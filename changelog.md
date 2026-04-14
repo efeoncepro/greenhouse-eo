@@ -2,6 +2,17 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-392: Management Accounting Reliable Actual Foundation Program cerrado como entrega documental
+
+- Nueva seccion `## Reliable Actual Foundation` en `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` con:
+  - **Definicion operativa de "actual confiable"** — 5 criterios obligatorios: reconciled, fully-loaded, period-aware, traceable, tested & transactional.
+  - **Tabla de fundaciones requeridas** mapeando cada criterio a la task owner que lo cierra.
+  - **Gate de readiness** — 6 checkboxes que una capability downstream de Management Accounting debe satisfacer antes de declararse enterprise-ready. 5 verdes al cierre del umbrella: TASK-174, TASK-175, TASK-179, TASK-401, TASK-167/192. 1 rojo: TASK-176 (labor provisions fully-loaded cost, ~12.5% gap).
+  - **Secuencia canonica de cierre** — orden de ataque canonico para llevar cualquier modulo economico a `reliable actual` sin saltarse pasos.
+- El umbrella se cierra aunque TASK-176 siga abierta porque la entrega del programa es la DEFINICION del gate, no el estado final de cada checkbox. Las capabilities downstream (TASK-393 period governance, TASK-395 planning, TASK-396 variance/forecast, TASK-397 financial costs, TASK-398 enterprise hardening) ahora tienen un criterio explicito de cuando pueden declararse ready.
+- TASK-176 queda flaggeada con un delta explicito como el unico blocker restante del gate.
+- Cierra el bloque de foundation tasks de Finance/Management Accounting del 2026-04-13: TASK-174 + TASK-175 + TASK-179 + TASK-401 + TASK-392 en una sola sesion.
+
 ### 2026-04-13 — TASK-401: Bank Reconciliation Continuous Matching — motor standalone + cron diario
 
 - Nuevo módulo `src/lib/finance/auto-match.ts` con el motor de scoring extraído de la route file period-scoped. Funciones puras (`amountMatches`, `dateMatchesWithinWindow`, `hasPartialReferenceMatch`, `scoreAutoMatches`) sin dependencias de DB, y un orchestrator `persistAutoMatchDecisions` con callbacks de persistencia inyectados. Contrato reutilizable desde cualquier trigger (manual, cron, post-sync).

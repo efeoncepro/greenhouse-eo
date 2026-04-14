@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-392 Management Accounting Reliable Actual Foundation Program (complete)
+
+- **Estado:** `complete` (umbrella cerrado como entrega documental; TASK-176 queda como unico blocker externo del gate)
+- **Rama:** `develop`
+- **Implementado:**
+  - `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` — nueva seccion `## Reliable Actual Foundation` insertada entre el roadmap de madurez y el checklist enterprise. Define 5 criterios operativos para "actual confiable" (reconciled, fully-loaded, period-aware, traceable, tested & transactional), tabla de fundaciones por criterio, gate de readiness (5 verdes + 1 rojo), y secuencia canonica de cierre.
+  - `docs/tasks/complete/TASK-392-...md` — spec del umbrella actualizada con snapshot del gate, deliverables y delta historico conservado.
+  - `docs/tasks/to-do/TASK-176-labor-provisions-fully-loaded-cost.md` — delta 2026-04-13 agregado flaggeandola como el unico blocker restante del gate.
+- **Decision clave:** el umbrella se cerro aunque TASK-176 sigue abierta. La entrega es la DEFINICION del gate, no el estado final de cada checkbox. Patron correcto para umbrella tasks: cerrar cuando el programa queda formalizado, dejar que las deps individuales vivan sus propios lifecycles, y confiar en el gate documentado para bloquear declaraciones prematuras de "enterprise-ready".
+- **Context dependencia:** en esta misma sesion se cerraron TASK-174, TASK-175, TASK-179 y TASK-401 — 4 de las 5 deps del gate. TASK-167 esta superseded por TASK-192 (cerrada en runtime, pendiente reclasificacion administrativa). Solo TASK-176 queda como trabajo real pendiente del gate.
+- **Unblocks (documentalmente):** TASK-393, TASK-395, TASK-396, TASK-397, TASK-398 — estas tasks downstream ahora tienen un criterio explicito de cuando pueden declararse ready (cuando el gate este 100% verde).
+
 ## Sesion 2026-04-13 — TASK-401 Bank Reconciliation Continuous Matching (complete)
 
 - **Estado:** `complete` (Slice 1 + Slice 2 + cron fallback; Slice 3 UX polish y hooks directos diferidos a follow-on)

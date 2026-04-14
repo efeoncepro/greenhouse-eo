@@ -1,4 +1,32 @@
-## Delta 2026-04-13
+## Delta 2026-04-13 (cierre del programa)
+
+El programa umbrella se cierra como entrega documental con **5 de 6 foundation deps cerradas**. La definicion operativa de "actual confiable", el gate de readiness y la secuencia recomendada quedaron formalizadas en `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` bajo la nueva seccion `Reliable Actual Foundation`.
+
+### Snapshot del gate al cierre
+
+| Dep | Estado | Nota |
+|---|---|---|
+| `TASK-174` — Finance data integrity hardening | ✅ complete | bulk atomicity, idempotency_keys migrada, FOR UPDATE NOWAIT, payment ledger transactional |
+| `TASK-175` — Finance core test coverage | ✅ complete | 64 tests nuevos sobre `postgres-store-slice2`, `postgres-reconciliation`, `payment-ledger`, P&L E2E |
+| `TASK-179` — Finance reconciliation Postgres-only cutover | ✅ complete | zero dual-write BQ en reconciliation paths; HubSpot schema validation con outbox drift events |
+| `TASK-401` — Bank reconciliation continuous matching | ✅ complete | motor standalone `auto-match.ts` + cron diario 07:45 UTC + endpoint manual |
+| `TASK-167` — Operational P&L organization scope | 🟡 superseded | cerrado en runtime via TASK-192 (org scope materializer), pendiente reclasificacion administrativa |
+| `TASK-176` — Labor provisions fully-loaded cost | 🔴 **OPEN** | unico blocker real del gate; gap material ~12.5% en labor cost hasta que cierre |
+
+### Que se entrega con el cierre de este umbrella
+
+1. Seccion `## Reliable Actual Foundation` en `GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` — definicion de 5 criterios (reconciled, fully-loaded, period-aware, traceable, tested & transactional) + tabla de fundaciones requeridas + gate de readiness + secuencia recomendada.
+2. Este snapshot del estado del programa como fuente de verdad para los tasks downstream (`TASK-393`, `TASK-395`, `TASK-396`, `TASK-397`, `TASK-398`).
+3. Criterio explicito: las capabilities downstream NO pueden declararse enterprise-ready hasta que `TASK-176` tambien cierre.
+
+### Que NO se entrega (y por que)
+
+- `TASK-176` (labor provisions) sigue abierta. El umbrella cierra porque su deliverable es la **definicion del gate**, no el estado final de cada checkbox. El proximo agente que intente declarar `planning` / `variance` ready debera verificar que el gate este al 100%.
+- `TASK-167` queda marcada como superseded sin ser movida administrativamente — es un cleanup menor independiente.
+
+---
+
+## Delta 2026-04-13 (historico — TASK-174)
 
 - TASK-174 cerrada. El bloque de integridad transaccional de Finance ya está implementado: bulk atomicity, idempotency keys (tabla PG migrada), SELECT FOR UPDATE NOWAIT en reconciliación y payment ledger con FOR UPDATE atómico. El gap de "reconciliación financiera todavía en hardening" de este programa se reduce — solo resta el cutover Postgres-only de TASK-179 para que actuals sean 100% confiables sin riesgo de doble escritura.
 
@@ -10,12 +38,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy Alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `Diseno estructural`
+- Status real: `Cerrado como programa documental 2026-04-13 — 5/6 foundation deps cerradas, TASK-176 queda como unico blocker del gate`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`

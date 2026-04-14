@@ -892,6 +892,63 @@ Regla:
 
 ---
 
+## Reliable Actual Foundation
+
+Esta seccion formaliza la fase `reliable actual` del roadmap de madurez y define que significa, operativamente, que el `actual` de Management Accounting sea **confiable**. Cualquier capability downstream (planning, variance, forecast, control tower) debe construirse sobre un actual que cumpla estos criterios; no sobre snapshots parcialmente reconciliados o calculos sin cobertura de pruebas.
+
+### Definicion de "actual confiable"
+
+Un periodo contable es `actual-reliable` cuando sus numeros cumplen, simultaneamente, los cinco criterios siguientes:
+
+1. **Reconciled.** Los movimientos bancarios del periodo estan matcheados contra sus `income_payments` / `expense_payments`. La conciliacion no depende exclusivamente del cierre mensual manual: el matching continuo debe mantener `is_reconciled = true` con lag maximo de 24 horas para movimientos con `payment_account_id` asignado.
+
+2. **Fully-loaded.** El costo laboral refleja compensacion + social security + provisiones legales (vacaciones, indemnizacion, mutual variable). Un actual sin provisiones subestima el costo real en ~12.5% y rompe el contrato de margen operativo.
+
+3. **Period-aware.** Las transacciones estan asignadas al periodo correcto segun reglas de cierre documentadas. Mutaciones fuera de ventana estan gobernadas por un lifecycle formal (open → calculated → reconciled → closed) con locking y state machine explicito.
+
+4. **Traceable.** Cada linea del P&L puede explicarse en fuentes aguas arriba: invoice → payment → bank row, o expense → allocation rule → cost center. No hay agregaciones opacas que impiden la auditoria inversa.
+
+5. **Tested & transactional.** El nucleo de persistencia (income/expense CRUD, reconciliation, payment ledger) tiene cobertura de tests sobre sus code paths criticos y opera dentro de transacciones atomicas con idempotency keys para prevenir doble escritura por retry.
+
+### Pre-requisitos (foundation block)
+
+Los cinco criterios anteriores descansan en un bloque fundacional explicito:
+
+| Criterio | Fundacion requerida | Task owner |
+|---|---|---|
+| Reconciled | Postgres-only reconciliation cutover + continuous auto-match | `TASK-179`, `TASK-401` |
+| Fully-loaded | Labor provisions en `member_capacity_economics` y `operational_pl` | `TASK-176` |
+| Period-aware | Locking + state machine en `reconciliation_periods` | `TASK-174` (slice reconciliation) |
+| Traceable | Scope organization en `operational_pl_snapshots` + tracing de allocations | `TASK-167` (superseded by `TASK-192`) |
+| Tested & transactional | Test coverage sobre `postgres-store-slice2`, `postgres-reconciliation`, `payment-ledger` + bulk atomicity + idempotency | `TASK-174`, `TASK-175` |
+
+### Gate de readiness para capabilities downstream
+
+Una capability de Management Accounting enterprise (planning, variance, forecast, control tower, financial costs integration) **no puede declararse ready** mientras alguno de los siguientes items siga pendiente:
+
+- [x] `TASK-174` — Finance data integrity: bulk atomicity, idempotency keys, SELECT FOR UPDATE NOWAIT en reconciliation period, payment ledger transactional
+- [x] `TASK-175` — Finance core test coverage: 64+ tests sobre `postgres-store-slice2`, `postgres-reconciliation`, `payment-ledger`, P&L E2E
+- [x] `TASK-179` — Finance reconciliation Postgres-only cutover: zero dual-write BigQuery en reconciliation paths
+- [x] `TASK-401` — Bank reconciliation continuous matching: motor standalone + cron diario para lag sub-24h
+- [x] `TASK-167` / `TASK-192` — Operational P&L con scope `organization` (superseded, efectivamente cerrado en runtime)
+- [ ] `TASK-176` — Labor provisions fully-loaded cost (Chile: vacaciones 4.17%, indemnizacion 8.33%, mutual variable ~1.5%)
+
+Mientras el ultimo item siga abierto, el `actual` tecnicamente sigue subestimando costo laboral. Las fases posteriores del roadmap (`controlled close`, `planning`, `variance and forecast`) pueden prepararse y disenarse en paralelo, pero su corte de ready depende de cerrar este gate en su totalidad.
+
+### Secuencia recomendada de cierre
+
+La secuencia canonica para llevar el modulo a `reliable actual` — y que siente precedente para como debe abrirse cualquier nueva lane que toque el nucleo economico — es:
+
+1. **Integridad transaccional primero** (`TASK-174`). Sin locking ni idempotency, cualquier refactor posterior introduce riesgo de double-entry.
+2. **Test coverage sobre el nucleo** (`TASK-175`). Ninguna refactorizacion del layer de persistencia debe hacerse sin red de seguridad.
+3. **Cutover Postgres-only** (`TASK-179`). Un actual con dual-write es un actual con dos verdades potenciales.
+4. **Continuous matching** (`TASK-401`). Sin auto-match, el lag del actual sigue siendo mensual, incompatible con dashboards intra-periodo.
+5. **Fully-loaded labor cost** (`TASK-176`). Cierra la ultima fuente de subestimacion material en el P&L.
+
+Los pasos 1-4 ya cerraron (ver TASK-392 en `complete/`). El paso 5 es el unico gap activo del gate.
+
+---
+
 ## Checklist de completitud enterprise
 
 Un modulo de `Management Accounting` no deberia considerarse enterprise-complete mientras falte alguno de estos bloques:
