@@ -4,7 +4,10 @@ import { timingSafeEqual } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
-const getExpectedToken = () => process.env.GREENHOUSE_INTEGRATION_API_TOKEN?.trim() || null
+const getExpectedToken = () =>
+  process.env.GREENHOUSE_INTEGRATION_API_TOKEN?.trim() ||
+  process.env.GREENHOUSE_SISTER_PLATFORM_TOKEN?.trim() ||
+  null
 
 const safeEquals = (left: string, right: string) => {
   const leftBuffer = Buffer.from(left)
@@ -24,7 +27,11 @@ const extractToken = (request: Request) => {
     return authorization.slice('bearer '.length).trim()
   }
 
-  return request.headers.get('x-greenhouse-integration-key')?.trim() || null
+  return (
+    request.headers.get('x-greenhouse-integration-key')?.trim() ||
+    request.headers.get('x-greenhouse-sister-platform-key')?.trim() ||
+    null
+  )
 }
 
 export const requireIntegrationRequest = (request: Request) => {
@@ -34,7 +41,10 @@ export const requireIntegrationRequest = (request: Request) => {
     return {
       authorized: false,
       errorResponse: NextResponse.json(
-        { error: 'Missing GREENHOUSE_INTEGRATION_API_TOKEN environment variable.' },
+        {
+          error:
+            'Missing GREENHOUSE_INTEGRATION_API_TOKEN or GREENHOUSE_SISTER_PLATFORM_TOKEN environment variable.'
+        },
         { status: 500 }
       )
     }
