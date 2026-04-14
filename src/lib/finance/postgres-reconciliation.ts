@@ -809,17 +809,66 @@ export const listUnmatchedStatementRowsFromPostgres = async (periodId: string) =
 
   return queryRows<{
     row_id: string
+    period_id: string
     transaction_date: string | Date
     description: string
     reference: string | null
     amount: unknown
   }>(
     `
-      SELECT row_id, transaction_date, description, reference, amount
+      SELECT row_id, period_id, transaction_date, description, reference, amount
       FROM greenhouse_finance.bank_statement_rows
       WHERE period_id = $1 AND match_status = 'unmatched'
     `,
     [periodId]
+  )
+}
+
+/**
+ * Period-agnostic variant for continuous auto-match (TASK-401).
+ * Loads unmatched bank statement rows across ALL open periods within a date range,
+ * optionally filtered by account. Every row still carries its period_id FK so the
+ * caller can forward it to updateStatementRowMatchInPostgres.
+ */
+export const listUnmatchedStatementRowsByDateRangeFromPostgres = async ({
+  fromDate,
+  toDate,
+  accountId
+}: {
+  fromDate: string
+  toDate: string
+  accountId?: string | null
+}) => {
+  await assertFinanceSlice2PostgresReady()
+
+  const params: unknown[] = [fromDate, toDate]
+  let accountFilter = ''
+
+  if (accountId) {
+    params.push(accountId)
+    accountFilter = `AND rp.account_id = $${params.length}`
+  }
+
+  return queryRows<{
+    row_id: string
+    period_id: string
+    transaction_date: string | Date
+    description: string
+    reference: string | null
+    amount: unknown
+  }>(
+    `
+      SELECT bsr.row_id, bsr.period_id, bsr.transaction_date, bsr.description, bsr.reference, bsr.amount
+      FROM greenhouse_finance.bank_statement_rows bsr
+      JOIN greenhouse_finance.reconciliation_periods rp ON rp.period_id = bsr.period_id
+      WHERE bsr.match_status = 'unmatched'
+        AND bsr.transaction_date BETWEEN $1::date AND $2::date
+        AND rp.status <> 'closed'
+        ${accountFilter}
+      ORDER BY bsr.transaction_date DESC, bsr.row_id
+      LIMIT 2000
+    `,
+    params
   )
 }
 
@@ -859,19 +908,55 @@ export const listReconciliationCandidatesFromPostgres = async ({
   limit?: number
   windowDays?: number
 }) => {
-  await assertFinanceSlice2PostgresReady()
-
   const period = await getReconciliationPeriodContextFromPostgres(periodId)
-  const boundedLimit = Math.min(200, Math.max(1, limit))
-  const candidateRowLimit = Math.min(800, Math.max(200, boundedLimit * 4))
-  const normalizedSearch = normalizeString(search).toLowerCase()
-  const searchPattern = normalizedSearch ? `%${normalizedSearch}%` : ''
 
   const { startDate, endDate } = getPeriodBounds({
     year: period.year,
     month: period.month,
     windowDays
   })
+
+  const result = await listReconciliationCandidatesByDateRangeFromPostgres({
+    startDate,
+    endDate,
+    type,
+    search,
+    limit
+  })
+
+  const padMonth = (m: number) => String(m).padStart(2, '0')
+
+  return {
+    period: { ...period, monthLabel: `${period.year}-${padMonth(period.month)}` },
+    items: result.items,
+    total: result.total
+  }
+}
+
+/**
+ * Period-agnostic candidate loader for continuous auto-match (TASK-401).
+ * Accepts an explicit { startDate, endDate } date window and runs the same 3-query
+ * cascade (settlement legs → payment rows → invoice fallback) for both income and expense.
+ */
+export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
+  startDate,
+  endDate,
+  type = 'all',
+  search,
+  limit = 100
+}: {
+  startDate: string
+  endDate: string
+  type?: ReconciliationCandidateType | 'all'
+  search?: string
+  limit?: number
+}) => {
+  await assertFinanceSlice2PostgresReady()
+
+  const boundedLimit = Math.min(200, Math.max(1, limit))
+  const candidateRowLimit = Math.min(800, Math.max(200, boundedLimit * 4))
+  const normalizedSearch = normalizeString(search).toLowerCase()
+  const searchPattern = normalizedSearch ? `%${normalizedSearch}%` : ''
 
   const shouldLoadIncome = type === 'all' || type === 'income'
   const shouldLoadExpense = type === 'all' || type === 'expense'
@@ -1273,10 +1358,7 @@ export const listReconciliationCandidatesFromPostgres = async ({
     return Math.abs(right.amount) - Math.abs(left.amount)
   })
 
-  const padMonth = (m: number) => String(m).padStart(2, '0')
-
   return {
-    period: { ...period, monthLabel: `${period.year}-${padMonth(period.month)}` },
     items: filtered.slice(0, boundedLimit),
     total: filtered.length
   }

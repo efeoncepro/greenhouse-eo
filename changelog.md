@@ -2,6 +2,17 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-401: Bank Reconciliation Continuous Matching — motor standalone + cron diario
+
+- Nuevo módulo `src/lib/finance/auto-match.ts` con el motor de scoring extraído de la route file period-scoped. Funciones puras (`amountMatches`, `dateMatchesWithinWindow`, `hasPartialReferenceMatch`, `scoreAutoMatches`) sin dependencias de DB, y un orchestrator `persistAutoMatchDecisions` con callbacks de persistencia inyectados. Contrato reutilizable desde cualquier trigger (manual, cron, post-sync).
+- Helpers period-agnostic en `postgres-reconciliation.ts`: `listUnmatchedStatementRowsByDateRangeFromPostgres` (joins con reconciliation_periods + optional account filter + LIMIT 2000) y `listReconciliationCandidatesByDateRangeFromPostgres` (extrae la cascada de 3 queries settlement_legs → payment_rows → invoice_fallback para income y expense). El wrapper period-scoped ahora delega al date-range variant.
+- Nuevo endpoint standalone `POST /api/finance/reconciliation/auto-match` con body `{ fromDate, toDate, accountId? }`. Cero acoplamiento con `reconciliation_periods` — carga bank_statement_rows por rango de fecha, aplica el motor, persiste resultados, devuelve counts + ventana.
+- Route period-scoped `POST /api/finance/reconciliation/[id]/auto-match` refactorizada: 195 LOC reducidas a 100, cero duplicación de scoring con la versión standalone.
+- Nuevo Vercel cron `/api/cron/reconciliation-auto-match` que corre diariamente a las 07:45 UTC (~08:45 CLT, 15 min después del nubox-sync). Ventana de 7 días, idempotente, con alertCronFailure en caso de error.
+- 22 tests unitarios nuevos en `auto-match.test.ts`: amount tolerance (±1), date window configurable, partial reference fallback (4-char prefix), ambiguity discard (ties skip), threshold customization, persistence callbacks con/sin actorUserId, rowPeriodMap skip semantics.
+- Suite: 1122 → 1148 tests verdes (26 nuevos netos). Lint clean, build OK.
+- Desbloquea: TASK-392 (management accounting) — el matching continuo cierra el gap de "actual confiable con lag mensual" al llevar el is_reconciled a tiempo real para los movimientos recientes.
+
 ### 2026-04-13 — TASK-179: Finance Reconciliation Postgres-Only Cutover & HubSpot Schema Hardening
 
 - `src/lib/finance/schema.ts`: removidos `fin_reconciliation_periods` y `fin_bank_statement_rows` del provisioning BigQuery. La reconciliación ya no provisiona tablas BQ. Las tablas BigQuery históricas quedan como read-only.

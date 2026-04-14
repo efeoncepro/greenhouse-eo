@@ -33,6 +33,10 @@
       "schedule": "30 7 * * *"
     },
     {
+      "path": "/api/cron/reconciliation-auto-match",
+      "schedule": "45 7 * * *"
+    },
+    {
       "path": "/api/cron/webhook-dispatch",
       "schedule": "*/2 * * * *"
     },

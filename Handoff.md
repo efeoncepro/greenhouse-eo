@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-401 Bank Reconciliation Continuous Matching (complete)
+
+- **Estado:** `complete` (Slice 1 + Slice 2 + cron fallback; Slice 3 UX polish y hooks directos diferidos a follow-on)
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/finance/auto-match.ts` (nuevo) — motor de scoring puro (amountMatches, dateMatchesWithinWindow, hasPartialReferenceMatch, scoreAutoMatches) + `persistAutoMatchDecisions` con callbacks inyectados. No DB, no side effects en las funciones de scoring. Contrato preparado para reusar desde cualquier trigger (manual, cron, post-sync).
+  - `src/lib/finance/postgres-reconciliation.ts` — extracción de `listReconciliationCandidatesByDateRangeFromPostgres` (date range en vez de period_id), `listUnmatchedStatementRowsByDateRangeFromPostgres` (joins con reconciliation_periods para filtrar por status, optional account filter, LIMIT 2000). El wrapper `listReconciliationCandidatesFromPostgres` ahora delega al date-range variant.
+  - `src/app/api/finance/reconciliation/auto-match/route.ts` (nuevo, standalone) — recibe `{ fromDate, toDate, accountId? }`, corre el motor, persiste, retorna counts + ventana.
+  - `src/app/api/finance/reconciliation/[id]/auto-match/route.ts` (refactor) — 195 LOC reducidas a 100; reusa `scoreAutoMatches()` + `persistAutoMatchDecisions()` del módulo compartido. Cero duplicación de scoring.
+  - `src/app/api/cron/reconciliation-auto-match/route.ts` (nuevo) — Vercel cron diario 07:45 UTC, ventana de 7 días, cron auth guard, alertCronFailure, idempotente vía filtro `match_status = 'unmatched'`.
+  - `vercel.json` — nueva entrada cron.
+  - `src/lib/finance/__tests__/auto-match.test.ts` (nuevo) — 22 tests sobre las funciones puras y el orchestrator.
+- **Total suite:** 1148 tests verdes. Lint clean, build OK.
+- **Nota de scope:** La spec describe hooks directos post-Nubox-sync y post-factoring. Decisión pragmática: el cron diario de 7 días cubre el mismo ground con menos acoplamiento. Si se requiere matching inmediato de un payment específico, el endpoint manual `POST /api/finance/reconciliation/auto-match` puede invocarse puntualmente.
+- **Insight aprendido:** El tier 0.85 del scoring ladder es efectivamente inalcanzable — su condición (hasPartialReferenceMatch) ya está capturada por el tier 0.95. El lift del código preserva el bug original; la corrección semántica queda como posible follow-on.
+- **Prereqs cerrados:** TASK-174 (locking), TASK-175 (test coverage), TASK-179 (Postgres-only) — los tres prerrequisitos de esta task fueron cerrados antes de implementar.
+
+## Sesion 2026-04-13 — ISSUE-048 payroll compensation member ambiguity fix local
+
+- **Estado:** `fix local aplicado, pendiente verificación en staging`
+- **Issue:** `docs/issues/open/ISSUE-048-payroll-compensation-member-id-ambiguous-silent-degradation.md`
+- **Root cause corregida:**
+  - `src/lib/payroll/postgres-store.ts`
+  - la CTE `current_compensation` en `pgListPayrollCompensationMembers()` usaba `member_id` sin alias en `DISTINCT ON`, `SELECT` y `ORDER BY`
+  - se corrigió a `cv.member_id`, `cv.effective_from` y `cv.version` para evitar `column reference "member_id" is ambiguous`
+- **Guardrail agregado:**
+  - `src/lib/payroll/postgres-store.test.ts`
+  - nueva prueba focalizada que inspecciona el SQL y asegura que el reader quede aliasado
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/payroll/postgres-store.test.ts`
+- **Decisión explícita de no tocar en este lote:**
+  - `pgGetCompensationOverview()` sigue degradando silenciosamente si falla el reader de miembros
+  - se dejó igual para mantener backward compatibility y limitar el diff al root cause confirmado del issue
+- **Pendiente operativo:**
+  - verificar en staging `/api/hr/payroll/compensation`
+  - validar visualmente `Payroll > Compensaciones vigentes` post-deploy
+
 ## Sesion 2026-04-13 — TASK-179 Finance Reconciliation Postgres-Only Cutover (complete)
 
 - **Estado:** `complete`

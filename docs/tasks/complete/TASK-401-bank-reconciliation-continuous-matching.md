@@ -12,12 +12,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Grande`
 - Type: `implementation`
-- Status real: `Diseño`
+- Status real: `Implementado (Slice 1+2 + cron fallback; UX polish de Slice 3 diferida)`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
