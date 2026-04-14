@@ -12079,3 +12079,34 @@ Fase 4 completada:
   - `ISSUE-042` organigrama usa reporting lines, no jerarquía estructural
   - `ISSUE-043` acceso al organigrama puede existir sin reflejo en el menú
 - No se hicieron fixes nuevos en esta sesión de auditoría; solo documentación y verificación end-to-end para dejar el estado reproducible.
+
+### Sesión 2026-04-14 — bridge de identidad compartida con Kortex
+
+- Sello de continuidad: `Kortex Agent`
+- Objetivo: hacer que Kortex consuma el mismo contrato de identidad de Greenhouse para credenciales compartidas, tenant context y autorización por organización/roles.
+- Cambios hechos en Greenhouse:
+  - `src/app/api/integrations/v1/sister-platforms/identity/route.ts`
+    - nuevo endpoint `POST /api/integrations/v1/sister-platforms/identity`
+    - autentica `email + password` contra `tenant access`
+    - devuelve contrato de identidad rico para sister platforms:
+      - `userId`, `clientId`, `clientName`, `tenantType`
+      - `roleCodes`, `primaryRoleCode`, `routeGroups`
+      - `projectScopes`, `campaignScopes`, `businessLines`, `serviceModules`, `projectIds`
+      - `featureFlags`, `timezone`, `portalHomePath`, `authMode`, `provider`, `microsoftEmail`
+      - `organization { clientId, clientName, tenantType }`
+    - actualiza `last login` con origen `sister_platform_credentials`
+  - `src/lib/integrations/integration-auth.ts`
+    - el guard de integración ahora acepta también `x-greenhouse-sister-platform-key`
+    - el token esperado puede venir de `GREENHOUSE_INTEGRATION_API_TOKEN` o `GREENHOUSE_SISTER_PLATFORM_TOKEN`
+- Cambios coordinados del lado Kortex:
+  - Kortex backend primero intenta validar credenciales contra este endpoint de Greenhouse; si Greenhouse no está configurado o falla, conserva fallback local
+  - Kortex web persiste en sesión/JWT el contrato extendido de identidad y filtra portales por `clientId` para tenants cliente
+- Commits asociados:
+  - Greenhouse: `762558257e607621567bbebf6bc3dc8be4b56907`
+  - Kortex: `a205dec961ceb01fadf8114e0685b00af287d64b`
+- Validación ejecutada:
+  - en Kortex web: `eslint` focalizado + `next build` OK
+  - en Kortex backend: `python3 -m py_compile services/agent/kortex_agent/card_api.py` OK
+- Nota operativa:
+  - Greenhouse quedó enlazado por CLI a Vercel scope `efeonce` durante esta sesión para poder forzar deploy productivo si el webhook no dispara solo
+  - si otro agente retoma, buscar este bloque por el sello `Kortex Agent`
