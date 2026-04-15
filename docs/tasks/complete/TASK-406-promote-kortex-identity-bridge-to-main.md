@@ -8,22 +8,22 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
-- Rank: `TBD`
+- Status real: `Complete`
+- Rank: `N/A`
 - Domain: `ops`
-- Blocked by: `TASK-405`
-- Branch: `task/TASK-406-promote-kortex-identity-bridge-to-main`
+- Blocked by: `none`
+- Branch: `main`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Una vez que `TASK-405` deje reconciliado el bridge de identidad Kortex dentro de `develop`, esta task debe promover ese estado a `main` sin reintroducir drift entre ramas, validar que el dominio canónico de Greenhouse sirva la surface correcta y dejar el handoff explícito para el rollout posterior del runtime Kortex.
+La promoción posterior a `TASK-405` quedó cerrada: `main` absorbió el estado reconciliado, el bridge de identidad Kortex vive en la línea productiva del repo y el dominio canónico responde con la capa de auth esperada.
 
 ## Why This Task Exists
 
@@ -62,7 +62,7 @@ Reglas obligatorias:
 
 - `docs/documentation/plataforma/sister-platform-bindings.md`
 - `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md`
-- `docs/tasks/to-do/TASK-405-reconcile-main-into-develop-kortex-identity.md`
+- `docs/tasks/complete/TASK-405-reconcile-main-into-develop-kortex-identity.md`
 - `Handoff.md`
 - `README.md`
 
@@ -70,7 +70,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-405-reconcile-main-into-develop-kortex-identity.md`
+- `docs/tasks/complete/TASK-405-reconcile-main-into-develop-kortex-identity.md`
 - `src/app/api/integrations/v1/sister-platforms/identity/route.ts`
 - `src/lib/integrations/integration-auth.ts`
 
@@ -82,7 +82,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-406-promote-kortex-identity-bridge-to-main.md`
+- `docs/tasks/complete/TASK-406-promote-kortex-identity-bridge-to-main.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `docs/tasks/README.md`
 - `Handoff.md`
@@ -99,9 +99,7 @@ Reglas obligatorias:
 
 ### Gap
 
-- Falta una task que cierre explícitamente la promoción posterior a `TASK-405`.
-- Falta dejar el check operativo de que el bridge reconciliado llegó a `main` y al dominio canónico.
-- Falta un handoff documentado que marque que el siguiente corte ya no es Greenhouse-only, sino rollout bilateral con Kortex.
+- Cerrado 2026-04-15. `main` quedó convergida en contenido con `develop`, el bridge reconciliado ya vive en la rama productiva y la verificación del dominio canónico devolvió `401` en `POST /api/integrations/v1/sister-platforms/identity`, confirmando existencia de la ruta y protección auth server-to-server.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -163,10 +161,10 @@ Si hay diferencia entre alias Vercel, proyecto enlazado localmente y dominio can
 
 ## Acceptance Criteria
 
-- [ ] `TASK-405` quedó absorbida en la promoción hacia `main` sin perder el bridge de identidad Kortex.
-- [ ] `src/app/api/integrations/v1/sister-platforms/identity/route.ts` y `src/lib/integrations/integration-auth.ts` viven ya en `main`.
-- [ ] `greenhouse.efeoncepro.com` apunta al deployment canónico que incluye ese bridge.
-- [ ] `Handoff.md` deja claro que el siguiente paso operativo vive del lado Kortex runtime/backend.
+- [x] `TASK-405` quedó absorbida en la promoción hacia `main` sin perder el bridge de identidad Kortex.
+- [x] `src/app/api/integrations/v1/sister-platforms/identity/route.ts` y `src/lib/integrations/integration-auth.ts` viven ya en `main`.
+- [x] `greenhouse.efeoncepro.com` apunta al deployment canónico que incluye ese bridge.
+- [x] `Handoff.md` deja claro que el siguiente paso operativo vive del lado Kortex runtime/backend.
 
 ## Verification
 
@@ -176,15 +174,22 @@ Si hay diferencia entre alias Vercel, proyecto enlazado localmente y dominio can
 - `vercel inspect greenhouse.efeoncepro.com --scope efeonce-7670142f`
 - smoke manual o CLI de `/api/integrations/v1/sister-platforms/identity` en el deployment canónico
 
+### Execution Notes
+
+- `origin/main` y `origin/develop` quedaron sin diferencias de contenido (`git diff --name-only origin/main origin/develop` -> `0`).
+- Commit de cierre documentado en `main`: `c4a57c78`.
+- Verificación operativa: `POST https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/identity` con body vacío devolvió `401`, consistente con la presencia del endpoint bajo capa de auth.
+- El cierre Greenhouse-side quedó registrado en `Handoff.md`; el siguiente paso ya no es reconciliación de ramas sino rollout/consumo desde el runtime Kortex.
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] quedó referenciado el commit/deployment exacto que Kortex debe consumir después del cierre Greenhouse-side
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`complete`)
+- [x] el archivo vive en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado con el cierre operativo
+- [x] `changelog.md` no requirió cambio adicional porque el cierre no introdujo comportamiento nuevo
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (`TASK-405`, `TASK-377`)
+- [x] quedó referenciado el commit/deployment exacto que Kortex debe consumir después del cierre Greenhouse-side
 
 ## Follow-ups
 
@@ -193,4 +198,4 @@ Si hay diferencia entre alias Vercel, proyecto enlazado localmente y dominio can
 
 ## Open Questions
 
-- Si la promoción final desde `develop` a `main` se hará por PR formal o por el mecanismo release que el equipo esté usando en ese momento.
+- Cerrado. La promoción Greenhouse-side ya quedó absorbida; el trabajo pendiente vive del lado del runtime Kortex y su rollout bilateral.

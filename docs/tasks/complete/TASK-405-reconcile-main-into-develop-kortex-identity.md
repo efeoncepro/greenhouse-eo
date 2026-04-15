@@ -8,22 +8,22 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
-- Rank: `TBD`
+- Status real: `Complete`
+- Rank: `N/A`
 - Domain: `ops`
 - Blocked by: `none`
-- Branch: `task/TASK-405-reconcile-main-into-develop-kortex-identity`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-`develop` y `main` en Greenhouse quedaron divergidas mientras el bridge de identidad compartida con Kortex se implemento directo en `main`. Esta task debe reconciliar ambas ramas sin perder los commits vivos de `develop`, preservando el endpoint `sister-platforms/identity`, el hardening de `integration-auth` y el handoff `Kortex Agent`.
+`develop` y `main` quedaron reconciliadas a nivel de contenido sin perder el bridge de identidad Kortex ni el trabajo vivo que existia en `develop`. El endpoint `sister-platforms/identity`, el hardening de `integration-auth` y el handoff `Kortex Agent` quedaron absorbidos dentro del estado convergido.
 
 ## Why This Task Exists
 
@@ -81,7 +81,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-405-reconcile-main-into-develop-kortex-identity.md`
+- `docs/tasks/complete/TASK-405-reconcile-main-into-develop-kortex-identity.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `docs/tasks/README.md`
 - `src/app/api/integrations/v1/sister-platforms/identity/route.ts`
@@ -104,9 +104,7 @@ Reglas obligatorias:
 
 ### Gap
 
-- `develop` todavía no incorpora el endpoint `src/app/api/integrations/v1/sister-platforms/identity/route.ts`.
-- `develop` todavía no incorpora el hardening de `src/lib/integrations/integration-auth.ts` para `x-greenhouse-sister-platform-key` y `GREENHOUSE_SISTER_PLATFORM_TOKEN`.
-- El sello documental `Kortex Agent` del handoff quedó solo en `main`.
+- Cerrado 2026-04-15. `develop` absorbio el endpoint `src/app/api/integrations/v1/sister-platforms/identity/route.ts`, el hardening de `src/lib/integrations/integration-auth.ts` y el bloque documental `Kortex Agent` sin perder los commits vivos de la rama.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -171,10 +169,10 @@ Si aparece conflicto sobre `Handoff.md` o docs/tasks, resolver manteniendo el bl
 
 ## Acceptance Criteria
 
-- [ ] Existe una rama de reconciliación basada en `develop` que incorpora los commits `76255825` y `314146ad` sin perder los commits exclusivos de `develop`.
-- [ ] `src/app/api/integrations/v1/sister-platforms/identity/route.ts` queda presente y funcional en la rama reconciliada.
-- [ ] `src/lib/integrations/integration-auth.ts` acepta `x-greenhouse-sister-platform-key` y puede validar `GREENHOUSE_INTEGRATION_API_TOKEN` o `GREENHOUSE_SISTER_PLATFORM_TOKEN`.
-- [ ] `Handoff.md` conserva el sello `Kortex Agent` y deja claro el siguiente paso de promoción.
+- [x] Existe una reconciliación basada en `develop` que incorporó los commits `76255825` y `314146ad` sin perder los commits exclusivos de `develop`.
+- [x] `src/app/api/integrations/v1/sister-platforms/identity/route.ts` quedó presente y funcional en el estado reconciliado.
+- [x] `src/lib/integrations/integration-auth.ts` acepta `x-greenhouse-sister-platform-key` y puede validar `GREENHOUSE_INTEGRATION_API_TOKEN` o `GREENHOUSE_SISTER_PLATFORM_TOKEN`.
+- [x] `Handoff.md` conserva el sello `Kortex Agent` y deja claro el siguiente paso de promoción.
 
 ## Verification
 
@@ -183,21 +181,27 @@ Si aparece conflicto sobre `Handoff.md` o docs/tasks, resolver manteniendo el bl
 - `pnpm build`
 - smoke manual de preview sobre `/api/integrations/v1/sister-platforms/identity` verificando que la ruta exista y responda con la capa de auth esperada
 
+### Execution Notes
+
+- La absorción del bridge Kortex en `develop` quedó registrada dentro de la reconciliación 2026-04-15.
+- Commit de cierre documentado en `develop`: `6ce4cf8e`.
+- La paridad de contenido entre `origin/main` y `origin/develop` quedó validada con `git diff --name-only origin/main origin/develop` -> `0`.
+- El cierre documental quedó reflejado en `Handoff.md` y en el índice de tasks.
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] quedó documentado si la promoción final debe ocurrir via PR `reconcile -> develop`, `develop -> main`, o ambas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`complete`)
+- [x] el archivo vive en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado con el cierre operativo
+- [x] `changelog.md` no requirió cambio adicional porque este cierre no introdujo comportamiento nuevo sobre runtime
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (`TASK-406`)
+- [x] quedó documentado que la promoción posterior hacia `main` fue absorbida en la reconciliación cerrada por `TASK-406`
 
 ## Follow-ups
 
-- Actualizar `TASK-377` si la reconciliación cambia el carril operativo esperado de Greenhouse -> Kortex.
-- Crear task espejo o PR de promoción si la rama reconciliada queda validada y lista para subir a `main`.
+- Actualizar `TASK-377` solo si el rollout posterior de Kortex runtime cambia el carril operativo esperado de Greenhouse -> Kortex.
 
 ## Open Questions
 
-- Si la promoción final debe hacerse primero hacia `develop` o si esta reconciliación se tomará como release-prep para `main`.
+- Cerrado. La reconciliación se ejecutó sobre `develop` y luego se absorbió en la convergencia final con `main`.
