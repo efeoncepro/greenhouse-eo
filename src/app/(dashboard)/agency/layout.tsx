@@ -30,7 +30,7 @@ export default async function AgencyLayout({ children }: { children: ReactNode }
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children

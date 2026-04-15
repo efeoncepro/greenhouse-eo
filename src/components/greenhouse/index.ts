@@ -41,6 +41,8 @@ export { default as ProjectTeamSection } from './ProjectTeamSection'
 export { default as SprintTeamVelocitySection } from './SprintTeamVelocitySection'
 export { default as BusinessLineBadge } from './BusinessLineBadge'
 export { default as BusinessLineMetadataCard } from './BusinessLineMetadataCard'
-export { default as CertificatePreviewDialog } from './CertificatePreviewDialog'
+
+// Intentionally excluded from the shared barrel: react-pdf eagerly loads pdfjs
+// and touches browser-only globals during SSR. Import it directly where needed.
 export { default as ProfessionalLinksCard } from './ProfessionalLinksCard'
 export { default as AboutMeCard } from './AboutMeCard'

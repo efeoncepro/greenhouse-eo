@@ -14,7 +14,7 @@ const HrOrgChartPage = async () => {
   const accessContext = await resolveHrOrgChartAccessContext(tenant)
 
   if (!accessContext) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return <HrOrgChartView />

@@ -19,7 +19,7 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
     items: [
       {
         label: 'Pulse',
-        href: '/dashboard',
+        href: '/home',
         icon: 'tabler-smart-home'
       },
       {
@@ -119,7 +119,7 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
       },
       {
         label: 'Torre de control',
-        href: '/internal/dashboard',
+        href: '/admin',
         icon: 'tabler-layout-dashboard'
       },
       {

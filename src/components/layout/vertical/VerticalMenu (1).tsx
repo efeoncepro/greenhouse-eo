@@ -48,7 +48,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const { data: session } = useSession()
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
-  const dashboardHref = session?.user?.portalHomePath || '/dashboard'
+  const dashboardHref = session?.user?.portalHomePath || '/home'
 
   const capabilityModules = resolveCapabilityModules({
     businessLines: session?.user?.businessLines || [],

@@ -13,7 +13,7 @@ export default async function Layout({ children, params }: ChildrenType & { para
   }
 
   if (tenant.tenantType !== 'client' || !tenant.routeGroups.includes('client')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   const { moduleId } = await params
@@ -24,7 +24,7 @@ export default async function Layout({ children, params }: ChildrenType & { para
   })
 
   if (!capabilityModule) {
-    redirect('/dashboard')
+    redirect('/home')
   }
 
   return children

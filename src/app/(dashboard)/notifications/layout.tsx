@@ -19,7 +19,7 @@ export default async function NotificationsLayout({ children }: { children: Reac
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children

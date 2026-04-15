@@ -22,7 +22,7 @@ export default async function Page() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/auth/landing')
+    redirect(tenant.portalHomePath)
   }
 
   return <GreenhouseSettings hasMicrosoftAuth={hasMicrosoftAuth} hasGoogleAuth={hasGoogleAuth} />

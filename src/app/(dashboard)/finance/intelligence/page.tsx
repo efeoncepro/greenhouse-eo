@@ -28,7 +28,7 @@ const IntelligencePage = async () => {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return (

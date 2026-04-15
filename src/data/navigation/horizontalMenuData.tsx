@@ -5,7 +5,7 @@ import { GH_CLIENT_NAV } from '@/config/greenhouse-nomenclature'
 const horizontalMenuData = (): HorizontalMenuDataType[] => [
   {
     label: GH_CLIENT_NAV.dashboard.label,
-    href: '/dashboard',
+    href: '/home',
     icon: 'tabler-smart-home'
   },
   {

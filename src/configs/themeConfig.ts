@@ -51,7 +51,7 @@ export type Config = {
 
 const themeConfig: Config = {
   templateName: 'Greenhouse',
-  homePageUrl: '/dashboard',
+  homePageUrl: '/home',
   settingsCookieName: 'greenhouse-eo-portal',
   mode: 'light', // 'system', 'light', 'dark'
   skin: 'default', // 'default', 'bordered'

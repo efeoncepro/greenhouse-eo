@@ -17,7 +17,7 @@ export default async function AgencyCapacityRedirect() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   redirect('/agency?tab=capacidad')

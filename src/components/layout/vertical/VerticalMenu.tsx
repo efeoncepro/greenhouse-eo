@@ -72,7 +72,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     roleCodes.includes(ROLE_CODES.FINANCE_ADMIN) ||
     roleCodes.includes(ROLE_CODES.FINANCE_ANALYST)
 
-  const dashboardHref = session?.user?.portalHomePath || '/dashboard'
+  const dashboardHref = session?.user?.portalHomePath || '/home'
 
   const hasSupervisorWorkspaceLanding =
     isInternalUser &&

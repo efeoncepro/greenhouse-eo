@@ -23,7 +23,7 @@ export default async function EmailPreviewPage() {
     fallback: tenant.routeGroups.includes('admin')
   })
 
-  if (!hasAccess) redirect(tenant.portalHomePath || '/dashboard')
+  if (!hasAccess) redirect(tenant.portalHomePath)
 
   return <EmailTemplatePreviewView />
 }

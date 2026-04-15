@@ -17,7 +17,7 @@ export default async function AgencySpacesRedirect() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   redirect('/agency?tab=spaces')

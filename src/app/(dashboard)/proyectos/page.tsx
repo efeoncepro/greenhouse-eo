@@ -12,7 +12,7 @@ export default async function Page() {
   }
 
   if (!tenant.routeGroups.includes('client')) {
-    redirect(tenant.portalHomePath || '/auth/landing')
+    redirect(tenant.portalHomePath)
   }
 
   return <GreenhouseProjects />

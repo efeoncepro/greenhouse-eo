@@ -20,7 +20,7 @@ export const dispatchWelcomeNotification = async (params: {
       category: 'system_event',
       title: 'Bienvenido a Greenhouse',
       body: 'Tu portal operativo está listo. Explora tus proyectos, métricas y herramientas.',
-      actionUrl: '/dashboard',
+      actionUrl: '/home',
       icon: 'tabler-plant-2',
       recipients: [{
         userId: params.userId,

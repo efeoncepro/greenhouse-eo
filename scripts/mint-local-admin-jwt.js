@@ -60,7 +60,7 @@ const loadNextAuthSecret = async () => {
       role: 'efeonce_admin',
       featureFlags: [],
       timezone: 'America/Santiago',
-      portalHomePath: '/internal/dashboard',
+      portalHomePath: '/home',
       authMode: 'both',
       provider: 'credentials',
       microsoftEmail: 'julio.reyes@efeonce.org'

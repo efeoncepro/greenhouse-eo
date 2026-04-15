@@ -20,7 +20,7 @@ export default async function HrPayrollLayout({ children }: { children: ReactNod
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children

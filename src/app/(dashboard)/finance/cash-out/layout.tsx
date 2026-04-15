@@ -20,7 +20,7 @@ export default async function FinanceCashOutLayout({ children }: { children: Rea
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children

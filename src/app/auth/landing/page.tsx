@@ -9,5 +9,5 @@ export default async function Page() {
     redirect('/login')
   }
 
-  redirect(session.user.portalHomePath || '/home')
+  redirect(session.user.portalHomePath)
 }

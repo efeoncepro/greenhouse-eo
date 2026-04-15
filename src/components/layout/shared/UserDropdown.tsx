@@ -38,7 +38,7 @@ const UserDropdown = () => {
   const router = useRouter()
   const { settings } = useSettings()
   const { data: session } = useSession()
-  const dashboardHref = session?.user?.portalHomePath || '/dashboard'
+  const dashboardHref = session?.user?.portalHomePath || '/home'
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
 

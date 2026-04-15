@@ -212,7 +212,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
               ? 'success'
               : 'warning',
         title: latestMonthlyDelivery ? latestMonthlyDelivery.label : 'Ultimo mes activo',
-        value: latestMonthlyDelivery?.onTimePct !== null ? `${latestMonthlyDelivery?.onTimePct}%` : 'Sin dato',
+        value: latestMonthlyDelivery?.onTimePct != null ? `${latestMonthlyDelivery.onTimePct}%` : 'Sin dato',
         detail: latestMonthlyDelivery
           ? `${latestMonthlyDelivery.totalDeliverables} entregables visibles en la serie actual.`
           : 'Todavia no hay meses con entregables visibles en el alcance actual.',

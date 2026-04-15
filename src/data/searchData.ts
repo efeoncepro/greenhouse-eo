@@ -9,7 +9,7 @@ type SearchData = {
 
 const data: SearchData[] = [
   // Dashboards
-  { id: '1', name: 'Pulse', url: '/dashboards', icon: 'tabler-trending-up', section: 'Dashboards' },
+  { id: '1', name: 'Home', url: '/home', icon: 'tabler-smart-home', section: 'Dashboards' },
   { id: '2', name: 'Dashboard financiero', url: '/finance', icon: 'tabler-chart-bar', section: 'Dashboards' },
 
   // Finanzas

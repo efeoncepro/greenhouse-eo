@@ -15,7 +15,7 @@ const LeavePage = async () => {
   const accessContext = hasAccess ? null : await resolveHrLeaveAccessContext(tenant)
 
   if (!hasAccess && !accessContext) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return <HrLeaveView />

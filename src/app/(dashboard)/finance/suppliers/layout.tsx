@@ -20,7 +20,7 @@ export default async function FinanceSuppliersLayout({ children }: { children: R
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children
