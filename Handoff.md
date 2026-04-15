@@ -66,6 +66,23 @@
     - `leave_request_decision` -> `dferreira@efeoncepro.com` -> `status=sent` -> `resend_id=1497dfc7-4d98-4e7a-85b7-260f3b00da06`
     - `notification` -> `daniela.ferreira@efeonce.org` -> `status=sent` -> `resend_id=dc34b39a-9caf-4b96-8e43-49b39c9203c8`
   - nota: `POST /api/admin/ops/email-delivery-retry` ya no encontró backlog pendiente porque esas tres entregas ya habían sido drenadas exitosamente antes del recheck final
+- **Delta 2026-04-15 15:58 CLST — worker compartido alineado también para production**
+  - investigación confirmó que hoy no existe `greenhouse-pg-prod`; la topología vigente sigue siendo una única instancia `greenhouse-pg-dev` consumida por todos los runtimes
+  - el drift real estaba en `ops-worker`: venía sirviendo con `RESEND_API_KEY_SECRET_REF=greenhouse-resend-api-key-staging`
+  - se creó el secret `greenhouse-resend-api-key-production` en Secret Manager y se le otorgó `roles/secretmanager.secretAccessor` al SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+  - `services/ops-worker/deploy.sh` quedó endurecido para:
+    - soportar overrides explícitos de `NEXTAUTH_SECRET_REF`, `PG_PASSWORD_REF`, `PG_INSTANCE` y `RESEND_API_KEY_SECRET_REF`
+    - dejar `ENV=production` alineado a la topología real actual en vez de asumir refs/instancias productivas inexistentes
+  - deploy productivo ejecutado desde worktree limpio (el árbol principal tenía cambios de payroll que rompían el tarball de Cloud Build) -> revisión activa `ops-worker-00012-shc`
+  - contrato activo verificado en Cloud Run:
+    - `NEXTAUTH_SECRET -> greenhouse-nextauth-secret-production`
+    - `RESEND_API_KEY -> greenhouse-resend-api-key-production`
+    - `RESEND_API_KEY_SECRET_REF=greenhouse-resend-api-key-production`
+    - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`
+    - `GREENHOUSE_POSTGRES_PASSWORD -> greenhouse-pg-dev-app-password`
+  - smoke adicional sobre producción:
+    - últimos 7 días: `0` filas con `error_message='RESEND_API_KEY is not configured.'`
+    - últimos 7 días: `leave_request_decision=2 sent`, `leave_review_confirmation=2 sent`
 
 ## Sesion 2026-04-15 — Reconciliacion main/develop (content parity)
 

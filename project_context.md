@@ -12,6 +12,21 @@
   - cualquier runtime que procese proyecciones reactivas de email debe recibir el mismo contrato (`RESEND_API_KEY_SECRET_REF` o fallback explícito equivalente), no una configuración manual divergente
   - `EMAIL_FROM` deja de asumirse implícito en Cloud Run y debe propagarse también al worker cuando ese runtime emite emails
 
+## Delta 2026-04-15 Production ops-worker deploy contract aligned to actual shared infrastructure
+
+- El deploy del `ops-worker` ya no debe asumir una topología `production` separada que hoy no existe en GCP.
+- Runtime actualizado:
+  - `services/ops-worker/deploy.sh` usa defaults por ambiente pero ahora permite overrides explícitos para `NEXTAUTH_SECRET_REF`, `PG_PASSWORD_REF`, `PG_INSTANCE` y `RESEND_API_KEY_SECRET_REF`
+  - el deploy `ENV=production` quedó alineado al contrato real:
+    - `NEXTAUTH_SECRET` desde `greenhouse-nextauth-secret-production`
+    - `RESEND_API_KEY` desde `greenhouse-resend-api-key-production`
+    - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` sigue apuntando a `efeonce-group:us-east4:greenhouse-pg-dev`
+    - `GREENHOUSE_POSTGRES_PASSWORD` sigue resolviendo `greenhouse-pg-dev-app-password`
+- Contrato operativo:
+  - hoy existe **un worker Cloud Run compartido** (`ops-worker`) y **una única instancia Cloud SQL** (`greenhouse-pg-dev`)
+  - `ENV=production` no significa “infra PostgreSQL separada”; significa `auth/email/secrets` de producción sobre la infraestructura compartida vigente
+  - si en el futuro aparece una instancia o password dedicada de producción, el deploy debe hacerse por override explícito o actualizando los defaults, no inventando refs inexistentes
+
 ## Delta 2026-04-13 Entitlements modulares quedan formalizados como dirección canónica de autorización
 
 - Greenhouse ya tiene una arquitectura explícita para evolucionar desde `roleCodes + routeGroups + authorizedViews` hacia una capa de entitlements modular, action-based y scope-aware.

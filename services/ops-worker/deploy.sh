@@ -50,20 +50,28 @@ DEFAULT_EMAIL_FROM="Efeonce Greenhouse <greenhouse@efeoncepro.com>"
 # Cloud Scheduler timezone
 SCHEDULER_TZ="America/Santiago"
 
-# Environment-specific secrets (Secret Manager references)
+# Environment-specific defaults (overridable)
 if [ "${ENV}" = "production" ]; then
-  NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-production:latest"
-  PG_PASSWORD_REF="greenhouse-pg-prod-app-password:latest"
-  PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-prod"
+  DEFAULT_NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-production:latest"
+  # Production currently shares the canonical Cloud SQL instance and app password
+  # with the rest of the portal runtime. Keep the contract overrideable so the
+  # script can move to dedicated prod infrastructure without another refactor.
+  DEFAULT_PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
+  DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
+  DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-production"
   echo "=== PRODUCTION deployment ==="
 else
-  NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-staging:latest"
-  PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
-  PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
+  DEFAULT_NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-staging:latest"
+  DEFAULT_PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
+  DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
+  DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-staging"
   echo "=== STAGING deployment ==="
 fi
 
-RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-}"
+NEXTAUTH_SECRET_REF="${NEXTAUTH_SECRET_REF:-${DEFAULT_NEXTAUTH_SECRET_REF}}"
+PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
+PG_INSTANCE="${PG_INSTANCE:-${DEFAULT_PG_INSTANCE}}"
+RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-${DEFAULT_RESEND_API_KEY_SECRET_REF}}"
 EMAIL_FROM="${EMAIL_FROM:-${DEFAULT_EMAIL_FROM}}"
 
 # ─── Secret access helpers ───────────────────────────────────────────────────
