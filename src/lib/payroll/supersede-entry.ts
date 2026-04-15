@@ -145,19 +145,45 @@ export const supersedePayrollEntryOnRecalculate = async ({
     }
 
     // Case A: first supersession. We need to create a new v2 row.
-    // Mark v1 as inactive first to free up the partial unique index, then
-    // insert v2 with version=2 / is_active=true / reopen_audit_id set.
+    //
+    // Transaction ordering is non-trivial because two constraints interact:
+    //
+    //   1. Partial unique index `payroll_entries_period_member_active_unique`
+    //      forbids two rows with `is_active = TRUE` for the same
+    //      (period_id, member_id). v1 MUST be marked inactive before v2 is
+    //      inserted as active.
+    //
+    //   2. Foreign key `payroll_entries_superseded_by_fkey` is checked
+    //      immediately (it is not DEFERRABLE). We CANNOT set
+    //      v1.superseded_by = v2.entry_id before v2 exists — the FK
+    //      validation fails with `23503` and the whole transaction rolls
+    //      back with `Unable to calculate payroll.`
+    //
+    // Correct sequence (three statements, respects both constraints):
+    //
+    //   Step 1: UPDATE v1 SET is_active = FALSE
+    //           → partial unique index is now free for v2
+    //           → superseded_by stays NULL (valid FK — null allowed)
+    //
+    //   Step 2: INSERT v2 with is_active = TRUE and reopen_audit_id
+    //           → partial unique index OK because v1 is inactive
+    //           → v2.entry_id now exists in the table
+    //
+    //   Step 3: UPDATE v1 SET superseded_by = v2.entry_id
+    //           → FK OK because v2 exists
+    //           → chain is complete
+    //
     const newEntryId = `payroll-entry-${randomUUID()}`
 
+    // Step 1 — free the partial unique index without touching superseded_by.
     await client.query(
       `
         UPDATE greenhouse_payroll.payroll_entries
         SET is_active = FALSE,
-            superseded_by = $2,
             updated_at = CURRENT_TIMESTAMP
         WHERE entry_id = $1
       `,
-      [previousEntryId, newEntryId]
+      [previousEntryId]
     )
 
     const entryForInsert: PayrollEntry = {
@@ -165,6 +191,8 @@ export const supersedePayrollEntryOnRecalculate = async ({
       entryId: newEntryId
     }
 
+    // Step 2 — insert v2 as the new active row. pgUpsertPayrollEntry writes
+    // version / is_active / reopen_audit_id via the supersede options path.
     await pgUpsertPayrollEntry(entryForInsert, {
       client,
       supersede: {
@@ -181,6 +209,17 @@ export const supersedePayrollEntryOnRecalculate = async ({
         operationalMonth
       }
     })
+
+    // Step 3 — link v1 to its successor. Safe now because v2 exists.
+    await client.query(
+      `
+        UPDATE greenhouse_payroll.payroll_entries
+        SET superseded_by = $2,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE entry_id = $1
+      `,
+      [previousEntryId, newEntryId]
+    )
 
     return {
       entryId: newEntryId,
