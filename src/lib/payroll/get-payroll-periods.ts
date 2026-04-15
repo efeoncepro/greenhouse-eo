@@ -83,7 +83,13 @@ const normalizePayrollPeriod = (row: PayrollPeriodRow): PayrollPeriod => ({
   periodId: String(row.period_id || ''),
   year: toNumber(row.year),
   month: toNumber(row.month),
-  status: row.status === 'approved' || row.status === 'exported' || row.status === 'calculated' ? row.status : 'draft',
+  status:
+    row.status === 'approved' ||
+    row.status === 'exported' ||
+    row.status === 'calculated' ||
+    row.status === 'reopened'
+      ? row.status
+      : 'draft',
   calculatedAt: toTimestampString(row.calculated_at),
   calculatedBy: row.calculated_by || null,
   approvedAt: toTimestampString(row.approved_at),

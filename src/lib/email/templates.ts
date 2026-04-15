@@ -8,6 +8,7 @@ import LeaveReviewConfirmationEmail from '@/emails/LeaveReviewConfirmationEmail'
 import NotificationEmail from '@/emails/NotificationEmail'
 import PasswordResetEmail from '@/emails/PasswordResetEmail'
 import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
+import PayrollLiquidacionV2Email from '@/emails/PayrollLiquidacionV2Email'
 import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
 import VerifyEmail from '@/emails/VerifyEmail'
 
@@ -125,6 +126,44 @@ const buildPayrollReceiptPlainText = (context: {
         '',
         '— Greenhouse by Efeonce Group'
       ].join('\n')
+}
+
+const buildPayrollLiquidacionV2PlainText = (context: {
+  fullName: string
+  periodYear: number
+  periodMonth: number
+  previousNetTotal: number
+  newNetTotal: number
+  currency: 'CLP' | 'USD'
+  receiptUrl?: string
+}) => {
+  const monthName = MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)
+  const firstName = context.fullName.split(' ')[0] || context.fullName
+  const delta = context.newNetTotal - context.previousNetTotal
+
+  const deltaLabel =
+    delta > 0
+      ? `+${formatMoney(Math.abs(delta), context.currency)}`
+      : delta < 0
+        ? `-${formatMoney(Math.abs(delta), context.currency)}`
+        : 'Sin cambios netos'
+
+  const link = context.receiptUrl ?? `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/my/payroll`
+
+  return [
+    `Hola ${firstName},`,
+    '',
+    `Actualizamos tu liquidación de ${monthName} ${context.periodYear}. Esta versión reemplaza a la anterior y ya está disponible en Greenhouse.`,
+    '',
+    'Resumen:',
+    `- Líquido anterior: ${formatMoney(context.previousNetTotal, context.currency)}`,
+    `- Líquido actualizado: ${formatMoney(context.newNetTotal, context.currency)}`,
+    `- Diferencia: ${deltaLabel}`,
+    '',
+    `Ver liquidación actualizada: ${link}`,
+    '',
+    '— Greenhouse by Efeonce Group'
+  ].join('\n')
 }
 
 const buildNotificationPlainText = (context: {
@@ -328,6 +367,28 @@ registerTemplate('payroll_receipt', (context: {
     content: context.pdfBuffer,
     contentType: 'application/pdf'
   }]
+}))
+
+registerTemplate('payroll_liquidacion_v2', (context: {
+  fullName: string
+  periodYear: number
+  periodMonth: number
+  previousNetTotal: number
+  newNetTotal: number
+  currency: 'CLP' | 'USD'
+  receiptUrl?: string
+}) => ({
+  subject: `Tu liquidación de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} fue actualizada`,
+  react: PayrollLiquidacionV2Email({
+    fullName: context.fullName,
+    periodYear: context.periodYear,
+    periodMonth: context.periodMonth,
+    previousNetTotal: context.previousNetTotal,
+    newNetTotal: context.newNetTotal,
+    currency: context.currency,
+    receiptUrl: context.receiptUrl
+  }),
+  text: buildPayrollLiquidacionV2PlainText(context)
 }))
 
 // ── Leave Request Decision (to the requester) ──
@@ -755,6 +816,30 @@ registerPreviewMeta('payroll_receipt', {
     { key: 'totalDeductions', label: 'Descuentos', type: 'number' },
     { key: 'netTotal', label: 'Liquido', type: 'number' },
     { key: 'payRegime', label: 'Regimen', type: 'select', options: ['chile', 'international'] }
+  ]
+})
+
+registerPreviewMeta('payroll_liquidacion_v2', {
+  label: 'Liquidacion actualizada (v2)',
+  description: 'Aviso al colaborador de que su liquidacion fue reliquidada y esta disponible en una nueva version',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    periodYear: 2026,
+    periodMonth: 3,
+    previousNetTotal: 1480000,
+    newNetTotal: 1550000,
+    currency: 'CLP'
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'periodYear', label: 'Ano', type: 'number' },
+    { key: 'periodMonth', label: 'Mes (1-12)', type: 'number' },
+    { key: 'previousNetTotal', label: 'Liquido anterior', type: 'number' },
+    { key: 'newNetTotal', label: 'Liquido actualizado', type: 'number' },
+    { key: 'currency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'receiptUrl', label: 'URL del recibo', type: 'text' }
   ]
 })
 

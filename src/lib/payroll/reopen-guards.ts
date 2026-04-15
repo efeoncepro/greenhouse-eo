@@ -96,9 +96,8 @@ export const assertPeriodReopenable = (snapshot: ReopenPeriodSnapshot): void => 
  * Retorna `false` — el período NO fue declarado a Previred aún según la
  * inferencia V1. El valor se persiste en el audit como snapshot.
  */
-export const checkPreviredDeclaredSnapshot = (_periodId: string): boolean => {
-  return false
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const checkPreviredDeclaredSnapshot = (_periodId: string): boolean => false
 
 /**
  * Valida que el motivo de reopen viene de la taxonomía controlada y que

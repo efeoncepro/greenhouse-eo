@@ -87,6 +87,7 @@ export const reopenPayrollPeriod = async (
   return withTransaction(async client => {
     // 1 & 2 — load the period under FOR UPDATE NOWAIT lock.
     let snapshot
+
     try {
       snapshot = await assertNoExportInProgress(periodId, client)
     } catch (error) {
@@ -98,6 +99,7 @@ export const reopenPayrollPeriod = async (
           409
         )
       }
+
       throw error
     }
 
@@ -177,6 +179,7 @@ export const reopenPayrollPeriod = async (
  */
 export const getActiveReopenAuditForPeriod = async (periodId: string) => {
   const { query } = await import('@/lib/db')
+
   const rows = await query<{
     audit_id: string
     period_id: string

@@ -264,6 +264,18 @@ export interface PayrollEntry {
   adjustedColacionAmount: number | null
   adjustedMovilizacionAmount: number | null
   adjustedFixedBonusAmount: number | null
+
+  /** TASK-410/412 — version number within (period, member). v1 = original, v2+ = reliquidation. */
+  version: number
+
+  /** TASK-410/412 — whether this row is the currently authoritative version. */
+  isActive: boolean
+
+  /** TASK-410/412 — entry_id of the version that superseded this one, if any. */
+  supersededBy: string | null
+
+  /** TASK-410/412 — reopen audit row that justified this version (null for v1). */
+  reopenAuditId: string | null
   createdAt: string | null
   updatedAt: string | null
 }

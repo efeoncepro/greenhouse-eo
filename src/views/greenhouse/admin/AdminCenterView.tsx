@@ -273,6 +273,22 @@ const buildDomainCards = ({
     ]
   },
   {
+    id: 'payroll-reopen-audit',
+    title: 'Auditoría de nómina',
+    subtitle: 'Historial de períodos de nómina reabiertos para reliquidación y sus justificaciones.',
+    icon: 'tabler-file-alert',
+    avatarColor: 'warning',
+    status: { label: 'Activo', color: 'success' },
+    href: '/admin/payroll-reopen-audit',
+    primaryAction: 'Abrir auditoría',
+    routes: ['/admin/payroll-reopen-audit'],
+    points: [
+      'Cada reapertura queda registrada con operador, motivo y estado previo',
+      'Filtra por mes operativo o por usuario que ejecutó la reapertura',
+      'Insumo para compliance y reporting de cambios en liquidaciones cerradas'
+    ]
+  },
+  {
     id: 'spaces',
     title: 'Spaces',
     subtitle: 'Provisioning context, enablement y postura de acceso por tenant.',

@@ -188,6 +188,12 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   adjustedColacionAmount: toNullableNumber(row.adjusted_colacion_amount),
   adjustedMovilizacionAmount: toNullableNumber(row.adjusted_movilizacion_amount),
   adjustedFixedBonusAmount: toNullableNumber(row.adjusted_fixed_bonus_amount),
+
+  // TASK-412 — versioning lives only in Postgres. BQ fallback defaults to v1.
+  version: 1,
+  isActive: true,
+  supersededBy: null,
+  reopenAuditId: null,
   createdAt: toTimestampString(row.created_at),
   updatedAt: toTimestampString(row.updated_at)
 })

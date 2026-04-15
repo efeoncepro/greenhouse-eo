@@ -45,6 +45,7 @@ export async function POST(
     const { periodId } = await params
 
     let body: ReopenRequestBody = {}
+
     try {
       body = (await request.json()) as ReopenRequestBody
     } catch {

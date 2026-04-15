@@ -102,14 +102,24 @@ export const materializePayrollExpensesForExportedPeriod = async ({
   let payrollSkipped = 0
 
   for (const row of payrollRows) {
+    // TASK-411 — dedupe by (period_id, member_id) instead of payroll_entry_id.
+    // After a reliquidación, v2 has a new entry_id so the legacy entry_id check
+    // would let the exported materialization re-create the base expense and
+    // double-count against the delta row. Only the base (source_type
+    // 'payroll_generated') row is relevant here; the reliquidación delta rows
+    // coexist on the same (period, member) via source_type
+    // 'payroll_reliquidation' and are intentionally ignored by this check.
     const existing = await runGreenhousePostgresQuery<ExistingExpenseRow>(
       `
         SELECT expense_id
         FROM greenhouse_finance.expenses
-        WHERE payroll_entry_id = $1
+        WHERE payroll_period_id = $1
+          AND member_id = $2
+          AND expense_type = 'payroll'
+          AND source_type = 'payroll_generated'
         LIMIT 1
       `,
-      [row.entry_id]
+      [row.period_id, row.member_id]
     )
 
     if (existing.length > 0) {

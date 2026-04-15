@@ -5,6 +5,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { PayrollPeriod } from '@/types/payroll'
 
+// TASK-412 — the period tab reads the session to decide whether to show
+// the admin-only "Reabrir nómina" action. Stub useSession so jsdom renders
+// don't need a full SessionProvider wrapper.
+vi.mock('next-auth/react', () => ({
+  useSession: () => ({ data: { user: { roleCodes: [] } } })
+}))
+
 import PayrollPeriodTab from './PayrollPeriodTab'
 
 const period: PayrollPeriod = {

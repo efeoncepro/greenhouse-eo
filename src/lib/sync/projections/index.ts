@@ -22,6 +22,7 @@ import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
+import { payrollReliquidationDeltaProjection } from './payroll-reliquidation-delta'
 import { agencyPerformanceReportProjection } from './agency-performance-report'
 import { icoAiSignalsProjection } from './ico-ai-signals'
 import { icoLlmEnrichmentsProjection } from './ico-llm-enrichments'
@@ -55,6 +56,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(periodClosureStatusProjection)
   registerProjection(providerToolingProjection)
   registerProjection(financeExpenseReactiveIntakeProjection)
+  registerProjection(payrollReliquidationDeltaProjection)
   registerProjection(accountBalancesProjection)
   registerProjection(staffAugPlacementProjection)
   registerProjection(commercialCostAttributionProjection)

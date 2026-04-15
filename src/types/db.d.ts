@@ -1810,6 +1810,10 @@ export interface GreenhouseFinanceExpenses {
   receipt_date: Timestamp | null;
   reconciliation_id: string | null;
   recurrence_frequency: string | null;
+  /**
+   * FK to greenhouse_payroll.payroll_period_reopen_audit for expense rows that represent a reliquidación delta (TASK-411). NULL for every other expense.
+   */
+  reopen_audit_id: string | null;
   service_line: string | null;
   sii_document_status: string | null;
   social_security_institution: string | null;

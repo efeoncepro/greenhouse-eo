@@ -216,6 +216,10 @@ type PgEntryRow = {
   adjusted_colacion_amount: number | string | null
   adjusted_movilizacion_amount: number | string | null
   adjusted_fixed_bonus_amount: number | string | null
+  version: number | string | null
+  is_active: boolean | null
+  superseded_by: string | null
+  reopen_audit_id: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
 }
@@ -487,7 +491,13 @@ const mapPeriod = (row: PgPeriodRow): PayrollPeriod => ({
   periodId: row.period_id,
   year: toNumber(row.year),
   month: toNumber(row.month),
-  status: row.status === 'approved' || row.status === 'exported' || row.status === 'calculated' ? row.status : 'draft',
+  status:
+    row.status === 'approved' ||
+    row.status === 'exported' ||
+    row.status === 'calculated' ||
+    row.status === 'reopened'
+      ? row.status
+      : 'draft',
   calculatedAt: toPgTimestampString(row.calculated_at),
   calculatedBy: normalizeNullableString(row.calculated_by_user_id),
   approvedAt: toPgTimestampString(row.approved_at),
@@ -581,6 +591,10 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   adjustedColacionAmount: toNullableNumber(row.adjusted_colacion_amount),
   adjustedMovilizacionAmount: toNullableNumber(row.adjusted_movilizacion_amount),
   adjustedFixedBonusAmount: toNullableNumber(row.adjusted_fixed_bonus_amount),
+  version: row.version != null ? Number(row.version) : 1,
+  isActive: row.is_active == null ? true : Boolean(row.is_active),
+  supersededBy: normalizeNullableString(row.superseded_by),
+  reopenAuditId: normalizeNullableString(row.reopen_audit_id),
   createdAt: toPgTimestampString(row.created_at),
   updatedAt: toPgTimestampString(row.updated_at)
 })
@@ -1871,6 +1885,10 @@ const ENTRY_BASE_SELECT = `
     e.adjusted_colacion_amount,
     e.adjusted_movilizacion_amount,
     e.adjusted_fixed_bonus_amount,
+    e.version,
+    e.is_active,
+    e.superseded_by,
+    e.reopen_audit_id,
     e.created_at,
     e.updated_at
   FROM greenhouse_payroll.payroll_entries AS e

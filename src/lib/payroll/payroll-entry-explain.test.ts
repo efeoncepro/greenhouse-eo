@@ -131,6 +131,10 @@ const entry: PayrollEntry = {
   adjustedColacionAmount: 0,
   adjustedMovilizacionAmount: 0,
   adjustedFixedBonusAmount: 67.5,
+  version: 1,
+  isActive: true,
+  supersededBy: null,
+  reopenAuditId: null,
   createdAt: null,
   updatedAt: null
 }

@@ -22,11 +22,15 @@ describe('reopen-guards — TASK-410', () => {
       REOPEN_REASON_VALUES.forEach(reason => {
         if (reason === 'otro') {
           const result = assertValidReopenReason(reason, 'detalle obligatorio')
+
           expect(result.reason).toBe('otro')
           expect(result.reasonDetail).toBe('detalle obligatorio')
-          return
+          
+return
         }
+
         const result = assertValidReopenReason(reason, null)
+
         expect(result.reason).toBe(reason)
         expect(result.reasonDetail).toBeNull()
       })
@@ -43,6 +47,7 @@ describe('reopen-guards — TASK-410', () => {
 
     it('trims whitespace from detail for non-otro reasons', () => {
       const result = assertValidReopenReason('error_calculo', '  bug en bono RPA  ')
+
       expect(result.reasonDetail).toBe('bug en bono RPA')
     })
   })

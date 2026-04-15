@@ -377,6 +377,10 @@ export const buildPayrollEntry = async ({
     adjustedColacionAmount: deductibleDays > 0 ? adjustedColacionAmount : null,
     adjustedMovilizacionAmount: deductibleDays > 0 ? adjustedMovilizacionAmount : null,
     adjustedFixedBonusAmount: deductibleDays > 0 ? adjustedFixedBonusAmount : null,
+    version: 1,
+    isActive: true,
+    supersededBy: null,
+    reopenAuditId: null,
     createdAt: null,
     updatedAt: null
   }
