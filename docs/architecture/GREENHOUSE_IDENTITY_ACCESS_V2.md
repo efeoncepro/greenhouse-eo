@@ -1,5 +1,23 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-13 — portal home contract converges on `/home` with centralized policy resolution (TASK-400)
+
+- `/home` queda como startup contract canónico del portal.
+- `portalHomePath` ya no se resuelve con fallbacks dispersos en root, auth, provisioning o shell; vive en una policy centralizada del runtime.
+- La policy actual distingue explícitamente:
+  - `client_default` → `/home`
+  - `internal_default` → `/home`
+  - `hr_workspace` → `/hr/payroll`
+  - `finance_workspace` → `/finance`
+  - `my_workspace` → `/my`
+- Los aliases legacy siguen soportados y se normalizan antes de llegar a sesión/UI:
+  - `/dashboard` → `/home`
+  - `/internal/dashboard` → `/home`
+  - `/finance/dashboard` → `/finance`
+  - `/hr/leave` → `/hr/payroll`
+  - `/my/profile` → `/my`
+- `/dashboard` puede seguir existiendo como feature route legacy para compatibilidad, pero ya no es el contrato de arranque ni el fallback estructural de acceso denegado.
+
 ## Delta 2026-04-10 — hierarchy governance stays broad-only and preserves manual precedence (TASK-330)
 
 - `HR > Jerarquía` mantiene su carácter broad HR/admin; no se abre a supervisoría limitada.
@@ -555,11 +573,11 @@ Route groups are the enforcement boundary. Each route group maps to a set of URL
 
 | route_group  | URL Prefixes                                                                                                                      | Required Roles (any of)                                                                                             | Tenant Context        |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `client`     | `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings`                                                       | `client_executive`, `client_manager`, `client_specialist`, `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Active tenant         |
+| `client`     | `/home`, `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings`                                              | `client_executive`, `client_manager`, `client_specialist`, `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Active tenant         |
 | `my`         | `/my/leave`, `/my/attendance`, `/my/expenses`, `/my/tools`, `/my/payroll`, `/my/profile`                                          | `collaborator`, `efeonce_admin`                                                                                     | Home tenant (efeonce) |
-| `internal`   | `/internal/dashboard`, `/internal/clientes`, `/internal/capacidad`, `/internal/riesgos`, `/internal/kpis`                         | `efeonce_account`, `efeonce_operations`, `efeonce_admin`                                                            | Cross-tenant          |
+| `internal`   | `/home`, `/admin`, `/internal/dashboard`, `/internal/clientes`, `/internal/capacidad`, `/internal/riesgos`, `/internal/kpis`    | `efeonce_account`, `efeonce_operations`, `efeonce_admin`                                                            | Cross-tenant          |
 | `hr`         | `/hr/leave`, `/hr/attendance`, `/hr/org-chart`, `/hr/payroll`, `/hr/approvals`, `/hr/hierarchy`, `/hr/departments`                | `hr_manager`, `hr_payroll`, `efeonce_admin`                                                                         | Efeonce tenant        |
-| `finance`    | `/finance/dashboard`, `/finance/income`, `/finance/expenses`, `/finance/suppliers`, `/finance/reconciliation`, `/finance/clients` | `finance_analyst`, `finance_admin`, `efeonce_admin`                                                                 | Efeonce tenant        |
+| `finance`    | `/finance`, `/finance/income`, `/finance/expenses`, `/finance/suppliers`, `/finance/reconciliation`, `/finance/clients`          | `finance_analyst`, `finance_admin`, `efeonce_admin`                                                                 | Efeonce tenant        |
 | `people`     | `/people`, `/people/[memberId]`                                                                                                   | `people_viewer`, `hr_manager`, `efeonce_operations`, `efeonce_admin`                                                | Efeonce tenant        |
 | `ai_tooling` | `/ai-tools/catalog`, `/ai-tools/licenses`, `/ai-tools/wallets`, `/ai-tools/ledger`                                                | `ai_tooling_admin`, `efeonce_admin`                                                                                 | Efeonce tenant        |
 | `admin`      | `/admin/tenants`, `/admin/users`, `/admin/roles`, `/admin/scopes`, `/admin/feature-flags`                                         | `efeonce_admin`                                                                                                     | Cross-tenant          |
@@ -755,7 +773,7 @@ interface GreenhouseSession {
 5. If `tenant_type = 'efeonce_internal'`, attempt to resolve `member_id` from `members` via `identity_profile_id`
 6. Load scope assignments if applicable roles are present
 7. Load tenant feature flags
-8. Determine `portalHomePath` based on highest-priority route group
+8. Determine `portalHomePath` through the centralized portal-home policy (roles + route groups + legacy alias normalization)
 
 #### Auth flow UX states (TASK-130)
 
@@ -778,17 +796,23 @@ Errores categorizados por NextAuth error code:
 
 ### Portal home path resolution
 
-| Highest Priority Role                | Home Path             |
-| ------------------------------------ | --------------------- |
-| `efeonce_admin`                      | `/admin/tenants`      |
-| `efeonce_operations`                 | `/internal/dashboard` |
-| `efeonce_account`                    | `/internal/clientes`  |
-| `finance_admin` or `finance_analyst` | `/finance/dashboard`  |
-| `hr_manager` or `hr_payroll`         | `/hr/leave`           |
-| `collaborator` (only)                | `/my/profile`         |
-| `client_executive`                   | `/dashboard`          |
-| `client_manager`                     | `/dashboard`          |
-| `client_specialist`                  | `/dashboard`          |
+| Policy key          | Resolution rule                                                            | Home Path     |
+| ------------------- | -------------------------------------------------------------------------- | ------------- |
+| `hr_workspace`      | `routeGroup = hr` o rol `hr_manager` / `hr_payroll`                        | `/hr/payroll` |
+| `finance_workspace` | `routeGroup = finance` o rol `finance_admin` / `finance_analyst`           | `/finance`    |
+| `my_workspace`      | `collaborator` puro sin takeover de `efeonce_admin` / `efeonce_operations` | `/my`         |
+| `internal_default`  | tenant `efeonce_internal` sin home funcional más específica                 | `/home`       |
+| `client_default`    | tenant `client` sin home funcional más específica                           | `/home`       |
+
+Los valores legacy persistidos se reescriben por compatibilidad antes de producir sesión:
+
+| Legacy path           | Normalized path |
+| --------------------- | --------------- |
+| `/dashboard`          | `/home`         |
+| `/internal/dashboard` | `/home`         |
+| `/finance/dashboard`  | `/finance`      |
+| `/hr/leave`           | `/hr/payroll`   |
+| `/my/profile`         | `/my`           |
 
 ## Sidebar Composition
 

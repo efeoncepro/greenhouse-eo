@@ -1,5 +1,333 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-392 Management Accounting Reliable Actual Foundation Program (complete)
+
+- **Estado:** `complete` (umbrella cerrado como entrega documental; TASK-176 queda como unico blocker externo del gate)
+- **Rama:** `develop`
+- **Implementado:**
+  - `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` — nueva seccion `## Reliable Actual Foundation` insertada entre el roadmap de madurez y el checklist enterprise. Define 5 criterios operativos para "actual confiable" (reconciled, fully-loaded, period-aware, traceable, tested & transactional), tabla de fundaciones por criterio, gate de readiness (5 verdes + 1 rojo), y secuencia canonica de cierre.
+  - `docs/tasks/complete/TASK-392-...md` — spec del umbrella actualizada con snapshot del gate, deliverables y delta historico conservado.
+  - `docs/tasks/to-do/TASK-176-labor-provisions-fully-loaded-cost.md` — delta 2026-04-13 agregado flaggeandola como el unico blocker restante del gate.
+- **Decision clave:** el umbrella se cerro aunque TASK-176 sigue abierta. La entrega es la DEFINICION del gate, no el estado final de cada checkbox. Patron correcto para umbrella tasks: cerrar cuando el programa queda formalizado, dejar que las deps individuales vivan sus propios lifecycles, y confiar en el gate documentado para bloquear declaraciones prematuras de "enterprise-ready".
+- **Context dependencia:** en esta misma sesion se cerraron TASK-174, TASK-175, TASK-179 y TASK-401 — 4 de las 5 deps del gate. TASK-167 esta superseded por TASK-192 (cerrada en runtime, pendiente reclasificacion administrativa). Solo TASK-176 queda como trabajo real pendiente del gate.
+- **Unblocks (documentalmente):** TASK-393, TASK-395, TASK-396, TASK-397, TASK-398 — estas tasks downstream ahora tienen un criterio explicito de cuando pueden declararse ready (cuando el gate este 100% verde).
+
+## Sesion 2026-04-13 — TASK-401 Bank Reconciliation Continuous Matching (complete)
+
+- **Estado:** `complete` (Slice 1 + Slice 2 + cron fallback; Slice 3 UX polish y hooks directos diferidos a follow-on)
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/finance/auto-match.ts` (nuevo) — motor de scoring puro (amountMatches, dateMatchesWithinWindow, hasPartialReferenceMatch, scoreAutoMatches) + `persistAutoMatchDecisions` con callbacks inyectados. No DB, no side effects en las funciones de scoring. Contrato preparado para reusar desde cualquier trigger (manual, cron, post-sync).
+  - `src/lib/finance/postgres-reconciliation.ts` — extracción de `listReconciliationCandidatesByDateRangeFromPostgres` (date range en vez de period_id), `listUnmatchedStatementRowsByDateRangeFromPostgres` (joins con reconciliation_periods para filtrar por status, optional account filter, LIMIT 2000). El wrapper `listReconciliationCandidatesFromPostgres` ahora delega al date-range variant.
+  - `src/app/api/finance/reconciliation/auto-match/route.ts` (nuevo, standalone) — recibe `{ fromDate, toDate, accountId? }`, corre el motor, persiste, retorna counts + ventana.
+  - `src/app/api/finance/reconciliation/[id]/auto-match/route.ts` (refactor) — 195 LOC reducidas a 100; reusa `scoreAutoMatches()` + `persistAutoMatchDecisions()` del módulo compartido. Cero duplicación de scoring.
+  - `src/app/api/cron/reconciliation-auto-match/route.ts` (nuevo) — Vercel cron diario 07:45 UTC, ventana de 7 días, cron auth guard, alertCronFailure, idempotente vía filtro `match_status = 'unmatched'`.
+  - `vercel.json` — nueva entrada cron.
+  - `src/lib/finance/__tests__/auto-match.test.ts` (nuevo) — 22 tests sobre las funciones puras y el orchestrator.
+- **Total suite:** 1148 tests verdes. Lint clean, build OK.
+- **Nota de scope:** La spec describe hooks directos post-Nubox-sync y post-factoring. Decisión pragmática: el cron diario de 7 días cubre el mismo ground con menos acoplamiento. Si se requiere matching inmediato de un payment específico, el endpoint manual `POST /api/finance/reconciliation/auto-match` puede invocarse puntualmente.
+- **Insight aprendido:** El tier 0.85 del scoring ladder es efectivamente inalcanzable — su condición (hasPartialReferenceMatch) ya está capturada por el tier 0.95. El lift del código preserva el bug original; la corrección semántica queda como posible follow-on.
+- **Prereqs cerrados:** TASK-174 (locking), TASK-175 (test coverage), TASK-179 (Postgres-only) — los tres prerrequisitos de esta task fueron cerrados antes de implementar.
+
+## Sesion 2026-04-13 — ISSUE-048 payroll compensation member ambiguity fix local
+
+- **Estado:** `fix local aplicado, pendiente verificación en staging`
+- **Issue:** `docs/issues/open/ISSUE-048-payroll-compensation-member-id-ambiguous-silent-degradation.md`
+- **Root cause corregida:**
+  - `src/lib/payroll/postgres-store.ts`
+  - la CTE `current_compensation` en `pgListPayrollCompensationMembers()` usaba `member_id` sin alias en `DISTINCT ON`, `SELECT` y `ORDER BY`
+  - se corrigió a `cv.member_id`, `cv.effective_from` y `cv.version` para evitar `column reference "member_id" is ambiguous`
+- **Guardrail agregado:**
+  - `src/lib/payroll/postgres-store.test.ts`
+  - nueva prueba focalizada que inspecciona el SQL y asegura que el reader quede aliasado
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/payroll/postgres-store.test.ts`
+  - runtime local autenticado:
+    - `POST /api/auth/agent-session` -> `200`
+    - `GET /api/hr/payroll/compensation` -> `200`
+    - payload post-fix: `compensations=6`, `members=7`, `eligibleMembers=1`
+    - `GET /hr/payroll` -> `200`
+- **Decisión explícita de no tocar en este lote:**
+  - `pgGetCompensationOverview()` sigue degradando silenciosamente si falla el reader de miembros
+  - se dejó igual para mantener backward compatibility y limitar el diff al root cause confirmado del issue
+- **Pendiente operativo:**
+  - verificar en staging `/api/hr/payroll/compensation`
+  - validar visualmente `Payroll > Compensaciones vigentes` post-deploy
+
+## Sesion 2026-04-13 — TASK-179 Finance Reconciliation Postgres-Only Cutover (complete)
+
+- **Estado:** `complete`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/finance/schema.ts` — removidos `fin_reconciliation_periods` y `fin_bank_statement_rows` del DDL BigQuery (`FINANCE_TABLE_DEFINITIONS` + `FINANCE_COLUMN_REQUIREMENTS`). Reconciliation ya no provisiona tablas BQ.
+  - `src/app/api/finance/expenses/bulk/route.ts` — eliminados 3 imports obsoletos (`ensureFinanceInfrastructure`, `shouldFallbackFromFinancePostgres`, `isFinanceBigQueryWriteEnabled`) y el bloque BQ fallback try/catch completo (~80 LOC). La Phase 2 ahora es un `await withTransaction(...)` directo sin red BigQuery.
+  - `src/app/api/finance/reconciliation/route.ts` — removido stale error message `"BigQuery fallback is disabled"` y código `FINANCE_BQ_WRITE_DISABLED` del POST catch. Los errores de Postgres ahora se re-lanzan limpiamente.
+  - `src/lib/finance/hubspot.ts` — agregada schema validation (`validateHubSpotCompaniesSchema`, `validateHubSpotDealsSchema`) con `publishOutboxEvent` en `integration_health` para drift crítico (throws) y drift de columnas esperadas (warning). `pickColumn` ahora loguea cuando usa una columna fallback.
+  - `src/app/api/finance/bigquery-write-cutover.test.ts` — actualizados 2 tests que verificaban el comportamiento 503/FINANCE_BQ_WRITE_DISABLED eliminado; ahora verifican que los errores Postgres se propagan (rethrow).
+- **Verificación:** 1122/1122 tests, lint clean, build OK.
+- **Nota:** `bigquery-write-flag.ts` tiene 15 callsites activos en income/expenses/accounts — está fuera del scope de esta task. El flag sigue vigente para esos paths. El cleanup completo pertenece a un bloque de cutover posterior.
+
+## Sesion 2026-04-13 — TASK-175 Finance Core Test Coverage (complete)
+
+- **Estado:** `complete`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/finance/__tests__/postgres-store-slice2.test.ts` — 14 tests: income CRUD, expense CRUD con/sin client externo, buildMonthlySequenceIdFromPostgres, TTL readiness cache
+  - `src/lib/finance/__tests__/postgres-store.test.ts` — 11 tests: shouldFallbackFromFinancePostgres, createFinanceAccountInPostgres, upsertFinanceExchangeRateInPostgres, seedFinanceSupplierInPostgres, listFinanceAccountsFromPostgres
+  - `src/lib/finance/__tests__/payment-ledger.test.ts` — 15 tests: recordPayment (happy path, 409 overpayment, 409 duplicate, 404 income not found, full paid), getPaymentsForIncome, reconcilePaymentTotals (4 escenarios)
+  - `src/lib/finance/__tests__/postgres-reconciliation.test.ts` — 18 tests: createReconciliationPeriodInPostgres (happy, 409 dup, 404 account), listReconciliationPeriods, updateStatementRowMatch con/sin client, clearStatementRowMatch, assertMutable, validateReconciledTransition
+  - `src/lib/finance/__tests__/finance-pnl-e2e.test.ts` — 5 tests: computeClientEconomicsSnapshots (zero-revenue, empty period, multi-client, labor attribution call, silent error swallowing)
+- **Total:** 64 tests nuevos. Suite: 1122 tests, 255 archivos, lint clean, build OK.
+- **Patrones clave aprendidos:**
+  - `assertFinanceSlice2PostgresReady` tiene TTL 60s de módulo — se primea en `beforeAll`, evitando consumo extra de mocks en tests posteriores
+  - `reconcilePaymentTotals` usa `client.query` directo (no `queryRows`), retorna `{ rows, rowCount }` — mock distinto al resto
+  - `postgres-reconciliation.ts` importa `'server-only'` — requiere `vi.mock('server-only', () => ({}))`
+  - outbox local en slice2/store vs outbox importado en reconciliation/ledger — distinto mock target
+
+## Sesion 2026-04-13 — Arquitectura de entitlements modulares formalizada
+
+- **Estado:** `documentado`
+- **Artefacto nuevo:**
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+- **Decisión principal:**
+  - Greenhouse debe converger a una capa híbrida de autorización:
+    - `roleCodes` para identidad base
+    - `routeGroups` para superficies broad
+    - `entitlements` para autorización real por capability
+    - `authorizedViews` como proyección derivada
+    - `startupPolicy` como contrato separado
+- **Integración documental:**
+  - `docs/README.md` actualizado
+  - `project_context.md` actualizado
+  - `changelog.md` actualizado
+  - `TASK-402` ahora referencia esta arquitectura como foundation obligatoria
+
+## Sesion 2026-04-13 — Hotfix de Home universal para superadmin y perfiles mixtos
+
+- **Estado:** `validado localmente`
+- **Problema detectado:**
+  - la policy de `resolvePortalHomePath()` seguía derivando el startup home desde `routeGroups`
+  - como `efeonce_admin` hereda `admin`, `internal`, `hr`, `finance`, `my` y otras superficies, el resolver estaba priorizando `hr_workspace`
+  - resultado visible: superadministradores y perfiles mixtos entraban a `/hr/payroll` en vez de a `/home`
+- **Fix aplicado:**
+  - `src/lib/tenant/resolve-portal-home-path.ts`
+    - `efeonce_admin` y perfiles con `routeGroups` administrativos ahora priorizan `internal_default`
+    - el startup home de superadmin queda forzado a `/home`
+  - `src/lib/tenant/resolve-portal-home-path.test.ts`
+    - se agregó regresión explícita para `efeonce_admin` + route groups mixtos
+- **Validación cerrada:**
+  - `pnpm exec vitest run src/lib/tenant/resolve-portal-home-path.test.ts`
+  - `pnpm build`
+  - verificación real con login por credenciales:
+    - `GET /` sin sesión -> `/login`
+    - login del usuario agente/superadmin-like -> `/home`
+    - contenido visible en `/home`: `Home Nexa y operación de hoy`
+- **Decisión de producto sugerida:**
+  - consolidar `/home` como entrypoint universal del portal
+  - mantener HR / Finance / My como workspaces especializados dentro de una Home adaptativa, no como homes rivales
+- **Follow-up sembrado:**
+  - `TASK-402` para diseñar e implementar Home universal adaptativa con policy de startup separada de permisos
+
+## Sesion 2026-04-13 — TASK-400 cierre formal con verificación runtime real
+
+- **Estado:** `complete`
+- **Ajuste de cierre detectado durante la verificación:**
+  - `next.config.ts` todavía forzaba `source: '/' -> destination: '/dashboard'`
+  - ese redirect global estaba sobreescribiendo el contrato de `src/app/page.tsx`
+  - se removió para que `/` respete el `portalHomePath` resuelto por sesión
+- **Cleanup aplicado además del runtime ya convergido:**
+  - `src/components/layout/shared/search/NoResult.tsx` ahora vuelve a `/home`
+  - breadcrumbs cliente-safe de proyecto y sprint ahora vuelven a `/home`
+  - docs sincronizadas:
+    - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+    - `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`
+    - `docs/documentation/identity/sistema-identidad-roles-acceso.md`
+  - lifecycle sincronizado:
+    - spec movida a `docs/tasks/complete/`
+    - `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` actualizados
+- **Validación cerrada:**
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src scripts`
+  - runtime local autenticado con agente:
+    - `GET /` -> `307 /hr/payroll`
+    - `GET /home` -> `200`
+    - `GET /dashboard` -> `200`
+    - `GET /hr/payroll` -> `200`
+- **Notas:**
+  - `pnpm build` sigue emitiendo warnings esperados de `Dynamic server usage` en páginas autenticadas que usan `headers`; no bloquean el build y no nacen de esta task
+  - el workspace sigue teniendo cambios ajenos de `TASK-174`; no fueron tocados
+- **Pendiente fuera del cierre técnico:**
+  - commit + push
+  - verificación de staging post-push si se quiere confirmar el deployment nuevo contra `/`, `/home` y `/dashboard`
+
+## Sesion 2026-04-13 — TASK-174 Slice 1-3 implementados (Finance Data Integrity)
+
+- **Rama activa:** `develop`
+- **Motivación:** P0 — prevenir double-entry por retry de red, bulk parcial sin rollback, y race conditions en conciliación.
+- **Implementado:**
+  - Migración `20260413222055844_finance-idempotency-keys.sql` — tabla `greenhouse_finance.idempotency_keys` (TTL 24h)
+  - `src/lib/finance/idempotency.ts` — middleware `withIdempotency()` aplicado a `POST /api/finance/income` y `POST /api/finance/expenses`
+  - `expenses/bulk/route.ts` — resolución de items separada de inserción; toda la escritura Postgres ocurre en un solo `withTransaction` (rollback total si falla cualquier item)
+  - `postgres-store-slice2.ts` — `createFinanceExpenseInPostgres` acepta `opts?: { client?: PoolClient }` para participar en transacción externa
+  - `postgres-reconciliation.ts` — `updateReconciliationPeriodInPostgres` usa `withGreenhousePostgresTransaction` + `SELECT FOR UPDATE NOWAIT`; `updateStatementRowMatchInPostgres` y `clearStatementRowMatchInPostgres` aceptan `opts?.client`
+  - `match/route.ts` y `unmatch/route.ts` — `withTransaction` + `FOR UPDATE NOWAIT` en `bank_statement_rows` antes de modificar match state
+- **Validación:** `pnpm tsc --noEmit` limpio, `pnpm lint` limpio, `pnpm test` 250/250 archivos pass
+- **Pendiente para cerrar TASK-174:**
+  - `pnpm migrate:up` en staging para crear `idempotency_keys`
+  - Verificación en staging: bulk rollback real, idempotency-key retry, concurrent reconciliation → 409
+  - Slice 4 minor: `reconcilePaymentTotals()` en `payment-ledger.ts` (ya tiene transaction en `recordPayment`, esto es corrección menor)
+
+## Sesion 2026-04-13 — TASK-400 implementada localmente con policy centralizada de Home y compatibilidad legacy gobernada
+
+- implementación cerrada en código:
+  - `/` y `/auth/landing` ya resuelven solo `session.user.portalHomePath`; se elimina la dependencia estructural de `|| '/dashboard'`
+  - `src/lib/tenant/resolve-portal-home-path.ts` ahora concentra:
+    - aliases legacy (`/dashboard`, `/internal/dashboard`, `/finance/dashboard`, `/hr/leave`, `/my/profile`)
+    - policy centralizada por tipo de home (`client_default`, `internal_default`, `hr_workspace`, `finance_workspace`, `my_workspace`)
+    - base explícita para soportar homes distintas por tipo de usuario sin volver a dispersar lógica en routes y shell
+  - `src/lib/auth.ts`, `src/lib/tenant/access.ts` y `src/app/api/auth/agent-session/route.ts` ya consumen la misma policy
+  - provisioning, theme config, navegación, search suggestions, footers, dropdown de usuario, notifications y `view-access-catalog` quedaron alineados a `/home` como contrato canónico
+  - `/dashboard` sigue accesible como compatibilidad/feature route, pero ya no es fallback estructural y quedó hardenizado para no explotar cuando faltan señales de calidad/delivery
+  - se agregó `scripts/backfill-portal-home-contract.ts` para normalizar `default_portal_home_path` en PostgreSQL + BigQuery (dry-run por default, `--apply` para ejecutar)
+- validación local cerrada:
+  - `pnpm test src/lib/tenant/resolve-portal-home-path.test.ts src/views/greenhouse/GreenhouseDashboard.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src scripts` sin nuevos pools fuera de `src/lib/postgres/client.ts`
+- cobertura agregada:
+  - tests de aliases/policy en `src/lib/tenant/resolve-portal-home-path.test.ts`
+  - regresión de render para `src/views/greenhouse/GreenhouseDashboard.test.tsx`
+- estado de staging antes del push:
+  - `pnpm staging:request /`
+  - `pnpm staging:request /home`
+  - `pnpm staging:request /dashboard`
+  - los tres siguen devolviendo `HTTP 500` en el deployment actual de `develop`, por lo que ese entorno todavía no refleja este diff local
+- próximos pasos operativos:
+  - commit + push de `develop`
+  - volver a verificar staging en `/`, `/home` y `/dashboard` una vez que el deploy nuevo termine
+  - si staging siguiera en `500` tras el deploy, revisar logs del deployment nuevo y reconciliar con `ISSUE-044`
+
+## Sesion 2026-04-13 — TASK-400 sembrada para gobernar el contrato canónico de Home y desactivar `/dashboard` como fallback estructural
+
+- backlog nuevo:
+  - `docs/tasks/in-progress/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`
+- problema formalizado:
+  - el repo actual tiene múltiples contratos de entrada conviviendo:
+    - `src/app/page.tsx` redirige a `session.user.portalHomePath || '/dashboard'`
+    - `src/app/auth/landing/page.tsx` cae a `'/home'`
+    - `src/lib/admin/tenant-member-provisioning.ts` sigue sembrando `DEFAULT_PORTAL_HOME = '/dashboard'`
+    - decenas de guards/layouts y navegación usan `tenant.portalHomePath || '/dashboard'`
+  - `/dashboard` está actuando como fallback estructural pese a que semánticamente `Home` ya es la landing moderna del portal
+- alcance que debe cubrir la task:
+  - policy canónica para startup home / access-denied fallback / legacy compatibility
+  - cutover coordinado de root, auth, provisioning, agent auth y navegación
+  - normalización/backfill de valores persistidos legacy (`/dashboard`, `/internal/dashboard`)
+  - compatibilidad gobernada para `/dashboard` y hardening mínimo si sigue accesible
+- relación con issues/tasks existentes:
+  - esto no reemplaza el fix SSR de `ISSUE-044`; lo complementa
+  - tampoco duplica `TASK-378`: esa lane endurece SSR/error boundaries; `TASK-400` gobierna el contrato de entrada
+- estado operativo:
+  - tomada en `in-progress`
+  - discovery ya confirmó drift adicional en stores PG/BQ, shell UI, notifications y docs de arquitectura
+
+## Sesion 2026-04-13 — ISSUE-044 root cause confirmado y fix mínimo implementado
+
+- issue atacado:
+  - `docs/issues/open/ISSUE-044-dashboard-ssr-500-agent-headless.md`
+- causa raíz confirmada:
+  - el 500 de HTML SSR para requests headless autenticados no venía de auth, cookies, MUI ni providers
+  - el runtime de producción local reprodujo el fallo exacto: `ReferenceError: DOMMatrix is not defined`
+  - la fuente real era un import transitive desde el barrel `@/components/greenhouse`, que exportaba `CertificatePreviewDialog` y arrastraba `react-pdf/pdfjs` al SSR del layout y de vistas cliente-safe
+- fix aplicado:
+  - `src/components/layout/vertical/FooterContent.tsx` ahora importa `BrandWordmark` directo
+  - `src/components/layout/horizontal/FooterContent.tsx` ahora importa `BrandWordmark` directo
+  - `src/components/greenhouse/index.ts` deja de exportar `CertificatePreviewDialog` y documenta que debe importarse directo
+- blast radius validado:
+  - build local de producción
+  - auth real con `/api/auth/agent-session`
+  - HTML 200 para `/home`, `/admin`, `/settings`, `/dashboard`, `/updates`
+- pendiente:
+  - no quedó validado en `staging` porque en este turno no se desplegó el fix
+  - por política del tracker el issue se mantiene `open` hasta verificar `pnpm staging:request /home|/admin|/settings`
+
+## Sesion 2026-04-13 — Management Accounting ya queda aterrizado como programa ejecutable de 7 tasks robustas
+
+- backlog nuevo documentado:
+  - `docs/tasks/to-do/TASK-392-management-accounting-reliable-actual-foundation-program.md`
+  - `docs/tasks/to-do/TASK-393-management-accounting-period-governance-restatements-reclassification.md`
+  - `docs/tasks/to-do/TASK-394-management-accounting-scope-expansion-bu-legal-entity-intercompany.md`
+  - `docs/tasks/to-do/TASK-395-management-accounting-planning-engine-budgets-drivers-approval-governance.md`
+  - `docs/tasks/to-do/TASK-396-management-accounting-variance-forecast-executive-control-tower.md`
+  - `docs/tasks/to-do/TASK-397-management-accounting-financial-costs-integration-factoring-fx-fees-treasury.md`
+  - `docs/tasks/to-do/TASK-398-management-accounting-enterprise-hardening-explainability-rbac-observability-runbooks.md`
+- criterio de particion:
+  - se evitó fragmentar demasiado el programa
+  - las 7 lanes quedan lo bastante grandes para coordinar trabajo enterprise, pero lo bastante separadas para no mezclar foundation, governance, planning, analytics, financial costs y hardening
+- amarras importantes:
+  - `TASK-392` queda como gate fundacional antes de planning / forecast / variance
+  - `TASK-395` absorbe y reencuadra `TASK-178` como planning engine
+  - `TASK-397` amarra `TASK-391` al modelo de Management Accounting
+  - `TASK-398` concentra explainability, RBAC, observabilidad, runbooks y testing de negocio
+- docs sincronizados:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `changelog.md`
+- validación:
+  - documentación solamente
+  - pendiente correr `git diff --check` tras la actualización del índice y registro
+
+## Sesion 2026-04-13 — TASK-391 Finance Factoring Operations: implementación completa
+
+- implementación:
+  - `migrations/20260413195519177_factoring-operations-fee-breakdown.sql` — 4 columnas nuevas en `factoring_operations` (interest_amount, advisory_fee_amount, external_reference, external_folio). Migración aplicada, `db.d.ts` regenerado.
+  - `src/lib/finance/factoring.ts` — función `recordFactoringOperation()`: transacción atómica con `withGreenhousePostgresTransaction`, 8 operaciones en un solo commit (lock income, validate provider, INSERT factoring_op, INSERT income_payment, INSERT expense x2, UPDATE income)
+  - `src/app/api/finance/income/[id]/factor/route.ts` — `POST` con validación de fee balance (±$1 CLP tolerancia), auth guard, manejo de errores
+  - `src/app/api/finance/factoring/providers/route.ts` — `GET` para dropdown filtrado por `provider_type = 'factoring'`
+  - `src/views/greenhouse/finance/drawers/FactoringOperationDrawer.tsx` — Drawer 520px, provider select, advance/interés/asesoría inputs, fee calculator en tiempo real con indicador visual, fechas, referencias externas, cuenta de depósito
+  - `src/views/greenhouse/finance/IncomeDetailView.tsx` — `collectionMethod` en interfaz + botón "Ceder a Factoring" (oculto si ya pagado/cedido) + badge FACTORADA + drawer montado
+  - `src/views/greenhouse/finance/IncomeListView.tsx` — `collectionMethod` en interfaz + badge FACTORADA en columna de estado
+  - `src/views/greenhouse/finance/CashInListView.tsx` — `paymentSource` en interfaces + badge "Vía factoring" cuando `payment_source = 'factoring_proceeds'`
+  - `src/app/api/finance/income/[id]/route.ts` — `collectionMethod` agregado al BigQuery fallback normalizer
+- semántica de negocio implementada:
+  - `income.amount_paid = nominalAmount` (obligación del cliente saldada al 100%)
+  - `income_payment.amount = advanceAmount` (efectivo real recibido — conciliable contra banco)
+  - diferencia (fee) = 2 expenses en P&L (factoring_fee + factoring_advisory)
+- validación: `npx tsc --noEmit` — 0 errores
+- task: `TASK-391` movida a `complete/`
+- pendiente para uso real: seed del proveedor Xepelin en `greenhouse_core.providers` (INSERT manual con `provider_type = 'factoring'`)
+
+## Sesion 2026-04-13 — Management Accounting queda documentado como capability enterprise distinta de contabilidad legal
+
+- alcance documental:
+  - `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`
+  - `docs/README.md`
+  - `project_context.md`
+  - `changelog.md`
+- decisión tomada:
+  - Greenhouse no debe abrir primero un módulo de contabilidad legal/partida doble
+  - la capability correcta a profundizar es `Management Accounting`, con lectura funcional `contabilidad de costos` y surface recomendada `Finance > Economia operativa`
+- actualización clave:
+  - el documento nuevo ya no deja solo la tesis base del módulo
+  - también fija el inventario de gaps y hardening enterprise pendiente:
+    - budget / variance / forecast
+    - fully-loaded labor cost
+    - BU P&L
+    - cierre gobernado
+    - explainability y auditabilidad
+    - overrides manuales
+    - RBAC
+    - observabilidad y data quality
+    - materialización escalable
+    - legal entity / intercompany / related parties
+    - multi-moneda más fuerte
+    - runbooks, testing de negocio y roadmap de madurez
+- nota importante:
+  - `factoring` quedó explicitado como input financiero que pertenece primero a `Finance`, pero cuyo impacto real debe absorberse dentro de `Management Accounting`
+- validación:
+  - documentación solamente
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — hardening del lifecycle de tasks para forzar cierre real
 
 - alcance documental:
@@ -12080,33 +12408,60 @@ Fase 4 completada:
   - `ISSUE-043` acceso al organigrama puede existir sin reflejo en el menú
 - No se hicieron fixes nuevos en esta sesión de auditoría; solo documentación y verificación end-to-end para dejar el estado reproducible.
 
-### Sesión 2026-04-14 — bridge de identidad compartida con Kortex
+### Sesión 2026-04-13 — hardening real de sync Nubox docs
 
-- Sello de continuidad: `Kortex Agent`
-- Objetivo: hacer que Kortex consuma el mismo contrato de identidad de Greenhouse para credenciales compartidas, tenant context y autorización por organización/roles.
-- Cambios hechos en Greenhouse:
-  - `src/app/api/integrations/v1/sister-platforms/identity/route.ts`
-    - nuevo endpoint `POST /api/integrations/v1/sister-platforms/identity`
-    - autentica `email + password` contra `tenant access`
-    - devuelve contrato de identidad rico para sister platforms:
-      - `userId`, `clientId`, `clientName`, `tenantType`
-      - `roleCodes`, `primaryRoleCode`, `routeGroups`
-      - `projectScopes`, `campaignScopes`, `businessLines`, `serviceModules`, `projectIds`
-      - `featureFlags`, `timezone`, `portalHomePath`, `authMode`, `provider`, `microsoftEmail`
-      - `organization { clientId, clientName, tenantType }`
-    - actualiza `last login` con origen `sister_platform_credentials`
-  - `src/lib/integrations/integration-auth.ts`
-    - el guard de integración ahora acepta también `x-greenhouse-sister-platform-key`
-    - el token esperado puede venir de `GREENHOUSE_INTEGRATION_API_TOKEN` o `GREENHOUSE_SISTER_PLATFORM_TOKEN`
-- Cambios coordinados del lado Kortex:
-  - Kortex backend primero intenta validar credenciales contra este endpoint de Greenhouse; si Greenhouse no está configurado o falla, conserva fallback local
-  - Kortex web persiste en sesión/JWT el contrato extendido de identidad y filtra portales por `clientId` para tenants cliente
-- Commits asociados:
-  - Greenhouse: `762558257e607621567bbebf6bc3dc8be4b56907`
-  - Kortex: `a205dec961ceb01fadf8114e0685b00af287d64b`
+- Pedido del usuario: revisar por qué Nubox “no estaba sincronizando docs hace días” y dejarlo resuelto con una solución robusta y escalable, no un parche.
+- Diagnóstico operativo:
+  - `raw` sí estaba corriendo diariamente en staging/producción; había runs exitosos hasta `2026-04-13 07:30 UTC`.
+  - El problema real era doble:
+    - el raw default solo cubría ventana corta reciente, así que rectificaciones históricas podían quedar fuera indefinidamente
+    - la capa `conformed` seguía usando `DELETE + INSERT` por ID en BigQuery; al ejecutar un backfill masivo, chocó con el streaming buffer (`UPDATE or DELETE ... would affect rows in the streaming buffer`)
+  - además, `postgres_projection` marcaba `nubox_last_synced_at = NOW()` aunque el raw real no hubiera refrescado ese documento en la corrida actual; eso maquillaba frescura.
+  - el fallo local `403 Invalid key=value pair in Authorization header` vino de drift del token/local env; staging siguió autenticando bien, por lo que no era la causa raíz del incidente productivo.
+- Cambios implementados:
+  - `src/lib/nubox/sync-plan.ts` + `src/lib/nubox/sync-plan.test.ts`
+    - nuevo plan de sync con hot window configurable + historical sweep rotativo persistido en `greenhouse_sync.source_sync_watermarks`
+  - `src/lib/nubox/sync-nubox-raw.ts`
+    - usa el sync plan por defecto
+    - registra `period_window`
+    - marca `partial` si hay familias con error pero el raw escribió algo
+  - `src/lib/nubox/client.ts` + `src/lib/nubox/client.test.ts`
+    - `fetchAllPages()` ya no depende ciegamente de `x-total-count`; sigue paginando cuando la página viene llena
+  - `src/lib/nubox/sync-nubox-conformed.ts`
+    - cambia el contrato de `conformed` a append-only snapshots
+    - ya no hace `DELETE` previo sobre tablas calientes de BigQuery
+  - `src/lib/nubox/sync-nubox-to-postgres.ts`
+    - lectores de `conformed` y `bank_movements` ahora resuelven latest snapshot por ID
+    - `nubox_last_synced_at` ahora se alimenta desde `source_last_ingested_at` del raw real, no desde `NOW()`
+  - `src/app/api/cron/nubox-balance-sync/route.ts`
+    - balances leen latest snapshot por ID, compatibles con append-only conformed
+  - `src/lib/finance/payment-ledger-remediation.ts`
+    - bank movements usan latest snapshot por `nubox_movement_id`
+  - `src/app/api/finance/nubox/sync-status/route.ts`
+    - expone `lastRaw`, `lastConformed`, `lastProjection` y deja de esconder frescura real detrás de cualquier run Nubox reciente
+  - `scripts/setup-bigquery-nubox-conformed.sql`
+    - documentación actualizada a append-only snapshots
+- Recuperación operativa ejecutada:
+  - staging backfill raw por lotes `2023-01 -> 2026-04`: completado con éxito
+  - conformed local con nuevo contrato: `nubox-conf-2e8e7828-68ce-48b6-bebd-076da5f798c8` succeeded
+  - postgres projection local: `nubox-pg-ce4b8eeb-8a2b-4777-9885-37d96c0a1ed8` succeeded
+    - `Income: 1 created, 71 updated`
+    - `Expenses: 2 created, 122 updated`
+    - `Reconciled: 0 expenses, 2 incomes`
+    - `Orphaned: 17`
+- Estado final verificado:
+  - `GET /api/finance/nubox/sync-status` en staging terminó en `succeeded` para `postgres_projection`
+  - los failures `conformed_sync` previos a las `20:30 UTC` del `2026-04-13` quedan como evidencia histórica del incidente de streaming buffer y ya no representan el estado actual
 - Validación ejecutada:
-  - en Kortex web: `eslint` focalizado + `next build` OK
-  - en Kortex backend: `python3 -m py_compile services/agent/kortex_agent/card_api.py` OK
-- Nota operativa:
-  - Greenhouse quedó enlazado por CLI a Vercel scope `efeonce` durante esta sesión para poder forzar deploy productivo si el webhook no dispara solo
-  - si otro agente retoma, buscar este bloque por el sello `Kortex Agent`
+  - `pnpm exec vitest run src/lib/nubox/client.test.ts src/lib/nubox/sync-plan.test.ts`
+  - `pnpm exec eslint src/lib/nubox/sync-nubox-conformed.ts src/lib/nubox/sync-nubox-to-postgres.ts src/app/api/cron/nubox-balance-sync/route.ts src/lib/finance/payment-ledger-remediation.ts`
+  - `pnpm exec tsc --noEmit`
+  - `git diff --check`
+  - `pnpm exec tsx scripts/test-nubox-sync.ts conformed`
+  - `pnpm exec tsx scripts/test-nubox-sync.ts postgres`
+  - `pnpm staging:request /api/finance/nubox/sync-status --pretty`
+- Riesgo/deuda abierta:
+  - siguen existiendo `17` orphaned sales sin identity resolution suficiente; eso ya no es un problema de sincronización sino de matching organizacional/RUT.
+  - follow-on arquitectónico/documental abierto:
+    - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` y `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` ya quedaron ampliados con el `Integration Runtime Pattern`
+    - nueva `TASK-399` creada para institucionalizar el hardening runtime de integraciones source-led como carril separado de `TASK-188`

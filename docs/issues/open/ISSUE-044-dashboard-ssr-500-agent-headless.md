@@ -29,22 +29,31 @@ Todas las páginas bajo el route group `(dashboard)/` devuelven HTTP 500 cuando 
 
 ## Causa raíz
 
-**No es lógica de negocio.** Investigación exhaustiva descartó:
+**Sí es un problema de SSR runtime, pero no de lógica de negocio ni de sesión.**
 
-1. ~~`getOperatingEntityIdentity()` sin try-catch~~ — Verificado: devuelve datos OK vía diagnóstico API
-2. ~~`getServerAuthSession()` falla~~ — Verificado: sesión válida, userId correcto
-3. ~~`getMode()`/`getSystemMode()` falla~~ — Verificado: devuelven `light` correctamente
-4. ~~Cookie inválida~~ — Verificado: sin cookie devuelve 307→/login (correcto), con cookie devuelve 500 (session encontrada pero rendering falla)
-5. ~~Error boundary ausente~~ — Verificado: `error.tsx` ya existe con chunk recovery
+Investigación y reproducción local en build de producción confirmaron:
 
-**Evidencia clave:** La request con header `RSC: 1` devuelve **200** con payload RSC válido (incluye sesión completa, componentes, etc.). La misma request sin RSC header devuelve **500** como HTML. Esto indica que:
-- El server component tree se renderiza correctamente (RSC OK)
-- El error ocurre durante la **HTML streaming/serialización** del RSC payload a HTML
-- El body HTML de 105KB contiene una referencia a un componente 404 interno de Next.js
+1. `POST /api/auth/agent-session` funciona y la sesión queda válida
+2. `GET /home` con header `RSC: 1` devuelve **200**
+3. `GET /home` HTML devuelve **500**
+4. El runtime local de producción registra el error exacto:
 
-**Hipótesis más probable:** Incompatibilidad entre Next.js 16 HTML streaming SSR y el stack de CSS-in-JS (MUI CssVarsProvider + Emotion AppRouterCacheProvider). El rendering RSC no necesita generar CSS, pero el HTML streaming sí — y es ahí donde falla.
+```text
+ReferenceError: DOMMatrix is not defined
+```
 
-**Pre-existente:** El issue se reproduce con deployments anteriores a cualquier cambio de la sesión del 2026-04-11. No fue introducido por los cambios de TASK-264, TASK-373, ni TASK-378.
+La causa concreta fue un **import transitive SSR-unsafe** desde el barrel `@/components/greenhouse`:
+
+- el barrel exportaba `CertificatePreviewDialog`
+- `CertificatePreviewDialog` importa `react-pdf`
+- `react-pdf/pdfjs` toca `DOMMatrix` al evaluarse en Node SSR
+
+Eso se activaba aunque la página no usara certificados directamente, porque:
+
+1. los footers compartidos del layout importaban `BrandWordmark` desde el barrel
+2. vistas como `GreenhouseSettings` importaban componentes seguros (`TeamDossierSection`) desde el mismo barrel
+
+En ambos casos, el SSR de HTML evaluaba el barrel completo y arrastraba `react-pdf`, lo que rompía el render HTML del route group `(dashboard)`.
 
 ## Impacto
 
@@ -54,31 +63,52 @@ Todas las páginas bajo el route group `(dashboard)/` devuelven HTTP 500 cuando 
 
 ## Solución
 
-### Ya aplicado (hardening defensivo — TASK-378):
-- `src/components/Providers.tsx`: `getOperatingEntityIdentity()` envuelto en try-catch
-- `src/app/(dashboard)/layout.tsx`: `getServerAuthSession()`, `getMode()`, `getSystemMode()` envueltos en try-catch
-- Estas mejoras previenen futuros crashes por fallas de DB/auth pero NO resuelven el 500 actual
+### Fix implementado
 
-### Pendiente (investigación de infraestructura):
-1. Investigar la interacción entre Next.js 16 streaming SSR y MUI/Emotion:
-   - `InitColorSchemeScript` en root layout
-   - `AppRouterCacheProvider` de `@mui/material-nextjs`
-   - `ThemeProvider` con `CssVarsProvider` de MUI
-   - `stylis-plugin-rtl` en la pipeline de Emotion
-2. Verificar si el user-agent del `fetch()` de Node.js afecta el rendering path de Next.js (streaming vs buffered)
-3. Evaluar si agregar headers de browser al fetch del agente resuelve el 500 (Accept, User-Agent, etc.)
-4. Consultar issues de Next.js 16 + MUI 7 en GitHub para incompatibilidades conocidas
+1. `src/components/layout/vertical/FooterContent.tsx`
+   - dejó de importar `BrandWordmark` desde `@/components/greenhouse`
+   - ahora importa directo desde `@/components/greenhouse/BrandWordmark`
+
+2. `src/components/layout/horizontal/FooterContent.tsx`
+   - mismo ajuste para cortar el arrastre del barrel en el layout compartido
+
+3. `src/components/greenhouse/index.ts`
+   - `CertificatePreviewDialog` fue removido del barrel compartido
+   - se documentó explícitamente que debe importarse directo porque `react-pdf` no es safe para SSR compartido
+
+### Qué protege este fix
+
+- evita que el layout autenticado cargue `react-pdf` por accidente
+- evita que vistas que consumen componentes seguros del barrel hereden `DOMMatrix` en SSR
+- conserva contratos públicos visibles:
+  - rutas
+  - payloads
+  - semántica de auth
+  - UI del footer
+  - imports directos de `CertificatePreviewDialog`
 
 ## Verificación
 
-Cuando se resuelva:
-- `pnpm staging:request /home` → HTTP 200
-- `pnpm staging:request /admin` → HTTP 200
-- `pnpm staging:request /settings` → HTTP 200
+Verificado en build local de producción usando `agent-session` real:
+
+- `GET /home` → HTTP 200
+- `GET /admin` → HTTP 200
+- `GET /settings` → HTTP 200
+- `GET /dashboard` → HTTP 200
+- `GET /updates` → HTTP 200
+
+También se volvió a correr `pnpm build` sin reproducir `DOMMatrix is not defined`.
+
+Pendiente para cerrar formalmente el issue:
+
+- desplegar a `staging`
+- validar `pnpm staging:request /home`
+- validar `pnpm staging:request /admin`
+- validar `pnpm staging:request /settings`
 
 ## Estado
 
-open
+open — fix implementado, pendiente verificación en staging
 
 ## Relacionado
 
@@ -87,5 +117,6 @@ open
 - `docs/architecture/GREENHOUSE_STAGING_ACCESS_V1.md` — documentación de acceso staging
 - `scripts/staging-request.mjs` — script de requests headless
 - `src/app/(dashboard)/layout.tsx` — layout afectado
-- `src/components/Providers.tsx` — provider chain del layout
-- `src/components/theme/index.tsx` — ThemeProvider con MUI CssVars
+- `src/components/layout/vertical/FooterContent.tsx` — import transitive corregido
+- `src/components/layout/horizontal/FooterContent.tsx` — import transitive corregido
+- `src/components/greenhouse/index.ts` — barrel endurecido para SSR

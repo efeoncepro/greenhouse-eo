@@ -2,6 +2,90 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-392: Management Accounting Reliable Actual Foundation Program cerrado como entrega documental
+
+- Nueva seccion `## Reliable Actual Foundation` en `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md` con:
+  - **Definicion operativa de "actual confiable"** — 5 criterios obligatorios: reconciled, fully-loaded, period-aware, traceable, tested & transactional.
+  - **Tabla de fundaciones requeridas** mapeando cada criterio a la task owner que lo cierra.
+  - **Gate de readiness** — 6 checkboxes que una capability downstream de Management Accounting debe satisfacer antes de declararse enterprise-ready. 5 verdes al cierre del umbrella: TASK-174, TASK-175, TASK-179, TASK-401, TASK-167/192. 1 rojo: TASK-176 (labor provisions fully-loaded cost, ~12.5% gap).
+  - **Secuencia canonica de cierre** — orden de ataque canonico para llevar cualquier modulo economico a `reliable actual` sin saltarse pasos.
+- El umbrella se cierra aunque TASK-176 siga abierta porque la entrega del programa es la DEFINICION del gate, no el estado final de cada checkbox. Las capabilities downstream (TASK-393 period governance, TASK-395 planning, TASK-396 variance/forecast, TASK-397 financial costs, TASK-398 enterprise hardening) ahora tienen un criterio explicito de cuando pueden declararse ready.
+- TASK-176 queda flaggeada con un delta explicito como el unico blocker restante del gate.
+- Cierra el bloque de foundation tasks de Finance/Management Accounting del 2026-04-13: TASK-174 + TASK-175 + TASK-179 + TASK-401 + TASK-392 en una sola sesion.
+
+### 2026-04-13 — TASK-401: Bank Reconciliation Continuous Matching — motor standalone + cron diario
+
+- Nuevo módulo `src/lib/finance/auto-match.ts` con el motor de scoring extraído de la route file period-scoped. Funciones puras (`amountMatches`, `dateMatchesWithinWindow`, `hasPartialReferenceMatch`, `scoreAutoMatches`) sin dependencias de DB, y un orchestrator `persistAutoMatchDecisions` con callbacks de persistencia inyectados. Contrato reutilizable desde cualquier trigger (manual, cron, post-sync).
+- Helpers period-agnostic en `postgres-reconciliation.ts`: `listUnmatchedStatementRowsByDateRangeFromPostgres` (joins con reconciliation_periods + optional account filter + LIMIT 2000) y `listReconciliationCandidatesByDateRangeFromPostgres` (extrae la cascada de 3 queries settlement_legs → payment_rows → invoice_fallback para income y expense). El wrapper period-scoped ahora delega al date-range variant.
+- Nuevo endpoint standalone `POST /api/finance/reconciliation/auto-match` con body `{ fromDate, toDate, accountId? }`. Cero acoplamiento con `reconciliation_periods` — carga bank_statement_rows por rango de fecha, aplica el motor, persiste resultados, devuelve counts + ventana.
+- Route period-scoped `POST /api/finance/reconciliation/[id]/auto-match` refactorizada: 195 LOC reducidas a 100, cero duplicación de scoring con la versión standalone.
+- Nuevo Vercel cron `/api/cron/reconciliation-auto-match` que corre diariamente a las 07:45 UTC (~08:45 CLT, 15 min después del nubox-sync). Ventana de 7 días, idempotente, con alertCronFailure en caso de error.
+- 22 tests unitarios nuevos en `auto-match.test.ts`: amount tolerance (±1), date window configurable, partial reference fallback (4-char prefix), ambiguity discard (ties skip), threshold customization, persistence callbacks con/sin actorUserId, rowPeriodMap skip semantics.
+- Suite: 1122 → 1148 tests verdes (26 nuevos netos). Lint clean, build OK.
+- Desbloquea: TASK-392 (management accounting) — el matching continuo cierra el gap de "actual confiable con lag mensual" al llevar el is_reconciled a tiempo real para los movimientos recientes.
+
+### 2026-04-13 — TASK-179: Finance Reconciliation Postgres-Only Cutover & HubSpot Schema Hardening
+
+- `src/lib/finance/schema.ts`: removidos `fin_reconciliation_periods` y `fin_bank_statement_rows` del provisioning BigQuery. La reconciliación ya no provisiona tablas BQ. Las tablas BigQuery históricas quedan como read-only.
+- `src/app/api/finance/expenses/bulk/route.ts`: eliminado el bloque BQ fallback try/catch completo (~80 LOC) y 3 imports obsoletos. El bulk de gastos ahora es Postgres-only con `withTransaction` atómico directo.
+- `src/app/api/finance/reconciliation/route.ts`: removido el error code `FINANCE_BQ_WRITE_DISABLED` y el mensaje obsoleto "BigQuery fallback is disabled" del POST catch. Los errores Postgres se re-lanzan limpiamente al runtime de Next.js.
+- `src/lib/finance/hubspot.ts`: agregada `validateHubSpotCompaniesSchema` y `validateHubSpotDealsSchema` que emiten `integration.schema_drift.detected` al outbox (`integration_health`) cuando faltan columnas críticas (error fatal) o columnas esperadas (warning observable). `pickColumn` ahora loguea `console.warn` cuando resuelve a una columna fallback — hace observable el drift en producción sin romper el flujo.
+- Tests actualizados en `bigquery-write-cutover.test.ts` para reflejar que las rutas migradas ya no retornan 503/FINANCE_BQ_WRITE_DISABLED sino que propagan errores Postgres al caller.
+
+### 2026-04-13 — TASK-175: Finance Core Test Coverage — 64 tests nuevos sobre la capa de persistencia Finance
+
+- `src/lib/finance/__tests__/` creado con 5 archivos nuevos cubriendo los módulos de mayor riesgo: `postgres-store-slice2.ts` (income/expense CRUD), `postgres-reconciliation.ts` (period lifecycle + match ops), `payment-ledger.ts` (recordPayment + reconcilePaymentTotals), `postgres-store.ts` (accounts/FX/suppliers), y P&L E2E (`computeClientEconomicsSnapshots`).
+- Los archivos críticos de Finance que tenían 0% de cobertura (`postgres-store-slice2.ts` ~1800 LOC, `postgres-reconciliation.ts` ~2000 LOC, `payment-ledger.ts` ~300 LOC) ahora tienen red de seguridad para sus principales code paths.
+- El suite total pasó de 1058 a 1122 tests (64 nuevos). Lint clean, build OK, sin regresiones.
+- Prerequisito cerrado para TASK-179 (reconciliation cutover) y TASK-401 (auto-match continuo): ambos podían refactorizar sin red de seguridad antes de este bloque.
+
+### 2026-04-13 — Entitlements modulares quedan formalizados como dirección canónica de autorización
+
+- Se agregó `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+- El repo ahora deja explícita una evolución canónica desde `roleCodes + routeGroups + authorizedViews` hacia una capa de entitlements por `module + capability + action + scope`.
+- La nueva arquitectura se conecta explícitamente con `TASK-402` (Home universal adaptativa) y `TASK-285` (client role differentiation) para que el runtime no siga creciendo sobre permisos centrados en vistas/pathnames.
+
+### 2026-04-13 — TASK-400 alinea el contrato canónico de Home y deja base para homes distintas por tipo de usuario
+
+- `/` y `/auth/landing` ya no dependen de `|| '/dashboard'`; ambos consumen el `portalHomePath` resuelto por la misma policy runtime.
+- `next.config.ts` ya no fuerza `source: '/' -> destination: '/dashboard'`, por lo que el root vuelve a respetar el contrato del App Router y la sesión autenticada.
+- `src/lib/tenant/resolve-portal-home-path.ts` ahora centraliza:
+  - aliases legacy (`/dashboard`, `/internal/dashboard`, `/finance/dashboard`, `/hr/leave`, `/my/profile`)
+  - policy explícita de home por tipo (`client_default`, `internal_default`, `hr_workspace`, `finance_workspace`, `my_workspace`)
+  - una base extensible para soportar homes diferenciadas por tipo de usuario sin reintroducir drift en guards, auth y shell
+- provisioning, session auth, agent auth, navegación, shortcuts, notifications y `view-access-catalog` quedaron alineados a `/home` como startup contract canónico.
+- `/dashboard` se mantiene como ruta legacy/compatibilidad, pero deja de ser el fallback estructural del portal.
+- la búsqueda sin resultados y los breadcrumbs cliente-safe ya vuelven a `/home` en lugar de reforzar rutas legacy.
+- `efeonce_admin` y perfiles administrativos mixtos ya no aterrizan por error en `/hr/payroll`; el startup home vuelve a priorizar `/home` para la experiencia universal de Nexa.
+- Se agregó `scripts/backfill-portal-home-contract.ts` para normalizar `default_portal_home_path` en PostgreSQL y BigQuery bajo control explícito.
+- Se agregó regresión focalizada para evitar que `/dashboard` vuelva a romper cuando falten quality/delivery signals.
+
+### 2026-04-13 — Se agrega `TASK-400` para gobernar el contrato canónico de Home del portal
+
+- Se creó `docs/tasks/to-do/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`.
+- La task formaliza que el problema no es solo un bug de `/dashboard`, sino drift de contrato entre root routing, auth landing, provisioning, session resolution, agent auth, guards y navegación.
+- El backlog ahora exige resolver esto como lane enterprise: policy canónica de startup home, compatibilidad legacy gobernada para `/dashboard`, normalización/backfill de valores persistidos y validación de blast radius.
+
+### 2026-04-13 — Dashboard SSR headless deja de arrastrar `react-pdf` en rutas autenticadas
+
+- Se corrigieron los imports compartidos del layout para que `BrandWordmark` no entre por el barrel `@/components/greenhouse`.
+- `src/components/greenhouse/index.ts` ya no exporta `CertificatePreviewDialog`, porque `react-pdf/pdfjs` toca `DOMMatrix` al evaluarse en Node SSR.
+- El fix protege el render HTML autenticado de requests headless sin cambiar rutas, payloads, auth ni semántica visible del portal.
+
+### 2026-04-13 — Se registra el programa de 7 tasks robustas para Management Accounting
+
+- Se agregaron `TASK-392` a `TASK-398` bajo `docs/tasks/to-do/` para convertir la arquitectura nueva de Management Accounting en backlog ejecutable.
+- El programa queda ordenado en 7 lanes robustas: actual foundation, period governance, scope expansion, planning engine, variance/forecast/control tower, financial costs integration y enterprise hardening.
+- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron actualizados para reservar los IDs y dejar visible la secuencia de ejecución.
+
+### 2026-04-13 — Management Accounting queda formalizado como capability canonica separada de contabilidad legal
+
+- Se agregó `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`.
+- La arquitectura ahora deja explícito que el siguiente módulo financiero a institucionalizar en Greenhouse es `Management Accounting`, no un módulo de contabilidad legal o de partida doble.
+- La lectura funcional recomendada queda fijada como `contabilidad de costos`, mientras que la surface product recomendada sigue siendo `Finance > Economia operativa`.
+- El documento nuevo también deja formalizado qué falta para que la capability sea enterprise: budget, variance, forecast, fully-loaded labor cost, P&L por BU, cierre gobernado, explainability, overrides, RBAC, observabilidad, data quality, runbooks, testing de negocio, policy map y roadmap de madurez.
+- `docs/README.md` y `project_context.md` quedaron alineados para que la decisión ya no viva solo en un archivo aislado.
+
 ### 2026-04-13 — Lifecycle de tasks endurecido para evitar cierres a medias
 
 - `docs/tasks/TASK_TEMPLATE.md` ahora deja el cierre como parte explícita de Definition of Done: sincronizar `Lifecycle`, mover el archivo y actualizar `docs/tasks/README.md`.
@@ -5305,6 +5389,15 @@
 - La validación funcional quedó cubierta con `dryRun` real para `Marzo 2026`, resolviendo el target page existente sin sobrescribir el contenido histórico durante la verificación.
 
 # Changelog
+
+## 2026-04-13
+
+- Nubox sync hardening: el raw sync ya no depende solo de la ventana reciente; ahora combina hot window configurable con historical sweep rotativo persistido, para que documentos tardíos o rectificaciones históricas no queden fuera indefinidamente.
+- Nubox conformed: las tablas `greenhouse_conformed.nubox_*` pasan a operar como snapshots append-only; los readers de balances, ledger remediation y proyección a PostgreSQL resuelven siempre el último snapshot por ID, evitando fallos por streaming buffer de BigQuery durante backfills.
+- Nubox freshness: `nubox_last_synced_at` en `income`, `expenses` y `quotes` ahora refleja el `ingested_at` real del raw snapshot fuente, no el timestamp artificial de cualquier proyección.
+- Finance Ops: se ejecutó backfill raw histórico `2023-01 -> 2026-04` y luego una corrida `conformed -> postgres` exitosa; staging terminó con `postgres_projection` exitosa (`1 income` creado, `2 expenses` creados, `2 incomes` reconciliados).
+- Architecture / backlog: `GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1` y `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1` ya formalizan el patrón runtime reusable para integraciones source-led, y se abrió `TASK-399` para institucionalizar adapters resilientes, control plane por etapa y replay governance.
+- Task backlog: `docs/tasks/README.md` ahora deja explícita la prioridad operativa vigente del backlog `to-do` separando `impacto cliente` e `impacto agencia`, para que los agentes no infieran el orden solo desde el ID o el título.
 
 ## 2026-04-10
 

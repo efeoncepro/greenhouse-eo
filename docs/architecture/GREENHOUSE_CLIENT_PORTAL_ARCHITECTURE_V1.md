@@ -14,9 +14,16 @@
   - `docs/architecture/GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`
 - Regla nueva:
   - la experiencia cliente de equipo debe evolucionar hacia `Equipo asignado`
-  - debe combinar roster, FTE visible, seniority mix, capability coverage y team health
-  - debe soportar lectura consolidada por cliente y drilldown por `space`
-  - los perfiles individuales visibles deben ser siempre `client-safe`
+- debe combinar roster, FTE visible, seniority mix, capability coverage y team health
+- debe soportar lectura consolidada por cliente y drilldown por `space`
+- los perfiles individuales visibles deben ser siempre `client-safe`
+
+## Delta 2026-04-13 — `Pulse` deja de ser el startup contract y `/home` pasa a ser la entrada canónica del portal cliente (TASK-400)
+
+- `cliente.pulse` sigue existiendo como capability/view del portal cliente, pero la entrada canónica del tenant ya no es `/dashboard`.
+- `/home` pasa a ser el entrypoint canónico del portal y `cliente.pulse` queda apuntando a esa landing moderna.
+- `/dashboard` se mantiene como ruta legacy/compatibilidad mientras exista cohort o deep links que todavía la consuman.
+- La policy de `portalHomePath` quedó centralizada para permitir que en el futuro distintos tipos de usuario cliente aterricen en homes distintas sin duplicar lógica de routing.
 
 ---
 
@@ -123,7 +130,7 @@ Los tres roles existen como concepto pero no tienen permisos distintos. No hay m
 
 | View Code | Label | Ruta | Descripcion |
 |-----------|-------|------|-------------|
-| `cliente.pulse` | Pulse | `/dashboard` | Vista general del space cliente |
+| `cliente.pulse` | Pulse | `/home` | Vista general del space cliente |
 | `cliente.proyectos` | Proyectos | `/proyectos` | Inventario activo de proyectos visibles |
 | `cliente.ciclos` | Ciclos | `/sprints` | Seguimiento de sprints y produccion |
 | `cliente.equipo` | Equipo | `/equipo` | Equipo asignado, perfiles y roster |
@@ -184,7 +191,7 @@ El menu lateral se construye en `src/components/layout/vertical/VerticalMenu.tsx
 
 7 items fijos (filtrados por view code):
 
-1. **Pulse** (`/dashboard`) — `cliente.pulse`
+1. **Pulse** (`/home`) — `cliente.pulse`
 2. **Proyectos** (`/proyectos`) — `cliente.proyectos`
 3. **Ciclos** (`/sprints`) — `cliente.ciclos`
 4. **Equipo** (`/equipo`) — `cliente.equipo`
@@ -348,7 +355,7 @@ interface TenantAccessRecord {
   featureFlags: string[]
 
   // Contexto
-  portalHomePath: string       // '/dashboard'
+  portalHomePath: string       // '/home'
   timezone: string
   spaceId?: string
   organizationId?: string

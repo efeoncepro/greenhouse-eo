@@ -27,7 +27,8 @@ La metáfora del Greenhouse se aplica en **dos capas con reglas distintas:**
 
 | Ruta técnica | Nombre Greenhouse | Icono sugerido | Subtítulo en sidebar |
 |---|---|---|---|
-| `/dashboard` | **Pulse** | Actividad / pulso | Vista general de tu operación |
+| `/home` | **Pulse** | Actividad / pulso | Vista general de tu operación |
+| `/dashboard` | **Pulse** | Actividad / pulso | Ruta legacy/compatibilidad |
 | `/proyectos` | **Proyectos** | Carpeta / grid | Proyectos activos |
 | `/proyectos/[id]` | **[Nombre del proyecto]** | — | — |
 | `/sprints` | **Ciclos** | Reloj circular | Sprints de producción |
@@ -103,6 +104,7 @@ Las siguientes rutas referenciadas en documentos anteriores **no existen** en el
 ### 2.9 Decisiones de naming
 
 - **Pulse** se mantiene: es terminología real de dashboards operativos ("pulse check", "pulse report"). No suena infantil, suena tech.
+- El startup contract canónico de **Pulse** es `/home`; `/dashboard` queda como ruta legacy/compatibilidad mientras siga habiendo deep links o cohorts que la consuman.
 - **Proyectos** vuelve a su nombre funcional. El cliente busca "sus proyectos", no "sus cultivos". El nombre del proyecto real siempre es visible tal cual lo nombró el cliente.
 - **Ciclos** funciona bien como reemplazo de "Sprints" porque es más accesible para un perfil de marketing que no vive en Scrum, y coincide con la metáfora de "ciclos de cultivo" sin forzarla.
 - **Configuración** reemplaza "Mi Greenhouse" para alinear con la nomenclatura funcional del sistema expandido.
