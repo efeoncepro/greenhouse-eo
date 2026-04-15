@@ -431,4 +431,32 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-379` | `complete` | Reactive Projections Enterprise Hardening | `docs/tasks/complete/TASK-379-reactive-projections-enterprise-hardening.md` |
 | `TASK-380` | `to-do` | Structured Context Layer Foundation | `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md` |
 | `TASK-381` | `to-do` | Structured Context Layer Enterprise Hardening | `docs/tasks/to-do/TASK-381-structured-context-layer-enterprise-hardening.md` |
-| `TASK-382` | `to-do` | Email System Enterprise Hardening | `docs/tasks/to-do/TASK-382-email-system-enterprise-hardening.md` |
+| `TASK-382` | `complete` | Email System Enterprise Hardening | `docs/tasks/complete/TASK-382-email-system-enterprise-hardening.md` |
+| `TASK-383` | `to-do` | Email Observabilidad | `docs/tasks/to-do/TASK-383-email-observabilidad.md` |
+| `TASK-384` | `to-do` | Email Compliance & Retención GDPR | `docs/tasks/to-do/TASK-384-email-compliance-retencion.md` |
+| `TASK-385` | `to-do` | Email Scaling Cloud Run | `docs/tasks/to-do/TASK-385-email-scaling-cloud-run.md` |
+| `TASK-386` | `to-do` | Notificaciones In-App Real-Time SSE | `docs/tasks/to-do/TASK-386-notifications-realtime-sse.md` |
+| `TASK-387` | `to-do` | Notificaciones In-App Agrupación y Digest | `docs/tasks/to-do/TASK-387-notifications-agrupacion-digest.md` |
+| `TASK-388` | `to-do` | Notificaciones In-App Acciones Inline | `docs/tasks/to-do/TASK-388-notifications-acciones-inline.md` |
+| `TASK-389` | `to-do` | Notificaciones In-App Retención y Purga | `docs/tasks/to-do/TASK-389-notifications-retencion-purga.md` |
+| `TASK-390` | `to-do` | Notificaciones In-App Broadcast Admin | `docs/tasks/to-do/TASK-390-notifications-broadcast-admin.md` |
+| `TASK-391` | `to-do` | Finance Factoring Operations | `docs/tasks/to-do/TASK-391-finance-factoring-operations.md` |
+| `TASK-392` | `to-do` | Management Accounting Reliable Actual Foundation Program | `docs/tasks/to-do/TASK-392-management-accounting-reliable-actual-foundation-program.md` |
+| `TASK-393` | `to-do` | Management Accounting Period Governance, Restatements & Reclassification | `docs/tasks/to-do/TASK-393-management-accounting-period-governance-restatements-reclassification.md` |
+| `TASK-394` | `to-do` | Management Accounting Scope Expansion: BU, Legal Entity & Intercompany | `docs/tasks/to-do/TASK-394-management-accounting-scope-expansion-bu-legal-entity-intercompany.md` |
+| `TASK-395` | `to-do` | Management Accounting Planning Engine: Budgets, Drivers & Approval Governance | `docs/tasks/to-do/TASK-395-management-accounting-planning-engine-budgets-drivers-approval-governance.md` |
+| `TASK-396` | `to-do` | Management Accounting Variance, Forecast & Executive Control Tower | `docs/tasks/to-do/TASK-396-management-accounting-variance-forecast-executive-control-tower.md` |
+| `TASK-397` | `to-do` | Management Accounting Financial Costs Integration: Factoring, FX, Fees & Treasury | `docs/tasks/to-do/TASK-397-management-accounting-financial-costs-integration-factoring-fx-fees-treasury.md` |
+| `TASK-398` | `to-do` | Management Accounting Enterprise Hardening: Explainability, RBAC, Observability & Runbooks | `docs/tasks/to-do/TASK-398-management-accounting-enterprise-hardening-explainability-rbac-observability-runbooks.md` |
+| `TASK-399` | `to-do` | Native Integrations Runtime Hardening: Source Adapters, Control Plane & Replay Governance | `docs/tasks/to-do/TASK-399-native-integrations-runtime-hardening-source-adapters-control-plane-replay.md` |
+| `TASK-400` | `complete` | Portal Home Contract Governance, Entrypoint Cutover & Dashboard Compatibility | `docs/tasks/complete/TASK-400-portal-home-contract-governance-entrypoint-cutover.md` |
+| `TASK-401` | `to-do` | Bank Reconciliation: Continuous Transaction Matching | `docs/tasks/to-do/TASK-401-bank-reconciliation-continuous-matching.md` |
+| `TASK-402` | `to-do` | Universal Adaptive Home Orchestration | `docs/tasks/to-do/TASK-402-universal-adaptive-home-orchestration.md` |
+| `TASK-403` | `to-do` | Entitlements Runtime Foundation & Home Bridge | `docs/tasks/to-do/TASK-403-entitlements-runtime-foundation-home-bridge.md` |
+| `TASK-404` | `to-do` | Entitlements Governance Admin Center | `docs/tasks/to-do/TASK-404-entitlements-governance-admin-center.md` |
+| `TASK-405` | `to-do` | Reconcile `main` into `develop` for Kortex Identity Bridge | `docs/tasks/to-do/TASK-405-reconcile-main-into-develop-kortex-identity.md` |
+| `TASK-406` | `to-do` | Promote Reconciled Kortex Identity Bridge to `main` | `docs/tasks/to-do/TASK-406-promote-kortex-identity-bridge-to-main.md` |
+| `TASK-409` | `to-do` | Payroll Reliquidación Program | `docs/tasks/to-do/TASK-409-payroll-reliquidation-program.md` |
+| `TASK-410` | `to-do` | Payroll Period Reopen Foundation & Entry Versioning | `docs/tasks/to-do/TASK-410-payroll-period-reopen-foundation-versioning.md` |
+| `TASK-411` | `to-do` | Payroll Reliquidación Finance Delta Consumer | `docs/tasks/to-do/TASK-411-payroll-reliquidation-finance-delta-consumer.md` |
+| `TASK-412` | `to-do` | Payroll Reliquidación Admin UI, Preview & Audit Trail | `docs/tasks/to-do/TASK-412-payroll-reliquidation-admin-ui-preview-audit.md` |

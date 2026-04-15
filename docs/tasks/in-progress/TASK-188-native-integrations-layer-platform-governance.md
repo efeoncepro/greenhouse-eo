@@ -1,5 +1,19 @@
 # TASK-188 - Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model
 
+## Delta 2026-04-13 — runtime hardening split formalized as follow-on lane
+
+- El incidente real de `Nubox` mostró que `TASK-188` ya cubre bien taxonomía, registry, readiness y governance shared, pero todavía quedaba demasiado amplio para cerrar por sí sola el hardening runtime profundo de source adapters.
+- A partir de esta fecha, el follow-on específico para:
+  - adapter resilience
+  - sync planning / leases / watermarks
+  - snapshot-safe conformed writers
+  - stage freshness y partial success
+  - replay / backfill / runbooks
+  queda explicitado en `TASK-399`.
+- Relación entre ambas:
+  - `TASK-188` = capability umbrella / native integrations layer
+  - `TASK-399` = runtime hardening execution lane para source-led connectors
+
 ## Delta 2026-04-03 — Integrations feeding ICO must preserve the metric contract
 
 - Cualquier upstream que alimente `ICO` bajo esta lane debe alinearse al contrato maestro `docs/architecture/Contrato_Metricas_ICO_v1.md`.

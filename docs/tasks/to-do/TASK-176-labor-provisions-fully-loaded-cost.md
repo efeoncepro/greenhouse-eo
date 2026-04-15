@@ -1,3 +1,7 @@
+## Delta 2026-04-13
+
+- TASK-392 cerrada como programa documental. Esta task queda como el **unico blocker restante** del gate `Reliable Actual Foundation` definido en `GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`. Los otros 5 prerequisitos (TASK-174 locking, TASK-175 tests, TASK-179 Postgres cutover, TASK-401 continuous matching, TASK-167/192 organization scope) ya estan cerrados. Hasta que esta task cierre, el `actual` de Management Accounting sigue subestimando labor cost en ~12.5% y las capabilities downstream (`TASK-395` planning, `TASK-396` variance, `TASK-397` financial costs, `TASK-398` enterprise hardening) no pueden declararse enterprise-ready.
+
 ## Delta 2026-03-31
 - TASK-182 (Expense Drawer Agency Taxonomy) redefine Previred como egreso al proveedor "Previred" en vez de tipo `social_security`. Las provisiones laborales que esta task materializa en `member_capacity_economics` deben alinearse: el gasto Previred consolidado se registra como expense operacional, y el desglose por persona viene del calculo de provisiones de esta task.
 - Delta correctiva: la implementación final de `TASK-182` + `TASK-183` mantuvo compatibilidad transicional con `expense_type = 'social_security'` para el consolidado de Previred, pero ya separa `payment_provider = 'previred'`, `payment_rail = 'previred'` y usa `payroll_period.exported` como trigger reactivo del ledger. Esta task debe consumir ese contrato real y no asumir un cutover completo a `supplier` todavía.

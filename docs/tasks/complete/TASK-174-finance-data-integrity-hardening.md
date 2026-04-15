@@ -1,3 +1,19 @@
+## Delta 2026-04-13
+
+**Implementación parcial completada:**
+
+- ✅ **Migración Postgres** creada: `migrations/20260413222055844_finance-idempotency-keys.sql` — tabla `greenhouse_finance.idempotency_keys` con TTL 24h e índice por expiración.
+- ✅ **Middleware idempotencia** creado: `src/lib/finance/idempotency.ts` — `withIdempotency()` wraps POST handlers, stores/returns cached responses, handles in-flight 409.
+- ✅ **Bulk atomicidad** (`expenses/bulk/route.ts`): resolución de items separada de la inserción; toda la escritura en Postgres ocurre dentro de `withTransaction` (rollback total si falla cualquier item). BigQuery fallback retenido en catch externo hasta TASK-179.
+- ✅ **Idempotencia aplicada** a `POST /api/finance/income` y `POST /api/finance/expenses`.
+- ✅ **SELECT FOR UPDATE NOWAIT** en `updateReconciliationPeriodInPostgres` — envuelta en `withGreenhousePostgresTransaction`, lock exclusivo antes del UPDATE. Concurrent update retorna 409.
+- ✅ **Lock en match/unmatch**: `match/route.ts` y `unmatch/route.ts` usan `withTransaction` + `SELECT FOR UPDATE NOWAIT` en `bank_statement_rows` antes de modificar el estado. `updateStatementRowMatchInPostgres` y `clearStatementRowMatchInPostgres` ahora aceptan `opts?.client`.
+
+**Pendiente (mismo scope, requieren migración aplicada y DB activa):**
+- [ ] Migración `20260413222055844_finance-idempotency-keys.sql` aplicada en staging (`pnpm migrate:up`)
+- [ ] Slice 4 — `reconcilePaymentTotals()`: verificar atomicidad (minor)
+- [ ] Verificación en staging: bulk rollback, idempotency key retry, concurrent reconciliation update → 409
+
 ## Delta 2026-04-01
 - TASK-184/TASK-185 (Database Tooling Foundation) ahora disponible: todo DDL futuro debe ir como migración versionada via `pnpm migrate:create`. Usar `src/lib/db.ts` para queries (re-export del singleton existente + Kysely para módulos nuevos).
 - TASK-181 ya dejó el write path de `Finance Clients` envuelto en transacciones compartidas entre `organizations` y `client_profiles`; esta task ya no necesita diseñar ese tramo desde cero y debe enfocarse en bulk/idempotency/concurrency sobre el resto del dominio Finance.
@@ -13,11 +29,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P0` |
 | Impact | `Critico` |
 | Effort | `Medio` |
-| Status real | `Diseno` |
+| Status real | `Implementación parcial` |
 | Domain | Finance / Platform |
 | Sequence | Independiente — prerequisito para enterprise-grade |
 
