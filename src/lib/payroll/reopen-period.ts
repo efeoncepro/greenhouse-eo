@@ -106,8 +106,8 @@ export const reopenPayrollPeriod = async (
     // 3 — period must be in 'exported' state.
     assertPeriodReopenable(snapshot)
 
-    // 4 — period must be the current operational month.
-    assertReopenWindow(snapshot.year, snapshot.month, referenceDate)
+    // 4 — period must be within the reopen window (days since exported_at).
+    assertReopenWindow(snapshot, referenceDate)
 
     // 5 — transition status.
     await client.query(

@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server'
 
 import { ROLE_CODES } from '@/config/role-codes'
-import { getOperationalPayrollMonth } from '@/lib/calendar/operational-calendar'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { getActiveReopenAuditForPeriod } from '@/lib/payroll/reopen-period'
+import { evaluateReopenWindow, resolveReopenWindowDays } from '@/lib/payroll/reopen-guards'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 import { hasRoleCode, requireHrTenantContext } from '@/lib/tenant/authorization'
 import type { PeriodStatus } from '@/types/payroll'
 
 // TASK-412 — GET /api/hr/payroll/periods/[periodId]/reopen-preview
+// Hotfix 2026-04-15 — ventana basada en `exported_at` + días configurables
 //
 // Dry-run preview of the reopen eligibility checks. Returns the same
 // information the UI needs to decide whether the "Reabrir nómina" action
@@ -29,8 +30,9 @@ interface ReopenPreviewResponse {
   canReopen: boolean
   reasons: ReopenPreviewReason[]
   currentStatus: PeriodStatus
-  operationalYear: number
-  operationalMonth: number
+  windowDays: number
+  daysSinceExport: number | null
+  exportedAt: string | null
   inWindow: boolean
   entriesCount: number
   alreadyReopened: boolean
@@ -61,10 +63,8 @@ export async function GET(
       throw new PayrollValidationError(`Período de nómina ${periodId} no existe.`, 404)
     }
 
-    const operational = getOperationalPayrollMonth(new Date())
-
-    const inWindow =
-      operational.operationalYear === period.year && operational.operationalMonth === period.month
+    const windowDays = resolveReopenWindowDays()
+    const windowEval = evaluateReopenWindow({ exported_at: period.exportedAt }, new Date(), windowDays)
 
     const entries = await getPayrollEntries(periodId)
     const existingAudit = await getActiveReopenAuditForPeriod(periodId)
@@ -93,18 +93,28 @@ export async function GET(
       })
     }
 
-    // Operational window check — the period must be the current operational month.
-    if (inWindow) {
+    // Reopen window check — days since exported_at <= windowDays.
+    if (windowEval.reason === 'ok') {
+      const rounded = Math.round(windowEval.daysSinceExport ?? 0)
+
       reasons.push({
-        code: 'window_current',
+        code: 'window_ok',
         blocking: false,
-        message: `El período corresponde al mes operativo vigente (${operational.operationalYear}-${String(operational.operationalMonth).padStart(2, '0')}).`
+        message: `La nómina fue exportada hace ${rounded} día(s). Dentro del rango permitido (${windowDays} días).`
+      })
+    } else if (windowEval.reason === 'not_exported') {
+      reasons.push({
+        code: 'window_not_exported',
+        blocking: true,
+        message: 'La nómina no tiene fecha de exportación registrada.'
       })
     } else {
+      const rounded = Math.round(windowEval.daysSinceExport ?? 0)
+
       reasons.push({
         code: 'window_out_of_range',
         blocking: true,
-        message: `Solo se puede reabrir el período del mes operativo vigente (${operational.operationalYear}-${String(operational.operationalMonth).padStart(2, '0')}). Para meses anteriores registra un ajuste en el período actual.`
+        message: `La nómina fue exportada hace ${rounded} día(s). Excede los ${windowDays} días permitidos. Registra un ajuste retroactivo en el período actual.`
       })
     }
 
@@ -123,9 +133,10 @@ export async function GET(
       canReopen,
       reasons,
       currentStatus: period.status,
-      operationalYear: operational.operationalYear,
-      operationalMonth: operational.operationalMonth,
-      inWindow,
+      windowDays,
+      daysSinceExport: windowEval.daysSinceExport,
+      exportedAt: windowEval.exportedAt,
+      inWindow: windowEval.withinWindow,
       entriesCount: entries.length,
       alreadyReopened
     }

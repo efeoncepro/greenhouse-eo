@@ -2,17 +2,37 @@ import 'server-only'
 
 import type { PoolClient } from 'pg'
 
-import { getOperationalPayrollMonth } from '@/lib/calendar/operational-calendar'
 import { canReopenPayrollPeriod } from '@/lib/payroll/period-lifecycle'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 import type { PeriodStatus } from '@/types/payroll'
 
-// TASK-410 — Guardas de reopen de nómina.
+// TASK-410 + hotfix 2026-04-15 — Guardas de reopen de nómina.
 //
 // Cada guarda verifica una precondición del flujo de reliquidación y lanza
 // PayrollValidationError con mensaje accionable cuando la precondición falla.
 // Los chequeos transaccionales (lock y lectura de estado) requieren un
 // PoolClient vivo dentro de withTransaction.
+
+/**
+ * Ventana máxima entre `exported_at` y el momento del reopen, en días.
+ * Configurable vía env var `PAYROLL_REOPEN_WINDOW_DAYS`. Default 45 días,
+ * que cubre el ciclo Previred/pagos del mes siguiente sin habilitar
+ * correcciones retroactivas profundas. TASK-413 reemplazará esta guarda
+ * con un policy engine declarativo (ver docs/tasks/).
+ */
+export const DEFAULT_REOPEN_WINDOW_DAYS = 45
+
+export const resolveReopenWindowDays = (): number => {
+  const raw = process.env.PAYROLL_REOPEN_WINDOW_DAYS
+
+  if (!raw) return DEFAULT_REOPEN_WINDOW_DAYS
+
+  const parsed = Number.parseInt(raw, 10)
+
+  if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_REOPEN_WINDOW_DAYS
+
+  return parsed
+}
 
 /**
  * Row mínima que las guardas necesitan leer del período. Se define aquí
@@ -23,25 +43,94 @@ export interface ReopenPeriodSnapshot {
   year: number
   month: number
   status: PeriodStatus
+  exported_at: Date | string | null
+}
+
+const parseExportedAt = (value: Date | string | null): Date | null => {
+  if (!value) return null
+  if (value instanceof Date) return value
+
+  const parsed = new Date(value)
+
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+const daysBetween = (from: Date, to: Date): number => {
+  const diffMs = to.getTime() - from.getTime()
+
+  return diffMs / (1000 * 60 * 60 * 24)
 }
 
 /**
- * Verifica que el período a reabrir es el mes operativo vigente según
- * `operational-calendar.ts`. Esta guarda actúa como proxy de "Previred aún
- * no declarado" dado que Previred se declara entre el 1 y el 10 del mes
- * siguiente al período y el mes operativo vigente, por definición, todavía
- * no ha sido declarado.
+ * Evalúa la ventana sin lanzar (para el endpoint preview). Retorna el
+ * resultado estructurado con la decisión, los días transcurridos y el
+ * límite aplicable. El endpoint de preview usa esto para mostrar razones
+ * al usuario sin interrumpir el flujo.
+ */
+export interface ReopenWindowEvaluation {
+  withinWindow: boolean
+  daysSinceExport: number | null
+  windowDays: number
+  exportedAt: string | null
+  reason: 'ok' | 'not_exported' | 'outside_window'
+}
+
+export const evaluateReopenWindow = (
+  snapshot: Pick<ReopenPeriodSnapshot, 'exported_at'>,
+  referenceDate: Date = new Date(),
+  windowDays: number = resolveReopenWindowDays()
+): ReopenWindowEvaluation => {
+  const exportedAt = parseExportedAt(snapshot.exported_at ?? null)
+
+  if (!exportedAt) {
+    return {
+      withinWindow: false,
+      daysSinceExport: null,
+      windowDays,
+      exportedAt: null,
+      reason: 'not_exported'
+    }
+  }
+
+  const elapsed = daysBetween(exportedAt, referenceDate)
+
+  return {
+    withinWindow: elapsed <= windowDays,
+    daysSinceExport: elapsed,
+    windowDays,
+    exportedAt: exportedAt.toISOString(),
+    reason: elapsed <= windowDays ? 'ok' : 'outside_window'
+  }
+}
+
+/**
+ * Versión throwing de `evaluateReopenWindow`, usada por el flujo
+ * transaccional. El período debe haber sido exportado (`exported_at`
+ * populado) y la diferencia entre `exported_at` y `referenceDate` debe
+ * estar dentro de la ventana configurada.
+ *
+ * Reemplaza el check "mes operativo vigente" original de TASK-410 porque
+ * ese criterio dejaba una zanja muerta — el mes operativo vigente típica-
+ * mente aún no está exportado.
  */
 export const assertReopenWindow = (
-  periodYear: number,
-  periodMonth: number,
+  snapshot: Pick<ReopenPeriodSnapshot, 'exported_at'>,
   referenceDate: Date = new Date()
 ): void => {
-  const operational = getOperationalPayrollMonth(referenceDate)
+  const evaluation = evaluateReopenWindow(snapshot, referenceDate)
 
-  if (operational.operationalYear !== periodYear || operational.operationalMonth !== periodMonth) {
+  if (evaluation.reason === 'not_exported') {
     throw new PayrollValidationError(
-      `Solo se puede reabrir el período del mes operativo vigente (${operational.operationalYear}-${String(operational.operationalMonth).padStart(2, '0')}). Para meses anteriores usa un ajuste en el período actual.`,
+      'La nómina no tiene fecha de exportación. Solo se pueden reabrir nóminas exportadas.',
+      409
+    )
+  }
+
+  if (!evaluation.withinWindow) {
+    const rounded = Math.round(evaluation.daysSinceExport ?? 0)
+
+    throw new PayrollValidationError(
+      `La nómina fue exportada hace ${rounded} día(s). Solo se pueden reabrir nóminas exportadas dentro de los últimos ${evaluation.windowDays} días. Para correcciones más antiguas usa un ajuste retroactivo en el período actual.`,
       409
     )
   }
@@ -58,7 +147,7 @@ export const assertNoExportInProgress = async (
 ): Promise<ReopenPeriodSnapshot> => {
   const { rows } = await client.query<ReopenPeriodSnapshot>(
     `
-      SELECT period_id, year, month, status
+      SELECT period_id, year, month, status, exported_at
       FROM greenhouse_payroll.payroll_periods
       WHERE period_id = $1
       FOR UPDATE NOWAIT
