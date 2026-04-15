@@ -452,5 +452,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-400` | `complete` | Portal Home Contract Governance, Entrypoint Cutover & Dashboard Compatibility | `docs/tasks/complete/TASK-400-portal-home-contract-governance-entrypoint-cutover.md` |
 | `TASK-401` | `to-do` | Bank Reconciliation: Continuous Transaction Matching | `docs/tasks/to-do/TASK-401-bank-reconciliation-continuous-matching.md` |
 | `TASK-402` | `to-do` | Universal Adaptive Home Orchestration | `docs/tasks/to-do/TASK-402-universal-adaptive-home-orchestration.md` |
+| `TASK-403` | `to-do` | Entitlements Runtime Foundation & Home Bridge | `docs/tasks/to-do/TASK-403-entitlements-runtime-foundation-home-bridge.md` |
+| `TASK-404` | `to-do` | Entitlements Governance Admin Center | `docs/tasks/to-do/TASK-404-entitlements-governance-admin-center.md` |
 | `TASK-405` | `to-do` | Reconcile `main` into `develop` for Kortex Identity Bridge | `docs/tasks/to-do/TASK-405-reconcile-main-into-develop-kortex-identity.md` |
 | `TASK-406` | `to-do` | Promote Reconciled Kortex Identity Bridge to `main` | `docs/tasks/to-do/TASK-406-promote-kortex-identity-bridge-to-main.md` |
+| `TASK-409` | `to-do` | Payroll Reliquidación Program | `docs/tasks/to-do/TASK-409-payroll-reliquidation-program.md` |
+| `TASK-410` | `to-do` | Payroll Period Reopen Foundation & Entry Versioning | `docs/tasks/to-do/TASK-410-payroll-period-reopen-foundation-versioning.md` |
+| `TASK-411` | `to-do` | Payroll Reliquidación Finance Delta Consumer | `docs/tasks/to-do/TASK-411-payroll-reliquidation-finance-delta-consumer.md` |
+| `TASK-412` | `to-do` | Payroll Reliquidación Admin UI, Preview & Audit Trail | `docs/tasks/to-do/TASK-412-payroll-reliquidation-admin-ui-preview-audit.md` |
