@@ -250,6 +250,7 @@ const run = async () => {
     // event_id. The reactive consumer keys idempotency on
     // (event_id, handler), so a fresh ID guarantees the handler will run.
     const eventId = `outbox-${randomUUID()}`
+
     const payload = {
       entryId: v2.entry_id,
       periodId: PERIOD_ID,

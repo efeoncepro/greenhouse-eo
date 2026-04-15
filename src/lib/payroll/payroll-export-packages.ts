@@ -3,6 +3,7 @@ import 'server-only'
 import { Buffer } from 'node:buffer'
 
 import type { CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
+import { query } from '@/lib/db'
 import { sendEmail } from '@/lib/email/delivery'
 import { generatePayrollCsv } from '@/lib/payroll/export-payroll'
 import { generatePayrollPeriodPdf } from '@/lib/payroll/generate-payroll-pdf'
@@ -92,11 +93,65 @@ export const buildPayrollExportArtifactFilename = (periodId: string, kind: 'pdf'
 const readStoredArtifact = async (storagePath: string) =>
   Buffer.from((await downloadGreenhouseMediaAsset(storagePath)).arrayBuffer)
 
-const canReuseStoredPackage = (record: PayrollExportPackageRecord) =>
-  record.pdfTemplateVersion === PAYROLL_EXPORT_PACKAGE_TEMPLATE_VERSION &&
-  record.csvTemplateVersion === PAYROLL_EXPORT_PACKAGE_TEMPLATE_VERSION &&
-  Boolean(record.pdfStoragePath) &&
-  Boolean(record.csvStoragePath)
+// TASK-409 hotfix 2026-04-15 — content-freshness cache invariant.
+//
+// The package record carries a `generatedAt` timestamp that marks when
+// the PDF/CSV files in storage were materialized. Before trusting a
+// cached package, we compare it against the most recent `updated_at`
+// across the currently-active payroll entries for the period. If any
+// active entry was touched after the package was generated (e.g. a
+// reliquidación created a v2 row via supersede, or a manual edit
+// landed), the stored files are stale and MUST be regenerated.
+//
+// Without this check, the cache would only invalidate on template
+// version bumps and storage path drops — the observed bug on Marzo
+// 2026 was exactly that: post-reliquidación, `canReuseStoredPackage`
+// returned true, the email attached the v1 PDF/CSV, and the operator
+// received a report that no longer matched the live Finance state.
+//
+// The query is one cheap SELECT over the partial unique index
+// `payroll_entries_period_member_active_unique` which covers
+// (period_id, member_id) WHERE is_active=TRUE.
+const getLatestActiveEntryTimestamp = async (periodId: string): Promise<string | null> => {
+  const rows = await query<{ latest: Date | string | null }>(
+    `
+      SELECT MAX(updated_at) AS latest
+      FROM greenhouse_payroll.payroll_entries
+      WHERE period_id = $1
+        AND is_active = TRUE
+    `,
+    [periodId]
+  )
+
+  const latest = rows[0]?.latest
+
+  if (!latest) return null
+
+  return latest instanceof Date ? latest.toISOString() : String(latest)
+}
+
+export const canReuseStoredPackage = (
+  record: PayrollExportPackageRecord,
+  latestEntryTimestamp: string | null
+) => {
+  if (record.pdfTemplateVersion !== PAYROLL_EXPORT_PACKAGE_TEMPLATE_VERSION) return false
+  if (record.csvTemplateVersion !== PAYROLL_EXPORT_PACKAGE_TEMPLATE_VERSION) return false
+  if (!record.pdfStoragePath || !record.csvStoragePath) return false
+
+  if (!record.generatedAt) return false
+
+  // If we can't read the entry freshness for any reason, regenerate
+  // rather than serve a possibly-stale package. Fail-safe default.
+  if (!latestEntryTimestamp) return false
+
+  const generatedAtMs = Date.parse(record.generatedAt)
+  const latestEntryMs = Date.parse(latestEntryTimestamp)
+
+  if (!Number.isFinite(generatedAtMs) || !Number.isFinite(latestEntryMs)) return false
+
+  // Entries newer than the package → regenerate.
+  return latestEntryMs <= generatedAtMs
+}
 
 const generateAndPersistPackage = async (params: {
   periodId: string
@@ -202,9 +257,13 @@ export const getOrCreatePayrollExportPackageAssets = async (
   }
 
   const entries = await getPayrollEntries(periodId)
-  const existing = await getPayrollExportPackageByPeriodId(periodId)
 
-  if (existing && canReuseStoredPackage(existing)) {
+  const [existing, latestEntryTimestamp] = await Promise.all([
+    getPayrollExportPackageByPeriodId(periodId),
+    getLatestActiveEntryTimestamp(periodId)
+  ])
+
+  if (existing && canReuseStoredPackage(existing, latestEntryTimestamp)) {
     try {
       const [pdfBuffer, csvBuffer] = await Promise.all([
         readStoredArtifact(existing.pdfStoragePath as string),
