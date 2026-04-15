@@ -19,7 +19,7 @@ const GreenhouseSprintDetail = ({ sprintId }: GreenhouseSprintDetailProps) => {
     <Stack spacing={6}>
       <Stack spacing={1.5}>
         <Breadcrumbs aria-label='breadcrumbs'>
-          <Typography component={Link} href='/dashboard' color='inherit'>
+          <Typography component={Link} href='/home' color='inherit'>
             {GH_CLIENT_NAV.dashboard.label}
           </Typography>
           <Typography component={Link} href='/sprints' color='inherit'>

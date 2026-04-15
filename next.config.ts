@@ -8,17 +8,7 @@ const sourcemapsReady =
 
 const nextConfig: NextConfig = {
   basePath: process.env.BASEPATH,
-  distDir: process.env.NEXT_DIST_DIR || '.next',
-  redirects: async () => {
-    return [
-      {
-        source: '/',
-        destination: '/dashboard',
-        permanent: true,
-        locale: false
-      }
-    ]
-  }
+  distDir: process.env.NEXT_DIST_DIR || '.next'
 }
 
 export default withSentryConfig(nextConfig, {
