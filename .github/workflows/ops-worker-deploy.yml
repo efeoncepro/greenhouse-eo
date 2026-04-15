@@ -71,7 +71,14 @@ jobs:
         }}
       GCP_PROJECT_ID: efeonce-group
       GCP_REGION: us-east4
-      SERVICE_ACCOUNT: greenhouse-portal@efeonce-group.iam.gserviceaccount.com
+      # Deployer identity: generic github-actions-deployer SA, impersonated
+      # via Workload Identity Federation (see scripts/setup-github-actions-wif.sh).
+      # This SA has permission to SET greenhouse-portal as the Cloud Run
+      # runtime SA (via roles/iam.serviceAccountUser) but is NOT
+      # greenhouse-portal itself — deploy identity and runtime identity
+      # are kept separate on purpose.
+      DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+      RUNTIME_SERVICE_ACCOUNT: greenhouse-portal@efeonce-group.iam.gserviceaccount.com
 
     steps:
       - name: Checkout
@@ -82,7 +89,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT }}
+          service_account: ${{ env.DEPLOYER_SERVICE_ACCOUNT }}
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
