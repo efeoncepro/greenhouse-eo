@@ -12,8 +12,20 @@
  */
 
 import { closeGreenhousePostgres, query } from '@/lib/db'
+import { buildReactiveHandlerKey } from '@/lib/sync/reactive-handler-key'
 
 const PERIOD_ID = '2026-03'
+
+// Single source of truth for the reliquidation projection identity.
+// The projection module itself has `import 'server-only'` and cannot
+// be loaded from a plain tsx script; we restate the name and trigger
+// events here as constants the script asserts against. If the
+// projection is renamed the diagnose run will still succeed but a
+// mismatch would surface as zero rows in the log lookup, which is
+// exactly the symptom that prompted this refactor — kept intentionally
+// visible rather than silently tolerant.
+const RELIQUIDATION_PROJECTION_NAME = 'payroll_reliquidation_delta'
+const RELIQUIDATION_TRIGGER_EVENTS = ['payroll_entry.reliquidated'] as const
 
 interface DeltaRow extends Record<string, unknown> {
   expense_id: string
@@ -103,6 +115,14 @@ const run = async () => {
     )
   }
 
+  // The `handler` column in outbox_reactive_log carries a composite
+  // `<projection_name>:<event_type>` value. We compose the keys via
+  // `buildReactiveHandlerKey` (shared module, no server-only) so the
+  // reader and writer can never drift on the format.
+  const handlerKeys = RELIQUIDATION_TRIGGER_EVENTS.map(eventType =>
+    buildReactiveHandlerKey(RELIQUIDATION_PROJECTION_NAME, eventType)
+  )
+
   const logRows = await query<ReactiveLogRow>(
     `
       SELECT l.event_id, l.handler, l.reacted_at, l.result, l.retries, l.last_error
@@ -110,10 +130,10 @@ const run = async () => {
       INNER JOIN greenhouse_sync.outbox_events AS e ON e.event_id = l.event_id
       WHERE e.event_type = 'payroll_entry.reliquidated'
         AND (e.payload_json->>'periodId' = $1)
-        AND l.handler = 'payroll_reliquidation_delta'
+        AND l.handler = ANY($2::text[])
       ORDER BY l.reacted_at ASC
     `,
-    [PERIOD_ID]
+    [PERIOD_ID, handlerKeys]
   )
 
   console.log(`\n outbox_reactive_log entries (payroll_reliquidation_delta handler): ${logRows.length}`)
