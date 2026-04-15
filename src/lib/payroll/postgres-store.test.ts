@@ -12,7 +12,8 @@ vi.mock('@/lib/postgres/client', () => ({
     callback({ query: mockClientQuery })
 }))
 
-const { pgUpdatePayrollPeriod, pgSetPeriodApproved, pgSetPeriodExported } = await import('./postgres-store')
+const { pgListPayrollCompensationMembers, pgUpdatePayrollPeriod, pgSetPeriodApproved, pgSetPeriodExported } =
+  await import('./postgres-store')
 
 const PAYROLL_REQUIRED_TABLES = [
   'greenhouse_core.members',
@@ -324,5 +325,74 @@ describe('pgSetPeriodExported', () => {
     await expect(pgSetPeriodExported('2026-03')).rejects.toThrow('Only approved payroll periods can be exported.')
 
     expect(mockClientQuery).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('pgListPayrollCompensationMembers', () => {
+  beforeEach(() => {
+    mockRunGreenhousePostgresQuery.mockReset()
+    mockClientQuery.mockReset()
+  })
+
+  it('qualifies member_id references in current_compensation to avoid ambiguous SQL', async () => {
+    mockRunGreenhousePostgresQuery.mockImplementation(async (text: string) => {
+      if (text.includes('information_schema.tables')) {
+        return PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name }))
+      }
+
+      if (text.includes('WITH compensation_counts AS')) {
+        return [
+          {
+            member_id: 'member-1',
+            display_name: 'Andres Carlosama',
+            primary_email: 'andres@efeoncepro.com',
+            avatar_url: null,
+            active: true,
+            compensation_version_count: 2,
+            current_version_id: 'member-1_v2',
+            current_effective_from: '2026-04-01',
+            current_contract_type: 'employee',
+            current_pay_regime: 'chile',
+            current_payroll_via: 'greenhouse',
+            current_daily_required: true,
+            current_deel_contract_id: null,
+            contract_end_date: null,
+            current_currency: 'CLP'
+          }
+        ]
+      }
+
+      throw new Error(`Unexpected query: ${text}`)
+    })
+
+    const members = await pgListPayrollCompensationMembers()
+
+    expect(members).toHaveLength(1)
+    expect(members[0]).toMatchObject({
+      memberId: 'member-1',
+      memberName: 'Andres Carlosama',
+      hasCompensationHistory: true,
+      compensationVersionCount: 2,
+      currentCompensationVersionId: 'member-1_v2'
+    })
+
+    const sqlCall = mockRunGreenhousePostgresQuery.mock.calls.find(call =>
+      String(call[0]).includes('WITH compensation_counts AS')
+    )
+
+    const sql = String(sqlCall?.[0] ?? '')
+
+    expect(sql).toContain('SELECT DISTINCT ON (cv.member_id)')
+    expect(sql).toContain('cv.member_id,')
+    expect(sql).toContain('cv.version_id AS current_version_id')
+    expect(sql).toContain('cv.effective_from AS current_effective_from')
+    expect(sql).toContain('cv.contract_type AS current_contract_type')
+    expect(sql).toContain('cv.pay_regime AS current_pay_regime')
+    expect(sql).toContain('cv.currency AS current_currency')
+    expect(sql).toContain('WHERE cv.effective_from <= CURRENT_DATE')
+    expect(sql).toContain('cv.effective_to IS NULL OR cv.effective_to >= CURRENT_DATE')
+    expect(sql).toContain('ORDER BY cv.member_id, cv.effective_from DESC, cv.version DESC')
+    expect(sql).not.toContain('SELECT DISTINCT ON (member_id)')
+    expect(sql).not.toContain('ORDER BY member_id, effective_from DESC, version DESC')
   })
 })
