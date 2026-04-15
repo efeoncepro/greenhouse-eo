@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -70,5 +70,60 @@ describe('LeaveRequestDialog', () => {
         endDate: '2026-04-14'
       })
     )
+  })
+
+  it('keeps the draft values when submit fails', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn().mockRejectedValue(new Error('Unable to create leave request.'))
+
+    renderWithTheme(
+      <LeaveRequestDialog
+        open
+        saving={false}
+        leaveTypes={[
+          {
+            leaveTypeCode: 'medical',
+            leaveTypeName: 'Permiso médico / cita médica',
+            description: null,
+            defaultAnnualAllowanceDays: 0,
+            requiresAttachment: false,
+            isPaid: true,
+            active: true,
+            colorToken: null
+          }
+        ]}
+        onClose={vi.fn()}
+        onSubmit={onSubmit}
+      />
+    )
+
+    const dialog = screen.getByRole('dialog')
+    const startDateInput = within(dialog).getByLabelText(/desde/i, { selector: 'input' })
+    const endDateInput = within(dialog).getByLabelText(/hasta/i, { selector: 'input' })
+    const reasonInput = within(dialog).getAllByLabelText(/motivo/i, { selector: 'textarea' }).at(-1)
+
+    expect(startDateInput).toBeTruthy()
+    expect(endDateInput).toBeTruthy()
+    expect(reasonInput).toBeTruthy()
+
+    fireEvent.change(startDateInput!, { target: { value: '2026-04-17' } })
+    fireEvent.change(endDateInput!, { target: { value: '2026-04-17' } })
+    fireEvent.change(reasonInput!, { target: { value: 'Control médico' } })
+
+    const submitButton = screen.getByRole('button', { name: /solicitar/i })
+
+    await waitFor(() => {
+      expect(submitButton).toBeEnabled()
+    })
+
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1)
+    })
+
+    expect(startDateInput).toHaveValue('2026-04-17')
+    expect(endDateInput).toHaveValue('2026-04-17')
+    expect(reasonInput).toHaveValue('Control médico')
   })
 })

@@ -115,7 +115,10 @@ const MyLeaveView = () => {
       setCreateOpen(false)
       await load()
     } catch (createError) {
-      setError(createError instanceof Error ? createError.message : 'No fue posible crear la solicitud.')
+      const message = createError instanceof Error ? createError.message : 'No fue posible crear la solicitud.'
+
+      setError(message)
+      throw createError instanceof Error ? createError : new Error(message)
     } finally {
       setCreateSaving(false)
     }

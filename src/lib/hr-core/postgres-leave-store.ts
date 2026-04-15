@@ -590,16 +590,16 @@ const getMemberById = async (memberId: string, client?: PoolClient) => {
   const [row] = await queryRows<PostgresMemberResolverRow>(
     `
       SELECT
-        member_id,
-        display_name,
-        primary_email AS email,
+        m.member_id,
+        m.display_name,
+        m.primary_email AS email,
         COALESCE(p360.resolved_avatar_url, m.avatar_url) AS avatar_url,
         p360.user_id AS linked_user_id,
-        identity_profile_id,
-        reports_to_member_id AS reports_to,
-        employment_type,
-        hire_date,
-        COALESCE(prior_work_years, 0) AS prior_work_years,
+        m.identity_profile_id,
+        m.reports_to_member_id AS reports_to,
+        m.employment_type,
+        m.hire_date,
+        COALESCE(m.prior_work_years, 0) AS prior_work_years,
         (
           SELECT cv.pay_regime
           FROM greenhouse_payroll.compensation_versions AS cv
