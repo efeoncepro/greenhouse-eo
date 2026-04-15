@@ -9,12 +9,27 @@ import { getMonthDateRange } from '@/lib/finance/periods'
 /**
  * TASK-411 — Payroll Reliquidación Finance Delta Consumer.
  *
- * Applies the gross-total delta of a payroll reliquidation as a signed
+ * Applies the NET-total delta of a payroll reliquidation as a signed
  * finance expense row. The row is posted into the original operational month
  * (so P&L, cost attribution, and client economics all rebuild into the
  * correct period), linked back to the reopen audit row, and tagged with
  * `source_type = 'payroll_reliquidation'` so the base payroll materialization
  * ignores it on subsequent runs.
+ *
+ * **Why net and not gross** (hotfix 2026-04-15): the base payroll expense
+ * written by `finance_expense_reactive_intake` uses `payroll_entries.net_total`
+ * (the "nómina neta" that actually gets paid to the worker). For Chile
+ * contracts, gross ≠ net because worker-side deductions (AFP, salud,
+ * impuesto) are withheld in payroll. Using `deltaGross` in the delta row
+ * while the base row tracks `net_total` breaks the accounting invariant:
+ * `sum(base + deltas) != final_net`. All delta rows must reference the
+ * same amount dimension as the base row they correct. For international
+ * / Deel contracts gross == net so the choice is invisible, but Chile
+ * regime reliquidations like Valentina Hoyos on Marzo 2026 surfaced the
+ * bug (gross delta CLP 823 vs net delta CLP 56.95). The consumer now
+ * expects `deltaNet` and `previousNet`/`newNet` in the payload and uses
+ * them exclusively. `deltaGross` is still recorded in `notes` for audit
+ * trail because it's useful for forensics.
  *
  * Idempotency is provided by the reactive consumer: the outbox event is
  * processed once per (projection, scope) group, and the expense row carries
@@ -32,6 +47,9 @@ export interface ApplyPayrollReliquidationDeltaParams {
   memberId: string
   operationalYear: number
   operationalMonth: number
+  previousNet: number
+  newNet: number
+  deltaNet: number
   previousGross: number
   newGross: number
   deltaGross: number
@@ -56,6 +74,9 @@ export const applyPayrollReliquidationDelta = async (
     memberId,
     operationalYear,
     operationalMonth,
+    previousNet,
+    newNet,
+    deltaNet,
     previousGross,
     newGross,
     deltaGross,
@@ -75,11 +96,11 @@ export const applyPayrollReliquidationDelta = async (
     throw new Error(`applyPayrollReliquidationDelta: invalid currency "${currency}"`)
   }
 
-  const rounded = roundMoney(deltaGross)
+  const rounded = roundMoney(deltaNet)
 
   if (!Number.isFinite(rounded) || rounded === 0) {
     console.info(
-      `[payroll-reliquidation-delta] noop for period=${periodId} member=${memberId} delta=${deltaGross} (previous=${previousGross}, new=${newGross})`
+      `[payroll-reliquidation-delta] noop for period=${periodId} member=${memberId} deltaNet=${deltaNet} (previousNet=${previousNet}, newNet=${newNet})`
     )
 
     return 'noop'
@@ -90,7 +111,17 @@ export const applyPayrollReliquidationDelta = async (
   const exchangeRateToClp = currency === 'USD' ? 0 : 1
   const totalAmountClp = currency === 'USD' ? 0 : rounded
   const description = `Reliquidación nómina ${periodId} (${reason})`
-  const notes = `TASK-411 payroll reliquidation delta. eventId=${eventId} previousGross=${roundMoney(previousGross)} newGross=${roundMoney(newGross)} deltaGross=${rounded}`
+
+  const notes = [
+    'TASK-411 payroll reliquidation delta',
+    `eventId=${eventId}`,
+    `previousNet=${roundMoney(previousNet)}`,
+    `newNet=${roundMoney(newNet)}`,
+    `deltaNet=${rounded}`,
+    `previousGross=${roundMoney(previousGross)}`,
+    `newGross=${roundMoney(newGross)}`,
+    `deltaGross=${roundMoney(deltaGross)}`
+  ].join(' ')
 
   await client.query(
     `
@@ -147,7 +178,7 @@ export const applyPayrollReliquidationDelta = async (
   )
 
   console.info(
-    `[payroll-reliquidation-delta] applied period=${periodId} member=${memberId} delta=${rounded} ${currency} expense=${expenseId}`
+    `[payroll-reliquidation-delta] applied period=${periodId} member=${memberId} deltaNet=${rounded} ${currency} expense=${expenseId}`
   )
 
   return 'applied'

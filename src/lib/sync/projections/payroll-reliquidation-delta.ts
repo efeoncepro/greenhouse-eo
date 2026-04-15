@@ -78,6 +78,14 @@ export const payrollReliquidationDeltaProjection: ProjectionDefinition = {
       return null
     }
 
+    // TASK-411 hotfix 2026-04-15 — the base payroll expense tracks NET, so
+    // the delta row must also be computed from NET. Reading gross values
+    // from the payload stays for audit/forensics but they are not used for
+    // the expense amount.
+    const previousNet = toFiniteNumber(payload.previousNetTotal) ?? 0
+    const newNet = toFiniteNumber(payload.newNetTotal) ?? 0
+    const deltaNet = toFiniteNumber(payload.deltaNet) ?? newNet - previousNet
+
     const previousGross = toFiniteNumber(payload.previousGrossTotal) ?? 0
     const newGross = toFiniteNumber(payload.newGrossTotal) ?? 0
     const deltaGross = toFiniteNumber(payload.deltaGross) ?? newGross - previousGross
@@ -102,6 +110,9 @@ export const payrollReliquidationDeltaProjection: ProjectionDefinition = {
         memberId,
         operationalYear,
         operationalMonth,
+        previousNet,
+        newNet,
+        deltaNet,
         previousGross,
         newGross,
         deltaGross,
@@ -112,7 +123,7 @@ export const payrollReliquidationDeltaProjection: ProjectionDefinition = {
       })
     )
 
-    return `payroll reliquidation delta ${outcome} for period=${periodId} member=${memberId} delta=${deltaGross} ${currency}`
+    return `payroll reliquidation delta ${outcome} for period=${periodId} member=${memberId} deltaNet=${deltaNet} ${currency}`
   },
 
   maxRetries: 3
