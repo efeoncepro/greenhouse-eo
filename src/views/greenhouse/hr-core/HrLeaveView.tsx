@@ -173,10 +173,11 @@ const HrLeaveView = () => {
 
       if (!res.ok) {
         const d = await res.json()
+        const message = d.error || 'Error al crear solicitud'
 
-        setError(d.error || 'Error al crear solicitud')
+        setError(message)
 
-        return
+        throw new Error(message)
       }
 
       setCreateOpen(false)

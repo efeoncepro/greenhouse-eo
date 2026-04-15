@@ -77,20 +77,24 @@ const LeaveRequestDialog = ({
   }
 
   const handleSubmit = async () => {
-    await onSubmit({
-      memberId: ownerMemberId || undefined,
-      leaveTypeCode,
-      startDate,
-      endDate,
-      startPeriod,
-      endPeriod,
-      reason: reason || null,
-      attachmentAssetId: attachmentAsset?.assetId || null,
-      attachmentUrl: null,
-      notes: notes || null
-    })
+    try {
+      await onSubmit({
+        memberId: ownerMemberId || undefined,
+        leaveTypeCode,
+        startDate,
+        endDate,
+        startPeriod,
+        endPeriod,
+        reason: reason || null,
+        attachmentAssetId: attachmentAsset?.assetId || null,
+        attachmentUrl: null,
+        notes: notes || null
+      })
 
-    reset()
+      reset()
+    } catch {
+      // Keep the draft untouched so the caller can surface the error and the user can retry.
+    }
   }
 
   return (

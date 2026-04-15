@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 
+const leaveRequestDialogSpy = vi.hoisted(() => vi.fn())
+
 vi.mock('next/dynamic', () => ({
   default: () => () => null
 }))
@@ -14,7 +16,11 @@ vi.mock('@/components/greenhouse/GreenhouseCalendar', () => ({
 }))
 
 vi.mock('@/components/greenhouse/LeaveRequestDialog', () => ({
-  default: () => null
+  default: (props: Record<string, unknown>) => {
+    leaveRequestDialogSpy(props)
+
+    return null
+  }
 }))
 
 vi.mock('@/components/card-statistics', () => ({
@@ -137,5 +143,102 @@ describe('HrLeaveView', () => {
 
     expect(attachmentLink).toHaveAttribute('href', '/api/assets/private/asset-1')
     expect(attachmentLink).toHaveAttribute('target', '_blank')
+  })
+
+  it('rethrows create errors so the request dialog preserves the draft', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input)
+
+      if (url.startsWith('/api/hr/core/leave/requests?')) {
+        return Response.json({
+          requests: [],
+          summary: {
+            total: 0,
+            pendingSupervisor: 0,
+            pendingHr: 0,
+            approved: 0
+          }
+        })
+      }
+
+      if (url.startsWith('/api/hr/core/leave/balances?')) {
+        return Response.json({
+          balances: [],
+          summary: {
+            memberCount: 0,
+            totalAvailableDays: 0
+          }
+        })
+      }
+
+      if (url.startsWith('/api/hr/core/leave/calendar?')) {
+        return Response.json({
+          from: '2026-01-01',
+          to: '2026-12-31',
+          holidaySource: 'none',
+          events: []
+        })
+      }
+
+      if (url === '/api/hr/core/meta') {
+        return Response.json({
+          currentMemberId: 'daniela-ferreira',
+          departments: [],
+          leaveTypes: [
+            {
+              leaveTypeCode: 'medical',
+              leaveTypeName: 'Permiso médico / cita médica',
+              description: null,
+              defaultAnnualAllowanceDays: 0,
+              requiresAttachment: true,
+              isPaid: true,
+              active: true,
+              colorToken: null
+            }
+          ],
+          jobLevels: [],
+          employmentTypes: [],
+          healthSystems: [],
+          bankAccountTypes: [],
+          leaveRequestStatuses: [],
+          attendanceStatuses: []
+        })
+      }
+
+      if (url === '/api/hr/core/leave/requests' && init?.method === 'POST') {
+        return Response.json({ error: 'Unable to create leave request.' }, { status: 500 })
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`)
+    })
+
+    const { default: HrLeaveView } = await import('./HrLeaveView')
+
+    renderWithTheme(<HrLeaveView />)
+
+    await waitFor(() => {
+      expect(leaveRequestDialogSpy).toHaveBeenCalled()
+    })
+
+    const latestDialogProps = leaveRequestDialogSpy.mock.calls.at(-1)?.[0] as {
+      onSubmit: (payload: Record<string, unknown>) => Promise<void>
+    }
+
+    await expect(latestDialogProps.onSubmit({
+      memberId: 'daniela-ferreira',
+      leaveTypeCode: 'medical',
+      startDate: '2026-04-17',
+      endDate: '2026-04-17',
+      startPeriod: 'morning',
+      endPeriod: 'morning',
+      reason: 'Control médico',
+      attachmentAssetId: 'asset-1',
+      attachmentUrl: null,
+      notes: null
+    })).rejects.toThrow('Unable to create leave request.')
+
+    await waitFor(() => {
+      expect(screen.getByText('Unable to create leave request.')).toBeInTheDocument()
+    })
   })
 })
