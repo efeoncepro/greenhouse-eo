@@ -66,6 +66,56 @@ fi
 RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-}"
 EMAIL_FROM="${EMAIL_FROM:-${DEFAULT_EMAIL_FROM}}"
 
+# ─── Secret access helpers ───────────────────────────────────────────────────
+
+extract_secret_name() {
+  local ref="$1"
+  local normalized="${ref%%:latest}"
+
+  if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
+    normalized="${normalized#projects/}"
+    normalized="${normalized#*/secrets/}"
+    normalized="${normalized%%/versions/*}"
+  fi
+
+  printf '%s' "${normalized}"
+}
+
+normalize_secret_ref_for_cloud_run() {
+  local ref="$1"
+  local normalized="${ref}"
+
+  if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
+    printf '%s' "${normalized}"
+    return 0
+  fi
+
+  if [[ "${normalized}" == *:* ]]; then
+    printf '%s' "${normalized}"
+    return 0
+  fi
+
+  printf '%s:latest' "${normalized}"
+}
+
+ensure_secret_accessor_binding() {
+  local ref="$1"
+
+  if [ -z "${ref}" ]; then
+    return 0
+  fi
+
+  local secret_name
+  secret_name="$(extract_secret_name "${ref}")"
+
+  echo "=== Ensuring ${SERVICE_ACCOUNT} can access secret ${secret_name} ==="
+  gcloud secrets add-iam-policy-binding "${secret_name}" \
+    --project="${PROJECT_ID}" \
+    --member="serviceAccount:${SERVICE_ACCOUNT}" \
+    --role="roles/secretmanager.secretAccessor" \
+    --quiet >/dev/null
+}
+
 # ─── Build & Deploy to Cloud Run ─────────────────────────────────────────────
 
 echo "=== Building ${SERVICE_NAME} image via Cloud Build ==="
@@ -108,6 +158,17 @@ fi
 # Secrets from Secret Manager (mounted as env vars)
 SECRETS="NEXTAUTH_SECRET=${NEXTAUTH_SECRET_REF}"
 SECRETS="${SECRETS},GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
+
+if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
+  SECRETS="${SECRETS},RESEND_API_KEY=$(normalize_secret_ref_for_cloud_run "${RESEND_API_KEY_SECRET_REF}")"
+fi
+
+ensure_secret_accessor_binding "${NEXTAUTH_SECRET_REF}"
+ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
+
+if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
+  ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF}"
+fi
 
 gcloud run deploy "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \

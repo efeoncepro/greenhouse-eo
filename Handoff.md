@@ -52,6 +52,20 @@
   - reprobar aprobación/rechazo real de solicitudes `pending_supervisor`
   - desplegar `ops-worker` con `RESEND_API_KEY_SECRET_REF` real
   - reprobar un `leave_request.created` real verificando in-app + emails
+- **Delta 2026-04-15 15:30 CLST — email approval confirmation estabilizado en staging**
+  - deployado `ops-worker` revision `ops-worker-00011-ln8`
+  - `services/ops-worker/deploy.sh` ahora:
+    - asegura `roles/secretmanager.secretAccessor` para los secrets runtime del worker
+    - inyecta `RESEND_API_KEY` como secret nativo de Cloud Run
+    - conserva `RESEND_API_KEY_SECRET_REF` como contrato declarativo para observabilidad/fallback
+  - `gcloud run services describe ops-worker` confirma:
+    - `RESEND_API_KEY_SECRET_REF=greenhouse-resend-api-key-staging`
+    - `RESEND_API_KEY` via `valueFrom.secretKeyRef`
+  - evidencia de entrega ya enviada en staging para la aprobación de Daniela:
+    - `leave_review_confirmation` -> `jreyes@efeoncepro.com` -> `status=sent` -> `resend_id=afeadeae-851d-4ab3-af18-fa77036806fa`
+    - `leave_request_decision` -> `dferreira@efeoncepro.com` -> `status=sent` -> `resend_id=1497dfc7-4d98-4e7a-85b7-260f3b00da06`
+    - `notification` -> `daniela.ferreira@efeonce.org` -> `status=sent` -> `resend_id=dc34b39a-9caf-4b96-8e43-49b39c9203c8`
+  - nota: `POST /api/admin/ops/email-delivery-retry` ya no encontró backlog pendiente porque esas tres entregas ya habían sido drenadas exitosamente antes del recheck final
 
 ## Sesion 2026-04-15 — Reconciliacion main/develop (content parity)
 
