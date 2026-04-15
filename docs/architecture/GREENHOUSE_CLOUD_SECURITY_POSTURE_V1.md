@@ -8,6 +8,23 @@
 
 ---
 
+## Delta 2026-04-15 — Shared infra requires environment-specific secrets without pretending infra isolation
+
+- La postura vigente de Greenhouse no es `prod infra` vs `staging infra` para todos los componentes cloud.
+- Hoy el portal y el runtime reactivo operan sobre infraestructura compartida:
+  - Cloud Run `ops-worker` compartido
+  - Cloud SQL `greenhouse-pg-dev` compartido
+- Por lo tanto, la separación de riesgo entre `staging` y `production` depende de contratos explícitos de configuración y secretos donde sí existe blast radius por ambiente.
+
+Regla de seguridad vigente:
+
+- No asumir aislamiento efectivo solo porque una variable o un deploy usen la palabra `production`.
+- Cuando la infraestructura subyacente sea compartida, los secretos con impacto ambiente-específico deben seguir separados, especialmente:
+  - `NEXTAUTH_SECRET`
+  - `RESEND_API_KEY`
+  - cualquier signing secret, bearer token o credencial third-party con distinto riesgo operacional por ambiente
+- La documentación y los scripts de deploy deben reflejar la topología real. Inventar refs de producción inexistentes es riesgo operativo, no hardening.
+
 ## Delta 2026-04-15 — Resend deja de ser Vercel-only cuando el email corre también en Cloud Run
 
 - ISSUE-050 confirmó drift real: el portal staging tenía `RESEND_API_KEY`, pero el runtime reactivo que procesa correos (`ops-worker`) no compartía ese contrato y degradaba emails transaccionales.
