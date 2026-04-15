@@ -8,6 +8,18 @@
 
 ---
 
+## Delta 2026-04-15 — Resend deja de ser Vercel-only cuando el email corre también en Cloud Run
+
+- ISSUE-050 confirmó drift real: el portal staging tenía `RESEND_API_KEY`, pero el runtime reactivo que procesa correos (`ops-worker`) no compartía ese contrato y degradaba emails transaccionales.
+- Decisión vigente:
+  - `RESEND_API_KEY_SECRET_REF` pasa a ser el contrato canónico recomendado para email cuando el mismo flujo puede ejecutarse en más de un runtime
+  - `RESEND_API_KEY` directo queda como fallback legacy
+  - `EMAIL_FROM` debe propagarse explícitamente a cualquier worker que pueda emitir emails; no debe asumirse solo en el runtime web
+- Implementación alineada:
+  - `src/lib/resend.ts` resuelve `RESEND_API_KEY` vía helper canónico `Secret Manager -> env fallback`
+  - `services/ops-worker/deploy.sh` ya acepta `RESEND_API_KEY_SECRET_REF` para Cloud Run
+
+
 ## Delta 2026-04-09 — Secret Manager payload hygiene enforced after ISSUE-032
 
 - Se confirmó un riesgo operativo real: un secreto podía existir, resolver por `*_SECRET_REF` y aun así romper runtime si el payload fue publicado con comillas envolventes o `\\n` literal.
@@ -511,7 +523,7 @@ These principles govern security decisions across the hardening track and future
 
 3. **Fallback on every path** — WIF falls back to SA key, Secret Manager falls back to env var. Zero-downtime migration, always.
 
-4. **Proportional investment** — protect critical secrets (payroll passwords, session keys, tax API tokens) with Secret Manager. Leave `CRON_SECRET` and `RESEND_API_KEY` in Vercel env vars.
+4. **Proportional investment** — protect critical secrets (payroll passwords, session keys, tax API tokens) with Secret Manager. `CRON_SECRET` puede seguir en env directo; `RESEND_API_KEY` puede quedar en env directo solo si el flujo corre en un único runtime. Si el email corre en más de un runtime, usar `RESEND_API_KEY_SECRET_REF`.
 
 5. **Verify before trusting** — test the restore, test the WIF token, test the auth helper. "It should work" is not the same as "it works".
 

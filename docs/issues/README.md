@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-049`
+`ISSUE-051`
 
 ## Open
 
@@ -75,6 +75,8 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-047` | [Kill switch de email sin endpoint CRUD — solo operable por SQL directo](open/ISSUE-047-email-kill-switch-sin-endpoint-crud.md) | production + staging | 2026-04-13 | open   |
 | `ISSUE-045` | [Registrar OC falla por referencia ambigua a `client_id` en el resolver canónico de Finance](open/ISSUE-045-purchase-order-create-ambiguous-client-id.md) | staging | 2026-04-13 | open |
 | `ISSUE-048` | [Payroll compensation overview puede fallar o degradar por referencia ambigua a `member_id`](open/ISSUE-048-payroll-compensation-member-id-ambiguous-silent-degradation.md) | staging + runtime general | 2026-04-13 | open |
+| `ISSUE-049` | [Leave review puede fallar con acción stale y policy frágil de aprobación](open/ISSUE-049-leave-review-modal-stale-actions-and-brittle-approval-policy.md) | staging + runtime general | 2026-04-15 | open |
+| `ISSUE-050` | [Staging salta correos de permisos porque el runtime reactivo no tiene Resend configurado](open/ISSUE-050-staging-leave-emails-skipped-resend-not-configured-in-reactive-runtime.md) | staging | 2026-04-15 | open |
 
 ## Resolved
 

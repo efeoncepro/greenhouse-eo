@@ -1,5 +1,58 @@
 # Handoff.md
 
+## Sesion 2026-04-15 — ISSUE-049 leave review fix local + ISSUE-050 staging email drift identificada
+
+- **Estado:** `fix local aplicado para review`, `issue separado abierto para email staging`
+- **Rama:** `develop`
+- **Root cause confirmada del review error (`Unable to review leave request.`):**
+  - logs de staging para `POST /api/hr/core/leave/requests/leave-f7b4f48c-cea0-4c0a-89ee-fb4152a8344c/review`
+  - PostgreSQL devolvía `42P08: could not determine data type of parameter $4`
+  - el query afectado era `applyWorkflowApprovalOverrideInTransaction()` en `src/lib/approval-authority/store.ts`, dentro de `jsonb_build_object(...)`
+- **Implementado localmente:**
+  - `src/lib/approval-authority/store.ts`
+    - casteo explícito `$4::text` y `$5::text` en el payload JSON del override HR
+  - `src/lib/hr-core/leave-review-policy.ts` (nuevo)
+    - policy pura compartida para acciones válidas de review por actor + estado
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - elimina dispatch stale por `reviewAction` state
+    - envía la acción clickeada explícitamente
+    - muestra solo botones válidos según la policy
+    - consume `hasHrAdminAccess` desde meta
+  - `src/app/api/hr/core/meta/route.ts`
+  - `src/types/hr-core.ts`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/lib/hr-core/service.ts`
+    - backend alineado a la misma policy para evitar drift UI/backend
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/approval-authority/store.test.ts src/lib/hr-core/leave-review-policy.test.ts src/app/api/hr/core/meta/route.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+  - `12` tests OK
+  - `pnpm exec eslint ...` dirigido sobre los archivos tocados OK
+- **Tema adicional investigado (correo/notificación al crear la solicitud):**
+  - `leave_request.created` sí se publicó en staging
+  - autenticado como `jreyes@efeoncepro.com`, `GET /api/notifications?unreadOnly=true&pageSize=10` sí devuelve la notificación in-app de Daniela
+  - los correos `leave_request_submitted` y `leave_request_pending_review` existen pero quedaron `skipped` con `errorMessage = "RESEND_API_KEY is not configured."`
+  - se abrió `docs/issues/open/ISSUE-050-staging-leave-emails-skipped-resend-not-configured-in-reactive-runtime.md`
+- **Hardening adicional aplicado localmente para ISSUE-050:**
+  - `src/lib/resend.ts`
+    - Resend ya no depende solo de env directo; ahora resuelve `RESEND_API_KEY` vía helper canónico `Secret Manager -> env fallback`
+  - `services/ops-worker/deploy.sh`
+    - acepta `RESEND_API_KEY_SECRET_REF`
+    - propaga `EMAIL_FROM`
+    - deja warning explícito si el worker se despliega sin contrato de email
+  - `src/lib/resend.test.ts` (nuevo)
+    - cubre resolución vía secret helper + fallback unconfigured/default sender
+  - `.env.example`, `project_context.md`, `changelog.md`, `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`, `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+    - sincronizados al contrato nuevo multi-runtime
+- **Lectura operativa actual:**
+  - el problema de review sí era código y quedó corregido localmente
+  - el problema de email staging es drift/config del runtime reactivo y contrato incompleto de Resend entre runtimes, no del flujo HR
+- **Pendiente antes de cerrar ISSUE-049/ISSUE-050 en staging:**
+  - commit + push del fix local
+  - redeploy de `develop`
+  - reprobar aprobación/rechazo real de solicitudes `pending_supervisor`
+  - desplegar `ops-worker` con `RESEND_API_KEY_SECRET_REF` real
+  - reprobar un `leave_request.created` real verificando in-app + emails
+
 ## Sesion 2026-04-15 — Reconciliacion main/develop (content parity)
 
 - **Estado:** `complete`

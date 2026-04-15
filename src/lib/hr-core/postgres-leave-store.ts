@@ -20,7 +20,7 @@ import type {
   ReviewLeaveRequestInput
 } from '@/types/hr-core'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
-import type { ApprovalStageCode, WorkflowApprovalSnapshotRecord } from '@/lib/approval-authority/types'
+import type { WorkflowApprovalSnapshotRecord } from '@/lib/approval-authority/types'
 
 import {
   calculateProgressiveExtraDays,
@@ -37,6 +37,7 @@ import {
   loadHolidayDateSetForRange
 } from '@/lib/hr-core/leave-domain'
 import type { LeaveDayPeriod, LeavePayrollImpactPeriod, LeavePolicy } from '@/lib/hr-core/leave-domain'
+import { canPerformLeaveReviewAction, getLeaveApprovalStageCode } from '@/lib/hr-core/leave-review-policy'
 import { getNextApprovalAuthority, resolveInitialApprovalAuthority } from '@/lib/approval-authority/resolver'
 import {
   applyWorkflowApprovalOverrideInTransaction,
@@ -343,18 +344,6 @@ const mapLeaveRequest = (row: PostgresLeaveRequestRow): HrLeaveRequest => ({
   notes: normalizeNullableString(row.notes),
   createdAt: toPgTimestampString(row.created_at)
 })
-
-const getLeaveApprovalStageCode = (status: HrLeaveRequest['status']): ApprovalStageCode | null => {
-  if (status === 'pending_supervisor') {
-    return 'supervisor_review'
-  }
-
-  if (status === 'pending_hr') {
-    return 'hr_review'
-  }
-
-  return null
-}
 
 const pickBestApprovalSnapshot = ({
   request,
@@ -1915,6 +1904,7 @@ export const reviewLeaveRequestInPostgres = async ({
     const actorMember = await resolveTenantMember(tenant, client).catch(() => null)
     const actorMemberId = actorMember?.member_id || null
     const actorName = actorMember?.display_name || tenant.userId
+    const hasHrAdminAccess = isHrAdminTenant(tenant)
     const member = await getMemberById(request.memberId, client)
 
     const [leaveTypes, leavePolicies] = await Promise.all([
@@ -1951,15 +1941,33 @@ export const reviewLeaveRequestInPostgres = async ({
     let approvalSnapshot = await getCurrentLeaveApprovalSnapshot(request, client)
     const currentApprovalStageCode = getLeaveApprovalStageCode(request.status)
 
+    const requestForReview: HrLeaveRequest = {
+      ...request,
+      approvalStageCode: currentApprovalStageCode,
+      approvalSnapshot
+    }
+
+    if (!['pending_supervisor', 'pending_hr'].includes(request.status)) {
+      throw new HrCoreValidationError(
+        action === 'cancel'
+          ? 'Only pending requests can be cancelled.'
+          : 'This request is no longer pending HR review.',
+        409
+      )
+    }
+
+    if (!canPerformLeaveReviewAction({
+      request: requestForReview,
+      actor: {
+        currentMemberId: actorMemberId,
+        hasHrAdminAccess
+      },
+      action
+    })) {
+      throw new HrCoreValidationError('Forbidden', 403)
+    }
+
     if (action === 'cancel') {
-      if (!isHrAdminTenant(tenant) && actorMemberId !== request.memberId) {
-        throw new HrCoreValidationError('Forbidden', 403)
-      }
-
-      if (!['pending_supervisor', 'pending_hr'].includes(request.status)) {
-        throw new HrCoreValidationError('Only pending requests can be cancelled.', 409)
-      }
-
       await client.query(
         `
           UPDATE greenhouse_hr.leave_requests
@@ -1988,18 +1996,7 @@ export const reviewLeaveRequestInPostgres = async ({
           client
         })
       }
-    } else if (!isHrAdminTenant(tenant)) {
-      const effectiveApproverMemberId =
-        approvalSnapshot?.effectiveApproverMemberId ?? request.supervisorMemberId
-
-      if (
-        request.status !== 'pending_supervisor' ||
-        !actorMemberId ||
-        effectiveApproverMemberId !== actorMemberId
-      ) {
-        throw new HrCoreValidationError('Forbidden', 403)
-      }
-
+    } else if (!hasHrAdminAccess) {
       await client.query(
         `
           UPDATE greenhouse_hr.leave_requests
@@ -2050,10 +2047,6 @@ export const reviewLeaveRequestInPostgres = async ({
         })
       }
     } else {
-      if (!['pending_hr', 'pending_supervisor'].includes(request.status)) {
-        throw new HrCoreValidationError('This request is no longer pending HR review.', 409)
-      }
-
       if (request.status === 'pending_supervisor' && currentApprovalStageCode === 'supervisor_review') {
         approvalSnapshot = await applyWorkflowApprovalOverrideInTransaction({
           workflowDomain: 'leave',

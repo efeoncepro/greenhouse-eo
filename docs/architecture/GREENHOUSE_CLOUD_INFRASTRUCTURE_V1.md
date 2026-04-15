@@ -6,6 +6,16 @@
 
 ---
 
+## Delta 2026-04-15 — ops-worker adopta contrato explícito para email transaccional
+
+- El worker reactivo de Cloud Run ya no debe asumir que el contrato de email existe solo en Vercel.
+- Runtime actualizado:
+  - `services/ops-worker/deploy.sh` propaga `EMAIL_FROM`
+  - `services/ops-worker/deploy.sh` acepta `RESEND_API_KEY_SECRET_REF` para que el worker resuelva Resend vía Secret Manager
+- Regla operativa:
+  - si `ops-worker` procesa proyecciones que envían correo, el deploy debe incluir `RESEND_API_KEY_SECRET_REF`
+  - dejar esa variable ausente degrada el canal email aunque el portal web siga teniendo `RESEND_API_KEY`
+
 ## Delta 2026-04-09 — Secret Manager publication protocol tightened after ISSUE-032
 
 Greenhouse formaliza un protocolo operativo para secretos runtime en GCP Secret Manager:

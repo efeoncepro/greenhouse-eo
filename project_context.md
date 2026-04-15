@@ -1,5 +1,17 @@
 # project_context.md
 
+## Delta 2026-04-15 Email runtime multi-runtime contract hardened
+
+- El sistema de correo transaccional ya no debe asumir que `RESEND_API_KEY` vive solo como env directo del runtime web de Vercel.
+- Runtime actualizado:
+  - `src/lib/resend.ts` ahora resuelve `RESEND_API_KEY` mediante el helper canónico `Secret Manager -> env fallback -> unconfigured`
+  - `services/ops-worker/deploy.sh` ahora acepta `RESEND_API_KEY_SECRET_REF` y propaga `EMAIL_FROM` al worker
+- Contrato operativo:
+  - el secreto canónico de Resend puede declararse como `RESEND_API_KEY_SECRET_REF`
+  - `RESEND_API_KEY` sigue permitido como fallback legacy para runtimes que aún dependan de env directo
+  - cualquier runtime que procese proyecciones reactivas de email debe recibir el mismo contrato (`RESEND_API_KEY_SECRET_REF` o fallback explícito equivalente), no una configuración manual divergente
+  - `EMAIL_FROM` deja de asumirse implícito en Cloud Run y debe propagarse también al worker cuando ese runtime emite emails
+
 ## Delta 2026-04-13 Entitlements modulares quedan formalizados como dirección canónica de autorización
 
 - Greenhouse ya tiene una arquitectura explícita para evolucionar desde `roleCodes + routeGroups + authorizedViews` hacia una capa de entitlements modular, action-based y scope-aware.
@@ -4533,6 +4545,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `RESEND_API_KEY`
+- `RESEND_API_KEY_SECRET_REF`
 - `EMAIL_FROM`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 - `AGENT_AUTH_SECRET` — shared secret para autenticación headless de agentes y E2E (generar con `openssl rand -hex 32`). Sin esta variable el endpoint `/api/auth/agent-session` responde 404.
@@ -4550,12 +4563,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `RESEND_API_KEY`
+- `RESEND_API_KEY_SECRET_REF`
 - `EMAIL_FROM`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
 - `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` habilitan Microsoft SSO multi-tenant en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` habilitan Google SSO en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `RESEND_API_KEY` y `EMAIL_FROM` quedan reservadas para el sistema de emails transaccionales; no deben commitearse con valores reales y deben existir al menos en `Development`, `Preview`, `Staging` y `Production` si ese flujo se habilita.
+- `RESEND_API_KEY_SECRET_REF` es el contrato canónico recomendado cuando el mismo flujo de email puede correr en más de un runtime (por ejemplo Vercel + Cloud Run); el valor directo `RESEND_API_KEY` queda como fallback legacy.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.

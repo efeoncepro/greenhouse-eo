@@ -1,5 +1,14 @@
 # changelog.md
 
+## 2026-04-15
+
+### 2026-04-15 — Email runtime de Resend endurecido para Vercel + Cloud Run
+
+- `src/lib/resend.ts` ya no depende solo de `process.env.RESEND_API_KEY`; ahora resuelve `RESEND_API_KEY` vía el helper canónico `Secret Manager -> env fallback -> unconfigured`.
+- Se agrega `RESEND_API_KEY_SECRET_REF` al contrato documentado del repo (`.env.example`, `project_context.md`) para evitar drift entre runtimes que procesan email.
+- `services/ops-worker/deploy.sh` ahora propaga `EMAIL_FROM` y acepta `RESEND_API_KEY_SECRET_REF` para que el worker reactivo pueda emitir correos con el mismo contrato de secretos del portal.
+- La corrección apunta al incidente de staging donde las solicitudes de permisos sí generaban eventos y notificaciones in-app, pero los correos quedaban `failed/skipped` por ausencia de configuración efectiva de Resend en el runtime reactivo.
+
 ## 2026-04-13
 
 ### 2026-04-13 — TASK-392: Management Accounting Reliable Actual Foundation Program cerrado como entrega documental

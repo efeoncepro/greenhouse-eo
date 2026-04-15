@@ -45,6 +45,7 @@ CPU="2"
 TIMEOUT="540"
 CONCURRENCY="4"
 REACTIVE_BATCH_SIZE="500"
+DEFAULT_EMAIL_FROM="Efeonce Greenhouse <greenhouse@efeoncepro.com>"
 
 # Cloud Scheduler timezone
 SCHEDULER_TZ="America/Santiago"
@@ -61,6 +62,9 @@ else
   PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
   echo "=== STAGING deployment ==="
 fi
+
+RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-}"
+EMAIL_FROM="${EMAIL_FROM:-${DEFAULT_EMAIL_FROM}}"
 
 # ─── Build & Deploy to Cloud Run ─────────────────────────────────────────────
 
@@ -93,6 +97,13 @@ ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=${PG_INSTANCE
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
+ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
+
+if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
+  ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
+else
+  echo "WARN: RESEND_API_KEY_SECRET_REF is not set; ops-worker will skip outbound email delivery."
+fi
 
 # Secrets from Secret Manager (mounted as env vars)
 SECRETS="NEXTAUTH_SECRET=${NEXTAUTH_SECRET_REF}"

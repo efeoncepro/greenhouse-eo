@@ -319,8 +319,8 @@ export const applyWorkflowApprovalOverrideInTransaction = async ({
         override_reason = $5,
         snapshot_payload = COALESCE(snapshot_payload, '{}'::jsonb) || jsonb_build_object(
           'overrideApplied', TRUE,
-          'overrideActorUserId', $4,
-          'overrideReason', $5,
+          'overrideActorUserId', $4::text,
+          'overrideReason', $5::text,
           'overrideAppliedAt', CURRENT_TIMESTAMP
         ),
         updated_at = CURRENT_TIMESTAMP

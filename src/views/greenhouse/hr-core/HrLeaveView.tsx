@@ -43,6 +43,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import GreenhouseCalendar from '@/components/greenhouse/GreenhouseCalendar'
 import LeaveRequestDialog from '@/components/greenhouse/LeaveRequestDialog'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
+import { getLeaveReviewCapabilities } from '@/lib/hr-core/leave-review-policy'
 import type {
   CreateLeaveRequestInput,
   HrApprovalAction,
@@ -87,6 +88,7 @@ const HrLeaveView = () => {
   const [calData, setCalData] = useState<HrLeaveCalendarResponse | null>(null)
   const [leaveTypes, setLeaveTypes] = useState<HrLeaveType[]>([])
   const [currentMemberId, setCurrentMemberId] = useState<string | null>(null)
+  const [hasHrAdminAccess, setHasHrAdminAccess] = useState(false)
 
   // Filters
   const [filterStatus, setFilterStatus] = useState<HrLeaveRequestStatus | ''>('')
@@ -98,7 +100,6 @@ const HrLeaveView = () => {
 
   // Review dialog
   const [reviewReq, setReviewReq] = useState<HrLeaveRequest | null>(null)
-  const [reviewAction, setReviewAction] = useState<HrApprovalAction>('approve')
   const [reviewNotes, setReviewNotes] = useState('')
   const [reviewSaving, setReviewSaving] = useState(false)
   const activeLeaveTypes = leaveTypes.filter(leaveType => leaveType.active)
@@ -146,6 +147,7 @@ const HrLeaveView = () => {
 
         setLeaveTypes(meta.leaveTypes ?? [])
         setCurrentMemberId(meta.currentMemberId ?? null)
+        setHasHrAdminAccess(meta.hasHrAdminAccess === true)
       } else {
         const payload = await metaRes.json().catch(() => null)
 
@@ -187,7 +189,7 @@ const HrLeaveView = () => {
     }
   }
 
-  const handleReview = async () => {
+  const handleReview = async (action: HrApprovalAction) => {
     if (!reviewReq) return
 
     setReviewSaving(true)
@@ -197,7 +199,7 @@ const HrLeaveView = () => {
       const res = await fetch(`/api/hr/core/leave/requests/${reviewReq.requestId}/review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: reviewAction, notes: reviewNotes || null })
+        body: JSON.stringify({ action, notes: reviewNotes || null })
       })
 
       if (!res.ok) {
@@ -210,16 +212,10 @@ const HrLeaveView = () => {
 
       setReviewReq(null)
       setReviewNotes('')
-      fetchData()
+      await fetchData()
     } finally {
       setReviewSaving(false)
     }
-  }
-
-  const handleReviewAction = (action: HrApprovalAction) => {
-    setReviewAction(action)
-
-    void handleReview()
   }
 
   if (loading) {
@@ -241,6 +237,13 @@ const HrLeaveView = () => {
   const summary = reqData?.summary ?? { total: 0, pendingSupervisor: 0, pendingHr: 0, approved: 0 }
   const requests = reqData?.requests ?? []
   const balances = balData?.balances ?? []
+
+  const reviewCapabilities = reviewReq
+    ? getLeaveReviewCapabilities({
+        request: reviewReq,
+        actor: { currentMemberId, hasHrAdminAccess }
+      })
+    : null
 
   // Group balances by leave type for radial gauges
   const balancesByType = leaveTypes.map(lt => {
@@ -384,7 +387,11 @@ const HrLeaveView = () => {
                     {requests.map(req => {
                       const typeConf = getLeaveTypeConfig(req.leaveTypeCode)
                       const statusConf = leaveStatusConfig[req.status]
-                      const isPending = req.status === 'pending_supervisor' || req.status === 'pending_hr'
+
+                      const canReview = getLeaveReviewCapabilities({
+                        request: req,
+                        actor: { currentMemberId, hasHrAdminAccess }
+                      }).canOpenReview
 
                       return (
                         <TableRow key={req.requestId} hover>
@@ -432,12 +439,12 @@ const HrLeaveView = () => {
                             </Typography>
                           </TableCell>
                           <TableCell align='right'>
-                            {isPending && (
+                            {canReview && (
                               <Button
                                 variant='tonal'
                                 size='small'
                                 color='primary'
-                                onClick={() => { setReviewReq(req); setReviewAction('approve'); setReviewNotes('') }}
+                                onClick={() => { setReviewReq(req); setReviewNotes('') }}
                               >
                                 Revisar
                               </Button>
@@ -669,33 +676,39 @@ const HrLeaveView = () => {
           <Button variant='tonal' color='secondary' onClick={() => setReviewReq(null)} disabled={reviewSaving}>
             Cerrar
           </Button>
-          <Button
-            variant='tonal'
-            color='warning'
-            onClick={() => handleReviewAction('cancel')}
-            disabled={reviewSaving}
-            startIcon={<i className='tabler-ban' />}
-          >
-            Cancelar solicitud
-          </Button>
-          <Button
-            variant='contained'
-            color='error'
-            onClick={() => handleReviewAction('reject')}
-            disabled={reviewSaving}
-            startIcon={<i className='tabler-circle-x' />}
-          >
-            Rechazar
-          </Button>
-          <Button
-            variant='contained'
-            color='success'
-            onClick={() => handleReviewAction('approve')}
-            disabled={reviewSaving}
-            startIcon={<i className='tabler-circle-check' />}
-          >
-            Aprobar
-          </Button>
+          {reviewCapabilities?.canCancel && (
+            <Button
+              variant='tonal'
+              color='warning'
+              onClick={() => void handleReview('cancel')}
+              disabled={reviewSaving}
+              startIcon={<i className='tabler-ban' />}
+            >
+              Cancelar solicitud
+            </Button>
+          )}
+          {reviewCapabilities?.canReject && (
+            <Button
+              variant='contained'
+              color='error'
+              onClick={() => void handleReview('reject')}
+              disabled={reviewSaving}
+              startIcon={<i className='tabler-circle-x' />}
+            >
+              Rechazar
+            </Button>
+          )}
+          {reviewCapabilities?.canApprove && (
+            <Button
+              variant='contained'
+              color='success'
+              onClick={() => void handleReview('approve')}
+              disabled={reviewSaving}
+              startIcon={<i className='tabler-circle-check' />}
+            >
+              Aprobar
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </Stack>
