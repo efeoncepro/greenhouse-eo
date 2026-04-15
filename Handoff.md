@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-04-15 — Reconciliacion main/develop (content parity)
+
+- **Estado:** `complete`
+- **Ramas:** `origin/main` y `origin/develop`
+- **Resultado:** no quedan diferencias de contenido entre ambas ramas (`git diff --name-only origin/main origin/develop` -> `0`). La divergencia restante de historial (`git rev-list --left-right --count origin/main...origin/develop` -> `33 39`) responde a cherry-picks y promociones separadas, no a archivos distintos.
+- **Promovido a `main`:**
+  - hardening de finance y Nubox ya validado en `develop`
+  - cierre del `portal home contract` (runtime, navegación, backfill y consumers)
+  - guardrail de payroll para lookup de compensaciones
+- **Promovido a `develop`:**
+  - identity endpoint de sister platforms
+  - hardening de creación de leave requests
+- **Validación ejecutada:** suite Vitest verde en los lotes finales (`256` archivos, `1151` tests OK, `2` skipped), más pruebas focalizadas para payroll y Nubox/finance.
+- **Nota operativa:** para ver el estado reconciliado en VS Code basta trabajar con refs actualizadas; el contenido de `main` y `develop` ya coincide aunque el historial de commits no sea idéntico.
+
 ## Sesion 2026-04-13 — TASK-392 Management Accounting Reliable Actual Foundation Program (complete)
 
 - **Estado:** `complete` (umbrella cerrado como entrega documental; TASK-176 queda como unico blocker externo del gate)
