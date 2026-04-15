@@ -24,7 +24,11 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
-import { getCurrentPayrollPeriod, getNextPayrollPeriodSuggestion } from '@/lib/payroll/current-payroll-period'
+import {
+  getActivePayrollPeriods,
+  getNextPayrollPeriodSuggestion,
+  type ActivePayrollPeriodEntry
+} from '@/lib/payroll/current-payroll-period'
 import type { CompensationVersion, PayrollCompensationMember, PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
@@ -39,6 +43,7 @@ const PayrollDashboard = () => {
   // Data
   const [periods, setPeriods] = useState<PayrollPeriod[]>([])
   const [activePeriod, setActivePeriod] = useState<PayrollPeriod | null>(null)
+  const [activePayrollEntries, setActivePayrollEntries] = useState<ActivePayrollPeriodEntry[]>([])
   const [activeEntries, setActiveEntries] = useState<PayrollEntry[]>([])
 
   const [currencyEquivalents, setCurrencyEquivalents] = useState<{
@@ -88,8 +93,13 @@ const PayrollDashboard = () => {
 
         setPeriods(nextPeriods)
 
-        // Auto-select only the latest chronological period if it is still open
-        const active = getCurrentPayrollPeriod(nextPeriods)
+        // TASK-409 — multi-period awareness. Compute all periods that
+        // demand attention (reopened, current operational month, approved
+        // pending export, future drafts) and use the top-priority entry
+        // as the default active selection. The full list is surfaced in
+        // the UI as secondary cards when more than one period is active.
+        const activeEntries = getActivePayrollPeriods(nextPeriods)
+        const active = activeEntries[0]?.period ?? null
 
         const currentSelectedPeriodId = selectedPeriodIdRef.current
 
@@ -98,6 +108,7 @@ const PayrollDashboard = () => {
             ? currentSelectedPeriodId
             : active?.periodId ?? null
 
+        setActivePayrollEntries(activeEntries)
         setActivePeriod(active)
         setSelectedPeriodId(nextSelectedPeriodId)
 
@@ -243,6 +254,12 @@ const PayrollDashboard = () => {
   const grossSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.grossTotal)
   const netSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.netTotal)
 
+  // TASK-409 — multi-period awareness. When more than one period is active
+  // (e.g. Marzo reopened + Abril draft), surface a secondary entries list
+  // so the operator can jump between them without the "Historial" tab. The
+  // primary period (index 0) is already rendered in the main area.
+  const secondaryActivePeriods = activePayrollEntries.slice(1)
+
   const selectedPeriod = selectedPeriodId ? periods.find(period => period.periodId === selectedPeriodId) ?? null : null
   const displayedPeriod = selectedPeriod ?? activePeriod
   const displayedEntries = selectedPeriod?.periodId === activePeriod?.periodId ? activeEntries : selectedEntries
@@ -292,6 +309,37 @@ const PayrollDashboard = () => {
             {hasActivePayrollMembers
               ? 'Antes de calcular nómina, configura salario base, previsión y bonos desde la pestaña Compensaciones.'
               : 'No hay colaboradores activos disponibles para nómina. Primero debes habilitarlos desde Admin > Equipo.'}
+          </Alert>
+        )}
+
+        {/* TASK-409 — multi-period awareness banner. Renders only when more
+            than one period is in an active state simultaneously (e.g. a
+            prior month reopened for reliquidación while the current
+            operational month is in draft). Lets the operator jump between
+            them without leaving the "Período actual" tab. */}
+        {secondaryActivePeriods.length > 0 && (
+          <Alert
+            severity='info'
+            action={
+              <Stack direction='row' spacing={1}>
+                {secondaryActivePeriods.map(entry => (
+                  <Button
+                    key={entry.period.periodId}
+                    color='inherit'
+                    size='small'
+                    variant='outlined'
+                    onClick={() => {
+                      setSelectedPeriodId(entry.period.periodId)
+                      setTab('period')
+                    }}
+                  >
+                    {formatPeriodLabel(entry.period.year, entry.period.month)}
+                  </Button>
+                ))}
+              </Stack>
+            }
+          >
+            Hay {activePayrollEntries.length} períodos de nómina que requieren atención. El más urgente se muestra debajo.
           </Alert>
         )}
 
