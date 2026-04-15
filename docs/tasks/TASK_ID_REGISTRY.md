@@ -460,3 +460,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-410` | `complete` | Payroll Period Reopen Foundation & Entry Versioning | `docs/tasks/complete/TASK-410-payroll-period-reopen-foundation-versioning.md` |
 | `TASK-411` | `complete` | Payroll Reliquidación Finance Delta Consumer | `docs/tasks/complete/TASK-411-payroll-reliquidation-finance-delta-consumer.md` |
 | `TASK-412` | `complete` | Payroll Reliquidación Admin UI, Preview & Audit Trail | `docs/tasks/complete/TASK-412-payroll-reliquidation-admin-ui-preview-audit.md` |
+| `TASK-413` | `to-do` | Kortex Identity Bridge Hardening & Contract Closure | `docs/tasks/to-do/TASK-413-kortex-identity-bridge-hardening.md` |
