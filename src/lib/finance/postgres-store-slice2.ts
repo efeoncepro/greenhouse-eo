@@ -1912,10 +1912,10 @@ export const createFinanceExpenseInPostgres = async ({
   directOverheadMemberId: string | null
   notes: string | null
   actorUserId: string | null
-}) => {
+}, opts?: { client?: PoolClient }) => {
   await assertFinanceSlice2PostgresReady()
 
-  return withGreenhousePostgresTransaction(async client => {
+  const run = async (client: PoolClient) => {
     const rows = await queryRows<PostgresExpenseRow>(
       `
         INSERT INTO greenhouse_finance.expenses (
@@ -1992,7 +1992,13 @@ export const createFinanceExpenseInPostgres = async ({
     }).catch(err => console.error('[auto-allocation] Failed:', err))
 
     return created
-  })
+  }
+
+  if (opts?.client) {
+    return run(opts.client)
+  }
+
+  return withGreenhousePostgresTransaction(run)
 }
 
 // ─── Income payments: list by income ────────────────────────────────
