@@ -2664,6 +2664,10 @@ export interface GreenhousePayrollPayrollEntries {
   fixed_bonus_amount: Generated<Numeric>;
   fixed_bonus_label: string | null;
   gross_total: Numeric;
+  /**
+   * Only one active version per (period_id, member_id). Enforced via partial unique index payroll_entries_period_member_active_unique.
+   */
+  is_active: Generated<boolean>;
   kpi_data_source: Generated<string | null>;
   kpi_otd_percent: Numeric | null;
   kpi_otd_qualifies: boolean | null;
@@ -2682,9 +2686,21 @@ export interface GreenhousePayrollPayrollEntries {
   payroll_via: Generated<string>;
   period_id: string;
   remote_allowance: Generated<Numeric>;
+  /**
+   * Audit row that justifies this entry version. NULL for original v1 entries; populated for v>=2.
+   */
+  reopen_audit_id: string | null;
   sii_retention_amount: Numeric | null;
   sii_retention_rate: Numeric | null;
+  /**
+   * Points to the entry_id that replaced this row (NULL for active rows and rows never reliquidated).
+   */
+  superseded_by: string | null;
   updated_at: Generated<Timestamp>;
+  /**
+   * Entry version. 1 = original export. 2 = reliquidated version after reopen. V1 caps at 2 via payroll_entries_version_v1_cap.
+   */
+  version: Generated<number>;
   working_days_in_period: number | null;
 }
 
@@ -2709,6 +2725,20 @@ export interface GreenhousePayrollPayrollExportPackages {
   period_id: string;
   storage_bucket: string | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhousePayrollPayrollPeriodReopenAudit {
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  locked_at: Timestamp | null;
+  operational_month: Timestamp;
+  period_id: string;
+  previous_status: string;
+  previred_declared_check: Generated<boolean>;
+  reason: string;
+  reason_detail: string | null;
+  reopened_at: Generated<Timestamp>;
+  reopened_by_user_id: string;
 }
 
 export interface GreenhousePayrollPayrollPeriods {
@@ -4311,6 +4341,7 @@ export interface DB {
   "greenhouse_payroll.payroll_bonus_config": GreenhousePayrollPayrollBonusConfig;
   "greenhouse_payroll.payroll_entries": GreenhousePayrollPayrollEntries;
   "greenhouse_payroll.payroll_export_packages": GreenhousePayrollPayrollExportPackages;
+  "greenhouse_payroll.payroll_period_reopen_audit": GreenhousePayrollPayrollPeriodReopenAudit;
   "greenhouse_payroll.payroll_periods": GreenhousePayrollPayrollPeriods;
   "greenhouse_payroll.payroll_receipts": GreenhousePayrollPayrollReceipts;
   "greenhouse_payroll.previred_afp_rates": GreenhousePayrollPreviredAfpRates;

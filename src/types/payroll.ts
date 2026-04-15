@@ -9,7 +9,7 @@ import type {
 export type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
 
 export type PayrollCurrency = 'CLP' | 'USD'
-export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported'
+export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported' | 'reopened'
 export type HealthSystem = 'fonasa' | 'isapre'
 export type GratificacionLegalMode = 'mensual_25pct' | 'anual_proporcional' | 'ninguna'
 export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual' | 'external'

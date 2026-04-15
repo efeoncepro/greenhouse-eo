@@ -505,6 +505,7 @@ export const resolveFinanceMemberContext = async ({
       `SELECT entry_id, period_id, member_id
        FROM greenhouse_payroll.payroll_entries
        WHERE entry_id = $1
+         AND is_active = TRUE
        LIMIT 1`,
       [normalizedPayrollEntryId]
     ).catch(() => [] as PayrollEntryRow[])

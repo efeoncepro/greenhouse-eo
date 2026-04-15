@@ -316,8 +316,20 @@ Definido en [TASK-409](./TASK-409-payroll-reliquidation-program.md) sección Det
 - Si durante Discovery se detecta que `payroll_entries.entry_id` no es UUID sino otro tipo, ajustar la migración
 - Si `payroll_previsional_snapshot` no tiene un campo claro de "declarado", crear un helper intermedio o abrir issue
 
-## Open Questions
+## Delta 2026-04-15 — Audit Findings (pre-implementación)
 
-- ¿El check de Previred se hace contra `payroll_previsional_snapshot.status` o contra un flag distinto? (Resolver en Discovery leyendo el schema real.)
-- ¿El flag `is_active` debe estar en la tabla o puede derivarse? → Propuesta: en la tabla + unique index parcial, es más simple y performante que una view.
-- ¿Emitir `payroll_entry.reliquidated` con delta cero o skip? → Propuesta: emitir siempre por trazabilidad; el consumer de Finance puede hacer no-op si delta=0.
+Durante Discovery se detectaron varios supuestos desactualizados que ajustan la implementación:
+
+1. **`payroll_entries.entry_id` es TEXT, no uuid.** La migración usa `text` para `superseded_by` y `period_id` en la tabla audit.
+2. **`payroll_periods.status` es TEXT con CHECK constraint, no enum PG.** La migración hace `DROP CONSTRAINT payroll_periods_status_check` y lo recrea con `'reopened'` incluido.
+3. **`payroll_entries` tiene `UNIQUE(period_id, member_id)` activa.** La migración la DROP y reemplaza con `CREATE UNIQUE INDEX ... ON (period_id, member_id) WHERE is_active = true`.
+4. **No existe campo "Previred declarado" en ninguna tabla.** Solo `previred_period_indicators` y `previred_afp_rates` (snapshots económicos). La ventana operativa actúa como proxy: Previred se declara entre el 1 y el 10 del mes siguiente, y el mes operativo vigente es por definición el no-declarado. V1 no implementa `assertPreviredNotDeclared` — la guarda de ventana la subsume. El audit table mantiene la columna `previred_declared_check boolean` con default `false`. Follow-up V2: tracking explícito de declaración Previred.
+5. **Recalculate flow actual hace UPSERT in-place** (`upsertPayrollEntry` en `persist-entry.ts`). La foundation agrega `supersedePayrollEntryOnRecalculate` y un branch en `recalculate-entry.ts` que la invoca cuando `period.status === 'reopened'`.
+6. **No existe zod en payroll routes.** Validación manual + `PayrollValidationError` + `toPayrollErrorResponse` es el patrón.
+7. **Se emite `payroll_entry.reliquidated` incluso con delta cero** (trazabilidad); el consumer de Finance hace no-op.
+
+## Open Questions — Resueltas
+
+- **Previred check**: delegado a ventana operativa (no se implementa guarda separada en V1).
+- **`is_active` flag**: columna real + unique index parcial.
+- **Delta cero**: emitir siempre.

@@ -11,11 +11,16 @@ import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { getCompensationVersionById } from '@/lib/payroll/get-compensation'
 import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { canEditPayrollEntries, shouldReopenApprovedPayrollPeriod } from '@/lib/payroll/period-lifecycle'
+import {
+  canEditPayrollEntries,
+  isPayrollPeriodReopened,
+  shouldReopenApprovedPayrollPeriod
+} from '@/lib/payroll/period-lifecycle'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
 import { isPayrollPostgresEnabled, pgGetActiveBonusConfig, pgSetPeriodCalculated } from '@/lib/payroll/postgres-store'
+import { supersedePayrollEntryOnRecalculate } from '@/lib/payroll/supersede-entry'
 
 type BonusConfigRow = {
   otd_threshold: number | string | null
@@ -419,6 +424,32 @@ export const recalculatePayrollEntry = async ({
     manualOverrideNote: input.manualOverrideNote !== undefined ? input.manualOverrideNote : entry.manualOverrideNote,
     adjustedColacionAmount: entry.adjustedColacionAmount ?? compensation.colacionAmount,
     adjustedMovilizacionAmount: entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount
+  }
+
+  // TASK-410 — when the period is in `reopened` state we must never mutate
+  // the v1 entry in place. The supersede path creates (or updates) the v2
+  // row inside a transaction and emits `payroll_entry.reliquidated` for the
+  // finance delta consumer.
+  if (isPayrollPeriodReopened(effectivePeriodStatus)) {
+    if (!isPayrollPostgresEnabled()) {
+      throw new PayrollValidationError(
+        'Payroll reliquidation requires the Postgres store. Enable GREENHOUSE_PAYROLL_USE_POSTGRES.',
+        500
+      )
+    }
+
+    const superseded = await supersedePayrollEntryOnRecalculate({
+      updatedEntry,
+      actorUserId: actorIdentifier ?? 'system'
+    })
+
+    const persisted = await getPayrollEntryById(superseded.entryId)
+
+    if (!persisted) {
+      throw new PayrollValidationError('Unable to reload superseded payroll entry.', 500)
+    }
+
+    return persisted
   }
 
   await upsertPayrollEntry(updatedEntry)

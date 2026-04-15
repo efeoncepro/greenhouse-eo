@@ -90,7 +90,8 @@ export async function GET(request: Request) {
          COALESCE(SUM(CASE WHEN e.currency = 'USD' THEN COALESCE(e.bonus_otd_amount, 0) + COALESCE(e.bonus_rpa_amount, 0) + COALESCE(e.bonus_other_amount, 0) ELSE 0 END), 0) AS bonuses_usd
        FROM greenhouse_payroll.payroll_entries e
        INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
-       WHERE p.year = $1 AND p.month = $2 AND p.status IN ('approved', 'exported')`,
+       WHERE p.year = $1 AND p.month = $2 AND p.status IN ('approved', 'exported')
+         AND e.is_active = TRUE`,
       [year, month]
     ),
 

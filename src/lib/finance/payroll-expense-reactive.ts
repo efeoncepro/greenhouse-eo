@@ -81,6 +81,7 @@ export const materializePayrollExpensesForExportedPeriod = async ({
       INNER JOIN greenhouse_core.members AS m
         ON m.member_id = e.member_id
       WHERE e.period_id = $1
+        AND e.is_active = TRUE
       ORDER BY m.display_name ASC NULLS LAST, e.entry_id ASC
     `,
     [periodId]

@@ -341,6 +341,7 @@ export const materializeProviderToolingSnapshotsForPeriod = async (
         WHERE pp.year = $3
           AND pp.month = $4
           AND pp.status IN ('calculated', 'approved', 'exported')
+          AND pe.is_active = TRUE
         GROUP BY lm.provider_id
       `,
       [periodStart, periodEnd, year, month]

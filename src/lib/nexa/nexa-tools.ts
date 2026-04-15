@@ -188,6 +188,7 @@ const checkPayrollTool: NexaToolDefinition = {
         FROM greenhouse_payroll.payroll_periods AS p
         LEFT JOIN greenhouse_payroll.payroll_entries AS e
           ON e.period_id = p.period_id
+          AND e.is_active = TRUE
         GROUP BY p.period_id, p.year, p.month, p.status, p.calculated_at, p.approved_at, p.exported_at
         ORDER BY p.year DESC, p.month DESC
         LIMIT 1

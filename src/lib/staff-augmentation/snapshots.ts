@@ -271,6 +271,7 @@ export const materializeStaffAugPlacementSnapshotsForPeriod = async (
           FROM greenhouse_payroll.payroll_entries
           WHERE member_id = $1
             AND period_id = $2
+            AND is_active = TRUE
           LIMIT 1
         `,
         [placement.member_id, periodId]

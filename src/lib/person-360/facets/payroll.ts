@@ -108,6 +108,7 @@ export const fetchPayrollFacet = async (ctx: FacetFetchContext): Promise<PersonP
       FROM greenhouse_payroll.payroll_entries pe
       JOIN greenhouse_payroll.payroll_periods pp ON pp.period_id = pe.period_id
       WHERE pe.member_id = $1
+        AND pe.is_active = TRUE
         ${entryFilter}
       ORDER BY pp.year DESC, pp.month DESC
       LIMIT 1`,

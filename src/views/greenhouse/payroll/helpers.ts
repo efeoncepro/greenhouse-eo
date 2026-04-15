@@ -100,7 +100,8 @@ export const periodStatusConfig: Record<PeriodStatus, StatusConfig> = {
   draft: { label: 'Borrador', color: 'default', icon: 'tabler-file-text' },
   calculated: { label: 'Calculado', color: 'info', icon: 'tabler-calculator' },
   approved: { label: 'Aprobado', color: 'success', icon: 'tabler-circle-check' },
-  exported: { label: 'Exportado', color: 'primary', icon: 'tabler-file-export' }
+  exported: { label: 'Exportado', color: 'primary', icon: 'tabler-file-export' },
+  reopened: { label: 'Reabierto', color: 'warning', icon: 'tabler-arrow-back-up' }
 }
 
 // ── Regime ───────────────────────────────────────────────────────────

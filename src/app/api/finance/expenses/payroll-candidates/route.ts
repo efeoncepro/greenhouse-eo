@@ -51,7 +51,7 @@ export async function GET(request: Request) {
   const linkStatus = searchParams.get('linkStatus')?.trim() || 'available'
 
   const params: unknown[] = []
-  let filters = `WHERE pp.status IN ('approved', 'exported')`
+  let filters = `WHERE pp.status IN ('approved', 'exported') AND pe.is_active = TRUE`
   let idx = 1
 
   if (periodId) {
