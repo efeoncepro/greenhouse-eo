@@ -1,8 +1,8 @@
 -- ============================================================================
--- Nubox Conformed Tables — Current-state BigQuery tables
+-- Nubox Conformed Tables — Append-only BigQuery snapshot tables
 -- ============================================================================
--- These tables hold the transformed, identity-resolved view of Nubox data.
--- Refreshed via DELETE/INSERT on each sync run (same pattern as delivery_*).
+-- These tables hold transformed, identity-resolved Nubox snapshots.
+-- Writers append a new snapshot per sync run; readers must resolve latest row per Nubox ID.
 -- Enables: DTE analytics, supplier spend, cash flow timing, tax reporting.
 --
 -- Prerequisites: greenhouse_conformed dataset must exist
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.nubox_sales` (
 )
 PARTITION BY DATE(synced_at)
 CLUSTER BY nubox_sale_id, client_rut
-OPTIONS(description = "Current-state Nubox sales with identity resolution to Greenhouse organizations and income records");
+OPTIONS(description = "Append-only Nubox sales snapshots with identity resolution to Greenhouse organizations and income records");
 
 CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.nubox_purchases` (
   nubox_purchase_id STRING NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.nubox_purchases`
 )
 PARTITION BY DATE(synced_at)
 CLUSTER BY nubox_purchase_id, supplier_rut
-OPTIONS(description = "Current-state Nubox purchases with identity resolution to Greenhouse suppliers and expense records");
+OPTIONS(description = "Append-only Nubox purchases snapshots with identity resolution to Greenhouse suppliers and expense records");
 
 CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.nubox_bank_movements` (
   nubox_movement_id STRING NOT NULL,
