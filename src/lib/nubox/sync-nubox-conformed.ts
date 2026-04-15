@@ -220,16 +220,6 @@ const writeConformedSales = async (projectId: string, rows: NuboxConformedSale[]
 
   const bq = getBigQueryClient()
 
-  // Delete only IDs we're about to re-insert (safe upsert pattern)
-  const ids = rows.map(r => r.nubox_sale_id)
-  const placeholders = ids.map((_, i) => `@id_${i}`).join(', ')
-  const params = Object.fromEntries(ids.map((id, i) => [`id_${i}`, id]))
-
-  await bq.query({
-    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_sales\` WHERE nubox_sale_id IN (${placeholders})`,
-    params
-  })
-
   await bq.dataset('greenhouse_conformed').table('nubox_sales').insert(rows)
 }
 
@@ -238,15 +228,6 @@ const writeConformedPurchases = async (projectId: string, rows: NuboxConformedPu
 
   const bq = getBigQueryClient()
 
-  const ids = rows.map(r => r.nubox_purchase_id)
-  const placeholders = ids.map((_, i) => `@id_${i}`).join(', ')
-  const params = Object.fromEntries(ids.map((id, i) => [`id_${i}`, id]))
-
-  await bq.query({
-    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_purchases\` WHERE nubox_purchase_id IN (${placeholders})`,
-    params
-  })
-
   await bq.dataset('greenhouse_conformed').table('nubox_purchases').insert(rows)
 }
 
@@ -254,15 +235,6 @@ const writeConformedBankMovements = async (projectId: string, rows: NuboxConform
   if (rows.length === 0) return
 
   const bq = getBigQueryClient()
-
-  const ids = rows.map(r => r.nubox_movement_id)
-  const placeholders = ids.map((_, i) => `@id_${i}`).join(', ')
-  const params = Object.fromEntries(ids.map((id, i) => [`id_${i}`, id]))
-
-  await bq.query({
-    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_bank_movements\` WHERE nubox_movement_id IN (${placeholders})`,
-    params
-  })
 
   await bq.dataset('greenhouse_conformed').table('nubox_bank_movements').insert(rows)
 }
@@ -287,7 +259,7 @@ const writeSyncRun = async ({
       sync_run_id, source_system, source_object_type, sync_mode,
       status, records_read, records_written_conformed, triggered_by, notes, finished_at
     )
-    VALUES ($1, 'nubox', 'conformed_sync', 'full_refresh', $2, $3, $4, 'nubox_sync', $5,
+    VALUES ($1, 'nubox', 'conformed_sync', 'incremental', $2, $3, $4, 'nubox_sync', $5,
       CASE WHEN $2 = 'running' THEN NULL ELSE CURRENT_TIMESTAMP END)
     ON CONFLICT (sync_run_id) DO UPDATE SET
       status = EXCLUDED.status,
@@ -343,7 +315,7 @@ export const syncNuboxToConformed = async (): Promise<SyncNuboxConformedResult> 
     const orphanedSales = conformedSales.filter(s => s.client_rut && !s.organization_id).length
     const orphanedPurchases = conformedPurchases.filter(p => p.supplier_rut && !p.supplier_id).length
 
-    // 5. Write conformed (DELETE/INSERT)
+    // 5. Append conformed snapshots; downstream readers select latest snapshot per Nubox ID
     await writeConformedSales(projectId, conformedSales)
     await writeConformedPurchases(projectId, conformedPurchases)
     await writeConformedBankMovements(projectId, bankMovements)

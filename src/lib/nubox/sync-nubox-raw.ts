@@ -11,6 +11,7 @@ import {
   listNuboxIncomes,
   fetchAllPages
 } from '@/lib/nubox/client'
+import { commitNuboxSyncPlan, resolveNuboxSyncPlan } from '@/lib/nubox/sync-plan'
 import {
   mapSaleToRawRow,
   mapPurchaseToRawRow,
@@ -23,6 +24,9 @@ import type { NuboxRawSnapshotRow } from '@/lib/nubox/types'
 
 export type SyncNuboxRawResult = {
   syncRunId: string
+  periods: string[]
+  hotPeriods: string[]
+  historicalPeriods: string[]
   salesFetched: number
   purchasesFetched: number
   expensesFetched: number
@@ -38,13 +42,19 @@ const writeSyncRun = async ({
   runId,
   objectType,
   status,
+  watermarkKey,
+  watermarkStartValue,
+  watermarkEndValue,
   recordsRead = 0,
   recordsWrittenRaw = 0,
   notes
 }: {
   runId: string
   objectType: string
-  status: 'running' | 'succeeded' | 'failed'
+  status: 'running' | 'succeeded' | 'failed' | 'partial'
+  watermarkKey?: string | null
+  watermarkStartValue?: string | null
+  watermarkEndValue?: string | null
   recordsRead?: number
   recordsWrittenRaw?: number
   notes?: string | null
@@ -52,17 +62,31 @@ const writeSyncRun = async ({
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_sync.source_sync_runs (
       sync_run_id, source_system, source_object_type, sync_mode,
-      status, records_read, records_written_raw, triggered_by, notes, finished_at
+      status, watermark_key, watermark_start_value, watermark_end_value,
+      records_read, records_written_raw, triggered_by, notes, finished_at
     )
-    VALUES ($1, 'nubox', $2, 'poll', $3, $4, $5, 'nubox_sync', $6,
+    VALUES ($1, 'nubox', $2, 'poll', $3, $4, $5, $6, $7, $8, 'nubox_sync', $9,
       CASE WHEN $3 = 'running' THEN NULL ELSE CURRENT_TIMESTAMP END)
     ON CONFLICT (sync_run_id) DO UPDATE SET
       status = EXCLUDED.status,
+      watermark_key = EXCLUDED.watermark_key,
+      watermark_start_value = EXCLUDED.watermark_start_value,
+      watermark_end_value = EXCLUDED.watermark_end_value,
       records_read = EXCLUDED.records_read,
       records_written_raw = EXCLUDED.records_written_raw,
       notes = EXCLUDED.notes,
       finished_at = EXCLUDED.finished_at`,
-    [runId, objectType, status, recordsRead, recordsWrittenRaw, notes || null]
+    [
+      runId,
+      objectType,
+      status,
+      watermarkKey || null,
+      watermarkStartValue || null,
+      watermarkEndValue || null,
+      recordsRead,
+      recordsWrittenRaw,
+      notes || null
+    ]
   )
 }
 
@@ -102,22 +126,6 @@ const insertRawSnapshots = async (tableName: string, rows: NuboxRawSnapshotRow[]
   return rows.length
 }
 
-// ─── Period Helpers ─────────────────────────────────────────────────────────
-
-const getCurrentPeriod = () => {
-  const now = new Date()
-
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-}
-
-const getPreviousPeriod = (period: string) => {
-  const [year, month] = period.split('-').map(Number)
-
-  if (month === 1) return `${year - 1}-12`
-
-  return `${year}-${String(month - 1).padStart(2, '0')}`
-}
-
 // ─── Main Sync Function ────────────────────────────────────────────────────
 
 export const syncNuboxToRaw = async (options?: {
@@ -127,10 +135,30 @@ export const syncNuboxToRaw = async (options?: {
   const syncRunId = `nubox-raw-${randomUUID()}`
   const errors: string[] = []
 
-  const currentPeriod = getCurrentPeriod()
-  const periods = options?.periods || [getPreviousPeriod(currentPeriod), currentPeriod]
+  const manualPeriods = options?.periods?.map(period => period.trim()).filter(Boolean) || null
 
-  await writeSyncRun({ runId: syncRunId, objectType: 'raw_sync', status: 'running' })
+  const plan = manualPeriods
+    ? {
+        periods: Array.from(new Set(manualPeriods)),
+        hotPeriods: Array.from(new Set(manualPeriods)),
+        historicalPeriods: [] as string[],
+        nextHistoricalCursor: null as string | null,
+        windowStartPeriod: Array.from(new Set(manualPeriods)).sort()[0] || null,
+        windowEndPeriod: Array.from(new Set(manualPeriods)).sort().slice(-1)[0] || null
+      }
+    : await resolveNuboxSyncPlan()
+
+  const periods = plan.periods
+
+  await writeSyncRun({
+    runId: syncRunId,
+    objectType: 'raw_sync',
+    status: 'running',
+    watermarkKey: 'period_window',
+    watermarkStartValue: plan.windowStartPeriod,
+    watermarkEndValue: plan.windowEndPeriod,
+    notes: `Periods: ${periods.join(', ')}`
+  })
 
   let salesFetched = 0
   let purchasesFetched = 0
@@ -204,19 +232,42 @@ export const syncNuboxToRaw = async (options?: {
 
   // ── Finalize ──
   const totalRead = salesFetched + purchasesFetched + expensesFetched + incomesFetched
-  const finalStatus = errors.length === 0 ? 'succeeded' : (totalWrittenRaw > 0 ? 'succeeded' : 'failed')
+
+  const finalStatus: 'succeeded' | 'partial' | 'failed' =
+    errors.length === 0 ? 'succeeded' : (totalWrittenRaw > 0 ? 'partial' : 'failed')
+
+  const planNotes = [
+    `Periods: ${periods.join(', ')}`,
+    plan.historicalPeriods.length > 0 ? `Historical sweep: ${plan.historicalPeriods.join(', ')}` : null,
+    errors.length > 0 ? `Errors: ${errors.join('; ')}` : null
+  ]
+    .filter(Boolean)
+    .join(' | ')
 
   await writeSyncRun({
     runId: syncRunId,
     objectType: 'raw_sync',
     status: finalStatus,
+    watermarkKey: 'period_window',
+    watermarkStartValue: plan.windowStartPeriod,
+    watermarkEndValue: plan.windowEndPeriod,
     recordsRead: totalRead,
     recordsWrittenRaw: totalWrittenRaw,
-    notes: errors.length > 0 ? `Partial: ${errors.join('; ')}` : null
+    notes: planNotes || null
   })
+
+  if (!manualPeriods && finalStatus === 'succeeded') {
+    await commitNuboxSyncPlan({
+      syncRunId,
+      nextHistoricalCursor: plan.nextHistoricalCursor
+    })
+  }
 
   return {
     syncRunId,
+    periods,
+    hotPeriods: plan.hotPeriods,
+    historicalPeriods: plan.historicalPeriods,
     salesFetched,
     purchasesFetched,
     expensesFetched,

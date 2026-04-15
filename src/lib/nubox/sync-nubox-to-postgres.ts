@@ -8,6 +8,14 @@ import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
 
+type NuboxProjectionSale = NuboxConformedSale & {
+  source_last_ingested_at: string | null
+}
+
+type NuboxProjectionPurchase = NuboxConformedPurchase & {
+  source_last_ingested_at: string | null
+}
+
 /** Safely parse a numeric value that may come as string, quoted string, or number from BigQuery */
 const safeNum = (v: unknown): number | null => {
   if (v == null) return null
@@ -41,37 +49,85 @@ export type SyncNuboxToPostgresResult = {
 
 // ─── Read Conformed Data ────────────────────────────────────────────────────
 
-const readConformedSales = async (projectId: string): Promise<NuboxConformedSale[]> => {
+const readConformedSales = async (projectId: string): Promise<NuboxProjectionSale[]> => {
   const bq = getBigQueryClient()
 
   const [rows] = await bq.query({
-    query: `SELECT * REPLACE(
-      CAST(emission_date AS STRING) AS emission_date,
-      CAST(due_date AS STRING) AS due_date,
-      CAST(synced_at AS STRING) AS synced_at
-    ) FROM \`${projectId}.greenhouse_conformed.nubox_sales\``
+    query: `
+      WITH latest_conformed AS (
+        SELECT * EXCEPT(rn)
+        FROM (
+          SELECT c.*,
+                 ROW_NUMBER() OVER (PARTITION BY nubox_sale_id ORDER BY synced_at DESC, sync_run_id DESC) AS rn
+          FROM \`${projectId}.greenhouse_conformed.nubox_sales\` c
+        )
+        WHERE rn = 1
+      ),
+      latest_raw AS (
+        SELECT source_object_id, CAST(ingested_at AS STRING) AS source_last_ingested_at
+        FROM (
+          SELECT source_object_id, ingested_at,
+                 ROW_NUMBER() OVER (PARTITION BY source_object_id ORDER BY ingested_at DESC) AS rn
+          FROM \`${projectId}.greenhouse_raw.nubox_sales_snapshots\`
+          WHERE is_deleted = FALSE
+        )
+        WHERE rn = 1
+      )
+      SELECT c.* REPLACE(
+        CAST(c.emission_date AS STRING) AS emission_date,
+        CAST(c.due_date AS STRING) AS due_date,
+        CAST(c.synced_at AS STRING) AS synced_at
+      ),
+      latest_raw.source_last_ingested_at
+      FROM latest_conformed c
+      LEFT JOIN latest_raw ON latest_raw.source_object_id = c.nubox_sale_id
+    `
   })
 
-  return rows as unknown as NuboxConformedSale[]
+  return rows as unknown as NuboxProjectionSale[]
 }
 
-const readConformedPurchases = async (projectId: string): Promise<NuboxConformedPurchase[]> => {
+const readConformedPurchases = async (projectId: string): Promise<NuboxProjectionPurchase[]> => {
   const bq = getBigQueryClient()
 
   const [rows] = await bq.query({
-    query: `SELECT * REPLACE(
-      CAST(emission_date AS STRING) AS emission_date,
-      CAST(due_date AS STRING) AS due_date,
-      CAST(synced_at AS STRING) AS synced_at
-    ) FROM \`${projectId}.greenhouse_conformed.nubox_purchases\``
+    query: `
+      WITH latest_conformed AS (
+        SELECT * EXCEPT(rn)
+        FROM (
+          SELECT c.*,
+                 ROW_NUMBER() OVER (PARTITION BY nubox_purchase_id ORDER BY synced_at DESC, sync_run_id DESC) AS rn
+          FROM \`${projectId}.greenhouse_conformed.nubox_purchases\` c
+        )
+        WHERE rn = 1
+      ),
+      latest_raw AS (
+        SELECT source_object_id, CAST(ingested_at AS STRING) AS source_last_ingested_at
+        FROM (
+          SELECT source_object_id, ingested_at,
+                 ROW_NUMBER() OVER (PARTITION BY source_object_id ORDER BY ingested_at DESC) AS rn
+          FROM \`${projectId}.greenhouse_raw.nubox_purchases_snapshots\`
+          WHERE is_deleted = FALSE
+        )
+        WHERE rn = 1
+      )
+      SELECT c.* REPLACE(
+        CAST(c.emission_date AS STRING) AS emission_date,
+        CAST(c.due_date AS STRING) AS due_date,
+        CAST(c.synced_at AS STRING) AS synced_at
+      ),
+      latest_raw.source_last_ingested_at
+      FROM latest_conformed c
+      LEFT JOIN latest_raw ON latest_raw.source_object_id = c.nubox_purchase_id
+    `
   })
 
-  return rows as unknown as NuboxConformedPurchase[]
+  return rows as unknown as NuboxProjectionPurchase[]
 }
 
 // ─── Income Projection ─────────────────────────────────────────────────────
 
-const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created' | 'updated' | 'skipped'> => {
+const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
   // Skip if nubox_sale_id is not a valid number
   if (!sale.nubox_sale_id || isNaN(Number(sale.nubox_sale_id))) return 'skipped'
 
@@ -99,7 +155,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         is_annulled = $8,
         nubox_pdf_url = $9,
         nubox_xml_url = $10,
-        nubox_last_synced_at = NOW(),
+        nubox_last_synced_at = COALESCE($11::timestamptz, greenhouse_finance.income.nubox_last_synced_at, NOW()),
         updated_at = NOW()
       WHERE nubox_document_id = $1`,
       [
@@ -112,7 +168,8 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         safeNum(sale.balance),
         isAnnulled,
         sale.pdf_url,
-        sale.xml_url
+        sale.xml_url,
+        sale.source_last_ingested_at
       ]
     )
 
@@ -159,7 +216,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         1, $10,
         $11, 0, $12, $19, NULL,
         $13, $14, $15,
-        $16, $17, $18, NOW(),
+        $16, $17, $18, $36::timestamptz,
         $20, $21,
         $22, $23, $24,
         $25, $26, $27,
@@ -180,7 +237,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         balance_nubox = EXCLUDED.balance_nubox,
         nubox_pdf_url = COALESCE(EXCLUDED.nubox_pdf_url, greenhouse_finance.income.nubox_pdf_url),
         nubox_xml_url = COALESCE(EXCLUDED.nubox_xml_url, greenhouse_finance.income.nubox_xml_url),
-        nubox_last_synced_at = NOW(),
+        nubox_last_synced_at = COALESCE($36::timestamptz, greenhouse_finance.income.nubox_last_synced_at, NOW()),
         updated_at = NOW()`,
       [
         incomeId,
@@ -217,7 +274,8 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         sale.xml_url,
         sale.details_url,
         sale.references_url,
-        sale.client_main_activity
+        sale.client_main_activity,
+        sale.source_last_ingested_at
       ]
     )
 
@@ -286,7 +344,7 @@ const autoProvisionSupplier = async (purchase: NuboxConformedPurchase): Promise<
 }
 
 const upsertExpenseFromPurchase = async (
-  purchase: NuboxConformedPurchase
+  purchase: NuboxProjectionPurchase
 ): Promise<{ action: 'created' | 'updated' | 'skipped'; autoProvisioned: boolean }> => {
   // Check if expense already exists for this nubox purchase
   const existing = await runGreenhousePostgresQuery<{ expense_id: string }>(
@@ -305,7 +363,7 @@ const upsertExpenseFromPurchase = async (
         sii_document_status = $4,
         balance_nubox = $5,
         nubox_pdf_url = $6,
-        nubox_last_synced_at = NOW(),
+        nubox_last_synced_at = COALESCE($7::timestamptz, greenhouse_finance.expenses.nubox_last_synced_at, NOW()),
         updated_at = NOW()
       WHERE nubox_purchase_id = $1`,
       [
@@ -314,7 +372,8 @@ const upsertExpenseFromPurchase = async (
         purchase.is_annulled ?? false,
         purchase.document_status_name,
         safeNum(purchase.balance),
-        purchase.pdf_url
+        purchase.pdf_url,
+        purchase.source_last_ingested_at
       ]
     )
 
@@ -367,7 +426,7 @@ const upsertExpenseFromPurchase = async (
         $6, $7, $8, $9,
         $10, $11,
         $12, $13, $14,
-        $15, $16, NOW(),
+        $15, $16, $33::timestamptz,
         $17, $18, $19::date, $20,
         $21, $22, $23, $24,
         $25, $26, $27,
@@ -408,7 +467,8 @@ const upsertExpenseFromPurchase = async (
         safeNum(purchase.total_other_taxes_amount),
         safeNum(purchase.total_withholding_amount),
         purchase.period_year,
-        purchase.period_month
+        purchase.period_month,
+        purchase.source_last_ingested_at
       ]
     )
 
@@ -457,11 +517,23 @@ const readConformedBankMovements = async (projectId: string): Promise<NuboxConfo
   const bq = getBigQueryClient()
 
   const [rows] = await bq.query({
-    query: `SELECT * REPLACE(
-      CAST(payment_date AS STRING) AS payment_date,
-      CAST(synced_at AS STRING) AS synced_at
-    ) FROM \`${projectId}.greenhouse_conformed.nubox_bank_movements\`
-    WHERE linked_purchase_id IS NOT NULL OR linked_sale_id IS NOT NULL`
+    query: `
+      WITH latest_conformed AS (
+        SELECT * EXCEPT(rn)
+        FROM (
+          SELECT c.*,
+                 ROW_NUMBER() OVER (PARTITION BY nubox_movement_id ORDER BY synced_at DESC, sync_run_id DESC) AS rn
+          FROM \`${projectId}.greenhouse_conformed.nubox_bank_movements\` c
+        )
+        WHERE rn = 1
+      )
+      SELECT * REPLACE(
+        CAST(payment_date AS STRING) AS payment_date,
+        CAST(synced_at AS STRING) AS synced_at
+      )
+      FROM latest_conformed
+      WHERE linked_purchase_id IS NOT NULL OR linked_sale_id IS NOT NULL
+    `
   })
 
   return rows as unknown as NuboxConformedBankMovement[]
@@ -571,7 +643,7 @@ const reconcileIncomeFromBankMovement = async (
 
 // ─── Quote Upsert (DTE 52 → quotes table) ────────────────────────────────
 
-const upsertQuoteFromSale = async (sale: NuboxConformedSale): Promise<'created' | 'updated' | 'skipped'> => {
+const upsertQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
   if (!sale.nubox_sale_id || isNaN(Number(sale.nubox_sale_id))) return 'skipped'
 
   const existing = await runGreenhousePostgresQuery<{ quote_id: string }>(
@@ -584,10 +656,10 @@ const upsertQuoteFromSale = async (sale: NuboxConformedSale): Promise<'created' 
       `UPDATE greenhouse_finance.quotes SET
         nubox_sii_track_id = $2,
         nubox_emission_status = $3,
-        nubox_last_synced_at = NOW(),
+        nubox_last_synced_at = COALESCE($4::timestamptz, greenhouse_finance.quotes.nubox_last_synced_at, NOW()),
         updated_at = NOW()
       WHERE nubox_document_id = $1`,
-      [String(sale.nubox_sale_id), sale.sii_track_id, sale.emission_status_name]
+      [String(sale.nubox_sale_id), sale.sii_track_id, sale.emission_status_name, sale.source_last_ingested_at]
     )
 
     return 'updated'
@@ -612,11 +684,11 @@ const upsertQuoteFromSale = async (sale: NuboxConformedSale): Promise<'created' 
       'CLP', $8, 0.19, $9, $10,
       1, $10,
       'sent', $11, $12, $13,
-      '52', $14, $15, NOW(),
+      '52', $14, $15, $16::timestamptz,
       NOW(), NOW()
     )
     ON CONFLICT (quote_id) DO UPDATE SET
-      nubox_last_synced_at = NOW(), updated_at = NOW()`,
+      nubox_last_synced_at = COALESCE($16::timestamptz, greenhouse_finance.quotes.nubox_last_synced_at, NOW()), updated_at = NOW()`,
     [
       quoteId,
       sale.client_id,
@@ -632,7 +704,8 @@ const upsertQuoteFromSale = async (sale: NuboxConformedSale): Promise<'created' 
       sale.sii_track_id,
       sale.emission_status_name,
       sale.folio,
-      sale.emission_date
+      sale.emission_date,
+      sale.source_last_ingested_at
     ]
   )
 

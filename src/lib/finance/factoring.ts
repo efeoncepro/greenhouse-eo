@@ -137,6 +137,7 @@ export const recordFactoringOperation = async (
        FROM greenhouse_finance.income WHERE income_id = $1 FOR UPDATE`,
       [input.incomeId]
     )
+
     const incomeRows = incomeRes.rows
 
     if (incomeRows.length === 0) {
@@ -160,6 +161,7 @@ export const recordFactoringOperation = async (
        WHERE provider_id = $1 AND provider_type = 'factoring' AND active = true`,
       [input.factoringProviderId]
     )
+
     const providerRows = providerRes.rows
 
     if (providerRows.length === 0) {

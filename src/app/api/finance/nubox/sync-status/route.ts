@@ -29,6 +29,8 @@ export async function GET() {
   )
 
   const latest = runs[0] || null
+  const lastRaw = runs.find(r => r.source_object_type === 'raw_sync') || null
+  const lastConformed = runs.find(r => r.source_object_type === 'conformed_sync') || null
 
   // Aggregate counts from the most recent successful postgres projection run
   const lastProjection = runs.find(
@@ -36,15 +38,35 @@ export async function GET() {
   )
 
   return NextResponse.json({
-    lastSync: latest
+    lastSync: (lastRaw || latest)
       ? {
-          syncRunId: latest.sync_run_id,
-          type: latest.source_object_type,
-          status: latest.status,
-          recordsRead: latest.records_read,
-          notes: latest.notes,
-          startedAt: latest.started_at ? String(latest.started_at) : null,
-          finishedAt: latest.finished_at ? String(latest.finished_at) : null
+          syncRunId: (lastRaw || latest)!.sync_run_id,
+          type: (lastRaw || latest)!.source_object_type,
+          status: (lastRaw || latest)!.status,
+          recordsRead: (lastRaw || latest)!.records_read,
+          notes: (lastRaw || latest)!.notes,
+          startedAt: (lastRaw || latest)!.started_at ? String((lastRaw || latest)!.started_at) : null,
+          finishedAt: (lastRaw || latest)!.finished_at ? String((lastRaw || latest)!.finished_at) : null
+        }
+      : null,
+    lastRaw: lastRaw
+      ? {
+          syncRunId: lastRaw.sync_run_id,
+          status: lastRaw.status,
+          recordsRead: lastRaw.records_read,
+          notes: lastRaw.notes,
+          startedAt: lastRaw.started_at ? String(lastRaw.started_at) : null,
+          finishedAt: lastRaw.finished_at ? String(lastRaw.finished_at) : null
+        }
+      : null,
+    lastConformed: lastConformed
+      ? {
+          syncRunId: lastConformed.sync_run_id,
+          status: lastConformed.status,
+          recordsRead: lastConformed.records_read,
+          notes: lastConformed.notes,
+          startedAt: lastConformed.started_at ? String(lastConformed.started_at) : null,
+          finishedAt: lastConformed.finished_at ? String(lastConformed.finished_at) : null
         }
       : null,
     lastProjection: lastProjection

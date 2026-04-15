@@ -207,11 +207,22 @@ const buildIncomeMovementMap = async () => {
   const bigQuery = getBigQueryClient()
 
   const [movementRows] = await bigQuery.query({
-    query: `SELECT nubox_movement_id, linked_sale_id, total_amount, CAST(payment_date AS STRING) AS payment_date
-            FROM \`${projectId}.greenhouse_conformed.nubox_bank_movements\`
-            WHERE linked_sale_id IS NOT NULL
-              AND movement_direction = 'credit'
-              AND payment_date IS NOT NULL`
+    query: `
+      WITH latest_movements AS (
+        SELECT * EXCEPT(rn)
+        FROM (
+          SELECT m.*,
+                 ROW_NUMBER() OVER (PARTITION BY nubox_movement_id ORDER BY synced_at DESC, sync_run_id DESC) AS rn
+          FROM \`${projectId}.greenhouse_conformed.nubox_bank_movements\` m
+        )
+        WHERE rn = 1
+      )
+      SELECT nubox_movement_id, linked_sale_id, total_amount, CAST(payment_date AS STRING) AS payment_date
+      FROM latest_movements
+      WHERE linked_sale_id IS NOT NULL
+        AND movement_direction = 'credit'
+        AND payment_date IS NOT NULL
+    `
   })
 
   const movements = movementRows as unknown as NuboxMovement[]
