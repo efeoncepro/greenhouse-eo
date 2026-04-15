@@ -1637,7 +1637,10 @@ export const pgSetPeriodCalculated = async (periodId: string, actorEmail: string
     }
 
     if (!canSetPayrollPeriodCalculated(currentPeriod.status)) {
-      throw new PayrollValidationError('Payroll periods can only be calculated from draft, calculated, or approved states.', 409)
+      throw new PayrollValidationError(
+        'Payroll periods can only be calculated from draft, calculated, approved, or reopened states.',
+        409
+      )
     }
 
     const result = await client.query<PgPeriodRow>(
