@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — TASK-285: Client Role Differentiation
+
+- **Estado:** `complete`, migracion aplicada en shared dev DB
+- **Rama:** `develop`
+- **Implementado:**
+  - `migrations/20260416095444700_seed-client-role-view-assignments.sql`
+    - Siembra `role_view_assignments` para 3 roles x 11 vistas (33 rows)
+    - `client_executive`: 11/11 granted
+    - `client_manager`: 11/11 granted
+    - `client_specialist`: 8/11 granted, 3 denied (analytics, campanas, equipo)
+  - `src/lib/admin/client-role-visibility.test.ts` — 8 tests que documentan la matriz
+  - `docs/architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` §3 actualizado
+- **Decision de diseno:** No se necesitan route groups nuevos. La infraestructura existente (view-access-store + canSeeView + hasAuthorizedViewCode) ya estaba cableada. Solo faltaban los datos.
+- **Impacto cruzado:** TASK-286 y TASK-303 desbloqueadas (updated blockers). TASK-402 y TASK-404 actualizados con path correcto.
+- **Post-deploy:** usuarios client_specialist deberan re-login para que el JWT refleje las nuevas asignaciones.
+
+---
+
 ## Sesion 2026-04-16 — HR Leave corrige accrual Chile de primer año y self-heal de balances
 
 - **Estado:** `implemented localmente`, `migracion aplicada en shared dev DB`, `pendiente push/deploy staging`

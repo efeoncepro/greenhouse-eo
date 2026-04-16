@@ -2,6 +2,14 @@
 
 ## 2026-04-16
 
+### 2026-04-16 — TASK-285: Diferenciacion de roles cliente
+
+- Los 3 roles de cliente (`client_executive`, `client_manager`, `client_specialist`) ahora tienen visibilidad diferenciada en el portal.
+- `client_specialist` pierde acceso a Analytics, Campanas y Equipo (menu + page guard).
+- `client_executive` y `client_manager` mantienen acceso a las 11 vistas actuales (su diferenciacion se activara con view codes nuevos de TASK-286+).
+- Implementado via migracion que siembra `role_view_assignments` en `greenhouse_core` — zero cambios de codigo. La infraestructura ya estaba cableada.
+- Usuarios client_specialist necesitan re-login para que el JWT refleje las nuevas asignaciones.
+
 ### 2026-04-16 — HR Leave corrige accrual Chile en primer año de servicio
 
 - `HR > Permisos` ya no debe mostrar automáticamente `15` días de vacaciones para colaboradores Chile interno cuyo primer aniversario laboral todavía no se cumple.

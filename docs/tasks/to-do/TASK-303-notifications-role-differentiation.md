@@ -1,3 +1,7 @@
+## Delta 2026-04-16
+
+- TASK-285 completada — roles diferenciados via `role_view_assignments`. Blocker resuelto.
+
 # TASK-303 — Notifications Role Differentiation
 
 ## Status
@@ -10,7 +14,7 @@
 - Status real: `Diseno`
 - Rank: `19`
 - Domain: `platform`
-- Blocked by: `TASK-285`
+- Blocked by: `none` (TASK-285 completada 2026-04-16)
 - Branch: `task/TASK-303-notifications-role-differentiation`
 
 ## Summary

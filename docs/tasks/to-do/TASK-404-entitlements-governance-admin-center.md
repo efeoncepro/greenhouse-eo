@@ -74,7 +74,7 @@ Reglas obligatorias:
 - `Handoff.md`
 - `docs/tasks/to-do/TASK-402-universal-adaptive-home-orchestration.md`
 - `docs/tasks/to-do/TASK-403-entitlements-runtime-foundation-home-bridge.md`
-- `docs/tasks/to-do/TASK-285-client-role-differentiation.md`
+- `docs/tasks/complete/TASK-285-client-role-differentiation.md`
 
 ## Dependencies & Impact
 

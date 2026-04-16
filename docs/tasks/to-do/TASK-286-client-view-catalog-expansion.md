@@ -1,3 +1,8 @@
+## Delta 2026-04-16
+
+- TASK-285 completada — `role_view_assignments` sembrados para 3 roles x 11 vistas. La infraestructura esta activa. Esta task puede agregar view codes nuevos e insertar sus assignments en la misma tabla.
+- No se crearon route groups nuevos — la diferenciacion es via view code assignments, no route groups.
+
 # TASK-286 — Client View Catalog Expansion
 
 ## Status
@@ -10,7 +15,7 @@
 - Status real: `Diseno`
 - Rank: `2`
 - Domain: `platform`
-- Blocked by: `TASK-285`
+- Blocked by: `none` (TASK-285 completada 2026-04-16)
 - Branch: `task/TASK-286-client-view-catalog-expansion`
 
 ## Summary
