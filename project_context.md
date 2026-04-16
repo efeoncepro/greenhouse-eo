@@ -1,5 +1,22 @@
 # project_context.md
 
+## Delta 2026-04-15 Service SLA/SLO runtime foundation materialized per service
+
+- `TASK-156` ya no vive solo como intención documental: existe una foundation runtime para gobernar `SLI -> SLO -> SLA` por servicio.
+- Runtime nuevo:
+  - migración `20260415233952871_task-156-service-sla-foundation.sql`
+  - tablas `greenhouse_core.service_sla_definitions` y `greenhouse_serving.service_sla_compliance_snapshots`
+  - route `GET/POST/PATCH/DELETE /api/agency/services/[serviceId]/sla?spaceId=...`
+  - helper canónico `src/lib/agency/sla-compliance.ts`
+  - store `src/lib/services/service-sla-store.ts`
+  - proyección reactiva `src/lib/sync/projections/service-sla-compliance.ts`
+- Contrato operativo:
+  - cada definición SLA queda aislada por `service_id + space_id`
+  - el serving status se materializa por definición con evidencia (`evidence_json`) y estados explícitos (`met`, `at_risk`, `breached`, `source_unavailable`)
+  - los indicadores v1 soportados son `otd_pct`, `rpa_avg`, `ftr_pct`, `revision_rounds` y `ttm_days`
+  - `response_hours` y `first_delivery_days` siguen diferidos hasta tener una fuente canónica materializada; no se deben estimar inline
+  - las métricas se consumen desde `ICO Engine / BigQuery`; la UI nunca debe recalcularlas por su cuenta
+
 ## Delta 2026-04-15 Email runtime multi-runtime contract hardened
 
 - El sistema de correo transaccional ya no debe asumir que `RESEND_API_KEY` vive solo como env directo del runtime web de Vercel.

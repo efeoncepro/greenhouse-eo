@@ -190,6 +190,22 @@ const buildDomainCards = ({
     ]
   },
   {
+    id: 'service-sla-governance',
+    title: 'SLA de servicios',
+    subtitle: 'SLI, SLO y SLA por servicio con lectura de cumplimiento y gobierno ligero.',
+    icon: 'tabler-shield-check',
+    avatarColor: 'info',
+    status: { label: 'Gobierno', color: 'info' },
+    href: '/admin/service-slas',
+    primaryAction: 'Abrir SLA de servicios',
+    routes: ['/admin/service-slas'],
+    points: [
+      'Contrato por servicio con fuente defendible y umbral explícito',
+      'Lectura de cumplimiento en la ficha del servicio y en Space 360',
+      'CRUD operativo para crear, editar o retirar definiciones'
+    ]
+  },
+  {
     id: 'ai-governance',
     title: 'AI Governance',
     subtitle: 'Catalogo, licencias, wallets y control administrativo de AI Tools.',

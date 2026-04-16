@@ -201,7 +201,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-153` | `to-do` | Capacity Forecast — FTE Projection by Role | `docs/tasks/to-do/TASK-153-capacity-forecast.md` |
 | `TASK-154` | `to-do` | Revenue Pipeline Intelligence (HubSpot → Forecast) | `docs/tasks/to-do/TASK-154-revenue-pipeline-intelligence.md` |
 | `TASK-155` | `to-do` | Scope Intelligence — Automatic Scope Creep Detection | `docs/tasks/to-do/TASK-155-scope-intelligence.md` |
-| `TASK-156` | `to-do` | SLI/SLO/SLA Contractual per Service | `docs/tasks/to-do/TASK-156-sla-slo-per-service.md` |
+| `TASK-156` | `complete` | SLI/SLO/SLA Contractual per Service | `docs/tasks/complete/TASK-156-sla-slo-per-service.md` |
 | `TASK-157` | `complete` | Skills Matrix + Intelligent Staffing Engine | `docs/tasks/complete/TASK-157-skills-matrix-staffing.md` |
 | `TASK-158` | `to-do` | Client Lifecycle Intelligence & Churn Prediction | `docs/tasks/to-do/TASK-158-client-lifecycle-churn.md` |
 | `TASK-159` | `to-do` | Nexa Agency Tools — Query, Recommend, Act | `docs/tasks/to-do/TASK-159-nexa-agency-tools.md` |

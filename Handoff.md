@@ -478,6 +478,46 @@
 - validación:
   - `git diff --check`
 
+## Sesion 2026-04-15 — TASK-156 implementada end-to-end
+
+- alcance:
+  - `docs/tasks/complete/TASK-156-sla-slo-per-service.md`
+  - `migrations/20260415233952871_task-156-service-sla-foundation.sql`
+  - `src/lib/services/service-sla-store.ts`
+  - `src/lib/agency/sla-compliance.ts`
+  - `src/app/api/agency/services/[serviceId]/sla/route.ts`
+  - `src/lib/sync/projections/service-sla-compliance.ts`
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/views/greenhouse/agency/services/ServiceDetailView.tsx`
+  - `src/views/greenhouse/agency/space-360/tabs/ServicesTab.tsx`
+  - `src/views/greenhouse/admin/ServiceSlaGovernanceView.tsx`
+  - `src/app/(dashboard)/admin/service-slas/page.tsx`
+  - `src/lib/agency/space-360.ts`
+  - `src/types/service-sla.ts`
+  - `src/types/db.d.ts`
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `project_context.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+- decisión tomada:
+  - la implementación v1 soporta solo indicadores con source defendible hoy: `otd_pct`, `rpa_avg`, `ftr_pct`, `revision_rounds`, `ttm_days`
+  - `response_hours` y `first_delivery_days` quedan explícitamente diferidos hasta que exista source canónica materializada por servicio
+  - el compliance contractual se materializa en `greenhouse_serving.service_sla_compliance_snapshots` y emite señal reactiva `service.sla_status.changed`
+- actualización clave:
+  - Admin Center ya tiene surface `/admin/service-slas`
+  - la ficha de servicio ya permite CRUD de definiciones SLA y muestra compliance/evidence
+  - `Space 360 > Servicios` ya expone badge SLA por servicio
+  - breach / at-risk ya disparan `ico_alert` para admins vía proyección de notificaciones
+- validación:
+  - `pnpm exec vitest run src/lib/agency/sla-compliance.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm migrate:up`
+  - `rg -n "new Pool\\(" src`
+- notas operativas:
+  - `pnpm build` sigue mostrando logs preexistentes de `Dynamic server usage` por `headers()` en múltiples rutas del dashboard/auth shell, pero el comando termina exitosamente
+  - había cambios ajenos en el worktree que no se tocaron: `.claude/scheduled_tasks.lock` y `services/ops-worker/deploy.sh`
+
 ## Sesion 2026-04-13 — TASK-031 rebaselined al runtime actual del repo
 
 - alcance documental:

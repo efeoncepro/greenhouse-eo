@@ -967,6 +967,28 @@ export interface GreenhouseCoreServiceSkillRequirements {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreServiceSlaDefinitions {
+  active: Generated<boolean>;
+  breach_threshold: Numeric | null;
+  comparison_mode: string;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  definition_id: string;
+  display_order: Generated<number>;
+  indicator_code: string;
+  indicator_formula: string;
+  measurement_source: string;
+  service_id: string;
+  sla_target_value: Numeric;
+  sli_label: string | null;
+  slo_target_value: Numeric;
+  space_id: string;
+  unit: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string | null;
+  warning_threshold: Numeric | null;
+}
+
 export interface GreenhouseCoreSisterPlatformBindings {
   activated_at: Timestamp | null;
   activated_by_user_id: string | null;
@@ -3647,6 +3669,32 @@ export interface GreenhouseServingProviderToolingSnapshots {
   wallet_count: Generated<number>;
 }
 
+export interface GreenhouseServingServiceSlaComplianceSnapshots {
+  actual_value: Numeric | null;
+  breach_threshold: Numeric | null;
+  comparison_mode: string;
+  compliance_status: string;
+  confidence_level: string | null;
+  created_at: Generated<Timestamp>;
+  definition_id: string;
+  delta_to_target: Numeric | null;
+  evaluated_at: Generated<Timestamp>;
+  evidence_json: Generated<Json>;
+  indicator_code: string;
+  service_id: string;
+  sla_target_value: Numeric;
+  slo_target_value: Numeric;
+  snapshot_id: string;
+  source_period_month: number | null;
+  source_period_year: number | null;
+  source_status: string;
+  space_id: string;
+  trend_status: Generated<string>;
+  unit: string;
+  updated_at: Generated<Timestamp>;
+  warning_threshold: Numeric | null;
+}
+
 export interface GreenhouseServingSession360 {
   active: boolean | null;
   auth_mode: string | null;
@@ -4267,6 +4315,7 @@ export interface DB {
   "greenhouse_core.service_history": GreenhouseCoreServiceHistory;
   "greenhouse_core.service_modules": GreenhouseCoreServiceModules;
   "greenhouse_core.service_skill_requirements": GreenhouseCoreServiceSkillRequirements;
+  "greenhouse_core.service_sla_definitions": GreenhouseCoreServiceSlaDefinitions;
   "greenhouse_core.services": GreenhouseCoreServices;
   "greenhouse_core.sister_platform_bindings": GreenhouseCoreSisterPlatformBindings;
   "greenhouse_core.sister_platform_consumers": GreenhouseCoreSisterPlatformConsumers;
@@ -4382,6 +4431,7 @@ export interface DB {
   "greenhouse_serving.provider_360": GreenhouseServingProvider360;
   "greenhouse_serving.provider_finance_360": GreenhouseServingProviderFinance360;
   "greenhouse_serving.provider_tooling_snapshots": GreenhouseServingProviderToolingSnapshots;
+  "greenhouse_serving.service_sla_compliance_snapshots": GreenhouseServingServiceSlaComplianceSnapshots;
   "greenhouse_serving.session_360": GreenhouseServingSession360;
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
