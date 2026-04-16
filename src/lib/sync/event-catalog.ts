@@ -30,6 +30,11 @@ export const AGGREGATE_TYPES = {
   goal: 'goal',
   goalCycle: 'goal_cycle',
 
+  // HR Performance Evaluations (TASK-031)
+  evalCycle: 'eval_cycle',
+  evalAssignment: 'eval_assignment',
+  evalSummary: 'eval_summary',
+
   // Payroll
   payrollPeriod: 'payroll_period',
   payrollEntry: 'payroll_entry',
@@ -243,6 +248,12 @@ export const EVENT_TYPES = {
   goalProgressRecorded: 'goal.progress_recorded',
   goalCycleActivated: 'goal_cycle.activated',
   goalCycleClosed: 'goal_cycle.closed',
+
+  // HR Performance Evaluations (TASK-031)
+  evalCyclePhaseAdvanced: 'eval_cycle.phase_advanced',
+  evalCycleClosed: 'eval_cycle.closed',
+  evalAssignmentSubmitted: 'eval_assignment.submitted',
+  evalSummaryFinalized: 'eval_summary.finalized',
   compensationVersionCreated: 'compensation_version.created',
   compensationVersionUpdated: 'compensation_version.updated',
   payrollPrevisionalSnapshotUpserted: 'payroll.previsional_snapshot.upserted',

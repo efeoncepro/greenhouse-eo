@@ -23,6 +23,7 @@ export default async function MyLayout({ children }: { children: ReactNode }) {
       'mi_ficha.mi_nomina',
       'mi_ficha.mis_permisos',
       'mi_ficha.mis_objetivos',
+      'mi_ficha.mis_evaluaciones',
       'mi_ficha.mi_organizacion'
     ],
     fallback: tenant.routeGroups.includes('my')

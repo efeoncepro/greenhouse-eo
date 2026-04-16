@@ -97,7 +97,8 @@ export const GH_HR_NAV = {
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
   leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
   attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' },
-  goals: { label: 'Objetivos', subtitle: 'OKRs, ciclos y seguimiento de avance' }
+  goals: { label: 'Objetivos', subtitle: 'OKRs, ciclos y seguimiento de avance' },
+  evaluations: { label: 'Evaluaciones', subtitle: 'Ciclos 360, asignaciones y calibracion' }
 } as const
 
 export const GH_MY_NAV = {
@@ -109,6 +110,7 @@ export const GH_MY_NAV = {
   payroll: { label: 'Mi Nómina', subtitle: 'Liquidaciones y compensación' },
   leave: { label: 'Mis Permisos', subtitle: 'Saldos y solicitudes' },
   goals: { label: 'Mis Objetivos', subtitle: 'OKRs y key results del ciclo' },
+  evaluations: { label: 'Mis Evaluaciones', subtitle: 'Feedback 360 y resultados' },
   organization: { label: 'Mi Organización', subtitle: 'Directorio y colegas' },
   settings: { label: 'Configuración', subtitle: 'Notificaciones y preferencias' }
 } as const
