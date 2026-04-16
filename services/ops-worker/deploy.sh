@@ -151,8 +151,14 @@ echo "=== Building ${SERVICE_NAME} image via Cloud Build ==="
 # --config and --tag are mutually exclusive, so we use inline cloudbuild.yaml)
 IMAGE="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
 
-if ! gcloud builds submit . \
+# Submit build in async mode and poll for status. gcloud builds submit
+# normally streams logs in real-time, but the deployer SA cannot read
+# Cloud Build's default GCS logs bucket (requires project Viewer/Owner).
+# Async + poll avoids the log-streaming dependency entirely.
+BUILD_ID=$(gcloud builds submit . \
   --project="${PROJECT_ID}" \
+  --async \
+  --format='value(id)' \
   --config=/dev/stdin <<CLOUDBUILD_EOF
 steps:
   - name: 'gcr.io/cloud-builders/docker'
@@ -160,17 +166,41 @@ steps:
 images:
   - '${IMAGE}'
 options:
-  # Route build logs exclusively to Cloud Logging. Cloud Build's legacy
-  # behavior writes logs to a GCS bucket that requires project Viewer/Owner
-  # to stream, which breaks \`gcloud builds submit\` from restricted deployer
-  # SAs even when the build itself succeeds. Cloud Logging honors the
-  # deployer's \`roles/logging.viewer\` binding cleanly.
   logging: CLOUD_LOGGING_ONLY
 CLOUDBUILD_EOF
-then
-  echo "ERROR: Cloud Build failed — aborting deployment."
+)
+
+if [ -z "${BUILD_ID}" ]; then
+  echo "ERROR: Cloud Build submit failed — no build ID returned."
   exit 1
 fi
+
+echo "=== Build submitted: ${BUILD_ID} — polling for completion ==="
+
+BUILD_STATUS=""
+POLL_COUNT=0
+MAX_POLLS=60  # 60 × 10s = 10 min max wait
+
+while [ "${BUILD_STATUS}" != "SUCCESS" ] && [ "${BUILD_STATUS}" != "FAILURE" ] && [ "${BUILD_STATUS}" != "TIMEOUT" ] && [ "${BUILD_STATUS}" != "CANCELLED" ]; do
+  POLL_COUNT=$((POLL_COUNT + 1))
+  if [ "${POLL_COUNT}" -gt "${MAX_POLLS}" ]; then
+    echo "ERROR: Build ${BUILD_ID} did not complete within $((MAX_POLLS * 10))s."
+    exit 1
+  fi
+  sleep 10
+  BUILD_STATUS=$(gcloud builds describe "${BUILD_ID}" \
+    --project="${PROJECT_ID}" \
+    --format='value(status)' 2>/dev/null || echo "UNKNOWN")
+  echo "  poll ${POLL_COUNT}/${MAX_POLLS}: status=${BUILD_STATUS}"
+done
+
+if [ "${BUILD_STATUS}" != "SUCCESS" ]; then
+  echo "ERROR: Cloud Build ${BUILD_ID} finished with status ${BUILD_STATUS}."
+  echo "       Logs: https://console.cloud.google.com/cloud-build/builds/${BUILD_ID}?project=${PROJECT_ID}"
+  exit 1
+fi
+
+echo "=== Build ${BUILD_ID} succeeded ==="
 
 echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
 
