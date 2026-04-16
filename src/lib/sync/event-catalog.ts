@@ -26,6 +26,10 @@ export const AGGREGATE_TYPES = {
   leaveRequest: 'leave_request',
   leaveBalance: 'leave_balance',
 
+  // HR Goals (TASK-029)
+  goal: 'goal',
+  goalCycle: 'goal_cycle',
+
   // Payroll
   payrollPeriod: 'payroll_period',
   payrollEntry: 'payroll_entry',
@@ -232,6 +236,13 @@ export const EVENT_TYPES = {
   leaveRequestPayrollImpactDetected: 'leave_request.payroll_impact_detected',
   leaveBalanceAdjusted: 'leave_balance.adjusted',
   leaveBalanceAdjustmentReversed: 'leave_balance.adjustment_reversed',
+
+  // HR Goals (TASK-029)
+  goalCreated: 'goal.created',
+  goalUpdated: 'goal.updated',
+  goalProgressRecorded: 'goal.progress_recorded',
+  goalCycleActivated: 'goal_cycle.activated',
+  goalCycleClosed: 'goal_cycle.closed',
   compensationVersionCreated: 'compensation_version.created',
   compensationVersionUpdated: 'compensation_version.updated',
   payrollPrevisionalSnapshotUpserted: 'payroll.previsional_snapshot.upserted',

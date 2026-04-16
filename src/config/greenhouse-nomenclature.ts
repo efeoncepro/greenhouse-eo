@@ -96,7 +96,8 @@ export const GH_HR_NAV = {
   orgChart: { label: 'Organigrama', subtitle: 'Explorador visual de la jerarquía' },
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
   leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
-  attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' }
+  attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' },
+  goals: { label: 'Objetivos', subtitle: 'OKRs, ciclos y seguimiento de avance' }
 } as const
 
 export const GH_MY_NAV = {
@@ -107,6 +108,7 @@ export const GH_MY_NAV = {
   profile: { label: 'Mi Perfil', subtitle: 'Identidad y datos personales' },
   payroll: { label: 'Mi Nómina', subtitle: 'Liquidaciones y compensación' },
   leave: { label: 'Mis Permisos', subtitle: 'Saldos y solicitudes' },
+  goals: { label: 'Mis Objetivos', subtitle: 'OKRs y key results del ciclo' },
   organization: { label: 'Mi Organización', subtitle: 'Directorio y colegas' },
   settings: { label: 'Configuración', subtitle: 'Notificaciones y preferencias' }
 } as const

@@ -1,0 +1,150 @@
+import 'server-only'
+
+import type { TenantContext } from '@/lib/tenant/get-tenant-context'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+
+// ── Types ──
+
+export interface GoalAccessResult {
+  eligible: boolean
+  canCreate: boolean
+  canView: boolean
+  memberId: string
+  reason?: string
+}
+
+// ── Helpers ──
+
+const MS_PER_DAY = 86_400_000
+
+const daysSince = (date: string | null): number => {
+  if (!date) return 0
+
+  const parsed = new Date(date)
+
+  if (Number.isNaN(parsed.getTime())) return 0
+
+  const now = new Date()
+  const diffMs = now.getTime() - parsed.getTime()
+
+  return Math.floor(diffMs / MS_PER_DAY)
+}
+
+type MemberRow = {
+  member_id: string
+  contract_type: string | null
+  hire_date: string | Date | null
+}
+
+const toDateString = (value: string | Date | null): string | null => {
+  if (!value) return null
+  if (value instanceof Date) return value.toISOString().slice(0, 10)
+
+  return typeof value === 'string' ? value.slice(0, 10) : null
+}
+
+// ── Core eligibility logic (pure, testable) ──
+
+export function resolveGoalAccessForMember(member: {
+  contractType: string
+  hireDate: string | null
+}): { canCreate: boolean; canView: boolean; reason?: string } {
+  const contractType = member.contractType?.toLowerCase() ?? ''
+
+  if (contractType === 'honorarios') {
+    return {
+      canCreate: false,
+      canView: false,
+      reason: 'Honorarios contracts do not have access to goals.'
+    }
+  }
+
+  if (contractType === 'contractor') {
+    const days = daysSince(member.hireDate)
+
+    return {
+      canCreate: false,
+      canView: days >= 180,
+      reason: days < 180
+        ? `Contractors can view goals after 180 days. Current tenure: ${days} days.`
+        : undefined
+    }
+  }
+
+  if (contractType === 'plazo_fijo') {
+    const days = daysSince(member.hireDate)
+
+    return {
+      canCreate: days >= 90,
+      canView: true,
+      reason: days < 90
+        ? `Fixed-term contracts can create goals after 90 days. Current tenure: ${days} days.`
+        : undefined
+    }
+  }
+
+  // indefinido, eor, and any other contract type
+  return {
+    canCreate: true,
+    canView: true
+  }
+}
+
+// ── Async resolver for API routes (looks up member from DB) ──
+
+/**
+ * Resolve goal access for the current tenant session.
+ * Looks up the member's contract_type and hire_date from PostgreSQL,
+ * then applies eligibility rules.
+ */
+export async function resolveGoalAccess(tenant: TenantContext): Promise<GoalAccessResult> {
+  const memberId = tenant.memberId
+
+  if (!memberId) {
+    return {
+      eligible: false,
+      canCreate: false,
+      canView: false,
+      memberId: '',
+      reason: 'No member linked to current session.'
+    }
+  }
+
+  const rows = await runGreenhousePostgresQuery<MemberRow>(
+    `
+      SELECT
+        member_id,
+        contract_type,
+        hire_date
+      FROM greenhouse_core.members
+      WHERE member_id = $1
+      LIMIT 1
+    `,
+    [memberId]
+  )
+
+  if (rows.length === 0) {
+    return {
+      eligible: false,
+      canCreate: false,
+      canView: false,
+      memberId,
+      reason: 'Member record not found.'
+    }
+  }
+
+  const row = rows[0]
+
+  const access = resolveGoalAccessForMember({
+    contractType: row.contract_type || 'indefinido',
+    hireDate: toDateString(row.hire_date)
+  })
+
+  return {
+    eligible: access.canView,
+    canCreate: access.canCreate,
+    canView: access.canView,
+    memberId,
+    reason: access.reason
+  }
+}

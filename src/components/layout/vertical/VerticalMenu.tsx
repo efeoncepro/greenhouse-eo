@@ -233,7 +233,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
               return true
             })
-          }
+          },
+          ...(canSeeView('equipo.objetivos', true)
+            ? [{ label: nl(GH_HR_NAV.goals), href: '/hr/goals', icon: 'tabler-target' }]
+            : [])
         ]
       : []
 
@@ -471,6 +474,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
+          { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
           { label: nl(GH_MY_NAV.organization), href: '/my/organization', icon: 'tabler-building' }
         ].filter(item => {
           if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
@@ -479,6 +483,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
+          if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
           if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
 
           return true
@@ -566,6 +571,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
+          { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
           { label: nl(GH_MY_NAV.organization), href: '/my/organization', icon: 'tabler-building' }
         ].filter(item => {
           if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
@@ -574,6 +580,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
+          if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
           if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
 
           return true
