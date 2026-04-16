@@ -39,8 +39,9 @@ yarn-error.log*
 .env*.tmp
 .env.vercel-*
 
-# claude code local settings (may contain API keys)
+# claude code local state (settings, lock files)
 .claude/settings.json
+.claude/scheduled_tasks.lock
 
 # vercel
 .vercel
