@@ -476,6 +476,9 @@ Carry-over y progresivos:
   - `progressive_interval_years`
   - `progressive_max_extra_days`
 - para vacaciones Chile, esa lógica se aplica sobre `pay_regime = 'chile'`
+- para la policy Chile interna (`policy-vacation-chile`), el seed del balance ya no debe tratar el primer año de servicio como `annual_fixed`:
+  - mientras la persona no cumple su primer aniversario laboral, `allowance_days` se accrualiza desde `hire_date`
+  - el runtime debe self-heal balances ya sembrados cuando la policy o el cálculo cambian, actualizando `allowance_days`, `progressive_extra_days`, `carried_over_days` y `accumulated_periods` por `ON CONFLICT DO UPDATE`
 
 Flujo de aprobación:
 

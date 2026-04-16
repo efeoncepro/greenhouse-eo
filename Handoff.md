@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — HR Leave corrige accrual Chile de primer año y self-heal de balances
+
+- **Estado:** `implemented localmente`, `migracion aplicada en shared dev DB`, `pendiente push/deploy staging`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/hr-core/postgres-leave-store.ts`
+    - la resolución de `leave_policy` ahora prioriza especificidad (`employment_type`, `pay_regime`, `contract_type`, `payroll_via`) en vez de depender del orden de lectura
+    - `policy-vacation-chile` deja de sembrar `15` automáticos durante el primer ciclo laboral; el allowance se accrualiza desde `hire_date`
+    - el seed de balances pasa de `ON CONFLICT DO NOTHING` a `ON CONFLICT DO UPDATE` para self-heal de `allowance_days`, `progressive_extra_days`, `carried_over_days` y `accumulated_periods`
+  - `src/lib/hr-core/leave-domain.ts`
+    - helper nuevo `calculateAccruedLeaveAllowanceDays()` para accrual del primer año
+  - `migrations/20260416094722775_task-416-hr-leave-chile-accrual-hardening.sql`
+    - alinea `greenhouse_hr.leave_policies.policy-vacation-chile` a `accrual_type = 'monthly_accrual'`
+  - `scripts/setup-postgres-hr-leave.sql`
+    - seed alineado al mismo contrato
+  - tests nuevos/actualizados:
+    - `src/lib/hr-core/leave-domain.test.ts`
+    - `src/lib/hr-core/postgres-leave-store.test.ts`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/hr-core/leave-domain.test.ts src/lib/hr-core/postgres-leave-store.test.ts`
+  - `pnpm exec eslint src/lib/hr-core/leave-domain.ts src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/leave-domain.test.ts src/lib/hr-core/postgres-leave-store.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm pg:connect:migrate`
+- **Dato operacional relevante:**
+  - el shared dev DB aplicó también una migración pendiente ajena ya presente en el workspace: `20260416095444700_seed-client-role-view-assignments`; no forma parte de este fix de leave, pero quedó registrada en `pgmigrations`
+- **Resultado esperado en staging una vez deployado:**
+  - Valentina Hoyos deja de ver `15` días completos de vacaciones antes de su aniversario laboral
+  - el admin detail y self-service deben resolver `policy-vacation-chile` en vez de la policy default derivada
+
 ## Sesion 2026-04-16 — HR Leave UX split de saldos personales vs equipo en develop
 
 - **Estado:** `complete`, `pushed a develop`, `deploy staging en curso`

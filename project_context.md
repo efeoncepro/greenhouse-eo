@@ -1,5 +1,17 @@
 # project_context.md
 
+## Delta 2026-04-16 HR leave corrige accrual Chile de primer año y deja self-heal de balances
+
+- El runtime de vacaciones Chile interno ya no debe sembrar `15` días completos por default cuando la persona aún no cumple su primer aniversario laboral.
+- Runtime actualizado:
+  - migración `20260416094722775_task-416-hr-leave-chile-accrual-hardening.sql`
+  - `src/lib/hr-core/leave-domain.ts`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+- Contrato operativo:
+  - `policy-vacation-chile` se interpreta como accrual desde `hire_date` durante el primer ciclo laboral y no como anual fijo inmediato
+  - la resolución de policy ya no depende del orden de lectura; prioriza especificidad laboral real (`employment_type`, `pay_regime`, `contract_type`, `payroll_via`)
+  - la resemilla de `leave_balances` debe autocorregir balances ya sembrados cuando cambia la policy o el cálculo, sin tocar `used_days`, `reserved_days` ni `adjustment_days`
+
 ## Delta 2026-04-16 TASK-415 formaliza HR leave admin operations con backfill y ledger de ajustes
 
 - Greenhouse ya no limita la gestión de vacaciones al autoservicio del colaborador; HR/admin ahora tiene una superficie operativa explícita para saldos, backfills y correcciones auditables.

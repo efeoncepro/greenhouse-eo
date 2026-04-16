@@ -30,6 +30,7 @@ import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import type { WorkflowApprovalSnapshotRecord } from '@/lib/approval-authority/types'
 
 import {
+  calculateAccruedLeaveAllowanceDays,
   calculateProgressiveExtraDays,
   classifyLeavePayrollImpact,
   computeLeaveDayBreakdown,
@@ -895,16 +896,53 @@ const resolveApplicableLeavePolicy = ({
   policies: LeavePolicy[]
   member: LeavePolicyMemberContext
 }): ResolvedLeavePolicy => {
-  const exactMatch = policies.find(policy =>
-    policy.leaveTypeCode === leaveType.leaveTypeCode &&
-    isPolicyApplicableToMember({
-      policy,
-      employmentType: member.employmentType,
-      payRegime: member.payRegime,
-      contractType: member.contractType,
-      payrollVia: member.payrollVia
+  const exactMatch = [...policies]
+    .filter(policy =>
+      policy.leaveTypeCode === leaveType.leaveTypeCode &&
+      isPolicyApplicableToMember({
+        policy,
+        employmentType: member.employmentType,
+        payRegime: member.payRegime,
+        contractType: member.contractType,
+        payrollVia: member.payrollVia
+      })
+    )
+    .sort((left, right) => {
+      const leftScopedDimensions =
+        (left.applicableEmploymentTypes.length > 0 ? 1 : 0) +
+        (left.applicablePayRegimes.length > 0 ? 1 : 0) +
+        (left.applicableContractTypes.length > 0 ? 1 : 0) +
+        (left.applicablePayrollVias.length > 0 ? 1 : 0)
+
+      const rightScopedDimensions =
+        (right.applicableEmploymentTypes.length > 0 ? 1 : 0) +
+        (right.applicablePayRegimes.length > 0 ? 1 : 0) +
+        (right.applicableContractTypes.length > 0 ? 1 : 0) +
+        (right.applicablePayrollVias.length > 0 ? 1 : 0)
+
+      if (rightScopedDimensions !== leftScopedDimensions) {
+        return rightScopedDimensions - leftScopedDimensions
+      }
+
+      const leftDeclaredValues =
+        left.applicableEmploymentTypes.length +
+        left.applicablePayRegimes.length +
+        left.applicableContractTypes.length +
+        left.applicablePayrollVias.length
+
+      const rightDeclaredValues =
+        right.applicableEmploymentTypes.length +
+        right.applicablePayRegimes.length +
+        right.applicableContractTypes.length +
+        right.applicablePayrollVias.length
+
+      if (leftDeclaredValues !== rightDeclaredValues) {
+        return leftDeclaredValues - rightDeclaredValues
+      }
+
+      return left.policyId.localeCompare(right.policyId)
     })
-  )
+    .at(0)
 
   if (exactMatch) {
     return {
@@ -940,26 +978,26 @@ const resolveApplicableLeavePolicy = ({
   return {
     policy: mapLeavePolicy({
       policy_id: `policy-${leaveType.leaveTypeCode}-default-${member.contractType}-${member.payRegime}`,
-    leave_type_code: leaveType.leaveTypeCode,
-    policy_name: leaveType.leaveTypeName,
-    accrual_type: 'annual_fixed',
-    annual_days: leaveType.defaultAnnualAllowanceDays,
-    max_carry_over_days: 0,
-    requires_approval: true,
-    min_advance_days: 0,
-    max_consecutive_days: null,
-    min_continuous_days: null,
-    max_accumulation_periods: null,
-    progressive_enabled: false,
-    progressive_base_years: 10,
-    progressive_interval_years: 3,
-    progressive_max_extra_days: 10,
-    applicable_employment_types: member.employmentType ? [member.employmentType] : [],
-    applicable_pay_regimes: member.payRegime ? [member.payRegime] : [],
-    applicable_contract_types: member.contractType ? [member.contractType] : [],
-    applicable_payroll_vias: member.payrollVia ? [member.payrollVia] : [],
-    allow_negative_balance: leaveType.defaultAnnualAllowanceDays <= 0,
-    active: leaveType.active
+      leave_type_code: leaveType.leaveTypeCode,
+      policy_name: leaveType.leaveTypeName,
+      accrual_type: 'annual_fixed',
+      annual_days: leaveType.defaultAnnualAllowanceDays,
+      max_carry_over_days: 0,
+      requires_approval: true,
+      min_advance_days: 0,
+      max_consecutive_days: null,
+      min_continuous_days: null,
+      max_accumulation_periods: null,
+      progressive_enabled: false,
+      progressive_base_years: 10,
+      progressive_interval_years: 3,
+      progressive_max_extra_days: 10,
+      applicable_employment_types: member.employmentType ? [member.employmentType] : [],
+      applicable_pay_regimes: member.payRegime ? [member.payRegime] : [],
+      applicable_contract_types: member.contractType ? [member.contractType] : [],
+      applicable_payroll_vias: member.payrollVia ? [member.payrollVia] : [],
+      allow_negative_balance: leaveType.defaultAnnualAllowanceDays <= 0,
+      active: leaveType.active
     }),
     source: 'derived_internal'
   }
@@ -1009,6 +1047,9 @@ const computeBalanceSeedForYear = async ({
   actorUserId: string
   client: PoolClient
 }) => {
+  const todayDate = getTodayDateKey()
+  const todayYear = Number(todayDate.slice(0, 4))
+
   const previousBalance = year > 0
     ? await getBalanceByKey({
       memberId: member.member_id,
@@ -1019,18 +1060,47 @@ const computeBalanceSeedForYear = async ({
     : null
 
   const previousAccumulatedPeriods = previousBalance?.accumulatedPeriods ?? 0
-  const previousAvailable = previousBalance?.availableDays ?? 0
-  const carriedOverDays = Math.min(previousAvailable, policy.maxCarryOverDays)
+
+  const currentAsOfDate =
+    year === todayYear ? todayDate : `${year}-12-31`
+
+  const previousYearAllowanceDays = previousBalance
+    ? calculateAccruedLeaveAllowanceDays({
+      annualDays: policy.annualDays,
+      accrualType: policy.accrualType,
+      hireDate: toPgDateString(member.hire_date),
+      year: year - 1,
+      asOfDate: `${year - 1}-12-31`
+    })
+    : 0
+
+  const previousAvailable = previousBalance
+    ? previousYearAllowanceDays +
+      (previousBalance.progressiveExtraDays ?? 0) +
+      (previousBalance.carriedOverDays ?? 0) +
+      (previousBalance.adjustmentDays ?? 0) -
+      (previousBalance.usedDays ?? 0) -
+      (previousBalance.reservedDays ?? 0)
+    : 0
+
+  const carriedOverDays = Math.min(Math.max(previousAvailable, 0), policy.maxCarryOverDays)
   const accumulatedPeriods = previousAvailable > 0 ? previousAccumulatedPeriods + 1 : 0
-  const asOfDate = `${year}-01-01`
   const priorWorkYears = toNullableNumber(member.prior_work_years) ?? 0
+
+  const allowanceDays = calculateAccruedLeaveAllowanceDays({
+    annualDays: policy.annualDays,
+    accrualType: policy.accrualType,
+    hireDate: toPgDateString(member.hire_date),
+    year,
+    asOfDate: currentAsOfDate
+  })
 
   const progressiveExtraDays =
     policy.progressiveEnabled && member.pay_regime === 'chile'
       ? calculateProgressiveExtraDays({
         priorWorkYears,
         hireDate: toPgDateString(member.hire_date),
-        asOfDate,
+        asOfDate: currentAsOfDate,
         progressiveBaseYears: policy.progressiveBaseYears,
         progressiveIntervalYears: policy.progressiveIntervalYears,
         progressiveMaxExtraDays: policy.progressiveMaxExtraDays
@@ -1054,14 +1124,21 @@ const computeBalanceSeedForYear = async ({
         updated_by_user_id
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, 0, $8, 0, 0, $9)
-      ON CONFLICT (member_id, leave_type_code, year) DO NOTHING
+      ON CONFLICT (member_id, leave_type_code, year) DO UPDATE
+      SET
+        allowance_days = EXCLUDED.allowance_days,
+        progressive_extra_days = EXCLUDED.progressive_extra_days,
+        carried_over_days = EXCLUDED.carried_over_days,
+        accumulated_periods = EXCLUDED.accumulated_periods,
+        updated_by_user_id = EXCLUDED.updated_by_user_id,
+        updated_at = CURRENT_TIMESTAMP
     `,
     [
       `${member.member_id}-${year}-${leaveType.leaveTypeCode}`,
       member.member_id,
       leaveType.leaveTypeCode,
       year,
-      policy.annualDays,
+      allowanceDays,
       progressiveExtraDays,
       carriedOverDays,
       accumulatedPeriods,

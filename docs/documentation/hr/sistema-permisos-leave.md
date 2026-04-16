@@ -160,6 +160,8 @@ Greenhouse no decide vacaciones solo por moneda. Para el calculo y la explicacio
 
 Cuando la persona pertenece a Chile interno y tiene contrato laboral aplicable, el saldo anual y los progresivos se calculan desde su fecha de ingreso y la politica chilena vigente del portal.
 
+En la practica eso significa que Greenhouse no debe sembrar automaticamente `15` dias completos para una persona que aun esta en su primer ciclo de antiguedad laboral. Durante ese primer tramo, el saldo visible se accrualiza desde `hire_date`; una vez que se cumple el aniversario laboral, la politica ya puede consolidarse al anual completo segun corresponda.
+
 ### Casos no equivalentes
 
 No todos los contratos usan la misma logica:

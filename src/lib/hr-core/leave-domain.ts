@@ -94,6 +94,39 @@ const addUtcDays = (value: string, days: number) => {
   return toDateKey(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate())
 }
 
+const addUtcYears = (value: string, years: number) => {
+  const parsed = parseDateOnly(value)
+  const date = new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day))
+
+  date.setUTCFullYear(date.getUTCFullYear() + years)
+
+  return toDateKey(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate())
+}
+
+const getYearStartDateKey = (year: number) => `${year}-01-01`
+
+const getYearEndDateKey = (year: number) => `${year}-12-31`
+
+const clampDateKey = (value: string, min: string, max: string) => {
+  if (value < min) {
+    return min
+  }
+
+  if (value > max) {
+    return max
+  }
+
+  return value
+}
+
+const maxDateKey = (...values: string[]) =>
+  [...values].sort((left, right) => left.localeCompare(right)).at(-1) ?? values[0] ?? ''
+
+const minDateKey = (...values: string[]) =>
+  [...values].sort((left, right) => left.localeCompare(right)).at(0) ?? values[0] ?? ''
+
+const roundToTwoDecimals = (value: number) => Math.round(value * 100) / 100
+
 const isWeekendDateKey = (value: string) => {
   const parsed = parseDateOnly(value)
   const dayOfWeek = new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day)).getUTCDay()
@@ -304,6 +337,62 @@ export const calculateProgressiveExtraDays = ({
     progressiveMaxExtraDays,
     Math.floor(yearsOverBase / progressiveIntervalYears)
   )
+}
+
+export const calculateAccruedLeaveAllowanceDays = ({
+  annualDays,
+  accrualType,
+  hireDate,
+  year,
+  asOfDate
+}: {
+  annualDays: number
+  accrualType: LeavePolicy['accrualType']
+  hireDate: string | null
+  year: number
+  asOfDate: string
+}) => {
+  if (annualDays <= 0) {
+    return 0
+  }
+
+  if (accrualType !== 'monthly_accrual' || !hireDate) {
+    return annualDays
+  }
+
+  parseDateOnly(hireDate)
+  parseDateOnly(asOfDate)
+
+  const yearStart = getYearStartDateKey(year)
+  const yearEnd = getYearEndDateKey(year)
+  const effectiveAsOfDate = clampDateKey(asOfDate, yearStart, yearEnd)
+
+  if (effectiveAsOfDate < hireDate) {
+    return 0
+  }
+
+  const firstAnniversary = addUtcYears(hireDate, 1)
+
+  if (yearStart >= firstAnniversary || effectiveAsOfDate >= firstAnniversary) {
+    return annualDays
+  }
+
+  const firstServiceCycleEnd = addUtcDays(firstAnniversary, -1)
+  const overlapStart = maxDateKey(hireDate, yearStart)
+  const overlapEnd = minDateKey(effectiveAsOfDate, yearEnd, firstServiceCycleEnd)
+
+  if (overlapEnd < overlapStart) {
+    return 0
+  }
+
+  const firstServiceCycleDays = getCalendarDayDiff(hireDate, firstServiceCycleEnd) + 1
+  const overlapDays = getCalendarDayDiff(overlapStart, overlapEnd) + 1
+
+  if (firstServiceCycleDays <= 0 || overlapDays <= 0) {
+    return 0
+  }
+
+  return roundToTwoDecimals((annualDays * overlapDays) / firstServiceCycleDays)
 }
 
 export const listPeriodIdsInRange = (startDate: string, endDate: string) => {

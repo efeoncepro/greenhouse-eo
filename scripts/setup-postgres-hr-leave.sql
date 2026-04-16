@@ -210,7 +210,7 @@ INSERT INTO greenhouse_hr.leave_policies (
   active
 )
 VALUES
-  ('policy-vacation-chile', 'vacation', 'Vacaciones Chile dependientes', 'annual_fixed', 15, 5, TRUE, 7, 15, 5, 2, TRUE, 10, 3, 10, ARRAY['full_time'], ARRAY['chile'], ARRAY['indefinido', 'plazo_fijo'], ARRAY['internal'], FALSE, TRUE),
+  ('policy-vacation-chile', 'vacation', 'Vacaciones Chile dependientes', 'monthly_accrual', 15, 5, TRUE, 7, 15, 5, 2, TRUE, 10, 3, 10, ARRAY['full_time'], ARRAY['chile'], ARRAY['indefinido', 'plazo_fijo'], ARRAY['internal'], FALSE, TRUE),
   ('policy-vacation-default', 'vacation', 'Vacaciones base portal', 'annual_fixed', 15, 0, TRUE, 7, 15, 5, 1, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
   ('policy-floating-holiday-default', 'floating_holiday', 'Día libre flotante', 'annual_fixed', 1, 0, TRUE, 2, 1, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
   ('policy-bereavement-default', 'bereavement', 'Permiso por duelo', 'annual_fixed', 3, 0, TRUE, 0, 3, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),

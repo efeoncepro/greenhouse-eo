@@ -63,6 +63,7 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 ### Correcciones
 
 - Los cambios administrativos de vacaciones ya no quedan resumidos solo como un número agregado sin trazabilidad.
+- Los saldos de vacaciones para Chile interno dejan de sembrarse como `15` días completos cuando la persona todavía está en su primer ciclo laboral; el saldo visible ahora respeta mejor la fecha de ingreso.
 
 ### Notas
 

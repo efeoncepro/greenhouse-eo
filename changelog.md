@@ -2,6 +2,15 @@
 
 ## 2026-04-16
 
+### 2026-04-16 — HR Leave corrige accrual Chile en primer año de servicio
+
+- `HR > Permisos` ya no debe mostrar automáticamente `15` días de vacaciones para colaboradores Chile interno cuyo primer aniversario laboral todavía no se cumple.
+- `src/lib/hr-core/postgres-leave-store.ts` ahora:
+  - resuelve la policy aplicable por especificidad real y evita que la policy genérica le gane a `policy-vacation-chile`
+  - accrualiza `allowance_days` desde `hire_date` durante el primer ciclo laboral chileno
+  - resemilla balances con `ON CONFLICT DO UPDATE` para corregir saldos históricos sin tocar manualmente `used_days`, `reserved_days` ni `adjustment_days`
+- Se agrega la migración `20260416094722775_task-416-hr-leave-chile-accrual-hardening.sql` y `scripts/setup-postgres-hr-leave.sql` queda alineado con `policy-vacation-chile.accrual_type = 'monthly_accrual'`.
+
 ### 2026-04-16 — HR Leave UI split entre saldos personales y saldos del equipo
 
 - `HR > Permisos` deja de mezclar la consulta personal con la operación administrativa:
