@@ -110,6 +110,8 @@ type PostgresLeaveBalanceRow = {
   balance_id: string
   member_id: string
   member_name: string | null
+  member_avatar_url: string | null
+  member_linked_user_id: string | null
   employment_type: string | null
   hire_date: string | Date | null
   contract_type: string | null
@@ -303,6 +305,10 @@ const mapLeaveBalance = (row: PostgresLeaveBalanceRow): HrLeaveBalance => {
     balanceId: row.balance_id,
     memberId: row.member_id,
     memberName: normalizeNullableString(row.member_name),
+    memberAvatarUrl: resolveAvatarUrl(
+      normalizeNullableString(row.member_avatar_url),
+      normalizeNullableString(row.member_linked_user_id)
+    ),
     leaveTypeCode: row.leave_type_code,
     leaveTypeName: normalizeNullableString(row.leave_type_name) || row.leave_type_code,
     year: toInt(row.year),
@@ -1255,7 +1261,9 @@ const getBalanceByKey = async ({
       SELECT
         b.balance_id,
         b.member_id,
-        m.display_name AS member_name,
+        COALESCE(p360.resolved_display_name, m.display_name) AS member_name,
+        COALESCE(p360.resolved_avatar_url, m.avatar_url) AS member_avatar_url,
+        COALESCE(p360.user_id, linked_user.user_id) AS member_linked_user_id,
         m.employment_type,
         m.hire_date,
         m.contract_type,
@@ -1283,6 +1291,15 @@ const getBalanceByKey = async ({
       FROM greenhouse_hr.leave_balances AS b
       LEFT JOIN greenhouse_core.members AS m
         ON m.member_id = b.member_id
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = m.member_id
+      LEFT JOIN LATERAL (
+        SELECT cu.user_id
+        FROM greenhouse_core.client_users AS cu
+        WHERE cu.member_id = m.member_id
+        ORDER BY cu.active DESC, cu.updated_at DESC NULLS LAST, cu.created_at DESC NULLS LAST
+        LIMIT 1
+      ) AS linked_user ON TRUE
       LEFT JOIN greenhouse_hr.leave_types AS lt
         ON lt.leave_type_code = b.leave_type_code
       WHERE b.member_id = $1
@@ -1636,7 +1653,9 @@ export const listLeaveBalancesFromPostgres = async ({
       SELECT
         b.balance_id,
         b.member_id,
-        member.display_name AS member_name,
+        COALESCE(p360.resolved_display_name, member.display_name) AS member_name,
+        COALESCE(p360.resolved_avatar_url, member.avatar_url) AS member_avatar_url,
+        COALESCE(p360.user_id, linked_user.user_id) AS member_linked_user_id,
         member.employment_type,
         member.hire_date,
         member.contract_type,
@@ -1664,6 +1683,15 @@ export const listLeaveBalancesFromPostgres = async ({
       FROM greenhouse_hr.leave_balances AS b
       LEFT JOIN greenhouse_core.members AS member
         ON member.member_id = b.member_id
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = member.member_id
+      LEFT JOIN LATERAL (
+        SELECT cu.user_id
+        FROM greenhouse_core.client_users AS cu
+        WHERE cu.member_id = member.member_id
+        ORDER BY cu.active DESC, cu.updated_at DESC NULLS LAST, cu.created_at DESC NULLS LAST
+        LIMIT 1
+      ) AS linked_user ON TRUE
       LEFT JOIN greenhouse_hr.leave_types AS lt
         ON lt.leave_type_code = b.leave_type_code
       WHERE ${filters.join(' AND ')}

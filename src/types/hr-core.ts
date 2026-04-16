@@ -88,6 +88,7 @@ export interface HrLeaveBalance {
   balanceId: string
   memberId: string
   memberName: string | null
+  memberAvatarUrl?: string | null
   leaveTypeCode: string
   leaveTypeName: string
   year: number

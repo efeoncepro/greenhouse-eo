@@ -609,6 +609,159 @@ describe('HrLeaveView', () => {
     expect(within(teamDetailDialog).queryByText('4.039999999999999')).not.toBeInTheDocument()
   })
 
+  it('shows enriched identity avatars and separates retroactive backfills from manual balance adjustments', async () => {
+    fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
+      const url = String(input)
+
+      if (url.startsWith('/api/hr/core/leave/requests?')) {
+        return Response.json({
+          requests: [
+            {
+              requestId: 'leave-backfill-1',
+              memberId: 'valentina-hoyos',
+              memberName: 'Valentina Hoyos',
+              memberAvatarUrl: '/api/media/users/user-valentina/avatar',
+              leaveTypeCode: 'vacation',
+              leaveTypeName: 'Vacaciones',
+              startDate: '2026-04-06',
+              endDate: '2026-04-10',
+              startPeriod: 'full_day',
+              endPeriod: 'full_day',
+              requestedDays: 5,
+              status: 'approved',
+              reason: 'Vacaciones registradas por HR',
+              attachmentUrl: null,
+              supervisorMemberId: null,
+              supervisorName: null,
+              hrReviewerUserId: 'user-admin',
+              decidedAt: '2026-04-11T10:00:00.000Z',
+              decidedBy: 'user-admin',
+              notes: 'Carga retroactiva por ausencia previa.',
+              createdAt: '2026-04-11T10:00:00.000Z',
+              sourceKind: 'admin_backfill'
+            }
+          ],
+          summary: {
+            total: 1,
+            pendingSupervisor: 0,
+            pendingHr: 0,
+            approved: 1
+          }
+        })
+      }
+
+      if (url.startsWith('/api/hr/core/leave/balances?')) {
+        return Response.json({
+          balances: [
+            {
+              balanceId: 'balance-valentina-vacation-2026',
+              memberId: 'valentina-hoyos',
+              memberName: 'Valentina Hoyos',
+              memberAvatarUrl: '/api/media/users/user-valentina/avatar',
+              leaveTypeCode: 'vacation',
+              leaveTypeName: 'Vacaciones',
+              year: 2026,
+              allowanceDays: 4.36,
+              progressiveExtraDays: 0,
+              carriedOverDays: 4.68,
+              adjustmentDays: 0,
+              usedDays: 5,
+              reservedDays: 0,
+              availableDays: 4.04,
+              policyExplain: {
+                policyId: 'policy-vacation-chile',
+                policyName: 'Vacaciones Chile dependientes',
+                policySource: 'catalog',
+                accrualType: 'monthly_accrual',
+                contractType: 'indefinido',
+                payRegime: 'chile',
+                payrollVia: 'internal',
+                hireDate: '2025-09-09',
+                annualDays: 15,
+                tracksBalance: true,
+                progressiveEnabled: true,
+                allowNegativeBalance: false
+              }
+            }
+          ],
+          summary: {
+            memberCount: 1,
+            totalAvailableDays: 4.04
+          }
+        })
+      }
+
+      if (url.startsWith('/api/hr/core/leave/calendar?')) {
+        return Response.json({
+          from: '2026-01-01',
+          to: '2026-12-31',
+          holidaySource: 'none',
+          events: []
+        })
+      }
+
+      if (url === '/api/hr/core/meta') {
+        return Response.json({
+          currentMemberId: 'julio-reyes',
+          hasHrAdminAccess: true,
+          canManageLeaveBackfills: true,
+          canManageLeaveAdjustments: true,
+          canReverseLeaveAdjustments: true,
+          departments: [],
+          leaveTypes: [
+            {
+              leaveTypeCode: 'vacation',
+              leaveTypeName: 'Vacaciones',
+              description: null,
+              defaultAnnualAllowanceDays: 15,
+              requiresAttachment: false,
+              isPaid: true,
+              active: true,
+              colorToken: null
+            }
+          ],
+          jobLevels: [],
+          employmentTypes: [],
+          healthSystems: [],
+          bankAccountTypes: [],
+          leaveRequestStatuses: [],
+          attendanceStatuses: []
+        })
+      }
+
+      if (url.startsWith('/api/hr/core/leave/adjustments?')) {
+        return Response.json({
+          adjustments: [],
+          summary: {
+            total: 0,
+            totalDaysDelta: 0
+          }
+        })
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`)
+    })
+
+    const { default: HrLeaveView } = await import('./HrLeaveView')
+
+    renderWithTheme(<HrLeaveView />)
+
+    fireEvent.click(await screen.findByRole('tab', { name: 'Saldos del equipo' }))
+
+    expect(screen.getByRole('img', { name: 'Valentina Hoyos' })).toBeInTheDocument()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver detalle' }))
+
+    const teamDetailDialog = await screen.findByRole('dialog', { name: /Valentina Hoyos/i })
+
+    expect(within(teamDetailDialog).getByText('Actividad administrativa')).toBeInTheDocument()
+    expect(within(teamDetailDialog).getByText('Días ya tomados registrados')).toBeInTheDocument()
+    expect(within(teamDetailDialog).getByText('Vacaciones registradas por HR')).toBeInTheDocument()
+    expect(within(teamDetailDialog).getByText('Carga retroactiva por ausencia previa.')).toBeInTheDocument()
+    expect(within(teamDetailDialog).getByText('06/04/2026 — 10/04/2026')).toBeInTheDocument()
+    expect(within(teamDetailDialog).getByText('No hay ajustes manuales registrados para este colaborador.')).toBeInTheDocument()
+  })
+
   it('shows adjustment history and lets an admin reverse an active adjustment', async () => {
     let reversePayload: Record<string, unknown> | null = null
 
@@ -769,7 +922,7 @@ describe('HrLeaveView', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Ver detalle' }))
 
     await waitFor(() => {
-      expect(screen.getByText('Historial de ajustes')).toBeInTheDocument()
+      expect(screen.getByText('Actividad administrativa')).toBeInTheDocument()
     })
 
     const teamDetailDialog = await screen.findByRole('dialog', { name: /Valentina Gómez/i })

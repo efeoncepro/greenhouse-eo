@@ -138,6 +138,8 @@ describe('listLeaveRequestsFromPostgres', () => {
             balance_id: 'balance-medical-2026',
             member_id: 'daniela-ferreira',
             member_name: 'Daniela Ferreira',
+            member_avatar_url: 'gs://greenhouse-assets/users/daniela.png',
+            member_linked_user_id: 'user-daniela',
             leave_type_code: 'medical',
             leave_type_name: 'Permiso médico / cita médica',
             year: 2026,
@@ -216,6 +218,7 @@ describe('listLeaveRequestsFromPostgres', () => {
 
     expect(payload.balances).toHaveLength(1)
     expect(payload.balances[0]?.memberId).toBe('daniela-ferreira')
+    expect(payload.balances[0]?.memberAvatarUrl).toBe('/api/media/users/user-daniela/avatar')
     expect(payload.balances[0]?.policyExplain).toMatchObject({
       contractType: 'indefinido',
       payRegime: 'chile',
@@ -293,6 +296,8 @@ describe('listLeaveRequestsFromPostgres', () => {
             balance_id: 'balance-valentina-vacation-2025',
             member_id: 'valentina-hoyos',
             member_name: 'Valentina Hoyos',
+            member_avatar_url: 'gs://greenhouse-assets/users/valentina.png',
+            member_linked_user_id: 'user-valentina',
             employment_type: 'full_time',
             hire_date: '2025-09-09',
             contract_type: 'indefinido',
@@ -434,6 +439,7 @@ describe('listLeaveRequestsFromPostgres', () => {
       payRegime: 'chile',
       payrollVia: 'internal'
     })
+    expect(payload.balances[0]?.memberAvatarUrl).toBe('/api/media/users/user-valentina/avatar')
 
     const insertCall = mockClientQuery.mock.calls.find(call =>
       String(call[0]).includes('INSERT INTO greenhouse_hr.leave_balances'))
@@ -457,6 +463,8 @@ describe('listLeaveRequestsFromPostgres', () => {
             balance_id: 'balance-daniela-vacation-2026',
             member_id: 'daniela-ferreira',
             member_name: 'Daniela Ferreira',
+            member_avatar_url: 'gs://greenhouse-assets/users/daniela.png',
+            member_linked_user_id: 'user-daniela',
             employment_type: 'full_time',
             hire_date: '2024-01-10',
             contract_type: 'indefinido',
@@ -477,6 +485,8 @@ describe('listLeaveRequestsFromPostgres', () => {
             balance_id: 'balance-valentina-vacation-2026',
             member_id: 'valentina-hoyos',
             member_name: 'Valentina Hoyos',
+            member_avatar_url: 'gs://greenhouse-assets/users/valentina.png',
+            member_linked_user_id: 'user-valentina',
             employment_type: 'full_time',
             hire_date: '2024-03-01',
             contract_type: 'indefinido',

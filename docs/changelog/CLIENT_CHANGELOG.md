@@ -63,6 +63,8 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 ### Correcciones
 
 - `HR > Permisos` ya no expone decimales infinitos en saldos administrativos de vacaciones; los montos visibles quedan redondeados y explicados con mejor contexto.
+- `HR > Permisos` ahora muestra el avatar del colaborador en la vista de saldos del equipo cuando la identidad ya está resuelta en el portal.
+- El detalle administrativo del colaborador ya no confunde períodos retroactivos cargados por HR con ajustes manuales de saldo, y deja una lectura más clara de ambas cosas.
 - `HR > Permisos` ahora separa `Mis saldos` de `Saldos del equipo`, con búsqueda por colaborador, alertas operativas y detalle administrativo en vez de un listado plano difícil de operar.
 
 ### Correcciones

@@ -37,6 +37,13 @@
   - `Saldo actual`
 - El detalle de colaborador y las tarjetas de resumen ahora explican cuando el saldo está en acumulación proporcional y/o incluye arrastre, evitando interpretar `base / acumulado` como saldo final.
 
+### 2026-04-16 — HR Leave unifica identidad visible y actividad administrativa del detalle de equipo
+
+- Los saldos de `HR > Permisos` ahora heredan el mismo enriquecimiento de identidad visible que ya existía en solicitudes: `memberAvatarUrl` pasa a formar parte del contrato de balances y se resuelve tanto en PostgreSQL como en el fallback legacy.
+- La vista `Saldos del equipo` ya no cae a iniciales cuando el avatar existe en la identidad canónica del colaborador.
+- El detalle por colaborador reemplaza la tabla ancha por cards operativas por tipo de permiso, eliminando el scroll horizontal largo del dialog.
+- El bloque inferior deja de implicar que un backfill sea un “ajuste”: ahora muestra `Actividad administrativa` con periodos retroactivos por un lado y ajustes de saldo por otro.
+
 ### 2026-04-16 — TASK-415: HR Leave admin backfills, ajustes y policy explain
 
 - `HR Leave` gana base admin real para vacaciones del equipo:

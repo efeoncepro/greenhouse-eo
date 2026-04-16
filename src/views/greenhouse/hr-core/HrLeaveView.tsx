@@ -62,7 +62,7 @@ import type {
   LeaveDayPeriod
 } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
-import { leaveStatusConfig, getLeaveTypeConfig, formatDate } from './helpers'
+import { leaveStatusConfig, getLeaveTypeConfig, formatDate, formatDateRange, formatTimestamp } from './helpers'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -156,6 +156,7 @@ const getCalendarRangeForYear = (year: number) => ({
 type TeamBalanceSummaryRow = {
   memberId: string
   memberName: string
+  memberAvatarUrl: string | null
   balances: HrLeaveBalance[]
   vacationBalance: HrLeaveBalance | null
   policyLabel: string
@@ -215,6 +216,7 @@ const buildTeamBalanceRows = (balances: HrLeaveBalance[]) => {
     rows.set(balance.memberId, {
       memberId: balance.memberId,
       memberName: balance.memberName || balance.memberId,
+      memberAvatarUrl: balance.memberAvatarUrl || null,
       balances: [balance],
       vacationBalance: null,
       policyLabel: 'Sin política visible',
@@ -236,6 +238,7 @@ const buildTeamBalanceRows = (balances: HrLeaveBalance[]) => {
       return {
         ...row,
         vacationBalance,
+        memberAvatarUrl: row.memberAvatarUrl || baseBalance?.memberAvatarUrl || null,
         policyLabel: baseBalance?.policyExplain ? formatPolicyExplainLabel(baseBalance.policyExplain) : 'Sin política visible',
         policyHint: vacationBalance ? getBalancePolicySupportText(vacationBalance) || null : null,
         availableDays: vacationBalance?.availableDays ?? null,
@@ -267,6 +270,20 @@ const getTeamAlertLabels = (row: TeamBalanceSummaryRow) => {
   return alerts
 }
 
+const MemberAvatar = ({
+  name,
+  avatarUrl,
+  size = 32
+}: {
+  name: string
+  avatarUrl: string | null
+  size?: number
+}) => (
+  <Avatar alt={name} src={avatarUrl || undefined} sx={{ width: size, height: size, fontSize: size <= 32 ? '0.8rem' : '1rem' }}>
+    {getInitials(name)}
+  </Avatar>
+)
+
 const HrLeaveView = () => {
   const theme = useTheme()
   const [tab, setTab] = useState('requests')
@@ -277,6 +294,9 @@ const HrLeaveView = () => {
   const [balData, setBalData] = useState<HrLeaveBalancesResponse | null>(null)
   const [calData, setCalData] = useState<HrLeaveCalendarResponse | null>(null)
   const [adjustmentsData, setAdjustmentsData] = useState<HrLeaveBalanceAdjustmentsResponse | null>(null)
+  const [teamDetailRequests, setTeamDetailRequests] = useState<HrLeaveRequest[]>([])
+  const [teamDetailRequestsLoading, setTeamDetailRequestsLoading] = useState(false)
+  const [teamDetailRequestsError, setTeamDetailRequestsError] = useState<string | null>(null)
   const [leaveTypes, setLeaveTypes] = useState<HrLeaveType[]>([])
   const [currentMemberId, setCurrentMemberId] = useState<string | null>(null)
   const [hasHrAdminAccess, setHasHrAdminAccess] = useState(false)
@@ -321,6 +341,7 @@ const HrLeaveView = () => {
   const activeLeaveTypes = leaveTypes.filter(leaveType => leaveType.active)
   const canManageLeaveAdminActions = canManageLeaveBackfills || canManageLeaveAdjustments
   const canShowAdjustmentHistory = canManageLeaveAdjustments || canReverseLeaveAdjustments
+  const canShowTeamAdminActivity = canManageLeaveBackfills || canShowAdjustmentHistory
   const backfillYear = backfillTarget?.year ?? filterYear
   const adjustmentYear = adjustmentTarget?.year ?? filterYear
 
@@ -403,6 +424,61 @@ const HrLeaveView = () => {
   }, [filterStatus, filterYear])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  useEffect(() => {
+    if (!teamDetailMemberId) {
+      setTeamDetailRequests([])
+      setTeamDetailRequestsError(null)
+      setTeamDetailRequestsLoading(false)
+
+      return
+    }
+
+    let cancelled = false
+
+    const fetchTeamDetailRequests = async () => {
+      setTeamDetailRequestsLoading(true)
+      setTeamDetailRequestsError(null)
+
+      try {
+        const detailParams = new URLSearchParams({
+          memberId: teamDetailMemberId,
+          year: String(filterYear)
+        })
+
+        const response = await fetch(`/api/hr/core/leave/requests?${detailParams}`)
+
+        if (!response.ok) {
+          const payload = await response.json().catch(() => null)
+
+          throw new Error(getHrLeaveErrorMessage(payload, 'No fue posible cargar la actividad administrativa del colaborador.'))
+        }
+
+        const payload = (await response.json()) as HrLeaveRequestsResponse
+
+        if (!cancelled) {
+          setTeamDetailRequests(payload.requests ?? [])
+        }
+      } catch (detailError) {
+        if (!cancelled) {
+          setTeamDetailRequests([])
+          setTeamDetailRequestsError(
+            detailError instanceof Error ? detailError.message : 'No fue posible cargar la actividad administrativa del colaborador.'
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setTeamDetailRequestsLoading(false)
+        }
+      }
+    }
+
+    void fetchTeamDetailRequests()
+
+    return () => {
+      cancelled = true
+    }
+  }, [filterYear, teamDetailMemberId])
 
   const handleCreate = async (input: CreateLeaveRequestInput) => {
     setCreateSaving(true)
@@ -655,6 +731,19 @@ const HrLeaveView = () => {
   const selectedTeamAdjustments = useMemo(
     () => adjustments.filter(adjustment => adjustment.memberId === teamDetailMemberId),
     [adjustments, teamDetailMemberId]
+  )
+
+  const selectedTeamBackfills = useMemo(
+    () =>
+      teamDetailRequests
+        .filter(request => request.memberId === teamDetailMemberId && request.sourceKind === 'admin_backfill')
+        .sort((left, right) => {
+          const leftDate = left.createdAt || left.startDate
+          const rightDate = right.createdAt || right.startDate
+
+          return rightDate.localeCompare(leftDate)
+        }),
+    [teamDetailMemberId, teamDetailRequests]
   )
 
   const selectedTeamBalances = useMemo(() => {
@@ -1261,9 +1350,7 @@ const HrLeaveView = () => {
                             <TableRow key={row.memberId} hover>
                               <TableCell>
                                 <Stack direction='row' spacing={1.5} alignItems='center'>
-                                  <Avatar sx={{ width: 32, height: 32, fontSize: '0.8rem' }}>
-                                    {getInitials(row.memberName)}
-                                  </Avatar>
+                                  <MemberAvatar name={row.memberName} avatarUrl={row.memberAvatarUrl} size={32} />
                                   <Box>
                                     <Typography variant='body2' fontWeight={600}>
                                       {row.memberName}
@@ -1357,11 +1444,18 @@ const HrLeaveView = () => {
         {selectedTeamBalanceRow && (
           <>
             <DialogTitle>
-              <Stack spacing={0.5}>
-                <Typography variant='h5'>{selectedTeamBalanceRow.memberName}</Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  Revisión administrativa de saldos, reservas y ajustes por tipo de permiso.
-                </Typography>
+              <Stack direction='row' spacing={2} alignItems='center'>
+                <MemberAvatar
+                  name={selectedTeamBalanceRow.memberName}
+                  avatarUrl={selectedTeamBalanceRow.memberAvatarUrl}
+                  size={48}
+                />
+                <Stack spacing={0.5}>
+                  <Typography variant='h5'>{selectedTeamBalanceRow.memberName}</Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    Revisión administrativa de saldos, reservas y ajustes por tipo de permiso.
+                  </Typography>
+                </Stack>
               </Stack>
             </DialogTitle>
             <Divider />
@@ -1453,75 +1547,51 @@ const HrLeaveView = () => {
                 <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
                   <CardHeader
                     title='Detalle por tipo de permiso'
-                    subheader='Desde aquí puedes revisar disponibilidad y operar acciones administrativas sin perder el contexto.'
+                    subheader='Disponibilidad y acciones administrativas organizadas por tipo de permiso.'
                   />
                   <Divider />
                   <CardContent>
-                    <TableContainer>
-                      <Table size='small'>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Tipo</TableCell>
-                            <TableCell>Política</TableCell>
-                            <TableCell align='center'>Año</TableCell>
-                            <TableCell align='center'>Base / acumulado</TableCell>
-                            <TableCell align='center'>Progresivos</TableCell>
-                            <TableCell align='center'>Arrastre</TableCell>
-                            <TableCell align='center'>Usados</TableCell>
-                            <TableCell align='center'>Reservados</TableCell>
-                            <TableCell align='center'>Ajustes</TableCell>
-                            <TableCell align='center'>Saldo actual</TableCell>
-                            <TableCell align='right'>Acciones</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {selectedTeamBalances.map(balance => {
-                            const conf = getLeaveTypeConfig(balance.leaveTypeCode)
+                    <Stack spacing={3}>
+                      {selectedTeamBalances.map(balance => {
+                        const conf = getLeaveTypeConfig(balance.leaveTypeCode)
 
-                            return (
-                              <TableRow key={balance.balanceId} hover>
-                                <TableCell>
-                                  <CustomChip
-                                    round='true'
-                                    size='small'
-                                    icon={<i className={conf.icon} />}
-                                    label={conf.label}
-                                    color={conf.color}
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Stack spacing={0.25}>
-                                    <Typography variant='body2' color='text.secondary'>
-                                      {balance.policyExplain
-                                        ? formatPolicyExplainLabel(balance.policyExplain)
-                                        : 'Regla estándar de permisos'}
-                                    </Typography>
-                                    {getBalancePolicySupportText(balance) && (
+                        return (
+                          <Card key={balance.balanceId} elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                            <CardContent>
+                              <Stack spacing={3}>
+                                <Stack
+                                  direction={{ xs: 'column', md: 'row' }}
+                                  spacing={2}
+                                  justifyContent='space-between'
+                                  alignItems={{ md: 'flex-start' }}
+                                >
+                                  <Stack spacing={1}>
+                                    <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap'>
+                                      <CustomChip
+                                        round='true'
+                                        size='small'
+                                        icon={<i className={conf.icon} />}
+                                        label={conf.label}
+                                        color={conf.color}
+                                      />
                                       <Typography variant='caption' color='text.secondary'>
-                                        {getBalancePolicySupportText(balance)}
+                                        Año {balance.year}
                                       </Typography>
-                                    )}
+                                    </Stack>
+                                    <Stack spacing={0.25}>
+                                      <Typography variant='body2' color='text.secondary'>
+                                        {balance.policyExplain
+                                          ? formatPolicyExplainLabel(balance.policyExplain)
+                                          : 'Regla estándar de permisos'}
+                                      </Typography>
+                                      {getBalancePolicySupportText(balance) && (
+                                        <Typography variant='caption' color='text.secondary'>
+                                          {getBalancePolicySupportText(balance)}
+                                        </Typography>
+                                      )}
+                                    </Stack>
                                   </Stack>
-                                </TableCell>
-                                <TableCell align='center'>{balance.year}</TableCell>
-                                <TableCell align='center'>{formatLeaveDays(balance.allowanceDays)}</TableCell>
-                                <TableCell align='center'>{formatLeaveDays(balance.progressiveExtraDays ?? 0)}</TableCell>
-                                <TableCell align='center'>{formatLeaveDays(balance.carriedOverDays)}</TableCell>
-                                <TableCell align='center'>{formatLeaveDays(balance.usedDays)}</TableCell>
-                                <TableCell align='center'>{formatLeaveDays(balance.reservedDays)}</TableCell>
-                                <TableCell align='center'>{formatLeaveDays(balance.adjustmentDays ?? 0)}</TableCell>
-                                <TableCell align='center'>
-                                  <Typography variant='body2' fontWeight={600}>
-                                    {formatLeaveDays(balance.availableDays)}
-                                  </Typography>
-                                </TableCell>
-                                <TableCell align='right'>
-                                  <Stack
-                                    direction={{ xs: 'column', lg: 'row' }}
-                                    spacing={1}
-                                    justifyContent='flex-end'
-                                    alignItems={{ lg: 'center' }}
-                                  >
+                                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} flexWrap='wrap'>
                                     {canManageLeaveBackfills && (
                                       <Button
                                         variant='tonal'
@@ -1548,109 +1618,229 @@ const HrLeaveView = () => {
                                       </Button>
                                     )}
                                   </Stack>
-                                </TableCell>
-                              </TableRow>
-                            )
-                          })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                                </Stack>
+
+                                <Grid container spacing={2}>
+                                  {[
+                                    ['Base / acumulado', formatLeaveDays(balance.allowanceDays)],
+                                    ['Progresivos', formatLeaveDays(balance.progressiveExtraDays ?? 0)],
+                                    ['Arrastre', formatLeaveDays(balance.carriedOverDays)],
+                                    ['Usados', formatLeaveDays(balance.usedDays)],
+                                    ['Reservados', formatLeaveDays(balance.reservedDays)],
+                                    ['Ajustes', formatLeaveDays(balance.adjustmentDays ?? 0)],
+                                    ['Saldo actual', formatLeaveDays(balance.availableDays)]
+                                  ].map(([label, value]) => (
+                                    <Grid key={label} size={{ xs: 6, md: 3 }}>
+                                      <Box
+                                        sx={{
+                                          px: 2,
+                                          py: 1.5,
+                                          borderRadius: 2,
+                                          bgcolor: 'action.hover',
+                                          border: t => `1px solid ${t.palette.divider}`,
+                                          height: '100%'
+                                        }}
+                                      >
+                                        <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                                          {label}
+                                        </Typography>
+                                        <Typography variant='body1' fontWeight={600} sx={{ mt: 0.5 }}>
+                                          {value}
+                                        </Typography>
+                                      </Box>
+                                    </Grid>
+                                  ))}
+                                </Grid>
+                              </Stack>
+                            </CardContent>
+                          </Card>
+                        )
+                      })}
+                    </Stack>
                   </CardContent>
                 </Card>
 
-                {canShowAdjustmentHistory && (
+                {canShowTeamAdminActivity && (
                   <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
                     <CardHeader
-                      title='Historial de ajustes'
-                      subheader='Trazabilidad de cambios manuales y reversiones para este colaborador.'
+                      title='Actividad administrativa'
+                      subheader='Registro de días ya tomados, ajustes manuales y reversiones para este colaborador.'
                     />
                     <Divider />
                     <CardContent>
-                      {selectedTeamAdjustments.length > 0 ? (
-                        <TableContainer>
-                          <Table size='small'>
-                            <TableHead>
-                              <TableRow>
-                                <TableCell>Tipo</TableCell>
-                                <TableCell>Fecha efectiva</TableCell>
-                                <TableCell align='center'>Delta</TableCell>
-                                <TableCell>Motivo</TableCell>
-                                <TableCell>Estado</TableCell>
-                                <TableCell align='right'>Acciones</TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {selectedTeamAdjustments.map(adjustment => {
-                                const conf = getLeaveTypeConfig(adjustment.leaveTypeCode)
-                                const isReversed = Boolean(adjustment.reversedAt)
-
-                                const canReverseAdjustment =
-                                  canReverseLeaveAdjustments &&
-                                  adjustment.sourceKind === 'manual_adjustment' &&
-                                  !isReversed
-
-                                return (
-                                  <TableRow key={adjustment.adjustmentId} hover>
-                                    <TableCell>
-                                      <CustomChip
-                                        round='true'
-                                        size='small'
-                                        icon={<i className={conf.icon} />}
-                                        label={conf.label}
-                                        color={conf.color}
-                                      />
-                                    </TableCell>
-                                    <TableCell>{formatDate(adjustment.effectiveDate)}</TableCell>
-                                    <TableCell align='center'>
-                                      <Typography variant='body2' fontWeight={600}>
-                                        {adjustment.daysDelta > 0 ? `+${adjustment.daysDelta}` : adjustment.daysDelta}
-                                      </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                      <Stack spacing={0.25}>
-                                        <Typography variant='body2'>{adjustment.reason}</Typography>
-                                        {adjustment.notes && (
-                                          <Typography variant='caption' color='text.secondary'>
-                                            {adjustment.notes}
-                                          </Typography>
-                                        )}
-                                      </Stack>
-                                    </TableCell>
-                                    <TableCell>
-                                      <CustomChip
-                                        round='true'
-                                        size='small'
-                                        color={isReversed ? 'secondary' : 'success'}
-                                        label={isReversed ? 'Revertido' : 'Activo'}
-                                      />
-                                    </TableCell>
-                                    <TableCell align='right'>
-                                      {canReverseAdjustment && (
-                                        <Button
-                                          variant='tonal'
-                                          size='small'
-                                          color='warning'
-                                          onClick={() => {
-                                            setTeamDetailMemberId(null)
-                                            openReverseDialog(adjustment)
-                                          }}
-                                        >
-                                          Revertir
-                                        </Button>
-                                      )}
-                                    </TableCell>
-                                  </TableRow>
-                                )
-                              })}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
+                      {teamDetailRequestsError ? (
+                        <Alert severity='warning'>{teamDetailRequestsError}</Alert>
+                      ) : teamDetailRequestsLoading ? (
+                        <Stack spacing={2}>
+                          {[0, 1].map(item => (
+                            <Skeleton key={item} variant='rounded' height={88} />
+                          ))}
+                        </Stack>
                       ) : (
-                        <Stack alignItems='center' spacing={1} sx={{ py: 4 }}>
-                          <i className='tabler-history-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                          <Typography color='text.secondary'>
-                            No hay ajustes manuales registrados para este colaborador.
-                          </Typography>
+                        <Stack spacing={4}>
+                          {canManageLeaveBackfills && (
+                            <Stack spacing={2}>
+                              <Stack spacing={0.5}>
+                                <Typography variant='subtitle2'>Días ya tomados registrados</Typography>
+                                <Typography variant='body2' color='text.secondary'>
+                                  Periodos cargados retroactivamente para reflejar ausencias que ocurrieron fuera del flujo normal.
+                                </Typography>
+                              </Stack>
+                              {selectedTeamBackfills.length > 0 ? (
+                                <Stack spacing={2}>
+                                  {selectedTeamBackfills.map(backfill => {
+                                    const conf = getLeaveTypeConfig(backfill.leaveTypeCode)
+
+                                    return (
+                                      <Card key={backfill.requestId} elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                                        <CardContent>
+                                          <Stack spacing={2}>
+                                            <Stack
+                                              direction={{ xs: 'column', md: 'row' }}
+                                              spacing={2}
+                                              justifyContent='space-between'
+                                              alignItems={{ md: 'flex-start' }}
+                                            >
+                                              <Stack spacing={1}>
+                                                <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap'>
+                                                  <CustomChip
+                                                    round='true'
+                                                    size='small'
+                                                    icon={<i className={conf.icon} />}
+                                                    label={conf.label}
+                                                    color={conf.color}
+                                                  />
+                                                  <CustomChip round='true' size='small' color='info' label='Días ya tomados' />
+                                                </Stack>
+                                                <Typography variant='body2' fontWeight={600}>
+                                                  {formatDateRange(backfill.startDate, backfill.endDate)}
+                                                </Typography>
+                                                <Typography variant='caption' color='text.secondary'>
+                                                  Registrado {backfill.createdAt ? formatTimestamp(backfill.createdAt) : 'sin fecha de registro'}.
+                                                </Typography>
+                                              </Stack>
+                                              <Typography variant='h6'>{formatLeaveDays(backfill.requestedDays)} días</Typography>
+                                            </Stack>
+                                            <Stack spacing={0.5}>
+                                              {backfill.reason && <Typography variant='body2'>{backfill.reason}</Typography>}
+                                              {backfill.notes && (
+                                                <Typography variant='caption' color='text.secondary'>
+                                                  {backfill.notes}
+                                                </Typography>
+                                              )}
+                                            </Stack>
+                                          </Stack>
+                                        </CardContent>
+                                      </Card>
+                                    )
+                                  })}
+                                </Stack>
+                              ) : (
+                                <Typography variant='body2' color='text.secondary'>
+                                  No hay períodos retroactivos registrados para este colaborador.
+                                </Typography>
+                              )}
+                            </Stack>
+                          )}
+
+                          {canShowAdjustmentHistory && <Divider />}
+
+                          {canShowAdjustmentHistory && (
+                            <Stack spacing={2}>
+                              <Stack spacing={0.5}>
+                                <Typography variant='subtitle2'>Ajustes de saldo</Typography>
+                                <Typography variant='body2' color='text.secondary'>
+                                  Correcciones manuales y reversiones aplicadas directamente sobre el saldo.
+                                </Typography>
+                              </Stack>
+                              {selectedTeamAdjustments.length > 0 ? (
+                                <Stack spacing={2}>
+                                  {selectedTeamAdjustments.map(adjustment => {
+                                    const conf = getLeaveTypeConfig(adjustment.leaveTypeCode)
+                                    const isReversed = Boolean(adjustment.reversedAt)
+
+                                    const canReverseAdjustment =
+                                      canReverseLeaveAdjustments &&
+                                      adjustment.sourceKind === 'manual_adjustment' &&
+                                      !isReversed
+
+                                    return (
+                                      <Card key={adjustment.adjustmentId} elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                                        <CardContent>
+                                          <Stack
+                                            direction={{ xs: 'column', md: 'row' }}
+                                            spacing={2}
+                                            justifyContent='space-between'
+                                            alignItems={{ md: 'flex-start' }}
+                                          >
+                                            <Stack spacing={1}>
+                                              <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap'>
+                                                <CustomChip
+                                                  round='true'
+                                                  size='small'
+                                                  icon={<i className={conf.icon} />}
+                                                  label={conf.label}
+                                                  color={conf.color}
+                                                />
+                                                <CustomChip
+                                                  round='true'
+                                                  size='small'
+                                                  color={isReversed ? 'secondary' : 'success'}
+                                                  label={isReversed ? 'Revertido' : 'Activo'}
+                                                />
+                                              </Stack>
+                                              <Typography variant='body2' fontWeight={600}>
+                                                {adjustment.reason}
+                                              </Typography>
+                                              <Typography variant='caption' color='text.secondary'>
+                                                Fecha efectiva {formatDate(adjustment.effectiveDate)}
+                                              </Typography>
+                                              {adjustment.notes && (
+                                                <Typography variant='caption' color='text.secondary'>
+                                                  {adjustment.notes}
+                                                </Typography>
+                                              )}
+                                            </Stack>
+                                            <Stack spacing={1} alignItems={{ xs: 'flex-start', md: 'flex-end' }}>
+                                              <Typography variant='h6'>
+                                                {adjustment.daysDelta > 0 ? `+${formatLeaveDays(adjustment.daysDelta)}` : formatLeaveDays(adjustment.daysDelta)}
+                                              </Typography>
+                                              {canReverseAdjustment && (
+                                                <Button
+                                                  variant='tonal'
+                                                  size='small'
+                                                  color='warning'
+                                                  onClick={() => {
+                                                    setTeamDetailMemberId(null)
+                                                    openReverseDialog(adjustment)
+                                                  }}
+                                                >
+                                                  Revertir
+                                                </Button>
+                                              )}
+                                            </Stack>
+                                          </Stack>
+                                        </CardContent>
+                                      </Card>
+                                    )
+                                  })}
+                                </Stack>
+                              ) : (
+                                <Typography variant='body2' color='text.secondary'>
+                                  No hay ajustes manuales registrados para este colaborador.
+                                </Typography>
+                              )}
+                            </Stack>
+                          )}
+
+                          {selectedTeamBackfills.length === 0 && selectedTeamAdjustments.length === 0 && !canManageLeaveBackfills && (
+                            <Stack alignItems='center' spacing={1} sx={{ py: 2 }}>
+                              <i className='tabler-history-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+                              <Typography color='text.secondary'>
+                                No hay actividad administrativa registrada para este colaborador.
+                              </Typography>
+                            </Stack>
+                          )}
                         </Stack>
                       )}
                     </CardContent>

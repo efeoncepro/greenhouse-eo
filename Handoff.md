@@ -22,6 +22,28 @@
   - `pnpm vitest run src/lib/hr-core/leave-domain.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
   - `pnpm exec eslint src/lib/hr-core/leave-domain.ts src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/service.ts src/types/hr-core.ts src/views/greenhouse/hr-core/HrLeaveView.tsx src/lib/hr-core/leave-domain.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
 
+## Sesion 2026-04-16 — HR Leave team balances recupera identidad visible y actividad admin canónica
+
+- **Estado:** `implemented localmente`, `pendiente lint/build final`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/types/hr-core.ts`
+    - `HrLeaveBalance` ahora puede exponer `memberAvatarUrl`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/lib/hr-core/service.ts`
+    - los balances de leave resuelven avatar con el mismo criterio canónico de solicitudes (`avatar_url + linked_user_id -> /api/media/users/.../avatar`)
+    - el fallback legacy de requests también queda alineado con la misma resolución
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - `Saldos del equipo` usa avatar real del colaborador cuando existe
+    - el dialog de detalle deja la tabla horizontal y pasa a cards por tipo de permiso
+    - el bloque `Actividad administrativa` separa retroactivos `Días ya tomados` de `Ajustes de saldo`
+  - tests nuevos/actualizados:
+    - `src/lib/hr-core/postgres-leave-store.test.ts`
+    - `src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/hr-core/postgres-leave-store.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+  - `pnpm exec eslint src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/postgres-leave-store.test.ts src/lib/hr-core/service.ts src/types/hr-core.ts src/views/greenhouse/hr-core/HrLeaveView.tsx src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+
 ---
 
 ## Sesion 2026-04-16 — TASK-285: Client Role Differentiation
