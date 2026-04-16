@@ -2,6 +2,19 @@
 
 ## 2026-04-16
 
+### 2026-04-16 — TASK-243: Person 360 incorpora Nexa Insights filtrados por miembro
+
+- `People > Person 360` ahora muestra `Nexa Insights` al inicio de la surface visible `activity`, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.
+- Se agrega `readMemberAiLlmSummary(memberId, periodYear, periodMonth, limit)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` para leer insights del miembro en el período actual, ordenados por:
+  - severidad (`critical > warning > info`)
+  - `quality_score DESC`
+  - `processed_at DESC`
+- `GET /api/people/[memberId]/intelligence` ahora incluye `nexaInsights` en el payload del snapshot del miembro, sin abrir una route nueva ni recalcular señales inline.
+- `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` inserta `NexaInsightsBlock` al inicio de la surface visible y conserva el contrato actual de `@mentions`:
+  - `@[Miembro](member:...)` -> `People`
+  - `@[Space](space:...)` -> `Space 360`
+- No se agregaron migraciones ni nuevos publishers/consumers reactivos; el cambio es un consumer read-only sobre serving existente.
+
 ### 2026-04-16 — TASK-029: Modulo de Objetivos y OKRs
 
 - Nuevo modulo HRIS Goals & OKRs con ciclos trimestrales/semestrales/anuales

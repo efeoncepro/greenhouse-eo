@@ -46,7 +46,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 | Operaciones | `/agency/operations` | Stub | Health monitoring del platform (pendiente) |
 | Organizaciones | `/agency/organizations` | Implementada | Lista + detalle con economics, projects, equipo |
 | Servicios | `/agency/services` | Implementada | Servicios por space con sync HubSpot |
-| Personas | `/people` | Implementada | Directorio + ficha 360 de cada colaborador; debe escalar capacidad/economía desde `member_capacity_economics` cuando aplique |
+| Personas | `/people` | Implementada | Directorio + ficha 360 de cada colaborador; la surface `activity` ya combina métricas operativas con Nexa insights filtrados por `member_id` y debe seguir escalando capacidad/economía desde `member_capacity_economics` cuando aplique |
 | Nómina | `/hr/payroll` | Implementada | Períodos, cálculo, entries, readiness |
 | Nómina Proyectada | `/hr/payroll/projected` | Implementada | Simulación proyectada + promoción explícita a borrador oficial |
 | Departamentos | `/hr/departments` | Implementada | Estructura organizacional |

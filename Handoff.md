@@ -1,5 +1,37 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — TASK-243 Nexa Insights en Person 360
+
+- **Estado:** `complete`, `pushed a develop`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+    - reader nuevo `readMemberAiLlmSummary(memberId, periodYear, periodMonth, limit)`
+    - filtro explícito `member_id + period_year + period_month`, lista visible solo con `status='succeeded'`
+    - ranking alineado a Home/Agency: `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - `src/lib/ico-engine/ai/llm-types.ts`
+    - tipos `MemberNexaInsightItem` y `MemberNexaInsightsPayload`
+  - `src/lib/person-intelligence/types.ts`
+    - `PersonIntelligenceResponse` ahora puede incluir `nexaInsights`
+  - `src/app/api/people/[memberId]/intelligence/route.ts`
+    - el snapshot del miembro incorpora `nexaInsights` sin abrir route nueva
+  - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx`
+    - la surface visible `activity` renderiza `NexaInsightsBlock` al inicio
+    - consume el summary AI desde la route de intelligence y conserva la navegación por `@mentions`
+  - tests nuevos/actualizados:
+    - `src/lib/ico-engine/ai/llm-enrichment-reader.test.ts`
+    - `src/app/api/people/[memberId]/intelligence/route.test.ts`
+    - `src/views/greenhouse/people/tabs/PersonActivityTab.test.tsx`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/ico-engine/ai/llm-enrichment-reader.test.ts 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/people/tabs/PersonActivityTab.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+- **Notas operativas:**
+  - la spec original quedó corregida: la surface visible real es `activity`, no un tab `intelligence` montado
+  - `docs/architecture/schema-snapshot-baseline.sql` sigue sin reflejar las tablas `ico_ai_signal_enrichments` / `ico_ai_enrichment_runs`; para este dominio la referencia real sigue siendo migración + `src/types/db.d.ts`
+
 ## Sesion 2026-04-16 — TASK-029: HRIS Goals & OKRs module
 
 - **Estado:** `complete`, pendiente migracion en shared dev DB

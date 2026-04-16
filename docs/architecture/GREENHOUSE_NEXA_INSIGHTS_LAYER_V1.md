@@ -1,5 +1,19 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-16 — Person 360 Activity ya consume insights Nexa filtrados por member
+
+- `People > Person 360` ya no depende solo del snapshot operativo y las métricas ICO para explicar desvíos individuales.
+- Runtime activo:
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` expone `readMemberAiLlmSummary(memberId, periodYear, periodMonth, limit)`
+  - `src/app/api/people/[memberId]/intelligence/route.ts` incorpora `nexaInsights` al payload del miembro
+  - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` renderiza `NexaInsightsBlock` al inicio de la surface visible de actividad/inteligencia
+- Contrato operativo:
+  - Person 360 consume enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`; no recalcula señales ni narrativa inline
+  - el filtro canónico es `member_id + period_year + period_month`, con lista visible restringida a `status = 'succeeded'`
+  - el ranking visible sigue `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - la navegación contextual reutiliza el contrato actual de `@mentions` (`member` -> `People`, `space` -> `Space 360`) sin mutaciones automáticas
+  - la integración se hace sobre la surface visible `activity`; no reabre el tab legacy `intelligence`
+
 ## Delta 2026-04-16 — Home/Pulse ya consume Top Insights cross-Space como surface read-only
 
 - `Pulse` (`/home`) ya no depende solo de shortcuts, contexto de acceso y estado operativo básico para hacer visible la lane advisory de Nexa.

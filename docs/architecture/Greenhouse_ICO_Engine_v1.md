@@ -1,5 +1,16 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-16 — TASK-243 surfaces member-scoped Nexa insights in Person 360
+
+`TASK-243` cierra el primer consumer person-level de la lane advisory del ICO Engine sin abrir storage nuevo ni recalcular señales fuera del engine.
+
+- **Reader member-scoped:** `src/lib/ico-engine/ai/llm-enrichment-reader.ts` ahora expone `readMemberAiLlmSummary(memberId, periodYear, periodMonth, limit)` sobre `greenhouse_serving.ico_ai_signal_enrichments`
+- **Filtro canónico:** `member_id + period_year + period_month`, lista visible solo con `status='succeeded'`
+- **Ranking:** `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+- **Person 360:** `GET /api/people/[memberId]/intelligence` incorpora `nexaInsights` al snapshot del miembro
+- **UI visible:** `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` renderiza `NexaInsightsBlock` al inicio de la surface `activity`
+- **Contrato:** Person 360 consume enrichments ya materializados por `ICO Engine -> Gemini -> serving`; no crea señales nuevas ni reabre tabs legacy
+
 ## Delta 2026-04-05 — ICO Engine performance fallback chain fix + delivery projection consumer
 
 Diagnóstico y resolución del error "Column name created_at is ambiguous" que impedía cargar el tab ICO Engine.
