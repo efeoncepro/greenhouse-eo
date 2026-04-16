@@ -134,6 +134,22 @@ export interface TopAiLlmEnrichmentItem {
   processedAt: string
 }
 
+export interface MemberNexaInsightItem {
+  id: string
+  signalType: string
+  metricId: string
+  severity: string | null
+  explanation: string | null
+  recommendedAction: string | null
+}
+
+export interface MemberNexaInsightsPayload {
+  totalAnalyzed: number
+  lastAnalysis: string | null
+  runStatus: IcoLlmRunStatus | null
+  insights: MemberNexaInsightItem[]
+}
+
 // ─── Metric Glossary (dynamic from registry) ──────────────────────────────
 
 const buildMetricGlossary = (): string => {

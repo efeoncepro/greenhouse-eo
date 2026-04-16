@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequirePeopleTenantContext = vi.fn()
 const mockReadPersonIntelligence = vi.fn()
 const mockReadPersonIntelligenceTrend = vi.fn()
 const mockReadMemberCapacityEconomicsSnapshot = vi.fn()
 const mockReadMemberCapacityEconomicsTrend = vi.fn()
+const mockReadMemberAiLlmSummary = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
   requirePeopleTenantContext: (...args: unknown[]) => mockRequirePeopleTenantContext(...args)
@@ -20,15 +21,25 @@ vi.mock('@/lib/member-capacity-economics/store', () => ({
   readMemberCapacityEconomicsTrend: (...args: unknown[]) => mockReadMemberCapacityEconomicsTrend(...args)
 }))
 
+vi.mock('@/lib/ico-engine/ai/llm-enrichment-reader', () => ({
+  readMemberAiLlmSummary: (...args: unknown[]) => mockReadMemberAiLlmSummary(...args)
+}))
+
 import { GET } from '@/app/api/people/[memberId]/intelligence/route'
 
 describe('GET /api/people/[memberId]/intelligence', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-04-15T12:00:00.000Z'))
     mockRequirePeopleTenantContext.mockResolvedValue({
       tenant: { tenantType: 'efeonce_internal', routeGroups: ['people'], roleCodes: ['efeonce_admin'] },
       errorResponse: null
     })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('overlays capacity and cost from member_capacity_economics on top of person intelligence', async () => {
@@ -96,6 +107,21 @@ describe('GET /api/people/[memberId]/intelligence', () => {
       materializedAt: '2026-03-26T01:00:00.000Z'
     })
     mockReadMemberCapacityEconomicsTrend.mockResolvedValue([])
+    mockReadMemberAiLlmSummary.mockResolvedValue({
+      totalAnalyzed: 2,
+      lastAnalysis: '2026-03-26T02:00:00.000Z',
+      runStatus: 'succeeded',
+      insights: [
+        {
+          id: 'EO-AIE-1',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: '@[Space A](space:space-a) está retrasado.',
+          recommendedAction: 'Revisar bloqueadores con @[Ana](member:member-2).'
+        }
+      ]
+    })
 
     const response = await GET(
       new Request('http://localhost/api/people/member-1/intelligence?trend=6'),
@@ -122,6 +148,22 @@ describe('GET /api/people/[memberId]/intelligence', () => {
       costPerHourTarget: 13500,
       suggestedBillRateTarget: 18225
     })
+    expect(mockReadMemberAiLlmSummary).toHaveBeenCalledWith('member-1', 2026, 4)
+    expect(body.nexaInsights).toEqual({
+      totalAnalyzed: 2,
+      lastAnalysis: '2026-03-26T02:00:00.000Z',
+      runStatus: 'succeeded',
+      insights: [
+        {
+          id: 'EO-AIE-1',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: '@[Space A](space:space-a) está retrasado.',
+          recommendedAction: 'Revisar bloqueadores con @[Ana](member:member-2).'
+        }
+      ]
+    })
     expect(body.current.derivedMetrics.find((metric: { metricId: string }) => metric.metricId === 'cost_per_hour')?.value).toBe(13500)
     expect(body.current.derivedMetrics.find((metric: { metricId: string }) => metric.metricId === 'utilization_pct')?.value).toBe(82)
   })
@@ -140,5 +182,6 @@ describe('GET /api/people/[memberId]/intelligence', () => {
     expect(response.status).toBe(403)
     expect(mockReadPersonIntelligence).not.toHaveBeenCalled()
     expect(mockReadMemberCapacityEconomicsSnapshot).not.toHaveBeenCalled()
+    expect(mockReadMemberAiLlmSummary).not.toHaveBeenCalled()
   })
 })

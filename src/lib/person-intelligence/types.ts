@@ -1,4 +1,5 @@
 import type { ThresholdZone } from '@/lib/ico-engine/metric-registry'
+import type { MemberNexaInsightsPayload } from '@/lib/ico-engine/ai/llm-types'
 import type { CapacityBreakdown } from '@/lib/team-capacity/shared'
 
 // ── Metric value with zone ──
@@ -80,6 +81,7 @@ export interface PersonIntelligenceResponse {
   memberId: string
   current: PersonIntelligenceSnapshot | null
   trend: PersonIntelligenceSnapshot[]
+  nexaInsights: MemberNexaInsightsPayload | null
   meta: {
     source: string
     materializedAt: string | null

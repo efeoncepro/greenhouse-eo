@@ -6,6 +6,8 @@ import type {
   AgencyAiLlmSummary,
   AgencyAiLlmSummaryItem,
   IcoLlmRunStatus,
+  MemberNexaInsightItem,
+  MemberNexaInsightsPayload,
   OrganizationAiLlmEnrichmentItem,
   TopAiLlmEnrichmentItem
 } from './llm-types'
@@ -65,6 +67,15 @@ const mapTopItem = (row: RawRow): TopAiLlmEnrichmentItem => ({
   recommendedAction: toText(row.recommended_action),
   confidence: toNumber(row.confidence),
   processedAt: String(row.processed_at)
+})
+
+const mapMemberInsightItem = (row: RawRow): MemberNexaInsightItem => ({
+  id: String(row.enrichment_id),
+  signalType: String(row.signal_type),
+  metricId: String(row.metric_name),
+  severity: toText(row.severity),
+  explanation: toText(row.explanation_summary),
+  recommendedAction: toText(row.recommended_action)
 })
 
 export const readAgencyAiLlmSummary = async (
@@ -295,4 +306,87 @@ export const readTopAiLlmEnrichments = async (
   ).catch(() => [])
 
   return rows.map(mapTopItem)
+}
+
+export const readMemberAiLlmSummary = async (
+  memberId: string,
+  periodYear: number,
+  periodMonth: number,
+  limit = 3
+): Promise<MemberNexaInsightsPayload> => {
+  const [totalsRows, recentRows, latestRunRows] = await Promise.all([
+    query<RawRow>(
+      `
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE status = 'succeeded') AS succeeded,
+          COUNT(*) FILTER (WHERE status = 'failed') AS failed,
+          AVG(quality_score) FILTER (WHERE status = 'succeeded') AS avg_quality_score,
+          MAX(processed_at)::text AS last_processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE member_id = $1
+          AND period_year = $2
+          AND period_month = $3
+      `,
+      [memberId, periodYear, periodMonth]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          enrichment_id,
+          signal_type,
+          metric_name,
+          severity,
+          explanation_summary,
+          recommended_action,
+          quality_score,
+          processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE member_id = $1
+          AND period_year = $2
+          AND period_month = $3
+          AND status = 'succeeded'
+        ORDER BY
+          CASE COALESCE(severity, '')
+            WHEN 'critical' THEN 0
+            WHEN 'warning' THEN 1
+            WHEN 'info' THEN 2
+            ELSE 3
+          END ASC,
+          quality_score DESC NULLS LAST,
+          processed_at DESC
+        LIMIT $4
+      `,
+      [memberId, periodYear, periodMonth, limit]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          run_id,
+          status,
+          started_at::text AS started_at,
+          completed_at::text AS completed_at
+        FROM greenhouse_serving.ico_ai_enrichment_runs
+        WHERE period_year = $1
+          AND period_month = $2
+        ORDER BY started_at DESC
+        LIMIT 1
+      `,
+      [periodYear, periodMonth]
+    ).catch(() => [])
+  ])
+
+  const totalsRow = totalsRows[0] ?? {}
+  const latestRunRow = latestRunRows[0]
+
+  const recentInsights = recentRows.map(mapMemberInsightItem)
+
+  return {
+    totalAnalyzed: recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : 0,
+    lastAnalysis: toText(totalsRow.last_processed_at),
+    runStatus: latestRunRow
+      ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
+      : null,
+    insights: recentInsights
+  }
 }
