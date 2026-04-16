@@ -1,5 +1,23 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-04-15 — TASK-409: Reliquidación de nómina — spec técnica completa
+
+### Correcciones a §9 (Lifecycle del período)
+
+- **Ventana de reapertura**: ya no depende de `getOperationalPayrollMonth`. La guarda ahora mide **días transcurridos desde `exported_at`** con una ventana configurable vía `PAYROLL_REOPEN_WINDOW_DAYS` (default 45 días). Esto desacopla la reapertura del mes operativo vigente y permite reliquidar períodos antiguos dentro de la ventana.
+  - Archivo: `src/lib/payroll/reopen-guards.ts:23` — `DEFAULT_REOPEN_WINDOW_DAYS = 45`
+  - Override: `process.env.PAYROLL_REOPEN_WINDOW_DAYS`
+
+- **Constraint `version <= 2`**: confirmado vigente en DB. Limita a una sola reliquidación por entry (v1→v2). Reliquidaciones múltiples (v3+) requieren ampliar el constraint y el supersede flow. Esto es scope de TASK-414 (Policy Engine).
+
+### Spec técnica completa
+
+La especificación técnica detallada de reliquidación vive en **§26. Reliquidación de nómina (TASK-409)** de este documento.
+
+La documentación funcional (lenguaje simple, para operadores y stakeholders) vive en `docs/documentation/hr/reliquidacion-de-nomina.md`.
+
+---
+
 ## Delta 2026-04-11 — Deel también usa conectividad como haber canónico de compensación
 
 - `remoteAllowance` deja de leerse como un haber exclusivo de nómina Chile.
@@ -769,12 +787,12 @@ Durante `reopened`:
 - el consumer reactivo `payroll_reliquidation_delta` (TASK-411) aplica **solo el delta** a `greenhouse_finance.expenses` como nuevo expense con `source_type='payroll_reliquidation'` + `reopen_audit_id`, preservando la expense primaria de v1 intacta
 - la suma contable queda: `expense_primario_v1 + sum(deltas_v2..vN) = monto_final`
 
-### Guardas de reopen (V1)
+### Guardas de reopen (V1, actualizado 2026-04-15)
 - Solo `status === 'exported'` puede reabrirse
-- Ventana temporal = mes operativo vigente según `getOperationalPayrollMonth`. Cubre implícitamente la declaración Previred (Previred se declara entre el 1 y el 10 del mes siguiente; el mes operativo vigente, por definición, aún no ha sido declarado).
+- Ventana temporal = **45 días desde `exported_at`** (configurable vía `PAYROLL_REOPEN_WINDOW_DAYS`). Ya no depende del mes operativo vigente. La función `evaluateReopenWindow()` en `src/lib/payroll/reopen-guards.ts` mide días transcurridos y retorna `{ canReopen, daysRemaining, reason }`.
 - `FOR UPDATE NOWAIT` bloquea reopens concurrentes con exports en curso
 - Motivo obligatorio de taxonomía controlada: `error_calculo | bono_retroactivo | correccion_contractual | otro` (este último exige detalle)
-- Constraint SQL `version <= 2` cierra V1 a una única reliquidación por entry. Reliquidaciones múltiples (v3+) quedan fuera de scope y requieren ampliar el constraint.
+- Constraint SQL `version <= 2` cierra V1 a una única reliquidación por entry. Reliquidaciones múltiples (v3+) quedan fuera de scope y requieren ampliar el constraint (TASK-414).
 
 ## 10. Flujo de cálculo mensual
 
@@ -1202,3 +1220,243 @@ Ambas rutas (`/api/hr/payroll/entries/[entryId]/receipt` y `/api/my/payroll/entr
 - El IMM es un piso absoluto del cálculo, no una advertencia.
 - El excedente Isapre se muestra pero no altera el sueldo base.
 - Para internacional, el salary base es input directo (sin reverse).
+
+## 26. Reliquidación de nómina (TASK-409)
+
+Spec técnica completa del flujo de reliquidación implementado en TASK-409 (umbrella), TASK-410 (foundation), TASK-411 (finance delta consumer), TASK-412 (admin UI). Para la documentación funcional en lenguaje simple, ver `docs/documentation/hr/reliquidacion-de-nomina.md`.
+
+### 26.1 Schema — entry versioning
+
+Columnas agregadas a `greenhouse_payroll.payroll_entries`:
+
+```sql
+version          INTEGER NOT NULL DEFAULT 1 CHECK (version >= 1),
+is_active        BOOLEAN NOT NULL DEFAULT TRUE,
+superseded_by    TEXT    REFERENCES greenhouse_payroll.payroll_entries(entry_id)
+                         DEFERRABLE INITIALLY DEFERRED,
+reopen_audit_id  TEXT    REFERENCES greenhouse_payroll.payroll_period_reopen_audit(audit_id)
+```
+
+Constraint de versión:
+
+```sql
+CHECK (version <= 2)  -- V1: una sola reliquidación por entry. TASK-414 amplía.
+```
+
+Partial unique index (garantiza una sola entry activa por (período, colaborador)):
+
+```sql
+CREATE UNIQUE INDEX payroll_entries_period_member_active_unique
+  ON greenhouse_payroll.payroll_entries (period_id, member_id)
+  WHERE is_active = TRUE;
+```
+
+Migración: `migrations/20260415182419195_payroll-reliquidation-foundation.sql`
+
+### 26.2 Schema — reopen audit
+
+Tabla inmutable `greenhouse_payroll.payroll_period_reopen_audit`:
+
+```sql
+CREATE TABLE greenhouse_payroll.payroll_period_reopen_audit (
+  audit_id              TEXT PRIMARY KEY,
+  period_id             TEXT NOT NULL REFERENCES greenhouse_payroll.payroll_periods(period_id),
+  reopened_by           TEXT NOT NULL,
+  reopened_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  reason                TEXT NOT NULL,  -- error_calculo | bono_retroactivo | correccion_contractual | otro
+  reason_detail         TEXT,           -- obligatorio si reason = 'otro'
+  previous_status       TEXT NOT NULL,
+  operational_month     TEXT NOT NULL,
+  previred_declared_check BOOLEAN NOT NULL DEFAULT FALSE,
+  metadata              JSONB
+);
+```
+
+Migración: misma que §26.1
+
+### 26.3 Schema — finance link
+
+FK desde `greenhouse_finance.expenses` al audit:
+
+```sql
+ALTER TABLE greenhouse_finance.expenses
+  ADD COLUMN reopen_audit_id TEXT
+  REFERENCES greenhouse_payroll.payroll_period_reopen_audit(audit_id);
+```
+
+Invariante de deduplicación para expenses generados por payroll:
+
+```sql
+CREATE UNIQUE INDEX finance_expenses_payroll_generated_unique
+  ON greenhouse_finance.expenses (payroll_period_id, member_id, expense_type)
+  WHERE source_type = 'payroll_generated'
+    AND is_annulled = FALSE
+    AND payroll_period_id IS NOT NULL
+    AND member_id IS NOT NULL;
+```
+
+Migraciones:
+- `migrations/20260415192102665_finance-expenses-reopen-audit-link.sql`
+- `migrations/20260415215940253_finance-expenses-payroll-dedupe-invariant.sql`
+
+### 26.4 Supersede transaction protocol
+
+El versionamiento v1→v2 ocurre en una transacción con FK DEFERRABLE INITIALLY DEFERRED y 3 pasos ordenados:
+
+```
+Paso 1: UPDATE v1 SET is_active = FALSE
+        (no se asigna superseded_by todavía — v2 no existe aún)
+
+Paso 2: INSERT v2 con is_active = TRUE, version = 2, reopen_audit_id = audit.audit_id
+        (v2 ahora existe con su entry_id generado)
+
+Paso 3: UPDATE v1 SET superseded_by = v2.entry_id
+        (FK apunta a un row que ya existe)
+```
+
+La FK `superseded_by` es `DEFERRABLE INITIALLY DEFERRED` para que el constraint se valide al COMMIT, no statement-by-statement. Esto permite que los 3 pasos corran dentro del mismo bloque sin violaciones intermedias.
+
+Migración: `migrations/20260415210956965_payroll-supersede-fk-deferrable.sql`
+
+Archivo: `src/lib/payroll/supersede-entry.ts`
+
+### 26.5 Finance delta consumer (TASK-411)
+
+Cuando una entry se reliquida, el outbox emite `payroll_entry.reliquidated` con:
+
+```typescript
+interface ReliquidationPayload {
+  periodId: string
+  memberId: string
+  entryId: string          // v2 entry
+  previousEntryId: string  // v1 entry
+  deltaNet: number         // newNet - previousNet (dimensión operativa)
+  deltaGross: number       // newGross - previousGross (solo para auditoría)
+  previousNet: number
+  newNet: number
+  previousGross: number
+  newGross: number
+  currency: string
+  reopenAuditId: string
+  operationalMonth: string
+}
+```
+
+El consumer reactivo `payroll_reliquidation_delta` (registrado con handler key `payroll_reliquidation_delta:payroll_entry.reliquidated`) invoca `applyPayrollReliquidationDelta()` que:
+
+1. Crea un expense en `greenhouse_finance.expenses` con:
+   - `source_type = 'payroll_reliquidation'`
+   - `amount = deltaNet` (no deltaGross — en Chile el costo empresa es el líquido + cotizaciones patronales, no el bruto)
+   - `reopen_audit_id = reopenAuditId` (link al audit trail)
+   - `is_annulled = FALSE`
+2. No toca el expense primario de v1 (`source_type = 'payroll_generated'`)
+3. La suma contable final = `expense_primario_v1 + Σ(deltas) = monto_final`
+
+Idempotencia: `outbox_reactive_log` con `ON CONFLICT DO NOTHING` sobre la idempotency key.
+
+Archivos:
+- `src/lib/finance/apply-payroll-reliquidation-delta.ts`
+- `src/lib/sync/projections/payroll-reliquidation-delta.ts`
+
+### 26.6 Content-freshness cache invariant
+
+Los export packages (PDFs y CSVs de nómina) se cachean en `payroll_export_packages`. Después de una reliquidación, el cache debe invalidarse para que la re-exportación genere archivos nuevos con entries v2.
+
+Invariante: `canReuseStoredPackage()` compara `package.generatedAt` contra `MAX(updated_at)` de entries activas del período:
+
+```typescript
+// Si la entry más reciente fue actualizada DESPUÉS de que se generó el
+// package, el cache es stale y debe regenerarse.
+const latestEntryMs = Date.parse(latestEntryTimestamp)
+const generatedAtMs = Date.parse(record.generatedAt)
+return latestEntryMs <= generatedAtMs
+```
+
+Fail-safe: si no hay entries activas o el timestamp no se puede parsear, retorna `false` (regenerar siempre).
+
+Archivo: `src/lib/payroll/payroll-export-packages.ts`
+
+### 26.7 Period prioritization (multi-period awareness)
+
+Un período reabierto tiene **prioridad máxima** en la UI:
+
+```typescript
+type ActivePayrollReason =
+  | 'reopened_for_reliquidation'  // priority 10 (más alta)
+  | 'current_operational_month'    // priority 20
+  | 'approved_pending_export'      // priority 30
+  | 'future_draft'                 // priority 40
+```
+
+Si hay un período reabierto y un período del mes actual, el reabierto aparece primero en la lista de períodos activos. Esto fuerza al operador a resolverlo antes de avanzar.
+
+Archivo: `src/lib/payroll/current-payroll-period.ts`
+
+### 26.8 API endpoints
+
+| Method | Path | Descripción |
+|---|---|---|
+| `POST` | `/api/hr/payroll/periods/[periodId]/reopen` | Reabrir período. Requiere `efeonce_admin`. Retorna `{ audit_id, period_status, operationalMonth, reason, reopenedAt }` |
+| `GET` | `/api/hr/payroll/periods/[periodId]/reopen-preview` | Dry-run: evalúa ventana, retorna `{ canReopen, daysRemaining, blockingReasons[], infoReasons[] }` |
+| `GET` | `/api/hr/payroll/entries/[entryId]/versions` | Historial de versiones de una entry. Retorna array ordenado `[{ entry_id, version, is_active, superseded_by, gross_total, net_total, timestamps }]` |
+
+### 26.9 UI components
+
+| Componente | Ubicación | Descripción |
+|---|---|---|
+| `ReopenPeriodDialog` | `src/views/greenhouse/payroll/ReopenPeriodDialog.tsx` | Modal de reapertura: razón, detalle, preview de ventana, confirmación |
+| `ReliquidationBadge` | `src/views/greenhouse/payroll/ReliquidationBadge.tsx` | Chip "v{N} reliquidada" en entries con `version > 1` |
+| `EntryVersionHistoryDrawer` | `src/views/greenhouse/payroll/EntryVersionHistoryDrawer.tsx` | Panel lateral con historial de todas las versiones, deltas, estados, links a PDFs |
+
+### 26.10 Reactive event flow (end-to-end)
+
+```
+1. Operador reabre período → POST /reopen
+   → INSERT payroll_period_reopen_audit
+   → UPDATE payroll_periods SET status = 'reopened'
+
+2. Operador edita entry → recalculate
+   → supersedePayrollEntryOnRecalculate()
+   → v1.is_active = false, v2 inserted, v1.superseded_by = v2
+   → INSERT outbox_events(payroll_entry.reliquidated, { deltas })
+
+3. ops-worker reactivo despierta (Cloud Scheduler, */5 domain=finance)
+   → SELECT FROM refresh_queue FOR UPDATE SKIP LOCKED
+   → handler payroll_reliquidation_delta:payroll_entry.reliquidated
+   → applyPayrollReliquidationDelta({ deltaNet, reopenAuditId })
+   → INSERT greenhouse_finance.expenses(source_type='payroll_reliquidation')
+   → INSERT outbox_reactive_log (idempotency)
+
+4. Operador re-exporta → canReuseStoredPackage() = false (cache stale)
+   → regenera PDFs/CSVs solo con entries is_active=TRUE
+   → email con archivos actualizados
+```
+
+### 26.11 Invariantes de datos
+
+| Invariante | Mecanismo | Archivo |
+|---|---|---|
+| Una sola entry activa por (período, colaborador) | Partial unique index `WHERE is_active = TRUE` | Migration foundation |
+| Máximo una reliquidación por entry (V1) | `CHECK (version <= 2)` | Migration foundation |
+| Un solo expense `payroll_generated` activo por (período, colaborador, tipo) | Partial unique index `WHERE source_type = 'payroll_generated' AND is_annulled = FALSE` | Migration dedupe invariant |
+| Delta usa net (no gross) | Assertion en `applyPayrollReliquidationDelta` | `apply-payroll-reliquidation-delta.ts` |
+| Audit row inmutable | No UPDATE/DELETE triggers; tabla sin ownership de módulo externo | Migration foundation |
+| FK supersede deferrable | `DEFERRABLE INITIALLY DEFERRED` | Migration deferrable |
+| Cache stale después de supersede | `MAX(updated_at)` > `generatedAt` | `payroll-export-packages.ts` |
+
+### 26.12 Tests
+
+| Suite | Archivo | Cobertura |
+|---|---|---|
+| Supersede flow | `src/lib/payroll/supersede-entry.test.ts` | v1→v2 creation, v2 edit in-place, delta calc, transaction ordering |
+| Reopen guards | `src/lib/payroll/reopen-guards.test.ts` | Ventana 45d, reason validation, Previred check |
+| Period lifecycle | `src/lib/payroll/period-lifecycle.test.ts` | Status transitions including `reopened` |
+| Period prioritization | `src/lib/payroll/current-payroll-period.test.ts` | Multi-period ranking with reopened priority |
+
+### 26.13 Limitaciones conocidas (V1)
+
+1. **Una sola reliquidación por entry** — `CHECK (version <= 2)`. Para v3+ se necesita ampliar el constraint y adaptar el supersede chain. Scope de TASK-414.
+2. **Ventana fija de 45 días** — no hay policy engine para excepciones, extensiones o aprobación especial de reapertura fuera de ventana. Scope de TASK-414.
+3. **Solo `efeonce_admin` puede reabrir** — no hay delegation a roles intermedios.
+4. **Ordering soft en reactive consumer** — si dos instancias de ops-worker toman `entry.superseded` y `entry.created` del mismo aggregate, pueden procesarse out-of-order. La idempotencia lo atrapa, pero no es FIFO estricto. Documentado en `docs/architecture/GREENHOUSE_REACTIVE_PIPELINE_SCALABILITY_V1.md`.
+5. **Latencia del delta a finanzas** — depende de la cadencia del scheduler (2-5 min). Documentado en el mismo doc de scalability.
