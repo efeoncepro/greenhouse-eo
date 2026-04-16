@@ -25,6 +25,22 @@ export interface HomeAccessContext {
   moduleKeys: GreenhouseEntitlementModule[]
 }
 
+export interface HomeNexaInsightItem {
+  id: string
+  signalType: string
+  metricId: string
+  severity: string | null
+  explanation: string | null
+  recommendedAction: string | null
+}
+
+export interface HomeNexaInsightsPayload {
+  totalAnalyzed: number
+  lastAnalysis: string | null
+  runStatus: 'succeeded' | 'partial' | 'failed' | null
+  insights: HomeNexaInsightItem[]
+}
+
 export interface PendingTask {
   id: string
   title: string
@@ -58,6 +74,7 @@ export interface HomeSnapshot {
   tasks: PendingTask[]
   recommendedShortcuts?: HomeRecommendedShortcut[]
   accessContext?: HomeAccessContext | null
+  nexaInsights?: HomeNexaInsightsPayload | null
   financeStatus?: {
     periodLabel: string
     closureStatus: string | null

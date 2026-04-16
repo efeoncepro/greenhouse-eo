@@ -23,6 +23,7 @@ import RecommendedShortcuts from './components/RecommendedShortcuts'
 import QuickAccess from './components/QuickAccess'
 import OperationStatus, { type StatusItem } from './components/OperationStatus'
 
+import NexaInsightsBlock, { type NexaInsightItem } from '@/components/greenhouse/NexaInsightsBlock'
 import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 import type { HomeSnapshot } from '@/types/home'
@@ -178,6 +179,26 @@ const HomeViewSkeleton = () => (
   </Box>
 )
 
+type HomeInsightsPayload = {
+  insights: NexaInsightItem[]
+  totalAnalyzed: number
+  lastAnalysis: string | null
+  runStatus: 'succeeded' | 'partial' | 'failed' | null
+}
+
+type HomeSnapshotWithInsights = HomeSnapshot & {
+  nexaInsights?: HomeInsightsPayload | null
+  homeInsights?: HomeInsightsPayload | null
+}
+
+const resolveHomeInsights = (snapshot: HomeSnapshot | null): HomeInsightsPayload | null => {
+  if (!snapshot) return null
+
+  const candidate = snapshot as HomeSnapshotWithInsights
+
+  return candidate.nexaInsights ?? candidate.homeInsights ?? null
+}
+
 // ── Chat state detector ────────────────────────────────────────
 
 const INITIAL_MESSAGE_COUNT = 1
@@ -185,6 +206,7 @@ const INITIAL_MESSAGE_COUNT = 1
 const HomeContent = ({
   snapshot,
   operationItems,
+  homeInsights,
   selectedModel,
   onModelChange,
   suggestions,
@@ -194,6 +216,7 @@ const HomeContent = ({
 }: {
   snapshot: HomeSnapshot
   operationItems: StatusItem[]
+  homeInsights: HomeInsightsPayload | null
   selectedModel: NexaModelId
   onModelChange: (model: NexaModelId) => void
   suggestions: string[]
@@ -227,6 +250,17 @@ const HomeContent = ({
             <NexaHero greeting={snapshot.greeting.title} selectedModel={selectedModel} onModelChange={onModelChange} />
             <Box sx={{ maxWidth: 720, mx: 'auto', px: 3, mt: 4, pb: 6 }}>
               <Grid container spacing={4}>
+                {homeInsights && (
+                  <Grid size={{ xs: 12 }}>
+                    <NexaInsightsBlock
+                      insights={homeInsights.insights}
+                      totalAnalyzed={homeInsights.totalAnalyzed}
+                      lastAnalysis={homeInsights.lastAnalysis}
+                      runStatus={homeInsights.runStatus}
+                      defaultExpanded={homeInsights.totalAnalyzed > 0}
+                    />
+                  </Grid>
+                )}
                 <Grid size={{ xs: 12 }}>
                   <RecommendedShortcuts
                     shortcuts={snapshot.recommendedShortcuts ?? []}
@@ -344,6 +378,7 @@ const HomeView = () => {
   const greeting = snapshot?.greeting ?? { title: 'Bienvenido a Greenhouse', subtitle: 'Tu centro de mando operativo.' }
   const modules = snapshot?.modules ?? []
   const nexaIntro = snapshot?.nexaIntro ?? 'Hola, soy Nexa. ¿En que puedo ayudarte hoy?'
+  const homeInsights = useMemo(() => resolveHomeInsights(snapshot), [snapshot])
 
   const operationItems = useMemo((): StatusItem[] => {
     if (snapshot?.financeStatus) {
@@ -442,6 +477,7 @@ const HomeView = () => {
         <HomeContent
           snapshot={effectiveSnapshot}
           operationItems={operationItems}
+          homeInsights={homeInsights}
           selectedModel={selectedModel}
           onModelChange={handleModelChange}
           suggestions={suggestions}

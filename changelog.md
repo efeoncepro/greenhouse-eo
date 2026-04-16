@@ -2,6 +2,20 @@
 
 ## 2026-04-16
 
+### 2026-04-16 — TASK-244: Pulse incorpora Top Insights de Nexa en Home
+
+- `Pulse` (`/home`) ahora muestra `Nexa Insights` al cargar la landing, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.
+- Se agrega `readTopAiLlmEnrichments(periodYear, periodMonth, limit)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` para leer los top insights cross-Space del período actual ordenados por:
+  - severidad (`critical > warning > info`)
+  - `quality_score DESC`
+  - `processed_at DESC`
+- `GET /api/home/snapshot` y `src/lib/home/get-home-snapshot.ts` ahora incluyen un payload `nexaInsights` específico para Home, sin abrir una route nueva ni recalcular métricas inline.
+- `src/views/greenhouse/home/HomeView.tsx` inserta `NexaInsightsBlock` en la landing de `Pulse`, entre `NexaHero` y los shortcuts recomendados, manteniendo intacto el modo chat.
+- La navegación contextual sigue el contrato actual de menciones:
+  - `@[Space](space:...)` -> `Space 360`
+  - `@[Miembro](member:...)` -> `People`
+- No se agregaron migraciones ni nuevos publishers/consumers reactivos; el cambio es un consumer read-only sobre serving existente.
+
 ### 2026-04-16 — TASK-285: Diferenciacion de roles cliente
 
 - Los 3 roles de cliente (`client_executive`, `client_manager`, `client_specialist`) ahora tienen visibilidad diferenciada en el portal.

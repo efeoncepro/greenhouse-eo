@@ -6,7 +6,8 @@ import type {
   AgencyAiLlmSummary,
   AgencyAiLlmSummaryItem,
   IcoLlmRunStatus,
-  OrganizationAiLlmEnrichmentItem
+  OrganizationAiLlmEnrichmentItem,
+  TopAiLlmEnrichmentItem
 } from './llm-types'
 
 type RawRow = Record<string, unknown>
@@ -40,6 +41,20 @@ const mapSummaryItem = (row: RawRow): AgencyAiLlmSummaryItem => ({
 })
 
 const mapOrganizationItem = (row: RawRow): OrganizationAiLlmEnrichmentItem => ({
+  signalId: String(row.signal_id),
+  spaceId: String(row.space_id),
+  metricName: String(row.metric_name),
+  signalType: String(row.signal_type),
+  severity: toText(row.severity),
+  qualityScore: toNumber(row.quality_score),
+  explanationSummary: toText(row.explanation_summary),
+  recommendedAction: toText(row.recommended_action),
+  confidence: toNumber(row.confidence),
+  processedAt: String(row.processed_at)
+})
+
+const mapTopItem = (row: RawRow): TopAiLlmEnrichmentItem => ({
+  enrichmentId: String(row.enrichment_id),
   signalId: String(row.signal_id),
   spaceId: String(row.space_id),
   metricName: String(row.metric_name),
@@ -240,4 +255,44 @@ export const readOrganizationAiLlmEnrichments = async (
   ).catch(() => [])
 
   return rows.map(mapOrganizationItem)
+}
+
+export const readTopAiLlmEnrichments = async (
+  periodYear: number,
+  periodMonth: number,
+  limit = 3
+): Promise<TopAiLlmEnrichmentItem[]> => {
+  const rows = await query<RawRow>(
+    `
+      SELECT
+        enrichment_id,
+        signal_id,
+        space_id,
+        metric_name,
+        signal_type,
+        severity,
+        quality_score,
+        explanation_summary,
+        recommended_action,
+        confidence,
+        processed_at
+      FROM greenhouse_serving.ico_ai_signal_enrichments
+      WHERE period_year = $1
+        AND period_month = $2
+        AND status = 'succeeded'
+      ORDER BY
+        CASE COALESCE(severity, '')
+          WHEN 'critical' THEN 0
+          WHEN 'warning' THEN 1
+          WHEN 'info' THEN 2
+          ELSE 3
+        END ASC,
+        quality_score DESC NULLS LAST,
+        processed_at DESC
+      LIMIT $3
+    `,
+    [periodYear, periodMonth, limit]
+  ).catch(() => [])
+
+  return rows.map(mapTopItem)
 }

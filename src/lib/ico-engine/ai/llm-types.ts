@@ -120,6 +120,20 @@ export interface OrganizationAiLlmEnrichmentItem {
   processedAt: string
 }
 
+export interface TopAiLlmEnrichmentItem {
+  enrichmentId: string
+  signalId: string
+  spaceId: string
+  metricName: string
+  signalType: string
+  severity: string | null
+  qualityScore: number | null
+  explanationSummary: string | null
+  recommendedAction: string | null
+  confidence: number | null
+  processedAt: string
+}
+
 // ─── Metric Glossary (dynamic from registry) ──────────────────────────────
 
 const buildMetricGlossary = (): string => {

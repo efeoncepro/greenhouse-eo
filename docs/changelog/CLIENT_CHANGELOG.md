@@ -42,6 +42,30 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.17
+
+**Canal:** Beta
+**Fecha:** 2026-04-16
+**Disponible para:** internal
+**Módulos:** Pulse / Nexa
+
+### Novedades
+
+- `Pulse` ahora destaca las 3 señales más críticas de `Nexa Insights` directamente en la landing de `/home`.
+
+### Mejoras
+
+- La home interna ya no obliga a entrar a `Agency > ICO Engine` para ver las alertas advisory más urgentes del período.
+- Las narrativas visibles en `Pulse` reutilizan la misma capa de contexto de `Nexa Insights`, incluyendo menciones navegables a `Space 360` y `People`.
+
+### Correcciones
+
+- Las señales destacadas de Home ahora respetan un orden operacional explícito: `critical`, luego `warning`, luego `info`, antes de priorizar calidad y frescura.
+
+### Notas
+
+- Este bloque sigue siendo advisory-only: no ejecuta acciones automáticas ni reemplaza la lectura detallada de `Agency > ICO Engine`.
+
 ## 2026.04-beta.16
 
 **Canal:** Beta

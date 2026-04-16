@@ -1,5 +1,18 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-16 — Home/Pulse ya consume Top Insights cross-Space como surface read-only
+
+- `Pulse` (`/home`) ya no depende solo de shortcuts, contexto de acceso y estado operativo básico para hacer visible la lane advisory de Nexa.
+- Runtime activo:
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` expone `readTopAiLlmEnrichments(periodYear, periodMonth, limit)`
+  - `src/lib/home/get-home-snapshot.ts` incorpora `nexaInsights` al snapshot de Home
+  - `src/views/greenhouse/home/HomeView.tsx` renderiza `NexaInsightsBlock` en la landing de `Pulse`
+- Contrato operativo:
+  - Home consume enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`; no recalcula señales ni narrativa inline
+  - el ranking visible sigue `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - la navegación contextual en Home sigue el contrato actual de `@mentions` (`space` -> `Space 360`, `member` -> `People`), sin introducir mutaciones ni acciones automáticas
+  - el bloque sigue siendo advisory-only y reutiliza el mismo disclaimer/copy del componente compartido
+
 > **Version:** 1.0
 > **Creado:** 2026-04-05
 > **Audience:** Agentes de implementación, arquitectos, product owners
@@ -83,6 +96,7 @@ Un sistema transversal que permite a cualquier módulo del portal Greenhouse:
 │                                                                  │
 │  Activos:                                                        │
 │  • Agency ICO tab (NexaInsightsBlock)                            │
+│  • Pulse / Home Dashboard → Top 3 insights cross-Space           │
 │  • Nexa Chat Home (enrichments como contexto)                    │
 │                                                                  │
 │  Próximos (Tier 1):                                              │

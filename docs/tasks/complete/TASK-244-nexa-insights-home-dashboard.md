@@ -2,12 +2,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -25,8 +25,8 @@ El Home Dashboard es la primera pantalla que ve el operador al iniciar sesión. 
 ## Goal
 
 - El Home Dashboard muestra las 3 señales más críticas (severity: critical > warning > info)
-- El widget usa `NexaInsightsBlock` en modo compacto o una variante ligera
-- Click en un insight navega al contexto (Space 360 o Agency ICO)
+- El widget reutiliza el `NexaInsightsBlock` actual limitado a 3 insights; no asumir un `compact mode` inexistente
+- La navegación al contexto se resuelve por @mentions clickeables dentro del insight y por el contexto natural del bloque; no asumir click sobre toda la card salvo que se extienda el componente explícitamente
 - El widget se refresca al cargar el Home (reader on-demand)
 
 ## Architecture Alignment
@@ -59,17 +59,19 @@ Revisar y respetar:
 ### Gap
 - No existe reader que retorne top N enrichments cross-Space ordenados por severidad
 - Home no muestra insights proactivos
+- `NexaInsightsBlock` no tiene hoy `compact mode`
+- El schema snapshot baseline está desactualizado para `ico_ai_signals` / `ico_ai_signal_enrichments`; la referencia real es migraciones + `src/types/db.d.ts`
 
 ## Scope
 
 ### Slice 1 — Reader top N cross-Space
 - Agregar `readTopAiLlmEnrichments(periodYear, periodMonth, limit)` a `llm-enrichment-reader.ts`
-- Ordenar por severity (critical primero), luego por quality score DESC
+- Ordenar por severity (`critical` > `warning` > `info`), luego por `quality_score DESC`, luego por `processed_at DESC`
 - Sin filtro de space_id — agrega cross-Space
 
 ### Slice 2 — Widget en Home Dashboard
-- Agregar sección "Insights destacados" o "Nexa Insights" en HomeView
-- Usar `NexaInsightsBlock` con `defaultExpanded={true}` y límite de 3 insights
+- Agregar sección `Nexa Insights` en HomeView
+- Usar `NexaInsightsBlock` actual con `defaultExpanded={true}` y límite de 3 insights
 - Posicionar después del greeting y antes de los shortcuts
 
 ## Out of Scope
@@ -81,6 +83,8 @@ Revisar y respetar:
 - [ ] `readTopAiLlmEnrichments()` retorna top N enrichments cross-Space
 - [ ] Home Dashboard muestra widget con top 3 insights del mes
 - [ ] Sin enrichments muestra empty state
+- [ ] El ranking sigue `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+- [ ] Las @mentions siguen navegando a `Space 360` y `People` sin romper el contrato actual de `NexaMentionText`
 - [ ] `pnpm build` y `pnpm lint` sin errores
 
 ## Verification

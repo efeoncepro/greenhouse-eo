@@ -2,9 +2,10 @@ import 'server-only'
 
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
+import { readAgencyAiLlmSummary, readTopAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import type { HomeSnapshot, ModuleCard, PendingTask } from '@/types/home'
+import type { HomeSnapshot, HomeNexaInsightItem, ModuleCard, PendingTask } from '@/types/home'
 
 export interface HomeSnapshotInput {
   userId: string
@@ -25,6 +26,38 @@ export interface HomeSnapshotInput {
 }
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const HOME_INSIGHTS_LIMIT = 3
+const HOME_TIMEZONE = 'America/Santiago'
+
+const HOME_PERIOD_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+  timeZone: HOME_TIMEZONE,
+  year: 'numeric',
+  month: '2-digit'
+})
+
+const mapHomeInsight = (row: {
+  enrichmentId: string
+  signalType: string
+  metricName: string
+  severity: string | null
+  explanationSummary: string | null
+  recommendedAction: string | null
+}): HomeNexaInsightItem => ({
+  id: row.enrichmentId,
+  signalType: row.signalType,
+  metricId: row.metricName,
+  severity: row.severity,
+  explanation: row.explanationSummary,
+  recommendedAction: row.recommendedAction
+})
+
+const getHomeCurrentPeriod = () => {
+  const parts = HOME_PERIOD_FORMATTER.formatToParts(new Date())
+  const year = Number(parts.find(part => part.type === 'year')?.value ?? new Date().getFullYear())
+  const month = Number(parts.find(part => part.type === 'month')?.value ?? new Date().getMonth() + 1)
+
+  return { year, month }
+}
 
 export const getHomeFinanceStatus = async () => {
   const [currentPeriod, latestMargin] = await Promise.all([
@@ -82,6 +115,7 @@ export const getHomeFinanceStatus = async () => {
 export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSnapshot> {
   const now = new Date()
   const hour = now.getHours()
+  const { year: currentYear, month: currentMonth } = getHomeCurrentPeriod()
 
   // 1. Resolve Greeting
   let greetingPool = HOME_GREETINGS.default
@@ -118,21 +152,49 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     color: 'primary'
   }))
 
-  // 3. Resolve Tasks (Unread Notifications) — graceful fallback if DB unavailable
-  let notifications: Awaited<ReturnType<typeof NotificationService.getNotifications>>['items'] = []
-
-  try {
-    const result = await NotificationService.getNotifications(input.userId, {
-      unreadOnly: true,
-      pageSize: 5
-    })
-
-    notifications = result.items
-  } catch (error) {
+  const notificationsPromise = NotificationService.getNotifications(input.userId, {
+    unreadOnly: true,
+    pageSize: 5
+  }).catch(error => {
     console.warn('[home-snapshot] Failed to fetch notifications, continuing with empty tasks:', error instanceof Error ? error.message : error)
-  }
 
-  const tasks: PendingTask[] = notifications.map(n => ({
+    return { items: [], total: 0 } as Awaited<ReturnType<typeof NotificationService.getNotifications>>
+  })
+
+  const topInsightsPromise = readTopAiLlmEnrichments(currentYear, currentMonth, HOME_INSIGHTS_LIMIT).catch(error => {
+    console.warn('[home-snapshot] Failed to fetch Nexa insights, continuing with an empty widget:', error instanceof Error ? error.message : error)
+
+    return []
+  })
+
+  const insightsSummaryPromise = readAgencyAiLlmSummary(currentYear, currentMonth, 1).catch(error => {
+    console.warn('[home-snapshot] Failed to fetch Nexa insights summary, continuing with empty summary metadata:', error instanceof Error ? error.message : error)
+
+    return {
+      totals: {
+        total: 0,
+        succeeded: 0,
+        failed: 0,
+        avgQualityScore: null
+      },
+      latestRun: null,
+      recentEnrichments: [],
+      lastProcessedAt: null
+    }
+  })
+
+  const financeStatusPromise = homeEntitlements.canSeeFinanceStatus
+    ? getHomeFinanceStatus()
+    : Promise.resolve(null)
+
+  const [notificationResult, topInsightsRows, insightsSummary, financeStatus] = await Promise.all([
+    notificationsPromise,
+    topInsightsPromise,
+    insightsSummaryPromise,
+    financeStatusPromise
+  ])
+
+  const tasks: PendingTask[] = notificationResult.items.map(n => ({
     id: n.notification_id,
     title: n.title,
     description: n.body || '',
@@ -143,9 +205,14 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     ctaRoute: n.action_url || undefined
   }))
 
-  const financeStatus = homeEntitlements.canSeeFinanceStatus
-    ? await getHomeFinanceStatus()
-    : null
+  const visibleInsightsCount = topInsightsRows.length
+
+  const nexaInsights = {
+    totalAnalyzed: visibleInsightsCount > 0 ? insightsSummary.totals.succeeded : 0,
+    lastAnalysis: insightsSummary.lastProcessedAt,
+    runStatus: insightsSummary.latestRun?.status ?? null,
+    insights: topInsightsRows.map(mapHomeInsight)
+  }
 
   // 5. Nexa Intro (Simple logic for now)
   const nexaIntro = `Hola ${input.firstName}, soy Nexa. Tengo acceso al catálogo reactivo de Greenhouse y puedo ayudarte a navegar tu operación. Veo que tienes ${tasks.length} pendientes hoy. ¿Por dónde quieres empezar?`
@@ -164,6 +231,7 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     tasks,
     recommendedShortcuts: homeEntitlements.recommendedShortcuts,
     accessContext: homeEntitlements.accessContext,
+    nexaInsights,
     financeStatus,
     nexaIntro,
     computedAt: now.toISOString()

@@ -1,5 +1,34 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — TASK-244 Nexa Insights en Pulse/Home
+
+- **Estado:** `implementado localmente`, `lint dirigido OK`, `tsc/build global bloqueado por frente paralelo hr-goals`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+    - reader nuevo `readTopAiLlmEnrichments(periodYear, periodMonth, limit)`
+    - ranking explícito `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - `src/lib/home/get-home-snapshot.ts`
+  - `src/types/home.ts`
+    - `HomeSnapshot` ahora puede incluir `nexaInsights`
+  - `src/views/greenhouse/home/HomeView.tsx`
+    - `Pulse` renderiza `NexaInsightsBlock` en la landing, entre `NexaHero` y `RecommendedShortcuts`
+  - docs actualizados:
+    - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
+    - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+    - `changelog.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `docs/tasks/README.md`
+    - task movida a `docs/tasks/in-progress/TASK-244-nexa-insights-home-dashboard.md`
+- **Validación ejecutada:**
+  - `pnpm exec eslint src/lib/ico-engine/ai/llm-enrichment-reader.ts src/lib/home/get-home-snapshot.ts src/types/home.ts src/views/greenhouse/home/HomeView.tsx`
+  - `pnpm exec tsc --noEmit --pretty false` -> falla por `src/views/greenhouse/hr-goals/HrGoalsView.tsx` (errores ajenos al task)
+  - `pnpm build` -> bloqueado en la misma lane `hr-goals`
+- **Notas operativas:**
+  - el cambio sigue el patrón canónico `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`; Home no recalcula señales ni narrativa
+  - la navegación contextual en Home depende del contrato actual de `NexaMentionText`; la card completa del insight sigue sin CTA/click dedicado
+  - `git status` ya venía sucio por trabajo paralelo de `hr-goals`; no fue tocado por TASK-244
+
 ## Sesion 2026-04-16 — HR Leave aclara UI de saldo proporcional Chile y arrastre
 
 - **Estado:** `implemented localmente`, `pendiente lint/build final`
