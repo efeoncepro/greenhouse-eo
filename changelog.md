@@ -2,6 +2,14 @@
 
 ## 2026-04-16
 
+### 2026-04-16 — HR Leave UI split entre saldos personales y saldos del equipo
+
+- `HR > Permisos` deja de mezclar la consulta personal con la operación administrativa:
+  - la pestaña de balances ahora se divide en `Mis saldos` y `Saldos del equipo` para usuarios admin/HR
+  - la vista de equipo resume por colaborador, agrega búsqueda y filtros por alertas (`saldo negativo`, `reservas`, `ajustes`)
+  - el detalle operativo se mueve a un dialog por colaborador con acciones de backfill, ajuste manual y reversión donde corresponde
+- Se actualizaron los tests del view para validar el nuevo flujo admin `Saldos del equipo -> Ver detalle`.
+
 ### 2026-04-16 — TASK-415: HR Leave admin backfills, ajustes y policy explain
 
 - `HR Leave` gana base admin real para vacaciones del equipo:

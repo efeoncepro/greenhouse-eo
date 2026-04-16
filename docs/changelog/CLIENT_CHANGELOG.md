@@ -58,6 +58,7 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 - `HR > Permisos` ahora hace más visible el saldo del equipo y el contexto de política con que se interpreta cada balance.
 - Las correcciones administrativas distinguen mejor entre un periodo real ya tomado y un ajuste contable de saldo.
+- `HR > Permisos` ahora separa `Mis saldos` de `Saldos del equipo`, con búsqueda por colaborador, alertas operativas y detalle administrativo en vez de un listado plano difícil de operar.
 
 ### Correcciones
 

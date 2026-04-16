@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — HR Leave UX split de saldos personales vs equipo en develop
+
+- **Estado:** `complete`, `pushed a develop`, `deploy staging en curso`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - la pestaña `Saldos` se separa en `Mis saldos` y `Saldos del equipo` para perfiles admin/HR
+    - la vista de equipo ya no renderiza un listado gigante `persona x tipo`
+    - nueva tabla resumida por colaborador con búsqueda, filtros de alertas y KPIs operativos
+    - nuevo drill-down por colaborador en dialog con detalle por tipo de permiso
+    - backfills, ajustes y reversión se ejecutan desde ese detalle sin perder trazabilidad
+  - `src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+    - tests admin actualizados al nuevo flujo `Saldos del equipo -> Ver detalle`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+  - `pnpm exec eslint src/views/greenhouse/hr-core/HrLeaveView.tsx src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas operativas:**
+  - el deploy de staging levantado desde `develop` corresponde al commit `70534687`
+  - sigue existiendo un cambio ajeno en `.claude/scheduled_tasks.lock`; no fue incluido
+
 ## Sesion 2026-04-16 — TASK-415 HR leave admin balance visibility, backfill y ajustes manuales
 
 - **Estado:** `complete`, `validado con migracion + tests dirigidos + lint + build`
