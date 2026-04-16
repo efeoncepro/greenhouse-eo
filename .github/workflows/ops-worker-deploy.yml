@@ -114,22 +114,18 @@ jobs:
             --region=${GCP_REGION} \
             --format='value(status.url)')"
           echo "Deployed ops-worker at: ${SERVICE_URL}"
-          # Proxy + health check loop — matches the final step in deploy.sh.
-          gcloud run services proxy ops-worker \
-            --project=${GCP_PROJECT_ID} \
-            --region=${GCP_REGION} \
-            --port=19092 &
-          PROXY_PID=$!
-          sleep 5
+          # Direct authenticated request — no proxy needed. The deployer SA
+          # mints an identity token scoped to the service URL, which Cloud Run
+          # validates as an authorized invoker.
+          TOKEN="$(gcloud auth print-identity-token --audiences="${SERVICE_URL}")"
           HEALTH_OK=false
           for i in 1 2 3 4 5; do
-            if curl -sf "http://localhost:19092/health" >/dev/null 2>&1; then
+            if curl -sf -H "Authorization: Bearer ${TOKEN}" "${SERVICE_URL}/health" >/dev/null 2>&1; then
               HEALTH_OK=true
               break
             fi
             sleep 3
           done
-          kill "${PROXY_PID}" 2>/dev/null || true
           if [ "${HEALTH_OK}" = "false" ]; then
             echo "::error::Health check failed after deploy. Investigate ops-worker logs."
             exit 1
