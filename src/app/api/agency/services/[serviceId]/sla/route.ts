@@ -175,6 +175,10 @@ export async function PATCH(request: Request, context: { params: RouteParams }) 
   return POST(request, context)
 }
 
+export async function PUT(request: Request, context: { params: RouteParams }) {
+  return POST(request, context)
+}
+
 export async function DELETE(request: Request, { params }: { params: RouteParams }) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
 
