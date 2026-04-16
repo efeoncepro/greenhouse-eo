@@ -12,7 +12,8 @@ const {
   calculateAccruedLeaveAllowanceDays,
   calculateProgressiveExtraDays,
   classifyLeavePayrollImpact,
-  computeLeaveDayBreakdown
+  computeLeaveDayBreakdown,
+  roundLeaveDays
 } = await import('@/lib/hr-core/leave-domain')
 
 describe('leave-domain', () => {
@@ -105,5 +106,10 @@ describe('leave-domain', () => {
         { periodId: '2026-03', year: 2026, month: 3, status: 'exported' }
       ]).mode
     ).toBe('deferred_adjustment_required')
+  })
+
+  it('rounds fractional leave balances to two decimals consistently', () => {
+    expect(roundLeaveDays(4.039999999999999)).toBe(4.04)
+    expect(roundLeaveDays(4.680000000000001)).toBe(4.68)
   })
 })

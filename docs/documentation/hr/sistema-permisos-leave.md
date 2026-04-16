@@ -147,6 +147,20 @@ Las solicitudes ya cerradas (aprobadas, rechazadas o canceladas) no se pueden re
 - Al rechazar o cancelar, se **devuelven** al saldo disponible
 - Los ajustes manuales quedan separados del historial de solicitudes y se reflejan como **ajustes** del saldo
 
+### Como leer los saldos administrativos
+
+En `HR > Permisos`, el detalle administrativo separa el saldo en columnas distintas para que RRHH no mezcle conceptos:
+
+- **Base / acumulado**: dias que la politica ya devengo para ese ano
+- **Progresivos**: dias extra por antiguedad cuando aplica
+- **Arrastre**: dias heredados del periodo anterior segun la politica
+- **Usados**: dias ya consumidos o cargados como backfill historico
+- **Reservados**: solicitudes pendientes que ya bloquean saldo
+- **Ajustes**: correcciones manuales netas
+- **Saldo actual**: resultado visible despues de sumar base, progresivos, arrastre y ajustes, y restar usados y reservados
+
+Esto evita interpretar mal casos como vacaciones Chile del primer ciclo laboral, donde una persona puede tener un **base / acumulado** parcial y aun asi un **saldo actual** mayor porque trae arrastre del periodo anterior.
+
 ## Politica de vacaciones
 
 Greenhouse no decide vacaciones solo por moneda. Para el calculo y la explicacion administrativa considera, como minimo:
@@ -161,6 +175,13 @@ Greenhouse no decide vacaciones solo por moneda. Para el calculo y la explicacio
 Cuando la persona pertenece a Chile interno y tiene contrato laboral aplicable, el saldo anual y los progresivos se calculan desde su fecha de ingreso y la politica chilena vigente del portal.
 
 En la practica eso significa que Greenhouse no debe sembrar automaticamente `15` dias completos para una persona que aun esta en su primer ciclo de antiguedad laboral. Durante ese primer tramo, el saldo visible se accrualiza desde `hire_date`; una vez que se cumple el aniversario laboral, la politica ya puede consolidarse al anual completo segun corresponda.
+
+Mientras ese primer ciclo sigue en curso, RRHH puede ver mensajes de apoyo como:
+
+- acumulacion proporcional desde la fecha de ingreso
+- arrastre visible del periodo anterior
+
+La idea es que el saldo no solo sea correcto, sino tambien legible para operacion y auditoria.
 
 ### Casos no equivalentes
 

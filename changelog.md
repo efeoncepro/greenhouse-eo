@@ -27,6 +27,16 @@
   - el detalle operativo se mueve a un dialog por colaborador con acciones de backfill, ajuste manual y reversión donde corresponde
 - Se actualizaron los tests del view para validar el nuevo flujo admin `Saldos del equipo -> Ver detalle`.
 
+### 2026-04-16 — HR Leave aclara saldo proporcional, arrastre y redondeo visible
+
+- `HR > Permisos` ahora redondea saldos de vacaciones a 2 decimales de forma consistente en runtime y UI.
+- La lectura administrativa de vacaciones Chile deja explícitos:
+  - `Base / acumulado`
+  - `Progresivos`
+  - `Arrastre`
+  - `Saldo actual`
+- El detalle de colaborador y las tarjetas de resumen ahora explican cuando el saldo está en acumulación proporcional y/o incluye arrastre, evitando interpretar `base / acumulado` como saldo final.
+
 ### 2026-04-16 — TASK-415: HR Leave admin backfills, ajustes y policy explain
 
 - `HR Leave` gana base admin real para vacaciones del equipo:

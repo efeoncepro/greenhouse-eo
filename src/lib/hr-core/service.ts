@@ -79,6 +79,7 @@ import {
   toStringArray,
   toTimestampString
 } from '@/lib/hr-core/shared'
+import { roundLeaveDays } from '@/lib/hr-core/leave-domain'
 import { getPeopleTableColumns } from '@/lib/people/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getSupervisorScopeForTenant } from '@/lib/reporting-hierarchy/access'
@@ -306,10 +307,10 @@ const mapLeaveType = (row: LeaveTypeRow): HrLeaveType => ({
 })
 
 const mapLeaveBalance = (row: LeaveBalanceRow): HrLeaveBalance => {
-  const allowanceDays = toNullableNumber(row.allowance_days) ?? 0
-  const carriedOverDays = toNullableNumber(row.carried_over_days) ?? 0
-  const usedDays = toNullableNumber(row.used_days) ?? 0
-  const reservedDays = toNullableNumber(row.reserved_days) ?? 0
+  const allowanceDays = roundLeaveDays(toNullableNumber(row.allowance_days) ?? 0)
+  const carriedOverDays = roundLeaveDays(toNullableNumber(row.carried_over_days) ?? 0)
+  const usedDays = roundLeaveDays(toNullableNumber(row.used_days) ?? 0)
+  const reservedDays = roundLeaveDays(toNullableNumber(row.reserved_days) ?? 0)
 
   return {
     balanceId: String(row.balance_id || ''),
@@ -322,7 +323,7 @@ const mapLeaveBalance = (row: LeaveBalanceRow): HrLeaveBalance => {
     carriedOverDays,
     usedDays,
     reservedDays,
-    availableDays: allowanceDays + carriedOverDays - usedDays - reservedDays
+    availableDays: roundLeaveDays(allowanceDays + carriedOverDays - usedDays - reservedDays)
   }
 }
 
@@ -1334,7 +1335,7 @@ export const listLeaveBalances = async ({
       balances,
       summary: {
         memberCount: new Set(balances.map(balance => balance.memberId)).size,
-        totalAvailableDays: balances.reduce((sum, balance) => sum + balance.availableDays, 0)
+        totalAvailableDays: roundLeaveDays(balances.reduce((sum, balance) => sum + balance.availableDays, 0))
       }
     }
   }

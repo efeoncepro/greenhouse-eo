@@ -91,6 +91,38 @@ const emptyRequests: HrLeaveRequest[] = []
 const emptyBalances: HrLeaveBalance[] = []
 const emptyAdjustments: HrLeaveBalanceAdjustmentRecord[] = []
 
+const leaveDaysFormatter = new Intl.NumberFormat('es-CL', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2
+})
+
+const formatLeaveDays = (value: number | null | undefined) => {
+  if (value == null || Number.isNaN(value)) {
+    return '—'
+  }
+
+  return leaveDaysFormatter.format(value)
+}
+
+const isProportionalVacationAccrualBalance = (balance: HrLeaveBalance) =>
+  balance.leaveTypeCode === 'vacation' &&
+  balance.policyExplain?.accrualType === 'monthly_accrual' &&
+  balance.allowanceDays < balance.policyExplain.annualDays
+
+const getBalancePolicySupportText = (balance: HrLeaveBalance) => {
+  const notes: string[] = []
+
+  if (isProportionalVacationAccrualBalance(balance) && balance.policyExplain?.hireDate) {
+    notes.push(`Acumulación proporcional desde ${formatDate(balance.policyExplain.hireDate)}.`)
+  }
+
+  if (balance.carriedOverDays > 0) {
+    notes.push(`Incluye ${formatLeaveDays(balance.carriedOverDays)} de arrastre.`)
+  }
+
+  return notes.join(' ')
+}
+
 const formatPolicyExplainLabel = (policyExplain: NonNullable<HrLeaveBalance['policyExplain']>) => {
   if (policyExplain.policySource === 'not_eligible') {
     return 'Sin acumulación automática'
@@ -127,6 +159,7 @@ type TeamBalanceSummaryRow = {
   balances: HrLeaveBalance[]
   vacationBalance: HrLeaveBalance | null
   policyLabel: string
+  policyHint: string | null
   availableDays: number | null
   reservedDays: number | null
   adjustmentDays: number | null
@@ -139,16 +172,31 @@ const buildBalancesByType = (leaveTypes: HrLeaveType[], balances: HrLeaveBalance
   leaveTypes.map(leaveType => {
     const matchingBalances = balances.filter(balance => balance.leaveTypeCode === leaveType.leaveTypeCode)
     const totalAllowance = matchingBalances.reduce((sum, balance) => sum + balance.allowanceDays, 0)
+    const totalProgressive = matchingBalances.reduce((sum, balance) => sum + (balance.progressiveExtraDays ?? 0), 0)
+    const totalCarriedOver = matchingBalances.reduce((sum, balance) => sum + balance.carriedOverDays, 0)
+    const totalAdjustment = matchingBalances.reduce((sum, balance) => sum + (balance.adjustmentDays ?? 0), 0)
     const totalUsed = matchingBalances.reduce((sum, balance) => sum + balance.usedDays, 0)
     const totalAvailable = matchingBalances.reduce((sum, balance) => sum + balance.availableDays, 0)
-    const pctUsed = totalAllowance > 0 ? Math.round((totalUsed / totalAllowance) * 100) : 0
+    const totalGrossBalance = totalAllowance + totalProgressive + totalCarriedOver + totalAdjustment
+
+    const pctAvailable =
+      totalGrossBalance > 0 ? Math.max(0, Math.min(100, Math.round((totalAvailable / totalGrossBalance) * 100))) : 0
+
+    const supportBalance = matchingBalances.find(
+      balance => isProportionalVacationAccrualBalance(balance) || balance.carriedOverDays > 0 || (balance.adjustmentDays ?? 0) !== 0
+    ) ?? matchingBalances[0]
 
     return {
       ...leaveType,
       totalAllowance,
+      totalProgressive,
+      totalCarriedOver,
+      totalAdjustment,
+      totalGrossBalance,
       totalUsed,
       totalAvailable,
-      pctUsed,
+      pctAvailable,
+      supportText: supportBalance ? getBalancePolicySupportText(supportBalance) : '',
       memberCount: matchingBalances.length
     }
   })
@@ -170,6 +218,7 @@ const buildTeamBalanceRows = (balances: HrLeaveBalance[]) => {
       balances: [balance],
       vacationBalance: null,
       policyLabel: 'Sin política visible',
+      policyHint: null,
       availableDays: null,
       reservedDays: null,
       adjustmentDays: null,
@@ -188,6 +237,7 @@ const buildTeamBalanceRows = (balances: HrLeaveBalance[]) => {
         ...row,
         vacationBalance,
         policyLabel: baseBalance?.policyExplain ? formatPolicyExplainLabel(baseBalance.policyExplain) : 'Sin política visible',
+        policyHint: vacationBalance ? getBalancePolicySupportText(vacationBalance) || null : null,
         availableDays: vacationBalance?.availableDays ?? null,
         reservedDays: vacationBalance?.reservedDays ?? null,
         adjustmentDays: vacationBalance?.adjustmentDays ?? null,
@@ -624,6 +674,21 @@ const HrLeaveView = () => {
     })
   }, [leaveTypeOrder, selectedTeamBalanceRow])
 
+  const selectedTeamVacationBalance = useMemo(
+    () => selectedTeamBalances.find(balance => balance.leaveTypeCode === 'vacation') ?? null,
+    [selectedTeamBalances]
+  )
+
+  const selectedTeamHasAccrualNotice = useMemo(
+    () => selectedTeamBalances.some(balance => isProportionalVacationAccrualBalance(balance) || balance.carriedOverDays > 0),
+    [selectedTeamBalances]
+  )
+
+  const myHasAccrualNotice = useMemo(
+    () => myBalances.some(balance => isProportionalVacationAccrualBalance(balance) || balance.carriedOverDays > 0),
+    [myBalances]
+  )
+
   const teamSummary = useMemo(
     () => ({
       members: teamBalanceRows.length,
@@ -945,7 +1010,7 @@ const HrLeaveView = () => {
                           fontSize: '18px',
                           fontWeight: 600,
                           offsetY: 6,
-                          formatter: () => `${bt.totalAvailable}`
+                          formatter: () => formatLeaveDays(bt.totalAvailable)
                         }
                       }
                     }
@@ -969,13 +1034,13 @@ const HrLeaveView = () => {
                             type='radialBar'
                             height={150}
                             options={gaugeOptions}
-                            series={[bt.totalAllowance > 0 ? Math.min(100, Math.round(((bt.totalAllowance - bt.totalUsed) / bt.totalAllowance) * 100)) : 0]}
+                            series={[bt.pctAvailable]}
                           />
                           <Typography variant='body2' color='text.secondary'>
-                            {bt.totalUsed} usados de {bt.totalAllowance}
+                            {formatLeaveDays(bt.totalUsed)} usados de {formatLeaveDays(bt.totalGrossBalance)} habilitados
                           </Typography>
                           <Typography variant='caption' color='text.disabled'>
-                            {bt.totalAvailable} días disponibles
+                            {bt.supportText || `${formatLeaveDays(bt.totalAvailable)} de saldo actual`}
                           </Typography>
                         </Stack>
                       </CardContent>
@@ -1009,6 +1074,11 @@ const HrLeaveView = () => {
               />
               <Divider />
               <CardContent>
+                {myHasAccrualNotice && (
+                  <Alert severity='info' sx={{ mb: 4 }}>
+                    Vacaciones Chile puede mostrarse como acumulación proporcional durante el primer ciclo laboral e incluir arrastre del período anterior.
+                  </Alert>
+                )}
                 <TableContainer>
                   <Table size='small'>
                     <TableHead>
@@ -1016,11 +1086,13 @@ const HrLeaveView = () => {
                         <TableCell>Tipo</TableCell>
                         <TableCell>Política</TableCell>
                         <TableCell align='center'>Año</TableCell>
-                        <TableCell align='center'>Asignados</TableCell>
+                        <TableCell align='center'>Base / acumulado</TableCell>
+                        <TableCell align='center'>Progresivos</TableCell>
+                        <TableCell align='center'>Arrastre</TableCell>
                         <TableCell align='center'>Usados</TableCell>
                         <TableCell align='center'>Reservados</TableCell>
                         <TableCell align='center'>Ajustes</TableCell>
-                        <TableCell align='center'>Disponibles</TableCell>
+                        <TableCell align='center'>Saldo actual</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -1039,20 +1111,29 @@ const HrLeaveView = () => {
                               />
                             </TableCell>
                             <TableCell>
-                              <Typography variant='body2' color='text.secondary'>
-                                {balance.policyExplain
-                                  ? formatPolicyExplainLabel(balance.policyExplain)
-                                  : 'Regla estándar de permisos'}
-                              </Typography>
+                              <Stack spacing={0.25}>
+                                <Typography variant='body2' color='text.secondary'>
+                                  {balance.policyExplain
+                                    ? formatPolicyExplainLabel(balance.policyExplain)
+                                    : 'Regla estándar de permisos'}
+                                </Typography>
+                                {getBalancePolicySupportText(balance) && (
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {getBalancePolicySupportText(balance)}
+                                  </Typography>
+                                )}
+                              </Stack>
                             </TableCell>
                             <TableCell align='center'>{balance.year}</TableCell>
-                            <TableCell align='center'>{balance.allowanceDays}</TableCell>
-                            <TableCell align='center'>{balance.usedDays}</TableCell>
-                            <TableCell align='center'>{balance.reservedDays}</TableCell>
-                            <TableCell align='center'>{balance.adjustmentDays ?? 0}</TableCell>
+                            <TableCell align='center'>{formatLeaveDays(balance.allowanceDays)}</TableCell>
+                            <TableCell align='center'>{formatLeaveDays(balance.progressiveExtraDays ?? 0)}</TableCell>
+                            <TableCell align='center'>{formatLeaveDays(balance.carriedOverDays)}</TableCell>
+                            <TableCell align='center'>{formatLeaveDays(balance.usedDays)}</TableCell>
+                            <TableCell align='center'>{formatLeaveDays(balance.reservedDays)}</TableCell>
+                            <TableCell align='center'>{formatLeaveDays(balance.adjustmentDays ?? 0)}</TableCell>
                             <TableCell align='center'>
                               <Typography variant='body2' fontWeight={600}>
-                                {balance.availableDays}
+                                {formatLeaveDays(balance.availableDays)}
                               </Typography>
                             </TableCell>
                           </TableRow>
@@ -1060,7 +1141,7 @@ const HrLeaveView = () => {
                       })}
                       {myBalances.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={8} align='center' sx={{ py: 6 }}>
+                          <TableCell colSpan={10} align='center' sx={{ py: 6 }}>
                             <Stack alignItems='center' spacing={1}>
                               <i className='tabler-scale' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
                               <Typography color='text.secondary'>No hay saldos personales para mostrar.</Typography>
@@ -1199,11 +1280,16 @@ const HrLeaveView = () => {
                                   <Typography variant='caption' color='text.secondary'>
                                     {row.balances.length} tipo{row.balances.length === 1 ? '' : 's'} disponible{row.balances.length === 1 ? '' : 's'}
                                   </Typography>
+                                  {row.policyHint && (
+                                    <Typography variant='caption' color='text.secondary'>
+                                      {row.policyHint}
+                                    </Typography>
+                                  )}
                                 </Stack>
                               </TableCell>
-                              <TableCell align='center'>{row.availableDays ?? '—'}</TableCell>
-                              <TableCell align='center'>{row.reservedDays ?? '—'}</TableCell>
-                              <TableCell align='center'>{row.adjustmentDays ?? '—'}</TableCell>
+                              <TableCell align='center'>{formatLeaveDays(row.availableDays)}</TableCell>
+                              <TableCell align='center'>{formatLeaveDays(row.reservedDays)}</TableCell>
+                              <TableCell align='center'>{formatLeaveDays(row.adjustmentDays)}</TableCell>
                               <TableCell>
                                 <Stack direction='row' spacing={1} flexWrap='wrap'>
                                   {alerts.length > 0 ? (
@@ -1281,6 +1367,11 @@ const HrLeaveView = () => {
             <Divider />
             <DialogContent>
               <Stack spacing={4} sx={{ mt: 1 }}>
+                {selectedTeamHasAccrualNotice && (
+                  <Alert severity='info'>
+                    Vacaciones Chile puede mostrarse como acumulación proporcional durante el primer ciclo laboral. El saldo actual también puede incluir arrastre del período anterior.
+                  </Alert>
+                )}
                 <Grid container spacing={3}>
                   <Grid size={{ xs: 12, md: 4 }}>
                     <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, height: '100%' }}>
@@ -1297,6 +1388,11 @@ const HrLeaveView = () => {
                         <Typography variant='body2' sx={{ mt: 0.5 }}>
                           {selectedTeamBalanceRow.policyLabel}
                         </Typography>
+                        {selectedTeamBalanceRow.policyHint && (
+                          <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
+                            {selectedTeamBalanceRow.policyHint}
+                          </Typography>
+                        )}
                       </CardContent>
                     </Card>
                   </Grid>
@@ -1306,10 +1402,10 @@ const HrLeaveView = () => {
                         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
                           <CardContent>
                             <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
-                              Días disponibles
+                              Saldo actual
                             </Typography>
                             <Typography variant='h4' sx={{ mt: 1 }}>
-                              {selectedTeamBalanceRow.availableDays ?? '—'}
+                              {formatLeaveDays(selectedTeamBalanceRow.availableDays)}
                             </Typography>
                           </CardContent>
                         </Card>
@@ -1321,7 +1417,7 @@ const HrLeaveView = () => {
                               Días reservados
                             </Typography>
                             <Typography variant='h4' sx={{ mt: 1 }}>
-                              {selectedTeamBalanceRow.reservedDays ?? '—'}
+                              {formatLeaveDays(selectedTeamBalanceRow.reservedDays)}
                             </Typography>
                           </CardContent>
                         </Card>
@@ -1333,7 +1429,19 @@ const HrLeaveView = () => {
                               Ajustes netos
                             </Typography>
                             <Typography variant='h4' sx={{ mt: 1 }}>
-                              {selectedTeamBalanceRow.adjustmentDays ?? '—'}
+                              {formatLeaveDays(selectedTeamBalanceRow.adjustmentDays)}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                          <CardContent>
+                            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                              Arrastre visible
+                            </Typography>
+                            <Typography variant='h4' sx={{ mt: 1 }}>
+                              {formatLeaveDays(selectedTeamVacationBalance?.carriedOverDays ?? 0)}
                             </Typography>
                           </CardContent>
                         </Card>
@@ -1356,11 +1464,13 @@ const HrLeaveView = () => {
                             <TableCell>Tipo</TableCell>
                             <TableCell>Política</TableCell>
                             <TableCell align='center'>Año</TableCell>
-                            <TableCell align='center'>Asignados</TableCell>
+                            <TableCell align='center'>Base / acumulado</TableCell>
+                            <TableCell align='center'>Progresivos</TableCell>
+                            <TableCell align='center'>Arrastre</TableCell>
                             <TableCell align='center'>Usados</TableCell>
                             <TableCell align='center'>Reservados</TableCell>
                             <TableCell align='center'>Ajustes</TableCell>
-                            <TableCell align='center'>Disponibles</TableCell>
+                            <TableCell align='center'>Saldo actual</TableCell>
                             <TableCell align='right'>Acciones</TableCell>
                           </TableRow>
                         </TableHead>
@@ -1380,20 +1490,29 @@ const HrLeaveView = () => {
                                   />
                                 </TableCell>
                                 <TableCell>
-                                  <Typography variant='body2' color='text.secondary'>
-                                    {balance.policyExplain
-                                      ? formatPolicyExplainLabel(balance.policyExplain)
-                                      : 'Regla estándar de permisos'}
-                                  </Typography>
+                                  <Stack spacing={0.25}>
+                                    <Typography variant='body2' color='text.secondary'>
+                                      {balance.policyExplain
+                                        ? formatPolicyExplainLabel(balance.policyExplain)
+                                        : 'Regla estándar de permisos'}
+                                    </Typography>
+                                    {getBalancePolicySupportText(balance) && (
+                                      <Typography variant='caption' color='text.secondary'>
+                                        {getBalancePolicySupportText(balance)}
+                                      </Typography>
+                                    )}
+                                  </Stack>
                                 </TableCell>
                                 <TableCell align='center'>{balance.year}</TableCell>
-                                <TableCell align='center'>{balance.allowanceDays}</TableCell>
-                                <TableCell align='center'>{balance.usedDays}</TableCell>
-                                <TableCell align='center'>{balance.reservedDays}</TableCell>
-                                <TableCell align='center'>{balance.adjustmentDays ?? 0}</TableCell>
+                                <TableCell align='center'>{formatLeaveDays(balance.allowanceDays)}</TableCell>
+                                <TableCell align='center'>{formatLeaveDays(balance.progressiveExtraDays ?? 0)}</TableCell>
+                                <TableCell align='center'>{formatLeaveDays(balance.carriedOverDays)}</TableCell>
+                                <TableCell align='center'>{formatLeaveDays(balance.usedDays)}</TableCell>
+                                <TableCell align='center'>{formatLeaveDays(balance.reservedDays)}</TableCell>
+                                <TableCell align='center'>{formatLeaveDays(balance.adjustmentDays ?? 0)}</TableCell>
                                 <TableCell align='center'>
                                   <Typography variant='body2' fontWeight={600}>
-                                    {balance.availableDays}
+                                    {formatLeaveDays(balance.availableDays)}
                                   </Typography>
                                 </TableCell>
                                 <TableCell align='right'>

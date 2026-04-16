@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — HR Leave aclara UI de saldo proporcional Chile y arrastre
+
+- **Estado:** `implemented localmente`, `pendiente lint/build final`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - tarjetas y tablas ya no muestran decimales infinitos en saldos
+    - `Mis saldos` y el detalle admin del equipo separan `Base / acumulado`, `Progresivos`, `Arrastre` y `Saldo actual`
+    - el resumen radial ahora usa el saldo bruto visible, incluyendo arrastre/ajustes, para que el porcentaje no contradiga el detalle
+    - se agregan mensajes de apoyo para vacaciones Chile con acumulación proporcional y arrastre
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/lib/hr-core/service.ts`
+    - normalizan balances de leave a 2 decimales al serializar payloads
+  - `src/types/hr-core.ts`
+    - `policyExplain` expone `accrualType` para que la UI pueda distinguir acumulación proporcional vs anual fija
+  - tests nuevos/actualizados:
+    - `src/lib/hr-core/leave-domain.test.ts`
+    - `src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/hr-core/leave-domain.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+  - `pnpm exec eslint src/lib/hr-core/leave-domain.ts src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/service.ts src/types/hr-core.ts src/views/greenhouse/hr-core/HrLeaveView.tsx src/lib/hr-core/leave-domain.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+
+---
+
 ## Sesion 2026-04-16 — TASK-285: Client Role Differentiation
 
 - **Estado:** `complete`, migracion aplicada en shared dev DB

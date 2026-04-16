@@ -127,6 +127,8 @@ const minDateKey = (...values: string[]) =>
 
 const roundToTwoDecimals = (value: number) => Math.round(value * 100) / 100
 
+export const roundLeaveDays = (value: number) => roundToTwoDecimals(value)
+
 const isWeekendDateKey = (value: string) => {
   const parsed = parseDateOnly(value)
   const dayOfWeek = new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day)).getUTCDay()
@@ -392,7 +394,7 @@ export const calculateAccruedLeaveAllowanceDays = ({
     return 0
   }
 
-  return roundToTwoDecimals((annualDays * overlapDays) / firstServiceCycleDays)
+  return roundLeaveDays((annualDays * overlapDays) / firstServiceCycleDays)
 }
 
 export const listPeriodIdsInRange = (startDate: string, endDate: string) => {

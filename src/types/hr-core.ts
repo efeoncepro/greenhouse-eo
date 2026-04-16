@@ -148,6 +148,7 @@ export interface HrLeavePolicyExplain {
   policyId: string
   policyName: string
   policySource: 'catalog' | 'derived_internal' | 'external_provider' | 'not_eligible'
+  accrualType?: 'annual_fixed' | 'monthly_accrual' | 'unlimited' | 'custom'
   contractType: ContractType | null
   payRegime: PayRegime | null
   payrollVia: PayrollVia | null

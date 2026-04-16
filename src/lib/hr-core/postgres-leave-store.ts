@@ -42,7 +42,8 @@ import {
   getTodayDateKey,
   isPolicyApplicableToMember,
   listPeriodIdsInRange,
-  loadHolidayDateSetForRange
+  loadHolidayDateSetForRange,
+  roundLeaveDays
 } from '@/lib/hr-core/leave-domain'
 import type { LeaveDayPeriod, LeavePayrollImpactPeriod, LeavePolicy } from '@/lib/hr-core/leave-domain'
 import { canPerformLeaveReviewAction, getLeaveApprovalStageCode } from '@/lib/hr-core/leave-review-policy'
@@ -290,13 +291,13 @@ const mapLeaveType = (row: PostgresLeaveTypeRow): HrLeaveType => ({
 })
 
 const mapLeaveBalance = (row: PostgresLeaveBalanceRow): HrLeaveBalance => {
-  const allowanceDays = toNullableNumber(row.allowance_days) ?? 0
-  const progressiveExtraDays = toNullableNumber(row.progressive_extra_days) ?? 0
-  const carriedOverDays = toNullableNumber(row.carried_over_days) ?? 0
-  const adjustmentDays = toNullableNumber(row.adjustment_days) ?? 0
+  const allowanceDays = roundLeaveDays(toNullableNumber(row.allowance_days) ?? 0)
+  const progressiveExtraDays = roundLeaveDays(toNullableNumber(row.progressive_extra_days) ?? 0)
+  const carriedOverDays = roundLeaveDays(toNullableNumber(row.carried_over_days) ?? 0)
+  const adjustmentDays = roundLeaveDays(toNullableNumber(row.adjustment_days) ?? 0)
   const accumulatedPeriods = toInt(row.accumulated_periods)
-  const usedDays = toNullableNumber(row.used_days) ?? 0
-  const reservedDays = toNullableNumber(row.reserved_days) ?? 0
+  const usedDays = roundLeaveDays(toNullableNumber(row.used_days) ?? 0)
+  const reservedDays = roundLeaveDays(toNullableNumber(row.reserved_days) ?? 0)
 
   return {
     balanceId: row.balance_id,
@@ -312,7 +313,9 @@ const mapLeaveBalance = (row: PostgresLeaveBalanceRow): HrLeaveBalance => {
     accumulatedPeriods,
     usedDays,
     reservedDays,
-    availableDays: allowanceDays + progressiveExtraDays + carriedOverDays + adjustmentDays - usedDays - reservedDays
+    availableDays: roundLeaveDays(
+      allowanceDays + progressiveExtraDays + carriedOverDays + adjustmentDays - usedDays - reservedDays
+    )
   }
 }
 
@@ -1022,6 +1025,7 @@ const buildPolicyExplain = ({
   policyId: resolution.policy.policyId,
   policyName: resolution.policy.policyName,
   policySource: resolution.source,
+  accrualType: resolution.policy.accrualType,
   contractType: member.contractType,
   payRegime: member.payRegime,
   payrollVia: member.payrollVia,
@@ -1075,15 +1079,17 @@ const computeBalanceSeedForYear = async ({
     : 0
 
   const previousAvailable = previousBalance
-    ? previousYearAllowanceDays +
+    ? roundLeaveDays(
+      previousYearAllowanceDays +
       (previousBalance.progressiveExtraDays ?? 0) +
       (previousBalance.carriedOverDays ?? 0) +
       (previousBalance.adjustmentDays ?? 0) -
       (previousBalance.usedDays ?? 0) -
       (previousBalance.reservedDays ?? 0)
+    )
     : 0
 
-  const carriedOverDays = Math.min(Math.max(previousAvailable, 0), policy.maxCarryOverDays)
+  const carriedOverDays = roundLeaveDays(Math.min(Math.max(previousAvailable, 0), policy.maxCarryOverDays))
   const accumulatedPeriods = previousAvailable > 0 ? previousAccumulatedPeriods + 1 : 0
   const priorWorkYears = toNullableNumber(member.prior_work_years) ?? 0
 
@@ -1708,7 +1714,7 @@ export const listLeaveBalancesFromPostgres = async ({
     policies: leavePolicies,
     summary: {
       memberCount: new Set(balances.map(balance => balance.memberId)).size,
-      totalAvailableDays: balances.reduce((sum, balance) => sum + balance.availableDays, 0)
+      totalAvailableDays: roundLeaveDays(balances.reduce((sum, balance) => sum + balance.availableDays, 0))
     }
   }
 }

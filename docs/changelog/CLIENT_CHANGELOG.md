@@ -58,6 +58,11 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 - `HR > Permisos` ahora hace más visible el saldo del equipo y el contexto de política con que se interpreta cada balance.
 - Las correcciones administrativas distinguen mejor entre un periodo real ya tomado y un ajuste contable de saldo.
+- En vacaciones Chile, el detalle de saldo ahora separa mejor acumulado del año, arrastre y saldo actual para evitar lecturas ambiguas durante el primer ciclo laboral.
+
+### Correcciones
+
+- `HR > Permisos` ya no expone decimales infinitos en saldos administrativos de vacaciones; los montos visibles quedan redondeados y explicados con mejor contexto.
 - `HR > Permisos` ahora separa `Mis saldos` de `Saldos del equipo`, con búsqueda por colaborador, alertas operativas y detalle administrativo en vez de un listado plano difícil de operar.
 
 ### Correcciones
