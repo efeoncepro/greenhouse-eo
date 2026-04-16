@@ -83,7 +83,7 @@ Primer bloque operativo asignado:
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
-- `TASK-242` agrega `NexaInsightsBlock` a la tab Overview del Space 360 con enrichments filtrados por `space_id`. Reader scoped + integración UI.
+- `TASK-242` ✅ — Nexa Insights en Space 360. **Cerrada 2026-04-16**. Space 360 ahora consume un summary Nexa filtrado por `space_id` desde `Space360Detail`, y la surface visible `Overview` renderiza `NexaInsightsBlock` al inicio sin abrir route nueva. Spec: `complete/TASK-242-nexa-insights-space-360.md`.
 - `TASK-243` ✅ — Nexa Insights en Person 360. **Cerrada 2026-04-16**. Person 360 ahora consume un summary Nexa filtrado por `member_id` desde `GET /api/people/[memberId]/intelligence`, y la surface visible `activity` renderiza `NexaInsightsBlock` al inicio sin reabrir tabs legacy. Spec: `complete/TASK-243-nexa-insights-person-360.md`.
 - `TASK-244` agrega widget "Top Insights" al Home Dashboard con las 3 señales más críticas cross-Space del período actual vía `NexaInsightsBlock`.
 - `TASK-245` crea el primer engine de señales fuera del ICO: detector de anomalías para métricas financieras, enrichment LLM domain-aware, y surfacing en Finance Dashboard.

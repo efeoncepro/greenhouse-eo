@@ -8,7 +8,7 @@ vi.mock('@/lib/db', () => ({
   query: (...args: unknown[]) => mockQuery(...args)
 }))
 
-const { readMemberAiLlmSummary, readTopAiLlmEnrichments } = await import('./llm-enrichment-reader')
+const { readMemberAiLlmSummary, readSpaceAiLlmSummary, readTopAiLlmEnrichments } = await import('./llm-enrichment-reader')
 
 beforeEach(() => {
   mockQuery.mockReset()
@@ -180,6 +180,82 @@ describe('readMemberAiLlmSummary', () => {
           severity: 'warning',
           explanation: 'Otra señal',
           recommendedAction: null
+        }
+      ]
+    })
+  })
+})
+
+describe('readSpaceAiLlmSummary', () => {
+  it('filters enrichments by space, period and succeeded status', async () => {
+    mockQuery
+      .mockResolvedValueOnce([
+        {
+          total: 3,
+          succeeded: 2,
+          failed: 1,
+          avg_quality_score: 94.6,
+          last_processed_at: '2026-04-15T14:00:00.000Z'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          enrichment_id: 'EO-AIE-20',
+          signal_type: 'anomaly',
+          metric_name: 'otd_pct',
+          severity: 'critical',
+          explanation_summary: 'Space impact',
+          recommended_action: 'Escalar',
+          quality_score: 98.2,
+          processed_at: '2026-04-15T14:00:00.000Z'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          run_id: 'EO-AIR-2',
+          status: 'succeeded',
+          started_at: '2026-04-15T13:50:00.000Z',
+          completed_at: '2026-04-15T14:02:00.000Z'
+        }
+      ])
+
+    const result = await readSpaceAiLlmSummary('space-123', 2026, 4, 3)
+
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      1,
+      expect.stringContaining('WHERE space_id = $1'),
+      ['space-123', 2026, 4]
+    )
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining("AND status = 'succeeded'"),
+      ['space-123', 2026, 4, 3]
+    )
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      3,
+      expect.stringContaining('WHERE space_id = $1'),
+      ['space-123', 2026, 4]
+    )
+
+    const spaceSql = mockQuery.mock.calls[1][0] as string
+
+    expect(spaceSql).toContain("CASE COALESCE(severity, '')")
+    expect(spaceSql).toContain("WHEN 'critical' THEN 0")
+    expect(spaceSql).toContain('quality_score DESC NULLS LAST')
+    expect(spaceSql).toContain('processed_at DESC')
+
+    expect(result).toEqual({
+      totalAnalyzed: 2,
+      lastAnalysis: '2026-04-15T14:00:00.000Z',
+      runStatus: 'succeeded',
+      insights: [
+        {
+          id: 'EO-AIE-20',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: 'Space impact',
+          recommendedAction: 'Escalar'
         }
       ]
     })

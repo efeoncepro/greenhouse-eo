@@ -38,7 +38,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 |-------|------|--------|-------------|
 | Torre de Control | `/internal/dashboard` | Implementada | Overview de clientes + equipo interno |
 | Agencia (Command Center) | `/agency` | Existente (pendiente redesign) | Pulse Global, métricas cross-space |
-| Spaces | `/agency/spaces` | Existente | Per-space health, RPA, OTD, team |
+| Spaces | `/agency/spaces` | Existente | Per-space health, RPA, OTD, team y Space 360 con Nexa Insights en Overview |
 | Economía | `/agency/economics` | Implementada | P&L KPIs, expense trends, top clients by revenue |
 | Equipo | `/agency/team` | Implementada | Capacidad contractual, compromiso comercial y uso operativo por miembro; consume `member_capacity_economics` |
 | Delivery | `/agency/delivery` | Stub | ICO + sprints + stuck assets (pendiente) |

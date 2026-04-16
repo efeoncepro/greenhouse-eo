@@ -1,5 +1,19 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-16 — Space 360 Overview ya consume insights Nexa filtrados por space
+
+- `Agency > Space 360 > Resumen` ya no depende solo del snapshot operativo, finance y delivery para explicar desvíos del espacio.
+- Runtime activo:
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` expone `readSpaceAiLlmSummary(spaceId, periodYear, periodMonth, limit)`
+  - `src/lib/agency/space-360.ts` incorpora `nexaInsights` al snapshot `Space360Detail`
+  - `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx` renderiza `NexaInsightsBlock` al inicio del Overview real
+- Contrato operativo:
+  - Space 360 consume enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`; no recalcula señales ni narrativa inline
+  - el filtro canónico es `space_id + period_year + period_month`, con lista visible restringida a `status = 'succeeded'`
+  - el ranking visible sigue `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - la navegación contextual reutiliza el contrato actual de `@mentions` (`space` -> `Space 360`, `member` -> `People`) sin mutaciones automáticas
+  - cuando no hay insights para el período, el bloque muestra el empty state compartido de Nexa en lugar de ocultarse
+
 ## Delta 2026-04-16 — Person 360 Activity ya consume insights Nexa filtrados por member
 
 - `People > Person 360` ya no depende solo del snapshot operativo y las métricas ICO para explicar desvíos individuales.
@@ -110,13 +124,13 @@ Un sistema transversal que permite a cualquier módulo del portal Greenhouse:
 │                                                                  │
 │  Activos:                                                        │
 │  • Agency ICO tab (NexaInsightsBlock)                            │
+│  • Space 360 Overview → NexaInsightsBlock filtrado por space_id  │
 │  • Pulse / Home Dashboard → Top 3 insights cross-Space           │
+│  • Person 360 Activity → filtrado por member_id                  │
 │  • Nexa Chat Home (enrichments como contexto)                    │
 │                                                                  │
 │  Próximos (Tier 1):                                              │
-│  • Space 360 Overview → NexaInsightsBlock filtrado por space_id  │
-│  • Person 360 Intelligence → filtrado por member_id              │
-│  • Home Dashboard → widget Top 3 insights cross-Space            │
+│  • Tier 1 ya materializado: Space 360, Person 360 y Home         │
 │                                                                  │
 │  Futuros (Tier 2-3):                                             │
 │  • Finance Dashboard → señales financieras                       │

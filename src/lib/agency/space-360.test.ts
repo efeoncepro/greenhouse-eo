@@ -7,6 +7,10 @@ const mockReadProjectMetrics = vi.fn()
 const mockRunIcoEngineQuery = vi.fn()
 const mockReadMemberCapacityEconomicsBatch = vi.fn()
 const mockGetServicesBySpace = vi.fn()
+const mockReadSpaceAiLlmSummary = vi.fn()
+const mockGetScopeOwnership = vi.fn()
+const mockGetSpaceSkillCoverage = vi.fn()
+const mockGetEmptySpaceSkillCoverage = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
@@ -41,6 +45,19 @@ vi.mock('@/lib/services/service-store', () => ({
   getServicesBySpace: (...args: unknown[]) => mockGetServicesBySpace(...args)
 }))
 
+vi.mock('@/lib/ico-engine/ai/llm-enrichment-reader', () => ({
+  readSpaceAiLlmSummary: (...args: unknown[]) => mockReadSpaceAiLlmSummary(...args)
+}))
+
+vi.mock('@/lib/operational-responsibility/readers', () => ({
+  getScopeOwnership: (...args: unknown[]) => mockGetScopeOwnership(...args)
+}))
+
+vi.mock('@/lib/agency/skills-staffing', () => ({
+  getSpaceSkillCoverage: (...args: unknown[]) => mockGetSpaceSkillCoverage(...args),
+  getEmptySpaceSkillCoverage: (...args: unknown[]) => mockGetEmptySpaceSkillCoverage(...args)
+}))
+
 import { getAgencySpace360 } from './space-360'
 
 describe('getAgencySpace360', () => {
@@ -53,6 +70,35 @@ describe('getAgencySpace360', () => {
     mockRunIcoEngineQuery.mockResolvedValue([])
     mockReadMemberCapacityEconomicsBatch.mockResolvedValue(new Map())
     mockGetServicesBySpace.mockResolvedValue([])
+    mockReadSpaceAiLlmSummary.mockResolvedValue(null)
+    mockGetScopeOwnership.mockResolvedValue({
+      accountLead: null,
+      deliveryLead: null,
+      financeReviewer: null,
+      operationsLead: null
+    })
+    mockGetSpaceSkillCoverage.mockResolvedValue({
+      summary: {
+        requiredSkillCount: 0,
+        coveredSkillCount: 0,
+        gapSkillCount: 0,
+        serviceCountWithRequirements: 0,
+        coveragePct: null
+      },
+      memberSkillsByMember: {},
+      services: []
+    })
+    mockGetEmptySpaceSkillCoverage.mockReturnValue({
+      summary: {
+        requiredSkillCount: 0,
+        coveredSkillCount: 0,
+        gapSkillCount: 0,
+        serviceCountWithRequirements: 0,
+        coveragePct: null
+      },
+      memberSkillsByMember: {},
+      services: []
+    })
   })
 
   it('returns null when the client/space cannot be resolved', async () => {
@@ -197,5 +243,114 @@ describe('getAgencySpace360', () => {
       usagePercent: 92,
       capacityHealth: 'attention'
     })
+  })
+
+  it('hydrates nexa insights for canonical spaces', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        {
+          client_id: 'client-2',
+          client_name: 'Acme Space',
+          tenant_type: 'client',
+          space_id: 'space-2',
+          space_name: 'Acme Space',
+          organization_id: 'org-2',
+          organization_name: 'Acme Org',
+          organization_public_id: 'ORG-2'
+        }
+      ])
+      .mockResolvedValueOnce([{ module_code: 'creative_hub' }])
+      .mockResolvedValueOnce([
+        {
+          scope_type: 'space',
+          scope_id: 'space-2',
+          scope_name: 'Acme Space',
+          period_year: 2026,
+          period_month: 3,
+          period_closed: false,
+          snapshot_revision: 1,
+          revenue_clp: 2500000,
+          labor_cost_clp: 900000,
+          direct_expense_clp: 120000,
+          overhead_clp: 80000,
+          total_cost_clp: 1100000,
+          gross_margin_clp: 1400000,
+          gross_margin_pct: 56,
+          headcount_fte: 2,
+          revenue_per_fte_clp: 1250000,
+          cost_per_fte_clp: 550000,
+          materialized_at: '2026-03-31T12:00:00.000Z'
+        }
+      ])
+      .mockResolvedValueOnce([{ receivables_clp: 100000, payables_clp: 20000 }])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          active_count: 0,
+          provider_count: 0,
+          projected_revenue_clp: 0,
+          payroll_employer_cost_clp: 0,
+          commercial_loaded_cost_clp: 0,
+          tooling_cost_clp: 0
+        }
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+
+    mockGetSpaceFinanceMetrics.mockResolvedValue([
+      {
+        clientId: 'client-2',
+        organizationId: 'org-2',
+        spaceId: 'space-2',
+        revenueCurrentMonth: 2500000,
+        revenuePreviousMonth: 2100000,
+        revenueTrend: 19,
+        expensesCurrentMonth: 1100000,
+        marginPct: 56,
+        periodYear: 2026,
+        periodMonth: 3,
+        periodClosed: false,
+        snapshotRevision: 1
+      }
+    ])
+
+    mockReadSpaceAiLlmSummary.mockResolvedValue({
+      totalAnalyzed: 2,
+      lastAnalysis: '2026-03-31T12:10:00.000Z',
+      runStatus: 'succeeded',
+      insights: [
+        {
+          id: 'EO-AIE-30',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Space insight',
+          recommendedAction: 'Revisar'
+        }
+      ]
+    })
+
+    const detail = await getAgencySpace360('space-2')
+
+    expect(detail).not.toBeNull()
+    expect(detail?.resolutionStatus).toBe('client_and_space')
+    expect(detail?.nexaInsights).toEqual({
+      totalAnalyzed: 2,
+      lastAnalysis: '2026-03-31T12:10:00.000Z',
+      runStatus: 'succeeded',
+      insights: [
+        {
+          id: 'EO-AIE-30',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Space insight',
+          recommendedAction: 'Revisar'
+        }
+      ]
+    })
+    expect(mockReadSpaceAiLlmSummary).toHaveBeenCalledWith('space-2', 2026, 4)
   })
 })

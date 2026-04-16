@@ -2,6 +2,20 @@
 
 ## 2026-04-16
 
+### 2026-04-16 — TASK-242: Space 360 incorpora Nexa Insights filtrados por Space
+
+- `Agency > Spaces > [space]` ahora muestra `Nexa Insights` al inicio del Overview real de `Space 360`, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.
+- Se agrega `readSpaceAiLlmSummary(spaceId, periodYear, periodMonth, limit)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` para leer insights del espacio en el período actual, ordenados por:
+  - severidad (`critical > warning > info`)
+  - `quality_score DESC`
+  - `processed_at DESC`
+- `src/lib/agency/space-360.ts` ahora incorpora `nexaInsights` dentro de `Space360Detail`, sin abrir una route nueva ni recalcular señales inline.
+- `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx` inserta `NexaInsightsBlock` antes del grid principal del Overview y mantiene el contrato actual de `@mentions`:
+  - `@[Space](space:...)` -> `Space 360`
+  - `@[Miembro](member:...)` -> `People`
+- Si el espacio no tiene enrichments para el período, el bloque cae al empty state compartido de Nexa en lugar de desaparecer.
+- No se agregaron migraciones ni nuevos publishers/consumers reactivos; el cambio es un consumer read-only sobre serving existente.
+
 ### 2026-04-16 — TASK-243: Person 360 incorpora Nexa Insights filtrados por miembro
 
 - `People > Person 360` ahora muestra `Nexa Insights` al inicio de la surface visible `activity`, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.

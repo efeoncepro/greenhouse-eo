@@ -150,6 +150,22 @@ export interface MemberNexaInsightsPayload {
   insights: MemberNexaInsightItem[]
 }
 
+export interface SpaceNexaInsightItem {
+  id: string
+  signalType: string
+  metricId: string
+  severity: string | null
+  explanation: string | null
+  recommendedAction: string | null
+}
+
+export interface SpaceNexaInsightsPayload {
+  totalAnalyzed: number
+  lastAnalysis: string | null
+  runStatus: IcoLlmRunStatus | null
+  insights: SpaceNexaInsightItem[]
+}
+
 // ─── Metric Glossary (dynamic from registry) ──────────────────────────────
 
 const buildMetricGlossary = (): string => {

@@ -9,6 +9,8 @@ import type {
   MemberNexaInsightItem,
   MemberNexaInsightsPayload,
   OrganizationAiLlmEnrichmentItem,
+  SpaceNexaInsightItem,
+  SpaceNexaInsightsPayload,
   TopAiLlmEnrichmentItem
 } from './llm-types'
 
@@ -70,6 +72,15 @@ const mapTopItem = (row: RawRow): TopAiLlmEnrichmentItem => ({
 })
 
 const mapMemberInsightItem = (row: RawRow): MemberNexaInsightItem => ({
+  id: String(row.enrichment_id),
+  signalType: String(row.signal_type),
+  metricId: String(row.metric_name),
+  severity: toText(row.severity),
+  explanation: toText(row.explanation_summary),
+  recommendedAction: toText(row.recommended_action)
+})
+
+const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
   id: String(row.enrichment_id),
   signalType: String(row.signal_type),
   metricId: String(row.metric_name),
@@ -380,6 +391,89 @@ export const readMemberAiLlmSummary = async (
   const latestRunRow = latestRunRows[0]
 
   const recentInsights = recentRows.map(mapMemberInsightItem)
+
+  return {
+    totalAnalyzed: recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : 0,
+    lastAnalysis: toText(totalsRow.last_processed_at),
+    runStatus: latestRunRow
+      ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
+      : null,
+    insights: recentInsights
+  }
+}
+
+export const readSpaceAiLlmSummary = async (
+  spaceId: string,
+  periodYear: number,
+  periodMonth: number,
+  limit = 3
+): Promise<SpaceNexaInsightsPayload> => {
+  const [totalsRows, recentRows, latestRunRows] = await Promise.all([
+    query<RawRow>(
+      `
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE status = 'succeeded') AS succeeded,
+          COUNT(*) FILTER (WHERE status = 'failed') AS failed,
+          AVG(quality_score) FILTER (WHERE status = 'succeeded') AS avg_quality_score,
+          MAX(processed_at)::text AS last_processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE space_id = $1
+          AND period_year = $2
+          AND period_month = $3
+      `,
+      [spaceId, periodYear, periodMonth]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          enrichment_id,
+          signal_type,
+          metric_name,
+          severity,
+          explanation_summary,
+          recommended_action,
+          quality_score,
+          processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE space_id = $1
+          AND period_year = $2
+          AND period_month = $3
+          AND status = 'succeeded'
+        ORDER BY
+          CASE COALESCE(severity, '')
+            WHEN 'critical' THEN 0
+            WHEN 'warning' THEN 1
+            WHEN 'info' THEN 2
+            ELSE 3
+          END ASC,
+          quality_score DESC NULLS LAST,
+          processed_at DESC
+        LIMIT $4
+      `,
+      [spaceId, periodYear, periodMonth, limit]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          run_id,
+          status,
+          started_at::text AS started_at,
+          completed_at::text AS completed_at
+        FROM greenhouse_serving.ico_ai_enrichment_runs
+        WHERE space_id = $1
+          AND period_year = $2
+          AND period_month = $3
+        ORDER BY started_at DESC
+        LIMIT 1
+      `,
+      [spaceId, periodYear, periodMonth]
+    ).catch(() => [])
+  ])
+
+  const totalsRow = totalsRows[0] ?? {}
+  const latestRunRow = latestRunRows[0]
+  const recentInsights = recentRows.map(mapSpaceInsightItem)
 
   return {
     totalAnalyzed: recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : 0,

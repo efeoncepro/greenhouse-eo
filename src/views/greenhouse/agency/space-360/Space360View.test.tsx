@@ -27,6 +27,32 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => searchParams
 }))
 
+vi.mock('@/components/greenhouse/NexaInsightsBlock', () => ({
+  default: ({
+    insights,
+    totalAnalyzed,
+    lastAnalysis,
+    runStatus,
+    defaultExpanded
+  }: {
+    insights: Array<{ id: string; signalType: string; metricId: string; explanation?: string | null }>
+    totalAnalyzed: number
+    lastAnalysis: string | null
+    runStatus: string | null
+    defaultExpanded?: boolean
+  }) => (
+    <div
+      data-testid='nexa-insights-block'
+      data-default-expanded={String(Boolean(defaultExpanded))}
+      data-total-analyzed={String(totalAnalyzed)}
+      data-run-status={runStatus ?? 'null'}
+      data-last-analysis={lastAnalysis ?? 'null'}
+    >
+      Nexa Insights {insights[0]?.explanation ?? 'none'}
+    </div>
+  )
+}))
+
 // Mock IntersectionObserver for AnimatedCounter's useInView
 beforeAll(() => {
   global.IntersectionObserver = class {
@@ -87,6 +113,21 @@ const detail: Space360Detail = {
         occurredAt: '2026-03-30T10:00:00.000Z',
         title: 'Assignment Updated',
         description: 'Asignación de equipo actualizada'
+      }
+    ]
+  },
+  nexaInsights: {
+    totalAnalyzed: 3,
+    lastAnalysis: '2026-04-15T16:00:00.000Z',
+    runStatus: 'succeeded',
+    insights: [
+      {
+        id: 'space-insight-1',
+        signalType: 'delivery',
+        metricId: 'otd_pct',
+        severity: 'warning',
+        explanation: 'La OTD del Space cayó en el último corte y conviene revisar el backlog activo.',
+        recommendedAction: 'Coordina con el equipo para limpiar el backlog y monitorea el próximo cierre.'
       }
     ]
   },
@@ -283,6 +324,16 @@ describe('Space360View', () => {
   it('renders the agency space 360 shell with honest partial-state messaging', () => {
     renderWithTheme(<Space360View detail={detail} requestedId='client-1' />)
 
+    const nexaBlock = screen.getByTestId('nexa-insights-block')
+    const overviewTitle = screen.getByText('Resumen operativo')
+
+    expect(nexaBlock).toBeInTheDocument()
+    expect(nexaBlock).toHaveTextContent('Nexa Insights')
+    expect(nexaBlock).toHaveTextContent('La OTD del Space cayó en el último corte y conviene revisar el backlog activo.')
+    expect(overviewTitle).toBeInTheDocument()
+    expect(
+      nexaBlock.compareDocumentPosition(overviewTitle) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(screen.getAllByText('Acme').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Health Atención')).toBeInTheDocument()
     expect(screen.getByText('Risk Medio')).toBeInTheDocument()
@@ -292,9 +343,9 @@ describe('Space360View', () => {
     expect(screen.getByText('Margin')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Resumen' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Equipo' })).toBeInTheDocument()
-    expect(screen.getByText('Resumen operativo')).toBeInTheDocument()
     expect(screen.getByText('Actividad reciente')).toBeInTheDocument()
     expect(screen.getByText('Assignment Updated')).toBeInTheDocument()
+    expect(nexaBlock).toHaveAttribute('data-default-expanded', 'true')
   })
 
   it('renders an empty state when the requested space cannot be resolved', () => {

@@ -1,5 +1,16 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-16 — TASK-242 surfaces space-scoped Nexa insights in Space 360
+
+`TASK-242` cierra el consumer space-level de la lane advisory del ICO Engine sin abrir storage nuevo ni recalcular señales fuera del engine.
+
+- **Reader space-scoped:** `src/lib/ico-engine/ai/llm-enrichment-reader.ts` ahora expone `readSpaceAiLlmSummary(spaceId, periodYear, periodMonth, limit)` sobre `greenhouse_serving.ico_ai_signal_enrichments`
+- **Filtro canónico:** `space_id + period_year + period_month`, lista visible solo con `status='succeeded'`
+- **Ranking:** `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+- **Space 360:** `src/lib/agency/space-360.ts` incorpora `nexaInsights` al snapshot `Space360Detail`
+- **UI visible:** `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx` renderiza `NexaInsightsBlock` al inicio del Overview real
+- **Contrato:** Space 360 consume enrichments ya materializados por `ICO Engine -> Gemini -> serving`; no crea señales nuevas ni abre una route paralela
+
 ## Delta 2026-04-16 — TASK-243 surfaces member-scoped Nexa insights in Person 360
 
 `TASK-243` cierra el primer consumer person-level de la lane advisory del ICO Engine sin abrir storage nuevo ni recalcular señales fuera del engine.

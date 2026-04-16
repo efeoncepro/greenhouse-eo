@@ -4,6 +4,7 @@ import { getSpaceFinanceMetrics } from '@/lib/agency/agency-finance-metrics'
 import { getServiceSlaComplianceReport } from '@/lib/agency/sla-compliance'
 import { getEmptySpaceSkillCoverage, getSpaceSkillCoverage } from '@/lib/agency/skills-staffing'
 import { readLatestSpaceMetrics, readProjectMetrics } from '@/lib/ico-engine/read-metrics'
+import { readSpaceAiLlmSummary } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getIcoEngineProjectId, runIcoEngineQuery, toNumber as toIcoNumber, normalizeString } from '@/lib/ico-engine/shared'
 import { ICO_DATASET } from '@/lib/ico-engine/schema'
 import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economics/store'
@@ -13,6 +14,7 @@ import { getSpaceHealth, type SpaceHealthZone } from '@/components/agency/space-
 import { getScopeOwnership, type ScopeOwnership } from '@/lib/operational-responsibility/readers'
 import type { MemberSkill, ServiceStaffingRecommendation } from '@/types/agency-skills'
 import type { ServiceSlaOverallStatus } from '@/types/service-sla'
+import type { SpaceNexaInsightsPayload } from '@/lib/ico-engine/ai/llm-types'
 
 type RiskLevel = 'low' | 'medium' | 'high'
 type DataStatus = 'ready' | 'partial' | 'missing'
@@ -548,6 +550,7 @@ export type Space360Detail = {
     health: ReturnType<typeof healthChip>
     risk: ReturnType<typeof riskChip>
   }
+  nexaInsights: SpaceNexaInsightsPayload | null
   overview: {
     dimensions: Array<{
       key: string
@@ -678,6 +681,7 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
   }
 
   const businessLines = await readBusinessLines(context.client_id).catch(() => [])
+  const currentPeriod = getCurrentPeriod()
 
   const [
     financeSnapshot,
@@ -690,7 +694,8 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
     placementExposure,
     services,
     recentActivity,
-    skillCoverage
+    skillCoverage,
+    nexaInsights
   ] = await Promise.all([
     readLatestFinanceSnapshot({ clientId: context.client_id, spaceId: context.space_id }),
     getSpaceFinanceMetrics().then(items =>
@@ -714,7 +719,10 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
     }),
     context.space_id
       ? getSpaceSkillCoverage({ spaceId: context.space_id }).catch(() => getEmptySpaceSkillCoverage(context.space_id))
-      : Promise.resolve(getEmptySpaceSkillCoverage(context.space_id))
+      : Promise.resolve(getEmptySpaceSkillCoverage(context.space_id)),
+    context.space_id
+      ? readSpaceAiLlmSummary(context.space_id, currentPeriod.year, currentPeriod.month).catch(() => null)
+      : Promise.resolve(null)
   ])
 
   const serviceSlaReports = context.space_id
@@ -727,8 +735,6 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
         )
       )
     : []
-
-  const currentPeriod = getCurrentPeriod()
 
   const memberSnapshots = assignments.length > 0
     ? await readMemberCapacityEconomicsBatch({
@@ -897,6 +903,7 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
       health: healthChip(healthZone),
       risk: riskChip(riskLevel)
     },
+    nexaInsights,
     overview: {
       dimensions: [
         {

@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — TASK-242 Nexa Insights en Space 360
+
+- **Estado:** `complete`, `validado localmente`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/ico-engine/ai/llm-types.ts`
+    - tipos nuevos `SpaceNexaInsightItem` y `SpaceNexaInsightsPayload`
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+    - reader nuevo `readSpaceAiLlmSummary(spaceId, periodYear, periodMonth, limit)`
+    - filtros explícitos por `space_id + period_year + period_month`
+    - lista visible solo con `status = 'succeeded'`
+    - ranking alineado al resto de Nexa/ICO: `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - `src/lib/agency/space-360.ts`
+    - `Space360Detail` ahora expone `nexaInsights`
+    - el snapshot canónico de Space 360 carga el summary AI del período Santiago cuando existe `space_id`
+  - `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx`
+    - `NexaInsightsBlock` se renderiza al inicio del Overview real de Space 360
+    - cuando `nexaInsights` viene vacío o nulo, la surface cae al empty state compartido de Nexa
+  - `src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+    - cobertura UI del bloque Nexa al inicio del Overview
+  - tests nuevos/actualizados:
+    - `src/lib/ico-engine/ai/llm-enrichment-reader.test.ts`
+    - `src/lib/agency/space-360.test.ts`
+    - `src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/ico-engine/ai/llm-enrichment-reader.test.ts src/lib/agency/space-360.test.ts src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+  - `pnpm exec eslint src/lib/ico-engine/ai/llm-types.ts src/lib/ico-engine/ai/llm-enrichment-reader.ts src/lib/ico-engine/ai/llm-enrichment-reader.test.ts src/lib/agency/space-360.ts src/lib/agency/space-360.test.ts src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+  - `pnpm build`
+- **Notas operativas:**
+  - `docs/architecture/schema-snapshot-baseline.sql` sigue desfasado frente a `greenhouse_serving.ico_ai_signal_enrichments`; la fuente real sigue siendo `migrations/20260404123559856_task-232-ico-llm-enrichments.sql` + `src/types/db.d.ts`
+  - `pnpm lint` sigue rojo por un issue ajeno en `src/app/api/hr/evaluations/summaries/[summaryId]/finalize/route.ts` (`padding-line-between-statements`); no pertenece a `TASK-242`
+  - el workspace ya venía sucio por cambios de HR evaluations ajenos y no se modificaron
+
 ## Sesion 2026-04-16 — TASK-243 Nexa Insights en Person 360
 
 - **Estado:** `complete`, `pushed a develop`
