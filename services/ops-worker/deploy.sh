@@ -17,10 +17,29 @@ set -euo pipefail
 
 # ─── Environment ─────────────────────────────────────────────────────────────
 # Usage:
-#   bash services/ops-worker/deploy.sh              # defaults to staging
+#   ENV=staging    bash services/ops-worker/deploy.sh
 #   ENV=production bash services/ops-worker/deploy.sh
+#
+# ENV is REQUIRED — there is no silent default. The ops-worker is a SINGLE
+# Cloud Run service intentionally shared by both staging and production
+# (same DB, same scheduler jobs, same runtime revision). This is the canonical
+# topology, not a temporary shortcut. ENV only selects which NEXTAUTH /
+# RESEND secret refs get mounted, so a wrong ENV silently swaps credentials
+# on a live shared service. Forcing the caller to be explicit is hygiene —
+# the GitHub Actions workflow derives ENV from the branch (develop→staging,
+# main→production) and local operators must type it.
 
-ENV="${ENV:-staging}"
+if [ -z "${ENV:-}" ]; then
+  echo "ERROR: ENV must be set explicitly — 'staging' or 'production'."
+  echo "       ops-worker is a shared service; silent defaults are unsafe."
+  echo "       Usage: ENV=staging bash services/ops-worker/deploy.sh"
+  exit 1
+fi
+
+if [ "${ENV}" != "staging" ] && [ "${ENV}" != "production" ]; then
+  echo "ERROR: ENV must be 'staging' or 'production', got '${ENV}'."
+  exit 1
+fi
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 
