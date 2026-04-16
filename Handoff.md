@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — TASK-029: HRIS Goals & OKRs module
+
+- **Estado:** `complete`, pendiente migracion en shared dev DB
+- **Rama:** `develop`
+- **Implementado:**
+  - Migration: 4 tablas en greenhouse_hr (goal_cycles, goals, goal_key_results, goal_progress)
+  - 3 core lib files: postgres-goals-store.ts, eligibility.ts, progress-calculator.ts
+  - 12 API routes en /api/hr/goals/
+  - 2 paginas: /my/goals (self-service), /hr/goals (admin 3 tabs)
+  - 2 view codes, 5 outbox events, menu integration
+- **Post-deploy:** pnpm pg:connect:migrate + pnpm db:generate-types
+- **Follow-ups:** People 360 tab "Objetivos", TASK-031 (Performance Evaluations)
+
 ## Sesion 2026-04-16 — TASK-244 Nexa Insights en Pulse/Home
 
 - **Estado:** `implementado localmente`, `lint dirigido OK`, `tsc/build global bloqueado por frente paralelo hr-goals`

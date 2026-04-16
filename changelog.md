@@ -2,6 +2,15 @@
 
 ## 2026-04-16
 
+### 2026-04-16 — TASK-029: Modulo de Objetivos y OKRs
+
+- Nuevo modulo HRIS Goals & OKRs con ciclos trimestrales/semestrales/anuales
+- Goals en cascade (empresa → departamento → individual) con key results medibles
+- Elegibilidad por tipo de contrato (indefinido, plazo_fijo, eor: full; contractor: solo lectura; honorarios: sin acceso)
+- Self-service en /my/goals: ver objetivos, registrar avance
+- Admin en /hr/goals: crear ciclos, seguimiento global con heatmap de progreso, vista de empresa
+- 12 API endpoints, 4 tablas PostgreSQL, 5 outbox events
+
 ### 2026-04-16 — TASK-244: Pulse incorpora Top Insights de Nexa en Home
 
 - `Pulse` (`/home`) ahora muestra `Nexa Insights` al cargar la landing, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.

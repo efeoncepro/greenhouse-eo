@@ -84,7 +84,7 @@ Primer bloque operativo asignado:
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
 - `TASK-242` agrega `NexaInsightsBlock` a la tab Overview del Space 360 con enrichments filtrados por `space_id`. Reader scoped + integración UI.
-- `TASK-243` agrega `NexaInsightsBlock` a la tab Intelligence del Person 360 con enrichments filtrados por `member_id`. Reader scoped + integración UI.
+- `TASK-243` agrega `NexaInsightsBlock` a la surface visible de actividad/inteligencia del Person 360 con enrichments filtrados por `member_id`. Reader scoped + integración UI. Spec: `in-progress/TASK-243-nexa-insights-person-360.md`.
 - `TASK-244` agrega widget "Top Insights" al Home Dashboard con las 3 señales más críticas cross-Space del período actual vía `NexaInsightsBlock`.
 - `TASK-245` crea el primer engine de señales fuera del ICO: detector de anomalías para métricas financieras, enrichment LLM domain-aware, y surfacing en Finance Dashboard.
 - `TASK-283` crea el módulo Banco/Tesorería: saldos materializados reactivamente por cuenta, transferencias internas, coverage de payment_account_id, discrepancia vs extracto, posición multi-moneda con exposición cambiaria, sección TC con cupos duales y cierre de período auditable.
@@ -337,7 +337,7 @@ Reglas de lectura:
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
 
-- Orden recomendado de ejecución a 2026-04-01: `TASK-030` → `TASK-027` → `TASK-028` → `TASK-029` → `TASK-031` → `TASK-025`.
+- Orden recomendado de ejecución a 2026-04-01: `TASK-030` → `TASK-027` → `TASK-028` → `TASK-029` ✅ → `TASK-031` → `TASK-025`.
 - Criterio: primero cerrar la taxonomía canónica de vinculación (`contract_type`, `payroll_via`, elegibilidad), luego módulos operativos que reutilizan outbox/notificaciones y entregan valor inmediato, después módulos de gestión y finalmente evaluaciones dependientes de goals. `TASK-025` queda al final porque sigue en `deferred`.
 
 ### Prioridad vigente — Staff Aug `TASK-038` y `TASK-041`
@@ -414,7 +414,7 @@ Reglas de lectura:
   - `TASK-223`: instrumenta aceleradores metodológicos internos (`Design System`, `Brand Voice para AI`)
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
-- **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
+- **Later / oportunistas:** `TASK-029` ✅ → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
 - **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-037`, `TASK-039`.
 - Criterio: priorizar guardrails baratos, tareas que desbloquean módulos enteros, hardening sobre foundations ya implementadas y lanes con valor operativo inmediato; postergar briefs históricos, addenda dependientes y apuestas estratégicas de alto costo que todavía no desbloquean runtime cercano.
 
