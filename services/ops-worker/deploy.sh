@@ -268,32 +268,39 @@ gcloud run services add-iam-policy-binding "${SERVICE_NAME}" \
   --quiet
 
 # ─── Health Check ────────────────────────────────────────────────────────────
+# In CI (GitHub Actions), skip the proxy-based health check. The proxy requires
+# an interactive gcloud component install and spawns a background process that
+# blocks the shell from exiting, causing the workflow step to hang until timeout.
+# The workflow has its own "Verify deployment health" step that handles this.
 
-echo "=== Running health check ==="
+if [ -n "${GITHUB_ACTIONS:-}" ]; then
+  echo "=== Skipping health check (CI mode — workflow handles this separately) ==="
+else
+  echo "=== Running health check ==="
 
-# Use gcloud proxy to reach the authenticated service without impersonation
-HEALTH_PORT=19092
-gcloud run services proxy "${SERVICE_NAME}" \
-  --project="${PROJECT_ID}" \
-  --region="${REGION}" \
-  --port="${HEALTH_PORT}" &
-PROXY_PID=$!
+  HEALTH_PORT=19092
+  gcloud run services proxy "${SERVICE_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --port="${HEALTH_PORT}" &
+  PROXY_PID=$!
 
-HEALTH_OK=false
-for i in 1 2 3 4 5; do
-  sleep 3
-  if curl -sf "http://localhost:${HEALTH_PORT}/health" | python3 -m json.tool 2>/dev/null; then
-    HEALTH_OK=true
-    break
+  HEALTH_OK=false
+  for i in 1 2 3 4 5; do
+    sleep 3
+    if curl -sf "http://localhost:${HEALTH_PORT}/health" | python3 -m json.tool 2>/dev/null; then
+      HEALTH_OK=true
+      break
+    fi
+    echo "  health check attempt ${i}/5 — retrying..."
+  done
+
+  kill "${PROXY_PID}" 2>/dev/null || true
+  wait "${PROXY_PID}" 2>/dev/null || true
+
+  if [ "${HEALTH_OK}" = "false" ]; then
+    echo "WARN: health check failed after 5 attempts — service may need manual verification"
   fi
-  echo "  health check attempt ${i}/5 — retrying..."
-done
-
-kill "${PROXY_PID}" 2>/dev/null || true
-wait "${PROXY_PID}" 2>/dev/null || true
-
-if [ "${HEALTH_OK}" = "false" ]; then
-  echo "WARN: health check failed after 5 attempts — service may need manual verification"
 fi
 
 # ─── Cloud Scheduler Jobs ────────────────────────────────────────────────────
