@@ -2329,6 +2329,74 @@ export interface GreenhouseFinanceSuppliers {
   website_url: string | null;
 }
 
+export interface GreenhouseHrEvalAssignments {
+  assignment_id: string;
+  created_at: Generated<Timestamp>;
+  eval_cycle_id: string;
+  eval_type: string;
+  evaluatee_id: string;
+  evaluator_id: string;
+  status: Generated<string>;
+  submitted_at: Timestamp | null;
+}
+
+export interface GreenhouseHrEvalCompetencies {
+  active: Generated<boolean>;
+  applicable_levels: Generated<string[] | null>;
+  category: string;
+  competency_id: string;
+  competency_name: string;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  sort_order: Generated<number>;
+}
+
+export interface GreenhouseHrEvalCycles {
+  competency_ids: Generated<string[] | null>;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  cycle_name: string;
+  cycle_type: string;
+  end_date: Timestamp;
+  eval_cycle_id: string;
+  manager_deadline: Timestamp | null;
+  min_tenure_days: Generated<number>;
+  peer_eval_deadline: Timestamp | null;
+  self_eval_deadline: Timestamp | null;
+  start_date: Timestamp;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrEvalResponses {
+  assignment_id: string;
+  comments: string | null;
+  competency_id: string;
+  created_at: Generated<Timestamp>;
+  rating: number;
+  response_id: string;
+}
+
+export interface GreenhouseHrEvalSummaries {
+  created_at: Generated<Timestamp>;
+  development_areas: string | null;
+  eval_cycle_id: string;
+  finalized_at: Timestamp | null;
+  finalized_by: string | null;
+  goal_completion_pct: Numeric | null;
+  hr_notes: string | null;
+  ico_otd_percent: Numeric | null;
+  ico_rpa_avg: Numeric | null;
+  manager_rating: Numeric | null;
+  member_id: string;
+  overall_rating: Numeric | null;
+  peer_rating: Numeric | null;
+  self_rating: Numeric | null;
+  strengths: string | null;
+  summary_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHrGoalCycles {
   created_at: Generated<Timestamp>;
   created_by: string;
@@ -4443,6 +4511,11 @@ export interface DB {
   "greenhouse_finance.shareholder_account_movements": GreenhouseFinanceShareholderAccountMovements;
   "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
+  "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
+  "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
+  "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;
+  "greenhouse_hr.eval_responses": GreenhouseHrEvalResponses;
+  "greenhouse_hr.eval_summaries": GreenhouseHrEvalSummaries;
   "greenhouse_hr.goal_cycles": GreenhouseHrGoalCycles;
   "greenhouse_hr.goal_key_results": GreenhouseHrGoalKeyResults;
   "greenhouse_hr.goal_progress": GreenhouseHrGoalProgress;
