@@ -465,6 +465,35 @@ Operaciones administrativas:
   - exige `reason`, `effective_date`, actor y timestamp
   - puede revertirse mediante un ajuste compensatorio con `source_kind = 'manual_adjustment_reversal'`
 
+Contrato de actividad administrativa:
+
+- el detalle operativo de `/hr/leave` compone una sola lectura administrativa a partir de dos fuentes distintas:
+  - `leave_requests` con `source_kind = 'admin_backfill'`
+  - `leave_balance_adjustments`
+- ambos carriles deben verse juntos para auditoria operativa, pero no mezclarse semantica ni contablemente
+- `admin_backfill` significa "periodo real ya tomado" y por eso incrementa `used_days`
+- `leave_balance_adjustments` significa "correccion de saldo" y por eso proyecta sobre `adjustment_days`
+- regla de producto: el estado vacio de ajustes no puede ocultar que existieron backfills; la UI debe distinguir ambos dentro de una misma seccion administrativa
+
+Contrato de identidad visible:
+
+- las lecturas de solicitudes y saldos deben exponer la misma identidad visible del colaborador
+- contratos minimos:
+  - `HrLeaveRequest.memberAvatarUrl`
+  - `HrLeaveBalance.memberAvatarUrl`
+- PostgreSQL debe priorizar `greenhouse_serving.person_360` para `resolved_display_name`, `resolved_email`, `resolved_avatar_url` y `user_id`
+- si Person 360 no resuelve avatar, el fallback canónico es `greenhouse_core.members.avatar_url`
+- cuando el avatar origen viene en formato `gs://`, la traduccion a URL consumible por UI debe centralizarse en `src/lib/person-360/resolve-avatar.ts`
+- el `user_id` necesario para resolver `/api/media/users/<userId>/avatar` puede venir desde `person_360.user_id` o desde el ultimo `greenhouse_core.client_users` activo para ese `member_id`
+- cualquier fallback legacy (incluido BigQuery) debe emitir el mismo contrato final para evitar divergencia visual entre requests y balances
+
+Regla de surface operativa:
+
+- `/my/leave` mantiene la vista personal de saldos e historial
+- `/hr/leave` agrega una vista separada de saldos del equipo; no reemplaza la vista personal
+- el detalle administrativo del equipo debe priorizar layout responsive por tarjetas o bloques metricos por tipo de permiso
+- una tabla ancha con scroll horizontal no es el patron primario permitido para esta inspeccion operativa
+
 Carry-over y progresivos:
 
 - `carry-over` se limita por `maxCarryOverDays`

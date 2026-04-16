@@ -1,9 +1,9 @@
 # Sistema de Permisos y Licencias
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-06 por Claude (TASK-271)
-> **Ultima actualizacion:** 2026-04-16 por Codex (TASK-415)
+> **Ultima actualizacion:** 2026-04-16 por Codex (TASK-415, identidad y actividad administrativa)
 > **Documentacion tecnica:** docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
 ## Que es
@@ -18,6 +18,14 @@ El sistema de permisos y licencias permite a los colaboradores solicitar dias li
 | `/hr/leave` | Supervisor / HR | Solicitudes del equipo, saldos, calendario del equipo y operaciones administrativas |
 
 Ambas vistas usan el mismo motor de calculo. No hay formulas distintas entre lo que ve el colaborador y lo que ve HR.
+
+En la vista del equipo, Greenhouse intenta mostrar la identidad visible completa de cada colaborador:
+
+- nombre visible resuelto
+- avatar del perfil cuando existe
+- iniciales como fallback cuando no hay avatar disponible
+
+Esto evita que la lectura operativa dependa de identificadores tecnicos o listados anonimos.
 
 ## Operaciones administrativas
 
@@ -48,6 +56,22 @@ Este flujo:
 - permite revertir el ajuste si fue cargado por error
 
 Ejemplo: arrastre heredado, correccion de onboarding o regularizacion historica.
+
+### Actividad administrativa del colaborador
+
+Cuando HR entra al detalle de una persona en `/hr/leave`, Greenhouse agrupa la trazabilidad operativa en una seccion de **Actividad administrativa**.
+
+Esa seccion separa dos cosas distintas:
+
+- **Dias ya tomados registrados**: periodos reales que la persona ya uso y que HR cargo despues
+- **Ajustes de saldo**: correcciones manuales al saldo, positivas o negativas
+
+La diferencia importa:
+
+- un registro de dias ya tomados afecta el historial del permiso y los dias usados
+- un ajuste de saldo corrige la contabilidad del saldo, pero no inventa fechas de ausencia
+
+Por eso puede pasar que una persona tenga actividad administrativa visible aun cuando no tenga ajustes manuales en su saldo.
 
 ## Tipos de permiso disponibles
 
@@ -160,6 +184,8 @@ En `HR > Permisos`, el detalle administrativo separa el saldo en columnas distin
 - **Saldo actual**: resultado visible despues de sumar base, progresivos, arrastre y ajustes, y restar usados y reservados
 
 Esto evita interpretar mal casos como vacaciones Chile del primer ciclo laboral, donde una persona puede tener un **base / acumulado** parcial y aun asi un **saldo actual** mayor porque trae arrastre del periodo anterior.
+
+En la vista del equipo, ese detalle ya no depende de una tabla horizontal gigante. Greenhouse muestra cada tipo de permiso como un bloque administrativo mas legible, para que RRHH pueda revisar saldos, actividad y acciones sin perder contexto en pantallas medianas o pequenas.
 
 ## Politica de vacaciones
 
