@@ -4,9 +4,12 @@ import { NextResponse } from 'next/server'
 
 import type { Query } from '@google-cloud/bigquery'
 
+import type { EntitlementAction, EntitlementScope, EntitlementCapabilityKey } from '@/config/entitlements-catalog'
+
 import type { ContractType } from '@/types/hr-contracts'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import { can } from '@/lib/entitlements/runtime'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { hasRoleCode, requireTenantContext } from '@/lib/tenant/authorization'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
@@ -208,6 +211,22 @@ export const maskSensitiveValue = (value: string | null, visibleDigits = 4) => {
 }
 
 export const isHrAdminTenant = (tenant: TenantContext) => tenant.routeGroups.includes('hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
+export const assertHrEntitlement = ({
+  tenant,
+  capability,
+  action,
+  scope
+}: {
+  tenant: TenantContext
+  capability: EntitlementCapabilityKey
+  action: EntitlementAction
+  scope?: EntitlementScope
+}) => {
+  if (!can(tenant, capability, action, scope)) {
+    throw new HrCoreValidationError('Forbidden', 403)
+  }
+}
 
 export const requireHrCoreReadTenantContext = async () => {
   const { tenant, unauthorizedResponse } = await requireTenantContext()

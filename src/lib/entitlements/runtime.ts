@@ -153,7 +153,43 @@ export const getTenantEntitlements = (subject: TenantEntitlementSubject): Tenant
       capability: 'hr.leave',
       action: 'read',
       scope: 'tenant',
+        source: hasRouteGroup(subject, 'hr') ? 'route_group' : 'authorized_view'
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.leave_balance',
+      action: 'read',
+      scope: 'tenant',
       source: hasRouteGroup(subject, 'hr') ? 'route_group' : 'authorized_view'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'hr') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.leave_backfill',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.leave_adjustment',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.leave_adjustment',
+      action: 'update',
+      scope: 'tenant',
+      source
     })
   }
 

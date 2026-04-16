@@ -42,6 +42,32 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.16
+
+**Canal:** Beta
+**Fecha:** 2026-04-16
+**Disponible para:** internal
+**Módulos:** HR / Permisos
+
+### Novedades
+
+- `Permisos` ahora permite a HR registrar vacaciones o ausencias ya tomadas cuando el periodo real no fue cargado antes en Greenhouse.
+- `Permisos` ahora incorpora ajustes manuales auditables de saldo para corregir arrastres o regularizaciones históricas.
+
+### Mejoras
+
+- `HR > Permisos` ahora hace más visible el saldo del equipo y el contexto de política con que se interpreta cada balance.
+- Las correcciones administrativas distinguen mejor entre un periodo real ya tomado y un ajuste contable de saldo.
+
+### Correcciones
+
+- Los cambios administrativos de vacaciones ya no quedan resumidos solo como un número agregado sin trazabilidad.
+
+### Notas
+
+- Esta entrega está pensada para operación interna de HR/admin.
+- Cuando existen fechas reales, Greenhouse prioriza registrar el periodo tomado antes que inventar un ajuste manual.
+
 ## 2026.04-beta.15
 
 **Canal:** Beta

@@ -59,6 +59,11 @@ describe('event catalog', () => {
     expect(REACTIVE_EVENT_TYPES).toContain('leave_request.payroll_impact_detected')
   })
 
+  it('includes leave balance adjustment events in the catalog', () => {
+    expect(EVENT_TYPES.leaveBalanceAdjusted).toBe('leave_balance.adjusted')
+    expect(EVENT_TYPES.leaveBalanceAdjustmentReversed).toBe('leave_balance.adjustment_reversed')
+  })
+
   it('includes ICO AI LLM enrichment events in the catalog and reactive trigger list', () => {
     expect(EVENT_TYPES.icoAiLlmEnrichmentsMaterialized).toBe('ico.ai_llm_enrichments.materialized')
     expect(REACTIVE_EVENT_TYPES).toContain('ico.ai_llm_enrichments.materialized')

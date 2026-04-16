@@ -1,5 +1,19 @@
 # Greenhouse Entitlements & Authorization Architecture V1
 
+## Delta 2026-04-16 — TASK-415 extiende el runtime a HR Leave admin operations
+
+- El runtime canónico ahora cubre una primera granularidad útil para operaciones de vacaciones del equipo:
+  - `hr.leave_balance` → lectura de saldo del equipo
+  - `hr.leave_backfill` → creación de backfills retroactivos con fechas reales
+  - `hr.leave_adjustment` → creación y reversión de ajustes manuales de saldo
+- La intención arquitectónica no es reemplazar el bridge broad/supervisor existente, sino dejar capabilities explícitas para:
+  - distinguir lectura de saldo vs aprobación de solicitudes
+  - separar backfill retroactivo de ajuste manual
+  - permitir que surfaces como `/hr/leave` expongan acciones operativas sin volver a checks ad hoc
+- En esta fase la asignación sigue derivando desde `routeGroups` y `authorizedViews`, especialmente para HR broad access.
+- Implicación operativa:
+  - `TASK-404` y cualquier Admin Center de permisos deben reutilizar estas capabilities en vez de reintroducir permisos específicos solo en UI.
+
 ## Delta 2026-04-15 — TASK-403 materializa el primer runtime canónico y lo conecta a Home/Nexa
 
 - Ya existe una foundation runtime code-versioned para entitlements sin migración de schema:

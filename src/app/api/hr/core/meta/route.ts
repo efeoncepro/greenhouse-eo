@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { can } from '@/lib/entitlements/runtime'
 import { getHrCoreMetadata, resolveCurrentHrMemberId } from '@/lib/hr-core/service'
 import { isHrAdminTenant, requireHrCoreReadTenantContext, toHrCoreErrorResponse } from '@/lib/hr-core/shared'
 
@@ -19,7 +20,10 @@ export async function GET() {
     return NextResponse.json({
       ...payload,
       currentMemberId,
-      hasHrAdminAccess: isHrAdminTenant(tenant)
+      hasHrAdminAccess: isHrAdminTenant(tenant),
+      canManageLeaveBackfills: can(tenant, 'hr.leave_backfill', 'create', 'tenant'),
+      canManageLeaveAdjustments: can(tenant, 'hr.leave_adjustment', 'create', 'tenant'),
+      canReverseLeaveAdjustments: can(tenant, 'hr.leave_adjustment', 'update', 'tenant')
     })
   } catch (error) {
     return toHrCoreErrorResponse(error, 'Unable to load HR Core metadata.')

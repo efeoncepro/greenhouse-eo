@@ -75,6 +75,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    key: 'hr.leave_balance',
+    module: 'hr',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'hr.leave_backfill',
+    module: 'hr',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'hr.leave_adjustment',
+    module: 'hr',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'hr.org_chart',
     module: 'hr',
     actions: ['read'] as const,

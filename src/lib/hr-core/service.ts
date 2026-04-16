@@ -8,6 +8,10 @@ import type {
   HrAttendanceRecord,
   HrAttendanceResponse,
   HrCoreMetadata,
+  HrLeaveBackfillInput,
+  HrLeaveBalanceAdjustmentInput,
+  HrLeaveBalanceAdjustmentReverseInput,
+  HrLeaveBalanceAdjustmentsResponse,
   HrLeaveCalendarResponse,
   HrDepartmentsResponse,
   HrLeaveBalance,
@@ -27,13 +31,17 @@ import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 import { assertHrCoreInfrastructureReady } from '@/lib/hr-core/schema'
 import {
+  createLeaveBackfillInPostgres,
+  createLeaveBalanceAdjustmentInPostgres,
   createLeaveRequestInPostgres,
   getHrCoreMetadataFromPostgres,
   getLeaveRequestByIdFromPostgres,
   isHrCoreLeavePostgresEnabled,
+  listLeaveBalanceAdjustmentsFromPostgres,
   listLeaveCalendarFromPostgres,
   listLeaveBalancesFromPostgres,
   listLeaveRequestsFromPostgres,
+  reverseLeaveBalanceAdjustmentInPostgres,
   reviewLeaveRequestInPostgres
 } from '@/lib/hr-core/postgres-leave-store'
 import { canPerformLeaveReviewAction, getLeaveApprovalStageCode } from '@/lib/hr-core/leave-review-policy'
@@ -1598,7 +1606,7 @@ export const createLeaveRequest = async ({
           notes: normalizeNullableString(input.notes),
           createdAt: null
         },
-        reservedDelta: requestedDays,
+        reservedDelta: 1,
         usedDelta: 0,
         actorUserId
       })
@@ -1694,7 +1702,7 @@ export const reviewLeaveRequest = async ({
       if (request.requestedDays > 0) {
         await adjustBalanceForRequest({
           request,
-          reservedDelta: -request.requestedDays,
+          reservedDelta: -1,
           usedDelta: 0,
           actorUserId
         })
@@ -1722,7 +1730,7 @@ export const reviewLeaveRequest = async ({
       if (action === 'reject' && request.requestedDays > 0) {
         await adjustBalanceForRequest({
           request,
-          reservedDelta: -request.requestedDays,
+          reservedDelta: -1,
           usedDelta: 0,
           actorUserId
         })
@@ -1752,8 +1760,8 @@ export const reviewLeaveRequest = async ({
       if (request.requestedDays > 0) {
         await adjustBalanceForRequest({
           request,
-          reservedDelta: -request.requestedDays,
-          usedDelta: action === 'approve' ? request.requestedDays : 0,
+          reservedDelta: -1,
+          usedDelta: action === 'approve' ? 1 : 0,
           actorUserId
         })
       }
@@ -1806,6 +1814,77 @@ export const reviewLeaveRequest = async ({
     operation: 'reviewLeaveRequest',
     postgres: () => reviewLeaveRequestInPostgres({ tenant, requestId, input, actorUserId }),
     fallback
+  })
+}
+
+export const createLeaveBackfill = async ({
+  tenant,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  input: HrLeaveBackfillInput
+  actorUserId: string
+}) => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    throw new HrCoreValidationError('Leave backfills require the PostgreSQL HR leave runtime.', 503)
+  }
+
+  return createLeaveBackfillInPostgres({ tenant, input, actorUserId })
+}
+
+export const listLeaveBalanceAdjustments = async ({
+  tenant,
+  memberId,
+  year
+}: {
+  tenant: TenantContext
+  memberId?: string | null
+  year?: number | null
+}): Promise<HrLeaveBalanceAdjustmentsResponse> => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    throw new HrCoreValidationError('Leave adjustments require the PostgreSQL HR leave runtime.', 503)
+  }
+
+  return listLeaveBalanceAdjustmentsFromPostgres({ tenant, memberId, year })
+}
+
+export const createLeaveBalanceAdjustment = async ({
+  tenant,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  input: HrLeaveBalanceAdjustmentInput
+  actorUserId: string
+}) => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    throw new HrCoreValidationError('Leave adjustments require the PostgreSQL HR leave runtime.', 503)
+  }
+
+  return createLeaveBalanceAdjustmentInPostgres({ tenant, input, actorUserId })
+}
+
+export const reverseLeaveBalanceAdjustment = async ({
+  tenant,
+  adjustmentId,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  adjustmentId: string
+  input: HrLeaveBalanceAdjustmentReverseInput
+  actorUserId: string
+}) => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    throw new HrCoreValidationError('Leave adjustments require the PostgreSQL HR leave runtime.', 503)
+  }
+
+  return reverseLeaveBalanceAdjustmentInPostgres({
+    tenant,
+    adjustmentId,
+    input,
+    actorUserId
   })
 }
 
