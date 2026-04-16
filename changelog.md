@@ -2,6 +2,24 @@
 
 ## 2026-04-15
 
+### 2026-04-15 — TASK-403: Entitlements runtime foundation conectada a Pulse y Nexa
+
+- Se agregó la primera foundation runtime de entitlements en código:
+  - `src/config/entitlements-catalog.ts`
+  - `src/lib/entitlements/types.ts`
+  - `src/lib/entitlements/runtime.ts`
+  - `src/lib/home/build-home-entitlements-context.ts`
+- La derivación sigue siendo backward-compatible con el modelo actual:
+  - usa `roleCodes`, `routeGroups` y `authorizedViews`
+  - mantiene `authorizedViews` como proyección fina para surfaces existentes
+  - conserva `resolvePortalHomePolicy()` como contrato separado de startup
+- `GET /api/home/snapshot` y `POST /api/home/nexa` ahora comparten el mismo bridge de acceso, incluyendo:
+  - `recommendedShortcuts`
+  - `accessContext`
+  - `canSeeFinanceStatus`
+- Pulse incorpora una surface visible mínima para este bridge con shortcuts recomendados y contexto de acceso, sin reemplazar todavía el catálogo capability-based existente.
+- Se agregaron tests unitarios para perfiles base (`superadmin`, `hr`, `finance`, `collaborator`, `client`) y para el bridge Home capability-aware.
+
 ### 2026-04-15 — TASK-156: foundation runtime para SLA/SLO contractual por servicio
 
 - Se creó la migración `20260415233952871_task-156-service-sla-foundation.sql` con dos piezas nuevas:

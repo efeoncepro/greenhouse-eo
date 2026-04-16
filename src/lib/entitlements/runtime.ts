@@ -1,0 +1,344 @@
+import { ENTITLEMENT_CAPABILITY_MAP, type EntitlementAction, type EntitlementCapabilityKey, type EntitlementScope, type GreenhouseEntitlementModule } from '@/config/entitlements-catalog'
+import { ROLE_CODES } from '@/config/role-codes'
+import type { TenantEntitlement, TenantEntitlementSource, TenantEntitlements, TenantEntitlementSubject, HomeAudienceKey } from '@/lib/entitlements/types'
+import { resolvePortalHomePolicy } from '@/lib/tenant/resolve-portal-home-path'
+
+const UNIQUE_SEPARATOR = '::'
+
+const hasRole = (subject: TenantEntitlementSubject, roleCode: string) => subject.roleCodes.includes(roleCode)
+const hasRouteGroup = (subject: TenantEntitlementSubject, routeGroup: string) => subject.routeGroups.includes(routeGroup)
+const hasAuthorizedView = (subject: TenantEntitlementSubject, viewCode: string) => subject.authorizedViews.includes(viewCode)
+
+const addEntitlement = (
+  registry: Map<string, TenantEntitlement>,
+  entitlement: TenantEntitlement
+) => {
+  const key = [entitlement.capability, entitlement.action, entitlement.scope].join(UNIQUE_SEPARATOR)
+
+  if (!registry.has(key)) {
+    registry.set(key, entitlement)
+  }
+}
+
+const inferAudience = (subject: TenantEntitlementSubject): HomeAudienceKey => {
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRouteGroup(subject, 'admin')) {
+    return 'admin'
+  }
+
+  if (subject.tenantType === 'client' || hasRouteGroup(subject, 'client')) {
+    return 'client'
+  }
+
+  const isPureFinance =
+    hasRouteGroup(subject, 'finance') &&
+    !hasRouteGroup(subject, 'hr') &&
+    !hasRouteGroup(subject, 'internal') &&
+    !hasRouteGroup(subject, 'my')
+
+  if (isPureFinance) {
+    return 'finance'
+  }
+
+  const isPureHr =
+    hasRouteGroup(subject, 'hr') &&
+    !hasRouteGroup(subject, 'finance') &&
+    !hasRouteGroup(subject, 'internal') &&
+    !hasRouteGroup(subject, 'my')
+
+  if (isPureHr) {
+    return 'hr'
+  }
+
+  const isPureCollaborator =
+    hasRole(subject, ROLE_CODES.COLLABORATOR) &&
+    !hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) &&
+    !hasRouteGroup(subject, 'hr') &&
+    !hasRouteGroup(subject, 'finance') &&
+    !hasRouteGroup(subject, 'internal') &&
+    hasRouteGroup(subject, 'my')
+
+  if (isPureCollaborator) {
+    return 'collaborator'
+  }
+
+  return 'internal'
+}
+
+export const getTenantEntitlements = (subject: TenantEntitlementSubject): TenantEntitlements => {
+  const entries = new Map<string, TenantEntitlement>()
+
+  addEntitlement(entries, {
+    module: 'home',
+    capability: 'home.view',
+    action: 'read',
+    scope: 'own',
+    source: 'policy'
+  })
+
+  addEntitlement(entries, {
+    module: 'home',
+    capability: 'home.nexa',
+    action: 'read',
+    scope: 'own',
+    source: 'policy'
+  })
+
+  addEntitlement(entries, {
+    module: 'home',
+    capability: 'home.shortcuts',
+    action: 'read',
+    scope: 'own',
+    source: 'policy'
+  })
+
+  if (hasRouteGroup(subject, 'internal') || hasRouteGroup(subject, 'admin')) {
+    addEntitlement(entries, {
+      module: 'agency',
+      capability: 'agency.workspace',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
+    })
+
+    addEntitlement(entries, {
+      module: 'agency',
+      capability: 'agency.workspace',
+      action: 'launch',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'people') ? 'route_group' : 'authorized_view'
+
+    addEntitlement(entries, {
+      module: 'people',
+      capability: 'people.directory',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'people',
+      capability: 'people.directory',
+      action: 'launch',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRouteGroup(subject, 'hr')) {
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.workspace',
+      action: 'read',
+      scope: 'tenant',
+      source: 'route_group'
+    })
+
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.workspace',
+      action: 'launch',
+      scope: 'tenant',
+      source: 'route_group'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.permisos')) {
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.leave',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'hr') ? 'route_group' : 'authorized_view'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.organigrama')) {
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'hr.org_chart',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'hr') ? 'route_group' : 'authorized_view'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'finance') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.workspace',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.workspace',
+      action: 'launch',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.status',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'admin') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'admin',
+      capability: 'admin.workspace',
+      action: 'read',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'admin',
+      capability: 'admin.workspace',
+      action: 'launch',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'admin',
+      capability: 'admin.workspace',
+      action: 'manage',
+      scope: 'all',
+      source: 'role'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'client')) {
+    addEntitlement(entries, {
+      module: 'client_portal',
+      capability: 'client_portal.workspace',
+      action: 'read',
+      scope: 'space',
+      source: 'route_group'
+    })
+
+    addEntitlement(entries, {
+      module: 'client_portal',
+      capability: 'client_portal.workspace',
+      action: 'launch',
+      scope: 'space',
+      source: 'route_group'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'my')) {
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'my_workspace.workspace',
+      action: 'read',
+      scope: 'own',
+      source: 'route_group'
+    })
+
+    addEntitlement(entries, {
+      module: 'my_workspace',
+      capability: 'my_workspace.workspace',
+      action: 'launch',
+      scope: 'own',
+      source: 'route_group'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'ai_tooling')) {
+    addEntitlement(entries, {
+      module: 'ai_tooling',
+      capability: 'ai_tooling.workspace',
+      action: 'read',
+      scope: 'tenant',
+      source: 'route_group'
+    })
+
+    addEntitlement(entries, {
+      module: 'ai_tooling',
+      capability: 'ai_tooling.workspace',
+      action: 'launch',
+      scope: 'tenant',
+      source: 'route_group'
+    })
+  }
+
+  const resolvedEntries = Array.from(entries.values())
+  const moduleKeys = Array.from(new Set(resolvedEntries.map(entry => entry.module)))
+
+  const startupPolicyKey = resolvePortalHomePolicy({
+    tenantType: subject.tenantType,
+    roleCodes: subject.roleCodes,
+    routeGroups: subject.routeGroups
+  }).key
+
+  return {
+    audienceKey: inferAudience(subject),
+    startupPolicyKey,
+    moduleKeys,
+    entries: resolvedEntries
+  }
+}
+
+const resolveEntitlements = (input: TenantEntitlements | TenantEntitlementSubject) =>
+  'entries' in input ? input : getTenantEntitlements(input)
+
+const scopeMatches = (candidate: EntitlementScope, requested?: EntitlementScope) => {
+  if (!requested) {
+    return true
+  }
+
+  if (candidate === requested) {
+    return true
+  }
+
+  return candidate === 'all'
+}
+
+export const hasEntitlement = (
+  input: TenantEntitlements | TenantEntitlementSubject,
+  capability: EntitlementCapabilityKey,
+  action: EntitlementAction,
+  scope?: EntitlementScope
+) => {
+  const entitlements = resolveEntitlements(input)
+
+  return entitlements.entries.some(entry =>
+    entry.capability === capability &&
+    entry.action === action &&
+    scopeMatches(entry.scope, scope)
+  )
+}
+
+export const can = hasEntitlement
+
+export const canSeeModule = (
+  input: TenantEntitlements | TenantEntitlementSubject,
+  module: GreenhouseEntitlementModule
+) => {
+  const entitlements = resolveEntitlements(input)
+
+  return entitlements.moduleKeys.includes(module)
+}
+
+export const getCapabilityModuleForEntitlement = (capability: EntitlementCapabilityKey) =>
+  ENTITLEMENT_CAPABILITY_MAP[capability].module

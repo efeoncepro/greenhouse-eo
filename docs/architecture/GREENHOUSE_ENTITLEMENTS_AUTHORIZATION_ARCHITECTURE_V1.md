@@ -1,5 +1,27 @@
 # Greenhouse Entitlements & Authorization Architecture V1
 
+## Delta 2026-04-15 — TASK-403 materializa el primer runtime canónico y lo conecta a Home/Nexa
+
+- Ya existe una foundation runtime code-versioned para entitlements sin migración de schema:
+  - `src/config/entitlements-catalog.ts`
+  - `src/lib/entitlements/types.ts`
+  - `src/lib/entitlements/runtime.ts`
+  - `src/lib/home/build-home-entitlements-context.ts`
+- El bridge actual convive con el runtime existente:
+  - deriva entitlements desde `roleCodes`, `routeGroups` y `authorizedViews`
+  - mantiene `authorizedViews` como proyección útil para surfaces finas de HR/People
+  - mantiene `resolvePortalHomePolicy()` como contrato separado de startup policy
+- Consumers reales ya conectados:
+  - `getHomeSnapshot()` y `GET /api/home/snapshot`
+  - `POST /api/home/nexa`
+  - Pulse ahora recibe `recommendedShortcuts` y `accessContext` desde el mismo runtime que usa Nexa
+- La primera surface visible no reemplaza `CAPABILITY_REGISTRY`; ambas capas conviven:
+  - capability modules siguen resolviéndose desde `businessLines + serviceModules`
+  - entitlements gobiernan shortcuts, audience y señal de acceso cross-module
+- Implicación operativa:
+  - `TASK-402` ya puede construir la Home adaptativa sobre un helper canónico en vez de checks ad hoc
+  - `TASK-404` debe tomar esta layer como base y no redefinir la semántica runtime en Admin
+
 ## Delta 2026-04-13 — Se formaliza una capa de entitlements modular, action-based y scope-aware
 
 - Greenhouse ya no debe pensar autorización solo como:

@@ -19,6 +19,7 @@ import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/uti
 import NexaHero from './components/NexaHero'
 import NexaThread from './components/NexaThread'
 import NexaThreadSidebar from './components/NexaThreadSidebar'
+import RecommendedShortcuts from './components/RecommendedShortcuts'
 import QuickAccess from './components/QuickAccess'
 import OperationStatus, { type StatusItem } from './components/OperationStatus'
 
@@ -226,6 +227,12 @@ const HomeContent = ({
             <NexaHero greeting={snapshot.greeting.title} selectedModel={selectedModel} onModelChange={onModelChange} />
             <Box sx={{ maxWidth: 720, mx: 'auto', px: 3, mt: 4, pb: 6 }}>
               <Grid container spacing={4}>
+                <Grid size={{ xs: 12 }}>
+                  <RecommendedShortcuts
+                    shortcuts={snapshot.recommendedShortcuts ?? []}
+                    accessContext={snapshot.accessContext}
+                  />
+                </Grid>
                 <Grid size={{ xs: 12, md: 7 }}>
                   <QuickAccess modules={snapshot.modules} />
                 </Grid>

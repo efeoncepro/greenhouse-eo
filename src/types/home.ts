@@ -1,3 +1,6 @@
+import type { GreenhouseEntitlementModule } from '@/config/entitlements-catalog'
+import type { PortalHomePolicyKey } from '@/lib/tenant/resolve-portal-home-path'
+
 export interface ModuleCard {
   id: string
   title: string
@@ -6,6 +9,20 @@ export interface ModuleCard {
   route: string
   color: 'primary' | 'secondary' | 'success' | 'warning' | 'info' | 'error'
   isNew?: boolean
+}
+
+export interface HomeRecommendedShortcut {
+  id: string
+  label: string
+  route: string
+  icon: string
+  module: GreenhouseEntitlementModule
+}
+
+export interface HomeAccessContext {
+  audienceKey: 'admin' | 'internal' | 'hr' | 'finance' | 'collaborator' | 'client'
+  startupPolicyKey: PortalHomePolicyKey
+  moduleKeys: GreenhouseEntitlementModule[]
 }
 
 export interface PendingTask {
@@ -39,6 +56,8 @@ export interface HomeSnapshot {
   }
   modules: ModuleCard[]
   tasks: PendingTask[]
+  recommendedShortcuts?: HomeRecommendedShortcut[]
+  accessContext?: HomeAccessContext | null
   financeStatus?: {
     periodLabel: string
     closureStatus: string | null

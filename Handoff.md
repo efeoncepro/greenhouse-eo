@@ -1,5 +1,43 @@
 # Handoff.md
 
+## Sesion 2026-04-15 — TASK-403 entitlements runtime bridge para Pulse/Nexa
+
+- **Estado:** `implementado localmente`, `validado con lint + tests dirigidos + build`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/config/entitlements-catalog.ts`
+    - catálogo mínimo de módulos, capabilities, actions y scopes para la primera layer runtime
+  - `src/lib/entitlements/types.ts`
+  - `src/lib/entitlements/runtime.ts`
+    - helpers `getTenantEntitlements()`, `can()`, `canSeeModule()`
+    - derivación backward-compatible desde `roleCodes`, `routeGroups` y `authorizedViews`
+  - `src/lib/home/build-home-entitlements-context.ts`
+    - bridge compartido para Home/Nexa con `recommendedShortcuts`, `accessContext` y `canSeeFinanceStatus`
+  - `src/lib/home/get-home-snapshot.ts`
+  - `src/app/api/home/snapshot/route.ts`
+  - `src/app/api/home/nexa/route.ts`
+    - ambos consumers ya usan el mismo runtime bridge
+  - `src/views/greenhouse/home/components/RecommendedShortcuts.tsx`
+  - `src/views/greenhouse/home/HomeView.tsx`
+    - Pulse ahora expone shortcuts y contexto de acceso visible
+  - tests nuevos:
+    - `src/lib/entitlements/runtime.test.ts`
+    - `src/lib/home/build-home-entitlements-context.test.ts`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/entitlements/runtime.test.ts src/lib/home/build-home-entitlements-context.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - guardrail `new Pool()` confirmado solo en `src/lib/postgres/client.ts`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Notas operativas:**
+  - no hubo migraciones DB en este corte
+  - `CAPABILITY_REGISTRY` sigue vivo para módulos capability-based; la layer de entitlements no lo reemplaza, lo complementa
+  - follow-on natural: `TASK-402` para la Home adaptativa completa y `TASK-404` para gobernanza admin de entitlements
+
 ## Sesion 2026-04-15 — ISSUE-049 leave review fix local + ISSUE-050 staging email drift identificada
 
 - **Estado:** `fix local aplicado para review`, `issue separado abierto para email staging`

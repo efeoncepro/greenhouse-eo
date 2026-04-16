@@ -8,12 +8,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -92,8 +92,12 @@ Reglas obligatorias:
 - `src/lib/auth.ts`
 - `src/lib/tenant/role-route-mapping.ts`
 - `src/config/role-codes.ts`
+- `src/config/capability-registry.ts`
+- `src/lib/capabilities/resolve-capabilities.ts`
+- `src/lib/capabilities/verify-module-access.ts`
 - `src/lib/home/get-home-snapshot.ts`
 - `src/app/api/home/snapshot/route.ts`
+- `src/app/api/home/nexa/route.ts`
 
 ### Blocks / Impacts
 
@@ -110,10 +114,11 @@ Reglas obligatorias:
 - `src/types/next-auth.d.ts`
 - `src/lib/home/get-home-snapshot.ts`
 - `src/app/api/home/snapshot/route.ts`
-- `src/config/[verificar-entitlements-catalog].ts`
-- `src/lib/[verificar-entitlements-runtime]/*.ts`
+- `src/app/api/home/nexa/route.ts`
+- `src/config/entitlements-catalog.ts`
+- `src/lib/entitlements/*.ts`
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
-- `docs/tasks/to-do/TASK-403-entitlements-runtime-foundation-home-bridge.md`
+- `docs/tasks/in-progress/TASK-403-entitlements-runtime-foundation-home-bridge.md`
 
 ## Current Repo State
 
@@ -122,14 +127,20 @@ Reglas obligatorias:
 - `src/lib/tenant/authorization.ts` ya concentra varios helpers reutilizables (`hasRouteGroup`, `hasRoleCode`, `hasAuthorizedViewCode`, etc.)
 - `src/lib/tenant/get-tenant-context.ts` ya expone el contexto base del usuario autenticado
 - `src/lib/auth.ts` ya serializa `roleCodes`, `routeGroups`, `authorizedViews` y `portalHomePath` al JWT/session
+- `resolvePortalHomePath()` ya centraliza la policy efectiva de landing y normaliza aliases legacy
+- `src/config/capability-registry.ts` + `src/lib/capabilities/resolve-capabilities.ts` ya resuelven módulos visibles desde `businessLines` y `serviceModules`
+- `src/lib/capabilities/verify-module-access.ts` ya ofrece un gate reusable para módulos capability-based
 - `/home` ya existe y consume `src/lib/home/get-home-snapshot.ts` vía `GET /api/home/snapshot`
+- `/api/home/nexa` ya reconstruye parte del mismo contexto de Home (módulos + señal financiera) para Nexa
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` ya formaliza el modelo objetivo
 
 ### Gap
 
 - no existe aún una estructura runtime canónica de `entitlements`
 - no existe un helper `can()` reutilizable para capabilities y actions
-- `/home` y su snapshot todavía no leen una capa de entitlements
+- `/home` y Nexa todavía leen módulos/capacidades desde lógica local, no desde una capa de entitlements reusable
+- Home hoy no consume `authorizedViews` y solo usa `roleCodes` / `routeGroups` para `financeStatus`
+- el contrato actual de Home tiene `tasks` con CTA potenciales, pero `TaskShortlist` no está montado; la primera adopción visible no puede asumir esa superficie como ya activa
 - la autorización fina sigue derivándose con demasiada frecuencia desde `routeGroups` o guards por vista/path
 - no existe un puente explícito entre el modelo actual y el modelo futuro de `module + capability + action + scope`
 
@@ -173,11 +184,11 @@ Reglas obligatorias:
 
 ### Slice 3 — Bridge mínimo hacia `/home`
 
-- conectar `getHomeSnapshot()` y/o `GET /api/home/snapshot` a la nueva capa para que `/home` tenga contexto de modules/capabilities
+- conectar `getHomeSnapshot()`, `GET /api/home/snapshot` y `POST /api/home/nexa` a la nueva capa para que Home y Nexa compartan el mismo bridge runtime
 - habilitar al menos un primer uso visible en Home:
   - módulos disponibles
-  - shortcuts recomendados
-  - CTA priorizados
+  - shortcuts recomendados sobre superficies realmente montadas
+  - CTA priorizados solo si el consumer visible queda efectivamente conectado en esta slice
 - dejar la Home lista para que `TASK-402` construya la composición adaptativa sobre esta base
 
 ### Slice 4 — Tests y documentación de adopción
@@ -225,36 +236,37 @@ Principios de implementación:
 
 3. **Primero Home, luego expansión**
    - `/home` es el mejor primer consumer porque necesita orquestar múltiples superficies
+   - el bridge debe alimentar también a Nexa para no dejar drift inmediato entre snapshot y asistente
 
 4. **Modelar capabilities, no solo vistas**
    - la foundation debe pensar en capacidades funcionales aunque se derive desde estado actual
 
 ## Acceptance Criteria
 
-- [ ] existe una representación runtime mínima de entitlements para el tenant autenticado
-- [ ] existe al menos un helper reutilizable `can()` o equivalente para capabilities/actions
-- [ ] `/home` consume esa capa de entitlements como primer bridge real
-- [ ] la foundation no rompe `roleCodes`, `routeGroups` ni `authorizedViews`
-- [ ] hay tests para la derivación de entitlements en perfiles base
-- [ ] `TASK-402` puede apoyarse explícitamente en esta foundation para la Home universal adaptativa
+- [x] existe una representación runtime mínima de entitlements para el tenant autenticado
+- [x] existe al menos un helper reutilizable `can()` o equivalente para capabilities/actions
+- [x] `/home` consume esa capa de entitlements como primer bridge real
+- [x] la foundation no rompe `roleCodes`, `routeGroups` ni `authorizedViews`
+- [x] hay tests para la derivación de entitlements en perfiles base
+- [x] `TASK-402` puede apoyarse explícitamente en esta foundation para la Home universal adaptativa
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test`
-- login manual con superadmin y validación de `/home`
-- verificación manual de que `/home` recibe contexto suficiente para modular accesos/CTA desde la nueva capa
+- [x] `pnpm lint`
+- [x] `pnpm build`
+- [x] `pnpm vitest run src/lib/entitlements/runtime.test.ts src/lib/home/build-home-entitlements-context.test.ts`
+- [ ] login manual con superadmin y validación de `/home`
+- [ ] verificación manual de que `/home` recibe contexto suficiente para modular accesos/CTA desde la nueva capa
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` quedo reconciliado con la implementación real del bridge
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` quedo reconciliado con la implementación real del bridge
 
 ## Follow-ups
 

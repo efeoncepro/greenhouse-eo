@@ -6,7 +6,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 
 | Vista | Ruta | Estado | Descripción |
 |-------|------|--------|-------------|
-| Pulse | `/home` | Implementada | Home canónica del portal cliente con accesos, contexto operativo y entrada a la experiencia moderna |
+| Pulse | `/home` | Implementada | Home canónica del portal con Nexa, shortcuts recomendados y contexto de acceso derivado del runtime de entitlements |
 | Pulse legacy | `/dashboard` | Compatibilidad | Vista legacy/feature route mantenida para deep links y compatibilidad gobernada |
 | Proyectos | `/proyectos` | Implementada | Lista de proyectos con tasks, RPA, review items |
 | Detalle Proyecto | `/proyectos/[id]` | Implementada | Tasks con assignee, ICO metrics, CSC phase |

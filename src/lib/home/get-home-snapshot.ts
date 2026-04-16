@@ -1,29 +1,30 @@
 import 'server-only'
 
-import { ROLE_CODES } from '@/config/role-codes'
 import { NotificationService } from '@/lib/notifications/notification-service'
-import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
+import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
 import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { HomeSnapshot, ModuleCard, PendingTask } from '@/types/home'
 
 export interface HomeSnapshotInput {
   userId: string
+  clientId?: string
   firstName: string
   lastName: string | null
   roleName: string
+  tenantType: 'client' | 'efeonce_internal'
+  primaryRoleCode: string
   businessLines: string[]
   serviceModules: string[]
-  roleCodes?: string[]
-  routeGroups?: string[]
+  roleCodes: string[]
+  routeGroups: string[]
+  authorizedViews: string[]
+  portalHomePath: string
+  memberId?: string
   organizationId?: string | null
 }
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-
-export const canSeeFinanceStatus = (input: Pick<HomeSnapshotInput, 'roleCodes' | 'routeGroups'>) =>
-  (input.routeGroups || []).includes('finance') ||
-  (input.roleCodes || []).some(code => code === ROLE_CODES.FINANCE_ADMIN || code === ROLE_CODES.EFEONCE_ADMIN || code === ROLE_CODES.EFEONCE_OPERATIONS)
 
 export const getHomeFinanceStatus = async () => {
   const [currentPeriod, latestMargin] = await Promise.all([
@@ -93,10 +94,20 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
   const resolvedGreeting = randomGreeting.replace('{name}', input.firstName)
 
   // 2. Resolve Modules (Capabilities)
-  const resolvedCapabilities = resolveCapabilityModules({
+  const homeEntitlements = buildHomeEntitlementsContext({
+    userId: input.userId,
+    tenantType: input.tenantType,
+    roleCodes: input.roleCodes,
+    primaryRoleCode: input.primaryRoleCode,
+    routeGroups: input.routeGroups,
+    authorizedViews: input.authorizedViews,
     businessLines: input.businessLines,
-    serviceModules: input.serviceModules
+    serviceModules: input.serviceModules,
+    portalHomePath: input.portalHomePath,
+    memberId: input.memberId
   })
+
+  const resolvedCapabilities = homeEntitlements.visibleCapabilityModules
 
   const modules: ModuleCard[] = resolvedCapabilities.map(cap => ({
     id: cap.id,
@@ -104,7 +115,7 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     subtitle: cap.description || '',
     icon: cap.icon,
     route: cap.route,
-    color: 'primary' // Default color for now
+    color: 'primary'
   }))
 
   // 3. Resolve Tasks (Unread Notifications) — graceful fallback if DB unavailable
@@ -132,11 +143,11 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     ctaRoute: n.action_url || undefined
   }))
 
-  const financeStatus = canSeeFinanceStatus(input)
+  const financeStatus = homeEntitlements.canSeeFinanceStatus
     ? await getHomeFinanceStatus()
     : null
 
-  // 4. Nexa Intro (Simple logic for now)
+  // 5. Nexa Intro (Simple logic for now)
   const nexaIntro = `Hola ${input.firstName}, soy Nexa. Tengo acceso al catálogo reactivo de Greenhouse y puedo ayudarte a navegar tu operación. Veo que tienes ${tasks.length} pendientes hoy. ¿Por dónde quieres empezar?`
 
   return {
@@ -151,6 +162,8 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     },
     modules,
     tasks,
+    recommendedShortcuts: homeEntitlements.recommendedShortcuts,
+    accessContext: homeEntitlements.accessContext,
     financeStatus,
     nexaIntro,
     computedAt: now.toISOString()

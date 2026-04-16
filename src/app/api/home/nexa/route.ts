@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 
 import { resolveNexaModel } from '@/config/nexa-models'
 import { getServerAuthSession } from '@/lib/auth'
-import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
-import { canSeeFinanceStatus, getHomeFinanceStatus } from '@/lib/home/get-home-snapshot'
+import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
+import { getHomeFinanceStatus } from '@/lib/home/get-home-snapshot'
 import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
 import { NexaService } from '@/lib/nexa/nexa-service'
 import { persistNexaConversation } from '@/lib/nexa/store'
@@ -40,23 +40,35 @@ export async function POST(req: Request) {
   try {
     const firstName = (user.name || '').split(' ')[0] || 'Usuario'
 
-    const modules = resolveCapabilityModules({
+    const homeEntitlements = buildHomeEntitlementsContext({
+      userId: user.userId,
+      tenantType: user.tenantType,
+      roleCodes: user.roleCodes || [],
+      primaryRoleCode: user.primaryRoleCode,
+      routeGroups: user.routeGroups || [],
+      authorizedViews: user.authorizedViews || [],
       businessLines: user.businessLines || [],
-      serviceModules: user.serviceModules || []
+      serviceModules: user.serviceModules || [],
+      portalHomePath: user.portalHomePath || '/home',
+      memberId: user.memberId
     })
 
-    const financeStatus = canSeeFinanceStatus({
-      roleCodes: user.roleCodes || [],
-      routeGroups: user.routeGroups || []
-    })
-      ? await getHomeFinanceStatus()
-      : null
+    const financeStatus = homeEntitlements.canSeeFinanceStatus ? await getHomeFinanceStatus() : null
 
     const lightContext = {
       user: { firstName, lastName: null, role: user.role || 'user' },
       greeting: { title: '', subtitle: '' },
-      modules: modules.map(m => ({ id: m.id, title: m.label, subtitle: m.description || '', icon: m.icon, route: m.route, color: 'primary' as const })),
+      modules: homeEntitlements.visibleCapabilityModules.map(m => ({
+        id: m.id,
+        title: m.label,
+        subtitle: m.description || '',
+        icon: m.icon,
+        route: m.route,
+        color: 'primary' as const
+      })),
       tasks: [],
+      recommendedShortcuts: homeEntitlements.recommendedShortcuts,
+      accessContext: homeEntitlements.accessContext,
       financeStatus,
       nexaIntro: '',
       computedAt: new Date().toISOString()

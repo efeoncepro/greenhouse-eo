@@ -18,13 +18,19 @@ export async function GET() {
   try {
     const snapshot = await getHomeSnapshot({
       userId: user.userId,
+      clientId: user.clientId,
       firstName: (user.name || '').split(' ')[0] || 'Usuario',
       lastName: (user.name || '').split(' ').slice(1).join(' ') || null,
       roleName: user.role || 'client_executive',
+      tenantType: user.tenantType,
+      primaryRoleCode: user.primaryRoleCode,
       businessLines: user.businessLines || [],
       serviceModules: user.serviceModules || [],
       roleCodes: user.roleCodes || [],
       routeGroups: user.routeGroups || [],
+      authorizedViews: user.authorizedViews || [],
+      portalHomePath: user.portalHomePath || '/home',
+      memberId: user.memberId,
       organizationId: user.organizationId
     })
 

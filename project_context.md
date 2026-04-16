@@ -1,5 +1,20 @@
 # project_context.md
 
+## Delta 2026-04-15 TASK-403 materializa el bridge real entre entitlements y Pulse/Nexa
+
+- Greenhouse ya no depende solo de checks locales para gobernar la Home moderna.
+- Runtime nuevo:
+  - `src/config/entitlements-catalog.ts`
+  - `src/lib/entitlements/types.ts`
+  - `src/lib/entitlements/runtime.ts`
+  - `src/lib/home/build-home-entitlements-context.ts`
+- Contrato operativo:
+  - la primera layer de entitlements es code-versioned y no requiere tablas nuevas
+  - deriva `module + capability + action + scope` desde `roleCodes`, `routeGroups` y `authorizedViews`
+  - `GET /api/home/snapshot` y `POST /api/home/nexa` ya consumen el mismo bridge, evitando drift entre Pulse y Nexa
+  - Pulse ahora recibe `recommendedShortcuts` y `accessContext` como surface mínima visible para audiencias mixtas
+  - `CAPABILITY_REGISTRY` sigue resolviendo módulos capability-based por `businessLines/serviceModules`; no fue reemplazado por este corte
+
 ## Delta 2026-04-15 Service SLA/SLO runtime foundation materialized per service
 
 - `TASK-156` ya no vive solo como intención documental: existe una foundation runtime para gobernar `SLI -> SLO -> SLA` por servicio.
