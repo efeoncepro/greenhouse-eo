@@ -89,6 +89,10 @@ REPO="efeoncepro/greenhouse-eo"
 DEPLOYER_SA_NAME="github-actions-deployer"
 DEPLOYER_SA_EMAIL="${DEPLOYER_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 RUNTIME_SA_EMAIL="greenhouse-portal@${PROJECT_ID}.iam.gserviceaccount.com"
+# Cloud Build in this project runs as the Compute Engine default SA (legacy
+# default for projects that predate Cloud Build's per-build SA feature). The
+# deployer must be able to act-as this SA for `gcloud builds submit` to work.
+CLOUDBUILD_SA_EMAIL="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
 PROJECT_ROLES=(
   "roles/cloudbuild.builds.editor"
@@ -158,6 +162,17 @@ done
 # ─── 5. Allow deployer to impersonate the runtime SA ────────────────────
 echo "→ ensuring deployer can act as ${RUNTIME_SA_EMAIL}"
 gcloud iam service-accounts add-iam-policy-binding "${RUNTIME_SA_EMAIL}" \
+  --project="${PROJECT_ID}" \
+  --role="roles/iam.serviceAccountUser" \
+  --member="serviceAccount:${DEPLOYER_SA_EMAIL}" \
+  --quiet >/dev/null
+
+# ─── 5b. Allow deployer to act as the Cloud Build default SA ───────────
+# `gcloud builds submit` runs the build as this SA by default; without
+# serviceAccountUser, submission fails with PERMISSION_DENIED (the deployer
+# can submit jobs but can't tell Cloud Build to run them as any SA).
+echo "→ ensuring deployer can act as ${CLOUDBUILD_SA_EMAIL}"
+gcloud iam service-accounts add-iam-policy-binding "${CLOUDBUILD_SA_EMAIL}" \
   --project="${PROJECT_ID}" \
   --role="roles/iam.serviceAccountUser" \
   --member="serviceAccount:${DEPLOYER_SA_EMAIL}" \
