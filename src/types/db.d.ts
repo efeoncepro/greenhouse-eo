@@ -2329,6 +2329,55 @@ export interface GreenhouseFinanceSuppliers {
   website_url: string | null;
 }
 
+export interface GreenhouseHrGoalCycles {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  cycle_id: string;
+  cycle_name: string;
+  cycle_type: string;
+  end_date: Timestamp;
+  start_date: Timestamp;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrGoalKeyResults {
+  created_at: Generated<Timestamp>;
+  current_value: Generated<Numeric>;
+  goal_id: string;
+  kr_id: string;
+  sort_order: Generated<number>;
+  target_value: Numeric | null;
+  title: string;
+  unit: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrGoalProgress {
+  goal_id: string;
+  notes: string | null;
+  progress_id: string;
+  progress_percent: Numeric;
+  recorded_at: Generated<Timestamp>;
+  recorded_by: string;
+}
+
+export interface GreenhouseHrGoals {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  cycle_id: string;
+  description: string | null;
+  goal_id: string;
+  owner_department_id: string | null;
+  owner_member_id: string | null;
+  owner_type: string;
+  parent_goal_id: string | null;
+  progress_percent: Generated<Numeric>;
+  status: Generated<string>;
+  title: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHrLeaveBalanceAdjustments {
   adjustment_id: string;
   created_at: Generated<Timestamp>;
@@ -4394,6 +4443,10 @@ export interface DB {
   "greenhouse_finance.shareholder_account_movements": GreenhouseFinanceShareholderAccountMovements;
   "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
+  "greenhouse_hr.goal_cycles": GreenhouseHrGoalCycles;
+  "greenhouse_hr.goal_key_results": GreenhouseHrGoalKeyResults;
+  "greenhouse_hr.goal_progress": GreenhouseHrGoalProgress;
+  "greenhouse_hr.goals": GreenhouseHrGoals;
   "greenhouse_hr.leave_balance_adjustments": GreenhouseHrLeaveBalanceAdjustments;
   "greenhouse_hr.leave_balances": GreenhouseHrLeaveBalances;
   "greenhouse_hr.leave_policies": GreenhouseHrLeavePolicies;
