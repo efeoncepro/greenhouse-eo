@@ -190,6 +190,22 @@ const buildDomainCards = ({
     ]
   },
   {
+    id: 'service-sla-governance',
+    title: 'SLA de servicios',
+    subtitle: 'SLI, SLO y SLA por servicio con lectura de cumplimiento y gobierno ligero.',
+    icon: 'tabler-shield-check',
+    avatarColor: 'info',
+    status: { label: 'Gobierno', color: 'info' },
+    href: '/admin/service-slas',
+    primaryAction: 'Abrir SLA de servicios',
+    routes: ['/admin/service-slas'],
+    points: [
+      'Contrato por servicio con fuente defendible y umbral explícito',
+      'Lectura de cumplimiento en la ficha del servicio y en Space 360',
+      'CRUD operativo para crear, editar o retirar definiciones'
+    ]
+  },
+  {
     id: 'ai-governance',
     title: 'AI Governance',
     subtitle: 'Catalogo, licencias, wallets y control administrativo de AI Tools.',
@@ -270,6 +286,22 @@ const buildDomainCards = ({
         ? `${operations.kpis.pendingProjections} proyecciones pendientes`
         : 'Sin proyecciones en cola',
       `${operations.cloud.health.checks.filter(check => !check.ok).length} checks cloud con atención`
+    ]
+  },
+  {
+    id: 'payroll-reopen-audit',
+    title: 'Auditoría de nómina',
+    subtitle: 'Historial de períodos de nómina reabiertos para reliquidación y sus justificaciones.',
+    icon: 'tabler-file-alert',
+    avatarColor: 'warning',
+    status: { label: 'Activo', color: 'success' },
+    href: '/admin/payroll-reopen-audit',
+    primaryAction: 'Abrir auditoría',
+    routes: ['/admin/payroll-reopen-audit'],
+    points: [
+      'Cada reapertura queda registrada con operador, motivo y estado previo',
+      'Filtra por mes operativo o por usuario que ejecutó la reapertura',
+      'Insumo para compliance y reporting de cambios en liquidaciones cerradas'
     ]
   },
   {

@@ -6,6 +6,41 @@
 
 ---
 
+## Delta 2026-04-15 — Shared runtime topology formalized for portal + reactive workers
+
+- Greenhouse opera hoy sobre una **infraestructura compartida** para el runtime principal del portal y el runtime reactivo:
+  - un único servicio Cloud Run `ops-worker`
+  - una única instancia Cloud SQL `greenhouse-pg-dev`
+- Esto significa que `staging` y `production` no tienen workers ni instancias PostgreSQL separadas por ahora.
+- La separación por ambiente vive en el **contrato de secrets/config**, no en un duplicado de infraestructura base.
+
+Topología vigente:
+
+| Recurso | Estado actual | Regla operativa |
+| --- | --- | --- |
+| Cloud Run reactive worker | único `ops-worker` | procesa lanes reactivos de todos los dominios |
+| Cloud SQL OLTP | única instancia `greenhouse-pg-dev` | sirve al portal y a los workers compartidos |
+| Secretos de auth/email | separados por ambiente cuando aplica | `production` y `staging` pueden resolver secrets distintos sobre la misma infraestructura |
+
+Reglas vigentes:
+
+- `ENV=production` en `services/ops-worker/deploy.sh` **no** implica una instancia Cloud SQL separada.
+- `ENV=production` sí debe aplicar el contrato productivo de secrets cuando exista diferencia real de ambiente, por ejemplo:
+  - `NEXTAUTH_SECRET`
+  - `RESEND_API_KEY`
+  - cualquier otro secret con blast radius ambiente-específico
+- Si en el futuro se crea infraestructura dedicada para producción, el deploy debe evolucionar por overrides explícitos o defaults nuevos, no por asumir refs inexistentes.
+
+## Delta 2026-04-15 — ops-worker adopta contrato explícito para email transaccional
+
+- El worker reactivo de Cloud Run ya no debe asumir que el contrato de email existe solo en Vercel.
+- Runtime actualizado:
+  - `services/ops-worker/deploy.sh` propaga `EMAIL_FROM`
+  - `services/ops-worker/deploy.sh` acepta `RESEND_API_KEY_SECRET_REF` para que el worker resuelva Resend vía Secret Manager
+- Regla operativa:
+  - si `ops-worker` procesa proyecciones que envían correo, el deploy debe incluir `RESEND_API_KEY_SECRET_REF`
+  - dejar esa variable ausente degrada el canal email aunque el portal web siga teniendo `RESEND_API_KEY`
+
 ## Delta 2026-04-09 — Secret Manager publication protocol tightened after ISSUE-032
 
 Greenhouse formaliza un protocolo operativo para secretos runtime en GCP Secret Manager:

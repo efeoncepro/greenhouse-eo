@@ -21,8 +21,9 @@ import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { canRecalculatePayrollPeriod } from '@/lib/payroll/period-lifecycle'
+import { canRecalculatePayrollPeriod, isPayrollPeriodReopened } from '@/lib/payroll/period-lifecycle'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
+import { supersedePayrollEntryOnRecalculate } from '@/lib/payroll/supersede-entry'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
 import {
@@ -377,6 +378,10 @@ export const buildPayrollEntry = async ({
     adjustedColacionAmount: deductibleDays > 0 ? adjustedColacionAmount : null,
     adjustedMovilizacionAmount: deductibleDays > 0 ? adjustedMovilizacionAmount : null,
     adjustedFixedBonusAmount: deductibleDays > 0 ? adjustedFixedBonusAmount : null,
+    version: 1,
+    isActive: true,
+    supersededBy: null,
+    reopenAuditId: null,
     createdAt: null,
     updatedAt: null
   }
@@ -563,11 +568,50 @@ export const calculatePayroll = async ({
       }
     }
 
-    await upsertPayrollEntry(entry)
+    // TASK-410/411 — when the period is reopened, each entry mutation must
+    // go through the supersede path so that v1 stays immutable, v2 is
+    // created/updated in place, and `payroll_entry.reliquidated` is emitted
+    // for the finance delta consumer. The direct upsert path would update
+    // v1 in place, break the versioning invariant, and silently skip the
+    // delta publication.
+    if (isPayrollPostgresEnabled() && isPayrollPeriodReopened(period.status)) {
+      try {
+        await supersedePayrollEntryOnRecalculate({
+          updatedEntry: entry,
+          actorUserId: actorIdentifier ?? 'system'
+        })
+      } catch (error) {
+        // If no active row exists yet for (period, member) the supersede
+        // flow can't compute a delta — this happens when calculate adds a
+        // brand-new member mid-reopen. Fall back to direct upsert so the
+        // new member materializes with version=1 / is_active=true. Emit a
+        // console warning so ops can spot these edge cases in the logs.
+        if (
+          error &&
+          typeof error === 'object' &&
+          'message' in error &&
+          String((error as { message?: unknown }).message).includes('No active payroll entry found')
+        ) {
+          console.warn(
+            `[calculate-payroll] supersede fallback: member ${compensation.memberId} has no active entry for period ${periodId} — inserting as v1.`
+          )
+          await upsertPayrollEntry(entry)
+        } else {
+          throw error
+        }
+      }
+    } else {
+      await upsertPayrollEntry(entry)
+    }
+
     entries.push(entry)
   }
 
-  if (isPayrollPostgresEnabled()) {
+  // TASK-410 — on reopened periods we never delete stale entries: v1 rows
+  // must be preserved as the historical record, and any members who lose
+  // compensation mid-reopen stay in the dataset for audit. `pgDelete...`
+  // would cascade-drop v1 rows and leave Finance orphaned.
+  if (isPayrollPostgresEnabled() && !isPayrollPeriodReopened(period.status)) {
     await pgDeleteStalePayrollEntries({
       periodId,
       keepMemberIds: compensationRows.map(row => row.memberId)

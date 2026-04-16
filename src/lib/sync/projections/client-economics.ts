@@ -182,6 +182,7 @@ export const CLIENT_ECONOMICS_TRIGGER_EVENTS = [
   'payroll_period.created',
   'payroll_period.updated',
   'payroll_entry.upserted',
+  'payroll_entry.reliquidated',
   'payroll_period.calculated',
   'payroll_period.approved',
   'payroll_period.exported'

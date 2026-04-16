@@ -2,6 +2,8 @@ import 'server-only'
 
 import { Resend } from 'resend'
 
+import { resolveSecret } from '@/lib/secrets/secret-manager'
+
 const DEFAULT_EMAIL_FROM = 'Efeonce Greenhouse <greenhouse@efeoncepro.com>'
 
 let cachedClient: Resend | null = null
@@ -14,9 +16,17 @@ const normalizeEnv = (value: string | undefined) => {
 
 export const getEmailFromAddress = () => normalizeEnv(process.env.EMAIL_FROM) || DEFAULT_EMAIL_FROM
 
-export const getResendApiKey = () => normalizeEnv(process.env.RESEND_API_KEY)
+const resendApiKeyResolution = await resolveSecret({
+  envVarName: 'RESEND_API_KEY'
+})
+
+export const getResendApiKey = () => resendApiKeyResolution.value?.trim() || null
 
 export const isResendConfigured = () => Boolean(getResendApiKey())
+
+export const clearResendClientCache = () => {
+  cachedClient = null
+}
 
 export const getResendClient = () => {
   if (cachedClient) {

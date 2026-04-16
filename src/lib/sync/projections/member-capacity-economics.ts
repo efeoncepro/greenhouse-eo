@@ -592,6 +592,7 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
         chile_employer_total_cost
       FROM greenhouse_payroll.payroll_entries
       WHERE member_id = $1 AND period_id = $2
+        AND is_active = TRUE
       LIMIT 1
     `,
     [memberId, payrollPeriodId]

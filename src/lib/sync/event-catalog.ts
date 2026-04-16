@@ -63,6 +63,7 @@ export const AGGREGATE_TYPES = {
 
   // Services
   service: 'service',
+  serviceSlaDefinition: 'service_sla_definition',
   serviceSkillRequirement: 'service_skill_requirement',
 
   // Person Intelligence
@@ -222,6 +223,7 @@ export const EVENT_TYPES = {
   payrollPeriodApproved: 'payroll_period.approved',
   payrollPeriodExported: 'payroll_period.exported',
   payrollEntryUpserted: 'payroll_entry.upserted',
+  payrollEntryReliquidated: 'payroll_entry.reliquidated',
   leaveRequestCreated: 'leave_request.created',
   leaveRequestEscalatedToHr: 'leave_request.escalated_to_hr',
   leaveRequestApproved: 'leave_request.approved',
@@ -236,6 +238,10 @@ export const EVENT_TYPES = {
   serviceCreated: 'service.created',
   serviceUpdated: 'service.updated',
   serviceDeactivated: 'service.deactivated',
+  serviceSlaDefinitionCreated: 'service.sla_definition.created',
+  serviceSlaDefinitionUpdated: 'service.sla_definition.updated',
+  serviceSlaDefinitionDeleted: 'service.sla_definition.deleted',
+  serviceSlaStatusChanged: 'service.sla_status.changed',
   serviceSkillRequirementUpserted: 'service_skill_requirement.upserted',
   serviceSkillRequirementDeleted: 'service_skill_requirement.deleted',
 
@@ -391,6 +397,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.payrollPeriodApproved,
   EVENT_TYPES.payrollPeriodExported,
   EVENT_TYPES.payrollEntryUpserted,
+  EVENT_TYPES.payrollEntryReliquidated,
   EVENT_TYPES.leaveRequestCreated,
   EVENT_TYPES.leaveRequestEscalatedToHr,
   EVENT_TYPES.leaveRequestApproved,

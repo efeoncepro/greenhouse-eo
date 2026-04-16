@@ -149,6 +149,7 @@ export const COMMERCIAL_COST_ATTRIBUTION_TRIGGER_EVENTS = [
   'payroll_period.approved',
   'payroll_period.exported',
   'payroll_entry.upserted',
+  'payroll_entry.reliquidated',
   'compensation_version.created',
   'compensation_version.updated'
 ] as const

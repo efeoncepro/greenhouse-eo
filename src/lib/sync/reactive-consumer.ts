@@ -18,6 +18,7 @@ import {
   type ProjectionDefinition,
   type ProjectionDomain
 } from './projection-registry'
+import { buildReactiveHandlerKey as sharedBuildReactiveHandlerKey } from './reactive-handler-key'
 import { ensureProjectionsRegistered } from './projections'
 import {
   buildRefreshQueueId,
@@ -161,8 +162,12 @@ export const ensureReactiveSchema = async () => {
 
 // ── Helpers ──
 
-export const buildReactiveHandlerKey = (projectionName: string, eventType: string) =>
-  `${projectionName}:${eventType}`
+// Re-export the pure helper so every existing caller of
+// `reactive-consumer.buildReactiveHandlerKey` keeps working. The
+// canonical definition lives in `./reactive-handler-key` (no
+// server-only) so scripts, tests, and readers can import it without
+// pulling the whole consumer runtime.
+export const buildReactiveHandlerKey = sharedBuildReactiveHandlerKey
 
 const parsePayload = (event: ReactiveEventRow): Record<string, unknown> => {
   const raw = event.payload_json

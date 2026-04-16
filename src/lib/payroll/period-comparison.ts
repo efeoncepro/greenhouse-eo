@@ -36,6 +36,7 @@ export const getPreviousOfficialPeriodTotals = async (
      INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
      WHERE p.period_id < $1
        AND p.status IN ('approved', 'exported')
+       AND e.is_active = TRUE
      ORDER BY p.period_id DESC`,
     [beforePeriodId]
   ).catch(() => [] as PeriodEntryRow[])
@@ -71,7 +72,8 @@ export const getOfficialPeriodTotals = async (
      FROM greenhouse_payroll.payroll_entries e
      INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
      WHERE p.period_id = $1
-       AND p.status IN ('calculated', 'approved', 'exported')`,
+       AND p.status IN ('calculated', 'approved', 'exported')
+       AND e.is_active = TRUE`,
     [periodId]
   ).catch(() => [] as PeriodEntryRow[])
 

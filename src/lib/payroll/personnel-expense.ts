@@ -284,6 +284,7 @@ export const getPersonnelExpenseReport = async (
           WHERE p.status IN ('approved', 'exported')
             AND p.period_id >= $1
             AND p.period_id <= $2
+            AND e.is_active = TRUE
           GROUP BY p.period_id, p.year, p.month, e.currency
           ORDER BY p.period_id ASC, e.currency ASC
         `,
@@ -302,6 +303,7 @@ export const getPersonnelExpenseReport = async (
           WHERE p.status IN ('approved', 'exported')
             AND p.period_id >= $1
             AND p.period_id <= $2
+            AND e.is_active = TRUE
           GROUP BY e.pay_regime, e.currency
         `,
         [periodIdFrom, periodIdTo]

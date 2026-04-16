@@ -1,0 +1,143 @@
+name: Ops Worker Deploy
+
+# TASK-409 / hotfix 2026-04-15 — eliminate deployment drift between Vercel
+# and Cloud Run ops-worker.
+#
+# The ops-worker service runs the reactive-consumer runtime (outbox event
+# processing, reliquidation delta application, commercial cost attribution
+# materialization). It shares the same source tree as the Vercel portal but
+# is deployed separately. Historically, pushes to develop/main that touched
+# reactive code landed on Vercel immediately but required a manual
+# `bash services/ops-worker/deploy.sh` run that could be (and was) skipped.
+#
+# This workflow watches the subset of source paths that affect ops-worker
+# behavior and triggers a staging deploy automatically on every push to
+# `develop`. Production deploys on `main` are gated behind an environment
+# with required reviewers so they cannot roll out silently.
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'services/ops-worker/**'
+      - 'src/lib/sync/**'
+      - 'src/lib/finance/payroll-expense-reactive.ts'
+      - 'src/lib/finance/apply-payroll-reliquidation-delta.ts'
+      - 'src/lib/payroll/supersede-entry.ts'
+      - 'src/lib/payroll/send-payroll-export-ready.ts'
+      - 'src/lib/payroll/payroll-export-packages.ts'
+      - 'src/lib/email/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: ops-worker-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # Required for Workload Identity Federation to GCP
+
+jobs:
+  deploy:
+    name: Deploy ops-worker to Cloud Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    # Route pushes by branch, fall back to manual dispatch input.
+    environment: >-
+      ${{
+        github.event_name == 'workflow_dispatch'
+          && github.event.inputs.environment
+          || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+      }}
+
+    env:
+      ENV: >-
+        ${{
+          github.event_name == 'workflow_dispatch'
+            && github.event.inputs.environment
+            || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+        }}
+      GCP_PROJECT_ID: efeonce-group
+      GCP_REGION: us-east4
+      # Deployer identity: generic github-actions-deployer SA, impersonated
+      # via Workload Identity Federation (see scripts/setup-github-actions-wif.sh).
+      # This SA has permission to SET greenhouse-portal as the Cloud Run
+      # runtime SA (via roles/iam.serviceAccountUser) but is NOT
+      # greenhouse-portal itself — deploy identity and runtime identity
+      # are kept separate on purpose.
+      DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+      RUNTIME_SERVICE_ACCOUNT: greenhouse-portal@efeonce-group.iam.gserviceaccount.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Verify gcloud account
+        run: |
+          gcloud config list --format='value(core.project,core.account)'
+          gcloud auth list
+
+      - name: Deploy ops-worker
+        run: |
+          bash services/ops-worker/deploy.sh
+        env:
+          ENV: ${{ env.ENV }}
+
+      - name: Verify deployment health
+        run: |
+          SERVICE_URL="$(gcloud run services describe ops-worker \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.url)')"
+          echo "Deployed ops-worker at: ${SERVICE_URL}"
+          # Proxy + health check loop — matches the final step in deploy.sh.
+          gcloud run services proxy ops-worker \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --port=19092 &
+          PROXY_PID=$!
+          sleep 5
+          HEALTH_OK=false
+          for i in 1 2 3 4 5; do
+            if curl -sf "http://localhost:19092/health" >/dev/null 2>&1; then
+              HEALTH_OK=true
+              break
+            fi
+            sleep 3
+          done
+          kill "${PROXY_PID}" 2>/dev/null || true
+          if [ "${HEALTH_OK}" = "false" ]; then
+            echo "::error::Health check failed after deploy. Investigate ops-worker logs."
+            exit 1
+          fi
+          echo "✓ ops-worker /health responded OK"
+
+      - name: Record deployment commit
+        run: |
+          echo "Deployed commit: ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"

@@ -216,6 +216,10 @@ type PgEntryRow = {
   adjusted_colacion_amount: number | string | null
   adjusted_movilizacion_amount: number | string | null
   adjusted_fixed_bonus_amount: number | string | null
+  version: number | string | null
+  is_active: boolean | null
+  superseded_by: string | null
+  reopen_audit_id: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
 }
@@ -487,7 +491,13 @@ const mapPeriod = (row: PgPeriodRow): PayrollPeriod => ({
   periodId: row.period_id,
   year: toNumber(row.year),
   month: toNumber(row.month),
-  status: row.status === 'approved' || row.status === 'exported' || row.status === 'calculated' ? row.status : 'draft',
+  status:
+    row.status === 'approved' ||
+    row.status === 'exported' ||
+    row.status === 'calculated' ||
+    row.status === 'reopened'
+      ? row.status
+      : 'draft',
   calculatedAt: toPgTimestampString(row.calculated_at),
   calculatedBy: normalizeNullableString(row.calculated_by_user_id),
   approvedAt: toPgTimestampString(row.approved_at),
@@ -581,6 +591,10 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   adjustedColacionAmount: toNullableNumber(row.adjusted_colacion_amount),
   adjustedMovilizacionAmount: toNullableNumber(row.adjusted_movilizacion_amount),
   adjustedFixedBonusAmount: toNullableNumber(row.adjusted_fixed_bonus_amount),
+  version: row.version != null ? Number(row.version) : 1,
+  isActive: row.is_active == null ? true : Boolean(row.is_active),
+  supersededBy: normalizeNullableString(row.superseded_by),
+  reopenAuditId: normalizeNullableString(row.reopen_audit_id),
   createdAt: toPgTimestampString(row.created_at),
   updatedAt: toPgTimestampString(row.updated_at)
 })
@@ -1623,7 +1637,10 @@ export const pgSetPeriodCalculated = async (periodId: string, actorEmail: string
     }
 
     if (!canSetPayrollPeriodCalculated(currentPeriod.status)) {
-      throw new PayrollValidationError('Payroll periods can only be calculated from draft, calculated, or approved states.', 409)
+      throw new PayrollValidationError(
+        'Payroll periods can only be calculated from draft, calculated, approved, or reopened states.',
+        409
+      )
     }
 
     const result = await client.query<PgPeriodRow>(
@@ -1871,6 +1888,10 @@ const ENTRY_BASE_SELECT = `
     e.adjusted_colacion_amount,
     e.adjusted_movilizacion_amount,
     e.adjusted_fixed_bonus_amount,
+    e.version,
+    e.is_active,
+    e.superseded_by,
+    e.reopen_audit_id,
     e.created_at,
     e.updated_at
   FROM greenhouse_payroll.payroll_entries AS e
@@ -1878,6 +1899,9 @@ const ENTRY_BASE_SELECT = `
   LEFT JOIN greenhouse_payroll.compensation_versions AS cv ON cv.version_id = e.compensation_version_id
 `
 
+// TASK-410 — list endpoints return only active versions. Reliquidated v1
+// rows (is_active=false) stay in the DB for audit/history but should not
+// appear in the default period or member listings.
 export const pgGetPayrollEntries = async (periodId: string) => {
   await assertPayrollPostgresReady()
 
@@ -1885,6 +1909,7 @@ export const pgGetPayrollEntries = async (periodId: string) => {
     `
       ${ENTRY_BASE_SELECT}
       WHERE e.period_id = $1
+        AND e.is_active = TRUE
       ORDER BY m.display_name ASC
     `,
     [periodId]
@@ -1893,6 +1918,10 @@ export const pgGetPayrollEntries = async (periodId: string) => {
   return rows.map(mapEntry)
 }
 
+// TASK-410 — entry-by-id stays version-agnostic because admin surfaces
+// (history drawer, audit view) need to look up superseded v1 rows by their
+// original entry_id. Callers that only want the active version should use
+// `pgGetActivePayrollEntryForMember` below.
 export const pgGetPayrollEntryById = async (entryId: string) => {
   await assertPayrollPostgresReady()
 
@@ -1908,6 +1937,29 @@ export const pgGetPayrollEntryById = async (entryId: string) => {
   return row ? mapEntry(row) : null
 }
 
+// TASK-410 — resolves "the currently active entry for this period+member".
+// Used by flows that want the authoritative current row regardless of which
+// version it is (v1 original, or v2 post-reliquidation).
+export const pgGetActivePayrollEntryForMember = async (
+  periodId: string,
+  memberId: string
+) => {
+  await assertPayrollPostgresReady()
+
+  const [row] = await runGreenhousePostgresQuery<PgEntryRow>(
+    `
+      ${ENTRY_BASE_SELECT}
+      WHERE e.period_id = $1
+        AND e.member_id = $2
+        AND e.is_active = TRUE
+      LIMIT 1
+    `,
+    [periodId, memberId]
+  )
+
+  return row ? mapEntry(row) : null
+}
+
 export const pgGetMemberPayrollEntries = async (memberId: string) => {
   await assertPayrollPostgresReady()
 
@@ -1916,7 +1968,8 @@ export const pgGetMemberPayrollEntries = async (memberId: string) => {
       ${ENTRY_BASE_SELECT}
       INNER JOIN greenhouse_payroll.payroll_periods AS p ON p.period_id = e.period_id
       WHERE e.member_id = $1
-        AND p.status IN ('approved', 'exported')
+        AND e.is_active = TRUE
+        AND p.status IN ('approved', 'exported', 'reopened')
       ORDER BY p.year DESC, p.month DESC
     `,
     [memberId]
@@ -1925,10 +1978,99 @@ export const pgGetMemberPayrollEntries = async (memberId: string) => {
   return rows.map(mapEntry)
 }
 
-export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
+// TASK-410 — metadata for every version of an entry (for admin history
+// drawer). Reads only the columns needed by the UI (not the full entry) so
+// the query stays cheap even on large periods.
+export interface PayrollEntryVersionMetadata {
+  entryId: string
+  periodId: string
+  memberId: string
+  version: number
+  isActive: boolean
+  supersededBy: string | null
+  reopenAuditId: string | null
+  grossTotal: number
+  netTotal: number
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export const pgGetPayrollEntryVersions = async (
+  periodId: string,
+  memberId: string
+): Promise<PayrollEntryVersionMetadata[]> => {
   await assertPayrollPostgresReady()
 
-  return withGreenhousePostgresTransaction(async (client) => {
+  const rows = await runGreenhousePostgresQuery<{
+    entry_id: string
+    period_id: string
+    member_id: string
+    version: number | string
+    is_active: boolean
+    superseded_by: string | null
+    reopen_audit_id: string | null
+    gross_total: string | number
+    net_total: string | number
+    created_at: Date | string
+    updated_at: Date | string
+  }>(
+    `
+      SELECT entry_id, period_id, member_id, version, is_active, superseded_by,
+             reopen_audit_id, gross_total, net_total, created_at, updated_at
+      FROM greenhouse_payroll.payroll_entries
+      WHERE period_id = $1
+        AND member_id = $2
+      ORDER BY version DESC, created_at DESC
+    `,
+    [periodId, memberId]
+  )
+
+  return rows.map(row => ({
+    entryId: row.entry_id,
+    periodId: row.period_id,
+    memberId: row.member_id,
+    version: Number(row.version ?? 1),
+    isActive: Boolean(row.is_active),
+    supersededBy: row.superseded_by ?? null,
+    reopenAuditId: row.reopen_audit_id ?? null,
+    grossTotal: Number(row.gross_total ?? 0),
+    netTotal: Number(row.net_total ?? 0),
+    createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+    updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : String(row.updated_at)
+  }))
+}
+
+// TASK-410 — supersede options allow the recalculate path to create a v2
+// entry (linked to a reopen audit row) while still reusing the full INSERT
+// statement for payroll_entries. When `supersede.version` is set, the INSERT
+// writes the version/is_active/reopen_audit_id columns explicitly and the
+// outbox event type is elevated to `payroll_entry.reliquidated`. Callers
+// must pass a transaction-bound `client` so the mark-v1-inactive UPDATE
+// and the v2 INSERT share the same transaction.
+interface PgUpsertPayrollEntryOptions {
+  client?: PoolClient
+  supersede?: {
+    version: number
+    isActive: boolean
+    reopenAuditId: string | null
+    previousEntryId: string
+    previousGrossTotal: number
+    previousNetTotal: number
+    deltaGross: number
+    deltaNet: number
+    auditReason: string
+    operationalYear: number
+    operationalMonth: number
+  }
+}
+
+export const pgUpsertPayrollEntry = async (
+  entry: PayrollEntry,
+  options: PgUpsertPayrollEntryOptions = {}
+) => {
+  await assertPayrollPostgresReady()
+
+  const runWithClient = async (client: PoolClient) => {
     // Get member display name for snapshot
     const [memberRow] = await queryRows<{ display_name: string | null }>(
       `SELECT display_name FROM greenhouse_core.members WHERE member_id = $1 LIMIT 1`,
@@ -2076,6 +2218,31 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
       ]
     )
 
+    // TASK-410 — when operating in supersede mode, explicitly set version /
+    // is_active / reopen_audit_id on the newly inserted row. The caller is
+    // responsible for having marked v1 as is_active=false in the same TX so
+    // the partial unique index (period_id, member_id WHERE is_active) stays
+    // satisfied at commit time.
+    if (options.supersede) {
+      await client.query(
+        `
+          UPDATE greenhouse_payroll.payroll_entries
+          SET version = $2,
+              is_active = $3,
+              reopen_audit_id = $4
+          WHERE entry_id = $1
+        `,
+        [
+          entry.entryId,
+          options.supersede.version,
+          options.supersede.isActive,
+          options.supersede.reopenAuditId
+        ]
+      )
+    }
+
+    // Emit the canonical upserted event for every write path so downstream
+    // consumers (projections, person 360, cost attribution) still react.
     await publishPayrollOutboxEvent({
       eventType: 'payroll_entry.upserted',
       aggregateType: 'payroll_entry',
@@ -2091,7 +2258,44 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
       },
       client
     })
-  })
+
+    // TASK-410 — in supersede mode, also emit the dedicated reliquidated
+    // event so the finance delta consumer (TASK-411) can apply the delta
+    // expense without double-counting. Delta=0 still emits for audit trail.
+    if (options.supersede) {
+      await publishPayrollOutboxEvent({
+        eventType: 'payroll_entry.reliquidated',
+        aggregateType: 'payroll_entry',
+        aggregateId: entry.entryId,
+        payload: {
+          entryId: entry.entryId,
+          periodId: entry.periodId,
+          operationalYear: options.supersede.operationalYear,
+          operationalMonth: options.supersede.operationalMonth,
+          memberId: entry.memberId,
+          version: options.supersede.version,
+          previousVersion: options.supersede.version - 1,
+          previousEntryId: options.supersede.previousEntryId,
+          previousGrossTotal: options.supersede.previousGrossTotal,
+          previousNetTotal: options.supersede.previousNetTotal,
+          newGrossTotal: entry.grossTotal,
+          newNetTotal: entry.netTotal,
+          deltaGross: options.supersede.deltaGross,
+          deltaNet: options.supersede.deltaNet,
+          currency: entry.currency,
+          reopenAuditId: options.supersede.reopenAuditId,
+          reason: options.supersede.auditReason
+        },
+        client
+      })
+    }
+  }
+
+  if (options.client) {
+    return runWithClient(options.client)
+  }
+
+  return withGreenhousePostgresTransaction(runWithClient)
 }
 
 export const pgDeleteStalePayrollEntries = async ({

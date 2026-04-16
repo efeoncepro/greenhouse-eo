@@ -60,6 +60,7 @@ export const getPayrollPeriodRecipients = async (periodId: string): Promise<Reci
      INNER JOIN greenhouse_core.members AS m
        ON m.member_id = e.member_id
      WHERE e.period_id = $1
+       AND e.is_active = TRUE
        AND m.active = TRUE
      ORDER BY e.member_id ASC`,
     [periodId]

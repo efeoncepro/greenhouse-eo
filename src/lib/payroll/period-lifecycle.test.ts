@@ -4,11 +4,13 @@ import {
   canEditPayrollPeriodMetadata,
   canEditPayrollEntries,
   canRecalculatePayrollPeriod,
+  canReopenPayrollPeriod,
   canSetPayrollPeriodApproved,
   canSetPayrollPeriodCalculated,
   canSetPayrollPeriodExported,
   doesPayrollPeriodUpdateRequireReset,
   isPayrollPeriodFinalized,
+  isPayrollPeriodReopened,
   shouldReopenApprovedPayrollPeriod
 } from './period-lifecycle'
 
@@ -45,8 +47,9 @@ describe('payroll period lifecycle', () => {
     expect(canRecalculatePayrollPeriod('exported')).toBe(false)
   })
 
-  it('allows entry editing only while the period is calculated', () => {
+  it('allows entry editing while calculated or reopened', () => {
     expect(canEditPayrollEntries('calculated')).toBe(true)
+    expect(canEditPayrollEntries('reopened')).toBe(true)
     expect(canEditPayrollEntries('approved')).toBe(false)
     expect(canEditPayrollEntries('draft')).toBe(false)
     expect(canEditPayrollEntries('exported')).toBe(false)
@@ -63,6 +66,32 @@ describe('payroll period lifecycle', () => {
     expect(shouldReopenApprovedPayrollPeriod('approved')).toBe(true)
     expect(shouldReopenApprovedPayrollPeriod('calculated')).toBe(false)
     expect(shouldReopenApprovedPayrollPeriod('exported')).toBe(false)
+  })
+
+  // TASK-410 — reopen of exported periods for reliquidación.
+  describe('reopened state (TASK-410)', () => {
+    it('canReopenPayrollPeriod only allows transition from exported', () => {
+      expect(canReopenPayrollPeriod('exported')).toBe(true)
+      expect(canReopenPayrollPeriod('draft')).toBe(false)
+      expect(canReopenPayrollPeriod('calculated')).toBe(false)
+      expect(canReopenPayrollPeriod('approved')).toBe(false)
+      expect(canReopenPayrollPeriod('reopened')).toBe(false)
+    })
+
+    it('isPayrollPeriodReopened is exclusive to the new state', () => {
+      expect(isPayrollPeriodReopened('reopened')).toBe(true)
+      expect(isPayrollPeriodReopened('exported')).toBe(false)
+      expect(isPayrollPeriodReopened('approved')).toBe(false)
+    })
+
+    it('reopened periods are NOT finalized so recalc is allowed', () => {
+      expect(isPayrollPeriodFinalized('reopened')).toBe(false)
+      expect(canRecalculatePayrollPeriod('reopened')).toBe(true)
+    })
+
+    it('canSetPayrollPeriodCalculated accepts reopened as a valid source', () => {
+      expect(canSetPayrollPeriodCalculated('reopened')).toBe(true)
+    })
   })
 
   it('requires resetting calculated data when month, year, uf, or tax table changes', () => {

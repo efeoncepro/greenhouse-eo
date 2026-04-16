@@ -22,10 +22,12 @@ import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
+import { payrollReliquidationDeltaProjection } from './payroll-reliquidation-delta'
 import { agencyPerformanceReportProjection } from './agency-performance-report'
 import { icoAiSignalsProjection } from './ico-ai-signals'
 import { icoLlmEnrichmentsProjection } from './ico-llm-enrichments'
 import { accountBalancesProjection } from './account-balances'
+import { serviceSlaComplianceProjection } from './service-sla-compliance'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -55,6 +57,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(periodClosureStatusProjection)
   registerProjection(providerToolingProjection)
   registerProjection(financeExpenseReactiveIntakeProjection)
+  registerProjection(payrollReliquidationDeltaProjection)
   registerProjection(accountBalancesProjection)
   registerProjection(staffAugPlacementProjection)
   registerProjection(commercialCostAttributionProjection)
@@ -62,4 +65,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(agencyPerformanceReportProjection)
   registerProjection(icoAiSignalsProjection)
   registerProjection(icoLlmEnrichmentsProjection)
+  registerProjection(serviceSlaComplianceProjection)
 }

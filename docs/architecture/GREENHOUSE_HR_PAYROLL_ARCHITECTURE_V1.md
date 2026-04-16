@@ -734,12 +734,14 @@ Estados válidos:
 - `calculated`
 - `approved`
 - `exported`
+- `reopened` (TASK-409 / TASK-410 — reliquidación post-cierre)
 
 ### Semántica vigente
 - `draft`: período creado o reabierto, sin cálculo vigente
 - `calculated`: período calculado y revisable
 - `approved`: listo para pago/revisión, todavía editable antes de exportar
-- `exported`: cierre final operativo
+- `exported`: cierre final operativo (pero ya no terminal — ver `reopened`)
+- `reopened`: período re-abierto para reliquidación. Entries existentes quedan inmutables (v1, `is_active=false`), las nuevas ediciones crean v2 con `is_active=true` vinculada a una fila en `payroll_period_reopen_audit`. Desde `reopened` el flujo continúa como `reopened → calculated → approved → exported` (segunda vuelta).
 
 ### Regla importante
 `approved` no es cierre final.
@@ -754,12 +756,25 @@ entonces:
 - vuelve a `calculated`
 - debe aprobarse de nuevo antes de exportarse
 
-### Candado final
-Solo `exported` bloquea:
-- recálculo
-- edición de entries
-- corrección retroactiva de la compensación ya utilizada
-- corrección del mes imputable
+### Candado final (actualizado por TASK-410)
+Solo `exported` bloquea edición directa. La **única** ruta permitida para mutar un período exportado es invocar explícitamente el endpoint `POST /api/hr/payroll/periods/[periodId]/reopen` (gated por rol `efeonce_admin`), que:
+
+- valida que el período es el **mes operativo vigente** (ventana temporal); meses anteriores requieren ajustes en el período actual, no reapertura histórica
+- escribe una fila inmutable en `payroll_period_reopen_audit` con `reason`, `reason_detail`, `previred_declared_check`, `operational_month` y `previous_status`
+- transiciona el período a `reopened` en una transacción atómica con `SELECT … FOR UPDATE NOWAIT` para bloquear exports concurrentes
+
+Durante `reopened`:
+- edición de entries está permitida pero **no muta v1 in-place** — `supersedePayrollEntryOnRecalculate` crea una fila v2 con `is_active=true` y marca v1 como `is_active=false`/`superseded_by=v2`, todo en la misma transacción
+- el outbox emite `payroll_entry.reliquidated` con `deltaGross`/`deltaNet` pre-calculados
+- el consumer reactivo `payroll_reliquidation_delta` (TASK-411) aplica **solo el delta** a `greenhouse_finance.expenses` como nuevo expense con `source_type='payroll_reliquidation'` + `reopen_audit_id`, preservando la expense primaria de v1 intacta
+- la suma contable queda: `expense_primario_v1 + sum(deltas_v2..vN) = monto_final`
+
+### Guardas de reopen (V1)
+- Solo `status === 'exported'` puede reabrirse
+- Ventana temporal = mes operativo vigente según `getOperationalPayrollMonth`. Cubre implícitamente la declaración Previred (Previred se declara entre el 1 y el 10 del mes siguiente; el mes operativo vigente, por definición, aún no ha sido declarado).
+- `FOR UPDATE NOWAIT` bloquea reopens concurrentes con exports en curso
+- Motivo obligatorio de taxonomía controlada: `error_calculo | bono_retroactivo | correccion_contractual | otro` (este último exige detalle)
+- Constraint SQL `version <= 2` cierra V1 a una única reliquidación por entry. Reliquidaciones múltiples (v3+) quedan fuera de scope y requieren ampliar el constraint.
 
 ## 10. Flujo de cálculo mensual
 

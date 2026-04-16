@@ -113,11 +113,13 @@ Notas:
 |---|---|---|---|---|
 | `payroll_period` | `payroll_period.created`, `payroll_period.updated`, `payroll_period.calculated`, `payroll_period.approved`, `payroll_period.exported` | `payroll/postgres-store.ts` | `{ periodId, month, year, status? }` | `member_capacity_economics`, `person_intelligence`, `client_economics` |
 | `payroll_entry` | `payroll_entry.upserted` | `payroll/postgres-store.ts` | `{ entryId, periodId, memberId, currency, grossTotal, netTotal }` | `member_capacity_economics`, `person_intelligence`, `client_economics` |
+| `payroll_entry` | `payroll_entry.reliquidated` | `payroll/postgres-store.ts` (supersede path) | `{ entryId, periodId, operationalYear, operationalMonth, memberId, version, previousVersion, previousEntryId, previousGrossTotal, previousNetTotal, newGrossTotal, newNetTotal, deltaGross, deltaNet, currency, reopenAuditId, reason }` | `payroll_reliquidation_delta`, `commercial_cost_attribution`, `client_economics` |
 | `compensation_version` | `compensation_version.created`, `compensation_version.updated` | `payroll/postgres-store.ts` | `{ versionId, memberId, effectiveFrom, payRegime, currency, baseSalary }` | `member_capacity_economics`, `person_intelligence` |
 
 Notas:
 - `payroll_period.exported` sigue siendo el cierre canónico de nómina y también alimenta el intake reactivo de `Finance > Expenses`.
 - La materialización reactiva de expenses de payroll y cargas sociales se publica downstream por las señales existentes de `finance.expense.created|updated`; no existe un evento dedicado `expense.tool_linked`.
+- **TASK-409 / TASK-411** — `payroll_entry.reliquidated` es el evento canónico de reliquidación post-reopen. Lo emite `pgUpsertPayrollEntry` cuando se invoca en modo supersede (dentro de la TX de `supersedePayrollEntryOnRecalculate`). Lleva `deltaGross`/`deltaNet` ya calculados — el consumer `payroll_reliquidation_delta` **solo aplica el delta** a `greenhouse_finance.expenses` (nunca el monto completo) y referencia la fila `payroll_period_reopen_audit` vía `reopenAuditId` para trazabilidad. `finance_expense_reactive_intake` dedupe por `(payroll_period_id, member_id, source_type='payroll_generated')` para que v2 no cree un segundo expense "primario" — la suma canónica queda: `expense_primario_v1 + sum(expense_delta_v2..vN) = monto_final`.
 
 ### ICO Materialization
 
@@ -260,7 +262,8 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.expense.created, finance.expense.updated, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
 | `person_intelligence` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated, ico.materialization.completed | Materializa inteligencia operativa/capacidad/costo por miembro y también soporta fanout por `finance_period` |
 | `projected_payroll` | people | compensation_version.*, payroll_entry.*, payroll_period.calculated, finance.exchange_rate.upserted, ico.materialization.completed | Refresca snapshots de nómina proyectada del período cuando cambia compensación, FX o quedan materializados KPI `ICO` |
-| `finance_expense_reactive_intake` | finance | payroll_period.exported | Materializa expenses system-generated de payroll y social_security en `greenhouse_finance.expenses` |
+| `finance_expense_reactive_intake` | finance | payroll_period.exported | Materializa expenses system-generated de payroll y social_security en `greenhouse_finance.expenses`. Dedupe por `(period_id, member_id, source_type='payroll_generated')` tras TASK-411. |
+| `payroll_reliquidation_delta` | finance | payroll_entry.reliquidated | Aplica delta neto (`deltaGross`) como nuevo expense con `source_type='payroll_reliquidation'` y `reopen_audit_id` FK. Skip/no-op si delta=0. Idempotente por `(event_id, handler)` en outbox_reactive_log. |
 | `payroll_receipts_delivery` | notifications | payroll_period.exported | Genera, persiste y envía el batch de recibos del período exportado |
 | `payroll_export_ready_notification` | notifications | payroll_period.exported | Envía el aviso de cierre/exportación a Finance/HR con el resumen operativo del período |
 

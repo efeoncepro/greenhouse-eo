@@ -1,5 +1,49 @@
 # project_context.md
 
+## Delta 2026-04-15 Service SLA/SLO runtime foundation materialized per service
+
+- `TASK-156` ya no vive solo como intención documental: existe una foundation runtime para gobernar `SLI -> SLO -> SLA` por servicio.
+- Runtime nuevo:
+  - migración `20260415233952871_task-156-service-sla-foundation.sql`
+  - tablas `greenhouse_core.service_sla_definitions` y `greenhouse_serving.service_sla_compliance_snapshots`
+  - route `GET/POST/PATCH/DELETE /api/agency/services/[serviceId]/sla?spaceId=...`
+  - helper canónico `src/lib/agency/sla-compliance.ts`
+  - store `src/lib/services/service-sla-store.ts`
+  - proyección reactiva `src/lib/sync/projections/service-sla-compliance.ts`
+- Contrato operativo:
+  - cada definición SLA queda aislada por `service_id + space_id`
+  - el serving status se materializa por definición con evidencia (`evidence_json`) y estados explícitos (`met`, `at_risk`, `breached`, `source_unavailable`)
+  - los indicadores v1 soportados son `otd_pct`, `rpa_avg`, `ftr_pct`, `revision_rounds` y `ttm_days`
+  - `response_hours` y `first_delivery_days` siguen diferidos hasta tener una fuente canónica materializada; no se deben estimar inline
+  - las métricas se consumen desde `ICO Engine / BigQuery`; la UI nunca debe recalcularlas por su cuenta
+
+## Delta 2026-04-15 Email runtime multi-runtime contract hardened
+
+- El sistema de correo transaccional ya no debe asumir que `RESEND_API_KEY` vive solo como env directo del runtime web de Vercel.
+- Runtime actualizado:
+  - `src/lib/resend.ts` ahora resuelve `RESEND_API_KEY` mediante el helper canónico `Secret Manager -> env fallback -> unconfigured`
+  - `services/ops-worker/deploy.sh` ahora acepta `RESEND_API_KEY_SECRET_REF` y propaga `EMAIL_FROM` al worker
+- Contrato operativo:
+  - el secreto canónico de Resend puede declararse como `RESEND_API_KEY_SECRET_REF`
+  - `RESEND_API_KEY` sigue permitido como fallback legacy para runtimes que aún dependan de env directo
+  - cualquier runtime que procese proyecciones reactivas de email debe recibir el mismo contrato (`RESEND_API_KEY_SECRET_REF` o fallback explícito equivalente), no una configuración manual divergente
+  - `EMAIL_FROM` deja de asumirse implícito en Cloud Run y debe propagarse también al worker cuando ese runtime emite emails
+
+## Delta 2026-04-15 Production ops-worker deploy contract aligned to actual shared infrastructure
+
+- El deploy del `ops-worker` ya no debe asumir una topología `production` separada que hoy no existe en GCP.
+- Runtime actualizado:
+  - `services/ops-worker/deploy.sh` usa defaults por ambiente pero ahora permite overrides explícitos para `NEXTAUTH_SECRET_REF`, `PG_PASSWORD_REF`, `PG_INSTANCE` y `RESEND_API_KEY_SECRET_REF`
+  - el deploy `ENV=production` quedó alineado al contrato real:
+    - `NEXTAUTH_SECRET` desde `greenhouse-nextauth-secret-production`
+    - `RESEND_API_KEY` desde `greenhouse-resend-api-key-production`
+    - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` sigue apuntando a `efeonce-group:us-east4:greenhouse-pg-dev`
+    - `GREENHOUSE_POSTGRES_PASSWORD` sigue resolviendo `greenhouse-pg-dev-app-password`
+- Contrato operativo:
+  - hoy existe **un worker Cloud Run compartido** (`ops-worker`) y **una única instancia Cloud SQL** (`greenhouse-pg-dev`)
+  - `ENV=production` no significa “infra PostgreSQL separada”; significa `auth/email/secrets` de producción sobre la infraestructura compartida vigente
+  - si en el futuro aparece una instancia o password dedicada de producción, el deploy debe hacerse por override explícito o actualizando los defaults, no inventando refs inexistentes
+
 ## Delta 2026-04-13 Entitlements modulares quedan formalizados como dirección canónica de autorización
 
 - Greenhouse ya tiene una arquitectura explícita para evolucionar desde `roleCodes + routeGroups + authorizedViews` hacia una capa de entitlements modular, action-based y scope-aware.
@@ -4533,6 +4577,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `RESEND_API_KEY`
+- `RESEND_API_KEY_SECRET_REF`
 - `EMAIL_FROM`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 - `AGENT_AUTH_SECRET` — shared secret para autenticación headless de agentes y E2E (generar con `openssl rand -hex 32`). Sin esta variable el endpoint `/api/auth/agent-session` responde 404.
@@ -4550,12 +4595,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `RESEND_API_KEY`
+- `RESEND_API_KEY_SECRET_REF`
 - `EMAIL_FROM`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
 - `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` habilitan Microsoft SSO multi-tenant en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` habilitan Google SSO en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `RESEND_API_KEY` y `EMAIL_FROM` quedan reservadas para el sistema de emails transaccionales; no deben commitearse con valores reales y deben existir al menos en `Development`, `Preview`, `Staging` y `Production` si ese flujo se habilita.
+- `RESEND_API_KEY_SECRET_REF` es el contrato canónico recomendado cuando el mismo flujo de email puede correr en más de un runtime (por ejemplo Vercel + Cloud Run); el valor directo `RESEND_API_KEY` queda como fallback legacy.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.

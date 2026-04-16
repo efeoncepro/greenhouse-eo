@@ -9,7 +9,7 @@ import type {
 export type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
 
 export type PayrollCurrency = 'CLP' | 'USD'
-export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported'
+export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported' | 'reopened'
 export type HealthSystem = 'fonasa' | 'isapre'
 export type GratificacionLegalMode = 'mensual_25pct' | 'anual_proporcional' | 'ninguna'
 export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual' | 'external'
@@ -264,6 +264,18 @@ export interface PayrollEntry {
   adjustedColacionAmount: number | null
   adjustedMovilizacionAmount: number | null
   adjustedFixedBonusAmount: number | null
+
+  /** TASK-410/412 — version number within (period, member). v1 = original, v2+ = reliquidation. */
+  version: number
+
+  /** TASK-410/412 — whether this row is the currently authoritative version. */
+  isActive: boolean
+
+  /** TASK-410/412 — entry_id of the version that superseded this one, if any. */
+  supersededBy: string | null
+
+  /** TASK-410/412 — reopen audit row that justified this version (null for v1). */
+  reopenAuditId: string | null
   createdAt: string | null
   updatedAt: string | null
 }

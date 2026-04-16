@@ -98,6 +98,7 @@ export async function GET(request: Request) {
            EXTRACT(YEAR FROM (CURRENT_DATE - ($1 || ' months')::interval)) * 100 +
            EXTRACT(MONTH FROM (CURRENT_DATE - ($1 || ' months')::interval))
          )
+           AND pe.is_active = TRUE
          GROUP BY pp.period_year, pp.period_month
          ORDER BY pp.period_year, pp.period_month`,
         [months]

@@ -209,6 +209,7 @@ const buildFinanceOverview = async (
       FROM greenhouse_payroll.payroll_entries pe
       JOIN greenhouse_payroll.payroll_periods pp ON pp.period_id = pe.period_id
       WHERE pe.member_id = $1
+        AND pe.is_active = TRUE
       ORDER BY pp.year DESC, pp.month DESC, pe.created_at DESC
       LIMIT 12`,
       [memberId]

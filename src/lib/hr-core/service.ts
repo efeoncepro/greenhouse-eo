@@ -36,6 +36,7 @@ import {
   listLeaveRequestsFromPostgres,
   reviewLeaveRequestInPostgres
 } from '@/lib/hr-core/postgres-leave-store'
+import { canPerformLeaveReviewAction, getLeaveApprovalStageCode } from '@/lib/hr-core/leave-review-policy'
 import {
   createDepartmentInPostgres,
   getDepartmentByIdFromPostgres,
@@ -1644,16 +1645,34 @@ export const reviewLeaveRequest = async ({
     const actorMember = await resolveTenantMember(tenant).catch(() => null)
     const actorMemberId = actorMember?.member_id || null
     const actorName = actorMember?.display_name || tenant.userId
+    const hasHrAdminAccess = isHrAdminTenant(tenant)
+
+    const requestForReview: HrLeaveRequest = {
+      ...request,
+      approvalStageCode: getLeaveApprovalStageCode(request.status)
+    }
+
+    if (!['pending_supervisor', 'pending_hr'].includes(request.status)) {
+      throw new HrCoreValidationError(
+        action === 'cancel'
+          ? 'Only pending requests can be cancelled.'
+          : 'This request is no longer pending HR review.',
+        409
+      )
+    }
+
+    if (!canPerformLeaveReviewAction({
+      request: requestForReview,
+      actor: {
+        currentMemberId: actorMemberId,
+        hasHrAdminAccess
+      },
+      action
+    })) {
+      throw new HrCoreValidationError('Forbidden', 403)
+    }
 
     if (action === 'cancel') {
-      if (!isHrAdminTenant(tenant) && actorMemberId !== request.memberId) {
-        throw new HrCoreValidationError('Forbidden', 403)
-      }
-
-      if (!['pending_supervisor', 'pending_hr'].includes(request.status)) {
-        throw new HrCoreValidationError('Only pending requests can be cancelled.', 409)
-      }
-
       await runHrCoreQuery(
         `
           UPDATE \`${projectId}.greenhouse.leave_requests\`
@@ -1680,11 +1699,7 @@ export const reviewLeaveRequest = async ({
           actorUserId
         })
       }
-    } else if (!isHrAdminTenant(tenant)) {
-      if (request.supervisorMemberId !== actorMemberId || request.status !== 'pending_supervisor') {
-        throw new HrCoreValidationError('Forbidden', 403)
-      }
-
+    } else if (!hasHrAdminAccess) {
       await runHrCoreQuery(
         `
           UPDATE \`${projectId}.greenhouse.leave_requests\`
@@ -1713,10 +1728,6 @@ export const reviewLeaveRequest = async ({
         })
       }
     } else {
-      if (!['pending_hr', 'pending_supervisor'].includes(request.status)) {
-        throw new HrCoreValidationError('This request is no longer pending HR review.', 409)
-      }
-
       await runHrCoreQuery(
         `
           UPDATE \`${projectId}.greenhouse.leave_requests\`

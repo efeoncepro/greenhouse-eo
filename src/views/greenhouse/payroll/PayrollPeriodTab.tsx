@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState, useTransition } from 'react'
 
+import { useSession } from 'next-auth/react'
+
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -25,12 +27,14 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import { ConfirmDialog } from '@/components/dialogs'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
+import { ROLE_CODES } from '@/config/role-codes'
 import type { PayrollEntry, PayrollPeriod, PayrollPeriodReadiness } from '@/types/payroll'
 import {
   canEditPayrollPeriodMetadata,
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
 import PayrollEntryTable from './PayrollEntryTable'
+import ReopenPeriodDialog from './ReopenPeriodDialog'
 import { buildPayrollCurrencySummary, formatCurrency, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
 
 type Props = {
@@ -52,10 +56,14 @@ const GOVERNANCE_ATTENDANCE_NOTES = new Set([
 ])
 
 const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel, isHistoricalSelection, currencyEquivalents }: Props) => {
+  const { data: session } = useSession()
+  const isEfeonceAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
+
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [confirmApprove, setConfirmApprove] = useState(false)
+  const [reopenDialogOpen, setReopenDialogOpen] = useState(false)
   const [editMetaOpen, setEditMetaOpen] = useState(false)
   const [editYear, setEditYear] = useState<number | ''>('')
   const [editMonth, setEditMonth] = useState<number | ''>('')
@@ -652,6 +660,36 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                   >
                     Reenviar correo
                   </Button>
+                  {isEfeonceAdmin && (
+                    <Button
+                      variant='tonal'
+                      size='small'
+                      color='warning'
+                      startIcon={<i className='tabler-arrow-back-up' />}
+                      onClick={() => setReopenDialogOpen(true)}
+                      disabled={isPending}
+                      aria-label={`Reabrir la nómina del período ${formatPeriodLabel(period.year, period.month)} para reliquidación`}
+                    >
+                      Reabrir nómina
+                    </Button>
+                  )}
+                </>
+              )}
+              {period.status === 'reopened' && (
+                <>
+                  <Alert severity='warning' sx={{ m: 0, py: 0, width: '100%' }}>
+                    Período reabierto. Recalcula las entries con ajustes y vuelve a cerrarlo para generar la v2.
+                  </Alert>
+                  <Button
+                    variant='contained'
+                    size='small'
+                    color='info'
+                    startIcon={<i className='tabler-refresh' />}
+                    onClick={handleCalculate}
+                    disabled={isPending}
+                  >
+                    Recalcular
+                  </Button>
                 </>
               )}
             </Stack>
@@ -784,6 +822,21 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
         confirmColor='success'
         onConfirm={handleApprove}
       />
+
+      {isEfeonceAdmin && period.status === 'exported' && (
+        <ReopenPeriodDialog
+          open={reopenDialogOpen}
+          onClose={() => setReopenDialogOpen(false)}
+          periodId={period.periodId}
+          periodLabel={formatPeriodLabel(period.year, period.month)}
+          onSuccess={result => {
+            setNotice(
+              `Nómina reabierta. Audit ${result.auditId}. Recalcula las entries con los ajustes y vuelve a cerrarla para exportar la v2.`
+            )
+            onRefresh()
+          }}
+        />
+      )}
 
       {/* Edit period metadata dialog */}
       <Dialog

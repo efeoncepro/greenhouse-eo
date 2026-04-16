@@ -1,5 +1,89 @@
 # Handoff.md
 
+## Sesion 2026-04-15 — ISSUE-049 leave review fix local + ISSUE-050 staging email drift identificada
+
+- **Estado:** `fix local aplicado para review`, `issue separado abierto para email staging`
+- **Rama:** `develop`
+- **Root cause confirmada del review error (`Unable to review leave request.`):**
+  - logs de staging para `POST /api/hr/core/leave/requests/leave-f7b4f48c-cea0-4c0a-89ee-fb4152a8344c/review`
+  - PostgreSQL devolvía `42P08: could not determine data type of parameter $4`
+  - el query afectado era `applyWorkflowApprovalOverrideInTransaction()` en `src/lib/approval-authority/store.ts`, dentro de `jsonb_build_object(...)`
+- **Implementado localmente:**
+  - `src/lib/approval-authority/store.ts`
+    - casteo explícito `$4::text` y `$5::text` en el payload JSON del override HR
+  - `src/lib/hr-core/leave-review-policy.ts` (nuevo)
+    - policy pura compartida para acciones válidas de review por actor + estado
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - elimina dispatch stale por `reviewAction` state
+    - envía la acción clickeada explícitamente
+    - muestra solo botones válidos según la policy
+    - consume `hasHrAdminAccess` desde meta
+  - `src/app/api/hr/core/meta/route.ts`
+  - `src/types/hr-core.ts`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/lib/hr-core/service.ts`
+    - backend alineado a la misma policy para evitar drift UI/backend
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/approval-authority/store.test.ts src/lib/hr-core/leave-review-policy.test.ts src/app/api/hr/core/meta/route.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+  - `12` tests OK
+  - `pnpm exec eslint ...` dirigido sobre los archivos tocados OK
+- **Tema adicional investigado (correo/notificación al crear la solicitud):**
+  - `leave_request.created` sí se publicó en staging
+  - autenticado como `jreyes@efeoncepro.com`, `GET /api/notifications?unreadOnly=true&pageSize=10` sí devuelve la notificación in-app de Daniela
+  - los correos `leave_request_submitted` y `leave_request_pending_review` existen pero quedaron `skipped` con `errorMessage = "RESEND_API_KEY is not configured."`
+  - se abrió `docs/issues/open/ISSUE-050-staging-leave-emails-skipped-resend-not-configured-in-reactive-runtime.md`
+- **Hardening adicional aplicado localmente para ISSUE-050:**
+  - `src/lib/resend.ts`
+    - Resend ya no depende solo de env directo; ahora resuelve `RESEND_API_KEY` vía helper canónico `Secret Manager -> env fallback`
+  - `services/ops-worker/deploy.sh`
+    - acepta `RESEND_API_KEY_SECRET_REF`
+    - propaga `EMAIL_FROM`
+    - deja warning explícito si el worker se despliega sin contrato de email
+  - `src/lib/resend.test.ts` (nuevo)
+    - cubre resolución vía secret helper + fallback unconfigured/default sender
+  - `.env.example`, `project_context.md`, `changelog.md`, `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`, `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+    - sincronizados al contrato nuevo multi-runtime
+- **Lectura operativa actual:**
+  - el problema de review sí era código y quedó corregido localmente
+  - el problema de email staging es drift/config del runtime reactivo y contrato incompleto de Resend entre runtimes, no del flujo HR
+- **Pendiente antes de cerrar ISSUE-049/ISSUE-050 en staging:**
+  - commit + push del fix local
+  - redeploy de `develop`
+  - reprobar aprobación/rechazo real de solicitudes `pending_supervisor`
+  - desplegar `ops-worker` con `RESEND_API_KEY_SECRET_REF` real
+  - reprobar un `leave_request.created` real verificando in-app + emails
+- **Delta 2026-04-15 15:30 CLST — email approval confirmation estabilizado en staging**
+  - deployado `ops-worker` revision `ops-worker-00011-ln8`
+  - `services/ops-worker/deploy.sh` ahora:
+    - asegura `roles/secretmanager.secretAccessor` para los secrets runtime del worker
+    - inyecta `RESEND_API_KEY` como secret nativo de Cloud Run
+    - conserva `RESEND_API_KEY_SECRET_REF` como contrato declarativo para observabilidad/fallback
+  - `gcloud run services describe ops-worker` confirma:
+    - `RESEND_API_KEY_SECRET_REF=greenhouse-resend-api-key-staging`
+    - `RESEND_API_KEY` via `valueFrom.secretKeyRef`
+  - evidencia de entrega ya enviada en staging para la aprobación de Daniela:
+    - `leave_review_confirmation` -> `jreyes@efeoncepro.com` -> `status=sent` -> `resend_id=afeadeae-851d-4ab3-af18-fa77036806fa`
+    - `leave_request_decision` -> `dferreira@efeoncepro.com` -> `status=sent` -> `resend_id=1497dfc7-4d98-4e7a-85b7-260f3b00da06`
+    - `notification` -> `daniela.ferreira@efeonce.org` -> `status=sent` -> `resend_id=dc34b39a-9caf-4b96-8e43-49b39c9203c8`
+  - nota: `POST /api/admin/ops/email-delivery-retry` ya no encontró backlog pendiente porque esas tres entregas ya habían sido drenadas exitosamente antes del recheck final
+- **Delta 2026-04-15 15:58 CLST — worker compartido alineado también para production**
+  - investigación confirmó que hoy no existe `greenhouse-pg-prod`; la topología vigente sigue siendo una única instancia `greenhouse-pg-dev` consumida por todos los runtimes
+  - el drift real estaba en `ops-worker`: venía sirviendo con `RESEND_API_KEY_SECRET_REF=greenhouse-resend-api-key-staging`
+  - se creó el secret `greenhouse-resend-api-key-production` en Secret Manager y se le otorgó `roles/secretmanager.secretAccessor` al SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+  - `services/ops-worker/deploy.sh` quedó endurecido para:
+    - soportar overrides explícitos de `NEXTAUTH_SECRET_REF`, `PG_PASSWORD_REF`, `PG_INSTANCE` y `RESEND_API_KEY_SECRET_REF`
+    - dejar `ENV=production` alineado a la topología real actual en vez de asumir refs/instancias productivas inexistentes
+  - deploy productivo ejecutado desde worktree limpio (el árbol principal tenía cambios de payroll que rompían el tarball de Cloud Build) -> revisión activa `ops-worker-00012-shc`
+  - contrato activo verificado en Cloud Run:
+    - `NEXTAUTH_SECRET -> greenhouse-nextauth-secret-production`
+    - `RESEND_API_KEY -> greenhouse-resend-api-key-production`
+    - `RESEND_API_KEY_SECRET_REF=greenhouse-resend-api-key-production`
+    - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`
+    - `GREENHOUSE_POSTGRES_PASSWORD -> greenhouse-pg-dev-app-password`
+  - smoke adicional sobre producción:
+    - últimos 7 días: `0` filas con `error_message='RESEND_API_KEY is not configured.'`
+    - últimos 7 días: `leave_request_decision=2 sent`, `leave_review_confirmation=2 sent`
+
 ## Sesion 2026-04-15 — Reconciliacion main/develop (content parity)
 
 - **Estado:** `complete`
@@ -393,6 +477,46 @@
   - el seteo y gobierno de estas definiciones queda exigido como CRUD en Admin Center
 - validación:
   - `git diff --check`
+
+## Sesion 2026-04-15 — TASK-156 implementada end-to-end
+
+- alcance:
+  - `docs/tasks/complete/TASK-156-sla-slo-per-service.md`
+  - `migrations/20260415233952871_task-156-service-sla-foundation.sql`
+  - `src/lib/services/service-sla-store.ts`
+  - `src/lib/agency/sla-compliance.ts`
+  - `src/app/api/agency/services/[serviceId]/sla/route.ts`
+  - `src/lib/sync/projections/service-sla-compliance.ts`
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/views/greenhouse/agency/services/ServiceDetailView.tsx`
+  - `src/views/greenhouse/agency/space-360/tabs/ServicesTab.tsx`
+  - `src/views/greenhouse/admin/ServiceSlaGovernanceView.tsx`
+  - `src/app/(dashboard)/admin/service-slas/page.tsx`
+  - `src/lib/agency/space-360.ts`
+  - `src/types/service-sla.ts`
+  - `src/types/db.d.ts`
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `project_context.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+- decisión tomada:
+  - la implementación v1 soporta solo indicadores con source defendible hoy: `otd_pct`, `rpa_avg`, `ftr_pct`, `revision_rounds`, `ttm_days`
+  - `response_hours` y `first_delivery_days` quedan explícitamente diferidos hasta que exista source canónica materializada por servicio
+  - el compliance contractual se materializa en `greenhouse_serving.service_sla_compliance_snapshots` y emite señal reactiva `service.sla_status.changed`
+- actualización clave:
+  - Admin Center ya tiene surface `/admin/service-slas`
+  - la ficha de servicio ya permite CRUD de definiciones SLA y muestra compliance/evidence
+  - `Space 360 > Servicios` ya expone badge SLA por servicio
+  - breach / at-risk ya disparan `ico_alert` para admins vía proyección de notificaciones
+- validación:
+  - `pnpm exec vitest run src/lib/agency/sla-compliance.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm migrate:up`
+  - `rg -n "new Pool\\(" src`
+- notas operativas:
+  - `pnpm build` sigue mostrando logs preexistentes de `Dynamic server usage` por `headers()` en múltiples rutas del dashboard/auth shell, pero el comando termina exitosamente
+  - había cambios ajenos en el worktree que no se tocaron: `.claude/scheduled_tasks.lock` y `services/ops-worker/deploy.sh`
 
 ## Sesion 2026-04-13 — TASK-031 rebaselined al runtime actual del repo
 

@@ -1125,17 +1125,43 @@ Team tab muestra:
 
 ### 11.5 SLA/SLO contractual por servicio
 
-Cada servicio contratado tiene compromisos formales. Hoy OTD es global — debería ser por servicio contra su SLA específico.
+Cada servicio contratado puede tener compromisos formales definidos por indicador. El primer corte ya no usa una tabla genérica `service_sla`; materializa la cadena `SLI -> SLO -> SLA` por servicio con evidencia y serving snapshot propios.
 
 **Data model:**
 
 ```sql
-CREATE TABLE greenhouse_core.service_sla (
+CREATE TABLE greenhouse_core.service_sla_definitions (
+  definition_id TEXT PRIMARY KEY,
   service_id TEXT NOT NULL,
-  sla_type TEXT NOT NULL,            -- 'response_time', 'first_delivery', 'revision_rounds', 'otd_target', 'rpa_target'
-  sla_value NUMERIC NOT NULL,        -- 24 (hours), 5 (days), 2 (rounds), 90 (%), 1.5 (ratio)
-  sla_unit TEXT NOT NULL,            -- 'hours', 'business_days', 'rounds', 'percent', 'ratio'
-  PRIMARY KEY (service_id, sla_type)
+  space_id TEXT NOT NULL,
+  indicator_code TEXT NOT NULL,      -- 'otd_pct' | 'rpa_avg' | 'ftr_pct' | 'revision_rounds' | 'ttm_days'
+  indicator_formula TEXT NOT NULL,
+  measurement_source TEXT NOT NULL,
+  comparison_mode TEXT NOT NULL,     -- 'at_least' | 'at_most'
+  unit TEXT NOT NULL,                -- 'percent' | 'ratio' | 'rounds' | 'days'
+  sli_label TEXT,
+  slo_target_value NUMERIC NOT NULL,
+  sla_target_value NUMERIC NOT NULL,
+  breach_threshold NUMERIC,
+  warning_threshold NUMERIC,
+  display_order INTEGER NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  UNIQUE (service_id, indicator_code)
+);
+
+CREATE TABLE greenhouse_serving.service_sla_compliance_snapshots (
+  snapshot_id TEXT PRIMARY KEY,
+  definition_id TEXT NOT NULL,
+  service_id TEXT NOT NULL,
+  space_id TEXT NOT NULL,
+  indicator_code TEXT NOT NULL,
+  compliance_status TEXT NOT NULL,   -- met | at_risk | breached | source_unavailable
+  source_status TEXT NOT NULL,       -- ready | source_unavailable | insufficient_linkage | insufficient_sample
+  trend_status TEXT NOT NULL,
+  actual_value NUMERIC,
+  delta_to_target NUMERIC,
+  confidence_level TEXT,
+  evidence_json JSONB NOT NULL
 );
 ```
 
@@ -1144,26 +1170,53 @@ CREATE TABLE greenhouse_core.service_sla (
 ```typescript
 interface SlaComplianceReport {
   serviceId: string
-  spaceName: string
-  slas: Array<{
-    type: string
+  spaceId: string
+  overallStatus: 'healthy' | 'at_risk' | 'breached' | 'partial' | 'no_sla_defined'
+  summary: {
+    totalDefinitions: number
+    metCount: number
+    atRiskCount: number
+    breachedCount: number
+    sourceUnavailableCount: number
+  }
+  items: Array<{
+    indicatorCode: string
     target: number
-    actual: number
+    actual: number | null
     unit: string
-    compliant: boolean
-    deviation: number          // positive = over target (good for OTD, bad for response time)
+    complianceStatus: 'met' | 'at_risk' | 'breached' | 'source_unavailable'
+    sourceStatus: 'ready' | 'source_unavailable' | 'insufficient_linkage' | 'insufficient_sample'
+    deltaToTarget: number | null
     trend: 'improving' | 'stable' | 'degrading'
+    evidence: {
+      sourceLabel: string
+      reasons: string[]
+    }
   }>
-  overallCompliance: number    // % of SLAs met
-  atRisk: string[]             // SLAs trending toward breach
 }
 ```
+
+**Indicadores soportados en v1:**
+- `otd_pct`, `rpa_avg`, `ftr_pct` desde `ICO Engine`
+- `revision_rounds` desde `ico_engine.v_tasks_enriched`
+- `ttm_days` desde `greenhouse_conformed.delivery_projects` usando el helper canónico de TTM
+
+**Indicadores explícitamente diferidos en v1:**
+- `response_hours`
+- `first_delivery_days`
+
+Estos dos quedan fuera hasta que exista una fuente canónica materializada y auditable; no se estiman inline desde la UI ni desde la route.
 
 **Consumer:**
 - Service detail page: compliance dashboard
 - Space 360 Services tab: SLA status per service
 - Anomaly detection: SLA breach o trending-toward-breach → alert
-- Client portal: "Your SLA compliance: 95%" (transparent)
+- Admin Center: CRUD de definiciones SLA por servicio
+
+**Runtime contract v1:**
+- route canónica: `GET/POST/PATCH/DELETE /api/agency/services/[serviceId]/sla?spaceId=...`
+- aislamiento tenant obligatorio por `space_id`
+- las métricas nunca se calculan inline desde componentes; se leen desde ICO Engine / BigQuery y se persisten en `greenhouse_serving.service_sla_compliance_snapshots`
 
 ### 11.6 Client Lifecycle Intelligence — Más allá del delivery
 

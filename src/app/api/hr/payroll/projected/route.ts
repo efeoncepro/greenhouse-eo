@@ -64,7 +64,8 @@ export async function GET(request: Request) {
          FROM greenhouse_payroll.payroll_entries e
          INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
          WHERE p.period_id = $1
-           AND p.status IN ('calculated', 'approved', 'exported')`,
+           AND p.status IN ('calculated', 'approved', 'exported')
+           AND e.is_active = TRUE`,
         [periodId]
       ).catch(() => [] as OfficialEntryRow[]),
       getPreviousOfficialPeriodTotals(periodId),

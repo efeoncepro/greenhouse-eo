@@ -8,6 +8,7 @@ export type EmailType =
   | 'verify_email'
   | 'payroll_export'
   | 'payroll_receipt'
+  | 'payroll_liquidacion_v2'
   | 'notification'
   | 'leave_request_decision'
   | 'leave_review_confirmation'
@@ -34,6 +35,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   notification:                 'broadcast',
   payroll_export:               'broadcast',
   payroll_receipt:              'broadcast',
+  payroll_liquidacion_v2:       'transactional',
 }
 
 export interface EmailRecipient {

@@ -31,8 +31,10 @@ import { canEditPayrollEntries } from '@/lib/payroll/period-lifecycle'
 import { getInitials } from '@/utils/getInitials'
 import BonusInput from './BonusInput'
 import ChileDeductionBreakdown from './ChileDeductionBreakdown'
+import EntryVersionHistoryDrawer from './EntryVersionHistoryDrawer'
 import PayrollEntryExplainDialog from './PayrollEntryExplainDialog'
 import PayrollReceiptDialog from './PayrollReceiptDialog'
+import ReliquidationBadge from './ReliquidationBadge'
 import { formatCurrency, formatPercent, formatDecimal, formatFactor, formatAttendanceRatio, otdSemaphore, rpaSemaphore, regimeLabel, regimeColor } from './helpers'
 
 type Props = {
@@ -46,6 +48,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [receiptEntry, setReceiptEntry] = useState<PayrollEntry | null>(null)
   const [explainEntry, setExplainEntry] = useState<PayrollEntry | null>(null)
+  const [historyEntry, setHistoryEntry] = useState<PayrollEntry | null>(null)
 
   const isEditable = canEditPayrollEntries(periodStatus)
 
@@ -116,7 +119,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                             {entry.memberName}
                           </Typography>
                         </Link>
-                        <Stack direction='row' spacing={0.75} sx={{ mt: 0.5 }}>
+                        <Stack direction='row' sx={{ mt: 0.5, flexWrap: 'wrap', gap: 0.5 }}>
                           <CustomChip
                             round='true'
                             size='small'
@@ -129,6 +132,19 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                           )}
                           {isHonorarios && (
                             <CustomChip round='true' size='small' label='Honorarios' color='warning' sx={{ height: 18, fontSize: '0.65rem' }} />
+                          )}
+                          <ReliquidationBadge version={entry.version} reliquidatedAt={entry.updatedAt} />
+                          {entry.version > 1 && (
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant='outlined'
+                              color='secondary'
+                              label='Ver historial'
+                              icon={<i className='tabler-history' />}
+                              onClick={() => setHistoryEntry(entry)}
+                              sx={{ height: 18, fontSize: '0.65rem', cursor: 'pointer' }}
+                            />
                           )}
                         </Stack>
                       </Box>
@@ -605,6 +621,12 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
       onClose={() => setExplainEntry(null)}
       entryId={explainEntry?.entryId ?? null}
       memberName={explainEntry?.memberName ?? null}
+    />
+    <EntryVersionHistoryDrawer
+      open={!!historyEntry}
+      onClose={() => setHistoryEntry(null)}
+      entryId={historyEntry?.entryId ?? null}
+      memberName={historyEntry?.memberName ?? null}
     />
     </>
   )

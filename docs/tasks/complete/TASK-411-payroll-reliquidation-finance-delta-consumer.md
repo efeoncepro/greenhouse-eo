@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -260,8 +260,24 @@ Esto preserva historial contable y no destruye el asiento original, lo cual es p
 - V2: reporte específico "Reliquidaciones del mes" en Finance dashboard
 - Investigar si el reporting actual de P&L suma correctamente postings con `posting_type = 'payroll_reliquidation_delta'` — podría requerir actualización de VIEWs
 
-## Open Questions
+## Delta 2026-04-15 — Audit Findings (pre-implementación)
 
-- ¿La tabla canónica es `greenhouse_finance.postings` o `journal_entries`? (Discovery)
-- ¿El framework reactivo tiene un método nativo para idempotencia o cada consumer lo implementa a mano? (Revisar patrón en `payroll-export-ready.ts`)
-- ¿El recompute de `commercial_cost_attribution` se puede disparar vía HTTP al worker (`POST /cost-attribution/materialize`) o debe llamarse in-process?
+Durante Discovery se detectaron supuestos desactualizados que cambian materialmente el diseño:
+
+1. **NO existe tabla `postings` / `journal_entries` en Finance.** El payroll cost vive en `greenhouse_finance.expenses` + `greenhouse_finance.expense_payments`. Flujo actual: `payroll_period.exported` → consumer `finance_expense_reactive_intake` materializa un `expense` por entry (`expenseType='payroll'`, linkeado vía `payroll_entry_id` + `payroll_period_id`).
+2. **El check de idempotencia actual es `WHERE payroll_entry_id = $1`**, lo que causaría **double-counting** si creamos v2 con nuevo `entry_id`: el consumer vería el v2 como "nuevo" y crearía una segunda expense. **Corrección obligatoria**: cambiar el check a `WHERE (payroll_period_id, member_id) = ($1, $2)` — una sola expense "primaria" por `(period, member)`, independiente del entry_id.
+3. **Idempotencia del framework reactivo es automática** vía PK `(event_id, handler)` en `greenhouse_sync.outbox_reactive_log`. No hay que implementarla en el handler.
+4. **Recompute de proyecciones**: `commercialCostAttributionProjection` y `clientEconomicsProjection` ya tienen eventos payroll en sus `triggerEvents`. Basta con agregar `payroll_entry.reliquidated` al mismo array — se recalculan automáticamente.
+5. **No existe `posting_type` ni `related_posting_id`**. La expense de delta se distingue por `costCategory='direct_labor'` + `notes` explícito + el `reopen_audit_id` como FK.
+
+## Arquitectura V1 Final (Delta-only)
+
+- **Cambio 1**: `finance_expense_reactive_intake` pasa a idempotencia por `(payroll_period_id, member_id)`.
+- **Cambio 2**: Nuevo consumer `payroll_reliquidation_delta` inserta expense de ajuste con `amount = delta_gross` en la misma `(period, member)`. Skip si delta = 0.
+- **Cambio 3**: Columna nueva `reopen_audit_id` en `greenhouse_finance.expenses` (nullable, FK al audit table).
+
+## Open Questions — Resueltas
+
+- Tabla canónica: `greenhouse_finance.expenses`.
+- Framework idempotente: automático vía `outbox_reactive_log`.
+- Recompute projections: automático al agregar `payroll_entry.reliquidated` a `triggerEvents`.

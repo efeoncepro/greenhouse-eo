@@ -17,10 +17,29 @@ set -euo pipefail
 
 # ─── Environment ─────────────────────────────────────────────────────────────
 # Usage:
-#   bash services/ops-worker/deploy.sh              # defaults to staging
+#   ENV=staging    bash services/ops-worker/deploy.sh
 #   ENV=production bash services/ops-worker/deploy.sh
+#
+# ENV is REQUIRED — there is no silent default. The ops-worker is a SINGLE
+# Cloud Run service intentionally shared by both staging and production
+# (same DB, same scheduler jobs, same runtime revision). This is the canonical
+# topology, not a temporary shortcut. ENV only selects which NEXTAUTH /
+# RESEND secret refs get mounted, so a wrong ENV silently swaps credentials
+# on a live shared service. Forcing the caller to be explicit is hygiene —
+# the GitHub Actions workflow derives ENV from the branch (develop→staging,
+# main→production) and local operators must type it.
 
-ENV="${ENV:-staging}"
+if [ -z "${ENV:-}" ]; then
+  echo "ERROR: ENV must be set explicitly — 'staging' or 'production'."
+  echo "       ops-worker is a shared service; silent defaults are unsafe."
+  echo "       Usage: ENV=staging bash services/ops-worker/deploy.sh"
+  exit 1
+fi
+
+if [ "${ENV}" != "staging" ] && [ "${ENV}" != "production" ]; then
+  echo "ERROR: ENV must be 'staging' or 'production', got '${ENV}'."
+  exit 1
+fi
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 
@@ -45,22 +64,84 @@ CPU="2"
 TIMEOUT="540"
 CONCURRENCY="4"
 REACTIVE_BATCH_SIZE="500"
+DEFAULT_EMAIL_FROM="Efeonce Greenhouse <greenhouse@efeoncepro.com>"
 
 # Cloud Scheduler timezone
 SCHEDULER_TZ="America/Santiago"
 
-# Environment-specific secrets (Secret Manager references)
+# Environment-specific defaults (overridable)
 if [ "${ENV}" = "production" ]; then
-  NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-production:latest"
-  PG_PASSWORD_REF="greenhouse-pg-prod-app-password:latest"
-  PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-prod"
+  DEFAULT_NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-production:latest"
+  # Production currently shares the canonical Cloud SQL instance and app password
+  # with the rest of the portal runtime. Keep the contract overrideable so the
+  # script can move to dedicated prod infrastructure without another refactor.
+  DEFAULT_PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
+  DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
+  DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-production"
   echo "=== PRODUCTION deployment ==="
 else
-  NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-staging:latest"
-  PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
-  PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
+  DEFAULT_NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-staging:latest"
+  DEFAULT_PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
+  DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
+  DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-staging"
   echo "=== STAGING deployment ==="
 fi
+
+NEXTAUTH_SECRET_REF="${NEXTAUTH_SECRET_REF:-${DEFAULT_NEXTAUTH_SECRET_REF}}"
+PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
+PG_INSTANCE="${PG_INSTANCE:-${DEFAULT_PG_INSTANCE}}"
+RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-${DEFAULT_RESEND_API_KEY_SECRET_REF}}"
+EMAIL_FROM="${EMAIL_FROM:-${DEFAULT_EMAIL_FROM}}"
+
+# ─── Secret access helpers ───────────────────────────────────────────────────
+
+extract_secret_name() {
+  local ref="$1"
+  local normalized="${ref%%:latest}"
+
+  if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
+    normalized="${normalized#projects/}"
+    normalized="${normalized#*/secrets/}"
+    normalized="${normalized%%/versions/*}"
+  fi
+
+  printf '%s' "${normalized}"
+}
+
+normalize_secret_ref_for_cloud_run() {
+  local ref="$1"
+  local normalized="${ref}"
+
+  if [[ "${normalized}" == projects/*/secrets/*/versions/* ]]; then
+    printf '%s' "${normalized}"
+    return 0
+  fi
+
+  if [[ "${normalized}" == *:* ]]; then
+    printf '%s' "${normalized}"
+    return 0
+  fi
+
+  printf '%s:latest' "${normalized}"
+}
+
+ensure_secret_accessor_binding() {
+  local ref="$1"
+
+  if [ -z "${ref}" ]; then
+    return 0
+  fi
+
+  local secret_name
+  secret_name="$(extract_secret_name "${ref}")"
+
+  echo "=== Ensuring ${SERVICE_ACCOUNT} can access secret ${secret_name} ==="
+  gcloud secrets add-iam-policy-binding "${secret_name}" \
+    --project="${PROJECT_ID}" \
+    --member="serviceAccount:${SERVICE_ACCOUNT}" \
+    --role="roles/secretmanager.secretAccessor" \
+    --quiet >/dev/null
+}
 
 # ─── Build & Deploy to Cloud Run ─────────────────────────────────────────────
 
@@ -78,6 +159,13 @@ steps:
     args: ['build', '-t', '${IMAGE}', '-f', 'services/ops-worker/Dockerfile', '.']
 images:
   - '${IMAGE}'
+options:
+  # Route build logs exclusively to Cloud Logging. Cloud Build's legacy
+  # behavior writes logs to a GCS bucket that requires project Viewer/Owner
+  # to stream, which breaks \`gcloud builds submit\` from restricted deployer
+  # SAs even when the build itself succeeds. Cloud Logging honors the
+  # deployer's \`roles/logging.viewer\` binding cleanly.
+  logging: CLOUD_LOGGING_ONLY
 CLOUDBUILD_EOF
 then
   echo "ERROR: Cloud Build failed — aborting deployment."
@@ -93,10 +181,28 @@ ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=${PG_INSTANCE
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
+ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
+
+if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
+  ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
+else
+  echo "WARN: RESEND_API_KEY_SECRET_REF is not set; ops-worker will skip outbound email delivery."
+fi
 
 # Secrets from Secret Manager (mounted as env vars)
 SECRETS="NEXTAUTH_SECRET=${NEXTAUTH_SECRET_REF}"
 SECRETS="${SECRETS},GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
+
+if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
+  SECRETS="${SECRETS},RESEND_API_KEY=$(normalize_secret_ref_for_cloud_run "${RESEND_API_KEY_SECRET_REF}")"
+fi
+
+ensure_secret_accessor_binding "${NEXTAUTH_SECRET_REF}"
+ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
+
+if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
+  ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF}"
+fi
 
 gcloud run deploy "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \

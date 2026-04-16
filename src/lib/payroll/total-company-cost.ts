@@ -54,6 +54,7 @@ export const getLatestPeriodCompanyCost = async (): Promise<PeriodCompanyCost | 
        FROM greenhouse_payroll.payroll_entries e
        INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
        WHERE p.status IN ('calculated', 'approved', 'exported')
+         AND e.is_active = TRUE
        GROUP BY p.year, p.month, p.status
        ORDER BY p.year DESC, p.month DESC
        LIMIT 1`

@@ -190,6 +190,7 @@ export interface HrAttendanceRecord {
 
 export interface HrCoreMetadata {
   currentMemberId?: string | null
+  hasHrAdminAccess?: boolean
   departments: HrDepartment[]
   leaveTypes: HrLeaveType[]
   jobLevels: HrJobLevel[]

@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getSpaceFinanceMetrics } from '@/lib/agency/agency-finance-metrics'
+import { getServiceSlaComplianceReport } from '@/lib/agency/sla-compliance'
 import { getEmptySpaceSkillCoverage, getSpaceSkillCoverage } from '@/lib/agency/skills-staffing'
 import { readLatestSpaceMetrics, readProjectMetrics } from '@/lib/ico-engine/read-metrics'
 import { getIcoEngineProjectId, runIcoEngineQuery, toNumber as toIcoNumber, normalizeString } from '@/lib/ico-engine/shared'
@@ -11,6 +12,7 @@ import { getServicesBySpace, type ServiceListItem } from '@/lib/services/service
 import { getSpaceHealth, type SpaceHealthZone } from '@/components/agency/space-health'
 import { getScopeOwnership, type ScopeOwnership } from '@/lib/operational-responsibility/readers'
 import type { MemberSkill, ServiceStaffingRecommendation } from '@/types/agency-skills'
+import type { ServiceSlaOverallStatus } from '@/types/service-sla'
 
 type RiskLevel = 'low' | 'medium' | 'high'
 type DataStatus = 'ready' | 'partial' | 'missing'
@@ -599,7 +601,13 @@ export type Space360Detail = {
     }
   }
   services: {
-    items: Array<ServiceListItem>
+    items: Array<ServiceListItem & {
+      slaOverallStatus?: ServiceSlaOverallStatus
+      slaDefinitionCount?: number
+      slaAtRiskCount?: number
+      slaBreachedCount?: number
+      slaSourceUnavailableCount?: number
+    }>
     totalCostClp: number
     stageMix: Record<string, number>
   }
@@ -709,6 +717,17 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
       : Promise.resolve(getEmptySpaceSkillCoverage(context.space_id))
   ])
 
+  const serviceSlaReports = context.space_id
+    ? await Promise.all(
+        services.map(service =>
+          getServiceSlaComplianceReport({
+            serviceId: service.serviceId,
+            spaceId: context.space_id as string
+          }).catch(() => null)
+        )
+      )
+    : []
+
   const currentPeriod = getCurrentPeriod()
 
   const memberSnapshots = assignments.length > 0
@@ -814,6 +833,19 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
 
     return acc
   }, {})
+
+  const servicesWithSla = services.map((service, index) => {
+    const report = serviceSlaReports[index] ?? null
+
+    return {
+      ...service,
+      slaOverallStatus: report?.overallStatus,
+      slaDefinitionCount: report?.summary.totalDefinitions ?? 0,
+      slaAtRiskCount: report?.summary.atRiskCount ?? 0,
+      slaBreachedCount: report?.summary.breachedCount ?? 0,
+      slaSourceUnavailableCount: report?.summary.sourceUnavailableCount ?? 0
+    }
+  })
 
   const provenance: string[] = []
 
@@ -921,7 +953,7 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
       }
     },
     services: {
-      items: services,
+      items: servicesWithSla,
       totalCostClp: Math.round(services.reduce((sum, service) => sum + (service.totalCost ?? 0), 0)),
       stageMix: servicesStageMix
     },

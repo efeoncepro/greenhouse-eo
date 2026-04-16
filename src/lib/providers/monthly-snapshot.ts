@@ -365,6 +365,7 @@ export const materializeProviderToolingMonthlySnapshot = async (
         INNER JOIN greenhouse_payroll.payroll_entries AS pe
           ON pe.period_id = pp.period_id
          AND pe.member_id = pm.member_id
+         AND pe.is_active = TRUE
       )
       SELECT
         p.provider_id,

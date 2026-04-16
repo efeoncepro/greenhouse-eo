@@ -1,5 +1,33 @@
 # changelog.md
 
+## 2026-04-15
+
+### 2026-04-15 — TASK-156: foundation runtime para SLA/SLO contractual por servicio
+
+- Se creó la migración `20260415233952871_task-156-service-sla-foundation.sql` con dos piezas nuevas:
+  - `greenhouse_core.service_sla_definitions` para definir `SLI -> SLO -> SLA` por servicio y `space_id`
+  - `greenhouse_serving.service_sla_compliance_snapshots` para materializar cumplimiento, evidencia y tendencia por definición
+- Nuevo helper `src/lib/agency/sla-compliance.ts` que evalúa el cumplimiento por servicio usando fuentes canónicas:
+  - `otd_pct`, `rpa_avg`, `ftr_pct` desde `ICO Engine`
+  - `revision_rounds` desde `ico_engine.v_tasks_enriched`
+  - `ttm_days` desde `greenhouse_conformed.delivery_projects` con el helper canónico de time-to-market
+- Nuevo store `src/lib/services/service-sla-store.ts` para CRUD tenant-safe por `space_id`, más snapshots y status agregados por servicio.
+- Nueva route `GET/POST/PATCH/DELETE /api/agency/services/[serviceId]/sla?spaceId=...` para consumo de Agency/Admin.
+- Nuevo flujo reactivo:
+  - eventos `service.sla_definition.created|updated|deleted`
+  - evento `service.sla_status.changed`
+  - proyección `src/lib/sync/projections/service-sla-compliance.ts`
+  - notificaciones `ico_alert` para admins cuando un servicio entra en `at_risk` o `breached`
+- La arquitectura quedó alineada al runtime real en `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`.
+- `response_hours` y `first_delivery_days` quedaron explícitamente diferidos hasta tener una fuente canónica materializada; este corte no los inventa inline.
+
+### 2026-04-15 — Email runtime de Resend endurecido para Vercel + Cloud Run
+
+- `src/lib/resend.ts` ya no depende solo de `process.env.RESEND_API_KEY`; ahora resuelve `RESEND_API_KEY` vía el helper canónico `Secret Manager -> env fallback -> unconfigured`.
+- Se agrega `RESEND_API_KEY_SECRET_REF` al contrato documentado del repo (`.env.example`, `project_context.md`) para evitar drift entre runtimes que procesan email.
+- `services/ops-worker/deploy.sh` ahora propaga `EMAIL_FROM` y acepta `RESEND_API_KEY_SECRET_REF` para que el worker reactivo pueda emitir correos con el mismo contrato de secretos del portal.
+- La corrección apunta al incidente de staging donde las solicitudes de permisos sí generaban eventos y notificaciones in-app, pero los correos quedaban `failed/skipped` por ausencia de configuración efectiva de Resend en el runtime reactivo.
+
 ## 2026-04-13
 
 ### 2026-04-13 — TASK-392: Management Accounting Reliable Actual Foundation Program cerrado como entrega documental
