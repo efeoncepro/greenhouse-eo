@@ -159,6 +159,13 @@ steps:
     args: ['build', '-t', '${IMAGE}', '-f', 'services/ops-worker/Dockerfile', '.']
 images:
   - '${IMAGE}'
+options:
+  # Route build logs exclusively to Cloud Logging. Cloud Build's legacy
+  # behavior writes logs to a GCS bucket that requires project Viewer/Owner
+  # to stream, which breaks \`gcloud builds submit\` from restricted deployer
+  # SAs even when the build itself succeeds. Cloud Logging honors the
+  # deployer's \`roles/logging.viewer\` binding cleanly.
+  logging: CLOUD_LOGGING_ONLY
 CLOUDBUILD_EOF
 then
   echo "ERROR: Cloud Build failed — aborting deployment."
