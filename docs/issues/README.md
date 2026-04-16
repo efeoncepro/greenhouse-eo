@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-051`
+`ISSUE-052`
 
 ## Open
 
@@ -113,6 +113,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-026` | [Mi Perfil crash: leave.requests nested object + auth redirect](resolved/ISSUE-026-my-profile-crash-leave-requests-nested-object.md)                              | production + staging           | 2026-04-07 | 2026-04-07 | `leave?.requests` es objeto anidado no array; fallback auth a `/dashboard` en vez de `/home`                             |
 | `ISSUE-029` | [HubSpot sync falla por columnas incorrectas en identity_profiles](resolved/ISSUE-029-hubspot-sync-identity-profiles-column-mismatch.md)                          | staging + production           | 2026-04-07 | 2026-04-07 | `source_system` → `primary_source_system` + `profile_type` NOT NULL faltante en INSERT                                   |
 | `ISSUE-028` | [HubSpot Cloud Run service 401: Private App Token expirado](resolved/ISSUE-028-hubspot-cloud-run-token-expired.md)                                                | staging + production           | 2026-04-07 | 2026-04-07 | Private App Token en Secret Manager revocado; rotado a version 2 + Cloud Run service update                              |
+| `ISSUE-051` | [Emails de recibo de nómina no se envían: INSERT column mismatch](resolved/ISSUE-051-payroll-receipt-emails-insert-column-mismatch.md) | staging + production | 2026-04-16 | 2026-04-16 | `buildSavePayrollReceiptStatement()` tenía 2 `CURRENT_TIMESTAMP` extra en VALUES sin columna correspondiente; ops-worker no auto-desplegaba cambios en `src/lib/payroll/` |
 | `ISSUE-001` | [SSL bad certificate en webhook-dispatch](resolved/ISSUE-001-ssl-bad-certificate-production.md)                                                                   | production                     | 2026-03-30 | 2026-03-30 | `GREENHOUSE_POSTGRES_IP_TYPE` faltante en production                                                                     |
 | `ISSUE-030` | [CI: test stale de OrganizationPeopleTab bloquea PRs no relacionados](resolved/ISSUE-030-ci-stale-organization-people-tab-test-blocks-unrelated-prs.md)           | preview + GitHub Actions CI    | 2026-04-08 | 2026-04-08 | El test asumía 1 `fetch()` y un solo `1.0`, pero el componente ya cargaba memberships + faceta `team` y renderizaba KPI  |
 | `ISSUE-033` | [Emails duplicados a HR cuando permiso salta supervisor](resolved/ISSUE-033-leave-email-duplicate-hr-when-no-supervisor.md)                                       | production + staging           | 2026-04-09 | 2026-04-09 | `leave_request.created` sin supervisor duplicaba notificacion de `escalated_to_hr` a HR                                  |
