@@ -462,3 +462,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-412` | `complete` | Payroll Reliquidación Admin UI, Preview & Audit Trail | `docs/tasks/complete/TASK-412-payroll-reliquidation-admin-ui-preview-audit.md` |
 | `TASK-413` | `to-do` | Kortex Identity Bridge Hardening & Contract Closure | `docs/tasks/to-do/TASK-413-kortex-identity-bridge-hardening.md` |
 | `TASK-414` | `to-do` | Payroll Reopen Policy Engine & Hardening | `docs/tasks/to-do/TASK-414-payroll-reopen-policy-engine-hardening.md` |
+| `TASK-415` | `to-do` | Space 360 Motion Consistency & Empty State Normalization | `docs/tasks/to-do/TASK-415-space-360-motion-consistency-empty-state.md` |
