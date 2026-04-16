@@ -225,4 +225,155 @@ describe('listLeaveRequestsFromPostgres', () => {
     expect(String(memberQuery?.[0])).toContain('m.identity_profile_id,')
     expect(String(memberQuery?.[0])).not.toContain('\n        member_id,')
   })
+
+  it('seeds balances for all active members when an admin opens team balances without a member filter', async () => {
+    mockRunGreenhousePostgresQuery.mockImplementation(async (query: unknown) => {
+      const sql = String(query)
+
+      if (sql.includes('FROM greenhouse_hr.leave_policies')) {
+        return []
+      }
+
+      if (sql.includes('FROM greenhouse_hr.leave_balances AS b')) {
+        return [
+          {
+            balance_id: 'balance-daniela-vacation-2026',
+            member_id: 'daniela-ferreira',
+            member_name: 'Daniela Ferreira',
+            employment_type: 'full_time',
+            hire_date: '2024-01-10',
+            contract_type: 'indefinido',
+            pay_regime: 'chile',
+            payroll_via: 'internal',
+            leave_type_code: 'vacation',
+            leave_type_name: 'Vacaciones',
+            year: 2026,
+            allowance_days: 15,
+            progressive_extra_days: 0,
+            carried_over_days: 0,
+            adjustment_days: 0,
+            accumulated_periods: 0,
+            used_days: 0,
+            reserved_days: 0
+          },
+          {
+            balance_id: 'balance-valentina-vacation-2026',
+            member_id: 'valentina-hoyos',
+            member_name: 'Valentina Hoyos',
+            employment_type: 'full_time',
+            hire_date: '2024-03-01',
+            contract_type: 'indefinido',
+            pay_regime: 'chile',
+            payroll_via: 'internal',
+            leave_type_code: 'vacation',
+            leave_type_name: 'Vacaciones',
+            year: 2026,
+            allowance_days: 15,
+            progressive_extra_days: 0,
+            carried_over_days: 0,
+            adjustment_days: 0,
+            accumulated_periods: 0,
+            used_days: 0,
+            reserved_days: 0
+          }
+        ]
+      }
+
+      return REQUIRED_TABLES.map(qualified_name => ({ qualified_name }))
+    })
+
+    mockClientQuery.mockImplementation(async (query: unknown, params?: unknown[]) => {
+      const sql = String(query)
+
+      if (sql.includes('FROM greenhouse_core.members AS m') && sql.includes('WHERE m.active = TRUE')) {
+        return {
+          rows: [
+            {
+              member_id: 'daniela-ferreira',
+              display_name: 'Daniela Ferreira',
+              email: 'daniela@efeoncepro.com',
+              avatar_url: null,
+              linked_user_id: 'user-daniela',
+              identity_profile_id: 'identity-daniela',
+              reports_to: null,
+              employment_type: 'full_time',
+              hire_date: '2024-01-10',
+              prior_work_years: 0,
+              contract_type: 'indefinido',
+              pay_regime: 'chile',
+              payroll_via: 'internal'
+            },
+            {
+              member_id: 'valentina-hoyos',
+              display_name: 'Valentina Hoyos',
+              email: 'valentina@efeoncepro.com',
+              avatar_url: null,
+              linked_user_id: 'user-valentina',
+              identity_profile_id: 'identity-valentina',
+              reports_to: null,
+              employment_type: 'full_time',
+              hire_date: '2024-03-01',
+              prior_work_years: 0,
+              contract_type: 'indefinido',
+              pay_regime: 'chile',
+              payroll_via: 'internal'
+            }
+          ]
+        }
+      }
+
+      if (sql.includes('FROM greenhouse_hr.leave_types')) {
+        return {
+          rows: [
+            {
+              leave_type_code: 'vacation',
+              leave_type_name: 'Vacaciones',
+              description: null,
+              default_annual_allowance_days: 15,
+              requires_attachment: false,
+              is_paid: true,
+              active: true,
+              color_token: null
+            }
+          ]
+        }
+      }
+
+      if (sql.includes('FROM greenhouse_hr.leave_policies')) {
+        return { rows: [] }
+      }
+
+      if (sql.includes('FROM greenhouse_hr.leave_balances') && sql.includes('AND b.year = $3')) {
+        return { rows: [] }
+      }
+
+      if (sql.includes('INSERT INTO greenhouse_hr.leave_balances')) {
+        return { rows: [], rowCount: 1, params }
+      }
+
+      return { rows: [] }
+    })
+
+    const payload = await listLeaveBalancesFromPostgres({
+      tenant: adminTenant,
+      year: 2026
+    })
+
+    expect(payload.balances.map(balance => balance.memberId)).toEqual(['daniela-ferreira', 'valentina-hoyos'])
+
+    const insertCalls = mockClientQuery.mock.calls.filter(call =>
+      String(call[0]).includes('INSERT INTO greenhouse_hr.leave_balances'))
+
+    expect(insertCalls).toHaveLength(2)
+
+    const insertedMemberIds = insertCalls.map(call => call[1]?.[1])
+
+    expect(insertedMemberIds).toContain('daniela-ferreira')
+    expect(insertedMemberIds).toContain('valentina-hoyos')
+
+    const activeMembersQuery = mockClientQuery.mock.calls.find(call =>
+      String(call[0]).includes('WHERE m.active = TRUE'))
+
+    expect(activeMembersQuery).toBeTruthy()
+  })
 })

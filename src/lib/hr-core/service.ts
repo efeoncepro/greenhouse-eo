@@ -686,6 +686,42 @@ const ensureYearBalances = async ({ memberId, year, actorUserId }: { memberId: s
   )
 }
 
+const listActiveMemberIdsForBalanceSeeding = async () => {
+  await assertHrCoreInfrastructureReady()
+  const projectId = getProjectId()
+
+  const rows = await runHrCoreQuery<{ member_id: string }>(
+    `
+      SELECT
+        m.member_id
+      FROM \`${projectId}.greenhouse.team_members\` AS m
+      WHERE COALESCE(m.active, TRUE) = TRUE
+      ORDER BY m.display_name ASC, m.member_id ASC
+    `,
+    {}
+  )
+
+  return rows.map(row => row.member_id).filter(Boolean)
+}
+
+const ensureYearBalancesForAllActiveMembers = async ({
+  year,
+  actorUserId
+}: {
+  year: number
+  actorUserId: string
+}) => {
+  const memberIds = await listActiveMemberIdsForBalanceSeeding()
+
+  for (const memberId of memberIds) {
+    await ensureYearBalances({
+      memberId,
+      year,
+      actorUserId
+    })
+  }
+}
+
 const getBalanceRow = async ({ memberId, leaveTypeCode, year }: { memberId: string; leaveTypeCode: string; year: number }) => {
   const projectId = getProjectId()
 
@@ -1247,6 +1283,11 @@ export const listLeaveBalances = async ({
       await assertMemberVisibleToTenant(tenant, effectiveMemberId)
       await ensureYearBalances({
         memberId: effectiveMemberId,
+        year: effectiveYear,
+        actorUserId: tenant.userId
+      })
+    } else if (isHrAdminTenant(tenant)) {
+      await ensureYearBalancesForAllActiveMembers({
         year: effectiveYear,
         actorUserId: tenant.userId
       })

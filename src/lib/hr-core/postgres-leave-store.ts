@@ -757,6 +757,45 @@ const getMemberById = async (memberId: string, client?: PoolClient) => {
   return row
 }
 
+const listActiveMembersForBalanceSeeding = async (client?: PoolClient) => {
+  await assertHrCoreLeavePostgresReady()
+
+  return queryRows<PostgresMemberResolverRow>(
+    `
+      SELECT
+        m.member_id,
+        m.display_name,
+        m.primary_email AS email,
+        COALESCE(p360.resolved_avatar_url, m.avatar_url) AS avatar_url,
+        p360.user_id AS linked_user_id,
+        m.identity_profile_id,
+        m.reports_to_member_id AS reports_to,
+        m.employment_type,
+        m.hire_date,
+        COALESCE(m.prior_work_years, 0) AS prior_work_years,
+        m.contract_type,
+        COALESCE(
+          m.pay_regime,
+          (
+            SELECT cv.pay_regime
+            FROM greenhouse_payroll.compensation_versions AS cv
+            WHERE cv.member_id = m.member_id
+            ORDER BY cv.effective_from DESC, cv.version DESC
+            LIMIT 1
+          )
+        ) AS pay_regime,
+        m.payroll_via
+      FROM greenhouse_core.members AS m
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = m.member_id
+      WHERE m.active = TRUE
+      ORDER BY m.display_name ASC, m.member_id ASC
+    `,
+    [],
+    client
+  )
+}
+
 const resolveTenantMember = async (tenant: TenantContext, client?: PoolClient) => {
   await assertHrCoreLeavePostgresReady()
 
@@ -1031,6 +1070,52 @@ const computeBalanceSeedForYear = async ({
   )
 }
 
+const seedYearBalancesForMembers = async ({
+  members,
+  year,
+  actorUserId,
+  client
+}: {
+  members: PostgresMemberResolverRow[]
+  year: number
+  actorUserId: string
+  client: PoolClient
+}) => {
+  if (members.length === 0) {
+    return
+  }
+
+  const [leaveTypes, leavePolicies] = await Promise.all([
+    listLeaveTypesInternal(client),
+    listLeavePoliciesInternal(client)
+  ])
+
+  for (const member of members) {
+    for (const leaveType of leaveTypes.filter(item => item.active)) {
+      const resolution = resolveApplicableLeavePolicy({
+        leaveType,
+        policies: leavePolicies,
+        member: buildMemberPolicyContext({
+          employmentType: member.employment_type,
+          hireDate: member.hire_date,
+          contractType: member.contract_type,
+          payRegime: member.pay_regime,
+          payrollVia: member.payroll_via
+        })
+      })
+
+      await computeBalanceSeedForYear({
+        member,
+        leaveType,
+        policy: resolution.policy,
+        year,
+        actorUserId,
+        client
+      })
+    }
+  }
+}
+
 const ensureYearBalances = async ({
   memberId,
   year,
@@ -1044,33 +1129,31 @@ const ensureYearBalances = async ({
 }) => {
   const member = await getMemberById(memberId, client)
 
-  const [leaveTypes, leavePolicies] = await Promise.all([
-    listLeaveTypesInternal(client),
-    listLeavePoliciesInternal(client)
-  ])
+  await seedYearBalancesForMembers({
+    members: [member],
+    year,
+    actorUserId,
+    client
+  })
+}
 
-  for (const leaveType of leaveTypes.filter(item => item.active)) {
-    const resolution = resolveApplicableLeavePolicy({
-      leaveType,
-      policies: leavePolicies,
-      member: buildMemberPolicyContext({
-        employmentType: member.employment_type,
-        hireDate: member.hire_date,
-        contractType: member.contract_type,
-        payRegime: member.pay_regime,
-        payrollVia: member.payroll_via
-      })
-    })
+const ensureYearBalancesForAllActiveMembers = async ({
+  year,
+  actorUserId,
+  client
+}: {
+  year: number
+  actorUserId: string
+  client: PoolClient
+}) => {
+  const members = await listActiveMembersForBalanceSeeding(client)
 
-    await computeBalanceSeedForYear({
-      member,
-      leaveType,
-      policy: resolution.policy,
-      year,
-      actorUserId,
-      client
-    })
-  }
+  await seedYearBalancesForMembers({
+    members,
+    year,
+    actorUserId,
+    client
+  })
 }
 
 const getBalanceByKey = async ({
@@ -1447,6 +1530,14 @@ export const listLeaveBalancesFromPostgres = async ({
     })
   } else if (!isHrAdminTenant(tenant)) {
     throw new HrCoreValidationError('Forbidden', 403)
+  } else {
+    await withGreenhousePostgresTransaction(async client => {
+      await ensureYearBalancesForAllActiveMembers({
+        year: effectiveYear,
+        actorUserId: tenant.userId,
+        client
+      })
+    })
   }
 
   const values: unknown[] = [effectiveYear]
