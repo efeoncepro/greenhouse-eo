@@ -258,9 +258,7 @@ const buildSavePayrollReceiptStatement = async (input: {
       INSERT INTO greenhouse_payroll.payroll_receipts (
         ${columns.join(',\n        ')}
       ) VALUES (
-        ${placeholders.join(', ')},
-        CURRENT_TIMESTAMP,
-        CURRENT_TIMESTAMP
+        ${placeholders.join(', ')}
       )
       ON CONFLICT (entry_id, revision) DO UPDATE SET
         ${updateAssignments.join(',\n        ')}
