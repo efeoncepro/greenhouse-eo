@@ -105,6 +105,7 @@ export const notificationProjection: ProjectionDefinition = {
 
   triggerEvents: [
     'service.created',
+    'service.sla_status.changed',
     'identity.reconciliation.approved',
     'finance.dte.discrepancy_found',
     'identity.profile.linked',
@@ -147,6 +148,49 @@ export const notificationProjection: ProjectionDefinition = {
       })
 
       return `notified ${recipients.length} admins about service.created`
+    }
+
+    if (eventType === 'service.sla_status.changed') {
+      const recipients = await getAdminRecipients()
+
+      if (recipients.length === 0) return null
+
+      const complianceStatus = typeof payload.complianceStatus === 'string' ? payload.complianceStatus : 'source_unavailable'
+
+      if (complianceStatus !== 'at_risk' && complianceStatus !== 'breached') {
+        return `skipped notification for SLA status ${complianceStatus}`
+      }
+
+      const serviceName = typeof payload.serviceName === 'string' && payload.serviceName.trim()
+        ? payload.serviceName.trim()
+        : 'Servicio'
+
+      const indicatorCode = typeof payload.indicatorCode === 'string' && payload.indicatorCode.trim()
+        ? payload.indicatorCode.trim()
+        : 'sli'
+
+      const actualValue = typeof payload.actualValue === 'number'
+        ? payload.actualValue
+        : typeof payload.actualValue === 'string'
+          ? Number(payload.actualValue)
+          : null
+
+      await NotificationService.dispatch({
+        category: 'ico_alert',
+        title: complianceStatus === 'breached'
+          ? `${serviceName} incumplió su SLA`
+          : `${serviceName} quedó en riesgo SLA`,
+        body: actualValue === null
+          ? `Revisar ${indicatorCode} y validar la fuente antes del siguiente ciclo.`
+          : `Indicador ${indicatorCode}: valor actual ${actualValue}.`,
+        actionUrl: typeof payload.serviceId === 'string' && payload.serviceId.trim()
+          ? `/agency/services/${payload.serviceId.trim()}`
+          : '/agency/services',
+        metadata: payload,
+        recipients
+      })
+
+      return `notified ${recipients.length} admins about service.sla_status.changed`
     }
 
     if (eventType === 'identity.reconciliation.approved') {

@@ -42,6 +42,32 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.15
+
+**Canal:** Beta
+**Fecha:** 2026-04-15
+**Disponible para:** internal
+**Módulos:** Agency / Servicios, Space 360, Admin Center
+
+### Novedades
+
+- `Servicios` ahora permite definir por servicio qué SLI se mide, cuál es su SLO y cuál es el SLA contractual asociado.
+- `Admin Center` suma una vista `SLA de servicios` para revisar qué contratos ya están definidos y qué servicios quedaron en riesgo o breach.
+
+### Mejoras
+
+- `Space 360 > Servicios` ahora muestra el estado SLA de cada servicio sin obligar a abrir cada ficha por separado.
+- La ficha del servicio distingue mejor entre cumplimiento real, datos parciales y ausencia de una fuente defendible.
+
+### Correcciones
+
+- Las definiciones sin source canónica ya no se presentan como si tuvieran una métrica válida; quedan visibles como `Datos parciales` o `Sin fuente`.
+
+### Notas
+
+- En esta primera entrega los indicadores soportados son `OTD`, `RpA`, `FTR`, `rondas de revisión` y `time to market`.
+- `response_hours` y `first_delivery_days` siguen diferidos hasta contar con una fuente materializada por servicio.
+
 ## 2026.04-beta.14
 
 **Canal:** Beta

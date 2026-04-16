@@ -30,6 +30,30 @@ const stageColor = (value: string) => {
   return 'secondary'
 }
 
+const slaStatusLabel = (value?: string) => {
+  if (!value) return 'Sin lectura'
+
+  const labels: Record<string, string> = {
+    healthy: 'Cumple',
+    at_risk: 'En riesgo',
+    breached: 'Incumplido',
+    partial: 'Datos parciales',
+    no_sla_defined: 'Sin SLA'
+  }
+
+  return labels[value] ?? value
+}
+
+const slaStatusColor = (value?: string): 'success' | 'warning' | 'error' | 'info' | 'secondary' => {
+  if (value === 'healthy') return 'success'
+  if (value === 'at_risk') return 'warning'
+  if (value === 'breached') return 'error'
+  if (value === 'partial') return 'info'
+  if (value === 'no_sla_defined') return 'secondary'
+
+  return 'info'
+}
+
 const ServicesTab = ({ detail }: Props) => (
   <Grid container spacing={6}>
     <Grid size={{ xs: 12 }}>
@@ -99,6 +123,13 @@ const ServicesTab = ({ detail }: Props) => (
                       <Stack direction='row' gap={1} flexWrap='wrap'>
                         <CustomChip round='true' size='small' color={stageColor(service.pipelineStage)} variant='tonal' label={titleize(service.pipelineStage)} />
                         <CustomChip round='true' size='small' color='secondary' variant='tonal' label={service.billingFrequency || 'Sin frecuencia'} />
+                        <CustomChip
+                          round='true'
+                          size='small'
+                          color={slaStatusColor(service.slaOverallStatus)}
+                          variant='tonal'
+                          label={`SLA ${slaStatusLabel(service.slaOverallStatus)}`}
+                        />
                       </Stack>
                     </Stack>
                     <Grid container spacing={3}>
