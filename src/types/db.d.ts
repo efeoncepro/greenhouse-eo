@@ -2329,6 +2329,24 @@ export interface GreenhouseFinanceSuppliers {
   website_url: string | null;
 }
 
+export interface GreenhouseHrLeaveBalanceAdjustments {
+  adjustment_id: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  days_delta: Numeric;
+  effective_date: Timestamp;
+  leave_type_code: string;
+  member_id: string;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  reason: string;
+  reversal_of_adjustment_id: string | null;
+  reversed_at: Timestamp | null;
+  reversed_by_user_id: string | null;
+  source_kind: Generated<string>;
+  year: number;
+}
+
 export interface GreenhouseHrLeaveBalances {
   accumulated_periods: Generated<Numeric>;
   adjustment_days: Generated<Numeric>;
@@ -2351,8 +2369,10 @@ export interface GreenhouseHrLeavePolicies {
   active: Generated<boolean>;
   allow_negative_balance: Generated<boolean>;
   annual_days: Generated<Numeric>;
+  applicable_contract_types: Generated<string[]>;
   applicable_employment_types: Generated<string[]>;
   applicable_pay_regimes: Generated<string[]>;
+  applicable_payroll_vias: Generated<string[]>;
   created_at: Generated<Timestamp>;
   leave_type_code: string;
   max_accumulation_periods: Numeric | null;
@@ -2397,6 +2417,7 @@ export interface GreenhouseHrLeaveRequests {
   reason: string | null;
   request_id: string;
   requested_days: Numeric;
+  source_kind: Generated<string>;
   start_date: Timestamp;
   start_period: Generated<string>;
   status: string;
@@ -4373,6 +4394,7 @@ export interface DB {
   "greenhouse_finance.shareholder_account_movements": GreenhouseFinanceShareholderAccountMovements;
   "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
+  "greenhouse_hr.leave_balance_adjustments": GreenhouseHrLeaveBalanceAdjustments;
   "greenhouse_hr.leave_balances": GreenhouseHrLeaveBalances;
   "greenhouse_hr.leave_policies": GreenhouseHrLeavePolicies;
   "greenhouse_hr.leave_request_actions": GreenhouseHrLeaveRequestActions;

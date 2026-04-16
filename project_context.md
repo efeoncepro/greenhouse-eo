@@ -1,5 +1,21 @@
 # project_context.md
 
+## Delta 2026-04-16 TASK-415 formaliza HR leave admin operations con backfill y ledger de ajustes
+
+- Greenhouse ya no limita la gestión de vacaciones al autoservicio del colaborador; HR/admin ahora tiene una superficie operativa explícita para saldos, backfills y correcciones auditables.
+- Runtime actualizado:
+  - migración `20260416083541945_task-415-hr-leave-admin-backfill-adjustments.sql`
+  - rutas `POST /api/hr/core/leave/backfills`, `GET/POST /api/hr/core/leave/adjustments`, `POST /api/hr/core/leave/adjustments/[adjustmentId]/reverse`
+  - ledger `greenhouse_hr.leave_balance_adjustments`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+- Contrato operativo:
+  - un periodo ya tomado con fechas reales se registra como backfill retroactivo y no como ajuste opaco de saldo
+  - una corrección sin fechas exactas vive en `leave_balance_adjustments` con `delta_days`, razón obligatoria, actor, metadata y reversal explícito
+  - la explicación de política visible de leave ya no depende solo de moneda o `employment_type`; debe resolver con `contract_type + pay_regime + payroll_via + hire_date`
+  - el caso Chile interno indefinido pagado en CLP queda preparado bajo esa resolución canónica, reutilizable por surfaces admin y self-service
+  - las capabilities runtime para este dominio incluyen `hr.leave_balance`, `hr.leave_backfill` y `hr.leave_adjustment`
+
 ## Delta 2026-04-15 TASK-403 materializa el bridge real entre entitlements y Pulse/Nexa
 
 - Greenhouse ya no depende solo de checks locales para gobernar la Home moderna.

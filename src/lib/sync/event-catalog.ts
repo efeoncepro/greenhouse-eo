@@ -230,6 +230,8 @@ export const EVENT_TYPES = {
   leaveRequestRejected: 'leave_request.rejected',
   leaveRequestCancelled: 'leave_request.cancelled',
   leaveRequestPayrollImpactDetected: 'leave_request.payroll_impact_detected',
+  leaveBalanceAdjusted: 'leave_balance.adjusted',
+  leaveBalanceAdjustmentReversed: 'leave_balance.adjustment_reversed',
   compensationVersionCreated: 'compensation_version.created',
   compensationVersionUpdated: 'compensation_version.updated',
   payrollPrevisionalSnapshotUpserted: 'payroll.previsional_snapshot.upserted',

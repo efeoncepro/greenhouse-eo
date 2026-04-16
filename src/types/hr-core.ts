@@ -14,6 +14,8 @@ export type HrLeaveRequestStatus =
   | 'cancelled'
 export type HrApprovalAction = 'approve' | 'reject' | 'cancel'
 export type HrAttendanceStatus = 'present' | 'late' | 'absent' | 'excused' | 'holiday'
+export type HrLeaveRequestSourceKind = 'request' | 'admin_backfill'
+export type HrLeaveAdjustmentSourceKind = 'manual_adjustment' | 'manual_adjustment_reversal'
 
 export interface HrDepartment {
   departmentId: string
@@ -97,6 +99,7 @@ export interface HrLeaveBalance {
   usedDays: number
   reservedDays: number
   availableDays: number
+  policyExplain?: HrLeavePolicyExplain | null
 }
 
 export interface HrLeavePayrollImpactPeriod {
@@ -136,8 +139,23 @@ export interface HrLeaveRequest {
   decidedBy: string | null
   notes: string | null
   createdAt: string | null
+  sourceKind?: HrLeaveRequestSourceKind
   holidaySource?: 'nager' | 'empty-fallback' | 'none'
   payrollImpact?: HrLeavePayrollImpactSummary | null
+}
+
+export interface HrLeavePolicyExplain {
+  policyId: string
+  policyName: string
+  policySource: 'catalog' | 'derived_internal' | 'external_provider' | 'not_eligible'
+  contractType: ContractType | null
+  payRegime: PayRegime | null
+  payrollVia: PayrollVia | null
+  hireDate: string | null
+  annualDays: number
+  tracksBalance: boolean
+  progressiveEnabled: boolean
+  allowNegativeBalance: boolean
 }
 
 export interface HrLeavePolicy {
@@ -191,6 +209,9 @@ export interface HrAttendanceRecord {
 export interface HrCoreMetadata {
   currentMemberId?: string | null
   hasHrAdminAccess?: boolean
+  canManageLeaveBackfills?: boolean
+  canManageLeaveAdjustments?: boolean
+  canReverseLeaveAdjustments?: boolean
   departments: HrDepartment[]
   leaveTypes: HrLeaveType[]
   jobLevels: HrJobLevel[]
@@ -518,6 +539,61 @@ export interface HrLeaveRequestsResponse {
     pendingSupervisor: number
     pendingHr: number
     approved: number
+  }
+}
+
+export interface HrLeaveBackfillInput {
+  memberId: string
+  leaveTypeCode: string
+  startDate: string
+  endDate: string
+  startPeriod?: 'full_day' | 'morning' | 'afternoon'
+  endPeriod?: 'full_day' | 'morning' | 'afternoon'
+  reason: string
+  notes?: string | null
+  attachmentAssetId?: string | null
+  attachmentUrl?: string | null
+}
+
+export interface HrLeaveBalanceAdjustmentRecord {
+  adjustmentId: string
+  memberId: string
+  memberName: string | null
+  leaveTypeCode: string
+  leaveTypeName: string
+  year: number
+  daysDelta: number
+  effectiveDate: string
+  sourceKind: HrLeaveAdjustmentSourceKind
+  reason: string
+  notes: string | null
+  createdByUserId: string | null
+  createdAt: string | null
+  reversedAt: string | null
+  reversedByUserId: string | null
+  reversalOfAdjustmentId: string | null
+}
+
+export interface HrLeaveBalanceAdjustmentInput {
+  memberId: string
+  leaveTypeCode: string
+  year: number
+  daysDelta: number
+  effectiveDate: string
+  reason: string
+  notes?: string | null
+}
+
+export interface HrLeaveBalanceAdjustmentReverseInput {
+  reason: string
+  notes?: string | null
+}
+
+export interface HrLeaveBalanceAdjustmentsResponse {
+  adjustments: HrLeaveBalanceAdjustmentRecord[]
+  summary: {
+    total: number
+    totalDaysDelta: number
   }
 }
 

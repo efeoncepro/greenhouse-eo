@@ -1,5 +1,52 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — TASK-415 HR leave admin balance visibility, backfill y ajustes manuales
+
+- **Estado:** `complete`, `validado con migracion + tests dirigidos + lint + build`
+- **Rama objetivo:** `task/TASK-415-hr-leave-balance-admin-backfill`
+- **Implementado:**
+  - migracion `20260416083541945_task-415-hr-leave-admin-backfill-adjustments.sql`
+    - nuevas columnas `applicable_contract_types` y `applicable_payroll_vias` en `greenhouse_hr.leave_policies`
+    - `leave_requests.source_kind`
+    - tabla auditable `greenhouse_hr.leave_balance_adjustments`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+    - resolver de policy endurecido con `contract_type + pay_regime + payroll_via + hire_date`
+    - `policyExplain` por saldo
+    - flows nuevos de `admin_backfill`, `list/create/reverse leave_balance_adjustments`
+    - correccion del movimiento de saldo para evitar doble multiplicacion en used/reserved deltas
+  - nuevas rutas:
+    - `POST /api/hr/core/leave/backfills`
+    - `GET/POST /api/hr/core/leave/adjustments`
+    - `POST /api/hr/core/leave/adjustments/[adjustmentId]/reverse`
+  - entitlements runtime nuevos:
+    - `hr.leave_balance`
+    - `hr.leave_backfill`
+    - `hr.leave_adjustment`
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - tabla admin de saldos por colaborador
+    - dialogo de backfill retroactivo
+    - dialogo de ajuste manual
+    - historial de ajustes con reversal
+    - badge de `Carga administrativa` para requests retroactivos
+- **Validacion ejecutada:**
+  - `pnpm pg:connect:migrate`
+  - `pnpm vitest run src/lib/hr-core/postgres-leave-store.test.ts src/lib/entitlements/runtime.test.ts src/app/api/hr/core/meta/route.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src` -> solo `src/lib/postgres/client.ts`
+- **Docs alineados:**
+  - `docs/documentation/hr/sistema-permisos-leave.md`
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+- **Notas operativas:**
+  - `docs/architecture/schema-snapshot-baseline.sql` sigue con drift respecto al DDL vivo de HR leave; para este dominio hay que contrastar siempre con migraciones y `scripts/setup-postgres-hr-leave.sql`
+  - el caso Chile interno indefinido ya no depende solo de moneda; la policy observable usa atributos laborales canonicos
+  - el backfill retroactivo se modela como request aprobada `source_kind='admin_backfill'`; el ajuste manual queda separado en ledger reversible
+  - existe un cambio ajeno en `.claude/scheduled_tasks.lock`; no pertenece a TASK-415
+
 ## Sesion 2026-04-15 — TASK-403 entitlements runtime bridge para Pulse/Nexa
 
 - **Estado:** `implementado localmente`, `validado con lint + tests dirigidos + build`

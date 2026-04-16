@@ -49,16 +49,55 @@ import type {
   HrApprovalAction,
   HrLeaveCalendarResponse,
   HrCoreMetadata,
+  HrLeaveBackfillInput,
+  HrLeaveBalance,
+  HrLeaveBalanceAdjustmentInput,
+  HrLeaveBalanceAdjustmentRecord,
+  HrLeaveBalanceAdjustmentsResponse,
   HrLeaveRequest,
   HrLeaveRequestsResponse,
   HrLeaveBalancesResponse,
   HrLeaveType,
-  HrLeaveRequestStatus
+  HrLeaveRequestStatus,
+  LeaveDayPeriod
 } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
 import { leaveStatusConfig, getLeaveTypeConfig, formatDate } from './helpers'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+
+const initialBackfillForm = {
+  startDate: '',
+  endDate: '',
+  startPeriod: 'full_day' as LeaveDayPeriod,
+  endPeriod: 'full_day' as LeaveDayPeriod,
+  reason: '',
+  notes: ''
+}
+
+const initialAdjustmentForm = {
+  daysDelta: '',
+  effectiveDate: '',
+  reason: '',
+  notes: ''
+}
+
+const initialReverseForm = {
+  reason: '',
+  notes: ''
+}
+
+const formatPolicyExplainLabel = (policyExplain: NonNullable<HrLeaveBalance['policyExplain']>) => {
+  if (policyExplain.policySource === 'not_eligible') {
+    return 'Sin acumulación automática'
+  }
+
+  if (policyExplain.policySource === 'external_provider') {
+    return 'Permiso cubierto por proveedor externo'
+  }
+
+  return policyExplain.policyName
+}
 
 const getHrLeaveErrorMessage = (payload: { error?: string | null; code?: string | null } | null | undefined, fallback: string) => {
   switch (payload?.code) {
@@ -83,12 +122,17 @@ const HrLeaveView = () => {
   const [tab, setTab] = useState('requests')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [adjustmentsError, setAdjustmentsError] = useState<string | null>(null)
   const [reqData, setReqData] = useState<HrLeaveRequestsResponse | null>(null)
   const [balData, setBalData] = useState<HrLeaveBalancesResponse | null>(null)
   const [calData, setCalData] = useState<HrLeaveCalendarResponse | null>(null)
+  const [adjustmentsData, setAdjustmentsData] = useState<HrLeaveBalanceAdjustmentsResponse | null>(null)
   const [leaveTypes, setLeaveTypes] = useState<HrLeaveType[]>([])
   const [currentMemberId, setCurrentMemberId] = useState<string | null>(null)
   const [hasHrAdminAccess, setHasHrAdminAccess] = useState(false)
+  const [canManageLeaveBackfills, setCanManageLeaveBackfills] = useState(false)
+  const [canManageLeaveAdjustments, setCanManageLeaveAdjustments] = useState(false)
+  const [canReverseLeaveAdjustments, setCanReverseLeaveAdjustments] = useState(false)
 
   // Filters
   const [filterStatus, setFilterStatus] = useState<HrLeaveRequestStatus | ''>('')
@@ -102,7 +146,30 @@ const HrLeaveView = () => {
   const [reviewReq, setReviewReq] = useState<HrLeaveRequest | null>(null)
   const [reviewNotes, setReviewNotes] = useState('')
   const [reviewSaving, setReviewSaving] = useState(false)
+
+  // Admin backfill dialog
+  const [backfillOpen, setBackfillOpen] = useState(false)
+  const [backfillSaving, setBackfillSaving] = useState(false)
+  const [backfillTarget, setBackfillTarget] = useState<HrLeaveBalance | null>(null)
+  const [backfillForm, setBackfillForm] = useState(initialBackfillForm)
+
+  // Admin balance adjustment dialog
+  const [adjustmentOpen, setAdjustmentOpen] = useState(false)
+  const [adjustmentSaving, setAdjustmentSaving] = useState(false)
+  const [adjustmentTarget, setAdjustmentTarget] = useState<HrLeaveBalance | null>(null)
+  const [adjustmentForm, setAdjustmentForm] = useState(initialAdjustmentForm)
+
+  // Admin reverse adjustment dialog
+  const [reverseOpen, setReverseOpen] = useState(false)
+  const [reverseSaving, setReverseSaving] = useState(false)
+  const [reverseTarget, setReverseTarget] = useState<HrLeaveBalanceAdjustmentRecord | null>(null)
+  const [reverseForm, setReverseForm] = useState(initialReverseForm)
+
   const activeLeaveTypes = leaveTypes.filter(leaveType => leaveType.active)
+  const canManageLeaveAdminActions = canManageLeaveBackfills || canManageLeaveAdjustments
+  const canShowAdjustmentHistory = canManageLeaveAdjustments || canReverseLeaveAdjustments
+  const backfillYear = backfillTarget?.year ?? filterYear
+  const adjustmentYear = adjustmentTarget?.year ?? filterYear
 
   const fetchData = useCallback(async () => {
     try {
@@ -110,6 +177,9 @@ const HrLeaveView = () => {
       const calendarRange = getCalendarRangeForYear(filterYear)
 
       if (filterStatus) params.set('status', filterStatus)
+
+      setAdjustmentsError(null)
+      setAdjustmentsData(null)
 
       const [reqRes, balRes, calRes, metaRes] = await Promise.all([
         fetch(`/api/hr/core/leave/requests?${params}`),
@@ -148,7 +218,26 @@ const HrLeaveView = () => {
         setLeaveTypes(meta.leaveTypes ?? [])
         setCurrentMemberId(meta.currentMemberId ?? null)
         setHasHrAdminAccess(meta.hasHrAdminAccess === true)
+        setCanManageLeaveBackfills(meta.canManageLeaveBackfills === true)
+        setCanManageLeaveAdjustments(meta.canManageLeaveAdjustments === true)
+        setCanReverseLeaveAdjustments(meta.canReverseLeaveAdjustments === true)
+
+        if (meta.canManageLeaveAdjustments || meta.canReverseLeaveAdjustments) {
+          const adjustmentsRes = await fetch(`/api/hr/core/leave/adjustments?year=${filterYear}`)
+
+          if (adjustmentsRes.ok) {
+            setAdjustmentsData(await adjustmentsRes.json())
+          } else {
+            const payload = await adjustmentsRes.json().catch(() => null)
+
+            setAdjustmentsData(null)
+            setAdjustmentsError(getHrLeaveErrorMessage(payload, 'No fue posible cargar el historial de ajustes.'))
+          }
+        } else {
+          setAdjustmentsData(null)
+        }
       } else {
+        setAdjustmentsData(null)
         const payload = await metaRes.json().catch(() => null)
 
         setError(current => current || getHrLeaveErrorMessage(payload, 'No fue posible cargar los tipos de permiso.'))
@@ -218,6 +307,144 @@ const HrLeaveView = () => {
     }
   }
 
+  const openBackfillDialog = (balance: HrLeaveBalance) => {
+    setBackfillTarget(balance)
+    setBackfillForm(initialBackfillForm)
+    setBackfillOpen(true)
+  }
+
+  const openAdjustmentDialog = (balance: HrLeaveBalance) => {
+    setAdjustmentTarget(balance)
+    setAdjustmentForm(initialAdjustmentForm)
+    setAdjustmentOpen(true)
+  }
+
+  const openReverseDialog = (adjustment: HrLeaveBalanceAdjustmentRecord) => {
+    setReverseTarget(adjustment)
+    setReverseForm(initialReverseForm)
+    setReverseOpen(true)
+  }
+
+  const submitBackfill = async () => {
+    if (!backfillTarget) return
+
+    setBackfillSaving(true)
+    setError(null)
+
+    try {
+      const input: HrLeaveBackfillInput = {
+        memberId: backfillTarget.memberId,
+        leaveTypeCode: backfillTarget.leaveTypeCode,
+        startDate: backfillForm.startDate,
+        endDate: backfillForm.endDate,
+        startPeriod: backfillForm.startPeriod,
+        endPeriod: backfillForm.endPeriod,
+        reason: backfillForm.reason.trim(),
+        notes: backfillForm.notes.trim() ? backfillForm.notes.trim() : null
+      }
+
+      const res = await fetch('/api/hr/core/leave/backfills', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input)
+      })
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null)
+
+        throw new Error(payload?.error || 'No fue posible registrar los días ya tomados.')
+      }
+
+      setBackfillOpen(false)
+      setBackfillTarget(null)
+      setBackfillForm(initialBackfillForm)
+      await fetchData()
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : 'No fue posible registrar los días ya tomados.'
+
+      setError(message)
+    } finally {
+      setBackfillSaving(false)
+    }
+  }
+
+  const submitAdjustment = async () => {
+    if (!adjustmentTarget) return
+
+    setAdjustmentSaving(true)
+    setError(null)
+
+    try {
+      const input: HrLeaveBalanceAdjustmentInput = {
+        memberId: adjustmentTarget.memberId,
+        leaveTypeCode: adjustmentTarget.leaveTypeCode,
+        year: adjustmentTarget.year,
+        daysDelta: Number(adjustmentForm.daysDelta),
+        effectiveDate: adjustmentForm.effectiveDate,
+        reason: adjustmentForm.reason.trim(),
+        notes: adjustmentForm.notes.trim() ? adjustmentForm.notes.trim() : null
+      }
+
+      const res = await fetch('/api/hr/core/leave/adjustments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input)
+      })
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null)
+
+        throw new Error(payload?.error || 'No fue posible ajustar el saldo.')
+      }
+
+      setAdjustmentOpen(false)
+      setAdjustmentTarget(null)
+      setAdjustmentForm(initialAdjustmentForm)
+      await fetchData()
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : 'No fue posible ajustar el saldo.'
+
+      setError(message)
+    } finally {
+      setAdjustmentSaving(false)
+    }
+  }
+
+  const submitReverseAdjustment = async () => {
+    if (!reverseTarget) return
+
+    setReverseSaving(true)
+    setError(null)
+
+    try {
+      const res = await fetch(`/api/hr/core/leave/adjustments/${reverseTarget.adjustmentId}/reverse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reason: reverseForm.reason.trim(),
+          notes: reverseForm.notes.trim() ? reverseForm.notes.trim() : null
+        })
+      })
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null)
+
+        throw new Error(payload?.error || 'No fue posible revertir el ajuste.')
+      }
+
+      setReverseOpen(false)
+      setReverseTarget(null)
+      setReverseForm(initialReverseForm)
+      await fetchData()
+    } catch (submitError) {
+      const message = submitError instanceof Error ? submitError.message : 'No fue posible revertir el ajuste.'
+
+      setError(message)
+    } finally {
+      setReverseSaving(false)
+    }
+  }
+
   if (loading) {
     return (
       <Stack spacing={6}>
@@ -237,6 +464,7 @@ const HrLeaveView = () => {
   const summary = reqData?.summary ?? { total: 0, pendingSupervisor: 0, pendingHr: 0, approved: 0 }
   const requests = reqData?.requests ?? []
   const balances = balData?.balances ?? []
+  const adjustments = adjustmentsData?.adjustments ?? []
 
   const reviewCapabilities = reviewReq
     ? getLeaveReviewCapabilities({
@@ -403,7 +631,18 @@ const HrLeaveView = () => {
                               >
                                 {getInitials(req.memberName || '')}
                               </Avatar>
-                              <Typography variant='body2' fontWeight={500}>{req.memberName}</Typography>
+                              <Stack spacing={0.25}>
+                                <Typography variant='body2' fontWeight={500}>{req.memberName}</Typography>
+                                {req.sourceKind === 'admin_backfill' && (
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    icon={<i className='tabler-file-plus' />}
+                                    label='Carga administrativa'
+                                    color='info'
+                                  />
+                                )}
+                              </Stack>
                             </Stack>
                           </TableCell>
                           <TableCell>
@@ -497,74 +736,309 @@ const HrLeaveView = () => {
 
         {/* Balances Tab */}
         <TabPanel value='balances' sx={{ p: 0 }}>
-          <Grid container spacing={6}>
-            {balancesByType.map(bt => {
-              const conf = getLeaveTypeConfig(bt.leaveTypeCode)
+          <Stack spacing={6}>
+            <Grid container spacing={6}>
+              {balancesByType.map(bt => {
+                const conf = getLeaveTypeConfig(bt.leaveTypeCode)
 
-              const gaugeOptions: ApexOptions = {
-                chart: { parentHeightOffset: 0, sparkline: { enabled: true } },
-                plotOptions: {
-                  radialBar: {
-                    hollow: { size: '60%' },
-                    track: { background: 'var(--mui-palette-action-hover)' },
-                    dataLabels: {
-                      name: { show: false },
-                      value: {
-                        show: true,
-                        fontSize: '18px',
-                        fontWeight: 600,
-                        offsetY: 6,
-                        formatter: () => `${bt.totalAvailable}`
+                const gaugeOptions: ApexOptions = {
+                  chart: { parentHeightOffset: 0, sparkline: { enabled: true } },
+                  plotOptions: {
+                    radialBar: {
+                      hollow: { size: '60%' },
+                      track: { background: 'var(--mui-palette-action-hover)' },
+                      dataLabels: {
+                        name: { show: false },
+                        value: {
+                          show: true,
+                          fontSize: '18px',
+                          fontWeight: 600,
+                          offsetY: 6,
+                          formatter: () => `${bt.totalAvailable}`
+                        }
                       }
                     }
-                  }
-                },
-                colors: [theme.palette[conf.color]?.main ?? theme.palette.primary.main]
-              }
+                  },
+                  colors: [theme.palette[conf.color]?.main ?? theme.palette.primary.main]
+                }
 
-              return (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={bt.leaveTypeCode}>
+                return (
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={bt.leaveTypeCode}>
+                    <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                      <CardContent>
+                        <Stack alignItems='center' spacing={1}>
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            icon={<i className={conf.icon} />}
+                            label={conf.label}
+                            color={conf.color}
+                          />
+                          <AppReactApexCharts
+                            type='radialBar'
+                            height={150}
+                            options={gaugeOptions}
+                            series={[bt.totalAllowance > 0 ? Math.min(100, Math.round(((bt.totalAllowance - bt.totalUsed) / bt.totalAllowance) * 100)) : 0]}
+                          />
+                          <Typography variant='body2' color='text.secondary'>
+                            {bt.totalUsed} usados de {bt.totalAllowance}
+                          </Typography>
+                          <Typography variant='caption' color='text.disabled'>
+                            {bt.totalAvailable} días disponibles
+                          </Typography>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                )
+              })}
+              {balancesByType.length === 0 && (
+                <Grid size={{ xs: 12 }}>
                   <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-                    <CardContent>
+                    <CardContent sx={{ py: 6, textAlign: 'center' }}>
                       <Stack alignItems='center' spacing={1}>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          icon={<i className={conf.icon} />}
-                          label={conf.label}
-                          color={conf.color}
-                        />
-                        <AppReactApexCharts
-                          type='radialBar'
-                          height={150}
-                          options={gaugeOptions}
-                          series={[bt.totalAllowance > 0 ? Math.min(100, Math.round(((bt.totalAllowance - bt.totalUsed) / bt.totalAllowance) * 100)) : 0]}
-                        />
-                        <Typography variant='body2' color='text.secondary'>
-                          {bt.totalUsed} usados de {bt.totalAllowance}
-                        </Typography>
-                        <Typography variant='caption' color='text.disabled'>
-                          {bt.totalAvailable} días disponibles
-                        </Typography>
+                        <i className='tabler-scale' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+                        <Typography color='text.secondary'>No hay saldos de permisos para mostrar.</Typography>
                       </Stack>
                     </CardContent>
                   </Card>
                 </Grid>
-              )
-            })}
-            {balancesByType.length === 0 && (
-              <Grid size={{ xs: 12 }}>
-                <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-                  <CardContent sx={{ py: 6, textAlign: 'center' }}>
-                    <Stack alignItems='center' spacing={1}>
-                      <i className='tabler-scale' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                      <Typography color='text.secondary'>No hay saldos de permisos para mostrar.</Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
+              )}
+            </Grid>
+
+            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+              <CardHeader
+                title='Saldos por colaborador'
+                subheader='Detalle operativo por colaborador y tipo de permiso.'
+                avatar={
+                  <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
+                    <i className='tabler-table' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
+                  </Avatar>
+                }
+              />
+              <Divider />
+              <CardContent>
+                <TableContainer>
+                  <Table size='small'>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Colaborador</TableCell>
+                        <TableCell>Tipo</TableCell>
+                        <TableCell align='center'>Año</TableCell>
+                        <TableCell align='center'>Asignados</TableCell>
+                        <TableCell align='center'>Usados</TableCell>
+                        <TableCell align='center'>Reservados</TableCell>
+                        <TableCell align='center'>Ajustes</TableCell>
+                        <TableCell align='center'>Disponibles</TableCell>
+                        {canManageLeaveAdminActions && <TableCell align='right'>Acciones</TableCell>}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {balances.map(balance => {
+                        const conf = getLeaveTypeConfig(balance.leaveTypeCode)
+
+                        return (
+                          <TableRow key={balance.balanceId} hover>
+                            <TableCell>
+                              <Stack direction='row' spacing={1.5} alignItems='center'>
+                                <Avatar
+                                  sx={{ width: 28, height: 28, fontSize: '0.75rem' }}
+                                >
+                                  {getInitials(balance.memberName || '')}
+                                </Avatar>
+                                <Box>
+                                  <Typography variant='body2' fontWeight={500}>
+                                    {balance.memberName || balance.memberId}
+                                  </Typography>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {balance.memberId}
+                                  </Typography>
+                                </Box>
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                            <Stack spacing={0.5}>
+                              <CustomChip
+                                round='true'
+                                size='small'
+                                icon={<i className={conf.icon} />}
+                                label={conf.label}
+                                color={conf.color}
+                              />
+                              <Typography variant='caption' color='text.secondary'>
+                                  {balance.policyExplain
+                                    ? formatPolicyExplainLabel(balance.policyExplain)
+                                    : 'Regla estándar de permisos'}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
+                            <TableCell align='center'>{balance.year}</TableCell>
+                            <TableCell align='center'>{balance.allowanceDays}</TableCell>
+                            <TableCell align='center'>{balance.usedDays}</TableCell>
+                            <TableCell align='center'>{balance.reservedDays}</TableCell>
+                            <TableCell align='center'>{balance.adjustmentDays ?? 0}</TableCell>
+                            <TableCell align='center'>
+                              <Typography variant='body2' fontWeight={600}>
+                                {balance.availableDays}
+                              </Typography>
+                            </TableCell>
+                            {canManageLeaveAdminActions && (
+                              <TableCell align='right'>
+                                <Stack direction='row' spacing={1} justifyContent='flex-end' flexWrap='wrap'>
+                                  {canManageLeaveBackfills && (
+                                    <Button
+                                      variant='tonal'
+                                      size='small'
+                                      color='info'
+                                      onClick={() => openBackfillDialog(balance)}
+                                    >
+                                      Registrar días ya tomados
+                                    </Button>
+                                  )}
+                                  {canManageLeaveAdjustments && (
+                                    <Button
+                                      variant='tonal'
+                                      size='small'
+                                      color='secondary'
+                                      onClick={() => openAdjustmentDialog(balance)}
+                                    >
+                                      Ajustar saldo
+                                    </Button>
+                                  )}
+                                </Stack>
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        )
+                      })}
+                      {balances.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={canManageLeaveAdminActions ? 9 : 8} align='center' sx={{ py: 6 }}>
+                            <Stack alignItems='center' spacing={1}>
+                              <i className='tabler-scale' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+                              <Typography color='text.secondary'>No hay saldos por colaborador para mostrar.</Typography>
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </CardContent>
+            </Card>
+
+            {canShowAdjustmentHistory && (
+              <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                <CardHeader
+                  title='Historial de ajustes'
+                  subheader={`Ajustes registrados para ${filterYear}.`}
+                  avatar={
+                    <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
+                      <i className='tabler-history' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} />
+                    </Avatar>
+                  }
+                />
+                <Divider />
+                <CardContent>
+                  {adjustmentsError && (
+                    <Alert severity='warning' sx={{ mb: 3 }}>
+                      {adjustmentsError}
+                    </Alert>
+                  )}
+                  <TableContainer>
+                    <Table size='small'>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Colaborador</TableCell>
+                          <TableCell>Tipo</TableCell>
+                          <TableCell align='center'>Fecha efectiva</TableCell>
+                          <TableCell align='center'>Delta</TableCell>
+                          <TableCell>Motivo</TableCell>
+                          <TableCell align='center'>Estado</TableCell>
+                          <TableCell align='right'>Acciones</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {adjustments.map(adjustment => {
+                          const conf = getLeaveTypeConfig(adjustment.leaveTypeCode)
+                          const isReversed = adjustment.reversedAt !== null
+
+                          return (
+                            <TableRow key={adjustment.adjustmentId} hover>
+                              <TableCell>
+                                <Stack spacing={0.25}>
+                                  <Typography variant='body2' fontWeight={500}>
+                                    {adjustment.memberName || adjustment.memberId}
+                                  </Typography>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {adjustment.memberId}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  icon={<i className={conf.icon} />}
+                                  label={conf.label}
+                                  color={conf.color}
+                                />
+                              </TableCell>
+                              <TableCell align='center'>{formatDate(adjustment.effectiveDate)}</TableCell>
+                              <TableCell align='center'>
+                                <Typography variant='body2' fontWeight={600} color={adjustment.daysDelta >= 0 ? 'success.main' : 'error.main'}>
+                                  {adjustment.daysDelta > 0 ? `+${adjustment.daysDelta}` : adjustment.daysDelta}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant='body2' color='text.secondary'>
+                                  {adjustment.reason}
+                                </Typography>
+                              </TableCell>
+                              <TableCell align='center'>
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  label={isReversed ? 'Revertido' : 'Vigente'}
+                                  color={isReversed ? 'secondary' : 'success'}
+                                />
+                              </TableCell>
+                              <TableCell align='right'>
+                                {canReverseLeaveAdjustments && !isReversed ? (
+                                  <Button
+                                    variant='tonal'
+                                    size='small'
+                                    color='warning'
+                                    onClick={() => openReverseDialog(adjustment)}
+                                  >
+                                    Revertir
+                                  </Button>
+                                ) : (
+                                  <Typography variant='caption' color='text.disabled'>
+                                    —
+                                  </Typography>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                        {adjustments.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
+                              <Stack alignItems='center' spacing={1}>
+                                <i className='tabler-history-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+                                <Typography color='text.secondary'>No hay ajustes registrados para este año.</Typography>
+                              </Stack>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
             )}
-          </Grid>
+          </Stack>
         </TabPanel>
       </TabContext>
 
@@ -709,6 +1183,233 @@ const HrLeaveView = () => {
               Aprobar
             </Button>
           )}
+          </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={backfillOpen}
+        onClose={() => !backfillSaving && setBackfillOpen(false)}
+        maxWidth='sm'
+        fullWidth
+        closeAfterTransition={false}
+      >
+        <DialogTitle>Registrar días ya tomados</DialogTitle>
+        <Divider />
+        <DialogContent>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            <Alert severity='info'>
+              Se registrará una solicitud aprobada para {backfillTarget?.memberName || backfillTarget?.memberId} en {backfillYear}.
+            </Alert>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Desde'
+                  type='date'
+                  value={backfillForm.startDate}
+                  onChange={e => setBackfillForm(current => ({ ...current, startDate: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Hasta'
+                  type='date'
+                  value={backfillForm.endDate}
+                  onChange={e => setBackfillForm(current => ({ ...current, endDate: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  select
+                  size='small'
+                  label='Inicio del periodo'
+                  value={backfillForm.startPeriod}
+                  onChange={e => setBackfillForm(current => ({ ...current, startPeriod: e.target.value as LeaveDayPeriod }))}
+                >
+                  <MenuItem value='full_day'>Día completo</MenuItem>
+                  <MenuItem value='morning'>Mañana</MenuItem>
+                  <MenuItem value='afternoon'>Tarde</MenuItem>
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  select
+                  size='small'
+                  label='Fin del periodo'
+                  value={backfillForm.endPeriod}
+                  onChange={e => setBackfillForm(current => ({ ...current, endPeriod: e.target.value as LeaveDayPeriod }))}
+                >
+                  <MenuItem value='full_day'>Día completo</MenuItem>
+                  <MenuItem value='morning'>Mañana</MenuItem>
+                  <MenuItem value='afternoon'>Tarde</MenuItem>
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Motivo'
+                  value={backfillForm.reason}
+                  onChange={e => setBackfillForm(current => ({ ...current, reason: e.target.value }))}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Notas'
+                  value={backfillForm.notes}
+                  onChange={e => setBackfillForm(current => ({ ...current, notes: e.target.value }))}
+                  multiline
+                  rows={3}
+                />
+              </Grid>
+            </Grid>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='tonal' color='secondary' onClick={() => setBackfillOpen(false)} disabled={backfillSaving}>
+            Cancelar
+          </Button>
+          <Button
+            variant='contained'
+            onClick={() => void submitBackfill()}
+            disabled={backfillSaving || !backfillForm.startDate || !backfillForm.endDate || !backfillForm.reason.trim()}
+            startIcon={<i className='tabler-clipboard-plus' />}
+          >
+            Registrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={adjustmentOpen}
+        onClose={() => !adjustmentSaving && setAdjustmentOpen(false)}
+        maxWidth='sm'
+        fullWidth
+        closeAfterTransition={false}
+      >
+        <DialogTitle>Ajustar saldo</DialogTitle>
+        <Divider />
+        <DialogContent>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            <Alert severity='info'>
+              Ajuste para {adjustmentTarget?.memberName || adjustmentTarget?.memberId} en {adjustmentYear}.
+            </Alert>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Delta días'
+                  type='number'
+                  inputProps={{ step: '0.5' }}
+                  value={adjustmentForm.daysDelta}
+                  onChange={e => setAdjustmentForm(current => ({ ...current, daysDelta: e.target.value }))}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Fecha efectiva'
+                  type='date'
+                  value={adjustmentForm.effectiveDate}
+                  onChange={e => setAdjustmentForm(current => ({ ...current, effectiveDate: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Motivo'
+                  value={adjustmentForm.reason}
+                  onChange={e => setAdjustmentForm(current => ({ ...current, reason: e.target.value }))}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Notas'
+                  value={adjustmentForm.notes}
+                  onChange={e => setAdjustmentForm(current => ({ ...current, notes: e.target.value }))}
+                  multiline
+                  rows={3}
+                />
+              </Grid>
+            </Grid>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='tonal' color='secondary' onClick={() => setAdjustmentOpen(false)} disabled={adjustmentSaving}>
+            Cancelar
+          </Button>
+          <Button
+            variant='contained'
+            onClick={() => void submitAdjustment()}
+            disabled={adjustmentSaving || adjustmentForm.daysDelta.trim() === '' || !adjustmentForm.effectiveDate || !adjustmentForm.reason.trim()}
+            startIcon={<i className='tabler-adjustments' />}
+          >
+            Guardar ajuste
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={reverseOpen}
+        onClose={() => !reverseSaving && setReverseOpen(false)}
+        maxWidth='sm'
+        fullWidth
+        closeAfterTransition={false}
+      >
+        <DialogTitle>Revertir ajuste</DialogTitle>
+        <Divider />
+        <DialogContent>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            <Alert severity='warning'>
+              Esta acción revierte {(reverseTarget?.daysDelta ?? 0) > 0 ? `+${reverseTarget?.daysDelta}` : reverseTarget?.daysDelta} días para{' '}
+              {reverseTarget?.memberName || reverseTarget?.memberId}.
+            </Alert>
+            <CustomTextField
+              fullWidth
+              size='small'
+              label='Motivo de la reversión'
+              value={reverseForm.reason}
+              onChange={e => setReverseForm(current => ({ ...current, reason: e.target.value }))}
+            />
+            <CustomTextField
+              fullWidth
+              size='small'
+              label='Notas'
+              value={reverseForm.notes}
+              onChange={e => setReverseForm(current => ({ ...current, notes: e.target.value }))}
+              multiline
+              rows={3}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='tonal' color='secondary' onClick={() => setReverseOpen(false)} disabled={reverseSaving}>
+            Cancelar
+          </Button>
+          <Button
+            variant='contained'
+            color='warning'
+            onClick={() => void submitReverseAdjustment()}
+            disabled={reverseSaving || !reverseForm.reason.trim()}
+            startIcon={<i className='tabler-restore' />}
+          >
+            Confirmar reversión
+          </Button>
         </DialogActions>
       </Dialog>
     </Stack>

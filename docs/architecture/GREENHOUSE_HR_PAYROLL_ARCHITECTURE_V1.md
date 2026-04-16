@@ -349,6 +349,7 @@ Source of truth de permisos:
 - `greenhouse_hr.leave_balances`
 - `greenhouse_hr.leave_requests`
 - `greenhouse_hr.leave_request_actions`
+- `greenhouse_hr.leave_balance_adjustments`
 - serving views:
   - `greenhouse_serving.member_leave_360`
   - `greenhouse_serving.person_hr_360`
@@ -385,6 +386,8 @@ Contrato de eventos:
 - `leave_request.rejected`
 - `leave_request.cancelled`
 - `leave_request.payroll_impact_detected`
+- `leave_balance.adjusted`
+- `leave_balance.adjustment_reversed`
 
 Regla de impacto en nómina:
 
@@ -403,8 +406,16 @@ Resolución de policy:
 - el sistema primero resuelve `leave_type`
 - luego selecciona la `leave_policy` aplicable según:
   - `employment_type`
+  - `contract_type`
   - `pay_regime`
+  - `payroll_via`
+  - `hire_date` cuando la policy depende de antigüedad
 - si no existe match exacto, usa una policy default derivada del `leave_type`
+- para vacaciones, el explain administrativo debe distinguir al menos:
+  - Chile interno laboral
+  - honorarios
+  - contractor
+  - EOR / provider externo
 
 Cálculo de días:
 
@@ -439,6 +450,20 @@ Semántica de balance:
 - al crear una solicitud pendiente, el sistema reserva días
 - al aprobarla en HR, libera reserva y mueve esos días a usados
 - al rechazar o cancelar, revierte la reserva
+- los ajustes administrativos no deben perderse como mutación opaca:
+  - el ledger canónico vive en `greenhouse_hr.leave_balance_adjustments`
+  - `leave_balances.adjustment_days` sigue siendo la proyección agregada visible
+
+Operaciones administrativas:
+
+- **backfill retroactivo con fechas reales**
+  - reutiliza `greenhouse_hr.leave_requests`
+  - debe persistirse con `source_kind = 'admin_backfill'`
+  - se comporta como un permiso ya aprobado cargado por HR/admin
+- **ajuste manual de saldo**
+  - usa `greenhouse_hr.leave_balance_adjustments`
+  - exige `reason`, `effective_date`, actor y timestamp
+  - puede revertirse mediante un ajuste compensatorio con `source_kind = 'manual_adjustment_reversal'`
 
 Carry-over y progresivos:
 

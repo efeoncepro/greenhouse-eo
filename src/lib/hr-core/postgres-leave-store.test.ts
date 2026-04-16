@@ -98,7 +98,8 @@ describe('listLeaveRequestsFromPostgres', () => {
           decided_at: null,
           decided_by: null,
           notes: null,
-          created_at: '2026-04-08T12:00:00.000Z'
+          created_at: '2026-04-08T12:00:00.000Z',
+          source_kind: 'admin_backfill'
         }
       ])
 
@@ -109,6 +110,7 @@ describe('listLeaveRequestsFromPostgres', () => {
 
     expect(payload.requests).toHaveLength(1)
     expect(payload.requests[0]?.memberAvatarUrl).toBe('/api/media/users/user-1/avatar')
+    expect(payload.requests[0]?.sourceKind).toBe('admin_backfill')
 
     const queryText = String(mockRunGreenhousePostgresQuery.mock.calls[1]?.[0] ?? '')
 
@@ -164,7 +166,9 @@ describe('listLeaveRequestsFromPostgres', () => {
               employment_type: 'full_time',
               hire_date: '2024-01-10',
               prior_work_years: 0,
-              pay_regime: 'chile'
+              contract_type: 'indefinido',
+              pay_regime: 'chile',
+              payroll_via: 'internal'
             }
           ]
         }
@@ -174,17 +178,17 @@ describe('listLeaveRequestsFromPostgres', () => {
         return {
           rows: [
             {
-              leave_type_code: 'medical',
-              leave_type_name: 'Permiso médico / cita médica',
-              description: null,
+            leave_type_code: 'medical',
+            leave_type_name: 'Permiso médico / cita médica',
+            description: null,
               default_annual_allowance_days: 0,
               requires_attachment: true,
               is_paid: true,
               active: true,
-              color_token: null
-            }
-          ]
-        }
+            color_token: null
+          }
+        ]
+      }
       }
 
       if (sql.includes('FROM greenhouse_hr.leave_policies')) {
@@ -206,6 +210,11 @@ describe('listLeaveRequestsFromPostgres', () => {
 
     expect(payload.balances).toHaveLength(1)
     expect(payload.balances[0]?.memberId).toBe('daniela-ferreira')
+    expect(payload.balances[0]?.policyExplain).toMatchObject({
+      contractType: 'indefinido',
+      payRegime: 'chile',
+      payrollVia: 'internal'
+    })
 
     const memberQuery = mockClientQuery.mock.calls.find(call =>
       String(call[0]).includes('FROM greenhouse_core.members AS m'))

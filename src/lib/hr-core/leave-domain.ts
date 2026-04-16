@@ -28,6 +28,8 @@ export interface LeavePolicy {
   progressiveMaxExtraDays: number
   applicableEmploymentTypes: string[]
   applicablePayRegimes: string[]
+  applicableContractTypes: string[]
+  applicablePayrollVias: string[]
   allowNegativeBalance: boolean
   active: boolean
 }
@@ -345,11 +347,15 @@ export const classifyLeavePayrollImpact = (
 export const isPolicyApplicableToMember = ({
   policy,
   employmentType,
-  payRegime
+  payRegime,
+  contractType,
+  payrollVia
 }: {
   policy: LeavePolicy
   employmentType: string | null
   payRegime: string | null
+  contractType: string | null
+  payrollVia: string | null
 }) => {
   const employmentMatch =
     policy.applicableEmploymentTypes.length === 0 ||
@@ -359,7 +365,15 @@ export const isPolicyApplicableToMember = ({
     policy.applicablePayRegimes.length === 0 ||
     (payRegime != null && policy.applicablePayRegimes.includes(payRegime))
 
-  return employmentMatch && payRegimeMatch
+  const contractTypeMatch =
+    policy.applicableContractTypes.length === 0 ||
+    (contractType != null && policy.applicableContractTypes.includes(contractType))
+
+  const payrollViaMatch =
+    policy.applicablePayrollVias.length === 0 ||
+    (payrollVia != null && policy.applicablePayrollVias.includes(payrollVia))
+
+  return employmentMatch && payRegimeMatch && contractTypeMatch && payrollViaMatch
 }
 
 export const getLeaveColorByStatus = (status: string) => {

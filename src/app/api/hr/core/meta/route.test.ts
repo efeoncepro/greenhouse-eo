@@ -4,6 +4,11 @@ const mockRequireHrCoreReadTenantContext = vi.fn()
 const mockGetHrCoreMetadata = vi.fn()
 const mockResolveCurrentHrMemberId = vi.fn()
 const mockIsHrAdminTenant = vi.fn()
+const mockCan = vi.fn()
+
+vi.mock('@/lib/entitlements/runtime', () => ({
+  can: (...args: unknown[]) => mockCan(...args)
+}))
 
 vi.mock('@/lib/hr-core/shared', () => ({
   requireHrCoreReadTenantContext: (...args: unknown[]) => mockRequireHrCoreReadTenantContext(...args),
@@ -45,6 +50,7 @@ describe('GET /api/hr/core/meta', () => {
       attendanceStatuses: []
     })
     mockIsHrAdminTenant.mockReturnValue(false)
+    mockCan.mockReturnValue(false)
   })
 
   it('returns currentMemberId when the session needs collaborator resolution', async () => {
@@ -56,6 +62,9 @@ describe('GET /api/hr/core/meta', () => {
     expect(response.status).toBe(200)
     expect(body.currentMemberId).toBe('member-123')
     expect(body.hasHrAdminAccess).toBe(false)
+    expect(body.canManageLeaveBackfills).toBe(false)
+    expect(body.canManageLeaveAdjustments).toBe(false)
+    expect(body.canReverseLeaveAdjustments).toBe(false)
     expect(body.leaveTypes).toEqual([])
   })
 
@@ -71,11 +80,19 @@ describe('GET /api/hr/core/meta', () => {
 
   it('returns hasHrAdminAccess when the tenant has broad HR admin authority', async () => {
     mockIsHrAdminTenant.mockReturnValue(true)
+    mockCan.mockImplementation((_tenant: unknown, capability: string, action: string) =>
+      capability === 'hr.leave_backfill' && action === 'create'
+        ? true
+        : capability === 'hr.leave_adjustment' && (action === 'create' || action === 'update')
+    )
 
     const response = await GET()
     const body = await response.json()
 
     expect(response.status).toBe(200)
     expect(body.hasHrAdminAccess).toBe(true)
+    expect(body.canManageLeaveBackfills).toBe(true)
+    expect(body.canManageLeaveAdjustments).toBe(true)
+    expect(body.canReverseLeaveAdjustments).toBe(true)
   })
 })

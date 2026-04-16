@@ -1,5 +1,28 @@
 # changelog.md
 
+## 2026-04-16
+
+### 2026-04-16 — TASK-415: HR Leave admin backfills, ajustes y policy explain
+
+- `HR Leave` gana base admin real para vacaciones del equipo:
+  - nuevos entitlements runtime `hr.leave_balance`, `hr.leave_backfill` y `hr.leave_adjustment`
+  - `GET /api/hr/core/meta` ahora expone flags de operación admin para backfills, ajustes y reversión
+  - nuevas routes:
+    - `POST /api/hr/core/leave/backfills`
+    - `GET/POST /api/hr/core/leave/adjustments`
+    - `POST /api/hr/core/leave/adjustments/[adjustmentId]/reverse`
+- El runtime PostgreSQL de leave ahora devuelve `policyExplain` por saldo y deja de resolver vacaciones solo por `employment_type + pay_regime`; ahora también considera `contract_type`, `payroll_via` y `hire_date`.
+- Se incorpora ledger auditable para operaciones administrativas:
+  - `greenhouse_hr.leave_requests.source_kind` distingue solicitudes normales de `admin_backfill`
+  - nueva tabla `greenhouse_hr.leave_balance_adjustments` para ajustes manuales y reversión
+  - la migración canónica es `20260416083541945_task-415-hr-leave-admin-backfill-adjustments.sql`
+- Se corrige además la semántica de movimiento de saldo reservado/usado en leave para evitar multiplicar dos veces los días al reservar, aprobar, rechazar o cancelar solicitudes.
+- `scripts/setup-postgres-hr-leave.sql` queda alineado con el contrato nuevo (`applicable_contract_types`, `applicable_payroll_vias`, `source_kind`, `leave_balance_adjustments`).
+- Documentación actualizada:
+  - `docs/documentation/hr/sistema-permisos-leave.md`
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+
 ## 2026-04-15
 
 ### 2026-04-15 — TASK-403: Entitlements runtime foundation conectada a Pulse y Nexa
