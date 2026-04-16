@@ -101,6 +101,10 @@ PROJECT_ROLES=(
   "roles/secretmanager.admin"
   "roles/storage.admin"
   "roles/artifactregistry.writer"
+  # Required so `gcloud builds submit` can stream Cloud Build logs back to
+  # the workflow output. Without it the submit succeeds but gcloud errors
+  # on log-stream retrieval, masking an otherwise-green build as a failure.
+  "roles/logging.viewer"
 )
 
 echo "=== GitHub Actions WIF setup — ${PROJECT_ID} ==="
