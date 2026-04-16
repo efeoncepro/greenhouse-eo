@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -87,6 +87,10 @@ const initialReverseForm = {
   notes: ''
 }
 
+const emptyRequests: HrLeaveRequest[] = []
+const emptyBalances: HrLeaveBalance[] = []
+const emptyAdjustments: HrLeaveBalanceAdjustmentRecord[] = []
+
 const formatPolicyExplainLabel = (policyExplain: NonNullable<HrLeaveBalance['policyExplain']>) => {
   if (policyExplain.policySource === 'not_eligible') {
     return 'Sin acumulación automática'
@@ -117,6 +121,102 @@ const getCalendarRangeForYear = (year: number) => ({
   to: `${year}-12-31`
 })
 
+type TeamBalanceSummaryRow = {
+  memberId: string
+  memberName: string
+  balances: HrLeaveBalance[]
+  vacationBalance: HrLeaveBalance | null
+  policyLabel: string
+  availableDays: number | null
+  reservedDays: number | null
+  adjustmentDays: number | null
+  hasNegativeBalance: boolean
+  hasReservations: boolean
+  hasAdjustments: boolean
+}
+
+const buildBalancesByType = (leaveTypes: HrLeaveType[], balances: HrLeaveBalance[]) =>
+  leaveTypes.map(leaveType => {
+    const matchingBalances = balances.filter(balance => balance.leaveTypeCode === leaveType.leaveTypeCode)
+    const totalAllowance = matchingBalances.reduce((sum, balance) => sum + balance.allowanceDays, 0)
+    const totalUsed = matchingBalances.reduce((sum, balance) => sum + balance.usedDays, 0)
+    const totalAvailable = matchingBalances.reduce((sum, balance) => sum + balance.availableDays, 0)
+    const pctUsed = totalAllowance > 0 ? Math.round((totalUsed / totalAllowance) * 100) : 0
+
+    return {
+      ...leaveType,
+      totalAllowance,
+      totalUsed,
+      totalAvailable,
+      pctUsed,
+      memberCount: matchingBalances.length
+    }
+  })
+
+const buildTeamBalanceRows = (balances: HrLeaveBalance[]) => {
+  const rows = new Map<string, TeamBalanceSummaryRow>()
+
+  for (const balance of balances) {
+    const existing = rows.get(balance.memberId)
+
+    if (existing) {
+      existing.balances.push(balance)
+      continue
+    }
+
+    rows.set(balance.memberId, {
+      memberId: balance.memberId,
+      memberName: balance.memberName || balance.memberId,
+      balances: [balance],
+      vacationBalance: null,
+      policyLabel: 'Sin política visible',
+      availableDays: null,
+      reservedDays: null,
+      adjustmentDays: null,
+      hasNegativeBalance: false,
+      hasReservations: false,
+      hasAdjustments: false
+    })
+  }
+
+  return Array.from(rows.values())
+    .map(row => {
+      const vacationBalance = row.balances.find(balance => balance.leaveTypeCode === 'vacation') ?? null
+      const baseBalance = vacationBalance ?? row.balances[0] ?? null
+
+      return {
+        ...row,
+        vacationBalance,
+        policyLabel: baseBalance?.policyExplain ? formatPolicyExplainLabel(baseBalance.policyExplain) : 'Sin política visible',
+        availableDays: vacationBalance?.availableDays ?? null,
+        reservedDays: vacationBalance?.reservedDays ?? null,
+        adjustmentDays: vacationBalance?.adjustmentDays ?? null,
+        hasNegativeBalance: row.balances.some(balance => balance.availableDays < 0),
+        hasReservations: row.balances.some(balance => balance.reservedDays > 0),
+        hasAdjustments: row.balances.some(balance => (balance.adjustmentDays ?? 0) !== 0)
+      }
+    })
+    .sort((left, right) => left.memberName.localeCompare(right.memberName, 'es'))
+}
+
+const getTeamAlertLabels = (row: TeamBalanceSummaryRow) => {
+  const alerts: string[] = []
+
+  if (row.hasNegativeBalance) {
+    alerts.push('Saldo negativo')
+  }
+
+  if (row.hasReservations) {
+    alerts.push('Con reservas')
+  }
+
+  if (row.hasAdjustments) {
+    alerts.push('Con ajustes')
+  }
+
+  return alerts
+}
+
 const HrLeaveView = () => {
   const theme = useTheme()
   const [tab, setTab] = useState('requests')
@@ -137,6 +237,9 @@ const HrLeaveView = () => {
   // Filters
   const [filterStatus, setFilterStatus] = useState<HrLeaveRequestStatus | ''>('')
   const [filterYear, setFilterYear] = useState(new Date().getFullYear())
+  const [teamSearch, setTeamSearch] = useState('')
+  const [teamAlertFilter, setTeamAlertFilter] = useState<'all' | 'negative' | 'reserved' | 'adjusted'>('all')
+  const [teamDetailMemberId, setTeamDetailMemberId] = useState<string | null>(null)
 
   // Create dialog
   const [createOpen, setCreateOpen] = useState(false)
@@ -445,6 +548,99 @@ const HrLeaveView = () => {
     }
   }
 
+  const summary = reqData?.summary ?? { total: 0, pendingSupervisor: 0, pendingHr: 0, approved: 0 }
+  const requests = reqData?.requests ?? emptyRequests
+  const balances = balData?.balances ?? emptyBalances
+  const adjustments = adjustmentsData?.adjustments ?? emptyAdjustments
+  const canSeeTeamBalances = hasHrAdminAccess || canManageLeaveAdminActions || canShowAdjustmentHistory
+
+  const leaveTypeOrder = useMemo(
+    () => new Map(leaveTypes.map((leaveType, index) => [leaveType.leaveTypeCode, index])),
+    [leaveTypes]
+  )
+
+  const myBalances = useMemo(() => {
+    if (hasHrAdminAccess) {
+      return currentMemberId ? balances.filter(balance => balance.memberId === currentMemberId) : []
+    }
+
+    return balances
+  }, [balances, currentMemberId, hasHrAdminAccess])
+
+  const myBalancesByType = useMemo(() => buildBalancesByType(leaveTypes, myBalances), [leaveTypes, myBalances])
+
+  const teamBalanceRows = useMemo(() => buildTeamBalanceRows(balances), [balances])
+
+  const filteredTeamBalanceRows = useMemo(() => {
+    const searchTerm = teamSearch.trim().toLowerCase()
+
+    return teamBalanceRows.filter(row => {
+      const matchesSearch =
+        searchTerm.length === 0 ||
+        row.memberName.toLowerCase().includes(searchTerm) ||
+        row.memberId.toLowerCase().includes(searchTerm)
+
+      if (!matchesSearch) {
+        return false
+      }
+
+      switch (teamAlertFilter) {
+        case 'negative':
+          return row.hasNegativeBalance
+        case 'reserved':
+          return row.hasReservations
+        case 'adjusted':
+          return row.hasAdjustments
+        default:
+          return true
+      }
+    })
+  }, [teamAlertFilter, teamBalanceRows, teamSearch])
+
+  const selectedTeamBalanceRow = useMemo(
+    () => teamBalanceRows.find(row => row.memberId === teamDetailMemberId) ?? null,
+    [teamBalanceRows, teamDetailMemberId]
+  )
+
+  const selectedTeamAdjustments = useMemo(
+    () => adjustments.filter(adjustment => adjustment.memberId === teamDetailMemberId),
+    [adjustments, teamDetailMemberId]
+  )
+
+  const selectedTeamBalances = useMemo(() => {
+    if (!selectedTeamBalanceRow) {
+      return []
+    }
+
+    return [...selectedTeamBalanceRow.balances].sort((left, right) => {
+      const leftOrder = leaveTypeOrder.get(left.leaveTypeCode) ?? Number.MAX_SAFE_INTEGER
+      const rightOrder = leaveTypeOrder.get(right.leaveTypeCode) ?? Number.MAX_SAFE_INTEGER
+
+      if (leftOrder !== rightOrder) {
+        return leftOrder - rightOrder
+      }
+
+      return left.leaveTypeName.localeCompare(right.leaveTypeName, 'es')
+    })
+  }, [leaveTypeOrder, selectedTeamBalanceRow])
+
+  const teamSummary = useMemo(
+    () => ({
+      members: teamBalanceRows.length,
+      negative: teamBalanceRows.filter(row => row.hasNegativeBalance).length,
+      reserved: teamBalanceRows.filter(row => row.hasReservations).length,
+      adjusted: teamBalanceRows.filter(row => row.hasAdjustments).length
+    }),
+    [teamBalanceRows]
+  )
+
+  const reviewCapabilities = reviewReq
+    ? getLeaveReviewCapabilities({
+        request: reviewReq,
+        actor: { currentMemberId, hasHrAdminAccess }
+      })
+    : null
+
   if (loading) {
     return (
       <Stack spacing={6}>
@@ -460,29 +656,6 @@ const HrLeaveView = () => {
       </Stack>
     )
   }
-
-  const summary = reqData?.summary ?? { total: 0, pendingSupervisor: 0, pendingHr: 0, approved: 0 }
-  const requests = reqData?.requests ?? []
-  const balances = balData?.balances ?? []
-  const adjustments = adjustmentsData?.adjustments ?? []
-
-  const reviewCapabilities = reviewReq
-    ? getLeaveReviewCapabilities({
-        request: reviewReq,
-        actor: { currentMemberId, hasHrAdminAccess }
-      })
-    : null
-
-  // Group balances by leave type for radial gauges
-  const balancesByType = leaveTypes.map(lt => {
-    const memberBalances = balances.filter(b => b.leaveTypeCode === lt.leaveTypeCode)
-    const totalAllowance = memberBalances.reduce((s, b) => s + b.allowanceDays, 0)
-    const totalUsed = memberBalances.reduce((s, b) => s + b.usedDays, 0)
-    const totalAvailable = memberBalances.reduce((s, b) => s + b.availableDays, 0)
-    const pctUsed = totalAllowance > 0 ? Math.round((totalUsed / totalAllowance) * 100) : 0
-
-    return { ...lt, totalAllowance, totalUsed, totalAvailable, pctUsed, memberCount: memberBalances.length }
-  })
 
   return (
     <Stack spacing={6}>
@@ -556,7 +729,20 @@ const HrLeaveView = () => {
         <CustomTabList onChange={(_, v) => setTab(v)} variant='scrollable'>
           <Tab value='requests' label='Solicitudes' icon={<i className='tabler-file-text' />} iconPosition='start' />
           <Tab value='calendar' label='Calendario' icon={<i className='tabler-calendar-month' />} iconPosition='start' />
-          <Tab value='balances' label='Saldos' icon={<i className='tabler-scale' />} iconPosition='start' />
+          <Tab
+            value='my-balances'
+            label={hasHrAdminAccess ? 'Mis saldos' : 'Saldos'}
+            icon={<i className='tabler-scale' />}
+            iconPosition='start'
+          />
+          {canSeeTeamBalances && (
+            <Tab
+              value='team-balances'
+              label='Saldos del equipo'
+              icon={<i className='tabler-users-group' />}
+              iconPosition='start'
+            />
+          )}
         </CustomTabList>
 
         {/* Requests Tab */}
@@ -734,11 +920,16 @@ const HrLeaveView = () => {
           </Card>
         </TabPanel>
 
-        {/* Balances Tab */}
-        <TabPanel value='balances' sx={{ p: 0 }}>
+        <TabPanel value='my-balances' sx={{ p: 0 }}>
           <Stack spacing={6}>
+            {hasHrAdminAccess && !currentMemberId && (
+              <Alert severity='info'>
+                No pudimos vincular tu ficha para mostrar tus saldos personales. Tu vista del equipo sigue disponible para gestionar permisos.
+              </Alert>
+            )}
+
             <Grid container spacing={6}>
-              {balancesByType.map(bt => {
+              {myBalancesByType.map(bt => {
                 const conf = getLeaveTypeConfig(bt.leaveTypeCode)
 
                 const gaugeOptions: ApexOptions = {
@@ -792,13 +983,13 @@ const HrLeaveView = () => {
                   </Grid>
                 )
               })}
-              {balancesByType.length === 0 && (
+              {myBalancesByType.length === 0 && (
                 <Grid size={{ xs: 12 }}>
                   <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
                     <CardContent sx={{ py: 6, textAlign: 'center' }}>
                       <Stack alignItems='center' spacing={1}>
                         <i className='tabler-scale' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                        <Typography color='text.secondary'>No hay saldos de permisos para mostrar.</Typography>
+                        <Typography color='text.secondary'>No hay saldos personales para mostrar.</Typography>
                       </Stack>
                     </CardContent>
                   </Card>
@@ -808,8 +999,8 @@ const HrLeaveView = () => {
 
             <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
               <CardHeader
-                title='Saldos por colaborador'
-                subheader='Detalle operativo por colaborador y tipo de permiso.'
+                title='Detalle de mis saldos'
+                subheader='Tu disponibilidad actual por tipo de permiso.'
                 avatar={
                   <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
                     <i className='tabler-table' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -822,42 +1013,23 @@ const HrLeaveView = () => {
                   <Table size='small'>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Colaborador</TableCell>
                         <TableCell>Tipo</TableCell>
+                        <TableCell>Política</TableCell>
                         <TableCell align='center'>Año</TableCell>
                         <TableCell align='center'>Asignados</TableCell>
                         <TableCell align='center'>Usados</TableCell>
                         <TableCell align='center'>Reservados</TableCell>
                         <TableCell align='center'>Ajustes</TableCell>
                         <TableCell align='center'>Disponibles</TableCell>
-                        {canManageLeaveAdminActions && <TableCell align='right'>Acciones</TableCell>}
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {balances.map(balance => {
+                      {myBalances.map(balance => {
                         const conf = getLeaveTypeConfig(balance.leaveTypeCode)
 
                         return (
                           <TableRow key={balance.balanceId} hover>
                             <TableCell>
-                              <Stack direction='row' spacing={1.5} alignItems='center'>
-                                <Avatar
-                                  sx={{ width: 28, height: 28, fontSize: '0.75rem' }}
-                                >
-                                  {getInitials(balance.memberName || '')}
-                                </Avatar>
-                                <Box>
-                                  <Typography variant='body2' fontWeight={500}>
-                                    {balance.memberName || balance.memberId}
-                                  </Typography>
-                                  <Typography variant='caption' color='text.secondary'>
-                                    {balance.memberId}
-                                  </Typography>
-                                </Box>
-                              </Stack>
-                            </TableCell>
-                            <TableCell>
-                            <Stack spacing={0.5}>
                               <CustomChip
                                 round='true'
                                 size='small'
@@ -865,13 +1037,14 @@ const HrLeaveView = () => {
                                 label={conf.label}
                                 color={conf.color}
                               />
-                              <Typography variant='caption' color='text.secondary'>
-                                  {balance.policyExplain
-                                    ? formatPolicyExplainLabel(balance.policyExplain)
-                                    : 'Regla estándar de permisos'}
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant='body2' color='text.secondary'>
+                                {balance.policyExplain
+                                  ? formatPolicyExplainLabel(balance.policyExplain)
+                                  : 'Regla estándar de permisos'}
                               </Typography>
-                            </Stack>
-                          </TableCell>
+                            </TableCell>
                             <TableCell align='center'>{balance.year}</TableCell>
                             <TableCell align='center'>{balance.allowanceDays}</TableCell>
                             <TableCell align='center'>{balance.usedDays}</TableCell>
@@ -882,41 +1055,15 @@ const HrLeaveView = () => {
                                 {balance.availableDays}
                               </Typography>
                             </TableCell>
-                            {canManageLeaveAdminActions && (
-                              <TableCell align='right'>
-                                <Stack direction='row' spacing={1} justifyContent='flex-end' flexWrap='wrap'>
-                                  {canManageLeaveBackfills && (
-                                    <Button
-                                      variant='tonal'
-                                      size='small'
-                                      color='info'
-                                      onClick={() => openBackfillDialog(balance)}
-                                    >
-                                      Registrar días ya tomados
-                                    </Button>
-                                  )}
-                                  {canManageLeaveAdjustments && (
-                                    <Button
-                                      variant='tonal'
-                                      size='small'
-                                      color='secondary'
-                                      onClick={() => openAdjustmentDialog(balance)}
-                                    >
-                                      Ajustar saldo
-                                    </Button>
-                                  )}
-                                </Stack>
-                              </TableCell>
-                            )}
                           </TableRow>
                         )
                       })}
-                      {balances.length === 0 && (
+                      {myBalances.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={canManageLeaveAdminActions ? 9 : 8} align='center' sx={{ py: 6 }}>
+                          <TableCell colSpan={8} align='center' sx={{ py: 6 }}>
                             <Stack alignItems='center' spacing={1}>
                               <i className='tabler-scale' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                              <Typography color='text.secondary'>No hay saldos por colaborador para mostrar.</Typography>
+                              <Typography color='text.secondary'>No hay saldos personales para mostrar.</Typography>
                             </Stack>
                           </TableCell>
                         </TableRow>
@@ -926,108 +1073,180 @@ const HrLeaveView = () => {
                 </TableContainer>
               </CardContent>
             </Card>
+          </Stack>
+        </TabPanel>
 
-            {canShowAdjustmentHistory && (
+        {canSeeTeamBalances && (
+          <TabPanel value='team-balances' sx={{ p: 0 }}>
+            <Stack spacing={6}>
+              <Grid container spacing={6}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Colaboradores visibles'
+                    stats={String(teamSummary.members)}
+                    avatarIcon='tabler-users-group'
+                    avatarColor='primary'
+                    subtitle='Roster operativo de permisos'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Saldo negativo'
+                    stats={String(teamSummary.negative)}
+                    avatarIcon='tabler-alert-triangle'
+                    avatarColor='error'
+                    subtitle='Disponibilidad que revisar'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Con reservas'
+                    stats={String(teamSummary.reserved)}
+                    avatarIcon='tabler-calendar-clock'
+                    avatarColor='warning'
+                    subtitle='Permisos ya comprometidos'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Con ajustes'
+                    stats={String(teamSummary.adjusted)}
+                    avatarIcon='tabler-history'
+                    avatarColor='success'
+                    subtitle='Cambios manuales este año'
+                  />
+                </Grid>
+              </Grid>
+
               <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
                 <CardHeader
-                  title='Historial de ajustes'
-                  subheader={`Ajustes registrados para ${filterYear}.`}
+                  title='Saldos del equipo'
+                  subheader='Consulta disponibilidad, reservas y ajustes por colaborador.'
                   avatar={
-                    <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
-                      <i className='tabler-history' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} />
+                    <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
+                      <i className='tabler-users-group' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
                     </Avatar>
                   }
                 />
                 <Divider />
                 <CardContent>
-                  {adjustmentsError && (
+                  {adjustmentsError && canShowAdjustmentHistory && (
                     <Alert severity='warning' sx={{ mb: 3 }}>
                       {adjustmentsError}
                     </Alert>
                   )}
+                  <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
+                    <CustomTextField
+                      size='small'
+                      label='Buscar colaborador'
+                      value={teamSearch}
+                      onChange={e => setTeamSearch(e.target.value)}
+                      placeholder='Nombre o member id'
+                      sx={{ minWidth: { xs: '100%', md: 280 } }}
+                    />
+                    <CustomTextField
+                      select
+                      size='small'
+                      label='Alertas'
+                      value={teamAlertFilter}
+                      onChange={e => setTeamAlertFilter(e.target.value as 'all' | 'negative' | 'reserved' | 'adjusted')}
+                      sx={{ minWidth: { xs: '100%', md: 220 } }}
+                    >
+                      <MenuItem value='all'>Todas</MenuItem>
+                      <MenuItem value='negative'>Saldo negativo</MenuItem>
+                      <MenuItem value='reserved'>Con reservas</MenuItem>
+                      <MenuItem value='adjusted'>Con ajustes</MenuItem>
+                    </CustomTextField>
+                  </Stack>
+
                   <TableContainer>
                     <Table size='small'>
                       <TableHead>
                         <TableRow>
                           <TableCell>Colaborador</TableCell>
-                          <TableCell>Tipo</TableCell>
-                          <TableCell align='center'>Fecha efectiva</TableCell>
-                          <TableCell align='center'>Delta</TableCell>
-                          <TableCell>Motivo</TableCell>
-                          <TableCell align='center'>Estado</TableCell>
+                          <TableCell>Política vacaciones</TableCell>
+                          <TableCell align='center'>Disponibles</TableCell>
+                          <TableCell align='center'>Reservadas</TableCell>
+                          <TableCell align='center'>Ajustes</TableCell>
+                          <TableCell>Alertas</TableCell>
                           <TableCell align='right'>Acciones</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {adjustments.map(adjustment => {
-                          const conf = getLeaveTypeConfig(adjustment.leaveTypeCode)
-                          const isReversed = adjustment.reversedAt !== null
+                        {filteredTeamBalanceRows.map(row => {
+                          const alerts = getTeamAlertLabels(row)
 
                           return (
-                            <TableRow key={adjustment.adjustmentId} hover>
+                            <TableRow key={row.memberId} hover>
                               <TableCell>
-                                <Stack spacing={0.25}>
-                                  <Typography variant='body2' fontWeight={500}>
-                                    {adjustment.memberName || adjustment.memberId}
-                                  </Typography>
-                                  <Typography variant='caption' color='text.secondary'>
-                                    {adjustment.memberId}
-                                  </Typography>
+                                <Stack direction='row' spacing={1.5} alignItems='center'>
+                                  <Avatar sx={{ width: 32, height: 32, fontSize: '0.8rem' }}>
+                                    {getInitials(row.memberName)}
+                                  </Avatar>
+                                  <Box>
+                                    <Typography variant='body2' fontWeight={600}>
+                                      {row.memberName}
+                                    </Typography>
+                                    <Typography variant='caption' color='text.secondary'>
+                                      {row.memberId}
+                                    </Typography>
+                                  </Box>
                                 </Stack>
                               </TableCell>
                               <TableCell>
-                                <CustomChip
-                                  round='true'
-                                  size='small'
-                                  icon={<i className={conf.icon} />}
-                                  label={conf.label}
-                                  color={conf.color}
-                                />
+                                <Stack spacing={0.25}>
+                                  <Typography variant='body2'>{row.policyLabel}</Typography>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {row.balances.length} tipo{row.balances.length === 1 ? '' : 's'} disponible{row.balances.length === 1 ? '' : 's'}
+                                  </Typography>
+                                </Stack>
                               </TableCell>
-                              <TableCell align='center'>{formatDate(adjustment.effectiveDate)}</TableCell>
-                              <TableCell align='center'>
-                                <Typography variant='body2' fontWeight={600} color={adjustment.daysDelta >= 0 ? 'success.main' : 'error.main'}>
-                                  {adjustment.daysDelta > 0 ? `+${adjustment.daysDelta}` : adjustment.daysDelta}
-                                </Typography>
-                              </TableCell>
+                              <TableCell align='center'>{row.availableDays ?? '—'}</TableCell>
+                              <TableCell align='center'>{row.reservedDays ?? '—'}</TableCell>
+                              <TableCell align='center'>{row.adjustmentDays ?? '—'}</TableCell>
                               <TableCell>
-                                <Typography variant='body2' color='text.secondary'>
-                                  {adjustment.reason}
-                                </Typography>
-                              </TableCell>
-                              <TableCell align='center'>
-                                <CustomChip
-                                  round='true'
-                                  size='small'
-                                  label={isReversed ? 'Revertido' : 'Vigente'}
-                                  color={isReversed ? 'secondary' : 'success'}
-                                />
+                                <Stack direction='row' spacing={1} flexWrap='wrap'>
+                                  {alerts.length > 0 ? (
+                                    alerts.map(alertLabel => (
+                                      <CustomChip
+                                        key={alertLabel}
+                                        round='true'
+                                        size='small'
+                                        color={
+                                          alertLabel === 'Saldo negativo'
+                                            ? 'error'
+                                            : alertLabel === 'Con reservas'
+                                              ? 'warning'
+                                              : 'info'
+                                        }
+                                        label={alertLabel}
+                                      />
+                                    ))
+                                  ) : (
+                                    <Typography variant='caption' color='text.secondary'>
+                                      Sin alertas
+                                    </Typography>
+                                  )}
+                                </Stack>
                               </TableCell>
                               <TableCell align='right'>
-                                {canReverseLeaveAdjustments && !isReversed ? (
-                                  <Button
-                                    variant='tonal'
-                                    size='small'
-                                    color='warning'
-                                    onClick={() => openReverseDialog(adjustment)}
-                                  >
-                                    Revertir
-                                  </Button>
-                                ) : (
-                                  <Typography variant='caption' color='text.disabled'>
-                                    —
-                                  </Typography>
-                                )}
+                                <Button variant='tonal' size='small' onClick={() => setTeamDetailMemberId(row.memberId)}>
+                                  Ver detalle
+                                </Button>
                               </TableCell>
                             </TableRow>
                           )
                         })}
-                        {adjustments.length === 0 && (
+                        {filteredTeamBalanceRows.length === 0 && (
                           <TableRow>
                             <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
                               <Stack alignItems='center' spacing={1}>
-                                <i className='tabler-history-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                                <Typography color='text.secondary'>No hay ajustes registrados para este año.</Typography>
+                                <i className='tabler-users-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+                                <Typography color='text.secondary'>
+                                  {teamSearch || teamAlertFilter !== 'all'
+                                    ? 'No encontramos colaboradores para esos filtros.'
+                                    : 'No hay saldos del equipo para mostrar todavía.'}
+                                </Typography>
                               </Stack>
                             </TableCell>
                           </TableRow>
@@ -1037,10 +1256,297 @@ const HrLeaveView = () => {
                   </TableContainer>
                 </CardContent>
               </Card>
-            )}
-          </Stack>
-        </TabPanel>
+            </Stack>
+          </TabPanel>
+        )}
       </TabContext>
+
+      <Dialog
+        open={!!selectedTeamBalanceRow}
+        onClose={() => setTeamDetailMemberId(null)}
+        maxWidth='lg'
+        fullWidth
+        closeAfterTransition={false}
+      >
+        {selectedTeamBalanceRow && (
+          <>
+            <DialogTitle>
+              <Stack spacing={0.5}>
+                <Typography variant='h5'>{selectedTeamBalanceRow.memberName}</Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  Revisión administrativa de saldos, reservas y ajustes por tipo de permiso.
+                </Typography>
+              </Stack>
+            </DialogTitle>
+            <Divider />
+            <DialogContent>
+              <Stack spacing={4} sx={{ mt: 1 }}>
+                <Grid container spacing={3}>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, height: '100%' }}>
+                      <CardContent>
+                        <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                          Identificador
+                        </Typography>
+                        <Typography variant='body1' fontWeight={600} sx={{ mt: 0.5 }}>
+                          {selectedTeamBalanceRow.memberId}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary' sx={{ mt: 2, display: 'block', textTransform: 'uppercase' }}>
+                          Política visible
+                        </Typography>
+                        <Typography variant='body2' sx={{ mt: 0.5 }}>
+                          {selectedTeamBalanceRow.policyLabel}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 8 }}>
+                    <Grid container spacing={3}>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                          <CardContent>
+                            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                              Días disponibles
+                            </Typography>
+                            <Typography variant='h4' sx={{ mt: 1 }}>
+                              {selectedTeamBalanceRow.availableDays ?? '—'}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                          <CardContent>
+                            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                              Días reservados
+                            </Typography>
+                            <Typography variant='h4' sx={{ mt: 1 }}>
+                              {selectedTeamBalanceRow.reservedDays ?? '—'}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                          <CardContent>
+                            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                              Ajustes netos
+                            </Typography>
+                            <Typography variant='h4' sx={{ mt: 1 }}>
+                              {selectedTeamBalanceRow.adjustmentDays ?? '—'}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                  <CardHeader
+                    title='Detalle por tipo de permiso'
+                    subheader='Desde aquí puedes revisar disponibilidad y operar acciones administrativas sin perder el contexto.'
+                  />
+                  <Divider />
+                  <CardContent>
+                    <TableContainer>
+                      <Table size='small'>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Tipo</TableCell>
+                            <TableCell>Política</TableCell>
+                            <TableCell align='center'>Año</TableCell>
+                            <TableCell align='center'>Asignados</TableCell>
+                            <TableCell align='center'>Usados</TableCell>
+                            <TableCell align='center'>Reservados</TableCell>
+                            <TableCell align='center'>Ajustes</TableCell>
+                            <TableCell align='center'>Disponibles</TableCell>
+                            <TableCell align='right'>Acciones</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {selectedTeamBalances.map(balance => {
+                            const conf = getLeaveTypeConfig(balance.leaveTypeCode)
+
+                            return (
+                              <TableRow key={balance.balanceId} hover>
+                                <TableCell>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    icon={<i className={conf.icon} />}
+                                    label={conf.label}
+                                    color={conf.color}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Typography variant='body2' color='text.secondary'>
+                                    {balance.policyExplain
+                                      ? formatPolicyExplainLabel(balance.policyExplain)
+                                      : 'Regla estándar de permisos'}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell align='center'>{balance.year}</TableCell>
+                                <TableCell align='center'>{balance.allowanceDays}</TableCell>
+                                <TableCell align='center'>{balance.usedDays}</TableCell>
+                                <TableCell align='center'>{balance.reservedDays}</TableCell>
+                                <TableCell align='center'>{balance.adjustmentDays ?? 0}</TableCell>
+                                <TableCell align='center'>
+                                  <Typography variant='body2' fontWeight={600}>
+                                    {balance.availableDays}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell align='right'>
+                                  <Stack
+                                    direction={{ xs: 'column', lg: 'row' }}
+                                    spacing={1}
+                                    justifyContent='flex-end'
+                                    alignItems={{ lg: 'center' }}
+                                  >
+                                    {canManageLeaveBackfills && (
+                                      <Button
+                                        variant='tonal'
+                                        size='small'
+                                        onClick={() => {
+                                          setTeamDetailMemberId(null)
+                                          openBackfillDialog(balance)
+                                        }}
+                                      >
+                                        Registrar días ya tomados
+                                      </Button>
+                                    )}
+                                    {canManageLeaveAdjustments && (
+                                      <Button
+                                        variant='tonal'
+                                        size='small'
+                                        color='secondary'
+                                        onClick={() => {
+                                          setTeamDetailMemberId(null)
+                                          openAdjustmentDialog(balance)
+                                        }}
+                                      >
+                                        Ajustar saldo
+                                      </Button>
+                                    )}
+                                  </Stack>
+                                </TableCell>
+                              </TableRow>
+                            )
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </CardContent>
+                </Card>
+
+                {canShowAdjustmentHistory && (
+                  <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                    <CardHeader
+                      title='Historial de ajustes'
+                      subheader='Trazabilidad de cambios manuales y reversiones para este colaborador.'
+                    />
+                    <Divider />
+                    <CardContent>
+                      {selectedTeamAdjustments.length > 0 ? (
+                        <TableContainer>
+                          <Table size='small'>
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>Tipo</TableCell>
+                                <TableCell>Fecha efectiva</TableCell>
+                                <TableCell align='center'>Delta</TableCell>
+                                <TableCell>Motivo</TableCell>
+                                <TableCell>Estado</TableCell>
+                                <TableCell align='right'>Acciones</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {selectedTeamAdjustments.map(adjustment => {
+                                const conf = getLeaveTypeConfig(adjustment.leaveTypeCode)
+                                const isReversed = Boolean(adjustment.reversedAt)
+
+                                const canReverseAdjustment =
+                                  canReverseLeaveAdjustments &&
+                                  adjustment.sourceKind === 'manual_adjustment' &&
+                                  !isReversed
+
+                                return (
+                                  <TableRow key={adjustment.adjustmentId} hover>
+                                    <TableCell>
+                                      <CustomChip
+                                        round='true'
+                                        size='small'
+                                        icon={<i className={conf.icon} />}
+                                        label={conf.label}
+                                        color={conf.color}
+                                      />
+                                    </TableCell>
+                                    <TableCell>{formatDate(adjustment.effectiveDate)}</TableCell>
+                                    <TableCell align='center'>
+                                      <Typography variant='body2' fontWeight={600}>
+                                        {adjustment.daysDelta > 0 ? `+${adjustment.daysDelta}` : adjustment.daysDelta}
+                                      </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Stack spacing={0.25}>
+                                        <Typography variant='body2'>{adjustment.reason}</Typography>
+                                        {adjustment.notes && (
+                                          <Typography variant='caption' color='text.secondary'>
+                                            {adjustment.notes}
+                                          </Typography>
+                                        )}
+                                      </Stack>
+                                    </TableCell>
+                                    <TableCell>
+                                      <CustomChip
+                                        round='true'
+                                        size='small'
+                                        color={isReversed ? 'secondary' : 'success'}
+                                        label={isReversed ? 'Revertido' : 'Activo'}
+                                      />
+                                    </TableCell>
+                                    <TableCell align='right'>
+                                      {canReverseAdjustment && (
+                                        <Button
+                                          variant='tonal'
+                                          size='small'
+                                          color='warning'
+                                          onClick={() => {
+                                            setTeamDetailMemberId(null)
+                                            openReverseDialog(adjustment)
+                                          }}
+                                        >
+                                          Revertir
+                                        </Button>
+                                      )}
+                                    </TableCell>
+                                  </TableRow>
+                                )
+                              })}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      ) : (
+                        <Stack alignItems='center' spacing={1} sx={{ py: 4 }}>
+                          <i className='tabler-history-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+                          <Typography color='text.secondary'>
+                            No hay ajustes manuales registrados para este colaborador.
+                          </Typography>
+                        </Stack>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </Stack>
+            </DialogContent>
+            <DialogActions>
+              <Button variant='tonal' color='secondary' onClick={() => setTeamDetailMemberId(null)}>
+                Cerrar
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
 
       <LeaveRequestDialog
         open={createOpen}

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
@@ -458,9 +458,12 @@ describe('HrLeaveView', () => {
 
     renderWithTheme(<HrLeaveView />)
 
-    fireEvent.click(await screen.findByRole('tab', { name: 'Saldos' }))
+    fireEvent.click(await screen.findByRole('tab', { name: 'Saldos del equipo' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver detalle' }))
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Registrar días ya tomados' })[0])
+    const teamDetailDialog = await screen.findByRole('dialog', { name: /Valentina Gómez/i })
+
+    fireEvent.click(within(teamDetailDialog).getByRole('button', { name: 'Registrar días ya tomados' }))
 
     fireEvent.change(screen.getByLabelText('Desde'), { target: { value: '2026-04-08' } })
     fireEvent.change(screen.getByLabelText('Hasta'), { target: { value: '2026-04-12' } })
@@ -639,14 +642,17 @@ describe('HrLeaveView', () => {
 
     renderWithTheme(<HrLeaveView />)
 
-    fireEvent.click(await screen.findByRole('tab', { name: 'Saldos' }))
+    fireEvent.click(await screen.findByRole('tab', { name: 'Saldos del equipo' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver detalle' }))
 
     await waitFor(() => {
       expect(screen.getByText('Historial de ajustes')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('Revertido')).toBeInTheDocument()
-    fireEvent.click(screen.getAllByRole('button', { name: 'Revertir' })[0])
+    const teamDetailDialog = await screen.findByRole('dialog', { name: /Valentina Gómez/i })
+
+    expect(within(teamDetailDialog).getByText('Revertido')).toBeInTheDocument()
+    fireEvent.click(within(teamDetailDialog).getByRole('button', { name: 'Revertir' }))
 
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: 'Revertir ajuste' })).toBeInTheDocument()
