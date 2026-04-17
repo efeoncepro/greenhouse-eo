@@ -18,6 +18,14 @@ export default defineConfig({
       'services/**/*.spec.ts'
     ],
     setupFiles: ['src/test/setup.ts'],
+
+    // Raised from Vitest default (5s) to give React component suites headroom
+    // under v8 coverage instrumentation on GitHub runners. Multi-step dialog/form
+    // tests in `pnpm test:coverage` were exceeding 5s in CI while passing locally
+    // (ISSUE-052). 15s still catches genuinely hung tests.
+    testTimeout: 15000,
+    hookTimeout: 15000,
+
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary', 'html'],

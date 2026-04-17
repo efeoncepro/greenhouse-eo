@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-052`
+`ISSUE-053`
 
 ## Open
 
@@ -86,6 +86,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-023` | [Tablas de email sin migracion formal](resolved/ISSUE-023-email-tables-no-formal-migration.md)                                   | production + staging | 2026-04-06 | 2026-04-13 | Migraciones formales creadas en TASK-382: `20260413162215719_email-notifications-schema-foundation.sql` + `20260413162238855_email-delivery-enterprise-v2.sql` |
 | `ISSUE-020` | [3 endpoints duplicados de retry batch sin error handling](resolved/ISSUE-020-duplicate-email-retry-endpoints.md)                | staging + production | 2026-04-06 | 2026-04-13 | STALE — duplicados ya habian sido removidos. Solo existe `/api/admin/ops/email-delivery-retry` con try-catch. Verificado en auditoria TASK-382. |
 | `ISSUE-046` | [Reactive pipeline silent-skip backlog (~11k eventos sin procesar)](resolved/ISSUE-046-reactive-pipeline-silent-skip-backlog.md) | staging + production (single-instance) | 2026-04-13 | 2026-04-13 | Consumer V1 silent-skip path + fan-out explosion. Resuelto por TASK-379 (PR #53) + audit-only sweep follow-up (PR #54). Backlog drenado de 11,495 → 0. |
+| `ISSUE-052` | [CI `test:coverage` flake: HrLeaveView backfill dialog times out](resolved/ISSUE-052-ci-coverage-flake-hr-leave-timeout.md) | CI (GitHub Actions) | 2026-04-17 | 2026-04-17 | Vitest `testTimeout` default de 5s quedaba corto bajo instrumentación v8 de coverage en GitHub runners. Fix: bump global a 15s en `vitest.config.ts`. Desbloquea 5 commits de `develop` con CI rojo por flake no-reproducible localmente. |
 | `ISSUE-031` | [Vercel Preview falla en build por drift de `NEXTAUTH_SECRET`](resolved/ISSUE-031-vercel-preview-build-fails-missing-nextauth-secret.md)                        | preview                        | 2026-04-08 | 2026-04-08 | `authOptions` se resolvía en import-time y Preview no tenía `NEXTAUTH_SECRET`, por lo que el build caía en page-data collection |
 | `ISSUE-032` | [Secret Manager payload contamination breaks runtime secrets](resolved/ISSUE-032-secret-manager-payload-contamination-breaks-runtime-secrets.md)                 | staging + production           | 2026-04-08 | 2026-04-09 | Payloads de Secret Manager publicados con comillas/`\\n` literal llegaban sucios al runtime y rompían auth/integraciones |
 | `ISSUE-027` | [My Profile vacío tras migración a Person 360: resolución "me" retorna 404](resolved/ISSUE-027-my-profile-360-me-resolution-404.md)                               | staging                        | 2026-04-07 | 2026-04-07 | `resolvePersonIdentifier` no buscaba por `identity_profile_id` — WHERE clause solo tenía `member_id OR user_id`          |
