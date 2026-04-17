@@ -317,6 +317,9 @@ describe('getAgencySpace360', () => {
     ])
 
     mockReadSpaceAiLlmSummary.mockResolvedValue({
+      summarySource: 'active',
+      activeAnalyzed: 2,
+      historicalAnalyzed: 2,
       totalAnalyzed: 2,
       lastAnalysis: '2026-03-31T12:10:00.000Z',
       runStatus: 'succeeded',
@@ -329,7 +332,28 @@ describe('getAgencySpace360', () => {
           explanation: 'Space insight',
           recommendedAction: 'Revisar'
         }
-      ]
+      ],
+      activePreview: [
+        {
+          id: 'EO-AIE-30',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Space insight',
+          recommendedAction: 'Revisar'
+        }
+      ],
+      historicalPreview: [
+        {
+          id: 'EO-AIE-30',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Space insight',
+          recommendedAction: 'Revisar'
+        }
+      ],
+      timeline: []
     })
 
     const detail = await getAgencySpace360('space-2')
@@ -337,6 +361,9 @@ describe('getAgencySpace360', () => {
     expect(detail).not.toBeNull()
     expect(detail?.resolutionStatus).toBe('client_and_space')
     expect(detail?.nexaInsights).toEqual({
+      summarySource: 'active',
+      activeAnalyzed: 2,
+      historicalAnalyzed: 2,
       totalAnalyzed: 2,
       lastAnalysis: '2026-03-31T12:10:00.000Z',
       runStatus: 'succeeded',
@@ -349,7 +376,28 @@ describe('getAgencySpace360', () => {
           explanation: 'Space insight',
           recommendedAction: 'Revisar'
         }
-      ]
+      ],
+      activePreview: [
+        {
+          id: 'EO-AIE-30',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Space insight',
+          recommendedAction: 'Revisar'
+        }
+      ],
+      historicalPreview: [
+        {
+          id: 'EO-AIE-30',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Space insight',
+          recommendedAction: 'Revisar'
+        }
+      ],
+      timeline: []
     })
     expect(mockReadSpaceAiLlmSummary).toHaveBeenCalledWith('space-2', 2026, 4)
   })

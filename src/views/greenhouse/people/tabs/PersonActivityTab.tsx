@@ -72,10 +72,15 @@ const shouldShowPendingClosures = (snapshot: IcoMetricSnapshot | null) =>
   Boolean(snapshot && snapshot.context.totalTasks > 0 && snapshot.context.completedTasks === 0)
 
 const EMPTY_NEXA_INSIGHTS: MemberNexaInsightsPayload = {
+  summarySource: 'empty',
+  activeAnalyzed: 0,
+  historicalAnalyzed: 0,
   totalAnalyzed: 0,
   lastAnalysis: null,
   runStatus: null,
   insights: [],
+  activePreview: [],
+  historicalPreview: [],
   timeline: []
 }
 

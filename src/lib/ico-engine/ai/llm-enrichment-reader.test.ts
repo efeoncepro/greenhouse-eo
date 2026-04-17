@@ -115,6 +115,12 @@ describe('readMemberAiLlmSummary', () => {
       ])
       .mockResolvedValueOnce([
         {
+          total: 5,
+          last_processed_at: '2026-04-16T10:20:18.447Z'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
           enrichment_id: 'EO-AIE-10',
           signal_type: 'anomaly',
           metric_name: 'otd_pct',
@@ -154,17 +160,22 @@ describe('readMemberAiLlmSummary', () => {
     )
     expect(mockQuery).toHaveBeenNthCalledWith(
       2,
+      expect.stringContaining('COUNT(DISTINCT enrichment_id)'),
+      ['member-123']
+    )
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      3,
       expect.stringContaining("AND status = 'succeeded'"),
       ['member-123', 2026, 4, 3]
     )
     expect(mockQuery).toHaveBeenNthCalledWith(
-      3,
+      4,
       expect.stringContaining('FROM greenhouse_serving.ico_ai_enrichment_runs'),
       [2026, 4]
     )
 
-    const memberSql = mockQuery.mock.calls[1][0] as string
-    const memberTimelineSql = mockQuery.mock.calls[3][0] as string
+    const memberSql = mockQuery.mock.calls[2][0] as string
+    const memberTimelineSql = mockQuery.mock.calls[4][0] as string
 
     expect(memberSql).toContain("CASE COALESCE(severity, '')")
     expect(memberSql).toContain("WHEN 'critical' THEN 0")
@@ -174,6 +185,9 @@ describe('readMemberAiLlmSummary', () => {
     expect(memberTimelineSql).toContain('DISTINCT ON (enrichment_id)')
 
     expect(result).toEqual({
+      summarySource: 'active',
+      activeAnalyzed: 2,
+      historicalAnalyzed: 5,
       totalAnalyzed: 2,
       lastAnalysis: '2026-04-15T13:10:00.000Z',
       runStatus: 'partial',
@@ -199,11 +213,34 @@ describe('readMemberAiLlmSummary', () => {
           processedAt: '2026-04-15T12:30:00.000Z'
         }
       ],
+      activePreview: [
+        {
+          id: 'EO-AIE-10',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: 'Member impact',
+          rootCauseNarrative: null,
+          recommendedAction: 'Actuar',
+          processedAt: '2026-04-15T13:10:00.000Z'
+        },
+        {
+          id: 'EO-AIE-11',
+          signalType: 'recommendation',
+          metricId: 'rpa_avg',
+          severity: 'warning',
+          explanation: 'Otra señal',
+          rootCauseNarrative: null,
+          recommendedAction: null,
+          processedAt: '2026-04-15T12:30:00.000Z'
+        }
+      ],
+      historicalPreview: [],
       timeline: []
     })
   })
 
-  it('falls back to historical timeline when current-state enrichments are empty', async () => {
+  it('surfaces historical insights explicitly when there are no active enrichments for the period', async () => {
     mockQuery
       .mockResolvedValueOnce([
         {
@@ -212,6 +249,12 @@ describe('readMemberAiLlmSummary', () => {
           failed: 0,
           avg_quality_score: null,
           last_processed_at: null
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          total: 1,
+          last_processed_at: '2026-04-16T10:20:18.447Z'
         }
       ])
       .mockResolvedValueOnce([])
@@ -239,10 +282,26 @@ describe('readMemberAiLlmSummary', () => {
     const result = await readMemberAiLlmSummary('member-123', 2026, 4, 3)
 
     expect(result).toEqual({
+      summarySource: 'historical',
+      activeAnalyzed: 0,
+      historicalAnalyzed: 1,
       totalAnalyzed: 1,
       lastAnalysis: '2026-04-16T10:20:18.447Z',
       runStatus: 'succeeded',
       insights: [
+        {
+          id: 'EO-AIE-90',
+          signalType: 'root_cause',
+          metricId: 'ftr_pct',
+          severity: 'critical',
+          explanation: 'Historial recuperado',
+          rootCauseNarrative: 'El problema viene de revisión tardía.',
+          recommendedAction: 'Revisar con Daniela',
+          processedAt: '2026-04-16T10:20:18.447Z'
+        }
+      ],
+      activePreview: [],
+      historicalPreview: [
         {
           id: 'EO-AIE-90',
           signalType: 'root_cause',
@@ -284,6 +343,12 @@ describe('readSpaceAiLlmSummary', () => {
       ])
       .mockResolvedValueOnce([
         {
+          total: 4,
+          last_processed_at: '2026-04-16T08:45:00.000Z'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
           enrichment_id: 'EO-AIE-20',
           signal_type: 'anomaly',
           metric_name: 'otd_pct',
@@ -313,17 +378,22 @@ describe('readSpaceAiLlmSummary', () => {
     )
     expect(mockQuery).toHaveBeenNthCalledWith(
       2,
+      expect.stringContaining('COUNT(DISTINCT enrichment_id)'),
+      ['space-123']
+    )
+    expect(mockQuery).toHaveBeenNthCalledWith(
+      3,
       expect.stringContaining("AND status = 'succeeded'"),
       ['space-123', 2026, 4, 3]
     )
     expect(mockQuery).toHaveBeenNthCalledWith(
-      3,
+      4,
       expect.stringContaining('WHERE space_id = $1'),
       ['space-123', 2026, 4]
     )
 
-    const spaceSql = mockQuery.mock.calls[1][0] as string
-    const spaceTimelineSql = mockQuery.mock.calls[3][0] as string
+    const spaceSql = mockQuery.mock.calls[2][0] as string
+    const spaceTimelineSql = mockQuery.mock.calls[4][0] as string
 
     expect(spaceSql).toContain("CASE COALESCE(severity, '')")
     expect(spaceSql).toContain("WHEN 'critical' THEN 0")
@@ -333,6 +403,9 @@ describe('readSpaceAiLlmSummary', () => {
     expect(spaceTimelineSql).toContain('DISTINCT ON (enrichment_id)')
 
     expect(result).toEqual({
+      summarySource: 'active',
+      activeAnalyzed: 2,
+      historicalAnalyzed: 4,
       totalAnalyzed: 2,
       lastAnalysis: '2026-04-15T14:00:00.000Z',
       runStatus: 'succeeded',
@@ -348,11 +421,24 @@ describe('readSpaceAiLlmSummary', () => {
           processedAt: '2026-04-15T14:00:00.000Z'
         }
       ],
+      activePreview: [
+        {
+          id: 'EO-AIE-20',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: 'Space impact',
+          rootCauseNarrative: null,
+          recommendedAction: 'Escalar',
+          processedAt: '2026-04-15T14:00:00.000Z'
+        }
+      ],
+      historicalPreview: [],
       timeline: []
     })
   })
 
-  it('falls back to historical timeline when the current-state space snapshot is empty', async () => {
+  it('surfaces historical space insights explicitly when the active snapshot is empty', async () => {
     mockQuery
       .mockResolvedValueOnce([
         {
@@ -361,6 +447,12 @@ describe('readSpaceAiLlmSummary', () => {
           failed: 0,
           avg_quality_score: null,
           last_processed_at: null
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          total: 1,
+          last_processed_at: '2026-04-16T08:45:00.000Z'
         }
       ])
       .mockResolvedValueOnce([])
@@ -388,10 +480,26 @@ describe('readSpaceAiLlmSummary', () => {
     const result = await readSpaceAiLlmSummary('space-123', 2026, 4, 3)
 
     expect(result).toEqual({
+      summarySource: 'historical',
+      activeAnalyzed: 0,
+      historicalAnalyzed: 1,
       totalAnalyzed: 1,
       lastAnalysis: '2026-04-16T08:45:00.000Z',
       runStatus: 'succeeded',
       insights: [
+        {
+          id: 'EO-AIE-91',
+          signalType: 'recommendation',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Historial de espacio recuperado',
+          rootCauseNarrative: null,
+          recommendedAction: 'Replanificar entregables',
+          processedAt: '2026-04-16T08:45:00.000Z'
+        }
+      ],
+      activePreview: [],
+      historicalPreview: [
         {
           id: 'EO-AIE-91',
           signalType: 'recommendation',
