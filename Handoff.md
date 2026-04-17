@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-343 Commercial Quotation Canonical Program
+
+- **Estado:** `complete`, `documentado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `docs/tasks/complete/TASK-343-commercial-quotation-canonical-program.md`
+    - la umbrella queda cerrada como programa documental, no como runtime task encubierta
+    - fija explícitamente que el repo actual sigue siendo `finance-first`
+    - publica `TASK-344` como primer hard gate del bloque antes de `TASK-345+`
+    - deja explícito que `Finance > Cotizaciones` sigue siendo la surface oficial mientras no cierre el corte contractual/canónico
+  - `docs/tasks/README.md`
+    - el bloque `TASK-343` a `TASK-351` ahora deja explícito el rol cerrado de la umbrella
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `TASK-343` sincronizada como `complete` y movida a `docs/tasks/complete/`
+- **Cambio operativo/documental:**
+  - el programa de Quotation ya no debe leerse como si faltara crear la secuencia de child tasks; esa secuencia ya existe
+  - el drift principal confirmado por la auditoría es contractual/documental:
+    - `Quote` sigue desalineado entre 360 object model y arquitectura comercial
+    - `schema-snapshot-baseline.sql` está atrasado respecto del runtime real de quotes/products/line items
+    - el naming/event policy y la convivencia `finance.quote.*` vs `commercial.quotation.*` siguen pendientes
+  - el siguiente corte real del programa es `TASK-344`, no `TASK-345`
+- **Validación ejecutada en esta sesión:**
+  - revisión manual cross-doc de:
+    - `docs/tasks/complete/TASK-343-commercial-quotation-canonical-program.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+- **Notas operativas:**
+  - no hubo cambios de runtime, schema físico, API, UI ni migraciones
+  - el workspace ya tenía trabajo ajeno no trackeado para `TASK-441` a `TASK-445`; no se tocó ni se revirtió
+
 ## Sesion 2026-04-17 — TASK-440 hardening de labels de proyecto en Nexa
 
 - **Estado:** `implementado localmente`, `validado`

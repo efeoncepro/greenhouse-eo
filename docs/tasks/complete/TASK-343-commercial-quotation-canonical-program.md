@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -21,7 +21,7 @@
 
 ## Summary
 
-Coordinar la implementación del módulo canónico de cotizaciones comerciales para que Greenhouse deje de tratar `quotes` solo como un listado multi-source de Finance y pase a usar una capa comercial explicable, conectada con pricing, delivery, HubSpot, Nubox, OC/HES, revenue pipeline y profitability tracking.
+Coordinar y dejar formalizado el programa del módulo canónico de cotizaciones comerciales para que Greenhouse deje de tratar `quotes` solo como un listado multi-source de Finance y pase a usar una capa comercial explicable, conectada con pricing, delivery, HubSpot, Nubox, OC/HES, revenue pipeline y profitability tracking.
 
 ## Why This Task Exists
 
@@ -41,11 +41,42 @@ Pero la arquitectura canónica de Quotation va bastante más lejos que ese runti
 
 Sin un programa explícito, el módulo corre el riesgo de bifurcarse entre "quotes multi-source de finance" y "quotation comercial canónica" como dos verdades paralelas.
 
+Además, la auditoría de `TASK-343` confirmó drift documental concreto que debe tratarse como baseline del programa:
+
+- `Quote` sigue apareciendo en el 360 object model como objeto todavía no institucionalizado, mientras la arquitectura comercial ya define `greenhouse_commercial.*`
+- la arquitectura comercial todavía referencia fuentes de costo/capacity antiguas frente al runtime real (`greenhouse_serving.member_capacity_economics`, `greenhouse_core.client_team_assignments`)
+- `schema-snapshot-baseline.sql` quedó atrasado para quotations respecto del runtime real de `TASK-210` y `TASK-211`
+- el naming de eventos y la convivencia `finance.quote.*` vs `commercial.quotation.*` todavía no tienen una policy explícita de cutover
+
 ## Goal
 
 - Consolidar primero el contrato canónico de Quotation y su estrategia de cutover
 - Bajar luego a runtime el storage, pricing, governance, UI, quote-to-cash e intelligence del módulo
 - Mantener compatibilidad con las surfaces actuales de Finance mientras se institucionaliza la capa comercial canónica
+
+## Program Decision
+
+`TASK-343` queda cerrada como umbrella documental/programática. No implementa runtime nuevo directamente.
+
+El programa oficial queda fijado así:
+
+1. el runtime actual es **finance-first**
+   - `greenhouse_finance.quotes`
+   - `greenhouse_finance.quote_line_items`
+   - `greenhouse_finance.products`
+   - `greenhouse_finance.purchase_orders`
+   - `greenhouse_finance.service_entry_sheets`
+2. el target sigue siendo **quotation canónica** con anchor único y corte explícito desde Finance
+3. el primer corte obligatorio es `TASK-344`
+   - antes de `TASK-345+`, debe cerrar source of truth, naming de eventos, tenant anchor y política de coexistencia/cutover
+4. `Finance > Cotizaciones` debe tratarse durante el programa como:
+   - surface vigente
+   - consumer o façade transicional del futuro anchor canónico
+   - no como prueba de que ya existe un módulo comercial institucionalizado
+5. ninguna child task debe implementar runtime nuevo suponiendo que:
+   - `greenhouse_commercial.*` ya existe físicamente
+   - PO/HES ya cuelgan de quotation canónica
+   - el schema snapshot baseline refleja toda la realidad actual de quotations
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -138,7 +169,10 @@ Reglas obligatorias:
 
 ### Gap
 
-- no existe una secuencia coordinada para transformar la base multi-source actual en el módulo comercial canónico descrito por arquitectura
+- ya existe la secuencia coordinada `TASK-344` a `TASK-351`, pero todavía no estaba explicitado en la umbrella que:
+  - el primer problema es contractual/documental, no de UI ni de migración física
+  - el repo real sigue siendo `finance-first`, no `commercial-canonical`
+  - el drift entre arquitectura, 360 object model, event naming y schema snapshot debe corregirse antes de bajar foundations de runtime nuevas
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -171,6 +205,7 @@ Reglas obligatorias:
 - implementación runtime directa dentro de esta umbrella
 - rediseño completo del módulo de Deals de HubSpot
 - contabilidad ERP full de contratos y revenue recognition
+- cerrar por sí sola el drift contractual; la ejecución concreta de ese corte vive en `TASK-344`
 
 ## Detailed Spec
 
@@ -194,24 +229,35 @@ Dependencias lógicas:
 - `348 -> 349`
 - `350 -> 351`
 
+Reglas programáticas fijadas por esta umbrella:
+
+- `TASK-344` es el hard gate del programa; ninguna child task debe saltarlo
+- mientras no cierre `TASK-344`, `greenhouse_finance.quotes` sigue siendo el runtime vigente y `Finance > Cotizaciones` sigue siendo la surface oficial
+- `TASK-345` no debe asumir que el schema canónico ya existe; debe decidir explícitamente bridge/cutover desde la base finance-first real
+- `TASK-350` no debe asumir que PO/HES ya referencian quotation; hoy siguen anclados a `greenhouse_finance`
+- `TASK-351` no debe inventar profitability/renewal automation sobre un anchor dual no resuelto
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
 
-- [ ] Existe una secuencia explícita de child tasks para contrato, foundation, pricing, sync HubSpot, governance, UI, quote-to-cash e intelligence
-- [ ] Cada child task distingue claramente ownership, dependencias y scope
-- [ ] El programa deja explícito cómo convive el runtime actual de Finance con el target canónico de Quotation
+- [x] Existe una secuencia explícita de child tasks para contrato, foundation, pricing, sync HubSpot, governance, UI, quote-to-cash e intelligence
+- [x] Cada child task distingue claramente ownership, dependencias y scope
+- [x] El programa deja explícito cómo convive el runtime actual de Finance con el target canónico de Quotation
+- [x] El programa deja explícito que `TASK-344` es el primer corte obligatorio antes de runtime nuevo
 
 ## Verification
 
 - Revisión manual de consistencia documental
 - Verificar que `TASK-344` a `TASK-351` existen y están indexadas correctamente
+- Verificar que la umbrella ya no trate el programa como si todavía faltara crear la secuencia de child tasks
 
 ## Closing Protocol
 
-- [ ] Mantener `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` alineados con el programa
+- [x] Mantener `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` alineados con el programa
+- [x] Dejar explícito en `Handoff.md` que `TASK-343` cierra como umbrella documental y que el siguiente corte real es `TASK-344`
 
 ## Follow-ups
 

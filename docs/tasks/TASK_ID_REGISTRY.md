@@ -392,7 +392,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-340` | `to-do` | Compensation Arrangement → Payroll Bridge | `docs/tasks/to-do/TASK-340-compensation-arrangement-payroll-bridge.md` |
 | `TASK-341` | `to-do` | Executive Economics 360 Read Model | `docs/tasks/to-do/TASK-341-executive-economics-360-read-model.md` |
 | `TASK-342` | `to-do` | Executive Compensation Cost Intelligence Integration | `docs/tasks/to-do/TASK-342-executive-compensation-cost-intelligence-integration.md` |
-| `TASK-343` | `to-do` | Commercial Quotation Canonical Program | `docs/tasks/to-do/TASK-343-commercial-quotation-canonical-program.md` |
+| `TASK-343` | `complete` | Commercial Quotation Canonical Program | `docs/tasks/complete/TASK-343-commercial-quotation-canonical-program.md` |
 | `TASK-344` | `to-do` | Quotation Contract Consolidation & Cutover Policy | `docs/tasks/to-do/TASK-344-quotation-contract-consolidation-cutover-policy.md` |
 | `TASK-345` | `to-do` | Quotation Canonical Schema & Finance Compatibility Bridge | `docs/tasks/to-do/TASK-345-quotation-canonical-schema-finance-compatibility-bridge.md` |
 | `TASK-346` | `to-do` | Quotation Pricing, Costing & Margin Health Core | `docs/tasks/to-do/TASK-346-quotation-pricing-costing-margin-health-core.md` |
@@ -490,3 +490,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-438` | `to-do` | Nexa Contextual Chat Per Domain (Copilot by Surface) | `docs/tasks/to-do/TASK-438-nexa-contextual-chat-per-domain.md` |
 | `TASK-439` | `to-do` | Nexa Daily Role-Based Briefing | `docs/tasks/to-do/TASK-439-nexa-daily-role-based-briefing.md` |
 | `TASK-440` | `in-progress` | Nexa Insights Project Label Resolution | `docs/tasks/in-progress/TASK-440-nexa-project-label-resolution.md` |
+| `TASK-441` | `to-do`       | Nexa Mentions Resolver + Allowlist + Sanitization | `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md` |
+| `TASK-442` | `to-do`       | Nexa Mentions Registry + Entity Expansion | `docs/tasks/to-do/TASK-442-nexa-mentions-registry-entity-expansion.md` |
+| `TASK-443` | `to-do`       | Nexa Thread Chat Mention Rendering (Quick Win) | `docs/tasks/to-do/TASK-443-nexa-thread-chat-mention-rendering.md` |
+| `TASK-444` | `to-do`       | Nexa Mentions Input Autocomplete | `docs/tasks/to-do/TASK-444-nexa-mentions-input-autocomplete.md` |
+| `TASK-445` | `to-do`       | Nexa Mentions Accessibility, Tests & Tombstone | `docs/tasks/to-do/TASK-445-nexa-mentions-a11y-tests-tombstone.md` |
