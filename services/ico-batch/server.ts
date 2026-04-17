@@ -6,9 +6,11 @@
  * src/lib/ modules from the monorepo.
  *
  * Endpoints:
- *   GET  /health             → 200 health check
- *   POST /ico/materialize    → full ICO monthly materialization
- *   POST /ico/llm-enrich     → LLM enrichment pipeline (prompt v2)
+ *   GET  /health                      → 200 health check
+ *   POST /ico/materialize             → full ICO monthly materialization
+ *   POST /ico/llm-enrich              → ICO LLM enrichment pipeline
+ *   POST /finance/materialize-signals → Finance Signal Engine anomaly detection
+ *   POST /finance/llm-enrich          → Finance LLM enrichment pipeline
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via tsx (handles TypeScript + @/ path aliases)
@@ -19,6 +21,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 
 import { materializeMonthlySnapshots } from '@/lib/ico-engine/materialize'
 import { materializeAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-worker'
+import { materializeFinanceSignals } from '@/lib/finance/ai/materialize-finance-signals'
+import { materializeFinanceAiLlmEnrichments } from '@/lib/finance/ai/llm-enrichment-worker'
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -156,6 +160,92 @@ const handleLlmEnrich = async (req: IncomingMessage, res: ServerResponse) => {
   json(res, 200, { monthsBack, results })
 }
 
+const handleFinanceMaterializeSignals = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const currentDate = new Date()
+  const year = Number(body.year) || currentDate.getFullYear()
+  const month = Number(body.month) || currentDate.getMonth() + 1
+  const monthsBack = Number(body.monthsBack) || 1
+
+  console.log(`[ico-batch] POST /finance/materialize-signals — year=${year} month=${month} monthsBack=${monthsBack}`)
+
+  const results = []
+
+  for (let i = 0; i < monthsBack; i++) {
+    const date = new Date(year, month - 1 - i, 1)
+    const periodYear = date.getFullYear()
+    const periodMonth = date.getMonth() + 1
+
+    console.log(`[ico-batch] finance-materialize ${periodYear}-${String(periodMonth).padStart(2, '0')}...`)
+
+    const result = await materializeFinanceSignals({
+      periodYear,
+      periodMonth,
+      triggerType: 'cloud_run_batch'
+    })
+
+    results.push(result)
+    console.log(
+      `[ico-batch] finance-materialize done ${periodYear}-${String(periodMonth).padStart(2, '0')}: ` +
+        `${result.snapshotsEvaluated} snapshots → ${result.signalsWritten} signals in ${result.durationMs}ms`
+    )
+  }
+
+  json(res, 200, {
+    monthsBack,
+    totalDurationMs: results.reduce((sum, result) => sum + result.durationMs, 0),
+    totalSnapshotsEvaluated: results.reduce((sum, result) => sum + result.snapshotsEvaluated, 0),
+    totalSignalsWritten: results.reduce((sum, result) => sum + result.signalsWritten, 0),
+    results
+  })
+}
+
+const handleFinanceLlmEnrich = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const currentDate = new Date()
+  const year = Number(body.year) || currentDate.getFullYear()
+  const month = Number(body.month) || currentDate.getMonth() + 1
+  const monthsBack = Number(body.monthsBack) || 1
+
+  console.log(`[ico-batch] POST /finance/llm-enrich — year=${year} month=${month} monthsBack=${monthsBack}`)
+
+  const results = []
+
+  for (let i = 0; i < monthsBack; i++) {
+    const date = new Date(year, month - 1 - i, 1)
+    const periodYear = date.getFullYear()
+    const periodMonth = date.getMonth() + 1
+
+    console.log(`[ico-batch] finance-enrich ${periodYear}-${String(periodMonth).padStart(2, '0')}...`)
+
+    const result = await materializeFinanceAiLlmEnrichments({
+      periodYear,
+      periodMonth,
+      triggerType: 'cloud_run_batch'
+    })
+
+    results.push({
+      period: `${periodYear}-${String(periodMonth).padStart(2, '0')}`,
+      runId: result.run.runId,
+      status: result.run.status,
+      signalsSeen: result.run.signalsSeen,
+      succeeded: result.succeeded,
+      failed: result.failed,
+      skipped: result.skipped,
+      promptVersion: result.run.promptVersion,
+      promptHash: result.run.promptHash,
+      latencyMs: result.run.latencyMs
+    })
+
+    console.log(
+      `[ico-batch] finance-enrich done ${periodYear}-${String(periodMonth).padStart(2, '0')}: ` +
+        `${result.succeeded} ok / ${result.failed} failed / ${result.skipped} skipped`
+    )
+  }
+
+  json(res, 200, { monthsBack, results })
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -184,6 +274,18 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/ico/llm-enrich') {
       await handleLlmEnrich(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/finance/materialize-signals') {
+      await handleFinanceMaterializeSignals(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/finance/llm-enrich') {
+      await handleFinanceLlmEnrich(req, res)
 
       return
     }

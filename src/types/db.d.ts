@@ -3111,6 +3111,92 @@ export interface GreenhouseServingCommercialCostAttribution {
   source_of_truth: string;
 }
 
+export interface GreenhouseServingFinanceAiEnrichmentRuns {
+  client_id: string | null;
+  completed_at: Timestamp | null;
+  error_message: string | null;
+  latency_ms: number | null;
+  model_id: string;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  prompt_hash: string | null;
+  prompt_version: string;
+  run_id: string;
+  signals_enriched: Generated<number>;
+  signals_failed: Generated<number>;
+  signals_seen: Generated<number>;
+  source: Generated<string>;
+  started_at: Timestamp;
+  status: string;
+  synced_at: Generated<Timestamp>;
+  tokens_in: number | null;
+  tokens_out: number | null;
+  trigger_event_id: string | null;
+  trigger_type: string;
+}
+
+export interface GreenhouseServingFinanceAiSignalEnrichments {
+  client_id: string | null;
+  confidence: Numeric | null;
+  enrichment_id: string;
+  error_message: string | null;
+  explanation_json: Generated<Json>;
+  explanation_summary: string | null;
+  latency_ms: number | null;
+  metric_name: string;
+  model_id: string;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  processed_at: Timestamp;
+  prompt_hash: string | null;
+  prompt_version: string;
+  quality_score: Numeric | null;
+  recommended_action: string | null;
+  root_cause_narrative: string | null;
+  run_id: string;
+  severity: string | null;
+  signal_id: string;
+  signal_type: string;
+  source: Generated<string>;
+  space_id: string | null;
+  status: string;
+  synced_at: Generated<Timestamp>;
+  tokens_in: number | null;
+  tokens_out: number | null;
+}
+
+export interface GreenhouseServingFinanceAiSignals {
+  action_summary: string | null;
+  action_target_id: string | null;
+  action_type: string | null;
+  ai_eligible: Generated<boolean>;
+  client_id: string | null;
+  confidence: Numeric | null;
+  contribution_pct: Numeric | null;
+  current_value: Numeric | null;
+  dimension: string | null;
+  dimension_id: string | null;
+  expected_value: Numeric | null;
+  generated_at: Timestamp;
+  metric_name: string;
+  model_version: string;
+  organization_id: string | null;
+  payload_json: Generated<Json>;
+  period_month: number;
+  period_year: number;
+  predicted_value: Numeric | null;
+  prediction_horizon: string | null;
+  severity: string | null;
+  signal_id: string;
+  signal_type: string;
+  source: Generated<string>;
+  space_id: string | null;
+  synced_at: Generated<Timestamp>;
+  z_score: Numeric | null;
+}
+
 export interface GreenhouseServingIcoAiEnrichmentRuns {
   completed_at: Timestamp | null;
   error_message: string | null;
@@ -4553,6 +4639,9 @@ export interface DB {
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;
   "greenhouse_serving.commercial_cost_attribution": GreenhouseServingCommercialCostAttribution;
+  "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
+  "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
+  "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
   "greenhouse_serving.ico_ai_enrichment_runs": GreenhouseServingIcoAiEnrichmentRuns;
   "greenhouse_serving.ico_ai_signal_enrichments": GreenhouseServingIcoAiSignalEnrichments;
   "greenhouse_serving.ico_ai_signals": GreenhouseServingIcoAiSignals;

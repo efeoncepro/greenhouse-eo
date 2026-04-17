@@ -1,5 +1,27 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-16 — Finance Signal Engine (TASK-245) es el primer dominio fuera de ICO
+
+- Finance Dashboard ya no depende solo de KPIs y P&L para explicar desvíos financieros mensuales.
+- Runtime activo:
+  - Detector: `src/lib/finance/ai/anomaly-detector.ts` — Z-score rolling 6 meses sobre `greenhouse_finance.client_economics` (net_margin_pct, gross_margin_pct, revenue_clp, direct_costs_clp, indirect_costs_clp, net_margin_clp)
+  - Materializer: `src/lib/finance/ai/materialize-finance-signals.ts` escribe en `greenhouse_serving.finance_ai_signals`
+  - LLM worker: `src/lib/finance/ai/llm-enrichment-worker.ts` con prompt domain-aware `finance_signal_enrichment_v1` y glosario financiero específico
+  - Reader: `src/lib/finance/ai/llm-enrichment-reader.ts` expone `readFinanceAiLlmSummary(periodYear, periodMonth)` (portfolio) y `readClientFinanceAiLlmSummary(clientId, …)` (cliente)
+  - UI: `src/views/greenhouse/finance/FinanceDashboardView.tsx` renderiza `NexaInsightsBlock` entre KPIs y Economic Indicators
+  - API: `GET /api/finance/intelligence/nexa-insights` (reader), `GET /api/cron/finance-ai-signals` (trigger)
+  - Cloud Run: `services/ico-batch/server.ts` añade `POST /finance/materialize-signals` y `POST /finance/llm-enrich`
+- Contrato operativo:
+  - Finance usa `client_id` + `organization_id` como dimensiones primarias (Finance es org/client-first, no space-first)
+  - Tablas serving: `greenhouse_serving.finance_ai_signals`, `greenhouse_serving.finance_ai_signal_enrichments`, `greenhouse_serving.finance_ai_enrichment_runs`
+  - IDs estables: `EO-FSIG-*`, `EO-FAIE-*`, `EO-FAIR-*`
+  - El prompt financiero usa menciones `@[Nombre](client:CLIENT_ID)` y `@[Nombre](organization:ORG_ID)` además de `space:SPACE_ID`
+  - Ranking visible sigue el patrón canónico: `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - Solo deteriorations se emiten como signals (improvements se consolidan en otras surfaces)
+- Eventos outbox nuevos:
+  - `finance.ai_signals.materialized` (`AGGREGATE_TYPES.financeAiSignals`)
+  - `finance.ai_llm_enrichments.materialized` (`AGGREGATE_TYPES.financeAiLlmEnrichments`)
+
 ## Delta 2026-04-16 — Space 360 Overview ya consume insights Nexa filtrados por space
 
 - `Agency > Space 360 > Resumen` ya no depende solo del snapshot operativo, finance y delivery para explicar desvíos del espacio.
