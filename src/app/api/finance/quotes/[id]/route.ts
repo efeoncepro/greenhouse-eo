@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { query } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   getFinanceQuoteDetailFromCanonical,
@@ -9,6 +10,10 @@ import {
   isFinanceSchemaDriftError,
   logFinanceSchemaDrift
 } from '@/lib/finance/schema-drift'
+import {
+  recalculateQuotationPricing,
+  resolveQuotationIdentity
+} from '@/lib/finance/pricing'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 
@@ -155,4 +160,140 @@ export async function GET(
 
     throw error
   }
+}
+
+interface UpdateQuotationPayload {
+  quotationNumber?: string | null
+  status?: string | null
+  businessLineCode?: string | null
+  currency?: string | null
+  billingFrequency?: string | null
+  contractDurationMonths?: number | null
+  globalDiscountType?: 'percentage' | 'fixed_amount' | null
+  globalDiscountValue?: number | null
+  targetMarginPct?: number | null
+  marginFloorPct?: number | null
+  exchangeRates?: Record<string, number>
+  exchangeSnapshotDate?: string | null
+  description?: string | null
+  internalNotes?: string | null
+  notes?: string | null
+  dueDate?: string | null
+  validUntil?: string | null
+  expiryDate?: string | null
+  recalculatePricing?: boolean
+  createVersion?: boolean
+}
+
+const ALLOWED_STATUS_TRANSITIONS = new Set([
+  'draft',
+  'pending_approval',
+  'sent',
+  'approved',
+  'rejected',
+  'expired',
+  'converted'
+])
+
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { id: quoteId } = await params
+  const identity = await resolveQuotationIdentity(quoteId)
+
+  if (!identity) {
+    return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
+  }
+
+  let body: UpdateQuotationPayload
+
+  try {
+    body = (await request.json()) as UpdateQuotationPayload
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 })
+  }
+
+  const updates: string[] = []
+  const values: unknown[] = [identity.quotationId]
+  let idx = 1
+
+  const push = (column: string, value: unknown, cast?: string) => {
+    idx += 1
+    const ref = cast ? `$${idx}${cast}` : `$${idx}`
+
+    updates.push(`${column} = ${ref}`)
+    values.push(value)
+  }
+
+  if (body.quotationNumber !== undefined) push('quotation_number', body.quotationNumber)
+
+  if (body.status !== undefined && body.status) {
+    if (!ALLOWED_STATUS_TRANSITIONS.has(body.status)) {
+      return NextResponse.json({ error: `Invalid status: ${body.status}` }, { status: 400 })
+    }
+
+    push('status', body.status)
+  }
+
+  if (body.businessLineCode !== undefined) push('business_line_code', body.businessLineCode)
+  if (body.currency !== undefined && body.currency) push('currency', body.currency)
+  if (body.billingFrequency !== undefined && body.billingFrequency) push('billing_frequency', body.billingFrequency)
+
+  if (body.contractDurationMonths !== undefined) {
+    push('contract_duration_months', body.contractDurationMonths)
+  }
+
+  if (body.globalDiscountType !== undefined) push('global_discount_type', body.globalDiscountType)
+  if (body.globalDiscountValue !== undefined) push('global_discount_value', body.globalDiscountValue)
+  if (body.targetMarginPct !== undefined) push('target_margin_pct', body.targetMarginPct)
+  if (body.marginFloorPct !== undefined) push('margin_floor_pct', body.marginFloorPct)
+
+  if (body.exchangeRates !== undefined) {
+    push('exchange_rates', JSON.stringify(body.exchangeRates), '::jsonb')
+  }
+
+  if (body.exchangeSnapshotDate !== undefined) push('exchange_snapshot_date', body.exchangeSnapshotDate, '::date')
+  if (body.description !== undefined) push('description', body.description)
+  if (body.internalNotes !== undefined) push('internal_notes', body.internalNotes)
+  if (body.notes !== undefined) push('notes', body.notes)
+  if (body.dueDate !== undefined) push('due_date', body.dueDate, '::date')
+  if (body.validUntil !== undefined) push('valid_until', body.validUntil, '::date')
+  if (body.expiryDate !== undefined) push('expiry_date', body.expiryDate, '::date')
+
+  if (updates.length > 0) {
+    updates.push('updated_at = CURRENT_TIMESTAMP')
+
+    await query(
+      `UPDATE greenhouse_commercial.quotations
+         SET ${updates.join(', ')}
+         WHERE quotation_id = $1`,
+      values
+    )
+  }
+
+  if (body.recalculatePricing !== false) {
+    const snapshot = await recalculateQuotationPricing({
+      quotationId: identity.quotationId,
+      createdBy: tenant.userId,
+      createVersion: body.createVersion ?? false
+    })
+
+    return NextResponse.json({
+      quotationId: identity.quotationId,
+      updated: true,
+      totals: snapshot.totals,
+      revenue: snapshot.revenue,
+      marginResolution: snapshot.marginResolution,
+      health: snapshot.health
+    })
+  }
+
+  return NextResponse.json({ quotationId: identity.quotationId, updated: true })
 }

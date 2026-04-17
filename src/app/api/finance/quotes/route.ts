@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { withTransaction } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   listFinanceQuotesFromCanonical,
@@ -10,6 +11,13 @@ import {
   isFinanceSchemaDriftError,
   logFinanceSchemaDrift
 } from '@/lib/finance/schema-drift'
+import {
+  persistQuotationPricing,
+  type QuotationPricingCurrency,
+  type QuotationBillingFrequency,
+  type QuotationDiscountType,
+  type QuotationLineInput
+} from '@/lib/finance/pricing'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 
@@ -134,4 +142,194 @@ export async function GET(request: Request) {
 
     throw error
   }
+}
+
+interface CreateQuotationPayload {
+  quotationNumber?: string
+  clientId?: string | null
+  organizationId?: string | null
+  spaceId?: string | null
+  businessLineCode?: string | null
+  currency?: QuotationPricingCurrency
+  quoteDate?: string | null
+  dueDate?: string | null
+  validUntil?: string | null
+  billingFrequency?: QuotationBillingFrequency
+  contractDurationMonths?: number | null
+  exchangeRates?: Record<string, number>
+  exchangeSnapshotDate?: string | null
+  globalDiscountType?: QuotationDiscountType | null
+  globalDiscountValue?: number | null
+  targetMarginPct?: number | null
+  marginFloorPct?: number | null
+  description?: string | null
+  internalNotes?: string | null
+  lineItems?: QuotationLineInput[]
+  pricingModel?: 'staff_aug' | 'retainer' | 'project'
+}
+
+const generateQuotationNumber = () => {
+  const now = new Date()
+  const y = now.getUTCFullYear()
+  const m = String(now.getUTCMonth() + 1).padStart(2, '0')
+  const suffix = Math.random().toString(36).slice(2, 8).toUpperCase()
+
+  return `EO-QUO-${y}${m}-${suffix}`
+}
+
+export async function POST(request: Request) {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  let body: CreateQuotationPayload
+
+  try {
+    body = (await request.json()) as CreateQuotationPayload
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 })
+  }
+
+  const currency: QuotationPricingCurrency = (body.currency || 'CLP') as QuotationPricingCurrency
+  const billingFrequency: QuotationBillingFrequency = body.billingFrequency || 'one_time'
+  const quoteDate = (body.quoteDate || new Date().toISOString().slice(0, 10)).slice(0, 10)
+  const quotationNumber = body.quotationNumber?.trim() || generateQuotationNumber()
+  const createdBy = tenant.userId
+  const pricingModel = body.pricingModel || 'project'
+
+  let quotationId: string
+
+  try {
+    quotationId = await withTransaction(async client => {
+      const insert = await client.query<{ quotation_id: string }>(
+        `INSERT INTO greenhouse_commercial.quotations (
+           quotation_number,
+           client_id,
+           organization_id,
+           space_id,
+           business_line_code,
+           pricing_model,
+           status,
+           current_version,
+           currency,
+           exchange_rate_to_clp,
+           exchange_rates,
+           exchange_snapshot_date,
+           target_margin_pct,
+           margin_floor_pct,
+           global_discount_type,
+           global_discount_value,
+           revenue_type,
+           billing_frequency,
+           payment_terms_days,
+           contract_duration_months,
+           quote_date,
+           due_date,
+           valid_until,
+           description,
+           internal_notes,
+           source_system,
+           source_quote_id,
+           space_resolution_source,
+           created_by
+         ) VALUES (
+           $1, $2, $3, $4, $5, $6, 'draft', 1,
+           $7, NULL, $8::jsonb, $9::date,
+           $10, $11, $12, $13,
+           'one_time', $14, 30, $15,
+           $16::date, $17::date, $18::date,
+           $19, $20,
+           'manual', $1,
+           CASE WHEN $4 IS NOT NULL THEN 'explicit' ELSE 'unresolved' END,
+           $21
+         )
+         RETURNING quotation_id`,
+        [
+          quotationNumber,
+          body.clientId ?? null,
+          body.organizationId ?? null,
+          body.spaceId ?? null,
+          body.businessLineCode ?? null,
+          pricingModel,
+          currency,
+          JSON.stringify(body.exchangeRates ?? {}),
+          body.exchangeSnapshotDate ?? null,
+          body.targetMarginPct ?? null,
+          body.marginFloorPct ?? null,
+          body.globalDiscountType ?? null,
+          body.globalDiscountValue ?? null,
+          billingFrequency,
+          body.contractDurationMonths ?? null,
+          quoteDate,
+          body.dueDate ?? null,
+          body.validUntil ?? null,
+          body.description ?? null,
+          body.internalNotes ?? null,
+          createdBy
+        ]
+      )
+
+      return insert.rows[0].quotation_id
+    })
+  } catch (error) {
+    if (isFinanceSchemaDriftError(error)) {
+      return financeSchemaDriftResponse('quotes_create', { error: 'Canonical quotation schema unavailable.' })
+    }
+
+    throw error
+  }
+
+  const lineItems = Array.isArray(body.lineItems) ? body.lineItems : []
+
+  const snapshot = await persistQuotationPricing(
+    {
+      quotationId,
+      versionNumber: 1,
+      businessLineCode: body.businessLineCode ?? null,
+      quoteCurrency: currency,
+      quoteDate,
+      billingFrequency,
+      contractDurationMonths: body.contractDurationMonths ?? null,
+      exchangeRates: body.exchangeRates ?? {},
+      exchangeSnapshotDate: body.exchangeSnapshotDate ?? null,
+      globalDiscountType: body.globalDiscountType ?? null,
+      globalDiscountValue: body.globalDiscountValue ?? null,
+      marginTargetPct: body.targetMarginPct ?? null,
+      marginFloorPct: body.marginFloorPct ?? null,
+      lineItems,
+      createdBy
+    },
+    { createVersion: true, versionNotes: 'Draft created via API.' }
+  )
+
+  return NextResponse.json(
+    {
+      quotationId,
+      quotationNumber,
+      currentVersion: snapshot.versionNumber,
+      totals: snapshot.totals,
+      revenue: snapshot.revenue,
+      marginResolution: snapshot.marginResolution,
+      health: snapshot.health,
+      lineItems: snapshot.lineItems.map(line => ({
+        lineItemId: line.lineItemId ?? null,
+        label: line.label,
+        lineType: line.lineType,
+        quantity: line.quantity,
+        unit: line.unit ?? 'unit',
+        unitCost: line.unitCost,
+        unitPrice: line.unitPrice,
+        subtotalCost: line.subtotalCost,
+        subtotalPrice: line.subtotalPrice,
+        discountAmount: line.discountAmount,
+        subtotalAfterDiscount: line.subtotalAfterDiscount,
+        effectiveMarginPct: line.effectiveMarginPct,
+        recurrenceType: line.recurrenceType,
+        resolutionNotes: line.resolutionNotes
+      }))
+    },
+    { status: 201 }
+  )
 }

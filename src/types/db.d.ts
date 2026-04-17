@@ -149,6 +149,19 @@ export interface GreenhouseAiToolCatalog {
   website_url: string | null;
 }
 
+export interface GreenhouseCommercialMarginTargets {
+  business_line_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  effective_from: Timestamp;
+  effective_until: Timestamp | null;
+  floor_margin_pct: Numeric;
+  notes: string | null;
+  target_id: Generated<string>;
+  target_margin_pct: Numeric;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialProductCatalog {
   active: Generated<boolean>;
   business_line_code: string | null;
@@ -307,6 +320,33 @@ export interface GreenhouseCommercialQuotationVersions {
   total_price: Numeric | null;
   version_id: Generated<string>;
   version_number: number;
+}
+
+export interface GreenhouseCommercialRevenueMetricConfig {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  config_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  hubspot_amount_metric: Generated<string>;
+  notes: string | null;
+  pipeline_default_metric: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialRoleRateCards {
+  business_line_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  currency: Generated<string>;
+  effective_from: Timestamp;
+  effective_until: Timestamp | null;
+  hourly_rate_cost: Numeric;
+  notes: string | null;
+  rate_card_id: Generated<string>;
+  role_code: string;
+  seniority_level: Generated<string>;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseContextContextDocumentQuarantine {
@@ -4656,10 +4696,13 @@ export interface DB {
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
+  "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;
   "greenhouse_commercial.quotation_versions": GreenhouseCommercialQuotationVersions;
   "greenhouse_commercial.quotations": GreenhouseCommercialQuotations;
+  "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
+  "greenhouse_commercial.role_rate_cards": GreenhouseCommercialRoleRateCards;
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;

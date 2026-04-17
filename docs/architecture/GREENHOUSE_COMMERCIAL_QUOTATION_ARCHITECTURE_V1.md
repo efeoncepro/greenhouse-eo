@@ -1,12 +1,51 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.2
+> **Version:** 2.3
 > **Created:** 2026-04-09
-> **Updated:** 2026-04-17 — v2.2: TASK-345 canonical schema materialized, finance compatibility bridge live
+> **Updated:** 2026-04-17 — v2.3: TASK-346 pricing/costing/margin core materialized (margin targets, role rate cards, revenue metric config, costing engine, discount health, MRR/ARR/TCV/ACV)
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 
 ---
+
+## Delta 2026-04-17 — TASK-346 Pricing/costing/margin core live
+
+- Pricing config foundation materializada en `greenhouse_commercial`:
+  - `margin_targets` (business_line_code nullable + effective_from; CHECK floor ≤ target)
+  - `role_rate_cards` (business_line_code + role_code + seniority_level + effective_from)
+  - `revenue_metric_config` (business_line_code nullable, hubspot_amount_metric + pipeline_default_metric)
+- Runtime pricing helpers en `src/lib/finance/pricing/`:
+  - `pricing-config-store.ts` — resolvers con herencia `quotation_override → business_line → global_default`.
+  - `costing-engine.ts` — `resolveLineItemCost` es la única puerta para obtener costo de un line item.
+  - `margin-health.ts` — clasifica alertas (blocking / finance-approval / warning / info).
+  - `revenue-metrics.ts` — resuelve `recurrence_type = 'inherit'` según `billing_frequency` y calcula MRR/ARR/TCV/ACV.
+  - `quotation-pricing-orchestrator.ts` — `buildQuotationPricingSnapshot` / `persistQuotationPricing` /
+    `recalculateQuotationPricing` orquestan costing + totals + health + revenue + persistencia transaccional y
+    publican al outbox `commercial.discount.health_alert` cuando hay alerta severa.
+- Política canónica **snapshot vs recompute** (bajada a código):
+  - **Snapshot (congelado al guardar en `quotation_line_items`)**: `unit_cost`, `cost_breakdown`,
+    `subtotal_cost`. Esto blinda la cotización contra cambios posteriores de payroll/FX/rate cards
+    salvo recálculo explícito.
+  - **Recompute (siempre en cada save)**: `subtotal_price`, `discount_amount`, `subtotal_after_discount`,
+    `effective_margin_pct` por línea y los agregados de quotation (`total_cost`, `total_price`,
+    `effective_margin_pct`, `mrr`, `arr`, `tcv`, `acv`, `revenue_type`).
+  - **Recompute bajo comando del usuario**: `POST /api/finance/quotes/[id]/recalculate` re-lee
+    `member_capacity_economics` y `role_rate_cards` vigentes, actualizando el snapshot. Opcionalmente
+    crea una nueva versión (`createVersion: true`) en `quotation_versions`.
+- FX multi-moneda:
+  - `quotations.exchange_rates` (JSONB) guarda las tasas canónicas del momento del snapshot.
+  - El engine acepta claves `FROM_TO` y su inversa; si no encuentra tasa usa `fx_rate` del snapshot
+    de capacity cuando la target es CLP; si no hay match deja el costo sin convertir y agrega warning
+    a `resolutionNotes` del line item.
+- API routes (finance-scoped):
+  - `POST /api/finance/quotes` — create draft + snapshot inicial
+  - `PUT /api/finance/quotes/[id]` — update headers + recalculate (`recalculatePricing: boolean`)
+  - `POST /api/finance/quotes/[id]/lines` — replace line items + recompute
+  - `POST /api/finance/quotes/[id]/recalculate` — force re-read del backbone
+  - `GET /api/finance/quotes/[id]/health` — discount health server-side
+  - `GET/PUT /api/finance/quotes/pricing/config` — PUT gated a `finance_admin` / `efeonce_admin`
+- El namespace de eventos sigue en `finance.quote.*` para compat (converge a `commercial.quotation.*`
+  en TASK-347). TASK-346 suma el nuevo evento `commercial.discount.health_alert` al outbox.
 
 ## Delta 2026-04-17 — TASK-345 Canonical schema + finance compatibility bridge
 
