@@ -1,5 +1,36 @@
 # CODEX TASK -- Greenhouse Email Catalog v1: transactional, security, executive y domain notifications
 
+## Delta 2026-04-17 — Foto real del sistema de email hoy
+
+Greenhouse ya no tiene solo un puñado de templates sueltos, pero tampoco debe documentarse como si fuera una plataforma completa de campañas, journeys y analytics avanzados.
+
+La foto real hoy es:
+
+- existe una **capa centralizada de delivery** en `src/lib/email/delivery.ts`
+- el provider canónico sigue siendo **Resend**
+- los templates canónicos siguen siendo **React Email**
+- cada entrega queda persistida en `greenhouse_notifications.email_deliveries`
+- existe control operativo básico y útil:
+  - `priority` por tipo (`critical`, `transactional`, `broadcast`)
+  - `rate limiting` por destinatario
+  - `kill switch` por `email_type`
+  - reintentos sobre entregas fallidas
+  - estado `dead_letter` cuando una entrega agota intentos
+  - manejo de `bounce` / `complaint` vía webhook de Resend
+  - `unsubscribe` firmado para tipos broadcast
+  - resolución automática de contexto del destinatario
+- existe además un **runtime async complementario** en `ops-worker` para envíos batch o programados como el digest semanal de Nexa
+
+Pero el sistema **todavía no es**:
+
+- un motor de campañas masivas o marketing automation
+- un journey/orchestration engine multistep
+- un centro de control operativo completo para email dentro del portal
+- una capa con analytics de engagement profundos ya explotados en UI
+- una lane unificada de preferencia por categoría de negocio fina para todos los módulos
+
+En resumen: hoy Greenhouse tiene un **sistema robusto de email transaccional, operativo y de algunos broadcast importantes**, no una suite completa de messaging enterprise generalista.
+
 ## Estado
 
 Baseline de producto y arquitectura al 2026-03-19.
@@ -92,6 +123,123 @@ Como portal multi-tenant de visibilidad ejecutiva y contexto operativo, Greenhou
 2. `Security`
 3. `Executive Digests & Decision Support`
 4. `Domain Notifications`
+
+## Runtime actual
+
+### Qué existe hoy
+
+#### 1. Delivery layer centralizada
+
+- `src/lib/email/delivery.ts` es la entrada canónica para enviar correos
+- unifica:
+  - render de template
+  - persistencia de entrega
+  - llamada a Resend
+  - rate limiting
+  - unsubscribe link para broadcast
+  - actualización de estado
+  - retry y dead letter
+
+#### 2. Persistencia operativa en PostgreSQL
+
+Las tablas operativas ya existen en `greenhouse_notifications`:
+
+- `email_deliveries`
+- `email_subscriptions`
+- `email_type_config`
+- `email_engagement`
+
+Uso real hoy:
+
+- `email_deliveries` = source of truth de entregas y retries
+- `email_subscriptions` = opt-in / opt-out por tipo
+- `email_type_config` = kill switch por `email_type`
+- `email_engagement` = foundation de tracking, pero todavía no es una surface operativa madura del portal
+
+#### 3. Prioridades y dos modos de entrega
+
+El runtime hoy diferencia tres prioridades:
+
+- `critical`
+- `transactional`
+- `broadcast`
+
+Y opera con dos caminos prácticos:
+
+- **single/sequential path** para envíos individuales o no-broadcast
+- **batch path** para broadcast multi-recipient cuando el caso aplica
+
+#### 4. Webhook de entregabilidad
+
+`POST /api/webhooks/resend` ya procesa:
+
+- `email.delivered`
+- `email.bounced`
+- `email.complained`
+
+Eso permite:
+
+- confirmar delivered cuando Resend lo reporta
+- marcar `email_undeliverable` en `client_users` frente a hard bounce
+- auto-desuscribir cuando hay complaint en un tipo broadcast
+
+#### 5. Context resolver
+
+El sistema ya no depende de que cada caller hidrate manualmente nombre, locale y tenant del destinatario.
+
+`resolveEmailContext()` resuelve de forma centralizada:
+
+- recipient
+- client
+- locale
+- platform metadata
+
+#### 6. Runtime multi-runtime
+
+El contrato ya no vive solo en Vercel:
+
+- el runtime web usa la misma capa canónica
+- `ops-worker` puede disparar envíos via `sendEmail()` o endpoints dedicados como el digest semanal
+- el secreto de Resend ya está documentado para Vercel + Cloud Run vía `RESEND_API_KEY_SECRET_REF`
+
+### Qué no existe todavía como capacidad madura
+
+- campañas arbitrarias con segmentación rica desde UI admin
+- scheduler de newsletters o sequences genéricas
+- centro de observabilidad de email con dashboards first-class en Admin Center
+- analítica de engagement realmente consumida por producto
+- control plane completo de preferencias por categoría funcional fina
+- plantilla/base de attachments y assets con governance transversal a todos los dominios
+- colas dedicadas independientes del worker/reactive stack para todos los broadcasts grandes
+
+## Gaps para evolucionarlo más
+
+Para pasar de “sistema robusto de email transaccional y operativo” a “plataforma madura de messaging”, las siguientes lanes siguen abiertas:
+
+1. **Observabilidad first-class**
+   - explotar `email_engagement` y `email_deliveries` en una surface admin real
+   - KPIs: sent, delivered, failed, complaint rate, bounce rate, dead letter backlog, retry success rate
+
+2. **Control plane más fino**
+   - kill switches más granulares
+   - governance por tenant, dominio o categoría operativa
+   - administración visible de preferencias por familia de email, no solo por tipo aislado
+
+3. **Broadcasts grandes desacoplados**
+   - llevar envíos masivos o costosos a un carril más explícito de worker/queue
+   - evitar que el runtime de retries y el runtime de notificaciones compartan toda la misma presión operativa
+
+4. **Productización de engagement**
+   - usar aperturas/clicks/complaints para decisiones operativas reales
+   - alertar cuando una familia cae en deliverability mala o cuando un digest deja de abrirse
+
+5. **Mayor cobertura de catálogo**
+   - el catálogo ya existe como dirección, pero no toda la familia recomendada está implementada
+   - faltan lanes de seguridad, finanzas, governance y algunos digests/resúmenes más maduros
+
+6. **UX operativa para soporte**
+   - lookup y troubleshooting de una entrega desde Admin Center
+   - replay más claro por lote, por email type, por source event y por destinatario
 
 La regla principal es:
 - Greenhouse no debe convertirse en un sistema de spam operativo

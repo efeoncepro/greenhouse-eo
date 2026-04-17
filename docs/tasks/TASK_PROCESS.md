@@ -145,14 +145,21 @@ El agente DEBE hacer estas acciones antes de producir un plan:
 3. Explorar los archivos listados en `Files owned` — confirmar que existe, que no
 4. Explorar los archivos listados en `Depends on` — confirmar que tablas, schemas, types existen
 5. Si la task tiene `Current Repo State`, validar que las afirmaciones siguen siendo ciertas
-6. **Skill scan** — consultar skills disponibles en el entorno del agente a nivel global o de repo. Leer cada skill relevante antes de escribir codigo que la necesite. Registrar en Discovery summary que skills se usaran y para que slice.
-7. **Subagent assessment** — evaluar si la task se beneficia de delegacion a subagentes (ver protocolo abajo). Registrar la decision en el plan: ejecucion secuencial por el agente principal, o fork con coordinacion.
+6. **Access model check** — si la task toca permisos, menú, navegación, Home, page guards, tabs o surfaces por rol, verificar explícitamente qué parte vive en:
+   - `routeGroups`
+   - `views` / `authorizedViews` / `view_code`
+   - `entitlements` / `module + capability + action + scope`
+   - `startup policy`
+   Registrar en Discovery si la solución afecta uno o varios planos. No asumir que `views` son la única capa de acceso.
+7. **Skill scan** — consultar skills disponibles en el entorno del agente a nivel global o de repo. Leer cada skill relevante antes de escribir codigo que la necesite. Registrar en Discovery summary que skills se usaran y para que slice.
+8. **Subagent assessment** — evaluar si la task se beneficia de delegacion a subagentes (ver protocolo abajo). Registrar la decision en el plan: ejecucion secuencial por el agente principal, o fork con coordinacion.
 
 **Output de Discovery:** un bloque de texto (o seccion en `plan.md`) que lista:
 - Archivos encontrados vs. esperados
 - Discrepancias entre la task y el repo real
 - Dependencias satisfechas vs. bloqueantes
 - Cualquier contradiccion detectada entre la task y la arquitectura
+- **Access model resolution** — si el cambio toca acceso, dejar explicito si impacta `views`, `entitlements`, `startup policy`, `routeGroups` o una combinacion
 - **Skills identificadas** — cuales se usaran y para que slice
 - **Subagent decision** — secuencial o fork, y justificacion
 
@@ -165,6 +172,14 @@ Con el output de Discovery, el agente produce un `plan.md` que incluye:
 
 ## Discovery summary
 [Hallazgos de la fase anterior, discrepancias, dependencias confirmadas]
+
+## Access model
+[Si aplica: que capa de acceso toca la task]
+- `routeGroups`: ...
+- `views` / `authorizedViews`: ...
+- `entitlements`: ...
+- `startup policy`: ...
+- Decision de diseño: ...
 
 ## Skills
 [Que skills se usan y en que slice]

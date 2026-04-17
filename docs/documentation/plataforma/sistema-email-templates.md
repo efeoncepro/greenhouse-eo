@@ -1,14 +1,16 @@
 # Sistema de Email — Entrega, Templates y Proteccion
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-06 por Claude (asistido por Julio Reyes)
-> **Ultima actualizacion:** 2026-04-16 por Codex
+> **Ultima actualizacion:** 2026-04-17 por Codex
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` (seccion email delivery), `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
 
 ## Que es
 
-Greenhouse cuenta con un sistema completo de entrega de emails transaccionales. No se trata solo de templates — es una capa enterprise que cubre todo el ciclo de vida de un email:
+Greenhouse cuenta hoy con una capa seria de email transaccional y operativo. Ya no es solo una colección de templates, pero tampoco debe entenderse como una suite completa de campañas o marketing automation.
+
+Hoy el sistema cubre bien los correos que importan para la operación del portal:
 
 - **Templates** — componentes React (react-email) que generan HTML compatible con todos los clientes de correo
 - **Context Resolver** — resuelve automaticamente los datos del destinatario (nombre, idioma, cliente) antes de enviar
@@ -19,7 +21,35 @@ Greenhouse cuenta con un sistema completo de entrega de emails transaccionales. 
 - **Tracking de entrega** — cada email queda registrado en PostgreSQL con su estado completo
 - **Reintentos** — ventana de 24 horas con hasta 3 intentos para entregas fallidas
 
-El proveedor de entrega es **Resend**, integrado via su SDK en el backend.
+El proveedor de entrega es **Resend**, integrado via su SDK en el backend. Parte de los envíos también puede ejecutarse desde el `ops-worker`, por ejemplo para lanes programadas o batch como el digest semanal de Nexa.
+
+## Lo que es hoy
+
+Hoy Greenhouse tiene:
+
+- una capa central de envío para emails transaccionales y algunos broadcast relevantes
+- un catálogo de templates reusable
+- tracking operativo de entregas en PostgreSQL
+- reintentos, dead letter y protecciones básicas de entregabilidad
+- integración con eventos de negocio que sí justifican email
+
+En la práctica, esto cubre bien:
+
+- acceso e identidad
+- nómina y adjuntos operativos
+- notificaciones importantes
+- permisos/leave
+- un digest ejecutivo semanal interno de Nexa
+
+## Lo que todavía no es
+
+Hoy Greenhouse **no** tiene todavía:
+
+- un sistema de campañas de marketing
+- journeys multistep configurables desde UI
+- un centro de observabilidad de email completo dentro del portal
+- segmentación rica por audiencias arbitrarias para envíos masivos
+- una política de preferencias súper detallada por todas las categorías de negocio
 
 ## Inventario de templates
 
@@ -36,6 +66,16 @@ El proveedor de entrega es **Resend**, integrado via su SDK en el backend.
 Los 4 templates de identidad (invitacion, reset, verificacion, notificacion) soportan espanol e ingles a traves de la prop `locale`. Los templates de payroll usan su propia logica de idioma basada en `payRegime` (chile = espanol, international = ingles).
 
 El digest semanal de Nexa es un template interno orientado a liderazgo. No resuelve idioma por usuario en este corte: se envia en espanol y reutiliza narrativas ya materializadas por la lane advisory de Nexa.
+
+## Cómo funciona hoy, en simple
+
+1. Un módulo del portal decide que un evento merece email.
+2. Llama a la capa central de entrega.
+3. Greenhouse resuelve automáticamente contexto del destinatario cuando puede.
+4. Se renderiza el template.
+5. Se intenta el envío por Resend.
+6. La entrega queda registrada en PostgreSQL con su estado.
+7. Si Resend luego reporta entrega, bounce o complaint, Greenhouse actualiza ese estado.
 
 ## Context Resolver automatico
 
@@ -215,6 +255,8 @@ El sistema de notificaciones de Greenhouse (`NotificationService.dispatch()`) us
 | Reintento manual | `retryFailedDelivery(deliveryId)` permite reintentar una entrega especifica |
 | Suscripciones | Si no se especifican destinatarios, se consulta `email_subscriptions` para el tipo de email |
 
+Hoy este servicio está pensado para correo transaccional y broadcast importante. No está pensado todavía como una consola universal de campañas ni como reemplazo de un sistema dedicado de messaging masivo.
+
 Estados posibles de una entrega:
 
 | Status | Significado |
@@ -227,6 +269,40 @@ Estados posibles de una entrega:
 | `rate_limited` | Bloqueado por rate limit |
 
 > Detalle tecnico: `src/lib/email/delivery.ts`. Funciones `sendEmail()`, `processFailedEmailDeliveries()`, `retryFailedDelivery()`.
+
+## Qué falta para evolucionarlo más
+
+Si Greenhouse quiere llevar esta capa a un nivel todavía más alto, los siguientes pasos siguen pendientes:
+
+### 1. Observabilidad visible para operadores
+
+Hoy los datos existen, pero falta una surface madura para ver:
+
+- entregas fallidas
+- dead letters
+- complaint rate
+- bounce rate
+- retries exitosos vs agotados
+
+### 2. Mejor control operativo por tenant y por categoría
+
+Faltaría poder gobernar mejor:
+
+- qué tenant puede enviar qué familia de emails
+- qué familias están pausadas por entorno o por cliente
+- qué preferencias se administran por categoría de negocio y no solo por tipo puntual
+
+### 3. Broadcasts más desacoplados
+
+Los envíos grandes o programados todavía pueden evolucionar hacia una lane más clara de queue/worker dedicada, para que el sistema operativo de email escale sin apoyarse siempre en los mismos caminos del runtime actual.
+
+### 4. Más catálogo implementado
+
+El catálogo recomendado ya contempla más familias que las que hoy están realmente vivas en producción. Todavía faltan varias notificaciones de seguridad, finanzas y governance.
+
+### 5. Soporte interno más directo
+
+Sería útil una vista administrativa que permita buscar una entrega, entender por qué falló y reintentarla sin depender tanto de inspección técnica.
 
 ## Componentes compartidos
 
