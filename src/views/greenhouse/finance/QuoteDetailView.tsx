@@ -32,6 +32,9 @@ import QuoteApprovalsPanel, { type ApprovalStep } from './governance/QuoteApprov
 import QuoteAuditTrail, { type AuditEntry } from './governance/QuoteAuditTrail'
 import QuoteTermsSection, { type QuotationTerm } from './governance/QuoteTermsSection'
 import QuoteVersionsTimeline, { type VersionHistoryEntry } from './governance/QuoteVersionsTimeline'
+import QuoteHealthCard from './workspace/QuoteHealthCard'
+import QuoteSaveAsTemplateDialog from './workspace/QuoteSaveAsTemplateDialog'
+import QuoteSendDialog from './workspace/QuoteSendDialog'
 
 // ── Types ──
 
@@ -60,6 +63,26 @@ interface QuoteDetail {
   hubspotDealId: string | null
   notes: string | null
   currentVersion?: number | null
+  businessLineCode?: string | null
+  effectiveMarginPct?: number | null
+  targetMarginPct?: number | null
+  marginFloorPct?: number | null
+  totalDiscount?: number | null
+  totalPrice?: number | null
+}
+
+interface HealthState {
+  quotationMarginPct: number | null
+  marginTargetPct: number | null
+  marginFloorPct: number | null
+  alerts: Array<{
+    level: 'error' | 'warning' | 'info'
+    code: string
+    message: string
+    requiredApproval?: 'finance' | null
+  }>
+  blocking: boolean
+  requiresApproval: boolean
 }
 
 interface LineItem {
@@ -197,6 +220,15 @@ const QuoteDetailView = () => {
   const [auditLoading, setAuditLoading] = useState(false)
   const [auditError, setAuditError] = useState<string | null>(null)
 
+  const [health, setHealth] = useState<HealthState | null>(null)
+  const [sendOpen, setSendOpen] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
+  const [saveTemplateOpen, setSaveTemplateOpen] = useState(false)
+  const [savingTemplate, setSavingTemplate] = useState(false)
+  const [saveTemplateError, setSaveTemplateError] = useState<string | null>(null)
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -321,9 +353,115 @@ const QuoteDetailView = () => {
     }
   }, [quoteId])
 
+  const fetchHealth = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/finance/quotes/${quoteId}/health`)
+
+      if (!res.ok) return
+
+      const data = (await res.json()) as {
+        health?: {
+          quotationMarginPct: number | null
+          marginTargetPct: number | null
+          marginFloorPct: number | null
+          alerts: Array<{
+            level: 'error' | 'warning' | 'info'
+            code: string
+            message: string
+            requiredApproval?: 'finance' | null
+          }>
+          blocking: boolean
+          requiresApproval: boolean
+        }
+      }
+
+      if (data.health) setHealth(data.health)
+    } catch {
+      // health is non-critical; silently ignore
+    }
+  }, [quoteId])
+
+  const handleOpenSendDialog = useCallback(() => {
+    setSendError(null)
+    setSendOpen(true)
+  }, [])
+
+  const handleConfirmSend = useCallback(async () => {
+    setSending(true)
+    setSendError(null)
+
+    try {
+      const res = await fetch(`/api/finance/quotes/${quoteId}/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+
+      const body = (await res.json().catch(() => ({}))) as {
+        sent?: boolean
+        approvalRequired?: boolean
+        error?: string
+      }
+
+      if (!res.ok) {
+        setSendError(body.error || 'No pudimos enviar la cotización.')
+
+        return
+      }
+
+      setSendOpen(false)
+      setActionMessage(
+        body.approvalRequired
+          ? 'La cotización quedó en aprobación. Notificamos a los aprobadores correspondientes.'
+          : 'Cotización enviada.'
+      )
+      await Promise.all([fetchData(), fetchApprovals(), fetchHealth()])
+    } catch {
+      setSendError('Error de conexión. Intenta de nuevo.')
+    } finally {
+      setSending(false)
+    }
+  }, [quoteId, fetchData, fetchApprovals, fetchHealth])
+
+  const handleDownloadPdf = useCallback(() => {
+    window.open(`/api/finance/quotes/${quoteId}/pdf`, '_blank', 'noopener,noreferrer')
+  }, [quoteId])
+
+  const handleSaveAsTemplate = useCallback(
+    async (payload: { templateName: string; templateCode: string; description: string | null }) => {
+      setSavingTemplate(true)
+      setSaveTemplateError(null)
+
+      try {
+        const res = await fetch(`/api/finance/quotes/${quoteId}/save-as-template`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+
+        const body = (await res.json().catch(() => ({}))) as { templateCode?: string; error?: string }
+
+        if (!res.ok) {
+          setSaveTemplateError(body.error || 'No pudimos guardar el template.')
+
+          return
+        }
+
+        setSaveTemplateOpen(false)
+        setActionMessage(`Template ${body.templateCode ?? payload.templateCode} creado. Ya está disponible para reutilizarlo.`)
+      } catch {
+        setSaveTemplateError('Error de conexión. Intenta de nuevo.')
+      } finally {
+        setSavingTemplate(false)
+      }
+    },
+    [quoteId]
+  )
+
   useEffect(() => {
     fetchData()
-  }, [fetchData])
+    fetchHealth()
+  }, [fetchData, fetchHealth])
 
   useEffect(() => {
     let cancelled = false
@@ -508,9 +646,41 @@ const QuoteDetailView = () => {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
             <CustomChip round='true' size='small' variant='tonal' color={statusConf.color} label={statusConf.label} />
             <CustomChip round='true' size='small' variant='tonal' color={sourceConf.color} label={sourceConf.label} />
+            <Button
+              variant='outlined'
+              size='small'
+              startIcon={<i className='tabler-file-download' />}
+              onClick={handleDownloadPdf}
+            >
+              PDF
+            </Button>
+            {viewer.canEdit && quote.status === 'draft' && (
+              <Button
+                variant='outlined'
+                size='small'
+                startIcon={<i className='tabler-device-floppy' />}
+                onClick={() => {
+                  setSaveTemplateError(null)
+                  setSaveTemplateOpen(true)
+                }}
+              >
+                Guardar como template
+              </Button>
+            )}
+            {viewer.canEdit && (quote.status === 'draft' || quote.status === 'pending_approval' || quote.status === 'approved') && (
+              <Button
+                variant='contained'
+                size='small'
+                startIcon={<i className='tabler-send' />}
+                onClick={handleOpenSendDialog}
+                disabled={sending}
+              >
+                Enviar
+              </Button>
+            )}
             {quote.hubspotQuoteId && (
               <Button
                 variant='outlined'
@@ -528,6 +698,12 @@ const QuoteDetailView = () => {
         </Box>
       </Box>
 
+      {actionMessage && (
+        <Alert severity='success' onClose={() => setActionMessage(null)}>
+          {actionMessage}
+        </Alert>
+      )}
+
       {/* ── Tabs ── */}
       <Tabs
         value={tab}
@@ -544,6 +720,23 @@ const QuoteDetailView = () => {
 
       {tab === 'overview' && (
         <Stack spacing={4}>
+          {/* ── Health ── */}
+          {health && (
+            <QuoteHealthCard
+              quotationId={quote.quoteId}
+              businessLineCode={quote.businessLineCode ?? null}
+              currency={quote.currency}
+              totalPrice={quote.totalPrice ?? quote.totalAmount ?? null}
+              totalDiscount={quote.totalDiscount ?? null}
+              effectiveMarginPct={health.quotationMarginPct}
+              targetMarginPct={health.marginTargetPct}
+              floorMarginPct={health.marginFloorPct}
+              alerts={health.alerts}
+              canRequestApproval={viewer.canEdit && quote.status === 'draft'}
+              onRequestApproval={handleOpenSendDialog}
+            />
+          )}
+
           {/* ── KPIs ── */}
           <Grid container spacing={6}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -801,6 +994,34 @@ const QuoteDetailView = () => {
       {tab === 'audit' && (
         <QuoteAuditTrail loading={auditLoading} error={auditError} entries={auditEntries} />
       )}
+
+      <QuoteSendDialog
+        open={sendOpen}
+        quotationStatus={quote.status}
+        healthSummary={
+          health
+            ? {
+                marginPct: health.quotationMarginPct,
+                requiresApproval: health.requiresApproval,
+                alerts: health.alerts.map(a => ({ level: a.level, message: a.message }))
+              }
+            : null
+        }
+        pendingApprovalSteps={approvals.filter(step => step.status === 'pending').length}
+        submitting={sending}
+        error={sendError}
+        onClose={() => setSendOpen(false)}
+        onConfirm={handleConfirmSend}
+      />
+
+      <QuoteSaveAsTemplateDialog
+        open={saveTemplateOpen}
+        quotationNumber={quote.quoteNumber || quote.quoteId}
+        submitting={savingTemplate}
+        error={saveTemplateError}
+        onClose={() => setSaveTemplateOpen(false)}
+        onConfirm={handleSaveAsTemplate}
+      />
     </Stack>
   )
 }

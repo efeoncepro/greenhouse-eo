@@ -2,6 +2,15 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — Quotation workspace: builder canónico, health card y PDF client-safe (TASK-349)
+
+- `QuoteCreateDrawer` nuevo (modo "Desde cero" / "Desde template") reemplaza al drawer HubSpot-only como acción primaria; HubSpot queda como acción secundaria. El POST `/api/finance/quotes` acepta `templateId` opcional, hereda defaults del template, inserta line items y siembra terms vía `seedQuotationDefaultTerms`. Publica `commercial.quotation.template_used`.
+- `QuoteDetailView` gana `QuoteHealthCard` (margen efectivo + target + piso + alertas) y botones de header: "Descargar PDF", "Enviar" (dialog contextual con health + steps pendientes), "Guardar como template" (solo drafts). `QuoteLineItemsEditor` listo para integrar en drafts.
+- Endpoints nuevos: `GET /api/finance/quotes/[id]/pdf` renderiza un PDF client-safe via `@react-pdf/renderer` (el input TS excluye costos/márgenes — firewall estructural, no solo runtime). `POST /send` transiciona draft→sent/pending_approval según health check. `POST /save-as-template` copia line items (strip `member_id`) + terms incluidos a un `quote_templates` nuevo.
+- List view incluye columnas Versión + Margen con chips de salud (verde/ámbar/rojo).
+- Smoke E2E contra dev DB: PDF 1 página 3665 bytes OK; `/send` transición `draft→sent` + health snapshot OK.
+- Doc arch `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.6.
+
 ### 2026-04-17 — Blindaje de `password_hash`: ningún batch/sync puede volver a rotar credenciales silenciosamente
 
 - TASK-451 resuelve ISSUE-053: un cron a las 08:00 UTC había reescrito el hash de Julio en la DB de dev y lo había dejado sin login con credentials en staging. Prod y staging comparten la misma DB, así que el hecho de que prod siguiera aceptando el login se atribuye a JWT de sesión ya emitido (NextAuth no re-valida hash por request) — queda como hipótesis de observable si recurre.

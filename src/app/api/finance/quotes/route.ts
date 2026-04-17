@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { withTransaction } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { recordAudit } from '@/lib/commercial/governance/audit-log'
+import { seedQuotationDefaultTerms } from '@/lib/commercial/governance/terms-store'
+import { recordTemplateUsage } from '@/lib/commercial/governance/templates-store'
+import { publishTemplateUsed } from '@/lib/commercial/quotation-events'
 import {
   listFinanceQuotesFromCanonical,
   mapCanonicalQuoteListRow
@@ -166,6 +170,7 @@ interface CreateQuotationPayload {
   internalNotes?: string | null
   lineItems?: QuotationLineInput[]
   pricingModel?: 'staff_aug' | 'retainer' | 'project'
+  templateId?: string | null
 }
 
 const generateQuotationNumber = () => {
@@ -192,12 +197,47 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 })
   }
 
-  const currency: QuotationPricingCurrency = (body.currency || 'CLP') as QuotationPricingCurrency
-  const billingFrequency: QuotationBillingFrequency = body.billingFrequency || 'one_time'
+  // Optional template resolution — when `templateId` is passed, pull defaults
+  // (currency, billing, contract duration, pricing model, business line) and
+  // seed lineItems + default terms from the template snapshot. Explicit body
+  // fields always win over template defaults. Usage counter is bumped here.
+  let templateSnapshot: Awaited<ReturnType<typeof recordTemplateUsage>> = null
+  let templateBusinessLineCode: string | null = null
+
+  if (body.templateId && typeof body.templateId === 'string') {
+    templateSnapshot = await recordTemplateUsage(body.templateId)
+
+    if (!templateSnapshot) {
+      return NextResponse.json({ error: 'Template not found.' }, { status: 404 })
+    }
+
+    templateBusinessLineCode = templateSnapshot.defaults.businessLineCode
+  }
+
+  const resolvedBusinessLineCode =
+    body.businessLineCode !== undefined ? body.businessLineCode : templateBusinessLineCode
+
+  const currency: QuotationPricingCurrency = (body.currency ||
+    (templateSnapshot?.defaults.currency as QuotationPricingCurrency | undefined) ||
+    'CLP') as QuotationPricingCurrency
+
+  const billingFrequency: QuotationBillingFrequency = (body.billingFrequency ||
+    (templateSnapshot?.defaults.billingFrequency as QuotationBillingFrequency | undefined) ||
+    'one_time') as QuotationBillingFrequency
+
   const quoteDate = (body.quoteDate || new Date().toISOString().slice(0, 10)).slice(0, 10)
   const quotationNumber = body.quotationNumber?.trim() || generateQuotationNumber()
   const createdBy = tenant.userId
-  const pricingModel = body.pricingModel || 'project'
+
+  const pricingModel =
+    body.pricingModel ||
+    (templateSnapshot?.defaults.pricingModel as 'staff_aug' | 'retainer' | 'project' | undefined) ||
+    'project'
+
+  const contractDurationMonths =
+    body.contractDurationMonths !== undefined
+      ? body.contractDurationMonths
+      : templateSnapshot?.defaults.contractDurationMonths ?? null
 
   let quotationId: string
 
@@ -251,7 +291,7 @@ export async function POST(request: Request) {
           body.clientId ?? null,
           body.organizationId ?? null,
           body.spaceId ?? null,
-          body.businessLineCode ?? null,
+          resolvedBusinessLineCode,
           pricingModel,
           currency,
           JSON.stringify(body.exchangeRates ?? {}),
@@ -261,7 +301,7 @@ export async function POST(request: Request) {
           body.globalDiscountType ?? null,
           body.globalDiscountValue ?? null,
           billingFrequency,
-          body.contractDurationMonths ?? null,
+          contractDurationMonths,
           quoteDate,
           body.dueDate ?? null,
           body.validUntil ?? null,
@@ -281,17 +321,33 @@ export async function POST(request: Request) {
     throw error
   }
 
-  const lineItems = Array.isArray(body.lineItems) ? body.lineItems : []
+  const bodyLineItems = Array.isArray(body.lineItems) ? body.lineItems : []
+
+  const lineItems: QuotationLineInput[] =
+    bodyLineItems.length === 0 && templateSnapshot && templateSnapshot.items.length > 0
+      ? templateSnapshot.items.map(item => ({
+          productId: item.productId ?? null,
+          lineType: item.lineType,
+          sortOrder: item.sortOrder,
+          label: item.label,
+          description: item.description ?? null,
+          roleCode: item.roleCode ?? null,
+          hoursEstimated: item.suggestedHours ?? null,
+          unit: item.unit,
+          quantity: item.quantity,
+          unitPrice: item.defaultUnitPrice ?? 0
+        }))
+      : bodyLineItems
 
   const snapshot = await persistQuotationPricing(
     {
       quotationId,
       versionNumber: 1,
-      businessLineCode: body.businessLineCode ?? null,
+      businessLineCode: resolvedBusinessLineCode,
       quoteCurrency: currency,
       quoteDate,
       billingFrequency,
-      contractDurationMonths: body.contractDurationMonths ?? null,
+      contractDurationMonths,
       exchangeRates: body.exchangeRates ?? {},
       exchangeSnapshotDate: body.exchangeSnapshotDate ?? null,
       globalDiscountType: body.globalDiscountType ?? null,
@@ -303,6 +359,47 @@ export async function POST(request: Request) {
     },
     { createVersion: true, versionNotes: 'Draft created via API.' }
   )
+
+  // When a template is used, seed its default terms (templates carry a list
+  // of term_ids; the terms store picks them up and resolves variables).
+  if (templateSnapshot && templateSnapshot.defaults.termIds.length > 0) {
+    await seedQuotationDefaultTerms({
+      quotationId,
+      pricingModel,
+      businessLineCode: resolvedBusinessLineCode,
+      variables: {
+        paymentTermsDays: templateSnapshot.defaults.paymentTermsDays,
+        contractDurationMonths,
+        billingFrequency,
+        validUntil: body.validUntil ?? null,
+        organizationName: null,
+        escalationPct: null
+      }
+    })
+  }
+
+  if (templateSnapshot) {
+    await publishTemplateUsed({
+      templateId: templateSnapshot.templateId,
+      templateCode: templateSnapshot.templateCode,
+      quotationId,
+      usedBy: createdBy
+    })
+
+    await recordAudit({
+      quotationId,
+      versionNumber: 1,
+      action: 'template_used',
+      actorUserId: createdBy,
+      actorName: tenant.clientName || createdBy,
+      details: {
+        templateId: templateSnapshot.templateId,
+        templateCode: templateSnapshot.templateCode,
+        itemsSeeded: lineItems.length,
+        termsSeeded: templateSnapshot.defaults.termIds.length
+      }
+    })
+  }
 
   return NextResponse.json(
     {

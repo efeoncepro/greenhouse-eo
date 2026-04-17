@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Entregado 2026-04-17`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-345, TASK-346, TASK-347, TASK-348`
@@ -147,10 +147,44 @@ La task debe responder:
 
 ## Acceptance Criteria
 
-- [ ] El listado y el detalle de cotizaciones consumen el runtime canónico y exponen health/versiones/status relevantes
-- [ ] La UI permite crear o editar una quote usando catálogo, line items y términos del módulo
-- [ ] Se puede generar y descargar un PDF client-safe alineado a la versión vigente
-- [ ] La surface no expone costo ni margen interno al cliente
+- [x] El listado y el detalle de cotizaciones consumen el runtime canónico y exponen health/versiones/status relevantes
+- [x] La UI permite crear o editar una quote usando catálogo, line items y términos del módulo
+- [x] Se puede generar y descargar un PDF client-safe alineado a la versión vigente
+- [x] La surface no expone costo ni margen interno al cliente
+
+## Completion Summary (2026-04-17)
+
+**Archivos nuevos**
+- Backend PDF: `src/lib/finance/pdf/{contracts,quotation-pdf-document,render-quotation-pdf}.{ts,tsx}`.
+- Endpoints: `src/app/api/finance/quotes/[id]/{pdf,send,save-as-template}/route.ts`.
+- UI workspace: `src/views/greenhouse/finance/workspace/{QuoteCreateDrawer,QuoteLineItemsEditor,QuoteHealthCard,QuoteSendDialog,QuoteSaveAsTemplateDialog}.tsx`.
+
+**Archivos extendidos**
+- `src/app/api/finance/quotes/route.ts` — POST acepta `templateId` opcional, hereda defaults, seedQuotationDefaultTerms, emite `publishTemplateUsed`.
+- `src/lib/finance/quotation-canonical-store.ts` — list row incluye `current_version`, `effective_margin_pct`, `margin_floor_pct`, `target_margin_pct` para badges.
+- `src/views/greenhouse/finance/QuotesListView.tsx` — dos botones de creación (canónico + HubSpot), nuevas columnas Versión + Margen, status config extendida.
+- `src/views/greenhouse/finance/QuoteDetailView.tsx` — HealthCard en General, action buttons (PDF, Enviar, Guardar como template), send/save-as-template dialogs.
+- `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.6 con delta completo.
+
+**Verificación**
+- `pnpm exec tsc --noEmit --incremental false` ✓
+- `pnpm lint` ✓
+- `pnpm test` 1337 passed
+- `pnpm build` ✓
+- Smoke E2E dev server + agent auth:
+  - `GET /api/finance/quotes/{id}/pdf` → HTTP 200, `application/pdf`, 3665 bytes, PDF 1.3 1 página.
+  - `POST /api/finance/quotes/{id}/send` → HTTP 200, `{ sent: true, newStatus: 'sent', health }`.
+  - Auditoría registra `sent` con actor + version.
+
+**Decisiones**
+- Ruta canónica se mantiene en `/finance/quotes` (spec Open Question resuelta). No se abrió workspace comercial separado.
+- PDF vía `@react-pdf/renderer` (ya instalado). Input contract excluye `unit_cost`/`margin`/`cost_breakdown` a nivel TypeScript — firewall estructural contra leak de cost intelligence al cliente.
+- HubSpot drawer legacy se mantiene como acción secundaria; el primary es el nuevo canonical drawer.
+- Save-as-Template strip `member_id` (templates son role-based, no persona-bound).
+
+**Follow-ups**
+- Email dispatch del PDF como consumer reactivo sobre `commercial.quotation.sent` — queda para task posterior.
+- PDF multi-página / font embedding — cosmético.
 
 ## Verification
 
