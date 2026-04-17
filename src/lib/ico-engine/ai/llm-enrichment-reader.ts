@@ -94,56 +94,79 @@ const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
   recommendedAction: toText(row.recommended_action)
 })
 
+const TIMELINE_DEFAULT_LIMIT = 20
+const TIMELINE_MAX_LIMIT = 50
+
+export const readAgencyAiLlmTimeline = async (
+  limit = TIMELINE_DEFAULT_LIMIT
+): Promise<AgencyAiLlmSummaryItem[]> => {
+  const boundedLimit = Math.min(Math.max(Math.trunc(limit), 1), TIMELINE_MAX_LIMIT)
+
+  const rows = await query<RawRow>(
+    `
+      SELECT *
+      FROM greenhouse_serving.ico_ai_signal_enrichments
+      WHERE status = 'succeeded'
+      ORDER BY processed_at DESC
+      LIMIT $1
+    `,
+    [boundedLimit]
+  ).catch(() => [])
+
+  return rows.map(mapSummaryItem)
+}
+
 export const readAgencyAiLlmSummary = async (
   periodYear: number,
   periodMonth: number,
   limit = 8
 ): Promise<AgencyAiLlmSummary> => {
-  const totalsRows = await query<RawRow>(
-    `
-      SELECT
-        COUNT(*) AS total,
-        COUNT(*) FILTER (WHERE status = 'succeeded') AS succeeded,
-        COUNT(*) FILTER (WHERE status = 'failed') AS failed,
-        AVG(quality_score) FILTER (WHERE status = 'succeeded') AS avg_quality_score,
-        MAX(processed_at)::text AS last_processed_at
-      FROM greenhouse_serving.ico_ai_signal_enrichments
-      WHERE period_year = $1
-        AND period_month = $2
-    `,
-    [periodYear, periodMonth]
-  ).catch(() => [])
-
-  const recentRows = await query<RawRow>(
-    `
-      SELECT *
-      FROM greenhouse_serving.ico_ai_signal_enrichments
-      WHERE period_year = $1
-        AND period_month = $2
-      ORDER BY processed_at DESC, quality_score DESC NULLS LAST
-      LIMIT $3
-    `,
-    [periodYear, periodMonth, limit]
-  ).catch(() => [])
-
-  const latestRunRows = await query<RawRow>(
-    `
-      SELECT
-        run_id,
-        status,
-        started_at::text AS started_at,
-        completed_at::text AS completed_at,
-        signals_seen,
-        signals_enriched,
-        signals_failed
-      FROM greenhouse_serving.ico_ai_enrichment_runs
-      WHERE period_year = $1
-        AND period_month = $2
-      ORDER BY started_at DESC
-      LIMIT 1
-    `,
-    [periodYear, periodMonth]
-  ).catch(() => [])
+  const [totalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
+    query<RawRow>(
+      `
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE status = 'succeeded') AS succeeded,
+          COUNT(*) FILTER (WHERE status = 'failed') AS failed,
+          AVG(quality_score) FILTER (WHERE status = 'succeeded') AS avg_quality_score,
+          MAX(processed_at)::text AS last_processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE period_year = $1
+          AND period_month = $2
+      `,
+      [periodYear, periodMonth]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT *
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE period_year = $1
+          AND period_month = $2
+        ORDER BY processed_at DESC, quality_score DESC NULLS LAST
+        LIMIT $3
+      `,
+      [periodYear, periodMonth, limit]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          run_id,
+          status,
+          started_at::text AS started_at,
+          completed_at::text AS completed_at,
+          signals_seen,
+          signals_enriched,
+          signals_failed
+        FROM greenhouse_serving.ico_ai_enrichment_runs
+        WHERE period_year = $1
+          AND period_month = $2
+        ORDER BY started_at DESC
+        LIMIT 1
+      `,
+      [periodYear, periodMonth]
+    ).catch(() => []),
+    readAgencyAiLlmTimeline(TIMELINE_DEFAULT_LIMIT).catch(() => [] as AgencyAiLlmSummaryItem[])
+  ])
 
   const totalsRow = totalsRows[0] ?? {}
   const latestRunRow = latestRunRows[0]
@@ -167,6 +190,7 @@ export const readAgencyAiLlmSummary = async (
         }
       : null,
     recentEnrichments: recentRows.map(mapSummaryItem),
+    timeline: timelineItems,
     lastProcessedAt: toText(totalsRow.last_processed_at)
   }
 }

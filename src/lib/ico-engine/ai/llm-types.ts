@@ -105,6 +105,7 @@ export interface AgencyAiLlmSummary {
     signalsFailed: number
   } | null
   recentEnrichments: AgencyAiLlmSummaryItem[]
+  timeline: AgencyAiLlmSummaryItem[]
   lastProcessedAt: string | null
 }
 

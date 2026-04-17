@@ -1326,6 +1326,19 @@ export const GH_NEXA = {
   insights_root_cause_collapse: 'Ocultar causa raíz',
   insights_last_analysis: (label: string) => `Último análisis: ${label}`,
 
+  // View mode toggle (Recientes vs Historial)
+  insights_view_mode_aria: 'Modo de visualización',
+  insights_view_mode_recent: 'Recientes',
+  insights_view_mode_timeline: 'Historial',
+  insights_timeline_title: 'Historial de señales',
+  insights_timeline_subtitle: (n: number) => `${n} ${n === 1 ? 'señal registrada' : 'señales registradas'}`,
+  insights_timeline_empty_title: 'Aún no hay señales analizadas',
+  insights_timeline_empty_description:
+    'Cuando Nexa procese nuevas señales, aparecerán aquí ordenadas por fecha.',
+  insights_timeline_day_today: 'Hoy',
+  insights_timeline_day_yesterday: 'Ayer',
+  insights_timeline_time_at: (label: string) => `a las ${label}`,
+
   // KPIs
   kpi_analyzed: 'Señales analizadas',
   kpi_analyzed_tooltip: 'Señales del ICO Engine que Nexa analizó este período',
