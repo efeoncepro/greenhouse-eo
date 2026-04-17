@@ -43,6 +43,7 @@ const mapHomeInsight = (row: {
   explanationSummary: string | null
   rootCauseNarrative: string | null
   recommendedAction: string | null
+  processedAt: string
 }): HomeNexaInsightItem => ({
   id: row.enrichmentId,
   signalType: row.signalType,
@@ -50,7 +51,8 @@ const mapHomeInsight = (row: {
   severity: row.severity,
   explanation: row.explanationSummary,
   rootCauseNarrative: row.rootCauseNarrative,
-  recommendedAction: row.recommendedAction
+  recommendedAction: row.recommendedAction,
+  processedAt: row.processedAt
 })
 
 const getHomeCurrentPeriod = () => {
@@ -181,6 +183,7 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
       },
       latestRun: null,
       recentEnrichments: [],
+      timeline: [],
       lastProcessedAt: null
     }
   })
@@ -213,7 +216,17 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     totalAnalyzed: visibleInsightsCount > 0 ? insightsSummary.totals.succeeded : 0,
     lastAnalysis: insightsSummary.lastProcessedAt,
     runStatus: insightsSummary.latestRun?.status ?? null,
-    insights: topInsightsRows.map(mapHomeInsight)
+    insights: topInsightsRows.map(mapHomeInsight),
+    timeline: insightsSummary.timeline.map(item => ({
+      enrichmentId: item.enrichmentId,
+      signalType: item.signalType,
+      metricName: item.metricName,
+      severity: item.severity,
+      explanationSummary: item.explanationSummary,
+      rootCauseNarrative: item.rootCauseNarrative,
+      recommendedAction: item.recommendedAction,
+      processedAt: item.processedAt
+    })).map(mapHomeInsight)
   }
 
   // 5. Nexa Intro (Simple logic for now)

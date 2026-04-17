@@ -33,6 +33,7 @@ export interface HomeNexaInsightItem {
   explanation: string | null
   rootCauseNarrative: string | null
   recommendedAction: string | null
+  processedAt: string
 }
 
 export interface HomeNexaInsightsPayload {
@@ -40,6 +41,7 @@ export interface HomeNexaInsightsPayload {
   lastAnalysis: string | null
   runStatus: 'succeeded' | 'partial' | 'failed' | null
   insights: HomeNexaInsightItem[]
+  timeline: HomeNexaInsightItem[]
 }
 
 export interface PendingTask {

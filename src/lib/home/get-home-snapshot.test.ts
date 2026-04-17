@@ -118,6 +118,7 @@ describe('getHomeSnapshot', () => {
         signalsFailed: 1
       },
       recentEnrichments: [],
+      timeline: [],
       lastProcessedAt: '2026-04-15T13:10:00.000Z'
     })
   })
@@ -152,7 +153,9 @@ describe('getHomeSnapshot', () => {
           metricId: 'otd_pct',
           severity: 'critical',
           explanation: '@[Space 1](space:space-1) tiene retrasos recurrentes.',
-          recommendedAction: 'Revisar @[Project 1](project:project-1).'
+          rootCauseNarrative: undefined,
+          recommendedAction: 'Revisar @[Project 1](project:project-1).',
+          processedAt: '2026-04-15T13:10:00.000Z'
         },
         {
           id: 'EO-AIE-2',
@@ -160,7 +163,9 @@ describe('getHomeSnapshot', () => {
           metricId: 'rpa_avg',
           severity: 'warning',
           explanation: 'Mayor carga en @[Space 2](space:space-2).',
-          recommendedAction: 'Priorizar revisión.'
+          rootCauseNarrative: undefined,
+          recommendedAction: 'Priorizar revisión.',
+          processedAt: '2026-04-15T12:45:00.000Z'
         },
         {
           id: 'EO-AIE-3',
@@ -168,9 +173,12 @@ describe('getHomeSnapshot', () => {
           metricId: 'ftr_pct',
           severity: 'info',
           explanation: 'Sincronización pendiente.',
-          recommendedAction: null
+          rootCauseNarrative: undefined,
+          recommendedAction: null,
+          processedAt: '2026-04-15T11:20:00.000Z'
         }
-      ]
+      ],
+      timeline: []
     })
   })
 })

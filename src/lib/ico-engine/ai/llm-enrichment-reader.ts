@@ -81,7 +81,8 @@ const mapMemberInsightItem = (row: RawRow): MemberNexaInsightItem => ({
   severity: toText(row.severity),
   explanation: toText(row.explanation_summary),
   rootCauseNarrative: toText(row.root_cause_narrative),
-  recommendedAction: toText(row.recommended_action)
+  recommendedAction: toText(row.recommended_action),
+  processedAt: String(row.processed_at)
 })
 
 const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
@@ -91,7 +92,8 @@ const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
   severity: toText(row.severity),
   explanation: toText(row.explanation_summary),
   rootCauseNarrative: toText(row.root_cause_narrative),
-  recommendedAction: toText(row.recommended_action)
+  recommendedAction: toText(row.recommended_action),
+  processedAt: String(row.processed_at)
 })
 
 const TIMELINE_DEFAULT_LIMIT = 20
@@ -349,13 +351,55 @@ export const readTopAiLlmEnrichments = async (
   return rows.map(mapTopItem)
 }
 
+export const readMemberAiLlmTimeline = async (
+  memberId: string,
+  limit = TIMELINE_DEFAULT_LIMIT
+): Promise<MemberNexaInsightItem[]> => {
+  const boundedLimit = Math.min(Math.max(Math.trunc(limit), 1), TIMELINE_MAX_LIMIT)
+
+  const rows = await query<RawRow>(
+    `
+      SELECT *
+      FROM greenhouse_serving.ico_ai_signal_enrichments
+      WHERE member_id = $1
+        AND status = 'succeeded'
+      ORDER BY processed_at DESC
+      LIMIT $2
+    `,
+    [memberId, boundedLimit]
+  ).catch(() => [])
+
+  return rows.map(mapMemberInsightItem)
+}
+
+export const readSpaceAiLlmTimeline = async (
+  spaceId: string,
+  limit = TIMELINE_DEFAULT_LIMIT
+): Promise<SpaceNexaInsightItem[]> => {
+  const boundedLimit = Math.min(Math.max(Math.trunc(limit), 1), TIMELINE_MAX_LIMIT)
+
+  const rows = await query<RawRow>(
+    `
+      SELECT *
+      FROM greenhouse_serving.ico_ai_signal_enrichments
+      WHERE space_id = $1
+        AND status = 'succeeded'
+      ORDER BY processed_at DESC
+      LIMIT $2
+    `,
+    [spaceId, boundedLimit]
+  ).catch(() => [])
+
+  return rows.map(mapSpaceInsightItem)
+}
+
 export const readMemberAiLlmSummary = async (
   memberId: string,
   periodYear: number,
   periodMonth: number,
   limit = 3
 ): Promise<MemberNexaInsightsPayload> => {
-  const [totalsRows, recentRows, latestRunRows] = await Promise.all([
+  const [totalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
     query<RawRow>(
       `
         SELECT
@@ -415,7 +459,10 @@ export const readMemberAiLlmSummary = async (
         LIMIT 1
       `,
       [periodYear, periodMonth]
-    ).catch(() => [])
+    ).catch(() => []),
+    readMemberAiLlmTimeline(memberId, TIMELINE_DEFAULT_LIMIT).catch(
+      () => [] as MemberNexaInsightItem[]
+    )
   ])
 
   const totalsRow = totalsRows[0] ?? {}
@@ -429,7 +476,8 @@ export const readMemberAiLlmSummary = async (
     runStatus: latestRunRow
       ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
       : null,
-    insights: recentInsights
+    insights: recentInsights,
+    timeline: timelineItems
   }
 }
 
@@ -439,7 +487,7 @@ export const readSpaceAiLlmSummary = async (
   periodMonth: number,
   limit = 3
 ): Promise<SpaceNexaInsightsPayload> => {
-  const [totalsRows, recentRows, latestRunRows] = await Promise.all([
+  const [totalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
     query<RawRow>(
       `
         SELECT
@@ -500,7 +548,10 @@ export const readSpaceAiLlmSummary = async (
         LIMIT 1
       `,
       [spaceId, periodYear, periodMonth]
-    ).catch(() => [])
+    ).catch(() => []),
+    readSpaceAiLlmTimeline(spaceId, TIMELINE_DEFAULT_LIMIT).catch(
+      () => [] as SpaceNexaInsightItem[]
+    )
   ])
 
   const totalsRow = totalsRows[0] ?? {}
@@ -513,6 +564,7 @@ export const readSpaceAiLlmSummary = async (
     runStatus: latestRunRow
       ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
       : null,
-    insights: recentInsights
+    insights: recentInsights,
+    timeline: timelineItems
   }
 }

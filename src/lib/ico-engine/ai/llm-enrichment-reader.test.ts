@@ -136,6 +136,7 @@ describe('readMemberAiLlmSummary', () => {
           completed_at: '2026-04-15T12:06:00.000Z'
         }
       ])
+      .mockResolvedValueOnce([])
 
     const result = await readMemberAiLlmSummary('member-123', 2026, 4, 3)
 
@@ -174,7 +175,8 @@ describe('readMemberAiLlmSummary', () => {
           severity: 'critical',
           explanation: 'Member impact',
           rootCauseNarrative: null,
-          recommendedAction: 'Actuar'
+          recommendedAction: 'Actuar',
+          processedAt: '2026-04-15T13:10:00.000Z'
         },
         {
           id: 'EO-AIE-11',
@@ -183,9 +185,11 @@ describe('readMemberAiLlmSummary', () => {
           severity: 'warning',
           explanation: 'Otra señal',
           rootCauseNarrative: null,
-          recommendedAction: null
+          recommendedAction: null,
+          processedAt: '2026-04-15T12:30:00.000Z'
         }
-      ]
+      ],
+      timeline: []
     })
   })
 })
@@ -222,6 +226,7 @@ describe('readSpaceAiLlmSummary', () => {
           completed_at: '2026-04-15T14:02:00.000Z'
         }
       ])
+      .mockResolvedValueOnce([])
 
     const result = await readSpaceAiLlmSummary('space-123', 2026, 4, 3)
 
@@ -260,9 +265,11 @@ describe('readSpaceAiLlmSummary', () => {
           severity: 'critical',
           explanation: 'Space impact',
           rootCauseNarrative: null,
-          recommendedAction: 'Escalar'
+          recommendedAction: 'Escalar',
+          processedAt: '2026-04-15T14:00:00.000Z'
         }
-      ]
+      ],
+      timeline: []
     })
   })
 })

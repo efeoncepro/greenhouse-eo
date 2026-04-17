@@ -146,6 +146,7 @@ export interface MemberNexaInsightItem {
   explanation: string | null
   rootCauseNarrative: string | null
   recommendedAction: string | null
+  processedAt: string
 }
 
 export interface MemberNexaInsightsPayload {
@@ -153,6 +154,7 @@ export interface MemberNexaInsightsPayload {
   lastAnalysis: string | null
   runStatus: IcoLlmRunStatus | null
   insights: MemberNexaInsightItem[]
+  timeline: MemberNexaInsightItem[]
 }
 
 export interface SpaceNexaInsightItem {
@@ -163,6 +165,7 @@ export interface SpaceNexaInsightItem {
   explanation: string | null
   rootCauseNarrative: string | null
   recommendedAction: string | null
+  processedAt: string
 }
 
 export interface SpaceNexaInsightsPayload {
@@ -170,6 +173,7 @@ export interface SpaceNexaInsightsPayload {
   lastAnalysis: string | null
   runStatus: IcoLlmRunStatus | null
   insights: SpaceNexaInsightItem[]
+  timeline: SpaceNexaInsightItem[]
 }
 
 // ─── Metric Glossary (dynamic from registry) ──────────────────────────────

@@ -128,9 +128,11 @@ const detail: Space360Detail = {
         severity: 'warning',
         explanation: 'La OTD del Space cayó en el último corte y conviene revisar el backlog activo.',
         rootCauseNarrative: null,
-        recommendedAction: 'Coordina con el equipo para limpiar el backlog y monitorea el próximo cierre.'
+        recommendedAction: 'Coordina con el equipo para limpiar el backlog y monitorea el próximo cierre.',
+        processedAt: '2026-04-15T16:00:00.000Z'
       }
-    ]
+    ],
+    timeline: []
   },
   team: {
     summary: {

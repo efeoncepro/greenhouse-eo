@@ -184,6 +184,7 @@ type HomeInsightsPayload = {
   totalAnalyzed: number
   lastAnalysis: string | null
   runStatus: 'succeeded' | 'partial' | 'failed' | null
+  timeline?: Array<NexaInsightItem & { processedAt: string }>
 }
 
 type HomeSnapshotWithInsights = HomeSnapshot & {
@@ -258,6 +259,7 @@ const HomeContent = ({
                       lastAnalysis={homeInsights.lastAnalysis}
                       runStatus={homeInsights.runStatus}
                       defaultExpanded={homeInsights.totalAnalyzed > 0}
+                      timelineInsights={homeInsights.timeline}
                     />
                   </Grid>
                 )}

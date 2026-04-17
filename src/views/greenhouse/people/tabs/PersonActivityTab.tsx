@@ -75,7 +75,8 @@ const EMPTY_NEXA_INSIGHTS: MemberNexaInsightsPayload = {
   totalAnalyzed: 0,
   lastAnalysis: null,
   runStatus: null,
-  insights: []
+  insights: [],
+  timeline: []
 }
 
 // ── KPI Config ────────────────────────────────────────────────────────
@@ -352,6 +353,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
             lastAnalysis={nexaInsights.lastAnalysis}
             runStatus={nexaInsights.runStatus}
             defaultExpanded={nexaInsights.totalAnalyzed > 0}
+            timelineInsights={nexaInsights.timeline ?? []}
           />
         </Grid>
       )}

@@ -46,7 +46,8 @@ const OverviewTab = ({ detail }: Props) => {
     insights: [],
     totalAnalyzed: 0,
     lastAnalysis: null,
-    runStatus: null
+    runStatus: null,
+    timeline: []
   }
 
   return (
@@ -57,6 +58,7 @@ const OverviewTab = ({ detail }: Props) => {
         lastAnalysis={nexaInsights.lastAnalysis}
         runStatus={nexaInsights.runStatus}
         defaultExpanded={nexaInsights.totalAnalyzed > 0}
+        timelineInsights={nexaInsights.timeline ?? []}
       />
 
       <Grid container spacing={6}>
