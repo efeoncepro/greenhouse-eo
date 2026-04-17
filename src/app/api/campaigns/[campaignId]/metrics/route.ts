@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { getCampaignMetrics } from '@/lib/campaigns/campaign-metrics'
+import { getCampaignForTenant } from '@/lib/campaigns/tenant-scope'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,9 +18,13 @@ export async function GET(
 
   try {
     const { campaignId } = await params
+    const access = await getCampaignForTenant({ tenant, campaignId })
 
-    // Campaign subset enforcement
-    if (tenant.campaignScopes.length > 0 && !tenant.campaignScopes.includes(campaignId)) {
+    if (!access.ok && access.reason === 'not_found') {
+      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+    }
+
+    if (!access.ok) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

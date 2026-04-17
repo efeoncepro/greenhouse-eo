@@ -45,6 +45,8 @@ interface CampaignItem {
   spaceId: string
 }
 
+const CAMPAIGNS_ENDPOINTS = ['/api/agency/campaigns', '/api/campaigns'] as const
+
 const STATUS_COLORS: Record<string, 'secondary' | 'info' | 'success' | 'warning' | 'primary'> = {
   draft: 'secondary', planning: 'info', active: 'success', paused: 'warning', completed: 'primary', archived: 'secondary'
 }
@@ -153,7 +155,22 @@ const AgencyCampaignsView = () => {
     setErrorMessage(null)
 
     try {
-      const res = await fetch('/api/campaigns')
+      let res: Response | null = null
+
+      for (const endpoint of CAMPAIGNS_ENDPOINTS) {
+        const candidate = await fetch(endpoint)
+
+        if (candidate.status === 404 && endpoint !== CAMPAIGNS_ENDPOINTS[CAMPAIGNS_ENDPOINTS.length - 1]) {
+          continue
+        }
+
+        res = candidate
+        break
+      }
+
+      if (!res) {
+        throw new Error('No pudimos cargar las campañas.')
+      }
 
       if (res.ok) {
         const data = await res.json()

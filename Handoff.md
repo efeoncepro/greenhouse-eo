@@ -1,5 +1,51 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-145 Agency Campaigns API rescope
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/app/api/agency/campaigns/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/360/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/metrics/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/financials/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/roster/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/projects/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/projects/[linkId]/route.ts`
+    - namespace Agency nuevo con paridad sobre el runtime actual de campañas
+  - `src/lib/campaigns/tenant-scope.ts`
+    - helper tenant-safe nuevo
+    - resuelve spaces cliente con `getDb()` sobre `greenhouse_core.spaces`
+    - corrige el bug `clientId -> spaceId`
+    - endurece acceso detail/sub-routes por pertenencia real a `space_id`
+  - `src/lib/campaigns/campaign-store.ts`
+    - nuevo reader `listCampaignsBySpaceIds()` para multi-space SQL-first
+  - `src/app/api/campaigns/**`
+    - rutas compartidas alineadas al helper tenant-safe
+  - `src/views/agency/AgencyCampaignsView.tsx`
+    - Agency consume `/api/agency/campaigns` como endpoint primario
+    - mantiene fallback a `/api/campaigns` durante la coexistencia
+  - tests nuevos/actualizados:
+    - `src/lib/campaigns/tenant-scope.test.ts`
+    - `src/app/api/campaigns/route.test.ts`
+    - `src/app/api/agency/campaigns/route.test.ts`
+    - `src/views/agency/AgencyCampaignsView.test.tsx`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/in-progress/TASK-145-agency-campaigns-rescope.md`
+  - `changelog.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/campaigns/tenant-scope.test.ts src/app/api/campaigns/route.test.ts src/app/api/agency/campaigns/route.test.ts src/views/agency/AgencyCampaignsView.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'`
+- **Notas operativas:**
+  - `pnpm build` quedó verde; volvió a imprimir warnings conocidos de `Dynamic server usage` en páginas autenticadas del dashboard, pero no bloquearon la build ni fueron introducidos por esta lane
+  - no hubo migraciones ni cambios de schema
+  - `/api/campaigns/**` sigue siendo namespace compartido para internal + client; el cutover total no se hizo en esta lane para no romper `/campaigns` ni `/campanas`
+
 ## Sesion 2026-04-17 — TASK-144 Agency Team API dedicada y deduplicada
 
 - **Estado:** `implementado localmente`, `validado`

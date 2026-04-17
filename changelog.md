@@ -2,6 +2,14 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — TASK-145: Agency Campaigns queda desacoplado del namespace global y endurece tenancy
+
+- Nace el namespace dedicado `GET/POST /api/agency/campaigns` con paridad de sub-routes para detalle, `360`, métricas, financials, roster y project links.
+- `Agency > Campañas` deja de depender directamente de `/api/campaigns` como contrato primario; ahora intenta primero el namespace Agency y conserva fallback legacy mientras dura la coexistencia.
+- `src/lib/campaigns/tenant-scope.ts` centraliza la resolución tenant-safe del dominio y corrige el drift que usaba `clientId` como si fuera `spaceId`.
+- Las rutas compartidas `src/app/api/campaigns/**` también quedan endurecidas: cuando falta `campaignScopes`, igual validan pertenencia por tenant/`space_id` antes de exponer detalle o sub-recursos.
+- El runtime multi-space para clientes deja de filtrar campañas en memoria y pasa a resolverlas con filtros SQL explícitos por `space_id`.
+
 ### 2026-04-17 — TASK-144: Agency Team queda servido por una API dedicada y un store canónico
 
 - Se agrega `src/lib/agency/team-capacity-store.ts` como store canónico para roster activo + assignments + placement metadata + overlay de `member_capacity_economics`, sin duplicar la lógica entre Team view y el tab de capacidad.

@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
 
-import { ROLE_CODES } from '@/config/role-codes'
-import { requireTenantContext } from '@/lib/tenant/authorization'
 import { updateCampaign } from '@/lib/campaigns/campaign-store'
 import { getCampaignForTenant } from '@/lib/campaigns/tenant-scope'
+import { requireAgencyTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +10,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ campaignId: string }> }
 ) {
-  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
+  const { tenant, errorResponse } = await requireAgencyTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -31,7 +30,7 @@ export async function GET(
 
     return NextResponse.json(access.campaign)
   } catch (error) {
-    console.error('GET /api/campaigns/[campaignId] failed:', error)
+    console.error('GET /api/agency/campaigns/[campaignId] failed:', error)
 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
@@ -44,14 +43,10 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ campaignId: string }> }
 ) {
-  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
+  const { tenant, errorResponse } = await requireAgencyTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  if (!tenant.routeGroups.includes('internal') && !tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   try {
@@ -75,7 +70,7 @@ export async function PATCH(
 
     return NextResponse.json(updated)
   } catch (error) {
-    console.error('PATCH /api/campaigns/[campaignId] failed:', error)
+    console.error('PATCH /api/agency/campaigns/[campaignId] failed:', error)
 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },

@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
 
-import { ROLE_CODES } from '@/config/role-codes'
-import { requireTenantContext } from '@/lib/tenant/authorization'
 import { removeProjectFromCampaign } from '@/lib/campaigns/campaign-store'
 import { getCampaignForTenant } from '@/lib/campaigns/tenant-scope'
+import { requireAgencyTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,14 +10,10 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ campaignId: string; linkId: string }> }
 ) {
-  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
+  const { tenant, errorResponse } = await requireAgencyTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  if (!tenant.routeGroups.includes('internal') && !tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   try {
@@ -37,7 +32,7 @@ export async function DELETE(
 
     return NextResponse.json({ deleted: true })
   } catch (error) {
-    console.error('DELETE /api/campaigns/[campaignId]/projects/[linkId] failed:', error)
+    console.error('DELETE /api/agency/campaigns/[campaignId]/projects/[linkId] failed:', error)
 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },

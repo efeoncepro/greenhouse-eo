@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
-import { getCampaign } from '@/lib/campaigns/campaign-store'
 import { getCampaignMetrics } from '@/lib/campaigns/campaign-metrics'
 import { getCampaign360 } from '@/lib/campaigns/campaign-extended'
+import { getCampaignForTenant } from '@/lib/campaigns/tenant-scope'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,15 +19,14 @@ export async function GET(
 
   try {
     const { campaignId } = await params
+    const access = await getCampaignForTenant({ tenant, campaignId })
 
-    if (tenant.campaignScopes.length > 0 && !tenant.campaignScopes.includes(campaignId)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (!access.ok && access.reason === 'not_found') {
+      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
     }
 
-    const campaign = await getCampaign(campaignId)
-
-    if (!campaign) {
-      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+    if (!access.ok) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const [metrics, extended] = await Promise.all([
@@ -36,7 +35,7 @@ export async function GET(
     ])
 
     return NextResponse.json({
-      campaign,
+      campaign: access.campaign,
       metrics,
       financials: extended.financials,
       team: extended.team,

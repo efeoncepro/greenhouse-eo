@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
 
-import { ROLE_CODES } from '@/config/role-codes'
-import { requireTenantContext } from '@/lib/tenant/authorization'
-import { updateCampaign } from '@/lib/campaigns/campaign-store'
+import { addProjectToCampaign, listCampaignProjects } from '@/lib/campaigns/campaign-store'
 import { getCampaignForTenant } from '@/lib/campaigns/tenant-scope'
+import { requireAgencyTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +10,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ campaignId: string }> }
 ) {
-  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
+  const { tenant, errorResponse } = await requireAgencyTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -29,9 +28,11 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    return NextResponse.json(access.campaign)
+    const projects = await listCampaignProjects(campaignId)
+
+    return NextResponse.json({ items: projects, total: projects.length })
   } catch (error) {
-    console.error('GET /api/campaigns/[campaignId] failed:', error)
+    console.error('GET /api/agency/campaigns/[campaignId]/projects failed:', error)
 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
@@ -40,23 +41,24 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+export async function POST(
   request: Request,
   { params }: { params: Promise<{ campaignId: string }> }
 ) {
-  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
+  const { tenant, errorResponse } = await requireAgencyTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!tenant.routeGroups.includes('internal') && !tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-
   try {
     const { campaignId } = await params
     const body = await request.json()
+
+    if (!body.projectSourceId) {
+      return NextResponse.json({ error: 'projectSourceId is required' }, { status: 400 })
+    }
+
     const access = await getCampaignForTenant({ tenant, campaignId })
 
     if (!access.ok && access.reason === 'not_found') {
@@ -67,15 +69,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const updated = await updateCampaign(campaignId, body)
+    const link = await addProjectToCampaign({
+      campaignId,
+      spaceId: access.campaign.spaceId,
+      projectSourceId: body.projectSourceId,
+      projectSourceSystem: body.projectSourceSystem
+    })
 
-    if (!updated) {
-      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+    return NextResponse.json(link, { status: 201 })
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('uq_campaign_project_space')) {
+      return NextResponse.json({ error: 'Este proyecto ya está vinculado a una campaña en este Space' }, { status: 409 })
     }
 
-    return NextResponse.json(updated)
-  } catch (error) {
-    console.error('PATCH /api/campaigns/[campaignId] failed:', error)
+    console.error('POST /api/agency/campaigns/[campaignId]/projects failed:', error)
 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },

@@ -1655,6 +1655,12 @@ Cada componente nuevo coexiste con el viejo hasta que se valida:
 | Inline capacity queries | `TeamCapacityStore` | Store encapsula queries existentes, misma data | Store validado con tests |
 | `/api/campaigns` (global) | `/api/agency/campaigns` | Proxy: nuevo delega al viejo | Viejo eliminado después de 30 días |
 
+Estado real 2026-04-17:
+
+- `GET/POST /api/agency/campaigns` y los sub-routes Agency ya existen como namespace dedicado para la surface `/agency/campaigns`.
+- `/api/campaigns/**` sigue vivo como runtime compartido de internal + client (`/campaigns`, `/campanas`) mientras dure la coexistencia.
+- La resolución tenant-safe de campañas debe hacerse por `space_id` real y subset `campaignScopes`; no por el atajo inválido `clientId -> spaceId`.
+
 ### Migration checklist por componente
 
 ```
