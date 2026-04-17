@@ -1,5 +1,14 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-17 — Nexa Insights gana vista Historial (timeline cross-period) sobre el mismo serving layer
+
+- Reader nuevo: `readAgencyAiLlmTimeline(limit=20)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` — SELECT sin filtro de período sobre `greenhouse_serving.ico_ai_signal_enrichments`, ordenado por `processed_at DESC`, status='succeeded' only
+- `readAgencyAiLlmSummary` fetchea current-period + timeline en paralelo (Promise.all) — sin impacto de latencia percibido
+- `AgencyAiLlmSummary.timeline: AgencyAiLlmSummaryItem[]` — extensión retrocompatible del contrato
+- UI: `NexaInsightsBlock` incorpora toggle Recientes/Historial (solo visible si hay timeline data); nueva `NexaInsightsTimeline.tsx` agrupa por día con MUI Lab Timeline
+- Superficies beneficiadas sin cambios adicionales: Agency tab=ico (vía `IcoAdvisoryBlock`). Home y 360 opt-in cuando el caller provea `timelineInsights`
+- Contrato advisory-only intacto: la vista Historial consume enrichments ya materializados, no reprocesa signals
+
 ## Delta 2026-04-17 — TASK-446 surfaces `rootCauseNarrative` end-to-end en Nexa Insights + Weekly Digest
 
 `TASK-446` cierra el gap dormido de la lane advisory: el LLM ya emitía `rootCauseNarrative` distinto de `explanationSummary` (ver prompt en `src/lib/ico-engine/ai/llm-types.ts:112-114`), la columna `root_cause_narrative` vivía en `greenhouse_serving.ico_ai_signal_enrichments` y `greenhouse_serving.finance_ai_signal_enrichments`, y además ya pasaba por `sanitizeProjectNarrative` antes del write. El reader la descartaba en todas las superficies.

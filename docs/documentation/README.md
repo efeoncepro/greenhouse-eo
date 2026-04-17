@@ -48,6 +48,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 - [Motor ICO — Metricas Operativas](delivery/motor-ico-metricas-operativas.md) — metricas operativas, materializacion diaria, cadena de fallback (Postgres/BQ/live), diagnostico
 - [Nexa Insights — Digest semanal para liderazgo](delivery/nexa-insights-digest-semanal.md) — resumen semanal interno por email con top insights ICO-first, audiencias, schedule, links al portal y limites del corte actual
+- [Nexa Insights — Bloque en Agency, Home y 360](delivery/nexa-insights-bloque-agency.md) — superficie dentro del portal con KPIs, lista de senales recientes y modo Historial (timeline cross-period). Explica el toggle, causa raiz colapsable y menciones clickeables
 
 ### Herramientas IA
 

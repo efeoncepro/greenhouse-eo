@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — Nexa Insights timeline (modo Historial) + root cause mapping fix
+
+- **Estado:** `complete`, `deployed a develop` (commit `f3d59422` + `91f66c3c`)
+- **Rama:** trabajo en ramas locales, push directo a develop (ver política de velocidad en modelo multi-agente)
+- **Problema resuelto:**
+  1. El toggle de vista "Ver causa raíz" no aparecía en `/agency?tab=ico` pese al merge de TASK-446 — tres mappers consumer olvidaban pasar `rootCauseNarrative` porque el field era opcional en el tipo
+  2. Usuarios veían solo N señales del período actual sin contexto histórico — no había forma de responder "¿es normal tener 2 insights esta semana?" sin salir a PG
+- **Implementado:**
+  - **Fix mapping (commit `91f66c3c`, PR #67):**
+    - `IcoAdvisoryBlock.tsx` ahora pasa `rootCauseNarrative` al mapear `AgencyAiLlmSummaryItem → NexaInsightItem`
+    - `get-home-snapshot.ts` + `HomeNexaInsightItem` incluyen el campo
+    - `NexaInsightItem.rootCauseNarrative` pasó de `?:string \| null` a `:string \| null` (required nullable) — TypeScript ahora flaggea cualquier futuro consumer que lo omita
+  - **Timeline feature (commit `f3d59422`, push directo):**
+    - Nuevo reader `readAgencyAiLlmTimeline(limit=20)` sin filtro de período
+    - `AgencyAiLlmSummary.timeline` extiende el contrato (fetched en paralelo con currentEnrichments)
+    - Nuevo componente `NexaInsightsTimeline.tsx` con MUI Lab Timeline agrupada por día, dots severity-coded, reuso de `NexaMentionText` + `NexaInsightRootCauseSection`
+    - `NexaInsightsBlock` incorpora `ToggleButtonGroup` Recientes/Historial (solo visible si hay timeline data, backward compatible)
+    - `IcoAdvisoryBlock` mapea timeline y lo pasa via `timelineInsights` prop
+    - Copy keys nuevas en `GH_NEXA`: `insights_view_mode_*`, `insights_timeline_*`
+- **Política de velocidad usada:** PR #67 siguió flujo completo (PR + CI + squash merge). Timeline feature se pusheó directo a develop tras local gates verdes (lint + tsc + test 1269 pass + build) — tiempo total ~5 min vs ~20 min del flujo PR. Ver `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` §Merge policy canónica.
+- **Validado:** `pnpm lint` ✓ · `pnpm tsc --noEmit` ✓ · `pnpm test` ✓ (1269 pass, 2 skipped) · `pnpm build` ✓
+- **Validado en staging:** Vercel deploy `f3d59422` live a `dev-greenhouse.efeoncepro.com` el 17 abr 12:17 UTC
+- **Impacto consumer:**
+  - `/agency?tab=ico` (vía `IcoAdvisoryBlock`) — toggle + timeline operativos
+  - Home, Space 360, Person 360 — mapping fix propaga `rootCauseNarrative` (visible el collapse "Ver causa raíz"). Timeline no aparece en esas surfaces aún (opt-in futuro — basta con pasar `timelineInsights` prop)
+  - Finance Dashboard — inherited del cast directo del JSON, sin cambios necesarios
+- **Archivos owned / tocados:**
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` (nuevo reader + parallel fetch)
+  - `src/lib/ico-engine/ai/llm-types.ts` (`timeline` en AgencyAiLlmSummary)
+  - `src/components/greenhouse/NexaInsightsTimeline.tsx` (nuevo)
+  - `src/components/greenhouse/NexaInsightsBlock.tsx` (toggle + render condicional + required `rootCauseNarrative`)
+  - `src/components/agency/IcoAdvisoryBlock.tsx` (mapping fix + timeline)
+  - `src/lib/home/get-home-snapshot.ts` + `src/types/home.ts` (mapping fix)
+  - `src/config/greenhouse-nomenclature.ts` (copy keys)
+  - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md` (delta)
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` (delta)
+- **Follow-ups opcionales:**
+  - Home / Space 360 / Person 360 podrían activar el toggle Historial — solo requiere que sus views pasen `timelineInsights` prop
+  - Preferencia de vista podría persistirse por usuario (actualmente es local al componente, se resetea al reload)
+  - Timeline podría ganar filtro por severidad / métrica si el operador lo pide
+
 ## Sesion 2026-04-17 — Multi-agent integration patterns documentados
 
 - **Estado:** `complete`, `PR abierta contra develop`

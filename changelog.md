@@ -2,6 +2,21 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — Nexa Insights gana modo Historial (timeline cross-period)
+
+- `NexaInsightsBlock` incorpora un toggle Recientes/Historial en su header. La vista Historial muestra las últimas 20 señales succeeded del sistema ordenadas cronológicamente y agrupadas por día ("Hoy", "Ayer", fecha absoluta).
+- Habilita responder la pregunta "¿cuántas señales tuvimos esta semana vs. el promedio?" sin salir del bloque — el operador ve la cadencia real sin consultar PG.
+- Backend: nuevo reader `readAgencyAiLlmTimeline(limit=20)` sin filtro de período. `readAgencyAiLlmSummary` fetchea current-period + timeline en paralelo (Promise.all) — sin latencia añadida.
+- UI: nuevo componente `NexaInsightsTimeline.tsx` con MUI Lab `Timeline`, severity dots, reuso de `NexaMentionText` y `NexaInsightRootCauseSection` para coherencia con vista Recientes.
+- El toggle solo aparece cuando `timelineInsights` viene con data (backward compatible). Modo default sigue siendo "Recientes" — sin regresión visual.
+- Surfaces beneficiadas: `/agency?tab=ico` vía `IcoAdvisoryBlock`. Home/360 pueden opt-in cuando el caller pase el prop.
+
+### 2026-04-17 — Nexa Insights: fix mapping para surface real de `rootCauseNarrative`
+
+- Tres mappers (`IcoAdvisoryBlock`, `get-home-snapshot`, `HomeNexaInsightItem`) no propagaban el campo `rootCauseNarrative` desde los readers canónicos a la UI. El bloque "Ver causa raíz" quedaba invisible en `/agency` y `/home` aunque la data estaba poblada (15/15 enrichments tenían el campo).
+- `NexaInsightItem.rootCauseNarrative` pasó de opcional a required nullable (`string | null`) para que TypeScript flaggee cualquier consumer futuro que lo omita.
+- Finance Dashboard ya funcionaba correcto porque hace cast directo del JSON API al tipo — no requirió fix.
+
 ### 2026-04-17 — Patrones multi-agente documentados en modelo operativo canónico
 
 - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` incorpora 4 secciones nuevas aprendidas en la sesión paralela Claude (TASK-446) + Codex (TASK-345):

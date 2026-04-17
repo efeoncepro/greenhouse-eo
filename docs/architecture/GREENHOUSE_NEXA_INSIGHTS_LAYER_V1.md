@@ -1,5 +1,34 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-17 — NexaInsightsBlock gana modo Historial (timeline) además de Recientes
+
+- Runtime activo:
+  - Nuevo reader `readAgencyAiLlmTimeline(limit=20)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` — ordena por `processed_at DESC`, filtra `status='succeeded'`, **no aplica filtro de período** (cross-period)
+  - `readAgencyAiLlmSummary` fetchea `recentEnrichments` + `timeline` en paralelo vía `Promise.all` — zero latency añadida al critical path
+  - `AgencyAiLlmSummary` extendido con `timeline: AgencyAiLlmSummaryItem[]`
+  - Nuevo componente `src/components/greenhouse/NexaInsightsTimeline.tsx` — MUI Lab `Timeline` agrupada por día con labels "Hoy"/"Ayer"/fecha, dots severity-coded (`critical=error`, `warning=warning`, `info=info`, `null=grey outlined`)
+  - `NexaInsightsBlock` incorpora `ToggleButtonGroup` (Recientes | Historial) que solo aparece cuando `timelineInsights` llega con data — backward compatible
+  - `IcoAdvisoryBlock` mapea `AgencyAiLlmSummary.timeline` → `NexaTimelineItem[]` y lo pasa via prop
+- Contrato operativo:
+  - Timeline es cross-period e incluye últimas 20 señales succeeded del sistema — responde la pregunta "¿cuántas señales ha habido esta semana/mes?" sin salir del bloque
+  - Modo default sigue siendo "Recientes" (período actual) — sin regresión visual para usuarios que no accionan el toggle
+  - Cada item del timeline reutiliza `NexaMentionText` para chips clickeables y `NexaInsightRootCauseSection` para causa raíz — coherencia total con vista Recientes
+  - Severidad nunca se comunica solo por color: chip textual + dot color redundantes (WCAG 2.2 AA)
+  - Keyboard: Tab al toggle, Enter/Space activa; ARIA `role="region"` + `aria-label` en timeline
+  - Preferencia de vista es local al componente (no persistida) — el operador elige por sesión
+
+## Delta 2026-04-17 — TASK-446 expone `rootCauseNarrative` end-to-end en UI, Weekly Digest y API
+
+- Runtime activo:
+  - El campo `root_cause_narrative` (ya generado y persistido desde `ico_signal_enrichment_v4` / `finance_signal_enrichment_v1`) ahora fluye por los 7 readers del serving layer a la UI
+  - `NexaInsightsBlock` renderiza sección colapsable "Causa raíz" via `NexaInsightRootCauseSection.tsx` con localStorage global `nexa.insights.rootCause.expanded`, ARIA completo y keyboard nav
+  - Weekly Executive Digest incluye bloque "Causa probable" con left border `EMAIL_COLORS.primary` cuando el campo viene poblado
+  - Mappers consumer (`IcoAdvisoryBlock`, `get-home-snapshot`, `HomeNexaInsightItem`) propagan el campo; `NexaInsightItem.rootCauseNarrative` pasó de opcional a required nullable para que TypeScript flaggee futuros consumers que lo olviden
+- Contrato operativo:
+  - Sin cambios al prompt ni a las tablas (la columna existía); el cambio es puramente de surfacing
+  - Enrichments antiguos sin el campo no rompen la UI: la sección no renderiza y el digest omite el bloque
+  - Funcionalmente separa "qué pasó" (explanation), "por qué" (rootCauseNarrative), "qué hacer" (recommendedAction) — contrato canónico que los consumers ya pueden asumir vigente
+
 ## Delta 2026-04-17 — TASK-440 corrige labels técnicos de proyecto en Home, Space 360 y Person 360 sin abrir surfaces nuevas
 
 - Runtime activo:
