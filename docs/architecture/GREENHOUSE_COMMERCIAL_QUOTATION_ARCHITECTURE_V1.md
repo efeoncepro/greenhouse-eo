@@ -1,10 +1,94 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.5
+> **Version:** 2.6
 > **Created:** 2026-04-09
-> **Updated:** 2026-04-17 — v2.5: TASK-348 governance runtime (approvals, versions, audit trail, terms library, templates) live. Added 7 tablas en `greenhouse_commercial`, 4 nuevos eventos outbox (`version_created`, `approval_requested`, `approval_decided`, `template_used/saved`), API extensions bajo `/api/finance/quotes/[id]/*` y `/api/finance/quotation-governance/*`, pestañas de gobernanza en QuoteDetailView.
+> **Updated:** 2026-04-17 — v2.6: TASK-349 workspace UI + PDF delivery. Nueva experiencia de creación canónica (QuoteCreateDrawer con modos "Desde cero" / "Desde template"), editor inline de line items, health card en detalle, dialogs de Send y Save-as-Template, endpoints nuevos `/send`, `/pdf`, `/save-as-template`, extensión del POST `/quotes` para aceptar `templateId`, render de PDF client-safe via `@react-pdf/renderer` con firewall explícito contra costos/márgenes.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-17 — TASK-349 Workspace UI + PDF Delivery
+
+### UI surface consolidada
+
+- **Ruta canónica sigue siendo** `/finance/quotes`. No se abrió workspace comercial separado — spec Open Question resuelta: la fachada Finance permanece como entrypoint único; la experiencia comercial vive debajo vía tabs y drawers.
+- **QuotesListView** ahora muestra columna **Versión** (vN si current_version > 1) y columna **Margen** (chip verde/ámbar/rojo según `effective_margin_pct` vs `margin_floor_pct` / `target_margin_pct`). Dos botones de creación:
+  - "Nueva cotización" (primary) → `QuoteCreateDrawer` canónico (POST `/api/finance/quotes`).
+  - "HubSpot" (secondary) → drawer legacy que publica directo a HubSpot vía `/api/finance/quotes/hubspot`.
+- **QuoteDetailView** en tab `General` incorpora `QuoteHealthCard` (margen efectivo + target + piso + descuento + alertas) en la parte superior. Header ahora expone botones "PDF", "Guardar como template" (draft only) y "Enviar" (draft | pending_approval | approved) según permisos y status.
+
+### Componentes nuevos en `src/views/greenhouse/finance/workspace/`
+
+| Componente | Responsabilidad |
+|---|---|
+| `QuoteCreateDrawer` | Drawer lateral 560px con toggle "Desde cero" / "Desde template". Precarga currency/billing/pricingModel desde el template seleccionado. Envía payload extendido al POST `/api/finance/quotes`. |
+| `QuoteLineItemsEditor` | Editor inline de line items (habilitado solo si status=draft y canEdit). Read-only si editable=false. Soporta agregar/eliminar filas, subtotales preview local, guardar/descartar. |
+| `QuoteHealthCard` | Tarjeta de salud de margen. Muestra chip (Óptimo/Atención/Crítico/Sin datos), breakdown target/piso/descuento, lista de alertas MUI `Alert`, y CTA "Solicitar aprobación" cuando hay alerta `requiredApproval='finance'`. |
+| `QuoteSendDialog` | Confirm dialog context-aware: distingue `needs_approval`, `approval_in_progress`, `ready`, `blocked`. Muestra health + steps pendientes + alertas. Disabled en estados bloqueantes. |
+| `QuoteSaveAsTemplateDialog` | Dialog con templateName (≥4 chars) + templateCode (pattern `^[A-Z0-9\-]+$`, auto-uppercase) + description opcional. |
+
+### Endpoints nuevos
+
+| Método | Ruta | Responsabilidad |
+|---|---|---|
+| `GET` | `/api/finance/quotes/[id]/pdf` | Render client-safe del PDF usando `@react-pdf/renderer`. Excluye `unit_cost`, `subtotal_cost`, `margin_pct`, `effective_margin_pct`, `cost_breakdown`, metadata de approvals. `?download=1` cambia `Content-Disposition` de `inline` a `attachment`. Registra `pdf_generated` en audit_log (sin outbox event — es señal interna). |
+| `POST` | `/api/finance/quotes/[id]/send` | Transiciona `draft → sent` (directo si health OK) o `draft → pending_approval` (si health requiere aprobación; crea approval_steps). Bloquea transiciones desde `sent`/`approved`/`pending_approval`/`rejected`/`converted`/`expired` con 409. Emite `commercial.quotation.sent` o `commercial.quotation.approval_requested` según corresponda. Actualiza `sent_at`. |
+| `POST` | `/api/finance/quotes/[id]/save-as-template` | Crea template en `greenhouse_commercial.quote_templates` desde la quote actual: copia pricing_model, currency, billing_frequency, payment_terms, contract_duration; mapea current-version line items a `quote_template_items` (strip `member_id`, keep role_code); extrae `default_term_ids` de `quotation_terms` con `included=true`. Emite `commercial.quotation.template_saved`. |
+
+### POST `/api/finance/quotes` extendido
+
+Acepta opcional `templateId`. Cuando está presente:
+1. Llama `recordTemplateUsage(templateId)` (increment `usage_count`, update `last_used_at`).
+2. Defaults heredados del template: `currency`, `billingFrequency`, `pricingModel`, `contractDurationMonths`, `businessLineCode` (los valores del body sobrescriben).
+3. Si `body.lineItems` está vacío → genera desde `template.items`.
+4. Después del pricing snapshot, llama `seedQuotationDefaultTerms` con los `default_term_ids` del template.
+5. Emite `commercial.quotation.template_used`.
+
+Comportamiento idéntico al anterior cuando `templateId` es null/undefined.
+
+### PDF Pipeline (client-safe)
+
+- **Renderer:** `@react-pdf/renderer@4.3.2` en Node runtime vía `renderToBuffer`. No requiere Puppeteer ni headless Chrome.
+- **Documento:** `src/lib/finance/pdf/quotation-pdf-document.tsx` usa `Document`, `Page`, `View`, `Text`, `StyleSheet`. Paleta: azul Greenhouse `#0375DB` primario, gris `#6E6B7B` secundario. Fallback Helvetica cuando Poppins no está disponible server-side.
+- **Input contract (`src/lib/finance/pdf/contracts.ts`):** solo acepta campos externamente-seguros (`label`, `description`, `quantity`, `unitPrice`, `subtotalAfterDiscount`). El tipo en sí excluye costos/márgenes — **firewall a nivel TypeScript**. Si un caller intenta inyectar costos, TS falla en compilación.
+- **Layout:** Header (Efeonce + numeroQuote · versión · fecha · válida hasta) → Cliente → Tabla line items (7 columnas client-safe) → Totales (subtotal / descuento / total) → Términos opcionales → Footer (datos fiscales + timestamp).
+- **Audit:** cada render emite `pdf_generated` a `greenhouse_commercial.quotation_audit_log` con `{ versionNumber, downloadMode, fileName }` en details.
+
+### Compatibilidad quote heredadas multi-source
+
+- Quotes con `source_system ∈ {nubox, hubspot}` se muestran con el mismo shell — el chip "Fuente" indica origen.
+- Quotes sin `effective_margin_pct` (típico de ingestas legacy) renderean `QuoteHealthCard` en modo muted "Aún sin margen calculado".
+- El PDF funciona para cualquier quote con `current_version` y `quotation_line_items`; no requiere pricing config completa.
+
+### Archivos tocados
+
+- `src/lib/finance/pdf/contracts.ts` (nuevo)
+- `src/lib/finance/pdf/quotation-pdf-document.tsx` (nuevo)
+- `src/lib/finance/pdf/render-quotation-pdf.ts` (nuevo)
+- `src/app/api/finance/quotes/[id]/pdf/route.ts` (nuevo)
+- `src/app/api/finance/quotes/[id]/send/route.ts` (nuevo)
+- `src/app/api/finance/quotes/[id]/save-as-template/route.ts` (nuevo)
+- `src/app/api/finance/quotes/route.ts` (POST extendido)
+- `src/lib/finance/quotation-canonical-store.ts` (list row incluye `current_version` + margen para badges)
+- `src/views/greenhouse/finance/workspace/` (5 componentes nuevos)
+- `src/views/greenhouse/finance/QuotesListView.tsx` (columnas + canonical drawer wiring)
+- `src/views/greenhouse/finance/QuoteDetailView.tsx` (health card + action buttons + dialogs)
+
+### Verificación
+
+- tsc strict, lint, test (1337 passed), build ✓.
+- Smoke E2E staging-equivalent contra dev DB:
+  - `GET /api/finance/quotes/{id}/pdf` → HTTP 200, `application/pdf` 3665 bytes, PDF 1.3 1 página.
+  - `POST /api/finance/quotes/{id}/send` → HTTP 200, `{ sent: true, newStatus: 'sent', health }`.
+- Observacional: auditoría registra `pdf_generated` y `sent` con actor + version.
+
+### Follow-ups explícitos
+
+- Email dispatch del PDF al cliente (consumer reactivo sobre `commercial.quotation.sent` con attachment) — queda para iteración posterior.
+- PDF multi-página cuando line items > 30 (actual caso: la page única se ajusta automáticamente por el flex del renderer; con volumen real puede requerir pagination explícita).
+- Font embedding de Poppins/DM Sans server-side (ahora fallback a Helvetica; cosmético).
+- Analytics de uso del workspace.
 
 ---
 

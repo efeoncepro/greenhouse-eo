@@ -23,6 +23,10 @@ type CanonicalQuoteListRow = {
   source_system: string | null
   hubspot_quote_id: string | null
   hubspot_deal_id: string | null
+  current_version: number | null
+  effective_margin_pct: string | number | null
+  margin_floor_pct: string | number | null
+  target_margin_pct: string | number | null
 }
 
 type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
@@ -194,7 +198,11 @@ export const listFinanceQuotesFromCanonical = async ({
        q.nubox_document_id,
        q.source_system,
        q.hubspot_quote_id,
-       q.hubspot_deal_id
+       q.hubspot_deal_id,
+       q.current_version,
+       q.effective_margin_pct,
+       q.margin_floor_pct,
+       q.target_margin_pct
      FROM greenhouse_commercial.quotations q
      LEFT JOIN greenhouse_core.organizations org
        ON org.organization_id = q.organization_id
@@ -1000,7 +1008,11 @@ export const mapCanonicalQuoteListRow = (row: CanonicalQuoteListRow) => ({
   source: String(row.source_system || 'manual'),
   hubspotQuoteId: row.hubspot_quote_id ? String(row.hubspot_quote_id) : null,
   hubspotDealId: row.hubspot_deal_id ? String(row.hubspot_deal_id) : null,
-  isFromNubox: Boolean(row.nubox_document_id)
+  isFromNubox: Boolean(row.nubox_document_id),
+  currentVersion: row.current_version !== null && row.current_version !== undefined ? Number(row.current_version) : null,
+  effectiveMarginPct: row.effective_margin_pct !== null && row.effective_margin_pct !== undefined ? Number(row.effective_margin_pct) : null,
+  marginFloorPct: row.margin_floor_pct !== null && row.margin_floor_pct !== undefined ? Number(row.margin_floor_pct) : null,
+  targetMarginPct: row.target_margin_pct !== null && row.target_margin_pct !== undefined ? Number(row.target_margin_pct) : null
 })
 
 export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { legacy_status?: string | null }) => ({

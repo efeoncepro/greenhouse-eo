@@ -398,7 +398,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-346` | `to-do` | Quotation Pricing, Costing & Margin Health Core | `docs/tasks/to-do/TASK-346-quotation-pricing-costing-margin-health-core.md` |
 | `TASK-347` | `to-do` | Quotation Catalog & HubSpot Canonical Bridge | `docs/tasks/to-do/TASK-347-quotation-catalog-hubspot-canonical-bridge.md` |
 | `TASK-348` | `to-do` | Quotation Governance Runtime: Approvals, Versions, Templates & Audit | `docs/tasks/to-do/TASK-348-quotation-governance-runtime-approvals-versions-templates.md` |
-| `TASK-349` | `to-do` | Quotation Workspace UI & PDF Delivery | `docs/tasks/to-do/TASK-349-quotation-workspace-ui-pdf-delivery.md` |
+| `TASK-349` | `complete` | Quotation Workspace UI & PDF Delivery | `docs/tasks/complete/TASK-349-quotation-workspace-ui-pdf-delivery.md` |
 | `TASK-350` | `to-do` | Quotation-to-Cash Document Chain Bridge | `docs/tasks/to-do/TASK-350-quotation-to-cash-document-chain-bridge.md` |
 | `TASK-351` | `to-do` | Quotation Intelligence Automation: Pipeline, Renewals & Profitability | `docs/tasks/to-do/TASK-351-quotation-intelligence-automation-pipeline-renewals-profitability.md` |
 | `TASK-352` | `to-do` | Hiring / ATS Canonical Program | `docs/tasks/to-do/TASK-352-hiring-ats-canonical-program.md` |

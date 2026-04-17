@@ -26,6 +26,8 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import QuoteCreateDrawer from './workspace/QuoteCreateDrawer'
+
 // ── Types ──
 
 interface Quote {
@@ -42,6 +44,10 @@ interface Quote {
   source: string
   hubspotQuoteId: string | null
   isFromNubox: boolean
+  currentVersion: number | null
+  effectiveMarginPct: number | null
+  marginFloorPct: number | null
+  targetMarginPct: number | null
 }
 
 interface LineItemInput {
@@ -61,9 +67,11 @@ interface ProductOption {
 
 // ── Status config ──
 
-const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'primary' | 'secondary' }> = {
+const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'primary' | 'secondary' | 'warning' }> = {
   draft: { label: 'Borrador', color: 'secondary' },
+  pending_approval: { label: 'En aprobación', color: 'warning' },
   sent: { label: 'Enviada', color: 'info' },
+  approved: { label: 'Aprobada', color: 'success' },
   accepted: { label: 'Aceptada', color: 'success' },
   rejected: { label: 'Rechazada', color: 'error' },
   expired: { label: 'Vencida', color: 'secondary' },
@@ -73,8 +81,9 @@ const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' |
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
   { value: 'draft', label: 'Borradores' },
+  { value: 'pending_approval', label: 'En aprobación' },
   { value: 'sent', label: 'Enviadas' },
-  { value: 'accepted', label: 'Aceptadas' },
+  { value: 'approved', label: 'Aprobadas' },
   { value: 'rejected', label: 'Rechazadas' },
   { value: 'expired', label: 'Vencidas' },
   { value: 'converted', label: 'Facturadas' }
@@ -398,13 +407,47 @@ const CreateQuoteDrawer = ({
 
 // ── Component ──
 
+interface TemplateOption {
+  templateId: string
+  templateName: string
+  templateCode: string
+  pricingModel: 'staff_aug' | 'retainer' | 'project'
+  businessLineCode: string | null
+  usageCount: number
+  defaults: {
+    currency: string
+    billingFrequency: string
+    paymentTermsDays: number
+    contractDurationMonths: number | null
+  }
+}
+
+interface OrganizationOption {
+  organizationId: string
+  organizationName: string
+}
+
+const marginChipColor = (effective: number | null, floor: number | null, target: number | null):
+  'success' | 'warning' | 'error' | 'secondary' => {
+  if (effective === null) return 'secondary'
+  if (floor !== null && effective < floor) return 'error'
+  if (target !== null && effective < target) return 'warning'
+
+  return 'success'
+}
+
 const QuotesListView = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Quote[]>([])
   const [statusFilter, setStatusFilter] = useState('')
   const [sourceFilter, setSourceFilter] = useState('')
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [hubspotDrawerOpen, setHubspotDrawerOpen] = useState(false)
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
+  const [templates, setTemplates] = useState<TemplateOption[]>([])
+  const [organizations, setOrganizations] = useState<OrganizationOption[]>([])
+  const [creating, setCreating] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true)
@@ -431,6 +474,109 @@ const QuotesListView = () => {
     fetchQuotes()
   }, [fetchQuotes])
 
+  const openCreateDrawer = useCallback(async () => {
+    setCreateError(null)
+
+    try {
+      const [tplRes, orgRes] = await Promise.all([
+        fetch('/api/finance/quotation-governance/templates'),
+        fetch('/api/organizations?active=true&limit=200').catch(() => null)
+      ])
+
+      if (tplRes.ok) {
+        const data = await tplRes.json()
+
+        setTemplates(
+          (data.items ?? []).map((t: Record<string, unknown>) => ({
+            templateId: String(t.templateId),
+            templateName: String(t.templateName),
+            templateCode: String(t.templateCode),
+            pricingModel: (t.pricingModel as 'staff_aug' | 'retainer' | 'project') ?? 'project',
+            businessLineCode: t.businessLineCode ? String(t.businessLineCode) : null,
+            usageCount: Number(t.usageCount ?? 0),
+            defaults: {
+              currency: String(t.defaultCurrency ?? 'CLP'),
+              billingFrequency: String(t.defaultBillingFrequency ?? 'monthly'),
+              paymentTermsDays: Number(t.defaultPaymentTermsDays ?? 30),
+              contractDurationMonths:
+                t.defaultContractDurationMonths !== null && t.defaultContractDurationMonths !== undefined
+                  ? Number(t.defaultContractDurationMonths)
+                  : null
+            }
+          }))
+        )
+      }
+
+      if (orgRes && orgRes.ok) {
+        const data = await orgRes.json()
+
+        setOrganizations(
+          (data.items ?? []).map((o: Record<string, unknown>) => ({
+            organizationId: String(o.organizationId ?? o.organization_id),
+            organizationName: String(o.organizationName ?? o.organization_name ?? o.name ?? 'Sin nombre')
+          }))
+        )
+      }
+    } catch {
+      // Silent fallback — drawer still opens with empty org/template lists
+    }
+
+    setCreateDrawerOpen(true)
+  }, [])
+
+  const handleCreateQuote = useCallback(
+    async (payload: Parameters<React.ComponentProps<typeof QuoteCreateDrawer>['onSubmit']>[0]) => {
+      setCreating(true)
+      setCreateError(null)
+
+      try {
+        const res = await fetch('/api/finance/quotes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            templateId: payload.templateId,
+            organizationId: payload.organizationId,
+            description: payload.description,
+            pricingModel: payload.pricingModel,
+            currency: payload.currency,
+            billingFrequency: payload.billingFrequency,
+            contractDurationMonths: payload.contractDurationMonths,
+            validUntil: payload.validUntil,
+            lineItems: payload.lineItems.map(li => ({
+              label: li.label,
+              lineType: 'deliverable' as const,
+              unit: li.unit,
+              quantity: li.quantity,
+              unitPrice: li.unitPrice
+            }))
+          })
+        })
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+
+          setCreateError(body.error || 'No pudimos crear la cotización.')
+
+          return
+        }
+
+        const created = await res.json()
+
+        setCreateDrawerOpen(false)
+        await fetchQuotes()
+
+        if (created.quotationId) {
+          router.push(`/finance/quotes/${created.quotationId}`)
+        }
+      } catch {
+        setCreateError('Error de conexión. Intenta de nuevo.')
+      } finally {
+        setCreating(false)
+      }
+    },
+    [fetchQuotes, router]
+  )
+
   if (loading) {
     return (
       <Stack spacing={4}>
@@ -449,13 +595,22 @@ const QuotesListView = () => {
             Cotizaciones sincronizadas desde Nubox y HubSpot
           </Typography>
         </Box>
-        <Button
-          variant='contained'
-          startIcon={<i className='tabler-plus' />}
-          onClick={() => setDrawerOpen(true)}
-        >
-          Nueva cotizacion HubSpot
-        </Button>
+        <Stack direction='row' spacing={1}>
+          <Button
+            variant='outlined'
+            startIcon={<i className='tabler-brand-hubspot' />}
+            onClick={() => setHubspotDrawerOpen(true)}
+          >
+            HubSpot
+          </Button>
+          <Button
+            variant='contained'
+            startIcon={<i className='tabler-plus' />}
+            onClick={openCreateDrawer}
+          >
+            Nueva cotización
+          </Button>
+        </Stack>
       </Box>
 
       <Card variant='outlined'>
@@ -516,6 +671,8 @@ const QuotesListView = () => {
                   <TableCell>Fecha</TableCell>
                   <TableCell>Vencimiento</TableCell>
                   <TableCell align='right'>Monto</TableCell>
+                  <TableCell>Versión</TableCell>
+                  <TableCell>Margen</TableCell>
                   <TableCell>Estado</TableCell>
                   <TableCell>Fuente</TableCell>
                 </TableRow>
@@ -524,6 +681,7 @@ const QuotesListView = () => {
                 {items.map(q => {
                   const statusConf = STATUS_CONFIG[q.status] ?? STATUS_CONFIG.draft
                   const sourceConf = SOURCE_CHIP_CONFIG[q.source] ?? SOURCE_CHIP_CONFIG.manual
+                  const marginColor = marginChipColor(q.effectiveMarginPct, q.marginFloorPct, q.targetMarginPct)
 
                   return (
                     <TableRow key={q.quoteId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/quotes/${q.quoteId}`)}>
@@ -545,6 +703,20 @@ const QuotesListView = () => {
                         <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(q.totalAmountClp)}</Typography>
                       </TableCell>
                       <TableCell>
+                        {q.currentVersion && q.currentVersion > 1 ? (
+                          <CustomChip round='true' size='small' variant='outlined' color='secondary' label={`v${q.currentVersion}`} />
+                        ) : (
+                          <Typography variant='caption' color='text.secondary'>v1</Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {q.effectiveMarginPct !== null ? (
+                          <CustomChip round='true' size='small' variant='tonal' color={marginColor} label={`${q.effectiveMarginPct.toFixed(1)}%`} />
+                        ) : (
+                          <Typography variant='caption' color='text.secondary'>—</Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <CustomChip round='true' size='small' variant='tonal' color={statusConf.color} label={statusConf.label} />
                       </TableCell>
                       <TableCell>
@@ -560,9 +732,19 @@ const QuotesListView = () => {
       </Card>
 
       <CreateQuoteDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={hubspotDrawerOpen}
+        onClose={() => setHubspotDrawerOpen(false)}
         onCreated={fetchQuotes}
+      />
+
+      <QuoteCreateDrawer
+        open={createDrawerOpen}
+        submitting={creating}
+        error={createError}
+        templates={templates}
+        organizations={organizations}
+        onClose={() => setCreateDrawerOpen(false)}
+        onSubmit={handleCreateQuote}
       />
     </Stack>
   )

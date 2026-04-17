@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-349 Quotation Workspace UI + PDF Delivery
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-349-quotation-workspace-ui-pdf-delivery`
+- **Dependencias:** TASK-345 (schema canónico), TASK-346 (pricing engine), TASK-347 (HubSpot bridge), TASK-348 (governance runtime) — todas mergeadas a develop.
+- **Entregado:**
+  - **UI workspace** (`src/views/greenhouse/finance/workspace/`):
+    - `QuoteCreateDrawer.tsx` — drawer lateral con toggle "Desde cero" / "Desde template". Precarga defaults del template seleccionado. Primary action en QuotesListView.
+    - `QuoteLineItemsEditor.tsx` — editor inline con product picker, add/remove, subtotales preview local, guardar/descartar. Read-only cuando el status no permite edición.
+    - `QuoteHealthCard.tsx` — card con margen efectivo + target + piso + chip (Óptimo/Atención/Crítico) + alertas MUI + CTA "Solicitar aprobación".
+    - `QuoteSendDialog.tsx` — dialog contextual (needs_approval / approval_in_progress / ready / blocked).
+    - `QuoteSaveAsTemplateDialog.tsx` — dialog con templateName + templateCode (auto-uppercase) + description.
+  - **Endpoints nuevos:**
+    - `GET /api/finance/quotes/[id]/pdf` — renderiza PDF client-safe via `@react-pdf/renderer`. `?download=1` cambia a attachment. Registra `pdf_generated` en audit_log (no outbox). Input contract TS excluye cost/margin/cost_breakdown — firewall estructural.
+    - `POST /api/finance/quotes/[id]/send` — transiciona draft → sent directo si health OK, o draft → pending_approval si requiere aprobación (crea approval_steps). 409 en transiciones inválidas.
+    - `POST /api/finance/quotes/[id]/save-as-template` — copia current-version line items (strip `member_id`), extrae term_ids, crea quote_templates + quote_template_items. Emite `commercial.quotation.template_saved`.
+  - **POST `/api/finance/quotes` extendido:** acepta `templateId` opcional → llama `recordTemplateUsage`, hereda defaults (currency/billingFrequency/pricingModel/contractDurationMonths/businessLineCode), genera line items desde template si body vacío, siembra terms vía `seedQuotationDefaultTerms`, emite `publishTemplateUsed`.
+  - **QuotesListView:** columnas nuevas Versión (chip vN si >1) + Margen (chip verde/ámbar/rojo vs floor/target). Status config extendida con `pending_approval`/`approved`. Dos botones de creación.
+  - **QuoteDetailView:** `QuoteHealthCard` en General tab arriba de las KPIs. Action buttons en header: PDF, Guardar como template (draft), Enviar (draft|pending_approval|approved). Dialogs de send y save-as-template al pie. Mensaje de éxito de acciones.
+  - **PDF document + render helper:** `src/lib/finance/pdf/{contracts,quotation-pdf-document,render-quotation-pdf}.{ts,tsx}`. Azul Greenhouse `#0375DB`. Helvetica fallback server-side. Layout: header → cliente → table line items client-safe (7 cols) → totales → términos → footer fiscal.
+  - **List row mapping extendido:** `current_version`, `effective_margin_pct`, `margin_floor_pct`, `target_margin_pct` en la response para habilitar badges.
+- **Validado:**
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm test` 1337 passed
+  - `pnpm build` ✓
+  - Smoke E2E contra dev server + agent auth: PDF 200 + application/pdf 3665 bytes 1 página. `/send` 200 `{ sent:true, newStatus:'sent', health }`.
+- **Decisiones notables:**
+  - Ruta canónica sigue en `/finance/quotes`. No se abrió workspace comercial separado — Open Question resuelta.
+  - HubSpot drawer legacy conservado como acción secundaria; primary es el canonical drawer.
+  - PDF input contract **excluye cost/margin a nivel tipos**, no solo runtime: cualquier intento de pasar costo falla en tsc.
+  - Save-as-template strip `member_id` (templates role-based).
+- **Follow-ups (out of scope):**
+  - Email dispatch del PDF como consumer reactivo sobre `commercial.quotation.sent`.
+  - PDF multi-página / font embedding (cosmético).
+  - Analytics del workspace.
+
 ## Sesion 2026-04-17 — TASK-451 Password hash mutation guardrails (cierra ISSUE-053)
 
 - **Estado:** `complete`, entregado.
