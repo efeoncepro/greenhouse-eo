@@ -87,6 +87,10 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - cambio supuestos del proyecto
 - Si dos agentes pueden tocar la misma zona, prevalece el ultimo handoff documentado, no la memoria conversacional.
 - Si otro agente ya esta trabajando en el workspace actual y hace falta otra rama, **no cambiar la rama de ese checkout**; abrir un `git worktree` aislado. Fuente canonica: `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.
+- Cuando tomes un worktree pre-existente, NO correr `pnpm install` a ciegas. Verificar primero lockfile md5 vs `main`; reutilizar `node_modules`, y symlinkear `.env.local` / `.vercel/` si no existen. Detalle: [Higiene de worktree preexistente](docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md#higiene-de-worktree-preexistente).
+- Cuando dos PRs vayan a `develop` en paralelo, usar `git rebase --onto origin/develop <other-agent-commit>` para separar scope y `git push --force-with-lease` (nunca `--force` solo). Detalle: [Patrones de integración multi-agente](docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md#patrones-de-integración-multi-agente).
+- Si tu PR falla CI por un test que no tocaste, **no hacer admin override**. Triage: correr `pnpm test:coverage` local y revisar los últimos runs de `develop`. Si el flake es heredado, abrir `ISSUE-###` + PR separada de fix → merge → rebase tu PR original. Detalle: [CI como gate compartido](docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md#ci-como-gate-compartido).
+- Merge a `develop` es siempre **squash merge + delete branch**. `develop` no tiene branch protection, entonces `gh pr merge --auto` no funciona — usar background watcher (`until CI completed; gh pr merge --squash --delete-branch`). Detalle: [Merge policy canónica](docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md#merge-policy-canónica).
 
 ### 4. Regla de cambios minimos
 
