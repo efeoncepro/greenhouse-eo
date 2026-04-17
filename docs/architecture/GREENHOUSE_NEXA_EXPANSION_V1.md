@@ -174,18 +174,24 @@ Reglas:
 
 ### Programa inicial (tasks creadas)
 
+**Core (priorizar):**
 - `TASK-432` — Client Portal Nexa Pulse (Eje 2, valor comercial)
 - `TASK-433` — Payroll Signal Engine (Eje 1, valor operativo mensual)
 - `TASK-434` — Staff Augmentation Signal Engine (Eje 1, revenue protection)
 - `TASK-435` — Nexa Actionable Insights / CTA Contract (Eje 3, multiplicador)
 - `TASK-436` — Nexa Critical Push Distribution (Eje 3, multiplicador de alcance)
 
-### Follow-ons (a crear cuando el core esté operativo)
+**Capacidades avanzadas (requieren core maduro):**
+- `TASK-437` — Cross-Domain Causality Engine (diferenciador técnico; requiere TASK-432+433+434)
+- `TASK-438` — Contextual Chat Per Domain (copilot por surface; extiende TASK-110 Slice 2)
+- `TASK-439` — Daily Role-Based Briefing (complemento del weekly digest, action-oriented)
 
-- Cross-domain causality engine
-- Contextual chat per domain (extension de TASK-110)
-- Daily role-based briefing (complemento del weekly digest)
+### Follow-ons aún no tasked
+
 - Capacity Signal Engine (Tier 2 ya mencionado en el roadmap base)
+- Response interactiva al push Slack/Teams (Interactive Components)
+- Memoria cross-thread del usuario (RAG sobre historial)
+- Cliente-facing push (canales compartidos con cliente externo) — requiere decisión de producto
 
 ## Métricas de éxito
 

@@ -481,3 +481,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-429` | `to-do` | Locale-Aware Formatting Utilities — child de TASK-266 | `docs/tasks/to-do/TASK-429-locale-aware-formatting-utilities.md` |
 | `TASK-430` | `to-do` | Dictionary Foundation Activation — child de TASK-266 | `docs/tasks/to-do/TASK-430-dictionary-foundation-activation.md` |
 | `TASK-431` | `to-do` | Tenant + User Locale Persistence Model — child de TASK-266 | `docs/tasks/to-do/TASK-431-tenant-user-locale-persistence.md` |
+| `TASK-432` | `to-do` | Client Portal Nexa Pulse (Client-Facing Insights) | `docs/tasks/to-do/TASK-432-client-portal-nexa-pulse.md` |
+| `TASK-433` | `to-do` | Payroll Signal Engine | `docs/tasks/to-do/TASK-433-payroll-signal-engine.md` |
+| `TASK-434` | `to-do` | Staff Augmentation Assignment Economics Signal Engine | `docs/tasks/to-do/TASK-434-staff-augmentation-signal-engine.md` |
+| `TASK-435` | `to-do` | Nexa Actionable Insights (CTA Contract) | `docs/tasks/to-do/TASK-435-nexa-actionable-insights-cta-contract.md` |
+| `TASK-436` | `to-do` | Nexa Critical Push Distribution (Slack / Teams) | `docs/tasks/to-do/TASK-436-nexa-critical-push-distribution.md` |
+| `TASK-437` | `to-do` | Nexa Cross-Domain Causality Engine | `docs/tasks/to-do/TASK-437-nexa-cross-domain-causality.md` |
+| `TASK-438` | `to-do` | Nexa Contextual Chat Per Domain (Copilot by Surface) | `docs/tasks/to-do/TASK-438-nexa-contextual-chat-per-domain.md` |
+| `TASK-439` | `to-do` | Nexa Daily Role-Based Briefing | `docs/tasks/to-do/TASK-439-nexa-daily-role-based-briefing.md` |
