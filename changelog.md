@@ -2,6 +2,15 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — Quotation gana gobernanza enterprise: versiones, aprobaciones, términos, templates y audit
+
+- TASK-348 entrega 7 tablas nuevas en `greenhouse_commercial` (`approval_policies`, `approval_steps`, `quotation_audit_log`, `terms_library`, `quotation_terms`, `quote_templates`, `quote_template_items`) vía `20260417140553325_task-348-quotation-governance-runtime.sql`.
+- Approval por excepción conectado al discount health de TASK-346: al intentar enviar, se evalúan las policies activas y se crean steps en orden; el Account Lead sólo necesita aprobación cuando margen/monto/descuento disparan una regla.
+- Nuevas versiones clonan line items + snapshot jsonb + diff automático vs la versión anterior, y dejan la cotización en `draft`. El audit_log registra cambios atómicos con actor, versión y detalle.
+- Library de términos con `body_template` y variables `{{payment_terms_days}}`, `{{valid_until}}`, etc., aplicados al crear la quote y editables manteniendo el texto resuelto como snapshot inmutable.
+- Templates reutilizables con line items default, terms precargados y usage_count — listos para disparar `commercial.quotation.template_used/saved` al aplicarse.
+- 8 nuevos events outbox bajo `commercial.quotation.*` (version_created, approval_requested/decided, sent, approved, rejected, template_used/saved). QuoteDetailView ahora tiene tabs General / Versiones / Aprobaciones / Términos / Auditoría.
+
 ### 2026-04-17 — Nexa Insights deja de perder historial semanal al cambiar el set actual de anomalías
 
 - Se agrega `greenhouse_serving.ico_ai_signal_enrichment_history` como archivo append-only de enrichments LLM; `ico_ai_signal_enrichments` se mantiene como snapshot current-state.

@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado y validado 2026-04-17`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-344, TASK-345`
-- Branch: `task/TASK-346-quotation-pricing-costing-margin-health-core`
+- Blocked by: `TASK-344 (cerrada como policy en TASK-343), TASK-345 (migración + bridge live)`
+- Branch: `feat/nexa-insights-timeline`
 - Legacy ID: `follow-on de GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1 §4-6 y §11A`
 - GitHub Issue: `none`
 
@@ -184,3 +184,81 @@ La task debe responder explícitamente:
 ## Open Questions
 
 - si los `direct_cost` line items deben permitir edición humana plena o solo configuración paramétrica con audit trail
+
+## Completion Notes (2026-04-17)
+
+### Entregado
+
+- **Migration**: `migrations/20260417124905235_task-346-quotation-pricing-config.sql` crea
+  `greenhouse_commercial.{margin_targets, role_rate_cards, revenue_metric_config}` con
+  unique indexes por COALESCE(business_line_code, '__global__'), seeds para SERVICE_LINES
+  (Wave 28/20, Reach 18/10, Globe 40/25, Efeonce Digital 35/20, CRM Solutions 30/18)
+  y grants al runtime/migrator/app.
+- **Pricing helpers** en `src/lib/finance/pricing/`:
+  - `contracts.ts` tipos canónicos (MarginTarget, RoleRateCard, RevenueMetricConfig,
+    CostComponentBreakdown, DiscountHealthResult, QuotationRevenueMetrics).
+  - `pricing-config-store.ts` CRUD + inheritance resolver (quotation override → business_line → global default).
+  - `costing-engine.ts` `resolveLineItemCost` cubre `person` (lee
+    `greenhouse_serving.member_capacity_economics.cost_per_hour_target`),
+    `role` (lee role_rate_cards con fallback global), `deliverable`
+    (`product_catalog.default_unit_price`), `direct_cost` (manual). Convierte FX con
+    `quotations.exchange_rates` snapshot.
+  - `line-item-totals.ts` + `quotation-pricing-orchestrator.ts`
+    (`buildQuotationPricingSnapshot`, `persistQuotationPricing`,
+    `recalculateQuotationPricing`). Persiste versión en `quotation_versions`
+    y publica `commercial.discount.health_alert` al outbox cuando hay alertas.
+  - `margin-health.ts` classifier: `margin_below_zero` (blocking),
+    `margin_below_floor` (finance approval), `margin_below_target` (warning),
+    `item_negative_margin` (warning), `discount_exceeds_threshold` (info).
+  - `revenue-metrics.ts` resuelve `inherit` (monthly → recurring, else one_time) y
+    produce MRR/ARR/TCV/ACV + `revenue_type`.
+- **API routes** (todos bajo `requireFinanceTenantContext`):
+  - `POST /api/finance/quotes` create draft + pricing snapshot inicial.
+  - `PUT /api/finance/quotes/[id]` update headers + recalcula (o skip con `recalculatePricing:false`).
+  - `POST /api/finance/quotes/[id]/lines` replace line items y recompone versión.
+  - `POST /api/finance/quotes/[id]/recalculate` re-aplica costing desde backbone.
+  - `GET /api/finance/quotes/[id]/health` snapshot discount health server-side.
+  - `GET/PUT /api/finance/quotes/pricing/config` (PUT solo finance_admin/efeonce_admin).
+- **Tests**: 22 casos en `__tests__/` (revenue-metrics, margin-health, line-item-totals);
+  suite global 1291 tests passed.
+
+### Resolución explícita de detailed spec
+
+- **Snapshot vs recompute**: `unit_cost`, `cost_breakdown`, `subtotal_cost` se
+  persisten como snapshot en `quotation_line_items` al guardar; se recomputan solo
+  cuando el usuario invoca `/recalculate` o replace `/lines`. Totales y márgenes
+  agregados SIEMPRE se recalculan on save. Documentado en arquitectura.
+- **Multi-moneda**: `quotations.exchange_rates` JSONB congela FX al crear; el
+  costing engine usa `exchangeRates[FROM_TO]` o inverse `exchangeRates[TO_FROM]` o
+  `fx_rate` del capacity snapshot (sólo cuando target=CLP); si no hay match se
+  deja el valor original con warning en `resolutionNotes`.
+- **`recurrence_type = inherit`**: resuelto por `resolveLineRecurrence` —
+  `monthly` → recurring, `milestone|one_time` → one_time.
+
+### Acceptance criteria
+
+- [x] Una cotización puede calcular costo y margen desde readers canónicos sin costo manual ad hoc.
+- [x] Existen rate cards y margin targets configurables para casos sin persona asignada.
+- [x] El health check de descuentos detecta y clasifica pérdida, margen bajo floor y margen bajo target.
+- [x] MRR, ARR, TCV, ACV y `revenue_type` quedan persistidos en el runtime canónico.
+
+### Archivos modificados / creados
+
+- `migrations/20260417124905235_task-346-quotation-pricing-config.sql` (nuevo)
+- `src/lib/finance/pricing/` (carpeta nueva, 8 archivos)
+- `src/app/api/finance/quotes/route.ts` (POST agregado)
+- `src/app/api/finance/quotes/[id]/route.ts` (PUT agregado)
+- `src/app/api/finance/quotes/[id]/lines/route.ts` (POST agregado)
+- `src/app/api/finance/quotes/[id]/recalculate/route.ts` (nuevo)
+- `src/app/api/finance/quotes/[id]/health/route.ts` (nuevo)
+- `src/app/api/finance/quotes/pricing/config/route.ts` (nuevo)
+- `src/types/db.d.ts` regenerado por `pnpm db:generate-types`
+
+### Verification ejecutado
+
+- `pnpm migrate:up` → migración aplicada y tipos regenerados.
+- `pnpm exec tsc --noEmit --incremental false` → 0 errors.
+- `pnpm lint` → 0 errors.
+- `pnpm test` → 1291 passed / 2 skipped.
+- `pnpm build` → exit 0 (warnings preexistentes de Dynamic server usage, no introducidos por TASK-346).
+- `rg "new Pool\(" src` → sólo `src/lib/postgres/client.ts`.

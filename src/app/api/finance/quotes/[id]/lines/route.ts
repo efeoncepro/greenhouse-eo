@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { query } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   listFinanceQuoteLinesFromCanonical,
@@ -10,6 +11,14 @@ import {
   isFinanceSchemaDriftError,
   logFinanceSchemaDrift
 } from '@/lib/finance/schema-drift'
+import {
+  persistQuotationPricing,
+  resolveQuotationIdentity,
+  type QuotationBillingFrequency,
+  type QuotationDiscountType,
+  type QuotationLineInput,
+  type QuotationPricingCurrency
+} from '@/lib/finance/pricing'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
 
@@ -112,4 +121,136 @@ export async function GET(
 
     throw error
   }
+}
+
+interface ReplaceLinesPayload {
+  lineItems: QuotationLineInput[]
+  createVersion?: boolean
+}
+
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { id: quoteId } = await params
+  const identity = await resolveQuotationIdentity(quoteId)
+
+  if (!identity) {
+    return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
+  }
+
+  let body: ReplaceLinesPayload
+
+  try {
+    body = (await request.json()) as ReplaceLinesPayload
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 })
+  }
+
+  if (!Array.isArray(body.lineItems)) {
+    return NextResponse.json({ error: 'lineItems must be an array.' }, { status: 400 })
+  }
+
+  const header = await query<{
+    business_line_code: string | null
+    currency: string
+    quote_date: string | Date | null
+    billing_frequency: string
+    contract_duration_months: number | null
+    global_discount_type: string | null
+    global_discount_value: string | number | null
+    target_margin_pct: string | number | null
+    margin_floor_pct: string | number | null
+    exchange_rates: Record<string, unknown> | null
+    exchange_snapshot_date: string | Date | null
+    current_version: number
+  }>(
+    `SELECT business_line_code, currency, quote_date,
+            billing_frequency, contract_duration_months,
+            global_discount_type, global_discount_value,
+            target_margin_pct, margin_floor_pct,
+            exchange_rates, exchange_snapshot_date, current_version
+     FROM greenhouse_commercial.quotations
+     WHERE quotation_id = $1`,
+    [identity.quotationId]
+  )
+
+  const row = header[0]
+
+  if (!row) {
+    return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
+  }
+
+  const quoteDate =
+    row.quote_date instanceof Date
+      ? row.quote_date.toISOString().slice(0, 10)
+      : (row.quote_date ?? new Date().toISOString().slice(0, 10)).slice(0, 10)
+
+  const exchangeRates: Record<string, number> = {}
+
+  if (row.exchange_rates && typeof row.exchange_rates === 'object') {
+    for (const [key, val] of Object.entries(row.exchange_rates)) {
+      const num = Number(val)
+
+      if (Number.isFinite(num) && num > 0) exchangeRates[key] = num
+    }
+  }
+
+  const snapshot = await persistQuotationPricing(
+    {
+      quotationId: identity.quotationId,
+      versionNumber: row.current_version,
+      businessLineCode: row.business_line_code,
+      quoteCurrency: (row.currency as QuotationPricingCurrency) || 'CLP',
+      quoteDate,
+      billingFrequency: (row.billing_frequency as QuotationBillingFrequency) || 'one_time',
+      contractDurationMonths: row.contract_duration_months,
+      exchangeRates,
+      exchangeSnapshotDate:
+        row.exchange_snapshot_date instanceof Date
+          ? row.exchange_snapshot_date.toISOString().slice(0, 10)
+          : row.exchange_snapshot_date?.slice(0, 10) ?? null,
+      globalDiscountType: row.global_discount_type as QuotationDiscountType | null,
+      globalDiscountValue:
+        row.global_discount_value != null ? Number(row.global_discount_value) : null,
+      marginTargetPct: row.target_margin_pct != null ? Number(row.target_margin_pct) : null,
+      marginFloorPct: row.margin_floor_pct != null ? Number(row.margin_floor_pct) : null,
+      lineItems: body.lineItems,
+      createdBy: tenant.userId
+    },
+    {
+      createVersion: body.createVersion ?? false,
+      versionNotes: body.createVersion ? 'Line items replaced via API.' : null
+    }
+  )
+
+  return NextResponse.json({
+    quotationId: identity.quotationId,
+    versionNumber: snapshot.versionNumber,
+    totals: snapshot.totals,
+    revenue: snapshot.revenue,
+    marginResolution: snapshot.marginResolution,
+    health: snapshot.health,
+    lineItems: snapshot.lineItems.map(line => ({
+      lineItemId: line.lineItemId ?? null,
+      label: line.label,
+      lineType: line.lineType,
+      quantity: line.quantity,
+      unitCost: line.unitCost,
+      unitPrice: line.unitPrice,
+      subtotalCost: line.subtotalCost,
+      subtotalPrice: line.subtotalPrice,
+      discountAmount: line.discountAmount,
+      subtotalAfterDiscount: line.subtotalAfterDiscount,
+      effectiveMarginPct: line.effectiveMarginPct,
+      recurrenceType: line.recurrenceType,
+      resolutionNotes: line.resolutionNotes
+    }))
+  })
 }

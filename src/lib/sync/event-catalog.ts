@@ -90,11 +90,16 @@ export const AGGREGATE_TYPES = {
   // Email Delivery
   emailDelivery: 'email_delivery',
 
-  // Quotes
+  // Quotes (legacy finance namespace, kept for compat during cutover — TASK-344)
   quote: 'quote',
   quoteLineItem: 'quote_line_item',
 
-  // Products
+  // Commercial Quotation (canonical, TASK-347 cutover)
+  quotation: 'quotation',
+  quotationLineItem: 'quotation_line_item',
+  productCatalog: 'product_catalog',
+
+  // Products (legacy finance namespace)
   product: 'product',
 
   // Purchase Orders & HES
@@ -302,16 +307,38 @@ export const EVENT_TYPES = {
   emailDeliverabilityAlert: 'email_delivery.deliverability_alert',
   emailGdprDeletionCompleted: 'email_delivery.gdpr_deletion_completed',
 
-  // Quotes & Credit Notes
+  // Quotes & Credit Notes (legacy finance namespace, TASK-344 cutover aliased via commercial.*)
   quoteCreated: 'finance.quote.created',
   quoteSynced: 'finance.quote.synced',
   quoteConverted: 'finance.quote.converted',
   quoteLineItemSynced: 'finance.quote_line_item.synced',
   creditNoteCreated: 'finance.credit_note.created',
 
-  // Products
+  // Commercial Quotation (canonical, TASK-347)
+  // Emitted alongside finance.quote.* during cutover so consumers can migrate gradually.
+  quotationCreated: 'commercial.quotation.created',
+  quotationSynced: 'commercial.quotation.synced',
+  quotationConverted: 'commercial.quotation.converted',
+  quotationLineItemsSynced: 'commercial.quotation.line_items_synced',
+  quotationDiscountHealthAlert: 'commercial.discount.health_alert',
+
+  // Commercial Quotation Governance (TASK-348)
+  quotationVersionCreated: 'commercial.quotation.version_created',
+  quotationApprovalRequested: 'commercial.quotation.approval_requested',
+  quotationApprovalDecided: 'commercial.quotation.approval_decided',
+  quotationSent: 'commercial.quotation.sent',
+  quotationApproved: 'commercial.quotation.approved',
+  quotationRejected: 'commercial.quotation.rejected',
+  quotationTemplateUsed: 'commercial.quotation.template_used',
+  quotationTemplateSaved: 'commercial.quotation.template_saved',
+
+  // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
   productCreated: 'finance.product.created',
+
+  // Commercial Product Catalog (canonical, TASK-347)
+  productCatalogSynced: 'commercial.product_catalog.synced',
+  productCatalogCreated: 'commercial.product_catalog.created',
 
   // Purchase Orders & HES
   purchaseOrderCreated: 'finance.purchase_order.created',

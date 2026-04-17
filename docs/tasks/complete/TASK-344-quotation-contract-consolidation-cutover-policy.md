@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `policy`
-- Status real: `Diseno`
+- Status real: `Cerrada como policy 2026-04-17. Decisiones migraron a GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1 (Delta 2026-04-17)`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -188,3 +188,42 @@ La policy debe resolver explícitamente:
 ## Open Questions
 
 - si el catálogo de eventos debe converger a `commercial.quotation.*` con aliases de compatibilidad para consumers existentes de `finance.quote.*`
+
+## Completion Notes (2026-04-17)
+
+### Decisiones finales
+
+- **Anchor canónico:** `greenhouse_commercial.quotations` (NO `greenhouse_finance.quotes`).
+  `Finance > Cotizaciones` queda como **façade estable** sobre el bridge canónico —
+  no se deprecia durante el cutover, pero lee/escribe vía
+  `src/lib/finance/quotation-canonical-store.ts`.
+- **Status set canónico** (incluye `pending_approval` que faltaba en Finance legacy):
+  `draft | pending_approval | sent | approved | rejected | expired | converted`.
+  Mapeo legacy → canonical: `accepted` → `approved`; el resto se preserva.
+- **Event catalog:** namespace objetivo `commercial.quotation.*`. Durante el cutover
+  conviven los publishers actuales `finance.quote.*` (HubSpot/Nubox syncers) y los
+  nuevos eventos internos (`commercial.discount.health_alert` desde TASK-346). La
+  convergencia formal + aliases de compat queda para **TASK-347** (HubSpot bridge).
+- **Sources de capacity/cost alineadas al repo real:** `greenhouse_core.client_team_assignments`
+  y `greenhouse_serving.member_capacity_economics` (NO los placeholders
+  `greenhouse_core.assignments` / `greenhouse_hr.member_capacity_economics` que
+  la spec original mencionaba).
+- **Cutover policy de productos:** `greenhouse_finance.products` se **absorbe** como
+  `greenhouse_commercial.product_catalog` con `finance_product_id` como bridge key.
+  Se mantiene compat escribiendo en ambos durante el cutover (TASK-345 bridge).
+
+### Ejecución
+
+Esta task quedó **cerrada como policy umbrella**: no generó código directamente.
+Sus decisiones se bajaron a:
+
+- `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` (Delta 2026-04-17)
+- `docs/tasks/complete/TASK-343-commercial-quotation-canonical-program.md` (umbrella del programa)
+- TASK-345 materializó el schema canónico + bridge
+- TASK-346 materializó pricing/costing/margin core consumiendo el bridge
+- TASK-347 completará la convergencia de events hacia `commercial.quotation.*`
+
+### Archivo físico
+
+Movido de `docs/tasks/to-do/` a `docs/tasks/complete/` el 2026-04-17 como parte del
+cleanup de lifecycle drift tras cerrar TASK-346.

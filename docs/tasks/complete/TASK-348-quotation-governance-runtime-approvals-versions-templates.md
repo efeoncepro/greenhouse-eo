@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Entregado 2026-04-17`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-344, TASK-345, TASK-346`
@@ -141,10 +141,22 @@ La task debe dejar explícito:
 
 ## Acceptance Criteria
 
-- [ ] Las cotizaciones pueden versionarse con snapshot y diff
-- [ ] Existe approval workflow por excepción conectado al pricing health
-- [ ] Templates y terms pueden reutilizarse sin acoplarse a una quote puntual
-- [ ] El audit trail de Quotation distingue cambios de line items, descuentos, status y decisiones de aprobación
+- [x] Las cotizaciones pueden versionarse con snapshot y diff
+- [x] Existe approval workflow por excepción conectado al pricing health
+- [x] Templates y terms pueden reutilizarse sin acoplarse a una quote puntual
+- [x] El audit trail de Quotation distingue cambios de line items, descuentos, status y decisiones de aprobación
+
+## Completion Summary (2026-04-17)
+
+- Migration `20260417140553325_task-348-quotation-governance-runtime.sql` aplicada. 7 tablas nuevas en `greenhouse_commercial` + seeds iniciales de 3 approval_policies y 6 terms_library.
+- Runtime helpers en `src/lib/commercial/governance/` (contracts, audit-log, approval-evaluator, approval-steps-store, policies-store, terms-store, templates-store, versions-store, version-diff).
+- API surface extension:
+  - Por quote: `/api/finance/quotes/[id]/versions`, `/approve`, `/audit`, `/terms`.
+  - Globales: `/api/finance/quotation-governance/approval-policies[/[id]]`, `/terms-library[/[id]]`, `/templates[/[id]]`.
+- 8 events nuevos en `event-catalog.ts` + publishers en `src/lib/commercial/quotation-events.ts`.
+- UI: tabs General / Versiones / Aprobaciones / Términos / Auditoría en `QuoteDetailView.tsx` y componentes `src/views/greenhouse/finance/governance/*`.
+- Doc `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` bumped a v2.5 con delta del runtime governance.
+- Verificado: `pnpm lint`, `npx tsc --noEmit --incremental false`, `pnpm test` (1309 passed), `pnpm build` OK.
 
 ## Verification
 
@@ -167,4 +179,4 @@ La task debe dejar explícito:
 
 ## Open Questions
 
-- si los templates deben poder guardar pricing explícito o solo estructura + sugerencias de margen
+- ~~si los templates deben poder guardar pricing explícito o solo estructura + sugerencias de margen~~ → **Resuelto 2026-04-17:** `quote_template_items` guarda ambos: `default_margin_pct` (sugerencia, reutiliza el costing-engine al instanciar) y `default_unit_price` (precio explícito opcional). El comercial elige en el wizard de template si deja el margen resolver el precio o fija un unit_price. Precio explícito gana al instanciar si está presente; si es null, el orchestrator calcula desde cost + default_margin_pct.

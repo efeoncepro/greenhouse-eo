@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Ready for implementation`
+- Status real: `Implementado, validado y deployed 2026-04-17`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none` (`TASK-344` completada el 2026-04-17)
-- Branch: `task/TASK-345-quotation-canonical-schema-finance-compatibility-bridge`
+- Branch: `task/TASK-345-quotation-canonical-schema-bridge`
 - Legacy ID: `follow-on de TASK-210 y TASK-211`
 - GitHub Issue: `none`
 
@@ -216,3 +216,80 @@ La task debe dejar resuelto:
 ## Open Questions
 
 - si la compatibilidad de Finance conviene materializarla como façade de store, vista SQL o ambos
+
+## Completion Notes (2026-04-17)
+
+### Entregado
+
+- **Migration** `migrations/20260417103700979_task-345-quotation-canonical-schema-finance-compatibility-bridge.sql`:
+  - Schema `greenhouse_commercial` + 4 tablas (`product_catalog`, `quotations`,
+    `quotation_versions`, `quotation_line_items`) con FKs a
+    `greenhouse_core.{spaces, organizations, clients}` y `product_catalog`.
+  - Backfill idempotente desde `greenhouse_finance.{quotes, quote_line_items, products}`
+    mapeando status legacy → canónico, resolviendo `space_id` via
+    `greenhouse_core.spaces` por `organization_id` o `client_id`.
+  - Versión inicial `v1` en `quotation_versions.snapshot_json` por cada quote backfilleada.
+  - Grants a `greenhouse_runtime` / `greenhouse_migrator` / `greenhouse_app`.
+- **Runtime store** `src/lib/finance/quotation-canonical-store.ts` (~1000 líneas):
+  - `resolveFinanceQuoteTenantSpaceIds` (tenant-scoped space filter)
+  - `listFinanceQuotesFromCanonical` / `getFinanceQuoteDetailFromCanonical` /
+    `listFinanceQuoteLinesFromCanonical` (readers desde canonical)
+  - `syncCanonicalFinanceQuote` / `syncCanonicalFinanceProduct` (writers canónicos)
+  - `mapCanonicalQuote{List,Detail,Line}Row` (map canonical → legacy Finance API shape)
+- **Contracts** en `src/lib/finance/contracts.ts`:
+  - `QUOTATION_CANONICAL_STATUSES` (incluye `pending_approval`)
+  - `QUOTATION_LEGACY_STATUSES` (mantiene `accepted` para compat)
+  - `QUOTATION_SOURCE_SYSTEMS`
+- **Rutas Finance existentes** refactorizadas para leer desde canonical:
+  - `GET /api/finance/quotes` → `listFinanceQuotesFromCanonical` con fallback legacy
+  - `GET /api/finance/quotes/[id]` → `getFinanceQuoteDetailFromCanonical`
+  - `GET /api/finance/quotes/[id]/lines` → `listFinanceQuoteLinesFromCanonical`
+- **Writers HubSpot/Nubox** actualizados para syncar anchor canónico:
+  - `src/lib/hubspot/sync-hubspot-quotes.ts`
+  - `src/lib/hubspot/create-hubspot-quote.ts`
+  - `src/lib/hubspot/sync-hubspot-line-items.ts`
+  - `src/lib/hubspot/sync-hubspot-products.ts`
+  - `src/lib/nubox/sync-nubox-to-postgres.ts`
+
+### Acceptance criteria
+
+- [x] Storage canónico para quotations, versions y line items existe y está poblado.
+- [x] Rutas actuales de Finance resuelven quotes desde el nuevo anchor (con fallback legacy por schema drift).
+- [x] Backfill documentado e idempotente (ON CONFLICT ... DO UPDATE en cada sección).
+- [x] Sin dos roots equivalentes: `greenhouse_commercial.quotations` es canónico,
+      `greenhouse_finance.quotes` queda como bridge con `finance_quote_id` como clave.
+- [x] Writers HubSpot/Nubox mantienen anchor canónico sincronizado.
+- [x] Lecturas del bridge scopeadas por `space_id` via `resolveFinanceQuoteTenantSpaceIds`.
+
+### Verification ejecutado
+
+- `pnpm pg:connect:migrate` → migración aplicada, tipos regenerados (`db.d.ts`).
+- `pnpm exec tsc --noEmit --incremental false` → 0 errors (único warning preexistente
+  en `src/lib/campaigns/tenant-scope.test.ts` ajeno a TASK-345).
+- `pnpm lint` → 0 errors.
+- `pnpm build` → exit 0 (warnings Dynamic server usage preexistentes).
+- `rg "new Pool\(" src` → sólo `src/lib/postgres/client.ts`.
+
+### Archivo físico
+
+Trabajo completado y deployed 2026-04-17 (per Handoff.md "Sesion 2026-04-17 — TASK-345").
+Archivo movido de `docs/tasks/to-do/` a `docs/tasks/complete/` el 2026-04-17 como
+parte del cleanup de lifecycle drift tras cerrar TASK-346.
+
+### Detailed spec resuelta
+
+- **Representación de quote HubSpot:** `hubspot_quote_id` + `hubspot_deal_id` +
+  `hubspot_last_synced_at` en `quotations`; line items mantienen `hubspot_line_item_id`
+  + `hubspot_product_id`. `source_system = 'hubspot'` marca origen.
+- **Convivencia de IDs:** `quotation_id` (canonical) + `finance_quote_id` (legacy bridge,
+  UNIQUE) + `hubspot_quote_id` + `nubox_document_id` conviven en la misma fila.
+  `source_quote_id` captura el ID del sistema origen si el source no es manual.
+- **Versionado de quotes históricos:** backfill crea `v1` con snapshot_json basado en
+  las líneas actuales. Versiones futuras las genera TASK-346 (`persistQuotationPricing`
+  con `createVersion: true`).
+- **Anchor actualizado durante cutover:** syncers HubSpot/Nubox llaman
+  `syncCanonicalFinanceQuote` después de escribir a `greenhouse_finance.quotes`,
+  garantizando sync bidireccional hasta que TASK-347 migre publishers.
+- **Tenancy:** `space_resolution_source` (`organization` | `client` | `explicit` |
+  `unresolved`) auditado por fila; queries downstream pueden filtrar `unresolved`
+  para detectar drift.

@@ -1,5 +1,206 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-348 Quotation Governance Runtime (approvals, versions, terms, templates, audit)
+
+- **Estado:** `complete`, entregado y pusheado.
+- **Rama:** `task/TASK-348-quotation-governance-runtime`
+- **Entregado:**
+  - Migration `20260417140553325_task-348-quotation-governance-runtime.sql` — 7 tablas nuevas en `greenhouse_commercial` (`approval_policies`, `approval_steps`, `quotation_audit_log`, `terms_library`, `quotation_terms`, `quote_templates`, `quote_template_items`) + seeds de 3 approval policies globales y 6 terms reutilizables.
+  - Runtime helpers en `src/lib/commercial/governance/` (audit-log, approval-evaluator, approval-steps-store, policies-store, terms-store con variable resolver, templates-store, versions-store con clone+diff).
+  - API extension:
+    - Per-quote: `/api/finance/quotes/[id]/{versions,approve,audit,terms}`.
+    - Globales: `/api/finance/quotation-governance/{approval-policies,terms-library,templates}[/[id]]`.
+  - 8 eventos outbox nuevos bajo `commercial.quotation.*` (`version_created`, `approval_requested`, `approval_decided`, `sent`, `approved`, `rejected`, `template_used`, `template_saved`).
+  - UI con tabs en `QuoteDetailView.tsx`: General / Versiones / Aprobaciones / Términos / Auditoría + componentes en `src/views/greenhouse/finance/governance/`.
+  - 21 tests unitarios nuevos en `src/lib/commercial/governance/__tests__/` cubriendo `approval-evaluator`, `version-diff` y `resolveTermVariables`.
+  - Doc arch `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.5 con delta del governance runtime y resolución de la open question sobre templates (`default_unit_price` + `default_margin_pct` coexisten).
+  - Doc funcional `docs/documentation/finance/cotizaciones-gobernanza.md` creada.
+- **Decisiones notables:**
+  - La gobernanza se expone bajo `/api/finance/quotes/[id]/*` y `/api/finance/quotation-governance/*` en vez de `/api/commercial/*` declarado en la spec §22 — coherente con el runtime vigente post TASK-345/346; cuando cierre el cutover full-commercial (`TASK-349`) se podrá aliasear.
+  - `approved_by` / `approved_at` se siguen poblando en `quotations`, pero la verdad de quién aprobó qué paso vive en `approval_steps`; el audit log registra ambas narrativas.
+  - Terms guardan `body_resolved` como snapshot inmutable al aplicar — un cambio en `terms_library` NO re-escribe el texto ya aplicado a una quote.
+- **Gaps que quedan para TASK-349:**
+  - Apply template al crear quote (`POST /api/finance/quotes` debería aceptar `templateId`).
+  - Save-as-template desde quote existente (endpoint nuevo).
+  - Páginas admin para CRUD visual de policies / terms / templates.
+  - Smoke manual del flow approve/reject pendiente de levantar dev server (cubierto en verificación de TASK-349).
+- **Validado:**
+  - `pnpm pg:connect:migrate` ✓
+  - `pnpm db:generate-types` ✓
+  - `pnpm lint` ✓
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm test` 1309/1309 ✓ (+ 21 tests nuevos de governance)
+  - `pnpm build` ✓
+
+## Sesion 2026-04-17 — Nexa Insights history archive + replay parcial de abril
+
+- **Estado:** `in_progress`, fix backend listo y validado; recovery operativo ejecutado de forma parcial por retención de origen.
+- **Rama:** `feat/nexa-insights-timeline`
+- **Problema resuelto:** `greenhouse_serving.ico_ai_signal_enrichments` funcionaba como snapshot current-state del período y el worker lo sobrescribía en cada corrida. Eso borraba de facto el historial visible para timeline y weekly digest cuando una anomalía dejaba de estar activa.
+- **Implementado:**
+  - Migration `20260417131401099_nexa-advisory-history-serving.sql` crea `greenhouse_serving.ico_ai_signal_enrichment_history` y backfillea el snapshot vigente.
+  - `src/lib/ico-engine/ai/llm-enrichment-worker.ts` ahora:
+    - escribe siempre en historial append-only,
+    - mantiene `ico_ai_signal_enrichments` como current-state,
+    - soporta replay `historyOnly + asOfTime`,
+    - agrega timeout por señal LLM (`60s`) para que una generación colgada no congele toda la corrida.
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` mueve timelines Agency/Member/Space a historial deduplicado por `enrichment_id`.
+  - `src/lib/nexa/digest/build-weekly-digest.ts` consume historial deduplicado en vez del snapshot actual.
+  - Script operativo nuevo: `scripts/backfill-ico-llm-history.ts`.
+- **Recovery ejecutado:**
+  - BigQuery time travel confirmó frontera dura de retención en `2026-04-10T13:17:57.392Z`.
+  - Se relanzó el replay recuperable de abril con:
+    - `NODE_OPTIONS=--conditions=react-server pnpm exec tsx scripts/backfill-ico-llm-history.ts --year 2026 --month 4 --from 2026-04-10T13:18:00.000Z --to 2026-04-17T23:59:59.999Z`
+  - Resultado:
+    - `2026-04-15 10:25:09Z` -> 2 history rows recuperadas
+    - `2026-04-16 10:20:18Z` -> 9 history rows recuperadas
+    - `2026-04-17 07:20:11Z` -> 2 history rows recuperadas
+    - `2026-04-17 07:45:12Z` -> 2 history rows recuperadas
+    - `2026-04-17 10:20:10Z` -> 2 history rows recuperadas + snapshot vigente backfilleado
+  - Las corridas del `2026-04-11`, `2026-04-12` y `2026-04-14` devolvieron `0` señales replayables en el `SYSTEM_TIME` exacto de esas corridas, pese a que los logs de runs históricos marcaban enrichments en ese momento.
+  - Daniela quedó nuevamente visible en historial con 2 insights `ftr_pct` del `2026-04-16 10:20:18Z` (`root_cause` + `recommendation`).
+- **Límite conocido:**
+  - No hay forma fiel de reconstruir `2026-04-01` a `2026-04-10 13:17 UTC` desde la fuente actual porque el snapshot BQ ya cayó fuera de time travel.
+  - Si se quiere blindar el resto del mes completo hacia adelante, este fix ya lo hace: desde ahora las corridas nuevas no deberían volver a perderse.
+- **Validado:**
+  - `pnpm exec vitest run src/lib/ico-engine/ai/llm-enrichment-reader.test.ts src/lib/nexa/digest/build-weekly-digest.test.ts` ✓
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm pg:connect:migrate` ✓ (regeneró `src/types/db.d.ts`)
+
+## Sesion 2026-04-17 — TASK-347 Quotation Catalog & HubSpot Canonical Bridge
+
+- **Estado:** `complete`, `validado localmente`, pendiente commit + push.
+- **Rama:** `feat/nexa-insights-timeline`.
+- **Contexto:** sigue la secuencia del Commercial Quotation Canonical Program
+  (TASK-344 ✅ → TASK-345 ✅ → TASK-346 ✅). TASK-345 ya dejó el bridge sidecar;
+  TASK-347 (a) formaliza canonical-first sin flip destructivo, (b) introduce el
+  namespace de eventos `commercial.quotation.*` con aliases `finance.quote.*`
+  durante cutover, (c) cierra la deuda de gobernanza que permitía que
+  `costOfGoodsSold` saliera a HubSpot.
+- **Implementado:**
+  - **Event catalog** (`src/lib/sync/event-catalog.ts`): `AGGREGATE_TYPES.quotation`,
+    `quotationLineItem`, `productCatalog`; `EVENT_TYPES.quotationCreated/Synced/
+    Converted/LineItemsSynced/DiscountHealthAlert`, `productCatalogCreated/Synced`.
+  - **`src/lib/commercial/` nuevo**:
+    - `quotation-events.ts` — dual-publish centralizado (legacy + canonical)
+    - `hubspot-outbound-guard.ts` — `sanitizeHubSpotProductPayload` +
+      `HubSpotCostFieldLeakError` bloqueando 10 variantes de cost/margin fields
+    - `product-catalog-store.ts` — reader canónico de `greenhouse_commercial.product_catalog`
+  - **5 callers HubSpot** refactorizados para dual-publish y aplicar el guard
+    antes de `createHubSpotGreenhouseProduct`.
+  - **Defense-in-depth** en `createHubSpotGreenhouseProduct`: borra
+    `costOfGoodsSold` del payload incluso si el caller saltó el guard.
+  - **API `/api/finance/products?view=canonical`** routea al reader nuevo;
+    default preserva contrato legacy.
+  - **Fix TASK-346 bug**: orchestrator insertaba en `outbox_events(payload)`
+    pero columna real es `payload_json`; emit ahora vía `publishDiscountHealthAlert`.
+  - **Docs**: `GREENHOUSE_EVENT_CATALOG_V1.md` secciones nuevas + 
+    `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` v2.4 Delta 2026-04-17.
+- **Validado:**
+  - `pnpm exec tsc --noEmit` → 0 errors
+  - `pnpm lint` → 0 errors
+  - `pnpm test` → 1309 passed / 2 skipped (18 tests nuevos en `src/lib/commercial`)
+  - `pnpm build` → exit 0
+  - `rg "new Pool\(" src` → sólo `src/lib/postgres/client.ts`
+- **Impacto cross-module:**
+  - TASK-349 (workspace UI) desbloqueada.
+  - TASK-346 bug arreglado: `commercial.discount.health_alert` persiste OK.
+  - Consumers legacy (`finance.quote.*`) siguen sin cambio.
+- **Out of scope (como spec):** Nubox line items (TASK-212), workspace UI final
+  (TASK-349), drop de aliases `finance.quote.*` cuando migren todos los consumers.
+
+## Sesion 2026-04-17 — TASK-346 Quotation Pricing, Costing & Margin Health Core
+
+- **Estado:** `complete`, `validado localmente`, pendiente commit + push.
+- **Rama:** `feat/nexa-insights-timeline` (misma rama activa; push directo a develop).
+- **Contexto:** cierra el core de pricing de `Commercial Quotation Canonical Program`
+  (TASK-343 umbrella → TASK-344/TASK-345 ya consolidados). TASK-345 ya había dejado
+  el schema canónico y el bridge con Finance; faltaba el costing explicable desde
+  el backbone, los guardrails de margen y las métricas de revenue.
+- **Implementado:**
+  - **Migration** `migrations/20260417124905235_task-346-quotation-pricing-config.sql`:
+    `greenhouse_commercial.{margin_targets, role_rate_cards, revenue_metric_config}` con
+    unique indexes por `COALESCE(business_line_code, '__global__')`, CHECKs de rangos,
+    seeds por business line (Wave 28/20, Reach 18/10, Globe 40/25, Efeonce Digital 35/20,
+    CRM Solutions 30/18, default global 25/15) + revenue metric config per BL; ALTER
+    OWNER + grants al runtime/migrator/app.
+  - **Pricing helpers** en `src/lib/finance/pricing/`:
+    - `contracts.ts` tipos canónicos (MarginTarget, RoleRateCard, RevenueMetricConfig,
+      CostComponentBreakdown, QuotationPricingTotals, QuotationRevenueMetrics,
+      DiscountAlert, DiscountHealthResult).
+    - `pricing-config-store.ts` CRUD + readers con herencia
+      `quotation_override → business_line → global_default` para márgenes, rate cards
+      (match exacto BL+seniority, fallback global) y revenue metric config.
+    - `costing-engine.ts` `resolveLineItemCost` cubre los 4 lineTypes:
+      `person` → `member_capacity_economics.cost_per_hour_target` con fallback a snapshot
+      más reciente; `role` → role_rate_cards; `deliverable` →
+      `product_catalog.default_unit_price`; `direct_cost` → manual. Convierte FX con
+      `quotation.exchange_rates` o inverse o `fx_rate` del capacity snapshot.
+    - `line-item-totals.ts` calcula subtotals, discount_amount (percentage/fixed_amount
+      con clamp a subtotal), subtotal_after_discount, margin_amount y effective_margin_pct.
+    - `margin-health.ts` `checkDiscountHealth` clasifica alertas:
+      `margin_below_zero` (blocking) / `margin_below_floor` (finance approval) /
+      `margin_below_target` (warning) / `item_negative_margin` (warning) /
+      `discount_exceeds_threshold` (info, >25%).
+    - `revenue-metrics.ts` resuelve `recurrence_type = inherit` (monthly → recurring,
+      milestone/one_time → one_time) y calcula MRR/ARR/TCV/ACV + revenue_type
+      (recurring | one_time | hybrid).
+    - `quotation-pricing-orchestrator.ts` `buildQuotationPricingSnapshot` ->
+      `persistQuotationPricing` (tx con `withTransaction`: update headers, replace
+      line_items, insert version en `quotation_versions` con `snapshot_json` ordenado,
+      publish outbox `commercial.discount.health_alert` cuando hay alerta severa).
+    - `quotation-id-resolver.ts` resuelve canonical `quotation_id` desde canonical o
+      `finance_quote_id` legacy.
+  - **API routes** bajo `requireFinanceTenantContext` (Finance Admin requerido para
+    editar pricing config):
+    - `POST /api/finance/quotes` — create draft + pricing snapshot inicial.
+    - `PUT /api/finance/quotes/[id]` — update headers + recalculate (o skip con
+      `recalculatePricing:false`).
+    - `POST /api/finance/quotes/[id]/lines` — replace line items + recompute.
+    - `POST /api/finance/quotes/[id]/recalculate` — force re-read del backbone.
+    - `GET /api/finance/quotes/[id]/health` — discount health server-side (para UI).
+    - `GET/PUT /api/finance/quotes/pricing/config` — listar + upsert (PUT gated a
+      `finance_admin` o `efeonce_admin`).
+- **Detailed spec resuelta:**
+  - **Snapshot vs recompute:** `unit_cost`, `cost_breakdown`, `subtotal_cost` se
+    congelan como snapshot al guardar; totales y métricas agregadas SIEMPRE se
+    recalculan. `/recalculate` fuerza re-read de `member_capacity_economics` y
+    `role_rate_cards` sin tocar líneas manuales/direct_cost.
+  - **FX multi-moneda:** `quotations.exchange_rates` JSONB congela snapshot; el
+    engine intenta `rates[FROM_TO]`, luego inverse `rates[TO_FROM]`, luego
+    `member_capacity_economics.fx_rate` si target=CLP. Si no hay match, no convierte
+    y deja warning en `resolutionNotes` del line item.
+  - **`recurrence_type = inherit`:** `resolveLineRecurrence` → monthly → recurring,
+    milestone/one_time → one_time. Probado con 6 tests unitarios.
+- **Validado localmente:**
+  - `pnpm migrate:up` → tipos regenerados, 3 tablas nuevas visibles en `db.d.ts`.
+  - `pnpm exec tsc --noEmit --incremental false` → 0 errors.
+  - `pnpm lint` → 0 errors.
+  - `pnpm test` → 1291 passed / 2 skipped.
+  - `pnpm build` → exit 0 (warnings Dynamic server usage preexistentes, no
+    introducidos por esta lane).
+  - `rg "new Pool\(" src` → sólo `src/lib/postgres/client.ts`.
+- **Casos borde validados (unit tests):**
+  - one_time puro con duración null → tcv=sum(one_time), acv=tcv.
+  - recurring puro con duración 12m → mrr=X, arr=X*12, tcv=X*12, acv=X*12.
+  - hybrid recurring+one_time con duración 12m → tcv = mrr*12 + oneTimeTotal.
+  - duración 24m → acv = tcv/2 (ceil(24/12)).
+  - inherit con monthly → recurring; inherit con milestone → one_time.
+  - margin <0% → blocking; <floor → finance approval; <target → warning.
+- **Impacto cross-module:**
+  - `TASK-348`, `TASK-349`, `TASK-350`, `TASK-351` ya no están bloqueadas por TASK-346.
+  - `member_capacity_economics` del módulo Team Capacity ahora tiene un consumer
+    commercial directo (antes solo lo usaba Cost Intelligence / Payroll).
+  - Outbox gana evento `commercial.discount.health_alert` (consumer: Notifications
+    → Finance, audit log; implementación de consumer queda para TASK-348+).
+- **Follow-ups / out of scope (como spec declaró):**
+  - Approval workflow UI + backend → TASK-348.
+  - Templates + terms library → TASK-349.
+  - HubSpot sync del namespace `commercial.quotation.*` → TASK-347.
+  - PDF + workspace UI final → TASK-350.
+  - Profitability tracking actual vs quoted → TASK-351.
+
 ## Sesion 2026-04-17 — Nexa Insights: Historial activado en las 4 superficies
 
 - **Estado:** `complete`, `deployed` (commit `bcf8a9c9`)
