@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado y validado 2026-04-17`
 - Rank: `TBD`
 - Domain: `crm`
-- Blocked by: `TASK-344, TASK-345`
-- Branch: `task/TASK-347-quotation-catalog-hubspot-canonical-bridge`
+- Blocked by: `TASK-344 ✅, TASK-345 ✅`
+- Branch: `feat/nexa-insights-timeline`
 - Legacy ID: `follow-on de TASK-210 y TASK-211`
 - GitHub Issue: `none`
 
@@ -182,3 +182,101 @@ La task debe responder:
 ## Open Questions
 
 - si el catálogo local seguirá permitiendo productos `greenhouse_only` o si el primer corte exige sync para todo producto cotizable
+
+## Completion Notes (2026-04-17)
+
+### Entregado
+
+- **Event catalog** (`src/lib/sync/event-catalog.ts`):
+  - `AGGREGATE_TYPES.quotation` / `quotationLineItem` / `productCatalog` añadidos
+  - Nuevos `EVENT_TYPES` canónicos: `commercial.quotation.{created,synced,converted}`,
+    `commercial.quotation.line_items_synced`, `commercial.discount.health_alert`,
+    `commercial.product_catalog.{created,synced}`
+  - Legacy `finance.quote.*` / `finance.product.*` se conservan como aliases
+- **Helper centralizado** (`src/lib/commercial/quotation-events.ts`):
+  - `publishQuoteCreated/Synced/Converted/LineItemsSynced` — dual-publish
+    (legacy + canonical) cuando `quotationId` está disponible
+  - `publishProductCreated/Synced` — idem con `commercialProductId`
+  - `publishDiscountHealthAlert` — canonical only (nacido en TASK-346)
+- **Outbound guard** (`src/lib/commercial/hubspot-outbound-guard.ts`):
+  - `sanitizeHubSpotProductPayload` descarta `costOfGoodsSold`, `unit_cost`,
+    `loaded_cost`, `marginPct`, `targetMarginPct`, `floorMarginPct`,
+    `effectiveMarginPct`, `costBreakdown` (ambos camelCase y snake_case)
+  - `assertNoCostFieldsInHubSpotPayload` + `HubSpotCostFieldLeakError` para
+    chequeo defensivo
+  - Defense-in-depth extra en `createHubSpotGreenhouseProduct`: borra
+    `costOfGoodsSold` del payload incluso si el caller olvidó el guard
+- **Product catalog store** (`src/lib/commercial/product-catalog-store.ts`):
+  - `listCommercialProductCatalog` (search, source, active, business_line_code,
+    pagination) lee de `greenhouse_commercial.product_catalog`
+  - `getCommercialProduct` por `product_id` canónico o `finance_product_id`
+- **Callers actualizados** (5 archivos):
+  - `src/lib/hubspot/sync-hubspot-quotes.ts` — publisher movido al caller para
+    incluir `quotationId` tras `syncCanonicalFinanceQuote`
+  - `src/lib/hubspot/sync-hubspot-line-items.ts` — usa `publishQuoteLineItemsSynced`
+    con resolución de `quotationId`
+  - `src/lib/hubspot/sync-hubspot-products.ts` — usa `publishProductSynced`
+    tras `syncCanonicalFinanceProduct` + `getCommercialProduct` lookup
+  - `src/lib/hubspot/create-hubspot-quote.ts` — usa `publishQuoteCreated`
+  - `src/lib/hubspot/create-hubspot-product.ts` — aplica `sanitizeHubSpotProductPayload`
+    + `assertNoCostFieldsInHubSpotPayload` ANTES de `createHubSpotGreenhouseProduct`,
+    usa `publishProductCreated`
+- **TASK-346 bug fix**: El orchestrator (`quotation-pricing-orchestrator.ts`)
+  insertaba directo en `outbox_events(aggregate_type, aggregate_id, event_type, payload)`
+  pero la columna real es `payload_json` y faltaban `event_id`/`status`. El emit
+  ahora usa `publishDiscountHealthAlert` que llama al helper canónico
+  `publishOutboxEvent` con el schema correcto.
+- **API route `/api/finance/products`**: agregado query param `view=canonical`
+  que enruta a `listCommercialProductCatalog`. Default (`view=finance_legacy`)
+  mantiene el contrato previo sin cambios.
+- **Type marker**: `HubSpotGreenhouseCreateProductRequest.costOfGoodsSold`
+  anotado `@deprecated` con referencia al guard.
+
+### Tests añadidos (14 casos en 2 archivos)
+
+- `src/lib/commercial/__tests__/hubspot-outbound-guard.test.ts` (8 casos):
+  strip camelCase y snake_case, strip margin fields, preserve pricing-safe fields,
+  throw con lista de leaked fields, no throw con safe-only, leak report
+- `src/lib/commercial/__tests__/quotation-events.test.ts` (6 casos):
+  dual-publish para quote created/synced, line_items_synced, product created/synced,
+  canonical-only para discount health alert, skip canonical cuando `quotationId` es null
+
+### Detailed Spec resuelta
+
+- **`greenhouse_finance.products` migration**: queda como FAÇADE durante cutover.
+  Se absorbe lógicamente vía `finance_product_id` bridge en
+  `greenhouse_commercial.product_catalog`. No se borra en TASK-347;
+  TASK-349 cerrará el drop cuando la UI de workspace esté lista.
+- **Mapping HubSpot quote → quotation**: `hubspot_quote_id` persiste en
+  `greenhouse_commercial.quotations.hubspot_quote_id`. La identidad canónica
+  (`quotation_id`) se resuelve via `resolveQuotationIdentity` (TASK-346);
+  `quotation_number` es distinto de `hubspot_quote_id` (uno es human-readable
+  agency-side, el otro HubSpot internal ID).
+- **Drift cron vs edición local**: resuelto por ahora con dirección inbound
+  dominante (cron HubSpot → canonical). Edición local de drafts canónicos aún
+  no expone surface (TASK-349). Cuando coexistan, el `source_system` en
+  `quotations` + `updated_at` serán los tiebreakers; `hubspot_last_synced_at`
+  registra el último roundtrip.
+
+### Verification ejecutado
+
+- `pnpm exec tsc --noEmit --incremental false` → 0 errors
+- `pnpm lint` → 0 errors
+- `pnpm test` → 1309 passed / 2 skipped (18 tests nuevos)
+- `pnpm build` → exit 0 (warnings Dynamic server usage preexistentes)
+- `rg "new Pool\(" src` → sólo `src/lib/postgres/client.ts`
+
+### Acceptance criteria
+
+- [x] Quotes, products y line items HubSpot sincronizan contra el anchor canónico
+      y emiten eventos `commercial.*` además de los legacy `finance.*`
+- [x] Rutas y cron actuales de HubSpot siguen operativos (sin cambio externo)
+- [x] No se empujan costo ni margen a HubSpot (guard + defense-in-depth en service)
+- [x] El catálogo synced convive con el canonical como bridge, no como root
+      comercial alternativo (escritura legacy + canonical en misma transacción,
+      lecturas canonical-first)
+
+### Archivos físicos
+
+Archivo movido de `docs/tasks/to-do/` a `docs/tasks/complete/` el 2026-04-17
+tras pasar verificación completa.

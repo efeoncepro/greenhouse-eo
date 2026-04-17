@@ -2,9 +2,13 @@ import 'server-only'
 
 import { createHubSpotGreenhouseProduct } from '@/lib/integrations/hubspot-greenhouse-service'
 import { syncCanonicalFinanceProduct } from '@/lib/finance/quotation-canonical-store'
+import { getCommercialProduct } from '@/lib/commercial/product-catalog-store'
+import {
+  assertNoCostFieldsInHubSpotPayload,
+  sanitizeHubSpotProductPayload
+} from '@/lib/commercial/hubspot-outbound-guard'
+import { publishProductCreated } from '@/lib/commercial/quotation-events'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 // ── Types ──
 
@@ -36,18 +40,23 @@ export const createHubSpotProduct = async (input: CreateHubSpotProductInput): Pr
   // 1. Call Cloud Run to create in HubSpot
   let hubspotProductId: string | null = null
 
+  // TASK-347: cost/margin fields must NEVER leave Greenhouse. Strip them before
+  // forwarding to the HubSpot integration service.
+  const hubspotPayload = sanitizeHubSpotProductPayload({
+    name,
+    sku,
+    description,
+    unitPrice,
+    tax,
+    isRecurring,
+    billingFrequency,
+    billingPeriodCount
+  })
+
+  assertNoCostFieldsInHubSpotPayload(hubspotPayload as Record<string, unknown>)
+
   try {
-    const response = await createHubSpotGreenhouseProduct({
-      name,
-      sku,
-      description,
-      unitPrice,
-      costOfGoodsSold,
-      tax,
-      isRecurring,
-      billingFrequency,
-      billingPeriodCount
-    })
+    const response = await createHubSpotGreenhouseProduct(hubspotPayload as Parameters<typeof createHubSpotGreenhouseProduct>[0])
 
     hubspotProductId = response.hubspotProductId
   } catch (error) {
@@ -94,18 +103,16 @@ export const createHubSpotProduct = async (input: CreateHubSpotProductInput): Pr
 
   await syncCanonicalFinanceProduct({ productId })
 
-  // 3. Outbox event
-  await publishOutboxEvent({
-    aggregateType: AGGREGATE_TYPES.product,
-    aggregateId: productId,
-    eventType: EVENT_TYPES.productCreated,
-    payload: {
-      productId,
-      hubspotProductId,
-      name,
-      sku,
-      direction: 'outbound'
-    }
+  const canonical = await getCommercialProduct(productId).catch(() => null)
+
+  // 3. Outbox events (legacy finance.product.* + canonical commercial.product_catalog.*)
+  await publishProductCreated({
+    productId,
+    hubspotProductId,
+    name,
+    sku,
+    commercialProductId: canonical?.productId ?? null,
+    direction: 'outbound'
   })
 
   return {

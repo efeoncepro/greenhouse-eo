@@ -5,9 +5,9 @@ import {
   type HubSpotGreenhouseQuoteProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
+import { resolveQuotationIdentity } from '@/lib/finance/pricing'
+import { publishQuoteSynced } from '@/lib/commercial/quotation-events'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { syncQuoteLineItems } from '@/lib/hubspot/sync-hubspot-line-items'
 
 // ── Status mapping: HubSpot → Greenhouse ──
@@ -138,22 +138,8 @@ const upsertQuoteFromHubSpot = async (
 
   const action = (result[0]?.action ?? 'skipped') as 'created' | 'updated' | 'skipped'
 
-  if (action === 'created' || action === 'updated') {
-    await publishOutboxEvent({
-      aggregateType: AGGREGATE_TYPES.quote,
-      aggregateId: quoteId,
-      eventType: EVENT_TYPES.quoteSynced,
-      payload: {
-        quoteId,
-        hubspotQuoteId,
-        hubspotDealId: dealId,
-        sourceSystem: 'hubspot',
-        action,
-        organizationId: space.organization_id,
-        spaceId: space.space_id
-      }
-    })
-  }
+  // Canonical publish happens after line items + canonical sync in the caller,
+  // so quotationId can be included. See syncHubSpotQuotesForCompany below.
 
   return action
 }
@@ -224,10 +210,31 @@ export const syncHubSpotQuotesForCompany = async (hubspotCompanyId: string): Pro
           result.errors.push(`Quote ${quoteId} line items: ${liErr instanceof Error ? liErr.message : String(liErr)}`)
         }
 
+        let quotationId: string | null = null
+
         try {
           await syncCanonicalFinanceQuote({ quoteId })
+
+          const identity = await resolveQuotationIdentity(quoteId)
+
+          quotationId = identity?.quotationId ?? null
         } catch (bridgeErr) {
           result.errors.push(`Quote ${quoteId} canonical bridge: ${bridgeErr instanceof Error ? bridgeErr.message : String(bridgeErr)}`)
+        }
+
+        try {
+          await publishQuoteSynced({
+            quoteId,
+            quotationId,
+            hubspotQuoteId: quote.identity.hubspotQuoteId,
+            hubspotDealId: quote.associations.dealId ?? null,
+            sourceSystem: 'hubspot',
+            action,
+            organizationId: space.organization_id,
+            spaceId: space.space_id
+          })
+        } catch (publishErr) {
+          result.errors.push(`Quote ${quoteId} publish: ${publishErr instanceof Error ? publishErr.message : String(publishErr)}`)
         }
       }
     } catch (err) {

@@ -245,6 +245,13 @@ export interface HubSpotGreenhouseCreateProductRequest {
   sku: string
   description?: string
   unitPrice?: number
+
+  /**
+   * @deprecated TASK-347: cost must never be forwarded to HubSpot. Keep in the type
+   * only to support the legacy inbound sync where HubSpot sends it back to Greenhouse.
+   * Callers creating outbound products must NOT set this field; the outbound guard
+   * (`src/lib/commercial/hubspot-outbound-guard.ts`) strips it defensively.
+   */
   costOfGoodsSold?: number
   tax?: number
   isRecurring?: boolean
@@ -390,10 +397,16 @@ export const getHubSpotGreenhouseProduct = async (productId: string) =>
 export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseCreateProductRequest) => {
   const { baseUrl, timeoutMs } = getServiceConfig()
 
+  // TASK-347 defense-in-depth: strip cost_of_goods_sold if a caller forgot the guard.
+  // The authoritative sanitizer lives in src/lib/commercial/hubspot-outbound-guard.ts.
+  const safePayload: Record<string, unknown> = { ...payload }
+
+  delete safePayload.costOfGoodsSold
+
   const response = await fetch(`${baseUrl}/products`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(safePayload),
     cache: 'no-store',
     next: { revalidate: 0 },
     signal: AbortSignal.timeout(timeoutMs)

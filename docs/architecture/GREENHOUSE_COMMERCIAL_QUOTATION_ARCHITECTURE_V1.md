@@ -1,10 +1,69 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.3
+> **Version:** 2.4
 > **Created:** 2026-04-09
-> **Updated:** 2026-04-17 — v2.3: TASK-346 pricing/costing/margin core materialized (margin targets, role rate cards, revenue metric config, costing engine, discount health, MRR/ARR/TCV/ACV)
+> **Updated:** 2026-04-17 — v2.4: TASK-347 HubSpot canonical bridge + event namespace convergence (`commercial.quotation.*`, `commercial.product_catalog.*`), outbound cost-field guard, `source=canonical` reader for product catalog
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
-> **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+> **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-17 — TASK-347 HubSpot canonical bridge + event namespace convergence
+
+- **Canonical-first semantics declared.** `greenhouse_commercial.*` is the primary
+  contract target; `greenhouse_finance.*` persists as a compat façade with bridge
+  syncers for the duration of the cutover (until TASK-349 closes). No table dropped.
+- **Event namespace fan-out.** HubSpot sync publishers (inbound quotes, inbound
+  products, inbound line items, outbound create-quote, outbound create-product)
+  now route all emissions through `src/lib/commercial/quotation-events.ts`, which
+  dual-publishes:
+  - legacy `finance.quote.*` / `finance.product.*` / `finance.quote_line_item.*`
+  - canonical `commercial.quotation.*` / `commercial.product_catalog.*` /
+    `commercial.quotation.line_items_synced`
+  - `commercial.discount.health_alert` (TASK-346) now registered canonically with
+    `aggregate_type='quotation'` and uses the proper `outbox_events.payload_json`
+    column (fix from TASK-346 where raw insert referenced a missing column).
+- **Outbound cost-field governance.** `src/lib/commercial/hubspot-outbound-guard.ts`
+  is the only authoritative path for building HubSpot-bound payloads. Forbidden
+  fields (`costOfGoodsSold`, `cost_of_goods_sold`, `unit_cost`, `loaded_cost`,
+  `marginPct`, `targetMarginPct`, `floorMarginPct`, `effectiveMarginPct`,
+  `costBreakdown`) are stripped by `sanitizeHubSpotProductPayload` and double-checked
+  at the service boundary (`createHubSpotGreenhouseProduct` deletes `costOfGoodsSold`
+  defensively even if a caller skipped the guard). Violations throw
+  `HubSpotCostFieldLeakError`.
+- **Canonical product catalog reader.** `src/lib/commercial/product-catalog-store.ts`
+  (`listCommercialProductCatalog`, `getCommercialProduct`) exposes
+  `greenhouse_commercial.product_catalog` with canonical identity
+  (`product_id` + `finance_product_id` bridge). `/api/finance/products?view=canonical`
+  returns the new shape without breaking the legacy default view. ProductCatalogView
+  UI is NOT wired to sidebar yet (left for TASK-349 workspace redesign).
+- **Aggregate types registered.** `AGGREGATE_TYPES.quotation`,
+  `AGGREGATE_TYPES.quotationLineItem`, `AGGREGATE_TYPES.productCatalog` added to
+  `event-catalog.ts`. Legacy aggregate types (`quote`, `quote_line_item`, `product`)
+  preserved for backward compatibility.
+- **Cutover policy.**
+  - Inbound sync: HubSpot → `greenhouse_finance.*` (bridge writes to
+    `greenhouse_commercial.*` via existing `syncCanonicalFinanceQuote` /
+    `syncCanonicalFinanceProduct`). Legacy write + canonical bridge remain
+    transactional; events emitted after canonical anchor is populated.
+  - Outbound create: Greenhouse → `greenhouse_finance.*` → HubSpot (payload
+    sanitized) → `syncCanonicalFinanceQuote` / `syncCanonicalFinanceProduct`
+    → dual publish. `publishProductCreated` / `publishQuoteCreated` fan-out to
+    both namespaces in the same transaction.
+  - Double-write avoidance: the bridge is idempotent via `ON CONFLICT (finance_quote_id)`
+    on `quotations` and `ON CONFLICT (finance_product_id)` on `product_catalog`.
+- **Compatibility surfaces.**
+  - `/api/finance/quotes`, `/api/finance/quotes/[id]`, `/api/finance/quotes/[id]/lines`
+    already read from canonical (TASK-345). No changes required for TASK-347.
+  - `/api/finance/products` default view preserved; `view=canonical` query param
+    switches to `greenhouse_commercial.product_catalog`.
+  - Cron routes (`/api/cron/hubspot-quotes-sync`, `/api/cron/hubspot-products-sync`)
+    unchanged externally; internally they invoke the updated publishers.
+- **Pending cleanup (future tasks):**
+  - Retire `finance.quote.*` / `finance.product.*` aliases once all consumers
+    migrate (TASK-349+).
+  - Drop `greenhouse_finance.products` table entirely after ProductCatalog workspace
+    (TASK-349) is live (out of scope for TASK-347).
 
 ---
 

@@ -6,8 +6,8 @@ import {
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { resolveQuotationIdentity } from '@/lib/finance/pricing'
+import { publishQuoteCreated } from '@/lib/commercial/quotation-events'
 
 // ── Types ──
 
@@ -231,12 +231,12 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
 
     await syncCanonicalFinanceQuote({ quoteId: persistedQuoteId, client })
 
-    await publishOutboxEvent({
-      aggregateType: AGGREGATE_TYPES.quote,
-      aggregateId: persistedQuoteId,
-      eventType: EVENT_TYPES.quoteCreated,
-      payload: {
+    const identity = await resolveQuotationIdentity(persistedQuoteId).catch(() => null)
+
+    await publishQuoteCreated(
+      {
         quoteId: persistedQuoteId,
+        quotationId: identity?.quotationId ?? null,
         hubspotQuoteId,
         hubspotDealId: dealId || null,
         sourceSystem: 'hubspot',
@@ -246,8 +246,9 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
         amount: totalAmount,
         currency: 'CLP',
         lineItemCount: lineItems.length
-      }
-    }, client)
+      },
+      client
+    )
   })
 
   return {

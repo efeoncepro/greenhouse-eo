@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
+import { publishDiscountHealthAlert } from '@/lib/commercial/quotation-events'
 
 import type {
   CostComponentBreakdown,
@@ -456,25 +457,17 @@ export const persistQuotationPricing = async (
 
     if (snapshot.health.alerts.some(alert => alert.level === 'error' || alert.requiredApproval === 'finance')) {
       try {
-        await client.query(
-          `INSERT INTO greenhouse_sync.outbox_events (
-             aggregate_type,
-             aggregate_id,
-             event_type,
-             payload
-           ) VALUES ('quote', $1, 'commercial.discount.health_alert', $2::jsonb)`,
-          [
-            input.quotationId,
-            JSON.stringify({
-              quotationId: input.quotationId,
-              versionNumber: input.versionNumber,
-              marginPct: snapshot.totals.effectiveMarginPct,
-              floorPct: snapshot.marginResolution.floorMarginPct,
-              targetPct: snapshot.marginResolution.targetMarginPct,
-              alerts: snapshot.health.alerts,
-              createdBy: input.createdBy
-            })
-          ]
+        await publishDiscountHealthAlert(
+          {
+            quotationId: input.quotationId,
+            versionNumber: input.versionNumber,
+            marginPct: snapshot.totals.effectiveMarginPct,
+            floorPct: snapshot.marginResolution.floorMarginPct,
+            targetPct: snapshot.marginResolution.targetMarginPct,
+            alerts: snapshot.health.alerts as unknown as Array<Record<string, unknown>>,
+            createdBy: input.createdBy
+          },
+          client
         )
       } catch (error) {
         // Outbox insertion is best-effort; alert publishing should not block save.
