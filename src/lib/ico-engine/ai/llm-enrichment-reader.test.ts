@@ -202,6 +202,72 @@ describe('readMemberAiLlmSummary', () => {
       timeline: []
     })
   })
+
+  it('falls back to historical timeline when current-state enrichments are empty', async () => {
+    mockQuery
+      .mockResolvedValueOnce([
+        {
+          total: 0,
+          succeeded: 0,
+          failed: 0,
+          avg_quality_score: null,
+          last_processed_at: null
+        }
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          run_id: 'EO-AIR-9',
+          status: 'succeeded',
+          started_at: '2026-04-17T09:00:00.000Z',
+          completed_at: '2026-04-17T09:02:00.000Z'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          enrichment_id: 'EO-AIE-90',
+          signal_type: 'root_cause',
+          metric_name: 'ftr_pct',
+          severity: 'critical',
+          explanation_summary: 'Historial recuperado',
+          root_cause_narrative: 'El problema viene de revisión tardía.',
+          recommended_action: 'Revisar con Daniela',
+          processed_at: '2026-04-16T10:20:18.447Z'
+        }
+      ])
+
+    const result = await readMemberAiLlmSummary('member-123', 2026, 4, 3)
+
+    expect(result).toEqual({
+      totalAnalyzed: 1,
+      lastAnalysis: '2026-04-16T10:20:18.447Z',
+      runStatus: 'succeeded',
+      insights: [
+        {
+          id: 'EO-AIE-90',
+          signalType: 'root_cause',
+          metricId: 'ftr_pct',
+          severity: 'critical',
+          explanation: 'Historial recuperado',
+          rootCauseNarrative: 'El problema viene de revisión tardía.',
+          recommendedAction: 'Revisar con Daniela',
+          processedAt: '2026-04-16T10:20:18.447Z'
+        }
+      ],
+      timeline: [
+        {
+          id: 'EO-AIE-90',
+          signalType: 'root_cause',
+          metricId: 'ftr_pct',
+          severity: 'critical',
+          explanation: 'Historial recuperado',
+          rootCauseNarrative: 'El problema viene de revisión tardía.',
+          recommendedAction: 'Revisar con Daniela',
+          processedAt: '2026-04-16T10:20:18.447Z'
+        }
+      ]
+    })
+  })
 })
 
 describe('readSpaceAiLlmSummary', () => {
@@ -283,6 +349,72 @@ describe('readSpaceAiLlmSummary', () => {
         }
       ],
       timeline: []
+    })
+  })
+
+  it('falls back to historical timeline when the current-state space snapshot is empty', async () => {
+    mockQuery
+      .mockResolvedValueOnce([
+        {
+          total: 0,
+          succeeded: 0,
+          failed: 0,
+          avg_quality_score: null,
+          last_processed_at: null
+        }
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          run_id: 'EO-AIR-10',
+          status: 'succeeded',
+          started_at: '2026-04-17T10:00:00.000Z',
+          completed_at: '2026-04-17T10:02:00.000Z'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          enrichment_id: 'EO-AIE-91',
+          signal_type: 'recommendation',
+          metric_name: 'otd_pct',
+          severity: 'warning',
+          explanation_summary: 'Historial de espacio recuperado',
+          root_cause_narrative: null,
+          recommended_action: 'Replanificar entregables',
+          processed_at: '2026-04-16T08:45:00.000Z'
+        }
+      ])
+
+    const result = await readSpaceAiLlmSummary('space-123', 2026, 4, 3)
+
+    expect(result).toEqual({
+      totalAnalyzed: 1,
+      lastAnalysis: '2026-04-16T08:45:00.000Z',
+      runStatus: 'succeeded',
+      insights: [
+        {
+          id: 'EO-AIE-91',
+          signalType: 'recommendation',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Historial de espacio recuperado',
+          rootCauseNarrative: null,
+          recommendedAction: 'Replanificar entregables',
+          processedAt: '2026-04-16T08:45:00.000Z'
+        }
+      ],
+      timeline: [
+        {
+          id: 'EO-AIE-91',
+          signalType: 'recommendation',
+          metricId: 'otd_pct',
+          severity: 'warning',
+          explanation: 'Historial de espacio recuperado',
+          rootCauseNarrative: null,
+          recommendedAction: 'Replanificar entregables',
+          processedAt: '2026-04-16T08:45:00.000Z'
+        }
+      ]
     })
   })
 })
