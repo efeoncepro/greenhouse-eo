@@ -463,3 +463,15 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-413` | `to-do` | Kortex Identity Bridge Hardening & Contract Closure | `docs/tasks/to-do/TASK-413-kortex-identity-bridge-hardening.md` |
 | `TASK-414` | `to-do` | Payroll Reopen Policy Engine & Hardening | `docs/tasks/to-do/TASK-414-payroll-reopen-policy-engine-hardening.md` |
 | `TASK-415` | `complete` | HR Leave Balance Visibility, Admin Backfill & Manual Adjustments | `docs/tasks/complete/TASK-415-hr-leave-balance-admin-backfill.md` |
+| `TASK-416` | `to-do` | Finance Metric Registry Foundation | `docs/tasks/to-do/TASK-416-finance-metric-registry-foundation.md` |
+| `TASK-417` | `to-do` | Finance Metric Registry Reader Primitives | `docs/tasks/to-do/TASK-417-finance-metric-registry-reader-primitives.md` |
+| `TASK-418` | `to-do` | Finance Signal Engine Cutover to Registry | `docs/tasks/to-do/TASK-418-finance-signal-engine-registry-cutover.md` |
+| `TASK-419` | `to-do` | Finance Dashboard Cutover to Registry | `docs/tasks/to-do/TASK-419-finance-dashboard-registry-cutover.md` |
+| `TASK-420` | `to-do` | Cost Intelligence Consumer Cutover to Registry | `docs/tasks/to-do/TASK-420-cost-intelligence-registry-cutover.md` |
+| `TASK-421` | `to-do` | Finance Metric Targets Editable + Effective-Dating (v2) | `docs/tasks/to-do/TASK-421-finance-metric-targets-editable-effective-dating.md` |
+| `TASK-422` | `to-do` | Finance Metric Quality Gates Runtime + Stale Data UX (v2) | `docs/tasks/to-do/TASK-422-finance-metric-quality-gates-stale-data-ux.md` |
+| `TASK-423` | `to-do` | Finance Metric Per-Scope Thresholds (v2) | `docs/tasks/to-do/TASK-423-finance-metric-per-scope-thresholds.md` |
+| `TASK-424` | `to-do` | Finance Metric LLM Glossary Prompt Scoping (v2) | `docs/tasks/to-do/TASK-424-finance-metric-llm-glossary-prompt-scoping.md` |
+| `TASK-425` | `to-do` | Finance Metric Dependency DAG Runtime Propagation (v2) | `docs/tasks/to-do/TASK-425-finance-metric-dependency-dag-runtime-propagation.md` |
+| `TASK-426` | `to-do` | Finance Metric Cross-Domain References (v2) | `docs/tasks/to-do/TASK-426-finance-metric-cross-domain-references.md` |
+| `TASK-427` | `to-do` | Finance Metric Registry Sharding (trigger-based) | `docs/tasks/to-do/TASK-427-finance-metric-registry-sharding.md` |
