@@ -179,4 +179,4 @@ La task debe dejar explícito:
 
 ## Open Questions
 
-- si los templates deben poder guardar pricing explícito o solo estructura + sugerencias de margen
+- ~~si los templates deben poder guardar pricing explícito o solo estructura + sugerencias de margen~~ → **Resuelto 2026-04-17:** `quote_template_items` guarda ambos: `default_margin_pct` (sugerencia, reutiliza el costing-engine al instanciar) y `default_unit_price` (precio explícito opcional). El comercial elige en el wizard de template si deja el margen resolver el precio o fija un unit_price. Precio explícito gana al instanciar si está presente; si es null, el orchestrator calcula desde cost + default_margin_pct.

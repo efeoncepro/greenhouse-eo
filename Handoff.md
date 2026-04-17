@@ -1,5 +1,37 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-348 Quotation Governance Runtime (approvals, versions, terms, templates, audit)
+
+- **Estado:** `complete`, entregado y pusheado.
+- **Rama:** `task/TASK-348-quotation-governance-runtime`
+- **Entregado:**
+  - Migration `20260417140553325_task-348-quotation-governance-runtime.sql` — 7 tablas nuevas en `greenhouse_commercial` (`approval_policies`, `approval_steps`, `quotation_audit_log`, `terms_library`, `quotation_terms`, `quote_templates`, `quote_template_items`) + seeds de 3 approval policies globales y 6 terms reutilizables.
+  - Runtime helpers en `src/lib/commercial/governance/` (audit-log, approval-evaluator, approval-steps-store, policies-store, terms-store con variable resolver, templates-store, versions-store con clone+diff).
+  - API extension:
+    - Per-quote: `/api/finance/quotes/[id]/{versions,approve,audit,terms}`.
+    - Globales: `/api/finance/quotation-governance/{approval-policies,terms-library,templates}[/[id]]`.
+  - 8 eventos outbox nuevos bajo `commercial.quotation.*` (`version_created`, `approval_requested`, `approval_decided`, `sent`, `approved`, `rejected`, `template_used`, `template_saved`).
+  - UI con tabs en `QuoteDetailView.tsx`: General / Versiones / Aprobaciones / Términos / Auditoría + componentes en `src/views/greenhouse/finance/governance/`.
+  - 21 tests unitarios nuevos en `src/lib/commercial/governance/__tests__/` cubriendo `approval-evaluator`, `version-diff` y `resolveTermVariables`.
+  - Doc arch `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.5 con delta del governance runtime y resolución de la open question sobre templates (`default_unit_price` + `default_margin_pct` coexisten).
+  - Doc funcional `docs/documentation/finance/cotizaciones-gobernanza.md` creada.
+- **Decisiones notables:**
+  - La gobernanza se expone bajo `/api/finance/quotes/[id]/*` y `/api/finance/quotation-governance/*` en vez de `/api/commercial/*` declarado en la spec §22 — coherente con el runtime vigente post TASK-345/346; cuando cierre el cutover full-commercial (`TASK-349`) se podrá aliasear.
+  - `approved_by` / `approved_at` se siguen poblando en `quotations`, pero la verdad de quién aprobó qué paso vive en `approval_steps`; el audit log registra ambas narrativas.
+  - Terms guardan `body_resolved` como snapshot inmutable al aplicar — un cambio en `terms_library` NO re-escribe el texto ya aplicado a una quote.
+- **Gaps que quedan para TASK-349:**
+  - Apply template al crear quote (`POST /api/finance/quotes` debería aceptar `templateId`).
+  - Save-as-template desde quote existente (endpoint nuevo).
+  - Páginas admin para CRUD visual de policies / terms / templates.
+  - Smoke manual del flow approve/reject pendiente de levantar dev server (cubierto en verificación de TASK-349).
+- **Validado:**
+  - `pnpm pg:connect:migrate` ✓
+  - `pnpm db:generate-types` ✓
+  - `pnpm lint` ✓
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm test` 1309/1309 ✓ (+ 21 tests nuevos de governance)
+  - `pnpm build` ✓
+
 ## Sesion 2026-04-17 — Nexa Insights history archive + replay parcial de abril
 
 - **Estado:** `in_progress`, fix backend listo y validado; recovery operativo ejecutado de forma parcial por retención de origen.

@@ -1464,13 +1464,22 @@ CREATE TABLE greenhouse_commercial.quote_template_items (
   suggested_hours    NUMERIC(8,2),
   unit               TEXT NOT NULL DEFAULT 'hour',
   quantity           NUMERIC(10,2) NOT NULL DEFAULT 1,
-  default_margin_pct NUMERIC(5,2),
+  default_margin_pct NUMERIC(5,2),        -- sugerencia para el costing-engine
+  default_unit_price NUMERIC(14,2),       -- precio explícito opcional; si != null gana al instanciar
   sort_order         INTEGER NOT NULL DEFAULT 0,
   created_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_template_items ON greenhouse_commercial.quote_template_items (template_id);
 ```
+
+**Resolución de precio al instanciar un template (v2 — TASK-348):** el template guarda AMBOS `default_margin_pct` (sugerencia) y `default_unit_price` (precio explícito opcional). El orchestrator al aplicar el template:
+
+1. Si `default_unit_price` está presente → lo usa directo como `unit_price` de la line item.
+2. Si `default_unit_price` es null → el costing-engine calcula `unit_cost` desde role rate card y luego `unit_price = unit_cost / (1 - default_margin_pct/100)`.
+3. Si ambos son null → solo se pre-popula la estructura y el comercial completa manualmente.
+
+Esta doble opción permite templates rígidos (por ejemplo "Onboarding fijo $5M") coexistiendo con templates variables (por ejemplo "Retainer creativo con margen objetivo 35%").
 
 ### 19.2. Flujo de uso
 
