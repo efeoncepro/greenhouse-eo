@@ -2,8 +2,7 @@ import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
 
-
-import AgencyEconomicsView from '@/views/agency/AgencyEconomicsView'
+import AgencyEconomicsView from '@/views/greenhouse/agency/economics/EconomicsView'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 

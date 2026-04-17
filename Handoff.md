@@ -1,5 +1,77 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-143 Agency Economics API & View
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/agency/agency-economics.ts`
+    - reader nuevo sobre `getDb()` + SQL tipado para leer `greenhouse_serving.operational_pl_snapshots` en modo `space-first`
+    - resuelve ventana mensual, totales, ranking, tendencia y estado parcial sin recalcular P&L inline
+    - reutiliza `getServicesBySpace()` solo como contexto contractual del drill-down, sin inventar economía por servicio
+  - `src/app/api/agency/economics/route.ts`
+    - route nueva `GET /api/agency/economics`
+    - mantiene guard `requireAgencyTenantContext()` y acepta `year`, `month`, `trendMonths`
+  - `src/views/greenhouse/agency/economics/EconomicsView.tsx`
+    - nueva surface Agency con componentes Vuexy/MUI existentes (`StatsWithAreaChart`, `HorizontalWithSubtitle`, `CustomChip`, `EmptyState`)
+    - KPIs, tabla expandible por Space, ranking, tendencias y contexto de servicios
+    - copy visible deja explícito que el detalle económico por servicio todavía no existe
+  - `src/app/(dashboard)/agency/economics/page.tsx`
+    - deja de montar la vista legacy `src/views/agency/AgencyEconomicsView.tsx`
+    - ahora apunta al surface nuevo `src/views/greenhouse/agency/economics/EconomicsView.tsx`
+  - tests nuevos:
+    - `src/app/api/agency/economics/route.test.ts`
+    - `src/views/greenhouse/agency/economics/EconomicsView.test.tsx`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/complete/TASK-143-agency-economics-api.md`
+  - `changelog.md`
+  - `project_context.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/app/api/agency/economics/route.test.ts src/views/greenhouse/agency/economics/EconomicsView.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+- **Notas operativas:**
+  - la lane queda cerrada sobre `operational_pl_snapshots`; no reintroduce lecturas directas del bridge legacy ni usa `/api/finance/dashboard/pnl` como motor principal
+  - el drill-down por servicio sigue pendiente hasta que exista serving dedicado en `TASK-146`
+
+## Sesion 2026-04-17 — documentación del sistema de email aterrizada al runtime real
+
+- **Estado:** `documentado`
+- **Rama:** `develop`
+- **Actualizado:**
+  - `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+  - `docs/documentation/plataforma/sistema-email-templates.md`
+- **Cambio documental:**
+  - la documentación ya no describe el sistema de email como si fuera solo una capa simple de templates, ni como si ya fuera una suite completa de messaging enterprise
+  - la foto real quedó explicitada como:
+    - delivery centralizado sobre Resend
+    - persistencia operativa en `greenhouse_notifications`
+    - retries, `dead_letter`, `priority`, `kill switch`, webhook de bounce/complaint, unsubscribe y contexto automático
+    - soporte async complementario vía `ops-worker`
+  - también quedó documentado lo que todavía falta para evolucionarlo más: observabilidad first-class, control plane más fino, broadcasts más desacoplados, más catálogo vivo y mejor UX operativa de soporte
+
+## Sesion 2026-04-17 — docs operativos de agentes alineados al modelo views + entitlements
+
+- **Estado:** `documentado`
+- **Rama:** `develop`
+- **Actualizado:**
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - `docs/tasks/TASK_PROCESS.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Cambio operativo:**
+  - los agentes ya no deben pensar permisos solo desde `views`
+  - cualquier diseño de arquitectura, task o solución que toque acceso debe distinguir explícitamente entre:
+    - `routeGroups`
+    - `views` / `authorizedViews`
+    - `entitlements`
+    - `startup policy`
+
 ## Sesion 2026-04-17 — TASK-404 Entitlements Governance Admin Center
 
 - **Estado:** `complete`, `validado localmente`, `migracion aplicada en shared dev DB`

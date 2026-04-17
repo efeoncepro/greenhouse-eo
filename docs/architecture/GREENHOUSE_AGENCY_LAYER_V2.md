@@ -202,7 +202,7 @@ La vista más importante. Cuando un Operations Lead abre un Space, debe ver todo
 
 ### 4.2 Economics Engine
 
-Reemplaza el placeholder actual. Construye P&L real por Space y por Service.
+La surface `/agency/economics` ya quedó activada en modo `space-first`. Construye P&L real por Space sobre serving materializado y deja el detalle económico por servicio como follow-up explícito.
 
 ```
 /agency/economics
@@ -227,7 +227,11 @@ Reemplaza el placeholder actual. Construye P&L real por Space y por Service.
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Backend:** Consume `GET /api/finance/dashboard/pnl` para totales y `getSpaceFinanceMetrics()` para per-space. Post TASK-069: lee `operational_pl_snapshots` materializado.
+**Backend real (2026-04-17):**
+- `GET /api/agency/economics`
+- reader dedicado `src/lib/agency/agency-economics.ts`
+- source principal `greenhouse_serving.operational_pl_snapshots` (`scope_type='space'`)
+- expansión por fila con contexto de `services`, sin `service_economics` fabricado antes de `TASK-146`
 
 ### 4.3 Team Capacity Engine
 

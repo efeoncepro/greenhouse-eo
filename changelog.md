@@ -2,6 +2,25 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — TASK-143: Agency Economics queda space-first sobre Cost Intelligence
+
+- `GET /api/agency/economics` ya existe y entrega el snapshot de Agency Economics desde `greenhouse_serving.operational_pl_snapshots`, con ventana mensual, ranking, tendencias y estado parcial explícito.
+- `/agency/economics` deja de depender de la surface legacy client-first y monta una vista nueva en `src/views/greenhouse/agency/economics/EconomicsView.tsx`.
+- La nueva surface usa componentes Vuexy/MUI ya presentes en el repo para mostrar:
+  - KPIs de ingresos, margen, payroll ratio y costo total
+  - tabla expandible por Space con `labor`, `direct`, `overhead`, margen y comparación contra el mes anterior
+  - ranking de rentabilidad y charts de ingresos vs costo / tendencia de margen
+- El drill-down por servicio queda explícitamente honesto: muestra contexto contractual y catálogo del Space, pero no fabrica revenue, costo ni margen por servicio antes de `TASK-146`.
+
+### 2026-04-17 — Docs operativos de agentes alineados al modelo views + entitlements
+
+- `AGENTS.md`, `CLAUDE.md` y `docs/tasks/TASK_PROCESS.md` ahora exigen que agentes y tasks distingan explícitamente entre:
+  - `routeGroups` como acceso broad
+  - `views` / `authorizedViews` como surface visible y proyección de UI
+  - `entitlements` como autorización fina capability-based
+  - `startup policy` como contrato separado de entrypoint/Home
+- El objetivo es evitar soluciones y specs nuevas que modelen acceso solo como `views` o solo como `capabilities` sin declarar el plano correcto.
+
 ### 2026-04-17 — TASK-404: Entitlements Governance Admin Center
 
 - `Admin Center > Gobernanza de acceso` deja de ser solo una lane de `authorizedViews` y pasa a gobernar entitlements operativos con:

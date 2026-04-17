@@ -1,4 +1,28 @@
+## Delta 2026-04-17 TASK-143 Agency Economics queda activada sobre serving canónico
+
+- `Agency > Economía` ya no debe tratarse como una vista legacy client-first ni como placeholder.
+- Runtime nuevo:
+  - `GET /api/agency/economics`
+  - `src/lib/agency/agency-economics.ts`
+  - `src/views/greenhouse/agency/economics/EconomicsView.tsx`
+- Contrato operativo:
+  - la lane consume `greenhouse_serving.operational_pl_snapshots` como source principal
+  - el drill-down por servicio no debe inventar métricas ni repartir revenue inline mientras `TASK-146` siga abierta
+  - la expansión por Space puede mostrar solo contexto contractual/catálogo vía `services`
+- Decisión UI:
+  - la surface nueva reutiliza componentes Vuexy/MUI nativos del repo como referencia principal, no componentes inventados ad hoc
+
 # project_context.md
+
+## Delta 2026-04-17 Los docs operativos de agentes ya exigen pensar acceso en views + entitlements
+
+- `AGENTS.md`, `CLAUDE.md` y `docs/tasks/TASK_PROCESS.md` ya no deben permitir que una solution proposal trate acceso como si solo existieran `views`.
+- Contrato operativo actualizado para agentes:
+  - `routeGroups` siguen definiendo acceso broad por workspace o familia de rutas
+  - `authorizedViews` / `view_code` siguen definiendo surface visible, menú, tabs, page guards y otras proyecciones de UI
+  - `entitlements` (`module + capability + action + scope`) son la dirección canónica de autorización fina
+  - `startup policy` sigue siendo un contrato separado para entrypoint/Home
+- Al diseñar arquitectura, redactar tasks o proponer una implementación que toque acceso, el agente debe dejar explícito si el cambio vive en `views`, `entitlements`, `startup policy`, `routeGroups` o en varios planos a la vez.
 
 ## Delta 2026-04-17 TASK-404 materializa la gobernanza operativa de entitlements en Admin Center
 
