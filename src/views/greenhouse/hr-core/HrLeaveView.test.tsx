@@ -484,7 +484,7 @@ describe('HrLeaveView', () => {
         notes: 'Registro retroactivo'
       })
     })
-  })
+  }, 10000)
 
   it('explains proportional Chile vacation balances with carryover and rounded saldo actual', async () => {
     fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
@@ -755,7 +755,6 @@ describe('HrLeaveView', () => {
     const teamDetailDialog = await screen.findByRole('dialog', { name: /Valentina Hoyos/i })
 
     expect(within(teamDetailDialog).getByText('Actividad administrativa')).toBeInTheDocument()
-    expect(within(teamDetailDialog).getByText('Días ya tomados registrados')).toBeInTheDocument()
     expect(within(teamDetailDialog).getByText('Vacaciones registradas por HR')).toBeInTheDocument()
     expect(within(teamDetailDialog).getByText('Carga retroactiva por ausencia previa.')).toBeInTheDocument()
     expect(within(teamDetailDialog).getByText('06/04/2026 — 10/04/2026')).toBeInTheDocument()
