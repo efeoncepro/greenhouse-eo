@@ -2,6 +2,13 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — Nexa Insights: Historial extendido a Home, Space 360 y Person 360
+
+- Las 4 superficies Nexa (Agency, Home, Space 360, Person 360) ahora tienen toggle Recientes/Historial.
+- Cada timeline está scoped al contexto: Home ve todo el sistema, Space 360 solo ese space, Person 360 solo ese miembro.
+- Nuevos readers `readMemberAiLlmTimeline` y `readSpaceAiLlmTimeline` con el mismo patrón que el agency-wide, fetcheados en paralelo dentro de los summary readers existentes — sin impacto de latencia.
+- `MemberNexaInsightItem` / `SpaceNexaInsightItem` / `HomeNexaInsightItem` ahora requieren `processedAt`; los payloads incluyen `timeline: Item[]`.
+
 ### 2026-04-17 — Nexa Insights gana modo Historial (timeline cross-period)
 
 - `NexaInsightsBlock` incorpora un toggle Recientes/Historial en su header. La vista Historial muestra las últimas 20 señales succeeded del sistema ordenadas cronológicamente y agrupadas por día ("Hoy", "Ayer", fecha absoluta).

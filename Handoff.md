@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — Nexa Insights: Historial activado en las 4 superficies
+
+- **Estado:** `complete`, `deployed` (commit `bcf8a9c9`)
+- **Rama:** `feat/nexa-insights-timeline` → direct push a develop (política de velocidad)
+- **Contexto:** el commit anterior `f3d59422` shipeó el toggle Historial solo para Agency (via `IcoAdvisoryBlock`). Home, Space 360 y Person 360 quedaban opt-in — esta sesión las activa para cerrar el tema en todas las superficies Nexa.
+- **Implementado:**
+  - Backend scoped timelines:
+    - `readMemberAiLlmTimeline(memberId, limit=20)` — enrichments filtrados por `member_id`
+    - `readSpaceAiLlmTimeline(spaceId, limit=20)` — enrichments filtrados por `space_id`
+    - Ambos ordenan por `processed_at DESC`, `status='succeeded'`, sin filtro de período
+  - `readMemberAiLlmSummary` / `readSpaceAiLlmSummary` fetchean su timeline en paralelo (Promise.all) — zero latency extra
+  - Types: `MemberNexaInsightItem` / `SpaceNexaInsightItem` / `HomeNexaInsightItem` ganan `processedAt: string`; payloads ganan `timeline: Item[]`
+  - `get-home-snapshot.ts` mapea `insightsSummary.timeline` (agency-wide) via `mapHomeInsight`
+  - Views: HomeView + OverviewTab + PersonActivityTab pasan `timelineInsights={payload.timeline ?? []}`
+  - Tests: fixtures actualizados con `processedAt` + `timeline: []`
+- **Política de velocidad:** direct push tras local gates (lint + tsc + test 1269 pass + build). No PR — consistente con merge policy canónica cuando no hay branch protection.
+- **Validado:** local gates todos verdes.
+- **Impacto consumer:**
+  - `/home` → toggle aparece cuando hay timeline data (scope agency-wide)
+  - `/agency/spaces/[id]` → toggle con timeline scoped al space
+  - `/people/[memberId]` → toggle con timeline scoped al miembro
+  - `/agency?tab=ico` → ya estaba activo desde `f3d59422`, sigue idéntico
+- **Parallel work de Codex:** Codex pusheó en paralelo `TASK-450` + edits a README/REGISTRY. No pisé esos archivos; mi commit es selective-stage solo a los files owned por la feature.
+- **Follow-ups opcionales:**
+  - Filtrar timeline por severidad en el toggle (ej: solo críticos)
+  - Persistir preferencia de vista por usuario (actualmente es session-local)
+  - Agregar timeline a Finance Dashboard si se pide (actualmente el FinanceNexaInsightItem no tiene `processedAt` pero es extensión trivial)
+
 ## Sesion 2026-04-17 — Nexa Insights timeline (modo Historial) + root cause mapping fix
 
 - **Estado:** `complete`, `deployed a develop` (commit `f3d59422` + `91f66c3c`)

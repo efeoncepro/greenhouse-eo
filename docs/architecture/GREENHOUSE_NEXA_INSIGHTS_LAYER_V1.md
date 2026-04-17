@@ -1,5 +1,20 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-17 — Historial activado en las 4 superficies Nexa (Agency, Home, Space 360, Person 360)
+
+- Runtime activo:
+  - Nuevos readers scoped: `readMemberAiLlmTimeline(memberId, limit=20)` y `readSpaceAiLlmTimeline(spaceId, limit=20)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` — mismo patrón que `readAgencyAiLlmTimeline` pero filtrando por `member_id` / `space_id` respectivamente, status='succeeded', sin filtro de período
+  - `readMemberAiLlmSummary` y `readSpaceAiLlmSummary` fetchean su timeline scoped en paralelo via `Promise.all` — zero latency extra en el critical path
+  - `MemberNexaInsightItem` / `SpaceNexaInsightItem` / `HomeNexaInsightItem` ganan `processedAt: string` (requerido); todos los mappers lo propagan
+  - `MemberNexaInsightsPayload` / `SpaceNexaInsightsPayload` / `HomeNexaInsightsPayload` ganan `timeline: <Item>[]` (requerido, default array vacío)
+  - `get-home-snapshot.ts` mapea `insightsSummary.timeline` (agency-wide, ya fetcheado) via `mapHomeInsight` → Home hereda el timeline del scope agency
+  - `HomeView`, `OverviewTab` (Space 360) y `PersonActivityTab` (Person 360) pasan `timelineInsights={payload.timeline ?? []}` a `NexaInsightsBlock`
+- Contrato operativo:
+  - Cada superficie muestra su cadencia **scoped**: Home → sistema-wide, Space 360 → ese space, Person 360 → ese miembro. No hay drift de datos entre contextos
+  - El toggle Recientes/Historial aparece automáticamente en las 4 superficies cuando hay data — sin wiring adicional en consumers futuros
+  - Backward compatible: `timelineInsights` sigue siendo opcional en `NexaInsightsBlock`; callers que no lo pasen simplemente no muestran el toggle
+  - Los tests fixture se actualizaron para reflejar `processedAt` y `timeline: []` — el contrato queda reforzado por TypeScript
+
 ## Delta 2026-04-17 — NexaInsightsBlock gana modo Historial (timeline) además de Recientes
 
 - Runtime activo:
