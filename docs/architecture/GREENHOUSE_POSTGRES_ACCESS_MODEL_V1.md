@@ -1,5 +1,63 @@
 # Greenhouse PostgreSQL Access Model V1
 
+## Delta 2026-04-17 — Mutation guardrails vía trigger + session var (TASK-451)
+
+### Patrón canónico
+
+Para campos sensibles cuyo único writer legítimo es un flujo user-initiated (por definición, no sincronizable desde BigQuery u otro sistema), el modelo de acceso se refuerza con un **trigger a nivel DB + session var transaccional**. Esto vive encima del modelo de roles (runtime/migrator/admin): aunque un role tenga privilegio `UPDATE`, el trigger rechaza la mutación si el código no declara explícitamente la autorización.
+
+Forma canónica:
+
+```sql
+CREATE FUNCTION <schema>.guard_<field>_mutation() RETURNS TRIGGER AS $$
+BEGIN
+  IF OLD.<field> IS DISTINCT FROM NEW.<field> THEN
+    IF current_setting('app.<field>_change_authorized', TRUE) IS DISTINCT FROM 'true' THEN
+      RAISE EXCEPTION '<field> mutation not authorized.' USING ERRCODE = 'P0001';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER <table>_<field>_guard
+BEFORE UPDATE ON <schema>.<table>
+FOR EACH ROW EXECUTE FUNCTION <schema>.guard_<field>_mutation();
+```
+
+Y del lado aplicación, un helper que envuelve la escritura:
+
+```ts
+await withTransaction(async client => {
+  await client.query(`SET LOCAL app.<field>_change_authorized = 'true'`)
+  await client.query(`UPDATE ... SET <field> = $1 WHERE ...`, [value])
+  // opcional: publicar outbox event para observabilidad
+})
+```
+
+### Cuándo aplicar este patrón
+
+- El campo es user-initiated (passwords, secretos de usuario, tokens).
+- Ningún sistema externo es fuente de verdad para el campo.
+- Batches/syncs/backfills NO deben tocarlo.
+- El costo de una rotación accidental es alto (lockout, pérdida de acceso, compliance).
+
+### Implementación vigente
+
+- **`client_users.password_hash`** — TASK-451 / ISSUE-053. Ver detalle en `GREENHOUSE_IDENTITY_ACCESS_V2.md` Delta 2026-04-17.
+
+### Reglas
+
+1. Ningún batch/sync/cron puede emitir un UPDATE sobre un campo protegido sin el session var. Si lo intenta, el trigger rechaza loud con `P0001`.
+2. El session var es **`LOCAL`** (scope transacción), nunca `SESSION`. Previene fugas entre operaciones.
+3. Cada mutación legítima emite un evento outbox para observabilidad. Source enum explícito (`user_reset`, `accept_invite`, `bootstrap_admin`, `test_fixture` u otro scope cerrado por campo).
+4. El helper de aplicación es la única API autorizada. No duplicar el `SET LOCAL` en callers pelados — rompe el contrato de observabilidad.
+
+### Follow-ups abiertos
+
+- Wire de alerter Slack/Sentry sobre `identity.password_hash.rotated` cuando `source` no sea `user_reset`/`accept_invite`.
+- Evaluar candidatos adicionales: `microsoft_oid`, `google_sub`, `auth_mode` de `client_users` (identidad SSO), secretos de integración en tablas de config.
+
 ## Delta 2026-04-01 — Ownership consolidation to greenhouse_ops
 
 - **Problema resuelto:** 5 owners distintos (`greenhouse_migrator` 41, `greenhouse_migrator_user` 39, `postgres` 32, `greenhouse_app` 9, `greenhouse_ops` 1) sobre 122 tablas, causando fallos en `pg_dump` y errores de permisos.
