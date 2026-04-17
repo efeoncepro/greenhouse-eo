@@ -207,8 +207,41 @@ export const buildWeeklyDigest = async (
   const portalUrl = resolvePortalUrl()
   const db = await getDb()
 
+  const enrichmentHistoryWindow = sql<{
+    enrichment_id: string
+    space_id: string
+    signal_type: string
+    metric_name: string
+    severity: string | null
+    quality_score: number | string | null
+    explanation_summary: string | null
+    recommended_action: string | null
+    root_cause_narrative: string | null
+    confidence: number | string | null
+    processed_at: Date
+    status: string
+  }>`(
+    SELECT DISTINCT ON (enrichment_id)
+      enrichment_id,
+      space_id,
+      signal_type,
+      metric_name,
+      severity,
+      quality_score,
+      explanation_summary,
+      recommended_action,
+      root_cause_narrative,
+      confidence,
+      processed_at,
+      status
+    FROM greenhouse_serving.ico_ai_signal_enrichment_history
+    WHERE processed_at >= ${window.startAt}
+      AND processed_at < ${window.endAt}
+    ORDER BY enrichment_id, processed_at DESC
+  )`.as('enrich')
+
   const rows = await db
-    .selectFrom('greenhouse_serving.ico_ai_signal_enrichments as enrich')
+    .selectFrom(enrichmentHistoryWindow)
     .innerJoin('greenhouse_core.spaces as spaces', join =>
       join
         .onRef('spaces.space_id', '=', 'enrich.space_id')
@@ -231,8 +264,6 @@ export const buildWeeklyDigest = async (
       sql<string>`enrich.processed_at::text`.as('processed_at')
     ])
     .where('enrich.status', '=', 'succeeded')
-    .where('enrich.processed_at', '>=', window.startAt)
-    .where('enrich.processed_at', '<', window.endAt)
     .orderBy(sql`
       CASE COALESCE(enrich.severity, '')
         WHEN 'critical' THEN 0

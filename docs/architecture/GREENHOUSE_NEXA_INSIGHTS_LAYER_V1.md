@@ -1,5 +1,17 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-17 — Historial advisory append-only para timeline y weekly digest
+
+- Runtime activo:
+  - Nuevo archivo histórico `greenhouse_serving.ico_ai_signal_enrichment_history` con escritura append-only por run de LLM
+  - `ico_ai_signal_enrichments` se mantiene como snapshot current-state del período activo; no cambia el contrato de las surfaces "Recientes"
+  - `readAgencyAiLlmTimeline`, `readMemberAiLlmTimeline` y `readSpaceAiLlmTimeline` ahora leen desde historial, deduplicado por `enrichment_id` con `DISTINCT ON`
+  - `src/lib/nexa/digest/build-weekly-digest.ts` ahora arma el corte semanal desde historial deduplicado, no desde el snapshot vigente
+- Contrato operativo:
+  - una señal que desaparece del set actual por mejora operativa deja de verse en "Recientes", pero sigue viva en timeline y en el weekly digest de su ventana histórica
+  - reruns del mismo enrichment no duplican timeline/digest: el consumer colapsa a la última versión por `enrichment_id`
+  - esto evita pérdida silenciosa de contexto semanal/mensual en People, Space 360, Home y Agency
+
 ## Delta 2026-04-17 — Historial activado en las 4 superficies Nexa (Agency, Home, Space 360, Person 360)
 
 - Runtime activo:

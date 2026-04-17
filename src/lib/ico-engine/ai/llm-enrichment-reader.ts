@@ -98,6 +98,37 @@ const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
 
 const TIMELINE_DEFAULT_LIMIT = 20
 const TIMELINE_MAX_LIMIT = 50
+const ENRICHMENT_HISTORY_TABLE = 'greenhouse_serving.ico_ai_signal_enrichment_history'
+
+const TIMELINE_SELECT_COLUMNS = `
+  enrichment_id,
+  signal_id,
+  space_id,
+  member_id,
+  project_id,
+  signal_type,
+  metric_name,
+  severity,
+  quality_score,
+  explanation_summary,
+  root_cause_narrative,
+  recommended_action,
+  confidence,
+  processed_at::text AS processed_at
+`
+
+const buildHistoricalTimelineQuery = (scopeSql: string) => `
+  SELECT ${TIMELINE_SELECT_COLUMNS}
+  FROM (
+    SELECT DISTINCT ON (enrichment_id) *
+    FROM ${ENRICHMENT_HISTORY_TABLE}
+    WHERE ${scopeSql}
+      AND status = 'succeeded'
+    ORDER BY enrichment_id, processed_at DESC
+  ) enrichments
+  ORDER BY processed_at DESC
+  LIMIT $2
+`
 
 export const readAgencyAiLlmTimeline = async (
   limit = TIMELINE_DEFAULT_LIMIT
@@ -106,9 +137,13 @@ export const readAgencyAiLlmTimeline = async (
 
   const rows = await query<RawRow>(
     `
-      SELECT *
-      FROM greenhouse_serving.ico_ai_signal_enrichments
-      WHERE status = 'succeeded'
+      SELECT ${TIMELINE_SELECT_COLUMNS}
+      FROM (
+        SELECT DISTINCT ON (enrichment_id) *
+        FROM ${ENRICHMENT_HISTORY_TABLE}
+        WHERE status = 'succeeded'
+        ORDER BY enrichment_id, processed_at DESC
+      ) enrichments
       ORDER BY processed_at DESC
       LIMIT $1
     `,
@@ -358,14 +393,7 @@ export const readMemberAiLlmTimeline = async (
   const boundedLimit = Math.min(Math.max(Math.trunc(limit), 1), TIMELINE_MAX_LIMIT)
 
   const rows = await query<RawRow>(
-    `
-      SELECT *
-      FROM greenhouse_serving.ico_ai_signal_enrichments
-      WHERE member_id = $1
-        AND status = 'succeeded'
-      ORDER BY processed_at DESC
-      LIMIT $2
-    `,
+    buildHistoricalTimelineQuery('member_id = $1'),
     [memberId, boundedLimit]
   ).catch(() => [])
 
@@ -379,14 +407,7 @@ export const readSpaceAiLlmTimeline = async (
   const boundedLimit = Math.min(Math.max(Math.trunc(limit), 1), TIMELINE_MAX_LIMIT)
 
   const rows = await query<RawRow>(
-    `
-      SELECT *
-      FROM greenhouse_serving.ico_ai_signal_enrichments
-      WHERE space_id = $1
-        AND status = 'succeeded'
-      ORDER BY processed_at DESC
-      LIMIT $2
-    `,
+    buildHistoricalTimelineQuery('space_id = $1'),
     [spaceId, boundedLimit]
   ).catch(() => [])
 

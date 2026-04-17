@@ -266,5 +266,17 @@ export const toSerializableSignalSnapshot = (signal: AiSignalRecord) => ({
 export const stableEnrichmentId = (signalId: string, promptHash: string) =>
   `EO-AIE-${createHash('sha1').update(`${signalId}|${promptHash}`).digest('hex').slice(0, 8)}`.toUpperCase()
 
+export const stableEnrichmentHistoryId = (runId: string, enrichmentId: string) =>
+  `EO-AIH-${createHash('sha1').update(`${runId}|${enrichmentId}`).digest('hex').slice(0, 8)}`.toUpperCase()
+
+export const stableReplayRunId = (
+  periodYear: number,
+  periodMonth: number,
+  promptHash: string,
+  asOfTime: string,
+  spaceId?: string | null
+) =>
+  `EO-AIR-${createHash('sha1').update(`${periodYear}-${periodMonth}|${promptHash}|${asOfTime}|${spaceId ?? 'all'}|replay`).digest('hex').slice(0, 8)}`.toUpperCase()
+
 export const stableRunId = (periodYear: number, periodMonth: number, promptHash: string) =>
   `EO-AIR-${createHash('sha1').update(`${periodYear}-${periodMonth}|${promptHash}|${Date.now()}`).digest('hex').slice(0, 8)}`.toUpperCase()

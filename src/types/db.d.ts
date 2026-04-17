@@ -3381,6 +3381,38 @@ export interface GreenhouseServingIcoAiEnrichmentRuns {
   trigger_type: string;
 }
 
+export interface GreenhouseServingIcoAiSignalEnrichmentHistory {
+  confidence: Numeric | null;
+  enrichment_id: string;
+  error_message: string | null;
+  explanation_json: Generated<Json>;
+  explanation_summary: string | null;
+  history_id: string;
+  latency_ms: number | null;
+  member_id: string | null;
+  metric_name: string;
+  model_id: string;
+  period_month: number;
+  period_year: number;
+  processed_at: Timestamp;
+  project_id: string | null;
+  prompt_hash: string | null;
+  prompt_version: string;
+  quality_score: Numeric | null;
+  recommended_action: string | null;
+  root_cause_narrative: string | null;
+  run_id: string;
+  severity: string | null;
+  signal_id: string;
+  signal_type: string;
+  source: Generated<string>;
+  space_id: string;
+  status: string;
+  synced_at: Generated<Timestamp>;
+  tokens_in: number | null;
+  tokens_out: number | null;
+}
+
 export interface GreenhouseServingIcoAiSignalEnrichments {
   confidence: Numeric | null;
   enrichment_id: string;
@@ -4807,6 +4839,7 @@ export interface DB {
   "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
   "greenhouse_serving.ico_ai_enrichment_runs": GreenhouseServingIcoAiEnrichmentRuns;
+  "greenhouse_serving.ico_ai_signal_enrichment_history": GreenhouseServingIcoAiSignalEnrichmentHistory;
   "greenhouse_serving.ico_ai_signal_enrichments": GreenhouseServingIcoAiSignalEnrichments;
   "greenhouse_serving.ico_ai_signals": GreenhouseServingIcoAiSignals;
   "greenhouse_serving.ico_member_metrics": GreenhouseServingIcoMemberMetrics;

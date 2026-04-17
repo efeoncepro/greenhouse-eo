@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-16 por Codex
-> **Ultima actualizacion:** 2026-04-16 por Codex
+> **Ultima actualizacion:** 2026-04-17 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md](../../architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md), [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md), [GREENHOUSE_EMAIL_CATALOG_V1.md](../../architecture/GREENHOUSE_EMAIL_CATALOG_V1.md)
 
 # Nexa Insights — Digest Semanal para Liderazgo
@@ -64,13 +64,14 @@ El digest no calcula metricas inline dentro del correo ni corre analisis nuevos 
 
 Reutiliza:
 
-- enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`
+- enrichments historicos ya materializados en `greenhouse_serving.ico_ai_signal_enrichment_history`
+- deduplicacion por `enrichment_id` para no repetir reruns del mismo advisory
 - ranking canonico de Nexa:
   - `critical > warning > info`
   - luego `quality_score DESC`
   - luego `processed_at DESC`
 
-Esto mantiene el correo alineado con lo que ya consume el portal en `Pulse`, `Space 360`, `Person 360` y el workspace de agency.
+Esto mantiene el correo alineado con lo que ya consume el portal en `Pulse`, `Space 360`, `Person 360` y el workspace de agency, sin perder señales que ya salieron del snapshot actual del mes.
 
 ---
 
