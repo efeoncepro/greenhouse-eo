@@ -755,9 +755,9 @@ describe('HrLeaveView', () => {
     const teamDetailDialog = await screen.findByRole('dialog', { name: /Valentina Hoyos/i })
 
     expect(within(teamDetailDialog).getByText('Actividad administrativa')).toBeInTheDocument()
-    expect(within(teamDetailDialog).getByText('Vacaciones registradas por HR')).toBeInTheDocument()
-    expect(within(teamDetailDialog).getByText('Carga retroactiva por ausencia previa.')).toBeInTheDocument()
-    expect(within(teamDetailDialog).getByText('06/04/2026 — 10/04/2026')).toBeInTheDocument()
+    expect(await within(teamDetailDialog).findByText('Vacaciones registradas por HR')).toBeInTheDocument()
+    expect(await within(teamDetailDialog).findByText('Carga retroactiva por ausencia previa.')).toBeInTheDocument()
+    expect(await within(teamDetailDialog).findByText('06/04/2026 — 10/04/2026')).toBeInTheDocument()
     expect(within(teamDetailDialog).getByText('No hay ajustes manuales registrados para este colaborador.')).toBeInTheDocument()
   })
 
