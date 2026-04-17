@@ -9,6 +9,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { generateAiSignalEnrichment } from './llm-provider'
 import { resolveSignalContext } from './resolve-signal-context'
 import type { AiSignalRecord } from './types'
+import { getResolvedProjectDisplay } from './entity-display-resolution'
 import {
   buildIcoLlmPromptHash,
   ICO_LLM_DEFAULT_MODEL_ID,
@@ -532,6 +533,10 @@ export const materializeAiLlmEnrichments = async (
         }
 
         try {
+          const resolvedProject = signal.projectId
+            ? getResolvedProjectDisplay(resolvedContext.projectResolutions, signal.spaceId, signal.projectId)
+            : null
+
           const generated = await generateAiSignalEnrichment({
             signal,
             modelId,
@@ -546,7 +551,20 @@ export const materializeAiLlmEnrichments = async (
             explanationSummary: generated.output.explanationSummary,
             rootCauseNarrative: generated.output.rootCauseNarrative,
             recommendedAction: generated.output.recommendedAction,
-            explanationJson: generated.output,
+            explanationJson: {
+              ...generated.output,
+              meta: {
+                projectResolution: resolvedProject
+                  ? {
+                      displayLabel: resolvedProject.displayLabel,
+                      matchedBy: resolvedProject.matchedBy,
+                      canonicalProjectId: resolvedProject.canonicalProjectId,
+                      sourceProjectId: resolvedProject.sourceProjectId,
+                      spaceId: resolvedProject.spaceId
+                    }
+                  : null
+              }
+            },
             confidence: generated.output.confidence,
             tokensIn: generated.tokensIn,
             tokensOut: generated.tokensOut,

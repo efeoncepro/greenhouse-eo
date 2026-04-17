@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { ICO_METRIC_REGISTRY } from '../metric-registry'
 import type { AiSignalRecord } from './types'
 
-export const ICO_LLM_PROMPT_VERSION = 'ico_signal_enrichment_v3'
+export const ICO_LLM_PROMPT_VERSION = 'ico_signal_enrichment_v4'
 export const ICO_LLM_DEFAULT_MODEL_ID = 'google/gemini-2.5-flash@default'
 export const ICO_LLM_SUPPORTED_SIGNAL_TYPES = ['anomaly', 'prediction', 'root_cause', 'recommendation'] as const
 export const ICO_LLM_ENRICHMENT_STATUSES = ['succeeded', 'failed', 'skipped'] as const

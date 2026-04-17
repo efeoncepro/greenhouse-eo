@@ -1,5 +1,62 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-440 hardening de labels de proyecto en Nexa
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/ico-engine/ai/entity-display-resolution.ts`
+    - resolver tenant-safe nuevo para labels de proyecto por `space_id`
+    - soporta `project_record_id` y `notion_project_id` / `project_source_id`
+    - agrega sanitización backend de narrativa para mentions y texto plano cuando aparece un ID técnico
+  - `src/lib/ico-engine/ai/resolve-signal-context.ts`
+    - deja de resolver proyectos solo por `project_record_id`
+    - ahora expone `projectResolutions` y helper `getResolvedProjectLabel()`
+  - `src/lib/ico-engine/ai/materialize-ai-signals.ts`
+    - humaniza `dimension_label` de root causes de proyecto antes de construir señales
+    - las recomendaciones de proyecto degradan a `este proyecto` cuando el label sigue siendo técnico
+  - `src/lib/ico-engine/ai/llm-provider.ts`
+    - corta el fallback `projectName = projectId`
+    - solo expone `projectId` al prompt cuando existe `projectName` humano confiable
+    - sanea `explanationSummary`, `rootCauseNarrative` y `recommendedAction` antes de persistir enrichments
+  - `src/lib/ico-engine/ai/llm-enrichment-worker.ts`
+    - persiste metadata mínima de `projectResolution` en `explanation_json.meta`
+  - tests nuevos:
+    - `src/lib/ico-engine/ai/resolve-signal-context.test.ts`
+    - `src/lib/ico-engine/ai/llm-provider.test.ts`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_MENTION_SYSTEM_V1.md`
+  - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/in-progress/TASK-440-nexa-project-label-resolution.md`
+  - `Handoff.md`
+- **Cambio operativo/documental:**
+  - se dejó explícito que la corrección de `TASK-440` vive en backend y no en la UI
+  - la resolución canónica de proyecto queda documentada como `space_id` + (`project_record_id` o wrapper/source IDs equivalentes)
+  - la degradación visible obligatoria cuando no hay label resoluble queda fijada en `este proyecto`
+  - `Pulse/Home`, `Space 360` y `Person 360` quedan declaradas como consumers beneficiados vía readers existentes, sin route/surface nueva
+  - `explanation_json.meta.projectResolution` queda registrado como metadata mínima permitida para auditoría
+- **Validación ejecutada en esta sesión:**
+  - `pnpm exec vitest run src/lib/ico-engine/ai/llm-provider.test.ts src/lib/ico-engine/ai/resolve-signal-context.test.ts`
+  - `pnpm exec vitest run src/lib/home/get-home-snapshot.test.ts src/lib/agency/space-360.test.ts 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/people/tabs/PersonActivityTab.test.tsx`
+  - `pnpm exec eslint src/lib/ico-engine/ai/entity-display-resolution.ts src/lib/ico-engine/ai/llm-provider.ts src/lib/ico-engine/ai/llm-provider.test.ts src/lib/ico-engine/ai/llm-types.ts src/lib/ico-engine/ai/materialize-ai-signals.ts src/lib/ico-engine/ai/resolve-signal-context.ts src/lib/ico-engine/ai/resolve-signal-context.test.ts src/lib/ico-engine/ai/llm-enrichment-worker.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'`
+  - `pnpm exec tsc --noEmit --pretty false` -> falla por issue ajeno en `src/lib/campaigns/tenant-scope.test.ts(21,44): TS2556`
+  - `pnpm test` -> falla por suites ajenas con timeouts prolongados:
+    - `src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+    - `src/views/greenhouse/agency/services/ServicesListView.test.tsx`
+    - `src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+    - `src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+- **Notas operativas:**
+  - `pnpm build` quedó verde; siguió imprimiendo warnings conocidos de `Dynamic server usage` en páginas autenticadas del dashboard, pero no bloquearon la build ni fueron introducidos por esta lane
+  - no hubo migraciones ni cambios de schema físico
+  - la task fue movida a `docs/tasks/in-progress/` y quedó con `Lifecycle: in-progress`
+
 ## Sesion 2026-04-17 — TASK-145 Agency Campaigns API rescope
 
 - **Estado:** `complete`, `validado`

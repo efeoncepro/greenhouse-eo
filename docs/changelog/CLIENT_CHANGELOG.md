@@ -42,6 +42,30 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.20
+
+**Canal:** Beta
+**Fecha:** 2026-04-17
+**Disponible para:** internal
+**Módulos:** Nexa / Pulse / Space 360 / People
+
+### Novedades
+
+- Sin surfaces nuevas en esta entrega; la mejora entra sobre las vistas actuales de `Nexa Insights`.
+
+### Mejoras
+
+- Las referencias a proyectos dentro de `Nexa Insights` ahora priorizan el nombre visible del proyecto cuando Greenhouse puede resolverlo desde el contexto real del Space.
+
+### Correcciones
+
+- `Pulse`, `Space 360` y `Person 360` ya no deberían mostrar UUIDs o IDs técnicos de proyecto dentro de narrativas y menciones de Nexa.
+- Cuando Greenhouse todavía no puede resolver el nombre del proyecto, Nexa degrada la referencia a una frase humana (`este proyecto`) en vez de exponer un identificador opaco.
+
+### Notas
+
+- Esta corrección reutiliza la infraestructura actual de `Nexa Insights`; no agrega rutas ni navegación nueva.
+
 ## 2026.04-beta.19
 
 **Canal:** Beta

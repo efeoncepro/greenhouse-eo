@@ -1,5 +1,17 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-17 — TASK-440 corrige labels técnicos de proyecto en Home, Space 360 y Person 360 sin abrir surfaces nuevas
+
+- Runtime activo:
+  - resolución canónica de proyecto por `space_id` + (`project_record_id` o wrapper/source IDs equivalentes como `notion_project_id` / `project_source_id`)
+  - humanización de `dimension_label` para señales/root cause cuando existe label resoluble
+  - sanitización backend de mentions y narrativa antes de persistir enrichments
+  - persistencia mínima de metadata de resolución en `explanation_json.meta.projectResolution`
+- Contrato operativo:
+  - `llm-provider` ya no debe caer a `projectId` técnico cuando no hay label; la degradación visible canónica es `este proyecto`
+  - la corrección ocurre en backend y beneficia automáticamente a `Pulse/Home`, `Space 360` y `Person 360` vía readers existentes
+  - no se agrega route ni surface nueva; el cambio corrige calidad narrativa sobre la lane advisory ya materializada
+
 ## Delta 2026-04-16 — Weekly Executive Digest de Nexa queda operativo sobre ops-worker
 
 - Runtime activo:
@@ -297,6 +309,7 @@ Cada dominio define su propio glosario y cadena causal. Las instrucciones de nar
 | Recomendaciones concretas y accionables | Recomendaciones genéricas |
 | Narrativa en español con spanglish operativo | Inglés puro o jerga no-operativa |
 | @mentions con IDs verificados | Nombres sin ID (puede confundir) |
+| Labels visibles humanos para entidades resueltas | UUIDs, source IDs o `projectId` crudos en narrativa |
 | Doble capa: técnica + operativa | Solo técnica o solo operativa |
 
 ### Disclaimer obligatorio

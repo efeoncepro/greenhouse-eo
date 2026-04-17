@@ -4,7 +4,14 @@ import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-g
 
 import { getMetricById } from '../metric-registry'
 import type { AiSignalRecord } from './types'
-import type { ResolvedSignalContext } from './resolve-signal-context'
+import {
+  getResolvedProjectLabel,
+  type ResolvedSignalContext
+} from './resolve-signal-context'
+import {
+  getResolvedProjectDisplay,
+  sanitizeProjectNarrative
+} from './entity-display-resolution'
 import {
   ICO_LLM_DEFAULT_MODEL_ID,
   ICO_LLM_PROMPT_TEMPLATE,
@@ -53,22 +60,49 @@ const parseStructuredJson = (text: string): AiSignalEnrichmentModelOutput => {
   }
 }
 
-const enrichSignalPayload = (signal: AiSignalRecord, context?: ResolvedSignalContext | null) => {
+export const enrichSignalPayload = (signal: AiSignalRecord, context?: ResolvedSignalContext | null) => {
   const metricDef = getMetricById(signal.metricName) ?? getMetricById(signal.metricName.replace('_avg', ''))
+
+  const resolvedProject = signal.projectId
+    ? getResolvedProjectDisplay(context?.projectResolutions ?? new Map(), signal.spaceId, signal.projectId)
+    : null
+
+  const projectName = getResolvedProjectLabel(context, signal.spaceId, signal.projectId)
+
+  const dimensionLabel =
+    signal.dimension === 'project'
+      ? projectName ?? 'este proyecto'
+      : typeof signal.payloadJson.dimensionLabel === 'string'
+        ? signal.payloadJson.dimensionLabel
+        : null
 
   return {
     ...signal,
+    projectId: projectName ? signal.projectId : null,
     metricDisplayName: metricDef?.shortName ?? signal.metricName,
     metricDescription: metricDef?.description ?? null,
     metricUnit: metricDef?.unit ?? null,
     metricDirection: metricDef ? (metricDef.higherIsBetter ? 'higher is better' : 'lower is better') : null,
     spaceName: context?.spaces.get(signal.spaceId) ?? signal.spaceId,
     memberName: signal.memberId ? (context?.members.get(signal.memberId) ?? signal.memberId) : null,
-    projectName: signal.projectId ? (context?.projects.get(signal.projectId) ?? signal.projectId) : null
+    projectName,
+    payloadJson: {
+      ...signal.payloadJson,
+      dimensionLabel
+    },
+    projectResolution: resolvedProject
+      ? {
+          displayLabel: resolvedProject.displayLabel,
+          matchedBy: resolvedProject.matchedBy,
+          canonicalProjectId: resolvedProject.canonicalProjectId,
+          sourceProjectId: resolvedProject.sourceProjectId,
+          spaceId: resolvedProject.spaceId
+        }
+      : null
   }
 }
 
-const buildSignalPrompt = (signal: AiSignalRecord, context?: ResolvedSignalContext | null) =>
+export const buildSignalPrompt = (signal: AiSignalRecord, context?: ResolvedSignalContext | null) =>
   [
     ICO_LLM_PROMPT_TEMPLATE,
     '',
@@ -79,10 +113,37 @@ const buildSignalPrompt = (signal: AiSignalRecord, context?: ResolvedSignalConte
     '- rootCauseNarrative explica la causa probable usando solo la evidencia visible.',
     '- recommendedAction propone una acción concreta, breve y accionable.',
     '- Si la señal tiene evidencia limitada, dilo en la explicación.',
+    '- Si no existe un nombre humano confiable para el proyecto, refiérete a "este proyecto" y no expongas el ID técnico.',
     '',
     'Signal materializado:',
     JSON.stringify(enrichSignalPayload(signal, context), null, 2)
   ].join('\n')
+
+export const sanitizeAiSignalEnrichmentOutput = (
+  signal: AiSignalRecord,
+  output: AiSignalEnrichmentModelOutput,
+  context?: ResolvedSignalContext | null
+): AiSignalEnrichmentModelOutput => ({
+  ...output,
+  explanationSummary: sanitizeProjectNarrative({
+    text: output.explanationSummary,
+    signalProjectId: signal.projectId,
+    spaceId: signal.spaceId,
+    projectResolutions: context?.projectResolutions ?? new Map()
+  }) ?? output.explanationSummary,
+  rootCauseNarrative: sanitizeProjectNarrative({
+    text: output.rootCauseNarrative,
+    signalProjectId: signal.projectId,
+    spaceId: signal.spaceId,
+    projectResolutions: context?.projectResolutions ?? new Map()
+  }) ?? output.rootCauseNarrative,
+  recommendedAction: sanitizeProjectNarrative({
+    text: output.recommendedAction,
+    signalProjectId: signal.projectId,
+    spaceId: signal.spaceId,
+    projectResolutions: context?.projectResolutions ?? new Map()
+  }) ?? output.recommendedAction
+})
 
 export const generateAiSignalEnrichment = async (
   input: GenerateAiSignalEnrichmentInput
@@ -117,7 +178,7 @@ export const generateAiSignalEnrichment = async (
     throw new Error('LLM response was empty')
   }
 
-  const output = parseStructuredJson(text)
+  const output = sanitizeAiSignalEnrichmentOutput(input.signal, parseStructuredJson(text), input.resolvedContext)
 
   return {
     output,

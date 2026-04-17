@@ -2,6 +2,14 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — TASK-440: Nexa deja de exponer IDs técnicos de proyecto en narrativa visible
+
+- La resolución de labels de proyecto para Nexa ya no depende de un solo identificador: el backend resuelve por `space_id` y acepta tanto `project_record_id` como el wrapper/source ID que hoy viaja por ICO (`notion_project_id` / `project_source_id`).
+- `materialize-ai-signals` ya no debe dejar `dimension_label` técnico cuando existe un nombre humano resoluble para el proyecto asociado.
+- `llm-provider` deja de caer a `projectId` crudo cuando no hay label; la degradación visible canónica pasa a ser `este proyecto`.
+- La sanitización backend ahora corrige mentions y narrativa antes de persistir enrichments, y guarda metadata mínima de resolución en `explanation_json.meta.projectResolution`.
+- No se agregan routes ni surfaces nuevas: `Pulse/Home`, `Space 360` y `Person 360` se benefician vía readers existentes sobre enrichments ya saneados.
+
 ### 2026-04-17 — TASK-145: Agency Campaigns queda desacoplado del namespace global y endurece tenancy
 
 - Nace el namespace dedicado `GET/POST /api/agency/campaigns` con paridad de sub-routes para detalle, `360`, métricas, financials, roster y project links.
