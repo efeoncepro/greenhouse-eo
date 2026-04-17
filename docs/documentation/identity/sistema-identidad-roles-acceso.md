@@ -1,10 +1,10 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-04-05 por Claude (Agent Auth — usuario dedicado y documentacion completa)
-> **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md)
+> **Ultima actualizacion:** 2026-04-17 por Codex (TASK-404 — gobernanza de entitlements en Admin Center)
+> **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
 
@@ -153,6 +153,81 @@ Todo cambio importante queda registrado automaticamente como evento de auditoria
 Cada evento incluye: quien lo hizo, cuando, y los detalles del cambio.
 
 > **Detalle tecnico:** Los eventos se emiten via outbox pattern a `greenhouse_sync.outbox_events`. El catalogo completo esta en [GREENHOUSE_EVENT_CATALOG_V1.md](../../architecture/GREENHOUSE_EVENT_CATALOG_V1.md).
+
+---
+
+## Gobernanza de acceso en Admin Center
+
+Greenhouse ahora separa dos trabajos distintos:
+
+### 1. Politica base
+
+Vive en **Admin Center > Gobernanza de acceso**.
+
+Desde ahi un administrador puede:
+
+- revisar el catalogo de capabilities activas
+- definir defaults por rol
+- ver el mapa entre una vista del portal y la capability que la sostiene
+- revisar la politica de inicio de Home
+- auditar cambios recientes
+
+Importante: el catalogo de capabilities sigue siendo una base canonica del sistema, no una lista que se inventa a mano en la UI. Lo que si se administra desde Admin Center son las **excepciones y overlays operativos** sobre ese catalogo.
+
+### 2. Caso individual
+
+Vive en **Admin Center > Usuarios > [usuario] > Acceso**.
+
+Desde ahi un administrador puede:
+
+- ver los roles base del usuario
+- ver las vistas activas hoy
+- revisar los permisos efectivos por capability, accion y scope
+- agregar o quitar excepciones manuales
+- cambiar la politica de inicio solo para esa persona
+
+La pantalla responde cuatro preguntas operativas:
+
+1. que ve esta persona
+2. por que lo ve
+3. que excepcion manual tiene
+4. cual sera su Home de inicio al entrar
+
+### Como se resuelve el acceso efectivo
+
+Greenhouse combina cuatro capas, en este orden:
+
+1. **Runtime base** — lo que se deriva desde roles, route groups y vistas autorizadas
+2. **Defaults por rol** — grants o revokes adicionales definidos por Admin Center
+3. **Overrides por usuario** — excepciones individuales con motivo y vencimiento opcional
+4. **Politica de inicio** — el Home sugerido y, si aplica, una excepcion individual guardada
+
+Eso permite que el sistema siga siendo compatible con el modelo actual de vistas y permission sets, pero ya no obliga a resolver todo con reglas duras escondidas en codigo.
+
+### La politica de inicio (Home)
+
+La politica de inicio ya no es solo "a que ruta te mando". Greenhouse distingue entre:
+
+- **politica global** — la que se deriva automaticamente del contexto del usuario
+- **excepcion individual** — un path configurado solo para esa persona
+
+Ejemplos:
+
+- un colaborador puro normalmente cae en **My**
+- alguien de HR cae en **HR Workspace**
+- alguien de finanzas cae en **Finance Workspace**
+- un superadministrador cae en **Internal Home**
+
+Si una persona tiene una excepcion individual valida, esa excepcion se usa. Si no, el sistema vuelve a la politica global.
+
+### Que sigue igual
+
+- los roles siguen definiendo la identidad base
+- los route groups siguen definiendo las superficies grandes del portal
+- las vistas autorizadas siguen siendo utiles para surfaces finas
+- los permission sets siguen agregando vistas reutilizables
+
+La diferencia es que ahora Admin Center tambien puede explicar y operar la capa de capabilities sin depender de cambios manuales en base de datos o de editar codigo para cada caso.
 
 ---
 

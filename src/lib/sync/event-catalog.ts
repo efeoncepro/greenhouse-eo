@@ -68,6 +68,7 @@ export const AGGREGATE_TYPES = {
   identityReconciliation: 'identity_reconciliation',
   identityProfile: 'identity_profile',
   viewAccess: 'view_access',
+  entitlementGovernance: 'entitlement_governance',
   asset: 'asset',
 
   // Services
@@ -181,6 +182,9 @@ export const EVENT_TYPES = {
   reconciliationRejected: 'identity.reconciliation.rejected',
   profileLinked: 'identity.profile.linked',
   profileMerged: 'identity.profile.merged',
+  entitlementRoleDefaultChanged: 'access.entitlement_role_default_changed',
+  entitlementUserOverrideChanged: 'access.entitlement_user_override_changed',
+  startupPolicyChanged: 'access.startup_policy_changed',
 
   // DTE Reconciliation
   dteAutoMatched: 'finance.dte.auto_matched',

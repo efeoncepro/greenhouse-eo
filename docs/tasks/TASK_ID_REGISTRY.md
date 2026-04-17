@@ -453,7 +453,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-401` | `to-do` | Bank Reconciliation: Continuous Transaction Matching | `docs/tasks/to-do/TASK-401-bank-reconciliation-continuous-matching.md` |
 | `TASK-402` | `to-do` | Universal Adaptive Home Orchestration | `docs/tasks/to-do/TASK-402-universal-adaptive-home-orchestration.md` |
 | `TASK-403` | `complete` | Entitlements Runtime Foundation & Home Bridge | `docs/tasks/complete/TASK-403-entitlements-runtime-foundation-home-bridge.md` |
-| `TASK-404` | `to-do` | Entitlements Governance Admin Center | `docs/tasks/to-do/TASK-404-entitlements-governance-admin-center.md` |
+| `TASK-404` | `complete` | Entitlements Governance Admin Center | `docs/tasks/complete/TASK-404-entitlements-governance-admin-center.md` |
 | `TASK-405` | `complete` | Reconcile `main` into `develop` for Kortex Identity Bridge | `docs/tasks/complete/TASK-405-reconcile-main-into-develop-kortex-identity.md` |
 | `TASK-406` | `complete` | Promote Reconciled Kortex Identity Bridge to `main` | `docs/tasks/complete/TASK-406-promote-kortex-identity-bridge-to-main.md` |
 | `TASK-409` | `complete` | Payroll Reliquidación Program | `docs/tasks/complete/TASK-409-payroll-reliquidation-program.md` |

@@ -1,5 +1,28 @@
 # Greenhouse Entitlements & Authorization Architecture V1
 
+## Delta 2026-04-17 — TASK-404 conecta la gobernanza operativa de entitlements al Admin Center
+
+- El catálogo de capabilities **sigue siendo code-versioned**; el source of truth canónico continúa en:
+  - `src/config/entitlements-catalog.ts`
+  - `src/lib/entitlements/runtime.ts`
+- `TASK-404` agrega una capa operativa persistida para gobernar overlays administrativos sin duplicar el catálogo:
+  - `greenhouse_core.role_entitlement_defaults`
+  - `greenhouse_core.user_entitlement_overrides`
+  - `greenhouse_core.entitlement_governance_audit_log`
+- La precedencia efectiva queda así:
+  1. runtime base derivado desde `roleCodes + routeGroups + authorizedViews`
+  2. defaults por rol persistidos
+  3. overrides por usuario persistidos
+  4. startup policy resuelta vía `resolvePortalHomePolicy()` + excepción individual en `default_portal_home_path`
+- El Admin Center ya expone dos surfaces complementarias:
+  - `Admin Center > Gobernanza de acceso` para catálogo, defaults por rol, mapa `vista -> capability`, policies de Home y auditoría
+  - `Admin Center > Usuarios > [usuario] > Acceso` para permisos efectivos, overrides y Home de inicio a nivel individual
+- La conexión con Home se mantiene explícita:
+  - no existe un segundo resolver de startup policy
+  - la excepción individual de inicio sigue viviendo en `greenhouse_core.client_users.default_portal_home_path`
+- Implicación operativa:
+  - Greenhouse ya puede operar grants/revokes por `capability/action/scope` desde Admin Center sin romper `authorizedViews`, `permission_sets` ni el bridge runtime de `TASK-403`
+
 ## Delta 2026-04-16 — TASK-415 extiende el runtime a HR Leave admin operations
 
 - El runtime canónico ahora cubre una primera granularidad útil para operaciones de vacaciones del equipo:

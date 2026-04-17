@@ -1,5 +1,32 @@
 # changelog.md
 
+## 2026-04-17
+
+### 2026-04-17 — TASK-404: Entitlements Governance Admin Center
+
+- `Admin Center > Gobernanza de acceso` deja de ser solo una lane de `authorizedViews` y pasa a gobernar entitlements operativos con:
+  - catálogo canónico code-versioned de capabilities/actions/scopes
+  - defaults persistidos por rol
+  - overrides persistidos por usuario
+  - policy de startup/home editable
+  - auditoría de cambios y eventos outbox para gobernanza de acceso
+- Se agrega la migración `20260417044741101_task-404-entitlements-governance.sql` con tres tablas tenant-safe en `greenhouse_core`:
+  - `role_entitlement_defaults`
+  - `user_entitlement_overrides`
+  - `entitlement_governance_audit_log`
+- Nuevas rutas admin:
+  - `GET /api/admin/entitlements/governance`
+  - `POST /api/admin/entitlements/roles`
+  - `GET /api/admin/entitlements/users/[userId]`
+  - `POST /api/admin/entitlements/users/[userId]/overrides`
+  - `PATCH /api/admin/entitlements/users/[userId]/startup-policy`
+- `Admin Center > Usuarios > Acceso` ahora explica permisos efectivos por `capability/action/scope`, su origen (`runtime`, `role_default`, `user_override`) y permite editar excepciones individuales y el startup path sin tocar SQL manual ni código.
+- La resolución efectiva queda explícita y documentada como:
+  - base runtime derivada de `TASK-403`
+  - overlay de defaults por rol
+  - overlay de overrides por usuario
+  - startup policy separada vía `resolvePortalHomePolicy()`
+
 ## 2026-04-16
 
 ### 2026-04-16 — TASK-246: Digest ejecutivo semanal de Nexa via ops-worker

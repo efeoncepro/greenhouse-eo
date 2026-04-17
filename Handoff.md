@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-404 Entitlements Governance Admin Center
+
+- **Estado:** `complete`, `validado localmente`, `migracion aplicada en shared dev DB`
+- **Rama:** `develop`
+- **Implementado:**
+  - migración `migrations/20260417044741101_task-404-entitlements-governance.sql`
+    - tablas nuevas `greenhouse_core.role_entitlement_defaults`, `greenhouse_core.user_entitlement_overrides`, `greenhouse_core.entitlement_governance_audit_log`
+    - índices tenant-safe por `space_id`
+  - `src/lib/admin/entitlements-governance.ts`
+    - store Kysely para overview global, acceso efectivo por usuario, defaults por rol, overrides por usuario y startup policy
+    - precedencia explícita `runtime -> role default -> user override`
+    - outbox events `access.entitlement_role_default_changed`, `access.entitlement_user_override_changed`, `access.startup_policy_changed`
+  - `src/lib/admin/entitlement-view-map.ts`
+    - bridge entre `VIEW_REGISTRY` y capabilities para explicar relación `vista -> entitlement`
+  - rutas admin nuevas:
+    - `GET /api/admin/entitlements/governance`
+    - `POST /api/admin/entitlements/roles`
+    - `GET /api/admin/entitlements/users/[userId]`
+    - `POST /api/admin/entitlements/users/[userId]/overrides`
+    - `PATCH /api/admin/entitlements/users/[userId]/startup-policy`
+  - UI:
+    - `Admin Center > Gobernanza de acceso` agrega tab `Entitlements`
+    - `Admin Center > Usuarios > Acceso` ahora muestra permisos efectivos, overrides y startup policy editable
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+  - `docs/documentation/identity/sistema-identidad-roles-acceso.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `changelog.md`
+  - `project_context.md`
+- **Validación ejecutada:**
+  - `pnpm exec eslint src/lib/admin/entitlements-governance.ts src/lib/admin/entitlement-view-map.ts src/app/api/admin/entitlements/governance/route.ts src/app/api/admin/entitlements/roles/route.ts 'src/app/api/admin/entitlements/users/[userId]/route.ts' 'src/app/api/admin/entitlements/users/[userId]/overrides/route.ts' 'src/app/api/admin/entitlements/users/[userId]/startup-policy/route.ts' 'src/app/(dashboard)/admin/views/page.tsx' src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx src/views/greenhouse/admin/EntitlementsGovernanceTab.tsx src/views/greenhouse/admin/users/UserAccessTab.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+  - `pnpm pg:connect:migrate`
+- **Notas operativas:**
+  - `pnpm pg:connect:migrate` aplicó la migración y regeneró `src/types/db.d.ts` sin diff final
+  - se tocó `src/app/api/hr/evaluations/summaries/[summaryId]/finalize/route.ts` solo para corregir un issue de lint preexistente (`padding-line-between-statements`) que bloqueaba `pnpm lint`
+  - el workspace sigue teniendo un archivo ajeno sin trackear: `docs/architecture/GREENHOUSE_FINANCE_METRIC_REGISTRY_V1.md`
+
 ## Sesion 2026-04-16 — TASK-246 Digest ejecutivo semanal de Nexa
 
 - **Estado:** `implementado localmente`, `validado`

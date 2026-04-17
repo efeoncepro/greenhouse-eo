@@ -42,6 +42,30 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.19
+
+**Canal:** Beta
+**Fecha:** 2026-04-17
+**Disponible para:** internal
+**Módulos:** Admin Center / Identity / Home
+
+### Novedades
+
+- `Admin Center` ahora permite gobernar permisos granulares desde una sola surface: catálogo de capabilities, defaults por rol, excepciones por usuario y política de inicio.
+
+### Mejoras
+
+- `Admin Center > Usuarios > Acceso` ahora explica qué permisos tiene una persona y de dónde vienen, en vez de obligar a inferirlo desde roles, vistas y excepciones dispersas.
+- La política de `Home` y startup path ahora se puede ajustar desde Admin Center para casos puntuales sin tocar código.
+
+### Correcciones
+
+- La gobernanza de acceso ya no depende solo de cambios hardcodeados o ajustes manuales sobre la base de datos cuando hay que dar o retirar una capability puntual.
+
+### Notas
+
+- Esta entrega convive con el modelo actual de `roles`, `route groups` y `authorizedViews`; no lo reemplaza de una sola vez.
+
 ## 2026.04-beta.18
 
 **Canal:** Beta

@@ -8,15 +8,15 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `identity`
-- Blocked by: `TASK-403`
+- Blocked by: `none`
 - Branch: `task/TASK-404-entitlements-governance-admin-center`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -73,7 +73,7 @@ Reglas obligatorias:
 - `project_context.md`
 - `Handoff.md`
 - `docs/tasks/to-do/TASK-402-universal-adaptive-home-orchestration.md`
-- `docs/tasks/to-do/TASK-403-entitlements-runtime-foundation-home-bridge.md`
+- `docs/tasks/complete/TASK-403-entitlements-runtime-foundation-home-bridge.md`
 - `docs/tasks/complete/TASK-285-client-role-differentiation.md`
 
 ## Dependencies & Impact
@@ -112,7 +112,7 @@ Reglas obligatorias:
 - `src/lib/home/**`
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 - `docs/documentation/identity/**`
-- `docs/tasks/to-do/TASK-404-entitlements-governance-admin-center.md`
+- `docs/tasks/complete/TASK-404-entitlements-governance-admin-center.md`
 
 ## Current Repo State
 
@@ -122,7 +122,9 @@ Reglas obligatorias:
 - ya existen stores y APIs para asignaciones por set, overrides por usuario y lectura de acceso administrativo
 - ya existe `User Access` dentro de Admin Users
 - la arquitectura objetivo de entitlements ya quedó documentada
-- `TASK-403` define la primera foundation runtime para capabilities y bridge con `/home`
+- `TASK-403` ya cerró la primera foundation runtime para capabilities y bridge con `/home`
+- ya existe una vista parcial de acceso efectivo a nivel de vistas (`effective-views`) para usuario
+- la startup policy de Home ya tiene resolver centralizado (`resolvePortalHomePolicy`) y soporte en `default_portal_home_path`
 
 ### Gap
 

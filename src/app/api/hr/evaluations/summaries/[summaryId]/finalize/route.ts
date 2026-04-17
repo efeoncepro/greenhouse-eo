@@ -14,6 +14,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ summaryId
 
   try {
     const { summaryId } = await params
+
     await finalizeEvalSummary(summaryId, tenant.userId)
 
     return NextResponse.json({ finalized: true })

@@ -1,5 +1,20 @@
 # project_context.md
 
+## Delta 2026-04-17 TASK-404 materializa la gobernanza operativa de entitlements en Admin Center
+
+- Greenhouse ya no depende solo de runtime code-versioned o ajustes manuales de base para operar permisos granulares.
+- Runtime actualizado:
+  - migración `20260417044741101_task-404-entitlements-governance.sql`
+  - tablas `greenhouse_core.role_entitlement_defaults`, `greenhouse_core.user_entitlement_overrides`, `greenhouse_core.entitlement_governance_audit_log`
+  - rutas `GET /api/admin/entitlements/governance`, `POST /api/admin/entitlements/roles`, `GET /api/admin/entitlements/users/[userId]`, `POST /api/admin/entitlements/users/[userId]/overrides`, `PATCH /api/admin/entitlements/users/[userId]/startup-policy`
+  - surfaces `Admin Center > Gobernanza de acceso` y `Admin Center > Usuarios > Acceso`
+- Contrato operativo:
+  - el catálogo de entitlements sigue siendo code-versioned; la persistencia gobierna overlays, no redefine el catálogo base
+  - la precedencia efectiva es `runtime base -> role defaults -> user overrides`
+  - la startup policy sigue siendo un contrato separado de permisos y se resuelve vía `resolvePortalHomePolicy()`
+  - toda mutación de gobernanza se registra con auditoría y evento outbox
+  - las nuevas tablas y queries administrativas deben seguir aisladas por `space_id`; cuando no existe tenant real se usa el sentinel `__platform__`
+
 ## Delta 2026-04-16 HR leave corrige accrual Chile de primer año y deja self-heal de balances
 
 - El runtime de vacaciones Chile interno ya no debe sembrar `15` días completos por default cuando la persona aún no cumple su primer aniversario laboral.
