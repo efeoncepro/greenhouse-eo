@@ -2,6 +2,14 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — Blindaje de `password_hash`: ningún batch/sync puede volver a rotar credenciales silenciosamente
+
+- TASK-451 resuelve ISSUE-053: un cron a las 08:00 UTC había reescrito el hash de Julio en la DB de dev y lo había dejado sin login con credentials en staging. Prod y staging comparten la misma DB, así que el hecho de que prod siguiera aceptando el login se atribuye a JWT de sesión ya emitido (NextAuth no re-valida hash por request) — queda como hipótesis de observable si recurre.
+- Migration `20260417165907294_task-451-password-hash-mutation-guard.sql` instala `greenhouse_core.guard_password_hash_mutation()` + trigger `client_users_password_guard`. Cualquier `UPDATE` que intente cambiar `password_hash` sin que la transacción setee `app.password_change_authorized='true'` falla loud con `P0001`.
+- Helper `withPasswordChangeAuthorization` en `src/lib/identity/password-mutation.ts` envuelve los writes legítimos, setea el session var, ejecuta el UPDATE y publica `identity.password_hash.rotated` al outbox para observabilidad.
+- `/api/account/reset-password` y `/api/account/accept-invite` migrados al helper. `scripts/backfill-postgres-identity-v2.ts` deja de leer y escribir `password_hash` + `password_hash_algorithm` — los campos se removieron del SELECT de BigQuery y del UPDATE de PG.
+- Tests: 5 nuevos unit tests para el helper, 1337 tests totales passing. Smoke en dev DB confirmó que el trigger bloquea writes sin session var y deja pasar los autorizados.
+
 ### 2026-04-17 — Quotation gana gobernanza enterprise: versiones, aprobaciones, términos, templates y audit
 
 - TASK-348 entrega 7 tablas nuevas en `greenhouse_commercial` (`approval_policies`, `approval_steps`, `quotation_audit_log`, `terms_library`, `quotation_terms`, `quote_templates`, `quote_template_items`) vía `20260417140553325_task-348-quotation-governance-runtime.sql`.

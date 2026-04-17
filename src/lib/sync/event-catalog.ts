@@ -141,7 +141,10 @@ export const AGGREGATE_TYPES = {
   permissionSet: 'permission_set',
 
   // Sister Platforms (TASK-375)
-  sisterPlatformBinding: 'sister_platform_binding'
+  sisterPlatformBinding: 'sister_platform_binding',
+
+  // Identity credential (TASK-451)
+  identityCredential: 'identity_credential'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -417,7 +420,10 @@ export const EVENT_TYPES = {
   sisterPlatformBindingUpdated: 'sister_platform_binding.updated',
   sisterPlatformBindingActivated: 'sister_platform_binding.activated',
   sisterPlatformBindingSuspended: 'sister_platform_binding.suspended',
-  sisterPlatformBindingDeprecated: 'sister_platform_binding.deprecated'
+  sisterPlatformBindingDeprecated: 'sister_platform_binding.deprecated',
+
+  // Identity credential (TASK-451)
+  identityPasswordHashRotated: 'identity.password_hash.rotated'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

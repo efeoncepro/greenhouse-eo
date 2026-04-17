@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-451 Password hash mutation guardrails (cierra ISSUE-053)
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-451-password-hash-mutation-guardrails`
+- **Incidente (ISSUE-053):** login con credentials en staging dejó de funcionar para `jreyes@efeoncepro.com` tras un batch a las 08:00 UTC que tocó `password_hash` de 7 usuarios en la DB de dev. Producción aparecía sin problema al momento del reporte a pesar de compartir la misma DB (`greenhouse-pg-dev`) — observable sin explicar completa; hipótesis probable: JWT persistente emitido en prod antes del batch, NextAuth no re-valida hash por request.
+- **Desbloqueo inmediato:** reset manual del hash en dev DB a la password temporal del usuario (`karor-01`, el usuario la cambia desde profile).
+- **Fix estructural (TASK-451):**
+  - Migration `20260417165907294_task-451-password-hash-mutation-guard.sql` crea trigger `client_users_password_guard` + función `greenhouse_core.guard_password_hash_mutation()`.
+  - Regla: cualquier `UPDATE` sobre `client_users.password_hash` exige que la transacción setee `SET LOCAL app.password_change_authorized = 'true'`. Sino, `RAISE EXCEPTION` con `ERRCODE='P0001'`.
+  - Helper `withPasswordChangeAuthorization` en `src/lib/identity/password-mutation.ts` envuelve en `withTransaction`, setea el flag, ejecuta el callback, publica `identity.password_hash.rotated` al outbox (`aggregate_type='identity_credential'`).
+  - Writers legítimos migrados al helper: `/api/account/reset-password`, `/api/account/accept-invite`.
+  - `scripts/backfill-postgres-identity-v2.ts`: removí `password_hash` + `password_hash_algorithm` del SELECT BQ y del UPDATE PG. Comentario inline explicando la razón y apuntando a TASK-451.
+  - Event catalog: agregados `AGGREGATE_TYPES.identityCredential` + `EVENT_TYPES.identityPasswordHashRotated`.
+  - 5 unit tests nuevos en `src/lib/identity/__tests__/password-mutation.test.ts`.
+- **Validado:**
+  - `pnpm pg:connect:migrate` ✓ (trigger live en dev)
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm test` 1337 passed
+  - `pnpm build` ✓
+  - Smoke E2E vía tsx: UPDATE sin session var → rechazado; UPDATE legítimo vía helper → hash actualizado + outbox event publicado; login sigue funcionando.
+- **Follow-up (out of scope inmediato):**
+  - Wire consumer reactivo que alerte a Slack si `identity.password_hash.rotated` viene con `source` inesperado o target distinto de `user-agent-e2e-001`.
+  - Auditar si otros campos sensibles de `client_users` (`microsoft_oid`, `google_sub`, `auth_mode`) merecen guards similares.
+
 ## Sesion 2026-04-17 — TASK-348 Quotation Governance Runtime (approvals, versions, terms, templates, audit)
 
 - **Estado:** `complete`, entregado y pusheado.
