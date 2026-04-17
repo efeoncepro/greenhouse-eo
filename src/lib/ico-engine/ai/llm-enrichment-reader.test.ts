@@ -8,7 +8,14 @@ vi.mock('@/lib/db', () => ({
   query: (...args: unknown[]) => mockQuery(...args)
 }))
 
-const { readMemberAiLlmSummary, readSpaceAiLlmSummary, readTopAiLlmEnrichments } = await import('./llm-enrichment-reader')
+const {
+  readAgencyAiLlmTimeline,
+  readMemberAiLlmSummary,
+  readMemberAiLlmTimeline,
+  readSpaceAiLlmSummary,
+  readSpaceAiLlmTimeline,
+  readTopAiLlmEnrichments
+} = await import('./llm-enrichment-reader')
 
 beforeEach(() => {
   mockQuery.mockReset()
@@ -157,11 +164,14 @@ describe('readMemberAiLlmSummary', () => {
     )
 
     const memberSql = mockQuery.mock.calls[1][0] as string
+    const memberTimelineSql = mockQuery.mock.calls[3][0] as string
 
     expect(memberSql).toContain("CASE COALESCE(severity, '')")
     expect(memberSql).toContain("WHEN 'critical' THEN 0")
     expect(memberSql).toContain('quality_score DESC NULLS LAST')
     expect(memberSql).toContain('processed_at DESC')
+    expect(memberTimelineSql).toContain('greenhouse_serving.ico_ai_signal_enrichment_history')
+    expect(memberTimelineSql).toContain('DISTINCT ON (enrichment_id)')
 
     expect(result).toEqual({
       totalAnalyzed: 2,
@@ -247,11 +257,14 @@ describe('readSpaceAiLlmSummary', () => {
     )
 
     const spaceSql = mockQuery.mock.calls[1][0] as string
+    const spaceTimelineSql = mockQuery.mock.calls[3][0] as string
 
     expect(spaceSql).toContain("CASE COALESCE(severity, '')")
     expect(spaceSql).toContain("WHEN 'critical' THEN 0")
     expect(spaceSql).toContain('quality_score DESC NULLS LAST')
     expect(spaceSql).toContain('processed_at DESC')
+    expect(spaceTimelineSql).toContain('greenhouse_serving.ico_ai_signal_enrichment_history')
+    expect(spaceTimelineSql).toContain('DISTINCT ON (enrichment_id)')
 
     expect(result).toEqual({
       totalAnalyzed: 2,
@@ -271,5 +284,115 @@ describe('readSpaceAiLlmSummary', () => {
       ],
       timeline: []
     })
+  })
+})
+
+describe('timeline readers', () => {
+  it('reads the agency timeline from historical enrichments deduplicated by enrichment', async () => {
+    mockQuery.mockResolvedValue([
+      {
+        enrichment_id: 'EO-AIE-30',
+        signal_id: 'signal-30',
+        signal_type: 'root_cause',
+        space_id: 'space-9',
+        metric_name: 'ftr_pct',
+        severity: 'critical',
+        explanation_summary: 'Persisted in history',
+        recommended_action: 'Escalar',
+        processed_at: '2026-04-16T10:00:00.000Z'
+      }
+    ])
+
+    const result = await readAgencyAiLlmTimeline(10)
+    const sql = mockQuery.mock.calls[0][0] as string
+
+    expect(sql).toContain('greenhouse_serving.ico_ai_signal_enrichment_history')
+    expect(sql).toContain('DISTINCT ON (enrichment_id)')
+    expect(sql).toContain("WHERE status = 'succeeded'")
+
+    expect(result).toEqual([
+      {
+        enrichmentId: 'EO-AIE-30',
+        signalId: 'signal-30',
+        signalType: 'root_cause',
+        spaceId: 'space-9',
+        metricName: 'ftr_pct',
+        severity: 'critical',
+        qualityScore: null,
+        explanationSummary: 'Persisted in history',
+        rootCauseNarrative: null,
+        recommendedAction: 'Escalar',
+        confidence: null,
+        processedAt: '2026-04-16T10:00:00.000Z'
+      }
+    ])
+  })
+
+  it('reads the member timeline from historical enrichments deduplicated by enrichment', async () => {
+    mockQuery.mockResolvedValue([
+      {
+        enrichment_id: 'EO-AIE-31',
+        signal_type: 'recommendation',
+        metric_name: 'rpa_avg',
+        severity: 'warning',
+        explanation_summary: 'Historial de persona',
+        recommended_action: null,
+        processed_at: '2026-04-16T09:30:00.000Z'
+      }
+    ])
+
+    const result = await readMemberAiLlmTimeline('member-42', 10)
+    const sql = mockQuery.mock.calls[0][0] as string
+
+    expect(sql).toContain('greenhouse_serving.ico_ai_signal_enrichment_history')
+    expect(sql).toContain('member_id = $1')
+    expect(sql).toContain('DISTINCT ON (enrichment_id)')
+
+    expect(result).toEqual([
+      {
+        id: 'EO-AIE-31',
+        signalType: 'recommendation',
+        metricId: 'rpa_avg',
+        severity: 'warning',
+        explanation: 'Historial de persona',
+        rootCauseNarrative: null,
+        recommendedAction: null,
+        processedAt: '2026-04-16T09:30:00.000Z'
+      }
+    ])
+  })
+
+  it('reads the space timeline from historical enrichments deduplicated by enrichment', async () => {
+    mockQuery.mockResolvedValue([
+      {
+        enrichment_id: 'EO-AIE-32',
+        signal_type: 'anomaly',
+        metric_name: 'otd_pct',
+        severity: 'critical',
+        explanation_summary: 'Historial de space',
+        recommended_action: 'Ajustar staffing',
+        processed_at: '2026-04-16T08:45:00.000Z'
+      }
+    ])
+
+    const result = await readSpaceAiLlmTimeline('space-42', 10)
+    const sql = mockQuery.mock.calls[0][0] as string
+
+    expect(sql).toContain('greenhouse_serving.ico_ai_signal_enrichment_history')
+    expect(sql).toContain('space_id = $1')
+    expect(sql).toContain('DISTINCT ON (enrichment_id)')
+
+    expect(result).toEqual([
+      {
+        id: 'EO-AIE-32',
+        signalType: 'anomaly',
+        metricId: 'otd_pct',
+        severity: 'critical',
+        explanation: 'Historial de space',
+        rootCauseNarrative: null,
+        recommendedAction: 'Ajustar staffing',
+        processedAt: '2026-04-16T08:45:00.000Z'
+      }
+    ])
   })
 })

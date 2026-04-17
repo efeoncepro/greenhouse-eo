@@ -1,8 +1,15 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-17 — Nexa Insights preserva historial advisory con archive append-only
+
+- Nuevo archivo `greenhouse_serving.ico_ai_signal_enrichment_history` para conservar cada corrida LLM sin sobrescribirla
+- `readAgencyAiLlmTimeline(limit=20)` y los timelines scoped ahora leen desde historial deduplicado por `enrichment_id`, no desde `greenhouse_serving.ico_ai_signal_enrichments`
+- `src/lib/nexa/digest/build-weekly-digest.ts` consume el mismo historial deduplicado para no perder advisories cuando cambian las anomalías del período
+- Se agrega replay histórico `historyOnly` con `asOfTime` en `materializeAiLlmEnrichments()` y script operativo `scripts/backfill-ico-llm-history.ts`
+
 ## Delta 2026-04-17 — Nexa Insights gana vista Historial (timeline cross-period) sobre el mismo serving layer
 
-- Reader nuevo: `readAgencyAiLlmTimeline(limit=20)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` — SELECT sin filtro de período sobre `greenhouse_serving.ico_ai_signal_enrichments`, ordenado por `processed_at DESC`, status='succeeded' only
+- Reader nuevo: `readAgencyAiLlmTimeline(limit=20)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` — SELECT sin filtro de período sobre el historial advisory deduplicado, ordenado por `processed_at DESC`, status='succeeded' only
 - `readAgencyAiLlmSummary` fetchea current-period + timeline en paralelo (Promise.all) — sin impacto de latencia percibido
 - `AgencyAiLlmSummary.timeline: AgencyAiLlmSummaryItem[]` — extensión retrocompatible del contrato
 - UI: `NexaInsightsBlock` incorpora toggle Recientes/Historial (solo visible si hay timeline data); nueva `NexaInsightsTimeline.tsx` agrupa por día con MUI Lab Timeline
