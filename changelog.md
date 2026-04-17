@@ -7,6 +7,7 @@
 - Se agrega `greenhouse_serving.ico_ai_signal_enrichment_history` como archivo append-only de enrichments LLM; `ico_ai_signal_enrichments` se mantiene como snapshot current-state.
 - Los timelines de Agency, Home, Space 360 y Person 360 pasan a leer historial deduplicado por `enrichment_id`, así que una señal que desaparece del mes actual sigue viva en Historial.
 - El weekly digest ahora se arma desde ese historial deduplicado y ya no depende solo del snapshot vigente.
+- Los summary readers de Person 360 y Space 360 ahora hacen fallback al historial recuperado cuando el snapshot current-state del período queda vacío, evitando falsos "Sin datos" en miembros o spaces que sí tuvieron insights días antes.
 - Se agrega replay histórico `historyOnly` con `asOfTime` y script `scripts/backfill-ico-llm-history.ts`; se recuperó el tramo replayable de abril 2026 (`2026-04-15` a `2026-04-17`) y quedó confirmado que `2026-04-01` a `2026-04-10 13:17 UTC` ya no es recuperable vía BigQuery time travel.
 
 ### 2026-04-17 — Nexa Insights: Historial extendido a Home, Space 360 y Person 360

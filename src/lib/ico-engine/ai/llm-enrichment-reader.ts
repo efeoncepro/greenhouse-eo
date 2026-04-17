@@ -491,13 +491,22 @@ export const readMemberAiLlmSummary = async (
 
   const recentInsights = recentRows.map(mapMemberInsightItem)
 
+  const visibleInsights =
+    recentInsights.length > 0 ? recentInsights : timelineItems.slice(0, Math.max(1, limit))
+
+  const lastAnalysis =
+    recentInsights.length > 0
+      ? toText(totalsRow.last_processed_at)
+      : visibleInsights[0]?.processedAt ?? null
+
   return {
-    totalAnalyzed: recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : 0,
-    lastAnalysis: toText(totalsRow.last_processed_at),
+    totalAnalyzed:
+      recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : timelineItems.length,
+    lastAnalysis,
     runStatus: latestRunRow
       ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
       : null,
-    insights: recentInsights,
+    insights: visibleInsights,
     timeline: timelineItems
   }
 }
@@ -579,13 +588,22 @@ export const readSpaceAiLlmSummary = async (
   const latestRunRow = latestRunRows[0]
   const recentInsights = recentRows.map(mapSpaceInsightItem)
 
+  const visibleInsights =
+    recentInsights.length > 0 ? recentInsights : timelineItems.slice(0, Math.max(1, limit))
+
+  const lastAnalysis =
+    recentInsights.length > 0
+      ? toText(totalsRow.last_processed_at)
+      : visibleInsights[0]?.processedAt ?? null
+
   return {
-    totalAnalyzed: recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : 0,
-    lastAnalysis: toText(totalsRow.last_processed_at),
+    totalAnalyzed:
+      recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : timelineItems.length,
+    lastAnalysis,
     runStatus: latestRunRow
       ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
       : null,
-    insights: recentInsights,
+    insights: visibleInsights,
     timeline: timelineItems
   }
 }
