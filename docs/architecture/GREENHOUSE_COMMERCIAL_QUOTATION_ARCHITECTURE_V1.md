@@ -1,10 +1,34 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.4
+> **Version:** 2.5
 > **Created:** 2026-04-09
-> **Updated:** 2026-04-17 — v2.4: TASK-347 HubSpot canonical bridge + event namespace convergence (`commercial.quotation.*`, `commercial.product_catalog.*`), outbound cost-field guard, `source=canonical` reader for product catalog
+> **Updated:** 2026-04-17 — v2.5: TASK-348 governance runtime (approvals, versions, audit trail, terms library, templates) live. Added 7 tablas en `greenhouse_commercial`, 4 nuevos eventos outbox (`version_created`, `approval_requested`, `approval_decided`, `template_used/saved`), API extensions bajo `/api/finance/quotes/[id]/*` y `/api/finance/quotation-governance/*`, pestañas de gobernanza en QuoteDetailView.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-17 — TASK-348 quotation governance runtime
+
+- **7 tablas nuevas en `greenhouse_commercial`** (migration `20260417140553325_task-348-quotation-governance-runtime.sql`):
+  - `approval_policies` — reglas parametrizables de aprobación por BL, pricing model, condition type (`margin_below_floor`, `margin_below_target`, `amount_above_threshold`, `discount_above_threshold`, `always`).
+  - `approval_steps` — instancias pendientes/decididas por `(quotation_id, version_number)` con required_role, step_order, notes y decided_at.
+  - `quotation_audit_log` — trail inmutable de acciones (`created`, `status_changed`, `version_created`, `approval_requested`, `approval_decided`, `terms_changed`, `template_used`, …) con detalle en jsonb.
+  - `terms_library` — catálogo global de términos reutilizables con `body_template` que admite variables `{{payment_terms_days}}`, `{{valid_until}}`, etc.
+  - `quotation_terms` — snapshot por cotización del término aplicado con `body_resolved` inmutable.
+  - `quote_templates` + `quote_template_items` — plantillas por BL + pricing model con line items default, currency, billing frequency, terms referenciados y usage_count.
+- **Runtime governance helpers** en `src/lib/commercial/governance/`:
+  - `contracts.ts`, `audit-log.ts`, `approval-evaluator.ts`, `approval-steps-store.ts`, `policies-store.ts`, `terms-store.ts` (incluye `resolveTermVariables`), `templates-store.ts`, `versions-store.ts`, `version-diff.ts`.
+  - `evaluateApproval()` recibe `health.quotationMarginPct/discountPct + totalPrice` y retorna los steps a crear en orden.
+  - `createNewVersion()` clona line items de la versión vigente, incrementa `current_version`, crea snapshot en `quotation_versions` y deja la cotización en `draft`.
+  - `seedQuotationDefaultTerms()` + `upsertQuotationTerms()` aplican términos del library a una quote resolviendo variables.
+- **Outbox fan-out**. Nuevos event types en `event-catalog.ts`: `commercial.quotation.version_created`, `commercial.quotation.approval_requested`, `commercial.quotation.approval_decided`, `commercial.quotation.sent`, `commercial.quotation.approved`, `commercial.quotation.rejected`, `commercial.quotation.template_used`, `commercial.quotation.template_saved`. Publishers correspondientes viven en `src/lib/commercial/quotation-events.ts`.
+- **API surface extension**. La gobernanza se expone bajo la superficie runtime existente (no se duplica el bridge TASK-345):
+  - Por cotización: `/api/finance/quotes/[id]/versions`, `/approve`, `/audit`, `/terms`.
+  - Globales: `/api/finance/quotation-governance/approval-policies[/[id]]`, `/terms-library[/[id]]`, `/templates[/[id]]`. Todos protegidos por `requireFinanceTenantContext` + role gate en mutaciones.
+- **UI tabs** en `src/views/greenhouse/finance/QuoteDetailView.tsx`: General / Versiones / Aprobaciones / Términos / Auditoría. Componentes nuevos en `src/views/greenhouse/finance/governance/`.
+- **Seeds iniciales**: 3 approval policies globales (margen bajo piso, monto > 50M, descuento > 30%) y 6 terms library reutilizables (pago, vigencia, confidencialidad, cambios de alcance, reemplazo, escalamiento).
+- **Respeta boundaries**: audit, versions y outbox coexisten — cada uno cumple un propósito distinto según §18.3.
 
 ---
 

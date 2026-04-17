@@ -149,6 +149,37 @@ export interface GreenhouseAiToolCatalog {
   website_url: string | null;
 }
 
+export interface GreenhouseCommercialApprovalPolicies {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  condition_type: string;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  policy_id: Generated<string>;
+  policy_name: string;
+  pricing_model: string | null;
+  required_role: string;
+  step_order: Generated<number>;
+  threshold_value: Numeric | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialApprovalSteps {
+  assigned_to: string | null;
+  condition_label: string;
+  created_at: Generated<Timestamp>;
+  decided_at: Timestamp | null;
+  decided_by: string | null;
+  notes: string | null;
+  policy_id: string | null;
+  quotation_id: string;
+  required_role: string;
+  status: Generated<string>;
+  step_id: Generated<string>;
+  step_order: Generated<number>;
+  version_number: number;
+}
+
 export interface GreenhouseCommercialMarginTargets {
   business_line_code: string | null;
   created_at: Generated<Timestamp>;
@@ -187,6 +218,17 @@ export interface GreenhouseCommercialProductCatalog {
   sync_direction: Generated<string>;
   sync_status: Generated<string>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialQuotationAuditLog {
+  action: string;
+  actor_name: string;
+  actor_user_id: string;
+  created_at: Generated<Timestamp>;
+  details: Generated<Json>;
+  log_id: Generated<string>;
+  quotation_id: string;
+  version_number: number | null;
 }
 
 export interface GreenhouseCommercialQuotationLineItems {
@@ -306,6 +348,17 @@ export interface GreenhouseCommercialQuotations {
   valid_until: Timestamp | null;
 }
 
+export interface GreenhouseCommercialQuotationTerms {
+  body_resolved: string;
+  created_at: Generated<Timestamp>;
+  included: Generated<boolean>;
+  quotation_id: string;
+  quotation_term_id: Generated<string>;
+  sort_order: Generated<number>;
+  term_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialQuotationVersions {
   created_at: Generated<Timestamp>;
   created_by: Generated<string>;
@@ -320,6 +373,45 @@ export interface GreenhouseCommercialQuotationVersions {
   total_price: Numeric | null;
   version_id: Generated<string>;
   version_number: number;
+}
+
+export interface GreenhouseCommercialQuoteTemplateItems {
+  created_at: Generated<Timestamp>;
+  default_margin_pct: Numeric | null;
+  default_unit_price: Numeric | null;
+  description: string | null;
+  label: string;
+  line_type: Generated<string>;
+  product_id: string | null;
+  quantity: Generated<Numeric>;
+  role_code: string | null;
+  sort_order: Generated<number>;
+  suggested_hours: Numeric | null;
+  template_id: string;
+  template_item_id: Generated<string>;
+  unit: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialQuoteTemplates {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  default_billing_frequency: Generated<string>;
+  default_conditions_text: string | null;
+  default_contract_duration_months: number | null;
+  default_currency: Generated<string>;
+  default_payment_terms_days: Generated<number>;
+  default_term_ids: Generated<string[]>;
+  description: string | null;
+  last_used_at: Timestamp | null;
+  pricing_model: string;
+  template_code: string;
+  template_id: Generated<string>;
+  template_name: string;
+  updated_at: Generated<Timestamp>;
+  usage_count: Generated<number>;
 }
 
 export interface GreenhouseCommercialRevenueMetricConfig {
@@ -347,6 +439,23 @@ export interface GreenhouseCommercialRoleRateCards {
   role_code: string;
   seniority_level: Generated<string>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialTermsLibrary {
+  active: Generated<boolean>;
+  applies_to_model: string | null;
+  body_template: string;
+  category: string;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  default_for_bl: Generated<string[]>;
+  required: Generated<boolean>;
+  sort_order: Generated<number>;
+  term_code: string;
+  term_id: Generated<string>;
+  title: string;
+  updated_at: Generated<Timestamp>;
+  version: Generated<number>;
 }
 
 export interface GreenhouseContextContextDocumentQuarantine {
@@ -3421,6 +3530,38 @@ export interface GreenhouseServingIcoAiEnrichmentRuns {
   trigger_type: string;
 }
 
+export interface GreenhouseServingIcoAiSignalEnrichmentHistory {
+  confidence: Numeric | null;
+  enrichment_id: string;
+  error_message: string | null;
+  explanation_json: Generated<Json>;
+  explanation_summary: string | null;
+  history_id: string;
+  latency_ms: number | null;
+  member_id: string | null;
+  metric_name: string;
+  model_id: string;
+  period_month: number;
+  period_year: number;
+  processed_at: Timestamp;
+  project_id: string | null;
+  prompt_hash: string | null;
+  prompt_version: string;
+  quality_score: Numeric | null;
+  recommended_action: string | null;
+  root_cause_narrative: string | null;
+  run_id: string;
+  severity: string | null;
+  signal_id: string;
+  signal_type: string;
+  source: Generated<string>;
+  space_id: string;
+  status: string;
+  synced_at: Generated<Timestamp>;
+  tokens_in: number | null;
+  tokens_out: number | null;
+}
+
 export interface GreenhouseServingIcoAiSignalEnrichments {
   confidence: Numeric | null;
   enrichment_id: string;
@@ -4696,13 +4837,20 @@ export interface DB {
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
+  "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
+  "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
+  "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;
+  "greenhouse_commercial.quotation_terms": GreenhouseCommercialQuotationTerms;
   "greenhouse_commercial.quotation_versions": GreenhouseCommercialQuotationVersions;
   "greenhouse_commercial.quotations": GreenhouseCommercialQuotations;
+  "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
+  "greenhouse_commercial.quote_templates": GreenhouseCommercialQuoteTemplates;
   "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
   "greenhouse_commercial.role_rate_cards": GreenhouseCommercialRoleRateCards;
+  "greenhouse_commercial.terms_library": GreenhouseCommercialTermsLibrary;
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;
@@ -4850,6 +4998,7 @@ export interface DB {
   "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
   "greenhouse_serving.ico_ai_enrichment_runs": GreenhouseServingIcoAiEnrichmentRuns;
+  "greenhouse_serving.ico_ai_signal_enrichment_history": GreenhouseServingIcoAiSignalEnrichmentHistory;
   "greenhouse_serving.ico_ai_signal_enrichments": GreenhouseServingIcoAiSignalEnrichments;
   "greenhouse_serving.ico_ai_signals": GreenhouseServingIcoAiSignals;
   "greenhouse_serving.ico_member_metrics": GreenhouseServingIcoMemberMetrics;

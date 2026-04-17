@@ -322,6 +322,16 @@ export const EVENT_TYPES = {
   quotationLineItemsSynced: 'commercial.quotation.line_items_synced',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
+  // Commercial Quotation Governance (TASK-348)
+  quotationVersionCreated: 'commercial.quotation.version_created',
+  quotationApprovalRequested: 'commercial.quotation.approval_requested',
+  quotationApprovalDecided: 'commercial.quotation.approval_decided',
+  quotationSent: 'commercial.quotation.sent',
+  quotationApproved: 'commercial.quotation.approved',
+  quotationRejected: 'commercial.quotation.rejected',
+  quotationTemplateUsed: 'commercial.quotation.template_used',
+  quotationTemplateSaved: 'commercial.quotation.template_saved',
+
   // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
   productCreated: 'finance.product.created',

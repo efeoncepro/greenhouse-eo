@@ -335,3 +335,240 @@ export const publishDiscountHealthAlert = async (
     client
   )
 }
+
+// ═══════════════════════════════════════════════════════════════
+// TASK-348 — Quotation Governance outbox publishers
+// ═══════════════════════════════════════════════════════════════
+
+interface VersionCreatedParams {
+  quotationId: string
+  fromVersion: number
+  toVersion: number
+  createdBy: string
+  notes?: string | null
+}
+
+export const publishQuotationVersionCreated = async (
+  params: VersionCreatedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationVersionCreated,
+      payload: {
+        quotationId: params.quotationId,
+        fromVersion: params.fromVersion,
+        toVersion: params.toVersion,
+        createdBy: params.createdBy,
+        notes: params.notes ?? null
+      }
+    },
+    client
+  )
+}
+
+interface ApprovalRequestedParams {
+  quotationId: string
+  versionNumber: number
+  steps: Array<{
+    stepId: string
+    requiredRole: string
+    conditionLabel: string
+  }>
+  requestedBy: string
+}
+
+export const publishQuotationApprovalRequested = async (
+  params: ApprovalRequestedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationApprovalRequested,
+      payload: {
+        quotationId: params.quotationId,
+        versionNumber: params.versionNumber,
+        steps: params.steps,
+        requestedBy: params.requestedBy
+      }
+    },
+    client
+  )
+}
+
+interface ApprovalDecidedParams {
+  quotationId: string
+  versionNumber: number
+  stepId: string
+  decision: 'approved' | 'rejected'
+  decidedBy: string
+  conditionLabel: string
+  notes?: string | null
+  resultingStatus: 'draft' | 'sent' | 'pending_approval' | null
+}
+
+export const publishQuotationApprovalDecided = async (
+  params: ApprovalDecidedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationApprovalDecided,
+      payload: {
+        quotationId: params.quotationId,
+        versionNumber: params.versionNumber,
+        stepId: params.stepId,
+        decision: params.decision,
+        decidedBy: params.decidedBy,
+        conditionLabel: params.conditionLabel,
+        notes: params.notes ?? null,
+        resultingStatus: params.resultingStatus
+      }
+    },
+    client
+  )
+
+  if (params.resultingStatus === 'sent' && params.decision === 'approved') {
+    await publishOutboxEvent(
+      {
+        aggregateType: AGGREGATE_TYPES.quotation,
+        aggregateId: params.quotationId,
+        eventType: EVENT_TYPES.quotationSent,
+        payload: {
+          quotationId: params.quotationId,
+          versionNumber: params.versionNumber,
+          sentBy: params.decidedBy,
+          postApproval: true
+        }
+      },
+      client
+    )
+  }
+
+  if (params.decision === 'rejected') {
+    await publishOutboxEvent(
+      {
+        aggregateType: AGGREGATE_TYPES.quotation,
+        aggregateId: params.quotationId,
+        eventType: EVENT_TYPES.quotationRejected,
+        payload: {
+          quotationId: params.quotationId,
+          versionNumber: params.versionNumber,
+          stepId: params.stepId,
+          rejectedBy: params.decidedBy,
+          notes: params.notes ?? null
+        }
+      },
+      client
+    )
+  }
+}
+
+interface QuotationSentParams {
+  quotationId: string
+  versionNumber: number
+  sentBy: string
+}
+
+export const publishQuotationSent = async (
+  params: QuotationSentParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationSent,
+      payload: {
+        quotationId: params.quotationId,
+        versionNumber: params.versionNumber,
+        sentBy: params.sentBy,
+        postApproval: false
+      }
+    },
+    client
+  )
+}
+
+interface QuotationApprovedParams {
+  quotationId: string
+  approvedBy: string
+}
+
+export const publishQuotationApproved = async (
+  params: QuotationApprovedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationApproved,
+      payload: {
+        quotationId: params.quotationId,
+        approvedBy: params.approvedBy
+      }
+    },
+    client
+  )
+}
+
+interface TemplateUsedParams {
+  templateId: string
+  templateCode: string
+  quotationId: string
+  usedBy: string
+}
+
+export const publishTemplateUsed = async (
+  params: TemplateUsedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationTemplateUsed,
+      payload: {
+        templateId: params.templateId,
+        templateCode: params.templateCode,
+        quotationId: params.quotationId,
+        usedBy: params.usedBy
+      }
+    },
+    client
+  )
+}
+
+interface TemplateSavedParams {
+  templateId: string
+  templateCode: string
+  sourceQuotationId: string | null
+  createdBy: string
+}
+
+export const publishTemplateSaved = async (
+  params: TemplateSavedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.sourceQuotationId ?? params.templateId,
+      eventType: EVENT_TYPES.quotationTemplateSaved,
+      payload: {
+        templateId: params.templateId,
+        templateCode: params.templateCode,
+        sourceQuotationId: params.sourceQuotationId,
+        createdBy: params.createdBy
+      }
+    },
+    client
+  )
+}

@@ -38,6 +38,7 @@ type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
   dte_type_code: string | null
   dte_folio: string | null
   notes: string | null
+  current_version: number | null
   created_at: string | Date | null
   updated_at: string | Date | null
 }
@@ -231,6 +232,7 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        q.hubspot_quote_id,
        q.hubspot_deal_id,
        q.notes,
+       q.current_version,
        q.created_at,
        q.updated_at,
        q.legacy_status
@@ -1014,6 +1016,7 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
   hubspotQuoteId: row.hubspot_quote_id ? String(row.hubspot_quote_id) : null,
   hubspotDealId: row.hubspot_deal_id ? String(row.hubspot_deal_id) : null,
   notes: row.notes ? String(row.notes) : null,
+  currentVersion: row.current_version !== null && row.current_version !== undefined ? Number(row.current_version) : null,
   createdAt: row.created_at ? String(row.created_at) : null,
   updatedAt: row.updated_at ? String(row.updated_at) : null
 })
