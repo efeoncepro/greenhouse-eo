@@ -31,11 +31,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | P1 |
 | Impact | Bajo |
 | Effort | Bajo |
-| Status real | `Discovery + spec correction` |
+| Status real | `Complete` |
 | Rank | — |
 | Domain | Agency / Campaigns |
 | Sequence | Agency Layer V2 — Phase 1 |
@@ -66,12 +66,18 @@ Update Agency Campaigns UI to consume `/api/agency/campaigns`. Keep `/api/campai
 
 ## Acceptance Criteria
 
-- [ ] `/api/agency/campaigns` serves campaign data for the Agency surface
-- [ ] Agency Campaigns view at `/agency/campaigns` calls the new API path
-- [ ] Existing `/api/campaigns/**` runtime stays functional for internal/client surfaces or is safely wrapped without regressions
-- [ ] Campaign resolution is tenant-safe by `space_id` / subset and no longer depends on the `clientId -> spaceId` mismatch
-- [ ] Any new Agency sub-routes added in this lane preserve parity with the existing runtime contract where needed
-- [ ] No broken references in the codebase
+- [x] `/api/agency/campaigns` serves campaign data for the Agency surface
+- [x] Agency Campaigns view at `/agency/campaigns` calls the new API path
+- [x] Existing `/api/campaigns/**` runtime stays functional for internal/client surfaces or is safely wrapped without regressions
+- [x] Campaign resolution is tenant-safe by `space_id` / subset and no longer depends on the `clientId -> spaceId` mismatch
+- [x] Any new Agency sub-routes added in this lane preserve parity with the existing runtime contract where needed
+- [x] No broken references in the codebase
+
+## Completion Notes
+
+- Agency now consumes `/api/agency/campaigns` as its only runtime contract; the temporary UI fallback to `/api/campaigns` was removed once the dedicated namespace was validated.
+- `/api/campaigns/**` remains alive as the shared namespace for internal and client-facing surfaces (`/campaigns`, `/campanas`), which is the intended coexistence boundary for this lane.
+- No migration was required because the task closed on top of the existing `greenhouse_core.campaigns` and `greenhouse_core.campaign_project_links` runtime.
 
 ## File Reference
 

@@ -55,44 +55,6 @@ describe('AgencyCampaignsView', () => {
     expect(screen.getAllByText('$120.000')).toHaveLength(2)
   })
 
-  it('falls back to the legacy campaigns route when the agency route is not available', async () => {
-    fetchMock
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        json: async () => ({ error: 'Not found' })
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({
-          items: [
-            {
-              campaignId: 'cmp-2',
-              eoId: 'EO-CMP-0002',
-              displayName: 'Sprint Invierno',
-              campaignType: 'campaign',
-              status: 'planning',
-              plannedStartDate: '2026-06-01',
-              plannedEndDate: '2026-06-20',
-              projectCount: 2,
-              budgetClp: 80000,
-              spaceId: 'spc-2'
-            }
-          ]
-        })
-      })
-
-    renderWithTheme(<AgencyCampaignsView />)
-
-    await waitFor(() => {
-      expect(screen.getByText('Sprint Invierno')).toBeInTheDocument()
-    })
-
-    expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/agency/campaigns')
-    expect(fetchMock).toHaveBeenNthCalledWith(2, '/api/campaigns')
-  })
-
   it('shows the API error instead of the empty state when the request fails', async () => {
     fetchMock.mockResolvedValue({
       ok: false,
@@ -108,5 +70,22 @@ describe('AgencyCampaignsView', () => {
 
     expect(screen.getByText('spaceId is required')).toBeInTheDocument()
     expect(screen.queryByText('Sin campañas registradas')).not.toBeInTheDocument()
+  })
+
+  it('does not fall back to the shared global campaign namespace', async () => {
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: async () => ({ error: 'Not found' })
+    })
+
+    renderWithTheme(<AgencyCampaignsView />)
+
+    await waitFor(() => {
+      expect(screen.getByText('No pudimos cargar campañas')).toBeInTheDocument()
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock).toHaveBeenCalledWith('/api/agency/campaigns')
   })
 })

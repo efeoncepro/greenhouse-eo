@@ -190,7 +190,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-142` | `complete` | Agency Space 360 View | `docs/tasks/complete/TASK-142-agency-space-360-view.md` |
 | `TASK-143` | `complete` | Agency Economics API & View | `docs/tasks/complete/TASK-143-agency-economics-api.md` |
 | `TASK-144` | `complete` | Agency Team Dedicated API | `docs/tasks/complete/TASK-144-agency-team-api-dedup.md` |
-| `TASK-145` | `in-progress` | Agency Campaigns API Rescope | `docs/tasks/in-progress/TASK-145-agency-campaigns-rescope.md` |
+| `TASK-145` | `complete` | Agency Campaigns API Rescope | `docs/tasks/complete/TASK-145-agency-campaigns-rescope.md` |
 | `TASK-146` | `to-do` | Service-Level P&L (Economics per Service) | `docs/tasks/to-do/TASK-146-service-pnl.md` |
 | `TASK-147` | `to-do` | Campaign ↔ Service Bridge | `docs/tasks/to-do/TASK-147-campaign-service-bridge.md` |
 | `TASK-148` | `to-do` | Agency Outbox Event Emission | `docs/tasks/to-do/TASK-148-agency-outbox-events.md` |

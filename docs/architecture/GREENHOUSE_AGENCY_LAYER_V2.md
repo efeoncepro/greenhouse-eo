@@ -1653,7 +1653,7 @@ Cada componente nuevo coexiste con el viejo hasta que se valida:
 | Space redirect → Admin | Space 360 page | Space 360 como nueva ruta, redirect se mantiene en `/admin/tenants/[id]` | Space 360 tiene todos los tabs funcionales |
 | Economics placeholder | Economics API + view | Nuevo reemplaza placeholder directamente | API retorna datos reales |
 | Inline capacity queries | `TeamCapacityStore` | Store encapsula queries existentes, misma data | Store validado con tests |
-| `/api/campaigns` (global) | `/api/agency/campaigns` | Proxy: nuevo delega al viejo | Viejo eliminado después de 30 días |
+| `/api/campaigns` (global compartido por internal/client) | `/api/agency/campaigns` | Coexistencia: Agency consume el namespace nuevo; global sigue sirviendo `/campaigns` y `/campanas` | Revaluar cuando se cierre una estrategia de namespace unificado para Campaigns |
 
 Estado real 2026-04-17:
 

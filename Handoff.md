@@ -2,7 +2,7 @@
 
 ## Sesion 2026-04-17 — TASK-145 Agency Campaigns API rescope
 
-- **Estado:** `implementado localmente`, `validado`
+- **Estado:** `complete`, `validado`
 - **Rama:** `develop`
 - **Implementado:**
   - `src/app/api/agency/campaigns/route.ts`
@@ -25,7 +25,7 @@
     - rutas compartidas alineadas al helper tenant-safe
   - `src/views/agency/AgencyCampaignsView.tsx`
     - Agency consume `/api/agency/campaigns` como endpoint primario
-    - mantiene fallback a `/api/campaigns` durante la coexistencia
+    - deja de mantener fallback a `/api/campaigns`; la surface Agency queda cortada al namespace dedicado
   - tests nuevos/actualizados:
     - `src/lib/campaigns/tenant-scope.test.ts`
     - `src/app/api/campaigns/route.test.ts`
@@ -34,7 +34,7 @@
 - **Docs alineados:**
   - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
   - `docs/tasks/TASK_ID_REGISTRY.md`
-  - `docs/tasks/in-progress/TASK-145-agency-campaigns-rescope.md`
+  - `docs/tasks/complete/TASK-145-agency-campaigns-rescope.md`
   - `changelog.md`
 - **Validación ejecutada:**
   - `pnpm exec vitest run src/lib/campaigns/tenant-scope.test.ts src/app/api/campaigns/route.test.ts src/app/api/agency/campaigns/route.test.ts src/views/agency/AgencyCampaignsView.test.tsx`
@@ -44,7 +44,8 @@
 - **Notas operativas:**
   - `pnpm build` quedó verde; volvió a imprimir warnings conocidos de `Dynamic server usage` en páginas autenticadas del dashboard, pero no bloquearon la build ni fueron introducidos por esta lane
   - no hubo migraciones ni cambios de schema
-  - `/api/campaigns/**` sigue siendo namespace compartido para internal + client; el cutover total no se hizo en esta lane para no romper `/campaigns` ni `/campanas`
+  - `Agency > Campaigns` ya no mantiene fallback a `/api/campaigns`; el namespace dedicado quedó como contrato primario y único para esa surface
+  - `/api/campaigns/**` sigue siendo namespace compartido para internal + client; esa coexistencia es deliberada para no romper `/campaigns` ni `/campanas`
 
 ## Sesion 2026-04-17 — TASK-144 Agency Team API dedicada y deduplicada
 
