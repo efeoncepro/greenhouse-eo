@@ -41,6 +41,7 @@ const mapHomeInsight = (row: {
   metricName: string
   severity: string | null
   explanationSummary: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
 }): HomeNexaInsightItem => ({
   id: row.enrichmentId,
@@ -48,6 +49,7 @@ const mapHomeInsight = (row: {
   metricId: row.metricName,
   severity: row.severity,
   explanation: row.explanationSummary,
+  rootCauseNarrative: row.rootCauseNarrative,
   recommendedAction: row.recommendedAction
 })
 
