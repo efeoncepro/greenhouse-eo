@@ -2,6 +2,14 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — TASK-345: Quotations ya tiene bridge canónico materializado sin romper Finance
+
+- Nace físicamente el schema `greenhouse_commercial` con `product_catalog`, `quotations`, `quotation_versions` y `quotation_line_items`.
+- `Finance > Cotizaciones` no cambia de surface ni de payload visible, pero sus APIs ya leen vía façade canónica en vez de depender solo de `greenhouse_finance.*`.
+- Los writers actuales de HubSpot y Nubox siguen usando el lane Finance por compatibilidad, pero ahora sincronizan también el anchor canónico.
+- El bridge materializa `space_id` para quotations y deja trazabilidad de resolución (`space_resolution_source`) sobre una lane que antes era solo `organization/client-first`.
+- La generación outbound de quotes HubSpot deja de persistir IDs sintéticos efímeros como única identidad local y converge mejor con `hubspot_quote_id`.
+
 ### 2026-04-17 — TASK-440: Nexa deja de exponer IDs técnicos de proyecto en narrativa visible
 
 - La resolución de labels de proyecto para Nexa ya no depende de un solo identificador: el backend resuelve por `space_id` y acepta tanto `project_record_id` como el wrapper/source ID que hoy viaja por ICO (`notion_project_id` / `project_source_id`).

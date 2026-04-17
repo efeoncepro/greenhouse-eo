@@ -4,6 +4,7 @@ import {
   getHubSpotGreenhouseCompanyQuotes,
   type HubSpotGreenhouseQuoteProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -79,7 +80,20 @@ const upsertQuoteFromHubSpot = async (
 
   if (!hubspotQuoteId) return 'skipped'
 
-  const quoteId = `QUO-HS-${hubspotQuoteId}`
+  const generatedQuoteId = `QUO-HS-${hubspotQuoteId}`
+
+  const existingRows = await runGreenhousePostgresQuery<{ quote_id: string }>(
+    `SELECT quote_id
+     FROM greenhouse_finance.quotes
+     WHERE hubspot_quote_id = $1
+        OR quote_id = $2
+     ORDER BY CASE WHEN quote_id = $2 THEN 0 ELSE 1 END
+    LIMIT 1`,
+    [hubspotQuoteId, generatedQuoteId]
+  )
+
+  const quoteId = existingRows[0]?.quote_id ?? generatedQuoteId
+
   const title = quote.identity.title || `HubSpot Quote ${hubspotQuoteId}`
   const quoteNumber = quote.identity.quoteNumber || null
   const amount = quote.financial.amount ?? 0
@@ -188,13 +202,32 @@ export const syncHubSpotQuotesForCompany = async (hubspotCompanyId: string): Pro
       else result.skipped++
 
       // Sync line items for this quote (TASK-211)
-      if (action === 'created' || action === 'updated') {
-        const quoteId = `QUO-HS-${quote.identity.hubspotQuoteId}`
+      if (action === 'created' || action === 'updated' ) {
+        const hubspotQuoteId = quote.identity.hubspotQuoteId
+
+        const resolvedQuoteRows = hubspotQuoteId
+          ? await runGreenhousePostgresQuery<{ quote_id: string }>(
+            `SELECT quote_id
+             FROM greenhouse_finance.quotes
+             WHERE hubspot_quote_id = $1
+             ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST
+             LIMIT 1`,
+            [hubspotQuoteId]
+          )
+          : []
+
+        const quoteId = resolvedQuoteRows[0]?.quote_id ?? (hubspotQuoteId ? `QUO-HS-${hubspotQuoteId}` : '')
 
         try {
           await syncQuoteLineItems(quoteId, quote.identity.hubspotQuoteId)
         } catch (liErr) {
           result.errors.push(`Quote ${quoteId} line items: ${liErr instanceof Error ? liErr.message : String(liErr)}`)
+        }
+
+        try {
+          await syncCanonicalFinanceQuote({ quoteId })
+        } catch (bridgeErr) {
+          result.errors.push(`Quote ${quoteId} canonical bridge: ${bridgeErr instanceof Error ? bridgeErr.message : String(bridgeErr)}`)
         }
       }
     } catch (err) {

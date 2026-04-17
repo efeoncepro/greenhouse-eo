@@ -4,6 +4,7 @@ import {
   getHubSpotGreenhouseQuoteLineItems,
   type HubSpotGreenhouseLineItemProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -127,6 +128,10 @@ export const syncQuoteLineItems = async (
     } catch (err) {
       result.errors.push(`LineItem ${li.identity.lineItemId}: ${err instanceof Error ? err.message : String(err)}`)
     }
+  }
+
+  if (result.created > 0 || result.updated > 0) {
+    await syncCanonicalFinanceQuote({ quoteId })
   }
 
   if (result.created > 0 || result.updated > 0) {

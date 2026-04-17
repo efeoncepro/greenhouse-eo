@@ -2,6 +2,23 @@ export type FinanceCurrency = 'CLP' | 'USD'
 
 export const VALID_CURRENCIES: FinanceCurrency[] = ['CLP', 'USD']
 
+export const QUOTATION_SOURCE_SYSTEMS = ['manual', 'hubspot', 'nubox'] as const
+export type QuotationSourceSystem = (typeof QUOTATION_SOURCE_SYSTEMS)[number]
+
+export const QUOTATION_LEGACY_STATUSES = ['draft', 'sent', 'accepted', 'rejected', 'expired', 'converted'] as const
+export type QuotationLegacyStatus = (typeof QUOTATION_LEGACY_STATUSES)[number]
+
+export const QUOTATION_CANONICAL_STATUSES = [
+  'draft',
+  'pending_approval',
+  'sent',
+  'approved',
+  'rejected',
+  'expired',
+  'converted'
+] as const
+export type QuotationCanonicalStatus = (typeof QUOTATION_CANONICAL_STATUSES)[number]
+
 export const ACCOUNT_TYPES = ['checking', 'savings', 'paypal', 'wise', 'other'] as const
 export type AccountType = (typeof ACCOUNT_TYPES)[number]
 

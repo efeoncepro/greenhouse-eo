@@ -1,12 +1,33 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.0
+> **Version:** 2.2
 > **Created:** 2026-04-09
-> **Updated:** 2026-04-09 — v2.0: approval workflow, capacity check, revenue pipeline, profitability tracking, renewal lifecycle, terms library, audit trail, quote templates
+> **Updated:** 2026-04-17 — v2.2: TASK-345 canonical schema materialized, finance compatibility bridge live
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 
 ---
+
+## Delta 2026-04-17 — TASK-345 Canonical schema + finance compatibility bridge
+
+- `greenhouse_commercial` ya existe físicamente en PostgreSQL para la lane de quotations.
+- Foundation materializada:
+  - `greenhouse_commercial.product_catalog`
+  - `greenhouse_commercial.quotations`
+  - `greenhouse_commercial.quotation_versions`
+  - `greenhouse_commercial.quotation_line_items`
+- La materialización nace como **bridge canónico**, no como surface visible nueva:
+  - `Finance > Cotizaciones` sigue siendo la fachada visible
+  - las APIs Finance leen vía façade canónica manteniendo el contrato legacy del portal
+  - los writers actuales de HubSpot/Nubox siguen publicando `finance.quote.*` / `finance.product.*`, pero ahora sincronizan también el anchor canónico
+- Regla de IDs/cutover:
+  - `quotation_id` es la identidad canónica interna del nuevo schema
+  - `finance_quote_id`, `finance_product_id` y `finance_line_item_id` quedan persistidos como claves de compatibilidad/runtime
+  - el portal Finance sigue exponiendo `quoteId` y `lineItemId` legacy mientras dure el cutover
+- Regla de tenancy actualizada:
+  - `space_id` queda materializado en `greenhouse_commercial.quotations` via resolución bridge desde `organization_id` / `client_id`
+  - si el lane legacy no trae `space_id` explícito, el bridge conserva `space_resolution_source` para auditar cómo se resolvió
+- Los eventos `commercial.quotation.*` siguen siendo naming objetivo; TASK-345 no introduce todavía publishers runtime en esa familia.
 
 ## 1. Vision y proposito
 
@@ -44,7 +65,9 @@ Los 3 modelos comparten la misma estructura de datos (quotation + line items). L
 
 ## 3. Schema: `greenhouse_commercial`
 
-Nuevo schema dedicado. Ownership: `greenhouse_ops`.
+Schema dedicado ya materializado. Ownership: `greenhouse_ops`.
+
+> **Nota de cutover:** este schema ya existe físicamente desde `TASK-345`, pero el portal no hace bypass directo del lane Finance. El runtime visible sigue siendo finance-first con façade canónica detrás.
 
 ### 3.1. Margin targets (configuracion por business line)
 

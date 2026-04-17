@@ -3,12 +3,23 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-07 por Claude (TASK-210)
-> **Ultima actualizacion:** 2026-04-07 por Claude (TASK-210)
+> **Ultima actualizacion:** 2026-04-17 por Codex (TASK-345)
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 ## Que es
 
 El modulo de cotizaciones consolida las propuestas comerciales de dos fuentes — Nubox (DTE 52) y HubSpot CRM — en una sola tabla. Esto permite ver todo el pipeline de cotizaciones en un solo lugar, sin importar donde se originaron. Ademas, permite crear cotizaciones nuevas en HubSpot directamente desde Greenhouse.
+
+## Rol durante el cutover
+
+Hoy esta surface debe leerse como el runtime vigente de cotizaciones en Greenhouse, no como el modulo comercial canonico final.
+
+- La vista oficial sigue siendo `Finanzas > Cotizaciones`
+- La escritura operativa actual sigue entrando por `greenhouse_finance.quotes`
+- El modulo comercial canonico (`greenhouse_commercial.quotations`) ya existe como bridge canónico materializado
+- La lectura del portal sigue entrando por la fachada Finance; no aparece una pantalla comercial nueva ni cambia el contrato visible del usuario
+
+En otras palabras: Finance sigue siendo la fachada y runtime visible actual; el cutover comercial ya empezó a materializarse por debajo con un bridge canónico, pero todavía no expone una surface comercial separada.
 
 ## Superficies del portal
 

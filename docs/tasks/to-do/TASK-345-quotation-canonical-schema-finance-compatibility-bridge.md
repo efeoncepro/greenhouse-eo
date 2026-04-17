@@ -11,10 +11,10 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Ready for implementation`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-344`
+- Blocked by: `none` (`TASK-344` completada el 2026-04-17)
 - Branch: `task/TASK-345-quotation-canonical-schema-finance-compatibility-bridge`
 - Legacy ID: `follow-on de TASK-210 y TASK-211`
 - GitHub Issue: `none`
@@ -54,6 +54,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
 - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
 
 Reglas obligatorias:
 
@@ -66,6 +67,7 @@ Reglas obligatorias:
 - `project_context.md`
 - `Handoff.md`
 - `docs/documentation/finance/cotizaciones-multi-source.md`
+- `docs/tasks/complete/TASK-344-quotation-contract-consolidation-cutover-policy.md`
 - `docs/tasks/complete/TASK-210-hubspot-quotes-integration.md`
 - `docs/tasks/complete/TASK-211-hubspot-products-line-items-integration.md`
 
@@ -73,11 +75,15 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-344-quotation-contract-consolidation-cutover-policy.md`
+- `docs/tasks/complete/TASK-344-quotation-contract-consolidation-cutover-policy.md`
 - `docs/tasks/complete/TASK-210-hubspot-quotes-integration.md`
 - `docs/tasks/complete/TASK-211-hubspot-products-line-items-integration.md`
 - `src/app/api/finance/quotes/route.ts`
-- `src/lib/finance/postgres-store.ts`
+- `src/lib/hubspot/sync-hubspot-quotes.ts`
+- `src/lib/hubspot/create-hubspot-quote.ts`
+- `src/lib/hubspot/sync-hubspot-line-items.ts`
+- `src/lib/hubspot/sync-hubspot-products.ts`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
 
 ### Blocks / Impacts
 
@@ -90,7 +96,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/[verificar]-quotation-canonical-schema.sql`
+- `migrations/[generated]-task-345-quotation-canonical-schema-finance-compatibility-bridge.sql`
 - `src/lib/finance/schema.ts`
 - `src/lib/finance/contracts.ts`
 - `src/lib/finance/canonical.ts`
@@ -98,6 +104,11 @@ Reglas obligatorias:
 - `src/app/api/finance/quotes/route.ts`
 - `src/app/api/finance/quotes/[id]/route.ts`
 - `src/app/api/finance/quotes/[id]/lines/route.ts`
+- `src/lib/hubspot/sync-hubspot-quotes.ts`
+- `src/lib/hubspot/create-hubspot-quote.ts`
+- `src/lib/hubspot/sync-hubspot-line-items.ts`
+- `src/lib/hubspot/sync-hubspot-products.ts`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
 - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
 
 ## Current Repo State
@@ -111,12 +122,23 @@ Reglas obligatorias:
   - `src/app/api/finance/quotes/route.ts`
   - `src/app/api/finance/quotes/[id]/route.ts`
   - `src/app/api/finance/quotes/[id]/lines/route.ts`
+- current writers/syncs:
+  - `src/lib/hubspot/sync-hubspot-quotes.ts`
+  - `src/lib/hubspot/create-hubspot-quote.ts`
+  - `src/lib/hubspot/sync-hubspot-line-items.ts`
+  - `src/lib/hubspot/sync-hubspot-products.ts`
+  - `src/lib/nubox/sync-nubox-to-postgres.ts`
 - setup y backfill operativo:
   - `src/app/api/admin/ops/finance/setup-quotes/route.ts`
+- drift conocido:
+  - `docs/architecture/schema-snapshot-baseline.sql` no refleja aun el lane multi-source completo
+  - `quotes`, `quote_line_items` y `products` siguen sin `space_id`
 
 ### Gap
 
 - no existe aún el storage canónico de Quotation con versionado y contrato suficientemente rico para el target comercial
+- el runtime actual de cotizaciones no pasa por una sola capa de store; varias escrituras siguen viviendo directo en helpers HubSpot/Nubox
+- la compatibilidad tenant-safe todavía no está cerrada porque el lane actual no es `space-first`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -133,11 +155,13 @@ Reglas obligatorias:
 
 - Mapear quotes, line items y products ya existentes al nuevo anchor
 - Dejar readers/repositorios que abstraigan la compatibilidad mientras siga existiendo `Finance > Cotizaciones`
+- Dejar bridge explícito para que los writers actuales de HubSpot/Nubox mantengan sincronizado el anchor canónico durante el cutover
 
 ### Slice 3 — Finance compatibility
 
 - Ajustar las APIs actuales de Finance para leer/escribir vía el nuevo anchor o façade acordada
 - Mantener backward compatibility razonable para consumers actuales del portal
+- Resolver de forma explícita el drift de tenancy para que las lecturas del bridge queden filtrables por `space_id`
 
 ## Out of Scope
 
@@ -153,6 +177,8 @@ La task debe dejar resuelto:
 - cómo se representa una quote de HubSpot ya sincronizada dentro del anchor canónico
 - cómo conviven `hubspot_quote_id`, `nubox_document_id` y `quotation_id`
 - cómo se versiona una quote histórica existente que hoy solo tiene header + line items actuales
+- cómo se mantiene el anchor canónico actualizado cuando los writers reales siguen entrando por rutas/helpers de Finance, HubSpot y Nubox
+- cómo se materializa o resuelve `space_id` para un lane que hoy todavía es principalmente `organization/client-first`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -164,6 +190,8 @@ La task debe dejar resuelto:
 - [ ] Las rutas actuales de Finance pueden seguir resolviendo quotes desde el nuevo anchor o façade definida
 - [ ] El backfill/mapeo desde `greenhouse_finance.quotes` queda documentado y es idempotente
 - [ ] El módulo no deja dos roots equivalentes sin policy de compatibilidad
+- [ ] Los writers actuales de HubSpot/Nubox no dejan drift entre `greenhouse_finance.*` y el anchor canónico
+- [ ] Las lecturas del bridge quedan scopeadas por `space_id`
 
 ## Verification
 

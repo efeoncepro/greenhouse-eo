@@ -14,6 +14,24 @@
 
 # project_context.md
 
+## Delta 2026-04-17 TASK-345 materializa el bridge canónico de quotations
+
+- `greenhouse_commercial` ya existe físicamente con:
+  - `product_catalog`
+  - `quotations`
+  - `quotation_versions`
+  - `quotation_line_items`
+- Regla operativa nueva:
+  - writers HubSpot/Nubox siguen entrando por el lane Finance por compatibilidad
+  - el anchor canónico se mantiene sincronizado desde esos mismos writers
+  - las APIs Finance de quotes ya leen vía façade canónica, preservando el payload legacy del portal
+- Regla de tenancy actualizada:
+  - el bridge materializa `space_id` en quotations con resolución derivada desde `organization_id` / `client_id`
+  - la resolución queda auditada en `space_resolution_source`
+- Regla de cutover:
+  - `greenhouse_finance.*` deja de ser la única base de lectura del lane
+  - `commercial.quotation.*` sigue siendo naming objetivo de eventos, no publisher runtime activo
+
 ## Delta 2026-04-17 Los docs operativos de agentes ya exigen pensar acceso en views + entitlements
 
 - `AGENTS.md`, `CLAUDE.md` y `docs/tasks/TASK_PROCESS.md` ya no deben permitir que una solution proposal trate acceso como si solo existieran `views`.
