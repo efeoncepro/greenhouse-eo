@@ -71,6 +71,7 @@ describe('readTopAiLlmEnrichments', () => {
         severity: 'critical',
         qualityScore: 97.5,
         explanationSummary: 'Crítica',
+        rootCauseNarrative: null,
         recommendedAction: 'Actuar',
         confidence: 0.93,
         processedAt: '2026-04-15T13:10:00.000Z'
@@ -84,6 +85,7 @@ describe('readTopAiLlmEnrichments', () => {
         severity: 'warning',
         qualityScore: 92.1,
         explanationSummary: 'Warning',
+        rootCauseNarrative: null,
         recommendedAction: 'Revisar',
         confidence: 0.88,
         processedAt: '2026-04-15T13:05:00.000Z'
@@ -171,6 +173,7 @@ describe('readMemberAiLlmSummary', () => {
           metricId: 'otd_pct',
           severity: 'critical',
           explanation: 'Member impact',
+          rootCauseNarrative: null,
           recommendedAction: 'Actuar'
         },
         {
@@ -179,6 +182,7 @@ describe('readMemberAiLlmSummary', () => {
           metricId: 'rpa_avg',
           severity: 'warning',
           explanation: 'Otra señal',
+          rootCauseNarrative: null,
           recommendedAction: null
         }
       ]
@@ -255,6 +259,7 @@ describe('readSpaceAiLlmSummary', () => {
           metricId: 'otd_pct',
           severity: 'critical',
           explanation: 'Space impact',
+          rootCauseNarrative: null,
           recommendedAction: 'Escalar'
         }
       ]

@@ -495,3 +495,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-443` | `to-do`       | Nexa Thread Chat Mention Rendering (Quick Win) | `docs/tasks/to-do/TASK-443-nexa-thread-chat-mention-rendering.md` |
 | `TASK-444` | `to-do`       | Nexa Mentions Input Autocomplete | `docs/tasks/to-do/TASK-444-nexa-mentions-input-autocomplete.md` |
 | `TASK-445` | `to-do`       | Nexa Mentions Accessibility, Tests & Tombstone | `docs/tasks/to-do/TASK-445-nexa-mentions-a11y-tests-tombstone.md` |
+| `TASK-446` | `complete`    | Nexa Insights Root Cause Narrative Surfacing (Insights Quick Win) | `docs/tasks/complete/TASK-446-nexa-insights-root-cause-narrative-surfacing.md` |
+| `TASK-447` | `to-do`       | Nexa Insights Mention Hover Preview Cards | `docs/tasks/to-do/TASK-447-nexa-insights-mention-hover-preview-cards.md` |
+| `TASK-448` | `to-do`       | Nexa Insights Mention Reverse Index + Entity Filter | `docs/tasks/to-do/TASK-448-nexa-insights-mention-reverse-index-filter.md` |
+| `TASK-449` | `to-do`       | Nexa Insights Interaction Layer (Read / Pin / Dismiss / Share) | `docs/tasks/to-do/TASK-449-nexa-insights-interaction-layer.md` |

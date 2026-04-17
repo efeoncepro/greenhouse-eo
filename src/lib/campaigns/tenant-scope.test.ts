@@ -18,7 +18,7 @@ const mockGetDb = vi.fn(async () => ({
 }))
 
 vi.mock('@/lib/db', () => ({
-  getDb: (...args: unknown[]) => mockGetDb(...args)
+  getDb: () => mockGetDb()
 }))
 
 vi.mock('./campaign-store', () => ({

@@ -19,6 +19,7 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_NEXA } from '@/config/greenhouse-nomenclature'
 import { getMetricById } from '@/lib/ico-engine/metric-registry'
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
+import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRootCauseSection'
 
 // ─── Public Types ──────────────────────────────────────────────────────────
 
@@ -28,6 +29,7 @@ export type NexaInsightItem = {
   metricId: string
   severity: string | null
   explanation: string | null
+  rootCauseNarrative?: string | null
   recommendedAction: string | null
 }
 
@@ -127,6 +129,11 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
               overflow: 'hidden'
             }}
           />
+        )}
+
+        {/* Root cause narrative (collapsible) */}
+        {item.rootCauseNarrative && item.rootCauseNarrative.trim() && (
+          <NexaInsightRootCauseSection narrative={item.rootCauseNarrative} insightId={item.id} />
         )}
 
         {/* Recommended action */}

@@ -17,6 +17,7 @@ export interface WeeklyExecutiveDigestInsight {
   severity: WeeklyDigestSeverity
   headline: string
   narrative: WeeklyExecutiveDigestNarrativePart[]
+  rootCauseNarrative?: WeeklyExecutiveDigestNarrativePart[]
   actionLabel?: string
   actionUrl?: string
 }
@@ -320,6 +321,39 @@ export default function WeeklyExecutiveDigestEmail({
                     }}>
                       {renderNarrative(insight.narrative)}
                     </Text>
+
+                    {insight.rootCauseNarrative && insight.rootCauseNarrative.length > 0 && (
+                      <Section
+                        style={{
+                          marginTop: '10px',
+                          padding: '10px 12px',
+                          borderLeft: `3px solid ${EMAIL_COLORS.primary}`,
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '4px',
+                        }}
+                      >
+                        <Text style={{
+                          fontFamily: EMAIL_FONTS.body,
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: EMAIL_COLORS.muted,
+                          letterSpacing: '0',
+                          textTransform: 'uppercase' as const,
+                          margin: '0 0 4px',
+                          lineHeight: '16px',
+                        }}>
+                          Causa probable
+                        </Text>
+                        <Text style={{
+                          fontSize: '13px',
+                          color: EMAIL_COLORS.secondary,
+                          lineHeight: '20px',
+                          margin: 0,
+                        }}>
+                          {renderNarrative(insight.rootCauseNarrative)}
+                        </Text>
+                      </Section>
+                    )}
 
                     {insight.actionUrl && (
                       <Text style={{

@@ -1,5 +1,18 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-17 — TASK-446 surfaces `rootCauseNarrative` end-to-end en Nexa Insights + Weekly Digest
+
+`TASK-446` cierra el gap dormido de la lane advisory: el LLM ya emitía `rootCauseNarrative` distinto de `explanationSummary` (ver prompt en `src/lib/ico-engine/ai/llm-types.ts:112-114`), la columna `root_cause_narrative` vivía en `greenhouse_serving.ico_ai_signal_enrichments` y `greenhouse_serving.finance_ai_signal_enrichments`, y además ya pasaba por `sanitizeProjectNarrative` antes del write. El reader la descartaba en todas las superficies.
+
+- **Readers ICO:** `src/lib/ico-engine/ai/llm-enrichment-reader.ts` selecciona ahora `root_cause_narrative` en `readTopAiLlmEnrichments`, `readMemberAiLlmSummary`, `readSpaceAiLlmSummary` y lo propaga vía `mapSummaryItem`, `mapOrganizationItem`, `mapTopItem`, `mapMemberInsightItem`, `mapSpaceInsightItem`
+- **Reader Finance:** `src/lib/finance/ai/llm-enrichment-reader.ts` lo selecciona en `readFinanceAiLlmSummary` y `readClientFinanceAiLlmSummary`
+- **Tipos:** `AgencyAiLlmSummaryItem`, `OrganizationAiLlmEnrichmentItem`, `TopAiLlmEnrichmentItem`, `MemberNexaInsightItem`, `SpaceNexaInsightItem` y `FinanceNexaInsightItem` declaran `rootCauseNarrative: string | null`
+- **UI:** nuevo componente `src/components/greenhouse/NexaInsightRootCauseSection.tsx` con toggle colapsable global (localStorage key `nexa.insights.rootCause.expanded`), ARIA (`aria-expanded`, `aria-controls`, `role=region`) y keyboard (Enter/Space); `NexaInsightsBlock` lo renderiza entre `explanation` y `recommendedAction` cuando existe narrativa
+- **Copy:** `GH_NEXA.insights_root_cause_label` / `_expand` / `_collapse` centralizan microcopy
+- **Weekly Digest:** `src/lib/nexa/digest/build-weekly-digest.ts` selecciona `enrich.root_cause_narrative` y produce `rootCauseNarrative?: WeeklyDigestNarrativePart[]` via `parseNarrativeText` (mentions `@[Name](type:id)` → links); `src/emails/WeeklyExecutiveDigestEmail.tsx` renderiza bloque "Causa probable" con `EMAIL_COLORS.primary` border cuando el campo viene poblado
+- **Backward compat:** campo opcional en el contrato UI; ausente o vacío → sección no renderiza; no hay cambios al prompt ni al write path
+- **Contrato:** ambas narrativas (`explanationSummary` + `rootCauseNarrative`) quedan formalmente expuestas; los agentes consumers pueden asumir que la causa raíz está disponible cuando el enrichment fue producido con `ico_signal_enrichment_v4` o `finance_signal_enrichment_v1`
+
 ## Delta 2026-04-16 — TASK-242 surfaces space-scoped Nexa insights in Space 360
 
 `TASK-242` cierra el consumer space-level de la lane advisory del ICO Engine sin abrir storage nuevo ni recalcular señales fuera del engine.
