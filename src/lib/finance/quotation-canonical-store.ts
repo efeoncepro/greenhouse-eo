@@ -96,6 +96,21 @@ export const resolveFinanceQuoteTenantSpaceIds = async (tenant: TenantContext) =
     return [explicitSpaceId]
   }
 
+  // efeonce_internal users with finance access see all spaces. The
+  // route guard (requireFinanceTenantContext) already authorized them,
+  // so we widen the space filter rather than returning [] which would
+  // silently hide every quote from admins/finance/ops.
+  if (tenant.tenantType === 'efeonce_internal') {
+    const rows = await query<TenantSpaceRow>(
+      `SELECT DISTINCT space_id
+       FROM greenhouse_core.spaces
+       WHERE active = TRUE
+       ORDER BY space_id ASC`
+    )
+
+    return rows.map(row => row.space_id)
+  }
+
   const conditions: string[] = []
   const values: unknown[] = []
   let idx = 0
