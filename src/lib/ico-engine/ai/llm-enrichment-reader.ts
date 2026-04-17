@@ -15,6 +15,10 @@ import type {
 } from './llm-types'
 
 type RawRow = Record<string, unknown>
+type HistoricalTotalsRow = {
+  total: unknown
+  last_processed_at: unknown
+}
 
 const toNumber = (value: unknown) => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null
@@ -129,6 +133,56 @@ const buildHistoricalTimelineQuery = (scopeSql: string) => `
   ORDER BY processed_at DESC
   LIMIT $2
 `
+
+const buildHistoricalTotalsQuery = (scopeSql: string) => `
+  SELECT
+    COUNT(DISTINCT enrichment_id) AS total,
+    MAX(processed_at)::text AS last_processed_at
+  FROM ${ENRICHMENT_HISTORY_TABLE}
+  WHERE ${scopeSql}
+    AND status = 'succeeded'
+`
+
+const buildScopedSummarySelection = <T extends { processedAt: string }>(
+  activeTotalsRow: RawRow,
+  historicalTotalsRow: HistoricalTotalsRow,
+  activePreview: T[],
+  historicalPreview: T[]
+) => {
+  const activeAnalyzed = Number(activeTotalsRow.succeeded ?? 0)
+  const historicalAnalyzed = toNumber(historicalTotalsRow.total) ?? 0
+
+  const summarySource =
+    activeAnalyzed > 0 ? 'active' : historicalAnalyzed > 0 ? 'historical' : 'empty'
+
+  const totalAnalyzed =
+    summarySource === 'active' ? activeAnalyzed : summarySource === 'historical' ? historicalAnalyzed : 0
+
+  const lastAnalysis =
+    summarySource === 'active'
+      ? toText(activeTotalsRow.last_processed_at)
+      : summarySource === 'historical'
+        ? toText(historicalTotalsRow.last_processed_at)
+        : null
+
+  const insights =
+    summarySource === 'active'
+      ? activePreview
+      : summarySource === 'historical'
+        ? historicalPreview
+        : []
+
+  return {
+    summarySource,
+    activeAnalyzed,
+    historicalAnalyzed,
+    totalAnalyzed,
+    lastAnalysis,
+    insights,
+    activePreview,
+    historicalPreview
+  } as const
+}
 
 export const readAgencyAiLlmTimeline = async (
   limit = TIMELINE_DEFAULT_LIMIT
@@ -420,7 +474,7 @@ export const readMemberAiLlmSummary = async (
   periodMonth: number,
   limit = 3
 ): Promise<MemberNexaInsightsPayload> => {
-  const [totalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
+  const [totalsRows, historicalTotalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
     query<RawRow>(
       `
         SELECT
@@ -435,6 +489,10 @@ export const readMemberAiLlmSummary = async (
           AND period_month = $3
       `,
       [memberId, periodYear, periodMonth]
+    ).catch(() => []),
+    query<HistoricalTotalsRow>(
+      buildHistoricalTotalsQuery('member_id = $1'),
+      [memberId]
     ).catch(() => []),
     query<RawRow>(
       `
@@ -487,26 +545,31 @@ export const readMemberAiLlmSummary = async (
   ])
 
   const totalsRow = totalsRows[0] ?? {}
+  const historicalTotalsRow = historicalTotalsRows[0] ?? { total: 0, last_processed_at: null }
   const latestRunRow = latestRunRows[0]
 
-  const recentInsights = recentRows.map(mapMemberInsightItem)
+  const activePreview = recentRows.map(mapMemberInsightItem)
+  const historicalPreview = timelineItems.slice(0, Math.max(1, limit))
 
-  const visibleInsights =
-    recentInsights.length > 0 ? recentInsights : timelineItems.slice(0, Math.max(1, limit))
-
-  const lastAnalysis =
-    recentInsights.length > 0
-      ? toText(totalsRow.last_processed_at)
-      : visibleInsights[0]?.processedAt ?? null
+  const scopedSummary = buildScopedSummarySelection(
+    totalsRow,
+    historicalTotalsRow,
+    activePreview,
+    historicalPreview
+  )
 
   return {
-    totalAnalyzed:
-      recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : timelineItems.length,
-    lastAnalysis,
+    summarySource: scopedSummary.summarySource,
+    activeAnalyzed: scopedSummary.activeAnalyzed,
+    historicalAnalyzed: scopedSummary.historicalAnalyzed,
+    totalAnalyzed: scopedSummary.totalAnalyzed,
+    lastAnalysis: scopedSummary.lastAnalysis,
     runStatus: latestRunRow
       ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
       : null,
-    insights: visibleInsights,
+    insights: scopedSummary.insights,
+    activePreview: scopedSummary.activePreview,
+    historicalPreview: scopedSummary.historicalPreview,
     timeline: timelineItems
   }
 }
@@ -517,7 +580,7 @@ export const readSpaceAiLlmSummary = async (
   periodMonth: number,
   limit = 3
 ): Promise<SpaceNexaInsightsPayload> => {
-  const [totalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
+  const [totalsRows, historicalTotalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
     query<RawRow>(
       `
         SELECT
@@ -532,6 +595,10 @@ export const readSpaceAiLlmSummary = async (
           AND period_month = $3
       `,
       [spaceId, periodYear, periodMonth]
+    ).catch(() => []),
+    query<HistoricalTotalsRow>(
+      buildHistoricalTotalsQuery('space_id = $1'),
+      [spaceId]
     ).catch(() => []),
     query<RawRow>(
       `
@@ -585,25 +652,31 @@ export const readSpaceAiLlmSummary = async (
   ])
 
   const totalsRow = totalsRows[0] ?? {}
+  const historicalTotalsRow = historicalTotalsRows[0] ?? { total: 0, last_processed_at: null }
   const latestRunRow = latestRunRows[0]
-  const recentInsights = recentRows.map(mapSpaceInsightItem)
 
-  const visibleInsights =
-    recentInsights.length > 0 ? recentInsights : timelineItems.slice(0, Math.max(1, limit))
+  const activePreview = recentRows.map(mapSpaceInsightItem)
+  const historicalPreview = timelineItems.slice(0, Math.max(1, limit))
 
-  const lastAnalysis =
-    recentInsights.length > 0
-      ? toText(totalsRow.last_processed_at)
-      : visibleInsights[0]?.processedAt ?? null
+  const scopedSummary = buildScopedSummarySelection(
+    totalsRow,
+    historicalTotalsRow,
+    activePreview,
+    historicalPreview
+  )
 
   return {
-    totalAnalyzed:
-      recentInsights.length > 0 ? Number(totalsRow.succeeded ?? 0) : timelineItems.length,
-    lastAnalysis,
+    summarySource: scopedSummary.summarySource,
+    activeAnalyzed: scopedSummary.activeAnalyzed,
+    historicalAnalyzed: scopedSummary.historicalAnalyzed,
+    totalAnalyzed: scopedSummary.totalAnalyzed,
+    lastAnalysis: scopedSummary.lastAnalysis,
     runStatus: latestRunRow
       ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
       : null,
-    insights: visibleInsights,
+    insights: scopedSummary.insights,
+    activePreview: scopedSummary.activePreview,
+    historicalPreview: scopedSummary.historicalPreview,
     timeline: timelineItems
   }
 }

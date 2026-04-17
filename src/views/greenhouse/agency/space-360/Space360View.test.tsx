@@ -117,10 +117,37 @@ const detail: Space360Detail = {
     ]
   },
   nexaInsights: {
+    summarySource: 'active',
+    activeAnalyzed: 3,
+    historicalAnalyzed: 3,
     totalAnalyzed: 3,
     lastAnalysis: '2026-04-15T16:00:00.000Z',
     runStatus: 'succeeded',
     insights: [
+      {
+        id: 'space-insight-1',
+        signalType: 'delivery',
+        metricId: 'otd_pct',
+        severity: 'warning',
+        explanation: 'La OTD del Space cayó en el último corte y conviene revisar el backlog activo.',
+        rootCauseNarrative: null,
+        recommendedAction: 'Coordina con el equipo para limpiar el backlog y monitorea el próximo cierre.',
+        processedAt: '2026-04-15T16:00:00.000Z'
+      }
+    ],
+    activePreview: [
+      {
+        id: 'space-insight-1',
+        signalType: 'delivery',
+        metricId: 'otd_pct',
+        severity: 'warning',
+        explanation: 'La OTD del Space cayó en el último corte y conviene revisar el backlog activo.',
+        rootCauseNarrative: null,
+        recommendedAction: 'Coordina con el equipo para limpiar el backlog y monitorea el próximo cierre.',
+        processedAt: '2026-04-15T16:00:00.000Z'
+      }
+    ],
+    historicalPreview: [
       {
         id: 'space-insight-1',
         signalType: 'delivery',

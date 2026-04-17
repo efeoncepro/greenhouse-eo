@@ -5,10 +5,12 @@
 - Runtime activo:
   - Nuevo archivo histórico `greenhouse_serving.ico_ai_signal_enrichment_history` con escritura append-only por run de LLM
   - `ico_ai_signal_enrichments` se mantiene como snapshot current-state del período activo; no cambia el contrato de las surfaces "Recientes"
+  - Los summary readers scoped de Person 360 y Space 360 exponen `summarySource`, `activeAnalyzed`, `historicalAnalyzed`, `activePreview` y `historicalPreview`; el reader decide explícitamente si la surface visible representa estado activo o memoria histórica
   - `readAgencyAiLlmTimeline`, `readMemberAiLlmTimeline` y `readSpaceAiLlmTimeline` ahora leen desde historial, deduplicado por `enrichment_id` con `DISTINCT ON`
   - `src/lib/nexa/digest/build-weekly-digest.ts` ahora arma el corte semanal desde historial deduplicado, no desde el snapshot vigente
 - Contrato operativo:
   - una señal que desaparece del set actual por mejora operativa deja de verse en "Recientes", pero sigue viva en timeline y en el weekly digest de su ventana histórica
+  - las surfaces que muestran summary scoped ya no dependen de un fallback implícito; consumen un payload que declara si la data visible es `active`, `historical` o `empty`
   - reruns del mismo enrichment no duplican timeline/digest: el consumer colapsa a la última versión por `enrichment_id`
   - esto evita pérdida silenciosa de contexto semanal/mensual en People, Space 360, Home y Agency
 

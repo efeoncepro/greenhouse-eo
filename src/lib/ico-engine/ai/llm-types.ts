@@ -149,11 +149,18 @@ export interface MemberNexaInsightItem {
   processedAt: string
 }
 
+export type NexaSummarySource = 'active' | 'historical' | 'empty'
+
 export interface MemberNexaInsightsPayload {
+  summarySource: NexaSummarySource
+  activeAnalyzed: number
+  historicalAnalyzed: number
   totalAnalyzed: number
   lastAnalysis: string | null
   runStatus: IcoLlmRunStatus | null
   insights: MemberNexaInsightItem[]
+  activePreview: MemberNexaInsightItem[]
+  historicalPreview: MemberNexaInsightItem[]
   timeline: MemberNexaInsightItem[]
 }
 
@@ -169,10 +176,15 @@ export interface SpaceNexaInsightItem {
 }
 
 export interface SpaceNexaInsightsPayload {
+  summarySource: NexaSummarySource
+  activeAnalyzed: number
+  historicalAnalyzed: number
   totalAnalyzed: number
   lastAnalysis: string | null
   runStatus: IcoLlmRunStatus | null
   insights: SpaceNexaInsightItem[]
+  activePreview: SpaceNexaInsightItem[]
+  historicalPreview: SpaceNexaInsightItem[]
   timeline: SpaceNexaInsightItem[]
 }
 

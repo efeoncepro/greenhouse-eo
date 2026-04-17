@@ -108,6 +108,9 @@ describe('GET /api/people/[memberId]/intelligence', () => {
     })
     mockReadMemberCapacityEconomicsTrend.mockResolvedValue([])
     mockReadMemberAiLlmSummary.mockResolvedValue({
+      summarySource: 'active',
+      activeAnalyzed: 2,
+      historicalAnalyzed: 2,
       totalAnalyzed: 2,
       lastAnalysis: '2026-03-26T02:00:00.000Z',
       runStatus: 'succeeded',
@@ -120,7 +123,28 @@ describe('GET /api/people/[memberId]/intelligence', () => {
           explanation: '@[Space A](space:space-a) está retrasado.',
           recommendedAction: 'Revisar bloqueadores con @[Ana](member:member-2).'
         }
-      ]
+      ],
+      activePreview: [
+        {
+          id: 'EO-AIE-1',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: '@[Space A](space:space-a) está retrasado.',
+          recommendedAction: 'Revisar bloqueadores con @[Ana](member:member-2).'
+        }
+      ],
+      historicalPreview: [
+        {
+          id: 'EO-AIE-1',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: '@[Space A](space:space-a) está retrasado.',
+          recommendedAction: 'Revisar bloqueadores con @[Ana](member:member-2).'
+        }
+      ],
+      timeline: []
     })
 
     const response = await GET(
@@ -150,6 +174,9 @@ describe('GET /api/people/[memberId]/intelligence', () => {
     })
     expect(mockReadMemberAiLlmSummary).toHaveBeenCalledWith('member-1', 2026, 4)
     expect(body.nexaInsights).toEqual({
+      summarySource: 'active',
+      activeAnalyzed: 2,
+      historicalAnalyzed: 2,
       totalAnalyzed: 2,
       lastAnalysis: '2026-03-26T02:00:00.000Z',
       runStatus: 'succeeded',
@@ -162,7 +189,28 @@ describe('GET /api/people/[memberId]/intelligence', () => {
           explanation: '@[Space A](space:space-a) está retrasado.',
           recommendedAction: 'Revisar bloqueadores con @[Ana](member:member-2).'
         }
-      ]
+      ],
+      activePreview: [
+        {
+          id: 'EO-AIE-1',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: '@[Space A](space:space-a) está retrasado.',
+          recommendedAction: 'Revisar bloqueadores con @[Ana](member:member-2).'
+        }
+      ],
+      historicalPreview: [
+        {
+          id: 'EO-AIE-1',
+          signalType: 'anomaly',
+          metricId: 'otd_pct',
+          severity: 'critical',
+          explanation: '@[Space A](space:space-a) está retrasado.',
+          recommendedAction: 'Revisar bloqueadores con @[Ana](member:member-2).'
+        }
+      ],
+      timeline: []
     })
     expect(body.current.derivedMetrics.find((metric: { metricId: string }) => metric.metricId === 'cost_per_hour')?.value).toBe(13500)
     expect(body.current.derivedMetrics.find((metric: { metricId: string }) => metric.metricId === 'utilization_pct')?.value).toBe(82)

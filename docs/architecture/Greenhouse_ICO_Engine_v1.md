@@ -4,6 +4,7 @@
 
 - Nuevo archivo `greenhouse_serving.ico_ai_signal_enrichment_history` para conservar cada corrida LLM sin sobrescribirla
 - `readAgencyAiLlmTimeline(limit=20)` y los timelines scoped ahora leen desde historial deduplicado por `enrichment_id`, no desde `greenhouse_serving.ico_ai_signal_enrichments`
+- `readMemberAiLlmSummary` y `readSpaceAiLlmSummary` exponen contrato explícito `summarySource + activeAnalyzed + historicalAnalyzed + activePreview + historicalPreview`; la selección de insights visibles deja de depender de fallback implícito
 - `src/lib/nexa/digest/build-weekly-digest.ts` consume el mismo historial deduplicado para no perder advisories cuando cambian las anomalías del período
 - Se agrega replay histórico `historyOnly` con `asOfTime` en `materializeAiLlmEnrichments()` y script operativo `scripts/backfill-ico-llm-history.ts`
 
