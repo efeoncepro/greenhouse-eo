@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-05 por Claude (agente)
-> **Ultima actualizacion:** 2026-04-05 por Claude (agente)
+> **Ultima actualizacion:** 2026-04-16 por Codex
 > **Documentacion tecnica:** [Greenhouse ICO Engine v1](../../architecture/Greenhouse_ICO_Engine_v1.md), [Contrato Metricas ICO v1](../../architecture/Contrato_Metricas_ICO_v1.md)
 
 # Motor ICO — Metricas Operativas
@@ -80,6 +80,19 @@ El tab ICO Engine del workspace de agencia muestra:
 - **Task Mix**: distribucion de tareas por segmento (cliente)
 - **Trust Metadata**: nivel de confianza de cada metrica (alto, medio, bajo, sin datos)
 - **Nexa Insights**: analisis narrativo generado por IA con recomendaciones accionables
+
+### Digest semanal para liderazgo
+
+Ademas del consumo dentro del portal, Greenhouse ya puede reutilizar los insights materializados de Nexa para enviar un **digest semanal por email** al liderazgo interno.
+
+Ese digest:
+
+- no recalcula metricas
+- reutiliza el ranking advisory ya materializado
+- resume los hallazgos mas relevantes de la semana
+- enlaza de vuelta al portal para abrir mas contexto
+
+> Detalle funcional: [Nexa Insights — Digest semanal para liderazgo](nexa-insights-digest-semanal.md)
 
 ### Metricas por persona (People)
 

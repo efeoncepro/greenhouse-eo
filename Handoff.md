@@ -26,6 +26,11 @@
   - `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
   - `changelog.md`
   - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `docs/documentation/delivery/nexa-insights-digest-semanal.md`
+  - `docs/documentation/plataforma/sistema-email-templates.md`
+  - `docs/documentation/delivery/motor-ico-metricas-operativas.md`
+  - `docs/documentation/operations/ops-worker-reactive-crons.md`
+  - `docs/documentation/README.md`
 - **Validación ejecutada:**
   - `pnpm exec vitest run src/lib/nexa/digest/build-weekly-digest.test.ts src/lib/email/templates.test.ts`
   - `pnpm exec eslint src/lib/nexa/digest/build-weekly-digest.ts src/lib/nexa/digest/build-weekly-digest.test.ts src/lib/nexa/digest/recipient-resolver.ts src/lib/nexa/digest/types.ts src/lib/email/types.ts src/lib/email/templates.ts src/lib/email/templates.test.ts src/emails/WeeklyExecutiveDigestEmail.tsx services/ops-worker/server.ts`

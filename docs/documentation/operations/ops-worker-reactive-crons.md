@@ -1,9 +1,9 @@
-# Ops Worker — Crons Reactivos y Materializacion en Cloud Run
+# Ops Worker — Crons Reactivos, Materializacion y Jobs Operativos en Cloud Run
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-17 por agente (TASK-254)
-> **Ultima actualizacion:** 2026-04-07 por agente (TASK-279)
+> **Ultima actualizacion:** 2026-04-16 por Codex (TASK-246)
 > **Documentacion tecnica:** [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md) (§4.9, §5)
 
 ---
@@ -12,7 +12,7 @@
 
 El **ops-worker** es un servicio que corre en Google Cloud Run y se encarga de procesar los eventos reactivos del portal Greenhouse. Antes, estos procesos corrian como cron jobs dentro de Vercel, pero se migraron a Cloud Run para mayor durabilidad y tiempo de ejecucion.
 
-El servicio procesa cuatro tipos de trabajo:
+El servicio procesa cinco tipos de trabajo:
 
 | Trabajo | Que hace | Cada cuanto corre |
 |---|---|---|
@@ -20,6 +20,7 @@ El servicio procesa cuatro tipos de trabajo:
 | **Reactive Process Delivery** | Procesa solo los eventos reactivos del dominio `delivery` | Cada 5 minutos (desplazado 2 min) |
 | **Reactive Recover** | Recupera proyecciones huerfanas que quedaron pendientes en la cola de refresh | Cada 15 minutos |
 | **Cost Attribution Materialize** | Materializa la atribucion de costos laborales comerciales por periodo y recomputa snapshots de economics de clientes | Bajo demanda (manual o via reactive projection) |
+| **Nexa Weekly Digest** | Construye y entrega el digest ejecutivo semanal de Nexa al liderazgo interno | Cada lunes, 7:00 AM Chile |
 
 ---
 
@@ -50,6 +51,7 @@ En **Admin Center > Ops Health**, el subsistema **Reactive Worker** muestra:
 | POST | `/reactive/process-domain` | Procesa backlog de un dominio especifico |
 | POST | `/reactive/recover` | Recupera proyecciones huerfanas |
 | POST | `/cost-attribution/materialize` | Materializa cost attribution + client economics |
+| POST | `/nexa/weekly-digest` | Construye y envia el digest semanal de Nexa |
 
 Los endpoints reactivos aceptan un body JSON con `batchSize` (tamaño del lote).
 
@@ -58,6 +60,11 @@ El endpoint `/cost-attribution/materialize` acepta:
 - `{}` (sin parametros) — materializa todos los periodos con datos
 - `{ recomputeEconomics: false }` — omite la recomputacion de `client_economics` despues de materializar
 
+El endpoint `/nexa/weekly-digest` acepta:
+- `{ limit }` — cantidad maxima de insights a incluir en el correo
+
+En el flujo normal el Scheduler lo dispara con el valor por defecto del corte actual.
+
 ---
 
 ## Configuracion operativa
@@ -65,11 +72,11 @@ El endpoint `/cost-attribution/materialize` acepta:
 | Parametro | Valor |
 |---|---|
 | **Region** | `us-east4` (junto a la base de datos) |
-| **Memoria** | 1 GiB |
-| **CPU** | 1 |
-| **Timeout** | 300 segundos (5 minutos) |
-| **Instancias maximas** | 2 |
-| **Concurrencia** | 1 (una request a la vez por instancia) |
+| **Memoria** | 2 GiB |
+| **CPU** | 2 |
+| **Timeout** | 540 segundos (9 minutos) |
+| **Instancias maximas** | 5 |
+| **Concurrencia** | 4 |
 | **Autenticacion** | IAM + OIDC (no acepta requests sin autenticar) |
 | **Timezone** | `America/Santiago` |
 
@@ -92,6 +99,26 @@ Cuando un evento financiero (factura, gasto, asignacion, nomina) dispara la proy
 ## Que paso con los cron de Vercel
 
 Los 3 crons originales fueron removidos de `vercel.json`. Las rutas API de Vercel (`/api/cron/outbox-react`, `/api/cron/outbox-react-delivery`, `/api/cron/projection-recovery`) **siguen existiendo** como endpoints manuales de fallback, pero ya no estan programados automaticamente.
+
+El digest semanal de Nexa nace directamente en Cloud Run y no tiene una version programada en Vercel.
+
+---
+
+## Job operativo nuevo: digest semanal de Nexa
+
+El job `ops-nexa-weekly-digest` corre cada lunes a las 7:00 AM `America/Santiago`.
+
+Su responsabilidad es:
+
+1. leer los insights advisory ya materializados de la ultima semana
+2. priorizarlos segun el ranking canónico de Nexa
+3. agruparlos por Space
+4. resolver destinatarios internos de liderazgo
+5. entregar el correo via el pipeline canónico de email
+
+No recalcula señales, no consulta BigQuery en vivo y no abre una lane cross-domain nueva. Reutiliza el serving existente del ICO Engine.
+
+> Detalle funcional: [Nexa Insights — Digest semanal para liderazgo](../delivery/nexa-insights-digest-semanal.md)
 
 ---
 

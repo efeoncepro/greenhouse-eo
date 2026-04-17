@@ -196,6 +196,8 @@ Estos emails deben ser:
 
 No deben intentar reemplazar al dashboard.
 
+`weekly_executive_digest` hoy corre como digest interno de liderazgo sobre `ops-worker`, con delivery via `src/lib/email/delivery.ts` y contenido ICO-first. La expansion a un digest cross-domain real queda desacoplada de este contrato inicial.
+
 ## 4. Domain Notifications
 
 Emails ligados a capacidades o modulos especificos, pero solo cuando el evento importa.

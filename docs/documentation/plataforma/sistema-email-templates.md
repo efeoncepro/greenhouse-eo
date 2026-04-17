@@ -1,9 +1,9 @@
 # Sistema de Email — Entrega, Templates y Proteccion
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-06 por Claude (asistido por Julio Reyes)
-> **Ultima actualizacion:** 2026-04-06 por Claude
+> **Ultima actualizacion:** 2026-04-16 por Codex
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` (seccion email delivery), `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
 
 ## Que es
@@ -31,8 +31,11 @@ El proveedor de entrega es **Resend**, integrado via su SDK en el backend.
 | Notificacion generica | `src/emails/NotificationEmail.tsx` | system | es, en | No |
 | Recibo de nomina | `src/emails/PayrollReceiptEmail.tsx` | payroll | es (chile), en (international) | Si |
 | Exportacion de nomina lista | `src/emails/PayrollExportReadyEmail.tsx` | payroll | es | Si |
+| Resumen ejecutivo semanal Nexa | `src/emails/WeeklyExecutiveDigestEmail.tsx` | delivery | es | Si |
 
 Los 4 templates de identidad (invitacion, reset, verificacion, notificacion) soportan espanol e ingles a traves de la prop `locale`. Los templates de payroll usan su propia logica de idioma basada en `payRegime` (chile = espanol, international = ingles).
+
+El digest semanal de Nexa es un template interno orientado a liderazgo. No resuelve idioma por usuario en este corte: se envia en espanol y reutiliza narrativas ya materializadas por la lane advisory de Nexa.
 
 ## Context Resolver automatico
 
@@ -129,6 +132,8 @@ Para proteger contra loops accidentales (por ejemplo, un cron que dispara el mis
 El rate limit se evalua antes de enviar. Si el destinatario ya recibio 10 emails en la ultima hora, el nuevo envio no se ejecuta pero queda registrado en la tabla de entregas para trazabilidad.
 
 > Detalle tecnico: `src/lib/email/rate-limit.ts`. Funcion `checkRecipientRateLimit()`.
+
+Para el digest semanal de Nexa esto importa especialmente porque el template esta marcado como `broadcast`. La programacion normal es una vez por semana, pero cualquier replay manual sigue pasando por el mismo control de entrega y trazabilidad.
 
 ## Unsubscribe
 
