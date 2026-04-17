@@ -2,6 +2,14 @@
 
 ## 2026-04-16
 
+### 2026-04-16 — TASK-246: Digest ejecutivo semanal de Nexa via ops-worker
+
+- Se agrega el builder `src/lib/nexa/digest/build-weekly-digest.ts` para consolidar los top insights ICO-first de la ultima semana usando `greenhouse_serving.ico_ai_signal_enrichments`, sin recalcular métricas inline ni abrir una lane cross-domain ficticia.
+- `src/lib/nexa/digest/recipient-resolver.ts` resuelve destinatarios internos de liderazgo desde roles runtime y filtra el resultado contra el identity store interno antes de enviar.
+- `src/lib/email/types.ts`, `src/lib/email/templates.ts` y `src/emails/WeeklyExecutiveDigestEmail.tsx` activan el template `weekly_executive_digest` dentro del pipeline canonico de email.
+- `services/ops-worker/server.ts` suma `POST /nexa/weekly-digest` y `services/ops-worker/deploy.sh` crea el job `ops-nexa-weekly-digest` cada lunes a las `07:00` `America/Santiago`.
+- La conversión de `@mentions` para email queda explícita: `space` y `member` generan links HTML al portal; `project` sigue como texto hasta que exista una ruta canónica de destino.
+
 ### 2026-04-16 — TASK-242: Space 360 incorpora Nexa Insights filtrados por Space
 
 - `Agency > Spaces > [space]` ahora muestra `Nexa Insights` al inicio del Overview real de `Space 360`, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.

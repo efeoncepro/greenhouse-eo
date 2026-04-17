@@ -611,6 +611,7 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 #### 9. ops-worker (us-east4)
 
 > Config actualizada 2026-04-13 via TASK-379 (reactive projections V2 hardening). Baseline anterior era `cpu=1 mem=1Gi max=2 concurrency=1 timeout=300`.
+> Delta 2026-04-16 via TASK-246: el mismo servicio ahora expone `POST /nexa/weekly-digest` para enviar el digest ejecutivo semanal de Nexa sin pasar por Vercel.
 
 | Property      | Value                                                                                                                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -624,8 +625,8 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 | Concurrency   | 4 (TASK-379)                                                                                                                                                                              |
 | Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                                                                        |
 | Source        | `services/ops-worker/` (monorepo, reuses `src/lib/`)                                                                                                                                      |
-| Purpose       | Durable reactive worker V2: processes outbox reactive events with scope coalescing and circuit breaker (TASK-379), domain-specific reactive events, recovers orphaned projection refreshes, and materializes commercial cost attribution. Replaces Vercel crons that risked 120s timeout. |
-| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`, `GET /reactive/queue-depth` (TASK-379)           |
+| Purpose       | Durable reactive worker V2: processes outbox reactive events with scope coalescing and circuit breaker (TASK-379), domain-specific reactive events, recovers orphaned projection refreshes, materializes commercial cost attribution, and entrega el digest ejecutivo semanal de Nexa. Replaces Vercel crons that risked 120s timeout. |
+| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`, `GET /reactive/queue-depth`, `POST /nexa/weekly-digest` |
 | SA            | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` (runs as + `roles/run.invoker` for scheduler OIDC)                                                                              |
 | Image         | `gcr.io/efeonce-group/ops-worker` (Cloud Build)                                                                                                                                           |
 | Build         | esbuild two-stage Dockerfile with 9 `--alias` shims for ESM/CJS interop (see note below)                                                                                                 |
@@ -666,12 +667,15 @@ Staging services share the same configuration as their production counterparts b
 | `ops-reactive-delivery`         | `*/5 * * * *` (every 5 min)                          | `ops-worker` (us-east4)       | America/Santiago |
 | `ops-reactive-cost-intelligence`| `*/10 * * * *` (every 10 min)                        | `ops-worker` (us-east4)       | America/Santiago |
 | `ops-reactive-recover`          | `*/15 * * * *` (every 15 min)                        | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-nexa-weekly-digest`        | `0 7 * * 1` (lunes 7:00 AM)                          | `ops-worker` (us-east4)       | America/Santiago |
 
 The 7-minute offset on `notion-hubspot-reverse-poll` prevents overlap with the forward sync job, reducing contention on shared Notion API rate limits.
 
 The `ico-materialize-daily` and `ico-llm-enrich-daily` jobs replace the Vercel cron routes that exceeded the 120s timeout. The 30-minute gap between materialization and LLM enrichment ensures outbox events from materialization are published before enrichment reads the signals. Both jobs target the `ico-batch-worker` service in `us-east4` (co-located with Cloud SQL) via IAM OIDC authentication.
 
 Los `ops-reactive-*` jobs forman el fan-out por dominio del reactive worker. Actualizado 2026-04-13 via TASK-379: la topologia paso de 3 jobs (`ops-reactive-process`, `ops-reactive-process-delivery`, `ops-reactive-recover`) a 7 jobs (uno por dominio + recovery) para que ningun dominio bloquee al siguiente y el backlog se drene en paralelo. Los 6 jobs de dominio invocan `POST /reactive/process-domain` con `{ domain: "<name>" }`; el job de recovery invoca `POST /reactive/recover` para reclamar items huerfanos via `claimOrphanedRefreshItems`. Todos autenticados via OIDC con SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Las Vercel API routes (`/api/cron/outbox-react*`, `/api/cron/projection-recovery`) siguen disponibles como fallback manual pero no estan agendadas.
+
+`ops-nexa-weekly-digest` se agrego en 2026-04-16 via TASK-246. Invoca `POST /nexa/weekly-digest` cada lunes a las 07:00 `America/Santiago`, arma un resumen ICO-first con top insights cross-Space de la ultima semana y lo entrega via el pipeline canónico `src/lib/email/delivery.ts` + Resend. La lane sigue siendo interna/advisory-only y reutiliza los enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`.
 
 ### Paused Jobs (Staging)
 

@@ -10,7 +10,8 @@ describe('email templates registry', () => {
       'verify_email',
       'notification',
       'payroll_export',
-      'payroll_receipt'
+      'payroll_receipt',
+      'weekly_executive_digest'
     ]))
   })
 
@@ -25,5 +26,42 @@ describe('email templates registry', () => {
     expect(template.subject).toBe('Nuevo servicio disponible')
     expect(template.text).toContain('Nuevo servicio disponible')
     expect(template.text).toContain('/agency/services')
+  })
+
+  it('resolves the weekly executive digest template with digest context', () => {
+    const template = resolveTemplate('weekly_executive_digest', {
+      periodLabel: 'Semana del 8 al 14 de abril de 2026',
+      totalInsights: 2,
+      criticalCount: 1,
+      warningCount: 1,
+      infoCount: 0,
+      spacesAffected: 1,
+      portalUrl: 'https://greenhouse.efeoncepro.com',
+      closingNote: 'Resumen semanal.',
+      window: {
+        startAt: '2026-04-08T00:00:00.000Z',
+        endAt: '2026-04-14T23:59:59.999Z',
+        label: '8 abr 2026 - 14 abr 2026'
+      },
+      spaces: [
+        {
+          name: 'Space Operaciones',
+          href: 'https://greenhouse.efeoncepro.com/agency/spaces/space-1',
+          insights: [
+            {
+              severity: 'critical',
+              headline: 'OTD% · score 98',
+              narrative: [{ type: 'text', value: 'Insight semanal.' }],
+              actionLabel: 'Abrir Space',
+              actionUrl: 'https://greenhouse.efeoncepro.com/agency/spaces/space-1'
+            }
+          ]
+        }
+      ]
+    })
+
+    expect(template.subject).toBe('Resumen semanal — Nexa Insights')
+    expect(template.text).toContain('Resumen semanal')
+    expect(template.react).toBeTruthy()
   })
 })

@@ -10,7 +10,9 @@ import PasswordResetEmail from '@/emails/PasswordResetEmail'
 import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
 import PayrollLiquidacionV2Email from '@/emails/PayrollLiquidacionV2Email'
 import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
+import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import VerifyEmail from '@/emails/VerifyEmail'
+import type { WeeklyDigestEmailContext } from '@/lib/nexa/digest'
 
 import type {
   EmailAttachment,
@@ -696,6 +698,33 @@ registerTemplate('leave_request_pending_review', (context: {
   }
 })
 
+registerTemplate('weekly_executive_digest', (context: WeeklyDigestEmailContext) => {
+  const previewPeriodLabel = context.periodLabel || 'Semana del 8 al 14 de abril de 2026'
+
+  return {
+    subject: 'Resumen semanal — Nexa Insights',
+    react: WeeklyExecutiveDigestEmail({
+      periodLabel: previewPeriodLabel,
+      totalInsights: context.totalInsights,
+      criticalCount: context.criticalCount,
+      warningCount: context.warningCount,
+      infoCount: context.infoCount,
+      spacesAffected: context.spacesAffected,
+      spaces: context.spaces,
+      portalUrl: context.portalUrl,
+      closingNote: context.closingNote,
+      unsubscribeUrl: context.unsubscribeUrl
+    }),
+    text: [
+      'Resumen semanal — Nexa Insights',
+      '',
+      `Período: ${previewPeriodLabel}`,
+      '',
+      'Abre el portal para ver el detalle completo.'
+    ].join('\n')
+  }
+})
+
 // ═══════════════════════════════════════════════════════════
 // Preview Metadata Registry
 // Auto-descubrible: nuevos templates con registerPreviewMeta()
@@ -944,5 +973,98 @@ registerPreviewMeta('leave_request_pending_review', {
     { key: 'endDate', label: 'Fecha fin', type: 'text' },
     { key: 'requestedDays', label: 'Dias solicitados', type: 'number' },
     { key: 'reason', label: 'Motivo de la solicitud', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('weekly_executive_digest', {
+  label: 'Resumen ejecutivo semanal',
+  description: 'Digest semanal para liderazgo con insights cross-Space e ICO-first',
+  domain: 'delivery',
+  supportsLocale: false,
+  defaultProps: {
+    periodLabel: 'Semana del 8 al 14 de abril de 2026',
+    totalInsights: 4,
+    criticalCount: 1,
+    warningCount: 2,
+    infoCount: 1,
+    spacesAffected: 3,
+    portalUrl: 'https://greenhouse.efeoncepro.com',
+    closingNote: 'Resumen automático basado en los insights materializados del período. Abre Greenhouse para ver el detalle completo.',
+    spaces: [
+      {
+        name: 'Space Operaciones',
+        href: 'https://greenhouse.efeoncepro.com/agency/spaces/operaciones',
+        insights: [
+          {
+            severity: 'critical',
+            headline: 'Retraso crítico en una ruta operativa clave',
+            narrative: [
+              { type: 'text', value: 'El Space ' },
+              { type: 'link', value: 'Operaciones', href: 'https://greenhouse.efeoncepro.com/agency/spaces/operaciones' },
+              { type: 'text', value: ' muestra un retraso que afecta a ' },
+              { type: 'link', value: 'Valentina Hoyos', href: 'https://greenhouse.efeoncepro.com/people/valentina-hoyos' },
+              { type: 'text', value: ' y requiere revisión antes del cierre semanal.' }
+            ],
+            actionLabel: 'Abrir Space',
+            actionUrl: 'https://greenhouse.efeoncepro.com/agency/spaces/operaciones'
+          },
+          {
+            severity: 'warning',
+            headline: 'Carga de trabajo por encima del promedio',
+            narrative: [
+              { type: 'text', value: 'La actividad en ' },
+              { type: 'link', value: 'Operaciones Norte', href: 'https://greenhouse.efeoncepro.com/agency/spaces/operaciones-norte' },
+              { type: 'text', value: ' se mantuvo por encima del umbral esperado durante tres días hábiles.' }
+            ]
+          }
+        ]
+      },
+      {
+        name: 'Space Comercial',
+        href: 'https://greenhouse.efeoncepro.com/agency/spaces/comercial',
+        insights: [
+          {
+            severity: 'warning',
+            headline: 'Señal temprana en pipeline de cuentas clave',
+            narrative: [
+              { type: 'text', value: 'El seguimiento a ' },
+              { type: 'link', value: 'ACME', href: 'https://greenhouse.efeoncepro.com/clients/acme' },
+              { type: 'text', value: ' y ' },
+              { type: 'link', value: 'Northwind', href: 'https://greenhouse.efeoncepro.com/clients/northwind' },
+              { type: 'text', value: ' sugiere revisar prioridades antes de la próxima reunión ejecutiva.' }
+            ],
+            actionLabel: 'Ver detalle',
+            actionUrl: 'https://greenhouse.efeoncepro.com/agency/spaces/comercial'
+          }
+        ]
+      },
+      {
+        name: 'Space Personas',
+        href: 'https://greenhouse.efeoncepro.com/people',
+        insights: [
+          {
+            severity: 'info',
+            headline: 'Movimientos de equipo concentrados en dos unidades',
+            narrative: [
+              { type: 'text', value: 'La rotación reciente en ' },
+              { type: 'link', value: 'People Ops', href: 'https://greenhouse.efeoncepro.com/people?team=people-ops' },
+              { type: 'text', value: ' y ' },
+              { type: 'link', value: 'Customer Success', href: 'https://greenhouse.efeoncepro.com/people?team=customer-success' },
+              { type: 'text', value: ' no requiere acción inmediata, pero conviene seguirla en el próximo corte.' }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  propsSchema: [
+    { key: 'periodLabel', label: 'Periodo', type: 'text' },
+    { key: 'totalInsights', label: 'Total de insights', type: 'number' },
+    { key: 'criticalCount', label: 'Críticos', type: 'number' },
+    { key: 'warningCount', label: 'En seguimiento', type: 'number' },
+    { key: 'infoCount', label: 'Informativos', type: 'number' },
+    { key: 'spacesAffected', label: 'Spaces afectados', type: 'number' },
+    { key: 'portalUrl', label: 'URL del portal', type: 'text' },
+    { key: 'closingNote', label: 'Nota de cierre', type: 'text' }
   ]
 })

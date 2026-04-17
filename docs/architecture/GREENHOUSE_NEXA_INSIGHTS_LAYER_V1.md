@@ -1,5 +1,20 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-16 — Weekly Executive Digest de Nexa queda operativo sobre ops-worker
+
+- Runtime activo:
+  - Builder: `src/lib/nexa/digest/build-weekly-digest.ts` agrega los top enrichments ICO-first de la última semana sobre `greenhouse_serving.ico_ai_signal_enrichments`
+  - Recipients: `src/lib/nexa/digest/recipient-resolver.ts` resuelve liderazgo interno vía `getRoleCodeNotificationRecipients()` + filtro `getInternalUsersFromPostgres()`
+  - Email: `src/emails/WeeklyExecutiveDigestEmail.tsx` + `src/lib/email/templates.ts` registran `weekly_executive_digest`
+  - Worker: `services/ops-worker/server.ts` expone `POST /nexa/weekly-digest`
+  - Scheduler: `services/ops-worker/deploy.sh` crea `ops-nexa-weekly-digest` cada lunes 07:00 `America/Santiago`
+- Contrato operativo:
+  - Este corte es **ICO-first y cross-Space**; la lane cross-domain queda preparada como follow-up y no debe asumirse implementada
+  - El digest consume enrichments ya materializados; no recalcula métricas ni inferencias inline
+  - El ranking visible conserva el orden canónico `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - Las menciones `space` y `member` se convierten en links HTML; `project` se mantiene como texto hasta que exista una ruta canónica de destino
+  - El email es advisory-only e interno; no incluye payloads sensibles por cliente
+
 ## Delta 2026-04-16 — Finance Signal Engine (TASK-245) es el primer dominio fuera de ICO
 
 - Finance Dashboard ya no depende solo de KPIs y P&L para explicar desvíos financieros mensuales.
@@ -69,7 +84,7 @@
 > **Docs relacionados:**
 > - `GREENHOUSE_MENTION_SYSTEM_V1.md` — formato de @mentions
 > - `Greenhouse_ICO_Engine_v1.md` — contrato del ICO Engine y LLM lane
-> - `GREENHOUSE_BATCH_PROCESSING_POLICY_V1.md` (§1.1 en Cloud Infrastructure) — política de Cloud Run
+> - `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` — Cloud Run workers y Scheduler canónicos
 
 ---
 

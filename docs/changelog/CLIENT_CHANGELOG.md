@@ -42,6 +42,31 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.18
+
+**Canal:** Beta
+**Fecha:** 2026-04-16
+**Disponible para:** internal
+**Módulos:** Nexa / Email Delivery / Leadership
+
+### Novedades
+
+- Liderazgo interno ahora recibe un resumen semanal de `Nexa Insights` cada lunes a las 7:00 AM con los hallazgos operativos más relevantes de la última semana.
+
+### Mejoras
+
+- El digest ordena los insights por impacto antes de priorizar calidad y frescura, para dejar primero lo verdaderamente urgente.
+- Las menciones a `Spaces` y `People` en la narrativa llegan con enlaces directos al portal para abrir contexto sin buscarlo a mano.
+
+### Correcciones
+
+- El resumen semanal ya no depende de abrir `Pulse` o `Agency > ICO Engine` para enterarse de los desvíos más importantes del período.
+
+### Notas
+
+- Esta entrega es interna y advisory-only.
+- El corte actual es `ICO-first`: resume insights ya materializados y no agrega cálculos nuevos por email.
+
 ## 2026.04-beta.17
 
 **Canal:** Beta

@@ -13,6 +13,7 @@
  *   GET  /reactive/queue-depth      → Queue depth + oldest-event lag, optionally filtered by ?domain=<x>
  *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
+ *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -36,6 +37,7 @@ import {
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { sendEmail } from '@/lib/email/delivery'
+import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 
@@ -477,6 +479,71 @@ const handleBatchEmailSend = async (req: IncomingMessage, res: ServerResponse) =
   }
 }
 
+/**
+ * POST /nexa/weekly-digest
+ * Builds and sends the ICO-first Nexa executive digest to internal leadership.
+ */
+const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const limitCandidate = Number(body.limit)
+  const limit = Number.isFinite(limitCandidate) ? limitCandidate : WEEKLY_DIGEST_DEFAULT_LIMIT
+
+  console.log(`[ops-worker] POST /nexa/weekly-digest — limit=${limit}`)
+
+  try {
+    const digest = await buildWeeklyDigest({ limit })
+
+    if (digest.totalInsights === 0 || digest.spaces.length === 0) {
+      json(res, 200, {
+        ok: true,
+        skipped: true,
+        reason: 'no_weekly_insights',
+        digest
+      })
+
+      return
+    }
+
+    const recipients = await resolveWeeklyDigestRecipients()
+
+    if (recipients.length === 0) {
+      json(res, 200, {
+        ok: true,
+        skipped: true,
+        reason: 'no_weekly_digest_recipients',
+        digest
+      })
+
+      return
+    }
+
+    const result = await sendEmail({
+      emailType: 'weekly_executive_digest',
+      domain: 'delivery',
+      recipients,
+      context: digest,
+      sourceEventId: `nexa-weekly-digest:${digest.window.startAt}:${digest.window.endAt}`,
+      sourceEntity: 'nexa.weekly_digest'
+    })
+
+    console.log(
+      `[ops-worker] /nexa/weekly-digest done — status=${result.status} recipients=${recipients.length} insights=${digest.totalInsights}`
+    )
+
+    json(res, 200, {
+      ok: result.status === 'sent',
+      digest,
+      recipientsResolved: recipients.length,
+      result
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /nexa/weekly-digest failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -529,6 +596,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/batch-email-send') {
       await handleBatchEmailSend(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/nexa/weekly-digest') {
+      await handleNexaWeeklyDigest(req, res)
 
       return
     }

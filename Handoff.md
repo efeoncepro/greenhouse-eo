@@ -1,5 +1,47 @@
 # Handoff.md
 
+## Sesion 2026-04-16 — TASK-246 Digest ejecutivo semanal de Nexa
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/nexa/digest/build-weekly-digest.ts`
+    - builder nuevo sobre `getDb()` / Kysely para consolidar los top insights ICO-first de la última semana
+    - ranking explícito `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+    - renderer de `@mentions` para email: `space` y `member` con link; `project` queda como texto
+  - `src/lib/nexa/digest/recipient-resolver.ts`
+    - resolución runtime de destinatarios internos vía roles de liderazgo + filtro contra identity store interno
+  - `src/lib/email/types.ts`
+    - nuevo `EmailType` `weekly_executive_digest`
+  - `src/lib/email/templates.ts`
+  - `src/emails/WeeklyExecutiveDigestEmail.tsx`
+    - template React Email + preview catalog del digest semanal
+  - `services/ops-worker/server.ts`
+    - endpoint nuevo `POST /nexa/weekly-digest`
+  - `services/ops-worker/deploy.sh`
+    - scheduler job nuevo `ops-nexa-weekly-digest` (`0 7 * * 1`, `America/Santiago`)
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/nexa/digest/build-weekly-digest.test.ts src/lib/email/templates.test.ts`
+  - `pnpm exec eslint src/lib/nexa/digest/build-weekly-digest.ts src/lib/nexa/digest/build-weekly-digest.test.ts src/lib/nexa/digest/recipient-resolver.ts src/lib/nexa/digest/types.ts src/lib/email/types.ts src/lib/email/templates.ts src/lib/email/templates.test.ts src/emails/WeeklyExecutiveDigestEmail.tsx services/ops-worker/server.ts`
+  - `bash -n services/ops-worker/deploy.sh`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+  - Smoke con datos reales:
+    - `buildWeeklyDigest({ limit: 3 })` devolvió `periodLabel="9 abr 2026 - 16 abr 2026"`, `totalInsights=5`, `spacesAffected=1`
+    - `resolveWeeklyDigestRecipients()` devolvió liderazgo interno (`daniela.ferreira@efeonce.org`, `agent@greenhouse.efeonce.org`, `jreyes@efeoncepro.com`)
+- **Notas operativas:**
+  - la spec quedó corregida a un corte realista `ICO-first / cross-Space`; la lane cross-domain queda como follow-up
+  - el workspace ya venía sucio por cambios ajenos en `src/app/api/hr/evaluations/summaries/[summaryId]/finalize/route.ts` y no se tocaron
+  - no se disparó envío real del digest ni deploy del worker en esta sesión; el endpoint y el scheduler quedaron listos para activación
+
 ## Sesion 2026-04-16 — TASK-242 Nexa Insights en Space 360
 
 - **Estado:** `complete`, `validado localmente`

@@ -174,7 +174,7 @@ Emails centrados en resumen y decision, no en micro-eventos.
 ### Recomendados
 
 - `daily_executive_digest`
-- `weekly_executive_digest`
+- `weekly_executive_digest` -- **implementado 2026-04-16** como digest interno de Nexa/ICO para liderazgo
 - `monthly_executive_summary`
 - `risk_alert_digest`
 
@@ -257,7 +257,7 @@ Notas:
 
 ## P1 -- cuando Data Node / digests y Creative Hub esten mas maduros
 
-- `weekly_executive_digest`
+- `weekly_executive_digest` -- **ya implementado 2026-04-16** para leadership digest interno sobre Nexa/ICO
 - `creative_feedback_pending`
 - `campaign_milestone`
 - `invoice_issued`

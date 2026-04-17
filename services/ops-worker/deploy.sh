@@ -414,6 +414,13 @@ upsert_scheduler_job \
   '{"batchSize":10,"staleMinutes":30}'
 echo "  -> ops-reactive-recover: */15 * * * * (projection recovery)"
 
+upsert_scheduler_job \
+  "ops-nexa-weekly-digest" \
+  "0 7 * * 1" \
+  "/nexa/weekly-digest" \
+  '{"limit":8}'
+echo "  -> ops-nexa-weekly-digest: 0 7 * * 1 (weekly Nexa executive digest)"
+
 echo ""
 echo "=== Deployment complete ==="
 echo ""
@@ -422,4 +429,4 @@ echo "  1. Verify health:  gcloud run services proxy ${SERVICE_NAME} --port=9092
 echo "  2. Run a lane manually:  gcloud scheduler jobs run ops-reactive-finance --project=${PROJECT_ID} --location=${REGION}"
 echo "  3. Check queue depth:  gcloud run services proxy ${SERVICE_NAME} --port=9092 & sleep 3 && curl -s 'http://localhost:9092/reactive/queue-depth?domain=finance'"
 echo "  4. Check logs:  gcloud logging read 'resource.labels.service_name=\"${SERVICE_NAME}\"' --project=${PROJECT_ID} --limit=10"
-echo "  5. Active scheduler jobs (TASK-379 Slice 3): ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover}"
+echo "  5. Active scheduler jobs: ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover} + ops-nexa-weekly-digest"
