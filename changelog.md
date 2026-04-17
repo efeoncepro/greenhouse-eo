@@ -2,6 +2,16 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — TASK-446: Nexa Insights expone `rootCauseNarrative` en UI, Weekly Digest y API
+
+- La narrativa causal (distinta al resumen del impacto) que Gemini ya generaba deja de descartarse en el serving layer.
+- Superficies nuevas: `NexaInsightsBlock` renderiza una sección colapsable "Causa raíz" entre la explicación y la acción sugerida; el toggle persiste en `localStorage['nexa.insights.rootCause.expanded']` como preferencia global del operador.
+- Weekly Executive Digest (email) ahora incluye un bloque secundario "Causa probable" por insight cuando el campo está poblado, con mentions parseadas.
+- Readers que ahora propagan el campo: `readAgencyAiLlmSummary`, `readOrganizationAiLlmEnrichments`, `readTopAiLlmEnrichments`, `readMemberAiLlmSummary`, `readSpaceAiLlmSummary`, `readFinanceAiLlmSummary`, `readClientFinanceAiLlmSummary`.
+- No cambios al prompt ni a las tablas: `ico_signal_enrichment_v4` y `finance_signal_enrichment_v1` ya emitían la narrativa; la columna `root_cause_narrative` ya existía en ambas tablas serving.
+- Enrichments antiguos (sin el campo) siguen funcionando sin regresión: la sección UI no aparece y el digest omite el bloque.
+- Fix incidental: error de tipos pre-existente en `src/lib/campaigns/tenant-scope.test.ts` (spread sobre vi.fn con implementación no-arg) queda resuelto.
+
 ### 2026-04-17 — TASK-345: Quotations ya tiene bridge canónico materializado sin romper Finance
 
 - Nace físicamente el schema `greenhouse_commercial` con `product_catalog`, `quotations`, `quotation_versions` y `quotation_line_items`.

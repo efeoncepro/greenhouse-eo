@@ -185,6 +185,7 @@ export interface FinanceNexaInsightItem {
   metricId: string
   severity: string | null
   explanation: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
 }
 

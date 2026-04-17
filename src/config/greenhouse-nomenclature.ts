@@ -1321,6 +1321,9 @@ export const GH_NEXA = {
   insights_chip_no_data: 'Sin datos',
   insights_list_title: 'Señales recientes',
   insights_action_label: 'Acción sugerida',
+  insights_root_cause_label: 'Causa raíz',
+  insights_root_cause_expand: 'Ver causa raíz',
+  insights_root_cause_collapse: 'Ocultar causa raíz',
   insights_last_analysis: (label: string) => `Último análisis: ${label}`,
 
   // KPIs

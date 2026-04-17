@@ -82,6 +82,7 @@ export interface AgencyAiLlmSummaryItem {
   severity: string | null
   qualityScore: number | null
   explanationSummary: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
   confidence: number | null
   processedAt: string
@@ -115,6 +116,7 @@ export interface OrganizationAiLlmEnrichmentItem {
   severity: string | null
   qualityScore: number | null
   explanationSummary: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
   confidence: number | null
   processedAt: string
@@ -129,6 +131,7 @@ export interface TopAiLlmEnrichmentItem {
   severity: string | null
   qualityScore: number | null
   explanationSummary: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
   confidence: number | null
   processedAt: string
@@ -140,6 +143,7 @@ export interface MemberNexaInsightItem {
   metricId: string
   severity: string | null
   explanation: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
 }
 
@@ -156,6 +160,7 @@ export interface SpaceNexaInsightItem {
   metricId: string
   severity: string | null
   explanation: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
 }
 

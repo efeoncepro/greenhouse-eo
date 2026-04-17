@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-446 Nexa Insights Root Cause Narrative Surfacing (Insights Quick Win)
+
+- **Estado:** `complete`, `documentado`, `branch task/TASK-446-nexa-insights-root-cause-narrative`
+- **Problema resuelto:** el LLM generaba `rootCauseNarrative` y lo persistía en `greenhouse_serving.ico_ai_signal_enrichments.root_cause_narrative` y `greenhouse_serving.finance_ai_signal_enrichments.root_cause_narrative`, pero el reader lo excluía de los SELECTs y el tipo UI no lo declaraba. Data pagada en tokens que nunca llegaba al operador.
+- **Implementado:**
+  - Backend ICO: `src/lib/ico-engine/ai/llm-enrichment-reader.ts` y `src/lib/ico-engine/ai/llm-types.ts` incorporan `rootCauseNarrative: string | null` en 5 funciones (`readAgencyAiLlmSummary`, `readOrganizationAiLlmEnrichments`, `readTopAiLlmEnrichments`, `readMemberAiLlmSummary`, `readSpaceAiLlmSummary`) + sus 5 mappers + 3 SELECTs explícitos
+  - Backend Finance: `src/lib/finance/ai/llm-enrichment-reader.ts` y `finance-signal-types.ts` incorporan el campo en `readFinanceAiLlmSummary`, `readClientFinanceAiLlmSummary` y `FinanceNexaInsightItem`
+  - Weekly digest builder: `src/lib/nexa/digest/build-weekly-digest.ts` selecciona `enrich.root_cause_narrative` y produce `rootCauseNarrative?: WeeklyDigestNarrativePart[]` via `parseNarrativeText` (reusa el parser de mentions existente)
+  - UI: `src/components/greenhouse/NexaInsightRootCauseSection.tsx` (nuevo) — collapsible con localStorage global `nexa.insights.rootCause.expanded`, ARIA completo, keyboard, uppercase caption "Causa raíz"
+  - UI: `NexaInsightsBlock.tsx` extiende `NexaInsightItem` con `rootCauseNarrative?: string | null` y renderiza la sección entre `explanation` y `recommendedAction`
+  - Copy: 3 keys nuevas en `GH_NEXA` (`insights_root_cause_label`, `_expand`, `_collapse`)
+  - Email: `src/emails/WeeklyExecutiveDigestEmail.tsx` renderiza bloque "Causa probable" con left border `EMAIL_COLORS.primary` cuando el campo viene poblado
+  - Architecture doc: `docs/architecture/Greenhouse_ICO_Engine_v1.md` con delta canónico
+- **No cambios:** prompt del LLM (ya emitía el campo), migraciones (columna existente), sanitizer (ya aplicado al write)
+- **Tests:** 3 fixtures actualizados en `llm-enrichment-reader.test.ts` con `rootCauseNarrative: null`; 1 fixture en `Space360View.test.tsx`; fix incidental de TS error pre-existente en `campaigns/tenant-scope.test.ts:21`
+- **Verificación:** `pnpm lint` ✓ `pnpm tsc --noEmit` ✓ `pnpm test` ✓ (1269 pass) `pnpm build` ✓
+- **Impacto cruzado consumers:**
+  - Home (`HomeView` → `readAgencyAiLlmSummary`) — propaga el campo
+  - Space 360 Overview — propaga el campo
+  - Person 360 Activity — propaga el campo
+  - Finance Dashboard — propaga el campo
+  - ICO Agency metrics `/api/ico-engine/metrics/agency` — propaga el campo
+  - Weekly digest email — renderiza bloque "Causa probable"
+- **Backward compat:** enrichments antiguos sin el campo → sección no renderiza, digest no incluye bloque
+
 ## Sesion 2026-04-17 — TASK-345 Quotation Canonical Schema & Finance Compatibility Bridge
 
 - **Estado:** `complete`, `validado`, rama publicada para PR contra `develop`

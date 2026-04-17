@@ -39,6 +39,7 @@ const mapSummaryItem = (row: RawRow): AgencyAiLlmSummaryItem => ({
   severity: toText(row.severity),
   qualityScore: toNumber(row.quality_score),
   explanationSummary: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action),
   confidence: toNumber(row.confidence),
   processedAt: String(row.processed_at)
@@ -52,6 +53,7 @@ const mapOrganizationItem = (row: RawRow): OrganizationAiLlmEnrichmentItem => ({
   severity: toText(row.severity),
   qualityScore: toNumber(row.quality_score),
   explanationSummary: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action),
   confidence: toNumber(row.confidence),
   processedAt: String(row.processed_at)
@@ -66,6 +68,7 @@ const mapTopItem = (row: RawRow): TopAiLlmEnrichmentItem => ({
   severity: toText(row.severity),
   qualityScore: toNumber(row.quality_score),
   explanationSummary: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action),
   confidence: toNumber(row.confidence),
   processedAt: String(row.processed_at)
@@ -77,6 +80,7 @@ const mapMemberInsightItem = (row: RawRow): MemberNexaInsightItem => ({
   metricId: String(row.metric_name),
   severity: toText(row.severity),
   explanation: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action)
 })
 
@@ -86,6 +90,7 @@ const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
   metricId: String(row.metric_name),
   severity: toText(row.severity),
   explanation: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action)
 })
 
@@ -295,6 +300,7 @@ export const readTopAiLlmEnrichments = async (
         severity,
         quality_score,
         explanation_summary,
+        root_cause_narrative,
         recommended_action,
         confidence,
         processed_at
@@ -349,6 +355,7 @@ export const readMemberAiLlmSummary = async (
           metric_name,
           severity,
           explanation_summary,
+          root_cause_narrative,
           recommended_action,
           quality_score,
           processed_at
@@ -432,6 +439,7 @@ export const readSpaceAiLlmSummary = async (
           metric_name,
           severity,
           explanation_summary,
+          root_cause_narrative,
           recommended_action,
           quality_score,
           processed_at

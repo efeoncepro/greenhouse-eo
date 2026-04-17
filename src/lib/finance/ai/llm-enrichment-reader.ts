@@ -18,6 +18,7 @@ const mapInsightItem = (row: RawRow): FinanceNexaInsightItem => ({
   metricId: String(row.metric_name),
   severity: toText(row.severity),
   explanation: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action)
 })
 
@@ -51,6 +52,7 @@ export const readFinanceAiLlmSummary = async (
           metric_name,
           severity,
           explanation_summary,
+          root_cause_narrative,
           recommended_action,
           quality_score,
           processed_at
@@ -133,6 +135,7 @@ export const readClientFinanceAiLlmSummary = async (
           metric_name,
           severity,
           explanation_summary,
+          root_cause_narrative,
           recommended_action,
           quality_score,
           processed_at

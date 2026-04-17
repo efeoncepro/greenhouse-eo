@@ -10,6 +10,7 @@ export interface WeeklyDigestInsight {
   severity: WeeklyDigestSeverity
   headline: string
   narrative: WeeklyDigestNarrativePart[]
+  rootCauseNarrative?: WeeklyDigestNarrativePart[]
   actionLabel?: string
   actionUrl?: string
 }

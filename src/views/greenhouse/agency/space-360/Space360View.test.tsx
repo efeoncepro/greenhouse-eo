@@ -127,6 +127,7 @@ const detail: Space360Detail = {
         metricId: 'otd_pct',
         severity: 'warning',
         explanation: 'La OTD del Space cayó en el último corte y conviene revisar el backlog activo.',
+        rootCauseNarrative: null,
         recommendedAction: 'Coordina con el equipo para limpiar el backlog y monitorea el próximo cierre.'
       }
     ]

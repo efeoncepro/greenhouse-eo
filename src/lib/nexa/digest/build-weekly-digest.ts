@@ -31,6 +31,7 @@ interface WeeklyDigestRow extends Record<string, unknown> {
   severity: string | null
   quality_score: number | string | null
   explanation_summary: string | null
+  root_cause_narrative: string | null
   recommended_action: string | null
   confidence: number | string | null
   processed_at: string | Date
@@ -225,6 +226,7 @@ export const buildWeeklyDigest = async (
       'enrich.quality_score as quality_score',
       'enrich.explanation_summary as explanation_summary',
       'enrich.recommended_action as recommended_action',
+      'enrich.root_cause_narrative as root_cause_narrative',
       'enrich.confidence as confidence',
       sql<string>`enrich.processed_at::text`.as('processed_at')
     ])
@@ -266,10 +268,17 @@ export const buildWeeklyDigest = async (
     const spaceName = row.space_name?.trim() || row.space_id
     const sectionName = spaceName
 
+    const rootCauseText = row.root_cause_narrative?.trim()
+
+    const rootCauseNarrative = rootCauseText
+      ? parseNarrativeText(rootCauseText, portalUrl)
+      : undefined
+
     const insight: WeeklyDigestInsight = {
       severity: row.severity,
       headline: buildInsightHeadline(row),
       narrative: buildInsightNarrative(row, portalUrl),
+      ...(rootCauseNarrative ? { rootCauseNarrative } : {}),
       actionLabel: 'Abrir Space',
       actionUrl: buildSpaceHref(row.space_id, portalUrl)
     }
