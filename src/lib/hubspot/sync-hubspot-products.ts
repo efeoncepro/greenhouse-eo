@@ -4,6 +4,7 @@ import {
   getHubSpotGreenhouseProductCatalog,
   type HubSpotGreenhouseProductProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { syncCanonicalFinanceProduct } from '@/lib/finance/quotation-canonical-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -106,10 +107,15 @@ export const syncHubSpotProductCatalog = async (): Promise<ProductSyncResult> =>
   for (const product of products) {
     try {
       const action = await upsertProductFromHubSpot(product)
+      const hubspotProductId = product.identity.hubspotProductId
 
       if (action === 'created') result.created++
       else if (action === 'updated') result.updated++
       else result.skipped++
+
+      if ((action === 'created' || action === 'updated') && hubspotProductId) {
+        await syncCanonicalFinanceProduct({ productId: `GH-PROD-${hubspotProductId}` })
+      }
     } catch (err) {
       result.errors.push(`Product ${product.identity.productId}: ${err instanceof Error ? err.message : String(err)}`)
     }

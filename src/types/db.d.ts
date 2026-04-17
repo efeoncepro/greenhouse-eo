@@ -149,6 +149,166 @@ export interface GreenhouseAiToolCatalog {
   website_url: string | null;
 }
 
+export interface GreenhouseCommercialProductCatalog {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  default_currency: Generated<string>;
+  default_unit: Generated<string>;
+  default_unit_price: Numeric | null;
+  description: string | null;
+  finance_product_id: string | null;
+  hubspot_product_id: string | null;
+  last_synced_at: Timestamp | null;
+  legacy_category: string | null;
+  legacy_sku: string | null;
+  pricing_model: string | null;
+  product_code: string;
+  product_id: Generated<string>;
+  product_name: string;
+  product_type: Generated<string>;
+  source_system: Generated<string>;
+  suggested_hours: Numeric | null;
+  suggested_role_code: string | null;
+  sync_direction: Generated<string>;
+  sync_status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialQuotationLineItems {
+  cost_breakdown: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  currency: string | null;
+  description: string | null;
+  discount_amount: Numeric | null;
+  discount_type: string | null;
+  discount_value: Numeric | null;
+  effective_margin_pct: Numeric | null;
+  finance_line_item_id: string | null;
+  finance_product_id: string | null;
+  finance_quote_id: string | null;
+  fte_allocation: Numeric | null;
+  hours_estimated: Numeric | null;
+  hubspot_line_item_id: string | null;
+  hubspot_product_id: string | null;
+  label: string;
+  legacy_tax_amount: Numeric | null;
+  legacy_total_amount: Numeric | null;
+  line_item_id: Generated<string>;
+  line_number: number | null;
+  line_type: Generated<string>;
+  margin_pct: Numeric | null;
+  member_id: string | null;
+  notes: string | null;
+  product_id: string | null;
+  quantity: Generated<Numeric>;
+  quotation_id: string;
+  recurrence_type: Generated<string>;
+  role_code: string | null;
+  sort_order: Generated<number>;
+  source_system: Generated<string>;
+  subtotal_after_discount: Numeric | null;
+  subtotal_cost: Numeric | null;
+  subtotal_price: Numeric | null;
+  unit: Generated<string>;
+  unit_cost: Numeric | null;
+  unit_price: Numeric | null;
+  updated_at: Generated<Timestamp>;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialQuotations {
+  acv: Numeric | null;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  arr: Numeric | null;
+  billing_frequency: Generated<string>;
+  business_line_code: string | null;
+  client_id: string | null;
+  client_name_cache: string | null;
+  conditions_text: string | null;
+  contract_duration_months: number | null;
+  converted_at: Timestamp | null;
+  converted_to_income_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  currency: Generated<string>;
+  current_version: Generated<number>;
+  description: string | null;
+  dte_folio: string | null;
+  dte_type_code: string | null;
+  due_date: Timestamp | null;
+  effective_margin_pct: Numeric | null;
+  escalation_base_date: Timestamp | null;
+  escalation_frequency_months: number | null;
+  escalation_mode: Generated<string>;
+  escalation_pct: Numeric | null;
+  exchange_rate_to_clp: Numeric | null;
+  exchange_rates: Generated<Json>;
+  exchange_snapshot_date: Timestamp | null;
+  expired_at: Timestamp | null;
+  expiry_date: Timestamp | null;
+  finance_quote_id: string | null;
+  global_discount_type: string | null;
+  global_discount_value: Numeric | null;
+  hubspot_deal_id: string | null;
+  hubspot_last_synced_at: Timestamp | null;
+  hubspot_quote_id: string | null;
+  internal_notes: string | null;
+  legacy_status: string | null;
+  margin_floor_pct: Numeric | null;
+  mrr: Numeric | null;
+  notes: string | null;
+  nubox_document_id: string | null;
+  nubox_emission_status: string | null;
+  nubox_emitted_at: Timestamp | null;
+  nubox_last_synced_at: Timestamp | null;
+  nubox_sii_track_id: string | null;
+  organization_id: string | null;
+  payment_terms_days: Generated<number>;
+  pricing_model: Generated<string>;
+  quotation_id: Generated<string>;
+  quotation_number: string;
+  quote_date: Timestamp | null;
+  revenue_type: Generated<string>;
+  sent_at: Timestamp | null;
+  source_quote_id: string | null;
+  source_system: Generated<string>;
+  space_id: string | null;
+  space_resolution_source: Generated<string>;
+  status: Generated<string>;
+  subtotal: Numeric | null;
+  target_margin_pct: Numeric | null;
+  tax_amount: Numeric | null;
+  tax_rate: Numeric | null;
+  tcv: Numeric | null;
+  total_amount: Numeric | null;
+  total_amount_clp: Numeric | null;
+  total_cost: Numeric | null;
+  total_discount: Numeric | null;
+  total_price: Numeric | null;
+  total_price_before_discount: Numeric | null;
+  updated_at: Generated<Timestamp>;
+  valid_until: Timestamp | null;
+}
+
+export interface GreenhouseCommercialQuotationVersions {
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  diff_from_previous: Json | null;
+  effective_margin_pct: Numeric | null;
+  finance_quote_id: string | null;
+  notes: string | null;
+  quotation_id: string;
+  snapshot_json: Generated<Json>;
+  total_cost: Numeric | null;
+  total_discount: Numeric | null;
+  total_price: Numeric | null;
+  version_id: Generated<string>;
+  version_number: number;
+}
+
 export interface GreenhouseContextContextDocumentQuarantine {
   client_id: string | null;
   context_kind: string | null;
@@ -4496,6 +4656,10 @@ export interface DB {
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
+  "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
+  "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;
+  "greenhouse_commercial.quotation_versions": GreenhouseCommercialQuotationVersions;
+  "greenhouse_commercial.quotations": GreenhouseCommercialQuotations;
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;

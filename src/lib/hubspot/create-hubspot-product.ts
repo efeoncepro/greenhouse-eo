@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { createHubSpotGreenhouseProduct } from '@/lib/integrations/hubspot-greenhouse-service'
+import { syncCanonicalFinanceProduct } from '@/lib/finance/quotation-canonical-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -90,6 +91,8 @@ export const createHubSpotProduct = async (input: CreateHubSpotProductInput): Pr
       hubspotProductId, createdBy || null
     ]
   )
+
+  await syncCanonicalFinanceProduct({ productId })
 
   // 3. Outbox event
   await publishOutboxEvent({

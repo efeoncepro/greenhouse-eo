@@ -6,6 +6,17 @@
 
 ---
 
+## Delta 2026-04-17 — TASK-345 Quotation canonical bridge materialized
+
+- Finance quotations deja de depender solo de `greenhouse_finance.*` como storage leído por APIs.
+- Estado nuevo del lane:
+  - writers runtime siguen entrando por `greenhouse_finance.quotes`, `quote_line_items` y `products`
+  - el anchor canónico ya existe en `greenhouse_commercial.*`
+  - `GET /api/finance/quotes`, `GET /api/finance/quotes/[id]` y `GET /api/finance/quotes/[id]/lines` ya leen vía façade canónica manteniendo payload legacy
+- `finance.quote.*`, `finance.quote_line_item.*` y `finance.product.*` siguen siendo la familia runtime vigente del outbox.
+- HubSpot/Nubox ahora deben tratarse como writers del bridge, no como writers exclusivos de Finance tables.
+- La lane sigue siendo `finance-first surface`, pero ya no es `finance-only storage`.
+
 ## Delta 2026-04-16 — Finance Signal Engine (TASK-245)
 
 - Primer engine de señales AI fuera del ICO Engine.

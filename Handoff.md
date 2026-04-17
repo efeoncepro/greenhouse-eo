@@ -1,5 +1,45 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-345 Quotation Canonical Schema & Finance Compatibility Bridge
+
+- **Estado:** `complete`, `validado`, rama publicada para PR contra `develop`
+- **Rama local de trabajo:** `task/TASK-345-quotation-canonical-schema-bridge`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-345`
+- **Implementado:**
+  - `migrations/20260417103700979_task-345-quotation-canonical-schema-finance-compatibility-bridge.sql`
+    - crea `greenhouse_commercial`
+    - crea `product_catalog`, `quotations`, `quotation_versions`, `quotation_line_items`
+    - aplica ownership/grants/default privileges
+    - backfillea desde `greenhouse_finance.quotes`, `quote_line_items`, `products`
+  - `src/lib/finance/quotation-canonical-store.ts`
+    - façade quote-specific para list/detail/lines
+    - sync bridge para quotes/products desde Finance runtime hacia `greenhouse_commercial.*`
+    - resolución tenant-aware por `space_id`
+  - routes:
+    - `src/app/api/finance/quotes/route.ts`
+    - `src/app/api/finance/quotes/[id]/route.ts`
+    - `src/app/api/finance/quotes/[id]/lines/route.ts`
+    - ahora leen vía façade canónica y conservan fallback legacy ante schema drift
+  - writers bridgeados:
+    - `src/lib/hubspot/create-hubspot-quote.ts`
+    - `src/lib/hubspot/sync-hubspot-quotes.ts`
+    - `src/lib/hubspot/sync-hubspot-line-items.ts`
+    - `src/lib/hubspot/sync-hubspot-products.ts`
+    - `src/lib/hubspot/create-hubspot-product.ts`
+    - `src/lib/nubox/sync-nubox-to-postgres.ts`
+- **Validación ejecutada:**
+  - `pnpm pg:connect:migrate`
+    - migración aplicada
+    - `src/types/db.d.ts` regenerado por el flujo canónico
+  - `pnpm exec tsc --noEmit --incremental false`
+    - único error restante observado: `src/lib/campaigns/tenant-scope.test.ts(21,44)` preexistente y ajeno a TASK-345
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'`
+- **Notas operativas:**
+  - la rama fue rebasada para que el PR arrastre solo TASK-345 y no mezcle commits previos de TASK-344
+  - `pnpm build` quedó verde; siguió mostrando warnings conocidos de `Dynamic server usage` en páginas autenticadas del dashboard, pero no bloquearon la build ni fueron introducidos por esta lane
+
 ## Sesion 2026-04-17 — TASK-343 Commercial Quotation Canonical Program
 
 - **Estado:** `complete`, `documentado`

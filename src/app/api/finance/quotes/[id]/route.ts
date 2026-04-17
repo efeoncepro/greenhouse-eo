@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import {
+  getFinanceQuoteDetailFromCanonical,
+  mapCanonicalQuoteDetailRow
+} from '@/lib/finance/quotation-canonical-store'
+import {
+  isFinanceSchemaDriftError,
+  logFinanceSchemaDrift
+} from '@/lib/finance/schema-drift'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 
@@ -38,18 +46,7 @@ interface QuoteDetailRow extends Record<string, unknown> {
   updated_at: string | null
 }
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
-
-  if (!tenant) {
-    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const { id: quoteId } = await params
-
+const getLegacyQuoteDetail = async (quoteId: string) => {
   const rows = await runGreenhousePostgresQuery<QuoteDetailRow>(
     `SELECT quote_id, client_id, organization_id, client_name,
             quote_number, quote_date, due_date, expiry_date, description,
@@ -66,12 +63,12 @@ export async function GET(
   )
 
   if (rows.length === 0) {
-    return NextResponse.json({ error: 'Quote not found' }, { status: 404 })
+    return null
   }
 
   const r = rows[0]
 
-  return NextResponse.json({
+  return {
     quoteId: String(r.quote_id),
     clientId: r.client_id ? String(r.client_id) : null,
     organizationId: r.organization_id ? String(r.organization_id) : null,
@@ -101,5 +98,61 @@ export async function GET(
     notes: r.notes ? String(r.notes) : null,
     createdAt: r.created_at ? String(r.created_at) : null,
     updatedAt: r.updated_at ? String(r.updated_at) : null
-  })
+  }
+}
+
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { id: quoteId } = await params
+
+  try {
+    const row = await getFinanceQuoteDetailFromCanonical({ tenant, quoteId })
+
+    if (!row) {
+      return NextResponse.json({ error: 'Quote not found' }, { status: 404 })
+    }
+
+    const mapped = mapCanonicalQuoteDetailRow(row as unknown as Parameters<typeof mapCanonicalQuoteDetailRow>[0])
+
+    return NextResponse.json({
+      ...mapped,
+      quoteDate: toDateString(mapped.quoteDate),
+      dueDate: toDateString(mapped.dueDate),
+      expiryDate: toDateString(mapped.expiryDate),
+      subtotal: mapped.subtotal !== null ? roundCurrency(mapped.subtotal) : null,
+      taxAmount: mapped.taxAmount !== null ? roundCurrency(mapped.taxAmount) : null,
+      totalAmount: roundCurrency(mapped.totalAmount),
+      totalAmountClp: roundCurrency(mapped.totalAmountClp)
+    })
+  } catch (error) {
+    if (isFinanceSchemaDriftError(error)) {
+      logFinanceSchemaDrift('quotes_detail', error)
+
+      const legacyItem = await getLegacyQuoteDetail(quoteId).catch(() => null)
+
+      if (legacyItem) {
+        return NextResponse.json(legacyItem)
+      }
+
+      return NextResponse.json(
+        {
+          error: 'Quote not found',
+          degraded: true,
+          errorCode: 'FINANCE_SCHEMA_DRIFT',
+          message: 'Finance data for quotes_detail is temporarily unavailable because the database schema is not ready.'
+        },
+        { status: 404 }
+      )
+    }
+
+    throw error
+  }
 }
