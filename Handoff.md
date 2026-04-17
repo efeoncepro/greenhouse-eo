@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — Multi-agent integration patterns documentados
+
+- **Estado:** `complete`, `PR abierta contra develop`
+- **Rama:** `docs/multi-agent-integration-patterns`
+- **Motivación:** tras cerrar TASK-446 en paralelo con TASK-345 de Codex, las lecciones operativas (worktree hygiene, rebase --onto, CI flake heredado, squash merge sin branch protection) quedaban sin canónico. Las formalizamos antes de que la próxima sesión descubra esto a fuego.
+- **Implementado:**
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` con 4 secciones nuevas:
+    - Higiene de worktree preexistente
+    - Patrones de integración multi-agente
+    - CI como gate compartido
+    - Merge policy canónica
+  - `AGENTS.md` Regla 3 ("Coordinacion entre agentes") agrega 4 pointers breves a las nuevas secciones.
+  - `CLAUDE.md` Key Docs agrega entry canónica para trabajo multi-agente.
+  - `changelog.md` registra la política nueva.
+- **Caso base referenciado:** ISSUE-052 (flake `HrLeaveView.test.tsx` bajo `pnpm test:coverage`), resuelto en PR #65 con bump `testTimeout` 5s → 15s; desbloqueó PR #63 y toda la queue de develop.
+- **No cambios de runtime:** pura documentación operativa. Zero riesgo de regresión.
+
 ## Sesion 2026-04-17 — TASK-446 Nexa Insights Root Cause Narrative Surfacing (Insights Quick Win)
 
 - **Estado:** `complete`, `documentado`, `branch task/TASK-446-nexa-insights-root-cause-narrative`

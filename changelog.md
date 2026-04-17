@@ -2,6 +2,15 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — Patrones multi-agente documentados en modelo operativo canónico
+
+- `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` incorpora 4 secciones nuevas aprendidas en la sesión paralela Claude (TASK-446) + Codex (TASK-345):
+  - **Higiene de worktree preexistente** — checklist `md5sum pnpm-lock.yaml`, `diff package.json`, symlinks `.env.local` / `.vercel/`, cleanup de `.next-local/build-*`. Evita `pnpm install` innecesario cuando el worktree heredado ya está consistente.
+  - **Patrones de integración multi-agente** — `git rebase --onto origin/develop <other-agent-commit>` para separar scope, `git push --force-with-lease` (nunca `--force` solo), hotspots de conflict recurrentes (`Handoff.md`, `changelog.md`, `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, `docs/issues/README.md`), rebase cascading cuando develop avanza durante el CI.
+  - **CI como gate compartido** — protocolo de triage antes de asumir culpa (local vs runs previos en develop), regla "no admin override por flake heredado", ISSUE-### + PR separada de fix → merge → rebase PR original. Ejemplo canónico: ISSUE-052.
+  - **Merge policy canónica** — squash merge obligatorio, `gh pr merge --auto` nativo no funciona por ausencia de branch protection en develop, background watcher `until CI completed; gh pr merge --squash --delete-branch`, caveat de checkout local fallando cuando otro worktree tiene develop.
+- `AGENTS.md` Regla 3 (coordinación entre agentes) y `CLAUDE.md` Key Docs agregan pointers directos a las nuevas secciones.
+
 ### 2026-04-17 — TASK-446: Nexa Insights expone `rootCauseNarrative` en UI, Weekly Digest y API
 
 - La narrativa causal (distinta al resumen del impacto) que Gemini ya generaba deja de descartarse en el serving layer.

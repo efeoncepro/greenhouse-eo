@@ -86,6 +86,8 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
   - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+- Fuente canónica para trabajo multi-agente (Claude + Codex en paralelo):
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — incluye higiene de worktrees, `rebase --onto`, `force-push-with-lease`, CI como gate compartido, squash merge policy, background watcher pattern para auto-merge sin branch protection
 - Convenciones de skills locales:
   - Claude: `.claude/skills/<skill-name>/skill.md` (minuscula)
   - Codex: `.codex/skills/<skill-name>/SKILL.md` (mayuscula)
