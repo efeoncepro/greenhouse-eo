@@ -15,6 +15,7 @@ const IcoAdvisoryBlock = ({ aiLlm }: Props) => {
     metricId: item.metricName,
     severity: item.severity,
     explanation: item.explanationSummary,
+    rootCauseNarrative: item.rootCauseNarrative,
     recommendedAction: item.recommendedAction
   }))
 

@@ -29,7 +29,7 @@ export type NexaInsightItem = {
   metricId: string
   severity: string | null
   explanation: string | null
-  rootCauseNarrative?: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
 }
 
