@@ -1,3 +1,19 @@
+## Delta 2026-04-17 — alineación con capa de entitlements
+
+TASK-286 fue ampliada para declarar capabilities granulares `client_portal.*` con `defaultScope: 'organization'`. Esta task ahora debe consumir esa capa al implementar la página y sus acciones.
+
+- **View code:** `cliente.mis_revisiones`
+- **Capability:** `client_portal.reviews`
+- **Actions requeridas:** `view`, `approve`, `reject`, `comment`
+- **Scope:** `organization`
+- **Guard de página:** combinar `hasAuthorizedViewCode(tenant, 'cliente.mis_revisiones')` + `can(tenant, 'client_portal.reviews', 'view', 'organization')`.
+- **Guards de acciones:**
+  - Approve button → `can(tenant, 'client_portal.reviews', 'approve', 'organization')`
+  - Reject button → `can(tenant, 'client_portal.reviews', 'reject', 'organization')`
+  - Comment form → `can(tenant, 'client_portal.reviews', 'comment', 'organization')`
+- **Regla:** un rol tipo `client_viewer` puede ver la cola pero no puede aprobar/rechazar. Un rol tipo `client_approver` sí. Los botones deben ocultarse o quedar disabled según los actions permitidos del usuario.
+- **Ref canónica:** `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
 # TASK-292 — Mis Revisiones: Personal Review Queue
 
 ## Status
@@ -10,7 +26,7 @@
 - Status real: `Diseno`
 - Rank: `8`
 - Domain: `delivery`
-- Blocked by: `TASK-286`
+- Blocked by: `TASK-286` (view code + capability con actions view/approve/reject/comment + binding + role defaults)
 - Branch: `task/TASK-292-mis-revisiones-personal-queue`
 
 ## Summary

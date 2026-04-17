@@ -1,3 +1,19 @@
+## Delta 2026-04-17 — alineación con capa de entitlements
+
+TASK-286 fue ampliada para declarar capabilities granulares `client_portal.*` con `defaultScope: 'organization'`. Esta task toca el detalle de proyecto, que convive con dos surfaces distintas — clarificar en planning cuál es el target.
+
+- **Surface existente:** `/proyectos/[id]` (enhancement de detalle actual).
+- **Surface nueva TASK-286:** `cliente.mi_proyecto` en `/my-project` — nueva landing del cliente para SU proyecto principal.
+
+**Clarificar en planning:** ¿esta task enriquece la surface existente, la nueva, o ambas?
+
+- **Capability:** `client_portal.project`
+- **Actions requeridas:** `view`, `comment` (si la task habilita comentarios del cliente sobre el proyecto; si no, dejar solo `view`).
+- **Scope:** `organization`
+- **Guard de página (si target es `cliente.mi_proyecto`):** combinar `hasAuthorizedViewCode(tenant, 'cliente.mi_proyecto')` + `can(tenant, 'client_portal.project', 'view', 'organization')`.
+- **Guard de comentarios:** si hay flujo de comentarios, agregar `can(tenant, 'client_portal.project', 'comment', 'organization')`.
+- **Ref canónica:** `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
 # TASK-300 — Mi Proyecto Enhanced Drill-down
 
 ## Status
@@ -10,7 +26,7 @@
 - Status real: `Diseno`
 - Rank: `16`
 - Domain: `delivery`
-- Blocked by: `TASK-286`
+- Blocked by: `TASK-286` (view code + capability `client_portal.project` + binding + role defaults)
 - Branch: `task/TASK-300-mi-proyecto-enhanced-drilldown`
 
 ## Summary

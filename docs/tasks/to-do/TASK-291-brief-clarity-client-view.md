@@ -1,3 +1,14 @@
+## Delta 2026-04-17 — alineación con capa de entitlements
+
+TASK-286 fue ampliada para declarar capabilities granulares `client_portal.*` con `defaultScope: 'organization'`. Esta task ahora debe consumir esa capa al implementar la página.
+
+- **View code:** `cliente.brief_clarity`
+- **Capability:** `client_portal.brief_clarity`
+- **Actions requeridas:** `view`. **Open question:** si el cliente edita briefs en esta surface, declarar también `edit`. Si es read-only de métricas (BCS, breakdown, recomendaciones), dejar solo `view`. Validar en planning — el summary actual sugiere read-only.
+- **Scope:** `organization`
+- **Guard de página:** combinar `hasAuthorizedViewCode(tenant, 'cliente.brief_clarity')` + `can(tenant, 'client_portal.brief_clarity', 'view', 'organization')`.
+- **Ref canónica:** `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
 # TASK-291 — Brief Clarity Client View
 
 ## Status
@@ -10,7 +21,7 @@
 - Status real: `Diseno`
 - Rank: `7`
 - Domain: `agency`
-- Blocked by: `TASK-286`
+- Blocked by: `TASK-286` (view code + capability + binding + role defaults)
 - Branch: `task/TASK-291-brief-clarity-client-view`
 
 ## Summary

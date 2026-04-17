@@ -1,3 +1,25 @@
+## Delta 2026-04-17 — implicancias si se implementa (alineación con entitlements)
+
+Esta task tiene decisión pendiente (implementar vs eliminar). Si se implementa, aplica el contrato de capabilities de TASK-286:
+
+- **View code existente:** `cliente.actualizaciones` (si se decide mantener y llenar con contenido).
+- **Capability requerida:** declarar `client_portal.updates` en `entitlements-catalog.ts` con:
+  - `module: 'client_portal'`
+  - `actions: ['view']` (read-only feed)
+  - `defaultScope: 'organization'`
+- **Binding:** agregar `cliente.actualizaciones → client_portal.updates` en `entitlement-view-map.ts`.
+- **Role defaults:** incluir en `role_entitlement_defaults` para roles cliente (default: todos los roles cliente tienen `view` del feed).
+- **Guard de página:** `hasAuthorizedViewCode(tenant, 'cliente.actualizaciones')` + `can(tenant, 'client_portal.updates', 'view', 'organization')`.
+
+Si se decide eliminar:
+
+- Remover `cliente.actualizaciones` de `view-access-catalog.ts`.
+- Remover cualquier referencia en `entitlement-view-map.ts` si existe.
+- Remover item del menú.
+- Documentar la decisión en el cierre.
+
+**Ref canónica:** `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
 # TASK-294 — Novedades: Implementar o Eliminar
 
 ## Status

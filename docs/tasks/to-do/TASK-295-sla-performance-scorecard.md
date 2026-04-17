@@ -1,3 +1,14 @@
+## Delta 2026-04-17 — alineación con capa de entitlements
+
+TASK-286 fue ampliada para declarar capabilities granulares `client_portal.*` con `defaultScope: 'organization'`. Esta task ahora debe consumir esa capa al implementar la página.
+
+- **View code:** `cliente.sla`
+- **Capability:** `client_portal.sla`
+- **Actions requeridas:** `view` (read-only scorecard)
+- **Scope:** `organization`
+- **Guard de página:** combinar `hasAuthorizedViewCode(tenant, 'cliente.sla')` + `can(tenant, 'client_portal.sla', 'view', 'organization')`.
+- **Ref canónica:** `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
 # TASK-295 — SLA & Performance Scorecard
 
 ## Status
@@ -10,7 +21,7 @@
 - Status real: `Diseno`
 - Rank: `11`
 - Domain: `agency`
-- Blocked by: `TASK-286`
+- Blocked by: `TASK-286` (view code + capability + binding + role defaults)
 - Branch: `task/TASK-295-sla-performance-scorecard`
 
 ## Summary
