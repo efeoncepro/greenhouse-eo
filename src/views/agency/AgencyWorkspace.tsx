@@ -125,7 +125,7 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
     setCapacityError(null)
 
     try {
-      const res = await fetch('/api/team/capacity-breakdown')
+      const res = await fetch('/api/agency/team')
 
       if (res.ok) {
         const data = await res.json()

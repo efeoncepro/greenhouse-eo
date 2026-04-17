@@ -237,6 +237,14 @@ La surface `/agency/economics` ya quedó activada en modo `space-first`. Constru
 
 De vista estática a motor de constraints.
 
+Runtime canónico desde `TASK-144`:
+
+- store: `src/lib/agency/team-capacity-store.ts`
+- contrato Agency: `GET /api/agency/team`
+- compatibilidad legacy:
+  - `GET /api/team/capacity-breakdown` queda como wrapper sobre el mismo store
+  - `GET /api/agency/capacity` deriva su overview legacy desde el mismo payload y deja de leer la lane BigQuery-first
+
 ```
 Capacidad como motor:
 

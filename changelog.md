@@ -2,6 +2,13 @@
 
 ## 2026-04-17
 
+### 2026-04-17 — TASK-144: Agency Team queda servido por una API dedicada y un store canónico
+
+- Se agrega `src/lib/agency/team-capacity-store.ts` como store canónico para roster activo + assignments + placement metadata + overlay de `member_capacity_economics`, sin duplicar la lógica entre Team view y el tab de capacidad.
+- Nace `GET /api/agency/team` como contrato dedicado para Agency Team / Capacity.
+- `GET /api/team/capacity-breakdown` queda vivo como compat wrapper sobre el mismo store y `GET /api/agency/capacity` deja de depender de la lane legacy `BigQuery-first`; ahora deriva su overview desde el payload canónico.
+- `/agency/team`, el tab `Capacidad` en `AgencyWorkspace` y `AssignMemberDrawer` pasan a consumir `/api/agency/team`, manteniendo el comportamiento visible pero cortando la deduplicación real pedida por la task.
+
 ### 2026-04-17 — TASK-143: Agency Economics queda space-first sobre Cost Intelligence
 
 - `GET /api/agency/economics` ya existe y entrega el snapshot de Agency Economics desde `greenhouse_serving.operational_pl_snapshots`, con ventana mensual, ranking, tendencias y estado parcial explícito.

@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-144 Agency Team API dedicada y deduplicada
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/agency/team-capacity-store.ts`
+    - store canónico nuevo sobre `getDb()` + SQL tipado
+    - consolida roster activo, assignments, enrichment derivado de `space`, metadata de placements y overlay de `member_capacity_economics`
+    - expone también conversión `toAgencyCapacityOverview()` para mantener compatibilidad con el shape legacy de `/api/agency/capacity`
+  - `src/app/api/agency/team/route.ts`
+    - route nueva `GET /api/agency/team`
+    - mantiene `requireAgencyTenantContext()` y headers `no-store`
+  - wrappers y consumers alineados:
+    - `src/app/api/team/capacity-breakdown/route.ts` ahora delega al store canónico
+    - `src/app/api/agency/capacity/route.ts` deja la lane `BigQuery-first` y deriva el overview legacy desde el store nuevo
+    - `src/views/agency/AgencyTeamView.tsx`
+    - `src/views/agency/AgencyWorkspace.tsx`
+    - `src/views/agency/drawers/AssignMemberDrawer.tsx`
+      ahora consumen `/api/agency/team`
+  - tests nuevos/actualizados:
+    - `src/lib/agency/team-capacity-store.test.ts`
+    - `src/app/api/agency/team/route.test.ts`
+    - `src/app/api/team/capacity-breakdown/route.test.ts`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/complete/TASK-144-agency-team-api-dedup.md`
+  - `changelog.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/agency/team-capacity-store.test.ts src/app/api/agency/team/route.test.ts src/app/api/team/capacity-breakdown/route.test.ts`
+  - `pnpm exec vitest run src/views/agency/AgencyTeamView.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm exec eslint src/types/agency-team.ts src/lib/agency/team-capacity-store.ts src/lib/agency/team-capacity-store.test.ts src/app/api/agency/team/route.ts src/app/api/agency/team/route.test.ts src/app/api/team/capacity-breakdown/route.ts src/app/api/team/capacity-breakdown/route.test.ts src/app/api/agency/capacity/route.ts src/views/agency/AgencyTeamView.tsx src/views/agency/AgencyWorkspace.tsx src/views/agency/drawers/AssignMemberDrawer.tsx src/components/agency/CapacityOverview.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+- **Notas operativas:**
+  - `pnpm build` quedó verde; el log siguió imprimiendo warnings conocidos de `Dynamic server usage` para múltiples páginas autenticadas del dashboard, pero no bloquearon el build ni fueron introducidos por esta lane
+  - no hubo migraciones ni cambios de schema en esta sesión
+
 ## Sesion 2026-04-17 — TASK-143 Agency Economics API & View
 
 - **Estado:** `implementado localmente`, `validado`

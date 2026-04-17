@@ -13,7 +13,7 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 
-// ── Types matching /api/team/capacity-breakdown response ──
+// ── Types matching /api/agency/team response ──
 
 interface CapacityBreakdown {
   contractedHoursMonth: number
