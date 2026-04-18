@@ -26,7 +26,12 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 type PricingModel = 'staff_aug' | 'retainer' | 'project'
-type Currency = 'CLP' | 'USD' | 'CLF'
+
+// Alineado con PricingOutputCurrency del engine v2 (TASK-464d).
+// Antes: solo CLP/USD/CLF; extendido a 6 monedas LatAm para consistency con
+// el engine y con CurrencySwitcher primitive (TASK-464e).
+type Currency = 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN'
+
 type BillingFrequency = 'monthly' | 'milestone' | 'one_time'
 type LineUnit = 'hour' | 'month' | 'unit' | 'project'
 
@@ -88,7 +93,10 @@ const PRICING_MODEL_OPTIONS: Array<{ value: PricingModel; label: string }> = [
 const CURRENCY_OPTIONS: Array<{ value: Currency; label: string }> = [
   { value: 'CLP', label: 'CLP · Peso chileno' },
   { value: 'USD', label: 'USD · Dólar' },
-  { value: 'CLF', label: 'CLF · UF' }
+  { value: 'CLF', label: 'CLF · UF' },
+  { value: 'COP', label: 'COP · Peso colombiano' },
+  { value: 'MXN', label: 'MXN · Peso mexicano' },
+  { value: 'PEN', label: 'PEN · Sol peruano' }
 ]
 
 const BILLING_FREQUENCY_OPTIONS: Array<{ value: BillingFrequency; label: string }> = [
@@ -105,7 +113,7 @@ const UNIT_OPTIONS: Array<{ value: LineUnit; label: string }> = [
 ]
 
 const coerceCurrency = (value: string): Currency => {
-  if (value === 'USD' || value === 'CLF') return value
+  if (value === 'USD' || value === 'CLF' || value === 'COP' || value === 'MXN' || value === 'PEN') return value
 
   return 'CLP'
 }
