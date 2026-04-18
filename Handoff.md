@@ -112,6 +112,20 @@
   - Backfill de `quotation_id` en POs/HES legacy heurísticamente (por `po_number` cuando la quote tenga número matching).
   - UI de "Vincular OC existente" desde QuoteDetail — actualmente solo hay chip `canLinkExisting` sin dialog.
 
+## Sesion 2026-04-17 — TASK-146 Service-Level P&L audit de bloqueo documental
+
+- **Estado:** `blocked`, sin implementación iniciada.
+- **Rama:** `task/TASK-146-service-pnl`
+- **Hallazgo central:** el repo sí tiene P&L operativo por `space` (`greenhouse_serving.operational_pl_snapshots`), costo comercial por `member + client` (`greenhouse_serving.commercial_cost_attribution`) y loaded cost por persona (`greenhouse_serving.member_capacity_economics`), pero **no** tiene un contrato canónico para atribuir revenue/direct cost/labor a `greenhouse_core.services.service_id`.
+- **Contratos faltantes que bloquean runtime seguro:**
+  - `greenhouse_finance.income` no expone `service_id`; solo `service_line` y referencias auxiliares (`hubspot_deal_id`, `quotation_id`, `hes_id`)
+  - `greenhouse_finance.expenses` y `greenhouse_finance.cost_allocations` no exponen `service_id`
+  - `commercial_cost_attribution` sigue keyed por `member_id + client_id + period`, no por servicio
+  - `computeOperationalPl()` resuelve `space` desde `client_id` con `DISTINCT ON`, suficiente para `space`-level P&L pero no para atribución fiel por servicio
+- **Acción tomada:** se corrigió la spec `docs/tasks/to-do/TASK-146-service-pnl.md` para dejar explícito que la task está bloqueada por contratos upstream de atribución y que la UI actual debe seguir mostrando solo contexto contractual por servicio.
+- **Siguiente paso recomendado:** abrir task/prerrequisito que formalice el bridge canónico `Finance/Commercial/Staffing -> service_id` antes de volver a intentar `service_economics`.
+- **Actualización 2026-04-18:** se registró `TASK-452 - Service Attribution Foundation` como prerrequisito formal y se alineó el índice de tasks para que el siguiente ID disponible pase a `TASK-453`.
+
 ## Sesion 2026-04-17 — TASK-349 Quotation Workspace UI + PDF Delivery
 
 - **Estado:** `complete`, entregado.
