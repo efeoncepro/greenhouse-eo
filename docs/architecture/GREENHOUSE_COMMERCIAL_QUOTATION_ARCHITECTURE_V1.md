@@ -1,11 +1,36 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.8
+> **Version:** 2.9
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-18 — v2.9: TASK-464a sellable roles catalog foundation. Nuevas tablas `sellable_roles`, `employment_types`, `sellable_role_cost_components`, `role_employment_compatibility`, `sellable_role_pricing_currency` y sequence `sellable_role_sku_seq` en `greenhouse_commercial`. Seeder idempotente `scripts/seed-sellable-roles.ts` consume `data/pricing/seed/sellable-roles-pricing.csv` (32 roles activos, 54 placeholders) y publica eventos `commercial.sellable_role.{created,cost_updated,pricing_updated}`. `role_rate_cards` sigue en coexistencia temporal hasta TASK-464d.
 > **Updated:** 2026-04-18 — v2.8: TASK-351 quotation intelligence automation. Reactive projections `quotation_pipeline` + `quotation_profitability` en domain `cost_intelligence`. Daily lifecycle sweep (`/api/cron/quotation-lifecycle` + ops-worker `/quotation-lifecycle/sweep`) que expira cotizaciones vencidas y emite `renewal_due` con dedup. 4 eventos canónicos nuevos (`expired`, `renewal_due`, `pipeline_materialized`, `profitability_materialized`). Nueva tab "Cotizaciones" en `/finance/intelligence` con Pipeline + Rentabilidad + Renovaciones.
 > **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-18 — TASK-464a Sellable Roles Catalog Foundation
+
+- Pricing comercial deja de depender solo de `role_rate_cards` como fuente de costo/precio por rol.
+- Foundation nueva en `greenhouse_commercial`:
+  - `sellable_roles` — catálogo canónico por SKU `ECG-XXX`, categoría, tier y flags `can_sell_as_staff` / `can_sell_as_service_component`.
+  - `employment_types` — vocabulario comercial versionado e independiente de payroll (`indefinido_clp`, `honorarios_clp`, `contractor_deel_usd`, etc.).
+  - `sellable_role_cost_components` — stack de costo por `(role_id, employment_type_code, effective_from)` con salario base, 4 bonos, previsional, Deel/EOR y columnas generadas `total_monthly_cost_usd` / `hourly_cost_usd`.
+  - `role_employment_compatibility` — compatibilidad/default por rol sin tocar `greenhouse_payroll.*`.
+  - `sellable_role_pricing_currency` — precio vigente por rol y moneda (`USD`, `CLP`, `CLF`, `COP`, `MXN`, `PEN`).
+- Seeder operativo:
+  - `scripts/seed-sellable-roles.ts` consume `data/pricing/seed/sellable-roles-pricing.csv`.
+  - Es **resumable e idempotente**: usa upserts por PK compuesta para resembrar el mismo `effective_from` sin duplicados.
+  - Distingue `skipped_placeholder`, `rejected`, `needs_review` y exporta artifact local para las filas ambiguas.
+  - Inferencia de `employment_type` es conservadora; los casos ambiguos no crean compatibilidad automática.
+- Eventos nuevos:
+  - `commercial.sellable_role.created`
+  - `commercial.sellable_role.cost_updated`
+  - `commercial.sellable_role.pricing_updated`
+- Regla de coexistencia:
+  - `role_rate_cards` sigue como compatibilidad para callers legacy del engine TASK-346.
+  - TASK-464d migra consumers al nuevo backbone y recién ahí habilita la deprecación efectiva de `role_rate_cards`.
 
 ---
 

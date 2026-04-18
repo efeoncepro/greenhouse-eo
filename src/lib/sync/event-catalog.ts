@@ -99,6 +99,8 @@ export const AGGREGATE_TYPES = {
   quotation: 'quotation',
   quotationLineItem: 'quotation_line_item',
   productCatalog: 'product_catalog',
+  sellableRole: 'sellable_role',
+  employmentType: 'employment_type',
 
   // Products (legacy finance namespace)
   product: 'product',
@@ -357,6 +359,9 @@ export const EVENT_TYPES = {
   // Commercial Product Catalog (canonical, TASK-347)
   productCatalogSynced: 'commercial.product_catalog.synced',
   productCatalogCreated: 'commercial.product_catalog.created',
+  sellableRoleCreated: 'commercial.sellable_role.created',
+  sellableRoleCostUpdated: 'commercial.sellable_role.cost_updated',
+  sellableRolePricingUpdated: 'commercial.sellable_role.pricing_updated',
 
   // Purchase Orders & HES
   purchaseOrderCreated: 'finance.purchase_order.created',

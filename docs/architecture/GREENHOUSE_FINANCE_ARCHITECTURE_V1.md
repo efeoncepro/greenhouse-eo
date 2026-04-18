@@ -6,6 +6,17 @@
 
 ---
 
+## Delta 2026-04-18 — TASK-464a Sellable Roles Catalog Foundation
+
+- Finance quotation pricing gana un backbone comercial más rico, pero sin cutover inmediato:
+  - `greenhouse_commercial.role_rate_cards` sigue siendo la fuente consumida por el engine vigente de TASK-346.
+  - `greenhouse_commercial.sellable_roles`, `employment_types`, `sellable_role_cost_components`, `role_employment_compatibility` y `sellable_role_pricing_currency` quedan listas para el refactor de TASK-464d.
+- Implicación operativa:
+  - Finance mantiene su contrato estable actual.
+  - El programa pricing/revenue pipeline ya puede modelar costo por SKU `ECG-XXX`, modalidad contractual y moneda de venta sin crear identidades paralelas fuera del schema comercial.
+- Guardrail explícito:
+  - la foundation comercial no toca `greenhouse_payroll.*`; la convergencia de vocabulario con payroll queda aislada en TASK-468.
+
 ## Delta 2026-04-17 — TASK-345 Quotation canonical bridge materialized
 
 - Finance quotations deja de depender solo de `greenhouse_finance.*` como storage leído por APIs.
