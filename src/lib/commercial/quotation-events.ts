@@ -663,3 +663,131 @@ export const publishTemplateSaved = async (
     client
   )
 }
+
+// ═══════════════════════════════════════════════════════════════
+// TASK-351 — Quotation Intelligence Automation publishers
+// ═══════════════════════════════════════════════════════════════
+
+interface QuotationExpiredParams {
+  quotationId: string
+  clientId: string | null
+  organizationId: string | null
+  totalAmountClp: number | null
+  expiredAt: string
+  daysSinceExpiry: number
+}
+
+export const publishQuotationExpired = async (
+  params: QuotationExpiredParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationExpired,
+      payload: {
+        quotationId: params.quotationId,
+        clientId: params.clientId,
+        organizationId: params.organizationId,
+        totalAmountClp: params.totalAmountClp,
+        expiredAt: params.expiredAt,
+        daysSinceExpiry: params.daysSinceExpiry
+      }
+    },
+    client
+  )
+}
+
+interface QuotationRenewalDueParams {
+  quotationId: string
+  clientId: string | null
+  organizationId: string | null
+  totalAmountClp: number | null
+  expiryDate: string | null
+  daysUntilExpiry: number
+}
+
+export const publishQuotationRenewalDue = async (
+  params: QuotationRenewalDueParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationRenewalDue,
+      payload: {
+        quotationId: params.quotationId,
+        clientId: params.clientId,
+        organizationId: params.organizationId,
+        totalAmountClp: params.totalAmountClp,
+        expiryDate: params.expiryDate,
+        daysUntilExpiry: params.daysUntilExpiry
+      }
+    },
+    client
+  )
+}
+
+interface QuotationPipelineMaterializedParams {
+  quotationId: string
+  pipelineStage: string
+  status: string
+  totalAmountClp: number | null
+  probabilityPct: number
+}
+
+export const publishQuotationPipelineMaterialized = async (
+  params: QuotationPipelineMaterializedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationPipelineMaterialized,
+      payload: {
+        quotationId: params.quotationId,
+        pipelineStage: params.pipelineStage,
+        status: params.status,
+        totalAmountClp: params.totalAmountClp,
+        probabilityPct: params.probabilityPct
+      }
+    },
+    client
+  )
+}
+
+interface QuotationProfitabilityMaterializedParams {
+  quotationId: string
+  periodYear: number
+  periodMonth: number
+  effectiveMarginPct: number | null
+  quotedMarginPct: number | null
+  marginDriftPct: number | null
+  driftSeverity: 'aligned' | 'warning' | 'critical'
+}
+
+export const publishQuotationProfitabilityMaterialized = async (
+  params: QuotationProfitabilityMaterializedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationProfitabilityMaterialized,
+      payload: {
+        quotationId: params.quotationId,
+        periodYear: params.periodYear,
+        periodMonth: params.periodMonth,
+        effectiveMarginPct: params.effectiveMarginPct,
+        quotedMarginPct: params.quotedMarginPct,
+        marginDriftPct: params.marginDriftPct,
+        driftSeverity: params.driftSeverity
+      }
+    },
+    client
+  )
+}

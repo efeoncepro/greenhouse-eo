@@ -1,5 +1,67 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-351 Quotation Intelligence Automation
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-351-quotation-intelligence-automation`
+- **Dependencias:** TASK-345 (schema canónico), TASK-346 (pricing engine), TASK-350 (quote-to-cash bridge). Todas cerradas.
+- **Entregado:**
+  - **Migration** `20260418005940703_task-351-quotation-intelligence.sql`:
+    - `greenhouse_serving.quotation_pipeline_snapshots` — 1 fila por quote, stage/probability/aging/renewal-state/expiry, totales autorizado+facturado del bridge TASK-350.
+    - `greenhouse_serving.quotation_profitability_snapshots` — 1 fila por quote-período, quoted vs authorized vs invoiced vs realized + costo atribuido + drift_severity + drift_drivers JSONB.
+    - `greenhouse_commercial.quotation_renewal_reminders` — cadencia/dedup de alertas de renovación.
+  - **Runtime** (`src/lib/commercial-intelligence/`):
+    - `contracts.ts` — tipos canónicos + umbrales (lookahead 60d, cadencia 14d, drift warning 5pp/critical 15pp).
+    - `pipeline-materializer.ts` — `buildPipelineSnapshot` + `upsertPipelineSnapshot` + `materializePipelineSnapshot`. Stage derivado de `status`, probability por stage, aging via `stageEnteredAt`, renewal/expired flags. Reutiliza `purchase_orders.quotation_id` / `income.quotation_id` del bridge TASK-350 para totales autorizados/facturados.
+    - `profitability-materializer.ts` — `materializeProfitabilitySnapshots` (por quote) + `materializeProfitabilityForPeriod` (por período). Cost attribution: prorrateado por share de revenue del quote vs revenue total del cliente en el período (leído de `greenhouse_serving.commercial_cost_attribution`). Si el quote es el único linked en el período, toma cost completo.
+    - `renewal-lifecycle.ts` — `runQuotationLifecycleSweep`: pasa a `expired` y emite evento + audit; emite `renewal_due` con dedup via `quotation_renewal_reminders`.
+    - `intelligence-store.ts` — readers tenant-safe con filtros.
+  - **Eventos canónicos nuevos** (`src/lib/sync/event-catalog.ts`):
+    - `commercial.quotation.expired`
+    - `commercial.quotation.renewal_due`
+    - `commercial.quotation.pipeline_materialized`
+    - `commercial.quotation.profitability_materialized`
+  - **Publishers** en `src/lib/commercial/quotation-events.ts`: 4 nuevos.
+  - **Reactive projections** en domain `cost_intelligence` (reutilizan cron `ops-reactive-cost-intelligence` cada 10min):
+    - `quotation_pipeline` — 12 trigger events (created, synced, sent, approved, rejected, converted, expired, renewal_due, version_created, po_linked, hes_linked, invoice_emitted).
+    - `quotation_profitability` — 9 trigger events (approved, converted, po_linked, hes_linked, invoice_emitted, version_created, finance.income.created/updated, accounting.commercial_cost_attribution.period_materialized). Acepta scope por quote o por período.
+  - **Cron scheduled**:
+    - Vercel fallback: `GET /api/cron/quotation-lifecycle` 10:00 UTC daily (07:00 Santiago).
+    - Cloud Run canonical: `POST /quotation-lifecycle/sweep` en ops-worker; Cloud Scheduler job `ops-quotation-lifecycle` 07:00 Santiago declarado en `services/ops-worker/deploy.sh`.
+  - **API surface**:
+    - `GET /api/finance/commercial-intelligence/pipeline?stage=&clientId=&businessLineCode=&renewalsDueOnly=true` → `{ items, totals, count }`.
+    - `GET /api/finance/commercial-intelligence/profitability?periodYear=&periodMonth=&quotationId=&driftSeverity=` → `{ items, count }`.
+    - `GET /api/finance/commercial-intelligence/renewals?include=renewals|expired|all` → `{ renewals, expired, counts }`.
+    - `POST /api/finance/commercial-intelligence/materialize` (admin / finance_manager) — `{ quotationId? , lifecycleSweep?: boolean }` para re-hydrate manual.
+  - **UI**:
+    - `CommercialIntelligenceView.tsx` — 3 tabs: Pipeline (4 KPIs + tabla filtrable), Rentabilidad (tabla con drift chips), Renovaciones (2 secciones: por vencer / vencidas). Scope automático según `tenant.tenantType` (cliente ve solo lo suyo, efeonce_internal ve todo).
+    - `FinanceIntelligenceView.tsx` extendido: tercera tab "Cotizaciones" renderiza `CommercialIntelligenceView`.
+- **Política de rematerialización:**
+  - Reactive: cualquiera de los 12/9 eventos dispara re-hydrate automáticamente vía `ops-reactive-cost-intelligence` (domain cost_intelligence, cada 10min).
+  - Scheduled: sweep diario detecta `expired` y `renewal_due`, que a su vez emiten eventos que disparan pipeline_materialized.
+  - Manual: POST `/materialize` con `quotationId` o `lifecycleSweep:true`.
+- **Métrica default del dashboard y cómo cambia por BU:** 
+  - Pipeline tab default = `openPipelineClp` (suma de etapas draft/in_review/sent/approved). Alternativas visibles en misma row: `weightedPipelineClp`, `wonClp`, `lostClp`.
+  - Filtrable por `businessLineCode` vía query string del endpoint `pipeline`. Future dashboards por BU pueden filtrar explícito (TASK-351 follow-up doc).
+- **Detección `expired_without_renewal` sin duplicar lógica:**
+  - Único fuente de expiration: `runQuotationLifecycleSweep` (flip status + emit event).
+  - `expired` se correlaciona con ausencia de `quotation_renewal_reminders.last_reminder_at` + absence de drafts posteriores (attribute queryable via audit log). No hay cron separado — la lógica vive en un solo módulo.
+- **Convivencia rama simple vs enterprise en profitability:**
+  - Rama simple: `invoicedVsQuotedPct` y `realizedVsQuotedPct` son los drivers principales (no hay PO).
+  - Rama enterprise: además `authorizedVsQuotedPct` muestra drift entre lo cotizado y lo autorizado por HES.
+  - Ambos drivers quedan expuestos en `drift_drivers` JSONB para consumidores downstream.
+- **Validado:**
+  - `pnpm migrate:status` ✓ (sin pendientes)
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm test` ✓ 1337 passed, 2 skipped
+  - `pnpm build` en curso al commit.
+- **Follow-ups (out of scope):**
+  - Forecasting predictivo ML.
+  - Dashboard ejecutivo hiper-pulido por BU (agregar filtros visibles + mini-charts).
+  - Cloud Run deploy del nuevo endpoint `/quotation-lifecycle/sweep` (`bash services/ops-worker/deploy.sh` después del merge).
+  - Draft automático de renovación — actualmente solo se emite el evento; draft lo crea el usuario desde UI con audit `renewal_generated`.
+
 ## Sesion 2026-04-17 — TASK-350 Quotation-to-Cash Document Chain Bridge
 
 - **Estado:** `complete`, entregado.

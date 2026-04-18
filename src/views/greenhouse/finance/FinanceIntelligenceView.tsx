@@ -14,6 +14,7 @@ import CustomTabList from '@core/components/mui/TabList'
 
 import FinancePeriodClosureDashboardView from './FinancePeriodClosureDashboardView'
 import ClientEconomicsView from './ClientEconomicsView'
+import CommercialIntelligenceView from './CommercialIntelligenceView'
 
 type Props = {
   canManageClosure: boolean
@@ -39,6 +40,7 @@ const FinanceIntelligenceView = ({ canManageClosure, canReopen }: Props) => {
           <CustomTabList onChange={(_e, v) => setTab(v)} variant='scrollable'>
             <Tab value='closure' label='Cierre de período' icon={<i className='tabler-lock' />} iconPosition='start' />
             <Tab value='economics' label='Rentabilidad por cliente' icon={<i className='tabler-chart-bar' />} iconPosition='start' />
+            <Tab value='quotations' label='Cotizaciones' icon={<i className='tabler-file-description' />} iconPosition='start' />
           </CustomTabList>
 
           <TabPanel value='closure' sx={{ p: 0 }}>
@@ -47,6 +49,10 @@ const FinanceIntelligenceView = ({ canManageClosure, canReopen }: Props) => {
 
           <TabPanel value='economics' sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
             <ClientEconomicsView embedded />
+          </TabPanel>
+
+          <TabPanel value='quotations' sx={{ p: 0 }}>
+            <CommercialIntelligenceView />
           </TabPanel>
         </TabContext>
       </Card>

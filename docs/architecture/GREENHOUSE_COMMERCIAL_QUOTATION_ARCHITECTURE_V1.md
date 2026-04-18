@@ -1,10 +1,82 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.7
+> **Version:** 2.8
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-18 — v2.8: TASK-351 quotation intelligence automation. Reactive projections `quotation_pipeline` + `quotation_profitability` en domain `cost_intelligence`. Daily lifecycle sweep (`/api/cron/quotation-lifecycle` + ops-worker `/quotation-lifecycle/sweep`) que expira cotizaciones vencidas y emite `renewal_due` con dedup. 4 eventos canónicos nuevos (`expired`, `renewal_due`, `pipeline_materialized`, `profitability_materialized`). Nueva tab "Cotizaciones" en `/finance/intelligence` con Pipeline + Rentabilidad + Renovaciones.
 > **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-18 — TASK-351 Quotation Intelligence Automation
+
+### Problema que cerró
+
+El bridge TASK-350 dejó las FKs listas, pero no había materialización downstream. Responder "¿cuánto pipeline hay y con qué probabilidad? ¿qué se renueva pronto? ¿cuánto drift tiene el margen real contra el cotizado?" seguía exigiendo joins ad-hoc en cada lectura.
+
+### Schema (migration `20260418005940703_task-351-quotation-intelligence.sql`)
+
+- `greenhouse_serving.quotation_pipeline_snapshots` — 1 fila por quote. Key = `quotation_id`. Guarda: stage derivado (draft/in_review/sent/approved/converted/rejected/expired), probability_pct, totales autorizado/facturado del bridge, days_in_stage, days_until_expiry, is_renewal_due, is_expired, snapshot_source_event.
+- `greenhouse_serving.quotation_profitability_snapshots` — 1 fila por (quotation_id, period_year, period_month). Guarda quoted/authorized/invoiced/realized + attributed_cost_clp + effective_margin_pct + margin_drift_pct + drift_severity (`aligned`/`warning`/`critical`) + drift_drivers JSONB.
+- `greenhouse_commercial.quotation_renewal_reminders` — dedup de alertas: last_reminder_at, reminder_count, next_check_at, last_event_type.
+
+### Runtime (`src/lib/commercial-intelligence/`)
+
+- `pipeline-materializer.ts:materializePipelineSnapshot({ quotationId, sourceEvent })` — idempotente. Lee quote + agrega `purchase_orders.authorized_amount_clp` + `income.total_amount_clp` por quote. Upsert con ON CONFLICT.
+- `profitability-materializer.ts:materializeProfitabilitySnapshots({ quotationId })` — por quote, itera sobre cada período con income + costo atribuido prorrateado por share revenue del quote vs revenue cliente/período. `materializeProfitabilityForPeriod({ year, month })` para fan-out desde el evento de cost attribution.
+- `renewal-lifecycle.ts:runQuotationLifecycleSweep()` — sweep diario. Expira quotes + emite `renewal_due` con dedup via `quotation_renewal_reminders` (cadencia 14d, lookahead 60d).
+- `intelligence-store.ts` — `listPipelineSnapshots(filters)`, `buildPipelineTotals(items)`, `listProfitabilitySnapshots(filters)` — todos tenant-safe por clientId/organizationId/spaceId.
+
+### Eventos canónicos nuevos
+
+| Evento | Emisor | Consumidores reactivos |
+|---|---|---|
+| `commercial.quotation.expired` | lifecycle sweep | `quotation_pipeline` projection, audit log (`action: 'expired'`), notifications |
+| `commercial.quotation.renewal_due` | lifecycle sweep | `quotation_pipeline` projection, notifications (`finance_alert` con `metadata.subtype: quotation_renewal`) |
+| `commercial.quotation.pipeline_materialized` | `quotation_pipeline` projection | observabilidad, dashboards |
+| `commercial.quotation.profitability_materialized` | `quotation_profitability` projection | observabilidad, dashboards |
+
+### Projections (domain `cost_intelligence`)
+
+- `quotation_pipeline` — triggerEvents: `created, synced, sent, approved, rejected, converted, expired, renewal_due, version_created, po_linked, hes_linked, invoice_emitted`. Scope: `{ entityType: 'quotation', entityId }`.
+- `quotation_profitability` — triggerEvents: `approved, converted, po_linked, hes_linked, invoice_emitted, version_created, finance.income.created/updated, accounting.commercial_cost_attribution.period_materialized`. Scope: quote o período. El evento de cost attribution dispara fan-out por quote del período.
+
+Ambas corren dentro del cron existente `ops-reactive-cost-intelligence` (*/10 min) del ops-worker — no se agregó cron reactivo nuevo.
+
+### Scheduled lifecycle job
+
+- Cloud Run canonical: `POST /quotation-lifecycle/sweep` en ops-worker. Cloud Scheduler `ops-quotation-lifecycle` 07:00 Santiago (declarado en `services/ops-worker/deploy.sh`).
+- Vercel fallback: `GET /api/cron/quotation-lifecycle` 10:00 UTC daily.
+
+### Profitability — cómo se computa el costo atribuido
+
+1. Lee `realized_revenue_clp` = `SUM(income.total_amount_clp) WHERE quotation_id AND period_year/month`.
+2. Lee `client_loaded_cost_clp` = `SUM(commercial_loaded_cost_target) FROM greenhouse_serving.commercial_cost_attribution WHERE client_id AND period`.
+3. Lee `client_period_revenue` = `SUM(income.total_amount_clp) WHERE client_id AND period_year/month`.
+4. Share = `min(1, realized_revenue / client_period_revenue)`. Si `client_period_revenue = 0` o el quote es el único linked, share = 1.
+5. `attributed_cost_clp = client_loaded_cost_clp * share`.
+6. `effective_margin_pct = ((realized_revenue - attributed_cost) / realized_revenue) * 100`.
+7. `margin_drift_pct = effective_margin_pct - quoted_margin_pct`.
+8. `drift_severity`: `aligned` (|drift| < 5pp), `warning` (5-15pp), `critical` (≥15pp).
+
+Los drivers adicionales (`authorizedVsQuotedPct`, `invoicedVsQuotedPct`, `realizedVsQuotedPct`) quedan persistidos en `drift_drivers` JSONB.
+
+### API
+
+- `GET /api/finance/commercial-intelligence/pipeline` — `{ items, totals, count }`. Filtros: `stage, clientId, businessLineCode, renewalsDueOnly, expiredOnly`. Tenant scope automático.
+- `GET /api/finance/commercial-intelligence/profitability` — `{ items, count }`. Filtros: `quotationId, periodYear, periodMonth, driftSeverity, clientId`.
+- `GET /api/finance/commercial-intelligence/renewals?include=renewals|expired|all` — `{ renewals, expired, counts }`.
+- `POST /api/finance/commercial-intelligence/materialize` — admin/finance_manager. `{ quotationId? }` o `{ lifecycleSweep: true }`.
+
+### UI
+
+- `/finance/intelligence` → tab **"Cotizaciones"** → `CommercialIntelligenceView` con 3 sub-tabs:
+  - **Pipeline** — 4 KPIs (abierto / ponderado / ganado / perdido) + tabla por stage con probability, margen, vencimiento, badge de renovación/vencida.
+  - **Rentabilidad** — tabla por quote-período con quoted/invoiced/costo + margen cotizado vs efectivo + chip drift (Alineado/Atención/Crítico).
+  - **Renovaciones** — dos secciones: "Próximas a vencer" (60d) y "Vencidas".
+
+Todas las listas respetan tenant scope automáticamente.
 
 ---
 

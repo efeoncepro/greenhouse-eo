@@ -12,6 +12,7 @@
  *   POST /reactive/recover          → Recover orphaned projection queue items (replaces projection-recovery cron)
  *   GET  /reactive/queue-depth      → Queue depth + oldest-event lag, optionally filtered by ?domain=<x>
  *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
+ *   POST /quotation-lifecycle/sweep    → Daily sweep: expire overdue quotes + emit renewal_due events (TASK-351)
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *
@@ -36,6 +37,7 @@ import {
   materializeAllAvailablePeriods
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
+import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
@@ -392,6 +394,35 @@ const handleCostAttributionMaterialize = async (req: IncomingMessage, res: Serve
 }
 
 /**
+ * POST /quotation-lifecycle/sweep
+ * TASK-351: Daily quotation lifecycle sweep.
+ * - Flips quotations past `expiry_date` to `status='expired'` + emits `commercial.quotation.expired`.
+ * - Emits `commercial.quotation.renewal_due` for open quotes inside the lookahead window,
+ *   deduplicated by the `quotation_renewal_reminders` cadence table.
+ */
+const handleQuotationLifecycleSweep = async (_req: IncomingMessage, res: ServerResponse) => {
+  const startMs = Date.now()
+
+  console.log('[ops-worker] POST /quotation-lifecycle/sweep')
+
+  try {
+    const result = await runQuotationLifecycleSweep()
+    const durationMs = Date.now() - startMs
+
+    console.log(
+      `[ops-worker] /quotation-lifecycle/sweep done — expired=${result.expiredCount} renewalDue=${result.renewalDueCount} processed=${result.quotationsProcessed} ${durationMs}ms`
+    )
+
+    json(res, 200, { ...result, durationMs })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /quotation-lifecycle/sweep failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
  * GET /reactive/queue-depth
  * Returns the number of outbox events still pending reactive processing for a
  * domain (or across all domains if `domain` is omitted), plus the oldest event
@@ -590,6 +621,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/cost-attribution/materialize') {
       await handleCostAttributionMaterialize(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/quotation-lifecycle/sweep') {
+      await handleQuotationLifecycleSweep(req, res)
 
       return
     }
