@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-453 Deal Canonicalization & Commercial Bridge (cierre)
+
+- **Owner:** Codex
+- **Rama:** `develop`
+- **Estado:** implementado y validado
+- **Entregables:**
+  - migración `20260418224710163_task-453-commercial-deals-canonical-bridge.sql`
+  - `src/lib/commercial/deals-store.ts`
+  - `src/lib/commercial/deal-events.ts`
+  - `src/lib/hubspot/sync-hubspot-deals.ts`
+  - cron `src/app/api/cron/hubspot-deals-sync/route.ts`
+  - script `scripts/backfill-hubspot-deals.ts`
+  - tests `src/lib/commercial/__tests__/deal-events.test.ts` y `deals-store.test.ts`
+  - docs actualizadas en arquitectura + task README
+- **Resultado operativo:**
+  - existe `greenhouse_commercial.deals` como mirror comercial canónico sobre el carril inbound existente `greenhouse_crm.deals`
+  - existe `greenhouse_commercial.hubspot_deal_pipeline_config` con bootstrap inicial desde staging y soporte de overrides manuales por `pipeline_id + stage_id`
+  - el bridge resuelve `organization_id` / `space_id`, calcula `amount_clp` con `greenhouse_finance.exchange_rates`, mantiene `hubspot_deal_id` como link lógico hacia quotations y publica `commercial.deal.created|synced|stage_changed|won|lost`
+  - `/api/cron/hubspot-deals-sync` ya corre sobre el runtime actual sin depender de un endpoint nuevo en Cloud Run
+  - el backfill standalone quedó usable fuera de Next.js runtime; se corrigió el fallo real de `server-only` para que funcione como script operativo
+- **Validaciones corridas:**
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec vitest run src/lib/commercial/__tests__/deal-events.test.ts src/lib/commercial/__tests__/deals-store.test.ts`
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm tsx scripts/backfill-hubspot-deals.ts --include-closed` -> `25 created / 0 errors`
+  - rerun idempotente del mismo script -> `25 skipped / 0 errors`
+  - `pnpm lint`
+  - `pnpm test src/lib/payroll/` -> `29` files / `194` tests passing
+  - `pnpm test` -> `304` files / `1393` tests passing, `2` skipped
+  - `pnpm build`
+  - `pnpm pg:connect:status` -> sin migraciones pendientes
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` -> sin matches
+- **Dependencias desbloqueadas:**
+  - `TASK-455` ya puede snapshotear contexto comercial desde deal canonical
+  - `TASK-456` ya tiene aggregate/event foundation para `deal_pipeline_snapshots`
+  - `TASK-457` ya puede leer deal-grain real sin depender del staging `greenhouse_crm.deals`
+- **Notas de convivencia multi-agente:**
+  - hay archivos UI untracked en `src/views/greenhouse/finance/workspace/` presentes en el workspace que no fueron tocados por esta task
+  - la distinción canónica queda documentada: `greenhouse_crm.deals` = staging/runtime inbound, `greenhouse_commercial.deals` = canon comercial
+  - próximo paso natural del programa: `TASK-455` o `TASK-456`, según si se prioriza contexto histórico de quote o la proyección deal-grain
+
 ## Sesion 2026-04-18 — TASK-464e Phase 1: backend + UI primitives (Claude)
 
 - **Owner:** Claude

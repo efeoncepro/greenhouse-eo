@@ -209,6 +209,37 @@ export interface GreenhouseCommercialCountryPricingFactors {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialDeals {
+  amount: Numeric | null;
+  amount_clp: Numeric | null;
+  client_id: string | null;
+  close_date: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_in_hubspot_at: Timestamp | null;
+  currency: Generated<string>;
+  deal_id: Generated<string>;
+  deal_name: string;
+  deal_owner_email: string | null;
+  deal_owner_hubspot_user_id: string | null;
+  deal_owner_user_id: string | null;
+  deal_type: string | null;
+  dealstage: string;
+  dealstage_label: string | null;
+  exchange_rate_to_clp: Numeric | null;
+  hubspot_deal_id: string;
+  hubspot_last_synced_at: Generated<Timestamp>;
+  hubspot_pipeline_id: string | null;
+  is_closed: Generated<boolean>;
+  is_deleted: Generated<boolean>;
+  is_won: Generated<boolean>;
+  organization_id: string | null;
+  pipeline_name: string | null;
+  probability_pct: Numeric | null;
+  source_payload: Generated<Json>;
+  space_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialEmploymentTypeAliases {
   active: Generated<boolean>;
   confidence: Generated<string>;
@@ -247,6 +278,18 @@ export interface GreenhouseCommercialFteHoursGuide {
   fte_label: string;
   monthly_hours: number;
   recommended_description: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialHubspotDealPipelineConfig {
+  created_at: Generated<Timestamp>;
+  is_closed: Generated<boolean>;
+  is_won: Generated<boolean>;
+  notes: string | null;
+  pipeline_id: string;
+  probability_pct: Numeric | null;
+  stage_id: string;
+  stage_label: string;
   updated_at: Generated<Timestamp>;
 }
 
@@ -5116,9 +5159,11 @@ export interface DB {
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
   "greenhouse_commercial.commercial_model_multipliers": GreenhouseCommercialCommercialModelMultipliers;
   "greenhouse_commercial.country_pricing_factors": GreenhouseCommercialCountryPricingFactors;
+  "greenhouse_commercial.deals": GreenhouseCommercialDeals;
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
+  "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;

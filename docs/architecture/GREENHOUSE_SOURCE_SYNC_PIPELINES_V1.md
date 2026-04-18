@@ -808,6 +808,11 @@ Sync rule:
 - upsert conformed current-state rows
 - project runtime-critical records into `greenhouse_crm`
 
+Bridge canónico comercial vigente:
+- **TASK-453** agrega un segundo carril sobre el runtime existente: `greenhouse_crm.deals` sigue siendo la proyección operational/raw-backed desde HubSpot, mientras `greenhouse_commercial.deals` pasa a ser el mirror canónico comercial para forecasting y revenue pipeline.
+- El sync de este bridge no relee BigQuery ni reemplaza el control plane source-sync: consume `greenhouse_crm.deals`, resuelve `organization_id` / `space_id`, calcula FX a CLP con `greenhouse_finance.exchange_rates` y publica `commercial.deal.*` al outbox.
+- La consecuencia operativa es explícita: `greenhouse_crm.deals` = staging/runtime inbound; `greenhouse_commercial.deals` = entidad canónica comercial consumida por TASK-455/456/457.
+
 ### Conflict rule
 
 If the incoming `payload_hash` did not change, projection to Postgres can be skipped.
