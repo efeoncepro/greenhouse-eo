@@ -66,6 +66,7 @@ Reglas obligatorias:
 - Multi-currency output usa exchange rates canónicas en `greenhouse_finance.exchange_rates` (ya existente) cuando el CSV no tiene el precio pre-calculado, o fallback al precio pre-calculado del Excel
 - Engine nunca escribe — solo computa y retorna
 - Backward compat: adapter layer para los callers antiguos
+- **🛑 AISLAMIENTO PAYROLL**: engine LEE opcionalmente de `greenhouse_payroll.chile_afp_rates` + `chile_previred_indicators` para enriquecer cost stack cuando quote es CLP+indefinido (solo SELECT, nunca WRITE). NO modifica logic de `src/lib/payroll/*`. `lineType='person'` sigue consumiendo `member_capacity_economics` sin cambios. Antes de cerrar, `pnpm test src/lib/payroll/` (baseline: 194 tests / 29 files passing al 2026-04-18 — debe mantenerse intacto) debe pasar intacto.
 
 ## Normative Docs
 
@@ -77,7 +78,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-464a — `sellable_roles`, `sellable_role_cost_components`, `sellable_role_pricing_currency` existen con seed
+- TASK-464a — `sellable_roles`, `employment_types`, `sellable_role_cost_components` (multi-row por employment_type), `role_employment_compatibility`, `sellable_role_pricing_currency` existen con seed
 - TASK-464b — tier margins, commercial model multipliers, country factors, FTE guide existen con seed
 - TASK-464c — `ai.tool_catalog` extendida + `overhead_addons` existe con seed
 
@@ -127,8 +128,8 @@ Reglas obligatorias:
 
 ```typescript
 export type PricingLineInput =
-  | { lineType: 'role'; roleSku: string; hours?: number; fteFraction?: number; periods?: number; quantity?: number; overrideMarginPct?: number }
-  | { lineType: 'person'; memberId: string; hours?: number; fteFraction?: number; periods?: number; overrideMarginPct?: number }
+  | { lineType: 'role'; roleSku: string; employmentTypeCode?: string; hours?: number; fteFraction?: number; periods?: number; quantity?: number; overrideMarginPct?: number }
+  | { lineType: 'person'; memberId: string; hours?: number; fteFraction?: number; periods?: number; overrideMarginPct?: number }  // employment_type derivado de compensation_versions
   | { lineType: 'tool'; toolSku: string; quantity: number; periods?: number }
   | { lineType: 'overhead_addon'; addonSku: string; basisSubtotal?: number }
   | { lineType: 'direct_cost'; label: string; amount: number; currency: string }
@@ -150,6 +151,8 @@ export interface PricingLineOutput {
     hourlyCostUsd?: number
     totalCostUsd: number
     breakdown: Record<string, number>         // base salary, bonuses, overhead, etc.
+    employmentTypeCode?: string                // para líneas role/person, employment_type efectivo aplicado
+    employmentTypeSource?: 'explicit_input' | 'role_default' | 'payroll_compensation_version'
   }
   // Client-facing price
   suggestedBillRate: {
@@ -198,8 +201,8 @@ export interface PricingEngineOutputV2 {
 
 Orden de cálculo:
 1. Para cada línea, resolver base cost según `lineType`:
-   - `role`: SELECT de `sellable_role_cost_components` via `roleSku` → `hourly_cost_usd`
-   - `person`: SELECT de `member_capacity_economics` → `cost_per_hour_target`
+   - `role`: resolve employment_type_code (input override → default de `role_employment_compatibility`). SELECT de `sellable_role_cost_components` via `(role_id, employment_type_code, latest effective_from)` → `hourly_cost_usd`. Si employment_type NO allowed para este rol → throw error / warning.
+   - `person`: SELECT de `member_capacity_economics` → `cost_per_hour_target` (ya refleja el employment_type real del member via compensation_versions)
    - `tool`: SELECT de `ai.tool_catalog` via `tool_sku` → `prorated_cost_usd` × quantity × periods
    - `overhead_addon`: SELECT de `overhead_addons` via `addon_sku` → depende de `addon_type`
    - `direct_cost`: amount provisto manualmente

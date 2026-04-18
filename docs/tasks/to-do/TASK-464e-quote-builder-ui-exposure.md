@@ -150,10 +150,11 @@ Botones: `[+ Rol]` `[+ Persona]` `[+ Herramienta]` `[+ Overhead]`
 - Autocomplete `RolePickerAutocomplete` con los 33 sellable roles, agrupados por categoría
 - Al seleccionar, abre inline editor:
   - **Cantidad**: personas (ej. 2 diseñadores)
+  - **Modalidad de contrato**: dropdown con los employment_types admitidos del rol (filtrado por `role_employment_compatibility.allowed=TRUE`). Default al `is_default=TRUE`. Ej. Senior Designer: indefinido_clp (default) / plazo_fijo_clp / contractor_deel_usd. Consultor HubSpot: honorarios_clp (default) / contractor_deel_usd.
   - **FTE** slider + input (0.1-1.0) con label "X horas/mes" auto desde `fte_hours_guide`
   - **Períodos** (meses): auto-disabled para on-demand, editable para retainer
   - **Override margin** (opcional, gated finance): slider entre `margin_min` y `margin_max` del tier, default `margin_opt`
-- Al guardar, llama simulate endpoint → actualiza cost stack + bill rate
+- Al guardar, llama simulate endpoint → actualiza cost stack + bill rate (el stack varía según el employment_type seleccionado)
 
 **Add Herramienta**:
 - Autocomplete `ToolPickerAutocomplete` con 26 tools, filtrados por BL

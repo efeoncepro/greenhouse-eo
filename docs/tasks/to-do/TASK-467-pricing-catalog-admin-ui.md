@@ -64,6 +64,7 @@ Reglas obligatorias:
 - Effective date obligatorio en cambios de cost/pricing (para no retroactivamente alterar quotes existentes)
 - Audit log reusa `quotation_audit_log` pattern o crea `pricing_catalog_audit_log` paralelo
 - Copy via `greenhouse-ux-writing` skill
+- **🛑 AISLAMIENTO PAYROLL**: esta UI NUNCA escribe en `greenhouse_payroll.*`. Panels que muestran rates vigentes de payroll (afp_rates, previred_indicators) son SOLO lectura (SELECT) para referencia. La UI de pricing catalog NO triggerea recálculos de payroll, NO altera compensation_versions, NO toca lógica de `src/lib/payroll/*`. Antes de cerrar, suite `pnpm test src/lib/payroll/` (baseline: 194 tests / 29 files passing al 2026-04-18 — debe mantenerse intacto) debe pasar sin modificación.
 
 ## Normative Docs
 
@@ -155,8 +156,9 @@ CREATE INDEX idx_pc_audit_actor ON greenhouse_commercial.pricing_catalog_audit_l
 
 ### Slice 2 — Home + navigation
 
-- `/admin/pricing-catalog` landing page con 6 tiles:
+- `/admin/pricing-catalog` landing page con 7 tiles:
   - **Roles** (count activos / total) → `/admin/pricing-catalog/roles`
+  - **Modalidades de contrato** (employment types) → `/admin/pricing-catalog/employment-types`
   - **Herramientas** → `/admin/pricing-catalog/tools`
   - **Overheads y Fees** → `/admin/pricing-catalog/overheads`
   - **Tiers de margen** → `/admin/pricing-catalog/tiers` (role + service)
@@ -175,7 +177,8 @@ CREATE INDEX idx_pc_audit_actor ON greenhouse_commercial.pricing_catalog_audit_l
 
 **Detail + edit view** `/admin/pricing-catalog/roles/[id]`:
 - Tab **Info general**: role_label (es/en), category, tier, tipo (staff/service), active toggle, notes
-- Tab **Cost components**: base_salary_usd, 4 bonos, gastos_previsionales, fee_deel, hours_per_fte_month → auto-calcula total + hourly cost preview. Cambiar requiere `effective_from` date (default today)
+- Tab **Modalidades de contrato**: gestión de `role_employment_compatibility` — lista de employment_types admitidos con toggle allowed + radio default. Agregar nuevos con autocomplete desde `employment_types` catalog.
+- Tab **Cost components por modalidad**: sub-tabs por cada employment_type admitido (indefinido_clp / honorarios_clp / contractor_deel_usd / etc). Cada sub-tab: base_salary_usd, 4 bonos, gastos_previsionales (override o inherit de employment_type.previsional_pct_default), fee_deel, fee_eor, hours_per_fte_month → auto-calcula total + hourly cost preview. Cambiar requiere `effective_from` date. **Sinergia con payroll**: cuando employment_type.source_of_truth='greenhouse_payroll_chile_rates', la UI muestra rates vigentes en payroll como comparación ("AFP vigente en payroll: 11.5% — tu valor: X%") sin forzar actualización.
 - Tab **Pricing currency**: 6 filas editables (USD/CLP/CLF/COP/MXN/PEN) con margin_pct, hourly_price, fte_monthly_price. Cambiar requiere effective_from.
 - Tab **Historia**: audit log del rol (todos los cambios con diff)
 
@@ -202,7 +205,21 @@ CREATE INDEX idx_pc_audit_actor ON greenhouse_commercial.pricing_catalog_audit_l
 - Visibility toggle (visible_to_client)
 - **Create new**: DEFAULT sequence → EFO-010+
 
-### Slice 6 — CRUD Tiers / Commercial Models / Country Factors
+### Slice 6 — CRUD Employment Types
+
+**List view** `/admin/pricing-catalog/employment-types`:
+- Columnas: code · label · currency · country · previsional? · fee USD · source_of_truth · active
+- Click row → detail
+
+**Detail + edit**:
+- Info: label_es/en, payment_currency, country_code, applies_previsional, applies_bonuses, source_of_truth
+- Rates defaults: previsional_pct_default, fee_monthly_usd_default, fee_pct_default
+- Historia audit
+- **Sinergia con payroll**: cuando `source_of_truth='greenhouse_payroll_chile_rates'`, panel lateral muestra rates vigentes leídos en SELECT-only de payroll tables (afp_rates, previred_indicators) para que admin valide drift. NO se puede triggerar sync desde aquí — ese es scope de TASK-468.
+
+**Create new**: form simple; code se escribe (no auto-sequence porque son string-based codes manuales)
+
+### Slice 7 — CRUD Tiers / Commercial Models / Country Factors
 
 - Estos son lookup tables chicos (4-11 filas). List view + inline edit (no separate detail page)
 - Tier: min/opt/max margin sliders + validation (min ≤ opt ≤ max)
