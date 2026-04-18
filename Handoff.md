@@ -23,6 +23,12 @@
 - **Notas operativas:**
   - Próximo en mi cola: esperar señal del usuario para arrancar TASK-464e/465/467 (Ola 4, requieren TASK-464a/b/c/d merged primero)
   - Codex sigue trabajando en `task/TASK-458-honest-label-pipeline-fix` (Ola 1)
+- **Coexistencia con Codex (heads-up):**
+  - `src/components/greenhouse/pricing/` ya existe como scaffold (README + .gitkeep). NO recrear. Es destino de los 9 componentes UI de Ola 4-5 (todos míos).
+  - `src/config/greenhouse-nomenclature.ts` tiene `GH_PRICING` ya commiteado. Si Codex en TASK-464a..d/468 necesita agregar copy (improbable, son backend/schema), append al final del bloque `GH_PRICING`, no cambiar entradas existentes ni renombrar campos — los consumers UI de Ola 4 ya están razonando con esos nombres.
+  - `siguiente ID disponible` ahora es `TASK-470` (no `469`). Si Codex crea task nueva, usar 470.
+  - TASK-469 está en `docs/tasks/complete/` — no reabrir; si surge necesidad de plano nuevo (componente no inventariado), crear `TASK-469-delta` o `TASK-470` separado.
+  - Rebase pattern: yo siempre `git pull --rebase origin develop` + `--force-with-lease` desde mi branch antes de push. Si Codex y yo estamos en branches paralelos, ninguno toca el branch del otro; CI es gate compartido.
 
 ## Sesion 2026-04-18 — Pricing seeds/tasks normalization contract hardening (docs only)
 
