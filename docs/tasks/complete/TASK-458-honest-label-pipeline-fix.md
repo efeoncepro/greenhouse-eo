@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -21,17 +21,17 @@
 
 ## Summary
 
-Quick fix UI (1-2h) para dejar de prometer "forecast comercial" en la tab actual de TASK-351. Renombrar labels + tooltips para que sea honesta mientras llega la reframe completa (TASK-457). Evita malinterpretación operativa de ejecutivos que miren el pipeline actual como forecast real.
+Quick fix UI (1-2h) para dejar de prometer "forecast comercial" en la tab actual de TASK-351. Renombrar labels + tooltips para que la vista refleje honestamente que hoy es seguimiento a grain de cotización mientras llega la reframe completa (TASK-457). Evita malinterpretación operativa de ejecutivos que miren el pipeline actual como forecast real.
 
 ## Why This Task Exists
 
-TASK-351 shipó a producción una tab "Pipeline" que materializa a grain de quote, pero el forecast comercial correcto es grain de deal. Entre el deploy actual y la entrega de TASK-457 (que requiere TASK-453 + 456), pueden pasar varias semanas. Durante ese tiempo, quien vea la tab puede interpretar los números como forecast real cuando en realidad es tracking de contratos/documentos en proceso.
+TASK-351 shipó a producción una tab "Pipeline" que materializa a grain de quote, pero el forecast comercial correcto es grain de deal. Entre el deploy actual y la entrega de TASK-457 (que requiere TASK-453 + 456), pueden pasar varias semanas. Durante ese tiempo, quien vea la tab puede interpretar los números como forecast real cuando en realidad es tracking de cotizaciones/documentos en proceso.
 
 Esta task es **zero-risk cosmética**: no toca backend ni lógica, solo reetiqueta + agrega un disclaimer.
 
 ## Goal
 
-- Sub-tab "Pipeline" renombrada a "Contratos activos" (o similar, validar con UX-writing)
+- Sub-tab "Pipeline" renombrada a una etiqueta honesta de quote-grain, por ejemplo "Cotizaciones en curso" (validar con `greenhouse-ux-content-accessibility`)
 - Tooltip/alert explicando que la vista es grain quote, no forecast de deals
 - Referencia a TASK-457 para la vista completa cuando esté disponible
 - No se modifica ningún endpoint, materializer, ni projection
@@ -49,7 +49,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - No tocar backend, solo UI + copy
-- Copy debe pasar por `greenhouse-ux-writing` skill
+- Copy debe pasar por `greenhouse-ux-content-accessibility`
 - No romper tests existentes
 
 ## Normative Docs
@@ -70,7 +70,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `src/views/greenhouse/finance/CommercialIntelligenceView.tsx` (solo labels + tooltip)
-- `src/config/greenhouse-nomenclature.ts` (opcional, si se surfacea labels allí)
+- `src/config/greenhouse-nomenclature.ts` (no requerido para este quick fix salvo que aparezca una necesidad real de reutilización)
 
 ## Current Repo State
 
@@ -93,9 +93,9 @@ Reglas obligatorias:
 
 ### Slice único — Rename + disclaimer
 
-- Sub-tab title: "Pipeline" → **"Contratos activos"** (confirmar con ux-writing)
-- Agregar `Alert severity='info'` al tope del sub-tab con copy del estilo: "Esta vista lista contratos (cotizaciones) en curso. El forecast comercial completo por deal llegará con la próxima iteración."
-- Tooltip en los KPIs "Pipeline abierto" / "Pipeline ponderado" clarificando que el agregado es por contrato, no por oportunidad comercial
+- Sub-tab title: "Pipeline" → **"Cotizaciones en curso"** (confirmar con `greenhouse-ux-content-accessibility`)
+- Agregar `Alert severity='info'` al tope del sub-tab con copy del estilo: "Esta vista sigue cotizaciones en curso. El pipeline comercial completo por deal llegará con la próxima iteración."
+- Tooltip en los KPIs "Pipeline abierto" / "Pipeline ponderado" clarificando que el agregado es por cotización emitida, no por oportunidad comercial
 - Opcional: agregar chip "beta" o "preview" en la tab
 
 ## Out of Scope
@@ -107,13 +107,13 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-### Copy propuesto (validar con `greenhouse-ux-writing`)
+### Copy propuesto (validar con `greenhouse-ux-content-accessibility`)
 
-- Sub-tab label: `Contratos activos`
+- Sub-tab label: `Cotizaciones en curso`
 - Alert al tope del tab:
-  > Esta vista muestra contratos en curso a grain de cotización. Para forecast comercial completo por deal (incluyendo oportunidades pre-quote), revisa la próxima release de Pipeline comercial unificado.
+  > Esta vista muestra cotizaciones en curso. Para forecast comercial completo por deal (incluyendo oportunidades pre-quote), revisa la próxima iteración del pipeline comercial unificado.
 - Tooltip en KPI "Pipeline abierto":
-  > Suma de montos cotizados en contratos activos (draft, enviada, aprobada). No incluye deals sin cotización emitida.
+  > Suma de montos cotizados en cotizaciones activas (draft, en revisión, enviadas y aprobadas). No incluye deals sin cotización emitida.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -121,11 +121,11 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Sub-tab "Pipeline" muestra label nuevo
-- [ ] Alert informativo visible al tope
-- [ ] Tooltips en KPIs añadidos
-- [ ] No se tocó backend (diff solo en UI files)
-- [ ] Tests existentes pasan sin cambios
+- [x] Sub-tab "Pipeline" muestra label nuevo
+- [x] Alert informativo visible al tope
+- [x] Tooltips en KPIs añadidos
+- [x] No se tocó backend (diff solo en UI files)
+- [x] Tests existentes pasan sin cambios
 
 ## Verification
 
@@ -136,11 +136,24 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] Chequeo de impacto cruzado con TASK-457 (esta task será absorbida cuando TASK-457 cierre)
+- [x] `Lifecycle` sincronizado con carpeta
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] Chequeo de impacto cruzado con TASK-457 (esta task será absorbida cuando TASK-457 cierre)
+
+## Execution Notes
+
+- Implementación final en `src/views/greenhouse/finance/CommercialIntelligenceView.tsx`
+- Label aplicado: `Cotizaciones en curso`
+- Disclaimer agregado al inicio del sub-tab para dejar explícito que la vista sigue cotizaciones ya emitidas y no el pipeline comercial completo por deal
+- Tooltips agregados en `Pipeline abierto` y `Pipeline ponderado` usando `HorizontalWithSubtitle.titleTooltip`
+- Verificación ejecutada:
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm test` ✓ (`1339 passed`, `2 skipped`)
+  - `pnpm test src/lib/payroll/` ✓ (`194 passed`, `29 files`)
+  - `pnpm lint` ✗ heredado: `src/app/layout.tsx` no resuelve `@assets/iconify-icons/generated-icons.css`
+  - `pnpm build` ✗ heredado: mismo fallo de resolución en `src/app/layout.tsx`
 
 ## Follow-ups
 
@@ -148,4 +161,4 @@ Reglas obligatorias:
 
 ## Open Questions
 
-- ¿Qué label exacto usa ux-writing? "Contratos activos" vs "Contratos en curso" vs "Pipeline documental". Resolver en Discovery invocando el skill.
+- ¿Qué label exacto usa el skill de UX? Base propuesta: "Cotizaciones en curso". Resolver en Discovery antes de escribir el copy final.

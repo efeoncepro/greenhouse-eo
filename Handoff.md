@@ -55,6 +55,33 @@
   - baseline payroll previamente verificado en este worktree: `194/194` tests passing, `29` files
   - `pnpm pg:connect:status` previamente verificado en este worktree: sin migraciones pendientes
 
+## Sesion 2026-04-18 — TASK-458 honest-label quick fix
+
+- **Estado:** `complete`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-codex`
+- **Rama:** `task/TASK-458-honest-label-pipeline-fix`
+- **Objetivo:** corregir el framing semántico de la sub-tab `Pipeline` de `CommercialIntelligenceView` sin tocar backend.
+- **Descubrimiento confirmado:**
+  - la vista actual consume `greenhouse_serving.quotation_pipeline_snapshots` vía `/api/finance/commercial-intelligence/pipeline`, por lo que el dato es `quote-grain`, no `deal-grain`
+  - `HorizontalWithSubtitle` ya soporta `titleTooltip`, así que el quick fix cabe en un diff local del view
+- **Entregado:**
+  - sub-tab `Pipeline` renombrada a `Cotizaciones en curso`
+  - alert informativo agregado al inicio del sub-tab
+  - tooltips agregados en `Pipeline abierto` y `Pipeline ponderado` usando el soporte existente de `HorizontalWithSubtitle`
+- **Ajustes documentales:**
+  - `TASK-458` movida a `complete/`
+  - la spec se corrigió para usar el skill vigente `greenhouse-ux-content-accessibility`
+  - la propuesta de label se ajustó a lenguaje honesto de cotización (`Cotizaciones en curso`) en vez de `Contratos activos`
+- **Validado:**
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm test` ✓ (`1339 passed`, `2 skipped`)
+  - `pnpm test src/lib/payroll/` ✓ (`194 passed`, `29` files)
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` → sin matches ✓
+- **Gap heredado de repo base:**
+  - `pnpm lint` ✗
+  - `pnpm build` ✗
+  - ambos fallan por la misma resolución preexistente en `src/app/layout.tsx`: `@assets/iconify-icons/generated-icons.css`
+
 ## Sesion 2026-04-18 — TASK-337 Person ↔ Legal Entity Relationship Runtime Foundation
 
 - **Estado:** `complete`, entregado.
