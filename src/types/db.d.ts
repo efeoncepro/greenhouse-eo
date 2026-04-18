@@ -124,6 +124,8 @@ export interface GreenhouseAiNexaThreads {
 }
 
 export interface GreenhouseAiToolCatalog {
+  applicability_tags: Generated<string[]>;
+  applicable_business_lines: Generated<string[]>;
   cost_model: string;
   created_at: Generated<Timestamp>;
   credit_unit_cost: Numeric | null;
@@ -133,7 +135,13 @@ export interface GreenhouseAiToolCatalog {
   description: string | null;
   fin_supplier_id: string | null;
   icon_url: string | null;
+  includes_in_addon: Generated<boolean>;
   is_active: Generated<boolean>;
+  notes_for_quoting: string | null;
+  prorated_cost_usd: Numeric | null;
+  prorated_price_usd: Numeric | null;
+  prorating_qty: Numeric | null;
+  prorating_unit: string | null;
   provider_id: string;
   sort_order: Generated<number>;
   subscription_amount: Numeric | null;
@@ -143,6 +151,7 @@ export interface GreenhouseAiToolCatalog {
   tool_category: string;
   tool_id: string;
   tool_name: string;
+  tool_sku: Generated<string | null>;
   tool_subcategory: string | null;
   updated_at: Generated<Timestamp>;
   vendor: string | null;
@@ -252,6 +261,31 @@ export interface GreenhouseCommercialMarginTargets {
   target_id: Generated<string>;
   target_margin_pct: Numeric;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialOverheadAddons {
+  active: Generated<boolean>;
+  addon_id: Generated<string>;
+  addon_name: string;
+  addon_sku: Generated<string>;
+  addon_type: string;
+  applicable_to: Generated<string[]>;
+  category: string;
+  conditions: string | null;
+  cost_internal_usd: Generated<Numeric>;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  effective_from: Generated<Timestamp>;
+  final_price_pct: Numeric | null;
+  final_price_usd: Numeric | null;
+  margin_pct: Numeric | null;
+  minimum_amount_usd: Numeric | null;
+  notes: string | null;
+  pct_max: Numeric | null;
+  pct_min: Numeric | null;
+  unit: string | null;
+  updated_at: Generated<Timestamp>;
+  visible_to_client: Generated<boolean>;
 }
 
 export interface GreenhouseCommercialProductCatalog {
@@ -5086,6 +5120,7 @@ export interface DB {
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
+  "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;

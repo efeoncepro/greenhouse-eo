@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado y validado`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none` (puede ir en paralelo con 464a y 464b)
@@ -38,7 +38,7 @@ Los overheads son DIFERENTES de tools: son fees/markups/ajustes que se aplican a
 ## Goal
 
 - `greenhouse_ai.tool_catalog` (o promovida a `commercial.tool_catalog`) extendida con prorrateo + applicable_business_lines + includes_in_addon
-- Poblado con los 26 tools del Excel via seeder idempotente
+- Poblado con las 26 filas útiles del Excel via seeder idempotente, saltando placeholders y filas vacías
 - `greenhouse_commercial.overhead_addons` creada con seed de los 9 addons del Excel
 - Reader helpers que sirvan al pricing engine (TASK-464d) y UI (TASK-464e)
 
@@ -62,7 +62,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `data/pricing/seed/tool-catalog.csv` (26 tools)
+- `data/pricing/seed/tool-catalog.csv` (26 tools útiles + placeholders a omitir)
 - `data/pricing/seed/overhead-addons.csv` (9 addons)
 - Hojas "Herramientas" y "Addons - Overheads" del Excel
 - `greenhouse_ai.tool_catalog` schema existente
@@ -90,6 +90,8 @@ Reglas obligatorias:
 - `scripts/seed-overhead-addons.ts`
 - `src/lib/commercial/tool-catalog-store.ts` (reader ampliado)
 - `src/lib/commercial/overhead-addons-store.ts`
+- `src/lib/commercial/tool-catalog-seed.ts`
+- `src/lib/commercial/overhead-addons-seed.ts`
 - `src/types/db.d.ts` (auto-regen)
 
 ## Current Repo State
@@ -104,7 +106,7 @@ Reglas obligatorias:
 
 ### Gap
 
-- `greenhouse_ai.tool_catalog` NO tiene: `prorating_qty`, `prorating_unit`, `prorated_cost_usd`, `prorated_price_usd`, `applicable_business_lines` (array), `includes_in_addon` (bool), `notes_for_quoting`
+- `greenhouse_ai.tool_catalog` NO tiene: `tool_sku`, `prorating_qty`, `prorating_unit`, `prorated_cost_usd`, `prorated_price_usd`, `applicable_business_lines` (array), `applicability_tags` (array), `includes_in_addon` (bool), `notes_for_quoting`
 - No existe tabla de overhead addons (PM Fee, Setup Aug, etc.)
 - Excel tiene info rica sobre prorrateo ("Envato Elements → 4 proyectos/mes → $8.25 prorated") que no está en DB
 
@@ -112,8 +114,10 @@ Reglas obligatorias:
 
 - Source of truth operativo: `data/pricing/seed/tool-catalog.csv`. El `.xlsx` solo sirve para contraste humano.
 - `tool_sku`, `Nombre de la Herramienta` y la categoría textual son obligatorios para sembrar una fila.
+- Las filas placeholder (`ETG-027+`) y filas completamente vacías se omiten; no deben crear registros ni avanzar secuencias.
 - `Tipo`, `Unidad`, `Frecuencia`, `Tipo de prorrateo` y `Aplicable a` se resuelven vía diccionarios y helpers code-versioned; no deben persistirse como texto libre cuando el campo destino es canónico.
 - `Costo Total (USD)` puede venir como `N/A`; en ese caso la fila sigue siendo válida, pero el costo queda `NULL` y el seeder debe registrar warning explícito.
+- `provider_id` no puede quedar `NULL`: el seeder debe resolver un provider existente o crear/upsertar uno de forma determinística antes de insertar el tool.
 - Los callers existentes sobre `greenhouse_ai.tool_catalog` no deben romperse; por eso toda nueva semántica entra como columnas aditivas, no como reemplazo destructivo del modelo actual.
 
 ## Addon Formula Parsing
@@ -131,7 +135,7 @@ Reglas obligatorias:
 ## Applicability Semantics
 
 - `applicable_business_lines` solo admite business lines canónicas del repo (`globe`, `wave`, `reach`, `efeonce_digital`, `crm_solutions` y equivalentes confirmados).
-- Cualquier noción que no sea una business line real debe vivir fuera de ese array, por ejemplo como `applicability_tags` o en `applicable_to`:
+- Cualquier noción que no sea una business line real debe vivir fuera de ese array, en `applicability_tags` o `applicable_to`:
   - `Staff Augmentation`
   - `Todos`
   - `Efeonce` cuando signifique operación interna y no BL formal
@@ -147,7 +151,9 @@ Reglas obligatorias:
 
 ```sql
 -- SKU auto-generation via PostgreSQL sequence para tools nuevos añadidos post-seed.
--- Seed inserta SKUs explícitos del CSV (ETG-001..026). Admin UI inserta sin sku → DEFAULT genera ETG-027+.
+-- Seed inserta SKUs explícitos del CSV (ETG-001..026) y omite placeholders.
+-- La columna nace nullable para no backfillear SKUs accidentales sobre filas legacy;
+-- luego se le deja DEFAULT para inserts futuros y se sincroniza la sequence al max seeded.
 CREATE SEQUENCE IF NOT EXISTS greenhouse_ai.tool_sku_seq START WITH 27;
 
 CREATE OR REPLACE FUNCTION greenhouse_ai.generate_tool_sku()
@@ -158,14 +164,22 @@ END;
 $$ LANGUAGE plpgsql;
 
 ALTER TABLE greenhouse_ai.tool_catalog
-  ADD COLUMN IF NOT EXISTS tool_sku text UNIQUE DEFAULT greenhouse_ai.generate_tool_sku(),  -- 'ETG-001' explícito (seed) o auto 'ETG-027+'
+  ADD COLUMN IF NOT EXISTS tool_sku text,
   ADD COLUMN IF NOT EXISTS prorating_qty numeric(10,2),                   -- '4' de "4 proyectos/mes"
   ADD COLUMN IF NOT EXISTS prorating_unit text,                             -- 'proyectos_mes' | 'clientes_activos' | 'usuarios_mes' | 'proyectos'
   ADD COLUMN IF NOT EXISTS prorated_cost_usd numeric(12,4),                 -- pre-calculado desde Excel ($20 desde $80/4)
   ADD COLUMN IF NOT EXISTS prorated_price_usd numeric(12,4),                -- con markup (ej. $23 desde $20×1.15)
   ADD COLUMN IF NOT EXISTS applicable_business_lines text[],                -- ['globe', 'wave'] etc
+  ADD COLUMN IF NOT EXISTS applicability_tags text[],                       -- ['staff_augmentation', 'internal_ops', 'all_business_lines']
   ADD COLUMN IF NOT EXISTS includes_in_addon boolean DEFAULT FALSE,         -- flag del Excel ✅/❌
   ADD COLUMN IF NOT EXISTS notes_for_quoting text;
+
+CREATE UNIQUE INDEX IF NOT EXISTS greenhouse_ai_tool_catalog_tool_sku_idx
+  ON greenhouse_ai.tool_catalog (tool_sku)
+  WHERE tool_sku IS NOT NULL;
+
+ALTER TABLE greenhouse_ai.tool_catalog
+  ALTER COLUMN tool_sku SET DEFAULT greenhouse_ai.generate_tool_sku();
 ```
 
 Compatibilidad: callers existentes (member_tool_licenses, provider_tooling_snapshots) siguen funcionando — solo agrega columnas opcionales.
@@ -195,7 +209,7 @@ CREATE TABLE greenhouse_commercial.overhead_addons (
     'overhead_fixed',     -- flat cost in USD
     'fee_percentage',     -- % del subtotal del quote
     'fee_fixed',          -- flat fee USD aplicado 1 vez
-    'fee_fixed_monthly',  -- flat fee USD por período
+    'resource_month',     -- 1 mes del costo del recurso
     'adjustment_pct'      -- discount/bonus +/- %
   )),
   unit text,                                          -- 'Mes' | 'Proyecto / Mes' | 'Único (setup)' | '% del monto' | 'Usuario'
@@ -228,8 +242,9 @@ GRANT SELECT ON greenhouse_commercial.overhead_addons TO greenhouse_runtime;
 - Para cada fila con `Nombre de la Herramienta` no vacío:
   - UPSERT por `tool_sku`
   - Si es nueva, INSERT en tool_catalog con: sku, name, category, type → cost_model mapeado, subscription_amount desde "Costo Total (USD)", billing_cycle desde "Frecuencia"
-  - Update prorating_qty, prorating_unit, prorated_cost_usd, prorated_price_usd, applicable_business_lines (parse "Globe / Wave" → ['globe', 'wave']), includes_in_addon (parse ✅/❌)
-- Intenta resolver `provider_id` por nombre vendor (match fuzzy contra `greenhouse_core.providers.provider_name`); si no encuentra, deja NULL y loguea warning
+  - Update prorating_qty, prorating_unit, prorated_cost_usd, prorated_price_usd, applicable_business_lines + applicability_tags, includes_in_addon (parse ✅/❌)
+- Omite placeholders (`ETG-027+` sin nombre) y filas vacías
+- Resuelve `provider_id` por diccionario determinístico tool/vendor → provider, y si no existe hace upsert en `greenhouse_core.providers` usando vocabulario compatible con runtime actual (`organization` / `platform` / `financial_vendor`)
 
 **`seed-overhead-addons.ts`**:
 - Lee `data/pricing/seed/overhead-addons.csv`
@@ -237,8 +252,8 @@ GRANT SELECT ON greenhouse_commercial.overhead_addons TO greenhouse_runtime;
   - EFO-001 Herramientas Creativas → overhead_fixed USD $50/mes
   - EFO-002 MarTech/HubSpot → overhead_fixed USD $80/mes
   - EFO-003 PM Fee → fee_percentage 10% del subtotal
-  - EFO-004 Recruiting & Onboarding Staff Aug → fee_fixed USD (1 mes del costo)
-  - EFO-005 Renovación Staff Aug → fee_percentage_monthly 5% valor mensual
+  - EFO-004 Recruiting & Onboarding Staff Aug → resource_month (1 mes del costo)
+  - EFO-005 Renovación Staff Aug → fee_percentage 5% con `unit='Mensual'`
   - EFO-006 Costos Transaccionales → fee_percentage rango 4-7%
   - EFO-007 AI & Data Infra → fee_percentage 3% con minimum USD 30
   - EFO-008 Efeonce Operational Overhead (base) → fee_percentage 8-10% global, `visible_to_client=FALSE`
@@ -271,15 +286,15 @@ CSV column                   → DB field
 SKU                          → tool_sku ('ETG-001')
 Categoría                    → tool_category
 Nombre                       → tool_name
-Tipo                         → infer cost_model (SaaS/Licencia → 'subscription', Recurso → 'one_time_resource')
-Unidad                       → subscription_billing_cycle (Mes → 'monthly', Año → 'annual', Usuario → 'per_seat')
-Costo Total (USD)            → subscription_amount (full) + split per-unit
+Tipo                         → infer cost_model compatible con AI tooling (`subscription`, `included`, `hybrid`)
+Unidad                       → helper semántico; no se persiste raw salvo cuando aporta a recurrence/seat semantics
+Costo Total (USD)            → subscription_amount
 Frecuencia                   → subscription_billing_cycle
 Prorrateo Estimado           → prorating_qty
 Tipo de prorrateo            → prorating_unit
 Costo Prorrateado (USD)      → prorated_cost_usd
 Precio Prorrateado           → prorated_price_usd
-Aplicable a                  → applicable_business_lines (parse 'Globe / Wave' → array)
+Aplicable a                  → applicable_business_lines + applicability_tags
 Incluye en Add-on            → includes_in_addon (✅ → true, ❌ → false)
 Comentarios                  → notes_for_quoting
 ```
@@ -289,7 +304,7 @@ Comentarios                  → notes_for_quoting
 - `overhead_fixed`: costo fijo USD agregado como línea (ej. "Creative Tools overhead $50/mes")
 - `fee_percentage`: calcula como % del subtotal del quote (ej. PM Fee 10% × $10K = $1K)
 - `fee_fixed`: flat USD fijo (ej. setup fee $500)
-- `fee_fixed_monthly`: flat USD recurrente mensual
+- `resource_month`: equivale a 1 mes del costo del recurso resuelto por el engine
 - `adjustment_pct`: discount/bonus aplicado al total final (puede ser +/-)
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -300,12 +315,13 @@ Comentarios                  → notes_for_quoting
 
 - [ ] ALTER de `greenhouse_ai.tool_catalog` aplica sin romper columnas existentes
 - [ ] `greenhouse_commercial.overhead_addons` creada con grants correctos
-- [ ] Seeder de tools inserta/actualiza 26 tools sin duplicar
+- [ ] Seeder de tools inserta/actualiza 26 tools útiles sin duplicar y omite placeholders/vacíos
 - [ ] Seeder de overheads inserta 9 addons
 - [ ] `getToolBySku('ETG-019')` devuelve Figma con prorating_qty=3, prorated_cost_usd=20, applicable_business_lines=['wave']
 - [ ] `getOverheadAddonBySku('EFO-003')` devuelve PM Fee tipo fee_percentage con `final_price_pct=0.10`
 - [ ] `resolveApplicableAddons({ staffingModel: 'named_resources', ... })` incluye EFO-004 (Recruiting) y EFO-005 (Renovación)
 - [ ] Member tool licenses + provider tooling snapshots NO se rompen (regression test)
+- [ ] Providers faltantes del catálogo quedan resueltos sin violar `provider_id NOT NULL`
 
 ## Verification
 
@@ -333,4 +349,4 @@ Comentarios                  → notes_for_quoting
 ## Open Questions
 
 - ¿Queda `ai.tool_catalog` con el prefijo `ai_` o promovemos al schema `commercial`? Propuesta: dejar ai_ por esta task (no breaking), evaluar rename en follow-up. Mientras tanto, TASK-464d/e consumen directo desde `ai.tool_catalog`.
-- 6 proveedores nuevos que aparecen en el Excel y no están en `greenhouse_core.providers` (ej. Envato, Frame.io, Cloudways) — ¿crear provider rows como parte del seed, o dejar `provider_id=NULL` y que alguien los cree manual después? Propuesta: crear providers automáticamente con `provider_type='tool_vendor'` si no existen.
+- Los providers faltantes del Excel se crean/upsertan como parte del seed; `provider_id=NULL` no es opción porque el schema runtime actual no lo permite.

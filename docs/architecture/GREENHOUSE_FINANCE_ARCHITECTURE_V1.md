@@ -6,6 +6,19 @@
 
 ---
 
+## Delta 2026-04-18 — TASK-464c Tool Catalog + Overhead Addons Foundation
+
+- Finance quotation pricing gana la capa de costos directos y fees complementarios que faltaba para el engine v2:
+  - `greenhouse_ai.tool_catalog` ahora expone `tool_sku`, prorrateo, business lines y tags de aplicabilidad
+  - `greenhouse_commercial.overhead_addons` modela los 9 fees/overheads de Efeonce fuera del catálogo de tools
+- Implicación operativa:
+  - el runtime actual de TASK-346 no cambia todavía su cálculo legacy
+  - `TASK-464d` ya puede consumir herramientas y overheads desde stores canónicos, sin volver al Excel ni mezclar tool costs con markups/fees
+- Guardrails explícitos:
+  - el catálogo de tools sigue compartido con AI tooling; no se crea identidad paralela en Finance
+  - los addons no viven en `greenhouse_finance.*`; se tratan como inputs comerciales del quote engine
+  - reseed idempotente ya verificado para `26` tools activas y `9` addons
+
 ## Delta 2026-04-18 — TASK-464b Pricing Governance Tables
 
 - Finance quotation pricing sigue sin cutover inmediato, pero gana la capa de governance que el engine v2 ya puede consumir:

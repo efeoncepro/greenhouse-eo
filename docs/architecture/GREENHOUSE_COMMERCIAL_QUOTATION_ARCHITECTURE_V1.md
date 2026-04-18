@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.11
+> **Version:** 2.12
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-18 — v2.12: TASK-464c tool catalog + overhead addons foundation implementada. `greenhouse_ai.tool_catalog` se extiende con `tool_sku`, prorrateo, `applicable_business_lines`, `applicability_tags`, `includes_in_addon` y `notes_for_quoting`; se crea `greenhouse_commercial.overhead_addons` con 9 addons canonizados (`EFO-001..009`). Nuevos módulos `tool-catalog-store.ts`, `overhead-addons-store.ts`, `tool-catalog-events.ts` y seeders idempotentes `scripts/seed-tool-catalog.ts` / `scripts/seed-overhead-addons.ts`. El catálogo comercial sigue conviviendo con AI tooling sin romper consumers existentes.
 > **Updated:** 2026-04-18 — v2.11: TASK-464b pricing governance tables implementada. Nuevas tablas `role_tier_margins`, `service_tier_margins`, `commercial_model_multipliers`, `country_pricing_factors` y `fte_hours_guide` en `greenhouse_commercial`, con versionado liviano por `effective_from`, readers cacheados en `pricing-governance-store.ts` y seeder idempotente `scripts/seed-pricing-governance.ts`. El seed real dejó `21` drifts rol→tier auditados contra `TASK-464a`; el catálogo canónico sigue ganando y la reconciliación queda para consumers posteriores.
 > **Updated:** 2026-04-18 — v2.10: TASK-468 commercial-side payroll employment type bridge. Nueva tabla `greenhouse_commercial.employment_type_aliases` para resolver vocabulario factual de payroll (`contract_type`) hacia `employment_types` canónicos sin tocar `greenhouse_payroll.*`. Nuevos módulos `employment-type-alias-store.ts`, `employment-type-alias-normalization.ts`, `payroll-rates-bridge.ts` y script `scripts/audit-payroll-contract-types.ts`. El bridge queda read-only y auditable; el cutover del engine sigue diferido a TASK-464d.
 > **Updated:** 2026-04-18 — v2.9: TASK-464a sellable roles catalog foundation. Nuevas tablas `sellable_roles`, `employment_types`, `sellable_role_cost_components`, `role_employment_compatibility`, `sellable_role_pricing_currency` y sequence `sellable_role_sku_seq` en `greenhouse_commercial`. Seeder idempotente `scripts/seed-sellable-roles.ts` consume `data/pricing/seed/sellable-roles-pricing.csv` (32 roles activos, 54 placeholders) y publica eventos `commercial.sellable_role.{created,cost_updated,pricing_updated}`. `role_rate_cards` sigue en coexistencia temporal hasta TASK-464d.
@@ -9,6 +10,36 @@
 > **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-18 — TASK-464c Tool Catalog Extension + Overhead Addons
+
+- `greenhouse_ai.tool_catalog` pasa a ser también el catálogo comercial runtime de herramientas, sin moverlo de schema ni romper AI tooling:
+  - columnas nuevas: `tool_sku`, `prorating_qty`, `prorating_unit`, `prorated_cost_usd`, `prorated_price_usd`, `applicable_business_lines`, `applicability_tags`, `includes_in_addon`, `notes_for_quoting`
+  - secuencia `greenhouse_ai.tool_sku_seq` + `generate_tool_sku()` para altas futuras `ETG-027+`
+  - índices nuevos: unique parcial por `tool_sku` y GIN para `applicable_business_lines` / `applicability_tags`
+- Nuevo catálogo complementario `greenhouse_commercial.overhead_addons`:
+  - secuencia `overhead_addon_sku_seq` + `generate_overhead_addon_sku()`
+  - 9 addons canonizados `EFO-001..009`
+  - enum operativo actual: `overhead_fixed`, `fee_percentage`, `fee_fixed`, `resource_month`, `adjustment_pct`
+- Contrato de normalización nuevo:
+  - business lines canónicas viven en `applicable_business_lines`
+  - tags no-BL (`all_business_lines`, `staff_augmentation`, `internal_ops`) viven en `applicability_tags`
+  - `provider_id` queda siempre resuelto y no puede degradar a `NULL`
+  - filas placeholder y vacías del CSV no crean registros ni avanzan secuencias
+- Runtime nuevo disponible para consumers:
+  - `src/lib/commercial/tool-catalog-store.ts`
+  - `src/lib/commercial/overhead-addons-store.ts`
+  - `src/lib/commercial/tool-catalog-events.ts`
+  - `resolveApplicableAddons()` ya resuelve `named_resources` -> `EFO-003/EFO-004/EFO-005`
+- Seeder contract:
+  - `scripts/seed-tool-catalog.ts` consume `tool-catalog.csv` y deja `26` rows activas sembradas
+  - `scripts/seed-overhead-addons.ts` consume `overhead-addons.csv` y deja `9` rows sembradas
+  - rerun idempotente verificado (`0 inserted / 0 updated` en ambos)
+- Coexistencia:
+  - AI tooling readers y `provider_tooling_snapshots` siguen usando `greenhouse_ai.tool_catalog`
+  - `TASK-464d` toma este catálogo extendido como foundation del engine, no reinterpreta CSVs ni reconstruye tooling
 
 ---
 

@@ -2,6 +2,14 @@
 
 ## 2026-04-18
 
+### 2026-04-18 — TASK-464c: foundation canónica de tools comerciales y overhead addons
+
+- `greenhouse_ai.tool_catalog` se extiende sin romper AI tooling: ahora soporta `tool_sku`, prorrateo, business lines/tags de aplicabilidad, `includes_in_addon` y `notes_for_quoting`.
+- Nace `greenhouse_commercial.overhead_addons` con 9 addons canonizados (`EFO-001..009`) para fees/markups/ajustes que no son tools individuales.
+- Nuevos stores backend `tool-catalog-store.ts` y `overhead-addons-store.ts`, más `tool-catalog-events.ts` para publicar `ai_tool.created/updated` y refrescar costos de licencias cuando cambia el pricing del catálogo.
+- Seeders nuevos `scripts/seed-tool-catalog.ts` y `scripts/seed-overhead-addons.ts` consumen los CSVs pricing de Efeonce y quedaron verificados como idempotentes.
+- Se corrige un gap de permisos en secuencias (`tool_sku_seq`, `overhead_addon_sku_seq`) con migración adicional de grants para que los reseeds runtime puedan resincronizar secuencias sin fallar.
+
 ### 2026-04-18 — TASK-337 materializa la capa runtime persona ↔ entidad legal
 
 - Se crea `greenhouse_core.person_legal_entity_relationships` como foundation explícita para modelar vínculos `identity_profile ↔ legal entity`, sin colgar esa semántica de `user`, `member`, `space` ni `organization_type`.

@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-464c Tool Catalog Extension + Overhead Addons (cierre)
+
+- **Owner:** Codex
+- **Rama:** `develop`
+- **Estado:** implementado y validado
+- **Entregables:**
+  - migraciones `20260418214928987_task-464c-tool-catalog-overhead-addons.sql` y `20260418220156821_task-464c-sequence-grants.sql`
+  - `src/lib/commercial/tool-catalog-seed.ts`
+  - `src/lib/commercial/overhead-addons-seed.ts`
+  - `src/lib/commercial/tool-catalog-store.ts`
+  - `src/lib/commercial/overhead-addons-store.ts`
+  - `src/lib/commercial/tool-catalog-events.ts`
+  - `scripts/seed-tool-catalog.ts`
+  - `scripts/seed-overhead-addons.ts`
+  - tests `src/lib/commercial/__tests__/tool-catalog-seed.test.ts` y `src/lib/commercial/__tests__/overhead-addons-seed.test.ts`
+- **Resultado operativo:**
+  - `greenhouse_ai.tool_catalog` quedó extendida con `tool_sku`, prorrateo, BLs/tags de aplicabilidad, `includes_in_addon` y `notes_for_quoting`
+  - `greenhouse_commercial.overhead_addons` quedó sembrada con `9` addons (`EFO-001..009`)
+  - el seed de tools dejó `26` filas activas, `7` placeholders omitidos y `3` filas vacías omitidas
+  - `provider_id` se resuelve determinísticamente y el catálogo convive con AI tooling sin romper readers existentes
+  - `resolveApplicableAddons({ staffingModel: 'named_resources' })` devuelve `EFO-003`, `EFO-004` y `EFO-005`
+- **Incidente resuelto durante implementación:**
+  - los seeders fallaban al sincronizar secuencias porque `greenhouse_runtime` no tenía `UPDATE` sobre `tool_sku_seq` / `overhead_addon_sku_seq`
+  - se corrigió con migración nueva de grants + bootstrap SQL alineado, no con workaround ad hoc
+- **Validaciones corridas:**
+  - `pnpm exec vitest run src/lib/commercial/__tests__/tool-catalog-seed.test.ts src/lib/commercial/__tests__/overhead-addons-seed.test.ts`
+  - `pnpm tsx scripts/seed-tool-catalog.ts --output /tmp/task-464c-tool-catalog-dry-run.json`
+  - `pnpm tsx scripts/seed-overhead-addons.ts --output /tmp/task-464c-overhead-addons-dry-run.json`
+  - `pnpm pg:connect:migrate`
+  - `pnpm tsx scripts/seed-tool-catalog.ts --apply --output /tmp/task-464c-tool-catalog-seed.json`
+  - `pnpm tsx scripts/seed-overhead-addons.ts --apply --output /tmp/task-464c-overhead-addons-seed.json`
+  - rerun idempotente de ambos seeders (`0 inserted / 0 updated`)
+  - `pnpm test src/lib/payroll/` -> `29` files / `194` tests passing
+- **Artifacts:**
+  - `/tmp/task-464c-tool-catalog-dry-run.json`
+  - `/tmp/task-464c-overhead-addons-dry-run.json`
+  - `/tmp/task-464c-tool-catalog-seed.json`
+  - `/tmp/task-464c-overhead-addons-seed.json`
+  - `/tmp/task-464c-tool-catalog-seed-rerun.json`
+  - `/tmp/task-464c-overhead-addons-seed-rerun.json`
+
 ## Sesion 2026-04-18 — TASK-464b Pricing Governance Tables (cierre)
 
 - **Owner:** Codex

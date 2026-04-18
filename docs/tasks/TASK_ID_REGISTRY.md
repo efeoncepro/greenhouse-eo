@@ -515,7 +515,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-463` | `to-do`       | Unified Quote Builder + Bidirectional HubSpot Bridge | `docs/tasks/to-do/TASK-463-unified-quote-builder-hubspot-bidirectional.md` |
 | `TASK-464a` | `to-do`      | Sellable Roles Catalog Canonical + Seed | `docs/tasks/to-do/TASK-464a-sellable-roles-catalog-canonical.md` |
 | `TASK-464b` | `to-do`      | Pricing Governance Tables (tiers + commercial models + country factors + FTE) | `docs/tasks/to-do/TASK-464b-pricing-governance-tables.md` |
-| `TASK-464c` | `to-do`      | Tool Catalog Extension + Overhead Addons Canonical | `docs/tasks/to-do/TASK-464c-tool-catalog-extension-overhead-addons.md` |
+| `TASK-464c` | `complete` | Tool Catalog Extension + Overhead Addons Canonical | `docs/tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md` |
 | `TASK-464d` | `to-do`      | Pricing Engine Full-Model Refactor (v2) | `docs/tasks/to-do/TASK-464d-pricing-engine-full-model-refactor.md` |
 | `TASK-464e` | `to-do`      | Quote Builder UI Exposure (role/tool/addon pickers + gated cost stack) | `docs/tasks/to-do/TASK-464e-quote-builder-ui-exposure.md` |
 | `TASK-465` | `to-do`       | Service Composition Catalog + Admin UI + Quote Picker | `docs/tasks/to-do/TASK-465-service-composition-catalog-ui.md` |
