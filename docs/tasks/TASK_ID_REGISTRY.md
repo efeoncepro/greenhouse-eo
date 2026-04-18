@@ -520,3 +520,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-464e` | `to-do`      | Quote Builder UI Exposure (role/tool/addon pickers + gated cost stack) | `docs/tasks/to-do/TASK-464e-quote-builder-ui-exposure.md` |
 | `TASK-465` | `to-do`       | Service Composition Catalog + Admin UI + Quote Picker | `docs/tasks/to-do/TASK-465-service-composition-catalog-ui.md` |
 | `TASK-466` | `to-do`       | Multi-Currency Quote Output (client view + PDF + email) | `docs/tasks/to-do/TASK-466-multi-currency-quote-output.md` |
+| `TASK-467` | `to-do`       | Pricing Catalog Admin UI (self-service CRUD) | `docs/tasks/to-do/TASK-467-pricing-catalog-admin-ui.md` |

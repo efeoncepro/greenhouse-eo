@@ -111,9 +111,22 @@ Reglas obligatorias:
 ### Slice 1 — Schema
 
 ```sql
+-- SKU auto-generation via PostgreSQL sequence.
+-- Seed inserta SKUs explícitos desde el CSV (ECG-001..ECG-033).
+-- Admin UI inserta SIN role_sku → DEFAULT dispara nextval → ECG-034, ECG-035...
+-- Race-safe + SKUs estables sin recyclage.
+CREATE SEQUENCE IF NOT EXISTS greenhouse_commercial.sellable_role_sku_seq START WITH 34;
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.generate_sellable_role_sku()
+RETURNS text AS $$
+BEGIN
+  RETURN 'ECG-' || LPAD(nextval('greenhouse_commercial.sellable_role_sku_seq')::text, 3, '0');
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE greenhouse_commercial.sellable_roles (
   role_id text PRIMARY KEY DEFAULT 'sr-' || gen_random_uuid(),
-  role_sku text UNIQUE NOT NULL,                    -- 'ECG-001'
+  role_sku text UNIQUE NOT NULL DEFAULT greenhouse_commercial.generate_sellable_role_sku(),  -- 'ECG-001' explícito (seed) o auto 'ECG-034+' (admin UI)
   role_code text NOT NULL,                          -- slug normalizado, ej. 'creative_operations_lead'
   role_label_es text NOT NULL,                      -- 'Creative Operations Lead'
   role_label_en text,
@@ -177,9 +190,11 @@ GRANT SELECT ON greenhouse_commercial.sellable_role_cost_components TO greenhous
 GRANT SELECT ON greenhouse_commercial.sellable_role_pricing_currency TO greenhouse_runtime;
 ```
 
-### Slice 2 — Seeder idempotente
+### Slice 2 — Seeder idempotente (respeta SKUs explícitos del CSV)
 
 - Script `scripts/seed-sellable-roles.ts`:
+- **Inserta con `role_sku` EXPLÍCITO** desde el CSV (ECG-001..033) → DEFAULT de sequence no se dispara
+- Al final del seed, `SELECT setval('greenhouse_commercial.sellable_role_sku_seq', 34, false)` para garantizar que el próximo INSERT sin SKU arranque en 34 (evita colisión si el seed se re-ejecuta con CSVs que ahora tienen más roles)
   - Lee `data/pricing/seed/sellable-roles-pricing.csv`
   - Parsea 33 roles activos (filtra filas con `Rol` vacío)
   - Normaliza `category` a lowercase (Creativo → creativo)

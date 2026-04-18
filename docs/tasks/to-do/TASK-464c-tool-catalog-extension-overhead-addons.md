@@ -117,8 +117,19 @@ Reglas obligatorias:
 ### Slice 1 — Extender `greenhouse_ai.tool_catalog`
 
 ```sql
+-- SKU auto-generation via PostgreSQL sequence para tools nuevos añadidos post-seed.
+-- Seed inserta SKUs explícitos del CSV (ETG-001..026). Admin UI inserta sin sku → DEFAULT genera ETG-027+.
+CREATE SEQUENCE IF NOT EXISTS greenhouse_ai.tool_sku_seq START WITH 27;
+
+CREATE OR REPLACE FUNCTION greenhouse_ai.generate_tool_sku()
+RETURNS text AS $$
+BEGIN
+  RETURN 'ETG-' || LPAD(nextval('greenhouse_ai.tool_sku_seq')::text, 3, '0');
+END;
+$$ LANGUAGE plpgsql;
+
 ALTER TABLE greenhouse_ai.tool_catalog
-  ADD COLUMN IF NOT EXISTS tool_sku text UNIQUE,                           -- 'ETG-001' del Excel
+  ADD COLUMN IF NOT EXISTS tool_sku text UNIQUE DEFAULT greenhouse_ai.generate_tool_sku(),  -- 'ETG-001' explícito (seed) o auto 'ETG-027+'
   ADD COLUMN IF NOT EXISTS prorating_qty numeric(10,2),                   -- '4' de "4 proyectos/mes"
   ADD COLUMN IF NOT EXISTS prorating_unit text,                             -- 'proyectos_mes' | 'clientes_activos' | 'usuarios_mes' | 'proyectos'
   ADD COLUMN IF NOT EXISTS prorated_cost_usd numeric(12,4),                 -- pre-calculado desde Excel ($20 desde $80/4)
@@ -135,9 +146,20 @@ Compatibilidad: callers existentes (member_tool_licenses, provider_tooling_snaps
 ### Slice 2 — Schema de overhead addons
 
 ```sql
+-- SKU auto-generation para addons nuevos añadidos post-seed.
+-- Seed inserta SKUs explícitos del CSV (EFO-001..009). Admin UI → DEFAULT genera EFO-010+.
+CREATE SEQUENCE IF NOT EXISTS greenhouse_commercial.overhead_addon_sku_seq START WITH 10;
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.generate_overhead_addon_sku()
+RETURNS text AS $$
+BEGIN
+  RETURN 'EFO-' || LPAD(nextval('greenhouse_commercial.overhead_addon_sku_seq')::text, 3, '0');
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE greenhouse_commercial.overhead_addons (
   addon_id text PRIMARY KEY DEFAULT 'ov-' || gen_random_uuid(),
-  addon_sku text UNIQUE NOT NULL,                    -- 'EFO-001'
+  addon_sku text UNIQUE NOT NULL DEFAULT greenhouse_commercial.generate_overhead_addon_sku(),  -- 'EFO-001' (seed) o auto 'EFO-010+'
   category text NOT NULL,                            -- 'Overhead Operativo' | 'Fee de Gestión Efeonce' | 'Fee Administrativo' | 'Fee Financiero' | 'Overhead General' | 'Descuento / Bono'
   addon_name text NOT NULL,                           -- 'Project Management Fee' etc
   addon_type text NOT NULL CHECK (addon_type IN (

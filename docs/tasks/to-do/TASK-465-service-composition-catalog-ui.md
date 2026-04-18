@@ -121,9 +121,22 @@ Reglas obligatorias:
 ### Slice 1 — Schema
 
 ```sql
+-- SKU auto-generation para servicios nuevos añadidos via admin UI.
+-- Seed inserta SKUs explícitos del CSV (EFG-001..007 activos). Admin UI → DEFAULT genera EFG-008+.
+-- Nota: los placeholders EFG-008 a EFG-048 del CSV se SKIPPEAN en el seed (Open Question resuelta),
+-- por lo que la sequence puede arrancar en 8 sin colisión.
+CREATE SEQUENCE IF NOT EXISTS greenhouse_commercial.service_sku_seq START WITH 8;
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.generate_service_sku()
+RETURNS text AS $$
+BEGIN
+  RETURN 'EFG-' || LPAD(nextval('greenhouse_commercial.service_sku_seq')::text, 3, '0');
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE greenhouse_commercial.service_catalog (
   service_id text PRIMARY KEY DEFAULT 'svc-' || gen_random_uuid(),
-  service_sku text UNIQUE NOT NULL,                     -- 'EFG-001'
+  service_sku text UNIQUE NOT NULL DEFAULT greenhouse_commercial.generate_service_sku(),  -- 'EFG-001' (seed) o auto 'EFG-008+'
   service_category text,                                -- 'Implementaciones MarTech' | 'Creatividad y Contenido' | etc.
   service_name text NOT NULL,
   service_unit text NOT NULL CHECK (service_unit IN ('project', 'monthly')),
