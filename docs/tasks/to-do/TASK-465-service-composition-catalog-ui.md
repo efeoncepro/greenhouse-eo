@@ -1,5 +1,28 @@
 # TASK-465 — Service Composition Catalog + Admin UI + Quote Picker
 
+## Delta 2026-04-18 — Reconciliación con modelo canónico
+
+Antes de arrancar implementación, reconciliación vs el 360 object model del CLAUDE.md (`Servicio → greenhouse_core.service_modules.module_id`) + la regla "módulos de dominio extienden estos objetos, no crean identidades paralelas".
+
+**Problema con la spec original:** crear `greenhouse_commercial.service_catalog` con su propio `service_id` genera una identidad paralela de "servicio" al lado de `greenhouse_core.service_modules` que ya es el canónico. Dos dueños del concepto "servicio", cero fuente de verdad.
+
+**Pivot arquitectónico:**
+
+1. **Identidad canónica = `greenhouse_core.service_modules.module_id`.** Cualquier servicio vendible tiene una fila ahí primero (module_code, module_name, business_line, module_kind, status). `service_modules` es owner del nombre, categoría operativa y BL. Seed reusa los `module_id` que ya existen para los 7 EFG; si no existen, los crea ahí.
+2. **Capa comercial extiende, no reemplaza.** Sustituyo `service_catalog` por `greenhouse_commercial.service_pricing` (o un nombre equivalente) con FK `module_id REFERENCES greenhouse_core.service_modules(module_id)`. Esta tabla aporta solo lo comercial: `service_sku` (EFG-XXX), `tier`, `commercial_model`, `service_unit` (project/monthly), `default_duration_months`, `default_description`, `active`. El admin crea/edita filas acá; las altas nuevas insertan en `service_modules` automáticamente si no existen.
+3. **Recipes apuntan a identidad canónica.** `service_role_recipe` y `service_tool_recipe` cambian FK: `module_id` en vez de `service_id`.
+4. **EFG-XXX es SEED, no límite.** La spec original lista 7 activos + 41 placeholders. El diseño debe ser ilimitado por construcción: admin UI permite agregar N servicios sin dev ni migración. La sequence `service_sku_seq` ya está prevista — solo refuerzo que se documente como extensible.
+5. **Trazabilidad en quote**: `quotation_line_items.module_id` (en vez de `service_sku` directo) como FK canónico, con `service_sku` como columna derivada read-only para display. Si se renombra el SKU, el quote histórico sigue atado al `module_id`.
+6. **El botón "+ Servicio" del picker drawer** (5to tab, hoy placeholder) consume `service_modules` via JOIN con `service_pricing` — solo activos con pricing configurado aparecen.
+
+**Impacto del pivot en acceptance criteria:**
+- Schema cambia: drop `service_catalog`, add `service_pricing` con FK a `service_modules`
+- Seed primero UPSERT en `service_modules`, luego INSERT en `service_pricing`
+- Admin UI escribe a las dos tablas en una transacción (crear servicio = crear `service_modules` row + `service_pricing` row)
+- Recipe FKs migran a `module_id`
+
+El resto de la spec (pricing engine v2 integration, picker drawer, reporting hooks) queda igual — solo el modelo de datos pivota.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -37,11 +60,11 @@ TASK-349 tiene "templates de quote" (snapshots de line items anteriores), pero e
 
 ## Goal
 
-- `greenhouse_commercial.service_catalog` + `service_role_recipe` + `service_tool_recipe` canonicalizadas
-- Seed de los 7 servicios del Excel (+ 41 placeholders de SKU declarados)
-- Admin UI para CRUD de servicios (finance/admin puede editar sin dev)
+- **Extender el modelo canónico**: `greenhouse_core.service_modules` (identidad) + `greenhouse_commercial.service_pricing` (capa comercial) + `service_role_recipe` + `service_tool_recipe`, todos con FK al `module_id` canónico
+- Seed de los 7 servicios EFG del Excel como SEED inicial (no límite) — admin UI soporta N servicios
+- Admin UI CRUD para finance/admin (crear / editar / activar / desactivar sin dev, sin migración)
 - Service picker en `QuoteCreateDrawer` como 5to modo (además de los 4 de TASK-464e: role/person/tool/overhead)
-- `quotation_line_items.service_sku` column (trazabilidad del servicio de origen)
+- `quotation_line_items.module_id` FK canónico + `service_sku` columna derivada read-only (trazabilidad robusta a renames)
 - Reporting: MRR / profitability / margin por servicio
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -53,13 +76,16 @@ TASK-349 tiene "templates de quote" (snapshots de line items anteriores), pero e
 Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` — **`Servicio → greenhouse_core.service_modules.module_id`** es la identidad canónica; la capa comercial extiende
 
 Reglas obligatorias:
 
+- **Extensión, no identidad paralela**: cualquier fila en `service_pricing` debe tener `module_id` que exista en `service_modules`. Admin UI crea ambos en transacción
 - Service al seleccionarse en drawer SNAPSHOT las líneas: cambios futuros al service recipe no afectan quotes emitidas (integrity histórica)
-- `service_catalog` NO obliga — el cotizador sigue funcionando sin seleccionar service (Mode B/C/D/E de TASK-464e)
-- Admin CRUD gated a `finance_manager` + `efeonce_admin`
+- `service_pricing` NO obliga — el cotizador sigue funcionando sin seleccionar service (Mode B/C/D/E de TASK-464e)
+- Admin CRUD gated a `finance_admin` + `efeonce_admin` (roles reales, ver role-codes.ts; la spec antigua decía `finance_manager` inexistente)
 - Consume pricing engine v2 (TASK-464d) para calcular total del service (no duplica logic)
+- Seed es SEED, no límite: admin agrega EFG-008+ sin dev
 
 ## Normative Docs
 
