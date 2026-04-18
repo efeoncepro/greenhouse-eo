@@ -22,10 +22,10 @@ interface QuotationRow extends Record<string, unknown> {
   quote_date: string | Date | null
   sent_at: string | Date | null
   approved_at: string | Date | null
-  rejected_at: string | Date | null
   converted_at: string | Date | null
   expired_at: string | Date | null
   expiry_date: string | Date | null
+  updated_at: string | Date | null
 }
 
 interface AuthorizedRow extends Record<string, unknown> {
@@ -105,7 +105,7 @@ const stageEnteredAt = (row: QuotationRow): string | null => {
     case 'sent':
       return toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'rejected':
-      return toIsoTimestamp(row.rejected_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.updated_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'expired':
       return toIsoTimestamp(row.expired_at) ?? toIsoDate(row.expiry_date) ?? toIsoDate(row.quote_date)
     default:
@@ -131,7 +131,8 @@ export const buildPipelineSnapshot = async ({
     `SELECT quotation_id, client_id, organization_id, space_id,
             status, legacy_status, total_price, total_amount_clp, currency,
             effective_margin_pct, target_margin_pct, business_line_code, pricing_model,
-            quote_date, sent_at, approved_at, rejected_at, converted_at, expired_at, expiry_date
+            quote_date, sent_at, approved_at, converted_at, expired_at, expiry_date,
+            updated_at
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1
        LIMIT 1`,
@@ -196,7 +197,7 @@ export const buildPipelineSnapshot = async ({
     approvedAt: toIsoTimestamp(quote.approved_at),
     expiryDate: expiryIso,
     convertedAt: toIsoTimestamp(quote.converted_at),
-    rejectedAt: toIsoTimestamp(quote.rejected_at),
+    rejectedAt: stage === 'rejected' ? toIsoTimestamp(quote.updated_at) : null,
     expiredAt: toIsoTimestamp(quote.expired_at),
 
     daysInStage,
