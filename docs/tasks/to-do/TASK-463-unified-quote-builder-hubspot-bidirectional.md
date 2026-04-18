@@ -107,6 +107,17 @@ Reglas obligatorias:
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
 
+## UI Plan
+
+Esta task implementa UI descrita en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)**. Consumir en lugar de re-especificar:
+
+- **Surface A — Quote Builder**: layout 9/3, reusa `full-version/src/views/apps/invoice/add/AddCard.tsx` + `AddActions.tsx` + `AddCustomerDrawer.tsx`, adaptados a `src/components/greenhouse/pricing/QuoteBuilderCard.tsx` + `QuoteBuilderActions.tsx` + `SpaceDealPickerDrawer.tsx`
+- **Surface E — Quote Preview**: reusa `full-version/src/views/apps/invoice/preview/PreviewCard.tsx` + `PreviewActions.tsx` + `print.css` → `QuotePreviewCard.tsx` / `QuotePreviewActions.tsx`
+- **Surface F — Send Drawer**: reusa `full-version/src/views/apps/invoice/shared/SendInvoiceDrawer.tsx` → `SendQuoteDrawer.tsx` con `react-hook-form`
+- **Surface G — Quote List**: reusa `InvoiceListTable.tsx` + `InvoiceCard.tsx` → `QuoteListTable.tsx` + `QuoteListStats.tsx`
+- **Copy**: extraer de `GH_PRICING` bloque (TASK-469 §4) en `src/config/greenhouse-nomenclature.ts`
+- **A11y floor**: 13-row checklist modern-ui (TASK-469 §5)
+
 ## Scope
 
 ### Slice 1 — Outbound sync wrapper

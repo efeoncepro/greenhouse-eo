@@ -114,6 +114,14 @@ Reglas obligatorias:
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
 
+## UI Plan
+
+Esta task **no tiene superficie UI directa** — es bridge server-side entre payroll y commercial. Sin embargo impacta 2 surfaces del programa (documentados en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)**):
+
+- **Surface D — Employment Type selector**: el picker en `QuoteBuilderActions.tsx` (TASK-463) consume `greenhouse_commercial.employment_types` vía este bridge. Contract: SELECT-only, NUNCA lectura directa a `greenhouse_payroll.*` desde UI comercial.
+- **Surface L — Employment Types admin**: tab en governance panel (TASK-467) CRUD sobre `greenhouse_commercial.employment_types`. Cambios aquí propagan a payroll SOLO vía bridge auditado con escritor explícito (no triggers).
+- **🛑 AISLAMIENTO PAYROLL (obligatorio)**: ningún componente del programa pricing toca `src/views/greenhouse/hr/payroll/**` ni `src/components/hr/payroll/**`. Los 194 tests de payroll (29 archivos) son gate de regresión antes de merge.
+
 ## Scope
 
 ### Slice 1 — Migración de valores legacy (non-breaking)

@@ -123,6 +123,18 @@ Reglas obligatorias:
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
 
+## UI Plan
+
+Esta task implementa UI descrita en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)**. Consumir en lugar de re-especificar:
+
+- **Surface H — Admin Pricing Overview**: 4 KPI cards (`HorizontalWithSubtitle`) + 9 `PricingCatalogNavCard` (nueva en §3.9) en Grid 3-columnas.
+- **Surface I — Entity List**: reusa `full-version/src/views/apps/ecommerce/products/list/ProductListTable.tsx` + `TableFilters.tsx` + `ProductCard.tsx` stats → `CatalogEntityListTable.tsx` (generic con column factory para 4 entidades: roles/tools/overhead/services).
+- **Surface J — Entity Edit**: reusa `ecommerce/products/add/ProductInformation.tsx` + `ProductPricing.tsx` + `ProductOrganize.tsx` como templates. Derivar `RoleInformation.tsx`, `ToolInformation.tsx`, `OverheadInformation.tsx`, `ServiceInformation.tsx` en `src/components/greenhouse/pricing/`.
+- **Surface L — Governance Panel**: tabs (tiers / commercial models / country factors / employment types / audit timeline). Simple entity tables reusan `ecommerce/products/category/ProductCategoryTable.tsx` + `AddCategoryDrawer.tsx` → `SimpleEntityTable.tsx` + `QuickEntityFormDrawer.tsx` (TASK-469 §3.7).
+- **PriceChangeAuditTimeline**: nuevo componente en §3.8 — MUI Lab `Timeline` con entidad + campo + valor viejo/nuevo + autor + razón.
+- **Copy**: `GH_PRICING.adminTitle` y todos los `admin*` (TASK-469 §4).
+- **A11y**: tabs con `aria-controls` + `role="tablist"`; audit timeline como `<ol>` semántico; entity list tables con `<caption>` y `aria-sort`.
+
 ## Scope
 
 ### Slice 1 — Audit log schema

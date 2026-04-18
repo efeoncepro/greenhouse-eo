@@ -103,6 +103,17 @@ Reglas obligatorias:
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
 
+## UI Plan
+
+Esta task implementa UI descrita en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)**. Consumir en lugar de re-especificar:
+
+- **Surface E — Quote Preview + Multi-currency**: reusa `full-version/src/views/apps/invoice/preview/PreviewCard.tsx` + `PreviewActions.tsx` + `print.css`. CurrencySwitcher en sidebar.
+- **CurrencySwitcher**: nuevo en `src/components/greenhouse/pricing/CurrencySwitcher.tsx`. Props en TASK-469 §3.5. Muestra disclaimer de tasa cuando difiere de la canónica.
+- **Regla diseño** (TASK-469 Open Questions): cliente ve solo moneda canónica; vista interna muestra selector con disclaimer `"Vista interna — la cotización enviada usa {canónica} (tasa {rate} al {asOf})"`.
+- **QuotePdfDocument**: usar `@react-pdf/renderer` (ya instalado). PDF siempre en la moneda canónica snapshot, nunca recalculado.
+- **Copy**: `GH_PRICING.currencyLabel`, `builderPreview`, copy de disclaimer arriba.
+- **A11y**: `<select>` nativo (no custom) para currency switcher; announce change via `aria-live="polite"`.
+
 ## Scope
 
 ### Slice 1 — Schema + snapshot

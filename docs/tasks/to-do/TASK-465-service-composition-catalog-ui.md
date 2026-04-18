@@ -116,6 +116,16 @@ Reglas obligatorias:
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
 
+## UI Plan
+
+Esta task implementa UI descrita en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)**. Consumir en lugar de re-especificar:
+
+- **Surface K — ServiceCompositionEditor**: nuevo en `src/components/greenhouse/pricing/`. Lista editable de roles + tools + overhead asignados al servicio. Reusa `GreenhouseDragList` wrapper (keyboard alt obligatorio). Props en TASK-469 §3.6.
+- **Surface I/J — Services list + edit**: reusa `ecommerce/products/list/ProductListTable.tsx` + `ecommerce/products/add/ProductInformation.tsx` + `ProductPricing.tsx` → `ServiceInformation.tsx` + `ServicePricing.tsx`.
+- **Surface B — picker tab "Servicios"**: incluido como 4ta tab en `SellableItemPickerDrawer` (TASK-464e). Esta task solo aporta la columna renderer variant en `SellableItemRow.tsx`.
+- **Copy**: `GH_PRICING.adminServices`, `pickerTabs.services`.
+- **A11y**: drag list con alternativa keyboard (arriba/abajo) — WCAG 2.5.7.
+
 ## Scope
 
 ### Slice 1 — Schema

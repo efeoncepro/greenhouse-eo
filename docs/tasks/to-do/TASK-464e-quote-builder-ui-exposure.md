@@ -115,6 +115,17 @@ Reglas obligatorias:
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
 
+## UI Plan
+
+Esta task implementa UI descrita en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)**. Consumir en lugar de re-especificar:
+
+- **Surface B — SellableItemPickerDrawer**: nuevo en `src/components/greenhouse/pricing/`, 4 tabs (Roles/Tools/Overhead/Servicios). Reusa patrón `ecommerce/products/list/ProductListTable.tsx` con `SellableItemRow.tsx` polimórfico. Props en TASK-469 §3.3/3.4.
+- **Surface C — CostStackPanel**: gated por entitlement `finance.cost_stack.view`. Variant `quote-builder` (accordion collapsed). Props en TASK-469 §3.1.
+- **Surface D — selectores commercial model / country factor / employment type**: dentro de `QuoteBuilderActions.tsx`. SELECT con helper text (ver TASK-469 §2 Surface D).
+- **MarginIndicatorBadge**: TASK-469 §3.2 — icon + label + color, 4 tiers.
+- **Copy**: `GH_PRICING.costStackTitle`, `marginLabels`, `pickerTabs`, `employmentTypeLabel` (TASK-469 §4).
+- **A11y**: panel gated renderiza `<></>` si no hay acceso; 13-row floor TASK-469 §5.
+
 ## Scope
 
 ### Slice 1 — Lookup API
