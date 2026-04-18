@@ -208,7 +208,7 @@ Regla simple:
 
 - fetch siempre antes de iniciar una sesión larga
 - rebase o merge desde la rama base correcta dentro del worktree correcto
-- nunca usar el checkout del otro agente para “ponerse al día”
+- nunca usar el checkout del otro agente para "ponerse al día"
 
 Ejemplo:
 
@@ -218,6 +218,55 @@ git rebase origin/develop
 ```
 
 Si la rama está basada en `main`, usar `origin/main`.
+
+### Layout canónico de worktrees
+
+Con múltiples agentes activos, el repo mantiene un layout fijo que evita ambigüedad sobre "dónde vive `develop`":
+
+| Worktree | Propósito | Rama |
+|---|---|---|
+| `greenhouse-eo/` (primary) | Task branch activa del agente principal (Claude). Entre tasks queda en detached HEAD sobre `origin/develop`. Nunca checkea `develop` directo (porque vive en otro worktree) | `task/TASK-xxx-*` o detached |
+| `greenhouse-eo-develop/` | **Mirror canónico de `develop`.** Única worktree que hace checkout de esa rama. Se usa para: (a) commits doc-only que van direct a develop, (b) validar que una PR recién merged se pulló limpio, (c) rebase base para branches nuevas | `develop` |
+| `greenhouse-eo-codex*/` | Worktrees dedicadas del agente Codex | `task/TASK-xxx-*` |
+| `greenhouse-eo-<task>/` | Worktrees temporales para tasks específicas (cualquier agente) | `task/TASK-xxx-*` |
+
+Regla dura: **`develop` solo checkea en `greenhouse-eo-develop/`**. Si el primary intenta `git checkout develop`, git lo bloquea con "already used by worktree". Esto es correcto — no hay que "arreglarlo".
+
+### Script de sincronización
+
+Para mantener todas las worktrees al día sin ir carpeta por carpeta:
+
+```bash
+# Sync default — solo actualiza greenhouse-eo-develop a origin/develop
+pnpm worktrees:sync
+
+# Status de todas las worktrees (ahead/behind/dirty, no toca refs)
+pnpm worktrees:status
+
+# Sync agresivo — intenta ff-merge en TODAS las worktrees con upstream
+pnpm worktrees:sync-all
+```
+
+El script (`scripts/worktree-sync.sh`) es estricto: solo aplica `git merge --ff-only`, nunca fuerza nada, salta worktrees dirty, respeta detached HEADs. Seguro para correr en paralelo con sesiones activas de otros agentes.
+
+### Doc-only commits van directo a develop
+
+Para cambios que no tocan código runtime (specs de task, `Handoff.md`, `docs/**`, `CLAUDE.md`, `AGENTS.md`):
+
+```bash
+# Primary está en detached HEAD o en una task branch — no importa
+pnpm worktrees:sync                            # asegura que -develop está al día
+
+# Editar el archivo desde el primary worktree funciona bien — git lo ve
+# Luego commit + push desde -develop:
+git -C ../greenhouse-eo-develop add <file>
+git -C ../greenhouse-eo-develop commit -m "docs(...): ..."
+git -C ../greenhouse-eo-develop push origin develop
+```
+
+**Alternativa más idiomática**: editar directamente dentro del worktree `-develop/` si es edición simple, o usar `cd ../greenhouse-eo-develop && ...`.
+
+Para cambios que tocan código (`src/`, `scripts/`, `migrations/`, `services/`): **siempre** branch + PR + squash merge, nunca direct a develop. La preferencia doc-only-direct no es licencia para saltarse review de código.
 
 ## Reglas de convivencia
 
