@@ -1622,10 +1622,11 @@ export const GH_PRICING = {
   builderEmptyLineItems: 'Aún no has agregado ítems a esta cotización',
   builderEmptyLineItemsCta: 'Agregar rol',
 
-  // Sellable item picker (drawer con 4 tabs)
+  // Sellable item picker (drawer con 5 tabs)
   pickerTitle: 'Agregar ítem',
   pickerTabs: {
     roles: 'Roles',
+    people: 'Personas',
     tools: 'Herramientas',
     overhead: 'Overhead',
     services: 'Servicios'

@@ -50,6 +50,9 @@ export interface QuoteLineItem {
   metadata?: {
     pricingV2LineType?: PricingV2LineType
     sku?: string
+    fteFraction?: number | null
+    periods?: number | null
+    employmentTypeCode?: string | null
   } | null
 }
 
@@ -101,6 +104,17 @@ const UNIT_LABELS: Record<QuoteLineItem['unit'], string> = {
   month: 'Mes',
   unit: 'Unidad',
   project: 'Proyecto'
+}
+
+const TIER_STATUS_META: Record<
+  'below_min' | 'in_range' | 'at_optimum' | 'above_max' | 'unknown',
+  { label: string; color: 'error' | 'warning' | 'success' | 'info' }
+> = {
+  below_min: { label: 'Bajo mínimo', color: 'error' },
+  in_range: { label: 'En rango', color: 'success' },
+  at_optimum: { label: 'Óptimo', color: 'success' },
+  above_max: { label: 'Sobre rango', color: 'warning' },
+  unknown: { label: 'Tier sin definir', color: 'info' }
 }
 
 const formatCurrency = (amount: number | null, currency: string): string => {
@@ -161,7 +175,7 @@ const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
         productId: null,
         discountType: null,
         discountValue: null,
-        metadata: { pricingV2LineType: 'role', sku: selection.sku }
+        metadata: { pricingV2LineType: 'role', sku: selection.sku, fteFraction: 1.0, periods: 1 }
       }
     case 'tools':
       return {
@@ -197,6 +211,23 @@ const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
         discountValue: null,
         metadata: { pricingV2LineType: 'overhead_addon', sku: selection.sku }
       }
+    case 'people':
+      return {
+        label: selection.label,
+        description: null,
+        lineType: 'person',
+        unit: 'hour',
+        quantity: 1,
+        unitPrice: null,
+        subtotalPrice: null,
+        subtotalAfterDiscount: null,
+        roleCode: null,
+        memberId: selection.sku,
+        productId: null,
+        discountType: null,
+        discountValue: null,
+        metadata: { pricingV2LineType: 'person', sku: selection.sku, fteFraction: 1.0, periods: 1 }
+      }
     case 'services':
     default:
       return {
@@ -217,28 +248,6 @@ const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
       }
   }
 }
-
-// Persona: el picker tab 'roles' no aplica; usamos lookup type=person.
-// Por simplicidad, reutilizamos el mismo drawer con tab 'roles' y mapeamos
-// al `memberId` cuando el sku viene del endpoint de people. Para MVP Phase 2c,
-// creamos una línea vacía tipo 'person' que el usuario completa manualmente
-// si no hay picker dedicado de people (follow-up).
-const emptyPersonLine = (): QuoteLineItem => ({
-  label: '',
-  description: null,
-  lineType: 'person',
-  unit: 'hour',
-  quantity: 1,
-  unitPrice: null,
-  subtotalPrice: null,
-  subtotalAfterDiscount: null,
-  productId: null,
-  roleCode: null,
-  memberId: null,
-  discountType: null,
-  discountValue: null,
-  metadata: { pricingV2LineType: 'person' }
-})
 
 const QuoteLineItemsEditor = ({
   currency,
@@ -282,11 +291,6 @@ const QuoteLineItemsEditor = ({
     if (selections.length === 0) return
 
     setDraftLines(prev => [...prev, ...selections.map(mapSelectionToLine)])
-    setDirty(true)
-  }, [])
-
-  const handleAddPersonLine = useCallback(() => {
-    setDraftLines(prev => [...prev, emptyPersonLine()])
     setDirty(true)
   }, [])
 
@@ -425,7 +429,7 @@ const QuoteLineItemsEditor = ({
             variant='outlined'
             size='small'
             startIcon={<i className='tabler-user' />}
-            onClick={handleAddPersonLine}
+            onClick={() => handleOpenPicker('people')}
             disabled={saving}
           >
             + Persona
@@ -481,6 +485,8 @@ const QuoteLineItemsEditor = ({
                 const typeMeta = LINE_TYPE_META[line.lineType]
                 const simulationLine = simulationLines?.[index] ?? null
                 const showCostStack = canViewCostStackProp && simulationLine && outputCurrency
+                const needsPricingContext = line.lineType === 'role' || line.lineType === 'person'
+                const tierMeta = simulationLine ? TIER_STATUS_META[simulationLine.tierCompliance.status] : null
 
                 return (
                   <>
@@ -504,7 +510,18 @@ const QuoteLineItemsEditor = ({
                         </Stack>
                       </TableCell>
                       <TableCell>
-                        <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
+                        <Stack spacing={0.5}>
+                          <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
+                          {tierMeta ? (
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant='tonal'
+                              color={tierMeta.color}
+                              label={tierMeta.label}
+                            />
+                          ) : null}
+                        </Stack>
                       </TableCell>
                       <TableCell align='right'>
                         <CustomTextField
@@ -573,6 +590,69 @@ const QuoteLineItemsEditor = ({
                         </Tooltip>
                       </TableCell>
                     </TableRow>
+                    {needsPricingContext ? (
+                      <TableRow key={`${line.lineItemId ?? `draft-${index}`}-ctx`}>
+                        <TableCell colSpan={7} sx={{ py: 1, bgcolor: 'background.default' }}>
+                          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }}>
+                            <Typography variant='caption' color='text.secondary' sx={{ minWidth: 140 }}>
+                              Contexto de pricing
+                            </Typography>
+                            <CustomTextField
+                              size='small'
+                              type='number'
+                              label='FTE'
+                              value={line.metadata?.fteFraction ?? ''}
+                              onChange={event => {
+                                const raw = event.target.value
+                                const next = raw === '' ? null : Number(raw)
+
+                                updateLine(index, {
+                                  metadata: { ...(line.metadata ?? {}), fteFraction: Number.isFinite(next) ? next : null }
+                                })
+                              }}
+                              helperText='0.1 a 1.0 (fracción dedicada)'
+                              sx={{ maxWidth: 160 }}
+                              disabled={saving}
+                              aria-label={`FTE del ítem ${index + 1}`}
+                            />
+                            <CustomTextField
+                              size='small'
+                              type='number'
+                              label='Períodos (meses)'
+                              value={line.metadata?.periods ?? ''}
+                              onChange={event => {
+                                const raw = event.target.value
+                                const next = raw === '' ? null : Number(raw)
+
+                                updateLine(index, {
+                                  metadata: { ...(line.metadata ?? {}), periods: Number.isFinite(next) ? next : null }
+                                })
+                              }}
+                              sx={{ maxWidth: 160 }}
+                              disabled={saving}
+                              aria-label={`Períodos del ítem ${index + 1}`}
+                            />
+                            <CustomTextField
+                              size='small'
+                              label='Tipo de contratación'
+                              value={line.metadata?.employmentTypeCode ?? ''}
+                              onChange={event => {
+                                updateLine(index, {
+                                  metadata: {
+                                    ...(line.metadata ?? {}),
+                                    employmentTypeCode: event.target.value || null
+                                  }
+                                })
+                              }}
+                              placeholder='Default del rol si vacío'
+                              sx={{ maxWidth: 240 }}
+                              disabled={saving}
+                              aria-label={`Tipo de contratación del ítem ${index + 1}`}
+                            />
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    ) : null}
                     {showCostStack && simulationLine && outputCurrency ? (
                       <TableRow key={`${line.lineItemId ?? `draft-${index}`}-cost`}>
                         <TableCell colSpan={7} sx={{ py: 1, bgcolor: 'background.default' }}>

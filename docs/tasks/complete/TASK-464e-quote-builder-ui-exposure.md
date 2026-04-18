@@ -1,6 +1,23 @@
 # TASK-464e — Quote Builder UI Exposure (Role/Tool/Addon Pickers + Cost Stack Gated)
 
-## Delta 2026-04-18
+## Delta 2026-04-18 (close-out)
+
+**Status real: complete.** Shipped en 2 PRs mergeados a develop:
+
+- PR #72 (squash `bf530340`): backend APIs (simulate + lookup + config), primitives (MarginIndicatorBadge, CurrencySwitcher, PricingCatalogNavCard, CostStackPanel, SellableItemRow, SellableItemPickerDrawer), hook `usePricingSimulation` (debounce 500ms + AbortController), workspace components (QuoteBuilderActions, QuoteTotalsFooter, AddonSuggestionsPanel, QuoteLineCostStack) y refactor final de QuoteCreateDrawer + QuoteLineItemsEditor con integración del engine v2.
+- PR close-out (siguiente merge): tab `people` en el picker drawer + `+ Persona` conectado al lookup `type=person`, tier compliance chip por línea visible para todos, contexto de pricing inline (FTE + períodos + tipo de contratación) para líneas de rol y persona, doc funcional `docs/documentation/finance/cotizador.md`.
+
+**Deltas asumidos durante ejecución** (documentados in-line):
+
+- **Pickers**: drawer único con **5 tabs** (roles + people + tools + overhead + services) vs 4 autocompletes separados de la spec original. Servicios queda como placeholder — TASK-465 lo habilita.
+- **Role gating**: `canViewCostStack` usa `EFEONCE_ADMIN | FINANCE_ADMIN | FINANCE_ANALYST` (los roles reales en `src/config/role-codes.ts`). La spec mencionaba `finance_manager` y `finance` que no existen en runtime.
+- **Currencies**: 6 monedas LatAm (`CLP|USD|CLF|COP|MXN|PEN`) alineadas con `PricingOutputCurrency` del engine v2.
+- **Line types**: engine v2 usa `role|person|tool|overhead_addon|direct_cost`; persistencia usa `person|role|deliverable|direct_cost`. `tool` y `overhead_addon` se aplanan a `direct_cost` + `metadata.pricingV2LineType` + `metadata.sku`. Cero cambio de schema.
+- **Entitlement**: role check directo (Opción A MVP). Capability `finance.cost_stack.view` queda como follow-up.
+- **Pricing context metadata**: `QuoteLineItem.metadata` extendido con `fteFraction`, `periods`, `employmentTypeCode` para role/person. Default `fteFraction=1.0`, `periods=1` al agregar del picker.
+- **Scope deferido a follow-ups**: edit de quote existente con este UI, override de margen por línea, Playwright E2E, Excel fidelity verification, mobile iPad smoke test.
+
+## Delta 2026-04-18 (spec → implementación, histórico)
 
 Reconciliación vs TASK-469 (plano maestro, posterior a esta spec) + realidad del repo:
 
@@ -16,16 +33,16 @@ Reconciliación vs TASK-469 (plano maestro, posterior a esta spec) + realidad de
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Shipped`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-464a, TASK-464b, TASK-464c, TASK-464d`
-- Branch: `task/TASK-464e-quote-builder-ui-exposure`
+- Branch: `task/TASK-464e-standalone-components` (merged via PR #72) + `task/TASK-464e-closeout`
 - Legacy ID: `parte de TASK-464 umbrella`
 - GitHub Issue: `none`
 

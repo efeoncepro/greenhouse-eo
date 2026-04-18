@@ -20,7 +20,7 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 
 import SellableItemRow, { type SellableItemVariant } from './SellableItemRow'
 
-export type SellableItemPickerTab = 'roles' | 'tools' | 'overhead' | 'services'
+export type SellableItemPickerTab = 'roles' | 'people' | 'tools' | 'overhead' | 'services'
 
 export interface SellableSelection {
   tab: SellableItemPickerTab
@@ -55,6 +55,7 @@ interface LookupResponseItem {
 
 const TAB_TO_LOOKUP_TYPE: Record<SellableItemPickerTab, string> = {
   roles: 'role',
+  people: 'person',
   tools: 'tool',
   overhead: 'addon',
   services: 'service'
@@ -62,6 +63,7 @@ const TAB_TO_LOOKUP_TYPE: Record<SellableItemPickerTab, string> = {
 
 const TAB_TO_ROW_VARIANT: Record<SellableItemPickerTab, SellableItemVariant> = {
   roles: 'role',
+  people: 'role',
   tools: 'tool',
   overhead: 'overhead',
   services: 'service'
@@ -69,6 +71,7 @@ const TAB_TO_ROW_VARIANT: Record<SellableItemPickerTab, SellableItemVariant> = {
 
 const TABS: Array<{ value: SellableItemPickerTab; label: string }> = [
   { value: 'roles', label: GH_PRICING.pickerTabs.roles },
+  { value: 'people', label: GH_PRICING.pickerTabs.people ?? 'Personas' },
   { value: 'tools', label: GH_PRICING.pickerTabs.tools },
   { value: 'overhead', label: GH_PRICING.pickerTabs.overhead },
   { value: 'services', label: GH_PRICING.pickerTabs.services }
