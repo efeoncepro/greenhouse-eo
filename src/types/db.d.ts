@@ -891,6 +891,15 @@ export interface GreenhouseCoreClients {
   created_at: Generated<Timestamp>;
   hubspot_company_id: string | null;
   legal_name: string | null;
+  /**
+   * HubSpot company lifecycle stage denormalized as a compatibility bridge for legacy client-scoped consumers.
+   */
+  lifecyclestage: Generated<string>;
+  /**
+   * Origin of the client lifecycle stage bridge value: hubspot_sync, nubox_fallback, manual_override, or unknown.
+   */
+  lifecyclestage_source: Generated<string>;
+  lifecyclestage_updated_at: Timestamp | null;
   notes: string | null;
   public_id: string | null;
   status: Generated<string>;

@@ -64,6 +64,12 @@ describe('event catalog', () => {
     expect(EVENT_TYPES.leaveBalanceAdjustmentReversed).toBe('leave_balance.adjustment_reversed')
   })
 
+  it('includes CRM company lifecycle stage change as a non-reactive catalog event', () => {
+    expect(AGGREGATE_TYPES.crmCompany).toBe('crm_company')
+    expect(EVENT_TYPES.companyLifecycleStageChanged).toBe('crm.company.lifecyclestage_changed')
+    expect(REACTIVE_EVENT_TYPES).not.toContain('crm.company.lifecyclestage_changed')
+  })
+
   it('includes ICO AI LLM enrichment events in the catalog and reactive trigger list', () => {
     expect(EVENT_TYPES.icoAiLlmEnrichmentsMaterialized).toBe('ico.ai_llm_enrichments.materialized')
     expect(REACTIVE_EVENT_TYPES).toContain('ico.ai_llm_enrichments.materialized')

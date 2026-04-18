@@ -2,6 +2,14 @@
 
 ## 2026-04-18
 
+### 2026-04-18 — TASK-454 materializa lifecyclestage HubSpot como bridge runtime client-scoped
+
+- `greenhouse_core.clients` agrega `lifecyclestage`, `lifecyclestage_source` y `lifecyclestage_updated_at` como bridge de compatibilidad para consumers legacy que siguen leyendo por `client_id`.
+- Nuevo sync inbound `src/lib/hubspot/sync-hubspot-company-lifecycle.ts` recorre `organizations.hubspot_company_id`, deriva `space_id`/`client_id`, lee `lifecyclestage` desde HubSpot y respeta `manual_override`.
+- Nuevo cron `GET /api/cron/hubspot-company-lifecycle-sync` cada 6 horas.
+- El outbox incorpora `crm.company.lifecyclestage_changed` bajo aggregate `crm_company`, sin consumer reactivo en este corte.
+- `getClientLifecycleStage(clientId)` expone lectura runtime simple para Finance y próximas tasks del pipeline híbrido.
+
 ### 2026-04-18 — TASK-464c: foundation canónica de tools comerciales y overhead addons
 
 - `greenhouse_ai.tool_catalog` se extiende sin romper AI tooling: ahora soporta `tool_sku`, prorrateo, business lines/tags de aplicabilidad, `includes_in_addon` y `notes_for_quoting`.

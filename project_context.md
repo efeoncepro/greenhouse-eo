@@ -39,6 +39,21 @@
   - el backfill inicial solo materializa relaciones con fuente verificable en runtime actual: `employee` y `shareholder_current_account_holder`
   - las lecturas portal filtran por `space_id` cuando existe tenant scope
 
+## Delta 2026-04-18 TASK-454 materializa lifecyclestage HubSpot como bridge runtime en clients
+
+- Greenhouse ya no debe tratar `lifecyclestage` como dato disponible solo por live read a HubSpot o por el projection CRM detallado.
+- Runtime actualizado:
+  - migración `20260418232659019_task-454-hubspot-company-lifecycle-stage.sql`
+  - columnas `greenhouse_core.clients.lifecyclestage`, `lifecyclestage_source`, `lifecyclestage_updated_at`
+  - helper `src/lib/hubspot/company-lifecycle-store.ts`
+  - sync `src/lib/hubspot/sync-hubspot-company-lifecycle.ts`
+  - cron `GET /api/cron/hubspot-company-lifecycle-sync`
+- Contrato operativo:
+  - la raíz canónica de company sigue repartida entre `organizations`, `spaces`, `client_profiles` y `greenhouse_crm.companies`
+  - `greenhouse_core.clients` solo materializa un bridge client-scoped de compatibilidad para downstreams que aún operan por `client_id`
+  - el sync respeta `manual_override`, puede dejar `unknown` cuando HubSpot no informa stage y usa `nubox_fallback` solo para rows legacy con evidencia económica runtime
+  - el evento `crm.company.lifecyclestage_changed` existe para follow-ons del pipeline comercial, pero este corte no agrega consumer reactivo
+
 # project_context.md
 
 ## Delta 2026-04-17 TASK-345 materializa el bridge canónico de quotations

@@ -52,6 +52,7 @@ export const AGGREGATE_TYPES = {
   organization: 'organization',
   space: 'space',
   membership: 'membership',
+  crmCompany: 'crm_company',
   personLegalEntityRelationship: 'person_legal_entity_relationship',
 
   // HR Core / People
@@ -162,6 +163,7 @@ export const EVENT_TYPES = {
   membershipCreated: 'membership.created',
   membershipUpdated: 'membership.updated',
   membershipDeactivated: 'membership.deactivated',
+  companyLifecycleStageChanged: 'crm.company.lifecyclestage_changed',
   personLegalEntityRelationshipCreated: 'person_legal_entity_relationship.created',
   personLegalEntityRelationshipUpdated: 'person_legal_entity_relationship.updated',
   personLegalEntityRelationshipDeactivated: 'person_legal_entity_relationship.deactivated',

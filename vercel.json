@@ -69,6 +69,10 @@
       "schedule": "0 */6 * * *"
     },
     {
+      "path": "/api/cron/hubspot-company-lifecycle-sync",
+      "schedule": "0 */6 * * *"
+    },
+    {
       "path": "/api/cron/hubspot-deals-sync",
       "schedule": "0 */4 * * *"
     },
