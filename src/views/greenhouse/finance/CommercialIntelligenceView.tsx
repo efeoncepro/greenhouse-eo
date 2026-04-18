@@ -167,12 +167,17 @@ const PipelineTab = ({
 
   return (
     <Stack spacing={4}>
+      <Alert severity='info' role='status' icon={<i className='tabler-info-circle' aria-hidden='true' />}>
+        Esta vista sigue cotizaciones en curso. No incluye deals sin cotización emitida ni reemplaza el pipeline comercial unificado que llegará en la próxima iteración.
+      </Alert>
+
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Pipeline abierto'
             stats={formatCLP(totals?.openPipelineClp ?? 0)}
             subtitle={`${(totals?.byStage.draft.count ?? 0) + (totals?.byStage.in_review.count ?? 0) + (totals?.byStage.sent.count ?? 0) + (totals?.byStage.approved.count ?? 0)} cotizaciones activas`}
+            titleTooltip='Suma de montos cotizados en borrador, revisión, enviadas y aprobadas. No incluye deals sin cotización emitida.'
             avatarIcon='tabler-stack-2'
             avatarColor='primary'
           />
@@ -182,6 +187,7 @@ const PipelineTab = ({
             title='Pipeline ponderado'
             stats={formatCLP(totals?.weightedPipelineClp ?? 0)}
             subtitle='Monto ajustado por probabilidad'
+            titleTooltip='Suma de montos cotizados ajustada por la probabilidad documental de cada cotización activa. No reemplaza el forecast comercial por deal.'
             avatarIcon='tabler-target'
             avatarColor='info'
           />
@@ -208,8 +214,8 @@ const PipelineTab = ({
 
       <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
         <CardHeader
-          title='Cotizaciones en pipeline'
-          subheader='Por etapa y probabilidad'
+          title='Cotizaciones en curso'
+          subheader='Seguimiento por estado documental y probabilidad'
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
               <i className='tabler-list' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} aria-hidden='true' />
@@ -648,7 +654,7 @@ const CommercialIntelligenceView = () => {
     <Card variant='outlined'>
       <TabContext value={tab}>
         <CustomTabList onChange={(_e, v) => setTab(v as typeof tab)} variant='scrollable'>
-          <Tab value='pipeline' label='Pipeline' icon={<i className='tabler-stack-2' />} iconPosition='start' />
+          <Tab value='pipeline' label='Cotizaciones en curso' icon={<i className='tabler-stack-2' />} iconPosition='start' />
           <Tab value='profitability' label='Rentabilidad' icon={<i className='tabler-scale' />} iconPosition='start' />
           <Tab
             value='renewals'
