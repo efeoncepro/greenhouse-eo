@@ -134,6 +134,7 @@ describe('purchase-orders route org-first contract', () => {
       clientId: 'client-1',
       organizationId: 'org-1',
       spaceId: 'space-1',
+      quotationId: null,
       authorizedAmount: 1200,
       currency: 'CLP',
       exchangeRateToClp: undefined,

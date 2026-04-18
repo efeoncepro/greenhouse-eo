@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-345, TASK-346, TASK-348, TASK-212`
@@ -158,10 +158,10 @@ La task debe dejar explícito:
 
 ## Acceptance Criteria
 
-- [ ] Una cotización puede enlazarse canónicamente con OC y HES
-- [ ] El sistema distingue lo cotizado, lo autorizado y lo facturado
-- [ ] La emisión/facturación puede apoyarse en el bridge quote-to-cash con trazabilidad auditable
-- [ ] La rama simple y la rama enterprise quedan explícitamente soportadas
+- [x] Una cotización puede enlazarse canónicamente con OC y HES (via `purchase_orders.quotation_id` + `service_entry_sheets.quotation_id`, con helpers `linkPurchaseOrderToQuotation` / `linkServiceEntryToQuotation` que validan consistencia y emiten outbox + audit).
+- [x] El sistema distingue lo cotizado, lo autorizado y lo facturado (reader `readQuotationDocumentChain` devuelve los tres totales y sus deltas; UI los muestra como KPIs con delta chip).
+- [x] La emisión/facturación puede apoyarse en el bridge quote-to-cash con trazabilidad auditable (`income.quotation_id` + `income.source_hes_id`; approve-HES puede encadenar materialización en el mismo handler; todos los cambios pasan por audit log + outbox).
+- [x] La rama simple y la rama enterprise quedan explícitamente soportadas (rama simple: `POST /convert-to-invoice` sobre quote aprobada sin PO/HES; rama enterprise: materialización desde HES aprobada con source_hes_id).
 
 ## Verification
 

@@ -1,10 +1,65 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.6
+> **Version:** 2.7
 > **Created:** 2026-04-09
-> **Updated:** 2026-04-17 — v2.6: TASK-349 workspace UI + PDF delivery. Nueva experiencia de creación canónica (QuoteCreateDrawer con modos "Desde cero" / "Desde template"), editor inline de line items, health card en detalle, dialogs de Send y Save-as-Template, endpoints nuevos `/send`, `/pdf`, `/save-as-template`, extensión del POST `/quotes` para aceptar `templateId`, render de PDF client-safe via `@react-pdf/renderer` con firewall explícito contra costos/márgenes.
+> **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-17 — TASK-350 Quotation-to-Cash Document Chain Bridge
+
+### Problema que cerró
+
+Antes de TASK-350, OC, HES e income se relacionaban con la cotización a través de strings frágiles (`po_number`, `hes_number`) o no se relacionaban en absoluto. No había modo de responder "¿cuánto se cotizó vs cuánto se autorizó vs cuánto se facturó de esta quote?" sin reconstruir joins heurísticamente.
+
+### Schema (migration `20260417190539017_task-350-quotation-to-cash-bridge.sql`)
+
+- `greenhouse_finance.purchase_orders.quotation_id` — FK → `greenhouse_commercial.quotations(quotation_id)`, `ON DELETE SET NULL`, indexada (partial index WHERE NOT NULL).
+- `greenhouse_finance.service_entry_sheets.quotation_id` — FK análogo. Auto-hereda del PO cuando se crea HES con `purchase_order_id`.
+- `greenhouse_finance.service_entry_sheets.amount_authorized_clp` — `numeric(14,2)` nullable. Fijado en `approveHes` (default = `amount_clp`). Habilita drift vs `amount_clp` (submitted) y vs quote total (quoted).
+- `greenhouse_finance.income.quotation_id` — FK canónica al quote ancestor. Poblada al materializar factura (simple branch desde quote, enterprise branch desde HES).
+- `greenhouse_finance.income.source_hes_id` — FK a HES que autorizó el income. NULL para rama simple.
+
+Todas las columnas son nullable y no se hace backfill: bridge solo aplica a flujos nuevos; callers que pasen `quotationId` explícito (o lo hereden vía PO) obtienen audit + outbox automáticamente.
+
+### Runtime (`src/lib/finance/quote-to-cash/`)
+
+- `linkPurchaseOrderToQuotation({ poId, quotationId, actor })` — valida consistencia client_id/organization_id entre PO y quote, setea FK, publica `commercial.quotation.po_linked`, registra audit `po_received`. `FOR UPDATE` sobre la PO.
+- `linkServiceEntryToQuotation({ hesId, quotationId, actor })` — análogo para HES; publica `commercial.quotation.hes_linked` y audit `hes_received`.
+- `readQuotationDocumentChain({ quotationId })` — read-only reader que devuelve quote header + POs + HES + incomes + `totals: { quoted, authorized, invoiced, authorizedVsQuotedDelta, invoicedVsQuotedDelta }`.
+- `materializeInvoiceFromApprovedQuotation({ quotationId, actor, dueDate? })` — **rama simple**. Precondiciones: quote status `approved`|`sent`, no convertida, sin POs linked, sin HES approved linked. Inserta income con `quotation_id`, transita quote a `converted`, publica `commercial.quotation.invoice_emitted` (`sourceHesId: null`) + audit `invoice_triggered` (branch: `simple`) + `status_changed`.
+- `materializeInvoiceFromApprovedHes({ hesId, actor, dueDate? })` — **rama enterprise**. Precondiciones: HES status `approved`, `quotation_id` set, `income_id` null. Inserta income con `quotation_id` + `source_hes_id`, marca HES `invoiced=TRUE` y `income_id`, transita quote a `converted` si aún no lo está. Publica `invoice_emitted` + audit `invoice_triggered` (branch: `enterprise`).
+
+### API surface
+
+- `POST /api/finance/purchase-orders` — acepta `quotationId` opcional. Corre link helper post-create; en fallo de validación rollback limpiando la FK (no deja PO sin quote si el caller quería el link).
+- `PUT /api/finance/purchase-orders/[id]` — acepta `quotationId`. Si cambia el link, corre helper.
+- `POST /api/finance/hes` — al crear HES, si quedó linked (explícito o heredado del PO) emite `hes_linked` + audit.
+- `POST /api/finance/hes/[id]/approve` — extendido. Acepta `amountAuthorizedClp` (persiste en approve) + `materializeInvoice` boolean + `dueDate`. Si se pide materializar y hay `quotation_id` y no hay `income_id`, encadena `materializeInvoiceFromApprovedHes` en el mismo handler. Error de materialización → 207 con `invoiceError` (approval ya ocurrió, no se revierte).
+- `GET /api/finance/quotes/[id]/document-chain` — devuelve la cadena leída por el reader.
+- `POST /api/finance/quotes/[id]/convert-to-invoice` — **rama simple**. Body `{ dueDate? }`.
+
+### UI
+
+- Nueva tab **"Cadena documental"** en `QuoteDetailView` (`src/views/greenhouse/finance/QuoteDetailView.tsx`).
+- Componente `QuoteDocumentChain` (`src/views/greenhouse/finance/workspace/QuoteDocumentChain.tsx`): 3 KPIs (Cotizado / Autorizado / Facturado) con delta chip contextualizado (Alineado / +X% sobre cotizado / -X% bajo cotizado), secciones PO / HES / Facturas con accent border por estado, CTA "Convertir a factura" habilitado solo en rama simple (quote approved/sent + sin POs + sin HES aprobadas + sin facturas).
+
+### Convivencia de ramas
+
+- **Simple** — cliente sin ciclo enterprise. Quote aprobada → `/convert-to-invoice` → income. Quote transita directo a `converted`.
+- **Enterprise** — cliente con procurement. Quote → link PO → submit HES (auto-herence de `quotation_id`) → approve HES (fija `amount_authorized_clp`) → opcional `materializeInvoice:true` → income con `source_hes_id`. La primera materialización transita la quote a `converted`; HES adicionales del mismo quote siguen materializándose sin re-transicionar.
+
+### Definición operativa de `converted`
+
+Una quote se considera `converted` cuando `converted_to_income_id` deja de ser NULL. Esto ocurre al primer `materializeInvoice*` exitoso. Quotes en rama enterprise con múltiples HES acumulan múltiples incomes pero sólo referencian el primero en `converted_to_income_id` — el resto queda trazable via `income.quotation_id`.
+
+### Qué se factura
+
+- Rama simple: quote vigente (subtotal/tax/total del quote).
+- Rama enterprise: monto autorizado por HES (`amount_authorized_clp`, fallback `amount_clp`).
+- Drift auditable: `readQuotationDocumentChain` expone `authorizedVsQuotedDelta` e `invoicedVsQuotedDelta` para dashboards de profitability (TASK-351).
 
 ---
 
@@ -1611,9 +1666,12 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | `commercial.quotation.expired_without_renewal` | Vencida sin draft de renovacion | Alerta critica → Account Lead + Finance |
 | `commercial.quotation.approval_requested` | Health check dispara approval | Notifications → aprobadores |
 | `commercial.quotation.approval_decided` | Aprobador decide | Notifications → creador, audit log |
-| `commercial.purchase_order.received` | Registrar OC | Notifications → Finance, pipeline projection |
-| `commercial.service_entry.received` | Registrar HES | Notifications → Finance |
-| `commercial.service_entry.invoiced` | Facturar | Nubox integration, finance.income |
+| `commercial.quotation.po_linked` (TASK-350) | OC vinculada a cotización canónica | Audit log, profitability tracking, ops notifications |
+| `commercial.quotation.hes_linked` (TASK-350) | HES vinculada a cotización canónica (explícito o heredado del PO) | Audit log, profitability tracking |
+| `commercial.quotation.invoice_emitted` (TASK-350) | Factura materializada desde quote (rama simple) o desde HES (rama enterprise) | Pipeline projection, profitability tracking, Nubox emission follow-up |
+| `commercial.purchase_order.received` | Registrar OC (legacy namespace) | Notifications → Finance, pipeline projection |
+| `commercial.service_entry.received` | Registrar HES (legacy namespace) | Notifications → Finance |
+| `commercial.service_entry.invoiced` | Facturar (legacy namespace) | Nubox integration, finance.income |
 | `commercial.product.created` | Crear producto | HubSpot sync (si sync habilitado) |
 | `commercial.product.updated` | Actualizar producto | HubSpot sync |
 | `commercial.discount.health_alert` | Descuento riesgoso | Notifications → Finance, audit log |

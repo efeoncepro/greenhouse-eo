@@ -1,5 +1,55 @@
 # Handoff.md
 
+## Sesion 2026-04-17 — TASK-350 Quotation-to-Cash Document Chain Bridge
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-350-quotation-to-cash-document-chain-bridge`
+- **Dependencias:** TASK-345 (schema canónico), TASK-346 (pricing engine), TASK-348 (governance runtime), TASK-164 (purchase_orders), TASK-212 (Nubox multiline). Todas mergeadas excepto 212 (solo necesitamos `emission.ts` existente).
+- **Entregado:**
+  - **Migration** `20260417190539017_task-350-quotation-to-cash-bridge.sql`:
+    - `purchase_orders.quotation_id` (FK → `greenhouse_commercial.quotations.quotation_id`, ON DELETE SET NULL, indexada).
+    - `service_entry_sheets.quotation_id` (FK + index) + `amount_authorized_clp` (para drift vs submitted).
+    - `income.quotation_id` + `income.source_hes_id` (FK a HES, SET NULL).
+  - **Stores extendidos (sin romper callers existentes):**
+    - `purchase-order-store.ts`: acepta/devuelve `quotationId`; `listPurchaseOrders` filtra por `quotationId`; `updatePurchaseOrder` acepta `quotationId`.
+    - `hes-store.ts`: `CreateHesInput.quotationId` (opcional; auto-hereda del PO cuando se crea HES con `purchaseOrderId`). `approveHes` acepta overload `{ actorUserId, amountAuthorizedClp }` — legacy string signature preservada. Al aprobar, setea `amount_authorized_clp` (default = `amount_clp`).
+  - **Bridge helpers** en `src/lib/finance/quote-to-cash/`:
+    - `link-purchase-order.ts` — `linkPurchaseOrderToQuotation` valida `client_id`/`organization_id` consistentes, actualiza FK, emite `commercial.quotation.po_linked` + audit `po_received`.
+    - `link-service-entry.ts` — `linkServiceEntryToQuotation` análogo; emite `commercial.quotation.hes_linked` + audit `hes_received`.
+    - `document-chain-reader.ts` — `readQuotationDocumentChain` lee quote + POs + HES + incomes + totales (quoted/authorized/invoiced + deltas).
+    - `materialize-invoice-from-quotation.ts` — **rama simple**: inserta income desde approved/sent quote si NO hay PO/HES aprobadas; rechaza sino (fuerza a usar rama enterprise). Transiciona quote a `converted`.
+    - `materialize-invoice-from-hes.ts` — **rama enterprise**: inserta income desde approved HES (con `source_hes_id` y `quotation_id`); marca HES `invoiced=TRUE`; transiciona quote a `converted` si aún no lo está.
+  - **Eventos nuevos en catalog** (`src/lib/sync/event-catalog.ts`): `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`.
+  - **Publishers** en `src/lib/commercial/quotation-events.ts`: `publishQuotationPurchaseOrderLinked`, `publishQuotationServiceEntryLinked`, `publishQuotationInvoiceEmitted`.
+  - **API routes:**
+    - `POST /api/finance/purchase-orders` — acepta `quotationId`. Si provisto corre el link helper; en fallo de validación (client mismatch, quote no existe) rollback limpiando FK.
+    - `PUT /api/finance/purchase-orders/[id]` — acepta `quotationId`. Si cambia el link, corre helper (emite evento + audit).
+    - `POST /api/finance/hes` — emite `hes_linked` + audit si el HES quedó linked (explícito o heredado del PO).
+    - `POST /api/finance/hes/[id]/approve` — acepta `amountAuthorizedClp` + opt `materializeInvoice` + `dueDate`. Si se pide materializar y el HES tiene `quotation_id` y no está facturado, corre `materializeInvoiceFromApprovedHes` en el mismo handler. Error → 207 con `invoiceError`.
+    - `GET /api/finance/quotes/[id]/document-chain` — lectura de la cadena (quote+POs+HES+incomes+totals+deltas).
+    - `POST /api/finance/quotes/[id]/convert-to-invoice` — **rama simple**: materializa factura directa desde quote aprobada sin PO/HES.
+  - **UI:**
+    - `src/views/greenhouse/finance/workspace/QuoteDocumentChain.tsx` — nuevo componente card con 3 KPIs (Cotizado / Autorizado / Facturado) con delta chips, secciones PO / HES / Facturas con accent borders, CTA "Convertir a factura" con tooltip contextual.
+    - `QuoteDetailView.tsx` — nueva tab **"Cadena documental"** con fetch del endpoint, wiring de `canConvertSimple` (viewer.canEdit + approved/sent + sin PO/HES aprobadas/facturas), handlers para navegar a PO/HES/factura individuales.
+- **Convivencia de ramas:**
+  - **Rama simple** (sin OC/HES): quote aprobada → `POST /convert-to-invoice` → income. Solo habilitada si no hay PO/HES linked.
+  - **Rama enterprise**: quote → link PO → submit HES (auto-herence de `quotation_id` del PO) → approve HES (fija `amount_authorized_clp`) → opcional `materializeInvoice:true` en el mismo approve → income con `source_hes_id` y `quotation_id`. Quote transita a `converted` en la primera materialización.
+- **Una cotización se considera `converted`** cuando la primera materialización (simple o enterprise) seteó `converted_to_income_id`; subsiguientes HES del mismo quote siguen materializándose sin retransicionar.
+- **Validado:**
+  - `pnpm migrate:status` — sin pendientes.
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm test` — 1339 passed, 2 skipped (tras ajustar `purchase-orders/route.test.ts` para incluir `quotationId: null` en el caller expectation).
+  - `pnpm build` — en curso al commit.
+- **Decisiones notables:**
+  - `quotation_id` en PO/HES es nullable: backfill no ejecutado para preservar legacy; bridge solo aplica a nuevos flujos. Callers que pasen `quotationId` obtienen audit + outbox automáticamente.
+  - `amount_authorized_clp` en HES se setea en `approveHes` (default = `amount_clp`). Drift `authorized - quoted` se computa en el reader.
+  - Emisión DTE (Nubox) no se tocó en esta task — se queda con el income ya materializado. La trazabilidad quedó en `income.source_hes_id` + `income.quotation_id`.
+- **Follow-ups (out of scope):**
+  - TASK-351 — quotation intelligence/automation pipeline (renewals, profitability) depende de este bridge.
+  - Backfill de `quotation_id` en POs/HES legacy heurísticamente (por `po_number` cuando la quote tenga número matching).
+  - UI de "Vincular OC existente" desde QuoteDetail — actualmente solo hay chip `canLinkExisting` sin dialog.
+
 ## Sesion 2026-04-17 — TASK-349 Quotation Workspace UI + PDF Delivery
 
 - **Estado:** `complete`, entregado.

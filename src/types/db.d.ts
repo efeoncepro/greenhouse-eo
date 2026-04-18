@@ -2285,9 +2285,17 @@ export interface GreenhouseFinanceIncome {
   period_year: number | null;
   po_number: string | null;
   purchase_order_id: string | null;
+  /**
+   * TASK-350: canonical quotation ancestor. Set when income is materialized from an approved quote (simple branch) or from an approved HES (enterprise branch).
+   */
+  quotation_id: string | null;
   reconciliation_id: string | null;
   referenced_income_id: string | null;
   service_line: string | null;
+  /**
+   * TASK-350: HES that authorized this income. NULL for simple-branch invoicing (quote → income directly without HES).
+   */
+  source_hes_id: string | null;
   subtotal: Numeric;
   tax_amount: Generated<Numeric>;
   tax_rate: Numeric | null;
@@ -2399,6 +2407,10 @@ export interface GreenhouseFinancePurchaseOrders {
   organization_id: string | null;
   po_id: string;
   po_number: string;
+  /**
+   * TASK-350: canonical quotation FK. Nullable because legacy POs predate the bridge; new POs created from a quote get this set.
+   */
+  quotation_id: string | null;
   received_at: Generated<Timestamp | null>;
   remaining_amount_clp: Numeric | null;
   service_scope: string | null;
@@ -2498,6 +2510,10 @@ export interface GreenhouseFinanceReconciliationPeriods {
 
 export interface GreenhouseFinanceServiceEntrySheets {
   amount: Numeric;
+  /**
+   * TASK-350: amount authorized by this HES. Distinct from amount_clp, which is the submitted/requested value. Used to compute quoted vs authorized drift.
+   */
+  amount_authorized_clp: Numeric | null;
   amount_clp: Numeric;
   approved_at: Timestamp | null;
   approved_by: string | null;
@@ -2516,6 +2532,10 @@ export interface GreenhouseFinanceServiceEntrySheets {
   notes: string | null;
   organization_id: string | null;
   purchase_order_id: string | null;
+  /**
+   * TASK-350: canonical quotation FK. Can inherit from purchase_order.quotation_id when HES is created from a PO.
+   */
+  quotation_id: string | null;
   rejection_reason: string | null;
   service_description: string;
   service_period_end: Timestamp | null;
