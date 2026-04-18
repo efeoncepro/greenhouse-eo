@@ -52,6 +52,7 @@ export const AGGREGATE_TYPES = {
   organization: 'organization',
   space: 'space',
   membership: 'membership',
+  personLegalEntityRelationship: 'person_legal_entity_relationship',
 
   // HR Core / People
   member: 'member',
@@ -158,6 +159,9 @@ export const EVENT_TYPES = {
   membershipCreated: 'membership.created',
   membershipUpdated: 'membership.updated',
   membershipDeactivated: 'membership.deactivated',
+  personLegalEntityRelationshipCreated: 'person_legal_entity_relationship.created',
+  personLegalEntityRelationshipUpdated: 'person_legal_entity_relationship.updated',
+  personLegalEntityRelationshipDeactivated: 'person_legal_entity_relationship.deactivated',
 
   // HR Core / People
   memberCreated: 'member.created',
@@ -449,6 +453,9 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.membershipCreated,
   EVENT_TYPES.membershipUpdated,
   EVENT_TYPES.membershipDeactivated,
+  EVENT_TYPES.personLegalEntityRelationshipCreated,
+  EVENT_TYPES.personLegalEntityRelationshipUpdated,
+  EVENT_TYPES.personLegalEntityRelationshipDeactivated,
   EVENT_TYPES.financeIncomeCreated,
   EVENT_TYPES.financeIncomeUpdated,
   EVENT_TYPES.financeExpenseCreated,

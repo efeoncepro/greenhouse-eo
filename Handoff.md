@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-337 Person ↔ Legal Entity Relationship Runtime Foundation
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-337-person-legal-entity-relationship-runtime-foundation`
+- **Entregado:**
+  - migración `20260418020712679_task-337-person-legal-entity-foundation.sql`
+  - tabla `greenhouse_core.person_legal_entity_relationships`
+  - helper `src/lib/account-360/person-legal-entity-relationships.ts`
+  - route `GET /api/people/[memberId]/legal-entity-relationships`
+  - proyección reactiva `operating_entity_legal_relationship`
+  - eventos `person_legal_entity_relationship.created|updated|deactivated`
+- **Decisiones clave:**
+  - `LegalEntity` v1 queda anclada explícitamente en `greenhouse_core.organizations` vía `legal_entity_organization_id`; no se crea tabla separada todavía.
+  - `person_memberships` sigue siendo contexto organizacional/operativo; la semántica legal vive en la tabla nueva.
+  - backfill inicial deliberadamente conservador:
+    - `employee` desde miembros activos del operating entity
+    - `shareholder_current_account_holder` desde `greenhouse_finance.shareholder_accounts`
+- **Validado:**
+  - `pnpm exec vitest run src/lib/sync/projections/operating-entity-legal-relationship.test.ts` ✓
+  - `pnpm migrate:up` ✓ (incluyó regeneración de `src/types/db.d.ts`)
+  - `pnpm lint` ✓
+  - `pnpm build` ✓
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` → sin matches ✓
+- **Notas operativas:**
+  - el worktree estaba detrás de `origin/develop` respecto de `migrations/20260418020055064_task-351-runtime-grants.sql`; se trajo ese archivo para alinear el historial local con la DB antes de correr `migrate:up`
+  - para validar `build` en worktree fue necesario reemplazar el symlink de `node_modules` por un directorio local hardlinkeado; Turbopack rechaza symlinks que salen del filesystem root
+
+
 ## Sesion 2026-04-18 — Release train: develop → main promotion (81 commits)
 
 - **Estado:** `complete`, deployado.

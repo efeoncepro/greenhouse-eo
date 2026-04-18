@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -22,6 +22,17 @@
 ## Summary
 
 Materializar la foundation runtime mínima para relaciones `persona ↔ entidad legal`, reutilizando `identity_profiles` y la institucionalización actual de `Efeonce Group SpA`, sin colgar la semántica legal de `user`, `member`, `space` o `organization_type`.
+
+## Delta 2026-04-18 — spec corregida contra runtime real
+
+- `Efeonce Group SpA` ya está institucionalizada como `operating entity` sobre `greenhouse_core.organizations` y se sincroniza a `person_memberships` vía:
+  - `src/lib/account-360/organization-identity.ts`
+  - `src/lib/account-360/operating-entity-membership.ts`
+  - `src/lib/sync/projections/operating-entity-membership.ts`
+- La semántica `person ↔ legal entity` sigue siendo documental; **no existe todavía** una tabla canónica `legal_entity` ni un `legal_entity_id` explícito en runtime.
+- `greenhouse_core.person_memberships` ya cubre vínculo persona ↔ organización, pero no agota la semántica legal/económica que esta task debe formalizar.
+- El `schema-snapshot-baseline.sql` sirve como referencia histórica, pero el carril real también requiere leer la migración de `TASK-193` y el runtime `account-360` ya mergeado.
+- Esta task es foundation **backend/data-only**. No incluye UI nueva ni una surface pública obligatoria en este slice.
 
 ## Why This Task Exists
 
@@ -65,7 +76,7 @@ Reglas obligatorias:
 
 - `project_context.md`
 - `Handoff.md`
-- `docs/tasks/in-progress/TASK-193-person-organization-synergy-activation.md`
+- `docs/tasks/complete/TASK-193-person-organization-synergy-activation.md`
 
 ## Dependencies & Impact
 
@@ -85,11 +96,11 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/[verificar]`
+- `migrations/[nuevo person-legal-entity relationship foundation]`
 - `src/lib/account-360/organization-identity.ts`
 - `src/lib/identity/canonical-person.ts`
 - `src/lib/account-360/operating-entity-membership.ts`
-- `src/types/[verificar]`
+- `src/types/[nuevo o extensión de tipos identity/account-360]`
 - `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
 
 ## Current Repo State
@@ -103,11 +114,15 @@ Reglas obligatorias:
 - readers canónicos de persona y organización:
   - `src/lib/identity/canonical-person.ts`
   - `src/lib/account-360/organization-identity.ts`
+  - `src/lib/account-360/operating-entity-membership.ts`
+  - `src/lib/person-360/person-complete-360.ts`
+  - `src/lib/person-360/facets/organization.ts`
 
 ### Gap
 
 - no existe relación runtime tipada y vigente para `shareholder`, `executive`, `founder`, `legal_representative`, etc.
 - `person_memberships` cubre contexto organizacional, pero no agota la semántica legal/contractual/económica
+- `organizations` hoy sirve como soporte runtime de `operating entity`, pero todavía no deja explicitado por sí solo el boundary de `LegalEntity`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -131,6 +146,7 @@ Reglas obligatorias:
 
 - Publicar helpers/readers para resolver relaciones activas por persona y por entidad
 - Mantener compatibilidad con `identity_profile`, `member_id` y la institutionalización actual de operating entity
+- Evitar que consumers infieran la relación desde `person_memberships`, `user`, `member` o `space` cuando el vínculo real es legal/económico
 
 ### Slice 3 — Documentation + seeds mínimos
 
@@ -143,6 +159,7 @@ Reglas obligatorias:
 - bridge a `Payroll`
 - cambios de UI
 - rediseño completo de `organizations`
+- crear un objeto `LegalEntity` separado de `organizations` si la solución v1 puede vivir como layer explícita sobre `organization_id`
 
 ## Detailed Spec
 
