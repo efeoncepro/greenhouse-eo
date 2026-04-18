@@ -1,0 +1,109 @@
+import 'server-only'
+
+/**
+ * TASK-351 — Commercial Intelligence contracts.
+ *
+ * Shared types for the pipeline + profitability + renewal projections.
+ */
+
+export type PipelineStage =
+  | 'draft'
+  | 'in_review'
+  | 'sent'
+  | 'approved'
+  | 'converted'
+  | 'rejected'
+  | 'expired'
+
+export interface PipelineSnapshotRow {
+  quotationId: string
+  clientId: string | null
+  organizationId: string | null
+  spaceId: string | null
+
+  status: string
+  pipelineStage: PipelineStage
+  probabilityPct: number
+
+  totalAmountClp: number | null
+  quotedMarginPct: number | null
+  businessLineCode: string | null
+  pricingModel: string | null
+  currency: string | null
+
+  quoteDate: string | null
+  sentAt: string | null
+  approvedAt: string | null
+  expiryDate: string | null
+  convertedAt: string | null
+  rejectedAt: string | null
+  expiredAt: string | null
+
+  daysInStage: number | null
+  daysUntilExpiry: number | null
+  isRenewalDue: boolean
+  isExpired: boolean
+
+  authorizedAmountClp: number | null
+  invoicedAmountClp: number | null
+
+  snapshotSourceEvent: string | null
+  materializedAt: string
+}
+
+export type DriftSeverity = 'aligned' | 'warning' | 'critical'
+
+export interface DriftDrivers {
+  authorizedVsQuotedPct?: number | null
+  invoicedVsQuotedPct?: number | null
+  costVsQuotedPct?: number | null
+  realizedVsQuotedPct?: number | null
+}
+
+export interface ProfitabilitySnapshotRow {
+  quotationId: string
+  periodYear: number
+  periodMonth: number
+
+  clientId: string | null
+  organizationId: string | null
+  spaceId: string | null
+
+  quotedTotalClp: number | null
+  quotedMarginPct: number | null
+
+  authorizedTotalClp: number | null
+  invoicedTotalClp: number | null
+  realizedRevenueClp: number | null
+  attributedCostClp: number | null
+
+  effectiveMarginPct: number | null
+  marginDriftPct: number | null
+  driftSeverity: DriftSeverity
+  driftDrivers: DriftDrivers
+
+  materializedAt: string
+}
+
+export interface RenewalReminderRow {
+  quotationId: string
+  lastReminderAt: string | null
+  reminderCount: number
+  nextCheckAt: string | null
+  lastEventType: string | null
+}
+
+export const PIPELINE_STAGE_PROBABILITY: Record<PipelineStage, number> = {
+  draft: 10,
+  in_review: 25,
+  sent: 40,
+  approved: 75,
+  converted: 100,
+  rejected: 0,
+  expired: 0
+}
+
+export const RENEWAL_LOOKAHEAD_DAYS = 60
+export const RENEWAL_CADENCE_DAYS = 14
+export const DRIFT_WARNING_THRESHOLD_PCT = 5
+export const DRIFT_CRITICAL_THRESHOLD_PCT = 15

@@ -340,6 +340,12 @@ export const EVENT_TYPES = {
   quotationServiceEntryLinked: 'commercial.quotation.hes_linked',
   quotationInvoiceEmitted: 'commercial.quotation.invoice_emitted',
 
+  // Quotation Intelligence Automation (TASK-351)
+  quotationExpired: 'commercial.quotation.expired',
+  quotationRenewalDue: 'commercial.quotation.renewal_due',
+  quotationPipelineMaterialized: 'commercial.quotation.pipeline_materialized',
+  quotationProfitabilityMaterialized: 'commercial.quotation.profitability_materialized',
+
   // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
   productCreated: 'finance.product.created',

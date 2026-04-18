@@ -421,6 +421,13 @@ upsert_scheduler_job \
   '{"limit":8}'
 echo "  -> ops-nexa-weekly-digest: 0 7 * * 1 (weekly Nexa executive digest)"
 
+upsert_scheduler_job \
+  "ops-quotation-lifecycle" \
+  "0 7 * * *" \
+  "/quotation-lifecycle/sweep" \
+  '{}'
+echo "  -> ops-quotation-lifecycle: 0 7 * * * (daily quote expiration + renewal_due sweep, TASK-351)"
+
 echo ""
 echo "=== Deployment complete ==="
 echo ""

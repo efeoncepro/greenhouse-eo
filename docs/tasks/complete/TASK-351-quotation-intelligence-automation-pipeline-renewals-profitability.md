@@ -11,7 +11,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -167,10 +167,10 @@ La task debe dejar explícito:
 
 ## Acceptance Criteria
 
-- [ ] Existe projection de revenue pipeline para cotizaciones canónicas
-- [ ] Renewal lifecycle puede alertar y/o generar draft según policy definida
-- [ ] Profitability tracking compara cotizado vs ejecutado con drift severity y drivers
-- [ ] Las automatizaciones relevantes quedan integradas al `ops-worker` o al runtime acordado
+- [x] Existe projection de revenue pipeline para cotizaciones canónicas (`greenhouse_serving.quotation_pipeline_snapshots` + `quotation_pipeline` reactive projection con 12 trigger events).
+- [x] Renewal lifecycle puede alertar y/o generar draft según policy definida (sweep diario emite `renewal_due` con dedup via `quotation_renewal_reminders`; draft manual desde UI con audit `renewal_generated` — auto-draft se dejó como follow-up consciente).
+- [x] Profitability tracking compara cotizado vs ejecutado con drift severity y drivers (`greenhouse_serving.quotation_profitability_snapshots` con `margin_drift_pct`, `drift_severity`, y `drift_drivers` JSONB que incluye `authorizedVsQuotedPct`, `invoicedVsQuotedPct`, `realizedVsQuotedPct`).
+- [x] Las automatizaciones relevantes quedan integradas al `ops-worker` o al runtime acordado (projections en domain `cost_intelligence` reutilizan `ops-reactive-cost-intelligence` cada 10 min; scheduled sweep via `POST /quotation-lifecycle/sweep` + Cloud Scheduler `ops-quotation-lifecycle` 07:00 Santiago + Vercel fallback).
 
 ## Verification
 
