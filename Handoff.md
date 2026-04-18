@@ -36,6 +36,38 @@
 - **Riesgo / pendiente menor:**
   - la validación explícita en staging queda atada al deploy de `develop` después del merge; localmente la cron route ya respondió `200`
 
+## Sesion 2026-04-18 — TASK-464e Quote Builder UI Exposure (cierre Ola 4 completa)
+
+- **Owner:** Claude
+- **Estado:** shipped + closed (Lifecycle `complete`, archivo movido a `docs/tasks/complete/`)
+- **PRs mergeados a develop:**
+  - PR #72 (squash `bf530340`) — backend APIs + primitives + workspace components + refactor final de QuoteCreateDrawer/QuoteLineItemsEditor
+  - Close-out commit directo a `task/TASK-464e-closeout` (siguiente merge) — tab `people` en picker, inline pricing context (FTE/periods/employment_type), tier compliance chip por línea, doc funcional
+- **Entregables totales Ola 4:**
+  - **Endpoints**: `GET /api/finance/quotes/pricing/config`, `GET /api/finance/quotes/pricing/lookup?type=role|person|tool|addon|employment_type`, `POST /api/finance/quotes/pricing/simulate` (con filtro de cost stack por rol)
+  - **Primitives** (`src/components/greenhouse/pricing/`): MarginIndicatorBadge, CurrencySwitcher, PricingCatalogNavCard, CostStackPanel, SellableItemRow, SellableItemPickerDrawer (5 tabs)
+  - **Hook**: `usePricingSimulation` (debounce 500ms + AbortController + serialized deps)
+  - **Workspace components**: QuoteBuilderActions (sidebar), QuoteTotalsFooter (sticky), AddonSuggestionsPanel (gated), QuoteLineCostStack (wrapper de CostStackPanel)
+  - **Refactors**: QuoteCreateDrawer integra sidebar + hook + totals + addons; QuoteLineItemsEditor con 4 botones de picker + tier chip + pricing context inline + cost stack gated
+  - **Auth**: `canViewCostStack` en `src/lib/tenant/authorization.ts` (`EFEONCE_ADMIN | FINANCE_ADMIN | FINANCE_ANALYST`)
+  - **Copy**: bloque `GH_PRICING` en `src/config/greenhouse-nomenclature.ts` con 5 tabs del picker + labels del builder
+  - **Doc funcional**: `docs/documentation/finance/cotizador.md`
+- **Deltas asumidos vs spec original** (documentados en el task file):
+  - 5 tabs en picker único (vs 4 autocompletes separados)
+  - Role gating con `EFEONCE_ADMIN | FINANCE_ADMIN | FINANCE_ANALYST` (los roles reales)
+  - 6 monedas LatAm (`CLP|USD|CLF|COP|MXN|PEN`) vs 4 originales
+  - `tool` y `overhead_addon` aplanados a `direct_cost` + metadata (cero cambio de schema)
+- **Follow-ups abiertos** (no bloquean cierre):
+  - Edit de quote existente con este UI (V2)
+  - Override de margen por línea con audit trail
+  - Playwright E2E de los 4 modos de composición
+  - Excel fidelity verification con casos de referencia
+  - Mobile iPad smoke test
+- **Tasks desbloqueadas**:
+  - TASK-465 (service composition) — tab `services` ya tiene placeholder en el picker
+  - TASK-467 (pricing catalog admin UI) — comparte endpoints con el cotizador
+  - TASK-463 (HubSpot unified drawer) — persistencia canónica lista para propagar
+
 ## Sesion 2026-04-18 — TASK-453 Deal Canonicalization & Commercial Bridge (cierre)
 
 - **Owner:** Codex
