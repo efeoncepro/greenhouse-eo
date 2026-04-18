@@ -1623,6 +1623,7 @@ export const GH_PRICING = {
   builderEmptyLineItemsCta: 'Agregar rol',
 
   // Sellable item picker (drawer con 4 tabs)
+  pickerTitle: 'Agregar ítem',
   pickerTabs: {
     roles: 'Roles',
     tools: 'Herramientas',
@@ -1632,6 +1633,15 @@ export const GH_PRICING = {
   pickerSearchPlaceholder: 'Buscar por SKU o nombre...',
   pickerEmpty: 'No hay ítems activos para este filtro',
   pickerEmptyCta: 'Ir al catálogo',
+  pickerServicesPlaceholder: 'Los servicios empaquetados se habilitan en TASK-465.',
+  pickerLoadingAria: 'Cargando catálogo',
+  pickerSelectionNone: 'Ningún ítem seleccionado',
+  pickerSelectionCountOne: (n: number) => `${n} ítem seleccionado`,
+  pickerSelectionCountMany: (n: number) => `${n} ítems seleccionados`,
+  pickerSubmit: 'Agregar seleccionados',
+  pickerCancel: 'Cancelar',
+  pickerClose: 'Cerrar',
+  pickerTabsAriaLabel: 'Categorías de ítems vendibles',
 
   // Cost stack (gated: solo finance/admin)
   costStackTitle: 'Detalle de costo (solo interno)',

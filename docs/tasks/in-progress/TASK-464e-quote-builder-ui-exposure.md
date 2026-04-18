@@ -1,12 +1,22 @@
 # TASK-464e — Quote Builder UI Exposure (Role/Tool/Addon Pickers + Cost Stack Gated)
 
+## Delta 2026-04-18
+
+Reconciliación vs TASK-469 (plano maestro, posterior a esta spec) + realidad del repo:
+
+- **Pickers**: la spec original listó 4 autocompletes separados en `workspace/`. TASK-469 §B canoniza **un solo drawer con 4 tabs** en `src/components/greenhouse/pricing/SellableItemPickerDrawer.tsx` (reusable por TASK-465/467). Adopto la versión del plano — los 4 botones `[+ Rol]` `[+ Persona]` `[+ Herramienta]` `[+ Overhead]` del editor abren el drawer con `initialTab` preseleccionada. Persona sigue como variant separada (Autocomplete simple sobre `team_members`) porque no viene del catálogo sellable.
+- **Role gating**: la spec usa `finance_manager` y `finance`. En `src/config/role-codes.ts` solo existen `FINANCE_ADMIN`, `FINANCE_ANALYST`, `EFEONCE_ADMIN`. Uso esos tres en `canViewCostStack()`; si luego aparece un rol `finance_manager` operativo, se agrega al helper sin tocar consumers.
+- **Currencies**: drawer actual acepta `CLP|USD|CLF`. Extiendo a 6 (`CLP|USD|CLF|COP|MXN|PEN`) alineado con `PricingOutputCurrency` del engine v2. `CurrencySwitcher` ya refleja esto.
+- **Line types**: el engine v2 usa `role|person|tool|overhead_addon|direct_cost`; la persistencia (`quotation_line_items`) usa `person|role|deliverable|direct_cost`. Para MVP, al persistir `tool` y `overhead_addon` los mapeo a `direct_cost` + `metadata.pricingV2LineType` + `metadata.sku` (stored en `description` JSON estructurado). Cero cambio de schema. La UI del builder mantiene los 4 modos visualmente; el flattening ocurre al submit.
+- **Entitlement**: uso role check directo (Opción A, MVP). `finance.cost_stack.view` capability queda como follow-up si aparece necesidad de governance fina (ej. override por user).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy Alto`
 - Effort: `Alto`

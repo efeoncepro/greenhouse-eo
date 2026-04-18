@@ -101,6 +101,7 @@ Esto viola el multi-agent operating model (`docs/operations/MULTI_AGENT_WORKTREE
 4. `git stash` o `git restore` los archivos del primary worktree después de mover
 
 Dejé los archivos tal cual están (no los toqué ni los incluí en mis commits) para que Codex pueda recuperarlos intactos. Mi rama `task/TASK-464e-standalone-components` NO incluye nada de ese WIP.
+
 ## Sesion 2026-04-18 — TASK-464d Pricing Engine Full-Model Refactor (cierre)
 
 - **Owner:** Codex

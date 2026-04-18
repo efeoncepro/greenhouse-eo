@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import Autocomplete from '@mui/material/Autocomplete'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -18,12 +17,20 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+
+import type { PricingLineOutputV2, PricingOutputCurrency, PricingV2LineType } from '@/lib/finance/pricing/contracts'
+
+import SellableItemPickerDrawer, {
+  type SellableItemPickerTab,
+  type SellableSelection
+} from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
+
+import QuoteLineCostStack from './QuoteLineCostStack'
 
 export interface QuoteLineItem {
   lineItemId?: string
@@ -40,15 +47,10 @@ export interface QuoteLineItem {
   memberId?: string | null
   discountType?: 'percentage' | 'fixed_amount' | null
   discountValue?: number | null
-}
-
-export interface QuoteLineItemsEditorProduct {
-  productId: string
-  productName: string
-  productCode: string
-  defaultUnitPrice: number | null
-  defaultUnit: string
-  suggestedRoleCode: string | null
+  metadata?: {
+    pricingV2LineType?: PricingV2LineType
+    sku?: string
+  } | null
 }
 
 export interface QuoteLineItemsEditorProps {
@@ -58,7 +60,17 @@ export interface QuoteLineItemsEditorProps {
   lineItems: QuoteLineItem[]
   onSave: (lines: QuoteLineItem[]) => Promise<void>
   saving: boolean
-  products: QuoteLineItemsEditorProduct[]
+  businessLineCode?: string | null
+
+  /** Gating del cost stack (solo finance/admin). El caller es responsable de
+   * computar este flag con `canViewCostStack(tenant)`. */
+  canViewCostStack?: boolean
+
+  /** Output del engine v2 por línea, indexado por posición. Cuando está disponible
+   * y el viewer tiene permisos, se renderiza el QuoteLineCostStack debajo de cada
+   * línea con tier compliance y breakdown interno. */
+  simulationLines?: PricingLineOutputV2[] | null
+  outputCurrency?: PricingOutputCurrency | null
 }
 
 const LINE_TYPE_OPTIONS: Array<{ value: QuoteLineItem['lineType']; label: string; color: 'primary' | 'info' | 'success' | 'warning' }> = [
@@ -128,10 +140,93 @@ const computeRowSubtotalAfterDiscount = (line: QuoteLineItem): number => {
 
 const cloneLineItems = (items: QuoteLineItem[]): QuoteLineItem[] => items.map(item => ({ ...item }))
 
-const emptyLine = (): QuoteLineItem => ({
+// Mapea una selección del SellableItemPickerDrawer a un QuoteLineItem persistible.
+// engine v2 usa 5 line types; la tabla actual persiste 4 (person/role/deliverable/direct_cost).
+// Para tool y overhead_addon, aplanamos a direct_cost + metadata.pricingV2LineType + metadata.sku
+// (TASK-464e Delta 2026-04-18).
+const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
+  switch (selection.tab) {
+    case 'roles':
+      return {
+        label: selection.label,
+        description: null,
+        lineType: 'role',
+        unit: 'month',
+        quantity: 1,
+        unitPrice: null,
+        subtotalPrice: null,
+        subtotalAfterDiscount: null,
+        roleCode: selection.sku,
+        memberId: null,
+        productId: null,
+        discountType: null,
+        discountValue: null,
+        metadata: { pricingV2LineType: 'role', sku: selection.sku }
+      }
+    case 'tools':
+      return {
+        label: selection.label,
+        description: null,
+        lineType: 'direct_cost',
+        unit: 'unit',
+        quantity: 1,
+        unitPrice: null,
+        subtotalPrice: null,
+        subtotalAfterDiscount: null,
+        roleCode: null,
+        memberId: null,
+        productId: null,
+        discountType: null,
+        discountValue: null,
+        metadata: { pricingV2LineType: 'tool', sku: selection.sku }
+      }
+    case 'overhead':
+      return {
+        label: selection.label,
+        description: null,
+        lineType: 'direct_cost',
+        unit: 'unit',
+        quantity: 1,
+        unitPrice: null,
+        subtotalPrice: null,
+        subtotalAfterDiscount: null,
+        roleCode: null,
+        memberId: null,
+        productId: null,
+        discountType: null,
+        discountValue: null,
+        metadata: { pricingV2LineType: 'overhead_addon', sku: selection.sku }
+      }
+    case 'services':
+    default:
+      return {
+        label: selection.label,
+        description: null,
+        lineType: 'deliverable',
+        unit: 'project',
+        quantity: 1,
+        unitPrice: null,
+        subtotalPrice: null,
+        subtotalAfterDiscount: null,
+        roleCode: null,
+        memberId: null,
+        productId: null,
+        discountType: null,
+        discountValue: null,
+        metadata: { sku: selection.sku }
+      }
+  }
+}
+
+// Persona: el picker tab 'roles' no aplica; usamos lookup type=person.
+// Por simplicidad, reutilizamos el mismo drawer con tab 'roles' y mapeamos
+// al `memberId` cuando el sku viene del endpoint de people. Para MVP Phase 2c,
+// creamos una línea vacía tipo 'person' que el usuario completa manualmente
+// si no hay picker dedicado de people (follow-up).
+const emptyPersonLine = (): QuoteLineItem => ({
   label: '',
   description: null,
-  lineType: 'role',
+  lineType: 'person',
   unit: 'hour',
   quantity: 1,
   unitPrice: null,
@@ -141,7 +236,8 @@ const emptyLine = (): QuoteLineItem => ({
   roleCode: null,
   memberId: null,
   discountType: null,
-  discountValue: null
+  discountValue: null,
+  metadata: { pricingV2LineType: 'person' }
 })
 
 const QuoteLineItemsEditor = ({
@@ -150,24 +246,21 @@ const QuoteLineItemsEditor = ({
   lineItems,
   onSave,
   saving,
-  products
+  businessLineCode = null,
+  canViewCostStack: canViewCostStackProp = false,
+  simulationLines = null,
+  outputCurrency = null
 }: QuoteLineItemsEditorProps) => {
   const [draftLines, setDraftLines] = useState<QuoteLineItem[]>(() => cloneLineItems(lineItems))
   const [dirty, setDirty] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerInitialTab, setPickerInitialTab] = useState<SellableItemPickerTab>('roles')
 
   useEffect(() => {
     if (!dirty) {
       setDraftLines(cloneLineItems(lineItems))
     }
   }, [lineItems, dirty])
-
-  const productById = useMemo(() => {
-    const map = new Map<string, QuoteLineItemsEditorProduct>()
-
-    products.forEach(product => map.set(product.productId, product))
-
-    return map
-  }, [products])
 
   const updateLine = useCallback((index: number, patch: Partial<QuoteLineItem>) => {
     setDraftLines(prev => {
@@ -180,8 +273,20 @@ const QuoteLineItemsEditor = ({
     setDirty(true)
   }, [])
 
-  const handleAddLine = useCallback(() => {
-    setDraftLines(prev => [...prev, emptyLine()])
+  const handleOpenPicker = useCallback((tab: SellableItemPickerTab) => {
+    setPickerInitialTab(tab)
+    setPickerOpen(true)
+  }, [])
+
+  const handlePickerSelect = useCallback((selections: SellableSelection[]) => {
+    if (selections.length === 0) return
+
+    setDraftLines(prev => [...prev, ...selections.map(mapSelectionToLine)])
+    setDirty(true)
+  }, [])
+
+  const handleAddPersonLine = useCallback(() => {
+    setDraftLines(prev => [...prev, emptyPersonLine()])
     setDirty(true)
   }, [])
 
@@ -200,39 +305,12 @@ const QuoteLineItemsEditor = ({
     setDirty(false)
   }, [draftLines, onSave])
 
-  const handleProductSelect = useCallback(
-    (index: number, productId: string | null) => {
-      if (productId === null) {
-        updateLine(index, { productId: null })
-
-        return
-      }
-
-      const product = productById.get(productId)
-
-      if (!product) {
-        updateLine(index, { productId })
-
-        return
-      }
-
-      const currentLine = draftLines[index]
-
-      const nextUnit: QuoteLineItem['unit'] = (['hour', 'month', 'unit', 'project'] as const).includes(
-        product.defaultUnit as QuoteLineItem['unit']
-      )
-        ? (product.defaultUnit as QuoteLineItem['unit'])
-        : currentLine.unit
-
-      updateLine(index, {
-        productId: product.productId,
-        label: currentLine.label.trim() ? currentLine.label : product.productName,
-        unit: nextUnit,
-        unitPrice: currentLine.unitPrice ?? product.defaultUnitPrice,
-        roleCode: product.suggestedRoleCode ?? currentLine.roleCode
-      })
-    },
-    [draftLines, productById, updateLine]
+  const excludedSkus = useMemo(
+    () =>
+      draftLines
+        .map(line => line.metadata?.sku ?? line.roleCode ?? line.productId ?? null)
+        .filter((sku): sku is string => typeof sku === 'string'),
+    [draftLines]
   )
 
   const totalRows = draftLines.length
@@ -324,36 +402,64 @@ const QuoteLineItemsEditor = ({
     <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
       <CardHeader
         title={`Ítems de la cotización (${totalRows})`}
-        subheader='Edita los ítems y guarda para recalcular precio y margen.'
+        subheader='Agrega ítems vendibles desde el catálogo o crea una línea manual.'
         avatar={
           <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
             <i className='tabler-list-details' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
           </Avatar>
         }
-        action={
+      />
+      <Divider />
+      <Box sx={{ p: 3 }}>
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           <Button
             variant='outlined'
             size='small'
-            startIcon={<i className='tabler-plus' />}
-            onClick={handleAddLine}
+            startIcon={<i className='tabler-user-star' />}
+            onClick={() => handleOpenPicker('roles')}
             disabled={saving}
           >
-            Agregar ítem
+            + Rol
           </Button>
-        }
-      />
+          <Button
+            variant='outlined'
+            size='small'
+            startIcon={<i className='tabler-user' />}
+            onClick={handleAddPersonLine}
+            disabled={saving}
+          >
+            + Persona
+          </Button>
+          <Button
+            variant='outlined'
+            size='small'
+            startIcon={<i className='tabler-tool' />}
+            onClick={() => handleOpenPicker('tools')}
+            disabled={saving}
+          >
+            + Herramienta
+          </Button>
+          <Button
+            variant='outlined'
+            size='small'
+            startIcon={<i className='tabler-receipt' />}
+            onClick={() => handleOpenPicker('overhead')}
+            disabled={saving}
+          >
+            + Overhead
+          </Button>
+        </Stack>
+      </Box>
       <Divider />
       <Box sx={{ overflowX: 'auto' }}>
         <Table size='small'>
           <TableHead>
             <TableRow>
               <TableCell sx={{ minWidth: 220 }}>Ítem</TableCell>
-              <TableCell sx={{ minWidth: 200 }}>Producto</TableCell>
               <TableCell sx={{ minWidth: 140 }}>Tipo</TableCell>
               <TableCell sx={{ minWidth: 90 }} align='right'>Cantidad</TableCell>
               <TableCell sx={{ minWidth: 110 }}>Unidad</TableCell>
               <TableCell sx={{ minWidth: 130 }} align='right'>Precio unitario</TableCell>
-              <TableCell sx={{ minWidth: 100 }} align='right'>Descuento %</TableCell>
               <TableCell sx={{ minWidth: 110 }} align='right'>Subtotal</TableCell>
               <TableCell sx={{ minWidth: 60 }} />
             </TableRow>
@@ -361,180 +467,120 @@ const QuoteLineItemsEditor = ({
           <TableBody>
             {draftLines.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9}>
+                <TableCell colSpan={7}>
                   <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
                     <Typography variant='body2' color='text.secondary'>
-                      Aún no agregaste ítems. Usa «Agregar ítem» para comenzar.
+                      Aún no agregaste ítems. Usa los botones de arriba para elegir del catálogo.
                     </Typography>
                   </Box>
                 </TableCell>
               </TableRow>
             ) : (
               draftLines.map((line, index) => {
-                const selectedProduct = line.productId ? productById.get(line.productId) ?? null : null
                 const subtotal = computeRowSubtotalAfterDiscount(line)
-
-                const discountPct =
-                  line.discountType === 'percentage' && line.discountValue !== null && line.discountValue !== undefined
-                    ? line.discountValue
-                    : null
+                const typeMeta = LINE_TYPE_META[line.lineType]
+                const simulationLine = simulationLines?.[index] ?? null
+                const showCostStack = canViewCostStackProp && simulationLine && outputCurrency
 
                 return (
-                  <TableRow key={line.lineItemId ?? `draft-${index}`} hover>
-                    <TableCell>
-                      <Stack spacing={1}>
-                        <CustomTextField
-                          size='small'
-                          fullWidth
-                          placeholder='Ej. Diseño de identidad'
-                          value={line.label}
-                          onChange={event => updateLine(index, { label: event.target.value })}
-                          disabled={saving}
-                          aria-label={`Etiqueta del ítem ${index + 1}`}
-                        />
-                        <CustomTextField
-                          size='small'
-                          fullWidth
-                          placeholder='Descripción (opcional)'
-                          value={line.description ?? ''}
-                          onChange={event =>
-                            updateLine(index, { description: event.target.value.trim() ? event.target.value : null })
-                          }
-                          disabled={saving}
-                          aria-label={`Descripción del ítem ${index + 1}`}
-                        />
-                      </Stack>
-                    </TableCell>
-                    <TableCell>
-                      <Autocomplete
-                        size='small'
-                        options={products}
-                        getOptionLabel={option => `${option.productCode} · ${option.productName}`}
-                        value={selectedProduct}
-                        onChange={(_event, value) => handleProductSelect(index, value ? value.productId : null)}
-                        disabled={saving}
-                        renderInput={params => (
-                          <TextField
-                            {...params}
+                  <>
+                    <TableRow key={line.lineItemId ?? `draft-${index}`} hover>
+                      <TableCell>
+                        <Stack spacing={1}>
+                          <CustomTextField
                             size='small'
-                            placeholder='Producto (opcional)'
-                            aria-label={`Producto del ítem ${index + 1}`}
-                          />
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <CustomTextField
-                        select
-                        size='small'
-                        fullWidth
-                        value={line.lineType}
-                        onChange={event => updateLine(index, { lineType: event.target.value as QuoteLineItem['lineType'] })}
-                        disabled={saving}
-                        aria-label={`Tipo del ítem ${index + 1}`}
-                      >
-                        {LINE_TYPE_OPTIONS.map(option => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </CustomTextField>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <CustomTextField
-                        size='small'
-                        type='number'
-                        value={line.quantity}
-                        onChange={event => {
-                          const raw = event.target.value
-                          const next = raw === '' ? 0 : Number(raw)
-
-                          updateLine(index, { quantity: Number.isFinite(next) ? next : 0 })
-                        }}
-                        inputProps={{ min: 0, step: 'any' }}
-                        disabled={saving}
-                        aria-label={`Cantidad del ítem ${index + 1}`}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <CustomTextField
-                        select
-                        size='small'
-                        fullWidth
-                        value={line.unit}
-                        onChange={event => updateLine(index, { unit: event.target.value as QuoteLineItem['unit'] })}
-                        disabled={saving}
-                        aria-label={`Unidad del ítem ${index + 1}`}
-                      >
-                        {UNIT_OPTIONS.map(option => (
-                          <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </CustomTextField>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <CustomTextField
-                        size='small'
-                        type='number'
-                        value={line.unitPrice ?? ''}
-                        onChange={event => {
-                          const raw = event.target.value
-
-                          updateLine(index, { unitPrice: raw === '' ? null : Number(raw) })
-                        }}
-                        inputProps={{ min: 0, step: 'any' }}
-                        disabled={saving}
-                        aria-label={`Precio unitario del ítem ${index + 1}`}
-                      />
-                    </TableCell>
-                    <TableCell align='right'>
-                      <CustomTextField
-                        size='small'
-                        type='number'
-                        value={discountPct ?? ''}
-                        onChange={event => {
-                          const raw = event.target.value
-
-                          if (raw === '') {
-                            updateLine(index, { discountType: null, discountValue: null })
-
-                            return
-                          }
-
-                          const parsed = Number(raw)
-
-                          updateLine(index, {
-                            discountType: 'percentage',
-                            discountValue: Number.isFinite(parsed) ? parsed : null
-                          })
-                        }}
-                        inputProps={{ min: 0, max: 100, step: 'any' }}
-                        disabled={saving}
-                        aria-label={`Descuento del ítem ${index + 1}`}
-                      />
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
-                        {formatCurrency(subtotal, currency)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Tooltip title='Eliminar ítem'>
-                        <span>
-                          <IconButton
-                            size='small'
-                            color='error'
-                            onClick={() => handleRemoveLine(index)}
+                            fullWidth
+                            placeholder='Ej. Diseño de identidad'
+                            value={line.label}
+                            onChange={event => updateLine(index, { label: event.target.value })}
                             disabled={saving}
-                            aria-label={`Eliminar ítem ${index + 1}`}
-                          >
-                            <i className='tabler-trash' />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
+                            aria-label={`Etiqueta del ítem ${index + 1}`}
+                          />
+                          {line.metadata?.sku && (
+                            <Typography variant='caption' color='text.secondary'>
+                              SKU {line.metadata.sku}
+                            </Typography>
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
+                      </TableCell>
+                      <TableCell align='right'>
+                        <CustomTextField
+                          size='small'
+                          type='number'
+                          value={line.quantity}
+                          onChange={event => {
+                            const raw = event.target.value
+                            const next = raw === '' ? 0 : Number(raw)
+
+                            updateLine(index, { quantity: Number.isFinite(next) ? next : 0 })
+                          }}
+                          disabled={saving}
+                          aria-label={`Cantidad del ítem ${index + 1}`}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <CustomTextField
+                          select
+                          size='small'
+                          fullWidth
+                          value={line.unit}
+                          onChange={event => updateLine(index, { unit: event.target.value as QuoteLineItem['unit'] })}
+                          disabled={saving}
+                          aria-label={`Unidad del ítem ${index + 1}`}
+                        >
+                          {UNIT_OPTIONS.map(option => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                        </CustomTextField>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <CustomTextField
+                          size='small'
+                          type='number'
+                          value={line.unitPrice ?? ''}
+                          onChange={event => {
+                            const raw = event.target.value
+
+                            updateLine(index, { unitPrice: raw === '' ? null : Number(raw) })
+                          }}
+                          disabled={saving}
+                          aria-label={`Precio unitario del ítem ${index + 1}`}
+                        />
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                          {formatCurrency(subtotal, currency)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Tooltip title='Eliminar ítem'>
+                          <span>
+                            <IconButton
+                              size='small'
+                              color='error'
+                              onClick={() => handleRemoveLine(index)}
+                              disabled={saving}
+                              aria-label={`Eliminar ítem ${index + 1}`}
+                            >
+                              <i className='tabler-trash' />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                    {showCostStack && simulationLine && outputCurrency ? (
+                      <TableRow key={`${line.lineItemId ?? `draft-${index}`}-cost`}>
+                        <TableCell colSpan={7} sx={{ py: 1, bgcolor: 'background.default' }}>
+                          <QuoteLineCostStack lineOutput={simulationLine} outputCurrency={outputCurrency} />
+                        </TableCell>
+                      </TableRow>
+                    ) : null}
+                  </>
                 )
               })
             )}
@@ -570,6 +616,15 @@ const QuoteLineItemsEditor = ({
           </Button>
         </Stack>
       </Box>
+
+      <SellableItemPickerDrawer
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onSelect={handlePickerSelect}
+        initialTab={pickerInitialTab}
+        businessLineCode={businessLineCode}
+        excludeSkus={excludedSkus}
+      />
     </Card>
   )
 }
