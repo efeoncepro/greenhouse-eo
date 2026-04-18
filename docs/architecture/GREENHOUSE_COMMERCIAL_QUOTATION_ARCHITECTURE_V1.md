@@ -5,7 +5,7 @@
 > **Updated:** 2026-04-18 — v2.12: TASK-464c tool catalog + overhead addons foundation implementada. `greenhouse_ai.tool_catalog` se extiende con `tool_sku`, prorrateo, `applicable_business_lines`, `applicability_tags`, `includes_in_addon` y `notes_for_quoting`; se crea `greenhouse_commercial.overhead_addons` con 9 addons canonizados (`EFO-001..009`). Nuevos módulos `tool-catalog-store.ts`, `overhead-addons-store.ts`, `tool-catalog-events.ts` y seeders idempotentes `scripts/seed-tool-catalog.ts` / `scripts/seed-overhead-addons.ts`. El catálogo comercial sigue conviviendo con AI tooling sin romper consumers existentes.
 > **Updated:** 2026-04-18 — v2.11: TASK-464b pricing governance tables implementada. Nuevas tablas `role_tier_margins`, `service_tier_margins`, `commercial_model_multipliers`, `country_pricing_factors` y `fte_hours_guide` en `greenhouse_commercial`, con versionado liviano por `effective_from`, readers cacheados en `pricing-governance-store.ts` y seeder idempotente `scripts/seed-pricing-governance.ts`. El seed real dejó `21` drifts rol→tier auditados contra `TASK-464a`; el catálogo canónico sigue ganando y la reconciliación queda para consumers posteriores.
 > **Updated:** 2026-04-18 — v2.10: TASK-468 commercial-side payroll employment type bridge. Nueva tabla `greenhouse_commercial.employment_type_aliases` para resolver vocabulario factual de payroll (`contract_type`) hacia `employment_types` canónicos sin tocar `greenhouse_payroll.*`. Nuevos módulos `employment-type-alias-store.ts`, `employment-type-alias-normalization.ts`, `payroll-rates-bridge.ts` y script `scripts/audit-payroll-contract-types.ts`. El bridge queda read-only y auditable; el cutover del engine sigue diferido a TASK-464d.
-> **Updated:** 2026-04-18 — v2.9: TASK-464a sellable roles catalog foundation. Nuevas tablas `sellable_roles`, `employment_types`, `sellable_role_cost_components`, `role_employment_compatibility`, `sellable_role_pricing_currency` y sequence `sellable_role_sku_seq` en `greenhouse_commercial`. Seeder idempotente `scripts/seed-sellable-roles.ts` consume `data/pricing/seed/sellable-roles-pricing.csv` (32 roles activos, 54 placeholders) y publica eventos `commercial.sellable_role.{created,cost_updated,pricing_updated}`. `role_rate_cards` sigue en coexistencia temporal hasta TASK-464d.
+> **Updated:** 2026-04-18 — v2.10: TASK-464d pricing engine v2 implementado como capa aditiva en `src/lib/finance/pricing/pricing-engine-v2.ts` con `tier-compliance.ts`, `addon-resolver.ts` y `currency-converter.ts`. El flujo persistente legacy de quotations (`QuotationPricingInput`, `resolveLineItemCost`, `quotation-pricing-orchestrator.ts`) sigue conviviendo con `role_rate_cards` / `margin_targets`, mientras el endpoint `GET /api/finance/quotes/pricing/config` ya expone también el catálogo canónico de roles, employment types, governance, tools y overhead addons.
 > **Updated:** 2026-04-18 — v2.8: TASK-351 quotation intelligence automation. Reactive projections `quotation_pipeline` + `quotation_profitability` en domain `cost_intelligence`. Daily lifecycle sweep (`/api/cron/quotation-lifecycle` + ops-worker `/quotation-lifecycle/sweep`) que expira cotizaciones vencidas y emite `renewal_due` con dedup. 4 eventos canónicos nuevos (`expired`, `renewal_due`, `pipeline_materialized`, `profitability_materialized`). Nueva tab "Cotizaciones" en `/finance/intelligence` con Pipeline + Rentabilidad + Renovaciones.
 > **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
@@ -105,7 +105,8 @@
   - `commercial.sellable_role.pricing_updated`
 - Regla de coexistencia:
   - `role_rate_cards` sigue como compatibilidad para callers legacy del engine TASK-346.
-  - TASK-464d migra consumers al nuevo backbone y recién ahí habilita la deprecación efectiva de `role_rate_cards`.
+  - `pricing-engine-v2.ts` es la superficie nueva para callers backend/UI que ya hablen en SKUs y output currencies extendidas.
+  - la deprecación efectiva de `role_rate_cards` queda supeditada al cutover completo de quotations/UI; no ocurre en el mismo merge de 464d.
 
 ---
 
@@ -410,7 +411,8 @@ Comportamiento idéntico al anterior cuando `templateId` es null/undefined.
   - `revenue_metric_config` (business_line_code nullable, hubspot_amount_metric + pipeline_default_metric)
 - Runtime pricing helpers en `src/lib/finance/pricing/`:
   - `pricing-config-store.ts` — resolvers con herencia `quotation_override → business_line → global_default`.
-  - `costing-engine.ts` — `resolveLineItemCost` es la única puerta para obtener costo de un line item.
+  - `costing-engine.ts` — puerta legacy para `QuotationPricingInput` / line items históricos.
+  - `pricing-engine-v2.ts` — puerta canónica nueva para role/person/tool/overhead/direct_cost con tier compliance, FX y addon resolver.
   - `margin-health.ts` — clasifica alertas (blocking / finance-approval / warning / info).
   - `revenue-metrics.ts` — resuelve `recurrence_type = 'inherit'` según `billing_frequency` y calcula MRR/ARR/TCV/ACV.
   - `quotation-pricing-orchestrator.ts` — `buildQuotationPricingSnapshot` / `persistQuotationPricing` /
@@ -437,7 +439,7 @@ Comportamiento idéntico al anterior cuando `templateId` es null/undefined.
   - `POST /api/finance/quotes/[id]/lines` — replace line items + recompute
   - `POST /api/finance/quotes/[id]/recalculate` — force re-read del backbone
   - `GET /api/finance/quotes/[id]/health` — discount health server-side
-  - `GET/PUT /api/finance/quotes/pricing/config` — PUT gated a `finance_admin` / `efeonce_admin`
+  - `GET/PUT /api/finance/quotes/pricing/config` — PUT gated a `finance_admin` / `efeonce_admin`; GET ahora expone tanto config legacy como catálogo canónico de pricing.
 - El namespace de eventos sigue en `finance.quote.*` para compat (converge a `commercial.quotation.*`
   en TASK-347). TASK-346 suma el nuevo evento `commercial.discount.health_alert` al outbox.
 

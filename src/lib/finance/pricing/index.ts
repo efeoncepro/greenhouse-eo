@@ -1,7 +1,10 @@
 export * from './contracts'
+export * from './currency-converter'
 export * from './line-item-totals'
 export * from './margin-health'
+export * from './pricing-engine-v2'
 export * from './revenue-metrics'
+export * from './tier-compliance'
 export {
   listMarginTargets,
   listRevenueMetricConfigs,

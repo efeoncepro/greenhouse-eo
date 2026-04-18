@@ -6,22 +6,22 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado y validado`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-464a (sellable roles), TASK-464b (pricing governance), TASK-464c (tool catalog + overheads)`
-- Branch: `task/TASK-464d-pricing-engine-full-model-refactor`
+- Branch: `develop`
 - Legacy ID: `parte de TASK-464 umbrella`
 - GitHub Issue: `none`
 
 ## Summary
 
-Refactorear el pricing engine (`src/lib/finance/pricing/costing-engine.ts`) para consumir el modelo completo de Efeonce: `sellable_roles` (TASK-464a) + tier governance + commercial model multipliers + country factors + FTE guide (TASK-464b) + tool catalog + overhead addons (TASK-464c). El output del engine debe retornar cost stack completo + suggested price multi-currency + tier compliance check + addons aplicables contextualmente.
+Construir la capa v2 del pricing engine sobre el modelo canónico de Efeonce: `sellable_roles` (TASK-464a) + tier governance + commercial model multipliers + country factors + FTE guide (TASK-464b) + tool catalog + overhead addons (TASK-464c). El output v2 debe retornar cost stack completo + suggested price multi-currency + tier compliance check + addons aplicables contextualmente, sin romper los callers legacy que todavía dependen del contrato v1.
 
 ## Why This Task Exists
 
@@ -35,11 +35,11 @@ Hoy `costing-engine.ts` soporta `lineType='person'` (lee member_capacity_economi
 - Overhead addons contextuales (PM Fee, Setup Aug, Transactional fees, etc.)
 - Tool catalog lookup (quantity × prorated_price_usd)
 
-El meta-modelo completo está en el Excel de Efeonce. TASK-464a/b/c lo canonicalizó en DB. TASK-464d hace que el engine lo use.
+El meta-modelo completo está en el Excel de Efeonce. TASK-464a/b/c lo canonicalizó en DB. TASK-464d hace que el engine lo use desde una entrypoint v2, manteniendo compatibilidad controlada con el flujo persistente actual de quotations.
 
 ## Goal
 
-- Pricing engine acepta input extendido con `commercial_model`, `country_factor_code`, `currency_output`, `line_items[]` que pueden ser role/person/tool/overhead
+- Pricing engine v2 acepta input extendido con `commercial_model`, `country_factor_code`, `currency_output`, `line_items[]` que pueden ser role/person/tool/overhead
 - Output incluye:
   - Cost stack por línea (internal, gated en UI a finance)
   - Suggested bill rate per unit
@@ -47,7 +47,7 @@ El meta-modelo completo está en el Excel de Efeonce. TASK-464a/b/c lo canonical
   - Margen efectivo por línea + agregado
   - Tier compliance check (`below_min / in_range / above_max` por línea)
   - Addons aplicables auto-sugeridos (con `visible_to_client` flag)
-- Callers existentes (API routes, health check) siguen funcionando con adapter que mappea input viejo → nuevo
+- Callers existentes (API routes, orchestrator, health check) siguen funcionando mientras el adapter legacy convive con el engine v2
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -62,11 +62,28 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- Engine es pure function: input determinístico → output determinístico. No side effects (write en outbox queda fuera, lo llaman los orchestrators)
-- Multi-currency output usa exchange rates canónicas en `greenhouse_finance.exchange_rates` (ya existente) cuando el CSV no tiene el precio pre-calculado, o fallback al precio pre-calculado del Excel
+- El cálculo v2 debe separar IO de cálculo. Los readers de DB pueden vivir en una capa de resolución, pero el motor de pricing no debe escribir ni disparar side effects.
+- Multi-currency output usa `greenhouse_finance.exchange_rates` como fuente primaria para conversiones runtime y puede usar `sellable_role_pricing_currency` como fallback para roles cuando exista pricing pre-calculado.
 - Engine nunca escribe — solo computa y retorna
-- Backward compat: adapter layer para los callers antiguos
+- Backward compat: adapter layer para los callers antiguos; el cutover completo de quotations queda desacoplado del primer merge de 464d
 - **🛑 AISLAMIENTO PAYROLL**: engine LEE opcionalmente de `greenhouse_payroll.chile_afp_rates` + `chile_previred_indicators` para enriquecer cost stack cuando quote es CLP+indefinido (solo SELECT, nunca WRITE). NO modifica logic de `src/lib/payroll/*`. `lineType='person'` sigue consumiendo `member_capacity_economics` sin cambios. Antes de cerrar, `pnpm test src/lib/payroll/` (baseline: 194 tests / 29 files passing al 2026-04-18 — debe mantenerse intacto) debe pasar intacto.
+
+## Discovery Corrections (2026-04-18)
+
+- El runtime real de quotations sigue viviendo sobre `QuotationPricingInput` / `QuotationPricingSnapshot` en `quotation-pricing-orchestrator.ts`; no existe aún el contrato v2 descrito abajo.
+- `QuotationPricingCurrency` del flujo persistente actual sigue limitado a `CLP | USD | CLF`. El soporte `COP | MXN | PEN` debe entrar primero como output v2 y no como ruptura inmediata del contrato persistente legacy.
+- `overhead_addons` hoy no expone una DSL rica tipo `applies_when JSONB`; el resolver de addons debe construirse sobre el schema actual y reglas versionadas en código hasta que exista un contrato declarativo explícito.
+- La fórmula normativa de margen para suggested bill rate es `price = cost / (1 - marginPct)`. El texto anterior que decía `cost × (1 + marginPct)` queda invalidado.
+- `schema-snapshot-baseline.sql` sirve como referencia histórica, pero el source of truth operativo para esta task es el runtime actual (`greenhouse_commercial.quotations`, `quotation_line_items`, `quotation_versions` y `src/types/db.d.ts`).
+
+## Implementation Closure (2026-04-18)
+
+- Se creó `pricing-engine-v2.ts` como superficie aditiva backend-first para role/person/tool/overhead/direct_cost.
+- Se agregaron `tier-compliance.ts`, `addon-resolver.ts` y `currency-converter.ts`.
+- `contracts.ts` ahora expone el contrato v2 sin romper `QuotationPricingInput` ni `QuotationPricingCurrency` legacy.
+- `GET /api/finance/quotes/pricing/config` ahora expone también el catálogo canónico (`sellableRoles`, `employmentTypes`, governance tables, tools y overhead addons) junto a la config legacy.
+- Se mantuvo coexistencia explícita con `role_rate_cards`, `margin_targets` y el orchestrator legacy de quotations; el cutover de callers queda desacoplado para TASK-464e / TASK-463.
+- Validación cerrada: `pnpm exec tsc --noEmit --incremental false`, tests focalizados del pricing v2, `pnpm lint`, `pnpm test src/lib/payroll/`, `pnpm test`, `pnpm build`, `pnpm pg:connect:status`.
 
 ## Normative Docs
 
@@ -139,12 +156,12 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — New types en contracts.ts
+### Slice 1 — New types en contracts.ts y contrato v2 aditivo
 
 ```typescript
 export type PricingLineInput =
   | { lineType: 'role'; roleSku: string; employmentTypeCode?: string; hours?: number; fteFraction?: number; periods?: number; quantity?: number; overrideMarginPct?: number }
-  | { lineType: 'person'; memberId: string; hours?: number; fteFraction?: number; periods?: number; overrideMarginPct?: number }  // employment_type derivado de compensation_versions
+  | { lineType: 'person'; memberId: string; hours?: number; fteFraction?: number; periods?: number; overrideMarginPct?: number }
   | { lineType: 'tool'; toolSku: string; quantity: number; periods?: number }
   | { lineType: 'overhead_addon'; addonSku: string; basisSubtotal?: number }
   | { lineType: 'direct_cost'; label: string; amount: number; currency: string }
@@ -212,6 +229,11 @@ export interface PricingEngineOutputV2 {
 }
 ```
 
+Notas de implementación:
+
+- Este contrato v2 es aditivo. No reemplaza de golpe `QuotationPricingInput`, `LineCostResolutionInput` ni `QuotationPricingCurrency` del flujo persistente actual.
+- Si hace falta compatibilidad con quotations legacy, se agrega un adapter explícito v1 → v2; no se expande el contrato legacy a la fuerza en el mismo paso.
+
 ### Slice 2 — Engine refactor core logic
 
 Orden de cálculo:
@@ -222,7 +244,7 @@ Orden de cálculo:
    - `overhead_addon`: SELECT de `overhead_addons` via `addon_sku` → depende de `addon_type`
    - `direct_cost`: amount provisto manualmente
 2. Calcular `suggestedBillRate`:
-   - Role/person: `cost × (1 + marginOpt del tier del rol)` × commercial_model_multiplier × country_factor
+   - Role/person: `cost / (1 - marginOpt del tier del rol)` y luego aplicar `commercial_model_multiplier` + `country_factor`
    - Tool: `prorated_price_usd` (ya tiene margin 15% del Excel) × quantity × periods × country_factor
 3. Tier compliance check usando `role_tier_margins` para roles/persons
 4. Auto-resolve addons contextuales (si `autoResolveAddons=true`):
@@ -232,7 +254,7 @@ Orden de cálculo:
    - Si BL='wave' o 'efeonce' → EFO-007 AI & Data Infra aplicable
 5. Currency conversion:
    - Si `outputCurrency='USD'`: no conversion
-   - Else: usar precio pre-calculado del Excel (sellable_role_pricing_currency) para líneas de rol
+   - Para líneas de rol: priorizar `sellable_role_pricing_currency` cuando exista una fila vigente para el rol/moneda; si no, convertir desde USD usando `greenhouse_finance.exchange_rates`
    - Para tools/overheads/direct_cost: convertir via `greenhouse_finance.exchange_rates` latest
 6. Aggregate totals + margin classification
 
@@ -242,7 +264,7 @@ Orden de cálculo:
   - `classifyTierCompliance({ effectiveMarginPct, tier })` → devuelve status + margin_min/opt/max del tier
 - `addon-resolver.ts`:
   - `resolveApplicableAddons({ commercialModel, staffingModel, lines, businessLine, outputCurrency }) → AddonApplication[]`
-  - Reglas declarativas en data (no hardcoded): cada addon tiene `applies_when` JSONB con expresión serializable
+  - Reglas centralizadas y versionadas. Mientras el schema actual no tenga una DSL explícita, las reglas viven en código apoyadas por `applicable_to`, `visible_to_client` y metadata vigente del addon.
 
 ### Slice 4 — Currency converter
 
@@ -255,9 +277,9 @@ Orden de cálculo:
 ### Slice 5 — Backward compat adapter
 
 - `pricing-engine-v2.ts` exporta nueva entrypoint
-- `costing-engine.ts` v1 queda vivo; pasa a ser thin wrapper que construye `PricingEngineInputV2` default (on_demand, chile_corporate, USD) y llama v2
-- Callers existentes (`quotation-pricing-orchestrator.ts`, `/api/finance/quotes/[id]/health/route.ts`) no necesitan cambiar aún
-- TASK-464e migra los callers cuando la UI nueva esté lista
+- `costing-engine.ts` v1 queda vivo y conserva su contrato actual; puede delegar selectivamente al v2 cuando el input sea representable sin romper behavior legacy
+- `quotation-pricing-orchestrator.ts` y los routes actuales no se rompen en este merge; la migración de callers puede ser incremental
+- TASK-464e / TASK-463 consumen la nueva surface v2 cuando la UI nueva esté lista
 
 ### Slice 6 — Tests
 

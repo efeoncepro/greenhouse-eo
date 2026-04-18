@@ -363,6 +363,21 @@ export const listCountryPricingFactors = async (
   return rows.filter(Boolean) as CountryPricingFactorEntry[]
 }
 
+export const listServiceTierMargins = async (
+  asOfDate?: string | null
+): Promise<ServiceTierMarginEntry[]> => {
+  const rows = await Promise.all(PRICING_TIER_CODES.map(tier => getServiceTierMargins(tier, asOfDate)))
+
+  return rows.filter(Boolean) as ServiceTierMarginEntry[]
+}
+
+export const listFteHoursGuide = async (asOfDate?: string | null): Promise<FteHoursGuideEntry[]> => {
+  const fractions = [0.1, 0.12, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.75, 1]
+  const rows = await Promise.all(fractions.map(fraction => convertFteToHours(fraction, asOfDate)))
+
+  return rows.filter(Boolean) as FteHoursGuideEntry[]
+}
+
 const resolveWriteAction = (
   currentEffective: Record<string, unknown> | undefined,
   latest: Record<string, unknown> | undefined,

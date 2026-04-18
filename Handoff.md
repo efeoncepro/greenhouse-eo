@@ -1,5 +1,59 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-464d Pricing Engine Full-Model Refactor (cierre)
+
+- **Owner:** Codex
+- **Rama:** `develop`
+- **Estado:** implementado y validado
+- **Entregables:**
+  - `src/lib/finance/pricing/pricing-engine-v2.ts`
+  - `src/lib/finance/pricing/tier-compliance.ts`
+  - `src/lib/finance/pricing/addon-resolver.ts`
+  - `src/lib/finance/pricing/currency-converter.ts`
+  - extensiones en `src/lib/finance/pricing/contracts.ts` e `src/lib/finance/pricing/index.ts`
+  - helpers `listEmploymentTypes` y `listServiceTierMargins` / `listFteHoursGuide`
+  - `src/app/api/finance/quotes/pricing/config/route.ts` extendido con catálogo canónico
+  - tests `src/lib/finance/pricing/__tests__/tier-compliance.test.ts`, `addon-resolver.test.ts`, `pricing-engine-v2.test.ts`
+- **Resultado operativo:**
+  - el repo ya tiene engine v2 aditivo para `role`, `person`, `tool`, `overhead_addon` y `direct_cost`
+  - el cálculo nuevo ya aplica tier compliance, commercial model multiplier, country factor, FX output y addon auto-resolver
+  - quotations legacy siguen estables; no hubo cutover brusco de `quotation-pricing-orchestrator.ts`
+  - `GET /api/finance/quotes/pricing/config` ya entrega el catálogo canónico que consumirá UI
+- **Validaciones corridas:**
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm exec vitest run src/lib/finance/pricing/__tests__/tier-compliance.test.ts src/lib/finance/pricing/__tests__/addon-resolver.test.ts src/lib/finance/pricing/__tests__/pricing-engine-v2.test.ts`
+  - `pnpm lint`
+  - `pnpm test src/lib/payroll/` -> `29` files / `194` tests passing
+  - `pnpm test` -> `299` files / `1366` tests passing, `2` skipped
+  - `pnpm build`
+  - `pnpm pg:connect:status` -> sin migraciones pendientes
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` -> sin matches
+- **Riesgos / follow-up:**
+  - el cutover del runtime persistente de quotations hacia v2 queda para TASK-464e / TASK-463
+  - `role_rate_cards` y `margin_targets` siguen coexistiendo como compatibilidad temporal
+  - la DSL declarativa de addons sigue pendiente de schema futuro; hoy la regla vive centralizada en código
+## Sesion 2026-04-18 — TASK-464d Pricing Engine Full-Model Refactor (inicio)
+
+- **Owner:** Codex
+- **Rama:** `develop`
+- **Estado:** discovery + audit en curso
+- **Discovery confirmado:**
+  - no hay migraciones pendientes en PG (`pnpm pg:connect:status` -> `No migrations to run!`)
+  - la foundation de `TASK-464a`, `TASK-464b`, `TASK-464c` y `TASK-468` ya está operativa y reusable desde stores/commercial readers
+  - el runtime real de quotations sigue siendo v1 (`QuotationPricingInput`, `resolveLineItemCost`, `persistQuotationPricing`, `recalculateQuotationPricing`)
+  - el drift principal de la spec 464d no es de schema sino de contrato: fórmula de margen, monedas persistentes legacy, resolver de addons y estrategia de backward compatibility
+- **Ajuste documental ya aplicado:**
+  - `TASK-464d` movida a `docs/tasks/in-progress/`
+  - spec corregida para dejar el engine v2 como capa aditiva y no como reemplazo inmediato del contrato legacy
+  - `docs/tasks/README.md` sincronizado
+- **Siguiente paso inmediato:**
+  - imprimir mapa de conexiones
+  - imprimir plan de implementación
+  - invocar `greenhouse-agent` antes de escribir runtime backend de pricing
+- **Riesgos activos:**
+  - no romper `quotation-pricing-orchestrator.ts` ni los routes actuales mientras convive el engine legacy
+  - no expandir `QuotationPricingCurrency` persistente sin revisar constraints/runtime dependiente
+  - mantener aislamiento total de payroll; solo bridge read-only
 ## Sesion 2026-04-18 — TASK-464c Tool Catalog Extension + Overhead Addons (cierre)
 
 - **Owner:** Codex

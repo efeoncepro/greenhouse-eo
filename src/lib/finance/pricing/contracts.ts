@@ -188,3 +188,135 @@ export interface DiscountHealthInput {
 }
 
 export type Currency = FinanceCurrency | 'CLF'
+
+export const PRICING_OUTPUT_CURRENCIES = ['USD', 'CLP', 'CLF', 'COP', 'MXN', 'PEN'] as const
+export type PricingOutputCurrency = (typeof PRICING_OUTPUT_CURRENCIES)[number]
+
+export const PRICING_V2_LINE_TYPES = [
+  'role',
+  'person',
+  'tool',
+  'overhead_addon',
+  'direct_cost'
+] as const
+export type PricingV2LineType = (typeof PRICING_V2_LINE_TYPES)[number]
+
+export interface RolePricingLineInputV2 {
+  lineType: 'role'
+  roleSku: string
+  employmentTypeCode?: string | null
+  hours?: number | null
+  fteFraction?: number | null
+  periods?: number | null
+  quantity?: number | null
+  overrideMarginPct?: number | null
+}
+
+export interface PersonPricingLineInputV2 {
+  lineType: 'person'
+  memberId: string
+  hours?: number | null
+  fteFraction?: number | null
+  periods?: number | null
+  quantity?: number | null
+  overrideMarginPct?: number | null
+}
+
+export interface ToolPricingLineInputV2 {
+  lineType: 'tool'
+  toolSku: string
+  quantity: number
+  periods?: number | null
+}
+
+export interface OverheadAddonPricingLineInputV2 {
+  lineType: 'overhead_addon'
+  addonSku: string
+  basisSubtotal?: number | null
+  quantity?: number | null
+}
+
+export interface DirectCostPricingLineInputV2 {
+  lineType: 'direct_cost'
+  label: string
+  amount: number
+  currency: string
+  quantity?: number | null
+}
+
+export type PricingLineInputV2 =
+  | RolePricingLineInputV2
+  | PersonPricingLineInputV2
+  | ToolPricingLineInputV2
+  | OverheadAddonPricingLineInputV2
+  | DirectCostPricingLineInputV2
+
+export interface PricingEngineInputV2 {
+  businessLineCode: string | null
+  commercialModel: 'on_going' | 'on_demand' | 'hybrid' | 'license_consulting'
+  countryFactorCode: string
+  outputCurrency: PricingOutputCurrency
+  quoteDate: string
+  lines: PricingLineInputV2[]
+  autoResolveAddons?: boolean
+}
+
+export interface PricingCostStackV2 {
+  totalCostUsd: number
+  breakdown: Record<string, number>
+  employmentTypeCode?: string | null
+  employmentTypeSource?: 'explicit_input' | 'role_default' | 'payroll_compensation_version'
+}
+
+export interface TierComplianceV2 {
+  tier?: string | null
+  status: 'below_min' | 'in_range' | 'at_optimum' | 'above_max' | 'unknown'
+  marginMin?: number | null
+  marginOpt?: number | null
+  marginMax?: number | null
+}
+
+export interface PricingSuggestedBillRateV2 {
+  pricingBasis: 'hour' | 'month' | 'unit'
+  unitPriceUsd: number
+  unitPriceOutputCurrency: number
+  totalBillUsd: number
+  totalBillOutputCurrency: number
+}
+
+export interface PricingLineOutputV2 {
+  lineInput: PricingLineInputV2
+  costStack: PricingCostStackV2
+  suggestedBillRate: PricingSuggestedBillRateV2
+  effectiveMarginPct: number
+  tierCompliance: TierComplianceV2
+  resolutionNotes: string[]
+}
+
+export interface PricingAddonOutputV2 {
+  sku: string
+  addonName: string
+  appliedReason: string
+  amountUsd: number
+  amountOutputCurrency: number
+  visibleToClient: boolean
+}
+
+export interface PricingEngineOutputV2 {
+  lines: PricingLineOutputV2[]
+  addons: PricingAddonOutputV2[]
+  totals: {
+    subtotalUsd: number
+    overheadUsd: number
+    totalUsd: number
+    totalOutputCurrency: number
+    commercialMultiplierApplied: number
+    countryFactorApplied: number
+    exchangeRateUsed: number
+  }
+  aggregateMargin: {
+    marginPct: number
+    classification: 'healthy' | 'warning' | 'critical'
+  }
+  warnings: string[]
+}

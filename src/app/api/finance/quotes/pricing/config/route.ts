@@ -1,5 +1,15 @@
 import { NextResponse } from 'next/server'
 
+import { listOverheadAddons } from '@/lib/commercial/overhead-addons-store'
+import {
+  listCommercialModelMultipliers,
+  listCountryPricingFactors,
+  listFteHoursGuide,
+  listRoleTierMargins,
+  listServiceTierMargins
+} from '@/lib/commercial/pricing-governance-store'
+import { listEmploymentTypes, listSellableRoles } from '@/lib/commercial/sellable-roles-store'
+import { listToolCatalog } from '@/lib/commercial/tool-catalog-store'
 import {
   listMarginTargets,
   listRevenueMetricConfigs,
@@ -27,16 +37,49 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [marginTargets, roleRateCards, revenueMetricConfigs] = await Promise.all([
+  const [
+    marginTargets,
+    roleRateCards,
+    revenueMetricConfigs,
+    sellableRoles,
+    employmentTypes,
+    roleTierMargins,
+    serviceTierMargins,
+    commercialModelMultipliers,
+    countryPricingFactors,
+    fteHoursGuide,
+    toolCatalog,
+    overheadAddons
+  ] = await Promise.all([
     listMarginTargets(),
     listRoleRateCards(),
-    listRevenueMetricConfigs()
+    listRevenueMetricConfigs(),
+    listSellableRoles({ activeOnly: true }),
+    listEmploymentTypes({ activeOnly: true }),
+    listRoleTierMargins(),
+    listServiceTierMargins(),
+    listCommercialModelMultipliers(),
+    listCountryPricingFactors(),
+    listFteHoursGuide(),
+    listToolCatalog({ active: true }),
+    listOverheadAddons({ active: true })
   ])
 
   return NextResponse.json({
     marginTargets,
     roleRateCards,
     revenueMetricConfigs,
+    catalog: {
+      sellableRoles,
+      employmentTypes,
+      roleTierMargins,
+      serviceTierMargins,
+      commercialModelMultipliers,
+      countryPricingFactors,
+      fteHoursGuide,
+      toolCatalog,
+      overheadAddons
+    },
     canEdit: canEditPricingConfig(tenant)
   })
 }

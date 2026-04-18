@@ -255,6 +255,24 @@ export const getEmploymentTypeByCode = async (employmentTypeCode: string): Promi
   return row ? mapEmploymentType(row) : null
 }
 
+export const listEmploymentTypes = async ({
+  activeOnly = true
+}: { activeOnly?: boolean } = {}): Promise<EmploymentTypeEntry[]> => {
+  const db = await getDb()
+  let statement = db.selectFrom('greenhouse_commercial.employment_types').selectAll()
+
+  if (activeOnly) {
+    statement = statement.where('active', '=', true)
+  }
+
+  const rows = await statement
+    .orderBy('employment_type_code', 'asc')
+    .orderBy('effective_from', 'desc')
+    .execute()
+
+  return rows.map(mapEmploymentType)
+}
+
 export const listCompatibleEmploymentTypes = async (
   roleId: string
 ): Promise<SellableRoleCompatibilityEntry[]> => {
