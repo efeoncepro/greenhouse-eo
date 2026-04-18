@@ -502,3 +502,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-450` | `to-do`       | Agency ICO Serving & Performance Hardening | `docs/tasks/to-do/TASK-450-agency-ico-serving-performance-hardening.md` |
 | `TASK-451` | `complete`    | Blindar `password_hash` contra rotaciones automáticas de batch/sync | `docs/tasks/complete/TASK-451-password-hash-mutation-guardrails.md` |
 | `TASK-452` | `to-do`       | Service Attribution Foundation | `docs/tasks/to-do/TASK-452-service-attribution-foundation.md` |
+| `TASK-453` | `to-do`       | Deal Canonicalization & Commercial Bridge | `docs/tasks/to-do/TASK-453-deal-canonicalization-commercial-bridge.md` |
+| `TASK-454` | `to-do`       | HubSpot lifecyclestage sync on canonical Company | `docs/tasks/to-do/TASK-454-lifecyclestage-sync-company-contact.md` |
+| `TASK-455` | `to-do`       | Quote Sales Context Snapshot | `docs/tasks/to-do/TASK-455-quote-sales-context-snapshot.md` |
+| `TASK-456` | `to-do`       | Deal Pipeline Snapshots Projection | `docs/tasks/to-do/TASK-456-deal-pipeline-snapshots-projection.md` |
+| `TASK-457` | `to-do`       | UI Revenue Pipeline Hybrid | `docs/tasks/to-do/TASK-457-ui-revenue-pipeline-hybrid.md` |
+| `TASK-458` | `to-do`       | Honest-label quick fix — reframe "Pipeline" sub-tab (TASK-351 follow-up) | `docs/tasks/to-do/TASK-458-honest-label-pipeline-fix.md` |
