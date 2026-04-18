@@ -1,5 +1,27 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-18 — TASK-454 adds a lightweight HubSpot lifecycle bridge sync
+
+Nuevo pipeline inbound liviano: `HubSpot company lifecycle -> greenhouse_core.clients`.
+
+### Topologia
+
+```text
+HubSpot Companies API (lifecyclestage)
+  -> Cloud Run hubspot-greenhouse-integration (company profile live read)
+    -> sync-hubspot-company-lifecycle.ts
+      -> greenhouse_core.clients (denormalized bridge fields)
+        -> greenhouse_sync.outbox_events (crm.company.lifecyclestage_changed)
+```
+
+### Reglas
+
+1. La raíz operativa sigue siendo `organizations.hubspot_company_id`; `clients` no se vuelve root canónico de Company.
+2. El writer solo actualiza rows cuyo `lifecyclestage_source` no sea `manual_override`.
+3. `nubox_fallback` se usa solo como backfill conservador para rows legacy sin `hubspot_company_id` pero con evidencia económica runtime.
+4. El evento nuevo solo se publica cuando el stage cambia realmente; si solo cambia el source, no hay noise en outbox.
+5. La cadencia queda en `0 */6 * * *` porque `lifecyclestage` no requiere polling agresivo.
+
 ## Delta 2026-04-13 — Nubox hardening generalizes the canonical inbound sync pattern
 
 El incidente `Nubox` del `2026-04-13` dejó explícito un patrón que ahora debe tratarse como canónico para cualquier pipeline inbound `source -> raw -> conformed -> product`.

@@ -1,5 +1,24 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-18 — Client lifecycle bridge formalized on top of canonical company runtime
+
+`TASK-454` agrega un bridge runtime explícito para `lifecyclestage` sin recentralizar el modelo de company.
+
+Tablas impactadas:
+- `greenhouse_core.clients`
+- `greenhouse_sync.outbox_events`
+
+Campos nuevos en `greenhouse_core.clients`:
+- `lifecyclestage`
+- `lifecyclestage_source`
+- `lifecyclestage_updated_at`
+
+Regla vigente:
+- `organizations`, `spaces`, `client_profiles` y `greenhouse_crm.companies` siguen definiendo el runtime canónico repartido de Company
+- `clients.lifecyclestage` existe solo como compatibility bridge para consumers client-scoped
+- `lifecyclestage_source` distingue `hubspot_sync`, `nubox_fallback`, `manual_override` y `unknown`
+- cualquier consumer nuevo que necesite detalle CRM sigue leyendo `greenhouse_crm.companies`; este bridge expone solo el stage actual y su metadata mínima
+- los cambios efectivos de stage publican `crm.company.lifecyclestage_changed` al outbox para follow-ons comerciales
 ## Delta 2026-04-04 — AI Core serving cache and prediction backbone
 
 `TASK-118` activa la foundation backend/pipeline de AI Core sobre el runtime real de `ICO`.

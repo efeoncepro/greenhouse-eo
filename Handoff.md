@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-454 tomada en worktree aislado (Codex)
+
+- **Owner:** Codex
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-454`
+- **Rama:** `task/TASK-454-lifecyclestage-sync-company-contact`
+- **Estado:** implementado y validado localmente; listo para merge a `develop`
+- **Decisión operativa clave:**
+  - la spec original asumía `greenhouse_core.clients` como root canónico de company, pero el runtime real ya está repartido entre `organizations`, `spaces`, `client_profiles` y `greenhouse_crm.companies`
+  - el corte se implementará como bridge denormalizado en `clients`, no como recentralización del modelo
+- **Entregables:**
+  - migración `20260418232659019_task-454-hubspot-company-lifecycle-stage.sql`
+  - `src/lib/hubspot/company-lifecycle-store.ts`
+  - `src/lib/hubspot/company-lifecycle-events.ts`
+  - `src/lib/hubspot/sync-hubspot-company-lifecycle.ts`
+  - `src/app/api/cron/hubspot-company-lifecycle-sync/route.ts`
+  - evento `crm.company.lifecyclestage_changed` en `src/lib/sync/event-catalog.ts`
+  - docs actualizadas en task, event catalog, source sync, data model, changelog y project context
+- **Resultado operativo:**
+  - `greenhouse_core.clients` ahora materializa `lifecyclestage`, `lifecyclestage_source` y `lifecyclestage_updated_at` como bridge runtime client-scoped
+  - el sync recorre `organizations.hubspot_company_id`, deriva `space_id`/`client_id`, respeta `manual_override` y publica outbox solo cuando el stage cambia
+  - existe cron `/api/cron/hubspot-company-lifecycle-sync` cada 6 horas
+  - el helper `getClientLifecycleStage(clientId)` evita live reads a HubSpot para consumers downstream
+- **Validaciones corridas:**
+  - `pnpm pg:doctor`
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec vitest run src/lib/sync/event-catalog.test.ts src/lib/hubspot/company-lifecycle-store.test.ts`
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm lint`
+  - `pnpm test` -> `302` files / `1375` tests passing, `2` skipped
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` -> sin matches
+  - cron local `GET /api/cron/hubspot-company-lifecycle-sync` -> `processed: 9`, `updated: 9`, `changed: 9`, `errors: []`
+  - distribución dev tras sync -> `customer/hubspot_sync: 9`, `customer/nubox_fallback: 1`, `unknown/unknown: 3`
+- **Riesgo / pendiente menor:**
+  - la validación explícita en staging queda atada al deploy de `develop` después del merge; localmente la cron route ya respondió `200`
+
 ## Sesion 2026-04-18 — TASK-453 Deal Canonicalization & Commercial Bridge (cierre)
 
 - **Owner:** Codex
