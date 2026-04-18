@@ -512,3 +512,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-460` | `to-do`       | Contract/SOW Canonical Entity & Lifecycle | `docs/tasks/to-do/TASK-460-contract-sow-canonical-entity.md` |
 | `TASK-461` | `to-do`       | MSA Umbrella Entity & Clause Library | `docs/tasks/to-do/TASK-461-msa-umbrella-clause-library.md` |
 | `TASK-462` | `to-do`       | MRR/ARR Contractual Projection & Dashboard | `docs/tasks/to-do/TASK-462-mrr-arr-contractual-projection-dashboard.md` |
+| `TASK-463` | `to-do`       | Unified Quote Builder + Bidirectional HubSpot Bridge | `docs/tasks/to-do/TASK-463-unified-quote-builder-hubspot-bidirectional.md` |
+| `TASK-464a` | `to-do`      | Sellable Roles Catalog Canonical + Seed | `docs/tasks/to-do/TASK-464a-sellable-roles-catalog-canonical.md` |
+| `TASK-464b` | `to-do`      | Pricing Governance Tables (tiers + commercial models + country factors + FTE) | `docs/tasks/to-do/TASK-464b-pricing-governance-tables.md` |
+| `TASK-464c` | `to-do`      | Tool Catalog Extension + Overhead Addons Canonical | `docs/tasks/to-do/TASK-464c-tool-catalog-extension-overhead-addons.md` |
+| `TASK-464d` | `to-do`      | Pricing Engine Full-Model Refactor (v2) | `docs/tasks/to-do/TASK-464d-pricing-engine-full-model-refactor.md` |
+| `TASK-464e` | `to-do`      | Quote Builder UI Exposure (role/tool/addon pickers + gated cost stack) | `docs/tasks/to-do/TASK-464e-quote-builder-ui-exposure.md` |
+| `TASK-465` | `to-do`       | Service Composition Catalog + Admin UI + Quote Picker | `docs/tasks/to-do/TASK-465-service-composition-catalog-ui.md` |
+| `TASK-466` | `to-do`       | Multi-Currency Quote Output (client view + PDF + email) | `docs/tasks/to-do/TASK-466-multi-currency-quote-output.md` |
