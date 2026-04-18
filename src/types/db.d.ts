@@ -1099,6 +1099,30 @@ export interface GreenhouseCorePermissionSets {
   view_codes: Generated<string[]>;
 }
 
+export interface GreenhouseCorePersonLegalEntityRelationships {
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  effective_from: Generated<Timestamp>;
+  effective_to: Timestamp | null;
+  /**
+   * V1 legal-entity anchor. Reuses greenhouse_core.organizations while preserving explicit legal-relationship semantics.
+   */
+  legal_entity_organization_id: string;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  profile_id: string;
+  public_id: string;
+  relationship_id: string;
+  relationship_type: string;
+  role_label: string | null;
+  source_of_truth: string;
+  source_record_id: string | null;
+  source_record_type: string | null;
+  space_id: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCorePersonMemberships {
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
@@ -4963,6 +4987,7 @@ export interface DB {
   "greenhouse_core.operational_responsibilities": GreenhouseCoreOperationalResponsibilities;
   "greenhouse_core.organizations": GreenhouseCoreOrganizations;
   "greenhouse_core.permission_sets": GreenhouseCorePermissionSets;
+  "greenhouse_core.person_legal_entity_relationships": GreenhouseCorePersonLegalEntityRelationships;
   "greenhouse_core.person_memberships": GreenhouseCorePersonMemberships;
   "greenhouse_core.providers": GreenhouseCoreProviders;
   "greenhouse_core.reporting_lines": GreenhouseCoreReportingLines;

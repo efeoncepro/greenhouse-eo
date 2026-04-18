@@ -11,6 +11,7 @@ import { icoOrganizationProjection } from './ico-organization-metrics'
 import { organizationOperationalProjection } from './organization-operational'
 import { memberCapacityEconomicsProjection } from './member-capacity-economics'
 import { assignmentMembershipSyncProjection } from './assignment-membership-sync'
+import { operatingEntityLegalRelationshipProjection } from './operating-entity-legal-relationship'
 import { operatingEntityMembershipProjection } from './operating-entity-membership'
 import { projectedPayrollProjection } from './projected-payroll'
 import { leavePayrollRecalculationProjection } from './leave-payroll-recalculation'
@@ -51,6 +52,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(organizationOperationalProjection)
   registerProjection(memberCapacityEconomicsProjection)
   registerProjection(assignmentMembershipSyncProjection)
+  registerProjection(operatingEntityLegalRelationshipProjection)
   registerProjection(operatingEntityMembershipProjection)
   registerProjection(projectedPayrollProjection)
   registerProjection(leavePayrollRecalculationProjection)

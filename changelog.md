@@ -1,5 +1,16 @@
 # changelog.md
 
+## 2026-04-18
+
+### 2026-04-18 — TASK-337 materializa la capa runtime persona ↔ entidad legal
+
+- Se crea `greenhouse_core.person_legal_entity_relationships` como foundation explícita para modelar vínculos `identity_profile ↔ legal entity`, sin colgar esa semántica de `user`, `member`, `space` ni `organization_type`.
+- El runtime v1 reutiliza `greenhouse_core.organizations` como ancla jurídica mediante `legal_entity_organization_id`, dejando documentado el boundary semántico en vez de seguir tratándolo como alias implícito de `organization`.
+- Nuevo helper canónico `src/lib/account-360/person-legal-entity-relationships.ts` con readers tenant-aware y sync reactivo del vínculo `employee` contra el operating entity.
+- Nueva proyección `operating_entity_legal_relationship` y eventos outbox `person_legal_entity_relationship.created|updated|deactivated`.
+- Nuevo endpoint `GET /api/people/[memberId]/legal-entity-relationships` para exponer la relación legal dentro del lane `People`.
+- Backfill inicial deliberadamente conservador: `employee` para miembros activos del operating entity y `shareholder_current_account_holder` para perfiles con `shareholder_accounts`.
+
 ## 2026-04-17
 
 ### 2026-04-17 — Quotation workspace: builder canónico, health card y PDF client-safe (TASK-349)

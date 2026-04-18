@@ -12,6 +12,22 @@
 - Decisión UI:
   - la surface nueva reutiliza componentes Vuexy/MUI nativos del repo como referencia principal, no componentes inventados ad hoc
 
+## Delta 2026-04-18 TASK-337 materializa la base runtime persona ↔ entidad legal
+
+- Greenhouse ya no deja esta relación solo como semántica documental.
+- Runtime nuevo:
+  - migración `20260418020712679_task-337-person-legal-entity-foundation.sql`
+  - tabla `greenhouse_core.person_legal_entity_relationships`
+  - helper `src/lib/account-360/person-legal-entity-relationships.ts`
+  - route `GET /api/people/[memberId]/legal-entity-relationships`
+  - proyección reactiva `src/lib/sync/projections/operating-entity-legal-relationship.ts`
+- Contrato operativo:
+  - la raíz humana sigue siendo `identity_profiles.profile_id`
+  - la contraparte legal v1 queda anclada explícitamente en `legal_entity_organization_id`, reutilizando `greenhouse_core.organizations`
+  - `person_memberships` no reemplaza esta capa; sigue representando contexto organizacional y operativo
+  - el backfill inicial solo materializa relaciones con fuente verificable en runtime actual: `employee` y `shareholder_current_account_holder`
+  - las lecturas portal filtran por `space_id` cuando existe tenant scope
+
 # project_context.md
 
 ## Delta 2026-04-17 TASK-345 materializa el bridge canónico de quotations
