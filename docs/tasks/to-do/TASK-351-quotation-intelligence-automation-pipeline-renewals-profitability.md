@@ -1,5 +1,10 @@
 # TASK-351 — Quotation Intelligence Automation: Pipeline, Renewals & Profitability
 
+## Delta 2026-04-17
+
+- Blocker `TASK-350` cerrado. El bridge quote-to-cash ya expone `readQuotationDocumentChain` (quoted vs authorized vs invoiced + deltas) y deja FK directas `income.quotation_id` / `income.source_hes_id` + `purchase_orders.quotation_id` / `service_entry_sheets.quotation_id`. Profitability tracking ya puede leer drift quoted→authorized→invoiced sin reconstruir joins por `po_number`/`hes_number`.
+- Eventos nuevos disponibles para proyecciones reactivas: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

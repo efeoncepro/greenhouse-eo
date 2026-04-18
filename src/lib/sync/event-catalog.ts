@@ -335,6 +335,11 @@ export const EVENT_TYPES = {
   quotationTemplateUsed: 'commercial.quotation.template_used',
   quotationTemplateSaved: 'commercial.quotation.template_saved',
 
+  // Quotation-to-Cash Document Chain Bridge (TASK-350)
+  quotationPurchaseOrderLinked: 'commercial.quotation.po_linked',
+  quotationServiceEntryLinked: 'commercial.quotation.hes_linked',
+  quotationInvoiceEmitted: 'commercial.quotation.invoice_emitted',
+
   // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
   productCreated: 'finance.product.created',

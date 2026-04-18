@@ -13,6 +13,7 @@ export type HesRecord = {
   hesId: string
   hesNumber: string
   purchaseOrderId: string | null
+  quotationId: string | null
   clientId: string
   organizationId: string | null
   spaceId: string | null
@@ -23,6 +24,7 @@ export type HesRecord = {
   amount: number
   currency: string
   amountClp: number
+  amountAuthorizedClp: number | null
   status: HesStatus
   submittedAt: string | null
   approvedAt: string | null
@@ -44,6 +46,7 @@ const mapRow = (r: HesRow): HesRecord => ({
   hesId: String(r.hes_id),
   hesNumber: String(r.hes_number),
   purchaseOrderId: r.purchase_order_id ? String(r.purchase_order_id) : null,
+  quotationId: r.quotation_id ? String(r.quotation_id) : null,
   clientId: String(r.client_id),
   organizationId: r.organization_id ? String(r.organization_id) : null,
   spaceId: r.space_id ? String(r.space_id) : null,
@@ -54,6 +57,7 @@ const mapRow = (r: HesRow): HesRecord => ({
   amount: toNumber(r.amount),
   currency: String(r.currency || 'CLP'),
   amountClp: toNumber(r.amount_clp),
+  amountAuthorizedClp: r.amount_authorized_clp === null || r.amount_authorized_clp === undefined ? null : toNumber(r.amount_authorized_clp),
   status: String(r.status) as HesStatus,
   submittedAt: r.submitted_at ? String(r.submitted_at) : null,
   approvedAt: r.approved_at ? String(r.approved_at) : null,
@@ -77,6 +81,7 @@ export const listHes = async (filters?: {
   spaceId?: string
   status?: string
   purchaseOrderId?: string
+  quotationId?: string
 }): Promise<HesRecord[]> => {
   const conditions: string[] = []
   const values: unknown[] = []
@@ -92,6 +97,7 @@ export const listHes = async (filters?: {
   if (identityConditions.length > 1) conditions.push(`(${identityConditions.join(' OR ')})`)
   if (filters?.status) { idx++; conditions.push(`status = $${idx}`); values.push(filters.status) }
   if (filters?.purchaseOrderId) { idx++; conditions.push(`purchase_order_id = $${idx}`); values.push(filters.purchaseOrderId) }
+  if (filters?.quotationId) { idx++; conditions.push(`quotation_id = $${idx}`); values.push(filters.quotationId) }
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
@@ -119,6 +125,7 @@ export const getHes = async (hesId: string): Promise<HesRecord | null> => {
 export type CreateHesInput = {
   hesNumber: string
   purchaseOrderId?: string | null
+  quotationId?: string | null
   clientId: string
   organizationId?: string | null
   spaceId?: string | null
@@ -142,6 +149,20 @@ export const createHes = async (input: CreateHesInput): Promise<HesRecord> => {
   const exchangeRate = input.exchangeRateToClp ?? 1
   const amountClp = roundCurrency(input.amount * exchangeRate)
 
+  // TASK-350: if quotationId not provided but purchaseOrderId is, auto-inherit
+  // the quotation_id from the PO (so the HES is automatically threaded to the
+  // canonical quotation ancestor).
+  let quotationId = input.quotationId || null
+
+  if (!quotationId && input.purchaseOrderId) {
+    const inheritRows = await runGreenhousePostgresQuery<{ quotation_id: string | null }>(
+      `SELECT quotation_id FROM greenhouse_finance.purchase_orders WHERE po_id = $1 LIMIT 1`,
+      [input.purchaseOrderId]
+    )
+
+    quotationId = inheritRows[0]?.quotation_id || null
+  }
+
   const rows = await runGreenhousePostgresQuery<HesRow>(
     `INSERT INTO greenhouse_finance.service_entry_sheets (
       hes_id, hes_number, purchase_order_id, client_id, organization_id, space_id,
@@ -150,7 +171,7 @@ export const createHes = async (input: CreateHesInput): Promise<HesRecord> => {
       status,
       submitted_at,
       client_contact_name, client_contact_email, attachment_url, notes,
-      created_by
+      created_by, quotation_id
     ) VALUES (
       $1, $2, $3, $4, $5, $6,
       $7, $8, $9, $10,
@@ -158,7 +179,7 @@ export const createHes = async (input: CreateHesInput): Promise<HesRecord> => {
       'submitted',
       NOW(),
       $14, $15, $16, $17,
-      $18
+      $18, $19
     ) RETURNING *`,
     [
       hesId, input.hesNumber, input.purchaseOrderId || null,
@@ -168,7 +189,7 @@ export const createHes = async (input: CreateHesInput): Promise<HesRecord> => {
       input.amount, currency, amountClp,
       input.clientContactName || null, input.clientContactEmail || null,
       input.attachmentUrl || null, input.notes || null,
-      input.createdBy || null
+      input.createdBy || null, quotationId
     ]
   )
 
@@ -188,12 +209,42 @@ export const submitHes = async (hesId: string): Promise<HesRecord | null> => {
   return rows.length > 0 ? mapRow(rows[0]) : null
 }
 
-export const approveHes = async (hesId: string, approvedBy: string): Promise<HesRecord | null> => {
+export type ApproveHesOptions = {
+  actorUserId: string
+  amountAuthorizedClp?: number | null
+}
+
+/**
+ * Approves a HES. Accepts either the legacy positional string signature
+ * (`approveHes(hesId, 'user-id')`) or the object form
+ * (`approveHes(hesId, { actorUserId, amountAuthorizedClp })`).
+ *
+ * When `amountAuthorizedClp` is omitted, it defaults to the current
+ * `amount_clp` of the HES at approval time (authorized == submitted).
+ */
+export const approveHes = async (
+  hesId: string,
+  approvedByOrOptions: string | ApproveHesOptions
+): Promise<HesRecord | null> => {
+  const options: ApproveHesOptions =
+    typeof approvedByOrOptions === 'string'
+      ? { actorUserId: approvedByOrOptions }
+      : approvedByOrOptions
+
+  const authorizedValue =
+    options.amountAuthorizedClp === undefined || options.amountAuthorizedClp === null
+      ? null
+      : roundCurrency(Number(options.amountAuthorizedClp))
+
   const rows = await runGreenhousePostgresQuery<HesRow>(
     `UPDATE greenhouse_finance.service_entry_sheets SET
-      status = 'approved', approved_at = NOW(), approved_by = $2, updated_at = NOW()
+      status = 'approved',
+      approved_at = NOW(),
+      approved_by = $2,
+      amount_authorized_clp = COALESCE($3::numeric, amount_clp),
+      updated_at = NOW()
     WHERE hes_id = $1 AND status = 'submitted' RETURNING *`,
-    [hesId, approvedBy]
+    [hesId, options.actorUserId, authorizedValue]
   )
 
   return rows.length > 0 ? mapRow(rows[0]) : null

@@ -15,6 +15,9 @@ describe('hes-store', () => {
   })
 
   it('creates HES as submitted so the registered workflow starts as received', async () => {
+    // TASK-350: when purchaseOrderId is set and quotationId is not, createHes
+    // first queries the PO to inherit its quotation_id, then runs the insert.
+    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([{ quotation_id: null }])
     mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
       {
         hes_id: 'HES-test-001',
@@ -66,9 +69,9 @@ describe('hes-store', () => {
       createdBy: 'user-1'
     })
 
-    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledTimes(1)
+    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledTimes(2)
 
-    const insertSql = String(mockRunGreenhousePostgresQuery.mock.calls[0]?.[0] ?? '')
+    const insertSql = String(mockRunGreenhousePostgresQuery.mock.calls[1]?.[0] ?? '')
 
     expect(insertSql).toContain('INSERT INTO greenhouse_finance.service_entry_sheets')
     expect(insertSql).toContain("'submitted'")

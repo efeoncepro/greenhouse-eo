@@ -546,6 +546,97 @@ export const publishTemplateUsed = async (
   )
 }
 
+// ═══════════════════════════════════════════════════════════════
+// TASK-350 — Quotation-to-Cash Document Chain Bridge publishers
+// ═══════════════════════════════════════════════════════════════
+
+interface QuotationPurchaseOrderLinkedParams {
+  quotationId: string
+  poId: string
+  poNumber: string | null
+  authorizedAmountClp: number | null
+  linkedBy: string
+}
+
+export const publishQuotationPurchaseOrderLinked = async (
+  params: QuotationPurchaseOrderLinkedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationPurchaseOrderLinked,
+      payload: {
+        quotationId: params.quotationId,
+        poId: params.poId,
+        poNumber: params.poNumber ?? null,
+        authorizedAmountClp: params.authorizedAmountClp ?? null,
+        linkedBy: params.linkedBy
+      }
+    },
+    client
+  )
+}
+
+interface QuotationServiceEntryLinkedParams {
+  quotationId: string
+  hesId: string
+  hesNumber: string | null
+  amountAuthorizedClp: number | null
+  linkedBy: string
+}
+
+export const publishQuotationServiceEntryLinked = async (
+  params: QuotationServiceEntryLinkedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationServiceEntryLinked,
+      payload: {
+        quotationId: params.quotationId,
+        hesId: params.hesId,
+        hesNumber: params.hesNumber ?? null,
+        amountAuthorizedClp: params.amountAuthorizedClp ?? null,
+        linkedBy: params.linkedBy
+      }
+    },
+    client
+  )
+}
+
+interface QuotationInvoiceEmittedParams {
+  quotationId: string
+  incomeId: string
+  sourceHesId: string | null
+  totalAmountClp: number | null
+  emittedBy: string
+}
+
+export const publishQuotationInvoiceEmitted = async (
+  params: QuotationInvoiceEmittedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationInvoiceEmitted,
+      payload: {
+        quotationId: params.quotationId,
+        incomeId: params.incomeId,
+        sourceHesId: params.sourceHesId ?? null,
+        totalAmountClp: params.totalAmountClp ?? null,
+        emittedBy: params.emittedBy
+      }
+    },
+    client
+  )
+}
+
 interface TemplateSavedParams {
   templateId: string
   templateCode: string

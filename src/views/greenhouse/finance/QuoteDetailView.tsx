@@ -32,6 +32,7 @@ import QuoteApprovalsPanel, { type ApprovalStep } from './governance/QuoteApprov
 import QuoteAuditTrail, { type AuditEntry } from './governance/QuoteAuditTrail'
 import QuoteTermsSection, { type QuotationTerm } from './governance/QuoteTermsSection'
 import QuoteVersionsTimeline, { type VersionHistoryEntry } from './governance/QuoteVersionsTimeline'
+import QuoteDocumentChain from './workspace/QuoteDocumentChain'
 import QuoteHealthCard from './workspace/QuoteHealthCard'
 import QuoteSaveAsTemplateDialog from './workspace/QuoteSaveAsTemplateDialog'
 import QuoteSendDialog from './workspace/QuoteSendDialog'
@@ -192,7 +193,7 @@ const QuoteDetailView = () => {
   const [quote, setQuote] = useState<QuoteDetail | null>(null)
   const [lineItems, setLineItems] = useState<LineItem[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [tab, setTab] = useState<'overview' | 'versions' | 'approvals' | 'terms' | 'audit'>('overview')
+  const [tab, setTab] = useState<'overview' | 'chain' | 'versions' | 'approvals' | 'terms' | 'audit'>('overview')
 
   const [viewer, setViewer] = useState<QuoteViewerContext>({
     userId: null,
@@ -224,6 +225,23 @@ const QuoteDetailView = () => {
   const [sendOpen, setSendOpen] = useState(false)
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
+
+  const [chain, setChain] = useState<{
+    purchaseOrders: Array<Record<string, unknown>>
+    serviceEntries: Array<Record<string, unknown>>
+    incomes: Array<Record<string, unknown>>
+    totals: {
+      quoted: number | null
+      authorized: number | null
+      invoiced: number | null
+      authorizedVsQuotedDelta: number | null
+      invoicedVsQuotedDelta: number | null
+    }
+  } | null>(null)
+
+  const [chainLoading, setChainLoading] = useState(false)
+  const [chainError, setChainError] = useState<string | null>(null)
+  const [convertingInvoice, setConvertingInvoice] = useState(false)
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false)
   const [savingTemplate, setSavingTemplate] = useState(false)
   const [saveTemplateError, setSaveTemplateError] = useState<string | null>(null)
@@ -353,6 +371,59 @@ const QuoteDetailView = () => {
     }
   }, [quoteId])
 
+  const fetchChain = useCallback(async () => {
+    setChainLoading(true)
+    setChainError(null)
+
+    try {
+      const res = await fetch(`/api/finance/quotes/${quoteId}/document-chain`)
+
+      if (!res.ok) {
+        setChainError('No pudimos cargar la cadena documental.')
+
+        return
+      }
+
+      const data = (await res.json()) as {
+        purchaseOrders?: Array<Record<string, unknown>>
+        serviceEntries?: Array<Record<string, unknown>>
+        incomes?: Array<Record<string, unknown>>
+        totals?: {
+          quoted: number
+          authorized: number
+          invoiced: number
+          authorizedVsQuotedDelta: number
+          invoicedVsQuotedDelta: number
+        }
+      }
+
+      setChain({
+        purchaseOrders: data.purchaseOrders ?? [],
+        serviceEntries: data.serviceEntries ?? [],
+        incomes: data.incomes ?? [],
+        totals: data.totals
+          ? {
+              quoted: data.totals.quoted,
+              authorized: data.totals.authorized,
+              invoiced: data.totals.invoiced,
+              authorizedVsQuotedDelta: data.totals.authorizedVsQuotedDelta,
+              invoicedVsQuotedDelta: data.totals.invoicedVsQuotedDelta
+            }
+          : {
+              quoted: null,
+              authorized: null,
+              invoiced: null,
+              authorizedVsQuotedDelta: null,
+              invoicedVsQuotedDelta: null
+            }
+      })
+    } catch {
+      setChainError('Error de conexión. Intenta de nuevo.')
+    } finally {
+      setChainLoading(false)
+    }
+  }, [quoteId])
+
   const fetchHealth = useCallback(async () => {
     try {
       const res = await fetch(`/api/finance/quotes/${quoteId}/health`)
@@ -427,6 +498,46 @@ const QuoteDetailView = () => {
     window.open(`/api/finance/quotes/${quoteId}/pdf`, '_blank', 'noopener,noreferrer')
   }, [quoteId])
 
+  const handleConvertToInvoice = useCallback(async () => {
+    setConvertingInvoice(true)
+    setChainError(null)
+
+    try {
+      const res = await fetch(`/api/finance/quotes/${quoteId}/convert-to-invoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+
+      const body = (await res.json().catch(() => ({}))) as { error?: string; incomeId?: string }
+
+      if (!res.ok) {
+        setChainError(body.error || 'No pudimos convertir la cotización a factura.')
+
+        return
+      }
+
+      setActionMessage(`Factura ${body.incomeId ?? ''} creada desde la cotización.`)
+      await Promise.all([fetchChain(), fetchData()])
+    } catch {
+      setChainError('Error de conexión. Intenta de nuevo.')
+    } finally {
+      setConvertingInvoice(false)
+    }
+  }, [quoteId, fetchChain, fetchData])
+
+  const handleGoToPurchaseOrder = useCallback((poId: string) => {
+    window.open(`/finance/purchase-orders/${poId}`, '_blank', 'noopener,noreferrer')
+  }, [])
+
+  const handleGoToHes = useCallback((hesId: string) => {
+    window.open(`/finance/hes/${hesId}`, '_blank', 'noopener,noreferrer')
+  }, [])
+
+  const handleGoToIncome = useCallback((incomeId: string) => {
+    window.open(`/finance/income/${incomeId}`, '_blank', 'noopener,noreferrer')
+  }, [])
+
   const handleSaveAsTemplate = useCallback(
     async (payload: { templateName: string; templateCode: string; description: string | null }) => {
       setSavingTemplate(true)
@@ -476,11 +587,12 @@ const QuoteDetailView = () => {
   }, [])
 
   useEffect(() => {
+    if (tab === 'chain') fetchChain()
     if (tab === 'versions') fetchVersions()
     if (tab === 'approvals') fetchApprovals()
     if (tab === 'terms') fetchTerms()
     if (tab === 'audit') fetchAudit()
-  }, [tab, fetchVersions, fetchApprovals, fetchTerms, fetchAudit])
+  }, [tab, fetchChain, fetchVersions, fetchApprovals, fetchTerms, fetchAudit])
 
   const handleCreateVersion = useCallback(async () => {
     setCreatingVersion(true)
@@ -712,6 +824,7 @@ const QuoteDetailView = () => {
         scrollButtons='auto'
       >
         <Tab label='General' value='overview' />
+        <Tab label='Cadena documental' value='chain' />
         <Tab label='Versiones' value='versions' />
         <Tab label='Aprobaciones' value='approvals' />
         <Tab label='Términos' value='terms' />
@@ -951,6 +1064,93 @@ const QuoteDetailView = () => {
           </Card>
         </Stack>
       )}
+
+      {tab === 'chain' && (() => {
+        const pos = chain?.purchaseOrders ?? []
+        const ses = chain?.serviceEntries ?? []
+        const incs = chain?.incomes ?? []
+
+        const totals = chain?.totals ?? {
+          quoted: null,
+          authorized: null,
+          invoiced: null,
+          authorizedVsQuotedDelta: null,
+          invoicedVsQuotedDelta: null
+        }
+
+        const toDeltaPct = (abs: number | null, base: number | null) => {
+          if (abs === null || base === null || base === 0) return null
+
+          return (abs / base) * 100
+        }
+
+        const canConvertSimple =
+          viewer.canEdit &&
+          (quote.status === 'approved' || quote.status === 'sent') &&
+          pos.length === 0 &&
+          !ses.some(h => (h as { status?: string }).status === 'approved') &&
+          incs.length === 0
+
+        return (
+          <QuoteDocumentChain
+            loading={chainLoading}
+            error={chainError}
+            quotationStatus={quote.status}
+            currency={quote.currency}
+            purchaseOrders={pos.map(p => ({
+              poId: String((p as { poId: string }).poId),
+              poNumber: String((p as { poNumber: string | null }).poNumber ?? ''),
+              status: String((p as { status: string }).status) as 'active' | 'consumed' | 'expired' | 'cancelled',
+              authorizedAmountClp: (p as { authorizedAmountClp: number | null }).authorizedAmountClp ?? null,
+              invoicedAmountClp: (p as { invoicedAmountClp: number | null }).invoicedAmountClp ?? null,
+              remainingAmountClp: (p as { remainingAmountClp: number | null }).remainingAmountClp ?? null,
+              issueDate: (p as { issueDate: string | null }).issueDate ?? null,
+              expiryDate: (p as { expiryDate: string | null }).expiryDate ?? null,
+              description: (p as { description: string | null }).description ?? null
+            }))}
+            serviceEntries={ses.map(h => ({
+              hesId: String((h as { hesId: string }).hesId),
+              hesNumber: String((h as { hesNumber: string | null }).hesNumber ?? ''),
+              purchaseOrderId: (h as { purchaseOrderId: string | null }).purchaseOrderId ?? null,
+              status: String((h as { status: string }).status) as 'draft' | 'submitted' | 'approved' | 'rejected' | 'cancelled',
+              servicePeriodStart: (h as { servicePeriodStart: string | null }).servicePeriodStart ?? null,
+              servicePeriodEnd: (h as { servicePeriodEnd: string | null }).servicePeriodEnd ?? null,
+              amountClp: (h as { amountClp: number | null }).amountClp ?? null,
+              amountAuthorizedClp: (h as { amountAuthorizedClp: number | null }).amountAuthorizedClp ?? null,
+              incomeId: (h as { incomeId: string | null }).incomeId ?? null,
+              invoiced: Boolean((h as { invoiced?: boolean }).invoiced),
+              submittedAt: (h as { submittedAt: string | null }).submittedAt ?? null,
+              approvedAt: (h as { approvedAt: string | null }).approvedAt ?? null
+            }))}
+            incomes={incs.map(i => ({
+              incomeId: String((i as { incomeId: string }).incomeId),
+              invoiceNumber: (i as { invoiceNumber: string | null }).invoiceNumber ?? null,
+              invoiceDate: (i as { invoiceDate: string | null }).invoiceDate ?? null,
+              totalAmount: Number((i as { totalAmount: number }).totalAmount ?? 0),
+              totalAmountClp: Number((i as { totalAmountClp: number }).totalAmountClp ?? 0),
+              currency: String((i as { currency: string }).currency ?? 'CLP'),
+              paymentStatus: String((i as { paymentStatus: string }).paymentStatus) as 'pending' | 'partial' | 'paid' | 'overdue' | 'written_off',
+              sourceHesId: (i as { sourceHesId: string | null }).sourceHesId ?? null,
+              nuboxDocumentId: (i as { nuboxDocumentId: string | null }).nuboxDocumentId ?? null,
+              dteFolio: (i as { dteFolio: string | null }).dteFolio ?? null
+            }))}
+            totals={{
+              quoted: totals.quoted,
+              authorized: totals.authorized,
+              invoiced: totals.invoiced,
+              authorizedVsQuotedDelta: toDeltaPct(totals.authorizedVsQuotedDelta, totals.quoted),
+              invoicedVsQuotedDelta: toDeltaPct(totals.invoicedVsQuotedDelta, totals.quoted)
+            }}
+            canConvertSimple={canConvertSimple}
+            canLinkExisting={viewer.canEdit}
+            converting={convertingInvoice}
+            onConvertSimple={handleConvertToInvoice}
+            onGoToPurchaseOrder={handleGoToPurchaseOrder}
+            onGoToHes={handleGoToHes}
+            onGoToIncome={handleGoToIncome}
+          />
+        )
+      })()}
 
       {tab === 'versions' && (
         <QuoteVersionsTimeline
