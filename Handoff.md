@@ -1,5 +1,70 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-464b Pricing Governance Tables (cierre)
+
+- **Owner:** Codex
+- **Rama:** `develop`
+- **Estado:** implementado y validado
+- **Entregables:**
+  - migración `20260418212705475_task-464b-pricing-governance-tables.sql`
+  - `src/lib/commercial/pricing-governance-types.ts`
+  - `src/lib/commercial/pricing-governance-seed.ts`
+  - `src/lib/commercial/pricing-governance-store.ts`
+  - `scripts/seed-pricing-governance.ts`
+  - tests `src/lib/commercial/__tests__/pricing-governance-seed.test.ts`
+- **Resultado operativo:**
+  - tablas nuevas sembradas en DB viva:
+    - `role_tier_margins`: `4`
+    - `service_tier_margins`: `4`
+    - `commercial_model_multipliers`: `4`
+    - `country_pricing_factors`: `6`
+    - `fte_hours_guide`: `11`
+  - readers verificados contra DB real:
+    - Tier 4 -> `0.60 / 0.70 / 0.80`
+    - `colombia_latam` -> `0.85 / 0.875 / 0.90`
+    - `on_demand` -> `0.10`
+    - `0.25 FTE` -> `45h`
+  - seeder idempotente confirmado en rerun: `0 inserted / 0 updated`
+  - artifacts:
+    - `/tmp/task-464b-pricing-governance-dry-run.json`
+    - `/tmp/task-464b-pricing-governance-seed.json`
+    - `/tmp/task-464b-pricing-governance-seed-rerun.json`
+- **Drift detectado:**
+  - `21` casos entre `role-tier-margins.csv` y `sellable_roles.tier`
+  - incluye mismatches reales de tier y gaps `csv_only` / `catalog_only`
+  - el contrato aplicado es que `TASK-464a` gana; esta task solo reporta drift, no reescribe el catálogo
+- **Validaciones corridas:**
+  - `pnpm exec vitest run src/lib/commercial/__tests__/pricing-governance-seed.test.ts`
+  - `pnpm test src/lib/payroll/` -> `29` files / `194` tests passing
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm lint`
+  - `pnpm test` -> `294` files / `1354` tests passing, `2` skipped
+  - `pnpm build`
+  - `pnpm pg:connect:status` -> sin migraciones pendientes
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` -> sin matches
+- **Siguiente dependencia natural:**
+  - `TASK-464d` ya puede leer governance tables desde `pricing-governance-store.ts`
+  - `TASK-464e` / `TASK-467` ya tienen el catálogo de governance listo para exponer en UI
+
+## Sesion 2026-04-18 — TASK-464b Pricing Governance Tables (inicio)
+
+- **Owner:** Codex
+- **Rama:** `develop`
+- **Estado:** discovery en curso
+- **Discovery confirmado:**
+  - la task realmente cubre `5` tablas, no `4`
+  - `role-tier-margins.csv` sí trae Tier 4 explícito y sus valores reales son `0.60 / 0.70 / 0.80`
+  - el CSV de role tiers es una matriz rol→tier con headers de sección; sirve para derivar la tabla agregada y para detectar drift contra `sellable_roles.tier`
+  - la spec original mezclaba `effective_from` con PKs single-row; se corrigió el contrato para versionado liviano con readers latest `<= asOfDate`
+  - `margin_targets` / `role_rate_cards` / `approval_policies` siguen coexistiendo como capas legacy o follow-up; no se reemplazan en esta task
+- **Ajuste documental ya aplicado:**
+  - `TASK-464b` movida a `docs/tasks/in-progress/`
+  - `docs/tasks/README.md` sincronizado
+- **Siguiente paso inmediato:**
+  - cerrar mapa de conexiones
+  - invocar `greenhouse-agent` antes de escribir migración/store/seeder
+  - implementar schema + parser/seed + readers sin romper la capa legacy de pricing
+
 ## Sesion 2026-04-18 — TASK-468 Payroll ↔ Commercial Employment Types Unification (cierre)
 
 - **Owner:** Codex

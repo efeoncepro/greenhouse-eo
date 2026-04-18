@@ -180,6 +180,26 @@ export interface GreenhouseCommercialApprovalSteps {
   version_number: number;
 }
 
+export interface GreenhouseCommercialCommercialModelMultipliers {
+  description: string | null;
+  effective_from: Generated<Timestamp>;
+  model_code: string;
+  model_label: string;
+  multiplier_pct: Numeric;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialCountryPricingFactors {
+  applies_when: string | null;
+  effective_from: Generated<Timestamp>;
+  factor_code: string;
+  factor_label: string;
+  factor_max: Numeric;
+  factor_min: Numeric;
+  factor_opt: Numeric;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialEmploymentTypeAliases {
   active: Generated<boolean>;
   confidence: Generated<string>;
@@ -209,6 +229,15 @@ export interface GreenhouseCommercialEmploymentTypes {
   payment_currency: string;
   previsional_pct_default: Numeric | null;
   source_of_truth: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialFteHoursGuide {
+  effective_from: Generated<Timestamp>;
+  fte_fraction: Numeric;
+  fte_label: string;
+  monthly_hours: number;
+  recommended_description: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -492,6 +521,17 @@ export interface GreenhouseCommercialRoleRateCards {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialRoleTierMargins {
+  effective_from: Generated<Timestamp>;
+  margin_max: Numeric;
+  margin_min: Numeric;
+  margin_opt: Numeric;
+  notes: string | null;
+  tier: string;
+  tier_label: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialSellableRoleCostComponents {
   base_salary_usd: Numeric;
   bonus_ar_usd: Generated<Numeric>;
@@ -534,6 +574,15 @@ export interface GreenhouseCommercialSellableRoles {
   role_label_en: string | null;
   role_label_es: string;
   role_sku: Generated<string>;
+  tier: string;
+  tier_label: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialServiceTierMargins {
+  description: string | null;
+  effective_from: Generated<Timestamp>;
+  margin_base: Numeric;
   tier: string;
   tier_label: string;
   updated_at: Generated<Timestamp>;
@@ -5031,8 +5080,11 @@ export interface DB {
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
+  "greenhouse_commercial.commercial_model_multipliers": GreenhouseCommercialCommercialModelMultipliers;
+  "greenhouse_commercial.country_pricing_factors": GreenhouseCommercialCountryPricingFactors;
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
+  "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
@@ -5046,9 +5098,11 @@ export interface DB {
   "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
   "greenhouse_commercial.role_employment_compatibility": GreenhouseCommercialRoleEmploymentCompatibility;
   "greenhouse_commercial.role_rate_cards": GreenhouseCommercialRoleRateCards;
+  "greenhouse_commercial.role_tier_margins": GreenhouseCommercialRoleTierMargins;
   "greenhouse_commercial.sellable_role_cost_components": GreenhouseCommercialSellableRoleCostComponents;
   "greenhouse_commercial.sellable_role_pricing_currency": GreenhouseCommercialSellableRolePricingCurrency;
   "greenhouse_commercial.sellable_roles": GreenhouseCommercialSellableRoles;
+  "greenhouse_commercial.service_tier_margins": GreenhouseCommercialServiceTierMargins;
   "greenhouse_commercial.terms_library": GreenhouseCommercialTermsLibrary;
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;

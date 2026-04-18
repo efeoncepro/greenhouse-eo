@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -21,7 +21,7 @@
 
 ## Summary
 
-Canonicalizar las 4 tablas de "dimensiones de pricing" que Efeonce usa en su Excel: `role_tier_margins` (4 tiers × min/opt/max por rol), `service_tier_margins` (4 tiers × margen base por servicio), `commercial_model_multipliers` (On-Going/On-Demand/Híbrido/Licencia con multiplicadores +0%/+10%/+5%/+15%), `country_pricing_factors` (Chile Corporate/Chile PYME/Colombia/Internacional/Licitación/Cliente Estratégico con factor 0.85-1.2), y `fte_hours_guide` (0.1 FTE → 1.0 FTE con equivalencia en horas mensuales). Seed desde CSVs ya extraídos del Excel.
+Canonicalizar las 5 tablas de "dimensiones de pricing" que Efeonce usa en su Excel: `role_tier_margins` (tiers 1-4 × min/opt/max), `service_tier_margins` (tiers 1-4 × margen base por servicio), `commercial_model_multipliers` (On-Going/On-Demand/Híbrido/Licencia con multiplicadores +0%/+10%/+5%/+15%), `country_pricing_factors` (Chile Corporate/Chile PYME/Colombia/Internacional/Licitación/Cliente Estratégico con factor 0.85-1.2), y `fte_hours_guide` (0.1 FTE → 1.0 FTE con equivalencia en horas mensuales). Seed desde CSVs ya extraídos del Excel.
 
 ## Why This Task Exists
 
@@ -37,7 +37,7 @@ Sin estas tablas en DB, el pricing engine (TASK-464d) no puede aplicar el modelo
 
 ## Goal
 
-- 4 tablas canónicas con seed desde CSVs del Excel
+- 5 tablas canónicas con seed desde CSVs del Excel
 - Pricing engine puede consultar tier margin min/opt/max para validar
 - Quote builder UI puede mostrar multiplicadores + factores al usuario
 - Governance (TASK-348) puede agregar condition type `tier_margin_below_min`
@@ -56,7 +56,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - Tablas "config" (no transaccional) — admin edita vía UI o directo SQL, sin versioning pesado
-- `effective_from` en todas para trackear cuándo cambió un parámetro sin perder histórico
+- `effective_from` en todas para trackear cambios sin bitemporalidad pesada; el modelo debe permitir múltiples versiones efectivas por clave y los readers resuelven la fila vigente por `quoteDate/asOfDate`
 - Source of truth es Excel → CSV → seeder
 
 ## Normative Docs
@@ -135,54 +135,61 @@ Reglas obligatorias:
 
 ```sql
 CREATE TABLE greenhouse_commercial.role_tier_margins (
-  tier text PRIMARY KEY CHECK (tier IN ('1', '2', '3', '4')),
+  tier text NOT NULL CHECK (tier IN ('1', '2', '3', '4')),
   tier_label text NOT NULL,                    -- 'Commoditizado' | 'Especializado' | 'Estratégico' | 'IP Propietaria'
   margin_min numeric(5,4) NOT NULL,            -- 0.20 = 20%
   margin_opt numeric(5,4) NOT NULL,            -- target óptimo
   margin_max numeric(5,4) NOT NULL,            -- ceiling
   effective_from date NOT NULL DEFAULT CURRENT_DATE,
   notes text,
-  updated_at timestamptz NOT NULL DEFAULT NOW()
+  updated_at timestamptz NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (tier, effective_from),
+  CONSTRAINT role_tier_margins_bounds CHECK (margin_min <= margin_opt AND margin_opt <= margin_max)
 );
 
 CREATE TABLE greenhouse_commercial.service_tier_margins (
-  tier text PRIMARY KEY CHECK (tier IN ('1', '2', '3', '4')),
+  tier text NOT NULL CHECK (tier IN ('1', '2', '3', '4')),
   tier_label text NOT NULL,                    -- 'Básicos o entrada' etc.
   margin_base numeric(5,4) NOT NULL,           -- 0.40 = 40%
   description text,
   effective_from date NOT NULL DEFAULT CURRENT_DATE,
-  updated_at timestamptz NOT NULL DEFAULT NOW()
+  updated_at timestamptz NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (tier, effective_from)
 );
 
 CREATE TABLE greenhouse_commercial.commercial_model_multipliers (
-  model_code text PRIMARY KEY CHECK (model_code IN (
+  model_code text NOT NULL CHECK (model_code IN (
     'on_going', 'on_demand', 'hybrid', 'license_consulting'
   )),
   model_label text NOT NULL,                   -- 'On-Going | Retainer', etc.
   multiplier_pct numeric(5,4) NOT NULL,        -- 0 = base, 0.10 = +10%
   description text,
   effective_from date NOT NULL DEFAULT CURRENT_DATE,
-  updated_at timestamptz NOT NULL DEFAULT NOW()
+  updated_at timestamptz NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (model_code, effective_from)
 );
 
 CREATE TABLE greenhouse_commercial.country_pricing_factors (
-  factor_code text PRIMARY KEY,                -- 'chile_corporate', 'chile_pyme', 'colombia_latam', 'international_usd', 'licitacion_publica', 'cliente_estrategico'
+  factor_code text NOT NULL,                   -- 'chile_corporate', 'chile_pyme', 'colombia_latam', 'international_usd', 'licitacion_publica', 'cliente_estrategico'
   factor_label text NOT NULL,
   factor_min numeric(5,4) NOT NULL,            -- 0.85
   factor_opt numeric(5,4) NOT NULL,            -- valor recomendado
   factor_max numeric(5,4) NOT NULL,            -- 1.20
   applies_when text,                            -- descripción del caso
   effective_from date NOT NULL DEFAULT CURRENT_DATE,
-  updated_at timestamptz NOT NULL DEFAULT NOW()
+  updated_at timestamptz NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (factor_code, effective_from),
+  CONSTRAINT country_pricing_factors_bounds CHECK (factor_min <= factor_opt AND factor_opt <= factor_max)
 );
 
 CREATE TABLE greenhouse_commercial.fte_hours_guide (
-  fte_fraction numeric(3,2) PRIMARY KEY,       -- 0.10, 0.20, 0.25, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00
+  fte_fraction numeric(3,2) NOT NULL,          -- 0.10, 0.20, 0.25, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00
   fte_label text NOT NULL,                     -- '0,1 FTE'
   monthly_hours integer NOT NULL,              -- 18, 36, 45, 54, 72, 90, 108, 126, 144, 162, 180
   recommended_description text,
   effective_from date NOT NULL DEFAULT CURRENT_DATE,
-  updated_at timestamptz NOT NULL DEFAULT NOW()
+  updated_at timestamptz NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (fte_fraction, effective_from)
 );
 
 -- Grants
@@ -203,7 +210,7 @@ GRANT SELECT ON greenhouse_commercial.fte_hours_guide TO greenhouse_runtime;
 - `scripts/seed-pricing-governance.ts`:
   - Lee los 5 CSVs de `data/pricing/seed/`
   - Idempotente (INSERT ON CONFLICT DO UPDATE)
-  - Role tier margins: 4 filas (tier 1/2/3/4 con min/opt/max)
+  - Role tier margins: deriva 4 filas canónicas por tier desde el CSV rol→tier y reporta drift cuando un rol contradice el tier del catálogo de `TASK-464a`
   - Service tier margins: 4 filas (tier 1: 40%, tier 2: 45%, tier 3: 50%, tier 4: 55%)
   - Commercial model: 4 filas (on_going 0%, on_demand 10%, hybrid 5%, license_consulting 15%)
   - Country factors: 6 filas (chile_corporate 1.0, chile_pyme 0.9, colombia_latam 0.85-0.90, international_usd 1.1-1.2, licitacion_publica 0.85-0.95, cliente_estrategico 0.95)
@@ -212,17 +219,17 @@ GRANT SELECT ON greenhouse_commercial.fte_hours_guide TO greenhouse_runtime;
 ### Slice 3 — Store + readers
 
 - `pricing-governance-store.ts`:
-  - `getRoleTierMargins(tier) → { min, opt, max }`
-  - `getServiceTierMargins(tier) → { base }`
-  - `getCommercialModelMultiplier(modelCode) → number`
-  - `getCountryPricingFactor(factorCode) → { min, opt, max }`
-  - `convertFteToHours(fraction) → monthlyHours`
+  - `getRoleTierMargins(tier, asOfDate?) → { min, opt, max, effectiveFrom }`
+  - `getServiceTierMargins(tier, asOfDate?) → { base, effectiveFrom }`
+  - `getCommercialModelMultiplier(modelCode, asOfDate?) → { multiplierPct, effectiveFrom }`
+  - `getCountryPricingFactor(factorCode, asOfDate?) → { min, opt, max, effectiveFrom }`
+  - `convertFteToHours(fraction, asOfDate?) → { monthlyHours, effectiveFrom }`
   - Todos con cache en memoria (5 min TTL) porque son config lookup tables
 
 ## Out of Scope
 
 - UI de edición (admin lo edita vía SQL en V1; TASK-464e puede exponerlo)
-- Versionado completo (tabla queda con un single current effective; `effective_from` documenta la última actualización, sin historia)
+- Bitemporalidad o governance compleja de versiones; basta con filas append-only por `effective_from` y readers latest `<= asOfDate`
 - Integración con TASK-348 approval policies (se hace en follow-up separado)
 
 ## Detailed Spec
@@ -234,9 +241,9 @@ GRANT SELECT ON greenhouse_commercial.fte_hours_guide TO greenhouse_runtime;
 tier=1 | Commoditizado    | min=0.20 | opt=0.30 | max=0.35
 tier=2 | Especializado    | min=0.30 | opt=0.40 | max=0.45
 tier=3 | Estratégico      | min=0.40 | opt=0.50 | max=0.60
-tier=4 | IP Propietaria   | min=0.50 | opt=0.60 | max=0.70
+tier=4 | IP Propietaria   | min=0.60 | opt=0.70 | max=0.80
 ```
-(Tier 4 no está explícito en la hoja Tiers; se infiere desde la hoja Precios personal donde Tier 4 IP Propietaria usa 60%. Flag `needs_validation` y confirm con Efeonce.)
+(Tier 4 sí aparece en `data/pricing/seed/role-tier-margins.csv`; no requiere inferencia manual.)
 
 **service_tier_margins:**
 ```
@@ -258,7 +265,7 @@ license_consulting   | Servicios especializados o de licenciamiento  | 0.15
 ```
 chile_corporate      | Mid-market o enterprise estándar   | 1.00 | 1.00 | 1.00
 chile_pyme           | Startup, PYME budget limitado      | 0.90 | 0.90 | 0.90
-colombia_latam       | Mercado precio-sensible            | 0.85 | 0.88 | 0.90
+colombia_latam       | Mercado precio-sensible            | 0.85 | 0.875 | 0.90
 international_usd    | USA, Europa con budget             | 1.10 | 1.15 | 1.20
 licitacion_publica   | Gobierno, concurso                 | 0.85 | 0.90 | 0.95
 cliente_estrategico  | Futuro valor > margen actual       | 0.95 | 0.95 | 0.95
@@ -292,6 +299,7 @@ cliente_estrategico  | Futuro valor > margen actual       | 0.95 | 0.95 | 0.95
 - [ ] `commercial_model_multipliers` tiene 4 filas
 - [ ] `country_pricing_factors` tiene 6 filas
 - [ ] `fte_hours_guide` tiene 11 filas
+- [ ] Drift rol→tier contra `TASK-464a` se reporta sin mutar el catálogo canónico
 - [ ] Store helpers devuelven valores correctos
 - [ ] Re-seed es idempotente
 
@@ -317,4 +325,4 @@ cliente_estrategico  | Futuro valor > margen actual       | 0.95 | 0.95 | 0.95
 
 ## Open Questions
 
-- Tier 4 IP Propietaria: el CSV `role-tier-margins.csv` no tiene fila dedicada (el Excel hoja "Tiers" solo lista Tier 1-3). Pero la hoja "Precios personal" tiene roles marcados con "Tier 4: IP Propietaria" usando 60% margen. ¿Confirmamos los valores min/opt/max para Tier 4? Propuesta default: 0.50 / 0.60 / 0.70. Validar con Efeonce en Discovery.
+- ¿La fila de encabezado `🌎 TABLA FACTOR PAÍS` en `country-pricing-factors.csv` debe ignorarse siempre como control row o queremos formalizarla como metadata del parser? Propuesta: ignorarla explícitamente y tratarla como `skipped_control_row`.

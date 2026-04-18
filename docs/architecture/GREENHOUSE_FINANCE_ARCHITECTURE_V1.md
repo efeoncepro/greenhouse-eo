@@ -6,6 +6,21 @@
 
 ---
 
+## Delta 2026-04-18 — TASK-464b Pricing Governance Tables
+
+- Finance quotation pricing sigue sin cutover inmediato, pero gana la capa de governance que el engine v2 ya puede consumir:
+  - `role_tier_margins`
+  - `service_tier_margins`
+  - `commercial_model_multipliers`
+  - `country_pricing_factors`
+  - `fte_hours_guide`
+- Implicación operativa:
+  - el runtime actual de TASK-346 no cambia su surface ni su storage legacy
+  - `TASK-464d` ya puede resolver margen óptimo por tier, multiplicador comercial, factor país y equivalencia FTE↔horas sin volver al Excel
+- Hallazgo relevante para downstream:
+  - el seed dejó `21` drifts entre `role-tier-margins.csv` y `sellable_roles.tier`
+  - esos drifts se tratan como señal de reconciliación, no como motivo para sobrescribir el catálogo canónico
+
 ## Delta 2026-04-18 — TASK-464a Sellable Roles Catalog Foundation
 
 - Finance quotation pricing gana un backbone comercial más rico, pero sin cutover inmediato:
