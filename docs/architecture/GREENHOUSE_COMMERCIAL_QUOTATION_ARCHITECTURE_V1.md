@@ -7,7 +7,7 @@
 > **Updated:** 2026-04-18 — v2.10: TASK-468 commercial-side payroll employment type bridge. Nueva tabla `greenhouse_commercial.employment_type_aliases` para resolver vocabulario factual de payroll (`contract_type`) hacia `employment_types` canónicos sin tocar `greenhouse_payroll.*`. Nuevos módulos `employment-type-alias-store.ts`, `employment-type-alias-normalization.ts`, `payroll-rates-bridge.ts` y script `scripts/audit-payroll-contract-types.ts`. El bridge queda read-only y auditable; el cutover del engine sigue diferido a TASK-464d.
 > **Updated:** 2026-04-18 — v2.10: TASK-464d pricing engine v2 implementado como capa aditiva en `src/lib/finance/pricing/pricing-engine-v2.ts` con `tier-compliance.ts`, `addon-resolver.ts` y `currency-converter.ts`. El flujo persistente legacy de quotations (`QuotationPricingInput`, `resolveLineItemCost`, `quotation-pricing-orchestrator.ts`) sigue conviviendo con `role_rate_cards` / `margin_targets`, mientras el endpoint `GET /api/finance/quotes/pricing/config` ya expone también el catálogo canónico de roles, employment types, governance, tools y overhead addons.
 > **Updated:** 2026-04-18 — v2.8: TASK-351 quotation intelligence automation. Reactive projections `quotation_pipeline` + `quotation_profitability` en domain `cost_intelligence`. Daily lifecycle sweep (`/api/cron/quotation-lifecycle` + ops-worker `/quotation-lifecycle/sweep`) que expira cotizaciones vencidas y emite `renewal_due` con dedup. 4 eventos canónicos nuevos (`expired`, `renewal_due`, `pipeline_materialized`, `profitability_materialized`). Nueva tab "Cotizaciones" en `/finance/intelligence` con Pipeline + Rentabilidad + Renovaciones.
-> **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
+> **Updated:** 2026-04-18 — v2.8: TASK-453 canonical deal bridge. Nuevo mirror `greenhouse_commercial.deals` + `hubspot_deal_pipeline_config`, sync cron `/api/cron/hubspot-deals-sync`, bridge desde `greenhouse_crm.deals` hacia canon comercial, helper `resolveDealForQuote()` y eventos `commercial.deal.created|synced|stage_changed|won|lost`. Esto deja explícita la convivencia: `greenhouse_crm.deals` sigue siendo staging/runtime inbound y `greenhouse_commercial.deals` pasa a ser la entidad comercial canónica para forecast y revenue pipeline híbrido.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
 
@@ -658,6 +658,22 @@ CREATE TABLE greenhouse_commercial.quotations (
 CREATE INDEX idx_quotations_org ON greenhouse_commercial.quotations (organization_id);
 CREATE INDEX idx_quotations_status ON greenhouse_commercial.quotations (status);
 CREATE INDEX idx_quotations_hs_deal ON greenhouse_commercial.quotations (hubspot_deal_id) WHERE hubspot_deal_id IS NOT NULL;
+
+### 3.4. Deals canónicos comerciales (TASK-453)
+
+El pipeline inbound de HubSpot ya materializaba deals en `greenhouse_crm.deals` como proyección operational/runtime, pero faltaba la entidad comercial de primer orden para forecast y revenue pipeline. Desde TASK-453 conviven dos capas con propósito distinto:
+
+- `greenhouse_crm.deals`:
+  - proyección runtime derivada del carril raw/conformed de HubSpot
+  - foco: ingest, staging, trazabilidad source-sync
+- `greenhouse_commercial.deals`:
+  - mirror canónico comercial consumido por quoting, sales context y pipeline híbrido
+  - resuelve `client_id`, `organization_id`, `space_id`, FX a CLP y stage normalization
+  - publica eventos `commercial.deal.*`
+
+`greenhouse_commercial.deals` se vincula con quotes por `hubspot_deal_id` como **soft link**: no hay FK física desde `quotations.hubspot_deal_id`, pero sí helpers de reconciliación (`resolveDealForQuote`, `listQuotesForDeal`) y constraint lógica de unicidad en `deals.hubspot_deal_id`.
+
+`hubspot_deal_pipeline_config` desacopla el significado de `dealstage` de nombres literales HubSpot y permite custom pipelines. El sync canónico bootstrappea stages observados desde `greenhouse_crm.deals`, pero el contrato admite overrides manuales/versionados para probability, `is_closed` e `is_won`.
 ```
 
 ### 3.5. Quotation versions
@@ -1036,6 +1052,12 @@ interface VersionDiff {
 ## 9. Integraciones
 
 ### 9.1. HubSpot — deals y line items
+
+**Estado runtime actual (TASK-453):**
+
+- El canon comercial de deals se alimenta desde `greenhouse_crm.deals` mediante `/api/cron/hubspot-deals-sync`.
+- No reemplaza el carril raw/conformed ni obliga todavía a un endpoint nuevo en Cloud Run para deals.
+- Los eventos `commercial.deal.*` quedan disponibles para TASK-455/456/457 sin romper el reader quote-first existente.
 
 **Sync bidireccional de deals:**
 

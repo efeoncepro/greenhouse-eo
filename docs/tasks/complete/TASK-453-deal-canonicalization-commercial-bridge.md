@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-345 (bridge canonical finance)`
-- Branch: `task/TASK-453-deal-canonicalization-commercial-bridge`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -29,7 +29,7 @@ TASK-351 materializó pipeline a grain de quote, pero la unidad de forecast come
 
 ## Goal
 
-- `greenhouse_commercial.deals` existe como mirror canónico de HubSpot Deal con FK a `hubspot_deal_id` y a `greenhouse_core.clients`
+- `greenhouse_commercial.deals` existe como mirror canónico de HubSpot Deal con `hubspot_deal_id` UNIQUE y FK relacional real a `greenhouse_core.clients`
 - Sync reactivo inbound desde HubSpot mantiene stage, amount, probability, close_date y owner al día
 - Quotes existentes resuelven su deal ancestor via `quote.hubspot_deal_id` → `deals.hubspot_deal_id`
 - Foundation lista para `deal_pipeline_snapshots` (TASK-456) y UI híbrida (TASK-457)
@@ -52,7 +52,7 @@ Reglas obligatorias:
 - Deal es source-of-truth HubSpot; Greenhouse solo mirror con `hubspot_deal_id` como identificador canónico
 - No sobrescribir `dealstage` ni `amount` — writers solo reciben inbound, outbound queda out of scope
 - Respetar el domain-per-schema: nueva tabla vive en `greenhouse_commercial`, no en `greenhouse_finance`
-- Reutilizar infra de source sync ya existente (`src/lib/sync/`, `publishOutboxEvent`)
+- Reutilizar infra de source sync y outbox ya existente sin reemplazar el carril raw/conformed actual (`greenhouse_raw` / `greenhouse_conformed` / `greenhouse_crm.deals`)
 
 ## Normative Docs
 
@@ -66,7 +66,7 @@ Reglas obligatorias:
 
 - TASK-345 — bridge canonical finance (ya complete)
 - `greenhouse_core.clients` con `hubspot_company_id` activo
-- HubSpot deals raw pipeline (verificar si ya existe raw ingest) `[verificar]`
+- HubSpot deals raw pipeline existente en BigQuery + `greenhouse_crm.deals` (reutilizar, no reemplazar)
 
 ### Blocks / Impacts
 
@@ -79,8 +79,8 @@ Reglas obligatorias:
 
 - `migrations/[verificar]-task-453-commercial-deals-schema.sql`
 - `src/lib/commercial/deals-store.ts` (nuevo)
-- `src/lib/sync/projections/hubspot-deals-sync.ts` (nuevo)
 - `src/lib/hubspot/sync-hubspot-deals.ts` (nuevo)
+- `src/lib/integrations/hubspot-greenhouse-service.ts` (extensión deals client)
 - `src/lib/commercial/deal-events.ts` (nuevo)
 - `src/app/api/cron/hubspot-deals-sync/route.ts` (nuevo)
 - `src/types/db.d.ts` (auto-regen)
@@ -94,12 +94,13 @@ Reglas obligatorias:
 - `src/lib/finance/quotation-canonical-store.ts:syncCanonicalFinanceQuote` — pattern de mirror canonical
 - HubSpot service (`HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`) como middleware para llamadas a HubSpot API
 - Vercel cron pattern en `/api/cron/hubspot-quotes-sync`, `/api/cron/hubspot-products-sync`
+- Existe carril raw/conformed/runtime para deals (`greenhouse_raw.hubspot_deals_snapshots`, `greenhouse_conformed.crm_deals`, `greenhouse_crm.deals`)
 
 ### Gap
 
 - No existe tabla canónica `greenhouse_commercial.deals`
 - Quote.hubspot_deal_id es string libre — no hay FK integrity hacia un deal real
-- Sin sync inbound de deals, no se conoce `dealstage` ni `closedate` ni `amount` en Greenhouse
+- No existe sync inbound canónico de deals en `src/lib/hubspot/*` ni cron dedicado
 - Sin lo anterior, pipeline level forecasting quedará siempre mis-modelado
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -111,17 +112,18 @@ Reglas obligatorias:
 ### Slice 1 — Schema + migration + pipeline stage config
 
 - Crear `greenhouse_commercial.deals` con columnas: `deal_id` (PK canónico), `hubspot_deal_id` (UNIQUE), `client_id` FK, `organization_id`, `space_id`, `deal_name`, `dealstage`, `pipeline`, `amount`, `amount_clp`, `currency`, `close_date`, `probability_pct`, `deal_owner`, `deal_type`, `hubspot_last_synced_at`, timestamps
-- Crear `greenhouse_commercial.hubspot_deal_pipeline_config` — tabla de soporte que normaliza stages por pipeline (porque HubSpot permite pipelines custom con stage names arbitrarios). Columnas: `pipeline_id`, `stage_id`, `stage_label`, `probability_pct`, `is_closed`, `is_won`. Seed inicial con los pipelines de Efeonce en HubSpot.
+- Crear `greenhouse_commercial.hubspot_deal_pipeline_config` — tabla de soporte que normaliza stages por pipeline (porque HubSpot permite pipelines custom con stage names arbitrarios). Columnas: `pipeline_id`, `stage_id`, `stage_label`, `probability_pct`, `is_closed`, `is_won`.
+- La tabla debe soportar bootstrap incremental y overrides versionados; no asumir un seed exhaustivo de pipelines/stages si esa fuente no está versionada en el repo.
 - `is_closed` e `is_won` en `deals` se derivan de la config, **no** de un literal `dealstage = 'closedwon'` (eso rompe con pipelines custom). Generated columns convertidas a plain columns + trigger que recalcule on update.
 - Índices en `client_id`, `hubspot_deal_id`, `dealstage` WHERE is_closed = FALSE
 - Grants a `greenhouse_runtime` (SELECT + DML) + `greenhouse_migrator` (ALL)
 
 ### Slice 2 — Sync inbound + publishers + backfill inicial obligatorio
 
-- `sync-hubspot-deals.ts` — resuelve lista de deals desde HubSpot API (paginación), upsertea en tabla canonical, publica `commercial.deal.synced` outbox event
+- `sync-hubspot-deals.ts` — resuelve lista de deals desde HubSpot API o desde el carril existente de staging/runtime cuando corresponda, upsertea en tabla canonical, publica `commercial.deal.synced` outbox event
 - `deal-events.ts` — publishers canónicos: `publishDealCreated`, `publishDealStageChanged`, `publishDealWon`, `publishDealLost`
 - Cron Vercel `/api/cron/hubspot-deals-sync` — cada 4h, llama a sync handler
-- Webhook HubSpot (si existe pipeline de webhooks inbound) — listen to `deal.propertyChange` para sync on-demand
+- Webhook HubSpot queda opcional en este corte; el mínimo obligatorio es cron + backfill
 - **Backfill obligatorio al deploy**: primera corrida del sync debe traer TODOS los deals abiertos existentes en HubSpot (sin filtro de fecha). Sin esto, quotes ya asociadas a deals no se resuelven y la transición Pre-sales → Deal de TASK-457 no funciona para el estado actual. Incluir script `scripts/backfill-hubspot-deals.ts` que se ejecuta una vez post-migration.
 
 ### Slice 3 — Reconciliation con quotes
@@ -195,8 +197,9 @@ dealLost: 'commercial.deal.lost',
 ### Sync flow
 
 1. Cron dispara `/api/cron/hubspot-deals-sync` cada 4h
-2. Handler llama a HubSpot service con paginación; por cada deal: upsert en tabla canonical, publica evento si es nuevo o si cambió `dealstage`
-3. Reactive consumers downstream (TASK-456) refrescan projections
+2. Handler consulta el origen inbound disponible para deals y upsertea en tabla canonical
+3. Si cambian stage / cierre / resultado, publica eventos `commercial.deal.*`
+4. Reactive consumers downstream (TASK-456) refrescan projections
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -210,6 +213,7 @@ dealLost: 'commercial.deal.lost',
 - [ ] Helper `resolveDealForQuote(quotationId)` devuelve deal canonical cuando `quote.hubspot_deal_id` resuelve, null cuando no
 - [ ] Eventos `commercial.deal.synced`, `commercial.deal.stage_changed` aparecen en outbox cuando corresponde
 - [ ] `greenhouse_runtime` puede hacer SELECT + DML en `deals`, `greenhouse_migrator` tiene ALL
+- [ ] La task documenta explícitamente la convivencia entre `greenhouse_crm.deals` (staging/runtime) y `greenhouse_commercial.deals` (mirror canónico comercial)
 
 ## Verification
 
@@ -237,5 +241,6 @@ dealLost: 'commercial.deal.lost',
 
 ## Open Questions
 
-- ¿Existe ya raw ingest de HubSpot deals en algún pipeline actual? (verificar en Discovery)
-- ¿Cuántos pipelines hay activos en HubSpot de Efeonce? (verificar en Discovery para armar seed inicial de `hubspot_deal_pipeline_config`). Inclinación: 1-2 pipelines principales + 1 de prospecting.
+- Raw ingest de HubSpot deals ya existe en BigQuery y `greenhouse_crm.deals`; esta task no debe reemplazarlo.
+- Confirmar si el integration service expone endpoint de deals o si el sync canónico debe leer desde el staging runtime existente.
+- Confirmar estrategia inicial para `hubspot_deal_pipeline_config`: seed mínimo versionado vs bootstrap incremental controlado.

@@ -98,6 +98,7 @@ export const AGGREGATE_TYPES = {
   // Commercial Quotation (canonical, TASK-347 cutover)
   quotation: 'quotation',
   quotationLineItem: 'quotation_line_item',
+  deal: 'deal',
   productCatalog: 'product_catalog',
   sellableRole: 'sellable_role',
   employmentType: 'employment_type',
@@ -330,6 +331,13 @@ export const EVENT_TYPES = {
   quotationConverted: 'commercial.quotation.converted',
   quotationLineItemsSynced: 'commercial.quotation.line_items_synced',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
+
+  // Commercial Deals (TASK-453)
+  dealSynced: 'commercial.deal.synced',
+  dealCreated: 'commercial.deal.created',
+  dealStageChanged: 'commercial.deal.stage_changed',
+  dealWon: 'commercial.deal.won',
+  dealLost: 'commercial.deal.lost',
 
   // Commercial Quotation Governance (TASK-348)
   quotationVersionCreated: 'commercial.quotation.version_created',

@@ -1,5 +1,106 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-453 Deal Canonicalization & Commercial Bridge (cierre)
+
+- **Owner:** Codex
+- **Rama:** `develop`
+- **Estado:** implementado y validado
+- **Entregables:**
+  - migración `20260418224710163_task-453-commercial-deals-canonical-bridge.sql`
+  - `src/lib/commercial/deals-store.ts`
+  - `src/lib/commercial/deal-events.ts`
+  - `src/lib/hubspot/sync-hubspot-deals.ts`
+  - cron `src/app/api/cron/hubspot-deals-sync/route.ts`
+  - script `scripts/backfill-hubspot-deals.ts`
+  - tests `src/lib/commercial/__tests__/deal-events.test.ts` y `deals-store.test.ts`
+  - docs actualizadas en arquitectura + task README
+- **Resultado operativo:**
+  - existe `greenhouse_commercial.deals` como mirror comercial canónico sobre el carril inbound existente `greenhouse_crm.deals`
+  - existe `greenhouse_commercial.hubspot_deal_pipeline_config` con bootstrap inicial desde staging y soporte de overrides manuales por `pipeline_id + stage_id`
+  - el bridge resuelve `organization_id` / `space_id`, calcula `amount_clp` con `greenhouse_finance.exchange_rates`, mantiene `hubspot_deal_id` como link lógico hacia quotations y publica `commercial.deal.created|synced|stage_changed|won|lost`
+  - `/api/cron/hubspot-deals-sync` ya corre sobre el runtime actual sin depender de un endpoint nuevo en Cloud Run
+  - el backfill standalone quedó usable fuera de Next.js runtime; se corrigió el fallo real de `server-only` para que funcione como script operativo
+- **Validaciones corridas:**
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec vitest run src/lib/commercial/__tests__/deal-events.test.ts src/lib/commercial/__tests__/deals-store.test.ts`
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm tsx scripts/backfill-hubspot-deals.ts --include-closed` -> `25 created / 0 errors`
+  - rerun idempotente del mismo script -> `25 skipped / 0 errors`
+  - `pnpm lint`
+  - `pnpm test src/lib/payroll/` -> `29` files / `194` tests passing
+  - `pnpm test` -> `304` files / `1393` tests passing, `2` skipped
+  - `pnpm build`
+  - `pnpm pg:connect:status` -> sin migraciones pendientes
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` -> sin matches
+- **Dependencias desbloqueadas:**
+  - `TASK-455` ya puede snapshotear contexto comercial desde deal canonical
+  - `TASK-456` ya tiene aggregate/event foundation para `deal_pipeline_snapshots`
+  - `TASK-457` ya puede leer deal-grain real sin depender del staging `greenhouse_crm.deals`
+- **Notas de convivencia multi-agente:**
+  - hay archivos UI untracked en `src/views/greenhouse/finance/workspace/` presentes en el workspace que no fueron tocados por esta task
+  - la distinción canónica queda documentada: `greenhouse_crm.deals` = staging/runtime inbound, `greenhouse_commercial.deals` = canon comercial
+  - próximo paso natural del programa: `TASK-455` o `TASK-456`, según si se prioriza contexto histórico de quote o la proyección deal-grain
+
+## Sesion 2026-04-18 — TASK-464e Phase 1: backend + UI primitives (Claude)
+
+- **Owner:** Claude
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo` (primary)
+- **Rama:** `task/TASK-464e-standalone-components` (PR #72, 3 commits)
+- **Estado:** phase 1 shipped; phase 2 (refactors grandes) pendiente
+- **Entregables (commit `aa697fbf`):**
+  - `src/lib/tenant/authorization.ts` — helper `canViewCostStack` (EFEONCE_ADMIN || FINANCE_ADMIN || FINANCE_ANALYST)
+  - `src/app/api/finance/quotes/pricing/simulate/route.ts` — wrapper engine v2 con filter de costStack per-line
+  - `src/app/api/finance/quotes/pricing/lookup/route.ts` — autocomplete con cache 5min sobre 5 tipos
+  - `src/components/greenhouse/pricing/CostStackPanel.tsx` — 2 variants (quote-builder accordion + admin-preview)
+  - `src/components/greenhouse/pricing/SellableItemRow.tsx` — renderer polimórfico 4 variants
+  - `src/components/greenhouse/pricing/SellableItemPickerDrawer.tsx` — drawer 4-tab con lookup
+  - `src/hooks/usePricingSimulation.ts` — debounce 500ms + AbortController + serialized dep
+  - `src/config/greenhouse-nomenclature.ts` — GH_PRICING extendido con 10+ entradas de drawer
+- **Deltas vs spec original TASK-464e (documentados en el markdown):**
+  - Drawer único con 4 tabs vs 4 autocompletes separados (alineado con TASK-469)
+  - Role codes reales (FINANCE_ADMIN/FINANCE_ANALYST/EFEONCE_ADMIN) en vez de `finance_manager`/`finance` inexistentes
+  - 6 monedas LatAm del engine v2 (CLP/USD/CLF/COP/MXN/PEN) en vez de 4 (CLP/USD/EUR/GBP)
+  - Line types: al persistir, tool/overhead_addon se mapean a direct_cost + metadata (evita schema change)
+  - Entitlement: role check directo MVP; `finance.cost_stack.view` capability queda como follow-up
+- **Validaciones:**
+  - `npx eslint src/app/api/finance/quotes/pricing/ src/components/greenhouse/pricing/ src/hooks/ src/lib/tenant/authorization.ts src/config/greenhouse-nomenclature.ts` ✓ limpio
+  - `pnpm vitest run src/components/greenhouse/pricing/ src/lib/payroll/` → 215/215 (194 payroll baseline + 21 pricing nuevos)
+  - `npx tsc --noEmit` global BLOQUEADO por WIP de Codex en deal-events.ts (ver heads-up abajo) — mi código compila aislado
+- **Phase 2 pendiente (próxima sesión):**
+  - `QuoteBuilderActions.tsx` — sidebar con selectores commercial_model/country_factor/outputCurrency/employment_type
+  - `QuoteTotalsFooter.tsx` — sticky footer totals + margin chip + warnings
+  - `AddonSuggestionsPanel.tsx` — addons auto-resueltos con checkboxes toggle
+  - `QuoteLineCostStack.tsx` — thin wrapper de CostStackPanel per-line
+  - Refactor `QuoteCreateDrawer.tsx` — integrar header fields + wire usePricingSimulation
+  - Refactor `QuoteLineItemsEditor.tsx` — 4 botones picker + live simulate + mapper line types v2→persist
+
+## Heads-up operativo — Multi-agent worktree discipline (2026-04-18)
+
+Durante esta sesión detecté que **Codex arrancó TASK-453 en el primary worktree** (`/Users/jreye/Documents/greenhouse-eo`) dejando archivos untracked:
+
+- `src/lib/commercial/deal-events.ts` (con TS errors — WIP incompleto)
+- `src/lib/commercial/deals-store.ts`
+- `src/lib/hubspot/sync-hubspot-deals.ts`
+- `src/app/api/cron/hubspot-deals-sync/`
+- `scripts/backfill-hubspot-deals.ts`
+- `migrations/20260418224710163_task-453-commercial-deals-canonical-bridge.sql`
+- Mod a `vercel.json` y `src/lib/sync/event-catalog.ts`
+- Movimiento de `TASK-453-*.md` de `to-do/` a `in-progress/`
+
+Esto viola el multi-agent operating model (`docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`):
+
+- El primary worktree se reserva para un agente (o para el humano)
+- El segundo agente usa `git worktree add ../greenhouse-eo-codex -b task/TASK-453-...`
+- Ningún agente modifica el branch del otro ni deja WIP en worktree ajeno
+- El conflicto en `deal-events.ts` (TS errors) actualmente **bloquea `tsc --noEmit` global** — si seguimos así, cualquier validación full-repo queda rota mientras el WIP exista
+
+**Acción requerida para Codex** cuando vuelva:
+1. Usar worktree dedicado para TASK-453: `git worktree add ../greenhouse-eo-codex-task-453 -b task/TASK-453-deal-canonicalization origin/develop`
+2. Mover el WIP uncommitted (los 8 archivos listados arriba) a ese worktree
+3. Commit ahí, no en primary
+4. `git stash` o `git restore` los archivos del primary worktree después de mover
+
+Dejé los archivos tal cual están (no los toqué ni los incluí en mis commits) para que Codex pueda recuperarlos intactos. Mi rama `task/TASK-464e-standalone-components` NO incluye nada de ese WIP.
 ## Sesion 2026-04-18 — TASK-464d Pricing Engine Full-Model Refactor (cierre)
 
 - **Owner:** Codex
