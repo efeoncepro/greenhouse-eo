@@ -65,6 +65,18 @@ describe('CurrencySwitcher', () => {
     expect(getByText(/945,20/)).toBeInTheDocument()
   })
 
+  it('exposes the 6 LatAm-focused currencies aligned with pricing engine v2', () => {
+    const { getByRole, getAllByRole } = renderWithTheme(
+      <CurrencySwitcher value='CLP' onChange={() => {}} />
+    )
+
+    fireEvent.mouseDown(getByRole('combobox'))
+    const options = getAllByRole('option')
+    const codes = options.map(o => o.textContent?.split('·')[0]?.trim())
+
+    expect(codes).toEqual(['CLP', 'USD', 'CLF', 'COP', 'MXN', 'PEN'])
+  })
+
   it('disables the select when disabled=true', () => {
     const { getByRole } = renderWithTheme(
       <CurrencySwitcher value='CLP' onChange={() => {}} disabled />

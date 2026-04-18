@@ -5,8 +5,13 @@ import MenuItem from '@mui/material/MenuItem'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
-export type Currency = 'CLP' | 'USD' | 'EUR' | 'GBP'
+/**
+ * Alias re-exported del engine v2 para que consumers del builder no tengan que
+ * importar el tipo desde dos módulos distintos.
+ */
+export type Currency = PricingOutputCurrency
 
 export interface CurrencySwitcherProps {
   value: Currency
@@ -23,11 +28,15 @@ export interface CurrencySwitcherProps {
   fullWidth?: boolean
 }
 
+// Orden operativo: local + internacional primero, luego LatAm.
+// Alineado con PRICING_OUTPUT_CURRENCIES del engine v2 (6 monedas).
 const CURRENCY_OPTIONS: Array<{ value: Currency; label: string }> = [
   { value: 'CLP', label: 'CLP · Peso chileno' },
   { value: 'USD', label: 'USD · Dólar estadounidense' },
-  { value: 'EUR', label: 'EUR · Euro' },
-  { value: 'GBP', label: 'GBP · Libra esterlina' }
+  { value: 'CLF', label: 'CLF · UF' },
+  { value: 'COP', label: 'COP · Peso colombiano' },
+  { value: 'MXN', label: 'MXN · Peso mexicano' },
+  { value: 'PEN', label: 'PEN · Sol peruano' }
 ]
 
 const formatAsOf = (isoDate: string): string => {
