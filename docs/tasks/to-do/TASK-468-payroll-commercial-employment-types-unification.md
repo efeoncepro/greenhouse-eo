@@ -110,6 +110,18 @@ Reglas obligatorias:
 - Admin UI commercial no puede "preview" rates vigentes de payroll como referencia
 - Valores legacy de `compensation_versions.contract_type` pueden no matchear los codes canónicos
 
+## Read-Only Bridge Policy
+
+- Esta task NO modifica schemas ni lógica de `greenhouse_payroll.*`. El bridge se resuelve desde commercial mediante readers, alias mapping y consumo SELECT-only de tablas de referencia payroll.
+- `greenhouse_payroll.compensation_versions.contract_type` sigue siendo string libre y source of truth factual del colaborador; la unificación comercial ocurre por resolución externa, no por FK o rewrite sobre payroll.
+- Cualquier eventual hardening del lado payroll (constraint, migración de valores, enforcement de catálogo) queda explícitamente fuera de este corte y requeriría una decisión posterior separada.
+
+## Payroll Isolation Guardrail
+
+- El baseline de regresión es `pnpm test src/lib/payroll/` = `194` tests / `29` files passing. Debe mantenerse idéntico antes y después del trabajo.
+- Esta task puede leer `greenhouse_payroll.chile_afp_rates`, `greenhouse_payroll.chile_previred_indicators` y `greenhouse_payroll.chile_tax_brackets`, pero no puede escribir sobre esas tablas ni cambiar `src/lib/payroll/**`.
+- Si aparece una necesidad que implique tocar schema o runtime payroll, el trabajo se pausa y se re-plantea como follow-up separado; no se mezcla dentro de TASK-468.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
@@ -124,13 +136,13 @@ Esta task **no tiene superficie UI directa** — es bridge server-side entre pay
 
 ## Scope
 
-### Slice 1 — Migración de valores legacy (non-breaking)
+### Slice 1 — Audit de valores legacy + alias mapping comercial (read-only first)
 
 - Auditoría de valores distintos en `compensation_versions.contract_type`:
   ```sql
   SELECT DISTINCT contract_type, COUNT(*) FROM greenhouse_payroll.compensation_versions GROUP BY 1;
   ```
-- Map de valores legacy → codes canónicos:
+- Map de valores legacy → codes canónicos resuelto del lado commercial:
   - `'indefinido'` → `'indefinido_clp'` (asume CLP por contexto chileno)
   - `'plazo_fijo'` → `'plazo_fijo_clp'`
   - `'honorarios'` → `'honorarios_clp'`
@@ -138,30 +150,16 @@ Esta task **no tiene superficie UI directa** — es bridge server-side entre pay
   - `'part-time'` → `'part_time_clp'`
   - Otros valores distintos → flag `needs_review` + reportar a admin
 
-- Script `scripts/migrate-compensation-version-contract-types.ts`:
+- Script `scripts/audit-payroll-contract-types.ts`:
   - Dry run mode: muestra diff sin ejecutar
-  - Apply mode: UPDATE transaccional con backup (copy original a column `contract_type_legacy_backup`)
-  - Reporte final: cuántos actualizados, cuántos necesitan review manual
+  - Reporte final: cuántos resuelven por alias, cuántos necesitan review manual
+  - Opcional: genera artifact local con alias no resueltos para limpieza posterior
 
-- **No rompe payroll**: compensation_versions sigue siendo string. Los nuevos valores siguen siendo legibles por la misma logic.
+### Slice 2 — Alias resolver canónico (commercial-side)
 
-### Slice 2 — Soft FK constraint (documentación + validación opcional)
-
-```sql
--- Agrega FK soft como NOT VALID constraint (documenta la relación sin enforcement hard)
-ALTER TABLE greenhouse_payroll.compensation_versions
-  ADD CONSTRAINT fk_compensation_versions_contract_type_commercial
-    FOREIGN KEY (contract_type)
-    REFERENCES greenhouse_commercial.employment_types(employment_type_code)
-    NOT VALID;
-
--- Comentario explicativo
-COMMENT ON CONSTRAINT fk_compensation_versions_contract_type_commercial
-  ON greenhouse_payroll.compensation_versions IS
-  'TASK-468: soft FK a commercial.employment_types. Constraint declarado NOT VALID — no enforcea a rows existentes ni bloquea INSERTs actuales. Provee documentación + base para validación opcional via `VALIDATE CONSTRAINT` cuando admin confirme limpieza completa.';
-```
-
-**Importante**: `NOT VALID` significa que PostgreSQL NO valida filas existentes ni bloquea nuevos INSERTs que no matcheen. Es solo semantic link para documentación + future validation opcional.
+- `src/lib/commercial/employment-type-aliases.ts` define el diccionario de alias que mapea strings legacy de payroll a `employment_type_code` canónico.
+- `resolveCommercialEmploymentTypeFromPayrollContractType(contractType)` encapsula esa traducción y retorna `{ employmentTypeCode | null, resolutionSource, warning? }`.
+- La ausencia de alias no rompe payroll; solo deja el caso en `unknown` / `needs_review` del lado commercial.
 
 ### Slice 3 — Payroll rates bridge (reader SELECT-only)
 
@@ -186,7 +184,7 @@ export const getCurrentUnemploymentRate = async (contractType: string, date: str
 
 Tests: verifican que las lecturas funcionan sin tocar payroll writers.
 
-### Slice 4 — Pricing engine integra rates opcional
+### Slice 4 — Pricing engine integra rates opcionalmente
 
 - `PricingEngineV2.computeRoleCost` acepta flag `useLiveRates: boolean` (default TRUE)
 - Cuando `useLiveRates=TRUE` + `employment_type.source_of_truth='greenhouse_payroll_chile_rates'` + quote en CLP + employment_type es indefinido/plazo_fijo:
@@ -217,6 +215,7 @@ Tests: verifican que las lecturas funcionan sin tocar payroll writers.
 ## Out of Scope
 
 - Migración completa de payroll a usar el catálogo commercial como source of truth (future architecture decision, no en este corte)
+- Cualquier FK, constraint o rewrite sobre `greenhouse_payroll.compensation_versions`
 - Modificación de lógica de cálculo payroll (Chilean previsional rules siguen embedded en `src/lib/payroll/chile-previsional-helpers.ts`)
 - Bidirectional sync automático commercial → payroll (follow-up si se pide)
 - Multi-country payroll (hoy solo Chile; future task)

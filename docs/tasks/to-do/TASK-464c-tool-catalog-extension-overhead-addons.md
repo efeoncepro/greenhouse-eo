@@ -108,6 +108,35 @@ Reglas obligatorias:
 - No existe tabla de overhead addons (PM Fee, Setup Aug, etc.)
 - Excel tiene info rica sobre prorrateo ("Envato Elements → 4 proyectos/mes → $8.25 prorated") que no está en DB
 
+## Tool Catalog Normalization Contract
+
+- Source of truth operativo: `data/pricing/seed/tool-catalog.csv`. El `.xlsx` solo sirve para contraste humano.
+- `tool_sku`, `Nombre de la Herramienta` y la categoría textual son obligatorios para sembrar una fila.
+- `Tipo`, `Unidad`, `Frecuencia`, `Tipo de prorrateo` y `Aplicable a` se resuelven vía diccionarios y helpers code-versioned; no deben persistirse como texto libre cuando el campo destino es canónico.
+- `Costo Total (USD)` puede venir como `N/A`; en ese caso la fila sigue siendo válida, pero el costo queda `NULL` y el seeder debe registrar warning explícito.
+- Los callers existentes sobre `greenhouse_ai.tool_catalog` no deben romperse; por eso toda nueva semántica entra como columnas aditivas, no como reemplazo destructivo del modelo actual.
+
+## Addon Formula Parsing
+
+- `overhead-addons.csv` requiere parser semántico, no solo cast de columnas.
+- Casos que el parser debe resolver de forma explícita:
+  - `50` → monto fijo USD
+  - `10 % del subtotal` → porcentaje fijo
+  - `1 mes del costo del recurso` → fórmula `resource_month`
+  - `4–7 % variable` → rango porcentual (`pct_min`, `pct_max`)
+  - `3 % del proyecto o USD 30 mínimo` → porcentaje con mínimo
+  - `−10 %` → ajuste porcentual negativo
+- Si una fórmula no matchea ninguno de esos patrones, la fila queda en `needs_review`; no se debe degradar a texto plano sin marcarlo.
+
+## Applicability Semantics
+
+- `applicable_business_lines` solo admite business lines canónicas del repo (`globe`, `wave`, `reach`, `efeonce_digital`, `crm_solutions` y equivalentes confirmados).
+- Cualquier noción que no sea una business line real debe vivir fuera de ese array, por ejemplo como `applicability_tags` o en `applicable_to`:
+  - `Staff Augmentation`
+  - `Todos`
+  - `Efeonce` cuando signifique operación interna y no BL formal
+- Regla práctica: no promover `Staff Augmentation`, `Todos` o labels ambiguas a business line canónica por inferencia automática.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->

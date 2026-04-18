@@ -102,6 +102,29 @@ Reglas obligatorias:
 - No hay factor por país/tipo de cliente
 - No hay guide FTE ↔ hours formalizada en DB
 
+## Canonical Dictionaries
+
+- Los diccionarios canónicos de esta task son code-versioned y no deben aprenderse dinámicamente del CSV:
+  - tiers: `1..4` con labels `Commoditizado`, `Especializado`, `Estratégico`, `IP Propietaria`
+  - commercial models: `on_going`, `on_demand`, `hybrid`, `license_consulting`
+  - country factors: `chile_corporate`, `chile_pyme`, `colombia_latam`, `international_usd`, `licitacion_publica`, `cliente_estrategico`
+- `service-tier-margins.csv`, `commercial-model-multipliers.csv` y `fte-hours-guide.csv` deben resolverse estrictamente contra esos diccionarios. Una etiqueta fuera de diccionario se rechaza o queda en `needs_review`; no se crean códigos nuevos desde el CSV.
+
+## Range Parsing Rules
+
+- `country-pricing-factors.csv` admite valores simples (`1.0`) y rangos (`0.85-0.9`).
+- Regla de parseo:
+  - valor simple → `factor_min = factor_opt = factor_max = value`
+  - rango → `factor_min = left`, `factor_max = right`, `factor_opt = promedio aritmético`
+- El parser debe normalizar separadores (`-`, `–`) y espacios. Si el rango no puede parsearse con seguridad, la fila queda en `needs_review`.
+- `fte-hours-guide.csv` debe parsear `% Dedicación` y `Horas mensuales` con normalización de coma decimal y sufijos textuales (`h/mes`).
+
+## Drift Resolution
+
+- `role-tier-margins.csv` se trata como fuente de validación cruzada rol → tier, no como source of truth principal del tier del catálogo.
+- Si el tier sugerido por `role-tier-margins.csv` contradice el tier materializado desde `sellable-roles-pricing.csv` en `TASK-464a`, gana `TASK-464a` y esta task debe registrar drift explícito.
+- Los seeders de governance deben reportar el mismo resumen estructurado que el resto del programa (`inserted`, `updated`, `needs_review`, `drift_detected`, etc.) para facilitar reconciliación entre fuentes.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->

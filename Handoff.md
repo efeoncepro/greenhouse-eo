@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — Pricing seeds/tasks normalization contract hardening (docs only)
+
+- **Estado:** `complete`, documental.
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-codex`
+- **Rama:** `task/TASK-458-honest-label-pipeline-fix`
+- **Entregado:**
+  - ajustes documentales en:
+    - `docs/tasks/to-do/TASK-464a-sellable-roles-catalog-canonical.md`
+    - `docs/tasks/to-do/TASK-464b-pricing-governance-tables.md`
+    - `docs/tasks/to-do/TASK-464c-tool-catalog-extension-overhead-addons.md`
+    - `docs/tasks/to-do/TASK-464d-pricing-engine-full-model-refactor.md`
+    - `docs/tasks/to-do/TASK-468-payroll-commercial-employment-types-unification.md`
+- **Decisiones clave:**
+  - `TASK-464a` ahora deja explícito el contrato de normalización del seed de roles, la inferencia conservadora de `employment_type` y la política de `needs_review`.
+  - `TASK-464b` ahora fija diccionarios canónicos, parseo de rangos (`0.85-0.9`) y resolución de drift a favor del catálogo de roles de `TASK-464a`.
+  - `TASK-464c` ahora separa semánticamente `applicable_business_lines` de tags/aditamentos no-BL y formaliza el parser semántico de fórmulas de addons.
+  - `TASK-464d` ahora deja explícito que el engine consume datos ya normalizados y no debe reimplementar parsing de CSV.
+  - `TASK-468` se corrigió para respetar el guardrail duro del programa: bridge read-only desde commercial, sin FK, sin rewrite y sin mutaciones de schema/runtime payroll.
+- **Validado:**
+  - `git diff -- docs/tasks/to-do/TASK-464{a,b,c,d}*.md docs/tasks/to-do/TASK-468-*.md` revisado manualmente ✓
+  - sin cambios de runtime, migraciones ni código ejecutable
+- **Notas operativas:**
+  - baseline payroll previamente verificado en este worktree: `194/194` tests passing, `29` files
+  - `pnpm pg:connect:status` previamente verificado en este worktree: sin migraciones pendientes
+
 ## Sesion 2026-04-18 — TASK-337 Person ↔ Legal Entity Relationship Runtime Foundation
 
 - **Estado:** `complete`, entregado.

@@ -118,6 +118,21 @@ Reglas obligatorias:
 - No resuelve addons contextuales
 - No soporta `lineType='tool'` con tool_sku (hoy `lineType='direct_cost'` es el catch-all manual)
 
+## Engine Input Assumptions
+
+- El engine v2 consume tablas canónicas ya normalizadas; no debe parsear labels crudos del CSV ni reimplementar reglas de limpieza de seeds.
+- `roleSku`, `toolSku`, `addonSku`, `commercialModel`, `countryFactorCode` y `employmentTypeCode` deben llegar ya canonizados desde `TASK-464a`, `TASK-464b` y `TASK-464c`.
+- Si una línea hace referencia a un código inexistente o no normalizado, el engine debe fallar de forma determinística con error explícito o warning estructurado; nunca intentar “adivinar” el código correcto.
+
+## Dependency on Normalized Seeds
+
+- `TASK-464d` depende del contrato de seeds definido en las tasks anteriores:
+  - roles: catálogo + employment type inference conservadora
+  - governance: diccionarios fijos y rangos normalizados
+  - tools/addons: applicability y fórmulas ya resueltas
+- El engine no debe introducir una segunda fuente de verdad para tiers, commercial models, country factors ni formulas de addons.
+- Backward compatibility vive en el adapter de entrada/salida, no en relajar el contrato de datos canónicos.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->

@@ -104,6 +104,30 @@ Reglas obligatorias:
 - No hay tabla `sellable_role_cost_components` con el stack (base + bonos + previsional + deel)
 - No hay `sellable_role_pricing_currency` (6 monedas pre-calculadas)
 
+## Seed Normalization Contract
+
+- Source of truth operativo del seed: `data/pricing/seed/sellable-roles-pricing.csv`. El `.xlsx` queda como referencia humana para revisar ambigüedades, no como input runtime del seeder.
+- `SKU`, `Rol`, `Categoría`, `Tipo (Staff/Servicio)` y `Tier` se consideran campos de identidad; si vienen vacíos o inválidos, la fila se rechaza.
+- `role_code` se deriva con slug estable desde `Rol`; `tier_code` se extrae de strings del tipo `Tier 3: Estratégico`; `tier_label` se toma de un diccionario fijo (`1..4`), no del texto libre del CSV.
+- Costos y hourly rates se recalculan desde el stack (`base + bonos + previsional + Deel`) y se comparan contra las columnas derivadas del CSV. Si hay drift sobre tolerancia, la fila sigue siendo válida pero se registra warning.
+- Precios por moneda (`USD`, `CLP`, `CLF`, `COP`, `MXN`, `PEN`) se siembran en `sellable_role_pricing_currency`; una moneda inválida no tumba la fila completa, pero sí se reporta como issue.
+- Placeholders, filas vacías o filas de control no se insertan. El seeder debe distinguir explícitamente entre `skipped_empty`, `skipped_placeholder`, `needs_review` y `rejected`.
+
+## Employment Type Inference Policy
+
+- La inferencia de `employment_type_code` es conservadora y nunca debe inventar compatibilidades silenciosas.
+- Reglas iniciales permitidas:
+  - `fee_deel_usd > 0` y `gastos_previsionales_usd = 0` → `contractor_deel_usd`
+  - `gastos_previsionales_usd > 0` y `fee_deel_usd = 0` → `indefinido_clp`
+- Casos ambiguos (`fee_deel_usd = 0` y `gastos_previsionales_usd = 0`, o combinaciones no contempladas) quedan en `needs_review`; el rol puede sembrarse, pero `role_employment_compatibility` no debe completarse con supuestos débiles.
+- Esta task no debe inferir automáticamente `plazo_fijo_clp`, `honorarios_clp`, `contractor_eor_usd` ni `contractor_direct_usd` sin evidencia adicional o mapeo explícito versionado en el repo.
+
+## Review Queue Policy
+
+- El seeder debe emitir un resumen estándar: `inserted`, `updated`, `skipped_empty`, `skipped_placeholder`, `needs_review`, `rejected`, `drift_detected`.
+- Las filas `needs_review` deben quedar exportables como artifact local o log estructurado para revisión manual posterior; no basta con `console.log` opaco.
+- Una fila en `needs_review` no debe bloquear la ejecución completa del seed, pero tampoco debe sembrarse con defaults irreversibles.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
