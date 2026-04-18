@@ -1,5 +1,53 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-468 Payroll ↔ Commercial Employment Types Unification (cierre)
+
+- **Owner:** Codex
+- **Rama:** `task/TASK-468-payroll-commercial-employment-types-unification`
+- **Estado:** implementado y validado
+- **Entregables:**
+  - migración `20260418211035632_task-468-commercial-employment-type-aliases.sql`
+  - `src/lib/commercial/employment-type-alias-normalization.ts`
+  - `src/lib/commercial/employment-type-alias-store.ts`
+  - `src/lib/commercial/payroll-rates-bridge.ts`
+  - `scripts/audit-payroll-contract-types.ts`
+  - tests nuevos para normalización, alias store y payroll rates bridge
+- **Resultado operativo:**
+  - tabla `greenhouse_commercial.employment_type_aliases` sembrada con mappings iniciales payroll -> commercial
+  - audit script validó la DB viva: `3` valores distintos / `12` rows en payroll, `0` pendientes de review
+  - payroll quedó intacto: `git diff --stat src/lib/payroll/` vacío
+- **Validaciones corridas:**
+  - `pnpm test src/lib/commercial/__tests__/employment-type-alias-normalization.test.ts src/lib/commercial/__tests__/employment-type-alias-store.test.ts src/lib/commercial/__tests__/payroll-rates-bridge.test.ts`
+  - `pnpm pg:connect:migrate`
+  - `pnpm tsx scripts/audit-payroll-contract-types.ts --output /tmp/task-468-payroll-contract-types-audit.json`
+  - `pnpm test src/lib/payroll/` -> `29` files / `194` tests passing
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm test` -> `293` files / `1351` tests passing, `2` skipped
+- **Siguiente dependencia natural:**
+  - `TASK-464d` puede consumir `payroll-rates-bridge.ts`
+  - `TASK-467` / `TASK-463` pueden leer alias coverage y drift sin tocar payroll
+
+## Sesion 2026-04-18 — TASK-468 Payroll ↔ Commercial Employment Types Unification (inicio)
+
+- **Owner:** Codex
+- **Rama:** `task/TASK-468-payroll-commercial-employment-types-unification`
+- **Estado:** discovery + audit cerrados, implementación pendiente
+- **Acciones ya hechas:**
+  - `TASK-464a` fue mergeada a `develop` antes de arrancar `468` (`e444761b`)
+  - baseline payroll confirmado: `29` files / `194` tests passing
+  - `pnpm pg:connect:status` confirmado sin migraciones pendientes
+  - DB viva auditada: `compensation_versions.contract_type` hoy tiene `indefinido (8)`, `contractor (2)`, `honorarios (2)`
+  - DB viva auditada: `greenhouse_commercial.employment_types` ya existe con 7 códigos seed
+- **Decisión de diseño:**
+  - `TASK-468` se ejecuta como bridge commercial-side, read-only y auditable
+  - queda fuera cualquier FK, rewrite, backfill o constraint sobre `greenhouse_payroll.*`
+  - la pieza robusta a introducir es una tabla commercial de aliases + helper store + reader de tasas payroll
+- **Docs movidos/actualizados:**
+  - `docs/tasks/in-progress/TASK-468-payroll-commercial-employment-types-unification.md`
+  - `docs/tasks/README.md`
+
 ## Sesion 2026-04-18 — TASK-464a Sellable Roles Catalog Canonical (cierre)
 
 - **Estado:** `complete`.

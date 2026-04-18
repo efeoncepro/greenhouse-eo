@@ -1,12 +1,27 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.9
+> **Version:** 2.10
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-18 — v2.10: TASK-468 commercial-side payroll employment type bridge. Nueva tabla `greenhouse_commercial.employment_type_aliases` para resolver vocabulario factual de payroll (`contract_type`) hacia `employment_types` canónicos sin tocar `greenhouse_payroll.*`. Nuevos módulos `employment-type-alias-store.ts`, `employment-type-alias-normalization.ts`, `payroll-rates-bridge.ts` y script `scripts/audit-payroll-contract-types.ts`. El bridge queda read-only y auditable; el cutover del engine sigue diferido a TASK-464d.
 > **Updated:** 2026-04-18 — v2.9: TASK-464a sellable roles catalog foundation. Nuevas tablas `sellable_roles`, `employment_types`, `sellable_role_cost_components`, `role_employment_compatibility`, `sellable_role_pricing_currency` y sequence `sellable_role_sku_seq` en `greenhouse_commercial`. Seeder idempotente `scripts/seed-sellable-roles.ts` consume `data/pricing/seed/sellable-roles-pricing.csv` (32 roles activos, 54 placeholders) y publica eventos `commercial.sellable_role.{created,cost_updated,pricing_updated}`. `role_rate_cards` sigue en coexistencia temporal hasta TASK-464d.
 > **Updated:** 2026-04-18 — v2.8: TASK-351 quotation intelligence automation. Reactive projections `quotation_pipeline` + `quotation_profitability` en domain `cost_intelligence`. Daily lifecycle sweep (`/api/cron/quotation-lifecycle` + ops-worker `/quotation-lifecycle/sweep`) que expira cotizaciones vencidas y emite `renewal_due` con dedup. 4 eventos canónicos nuevos (`expired`, `renewal_due`, `pipeline_materialized`, `profitability_materialized`). Nueva tab "Cotizaciones" en `/finance/intelligence` con Pipeline + Rentabilidad + Renovaciones.
 > **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-18 — TASK-468 Payroll Employment Type Bridge
+
+- `greenhouse_commercial` incorpora `employment_type_aliases` como capa persistente de resolución para vocabulario externo/factual.
+- El source inicial cubre `greenhouse_payroll.contract_type` y aliases legacy explícitos, con PK por `(source_system, source_value_normalized)`, `resolution_status`, `confidence` y target `employment_type_code`.
+- Regla nueva:
+  - commercial resuelve `contract_type` de payroll mediante alias table y **no** mediante FK, rewrite ni constraint sobre `greenhouse_payroll.*`
+  - el read path de tasas payroll vive en `src/lib/commercial/payroll-rates-bridge.ts` y solo hace `SELECT`
+  - cualquier writeback o sincronización bidireccional queda fuera de este corte
+- Contrato para consumers futuros:
+  - `TASK-467` / `TASK-463` pueden leer alias coverage y drift desde el bridge
+  - `TASK-464d` puede consumir `payroll-rates-bridge` sin acoplarse a `src/lib/payroll/**`
 
 ---
 

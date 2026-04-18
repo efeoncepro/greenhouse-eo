@@ -6,44 +6,43 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-464a (commercial.employment_types existe)`
+- Blocked by: `none`
 - Branch: `task/TASK-468-payroll-commercial-employment-types-unification`
 - Legacy ID: `follow-up de TASK-464a`
 - GitHub Issue: `none`
 
 ## Summary
 
-Unificar el vocabulario de employment_types entre `greenhouse_commercial.employment_types` (nuevo, TASK-464a) y `greenhouse_payroll.compensation_versions.contract_type` (existente, string libre). Crea sinergia natural bidireccional: pricing engine consume rates vigentes de payroll (chile_afp_rates, previred_indicators) cuando corresponde; payroll puede validar que cada compensation_version tenga un contract_type existente en el catálogo commercial. **Non-breaking**: NO altera schemas de payroll ni lógica de cálculo — solo añade soft references + readers compartidos.
+Materializar un bridge **commercial-side, read-only y auditable** entre `greenhouse_commercial.employment_types` y el vocabulario factual que hoy vive en `greenhouse_payroll.compensation_versions.contract_type`. El objetivo de este corte es resolver aliases, exponer readers determinísticos de tasas payroll hacia commercial y dejar listo el contrato backend para consumers futuros (`TASK-464d`, `TASK-467`, `TASK-463`) **sin** mutar schemas ni runtime payroll.
 
 ## Why This Task Exists
 
-Post TASK-464a quedan 2 fuentes de "employment_type":
+Post TASK-464a quedan 2 planos de "employment_type":
 
-1. `greenhouse_payroll.compensation_versions.contract_type` — string libre per member ('indefinido', 'plazo_fijo', etc.). Source of truth de la realidad de cada persona.
+1. `greenhouse_payroll.compensation_versions.contract_type` — snapshot factual en payroll con vocabulario corto (`indefinido`, `plazo_fijo`, `honorarios`, `contractor`, `eor`).
 2. `greenhouse_commercial.employment_types` — catálogo canónico con defaults fiscales. Source of truth del vocabulario + rates default.
 
 Sin unificación:
-- Drift potencial: el string `'indefinido'` de payroll puede no matchear al code `'indefinido_clp'` del catálogo
-- Pricing engine no aprovecha rates vigentes de `chile_afp_rates` al cotizar en CLP
-- Admin UI no puede mostrar "rates vigentes en payroll" como referencia al editar employment_types commercial
-- Al cambiar tax rules Chile (AFP sube de 10% a 10.5%), admin commercial tiene que updatear manual — debería heredar de payroll
+- Commercial no tiene una capa persistente para resolver `indefinido` -> `indefinido_clp` o `contractor` -> `contractor_deel_usd` sin hardcodes dispersos
+- Pricing backend no puede leer tasas vigentes de payroll desde un helper aislado del dominio commercial
+- Las futuras surfaces admin/UI de pricing no tienen un contrato backend estable para mostrar drift entre catálogo y payroll
 
-**Objetivo arquitectónico**: que ambos módulos operen sobre el mismo vocabulario + que pricing engine opcionalmente consuma rates vigentes de payroll sin duplicar lógica.
+**Objetivo arquitectónico**: resolver el vocabulario y el read path desde commercial, manteniendo payroll como fuente factual y aislada.
 
 ## Goal
 
-- Vocabulario unificado: `compensation_versions.contract_type` queda alineado con `commercial.employment_types.employment_type_code` (soft reference)
-- Pricing engine v2 consulta `chile_afp_rates` + `chile_previred_indicators` cuando employment_type tiene `source_of_truth='greenhouse_payroll_chile_rates'` y quote es CLP + indefinido
-- Admin UI commercial muestra rates vigentes de payroll como referencia (solo display, no mutación)
-- Migración de valores legacy en `compensation_versions.contract_type` a códigos canónicos
+- Resolver aliases payroll -> commercial mediante tabla/versionado en `greenhouse_commercial`
+- Exponer `payroll-rates-bridge` SELECT-only desde commercial
+- Dejar un script de auditoría para detectar drift real entre payroll y catálogo
+- Mantener `greenhouse_payroll.*` y `src/lib/payroll/**` intactos
 - **Zero breaking changes a payroll**: tests existentes pasan intactos
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -60,11 +59,11 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- **🛑 NO alterar schemas de payroll ni romper nada**: `compensation_versions.contract_type` sigue siendo `string Generated` sin restricciones. Se agrega soft reference como **constraint opcional NOT VALID** (documentación + validación futura, sin enforcement hard).
+- **🛑 NO alterar schemas de payroll ni romper nada**: `compensation_versions.contract_type` ya está restringido por `CHECK` a cinco valores y así se queda. Esta task no agrega FK, NOT VALID constraints, rewrites ni migraciones sobre `greenhouse_payroll.*`.
 - **🛑 NO modificar lógica de cálculo payroll**: los previsional computations de `src/lib/payroll/*` quedan intactos. Solo se agregan readers nuevos en commercial que consultan payroll tables en modo SELECT.
 - **🛑 Tests existentes de payroll deben pasar intactos**: suite `src/lib/payroll/**/*.test.ts` es regression gate hard.
-- Sync unidireccional primero: commercial LEE de payroll (defaults fiscales chilenos). Payroll → commercial solo si se solicita explícitamente (follow-up).
-- Migración es **idempotente + reversible**: si hay drift, queda documentado en audit, no silent.
+- Sync unidireccional primero: commercial LEE de payroll. No hay writeback payroll -> commercial ni commercial -> payroll en este corte.
+- La migración nueva vive solo en `greenhouse_commercial` y debe incluir GRANTS explícitos a `greenhouse_runtime`.
 
 ## Normative Docs
 
@@ -77,26 +76,25 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-464a shipped — `greenhouse_commercial.employment_types` existe con seed inicial
-- TASK-464d shipped (recomendado) — engine v2 para integrar rates lookup
 
 ### Blocks / Impacts
 
-- **Sinergia natural**: pricing engine + payroll operan sobre vocabulario compartido
-- **Reducción de duplicación**: un solo lugar para "cuánto es previsional chilena vigente"
-- **Future-proof**: nuevos países (Argentina, España) se modelan en `employment_types` sin duplicar en payroll
+- **Sinergia natural**: `TASK-464d` puede enchufarse al bridge sin tocar payroll
+- **Reducción de duplicación**: alias + tasas payroll quedan resueltos en un solo boundary commercial
+- **Future-proof**: nuevos orígenes y países pueden agregarse como aliases sin reescribir payroll
 
 ### Files owned
 
-- `migrations/[verificar]-task-468-payroll-commercial-employment-types-link.sql`
+- `migrations/[verificar]-task-468-commercial-employment-type-aliases.sql`
 - `src/lib/commercial/payroll-rates-bridge.ts` (nuevo — reader SELECT-only de payroll reference tables)
-- `src/lib/commercial/employment-types-store.ts` (extender con rate lookup cuando source_of_truth='payroll')
-- `scripts/migrate-compensation-version-contract-types.ts` (migración de strings legacy a codes canónicos)
+- `src/lib/commercial/employment-type-alias-store.ts` (nuevo — resolver de aliases payroll -> commercial)
+- `scripts/audit-payroll-contract-types.ts` (nuevo — auditoría read-only)
 
 ## Current Repo State
 
 ### Already exists (pre-TASK-468)
 
-- `greenhouse_payroll.compensation_versions.contract_type` string libre con valores como 'indefinido', 'plazo_fijo'
+- `greenhouse_payroll.compensation_versions.contract_type` con `CHECK` hard a `indefinido | plazo_fijo | honorarios | contractor | eor`
 - `greenhouse_payroll.chile_afp_rates` per AFP + période
 - `greenhouse_payroll.chile_previred_indicators` (SIS, tope UF, etc.)
 - `greenhouse_payroll.chile_tax_brackets`
@@ -105,15 +103,15 @@ Reglas obligatorias:
 
 ### Gap
 
-- No hay FK soft entre `compensation_versions.contract_type` y `commercial.employment_types.employment_type_code`
-- Pricing engine commercial NO consulta rates vigentes de payroll (usa values de `employment_types.previsional_pct_default`)
-- Admin UI commercial no puede "preview" rates vigentes de payroll como referencia
-- Valores legacy de `compensation_versions.contract_type` pueden no matchear los codes canónicos
+- No existe una tabla commercial de aliases persistente y auditable
+- No existe `payroll-rates-bridge.ts`
+- No existe script de auditoría de `contract_type`
+- El engine comercial todavía no consume este bridge porque eso corresponde a `TASK-464d`
 
 ## Read-Only Bridge Policy
 
 - Esta task NO modifica schemas ni lógica de `greenhouse_payroll.*`. El bridge se resuelve desde commercial mediante readers, alias mapping y consumo SELECT-only de tablas de referencia payroll.
-- `greenhouse_payroll.compensation_versions.contract_type` sigue siendo string libre y source of truth factual del colaborador; la unificación comercial ocurre por resolución externa, no por FK o rewrite sobre payroll.
+- `greenhouse_payroll.compensation_versions.contract_type` sigue siendo snapshot factual del colaborador; la unificación comercial ocurre por resolución externa, no por FK o rewrite sobre payroll.
 - Cualquier eventual hardening del lado payroll (constraint, migración de valores, enforcement de catálogo) queda explícitamente fuera de este corte y requeriría una decisión posterior separada.
 
 ## Payroll Isolation Guardrail
@@ -131,34 +129,35 @@ Reglas obligatorias:
 Esta task **no tiene superficie UI directa** — es bridge server-side entre payroll y commercial. Sin embargo impacta 2 surfaces del programa (documentados en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)**):
 
 - **Surface D — Employment Type selector**: el picker en `QuoteBuilderActions.tsx` (TASK-463) consume `greenhouse_commercial.employment_types` vía este bridge. Contract: SELECT-only, NUNCA lectura directa a `greenhouse_payroll.*` desde UI comercial.
-- **Surface L — Employment Types admin**: tab en governance panel (TASK-467) CRUD sobre `greenhouse_commercial.employment_types`. Cambios aquí propagan a payroll SOLO vía bridge auditado con escritor explícito (no triggers).
+- **Surface L — Employment Types admin**: tab en governance panel (TASK-467) podrá leer drift y alias coverage desde este bridge. No hay propagación a payroll en este corte.
 - **🛑 AISLAMIENTO PAYROLL (obligatorio)**: ningún componente del programa pricing toca `src/views/greenhouse/hr/payroll/**` ni `src/components/hr/payroll/**`. Los 194 tests de payroll (29 archivos) son gate de regresión antes de merge.
 
 ## Scope
 
-### Slice 1 — Audit de valores legacy + alias mapping comercial (read-only first)
+### Slice 1 — Audit de valores payroll + alias mapping comercial
 
 - Auditoría de valores distintos en `compensation_versions.contract_type`:
   ```sql
   SELECT DISTINCT contract_type, COUNT(*) FROM greenhouse_payroll.compensation_versions GROUP BY 1;
   ```
-- Map de valores legacy → codes canónicos resuelto del lado commercial:
+- Map de valores payroll -> codes canónicos resuelto del lado commercial:
   - `'indefinido'` → `'indefinido_clp'` (asume CLP por contexto chileno)
   - `'plazo_fijo'` → `'plazo_fijo_clp'`
   - `'honorarios'` → `'honorarios_clp'`
-  - `'contractor'` o `'contrator'` → `'contractor_deel_usd'` (requiere verificación humana)
-  - `'part-time'` → `'part_time_clp'`
+  - `'contractor'` → `'contractor_deel_usd'` por default inicial versionado en commercial
+  - `'eor'` → `'contractor_eor_usd'`
+  - aliases no payroll como `'contrator'` o `'part-time'` se aceptan solo como aliases explicitados en la tabla, no por fallback silencioso
   - Otros valores distintos → flag `needs_review` + reportar a admin
 
 - Script `scripts/audit-payroll-contract-types.ts`:
-  - Dry run mode: muestra diff sin ejecutar
+  - Dry run mode: muestra cobertura del mapping sin mutar nada
   - Reporte final: cuántos resuelven por alias, cuántos necesitan review manual
-  - Opcional: genera artifact local con alias no resueltos para limpieza posterior
+  - Genera artifact local con alias no resueltos para limpieza posterior
 
-### Slice 2 — Alias resolver canónico (commercial-side)
+### Slice 2 — Tabla de aliases + resolver canónico (commercial-side)
 
-- `src/lib/commercial/employment-type-aliases.ts` define el diccionario de alias que mapea strings legacy de payroll a `employment_type_code` canónico.
-- `resolveCommercialEmploymentTypeFromPayrollContractType(contractType)` encapsula esa traducción y retorna `{ employmentTypeCode | null, resolutionSource, warning? }`.
+- Nueva tabla `greenhouse_commercial.employment_type_aliases` como source of truth persistente para mappings por `source_system`.
+- `src/lib/commercial/employment-type-alias-store.ts` encapsula esa traducción y retorna `{ employmentTypeCode | null, resolutionSource, warning? }`.
 - La ausencia de alias no rompe payroll; solo deja el caso en `unknown` / `needs_review` del lado commercial.
 
 ### Slice 3 — Payroll rates bridge (reader SELECT-only)
@@ -184,41 +183,20 @@ export const getCurrentUnemploymentRate = async (contractType: string, date: str
 
 Tests: verifican que las lecturas funcionan sin tocar payroll writers.
 
-### Slice 4 — Pricing engine integra rates opcionalmente
-
-- `PricingEngineV2.computeRoleCost` acepta flag `useLiveRates: boolean` (default TRUE)
-- Cuando `useLiveRates=TRUE` + `employment_type.source_of_truth='greenhouse_payroll_chile_rates'` + quote en CLP + employment_type es indefinido/plazo_fijo:
-  - Consulta `getCurrentChileanPrevisionalRate(quote.date)` via bridge
-  - Overrides `previsional_pct_default` del catálogo con rate vigente de payroll
-  - Emite warning si drift > 1%: "Rate vigente en payroll 21.5% difiere del catálogo (20%). Usando payroll."
-- Cuando `useLiveRates=FALSE` o source_of_truth='catalog_manual':
-  - Usa valores del catálogo commercial sin consultar payroll
-
-### Slice 5 — Admin UI commercial muestra payroll rates como referencia
-
-- Tab "Modalidades de contrato" en `/admin/pricing-catalog/employment-types/[code]`:
-  - Para employment_types con `source_of_truth='greenhouse_payroll_chile_rates'`:
-    - Panel lateral "Rates vigentes en payroll":
-      - AFP promedio actual
-      - SIS rate actual
-      - Tope AFP UF
-      - Fecha de la última actualización de payroll
-    - Comparación con `previsional_pct_default` del catálogo → chip "Alineado" / "Drift X%"
-  - Botón "Actualizar catálogo desde payroll" (solo admin) → actualiza `previsional_pct_default` con valor vigente + audit log
-
-### Slice 6 — Tests de regresión payroll
+### Slice 4 — Tests de regresión payroll + contract tests del bridge
 
 - Ejecutar `pnpm test src/lib/payroll/` antes y después de cada slice
 - Toda suite de payroll debe pasar intacta sin modificación de test files
-- Documentar en PR description: "Payroll tests: X passed, 0 failed, 0 modified"
+- Agregar tests unitarios del alias resolver y del payroll rates bridge
 
 ## Out of Scope
 
-- Migración completa de payroll a usar el catálogo commercial como source of truth (future architecture decision, no en este corte)
+- Migración completa de payroll a usar el catálogo commercial como source of truth
 - Cualquier FK, constraint o rewrite sobre `greenhouse_payroll.compensation_versions`
-- Modificación de lógica de cálculo payroll (Chilean previsional rules siguen embedded en `src/lib/payroll/chile-previsional-helpers.ts`)
-- Bidirectional sync automático commercial → payroll (follow-up si se pide)
-- Multi-country payroll (hoy solo Chile; future task)
+- Modificación de lógica de cálculo payroll
+- Integración del pricing engine con live rates dentro de esta misma task
+- UI admin o quote builder; eso queda para `TASK-467` / `TASK-463`
+- Bidirectional sync automático commercial -> payroll
 
 ## Detailed Spec
 
@@ -242,7 +220,7 @@ Diagrama de aislamiento:
 │ greenhouse_commercial                            │
 │   employment_types                               │ ← CATÁLOGO canónico (fuente TASK-464a)
 │   payroll-rates-bridge.ts (TASK-468)             │ ← Reader SELECT-only hacia payroll
-│   sellable_role_cost_components                  │ ← opcionalmente override con rates payroll
+│   employment_type_aliases                        │ ← Bridge canónico payroll -> commercial
 └──────────────────────────────────────────────────┘
 ```
 
@@ -253,14 +231,13 @@ Diagrama de aislamiento:
 ## Acceptance Criteria
 
 - [ ] `pnpm test src/lib/payroll/` pasa **194 tests / 29 files** (baseline registrado 2026-04-18) sin modificar test files
-- [ ] Dry run de migración muestra diff coherente
-- [ ] Apply migration actualiza valores string + preserva backup
-- [ ] Soft FK constraint queda declarada NOT VALID sin bloquear INSERTs
+- [ ] Migración nueva vive solo en `greenhouse_commercial` y no toca `greenhouse_payroll.*`
+- [ ] Tabla de aliases resuelve los valores payroll actuales (`indefinido`, `contractor`, `honorarios`) hacia códigos commercial
+- [ ] Script de auditoría reporta alias cubiertos y `needs_review` sin side effects
 - [ ] `getCurrentChileanPrevisionalRate()` retorna valores correctos desde payroll sin side effects
-- [ ] Pricing engine con `useLiveRates=TRUE` override previsional correctamente
-- [ ] Admin UI muestra panel "Rates vigentes en payroll" funcional
+- [ ] Tests unitarios nuevos del bridge pasan
 - [ ] Zero modificación en archivos de `src/lib/payroll/` (verificable con git diff)
-- [ ] Zero modificación en schemas de `greenhouse_payroll.*` (migration solo toca commercial + agrega constraint documentacional)
+- [ ] Zero modificación en schemas de `greenhouse_payroll.*` (migration solo toca commercial)
 
 ## Verification
 
@@ -270,7 +247,7 @@ Diagrama de aislamiento:
 - `pnpm test` completo
 - `pnpm test src/lib/payroll/` explícito como gate
 - `git diff --stat src/lib/payroll/` debe retornar vacío
-- Manual staging: verificar que liquidación de payroll genera mismos resultados que antes
+- Validación manual de DB: alias table sembrada + readers devuelven datos coherentes para el último período payroll disponible
 
 ## Closing Protocol
 
@@ -284,12 +261,12 @@ Diagrama de aislamiento:
 
 ## Follow-ups
 
-- Migración bidireccional: payroll → commercial cuando cambia un AFP rate, notifica al admin commercial
+- Exponer alias coverage y drift en `TASK-467` / `TASK-463`
 - Extend a multi-country: cuando se abra Argentina, similar bridge entre `argentina_previsional_rates` y `employment_types` argentinos
-- Deprecate `contract_type` string en payroll cuando FK constraint se pueda `VALIDATE` completamente
+- Evaluar un patrón reusable de bridges cross-schema si aparecen más casos commercial ↔ finance / payroll
 
 ## Open Questions
 
 - ¿Cambio rates en payroll debería trigger automático un event outbox que commercial escuche para actualizar sus defaults? Propuesta: **NO en V1** — commercial consulta on-demand. Sync automático queda como follow-up.
-- ¿Admin commercial con permisos para triggerear re-sync de rates? Propuesta: sí, solo `efeonce_admin`. Finance manager solo ve, no triggeá.
-- ¿Valores legacy en `compensation_versions.contract_type` que no matcheen ningún code canónico — qué hacer? Propuesta: dejarlos con backup + flag `needs_review=TRUE` + admin decide caso a caso.
+- ¿Admin commercial con permisos para modificar aliases manualmente después? Propuesta: sí, pero en `TASK-467`, no aquí.
+- ¿Valores no cubiertos por alias table qué hacen? Propuesta: quedan en `needs_review`, se reportan, y no generan fallback silencioso a `indefinido`.

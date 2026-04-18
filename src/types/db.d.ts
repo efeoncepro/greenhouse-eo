@@ -180,6 +180,19 @@ export interface GreenhouseCommercialApprovalSteps {
   version_number: number;
 }
 
+export interface GreenhouseCommercialEmploymentTypeAliases {
+  active: Generated<boolean>;
+  confidence: Generated<string>;
+  created_at: Generated<Timestamp>;
+  employment_type_code: string | null;
+  notes: string | null;
+  resolution_status: Generated<string>;
+  source_system: string;
+  source_value: string;
+  source_value_normalized: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialEmploymentTypes {
   active: Generated<boolean>;
   applies_bonuses: Generated<boolean>;
@@ -5018,6 +5031,7 @@ export interface DB {
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
+  "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
