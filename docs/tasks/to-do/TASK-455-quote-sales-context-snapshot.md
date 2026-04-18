@@ -50,6 +50,7 @@ Reglas obligatorias:
 - Snapshot es immutable una vez capturado — no se re-escribe si lifecyclestage cambia después
 - No se hace lookup a HubSpot en hot path del send — usar valores ya sincronizados localmente (TASK-454 + TASK-453)
 - Respetar JSONB schema estable para consumers downstream
+- **Crítico — snapshot es para analytics, NO para classification de UI**: el classifier del pipeline híbrido (TASK-457) lee estado **vivo** de `clients.lifecyclestage` + `deals.dealstage`, no el snapshot. Esto permite que una quote a lead transicione automáticamente a Deal cuando el lead califica. El snapshot queda solo como trazabilidad histórica para reporting (conversion funnel lead→quote→deal→won).
 
 ## Normative Docs
 

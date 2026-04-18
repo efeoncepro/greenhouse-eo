@@ -108,19 +108,21 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Schema + migration
+### Slice 1 — Schema + migration + pipeline stage config
 
 - Crear `greenhouse_commercial.deals` con columnas: `deal_id` (PK canónico), `hubspot_deal_id` (UNIQUE), `client_id` FK, `organization_id`, `space_id`, `deal_name`, `dealstage`, `pipeline`, `amount`, `amount_clp`, `currency`, `close_date`, `probability_pct`, `deal_owner`, `deal_type`, `hubspot_last_synced_at`, timestamps
-- Índices en `client_id`, `hubspot_deal_id`, `dealstage` WHERE status not closed
+- Crear `greenhouse_commercial.hubspot_deal_pipeline_config` — tabla de soporte que normaliza stages por pipeline (porque HubSpot permite pipelines custom con stage names arbitrarios). Columnas: `pipeline_id`, `stage_id`, `stage_label`, `probability_pct`, `is_closed`, `is_won`. Seed inicial con los pipelines de Efeonce en HubSpot.
+- `is_closed` e `is_won` en `deals` se derivan de la config, **no** de un literal `dealstage = 'closedwon'` (eso rompe con pipelines custom). Generated columns convertidas a plain columns + trigger que recalcule on update.
+- Índices en `client_id`, `hubspot_deal_id`, `dealstage` WHERE is_closed = FALSE
 - Grants a `greenhouse_runtime` (SELECT + DML) + `greenhouse_migrator` (ALL)
-- Backfill opcional: traer snapshot inicial de deals ya existentes en HubSpot via API
 
-### Slice 2 — Sync inbound + publishers
+### Slice 2 — Sync inbound + publishers + backfill inicial obligatorio
 
 - `sync-hubspot-deals.ts` — resuelve lista de deals desde HubSpot API (paginación), upsertea en tabla canonical, publica `commercial.deal.synced` outbox event
 - `deal-events.ts` — publishers canónicos: `publishDealCreated`, `publishDealStageChanged`, `publishDealWon`, `publishDealLost`
 - Cron Vercel `/api/cron/hubspot-deals-sync` — cada 4h, llama a sync handler
 - Webhook HubSpot (si existe pipeline de webhooks inbound) — listen to `deal.propertyChange` para sync on-demand
+- **Backfill obligatorio al deploy**: primera corrida del sync debe traer TODOS los deals abiertos existentes en HubSpot (sin filtro de fecha). Sin esto, quotes ya asociadas a deals no se resuelven y la transición Pre-sales → Deal de TASK-457 no funciona para el estado actual. Incluir script `scripts/backfill-hubspot-deals.ts` que se ejecuta una vez post-migration.
 
 ### Slice 3 — Reconciliation con quotes
 
@@ -160,8 +162,8 @@ CREATE TABLE greenhouse_commercial.deals (
 
   close_date date,
   probability_pct numeric(5,2),
-  is_closed boolean GENERATED ALWAYS AS (dealstage LIKE 'closed%') STORED,
-  is_won boolean GENERATED ALWAYS AS (dealstage = 'closedwon') STORED,
+  is_closed boolean NOT NULL DEFAULT FALSE,  -- recomputado via trigger desde hubspot_deal_pipeline_config
+  is_won boolean NOT NULL DEFAULT FALSE,     -- recomputado via trigger desde hubspot_deal_pipeline_config
 
   deal_owner_hubspot_user_id text,
   deal_owner_email text,
@@ -236,4 +238,4 @@ dealLost: 'commercial.deal.lost',
 ## Open Questions
 
 - ¿Existe ya raw ingest de HubSpot deals en algún pipeline actual? (verificar en Discovery)
-- ¿Qué `dealstage` canonical vamos a normalizar como "open" vs "closed"? HubSpot permite pipelines custom con stages distintos — decidir si se normaliza o se conserva literal.
+- ¿Cuántos pipelines hay activos en HubSpot de Efeonce? (verificar en Discovery para armar seed inicial de `hubspot_deal_pipeline_config`). Inclinación: 1-2 pipelines principales + 1 de prospecting.

@@ -52,6 +52,8 @@ Reglas obligatorias:
 - Reusar ops-worker cron `ops-reactive-cost-intelligence` (no cron nuevo)
 - Grain = 1 fila por deal (no por quote) — la quote es metadata enriquecedora
 - Tenant scope aplicado vía `client_id` + `space_id` como en el resto de serving tables
+- **`is_open`/`is_won` resueltos via `greenhouse_commercial.hubspot_deal_pipeline_config`** (tabla creada en TASK-453), no via literal `dealstage = 'closedwon'`. HubSpot permite pipelines custom con stage names arbitrarios — rely en la config normalizada.
+- Deal con 0 quotes asociadas **debe aparecer en el pipeline** (fila legítima, representa oportunidad pre-quote). Materializer no filtra por `quote_count > 0`.
 
 ## Normative Docs
 

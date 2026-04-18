@@ -106,10 +106,18 @@ Reglas obligatorias:
   - `listRevenuePipelineUnified({ tenant, filters }) → UnifiedPipelineRow[]`
   - Query logic:
     - Deal rows: `SELECT ... FROM deal_pipeline_snapshots WHERE is_open = TRUE` mapeados como `category='deal'`
-    - Standalone quote rows: `SELECT ... FROM quotation_pipeline_snapshots q LEFT JOIN deals d ON q.quotation_id ~ d.hubspot_deal_id WHERE d.deal_id IS NULL` → classified by `client.lifecyclestage`
-    - `category = 'contract' | 'pre-sales'` según `lifecyclestage`
+    - Standalone quote rows: `SELECT ... FROM quotation_pipeline_snapshots q LEFT JOIN deals d ON q.quotation_id resolves to d.hubspot_deal_id WHERE d.deal_id IS NULL OR (d.is_closed AND NOT d.is_won)` → classified by `client.lifecyclestage` **vivo** (no snapshot)
+    - Edge case resuelto: **deal closedlost con quote approved → se excluye del pipeline**. Rationale: si el deal se perdió, aunque la quote siga `approved` en DB, no representa revenue forecast. Operativamente, cerrar deal como lost debería acompañarse de un `quote.reject` en HubSpot; si no se hace, el pipeline no lo cuenta de todas formas.
+    - Edge case resuelto: **deal closedwon con quote → se mueve a "Contrato"** (fila standalone), representando revenue under execution. Es el estado natural: deal cerró, contrato está en ejecución.
+    - `category = 'contract' | 'pre-sales'` según `lifecyclestage` **actual** del cliente (no el snapshot histórico de TASK-455). Un lead que se volvió customer mueve sus quotes standalone de pre-sales a contract.
   - Ordenamiento: deal rows primero por `close_date`, luego standalone por `expiry_date`
 - `GET /api/finance/commercial-intelligence/revenue-pipeline` — expone el reader
+
+### Precondición upstream crítica
+
+La transición **Pre-sales → Deal** de una quote al convertir un lead requiere que el AE **asocie la quote existente al deal nuevo en HubSpot** (acción humana, 1 clic). Próximo sync (TASK-453, 4h) trae `hubspot_deal_id` actualizado a la quote en Greenhouse, y el classifier detecta la transición automáticamente.
+
+**Sin esa asociación humana en HubSpot, la quote queda colgada como pre-sales permanentemente** — no es un bug del classifier sino del flujo comercial upstream. TASK-457 debe documentar esto en el onboarding del tab para que AEs lo sepan.
 
 ### Slice 2 — Componente unificado
 
@@ -226,4 +234,4 @@ WHERE d.is_open = TRUE;
 
 ## Open Questions
 
-- ¿Qué pasa con quotes que tienen `hubspot_deal_id` de un deal ya `closedlost` en HubSpot? Propuesta: clasificar como `contract` si `status='approved'` (ya firmado), o excluir si `status='rejected'`. Decidir en Discovery.
+- Resuelto en Slice 1: deal closedlost + quote approved → **excluir** del pipeline; deal closedwon + quote approved → **clasificar como contract** standalone (revenue under execution).

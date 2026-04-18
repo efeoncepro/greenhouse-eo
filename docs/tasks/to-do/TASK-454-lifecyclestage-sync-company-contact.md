@@ -99,17 +99,20 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Column + enum
+### Slice 1 — Column + enum + fallback para clientes sin hubspot_company_id
 
-- Agregar `lifecyclestage text` + `lifecyclestage_updated_at timestamptz` a `greenhouse_core.clients`
-- Opcional: CHECK constraint con valores canónicos HubSpot (`subscriber`, `lead`, `marketingqualifiedlead`, `salesqualifiedlead`, `opportunity`, `customer`, `evangelist`, `other`, `unknown`)
-- Default `'unknown'` para backfill
+- Agregar `lifecyclestage text` + `lifecyclestage_updated_at timestamptz` + `lifecyclestage_source text` a `greenhouse_core.clients`
+- `lifecyclestage_source` indica el origen del valor: `'hubspot_sync'`, `'nubox_fallback'`, `'manual_override'`, `'unknown'`
+- CHECK constraint con valores canónicos HubSpot (`subscriber`, `lead`, `marketingqualifiedlead`, `salesqualifiedlead`, `opportunity`, `customer`, `evangelist`, `other`, `unknown`)
+- **Fallback obligatorio — clientes sin `hubspot_company_id`**: clientes Nubox-sourced (migrados desde facturas sin contraparte HubSpot) reciben `lifecyclestage='customer'` y `lifecyclestage_source='nubox_fallback'` por default. Rationale: si hay factura Nubox es porque ya son clientes pagadores.
+- Default `'unknown'` para el resto sin información
 - Grants runtime (SELECT — el cambio es read-only para runtime) + migrator (DDL)
 
 ### Slice 2 — Sync inbound
 
 - Handler que lee `lifecyclestage` desde HubSpot API (bulk endpoint) y upsertea en `clients`
 - Si ya existe `sync-hubspot-companies.ts`, extender ese; sino crear `sync-hubspot-company-lifecycle.ts`
+- Sync solo escribe si `lifecyclestage_source != 'manual_override'` (respeta overrides manuales de Admin)
 - Publicar evento `crm.company.lifecyclestage_changed` solo cuando el valor cambia (no noise)
 - Cron cadence: cada 6h (lifecyclestage no cambia tan rápido)
 
@@ -133,7 +136,8 @@ Reglas obligatorias:
 ```sql
 ALTER TABLE greenhouse_core.clients
   ADD COLUMN IF NOT EXISTS lifecyclestage text DEFAULT 'unknown',
-  ADD COLUMN IF NOT EXISTS lifecyclestage_updated_at timestamptz;
+  ADD COLUMN IF NOT EXISTS lifecyclestage_updated_at timestamptz,
+  ADD COLUMN IF NOT EXISTS lifecyclestage_source text DEFAULT 'unknown';
 
 ALTER TABLE greenhouse_core.clients
   ADD CONSTRAINT clients_lifecyclestage_valid
@@ -141,6 +145,23 @@ ALTER TABLE greenhouse_core.clients
     'subscriber', 'lead', 'marketingqualifiedlead', 'salesqualifiedlead',
     'opportunity', 'customer', 'evangelist', 'other', 'unknown'
   )) NOT VALID;
+
+ALTER TABLE greenhouse_core.clients
+  ADD CONSTRAINT clients_lifecyclestage_source_valid
+  CHECK (lifecyclestage_source IN (
+    'hubspot_sync', 'nubox_fallback', 'manual_override', 'unknown'
+  )) NOT VALID;
+
+-- Backfill Nubox-sourced clients that have invoices but no hubspot_company_id
+UPDATE greenhouse_core.clients c
+SET lifecyclestage = 'customer',
+    lifecyclestage_source = 'nubox_fallback',
+    lifecyclestage_updated_at = NOW()
+WHERE hubspot_company_id IS NULL
+  AND EXISTS (
+    SELECT 1 FROM greenhouse_finance.income i
+    WHERE i.client_id = c.client_id
+  );
 ```
 
 ### Sync helper signature
