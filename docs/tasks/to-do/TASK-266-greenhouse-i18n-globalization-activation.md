@@ -10,40 +10,60 @@
 - Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Muy alto`
-- Effort: `Alto`
+- Effort: `Alto` (agregado de child tasks; el umbrella mismo no implementa)
 - Type: `umbrella`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `none`
+- Blocked by: `none` — la umbrella coordina; cada child task declara sus propios blockers.
 - Branch: `task/TASK-266-greenhouse-i18n-globalization-activation`
 - Legacy ID: —
 - GitHub Issue: —
+- Children:
+  - `TASK-428` — i18n architecture decision (library + routing strategy)
+  - `TASK-429` — locale-aware formatting utilities (independiente, puede arrancar sin 265)
+  - `TASK-430` — dictionary foundation activation (depende de 265 + 428)
+  - `TASK-431` — tenant + user locale persistence model (depende de 428; requiere PG migration)
+  - (futuros, derivar cuando corresponda) — shared shell rollout, emails localization, SEO & routing deep-links
 
 ## Summary
 
-Greenhouse opera globalmente y no debería quedarse atado a una capa verbal `es-only` indefinida. El upstream de Vuexy full-version ya trae un scaffolding real de i18n/dictionaries, pero el portal actual no lo adoptó. Esta task formaliza la activación de internacionalización y globalization de Greenhouse como programa incremental, separada de `TASK-265`, para no mezclar copy contract con routing, locale strategy, formateo, emails y surfaces runtime.
+Efeonce está radicada en Chile pero opera con clientes enterprise distribuidos por toda América y el mundo (aerolíneas, bancos, manufactura). Greenhouse no puede quedarse atado a una capa verbal `es-only` ni a formatos hardcoded en `es-CL`: ese es un techo real para el footprint del negocio, no una feature especulativa. El upstream de Vuexy full-version ya trae un scaffolding real de i18n/dictionaries (`configs/i18n.ts`, `utils/getDictionary.ts`, `data/dictionaries/*.json`), pero el portal actual no lo adoptó y el único caso de multi-locale en el runtime es un email aislado (`LeaveRequestPendingReviewEmail.tsx`) con un patrón manual ad-hoc. Esta task formaliza la activación de internacionalización y globalization de Greenhouse como programa incremental, separada de `TASK-265`, para no mezclar copy contract con routing, locale strategy, formateo, emails y surfaces runtime.
 
 ## Why This Task Exists
 
-Sí, incorporar i18n sirve. Pero no sirve como “detalle” dentro de la task de nomenclature. i18n introduce decisiones de plataforma que van bastante más allá del microcopy:
+### Driver de negocio (no especulativo)
+
+Los clientes de Efeonce están distribuidos por América y el mundo — aerolíneas, bancos y empresas de manufactura no son PYMES locales. Eso implica:
+
+- Stakeholders no hispanohablantes (portugués, inglés) que consumen el portal o sus derivables (reports, emails, exports).
+- Formatos de moneda, fecha y número que no pueden asumir `es-CL` — un cliente en Brasil no lee montos con separador `.` de miles, uno en US no lee fechas como `dd-mm-yyyy`.
+- SLAs, contracts y economics que cruzan monedas (CLP, BRL, USD, MXN) y no pueden seguir hardcodeando el locale de formateo.
+- Emails institucionales que hoy se envían en español a todos los tenants por default.
+
+Esto es distinto a una agencia chilena operando para clientes chilenos. i18n aquí no es expansión hipotética: es acompañar el footprint real del negocio.
+
+### Por qué carril propio (no dentro de TASK-265)
+
+Sí, incorporar i18n sirve. Pero no sirve como "detalle" dentro de la task de nomenclature. i18n introduce decisiones de plataforma que van bastante más allá del microcopy:
 
 - estrategia de locales y fallback
 - routing con o sin prefijo de locale
 - diccionarios y namespaces
-- formateo de fechas, moneda y números
+- formateo de fechas, moneda y números (crítico para Finance y payroll multi-currency)
 - persistencia de preferencia de idioma por usuario o tenant
 - emails, notificaciones y surfaces externas
 - SEO, caching y testing cross-locale
 
-Si se mezcla eso con `TASK-265`, la lane deja de ser una convergencia de copy contract y se vuelve una migración transversal del portal completo. Esta activación necesita carril propio y secuenciado.
+Si se mezcla eso con `TASK-265`, la lane deja de ser una convergencia de copy contract y se vuelve una migración transversal del portal completo. Esta activación necesita carril propio y secuenciado, pero con dependencia dura sobre `TASK-265` para no reconstruir la capa verbal dos veces.
 
 ## Goal
 
-- Formalizar una estrategia i18n/globalization defendible para Greenhouse.
-- Definir la arquitectura incremental para pasar de `es-only` a multi-locale sin romper el portal actual.
+- Formalizar una estrategia i18n/globalization defendible para Greenhouse, anclada al footprint real de clientes de Efeonce (LATAM + mercados hispanohablantes y no hispanohablantes).
+- Definir la arquitectura incremental para pasar de `es-only` + `es-CL` hardcoded a multi-locale / multi-currency sin romper el portal actual.
 - Reusar el scaffolding válido del upstream Vuexy cuando aporte, sin importar su estructura literalmente.
-- Dejar child tasks ejecutables para auth, navigation, shared surfaces, formatting, emails y preferencias de usuario.
+- **Separar copy (idioma) de globalization (formato)**: muchas superficies sólo necesitan locale-aware formatting (fechas, moneda, números) antes de traducción completa; eso puede entregar valor antes del full i18n.
+- Dejar child tasks ejecutables para auth, navigation, shared surfaces, formatting, emails, preferencias de usuario y tenant locale default.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -103,17 +123,23 @@ Reglas obligatorias:
 
 ### Already exists
 
-- El portal actual es efectivamente `es-only`.
-- Existe una capa propia de nomenclature/microcopy en `src/config/greenhouse-nomenclature.ts`.
-- Vuexy full-version sí trae i18n config + dictionaries listos como referencia.
-- El producto ya trabaja con contextos globales donde i18n y globalization son relevantes.
+- El portal actual es efectivamente `es-only` en código (0 paquetes i18n instalados: ni `next-intl`, ni `next-i18next`, ni `react-intl`).
+- Existe una capa propia de nomenclature/microcopy en `src/config/greenhouse-nomenclature.ts` (1592 líneas, ~94 importers). `TASK-265` está recortándola y abriendo la capa dictionary-ready que esta umbrella va a consumir.
+- Vuexy full-version sí trae i18n config + dictionaries listos como referencia (`full-version/src/configs/i18n.ts` con `en/fr/ar` + `langDirection`, `full-version/src/utils/getDictionary.ts`, `full-version/src/data/dictionaries/*.json`).
+- **254 instancias** de `Intl.DateTimeFormat` / `toLocaleDateString` / `toLocaleString` scattered por el repo, mayoritariamente fijadas a `'es-CL'` — la globalization de formato es el gap más inmediato y barato de cerrar.
+- `@formatjs/intl-localematcher` está presente como dependencia aislada (no integrada).
+- `LeaveRequestPendingReviewEmail.tsx` ya implementa un patrón bilingüe manual (`locale: 'es' | 'en'`) — útil como prototipo de patrón pero no escalable.
+- El producto ya trabaja con contextos globales donde i18n y globalization son relevantes (Finance multi-currency, payroll, emails, SLAs).
 
 ### Gap
 
 - No hay locale strategy formal en el runtime actual.
-- No existen diccionarios canónicos del portal Greenhouse.
-- Formatos y copy siguen asumiendo español por defecto.
+- No existen diccionarios canónicos del portal Greenhouse (la foundation la abre `TASK-265`).
+- Formatos hardcodeados a `es-CL` en 254+ call sites sin utility central — ni siquiera un `formatCurrency(amount, locale)` compartido.
+- No hay persistencia de preferencia de idioma por usuario ni por tenant (el modelo de tenant no tiene `default_locale`).
 - No existe una política institucional para qué surfaces entran primero en i18n.
+- No hay estrategia de routing por locale (prefix `/en/...` vs state-only).
+- Los emails no tienen framework de localization — replicar el patrón de `LeaveRequestPendingReviewEmail` en los 20+ templates actuales es insostenible.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -122,27 +148,31 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — i18n architecture decision
+Esta task es una **umbrella pura**: coordina el programa i18n/globalization, no implementa código. La ejecución vive en child tasks independientes, cada una con su propio scope, blockers y acceptance criteria.
 
-- Definir locales target, fallback locale y estrategia de routing.
-- Decidir si Greenhouse usará locale-prefixed routes o locale state sin cambiar URLs en la primera iteración.
-- Formalizar namespaces de diccionarios y ownership de copy.
+### Responsabilidades de este umbrella
 
-### Slice 2 — Dictionary foundation
+1. Mantener la visión agregada del programa: qué locales, cuándo, con qué dependencias.
+2. Declarar y priorizar child tasks a medida que el rollout avanza.
+3. Resolver el Locale Activation Gate (ver abajo) antes de que cualquier child task de traducción arranque.
+4. Arbitrar decisiones transversales que afecten a más de un child task (p.ej. cambio de librería i18n después de `TASK-428`).
+5. Consolidar el impacto en documentación de arquitectura (`GREENHOUSE_UI_PLATFORM_V1.md`).
 
-- Crear la foundation dictionary-ready del portal Greenhouse.
-- Alinearla con el resultado de `TASK-265` para no duplicar la capa verbal.
-- Dejar safe adapters para shared surfaces sin reescribir todo el producto.
+### Child tasks activas
 
-### Slice 3 — Formatting & locale semantics
+| ID | Alcance | Blocker | Paralelizable |
+|----|---------|---------|---------------|
+| `TASK-428` | Architecture decision: librería (probable `next-intl`), routing (prefix vs state), locales first-class, fallback strategy | none | — |
+| `TASK-429` | Formatting utilities centrales (`src/lib/format/`) para reemplazar 254+ call sites de `Intl.*` con `es-CL` hardcoded | none | Sí — puede arrancar sin 265 ni 428 |
+| `TASK-430` | Dictionary foundation activation: conectar locales reales sobre la capa dictionary-ready | `TASK-265`, `TASK-428` | — |
+| `TASK-431` | Tenant + user locale persistence (migración PG, Identity V2 coordination) | `TASK-428` | Sí con 429/430 |
 
-- Definir reglas para fechas, moneda, separadores numéricos, timezone y pluralización.
-- Establecer cómo conviven locale global, timezone operativa y formatos por tenant/usuario.
+### Child tasks futuras (crear cuando corresponda)
 
-### Slice 4 — Incremental surface rollout
-
-- Identificar y derivar child tasks para auth, navigation, shared empty/error states, notifications/emails y settings de usuario.
-- Priorizar shared surfaces antes de módulos profundos del dominio.
+- Shared shell rollout por locale (derivar de `TASK-407` cuando dictionary foundation esté lista).
+- Emails localization (derivar de `TASK-408` cuando `TASK-430` haya conectado el primer locale no-`es-CL`).
+- SEO, caching y testing cross-locale.
+- Módulos de dominio priorizados por footprint cliente (Finance multi-currency display, payroll reports).
 
 ## Out of Scope
 
@@ -151,12 +181,26 @@ Reglas obligatorias:
 - Resolver theme/branding (`TASK-264`) o copy contract base (`TASK-265`) dentro de esta task.
 - Tocar `efeoncepro/kortex`.
 
+## Locale Activation Gate
+
+La umbrella se activa y los slices se ejecutan cuando se cumplen **todas** estas condiciones:
+
+1. `TASK-265` en estado `complete` (capa dictionary-ready existe y microcopy shared migrado).
+2. Lista confirmada de locales first-class con ops/ventas de Efeonce — no activar "en abstracto". Recomendación base: `es-CL`, `en-US`, `pt-BR`.
+3. Decisión tomada sobre librería (probable `next-intl`) y estrategia de routing (prefixed vs state-only).
+4. Al menos un tenant piloto identificado como consumer inicial del locale no-`es-CL` para validar el rollout.
+
+Slice 3 (formatting) puede arrancar **sin esperar** Slices 2/4 porque entrega valor independiente y no toca copy.
+
 ## Acceptance Criteria
 
-- [ ] Existe una estrategia i18n/globalization explícita para Greenhouse.
+- [ ] Existe una estrategia i18n/globalization explícita para Greenhouse con locales first-class confirmados.
 - [ ] La task deja definidas child tasks ejecutables por slices, no una idea abstracta.
-- [ ] La relación con `TASK-265` queda clara: copy contract primero, activación i18n incremental después.
+- [ ] La relación con `TASK-265` queda clara: copy contract primero, activación i18n incremental después. La dependencia dura está registrada en `Blocked by`.
 - [ ] Queda definido cómo Greenhouse pasa de `es-only` a multi-locale sin romper el runtime actual.
+- [ ] La separación entre copy (idioma) y globalization (formato) está explícita: Slice 3 puede ejecutarse antes que Slice 2.
+- [ ] Las 254+ llamadas a `Intl.*` con `es-CL` hardcoded tienen un target de migración definido vía utility central.
+- [ ] El modelo de tenant tiene ruta clara para `default_locale` sin bloquear la umbrella.
 
 ## Verification
 
@@ -170,13 +214,25 @@ Reglas obligatorias:
 
 ## Follow-ups
 
-- Child task: auth + shared shell dictionary foundation
-- Child task: locale-aware formatting utilities
-- Child task: user/tenant locale preference model
-- Child task: email + notification localization
+Child tasks ya creadas (no son follow-ups, son el scope ejecutable):
+
+- `TASK-428` — i18n architecture decision
+- `TASK-429` — locale-aware formatting utilities
+- `TASK-430` — dictionary foundation activation
+- `TASK-431` — tenant + user locale persistence
+
+Follow-ups reales (a derivar cuando corresponda):
+
+- Shared shell rollout por locale
+- Emails localization
+- SEO + routing deep-links cross-locale
+- Finance multi-currency display separado de locale de UI
 
 ## Open Questions
 
-- ¿Greenhouse necesita locale-prefixed routes o basta una primera fase sin cambio de URL?
-- ¿Qué mercados/locales son first-class en la primera ola?
-- ¿Qué parte del portal realmente necesita traducción y qué parte solo necesita globalization de formatos?
+- ¿Greenhouse necesita locale-prefixed routes o basta una primera fase sin cambio de URL? — impacto sobre auth, previews Vercel y deep links debe evaluarse en Slice 1.
+- ¿Qué mercados/locales son first-class en la primera ola? Recomendación base: `es-CL` (default), `en-US`, `pt-BR`. Confirmar con ops/ventas de Efeonce.
+- ¿Qué parte del portal realmente necesita traducción y qué parte solo necesita globalization de formatos? — Slice 3 aislado responde parte de esta pregunta.
+- ¿El tenant dicta el locale default o el usuario? ¿Qué pasa con un colaborador interno de Efeonce viendo un tenant cliente en otro locale?
+- ¿Se traducen los nombres de módulos/navegación Greenhouse (`Pulse`, `Spaces`, `Ciclos`) o se tratan como brand names no traducibles?
+- ¿Finance requiere multi-currency display separado de locale (ej. un usuario en-US viendo un cliente chileno con CLP)? ¿O locale dicta moneda default?

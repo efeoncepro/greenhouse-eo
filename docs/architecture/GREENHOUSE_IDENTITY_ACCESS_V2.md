@@ -1,5 +1,121 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-17 — `password_hash` mutation guardrails (TASK-451 / ISSUE-053)
+
+### Problema detectado
+
+Un batch a las 08:00 UTC (dentro del ciclo de syncs de Entra + HubSpot) escribió sobre `greenhouse_core.client_users.password_hash` en la DB `greenhouse-pg-dev`, dejando inutilizable el login con credentials para `jreyes@efeoncepro.com` en staging. Producción comparte la misma DB; la hipótesis de por qué prod seguía aceptando el login es que ese usuario tenía un JWT de sesión ya emitido (NextAuth no re-valida el hash por request).
+
+Investigación confirmó dos cosas:
+
+1. El único writer legítimo en runtime de `password_hash` son `/api/account/reset-password` y `/api/account/accept-invite`.
+2. `scripts/backfill-postgres-identity-v2.ts` también escribía `password_hash = COALESCE($8, password_hash)` leyendo desde BigQuery — vulnerabilidad latente que ya había causado la rotación silenciosa.
+
+### Regla canónica
+
+**`client_users.password_hash` es user-initiated. No se sincroniza desde BigQuery, HubSpot, Entra, SCIM ni ningún sistema externo. Nunca.** Los únicos flujos que lo mutan son:
+
+| Flujo | Entry point | Source |
+|---|---|---|
+| Password reset self-service | `POST /api/account/reset-password` | `user_reset` |
+| Invite acceptance (set initial password) | `POST /api/account/accept-invite` | `accept_invite` |
+| Bootstrap admin / test fixture | `scripts/` bajo control explícito | `bootstrap_admin` / `test_fixture` |
+
+Cualquier otro path que mute `password_hash` es un bug y es **rechazado a nivel DB**.
+
+### Defensa en profundidad
+
+#### 1. Trigger DB (`client_users_password_guard`)
+
+Migration `20260417165907294_task-451-password-hash-mutation-guard.sql` instala:
+
+```sql
+CREATE FUNCTION greenhouse_core.guard_password_hash_mutation() RETURNS TRIGGER AS $$
+BEGIN
+  IF OLD.password_hash IS DISTINCT FROM NEW.password_hash THEN
+    IF current_setting('app.password_change_authorized', TRUE) IS DISTINCT FROM 'true' THEN
+      RAISE EXCEPTION 'password_hash mutation not authorized.'
+        USING ERRCODE = 'P0001';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER client_users_password_guard
+BEFORE UPDATE ON greenhouse_core.client_users
+FOR EACH ROW EXECUTE FUNCTION greenhouse_core.guard_password_hash_mutation();
+```
+
+Comportamiento:
+
+- `UPDATE ... SET password_hash = X` sin `SET LOCAL app.password_change_authorized = 'true'` → **excepción `P0001`**.
+- `UPDATE ... SET last_login_at = ...` (sin tocar password) → pasa siempre.
+- `UPDATE ... SET password_hash = OLD.password_hash` (no-op) → `IS DISTINCT FROM` filtra y pasa.
+
+#### 2. Helper de aplicación (`withPasswordChangeAuthorization`)
+
+`src/lib/identity/password-mutation.ts` es la única API autorizada para escribir `password_hash`:
+
+```ts
+await withPasswordChangeAuthorization(
+  { userId, source: 'user_reset' },
+  async client => {
+    await client.query(
+      `UPDATE greenhouse_core.client_users
+         SET password_hash = $1, password_hash_algorithm = 'bcrypt', updated_at = now()
+         WHERE user_id = $2`,
+      [passwordHash, userId]
+    )
+  }
+)
+```
+
+Qué hace internamente:
+
+1. Abre una transacción (`withTransaction`).
+2. Ejecuta `SET LOCAL app.password_change_authorized = 'true'`.
+3. Corre el callback del caller (el UPDATE real).
+4. Publica `identity.password_hash.rotated` al outbox con `{userId, source, actorUserId, rotatedAt}`.
+5. Commit.
+
+**Regla para contributors:** si tu código necesita escribir `password_hash`, lo único correcto es llamar al helper. Cualquier otro camino será rechazado por el trigger.
+
+#### 3. Outbox event (`identity.password_hash.rotated`)
+
+- `aggregate_type = 'identity_credential'`
+- `aggregate_id = userId`
+- `event_type = 'identity.password_hash.rotated'`
+- `payload = { userId, source, actorUserId, rotatedAt }`
+
+El evento es informativo; no bloquea la escritura. Queda persistido en `greenhouse_sync.outbox_events` para que cualquier consumer futuro pueda alertar (Slack/Sentry) si el `source` es inesperado. Follow-up abierto: wire del alerter en TASK posterior.
+
+### Reglas para todo desarrollo futuro
+
+1. **Ningún batch, sync, cron, backfill o migration puede SET `password_hash`**. Si tu cambio lo necesita, estás diseñando mal.
+2. **Ningún reader externo (BigQuery, HubSpot, Entra, SCIM, Notion) es fuente de verdad para passwords.** No se mirror, no se backfillea, no se reconcilia.
+3. Si tienes un caso de bootstrap legítimo (seed admin en un ambiente nuevo, fixture de test), usa el helper con `source: 'bootstrap_admin'` o `source: 'test_fixture'` — queda trazado en outbox.
+4. **El helper requiere transacción.** No uses `runGreenhousePostgresQuery` pelado para escribir `password_hash`.
+5. Si algo intenta mutar `password_hash` sin autorización y ves el error `password_hash mutation not authorized`, **no desactives el trigger ni seteés el flag sin pensar**. Investiga por qué ese path quiere escribir passwords.
+
+### Cambios aplicados
+
+- `migrations/20260417165907294_task-451-password-hash-mutation-guard.sql` — trigger + función.
+- `src/lib/identity/password-mutation.ts` — helper `withPasswordChangeAuthorization`.
+- `src/app/api/account/reset-password/route.ts` — migrado al helper (`source: 'user_reset'`).
+- `src/app/api/account/accept-invite/route.ts` — migrado al helper (`source: 'accept_invite'`).
+- `scripts/backfill-postgres-identity-v2.ts` — removidos `password_hash` + `password_hash_algorithm` del SELECT BigQuery y del UPDATE PG.
+- `src/lib/sync/event-catalog.ts` — agregados `AGGREGATE_TYPES.identityCredential` + `EVENT_TYPES.identityPasswordHashRotated`.
+- `src/lib/identity/__tests__/password-mutation.test.ts` — 5 unit tests.
+
+### Referencias
+
+- Incidente: `docs/issues/resolved/ISSUE-053-password-hash-overwritten-by-batch-sync.md`
+- Task: `docs/tasks/complete/TASK-451-password-hash-mutation-guardrails.md`
+- Pattern relacionado: `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` (trigger + session var como convención canónica de mutation guardrails)
+
+---
+
 ## Delta 2026-04-13 — portal home contract converges on `/home` with centralized policy resolution (TASK-400)
 
 - `/home` queda como startup contract canónico del portal.

@@ -26,6 +26,15 @@ export const AGGREGATE_TYPES = {
   leaveRequest: 'leave_request',
   leaveBalance: 'leave_balance',
 
+  // HR Goals (TASK-029)
+  goal: 'goal',
+  goalCycle: 'goal_cycle',
+
+  // HR Performance Evaluations (TASK-031)
+  evalCycle: 'eval_cycle',
+  evalAssignment: 'eval_assignment',
+  evalSummary: 'eval_summary',
+
   // Payroll
   payrollPeriod: 'payroll_period',
   payrollEntry: 'payroll_entry',
@@ -59,6 +68,7 @@ export const AGGREGATE_TYPES = {
   identityReconciliation: 'identity_reconciliation',
   identityProfile: 'identity_profile',
   viewAccess: 'view_access',
+  entitlementGovernance: 'entitlement_governance',
   asset: 'asset',
 
   // Services
@@ -71,6 +81,8 @@ export const AGGREGATE_TYPES = {
   icoMaterialization: 'ico_materialization',
   icoAiSignals: 'ico_ai_signals',
   icoAiLlmEnrichments: 'ico_ai_llm_enrichments',
+  financeAiSignals: 'finance_ai_signals',
+  financeAiLlmEnrichments: 'finance_ai_llm_enrichments',
 
   // Email Verification
   emailVerification: 'email_verification',
@@ -78,11 +90,16 @@ export const AGGREGATE_TYPES = {
   // Email Delivery
   emailDelivery: 'email_delivery',
 
-  // Quotes
+  // Quotes (legacy finance namespace, kept for compat during cutover — TASK-344)
   quote: 'quote',
   quoteLineItem: 'quote_line_item',
 
-  // Products
+  // Commercial Quotation (canonical, TASK-347 cutover)
+  quotation: 'quotation',
+  quotationLineItem: 'quotation_line_item',
+  productCatalog: 'product_catalog',
+
+  // Products (legacy finance namespace)
   product: 'product',
 
   // Purchase Orders & HES
@@ -124,7 +141,10 @@ export const AGGREGATE_TYPES = {
   permissionSet: 'permission_set',
 
   // Sister Platforms (TASK-375)
-  sisterPlatformBinding: 'sister_platform_binding'
+  sisterPlatformBinding: 'sister_platform_binding',
+
+  // Identity credential (TASK-451)
+  identityCredential: 'identity_credential'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -170,6 +190,9 @@ export const EVENT_TYPES = {
   reconciliationRejected: 'identity.reconciliation.rejected',
   profileLinked: 'identity.profile.linked',
   profileMerged: 'identity.profile.merged',
+  entitlementRoleDefaultChanged: 'access.entitlement_role_default_changed',
+  entitlementUserOverrideChanged: 'access.entitlement_user_override_changed',
+  startupPolicyChanged: 'access.startup_policy_changed',
 
   // DTE Reconciliation
   dteAutoMatched: 'finance.dte.auto_matched',
@@ -230,6 +253,21 @@ export const EVENT_TYPES = {
   leaveRequestRejected: 'leave_request.rejected',
   leaveRequestCancelled: 'leave_request.cancelled',
   leaveRequestPayrollImpactDetected: 'leave_request.payroll_impact_detected',
+  leaveBalanceAdjusted: 'leave_balance.adjusted',
+  leaveBalanceAdjustmentReversed: 'leave_balance.adjustment_reversed',
+
+  // HR Goals (TASK-029)
+  goalCreated: 'goal.created',
+  goalUpdated: 'goal.updated',
+  goalProgressRecorded: 'goal.progress_recorded',
+  goalCycleActivated: 'goal_cycle.activated',
+  goalCycleClosed: 'goal_cycle.closed',
+
+  // HR Performance Evaluations (TASK-031)
+  evalCyclePhaseAdvanced: 'eval_cycle.phase_advanced',
+  evalCycleClosed: 'eval_cycle.closed',
+  evalAssignmentSubmitted: 'eval_assignment.submitted',
+  evalSummaryFinalized: 'eval_summary.finalized',
   compensationVersionCreated: 'compensation_version.created',
   compensationVersionUpdated: 'compensation_version.updated',
   payrollPrevisionalSnapshotUpserted: 'payroll.previsional_snapshot.upserted',
@@ -250,6 +288,8 @@ export const EVENT_TYPES = {
   icoMaterializationCompleted: 'ico.materialization.completed',
   icoAiSignalsMaterialized: 'ico.ai_signals.materialized',
   icoAiLlmEnrichmentsMaterialized: 'ico.ai_llm_enrichments.materialized',
+  financeAiSignalsMaterialized: 'finance.ai_signals.materialized',
+  financeAiLlmEnrichmentsMaterialized: 'finance.ai_llm_enrichments.materialized',
 
   // Projected Payroll
   projectedPayrollSnapshotRefreshed: 'payroll.projected_snapshot.refreshed',
@@ -270,16 +310,49 @@ export const EVENT_TYPES = {
   emailDeliverabilityAlert: 'email_delivery.deliverability_alert',
   emailGdprDeletionCompleted: 'email_delivery.gdpr_deletion_completed',
 
-  // Quotes & Credit Notes
+  // Quotes & Credit Notes (legacy finance namespace, TASK-344 cutover aliased via commercial.*)
   quoteCreated: 'finance.quote.created',
   quoteSynced: 'finance.quote.synced',
   quoteConverted: 'finance.quote.converted',
   quoteLineItemSynced: 'finance.quote_line_item.synced',
   creditNoteCreated: 'finance.credit_note.created',
 
-  // Products
+  // Commercial Quotation (canonical, TASK-347)
+  // Emitted alongside finance.quote.* during cutover so consumers can migrate gradually.
+  quotationCreated: 'commercial.quotation.created',
+  quotationSynced: 'commercial.quotation.synced',
+  quotationConverted: 'commercial.quotation.converted',
+  quotationLineItemsSynced: 'commercial.quotation.line_items_synced',
+  quotationDiscountHealthAlert: 'commercial.discount.health_alert',
+
+  // Commercial Quotation Governance (TASK-348)
+  quotationVersionCreated: 'commercial.quotation.version_created',
+  quotationApprovalRequested: 'commercial.quotation.approval_requested',
+  quotationApprovalDecided: 'commercial.quotation.approval_decided',
+  quotationSent: 'commercial.quotation.sent',
+  quotationApproved: 'commercial.quotation.approved',
+  quotationRejected: 'commercial.quotation.rejected',
+  quotationTemplateUsed: 'commercial.quotation.template_used',
+  quotationTemplateSaved: 'commercial.quotation.template_saved',
+
+  // Quotation-to-Cash Document Chain Bridge (TASK-350)
+  quotationPurchaseOrderLinked: 'commercial.quotation.po_linked',
+  quotationServiceEntryLinked: 'commercial.quotation.hes_linked',
+  quotationInvoiceEmitted: 'commercial.quotation.invoice_emitted',
+
+  // Quotation Intelligence Automation (TASK-351)
+  quotationExpired: 'commercial.quotation.expired',
+  quotationRenewalDue: 'commercial.quotation.renewal_due',
+  quotationPipelineMaterialized: 'commercial.quotation.pipeline_materialized',
+  quotationProfitabilityMaterialized: 'commercial.quotation.profitability_materialized',
+
+  // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
   productCreated: 'finance.product.created',
+
+  // Commercial Product Catalog (canonical, TASK-347)
+  productCatalogSynced: 'commercial.product_catalog.synced',
+  productCatalogCreated: 'commercial.product_catalog.created',
 
   // Purchase Orders & HES
   purchaseOrderCreated: 'finance.purchase_order.created',
@@ -358,7 +431,10 @@ export const EVENT_TYPES = {
   sisterPlatformBindingUpdated: 'sister_platform_binding.updated',
   sisterPlatformBindingActivated: 'sister_platform_binding.activated',
   sisterPlatformBindingSuspended: 'sister_platform_binding.suspended',
-  sisterPlatformBindingDeprecated: 'sister_platform_binding.deprecated'
+  sisterPlatformBindingDeprecated: 'sister_platform_binding.deprecated',
+
+  // Identity credential (TASK-451)
+  identityPasswordHashRotated: 'identity.password_hash.rotated'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -421,6 +497,8 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.icoMaterializationCompleted,
   EVENT_TYPES.icoAiSignalsMaterialized,
   EVENT_TYPES.icoAiLlmEnrichmentsMaterialized,
+  EVENT_TYPES.financeAiSignalsMaterialized,
+  EVENT_TYPES.financeAiLlmEnrichmentsMaterialized,
   EVENT_TYPES.memberCreated,
   EVENT_TYPES.memberUpdated,
   EVENT_TYPES.memberSkillUpserted,

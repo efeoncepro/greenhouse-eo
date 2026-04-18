@@ -4,6 +4,7 @@ const mockRequireFinanceTenantContext = vi.fn()
 const mockResolveFinanceDownstreamScope = vi.fn()
 const mockListHes = vi.fn()
 const mockRunGreenhousePostgresQuery = vi.fn()
+const mockWithGreenhousePostgresTransaction = vi.fn()
 const mockListOperationalPlSnapshots = vi.fn()
 const mockGetFinanceCurrentPeriod = vi.fn()
 
@@ -21,7 +22,8 @@ vi.mock('@/lib/finance/hes-store', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
+  withGreenhousePostgresTransaction: (...args: unknown[]) => mockWithGreenhousePostgresTransaction(...args)
 }))
 
 vi.mock('@/lib/cost-intelligence/compute-operational-pl', () => ({
@@ -41,7 +43,12 @@ describe('Finance schema drift responses', () => {
     vi.clearAllMocks()
 
     mockRequireFinanceTenantContext.mockResolvedValue({
-      tenant: { tenantType: 'efeonce_internal', routeGroups: ['finance'], userId: 'user-1' },
+      tenant: {
+        tenantType: 'efeonce_internal',
+        routeGroups: ['finance'],
+        userId: 'user-1',
+        spaceId: 'space-1'
+      },
       errorResponse: null
     })
 
@@ -70,7 +77,9 @@ describe('Finance schema drift responses', () => {
   })
 
   it('returns a degraded payload for quotes when schema drift is detected', async () => {
-    mockRunGreenhousePostgresQuery.mockRejectedValueOnce(new Error('relation greenhouse_finance.quotes does not exist'))
+    mockRunGreenhousePostgresQuery
+      .mockRejectedValueOnce(new Error('relation greenhouse_commercial.quotations does not exist'))
+      .mockRejectedValueOnce(new Error('relation greenhouse_finance.quotes does not exist'))
 
     const response = await getQuotes(new Request('http://localhost/api/finance/quotes?status=sent'))
     const body = await response.json()

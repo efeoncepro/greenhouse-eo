@@ -6,7 +6,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 
 | Vista | Ruta | Estado | Descripción |
 |-------|------|--------|-------------|
-| Pulse | `/home` | Implementada | Home canónica del portal cliente con accesos, contexto operativo y entrada a la experiencia moderna |
+| Pulse | `/home` | Implementada | Home canónica del portal con Nexa, top insights cross-Space, shortcuts recomendados y contexto de acceso derivado del runtime de entitlements |
 | Pulse legacy | `/dashboard` | Compatibilidad | Vista legacy/feature route mantenida para deep links y compatibilidad gobernada |
 | Proyectos | `/proyectos` | Implementada | Lista de proyectos con tasks, RPA, review items |
 | Detalle Proyecto | `/proyectos/[id]` | Implementada | Tasks con assignee, ICO metrics, CSC phase |
@@ -38,15 +38,15 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 |-------|------|--------|-------------|
 | Torre de Control | `/internal/dashboard` | Implementada | Overview de clientes + equipo interno |
 | Agencia (Command Center) | `/agency` | Existente (pendiente redesign) | Pulse Global, métricas cross-space |
-| Spaces | `/agency/spaces` | Existente | Per-space health, RPA, OTD, team |
-| Economía | `/agency/economics` | Implementada | P&L KPIs, expense trends, top clients by revenue |
+| Spaces | `/agency/spaces` | Existente | Per-space health, RPA, OTD, team y Space 360 con Nexa Insights en Overview |
+| Economía | `/agency/economics` | Implementada | Surface `space-first` con KPIs de ingresos/margen/payroll ratio, tabla expandible por Space, ranking de rentabilidad y tendencia sobre `operational_pl_snapshots` |
 | Equipo | `/agency/team` | Implementada | Capacidad contractual, compromiso comercial y uso operativo por miembro; consume `member_capacity_economics` |
 | Delivery | `/agency/delivery` | Stub | ICO + sprints + stuck assets (pendiente) |
 | Campañas | `/agency/campaigns` | Implementada | Cross-space campaigns con KPIs y tabla |
 | Operaciones | `/agency/operations` | Stub | Health monitoring del platform (pendiente) |
 | Organizaciones | `/agency/organizations` | Implementada | Lista + detalle con economics, projects, equipo |
 | Servicios | `/agency/services` | Implementada | Servicios por space con sync HubSpot |
-| Personas | `/people` | Implementada | Directorio + ficha 360 de cada colaborador; debe escalar capacidad/economía desde `member_capacity_economics` cuando aplique |
+| Personas | `/people` | Implementada | Directorio + ficha 360 de cada colaborador; la surface `activity` ya combina métricas operativas con Nexa insights filtrados por `member_id` y debe seguir escalando capacidad/economía desde `member_capacity_economics` cuando aplique |
 | Nómina | `/hr/payroll` | Implementada | Períodos, cálculo, entries, readiness |
 | Nómina Proyectada | `/hr/payroll/projected` | Implementada | Simulación proyectada + promoción explícita a borrador oficial |
 | Departamentos | `/hr/departments` | Implementada | Estructura organizacional |

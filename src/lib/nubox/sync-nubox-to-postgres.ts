@@ -3,6 +3,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
 import { recordPayment } from '@/lib/finance/payment-ledger'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
@@ -662,6 +663,8 @@ const upsertQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created'
       [String(sale.nubox_sale_id), sale.sii_track_id, sale.emission_status_name, sale.source_last_ingested_at]
     )
 
+    await syncCanonicalFinanceQuote({ quoteId: existing[0].quote_id })
+
     return 'updated'
   }
 
@@ -712,6 +715,8 @@ const upsertQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created'
   await publishOutboxEvent('finance.quote', quoteId, 'finance.quote.created', {
     quote_id: quoteId, source: 'nubox_sync', nubox_sale_id: sale.nubox_sale_id, total_amount: sale.total_amount
   })
+
+  await syncCanonicalFinanceQuote({ quoteId })
 
   return 'created'
 }

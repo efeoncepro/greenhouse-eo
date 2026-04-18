@@ -1,3 +1,15 @@
+## Delta 2026-04-17 — alineación con capa de entitlements
+
+TASK-286 fue ampliada para declarar capabilities granulares `client_portal.*` con `defaultScope: 'organization'`. Esta task ahora debe consumir esa capa al implementar la página.
+
+- **View code:** `cliente.reportes`
+- **Capability:** `client_portal.reports`
+- **Actions requeridas:** `view`, `export`
+- **Scope:** `organization`
+- **Guard de página:** combinar `hasAuthorizedViewCode(tenant, 'cliente.reportes')` + `can(tenant, 'client_portal.reports', 'view', 'organization')`.
+- **Guard de export:** los endpoints de export deben chequear `can(tenant, 'client_portal.reports', 'export', 'organization')`. Un rol con solo `view` ve la página pero los botones de export quedan disabled.
+- **Ref canónica:** `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
 # TASK-288 — Reports Center MVP
 
 ## Status
@@ -10,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `4`
 - Domain: `platform`
-- Blocked by: `TASK-286`
+- Blocked by: `TASK-286` (view code + capability con actions `view` y `export` + binding + role defaults)
 - Branch: `task/TASK-288-reports-center-mvp`
 
 ## Summary

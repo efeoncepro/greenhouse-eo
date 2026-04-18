@@ -12,7 +12,9 @@
  *   POST /reactive/recover          → Recover orphaned projection queue items (replaces projection-recovery cron)
  *   GET  /reactive/queue-depth      → Queue depth + oldest-event lag, optionally filtered by ?domain=<x>
  *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
+ *   POST /quotation-lifecycle/sweep    → Daily sweep: expire overdue quotes + emit renewal_due events (TASK-351)
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
+ *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -35,7 +37,9 @@ import {
   materializeAllAvailablePeriods
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
+import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
+import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 
@@ -390,6 +394,35 @@ const handleCostAttributionMaterialize = async (req: IncomingMessage, res: Serve
 }
 
 /**
+ * POST /quotation-lifecycle/sweep
+ * TASK-351: Daily quotation lifecycle sweep.
+ * - Flips quotations past `expiry_date` to `status='expired'` + emits `commercial.quotation.expired`.
+ * - Emits `commercial.quotation.renewal_due` for open quotes inside the lookahead window,
+ *   deduplicated by the `quotation_renewal_reminders` cadence table.
+ */
+const handleQuotationLifecycleSweep = async (_req: IncomingMessage, res: ServerResponse) => {
+  const startMs = Date.now()
+
+  console.log('[ops-worker] POST /quotation-lifecycle/sweep')
+
+  try {
+    const result = await runQuotationLifecycleSweep()
+    const durationMs = Date.now() - startMs
+
+    console.log(
+      `[ops-worker] /quotation-lifecycle/sweep done — expired=${result.expiredCount} renewalDue=${result.renewalDueCount} processed=${result.quotationsProcessed} ${durationMs}ms`
+    )
+
+    json(res, 200, { ...result, durationMs })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /quotation-lifecycle/sweep failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
  * GET /reactive/queue-depth
  * Returns the number of outbox events still pending reactive processing for a
  * domain (or across all domains if `domain` is omitted), plus the oldest event
@@ -477,6 +510,71 @@ const handleBatchEmailSend = async (req: IncomingMessage, res: ServerResponse) =
   }
 }
 
+/**
+ * POST /nexa/weekly-digest
+ * Builds and sends the ICO-first Nexa executive digest to internal leadership.
+ */
+const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const limitCandidate = Number(body.limit)
+  const limit = Number.isFinite(limitCandidate) ? limitCandidate : WEEKLY_DIGEST_DEFAULT_LIMIT
+
+  console.log(`[ops-worker] POST /nexa/weekly-digest — limit=${limit}`)
+
+  try {
+    const digest = await buildWeeklyDigest({ limit })
+
+    if (digest.totalInsights === 0 || digest.spaces.length === 0) {
+      json(res, 200, {
+        ok: true,
+        skipped: true,
+        reason: 'no_weekly_insights',
+        digest
+      })
+
+      return
+    }
+
+    const recipients = await resolveWeeklyDigestRecipients()
+
+    if (recipients.length === 0) {
+      json(res, 200, {
+        ok: true,
+        skipped: true,
+        reason: 'no_weekly_digest_recipients',
+        digest
+      })
+
+      return
+    }
+
+    const result = await sendEmail({
+      emailType: 'weekly_executive_digest',
+      domain: 'delivery',
+      recipients,
+      context: digest,
+      sourceEventId: `nexa-weekly-digest:${digest.window.startAt}:${digest.window.endAt}`,
+      sourceEntity: 'nexa.weekly_digest'
+    })
+
+    console.log(
+      `[ops-worker] /nexa/weekly-digest done — status=${result.status} recipients=${recipients.length} insights=${digest.totalInsights}`
+    )
+
+    json(res, 200, {
+      ok: result.status === 'sent',
+      digest,
+      recipientsResolved: recipients.length,
+      result
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /nexa/weekly-digest failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -527,8 +625,20 @@ const server = createServer(async (req, res) => {
       return
     }
 
+    if (method === 'POST' && path === '/quotation-lifecycle/sweep') {
+      await handleQuotationLifecycleSweep(req, res)
+
+      return
+    }
+
     if (method === 'POST' && path === '/batch-email-send') {
       await handleBatchEmailSend(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/nexa/weekly-digest') {
+      await handleNexaWeeklyDigest(req, res)
 
       return
     }

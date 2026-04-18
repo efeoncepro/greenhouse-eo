@@ -1,8 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireTenantContext = vi.fn()
-const mockListCampaigns = vi.fn()
-const mockListAllCampaigns = vi.fn()
+const mockListCampaignsForTenant = vi.fn()
 const mockCreateCampaign = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
@@ -10,9 +9,11 @@ vi.mock('@/lib/tenant/authorization', () => ({
 }))
 
 vi.mock('@/lib/campaigns/campaign-store', () => ({
-  listCampaigns: (...args: unknown[]) => mockListCampaigns(...args),
-  listAllCampaigns: (...args: unknown[]) => mockListAllCampaigns(...args),
   createCampaign: (...args: unknown[]) => mockCreateCampaign(...args)
+}))
+
+vi.mock('@/lib/campaigns/tenant-scope', () => ({
+  listCampaignsForTenant: (...args: unknown[]) => mockListCampaignsForTenant(...args)
 }))
 
 import { GET } from '@/app/api/campaigns/route'
@@ -22,7 +23,7 @@ describe('GET /api/campaigns', () => {
     vi.clearAllMocks()
   })
 
-  it('returns all campaigns for internal users when no spaceId is provided', async () => {
+  it('delegates the shared list request to the tenant-safe campaign scope helper', async () => {
     mockRequireTenantContext.mockResolvedValue({
       tenant: {
         tenantType: 'efeonce_internal',
@@ -33,23 +34,33 @@ describe('GET /api/campaigns', () => {
       },
       unauthorizedResponse: null
     })
-    mockListAllCampaigns.mockResolvedValue([
-      { campaignId: 'cmp-1', displayName: 'Campaign 1' }
-    ])
+    mockListCampaignsForTenant.mockResolvedValue({
+      ok: true,
+      items: [{ campaignId: 'cmp-1', displayName: 'Campaign 1' }]
+    })
 
     const response = await GET(new Request('http://localhost/api/campaigns'))
     const body = await response.json()
 
     expect(response.status).toBe(200)
-    expect(mockListAllCampaigns).toHaveBeenCalledWith({ status: undefined, campaignIds: undefined })
-    expect(mockListCampaigns).not.toHaveBeenCalled()
+    expect(mockListCampaignsForTenant).toHaveBeenCalledWith({
+      tenant: {
+        tenantType: 'efeonce_internal',
+        campaignScopes: [],
+        routeGroups: ['internal'],
+        roleCodes: [],
+        clientId: null
+      },
+      status: undefined,
+      requestedSpaceId: undefined
+    })
     expect(body).toEqual({
       items: [{ campaignId: 'cmp-1', displayName: 'Campaign 1' }],
       total: 1
     })
   })
 
-  it('filters internal users by spaceId when provided', async () => {
+  it('passes the requested spaceId through to the tenant-safe helper', async () => {
     mockRequireTenantContext.mockResolvedValue({
       tenant: {
         tenantType: 'efeonce_internal',
@@ -60,16 +71,25 @@ describe('GET /api/campaigns', () => {
       },
       unauthorizedResponse: null
     })
-    mockListCampaigns.mockResolvedValue([])
+    mockListCampaignsForTenant.mockResolvedValue({ ok: true, items: [] })
 
     const response = await GET(new Request('http://localhost/api/campaigns?spaceId=spc-123&status=active'))
 
     expect(response.status).toBe(200)
-    expect(mockListCampaigns).toHaveBeenCalledWith('spc-123', { status: 'active', campaignIds: undefined })
-    expect(mockListAllCampaigns).not.toHaveBeenCalled()
+    expect(mockListCampaignsForTenant).toHaveBeenCalledWith({
+      tenant: {
+        tenantType: 'efeonce_internal',
+        campaignScopes: [],
+        routeGroups: ['internal'],
+        roleCodes: [],
+        clientId: null
+      },
+      status: 'active',
+      requestedSpaceId: 'spc-123'
+    })
   })
 
-  it('uses the tenant clientId for client users', async () => {
+  it('returns 403 when the tenant-safe helper rejects the requested scope', async () => {
     mockRequireTenantContext.mockResolvedValue({
       tenant: {
         tenantType: 'client',
@@ -80,12 +100,12 @@ describe('GET /api/campaigns', () => {
       },
       unauthorizedResponse: null
     })
-    mockListCampaigns.mockResolvedValue([])
+    mockListCampaignsForTenant.mockResolvedValue({ ok: false, reason: 'forbidden' })
 
-    const response = await GET(new Request('http://localhost/api/campaigns'))
+    const response = await GET(new Request('http://localhost/api/campaigns?spaceId=space-other'))
+    const body = await response.json()
 
-    expect(response.status).toBe(200)
-    expect(mockListCampaigns).toHaveBeenCalledWith('spc-client', { status: undefined, campaignIds: ['cmp-1'] })
-    expect(mockListAllCampaigns).not.toHaveBeenCalled()
+    expect(response.status).toBe(403)
+    expect(body).toEqual({ error: 'Forbidden' })
   })
 })

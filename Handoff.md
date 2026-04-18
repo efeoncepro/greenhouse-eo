@@ -1,5 +1,1182 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-351 Quotation Intelligence Automation
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-351-quotation-intelligence-automation`
+- **Dependencias:** TASK-345 (schema canónico), TASK-346 (pricing engine), TASK-350 (quote-to-cash bridge). Todas cerradas.
+- **Entregado:**
+  - **Migration** `20260418005940703_task-351-quotation-intelligence.sql`:
+    - `greenhouse_serving.quotation_pipeline_snapshots` — 1 fila por quote, stage/probability/aging/renewal-state/expiry, totales autorizado+facturado del bridge TASK-350.
+    - `greenhouse_serving.quotation_profitability_snapshots` — 1 fila por quote-período, quoted vs authorized vs invoiced vs realized + costo atribuido + drift_severity + drift_drivers JSONB.
+    - `greenhouse_commercial.quotation_renewal_reminders` — cadencia/dedup de alertas de renovación.
+  - **Runtime** (`src/lib/commercial-intelligence/`):
+    - `contracts.ts` — tipos canónicos + umbrales (lookahead 60d, cadencia 14d, drift warning 5pp/critical 15pp).
+    - `pipeline-materializer.ts` — `buildPipelineSnapshot` + `upsertPipelineSnapshot` + `materializePipelineSnapshot`. Stage derivado de `status`, probability por stage, aging via `stageEnteredAt`, renewal/expired flags. Reutiliza `purchase_orders.quotation_id` / `income.quotation_id` del bridge TASK-350 para totales autorizados/facturados.
+    - `profitability-materializer.ts` — `materializeProfitabilitySnapshots` (por quote) + `materializeProfitabilityForPeriod` (por período). Cost attribution: prorrateado por share de revenue del quote vs revenue total del cliente en el período (leído de `greenhouse_serving.commercial_cost_attribution`). Si el quote es el único linked en el período, toma cost completo.
+    - `renewal-lifecycle.ts` — `runQuotationLifecycleSweep`: pasa a `expired` y emite evento + audit; emite `renewal_due` con dedup via `quotation_renewal_reminders`.
+    - `intelligence-store.ts` — readers tenant-safe con filtros.
+  - **Eventos canónicos nuevos** (`src/lib/sync/event-catalog.ts`):
+    - `commercial.quotation.expired`
+    - `commercial.quotation.renewal_due`
+    - `commercial.quotation.pipeline_materialized`
+    - `commercial.quotation.profitability_materialized`
+  - **Publishers** en `src/lib/commercial/quotation-events.ts`: 4 nuevos.
+  - **Reactive projections** en domain `cost_intelligence` (reutilizan cron `ops-reactive-cost-intelligence` cada 10min):
+    - `quotation_pipeline` — 12 trigger events (created, synced, sent, approved, rejected, converted, expired, renewal_due, version_created, po_linked, hes_linked, invoice_emitted).
+    - `quotation_profitability` — 9 trigger events (approved, converted, po_linked, hes_linked, invoice_emitted, version_created, finance.income.created/updated, accounting.commercial_cost_attribution.period_materialized). Acepta scope por quote o por período.
+  - **Cron scheduled**:
+    - Vercel fallback: `GET /api/cron/quotation-lifecycle` 10:00 UTC daily (07:00 Santiago).
+    - Cloud Run canonical: `POST /quotation-lifecycle/sweep` en ops-worker; Cloud Scheduler job `ops-quotation-lifecycle` 07:00 Santiago declarado en `services/ops-worker/deploy.sh`.
+  - **API surface**:
+    - `GET /api/finance/commercial-intelligence/pipeline?stage=&clientId=&businessLineCode=&renewalsDueOnly=true` → `{ items, totals, count }`.
+    - `GET /api/finance/commercial-intelligence/profitability?periodYear=&periodMonth=&quotationId=&driftSeverity=` → `{ items, count }`.
+    - `GET /api/finance/commercial-intelligence/renewals?include=renewals|expired|all` → `{ renewals, expired, counts }`.
+    - `POST /api/finance/commercial-intelligence/materialize` (admin / finance_manager) — `{ quotationId? , lifecycleSweep?: boolean }` para re-hydrate manual.
+  - **UI**:
+    - `CommercialIntelligenceView.tsx` — 3 tabs: Pipeline (4 KPIs + tabla filtrable), Rentabilidad (tabla con drift chips), Renovaciones (2 secciones: por vencer / vencidas). Scope automático según `tenant.tenantType` (cliente ve solo lo suyo, efeonce_internal ve todo).
+    - `FinanceIntelligenceView.tsx` extendido: tercera tab "Cotizaciones" renderiza `CommercialIntelligenceView`.
+- **Política de rematerialización:**
+  - Reactive: cualquiera de los 12/9 eventos dispara re-hydrate automáticamente vía `ops-reactive-cost-intelligence` (domain cost_intelligence, cada 10min).
+  - Scheduled: sweep diario detecta `expired` y `renewal_due`, que a su vez emiten eventos que disparan pipeline_materialized.
+  - Manual: POST `/materialize` con `quotationId` o `lifecycleSweep:true`.
+- **Métrica default del dashboard y cómo cambia por BU:** 
+  - Pipeline tab default = `openPipelineClp` (suma de etapas draft/in_review/sent/approved). Alternativas visibles en misma row: `weightedPipelineClp`, `wonClp`, `lostClp`.
+  - Filtrable por `businessLineCode` vía query string del endpoint `pipeline`. Future dashboards por BU pueden filtrar explícito (TASK-351 follow-up doc).
+- **Detección `expired_without_renewal` sin duplicar lógica:**
+  - Único fuente de expiration: `runQuotationLifecycleSweep` (flip status + emit event).
+  - `expired` se correlaciona con ausencia de `quotation_renewal_reminders.last_reminder_at` + absence de drafts posteriores (attribute queryable via audit log). No hay cron separado — la lógica vive en un solo módulo.
+- **Convivencia rama simple vs enterprise en profitability:**
+  - Rama simple: `invoicedVsQuotedPct` y `realizedVsQuotedPct` son los drivers principales (no hay PO).
+  - Rama enterprise: además `authorizedVsQuotedPct` muestra drift entre lo cotizado y lo autorizado por HES.
+  - Ambos drivers quedan expuestos en `drift_drivers` JSONB para consumidores downstream.
+- **Validado:**
+  - `pnpm migrate:status` ✓ (sin pendientes)
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm test` ✓ 1337 passed, 2 skipped
+  - `pnpm build` en curso al commit.
+- **Follow-ups (out of scope):**
+  - Forecasting predictivo ML.
+  - Dashboard ejecutivo hiper-pulido por BU (agregar filtros visibles + mini-charts).
+  - Cloud Run deploy del nuevo endpoint `/quotation-lifecycle/sweep` (`bash services/ops-worker/deploy.sh` después del merge).
+  - Draft automático de renovación — actualmente solo se emite el evento; draft lo crea el usuario desde UI con audit `renewal_generated`.
+
+## Sesion 2026-04-17 — TASK-350 Quotation-to-Cash Document Chain Bridge
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-350-quotation-to-cash-document-chain-bridge`
+- **Dependencias:** TASK-345 (schema canónico), TASK-346 (pricing engine), TASK-348 (governance runtime), TASK-164 (purchase_orders), TASK-212 (Nubox multiline). Todas mergeadas excepto 212 (solo necesitamos `emission.ts` existente).
+- **Entregado:**
+  - **Migration** `20260417190539017_task-350-quotation-to-cash-bridge.sql`:
+    - `purchase_orders.quotation_id` (FK → `greenhouse_commercial.quotations.quotation_id`, ON DELETE SET NULL, indexada).
+    - `service_entry_sheets.quotation_id` (FK + index) + `amount_authorized_clp` (para drift vs submitted).
+    - `income.quotation_id` + `income.source_hes_id` (FK a HES, SET NULL).
+  - **Stores extendidos (sin romper callers existentes):**
+    - `purchase-order-store.ts`: acepta/devuelve `quotationId`; `listPurchaseOrders` filtra por `quotationId`; `updatePurchaseOrder` acepta `quotationId`.
+    - `hes-store.ts`: `CreateHesInput.quotationId` (opcional; auto-hereda del PO cuando se crea HES con `purchaseOrderId`). `approveHes` acepta overload `{ actorUserId, amountAuthorizedClp }` — legacy string signature preservada. Al aprobar, setea `amount_authorized_clp` (default = `amount_clp`).
+  - **Bridge helpers** en `src/lib/finance/quote-to-cash/`:
+    - `link-purchase-order.ts` — `linkPurchaseOrderToQuotation` valida `client_id`/`organization_id` consistentes, actualiza FK, emite `commercial.quotation.po_linked` + audit `po_received`.
+    - `link-service-entry.ts` — `linkServiceEntryToQuotation` análogo; emite `commercial.quotation.hes_linked` + audit `hes_received`.
+    - `document-chain-reader.ts` — `readQuotationDocumentChain` lee quote + POs + HES + incomes + totales (quoted/authorized/invoiced + deltas).
+    - `materialize-invoice-from-quotation.ts` — **rama simple**: inserta income desde approved/sent quote si NO hay PO/HES aprobadas; rechaza sino (fuerza a usar rama enterprise). Transiciona quote a `converted`.
+    - `materialize-invoice-from-hes.ts` — **rama enterprise**: inserta income desde approved HES (con `source_hes_id` y `quotation_id`); marca HES `invoiced=TRUE`; transiciona quote a `converted` si aún no lo está.
+  - **Eventos nuevos en catalog** (`src/lib/sync/event-catalog.ts`): `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`.
+  - **Publishers** en `src/lib/commercial/quotation-events.ts`: `publishQuotationPurchaseOrderLinked`, `publishQuotationServiceEntryLinked`, `publishQuotationInvoiceEmitted`.
+  - **API routes:**
+    - `POST /api/finance/purchase-orders` — acepta `quotationId`. Si provisto corre el link helper; en fallo de validación (client mismatch, quote no existe) rollback limpiando FK.
+    - `PUT /api/finance/purchase-orders/[id]` — acepta `quotationId`. Si cambia el link, corre helper (emite evento + audit).
+    - `POST /api/finance/hes` — emite `hes_linked` + audit si el HES quedó linked (explícito o heredado del PO).
+    - `POST /api/finance/hes/[id]/approve` — acepta `amountAuthorizedClp` + opt `materializeInvoice` + `dueDate`. Si se pide materializar y el HES tiene `quotation_id` y no está facturado, corre `materializeInvoiceFromApprovedHes` en el mismo handler. Error → 207 con `invoiceError`.
+    - `GET /api/finance/quotes/[id]/document-chain` — lectura de la cadena (quote+POs+HES+incomes+totals+deltas).
+    - `POST /api/finance/quotes/[id]/convert-to-invoice` — **rama simple**: materializa factura directa desde quote aprobada sin PO/HES.
+  - **UI:**
+    - `src/views/greenhouse/finance/workspace/QuoteDocumentChain.tsx` — nuevo componente card con 3 KPIs (Cotizado / Autorizado / Facturado) con delta chips, secciones PO / HES / Facturas con accent borders, CTA "Convertir a factura" con tooltip contextual.
+    - `QuoteDetailView.tsx` — nueva tab **"Cadena documental"** con fetch del endpoint, wiring de `canConvertSimple` (viewer.canEdit + approved/sent + sin PO/HES aprobadas/facturas), handlers para navegar a PO/HES/factura individuales.
+- **Convivencia de ramas:**
+  - **Rama simple** (sin OC/HES): quote aprobada → `POST /convert-to-invoice` → income. Solo habilitada si no hay PO/HES linked.
+  - **Rama enterprise**: quote → link PO → submit HES (auto-herence de `quotation_id` del PO) → approve HES (fija `amount_authorized_clp`) → opcional `materializeInvoice:true` en el mismo approve → income con `source_hes_id` y `quotation_id`. Quote transita a `converted` en la primera materialización.
+- **Una cotización se considera `converted`** cuando la primera materialización (simple o enterprise) seteó `converted_to_income_id`; subsiguientes HES del mismo quote siguen materializándose sin retransicionar.
+- **Validado:**
+  - `pnpm migrate:status` — sin pendientes.
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm test` — 1339 passed, 2 skipped (tras ajustar `purchase-orders/route.test.ts` para incluir `quotationId: null` en el caller expectation).
+  - `pnpm build` — en curso al commit.
+- **Decisiones notables:**
+  - `quotation_id` en PO/HES es nullable: backfill no ejecutado para preservar legacy; bridge solo aplica a nuevos flujos. Callers que pasen `quotationId` obtienen audit + outbox automáticamente.
+  - `amount_authorized_clp` en HES se setea en `approveHes` (default = `amount_clp`). Drift `authorized - quoted` se computa en el reader.
+  - Emisión DTE (Nubox) no se tocó en esta task — se queda con el income ya materializado. La trazabilidad quedó en `income.source_hes_id` + `income.quotation_id`.
+- **Follow-ups (out of scope):**
+  - TASK-351 — quotation intelligence/automation pipeline (renewals, profitability) depende de este bridge.
+  - Backfill de `quotation_id` en POs/HES legacy heurísticamente (por `po_number` cuando la quote tenga número matching).
+  - UI de "Vincular OC existente" desde QuoteDetail — actualmente solo hay chip `canLinkExisting` sin dialog.
+
+## Sesion 2026-04-17 — TASK-349 Quotation Workspace UI + PDF Delivery
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-349-quotation-workspace-ui-pdf-delivery`
+- **Dependencias:** TASK-345 (schema canónico), TASK-346 (pricing engine), TASK-347 (HubSpot bridge), TASK-348 (governance runtime) — todas mergeadas a develop.
+- **Entregado:**
+  - **UI workspace** (`src/views/greenhouse/finance/workspace/`):
+    - `QuoteCreateDrawer.tsx` — drawer lateral con toggle "Desde cero" / "Desde template". Precarga defaults del template seleccionado. Primary action en QuotesListView.
+    - `QuoteLineItemsEditor.tsx` — editor inline con product picker, add/remove, subtotales preview local, guardar/descartar. Read-only cuando el status no permite edición.
+    - `QuoteHealthCard.tsx` — card con margen efectivo + target + piso + chip (Óptimo/Atención/Crítico) + alertas MUI + CTA "Solicitar aprobación".
+    - `QuoteSendDialog.tsx` — dialog contextual (needs_approval / approval_in_progress / ready / blocked).
+    - `QuoteSaveAsTemplateDialog.tsx` — dialog con templateName + templateCode (auto-uppercase) + description.
+  - **Endpoints nuevos:**
+    - `GET /api/finance/quotes/[id]/pdf` — renderiza PDF client-safe via `@react-pdf/renderer`. `?download=1` cambia a attachment. Registra `pdf_generated` en audit_log (no outbox). Input contract TS excluye cost/margin/cost_breakdown — firewall estructural.
+    - `POST /api/finance/quotes/[id]/send` — transiciona draft → sent directo si health OK, o draft → pending_approval si requiere aprobación (crea approval_steps). 409 en transiciones inválidas.
+    - `POST /api/finance/quotes/[id]/save-as-template` — copia current-version line items (strip `member_id`), extrae term_ids, crea quote_templates + quote_template_items. Emite `commercial.quotation.template_saved`.
+  - **POST `/api/finance/quotes` extendido:** acepta `templateId` opcional → llama `recordTemplateUsage`, hereda defaults (currency/billingFrequency/pricingModel/contractDurationMonths/businessLineCode), genera line items desde template si body vacío, siembra terms vía `seedQuotationDefaultTerms`, emite `publishTemplateUsed`.
+  - **QuotesListView:** columnas nuevas Versión (chip vN si >1) + Margen (chip verde/ámbar/rojo vs floor/target). Status config extendida con `pending_approval`/`approved`. Dos botones de creación.
+  - **QuoteDetailView:** `QuoteHealthCard` en General tab arriba de las KPIs. Action buttons en header: PDF, Guardar como template (draft), Enviar (draft|pending_approval|approved). Dialogs de send y save-as-template al pie. Mensaje de éxito de acciones.
+  - **PDF document + render helper:** `src/lib/finance/pdf/{contracts,quotation-pdf-document,render-quotation-pdf}.{ts,tsx}`. Azul Greenhouse `#0375DB`. Helvetica fallback server-side. Layout: header → cliente → table line items client-safe (7 cols) → totales → términos → footer fiscal.
+  - **List row mapping extendido:** `current_version`, `effective_margin_pct`, `margin_floor_pct`, `target_margin_pct` en la response para habilitar badges.
+- **Validado:**
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm test` 1337 passed
+  - `pnpm build` ✓
+  - Smoke E2E contra dev server + agent auth: PDF 200 + application/pdf 3665 bytes 1 página. `/send` 200 `{ sent:true, newStatus:'sent', health }`.
+- **Decisiones notables:**
+  - Ruta canónica sigue en `/finance/quotes`. No se abrió workspace comercial separado — Open Question resuelta.
+  - HubSpot drawer legacy conservado como acción secundaria; primary es el canonical drawer.
+  - PDF input contract **excluye cost/margin a nivel tipos**, no solo runtime: cualquier intento de pasar costo falla en tsc.
+  - Save-as-template strip `member_id` (templates role-based).
+- **Follow-ups (out of scope):**
+  - Email dispatch del PDF como consumer reactivo sobre `commercial.quotation.sent`.
+  - PDF multi-página / font embedding (cosmético).
+  - Analytics del workspace.
+
+## Sesion 2026-04-17 — TASK-451 Password hash mutation guardrails (cierra ISSUE-053)
+
+- **Estado:** `complete`, entregado.
+- **Rama:** `task/TASK-451-password-hash-mutation-guardrails`
+- **Incidente (ISSUE-053):** login con credentials en staging dejó de funcionar para `jreyes@efeoncepro.com` tras un batch a las 08:00 UTC que tocó `password_hash` de 7 usuarios en la DB de dev. Producción aparecía sin problema al momento del reporte a pesar de compartir la misma DB (`greenhouse-pg-dev`) — observable sin explicar completa; hipótesis probable: JWT persistente emitido en prod antes del batch, NextAuth no re-valida hash por request.
+- **Desbloqueo inmediato:** reset manual del hash en dev DB a la password temporal del usuario (`karor-01`, el usuario la cambia desde profile).
+- **Fix estructural (TASK-451):**
+  - Migration `20260417165907294_task-451-password-hash-mutation-guard.sql` crea trigger `client_users_password_guard` + función `greenhouse_core.guard_password_hash_mutation()`.
+  - Regla: cualquier `UPDATE` sobre `client_users.password_hash` exige que la transacción setee `SET LOCAL app.password_change_authorized = 'true'`. Sino, `RAISE EXCEPTION` con `ERRCODE='P0001'`.
+  - Helper `withPasswordChangeAuthorization` en `src/lib/identity/password-mutation.ts` envuelve en `withTransaction`, setea el flag, ejecuta el callback, publica `identity.password_hash.rotated` al outbox (`aggregate_type='identity_credential'`).
+  - Writers legítimos migrados al helper: `/api/account/reset-password`, `/api/account/accept-invite`.
+  - `scripts/backfill-postgres-identity-v2.ts`: removí `password_hash` + `password_hash_algorithm` del SELECT BQ y del UPDATE PG. Comentario inline explicando la razón y apuntando a TASK-451.
+  - Event catalog: agregados `AGGREGATE_TYPES.identityCredential` + `EVENT_TYPES.identityPasswordHashRotated`.
+  - 5 unit tests nuevos en `src/lib/identity/__tests__/password-mutation.test.ts`.
+- **Validado:**
+  - `pnpm pg:connect:migrate` ✓ (trigger live en dev)
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm test` 1337 passed
+  - `pnpm build` ✓
+  - Smoke E2E vía tsx: UPDATE sin session var → rechazado; UPDATE legítimo vía helper → hash actualizado + outbox event publicado; login sigue funcionando.
+- **Follow-up (out of scope inmediato):**
+  - Wire consumer reactivo que alerte a Slack si `identity.password_hash.rotated` viene con `source` inesperado o target distinto de `user-agent-e2e-001`.
+  - Auditar si otros campos sensibles de `client_users` (`microsoft_oid`, `google_sub`, `auth_mode`) merecen guards similares.
+
+## Sesion 2026-04-17 — TASK-348 Quotation Governance Runtime (approvals, versions, terms, templates, audit)
+
+- **Estado:** `complete`, entregado y pusheado.
+- **Rama:** `task/TASK-348-quotation-governance-runtime`
+- **Entregado:**
+  - Migration `20260417140553325_task-348-quotation-governance-runtime.sql` — 7 tablas nuevas en `greenhouse_commercial` (`approval_policies`, `approval_steps`, `quotation_audit_log`, `terms_library`, `quotation_terms`, `quote_templates`, `quote_template_items`) + seeds de 3 approval policies globales y 6 terms reutilizables.
+  - Runtime helpers en `src/lib/commercial/governance/` (audit-log, approval-evaluator, approval-steps-store, policies-store, terms-store con variable resolver, templates-store, versions-store con clone+diff).
+  - API extension:
+    - Per-quote: `/api/finance/quotes/[id]/{versions,approve,audit,terms}`.
+    - Globales: `/api/finance/quotation-governance/{approval-policies,terms-library,templates}[/[id]]`.
+  - 8 eventos outbox nuevos bajo `commercial.quotation.*` (`version_created`, `approval_requested`, `approval_decided`, `sent`, `approved`, `rejected`, `template_used`, `template_saved`).
+  - UI con tabs en `QuoteDetailView.tsx`: General / Versiones / Aprobaciones / Términos / Auditoría + componentes en `src/views/greenhouse/finance/governance/`.
+  - 21 tests unitarios nuevos en `src/lib/commercial/governance/__tests__/` cubriendo `approval-evaluator`, `version-diff` y `resolveTermVariables`.
+  - Doc arch `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.5 con delta del governance runtime y resolución de la open question sobre templates (`default_unit_price` + `default_margin_pct` coexisten).
+  - Doc funcional `docs/documentation/finance/cotizaciones-gobernanza.md` creada.
+- **Decisiones notables:**
+  - La gobernanza se expone bajo `/api/finance/quotes/[id]/*` y `/api/finance/quotation-governance/*` en vez de `/api/commercial/*` declarado en la spec §22 — coherente con el runtime vigente post TASK-345/346; cuando cierre el cutover full-commercial (`TASK-349`) se podrá aliasear.
+  - `approved_by` / `approved_at` se siguen poblando en `quotations`, pero la verdad de quién aprobó qué paso vive en `approval_steps`; el audit log registra ambas narrativas.
+  - Terms guardan `body_resolved` como snapshot inmutable al aplicar — un cambio en `terms_library` NO re-escribe el texto ya aplicado a una quote.
+- **Gaps que quedan para TASK-349:**
+  - Apply template al crear quote (`POST /api/finance/quotes` debería aceptar `templateId`).
+  - Save-as-template desde quote existente (endpoint nuevo).
+  - Páginas admin para CRUD visual de policies / terms / templates.
+  - Smoke manual del flow approve/reject pendiente de levantar dev server (cubierto en verificación de TASK-349).
+- **Validado:**
+  - `pnpm pg:connect:migrate` ✓
+  - `pnpm db:generate-types` ✓
+  - `pnpm lint` ✓
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm test` 1309/1309 ✓ (+ 21 tests nuevos de governance)
+  - `pnpm build` ✓
+
+## Sesion 2026-04-17 — Nexa Insights history archive + replay parcial de abril
+
+- **Estado:** `in_progress`, fix backend listo y validado; recovery operativo ejecutado de forma parcial por retención de origen.
+- **Rama:** `feat/nexa-insights-timeline`
+- **Problema resuelto:** `greenhouse_serving.ico_ai_signal_enrichments` funcionaba como snapshot current-state del período y el worker lo sobrescribía en cada corrida. Eso borraba de facto el historial visible para timeline y weekly digest cuando una anomalía dejaba de estar activa.
+- **Implementado:**
+  - Migration `20260417131401099_nexa-advisory-history-serving.sql` crea `greenhouse_serving.ico_ai_signal_enrichment_history` y backfillea el snapshot vigente.
+  - `src/lib/ico-engine/ai/llm-enrichment-worker.ts` ahora:
+    - escribe siempre en historial append-only,
+    - mantiene `ico_ai_signal_enrichments` como current-state,
+    - soporta replay `historyOnly + asOfTime`,
+    - agrega timeout por señal LLM (`60s`) para que una generación colgada no congele toda la corrida.
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` mueve timelines Agency/Member/Space a historial deduplicado por `enrichment_id`.
+  - `src/lib/nexa/digest/build-weekly-digest.ts` consume historial deduplicado en vez del snapshot actual.
+  - Script operativo nuevo: `scripts/backfill-ico-llm-history.ts`.
+- **Recovery ejecutado:**
+  - BigQuery time travel confirmó frontera dura de retención en `2026-04-10T13:17:57.392Z`.
+  - Se relanzó el replay recuperable de abril con:
+    - `NODE_OPTIONS=--conditions=react-server pnpm exec tsx scripts/backfill-ico-llm-history.ts --year 2026 --month 4 --from 2026-04-10T13:18:00.000Z --to 2026-04-17T23:59:59.999Z`
+  - Resultado:
+    - `2026-04-15 10:25:09Z` -> 2 history rows recuperadas
+    - `2026-04-16 10:20:18Z` -> 9 history rows recuperadas
+    - `2026-04-17 07:20:11Z` -> 2 history rows recuperadas
+    - `2026-04-17 07:45:12Z` -> 2 history rows recuperadas
+    - `2026-04-17 10:20:10Z` -> 2 history rows recuperadas + snapshot vigente backfilleado
+  - Las corridas del `2026-04-11`, `2026-04-12` y `2026-04-14` devolvieron `0` señales replayables en el `SYSTEM_TIME` exacto de esas corridas, pese a que los logs de runs históricos marcaban enrichments en ese momento.
+  - Daniela quedó nuevamente visible en historial con 2 insights `ftr_pct` del `2026-04-16 10:20:18Z` (`root_cause` + `recommendation`).
+- **Límite conocido:**
+  - No hay forma fiel de reconstruir `2026-04-01` a `2026-04-10 13:17 UTC` desde la fuente actual porque el snapshot BQ ya cayó fuera de time travel.
+  - Si se quiere blindar el resto del mes completo hacia adelante, este fix ya lo hace: desde ahora las corridas nuevas no deberían volver a perderse.
+- **Validado:**
+  - `pnpm exec vitest run src/lib/ico-engine/ai/llm-enrichment-reader.test.ts src/lib/nexa/digest/build-weekly-digest.test.ts` ✓
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm lint` ✓
+  - `pnpm pg:connect:migrate` ✓ (regeneró `src/types/db.d.ts`)
+
+## Sesion 2026-04-17 — TASK-347 Quotation Catalog & HubSpot Canonical Bridge
+
+- **Estado:** `complete`, `validado localmente`, pendiente commit + push.
+- **Rama:** `feat/nexa-insights-timeline`.
+- **Contexto:** sigue la secuencia del Commercial Quotation Canonical Program
+  (TASK-344 ✅ → TASK-345 ✅ → TASK-346 ✅). TASK-345 ya dejó el bridge sidecar;
+  TASK-347 (a) formaliza canonical-first sin flip destructivo, (b) introduce el
+  namespace de eventos `commercial.quotation.*` con aliases `finance.quote.*`
+  durante cutover, (c) cierra la deuda de gobernanza que permitía que
+  `costOfGoodsSold` saliera a HubSpot.
+- **Implementado:**
+  - **Event catalog** (`src/lib/sync/event-catalog.ts`): `AGGREGATE_TYPES.quotation`,
+    `quotationLineItem`, `productCatalog`; `EVENT_TYPES.quotationCreated/Synced/
+    Converted/LineItemsSynced/DiscountHealthAlert`, `productCatalogCreated/Synced`.
+  - **`src/lib/commercial/` nuevo**:
+    - `quotation-events.ts` — dual-publish centralizado (legacy + canonical)
+    - `hubspot-outbound-guard.ts` — `sanitizeHubSpotProductPayload` +
+      `HubSpotCostFieldLeakError` bloqueando 10 variantes de cost/margin fields
+    - `product-catalog-store.ts` — reader canónico de `greenhouse_commercial.product_catalog`
+  - **5 callers HubSpot** refactorizados para dual-publish y aplicar el guard
+    antes de `createHubSpotGreenhouseProduct`.
+  - **Defense-in-depth** en `createHubSpotGreenhouseProduct`: borra
+    `costOfGoodsSold` del payload incluso si el caller saltó el guard.
+  - **API `/api/finance/products?view=canonical`** routea al reader nuevo;
+    default preserva contrato legacy.
+  - **Fix TASK-346 bug**: orchestrator insertaba en `outbox_events(payload)`
+    pero columna real es `payload_json`; emit ahora vía `publishDiscountHealthAlert`.
+  - **Docs**: `GREENHOUSE_EVENT_CATALOG_V1.md` secciones nuevas + 
+    `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` v2.4 Delta 2026-04-17.
+- **Validado:**
+  - `pnpm exec tsc --noEmit` → 0 errors
+  - `pnpm lint` → 0 errors
+  - `pnpm test` → 1309 passed / 2 skipped (18 tests nuevos en `src/lib/commercial`)
+  - `pnpm build` → exit 0
+  - `rg "new Pool\(" src` → sólo `src/lib/postgres/client.ts`
+- **Impacto cross-module:**
+  - TASK-349 (workspace UI) desbloqueada.
+  - TASK-346 bug arreglado: `commercial.discount.health_alert` persiste OK.
+  - Consumers legacy (`finance.quote.*`) siguen sin cambio.
+- **Out of scope (como spec):** Nubox line items (TASK-212), workspace UI final
+  (TASK-349), drop de aliases `finance.quote.*` cuando migren todos los consumers.
+
+## Sesion 2026-04-17 — TASK-346 Quotation Pricing, Costing & Margin Health Core
+
+- **Estado:** `complete`, `validado localmente`, pendiente commit + push.
+- **Rama:** `feat/nexa-insights-timeline` (misma rama activa; push directo a develop).
+- **Contexto:** cierra el core de pricing de `Commercial Quotation Canonical Program`
+  (TASK-343 umbrella → TASK-344/TASK-345 ya consolidados). TASK-345 ya había dejado
+  el schema canónico y el bridge con Finance; faltaba el costing explicable desde
+  el backbone, los guardrails de margen y las métricas de revenue.
+- **Implementado:**
+  - **Migration** `migrations/20260417124905235_task-346-quotation-pricing-config.sql`:
+    `greenhouse_commercial.{margin_targets, role_rate_cards, revenue_metric_config}` con
+    unique indexes por `COALESCE(business_line_code, '__global__')`, CHECKs de rangos,
+    seeds por business line (Wave 28/20, Reach 18/10, Globe 40/25, Efeonce Digital 35/20,
+    CRM Solutions 30/18, default global 25/15) + revenue metric config per BL; ALTER
+    OWNER + grants al runtime/migrator/app.
+  - **Pricing helpers** en `src/lib/finance/pricing/`:
+    - `contracts.ts` tipos canónicos (MarginTarget, RoleRateCard, RevenueMetricConfig,
+      CostComponentBreakdown, QuotationPricingTotals, QuotationRevenueMetrics,
+      DiscountAlert, DiscountHealthResult).
+    - `pricing-config-store.ts` CRUD + readers con herencia
+      `quotation_override → business_line → global_default` para márgenes, rate cards
+      (match exacto BL+seniority, fallback global) y revenue metric config.
+    - `costing-engine.ts` `resolveLineItemCost` cubre los 4 lineTypes:
+      `person` → `member_capacity_economics.cost_per_hour_target` con fallback a snapshot
+      más reciente; `role` → role_rate_cards; `deliverable` →
+      `product_catalog.default_unit_price`; `direct_cost` → manual. Convierte FX con
+      `quotation.exchange_rates` o inverse o `fx_rate` del capacity snapshot.
+    - `line-item-totals.ts` calcula subtotals, discount_amount (percentage/fixed_amount
+      con clamp a subtotal), subtotal_after_discount, margin_amount y effective_margin_pct.
+    - `margin-health.ts` `checkDiscountHealth` clasifica alertas:
+      `margin_below_zero` (blocking) / `margin_below_floor` (finance approval) /
+      `margin_below_target` (warning) / `item_negative_margin` (warning) /
+      `discount_exceeds_threshold` (info, >25%).
+    - `revenue-metrics.ts` resuelve `recurrence_type = inherit` (monthly → recurring,
+      milestone/one_time → one_time) y calcula MRR/ARR/TCV/ACV + revenue_type
+      (recurring | one_time | hybrid).
+    - `quotation-pricing-orchestrator.ts` `buildQuotationPricingSnapshot` ->
+      `persistQuotationPricing` (tx con `withTransaction`: update headers, replace
+      line_items, insert version en `quotation_versions` con `snapshot_json` ordenado,
+      publish outbox `commercial.discount.health_alert` cuando hay alerta severa).
+    - `quotation-id-resolver.ts` resuelve canonical `quotation_id` desde canonical o
+      `finance_quote_id` legacy.
+  - **API routes** bajo `requireFinanceTenantContext` (Finance Admin requerido para
+    editar pricing config):
+    - `POST /api/finance/quotes` — create draft + pricing snapshot inicial.
+    - `PUT /api/finance/quotes/[id]` — update headers + recalculate (o skip con
+      `recalculatePricing:false`).
+    - `POST /api/finance/quotes/[id]/lines` — replace line items + recompute.
+    - `POST /api/finance/quotes/[id]/recalculate` — force re-read del backbone.
+    - `GET /api/finance/quotes/[id]/health` — discount health server-side (para UI).
+    - `GET/PUT /api/finance/quotes/pricing/config` — listar + upsert (PUT gated a
+      `finance_admin` o `efeonce_admin`).
+- **Detailed spec resuelta:**
+  - **Snapshot vs recompute:** `unit_cost`, `cost_breakdown`, `subtotal_cost` se
+    congelan como snapshot al guardar; totales y métricas agregadas SIEMPRE se
+    recalculan. `/recalculate` fuerza re-read de `member_capacity_economics` y
+    `role_rate_cards` sin tocar líneas manuales/direct_cost.
+  - **FX multi-moneda:** `quotations.exchange_rates` JSONB congela snapshot; el
+    engine intenta `rates[FROM_TO]`, luego inverse `rates[TO_FROM]`, luego
+    `member_capacity_economics.fx_rate` si target=CLP. Si no hay match, no convierte
+    y deja warning en `resolutionNotes` del line item.
+  - **`recurrence_type = inherit`:** `resolveLineRecurrence` → monthly → recurring,
+    milestone/one_time → one_time. Probado con 6 tests unitarios.
+- **Validado localmente:**
+  - `pnpm migrate:up` → tipos regenerados, 3 tablas nuevas visibles en `db.d.ts`.
+  - `pnpm exec tsc --noEmit --incremental false` → 0 errors.
+  - `pnpm lint` → 0 errors.
+  - `pnpm test` → 1291 passed / 2 skipped.
+  - `pnpm build` → exit 0 (warnings Dynamic server usage preexistentes, no
+    introducidos por esta lane).
+  - `rg "new Pool\(" src` → sólo `src/lib/postgres/client.ts`.
+- **Casos borde validados (unit tests):**
+  - one_time puro con duración null → tcv=sum(one_time), acv=tcv.
+  - recurring puro con duración 12m → mrr=X, arr=X*12, tcv=X*12, acv=X*12.
+  - hybrid recurring+one_time con duración 12m → tcv = mrr*12 + oneTimeTotal.
+  - duración 24m → acv = tcv/2 (ceil(24/12)).
+  - inherit con monthly → recurring; inherit con milestone → one_time.
+  - margin <0% → blocking; <floor → finance approval; <target → warning.
+- **Impacto cross-module:**
+  - `TASK-348`, `TASK-349`, `TASK-350`, `TASK-351` ya no están bloqueadas por TASK-346.
+  - `member_capacity_economics` del módulo Team Capacity ahora tiene un consumer
+    commercial directo (antes solo lo usaba Cost Intelligence / Payroll).
+  - Outbox gana evento `commercial.discount.health_alert` (consumer: Notifications
+    → Finance, audit log; implementación de consumer queda para TASK-348+).
+- **Follow-ups / out of scope (como spec declaró):**
+  - Approval workflow UI + backend → TASK-348.
+  - Templates + terms library → TASK-349.
+  - HubSpot sync del namespace `commercial.quotation.*` → TASK-347.
+  - PDF + workspace UI final → TASK-350.
+  - Profitability tracking actual vs quoted → TASK-351.
+
+## Sesion 2026-04-17 — Nexa Insights: Historial activado en las 4 superficies
+
+- **Estado:** `complete`, `deployed` (commit `bcf8a9c9`)
+- **Rama:** `feat/nexa-insights-timeline` → direct push a develop (política de velocidad)
+- **Contexto:** el commit anterior `f3d59422` shipeó el toggle Historial solo para Agency (via `IcoAdvisoryBlock`). Home, Space 360 y Person 360 quedaban opt-in — esta sesión las activa para cerrar el tema en todas las superficies Nexa.
+- **Implementado:**
+  - Backend scoped timelines:
+    - `readMemberAiLlmTimeline(memberId, limit=20)` — enrichments filtrados por `member_id`
+    - `readSpaceAiLlmTimeline(spaceId, limit=20)` — enrichments filtrados por `space_id`
+    - Ambos ordenan por `processed_at DESC`, `status='succeeded'`, sin filtro de período
+  - `readMemberAiLlmSummary` / `readSpaceAiLlmSummary` fetchean su timeline en paralelo (Promise.all) — zero latency extra
+  - Types: `MemberNexaInsightItem` / `SpaceNexaInsightItem` / `HomeNexaInsightItem` ganan `processedAt: string`; payloads ganan `timeline: Item[]`
+  - `get-home-snapshot.ts` mapea `insightsSummary.timeline` (agency-wide) via `mapHomeInsight`
+  - Views: HomeView + OverviewTab + PersonActivityTab pasan `timelineInsights={payload.timeline ?? []}`
+  - Tests: fixtures actualizados con `processedAt` + `timeline: []`
+- **Política de velocidad:** direct push tras local gates (lint + tsc + test 1269 pass + build). No PR — consistente con merge policy canónica cuando no hay branch protection.
+- **Validado:** local gates todos verdes.
+- **Impacto consumer:**
+  - `/home` → toggle aparece cuando hay timeline data (scope agency-wide)
+  - `/agency/spaces/[id]` → toggle con timeline scoped al space
+  - `/people/[memberId]` → toggle con timeline scoped al miembro
+  - `/agency?tab=ico` → ya estaba activo desde `f3d59422`, sigue idéntico
+- **Parallel work de Codex:** Codex pusheó en paralelo `TASK-450` + edits a README/REGISTRY. No pisé esos archivos; mi commit es selective-stage solo a los files owned por la feature.
+- **Follow-ups opcionales:**
+  - Filtrar timeline por severidad en el toggle (ej: solo críticos)
+  - Persistir preferencia de vista por usuario (actualmente es session-local)
+  - Agregar timeline a Finance Dashboard si se pide (actualmente el FinanceNexaInsightItem no tiene `processedAt` pero es extensión trivial)
+
+## Sesion 2026-04-17 — Nexa Insights timeline (modo Historial) + root cause mapping fix
+
+- **Estado:** `complete`, `deployed a develop` (commit `f3d59422` + `91f66c3c`)
+- **Rama:** trabajo en ramas locales, push directo a develop (ver política de velocidad en modelo multi-agente)
+- **Problema resuelto:**
+  1. El toggle de vista "Ver causa raíz" no aparecía en `/agency?tab=ico` pese al merge de TASK-446 — tres mappers consumer olvidaban pasar `rootCauseNarrative` porque el field era opcional en el tipo
+  2. Usuarios veían solo N señales del período actual sin contexto histórico — no había forma de responder "¿es normal tener 2 insights esta semana?" sin salir a PG
+- **Implementado:**
+  - **Fix mapping (commit `91f66c3c`, PR #67):**
+    - `IcoAdvisoryBlock.tsx` ahora pasa `rootCauseNarrative` al mapear `AgencyAiLlmSummaryItem → NexaInsightItem`
+    - `get-home-snapshot.ts` + `HomeNexaInsightItem` incluyen el campo
+    - `NexaInsightItem.rootCauseNarrative` pasó de `?:string \| null` a `:string \| null` (required nullable) — TypeScript ahora flaggea cualquier futuro consumer que lo omita
+  - **Timeline feature (commit `f3d59422`, push directo):**
+    - Nuevo reader `readAgencyAiLlmTimeline(limit=20)` sin filtro de período
+    - `AgencyAiLlmSummary.timeline` extiende el contrato (fetched en paralelo con currentEnrichments)
+    - Nuevo componente `NexaInsightsTimeline.tsx` con MUI Lab Timeline agrupada por día, dots severity-coded, reuso de `NexaMentionText` + `NexaInsightRootCauseSection`
+    - `NexaInsightsBlock` incorpora `ToggleButtonGroup` Recientes/Historial (solo visible si hay timeline data, backward compatible)
+    - `IcoAdvisoryBlock` mapea timeline y lo pasa via `timelineInsights` prop
+    - Copy keys nuevas en `GH_NEXA`: `insights_view_mode_*`, `insights_timeline_*`
+- **Política de velocidad usada:** PR #67 siguió flujo completo (PR + CI + squash merge). Timeline feature se pusheó directo a develop tras local gates verdes (lint + tsc + test 1269 pass + build) — tiempo total ~5 min vs ~20 min del flujo PR. Ver `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` §Merge policy canónica.
+- **Validado:** `pnpm lint` ✓ · `pnpm tsc --noEmit` ✓ · `pnpm test` ✓ (1269 pass, 2 skipped) · `pnpm build` ✓
+- **Validado en staging:** Vercel deploy `f3d59422` live a `dev-greenhouse.efeoncepro.com` el 17 abr 12:17 UTC
+- **Impacto consumer:**
+  - `/agency?tab=ico` (vía `IcoAdvisoryBlock`) — toggle + timeline operativos
+  - Home, Space 360, Person 360 — mapping fix propaga `rootCauseNarrative` (visible el collapse "Ver causa raíz"). Timeline no aparece en esas surfaces aún (opt-in futuro — basta con pasar `timelineInsights` prop)
+  - Finance Dashboard — inherited del cast directo del JSON, sin cambios necesarios
+- **Archivos owned / tocados:**
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` (nuevo reader + parallel fetch)
+  - `src/lib/ico-engine/ai/llm-types.ts` (`timeline` en AgencyAiLlmSummary)
+  - `src/components/greenhouse/NexaInsightsTimeline.tsx` (nuevo)
+  - `src/components/greenhouse/NexaInsightsBlock.tsx` (toggle + render condicional + required `rootCauseNarrative`)
+  - `src/components/agency/IcoAdvisoryBlock.tsx` (mapping fix + timeline)
+  - `src/lib/home/get-home-snapshot.ts` + `src/types/home.ts` (mapping fix)
+  - `src/config/greenhouse-nomenclature.ts` (copy keys)
+  - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md` (delta)
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` (delta)
+- **Follow-ups opcionales:**
+  - Home / Space 360 / Person 360 podrían activar el toggle Historial — solo requiere que sus views pasen `timelineInsights` prop
+  - Preferencia de vista podría persistirse por usuario (actualmente es local al componente, se resetea al reload)
+  - Timeline podría ganar filtro por severidad / métrica si el operador lo pide
+
+## Sesion 2026-04-17 — Multi-agent integration patterns documentados
+
+- **Estado:** `complete`, `PR abierta contra develop`
+- **Rama:** `docs/multi-agent-integration-patterns`
+- **Motivación:** tras cerrar TASK-446 en paralelo con TASK-345 de Codex, las lecciones operativas (worktree hygiene, rebase --onto, CI flake heredado, squash merge sin branch protection) quedaban sin canónico. Las formalizamos antes de que la próxima sesión descubra esto a fuego.
+- **Implementado:**
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` con 4 secciones nuevas:
+    - Higiene de worktree preexistente
+    - Patrones de integración multi-agente
+    - CI como gate compartido
+    - Merge policy canónica
+  - `AGENTS.md` Regla 3 ("Coordinacion entre agentes") agrega 4 pointers breves a las nuevas secciones.
+  - `CLAUDE.md` Key Docs agrega entry canónica para trabajo multi-agente.
+  - `changelog.md` registra la política nueva.
+- **Caso base referenciado:** ISSUE-052 (flake `HrLeaveView.test.tsx` bajo `pnpm test:coverage`), resuelto en PR #65 con bump `testTimeout` 5s → 15s; desbloqueó PR #63 y toda la queue de develop.
+- **No cambios de runtime:** pura documentación operativa. Zero riesgo de regresión.
+
+## Sesion 2026-04-17 — TASK-446 Nexa Insights Root Cause Narrative Surfacing (Insights Quick Win)
+
+- **Estado:** `complete`, `documentado`, `branch task/TASK-446-nexa-insights-root-cause-narrative`
+- **Problema resuelto:** el LLM generaba `rootCauseNarrative` y lo persistía en `greenhouse_serving.ico_ai_signal_enrichments.root_cause_narrative` y `greenhouse_serving.finance_ai_signal_enrichments.root_cause_narrative`, pero el reader lo excluía de los SELECTs y el tipo UI no lo declaraba. Data pagada en tokens que nunca llegaba al operador.
+- **Implementado:**
+  - Backend ICO: `src/lib/ico-engine/ai/llm-enrichment-reader.ts` y `src/lib/ico-engine/ai/llm-types.ts` incorporan `rootCauseNarrative: string | null` en 5 funciones (`readAgencyAiLlmSummary`, `readOrganizationAiLlmEnrichments`, `readTopAiLlmEnrichments`, `readMemberAiLlmSummary`, `readSpaceAiLlmSummary`) + sus 5 mappers + 3 SELECTs explícitos
+  - Backend Finance: `src/lib/finance/ai/llm-enrichment-reader.ts` y `finance-signal-types.ts` incorporan el campo en `readFinanceAiLlmSummary`, `readClientFinanceAiLlmSummary` y `FinanceNexaInsightItem`
+  - Weekly digest builder: `src/lib/nexa/digest/build-weekly-digest.ts` selecciona `enrich.root_cause_narrative` y produce `rootCauseNarrative?: WeeklyDigestNarrativePart[]` via `parseNarrativeText` (reusa el parser de mentions existente)
+  - UI: `src/components/greenhouse/NexaInsightRootCauseSection.tsx` (nuevo) — collapsible con localStorage global `nexa.insights.rootCause.expanded`, ARIA completo, keyboard, uppercase caption "Causa raíz"
+  - UI: `NexaInsightsBlock.tsx` extiende `NexaInsightItem` con `rootCauseNarrative?: string | null` y renderiza la sección entre `explanation` y `recommendedAction`
+  - Copy: 3 keys nuevas en `GH_NEXA` (`insights_root_cause_label`, `_expand`, `_collapse`)
+  - Email: `src/emails/WeeklyExecutiveDigestEmail.tsx` renderiza bloque "Causa probable" con left border `EMAIL_COLORS.primary` cuando el campo viene poblado
+  - Architecture doc: `docs/architecture/Greenhouse_ICO_Engine_v1.md` con delta canónico
+- **No cambios:** prompt del LLM (ya emitía el campo), migraciones (columna existente), sanitizer (ya aplicado al write)
+- **Tests:** 3 fixtures actualizados en `llm-enrichment-reader.test.ts` con `rootCauseNarrative: null`; 1 fixture en `Space360View.test.tsx`; fix incidental de TS error pre-existente en `campaigns/tenant-scope.test.ts:21`
+- **Verificación:** `pnpm lint` ✓ `pnpm tsc --noEmit` ✓ `pnpm test` ✓ (1269 pass) `pnpm build` ✓
+- **Impacto cruzado consumers:**
+  - Home (`HomeView` → `readAgencyAiLlmSummary`) — propaga el campo
+  - Space 360 Overview — propaga el campo
+  - Person 360 Activity — propaga el campo
+  - Finance Dashboard — propaga el campo
+  - ICO Agency metrics `/api/ico-engine/metrics/agency` — propaga el campo
+  - Weekly digest email — renderiza bloque "Causa probable"
+- **Backward compat:** enrichments antiguos sin el campo → sección no renderiza, digest no incluye bloque
+
+## Sesion 2026-04-17 — TASK-345 Quotation Canonical Schema & Finance Compatibility Bridge
+
+- **Estado:** `complete`, `validado`, rama publicada para PR contra `develop`
+- **Rama local de trabajo:** `task/TASK-345-quotation-canonical-schema-bridge`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-345`
+- **Implementado:**
+  - `migrations/20260417103700979_task-345-quotation-canonical-schema-finance-compatibility-bridge.sql`
+    - crea `greenhouse_commercial`
+    - crea `product_catalog`, `quotations`, `quotation_versions`, `quotation_line_items`
+    - aplica ownership/grants/default privileges
+    - backfillea desde `greenhouse_finance.quotes`, `quote_line_items`, `products`
+  - `src/lib/finance/quotation-canonical-store.ts`
+    - façade quote-specific para list/detail/lines
+    - sync bridge para quotes/products desde Finance runtime hacia `greenhouse_commercial.*`
+    - resolución tenant-aware por `space_id`
+  - routes:
+    - `src/app/api/finance/quotes/route.ts`
+    - `src/app/api/finance/quotes/[id]/route.ts`
+    - `src/app/api/finance/quotes/[id]/lines/route.ts`
+    - ahora leen vía façade canónica y conservan fallback legacy ante schema drift
+  - writers bridgeados:
+    - `src/lib/hubspot/create-hubspot-quote.ts`
+    - `src/lib/hubspot/sync-hubspot-quotes.ts`
+    - `src/lib/hubspot/sync-hubspot-line-items.ts`
+    - `src/lib/hubspot/sync-hubspot-products.ts`
+    - `src/lib/hubspot/create-hubspot-product.ts`
+    - `src/lib/nubox/sync-nubox-to-postgres.ts`
+- **Validación ejecutada:**
+  - `pnpm pg:connect:migrate`
+    - migración aplicada
+    - `src/types/db.d.ts` regenerado por el flujo canónico
+  - `pnpm exec tsc --noEmit --incremental false`
+    - único error restante observado: `src/lib/campaigns/tenant-scope.test.ts(21,44)` preexistente y ajeno a TASK-345
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'`
+- **Notas operativas:**
+  - la rama fue rebasada para que el PR arrastre solo TASK-345 y no mezcle commits previos de TASK-344
+  - `pnpm build` quedó verde; siguió mostrando warnings conocidos de `Dynamic server usage` en páginas autenticadas del dashboard, pero no bloquearon la build ni fueron introducidos por esta lane
+
+## Sesion 2026-04-17 — TASK-343 Commercial Quotation Canonical Program
+
+- **Estado:** `complete`, `documentado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `docs/tasks/complete/TASK-343-commercial-quotation-canonical-program.md`
+    - la umbrella queda cerrada como programa documental, no como runtime task encubierta
+    - fija explícitamente que el repo actual sigue siendo `finance-first`
+    - publica `TASK-344` como primer hard gate del bloque antes de `TASK-345+`
+    - deja explícito que `Finance > Cotizaciones` sigue siendo la surface oficial mientras no cierre el corte contractual/canónico
+  - `docs/tasks/README.md`
+    - el bloque `TASK-343` a `TASK-351` ahora deja explícito el rol cerrado de la umbrella
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `TASK-343` sincronizada como `complete` y movida a `docs/tasks/complete/`
+- **Cambio operativo/documental:**
+  - el programa de Quotation ya no debe leerse como si faltara crear la secuencia de child tasks; esa secuencia ya existe
+  - el drift principal confirmado por la auditoría es contractual/documental:
+    - `Quote` sigue desalineado entre 360 object model y arquitectura comercial
+    - `schema-snapshot-baseline.sql` está atrasado respecto del runtime real de quotes/products/line items
+    - el naming/event policy y la convivencia `finance.quote.*` vs `commercial.quotation.*` siguen pendientes
+  - el siguiente corte real del programa es `TASK-344`, no `TASK-345`
+- **Validación ejecutada en esta sesión:**
+  - revisión manual cross-doc de:
+    - `docs/tasks/complete/TASK-343-commercial-quotation-canonical-program.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+- **Notas operativas:**
+  - no hubo cambios de runtime, schema físico, API, UI ni migraciones
+  - el workspace ya tenía trabajo ajeno no trackeado para `TASK-441` a `TASK-445`; no se tocó ni se revirtió
+
+## Sesion 2026-04-17 — TASK-440 hardening de labels de proyecto en Nexa
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/ico-engine/ai/entity-display-resolution.ts`
+    - resolver tenant-safe nuevo para labels de proyecto por `space_id`
+    - soporta `project_record_id` y `notion_project_id` / `project_source_id`
+    - agrega sanitización backend de narrativa para mentions y texto plano cuando aparece un ID técnico
+  - `src/lib/ico-engine/ai/resolve-signal-context.ts`
+    - deja de resolver proyectos solo por `project_record_id`
+    - ahora expone `projectResolutions` y helper `getResolvedProjectLabel()`
+  - `src/lib/ico-engine/ai/materialize-ai-signals.ts`
+    - humaniza `dimension_label` de root causes de proyecto antes de construir señales
+    - las recomendaciones de proyecto degradan a `este proyecto` cuando el label sigue siendo técnico
+  - `src/lib/ico-engine/ai/llm-provider.ts`
+    - corta el fallback `projectName = projectId`
+    - solo expone `projectId` al prompt cuando existe `projectName` humano confiable
+    - sanea `explanationSummary`, `rootCauseNarrative` y `recommendedAction` antes de persistir enrichments
+  - `src/lib/ico-engine/ai/llm-enrichment-worker.ts`
+    - persiste metadata mínima de `projectResolution` en `explanation_json.meta`
+  - tests nuevos:
+    - `src/lib/ico-engine/ai/resolve-signal-context.test.ts`
+    - `src/lib/ico-engine/ai/llm-provider.test.ts`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_MENTION_SYSTEM_V1.md`
+  - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/in-progress/TASK-440-nexa-project-label-resolution.md`
+  - `Handoff.md`
+- **Cambio operativo/documental:**
+  - se dejó explícito que la corrección de `TASK-440` vive en backend y no en la UI
+  - la resolución canónica de proyecto queda documentada como `space_id` + (`project_record_id` o wrapper/source IDs equivalentes)
+  - la degradación visible obligatoria cuando no hay label resoluble queda fijada en `este proyecto`
+  - `Pulse/Home`, `Space 360` y `Person 360` quedan declaradas como consumers beneficiados vía readers existentes, sin route/surface nueva
+  - `explanation_json.meta.projectResolution` queda registrado como metadata mínima permitida para auditoría
+- **Validación ejecutada en esta sesión:**
+  - `pnpm exec vitest run src/lib/ico-engine/ai/llm-provider.test.ts src/lib/ico-engine/ai/resolve-signal-context.test.ts`
+  - `pnpm exec vitest run src/lib/home/get-home-snapshot.test.ts src/lib/agency/space-360.test.ts 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/people/tabs/PersonActivityTab.test.tsx`
+  - `pnpm exec eslint src/lib/ico-engine/ai/entity-display-resolution.ts src/lib/ico-engine/ai/llm-provider.ts src/lib/ico-engine/ai/llm-provider.test.ts src/lib/ico-engine/ai/llm-types.ts src/lib/ico-engine/ai/materialize-ai-signals.ts src/lib/ico-engine/ai/resolve-signal-context.ts src/lib/ico-engine/ai/resolve-signal-context.test.ts src/lib/ico-engine/ai/llm-enrichment-worker.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'`
+  - `pnpm exec tsc --noEmit --pretty false` -> falla por issue ajeno en `src/lib/campaigns/tenant-scope.test.ts(21,44): TS2556`
+  - `pnpm test` -> falla por suites ajenas con timeouts prolongados:
+    - `src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+    - `src/views/greenhouse/agency/services/ServicesListView.test.tsx`
+    - `src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+    - `src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+- **Notas operativas:**
+  - `pnpm build` quedó verde; siguió imprimiendo warnings conocidos de `Dynamic server usage` en páginas autenticadas del dashboard, pero no bloquearon la build ni fueron introducidos por esta lane
+  - no hubo migraciones ni cambios de schema físico
+  - la task fue movida a `docs/tasks/in-progress/` y quedó con `Lifecycle: in-progress`
+
+## Sesion 2026-04-17 — TASK-145 Agency Campaigns API rescope
+
+- **Estado:** `complete`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/app/api/agency/campaigns/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/360/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/metrics/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/financials/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/roster/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/projects/route.ts`
+  - `src/app/api/agency/campaigns/[campaignId]/projects/[linkId]/route.ts`
+    - namespace Agency nuevo con paridad sobre el runtime actual de campañas
+  - `src/lib/campaigns/tenant-scope.ts`
+    - helper tenant-safe nuevo
+    - resuelve spaces cliente con `getDb()` sobre `greenhouse_core.spaces`
+    - corrige el bug `clientId -> spaceId`
+    - endurece acceso detail/sub-routes por pertenencia real a `space_id`
+  - `src/lib/campaigns/campaign-store.ts`
+    - nuevo reader `listCampaignsBySpaceIds()` para multi-space SQL-first
+  - `src/app/api/campaigns/**`
+    - rutas compartidas alineadas al helper tenant-safe
+  - `src/views/agency/AgencyCampaignsView.tsx`
+    - Agency consume `/api/agency/campaigns` como endpoint primario
+    - deja de mantener fallback a `/api/campaigns`; la surface Agency queda cortada al namespace dedicado
+  - tests nuevos/actualizados:
+    - `src/lib/campaigns/tenant-scope.test.ts`
+    - `src/app/api/campaigns/route.test.ts`
+    - `src/app/api/agency/campaigns/route.test.ts`
+    - `src/views/agency/AgencyCampaignsView.test.tsx`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/complete/TASK-145-agency-campaigns-rescope.md`
+  - `changelog.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/campaigns/tenant-scope.test.ts src/app/api/campaigns/route.test.ts src/app/api/agency/campaigns/route.test.ts src/views/agency/AgencyCampaignsView.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'`
+- **Notas operativas:**
+  - `pnpm build` quedó verde; volvió a imprimir warnings conocidos de `Dynamic server usage` en páginas autenticadas del dashboard, pero no bloquearon la build ni fueron introducidos por esta lane
+  - no hubo migraciones ni cambios de schema
+  - `Agency > Campaigns` ya no mantiene fallback a `/api/campaigns`; el namespace dedicado quedó como contrato primario y único para esa surface
+  - `/api/campaigns/**` sigue siendo namespace compartido para internal + client; esa coexistencia es deliberada para no romper `/campaigns` ni `/campanas`
+
+## Sesion 2026-04-17 — TASK-144 Agency Team API dedicada y deduplicada
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/agency/team-capacity-store.ts`
+    - store canónico nuevo sobre `getDb()` + SQL tipado
+    - consolida roster activo, assignments, enrichment derivado de `space`, metadata de placements y overlay de `member_capacity_economics`
+    - expone también conversión `toAgencyCapacityOverview()` para mantener compatibilidad con el shape legacy de `/api/agency/capacity`
+  - `src/app/api/agency/team/route.ts`
+    - route nueva `GET /api/agency/team`
+    - mantiene `requireAgencyTenantContext()` y headers `no-store`
+  - wrappers y consumers alineados:
+    - `src/app/api/team/capacity-breakdown/route.ts` ahora delega al store canónico
+    - `src/app/api/agency/capacity/route.ts` deja la lane `BigQuery-first` y deriva el overview legacy desde el store nuevo
+    - `src/views/agency/AgencyTeamView.tsx`
+    - `src/views/agency/AgencyWorkspace.tsx`
+    - `src/views/agency/drawers/AssignMemberDrawer.tsx`
+      ahora consumen `/api/agency/team`
+  - tests nuevos/actualizados:
+    - `src/lib/agency/team-capacity-store.test.ts`
+    - `src/app/api/agency/team/route.test.ts`
+    - `src/app/api/team/capacity-breakdown/route.test.ts`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/complete/TASK-144-agency-team-api-dedup.md`
+  - `changelog.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/agency/team-capacity-store.test.ts src/app/api/agency/team/route.test.ts src/app/api/team/capacity-breakdown/route.test.ts`
+  - `pnpm exec vitest run src/views/agency/AgencyTeamView.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm exec eslint src/types/agency-team.ts src/lib/agency/team-capacity-store.ts src/lib/agency/team-capacity-store.test.ts src/app/api/agency/team/route.ts src/app/api/agency/team/route.test.ts src/app/api/team/capacity-breakdown/route.ts src/app/api/team/capacity-breakdown/route.test.ts src/app/api/agency/capacity/route.ts src/views/agency/AgencyTeamView.tsx src/views/agency/AgencyWorkspace.tsx src/views/agency/drawers/AssignMemberDrawer.tsx src/components/agency/CapacityOverview.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+- **Notas operativas:**
+  - `pnpm build` quedó verde; el log siguió imprimiendo warnings conocidos de `Dynamic server usage` para múltiples páginas autenticadas del dashboard, pero no bloquearon el build ni fueron introducidos por esta lane
+  - no hubo migraciones ni cambios de schema en esta sesión
+
+## Sesion 2026-04-17 — TASK-143 Agency Economics API & View
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/agency/agency-economics.ts`
+    - reader nuevo sobre `getDb()` + SQL tipado para leer `greenhouse_serving.operational_pl_snapshots` en modo `space-first`
+    - resuelve ventana mensual, totales, ranking, tendencia y estado parcial sin recalcular P&L inline
+    - reutiliza `getServicesBySpace()` solo como contexto contractual del drill-down, sin inventar economía por servicio
+  - `src/app/api/agency/economics/route.ts`
+    - route nueva `GET /api/agency/economics`
+    - mantiene guard `requireAgencyTenantContext()` y acepta `year`, `month`, `trendMonths`
+  - `src/views/greenhouse/agency/economics/EconomicsView.tsx`
+    - nueva surface Agency con componentes Vuexy/MUI existentes (`StatsWithAreaChart`, `HorizontalWithSubtitle`, `CustomChip`, `EmptyState`)
+    - KPIs, tabla expandible por Space, ranking, tendencias y contexto de servicios
+    - copy visible deja explícito que el detalle económico por servicio todavía no existe
+  - `src/app/(dashboard)/agency/economics/page.tsx`
+    - deja de montar la vista legacy `src/views/agency/AgencyEconomicsView.tsx`
+    - ahora apunta al surface nuevo `src/views/greenhouse/agency/economics/EconomicsView.tsx`
+  - tests nuevos:
+    - `src/app/api/agency/economics/route.test.ts`
+    - `src/views/greenhouse/agency/economics/EconomicsView.test.tsx`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/complete/TASK-143-agency-economics-api.md`
+  - `changelog.md`
+  - `project_context.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/app/api/agency/economics/route.test.ts src/views/greenhouse/agency/economics/EconomicsView.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+- **Notas operativas:**
+  - la lane queda cerrada sobre `operational_pl_snapshots`; no reintroduce lecturas directas del bridge legacy ni usa `/api/finance/dashboard/pnl` como motor principal
+  - el drill-down por servicio sigue pendiente hasta que exista serving dedicado en `TASK-146`
+
+## Sesion 2026-04-17 — documentación del sistema de email aterrizada al runtime real
+
+- **Estado:** `documentado`
+- **Rama:** `develop`
+- **Actualizado:**
+  - `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+  - `docs/documentation/plataforma/sistema-email-templates.md`
+- **Cambio documental:**
+  - la documentación ya no describe el sistema de email como si fuera solo una capa simple de templates, ni como si ya fuera una suite completa de messaging enterprise
+  - la foto real quedó explicitada como:
+    - delivery centralizado sobre Resend
+    - persistencia operativa en `greenhouse_notifications`
+    - retries, `dead_letter`, `priority`, `kill switch`, webhook de bounce/complaint, unsubscribe y contexto automático
+    - soporte async complementario vía `ops-worker`
+  - también quedó documentado lo que todavía falta para evolucionarlo más: observabilidad first-class, control plane más fino, broadcasts más desacoplados, más catálogo vivo y mejor UX operativa de soporte
+
+## Sesion 2026-04-17 — docs operativos de agentes alineados al modelo views + entitlements
+
+- **Estado:** `documentado`
+- **Rama:** `develop`
+- **Actualizado:**
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - `docs/tasks/TASK_PROCESS.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Cambio operativo:**
+  - los agentes ya no deben pensar permisos solo desde `views`
+  - cualquier diseño de arquitectura, task o solución que toque acceso debe distinguir explícitamente entre:
+    - `routeGroups`
+    - `views` / `authorizedViews`
+    - `entitlements`
+    - `startup policy`
+
+## Sesion 2026-04-17 — TASK-404 Entitlements Governance Admin Center
+
+- **Estado:** `complete`, `validado localmente`, `migracion aplicada en shared dev DB`
+- **Rama:** `develop`
+- **Implementado:**
+  - migración `migrations/20260417044741101_task-404-entitlements-governance.sql`
+    - tablas nuevas `greenhouse_core.role_entitlement_defaults`, `greenhouse_core.user_entitlement_overrides`, `greenhouse_core.entitlement_governance_audit_log`
+    - índices tenant-safe por `space_id`
+  - `src/lib/admin/entitlements-governance.ts`
+    - store Kysely para overview global, acceso efectivo por usuario, defaults por rol, overrides por usuario y startup policy
+    - precedencia explícita `runtime -> role default -> user override`
+    - outbox events `access.entitlement_role_default_changed`, `access.entitlement_user_override_changed`, `access.startup_policy_changed`
+  - `src/lib/admin/entitlement-view-map.ts`
+    - bridge entre `VIEW_REGISTRY` y capabilities para explicar relación `vista -> entitlement`
+  - rutas admin nuevas:
+    - `GET /api/admin/entitlements/governance`
+    - `POST /api/admin/entitlements/roles`
+    - `GET /api/admin/entitlements/users/[userId]`
+    - `POST /api/admin/entitlements/users/[userId]/overrides`
+    - `PATCH /api/admin/entitlements/users/[userId]/startup-policy`
+  - UI:
+    - `Admin Center > Gobernanza de acceso` agrega tab `Entitlements`
+    - `Admin Center > Usuarios > Acceso` ahora muestra permisos efectivos, overrides y startup policy editable
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+  - `docs/documentation/identity/sistema-identidad-roles-acceso.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `changelog.md`
+  - `project_context.md`
+- **Validación ejecutada:**
+  - `pnpm exec eslint src/lib/admin/entitlements-governance.ts src/lib/admin/entitlement-view-map.ts src/app/api/admin/entitlements/governance/route.ts src/app/api/admin/entitlements/roles/route.ts 'src/app/api/admin/entitlements/users/[userId]/route.ts' 'src/app/api/admin/entitlements/users/[userId]/overrides/route.ts' 'src/app/api/admin/entitlements/users/[userId]/startup-policy/route.ts' 'src/app/(dashboard)/admin/views/page.tsx' src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx src/views/greenhouse/admin/EntitlementsGovernanceTab.tsx src/views/greenhouse/admin/users/UserAccessTab.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+  - `pnpm pg:connect:migrate`
+- **Notas operativas:**
+  - `pnpm pg:connect:migrate` aplicó la migración y regeneró `src/types/db.d.ts` sin diff final
+  - se tocó `src/app/api/hr/evaluations/summaries/[summaryId]/finalize/route.ts` solo para corregir un issue de lint preexistente (`padding-line-between-statements`) que bloqueaba `pnpm lint`
+  - el workspace sigue teniendo un archivo ajeno sin trackear: `docs/architecture/GREENHOUSE_FINANCE_METRIC_REGISTRY_V1.md`
+
+## Sesion 2026-04-16 — TASK-246 Digest ejecutivo semanal de Nexa
+
+- **Estado:** `implementado localmente`, `validado`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/nexa/digest/build-weekly-digest.ts`
+    - builder nuevo sobre `getDb()` / Kysely para consolidar los top insights ICO-first de la última semana
+    - ranking explícito `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+    - renderer de `@mentions` para email: `space` y `member` con link; `project` queda como texto
+  - `src/lib/nexa/digest/recipient-resolver.ts`
+    - resolución runtime de destinatarios internos vía roles de liderazgo + filtro contra identity store interno
+  - `src/lib/email/types.ts`
+    - nuevo `EmailType` `weekly_executive_digest`
+  - `src/lib/email/templates.ts`
+  - `src/emails/WeeklyExecutiveDigestEmail.tsx`
+    - template React Email + preview catalog del digest semanal
+  - `services/ops-worker/server.ts`
+    - endpoint nuevo `POST /nexa/weekly-digest`
+  - `services/ops-worker/deploy.sh`
+    - scheduler job nuevo `ops-nexa-weekly-digest` (`0 7 * * 1`, `America/Santiago`)
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `docs/documentation/delivery/nexa-insights-digest-semanal.md`
+  - `docs/documentation/plataforma/sistema-email-templates.md`
+  - `docs/documentation/delivery/motor-ico-metricas-operativas.md`
+  - `docs/documentation/operations/ops-worker-reactive-crons.md`
+  - `docs/documentation/README.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/nexa/digest/build-weekly-digest.test.ts src/lib/email/templates.test.ts`
+  - `pnpm exec eslint src/lib/nexa/digest/build-weekly-digest.ts src/lib/nexa/digest/build-weekly-digest.test.ts src/lib/nexa/digest/recipient-resolver.ts src/lib/nexa/digest/types.ts src/lib/email/types.ts src/lib/email/templates.ts src/lib/email/templates.test.ts src/emails/WeeklyExecutiveDigestEmail.tsx services/ops-worker/server.ts`
+  - `bash -n services/ops-worker/deploy.sh`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+  - Smoke con datos reales:
+    - `buildWeeklyDigest({ limit: 3 })` devolvió `periodLabel="9 abr 2026 - 16 abr 2026"`, `totalInsights=5`, `spacesAffected=1`
+    - `resolveWeeklyDigestRecipients()` devolvió liderazgo interno (`daniela.ferreira@efeonce.org`, `agent@greenhouse.efeonce.org`, `jreyes@efeoncepro.com`)
+- **Notas operativas:**
+  - la spec quedó corregida a un corte realista `ICO-first / cross-Space`; la lane cross-domain queda como follow-up
+  - el workspace ya venía sucio por cambios ajenos en `src/app/api/hr/evaluations/summaries/[summaryId]/finalize/route.ts` y no se tocaron
+  - no se disparó envío real del digest ni deploy del worker en esta sesión; el endpoint y el scheduler quedaron listos para activación
+
+## Sesion 2026-04-16 — TASK-242 Nexa Insights en Space 360
+
+- **Estado:** `complete`, `validado localmente`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/ico-engine/ai/llm-types.ts`
+    - tipos nuevos `SpaceNexaInsightItem` y `SpaceNexaInsightsPayload`
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+    - reader nuevo `readSpaceAiLlmSummary(spaceId, periodYear, periodMonth, limit)`
+    - filtros explícitos por `space_id + period_year + period_month`
+    - lista visible solo con `status = 'succeeded'`
+    - ranking alineado al resto de Nexa/ICO: `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - `src/lib/agency/space-360.ts`
+    - `Space360Detail` ahora expone `nexaInsights`
+    - el snapshot canónico de Space 360 carga el summary AI del período Santiago cuando existe `space_id`
+  - `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx`
+    - `NexaInsightsBlock` se renderiza al inicio del Overview real de Space 360
+    - cuando `nexaInsights` viene vacío o nulo, la surface cae al empty state compartido de Nexa
+  - `src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+    - cobertura UI del bloque Nexa al inicio del Overview
+  - tests nuevos/actualizados:
+    - `src/lib/ico-engine/ai/llm-enrichment-reader.test.ts`
+    - `src/lib/agency/space-360.test.ts`
+    - `src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+- **Validación ejecutada:**
+  - `pnpm exec vitest run src/lib/ico-engine/ai/llm-enrichment-reader.test.ts src/lib/agency/space-360.test.ts src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+  - `pnpm exec eslint src/lib/ico-engine/ai/llm-types.ts src/lib/ico-engine/ai/llm-enrichment-reader.ts src/lib/ico-engine/ai/llm-enrichment-reader.test.ts src/lib/agency/space-360.ts src/lib/agency/space-360.test.ts src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+  - `pnpm build`
+- **Notas operativas:**
+  - `docs/architecture/schema-snapshot-baseline.sql` sigue desfasado frente a `greenhouse_serving.ico_ai_signal_enrichments`; la fuente real sigue siendo `migrations/20260404123559856_task-232-ico-llm-enrichments.sql` + `src/types/db.d.ts`
+  - `pnpm lint` sigue rojo por un issue ajeno en `src/app/api/hr/evaluations/summaries/[summaryId]/finalize/route.ts` (`padding-line-between-statements`); no pertenece a `TASK-242`
+  - el workspace ya venía sucio por cambios de HR evaluations ajenos y no se modificaron
+
+## Sesion 2026-04-16 — TASK-243 Nexa Insights en Person 360
+
+- **Estado:** `complete`, `pushed a develop`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+    - reader nuevo `readMemberAiLlmSummary(memberId, periodYear, periodMonth, limit)`
+    - filtro explícito `member_id + period_year + period_month`, lista visible solo con `status='succeeded'`
+    - ranking alineado a Home/Agency: `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - `src/lib/ico-engine/ai/llm-types.ts`
+    - tipos `MemberNexaInsightItem` y `MemberNexaInsightsPayload`
+  - `src/lib/person-intelligence/types.ts`
+    - `PersonIntelligenceResponse` ahora puede incluir `nexaInsights`
+  - `src/app/api/people/[memberId]/intelligence/route.ts`
+    - el snapshot del miembro incorpora `nexaInsights` sin abrir route nueva
+  - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx`
+    - la surface visible `activity` renderiza `NexaInsightsBlock` al inicio
+    - consume el summary AI desde la route de intelligence y conserva la navegación por `@mentions`
+  - tests nuevos/actualizados:
+    - `src/lib/ico-engine/ai/llm-enrichment-reader.test.ts`
+    - `src/app/api/people/[memberId]/intelligence/route.test.ts`
+    - `src/views/greenhouse/people/tabs/PersonActivityTab.test.tsx`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/ico-engine/ai/llm-enrichment-reader.test.ts 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/people/tabs/PersonActivityTab.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src`
+- **Notas operativas:**
+  - la spec original quedó corregida: la surface visible real es `activity`, no un tab `intelligence` montado
+  - `docs/architecture/schema-snapshot-baseline.sql` sigue sin reflejar las tablas `ico_ai_signal_enrichments` / `ico_ai_enrichment_runs`; para este dominio la referencia real sigue siendo migración + `src/types/db.d.ts`
+
+## Sesion 2026-04-16 — TASK-029: HRIS Goals & OKRs module
+
+- **Estado:** `complete`, pendiente migracion en shared dev DB
+- **Rama:** `develop`
+- **Implementado:**
+  - Migration: 4 tablas en greenhouse_hr (goal_cycles, goals, goal_key_results, goal_progress)
+  - 3 core lib files: postgres-goals-store.ts, eligibility.ts, progress-calculator.ts
+  - 12 API routes en /api/hr/goals/
+  - 2 paginas: /my/goals (self-service), /hr/goals (admin 3 tabs)
+  - 2 view codes, 5 outbox events, menu integration
+- **Post-deploy:** pnpm pg:connect:migrate + pnpm db:generate-types
+- **Follow-ups:** People 360 tab "Objetivos", TASK-031 (Performance Evaluations)
+
+## Sesion 2026-04-16 — TASK-244 Nexa Insights en Pulse/Home
+
+- **Estado:** `implementado localmente`, `lint dirigido OK`, `tsc/build global bloqueado por frente paralelo hr-goals`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+    - reader nuevo `readTopAiLlmEnrichments(periodYear, periodMonth, limit)`
+    - ranking explícito `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - `src/lib/home/get-home-snapshot.ts`
+  - `src/types/home.ts`
+    - `HomeSnapshot` ahora puede incluir `nexaInsights`
+  - `src/views/greenhouse/home/HomeView.tsx`
+    - `Pulse` renderiza `NexaInsightsBlock` en la landing, entre `NexaHero` y `RecommendedShortcuts`
+  - docs actualizados:
+    - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
+    - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+    - `changelog.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `docs/tasks/README.md`
+    - task movida a `docs/tasks/in-progress/TASK-244-nexa-insights-home-dashboard.md`
+- **Validación ejecutada:**
+  - `pnpm exec eslint src/lib/ico-engine/ai/llm-enrichment-reader.ts src/lib/home/get-home-snapshot.ts src/types/home.ts src/views/greenhouse/home/HomeView.tsx`
+  - `pnpm exec tsc --noEmit --pretty false` -> falla por `src/views/greenhouse/hr-goals/HrGoalsView.tsx` (errores ajenos al task)
+  - `pnpm build` -> bloqueado en la misma lane `hr-goals`
+- **Notas operativas:**
+  - el cambio sigue el patrón canónico `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`; Home no recalcula señales ni narrativa
+  - la navegación contextual en Home depende del contrato actual de `NexaMentionText`; la card completa del insight sigue sin CTA/click dedicado
+  - `git status` ya venía sucio por trabajo paralelo de `hr-goals`; no fue tocado por TASK-244
+
+## Sesion 2026-04-16 — HR Leave aclara UI de saldo proporcional Chile y arrastre
+
+- **Estado:** `implemented localmente`, `pendiente lint/build final`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - tarjetas y tablas ya no muestran decimales infinitos en saldos
+    - `Mis saldos` y el detalle admin del equipo separan `Base / acumulado`, `Progresivos`, `Arrastre` y `Saldo actual`
+    - el resumen radial ahora usa el saldo bruto visible, incluyendo arrastre/ajustes, para que el porcentaje no contradiga el detalle
+    - se agregan mensajes de apoyo para vacaciones Chile con acumulación proporcional y arrastre
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/lib/hr-core/service.ts`
+    - normalizan balances de leave a 2 decimales al serializar payloads
+  - `src/types/hr-core.ts`
+    - `policyExplain` expone `accrualType` para que la UI pueda distinguir acumulación proporcional vs anual fija
+  - tests nuevos/actualizados:
+    - `src/lib/hr-core/leave-domain.test.ts`
+    - `src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/hr-core/leave-domain.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+  - `pnpm exec eslint src/lib/hr-core/leave-domain.ts src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/service.ts src/types/hr-core.ts src/views/greenhouse/hr-core/HrLeaveView.tsx src/lib/hr-core/leave-domain.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+
+## Sesion 2026-04-16 — HR Leave team balances recupera identidad visible y actividad admin canónica
+
+- **Estado:** `implemented localmente`, `pendiente lint/build final`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/types/hr-core.ts`
+    - `HrLeaveBalance` ahora puede exponer `memberAvatarUrl`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/lib/hr-core/service.ts`
+    - los balances de leave resuelven avatar con el mismo criterio canónico de solicitudes (`avatar_url + linked_user_id -> /api/media/users/.../avatar`)
+    - el fallback legacy de requests también queda alineado con la misma resolución
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - `Saldos del equipo` usa avatar real del colaborador cuando existe
+    - el dialog de detalle deja la tabla horizontal y pasa a cards por tipo de permiso
+    - el bloque `Actividad administrativa` separa retroactivos `Días ya tomados` de `Ajustes de saldo`
+  - tests nuevos/actualizados:
+    - `src/lib/hr-core/postgres-leave-store.test.ts`
+    - `src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/hr-core/postgres-leave-store.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+  - `pnpm exec eslint src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/postgres-leave-store.test.ts src/lib/hr-core/service.ts src/types/hr-core.ts src/views/greenhouse/hr-core/HrLeaveView.tsx src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+
+---
+
+## Sesion 2026-04-16 — TASK-285: Client Role Differentiation
+
+- **Estado:** `complete`, migracion aplicada en shared dev DB
+- **Rama:** `develop`
+- **Implementado:**
+  - `migrations/20260416095444700_seed-client-role-view-assignments.sql`
+    - Siembra `role_view_assignments` para 3 roles x 11 vistas (33 rows)
+    - `client_executive`: 11/11 granted
+    - `client_manager`: 11/11 granted
+    - `client_specialist`: 8/11 granted, 3 denied (analytics, campanas, equipo)
+  - `src/lib/admin/client-role-visibility.test.ts` — 8 tests que documentan la matriz
+  - `docs/architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` §3 actualizado
+- **Decision de diseno:** No se necesitan route groups nuevos. La infraestructura existente (view-access-store + canSeeView + hasAuthorizedViewCode) ya estaba cableada. Solo faltaban los datos.
+- **Impacto cruzado:** TASK-286 y TASK-303 desbloqueadas (updated blockers). TASK-402 y TASK-404 actualizados con path correcto.
+- **Post-deploy:** usuarios client_specialist deberan re-login para que el JWT refleje las nuevas asignaciones.
+
+---
+
+## Sesion 2026-04-16 — HR Leave corrige accrual Chile de primer año y self-heal de balances
+
+- **Estado:** `implemented localmente`, `migracion aplicada en shared dev DB`, `pendiente push/deploy staging`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/hr-core/postgres-leave-store.ts`
+    - la resolución de `leave_policy` ahora prioriza especificidad (`employment_type`, `pay_regime`, `contract_type`, `payroll_via`) en vez de depender del orden de lectura
+    - `policy-vacation-chile` deja de sembrar `15` automáticos durante el primer ciclo laboral; el allowance se accrualiza desde `hire_date`
+    - el seed de balances pasa de `ON CONFLICT DO NOTHING` a `ON CONFLICT DO UPDATE` para self-heal de `allowance_days`, `progressive_extra_days`, `carried_over_days` y `accumulated_periods`
+  - `src/lib/hr-core/leave-domain.ts`
+    - helper nuevo `calculateAccruedLeaveAllowanceDays()` para accrual del primer año
+  - `migrations/20260416094722775_task-416-hr-leave-chile-accrual-hardening.sql`
+    - alinea `greenhouse_hr.leave_policies.policy-vacation-chile` a `accrual_type = 'monthly_accrual'`
+  - `scripts/setup-postgres-hr-leave.sql`
+    - seed alineado al mismo contrato
+  - tests nuevos/actualizados:
+    - `src/lib/hr-core/leave-domain.test.ts`
+    - `src/lib/hr-core/postgres-leave-store.test.ts`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/hr-core/leave-domain.test.ts src/lib/hr-core/postgres-leave-store.test.ts`
+  - `pnpm exec eslint src/lib/hr-core/leave-domain.ts src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/leave-domain.test.ts src/lib/hr-core/postgres-leave-store.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm pg:connect:migrate`
+- **Dato operacional relevante:**
+  - el shared dev DB aplicó también una migración pendiente ajena ya presente en el workspace: `20260416095444700_seed-client-role-view-assignments`; no forma parte de este fix de leave, pero quedó registrada en `pgmigrations`
+- **Resultado esperado en staging una vez deployado:**
+  - Valentina Hoyos deja de ver `15` días completos de vacaciones antes de su aniversario laboral
+  - el admin detail y self-service deben resolver `policy-vacation-chile` en vez de la policy default derivada
+
+## Sesion 2026-04-16 — HR Leave UX split de saldos personales vs equipo en develop
+
+- **Estado:** `complete`, `pushed a develop`, `deploy staging en curso`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - la pestaña `Saldos` se separa en `Mis saldos` y `Saldos del equipo` para perfiles admin/HR
+    - la vista de equipo ya no renderiza un listado gigante `persona x tipo`
+    - nueva tabla resumida por colaborador con búsqueda, filtros de alertas y KPIs operativos
+    - nuevo drill-down por colaborador en dialog con detalle por tipo de permiso
+    - backfills, ajustes y reversión se ejecutan desde ese detalle sin perder trazabilidad
+  - `src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+    - tests admin actualizados al nuevo flujo `Saldos del equipo -> Ver detalle`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+  - `pnpm exec eslint src/views/greenhouse/hr-core/HrLeaveView.tsx src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas operativas:**
+  - el deploy de staging levantado desde `develop` corresponde al commit `70534687`
+  - sigue existiendo un cambio ajeno en `.claude/scheduled_tasks.lock`; no fue incluido
+
+## Sesion 2026-04-16 — TASK-415 HR leave admin balance visibility, backfill y ajustes manuales
+
+- **Estado:** `complete`, `validado con migracion + tests dirigidos + lint + build`
+- **Rama objetivo:** `task/TASK-415-hr-leave-balance-admin-backfill`
+- **Implementado:**
+  - migracion `20260416083541945_task-415-hr-leave-admin-backfill-adjustments.sql`
+    - nuevas columnas `applicable_contract_types` y `applicable_payroll_vias` en `greenhouse_hr.leave_policies`
+    - `leave_requests.source_kind`
+    - tabla auditable `greenhouse_hr.leave_balance_adjustments`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+    - resolver de policy endurecido con `contract_type + pay_regime + payroll_via + hire_date`
+    - `policyExplain` por saldo
+    - flows nuevos de `admin_backfill`, `list/create/reverse leave_balance_adjustments`
+    - correccion del movimiento de saldo para evitar doble multiplicacion en used/reserved deltas
+  - nuevas rutas:
+    - `POST /api/hr/core/leave/backfills`
+    - `GET/POST /api/hr/core/leave/adjustments`
+    - `POST /api/hr/core/leave/adjustments/[adjustmentId]/reverse`
+  - entitlements runtime nuevos:
+    - `hr.leave_balance`
+    - `hr.leave_backfill`
+    - `hr.leave_adjustment`
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+    - tabla admin de saldos por colaborador
+    - dialogo de backfill retroactivo
+    - dialogo de ajuste manual
+    - historial de ajustes con reversal
+    - badge de `Carga administrativa` para requests retroactivos
+- **Validacion ejecutada:**
+  - `pnpm pg:connect:migrate`
+  - `pnpm vitest run src/lib/hr-core/postgres-leave-store.test.ts src/lib/entitlements/runtime.test.ts src/app/api/hr/core/meta/route.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src` -> solo `src/lib/postgres/client.ts`
+- **Docs alineados:**
+  - `docs/documentation/hr/sistema-permisos-leave.md`
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+- **Notas operativas:**
+  - `docs/architecture/schema-snapshot-baseline.sql` sigue con drift respecto al DDL vivo de HR leave; para este dominio hay que contrastar siempre con migraciones y `scripts/setup-postgres-hr-leave.sql`
+  - el caso Chile interno indefinido ya no depende solo de moneda; la policy observable usa atributos laborales canonicos
+  - el backfill retroactivo se modela como request aprobada `source_kind='admin_backfill'`; el ajuste manual queda separado en ledger reversible
+  - existe un cambio ajeno en `.claude/scheduled_tasks.lock`; no pertenece a TASK-415
+
+## Sesion 2026-04-15 — TASK-403 entitlements runtime bridge para Pulse/Nexa
+
+- **Estado:** `implementado localmente`, `validado con lint + tests dirigidos + build`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/config/entitlements-catalog.ts`
+    - catálogo mínimo de módulos, capabilities, actions y scopes para la primera layer runtime
+  - `src/lib/entitlements/types.ts`
+  - `src/lib/entitlements/runtime.ts`
+    - helpers `getTenantEntitlements()`, `can()`, `canSeeModule()`
+    - derivación backward-compatible desde `roleCodes`, `routeGroups` y `authorizedViews`
+  - `src/lib/home/build-home-entitlements-context.ts`
+    - bridge compartido para Home/Nexa con `recommendedShortcuts`, `accessContext` y `canSeeFinanceStatus`
+  - `src/lib/home/get-home-snapshot.ts`
+  - `src/app/api/home/snapshot/route.ts`
+  - `src/app/api/home/nexa/route.ts`
+    - ambos consumers ya usan el mismo runtime bridge
+  - `src/views/greenhouse/home/components/RecommendedShortcuts.tsx`
+  - `src/views/greenhouse/home/HomeView.tsx`
+    - Pulse ahora expone shortcuts y contexto de acceso visible
+  - tests nuevos:
+    - `src/lib/entitlements/runtime.test.ts`
+    - `src/lib/home/build-home-entitlements-context.test.ts`
+- **Validación ejecutada:**
+  - `pnpm vitest run src/lib/entitlements/runtime.test.ts src/lib/home/build-home-entitlements-context.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - guardrail `new Pool()` confirmado solo en `src/lib/postgres/client.ts`
+- **Docs alineados:**
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Notas operativas:**
+  - no hubo migraciones DB en este corte
+  - `CAPABILITY_REGISTRY` sigue vivo para módulos capability-based; la layer de entitlements no lo reemplaza, lo complementa
+  - follow-on natural: `TASK-402` para la Home adaptativa completa y `TASK-404` para gobernanza admin de entitlements
+
 ## Sesion 2026-04-15 — ISSUE-049 leave review fix local + ISSUE-050 staging email drift identificada
 
 - **Estado:** `fix local aplicado para review`, `issue separado abierto para email staging`

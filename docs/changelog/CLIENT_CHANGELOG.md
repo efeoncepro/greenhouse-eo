@@ -42,6 +42,138 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.20
+
+**Canal:** Beta
+**Fecha:** 2026-04-17
+**Disponible para:** internal
+**Módulos:** Nexa / Pulse / Space 360 / People
+
+### Novedades
+
+- Sin surfaces nuevas en esta entrega; la mejora entra sobre las vistas actuales de `Nexa Insights`.
+
+### Mejoras
+
+- Las referencias a proyectos dentro de `Nexa Insights` ahora priorizan el nombre visible del proyecto cuando Greenhouse puede resolverlo desde el contexto real del Space.
+
+### Correcciones
+
+- `Pulse`, `Space 360` y `Person 360` ya no deberían mostrar UUIDs o IDs técnicos de proyecto dentro de narrativas y menciones de Nexa.
+- Cuando Greenhouse todavía no puede resolver el nombre del proyecto, Nexa degrada la referencia a una frase humana (`este proyecto`) en vez de exponer un identificador opaco.
+
+### Notas
+
+- Esta corrección reutiliza la infraestructura actual de `Nexa Insights`; no agrega rutas ni navegación nueva.
+
+## 2026.04-beta.19
+
+**Canal:** Beta
+**Fecha:** 2026-04-17
+**Disponible para:** internal
+**Módulos:** Admin Center / Identity / Home
+
+### Novedades
+
+- `Admin Center` ahora permite gobernar permisos granulares desde una sola surface: catálogo de capabilities, defaults por rol, excepciones por usuario y política de inicio.
+
+### Mejoras
+
+- `Admin Center > Usuarios > Acceso` ahora explica qué permisos tiene una persona y de dónde vienen, en vez de obligar a inferirlo desde roles, vistas y excepciones dispersas.
+- La política de `Home` y startup path ahora se puede ajustar desde Admin Center para casos puntuales sin tocar código.
+
+### Correcciones
+
+- La gobernanza de acceso ya no depende solo de cambios hardcodeados o ajustes manuales sobre la base de datos cuando hay que dar o retirar una capability puntual.
+
+### Notas
+
+- Esta entrega convive con el modelo actual de `roles`, `route groups` y `authorizedViews`; no lo reemplaza de una sola vez.
+
+## 2026.04-beta.18
+
+**Canal:** Beta
+**Fecha:** 2026-04-16
+**Disponible para:** internal
+**Módulos:** Nexa / Email Delivery / Leadership
+
+### Novedades
+
+- Liderazgo interno ahora recibe un resumen semanal de `Nexa Insights` cada lunes a las 7:00 AM con los hallazgos operativos más relevantes de la última semana.
+
+### Mejoras
+
+- El digest ordena los insights por impacto antes de priorizar calidad y frescura, para dejar primero lo verdaderamente urgente.
+- Las menciones a `Spaces` y `People` en la narrativa llegan con enlaces directos al portal para abrir contexto sin buscarlo a mano.
+
+### Correcciones
+
+- El resumen semanal ya no depende de abrir `Pulse` o `Agency > ICO Engine` para enterarse de los desvíos más importantes del período.
+
+### Notas
+
+- Esta entrega es interna y advisory-only.
+- El corte actual es `ICO-first`: resume insights ya materializados y no agrega cálculos nuevos por email.
+
+## 2026.04-beta.17
+
+**Canal:** Beta
+**Fecha:** 2026-04-16
+**Disponible para:** internal
+**Módulos:** Pulse / Nexa
+
+### Novedades
+
+- `Pulse` ahora destaca las 3 señales más críticas de `Nexa Insights` directamente en la landing de `/home`.
+
+### Mejoras
+
+- La home interna ya no obliga a entrar a `Agency > ICO Engine` para ver las alertas advisory más urgentes del período.
+- Las narrativas visibles en `Pulse` reutilizan la misma capa de contexto de `Nexa Insights`, incluyendo menciones navegables a `Space 360` y `People`.
+
+### Correcciones
+
+- Las señales destacadas de Home ahora respetan un orden operacional explícito: `critical`, luego `warning`, luego `info`, antes de priorizar calidad y frescura.
+
+### Notas
+
+- Este bloque sigue siendo advisory-only: no ejecuta acciones automáticas ni reemplaza la lectura detallada de `Agency > ICO Engine`.
+
+## 2026.04-beta.16
+
+**Canal:** Beta
+**Fecha:** 2026-04-16
+**Disponible para:** internal
+**Módulos:** HR / Permisos
+
+### Novedades
+
+- `Permisos` ahora permite a HR registrar vacaciones o ausencias ya tomadas cuando el periodo real no fue cargado antes en Greenhouse.
+- `Permisos` ahora incorpora ajustes manuales auditables de saldo para corregir arrastres o regularizaciones históricas.
+
+### Mejoras
+
+- `HR > Permisos` ahora hace más visible el saldo del equipo y el contexto de política con que se interpreta cada balance.
+- Las correcciones administrativas distinguen mejor entre un periodo real ya tomado y un ajuste contable de saldo.
+- En vacaciones Chile, el detalle de saldo ahora separa mejor acumulado del año, arrastre y saldo actual para evitar lecturas ambiguas durante el primer ciclo laboral.
+
+### Correcciones
+
+- `HR > Permisos` ya no expone decimales infinitos en saldos administrativos de vacaciones; los montos visibles quedan redondeados y explicados con mejor contexto.
+- `HR > Permisos` ahora muestra el avatar del colaborador en la vista de saldos del equipo cuando la identidad ya está resuelta en el portal.
+- El detalle administrativo del colaborador ya no confunde períodos retroactivos cargados por HR con ajustes manuales de saldo, y deja una lectura más clara de ambas cosas.
+- `HR > Permisos` ahora separa `Mis saldos` de `Saldos del equipo`, con búsqueda por colaborador, alertas operativas y detalle administrativo en vez de un listado plano difícil de operar.
+
+### Correcciones
+
+- Los cambios administrativos de vacaciones ya no quedan resumidos solo como un número agregado sin trazabilidad.
+- Los saldos de vacaciones para Chile interno dejan de sembrarse como `15` días completos cuando la persona todavía está en su primer ciclo laboral; el saldo visible ahora respeta mejor la fecha de ingreso.
+
+### Notas
+
+- Esta entrega está pensada para operación interna de HR/admin.
+- Cuando existen fechas reales, Greenhouse prioriza registrar el periodo tomado antes que inventar un ajuste manual.
+
 ## 2026.04-beta.15
 
 **Canal:** Beta

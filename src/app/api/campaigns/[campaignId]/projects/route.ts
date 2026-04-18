@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 
 import { ROLE_CODES } from '@/config/role-codes'
 import { requireTenantContext } from '@/lib/tenant/authorization'
-import { listCampaignProjects, addProjectToCampaign, getCampaign } from '@/lib/campaigns/campaign-store'
+import { addProjectToCampaign, listCampaignProjects } from '@/lib/campaigns/campaign-store'
+import { getCampaignForTenant } from '@/lib/campaigns/tenant-scope'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +19,16 @@ export async function GET(
 
   try {
     const { campaignId } = await params
+    const access = await getCampaignForTenant({ tenant, campaignId })
+
+    if (!access.ok && access.reason === 'not_found') {
+      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+    }
+
+    if (!access.ok) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const projects = await listCampaignProjects(campaignId)
 
     return NextResponse.json({ items: projects, total: projects.length })
@@ -53,15 +64,19 @@ export async function POST(
       return NextResponse.json({ error: 'projectSourceId is required' }, { status: 400 })
     }
 
-    const campaign = await getCampaign(campaignId)
+    const access = await getCampaignForTenant({ tenant, campaignId })
 
-    if (!campaign) {
+    if (!access.ok && access.reason === 'not_found') {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+    }
+
+    if (!access.ok) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const link = await addProjectToCampaign({
       campaignId,
-      spaceId: campaign.spaceId,
+      spaceId: access.campaign.spaceId,
       projectSourceId: body.projectSourceId,
       projectSourceSystem: body.projectSourceSystem
     })

@@ -9,6 +9,7 @@ import {
   readMemberCapacityEconomicsSnapshot,
   readMemberCapacityEconomicsTrend
 } from '@/lib/member-capacity-economics/store'
+import { readMemberAiLlmSummary } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 
 export const dynamic = 'force-dynamic'
 
@@ -149,11 +150,12 @@ export async function GET(
 
     const { year, month } = getCurrentSantiagoPeriod()
 
-    const [current, trend, currentEconomics, trendEconomics] = await Promise.all([
+    const [current, trend, currentEconomics, trendEconomics, nexaInsights] = await Promise.all([
       readPersonIntelligence(memberId, year, month),
       readPersonIntelligenceTrend(memberId, trendMonths),
       readMemberCapacityEconomicsSnapshot(memberId, year, month),
-      readMemberCapacityEconomicsTrend(memberId, trendMonths)
+      readMemberCapacityEconomicsTrend(memberId, trendMonths),
+      readMemberAiLlmSummary(memberId, year, month)
     ])
 
     const economicsByPeriod = new Map(
@@ -173,6 +175,7 @@ export async function GET(
       memberId,
       current: currentOverlay,
       trend: trendOverlay,
+      nexaInsights,
       meta: {
         source: currentOverlay?.source ?? 'person_intelligence',
         materializedAt: currentOverlay?.materializedAt ?? null,

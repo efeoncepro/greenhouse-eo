@@ -38,6 +38,14 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si el trabajo nace de una task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy), revisar obligatoriamente la arquitectura antes de implementar:
   - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
+- Si el trabajo toca permisos, navegacion, Home, menu, guards, surfaces por rol o diseño de nuevas capacidades:
+  - revisar `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - revisar `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+  - pensar y documentar la solucion sobre **ambos planos** del portal:
+    - `views` / `authorizedViews` / `view_code` como surface visible y proyeccion de UI
+    - `entitlements` / `capabilities` / `module + capability + action + scope` como autorizacion fina y direccion canonica
+  - no diseñar arquitectura o tasks nuevas asumiendo que `views` son la unica capa de acceso; tampoco saltarse las `views` cuando la feature requiere surface visible, menu, tabs, page guards o entrypoints
+  - `routeGroups` siguen resolviendo acceso broad y navegacion; `startup policy` sigue siendo un contrato separado de permisos
 - Si el trabajo toca el calendario operativo de Payroll, revisar `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `src/lib/calendar/operational-calendar.ts` y `src/lib/calendar/nager-date-holidays.ts`; la timezone canónica es IANA (`America/Santiago`) y los feriados nacionales se hidratan desde `Nager.Date` con overrides locales persistidos.
 - Si el cambio toca modelado de datos, sync, fuentes externas, PostgreSQL o BigQuery:
   - revisar `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
@@ -79,6 +87,10 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - cambio supuestos del proyecto
 - Si dos agentes pueden tocar la misma zona, prevalece el ultimo handoff documentado, no la memoria conversacional.
 - Si otro agente ya esta trabajando en el workspace actual y hace falta otra rama, **no cambiar la rama de ese checkout**; abrir un `git worktree` aislado. Fuente canonica: `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.
+- Cuando tomes un worktree pre-existente, NO correr `pnpm install` a ciegas. Verificar primero lockfile md5 vs `main`; reutilizar `node_modules`, y symlinkear `.env.local` / `.vercel/` si no existen. Detalle: [Higiene de worktree preexistente](docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md#higiene-de-worktree-preexistente).
+- Cuando dos PRs vayan a `develop` en paralelo, usar `git rebase --onto origin/develop <other-agent-commit>` para separar scope y `git push --force-with-lease` (nunca `--force` solo). Detalle: [Patrones de integración multi-agente](docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md#patrones-de-integración-multi-agente).
+- Si tu PR falla CI por un test que no tocaste, **no hacer admin override**. Triage: correr `pnpm test:coverage` local y revisar los últimos runs de `develop`. Si el flake es heredado, abrir `ISSUE-###` + PR separada de fix → merge → rebase tu PR original. Detalle: [CI como gate compartido](docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md#ci-como-gate-compartido).
+- Merge a `develop` es siempre **squash merge + delete branch**. `develop` no tiene branch protection, entonces `gh pr merge --auto` no funciona — usar background watcher (`until CI completed; gh pr merge --squash --delete-branch`). Detalle: [Merge policy canónica](docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md#merge-policy-canónica).
 
 ### 4. Regla de cambios minimos
 
@@ -127,6 +139,9 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `AGENTS.md` y `CLAUDE.md` dejan la regla operativa corta
   - `project_context.md` registra skills nuevas que cambian el contrato multi-agente
   - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` guarda la convención canónica para crear skills de Codex y Claude
+- Regla operativa adicional para agentes:
+  - cuando un agente redacte una task, un plan o una propuesta de arquitectura que toque acceso, debe explicitar si el cambio vive en `views`, en `entitlements`, o en ambos
+  - la ausencia de esa distincion debe tratarse como señal de diseño incompleto
 
 ### 8. Regla de line endings
 

@@ -86,6 +86,8 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
   - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+- Fuente canónica para trabajo multi-agente (Claude + Codex en paralelo):
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — incluye higiene de worktrees, `rebase --onto`, `force-push-with-lease`, CI como gate compartido, squash merge policy, background watcher pattern para auto-merge sin branch protection
 - Convenciones de skills locales:
   - Claude: `.claude/skills/<skill-name>/skill.md` (minuscula)
   - Codex: `.codex/skills/<skill-name>/SKILL.md` (mayuscula)
@@ -100,6 +102,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` — backbone 360 en Cloud SQL
 - `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` — desacople de Notion/HubSpot
 - `GREENHOUSE_IDENTITY_ACCESS_V2.md` — identidad y acceso (12/12 implementado)
+- `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` — modelo canónico de autorización: `routeGroups` + `authorizedViews` + entitlements capability-based + startup policy
 - `GREENHOUSE_EVENT_CATALOG_V1.md` — catálogo de eventos outbox
 - `GREENHOUSE_INTERNAL_IDENTITY_V1.md` — separación auth principal vs canonical identity
 - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — módulo Finance: P&L engine, dual-store, outbox, allocations
@@ -262,6 +265,17 @@ Contenido:
 
 - `docs/architecture/` → contratos técnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseño)
 - `docs/documentation/` → explicaciones funcionales para entender cómo funciona la plataforma (roles, flujos, reglas de negocio)
+
+### Heurística de acceso para agentes
+
+Cuando una solución toque permisos, navegación, menú, Home, tabs, guards o surfaces por rol, pensar siempre en los planos de acceso de Greenhouse al mismo tiempo:
+
+- `routeGroups` → acceso broad a workspaces o familias de rutas
+- `views` / `authorizedViews` / `view_code` → surface visible, menú, tabs, page guards y proyección de UI
+- `entitlements` / `capabilities` (`module + capability + action + scope`) → autorización fina y dirección canónica hacia adelante
+- `startup policy` → contrato separado para entrypoint/Home; no mezclarlo con permisos
+
+Regla: no diseñar una task o arquitectura nueva describiendo solo `views` si también hay autorización fina, y no describir solo `capabilities` si la feature además necesita una surface visible concreta.
 
 ## Conventions
 

@@ -202,7 +202,7 @@ La vista más importante. Cuando un Operations Lead abre un Space, debe ver todo
 
 ### 4.2 Economics Engine
 
-Reemplaza el placeholder actual. Construye P&L real por Space y por Service.
+La surface `/agency/economics` ya quedó activada en modo `space-first`. Construye P&L real por Space sobre serving materializado y deja el detalle económico por servicio como follow-up explícito.
 
 ```
 /agency/economics
@@ -227,11 +227,23 @@ Reemplaza el placeholder actual. Construye P&L real por Space y por Service.
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Backend:** Consume `GET /api/finance/dashboard/pnl` para totales y `getSpaceFinanceMetrics()` para per-space. Post TASK-069: lee `operational_pl_snapshots` materializado.
+**Backend real (2026-04-17):**
+- `GET /api/agency/economics`
+- reader dedicado `src/lib/agency/agency-economics.ts`
+- source principal `greenhouse_serving.operational_pl_snapshots` (`scope_type='space'`)
+- expansión por fila con contexto de `services`, sin `service_economics` fabricado antes de `TASK-146`
 
 ### 4.3 Team Capacity Engine
 
 De vista estática a motor de constraints.
+
+Runtime canónico desde `TASK-144`:
+
+- store: `src/lib/agency/team-capacity-store.ts`
+- contrato Agency: `GET /api/agency/team`
+- compatibilidad legacy:
+  - `GET /api/team/capacity-breakdown` queda como wrapper sobre el mismo store
+  - `GET /api/agency/capacity` deriva su overview legacy desde el mismo payload y deja de leer la lane BigQuery-first
 
 ```
 Capacidad como motor:
@@ -1641,7 +1653,13 @@ Cada componente nuevo coexiste con el viejo hasta que se valida:
 | Space redirect → Admin | Space 360 page | Space 360 como nueva ruta, redirect se mantiene en `/admin/tenants/[id]` | Space 360 tiene todos los tabs funcionales |
 | Economics placeholder | Economics API + view | Nuevo reemplaza placeholder directamente | API retorna datos reales |
 | Inline capacity queries | `TeamCapacityStore` | Store encapsula queries existentes, misma data | Store validado con tests |
-| `/api/campaigns` (global) | `/api/agency/campaigns` | Proxy: nuevo delega al viejo | Viejo eliminado después de 30 días |
+| `/api/campaigns` (global compartido por internal/client) | `/api/agency/campaigns` | Coexistencia: Agency consume el namespace nuevo; global sigue sirviendo `/campaigns` y `/campanas` | Revaluar cuando se cierre una estrategia de namespace unificado para Campaigns |
+
+Estado real 2026-04-17:
+
+- `GET/POST /api/agency/campaigns` y los sub-routes Agency ya existen como namespace dedicado para la surface `/agency/campaigns`.
+- `/api/campaigns/**` sigue vivo como runtime compartido de internal + client (`/campaigns`, `/campanas`) mientras dure la coexistencia.
+- La resolución tenant-safe de campañas debe hacerse por `space_id` real y subset `campaignScopes`; no por el atajo inválido `clientId -> spaceId`.
 
 ### Migration checklist por componente
 

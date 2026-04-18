@@ -8,6 +8,10 @@ import type {
   HrAttendanceRecord,
   HrAttendanceResponse,
   HrCoreMetadata,
+  HrLeaveBackfillInput,
+  HrLeaveBalanceAdjustmentInput,
+  HrLeaveBalanceAdjustmentReverseInput,
+  HrLeaveBalanceAdjustmentsResponse,
   HrLeaveCalendarResponse,
   HrDepartmentsResponse,
   HrLeaveBalance,
@@ -27,13 +31,17 @@ import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 import { assertHrCoreInfrastructureReady } from '@/lib/hr-core/schema'
 import {
+  createLeaveBackfillInPostgres,
+  createLeaveBalanceAdjustmentInPostgres,
   createLeaveRequestInPostgres,
   getHrCoreMetadataFromPostgres,
   getLeaveRequestByIdFromPostgres,
   isHrCoreLeavePostgresEnabled,
+  listLeaveBalanceAdjustmentsFromPostgres,
   listLeaveCalendarFromPostgres,
   listLeaveBalancesFromPostgres,
   listLeaveRequestsFromPostgres,
+  reverseLeaveBalanceAdjustmentInPostgres,
   reviewLeaveRequestInPostgres
 } from '@/lib/hr-core/postgres-leave-store'
 import { canPerformLeaveReviewAction, getLeaveApprovalStageCode } from '@/lib/hr-core/leave-review-policy'
@@ -71,6 +79,8 @@ import {
   toStringArray,
   toTimestampString
 } from '@/lib/hr-core/shared'
+import { roundLeaveDays } from '@/lib/hr-core/leave-domain'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import { getPeopleTableColumns } from '@/lib/people/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getSupervisorScopeForTenant } from '@/lib/reporting-hierarchy/access'
@@ -161,6 +171,8 @@ type LeaveBalanceRow = {
   balance_id: string | null
   member_id: string | null
   member_name: string | null
+  member_avatar_url: string | null
+  member_linked_user_id: string | null
   leave_type_code: string | null
   leave_type_name: string | null
   year: number | string | null
@@ -176,6 +188,7 @@ type LeaveRequestRow = {
   member_name: string | null
   member_email: string | null
   member_avatar_url: string | null
+  member_linked_user_id: string | null
   leave_type_code: string | null
   leave_type_name: string | null
   start_date: { value?: string } | string | null
@@ -216,6 +229,25 @@ type AttendanceRow = {
 const getProjectId = () => getHrCoreProjectId()
 
 const getCurrentYear = () => new Date().getUTCFullYear()
+
+const getLatestClientUsersByMemberQuery = (projectId: string) => `
+  LEFT JOIN (
+    SELECT member_id, user_id
+    FROM (
+      SELECT
+        member_id,
+        user_id,
+        ROW_NUMBER() OVER (
+          PARTITION BY member_id
+          ORDER BY active DESC, updated_at DESC, created_at DESC
+        ) AS row_num
+      FROM \`${projectId}.greenhouse.client_users\`
+      WHERE member_id IS NOT NULL
+    )
+    WHERE row_num = 1
+  ) AS linked_user
+    ON linked_user.member_id = m.member_id
+`
 
 const toDateStringFromAny = (value: string | Date | { value?: string } | null | undefined) => {
   if (!value) {
@@ -298,15 +330,19 @@ const mapLeaveType = (row: LeaveTypeRow): HrLeaveType => ({
 })
 
 const mapLeaveBalance = (row: LeaveBalanceRow): HrLeaveBalance => {
-  const allowanceDays = toNullableNumber(row.allowance_days) ?? 0
-  const carriedOverDays = toNullableNumber(row.carried_over_days) ?? 0
-  const usedDays = toNullableNumber(row.used_days) ?? 0
-  const reservedDays = toNullableNumber(row.reserved_days) ?? 0
+  const allowanceDays = roundLeaveDays(toNullableNumber(row.allowance_days) ?? 0)
+  const carriedOverDays = roundLeaveDays(toNullableNumber(row.carried_over_days) ?? 0)
+  const usedDays = roundLeaveDays(toNullableNumber(row.used_days) ?? 0)
+  const reservedDays = roundLeaveDays(toNullableNumber(row.reserved_days) ?? 0)
 
   return {
     balanceId: String(row.balance_id || ''),
     memberId: String(row.member_id || ''),
     memberName: normalizeNullableString(row.member_name),
+    memberAvatarUrl: resolveAvatarUrl(
+      normalizeNullableString(row.member_avatar_url),
+      normalizeNullableString(row.member_linked_user_id)
+    ),
     leaveTypeCode: String(row.leave_type_code || ''),
     leaveTypeName: String(row.leave_type_name || row.leave_type_code || ''),
     year: toInt(row.year),
@@ -314,7 +350,7 @@ const mapLeaveBalance = (row: LeaveBalanceRow): HrLeaveBalance => {
     carriedOverDays,
     usedDays,
     reservedDays,
-    availableDays: allowanceDays + carriedOverDays - usedDays - reservedDays
+    availableDays: roundLeaveDays(allowanceDays + carriedOverDays - usedDays - reservedDays)
   }
 }
 
@@ -322,7 +358,10 @@ const mapLeaveRequest = (row: LeaveRequestRow): HrLeaveRequest => ({
   requestId: String(row.request_id || ''),
   memberId: String(row.member_id || ''),
   memberName: normalizeNullableString(row.member_name),
-  memberAvatarUrl: normalizeNullableString(row.member_avatar_url),
+  memberAvatarUrl: resolveAvatarUrl(
+    normalizeNullableString(row.member_avatar_url),
+    normalizeNullableString(row.member_linked_user_id)
+  ),
   leaveTypeCode: String(row.leave_type_code || ''),
   leaveTypeName: String(row.leave_type_name || row.leave_type_code || ''),
   startDate: toDateString(row.start_date) || '',
@@ -678,6 +717,42 @@ const ensureYearBalances = async ({ memberId, year, actorUserId }: { memberId: s
   )
 }
 
+const listActiveMemberIdsForBalanceSeeding = async () => {
+  await assertHrCoreInfrastructureReady()
+  const projectId = getProjectId()
+
+  const rows = await runHrCoreQuery<{ member_id: string }>(
+    `
+      SELECT
+        m.member_id
+      FROM \`${projectId}.greenhouse.team_members\` AS m
+      WHERE COALESCE(m.active, TRUE) = TRUE
+      ORDER BY m.display_name ASC, m.member_id ASC
+    `,
+    {}
+  )
+
+  return rows.map(row => row.member_id).filter(Boolean)
+}
+
+const ensureYearBalancesForAllActiveMembers = async ({
+  year,
+  actorUserId
+}: {
+  year: number
+  actorUserId: string
+}) => {
+  const memberIds = await listActiveMemberIdsForBalanceSeeding()
+
+  for (const memberId of memberIds) {
+    await ensureYearBalances({
+      memberId,
+      year,
+      actorUserId
+    })
+  }
+}
+
 const getBalanceRow = async ({ memberId, leaveTypeCode, year }: { memberId: string; leaveTypeCode: string; year: number }) => {
   const projectId = getProjectId()
 
@@ -759,6 +834,7 @@ const getLeaveRequestByIdInternal = async (requestId: string) => {
         m.display_name AS member_name,
         m.email AS member_email,
         m.avatar_url AS member_avatar_url,
+        linked_user.user_id AS member_linked_user_id,
         r.leave_type_code,
         lt.leave_type_name,
         r.start_date,
@@ -777,6 +853,7 @@ const getLeaveRequestByIdInternal = async (requestId: string) => {
       FROM \`${projectId}.greenhouse.leave_requests\` AS r
       LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
         ON m.member_id = r.member_id
+      ${getLatestClientUsersByMemberQuery(projectId)}
       LEFT JOIN \`${projectId}.greenhouse.team_members\` AS supervisor
         ON supervisor.member_id = r.supervisor_member_id
       LEFT JOIN \`${projectId}.greenhouse.leave_types\` AS lt
@@ -1242,6 +1319,11 @@ export const listLeaveBalances = async ({
         year: effectiveYear,
         actorUserId: tenant.userId
       })
+    } else if (isHrAdminTenant(tenant)) {
+      await ensureYearBalancesForAllActiveMembers({
+        year: effectiveYear,
+        actorUserId: tenant.userId
+      })
     }
 
     const projectId = getProjectId()
@@ -1261,6 +1343,8 @@ export const listLeaveBalances = async ({
           b.balance_id,
           b.member_id,
           m.display_name AS member_name,
+          m.avatar_url AS member_avatar_url,
+          linked_user.user_id AS member_linked_user_id,
           b.leave_type_code,
           lt.leave_type_name,
           b.year,
@@ -1271,6 +1355,7 @@ export const listLeaveBalances = async ({
         FROM \`${projectId}.greenhouse.leave_balances\` AS b
         LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
           ON m.member_id = b.member_id
+        ${getLatestClientUsersByMemberQuery(projectId)}
         LEFT JOIN \`${projectId}.greenhouse.leave_types\` AS lt
           ON lt.leave_type_code = b.leave_type_code
         WHERE ${filters.join(' AND ')}
@@ -1285,7 +1370,7 @@ export const listLeaveBalances = async ({
       balances,
       summary: {
         memberCount: new Set(balances.map(balance => balance.memberId)).size,
-        totalAvailableDays: balances.reduce((sum, balance) => sum + balance.availableDays, 0)
+        totalAvailableDays: roundLeaveDays(balances.reduce((sum, balance) => sum + balance.availableDays, 0))
       }
     }
   }
@@ -1344,6 +1429,7 @@ export const listLeaveRequests = async ({
           m.display_name AS member_name,
           m.email AS member_email,
           m.avatar_url AS member_avatar_url,
+          linked_user.user_id AS member_linked_user_id,
           r.leave_type_code,
           lt.leave_type_name,
           r.start_date,
@@ -1362,6 +1448,7 @@ export const listLeaveRequests = async ({
         FROM \`${projectId}.greenhouse.leave_requests\` AS r
         LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
           ON m.member_id = r.member_id
+        ${getLatestClientUsersByMemberQuery(projectId)}
         LEFT JOIN \`${projectId}.greenhouse.team_members\` AS supervisor
           ON supervisor.member_id = r.supervisor_member_id
         LEFT JOIN \`${projectId}.greenhouse.leave_types\` AS lt
@@ -1598,7 +1685,7 @@ export const createLeaveRequest = async ({
           notes: normalizeNullableString(input.notes),
           createdAt: null
         },
-        reservedDelta: requestedDays,
+        reservedDelta: 1,
         usedDelta: 0,
         actorUserId
       })
@@ -1694,7 +1781,7 @@ export const reviewLeaveRequest = async ({
       if (request.requestedDays > 0) {
         await adjustBalanceForRequest({
           request,
-          reservedDelta: -request.requestedDays,
+          reservedDelta: -1,
           usedDelta: 0,
           actorUserId
         })
@@ -1722,7 +1809,7 @@ export const reviewLeaveRequest = async ({
       if (action === 'reject' && request.requestedDays > 0) {
         await adjustBalanceForRequest({
           request,
-          reservedDelta: -request.requestedDays,
+          reservedDelta: -1,
           usedDelta: 0,
           actorUserId
         })
@@ -1752,8 +1839,8 @@ export const reviewLeaveRequest = async ({
       if (request.requestedDays > 0) {
         await adjustBalanceForRequest({
           request,
-          reservedDelta: -request.requestedDays,
-          usedDelta: action === 'approve' ? request.requestedDays : 0,
+          reservedDelta: -1,
+          usedDelta: action === 'approve' ? 1 : 0,
           actorUserId
         })
       }
@@ -1806,6 +1893,77 @@ export const reviewLeaveRequest = async ({
     operation: 'reviewLeaveRequest',
     postgres: () => reviewLeaveRequestInPostgres({ tenant, requestId, input, actorUserId }),
     fallback
+  })
+}
+
+export const createLeaveBackfill = async ({
+  tenant,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  input: HrLeaveBackfillInput
+  actorUserId: string
+}) => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    throw new HrCoreValidationError('Leave backfills require the PostgreSQL HR leave runtime.', 503)
+  }
+
+  return createLeaveBackfillInPostgres({ tenant, input, actorUserId })
+}
+
+export const listLeaveBalanceAdjustments = async ({
+  tenant,
+  memberId,
+  year
+}: {
+  tenant: TenantContext
+  memberId?: string | null
+  year?: number | null
+}): Promise<HrLeaveBalanceAdjustmentsResponse> => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    throw new HrCoreValidationError('Leave adjustments require the PostgreSQL HR leave runtime.', 503)
+  }
+
+  return listLeaveBalanceAdjustmentsFromPostgres({ tenant, memberId, year })
+}
+
+export const createLeaveBalanceAdjustment = async ({
+  tenant,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  input: HrLeaveBalanceAdjustmentInput
+  actorUserId: string
+}) => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    throw new HrCoreValidationError('Leave adjustments require the PostgreSQL HR leave runtime.', 503)
+  }
+
+  return createLeaveBalanceAdjustmentInPostgres({ tenant, input, actorUserId })
+}
+
+export const reverseLeaveBalanceAdjustment = async ({
+  tenant,
+  adjustmentId,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  adjustmentId: string
+  input: HrLeaveBalanceAdjustmentReverseInput
+  actorUserId: string
+}) => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    throw new HrCoreValidationError('Leave adjustments require the PostgreSQL HR leave runtime.', 503)
+  }
+
+  return reverseLeaveBalanceAdjustmentInPostgres({
+    tenant,
+    adjustmentId,
+    input,
+    actorUserId
   })
 }
 

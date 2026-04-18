@@ -1,5 +1,57 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-17 — Nexa Insights preserva historial advisory con archive append-only
+
+- Nuevo archivo `greenhouse_serving.ico_ai_signal_enrichment_history` para conservar cada corrida LLM sin sobrescribirla
+- `readAgencyAiLlmTimeline(limit=20)` y los timelines scoped ahora leen desde historial deduplicado por `enrichment_id`, no desde `greenhouse_serving.ico_ai_signal_enrichments`
+- `readMemberAiLlmSummary` y `readSpaceAiLlmSummary` exponen contrato explícito `summarySource + activeAnalyzed + historicalAnalyzed + activePreview + historicalPreview`; la selección de insights visibles deja de depender de fallback implícito
+- `src/lib/nexa/digest/build-weekly-digest.ts` consume el mismo historial deduplicado para no perder advisories cuando cambian las anomalías del período
+- Se agrega replay histórico `historyOnly` con `asOfTime` en `materializeAiLlmEnrichments()` y script operativo `scripts/backfill-ico-llm-history.ts`
+
+## Delta 2026-04-17 — Nexa Insights gana vista Historial (timeline cross-period) sobre el mismo serving layer
+
+- Reader nuevo: `readAgencyAiLlmTimeline(limit=20)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` — SELECT sin filtro de período sobre el historial advisory deduplicado, ordenado por `processed_at DESC`, status='succeeded' only
+- `readAgencyAiLlmSummary` fetchea current-period + timeline en paralelo (Promise.all) — sin impacto de latencia percibido
+- `AgencyAiLlmSummary.timeline: AgencyAiLlmSummaryItem[]` — extensión retrocompatible del contrato
+- UI: `NexaInsightsBlock` incorpora toggle Recientes/Historial (solo visible si hay timeline data); nueva `NexaInsightsTimeline.tsx` agrupa por día con MUI Lab Timeline
+- Superficies beneficiadas sin cambios adicionales: Agency tab=ico (vía `IcoAdvisoryBlock`). Home y 360 opt-in cuando el caller provea `timelineInsights`
+- Contrato advisory-only intacto: la vista Historial consume enrichments ya materializados, no reprocesa signals
+
+## Delta 2026-04-17 — TASK-446 surfaces `rootCauseNarrative` end-to-end en Nexa Insights + Weekly Digest
+
+`TASK-446` cierra el gap dormido de la lane advisory: el LLM ya emitía `rootCauseNarrative` distinto de `explanationSummary` (ver prompt en `src/lib/ico-engine/ai/llm-types.ts:112-114`), la columna `root_cause_narrative` vivía en `greenhouse_serving.ico_ai_signal_enrichments` y `greenhouse_serving.finance_ai_signal_enrichments`, y además ya pasaba por `sanitizeProjectNarrative` antes del write. El reader la descartaba en todas las superficies.
+
+- **Readers ICO:** `src/lib/ico-engine/ai/llm-enrichment-reader.ts` selecciona ahora `root_cause_narrative` en `readTopAiLlmEnrichments`, `readMemberAiLlmSummary`, `readSpaceAiLlmSummary` y lo propaga vía `mapSummaryItem`, `mapOrganizationItem`, `mapTopItem`, `mapMemberInsightItem`, `mapSpaceInsightItem`
+- **Reader Finance:** `src/lib/finance/ai/llm-enrichment-reader.ts` lo selecciona en `readFinanceAiLlmSummary` y `readClientFinanceAiLlmSummary`
+- **Tipos:** `AgencyAiLlmSummaryItem`, `OrganizationAiLlmEnrichmentItem`, `TopAiLlmEnrichmentItem`, `MemberNexaInsightItem`, `SpaceNexaInsightItem` y `FinanceNexaInsightItem` declaran `rootCauseNarrative: string | null`
+- **UI:** nuevo componente `src/components/greenhouse/NexaInsightRootCauseSection.tsx` con toggle colapsable global (localStorage key `nexa.insights.rootCause.expanded`), ARIA (`aria-expanded`, `aria-controls`, `role=region`) y keyboard (Enter/Space); `NexaInsightsBlock` lo renderiza entre `explanation` y `recommendedAction` cuando existe narrativa
+- **Copy:** `GH_NEXA.insights_root_cause_label` / `_expand` / `_collapse` centralizan microcopy
+- **Weekly Digest:** `src/lib/nexa/digest/build-weekly-digest.ts` selecciona `enrich.root_cause_narrative` y produce `rootCauseNarrative?: WeeklyDigestNarrativePart[]` via `parseNarrativeText` (mentions `@[Name](type:id)` → links); `src/emails/WeeklyExecutiveDigestEmail.tsx` renderiza bloque "Causa probable" con `EMAIL_COLORS.primary` border cuando el campo viene poblado
+- **Backward compat:** campo opcional en el contrato UI; ausente o vacío → sección no renderiza; no hay cambios al prompt ni al write path
+- **Contrato:** ambas narrativas (`explanationSummary` + `rootCauseNarrative`) quedan formalmente expuestas; los agentes consumers pueden asumir que la causa raíz está disponible cuando el enrichment fue producido con `ico_signal_enrichment_v4` o `finance_signal_enrichment_v1`
+
+## Delta 2026-04-16 — TASK-242 surfaces space-scoped Nexa insights in Space 360
+
+`TASK-242` cierra el consumer space-level de la lane advisory del ICO Engine sin abrir storage nuevo ni recalcular señales fuera del engine.
+
+- **Reader space-scoped:** `src/lib/ico-engine/ai/llm-enrichment-reader.ts` ahora expone `readSpaceAiLlmSummary(spaceId, periodYear, periodMonth, limit)` sobre `greenhouse_serving.ico_ai_signal_enrichments`
+- **Filtro canónico:** `space_id + period_year + period_month`, lista visible solo con `status='succeeded'`
+- **Ranking:** `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+- **Space 360:** `src/lib/agency/space-360.ts` incorpora `nexaInsights` al snapshot `Space360Detail`
+- **UI visible:** `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx` renderiza `NexaInsightsBlock` al inicio del Overview real
+- **Contrato:** Space 360 consume enrichments ya materializados por `ICO Engine -> Gemini -> serving`; no crea señales nuevas ni abre una route paralela
+
+## Delta 2026-04-16 — TASK-243 surfaces member-scoped Nexa insights in Person 360
+
+`TASK-243` cierra el primer consumer person-level de la lane advisory del ICO Engine sin abrir storage nuevo ni recalcular señales fuera del engine.
+
+- **Reader member-scoped:** `src/lib/ico-engine/ai/llm-enrichment-reader.ts` ahora expone `readMemberAiLlmSummary(memberId, periodYear, periodMonth, limit)` sobre `greenhouse_serving.ico_ai_signal_enrichments`
+- **Filtro canónico:** `member_id + period_year + period_month`, lista visible solo con `status='succeeded'`
+- **Ranking:** `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+- **Person 360:** `GET /api/people/[memberId]/intelligence` incorpora `nexaInsights` al snapshot del miembro
+- **UI visible:** `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` renderiza `NexaInsightsBlock` al inicio de la surface `activity`
+- **Contrato:** Person 360 consume enrichments ya materializados por `ICO Engine -> Gemini -> serving`; no crea señales nuevas ni reabre tabs legacy
+
 ## Delta 2026-04-05 — ICO Engine performance fallback chain fix + delivery projection consumer
 
 Diagnóstico y resolución del error "Column name created_at is ambiguous" que impedía cargar el tab ICO Engine.

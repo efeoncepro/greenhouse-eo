@@ -5,8 +5,9 @@ import {
   type HubSpotGreenhouseCreateQuoteRequest
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
+import { resolveQuotationIdentity } from '@/lib/finance/pricing'
+import { publishQuoteCreated } from '@/lib/commercial/quotation-events'
 
 // ── Types ──
 
@@ -168,6 +169,7 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
   // 5. Persist locally + publish outbox event in a transaction
   const totalAmount = lineItems.reduce((sum, li) => sum + li.quantity * li.unitPrice, 0)
   const status = resolveOutboundStatus(publishImmediately)
+  const persistedQuoteId = hubspotQuoteId ? `QUO-HS-${hubspotQuoteId}` : quoteId
 
   await withGreenhousePostgresTransaction(async client => {
     await client.query(
@@ -183,9 +185,24 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
         'CLP', $8, $8, $9,
         'hubspot', $10, $11, NOW(),
         NOW(), NOW()
-      )`,
+      )
+      ON CONFLICT (quote_id) DO UPDATE SET
+        client_id = EXCLUDED.client_id,
+        organization_id = EXCLUDED.organization_id,
+        client_name = EXCLUDED.client_name,
+        quote_number = EXCLUDED.quote_number,
+        due_date = EXCLUDED.due_date,
+        description = EXCLUDED.description,
+        total_amount = EXCLUDED.total_amount,
+        total_amount_clp = EXCLUDED.total_amount_clp,
+        status = EXCLUDED.status,
+        source_system = EXCLUDED.source_system,
+        hubspot_quote_id = EXCLUDED.hubspot_quote_id,
+        hubspot_deal_id = EXCLUDED.hubspot_deal_id,
+        hubspot_last_synced_at = NOW(),
+        updated_at = NOW()`,
       [
-        quoteId, space.client_id, organizationId, clientName,
+        persistedQuoteId, space.client_id, organizationId, clientName,
         hubspotQuoteNumber, expirationDate, title,
         totalAmount, status,
         hubspotQuoteId, dealId || null
@@ -205,19 +222,21 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
           created_at, updated_at
         ) VALUES ($1, $2, 'hubspot', $3, $4, $5, $6, $7, $8, NOW(), NOW())`,
         [
-          liId, quoteId, i + 1,
+          liId, persistedQuoteId, i + 1,
           li.name, li.description || null,
           li.quantity, li.unitPrice, li.quantity * li.unitPrice
         ]
       )
     }
 
-    await publishOutboxEvent({
-      aggregateType: AGGREGATE_TYPES.quote,
-      aggregateId: quoteId,
-      eventType: EVENT_TYPES.quoteCreated,
-      payload: {
-        quoteId,
+    await syncCanonicalFinanceQuote({ quoteId: persistedQuoteId, client })
+
+    const identity = await resolveQuotationIdentity(persistedQuoteId).catch(() => null)
+
+    await publishQuoteCreated(
+      {
+        quoteId: persistedQuoteId,
+        quotationId: identity?.quotationId ?? null,
         hubspotQuoteId,
         hubspotDealId: dealId || null,
         sourceSystem: 'hubspot',
@@ -227,13 +246,14 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
         amount: totalAmount,
         currency: 'CLP',
         lineItemCount: lineItems.length
-      }
-    }, client)
+      },
+      client
+    )
   })
 
   return {
     success: true,
-    quoteId,
+    quoteId: persistedQuoteId,
     hubspotQuoteId,
     hubspotQuoteNumber,
     hubspotQuoteLink,

@@ -4,9 +4,10 @@ import {
   getHubSpotGreenhouseQuoteLineItems,
   type HubSpotGreenhouseLineItemProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
+import { resolveQuotationIdentity } from '@/lib/finance/pricing'
+import { publishQuoteLineItemsSynced } from '@/lib/commercial/quotation-events'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 // ── Resolve product_id from hubspot_product_id ──
 
@@ -130,16 +131,16 @@ export const syncQuoteLineItems = async (
   }
 
   if (result.created > 0 || result.updated > 0) {
-    await publishOutboxEvent({
-      aggregateType: AGGREGATE_TYPES.quoteLineItem,
-      aggregateId: quoteId,
-      eventType: EVENT_TYPES.quoteLineItemSynced,
-      payload: {
-        quoteId,
-        hubspotQuoteId,
-        created: result.created,
-        updated: result.updated
-      }
+    await syncCanonicalFinanceQuote({ quoteId })
+
+    const identity = await resolveQuotationIdentity(quoteId).catch(() => null)
+
+    await publishQuoteLineItemsSynced({
+      quoteId,
+      quotationId: identity?.quotationId ?? null,
+      hubspotQuoteId,
+      created: result.created,
+      updated: result.updated
     })
   }
 

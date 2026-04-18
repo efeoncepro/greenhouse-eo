@@ -1,6 +1,300 @@
 # changelog.md
 
+## 2026-04-17
+
+### 2026-04-17 — Quotation workspace: builder canónico, health card y PDF client-safe (TASK-349)
+
+- `QuoteCreateDrawer` nuevo (modo "Desde cero" / "Desde template") reemplaza al drawer HubSpot-only como acción primaria; HubSpot queda como acción secundaria. El POST `/api/finance/quotes` acepta `templateId` opcional, hereda defaults del template, inserta line items y siembra terms vía `seedQuotationDefaultTerms`. Publica `commercial.quotation.template_used`.
+- `QuoteDetailView` gana `QuoteHealthCard` (margen efectivo + target + piso + alertas) y botones de header: "Descargar PDF", "Enviar" (dialog contextual con health + steps pendientes), "Guardar como template" (solo drafts). `QuoteLineItemsEditor` listo para integrar en drafts.
+- Endpoints nuevos: `GET /api/finance/quotes/[id]/pdf` renderiza un PDF client-safe via `@react-pdf/renderer` (el input TS excluye costos/márgenes — firewall estructural, no solo runtime). `POST /send` transiciona draft→sent/pending_approval según health check. `POST /save-as-template` copia line items (strip `member_id`) + terms incluidos a un `quote_templates` nuevo.
+- List view incluye columnas Versión + Margen con chips de salud (verde/ámbar/rojo).
+- Smoke E2E contra dev DB: PDF 1 página 3665 bytes OK; `/send` transición `draft→sent` + health snapshot OK.
+- Doc arch `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.6.
+
+### 2026-04-17 — Blindaje de `password_hash`: ningún batch/sync puede volver a rotar credenciales silenciosamente
+
+- TASK-451 resuelve ISSUE-053: un cron a las 08:00 UTC había reescrito el hash de Julio en la DB de dev y lo había dejado sin login con credentials en staging. Prod y staging comparten la misma DB, así que el hecho de que prod siguiera aceptando el login se atribuye a JWT de sesión ya emitido (NextAuth no re-valida hash por request) — queda como hipótesis de observable si recurre.
+- Migration `20260417165907294_task-451-password-hash-mutation-guard.sql` instala `greenhouse_core.guard_password_hash_mutation()` + trigger `client_users_password_guard`. Cualquier `UPDATE` que intente cambiar `password_hash` sin que la transacción setee `app.password_change_authorized='true'` falla loud con `P0001`.
+- Helper `withPasswordChangeAuthorization` en `src/lib/identity/password-mutation.ts` envuelve los writes legítimos, setea el session var, ejecuta el UPDATE y publica `identity.password_hash.rotated` al outbox para observabilidad.
+- `/api/account/reset-password` y `/api/account/accept-invite` migrados al helper. `scripts/backfill-postgres-identity-v2.ts` deja de leer y escribir `password_hash` + `password_hash_algorithm` — los campos se removieron del SELECT de BigQuery y del UPDATE de PG.
+- Tests: 5 nuevos unit tests para el helper, 1337 tests totales passing. Smoke en dev DB confirmó que el trigger bloquea writes sin session var y deja pasar los autorizados.
+
+### 2026-04-17 — Quotation gana gobernanza enterprise: versiones, aprobaciones, términos, templates y audit
+
+- TASK-348 entrega 7 tablas nuevas en `greenhouse_commercial` (`approval_policies`, `approval_steps`, `quotation_audit_log`, `terms_library`, `quotation_terms`, `quote_templates`, `quote_template_items`) vía `20260417140553325_task-348-quotation-governance-runtime.sql`.
+- Approval por excepción conectado al discount health de TASK-346: al intentar enviar, se evalúan las policies activas y se crean steps en orden; el Account Lead sólo necesita aprobación cuando margen/monto/descuento disparan una regla.
+- Nuevas versiones clonan line items + snapshot jsonb + diff automático vs la versión anterior, y dejan la cotización en `draft`. El audit_log registra cambios atómicos con actor, versión y detalle.
+- Library de términos con `body_template` y variables `{{payment_terms_days}}`, `{{valid_until}}`, etc., aplicados al crear la quote y editables manteniendo el texto resuelto como snapshot inmutable.
+- Templates reutilizables con line items default, terms precargados y usage_count — listos para disparar `commercial.quotation.template_used/saved` al aplicarse.
+- 8 nuevos events outbox bajo `commercial.quotation.*` (version_created, approval_requested/decided, sent, approved, rejected, template_used/saved). QuoteDetailView ahora tiene tabs General / Versiones / Aprobaciones / Términos / Auditoría.
+
+### 2026-04-17 — Nexa Insights deja de perder historial semanal al cambiar el set actual de anomalías
+
+- Se agrega `greenhouse_serving.ico_ai_signal_enrichment_history` como archivo append-only de enrichments LLM; `ico_ai_signal_enrichments` se mantiene como snapshot current-state.
+- Los timelines de Agency, Home, Space 360 y Person 360 pasan a leer historial deduplicado por `enrichment_id`, así que una señal que desaparece del mes actual sigue viva en Historial.
+- El weekly digest ahora se arma desde ese historial deduplicado y ya no depende solo del snapshot vigente.
+- Los summary readers de Person 360 y Space 360 ahora exponen contrato explícito `summarySource + activeAnalyzed + historicalAnalyzed + activePreview + historicalPreview`; cuando el período no tiene signals activas, la surface muestra historial recuperado sin depender de un fallback implícito.
+- Se agrega replay histórico `historyOnly` con `asOfTime` y script `scripts/backfill-ico-llm-history.ts`; se recuperó el tramo replayable de abril 2026 (`2026-04-15` a `2026-04-17`) y quedó confirmado que `2026-04-01` a `2026-04-10 13:17 UTC` ya no es recuperable vía BigQuery time travel.
+
+### 2026-04-17 — Nexa Insights: Historial extendido a Home, Space 360 y Person 360
+
+- Las 4 superficies Nexa (Agency, Home, Space 360, Person 360) ahora tienen toggle Recientes/Historial.
+- Cada timeline está scoped al contexto: Home ve todo el sistema, Space 360 solo ese space, Person 360 solo ese miembro.
+- Nuevos readers `readMemberAiLlmTimeline` y `readSpaceAiLlmTimeline` con el mismo patrón que el agency-wide, fetcheados en paralelo dentro de los summary readers existentes — sin impacto de latencia.
+- `MemberNexaInsightItem` / `SpaceNexaInsightItem` / `HomeNexaInsightItem` ahora requieren `processedAt`; los payloads incluyen `timeline: Item[]`.
+
+### 2026-04-17 — Nexa Insights gana modo Historial (timeline cross-period)
+
+- `NexaInsightsBlock` incorpora un toggle Recientes/Historial en su header. La vista Historial muestra las últimas 20 señales succeeded del sistema ordenadas cronológicamente y agrupadas por día ("Hoy", "Ayer", fecha absoluta).
+- Habilita responder la pregunta "¿cuántas señales tuvimos esta semana vs. el promedio?" sin salir del bloque — el operador ve la cadencia real sin consultar PG.
+- Backend: nuevo reader `readAgencyAiLlmTimeline(limit=20)` sin filtro de período. `readAgencyAiLlmSummary` fetchea current-period + timeline en paralelo (Promise.all) — sin latencia añadida.
+- UI: nuevo componente `NexaInsightsTimeline.tsx` con MUI Lab `Timeline`, severity dots, reuso de `NexaMentionText` y `NexaInsightRootCauseSection` para coherencia con vista Recientes.
+- El toggle solo aparece cuando `timelineInsights` viene con data (backward compatible). Modo default sigue siendo "Recientes" — sin regresión visual.
+- Surfaces beneficiadas: `/agency?tab=ico` vía `IcoAdvisoryBlock`. Home/360 pueden opt-in cuando el caller pase el prop.
+
+### 2026-04-17 — Nexa Insights: fix mapping para surface real de `rootCauseNarrative`
+
+- Tres mappers (`IcoAdvisoryBlock`, `get-home-snapshot`, `HomeNexaInsightItem`) no propagaban el campo `rootCauseNarrative` desde los readers canónicos a la UI. El bloque "Ver causa raíz" quedaba invisible en `/agency` y `/home` aunque la data estaba poblada (15/15 enrichments tenían el campo).
+- `NexaInsightItem.rootCauseNarrative` pasó de opcional a required nullable (`string | null`) para que TypeScript flaggee cualquier consumer futuro que lo omita.
+- Finance Dashboard ya funcionaba correcto porque hace cast directo del JSON API al tipo — no requirió fix.
+
+### 2026-04-17 — Patrones multi-agente documentados en modelo operativo canónico
+
+- `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` incorpora 4 secciones nuevas aprendidas en la sesión paralela Claude (TASK-446) + Codex (TASK-345):
+  - **Higiene de worktree preexistente** — checklist `md5sum pnpm-lock.yaml`, `diff package.json`, symlinks `.env.local` / `.vercel/`, cleanup de `.next-local/build-*`. Evita `pnpm install` innecesario cuando el worktree heredado ya está consistente.
+  - **Patrones de integración multi-agente** — `git rebase --onto origin/develop <other-agent-commit>` para separar scope, `git push --force-with-lease` (nunca `--force` solo), hotspots de conflict recurrentes (`Handoff.md`, `changelog.md`, `docs/tasks/README.md`, `TASK_ID_REGISTRY.md`, `docs/issues/README.md`), rebase cascading cuando develop avanza durante el CI.
+  - **CI como gate compartido** — protocolo de triage antes de asumir culpa (local vs runs previos en develop), regla "no admin override por flake heredado", ISSUE-### + PR separada de fix → merge → rebase PR original. Ejemplo canónico: ISSUE-052.
+  - **Merge policy canónica** — squash merge obligatorio, `gh pr merge --auto` nativo no funciona por ausencia de branch protection en develop, background watcher `until CI completed; gh pr merge --squash --delete-branch`, caveat de checkout local fallando cuando otro worktree tiene develop.
+- `AGENTS.md` Regla 3 (coordinación entre agentes) y `CLAUDE.md` Key Docs agregan pointers directos a las nuevas secciones.
+
+### 2026-04-17 — TASK-446: Nexa Insights expone `rootCauseNarrative` en UI, Weekly Digest y API
+
+- La narrativa causal (distinta al resumen del impacto) que Gemini ya generaba deja de descartarse en el serving layer.
+- Superficies nuevas: `NexaInsightsBlock` renderiza una sección colapsable "Causa raíz" entre la explicación y la acción sugerida; el toggle persiste en `localStorage['nexa.insights.rootCause.expanded']` como preferencia global del operador.
+- Weekly Executive Digest (email) ahora incluye un bloque secundario "Causa probable" por insight cuando el campo está poblado, con mentions parseadas.
+- Readers que ahora propagan el campo: `readAgencyAiLlmSummary`, `readOrganizationAiLlmEnrichments`, `readTopAiLlmEnrichments`, `readMemberAiLlmSummary`, `readSpaceAiLlmSummary`, `readFinanceAiLlmSummary`, `readClientFinanceAiLlmSummary`.
+- No cambios al prompt ni a las tablas: `ico_signal_enrichment_v4` y `finance_signal_enrichment_v1` ya emitían la narrativa; la columna `root_cause_narrative` ya existía en ambas tablas serving.
+- Enrichments antiguos (sin el campo) siguen funcionando sin regresión: la sección UI no aparece y el digest omite el bloque.
+- Fix incidental: error de tipos pre-existente en `src/lib/campaigns/tenant-scope.test.ts` (spread sobre vi.fn con implementación no-arg) queda resuelto.
+
+### 2026-04-17 — TASK-345: Quotations ya tiene bridge canónico materializado sin romper Finance
+
+- Nace físicamente el schema `greenhouse_commercial` con `product_catalog`, `quotations`, `quotation_versions` y `quotation_line_items`.
+- `Finance > Cotizaciones` no cambia de surface ni de payload visible, pero sus APIs ya leen vía façade canónica en vez de depender solo de `greenhouse_finance.*`.
+- Los writers actuales de HubSpot y Nubox siguen usando el lane Finance por compatibilidad, pero ahora sincronizan también el anchor canónico.
+- El bridge materializa `space_id` para quotations y deja trazabilidad de resolución (`space_resolution_source`) sobre una lane que antes era solo `organization/client-first`.
+- La generación outbound de quotes HubSpot deja de persistir IDs sintéticos efímeros como única identidad local y converge mejor con `hubspot_quote_id`.
+
+### 2026-04-17 — TASK-440: Nexa deja de exponer IDs técnicos de proyecto en narrativa visible
+
+- La resolución de labels de proyecto para Nexa ya no depende de un solo identificador: el backend resuelve por `space_id` y acepta tanto `project_record_id` como el wrapper/source ID que hoy viaja por ICO (`notion_project_id` / `project_source_id`).
+- `materialize-ai-signals` ya no debe dejar `dimension_label` técnico cuando existe un nombre humano resoluble para el proyecto asociado.
+- `llm-provider` deja de caer a `projectId` crudo cuando no hay label; la degradación visible canónica pasa a ser `este proyecto`.
+- La sanitización backend ahora corrige mentions y narrativa antes de persistir enrichments, y guarda metadata mínima de resolución en `explanation_json.meta.projectResolution`.
+- No se agregan routes ni surfaces nuevas: `Pulse/Home`, `Space 360` y `Person 360` se benefician vía readers existentes sobre enrichments ya saneados.
+
+### 2026-04-17 — TASK-145: Agency Campaigns queda desacoplado del namespace global y endurece tenancy
+
+- Nace el namespace dedicado `GET/POST /api/agency/campaigns` con paridad de sub-routes para detalle, `360`, métricas, financials, roster y project links.
+- `Agency > Campañas` deja de depender de `/api/campaigns` y consume de forma directa el namespace dedicado `/api/agency/campaigns`.
+- `src/lib/campaigns/tenant-scope.ts` centraliza la resolución tenant-safe del dominio y corrige el drift que usaba `clientId` como si fuera `spaceId`.
+- Las rutas compartidas `src/app/api/campaigns/**` también quedan endurecidas: cuando falta `campaignScopes`, igual validan pertenencia por tenant/`space_id` antes de exponer detalle o sub-recursos.
+- El runtime multi-space para clientes deja de filtrar campañas en memoria y pasa a resolverlas con filtros SQL explícitos por `space_id`.
+- `/api/campaigns/**` se mantiene como namespace compartido para las surfaces internal y client (`/campaigns`, `/campanas`), que es el boundary de coexistencia intencional de esta lane.
+
+### 2026-04-17 — TASK-144: Agency Team queda servido por una API dedicada y un store canónico
+
+- Se agrega `src/lib/agency/team-capacity-store.ts` como store canónico para roster activo + assignments + placement metadata + overlay de `member_capacity_economics`, sin duplicar la lógica entre Team view y el tab de capacidad.
+- Nace `GET /api/agency/team` como contrato dedicado para Agency Team / Capacity.
+- `GET /api/team/capacity-breakdown` queda vivo como compat wrapper sobre el mismo store y `GET /api/agency/capacity` deja de depender de la lane legacy `BigQuery-first`; ahora deriva su overview desde el payload canónico.
+- `/agency/team`, el tab `Capacidad` en `AgencyWorkspace` y `AssignMemberDrawer` pasan a consumir `/api/agency/team`, manteniendo el comportamiento visible pero cortando la deduplicación real pedida por la task.
+
+### 2026-04-17 — TASK-143: Agency Economics queda space-first sobre Cost Intelligence
+
+- `GET /api/agency/economics` ya existe y entrega el snapshot de Agency Economics desde `greenhouse_serving.operational_pl_snapshots`, con ventana mensual, ranking, tendencias y estado parcial explícito.
+- `/agency/economics` deja de depender de la surface legacy client-first y monta una vista nueva en `src/views/greenhouse/agency/economics/EconomicsView.tsx`.
+- La nueva surface usa componentes Vuexy/MUI ya presentes en el repo para mostrar:
+  - KPIs de ingresos, margen, payroll ratio y costo total
+  - tabla expandible por Space con `labor`, `direct`, `overhead`, margen y comparación contra el mes anterior
+  - ranking de rentabilidad y charts de ingresos vs costo / tendencia de margen
+- El drill-down por servicio queda explícitamente honesto: muestra contexto contractual y catálogo del Space, pero no fabrica revenue, costo ni margen por servicio antes de `TASK-146`.
+
+### 2026-04-17 — Docs operativos de agentes alineados al modelo views + entitlements
+
+- `AGENTS.md`, `CLAUDE.md` y `docs/tasks/TASK_PROCESS.md` ahora exigen que agentes y tasks distingan explícitamente entre:
+  - `routeGroups` como acceso broad
+  - `views` / `authorizedViews` como surface visible y proyección de UI
+  - `entitlements` como autorización fina capability-based
+  - `startup policy` como contrato separado de entrypoint/Home
+- El objetivo es evitar soluciones y specs nuevas que modelen acceso solo como `views` o solo como `capabilities` sin declarar el plano correcto.
+
+### 2026-04-17 — TASK-404: Entitlements Governance Admin Center
+
+- `Admin Center > Gobernanza de acceso` deja de ser solo una lane de `authorizedViews` y pasa a gobernar entitlements operativos con:
+  - catálogo canónico code-versioned de capabilities/actions/scopes
+  - defaults persistidos por rol
+  - overrides persistidos por usuario
+  - policy de startup/home editable
+  - auditoría de cambios y eventos outbox para gobernanza de acceso
+- Se agrega la migración `20260417044741101_task-404-entitlements-governance.sql` con tres tablas tenant-safe en `greenhouse_core`:
+  - `role_entitlement_defaults`
+  - `user_entitlement_overrides`
+  - `entitlement_governance_audit_log`
+- Nuevas rutas admin:
+  - `GET /api/admin/entitlements/governance`
+  - `POST /api/admin/entitlements/roles`
+  - `GET /api/admin/entitlements/users/[userId]`
+  - `POST /api/admin/entitlements/users/[userId]/overrides`
+  - `PATCH /api/admin/entitlements/users/[userId]/startup-policy`
+- `Admin Center > Usuarios > Acceso` ahora explica permisos efectivos por `capability/action/scope`, su origen (`runtime`, `role_default`, `user_override`) y permite editar excepciones individuales y el startup path sin tocar SQL manual ni código.
+- La resolución efectiva queda explícita y documentada como:
+  - base runtime derivada de `TASK-403`
+  - overlay de defaults por rol
+  - overlay de overrides por usuario
+  - startup policy separada vía `resolvePortalHomePolicy()`
+
+## 2026-04-16
+
+### 2026-04-16 — TASK-246: Digest ejecutivo semanal de Nexa via ops-worker
+
+- Se agrega el builder `src/lib/nexa/digest/build-weekly-digest.ts` para consolidar los top insights ICO-first de la ultima semana usando `greenhouse_serving.ico_ai_signal_enrichments`, sin recalcular métricas inline ni abrir una lane cross-domain ficticia.
+- `src/lib/nexa/digest/recipient-resolver.ts` resuelve destinatarios internos de liderazgo desde roles runtime y filtra el resultado contra el identity store interno antes de enviar.
+- `src/lib/email/types.ts`, `src/lib/email/templates.ts` y `src/emails/WeeklyExecutiveDigestEmail.tsx` activan el template `weekly_executive_digest` dentro del pipeline canonico de email.
+- `services/ops-worker/server.ts` suma `POST /nexa/weekly-digest` y `services/ops-worker/deploy.sh` crea el job `ops-nexa-weekly-digest` cada lunes a las `07:00` `America/Santiago`.
+- La conversión de `@mentions` para email queda explícita: `space` y `member` generan links HTML al portal; `project` sigue como texto hasta que exista una ruta canónica de destino.
+
+### 2026-04-16 — TASK-242: Space 360 incorpora Nexa Insights filtrados por Space
+
+- `Agency > Spaces > [space]` ahora muestra `Nexa Insights` al inicio del Overview real de `Space 360`, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.
+- Se agrega `readSpaceAiLlmSummary(spaceId, periodYear, periodMonth, limit)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` para leer insights del espacio en el período actual, ordenados por:
+  - severidad (`critical > warning > info`)
+  - `quality_score DESC`
+  - `processed_at DESC`
+- `src/lib/agency/space-360.ts` ahora incorpora `nexaInsights` dentro de `Space360Detail`, sin abrir una route nueva ni recalcular señales inline.
+- `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx` inserta `NexaInsightsBlock` antes del grid principal del Overview y mantiene el contrato actual de `@mentions`:
+  - `@[Space](space:...)` -> `Space 360`
+  - `@[Miembro](member:...)` -> `People`
+- Si el espacio no tiene enrichments para el período, el bloque cae al empty state compartido de Nexa en lugar de desaparecer.
+- No se agregaron migraciones ni nuevos publishers/consumers reactivos; el cambio es un consumer read-only sobre serving existente.
+
+### 2026-04-16 — TASK-243: Person 360 incorpora Nexa Insights filtrados por miembro
+
+- `People > Person 360` ahora muestra `Nexa Insights` al inicio de la surface visible `activity`, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.
+- Se agrega `readMemberAiLlmSummary(memberId, periodYear, periodMonth, limit)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` para leer insights del miembro en el período actual, ordenados por:
+  - severidad (`critical > warning > info`)
+  - `quality_score DESC`
+  - `processed_at DESC`
+- `GET /api/people/[memberId]/intelligence` ahora incluye `nexaInsights` en el payload del snapshot del miembro, sin abrir una route nueva ni recalcular señales inline.
+- `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` inserta `NexaInsightsBlock` al inicio de la surface visible y conserva el contrato actual de `@mentions`:
+  - `@[Miembro](member:...)` -> `People`
+  - `@[Space](space:...)` -> `Space 360`
+- No se agregaron migraciones ni nuevos publishers/consumers reactivos; el cambio es un consumer read-only sobre serving existente.
+
+### 2026-04-16 — TASK-029: Modulo de Objetivos y OKRs
+
+- Nuevo modulo HRIS Goals & OKRs con ciclos trimestrales/semestrales/anuales
+- Goals en cascade (empresa → departamento → individual) con key results medibles
+- Elegibilidad por tipo de contrato (indefinido, plazo_fijo, eor: full; contractor: solo lectura; honorarios: sin acceso)
+- Self-service en /my/goals: ver objetivos, registrar avance
+- Admin en /hr/goals: crear ciclos, seguimiento global con heatmap de progreso, vista de empresa
+- 12 API endpoints, 4 tablas PostgreSQL, 5 outbox events
+
+### 2026-04-16 — TASK-244: Pulse incorpora Top Insights de Nexa en Home
+
+- `Pulse` (`/home`) ahora muestra `Nexa Insights` al cargar la landing, reutilizando la misma lane advisory ya materializada por `ICO Engine -> Gemini -> greenhouse_serving.ico_ai_signal_enrichments`.
+- Se agrega `readTopAiLlmEnrichments(periodYear, periodMonth, limit)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` para leer los top insights cross-Space del período actual ordenados por:
+  - severidad (`critical > warning > info`)
+  - `quality_score DESC`
+  - `processed_at DESC`
+- `GET /api/home/snapshot` y `src/lib/home/get-home-snapshot.ts` ahora incluyen un payload `nexaInsights` específico para Home, sin abrir una route nueva ni recalcular métricas inline.
+- `src/views/greenhouse/home/HomeView.tsx` inserta `NexaInsightsBlock` en la landing de `Pulse`, entre `NexaHero` y los shortcuts recomendados, manteniendo intacto el modo chat.
+- La navegación contextual sigue el contrato actual de menciones:
+  - `@[Space](space:...)` -> `Space 360`
+  - `@[Miembro](member:...)` -> `People`
+- No se agregaron migraciones ni nuevos publishers/consumers reactivos; el cambio es un consumer read-only sobre serving existente.
+
+### 2026-04-16 — TASK-285: Diferenciacion de roles cliente
+
+- Los 3 roles de cliente (`client_executive`, `client_manager`, `client_specialist`) ahora tienen visibilidad diferenciada en el portal.
+- `client_specialist` pierde acceso a Analytics, Campanas y Equipo (menu + page guard).
+- `client_executive` y `client_manager` mantienen acceso a las 11 vistas actuales (su diferenciacion se activara con view codes nuevos de TASK-286+).
+- Implementado via migracion que siembra `role_view_assignments` en `greenhouse_core` — zero cambios de codigo. La infraestructura ya estaba cableada.
+- Usuarios client_specialist necesitan re-login para que el JWT refleje las nuevas asignaciones.
+
+### 2026-04-16 — HR Leave corrige accrual Chile en primer año de servicio
+
+- `HR > Permisos` ya no debe mostrar automáticamente `15` días de vacaciones para colaboradores Chile interno cuyo primer aniversario laboral todavía no se cumple.
+- `src/lib/hr-core/postgres-leave-store.ts` ahora:
+  - resuelve la policy aplicable por especificidad real y evita que la policy genérica le gane a `policy-vacation-chile`
+  - accrualiza `allowance_days` desde `hire_date` durante el primer ciclo laboral chileno
+  - resemilla balances con `ON CONFLICT DO UPDATE` para corregir saldos históricos sin tocar manualmente `used_days`, `reserved_days` ni `adjustment_days`
+- Se agrega la migración `20260416094722775_task-416-hr-leave-chile-accrual-hardening.sql` y `scripts/setup-postgres-hr-leave.sql` queda alineado con `policy-vacation-chile.accrual_type = 'monthly_accrual'`.
+
+### 2026-04-16 — HR Leave UI split entre saldos personales y saldos del equipo
+
+- `HR > Permisos` deja de mezclar la consulta personal con la operación administrativa:
+  - la pestaña de balances ahora se divide en `Mis saldos` y `Saldos del equipo` para usuarios admin/HR
+  - la vista de equipo resume por colaborador, agrega búsqueda y filtros por alertas (`saldo negativo`, `reservas`, `ajustes`)
+  - el detalle operativo se mueve a un dialog por colaborador con acciones de backfill, ajuste manual y reversión donde corresponde
+- Se actualizaron los tests del view para validar el nuevo flujo admin `Saldos del equipo -> Ver detalle`.
+
+### 2026-04-16 — HR Leave aclara saldo proporcional, arrastre y redondeo visible
+
+- `HR > Permisos` ahora redondea saldos de vacaciones a 2 decimales de forma consistente en runtime y UI.
+- La lectura administrativa de vacaciones Chile deja explícitos:
+  - `Base / acumulado`
+  - `Progresivos`
+  - `Arrastre`
+  - `Saldo actual`
+- El detalle de colaborador y las tarjetas de resumen ahora explican cuando el saldo está en acumulación proporcional y/o incluye arrastre, evitando interpretar `base / acumulado` como saldo final.
+
+### 2026-04-16 — HR Leave unifica identidad visible y actividad administrativa del detalle de equipo
+
+- Los saldos de `HR > Permisos` ahora heredan el mismo enriquecimiento de identidad visible que ya existía en solicitudes: `memberAvatarUrl` pasa a formar parte del contrato de balances y se resuelve tanto en PostgreSQL como en el fallback legacy.
+- La vista `Saldos del equipo` ya no cae a iniciales cuando el avatar existe en la identidad canónica del colaborador.
+- El detalle por colaborador reemplaza la tabla ancha por cards operativas por tipo de permiso, eliminando el scroll horizontal largo del dialog.
+- El bloque inferior deja de implicar que un backfill sea un “ajuste”: ahora muestra `Actividad administrativa` con periodos retroactivos por un lado y ajustes de saldo por otro.
+
+### 2026-04-16 — TASK-415: HR Leave admin backfills, ajustes y policy explain
+
+- `HR Leave` gana base admin real para vacaciones del equipo:
+  - nuevos entitlements runtime `hr.leave_balance`, `hr.leave_backfill` y `hr.leave_adjustment`
+  - `GET /api/hr/core/meta` ahora expone flags de operación admin para backfills, ajustes y reversión
+  - nuevas routes:
+    - `POST /api/hr/core/leave/backfills`
+    - `GET/POST /api/hr/core/leave/adjustments`
+    - `POST /api/hr/core/leave/adjustments/[adjustmentId]/reverse`
+- El runtime PostgreSQL de leave ahora devuelve `policyExplain` por saldo y deja de resolver vacaciones solo por `employment_type + pay_regime`; ahora también considera `contract_type`, `payroll_via` y `hire_date`.
+- Se incorpora ledger auditable para operaciones administrativas:
+  - `greenhouse_hr.leave_requests.source_kind` distingue solicitudes normales de `admin_backfill`
+  - nueva tabla `greenhouse_hr.leave_balance_adjustments` para ajustes manuales y reversión
+  - la migración canónica es `20260416083541945_task-415-hr-leave-admin-backfill-adjustments.sql`
+- Se corrige además la semántica de movimiento de saldo reservado/usado en leave para evitar multiplicar dos veces los días al reservar, aprobar, rechazar o cancelar solicitudes.
+- `scripts/setup-postgres-hr-leave.sql` queda alineado con el contrato nuevo (`applicable_contract_types`, `applicable_payroll_vias`, `source_kind`, `leave_balance_adjustments`).
+- Documentación actualizada:
+  - `docs/documentation/hr/sistema-permisos-leave.md`
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+
 ## 2026-04-15
+
+### 2026-04-15 — TASK-403: Entitlements runtime foundation conectada a Pulse y Nexa
+
+- Se agregó la primera foundation runtime de entitlements en código:
+  - `src/config/entitlements-catalog.ts`
+  - `src/lib/entitlements/types.ts`
+  - `src/lib/entitlements/runtime.ts`
+  - `src/lib/home/build-home-entitlements-context.ts`
+- La derivación sigue siendo backward-compatible con el modelo actual:
+  - usa `roleCodes`, `routeGroups` y `authorizedViews`
+  - mantiene `authorizedViews` como proyección fina para surfaces existentes
+  - conserva `resolvePortalHomePolicy()` como contrato separado de startup
+- `GET /api/home/snapshot` y `POST /api/home/nexa` ahora comparten el mismo bridge de acceso, incluyendo:
+  - `recommendedShortcuts`
+  - `accessContext`
+  - `canSeeFinanceStatus`
+- Pulse incorpora una surface visible mínima para este bridge con shortcuts recomendados y contexto de acceso, sin reemplazar todavía el catálogo capability-based existente.
+- Se agregaron tests unitarios para perfiles base (`superadmin`, `hr`, `finance`, `collaborator`, `client`) y para el bridge Home capability-aware.
 
 ### 2026-04-15 — TASK-156: foundation runtime para SLA/SLO contractual por servicio
 

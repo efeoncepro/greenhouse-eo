@@ -6,6 +6,17 @@
 
 ---
 
+## Delta 2026-04-17 — TASK-440 endurece labels visibles de proyecto antes de persistir Nexa
+
+- La corrección de labels ya no recae en `NexaMentionText`; el contrato canónico ahora exige resolver y sanear nombres de proyecto en backend antes de persistir enrichments.
+- Resolución canónica actual para proyecto:
+  - scope obligatorio por `space_id`
+  - lookup por `project_record_id`
+  - fallback permitido por wrapper/source IDs que hoy viajan en ICO/Nexa (`notion_project_id` y `project_source_id`)
+- Si existe label resoluble, la narrativa persistida debe usar ese nombre humano tanto en `@mentions` como en texto libre/root cause.
+- Si no existe label resoluble, la degradación visible debe ser humana (`este proyecto`) y no técnica (UUID, source ID o `projectId` crudo).
+- `explanation_json.meta.projectResolution` puede persistir metadata mínima de resolución para auditoría, pero las surfaces consumidoras siguen siendo read-only sobre enrichments ya saneados.
+
 ## 1. Qué es
 
 Un sistema de menciones inline que permite referenciar entidades de Greenhouse (miembros, Spaces, proyectos) dentro de texto generado por LLM o input de usuario. Las menciones se renderizan como chips clickeables que navegan al perfil de la entidad.
@@ -99,6 +110,8 @@ El LLM recibe los IDs y nombres vía `enrichSignalPayload()` (TASK-239):
 - `memberName` + `memberId` 
 - `projectName` + `projectId`
 
+Desde `TASK-440`, `projectName` ya no debe caer a un ID técnico cuando el lookup falla. El backend resuelve un label humano por `space_id` + identidad de proyecto y, si no existe, degrada a una referencia genérica antes de persistir la narrativa.
+
 ## 5. Dónde se usa hoy
 
 | Surface | Componente | Campos con menciones |
@@ -145,3 +158,4 @@ const MENTION_CONFIG: Record<MentionType, { icon: string; href: (id: string) => 
 - **No hay autocompletado** — el sistema es output-only (LLM genera marcas). Para input de usuario (arrobar en chat), se necesita un componente de autocompletado separado
 - **Role colors no implementados** — los chips de miembros usan estilo neutral. Follow-up: usar `GH_COLORS.role.*` según el rol del miembro
 - **El LLM puede no usar el formato** — si la evidencia es ambigua o el modelo "se olvida", el nombre aparece como texto plano (fallback seguro)
+- **El ID de proyecto puede seguir siendo técnico internamente** — lo que queda prohibido es exponerlo como label visible; la sanitización backend debe reemplazarlo por nombre humano o por `este proyecto`

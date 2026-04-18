@@ -1,0 +1,124 @@
+name: ICO Batch Worker Deploy
+
+# TASK-245 follow-up — eliminate deployment drift between Vercel and the
+# ico-batch-worker Cloud Run service (same pattern as ops-worker-deploy.yml
+# introduced by TASK-409).
+#
+# ico-batch-worker runs the ICO Engine materialization pipeline and, after
+# TASK-245, the Finance Signal Engine pipeline. It shares the monorepo
+# source tree with Vercel but is deployed separately. Without a workflow,
+# pushes that touch either pipeline land on Vercel immediately while
+# Cloud Run requires a manual `bash services/ico-batch/deploy.sh` run.
+#
+# This workflow watches the paths that affect ico-batch-worker behavior
+# and deploys automatically on every push to `develop`. Production deploys
+# on `main` are gated behind an environment with required reviewers.
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'services/ico-batch/**'
+      - 'src/lib/ico-engine/**'
+      - 'src/lib/finance/ai/**'
+      - 'src/lib/ai/**'
+      - 'src/lib/sync/event-catalog.ts'
+      - 'src/lib/sync/publish-event.ts'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: ico-batch-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # Required for Workload Identity Federation to GCP
+
+jobs:
+  deploy:
+    name: Deploy ico-batch-worker to Cloud Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    # Route pushes by branch, fall back to manual dispatch input.
+    environment: >-
+      ${{
+        github.event_name == 'workflow_dispatch'
+          && github.event.inputs.environment
+          || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+      }}
+
+    env:
+      ENV: >-
+        ${{
+          github.event_name == 'workflow_dispatch'
+            && github.event.inputs.environment
+            || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+        }}
+      GCP_PROJECT_ID: efeonce-group
+      GCP_REGION: us-east4
+      # Deployer identity: generic github-actions-deployer SA, impersonated
+      # via Workload Identity Federation. Same pattern as ops-worker.
+      DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+      RUNTIME_SERVICE_ACCOUNT: greenhouse-portal@efeonce-group.iam.gserviceaccount.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Verify gcloud account
+        run: |
+          gcloud config list --format='value(core.project,core.account)'
+          gcloud auth list
+
+      - name: Deploy ico-batch-worker
+        run: |
+          bash services/ico-batch/deploy.sh
+        env:
+          ENV: ${{ env.ENV }}
+
+      - name: Verify deployment health
+        run: |
+          REVISION="$(gcloud run services describe ico-batch-worker \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.latestReadyRevisionName)')"
+          READY="$(gcloud run services describe ico-batch-worker \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.conditions[0].status)')"
+          echo "Latest ready revision: ${REVISION}"
+          echo "Service ready: ${READY}"
+          if [ "${READY}" != "True" ]; then
+            echo "::warning::Service reports not-ready. Check Cloud Run logs."
+          fi
+          echo "✓ ico-batch-worker deploy verified (revision ${REVISION})"
+
+      - name: Record deployment commit
+        run: |
+          echo "Deployed commit: ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"

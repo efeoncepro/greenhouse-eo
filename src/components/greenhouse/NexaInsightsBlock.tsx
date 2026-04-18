@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
@@ -8,6 +10,8 @@ import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -19,6 +23,10 @@ import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_NEXA } from '@/config/greenhouse-nomenclature'
 import { getMetricById } from '@/lib/ico-engine/metric-registry'
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
+import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRootCauseSection'
+import NexaInsightsTimeline, {
+  type NexaTimelineItem
+} from '@/components/greenhouse/NexaInsightsTimeline'
 
 // ─── Public Types ──────────────────────────────────────────────────────────
 
@@ -28,8 +36,11 @@ export type NexaInsightItem = {
   metricId: string
   severity: string | null
   explanation: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
 }
+
+type NexaInsightsViewMode = 'recent' | 'timeline'
 
 export type NexaInsightsBlockProps = {
   insights: NexaInsightItem[]
@@ -37,6 +48,7 @@ export type NexaInsightsBlockProps = {
   lastAnalysis: string | null
   runStatus: 'succeeded' | 'partial' | 'failed' | null
   defaultExpanded?: boolean
+  timelineInsights?: NexaTimelineItem[]
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -129,6 +141,11 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
           />
         )}
 
+        {/* Root cause narrative (collapsible) */}
+        {item.rootCauseNarrative && item.rootCauseNarrative.trim() && (
+          <NexaInsightRootCauseSection narrative={item.rootCauseNarrative} insightId={item.id} />
+        )}
+
         {/* Recommended action */}
         {item.recommendedAction && (
           <Box
@@ -173,13 +190,18 @@ const NexaInsightsBlock = ({
   totalAnalyzed,
   lastAnalysis,
   runStatus,
-  defaultExpanded
+  defaultExpanded,
+  timelineInsights
 }: NexaInsightsBlockProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
   const hasData = totalAnalyzed > 0
   const chip = getRunChip(runStatus)
   const countWithActions = insights.filter(i => i.recommendedAction).length
+  const timelineCount = timelineInsights?.length ?? 0
+  const timelineAvailable = timelineCount > 0
+  const [viewMode, setViewMode] = useState<NexaInsightsViewMode>('recent')
+  const activeView: NexaInsightsViewMode = timelineAvailable ? viewMode : 'recent'
 
   if (!hasData) {
     return (
@@ -264,8 +286,43 @@ const NexaInsightsBlock = ({
               </Grid>
             </Grid>
 
-            {/* Insights list */}
-            {insights.length > 0 && (
+            {/* View mode toggle (shown only when historical data is available) */}
+            {timelineAvailable && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ToggleButtonGroup
+                  value={activeView}
+                  exclusive
+                  onChange={(_, next) => {
+                    if (next === 'recent' || next === 'timeline') setViewMode(next)
+                  }}
+                  size='small'
+                  aria-label={GH_NEXA.insights_view_mode_aria}
+                  sx={{
+                    '& .MuiToggleButton-root': {
+                      textTransform: 'none',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      px: 2,
+                      py: 0.5,
+                      lineHeight: 1.5,
+                      minHeight: 32
+                    }
+                  }}
+                >
+                  <ToggleButton value='recent' aria-label={GH_NEXA.insights_view_mode_recent}>
+                    <i className='tabler-list-details' style={{ fontSize: 16, marginRight: 6 }} aria-hidden='true' />
+                    {GH_NEXA.insights_view_mode_recent}
+                  </ToggleButton>
+                  <ToggleButton value='timeline' aria-label={GH_NEXA.insights_view_mode_timeline}>
+                    <i className='tabler-history' style={{ fontSize: 16, marginRight: 6 }} aria-hidden='true' />
+                    {GH_NEXA.insights_view_mode_timeline}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+            )}
+
+            {/* Content: recent cards (default) or timeline (when enabled) */}
+            {activeView === 'recent' && insights.length > 0 && (
               <div>
                 <Typography variant='overline' sx={{ color: 'text.secondary', mb: 1.5, display: 'block' }}>
                   {GH_NEXA.insights_list_title}
@@ -278,6 +335,10 @@ const NexaInsightsBlock = ({
                   </Stack>
                 </AnimatePresence>
               </div>
+            )}
+
+            {activeView === 'timeline' && timelineInsights && (
+              <NexaInsightsTimeline insights={timelineInsights} />
             )}
 
             {/* Nexa disclaimer */}

@@ -1,9 +1,9 @@
 # Sistema de Permisos y Licencias
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-04-06 por Claude (TASK-271)
-> **Ultima actualizacion:** 2026-04-06 por Claude (TASK-271)
+> **Ultima actualizacion:** 2026-04-16 por Codex (TASK-415, identidad y actividad administrativa)
 > **Documentacion tecnica:** docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
 ## Que es
@@ -15,9 +15,63 @@ El sistema de permisos y licencias permite a los colaboradores solicitar dias li
 | Vista | Quien la usa | Que muestra |
 |-------|-------------|-------------|
 | `/my/leave` | Colaborador | Saldo personal, historial de solicitudes, calendario propio |
-| `/hr/leave` | Supervisor / HR | Solicitudes del equipo, saldos, calendario del equipo |
+| `/hr/leave` | Supervisor / HR | Solicitudes del equipo, saldos, calendario del equipo y operaciones administrativas |
 
 Ambas vistas usan el mismo motor de calculo. No hay formulas distintas entre lo que ve el colaborador y lo que ve HR.
+
+En la vista del equipo, Greenhouse intenta mostrar la identidad visible completa de cada colaborador:
+
+- nombre visible resuelto
+- avatar del perfil cuando existe
+- iniciales como fallback cuando no hay avatar disponible
+
+Esto evita que la lectura operativa dependa de identificadores tecnicos o listados anonimos.
+
+## Operaciones administrativas
+
+La vista `/hr/leave` ahora distingue dos operaciones distintas cuando HR necesita corregir historial:
+
+### Registrar dias ya tomados
+
+Se usa cuando el colaborador **si tomo vacaciones o permiso en fechas reales**, pero ese periodo no fue solicitado antes en Greenhouse.
+
+Este flujo:
+
+- registra el rango real tomado
+- deja el historial visible como una carga administrativa
+- mueve esos dias a usados
+- conserva razon, notas, actor y fecha de registro
+
+Ejemplo: Valentina tomo 5 dias la semana pasada y HR los registra despues.
+
+### Ajustar saldo
+
+Se usa cuando HR **necesita corregir el saldo** pero no existen fechas reales defendibles para crear una solicitud retroactiva.
+
+Este flujo:
+
+- aplica un delta positivo o negativo al saldo
+- exige motivo
+- deja un historial auditable
+- permite revertir el ajuste si fue cargado por error
+
+Ejemplo: arrastre heredado, correccion de onboarding o regularizacion historica.
+
+### Actividad administrativa del colaborador
+
+Cuando HR entra al detalle de una persona en `/hr/leave`, Greenhouse agrupa la trazabilidad operativa en una seccion de **Actividad administrativa**.
+
+Esa seccion separa dos cosas distintas:
+
+- **Dias ya tomados registrados**: periodos reales que la persona ya uso y que HR cargo despues
+- **Ajustes de saldo**: correcciones manuales al saldo, positivas o negativas
+
+La diferencia importa:
+
+- un registro de dias ya tomados afecta el historial del permiso y los dias usados
+- un ajuste de saldo corrige la contabilidad del saldo, pero no inventa fechas de ausencia
+
+Por eso puede pasar que una persona tenga actividad administrativa visible aun cuando no tenga ajustes manuales en su saldo.
 
 ## Tipos de permiso disponibles
 
@@ -115,5 +169,54 @@ Las solicitudes ya cerradas (aprobadas, rechazadas o canceladas) no se pueden re
 - Al crear una solicitud pendiente, los dias quedan **reservados** en el saldo
 - Al aprobar, se mueven de reservados a **usados**
 - Al rechazar o cancelar, se **devuelven** al saldo disponible
+- Los ajustes manuales quedan separados del historial de solicitudes y se reflejan como **ajustes** del saldo
+
+### Como leer los saldos administrativos
+
+En `HR > Permisos`, el detalle administrativo separa el saldo en columnas distintas para que RRHH no mezcle conceptos:
+
+- **Base / acumulado**: dias que la politica ya devengo para ese ano
+- **Progresivos**: dias extra por antiguedad cuando aplica
+- **Arrastre**: dias heredados del periodo anterior segun la politica
+- **Usados**: dias ya consumidos o cargados como backfill historico
+- **Reservados**: solicitudes pendientes que ya bloquean saldo
+- **Ajustes**: correcciones manuales netas
+- **Saldo actual**: resultado visible despues de sumar base, progresivos, arrastre y ajustes, y restar usados y reservados
+
+Esto evita interpretar mal casos como vacaciones Chile del primer ciclo laboral, donde una persona puede tener un **base / acumulado** parcial y aun asi un **saldo actual** mayor porque trae arrastre del periodo anterior.
+
+En la vista del equipo, ese detalle ya no depende de una tabla horizontal gigante. Greenhouse muestra cada tipo de permiso como un bloque administrativo mas legible, para que RRHH pueda revisar saldos, actividad y acciones sin perder contexto en pantallas medianas o pequenas.
+
+## Politica de vacaciones
+
+Greenhouse no decide vacaciones solo por moneda. Para el calculo y la explicacion administrativa considera, como minimo:
+
+- `contract_type`
+- `pay_regime`
+- `payroll_via`
+- `hire_date`
+
+### Caso Chile interno
+
+Cuando la persona pertenece a Chile interno y tiene contrato laboral aplicable, el saldo anual y los progresivos se calculan desde su fecha de ingreso y la politica chilena vigente del portal.
+
+En la practica eso significa que Greenhouse no debe sembrar automaticamente `15` dias completos para una persona que aun esta en su primer ciclo de antiguedad laboral. Durante ese primer tramo, el saldo visible se accrualiza desde `hire_date`; una vez que se cumple el aniversario laboral, la politica ya puede consolidarse al anual completo segun corresponda.
+
+Mientras ese primer ciclo sigue en curso, RRHH puede ver mensajes de apoyo como:
+
+- acumulacion proporcional desde la fecha de ingreso
+- arrastre visible del periodo anterior
+
+La idea es que el saldo no solo sea correcto, sino tambien legible para operacion y auditoria.
+
+### Casos no equivalentes
+
+No todos los contratos usan la misma logica:
+
+- `Indefinido` y `Plazo fijo` pueden seguir la politica laboral Chile interna
+- `Honorarios` no se interpreta automaticamente como vacaciones legales
+- `Contractor` y `EOR` pueden quedar sujetos a politica externa o sin saldo legal equivalente dentro del portal
+
+Por eso HR puede ver en la pantalla administrativa una explicacion basica de la politica aplicada a cada saldo.
 
 > Detalle tecnico: el motor de calculo vive en `src/lib/hr-core/leave-day-calculation.ts` y usa el calendario operativo de `src/lib/calendar/operational-calendar.ts`. Los schemas de datos estan en `greenhouse_hr` (leave_requests, leave_policies, leave_balances). Ver spec completa en `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` seccion 2.8.

@@ -151,8 +151,14 @@ echo "=== Building ${SERVICE_NAME} image via Cloud Build ==="
 # --config and --tag are mutually exclusive, so we use inline cloudbuild.yaml)
 IMAGE="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
 
-if ! gcloud builds submit . \
+# Submit build in async mode and poll for status. gcloud builds submit
+# normally streams logs in real-time, but the deployer SA cannot read
+# Cloud Build's default GCS logs bucket (requires project Viewer/Owner).
+# Async + poll avoids the log-streaming dependency entirely.
+BUILD_ID=$(gcloud builds submit . \
   --project="${PROJECT_ID}" \
+  --async \
+  --format='value(id)' \
   --config=/dev/stdin <<CLOUDBUILD_EOF
 steps:
   - name: 'gcr.io/cloud-builders/docker'
@@ -160,17 +166,41 @@ steps:
 images:
   - '${IMAGE}'
 options:
-  # Route build logs exclusively to Cloud Logging. Cloud Build's legacy
-  # behavior writes logs to a GCS bucket that requires project Viewer/Owner
-  # to stream, which breaks \`gcloud builds submit\` from restricted deployer
-  # SAs even when the build itself succeeds. Cloud Logging honors the
-  # deployer's \`roles/logging.viewer\` binding cleanly.
   logging: CLOUD_LOGGING_ONLY
 CLOUDBUILD_EOF
-then
-  echo "ERROR: Cloud Build failed — aborting deployment."
+)
+
+if [ -z "${BUILD_ID}" ]; then
+  echo "ERROR: Cloud Build submit failed — no build ID returned."
   exit 1
 fi
+
+echo "=== Build submitted: ${BUILD_ID} — polling for completion ==="
+
+BUILD_STATUS=""
+POLL_COUNT=0
+MAX_POLLS=60  # 60 × 10s = 10 min max wait
+
+while [ "${BUILD_STATUS}" != "SUCCESS" ] && [ "${BUILD_STATUS}" != "FAILURE" ] && [ "${BUILD_STATUS}" != "TIMEOUT" ] && [ "${BUILD_STATUS}" != "CANCELLED" ]; do
+  POLL_COUNT=$((POLL_COUNT + 1))
+  if [ "${POLL_COUNT}" -gt "${MAX_POLLS}" ]; then
+    echo "ERROR: Build ${BUILD_ID} did not complete within $((MAX_POLLS * 10))s."
+    exit 1
+  fi
+  sleep 10
+  BUILD_STATUS=$(gcloud builds describe "${BUILD_ID}" \
+    --project="${PROJECT_ID}" \
+    --format='value(status)' 2>/dev/null || echo "UNKNOWN")
+  echo "  poll ${POLL_COUNT}/${MAX_POLLS}: status=${BUILD_STATUS}"
+done
+
+if [ "${BUILD_STATUS}" != "SUCCESS" ]; then
+  echo "ERROR: Cloud Build ${BUILD_ID} finished with status ${BUILD_STATUS}."
+  echo "       Logs: https://console.cloud.google.com/cloud-build/builds/${BUILD_ID}?project=${PROJECT_ID}"
+  exit 1
+fi
+
+echo "=== Build ${BUILD_ID} succeeded ==="
 
 echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
 
@@ -238,32 +268,39 @@ gcloud run services add-iam-policy-binding "${SERVICE_NAME}" \
   --quiet
 
 # ─── Health Check ────────────────────────────────────────────────────────────
+# In CI (GitHub Actions), skip the proxy-based health check. The proxy requires
+# an interactive gcloud component install and spawns a background process that
+# blocks the shell from exiting, causing the workflow step to hang until timeout.
+# The workflow has its own "Verify deployment health" step that handles this.
 
-echo "=== Running health check ==="
+if [ -n "${GITHUB_ACTIONS:-}" ]; then
+  echo "=== Skipping health check (CI mode — workflow handles this separately) ==="
+else
+  echo "=== Running health check ==="
 
-# Use gcloud proxy to reach the authenticated service without impersonation
-HEALTH_PORT=19092
-gcloud run services proxy "${SERVICE_NAME}" \
-  --project="${PROJECT_ID}" \
-  --region="${REGION}" \
-  --port="${HEALTH_PORT}" &
-PROXY_PID=$!
+  HEALTH_PORT=19092
+  gcloud run services proxy "${SERVICE_NAME}" \
+    --project="${PROJECT_ID}" \
+    --region="${REGION}" \
+    --port="${HEALTH_PORT}" &
+  PROXY_PID=$!
 
-HEALTH_OK=false
-for i in 1 2 3 4 5; do
-  sleep 3
-  if curl -sf "http://localhost:${HEALTH_PORT}/health" | python3 -m json.tool 2>/dev/null; then
-    HEALTH_OK=true
-    break
+  HEALTH_OK=false
+  for i in 1 2 3 4 5; do
+    sleep 3
+    if curl -sf "http://localhost:${HEALTH_PORT}/health" | python3 -m json.tool 2>/dev/null; then
+      HEALTH_OK=true
+      break
+    fi
+    echo "  health check attempt ${i}/5 — retrying..."
+  done
+
+  kill "${PROXY_PID}" 2>/dev/null || true
+  wait "${PROXY_PID}" 2>/dev/null || true
+
+  if [ "${HEALTH_OK}" = "false" ]; then
+    echo "WARN: health check failed after 5 attempts — service may need manual verification"
   fi
-  echo "  health check attempt ${i}/5 — retrying..."
-done
-
-kill "${PROXY_PID}" 2>/dev/null || true
-wait "${PROXY_PID}" 2>/dev/null || true
-
-if [ "${HEALTH_OK}" = "false" ]; then
-  echo "WARN: health check failed after 5 attempts — service may need manual verification"
 fi
 
 # ─── Cloud Scheduler Jobs ────────────────────────────────────────────────────
@@ -377,6 +414,20 @@ upsert_scheduler_job \
   '{"batchSize":10,"staleMinutes":30}'
 echo "  -> ops-reactive-recover: */15 * * * * (projection recovery)"
 
+upsert_scheduler_job \
+  "ops-nexa-weekly-digest" \
+  "0 7 * * 1" \
+  "/nexa/weekly-digest" \
+  '{"limit":8}'
+echo "  -> ops-nexa-weekly-digest: 0 7 * * 1 (weekly Nexa executive digest)"
+
+upsert_scheduler_job \
+  "ops-quotation-lifecycle" \
+  "0 7 * * *" \
+  "/quotation-lifecycle/sweep" \
+  '{}'
+echo "  -> ops-quotation-lifecycle: 0 7 * * * (daily quote expiration + renewal_due sweep, TASK-351)"
+
 echo ""
 echo "=== Deployment complete ==="
 echo ""
@@ -385,4 +436,4 @@ echo "  1. Verify health:  gcloud run services proxy ${SERVICE_NAME} --port=9092
 echo "  2. Run a lane manually:  gcloud scheduler jobs run ops-reactive-finance --project=${PROJECT_ID} --location=${REGION}"
 echo "  3. Check queue depth:  gcloud run services proxy ${SERVICE_NAME} --port=9092 & sleep 3 && curl -s 'http://localhost:9092/reactive/queue-depth?domain=finance'"
 echo "  4. Check logs:  gcloud logging read 'resource.labels.service_name=\"${SERVICE_NAME}\"' --project=${PROJECT_ID} --limit=10"
-echo "  5. Active scheduler jobs (TASK-379 Slice 3): ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover}"
+echo "  5. Active scheduler jobs: ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover} + ops-nexa-weekly-digest"

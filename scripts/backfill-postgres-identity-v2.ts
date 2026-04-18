@@ -35,12 +35,15 @@ const main = async () => {
     // ─── 1. Backfill SSO + auth columns into client_users ────
     console.log('\n--- client_users SSO/auth columns ---')
 
+    // NOTE (TASK-451 / ISSUE-053): password_hash + password_hash_algorithm intentionally
+    // excluded from this backfill. Credentials are user-initiated (reset/invite flows)
+    // and must NEVER be mirrored from BigQuery. The DB trigger `client_users_password_guard`
+    // enforces this at the schema level.
     const [userRows] = await bq.query({
       query: `
         SELECT
           user_id, microsoft_oid, microsoft_tenant_id, microsoft_email,
           google_sub, google_email, avatar_url,
-          password_hash, password_hash_algorithm,
           timezone, default_portal_home_path, last_login_provider
         FROM \`${projectId}.greenhouse.client_users\`
         WHERE active = TRUE
@@ -56,7 +59,8 @@ const main = async () => {
 
       if (!userId) continue
 
-      // Only update if user exists in PG (UPDATE with RETURNING to count affected rows)
+      // Only update if user exists in PG (UPDATE with RETURNING to count affected rows).
+      // password_hash/password_hash_algorithm intentionally excluded — see note above.
       const updated = await runGreenhousePostgresQuery(
         `UPDATE greenhouse_core.client_users SET
           microsoft_oid = COALESCE($2, microsoft_oid),
@@ -65,11 +69,9 @@ const main = async () => {
           google_sub = COALESCE($5, google_sub),
           google_email = COALESCE($6, google_email),
           avatar_url = COALESCE($7, avatar_url),
-          password_hash = COALESCE($8, password_hash),
-          password_hash_algorithm = COALESCE($9, password_hash_algorithm),
-          timezone = COALESCE($10, timezone),
-          default_portal_home_path = COALESCE($11, default_portal_home_path),
-          last_login_provider = COALESCE($12, last_login_provider),
+          timezone = COALESCE($8, timezone),
+          default_portal_home_path = COALESCE($9, default_portal_home_path),
+          last_login_provider = COALESCE($10, last_login_provider),
           updated_at = CURRENT_TIMESTAMP
         WHERE user_id = $1
         RETURNING user_id`,
@@ -77,7 +79,6 @@ const main = async () => {
           userId,
           toStr(r.microsoft_oid), toStr(r.microsoft_tenant_id), toStr(r.microsoft_email),
           toStr(r.google_sub), toStr(r.google_email), toStr(r.avatar_url),
-          toStr(r.password_hash), toStr(r.password_hash_algorithm),
           toStr(r.timezone), toStr(r.default_portal_home_path), toStr(r.last_login_provider)
         ]
       )

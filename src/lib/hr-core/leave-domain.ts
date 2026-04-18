@@ -28,6 +28,8 @@ export interface LeavePolicy {
   progressiveMaxExtraDays: number
   applicableEmploymentTypes: string[]
   applicablePayRegimes: string[]
+  applicableContractTypes: string[]
+  applicablePayrollVias: string[]
   allowNegativeBalance: boolean
   active: boolean
 }
@@ -91,6 +93,41 @@ const addUtcDays = (value: string, days: number) => {
 
   return toDateKey(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate())
 }
+
+const addUtcYears = (value: string, years: number) => {
+  const parsed = parseDateOnly(value)
+  const date = new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day))
+
+  date.setUTCFullYear(date.getUTCFullYear() + years)
+
+  return toDateKey(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate())
+}
+
+const getYearStartDateKey = (year: number) => `${year}-01-01`
+
+const getYearEndDateKey = (year: number) => `${year}-12-31`
+
+const clampDateKey = (value: string, min: string, max: string) => {
+  if (value < min) {
+    return min
+  }
+
+  if (value > max) {
+    return max
+  }
+
+  return value
+}
+
+const maxDateKey = (...values: string[]) =>
+  [...values].sort((left, right) => left.localeCompare(right)).at(-1) ?? values[0] ?? ''
+
+const minDateKey = (...values: string[]) =>
+  [...values].sort((left, right) => left.localeCompare(right)).at(0) ?? values[0] ?? ''
+
+const roundToTwoDecimals = (value: number) => Math.round(value * 100) / 100
+
+export const roundLeaveDays = (value: number) => roundToTwoDecimals(value)
 
 const isWeekendDateKey = (value: string) => {
   const parsed = parseDateOnly(value)
@@ -304,6 +341,62 @@ export const calculateProgressiveExtraDays = ({
   )
 }
 
+export const calculateAccruedLeaveAllowanceDays = ({
+  annualDays,
+  accrualType,
+  hireDate,
+  year,
+  asOfDate
+}: {
+  annualDays: number
+  accrualType: LeavePolicy['accrualType']
+  hireDate: string | null
+  year: number
+  asOfDate: string
+}) => {
+  if (annualDays <= 0) {
+    return 0
+  }
+
+  if (accrualType !== 'monthly_accrual' || !hireDate) {
+    return annualDays
+  }
+
+  parseDateOnly(hireDate)
+  parseDateOnly(asOfDate)
+
+  const yearStart = getYearStartDateKey(year)
+  const yearEnd = getYearEndDateKey(year)
+  const effectiveAsOfDate = clampDateKey(asOfDate, yearStart, yearEnd)
+
+  if (effectiveAsOfDate < hireDate) {
+    return 0
+  }
+
+  const firstAnniversary = addUtcYears(hireDate, 1)
+
+  if (yearStart >= firstAnniversary || effectiveAsOfDate >= firstAnniversary) {
+    return annualDays
+  }
+
+  const firstServiceCycleEnd = addUtcDays(firstAnniversary, -1)
+  const overlapStart = maxDateKey(hireDate, yearStart)
+  const overlapEnd = minDateKey(effectiveAsOfDate, yearEnd, firstServiceCycleEnd)
+
+  if (overlapEnd < overlapStart) {
+    return 0
+  }
+
+  const firstServiceCycleDays = getCalendarDayDiff(hireDate, firstServiceCycleEnd) + 1
+  const overlapDays = getCalendarDayDiff(overlapStart, overlapEnd) + 1
+
+  if (firstServiceCycleDays <= 0 || overlapDays <= 0) {
+    return 0
+  }
+
+  return roundLeaveDays((annualDays * overlapDays) / firstServiceCycleDays)
+}
+
 export const listPeriodIdsInRange = (startDate: string, endDate: string) => {
   const dates = listDateKeysInRange(startDate, endDate)
   const unique = new Set<string>()
@@ -345,11 +438,15 @@ export const classifyLeavePayrollImpact = (
 export const isPolicyApplicableToMember = ({
   policy,
   employmentType,
-  payRegime
+  payRegime,
+  contractType,
+  payrollVia
 }: {
   policy: LeavePolicy
   employmentType: string | null
   payRegime: string | null
+  contractType: string | null
+  payrollVia: string | null
 }) => {
   const employmentMatch =
     policy.applicableEmploymentTypes.length === 0 ||
@@ -359,7 +456,15 @@ export const isPolicyApplicableToMember = ({
     policy.applicablePayRegimes.length === 0 ||
     (payRegime != null && policy.applicablePayRegimes.includes(payRegime))
 
-  return employmentMatch && payRegimeMatch
+  const contractTypeMatch =
+    policy.applicableContractTypes.length === 0 ||
+    (contractType != null && policy.applicableContractTypes.includes(contractType))
+
+  const payrollViaMatch =
+    policy.applicablePayrollVias.length === 0 ||
+    (payrollVia != null && policy.applicablePayrollVias.includes(payrollVia))
+
+  return employmentMatch && payRegimeMatch && contractTypeMatch && payrollViaMatch
 }
 
 export const getLeaveColorByStatus = (status: string) => {

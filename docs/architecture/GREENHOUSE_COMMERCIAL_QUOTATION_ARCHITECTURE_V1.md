@@ -1,12 +1,366 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.0
+> **Version:** 2.8
 > **Created:** 2026-04-09
-> **Updated:** 2026-04-09 — v2.0: approval workflow, capacity check, revenue pipeline, profitability tracking, renewal lifecycle, terms library, audit trail, quote templates
+> **Updated:** 2026-04-18 — v2.8: TASK-351 quotation intelligence automation. Reactive projections `quotation_pipeline` + `quotation_profitability` en domain `cost_intelligence`. Daily lifecycle sweep (`/api/cron/quotation-lifecycle` + ops-worker `/quotation-lifecycle/sweep`) que expira cotizaciones vencidas y emite `renewal_due` con dedup. 4 eventos canónicos nuevos (`expired`, `renewal_due`, `pipeline_materialized`, `profitability_materialized`). Nueva tab "Cotizaciones" en `/finance/intelligence` con Pipeline + Rentabilidad + Renovaciones.
+> **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
-> **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+> **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
 
 ---
+
+## Delta 2026-04-18 — TASK-351 Quotation Intelligence Automation
+
+### Problema que cerró
+
+El bridge TASK-350 dejó las FKs listas, pero no había materialización downstream. Responder "¿cuánto pipeline hay y con qué probabilidad? ¿qué se renueva pronto? ¿cuánto drift tiene el margen real contra el cotizado?" seguía exigiendo joins ad-hoc en cada lectura.
+
+### Schema (migration `20260418005940703_task-351-quotation-intelligence.sql`)
+
+- `greenhouse_serving.quotation_pipeline_snapshots` — 1 fila por quote. Key = `quotation_id`. Guarda: stage derivado (draft/in_review/sent/approved/converted/rejected/expired), probability_pct, totales autorizado/facturado del bridge, days_in_stage, days_until_expiry, is_renewal_due, is_expired, snapshot_source_event.
+- `greenhouse_serving.quotation_profitability_snapshots` — 1 fila por (quotation_id, period_year, period_month). Guarda quoted/authorized/invoiced/realized + attributed_cost_clp + effective_margin_pct + margin_drift_pct + drift_severity (`aligned`/`warning`/`critical`) + drift_drivers JSONB.
+- `greenhouse_commercial.quotation_renewal_reminders` — dedup de alertas: last_reminder_at, reminder_count, next_check_at, last_event_type.
+
+### Runtime (`src/lib/commercial-intelligence/`)
+
+- `pipeline-materializer.ts:materializePipelineSnapshot({ quotationId, sourceEvent })` — idempotente. Lee quote + agrega `purchase_orders.authorized_amount_clp` + `income.total_amount_clp` por quote. Upsert con ON CONFLICT.
+- `profitability-materializer.ts:materializeProfitabilitySnapshots({ quotationId })` — por quote, itera sobre cada período con income + costo atribuido prorrateado por share revenue del quote vs revenue cliente/período. `materializeProfitabilityForPeriod({ year, month })` para fan-out desde el evento de cost attribution.
+- `renewal-lifecycle.ts:runQuotationLifecycleSweep()` — sweep diario. Expira quotes + emite `renewal_due` con dedup via `quotation_renewal_reminders` (cadencia 14d, lookahead 60d).
+- `intelligence-store.ts` — `listPipelineSnapshots(filters)`, `buildPipelineTotals(items)`, `listProfitabilitySnapshots(filters)` — todos tenant-safe por clientId/organizationId/spaceId.
+
+### Eventos canónicos nuevos
+
+| Evento | Emisor | Consumidores reactivos |
+|---|---|---|
+| `commercial.quotation.expired` | lifecycle sweep | `quotation_pipeline` projection, audit log (`action: 'expired'`), notifications |
+| `commercial.quotation.renewal_due` | lifecycle sweep | `quotation_pipeline` projection, notifications (`finance_alert` con `metadata.subtype: quotation_renewal`) |
+| `commercial.quotation.pipeline_materialized` | `quotation_pipeline` projection | observabilidad, dashboards |
+| `commercial.quotation.profitability_materialized` | `quotation_profitability` projection | observabilidad, dashboards |
+
+### Projections (domain `cost_intelligence`)
+
+- `quotation_pipeline` — triggerEvents: `created, synced, sent, approved, rejected, converted, expired, renewal_due, version_created, po_linked, hes_linked, invoice_emitted`. Scope: `{ entityType: 'quotation', entityId }`.
+- `quotation_profitability` — triggerEvents: `approved, converted, po_linked, hes_linked, invoice_emitted, version_created, finance.income.created/updated, accounting.commercial_cost_attribution.period_materialized`. Scope: quote o período. El evento de cost attribution dispara fan-out por quote del período.
+
+Ambas corren dentro del cron existente `ops-reactive-cost-intelligence` (*/10 min) del ops-worker — no se agregó cron reactivo nuevo.
+
+### Scheduled lifecycle job
+
+- Cloud Run canonical: `POST /quotation-lifecycle/sweep` en ops-worker. Cloud Scheduler `ops-quotation-lifecycle` 07:00 Santiago (declarado en `services/ops-worker/deploy.sh`).
+- Vercel fallback: `GET /api/cron/quotation-lifecycle` 10:00 UTC daily.
+
+### Profitability — cómo se computa el costo atribuido
+
+1. Lee `realized_revenue_clp` = `SUM(income.total_amount_clp) WHERE quotation_id AND period_year/month`.
+2. Lee `client_loaded_cost_clp` = `SUM(commercial_loaded_cost_target) FROM greenhouse_serving.commercial_cost_attribution WHERE client_id AND period`.
+3. Lee `client_period_revenue` = `SUM(income.total_amount_clp) WHERE client_id AND period_year/month`.
+4. Share = `min(1, realized_revenue / client_period_revenue)`. Si `client_period_revenue = 0` o el quote es el único linked, share = 1.
+5. `attributed_cost_clp = client_loaded_cost_clp * share`.
+6. `effective_margin_pct = ((realized_revenue - attributed_cost) / realized_revenue) * 100`.
+7. `margin_drift_pct = effective_margin_pct - quoted_margin_pct`.
+8. `drift_severity`: `aligned` (|drift| < 5pp), `warning` (5-15pp), `critical` (≥15pp).
+
+Los drivers adicionales (`authorizedVsQuotedPct`, `invoicedVsQuotedPct`, `realizedVsQuotedPct`) quedan persistidos en `drift_drivers` JSONB.
+
+### API
+
+- `GET /api/finance/commercial-intelligence/pipeline` — `{ items, totals, count }`. Filtros: `stage, clientId, businessLineCode, renewalsDueOnly, expiredOnly`. Tenant scope automático.
+- `GET /api/finance/commercial-intelligence/profitability` — `{ items, count }`. Filtros: `quotationId, periodYear, periodMonth, driftSeverity, clientId`.
+- `GET /api/finance/commercial-intelligence/renewals?include=renewals|expired|all` — `{ renewals, expired, counts }`.
+- `POST /api/finance/commercial-intelligence/materialize` — admin/finance_manager. `{ quotationId? }` o `{ lifecycleSweep: true }`.
+
+### UI
+
+- `/finance/intelligence` → tab **"Cotizaciones"** → `CommercialIntelligenceView` con 3 sub-tabs:
+  - **Pipeline** — 4 KPIs (abierto / ponderado / ganado / perdido) + tabla por stage con probability, margen, vencimiento, badge de renovación/vencida.
+  - **Rentabilidad** — tabla por quote-período con quoted/invoiced/costo + margen cotizado vs efectivo + chip drift (Alineado/Atención/Crítico).
+  - **Renovaciones** — dos secciones: "Próximas a vencer" (60d) y "Vencidas".
+
+Todas las listas respetan tenant scope automáticamente.
+
+---
+
+## Delta 2026-04-17 — TASK-350 Quotation-to-Cash Document Chain Bridge
+
+### Problema que cerró
+
+Antes de TASK-350, OC, HES e income se relacionaban con la cotización a través de strings frágiles (`po_number`, `hes_number`) o no se relacionaban en absoluto. No había modo de responder "¿cuánto se cotizó vs cuánto se autorizó vs cuánto se facturó de esta quote?" sin reconstruir joins heurísticamente.
+
+### Schema (migration `20260417190539017_task-350-quotation-to-cash-bridge.sql`)
+
+- `greenhouse_finance.purchase_orders.quotation_id` — FK → `greenhouse_commercial.quotations(quotation_id)`, `ON DELETE SET NULL`, indexada (partial index WHERE NOT NULL).
+- `greenhouse_finance.service_entry_sheets.quotation_id` — FK análogo. Auto-hereda del PO cuando se crea HES con `purchase_order_id`.
+- `greenhouse_finance.service_entry_sheets.amount_authorized_clp` — `numeric(14,2)` nullable. Fijado en `approveHes` (default = `amount_clp`). Habilita drift vs `amount_clp` (submitted) y vs quote total (quoted).
+- `greenhouse_finance.income.quotation_id` — FK canónica al quote ancestor. Poblada al materializar factura (simple branch desde quote, enterprise branch desde HES).
+- `greenhouse_finance.income.source_hes_id` — FK a HES que autorizó el income. NULL para rama simple.
+
+Todas las columnas son nullable y no se hace backfill: bridge solo aplica a flujos nuevos; callers que pasen `quotationId` explícito (o lo hereden vía PO) obtienen audit + outbox automáticamente.
+
+### Runtime (`src/lib/finance/quote-to-cash/`)
+
+- `linkPurchaseOrderToQuotation({ poId, quotationId, actor })` — valida consistencia client_id/organization_id entre PO y quote, setea FK, publica `commercial.quotation.po_linked`, registra audit `po_received`. `FOR UPDATE` sobre la PO.
+- `linkServiceEntryToQuotation({ hesId, quotationId, actor })` — análogo para HES; publica `commercial.quotation.hes_linked` y audit `hes_received`.
+- `readQuotationDocumentChain({ quotationId })` — read-only reader que devuelve quote header + POs + HES + incomes + `totals: { quoted, authorized, invoiced, authorizedVsQuotedDelta, invoicedVsQuotedDelta }`.
+- `materializeInvoiceFromApprovedQuotation({ quotationId, actor, dueDate? })` — **rama simple**. Precondiciones: quote status `approved`|`sent`, no convertida, sin POs linked, sin HES approved linked. Inserta income con `quotation_id`, transita quote a `converted`, publica `commercial.quotation.invoice_emitted` (`sourceHesId: null`) + audit `invoice_triggered` (branch: `simple`) + `status_changed`.
+- `materializeInvoiceFromApprovedHes({ hesId, actor, dueDate? })` — **rama enterprise**. Precondiciones: HES status `approved`, `quotation_id` set, `income_id` null. Inserta income con `quotation_id` + `source_hes_id`, marca HES `invoiced=TRUE` y `income_id`, transita quote a `converted` si aún no lo está. Publica `invoice_emitted` + audit `invoice_triggered` (branch: `enterprise`).
+
+### API surface
+
+- `POST /api/finance/purchase-orders` — acepta `quotationId` opcional. Corre link helper post-create; en fallo de validación rollback limpiando la FK (no deja PO sin quote si el caller quería el link).
+- `PUT /api/finance/purchase-orders/[id]` — acepta `quotationId`. Si cambia el link, corre helper.
+- `POST /api/finance/hes` — al crear HES, si quedó linked (explícito o heredado del PO) emite `hes_linked` + audit.
+- `POST /api/finance/hes/[id]/approve` — extendido. Acepta `amountAuthorizedClp` (persiste en approve) + `materializeInvoice` boolean + `dueDate`. Si se pide materializar y hay `quotation_id` y no hay `income_id`, encadena `materializeInvoiceFromApprovedHes` en el mismo handler. Error de materialización → 207 con `invoiceError` (approval ya ocurrió, no se revierte).
+- `GET /api/finance/quotes/[id]/document-chain` — devuelve la cadena leída por el reader.
+- `POST /api/finance/quotes/[id]/convert-to-invoice` — **rama simple**. Body `{ dueDate? }`.
+
+### UI
+
+- Nueva tab **"Cadena documental"** en `QuoteDetailView` (`src/views/greenhouse/finance/QuoteDetailView.tsx`).
+- Componente `QuoteDocumentChain` (`src/views/greenhouse/finance/workspace/QuoteDocumentChain.tsx`): 3 KPIs (Cotizado / Autorizado / Facturado) con delta chip contextualizado (Alineado / +X% sobre cotizado / -X% bajo cotizado), secciones PO / HES / Facturas con accent border por estado, CTA "Convertir a factura" habilitado solo en rama simple (quote approved/sent + sin POs + sin HES aprobadas + sin facturas).
+
+### Convivencia de ramas
+
+- **Simple** — cliente sin ciclo enterprise. Quote aprobada → `/convert-to-invoice` → income. Quote transita directo a `converted`.
+- **Enterprise** — cliente con procurement. Quote → link PO → submit HES (auto-herence de `quotation_id`) → approve HES (fija `amount_authorized_clp`) → opcional `materializeInvoice:true` → income con `source_hes_id`. La primera materialización transita la quote a `converted`; HES adicionales del mismo quote siguen materializándose sin re-transicionar.
+
+### Definición operativa de `converted`
+
+Una quote se considera `converted` cuando `converted_to_income_id` deja de ser NULL. Esto ocurre al primer `materializeInvoice*` exitoso. Quotes en rama enterprise con múltiples HES acumulan múltiples incomes pero sólo referencian el primero en `converted_to_income_id` — el resto queda trazable via `income.quotation_id`.
+
+### Qué se factura
+
+- Rama simple: quote vigente (subtotal/tax/total del quote).
+- Rama enterprise: monto autorizado por HES (`amount_authorized_clp`, fallback `amount_clp`).
+- Drift auditable: `readQuotationDocumentChain` expone `authorizedVsQuotedDelta` e `invoicedVsQuotedDelta` para dashboards de profitability (TASK-351).
+
+---
+
+## Delta 2026-04-17 — TASK-349 Workspace UI + PDF Delivery
+
+### UI surface consolidada
+
+- **Ruta canónica sigue siendo** `/finance/quotes`. No se abrió workspace comercial separado — spec Open Question resuelta: la fachada Finance permanece como entrypoint único; la experiencia comercial vive debajo vía tabs y drawers.
+- **QuotesListView** ahora muestra columna **Versión** (vN si current_version > 1) y columna **Margen** (chip verde/ámbar/rojo según `effective_margin_pct` vs `margin_floor_pct` / `target_margin_pct`). Dos botones de creación:
+  - "Nueva cotización" (primary) → `QuoteCreateDrawer` canónico (POST `/api/finance/quotes`).
+  - "HubSpot" (secondary) → drawer legacy que publica directo a HubSpot vía `/api/finance/quotes/hubspot`.
+- **QuoteDetailView** en tab `General` incorpora `QuoteHealthCard` (margen efectivo + target + piso + descuento + alertas) en la parte superior. Header ahora expone botones "PDF", "Guardar como template" (draft only) y "Enviar" (draft | pending_approval | approved) según permisos y status.
+
+### Componentes nuevos en `src/views/greenhouse/finance/workspace/`
+
+| Componente | Responsabilidad |
+|---|---|
+| `QuoteCreateDrawer` | Drawer lateral 560px con toggle "Desde cero" / "Desde template". Precarga currency/billing/pricingModel desde el template seleccionado. Envía payload extendido al POST `/api/finance/quotes`. |
+| `QuoteLineItemsEditor` | Editor inline de line items (habilitado solo si status=draft y canEdit). Read-only si editable=false. Soporta agregar/eliminar filas, subtotales preview local, guardar/descartar. |
+| `QuoteHealthCard` | Tarjeta de salud de margen. Muestra chip (Óptimo/Atención/Crítico/Sin datos), breakdown target/piso/descuento, lista de alertas MUI `Alert`, y CTA "Solicitar aprobación" cuando hay alerta `requiredApproval='finance'`. |
+| `QuoteSendDialog` | Confirm dialog context-aware: distingue `needs_approval`, `approval_in_progress`, `ready`, `blocked`. Muestra health + steps pendientes + alertas. Disabled en estados bloqueantes. |
+| `QuoteSaveAsTemplateDialog` | Dialog con templateName (≥4 chars) + templateCode (pattern `^[A-Z0-9\-]+$`, auto-uppercase) + description opcional. |
+
+### Endpoints nuevos
+
+| Método | Ruta | Responsabilidad |
+|---|---|---|
+| `GET` | `/api/finance/quotes/[id]/pdf` | Render client-safe del PDF usando `@react-pdf/renderer`. Excluye `unit_cost`, `subtotal_cost`, `margin_pct`, `effective_margin_pct`, `cost_breakdown`, metadata de approvals. `?download=1` cambia `Content-Disposition` de `inline` a `attachment`. Registra `pdf_generated` en audit_log (sin outbox event — es señal interna). |
+| `POST` | `/api/finance/quotes/[id]/send` | Transiciona `draft → sent` (directo si health OK) o `draft → pending_approval` (si health requiere aprobación; crea approval_steps). Bloquea transiciones desde `sent`/`approved`/`pending_approval`/`rejected`/`converted`/`expired` con 409. Emite `commercial.quotation.sent` o `commercial.quotation.approval_requested` según corresponda. Actualiza `sent_at`. |
+| `POST` | `/api/finance/quotes/[id]/save-as-template` | Crea template en `greenhouse_commercial.quote_templates` desde la quote actual: copia pricing_model, currency, billing_frequency, payment_terms, contract_duration; mapea current-version line items a `quote_template_items` (strip `member_id`, keep role_code); extrae `default_term_ids` de `quotation_terms` con `included=true`. Emite `commercial.quotation.template_saved`. |
+
+### POST `/api/finance/quotes` extendido
+
+Acepta opcional `templateId`. Cuando está presente:
+1. Llama `recordTemplateUsage(templateId)` (increment `usage_count`, update `last_used_at`).
+2. Defaults heredados del template: `currency`, `billingFrequency`, `pricingModel`, `contractDurationMonths`, `businessLineCode` (los valores del body sobrescriben).
+3. Si `body.lineItems` está vacío → genera desde `template.items`.
+4. Después del pricing snapshot, llama `seedQuotationDefaultTerms` con los `default_term_ids` del template.
+5. Emite `commercial.quotation.template_used`.
+
+Comportamiento idéntico al anterior cuando `templateId` es null/undefined.
+
+### PDF Pipeline (client-safe)
+
+- **Renderer:** `@react-pdf/renderer@4.3.2` en Node runtime vía `renderToBuffer`. No requiere Puppeteer ni headless Chrome.
+- **Documento:** `src/lib/finance/pdf/quotation-pdf-document.tsx` usa `Document`, `Page`, `View`, `Text`, `StyleSheet`. Paleta: azul Greenhouse `#0375DB` primario, gris `#6E6B7B` secundario. Fallback Helvetica cuando Poppins no está disponible server-side.
+- **Input contract (`src/lib/finance/pdf/contracts.ts`):** solo acepta campos externamente-seguros (`label`, `description`, `quantity`, `unitPrice`, `subtotalAfterDiscount`). El tipo en sí excluye costos/márgenes — **firewall a nivel TypeScript**. Si un caller intenta inyectar costos, TS falla en compilación.
+- **Layout:** Header (Efeonce + numeroQuote · versión · fecha · válida hasta) → Cliente → Tabla line items (7 columnas client-safe) → Totales (subtotal / descuento / total) → Términos opcionales → Footer (datos fiscales + timestamp).
+- **Audit:** cada render emite `pdf_generated` a `greenhouse_commercial.quotation_audit_log` con `{ versionNumber, downloadMode, fileName }` en details.
+
+### Compatibilidad quote heredadas multi-source
+
+- Quotes con `source_system ∈ {nubox, hubspot}` se muestran con el mismo shell — el chip "Fuente" indica origen.
+- Quotes sin `effective_margin_pct` (típico de ingestas legacy) renderean `QuoteHealthCard` en modo muted "Aún sin margen calculado".
+- El PDF funciona para cualquier quote con `current_version` y `quotation_line_items`; no requiere pricing config completa.
+
+### Archivos tocados
+
+- `src/lib/finance/pdf/contracts.ts` (nuevo)
+- `src/lib/finance/pdf/quotation-pdf-document.tsx` (nuevo)
+- `src/lib/finance/pdf/render-quotation-pdf.ts` (nuevo)
+- `src/app/api/finance/quotes/[id]/pdf/route.ts` (nuevo)
+- `src/app/api/finance/quotes/[id]/send/route.ts` (nuevo)
+- `src/app/api/finance/quotes/[id]/save-as-template/route.ts` (nuevo)
+- `src/app/api/finance/quotes/route.ts` (POST extendido)
+- `src/lib/finance/quotation-canonical-store.ts` (list row incluye `current_version` + margen para badges)
+- `src/views/greenhouse/finance/workspace/` (5 componentes nuevos)
+- `src/views/greenhouse/finance/QuotesListView.tsx` (columnas + canonical drawer wiring)
+- `src/views/greenhouse/finance/QuoteDetailView.tsx` (health card + action buttons + dialogs)
+
+### Verificación
+
+- tsc strict, lint, test (1337 passed), build ✓.
+- Smoke E2E staging-equivalent contra dev DB:
+  - `GET /api/finance/quotes/{id}/pdf` → HTTP 200, `application/pdf` 3665 bytes, PDF 1.3 1 página.
+  - `POST /api/finance/quotes/{id}/send` → HTTP 200, `{ sent: true, newStatus: 'sent', health }`.
+- Observacional: auditoría registra `pdf_generated` y `sent` con actor + version.
+
+### Follow-ups explícitos
+
+- Email dispatch del PDF al cliente (consumer reactivo sobre `commercial.quotation.sent` con attachment) — queda para iteración posterior.
+- PDF multi-página cuando line items > 30 (actual caso: la page única se ajusta automáticamente por el flex del renderer; con volumen real puede requerir pagination explícita).
+- Font embedding de Poppins/DM Sans server-side (ahora fallback a Helvetica; cosmético).
+- Analytics de uso del workspace.
+
+---
+
+## Delta 2026-04-17 — TASK-348 quotation governance runtime
+
+- **7 tablas nuevas en `greenhouse_commercial`** (migration `20260417140553325_task-348-quotation-governance-runtime.sql`):
+  - `approval_policies` — reglas parametrizables de aprobación por BL, pricing model, condition type (`margin_below_floor`, `margin_below_target`, `amount_above_threshold`, `discount_above_threshold`, `always`).
+  - `approval_steps` — instancias pendientes/decididas por `(quotation_id, version_number)` con required_role, step_order, notes y decided_at.
+  - `quotation_audit_log` — trail inmutable de acciones (`created`, `status_changed`, `version_created`, `approval_requested`, `approval_decided`, `terms_changed`, `template_used`, …) con detalle en jsonb.
+  - `terms_library` — catálogo global de términos reutilizables con `body_template` que admite variables `{{payment_terms_days}}`, `{{valid_until}}`, etc.
+  - `quotation_terms` — snapshot por cotización del término aplicado con `body_resolved` inmutable.
+  - `quote_templates` + `quote_template_items` — plantillas por BL + pricing model con line items default, currency, billing frequency, terms referenciados y usage_count.
+- **Runtime governance helpers** en `src/lib/commercial/governance/`:
+  - `contracts.ts`, `audit-log.ts`, `approval-evaluator.ts`, `approval-steps-store.ts`, `policies-store.ts`, `terms-store.ts` (incluye `resolveTermVariables`), `templates-store.ts`, `versions-store.ts`, `version-diff.ts`.
+  - `evaluateApproval()` recibe `health.quotationMarginPct/discountPct + totalPrice` y retorna los steps a crear en orden.
+  - `createNewVersion()` clona line items de la versión vigente, incrementa `current_version`, crea snapshot en `quotation_versions` y deja la cotización en `draft`.
+  - `seedQuotationDefaultTerms()` + `upsertQuotationTerms()` aplican términos del library a una quote resolviendo variables.
+- **Outbox fan-out**. Nuevos event types en `event-catalog.ts`: `commercial.quotation.version_created`, `commercial.quotation.approval_requested`, `commercial.quotation.approval_decided`, `commercial.quotation.sent`, `commercial.quotation.approved`, `commercial.quotation.rejected`, `commercial.quotation.template_used`, `commercial.quotation.template_saved`. Publishers correspondientes viven en `src/lib/commercial/quotation-events.ts`.
+- **API surface extension**. La gobernanza se expone bajo la superficie runtime existente (no se duplica el bridge TASK-345):
+  - Por cotización: `/api/finance/quotes/[id]/versions`, `/approve`, `/audit`, `/terms`.
+  - Globales: `/api/finance/quotation-governance/approval-policies[/[id]]`, `/terms-library[/[id]]`, `/templates[/[id]]`. Todos protegidos por `requireFinanceTenantContext` + role gate en mutaciones.
+- **UI tabs** en `src/views/greenhouse/finance/QuoteDetailView.tsx`: General / Versiones / Aprobaciones / Términos / Auditoría. Componentes nuevos en `src/views/greenhouse/finance/governance/`.
+- **Seeds iniciales**: 3 approval policies globales (margen bajo piso, monto > 50M, descuento > 30%) y 6 terms library reutilizables (pago, vigencia, confidencialidad, cambios de alcance, reemplazo, escalamiento).
+- **Respeta boundaries**: audit, versions y outbox coexisten — cada uno cumple un propósito distinto según §18.3.
+
+---
+
+## Delta 2026-04-17 — TASK-347 HubSpot canonical bridge + event namespace convergence
+
+- **Canonical-first semantics declared.** `greenhouse_commercial.*` is the primary
+  contract target; `greenhouse_finance.*` persists as a compat façade with bridge
+  syncers for the duration of the cutover (until TASK-349 closes). No table dropped.
+- **Event namespace fan-out.** HubSpot sync publishers (inbound quotes, inbound
+  products, inbound line items, outbound create-quote, outbound create-product)
+  now route all emissions through `src/lib/commercial/quotation-events.ts`, which
+  dual-publishes:
+  - legacy `finance.quote.*` / `finance.product.*` / `finance.quote_line_item.*`
+  - canonical `commercial.quotation.*` / `commercial.product_catalog.*` /
+    `commercial.quotation.line_items_synced`
+  - `commercial.discount.health_alert` (TASK-346) now registered canonically with
+    `aggregate_type='quotation'` and uses the proper `outbox_events.payload_json`
+    column (fix from TASK-346 where raw insert referenced a missing column).
+- **Outbound cost-field governance.** `src/lib/commercial/hubspot-outbound-guard.ts`
+  is the only authoritative path for building HubSpot-bound payloads. Forbidden
+  fields (`costOfGoodsSold`, `cost_of_goods_sold`, `unit_cost`, `loaded_cost`,
+  `marginPct`, `targetMarginPct`, `floorMarginPct`, `effectiveMarginPct`,
+  `costBreakdown`) are stripped by `sanitizeHubSpotProductPayload` and double-checked
+  at the service boundary (`createHubSpotGreenhouseProduct` deletes `costOfGoodsSold`
+  defensively even if a caller skipped the guard). Violations throw
+  `HubSpotCostFieldLeakError`.
+- **Canonical product catalog reader.** `src/lib/commercial/product-catalog-store.ts`
+  (`listCommercialProductCatalog`, `getCommercialProduct`) exposes
+  `greenhouse_commercial.product_catalog` with canonical identity
+  (`product_id` + `finance_product_id` bridge). `/api/finance/products?view=canonical`
+  returns the new shape without breaking the legacy default view. ProductCatalogView
+  UI is NOT wired to sidebar yet (left for TASK-349 workspace redesign).
+- **Aggregate types registered.** `AGGREGATE_TYPES.quotation`,
+  `AGGREGATE_TYPES.quotationLineItem`, `AGGREGATE_TYPES.productCatalog` added to
+  `event-catalog.ts`. Legacy aggregate types (`quote`, `quote_line_item`, `product`)
+  preserved for backward compatibility.
+- **Cutover policy.**
+  - Inbound sync: HubSpot → `greenhouse_finance.*` (bridge writes to
+    `greenhouse_commercial.*` via existing `syncCanonicalFinanceQuote` /
+    `syncCanonicalFinanceProduct`). Legacy write + canonical bridge remain
+    transactional; events emitted after canonical anchor is populated.
+  - Outbound create: Greenhouse → `greenhouse_finance.*` → HubSpot (payload
+    sanitized) → `syncCanonicalFinanceQuote` / `syncCanonicalFinanceProduct`
+    → dual publish. `publishProductCreated` / `publishQuoteCreated` fan-out to
+    both namespaces in the same transaction.
+  - Double-write avoidance: the bridge is idempotent via `ON CONFLICT (finance_quote_id)`
+    on `quotations` and `ON CONFLICT (finance_product_id)` on `product_catalog`.
+- **Compatibility surfaces.**
+  - `/api/finance/quotes`, `/api/finance/quotes/[id]`, `/api/finance/quotes/[id]/lines`
+    already read from canonical (TASK-345). No changes required for TASK-347.
+  - `/api/finance/products` default view preserved; `view=canonical` query param
+    switches to `greenhouse_commercial.product_catalog`.
+  - Cron routes (`/api/cron/hubspot-quotes-sync`, `/api/cron/hubspot-products-sync`)
+    unchanged externally; internally they invoke the updated publishers.
+- **Pending cleanup (future tasks):**
+  - Retire `finance.quote.*` / `finance.product.*` aliases once all consumers
+    migrate (TASK-349+).
+  - Drop `greenhouse_finance.products` table entirely after ProductCatalog workspace
+    (TASK-349) is live (out of scope for TASK-347).
+
+---
+
+## Delta 2026-04-17 — TASK-346 Pricing/costing/margin core live
+
+- Pricing config foundation materializada en `greenhouse_commercial`:
+  - `margin_targets` (business_line_code nullable + effective_from; CHECK floor ≤ target)
+  - `role_rate_cards` (business_line_code + role_code + seniority_level + effective_from)
+  - `revenue_metric_config` (business_line_code nullable, hubspot_amount_metric + pipeline_default_metric)
+- Runtime pricing helpers en `src/lib/finance/pricing/`:
+  - `pricing-config-store.ts` — resolvers con herencia `quotation_override → business_line → global_default`.
+  - `costing-engine.ts` — `resolveLineItemCost` es la única puerta para obtener costo de un line item.
+  - `margin-health.ts` — clasifica alertas (blocking / finance-approval / warning / info).
+  - `revenue-metrics.ts` — resuelve `recurrence_type = 'inherit'` según `billing_frequency` y calcula MRR/ARR/TCV/ACV.
+  - `quotation-pricing-orchestrator.ts` — `buildQuotationPricingSnapshot` / `persistQuotationPricing` /
+    `recalculateQuotationPricing` orquestan costing + totals + health + revenue + persistencia transaccional y
+    publican al outbox `commercial.discount.health_alert` cuando hay alerta severa.
+- Política canónica **snapshot vs recompute** (bajada a código):
+  - **Snapshot (congelado al guardar en `quotation_line_items`)**: `unit_cost`, `cost_breakdown`,
+    `subtotal_cost`. Esto blinda la cotización contra cambios posteriores de payroll/FX/rate cards
+    salvo recálculo explícito.
+  - **Recompute (siempre en cada save)**: `subtotal_price`, `discount_amount`, `subtotal_after_discount`,
+    `effective_margin_pct` por línea y los agregados de quotation (`total_cost`, `total_price`,
+    `effective_margin_pct`, `mrr`, `arr`, `tcv`, `acv`, `revenue_type`).
+  - **Recompute bajo comando del usuario**: `POST /api/finance/quotes/[id]/recalculate` re-lee
+    `member_capacity_economics` y `role_rate_cards` vigentes, actualizando el snapshot. Opcionalmente
+    crea una nueva versión (`createVersion: true`) en `quotation_versions`.
+- FX multi-moneda:
+  - `quotations.exchange_rates` (JSONB) guarda las tasas canónicas del momento del snapshot.
+  - El engine acepta claves `FROM_TO` y su inversa; si no encuentra tasa usa `fx_rate` del snapshot
+    de capacity cuando la target es CLP; si no hay match deja el costo sin convertir y agrega warning
+    a `resolutionNotes` del line item.
+- API routes (finance-scoped):
+  - `POST /api/finance/quotes` — create draft + snapshot inicial
+  - `PUT /api/finance/quotes/[id]` — update headers + recalculate (`recalculatePricing: boolean`)
+  - `POST /api/finance/quotes/[id]/lines` — replace line items + recompute
+  - `POST /api/finance/quotes/[id]/recalculate` — force re-read del backbone
+  - `GET /api/finance/quotes/[id]/health` — discount health server-side
+  - `GET/PUT /api/finance/quotes/pricing/config` — PUT gated a `finance_admin` / `efeonce_admin`
+- El namespace de eventos sigue en `finance.quote.*` para compat (converge a `commercial.quotation.*`
+  en TASK-347). TASK-346 suma el nuevo evento `commercial.discount.health_alert` al outbox.
+
+## Delta 2026-04-17 — TASK-345 Canonical schema + finance compatibility bridge
+
+- `greenhouse_commercial` ya existe físicamente en PostgreSQL para la lane de quotations.
+- Foundation materializada:
+  - `greenhouse_commercial.product_catalog`
+  - `greenhouse_commercial.quotations`
+  - `greenhouse_commercial.quotation_versions`
+  - `greenhouse_commercial.quotation_line_items`
+- La materialización nace como **bridge canónico**, no como surface visible nueva:
+  - `Finance > Cotizaciones` sigue siendo la fachada visible
+  - las APIs Finance leen vía façade canónica manteniendo el contrato legacy del portal
+  - los writers actuales de HubSpot/Nubox siguen publicando `finance.quote.*` / `finance.product.*`, pero ahora sincronizan también el anchor canónico
+- Regla de IDs/cutover:
+  - `quotation_id` es la identidad canónica interna del nuevo schema
+  - `finance_quote_id`, `finance_product_id` y `finance_line_item_id` quedan persistidos como claves de compatibilidad/runtime
+  - el portal Finance sigue exponiendo `quoteId` y `lineItemId` legacy mientras dure el cutover
+- Regla de tenancy actualizada:
+  - `space_id` queda materializado en `greenhouse_commercial.quotations` via resolución bridge desde `organization_id` / `client_id`
+  - si el lane legacy no trae `space_id` explícito, el bridge conserva `space_resolution_source` para auditar cómo se resolvió
+- Los eventos `commercial.quotation.*` siguen siendo naming objetivo; TASK-345 no introduce todavía publishers runtime en esa familia.
 
 ## 1. Vision y proposito
 
@@ -44,7 +398,9 @@ Los 3 modelos comparten la misma estructura de datos (quotation + line items). L
 
 ## 3. Schema: `greenhouse_commercial`
 
-Nuevo schema dedicado. Ownership: `greenhouse_ops`.
+Schema dedicado ya materializado. Ownership: `greenhouse_ops`.
+
+> **Nota de cutover:** este schema ya existe físicamente desde `TASK-345`, pero el portal no hace bypass directo del lane Finance. El runtime visible sigue siendo finance-first con façade canónica detrás.
 
 ### 3.1. Margin targets (configuracion por business line)
 
@@ -1319,13 +1675,22 @@ CREATE TABLE greenhouse_commercial.quote_template_items (
   suggested_hours    NUMERIC(8,2),
   unit               TEXT NOT NULL DEFAULT 'hour',
   quantity           NUMERIC(10,2) NOT NULL DEFAULT 1,
-  default_margin_pct NUMERIC(5,2),
+  default_margin_pct NUMERIC(5,2),        -- sugerencia para el costing-engine
+  default_unit_price NUMERIC(14,2),       -- precio explícito opcional; si != null gana al instanciar
   sort_order         INTEGER NOT NULL DEFAULT 0,
   created_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_template_items ON greenhouse_commercial.quote_template_items (template_id);
 ```
+
+**Resolución de precio al instanciar un template (v2 — TASK-348):** el template guarda AMBOS `default_margin_pct` (sugerencia) y `default_unit_price` (precio explícito opcional). El orchestrator al aplicar el template:
+
+1. Si `default_unit_price` está presente → lo usa directo como `unit_price` de la line item.
+2. Si `default_unit_price` es null → el costing-engine calcula `unit_cost` desde role rate card y luego `unit_price = unit_cost / (1 - default_margin_pct/100)`.
+3. Si ambos son null → solo se pre-popula la estructura y el comercial completa manualmente.
+
+Esta doble opción permite templates rígidos (por ejemplo "Onboarding fijo $5M") coexistiendo con templates variables (por ejemplo "Retainer creativo con margen objetivo 35%").
 
 ### 19.2. Flujo de uso
 
@@ -1373,9 +1738,12 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | `commercial.quotation.expired_without_renewal` | Vencida sin draft de renovacion | Alerta critica → Account Lead + Finance |
 | `commercial.quotation.approval_requested` | Health check dispara approval | Notifications → aprobadores |
 | `commercial.quotation.approval_decided` | Aprobador decide | Notifications → creador, audit log |
-| `commercial.purchase_order.received` | Registrar OC | Notifications → Finance, pipeline projection |
-| `commercial.service_entry.received` | Registrar HES | Notifications → Finance |
-| `commercial.service_entry.invoiced` | Facturar | Nubox integration, finance.income |
+| `commercial.quotation.po_linked` (TASK-350) | OC vinculada a cotización canónica | Audit log, profitability tracking, ops notifications |
+| `commercial.quotation.hes_linked` (TASK-350) | HES vinculada a cotización canónica (explícito o heredado del PO) | Audit log, profitability tracking |
+| `commercial.quotation.invoice_emitted` (TASK-350) | Factura materializada desde quote (rama simple) o desde HES (rama enterprise) | Pipeline projection, profitability tracking, Nubox emission follow-up |
+| `commercial.purchase_order.received` | Registrar OC (legacy namespace) | Notifications → Finance, pipeline projection |
+| `commercial.service_entry.received` | Registrar HES (legacy namespace) | Notifications → Finance |
+| `commercial.service_entry.invoiced` | Facturar (legacy namespace) | Nubox integration, finance.income |
 | `commercial.product.created` | Crear producto | HubSpot sync (si sync habilitado) |
 | `commercial.product.updated` | Actualizar producto | HubSpot sync |
 | `commercial.discount.health_alert` | Descuento riesgoso | Notifications → Finance, audit log |

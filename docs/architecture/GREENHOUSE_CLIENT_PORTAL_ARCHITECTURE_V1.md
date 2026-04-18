@@ -115,12 +115,37 @@ Tres roles definidos en `src/config/role-codes.ts`:
 
 - Si un usuario cliente no tiene rol asignado, el sistema asigna `client_executive` por defecto (`src/lib/tenant/access.ts`).
 - Los tres roles mapean al **mismo route group**: `['client']` (`src/lib/tenant/role-route-mapping.ts`).
-- **No hay diferenciacion funcional** entre los tres roles — ven exactamente las mismas vistas y datos.
 - Los roles cliente tienen la prioridad mas baja en `ROLE_PRIORITY`, despues de todos los roles internos.
 
-### Gap: diferenciacion de roles
+### Diferenciacion de roles (TASK-285, 2026-04-16)
 
-Los tres roles existen como concepto pero no tienen permisos distintos. No hay matriz de permisos que defina que puede hacer un `client_specialist` vs un `client_executive`. Cualquier renovacion deberia decidir si estos roles necesitan diferenciacion real o si se consolidan.
+La diferenciacion se implementa via `role_view_assignments` en `greenhouse_core`, NO via route groups separados. Los tres roles comparten route group `['client']` pero tienen asignaciones de view codes distintas:
+
+| View Code | client_executive | client_manager | client_specialist |
+|-----------|:---:|:---:|:---:|
+| cliente.pulse | granted | granted | granted |
+| cliente.proyectos | granted | granted | granted |
+| cliente.ciclos | granted | granted | granted |
+| cliente.equipo | granted | granted | **denied** |
+| cliente.revisiones | granted | granted | granted |
+| cliente.analytics | granted | granted | **denied** |
+| cliente.campanas | granted | granted | **denied** |
+| cliente.modulos | granted | granted | granted |
+| cliente.actualizaciones | granted | granted | granted |
+| cliente.configuracion | granted | granted | granted |
+| cliente.notificaciones | granted | granted | granted |
+
+**Cadena de enforcement:**
+1. Login → `resolveAuthorizedViewsForUser()` lee `role_view_assignments` → JWT.authorizedViews
+2. Menu → `canSeeView()` en VerticalMenu.tsx filtra items por `authorizedViews`
+3. Page guard → `hasAuthorizedViewCode()` en cada page bloquea acceso directo y redirige a portalHomePath
+
+**Governance runtime:** la matriz es editable desde Admin Center (`/admin/views`) sin deploy.
+
+**Migration:** `20260416095444700_seed-client-role-view-assignments.sql`
+**Test:** `src/lib/admin/client-role-visibility.test.ts`
+
+> Nota: executive y manager son identicos para las 11 vistas actuales. Su diferenciacion se activara cuando se registren los view codes nuevos de §12.5 (TASK-286+).
 
 ---
 

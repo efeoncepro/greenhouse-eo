@@ -233,7 +233,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
               return true
             })
-          }
+          },
+          ...(canSeeView('equipo.objetivos', true)
+            ? [{ label: nl(GH_HR_NAV.goals), href: '/hr/goals', icon: 'tabler-target' }]
+            : []),
+          ...(canSeeView('equipo.evaluaciones', true)
+            ? [{ label: nl(GH_HR_NAV.evaluations), href: '/hr/evaluations', icon: 'tabler-clipboard-check' }]
+            : [])
         ]
       : []
 
@@ -417,12 +423,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminTalentReview), href: '/admin/talent-review', icon: 'tabler-rosette-discount-check' },
               { label: nl(GH_INTERNAL_NAV.adminTalentOps), href: '/admin/talent-ops', icon: 'tabler-heart-rate-monitor' },
               { label: nl(GH_INTERNAL_NAV.adminBusinessLines), href: '/admin/business-lines' },
+              { label: nl(GH_INTERNAL_NAV.adminServiceSlas), href: '/admin/service-slas', icon: 'tabler-shield-check' },
               { label: nl(GH_INTERNAL_NAV.adminPaymentInstruments), href: '/admin/payment-instruments' }
             ].filter(item => {
               if (item.href === '/admin/team') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/talent-review') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/talent-ops') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/business-lines') return canSeeView('administracion.admin_center', true)
+              if (item.href === '/admin/service-slas') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/payment-instruments') return canSeeView('administracion.instrumentos_pago', true)
 
               return true
@@ -469,6 +477,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
+          { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
+          { label: nl(GH_MY_NAV.evaluations), href: '/my/evaluations', icon: 'tabler-clipboard-check' },
           { label: nl(GH_MY_NAV.organization), href: '/my/organization', icon: 'tabler-building' }
         ].filter(item => {
           if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
@@ -477,6 +487,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
+          if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
+          if (item.href === '/my/evaluations') return canSeeView('mi_ficha.mis_evaluaciones', true)
           if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
 
           return true
@@ -564,6 +576,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_MY_NAV.profile), href: '/my/profile', icon: 'tabler-user-circle' },
           { label: nl(GH_MY_NAV.payroll), href: '/my/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_MY_NAV.leave), href: '/my/leave', icon: 'tabler-calendar-event' },
+          { label: nl(GH_MY_NAV.goals), href: '/my/goals', icon: 'tabler-target' },
+          { label: nl(GH_MY_NAV.evaluations), href: '/my/evaluations', icon: 'tabler-clipboard-check' },
           { label: nl(GH_MY_NAV.organization), href: '/my/organization', icon: 'tabler-building' }
         ].filter(item => {
           if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
@@ -572,6 +586,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
           if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
           if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
+          if (item.href === '/my/goals') return canSeeView('mi_ficha.mis_objetivos', true)
+          if (item.href === '/my/evaluations') return canSeeView('mi_ficha.mis_evaluaciones', true)
           if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
 
           return true

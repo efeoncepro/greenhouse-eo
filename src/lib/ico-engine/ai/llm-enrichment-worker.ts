@@ -9,12 +9,15 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { generateAiSignalEnrichment } from './llm-provider'
 import { resolveSignalContext } from './resolve-signal-context'
 import type { AiSignalRecord } from './types'
+import { getResolvedProjectDisplay } from './entity-display-resolution'
 import {
   buildIcoLlmPromptHash,
   ICO_LLM_DEFAULT_MODEL_ID,
   ICO_LLM_PROMPT_VERSION,
   ICO_LLM_SUPPORTED_SIGNAL_TYPES,
   stableEnrichmentId,
+  stableEnrichmentHistoryId,
+  stableReplayRunId,
   stableRunId,
   toSerializableSignalSnapshot,
   type AiEnrichmentRunRecord,
@@ -28,6 +31,8 @@ export interface MaterializeAiLlmEnrichmentsInput {
   triggerEventId?: string | null
   triggerType?: string
   modelId?: string | null
+  asOfTime?: string | null
+  historyOnly?: boolean
 }
 
 export interface MaterializeAiLlmEnrichmentsResult {
@@ -41,6 +46,7 @@ export interface MaterializeAiLlmEnrichmentsResult {
 type BigQuerySignalRow = Record<string, unknown>
 
 const SUPPORTED_SIGNAL_TYPES = new Set<string>(ICO_LLM_SUPPORTED_SIGNAL_TYPES)
+const LLM_ENRICHMENT_TIMEOUT_MS = 60_000
 
 const toNumber = (value: unknown) => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null
@@ -165,6 +171,25 @@ const chunk = <T>(items: T[], size: number) => {
   return groups
 }
 
+const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`LLM enrichment timed out after ${timeoutMs}ms (${label})`))
+        }, timeoutMs)
+      })
+    ])
+  } finally {
+    if (timer) {
+      clearTimeout(timer)
+    }
+  }
+}
+
 const buildBaseRecord = (signal: AiSignalRecord, runId: string, promptHash: string, modelId: string): Omit<AiSignalEnrichmentRecord, 'qualityScore' | 'explanationSummary' | 'rootCauseNarrative' | 'recommendedAction' | 'explanationJson' | 'confidence' | 'tokensIn' | 'tokensOut' | 'latencyMs' | 'status' | 'errorMessage' | 'processedAt'> => ({
   enrichmentId: stableEnrichmentId(signal.signalId, promptHash),
   runId,
@@ -265,7 +290,113 @@ const deleteBigQueryCurrentState = async (input: {
   await bigQuery.query({ query: enrichmentDeleteQuery, params })
 }
 
-const persistServingState = async (records: AiSignalEnrichmentRecord[], run: AiEnrichmentRunRecord) => {
+const persistServingState = async (
+  records: AiSignalEnrichmentRecord[],
+  run: AiEnrichmentRunRecord,
+  options?: { historyOnly?: boolean }
+) => {
+  for (const record of records) {
+    await query(
+      `
+        INSERT INTO greenhouse_serving.ico_ai_signal_enrichment_history (
+          history_id,
+          enrichment_id,
+          run_id,
+          signal_id,
+          space_id,
+          member_id,
+          project_id,
+          signal_type,
+          metric_name,
+          period_year,
+          period_month,
+          severity,
+          quality_score,
+          explanation_summary,
+          root_cause_narrative,
+          recommended_action,
+          explanation_json,
+          model_id,
+          prompt_version,
+          prompt_hash,
+          confidence,
+          tokens_in,
+          tokens_out,
+          latency_ms,
+          status,
+          error_message,
+          processed_at,
+          synced_at
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+          $11, $12, $13, $14, $15, $16, $17::jsonb, $18, $19, $20,
+          $21, $22, $23, $24, $25, $26, $27, NOW()
+        )
+        ON CONFLICT (history_id) DO UPDATE SET
+          enrichment_id = EXCLUDED.enrichment_id,
+          run_id = EXCLUDED.run_id,
+          signal_id = EXCLUDED.signal_id,
+          space_id = EXCLUDED.space_id,
+          member_id = EXCLUDED.member_id,
+          project_id = EXCLUDED.project_id,
+          signal_type = EXCLUDED.signal_type,
+          metric_name = EXCLUDED.metric_name,
+          period_year = EXCLUDED.period_year,
+          period_month = EXCLUDED.period_month,
+          severity = EXCLUDED.severity,
+          quality_score = EXCLUDED.quality_score,
+          explanation_summary = EXCLUDED.explanation_summary,
+          root_cause_narrative = EXCLUDED.root_cause_narrative,
+          recommended_action = EXCLUDED.recommended_action,
+          explanation_json = EXCLUDED.explanation_json,
+          model_id = EXCLUDED.model_id,
+          prompt_version = EXCLUDED.prompt_version,
+          prompt_hash = EXCLUDED.prompt_hash,
+          confidence = EXCLUDED.confidence,
+          tokens_in = EXCLUDED.tokens_in,
+          tokens_out = EXCLUDED.tokens_out,
+          latency_ms = EXCLUDED.latency_ms,
+          status = EXCLUDED.status,
+          error_message = EXCLUDED.error_message,
+          processed_at = EXCLUDED.processed_at,
+          synced_at = NOW()
+      `,
+      [
+        stableEnrichmentHistoryId(record.runId, record.enrichmentId),
+        record.enrichmentId,
+        record.runId,
+        record.signalId,
+        record.spaceId,
+        record.memberId,
+        record.projectId,
+        record.signalType,
+        record.metricName,
+        record.periodYear,
+        record.periodMonth,
+        record.severity,
+        record.qualityScore,
+        record.explanationSummary,
+        record.rootCauseNarrative,
+        record.recommendedAction,
+        JSON.stringify(record.explanationJson),
+        record.modelId,
+        record.promptVersion,
+        record.promptHash,
+        record.confidence,
+        record.tokensIn,
+        record.tokensOut,
+        record.latencyMs,
+        record.status,
+        record.errorMessage,
+        record.processedAt
+      ]
+    )
+  }
+
+  if (options?.historyOnly) {
+    return
+  }
+
   if (run.spaceId) {
     await query(
       `
@@ -460,7 +591,8 @@ const buildFailedRecord = (
   promptHash: string,
   modelId: string,
   status: AiSignalEnrichmentRecord['status'],
-  errorMessage: string
+  errorMessage: string,
+  processedAt: string
 ): AiSignalEnrichmentRecord => ({
   ...buildBaseRecord(signal, runId, promptHash, modelId),
   qualityScore: null,
@@ -474,7 +606,7 @@ const buildFailedRecord = (
   latencyMs: null,
   status,
   errorMessage,
-  processedAt: new Date().toISOString()
+  processedAt
 })
 
 export const materializeAiLlmEnrichments = async (
@@ -486,13 +618,22 @@ export const materializeAiLlmEnrichments = async (
   const bigQuery = getBigQueryClient()
   const modelId = input.modelId?.trim() || ICO_LLM_DEFAULT_MODEL_ID
   const promptHash = buildIcoLlmPromptHash()
-  const runId = stableRunId(input.periodYear, input.periodMonth, promptHash)
+  const asOfTime = input.asOfTime?.trim() || null
+  const historyOnly = input.historyOnly === true
+
+  const runId =
+    historyOnly && asOfTime
+      ? stableReplayRunId(input.periodYear, input.periodMonth, promptHash, asOfTime, input.spaceId)
+      : stableRunId(input.periodYear, input.periodMonth, promptHash)
+
   const startedAt = new Date().toISOString()
+  const recordProcessedAt = asOfTime ?? startedAt
+  const systemTimeClause = asOfTime ? ' FOR SYSTEM_TIME AS OF TIMESTAMP(@asOfTime)' : ''
 
   const queryText = input.spaceId
     ? `
       SELECT *
-      FROM \`${projectId}.${ICO_DATASET}.ai_signals\`
+      FROM \`${projectId}.${ICO_DATASET}.ai_signals\`${systemTimeClause}
       WHERE period_year = @periodYear
         AND period_month = @periodMonth
         AND space_id = @spaceId
@@ -500,15 +641,15 @@ export const materializeAiLlmEnrichments = async (
     `
     : `
       SELECT *
-      FROM \`${projectId}.${ICO_DATASET}.ai_signals\`
+      FROM \`${projectId}.${ICO_DATASET}.ai_signals\`${systemTimeClause}
       WHERE period_year = @periodYear
         AND period_month = @periodMonth
       ORDER BY generated_at DESC, signal_id ASC
     `
 
   const params = input.spaceId
-    ? { periodYear: input.periodYear, periodMonth: input.periodMonth, spaceId: input.spaceId }
-    : { periodYear: input.periodYear, periodMonth: input.periodMonth }
+    ? { periodYear: input.periodYear, periodMonth: input.periodMonth, spaceId: input.spaceId, ...(asOfTime ? { asOfTime } : {}) }
+    : { periodYear: input.periodYear, periodMonth: input.periodMonth, ...(asOfTime ? { asOfTime } : {}) }
 
   const [rawRows] = await bigQuery.query({ query: queryText, params })
 
@@ -524,21 +665,37 @@ export const materializeAiLlmEnrichments = async (
     const batchResults = await Promise.all(
       signalBatch.map(async signal => {
         if (!signal.aiEligible) {
-          return buildFailedRecord(signal, runId, promptHash, modelId, 'skipped', 'Signal is not AI-eligible')
+          return buildFailedRecord(signal, runId, promptHash, modelId, 'skipped', 'Signal is not AI-eligible', recordProcessedAt)
         }
 
         if (!SUPPORTED_SIGNAL_TYPES.has(signal.signalType)) {
-          return buildFailedRecord(signal, runId, promptHash, modelId, 'skipped', `Unsupported signal type: ${signal.signalType}`)
+          return buildFailedRecord(
+            signal,
+            runId,
+            promptHash,
+            modelId,
+            'skipped',
+            `Unsupported signal type: ${signal.signalType}`,
+            recordProcessedAt
+          )
         }
 
         try {
-          const generated = await generateAiSignalEnrichment({
-            signal,
-            modelId,
-            promptVersion: ICO_LLM_PROMPT_VERSION,
-            promptHash,
-            resolvedContext
-          })
+          const resolvedProject = signal.projectId
+            ? getResolvedProjectDisplay(resolvedContext.projectResolutions, signal.spaceId, signal.projectId)
+            : null
+
+          const generated = await withTimeout(
+            generateAiSignalEnrichment({
+              signal,
+              modelId,
+              promptVersion: ICO_LLM_PROMPT_VERSION,
+              promptHash,
+              resolvedContext
+            }),
+            LLM_ENRICHMENT_TIMEOUT_MS,
+            signal.signalId
+          )
 
           return {
             ...buildBaseRecord(signal, runId, promptHash, generated.modelId),
@@ -546,14 +703,27 @@ export const materializeAiLlmEnrichments = async (
             explanationSummary: generated.output.explanationSummary,
             rootCauseNarrative: generated.output.rootCauseNarrative,
             recommendedAction: generated.output.recommendedAction,
-            explanationJson: generated.output,
+            explanationJson: {
+              ...generated.output,
+              meta: {
+                projectResolution: resolvedProject
+                  ? {
+                      displayLabel: resolvedProject.displayLabel,
+                      matchedBy: resolvedProject.matchedBy,
+                      canonicalProjectId: resolvedProject.canonicalProjectId,
+                      sourceProjectId: resolvedProject.sourceProjectId,
+                      spaceId: resolvedProject.spaceId
+                    }
+                  : null
+              }
+            },
             confidence: generated.output.confidence,
             tokensIn: generated.tokensIn,
             tokensOut: generated.tokensOut,
             latencyMs: generated.latencyMs,
             status: 'succeeded' as const,
             errorMessage: null,
-            processedAt: new Date().toISOString()
+            processedAt: recordProcessedAt
           }
         } catch (error) {
           return buildFailedRecord(
@@ -562,7 +732,8 @@ export const materializeAiLlmEnrichments = async (
             promptHash,
             modelId,
             'failed',
-            error instanceof Error ? error.message : 'Unknown LLM generation error'
+            error instanceof Error ? error.message : 'Unknown LLM generation error',
+            recordProcessedAt
           )
         }
       })
@@ -606,46 +777,50 @@ export const materializeAiLlmEnrichments = async (
   }
 
   // BigQuery write: best-effort. If streaming buffer blocks DELETE, continue with PostgreSQL serving.
-  try {
-    await deleteBigQueryCurrentState({
-      projectId,
-      periodYear: input.periodYear,
-      periodMonth: input.periodMonth,
-      spaceId: input.spaceId
-    })
+  if (!historyOnly) {
+    try {
+      await deleteBigQueryCurrentState({
+        projectId,
+        periodYear: input.periodYear,
+        periodMonth: input.periodMonth,
+        spaceId: input.spaceId
+      })
 
-    if (records.length > 0) {
-      await bigQuery.dataset(ICO_DATASET).table('ai_signal_enrichments').insert(records.map(toBigQueryEnrichmentRow))
+      if (records.length > 0) {
+        await bigQuery.dataset(ICO_DATASET).table('ai_signal_enrichments').insert(records.map(toBigQueryEnrichmentRow))
+      }
+
+      await bigQuery.dataset(ICO_DATASET).table('ai_enrichment_runs').insert([toBigQueryRunRow(run)])
+    } catch (bqError) {
+      console.warn('[llm-enrichment] BigQuery write skipped (streaming buffer or transient error), persisting to PostgreSQL serving:', bqError instanceof Error ? bqError.message : bqError)
     }
-
-    await bigQuery.dataset(ICO_DATASET).table('ai_enrichment_runs').insert([toBigQueryRunRow(run)])
-  } catch (bqError) {
-    console.warn('[llm-enrichment] BigQuery write skipped (streaming buffer or transient error), persisting to PostgreSQL serving:', bqError instanceof Error ? bqError.message : bqError)
   }
 
-  await persistServingState(records, run)
+  await persistServingState(records, run, { historyOnly })
 
-  await publishOutboxEvent({
-    aggregateType: AGGREGATE_TYPES.icoAiLlmEnrichments,
-    aggregateId: input.spaceId
-      ? `ico-ai-llm-${input.periodYear}-${String(input.periodMonth).padStart(2, '0')}-${input.spaceId}`
-      : `ico-ai-llm-${input.periodYear}-${String(input.periodMonth).padStart(2, '0')}`,
-    eventType: EVENT_TYPES.icoAiLlmEnrichmentsMaterialized,
-    payload: {
-      runId,
-      periodYear: input.periodYear,
-      periodMonth: input.periodMonth,
-      spaceId: input.spaceId ?? null,
-      signalsSeen: run.signalsSeen,
-      signalsEnriched: run.signalsEnriched,
-      signalsFailed: run.signalsFailed,
-      skipped,
-      modelId,
-      promptVersion: ICO_LLM_PROMPT_VERSION,
-      promptHash,
-      status: run.status
-    }
-  }).catch(() => {})
+  if (!historyOnly) {
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.icoAiLlmEnrichments,
+      aggregateId: input.spaceId
+        ? `ico-ai-llm-${input.periodYear}-${String(input.periodMonth).padStart(2, '0')}-${input.spaceId}`
+        : `ico-ai-llm-${input.periodYear}-${String(input.periodMonth).padStart(2, '0')}`,
+      eventType: EVENT_TYPES.icoAiLlmEnrichmentsMaterialized,
+      payload: {
+        runId,
+        periodYear: input.periodYear,
+        periodMonth: input.periodMonth,
+        spaceId: input.spaceId ?? null,
+        signalsSeen: run.signalsSeen,
+        signalsEnriched: run.signalsEnriched,
+        signalsFailed: run.signalsFailed,
+        skipped,
+        modelId,
+        promptVersion: ICO_LLM_PROMPT_VERSION,
+        promptHash,
+        status: run.status
+      }
+    }).catch(() => {})
+  }
 
   return {
     run,

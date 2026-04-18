@@ -1,8 +1,29 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
-> **Version:** 1.4
-> **Last updated:** 2026-04-07
+> **Version:** 1.5
+> **Last updated:** 2026-04-16
 > **Audience:** Platform engineers, DevOps, on-call operators
+
+---
+
+## Delta 2026-04-16 — CI/CD pipeline for ops-worker via GitHub Actions + WIF
+
+Se implemento el pipeline completo de deploy automatico para ops-worker via GitHub Actions con autenticacion Workload Identity Federation (sin llaves de service account). Spec completa en nueva **§11. CI/CD Pipeline**.
+
+Componentes creados:
+- `.github/workflows/ops-worker-deploy.yml` — workflow con path triggers + manual dispatch
+- `scripts/setup-github-actions-wif.sh` — provisioning idempotente de pool, provider, SA, roles
+- `.github/DEPLOY.md` — contrato de deployment para contributors
+- GitHub repo secret `GCP_WORKLOAD_IDENTITY_PROVIDER` configurado
+- GitHub environments `staging` (auto) y `production` (required reviewer: cesargrowth11)
+
+Lecciones operativas incorporadas al diseño:
+1. Cloud Build logs van a Cloud Logging (`CLOUD_LOGGING_ONLY`), no al bucket GCS legacy
+2. Build submit es async + polling (no depende de log streaming)
+3. Health check en CI usa `gcloud run services describe` (no proxy, que cuelga por component install)
+4. `deploy.sh` requiere ENV explicito — sin default silencioso por seguridad de la topologia compartida
+
+Actualizacion a §9 Security Notes: WIF ya esta implementado (antes listado como gap pendiente).
 
 ---
 
@@ -590,6 +611,7 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 #### 9. ops-worker (us-east4)
 
 > Config actualizada 2026-04-13 via TASK-379 (reactive projections V2 hardening). Baseline anterior era `cpu=1 mem=1Gi max=2 concurrency=1 timeout=300`.
+> Delta 2026-04-16 via TASK-246: el mismo servicio ahora expone `POST /nexa/weekly-digest` para enviar el digest ejecutivo semanal de Nexa sin pasar por Vercel.
 
 | Property      | Value                                                                                                                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -603,8 +625,8 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 | Concurrency   | 4 (TASK-379)                                                                                                                                                                              |
 | Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                                                                        |
 | Source        | `services/ops-worker/` (monorepo, reuses `src/lib/`)                                                                                                                                      |
-| Purpose       | Durable reactive worker V2: processes outbox reactive events with scope coalescing and circuit breaker (TASK-379), domain-specific reactive events, recovers orphaned projection refreshes, and materializes commercial cost attribution. Replaces Vercel crons that risked 120s timeout. |
-| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`, `GET /reactive/queue-depth` (TASK-379)           |
+| Purpose       | Durable reactive worker V2: processes outbox reactive events with scope coalescing and circuit breaker (TASK-379), domain-specific reactive events, recovers orphaned projection refreshes, materializes commercial cost attribution, and entrega el digest ejecutivo semanal de Nexa. Replaces Vercel crons that risked 120s timeout. |
+| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`, `GET /reactive/queue-depth`, `POST /nexa/weekly-digest` |
 | SA            | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` (runs as + `roles/run.invoker` for scheduler OIDC)                                                                              |
 | Image         | `gcr.io/efeonce-group/ops-worker` (Cloud Build)                                                                                                                                           |
 | Build         | esbuild two-stage Dockerfile with 9 `--alias` shims for ESM/CJS interop (see note below)                                                                                                 |
@@ -645,12 +667,15 @@ Staging services share the same configuration as their production counterparts b
 | `ops-reactive-delivery`         | `*/5 * * * *` (every 5 min)                          | `ops-worker` (us-east4)       | America/Santiago |
 | `ops-reactive-cost-intelligence`| `*/10 * * * *` (every 10 min)                        | `ops-worker` (us-east4)       | America/Santiago |
 | `ops-reactive-recover`          | `*/15 * * * *` (every 15 min)                        | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-nexa-weekly-digest`        | `0 7 * * 1` (lunes 7:00 AM)                          | `ops-worker` (us-east4)       | America/Santiago |
 
 The 7-minute offset on `notion-hubspot-reverse-poll` prevents overlap with the forward sync job, reducing contention on shared Notion API rate limits.
 
 The `ico-materialize-daily` and `ico-llm-enrich-daily` jobs replace the Vercel cron routes that exceeded the 120s timeout. The 30-minute gap between materialization and LLM enrichment ensures outbox events from materialization are published before enrichment reads the signals. Both jobs target the `ico-batch-worker` service in `us-east4` (co-located with Cloud SQL) via IAM OIDC authentication.
 
 Los `ops-reactive-*` jobs forman el fan-out por dominio del reactive worker. Actualizado 2026-04-13 via TASK-379: la topologia paso de 3 jobs (`ops-reactive-process`, `ops-reactive-process-delivery`, `ops-reactive-recover`) a 7 jobs (uno por dominio + recovery) para que ningun dominio bloquee al siguiente y el backlog se drene en paralelo. Los 6 jobs de dominio invocan `POST /reactive/process-domain` con `{ domain: "<name>" }`; el job de recovery invoca `POST /reactive/recover` para reclamar items huerfanos via `claimOrphanedRefreshItems`. Todos autenticados via OIDC con SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Las Vercel API routes (`/api/cron/outbox-react*`, `/api/cron/projection-recovery`) siguen disponibles como fallback manual pero no estan agendadas.
+
+`ops-nexa-weekly-digest` se agrego en 2026-04-16 via TASK-246. Invoca `POST /nexa/weekly-digest` cada lunes a las 07:00 `America/Santiago`, arma un resumen ICO-first con top insights cross-Space de la ultima semana y lo entrega via el pipeline canónico `src/lib/email/delivery.ts` + Resend. La lane sigue siendo interna/advisory-only y reutiliza los enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`.
 
 ### Paused Jobs (Staging)
 
@@ -779,6 +804,7 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 | Plaintext API tokens          | **Medium**   | Most Cloud Functions store tokens in env vars                                                                       | Migrate critical secrets to Secret Manager                                   | TASK-096 Fase 3 |
 | Cloud SQL Connector adoption  | **Low**      | Preview WIF path ya quedó validado con connector, pero `develop/dev-greenhouse` sigue observándose con host directo | Estandarizar connector en el entorno compartido antes del hardening externo  | TASK-096 Fase 2 |
 | Service account key in Vercel | **Medium**   | WIF ya existe y quedó validado en preview, pero la SA key sigue presente como fallback transicional                 | Retirar la SA key después de validar entorno compartido y producción         | TASK-096 Fase 2 |
+| GitHub Actions → GCP auth     | **Resolved** | WIF implementado: pool `github-actions`, provider `efeoncepro-greenhouse-eo`, SA `github-actions-deployer`. Pipeline ops-worker verde. | Mantener. Para nuevos workflows, reusar mismo SA y agregar roles si necesario. Ver §11. | — |
 | No security headers           | **Medium**   | No middleware.ts, no CSP/HSTS/X-Frame-Options                                                                       | Create middleware.ts with security headers                                   | TASK-099        |
 | Silent production failures    | **High**     | console.error() only, zero alerting                                                                                 | Sentry + health endpoint + Slack alerts                                      | TASK-098        |
 | Inconsistent cron auth        | **Medium**   | 2 patterns, some fail-open, no timing-safe                                                                          | Centralized requireCronAuth() helper                                         | TASK-101        |
@@ -791,7 +817,7 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 2. **Enforce SSL** — change SSL mode to `ENCRYPTED_ONLY` (TASK-096 Fase 1).
 3. **Add tests to CI** — 86 test files not running in pipeline (TASK-100).
 4. **Security headers middleware** — CSP, HSTS, X-Frame-Options (TASK-099).
-5. **Workload Identity Federation** — eliminate static SA key (TASK-096 Fase 2).
+5. **Workload Identity Federation** — ~~eliminate static SA key~~ **Resuelto para GitHub Actions** (ver §11). SA key en Vercel aún presente como fallback (TASK-096 Fase 2).
 6. **Observability MVP** — Sentry + health endpoint + Slack cron alerts (TASK-098).
 7. **Migrate critical secrets** — 6 secrets to Secret Manager (TASK-096 Fase 3).
 8. **Standardize cron auth** — single timing-safe helper for 18 routes (TASK-101).
@@ -872,6 +898,196 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 4. **Serve** — The Next.js application reads from Cloud SQL (transactional queries) and BigQuery (analytical queries) to render dashboards, reports, and operational views.
 5. **Sync back** — Bidirectional syncs (HubSpot to Notion deals, Notion to HubSpot reverse sync) keep external systems aligned with Greenhouse state.
 6. **Notify** — `notion-teams-notify` pushes task-level events to Microsoft Teams channels for real-time team awareness.
+
+---
+
+## 11. CI/CD Pipeline — GitHub Actions + Workload Identity Federation
+
+### 11.1 Overview
+
+Los deploys de servicios Cloud Run (actualmente `ops-worker`, extensible a futuros servicios) se automatizan via GitHub Actions con autenticacion **Workload Identity Federation (WIF)** — sin llaves de service account persistentes en ningun sistema.
+
+```
+Push a develop/main (paths match)
+    │
+    ▼
+GitHub Actions runner
+    │ (mints OIDC token via https://token.actions.githubusercontent.com)
+    ▼
+Google STS — token exchange
+    │ (validates: repo == efeoncepro/greenhouse-eo)
+    ▼
+Federated principal impersonates github-actions-deployer@efeonce-group
+    │
+    ├── gcloud builds submit --async (Cloud Build)
+    │       └── Docker build → gcr.io/efeonce-group/ops-worker
+    │
+    ├── gcloud run deploy (Cloud Run)
+    │       └── New revision with 100% traffic
+    │
+    ├── gcloud scheduler jobs create/update (Cloud Scheduler)
+    │       └── 7 per-domain reactive jobs
+    │
+    └── gcloud run services describe (health verification)
+            └── Confirm latest revision ready
+```
+
+### 11.2 Identity architecture
+
+#### WIF Pool + Provider
+
+| Recurso | Valor |
+|---|---|
+| Pool ID | `github-actions` |
+| Pool location | `global` |
+| Provider ID | `efeoncepro-greenhouse-eo` |
+| Issuer URI | `https://token.actions.githubusercontent.com` |
+| Attribute condition | `assertion.repository == 'efeoncepro/greenhouse-eo'` |
+| Attribute mapping | `google.subject=assertion.sub`, `attribute.repository=assertion.repository`, `attribute.repository_owner=assertion.repository_owner`, `attribute.ref=assertion.ref`, `attribute.actor=assertion.actor` |
+
+La attribute condition **restringe por repositorio**: tokens de cualquier otro repo son rechazados en el exchange. No hay fallback a credentials por defecto.
+
+#### Deployer service account
+
+| Campo | Valor |
+|---|---|
+| Email | `github-actions-deployer@efeonce-group.iam.gserviceaccount.com` |
+| Display name | GitHub Actions Deployer |
+| Proposito | Identidad de deploy para TODOS los workflows de CI/CD del repo |
+
+**Un solo deployer SA, no uno por servicio.** Razon: la identidad de deploy es diferente de la identidad de runtime. El deployer puede CONFIGURAR que un servicio corra como `greenhouse-portal@efeonce-group` pero no puede ACTUAR como `greenhouse-portal`. Separar deploy identity de runtime identity limita el blast radius de un workflow comprometido: puede redesployar servicios (auditable via Cloud Build + revision history) pero no puede leer datos de produccion.
+
+Crear un deployer SA por servicio (`ops-worker-deployer`, `nexa-deployer`, etc.) escala O(n), crea drift de roles, y no agrega seguridad real. Solo crear un segundo deployer si un workflow necesita roles que ningun otro workflow deberia tener.
+
+### 11.3 IAM roles
+
+#### Project-level roles (en `github-actions-deployer`)
+
+| Role | Proposito |
+|---|---|
+| `roles/cloudbuild.builds.editor` | Submit + describe Cloud Build jobs |
+| `roles/run.admin` | Deploy, update, describe Cloud Run services |
+| `roles/cloudscheduler.admin` | CRUD Cloud Scheduler jobs |
+| `roles/secretmanager.admin` | Grant `secretAccessor` on individual secrets to runtime SAs |
+| `roles/storage.admin` | Read/write Cloud Build staging bucket + private assets |
+| `roles/artifactregistry.writer` | Push built container images |
+| `roles/logging.viewer` | Read Cloud Build logs (required by `CLOUD_LOGGING_ONLY`) |
+
+#### Resource-level bindings
+
+| Role | Resource | Proposito |
+|---|---|---|
+| `roles/iam.serviceAccountUser` | `greenhouse-portal@efeonce-group` | Permite al deployer SET este SA como runtime identity de Cloud Run services |
+| `roles/iam.serviceAccountUser` | `183008134038-compute@developer.gserviceaccount.com` | Permite al deployer usar el Compute Engine default SA para Cloud Build jobs |
+| `roles/iam.workloadIdentityUser` | `github-actions-deployer` (self) | Permite al principalSet federado impersonar al deployer |
+
+### 11.4 GitHub-side configuration
+
+#### Repository secret
+
+| Secret | Valor | Proposito |
+|---|---|---|
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | `projects/183008134038/locations/global/workloadIdentityPools/github-actions/providers/efeoncepro-greenhouse-eo` | Identifica el WIF provider para `google-github-actions/auth@v2` |
+
+#### Environments
+
+| Environment | Branch | Required reviewers | Deploy gate |
+|---|---|---|---|
+| `staging` | `develop` | Ninguno | Auto-deploy on push |
+| `production` | `main` | `cesargrowth11` | Pausa hasta aprobacion |
+
+### 11.5 Workflow: ops-worker-deploy.yml
+
+**Triggers:**
+
+```yaml
+on:
+  push:
+    branches: [develop, main]
+    paths:
+      - 'services/ops-worker/**'
+      - 'src/lib/sync/**'
+      - 'src/lib/finance/payroll-expense-reactive.ts'
+      - 'src/lib/finance/apply-payroll-reliquidation-delta.ts'
+      - 'src/lib/payroll/supersede-entry.ts'
+      - 'src/lib/payroll/send-payroll-export-ready.ts'
+      - 'src/lib/payroll/payroll-export-packages.ts'
+      - 'src/lib/email/**'
+  workflow_dispatch:
+    inputs:
+      environment: {type: choice, options: [staging, production]}
+```
+
+**Environment routing:**
+- Push a `develop` → environment `staging`
+- Push a `main` → environment `production` (gated por reviewer)
+- Manual dispatch → environment seleccionado
+
+**Concurrency:** `ops-worker-deploy-${{ github.ref }}` — un deploy a la vez por branch.
+
+### 11.6 Cloud Build — async submit + polling
+
+`deploy.sh` usa `gcloud builds submit --async` en vez del modo sincronico por defecto. Razon: el modo sincronico intenta streamear logs desde un bucket GCS que requiere `roles/viewer` (project-level, demasiado amplio). El modo async:
+
+1. Submit retorna inmediatamente con el build ID
+2. Polling cada 10s via `gcloud builds describe` hasta `SUCCESS | FAILURE | TIMEOUT | CANCELLED`
+3. Max 60 polls (10 min timeout)
+
+Cloud Build config inline incluye `options.logging: CLOUD_LOGGING_ONLY` para que los logs queden en Cloud Logging (donde `roles/logging.viewer` aplica) en vez del bucket GCS legacy.
+
+### 11.7 Health verification
+
+En CI (`GITHUB_ACTIONS=true`), el health check de `deploy.sh` se omite — la verificacion la hace el step separado del workflow. Razon: `gcloud run services proxy` requiere instalar un gcloud component que crea un proceso background que cuelga el step.
+
+El workflow verifica health via `gcloud run services describe`:
+- Confirma el nombre de la latest ready revision
+- Confirma que `status.conditions[0].status == True`
+- No requiere identity token, proxy, ni curl autenticado
+
+### 11.8 Lecciones operativas (pitfalls resueltos)
+
+| Pitfall | Sintoma | Fix |
+|---|---|---|
+| `gcloud builds submit` cuelga en CI | Step timeout 25min, build SUCCESS pero gcloud no retorna | `--async` + polling por build ID |
+| Cloud Build logs en GCS bucket | `ERROR: This tool can only stream logs if you are Viewer/Owner` | `options.logging: CLOUD_LOGGING_ONLY` |
+| `gcloud run services proxy` cuelga | Component install crea subprocess que no muere con `kill` | Skip proxy en CI, usar `gcloud describe` |
+| `print-identity-token --audiences` falla con WIF | `Invalid account type for --audiences. Requires valid service account.` | No usar identity tokens — verificar via describe |
+| `deploy.sh` default `ENV=staging` silencioso | Deployer manual olvida setear ENV, monta secrets equivocados en servicio compartido | Require explicit ENV, abort si no esta seteado |
+| Cloud Build SA permission denied | Deployer puede submit pero no act-as el default Compute Engine SA | `iam.serviceAccountUser` on `<project-number>-compute@developer` |
+
+### 11.9 Agregar un nuevo workflow
+
+1. Crear `.github/workflows/<name>.yml` usando `google-github-actions/auth@v2` con:
+   ```yaml
+   permissions:
+     contents: read
+     id-token: write
+   ```
+   Y referenciando `${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}` + `github-actions-deployer@efeonce-group.iam.gserviceaccount.com`.
+
+2. Si el workflow necesita un role que `github-actions-deployer` no tiene, agregarlo a `PROJECT_ROLES` en `scripts/setup-github-actions-wif.sh` y re-correr el script (idempotente).
+
+3. **No** crear un nuevo WIF pool, provider, ni service account a menos que el workflow necesite aislamiento real (extremadamente raro).
+
+### 11.10 Disaster recovery
+
+Si el setup WIF se corrompe o borra:
+
+1. `bash scripts/setup-github-actions-wif.sh` con un usuario que tenga `roles/owner` en el proyecto
+2. Copiar el provider resource name del output
+3. Actualizar `GCP_WORKLOAD_IDENTITY_PROVIDER` en GitHub repo secrets
+4. Disparar un workflow para confirmar
+
+Tiempo total: <5 min. No hay datos en riesgo — WIF es puramente attribute-based, no almacena material secreto.
+
+### 11.11 Archivos de referencia
+
+| Archivo | Proposito |
+|---|---|
+| `.github/workflows/ops-worker-deploy.yml` | Workflow de deploy para ops-worker |
+| `.github/DEPLOY.md` | Documentacion del contrato de deployment para contributors |
+| `scripts/setup-github-actions-wif.sh` | Provisioning idempotente de WIF pool, provider, SA, roles |
+| `services/ops-worker/deploy.sh` | Script de deploy ejecutado por el workflow |
 
 ---
 

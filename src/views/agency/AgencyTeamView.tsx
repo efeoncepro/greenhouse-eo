@@ -171,7 +171,7 @@ const AgencyTeamView = () => {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/team/capacity-breakdown', {
+      const res = await fetch('/api/agency/team', {
         cache: 'no-store',
         signal: AbortSignal.timeout(8000)
       })

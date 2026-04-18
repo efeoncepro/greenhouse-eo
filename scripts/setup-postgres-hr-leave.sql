@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_policies (
   progressive_max_extra_days INTEGER NOT NULL DEFAULT 10,
   applicable_employment_types TEXT[] NOT NULL DEFAULT '{}',
   applicable_pay_regimes TEXT[] NOT NULL DEFAULT '{}',
+  applicable_contract_types TEXT[] NOT NULL DEFAULT '{}',
+  applicable_payroll_vias TEXT[] NOT NULL DEFAULT '{}',
   allow_negative_balance BOOLEAN NOT NULL DEFAULT FALSE,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -74,6 +76,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_requests (
   decided_by TEXT,
   notes TEXT,
   created_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
+  source_kind TEXT NOT NULL DEFAULT 'request' CHECK (source_kind IN ('request', 'admin_backfill')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -87,6 +90,25 @@ CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_request_actions (
   actor_name TEXT,
   notes TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_balance_adjustments (
+  adjustment_id TEXT PRIMARY KEY,
+  member_id TEXT NOT NULL REFERENCES greenhouse_core.members(member_id) ON DELETE CASCADE,
+  leave_type_code TEXT NOT NULL REFERENCES greenhouse_hr.leave_types(leave_type_code),
+  year INTEGER NOT NULL,
+  days_delta NUMERIC(10, 2) NOT NULL,
+  reason TEXT NOT NULL,
+  effective_date DATE NOT NULL,
+  source_kind TEXT NOT NULL DEFAULT 'manual_adjustment'
+    CHECK (source_kind IN ('manual_adjustment', 'manual_adjustment_reversal')),
+  notes TEXT,
+  metadata_json JSONB,
+  created_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  reversed_at TIMESTAMPTZ,
+  reversed_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
+  reversal_of_adjustment_id TEXT REFERENCES greenhouse_hr.leave_balance_adjustments(adjustment_id)
 );
 
 ALTER TABLE greenhouse_core.members
@@ -121,6 +143,16 @@ CREATE INDEX IF NOT EXISTS leave_requests_status_start_idx
 
 CREATE INDEX IF NOT EXISTS leave_request_actions_request_idx
   ON greenhouse_hr.leave_request_actions (request_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS leave_balance_adjustments_member_year_idx
+  ON greenhouse_hr.leave_balance_adjustments (member_id, year, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS leave_balance_adjustments_type_year_idx
+  ON greenhouse_hr.leave_balance_adjustments (leave_type_code, year, created_at DESC);
+
+CREATE UNIQUE INDEX IF NOT EXISTS leave_balance_adjustments_reversal_unique
+  ON greenhouse_hr.leave_balance_adjustments (reversal_of_adjustment_id)
+  WHERE reversal_of_adjustment_id IS NOT NULL;
 
 INSERT INTO greenhouse_hr.leave_types (
   leave_type_code,
@@ -172,20 +204,22 @@ INSERT INTO greenhouse_hr.leave_policies (
   progressive_max_extra_days,
   applicable_employment_types,
   applicable_pay_regimes,
+  applicable_contract_types,
+  applicable_payroll_vias,
   allow_negative_balance,
   active
 )
 VALUES
-  ('policy-vacation-chile', 'vacation', 'Vacaciones Chile dependientes', 'annual_fixed', 15, 5, TRUE, 7, 15, 5, 2, TRUE, 10, 3, 10, ARRAY['full_time'], ARRAY['chile'], FALSE, TRUE),
-  ('policy-vacation-default', 'vacation', 'Vacaciones base portal', 'annual_fixed', 15, 0, TRUE, 7, 15, 5, 1, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
-  ('policy-floating-holiday-default', 'floating_holiday', 'Día libre flotante', 'annual_fixed', 1, 0, TRUE, 2, 1, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
-  ('policy-bereavement-default', 'bereavement', 'Permiso por duelo', 'annual_fixed', 3, 0, TRUE, 0, 3, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
-  ('policy-civic-duty-default', 'civic_duty', 'Permiso por deber cívico', 'annual_fixed', 2, 0, TRUE, 0, 2, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
-  ('policy-parental-default', 'parental', 'Permiso parental extendido', 'custom', 0, 0, TRUE, 0, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
-  ('policy-study-default', 'study', 'Permiso por estudio', 'custom', 0, 0, TRUE, 1.5, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
-  ('policy-personal-default', 'personal', 'Permiso personal', 'custom', 0, 0, TRUE, 1, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
-  ('policy-medical-default', 'medical', 'Permiso médico', 'custom', 0, 0, TRUE, 0, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
-  ('policy-unpaid-default', 'unpaid', 'Permiso sin goce', 'custom', 0, 0, TRUE, 2, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE)
+  ('policy-vacation-chile', 'vacation', 'Vacaciones Chile dependientes', 'monthly_accrual', 15, 5, TRUE, 7, 15, 5, 2, TRUE, 10, 3, 10, ARRAY['full_time'], ARRAY['chile'], ARRAY['indefinido', 'plazo_fijo'], ARRAY['internal'], FALSE, TRUE),
+  ('policy-vacation-default', 'vacation', 'Vacaciones base portal', 'annual_fixed', 15, 0, TRUE, 7, 15, 5, 1, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
+  ('policy-floating-holiday-default', 'floating_holiday', 'Día libre flotante', 'annual_fixed', 1, 0, TRUE, 2, 1, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
+  ('policy-bereavement-default', 'bereavement', 'Permiso por duelo', 'annual_fixed', 3, 0, TRUE, 0, 3, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
+  ('policy-civic-duty-default', 'civic_duty', 'Permiso por deber cívico', 'annual_fixed', 2, 0, TRUE, 0, 2, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
+  ('policy-parental-default', 'parental', 'Permiso parental extendido', 'custom', 0, 0, TRUE, 0, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-study-default', 'study', 'Permiso por estudio', 'custom', 0, 0, TRUE, 1.5, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-personal-default', 'personal', 'Permiso personal', 'custom', 0, 0, TRUE, 1, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-medical-default', 'medical', 'Permiso médico', 'custom', 0, 0, TRUE, 0, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-unpaid-default', 'unpaid', 'Permiso sin goce', 'custom', 0, 0, TRUE, 2, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE)
 ON CONFLICT (policy_id) DO UPDATE
 SET
   leave_type_code = EXCLUDED.leave_type_code,
@@ -204,6 +238,8 @@ SET
   progressive_max_extra_days = EXCLUDED.progressive_max_extra_days,
   applicable_employment_types = EXCLUDED.applicable_employment_types,
   applicable_pay_regimes = EXCLUDED.applicable_pay_regimes,
+  applicable_contract_types = EXCLUDED.applicable_contract_types,
+  applicable_payroll_vias = EXCLUDED.applicable_payroll_vias,
   allow_negative_balance = EXCLUDED.allow_negative_balance,
   active = EXCLUDED.active,
   updated_at = CURRENT_TIMESTAMP;

@@ -6,6 +6,37 @@
 
 ---
 
+## Delta 2026-04-17 — TASK-345 Quotation canonical bridge materialized
+
+- Finance quotations deja de depender solo de `greenhouse_finance.*` como storage leído por APIs.
+- Estado nuevo del lane:
+  - writers runtime siguen entrando por `greenhouse_finance.quotes`, `quote_line_items` y `products`
+  - el anchor canónico ya existe en `greenhouse_commercial.*`
+  - `GET /api/finance/quotes`, `GET /api/finance/quotes/[id]` y `GET /api/finance/quotes/[id]/lines` ya leen vía façade canónica manteniendo payload legacy
+- `finance.quote.*`, `finance.quote_line_item.*` y `finance.product.*` siguen siendo la familia runtime vigente del outbox.
+- HubSpot/Nubox ahora deben tratarse como writers del bridge, no como writers exclusivos de Finance tables.
+- La lane sigue siendo `finance-first surface`, pero ya no es `finance-only storage`.
+
+## Delta 2026-04-16 — Finance Signal Engine (TASK-245)
+
+- Primer engine de señales AI fuera del ICO Engine.
+- Detecta anomalías estadísticas (Z-score rolling 6m) sobre `greenhouse_finance.client_economics` por cliente:
+  - `net_margin_pct`, `gross_margin_pct`, `total_revenue_clp`, `direct_costs_clp`, `indirect_costs_clp`, `net_margin_clp`
+- Solo emite deteriorations (improvements no generan signals; mantiene el dashboard limpio).
+- Enriquecimiento con LLM (Gemini 2.5 Flash) via prompt domain-aware `finance_signal_enrichment_v1` con glosario financiero y cadena causal propia:
+  - Revenue ↓ o Direct Costs ↑ → Gross Margin ↓ → Net Margin ↓ → flujo de caja operativo ↓
+- Resultado visible en Finance Dashboard (`/finance`) como `NexaInsightsBlock` entre KPIs y Economic Indicators.
+- Infraestructura:
+  - Tablas PG: `greenhouse_serving.finance_ai_signals`, `greenhouse_serving.finance_ai_signal_enrichments`, `greenhouse_serving.finance_ai_enrichment_runs`
+  - Migración: `migrations/20260416235432829_task-245-finance-ai-signals.sql`
+  - Código: `src/lib/finance/ai/` (detector, materializer, llm provider, worker, reader, resolver, types)
+  - Cloud Run endpoints: `POST /finance/materialize-signals`, `POST /finance/llm-enrich` en `services/ico-batch/server.ts`
+  - Vercel cron: `GET /api/cron/finance-ai-signals` (fallback manual; producción usa Cloud Run)
+  - Reader API: `GET /api/finance/intelligence/nexa-insights?year=YYYY&month=MM`
+- Eventos outbox: `finance.ai_signals.materialized`, `finance.ai_llm_enrichments.materialized`.
+- Advisory-only: nunca bloquea workflows financieros; el disclaimer del componente Nexa se respeta.
+- Fuente canónica de contrato: `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`.
+
 ## Delta 2026-04-11 — Shareholder account anchored semantically to Person ↔ Legal Entity
 
 - `Finance > Cuenta accionista` sigue siendo owner del instrumento, ledger, settlement y balances.

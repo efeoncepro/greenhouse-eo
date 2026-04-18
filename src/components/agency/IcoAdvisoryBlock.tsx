@@ -2,6 +2,7 @@
 
 import NexaInsightsBlock from '@/components/greenhouse/NexaInsightsBlock'
 import type { NexaInsightItem } from '@/components/greenhouse/NexaInsightsBlock'
+import type { NexaTimelineItem } from '@/components/greenhouse/NexaInsightsTimeline'
 import type { AgencyAiLlmSummary } from '@/lib/ico-engine/ai/llm-types'
 
 type Props = {
@@ -15,7 +16,19 @@ const IcoAdvisoryBlock = ({ aiLlm }: Props) => {
     metricId: item.metricName,
     severity: item.severity,
     explanation: item.explanationSummary,
+    rootCauseNarrative: item.rootCauseNarrative,
     recommendedAction: item.recommendedAction
+  }))
+
+  const timelineInsights: NexaTimelineItem[] = (aiLlm.timeline ?? []).map(item => ({
+    id: item.enrichmentId,
+    signalType: item.signalType,
+    metricId: item.metricName,
+    severity: item.severity,
+    explanation: item.explanationSummary,
+    rootCauseNarrative: item.rootCauseNarrative,
+    recommendedAction: item.recommendedAction,
+    processedAt: item.processedAt
   }))
 
   return (
@@ -24,6 +37,7 @@ const IcoAdvisoryBlock = ({ aiLlm }: Props) => {
       totalAnalyzed={aiLlm.totals.total}
       lastAnalysis={aiLlm.lastProcessedAt}
       runStatus={aiLlm.latestRun?.status ?? null}
+      timelineInsights={timelineInsights}
     />
   )
 }

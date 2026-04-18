@@ -28,6 +28,8 @@ import { icoAiSignalsProjection } from './ico-ai-signals'
 import { icoLlmEnrichmentsProjection } from './ico-llm-enrichments'
 import { accountBalancesProjection } from './account-balances'
 import { serviceSlaComplianceProjection } from './service-sla-compliance'
+import { quotationPipelineProjection } from './quotation-pipeline'
+import { quotationProfitabilityProjection } from './quotation-profitability'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -66,4 +68,6 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(icoAiSignalsProjection)
   registerProjection(icoLlmEnrichmentsProjection)
   registerProjection(serviceSlaComplianceProjection)
+  registerProjection(quotationPipelineProjection)
+  registerProjection(quotationProfitabilityProjection)
 }

@@ -73,21 +73,49 @@ Los payloads del outbox siguen dos versiones que coexisten durante el rollout de
 | `economic_indicator` | `finance.economic_indicator.upserted` | `finance/postgres-store.ts` | `{ indicatorId, indicatorCode, indicatorDate, value, source }` | `member_capacity_economics`, `person_intelligence`, futuros consumers de forecast laboral/financiero |
 | `finance_expense_payment` | `finance.expense_payment.recorded` | `finance/expense-payment-ledger.ts` | `{ paymentId, expenseId, paymentDate, amount, paymentSource, reference, paymentStatus, amountPaid }` | client-economics, commercial-cost-attribution, operational-pl, period-closure-status |
 
-### Quotes (TASK-210)
+### Quotes — legacy finance namespace (TASK-210, kept during cutover per TASK-347)
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `quote` | `finance.quote.created` | `hubspot/create-hubspot-quote.ts` | `{ quoteId, hubspotQuoteId, sourceSystem, direction, organizationId, amount, currency }` | — |
-| `quote` | `finance.quote.synced` | `hubspot/sync-hubspot-quotes.ts` | `{ quoteId, hubspotQuoteId, hubspotDealId, sourceSystem, action, organizationId, spaceId }` | — |
+| `quote` | `finance.quote.created` | `commercial/quotation-events.ts` (dual-publish helper called from `hubspot/create-hubspot-quote.ts`) | `{ quoteId, hubspotQuoteId, sourceSystem, direction, organizationId, amount, currency }` | — |
+| `quote` | `finance.quote.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-quotes.ts`) | `{ quoteId, hubspotQuoteId, hubspotDealId, sourceSystem, action, organizationId, spaceId }` | — |
 | `quote` | `finance.quote.converted` | (futuro: quote → invoice bridge) | `{ quoteId, incomeId }` | — |
-| `quote_line_item` | `finance.quote_line_item.synced` | `hubspot/sync-hubspot-line-items.ts` | `{ quoteId, hubspotQuoteId, created, updated }` | — |
+| `quote_line_item` | `finance.quote_line_item.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-line-items.ts`) | `{ quoteId, hubspotQuoteId, created, updated }` | — |
 
-### Products (TASK-211)
+### Commercial Quotation — canonical namespace (TASK-347)
+
+Emitted alongside the legacy `finance.quote.*` family by the same publishers so
+consumers can migrate gradually. Canonical events are scoped to the commercial
+`quotation_id` and include the legacy `quoteId` in payload for cross-reference.
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `product` | `finance.product.synced` | `hubspot/sync-hubspot-products.ts` | `{ productId, hubspotProductId, name, sku, action }` | — |
-| `product` | `finance.product.created` | `hubspot/create-hubspot-product.ts` | `{ productId, hubspotProductId, name, sku, direction }` | — |
+| `quotation` | `commercial.quotation.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-quote.ts`, outbound) | `{ quotationId, quoteId, hubspotQuoteId, direction, organizationId, spaceId, amount, currency, lineItemCount }` | — |
+| `quotation` | `commercial.quotation.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-quotes.ts`, inbound) | `{ quotationId, quoteId, hubspotQuoteId, hubspotDealId, action, organizationId, spaceId }` | — |
+| `quotation` | `commercial.quotation.converted` | (futuro: quote-to-cash bridge, TASK-350) | `{ quotationId, quoteId, incomeId }` | — |
+| `quotation` | `commercial.quotation.po_linked` (TASK-350) | `finance/quote-to-cash/link-purchase-order.ts`, `api/finance/purchase-orders` POST/PUT | `{ quotationId, poId, poNumber, authorizedAmountClp, linkedBy }` | Audit log (quotation_audit_log `po_received`), profitability tracking (TASK-351) |
+| `quotation` | `commercial.quotation.hes_linked` (TASK-350) | `finance/quote-to-cash/link-service-entry.ts`, `api/finance/hes` POST | `{ quotationId, hesId, hesNumber, amountAuthorizedClp, linkedBy }` | Audit log (`hes_received`), profitability tracking |
+| `quotation` | `commercial.quotation.invoice_emitted` (TASK-350) | `finance/quote-to-cash/materialize-invoice-from-{quotation,hes}.ts` | `{ quotationId, incomeId, sourceHesId \| null, totalAmountClp, emittedBy }` | Audit log (`invoice_triggered`), pipeline projection, Nubox emission follow-up |
+| `quotation` | `commercial.quotation.expired` (TASK-351) | `commercial-intelligence/renewal-lifecycle.ts` | `{ quotationId, clientId, organizationId, totalAmountClp, expiredAt, daysSinceExpiry }` | `quotation_pipeline` projection, audit log (`action: 'expired'`), notifications |
+| `quotation` | `commercial.quotation.renewal_due` (TASK-351) | `commercial-intelligence/renewal-lifecycle.ts` | `{ quotationId, clientId, organizationId, totalAmountClp, expiryDate, daysUntilExpiry }` | `quotation_pipeline` projection, notifications (`finance_alert` + `metadata.subtype: quotation_renewal`) |
+| `quotation` | `commercial.quotation.pipeline_materialized` (TASK-351) | `commercial/quotation-events.ts` (from `quotation_pipeline` projection) | `{ quotationId, pipelineStage, status, totalAmountClp, probabilityPct }` | observability/dashboards |
+| `quotation` | `commercial.quotation.profitability_materialized` (TASK-351) | `commercial/quotation-events.ts` (from `quotation_profitability` projection) | `{ quotationId, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity }` | observability/dashboards |
+| `quotation_line_item` | `commercial.quotation.line_items_synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-line-items.ts`) | `{ quotationId, quoteId, hubspotQuoteId, created, updated }` | — |
+| `quotation` | `commercial.discount.health_alert` | `finance/pricing/quotation-pricing-orchestrator.ts` (TASK-346) | `{ quotationId, versionNumber, marginPct, floorPct, targetPct, alerts, createdBy }` | `notifications` (Finance approvals), audit log |
+
+### Products — legacy finance namespace (TASK-211, kept during cutover)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `product` | `finance.product.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`) | `{ productId, hubspotProductId, name, sku, action }` | — |
+| `product` | `finance.product.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-product.ts`) | `{ productId, hubspotProductId, name, sku, direction }` | — |
+
+### Commercial Product Catalog — canonical namespace (TASK-347)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `product_catalog` | `commercial.product_catalog.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-product.ts`) | `{ commercialProductId, productId, hubspotProductId, name, sku, direction }` | — |
+| `product_catalog` | `commercial.product_catalog.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`) | `{ commercialProductId, productId, hubspotProductId, name, sku, action }` | — |
 
 ### Nubox
 

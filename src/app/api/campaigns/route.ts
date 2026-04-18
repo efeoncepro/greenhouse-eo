@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 
 import { ROLE_CODES } from '@/config/role-codes'
 import { requireTenantContext } from '@/lib/tenant/authorization'
-import { listAllCampaigns, listCampaigns, createCampaign } from '@/lib/campaigns/campaign-store'
+import { createCampaign } from '@/lib/campaigns/campaign-store'
+import { listCampaignsForTenant } from '@/lib/campaigns/tenant-scope'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,26 +16,20 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status') || undefined
-  const campaignIds = tenant.campaignScopes.length > 0 ? tenant.campaignScopes : undefined
-
   const requestedSpaceId = searchParams.get('spaceId') || undefined
-  const isClientUser = tenant.tenantType === 'client'
-  const spaceId = isClientUser ? tenant.clientId : requestedSpaceId
 
   try {
-    if (spaceId) {
-      const campaigns = await listCampaigns(spaceId, { status, campaignIds })
+    const result = await listCampaignsForTenant({
+      tenant,
+      status,
+      requestedSpaceId
+    })
 
-      return NextResponse.json({ items: campaigns, total: campaigns.length })
+    if (!result.ok) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    if (isClientUser) {
-      return NextResponse.json({ error: 'spaceId is required' }, { status: 400 })
-    }
-
-    const campaigns = await listAllCampaigns({ status, campaignIds })
-
-    return NextResponse.json({ items: campaigns, total: campaigns.length })
+    return NextResponse.json({ items: result.items, total: result.items.length })
   } catch (error) {
     console.error('GET /api/campaigns failed:', error)
 

@@ -98,7 +98,7 @@ const AssignMemberDrawer = ({ open, existingMembers, onClose, onSuccess }: Props
     setLoadingMembers(true)
 
     try {
-      const res = await fetch('/api/team/capacity-breakdown', { signal: AbortSignal.timeout(5000) })
+      const res = await fetch('/api/agency/team', { signal: AbortSignal.timeout(5000) })
 
       if (res.ok) {
         const data = await res.json()

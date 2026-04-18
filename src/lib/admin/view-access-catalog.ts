@@ -176,6 +176,22 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.objetivos',
+    section: 'equipo',
+    label: 'Objetivos',
+    description: 'Ciclos de objetivos y OKRs, seguimiento de progreso por colaborador y departamento.',
+    routePath: '/hr/goals',
+    routeGroup: 'hr'
+  },
+  {
+    viewCode: 'equipo.evaluaciones',
+    section: 'equipo',
+    label: 'Evaluaciones',
+    description: 'Ciclos de evaluacion de desempeno, asignaciones y calibracion.',
+    routePath: '/hr/evaluations',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'finanzas.resumen',
     section: 'finanzas',
     label: 'Resumen financiero',
@@ -453,6 +469,22 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Mis permisos',
     description: 'Saldos, solicitudes y visibilidad de permisos personales.',
     routePath: '/my/leave',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mis_objetivos',
+    section: 'mi_ficha',
+    label: 'Mis objetivos',
+    description: 'Mis objetivos y key results del ciclo activo, con registro de avance.',
+    routePath: '/my/goals',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mis_evaluaciones',
+    section: 'mi_ficha',
+    label: 'Mis evaluaciones',
+    description: 'Evaluaciones pendientes, feedback recibido y resultados.',
+    routePath: '/my/evaluations',
     routeGroup: 'my'
   },
   {

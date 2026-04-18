@@ -9,6 +9,8 @@ import {
 } from '@/lib/finance/schema-drift'
 import { FinanceValidationError } from '@/lib/finance/shared'
 import { listHes, createHes } from '@/lib/finance/hes-store'
+import { publishQuotationServiceEntryLinked } from '@/lib/commercial/quotation-events'
+import { recordAudit } from '@/lib/commercial/governance/audit-log'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,7 +44,8 @@ export async function GET(request: Request) {
       organizationId: resolvedScope?.organizationId ?? organizationId,
       spaceId: resolvedScope?.spaceId ?? requestedSpaceId,
       status: searchParams.get('status') || undefined,
-      purchaseOrderId: searchParams.get('purchaseOrderId') || undefined
+      purchaseOrderId: searchParams.get('purchaseOrderId') || undefined,
+      quotationId: searchParams.get('quotationId') || undefined
     })
 
     return NextResponse.json({ items, total: items.length })
@@ -92,6 +95,32 @@ export async function POST(request: Request) {
       spaceId: resolvedScope.spaceId ?? tenant.spaceId ?? null,
       createdBy: tenant.userId
     })
+
+    // TASK-350: if the HES ended up linked to a quotation (either explicit
+    // body.quotationId or auto-inherited from the PO), publish the canonical
+    // hes_linked event + audit entry for the chain.
+    if (result.quotationId) {
+      await publishQuotationServiceEntryLinked({
+        quotationId: result.quotationId,
+        hesId: result.hesId,
+        hesNumber: result.hesNumber,
+        amountAuthorizedClp: result.amountAuthorizedClp ?? result.amountClp ?? null,
+        linkedBy: tenant.userId
+      })
+
+      await recordAudit({
+        quotationId: result.quotationId,
+        action: 'hes_received',
+        actorUserId: tenant.userId,
+        actorName: tenant.clientName || tenant.userId,
+        details: {
+          hesId: result.hesId,
+          hesNumber: result.hesNumber,
+          amountAuthorizedClp: result.amountAuthorizedClp ?? result.amountClp ?? null,
+          source: body.quotationId ? 'explicit' : 'inherited_from_po'
+        }
+      })
+    }
 
     return NextResponse.json(result, { status: 201 })
   } catch (error) {

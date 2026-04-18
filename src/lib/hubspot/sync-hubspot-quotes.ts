@@ -4,9 +4,10 @@ import {
   getHubSpotGreenhouseCompanyQuotes,
   type HubSpotGreenhouseQuoteProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
+import { resolveQuotationIdentity } from '@/lib/finance/pricing'
+import { publishQuoteSynced } from '@/lib/commercial/quotation-events'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { syncQuoteLineItems } from '@/lib/hubspot/sync-hubspot-line-items'
 
 // ── Status mapping: HubSpot → Greenhouse ──
@@ -79,7 +80,20 @@ const upsertQuoteFromHubSpot = async (
 
   if (!hubspotQuoteId) return 'skipped'
 
-  const quoteId = `QUO-HS-${hubspotQuoteId}`
+  const generatedQuoteId = `QUO-HS-${hubspotQuoteId}`
+
+  const existingRows = await runGreenhousePostgresQuery<{ quote_id: string }>(
+    `SELECT quote_id
+     FROM greenhouse_finance.quotes
+     WHERE hubspot_quote_id = $1
+        OR quote_id = $2
+     ORDER BY CASE WHEN quote_id = $2 THEN 0 ELSE 1 END
+    LIMIT 1`,
+    [hubspotQuoteId, generatedQuoteId]
+  )
+
+  const quoteId = existingRows[0]?.quote_id ?? generatedQuoteId
+
   const title = quote.identity.title || `HubSpot Quote ${hubspotQuoteId}`
   const quoteNumber = quote.identity.quoteNumber || null
   const amount = quote.financial.amount ?? 0
@@ -124,22 +138,8 @@ const upsertQuoteFromHubSpot = async (
 
   const action = (result[0]?.action ?? 'skipped') as 'created' | 'updated' | 'skipped'
 
-  if (action === 'created' || action === 'updated') {
-    await publishOutboxEvent({
-      aggregateType: AGGREGATE_TYPES.quote,
-      aggregateId: quoteId,
-      eventType: EVENT_TYPES.quoteSynced,
-      payload: {
-        quoteId,
-        hubspotQuoteId,
-        hubspotDealId: dealId,
-        sourceSystem: 'hubspot',
-        action,
-        organizationId: space.organization_id,
-        spaceId: space.space_id
-      }
-    })
-  }
+  // Canonical publish happens after line items + canonical sync in the caller,
+  // so quotationId can be included. See syncHubSpotQuotesForCompany below.
 
   return action
 }
@@ -188,13 +188,53 @@ export const syncHubSpotQuotesForCompany = async (hubspotCompanyId: string): Pro
       else result.skipped++
 
       // Sync line items for this quote (TASK-211)
-      if (action === 'created' || action === 'updated') {
-        const quoteId = `QUO-HS-${quote.identity.hubspotQuoteId}`
+      if (action === 'created' || action === 'updated' ) {
+        const hubspotQuoteId = quote.identity.hubspotQuoteId
+
+        const resolvedQuoteRows = hubspotQuoteId
+          ? await runGreenhousePostgresQuery<{ quote_id: string }>(
+            `SELECT quote_id
+             FROM greenhouse_finance.quotes
+             WHERE hubspot_quote_id = $1
+             ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST
+             LIMIT 1`,
+            [hubspotQuoteId]
+          )
+          : []
+
+        const quoteId = resolvedQuoteRows[0]?.quote_id ?? (hubspotQuoteId ? `QUO-HS-${hubspotQuoteId}` : '')
 
         try {
           await syncQuoteLineItems(quoteId, quote.identity.hubspotQuoteId)
         } catch (liErr) {
           result.errors.push(`Quote ${quoteId} line items: ${liErr instanceof Error ? liErr.message : String(liErr)}`)
+        }
+
+        let quotationId: string | null = null
+
+        try {
+          await syncCanonicalFinanceQuote({ quoteId })
+
+          const identity = await resolveQuotationIdentity(quoteId)
+
+          quotationId = identity?.quotationId ?? null
+        } catch (bridgeErr) {
+          result.errors.push(`Quote ${quoteId} canonical bridge: ${bridgeErr instanceof Error ? bridgeErr.message : String(bridgeErr)}`)
+        }
+
+        try {
+          await publishQuoteSynced({
+            quoteId,
+            quotationId,
+            hubspotQuoteId: quote.identity.hubspotQuoteId,
+            hubspotDealId: quote.associations.dealId ?? null,
+            sourceSystem: 'hubspot',
+            action,
+            organizationId: space.organization_id,
+            spaceId: space.space_id
+          })
+        } catch (publishErr) {
+          result.errors.push(`Quote ${quoteId} publish: ${publishErr instanceof Error ? publishErr.message : String(publishErr)}`)
         }
       }
     } catch (err) {

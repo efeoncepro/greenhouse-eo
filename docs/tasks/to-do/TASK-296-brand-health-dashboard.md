@@ -1,3 +1,14 @@
+## Delta 2026-04-17 — alineación con capa de entitlements
+
+TASK-286 fue ampliada para declarar capabilities granulares `client_portal.*` con `defaultScope: 'organization'`. Esta task ahora debe consumir esa capa al implementar la página.
+
+- **View code:** `cliente.brand_health`
+- **Capability:** `client_portal.brand_health`
+- **Actions requeridas:** `view` (read-only dashboard)
+- **Scope:** `organization`
+- **Guard de página:** combinar `hasAuthorizedViewCode(tenant, 'cliente.brand_health')` + `can(tenant, 'client_portal.brand_health', 'view', 'organization')`.
+- **Ref canónica:** `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
 # TASK-296 — Brand Health Dashboard
 
 ## Status
@@ -10,7 +21,7 @@
 - Status real: `Diseno`
 - Rank: `12`
 - Domain: `agency`
-- Blocked by: `TASK-286`
+- Blocked by: `TASK-286` (view code + capability + binding + role defaults)
 - Branch: `task/TASK-296-brand-health-dashboard`
 
 ## Summary

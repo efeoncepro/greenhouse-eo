@@ -24,6 +24,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Finanzas
 
 - [Cotizaciones multi-source](finance/cotizaciones-multi-source.md) — cotizaciones de Nubox y HubSpot unificadas, sync automatico, creacion outbound, mapeo de estados
+- [Cotizaciones — Gobernanza, versiones, aprobaciones y templates](finance/cotizaciones-gobernanza.md) — runtime de gobernanza interna: versiones con diff, approval por excepción conectado al margin health, terms library con variables, templates reutilizables y audit inmutable
 - [HES — Recepción y validación de servicio](finance/hes-recepcion-y-validacion.md) — hoja de entrada de servicio como respaldo recibido del cliente, estados visibles y herencia documental desde la OC
 - [Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), tesoreria por instrumento, cuenta corriente accionista y diferencia devengado vs caja
 
@@ -31,6 +32,8 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
 - [Jerarquía de Reporte y Supervisoría](hr/jerarquia-reporte-supervisoria.md) — gestion de supervisores, delegaciones temporales, historial y diferencias con departamentos
+- [Reliquidacion de Nomina](hr/reliquidacion-de-nomina.md) — reapertura de periodos exportados, versionamiento de entradas (v1/v2), delta a finanzas, ventana de 45 dias, auditoria inmutable
+- [Objetivos y OKRs](hr/objetivos-okrs.md) — ciclos de objetivos, goals en cascada (empresa, departamento, individual), key results medibles, elegibilidad por contrato, self-service y admin
 
 ### Personas
 
@@ -45,6 +48,8 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Delivery
 
 - [Motor ICO — Metricas Operativas](delivery/motor-ico-metricas-operativas.md) — metricas operativas, materializacion diaria, cadena de fallback (Postgres/BQ/live), diagnostico
+- [Nexa Insights — Digest semanal para liderazgo](delivery/nexa-insights-digest-semanal.md) — resumen semanal interno por email con top insights ICO-first, audiencias, schedule, links al portal y limites del corte actual
+- [Nexa Insights — Bloque en Agency, Home y 360](delivery/nexa-insights-bloque-agency.md) — superficie dentro del portal con KPIs, lista de senales recientes y modo Historial (timeline cross-period). Explica el toggle, causa raiz colapsable y menciones clickeables
 
 ### Herramientas IA
 

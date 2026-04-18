@@ -45,6 +45,8 @@ interface CampaignItem {
   spaceId: string
 }
 
+const AGENCY_CAMPAIGNS_ENDPOINT = '/api/agency/campaigns'
+
 const STATUS_COLORS: Record<string, 'secondary' | 'info' | 'success' | 'warning' | 'primary'> = {
   draft: 'secondary', planning: 'info', active: 'success', paused: 'warning', completed: 'primary', archived: 'secondary'
 }
@@ -153,7 +155,7 @@ const AgencyCampaignsView = () => {
     setErrorMessage(null)
 
     try {
-      const res = await fetch('/api/campaigns')
+      const res = await fetch(AGENCY_CAMPAIGNS_ENDPOINT)
 
       if (res.ok) {
         const data = await res.json()

@@ -4,9 +4,10 @@ import {
   getHubSpotGreenhouseProductCatalog,
   type HubSpotGreenhouseProductProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { syncCanonicalFinanceProduct } from '@/lib/finance/quotation-canonical-store'
+import { getCommercialProduct } from '@/lib/commercial/product-catalog-store'
+import { publishProductSynced } from '@/lib/commercial/quotation-events'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 // ── Upsert single product ──
 
@@ -67,14 +68,8 @@ const upsertProductFromHubSpot = async (
 
   const action = (result[0]?.action ?? 'skipped') as 'created' | 'updated' | 'skipped'
 
-  if (action === 'created' || action === 'updated') {
-    await publishOutboxEvent({
-      aggregateType: AGGREGATE_TYPES.product,
-      aggregateId: productId,
-      eventType: EVENT_TYPES.productSynced,
-      payload: { productId, hubspotProductId, name, sku, action }
-    })
-  }
+  // Canonical publish deferred to the caller (syncHubSpotProductCatalog) so the
+  // commercial product_id bridge has been populated before emitting.
 
   return action
 }
@@ -106,10 +101,28 @@ export const syncHubSpotProductCatalog = async (): Promise<ProductSyncResult> =>
   for (const product of products) {
     try {
       const action = await upsertProductFromHubSpot(product)
+      const hubspotProductId = product.identity.hubspotProductId
 
       if (action === 'created') result.created++
       else if (action === 'updated') result.updated++
       else result.skipped++
+
+      if ((action === 'created' || action === 'updated') && hubspotProductId) {
+        const financeProductId = `GH-PROD-${hubspotProductId}`
+
+        await syncCanonicalFinanceProduct({ productId: financeProductId })
+
+        const canonical = await getCommercialProduct(financeProductId).catch(() => null)
+
+        await publishProductSynced({
+          productId: financeProductId,
+          hubspotProductId,
+          name: product.identity.name ?? null,
+          sku: product.identity.sku ?? null,
+          commercialProductId: canonical?.productId ?? null,
+          action
+        })
+      }
     } catch (err) {
       result.errors.push(`Product ${product.identity.productId}: ${err instanceof Error ? err.message : String(err)}`)
     }

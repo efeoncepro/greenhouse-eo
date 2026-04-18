@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { ICO_METRIC_REGISTRY } from '../metric-registry'
 import type { AiSignalRecord } from './types'
 
-export const ICO_LLM_PROMPT_VERSION = 'ico_signal_enrichment_v3'
+export const ICO_LLM_PROMPT_VERSION = 'ico_signal_enrichment_v4'
 export const ICO_LLM_DEFAULT_MODEL_ID = 'google/gemini-2.5-flash@default'
 export const ICO_LLM_SUPPORTED_SIGNAL_TYPES = ['anomaly', 'prediction', 'root_cause', 'recommendation'] as const
 export const ICO_LLM_ENRICHMENT_STATUSES = ['succeeded', 'failed', 'skipped'] as const
@@ -82,6 +82,7 @@ export interface AgencyAiLlmSummaryItem {
   severity: string | null
   qualityScore: number | null
   explanationSummary: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
   confidence: number | null
   processedAt: string
@@ -104,6 +105,7 @@ export interface AgencyAiLlmSummary {
     signalsFailed: number
   } | null
   recentEnrichments: AgencyAiLlmSummaryItem[]
+  timeline: AgencyAiLlmSummaryItem[]
   lastProcessedAt: string | null
 }
 
@@ -115,9 +117,75 @@ export interface OrganizationAiLlmEnrichmentItem {
   severity: string | null
   qualityScore: number | null
   explanationSummary: string | null
+  rootCauseNarrative: string | null
   recommendedAction: string | null
   confidence: number | null
   processedAt: string
+}
+
+export interface TopAiLlmEnrichmentItem {
+  enrichmentId: string
+  signalId: string
+  spaceId: string
+  metricName: string
+  signalType: string
+  severity: string | null
+  qualityScore: number | null
+  explanationSummary: string | null
+  rootCauseNarrative: string | null
+  recommendedAction: string | null
+  confidence: number | null
+  processedAt: string
+}
+
+export interface MemberNexaInsightItem {
+  id: string
+  signalType: string
+  metricId: string
+  severity: string | null
+  explanation: string | null
+  rootCauseNarrative: string | null
+  recommendedAction: string | null
+  processedAt: string
+}
+
+export type NexaSummarySource = 'active' | 'historical' | 'empty'
+
+export interface MemberNexaInsightsPayload {
+  summarySource: NexaSummarySource
+  activeAnalyzed: number
+  historicalAnalyzed: number
+  totalAnalyzed: number
+  lastAnalysis: string | null
+  runStatus: IcoLlmRunStatus | null
+  insights: MemberNexaInsightItem[]
+  activePreview: MemberNexaInsightItem[]
+  historicalPreview: MemberNexaInsightItem[]
+  timeline: MemberNexaInsightItem[]
+}
+
+export interface SpaceNexaInsightItem {
+  id: string
+  signalType: string
+  metricId: string
+  severity: string | null
+  explanation: string | null
+  rootCauseNarrative: string | null
+  recommendedAction: string | null
+  processedAt: string
+}
+
+export interface SpaceNexaInsightsPayload {
+  summarySource: NexaSummarySource
+  activeAnalyzed: number
+  historicalAnalyzed: number
+  totalAnalyzed: number
+  lastAnalysis: string | null
+  runStatus: IcoLlmRunStatus | null
+  insights: SpaceNexaInsightItem[]
+  activePreview: SpaceNexaInsightItem[]
+  historicalPreview: SpaceNexaInsightItem[]
+  timeline: SpaceNexaInsightItem[]
 }
 
 // ─── Metric Glossary (dynamic from registry) ──────────────────────────────
@@ -209,6 +277,18 @@ export const toSerializableSignalSnapshot = (signal: AiSignalRecord) => ({
 
 export const stableEnrichmentId = (signalId: string, promptHash: string) =>
   `EO-AIE-${createHash('sha1').update(`${signalId}|${promptHash}`).digest('hex').slice(0, 8)}`.toUpperCase()
+
+export const stableEnrichmentHistoryId = (runId: string, enrichmentId: string) =>
+  `EO-AIH-${createHash('sha1').update(`${runId}|${enrichmentId}`).digest('hex').slice(0, 8)}`.toUpperCase()
+
+export const stableReplayRunId = (
+  periodYear: number,
+  periodMonth: number,
+  promptHash: string,
+  asOfTime: string,
+  spaceId?: string | null
+) =>
+  `EO-AIR-${createHash('sha1').update(`${periodYear}-${periodMonth}|${promptHash}|${asOfTime}|${spaceId ?? 'all'}|replay`).digest('hex').slice(0, 8)}`.toUpperCase()
 
 export const stableRunId = (periodYear: number, periodMonth: number, promptHash: string) =>
   `EO-AIR-${createHash('sha1').update(`${periodYear}-${periodMonth}|${promptHash}|${Date.now()}`).digest('hex').slice(0, 8)}`.toUpperCase()

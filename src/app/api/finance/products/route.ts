@@ -6,6 +6,7 @@ import {
   isFinanceSchemaDriftError,
   logFinanceSchemaDrift
 } from '@/lib/finance/schema-drift'
+import { listCommercialProductCatalog } from '@/lib/commercial/product-catalog-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 
@@ -40,6 +41,52 @@ export async function GET(request: Request) {
   const source = searchParams.get('source')
   const active = searchParams.get('active')
   const search = searchParams.get('search')
+  const view = searchParams.get('view') === 'canonical' ? 'canonical' : 'finance_legacy'
+
+  if (view === 'canonical') {
+    try {
+      const { items, total } = await listCommercialProductCatalog({
+        search,
+        source,
+        active: active === 'true' ? true : active === 'false' ? false : null,
+        limit: 500
+      })
+
+      return NextResponse.json({
+        view: 'canonical',
+        items: items.map(item => ({
+          productId: item.productId,
+          financeProductId: item.financeProductId,
+          productCode: item.productCode,
+          name: item.productName,
+          productType: item.productType,
+          pricingModel: item.pricingModel,
+          businessLineCode: item.businessLineCode,
+          defaultUnitPrice:
+            item.defaultUnitPrice !== null ? roundCurrency(item.defaultUnitPrice) : null,
+          defaultUnit: item.defaultUnit,
+          currency: item.defaultCurrency,
+          description: item.description,
+          isActive: item.active,
+          source: item.sourceSystem,
+          syncStatus: item.syncStatus,
+          syncDirection: item.syncDirection,
+          hubspotProductId: item.hubspotProductId,
+          lastSyncedAt: item.lastSyncedAt,
+          updatedAt: item.updatedAt
+        })),
+        total
+      })
+    } catch (error) {
+      if (isFinanceSchemaDriftError(error)) {
+        logFinanceSchemaDrift('products_canonical', error)
+
+        return financeSchemaDriftResponse('products_canonical', { items: [], total: 0 })
+      }
+
+      throw error
+    }
+  }
 
   const conditions: string[] = []
   const values: unknown[] = []

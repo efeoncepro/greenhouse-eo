@@ -73,7 +73,7 @@ Reglas obligatorias:
 - `project_context.md`
 - `Handoff.md`
 - `docs/tasks/complete/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`
-- `docs/tasks/to-do/TASK-285-client-role-differentiation.md`
+- `docs/tasks/complete/TASK-285-client-role-differentiation.md`
 
 ## Dependencies & Impact
 

@@ -21,17 +21,20 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import { ExecutiveMiniStatCard } from '@/components/greenhouse'
+import type { EntitlementsGovernanceOverview } from '@/lib/admin/entitlements-governance'
 import type { AdminGovernanceOverview } from '@/lib/admin/get-admin-view-access-governance'
 import { SECTION_ACCENT } from '@/lib/admin/view-access-catalog'
 import { ROLE_CODES } from '@/config/role-codes'
+import EntitlementsGovernanceTab from '@/views/greenhouse/admin/EntitlementsGovernanceTab'
 import PermissionSetsTab from '@/views/greenhouse/admin/permission-sets/PermissionSetsTab'
 
 type Props = {
   data: AdminGovernanceOverview
+  entitlementsData: EntitlementsGovernanceOverview
 }
 
 type RoleFilter = 'all' | 'efeonce_internal' | 'client'
-type ActiveTab = 'permissions' | 'preview' | 'sets'
+type ActiveTab = 'entitlements' | 'permissions' | 'preview' | 'sets'
 type OverrideMode = 'inherit' | 'grant' | 'revoke'
 type PermissionsFocus = 'all' | 'changed' | 'fallback'
 type PreviewFocus = 'all' | 'visible' | 'overrides' | 'impact'
@@ -72,9 +75,9 @@ const PREVIEW_STATE_COPY = {
   }
 }
 
-const AdminViewAccessGovernanceView = ({ data }: Props) => {
+const AdminViewAccessGovernanceView = ({ data, entitlementsData }: Props) => {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<ActiveTab>('permissions')
+  const [activeTab, setActiveTab] = useState<ActiveTab>('entitlements')
   const [query, setQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('efeonce_internal')
   const [sectionFilter, setSectionFilter] = useState<string>('all')
@@ -589,15 +592,15 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }} justifyContent='space-between'>
           <Box>
             <Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 1.5 }}>
-              <Chip size='small' variant='outlined' label='Gobierno de acceso activo' />
+              <Chip size='small' variant='outlined' label='Gobernanza de acceso' />
             </Stack>
             <Typography variant='h4' sx={{ mb: 1 }}>
-              Vistas y acceso
+              Gobernanza de acceso
             </Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 920 }}>
-              Esta superficie ya gobierna vistas por rol, overrides por usuario, expiración operativa y lectura efectiva
-              de sesión. El objetivo de este panel ahora es ayudar a decidir cambios con menos ambigüedad: qué está
-              persistido, qué sigue en fallback y qué impacto tendría un ajuste antes de guardarlo.
+              Administra capacidades, defaults por rol, excepciones y política de inicio sin perder la trazabilidad de
+              vistas, permission sets y fallback heredado. La capa nueva convive con el modelo actual para que un admin
+              pueda explicar la causa y el resultado efectivo desde el mismo shell.
             </Typography>
           </Box>
           <Alert severity={data.persistence?.rolesWithPersistedAssignments ? 'success' : 'info'} variant='outlined' sx={{ maxWidth: 460 }}>
@@ -630,10 +633,13 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
               variant='scrollable'
               allowScrollButtonsMobile
             >
+              <Tab value='entitlements' label='Entitlements' />
               <Tab value='permissions' label='Permisos' />
               <Tab value='preview' label='Preview' />
               <Tab value='sets' label='Sets de permisos' />
             </Tabs>
+
+            {activeTab === 'entitlements' ? <EntitlementsGovernanceTab data={entitlementsData} /> : null}
 
             {activeTab === 'permissions' ? (
               <Stack spacing={3}>

@@ -30,6 +30,7 @@ export const GH_INTERNAL_NAV = {
   adminNotifications: { label: 'Notificaciones', subtitle: 'Sistema de notificaciones in-app y email' },
   adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' },
   adminBusinessLines: { label: 'Business Lines', subtitle: 'Metadata canonica de las lineas de negocio' },
+  adminServiceSlas: { label: 'SLA de servicios', subtitle: 'Gobernanza contractual por servicio y cumplimiento' },
   adminIntegrationGovernance: { label: 'Integration Governance', subtitle: 'Registro, taxonomia, readiness y ownership de integraciones nativas' },
   adminAccounts: { label: 'Cuentas', subtitle: 'Organizaciones, spaces y gobierno de identidad' },
   adminPaymentInstruments: { label: 'Instrumentos de pago', subtitle: 'Cuentas bancarias, tarjetas, fintech y plataformas' },
@@ -95,7 +96,9 @@ export const GH_HR_NAV = {
   orgChart: { label: 'Organigrama', subtitle: 'Explorador visual de la jerarquía' },
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
   leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
-  attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' }
+  attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' },
+  goals: { label: 'Objetivos', subtitle: 'OKRs, ciclos y seguimiento de avance' },
+  evaluations: { label: 'Evaluaciones', subtitle: 'Ciclos 360, asignaciones y calibracion' }
 } as const
 
 export const GH_MY_NAV = {
@@ -106,6 +109,8 @@ export const GH_MY_NAV = {
   profile: { label: 'Mi Perfil', subtitle: 'Identidad y datos personales' },
   payroll: { label: 'Mi Nómina', subtitle: 'Liquidaciones y compensación' },
   leave: { label: 'Mis Permisos', subtitle: 'Saldos y solicitudes' },
+  goals: { label: 'Mis Objetivos', subtitle: 'OKRs y key results del ciclo' },
+  evaluations: { label: 'Mis Evaluaciones', subtitle: 'Feedback 360 y resultados' },
   organization: { label: 'Mi Organización', subtitle: 'Directorio y colegas' },
   settings: { label: 'Configuración', subtitle: 'Notificaciones y preferencias' }
 } as const
@@ -1316,7 +1321,23 @@ export const GH_NEXA = {
   insights_chip_no_data: 'Sin datos',
   insights_list_title: 'Señales recientes',
   insights_action_label: 'Acción sugerida',
+  insights_root_cause_label: 'Causa raíz',
+  insights_root_cause_expand: 'Ver causa raíz',
+  insights_root_cause_collapse: 'Ocultar causa raíz',
   insights_last_analysis: (label: string) => `Último análisis: ${label}`,
+
+  // View mode toggle (Recientes vs Historial)
+  insights_view_mode_aria: 'Modo de visualización',
+  insights_view_mode_recent: 'Recientes',
+  insights_view_mode_timeline: 'Historial',
+  insights_timeline_title: 'Historial de señales',
+  insights_timeline_subtitle: (n: number) => `${n} ${n === 1 ? 'señal registrada' : 'señales registradas'}`,
+  insights_timeline_empty_title: 'Aún no hay señales analizadas',
+  insights_timeline_empty_description:
+    'Cuando Nexa procese nuevas señales, aparecerán aquí ordenadas por fecha.',
+  insights_timeline_day_today: 'Hoy',
+  insights_timeline_day_yesterday: 'Ayer',
+  insights_timeline_time_at: (label: string) => `a las ${label}`,
 
   // KPIs
   kpi_analyzed: 'Señales analizadas',

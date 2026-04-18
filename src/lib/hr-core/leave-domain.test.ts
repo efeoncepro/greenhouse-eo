@@ -9,9 +9,11 @@ vi.mock('@/lib/calendar/nager-date-holidays', () => ({
 }))
 
 const {
+  calculateAccruedLeaveAllowanceDays,
   calculateProgressiveExtraDays,
   classifyLeavePayrollImpact,
-  computeLeaveDayBreakdown
+  computeLeaveDayBreakdown,
+  roundLeaveDays
 } = await import('@/lib/hr-core/leave-domain')
 
 describe('leave-domain', () => {
@@ -60,6 +62,38 @@ describe('leave-domain', () => {
     ).toBe(1)
   })
 
+  it('prorates Chile accrual balances during the first service year and settles to full annual after anniversary', () => {
+    expect(
+      calculateAccruedLeaveAllowanceDays({
+        annualDays: 15,
+        accrualType: 'monthly_accrual',
+        hireDate: '2025-09-09',
+        year: 2025,
+        asOfDate: '2025-12-31'
+      })
+    ).toBe(4.68)
+
+    expect(
+      calculateAccruedLeaveAllowanceDays({
+        annualDays: 15,
+        accrualType: 'monthly_accrual',
+        hireDate: '2025-09-09',
+        year: 2026,
+        asOfDate: '2026-04-16'
+      })
+    ).toBe(4.36)
+
+    expect(
+      calculateAccruedLeaveAllowanceDays({
+        annualDays: 15,
+        accrualType: 'monthly_accrual',
+        hireDate: '2025-09-09',
+        year: 2026,
+        asOfDate: '2026-09-09'
+      })
+    ).toBe(15)
+  })
+
   it('classifies payroll impact according to period lifecycle', () => {
     expect(classifyLeavePayrollImpact([]).mode).toBe('none')
     expect(
@@ -72,5 +106,10 @@ describe('leave-domain', () => {
         { periodId: '2026-03', year: 2026, month: 3, status: 'exported' }
       ]).mode
     ).toBe('deferred_adjustment_required')
+  })
+
+  it('rounds fractional leave balances to two decimals consistently', () => {
+    expect(roundLeaveDays(4.039999999999999)).toBe(4.04)
+    expect(roundLeaveDays(4.680000000000001)).toBe(4.68)
   })
 })

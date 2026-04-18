@@ -1,5 +1,15 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-04-16 — TASK-029 Goals & OKRs implementado
+
+- 4 tablas creadas en `greenhouse_hr`: `goal_cycles`, `goals`, `goal_key_results`, `goal_progress`
+- 12 API routes en `/api/hr/goals/`
+- 5 outbox events: `goal.created`, `goal.updated`, `goal.progress_recorded`, `goal_cycle.activated`, `goal_cycle.closed`
+- 2 view codes: `equipo.objetivos`, `mi_ficha.mis_objetivos`
+- Elegibilidad por contract_type implementada en `src/lib/hr-goals/eligibility.ts`
+- Vistas: `/my/goals` (self-service), `/hr/goals` (admin 3 tabs)
+- People 360 tab "Objetivos" diferido — se implementara como follow-up
+
 ## Delta 2026-04-11 — Talent Trust Ops: unified verification model, admin review queue, tool/skill reject (TASK-316)
 
 ### Unified verification model across skills, tools, and certifications

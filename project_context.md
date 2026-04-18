@@ -1,4 +1,104 @@
+## Delta 2026-04-17 TASK-143 Agency Economics queda activada sobre serving canónico
+
+- `Agency > Economía` ya no debe tratarse como una vista legacy client-first ni como placeholder.
+- Runtime nuevo:
+  - `GET /api/agency/economics`
+  - `src/lib/agency/agency-economics.ts`
+  - `src/views/greenhouse/agency/economics/EconomicsView.tsx`
+- Contrato operativo:
+  - la lane consume `greenhouse_serving.operational_pl_snapshots` como source principal
+  - el drill-down por servicio no debe inventar métricas ni repartir revenue inline mientras `TASK-146` siga abierta
+  - la expansión por Space puede mostrar solo contexto contractual/catálogo vía `services`
+- Decisión UI:
+  - la surface nueva reutiliza componentes Vuexy/MUI nativos del repo como referencia principal, no componentes inventados ad hoc
+
 # project_context.md
+
+## Delta 2026-04-17 TASK-345 materializa el bridge canónico de quotations
+
+- `greenhouse_commercial` ya existe físicamente con:
+  - `product_catalog`
+  - `quotations`
+  - `quotation_versions`
+  - `quotation_line_items`
+- Regla operativa nueva:
+  - writers HubSpot/Nubox siguen entrando por el lane Finance por compatibilidad
+  - el anchor canónico se mantiene sincronizado desde esos mismos writers
+  - las APIs Finance de quotes ya leen vía façade canónica, preservando el payload legacy del portal
+- Regla de tenancy actualizada:
+  - el bridge materializa `space_id` en quotations con resolución derivada desde `organization_id` / `client_id`
+  - la resolución queda auditada en `space_resolution_source`
+- Regla de cutover:
+  - `greenhouse_finance.*` deja de ser la única base de lectura del lane
+  - `commercial.quotation.*` sigue siendo naming objetivo de eventos, no publisher runtime activo
+
+## Delta 2026-04-17 Los docs operativos de agentes ya exigen pensar acceso en views + entitlements
+
+- `AGENTS.md`, `CLAUDE.md` y `docs/tasks/TASK_PROCESS.md` ya no deben permitir que una solution proposal trate acceso como si solo existieran `views`.
+- Contrato operativo actualizado para agentes:
+  - `routeGroups` siguen definiendo acceso broad por workspace o familia de rutas
+  - `authorizedViews` / `view_code` siguen definiendo surface visible, menú, tabs, page guards y otras proyecciones de UI
+  - `entitlements` (`module + capability + action + scope`) son la dirección canónica de autorización fina
+  - `startup policy` sigue siendo un contrato separado para entrypoint/Home
+- Al diseñar arquitectura, redactar tasks o proponer una implementación que toque acceso, el agente debe dejar explícito si el cambio vive en `views`, `entitlements`, `startup policy`, `routeGroups` o en varios planos a la vez.
+
+## Delta 2026-04-17 TASK-404 materializa la gobernanza operativa de entitlements en Admin Center
+
+- Greenhouse ya no depende solo de runtime code-versioned o ajustes manuales de base para operar permisos granulares.
+- Runtime actualizado:
+  - migración `20260417044741101_task-404-entitlements-governance.sql`
+  - tablas `greenhouse_core.role_entitlement_defaults`, `greenhouse_core.user_entitlement_overrides`, `greenhouse_core.entitlement_governance_audit_log`
+  - rutas `GET /api/admin/entitlements/governance`, `POST /api/admin/entitlements/roles`, `GET /api/admin/entitlements/users/[userId]`, `POST /api/admin/entitlements/users/[userId]/overrides`, `PATCH /api/admin/entitlements/users/[userId]/startup-policy`
+  - surfaces `Admin Center > Gobernanza de acceso` y `Admin Center > Usuarios > Acceso`
+- Contrato operativo:
+  - el catálogo de entitlements sigue siendo code-versioned; la persistencia gobierna overlays, no redefine el catálogo base
+  - la precedencia efectiva es `runtime base -> role defaults -> user overrides`
+  - la startup policy sigue siendo un contrato separado de permisos y se resuelve vía `resolvePortalHomePolicy()`
+  - toda mutación de gobernanza se registra con auditoría y evento outbox
+  - las nuevas tablas y queries administrativas deben seguir aisladas por `space_id`; cuando no existe tenant real se usa el sentinel `__platform__`
+
+## Delta 2026-04-16 HR leave corrige accrual Chile de primer año y deja self-heal de balances
+
+- El runtime de vacaciones Chile interno ya no debe sembrar `15` días completos por default cuando la persona aún no cumple su primer aniversario laboral.
+- Runtime actualizado:
+  - migración `20260416094722775_task-416-hr-leave-chile-accrual-hardening.sql`
+  - `src/lib/hr-core/leave-domain.ts`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+- Contrato operativo:
+  - `policy-vacation-chile` se interpreta como accrual desde `hire_date` durante el primer ciclo laboral y no como anual fijo inmediato
+  - la resolución de policy ya no depende del orden de lectura; prioriza especificidad laboral real (`employment_type`, `pay_regime`, `contract_type`, `payroll_via`)
+  - la resemilla de `leave_balances` debe autocorregir balances ya sembrados cuando cambia la policy o el cálculo, sin tocar `used_days`, `reserved_days` ni `adjustment_days`
+
+## Delta 2026-04-16 TASK-415 formaliza HR leave admin operations con backfill y ledger de ajustes
+
+- Greenhouse ya no limita la gestión de vacaciones al autoservicio del colaborador; HR/admin ahora tiene una superficie operativa explícita para saldos, backfills y correcciones auditables.
+- Runtime actualizado:
+  - migración `20260416083541945_task-415-hr-leave-admin-backfill-adjustments.sql`
+  - rutas `POST /api/hr/core/leave/backfills`, `GET/POST /api/hr/core/leave/adjustments`, `POST /api/hr/core/leave/adjustments/[adjustmentId]/reverse`
+  - ledger `greenhouse_hr.leave_balance_adjustments`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+- Contrato operativo:
+  - un periodo ya tomado con fechas reales se registra como backfill retroactivo y no como ajuste opaco de saldo
+  - una corrección sin fechas exactas vive en `leave_balance_adjustments` con `delta_days`, razón obligatoria, actor, metadata y reversal explícito
+  - la explicación de política visible de leave ya no depende solo de moneda o `employment_type`; debe resolver con `contract_type + pay_regime + payroll_via + hire_date`
+  - el caso Chile interno indefinido pagado en CLP queda preparado bajo esa resolución canónica, reutilizable por surfaces admin y self-service
+  - las capabilities runtime para este dominio incluyen `hr.leave_balance`, `hr.leave_backfill` y `hr.leave_adjustment`
+
+## Delta 2026-04-15 TASK-403 materializa el bridge real entre entitlements y Pulse/Nexa
+
+- Greenhouse ya no depende solo de checks locales para gobernar la Home moderna.
+- Runtime nuevo:
+  - `src/config/entitlements-catalog.ts`
+  - `src/lib/entitlements/types.ts`
+  - `src/lib/entitlements/runtime.ts`
+  - `src/lib/home/build-home-entitlements-context.ts`
+- Contrato operativo:
+  - la primera layer de entitlements es code-versioned y no requiere tablas nuevas
+  - deriva `module + capability + action + scope` desde `roleCodes`, `routeGroups` y `authorizedViews`
+  - `GET /api/home/snapshot` y `POST /api/home/nexa` ya consumen el mismo bridge, evitando drift entre Pulse y Nexa
+  - Pulse ahora recibe `recommendedShortcuts` y `accessContext` como surface mínima visible para audiencias mixtas
+  - `CAPABILITY_REGISTRY` sigue resolviendo módulos capability-based por `businessLines/serviceModules`; no fue reemplazado por este corte
 
 ## Delta 2026-04-15 Service SLA/SLO runtime foundation materialized per service
 

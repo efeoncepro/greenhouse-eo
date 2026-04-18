@@ -71,6 +71,10 @@
     {
       "path": "/api/cron/hubspot-products-sync",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/quotation-lifecycle",
+      "schedule": "0 10 * * *"
     }
   ]
 }

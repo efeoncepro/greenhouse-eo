@@ -1,12 +1,160 @@
 # Greenhouse — Nexa Insights Layer Architecture
 
+## Delta 2026-04-17 — Historial advisory append-only para timeline y weekly digest
+
+- Runtime activo:
+  - Nuevo archivo histórico `greenhouse_serving.ico_ai_signal_enrichment_history` con escritura append-only por run de LLM
+  - `ico_ai_signal_enrichments` se mantiene como snapshot current-state del período activo; no cambia el contrato de las surfaces "Recientes"
+  - Los summary readers scoped de Person 360 y Space 360 exponen `summarySource`, `activeAnalyzed`, `historicalAnalyzed`, `activePreview` y `historicalPreview`; el reader decide explícitamente si la surface visible representa estado activo o memoria histórica
+  - `readAgencyAiLlmTimeline`, `readMemberAiLlmTimeline` y `readSpaceAiLlmTimeline` ahora leen desde historial, deduplicado por `enrichment_id` con `DISTINCT ON`
+  - `src/lib/nexa/digest/build-weekly-digest.ts` ahora arma el corte semanal desde historial deduplicado, no desde el snapshot vigente
+- Contrato operativo:
+  - una señal que desaparece del set actual por mejora operativa deja de verse en "Recientes", pero sigue viva en timeline y en el weekly digest de su ventana histórica
+  - las surfaces que muestran summary scoped ya no dependen de un fallback implícito; consumen un payload que declara si la data visible es `active`, `historical` o `empty`
+  - reruns del mismo enrichment no duplican timeline/digest: el consumer colapsa a la última versión por `enrichment_id`
+  - esto evita pérdida silenciosa de contexto semanal/mensual en People, Space 360, Home y Agency
+
+## Delta 2026-04-17 — Historial activado en las 4 superficies Nexa (Agency, Home, Space 360, Person 360)
+
+- Runtime activo:
+  - Nuevos readers scoped: `readMemberAiLlmTimeline(memberId, limit=20)` y `readSpaceAiLlmTimeline(spaceId, limit=20)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` — mismo patrón que `readAgencyAiLlmTimeline` pero filtrando por `member_id` / `space_id` respectivamente, status='succeeded', sin filtro de período
+  - `readMemberAiLlmSummary` y `readSpaceAiLlmSummary` fetchean su timeline scoped en paralelo via `Promise.all` — zero latency extra en el critical path
+  - `MemberNexaInsightItem` / `SpaceNexaInsightItem` / `HomeNexaInsightItem` ganan `processedAt: string` (requerido); todos los mappers lo propagan
+  - `MemberNexaInsightsPayload` / `SpaceNexaInsightsPayload` / `HomeNexaInsightsPayload` ganan `timeline: <Item>[]` (requerido, default array vacío)
+  - `get-home-snapshot.ts` mapea `insightsSummary.timeline` (agency-wide, ya fetcheado) via `mapHomeInsight` → Home hereda el timeline del scope agency
+  - `HomeView`, `OverviewTab` (Space 360) y `PersonActivityTab` (Person 360) pasan `timelineInsights={payload.timeline ?? []}` a `NexaInsightsBlock`
+- Contrato operativo:
+  - Cada superficie muestra su cadencia **scoped**: Home → sistema-wide, Space 360 → ese space, Person 360 → ese miembro. No hay drift de datos entre contextos
+  - El toggle Recientes/Historial aparece automáticamente en las 4 superficies cuando hay data — sin wiring adicional en consumers futuros
+  - Backward compatible: `timelineInsights` sigue siendo opcional en `NexaInsightsBlock`; callers que no lo pasen simplemente no muestran el toggle
+  - Los tests fixture se actualizaron para reflejar `processedAt` y `timeline: []` — el contrato queda reforzado por TypeScript
+
+## Delta 2026-04-17 — NexaInsightsBlock gana modo Historial (timeline) además de Recientes
+
+- Runtime activo:
+  - Nuevo reader `readAgencyAiLlmTimeline(limit=20)` en `src/lib/ico-engine/ai/llm-enrichment-reader.ts` — ordena por `processed_at DESC`, filtra `status='succeeded'`, **no aplica filtro de período** (cross-period)
+  - `readAgencyAiLlmSummary` fetchea `recentEnrichments` + `timeline` en paralelo vía `Promise.all` — zero latency añadida al critical path
+  - `AgencyAiLlmSummary` extendido con `timeline: AgencyAiLlmSummaryItem[]`
+  - Nuevo componente `src/components/greenhouse/NexaInsightsTimeline.tsx` — MUI Lab `Timeline` agrupada por día con labels "Hoy"/"Ayer"/fecha, dots severity-coded (`critical=error`, `warning=warning`, `info=info`, `null=grey outlined`)
+  - `NexaInsightsBlock` incorpora `ToggleButtonGroup` (Recientes | Historial) que solo aparece cuando `timelineInsights` llega con data — backward compatible
+  - `IcoAdvisoryBlock` mapea `AgencyAiLlmSummary.timeline` → `NexaTimelineItem[]` y lo pasa via prop
+- Contrato operativo:
+  - Timeline es cross-period e incluye últimas 20 señales succeeded del sistema — responde la pregunta "¿cuántas señales ha habido esta semana/mes?" sin salir del bloque
+  - Modo default sigue siendo "Recientes" (período actual) — sin regresión visual para usuarios que no accionan el toggle
+  - Cada item del timeline reutiliza `NexaMentionText` para chips clickeables y `NexaInsightRootCauseSection` para causa raíz — coherencia total con vista Recientes
+  - Severidad nunca se comunica solo por color: chip textual + dot color redundantes (WCAG 2.2 AA)
+  - Keyboard: Tab al toggle, Enter/Space activa; ARIA `role="region"` + `aria-label` en timeline
+  - Preferencia de vista es local al componente (no persistida) — el operador elige por sesión
+
+## Delta 2026-04-17 — TASK-446 expone `rootCauseNarrative` end-to-end en UI, Weekly Digest y API
+
+- Runtime activo:
+  - El campo `root_cause_narrative` (ya generado y persistido desde `ico_signal_enrichment_v4` / `finance_signal_enrichment_v1`) ahora fluye por los 7 readers del serving layer a la UI
+  - `NexaInsightsBlock` renderiza sección colapsable "Causa raíz" via `NexaInsightRootCauseSection.tsx` con localStorage global `nexa.insights.rootCause.expanded`, ARIA completo y keyboard nav
+  - Weekly Executive Digest incluye bloque "Causa probable" con left border `EMAIL_COLORS.primary` cuando el campo viene poblado
+  - Mappers consumer (`IcoAdvisoryBlock`, `get-home-snapshot`, `HomeNexaInsightItem`) propagan el campo; `NexaInsightItem.rootCauseNarrative` pasó de opcional a required nullable para que TypeScript flaggee futuros consumers que lo olviden
+- Contrato operativo:
+  - Sin cambios al prompt ni a las tablas (la columna existía); el cambio es puramente de surfacing
+  - Enrichments antiguos sin el campo no rompen la UI: la sección no renderiza y el digest omite el bloque
+  - Funcionalmente separa "qué pasó" (explanation), "por qué" (rootCauseNarrative), "qué hacer" (recommendedAction) — contrato canónico que los consumers ya pueden asumir vigente
+
+## Delta 2026-04-17 — TASK-440 corrige labels técnicos de proyecto en Home, Space 360 y Person 360 sin abrir surfaces nuevas
+
+- Runtime activo:
+  - resolución canónica de proyecto por `space_id` + (`project_record_id` o wrapper/source IDs equivalentes como `notion_project_id` / `project_source_id`)
+  - humanización de `dimension_label` para señales/root cause cuando existe label resoluble
+  - sanitización backend de mentions y narrativa antes de persistir enrichments
+  - persistencia mínima de metadata de resolución en `explanation_json.meta.projectResolution`
+- Contrato operativo:
+  - `llm-provider` ya no debe caer a `projectId` técnico cuando no hay label; la degradación visible canónica es `este proyecto`
+  - la corrección ocurre en backend y beneficia automáticamente a `Pulse/Home`, `Space 360` y `Person 360` vía readers existentes
+  - no se agrega route ni surface nueva; el cambio corrige calidad narrativa sobre la lane advisory ya materializada
+
+## Delta 2026-04-16 — Weekly Executive Digest de Nexa queda operativo sobre ops-worker
+
+- Runtime activo:
+  - Builder: `src/lib/nexa/digest/build-weekly-digest.ts` agrega los top enrichments ICO-first de la última semana sobre `greenhouse_serving.ico_ai_signal_enrichments`
+  - Recipients: `src/lib/nexa/digest/recipient-resolver.ts` resuelve liderazgo interno vía `getRoleCodeNotificationRecipients()` + filtro `getInternalUsersFromPostgres()`
+  - Email: `src/emails/WeeklyExecutiveDigestEmail.tsx` + `src/lib/email/templates.ts` registran `weekly_executive_digest`
+  - Worker: `services/ops-worker/server.ts` expone `POST /nexa/weekly-digest`
+  - Scheduler: `services/ops-worker/deploy.sh` crea `ops-nexa-weekly-digest` cada lunes 07:00 `America/Santiago`
+- Contrato operativo:
+  - Este corte es **ICO-first y cross-Space**; la lane cross-domain queda preparada como follow-up y no debe asumirse implementada
+  - El digest consume enrichments ya materializados; no recalcula métricas ni inferencias inline
+  - El ranking visible conserva el orden canónico `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - Las menciones `space` y `member` se convierten en links HTML; `project` se mantiene como texto hasta que exista una ruta canónica de destino
+  - El email es advisory-only e interno; no incluye payloads sensibles por cliente
+
+## Delta 2026-04-16 — Finance Signal Engine (TASK-245) es el primer dominio fuera de ICO
+
+- Finance Dashboard ya no depende solo de KPIs y P&L para explicar desvíos financieros mensuales.
+- Runtime activo:
+  - Detector: `src/lib/finance/ai/anomaly-detector.ts` — Z-score rolling 6 meses sobre `greenhouse_finance.client_economics` (net_margin_pct, gross_margin_pct, revenue_clp, direct_costs_clp, indirect_costs_clp, net_margin_clp)
+  - Materializer: `src/lib/finance/ai/materialize-finance-signals.ts` escribe en `greenhouse_serving.finance_ai_signals`
+  - LLM worker: `src/lib/finance/ai/llm-enrichment-worker.ts` con prompt domain-aware `finance_signal_enrichment_v1` y glosario financiero específico
+  - Reader: `src/lib/finance/ai/llm-enrichment-reader.ts` expone `readFinanceAiLlmSummary(periodYear, periodMonth)` (portfolio) y `readClientFinanceAiLlmSummary(clientId, …)` (cliente)
+  - UI: `src/views/greenhouse/finance/FinanceDashboardView.tsx` renderiza `NexaInsightsBlock` entre KPIs y Economic Indicators
+  - API: `GET /api/finance/intelligence/nexa-insights` (reader), `GET /api/cron/finance-ai-signals` (trigger)
+  - Cloud Run: `services/ico-batch/server.ts` añade `POST /finance/materialize-signals` y `POST /finance/llm-enrich`
+- Contrato operativo:
+  - Finance usa `client_id` + `organization_id` como dimensiones primarias (Finance es org/client-first, no space-first)
+  - Tablas serving: `greenhouse_serving.finance_ai_signals`, `greenhouse_serving.finance_ai_signal_enrichments`, `greenhouse_serving.finance_ai_enrichment_runs`
+  - IDs estables: `EO-FSIG-*`, `EO-FAIE-*`, `EO-FAIR-*`
+  - El prompt financiero usa menciones `@[Nombre](client:CLIENT_ID)` y `@[Nombre](organization:ORG_ID)` además de `space:SPACE_ID`
+  - Ranking visible sigue el patrón canónico: `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - Solo deteriorations se emiten como signals (improvements se consolidan en otras surfaces)
+- Eventos outbox nuevos:
+  - `finance.ai_signals.materialized` (`AGGREGATE_TYPES.financeAiSignals`)
+  - `finance.ai_llm_enrichments.materialized` (`AGGREGATE_TYPES.financeAiLlmEnrichments`)
+
+## Delta 2026-04-16 — Space 360 Overview ya consume insights Nexa filtrados por space
+
+- `Agency > Space 360 > Resumen` ya no depende solo del snapshot operativo, finance y delivery para explicar desvíos del espacio.
+- Runtime activo:
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` expone `readSpaceAiLlmSummary(spaceId, periodYear, periodMonth, limit)`
+  - `src/lib/agency/space-360.ts` incorpora `nexaInsights` al snapshot `Space360Detail`
+  - `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx` renderiza `NexaInsightsBlock` al inicio del Overview real
+- Contrato operativo:
+  - Space 360 consume enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`; no recalcula señales ni narrativa inline
+  - el filtro canónico es `space_id + period_year + period_month`, con lista visible restringida a `status = 'succeeded'`
+  - el ranking visible sigue `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - la navegación contextual reutiliza el contrato actual de `@mentions` (`space` -> `Space 360`, `member` -> `People`) sin mutaciones automáticas
+  - cuando no hay insights para el período, el bloque muestra el empty state compartido de Nexa en lugar de ocultarse
+
+## Delta 2026-04-16 — Person 360 Activity ya consume insights Nexa filtrados por member
+
+- `People > Person 360` ya no depende solo del snapshot operativo y las métricas ICO para explicar desvíos individuales.
+- Runtime activo:
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` expone `readMemberAiLlmSummary(memberId, periodYear, periodMonth, limit)`
+  - `src/app/api/people/[memberId]/intelligence/route.ts` incorpora `nexaInsights` al payload del miembro
+  - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` renderiza `NexaInsightsBlock` al inicio de la surface visible de actividad/inteligencia
+- Contrato operativo:
+  - Person 360 consume enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`; no recalcula señales ni narrativa inline
+  - el filtro canónico es `member_id + period_year + period_month`, con lista visible restringida a `status = 'succeeded'`
+  - el ranking visible sigue `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - la navegación contextual reutiliza el contrato actual de `@mentions` (`member` -> `People`, `space` -> `Space 360`) sin mutaciones automáticas
+  - la integración se hace sobre la surface visible `activity`; no reabre el tab legacy `intelligence`
+
+## Delta 2026-04-16 — Home/Pulse ya consume Top Insights cross-Space como surface read-only
+
+- `Pulse` (`/home`) ya no depende solo de shortcuts, contexto de acceso y estado operativo básico para hacer visible la lane advisory de Nexa.
+- Runtime activo:
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts` expone `readTopAiLlmEnrichments(periodYear, periodMonth, limit)`
+  - `src/lib/home/get-home-snapshot.ts` incorpora `nexaInsights` al snapshot de Home
+  - `src/views/greenhouse/home/HomeView.tsx` renderiza `NexaInsightsBlock` en la landing de `Pulse`
+- Contrato operativo:
+  - Home consume enrichments ya materializados en `greenhouse_serving.ico_ai_signal_enrichments`; no recalcula señales ni narrativa inline
+  - el ranking visible sigue `critical > warning > info`, luego `quality_score DESC`, luego `processed_at DESC`
+  - la navegación contextual en Home sigue el contrato actual de `@mentions` (`space` -> `Space 360`, `member` -> `People`), sin introducir mutaciones ni acciones automáticas
+  - el bloque sigue siendo advisory-only y reutiliza el mismo disclaimer/copy del componente compartido
+
 > **Version:** 1.0
 > **Creado:** 2026-04-05
 > **Audience:** Agentes de implementación, arquitectos, product owners
 > **Docs relacionados:**
 > - `GREENHOUSE_MENTION_SYSTEM_V1.md` — formato de @mentions
 > - `Greenhouse_ICO_Engine_v1.md` — contrato del ICO Engine y LLM lane
-> - `GREENHOUSE_BATCH_PROCESSING_POLICY_V1.md` (§1.1 en Cloud Infrastructure) — política de Cloud Run
+> - `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` — Cloud Run workers y Scheduler canónicos
 
 ---
 
@@ -83,12 +231,13 @@ Un sistema transversal que permite a cualquier módulo del portal Greenhouse:
 │                                                                  │
 │  Activos:                                                        │
 │  • Agency ICO tab (NexaInsightsBlock)                            │
+│  • Space 360 Overview → NexaInsightsBlock filtrado por space_id  │
+│  • Pulse / Home Dashboard → Top 3 insights cross-Space           │
+│  • Person 360 Activity → filtrado por member_id                  │
 │  • Nexa Chat Home (enrichments como contexto)                    │
 │                                                                  │
 │  Próximos (Tier 1):                                              │
-│  • Space 360 Overview → NexaInsightsBlock filtrado por space_id  │
-│  • Person 360 Intelligence → filtrado por member_id              │
-│  • Home Dashboard → widget Top 3 insights cross-Space            │
+│  • Tier 1 ya materializado: Space 360, Person 360 y Home         │
 │                                                                  │
 │  Futuros (Tier 2-3):                                             │
 │  • Finance Dashboard → señales financieras                       │
@@ -218,6 +367,7 @@ Cada dominio define su propio glosario y cadena causal. Las instrucciones de nar
 | Recomendaciones concretas y accionables | Recomendaciones genéricas |
 | Narrativa en español con spanglish operativo | Inglés puro o jerga no-operativa |
 | @mentions con IDs verificados | Nombres sin ID (puede confundir) |
+| Labels visibles humanos para entidades resueltas | UUIDs, source IDs o `projectId` crudos en narrativa |
 | Doble capa: técnica + operativa | Solo técnica o solo operativa |
 
 ### Disclaimer obligatorio

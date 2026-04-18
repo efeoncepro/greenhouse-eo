@@ -18,12 +18,14 @@ import type { ApexOptions } from 'apexcharts'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import NexaInsightsBlock from '@/components/greenhouse/NexaInsightsBlock'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import type { MemberNexaInsightsPayload } from '@/lib/ico-engine/ai/llm-types'
 import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
@@ -69,6 +71,19 @@ const QUALITY_PENDING_METRIC_IDS = new Set(['rpa', 'otd_pct', 'ftr_pct', 'cycle_
 const shouldShowPendingClosures = (snapshot: IcoMetricSnapshot | null) =>
   Boolean(snapshot && snapshot.context.totalTasks > 0 && snapshot.context.completedTasks === 0)
 
+const EMPTY_NEXA_INSIGHTS: MemberNexaInsightsPayload = {
+  summarySource: 'empty',
+  activeAnalyzed: 0,
+  historicalAnalyzed: 0,
+  totalAnalyzed: 0,
+  lastAnalysis: null,
+  runStatus: null,
+  insights: [],
+  activePreview: [],
+  historicalPreview: [],
+  timeline: []
+}
+
 // ── KPI Config ────────────────────────────────────────────────────────
 
 const KPI_CONFIG: Array<{ id: string; label: string; icon: string; format: (v: number | null) => string }> = [
@@ -86,6 +101,10 @@ type Props = {
   memberId: string
 }
 
+type PersonActivityIntelligenceResponse = {
+  nexaInsights: MemberNexaInsightsPayload | null
+}
+
 const PersonActivityTab = ({ memberId }: Props) => {
   const theme = useTheme()
   const mode = theme.palette.mode
@@ -94,25 +113,51 @@ const PersonActivityTab = ({ memberId }: Props) => {
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [data, setData] = useState<IcoMetricSnapshot | null>(null)
+  const [nexaInsights, setNexaInsights] = useState<MemberNexaInsightsPayload | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let active = true
+
     const load = async () => {
       setLoading(true)
 
       try {
-        const res = await fetch(`/api/ico-engine/context?dimension=member&value=${memberId}&year=${year}&month=${month}`)
+        const [activityRes, intelligenceRes] = await Promise.allSettled([
+          fetch(`/api/ico-engine/context?dimension=member&value=${memberId}&year=${year}&month=${month}`),
+          fetch(`/api/people/${memberId}/intelligence?trend=6`)
+        ])
 
-        if (res.ok) setData(await res.json())
-        else setData(null)
+        if (!active) return
+
+        if (activityRes.status === 'fulfilled' && activityRes.value.ok) {
+          setData(await activityRes.value.json())
+        } else {
+          setData(null)
+        }
+
+        if (intelligenceRes.status === 'fulfilled' && intelligenceRes.value.ok) {
+          const intelligence = await intelligenceRes.value.json() as PersonActivityIntelligenceResponse
+
+          setNexaInsights(intelligence.nexaInsights ?? EMPTY_NEXA_INSIGHTS)
+        } else {
+          setNexaInsights(EMPTY_NEXA_INSIGHTS)
+        }
       } catch {
+        if (!active) return
+
         setData(null)
+        setNexaInsights(EMPTY_NEXA_INSIGHTS)
       } finally {
-        setLoading(false)
+        if (active) setLoading(false)
       }
     }
 
     void load()
+
+    return () => {
+      active = false
+    }
   }, [memberId, year, month])
 
   const hasData = data !== null
@@ -305,6 +350,19 @@ const PersonActivityTab = ({ memberId }: Props) => {
 
   return (
     <Grid container spacing={6}>
+      {nexaInsights && (
+        <Grid size={{ xs: 12 }}>
+          <NexaInsightsBlock
+            insights={nexaInsights.insights}
+            totalAnalyzed={nexaInsights.totalAnalyzed}
+            lastAnalysis={nexaInsights.lastAnalysis}
+            runStatus={nexaInsights.runStatus}
+            defaultExpanded={nexaInsights.totalAnalyzed > 0}
+            timelineInsights={nexaInsights.timeline ?? []}
+          />
+        </Grid>
+      )}
+
       {/* Period header */}
       <Grid size={{ xs: 12 }}>
         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>

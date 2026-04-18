@@ -127,7 +127,9 @@ Los consumers deben leer el snapshot y no recomputar fórmulas de dominio localm
 
 Consumer principal ya cortado:
 
-- `src/app/api/team/capacity-breakdown/route.ts`
+- `src/lib/agency/team-capacity-store.ts`
+- `src/app/api/agency/team/route.ts`
+- `src/app/api/team/capacity-breakdown/route.ts` (`compat wrapper`)
 - `src/views/agency/AgencyTeamView.tsx`
 
 Consumers siguientes esperados:
@@ -387,8 +389,10 @@ Esto no es una falla; es una implementación incremental deliberada.
 - `src/lib/team-capacity/overhead.ts`
 - `src/lib/team-capacity/pricing.ts`
 - `src/lib/team-capacity/shared.ts`
+- `src/lib/agency/team-capacity-store.ts`
 - `src/lib/member-capacity-economics/store.ts`
 - `src/lib/sync/projections/member-capacity-economics.ts`
+- `src/app/api/agency/team/route.ts`
 - `src/app/api/team/capacity-breakdown/route.ts`
 - `src/views/agency/AgencyTeamView.tsx`
 - `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md`

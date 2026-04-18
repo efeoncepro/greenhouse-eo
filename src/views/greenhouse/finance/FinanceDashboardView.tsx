@@ -46,6 +46,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import NexaInsightsBlock, { type NexaInsightItem } from '@/components/greenhouse/NexaInsightsBlock'
 import CustomTextField from '@core/components/mui/TextField'
 import { fuzzyFilter } from '@/components/tableUtils'
 
@@ -374,6 +375,13 @@ const FinanceDashboardView = () => {
   const [syncing, setSyncing] = useState(false)
   const [workingCapital, setWorkingCapital] = useState<{ dso: number | null; dpo: number | null; payrollToRevenueRatio: number | null }>({ dso: null, dpo: null, payrollToRevenueRatio: null })
 
+  const [nexaInsights, setNexaInsights] = useState<{
+    insights: NexaInsightItem[]
+    totalAnalyzed: number
+    lastAnalysis: string | null
+    runStatus: 'succeeded' | 'partial' | 'failed' | null
+  }>({ insights: [], totalAnalyzed: 0, lastAnalysis: null, runStatus: null })
+
   const fetchData = useCallback(async () => {
     let cancelled = false
 
@@ -382,7 +390,7 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes] = await Promise.all([
+      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes, nexaRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
         fetch('/api/finance/economic-indicators/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
@@ -392,7 +400,8 @@ const FinanceDashboardView = () => {
         fetch('/api/finance/dashboard/pnl', { cache: 'no-store' }),
         fetch('/api/finance/nubox/sync-status', { cache: 'no-store' }),
         fetch('/api/finance/dashboard/cashflow', { cache: 'no-store' }),
-        fetch('/api/finance/dashboard/summary', { cache: 'no-store' })
+        fetch('/api/finance/dashboard/summary', { cache: 'no-store' }),
+        fetch('/api/finance/intelligence/nexa-insights', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -497,6 +506,17 @@ const FinanceDashboardView = () => {
           dso: typeof summaryData.dso === 'number' ? summaryData.dso : null,
           dpo: typeof summaryData.dpo === 'number' ? summaryData.dpo : null,
           payrollToRevenueRatio: typeof summaryData.payrollToRevenueRatio === 'number' ? summaryData.payrollToRevenueRatio : null
+        })
+      }
+
+      if (nexaRes.ok) {
+        const nexaData = await nexaRes.json()
+
+        setNexaInsights({
+          insights: Array.isArray(nexaData.insights) ? (nexaData.insights as NexaInsightItem[]) : [],
+          totalAnalyzed: typeof nexaData.totalAnalyzed === 'number' ? nexaData.totalAnalyzed : 0,
+          lastAnalysis: typeof nexaData.lastAnalysis === 'string' ? nexaData.lastAnalysis : null,
+          runStatus: nexaData.runStatus ?? null
         })
       }
     } catch (e) {
@@ -713,6 +733,16 @@ const FinanceDashboardView = () => {
           })()}
         </Grid>
       </Grid>
+
+      {/* Finance Nexa Insights — advisory layer */}
+      {(nexaInsights.totalAnalyzed > 0 || nexaInsights.runStatus) && (
+        <NexaInsightsBlock
+          insights={nexaInsights.insights}
+          totalAnalyzed={nexaInsights.totalAnalyzed}
+          lastAnalysis={nexaInsights.lastAnalysis}
+          runStatus={nexaInsights.runStatus}
+        />
+      )}
 
       {/* Economic Indicators */}
       <Grid container spacing={6}>

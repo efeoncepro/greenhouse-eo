@@ -7,6 +7,11 @@ import type { PoolClient } from 'pg'
 import type {
   CreateLeaveRequestInput,
   HrCoreMetadata,
+  HrLeaveBackfillInput,
+  HrLeaveBalanceAdjustmentInput,
+  HrLeaveBalanceAdjustmentReverseInput,
+  HrLeaveBalanceAdjustmentRecord,
+  HrLeaveBalanceAdjustmentsResponse,
   HrLeaveCalendarResponse,
   HrDepartment,
   HrLeaveBalance,
@@ -14,15 +19,18 @@ import type {
   HrLeaveCalendarEvent,
   HrLeavePayrollImpactSummary,
   HrLeavePolicy,
+  HrLeavePolicyExplain,
   HrLeaveRequest,
   HrLeaveRequestsResponse,
   HrLeaveType,
   ReviewLeaveRequestInput
 } from '@/types/hr-core'
+import type { ContractType, PayRegime, PayrollVia } from '@/types/hr-contracts'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import type { WorkflowApprovalSnapshotRecord } from '@/lib/approval-authority/types'
 
 import {
+  calculateAccruedLeaveAllowanceDays,
   calculateProgressiveExtraDays,
   classifyLeavePayrollImpact,
   computeLeaveDayBreakdown,
@@ -34,7 +42,8 @@ import {
   getTodayDateKey,
   isPolicyApplicableToMember,
   listPeriodIdsInRange,
-  loadHolidayDateSetForRange
+  loadHolidayDateSetForRange,
+  roundLeaveDays
 } from '@/lib/hr-core/leave-domain'
 import type { LeaveDayPeriod, LeavePayrollImpactPeriod, LeavePolicy } from '@/lib/hr-core/leave-domain'
 import { canPerformLeaveReviewAction, getLeaveApprovalStageCode } from '@/lib/hr-core/leave-review-policy'
@@ -72,6 +81,7 @@ import {
 } from '@/lib/hr-core/shared'
 import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import { attachAssetToAggregate, buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
+import { normalizeContractType, normalizePayRegime, normalizePayrollVia } from '@/types/hr-contracts'
 
 type PostgresDepartmentRow = {
   department_id: string
@@ -100,6 +110,13 @@ type PostgresLeaveBalanceRow = {
   balance_id: string
   member_id: string
   member_name: string | null
+  member_avatar_url: string | null
+  member_linked_user_id: string | null
+  employment_type: string | null
+  hire_date: string | Date | null
+  contract_type: string | null
+  pay_regime: string | null
+  payroll_via: string | null
   leave_type_code: string
   leave_type_name: string | null
   year: number | string
@@ -137,6 +154,7 @@ type PostgresLeaveRequestRow = {
   decided_by: string | null
   notes: string | null
   created_at: string | Date | null
+  source_kind: 'request' | 'admin_backfill' | null
 }
 
 type PostgresMemberResolverRow = {
@@ -150,7 +168,9 @@ type PostgresMemberResolverRow = {
   employment_type: string | null
   hire_date: string | Date | null
   prior_work_years: number | string | null
+  contract_type: string | null
   pay_regime: string | null
+  payroll_via: string | null
 }
 
 type PostgresUserRow = {
@@ -177,8 +197,29 @@ type PostgresLeavePolicyRow = {
   progressive_max_extra_days: number | string | null
   applicable_employment_types: string[] | null
   applicable_pay_regimes: string[] | null
+  applicable_contract_types: string[] | null
+  applicable_payroll_vias: string[] | null
   allow_negative_balance: boolean
   active: boolean
+}
+
+type PostgresLeaveBalanceAdjustmentRow = {
+  adjustment_id: string
+  member_id: string
+  member_name: string | null
+  leave_type_code: string
+  leave_type_name: string | null
+  year: number | string
+  days_delta: number | string
+  effective_date: string | Date
+  source_kind: 'manual_adjustment' | 'manual_adjustment_reversal'
+  reason: string
+  notes: string | null
+  created_by_user_id: string | null
+  created_at: string | Date | null
+  reversed_at: string | Date | null
+  reversed_by_user_id: string | null
+  reversal_of_adjustment_id: string | null
 }
 
 type PostgresPayrollImpactPeriodRow = {
@@ -252,18 +293,22 @@ const mapLeaveType = (row: PostgresLeaveTypeRow): HrLeaveType => ({
 })
 
 const mapLeaveBalance = (row: PostgresLeaveBalanceRow): HrLeaveBalance => {
-  const allowanceDays = toNullableNumber(row.allowance_days) ?? 0
-  const progressiveExtraDays = toNullableNumber(row.progressive_extra_days) ?? 0
-  const carriedOverDays = toNullableNumber(row.carried_over_days) ?? 0
-  const adjustmentDays = toNullableNumber(row.adjustment_days) ?? 0
+  const allowanceDays = roundLeaveDays(toNullableNumber(row.allowance_days) ?? 0)
+  const progressiveExtraDays = roundLeaveDays(toNullableNumber(row.progressive_extra_days) ?? 0)
+  const carriedOverDays = roundLeaveDays(toNullableNumber(row.carried_over_days) ?? 0)
+  const adjustmentDays = roundLeaveDays(toNullableNumber(row.adjustment_days) ?? 0)
   const accumulatedPeriods = toInt(row.accumulated_periods)
-  const usedDays = toNullableNumber(row.used_days) ?? 0
-  const reservedDays = toNullableNumber(row.reserved_days) ?? 0
+  const usedDays = roundLeaveDays(toNullableNumber(row.used_days) ?? 0)
+  const reservedDays = roundLeaveDays(toNullableNumber(row.reserved_days) ?? 0)
 
   return {
     balanceId: row.balance_id,
     memberId: row.member_id,
     memberName: normalizeNullableString(row.member_name),
+    memberAvatarUrl: resolveAvatarUrl(
+      normalizeNullableString(row.member_avatar_url),
+      normalizeNullableString(row.member_linked_user_id)
+    ),
     leaveTypeCode: row.leave_type_code,
     leaveTypeName: normalizeNullableString(row.leave_type_name) || row.leave_type_code,
     year: toInt(row.year),
@@ -274,7 +319,9 @@ const mapLeaveBalance = (row: PostgresLeaveBalanceRow): HrLeaveBalance => {
     accumulatedPeriods,
     usedDays,
     reservedDays,
-    availableDays: allowanceDays + progressiveExtraDays + carriedOverDays + adjustmentDays - usedDays - reservedDays
+    availableDays: roundLeaveDays(
+      allowanceDays + progressiveExtraDays + carriedOverDays + adjustmentDays - usedDays - reservedDays
+    )
   }
 }
 
@@ -302,6 +349,12 @@ const mapLeavePolicy = (row: PostgresLeavePolicyRow): HrLeavePolicy & LeavePolic
     : [],
   applicablePayRegimes: Array.isArray(row.applicable_pay_regimes)
     ? row.applicable_pay_regimes.filter(Boolean).map(item => String(item).trim()).filter(Boolean)
+    : [],
+  applicableContractTypes: Array.isArray(row.applicable_contract_types)
+    ? row.applicable_contract_types.filter(Boolean).map(item => String(item).trim()).filter(Boolean)
+    : [],
+  applicablePayrollVias: Array.isArray(row.applicable_payroll_vias)
+    ? row.applicable_payroll_vias.filter(Boolean).map(item => String(item).trim()).filter(Boolean)
     : [],
   allowNegativeBalance: Boolean(row.allow_negative_balance),
   active: Boolean(row.active)
@@ -342,7 +395,101 @@ const mapLeaveRequest = (row: PostgresLeaveRequestRow): HrLeaveRequest => ({
   decidedAt: toPgTimestampString(row.decided_at),
   decidedBy: normalizeNullableString(row.decided_by),
   notes: normalizeNullableString(row.notes),
-  createdAt: toPgTimestampString(row.created_at)
+  createdAt: toPgTimestampString(row.created_at),
+  sourceKind: row.source_kind === 'admin_backfill' ? 'admin_backfill' : 'request'
+})
+
+const mapLeaveBalanceAdjustment = (row: PostgresLeaveBalanceAdjustmentRow): HrLeaveBalanceAdjustmentRecord => ({
+  adjustmentId: row.adjustment_id,
+  memberId: row.member_id,
+  memberName: normalizeNullableString(row.member_name),
+  leaveTypeCode: row.leave_type_code,
+  leaveTypeName: normalizeNullableString(row.leave_type_name) || row.leave_type_code,
+  year: toInt(row.year),
+  daysDelta: toNullableNumber(row.days_delta) ?? 0,
+  effectiveDate: toPgDateString(row.effective_date) || '',
+  sourceKind: row.source_kind,
+  reason: normalizeString(row.reason),
+  notes: normalizeNullableString(row.notes),
+  createdByUserId: normalizeNullableString(row.created_by_user_id),
+  createdAt: toPgTimestampString(row.created_at),
+  reversedAt: toPgTimestampString(row.reversed_at),
+  reversedByUserId: normalizeNullableString(row.reversed_by_user_id),
+  reversalOfAdjustmentId: normalizeNullableString(row.reversal_of_adjustment_id)
+})
+
+type LeavePolicyMemberContext = {
+  employmentType: string | null
+  hireDate: string | null
+  contractType: ContractType
+  payRegime: PayRegime
+  payrollVia: PayrollVia
+}
+
+type ResolvedLeavePolicy = {
+  policy: HrLeavePolicy & LeavePolicy
+  source: HrLeavePolicyExplain['policySource']
+}
+
+const buildMemberPolicyContext = ({
+  employmentType,
+  hireDate,
+  contractType,
+  payRegime,
+  payrollVia
+}: {
+  employmentType: string | null
+  hireDate: string | Date | null
+  contractType: string | null
+  payRegime: string | null
+  payrollVia: string | null
+}): LeavePolicyMemberContext => {
+  const normalizedContractType = normalizeContractType(contractType)
+  const normalizedPayRegime = normalizePayRegime(payRegime, normalizedContractType)
+  const normalizedPayrollVia = normalizePayrollVia(payrollVia, normalizedContractType)
+
+  return {
+    employmentType: normalizeNullableString(employmentType),
+    hireDate: toPgDateString(hireDate),
+    contractType: normalizedContractType,
+    payRegime: normalizedPayRegime,
+    payrollVia: normalizedPayrollVia
+  }
+}
+
+const buildDerivedVacationPolicy = ({
+  leaveType,
+  context,
+  source
+}: {
+  leaveType: HrLeaveType
+  context: LeavePolicyMemberContext
+  source: HrLeavePolicyExplain['policySource']
+}): HrLeavePolicy & LeavePolicy => ({
+  policyId: `policy-${leaveType.leaveTypeCode}-${source}-${context.contractType}-${context.payrollVia}`,
+  leaveTypeCode: leaveType.leaveTypeCode,
+  policyName:
+    source === 'external_provider'
+      ? 'Vacaciones gestionadas por proveedor externo'
+      : 'Vacaciones no habilitadas para este contrato',
+  accrualType: 'custom',
+  annualDays: 0,
+  maxCarryOverDays: 0,
+  requiresApproval: true,
+  minAdvanceDays: 0,
+  maxConsecutiveDays: null,
+  minContinuousDays: null,
+  maxAccumulationPeriods: null,
+  progressiveEnabled: false,
+  progressiveBaseYears: 10,
+  progressiveIntervalYears: 3,
+  progressiveMaxExtraDays: 0,
+  applicableEmploymentTypes: context.employmentType ? [context.employmentType] : [],
+  applicablePayRegimes: [context.payRegime],
+  applicableContractTypes: [context.contractType],
+  applicablePayrollVias: [context.payrollVia],
+  allowNegativeBalance: false,
+  active: true
 })
 
 const pickBestApprovalSnapshot = ({
@@ -560,6 +707,8 @@ const listLeavePoliciesInternal = async (client?: PoolClient) => {
         progressive_max_extra_days,
         applicable_employment_types,
         applicable_pay_regimes,
+        applicable_contract_types,
+        applicable_payroll_vias,
         allow_negative_balance,
         active
       FROM greenhouse_hr.leave_policies
@@ -589,13 +738,18 @@ const getMemberById = async (memberId: string, client?: PoolClient) => {
         m.employment_type,
         m.hire_date,
         COALESCE(m.prior_work_years, 0) AS prior_work_years,
-        (
-          SELECT cv.pay_regime
-          FROM greenhouse_payroll.compensation_versions AS cv
-          WHERE cv.member_id = m.member_id
-          ORDER BY cv.effective_from DESC, cv.version DESC
-          LIMIT 1
-        ) AS pay_regime
+        m.contract_type,
+        COALESCE(
+          m.pay_regime,
+          (
+            SELECT cv.pay_regime
+            FROM greenhouse_payroll.compensation_versions AS cv
+            WHERE cv.member_id = m.member_id
+            ORDER BY cv.effective_from DESC, cv.version DESC
+            LIMIT 1
+          )
+        ) AS pay_regime,
+        m.payroll_via
       FROM greenhouse_core.members AS m
       LEFT JOIN greenhouse_serving.person_360 AS p360
         ON p360.member_id = m.member_id
@@ -611,6 +765,45 @@ const getMemberById = async (memberId: string, client?: PoolClient) => {
   }
 
   return row
+}
+
+const listActiveMembersForBalanceSeeding = async (client?: PoolClient) => {
+  await assertHrCoreLeavePostgresReady()
+
+  return queryRows<PostgresMemberResolverRow>(
+    `
+      SELECT
+        m.member_id,
+        m.display_name,
+        m.primary_email AS email,
+        COALESCE(p360.resolved_avatar_url, m.avatar_url) AS avatar_url,
+        p360.user_id AS linked_user_id,
+        m.identity_profile_id,
+        m.reports_to_member_id AS reports_to,
+        m.employment_type,
+        m.hire_date,
+        COALESCE(m.prior_work_years, 0) AS prior_work_years,
+        m.contract_type,
+        COALESCE(
+          m.pay_regime,
+          (
+            SELECT cv.pay_regime
+            FROM greenhouse_payroll.compensation_versions AS cv
+            WHERE cv.member_id = m.member_id
+            ORDER BY cv.effective_from DESC, cv.version DESC
+            LIMIT 1
+          )
+        ) AS pay_regime,
+        m.payroll_via
+      FROM greenhouse_core.members AS m
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = m.member_id
+      WHERE m.active = TRUE
+      ORDER BY m.display_name ASC, m.member_id ASC
+    `,
+    [],
+    client
+  )
 }
 
 const resolveTenantMember = async (tenant: TenantContext, client?: PoolClient) => {
@@ -645,13 +838,18 @@ const resolveTenantMember = async (tenant: TenantContext, client?: PoolClient) =
         m.employment_type,
         m.hire_date,
         COALESCE(m.prior_work_years, 0) AS prior_work_years,
-        (
-          SELECT cv.pay_regime
-          FROM greenhouse_payroll.compensation_versions AS cv
-          WHERE cv.member_id = m.member_id
-          ORDER BY cv.effective_from DESC, cv.version DESC
-          LIMIT 1
-        ) AS pay_regime
+        m.contract_type,
+        COALESCE(
+          m.pay_regime,
+          (
+            SELECT cv.pay_regime
+            FROM greenhouse_payroll.compensation_versions AS cv
+            WHERE cv.member_id = m.member_id
+            ORDER BY cv.effective_from DESC, cv.version DESC
+            LIMIT 1
+          )
+        ) AS pay_regime,
+        m.payroll_via
       FROM greenhouse_core.members AS m
       WHERE (
         $1::text IS NOT NULL
@@ -701,48 +899,117 @@ const assertMemberVisibleToTenant = async (tenant: TenantContext, memberId: stri
 const resolveApplicableLeavePolicy = ({
   leaveType,
   policies,
-  employmentType,
-  payRegime
+  member
 }: {
   leaveType: HrLeaveType
   policies: LeavePolicy[]
-  employmentType: string | null
-  payRegime: string | null
-}) => {
-  const exactMatch = policies.find(policy =>
-    policy.leaveTypeCode === leaveType.leaveTypeCode &&
-    isPolicyApplicableToMember({
-      policy,
-      employmentType,
-      payRegime
+  member: LeavePolicyMemberContext
+}): ResolvedLeavePolicy => {
+  const exactMatch = [...policies]
+    .filter(policy =>
+      policy.leaveTypeCode === leaveType.leaveTypeCode &&
+      isPolicyApplicableToMember({
+        policy,
+        employmentType: member.employmentType,
+        payRegime: member.payRegime,
+        contractType: member.contractType,
+        payrollVia: member.payrollVia
+      })
+    )
+    .sort((left, right) => {
+      const leftScopedDimensions =
+        (left.applicableEmploymentTypes.length > 0 ? 1 : 0) +
+        (left.applicablePayRegimes.length > 0 ? 1 : 0) +
+        (left.applicableContractTypes.length > 0 ? 1 : 0) +
+        (left.applicablePayrollVias.length > 0 ? 1 : 0)
+
+      const rightScopedDimensions =
+        (right.applicableEmploymentTypes.length > 0 ? 1 : 0) +
+        (right.applicablePayRegimes.length > 0 ? 1 : 0) +
+        (right.applicableContractTypes.length > 0 ? 1 : 0) +
+        (right.applicablePayrollVias.length > 0 ? 1 : 0)
+
+      if (rightScopedDimensions !== leftScopedDimensions) {
+        return rightScopedDimensions - leftScopedDimensions
+      }
+
+      const leftDeclaredValues =
+        left.applicableEmploymentTypes.length +
+        left.applicablePayRegimes.length +
+        left.applicableContractTypes.length +
+        left.applicablePayrollVias.length
+
+      const rightDeclaredValues =
+        right.applicableEmploymentTypes.length +
+        right.applicablePayRegimes.length +
+        right.applicableContractTypes.length +
+        right.applicablePayrollVias.length
+
+      if (leftDeclaredValues !== rightDeclaredValues) {
+        return leftDeclaredValues - rightDeclaredValues
+      }
+
+      return left.policyId.localeCompare(right.policyId)
     })
-  )
+    .at(0)
 
   if (exactMatch) {
-    return exactMatch
+    return {
+      policy: exactMatch,
+      source: 'catalog'
+    }
   }
 
-  return mapLeavePolicy({
-    policy_id: `policy-${leaveType.leaveTypeCode}-default`,
-    leave_type_code: leaveType.leaveTypeCode,
-    policy_name: leaveType.leaveTypeName,
-    accrual_type: 'annual_fixed',
-    annual_days: leaveType.defaultAnnualAllowanceDays,
-    max_carry_over_days: 0,
-    requires_approval: true,
-    min_advance_days: 0,
-    max_consecutive_days: null,
-    min_continuous_days: null,
-    max_accumulation_periods: null,
-    progressive_enabled: false,
-    progressive_base_years: 10,
-    progressive_interval_years: 3,
-    progressive_max_extra_days: 10,
-    applicable_employment_types: employmentType ? [employmentType] : [],
-    applicable_pay_regimes: payRegime ? [payRegime] : [],
-    allow_negative_balance: leaveType.defaultAnnualAllowanceDays <= 0,
-    active: leaveType.active
-  })
+  if (leaveType.leaveTypeCode === 'vacation') {
+    if (member.payrollVia === 'deel' || member.contractType === 'contractor' || member.contractType === 'eor') {
+      return {
+        policy: buildDerivedVacationPolicy({
+          leaveType,
+          context: member,
+          source: 'external_provider'
+        }),
+        source: 'external_provider'
+      }
+    }
+
+    if (member.contractType === 'honorarios') {
+      return {
+        policy: buildDerivedVacationPolicy({
+          leaveType,
+          context: member,
+          source: 'not_eligible'
+        }),
+        source: 'not_eligible'
+      }
+    }
+  }
+
+  return {
+    policy: mapLeavePolicy({
+      policy_id: `policy-${leaveType.leaveTypeCode}-default-${member.contractType}-${member.payRegime}`,
+      leave_type_code: leaveType.leaveTypeCode,
+      policy_name: leaveType.leaveTypeName,
+      accrual_type: 'annual_fixed',
+      annual_days: leaveType.defaultAnnualAllowanceDays,
+      max_carry_over_days: 0,
+      requires_approval: true,
+      min_advance_days: 0,
+      max_consecutive_days: null,
+      min_continuous_days: null,
+      max_accumulation_periods: null,
+      progressive_enabled: false,
+      progressive_base_years: 10,
+      progressive_interval_years: 3,
+      progressive_max_extra_days: 10,
+      applicable_employment_types: member.employmentType ? [member.employmentType] : [],
+      applicable_pay_regimes: member.payRegime ? [member.payRegime] : [],
+      applicable_contract_types: member.contractType ? [member.contractType] : [],
+      applicable_payroll_vias: member.payrollVia ? [member.payrollVia] : [],
+      allow_negative_balance: leaveType.defaultAnnualAllowanceDays <= 0,
+      active: leaveType.active
+    }),
+    source: 'derived_internal'
+  }
 }
 
 const doesLeaveTrackBalance = (policy: LeavePolicy) =>
@@ -753,6 +1020,27 @@ const doesLeaveTrackBalance = (policy: LeavePolicy) =>
     policy.progressiveEnabled ||
     !policy.allowNegativeBalance
   )
+
+const buildPolicyExplain = ({
+  resolution,
+  member
+}: {
+  resolution: ResolvedLeavePolicy
+  member: LeavePolicyMemberContext
+}): HrLeavePolicyExplain => ({
+  policyId: resolution.policy.policyId,
+  policyName: resolution.policy.policyName,
+  policySource: resolution.source,
+  accrualType: resolution.policy.accrualType,
+  contractType: member.contractType,
+  payRegime: member.payRegime,
+  payrollVia: member.payrollVia,
+  hireDate: member.hireDate,
+  annualDays: resolution.policy.annualDays,
+  tracksBalance: doesLeaveTrackBalance(resolution.policy),
+  progressiveEnabled: resolution.policy.progressiveEnabled,
+  allowNegativeBalance: resolution.policy.allowNegativeBalance
+})
 
 const computeBalanceSeedForYear = async ({
   member,
@@ -769,6 +1057,9 @@ const computeBalanceSeedForYear = async ({
   actorUserId: string
   client: PoolClient
 }) => {
+  const todayDate = getTodayDateKey()
+  const todayYear = Number(todayDate.slice(0, 4))
+
   const previousBalance = year > 0
     ? await getBalanceByKey({
       memberId: member.member_id,
@@ -779,18 +1070,49 @@ const computeBalanceSeedForYear = async ({
     : null
 
   const previousAccumulatedPeriods = previousBalance?.accumulatedPeriods ?? 0
-  const previousAvailable = previousBalance?.availableDays ?? 0
-  const carriedOverDays = Math.min(previousAvailable, policy.maxCarryOverDays)
+
+  const currentAsOfDate =
+    year === todayYear ? todayDate : `${year}-12-31`
+
+  const previousYearAllowanceDays = previousBalance
+    ? calculateAccruedLeaveAllowanceDays({
+      annualDays: policy.annualDays,
+      accrualType: policy.accrualType,
+      hireDate: toPgDateString(member.hire_date),
+      year: year - 1,
+      asOfDate: `${year - 1}-12-31`
+    })
+    : 0
+
+  const previousAvailable = previousBalance
+    ? roundLeaveDays(
+      previousYearAllowanceDays +
+      (previousBalance.progressiveExtraDays ?? 0) +
+      (previousBalance.carriedOverDays ?? 0) +
+      (previousBalance.adjustmentDays ?? 0) -
+      (previousBalance.usedDays ?? 0) -
+      (previousBalance.reservedDays ?? 0)
+    )
+    : 0
+
+  const carriedOverDays = roundLeaveDays(Math.min(Math.max(previousAvailable, 0), policy.maxCarryOverDays))
   const accumulatedPeriods = previousAvailable > 0 ? previousAccumulatedPeriods + 1 : 0
-  const asOfDate = `${year}-01-01`
   const priorWorkYears = toNullableNumber(member.prior_work_years) ?? 0
+
+  const allowanceDays = calculateAccruedLeaveAllowanceDays({
+    annualDays: policy.annualDays,
+    accrualType: policy.accrualType,
+    hireDate: toPgDateString(member.hire_date),
+    year,
+    asOfDate: currentAsOfDate
+  })
 
   const progressiveExtraDays =
     policy.progressiveEnabled && member.pay_regime === 'chile'
       ? calculateProgressiveExtraDays({
         priorWorkYears,
         hireDate: toPgDateString(member.hire_date),
-        asOfDate,
+        asOfDate: currentAsOfDate,
         progressiveBaseYears: policy.progressiveBaseYears,
         progressiveIntervalYears: policy.progressiveIntervalYears,
         progressiveMaxExtraDays: policy.progressiveMaxExtraDays
@@ -814,20 +1136,73 @@ const computeBalanceSeedForYear = async ({
         updated_by_user_id
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, 0, $8, 0, 0, $9)
-      ON CONFLICT (member_id, leave_type_code, year) DO NOTHING
+      ON CONFLICT (member_id, leave_type_code, year) DO UPDATE
+      SET
+        allowance_days = EXCLUDED.allowance_days,
+        progressive_extra_days = EXCLUDED.progressive_extra_days,
+        carried_over_days = EXCLUDED.carried_over_days,
+        accumulated_periods = EXCLUDED.accumulated_periods,
+        updated_by_user_id = EXCLUDED.updated_by_user_id,
+        updated_at = CURRENT_TIMESTAMP
     `,
     [
       `${member.member_id}-${year}-${leaveType.leaveTypeCode}`,
       member.member_id,
       leaveType.leaveTypeCode,
       year,
-      policy.annualDays,
+      allowanceDays,
       progressiveExtraDays,
       carriedOverDays,
       accumulatedPeriods,
       actorUserId
     ]
   )
+}
+
+const seedYearBalancesForMembers = async ({
+  members,
+  year,
+  actorUserId,
+  client
+}: {
+  members: PostgresMemberResolverRow[]
+  year: number
+  actorUserId: string
+  client: PoolClient
+}) => {
+  if (members.length === 0) {
+    return
+  }
+
+  const [leaveTypes, leavePolicies] = await Promise.all([
+    listLeaveTypesInternal(client),
+    listLeavePoliciesInternal(client)
+  ])
+
+  for (const member of members) {
+    for (const leaveType of leaveTypes.filter(item => item.active)) {
+      const resolution = resolveApplicableLeavePolicy({
+        leaveType,
+        policies: leavePolicies,
+        member: buildMemberPolicyContext({
+          employmentType: member.employment_type,
+          hireDate: member.hire_date,
+          contractType: member.contract_type,
+          payRegime: member.pay_regime,
+          payrollVia: member.payroll_via
+        })
+      })
+
+      await computeBalanceSeedForYear({
+        member,
+        leaveType,
+        policy: resolution.policy,
+        year,
+        actorUserId,
+        client
+      })
+    }
+  }
 }
 
 const ensureYearBalances = async ({
@@ -843,28 +1218,31 @@ const ensureYearBalances = async ({
 }) => {
   const member = await getMemberById(memberId, client)
 
-  const [leaveTypes, leavePolicies] = await Promise.all([
-    listLeaveTypesInternal(client),
-    listLeavePoliciesInternal(client)
-  ])
+  await seedYearBalancesForMembers({
+    members: [member],
+    year,
+    actorUserId,
+    client
+  })
+}
 
-  for (const leaveType of leaveTypes.filter(item => item.active)) {
-    const policy = resolveApplicableLeavePolicy({
-      leaveType,
-      policies: leavePolicies,
-      employmentType: normalizeNullableString(member.employment_type),
-      payRegime: normalizeNullableString(member.pay_regime)
-    })
+const ensureYearBalancesForAllActiveMembers = async ({
+  year,
+  actorUserId,
+  client
+}: {
+  year: number
+  actorUserId: string
+  client: PoolClient
+}) => {
+  const members = await listActiveMembersForBalanceSeeding(client)
 
-    await computeBalanceSeedForYear({
-      member,
-      leaveType,
-      policy,
-      year,
-      actorUserId,
-      client
-    })
-  }
+  await seedYearBalancesForMembers({
+    members,
+    year,
+    actorUserId,
+    client
+  })
 }
 
 const getBalanceByKey = async ({
@@ -883,7 +1261,23 @@ const getBalanceByKey = async ({
       SELECT
         b.balance_id,
         b.member_id,
-        m.display_name AS member_name,
+        COALESCE(p360.resolved_display_name, m.display_name) AS member_name,
+        COALESCE(p360.resolved_avatar_url, m.avatar_url) AS member_avatar_url,
+        COALESCE(p360.user_id, linked_user.user_id) AS member_linked_user_id,
+        m.employment_type,
+        m.hire_date,
+        m.contract_type,
+        COALESCE(
+          m.pay_regime,
+          (
+            SELECT cv.pay_regime
+            FROM greenhouse_payroll.compensation_versions AS cv
+            WHERE cv.member_id = m.member_id
+            ORDER BY cv.effective_from DESC, cv.version DESC
+            LIMIT 1
+          )
+        ) AS pay_regime,
+        m.payroll_via,
         b.leave_type_code,
         lt.leave_type_name,
         b.year,
@@ -897,6 +1291,15 @@ const getBalanceByKey = async ({
       FROM greenhouse_hr.leave_balances AS b
       LEFT JOIN greenhouse_core.members AS m
         ON m.member_id = b.member_id
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = m.member_id
+      LEFT JOIN LATERAL (
+        SELECT cu.user_id
+        FROM greenhouse_core.client_users AS cu
+        WHERE cu.member_id = m.member_id
+        ORDER BY cu.active DESC, cu.updated_at DESC NULLS LAST, cu.created_at DESC NULLS LAST
+        LIMIT 1
+      ) AS linked_user ON TRUE
       LEFT JOIN greenhouse_hr.leave_types AS lt
         ON lt.leave_type_code = b.leave_type_code
       WHERE b.member_id = $1
@@ -909,6 +1312,36 @@ const getBalanceByKey = async ({
   )
 
   return row ? mapLeaveBalance(row) : null
+}
+
+const adjustBalanceByDelta = async ({
+  memberId,
+  leaveTypeCode,
+  year,
+  adjustmentDelta,
+  actorUserId,
+  client
+}: {
+  memberId: string
+  leaveTypeCode: string
+  year: number
+  adjustmentDelta: number
+  actorUserId: string
+  client: PoolClient
+}) => {
+  await client.query(
+    `
+      UPDATE greenhouse_hr.leave_balances
+      SET
+        adjustment_days = COALESCE(adjustment_days, 0) + $4,
+        updated_by_user_id = $5,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $1
+        AND leave_type_code = $2
+        AND year = $3
+    `,
+    [memberId, leaveTypeCode, year, adjustmentDelta, actorUserId]
+  )
 }
 
 const adjustBalanceForRequest = async ({
@@ -984,7 +1417,8 @@ const getLeaveRequestByIdInternal = async (requestId: string, client?: PoolClien
         r.decided_at,
         r.decided_by,
         r.notes,
-        r.created_at
+        r.created_at,
+        COALESCE(r.source_kind, 'request') AS source_kind
       FROM greenhouse_hr.leave_requests AS r
       LEFT JOIN greenhouse_core.members AS member
         ON member.member_id = r.member_id
@@ -1130,6 +1564,7 @@ const buildLeaveEventPayload = async ({
     endDate: request.endDate,
     requestedDays: request.requestedDays,
     status: request.status,
+    sourceKind: request.sourceKind ?? 'request',
     approvalStageCode: approvalSnapshot?.stageCode ?? getLeaveApprovalStageCode(request.status),
     approvalSnapshot: approvalSnapshot ?? request.approvalSnapshot ?? null,
     eventStage,
@@ -1180,7 +1615,7 @@ export const listLeaveBalancesFromPostgres = async ({
 
   const effectiveYear = year || new Date().getUTCFullYear()
   const effectiveMemberId = memberId || (isHrAdminTenant(tenant) ? null : (await resolveTenantMember(tenant)).member_id)
-  const leavePolicies = await listLeavePoliciesInternal()
+  const [leavePolicies, leaveTypes] = await Promise.all([listLeavePoliciesInternal(), listLeaveTypesInternal()])
 
   if (effectiveMemberId) {
     await assertMemberVisibleToTenant(tenant, effectiveMemberId)
@@ -1195,6 +1630,14 @@ export const listLeaveBalancesFromPostgres = async ({
     })
   } else if (!isHrAdminTenant(tenant)) {
     throw new HrCoreValidationError('Forbidden', 403)
+  } else {
+    await withGreenhousePostgresTransaction(async client => {
+      await ensureYearBalancesForAllActiveMembers({
+        year: effectiveYear,
+        actorUserId: tenant.userId,
+        client
+      })
+    })
   }
 
   const values: unknown[] = [effectiveYear]
@@ -1210,7 +1653,23 @@ export const listLeaveBalancesFromPostgres = async ({
       SELECT
         b.balance_id,
         b.member_id,
-        member.display_name AS member_name,
+        COALESCE(p360.resolved_display_name, member.display_name) AS member_name,
+        COALESCE(p360.resolved_avatar_url, member.avatar_url) AS member_avatar_url,
+        COALESCE(p360.user_id, linked_user.user_id) AS member_linked_user_id,
+        member.employment_type,
+        member.hire_date,
+        member.contract_type,
+        COALESCE(
+          member.pay_regime,
+          (
+            SELECT cv.pay_regime
+            FROM greenhouse_payroll.compensation_versions AS cv
+            WHERE cv.member_id = member.member_id
+            ORDER BY cv.effective_from DESC, cv.version DESC
+            LIMIT 1
+          )
+        ) AS pay_regime,
+        member.payroll_via,
         b.leave_type_code,
         lt.leave_type_name,
         b.year,
@@ -1224,6 +1683,15 @@ export const listLeaveBalancesFromPostgres = async ({
       FROM greenhouse_hr.leave_balances AS b
       LEFT JOIN greenhouse_core.members AS member
         ON member.member_id = b.member_id
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = member.member_id
+      LEFT JOIN LATERAL (
+        SELECT cu.user_id
+        FROM greenhouse_core.client_users AS cu
+        WHERE cu.member_id = member.member_id
+        ORDER BY cu.active DESC, cu.updated_at DESC NULLS LAST, cu.created_at DESC NULLS LAST
+        LIMIT 1
+      ) AS linked_user ON TRUE
       LEFT JOIN greenhouse_hr.leave_types AS lt
         ON lt.leave_type_code = b.leave_type_code
       WHERE ${filters.join(' AND ')}
@@ -1232,14 +1700,49 @@ export const listLeaveBalancesFromPostgres = async ({
     values
   )
 
-  const balances = rows.map(mapLeaveBalance)
+  const balances = rows.map(row => {
+    const leaveType =
+      leaveTypes.find(item => item.leaveTypeCode === row.leave_type_code) ??
+      ({
+        leaveTypeCode: row.leave_type_code,
+        leaveTypeName: normalizeNullableString(row.leave_type_name) || row.leave_type_code,
+        description: null,
+        defaultAnnualAllowanceDays: toNullableNumber(row.allowance_days) ?? 0,
+        requiresAttachment: false,
+        isPaid: true,
+        active: true,
+        colorToken: null
+      } satisfies HrLeaveType)
+
+    const memberPolicyContext = buildMemberPolicyContext({
+      employmentType: row.employment_type,
+      hireDate: row.hire_date,
+      contractType: row.contract_type,
+      payRegime: row.pay_regime,
+      payrollVia: row.payroll_via
+    })
+
+    const resolution = resolveApplicableLeavePolicy({
+      leaveType,
+      policies: leavePolicies,
+      member: memberPolicyContext
+    })
+
+    return {
+      ...mapLeaveBalance(row),
+      policyExplain: buildPolicyExplain({
+        resolution,
+        member: memberPolicyContext
+      })
+    }
+  })
 
   return {
     balances,
     policies: leavePolicies,
     summary: {
       memberCount: new Set(balances.map(balance => balance.memberId)).size,
-      totalAvailableDays: balances.reduce((sum, balance) => sum + balance.availableDays, 0)
+      totalAvailableDays: roundLeaveDays(balances.reduce((sum, balance) => sum + balance.availableDays, 0))
     }
   }
 }
@@ -1323,7 +1826,8 @@ export const listLeaveRequestsFromPostgres = async ({
         r.decided_at,
         r.decided_by,
         r.notes,
-        r.created_at
+        r.created_at,
+        COALESCE(r.source_kind, 'request') AS source_kind
       FROM greenhouse_hr.leave_requests AS r
       LEFT JOIN greenhouse_core.members AS member
         ON member.member_id = r.member_id
@@ -1471,7 +1975,8 @@ export const listLeaveCalendarFromPostgres = async ({
         r.decided_at,
         r.decided_by,
         r.notes,
-        r.created_at
+        r.created_at,
+        COALESCE(r.source_kind, 'request') AS source_kind
       FROM greenhouse_hr.leave_requests AS r
       LEFT JOIN greenhouse_core.members AS member
         ON member.member_id = r.member_id
@@ -1596,12 +2101,19 @@ export const createLeaveRequestInPostgres = async ({
       throw new HrCoreValidationError('Leave type not found.', 404)
     }
 
-    const policy = resolveApplicableLeavePolicy({
+    const resolution = resolveApplicableLeavePolicy({
       leaveType,
       policies: leavePolicies,
-      employmentType: normalizeNullableString(member.employment_type),
-      payRegime: normalizeNullableString(member.pay_regime)
+      member: buildMemberPolicyContext({
+        employmentType: member.employment_type,
+        hireDate: member.hire_date,
+        contractType: member.contract_type,
+        payRegime: member.pay_regime,
+        payrollVia: member.payroll_via
+      })
     })
+
+    const policy = resolution.policy
 
     const dayBreakdown = await computeLeaveDayBreakdown({
       startDate,
@@ -1831,7 +2343,7 @@ export const createLeaveRequestInPostgres = async ({
       await adjustBalanceForRequest({
         request: created,
         daysByYear: dayBreakdown.daysByYear,
-        reservedDelta: requestedDays,
+        reservedDelta: 1,
         usedDelta: 0,
         actorUserId,
         client
@@ -1918,12 +2430,19 @@ export const reviewLeaveRequestInPostgres = async ({
       throw new HrCoreValidationError('Leave type not found.', 404)
     }
 
-    const policy = resolveApplicableLeavePolicy({
+    const resolution = resolveApplicableLeavePolicy({
       leaveType,
       policies: leavePolicies,
-      employmentType: normalizeNullableString(member.employment_type),
-      payRegime: normalizeNullableString(member.pay_regime)
+      member: buildMemberPolicyContext({
+        employmentType: member.employment_type,
+        hireDate: member.hire_date,
+        contractType: member.contract_type,
+        payRegime: member.pay_regime,
+        payrollVia: member.payroll_via
+      })
     })
+
+    const policy = resolution.policy
 
     const dayBreakdown = await computeLeaveDayBreakdown({
       startDate: request.startDate,
@@ -1990,7 +2509,7 @@ export const reviewLeaveRequestInPostgres = async ({
         await adjustBalanceForRequest({
           request,
           daysByYear: dayBreakdown.daysByYear,
-          reservedDelta: -request.requestedDays,
+          reservedDelta: -1,
           usedDelta: 0,
           actorUserId,
           client
@@ -2040,7 +2559,7 @@ export const reviewLeaveRequestInPostgres = async ({
         await adjustBalanceForRequest({
           request,
           daysByYear: dayBreakdown.daysByYear,
-          reservedDelta: -request.requestedDays,
+          reservedDelta: -1,
           usedDelta: 0,
           actorUserId,
           client
@@ -2088,8 +2607,8 @@ export const reviewLeaveRequestInPostgres = async ({
         await adjustBalanceForRequest({
           request,
           daysByYear: dayBreakdown.daysByYear,
-          reservedDelta: -request.requestedDays,
-          usedDelta: action === 'approve' ? request.requestedDays : 0,
+          reservedDelta: -1,
+          usedDelta: action === 'approve' ? 1 : 0,
           actorUserId,
           client
         })
@@ -2171,5 +2690,698 @@ export const reviewLeaveRequestInPostgres = async ({
     }
 
     return updated
+  })
+}
+
+const getLeaveBalanceAdjustmentById = async ({
+  adjustmentId,
+  client
+}: {
+  adjustmentId: string
+  client?: PoolClient
+}) => {
+  const [row] = await queryRows<PostgresLeaveBalanceAdjustmentRow>(
+    `
+      SELECT
+        a.adjustment_id,
+        a.member_id,
+        member.display_name AS member_name,
+        a.leave_type_code,
+        lt.leave_type_name,
+        a.year,
+        a.days_delta,
+        a.effective_date,
+        a.source_kind,
+        a.reason,
+        a.notes,
+        a.created_by_user_id,
+        a.created_at,
+        a.reversed_at,
+        a.reversed_by_user_id,
+        a.reversal_of_adjustment_id
+      FROM greenhouse_hr.leave_balance_adjustments AS a
+      LEFT JOIN greenhouse_core.members AS member
+        ON member.member_id = a.member_id
+      LEFT JOIN greenhouse_hr.leave_types AS lt
+        ON lt.leave_type_code = a.leave_type_code
+      WHERE a.adjustment_id = $1
+      LIMIT 1
+    `,
+    [adjustmentId],
+    client
+  )
+
+  return row ? mapLeaveBalanceAdjustment(row) : null
+}
+
+export const listLeaveBalanceAdjustmentsFromPostgres = async ({
+  tenant,
+  memberId,
+  year
+}: {
+  tenant: TenantContext
+  memberId?: string | null
+  year?: number | null
+}): Promise<HrLeaveBalanceAdjustmentsResponse> => {
+  await assertHrCoreLeavePostgresReady()
+
+  const values: unknown[] = []
+  const filters = ['1 = 1']
+
+  if (memberId) {
+    await assertMemberVisibleToTenant(tenant, memberId)
+    values.push(memberId)
+    filters.push(`a.member_id = $${values.length}`)
+  }
+
+  if (year != null) {
+    values.push(year)
+    filters.push(`a.year = $${values.length}`)
+  }
+
+  const rows = await runGreenhousePostgresQuery<PostgresLeaveBalanceAdjustmentRow>(
+    `
+      SELECT
+        a.adjustment_id,
+        a.member_id,
+        member.display_name AS member_name,
+        a.leave_type_code,
+        lt.leave_type_name,
+        a.year,
+        a.days_delta,
+        a.effective_date,
+        a.source_kind,
+        a.reason,
+        a.notes,
+        a.created_by_user_id,
+        a.created_at,
+        a.reversed_at,
+        a.reversed_by_user_id,
+        a.reversal_of_adjustment_id
+      FROM greenhouse_hr.leave_balance_adjustments AS a
+      LEFT JOIN greenhouse_core.members AS member
+        ON member.member_id = a.member_id
+      LEFT JOIN greenhouse_hr.leave_types AS lt
+        ON lt.leave_type_code = a.leave_type_code
+      WHERE ${filters.join(' AND ')}
+      ORDER BY a.created_at DESC, a.adjustment_id DESC
+    `,
+    values
+  )
+
+  const adjustments = rows.map(mapLeaveBalanceAdjustment)
+
+  return {
+    adjustments,
+    summary: {
+      total: adjustments.length,
+      totalDaysDelta: adjustments.reduce((sum, adjustment) => sum + adjustment.daysDelta, 0)
+    }
+  }
+}
+
+export const createLeaveBackfillInPostgres = async ({
+  tenant,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  input: HrLeaveBackfillInput
+  actorUserId: string
+}) => {
+  await assertHrCoreLeavePostgresReady()
+
+  const effectiveMemberId = normalizeString(input.memberId)
+  const leaveTypeCode = normalizeString(input.leaveTypeCode)
+  const startDate = assertDateString(input.startDate, 'startDate')
+  const endDate = assertDateString(input.endDate, 'endDate')
+
+  if (endDate < startDate) {
+    throw new HrCoreValidationError('endDate must be greater than or equal to startDate.')
+  }
+
+  const VALID_PERIODS = ['full_day', 'morning', 'afternoon'] as const
+
+  const startPeriod: LeaveDayPeriod = VALID_PERIODS.includes(input.startPeriod as typeof VALID_PERIODS[number])
+    ? (input.startPeriod as LeaveDayPeriod)
+    : 'full_day'
+
+  const endPeriod: LeaveDayPeriod = VALID_PERIODS.includes(input.endPeriod as typeof VALID_PERIODS[number])
+    ? (input.endPeriod as LeaveDayPeriod)
+    : 'full_day'
+
+  if (startDate === endDate && startPeriod !== endPeriod) {
+    throw new HrCoreValidationError('For single-day requests, startPeriod and endPeriod must match.', 409)
+  }
+
+  if (startDate === endDate && startPeriod === 'afternoon' && endPeriod === 'morning') {
+    throw new HrCoreValidationError('Invalid period combination: afternoon start with morning end on the same day.', 409)
+  }
+
+  return withGreenhousePostgresTransaction(async client => {
+    await assertMemberVisibleToTenant(tenant, effectiveMemberId, client)
+
+    const [actorMember, member, leaveTypes, leavePolicies] = await Promise.all([
+      resolveTenantMember(tenant, client).catch(() => null),
+      getMemberById(effectiveMemberId, client),
+      listLeaveTypesInternal(client),
+      listLeavePoliciesInternal(client)
+    ])
+
+    const leaveType = leaveTypes.find(item => item.leaveTypeCode === leaveTypeCode)
+
+    if (!leaveType) {
+      throw new HrCoreValidationError('Leave type not found.', 404)
+    }
+
+    const resolution = resolveApplicableLeavePolicy({
+      leaveType,
+      policies: leavePolicies,
+      member: buildMemberPolicyContext({
+        employmentType: member.employment_type,
+        hireDate: member.hire_date,
+        contractType: member.contract_type,
+        payRegime: member.pay_regime,
+        payrollVia: member.payroll_via
+      })
+    })
+
+    const policy = resolution.policy
+
+    const tracksBalance = doesLeaveTrackBalance(policy)
+
+    const dayBreakdown = await computeLeaveDayBreakdown({
+      startDate,
+      endDate,
+      countryCode: 'CL',
+      startPeriod,
+      endPeriod
+    })
+
+    const requestedDays = dayBreakdown.totalDays
+
+    if (requestedDays <= 0) {
+      throw new HrCoreValidationError('The selected dates do not contain payable working days.', 409, {
+        holidaySource: dayBreakdown.holidaySource
+      })
+    }
+
+    const attachmentAssetId = normalizeNullableString(input.attachmentAssetId)
+    const attachmentUrlFallback = normalizeNullableString(input.attachmentUrl)
+
+    if (leaveType.requiresAttachment && !attachmentAssetId && !attachmentUrlFallback) {
+      throw new HrCoreValidationError('This leave type requires an attachment.', 409)
+    }
+
+    await assertNoLeaveOverlap({
+      memberId: effectiveMemberId,
+      startDate,
+      endDate,
+      client
+    })
+
+    for (const year of dayBreakdown.daysByYear.keys()) {
+      await ensureYearBalances({
+        memberId: effectiveMemberId,
+        year,
+        actorUserId,
+        client
+      })
+    }
+
+    if (tracksBalance && !policy.allowNegativeBalance) {
+      for (const [requestYear, yearDays] of dayBreakdown.daysByYear.entries()) {
+        const balance = await getBalanceByKey({
+          memberId: effectiveMemberId,
+          leaveTypeCode,
+          year: requestYear,
+          client
+        })
+
+        if (!balance || balance.availableDays < yearDays) {
+          throw new HrCoreValidationError('Insufficient leave balance.', 409, {
+            year: requestYear,
+            requestedDays: yearDays,
+            availableDays: balance?.availableDays ?? 0
+          })
+        }
+      }
+    }
+
+    const reason = normalizeString(input.reason)
+    const notes = normalizeNullableString(input.notes)
+    const attachmentUrl = attachmentAssetId ? buildPrivateAssetDownloadUrl(attachmentAssetId) : attachmentUrlFallback
+    const requestId = `leave-${randomUUID()}`
+    const actorName = actorMember?.display_name ?? tenant.userId
+    const actorMemberId = actorMember?.member_id ?? null
+
+    await client.query(
+      `
+        INSERT INTO greenhouse_hr.leave_requests (
+          request_id,
+          member_id,
+          leave_type_code,
+          start_date,
+          end_date,
+          start_period,
+          end_period,
+          requested_days,
+          status,
+          reason,
+          attachment_asset_id,
+          attachment_url,
+          supervisor_member_id,
+          hr_reviewer_user_id,
+          decided_at,
+          decided_by,
+          notes,
+          created_by_user_id,
+          source_kind
+        )
+        VALUES (
+          $1,
+          $2,
+          $3,
+          $4::date,
+          $5::date,
+          $6,
+          $7,
+          $8,
+          'approved',
+          $9,
+          $10,
+          $11,
+          $12,
+          $13,
+          CURRENT_TIMESTAMP,
+          $14,
+          $15,
+          $16,
+          'admin_backfill'
+        )
+      `,
+      [
+        requestId,
+        effectiveMemberId,
+        leaveTypeCode,
+        startDate,
+        endDate,
+        startPeriod,
+        endPeriod,
+        requestedDays,
+        reason,
+        attachmentAssetId,
+        attachmentUrl,
+        normalizeNullableString(member.reports_to),
+        tenant.userId,
+        actorName,
+        notes,
+        actorUserId
+      ]
+    )
+
+    if (attachmentAssetId) {
+      try {
+        await attachAssetToAggregate({
+          assetId: attachmentAssetId,
+          ownerAggregateType: 'leave_request',
+          ownerAggregateId: requestId,
+          actorUserId,
+          ownerClientId: tenant.clientId,
+          ownerSpaceId: tenant.spaceId ?? null,
+          ownerMemberId: effectiveMemberId,
+          metadata: {
+            leaveTypeCode,
+            startDate,
+            endDate,
+            sourceKind: 'admin_backfill'
+          },
+          client
+        })
+      } catch (error) {
+        throw new HrCoreValidationError(
+          error instanceof Error && error.message === 'asset_not_found'
+            ? 'Attachment asset not found.'
+            : 'Unable to attach the supporting document.',
+          409
+        )
+      }
+    }
+
+    await client.query(
+      `
+        INSERT INTO greenhouse_hr.leave_request_actions (
+          action_id,
+          request_id,
+          action,
+          actor_user_id,
+          actor_member_id,
+          actor_name,
+          notes
+        )
+        VALUES
+          ($1, $2, 'submit', $3, $4, $5, $6),
+          ($7, $2, 'approve', $3, $4, $5, $6)
+      `,
+      [
+        `leave-action-${randomUUID()}`,
+        requestId,
+        actorUserId,
+        actorMemberId,
+        actorName,
+        notes,
+        `leave-action-${randomUUID()}`
+      ]
+    )
+
+    const created: HrLeaveRequest = {
+      requestId,
+      memberId: effectiveMemberId,
+      memberName: normalizeNullableString(member.display_name),
+      memberAvatarUrl: resolveAvatarUrl(normalizeNullableString(member.avatar_url), normalizeNullableString(member.linked_user_id)),
+      leaveTypeCode,
+      leaveTypeName: leaveType.leaveTypeName,
+      startDate,
+      endDate,
+      startPeriod,
+      endPeriod,
+      requestedDays,
+      status: 'approved',
+      reason,
+      attachmentAssetId,
+      attachmentUrl,
+      supervisorMemberId: normalizeNullableString(member.reports_to),
+      supervisorName: null,
+      approvalStageCode: null,
+      approvalSnapshot: null,
+      hrReviewerUserId: tenant.userId,
+      decidedAt: new Date().toISOString(),
+      decidedBy: actorName,
+      notes,
+      createdAt: null,
+      sourceKind: 'admin_backfill',
+      holidaySource: dayBreakdown.holidaySource
+    }
+
+    if (tracksBalance) {
+      await adjustBalanceForRequest({
+        request: created,
+        daysByYear: dayBreakdown.daysByYear,
+        reservedDelta: 0,
+        usedDelta: 1,
+        actorUserId,
+        client
+      })
+    }
+
+    const payrollImpact = await getPayrollImpactForLeave({
+      startDate,
+      endDate,
+      client
+    })
+
+    created.payrollImpact = payrollImpact
+
+    const eventPayload = await buildLeaveEventPayload({
+      request: created,
+      actorUserId,
+      actorMemberId,
+      actorName,
+      daysByYear: dayBreakdown.daysByYear,
+      holidaySource: dayBreakdown.holidaySource,
+      payrollImpact,
+      eventStage: 'approved',
+      action: 'admin_backfill',
+      approvalSnapshot: null,
+      client
+    })
+
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.leaveRequest,
+      aggregateId: requestId,
+      eventType: EVENT_TYPES.leaveRequestCreated,
+      payload: eventPayload
+    }, client)
+
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.leaveRequest,
+      aggregateId: requestId,
+      eventType: EVENT_TYPES.leaveRequestApproved,
+      payload: eventPayload
+    }, client)
+
+    if (payrollImpact.mode !== 'none') {
+      for (const period of payrollImpact.impactedPeriods) {
+        await publishOutboxEvent({
+          aggregateType: AGGREGATE_TYPES.payrollPeriod,
+          aggregateId: period.periodId,
+          eventType: EVENT_TYPES.leaveRequestPayrollImpactDetected,
+          payload: {
+            ...eventPayload,
+            payrollImpactMode: payrollImpact.mode,
+            periodId: period.periodId,
+            periodYear: period.year,
+            periodMonth: period.month,
+            periodStatus: period.status
+          }
+        }, client)
+      }
+    }
+
+    const reloaded = await getLeaveRequestByIdInternal(requestId, client)
+
+    if (!reloaded) {
+      throw new HrCoreValidationError('Created leave request could not be reloaded.', 500)
+    }
+
+    return reloaded
+  })
+}
+
+export const createLeaveBalanceAdjustmentInPostgres = async ({
+  tenant,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  input: HrLeaveBalanceAdjustmentInput
+  actorUserId: string
+}) => {
+  await assertHrCoreLeavePostgresReady()
+
+  const memberId = normalizeString(input.memberId)
+  const leaveTypeCode = normalizeString(input.leaveTypeCode)
+  const effectiveDate = assertDateString(input.effectiveDate, 'effectiveDate')
+  const year = Math.trunc(Number(input.year))
+  const daysDelta = Number(input.daysDelta)
+  const reason = normalizeString(input.reason)
+  const notes = normalizeNullableString(input.notes)
+
+  if (!Number.isFinite(year) || year <= 0) {
+    throw new HrCoreValidationError('year must be a positive integer.')
+  }
+
+  if (!Number.isFinite(daysDelta) || daysDelta === 0) {
+    throw new HrCoreValidationError('daysDelta must be different from zero.')
+  }
+
+  return withGreenhousePostgresTransaction(async client => {
+    await assertMemberVisibleToTenant(tenant, memberId, client)
+    await getMemberById(memberId, client)
+
+    const leaveTypes = await listLeaveTypesInternal(client)
+    const leaveType = leaveTypes.find(item => item.leaveTypeCode === leaveTypeCode)
+
+    if (!leaveType) {
+      throw new HrCoreValidationError('Leave type not found.', 404)
+    }
+
+    await ensureYearBalances({
+      memberId,
+      year,
+      actorUserId,
+      client
+    })
+
+    const adjustmentId = `leave-adjustment-${randomUUID()}`
+
+    await client.query(
+      `
+        INSERT INTO greenhouse_hr.leave_balance_adjustments (
+          adjustment_id,
+          member_id,
+          leave_type_code,
+          year,
+          days_delta,
+          reason,
+          effective_date,
+          source_kind,
+          notes,
+          created_by_user_id
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7::date, 'manual_adjustment', $8, $9)
+      `,
+      [adjustmentId, memberId, leaveTypeCode, year, daysDelta, reason, effectiveDate, notes, actorUserId]
+    )
+
+    await adjustBalanceByDelta({
+      memberId,
+      leaveTypeCode,
+      year,
+      adjustmentDelta: daysDelta,
+      actorUserId,
+      client
+    })
+
+    const created = await getLeaveBalanceAdjustmentById({
+      adjustmentId,
+      client
+    })
+
+    if (!created) {
+      throw new HrCoreValidationError('Created leave adjustment could not be reloaded.', 500)
+    }
+
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.member,
+      aggregateId: memberId,
+      eventType: EVENT_TYPES.leaveBalanceAdjusted,
+      payload: {
+        adjustmentId,
+        memberId,
+        leaveTypeCode,
+        year,
+        daysDelta,
+        effectiveDate,
+        sourceKind: 'manual_adjustment',
+        reason,
+        notes,
+        actorUserId
+      }
+    }, client)
+
+    return created
+  })
+}
+
+export const reverseLeaveBalanceAdjustmentInPostgres = async ({
+  tenant,
+  adjustmentId,
+  input,
+  actorUserId
+}: {
+  tenant: TenantContext
+  adjustmentId: string
+  input: HrLeaveBalanceAdjustmentReverseInput
+  actorUserId: string
+}) => {
+  await assertHrCoreLeavePostgresReady()
+
+  const reason = normalizeString(input.reason)
+  const notes = normalizeNullableString(input.notes)
+
+  return withGreenhousePostgresTransaction(async client => {
+    const original = await getLeaveBalanceAdjustmentById({ adjustmentId, client })
+
+    if (!original) {
+      throw new HrCoreValidationError('Leave adjustment not found.', 404)
+    }
+
+    await assertMemberVisibleToTenant(tenant, original.memberId, client)
+
+    if (original.reversedAt || original.reversalOfAdjustmentId) {
+      throw new HrCoreValidationError('This leave adjustment has already been reversed.', 409)
+    }
+
+    await ensureYearBalances({
+      memberId: original.memberId,
+      year: original.year,
+      actorUserId,
+      client
+    })
+
+    const reversalId = `leave-adjustment-${randomUUID()}`
+    const reversalDaysDelta = original.daysDelta * -1
+
+    await client.query(
+      `
+        INSERT INTO greenhouse_hr.leave_balance_adjustments (
+          adjustment_id,
+          member_id,
+          leave_type_code,
+          year,
+          days_delta,
+          reason,
+          effective_date,
+          source_kind,
+          notes,
+          created_by_user_id,
+          reversal_of_adjustment_id
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7::date, 'manual_adjustment_reversal', $8, $9, $10)
+      `,
+      [
+        reversalId,
+        original.memberId,
+        original.leaveTypeCode,
+        original.year,
+        reversalDaysDelta,
+        reason,
+        original.effectiveDate,
+        notes,
+        actorUserId,
+        original.adjustmentId
+      ]
+    )
+
+    await client.query(
+      `
+        UPDATE greenhouse_hr.leave_balance_adjustments
+        SET
+          reversed_at = CURRENT_TIMESTAMP,
+          reversed_by_user_id = $2
+        WHERE adjustment_id = $1
+      `,
+      [original.adjustmentId, actorUserId]
+    )
+
+    await adjustBalanceByDelta({
+      memberId: original.memberId,
+      leaveTypeCode: original.leaveTypeCode,
+      year: original.year,
+      adjustmentDelta: reversalDaysDelta,
+      actorUserId,
+      client
+    })
+
+    const reversal = await getLeaveBalanceAdjustmentById({
+      adjustmentId: reversalId,
+      client
+    })
+
+    if (!reversal) {
+      throw new HrCoreValidationError('Reversed leave adjustment could not be reloaded.', 500)
+    }
+
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.member,
+      aggregateId: original.memberId,
+      eventType: EVENT_TYPES.leaveBalanceAdjustmentReversed,
+      payload: {
+        adjustmentId: original.adjustmentId,
+        reversalAdjustmentId: reversalId,
+        memberId: original.memberId,
+        leaveTypeCode: original.leaveTypeCode,
+        year: original.year,
+        daysDelta: reversalDaysDelta,
+        effectiveDate: original.effectiveDate,
+        sourceKind: 'manual_adjustment_reversal',
+        reason,
+        notes,
+        actorUserId
+      }
+    }, client)
+
+    return reversal
   })
 }

@@ -16,6 +16,7 @@ export type PurchaseOrderRecord = {
   clientId: string
   organizationId: string | null
   spaceId: string | null
+  quotationId: string | null
   authorizedAmount: number
   currency: string
   authorizedAmountClp: number
@@ -72,6 +73,7 @@ const mapRow = (r: PoRow): PurchaseOrderRecord => ({
   clientId: String(r.client_id),
   organizationId: r.organization_id ? String(r.organization_id) : null,
   spaceId: r.space_id ? String(r.space_id) : null,
+  quotationId: r.quotation_id ? String(r.quotation_id) : null,
   authorizedAmount: toNumber(r.authorized_amount),
   currency: String(r.currency || 'CLP'),
   authorizedAmountClp: toNumber(r.authorized_amount_clp),
@@ -123,6 +125,7 @@ export const listPurchaseOrders = async (filters?: {
   organizationId?: string
   spaceId?: string
   status?: string
+  quotationId?: string
 }): Promise<PurchaseOrderRecord[]> => {
   const conditions: string[] = []
   const values: unknown[] = []
@@ -160,6 +163,12 @@ export const listPurchaseOrders = async (filters?: {
     values.push(filters.status)
   }
 
+  if (filters?.quotationId) {
+    idx++
+    conditions.push(`quotation_id = $${idx}`)
+    values.push(filters.quotationId)
+  }
+
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
   const rows = await runGreenhousePostgresQuery<PoRow>(
@@ -191,6 +200,7 @@ export type CreatePurchaseOrderInput = {
   clientId: string
   organizationId?: string | null
   spaceId?: string | null
+  quotationId?: string | null
   authorizedAmount: number
   currency?: string
   exchangeRateToClp?: number
@@ -238,7 +248,8 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput): Prom
       'service_scope',
       'contact_name',
       'contact_email',
-      'notes'
+      'notes',
+      'quotation_id'
     ]
 
     const values: unknown[] = [
@@ -261,7 +272,8 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput): Prom
       input.serviceScope || null,
       input.contactName || null,
       input.contactEmail || null,
-      input.notes || null
+      input.notes || null,
+      input.quotationId || null
     ]
 
     if (attachmentPersistence.supportsAttachmentAssetId) {
@@ -304,7 +316,7 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput): Prom
 
 export const updatePurchaseOrder = async (
   poId: string,
-  updates: Partial<Pick<CreatePurchaseOrderInput, 'poNumber' | 'expiryDate' | 'description' | 'serviceScope' | 'contactName' | 'contactEmail' | 'notes' | 'attachmentAssetId' | 'attachmentUrl' | 'createdBy' | 'clientId' | 'spaceId'>>
+  updates: Partial<Pick<CreatePurchaseOrderInput, 'poNumber' | 'expiryDate' | 'description' | 'serviceScope' | 'contactName' | 'contactEmail' | 'notes' | 'attachmentAssetId' | 'attachmentUrl' | 'createdBy' | 'clientId' | 'spaceId' | 'quotationId'>>
 ): Promise<PurchaseOrderRecord | null> => {
   return withGreenhousePostgresTransaction(async client => {
     const sets: string[] = ['updated_at = NOW()']
@@ -348,6 +360,10 @@ export const updatePurchaseOrder = async (
     add('contact_name', updates.contactName)
     add('contact_email', updates.contactEmail)
     add('notes', updates.notes)
+
+    if (updates.quotationId !== undefined) {
+      add('quotation_id', updates.quotationId || null)
+    }
 
     if (attachmentPersistence) {
       if (attachmentPersistence.supportsAttachmentAssetId) {

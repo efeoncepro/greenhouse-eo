@@ -87,6 +87,12 @@ interface CampaignSchemaStatusRow extends Record<string, unknown> {
   has_currency: boolean
 }
 
+type CampaignListOptions = {
+  status?: string
+  campaignIds?: string[]
+  limit?: number
+}
+
 // ── Schema readiness ──
 
 let schemaReadyPromise: Promise<void> | null = null
@@ -213,60 +219,75 @@ const toSlug = (name: string): string =>
 
 export const listCampaigns = async (
   spaceId: string,
-  options?: { status?: string; campaignIds?: string[] }
+  options?: CampaignListOptions
 ): Promise<Campaign[]> => {
   await assertCampaignSchemaReady()
 
-  const params: unknown[] = [spaceId]
-  let filters = 'WHERE c.space_id = $1'
-  let idx = 2
-
-  if (options?.status) {
-    filters += ` AND c.status = $${idx}`
-    params.push(options.status)
-    idx++
-  }
-
-  if (options?.campaignIds?.length) {
-    filters += ` AND c.campaign_id = ANY($${idx})`
-    params.push(options.campaignIds)
-    idx++
-  }
-
-  const rows = await runGreenhousePostgresQuery<CampaignRow>(
-    `SELECT c.*,
-       (SELECT COUNT(*) FROM greenhouse_core.campaign_project_links cpl WHERE cpl.campaign_id = c.campaign_id) AS project_count
-     FROM greenhouse_core.campaigns c
-     ${filters}
-     ORDER BY c.updated_at DESC`,
-    params
-  )
-
-  return rows.map(mapCampaign)
+  return listCampaignsByScope({
+    spaceIds: [spaceId],
+    status: options?.status,
+    campaignIds: options?.campaignIds
+  })
 }
 
-export const listAllCampaigns = async (
-  options?: { status?: string; limit?: number; campaignIds?: string[] }
+export const listCampaignsBySpaceIds = async (
+  spaceIds: string[],
+  options?: CampaignListOptions
 ): Promise<Campaign[]> => {
   await assertCampaignSchemaReady()
 
+  const dedupedSpaceIds = [...new Set(spaceIds.filter(Boolean))]
+
+  if (dedupedSpaceIds.length === 0) {
+    return []
+  }
+
+  return listCampaignsByScope({
+    spaceIds: dedupedSpaceIds,
+    status: options?.status,
+    campaignIds: options?.campaignIds,
+    limit: options?.limit
+  })
+}
+
+const listCampaignsByScope = async ({
+  spaceIds,
+  status,
+  campaignIds,
+  limit
+}: {
+  spaceIds?: string[]
+  status?: string
+  campaignIds?: string[]
+  limit?: number
+}): Promise<Campaign[]> => {
   const params: unknown[] = []
   let filters = 'WHERE TRUE'
   let idx = 1
 
-  if (options?.status) {
+  if (spaceIds?.length === 1) {
+    filters += ` AND c.space_id = $${idx}`
+    params.push(spaceIds[0])
+    idx++
+  } else if (spaceIds && spaceIds.length > 1) {
+    filters += ` AND c.space_id = ANY($${idx})`
+    params.push(spaceIds)
+    idx++
+  }
+
+  if (status) {
     filters += ` AND c.status = $${idx}`
-    params.push(options.status)
+    params.push(status)
     idx++
   }
 
-  if (options?.campaignIds?.length) {
+  if (campaignIds?.length) {
     filters += ` AND c.campaign_id = ANY($${idx})`
-    params.push(options.campaignIds)
+    params.push(campaignIds)
     idx++
   }
 
-  const limit = options?.limit ?? 100
+  const limitClause = limit != null ? `LIMIT $${idx}` : ''
 
   const rows = await runGreenhousePostgresQuery<CampaignRow>(
     `SELECT c.*,
@@ -274,11 +295,23 @@ export const listAllCampaigns = async (
      FROM greenhouse_core.campaigns c
      ${filters}
      ORDER BY c.updated_at DESC
-     LIMIT $${idx}`,
-    [...params, limit]
+     ${limitClause}`,
+    limit != null ? [...params, limit] : params
   )
 
   return rows.map(mapCampaign)
+}
+
+export const listAllCampaigns = async (
+  options?: CampaignListOptions
+): Promise<Campaign[]> => {
+  await assertCampaignSchemaReady()
+
+  return listCampaignsByScope({
+    status: options?.status,
+    campaignIds: options?.campaignIds,
+    limit: options?.limit ?? 100
+  })
 }
 
 export const getCampaign = async (campaignId: string): Promise<Campaign | null> => {

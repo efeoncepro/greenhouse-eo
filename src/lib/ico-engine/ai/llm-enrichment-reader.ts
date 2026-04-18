@@ -6,10 +6,19 @@ import type {
   AgencyAiLlmSummary,
   AgencyAiLlmSummaryItem,
   IcoLlmRunStatus,
-  OrganizationAiLlmEnrichmentItem
+  MemberNexaInsightItem,
+  MemberNexaInsightsPayload,
+  OrganizationAiLlmEnrichmentItem,
+  SpaceNexaInsightItem,
+  SpaceNexaInsightsPayload,
+  TopAiLlmEnrichmentItem
 } from './llm-types'
 
 type RawRow = Record<string, unknown>
+type HistoricalTotalsRow = {
+  total: unknown
+  last_processed_at: unknown
+}
 
 const toNumber = (value: unknown) => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null
@@ -34,6 +43,7 @@ const mapSummaryItem = (row: RawRow): AgencyAiLlmSummaryItem => ({
   severity: toText(row.severity),
   qualityScore: toNumber(row.quality_score),
   explanationSummary: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action),
   confidence: toNumber(row.confidence),
   processedAt: String(row.processed_at)
@@ -47,61 +57,207 @@ const mapOrganizationItem = (row: RawRow): OrganizationAiLlmEnrichmentItem => ({
   severity: toText(row.severity),
   qualityScore: toNumber(row.quality_score),
   explanationSummary: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
   recommendedAction: toText(row.recommended_action),
   confidence: toNumber(row.confidence),
   processedAt: String(row.processed_at)
 })
+
+const mapTopItem = (row: RawRow): TopAiLlmEnrichmentItem => ({
+  enrichmentId: String(row.enrichment_id),
+  signalId: String(row.signal_id),
+  spaceId: String(row.space_id),
+  metricName: String(row.metric_name),
+  signalType: String(row.signal_type),
+  severity: toText(row.severity),
+  qualityScore: toNumber(row.quality_score),
+  explanationSummary: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
+  recommendedAction: toText(row.recommended_action),
+  confidence: toNumber(row.confidence),
+  processedAt: String(row.processed_at)
+})
+
+const mapMemberInsightItem = (row: RawRow): MemberNexaInsightItem => ({
+  id: String(row.enrichment_id),
+  signalType: String(row.signal_type),
+  metricId: String(row.metric_name),
+  severity: toText(row.severity),
+  explanation: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
+  recommendedAction: toText(row.recommended_action),
+  processedAt: String(row.processed_at)
+})
+
+const mapSpaceInsightItem = (row: RawRow): SpaceNexaInsightItem => ({
+  id: String(row.enrichment_id),
+  signalType: String(row.signal_type),
+  metricId: String(row.metric_name),
+  severity: toText(row.severity),
+  explanation: toText(row.explanation_summary),
+  rootCauseNarrative: toText(row.root_cause_narrative),
+  recommendedAction: toText(row.recommended_action),
+  processedAt: String(row.processed_at)
+})
+
+const TIMELINE_DEFAULT_LIMIT = 20
+const TIMELINE_MAX_LIMIT = 50
+const ENRICHMENT_HISTORY_TABLE = 'greenhouse_serving.ico_ai_signal_enrichment_history'
+
+const TIMELINE_SELECT_COLUMNS = `
+  enrichment_id,
+  signal_id,
+  space_id,
+  member_id,
+  project_id,
+  signal_type,
+  metric_name,
+  severity,
+  quality_score,
+  explanation_summary,
+  root_cause_narrative,
+  recommended_action,
+  confidence,
+  processed_at::text AS processed_at
+`
+
+const buildHistoricalTimelineQuery = (scopeSql: string) => `
+  SELECT ${TIMELINE_SELECT_COLUMNS}
+  FROM (
+    SELECT DISTINCT ON (enrichment_id) *
+    FROM ${ENRICHMENT_HISTORY_TABLE}
+    WHERE ${scopeSql}
+      AND status = 'succeeded'
+    ORDER BY enrichment_id, processed_at DESC
+  ) enrichments
+  ORDER BY processed_at DESC
+  LIMIT $2
+`
+
+const buildHistoricalTotalsQuery = (scopeSql: string) => `
+  SELECT
+    COUNT(DISTINCT enrichment_id) AS total,
+    MAX(processed_at)::text AS last_processed_at
+  FROM ${ENRICHMENT_HISTORY_TABLE}
+  WHERE ${scopeSql}
+    AND status = 'succeeded'
+`
+
+const buildScopedSummarySelection = <T extends { processedAt: string }>(
+  activeTotalsRow: RawRow,
+  historicalTotalsRow: HistoricalTotalsRow,
+  activePreview: T[],
+  historicalPreview: T[]
+) => {
+  const activeAnalyzed = Number(activeTotalsRow.succeeded ?? 0)
+  const historicalAnalyzed = toNumber(historicalTotalsRow.total) ?? 0
+
+  const summarySource =
+    activeAnalyzed > 0 ? 'active' : historicalAnalyzed > 0 ? 'historical' : 'empty'
+
+  const totalAnalyzed =
+    summarySource === 'active' ? activeAnalyzed : summarySource === 'historical' ? historicalAnalyzed : 0
+
+  const lastAnalysis =
+    summarySource === 'active'
+      ? toText(activeTotalsRow.last_processed_at)
+      : summarySource === 'historical'
+        ? toText(historicalTotalsRow.last_processed_at)
+        : null
+
+  const insights =
+    summarySource === 'active'
+      ? activePreview
+      : summarySource === 'historical'
+        ? historicalPreview
+        : []
+
+  return {
+    summarySource,
+    activeAnalyzed,
+    historicalAnalyzed,
+    totalAnalyzed,
+    lastAnalysis,
+    insights,
+    activePreview,
+    historicalPreview
+  } as const
+}
+
+export const readAgencyAiLlmTimeline = async (
+  limit = TIMELINE_DEFAULT_LIMIT
+): Promise<AgencyAiLlmSummaryItem[]> => {
+  const boundedLimit = Math.min(Math.max(Math.trunc(limit), 1), TIMELINE_MAX_LIMIT)
+
+  const rows = await query<RawRow>(
+    `
+      SELECT ${TIMELINE_SELECT_COLUMNS}
+      FROM (
+        SELECT DISTINCT ON (enrichment_id) *
+        FROM ${ENRICHMENT_HISTORY_TABLE}
+        WHERE status = 'succeeded'
+        ORDER BY enrichment_id, processed_at DESC
+      ) enrichments
+      ORDER BY processed_at DESC
+      LIMIT $1
+    `,
+    [boundedLimit]
+  ).catch(() => [])
+
+  return rows.map(mapSummaryItem)
+}
 
 export const readAgencyAiLlmSummary = async (
   periodYear: number,
   periodMonth: number,
   limit = 8
 ): Promise<AgencyAiLlmSummary> => {
-  const totalsRows = await query<RawRow>(
-    `
-      SELECT
-        COUNT(*) AS total,
-        COUNT(*) FILTER (WHERE status = 'succeeded') AS succeeded,
-        COUNT(*) FILTER (WHERE status = 'failed') AS failed,
-        AVG(quality_score) FILTER (WHERE status = 'succeeded') AS avg_quality_score,
-        MAX(processed_at)::text AS last_processed_at
-      FROM greenhouse_serving.ico_ai_signal_enrichments
-      WHERE period_year = $1
-        AND period_month = $2
-    `,
-    [periodYear, periodMonth]
-  ).catch(() => [])
-
-  const recentRows = await query<RawRow>(
-    `
-      SELECT *
-      FROM greenhouse_serving.ico_ai_signal_enrichments
-      WHERE period_year = $1
-        AND period_month = $2
-      ORDER BY processed_at DESC, quality_score DESC NULLS LAST
-      LIMIT $3
-    `,
-    [periodYear, periodMonth, limit]
-  ).catch(() => [])
-
-  const latestRunRows = await query<RawRow>(
-    `
-      SELECT
-        run_id,
-        status,
-        started_at::text AS started_at,
-        completed_at::text AS completed_at,
-        signals_seen,
-        signals_enriched,
-        signals_failed
-      FROM greenhouse_serving.ico_ai_enrichment_runs
-      WHERE period_year = $1
-        AND period_month = $2
-      ORDER BY started_at DESC
-      LIMIT 1
-    `,
-    [periodYear, periodMonth]
-  ).catch(() => [])
+  const [totalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
+    query<RawRow>(
+      `
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE status = 'succeeded') AS succeeded,
+          COUNT(*) FILTER (WHERE status = 'failed') AS failed,
+          AVG(quality_score) FILTER (WHERE status = 'succeeded') AS avg_quality_score,
+          MAX(processed_at)::text AS last_processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE period_year = $1
+          AND period_month = $2
+      `,
+      [periodYear, periodMonth]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT *
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE period_year = $1
+          AND period_month = $2
+        ORDER BY processed_at DESC, quality_score DESC NULLS LAST
+        LIMIT $3
+      `,
+      [periodYear, periodMonth, limit]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          run_id,
+          status,
+          started_at::text AS started_at,
+          completed_at::text AS completed_at,
+          signals_seen,
+          signals_enriched,
+          signals_failed
+        FROM greenhouse_serving.ico_ai_enrichment_runs
+        WHERE period_year = $1
+          AND period_month = $2
+        ORDER BY started_at DESC
+        LIMIT 1
+      `,
+      [periodYear, periodMonth]
+    ).catch(() => []),
+    readAgencyAiLlmTimeline(TIMELINE_DEFAULT_LIMIT).catch(() => [] as AgencyAiLlmSummaryItem[])
+  ])
 
   const totalsRow = totalsRows[0] ?? {}
   const latestRunRow = latestRunRows[0]
@@ -125,6 +281,7 @@ export const readAgencyAiLlmSummary = async (
         }
       : null,
     recentEnrichments: recentRows.map(mapSummaryItem),
+    timeline: timelineItems,
     lastProcessedAt: toText(totalsRow.last_processed_at)
   }
 }
@@ -240,4 +397,286 @@ export const readOrganizationAiLlmEnrichments = async (
   ).catch(() => [])
 
   return rows.map(mapOrganizationItem)
+}
+
+export const readTopAiLlmEnrichments = async (
+  periodYear: number,
+  periodMonth: number,
+  limit = 3
+): Promise<TopAiLlmEnrichmentItem[]> => {
+  const rows = await query<RawRow>(
+    `
+      SELECT
+        enrichment_id,
+        signal_id,
+        space_id,
+        metric_name,
+        signal_type,
+        severity,
+        quality_score,
+        explanation_summary,
+        root_cause_narrative,
+        recommended_action,
+        confidence,
+        processed_at
+      FROM greenhouse_serving.ico_ai_signal_enrichments
+      WHERE period_year = $1
+        AND period_month = $2
+        AND status = 'succeeded'
+      ORDER BY
+        CASE COALESCE(severity, '')
+          WHEN 'critical' THEN 0
+          WHEN 'warning' THEN 1
+          WHEN 'info' THEN 2
+          ELSE 3
+        END ASC,
+        quality_score DESC NULLS LAST,
+        processed_at DESC
+      LIMIT $3
+    `,
+    [periodYear, periodMonth, limit]
+  ).catch(() => [])
+
+  return rows.map(mapTopItem)
+}
+
+export const readMemberAiLlmTimeline = async (
+  memberId: string,
+  limit = TIMELINE_DEFAULT_LIMIT
+): Promise<MemberNexaInsightItem[]> => {
+  const boundedLimit = Math.min(Math.max(Math.trunc(limit), 1), TIMELINE_MAX_LIMIT)
+
+  const rows = await query<RawRow>(
+    buildHistoricalTimelineQuery('member_id = $1'),
+    [memberId, boundedLimit]
+  ).catch(() => [])
+
+  return rows.map(mapMemberInsightItem)
+}
+
+export const readSpaceAiLlmTimeline = async (
+  spaceId: string,
+  limit = TIMELINE_DEFAULT_LIMIT
+): Promise<SpaceNexaInsightItem[]> => {
+  const boundedLimit = Math.min(Math.max(Math.trunc(limit), 1), TIMELINE_MAX_LIMIT)
+
+  const rows = await query<RawRow>(
+    buildHistoricalTimelineQuery('space_id = $1'),
+    [spaceId, boundedLimit]
+  ).catch(() => [])
+
+  return rows.map(mapSpaceInsightItem)
+}
+
+export const readMemberAiLlmSummary = async (
+  memberId: string,
+  periodYear: number,
+  periodMonth: number,
+  limit = 3
+): Promise<MemberNexaInsightsPayload> => {
+  const [totalsRows, historicalTotalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
+    query<RawRow>(
+      `
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE status = 'succeeded') AS succeeded,
+          COUNT(*) FILTER (WHERE status = 'failed') AS failed,
+          AVG(quality_score) FILTER (WHERE status = 'succeeded') AS avg_quality_score,
+          MAX(processed_at)::text AS last_processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE member_id = $1
+          AND period_year = $2
+          AND period_month = $3
+      `,
+      [memberId, periodYear, periodMonth]
+    ).catch(() => []),
+    query<HistoricalTotalsRow>(
+      buildHistoricalTotalsQuery('member_id = $1'),
+      [memberId]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          enrichment_id,
+          signal_type,
+          metric_name,
+          severity,
+          explanation_summary,
+          root_cause_narrative,
+          recommended_action,
+          quality_score,
+          processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE member_id = $1
+          AND period_year = $2
+          AND period_month = $3
+          AND status = 'succeeded'
+        ORDER BY
+          CASE COALESCE(severity, '')
+            WHEN 'critical' THEN 0
+            WHEN 'warning' THEN 1
+            WHEN 'info' THEN 2
+            ELSE 3
+          END ASC,
+          quality_score DESC NULLS LAST,
+          processed_at DESC
+        LIMIT $4
+      `,
+      [memberId, periodYear, periodMonth, limit]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          run_id,
+          status,
+          started_at::text AS started_at,
+          completed_at::text AS completed_at
+        FROM greenhouse_serving.ico_ai_enrichment_runs
+        WHERE period_year = $1
+          AND period_month = $2
+        ORDER BY started_at DESC
+        LIMIT 1
+      `,
+      [periodYear, periodMonth]
+    ).catch(() => []),
+    readMemberAiLlmTimeline(memberId, TIMELINE_DEFAULT_LIMIT).catch(
+      () => [] as MemberNexaInsightItem[]
+    )
+  ])
+
+  const totalsRow = totalsRows[0] ?? {}
+  const historicalTotalsRow = historicalTotalsRows[0] ?? { total: 0, last_processed_at: null }
+  const latestRunRow = latestRunRows[0]
+
+  const activePreview = recentRows.map(mapMemberInsightItem)
+  const historicalPreview = timelineItems.slice(0, Math.max(1, limit))
+
+  const scopedSummary = buildScopedSummarySelection(
+    totalsRow,
+    historicalTotalsRow,
+    activePreview,
+    historicalPreview
+  )
+
+  return {
+    summarySource: scopedSummary.summarySource,
+    activeAnalyzed: scopedSummary.activeAnalyzed,
+    historicalAnalyzed: scopedSummary.historicalAnalyzed,
+    totalAnalyzed: scopedSummary.totalAnalyzed,
+    lastAnalysis: scopedSummary.lastAnalysis,
+    runStatus: latestRunRow
+      ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
+      : null,
+    insights: scopedSummary.insights,
+    activePreview: scopedSummary.activePreview,
+    historicalPreview: scopedSummary.historicalPreview,
+    timeline: timelineItems
+  }
+}
+
+export const readSpaceAiLlmSummary = async (
+  spaceId: string,
+  periodYear: number,
+  periodMonth: number,
+  limit = 3
+): Promise<SpaceNexaInsightsPayload> => {
+  const [totalsRows, historicalTotalsRows, recentRows, latestRunRows, timelineItems] = await Promise.all([
+    query<RawRow>(
+      `
+        SELECT
+          COUNT(*) AS total,
+          COUNT(*) FILTER (WHERE status = 'succeeded') AS succeeded,
+          COUNT(*) FILTER (WHERE status = 'failed') AS failed,
+          AVG(quality_score) FILTER (WHERE status = 'succeeded') AS avg_quality_score,
+          MAX(processed_at)::text AS last_processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE space_id = $1
+          AND period_year = $2
+          AND period_month = $3
+      `,
+      [spaceId, periodYear, periodMonth]
+    ).catch(() => []),
+    query<HistoricalTotalsRow>(
+      buildHistoricalTotalsQuery('space_id = $1'),
+      [spaceId]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          enrichment_id,
+          signal_type,
+          metric_name,
+          severity,
+          explanation_summary,
+          root_cause_narrative,
+          recommended_action,
+          quality_score,
+          processed_at
+        FROM greenhouse_serving.ico_ai_signal_enrichments
+        WHERE space_id = $1
+          AND period_year = $2
+          AND period_month = $3
+          AND status = 'succeeded'
+        ORDER BY
+          CASE COALESCE(severity, '')
+            WHEN 'critical' THEN 0
+            WHEN 'warning' THEN 1
+            WHEN 'info' THEN 2
+            ELSE 3
+          END ASC,
+          quality_score DESC NULLS LAST,
+          processed_at DESC
+        LIMIT $4
+      `,
+      [spaceId, periodYear, periodMonth, limit]
+    ).catch(() => []),
+    query<RawRow>(
+      `
+        SELECT
+          run_id,
+          status,
+          started_at::text AS started_at,
+          completed_at::text AS completed_at
+        FROM greenhouse_serving.ico_ai_enrichment_runs
+        WHERE space_id = $1
+          AND period_year = $2
+          AND period_month = $3
+        ORDER BY started_at DESC
+        LIMIT 1
+      `,
+      [spaceId, periodYear, periodMonth]
+    ).catch(() => []),
+    readSpaceAiLlmTimeline(spaceId, TIMELINE_DEFAULT_LIMIT).catch(
+      () => [] as SpaceNexaInsightItem[]
+    )
+  ])
+
+  const totalsRow = totalsRows[0] ?? {}
+  const historicalTotalsRow = historicalTotalsRows[0] ?? { total: 0, last_processed_at: null }
+  const latestRunRow = latestRunRows[0]
+
+  const activePreview = recentRows.map(mapSpaceInsightItem)
+  const historicalPreview = timelineItems.slice(0, Math.max(1, limit))
+
+  const scopedSummary = buildScopedSummarySelection(
+    totalsRow,
+    historicalTotalsRow,
+    activePreview,
+    historicalPreview
+  )
+
+  return {
+    summarySource: scopedSummary.summarySource,
+    activeAnalyzed: scopedSummary.activeAnalyzed,
+    historicalAnalyzed: scopedSummary.historicalAnalyzed,
+    totalAnalyzed: scopedSummary.totalAnalyzed,
+    lastAnalysis: scopedSummary.lastAnalysis,
+    runStatus: latestRunRow
+      ? (toText(latestRunRow.status) ?? 'failed') as IcoLlmRunStatus
+      : null,
+    insights: scopedSummary.insights,
+    activePreview: scopedSummary.activePreview,
+    historicalPreview: scopedSummary.historicalPreview,
+    timeline: timelineItems
+  }
 }

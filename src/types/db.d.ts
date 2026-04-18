@@ -149,6 +149,325 @@ export interface GreenhouseAiToolCatalog {
   website_url: string | null;
 }
 
+export interface GreenhouseCommercialApprovalPolicies {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  condition_type: string;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  policy_id: Generated<string>;
+  policy_name: string;
+  pricing_model: string | null;
+  required_role: string;
+  step_order: Generated<number>;
+  threshold_value: Numeric | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialApprovalSteps {
+  assigned_to: string | null;
+  condition_label: string;
+  created_at: Generated<Timestamp>;
+  decided_at: Timestamp | null;
+  decided_by: string | null;
+  notes: string | null;
+  policy_id: string | null;
+  quotation_id: string;
+  required_role: string;
+  status: Generated<string>;
+  step_id: Generated<string>;
+  step_order: Generated<number>;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialMarginTargets {
+  business_line_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  effective_from: Timestamp;
+  effective_until: Timestamp | null;
+  floor_margin_pct: Numeric;
+  notes: string | null;
+  target_id: Generated<string>;
+  target_margin_pct: Numeric;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProductCatalog {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  default_currency: Generated<string>;
+  default_unit: Generated<string>;
+  default_unit_price: Numeric | null;
+  description: string | null;
+  finance_product_id: string | null;
+  hubspot_product_id: string | null;
+  last_synced_at: Timestamp | null;
+  legacy_category: string | null;
+  legacy_sku: string | null;
+  pricing_model: string | null;
+  product_code: string;
+  product_id: Generated<string>;
+  product_name: string;
+  product_type: Generated<string>;
+  source_system: Generated<string>;
+  suggested_hours: Numeric | null;
+  suggested_role_code: string | null;
+  sync_direction: Generated<string>;
+  sync_status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialQuotationAuditLog {
+  action: string;
+  actor_name: string;
+  actor_user_id: string;
+  created_at: Generated<Timestamp>;
+  details: Generated<Json>;
+  log_id: Generated<string>;
+  quotation_id: string;
+  version_number: number | null;
+}
+
+export interface GreenhouseCommercialQuotationLineItems {
+  cost_breakdown: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  currency: string | null;
+  description: string | null;
+  discount_amount: Numeric | null;
+  discount_type: string | null;
+  discount_value: Numeric | null;
+  effective_margin_pct: Numeric | null;
+  finance_line_item_id: string | null;
+  finance_product_id: string | null;
+  finance_quote_id: string | null;
+  fte_allocation: Numeric | null;
+  hours_estimated: Numeric | null;
+  hubspot_line_item_id: string | null;
+  hubspot_product_id: string | null;
+  label: string;
+  legacy_tax_amount: Numeric | null;
+  legacy_total_amount: Numeric | null;
+  line_item_id: Generated<string>;
+  line_number: number | null;
+  line_type: Generated<string>;
+  margin_pct: Numeric | null;
+  member_id: string | null;
+  notes: string | null;
+  product_id: string | null;
+  quantity: Generated<Numeric>;
+  quotation_id: string;
+  recurrence_type: Generated<string>;
+  role_code: string | null;
+  sort_order: Generated<number>;
+  source_system: Generated<string>;
+  subtotal_after_discount: Numeric | null;
+  subtotal_cost: Numeric | null;
+  subtotal_price: Numeric | null;
+  unit: Generated<string>;
+  unit_cost: Numeric | null;
+  unit_price: Numeric | null;
+  updated_at: Generated<Timestamp>;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialQuotationRenewalReminders {
+  created_at: Generated<Timestamp>;
+  last_event_type: string | null;
+  last_reminder_at: Timestamp | null;
+  next_check_at: Timestamp | null;
+  quotation_id: string;
+  reminder_count: Generated<number>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialQuotations {
+  acv: Numeric | null;
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  arr: Numeric | null;
+  billing_frequency: Generated<string>;
+  business_line_code: string | null;
+  client_id: string | null;
+  client_name_cache: string | null;
+  conditions_text: string | null;
+  contract_duration_months: number | null;
+  converted_at: Timestamp | null;
+  converted_to_income_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  currency: Generated<string>;
+  current_version: Generated<number>;
+  description: string | null;
+  dte_folio: string | null;
+  dte_type_code: string | null;
+  due_date: Timestamp | null;
+  effective_margin_pct: Numeric | null;
+  escalation_base_date: Timestamp | null;
+  escalation_frequency_months: number | null;
+  escalation_mode: Generated<string>;
+  escalation_pct: Numeric | null;
+  exchange_rate_to_clp: Numeric | null;
+  exchange_rates: Generated<Json>;
+  exchange_snapshot_date: Timestamp | null;
+  expired_at: Timestamp | null;
+  expiry_date: Timestamp | null;
+  finance_quote_id: string | null;
+  global_discount_type: string | null;
+  global_discount_value: Numeric | null;
+  hubspot_deal_id: string | null;
+  hubspot_last_synced_at: Timestamp | null;
+  hubspot_quote_id: string | null;
+  internal_notes: string | null;
+  legacy_status: string | null;
+  margin_floor_pct: Numeric | null;
+  mrr: Numeric | null;
+  notes: string | null;
+  nubox_document_id: string | null;
+  nubox_emission_status: string | null;
+  nubox_emitted_at: Timestamp | null;
+  nubox_last_synced_at: Timestamp | null;
+  nubox_sii_track_id: string | null;
+  organization_id: string | null;
+  payment_terms_days: Generated<number>;
+  pricing_model: Generated<string>;
+  quotation_id: Generated<string>;
+  quotation_number: string;
+  quote_date: Timestamp | null;
+  revenue_type: Generated<string>;
+  sent_at: Timestamp | null;
+  source_quote_id: string | null;
+  source_system: Generated<string>;
+  space_id: string | null;
+  space_resolution_source: Generated<string>;
+  status: Generated<string>;
+  subtotal: Numeric | null;
+  target_margin_pct: Numeric | null;
+  tax_amount: Numeric | null;
+  tax_rate: Numeric | null;
+  tcv: Numeric | null;
+  total_amount: Numeric | null;
+  total_amount_clp: Numeric | null;
+  total_cost: Numeric | null;
+  total_discount: Numeric | null;
+  total_price: Numeric | null;
+  total_price_before_discount: Numeric | null;
+  updated_at: Generated<Timestamp>;
+  valid_until: Timestamp | null;
+}
+
+export interface GreenhouseCommercialQuotationTerms {
+  body_resolved: string;
+  created_at: Generated<Timestamp>;
+  included: Generated<boolean>;
+  quotation_id: string;
+  quotation_term_id: Generated<string>;
+  sort_order: Generated<number>;
+  term_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialQuotationVersions {
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  diff_from_previous: Json | null;
+  effective_margin_pct: Numeric | null;
+  finance_quote_id: string | null;
+  notes: string | null;
+  quotation_id: string;
+  snapshot_json: Generated<Json>;
+  total_cost: Numeric | null;
+  total_discount: Numeric | null;
+  total_price: Numeric | null;
+  version_id: Generated<string>;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialQuoteTemplateItems {
+  created_at: Generated<Timestamp>;
+  default_margin_pct: Numeric | null;
+  default_unit_price: Numeric | null;
+  description: string | null;
+  label: string;
+  line_type: Generated<string>;
+  product_id: string | null;
+  quantity: Generated<Numeric>;
+  role_code: string | null;
+  sort_order: Generated<number>;
+  suggested_hours: Numeric | null;
+  template_id: string;
+  template_item_id: Generated<string>;
+  unit: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialQuoteTemplates {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  default_billing_frequency: Generated<string>;
+  default_conditions_text: string | null;
+  default_contract_duration_months: number | null;
+  default_currency: Generated<string>;
+  default_payment_terms_days: Generated<number>;
+  default_term_ids: Generated<string[]>;
+  description: string | null;
+  last_used_at: Timestamp | null;
+  pricing_model: string;
+  template_code: string;
+  template_id: Generated<string>;
+  template_name: string;
+  updated_at: Generated<Timestamp>;
+  usage_count: Generated<number>;
+}
+
+export interface GreenhouseCommercialRevenueMetricConfig {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  config_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  hubspot_amount_metric: Generated<string>;
+  notes: string | null;
+  pipeline_default_metric: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialRoleRateCards {
+  business_line_code: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  currency: Generated<string>;
+  effective_from: Timestamp;
+  effective_until: Timestamp | null;
+  hourly_rate_cost: Numeric;
+  notes: string | null;
+  rate_card_id: Generated<string>;
+  role_code: string;
+  seniority_level: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialTermsLibrary {
+  active: Generated<boolean>;
+  applies_to_model: string | null;
+  body_template: string;
+  category: string;
+  created_at: Generated<Timestamp>;
+  created_by: Generated<string>;
+  default_for_bl: Generated<string[]>;
+  required: Generated<boolean>;
+  sort_order: Generated<number>;
+  term_code: string;
+  term_id: Generated<string>;
+  title: string;
+  updated_at: Generated<Timestamp>;
+  version: Generated<number>;
+}
+
 export interface GreenhouseContextContextDocumentQuarantine {
   client_id: string | null;
   context_kind: string | null;
@@ -1976,9 +2295,17 @@ export interface GreenhouseFinanceIncome {
   period_year: number | null;
   po_number: string | null;
   purchase_order_id: string | null;
+  /**
+   * TASK-350: canonical quotation ancestor. Set when income is materialized from an approved quote (simple branch) or from an approved HES (enterprise branch).
+   */
+  quotation_id: string | null;
   reconciliation_id: string | null;
   referenced_income_id: string | null;
   service_line: string | null;
+  /**
+   * TASK-350: HES that authorized this income. NULL for simple-branch invoicing (quote → income directly without HES).
+   */
+  source_hes_id: string | null;
   subtotal: Numeric;
   tax_amount: Generated<Numeric>;
   tax_rate: Numeric | null;
@@ -2090,6 +2417,10 @@ export interface GreenhouseFinancePurchaseOrders {
   organization_id: string | null;
   po_id: string;
   po_number: string;
+  /**
+   * TASK-350: canonical quotation FK. Nullable because legacy POs predate the bridge; new POs created from a quote get this set.
+   */
+  quotation_id: string | null;
   received_at: Generated<Timestamp | null>;
   remaining_amount_clp: Numeric | null;
   service_scope: string | null;
@@ -2189,6 +2520,10 @@ export interface GreenhouseFinanceReconciliationPeriods {
 
 export interface GreenhouseFinanceServiceEntrySheets {
   amount: Numeric;
+  /**
+   * TASK-350: amount authorized by this HES. Distinct from amount_clp, which is the submitted/requested value. Used to compute quoted vs authorized drift.
+   */
+  amount_authorized_clp: Numeric | null;
   amount_clp: Numeric;
   approved_at: Timestamp | null;
   approved_by: string | null;
@@ -2207,6 +2542,10 @@ export interface GreenhouseFinanceServiceEntrySheets {
   notes: string | null;
   organization_id: string | null;
   purchase_order_id: string | null;
+  /**
+   * TASK-350: canonical quotation FK. Can inherit from purchase_order.quotation_id when HES is created from a PO.
+   */
+  quotation_id: string | null;
   rejection_reason: string | null;
   service_description: string;
   service_period_end: Timestamp | null;
@@ -2329,6 +2668,141 @@ export interface GreenhouseFinanceSuppliers {
   website_url: string | null;
 }
 
+export interface GreenhouseHrEvalAssignments {
+  assignment_id: string;
+  created_at: Generated<Timestamp>;
+  eval_cycle_id: string;
+  eval_type: string;
+  evaluatee_id: string;
+  evaluator_id: string;
+  status: Generated<string>;
+  submitted_at: Timestamp | null;
+}
+
+export interface GreenhouseHrEvalCompetencies {
+  active: Generated<boolean>;
+  applicable_levels: Generated<string[] | null>;
+  category: string;
+  competency_id: string;
+  competency_name: string;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  sort_order: Generated<number>;
+}
+
+export interface GreenhouseHrEvalCycles {
+  competency_ids: Generated<string[] | null>;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  cycle_name: string;
+  cycle_type: string;
+  end_date: Timestamp;
+  eval_cycle_id: string;
+  manager_deadline: Timestamp | null;
+  min_tenure_days: Generated<number>;
+  peer_eval_deadline: Timestamp | null;
+  self_eval_deadline: Timestamp | null;
+  start_date: Timestamp;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrEvalResponses {
+  assignment_id: string;
+  comments: string | null;
+  competency_id: string;
+  created_at: Generated<Timestamp>;
+  rating: number;
+  response_id: string;
+}
+
+export interface GreenhouseHrEvalSummaries {
+  created_at: Generated<Timestamp>;
+  development_areas: string | null;
+  eval_cycle_id: string;
+  finalized_at: Timestamp | null;
+  finalized_by: string | null;
+  goal_completion_pct: Numeric | null;
+  hr_notes: string | null;
+  ico_otd_percent: Numeric | null;
+  ico_rpa_avg: Numeric | null;
+  manager_rating: Numeric | null;
+  member_id: string;
+  overall_rating: Numeric | null;
+  peer_rating: Numeric | null;
+  self_rating: Numeric | null;
+  strengths: string | null;
+  summary_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrGoalCycles {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  cycle_id: string;
+  cycle_name: string;
+  cycle_type: string;
+  end_date: Timestamp;
+  start_date: Timestamp;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrGoalKeyResults {
+  created_at: Generated<Timestamp>;
+  current_value: Generated<Numeric>;
+  goal_id: string;
+  kr_id: string;
+  sort_order: Generated<number>;
+  target_value: Numeric | null;
+  title: string;
+  unit: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrGoalProgress {
+  goal_id: string;
+  notes: string | null;
+  progress_id: string;
+  progress_percent: Numeric;
+  recorded_at: Generated<Timestamp>;
+  recorded_by: string;
+}
+
+export interface GreenhouseHrGoals {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  cycle_id: string;
+  description: string | null;
+  goal_id: string;
+  owner_department_id: string | null;
+  owner_member_id: string | null;
+  owner_type: string;
+  parent_goal_id: string | null;
+  progress_percent: Generated<Numeric>;
+  status: Generated<string>;
+  title: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHrLeaveBalanceAdjustments {
+  adjustment_id: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  days_delta: Numeric;
+  effective_date: Timestamp;
+  leave_type_code: string;
+  member_id: string;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  reason: string;
+  reversal_of_adjustment_id: string | null;
+  reversed_at: Timestamp | null;
+  reversed_by_user_id: string | null;
+  source_kind: Generated<string>;
+  year: number;
+}
+
 export interface GreenhouseHrLeaveBalances {
   accumulated_periods: Generated<Numeric>;
   adjustment_days: Generated<Numeric>;
@@ -2351,8 +2825,10 @@ export interface GreenhouseHrLeavePolicies {
   active: Generated<boolean>;
   allow_negative_balance: Generated<boolean>;
   annual_days: Generated<Numeric>;
+  applicable_contract_types: Generated<string[]>;
   applicable_employment_types: Generated<string[]>;
   applicable_pay_regimes: Generated<string[]>;
+  applicable_payroll_vias: Generated<string[]>;
   created_at: Generated<Timestamp>;
   leave_type_code: string;
   max_accumulation_periods: Numeric | null;
@@ -2397,6 +2873,7 @@ export interface GreenhouseHrLeaveRequests {
   reason: string | null;
   request_id: string;
   requested_days: Numeric;
+  source_kind: Generated<string>;
   start_date: Timestamp;
   start_period: Generated<string>;
   status: string;
@@ -2973,6 +3450,92 @@ export interface GreenhouseServingCommercialCostAttribution {
   source_of_truth: string;
 }
 
+export interface GreenhouseServingFinanceAiEnrichmentRuns {
+  client_id: string | null;
+  completed_at: Timestamp | null;
+  error_message: string | null;
+  latency_ms: number | null;
+  model_id: string;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  prompt_hash: string | null;
+  prompt_version: string;
+  run_id: string;
+  signals_enriched: Generated<number>;
+  signals_failed: Generated<number>;
+  signals_seen: Generated<number>;
+  source: Generated<string>;
+  started_at: Timestamp;
+  status: string;
+  synced_at: Generated<Timestamp>;
+  tokens_in: number | null;
+  tokens_out: number | null;
+  trigger_event_id: string | null;
+  trigger_type: string;
+}
+
+export interface GreenhouseServingFinanceAiSignalEnrichments {
+  client_id: string | null;
+  confidence: Numeric | null;
+  enrichment_id: string;
+  error_message: string | null;
+  explanation_json: Generated<Json>;
+  explanation_summary: string | null;
+  latency_ms: number | null;
+  metric_name: string;
+  model_id: string;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  processed_at: Timestamp;
+  prompt_hash: string | null;
+  prompt_version: string;
+  quality_score: Numeric | null;
+  recommended_action: string | null;
+  root_cause_narrative: string | null;
+  run_id: string;
+  severity: string | null;
+  signal_id: string;
+  signal_type: string;
+  source: Generated<string>;
+  space_id: string | null;
+  status: string;
+  synced_at: Generated<Timestamp>;
+  tokens_in: number | null;
+  tokens_out: number | null;
+}
+
+export interface GreenhouseServingFinanceAiSignals {
+  action_summary: string | null;
+  action_target_id: string | null;
+  action_type: string | null;
+  ai_eligible: Generated<boolean>;
+  client_id: string | null;
+  confidence: Numeric | null;
+  contribution_pct: Numeric | null;
+  current_value: Numeric | null;
+  dimension: string | null;
+  dimension_id: string | null;
+  expected_value: Numeric | null;
+  generated_at: Timestamp;
+  metric_name: string;
+  model_version: string;
+  organization_id: string | null;
+  payload_json: Generated<Json>;
+  period_month: number;
+  period_year: number;
+  predicted_value: Numeric | null;
+  prediction_horizon: string | null;
+  severity: string | null;
+  signal_id: string;
+  signal_type: string;
+  source: Generated<string>;
+  space_id: string | null;
+  synced_at: Generated<Timestamp>;
+  z_score: Numeric | null;
+}
+
 export interface GreenhouseServingIcoAiEnrichmentRuns {
   completed_at: Timestamp | null;
   error_message: string | null;
@@ -2995,6 +3558,38 @@ export interface GreenhouseServingIcoAiEnrichmentRuns {
   tokens_out: number | null;
   trigger_event_id: string | null;
   trigger_type: string;
+}
+
+export interface GreenhouseServingIcoAiSignalEnrichmentHistory {
+  confidence: Numeric | null;
+  enrichment_id: string;
+  error_message: string | null;
+  explanation_json: Generated<Json>;
+  explanation_summary: string | null;
+  history_id: string;
+  latency_ms: number | null;
+  member_id: string | null;
+  metric_name: string;
+  model_id: string;
+  period_month: number;
+  period_year: number;
+  processed_at: Timestamp;
+  project_id: string | null;
+  prompt_hash: string | null;
+  prompt_version: string;
+  quality_score: Numeric | null;
+  recommended_action: string | null;
+  root_cause_narrative: string | null;
+  run_id: string;
+  severity: string | null;
+  signal_id: string;
+  signal_type: string;
+  source: Generated<string>;
+  space_id: string;
+  status: string;
+  synced_at: Generated<Timestamp>;
+  tokens_in: number | null;
+  tokens_out: number | null;
 }
 
 export interface GreenhouseServingIcoAiSignalEnrichments {
@@ -3669,6 +4264,56 @@ export interface GreenhouseServingProviderToolingSnapshots {
   wallet_count: Generated<number>;
 }
 
+export interface GreenhouseServingQuotationPipelineSnapshots {
+  approved_at: Timestamp | null;
+  authorized_amount_clp: Numeric | null;
+  business_line_code: string | null;
+  client_id: string | null;
+  converted_at: Timestamp | null;
+  currency: string | null;
+  days_in_stage: number | null;
+  days_until_expiry: number | null;
+  expired_at: Timestamp | null;
+  expiry_date: Timestamp | null;
+  invoiced_amount_clp: Numeric | null;
+  is_expired: Generated<boolean>;
+  is_renewal_due: Generated<boolean>;
+  materialized_at: Generated<Timestamp>;
+  organization_id: string | null;
+  pipeline_stage: string;
+  pricing_model: string | null;
+  probability_pct: Generated<Numeric>;
+  quotation_id: string;
+  quote_date: Timestamp | null;
+  quoted_margin_pct: Numeric | null;
+  rejected_at: Timestamp | null;
+  sent_at: Timestamp | null;
+  snapshot_source_event: string | null;
+  space_id: string | null;
+  status: string;
+  total_amount_clp: Numeric | null;
+}
+
+export interface GreenhouseServingQuotationProfitabilitySnapshots {
+  attributed_cost_clp: Numeric | null;
+  authorized_total_clp: Numeric | null;
+  client_id: string | null;
+  drift_drivers: Generated<Json>;
+  drift_severity: Generated<string>;
+  effective_margin_pct: Numeric | null;
+  invoiced_total_clp: Numeric | null;
+  margin_drift_pct: Numeric | null;
+  materialized_at: Generated<Timestamp>;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  quotation_id: string;
+  quoted_margin_pct: Numeric | null;
+  quoted_total_clp: Numeric | null;
+  realized_revenue_clp: Numeric | null;
+  space_id: string | null;
+}
+
 export interface GreenhouseServingServiceSlaComplianceSnapshots {
   actual_value: Numeric | null;
   breach_threshold: Numeric | null;
@@ -4272,6 +4917,21 @@ export interface DB {
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
+  "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
+  "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
+  "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
+  "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
+  "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
+  "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;
+  "greenhouse_commercial.quotation_renewal_reminders": GreenhouseCommercialQuotationRenewalReminders;
+  "greenhouse_commercial.quotation_terms": GreenhouseCommercialQuotationTerms;
+  "greenhouse_commercial.quotation_versions": GreenhouseCommercialQuotationVersions;
+  "greenhouse_commercial.quotations": GreenhouseCommercialQuotations;
+  "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
+  "greenhouse_commercial.quote_templates": GreenhouseCommercialQuoteTemplates;
+  "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
+  "greenhouse_commercial.role_rate_cards": GreenhouseCommercialRoleRateCards;
+  "greenhouse_commercial.terms_library": GreenhouseCommercialTermsLibrary;
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;
@@ -4373,6 +5033,16 @@ export interface DB {
   "greenhouse_finance.shareholder_account_movements": GreenhouseFinanceShareholderAccountMovements;
   "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
+  "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
+  "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
+  "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;
+  "greenhouse_hr.eval_responses": GreenhouseHrEvalResponses;
+  "greenhouse_hr.eval_summaries": GreenhouseHrEvalSummaries;
+  "greenhouse_hr.goal_cycles": GreenhouseHrGoalCycles;
+  "greenhouse_hr.goal_key_results": GreenhouseHrGoalKeyResults;
+  "greenhouse_hr.goal_progress": GreenhouseHrGoalProgress;
+  "greenhouse_hr.goals": GreenhouseHrGoals;
+  "greenhouse_hr.leave_balance_adjustments": GreenhouseHrLeaveBalanceAdjustments;
   "greenhouse_hr.leave_balances": GreenhouseHrLeaveBalances;
   "greenhouse_hr.leave_policies": GreenhouseHrLeavePolicies;
   "greenhouse_hr.leave_request_actions": GreenhouseHrLeaveRequestActions;
@@ -4405,7 +5075,11 @@ export interface DB {
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;
   "greenhouse_serving.commercial_cost_attribution": GreenhouseServingCommercialCostAttribution;
+  "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
+  "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
+  "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
   "greenhouse_serving.ico_ai_enrichment_runs": GreenhouseServingIcoAiEnrichmentRuns;
+  "greenhouse_serving.ico_ai_signal_enrichment_history": GreenhouseServingIcoAiSignalEnrichmentHistory;
   "greenhouse_serving.ico_ai_signal_enrichments": GreenhouseServingIcoAiSignalEnrichments;
   "greenhouse_serving.ico_ai_signals": GreenhouseServingIcoAiSignals;
   "greenhouse_serving.ico_member_metrics": GreenhouseServingIcoMemberMetrics;
@@ -4431,6 +5105,8 @@ export interface DB {
   "greenhouse_serving.provider_360": GreenhouseServingProvider360;
   "greenhouse_serving.provider_finance_360": GreenhouseServingProviderFinance360;
   "greenhouse_serving.provider_tooling_snapshots": GreenhouseServingProviderToolingSnapshots;
+  "greenhouse_serving.quotation_pipeline_snapshots": GreenhouseServingQuotationPipelineSnapshots;
+  "greenhouse_serving.quotation_profitability_snapshots": GreenhouseServingQuotationProfitabilitySnapshots;
   "greenhouse_serving.service_sla_compliance_snapshots": GreenhouseServingServiceSlaComplianceSnapshots;
   "greenhouse_serving.session_360": GreenhouseServingSession360;
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;

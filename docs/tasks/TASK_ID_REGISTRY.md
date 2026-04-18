@@ -188,9 +188,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-140` | `complete` | Admin Views Person-First Preview Cutover | `docs/tasks/complete/TASK-140-admin-views-person-first-preview.md` |
 | `TASK-141` | `complete` | Canonical Person Identity Consumption | `docs/tasks/complete/TASK-141-canonical-person-identity-consumption.md` |
 | `TASK-142` | `complete` | Agency Space 360 View | `docs/tasks/complete/TASK-142-agency-space-360-view.md` |
-| `TASK-143` | `to-do` | Agency Economics API & View | `docs/tasks/to-do/TASK-143-agency-economics-api.md` |
-| `TASK-144` | `to-do` | Agency Team Dedicated API | `docs/tasks/to-do/TASK-144-agency-team-api-dedup.md` |
-| `TASK-145` | `to-do` | Agency Campaigns API Rescope | `docs/tasks/to-do/TASK-145-agency-campaigns-rescope.md` |
+| `TASK-143` | `complete` | Agency Economics API & View | `docs/tasks/complete/TASK-143-agency-economics-api.md` |
+| `TASK-144` | `complete` | Agency Team Dedicated API | `docs/tasks/complete/TASK-144-agency-team-api-dedup.md` |
+| `TASK-145` | `complete` | Agency Campaigns API Rescope | `docs/tasks/complete/TASK-145-agency-campaigns-rescope.md` |
 | `TASK-146` | `to-do` | Service-Level P&L (Economics per Service) | `docs/tasks/to-do/TASK-146-service-pnl.md` |
 | `TASK-147` | `to-do` | Campaign ↔ Service Bridge | `docs/tasks/to-do/TASK-147-campaign-service-bridge.md` |
 | `TASK-148` | `to-do` | Agency Outbox Event Emission | `docs/tasks/to-do/TASK-148-agency-outbox-events.md` |
@@ -392,13 +392,13 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-340` | `to-do` | Compensation Arrangement → Payroll Bridge | `docs/tasks/to-do/TASK-340-compensation-arrangement-payroll-bridge.md` |
 | `TASK-341` | `to-do` | Executive Economics 360 Read Model | `docs/tasks/to-do/TASK-341-executive-economics-360-read-model.md` |
 | `TASK-342` | `to-do` | Executive Compensation Cost Intelligence Integration | `docs/tasks/to-do/TASK-342-executive-compensation-cost-intelligence-integration.md` |
-| `TASK-343` | `to-do` | Commercial Quotation Canonical Program | `docs/tasks/to-do/TASK-343-commercial-quotation-canonical-program.md` |
+| `TASK-343` | `complete` | Commercial Quotation Canonical Program | `docs/tasks/complete/TASK-343-commercial-quotation-canonical-program.md` |
 | `TASK-344` | `to-do` | Quotation Contract Consolidation & Cutover Policy | `docs/tasks/to-do/TASK-344-quotation-contract-consolidation-cutover-policy.md` |
 | `TASK-345` | `to-do` | Quotation Canonical Schema & Finance Compatibility Bridge | `docs/tasks/to-do/TASK-345-quotation-canonical-schema-finance-compatibility-bridge.md` |
 | `TASK-346` | `to-do` | Quotation Pricing, Costing & Margin Health Core | `docs/tasks/to-do/TASK-346-quotation-pricing-costing-margin-health-core.md` |
 | `TASK-347` | `to-do` | Quotation Catalog & HubSpot Canonical Bridge | `docs/tasks/to-do/TASK-347-quotation-catalog-hubspot-canonical-bridge.md` |
 | `TASK-348` | `to-do` | Quotation Governance Runtime: Approvals, Versions, Templates & Audit | `docs/tasks/to-do/TASK-348-quotation-governance-runtime-approvals-versions-templates.md` |
-| `TASK-349` | `to-do` | Quotation Workspace UI & PDF Delivery | `docs/tasks/to-do/TASK-349-quotation-workspace-ui-pdf-delivery.md` |
+| `TASK-349` | `complete` | Quotation Workspace UI & PDF Delivery | `docs/tasks/complete/TASK-349-quotation-workspace-ui-pdf-delivery.md` |
 | `TASK-350` | `to-do` | Quotation-to-Cash Document Chain Bridge | `docs/tasks/to-do/TASK-350-quotation-to-cash-document-chain-bridge.md` |
 | `TASK-351` | `to-do` | Quotation Intelligence Automation: Pipeline, Renewals & Profitability | `docs/tasks/to-do/TASK-351-quotation-intelligence-automation-pipeline-renewals-profitability.md` |
 | `TASK-352` | `to-do` | Hiring / ATS Canonical Program | `docs/tasks/to-do/TASK-352-hiring-ats-canonical-program.md` |
@@ -452,8 +452,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-400` | `complete` | Portal Home Contract Governance, Entrypoint Cutover & Dashboard Compatibility | `docs/tasks/complete/TASK-400-portal-home-contract-governance-entrypoint-cutover.md` |
 | `TASK-401` | `to-do` | Bank Reconciliation: Continuous Transaction Matching | `docs/tasks/to-do/TASK-401-bank-reconciliation-continuous-matching.md` |
 | `TASK-402` | `to-do` | Universal Adaptive Home Orchestration | `docs/tasks/to-do/TASK-402-universal-adaptive-home-orchestration.md` |
-| `TASK-403` | `to-do` | Entitlements Runtime Foundation & Home Bridge | `docs/tasks/to-do/TASK-403-entitlements-runtime-foundation-home-bridge.md` |
-| `TASK-404` | `to-do` | Entitlements Governance Admin Center | `docs/tasks/to-do/TASK-404-entitlements-governance-admin-center.md` |
+| `TASK-403` | `complete` | Entitlements Runtime Foundation & Home Bridge | `docs/tasks/complete/TASK-403-entitlements-runtime-foundation-home-bridge.md` |
+| `TASK-404` | `complete` | Entitlements Governance Admin Center | `docs/tasks/complete/TASK-404-entitlements-governance-admin-center.md` |
 | `TASK-405` | `complete` | Reconcile `main` into `develop` for Kortex Identity Bridge | `docs/tasks/complete/TASK-405-reconcile-main-into-develop-kortex-identity.md` |
 | `TASK-406` | `complete` | Promote Reconciled Kortex Identity Bridge to `main` | `docs/tasks/complete/TASK-406-promote-kortex-identity-bridge-to-main.md` |
 | `TASK-409` | `complete` | Payroll Reliquidación Program | `docs/tasks/complete/TASK-409-payroll-reliquidation-program.md` |
@@ -462,3 +462,42 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-412` | `complete` | Payroll Reliquidación Admin UI, Preview & Audit Trail | `docs/tasks/complete/TASK-412-payroll-reliquidation-admin-ui-preview-audit.md` |
 | `TASK-413` | `to-do` | Kortex Identity Bridge Hardening & Contract Closure | `docs/tasks/to-do/TASK-413-kortex-identity-bridge-hardening.md` |
 | `TASK-414` | `to-do` | Payroll Reopen Policy Engine & Hardening | `docs/tasks/to-do/TASK-414-payroll-reopen-policy-engine-hardening.md` |
+| `TASK-415` | `complete` | HR Leave Balance Visibility, Admin Backfill & Manual Adjustments | `docs/tasks/complete/TASK-415-hr-leave-balance-admin-backfill.md` |
+| `TASK-416` | `to-do` | Finance Metric Registry Foundation | `docs/tasks/to-do/TASK-416-finance-metric-registry-foundation.md` |
+| `TASK-417` | `to-do` | Finance Metric Registry Reader Primitives | `docs/tasks/to-do/TASK-417-finance-metric-registry-reader-primitives.md` |
+| `TASK-418` | `to-do` | Finance Signal Engine Cutover to Registry | `docs/tasks/to-do/TASK-418-finance-signal-engine-registry-cutover.md` |
+| `TASK-419` | `to-do` | Finance Dashboard Cutover to Registry | `docs/tasks/to-do/TASK-419-finance-dashboard-registry-cutover.md` |
+| `TASK-420` | `to-do` | Cost Intelligence Consumer Cutover to Registry | `docs/tasks/to-do/TASK-420-cost-intelligence-registry-cutover.md` |
+| `TASK-421` | `to-do` | Finance Metric Targets Editable + Effective-Dating (v2) | `docs/tasks/to-do/TASK-421-finance-metric-targets-editable-effective-dating.md` |
+| `TASK-422` | `to-do` | Finance Metric Quality Gates Runtime + Stale Data UX (v2) | `docs/tasks/to-do/TASK-422-finance-metric-quality-gates-stale-data-ux.md` |
+| `TASK-423` | `to-do` | Finance Metric Per-Scope Thresholds (v2) | `docs/tasks/to-do/TASK-423-finance-metric-per-scope-thresholds.md` |
+| `TASK-424` | `to-do` | Finance Metric LLM Glossary Prompt Scoping (v2) | `docs/tasks/to-do/TASK-424-finance-metric-llm-glossary-prompt-scoping.md` |
+| `TASK-425` | `to-do` | Finance Metric Dependency DAG Runtime Propagation (v2) | `docs/tasks/to-do/TASK-425-finance-metric-dependency-dag-runtime-propagation.md` |
+| `TASK-426` | `to-do` | Finance Metric Cross-Domain References (v2) | `docs/tasks/to-do/TASK-426-finance-metric-cross-domain-references.md` |
+| `TASK-427` | `to-do` | Finance Metric Registry Sharding (trigger-based) | `docs/tasks/to-do/TASK-427-finance-metric-registry-sharding.md` |
+| `TASK-407` | `to-do` | Copy Migration: Shared Shell + Components (split de TASK-265) | `docs/tasks/to-do/TASK-407-copy-migration-shared-shell-components.md` |
+| `TASK-408` | `to-do` | Copy Migration: Notification Categories + Institutional Emails (split de TASK-265) | `docs/tasks/to-do/TASK-408-copy-migration-notifications-emails.md` |
+| `TASK-428` | `to-do` | i18n Architecture Decision (library + routing + locales) — child de TASK-266 | `docs/tasks/to-do/TASK-428-i18n-architecture-decision.md` |
+| `TASK-429` | `to-do` | Locale-Aware Formatting Utilities — child de TASK-266 | `docs/tasks/to-do/TASK-429-locale-aware-formatting-utilities.md` |
+| `TASK-430` | `to-do` | Dictionary Foundation Activation — child de TASK-266 | `docs/tasks/to-do/TASK-430-dictionary-foundation-activation.md` |
+| `TASK-431` | `to-do` | Tenant + User Locale Persistence Model — child de TASK-266 | `docs/tasks/to-do/TASK-431-tenant-user-locale-persistence.md` |
+| `TASK-432` | `to-do` | Client Portal Nexa Pulse (Client-Facing Insights) | `docs/tasks/to-do/TASK-432-client-portal-nexa-pulse.md` |
+| `TASK-433` | `to-do` | Payroll Signal Engine | `docs/tasks/to-do/TASK-433-payroll-signal-engine.md` |
+| `TASK-434` | `to-do` | Staff Augmentation Assignment Economics Signal Engine | `docs/tasks/to-do/TASK-434-staff-augmentation-signal-engine.md` |
+| `TASK-435` | `to-do` | Nexa Actionable Insights (CTA Contract) | `docs/tasks/to-do/TASK-435-nexa-actionable-insights-cta-contract.md` |
+| `TASK-436` | `to-do` | Nexa Critical Push Distribution (Slack / Teams) | `docs/tasks/to-do/TASK-436-nexa-critical-push-distribution.md` |
+| `TASK-437` | `to-do` | Nexa Cross-Domain Causality Engine | `docs/tasks/to-do/TASK-437-nexa-cross-domain-causality.md` |
+| `TASK-438` | `to-do` | Nexa Contextual Chat Per Domain (Copilot by Surface) | `docs/tasks/to-do/TASK-438-nexa-contextual-chat-per-domain.md` |
+| `TASK-439` | `to-do` | Nexa Daily Role-Based Briefing | `docs/tasks/to-do/TASK-439-nexa-daily-role-based-briefing.md` |
+| `TASK-440` | `in-progress` | Nexa Insights Project Label Resolution | `docs/tasks/in-progress/TASK-440-nexa-project-label-resolution.md` |
+| `TASK-441` | `to-do`       | Nexa Mentions Resolver + Allowlist + Sanitization | `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md` |
+| `TASK-442` | `to-do`       | Nexa Mentions Registry + Entity Expansion | `docs/tasks/to-do/TASK-442-nexa-mentions-registry-entity-expansion.md` |
+| `TASK-443` | `to-do`       | Nexa Thread Chat Mention Rendering (Quick Win) | `docs/tasks/to-do/TASK-443-nexa-thread-chat-mention-rendering.md` |
+| `TASK-444` | `to-do`       | Nexa Mentions Input Autocomplete | `docs/tasks/to-do/TASK-444-nexa-mentions-input-autocomplete.md` |
+| `TASK-445` | `to-do`       | Nexa Mentions Accessibility, Tests & Tombstone | `docs/tasks/to-do/TASK-445-nexa-mentions-a11y-tests-tombstone.md` |
+| `TASK-446` | `complete`    | Nexa Insights Root Cause Narrative Surfacing (Insights Quick Win) | `docs/tasks/complete/TASK-446-nexa-insights-root-cause-narrative-surfacing.md` |
+| `TASK-447` | `to-do`       | Nexa Insights Mention Hover Preview Cards | `docs/tasks/to-do/TASK-447-nexa-insights-mention-hover-preview-cards.md` |
+| `TASK-448` | `to-do`       | Nexa Insights Mention Reverse Index + Entity Filter | `docs/tasks/to-do/TASK-448-nexa-insights-mention-reverse-index-filter.md` |
+| `TASK-449` | `to-do`       | Nexa Insights Interaction Layer (Read / Pin / Dismiss / Share) | `docs/tasks/to-do/TASK-449-nexa-insights-interaction-layer.md` |
+| `TASK-450` | `to-do`       | Agency ICO Serving & Performance Hardening | `docs/tasks/to-do/TASK-450-agency-ico-serving-performance-hardening.md` |
+| `TASK-451` | `complete`    | Blindar `password_hash` contra rotaciones automáticas de batch/sync | `docs/tasks/complete/TASK-451-password-hash-mutation-guardrails.md` |

@@ -1,29 +1,67 @@
 import 'server-only'
 
-import { ROLE_CODES } from '@/config/role-codes'
 import { NotificationService } from '@/lib/notifications/notification-service'
-import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
+import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
+import { readAgencyAiLlmSummary, readTopAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import type { HomeSnapshot, ModuleCard, PendingTask } from '@/types/home'
+import type { HomeSnapshot, HomeNexaInsightItem, ModuleCard, PendingTask } from '@/types/home'
 
 export interface HomeSnapshotInput {
   userId: string
+  clientId?: string
   firstName: string
   lastName: string | null
   roleName: string
+  tenantType: 'client' | 'efeonce_internal'
+  primaryRoleCode: string
   businessLines: string[]
   serviceModules: string[]
-  roleCodes?: string[]
-  routeGroups?: string[]
+  roleCodes: string[]
+  routeGroups: string[]
+  authorizedViews: string[]
+  portalHomePath: string
+  memberId?: string
   organizationId?: string | null
 }
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+const HOME_INSIGHTS_LIMIT = 3
+const HOME_TIMEZONE = 'America/Santiago'
 
-export const canSeeFinanceStatus = (input: Pick<HomeSnapshotInput, 'roleCodes' | 'routeGroups'>) =>
-  (input.routeGroups || []).includes('finance') ||
-  (input.roleCodes || []).some(code => code === ROLE_CODES.FINANCE_ADMIN || code === ROLE_CODES.EFEONCE_ADMIN || code === ROLE_CODES.EFEONCE_OPERATIONS)
+const HOME_PERIOD_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+  timeZone: HOME_TIMEZONE,
+  year: 'numeric',
+  month: '2-digit'
+})
+
+const mapHomeInsight = (row: {
+  enrichmentId: string
+  signalType: string
+  metricName: string
+  severity: string | null
+  explanationSummary: string | null
+  rootCauseNarrative: string | null
+  recommendedAction: string | null
+  processedAt: string
+}): HomeNexaInsightItem => ({
+  id: row.enrichmentId,
+  signalType: row.signalType,
+  metricId: row.metricName,
+  severity: row.severity,
+  explanation: row.explanationSummary,
+  rootCauseNarrative: row.rootCauseNarrative,
+  recommendedAction: row.recommendedAction,
+  processedAt: row.processedAt
+})
+
+const getHomeCurrentPeriod = () => {
+  const parts = HOME_PERIOD_FORMATTER.formatToParts(new Date())
+  const year = Number(parts.find(part => part.type === 'year')?.value ?? new Date().getFullYear())
+  const month = Number(parts.find(part => part.type === 'month')?.value ?? new Date().getMonth() + 1)
+
+  return { year, month }
+}
 
 export const getHomeFinanceStatus = async () => {
   const [currentPeriod, latestMargin] = await Promise.all([
@@ -81,6 +119,7 @@ export const getHomeFinanceStatus = async () => {
 export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSnapshot> {
   const now = new Date()
   const hour = now.getHours()
+  const { year: currentYear, month: currentMonth } = getHomeCurrentPeriod()
 
   // 1. Resolve Greeting
   let greetingPool = HOME_GREETINGS.default
@@ -93,10 +132,20 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
   const resolvedGreeting = randomGreeting.replace('{name}', input.firstName)
 
   // 2. Resolve Modules (Capabilities)
-  const resolvedCapabilities = resolveCapabilityModules({
+  const homeEntitlements = buildHomeEntitlementsContext({
+    userId: input.userId,
+    tenantType: input.tenantType,
+    roleCodes: input.roleCodes,
+    primaryRoleCode: input.primaryRoleCode,
+    routeGroups: input.routeGroups,
+    authorizedViews: input.authorizedViews,
     businessLines: input.businessLines,
-    serviceModules: input.serviceModules
+    serviceModules: input.serviceModules,
+    portalHomePath: input.portalHomePath,
+    memberId: input.memberId
   })
+
+  const resolvedCapabilities = homeEntitlements.visibleCapabilityModules
 
   const modules: ModuleCard[] = resolvedCapabilities.map(cap => ({
     id: cap.id,
@@ -104,24 +153,53 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     subtitle: cap.description || '',
     icon: cap.icon,
     route: cap.route,
-    color: 'primary' // Default color for now
+    color: 'primary'
   }))
 
-  // 3. Resolve Tasks (Unread Notifications) — graceful fallback if DB unavailable
-  let notifications: Awaited<ReturnType<typeof NotificationService.getNotifications>>['items'] = []
-
-  try {
-    const result = await NotificationService.getNotifications(input.userId, {
-      unreadOnly: true,
-      pageSize: 5
-    })
-
-    notifications = result.items
-  } catch (error) {
+  const notificationsPromise = NotificationService.getNotifications(input.userId, {
+    unreadOnly: true,
+    pageSize: 5
+  }).catch(error => {
     console.warn('[home-snapshot] Failed to fetch notifications, continuing with empty tasks:', error instanceof Error ? error.message : error)
-  }
 
-  const tasks: PendingTask[] = notifications.map(n => ({
+    return { items: [], total: 0 } as Awaited<ReturnType<typeof NotificationService.getNotifications>>
+  })
+
+  const topInsightsPromise = readTopAiLlmEnrichments(currentYear, currentMonth, HOME_INSIGHTS_LIMIT).catch(error => {
+    console.warn('[home-snapshot] Failed to fetch Nexa insights, continuing with an empty widget:', error instanceof Error ? error.message : error)
+
+    return []
+  })
+
+  const insightsSummaryPromise = readAgencyAiLlmSummary(currentYear, currentMonth, 1).catch(error => {
+    console.warn('[home-snapshot] Failed to fetch Nexa insights summary, continuing with empty summary metadata:', error instanceof Error ? error.message : error)
+
+    return {
+      totals: {
+        total: 0,
+        succeeded: 0,
+        failed: 0,
+        avgQualityScore: null
+      },
+      latestRun: null,
+      recentEnrichments: [],
+      timeline: [],
+      lastProcessedAt: null
+    }
+  })
+
+  const financeStatusPromise = homeEntitlements.canSeeFinanceStatus
+    ? getHomeFinanceStatus()
+    : Promise.resolve(null)
+
+  const [notificationResult, topInsightsRows, insightsSummary, financeStatus] = await Promise.all([
+    notificationsPromise,
+    topInsightsPromise,
+    insightsSummaryPromise,
+    financeStatusPromise
+  ])
+
+  const tasks: PendingTask[] = notificationResult.items.map(n => ({
     id: n.notification_id,
     title: n.title,
     description: n.body || '',
@@ -132,11 +210,26 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     ctaRoute: n.action_url || undefined
   }))
 
-  const financeStatus = canSeeFinanceStatus(input)
-    ? await getHomeFinanceStatus()
-    : null
+  const visibleInsightsCount = topInsightsRows.length
 
-  // 4. Nexa Intro (Simple logic for now)
+  const nexaInsights = {
+    totalAnalyzed: visibleInsightsCount > 0 ? insightsSummary.totals.succeeded : 0,
+    lastAnalysis: insightsSummary.lastProcessedAt,
+    runStatus: insightsSummary.latestRun?.status ?? null,
+    insights: topInsightsRows.map(mapHomeInsight),
+    timeline: insightsSummary.timeline.map(item => ({
+      enrichmentId: item.enrichmentId,
+      signalType: item.signalType,
+      metricName: item.metricName,
+      severity: item.severity,
+      explanationSummary: item.explanationSummary,
+      rootCauseNarrative: item.rootCauseNarrative,
+      recommendedAction: item.recommendedAction,
+      processedAt: item.processedAt
+    })).map(mapHomeInsight)
+  }
+
+  // 5. Nexa Intro (Simple logic for now)
   const nexaIntro = `Hola ${input.firstName}, soy Nexa. Tengo acceso al catálogo reactivo de Greenhouse y puedo ayudarte a navegar tu operación. Veo que tienes ${tasks.length} pendientes hoy. ¿Por dónde quieres empezar?`
 
   return {
@@ -151,6 +244,9 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     },
     modules,
     tasks,
+    recommendedShortcuts: homeEntitlements.recommendedShortcuts,
+    accessContext: homeEntitlements.accessContext,
+    nexaInsights,
     financeStatus,
     nexaIntro,
     computedAt: now.toISOString()

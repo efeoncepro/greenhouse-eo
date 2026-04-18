@@ -11,6 +11,11 @@ import {
 import { detectAiAnomalies } from './anomaly-detector'
 import { buildAiPredictions } from './predictor'
 import { analyzeAiRootCauses } from './root-cause-analyzer'
+import {
+  getResolvedProjectDisplay,
+  isTechnicalProjectIdentifier,
+  resolveProjectDisplayBatch
+} from './entity-display-resolution'
 import type {
   AiMetricSnapshotRow,
   AiPredictionLogRow,
@@ -178,10 +183,30 @@ const readRootCauseDimensionRows = async (
     { periodYear, periodMonth }
   )
 
-  return [...memberRows, ...projectRows, ...phaseRows]
+  const projectResolutions = await resolveProjectDisplayBatch(
+    projectRows
+      .filter((row): row is AiRootCauseDimensionRow & { dimension_id: string } => Boolean(row.dimension_id?.trim()) && Boolean(row.space_id?.trim()))
+      .map(row => ({
+        entityId: row.dimension_id as string,
+        spaceId: row.space_id
+      }))
+  )
+
+  const hydratedProjectRows = projectRows.map(row => {
+    const resolution = row.dimension_id
+      ? getResolvedProjectDisplay(projectResolutions, row.space_id, row.dimension_id)
+      : null
+
+    return {
+      ...row,
+      dimension_label: resolution?.displayLabel ?? row.dimension_label
+    }
+  })
+
+  return [...memberRows, ...hydratedProjectRows, ...phaseRows]
 }
 
-const buildRecommendationSignals = ({
+export const buildRecommendationSignals = ({
   anomalies,
   rootCauses,
   generatedAt
@@ -204,11 +229,16 @@ const buildRecommendationSignals = ({
         ? primaryCause.payloadJson.dimensionLabel.trim()
         : primaryCause.dimensionId
 
+    const safeProjectLabel =
+      targetLabel && !isTechnicalProjectIdentifier(targetLabel)
+        ? targetLabel
+        : 'este proyecto'
+
     const actionSummary =
       primaryCause.dimension === 'member'
         ? `Investigar carga operativa de ${targetLabel || 'este responsable'}: concentra ${primaryCause.contributionPct ?? 'n/a'}% del deterioro de ${anomaly.metricName}.`
         : primaryCause.dimension === 'project'
-          ? `Priorizar el proyecto ${targetLabel || primaryCause.dimensionId}: concentra ${primaryCause.contributionPct ?? 'n/a'}% del deterioro de ${anomaly.metricName}.`
+          ? `Priorizar ${safeProjectLabel}: concentra ${primaryCause.contributionPct ?? 'n/a'}% del deterioro de ${anomaly.metricName}.`
           : `Destrabar la fase ${targetLabel || primaryCause.dimensionId}: concentra ${primaryCause.contributionPct ?? 'n/a'}% del deterioro de ${anomaly.metricName}.`
 
     recommendations.push({

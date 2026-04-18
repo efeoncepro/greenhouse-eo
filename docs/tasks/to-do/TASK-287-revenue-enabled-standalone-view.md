@@ -1,3 +1,14 @@
+## Delta 2026-04-17 — alineación con capa de entitlements
+
+TASK-286 fue ampliada para declarar capabilities granulares `client_portal.*` con `defaultScope: 'organization'`. Esta task ahora debe consumir esa capa al implementar la página.
+
+- **View code:** `cliente.revenue_enabled`
+- **Capability:** `client_portal.revenue_enabled`
+- **Actions requeridas:** `view` (read-only)
+- **Scope:** `organization`
+- **Guard de página:** combinar `hasAuthorizedViewCode(tenant, 'cliente.revenue_enabled')` + `can(tenant, 'client_portal.revenue_enabled', 'view', 'organization')`.
+- **Ref canónica:** `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+
 # TASK-287 — Revenue Enabled Standalone View
 
 ## Status
@@ -10,7 +21,7 @@
 - Status real: `Diseno`
 - Rank: `3`
 - Domain: `agency`
-- Blocked by: `TASK-286`
+- Blocked by: `TASK-286` (view code + capability + binding + role defaults)
 - Branch: `task/TASK-287-revenue-enabled-standalone-view`
 
 ## Summary
