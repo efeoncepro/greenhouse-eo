@@ -4,9 +4,12 @@
   "license": "Commercial",
   "private": true,
   "scripts": {
+    "predev": "pnpm build:icons",
     "dev": "next dev --turbopack",
+    "prebuild": "pnpm build:icons",
     "build": "node scripts/run-next-build.mjs",
     "start": "node scripts/run-next-start.mjs",
+    "prelint": "pnpm build:icons",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",

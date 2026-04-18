@@ -148,12 +148,15 @@ Reglas obligatorias:
 - Label aplicado: `Cotizaciones en curso`
 - Disclaimer agregado al inicio del sub-tab para dejar explícito que la vista sigue cotizaciones ya emitidas y no el pipeline comercial completo por deal
 - Tooltips agregados en `Pipeline abierto` y `Pipeline ponderado` usando `HorizontalWithSubtitle.titleTooltip`
+- Hardening adicional del repo para cerrar la task con gates verdes:
+  - `package.json` ahora regenera el bundle de iconos en `predev`, `prelint` y `prebuild`
+  - el archivo `src/assets/iconify-icons/generated-icons.css` sigue siendo generado, pero ya no depende de `postinstall` para existir en worktrees nuevos o reutilizados
 - Verificación ejecutada:
   - `pnpm exec tsc --noEmit --incremental false` ✓
   - `pnpm test` ✓ (`1339 passed`, `2 skipped`)
   - `pnpm test src/lib/payroll/` ✓ (`194 passed`, `29 files`)
-  - `pnpm lint` ✗ heredado: `src/app/layout.tsx` no resuelve `@assets/iconify-icons/generated-icons.css`
-  - `pnpm build` ✗ heredado: mismo fallo de resolución en `src/app/layout.tsx`
+  - `pnpm lint` ✓
+  - `pnpm build` ✓
 
 ## Follow-ups
 
