@@ -1,3 +1,14 @@
+## Delta 2026-04-18 Iconify generated CSS queda endurecido para worktrees y gates locales
+
+- El portal ya no debe asumir que `src/assets/iconify-icons/generated-icons.css` existe solo porque alguna vez corrió `postinstall`.
+- Contrato operativo actualizado:
+  - `src/assets/iconify-icons/generated-icons.css` sigue siendo un artefacto generado y no versionado
+  - `pnpm dev`, `pnpm lint` y `pnpm build` ahora regeneran el bundle antes de ejecutar su comando principal vía `predev`, `prelint` y `prebuild`
+  - esto evita drift en worktrees que reutilizan `node_modules` sin correr `pnpm install`
+- Source of truth:
+  - `src/assets/iconify-icons/bundle-icons-css.ts` sigue siendo la fuente canónica del bundle
+  - `package.json` gobierna la regeneración automática
+
 ## Delta 2026-04-17 TASK-143 Agency Economics queda activada sobre serving canónico
 
 - `Agency > Economía` ya no debe tratarse como una vista legacy client-first ni como placeholder.

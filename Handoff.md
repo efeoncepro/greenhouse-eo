@@ -46,11 +46,12 @@
   - `pnpm exec tsc --noEmit --incremental false` ✓
   - `pnpm test` ✓ (`1339 passed`, `2 skipped`)
   - `pnpm test src/lib/payroll/` ✓ (`194 passed`, `29` files)
+  - `pnpm lint` ✓
+  - `pnpm build` ✓
   - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` → sin matches ✓
-- **Gap heredado de repo base:**
-  - `pnpm lint` ✗
-  - `pnpm build` ✗
-  - ambos fallan por la misma resolución preexistente en `src/app/layout.tsx`: `@assets/iconify-icons/generated-icons.css`
+- **Hardening adicional aplicado:**
+  - `package.json` ahora ejecuta `pnpm build:icons` en `predev`, `prelint` y `prebuild`
+  - con eso, `src/assets/iconify-icons/generated-icons.css` deja de depender de `postinstall` y los worktrees reutilizando `node_modules` ya no rompen lint/build por ausencia del bundle
 
 ## Sesion 2026-04-18 — TASK-337 Person ↔ Legal Entity Relationship Runtime Foundation
 
