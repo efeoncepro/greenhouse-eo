@@ -1606,3 +1606,86 @@ export const GH_CLIENT_TALENT = {
   loading_profiles: 'Cargando perfiles...',
   error_profiles: 'No pudimos cargar los perfiles del equipo. Intenta de nuevo.'
 } as const
+
+/* ─────────────────── Commercial Pricing ─────────────────── */
+// Copy canónico para el programa de pricing comercial (TASK-463..468).
+// Inventariado y especificado en docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md §4.
+// No usar copy hardcoded en componentes de src/components/greenhouse/pricing/ — siempre desde aquí.
+
+export const GH_PRICING = {
+  // Builder
+  builderTitleNew: 'Nueva cotización',
+  builderTitleEdit: 'Editar cotización',
+  builderSaveDraft: 'Guardar borrador',
+  builderSendToClient: 'Enviar al cliente',
+  builderPreview: 'Vista previa',
+  builderEmptyLineItems: 'Aún no has agregado ítems a esta cotización',
+  builderEmptyLineItemsCta: 'Agregar rol',
+
+  // Sellable item picker (drawer con 4 tabs)
+  pickerTabs: {
+    roles: 'Roles',
+    tools: 'Herramientas',
+    overhead: 'Overhead',
+    services: 'Servicios'
+  } as Record<string, string>,
+  pickerSearchPlaceholder: 'Buscar por SKU o nombre...',
+  pickerEmpty: 'No hay ítems activos para este filtro',
+  pickerEmptyCta: 'Ir al catálogo',
+
+  // Cost stack (gated: solo finance/admin)
+  costStackTitle: 'Detalle de costo (solo interno)',
+  costStackTotalCost: 'Costo total',
+  costStackPriceToClient: 'Precio cliente',
+  costStackGrossMargin: 'Margen bruto',
+  costStackTierFit: 'Tier fit',
+
+  // Margin semaphore
+  marginLabels: {
+    critical: 'Crítico',
+    attention: 'Atención',
+    optimal: 'Óptimo',
+    overshoot: 'Sobre meta'
+  } as Record<string, string>,
+
+  // Commercial model + country factor + currency + employment type
+  commercialModelLabel: 'Modelo comercial',
+  countryFactorLabel: 'País del cliente',
+  currencyLabel: 'Moneda',
+  employmentTypeLabel: 'Tipo de contratación',
+
+  // Send quote drawer
+  sendDrawerTitle: 'Enviar cotización',
+  sendDrawerTo: 'Destinatario',
+  sendDrawerCc: 'Con copia',
+  sendDrawerSubject: 'Asunto',
+  sendDrawerMessage: 'Mensaje',
+  sendDrawerSubmit: 'Enviar cotización',
+  sendDrawerSaveOnly: 'Guardar sin enviar',
+
+  // Quote list
+  listKpiDrafts: 'Borradores',
+  listKpiSent: 'Enviadas',
+  listKpiApproved: 'Aprobadas',
+  listKpiExpired: 'Vencidas',
+  listNew: 'Nueva cotización',
+
+  // Pricing catalog admin
+  adminTitle: 'Catálogo de pricing',
+  adminRoles: 'Roles vendibles',
+  adminTools: 'Catálogo de herramientas',
+  adminOverhead: 'Overhead add-ons',
+  adminServices: 'Servicios empaquetados',
+  adminTiers: 'Tiers de rol',
+  adminCommercialModels: 'Modelos comerciales',
+  adminCountryFactors: 'Factores de país',
+  adminEmploymentTypes: 'Tipos de contratación',
+  adminAudit: 'Historial de cambios',
+
+  // Success / error toasts
+  toastQuoteSaved: 'Borrador guardado',
+  toastQuoteSent: (email: string) => `Cotización enviada a ${email}`,
+  toastRoleUpdated: (label: string) => `${label} actualizado`,
+  errorLoadCatalog: 'No pudimos cargar el catálogo. Intenta de nuevo.',
+  errorLoadQuote: 'No pudimos cargar esta cotización. Verifica el enlace e intenta de nuevo.'
+} as const

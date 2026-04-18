@@ -522,4 +522,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-466` | `to-do`       | Multi-Currency Quote Output (client view + PDF + email) | `docs/tasks/to-do/TASK-466-multi-currency-quote-output.md` |
 | `TASK-467` | `to-do`       | Pricing Catalog Admin UI (self-service CRUD) | `docs/tasks/to-do/TASK-467-pricing-catalog-admin-ui.md` |
 | `TASK-468` | `to-do`       | Payroll ↔ Commercial Employment Types Unification | `docs/tasks/to-do/TASK-468-payroll-commercial-employment-types-unification.md` |
-| `TASK-469` | `to-do`       | Commercial Pricing Program — UI Interface Plan & Vuexy Component Inventory | `docs/tasks/to-do/TASK-469-commercial-pricing-ui-interface-plan.md` |
+| `TASK-469` | `complete`    | Commercial Pricing Program — UI Interface Plan & Vuexy Component Inventory | `docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md` |

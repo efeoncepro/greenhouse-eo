@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-469 Commercial Pricing UI Interface Plan (cierre)
+
+- **Estado:** `complete`.
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo` (primary)
+- **Rama:** `develop`
+- **Entregado:**
+  - Plano maestro de UI cerrado en `docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md` (12 surfaces, 9 componentes nuevos, 13-row floor)
+  - Bloque `GH_PRICING` insertado en `src/config/greenhouse-nomenclature.ts` con copy canónico para builder, picker, cost stack, semaphore, send drawer, list, admin, toasts y errores
+  - Scaffold `src/components/greenhouse/pricing/` con `README.md` declarando los 9 componentes destino + reglas (copy desde GH_PRICING, 13-row floor, payroll isolation)
+  - `Lifecycle` sincronizado (carpeta `complete/` + header `complete`), README task index actualizado, `siguiente ID disponible: TASK-470`, registry sincronizado
+  - Cross-links a TASK-463/464e/465/466/467/468 ya commiteados previamente en a7d5a0bf
+- **Decisiones clave:**
+  - Micro-correcciones al bloque `GH_PRICING` vs spec original §4: `toastQuoteSent` y `toastRoleUpdated` convertidos de strings con `{placeholder}` a funciones `(arg: string) => string` para paridad con patrón `GH_NEXA` (type-safe, sin parsing en consumer)
+  - `marginLabels` y `pickerTabs` tipados con `as Record<string, string>` (paridad con `GH_NEXA.signal_type`)
+  - Anglicismos conservados (`Tier fit`, `Catálogo de pricing`, `Overhead add-ons`) — audiencia interna finance_admin/efeonce_admin, vocabulario canónico del programa
+  - `.gitkeep` vacío + `README.md` con contenido descubrible (no `.gitkeep` con contenido, que es weird)
+- **Validado:**
+  - `npx tsc --noEmit` ✓ sin errores
+  - `npx eslint src/config/greenhouse-nomenclature.ts` ✓ limpio
+  - `pnpm test src/lib/payroll/` ✓ 194/194 tests passing, 29 files (baseline mantenido)
+- **Notas operativas:**
+  - Próximo en mi cola: esperar señal del usuario para arrancar TASK-464e/465/467 (Ola 4, requieren TASK-464a/b/c/d merged primero)
+  - Codex sigue trabajando en `task/TASK-458-honest-label-pipeline-fix` (Ola 1)
+
 ## Sesion 2026-04-18 — Pricing seeds/tasks normalization contract hardening (docs only)
 
 - **Estado:** `complete`, documental.

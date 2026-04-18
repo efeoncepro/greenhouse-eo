@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio` (task de diseño + especificación — no implementa, habilita ejecución eficiente de 6 tasks)
 - Type: `design-spec`
-- Status real: `Diseño`
+- Status real: `Cerrada 2026-04-18`
 - Rank: `Antes de TASK-463, 464e, 465, 466, 467`
 - Domain: `ui`
 - Blocked by: `none`
