@@ -1,5 +1,62 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-464a Sellable Roles Catalog Canonical (cierre)
+
+- **Estado:** `complete`.
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-codex`
+- **Rama:** `task/TASK-464a-sellable-roles-catalog-canonical`
+- **Entregado:**
+  - migración `20260418203054136_task-464a-sellable-roles-foundation.sql`
+  - tablas `greenhouse_commercial.sellable_roles`, `employment_types`, `sellable_role_cost_components`, `role_employment_compatibility`, `sellable_role_pricing_currency`
+  - sequence/function `sellable_role_sku_seq` + `generate_sellable_role_sku()`
+  - parser + contrato de seed en `src/lib/commercial/sellable-roles-seed.ts`
+  - store Kysely en `src/lib/commercial/sellable-roles-store.ts`
+  - publishers `src/lib/commercial/sellable-role-events.ts`
+  - script `scripts/seed-sellable-roles.ts`
+  - tests `src/lib/commercial/__tests__/sellable-roles-seed.test.ts`
+  - catálogo de eventos extendido en `src/lib/sync/event-catalog.ts`
+- **Decisiones clave:**
+  - el seed quedó **resumable e idempotente por fila**, no envuelto en una transacción larga. Motivo: reintentos seguros + menos locks + soporte natural para re-seeding con mismo `effective_from`.
+  - `sellable_role_cost_components` y `sellable_role_pricing_currency` hacen upsert por PK compuesta cuando se reimporta la misma fecha efectiva.
+  - `employment_type` se infiere de forma conservadora; 4 filas ambiguas quedan en `needs_review` y NO reciben compatibilidad automática.
+  - coexistencia explícita con `greenhouse_commercial.role_rate_cards` hasta `TASK-464d`.
+- **Seed verificado en DB (effective_from `2026-04-18`):**
+  - `sellable_roles`: `32`
+  - `employment_types`: `7`
+  - `sellable_role_cost_components`: `28`
+  - `role_employment_compatibility`: `28`
+  - `sellable_role_pricing_currency`: `192`
+  - artifact local de revisión: `/tmp/task-464a-sellable-roles-seed-review.json`
+  - review queue: `ECG-004`, `ECG-017`, `ECG-018`, `ECG-032`
+- **Validado:**
+  - `pnpm exec vitest run src/lib/commercial/__tests__/sellable-roles-seed.test.ts` ✓
+  - `pnpm exec tsc --noEmit --incremental false` ✓
+  - `pnpm test src/lib/payroll/` ✓ `194/194`, `29 files`
+  - `pnpm pg:connect:status` ✓ sin migraciones pendientes
+- **Riesgos / follow-ups inmediatos:**
+  - TASK-468 debe mapear comercial ↔ payroll sin tocar `greenhouse_payroll.*`; esta task dejó el vocabulario comercial listo, no la convergencia.
+  - TASK-464d debe migrar consumers legacy fuera de `role_rate_cards`.
+
+## Sesion 2026-04-18 — TASK-464a Sellable Roles Catalog Canonical (inicio)
+
+- **Estado:** `in-progress`.
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-codex`
+- **Rama:** `task/TASK-464a-sellable-roles-catalog-canonical`
+- **Objetivo:** levantar la foundation schema-heavy de roles sellable/pricing base para desbloquear `TASK-464d`, `TASK-464e`, `TASK-465` y `TASK-467`.
+- **Discovery cerrado:**
+  - el CSV real `data/pricing/seed/sellable-roles-pricing.csv` hoy tiene `32` roles activos y `54` placeholders, no `33/53`
+  - la heurística amplia de `employment_type` de la spec era demasiado agresiva; los casos ambiguos deben ir a `needs_review`
+  - el ejemplo correcto de pricing spot-check es `ECG-008` (`Paid Media Manager`, `17.49 USD/h`), no `ECG-009`
+  - `docs/architecture/schema-snapshot-baseline.sql` está desfasado para esta lane; la referencia operativa real es `TASK-345`, `TASK-346` y `src/types/db.d.ts`
+  - si la task crea `sellable_role_sku_seq`, necesita grants explícitos de sequence en `greenhouse_commercial`
+- **Ajuste documental ya aplicado:**
+  - `TASK-464a` movida a `in-progress/`
+  - spec corregida para reflejar conteo real de filas, heurística conservadora, grants de secuencia y acceptance criteria válidos
+- **Guardrails vigentes antes de migrar:**
+  - payroll sigue aislado; `TASK-464a` no toca `greenhouse_payroll.*` ni `src/lib/payroll/**`
+  - baseline de payroll debe revalidarse justo antes de la migración (`pnpm test src/lib/payroll/`)
+  - coexistencia temporal obligatoria con `greenhouse_commercial.role_rate_cards` hasta `TASK-464d`
+
 ## Sesion 2026-04-18 — TASK-469 Commercial Pricing UI Interface Plan (cierre)
 
 - **Estado:** `complete`.

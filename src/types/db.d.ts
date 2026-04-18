@@ -180,6 +180,25 @@ export interface GreenhouseCommercialApprovalSteps {
   version_number: number;
 }
 
+export interface GreenhouseCommercialEmploymentTypes {
+  active: Generated<boolean>;
+  applies_bonuses: Generated<boolean>;
+  applies_previsional: boolean;
+  country_code: string;
+  created_at: Generated<Timestamp>;
+  effective_from: Generated<Timestamp>;
+  employment_type_code: string;
+  fee_monthly_usd_default: Generated<Numeric>;
+  fee_pct_default: Numeric | null;
+  label_en: string | null;
+  label_es: string;
+  notes: string | null;
+  payment_currency: string;
+  previsional_pct_default: Numeric | null;
+  source_of_truth: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialMarginTargets {
   business_line_code: string | null;
   created_at: Generated<Timestamp>;
@@ -436,6 +455,15 @@ export interface GreenhouseCommercialRevenueMetricConfig {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialRoleEmploymentCompatibility {
+  allowed: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  employment_type_code: string;
+  is_default: Generated<boolean>;
+  notes: string | null;
+  role_id: string;
+}
+
 export interface GreenhouseCommercialRoleRateCards {
   business_line_code: string | null;
   created_at: Generated<Timestamp>;
@@ -448,6 +476,53 @@ export interface GreenhouseCommercialRoleRateCards {
   rate_card_id: Generated<string>;
   role_code: string;
   seniority_level: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialSellableRoleCostComponents {
+  base_salary_usd: Numeric;
+  bonus_ar_usd: Generated<Numeric>;
+  bonus_jit_usd: Generated<Numeric>;
+  bonus_rpa_usd: Generated<Numeric>;
+  bonus_sobrecumplimiento_usd: Generated<Numeric>;
+  created_at: Generated<Timestamp>;
+  effective_from: Timestamp;
+  employment_type_code: string;
+  fee_deel_usd: Generated<Numeric>;
+  fee_eor_usd: Generated<Numeric>;
+  gastos_previsionales_usd: Generated<Numeric>;
+  hourly_cost_usd: Generated<Numeric | null>;
+  hours_per_fte_month: Generated<number>;
+  notes: string | null;
+  role_id: string;
+  total_monthly_cost_usd: Generated<Numeric | null>;
+}
+
+export interface GreenhouseCommercialSellableRolePricingCurrency {
+  created_at: Generated<Timestamp>;
+  currency_code: string;
+  effective_from: Timestamp;
+  fte_monthly_price: Numeric;
+  hourly_price: Numeric;
+  margin_pct: Numeric;
+  notes: string | null;
+  role_id: string;
+}
+
+export interface GreenhouseCommercialSellableRoles {
+  active: Generated<boolean>;
+  can_sell_as_service_component: Generated<boolean>;
+  can_sell_as_staff: Generated<boolean>;
+  category: string;
+  created_at: Generated<Timestamp>;
+  notes: string | null;
+  role_code: string;
+  role_id: Generated<string>;
+  role_label_en: string | null;
+  role_label_es: string;
+  role_sku: Generated<string>;
+  tier: string;
+  tier_label: string;
   updated_at: Generated<Timestamp>;
 }
 
@@ -4943,6 +5018,7 @@ export interface DB {
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
+  "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
@@ -4954,7 +5030,11 @@ export interface DB {
   "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
   "greenhouse_commercial.quote_templates": GreenhouseCommercialQuoteTemplates;
   "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
+  "greenhouse_commercial.role_employment_compatibility": GreenhouseCommercialRoleEmploymentCompatibility;
   "greenhouse_commercial.role_rate_cards": GreenhouseCommercialRoleRateCards;
+  "greenhouse_commercial.sellable_role_cost_components": GreenhouseCommercialSellableRoleCostComponents;
+  "greenhouse_commercial.sellable_role_pricing_currency": GreenhouseCommercialSellableRolePricingCurrency;
+  "greenhouse_commercial.sellable_roles": GreenhouseCommercialSellableRoles;
   "greenhouse_commercial.terms_library": GreenhouseCommercialTermsLibrary;
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
