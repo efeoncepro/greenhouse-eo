@@ -501,3 +501,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-449` | `to-do`       | Nexa Insights Interaction Layer (Read / Pin / Dismiss / Share) | `docs/tasks/to-do/TASK-449-nexa-insights-interaction-layer.md` |
 | `TASK-450` | `to-do`       | Agency ICO Serving & Performance Hardening | `docs/tasks/to-do/TASK-450-agency-ico-serving-performance-hardening.md` |
 | `TASK-451` | `complete`    | Blindar `password_hash` contra rotaciones automáticas de batch/sync | `docs/tasks/complete/TASK-451-password-hash-mutation-guardrails.md` |
+| `TASK-452` | `to-do`       | Service Attribution Foundation | `docs/tasks/to-do/TASK-452-service-attribution-foundation.md` |

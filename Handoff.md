@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — Release train: develop → main promotion (81 commits)
+
+- **Estado:** `complete`, deployado.
+- **Trigger:** cierre de TASK-351 con greenlight explícito del usuario para promover a producción.
+- **Scope:** 81 commits (438 archivos, +65k/-3k LOC) que cubrían acumulado de develop vs main:
+  - **Commercial Quotation canonical program** — TASK-344 (umbrella) → TASK-345 (schema + bridge) → TASK-346 (pricing/margin core) → TASK-347 (HubSpot canonical bridge) → TASK-348 (governance: approvals/versions/terms/templates/audit) → TASK-349 (workspace UI + PDF) → TASK-350 (quote-to-cash bridge) → TASK-351 (intelligence automation).
+  - **TASK-451** — password_hash mutation guardrails (cierra ISSUE-053).
+  - **TASK-029** — HRIS Goals & OKRs module.
+  - **TASK-031** — Performance Evaluations 360.
+  - **TASK-245** — Finance Signal Engine operationalized en Cloud Run.
+  - **TASK-285** — client role differentiation via view assignments.
+  - **TASK-404** — entitlements governance admin center.
+  - **TASK-415** — HR leave admin backfills + adjustments.
+  - **Hardening** — múltiples fixes sobre nexa, HR leave, chile accrual seeding.
+- **Ejecutado:**
+  - `git merge --no-ff origin/develop -m "Merge branch 'develop' into main"` en local → commit `a45b076a`.
+  - `git push origin main` → disparó Vercel production deploy.
+  - Vercel production `dpl_HtTJ744duJmH9M6Zw9BkpmpuGLpi` READY en ~3m20s. Dominios activos: `greenhouse.efeoncepro.com`, `greenhouse-eo.vercel.app`, `greenhouse-eo-efeonce-7670142f.vercel.app`.
+  - Staging deploy pre-existente (`dpl_2To66abpY1NRTAZZRYLYKMTDMKmh`, commit `a37e47fe`) ya estaba READY.
+- **Validado post-deploy en producción:**
+  - `GET /api/finance/commercial-intelligence/pipeline` → 401 (auth requerida) ✓ endpoint desplegado
+  - `GET /api/finance/commercial-intelligence/profitability` → 401 ✓
+  - `GET /api/finance/commercial-intelligence/renewals` → 401 ✓
+  - `GET /api/finance/quotes/[id]/document-chain` → 401 ✓
+  - `GET /api/cron/quotation-lifecycle` → 401 (cron-auth guard activo) ✓
+- **Migraciones:**
+  - Shared Cloud SQL `greenhouse-pg-dev` ya tenía aplicadas las migraciones de TASK-350 (`20260417190539017`) y TASK-351 (`20260418005940703`) cuando se hicieron los merges a develop. No se requirió paso manual adicional para prod porque staging y prod comparten la instancia.
+- **Ops-worker Cloud Run (staging deploy en paralelo):**
+  - `bash services/ops-worker/deploy.sh` con `ENV=staging` — Cloud Build success, revision `ops-worker-00033-mz8` serving traffic.
+  - Secrets intactos (`greenhouse-nextauth-secret-staging`, `greenhouse-resend-api-key-staging`) — no swap accidental hacia prod.
+  - Cloud Scheduler job `ops-quotation-lifecycle` upserted: `0 7 * * *` America/Santiago, ENABLED.
+  - Smoke test: `POST /quotation-lifecycle/sweep` → 200 `{"expiredCount":0,"renewalDueCount":0,"quotationsProcessed":0,"durationMs":41}`.
+  - Endpoints existentes intactos: `/reactive/process`, `/reactive/process-domain`, `/cost-attribution/materialize`, `/batch-email-send`, `/nexa/weekly-digest`, `/health`.
+- **Notas operativas:**
+  - `ops-worker` es un único Cloud Run service compartido entre staging y producción (topología canónica per `deploy.sh` comments). Mount de secrets cambia con `ENV`. Antes de redeploy, **verificar qué ENV está corriendo la revisión viva** para no swap-ear credenciales.
+  - Primera materialización real de `quotation_pipeline_snapshots` ocurrirá cuando un evento canónico dispare la reactive projection (ej. user crea/sincroniza quote) o cuando el Cloud Scheduler corra por primera vez mañana a las 07:00 Santiago.
+- **Follow-ups (out of scope de esta promoción):**
+  - Monitorear errores en `greenhouse.efeoncepro.com` durante las primeras 24h (81 commits es un release grande).
+  - Validar que TASK-029/031 (Goals + Performance Evaluations) se activen correctamente en producción — son módulos completos que no habían visto tráfico prod.
+  - TASK-452 (service-attribution-foundation) quedó registrada en docs (commit `23eef040`) pero sin implementar — es el siguiente ítem natural del backlog finance después de TASK-351.
+
 ## Sesion 2026-04-18 — TASK-351 Quotation Intelligence Automation
 
 - **Estado:** `complete`, entregado.
@@ -111,6 +152,20 @@
   - TASK-351 — quotation intelligence/automation pipeline (renewals, profitability) depende de este bridge.
   - Backfill de `quotation_id` en POs/HES legacy heurísticamente (por `po_number` cuando la quote tenga número matching).
   - UI de "Vincular OC existente" desde QuoteDetail — actualmente solo hay chip `canLinkExisting` sin dialog.
+
+## Sesion 2026-04-17 — TASK-146 Service-Level P&L audit de bloqueo documental
+
+- **Estado:** `blocked`, sin implementación iniciada.
+- **Rama:** `task/TASK-146-service-pnl`
+- **Hallazgo central:** el repo sí tiene P&L operativo por `space` (`greenhouse_serving.operational_pl_snapshots`), costo comercial por `member + client` (`greenhouse_serving.commercial_cost_attribution`) y loaded cost por persona (`greenhouse_serving.member_capacity_economics`), pero **no** tiene un contrato canónico para atribuir revenue/direct cost/labor a `greenhouse_core.services.service_id`.
+- **Contratos faltantes que bloquean runtime seguro:**
+  - `greenhouse_finance.income` no expone `service_id`; solo `service_line` y referencias auxiliares (`hubspot_deal_id`, `quotation_id`, `hes_id`)
+  - `greenhouse_finance.expenses` y `greenhouse_finance.cost_allocations` no exponen `service_id`
+  - `commercial_cost_attribution` sigue keyed por `member_id + client_id + period`, no por servicio
+  - `computeOperationalPl()` resuelve `space` desde `client_id` con `DISTINCT ON`, suficiente para `space`-level P&L pero no para atribución fiel por servicio
+- **Acción tomada:** se corrigió la spec `docs/tasks/to-do/TASK-146-service-pnl.md` para dejar explícito que la task está bloqueada por contratos upstream de atribución y que la UI actual debe seguir mostrando solo contexto contractual por servicio.
+- **Siguiente paso recomendado:** abrir task/prerrequisito que formalice el bridge canónico `Finance/Commercial/Staffing -> service_id` antes de volver a intentar `service_economics`.
+- **Actualización 2026-04-18:** se registró `TASK-452 - Service Attribution Foundation` como prerrequisito formal y se alineó el índice de tasks para que el siguiente ID disponible pase a `TASK-453`.
 
 ## Sesion 2026-04-17 — TASK-349 Quotation Workspace UI + PDF Delivery
 
