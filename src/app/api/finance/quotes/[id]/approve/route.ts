@@ -24,6 +24,8 @@ export const dynamic = 'force-dynamic'
 interface QuotationGovernanceRow extends Record<string, unknown> {
   business_line_code: string | null
   pricing_model: string
+  commercial_model: string | null
+  staffing_model: string | null
   total_cost: string | number | null
   total_price_before_discount: string | number | null
   total_discount: string | number | null
@@ -128,7 +130,7 @@ export async function POST(
 
   if (action === 'request') {
     const headerRows = await query<QuotationGovernanceRow>(
-      `SELECT business_line_code, pricing_model, total_cost, total_price_before_discount,
+      `SELECT business_line_code, pricing_model, commercial_model, staffing_model, total_cost, total_price_before_discount,
               total_discount, total_price, effective_margin_pct, target_margin_pct,
               margin_floor_pct, current_version, quote_date, status
          FROM greenhouse_commercial.quotations

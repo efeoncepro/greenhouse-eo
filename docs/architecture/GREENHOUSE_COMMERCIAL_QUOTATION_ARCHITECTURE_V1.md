@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.16
+> **Version:** 2.17
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-19 — v2.17: TASK-459 delivery model refinement. `greenhouse_commercial.quotations` desambiguada con `commercial_model` (`retainer | project | one_off`) + `staffing_model` (`named_resources | outcome_based | hybrid`) sin reusar el `CommercialModelCode` del pricing engine. `pricing_model` queda como alias legacy derivado. Se extiende `sales_context_at_sent`, `quotation_pipeline_snapshots`, `quotation_profitability_snapshots` y `deal_pipeline_snapshots` para surfacing downstream de ambos ejes.
 > **Updated:** 2026-04-19 — v2.16: TASK-467 pricing catalog admin UI (MVP). Nueva tabla `greenhouse_commercial.pricing_catalog_audit_log` + store `pricing-catalog-audit-store.ts` para audit de cambios en catálogo. 8 API routes bajo `/api/admin/pricing-catalog/{roles,tools,overheads,governance,audit-log}` con gate `canAdministerPricingCatalog` (efeonce_admin + finance_admin). UI bajo `/admin/pricing-catalog` con home (7 nav cards), list views con toggle active (roles/tools/overheads) + create drawers que consumen las DEFAULT sequences (auto-gen ECG/ETG/EFO), governance inline edit page para tier margins + commercial models + country factors + FTE hours. Scope MVP: cost/pricing multi-tab, Excel import, employment types admin, diff viewer de historial se difieren a follow-up TASK-467-phase-2. Bypass intencional de upsert stores (que esperan shape de seed CSV) con INSERT/UPDATE directos para respetar la DEFAULT sequence del SKU.
 > **Updated:** 2026-04-19 — v2.15: TASK-456 deal pipeline snapshots projection. Nueva tabla `greenhouse_serving.deal_pipeline_snapshots` (1 fila por deal canónico no borrado) como capa deal-grain para forecast comercial. Materializer reactivo `deal-pipeline-materializer.ts`, projection `deal_pipeline` en domain `cost_intelligence` y route `GET /api/finance/commercial-intelligence/deal-pipeline`. La fila conserva `is_open`/`is_won`, usa `probability_pct` real del deal (nullable cuando no hay override en `hubspot_deal_pipeline_config`) y rolea-up quotes asociadas por `hubspot_deal_id` (`latest_quote_id`, `quote_count`, `approved_quote_count`, `total_quotes_amount_clp`).
 > **Updated:** 2026-04-18 — v2.14: TASK-463 unified quote builder + bidirectional HubSpot bridge. Drawer legacy "HubSpot" eliminado de `QuotesListView.tsx` — queda un solo botón "+ Nueva cotización" que persiste al canónico y propaga a HubSpot vía reactive projection `quotationHubSpotOutbound`. Nuevo helper `push-canonical-quote.ts` adapta el quote canónico al payload legacy del Cloud Run service. Endpoint legacy `/api/finance/quotes/hubspot` deprecado a HTTP 410. Dos eventos canónicos nuevos: `commercial.quotation.pushed_to_hubspot` y `commercial.quotation.hubspot_sync_failed`. Outbound idempotente: skip si no hay `hubspot_deal_id`, create si no hay `hubspot_quote_id`, update si ya existe (stub MVP).
@@ -14,6 +15,30 @@
 > **Updated:** 2026-04-18 — v2.8: TASK-453 canonical deal bridge. Nuevo mirror `greenhouse_commercial.deals` + `hubspot_deal_pipeline_config`, sync cron `/api/cron/hubspot-deals-sync`, bridge desde `greenhouse_crm.deals` hacia canon comercial, helper `resolveDealForQuote()` y eventos `commercial.deal.created|synced|stage_changed|won|lost`. Esto deja explícita la convivencia: `greenhouse_crm.deals` sigue siendo staging/runtime inbound y `greenhouse_commercial.deals` pasa a ser la entidad comercial canónica para forecast y revenue pipeline híbrido.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-19 — TASK-459 Delivery Model Refinement
+
+- `greenhouse_commercial.quotations` ahora persiste dos ejes ortogonales de delivery:
+  - `commercial_model`: `retainer | project | one_off`
+  - `staffing_model`: `named_resources | outcome_based | hybrid`
+- `pricing_model` legacy no se elimina en este corte:
+  - sigue existiendo por compatibilidad con governance/templates/terms
+  - pasa a comportarse como alias derivado
+  - mapping vigente:
+    - `retainer + named_resources` -> `staff_aug`
+    - `retainer + outcome_based|hybrid` -> `retainer`
+    - `project|one_off + *` -> `project`
+- Regla crítica:
+  - este `commercial_model` describe el delivery contract del quote
+  - NO es el mismo dominio que `CommercialModelCode` del pricing engine (`on_going | on_demand | hybrid | license_consulting`)
+- Downstream actualizado:
+  - `GET /api/finance/quotes` y `GET /api/finance/quotes/[id]` exponen `pricingModel`, `commercialModel` y `staffingModel`
+  - `sales_context_at_sent` captura los tres campos para snapshot histórico
+  - `greenhouse_serving.quotation_pipeline_snapshots` y `greenhouse_serving.quotation_profitability_snapshots` materializan ambos ejes
+  - `greenhouse_serving.deal_pipeline_snapshots` agrega `latest_quote_pricing_model`, `latest_quote_commercial_model` y `latest_quote_staffing_model`
+  - renewals/pipeline/profitability/deal-pipeline ya pueden surfacing el split sin releer la quote raw
 
 ---
 

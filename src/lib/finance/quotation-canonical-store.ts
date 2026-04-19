@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { PoolClient, QueryResult } from 'pg'
 
+import { resolveQuoteDeliveryModel } from '@/lib/commercial/delivery-model'
 import { query } from '@/lib/db'
 import { normalizeQuoteSalesContext } from '@/lib/commercial/sales-context'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
@@ -28,6 +29,9 @@ type CanonicalQuoteListRow = {
   effective_margin_pct: string | number | null
   margin_floor_pct: string | number | null
   target_margin_pct: string | number | null
+  pricing_model: string | null
+  commercial_model: string | null
+  staffing_model: string | null
 }
 
 type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
@@ -204,7 +208,10 @@ export const listFinanceQuotesFromCanonical = async ({
        q.current_version,
        q.effective_margin_pct,
        q.margin_floor_pct,
-       q.target_margin_pct
+       q.target_margin_pct,
+       q.pricing_model,
+       q.commercial_model,
+       q.staffing_model
      FROM greenhouse_commercial.quotations q
      LEFT JOIN greenhouse_core.organizations org
        ON org.organization_id = q.organization_id
@@ -261,6 +268,9 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        q.created_at,
        q.updated_at,
        q.sales_context_at_sent,
+       q.pricing_model,
+       q.commercial_model,
+       q.staffing_model,
        q.legacy_status
      FROM greenhouse_commercial.quotations q
      LEFT JOIN greenhouse_core.organizations org
@@ -789,6 +799,10 @@ export const syncCanonicalFinanceQuote = async ({
   quoteId: string
   client?: QueryableClient
 }) => {
+  const deliveryModel = resolveQuoteDeliveryModel({
+    pricingModel: 'project'
+  })
+
   await syncCanonicalQuoteProducts({ quoteId, client })
 
   await runQuery(
@@ -801,6 +815,8 @@ export const syncCanonicalFinanceQuote = async ({
        space_id,
        client_id,
        pricing_model,
+       commercial_model,
+       staffing_model,
        status,
        current_version,
        currency,
@@ -853,7 +869,9 @@ export const syncCanonicalFinanceQuote = async ({
        COALESCE(q.organization_id, scope.organization_id),
        scope.space_id,
        q.client_id,
-       'project',
+       $2,
+       $3,
+       $4,
        CASE
          WHEN q.status = 'accepted' THEN 'approved'
          WHEN q.status = 'draft' THEN 'draft'
@@ -948,6 +966,9 @@ export const syncCanonicalFinanceQuote = async ({
        organization_id = EXCLUDED.organization_id,
        space_id = EXCLUDED.space_id,
        client_id = EXCLUDED.client_id,
+       pricing_model = EXCLUDED.pricing_model,
+       commercial_model = EXCLUDED.commercial_model,
+       staffing_model = EXCLUDED.staffing_model,
        status = EXCLUDED.status,
        currency = EXCLUDED.currency,
        exchange_rate_to_clp = EXCLUDED.exchange_rate_to_clp,
@@ -987,7 +1008,12 @@ export const syncCanonicalFinanceQuote = async ({
        nubox_last_synced_at = EXCLUDED.nubox_last_synced_at,
        space_resolution_source = EXCLUDED.space_resolution_source,
        updated_at = EXCLUDED.updated_at`,
-    [quoteId],
+    [
+      quoteId,
+      deliveryModel.pricingModel,
+      deliveryModel.commercialModel,
+      deliveryModel.staffingModel
+    ],
     client
   )
 
@@ -1015,7 +1041,10 @@ export const mapCanonicalQuoteListRow = (row: CanonicalQuoteListRow) => ({
   currentVersion: row.current_version !== null && row.current_version !== undefined ? Number(row.current_version) : null,
   effectiveMarginPct: row.effective_margin_pct !== null && row.effective_margin_pct !== undefined ? Number(row.effective_margin_pct) : null,
   marginFloorPct: row.margin_floor_pct !== null && row.margin_floor_pct !== undefined ? Number(row.margin_floor_pct) : null,
-  targetMarginPct: row.target_margin_pct !== null && row.target_margin_pct !== undefined ? Number(row.target_margin_pct) : null
+  targetMarginPct: row.target_margin_pct !== null && row.target_margin_pct !== undefined ? Number(row.target_margin_pct) : null,
+  pricingModel: row.pricing_model ? String(row.pricing_model) : null,
+  commercialModel: row.commercial_model ? String(row.commercial_model) : null,
+  staffingModel: row.staffing_model ? String(row.staffing_model) : null
 })
 
 export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { legacy_status?: string | null }) => ({
@@ -1049,6 +1078,9 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
   currentVersion: row.current_version !== null && row.current_version !== undefined ? Number(row.current_version) : null,
   createdAt: row.created_at ? String(row.created_at) : null,
   updatedAt: row.updated_at ? String(row.updated_at) : null,
+  pricingModel: row.pricing_model ? String(row.pricing_model) : null,
+  commercialModel: row.commercial_model ? String(row.commercial_model) : null,
+  staffingModel: row.staffing_model ? String(row.staffing_model) : null,
   salesContextAtSent: normalizeQuoteSalesContext(row.sales_context_at_sent)
 })
 

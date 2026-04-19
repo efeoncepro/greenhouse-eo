@@ -41,6 +41,9 @@ export async function GET(request: Request) {
       daysUntilExpiry: item.daysUntilExpiry,
       clientId: item.clientId,
       businessLineCode: item.businessLineCode,
+      pricingModel: item.pricingModel,
+      commercialModel: item.commercialModel,
+      staffingModel: item.staffingModel,
       materializedAt: item.materializedAt
     })),
     expired: expired.map(item => ({
@@ -51,6 +54,9 @@ export async function GET(request: Request) {
       expiredAt: item.expiredAt,
       clientId: item.clientId,
       businessLineCode: item.businessLineCode,
+      pricingModel: item.pricingModel,
+      commercialModel: item.commercialModel,
+      staffingModel: item.staffingModel,
       materializedAt: item.materializedAt
     })),
     counts: {

@@ -35,6 +35,9 @@ interface DealSnapshotSourceRow {
 export interface DealQuoteRollupRow {
   quotationId: string
   status: string
+  pricingModel: string | null
+  commercialModel: string | null
+  staffingModel: string | null
   totalAmountClp: number | null
   createdAt: string
   hasApprovalEvidence: boolean
@@ -43,6 +46,9 @@ export interface DealQuoteRollupRow {
 interface DealQuoteRollup {
   latestQuoteId: string | null
   latestQuoteStatus: string | null
+  latestQuotePricingModel: string | null
+  latestQuoteCommercialModel: string | null
+  latestQuoteStaffingModel: string | null
   quoteCount: number
   approvedQuoteCount: number
   totalQuotesAmountClp: number | null
@@ -89,19 +95,25 @@ export const buildDealQuoteRollup = (rows: DealQuoteRollupRow[]): DealQuoteRollu
     return {
       latestQuoteId: null,
       latestQuoteStatus: null,
+      latestQuotePricingModel: null,
+      latestQuoteCommercialModel: null,
+      latestQuoteStaffingModel: null,
       quoteCount: 0,
       approvedQuoteCount: 0,
       totalQuotesAmountClp: null
     }
   }
 
-  const latest = [...rows].sort((left, right) => {
+  const latestSorted = [...rows].sort((left, right) => {
     if (left.createdAt === right.createdAt) {
       return right.quotationId.localeCompare(left.quotationId)
     }
 
     return right.createdAt.localeCompare(left.createdAt)
-  })[0]
+  })
+
+  const latestActive = latestSorted.find(row => ACTIVE_QUOTE_STATUSES.has(row.status)) ?? null
+  const latest = latestActive ?? latestSorted[0]
 
   let approvedQuoteCount = 0
   let totalQuotesAmountClp = 0
@@ -121,6 +133,9 @@ export const buildDealQuoteRollup = (rows: DealQuoteRollupRow[]): DealQuoteRollu
   return {
     latestQuoteId: latest.quotationId,
     latestQuoteStatus: latest.status,
+    latestQuotePricingModel: latest.pricingModel,
+    latestQuoteCommercialModel: latest.commercialModel,
+    latestQuoteStaffingModel: latest.staffingModel,
     quoteCount: rows.length,
     approvedQuoteCount,
     totalQuotesAmountClp: hasActiveQuoteAmount ? Math.round(totalQuotesAmountClp * 100) / 100 : null
@@ -195,6 +210,9 @@ const listQuoteRollupRows = async ({
   const { rows } = await sql<{
     quotationId: string
     status: string
+    pricingModel: string | null
+    commercialModel: string | null
+    staffingModel: string | null
     totalAmountClp: string | number | null
     createdAt: string | Date
     hasApprovalEvidence: boolean
@@ -202,6 +220,9 @@ const listQuoteRollupRows = async ({
     SELECT
       q.quotation_id AS "quotationId",
       q.status,
+      q.pricing_model AS "pricingModel",
+      q.commercial_model AS "commercialModel",
+      q.staffing_model AS "staffingModel",
       q.total_amount_clp AS "totalAmountClp",
       q.created_at AS "createdAt",
       CASE
@@ -225,6 +246,9 @@ const listQuoteRollupRows = async ({
   return rows.map((row): DealQuoteRollupRow => ({
     quotationId: String(row.quotationId),
     status: String(row.status),
+    pricingModel: row.pricingModel ? String(row.pricingModel) : null,
+    commercialModel: row.commercialModel ? String(row.commercialModel) : null,
+    staffingModel: row.staffingModel ? String(row.staffingModel) : null,
     totalAmountClp: toNumber(row.totalAmountClp),
     createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
     hasApprovalEvidence: Boolean(row.hasApprovalEvidence)
@@ -284,6 +308,9 @@ export const buildDealPipelineSnapshot = async ({
 
     latestQuoteId: rollup.latestQuoteId,
     latestQuoteStatus: rollup.latestQuoteStatus,
+    latestQuotePricingModel: rollup.latestQuotePricingModel,
+    latestQuoteCommercialModel: rollup.latestQuoteCommercialModel,
+    latestQuoteStaffingModel: rollup.latestQuoteStaffingModel,
     quoteCount: rollup.quoteCount,
     approvedQuoteCount: rollup.approvedQuoteCount,
     totalQuotesAmountClp: rollup.totalQuotesAmountClp,
@@ -320,6 +347,9 @@ export const upsertDealPipelineSnapshot = async (row: DealPipelineSnapshotRow): 
       deal_owner_email: row.dealOwnerEmail,
       latest_quote_id: row.latestQuoteId,
       latest_quote_status: row.latestQuoteStatus,
+      latest_quote_pricing_model: row.latestQuotePricingModel,
+      latest_quote_commercial_model: row.latestQuoteCommercialModel,
+      latest_quote_staffing_model: row.latestQuoteStaffingModel,
       quote_count: row.quoteCount,
       approved_quote_count: row.approvedQuoteCount,
       total_quotes_amount_clp: row.totalQuotesAmountClp,
@@ -347,6 +377,9 @@ export const upsertDealPipelineSnapshot = async (row: DealPipelineSnapshotRow): 
       deal_owner_email: row.dealOwnerEmail,
       latest_quote_id: row.latestQuoteId,
       latest_quote_status: row.latestQuoteStatus,
+      latest_quote_pricing_model: row.latestQuotePricingModel,
+      latest_quote_commercial_model: row.latestQuoteCommercialModel,
+      latest_quote_staffing_model: row.latestQuoteStaffingModel,
       quote_count: row.quoteCount,
       approved_quote_count: row.approvedQuoteCount,
       total_quotes_amount_clp: row.totalQuotesAmountClp,

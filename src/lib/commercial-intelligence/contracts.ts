@@ -29,6 +29,8 @@ export interface PipelineSnapshotRow {
   quotedMarginPct: number | null
   businessLineCode: string | null
   pricingModel: string | null
+  commercialModel: string | null
+  staffingModel: string | null
   currency: string | null
 
   quoteDate: string | null
@@ -77,6 +79,9 @@ export interface DealPipelineSnapshotRow {
 
   latestQuoteId: string | null
   latestQuoteStatus: string | null
+  latestQuotePricingModel: string | null
+  latestQuoteCommercialModel: string | null
+  latestQuoteStaffingModel: string | null
   quoteCount: number
   approvedQuoteCount: number
   totalQuotesAmountClp: number | null
@@ -105,6 +110,9 @@ export interface ProfitabilitySnapshotRow {
 
   quotedTotalClp: number | null
   quotedMarginPct: number | null
+  pricingModel: string | null
+  commercialModel: string | null
+  staffingModel: string | null
 
   authorizedTotalClp: number | null
   invoicedTotalClp: number | null

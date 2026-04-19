@@ -1,3 +1,18 @@
+## Delta 2026-04-19 TASK-459 separa delivery model de quotation en dos ejes canónicos
+
+- Greenhouse ya no debe tratar `pricing_model` como source of truth suficiente para leer cómo se vende una quote.
+- Runtime nuevo:
+  - migración `20260419012226774_task-459-delivery-model-refinement.sql`
+  - helper `src/lib/commercial/delivery-model.ts`
+  - columnas `greenhouse_commercial.quotations.commercial_model` y `staffing_model`
+  - surfacing en `GET /api/finance/quotes`, `GET /api/finance/quotes/[id]`
+  - extensions en `quotation_pipeline_snapshots`, `quotation_profitability_snapshots` y `deal_pipeline_snapshots`
+- Contrato operativo:
+  - `commercial_model + staffing_model` pasa a ser la verdad canónica del delivery contract del quote
+  - `pricing_model` queda como alias legacy derivado para governance/templates/terms
+  - este `commercial_model` NO debe confundirse con `CommercialModelCode` del pricing engine comercial
+  - `sales_context_at_sent` ya preserva los tres campos para trazabilidad histórica
+
 ## Delta 2026-04-19 TASK-456 materializa forecasting comercial canónico a grain deal
 
 - Greenhouse ya no debe usar `quotation_pipeline_snapshots` como aproximación del pipeline comercial real cuando la pregunta es forecasting por oportunidad.

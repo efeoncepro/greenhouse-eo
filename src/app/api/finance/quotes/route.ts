@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 
+import {
+  resolveQuoteDeliveryModel,
+  type CommercialModel,
+  type StaffingModel
+} from '@/lib/commercial/delivery-model'
 import { withTransaction } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
@@ -99,6 +104,9 @@ const getLegacyQuotes = async ({
     source: String(r.source_system || 'manual'),
     hubspotQuoteId: r.hubspot_quote_id ? String(r.hubspot_quote_id) : null,
     hubspotDealId: r.hubspot_deal_id ? String(r.hubspot_deal_id) : null,
+    pricingModel: null,
+    commercialModel: null,
+    staffingModel: null,
     isFromNubox: Boolean(r.nubox_document_id)
   }))
 }
@@ -170,6 +178,8 @@ interface CreateQuotationPayload {
   internalNotes?: string | null
   lineItems?: QuotationLineInput[]
   pricingModel?: 'staff_aug' | 'retainer' | 'project'
+  commercialModel?: CommercialModel
+  staffingModel?: StaffingModel
   templateId?: string | null
 }
 
@@ -229,10 +239,14 @@ export async function POST(request: Request) {
   const quotationNumber = body.quotationNumber?.trim() || generateQuotationNumber()
   const createdBy = tenant.userId
 
-  const pricingModel =
-    body.pricingModel ||
-    (templateSnapshot?.defaults.pricingModel as 'staff_aug' | 'retainer' | 'project' | undefined) ||
-    'project'
+  const templatePricingModel =
+    templateSnapshot?.defaults.pricingModel as 'staff_aug' | 'retainer' | 'project' | undefined
+
+  const resolvedDeliveryModel = resolveQuoteDeliveryModel({
+    pricingModel: body.pricingModel ?? templatePricingModel ?? 'project',
+    commercialModel: body.commercialModel,
+    staffingModel: body.staffingModel
+  })
 
   const contractDurationMonths =
     body.contractDurationMonths !== undefined
@@ -251,6 +265,8 @@ export async function POST(request: Request) {
            space_id,
            business_line_code,
            pricing_model,
+           commercial_model,
+           staffing_model,
            status,
            current_version,
            currency,
@@ -275,15 +291,15 @@ export async function POST(request: Request) {
            space_resolution_source,
            created_by
          ) VALUES (
-           $1, $2, $3, $4, $5, $6, 'draft', 1,
-           $7, NULL, $8::jsonb, $9::date,
-           $10, $11, $12, $13,
-           'one_time', $14, 30, $15,
-           $16::date, $17::date, $18::date,
-           $19, $20,
+           $1, $2, $3, $4, $5, $6, $7, $8, 'draft', 1,
+           $9, NULL, $10::jsonb, $11::date,
+           $12, $13, $14, $15,
+           'one_time', $16, 30, $17,
+           $18::date, $19::date, $20::date,
+           $21, $22,
            'manual', $1,
            CASE WHEN $4 IS NOT NULL THEN 'explicit' ELSE 'unresolved' END,
-           $21
+           $23
          )
          RETURNING quotation_id`,
         [
@@ -292,7 +308,9 @@ export async function POST(request: Request) {
           body.organizationId ?? null,
           body.spaceId ?? null,
           resolvedBusinessLineCode,
-          pricingModel,
+          resolvedDeliveryModel.pricingModel,
+          resolvedDeliveryModel.commercialModel,
+          resolvedDeliveryModel.staffingModel,
           currency,
           JSON.stringify(body.exchangeRates ?? {}),
           body.exchangeSnapshotDate ?? null,
@@ -365,7 +383,7 @@ export async function POST(request: Request) {
   if (templateSnapshot && templateSnapshot.defaults.termIds.length > 0) {
     await seedQuotationDefaultTerms({
       quotationId,
-      pricingModel,
+      pricingModel: resolvedDeliveryModel.pricingModel,
       businessLineCode: resolvedBusinessLineCode,
       variables: {
         paymentTermsDays: templateSnapshot.defaults.paymentTermsDays,
@@ -405,6 +423,9 @@ export async function POST(request: Request) {
     {
       quotationId,
       quotationNumber,
+      pricingModel: resolvedDeliveryModel.pricingModel,
+      commercialModel: resolvedDeliveryModel.commercialModel,
+      staffingModel: resolvedDeliveryModel.staffingModel,
       currentVersion: snapshot.versionNumber,
       totals: snapshot.totals,
       revenue: snapshot.revenue,
