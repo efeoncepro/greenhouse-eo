@@ -550,3 +550,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-494` | `to-do` | HR Document Vault Convergence (EPIC-001) | `docs/tasks/to-do/TASK-494-hr-document-vault-convergence.md` |
 | `TASK-495` | `to-do` | Commercial & Legal Document Chain Convergence (EPIC-001) | `docs/tasks/to-do/TASK-495-commercial-legal-document-chain-convergence.md` |
 | `TASK-496` | `complete` | Quote Builder Deep Polish Sprint 1 | `docs/tasks/complete/TASK-496-quote-builder-deep-polish-sprint-1.md` |
+| `TASK-497` | `to-do` | Quote Builder Autosave + react-hook-form Migration (Sprint 2) | `docs/tasks/to-do/TASK-497-quote-builder-autosave-react-hook-form.md` |
+| `TASK-498` | `to-do` | UI Primitives Platform Extraction (Sprint 3) | `docs/tasks/to-do/TASK-498-ui-primitives-platform-extraction.md` |
+| `TASK-499` | `to-do` | Quote Builder Polish Backlog (audit remanente) | `docs/tasks/to-do/TASK-499-quote-builder-polish-backlog.md` |
