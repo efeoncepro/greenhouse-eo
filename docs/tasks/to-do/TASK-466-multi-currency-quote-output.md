@@ -1,5 +1,19 @@
 # TASK-466 — Multi-Currency Quote Output (Client View + PDF + Email)
 
+## Delta 2026-04-19 — Reanclaje a builder full-page
+
+La spec original asumía que el selector de `output_currency` vivía y seguiría viviendo en `QuoteCreateDrawer`. Esa superficie ya quedó chica para el quote builder y el programa ahora formaliza el pivot en `TASK-473`.
+
+**Ajuste canónico:**
+
+1. `TASK-466` ya no diseña el preview/switching alrededor del drawer legacy.
+2. Las superficies objetivo pasan a ser:
+   - `/finance/quotes/new`
+   - `/finance/quotes/[id]/edit`
+   - `/finance/quotes/[id]` como review/governance con toggle interno
+3. El PDF/email client-facing sigue siendo ownership de esta task, pero la integración UI en create/edit queda bloqueada por `TASK-473`.
+4. El selector interno de moneda y cualquier preview de salida debe montarse en el builder full-page y reutilizar la boundary nueva entre build/edit vs review/lifecycle.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -14,18 +28,20 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-464d (engine v2 with multi-currency output), TASK-464e (UI with currency selector)`
+- Blocked by: `TASK-464d (engine v2 with multi-currency output), TASK-464e (UI with currency selector), TASK-473 (builder full-page surface migration)`
 - Branch: `task/TASK-466-multi-currency-quote-output`
 - Legacy ID: `parte de revenue pricing program`
 - GitHub Issue: `none`
 
 ## Summary
 
-Propagar multi-currency output al cliente: la quote se persiste en USD (canonical) + output_currency seleccionado (CLP/CLF/COP/MXN/PEN). El cliente la ve, recibe el PDF y el email en SU moneda (ej. Pinturas Berel en MXN, Sky en CLP). Internal users ven ambas (USD + local). Footer del documento muestra exchange rate usado + fecha para transparencia.
+Propagar multi-currency output al cliente: la quote se persiste en USD (canonical) + `output_currency` seleccionado (CLP/CLF/COP/MXN/PEN). El cliente la ve, recibe el PDF y el email en SU moneda (ej. Pinturas Berel en MXN, Sky en CLP). Internal users ven ambas (USD + local). Footer del documento muestra exchange rate usado + fecha para transparencia. La integración UI debe vivir en el builder full-page y en la vista de review, no en el drawer legacy.
 
 ## Why This Task Exists
 
-TASK-464d genera output multi-currency desde el engine; TASK-464e permite seleccionar `output_currency` en el drawer. Pero el **rendering al cliente** todavía está hardcoded a CLP (default Efeonce Chile). Un cliente México recibe quote en CLP y no sabe convertir. Un cliente Colombia igual. Europa USD recibe USD pero no ve tabla de conversión.
+TASK-464d genera output multi-currency desde el engine; TASK-464e expuso la selección de `output_currency`, pero el **rendering al cliente** todavía está hardcoded a CLP (default Efeonce Chile). Un cliente México recibe quote en CLP y no sabe convertir. Un cliente Colombia igual. Europa USD recibe USD pero no ve tabla de conversión.
+
+Además, la surface de composición actual quedó anclada al drawer legacy; `TASK-473` corrige eso moviendo el builder a páginas dedicadas. `TASK-466` debe aterrizar directamente sobre esa surface correcta para no invertir esfuerzo en una UI transitoria.
 
 Con 85% retainer recurrente + Pinturas Berel México cerrándose + expansion LATAM, la multi-currency output es UX crítica para experiencia profesional.
 
@@ -35,7 +51,8 @@ Con 85% retainer recurrente + Pinturas Berel México cerrándose + expansion LAT
 - API responses incluyen precios en la moneda de output
 - PDF renderiza en output_currency con footer explicativo
 - Email renderiza igual + breakdown currency summary
-- Internal viewers ven toggle "USD / Cliente currency" en QuoteDetailView
+- Internal viewers ven toggle "USD / Cliente currency" en `QuoteDetailView`
+- Create/edit surfaces (`/finance/quotes/new`, `/finance/quotes/[id]/edit`) exponen preview consistente con la moneda de salida
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -66,12 +83,14 @@ Reglas obligatorias:
 
 - TASK-464d — engine v2 con multi-currency
 - TASK-464e — UI currency selector
+- TASK-473 — builder full-page como surface correcta de create/edit
 - `greenhouse_finance.exchange_rates` poblado con rates recientes
 
 ### Blocks / Impacts
 
 - TASK-462 — MRR/ARR reporting puede filtrar por output_currency
 - Client portal views — UI para ver quotes en su moneda
+- Quote builder surfaces — preview y review deben quedar consistentes entre create/edit/detail
 - TASK-348 governance — approval policies quizás quieren threshold in USD canonical, no en output currency (clarificar)
 
 ### Files owned
@@ -81,6 +100,7 @@ Reglas obligatorias:
 - `src/lib/finance/pdf/quotation-pdf-document.tsx` (idem)
 - `src/lib/email/templates/quote-sent.tsx` (refactor)
 - `src/lib/finance/quote-to-cash/document-chain-reader.ts` (retornar en output_currency + USD)
+- `src/views/greenhouse/finance/QuoteBuilderPageView.tsx` (preview/switching interno en full-page)
 - `src/views/greenhouse/finance/QuoteDetailView.tsx` (toggle USD / local)
 - `src/types/db.d.ts` (auto-regen)
 
@@ -105,9 +125,9 @@ Reglas obligatorias:
 
 ## UI Plan
 
-Esta task implementa UI descrita en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)**. Consumir en lugar de re-especificar:
+Esta task implementa UI descrita en **[TASK-469](TASK-469-commercial-pricing-ui-interface-plan.md)** y debe montarse sobre la surface full-page formalizada por `TASK-473`. Consumir en lugar de re-especificar:
 
-- **Surface E — Quote Preview + Multi-currency**: reusa `full-version/src/views/apps/invoice/preview/PreviewCard.tsx` + `PreviewActions.tsx` + `print.css`. CurrencySwitcher en sidebar.
+- **Surface E — Quote Preview + Multi-currency**: reusa `full-version/src/views/apps/invoice/preview/PreviewCard.tsx` + `PreviewActions.tsx` + `print.css`. CurrencySwitcher en sidebar del builder full-page o en la vista de review, no dentro de `QuoteCreateDrawer`.
 - **CurrencySwitcher**: nuevo en `src/components/greenhouse/pricing/CurrencySwitcher.tsx`. Props en TASK-469 §3.5. Muestra disclaimer de tasa cuando difiere de la canónica.
 - **Regla diseño** (TASK-469 Open Questions): cliente ve solo moneda canónica; vista interna muestra selector con disclaimer `"Vista interna — la cotización enviada usa {canónica} (tasa {rate} al {asOf})"`.
 - **QuotePdfDocument**: usar `@react-pdf/renderer` (ya instalado). PDF siempre en la moneda canónica snapshot, nunca recalculado.
@@ -171,9 +191,10 @@ ALTER TABLE greenhouse_commercial.quotations
 
 ### Slice 6 — UI internal toggle
 
-- `QuoteDetailView.tsx`:
+- `QuoteBuilderPageView.tsx` y `QuoteDetailView.tsx`:
   - Para internal users (finance/admin): toggle "Ver en USD" / "Ver en {outputCurrency}"
-  - Default: output_currency (lo que ve el cliente)
+  - En create/edit el preview usa la misma regla que el documento emitido
+  - En detail/review el default es `output_currency` (lo que ve el cliente)
   - Switch muestra mismo data en USD para reconciliación/comparación
 
 ### Slice 7 — Document chain + downstream

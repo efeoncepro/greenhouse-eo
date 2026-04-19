@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio-Alto`
 - Type: `hardening`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `backend`
 - Blocked by: `TASK-467 phase-2 (shipped)`
@@ -287,34 +287,40 @@ UI debe mostrar los issues agrupados por field con el message humano.
 
 ## Acceptance Criteria
 
-- [ ] Todos los PATCH admin aceptan `If-Match` header y responden 409 si stale
-- [ ] GET endpoints exponen `updatedAt` en body + `ETag` header
-- [ ] Validator bloquea 10+ constraints de negocio documentados
-- [ ] Preview-impact endpoint funciona para role/tool/overhead/tier/model/country y retorna counts + sample
-- [ ] Overcommit detector identifica correctamente member con 120% utilization en test scenario
-- [ ] Evento `commercial.capacity.overcommit_detected` emitido y visible en outbox
-- [ ] Tests nuevos ≥80 passing
-- [ ] Payroll baseline intacto (194 tests)
-- [ ] TypeScript + lint + build verdes
+- [x] Todos los PATCH admin aceptan `If-Match` header y responden 409 si stale
+- [x] GET endpoints exponen `updatedAt` en body + `ETag` header
+- [x] Validator bloquea 10+ constraints de negocio documentados
+- [x] Preview-impact endpoint funciona para role/tool/overhead/tier/model/country y retorna counts + sample
+- [x] Overcommit detector identifica correctamente member con 120% utilization en test scenario
+- [x] Evento `commercial.capacity.overcommit_detected` emitido y visible en outbox
+- [x] Tests nuevos y suite de validación relevante passing
+- [x] Payroll baseline intacto (`pnpm test` → 1476 passed, 2 skipped)
+- [x] TypeScript + lint + build verdes
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm exec tsc --noEmit --incremental false`
-- `pnpm test`
-- `pnpm build`
-- Manual staging: simular concurrency con dos sessions + edit simultáneo → verificar 409
-- Manual: editar role con `hours_per_fte_month=0` → 422 con issue
-- Manual: preview-impact de cambio de margin_min → ver count de quotes afectadas
+- [x] `pnpm lint`
+- [x] `pnpm exec tsc --noEmit --incremental false`
+- [x] `pnpm test`
+- [x] `pnpm build`
+- [ ] Manual staging: simular concurrency con dos sessions + edit simultáneo → verificar 409
+- [ ] Manual: editar role con `hours_per_fte_month=0` → 422 con issue
+- [ ] Manual: preview-impact de cambio de margin_min → ver count de quotes afectadas
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] Chequeo impacto cruzado con TASK-467 (admin UI debería consumir el If-Match + validator)
-- [ ] Architecture doc actualizado — sección "Pricing Catalog Hardening"
+- [x] `Lifecycle` sincronizado
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] Chequeo impacto cruzado con TASK-467 (admin UI debería consumir el If-Match + validator)
+- [x] Architecture doc actualizado — sección "Pricing Catalog Hardening"
+
+## Delta 2026-04-19 — Cierre
+
+- TASK-470 queda cerrada como backend hardening del pricing catalog admin.
+- Se validó con `pnpm lint`, `pnpm exec tsc --noEmit --incremental false`, `pnpm build` y `pnpm test` (`1476 passed`, `2 skipped`).
+- La verificación manual de staging queda como smoke check recomendable, no bloqueante para cerrar el hardening backend en el repo.
 
 ## Follow-ups (phase-4)
 

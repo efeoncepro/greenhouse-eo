@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — Realineamiento del programa de cotizaciones hacia builder full-page (Codex)
+
+- **Owner:** Codex
+- **Estado:** ajuste documental del programa; **sin cambios de runtime**
+- **Decisión de producto/UI:** el quote builder ya no debe seguir creciendo dentro de `QuoteCreateDrawer`. La dirección canónica vuelve a la Surface A de `TASK-469`: `/finance/quotes/new` y `/finance/quotes/[id]/edit` como builder full-page; `/finance/quotes/[id]` queda para review / governance / lifecycle.
+- **Task nueva creada:** `TASK-473 — Quote Builder Full-Page Surface Migration & Flow Recomposition`
+- **Backlog realineado:**
+  - `TASK-466` queda explícitamente bloqueada por `TASK-473` y se reancla al builder full-page + detail review
+  - `TASK-465` deja de referenciar `QuoteCreateDrawer` como surface principal y pasa a montar su picker dentro del builder canónico
+  - `TASK-473` endurece su contrato: el builder nuevo debe reconectar explícitamente catálogo, servicios, templates y manual como fuentes de composición
+  - `TASK-474` queda creada como red de seguridad post-merge si `TASK-465` y `TASK-473` aterrizan bien técnicamente pero todavía se perciben desconectadas en la UX final
+  - `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` quedaron sincronizados con `TASK-473`, `TASK-474` y con `TASK-465` en `in-progress`
+- **Importante:** `TASK-471` no se tocó a nivel de scope; sigue siendo pricing catalog admin polish, no quote-builder UX
+- **Riesgo evitado:** sin este ajuste, los follow-ons del módulo de cotizaciones seguían diseñándose sobre una surface transitoria y sobredensa
+
+## Sesion 2026-04-19 — TASK-470 formalmente cerrada (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Cierre formal:** la task ya no queda en `to-do`; se movió a `docs/tasks/complete/`.
+- **Validación final adicional corrida hoy:** `pnpm test` completo verde (`318` files, `1476` tests passed, `2` skipped).
+- **Conclusión:** no quedaba gap backend material en el scope de TASK-470; lo pendiente era sincronizar lifecycle/documentación con el estado real del repo.
+
 ## Sesion 2026-04-19 — E2E smoke test completo + ISSUE-054 detectado (Claude)
 
 - **Owner:** Claude
@@ -16,7 +39,7 @@
 ## Sesion 2026-04-19 — TASK-470 Pricing Catalog Enterprise Hardening (Codex)
 
 - **Owner:** Codex
-- **Estado:** implemented y validado; promoción a rama/PR desde worktree aislado para no tocar el checkout compartido en `develop`
+- **Estado:** implemented and locally validated on shared `develop`; **no commit / no push** por trabajo paralelo con Claude en el mismo checkout
 - **Scope shipped:**
   - Helper nuevo `src/lib/tenant/optimistic-locking.ts` + test `optimistic-locking.test.ts`
   - Validator central `src/lib/commercial/pricing-catalog-constraints.ts` + tests para monotonicidad/rangos
@@ -40,7 +63,7 @@
   - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'` → sin matches
 - **Heads-up:**
   - `pnpm build` sigue mostrando warnings preexistentes de Dynamic Server Usage bajo `(dashboard)`, pero terminó exit `0`
-  - El merge/cierre de esta task se hizo desde worktree aislado para convivir con trabajo paralelo de Claude en el checkout principal
+  - Como el checkout compartido está en `develop` y el user avisó trabajo paralelo con Claude, dejé el cambio listo sin `git commit`/`git push`
 
 ## Sesion 2026-04-19 — TASK-462 MRR/ARR Contractual Projection & Dashboard (cierre)
 
