@@ -11,7 +11,7 @@
 - HubSpot sync simplificado: `resolveSpaceForCompany` → `resolveOrganizationForCompany`. Gate ahora es "company tiene org mapeada" no "tiene space mapeado"; payload de `quote.synced` deja de llevar `spaceId`.
 - Quote Builder UI: label "Espacio destinatario" → "Organización (cliente o prospecto)"; segundo dropdown "Contacto" con fetch async al seleccionar org (ordenado `is_primary DESC`, marcador "Principal"). Payload del save incluye `contactIdentityProfileId`. Detail response del GET canonical expone `organization` + `contact` como objetos.
 - Docs: `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.23; `docs/documentation/finance/cotizador.md` → v3 con regla "A quién se le cotiza" explícita.
-- Pending: smoke staging post-deploy (task sigue en `in-progress` hasta verificación end-to-end con agent-session).
+- **Cerrada 2026-04-19** tras 7/7 smoke tests verdes en staging (POST validation, GET contacts real data, GET detail con `organization` + `contact` poblados). Fix intermedio en `resolveFinanceQuoteTenantOrganizationIds` (early-return de `efeonce_internal` al tope antes del self-check de `tenant.organizationId`) pusheado como parte del mismo tren (`48fd0ae6`).
 
 ### 2026-04-19 — fix(quotes): POST /api/finance/quotes now saves
 

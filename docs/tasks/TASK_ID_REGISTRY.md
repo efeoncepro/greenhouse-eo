@@ -539,4 +539,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-483` | `complete` | Commercial Cost Basis Engine Runtime Topology & Worker Foundation | `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md` |
 | `TASK-484` | `complete`    | FX Provider Adapter Platform | `docs/tasks/complete/TASK-484-fx-provider-adapter-platform.md` |
 | `TASK-485` | `to-do`       | FX Coverage Rollout (manual_only → auto_synced) | `docs/tasks/to-do/TASK-485-fx-coverage-rollout.md` |
-| `TASK-486` | `to-do`       | Commercial Quotation Canonical Anchor (Organization + Contact) | `docs/tasks/to-do/TASK-486-commercial-quotation-canonical-anchor.md` |
+| `TASK-486` | `complete`    | Commercial Quotation Canonical Anchor (Organization + Contact) | `docs/tasks/complete/TASK-486-commercial-quotation-canonical-anchor.md` |

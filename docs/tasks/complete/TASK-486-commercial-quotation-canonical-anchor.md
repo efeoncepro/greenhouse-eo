@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `En implementacion`
+- Status real: `Complete — smoke staging 7/7 verdes (2026-04-19)`
 - Rank: `TBD`
 - Domain: `finance / commercial`
 - Blocked by: `none` (foundation ya existe)

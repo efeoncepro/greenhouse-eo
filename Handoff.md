@@ -3,7 +3,7 @@
 ## Sesion 2026-04-19 — TASK-486 Commercial Quotation Canonical Anchor (Organization + Contact) (Claude)
 
 - **Owner:** Claude
-- **Estado:** `in-progress` — implementación completa, pending smoke test en staging post-deploy.
+- **Estado:** **`complete` — cerrada 2026-04-19 con 7/7 smoke tests verdes en staging.**
 - **Rama:** `develop`.
 - **Scope entregado:**
   - **Migration** `20260419144036463_task-486-quotation-canonical-anchor.sql`: agrega `greenhouse_commercial.quotations.contact_identity_profile_id` con FK a `greenhouse_core.identity_profiles(profile_id)` (ON DELETE SET NULL) + index parcial. Backfill de `organization_id` desde `client_profiles` + `spaces` para legacy rows. `space_id` y `space_resolution_source` marcadas DEPRECATED via COMMENT (no drop físico — quote-to-cash legacy readers aún leen space_id post-conversion). `organization_id` queda NULLABLE a nivel DB (backfill preservó orphans legacy sin data loss); enforcement se mueve a la capa API. Index nuevo `idx_commercial_quotations_organization_status`.
@@ -30,10 +30,19 @@
 - Migración aplicada en staging DB (via `pg:connect:migrate`)
 - Tipos regenerados via `pnpm db:generate-types`
 
-### Pending post-deploy
+### Smoke staging — cerrado 2026-04-19 (7/7 verdes)
 
-- **Smoke staging**: crear quote end-to-end con agent-session verificando 201 + objeto `contact` en response. Confirmar builder UI muestra los dos dropdowns en `dev-greenhouse.efeoncepro.com/finance/quotes/new`.
-- **HubSpot sync dry-run**: validar que el próximo sync no rompe por falta de space mapping.
+- T1 `POST /api/finance/quotes` sin `organizationId` → 400 "organizationId es obligatorio." ✅
+- T2 `POST` con `organizationId` inexistente (`org-NOPE`) → 404 "Organization org-NOPE no existe o está inactiva." ✅
+- T3 `POST` con `organizationId` válida → 201 con `quotationId`. ✅
+- T4 `GET /api/commercial/organizations/{orgId}/contacts` → 200 con 1 item real (Nicolas Barrientos, client_contact de Gobierno regional RM). ✅
+- T5 `POST` con `contactIdentityProfileId` que no tiene membership → 400 "contactIdentityProfileId no tiene una membership activa en esa organización." ✅
+- T6 `GET /api/finance/quotes/{id}` de quote creada sin contacto → `organization: {id, name, type='client'}`, `contact: null`. ✅
+- T7 `POST` con org + contacto válido → 201; `GET` detail devuelve `contact: { identityProfileId, fullName: 'Nicolas Barrientos', canonicalEmail, roleLabel: 'Social Development Analyst' }`. ✅
+
+### Fix post-deploy aplicado (commit 48fd0ae6)
+
+Smoke T4 inicialmente falló con 403 porque el resolver `resolveFinanceQuoteTenantOrganizationIds` chequeaba `tenant.organizationId` ANTES del early-return de `efeonce_internal`. Un agent/admin user cuya session trae su propia org quedaba limitado a esa. Movido el early-return de internal al tope del resolver (mismo patrón que ya usaba `resolveFinanceQuoteTenantSpaceIds`). Smoke re-ejecutado verde.
 
 ### Cross-impact
 
