@@ -2,6 +2,14 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-460 introduce Contracts como anchor canónico post-venta
+
+- Nace `greenhouse_commercial.contracts` como entidad operativa separada de quotation, con identificador visible `EO-CTR-*`, lifecycle propio y tabla join `contract_quotes` para convivir con múltiples quotes históricas bajo un mismo contrato lógico.
+- El document chain deja de depender solo de `quotation_id`: `purchase_orders`, `service_entry_sheets` e `income` ahora materializan también `contract_id`, y el reader nuevo `readContractDocumentChain({ contractId })` agrega toda la cadena del contrato.
+- La lane de rentabilidad y renovaciones ya tiene grain contractual: `greenhouse_serving.contract_profitability_snapshots`, `greenhouse_commercial.contract_renewal_reminders` y eventos `commercial.contract.*`.
+- Aparecen APIs tenant-safe `/api/finance/contracts/**` y la surface inicial `/finance/contracts`, con overview, quotes relacionadas, document chain y rentabilidad del contrato.
+- La convivencia queda explícita: quotation sigue siendo el artefacto pre-venta; contract pasa a ser el anchor post-aceptación para execution, renewal y futuras métricas de MRR/ARR.
+
 ### 2026-04-19 — TASK-459 separa el delivery model de quotation en dos ejes persistidos
 
 - `greenhouse_commercial.quotations` ahora materializa `commercial_model` y `staffing_model`, dejando `pricing_model` como alias legacy derivado para compatibility con governance/templates/terms.

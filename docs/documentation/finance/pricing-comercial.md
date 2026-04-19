@@ -141,7 +141,7 @@ El programa se implementa en olas para no romper flujos vivos:
 3. **Ola 3** — copy canónico + scaffolds UI: TASK-469 Slice 4 (ya completado)
 4. **Ola 4** — UI builder + admin: TASK-464e (quote builder pickers + cost stack), TASK-465 (service composition), TASK-467 (admin UI)
 5. **Ola 5** — integración externa: TASK-463 (HubSpot bidirectional), TASK-466 (multi-currency PDF + email)
-6. **Ola 6** — revenue pipeline hybrid: TASK-453..457 + TASK-460..462 (contract/SOW/MSA, MRR/ARR, pipeline UI)
+6. **Ola 6** — revenue pipeline hybrid: TASK-453..457 + TASK-460..462 (contract/SOW/MSA, MRR/ARR, pipeline UI). Estado actual: TASK-453, TASK-454, TASK-455, TASK-456, TASK-459 y TASK-460 ya están implementadas; quedan abiertos principalmente TASK-457, TASK-461 y TASK-462 para cerrar la vista unificada y la capa contractual ejecutiva.
 
 Durante Ola 2-3 el portal sigue usando el engine v1 y el flow de cotización legacy. La migración al engine v2 + UI nueva ocurre en Ola 4 con feature flag; el legacy queda deprecado en Ola 5.
 

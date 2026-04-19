@@ -135,6 +135,102 @@ export interface RenewalReminderRow {
   lastEventType: string | null
 }
 
+export type ContractStatus =
+  | 'draft'
+  | 'active'
+  | 'paused'
+  | 'terminated'
+  | 'completed'
+  | 'renewed'
+
+export type ContractQuoteRelationshipType =
+  | 'originator'
+  | 'renewal'
+  | 'modification'
+  | 'cancellation'
+
+export interface ContractListRow {
+  contractId: string
+  contractNumber: string
+  clientId: string | null
+  clientName: string | null
+  organizationId: string | null
+  spaceId: string | null
+  status: ContractStatus
+  commercialModel: string | null
+  staffingModel: string | null
+  startDate: string
+  endDate: string | null
+  autoRenewal: boolean
+  renewalFrequencyMonths: number | null
+  mrrClp: number | null
+  arrClp: number | null
+  tcvClp: number | null
+  acvClp: number | null
+  currency: string | null
+  originatorQuoteId: string | null
+  originatorQuoteNumber: string | null
+  quotesCount: number
+  linkedDocumentCount: number
+  updatedAt: string
+}
+
+export interface ContractQuoteRow {
+  contractId: string
+  quotationId: string
+  quotationNumber: string | null
+  quoteStatus: string | null
+  relationshipType: ContractQuoteRelationshipType
+  effectiveFrom: string | null
+  effectiveTo: string | null
+  quoteDate: string | null
+  totalAmountClp: number | null
+  pricingModel: string | null
+  commercialModel: string | null
+  staffingModel: string | null
+}
+
+export interface ContractDetailRow extends ContractListRow {
+  signedAt: string | null
+  terminatedAt: string | null
+  terminatedReason: string | null
+  renewedAt: string | null
+  exchangeRateToClp: number | null
+  quotes: ContractQuoteRow[]
+  reminder: ContractRenewalReminderRow | null
+}
+
+export interface ContractProfitabilitySnapshotRow {
+  contractId: string
+  periodYear: number
+  periodMonth: number
+  clientId: string | null
+  organizationId: string | null
+  spaceId: string | null
+  quotedTotalClp: number | null
+  quotedMarginPct: number | null
+  pricingModel: string | null
+  commercialModel: string | null
+  staffingModel: string | null
+  authorizedTotalClp: number | null
+  invoicedTotalClp: number | null
+  realizedRevenueClp: number | null
+  attributedCostClp: number | null
+  effectiveMarginPct: number | null
+  marginDriftPct: number | null
+  driftSeverity: DriftSeverity
+  driftDrivers: DriftDrivers
+  materializedAt: string
+}
+
+export interface ContractRenewalReminderRow {
+  contractId: string
+  lastReminderAt: string | null
+  reminderCount: number
+  nextCheckAt: string | null
+  lastEventType: string | null
+}
+
 export const PIPELINE_STAGE_PROBABILITY: Record<PipelineStage, number> = {
   draft: 10,
   in_review: 25,

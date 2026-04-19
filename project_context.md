@@ -1,3 +1,19 @@
+## Delta 2026-04-19 TASK-460 materializa contract como entidad canónica post-venta
+
+- Greenhouse ya no debe tratar `quotation_id` como único anchor válido para todo el lifecycle comercial después de la aceptación.
+- Runtime nuevo:
+  - migración `20260419071250347_task-460-contract-sow-canonical-entity.sql`
+  - tablas `greenhouse_commercial.contracts`, `greenhouse_commercial.contract_quotes`, `greenhouse_serving.contract_profitability_snapshots`, `greenhouse_commercial.contract_renewal_reminders`
+  - columnas `contract_id` en `greenhouse_finance.purchase_orders`, `greenhouse_finance.service_entry_sheets` e `greenhouse_finance.income`
+  - helpers `src/lib/commercial/contracts-store.ts`, `src/lib/commercial/contract-lifecycle.ts`
+  - endpoints `GET/POST /api/finance/contracts`, `GET /api/finance/contracts/[id]`, `GET /api/finance/contracts/[id]/document-chain`, `GET /api/finance/contracts/[id]/profitability`
+- Contrato operativo:
+  - `quotation` sigue siendo el artefacto pre-venta y de pricing
+  - `contract` pasa a ser el anchor canónico post-venta para document chain, profitability y renewals
+  - durante la transición ambos anchors coexisten y los consumers nuevos deben preferir `contract_id` cuando el caso de uso sea ejecución/rentabilidad/renovación
+  - `msa_id` queda reservado como referencia futura; no hay FK real hasta TASK-461
+  - toda lectura portal sigue tenant-scoped por `space_id`
+
 ## Delta 2026-04-19 TASK-459 separa delivery model de quotation en dos ejes canónicos
 
 - Greenhouse ya no debe tratar `pricing_model` como source of truth suficiente para leer cómo se vende una quote.

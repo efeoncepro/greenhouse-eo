@@ -99,6 +99,8 @@ export const AGGREGATE_TYPES = {
   // Commercial Quotation (canonical, TASK-347 cutover)
   quotation: 'quotation',
   quotationLineItem: 'quotation_line_item',
+  contract: 'contract',
+  contractQuote: 'contract_quote',
   deal: 'deal',
   productCatalog: 'product_catalog',
   sellableRole: 'sellable_role',
@@ -361,6 +363,16 @@ export const EVENT_TYPES = {
   quotationRenewalDue: 'commercial.quotation.renewal_due',
   quotationPipelineMaterialized: 'commercial.quotation.pipeline_materialized',
   quotationProfitabilityMaterialized: 'commercial.quotation.profitability_materialized',
+
+  // Commercial Contracts (TASK-460)
+  contractCreated: 'commercial.contract.created',
+  contractActivated: 'commercial.contract.activated',
+  contractRenewed: 'commercial.contract.renewed',
+  contractModified: 'commercial.contract.modified',
+  contractTerminated: 'commercial.contract.terminated',
+  contractCompleted: 'commercial.contract.completed',
+  contractRenewalDue: 'commercial.contract.renewal_due',
+  contractProfitabilityMaterialized: 'commercial.contract.profitability_materialized',
 
   // Unified Quote Builder HubSpot bidirectional outbound (TASK-463)
   quotationPushedToHubSpot: 'commercial.quotation.pushed_to_hubspot',

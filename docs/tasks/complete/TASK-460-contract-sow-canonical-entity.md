@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-459 (delivery model refinement)`
@@ -21,7 +21,7 @@
 
 ## Summary
 
-Introducir `greenhouse_commercial.contracts` (SOWs) como entidad canónica post-venta separada de quotation. Anchor stable para document chain, profitability y renewal — especialmente crítico para los retainers (85% del revenue) que pueden tener múltiples quotes históricas bajo un mismo contrato lógico que renueva implícita o explícitamente.
+Introducir `greenhouse_commercial.contracts` (SOWs) como entidad canónica post-venta separada de quotation. Anchor estable para document chain, profitability y renewal, especialmente crítico para los retainers (85% del revenue) que pueden tener múltiples quotes históricas bajo un mismo contrato lógico que renueva implícita o explícitamente.
 
 ## Why This Task Exists
 
@@ -38,9 +38,9 @@ Con 85% retainer + nadie puede responder MRR/ARR sin Excel + SOWs reales con Sky
 
 - `greenhouse_commercial.contracts` existe como first-class entity con lifecycle propio
 - Un contrato puede referenciar N quotes (originator, renewals, modifications)
-- Document chain (TASK-350) migrado a anchor en `contract_id`
-- Profitability tracking (TASK-351) migrado a contract × período (en vez de quote × período)
-- Renewal lifecycle (TASK-351) migrado a contract-level (retainer auto-renueva hasta terminación; project renueva con nueva quote)
+- Document chain (TASK-350) soporta `contract_id` como anchor canónico sin romper convivencia temporal con `quotation_id`
+- Profitability tracking (TASK-351) agrega grain `contract × período` sin remover de inmediato el grain `quote × período`
+- Renewal lifecycle (TASK-351) agrega contract-level; el sweep quote-grain se mantiene durante la transición
 - MRR/ARR computable desde `contracts` activos
 - UI (TASK-457) "Contrato" row = contract activo, no standalone quote
 
@@ -62,6 +62,8 @@ Reglas obligatorias:
 - Un Contract puede tener N Quotes (M:N via tabla join `contract_quotes`)
 - Lifecycle bien definido: `draft → active → paused → terminated / completed / renewed`
 - Retrocompat: TASK-350/351 siguen funcionando durante la migración (doble anchor temporal)
+- `docs/architecture/schema-snapshot-baseline.sql` sirve solo como referencia histórica; el schema comercial vigente debe validarse contra migraciones y runtime actual
+- `contract_id` puede ser técnico interno (`ctr-<uuid>`), pero el identificador de negocio visible debe seguir convención `EO-*`
 
 ## Normative Docs
 
@@ -77,7 +79,7 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- TASK-461 — MSA (contract.msa_id FK)
+- TASK-461 — MSA (`contract.msa_id` reservado como referencia futura; FK real se agrega cuando exista la entidad)
 - TASK-462 — MRR/ARR (contract es el grain correcto)
 - TASK-350 refactor — document chain re-anclada en contract
 - TASK-351 refactor — profitability + renewal re-anclados en contract
@@ -104,6 +106,7 @@ Reglas obligatorias:
 - TASK-350 document chain anchored en quote
 - TASK-351 profitability/renewal anchored en quote
 - TASK-459 split del delivery model
+- El schema baseline en `docs/architecture/schema-snapshot-baseline.sql` está desactualizado para el dominio commercial; la fuente operativa real son las migraciones vigentes
 
 ### Gap
 
@@ -121,10 +124,10 @@ Reglas obligatorias:
 ### Slice 1 — Schema + lifecycle
 
 - `greenhouse_commercial.contracts`:
-  - `contract_id` PK (formato `ctr-<uuid>`)
-  - `contract_number` human-readable
+  - `contract_id` PK técnico interno (formato `ctr-<uuid>`)
+  - `contract_number` human-readable con convención visible `EO-CTR-*`
   - `client_id` FK, `organization_id`, `space_id`
-  - `msa_id` FK opcional (NULL hasta TASK-461)
+  - `msa_id` referencia opcional nullable (sin FK real hasta TASK-461)
   - `commercial_model` (inherit de quote originator)
   - `staffing_model` (inherit de quote originator)
   - `status` enum: `draft / active / paused / terminated / completed / renewed`
@@ -161,13 +164,14 @@ Reglas obligatorias:
 ### Slice 3 — Refactor document chain (TASK-350) a anchor contract
 
 - `quote-to-cash/document-chain-reader.ts` — agregar variante `readContractDocumentChain({ contractId })` que retorna todos los POs/HES/incomes de TODAS las quotes del contract
-- Mantener reader por quote durante ventana de coexistencia
+- Mantener reader por quote durante ventana de coexistencia; ningún consumer existente debe romperse en este corte
 - `purchase_orders.contract_id`, `service_entry_sheets.contract_id`, `income.contract_id` — nullable FKs agregadas
 - Backfill: para cada contract creado via promoteQuoteToContract, propagar `contract_id` a sus POs/HES/incomes existentes via `quotation_id` chain
 
 ### Slice 4 — Refactor profitability + renewal (TASK-351) a anchor contract
 
-- `quotation_profitability_snapshots` → migrar gradualmente a `contract_profitability_snapshots` con grain `(contract_id, period_year, period_month)`
+- `quotation_profitability_snapshots` convive temporalmente con `contract_profitability_snapshots`; la migración es gradual, no destructiva
+- `contract_profitability_snapshots` usa grain `(contract_id, period_year, period_month)`
 - `renewal-lifecycle.ts` sweep → itera sobre `contracts WHERE status='active' AND end_date IS NOT NULL`
   - Retainer con `auto_renewal=TRUE` → no emite `renewal_due` hasta `terminated_at`
   - Contract con `end_date` próxima → emite `commercial.contract.renewal_due`
@@ -186,9 +190,8 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- MSA (TASK-461)
+- FK real de MSA / clause library (TASK-461)
 - MRR/ARR dashboard ejecutivo (TASK-462)
-- Clause library (TASK-461)
 - Refactor completo removiendo quote anchors legacy — en este corte queda doble anchor durante transición
 
 ## Detailed Spec
@@ -198,11 +201,11 @@ Reglas obligatorias:
 ```sql
 CREATE TABLE greenhouse_commercial.contracts (
   contract_id text PRIMARY KEY DEFAULT 'ctr-' || gen_random_uuid(),
-  contract_number text UNIQUE NOT NULL,
+  contract_number text UNIQUE NOT NULL, -- visible: EO-CTR-*
   client_id text REFERENCES greenhouse_core.clients(client_id) ON DELETE RESTRICT,
   organization_id text,
   space_id text,
-  msa_id text,  -- FK a TASK-461, nullable
+  msa_id text,  -- referencia futura a TASK-461, nullable y sin FK en este corte
   commercial_model text NOT NULL CHECK (commercial_model IN ('retainer', 'project', 'one_off')),
   staffing_model text NOT NULL CHECK (staffing_model IN ('named_resources', 'outcome_based', 'hybrid')),
   status text NOT NULL DEFAULT 'draft'
@@ -311,6 +314,7 @@ contractRenewalDue: 'commercial.contract.renewal_due',
 - [ ] Schema + backfill aplica idempotente
 - [ ] Cada quote `approved|converted|sent` tiene 1 contract asociado post-backfill
 - [ ] POs/HES/incomes existentes tienen `contract_id` poblado via la quote originator
+- [ ] Los readers/APIs quote-grain existentes siguen operando durante la coexistencia con contract-grain
 - [ ] Promoción automática: al hacer `POST /api/finance/quotes/[id]/convert-to-invoice` (TASK-350) se crea contract si no existe
 - [ ] `listActiveContracts({ tenant })` devuelve solo contracts con `status='active'`
 - [ ] Retainer contract con `end_date IS NULL` no se marca como `renewal_due` nunca
@@ -347,5 +351,5 @@ contractRenewalDue: 'commercial.contract.renewal_due',
 ## Open Questions
 
 - El backfill inicial crea 1 contract por quote approved. Para clientes con retainers históricos que tienen v1+v2+v3 quotes, esto genera 3 contracts cuando debió ser 1. ¿Resolvemos con una reconciliation task separada post-deploy (preferido) o lo enfrentamos en backfill con una heurística más agresiva?
-- `contract_number` formato: ¿heredar de `quotation_number` de la originator, o generar nuevo (ej. `CTR-YYYY-NNNN`)?
+- `contract_number` formato: ¿heredar de `quotation_number` de la originator, o generar nuevo (ej. `EO-CTR-YYYY-NNNN`)?
 - Para retainers con `auto_renewal=TRUE`: ¿la renewal crea un nuevo "period" interno o el contrato es un continuum único? Propuesta: continuum único; los periods son artefactos de billing, no del contract lifecycle.

@@ -71,6 +71,32 @@ export interface QuotationDocumentChain {
   }
 }
 
+export interface ContractDocumentChain {
+  contract: {
+    id: string
+    number: string
+    status: string
+    currency: string
+    originatorQuoteId: string | null
+  } | null
+  quotations: Array<{
+    quotationId: string
+    quotationNumber: string | null
+    status: string | null
+    relationshipType: string
+  }>
+  purchaseOrders: QuotationDocumentChainPurchaseOrder[]
+  serviceEntries: QuotationDocumentChainServiceEntry[]
+  incomes: QuotationDocumentChainIncome[]
+  totals: {
+    quoted: number
+    authorized: number
+    invoiced: number
+    authorizedVsQuotedDelta: number
+    invoicedVsQuotedDelta: number
+  }
+}
+
 interface QuotationRow extends Record<string, unknown> {
   quotation_id: string
   quotation_number: string | null
@@ -129,6 +155,24 @@ interface IncomeRow extends Record<string, unknown> {
   dte_folio: string | null
   dte_type_code: string | null
   created_at: string | Date | null
+}
+
+interface ContractRow extends Record<string, unknown> {
+  contract_id: string
+  contract_number: string
+  status: string
+  currency: string | null
+  originator_quote_id: string | null
+  tcv_clp: string | number | null
+}
+
+interface ContractQuoteRow extends Record<string, unknown> {
+  quotation_id: string
+  quotation_number: string | null
+  status: string | null
+  relationship_type: string
+  total_amount_clp: string | number | null
+  total_price: string | number | null
 }
 
 const toIsoDate = (value: string | Date | null): string | null => {
@@ -286,6 +330,182 @@ export const readQuotationDocumentChain = async ({
           currency: String(quotation.currency || 'CLP')
         }
       : null,
+    purchaseOrders,
+    serviceEntries,
+    incomes,
+    totals: {
+      quoted,
+      authorized,
+      invoiced,
+      authorizedVsQuotedDelta: round2(authorized - quoted),
+      invoicedVsQuotedDelta: round2(invoiced - quoted)
+    }
+  }
+}
+
+export const readContractDocumentChain = async ({
+  contractId
+}: {
+  contractId: string
+}): Promise<ContractDocumentChain> => {
+  const contractRows = await query<ContractRow>(
+    `SELECT contract_id, contract_number, status, currency, originator_quote_id, tcv_clp
+       FROM greenhouse_commercial.contracts
+      WHERE contract_id = $1
+      LIMIT 1`,
+    [contractId]
+  )
+
+  const contract = contractRows[0] ?? null
+
+  const quoteRows = await query<ContractQuoteRow>(
+    `SELECT
+       q.quotation_id,
+       q.quotation_number,
+       q.status,
+       cq.relationship_type,
+       q.total_amount_clp,
+       q.total_price
+     FROM greenhouse_commercial.contract_quotes cq
+     JOIN greenhouse_commercial.quotations q
+       ON q.quotation_id = cq.quotation_id
+    WHERE cq.contract_id = $1
+    ORDER BY
+      CASE cq.relationship_type
+        WHEN 'originator' THEN 0
+        WHEN 'renewal' THEN 1
+        WHEN 'modification' THEN 2
+        ELSE 3
+      END,
+      q.quote_date ASC NULLS LAST,
+      q.created_at ASC`,
+    [contractId]
+  )
+
+  const quotationIds = quoteRows.map(row => String(row.quotation_id))
+  const quotationIdsParam = quotationIds.length > 0 ? quotationIds : ['__none__']
+
+  const poRows = await query<PoRow>(
+    `SELECT po_id, po_number, status,
+            authorized_amount, authorized_amount_clp,
+            invoiced_amount_clp, remaining_amount_clp,
+            currency, issue_date, expiry_date, description, created_at
+       FROM greenhouse_finance.purchase_orders
+      WHERE contract_id = $1
+         OR quotation_id = ANY($2::text[])
+      ORDER BY issue_date ASC NULLS LAST, created_at ASC`,
+    [contractId, quotationIdsParam]
+  )
+
+  const hesRows = await query<HesRow>(
+    `SELECT hes_id, hes_number, purchase_order_id, status,
+            amount, amount_clp, amount_authorized_clp,
+            currency, service_period_start, service_period_end,
+            submitted_at, approved_at, income_id, invoiced, created_at
+       FROM greenhouse_finance.service_entry_sheets
+      WHERE contract_id = $1
+         OR quotation_id = ANY($2::text[])
+      ORDER BY service_period_start ASC NULLS LAST, created_at ASC`,
+    [contractId, quotationIdsParam]
+  )
+
+  const incomeRows = await query<IncomeRow>(
+    `SELECT income_id, invoice_number, invoice_date, due_date,
+            total_amount, total_amount_clp, currency,
+            payment_status, amount_paid, source_hes_id,
+            nubox_document_id, dte_folio, dte_type_code, created_at
+       FROM greenhouse_finance.income
+      WHERE contract_id = $1
+         OR quotation_id = ANY($2::text[])
+      ORDER BY invoice_date ASC NULLS LAST, created_at ASC`,
+    [contractId, quotationIdsParam]
+  )
+
+  const purchaseOrders: QuotationDocumentChainPurchaseOrder[] = poRows.map(row => ({
+    poId: String(row.po_id),
+    poNumber: row.po_number ? String(row.po_number) : null,
+    status: String(row.status),
+    authorizedAmount: num(row.authorized_amount),
+    authorizedAmountClp: num(row.authorized_amount_clp),
+    invoicedAmountClp: num(row.invoiced_amount_clp),
+    remainingAmountClp: num(row.remaining_amount_clp),
+    currency: String(row.currency || 'CLP'),
+    issueDate: toIsoDate(row.issue_date),
+    expiryDate: toIsoDate(row.expiry_date),
+    description: row.description ? String(row.description) : null,
+    createdAt: toIsoTimestamp(row.created_at)
+  }))
+
+  const serviceEntries: QuotationDocumentChainServiceEntry[] = hesRows.map(row => ({
+    hesId: String(row.hes_id),
+    hesNumber: row.hes_number ? String(row.hes_number) : null,
+    purchaseOrderId: row.purchase_order_id ? String(row.purchase_order_id) : null,
+    status: String(row.status),
+    amount: num(row.amount),
+    amountClp: num(row.amount_clp),
+    amountAuthorizedClp: row.amount_authorized_clp === null || row.amount_authorized_clp === undefined
+      ? null
+      : num(row.amount_authorized_clp),
+    currency: String(row.currency || 'CLP'),
+    servicePeriodStart: toIsoDate(row.service_period_start),
+    servicePeriodEnd: toIsoDate(row.service_period_end),
+    submittedAt: toIsoTimestamp(row.submitted_at),
+    approvedAt: toIsoTimestamp(row.approved_at),
+    incomeId: row.income_id ? String(row.income_id) : null,
+    invoiced: Boolean(row.invoiced),
+    createdAt: toIsoTimestamp(row.created_at)
+  }))
+
+  const incomes: QuotationDocumentChainIncome[] = incomeRows.map(row => ({
+    incomeId: String(row.income_id),
+    invoiceNumber: row.invoice_number ? String(row.invoice_number) : null,
+    invoiceDate: toIsoDate(row.invoice_date),
+    dueDate: toIsoDate(row.due_date),
+    totalAmount: num(row.total_amount),
+    totalAmountClp: num(row.total_amount_clp),
+    currency: String(row.currency || 'CLP'),
+    paymentStatus: String(row.payment_status),
+    amountPaid: num(row.amount_paid),
+    sourceHesId: row.source_hes_id ? String(row.source_hes_id) : null,
+    nuboxDocumentId: row.nubox_document_id ? String(row.nubox_document_id) : null,
+    dteFolio: row.dte_folio ? String(row.dte_folio) : null,
+    dteTypeCode: row.dte_type_code ? String(row.dte_type_code) : null,
+    createdAt: toIsoTimestamp(row.created_at)
+  }))
+
+  const relatedQuotedTotal = round2(
+    quoteRows.reduce(
+      (acc, row) => acc + num(row.total_amount_clp ?? row.total_price),
+      0
+    )
+  )
+
+  const quoted = round2(num(contract?.tcv_clp) || relatedQuotedTotal)
+
+  const authorized = round2(
+    hesRows
+      .filter(row => row.status === 'approved')
+      .reduce((acc, row) => acc + num(row.amount_authorized_clp ?? row.amount_clp), 0)
+  )
+
+  const invoiced = round2(incomes.reduce((acc, row) => acc + row.totalAmountClp, 0))
+
+  return {
+    contract: contract
+      ? {
+          id: String(contract.contract_id),
+          number: String(contract.contract_number),
+          status: String(contract.status),
+          currency: String(contract.currency || 'CLP'),
+          originatorQuoteId: contract.originator_quote_id ? String(contract.originator_quote_id) : null
+        }
+      : null,
+    quotations: quoteRows.map(row => ({
+      quotationId: String(row.quotation_id),
+      quotationNumber: row.quotation_number ? String(row.quotation_number) : null,
+      status: row.status ? String(row.status) : null,
+      relationshipType: String(row.relationship_type)
+    })),
     purchaseOrders,
     serviceEntries,
     incomes,

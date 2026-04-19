@@ -27,6 +27,45 @@
 - **TASK-470 abierta**: backend enterprise hardening — spec completa en `docs/tasks/to-do/TASK-470-pricing-catalog-enterprise-hardening.md`, registrada en TASK_ID_REGISTRY + README, pushed direct a develop (commit `b222e85d`). Cubre los 4 gaps enterprise identificados en review con el usuario: optimistic locking, validator de constraints, impact analysis pre-change, overcommit detector cross-layer entre capacity operacional y billable commitments.
 - **WIP de Codex observado en primary**: `src/app/(dashboard)/finance/contracts/`, `data/zapsign.txt`, `ContractDetailView.tsx`, `ContractsListView.tsx`, modificaciones a `finance/layout.tsx`, `VerticalMenu.tsx`, `greenhouse-nomenclature.ts` — es TASK-460 WIP sin committear, no incluido en mi branch.
 
+## Sesion 2026-04-19 — TASK-460 Contract / SOW Canonical Entity (Codex)
+
+- **Owner:** Codex
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-460`
+- **Rama:** `task/TASK-460-contract-sow-canonical-entity`
+- **Estado:** implementado y validado localmente; cerrando docs + Git integration sobre `develop`
+- **Decisión operativa clave:**
+  - la spec asumía que `quotation_id` seguía siendo suficiente como anchor downstream, pero el runtime comercial ya necesitaba separar pre-venta de ejecución
+  - el corte se cerró como **doble anchor intencional**: `quotation` sigue viva para pricing/aprobación; `contract` entra como anchor canónico post-venta para execution, rentabilidad y renovación
+- **Entregables:**
+  - migración `20260419071250347_task-460-contract-sow-canonical-entity.sql`
+  - `src/lib/commercial/contracts-store.ts`
+  - `src/lib/commercial/contract-lifecycle.ts`
+  - `src/lib/commercial/contract-events.ts`
+  - `src/lib/commercial-intelligence/contract-profitability-materializer.ts`
+  - `src/lib/commercial-intelligence/contract-renewal-lifecycle.ts`
+  - `src/app/api/finance/contracts/**`
+  - `src/views/greenhouse/finance/ContractsListView.tsx`
+  - `src/views/greenhouse/finance/ContractDetailView.tsx`
+  - extensiones en `quote-to-cash/*`, `document-chain-reader.ts`, `event-catalog.ts`, `greenhouse-nomenclature.ts`, `finance/layout.tsx`
+  - docs actualizadas en arquitectura comercial, event catalog, documentación funcional finance, changelog, project context y task index
+- **Resultado operativo:**
+  - `greenhouse_commercial.contracts` existe como entidad canónica post-venta con `contract_number` visible `EO-CTR-*`
+  - `greenhouse_commercial.contract_quotes` permite 1 contrato lógico con múltiples quotes históricas
+  - `purchase_orders`, `service_entry_sheets` e `income` ya aceptan `contract_id`
+  - `readContractDocumentChain({ contractId })` agrega la cadena documental por contrato
+  - al emitir invoice desde quote o HES, el runtime asegura el contract y materializa `contract_id`
+  - `greenhouse_serving.contract_profitability_snapshots` y `greenhouse_commercial.contract_renewal_reminders` ya existen para la lane contractual
+  - `/finance/contracts` y `/finance/contracts/[id]` abren la surface inicial tenant-safe para contratos
+- **Validaciones corridas:**
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src` -> solo matches en `src/lib/postgres/client.ts`
+- **Heads-up menor:**
+  - `pnpm build` terminó exit `0` con warnings preexistentes de Dynamic Server Usage bajo `(dashboard)`
+  - el Cloud SQL proxy local quedó levantado durante `pg:connect:migrate`; cerrarlo si ya no se necesita
+
 ## Sesion 2026-04-19 — TASK-459 Delivery Model Refinement (Codex)
 
 - **Owner:** Codex
