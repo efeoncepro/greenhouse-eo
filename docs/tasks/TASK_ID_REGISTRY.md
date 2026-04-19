@@ -553,3 +553,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-497` | `to-do` | Quote Builder Autosave + react-hook-form Migration (Sprint 2) | `docs/tasks/to-do/TASK-497-quote-builder-autosave-react-hook-form.md` |
 | `TASK-498` | `to-do` | UI Primitives Platform Extraction (Sprint 3) | `docs/tasks/to-do/TASK-498-ui-primitives-platform-extraction.md` |
 | `TASK-499` | `to-do` | Quote Builder Polish Backlog (audit remanente) | `docs/tasks/to-do/TASK-499-quote-builder-polish-backlog.md` |
+| `TASK-500` | `complete` | Quote Builder Quantity↔Periods Sync + EmpType Dropdown | `docs/tasks/complete/TASK-500-quote-builder-quantity-periods-sync.md` |
