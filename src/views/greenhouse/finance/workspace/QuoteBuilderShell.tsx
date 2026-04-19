@@ -379,10 +379,12 @@ const QuoteBuilderShell = ({
     businessLines: Array<{ code: string; label: string }>
     commercialModels: CommercialModelOption[]
     countryFactors: CountryFactorOption[]
+    employmentTypes: Array<{ value: string; label: string }>
   }>({
     businessLines: [],
     commercialModels: DEFAULT_COMMERCIAL_MODELS,
-    countryFactors: DEFAULT_COUNTRY_FACTORS
+    countryFactors: DEFAULT_COUNTRY_FACTORS,
+    employmentTypes: []
   })
 
   useEffect(() => {
@@ -399,6 +401,7 @@ const QuoteBuilderShell = ({
             commercialModelMultipliers?: Array<{ modelCode: CommercialModelCode; modelLabel: string; multiplierPct: number }>
             countryPricingFactors?: Array<{ factorCode: string; factorLabel: string; factorOpt: number }>
             businessLines?: Array<{ moduleCode: string; label: string; isActive?: boolean; sortOrder?: number }>
+            employmentTypes?: Array<{ employmentTypeCode: string; labelEs: string; active?: boolean }>
           }
         }
 
@@ -418,10 +421,15 @@ const QuoteBuilderShell = ({
           ?.filter(bl => bl.isActive !== false)
           .map(bl => ({ code: bl.moduleCode, label: bl.label }))
 
+        const employmentTypes = payload.catalog?.employmentTypes
+          ?.filter(et => et.active !== false)
+          .map(et => ({ value: et.employmentTypeCode, label: et.labelEs }))
+
         setBuilderOptions(prev => ({
           businessLines: businessLines && businessLines.length > 0 ? businessLines : prev.businessLines,
           commercialModels: commercialModels && commercialModels.length > 0 ? commercialModels : prev.commercialModels,
-          countryFactors: countryFactors && countryFactors.length > 0 ? countryFactors : prev.countryFactors
+          countryFactors: countryFactors && countryFactors.length > 0 ? countryFactors : prev.countryFactors,
+          employmentTypes: employmentTypes && employmentTypes.length > 0 ? employmentTypes : prev.employmentTypes
         }))
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') return
@@ -1055,6 +1063,7 @@ const QuoteBuilderShell = ({
             outputCurrency={currency}
             structuredWarnings={mergedStructuredWarnings.length > 0 ? mergedStructuredWarnings : null}
             simulating={simulating}
+            employmentTypeOptions={builderOptions.employmentTypes}
             onDraftChange={setLinesSnapshot}
             headerAction={
               <AddLineSplitButton

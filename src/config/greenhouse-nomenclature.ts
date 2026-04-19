@@ -1997,10 +1997,9 @@ export const GH_PRICING = {
   adjustPopover: {
     triggerLabel: 'Ajustes de pricing',
     title: 'Ajustes de pricing',
-    subtitle: 'Dedicación, períodos y tipo de contratación aplicados a esta línea.',
+    subtitle: 'Dedicación y tipo de contratación aplicados a esta línea. Los períodos se controlan desde la columna Cantidad.',
     fteLabel: 'FTE',
     fteHelper: '0.1 a 1.0 (fracción dedicada)',
-    periodsLabel: 'Períodos (meses)',
     employmentTypeLabel: 'Tipo de contratación',
     employmentTypePlaceholder: 'Default del rol si vacío',
     applyLabel: 'Aplicar',

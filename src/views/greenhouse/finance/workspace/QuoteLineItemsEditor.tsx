@@ -104,6 +104,9 @@ export interface QuoteLineItemsEditorProps {
   /** El engine v2 esta re-calculando. Dispara Skeletons en precio/subtotal. */
   simulating?: boolean
 
+  /** Opciones de tipo de contratación desde /api/finance/quotes/pricing/config (catalog.employmentTypes). */
+  employmentTypeOptions?: Array<{ value: string; label: string }>
+
   /** Se dispara en cada mutación del draft */
   onDraftChange?: (lines: QuoteLineItem[]) => void
 
@@ -371,6 +374,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     outputCurrency = null,
     structuredWarnings = null,
     simulating = false,
+    employmentTypeOptions = [],
     onDraftChange,
     headerAction,
     onAddFromCatalog,
@@ -769,36 +773,70 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                         </Stack>
                       </TableCell>
                       <TableCell align='right'>
-                        <CustomTextField
-                          size='small'
-                          type='number'
-                          value={line.quantity}
-                          onChange={event => {
-                            const raw = event.target.value
-                            const next = raw === '' ? 0 : Number(raw)
+                        <Stack spacing={0.25} alignItems='flex-end'>
+                          <CustomTextField
+                            size='small'
+                            type='number'
+                            value={line.quantity}
+                            onChange={event => {
+                              const raw = event.target.value
+                              const next = raw === '' ? 0 : Number(raw)
+                              const parsed = Number.isFinite(next) ? next : 0
 
-                            updateLine(index, { quantity: Number.isFinite(next) ? next : 0 })
-                          }}
-                          disabled={saving}
-                          aria-label={`Cantidad del ítem ${index + 1}`}
-                        />
+                              // Para lineas period-based (role/person) sincronizamos
+                              // metadata.periods con quantity: la engine multiplica
+                              // por periods, no por quantity, cuando la base es mensual.
+                              updateLine(index, needsPricingContext
+                                ? {
+                                    quantity: parsed,
+                                    metadata: {
+                                      ...(line.metadata ?? {}),
+                                      periods: parsed
+                                    }
+                                  }
+                                : { quantity: parsed }
+                              )
+                            }}
+                            disabled={saving}
+                            aria-label={`Cantidad del ítem ${index + 1}`}
+                          />
+                          {needsPricingContext ? (
+                            <Typography variant='caption' color='text.secondary'>
+                              meses facturables
+                            </Typography>
+                          ) : null}
+                        </Stack>
                       </TableCell>
                       <TableCell>
-                        <CustomTextField
-                          select
-                          size='small'
-                          fullWidth
-                          value={line.unit}
-                          onChange={event => updateLine(index, { unit: event.target.value as QuoteLineItem['unit'] })}
-                          disabled={saving}
-                          aria-label={`Unidad del ítem ${index + 1}`}
-                        >
-                          {UNIT_OPTIONS.map(option => (
-                            <MenuItem key={option.value} value={option.value}>
-                              {option.label}
-                            </MenuItem>
-                          ))}
-                        </CustomTextField>
+                        {needsPricingContext ? (
+                          <Tooltip title='El engine usa base mensual para roles y personas' disableInteractive>
+                            <span>
+                              <CustomChip
+                                round='true'
+                                size='small'
+                                variant='tonal'
+                                color='secondary'
+                                label='Mes'
+                              />
+                            </span>
+                          </Tooltip>
+                        ) : (
+                          <CustomTextField
+                            select
+                            size='small'
+                            fullWidth
+                            value={line.unit}
+                            onChange={event => updateLine(index, { unit: event.target.value as QuoteLineItem['unit'] })}
+                            disabled={saving}
+                            aria-label={`Unidad del ítem ${index + 1}`}
+                          >
+                            {UNIT_OPTIONS.map(option => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                              </MenuItem>
+                            ))}
+                          </CustomTextField>
+                        )}
                       </TableCell>
                       <TableCell align='right'>
                         <Stack spacing={0.5} alignItems='flex-end'>
@@ -1003,42 +1041,40 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 autoFocus
               />
               <CustomTextField
-                size='small'
-                type='number'
-                fullWidth
-                label={GH_PRICING.adjustPopover.periodsLabel}
-                value={currentAdjustLine.metadata?.periods ?? ''}
-                onChange={event => {
-                  const raw = event.target.value
-                  const next = raw === '' ? null : Number(raw)
-
-                  updateLine(adjustIndex, {
-                    metadata: {
-                      ...(currentAdjustLine.metadata ?? {}),
-                      periods: Number.isFinite(next) ? next : null
-                    }
-                  })
-                }}
-                disabled={saving}
-                aria-label={GH_PRICING.adjustPopover.periodsLabel}
-              />
-              <CustomTextField
+                select
                 size='small'
                 fullWidth
                 label={GH_PRICING.adjustPopover.employmentTypeLabel}
                 value={currentAdjustLine.metadata?.employmentTypeCode ?? ''}
                 onChange={event => {
+                  const raw = event.target.value
+
                   updateLine(adjustIndex, {
                     metadata: {
                       ...(currentAdjustLine.metadata ?? {}),
-                      employmentTypeCode: event.target.value || null
+                      employmentTypeCode: raw === '' ? null : raw
                     }
                   })
                 }}
-                placeholder={GH_PRICING.adjustPopover.employmentTypePlaceholder}
-                disabled={saving}
+                disabled={saving || employmentTypeOptions.length === 0}
+                helperText={
+                  employmentTypeOptions.length === 0
+                    ? 'Cargando opciones…'
+                    : GH_PRICING.adjustPopover.employmentTypePlaceholder
+                }
                 aria-label={GH_PRICING.adjustPopover.employmentTypeLabel}
-              />
+              >
+                <MenuItem value=''>
+                  <Typography variant='body2' color='text.secondary'>
+                    {GH_PRICING.adjustPopover.employmentTypePlaceholder}
+                  </Typography>
+                </MenuItem>
+                {employmentTypeOptions.map(option => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
               <Stack direction='row' spacing={1} justifyContent='flex-end'>
                 <Button variant='tonal' color='secondary' onClick={handleAdjustClose}>
                   {GH_PRICING.adjustPopover.closeLabel}
