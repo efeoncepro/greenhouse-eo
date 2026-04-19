@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
+vi.mock('@/lib/db', () => ({
+  query: vi.fn()
+}))
 
 describe('sales-context', () => {
   it('derives deal, contract and pre-sales categories from local runtime context', async () => {
@@ -58,5 +61,55 @@ describe('sales-context', () => {
       commercialModel: 'project',
       staffingModel: 'outcome_based'
     })
+  })
+
+  it('locks only the quotation row before reading sales context snapshot source', async () => {
+    const { captureSalesContextAtSent } = await import('./sales-context')
+
+    const client = {
+      query: vi
+        .fn()
+        .mockResolvedValueOnce({ rows: [{ quotation_id: 'qt-1' }] })
+        .mockResolvedValueOnce({
+          rows: [
+            {
+              quotation_id: 'qt-1',
+              organization_id: 'org-1',
+              space_id: 'sp-1',
+              client_id: 'cl-1',
+              hubspot_deal_id: null,
+              sales_context_at_sent: null,
+              pricing_model: 'project',
+              commercial_model: 'project',
+              staffing_model: 'outcome_based',
+              lifecyclestage: 'customer',
+              deal_id: null,
+              dealstage: null
+            }
+          ]
+        })
+        .mockResolvedValueOnce({ rows: [] })
+    }
+
+    const snapshot = await captureSalesContextAtSent({
+      quotationId: 'qt-1',
+      organizationId: 'org-1',
+      spaceId: 'sp-1',
+      client
+    })
+
+    expect(snapshot.categoryAtSent).toBe('contract')
+    expect(client.query).toHaveBeenCalledTimes(3)
+
+    const firstSql = client.query.mock.calls[0]?.[0] as string
+    const secondSql = client.query.mock.calls[1]?.[0] as string
+
+    expect(firstSql).toContain('FROM greenhouse_commercial.quotations AS q')
+    expect(firstSql).toContain('FOR UPDATE')
+    expect(firstSql).not.toContain('LEFT JOIN')
+
+    expect(secondSql).toContain('LEFT JOIN greenhouse_core.clients AS c')
+    expect(secondSql).toContain('LEFT JOIN greenhouse_commercial.deals AS d')
+    expect(secondSql).not.toContain('FOR UPDATE')
   })
 })

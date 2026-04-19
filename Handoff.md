@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — Quote issuance sales-context lock fix (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `fix/codex-quote-issue-for-update`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-quote-issue-for-update`
+- **Problema corregido:**
+  - al emitir una cotización desde el detalle, Postgres devolvía `FOR UPDATE cannot be applied to the nullable side of an outer join`.
+  - el error no estaba en permisos ni en approval logic; ocurría en `captureSalesContextAtSent`, donde el reader de sales context agregaba `FOR UPDATE` al mismo `SELECT` que hace `LEFT JOIN` hacia `clients` y `deals`.
+- **Solución aplicada:**
+  - `src/lib/commercial/sales-context.ts` separa el lock y la lectura:
+    - primero bloquea solo la fila base de `greenhouse_commercial.quotations`
+    - luego carga el snapshot enriquecido sin `FOR UPDATE`
+  - `src/lib/commercial/sales-context.test.ts` agrega regresión explícita para impedir que vuelva a aparecer el patrón `LEFT JOIN + FOR UPDATE`.
+- **Tests / validación:**
+  - `pnpm test -- src/lib/commercial/sales-context.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de coordinación:**
+  - worktree aislado; no se tocó `data/api_zapsign.txt`.
+  - para validar `build` se reemplazó el symlink de `node_modules` por un árbol hardlinked local, porque Turbopack no acepta symlinks que apunten fuera del root del worktree.
+
 ## Sesion 2026-04-19 — Quote issuance actions + superadmin visibility alignment (Codex)
 
 - **Owner:** Codex
