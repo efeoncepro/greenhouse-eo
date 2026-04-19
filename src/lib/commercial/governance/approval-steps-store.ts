@@ -193,6 +193,7 @@ export interface DecideApprovalParams {
   stepId: string
   decision: 'approved' | 'rejected'
   actor: { userId: string; name: string; roleCodes: string[] }
+  organizationId?: string | null
   spaceId?: string | null
   notes?: string | null
 }
@@ -210,10 +211,16 @@ export const decideApprovalStep = async (
   params: DecideApprovalParams
 ): Promise<DecideApprovalResult> => {
   return withTransaction(async client => {
-    const stepRows = await client.query<StepRow & { quotation_space_id: string | null }>(
+    const stepRows = await client.query<
+      StepRow & {
+        quotation_organization_id: string | null
+        quotation_space_id: string | null
+      }
+    >(
       `SELECT s.step_id, s.quotation_id, s.version_number, s.policy_id, s.step_order,
               s.required_role, s.assigned_to, s.condition_label, s.status,
               s.decided_by, s.decided_at, s.notes, s.created_at,
+              q.organization_id AS quotation_organization_id,
               q.space_id AS quotation_space_id
          FROM greenhouse_commercial.approval_steps s
          JOIN greenhouse_commercial.quotations q
@@ -240,6 +247,9 @@ export const decideApprovalStep = async (
     if (!hasRole) {
       throw new Error(`Actor does not hold required role: ${row.required_role}`)
     }
+
+    const effectiveOrganizationId =
+      params.organizationId ?? row.quotation_organization_id
 
     const effectiveSpaceId = params.spaceId ?? row.quotation_space_id
 
@@ -282,23 +292,37 @@ export const decideApprovalStep = async (
     } else if (allResolved) {
       quotationNewStatus = 'sent'
 
-      if (!effectiveSpaceId) {
-        throw new Error('Approval step quotation is missing tenant scope')
-      }
-
       await captureSalesContextAtSent({
         quotationId: step.quotationId,
+        organizationId: effectiveOrganizationId,
         spaceId: effectiveSpaceId,
         client
       })
 
-      await client.query(
-        `UPDATE greenhouse_commercial.quotations
-            SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-            WHERE quotation_id = $1
-              AND space_id = $2`,
-        [step.quotationId, effectiveSpaceId]
-      )
+      if (effectiveOrganizationId) {
+        await client.query(
+          `UPDATE greenhouse_commercial.quotations
+              SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+              WHERE quotation_id = $1
+                AND organization_id = $2`,
+          [step.quotationId, effectiveOrganizationId]
+        )
+      } else if (effectiveSpaceId) {
+        await client.query(
+          `UPDATE greenhouse_commercial.quotations
+              SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+              WHERE quotation_id = $1
+                AND space_id = $2`,
+          [step.quotationId, effectiveSpaceId]
+        )
+      } else {
+        await client.query(
+          `UPDATE greenhouse_commercial.quotations
+              SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+              WHERE quotation_id = $1`,
+          [step.quotationId]
+        )
+      }
     }
 
     await recordAudit(

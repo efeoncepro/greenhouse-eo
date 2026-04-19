@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — Quote detail governance org-first hardening (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `fix/codex-quote-detail-governance`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-quote-detail-governance`
+- **Problema corregido:**
+  - el builder moderno persistia `valid_until`, pero el detail y la rehidratacion de edicion seguian leyendo `expiry_date`; el vencimiento podia existir en DB y verse vacio.
+  - las routes `approve/send` seguian exigiendo `space_id`, pero desde `TASK-486` las cotizaciones nuevas son `organization-first` y pueden tener `space_id = NULL`, por eso la tab de `Aprobaciones` fallaba aunque la quote fuera valida.
+- **Solucion aplicada:**
+  - `src/lib/finance/quotation-canonical-store.ts`
+    - el detail canonico ahora lee `valid_until` y hace fallback a ese campo cuando `expiry_date` viene nulo.
+  - `src/app/api/finance/quotes/route.ts`
+  - `src/app/api/finance/quotes/[id]/route.ts`
+    - create/update sincronizan `valid_until` y `expiry_date` para evitar drift entre columnas de compatibilidad.
+  - `src/lib/finance/pricing/quotation-id-resolver.ts`
+  - `src/lib/finance/pricing/quotation-tenant-access.ts`
+    - el identity resolver ahora expone `organization_id` y se agrego validacion reutilizable de acceso tenant por `organization_id` o `space_id`.
+  - `src/app/api/finance/quotes/[id]/approve/route.ts`
+  - `src/app/api/finance/quotes/[id]/send/route.ts`
+    - governance de quotes soporta anchors org-first y deja de rechazar quotes validas solo porque `space_id` es null.
+  - `src/lib/commercial/governance/approval-steps-store.ts`
+  - `src/lib/commercial/sales-context.ts`
+    - la transicion a `sent` y el capture de sales context ya funcionan con `organization_id` fallback cuando no existe `space_id`.
+- **Tests / validacion:**
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de coordinacion:**
+  - para validar en worktree hubo que materializar `node_modules` localmente; Turbopack no acepta `node_modules` symlink fuera del filesystem root.
+
 ## Sesion 2026-04-19 — Quote Builder pricing/cost unification + edit rehydration hardening (Codex)
 
 - **Owner:** Codex

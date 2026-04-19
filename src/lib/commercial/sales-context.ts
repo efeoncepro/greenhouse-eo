@@ -7,7 +7,7 @@ import {
   type CommercialModel,
   type StaffingModel
 } from '@/lib/commercial/delivery-model'
-import { getDb } from '@/lib/db'
+import { query } from '@/lib/db'
 import {
   normalizeHubSpotLifecycleStage,
   type ClientLifecycleStage
@@ -49,9 +49,10 @@ interface PersistedSalesContextSnapshot {
   category_at_sent: SalesContextCategory
 }
 
-interface SalesContextSourceRow {
+interface SalesContextSourceRow extends Record<string, unknown> {
   quotation_id: string
-  space_id: string
+  organization_id: string | null
+  space_id: string | null
   client_id: string | null
   hubspot_deal_id: string | null
   sales_context_at_sent: unknown
@@ -65,6 +66,7 @@ interface SalesContextSourceRow {
 
 const SALES_CONTEXT_SOURCE_SQL = `SELECT
   q.quotation_id,
+  q.organization_id,
   q.space_id,
   q.client_id,
   q.hubspot_deal_id,
@@ -80,9 +82,15 @@ LEFT JOIN greenhouse_core.clients AS c
   ON c.client_id = q.client_id
 LEFT JOIN greenhouse_commercial.deals AS d
   ON d.hubspot_deal_id = q.hubspot_deal_id
- AND d.space_id = q.space_id
-WHERE q.quotation_id = $1
-  AND q.space_id = $2`
+ AND (
+   (q.space_id IS NOT NULL AND d.space_id = q.space_id)
+   OR (
+     q.space_id IS NULL
+     AND q.organization_id IS NOT NULL
+     AND d.organization_id = q.organization_id
+   )
+ )
+WHERE q.quotation_id = $1`
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -118,6 +126,73 @@ const toPersistedSalesContextSnapshot = (
   is_standalone: snapshot.isStandalone,
   category_at_sent: snapshot.categoryAtSent
 })
+
+const buildSalesContextScopeClause = ({
+  tableAlias = 'q',
+  organizationId,
+  spaceId,
+  startIndex
+}: {
+  tableAlias?: string
+  organizationId?: string | null
+  spaceId?: string | null
+  startIndex: number
+}) => {
+  const params: string[] = []
+  const conditions: string[] = []
+  let nextIndex = startIndex
+
+  if (organizationId) {
+    params.push(organizationId)
+    conditions.push(`${tableAlias}.organization_id = $${nextIndex}`)
+    nextIndex += 1
+  }
+
+  if (spaceId) {
+    params.push(spaceId)
+    conditions.push(`${tableAlias}.space_id = $${nextIndex}`)
+    nextIndex += 1
+  }
+
+  return {
+    params,
+    sql: conditions.length > 0 ? ` AND ${conditions.join(' AND ')}` : ''
+  }
+}
+
+const loadSalesContextSource = async ({
+  quotationId,
+  organizationId,
+  spaceId,
+  client,
+  lockForUpdate = false
+}: {
+  quotationId: string
+  organizationId?: string | null
+  spaceId?: string | null
+  client?: QueryableClient
+  lockForUpdate?: boolean
+}) => {
+  const scope = buildSalesContextScopeClause({
+    tableAlias: 'q',
+    organizationId,
+    spaceId,
+    startIndex: 2
+  })
+
+  const sql = `${SALES_CONTEXT_SOURCE_SQL}${scope.sql}${lockForUpdate ? '\nFOR UPDATE' : ''}`
+  const params: unknown[] = [quotationId, ...scope.params]
+
+  if (client) {
+    const result = await client.query<SalesContextSourceRow>(sql, params)
+
+    return result.rows[0] ?? null
+  }
+
+  const rows = await query<SalesContextSourceRow>(sql, params)
+
+  return rows[0] ?? null
+}
 
 export const deriveSalesContextCategory = ({
   lifecyclestage,
@@ -272,39 +347,20 @@ const buildSnapshotFromRow = (
 
 export const buildSalesContextSnapshot = async ({
   quotationId,
+  organizationId,
   spaceId,
   capturedAt
 }: {
   quotationId: string
-  spaceId: string
+  organizationId?: string | null
+  spaceId?: string | null
   capturedAt?: string
 }): Promise<SalesContextSnapshot> => {
-  const db = await getDb()
-
-  const row = await db
-    .selectFrom('greenhouse_commercial.quotations as q')
-    .leftJoin('greenhouse_core.clients as c', 'c.client_id', 'q.client_id')
-    .leftJoin('greenhouse_commercial.deals as d', join =>
-      join
-        .onRef('d.hubspot_deal_id', '=', 'q.hubspot_deal_id')
-        .onRef('d.space_id', '=', 'q.space_id')
-    )
-    .select([
-      'q.quotation_id',
-      'q.space_id',
-      'q.client_id',
-      'q.hubspot_deal_id',
-      'q.sales_context_at_sent',
-      'q.pricing_model',
-      'q.commercial_model',
-      'q.staffing_model',
-      'c.lifecyclestage',
-      'd.deal_id',
-      'd.dealstage'
-    ])
-    .where('q.quotation_id', '=', quotationId)
-    .where('q.space_id', '=', spaceId)
-    .executeTakeFirst()
+  const row = await loadSalesContextSource({
+    quotationId,
+    organizationId,
+    spaceId
+  })
 
   if (!row) {
     throw new Error('Quotation not found for sales context snapshot')
@@ -315,41 +371,42 @@ export const buildSalesContextSnapshot = async ({
 
 export const getQuoteSalesContext = async ({
   quotationId,
+  organizationId,
   spaceId
 }: {
   quotationId: string
-  spaceId: string
+  organizationId?: string | null
+  spaceId?: string | null
 }): Promise<SalesContextSnapshot | null> => {
-  const db = await getDb()
-
-  const row = await db
-    .selectFrom('greenhouse_commercial.quotations')
-    .select(['sales_context_at_sent'])
-    .where('quotation_id', '=', quotationId)
-    .where('space_id', '=', spaceId)
-    .executeTakeFirst()
+  const row = await loadSalesContextSource({
+    quotationId,
+    organizationId,
+    spaceId
+  })
 
   return normalizeQuoteSalesContext(row?.sales_context_at_sent ?? null)
 }
 
 export const captureSalesContextAtSent = async ({
   quotationId,
+  organizationId,
   spaceId,
   client,
   capturedAt
 }: {
   quotationId: string
-  spaceId: string
+  organizationId?: string | null
+  spaceId?: string | null
   client: QueryableClient
   capturedAt?: string
 }): Promise<SalesContextSnapshot> => {
-  const source = await client.query<SalesContextSourceRow>(
-    `${SALES_CONTEXT_SOURCE_SQL}
-     FOR UPDATE`,
-    [quotationId, spaceId]
-  )
-
-  const row = source.rows[0]
+  const row = await loadSalesContextSource({
+    quotationId,
+    organizationId,
+    spaceId,
+    client,
+    lockForUpdate: true
+  })
 
   if (!row) {
     throw new Error('Quotation not found for sales context snapshot')
@@ -366,13 +423,26 @@ export const captureSalesContextAtSent = async ({
     capturedAt ?? new Date().toISOString()
   )
 
+  const scope = buildSalesContextScopeClause({
+    tableAlias: 'greenhouse_commercial.quotations',
+    organizationId,
+    spaceId,
+    startIndex: 2
+  })
+
+  const snapshotPlaceholder = scope.params.length + 2
+
   await client.query(
     `UPDATE greenhouse_commercial.quotations
-        SET sales_context_at_sent = $3::jsonb
+        SET sales_context_at_sent = $${snapshotPlaceholder}::jsonb
       WHERE quotation_id = $1
-        AND space_id = $2
+        ${scope.sql ? scope.sql.replace(/^ AND /, 'AND ') : ''}
         AND sales_context_at_sent IS NULL`,
-    [quotationId, spaceId, JSON.stringify(toPersistedSalesContextSnapshot(snapshot))]
+    [
+      quotationId,
+      ...scope.params,
+      JSON.stringify(toPersistedSalesContextSnapshot(snapshot))
+    ]
   )
 
   return snapshot

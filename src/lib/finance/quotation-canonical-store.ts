@@ -43,6 +43,7 @@ type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
   contact_full_name: string | null
   contact_canonical_email: string | null
   contact_role_label: string | null
+  valid_until: string | Date | null
   expiry_date: string | Date | null
   description: string | null
   subtotal: string | number | null
@@ -327,6 +328,7 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        q.quotation_number AS quote_number,
        q.quote_date,
        q.due_date,
+       q.valid_until,
        q.expiry_date,
        q.description,
        q.currency,
@@ -1181,7 +1183,11 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
   quoteNumber: row.quote_number ? String(row.quote_number) : null,
   quoteDate: row.quote_date ? new Date(String(row.quote_date)).toISOString().slice(0, 10) : null,
   dueDate: row.due_date ? new Date(String(row.due_date)).toISOString().slice(0, 10) : null,
-  expiryDate: row.expiry_date ? new Date(String(row.expiry_date)).toISOString().slice(0, 10) : null,
+  expiryDate: row.expiry_date
+    ? new Date(String(row.expiry_date)).toISOString().slice(0, 10)
+    : row.valid_until
+      ? new Date(String(row.valid_until)).toISOString().slice(0, 10)
+      : null,
   description: row.description ? String(row.description) : null,
   currency: String(row.currency || 'CLP'),
   subtotal: row.subtotal !== null ? Number(row.subtotal) : null,

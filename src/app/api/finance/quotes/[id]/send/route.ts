@@ -13,6 +13,10 @@ import {
   resolveMarginTarget,
   resolveQuotationIdentity
 } from '@/lib/finance/pricing'
+import {
+  quotationIdentityHasTenantAnchor,
+  tenantCanAccessQuotationIdentity
+} from '@/lib/finance/pricing/quotation-tenant-access'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -72,11 +76,15 @@ export async function POST(
     return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
   }
 
-  if (!identity.spaceId) {
+  if (!quotationIdentityHasTenantAnchor(identity)) {
     return NextResponse.json(
       { error: 'La cotización no tiene un scope tenant válido.' },
       { status: 409 }
     )
+  }
+
+  if (!(await tenantCanAccessQuotationIdentity({ tenant, identity }))) {
+    return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
   }
 
   const headerRows = await query<QuotationHeaderRow>(
@@ -85,8 +93,11 @@ export async function POST(
             margin_floor_pct, current_version, quote_date, status
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1
-         AND space_id = $2`,
-    [identity.quotationId, identity.spaceId]
+         AND (
+           ($2::text IS NOT NULL AND organization_id = $2)
+           OR ($3::text IS NOT NULL AND space_id = $3)
+         )`,
+    [identity.quotationId, identity.organizationId, identity.spaceId]
   )
 
   const header = headerRows[0]
@@ -246,19 +257,41 @@ export async function POST(
   await withTransaction(async client => {
     await captureSalesContextAtSent({
       quotationId: identity.quotationId,
-      spaceId: identity.spaceId as string,
+      organizationId: identity.organizationId,
+      spaceId: identity.spaceId,
       client
     })
 
-    await client.query(
-      `UPDATE greenhouse_commercial.quotations
-         SET status = 'sent',
-             sent_at = CURRENT_TIMESTAMP,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE quotation_id = $1
-           AND space_id = $2`,
-      [identity.quotationId, identity.spaceId]
-    )
+    if (identity.organizationId) {
+      await client.query(
+        `UPDATE greenhouse_commercial.quotations
+           SET status = 'sent',
+               sent_at = CURRENT_TIMESTAMP,
+               updated_at = CURRENT_TIMESTAMP
+           WHERE quotation_id = $1
+             AND organization_id = $2`,
+        [identity.quotationId, identity.organizationId]
+      )
+    } else if (identity.spaceId) {
+      await client.query(
+        `UPDATE greenhouse_commercial.quotations
+           SET status = 'sent',
+               sent_at = CURRENT_TIMESTAMP,
+               updated_at = CURRENT_TIMESTAMP
+           WHERE quotation_id = $1
+             AND space_id = $2`,
+        [identity.quotationId, identity.spaceId]
+      )
+    } else {
+      await client.query(
+        `UPDATE greenhouse_commercial.quotations
+           SET status = 'sent',
+               sent_at = CURRENT_TIMESTAMP,
+               updated_at = CURRENT_TIMESTAMP
+           WHERE quotation_id = $1`,
+        [identity.quotationId]
+      )
+    }
   })
 
   await publishQuotationSent({

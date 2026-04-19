@@ -343,8 +343,13 @@ export async function PUT(
   if (body.internalNotes !== undefined) push('internal_notes', body.internalNotes)
   if (body.notes !== undefined) push('notes', body.notes)
   if (body.dueDate !== undefined) push('due_date', body.dueDate, '::date')
-  if (body.validUntil !== undefined) push('valid_until', body.validUntil, '::date')
-  if (body.expiryDate !== undefined) push('expiry_date', body.expiryDate, '::date')
+
+  if (body.validUntil !== undefined || body.expiryDate !== undefined) {
+    const resolvedExpiryDate = body.expiryDate ?? body.validUntil ?? null
+
+    push('valid_until', resolvedExpiryDate, '::date')
+    push('expiry_date', resolvedExpiryDate, '::date')
+  }
 
   if (
     body.pricingModel !== undefined ||

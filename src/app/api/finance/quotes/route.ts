@@ -180,6 +180,7 @@ interface CreateQuotationPayload {
   quoteDate?: string | null
   dueDate?: string | null
   validUntil?: string | null
+  expiryDate?: string | null
   billingFrequency?: QuotationBillingFrequency
   contractDurationMonths?: number | null
   exchangeRates?: Record<string, number>
@@ -322,6 +323,7 @@ export async function POST(request: Request) {
     'one_time') as QuotationBillingFrequency
 
   const quoteDate = (body.quoteDate || new Date().toISOString().slice(0, 10)).slice(0, 10)
+  const resolvedExpiryDate = body.expiryDate ?? body.validUntil ?? null
   const quotationNumber = body.quotationNumber?.trim() || generateQuotationNumber()
   const createdBy = tenant.userId
 
@@ -370,6 +372,7 @@ export async function POST(request: Request) {
            quote_date,
            due_date,
            valid_until,
+           expiry_date,
            description,
            internal_notes,
            source_system,
@@ -380,10 +383,10 @@ export async function POST(request: Request) {
            $9, NULL, $10::jsonb, $11::date,
            $12, $13, $14, $15,
            'one_time', $16, 30, $17,
-           $18::date, $19::date, $20::date,
-           $21, $22,
+           $18::date, $19::date, $20::date, $21::date,
+           $22, $23,
            'manual', $1,
-           $23
+           $24
          )
          RETURNING quotation_id`,
         [
@@ -406,7 +409,8 @@ export async function POST(request: Request) {
           contractDurationMonths,
           quoteDate,
           body.dueDate ?? null,
-          body.validUntil ?? null,
+          resolvedExpiryDate,
+          resolvedExpiryDate,
           body.description ?? null,
           body.internalNotes ?? null,
           createdBy
