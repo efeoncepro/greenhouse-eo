@@ -326,7 +326,7 @@ export async function POST(request: Request) {
           body.description ?? null,
           body.internalNotes ?? null,
           createdBy,
-          body.spaceId ? 'explicit' : 'unresolved'
+          body.spaceId != null ? 'explicit' : 'unresolved'
         ]
       )
 
