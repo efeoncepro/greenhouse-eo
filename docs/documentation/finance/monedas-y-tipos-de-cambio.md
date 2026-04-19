@@ -1,14 +1,14 @@
 # Monedas y Tipos de Cambio — Foundation Plataforma
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-19 por Claude (TASK-475 close-out)
-> **Ultima actualizacion:** 2026-04-19 por Claude
+> **Ultima actualizacion:** 2026-04-19 por Claude (TASK-484 — plataforma de provider adapters)
 > **Documentacion tecnica:**
 > - Spec canónica: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Finance architecture: [GREENHOUSE_FINANCE_ARCHITECTURE_V1](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 > - Sync pipelines: [GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1](../../architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md)
-> - Task: [TASK-475 — Greenhouse FX & Currency Platform Foundation](../../tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md)
+> - Tasks: [TASK-475 — Greenhouse FX & Currency Platform Foundation](../../tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md) · [TASK-484 — FX Provider Adapter Platform](../../tasks/in-progress/TASK-484-fx-provider-adapter-platform.md)
 
 ## Para qué sirve
 
@@ -69,18 +69,87 @@ El resolver **nunca explota** con error cuando falta una tasa. Siempre devuelve 
 
 ### 4. Registro de monedas
 
-Cada moneda está declarada con su política operativa en `currency-registry.ts`:
+Cada moneda está declarada con su política operativa en `currency-registry.ts`. TASK-484 extendió el registry con `providers: { primary, fallbacks[], historical? }` — cada par tiene ahora una cadena de adapters ordenados (no un string único):
 
-| Moneda | Cobertura | Provider | Sync | Fallback permitido |
+| Moneda | Cobertura (hoy) | Provider primario | Fallbacks | Sync cadence |
 |---|---|---|---|---|
-| `CLP` | `auto_synced` | Mindicador | diario | `inverse`, `usd_composition` |
-| `USD` | `auto_synced` | Mindicador + OpenER fallback | diario | `inverse`, `usd_composition` |
-| `CLF` | `manual_only` | — | manual | `inverse`, `usd_composition` |
-| `COP` | `manual_only` | — | manual | `usd_composition` |
-| `MXN` | `manual_only` | — | manual | `usd_composition` |
-| `PEN` | `manual_only` | — | manual | `usd_composition` |
+| `CLP` | `auto_synced` | Mindicador | OpenER | diario 23:05 UTC |
+| `USD` | `auto_synced` | Mindicador | OpenER | diario 23:05 UTC |
+| `CLF` | `manual_only`* | `clf_from_indicators` (lee UF de `economic_indicators`) | — | on-demand |
+| `COP` | `manual_only`* | Socrata TRM (Banco República de Colombia) | Fawaz Ahmed CDN | diario 09:00 UTC (tras flip) |
+| `MXN` | `manual_only`* | Banxico SIE FIX (SF43718) | Frankfurter → Fawaz Ahmed | diario 22:00 UTC (tras flip) |
+| `PEN` | `manual_only`* | apis.net.pe SUNAT SBS | BCRP → Fawaz Ahmed | diario 14:00 UTC (tras flip) |
 
-**Qué significa "manual_only"**: la moneda está soportada comercialmente (se puede elegir en el cotizador) pero el sync automático no existe todavía. Finance Admin carga tasas manuales cuando se necesitan. El cotizador avisa al AE que el par no está auto-cubierto.
+*Los adapters ya están wireados post-TASK-484 y las cron routes corriendo; lo que falta es flipear `coverage` a `auto_synced` en el registry. Eso queda para un **PR separado** después de 24–48h de dry-run verificado en staging. Hasta entonces el pricing engine sigue emitiendo `fx_fallback — Crítico` para esas monedas aunque la tasa ya se esté poblando.
+
+**Qué significa "manual_only"**: la moneda está soportada comercialmente (se puede elegir en el cotizador). Finance Admin puede cargar tasas manuales cuando se necesitan. El cotizador avisa al AE que el par no está auto-cubierto — aun cuando el sync automático ya esté corriendo en background, porque hasta el flip el contrato declara que no es confiable para producción.
+
+### 5. Cómo opera el sync diario (TASK-484)
+
+Hay 4 ventanas de cron que mantienen el registro de tasas fresco, cada una calibrada al horario en que la fuente oficial publica:
+
+| Hora UTC | Qué sincroniza | Por qué esa hora |
+|---|---|---|
+| 09:00 UTC | USD↔COP (+ refresh CLF como efecto) | El Banco República de Colombia publica la TRM del día muy temprano en Colombia; 09:00 UTC garantiza tener la tasa del día hábil en curso. |
+| 14:00 UTC | USD↔PEN | SUNAT publica la tasa SBS venta durante la mañana en Perú; 14:00 UTC (9:00 hora peruana) captura la publicación fresca. |
+| 22:00 UTC | USD↔MXN | Banxico publica la tasa FIX durante la jornada mexicana pero estabiliza al cierre; 22:00 UTC es la ventana segura. |
+| 23:05 UTC | USD↔CLP | Ventana existente de `economic-indicators`; no se tocó. Mindicador publica tarde en el día chileno. |
+
+Cada cron ejecuta el orchestrator `syncCurrencyPair()`: consulta el registry, intenta el provider primario, si falla (timeout, 5xx, validación) baja al siguiente fallback, y persiste con un solo transaction PG+outbox. Si toda la cadena falla emite un evento `finance.fx_sync.all_providers_failed` al outbox para que se pueda alertar.
+
+### 6. Runbook — cuando un par falla
+
+Si el pricing engine muestra `fx_fallback` persistente o Finance sospecha que una moneda no se está sincronizando:
+
+**Paso 1 — revisar las corridas recientes**
+
+```sql
+SELECT *
+FROM greenhouse_sync.source_sync_runs
+WHERE source_system = 'fx_sync_orchestrator'
+  AND started_at >= NOW() - INTERVAL '24 hours'
+ORDER BY started_at DESC
+LIMIT 50;
+```
+
+Cada fila trae el par (`from_currency`, `to_currency`), la fecha objetivo, el provider que resolvió (o la lista de providers intentados si falló), y el estado.
+
+**Paso 2 — forzar un re-sync puntual**
+
+```bash
+POST /api/admin/fx/sync-pair
+Content-Type: application/json
+
+{
+  "fromCurrency": "USD",
+  "toCurrency": "MXN",
+  "rateDate": "2026-04-19",
+  "dryRun": false
+}
+```
+
+Requiere rol con `canAdministerPricingCatalog`. **`dryRun` por defecto es `true`** — hay que explicitar `false` para que escriba. La respuesta trae el `runId` para correlacionar con `source_sync_runs`.
+
+`overrideProviderCode` opcional permite saltarse el primario y usar directamente un fallback específico cuando se sabe que el primario está caído (ej: `"overrideProviderCode": "frankfurter"` para USD↔MXN).
+
+**Paso 3 — cargar tasa manual cuando todos los providers están caídos**
+
+Si el orchestrator lleva horas fallando y hay envíos client-facing pendientes, Finance Admin puede upsertar una tasa manual usando el helper existente `upsertExchangeRates` (o el admin endpoint cuando caiga la UI de Finance). La tasa manual se persiste con `source = 'manual'` y queda visible en el readiness resolver igual que cualquier otra.
+
+**Paso 4 — si el problema es `BANXICO_SIE_TOKEN`**
+
+El adapter `banxico_sie` requiere el token. Si no está publicado en Secret Manager o quedó malformado, el primario fallará y MXN sincronizará por `frankfurter` → `fawaz_ahmed`. Eso es degradado pero funcional. Revisar `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md` §Secret Hygiene antes de rotar.
+
+### 7. Cómo agregar una moneda nueva (post TASK-484)
+
+El diseño escala: agregar una moneda con provider existente son ~3 edits declarativos; con provider nuevo, un archivo adicional.
+
+1. **Declarar la moneda** — append el código a `CURRENCIES_ALL` en [`src/lib/finance/currency-domain.ts`](../../../src/lib/finance/currency-domain.ts).
+2. **Sumarla al dominio** — agregar al array de `CURRENCY_DOMAIN_SUPPORT[pricing_output]` (u otro dominio si aplica).
+3. **Entry en el registry** — agregar la entrada en `CURRENCY_REGISTRY` con `providers: { primary, fallbacks: [...], historical? }` apuntando a los códigos de adapters existentes. `coverage` inicial: `manual_only` hasta verificar en staging.
+4. **Si necesita provider nuevo** — crear `src/lib/finance/fx/providers/<name>.ts` implementando el contrato `FxProviderAdapter` (fetchLatest + fetchHistorical + supports + code) y registrarlo en `src/lib/finance/fx/provider-index.ts`.
+5. **Sumar al cron** — agregar el par al array `WINDOW_CURRENCIES` del window correspondiente en `/api/cron/fx-sync-latam/route.ts` (o crear un window nuevo si el horario no calza con los 3 existentes).
+6. **Verificar 24–48h** — monitorear `source_sync_runs` con `FX_SYNC_DRY_RUN=true` en staging; cuando pase limpio, flipear `coverage` a `auto_synced` en un PR separado.
 
 ## Situaciones típicas
 
@@ -137,16 +206,26 @@ Para sends client-facing hay un threshold más estricto (`CLIENT_FACING_STALENES
 
 ## Lo que esta foundation NO hace
 
-Deliberadamente:
+Deliberadamente (post TASK-484):
 
 - No expande `FinanceCurrency` de `CLP | USD` — expandir contabilidad transaccional es una migración dedicada, no una edición de enum.
 - No migra `operational_pl`, `member_capacity_economics`, payroll ni cost intelligence a nuevas monedas. Siguen CLP-normalized (o CLP+USD en payroll) hasta que una task futura lo haga explícitamente.
 - No implementa el selector de output currency client-facing ni el snapshot a `quotations.exchange_rates` en el envío — eso es `TASK-466`, que consume esta foundation.
-- No implementa providers automáticos para COP/MXN/PEN — se declararon como `manual_only` hasta que el negocio justifique automatización.
+- **No flipea el `coverage` de CLF/COP/MXN/PEN a `auto_synced` en este merge.** Los providers automáticos **sí están wireados y corriendo** gracias a TASK-484 (9 adapters + orchestrator + 3 cron nuevas). Lo que queda pendiente es la promoción de `manual_only → auto_synced`, que se hace en un PR separado después de 24–48h de dry-run verificado. Hasta ese flip, el pricing engine sigue emitiendo `fx_fallback` warnings para esas monedas en producción aunque las tasas ya estén apareciendo en PG.
 - No resuelve formatting locale-aware — eso es `TASK-429`.
 
-> **Detalle técnico:** el contrato completo (chains de resolución, signatures, tests) vive en [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md). El código fuente canónico:
-> - [`src/lib/finance/currency-domain.ts`](../../../src/lib/finance/currency-domain.ts)
-> - [`src/lib/finance/currency-registry.ts`](../../../src/lib/finance/currency-registry.ts)
-> - [`src/lib/finance/fx-readiness.ts`](../../../src/lib/finance/fx-readiness.ts)
-> - [`src/app/api/finance/exchange-rates/readiness/route.ts`](../../../src/app/api/finance/exchange-rates/readiness/route.ts)
+> **Detalle técnico:** el contrato completo (chains de resolución, signatures, tests, adapter platform) vive en [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md). El código fuente canónico:
+> - Foundation (TASK-475):
+>   - [`src/lib/finance/currency-domain.ts`](../../../src/lib/finance/currency-domain.ts)
+>   - [`src/lib/finance/currency-registry.ts`](../../../src/lib/finance/currency-registry.ts)
+>   - [`src/lib/finance/fx-readiness.ts`](../../../src/lib/finance/fx-readiness.ts)
+>   - [`src/app/api/finance/exchange-rates/readiness/route.ts`](../../../src/app/api/finance/exchange-rates/readiness/route.ts)
+> - Adapter platform (TASK-484):
+>   - [`src/lib/finance/fx/sync-orchestrator.ts`](../../../src/lib/finance/fx/sync-orchestrator.ts)
+>   - [`src/lib/finance/fx/circuit-breaker.ts`](../../../src/lib/finance/fx/circuit-breaker.ts)
+>   - [`src/lib/finance/fx/provider-adapter.ts`](../../../src/lib/finance/fx/provider-adapter.ts)
+>   - [`src/lib/finance/fx/provider-index.ts`](../../../src/lib/finance/fx/provider-index.ts)
+>   - [`src/lib/finance/fx/providers/`](../../../src/lib/finance/fx/providers/) — 9 adapters
+>   - [`src/app/api/cron/fx-sync-latam/route.ts`](../../../src/app/api/cron/fx-sync-latam/route.ts)
+>   - [`src/app/api/admin/fx/sync-pair/route.ts`](../../../src/app/api/admin/fx/sync-pair/route.ts)
+>   - [`scripts/backfill-fx-rates.ts`](../../../scripts/backfill-fx-rates.ts)

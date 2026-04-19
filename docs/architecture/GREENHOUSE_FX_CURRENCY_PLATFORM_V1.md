@@ -211,6 +211,107 @@ UI / engine / PDF / email surfaces do not change — they consume the readiness 
 
 ---
 
+## 6.bis Provider adapters (TASK-484)
+
+TASK-475 shipped the contract; TASK-484 wires the automatic sync. The layer lives in [`src/lib/finance/fx/`](../../src/lib/finance/fx/) and is registry-driven — adding a provider is a file + registry edit, not a refactor of the sync path.
+
+### 6.bis.1 Adapter catalog
+
+Every adapter implements the shared `FxProviderAdapter` contract (timeouts 5s, retries x3 exponential for 5xx/network, circuit breaker, row-level validation `rate > 0 && isFinite(rate)`). The catalog shipped with TASK-484:
+
+| Code | File | Auth | Pair scope | Historical | Notes |
+|------|------|------|------------|------------|-------|
+| `mindicador` | [`providers/mindicador.ts`](../../src/lib/finance/fx/providers/mindicador.ts) | none | USD↔CLP | yes (per-day iter) | existing, refactored |
+| `open_er_api` | [`providers/open-er-api.ts`](../../src/lib/finance/fx/providers/open-er-api.ts) | none | USD↔any | no (free tier) | legacy fallback |
+| `banxico_sie` | [`providers/banxico-sie.ts`](../../src/lib/finance/fx/providers/banxico-sie.ts) | `BANXICO_SIE_TOKEN` | USD↔MXN | yes (range) | FIX series SF43718 |
+| `datos_gov_co_trm` | [`providers/datos-gov-co-trm.ts`](../../src/lib/finance/fx/providers/datos-gov-co-trm.ts) | none | USD↔COP | yes + window expansion | Socrata 32sa-8pi3 |
+| `apis_net_pe_sunat` | [`providers/apis-net-pe-sunat.ts`](../../src/lib/finance/fx/providers/apis-net-pe-sunat.ts) | none | USD↔PEN | yes (per-day iter) | SUNAT SBS venta |
+| `bcrp` | [`providers/bcrp.ts`](../../src/lib/finance/fx/providers/bcrp.ts) | none | USD↔PEN | yes (range) | historical backfills only |
+| `frankfurter` | [`providers/frankfurter.ts`](../../src/lib/finance/fx/providers/frankfurter.ts) | none | USD↔MXN | yes | ECB fallback |
+| `fawaz_ahmed` | [`providers/fawaz-ahmed.ts`](../../src/lib/finance/fx/providers/fawaz-ahmed.ts) | none | any pair | yes | universal fallback CDN |
+| `clf_from_indicators` | [`providers/clf-from-indicators.ts`](../../src/lib/finance/fx/providers/clf-from-indicators.ts) | none | CLP↔CLF | yes (DB range) | reads `greenhouse_finance.economic_indicators.UF` |
+
+The `CurrencyRegistryEntry` gains a `providers: { primary, fallbacks[], historical? }` shape so the registry declares the resolution order per currency without surface-side branching.
+
+### 6.bis.2 Orchestrator contract
+
+Single entry point: [`src/lib/finance/fx/sync-orchestrator.ts`](../../src/lib/finance/fx/sync-orchestrator.ts).
+
+```typescript
+syncCurrencyPair({
+  fromCurrency,
+  toCurrency,
+  rateDate?,              // defaults to today in UTC
+  dryRun?,                // if true: fetch + validate, skip upsert + outbox
+  overrideProviderCode?,  // force a specific adapter (admin endpoint)
+  triggeredBy?            // 'cron' | 'admin' | 'backfill' — tracked in source_sync_runs
+})
+```
+
+Resolution chain:
+
+1. Look up `CURRENCY_REGISTRY[toCurrency].providers.primary`. Attempt adapter.
+2. On failure (adapter threw, circuit breaker open, or row validation rejected), fall through `providers.fallbacks[]` in declared order.
+3. Every transition emits `finance.fx_sync.provider_fallback` to the outbox (new event) for observability.
+4. Success → `upsertFinanceExchangeRateInPostgres` (existing helper) wraps PG upsert + outbox event `finance.exchange_rate.upserted` (existing) in a single transaction; BQ dual-write remains.
+5. All providers exhausted → emit `finance.fx_sync.all_providers_failed` (new) and record the run as failed in `source_sync_runs` (`source_system = 'fx_sync_orchestrator'`). Never throws into the cron handler — the cron always returns 200 with a per-pair result array so Vercel's retry policy does not hide partial successes.
+
+Circuit breaker: 3 fails in 5min for a given `(provider_code, from_currency, to_currency)` → the provider is skipped for 15min. State is in-memory per Vercel function invocation and re-derived from `source_sync_runs` on cold start.
+
+Row-level guard: `rate > 0 && Number.isFinite(rate)`. Anything else is rejected before upsert — prevents garbage from propagating to the pricing engine.
+
+### 6.bis.3 Cron schedule
+
+Three new Vercel cron routes, each hitting `/api/cron/fx-sync-latam?window=morning|midday|evening` with different pair sets, timezone-aware for each provider's publication window:
+
+| Window | UTC | Pairs | Why that hour |
+|--------|-----|-------|---------------|
+| `morning` | 09:00 | USD↔COP (+ CLP↔CLF via `clf_from_indicators` for continuity) | Banco República de Colombia publishes TRM ~06:00 COT (11:00 UTC); we fetch earlier to catch the prior day's official rate |
+| `midday` | 14:00 | USD↔PEN | SUNAT publishes SBS venta mid-morning Peru time (~13:00 UTC); 14:00 UTC ensures same-day rate |
+| `evening` | 22:00 | USD↔MXN | Banxico FIX is published ~13:00 CDT (19:00 UTC) but stabilizes later; 22:00 UTC is the safe window |
+
+The existing 23:05 UTC `/api/finance/economic-indicators/sync` cron (which also upserts USD↔CLP) is **untouched**. TASK-484 refactors the Mindicador fetch to flow through the adapter pattern but keeps the behavior and the entry point identical so no regression on the only pair currently in `auto_synced`.
+
+### 6.bis.4 Admin + backfill
+
+**Admin endpoint:** `POST /api/admin/fx/sync-pair`
+
+- Gated by `canAdministerPricingCatalog` (Finance admin capability).
+- Body: `{ fromCurrency, toCurrency, rateDate?, dryRun?, overrideProviderCode? }`.
+- **`dryRun` defaults to `true`** — the operator must opt in to writing. Dry-run returns the fetch result + which adapter would have been used + validation outcome without touching PG / outbox / BQ.
+- Response includes the run id so Finance can correlate with `source_sync_runs`.
+
+**Backfill CLI:** [`scripts/backfill-fx-rates.ts`](../../scripts/backfill-fx-rates.ts)
+
+- Range-based (`--from YYYY-MM-DD --to YYYY-MM-DD --pair USD-MXN`).
+- Iterates day-by-day, respects adapter `supportsHistorical`, falls through fallbacks on missing days.
+- `--dry-run` prints the expected upserts without writing.
+
+### 6.bis.5 Events
+
+Two new outbox events added to the event catalog:
+
+- `finance.fx_sync.provider_fallback` — emitted every time the orchestrator moves from a primary adapter to a fallback. Payload includes `{ fromCurrency, toCurrency, rateDate, primaryProviderCode, fallbackProviderCode, reason }`.
+- `finance.fx_sync.all_providers_failed` — emitted when the entire chain is exhausted without a valid rate. Payload includes the attempted provider list + last error per attempt. Drives alerting.
+
+The existing `finance.exchange_rate.upserted` event is reused on success — no consumer downstream needs to migrate.
+
+### 6.bis.6 Rollout status
+
+Coverage flip is **deliberately deferred** to a separate PR after 24–48h dry-run verification in staging. TASK-484 landing puts the platform in place; the registry still declares `CLF/COP/MXN/PEN` as `manual_only` so the pricing engine keeps emitting `fx_fallback` warnings until the flip ships.
+
+| Currency | Coverage on TASK-484 merge | Flip PR | Verification required |
+|----------|---------------------------|---------|-----------------------|
+| CLP, USD | `auto_synced` (pre-existing) | n/a | smoke test 23:05 UTC cron still runs identically |
+| CLF | `manual_only` | post-deploy +24h | `clf_from_indicators` adapter emits rows without error |
+| COP | `manual_only` | post-deploy +24h | 09:00 UTC cron posts COP successfully for 2 consecutive days |
+| MXN | `manual_only` | post-deploy +48h | 22:00 UTC cron posts MXN (pending `BANXICO_SIE_TOKEN` provisioning) |
+| PEN | `manual_only` | post-deploy +24h | 14:00 UTC cron posts PEN successfully for 2 consecutive days |
+
+Until the flip PR lands, `FX_SYNC_DRY_RUN=true` may be set at the environment level to force orchestrator runs to dry-run regardless of the request payload — this is the safe posture for the first 24–48h.
+
+---
+
 ## 7. Consumer contract
 
 ### 7.1 Pricing engine v2
@@ -311,6 +412,17 @@ The pricing engine v2 test stubs the `resolvePricingOutputFxReadiness` dep so th
 ---
 
 ## 11. Deltas
+
+### Delta 2026-04-19 — Provider adapter platform (TASK-484)
+
+- Wired 9 provider adapters under `src/lib/finance/fx/providers/` covering USD↔CLP (Mindicador + OpenER), USD↔MXN (Banxico SIE primary, Frankfurter/Fawaz fallback), USD↔COP (Socrata TRM primary, Fawaz fallback), USD↔PEN (apis.net.pe SUNAT primary, BCRP historical, Fawaz fallback), and CLP↔CLF (`clf_from_indicators` reading UF from `economic_indicators`).
+- Added `src/lib/finance/fx/sync-orchestrator.ts` with primary → fallbacks resolution, circuit breaker (3 fails in 5min → skip 15min), row-level validation, transactional PG upsert via `upsertFinanceExchangeRateInPostgres`, and dry-run support.
+- Extended `CurrencyRegistryEntry` with `providers: { primary, fallbacks[], historical? }`; registry is now the single source of truth for adapter chain per pair.
+- Two new outbox events: `finance.fx_sync.provider_fallback` + `finance.fx_sync.all_providers_failed`. Existing `finance.exchange_rate.upserted` reused on success.
+- 3 new Vercel cron routes (09:00/14:00/22:00 UTC for COP/PEN/MXN) via `/api/cron/fx-sync-latam?window=...`. Existing 23:05 UTC cron for USD↔CLP is unchanged — Mindicador fetch refactored into the adapter path without behavior change.
+- New `POST /api/admin/fx/sync-pair` admin endpoint (dryRun default true, `canAdministerPricingCatalog` gate) + `scripts/backfill-fx-rates.ts` CLI for historical backfills.
+- 29/29 vitest passing (circuit-breaker, provider-adapter helpers, sync-orchestrator). `tsc --noEmit` clean, lint clean, build 14.8s.
+- **Rollout deferred to a separate PR.** `CLF/COP/MXN/PEN` remain `manual_only` on TASK-484 merge; flip to `auto_synced` is staggered 24–48h after deploy per currency, pending verification that adapters post without error in staging.
 
 ### Delta 2026-04-19 — V1 foundation (TASK-475)
 
