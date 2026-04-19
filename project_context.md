@@ -9,6 +9,22 @@
   - `src/assets/iconify-icons/bundle-icons-css.ts` sigue siendo la fuente canónica del bundle
   - `package.json` gobierna la regeneración automática
 
+## Delta 2026-04-18 TASK-455 materializa snapshot histórico del contexto comercial en quotations
+
+- Greenhouse ya no debe inferir ex post el contexto comercial de una quote enviada usando solo estado vivo del cliente o del deal.
+- Runtime actualizado:
+  - migración `20260418235105189_task-455-quote-sales-context-snapshot.sql`
+  - columna `greenhouse_commercial.quotations.sales_context_at_sent`
+  - helper `src/lib/commercial/sales-context.ts`
+  - extensión de `POST /api/finance/quotes/[id]/send`
+  - extensión del flujo `POST /api/finance/quotes/[id]/approve`
+  - exposición en `GET /api/finance/quotes/[id]`
+- Contrato operativo:
+  - el snapshot es histórico e immutable
+  - se construye solo con runtime local ya sincronizado
+  - el campo `hubspot_lead_id` queda reservado pero hoy se persiste como `null` por falta de source canónico local
+  - TASK-457 y cualquier classifier vivo deben seguir leyendo estado actual, no este snapshot
+
 ## Delta 2026-04-17 TASK-143 Agency Economics queda activada sobre serving canónico
 
 - `Agency > Economía` ya no debe tratarse como una vista legacy client-first ni como placeholder.

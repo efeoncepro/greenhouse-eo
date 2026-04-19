@@ -1,5 +1,23 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-18 — Quote sales context snapshot formalized on canonical quotations
+
+`TASK-455` agrega un snapshot histórico explícito del contexto comercial al momento del primer `sent` de una cotización.
+
+Tablas impactadas:
+- `greenhouse_commercial.quotations`
+
+Campo nuevo en `greenhouse_commercial.quotations`:
+- `sales_context_at_sent`
+
+Regla vigente:
+- el snapshot vive en el canon de quotations, no en `greenhouse_crm.*`
+- se construye solo con runtime local ya materializado (`clients.lifecyclestage` + `greenhouse_commercial.deals`)
+- es immutable una vez capturado
+- sirve para trazabilidad histórica y analytics
+- no reemplaza el classifier vivo del pipeline híbrido ni debe usarse para UI operativa live
+
+
 ## Delta 2026-04-18 — Client lifecycle bridge formalized on top of canonical company runtime
 
 `TASK-454` agrega un bridge runtime explícito para `lifecyclestage` sin recentralizar el modelo de company.

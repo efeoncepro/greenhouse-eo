@@ -100,6 +100,7 @@ const getLegacyQuoteDetail = async (quoteId: string) => {
     source: String(r.source_system || 'manual'),
     hubspotQuoteId: r.hubspot_quote_id ? String(r.hubspot_quote_id) : null,
     hubspotDealId: r.hubspot_deal_id ? String(r.hubspot_deal_id) : null,
+    salesContextAtSent: null,
     notes: r.notes ? String(r.notes) : null,
     createdAt: r.created_at ? String(r.created_at) : null,
     updatedAt: r.updated_at ? String(r.updated_at) : null

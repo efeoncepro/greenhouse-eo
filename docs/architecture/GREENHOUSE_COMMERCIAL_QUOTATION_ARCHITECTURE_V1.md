@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.12
+> **Version:** 2.13
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-18 — v2.13: TASK-455 quote sales context snapshot. `greenhouse_commercial.quotations` agrega `sales_context_at_sent jsonb` como snapshot histórico e inmutable del contexto comercial al primer `sent` (`lifecyclestage`, `dealstage`, `deal_id`, `hubspot_deal_id`, `category_at_sent`). La captura ocurre en el mismo flujo transaccional que marca `status='sent'`, cubriendo tanto `/send` directo como el cierre del approval workflow. `GET /api/finance/quotes/[id]` ahora lo expone como `salesContextAtSent`. El snapshot sirve para trazabilidad/analytics y NO reemplaza el classifier vivo de TASK-457.
 > **Updated:** 2026-04-18 — v2.12: TASK-464c tool catalog + overhead addons foundation implementada. `greenhouse_ai.tool_catalog` se extiende con `tool_sku`, prorrateo, `applicable_business_lines`, `applicability_tags`, `includes_in_addon` y `notes_for_quoting`; se crea `greenhouse_commercial.overhead_addons` con 9 addons canonizados (`EFO-001..009`). Nuevos módulos `tool-catalog-store.ts`, `overhead-addons-store.ts`, `tool-catalog-events.ts` y seeders idempotentes `scripts/seed-tool-catalog.ts` / `scripts/seed-overhead-addons.ts`. El catálogo comercial sigue conviviendo con AI tooling sin romper consumers existentes.
 > **Updated:** 2026-04-18 — v2.11: TASK-464b pricing governance tables implementada. Nuevas tablas `role_tier_margins`, `service_tier_margins`, `commercial_model_multipliers`, `country_pricing_factors` y `fte_hours_guide` en `greenhouse_commercial`, con versionado liviano por `effective_from`, readers cacheados en `pricing-governance-store.ts` y seeder idempotente `scripts/seed-pricing-governance.ts`. El seed real dejó `21` drifts rol→tier auditados contra `TASK-464a`; el catálogo canónico sigue ganando y la reconciliación queda para consumers posteriores.
 > **Updated:** 2026-04-18 — v2.10: TASK-468 commercial-side payroll employment type bridge. Nueva tabla `greenhouse_commercial.employment_type_aliases` para resolver vocabulario factual de payroll (`contract_type`) hacia `employment_types` canónicos sin tocar `greenhouse_payroll.*`. Nuevos módulos `employment-type-alias-store.ts`, `employment-type-alias-normalization.ts`, `payroll-rates-bridge.ts` y script `scripts/audit-payroll-contract-types.ts`. El bridge queda read-only y auditable; el cutover del engine sigue diferido a TASK-464d.
@@ -10,6 +11,32 @@
 > **Updated:** 2026-04-18 — v2.8: TASK-453 canonical deal bridge. Nuevo mirror `greenhouse_commercial.deals` + `hubspot_deal_pipeline_config`, sync cron `/api/cron/hubspot-deals-sync`, bridge desde `greenhouse_crm.deals` hacia canon comercial, helper `resolveDealForQuote()` y eventos `commercial.deal.created|synced|stage_changed|won|lost`. Esto deja explícita la convivencia: `greenhouse_crm.deals` sigue siendo staging/runtime inbound y `greenhouse_commercial.deals` pasa a ser la entidad comercial canónica para forecast y revenue pipeline híbrido.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-18 — TASK-455 Quote Sales Context Snapshot
+
+- `greenhouse_commercial.quotations` incorpora `sales_context_at_sent jsonb` como snapshot histórico e inmutable del contexto comercial al momento en que la quote queda `sent`.
+- Shape persistido actual:
+  - `captured_at`
+  - `lifecyclestage`
+  - `dealstage`
+  - `deal_id`
+  - `hubspot_deal_id`
+  - `hubspot_lead_id` (hoy `null` por falta de source canónico local)
+  - `is_standalone`
+  - `category_at_sent` (`deal | contract | pre-sales`)
+- Regla de captura:
+  - no hace live lookup a HubSpot
+  - reutiliza runtime local ya materializado en `greenhouse_core.clients.lifecyclestage` y `greenhouse_commercial.deals`
+  - se persiste en el mismo flujo transaccional que marca `status='sent'`
+  - cubre ambos caminos reales a `sent`: `POST /api/finance/quotes/[id]/send` y la resolución final del approval workflow
+- Regla de lectura:
+  - `GET /api/finance/quotes/[id]` expone `salesContextAtSent`
+  - el snapshot es solo para trazabilidad histórica, detalle y analytics
+  - el classifier operativo del pipeline híbrido sigue leyendo estado vivo (`clients.lifecyclestage` + `greenhouse_commercial.deals.dealstage`)
+- Índice nuevo:
+  - `idx_quotations_sales_context_category` sobre `(space_id, sales_context_at_sent ->> 'category_at_sent', sent_at DESC)` parcial para quotes con snapshot
 
 ---
 
@@ -261,7 +288,7 @@ Una quote se considera `converted` cuando `converted_to_income_id` deja de ser N
 | Método | Ruta | Responsabilidad |
 |---|---|---|
 | `GET` | `/api/finance/quotes/[id]/pdf` | Render client-safe del PDF usando `@react-pdf/renderer`. Excluye `unit_cost`, `subtotal_cost`, `margin_pct`, `effective_margin_pct`, `cost_breakdown`, metadata de approvals. `?download=1` cambia `Content-Disposition` de `inline` a `attachment`. Registra `pdf_generated` en audit_log (sin outbox event — es señal interna). |
-| `POST` | `/api/finance/quotes/[id]/send` | Transiciona `draft → sent` (directo si health OK) o `draft → pending_approval` (si health requiere aprobación; crea approval_steps). Bloquea transiciones desde `sent`/`approved`/`pending_approval`/`rejected`/`converted`/`expired` con 409. Emite `commercial.quotation.sent` o `commercial.quotation.approval_requested` según corresponda. Actualiza `sent_at`. |
+| `POST` | `/api/finance/quotes/[id]/send` | Transiciona `draft → sent` (directo si health OK) o `draft → pending_approval` (si health requiere aprobación; crea approval_steps). Bloquea transiciones desde `sent`/`approved`/`pending_approval`/`rejected`/`converted`/`expired` con 409. Emite `commercial.quotation.sent` o `commercial.quotation.approval_requested` según corresponda. Actualiza `sent_at` y captura `sales_context_at_sent` cuando la quote efectivamente queda `sent`. |
 | `POST` | `/api/finance/quotes/[id]/save-as-template` | Crea template en `greenhouse_commercial.quote_templates` desde la quote actual: copia pricing_model, currency, billing_frequency, payment_terms, contract_duration; mapea current-version line items a `quote_template_items` (strip `member_id`, keep role_code); extrae `default_term_ids` de `quotation_terms` con `included=true`. Emite `commercial.quotation.template_saved`. |
 
 ### POST `/api/finance/quotes` extendido
@@ -643,6 +670,7 @@ CREATE TABLE greenhouse_commercial.quotations (
 
   -- Integraciones
   hubspot_deal_id      TEXT,                 -- sync bidireccional
+  sales_context_at_sent JSONB,              -- snapshot historico del contexto comercial al primer send
 
   -- Auditoria
   created_by           TEXT NOT NULL,
@@ -1852,7 +1880,7 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | Evento | Trigger | Consumers |
 |--------|---------|-----------|
 | `commercial.quotation.created` | Crear draft | Notifications → Account Lead, audit log |
-| `commercial.quotation.sent` | Enviar al cliente | HubSpot sync (deal stage), Notifications |
+| `commercial.quotation.sent` | Enviar al cliente | HubSpot sync (deal stage), Notifications, readers históricos del quote detail |
 | `commercial.quotation.approved` | Aprobada (post-approval) | HubSpot sync, crear service module, crear assignments |
 | `commercial.quotation.rejected` | Rechazada | HubSpot sync, Notifications |
 | `commercial.quotation.expired` | Vencida sin renovacion | Notifications → Account Lead + Finance |

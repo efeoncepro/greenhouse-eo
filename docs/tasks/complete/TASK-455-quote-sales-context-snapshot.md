@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-454 (lifecyclestage sync)`
@@ -21,18 +21,18 @@
 
 ## Summary
 
-Capturar un snapshot del contexto comercial HubSpot (lifecyclestage, lead_id si aplica, dealstage al momento de envío) en cada cotización cuando se manda al cliente. Provee trazabilidad histórica: "esta quote se mandó cuando la cuenta era lead, no cuando era customer".
+Capturar un snapshot del contexto comercial local al momento en que una cotización pasa a `sent` (lifecycle client-scoped, dealstage si existe deal asociado y categoría histórica derivada). Provee trazabilidad histórica: "esta quote se mandó cuando la cuenta era lead, no cuando era customer", sin depender de lookups live a HubSpot.
 
 ## Why This Task Exists
 
-Hoy la quote tiene `hubspot_deal_id` pero no sabemos en qué momento del lifecycle de la cuenta se envió. Si una quote se envió a un lead y 6 meses después la cuenta se convierte en customer, perdemos la información "esto era una oportunidad pre-sales". Sin snapshot, el análisis de conversion rate lead→quote→deal→customer queda incompleto y el pipeline híbrido (TASK-457) no puede clasificar correctamente la quote por su context original.
+Hoy la quote tiene `hubspot_deal_id` pero no sabemos en qué momento del lifecycle de la cuenta se envió. Si una quote se envió a un lead y 6 meses después la cuenta se convierte en customer, perdemos la información "esto era una oportunidad pre-sales". Sin snapshot, el análisis de conversion rate lead→quote→deal→customer queda incompleto y falta trazabilidad histórica para reporting y auditoría comercial.
 
 ## Goal
 
-- Cada quote tiene un `sales_context_at_sent` JSONB con snapshot del estado HubSpot
-- El snapshot se captura en el evento `commercial.quotation.sent` y se persiste en la quote
-- Reader expone `getQuoteSalesContext(quotationId)` para UI y analytics
-- Pipeline classifier (TASK-457) puede usar este snapshot para resolver category histórica
+- Cada quote tiene un `sales_context_at_sent` JSONB con snapshot del contexto comercial local al momento de quedar `sent`
+- El snapshot se captura en el mismo flujo transaccional que marca `status='sent'`
+- Reader expone `getQuoteSalesContext(...)` para detalle, auditoría y analytics
+- El snapshot queda disponible para reporting histórico, sin reemplazar el classifier vivo de TASK-457
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -50,12 +50,15 @@ Reglas obligatorias:
 - Snapshot es immutable una vez capturado — no se re-escribe si lifecyclestage cambia después
 - No se hace lookup a HubSpot en hot path del send — usar valores ya sincronizados localmente (TASK-454 + TASK-453)
 - Respetar JSONB schema estable para consumers downstream
+- Cubrir los dos caminos reales hacia `sent`: `/api/finance/quotes/[id]/send` y la resolución final del flujo de aprobación
 - **Crítico — snapshot es para analytics, NO para classification de UI**: el classifier del pipeline híbrido (TASK-457) lee estado **vivo** de `clients.lifecyclestage` + `deals.dealstage`, no el snapshot. Esto permite que una quote a lead transicione automáticamente a Deal cuando el lead califica. El snapshot queda solo como trazabilidad histórica para reporting (conversion funnel lead→quote→deal→won).
 
 ## Normative Docs
 
 - `src/app/api/finance/quotes/[id]/send/route.ts` — handler de send
-- `src/lib/commercial/governance/audit-log.ts` — event de sent
+- `src/app/api/finance/quotes/[id]/approve/route.ts` — entrypoint de decisiones de aprobación
+- `src/lib/commercial/governance/approval-steps-store.ts` — flujo que también puede marcar `sent`
+- `src/lib/commercial/governance/audit-log.ts` — audit trail de quotation
 
 ## Dependencies & Impact
 
@@ -66,14 +69,15 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- TASK-457 — UI híbrido (classifier puede usar snapshot histórico)
+- TASK-457 — UI híbrido (puede leer snapshot solo como contexto histórico, no para classifier vivo)
 - Analytics de conversion funnel (lead→quote→deal→won)
 
 ### Files owned
 
 - `migrations/[verificar]-task-455-quote-sales-context.sql`
 - `src/app/api/finance/quotes/[id]/send/route.ts` (extender)
-- `src/lib/finance/quotation-canonical-store.ts` (extender writer)
+- `src/app/api/finance/quotes/[id]/approve/route.ts` o `src/lib/commercial/governance/approval-steps-store.ts` (cubrir segundo camino a sent)
+- `src/lib/finance/quotation-canonical-store.ts` (extender reader)
 - `src/lib/commercial/sales-context.ts` (nuevo — builder de snapshot)
 - `src/types/db.d.ts` (auto-regen)
 
@@ -82,12 +86,14 @@ Reglas obligatorias:
 ### Already exists
 
 - `greenhouse_commercial.quotations` con `hubspot_deal_id`, `hubspot_quote_id`
-- Endpoint `/api/finance/quotes/[id]/send` que transiciona draft→sent y registra audit
+- Endpoint `/api/finance/quotes/[id]/send` que puede transicionar draft→sent y registra audit
+- Flujo de aprobación que puede terminar en `sent`
 - Publisher `publishQuoteSent` en outbox
 
 ### Gap
 
 - No se persiste lifecyclestage ni dealstage al momento del send
+- No existe helper compartido que capture snapshot cuando la quote entra a `sent`
 - Consumers downstream pierden context histórico
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -108,7 +114,7 @@ Reglas obligatorias:
   "dealstage": "qualifiedtobuy",
   "deal_id": "dl-abc-123" | null,
   "hubspot_deal_id": "HS-456" | null,
-  "hubspot_lead_id": "HS-Lead-789" | null,
+  "hubspot_lead_id": null,
   "is_standalone": false,
   "category_at_sent": "deal" | "contract" | "pre-sales"
 }
@@ -116,21 +122,22 @@ Reglas obligatorias:
 
 ### Slice 2 — Builder + writer
 
-- `buildSalesContextSnapshot({ clientId, quotationId }) → SalesContextSnapshot`
-- Lee `clients.lifecyclestage`, `deals.dealstage` via helpers locales
-- Deriva `category_at_sent` con la misma lógica que usará el classifier del pipeline híbrido
-- Se invoca dentro del handler de `/send` antes de transicionar status
+- `buildSalesContextSnapshot(...) → SalesContextSnapshot`
+- Lee `clients.lifecyclestage` y `deals.dealstage` desde runtime local tenant-scoped
+- Deriva `category_at_sent` con una regla histórica explícita y reusable, sin depender del classifier vivo de TASK-457
+- Se invoca en ambos caminos que pueden dejar `status='sent'`
 
 ### Slice 3 — Reader + consumer hook
 
 - `getQuoteSalesContext(quotationId) → SalesContextSnapshot | null`
-- Expuesto en response de `/api/finance/quotes/[id]` (opcional si es admin/finance viewer)
-- TASK-457 lo consume para clasificación histórica
+- Expuesto en response de `/api/finance/quotes/[id]`
+- Consumers analíticos y de detalle lo pueden leer como contexto histórico
 
 ## Out of Scope
 
 - Snapshot re-capture (no recompute on lifecyclestage change downstream)
 - Snapshots para eventos que no sean `send` (create, approve, reject, etc.)
+- Historial per-version en `quotation_versions` para re-envíos futuros
 - Capturar full payload HubSpot — solo los campos críticos
 
 ## Detailed Spec
@@ -143,7 +150,8 @@ ALTER TABLE greenhouse_commercial.quotations
 
 CREATE INDEX IF NOT EXISTS idx_quotations_sales_context_category
   ON greenhouse_commercial.quotations
-  USING gin ((sales_context_at_sent -> 'category_at_sent'));
+  ((sales_context_at_sent ->> 'category_at_sent'))
+  WHERE sales_context_at_sent IS NOT NULL;
 ```
 
 ### Builder function
@@ -161,8 +169,8 @@ export interface SalesContextSnapshot {
 }
 
 export const buildSalesContextSnapshot = async (params: {
-  clientId: string | null
-  hubspotDealId: string | null
+  quotationId: string
+  spaceId: string
 }): Promise<SalesContextSnapshot>
 ```
 
@@ -172,33 +180,34 @@ export const buildSalesContextSnapshot = async (params: {
 
 ## Acceptance Criteria
 
-- [ ] Migration idempotente
-- [ ] Al enviar una quote (`/send`), `sales_context_at_sent` queda poblado
-- [ ] Quotes ya existentes mantienen NULL (backfill opcional, fuera de scope)
-- [ ] Shape de JSONB pasa JSON schema validation en los 3 escenarios (deal, contract, pre-sales)
-- [ ] Reader expuesto y devuelve null si la quote no ha sido enviada
+- [x] Migration idempotente
+- [x] Al pasar una quote a `sent`, `sales_context_at_sent` queda poblado en ambos caminos soportados
+- [x] Quotes ya existentes mantienen NULL (backfill opcional, fuera de scope)
+- [x] Shape de JSONB pasa JSON schema validation en los 3 escenarios (deal, contract, pre-sales)
+- [x] Reader expuesto y devuelve null si la quote no ha sido enviada
 
 ## Verification
 
-- `pnpm migrate:up`
+- `pnpm pg:connect:migrate`
+- `pnpm exec vitest run src/lib/commercial/sales-context.test.ts`
 - `pnpm lint`
-- `pnpm exec tsc --noEmit --incremental false`
-- `pnpm test`
-- Staging: enviar una quote, verificar snapshot poblado en DB
+- `pnpm build`
+- `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'`
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] Chequeo de impacto cruzado con TASK-457
+- [x] `Lifecycle` sincronizado con carpeta
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] Chequeo de impacto cruzado con TASK-457
 
 ## Follow-ups
 
 - Backfill histórico para quotes ya enviadas (opcional, costo: joins contra snapshots de lifecyclestage que probablemente no existan)
 - Event `commercial.quotation.sales_context_captured` si downstream consumers lo ameritan
+- Variante future-proof per-version si el negocio necesita historial de re-envíos
 
 ## Open Questions
 
-- ¿Capturar snapshot también en `approve` por consistencia, o solo en `send`? Send es el momento canónico de envío al cliente; approve es interno. Propuesta: solo send.
+- ¿Conviene promover más adelante este snapshot a grain per-version en `quotation_versions` para cubrir re-envíos sin ambigüedad?

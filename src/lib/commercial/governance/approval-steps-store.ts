@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
+import { captureSalesContextAtSent } from '@/lib/commercial/sales-context'
 
 import { recordAudit } from './audit-log'
 import {
@@ -51,13 +52,26 @@ const mapStep = (row: StepRow): ApprovalStep => ({
 
 export const listApprovalSteps = async (
   quotationId: string,
+  spaceId?: string,
   versionNumber?: number
 ): Promise<ApprovalStep[]> => {
   const params: unknown[] = [quotationId]
   let filter = 'quotation_id = $1'
 
+  if (spaceId) {
+    params.push(spaceId)
+    filter += ` AND EXISTS (
+      SELECT 1
+      FROM greenhouse_commercial.quotations q
+      WHERE q.quotation_id = greenhouse_commercial.approval_steps.quotation_id
+        AND q.space_id = $2
+    )`
+  }
+
   if (typeof versionNumber === 'number') {
-    filter += ' AND version_number = $2'
+    const placeholder = params.length + 1
+
+    filter += ` AND version_number = $${placeholder}`
     params.push(versionNumber)
   }
 
@@ -82,6 +96,7 @@ export interface RequestApprovalResult {
 export interface RequestApprovalParams {
   quotationId: string
   versionNumber: number
+  spaceId?: string | null
   actor: { userId: string; name: string }
   evaluationInput: ApprovalEvaluationInput
 }
@@ -133,12 +148,22 @@ export const requestApproval = async (
       created.push(mapStep(inserted.rows[0]))
     }
 
-    await client.query(
-      `UPDATE greenhouse_commercial.quotations
-          SET status = 'pending_approval', updated_at = CURRENT_TIMESTAMP
-          WHERE quotation_id = $1`,
-      [params.quotationId]
-    )
+    if (params.spaceId) {
+      await client.query(
+        `UPDATE greenhouse_commercial.quotations
+            SET status = 'pending_approval', updated_at = CURRENT_TIMESTAMP
+            WHERE quotation_id = $1
+              AND space_id = $2`,
+        [params.quotationId, params.spaceId]
+      )
+    } else {
+      await client.query(
+        `UPDATE greenhouse_commercial.quotations
+            SET status = 'pending_approval', updated_at = CURRENT_TIMESTAMP
+            WHERE quotation_id = $1`,
+        [params.quotationId]
+      )
+    }
 
     await recordAudit(
       {
@@ -168,6 +193,7 @@ export interface DecideApprovalParams {
   stepId: string
   decision: 'approved' | 'rejected'
   actor: { userId: string; name: string; roleCodes: string[] }
+  spaceId?: string | null
   notes?: string | null
 }
 
@@ -184,11 +210,14 @@ export const decideApprovalStep = async (
   params: DecideApprovalParams
 ): Promise<DecideApprovalResult> => {
   return withTransaction(async client => {
-    const stepRows = await client.query<StepRow & { actor_role_required: string }>(
-      `SELECT step_id, quotation_id, version_number, policy_id, step_order,
-              required_role, assigned_to, condition_label, status,
-              decided_by, decided_at, notes, created_at
-         FROM greenhouse_commercial.approval_steps
+    const stepRows = await client.query<StepRow & { quotation_space_id: string | null }>(
+      `SELECT s.step_id, s.quotation_id, s.version_number, s.policy_id, s.step_order,
+              s.required_role, s.assigned_to, s.condition_label, s.status,
+              s.decided_by, s.decided_at, s.notes, s.created_at,
+              q.space_id AS quotation_space_id
+         FROM greenhouse_commercial.approval_steps s
+         JOIN greenhouse_commercial.quotations q
+           ON q.quotation_id = s.quotation_id
          WHERE step_id = $1
          FOR UPDATE`,
       [params.stepId]
@@ -211,6 +240,8 @@ export const decideApprovalStep = async (
     if (!hasRole) {
       throw new Error(`Actor does not hold required role: ${row.required_role}`)
     }
+
+    const effectiveSpaceId = params.spaceId ?? row.quotation_space_id
 
     const updated = await client.query<StepRow>(
       `UPDATE greenhouse_commercial.approval_steps
@@ -251,11 +282,22 @@ export const decideApprovalStep = async (
     } else if (allResolved) {
       quotationNewStatus = 'sent'
 
+      if (!effectiveSpaceId) {
+        throw new Error('Approval step quotation is missing tenant scope')
+      }
+
+      await captureSalesContextAtSent({
+        quotationId: step.quotationId,
+        spaceId: effectiveSpaceId,
+        client
+      })
+
       await client.query(
         `UPDATE greenhouse_commercial.quotations
             SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-            WHERE quotation_id = $1`,
-        [step.quotationId]
+            WHERE quotation_id = $1
+              AND space_id = $2`,
+        [step.quotationId, effectiveSpaceId]
       )
     }
 

@@ -2,6 +2,14 @@
 
 ## 2026-04-18
 
+### 2026-04-18 — TASK-455 captura snapshot histórico del contexto comercial al enviar cotizaciones
+
+- `greenhouse_commercial.quotations` agrega `sales_context_at_sent` como JSONB histórico e inmutable para guardar el contexto comercial local al primer `sent`.
+- El snapshot reutiliza `greenhouse_core.clients.lifecyclestage` y `greenhouse_commercial.deals.dealstage`; no hace lecturas live a HubSpot en el hot path.
+- La captura ya cubre ambos caminos reales a `sent`: envío directo (`POST /api/finance/quotes/[id]/send`) y cierre del flujo de aprobación (`POST /api/finance/quotes/[id]/approve`).
+- `GET /api/finance/quotes/[id]` ahora devuelve `salesContextAtSent` para detalle y consumers analíticos.
+- El contrato queda explícito: este snapshot sirve para trazabilidad histórica y reporting, no para reemplazar la clasificación viva del pipeline híbrido.
+
 ### 2026-04-18 — TASK-454 materializa lifecyclestage HubSpot como bridge runtime client-scoped
 
 - `greenhouse_core.clients` agrega `lifecyclestage`, `lifecyclestage_source` y `lifecyclestage_updated_at` como bridge de compatibilidad para consumers legacy que siguen leyendo por `client_id`.

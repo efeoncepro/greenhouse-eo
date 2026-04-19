@@ -67,7 +67,14 @@ export async function GET(
     return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
   }
 
-  const steps = await listApprovalSteps(identity.quotationId)
+  if (!identity.spaceId) {
+    return NextResponse.json(
+      { error: 'La cotización no tiene un scope tenant válido.' },
+      { status: 409 }
+    )
+  }
+
+  const steps = await listApprovalSteps(identity.quotationId, identity.spaceId)
 
   return NextResponse.json({ quotationId: identity.quotationId, items: steps, total: steps.length })
 }
@@ -96,6 +103,13 @@ export async function POST(
     return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
   }
 
+  if (!identity.spaceId) {
+    return NextResponse.json(
+      { error: 'La cotización no tiene un scope tenant válido.' },
+      { status: 409 }
+    )
+  }
+
   let body: DecideBody
 
   try {
@@ -118,8 +132,9 @@ export async function POST(
               total_discount, total_price, effective_margin_pct, target_margin_pct,
               margin_floor_pct, current_version, quote_date, status
          FROM greenhouse_commercial.quotations
-         WHERE quotation_id = $1`,
-      [identity.quotationId]
+         WHERE quotation_id = $1
+           AND space_id = $2`,
+      [identity.quotationId, identity.spaceId]
     )
 
     const header = headerRows[0]
@@ -172,6 +187,7 @@ export async function POST(
     const result = await requestApproval({
       quotationId: identity.quotationId,
       versionNumber: header.current_version,
+      spaceId: identity.spaceId,
       actor: { userId: actor.userId, name: actor.name },
       evaluationInput: {
         businessLineCode: header.business_line_code,
@@ -234,6 +250,7 @@ export async function POST(
         stepId: body.stepId,
         decision: body.decision,
         actor,
+        spaceId: identity.spaceId,
         notes: body.notes ?? null
       })
 
