@@ -486,6 +486,17 @@ Al investigar el bug quedó expuesto que `quotations` mezcla identidades: tiene 
 - **TASK-472 creada** para Codex en `docs/tasks/to-do/TASK-472-my-profile-ssr-500-fix.md` (P2, Effort Bajo-Medio). Cubre diagnóstico + fix + regression test. Ownership Codex (domain identity/person-360 TASK-273/274 ha sido principalmente suyo). Registrada en TASK_ID_REGISTRY + tasks README.
 - **Interpretación del E2E**: la preocupación del usuario ("lo shippeado del programa no se está viendo") se disipó. Todo el programa visible end-to-end. El único rojo es `/my/profile` aislado, ya documentado + asignado.
 
+## Sesion 2026-04-19 — ISSUE-055 documentado en develop: role SKU `ECG-004` sin cost basis resoluble (Codex)
+
+- **Owner:** Codex
+- **Contexto:** diagnóstico manual sobre `/finance/quotes/new` tras reporte del usuario de que `PR Analyst` (`ECG-004`) quedaba en `$0` sin cálculo visible.
+- **Hallazgo confirmado en staging:** `POST /api/finance/quotes/pricing/simulate` para `ECG-004` responde `HTTP 422` con `Missing cost components for role ECG-004`; control con `ECG-001` responde `HTTP 200` y calcula normal.
+- **Root cause operacional:** el SKU existe en `sellable_roles`, pero no tiene filas en `sellable_role_cost_components` ni en `role_employment_compatibility`, por lo que el engine no puede resolver `role_modeled` ni `role_blended`.
+- **Antecedente relevante:** `ECG-004` ya figuraba como `needs_review` en `TASK-464a` por ambigüedad entre `Fee Deel` y `Gastos Previsionales`; el gap es de canonicalización/cost basis del rol, no una caída general del pricing engine.
+- **Documentación creada:** `docs/issues/open/ISSUE-055-quote-builder-role-sku-missing-cost-basis.md`
+- **Tracker actualizado:** `docs/issues/README.md`
+- **Pendiente de implementación:** completar el contrato canónico del rol en `develop` (employment type default + cost components + compatibility) y endurecer la UI del quote builder para exponer explícitamente errores `422` por SKU.
+
 ## Sesion 2026-04-19 — TASK-470 Pricing Catalog Enterprise Hardening (Codex)
 
 - **Owner:** Codex
