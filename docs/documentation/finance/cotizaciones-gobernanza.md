@@ -1,9 +1,9 @@
 # Cotizaciones — Gobernanza, versiones, aprobaciones y templates
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-17 por Claude (TASK-348)
-> **Ultima actualizacion:** 2026-04-17 por Claude (TASK-348)
+> **Ultima actualizacion:** 2026-04-19 por Codex (TASK-504)
 > **Documentacion tecnica:** [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 
 ## Que es
@@ -15,7 +15,7 @@ La gobernanza de cotizaciones es la capa que asegura que las propuestas comercia
 | Dolor operativo | Como lo resuelve la gobernanza |
 |-----------------|---------------------------------|
 | No hay trazabilidad de quién bajó el precio | Audit log inmutable por cotización con actor + timestamp + detalle |
-| Cambios sobre una quote enviada pisan la versión original | Cada edición significativa crea una versión nueva con diff automático vs la anterior |
+| Cambios sobre una quote emitida pisan la versión original | Cada edición significativa crea una versión nueva con diff automático vs la anterior |
 | El Account Lead aprueba descuentos sin visibilidad de Finance | Approval workflow por excepción conectado al margin health |
 | Cada quote se arma desde cero copiando otra | Templates reutilizables por Business Line + pricing model, con line items, terms y defaults |
 | Los términos y condiciones se copian mal de quote en quote | Library centralizada con variables dinámicas ({{payment_terms_days}}, {{valid_until}}, etc.) |
@@ -31,13 +31,13 @@ Cada cotización tiene una versión vigente (`current_version`). Cuando alguien 
 3. Calcula automáticamente un diff: qué se agregó, qué se removió, qué cambió (precio, cantidad, subtotal) y cuánto varió el total y el margen
 4. Deja la cotización en `draft` para que el comercial edite tranquilo
 
-Es el único mecanismo seguro para editar una cotización que ya fue enviada: no se pisa la versión previa, se genera una nueva y el PDF apunta a la vigente.
+Es el único mecanismo seguro para editar una cotización que ya fue emitida: no se pisa la versión previa, se genera una nueva y el PDF apunta a la vigente.
 
 > Detalle técnico: `src/lib/commercial/governance/versions-store.ts` + `version-diff.ts`.
 
 ### 2. Aprobaciones (por excepción)
 
-No toda cotización necesita aprobación. El flujo default es que el Account Lead crea, edita y envía. La aprobación se dispara solo cuando una condición de riesgo se cumple:
+No toda cotización necesita aprobación. El flujo default es que el Account Lead crea, edita y **emite**. La aprobación se dispara solo cuando una condición de riesgo se cumple:
 
 | Condición | Ejemplo de política default |
 |-----------|------------------------------|
@@ -49,12 +49,13 @@ No toda cotización necesita aprobación. El flujo default es que el Account Lea
 
 Flujo real:
 
-1. El comercial presiona **"Evaluar aprobación"** en el tab Aprobaciones
+1. El comercial presiona **"Emitir cotización"** desde el detail, o **"Evaluar excepción"** desde el tab Aprobaciones
 2. El sistema corre el discount health contra los totales de la versión vigente
 3. Busca las approval policies activas que apliquen a esa BL + pricing model
 4. Crea un `approval_step` pendiente por cada política que se haya cumplido
-5. La cotización pasa a `pending_approval` y se notifica a los aprobadores por outbox
-6. Cuando todos los pasos están `approved`, la cotización pasa a `sent` automáticamente; si alguno se rechaza, vuelve a `draft` con las notas visibles
+5. Si hubo excepción, la cotización pasa a `pending_approval` y se notifica a los aprobadores por outbox
+6. Si no hubo excepción, la cotización pasa directo a `issued`
+7. Cuando todos los pasos están `approved`, la cotización pasa a `issued` automáticamente; si alguno se rechaza, queda en `approval_rejected` con las notas visibles
 
 > Detalle técnico: `src/lib/commercial/governance/approval-evaluator.ts` + `approval-steps-store.ts`. Tablas `approval_policies` y `approval_steps`.
 
@@ -131,9 +132,9 @@ La vista `Finanzas > Cotizaciones > [id]` ahora tiene 5 tabs:
 | Tab | Contenido | Acciones |
 |-----|-----------|----------|
 | General | KPIs, metadata, line items, totales | Solo lectura (por ahora) |
-| Versiones | Timeline con diff resumido vs versión anterior | Botón "Nueva versión" (si la quote está en `draft`) |
-| Aprobaciones | Pasos pending + historial decidido | "Evaluar aprobación" (request) + Aprobar/Rechazar (si tienes el rol) |
-| Términos | Lista de terms aplicados con toggle include | Guardar cambios (si la quote está en `draft`) |
+| Versiones | Timeline con diff resumido vs versión anterior | Botón "Nueva versión" (si la quote no está en `pending_approval` ni `converted`) |
+| Aprobaciones | Pasos pending + historial decidido | "Evaluar excepción" (request) + Aprobar/Rechazar (si tienes el rol) |
+| Términos | Lista de terms aplicados con toggle include | Guardar cambios (si la quote está en `draft` o `approval_rejected`) |
 | Auditoría | Timeline cronológico inverso de todos los eventos | Solo lectura |
 
 ### Endpoints disponibles
@@ -142,6 +143,7 @@ La vista `Finanzas > Cotizaciones > [id]` ahora tiene 5 tabs:
 
 - `GET /api/finance/quotes/[id]/versions` — historial + diffs
 - `POST /api/finance/quotes/[id]/versions` — crear nueva versión (clona + diff)
+- `POST /api/finance/quotes/[id]/issue` — emitir la quote o gatillar aprobación por excepción
 - `GET /api/finance/quotes/[id]/approve` — listar pasos de aprobación
 - `POST /api/finance/quotes/[id]/approve` con `{ action: 'request' }` — evaluar y crear pasos
 - `POST /api/finance/quotes/[id]/approve` con `{ action: 'decide', stepId, decision, notes }` — aprobar/rechazar
@@ -160,11 +162,12 @@ La vista `Finanzas > Cotizaciones > [id]` ahora tiene 5 tabs:
 | Evento | Cuándo se emite | Consumers |
 |--------|-----------------|-----------|
 | `commercial.quotation.version_created` | Al crear una nueva versión | HubSpot sync (update deal amount), notifications |
+| `commercial.quotation.issued` | Cuando la quote queda emitida oficialmente | HubSpot sync, projections, quote-to-cash |
 | `commercial.quotation.approval_requested` | Al gatillarse aprobación | Notifications → aprobadores |
 | `commercial.quotation.approval_decided` | Cuando un step se aprueba/rechaza | Notifications → creador + Finance |
-| `commercial.quotation.sent` | Quote pasa a `sent` (post-approval o directo) | HubSpot sync, PDF pipeline (futuro) |
+| `commercial.quotation.sent` | Bridge legacy emitido junto a `issued` mientras existan consumers no migrados | Consumers legacy |
 | `commercial.quotation.approved` | Quote termina aprobada end-to-end | Delivery module (futuro), Finance projections |
-| `commercial.quotation.rejected` | Approval step rechaza | Notifications → creador |
+| `commercial.quotation.rejected` | Evento legacy de rechazo; la persistencia canónica queda en `approval_rejected` | Notifications legacy |
 | `commercial.quotation.template_used` | Template aplicado a una quote | Audit log, telemetría futura |
 | `commercial.quotation.template_saved` | Template creado o save-as-template | Audit log |
 | `commercial.discount.health_alert` | Margin health dispara warning/error | Notifications → Finance |
@@ -175,9 +178,9 @@ La vista `Finanzas > Cotizaciones > [id]` ahora tiene 5 tabs:
 |--------|------------------|
 | Ver cotización y su audit | Finance, Efeonce Admin (heredado por `requireFinanceTenantContext`) |
 | Crear nueva versión | Finance, Finance Admin, Efeonce Admin, Efeonce Operations |
-| Evaluar aprobación (request) | Mismo que crear versión |
+| Emitir cotización / Evaluar excepción | Mismo que crear versión |
 | Decidir un approval step | Quien tenga el `required_role` del step o `efeonce_admin` |
-| Editar terms aplicados | Mismo que crear versión, y solo si la quote está en `draft` |
+| Editar terms aplicados | Mismo que crear versión, y solo si la quote está en `draft` o `approval_rejected` |
 | CRUD approval policies / terms library | Solo Finance Admin y Efeonce Admin |
 | CRUD templates | Cualquier rol con acceso a Finance |
 

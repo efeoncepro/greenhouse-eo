@@ -5,7 +5,7 @@ import { publishCapacityOvercommitDetected } from '@/lib/commercial/capacity-ove
 import { readLatestMemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-const OPEN_QUOTATION_STATUSES = ['pending_approval', 'sent', 'approved'] as const
+const OPEN_QUOTATION_STATUSES = ['pending_approval', 'issued', 'sent', 'approved'] as const
 const DEFAULT_OPERATIONAL_HOURS_PER_FTE = 160
 
 const toNumber = (value: string | number | null | undefined): number => {

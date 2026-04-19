@@ -211,9 +211,8 @@ interface UpdateQuotationPayload {
 const ALLOWED_STATUS_TRANSITIONS = new Set([
   'draft',
   'pending_approval',
-  'sent',
-  'approved',
-  'rejected',
+  'approval_rejected',
+  'issued',
   'expired',
   'converted'
 ])

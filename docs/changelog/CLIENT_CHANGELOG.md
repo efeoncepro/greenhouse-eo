@@ -42,6 +42,32 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.22
+
+**Canal:** Beta
+**Fecha:** 2026-04-19
+**Disponible para:** internal
+**Módulos:** Finanzas / Cotizaciones
+
+### Novedades
+
+- Las cotizaciones ahora tienen un estado oficial **Emitida**. Guardar sigue dejando un borrador; emitir formaliza la versión documental que luego puedes descargar, compartir o convertir.
+
+### Mejoras
+
+- La aprobación queda por excepción: si la quote cumple política financiera, se emite directo; si no, entra a `En aprobación` y al aprobarse termina igual en `Emitida`.
+- Una cotización rechazada por governance queda en **Revisión requerida**, en vez de volver silenciosamente a borrador.
+
+### Correcciones
+
+- PDF, email y acciones de distribución ya no cambian el lifecycle principal de la cotización ni la dejan en un estado ambiguo.
+
+### Notas
+
+- La semántica legacy `sent/approved` sigue tolerada en bridges de compatibilidad mientras terminan de migrar los consumers downstream.
+
+---
+
 ## 2026.04-beta.21
 
 **Canal:** Beta

@@ -142,7 +142,7 @@ interface QuoteAggregate {
   lines: QuoteLineEvidence[]
 }
 
-const OPEN_QUOTE_STATUSES = ['draft', 'pending_approval', 'sent', 'approved'] as const
+const OPEN_QUOTE_STATUSES = ['draft', 'pending_approval', 'approval_rejected', 'issued', 'sent', 'approved'] as const
 
 const round2 = (value: number) => Math.round(value * 100) / 100
 
@@ -211,7 +211,7 @@ const loadOpenQuoteRows = async (organizationIds: string[]) => {
     `SELECT
        q.quotation_id,
        q.quotation_number,
-       COALESCE(q.legacy_status, q.status) AS status,
+       q.status,
        q.total_amount_clp,
        q.commercial_model,
        q.pricing_model,
@@ -244,7 +244,10 @@ const loadOpenQuoteRows = async (organizationIds: string[]) => {
        ON pc.product_id = qli.product_id
        OR pc.finance_product_id = qli.product_id
      WHERE q.organization_id = ANY($1::text[])
-       AND COALESCE(q.legacy_status, q.status) = ANY($2::text[])
+       AND (
+         q.status = ANY($2::text[])
+         OR q.legacy_status = ANY($2::text[])
+       )
      ORDER BY q.quote_date DESC NULLS LAST, q.updated_at DESC, q.quotation_id ASC, qli.sort_order ASC, qli.created_at ASC`,
     [organizationIds, OPEN_QUOTE_STATUSES]
   )

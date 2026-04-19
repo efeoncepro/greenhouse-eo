@@ -14,12 +14,12 @@ import { syncQuoteLineItems } from '@/lib/hubspot/sync-hubspot-line-items'
 
 const HUBSPOT_STATUS_MAP: Record<string, string> = {
   DRAFT: 'draft',
-  PENDING_APPROVAL: 'sent',
-  APPROVAL_NOT_NEEDED: 'sent',
-  APPROVED: 'accepted',
-  REJECTED: 'rejected',
-  SIGNED: 'accepted',
-  LOST: 'rejected',
+  PENDING_APPROVAL: 'pending_approval',
+  APPROVAL_NOT_NEEDED: 'issued',
+  APPROVED: 'issued',
+  REJECTED: 'approval_rejected',
+  SIGNED: 'issued',
+  LOST: 'approval_rejected',
   EXPIRED: 'expired'
 }
 

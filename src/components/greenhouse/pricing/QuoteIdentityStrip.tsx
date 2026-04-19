@@ -14,16 +14,20 @@ import CustomChip from '@core/components/mui/Chip'
 
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 
-export type QuoteStatus = 'draft' | 'sent' | 'approved' | 'expired'
+export type QuoteStatus = 'draft' | 'pending_approval' | 'approval_rejected' | 'issued' | 'sent' | 'approved' | 'expired' | 'converted'
 
 const STATUS_META: Record<
   QuoteStatus,
-  { label: string; color: 'secondary' | 'info' | 'success' | 'error'; icon: string }
+  { label: string; color: 'secondary' | 'warning' | 'info' | 'success' | 'error' | 'primary'; icon: string }
 > = {
   draft: { label: GH_PRICING.identityStrip.draftLabel, color: 'secondary', icon: 'tabler-pencil' },
+  pending_approval: { label: 'En aprobación', color: 'warning', icon: 'tabler-shield-check' },
+  approval_rejected: { label: 'Revisión requerida', color: 'error', icon: 'tabler-shield-x' },
+  issued: { label: 'Emitida', color: 'info', icon: 'tabler-file-check' },
   sent: { label: GH_PRICING.identityStrip.sentLabel, color: 'info', icon: 'tabler-send' },
-  approved: { label: GH_PRICING.identityStrip.approvedLabel, color: 'success', icon: 'tabler-circle-check' },
-  expired: { label: GH_PRICING.identityStrip.expiredLabel, color: 'error', icon: 'tabler-circle-x' }
+  approved: { label: 'Emitida', color: 'info', icon: 'tabler-file-check' },
+  expired: { label: GH_PRICING.identityStrip.expiredLabel, color: 'error', icon: 'tabler-circle-x' },
+  converted: { label: 'Facturada', color: 'primary', icon: 'tabler-receipt-2' }
 }
 
 export interface QuoteIdentityStripProps {

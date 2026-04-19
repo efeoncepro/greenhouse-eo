@@ -39,6 +39,7 @@ interface QuoteRow extends Record<string, unknown> {
   pricing_model: string | null
   status: string
   quote_date: string | Date | null
+  issued_at: string | Date | null
   sent_at: string | Date | null
   approved_at: string | Date | null
   converted_at: string | Date | null
@@ -104,8 +105,9 @@ const buildContractNumber = ({
 
 const deriveStartDate = (quote: QuoteRow, override?: string | null) =>
   override
-  ?? toIsoDate(quote.approved_at)
   ?? toIsoDate(quote.converted_at)
+  ?? toIsoDate(quote.approved_at)
+  ?? toIsoDate(quote.issued_at)
   ?? toIsoDate(quote.sent_at)
   ?? toIsoDate(quote.quote_date)
   ?? new Date().toISOString().slice(0, 10)
@@ -118,8 +120,8 @@ const deriveEndDate = (quote: QuoteRow, override?: string | null) => {
 }
 
 const deriveContractStatus = (quoteStatus: string) => {
-  if (quoteStatus === 'approved' || quoteStatus === 'converted') return 'active'
-  if (quoteStatus === 'sent') return 'draft'
+  if (quoteStatus === 'converted') return 'active'
+  if (quoteStatus === 'issued' || quoteStatus === 'approved' || quoteStatus === 'sent') return 'draft'
 
   return 'draft'
 }
@@ -164,7 +166,7 @@ const loadQuoteForContract = async (client: QueryableClient, quotationId: string
   const result = await client.query(
     `SELECT quotation_id, quotation_number, client_id, organization_id, space_id,
             commercial_model, staffing_model, pricing_model, status,
-            quote_date, sent_at, approved_at, converted_at, expiry_date, valid_until,
+            quote_date, issued_at, sent_at, approved_at, converted_at, expiry_date, valid_until,
             contract_duration_months, mrr, arr, tcv, acv, total_amount_clp, total_price,
             currency, exchange_rate_to_clp
        FROM greenhouse_commercial.quotations

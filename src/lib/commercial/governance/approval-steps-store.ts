@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
-import { captureSalesContextAtSent } from '@/lib/commercial/sales-context'
+import { finalizeQuotationIssued } from '@/lib/commercial/quotation-issuance'
 
 import { recordAudit } from './audit-log'
 import {
@@ -99,6 +99,8 @@ export interface RequestApprovalParams {
   spaceId?: string | null
   actor: { userId: string; name: string }
   evaluationInput: ApprovalEvaluationInput
+  requestOrigin?: 'manual' | 'issue'
+  issueContext?: Record<string, unknown>
 }
 
 export const requestApproval = async (
@@ -169,10 +171,16 @@ export const requestApproval = async (
       {
         quotationId: params.quotationId,
         versionNumber: params.versionNumber,
-        action: 'approval_requested',
+        action: params.requestOrigin === 'issue' ? 'issue_requested' : 'approval_requested',
         actorUserId: params.actor.userId,
         actorName: params.actor.name,
         details: {
+          ...(params.requestOrigin === 'issue'
+            ? {
+                approvalRequired: true,
+                ...params.issueContext
+              }
+            : {}),
           steps: created.map(step => ({
             stepId: step.stepId,
             requiredRole: step.requiredRole,
@@ -182,6 +190,26 @@ export const requestApproval = async (
       },
       client
     )
+
+    if (params.requestOrigin === 'issue') {
+      await recordAudit(
+        {
+          quotationId: params.quotationId,
+          versionNumber: params.versionNumber,
+          action: 'approval_requested',
+          actorUserId: params.actor.userId,
+          actorName: params.actor.name,
+          details: {
+            steps: created.map(step => ({
+              stepId: step.stepId,
+              requiredRole: step.requiredRole,
+              conditionLabel: step.conditionLabel
+            }))
+          }
+        },
+        client
+      )
+    }
 
     return created
   })
@@ -202,7 +230,7 @@ export interface DecideApprovalResult {
   step: ApprovalStep
   allResolved: boolean
   anyRejected: boolean
-  quotationNewStatus: 'sent' | 'draft' | null
+  quotationNewStatus: 'issued' | 'approval_rejected' | null
   versionNumber: number
   quotationId: string
 }
@@ -278,51 +306,32 @@ export const decideApprovalStep = async (
     const anyRejected = statuses.includes('rejected')
     const allResolved = statuses.every(status => status !== 'pending')
 
-    let quotationNewStatus: 'sent' | 'draft' | null = null
+    let quotationNewStatus: 'issued' | 'approval_rejected' | null = null
 
     if (anyRejected) {
-      quotationNewStatus = 'draft'
+      quotationNewStatus = 'approval_rejected'
 
       await client.query(
         `UPDATE greenhouse_commercial.quotations
-            SET status = 'draft', updated_at = CURRENT_TIMESTAMP
+            SET status = 'approval_rejected',
+                approval_rejected_at = CURRENT_TIMESTAMP,
+                approval_rejected_by = $2,
+                updated_at = CURRENT_TIMESTAMP
             WHERE quotation_id = $1`,
-        [step.quotationId]
+        [step.quotationId, params.actor.userId]
       )
     } else if (allResolved) {
-      quotationNewStatus = 'sent'
+      quotationNewStatus = 'issued'
 
-      await captureSalesContextAtSent({
+      await finalizeQuotationIssued({
         quotationId: step.quotationId,
+        versionNumber: step.versionNumber,
+        actor: { userId: params.actor.userId, name: params.actor.name },
         organizationId: effectiveOrganizationId,
         spaceId: effectiveSpaceId,
+        viaApproval: true,
         client
       })
-
-      if (effectiveOrganizationId) {
-        await client.query(
-          `UPDATE greenhouse_commercial.quotations
-              SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-              WHERE quotation_id = $1
-                AND organization_id = $2`,
-          [step.quotationId, effectiveOrganizationId]
-        )
-      } else if (effectiveSpaceId) {
-        await client.query(
-          `UPDATE greenhouse_commercial.quotations
-              SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-              WHERE quotation_id = $1
-                AND space_id = $2`,
-          [step.quotationId, effectiveSpaceId]
-        )
-      } else {
-        await client.query(
-          `UPDATE greenhouse_commercial.quotations
-              SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-              WHERE quotation_id = $1`,
-          [step.quotationId]
-        )
-      }
     }
 
     await recordAudit(
@@ -342,6 +351,24 @@ export const decideApprovalStep = async (
       },
       client
     )
+
+    if (quotationNewStatus === 'approval_rejected') {
+      await recordAudit(
+        {
+          quotationId: step.quotationId,
+          versionNumber: step.versionNumber,
+          action: 'approval_rejected',
+          actorUserId: params.actor.userId,
+          actorName: params.actor.name,
+          details: {
+            stepId: step.stepId,
+            conditionLabel: step.conditionLabel,
+            notes: params.notes ?? null
+          }
+        },
+        client
+      )
+    }
 
     return {
       step,

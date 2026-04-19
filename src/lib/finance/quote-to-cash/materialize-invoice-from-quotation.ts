@@ -84,12 +84,12 @@ const resolveClientName = async (
 }
 
 /**
- * Materializes an income row (invoice) directly from an approved quotation,
+ * Materializes an income row (invoice) directly from an issued quotation,
  * bypassing the OC/HES enterprise branch. This is the "simple branch" for
  * quote-to-cash — typical of non-enterprise clients without procurement chain.
  *
  * Preconditions:
- *  - Quotation status must be 'approved' or 'sent'
+ *  - Quotation status must be 'issued' (legacy: 'approved'/'sent')
  *  - Quotation must NOT already be converted
  *  - No POs or approved HES may be linked to this quotation (use enterprise branch)
  */
@@ -122,11 +122,11 @@ export const materializeInvoiceFromApprovedQuotation = async (
       )
     }
 
-    const allowedStatuses = new Set(['approved', 'sent'])
+    const allowedStatuses = new Set(['issued', 'approved', 'sent'])
 
     if (!allowedStatuses.has(quotation.status)) {
       throw new Error(
-        `Quotation ${quotationId} must be in status 'approved' or 'sent' (current: ${quotation.status}).`
+        `Quotation ${quotationId} must be in status 'issued' (legacy: 'approved' or 'sent') (current: ${quotation.status}).`
       )
     }
 
@@ -180,6 +180,15 @@ export const materializeInvoiceFromApprovedQuotation = async (
       quotation.client_name_cache
     )
 
+    await client.query(
+      `UPDATE greenhouse_commercial.quotations
+         SET status = 'converted',
+             converted_at = CURRENT_TIMESTAMP,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE quotation_id = $1`,
+      [quotationId]
+    )
+
     const contract = await ensureContractForQuotation({
       quotationId,
       actor
@@ -225,9 +234,7 @@ export const materializeInvoiceFromApprovedQuotation = async (
 
     await client.query(
       `UPDATE greenhouse_commercial.quotations
-         SET status = 'converted',
-             converted_to_income_id = $1,
-             converted_at = CURRENT_TIMESTAMP,
+         SET converted_to_income_id = $1,
              updated_at = CURRENT_TIMESTAMP
          WHERE quotation_id = $2`,
       [incomeId, quotationId]

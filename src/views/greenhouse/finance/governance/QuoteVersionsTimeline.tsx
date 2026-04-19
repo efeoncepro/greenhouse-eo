@@ -127,7 +127,7 @@ const QuoteVersionsTimeline = ({
   }
 
   const lockedForNewVersion =
-    quotationStatus === 'pending_approval' || quotationStatus === 'approved' || quotationStatus === 'converted'
+    quotationStatus === 'pending_approval' || quotationStatus === 'converted'
 
   return (
     <Stack spacing={3}>
@@ -152,7 +152,7 @@ const QuoteVersionsTimeline = ({
         {lockedForNewVersion && canCreateVersion && (
           <Box sx={{ px: 3, pb: 2 }}>
             <Alert severity='info'>
-              No se puede crear una versión mientras la cotización esté en {quotationStatus}. Vuelve a borrador primero.
+              No se puede crear una versión mientras la cotización esté en {quotationStatus}. Espera a que termine la aprobación o conversión para continuar.
             </Alert>
           </Box>
         )}

@@ -2,6 +2,14 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-504 quotation issuance lifecycle + approval-by-exception
+
+- Las cotizaciones ya no quedan atrapadas en el limbo semántico de `draft/sent/approved`. El lifecycle canónico pasa a `draft -> issued` cuando cumple policy, o `draft -> pending_approval -> issued` cuando requiere excepción.
+- Se crea el comando `issue` (`POST /api/finance/quotes/[id]/issue`) y `/send` queda solo como wrapper de compatibilidad. PDF, email y share dejan de redefinir el estado documental principal.
+- `greenhouse_commercial.quotations` ahora persiste `issued_at`, `issued_by`, `approval_rejected_at` y `approval_rejected_by`; rechazo de aprobación queda explícito como `approval_rejected`, no como retorno silencioso a borrador.
+- Se agrega el evento canónico `commercial.quotation.issued`; `commercial.quotation.sent` sigue publicándose temporalmente como bridge legacy para consumers no migrados.
+- Quote detail, list, governance tabs, quote-to-cash, contract lifecycle, HubSpot status mapping y proyecciones comerciales convergen sobre `issued` como documento oficial.
+
 ### 2026-04-19 — Quote Builder persisted pricing hardening
 
 - El Quote Builder deja de guardar líneas auto-valorizadas con `unit_price = 0` cuando el usuario cotiza desde catálogo, personas, tools u overheads. El submit ahora persiste el precio resuelto por el pricing engine v2, no solo el valor manual del draft.
