@@ -36,11 +36,13 @@ Revisar y respetar:
 - `docs/tasks/to-do/TASK-452-service-attribution-foundation.md`
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_FINANCE_METRIC_REGISTRY_V1.md`
+- `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`
 
 Reglas obligatorias:
 
 - El feedback loop consume serving/attribution; no recalcula heurísticas opacas inline.
 - La comparación debe mantener provenance suficiente para explicar el desvío.
+- La materialización batch de este loop debe vivir en `commercial-cost-worker`, sobre `POST /margin-feedback/materialize`, no en `ops-worker`.
 
 ## Dependencies & Impact
 
@@ -72,6 +74,7 @@ Reglas obligatorias:
 - document chain
 - cost intelligence consumers
 - service attribution foundation planificada
+- `TASK-483` ya dejó `commercial-cost-worker` operativo y reservó `POST /margin-feedback/materialize` como runtime target para esta task.
 
 ### Gap
 

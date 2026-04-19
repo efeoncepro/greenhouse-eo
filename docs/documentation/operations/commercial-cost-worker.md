@@ -56,3 +56,15 @@ La topologia objetivo es:
 - Scheduler base: `commercial-cost-materialize-daily`
 - Region: `us-east4`
 - Auth: IAM de Cloud Run con fallback opcional `CRON_SECRET`
+
+## Estado validado 2026-04-19
+
+- Workflow GitHub Actions validado: runs `24629415478` y `24629615574`
+- Revisión lista en Cloud Run: `commercial-cost-worker-00002-9xj`
+- Smoke run manual del scheduler: HTTP `200`
+- Evidencia persistida:
+  - `greenhouse_sync.source_sync_runs.sync_run_id = commercial-cost-6382a7ca-50fb-403c-b2c0-33dfba0f5503`
+  - `greenhouse_commercial.commercial_cost_basis_snapshots.snapshot_key = ccb:bundle:2026-04:global:commercial-cost-6382a7ca-50fb-403c-b2c0-33dfba0f5503`
+  - `records_written = 56`
+  - `records_failed = 0`
+- Corrección aplicada post-smoke: el join de `client_labor_cost_allocation` quedó endurecido con alias explícito en `member-period-attribution.ts` y test de regresión dedicado.

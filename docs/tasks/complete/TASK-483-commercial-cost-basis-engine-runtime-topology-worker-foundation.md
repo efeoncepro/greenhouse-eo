@@ -6,22 +6,29 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Implementación base completada; despliegue Cloud Run pendiente`
+- Status real: `Cerrada: worker desplegado en Cloud Run con WIF, scheduler activo y smoke run validado`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
 Definir e implementar la topología runtime del motor `Commercial Cost Basis` con un modelo híbrido y un **worker dedicado**: el portal mantiene el quote builder interactivo y lecturas livianas, mientras `commercial-cost-worker` absorbe materializaciones pesadas, backfills, recomputes orquestados y foundations batch del programa. Esta task evita que `TASK-477` a `TASK-482` terminen empujando cómputo intensivo a routes request-response o ampliando `ops-worker` como hogar permanente.
+
+## Closure Delta 2026-04-19
+
+- `commercial-cost-worker` quedó desplegado en Cloud Run `us-east4` con auto-deploy GitHub Actions -> WIF -> Cloud Run, sin llaves estáticas nuevas.
+- El scheduler `commercial-cost-materialize-daily` quedó habilitado sobre el servicio dedicado.
+- Se ejecutó smoke real contra la revisión `commercial-cost-worker-00002-9xj`: HTTP `200`, `source_sync_runs` en `succeeded` y snapshot `bundle` con `56` writes / `0` failed.
+- La primera corrida detectó un bug real de ambigüedad SQL en `client_labor_cost_allocation`; quedó corregido de raíz en `src/lib/commercial-cost-attribution/member-period-attribution.ts` usando alias explícito y test de regresión.
 
 ## Why This Task Exists
 
@@ -70,7 +77,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`
-- `docs/tasks/in-progress/TASK-475-greenhouse-fx-currency-platform-foundation.md`
+- `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md`
 - `docs/tasks/to-do/TASK-478-tool-provider-cost-basis-snapshots.md`
 - `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md`
 - `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
@@ -124,14 +131,13 @@ Reglas obligatorias:
 - El pricing engine actual del quote builder corre en modo síncrono dentro del portal y sirve bien para previews livianos.
 - Ya existen stores/materializaciones reusables para `member_capacity_economics`, `commercial_cost_attribution` y `provider_tooling_snapshots`.
 - `source_sync_runs` ya sirve como ledger base de corridas, y `greenhouse_context` permite guardar contexto rico sin inflar ese ledger.
+- `commercial-cost-worker` ya existe como servicio Cloud Run productizable con deploy automatizado por WIF, endpoints activos para `people`, `tools` y `bundle`, y scheduler base diario.
+- `greenhouse_commercial.commercial_cost_basis_snapshots` ya existe como manifiesto por `scope + period + run`, enlazado a `greenhouse_sync.source_sync_runs`.
 
 ### Gap
 
-- No existe contrato formal para separar preview interactivo de recompute/materialize pesado en Commercial Cost Basis.
-- No existe un worker dedicado ni un naming/deploy contract explícito para el lane comercial.
-- No existe una familia de tablas/contratos `commercial_cost_basis_*` para versionado y trazabilidad del basis engine.
-- No existe una familia de endpoints/jobs canonizada para snapshots de costo del programa; hoy hay materializadores puntuales, pero no un execution plane comercial cohesivo.
-- `TASK-477` a `TASK-482` no tienen todavía un runtime target claro, así que podrían divergir entre portal, `ops-worker` y un worker comercial futuro.
+- `TASK-477` a `TASK-482` todavía deben completar la matemática y los contratos de dominio que consumen este runtime.
+- `roles`, `quotes/reprice-bulk` y `margin-feedback/materialize` siguen reservados hasta que sus tasks hijas implementen el payload y la lógica final.
 - `docs/architecture/schema-snapshot-baseline.sql` quedó desactualizado frente a varias tablas/columnas del lane comercial y no puede tomarse como inventario exhaustivo sin corrección.
 
 ## Scope
@@ -208,11 +214,11 @@ La task debe aterrizar ese worker dedicado con naming, deploy, auth, run trackin
 
 ## Acceptance Criteria
 
-- [ ] Existe una decisión runtime explícita y aplicada para Commercial Cost Basis con separación clara entre lane interactivo del portal y lane de cómputo pesado en un worker dedicado de Cloud Run.
-- [ ] Existe una foundation de worker HTTP dedicado para Commercial Cost Basis con auth, run tracking y observabilidad reusando contratos existentes del repo.
-- [ ] El quote builder / pricing interactivo consume snapshots o resolvers livianos y no absorbe materializaciones batch inline.
-- [ ] La foundation batch cubre al menos `people` y `tools/provider` con contratos explícitos, y deja `roles` / `reprice-bulk` / `margin-feedback` documentados como follow-on del programa.
-- [ ] `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` y `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` quedan sincronizados con la topología elegida y explican por qué no se usa `ops-worker` como runtime base.
+- [x] Existe una decisión runtime explícita y aplicada para Commercial Cost Basis con separación clara entre lane interactivo del portal y lane de cómputo pesado en un worker dedicado de Cloud Run.
+- [x] Existe una foundation de worker HTTP dedicado para Commercial Cost Basis con auth, run tracking y observabilidad reusando contratos existentes del repo.
+- [x] El quote builder / pricing interactivo consume snapshots o resolvers livianos y no absorbe materializaciones batch inline.
+- [x] La foundation batch cubre al menos `people` y `tools/provider` con contratos explícitos, y deja `roles` / `reprice-bulk` / `margin-feedback` documentados como follow-on del programa.
+- [x] `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` y `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` quedan sincronizados con la topología elegida y explican por qué no se usa `ops-worker` como runtime base.
 
 ## Verification
 
@@ -222,15 +228,29 @@ La task debe aterrizar ese worker dedicado con naming, deploy, auth, run trackin
 - `docker build -f services/commercial-cost-worker/Dockerfile .`
 - validación manual del endpoint/worker elegido en staging o entorno equivalente
 
+### Verification Run 2026-04-19
+
+- `pnpm build` ok
+- `pnpm lint` ok
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/member-period-attribution.test.ts` ok
+- GitHub Actions `commercial-cost-worker-deploy` ok: runs `24629415478` y `24629615574`
+- Cloud Run ready revision: `commercial-cost-worker-00002-9xj`
+- Smoke run vía Cloud Scheduler manual: HTTP `200`
+- DB trace validada:
+  - `source_sync_runs.triggered_by = 'commercial_cost_worker'`
+  - `sync_run_id = commercial-cost-6382a7ca-50fb-403c-b2c0-33dfba0f5503`
+  - snapshot `ccb:bundle:2026-04:global:commercial-cost-6382a7ca-50fb-403c-b2c0-33dfba0f5503`
+  - `records_written = 56`, `records_failed = 0`
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] la decisión final dejó explícito el nombre/ownership del worker dedicado y la frontera con `ops-worker`
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] la decisión final dejó explícito el nombre/ownership del worker dedicado y la frontera con `ops-worker`
 
 ## Follow-ups
 

@@ -8,6 +8,12 @@
 - El workflow observa no solo `services/commercial-cost-worker/**`, sino también las librerías compartidas que cambian el runtime efectivo del worker (`commercial-cost-worker`, `commercial-cost-attribution`, `providers`, `db`, `structured-context`, `sync`, `src/types/db.d.ts`, lockfile y `tsconfig`), reduciendo drift entre monorepo y Cloud Run.
 - `services/commercial-cost-worker/deploy.sh` ahora deja visible la `latestReadyRevisionName` y el estado `ready` después del deploy, y documenta explícitamente la topología / capacidad conservadora del worker.
 
+### 2026-04-19 — TASK-483 cierra con smoke real del commercial-cost-worker
+
+- `commercial-cost-worker` queda validado como runtime base del programa `Commercial Cost Basis`: Cloud Run desplegado en `us-east4`, scheduler `commercial-cost-materialize-daily` habilitado y smoke real exitoso sobre la revisión `commercial-cost-worker-00002-9xj`.
+- La primera corrida detectó una ambigüedad SQL real en la materialización `bundle`; el fix endurece `src/lib/commercial-cost-attribution/member-period-attribution.ts` con alias explícito y agrega test de regresión para blindar futuros joins sobre `client_labor_cost_allocation`.
+- `TASK-476` a `TASK-482` quedan actualizadas para consumir este runtime foundation existente y no reabrir el debate de topología ni desviar batch work hacia `ops-worker`.
+
 ### 2026-04-19 — TASK-483 crea el commercial-cost-worker y el ledger de cost basis
 
 - Nace `services/commercial-cost-worker/` como runtime Cloud Run dedicado para la base de costos comercial. Expone `POST /cost-basis/materialize`, `/people`, `/tools` y `/bundle`, y reserva `/roles`, `/quotes/reprice-bulk` y `/margin-feedback/materialize` para las siguientes tasks del programa.

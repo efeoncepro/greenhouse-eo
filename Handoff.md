@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-483 cerrada con deploy WIF + smoke real (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete` en `develop`
+- **Scope:** cerrar de forma real el runtime foundation de Commercial Cost Basis y propagar el contrato a las tasks hermanas del programa.
+- **Cierre operativo:**
+  - `commercial-cost-worker` ya está desplegado en Cloud Run `us-east4`
+  - auto-deploy vía GitHub Actions + WIF validado en runs `24629415478` y `24629615574`
+  - scheduler `commercial-cost-materialize-daily` habilitado
+  - revisión lista validada: `commercial-cost-worker-00002-9xj`
+- **Smoke real:** corrida manual del scheduler -> HTTP `200`, `source_sync_runs` en `succeeded`, snapshot `bundle` `2026-04` con `56` writes / `0` failed
+- **Bug real encontrado en producción controlada:** el materializador `bundle` falló al primer smoke por `column reference "client_id" is ambiguous` en `client_labor_cost_allocation`; se corrigió endureciendo el query con alias explícito en `src/lib/commercial-cost-attribution/member-period-attribution.ts` y test de regresión dedicado.
+- **Backlog sincronizado:** `TASK-476` a `TASK-482` ahora dejan explícito que el worker ya existe y que sus slices batch deben montarse sobre `commercial-cost-worker`, no sobre `ops-worker` ni sobre request-response del portal.
+- **Ubicación del cierre:** `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`
+
 ## Sesion 2026-04-19 — commercial-cost-worker auto-deploy via GitHub Actions + WIF (Codex)
 
 - **Owner:** Codex

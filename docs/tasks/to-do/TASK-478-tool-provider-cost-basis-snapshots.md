@@ -35,6 +35,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`
 - `docs/tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md`
 
 Reglas obligatorias:
@@ -42,6 +43,7 @@ Reglas obligatorias:
 - `greenhouse_ai.tool_catalog` sigue siendo el catálogo canónico.
 - `greenhouse_core.providers` sigue siendo la identidad cross-domain del vendor.
 - Cada snapshot debe declarar freshness, provenance y confidence.
+- La materialización batch de tools/provider vive en `commercial-cost-worker`; el portal solo lee, explica o dispara la corrida.
 
 ## Dependencies & Impact
 
@@ -73,6 +75,7 @@ Reglas obligatorias:
 - licencias por member
 - credit ledger
 - providers cross-domain
+- `TASK-483` ya dejó activo `POST /cost-basis/materialize/tools` en `commercial-cost-worker` como runtime base de esta materialización.
 
 ### Gap
 

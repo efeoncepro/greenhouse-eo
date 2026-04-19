@@ -36,12 +36,14 @@ Revisar y respetar:
 - `docs/tasks/to-do/TASK-473-quote-builder-full-page-surface-migration.md`
 - `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`
 - `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
+- `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`
 
 Reglas obligatorias:
 
 - La surface principal es full-page builder, no `QuoteCreateDrawer`.
 - La UI no recalcula costo; consume la salida del engine/shared readers.
 - Override requiere motivo y debe dejar trazabilidad.
+- Si la UI necesita refrescar snapshots pesados, debe disparar el lane asíncrono existente y reflejar estado; no bloquear el builder con recomputes inline.
 
 ## Dependencies & Impact
 
@@ -75,6 +77,7 @@ Reglas obligatorias:
 - builder actions
 - totals footer
 - item picker
+- `TASK-483` ya dejó el split `portal interactive lane + commercial-cost-worker`, así que esta task debe quedarse en UX/consumo y no reabrir topología.
 
 ### Gap
 

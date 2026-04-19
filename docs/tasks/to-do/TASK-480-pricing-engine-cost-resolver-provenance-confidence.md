@@ -36,12 +36,14 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 - `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`
 - `docs/tasks/to-do/TASK-475-greenhouse-fx-currency-platform-foundation.md`
+- `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`
 
 Reglas obligatorias:
 
 - La prioridad de resolución debe ser explícita y determinística.
 - El engine no debe recalcular lógica de FX ni de costo factual inline; consume readers shared.
 - Override manual sigue existiendo, pero como excepción gobernada, no como camino default.
+- Repricing bulk o recomputes masivos salen del runtime interactivo y se delegan a `commercial-cost-worker`, sobre `POST /quotes/reprice-bulk` cuando esta task lo habilite.
 
 ## Dependencies & Impact
 
@@ -72,6 +74,7 @@ Reglas obligatorias:
 - pricing engine v2
 - quote canonical store
 - service expansion
+- `TASK-483` ya dejó `commercial-cost-worker` como compute lane canónico y reservó `POST /quotes/reprice-bulk` para el follow-on batch de esta task.
 
 ### Gap
 

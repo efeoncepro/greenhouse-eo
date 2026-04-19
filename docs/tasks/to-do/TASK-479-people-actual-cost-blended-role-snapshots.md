@@ -40,6 +40,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+- `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`
 - `docs/tasks/complete/TASK-468-payroll-commercial-employment-types-unification.md`
 
 Reglas obligatorias:
@@ -47,6 +48,7 @@ Reglas obligatorias:
 - `member_capacity_economics` es la fuente comercial principal de costo real por persona.
 - Payroll sigue siendo owner factual y solo se consume cuando hace falta enriquecer o explicar.
 - No crear otra identidad de persona comercial.
+- La materialización batch de personas/blended snapshots debe montarse sobre `commercial-cost-worker`; no va en `ops-worker` ni en request-response del portal.
 
 ## Dependencies & Impact
 
@@ -77,6 +79,7 @@ Reglas obligatorias:
 - `member_capacity_economics`
 - payroll factual
 - foundations de roles y employment types
+- `TASK-483` ya dejó activo `POST /cost-basis/materialize/people` en `commercial-cost-worker` para esta foundation.
 
 ### Gap
 

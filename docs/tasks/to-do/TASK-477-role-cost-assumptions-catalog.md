@@ -35,6 +35,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`
 - `docs/tasks/complete/TASK-464a-sellable-roles-catalog-canonical.md`
 - `docs/tasks/complete/TASK-468-payroll-commercial-employment-types-unification.md`
 
@@ -43,6 +44,7 @@ Reglas obligatorias:
 - Reusar `greenhouse_commercial.sellable_roles` y `sellable_role_cost_components`; no crear un catálogo maestro de roles paralelo.
 - `Payroll` sigue siendo owner factual; esta task modela costo comercial, no reescribe `compensation_versions`.
 - Las assumptions deben ser versionadas/effective-dated y auditables.
+- Si la task necesita materialización batch o backfill, debe habilitar el endpoint reservado `POST /cost-basis/materialize/roles` en `commercial-cost-worker`, no crecer en `ops-worker`.
 
 ## Dependencies & Impact
 
@@ -74,10 +76,12 @@ Reglas obligatorias:
 - `sellable_role_cost_components`
 - `role_employment_compatibility`
 - bridge commercial-side de employment types hacia payroll
+- `TASK-483` ya dejó `commercial-cost-worker` operativo y reservó `POST /cost-basis/materialize/roles` como target runtime de esta slice.
 
 ### Gap
 
 - No existe un contrato explícito de `role_modeled` con confidence/effective dating suficientemente fuerte.
+- El endpoint reservado de roles todavía no tiene payload/lógica final porque depende de esta task.
 
 ## Scope
 

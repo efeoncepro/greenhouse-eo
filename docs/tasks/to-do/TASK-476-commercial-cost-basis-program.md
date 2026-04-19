@@ -11,7 +11,7 @@
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `Diseno`
+- Status real: `Diseno consolidado; runtime foundation cerrada en TASK-483`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-475`
@@ -42,6 +42,7 @@ Lo que falta no es otro catálogo maestro, sino una capa que orqueste esas found
 - Declarar la jerarquía `actual -> blended -> modeled -> manual`.
 - Registrar child tasks ejecutables para roles, tools, personas, engine, UI y feedback loop.
 - Aislar el runtime pesado del programa en un worker dedicado y no en `ops-worker`.
+- Consumir el runtime foundation ya cerrado en `TASK-483` en vez de rediscutir topología en cada child task.
 - Proteger el resto del backlog de pricing para que no absorba este scope por accidente.
 
 ## Architecture Alignment
@@ -64,6 +65,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
+- `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`
 - `docs/tasks/complete/TASK-464a-sellable-roles-catalog-canonical.md`
 - `docs/tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md`
 - `docs/tasks/complete/TASK-468-payroll-commercial-employment-types-unification.md`
@@ -102,10 +104,11 @@ Reglas obligatorias:
 
 - Foundations fuertes de personas, payroll, roles, tooling, providers, servicios y FX ya viven en el repo.
 - El pricing engine v2 y el quote builder ya existen y pueden evolucionar.
+- `TASK-483` ya dejó `commercial-cost-worker` desplegado en Cloud Run con WIF, scheduler base y endpoints activos para `people`, `tools` y `bundle`.
 
 ### Gap
 
-- No existe una umbrella que explicite `Commercial Cost Basis`.
+- La umbrella todavía no traduce el runtime ya creado en un roadmap operativo detallado por child task.
 - Falta una jerarquía única de resolución y una semántica shared de provenance/confidence/freshness.
 
 ## Scope
