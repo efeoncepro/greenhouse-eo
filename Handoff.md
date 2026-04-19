@@ -33,6 +33,34 @@
   - para pasar `pnpm build` en este worktree fue necesario materializar `node_modules` localmente; Turbopack falló con el symlink fuera del filesystem root
   - no hay cambio de repo asociado a ese workaround
 
+## Sesion 2026-04-18 — TASK-463 Unified Quote Builder + Bidirectional HubSpot Bridge (cierre)
+
+- **Owner:** Claude
+- **Estado:** shipped + closed (Lifecycle `complete`, archivo movido a `docs/tasks/complete/`)
+- **Branch:** `task/TASK-463-unified-quote-builder-hubspot-bidirectional` (PR pendiente de squash-merge)
+- **Entregables:**
+  - **UI**: `src/views/greenhouse/finance/QuotesListView.tsx` — drawer `CreateQuoteDrawer` inline (284 líneas) + botón "HubSpot" + state `hubspotDrawerOpen` eliminados. 753 → 432 líneas
+  - **Helper outbound**: `src/lib/hubspot/push-canonical-quote.ts` — adapter canonical → legacy `createHubSpotQuote()`. Skip sin deal_id, create sin quote_id, update (stub) si existe
+  - **Helper update stub**: `src/lib/hubspot/update-hubspot-quote.ts` — PATCH al Cloud Run con fallback graceful a `update_not_supported`
+  - **Reactive projection**: `src/lib/sync/projections/quotation-hubspot-outbound.ts` (domain `cost_intelligence`) + registro en `projections/index.ts`
+  - **Event catalog**: `commercial.quotation.pushed_to_hubspot` + `commercial.quotation.hubspot_sync_failed` en `event-catalog.ts`
+  - **Publishers**: `publishQuotationPushedToHubSpot` + `publishQuotationHubSpotSyncFailed` en `quotation-events.ts`
+  - **Endpoint deprecado**: `POST /api/finance/quotes/hubspot` → 410 Gone + telemetría `console.warn`
+  - **Tests**: 3 escenarios (skip/create/update) en `src/lib/hubspot/__tests__/push-canonical-quote.test.ts`
+  - **Docs**: `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` v2.13 con Delta completo; `GREENHOUSE_EVENT_CATALOG_V1.md` con dos entradas nuevas
+- **Zero schema change**: columnas `hubspot_quote_id`, `hubspot_deal_id`, `hubspot_last_synced_at` ya existían en `greenhouse_commercial.quotations`
+- **Gates verdes**:
+  - `pnpm lint` → clean
+  - `npx tsc --noEmit` → clean
+  - `pnpm test` → 282/282 (194 payroll + 21 pricing + 64 commercial/hubspot + 3 TASK-463)
+  - `pnpm build` → compiled exit 0
+- **Flujo operativo**: User crea quote canónica → outbox event `commercial.quotation.created` → ops-worker consume vía projection `quotationHubSpotOutbound` → `pushCanonicalQuoteToHubSpot` → `createHubSpotQuote()` (primer push) o `updateHubSpotQuote()` (downstream updates). Idempotente por `hubspot_quote_id` natural key. Lifecycle events (`sent/approved/rejected/version_created`) disparan la misma projection automáticamente.
+- **Follow-ups abiertos** (no bloquean cierre):
+  - Endpoint PATCH real en Cloud Run `hubspot-greenhouse-integration` (hoy `updateHubSpotQuote` es stub)
+  - Dropear `greenhouse_finance.quotes` legacy cuando termine ventana de coexistencia
+  - Webhook subscription HubSpot para inbound casi-real-time
+  - Outbound de custom properties (ownership, deal stage)
+
 ## Sesion 2026-04-18 — TASK-454 tomada en worktree aislado (Codex)
 
 - **Owner:** Codex

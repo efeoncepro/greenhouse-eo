@@ -1,21 +1,47 @@
 # TASK-463 — Unified Quote Builder + Bidirectional HubSpot Bridge
 
+## Delta 2026-04-18 (close-out)
+
+**Status real: complete.** Shipped en PR único (ver commit squash en develop):
+
+- **UI unificada**: drawer `CreateQuoteDrawer` legacy inline (284 líneas) + botón "HubSpot" + state `hubspotDrawerOpen` eliminados de `QuotesListView.tsx` (753 → 432 líneas). Queda solo "+ Nueva cotización" que consume `QuoteCreateDrawer` canónico.
+- **Helper outbound nuevo** `src/lib/hubspot/push-canonical-quote.ts` adapta quote canónica al payload de `createHubSpotQuote()` legacy. Skip silencioso si falta `hubspot_deal_id`. Create si no existe `hubspot_quote_id`; update (stub) si ya existe.
+- **Helper update stub** `src/lib/hubspot/update-hubspot-quote.ts` — PATCH al Cloud Run service con fallback graceful a `update_not_supported`. Endpoint downstream pendiente de implementar (no bloquea el create path).
+- **Reactive projection** `src/lib/sync/projections/quotation-hubspot-outbound.ts` (domain `cost_intelligence`) consume `quotation.created|sent|approved|rejected|version_created` y dispara el push outbound async. Registrada en `projections/index.ts`. Retries via ops-worker (`maxRetries: 2`).
+- **Eventos catalog**: `commercial.quotation.pushed_to_hubspot` + `commercial.quotation.hubspot_sync_failed` agregados a `event-catalog.ts`. Publishers correspondientes en `quotation-events.ts`.
+- **Endpoint legacy deprecado**: `POST /api/finance/quotes/hubspot` → 410 Gone + telemetría `console.warn`. Archivo mantenido para rastreo de callers durante ventana de deprecation.
+- **Tests**: 3 escenarios (skip sin deal_id, create path, update path) con mocks del helper en `src/lib/hubspot/__tests__/push-canonical-quote.test.ts`.
+- **Schema changes**: NINGUNO. Las columnas `hubspot_quote_id`, `hubspot_deal_id`, `hubspot_last_synced_at` ya existían en `greenhouse_commercial.quotations`.
+
+**Supuestos corregidos vs spec original (documentados en audit):**
+
+- La columna `hubspot_quote_id` ya existía en canonical — no se necesitó migration
+- `CreateQuoteDrawer` vivía inline en `QuotesListView.tsx`, no como archivo separado
+- Patrón `*.pushed_to_hubspot` es nuevo — TASK-453 deals solo tiene eventos inbound, no hay precedente
+
+**Follow-ups explícitos:**
+
+- Implementar endpoint PATCH real en Cloud Run `hubspot-greenhouse-integration` para que `updateHubSpotQuote` deje de ser stub
+- Dropear `greenhouse_finance.quotes` legacy completo cuando termine la ventana de coexistencia
+- Webhook subscription HubSpot `quote.propertyChange` para inbound casi-real-time (hoy cron 6h)
+- Outbound de custom properties (ownership, deal stage) — out of scope del MVP
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Shipped`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
-- Branch: `task/TASK-463-unified-quote-builder-hubspot-bidirectional`
+- Branch: `task/TASK-463-unified-quote-builder-hubspot-bidirectional` (merged)
 - Legacy ID: `follow-on de TASK-347 + TASK-349`
 - GitHub Issue: `none`
 
