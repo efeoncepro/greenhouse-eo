@@ -326,7 +326,12 @@ export const PRICING_WARNING_CODES = [
   'tool_price_default_margin',
   'fx_fallback',
   'tier_below_min',
-  'legacy_rate_card_used'
+  'legacy_rate_card_used',
+
+  // Synthetic UI-only code (TASK-487): emitted by the frontend when the engine
+  // returns an HTTP 422 with a message that mentions an SKU, so the warning can
+  // anchor to the originating row instead of floating in the dock.
+  'engine_error'
 ] as const
 
 export type PricingWarningCode = (typeof PRICING_WARNING_CODES)[number]

@@ -31,23 +31,10 @@ export interface QuoteIdentityStripProps {
   subtitle?: string
   quoteNumber?: string | null
   status: QuoteStatus
-  validUntil?: string | null
   actions?: ReactNode
 
   /** Sticky top offset (for MUI AppBar spacing). Default 0 */
   stickyOffset?: number
-}
-
-const formatValidUntil = (iso: string | null | undefined): string => {
-  if (!iso) return GH_PRICING.identityStrip.validUntilEmpty
-
-  try {
-    const date = new Date(iso)
-
-    return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(date)
-  } catch {
-    return iso
-  }
 }
 
 /**
@@ -62,7 +49,6 @@ const QuoteIdentityStrip = ({
   subtitle,
   quoteNumber,
   status,
-  validUntil,
   actions,
   stickyOffset = 0
 }: QuoteIdentityStripProps) => {
@@ -172,21 +158,11 @@ const QuoteIdentityStrip = ({
                   label={statusMeta.label}
                 />
               </Stack>
-              <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
-                {subtitle ? (
-                  <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.3 }}>
-                    {subtitle}
-                  </Typography>
-                ) : null}
-                <Typography
-                  variant='caption'
-                  color='text.secondary'
-                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-                >
-                  <i className='tabler-calendar-event' aria-hidden='true' style={{ fontSize: 14 }} />
-                  {GH_PRICING.identityStrip.validUntilLabel}: {formatValidUntil(validUntil)}
+              {subtitle ? (
+                <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.3 }}>
+                  {subtitle}
                 </Typography>
-              </Stack>
+              ) : null}
             </Stack>
           </Stack>
 

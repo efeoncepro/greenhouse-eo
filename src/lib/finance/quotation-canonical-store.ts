@@ -77,6 +77,17 @@ type CanonicalQuoteLineRow = {
   hubspot_product_id: string | null
   product_name: string | null
   product_sku: string | null
+
+  // Typed fields (TASK-487) — required to preserve fidelity on edit mode hydration
+  line_type: string | null
+  unit: string | null
+  role_code: string | null
+  member_id: string | null
+  service_sku: string | null
+  module_id: string | null
+  tool_id: string | null
+  addon_id: string | null
+  fte_allocation: string | number | null
 }
 
 type TenantSpaceRow = { space_id: string }
@@ -401,7 +412,16 @@ export const listFinanceQuoteLinesFromCanonical = async ({
        qli.hubspot_line_item_id,
        qli.hubspot_product_id,
        pc.product_name,
-       pc.legacy_sku AS product_sku
+       pc.legacy_sku AS product_sku,
+       qli.line_type,
+       qli.unit,
+       qli.role_code,
+       qli.member_id,
+       qli.service_sku,
+       qli.module_id,
+       qli.tool_id,
+       qli.addon_id,
+       qli.fte_allocation
      FROM greenhouse_commercial.quotation_line_items qli
      JOIN greenhouse_commercial.quotations q
        ON q.quotation_id = qli.quotation_id
@@ -1201,5 +1221,14 @@ export const mapCanonicalQuoteLineRow = (row: CanonicalQuoteLineRow) => ({
   totalAmount: row.total_amount !== null ? Number(row.total_amount) : null,
   hubspotLineItemId: row.hubspot_line_item_id ? String(row.hubspot_line_item_id) : null,
   hubspotProductId: row.hubspot_product_id ? String(row.hubspot_product_id) : null,
-  product: row.product_name ? { name: String(row.product_name), sku: row.product_sku ? String(row.product_sku) : null } : null
+  product: row.product_name ? { name: String(row.product_name), sku: row.product_sku ? String(row.product_sku) : null } : null,
+  lineType: row.line_type ? String(row.line_type) : null,
+  unit: row.unit ? String(row.unit) : null,
+  roleCode: row.role_code ? String(row.role_code) : null,
+  memberId: row.member_id ? String(row.member_id) : null,
+  serviceSku: row.service_sku ? String(row.service_sku) : null,
+  moduleId: row.module_id ? String(row.module_id) : null,
+  toolId: row.tool_id ? String(row.tool_id) : null,
+  addonId: row.addon_id ? String(row.addon_id) : null,
+  fteAllocation: row.fte_allocation !== null && row.fte_allocation !== undefined ? Number(row.fte_allocation) : null
 })

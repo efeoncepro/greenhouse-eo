@@ -99,24 +99,73 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
     getOrganizationList({ page: 1, pageSize: 200, status: 'active' }).catch(() => ({ items: [] as Array<{ organizationId: string; organizationName: string }> }))
   ])
 
+  const coerceEditLineType = (value: string | null): QuoteLineItem['lineType'] => {
+    switch (value) {
+      case 'role':
+        return 'role'
+      case 'person':
+        return 'person'
+      case 'deliverable':
+      case 'service':
+        return 'deliverable'
+      case 'direct_cost':
+      case 'tool':
+      case 'overhead_addon':
+      default:
+        return value === 'person' ? 'person' : value === 'role' ? 'role' : value === 'deliverable' ? 'deliverable' : 'direct_cost'
+    }
+  }
+
+  const coerceEditUnit = (value: string | null): QuoteLineItem['unit'] => {
+    if (value === 'hour' || value === 'month' || value === 'project' || value === 'unit') return value
+
+    return 'unit'
+  }
+
   const initialLines: QuoteLineItem[] = linesRows
     .map(row => mapCanonicalQuoteLineRow(row))
-    .map(row => ({
-      lineItemId: row.lineItemId,
-      label: row.name,
-      description: row.description,
-      lineType: 'direct_cost' as const,
-      unit: 'unit' as const,
-      quantity: row.quantity,
-      unitPrice: row.unitPrice,
-      subtotalPrice: row.totalAmount,
-      subtotalAfterDiscount: row.totalAmount,
-      productId: row.productId,
-      discountType: row.discountPercent !== null ? ('percentage' as const) : null,
-      discountValue: row.discountPercent ?? row.discountAmount ?? null,
-      source: coerceLineSource(row.source),
-      metadata: null
-    }))
+    .map(row => {
+      const pricingV2LineType =
+        row.lineType === 'role' ||
+        row.lineType === 'person' ||
+        row.lineType === 'tool' ||
+        row.lineType === 'overhead_addon' ||
+        row.lineType === 'direct_cost'
+          ? row.lineType
+          : undefined
+
+      const resolvedSku =
+        row.roleCode ?? row.memberId ?? row.serviceSku ?? row.toolId ?? row.addonId ?? null
+
+      return {
+        lineItemId: row.lineItemId,
+        label: row.name,
+        description: row.description,
+        lineType: coerceEditLineType(row.lineType),
+        unit: coerceEditUnit(row.unit),
+        quantity: row.quantity,
+        unitPrice: row.unitPrice,
+        subtotalPrice: row.totalAmount,
+        subtotalAfterDiscount: row.totalAmount,
+        productId: row.productId,
+        roleCode: row.roleCode,
+        memberId: row.memberId,
+        serviceSku: row.serviceSku,
+        discountType: row.discountPercent !== null ? ('percentage' as const) : null,
+        discountValue: row.discountPercent ?? row.discountAmount ?? null,
+        source: coerceLineSource(row.source),
+        metadata: pricingV2LineType
+          ? {
+              pricingV2LineType,
+              sku: resolvedSku ?? undefined,
+              moduleId: row.moduleId,
+              serviceSku: row.serviceSku,
+              fteFraction: row.fteAllocation,
+              periods: 1
+            }
+          : null
+      }
+    })
 
   const templates: QuoteCreateTemplate[] = templateRows.map(template => ({
     templateId: template.templateId,

@@ -10,7 +10,6 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -21,7 +20,8 @@ import type {
   PricingEngineInputV2,
   PricingLineInputV2,
   PricingOutputCurrency,
-  PricingV2LineType
+  PricingV2LineType,
+  PricingWarning
 } from '@/lib/finance/pricing/contracts'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
@@ -469,12 +469,6 @@ const QuoteBuilderShell = ({
     return () => controller.abort()
   }, [organizationId])
 
-  const refreshLinesSnapshot = useCallback(() => {
-    const draft = editorRef.current?.getDraft()
-
-    if (draft) setLinesSnapshot(draft)
-  }, [])
-
   const currency = builderState.outputCurrency
 
   const pricingInput = useMemo(
@@ -487,6 +481,52 @@ const QuoteBuilderShell = ({
     loading: simulating,
     error: simulationError
   } = usePricingSimulation(pricingInput, { enabled: true })
+
+  // Cuando el engine v2 falla por un SKU especifico (ej. "Missing cost
+  // components for role ECG-004", "Unknown tool SKU: TOOL-X"), sinteticamos un
+  // PricingWarning con lineIndex para que el editor lo renderice inline debajo
+  // de la fila que lo causo, en vez de dejarlo huerfano en el dock.
+  const lineAnchoredError = useMemo<{ lineIndex: number; message: string } | null>(() => {
+    if (!simulationError) return null
+
+    // Matches 'role ECG-001', 'tool TOOL-FIGMA', 'person MEM-...', 'addon EFO-003', etc.
+    const skuPattern = /\b([A-Z]{2,}[-_][A-Z0-9][A-Z0-9-]+)\b/
+    const match = simulationError.match(skuPattern)
+
+    if (!match) return null
+
+    const sku = match[1]
+
+    const rowIdx = linesSnapshot.findIndex(line =>
+      line.metadata?.sku === sku ||
+      line.roleCode === sku ||
+      line.memberId === sku ||
+      line.serviceSku === sku
+    )
+
+    if (rowIdx === -1) return null
+
+    return { lineIndex: rowIdx, message: simulationError }
+  }, [simulationError, linesSnapshot])
+
+  const syntheticWarnings = useMemo<PricingWarning[]>(() => {
+    if (!lineAnchoredError) return []
+
+    return [{
+      code: 'engine_error',
+      severity: 'critical',
+      message: lineAnchoredError.message,
+      lineIndex: lineAnchoredError.lineIndex
+    }]
+  }, [lineAnchoredError])
+
+  const mergedStructuredWarnings = useMemo<PricingWarning[]>(
+    () => [...(simulation?.structuredWarnings ?? []), ...syntheticWarnings],
+    [simulation?.structuredWarnings, syntheticWarnings]
+  )
+
+  // Solo mostrar simulationError en el dock si NO pudo anclarse a una fila
+  const dockSimulationError = lineAnchoredError ? null : simulationError
 
   const includedAddonSkus = useMemo(
     () => (simulation?.addons ?? []).map(a => a.sku).filter(sku => !excludedAddons.has(sku)),
@@ -518,8 +558,7 @@ const QuoteBuilderShell = ({
 
   const handleManualLine = useCallback(() => {
     editorRef.current?.appendLines([makeBlankManualLine()])
-    refreshLinesSnapshot()
-  }, [refreshLinesSnapshot])
+  }, [])
 
   const handleTemplateSelect = useCallback((template: QuoteCreateTemplate) => {
     setSelectedTemplateId(template.templateId)
@@ -569,7 +608,6 @@ const QuoteBuilderShell = ({
 
         if (allLines.length > 0) {
           editorRef.current?.appendLines(allLines)
-          refreshLinesSnapshot()
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Error expandiendo el servicio.')
@@ -577,7 +615,7 @@ const QuoteBuilderShell = ({
         setServiceExpanding(false)
       }
     },
-    [builderState.commercialModel, currency, refreshLinesSnapshot]
+    [builderState.commercialModel, currency]
   )
 
   const handlePickerSelect = useCallback(
@@ -593,9 +631,8 @@ const QuoteBuilderShell = ({
       const mapped = selections.map(mapSelectionToLine)
 
       editorRef.current?.appendLines(mapped)
-      refreshLinesSnapshot()
     },
-    [pickerMode, expandServiceSelections, refreshLinesSnapshot]
+    [pickerMode, expandServiceSelections]
   )
 
   const handleEditorSave = useCallback(
@@ -623,7 +660,7 @@ const QuoteBuilderShell = ({
     return null
   }, [builderState.description, organizationId, selectedTemplateId, linesSnapshot])
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(async (closeAfter: boolean = true) => {
     const validation = validate()
 
     if (validation) {
@@ -637,6 +674,16 @@ const QuoteBuilderShell = ({
 
     try {
       const draftLines = editorRef.current?.getDraft() ?? linesSnapshot
+
+      const resolveRedirect = (id: string | null) => {
+        if (!id) return
+
+        if (closeAfter) {
+          router.push(`/finance/quotes/${id}`)
+        } else {
+          router.push(`/finance/quotes/${id}/edit`)
+        }
+      }
 
       if (onSubmit) {
         const result = await onSubmit({
@@ -659,9 +706,7 @@ const QuoteBuilderShell = ({
 
         const targetId = result?.quotationId ?? quote?.quotationId ?? null
 
-        if (targetId) {
-          router.push(`/finance/quotes/${targetId}`)
-        }
+        resolveRedirect(targetId)
 
         return
       }
@@ -707,7 +752,7 @@ const QuoteBuilderShell = ({
 
         const created = (await res.json()) as { quotationId?: string }
 
-        if (created.quotationId) router.push(`/finance/quotes/${created.quotationId}`)
+        resolveRedirect(created.quotationId ?? null)
 
         return
       }
@@ -760,7 +805,7 @@ const QuoteBuilderShell = ({
           throw new Error(body.error ?? GH_PRICING.builderSubmitErrorGeneric)
         }
 
-        router.push(`/finance/quotes/${quote.quotationId}`)
+        resolveRedirect(quote.quotationId)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : GH_PRICING.builderSubmitErrorGeneric)
@@ -840,20 +885,20 @@ const QuoteBuilderShell = ({
         subtitle={subtitle}
         quoteNumber={quote?.quotationNumber ?? null}
         status={quoteStatus}
-        validUntil={builderState.validUntil}
         actions={
           <>
             <Button variant='tonal' color='secondary' onClick={handleCancel} disabled={submitting}>
               {GH_PRICING.builderCancel}
             </Button>
             <Button
-              variant='contained'
+              variant='tonal'
+              color='primary'
               startIcon={<i className='tabler-device-floppy' aria-hidden='true' />}
-              onClick={handleSubmit}
+              onClick={() => handleSubmit(false)}
               disabled={submitting || serviceExpanding}
               sx={{ minHeight: 44 }}
             >
-              {submitting ? GH_PRICING.builderSaving : GH_PRICING.builderSaveAndClose}
+              {submitting ? GH_PRICING.builderSaving : GH_PRICING.builderSaveDraft}
             </Button>
           </>
         }
@@ -884,7 +929,7 @@ const QuoteBuilderShell = ({
         onValidUntilChange={iso => setBuilderState(prev => ({ ...prev, validUntil: iso }))}
       />
 
-      <Container maxWidth='lg' sx={{ py: { xs: 3, md: 4 } }}>
+      <Box sx={{ px: { xs: 2, md: 3 }, py: { xs: 3, md: 4 } }}>
         <Stack spacing={3}>
           {error ? (
             <Alert severity='error' role='alert' onClose={() => setError(null)}>
@@ -910,7 +955,8 @@ const QuoteBuilderShell = ({
             canViewCostStack={canSeeCostStack}
             simulationLines={simulation?.lines ?? null}
             outputCurrency={currency}
-            structuredWarnings={simulation?.structuredWarnings ?? null}
+            structuredWarnings={mergedStructuredWarnings.length > 0 ? mergedStructuredWarnings : null}
+            simulating={simulating}
             onDraftChange={setLinesSnapshot}
             headerAction={
               <AddLineSplitButton
@@ -928,12 +974,14 @@ const QuoteBuilderShell = ({
 
           <Accordion
             elevation={0}
-            defaultExpanded={builderState.description.length > 0}
+            defaultExpanded={mode === 'create' || builderState.description.length > 0}
             sx={theme => ({
               border: `1px solid ${theme.palette.divider}`,
-              borderRadius: 2,
+              borderRadius: 3,
               '&:before': { display: 'none' },
-              '&.Mui-expanded': { margin: 0 }
+              '&.Mui-expanded': { margin: 0 },
+              '&:first-of-type': { borderRadius: 3 },
+              '&:last-of-type': { borderRadius: 3 }
             })}
           >
             <AccordionSummary
@@ -985,20 +1033,16 @@ const QuoteBuilderShell = ({
             ) : undefined
           }
           primaryCtaLabel={submitting ? GH_PRICING.builderSaving : GH_PRICING.summaryDock.primaryCta}
-          primaryCtaIcon='tabler-device-floppy'
+          primaryCtaIcon='tabler-device-floppy-filled'
           primaryCtaLoading={submitting}
           primaryCtaDisabled={submitting || serviceExpanding}
-          onPrimaryClick={handleSubmit}
+          onPrimaryClick={() => handleSubmit(true)}
           marginClassification={marginClass}
           marginPct={marginPct}
+          simulationError={dockSimulationError}
         />
 
-        {simulationError ? (
-          <Alert severity='error' role='alert' sx={{ mt: 2 }}>
-            {simulationError}
-          </Alert>
-        ) : null}
-      </Container>
+      </Box>
 
       <SellableItemPickerDrawer
         open={pickerOpen}

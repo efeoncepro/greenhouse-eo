@@ -2,6 +2,7 @@
 
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 
+import Alert from '@mui/material/Alert'
 import Badge from '@mui/material/Badge'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -37,6 +38,10 @@ export interface QuoteSummaryDockProps {
   onSecondaryClick?: () => void
   marginClassification?: 'healthy' | 'warning' | 'critical' | null
   marginPct?: number | null
+
+  /** Si hay un error del engine v2, se muestra como Alert inline en la parte
+   * superior del dock (justo encima del bloque de totales). */
+  simulationError?: string | null
 }
 
 const CURRENCY_LOCALE: Record<PricingOutputCurrency, string> = {
@@ -96,7 +101,8 @@ const QuoteSummaryDock = ({
   secondaryCtaDisabled = false,
   onSecondaryClick,
   marginClassification,
-  marginPct
+  marginPct,
+  simulationError
 }: QuoteSummaryDockProps) => {
   const prefersReduced = useReducedMotion()
   const addonChipRef = useRef<HTMLDivElement | null>(null)
@@ -122,19 +128,30 @@ const QuoteSummaryDock = ({
       aria-label={GH_PRICING.summaryDock.ariaLabel}
       sx={theme => ({
         position: 'sticky',
-        bottom: 0,
+        bottom: 16,
         zIndex: theme.zIndex.appBar - 2,
         marginTop: 3,
-        mx: { xs: -2, md: -3 },
         px: { xs: 2, md: 3 },
         py: 2,
         backgroundColor: alpha(theme.palette.background.paper, 0.96),
         backdropFilter: 'saturate(180%) blur(10px)',
         WebkitBackdropFilter: 'saturate(180%) blur(10px)',
-        borderTop: `1px solid ${theme.palette.divider}`,
-        boxShadow: `0 -8px 24px -12px ${alpha(theme.palette.common.black, 0.18)}`
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 3,
+        boxShadow: `0 12px 32px -12px ${alpha(theme.palette.common.black, 0.22)}`
       })}
     >
+      {simulationError ? (
+        <Alert
+          severity='error'
+          role='alert'
+          icon={<i className='tabler-alert-triangle' aria-hidden='true' />}
+          sx={{ mb: 1.5, py: 0.5 }}
+        >
+          <Typography variant='body2'>{simulationError}</Typography>
+        </Alert>
+      ) : null}
+
       <Stack
         direction={{ xs: 'column', md: 'row' }}
         spacing={2}
