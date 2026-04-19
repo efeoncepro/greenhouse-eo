@@ -231,6 +231,108 @@ export interface ContractRenewalReminderRow {
   lastEventType: string | null
 }
 
+/**
+ * TASK-462 — MRR / ARR contractual projection contracts.
+ *
+ * Shared types for the per-period MRR/ARR snapshot, derived totals,
+ * timeline series, and NRR/GRR computation.
+ */
+
+export type MrrArrMovementType =
+  | 'new'
+  | 'expansion'
+  | 'contraction'
+  | 'churn'
+  | 'reactivation'
+  | 'unchanged'
+
+export const MRR_ARR_MOVEMENT_TYPES: MrrArrMovementType[] = [
+  'new',
+  'expansion',
+  'contraction',
+  'churn',
+  'reactivation',
+  'unchanged'
+]
+
+export interface ContractMrrArrSnapshotRow {
+  periodYear: number
+  periodMonth: number
+  contractId: string
+  contractNumber: string | null
+  clientId: string | null
+  clientName: string | null
+  organizationId: string | null
+  spaceId: string | null
+  businessLineCode: string | null
+  commercialModel: string
+  staffingModel: string
+  mrrClp: number
+  arrClp: number
+  previousMrrClp: number | null
+  mrrDeltaClp: number
+  movementType: MrrArrMovementType
+  materializedAt: string
+}
+
+export interface MrrArrModelAggregate {
+  mrrClp: number
+  count: number
+}
+
+export interface MrrArrMovementAggregate {
+  mrrClp: number
+  count: number
+}
+
+export interface MrrArrPeriodTotals {
+  periodYear: number
+  periodMonth: number
+  mrrClp: number
+  arrClp: number
+  contractsCount: number
+  mrrDeltaFromPrevClp: number
+  mrrDeltaPctFromPrev: number | null
+  byCommercialModel: Record<string, MrrArrModelAggregate>
+  byStaffingModel: Record<string, MrrArrModelAggregate>
+  byBusinessLine: Record<string, MrrArrModelAggregate>
+  byMovement: Record<MrrArrMovementType, MrrArrMovementAggregate>
+}
+
+export interface MrrArrSeriesPoint {
+  periodYear: number
+  periodMonth: number
+  mrrClp: number
+  arrClp: number
+  contractsCount: number
+  movements: Record<MrrArrMovementType, MrrArrMovementAggregate>
+}
+
+export interface MrrArrNrrComputation {
+  startingMrrClp: number
+  endingMrrClp: number
+  expansionClp: number
+  reactivationClp: number
+  contractionClp: number
+  churnClp: number
+  nrrPct: number | null
+  grrPct: number | null
+}
+
+export interface MrrArrMovementEntry {
+  contractId: string
+  contractNumber: string | null
+  clientId: string | null
+  clientName: string | null
+  businessLineCode: string | null
+  commercialModel: string
+  staffingModel: string
+  mrrClp: number
+  previousMrrClp: number | null
+  mrrDeltaClp: number
+  movementType: MrrArrMovementType
+}
+
 export const PIPELINE_STAGE_PROBABILITY: Record<PipelineStage, number> = {
   draft: 10,
   in_review: 25,

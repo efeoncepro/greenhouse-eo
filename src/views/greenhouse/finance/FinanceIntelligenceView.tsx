@@ -12,11 +12,12 @@ import { TabContext, TabPanel } from '@mui/lab'
 
 import CustomTabList from '@core/components/mui/TabList'
 
-import { GH_PIPELINE_COMMERCIAL } from '@/config/greenhouse-nomenclature'
+import { GH_MRR_ARR_DASHBOARD, GH_PIPELINE_COMMERCIAL } from '@/config/greenhouse-nomenclature'
 
 import FinancePeriodClosureDashboardView from './FinancePeriodClosureDashboardView'
 import ClientEconomicsView from './ClientEconomicsView'
 import CommercialIntelligenceView from './CommercialIntelligenceView'
+import MrrArrDashboardView from './MrrArrDashboardView'
 
 type Props = {
   canManageClosure: boolean
@@ -48,6 +49,12 @@ const FinanceIntelligenceView = ({ canManageClosure, canReopen }: Props) => {
               icon={<i className='tabler-file-description' />}
               iconPosition='start'
             />
+            <Tab
+              value='mrrArr'
+              label={GH_MRR_ARR_DASHBOARD.outerTabLabel}
+              icon={<i className='tabler-trending-up' />}
+              iconPosition='start'
+            />
           </CustomTabList>
 
           <TabPanel value='closure' sx={{ p: 0 }}>
@@ -60,6 +67,10 @@ const FinanceIntelligenceView = ({ canManageClosure, canReopen }: Props) => {
 
           <TabPanel value='quotations' sx={{ p: 0 }}>
             <CommercialIntelligenceView />
+          </TabPanel>
+
+          <TabPanel value='mrrArr' sx={{ p: 0 }}>
+            <MrrArrDashboardView />
           </TabPanel>
         </TabContext>
       </Card>

@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-462 MRR/ARR Contractual Projection & Dashboard (cierre)
+
+- **Owner:** Claude
+- **Estado:** shipped, pending PR merge + E2E smoke test
+- **Branch:** `task/TASK-462-mrr-arr-contractual-projection-dashboard` desde develop
+- **Scope shipped:**
+  - Migration `20260419083556852_task-462-mrr-arr-schema.sql` con tabla `greenhouse_serving.contract_mrr_arr_snapshots` (PK compuesto, generated columns `arr_clp`+`mrr_delta_clp`, 3 índices)
+  - Materializer `buildMrrArrSnapshotsForPeriod` + `backfillMrrArrFromFirstContract` con classifier (new/expansion/contraction/churn/reactivation/unchanged) detectando churn por contract desaparecido
+  - Store con `listMrrArrByPeriod | getMrrArrPeriodTotals | getMrrArrSeries | computeNrr | listMrrArrMovements` + JOINs a contracts/clients, NRR fórmula canónica
+  - Reactive projection `contractMrrArrProjection` domain `cost_intelligence`, 6 trigger events `commercial.contract.*`, scope `finance_period:YYYY-MM`
+  - 3 endpoints `/api/finance/commercial-intelligence/mrr-arr/{,/timeline,/movements}`
+  - UI: 4º outer tab "MRR/ARR" en `FinanceIntelligenceView` con `MrrArrDashboardView.tsx` (4 KPIs + ApexCharts timeline stacked + 3 breakdown cards + Top 10 + period switcher)
+  - Bloque `GH_MRR_ARR_DASHBOARD` en nomenclature
+  - Doc funcional `mrr-arr.md` nuevo + architecture doc v2.21
+- **Deviations documentadas:**
+  - Opción A (tab outer separado, no sub-tab dentro de "Pipeline comercial") — narrativa correcta: MRR/ARR = revenue firmado, Pipeline = forecast futuro
+  - Migration timestamp bumped por Codex WIP en DB sin push del file. `--no-check-order` one-shot + `pnpm migrate:create` fresh resolvió
+  - Codex TASK-470 WIP stashed aside (`capacity-overcommit-events.ts`, `pricing-catalog-constraints.ts`, `pricing-catalog-impact-analysis.ts`, `optimistic-locking.ts`, admin routes mods, event-catalog mods) — preservado en stash para restore post-merge
+  - UI subagent timed out mid-work, completé el View en hilo principal invocando skills
+- **Gates verdes:**
+  - `pnpm lint` clean
+  - `npx tsc --noEmit` clean
+  - `pnpm test` → 209/209 (194 payroll baseline intacto + 15 TASK-462 nuevos)
+  - `pnpm build` compiled exit 0 (17.0s)
+  - Migration aplicada + types regenerados (252 tables)
+- **Follow-ups:**
+  - Forecast MRR futuro con modelo predictivo
+  - Cohort analysis (retention curves)
+  - Surface MRR top-line en home ejecutiva
+  - Nexa weekly digest con MRR MoM Δ
+  - Backfill script opcional si se quiere historia pre-TASK-460
+- **E2E smoke test pendiente**: verificar con agent-session que el tab MRR/ARR se vea en `/finance/intelligence`. El user reportó preocupación de que algunas UI shipped del programa no se estaban viendo — verificar enlaces de menú + visibilidad del tab + `viewCode` del agent.
+
 ## Sesion 2026-04-19 — TASK-457 UI Revenue Pipeline Hybrid (cierre)
 
 - **Owner:** Claude

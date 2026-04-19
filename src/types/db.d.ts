@@ -433,6 +433,7 @@ export interface GreenhouseCommercialQuotationAuditLog {
 }
 
 export interface GreenhouseCommercialQuotationLineItems {
+  addon_id: string | null;
   cost_breakdown: Generated<Json>;
   created_at: Generated<Timestamp>;
   currency: string | null;
@@ -467,6 +468,7 @@ export interface GreenhouseCommercialQuotationLineItems {
   subtotal_after_discount: Numeric | null;
   subtotal_cost: Numeric | null;
   subtotal_price: Numeric | null;
+  tool_id: string | null;
   unit: Generated<string>;
   unit_cost: Numeric | null;
   unit_price: Numeric | null;
@@ -3769,6 +3771,24 @@ export interface GreenhouseServingCommercialCostAttribution {
   source_of_truth: string;
 }
 
+export interface GreenhouseServingContractMrrArrSnapshots {
+  arr_clp: Generated<Numeric | null>;
+  business_line_code: string | null;
+  client_id: string | null;
+  commercial_model: string;
+  contract_id: string;
+  materialized_at: Generated<Timestamp>;
+  movement_type: Generated<string>;
+  mrr_clp: Generated<Numeric>;
+  mrr_delta_clp: Generated<Numeric | null>;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  previous_mrr_clp: Numeric | null;
+  space_id: string | null;
+  staffing_model: string;
+}
+
 export interface GreenhouseServingContractProfitabilitySnapshots {
   attributed_cost_clp: Numeric | null;
   authorized_total_clp: Numeric | null;
@@ -5473,6 +5493,7 @@ export interface DB {
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;
   "greenhouse_serving.commercial_cost_attribution": GreenhouseServingCommercialCostAttribution;
+  "greenhouse_serving.contract_mrr_arr_snapshots": GreenhouseServingContractMrrArrSnapshots;
   "greenhouse_serving.contract_profitability_snapshots": GreenhouseServingContractProfitabilitySnapshots;
   "greenhouse_serving.deal_pipeline_snapshots": GreenhouseServingDealPipelineSnapshots;
   "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
