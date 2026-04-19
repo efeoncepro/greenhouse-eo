@@ -1,21 +1,76 @@
 # TASK-467 — Pricing Catalog Admin UI (Self-Service CRUD)
 
+## Delta 2026-04-19 (close-out MVP)
+
+**Status real: complete (MVP).** Shipped con scope acotado vs spec original:
+
+### Entregables
+
+- **Migration**: `20260419003745335_task-467-pricing-catalog-audit-log.sql` — tabla `greenhouse_commercial.pricing_catalog_audit_log` con 9 entity types + 7 actions + 3 índices (entity, actor, created_at DESC)
+- **Audit store**: `src/lib/commercial/pricing-catalog-audit-store.ts` con `recordPricingCatalogAudit()` + `listPricingCatalogAudit()`
+- **Permission helper**: `canAdministerPricingCatalog(tenant)` en `src/lib/tenant/authorization.ts` — efeonce_admin + finance_admin
+- **8 API routes** bajo `/api/admin/pricing-catalog/`:
+  - `roles` GET+POST, `roles/[id]` PATCH+DELETE
+  - `tools` GET+POST, `tools/[id]` PATCH+DELETE
+  - `overheads` GET+POST, `overheads/[id]` PATCH+DELETE
+  - `governance` GET+PATCH (dispatch de 5 types)
+  - `audit-log` GET con filtros
+- **UI** bajo `/admin/pricing-catalog/`:
+  - Home page con 7 `PricingCatalogNavCard` (4 activos + 3 placeholders)
+  - List views: `SellableRolesListView`, `ToolCatalogListView`, `OverheadAddonsListView` — TanStack table + filtros + search + toggle active inline
+  - Create drawers: `CreateSellableRoleDrawer`, `CreateToolDrawer`, `CreateOverheadDrawer` — forms con SKU auto-generado via DEFAULT sequence
+  - Governance inline view: 5 secciones accordion (role-tier / service-tier / commercial-model / country-factor / FTE read-only) con `InlinePctCell` (pencil-to-edit)
+- **Menu entry**: `adminPricingCatalog` en `GH_INTERNAL_NAV` + registro en `VerticalMenu.tsx` bajo "Equipo y operaciones" (vecinos: Business Lines / SLA de servicios)
+- **Docs**: `docs/documentation/finance/administracion-catalogo-pricing.md` funcional, architecture doc v2.16
+
+### Decisiones de scope MVP (no en esta iteración)
+
+| Fuera de MVP | Razón | Follow-up |
+|---|---|---|
+| Edit completo de cost components per employment_type | Multi-tab × 6 components × 6 employment_types × 6 currencies = UI compleja de días | TASK-467-phase-2 |
+| Edit pricing per currency multi-currency | Similar complejidad | TASK-467-phase-2 |
+| Admin UI de employment types | Baja frecuencia de cambio | Placeholder en home |
+| Excel import con preview diff | No hay parser pattern en repo; requiere diseño propio | Follow-up si Efeonce lo pide |
+| Diff viewer visual del audit log | API funcional; UI timeline con diff es scope grande | Follow-up |
+| Approval workflow para cambios críticos | V1 confía en admins; audit garantiza traceability | Follow-up extensión de TASK-348 |
+
+### Desviaciones técnicas documentadas
+
+1. **Bypass de upsert stores**: los stores `sellable-roles-store.ts` / `tool-catalog-store.ts` / `overhead-addons-store.ts` esperan shape de seed CSV (`rowNumber`, `driftWarnings`, `reviewReasons`) y requieren el `*_sku` explícito en input — eso anula la DEFAULT de la secuencia. Los API routes usan INSERT/UPDATE directos con `runGreenhousePostgresQuery` para respetar `generate_sellable_role_sku()` / `generate_tool_sku()` / `generate_overhead_addon_sku()`. Stores no modificados; se siguen usando los `list*` para GETs.
+2. **`actorName` fallback**: `TenantContext` no expone `displayName`. Se resuelve vía `getServerAuthSession()` → `user.name || user.email`; fallback `tenant.clientName || tenant.userId || 'unknown'`.
+3. **Providers lookup en ToolDrawer**: no existe endpoint `/api/admin/providers` todavía. Drawer pide `providerId` como texto libre con helper text explicando que debe existir en `greenhouse_core.providers`.
+4. **Edit inline de governance envía payload completo**: al editar 1 celda de tier margin, el PATCH envía los 3 valores (min/opt/max). Trade-off aceptable MVP.
+5. **DELETE idempotente**: si ya está inactivo devuelve 204 sin emitir audit.
+
+### Gates verdes
+
+- `pnpm lint` clean
+- `npx tsc --noEmit` clean
+- `pnpm test` → 284/284 (194 payroll baseline intacto + 21 pricing + 64 commercial/hubspot + 3 TASK-463 + 2 TASK-455)
+- `pnpm build` compiled exit 0
+- `pnpm migrate:up` aplicada + `src/types/db.d.ts` regenerado (247 tables)
+- Zero `new Pool()` rogue
+
+### Payroll isolation
+
+Los 194 tests de `src/lib/payroll/**` se mantienen intactos. Ningún write a `greenhouse_payroll.*` introducido. Módulo totalmente aislado.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Shipped (MVP)`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-464a, TASK-464b, TASK-464c`
-- Branch: `task/TASK-467-pricing-catalog-admin-ui`
+- Blocked by: `TASK-464a, TASK-464b, TASK-464c` (all shipped)
+- Branch: `task/TASK-467-pricing-catalog-admin-ui` (merged)
 - Legacy ID: `follow-on de TASK-464 umbrella`
 - GitHub Issue: `none`
 
