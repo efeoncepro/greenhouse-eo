@@ -357,26 +357,50 @@ export async function POST(request: Request) {
         }))
       : bodyLineItems
 
-  const snapshot = await persistQuotationPricing(
-    {
+  let snapshot: Awaited<ReturnType<typeof persistQuotationPricing>>
+
+  try {
+    snapshot = await persistQuotationPricing(
+      {
+        quotationId,
+        versionNumber: 1,
+        businessLineCode: resolvedBusinessLineCode,
+        quoteCurrency: currency,
+        quoteDate,
+        billingFrequency,
+        contractDurationMonths,
+        exchangeRates: body.exchangeRates ?? {},
+        exchangeSnapshotDate: body.exchangeSnapshotDate ?? null,
+        globalDiscountType: body.globalDiscountType ?? null,
+        globalDiscountValue: body.globalDiscountValue ?? null,
+        marginTargetPct: body.targetMarginPct ?? null,
+        marginFloorPct: body.marginFloorPct ?? null,
+        lineItems,
+        createdBy
+      },
+      { createVersion: true, versionNotes: 'Draft created via API.' }
+    )
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('[POST /api/finance/quotes] persistQuotationPricing failed', {
       quotationId,
-      versionNumber: 1,
-      businessLineCode: resolvedBusinessLineCode,
-      quoteCurrency: currency,
-      quoteDate,
-      billingFrequency,
-      contractDurationMonths,
-      exchangeRates: body.exchangeRates ?? {},
-      exchangeSnapshotDate: body.exchangeSnapshotDate ?? null,
-      globalDiscountType: body.globalDiscountType ?? null,
-      globalDiscountValue: body.globalDiscountValue ?? null,
-      marginTargetPct: body.targetMarginPct ?? null,
-      marginFloorPct: body.marginFloorPct ?? null,
-      lineItems,
-      createdBy
-    },
-    { createVersion: true, versionNotes: 'Draft created via API.' }
-  )
+      lineItemsCount: lineItems.length,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    })
+
+    if (isFinanceSchemaDriftError(error)) {
+      return financeSchemaDriftResponse('quotes_create_pricing', {
+        error: 'Pricing persistence schema unavailable.'
+      })
+    }
+
+    const message = error instanceof Error ? error.message : 'Failed to persist quotation pricing.'
+
+    return NextResponse.json(
+      { error: message, quotationId },
+      { status: 500 }
+    )
+  }
 
   // When a template is used, seed its default terms (templates carry a list
   // of term_ids; the terms store picks them up and resolves variables).
