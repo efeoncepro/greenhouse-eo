@@ -497,35 +497,66 @@ const QuoteBuilderShell = ({
   // Entries del panel: mezcla las sugerencias no aplicadas con los addons que
   // ya son línea explícita (para poder destildarlos). Cada entry incluye
   // la info necesaria (nombre + monto) para renderizar el checkbox.
+  // Dedupe por sku con applied como prioridad: durante la ventana de debounce
+  // del engine, un mismo sku puede aparecer simultáneamente como applied
+  // (linesSnapshot) y como suggestion (simulation cacheada del run anterior).
+  // Sin dedupe, el panel renderizaba dos filas y un click accidental sobre la
+  // "suggestion" disparaba otro appendLines duplicando la línea.
   const addonPanelEntries = useMemo(() => {
-    const applied = linesSnapshot
-      .map((line, idx) => ({ line, idx }))
-      .filter(({ line }) => line.metadata?.pricingV2LineType === 'overhead_addon')
-      .map(({ line, idx }) => {
-        const sku = line.metadata?.sku ?? ''
-        const simLine = simulation?.lines?.[idx] ?? null
+    const seen = new Set<string>()
 
-        const amountOutputCurrency =
-          simLine?.suggestedBillRate?.totalBillOutputCurrency ?? 0
+    const entries: Array<{
+      sku: string
+      addonName: string
+      appliedReason: string
+      amountOutputCurrency: number
+      amountUsd: number
+      visibleToClient: boolean
+    }> = []
 
-        const amountUsd = simLine?.suggestedBillRate?.totalBillUsd ?? 0
+    linesSnapshot.forEach((line, idx) => {
+      if (line.metadata?.pricingV2LineType !== 'overhead_addon') return
+      const sku = line.metadata?.sku ?? ''
 
-        return {
-          sku,
-          addonName: line.label,
-          appliedReason: '',
-          amountOutputCurrency,
-          amountUsd,
-          visibleToClient: true
-        }
+      if (sku.length === 0 || seen.has(sku)) return
+
+      seen.add(sku)
+
+      const simLine = simulation?.lines?.[idx] ?? null
+
+      entries.push({
+        sku,
+        addonName: line.label,
+        appliedReason: '',
+        amountOutputCurrency: simLine?.suggestedBillRate?.totalBillOutputCurrency ?? 0,
+        amountUsd: simLine?.suggestedBillRate?.totalBillUsd ?? 0,
+        visibleToClient: true
       })
+    })
 
-    return [...applied, ...addonSuggestions]
+    addonSuggestions.forEach(suggestion => {
+      if (seen.has(suggestion.sku)) return
+      seen.add(suggestion.sku)
+      entries.push(suggestion)
+    })
+
+    return entries
   }, [linesSnapshot, simulation?.lines, addonSuggestions])
 
   const handleAddonToggle = useCallback(
     (sku: string, include: boolean) => {
       if (include) {
+        // Guard idempotente: si el sku ya está como línea no-op. Protege de
+        // dobles clicks durante la ventana de debounce del engine (cuando un
+        // addon aparece simultáneamente como applied + suggestion).
+        const alreadyApplied = linesSnapshot.some(
+          line =>
+            line.metadata?.pricingV2LineType === 'overhead_addon' &&
+            line.metadata?.sku === sku
+        )
+
+        if (alreadyApplied) return
+
         // Promote suggestion → explicit overhead_addon line. El engine v2 la
         // trata como línea normal: bill suma al total, persiste como line item,
         // aparece en el PDF del cliente.
@@ -570,7 +601,7 @@ const QuoteBuilderShell = ({
         )
       )
     },
-    [addonSuggestions]
+    [addonSuggestions, linesSnapshot]
   )
 
   const openCatalogPicker = useCallback(() => {
@@ -1161,7 +1192,7 @@ const QuoteBuilderShell = ({
           total={totalOutputCurrency}
           currency={currency}
           loading={simulating}
-          addonCount={addonSuggestions.length}
+          addonCount={addonPanelEntries.length}
           addonContent={
             <AddonSuggestionsPanel
               suggestions={addonPanelEntries}

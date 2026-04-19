@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { type MouseEvent as ReactMouseEvent, type ReactNode, useEffect, useRef, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Badge from '@mui/material/Badge'
@@ -124,11 +124,18 @@ const QuoteSummaryDock = ({
   emptyStateMessage
 }: QuoteSummaryDockProps) => {
   const prefersReduced = useReducedMotion()
-  const addonChipRef = useRef<HTMLDivElement | null>(null)
-  const [addonsOpen, setAddonsOpen] = useState(false)
 
-  const handleAddonsToggle = () => setAddonsOpen(prev => !prev)
-  const handleAddonsClose = () => setAddonsOpen(false)
+  // Anchor capturado desde el evento click, no via ref. El Popper queda atado
+  // al elemento DOM real y sobrevive re-renders. Si usáramos ref.current, en
+  // el primer click ref puede ser null (orden de ejecución) y el Popper caería
+  // al top-left del viewport.
+  const [addonAnchor, setAddonAnchor] = useState<HTMLElement | null>(null)
+  const addonsOpen = addonAnchor !== null
+
+  const handleAddonsToggle = (event: ReactMouseEvent<HTMLElement>) =>
+    setAddonAnchor(prev => (prev ? null : event.currentTarget))
+
+  const handleAddonsClose = () => setAddonAnchor(null)
 
   // Guarda la diferencia clave del "before/after" para re-animar counter sólo cuando el valor cambia material
   const lastTotalRef = useRef<number | null>(null)
@@ -319,7 +326,6 @@ const QuoteSummaryDock = ({
           {addonContent && addonCount > 0 ? (
             <>
               <Box
-                ref={addonChipRef}
                 component='button'
                 type='button'
                 onClick={handleAddonsToggle}
@@ -376,7 +382,7 @@ const QuoteSummaryDock = ({
               </Box>
               <Popper
                 open={addonsOpen}
-                anchorEl={addonChipRef.current}
+                anchorEl={addonAnchor}
                 placement='top-end'
                 sx={{ zIndex: theme => theme.zIndex.modal + 1 }}
               >
