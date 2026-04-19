@@ -537,3 +537,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-481` | `to-do`       | Quote Builder Suggested Cost UX & Override Governance | `docs/tasks/to-do/TASK-481-quote-builder-suggested-cost-override-governance.md` |
 | `TASK-482` | `to-do`       | Quoted vs Actual Margin Feedback Loop | `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md` |
 | `TASK-483` | `in-progress` | Commercial Cost Basis Engine Runtime Topology & Worker Foundation | `docs/tasks/in-progress/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md` |
+| `TASK-484` | `to-do`       | FX Provider Adapter Platform | `docs/tasks/to-do/TASK-484-fx-provider-adapter-platform.md` |
