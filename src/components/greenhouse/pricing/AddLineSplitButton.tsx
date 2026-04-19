@@ -39,7 +39,7 @@ const AddLineSplitButton = ({
   onTemplate,
   onManual,
   disabled = false,
-  size = 'medium'
+  size = 'small'
 }: AddLineSplitButtonProps) => {
   const anchorRef = useRef<HTMLDivElement | null>(null)
   const [open, setOpen] = useState(false)
@@ -78,7 +78,6 @@ const AddLineSplitButton = ({
           onClick={onCatalog}
           startIcon={<i className='tabler-plus' aria-hidden='true' />}
           aria-label={GH_PRICING.addMenu.defaultAriaLabel}
-          sx={{ minHeight: 44 }}
         >
           {GH_PRICING.addMenu.triggerLabel}
         </Button>
@@ -89,7 +88,7 @@ const AddLineSplitButton = ({
           aria-haspopup='menu'
           aria-label={GH_PRICING.addMenu.caretAriaLabel}
           onClick={handleToggle}
-          sx={{ minWidth: 36, minHeight: 44, px: 1 }}
+          sx={{ minWidth: 32, px: 1 }}
         >
           <i className='tabler-chevron-down' aria-hidden='true' />
         </Button>

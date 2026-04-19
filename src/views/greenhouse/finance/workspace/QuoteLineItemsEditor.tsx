@@ -88,7 +88,6 @@ export interface QuoteLineItemsEditorProps {
   currency: string
   editable: boolean
   lineItems: QuoteLineItem[]
-  onSave: (lines: QuoteLineItem[]) => Promise<void>
   saving: boolean
   businessLineCode?: string | null
 
@@ -366,7 +365,6 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     currency,
     editable,
     lineItems,
-    onSave,
     saving,
     canViewCostStack: canViewCostStackProp = false,
     simulationLines = null,
@@ -445,19 +443,6 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     onDraftChangeRef.current?.(reverted)
   }, [lineItems])
 
-  const handleSave = useCallback(async () => {
-    await onSave(draftLines)
-    setDirty(false)
-  }, [draftLines, onSave])
-
-  const previewTotal = useMemo(
-    () =>
-      draftLines.reduce(
-        (acc, line, idx) => acc + resolveDisplaySubtotal(line, simulationLines?.[idx] ?? null),
-        0
-      ),
-    [draftLines, simulationLines]
-  )
 
   // Agrupar warnings por lineIndex para anclarlos a la row correspondiente
   const warningsByLine = useMemo(() => {
@@ -589,20 +574,27 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     )
   }
 
-  const emptyCtaLabels = {
-    primary: onAddFromCatalog ? GH_PRICING.emptyItems.ctaPrimary : null,
-    secondary: onAddFromService ? GH_PRICING.emptyItems.ctaSecondary : null,
-    tertiary: onAddFromTemplate ? GH_PRICING.emptyItems.ctaTertiary : null
-  }
-
   return (
     <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
       <CardHeader
-        title={`Ítems de la cotización (${draftLines.length})`}
+        title={
+          <Stack direction='row' spacing={1} alignItems='center'>
+            <Typography variant='h6' sx={{ fontWeight: 600 }}>
+              Ítems de la cotización
+            </Typography>
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color={draftLines.length === 0 ? 'secondary' : 'primary'}
+              label={String(draftLines.length)}
+            />
+          </Stack>
+        }
         subheader='Agrega ítems vendibles desde el catálogo o crea una línea manual.'
         avatar={
-          <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
-            <i className='tabler-list-details' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
+          <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity', width: 40, height: 40 }}>
+            <i className='tabler-list-details' style={{ fontSize: 20, color: 'var(--mui-palette-primary-main)' }} />
           </Avatar>
         }
         action={headerAction}
@@ -616,45 +608,50 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
             title={GH_PRICING.emptyItems.title}
             description={GH_PRICING.emptyItems.subtitle}
             action={
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} useFlexGap flexWrap='wrap' justifyContent='center'>
-                {emptyCtaLabels.primary && onAddFromCatalog ? (
+              onAddFromCatalog ? (
+                <Stack direction='row' spacing={1} alignItems='center' useFlexGap>
                   <Button
                     variant='contained'
+                    size='small'
                     startIcon={<i className='tabler-books' aria-hidden='true' />}
                     onClick={onAddFromCatalog}
                     disabled={saving}
-                    sx={{ minHeight: 44 }}
                   >
-                    {emptyCtaLabels.primary}
+                    {GH_PRICING.emptyItems.ctaPrimary}
                   </Button>
-                ) : null}
-                {emptyCtaLabels.secondary && onAddFromService ? (
-                  <Button
-                    variant='tonal'
-                    color='secondary'
-                    startIcon={<i className='tabler-package' aria-hidden='true' />}
-                    onClick={onAddFromService}
-                    disabled={saving}
-                    sx={{ minHeight: 44 }}
-                  >
-                    {emptyCtaLabels.secondary}
-                  </Button>
-                ) : null}
-                {emptyCtaLabels.tertiary && onAddFromTemplate ? (
-                  <Button
-                    variant='tonal'
-                    color='secondary'
-                    startIcon={<i className='tabler-template' aria-hidden='true' />}
-                    onClick={onAddFromTemplate}
-                    disabled={saving}
-                    sx={{ minHeight: 44 }}
-                  >
-                    {emptyCtaLabels.tertiary}
-                  </Button>
-                ) : null}
-              </Stack>
+                  {(onAddFromService || onAddFromTemplate) ? (
+                    <>
+                      <Typography variant='caption' color='text.secondary'>
+                        o
+                      </Typography>
+                      {onAddFromService ? (
+                        <Button
+                          variant='text'
+                          size='small'
+                          color='primary'
+                          onClick={onAddFromService}
+                          disabled={saving}
+                        >
+                          {GH_PRICING.emptyItems.ctaSecondary}
+                        </Button>
+                      ) : null}
+                      {onAddFromTemplate ? (
+                        <Button
+                          variant='text'
+                          size='small'
+                          color='primary'
+                          onClick={onAddFromTemplate}
+                          disabled={saving}
+                        >
+                          {GH_PRICING.emptyItems.ctaTertiary}
+                        </Button>
+                      ) : null}
+                    </>
+                  ) : null}
+                </Stack>
+              ) : null
             }
-            minHeight={260}
+            minHeight={220}
           />
         </CardContent>
       ) : (
@@ -881,44 +878,22 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
         </Box>
       ) : null}
 
-      <Divider />
-
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, p: 3 }}>
-        <Box>
-          <Typography variant='caption' color='text.secondary'>
-            Vista previa del subtotal. Los totales finales se calculan al guardar.
-          </Typography>
-          {simulating && previewTotal === 0 ? (
-            <Skeleton variant='text' width={140} height={24} />
-          ) : previewTotal === 0 && draftLines.every(l => l.unitPrice === null || l.unitPrice === undefined) ? (
-            <Typography variant='subtitle2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }}>
-              —
-            </Typography>
-          ) : (
-            <Typography variant='subtitle2' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-              {formatCurrency(previewTotal, currency)}
-            </Typography>
-          )}
-        </Box>
-        <Stack direction='row' spacing={1}>
-          <Button
-            variant='tonal'
-            color='secondary'
-            onClick={handleDiscard}
-            disabled={saving || !dirty}
-          >
-            Descartar
-          </Button>
-          <Button
-            variant='contained'
-            startIcon={<i className='tabler-device-floppy' />}
-            onClick={handleSave}
-            disabled={saving || !dirty}
-          >
-            {saving ? 'Guardando…' : 'Guardar cambios'}
-          </Button>
-        </Stack>
-      </Box>
+      {dirty && draftLines.length > 0 ? (
+        <>
+          <Divider />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, px: 3, py: 2 }}>
+            <Button
+              variant='text'
+              color='secondary'
+              size='small'
+              onClick={handleDiscard}
+              disabled={saving}
+            >
+              Descartar cambios
+            </Button>
+          </Box>
+        </>
+      ) : null}
 
       {/* Popover Ajustes de pricing por fila */}
       <Popover

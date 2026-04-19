@@ -635,13 +635,6 @@ const QuoteBuilderShell = ({
     [pickerMode, expandServiceSelections]
   )
 
-  const handleEditorSave = useCallback(
-    async (lines: QuoteLineItem[]) => {
-      setLinesSnapshot(lines)
-    },
-    []
-  )
-
   const validate = useCallback((): string | null => {
     if (builderState.description.trim().length === 0) {
       return GH_PRICING.builderValidationDescription
@@ -929,8 +922,8 @@ const QuoteBuilderShell = ({
         onValidUntilChange={iso => setBuilderState(prev => ({ ...prev, validUntil: iso }))}
       />
 
-      <Box sx={{ px: { xs: 2, md: 3 }, py: { xs: 3, md: 4 } }}>
-        <Stack spacing={3}>
+      <Box sx={{ px: { xs: 2, md: 3 }, py: { xs: 2, md: 3 } }}>
+        <Stack spacing={2}>
           {error ? (
             <Alert severity='error' role='alert' onClose={() => setError(null)}>
               {error}
@@ -949,7 +942,6 @@ const QuoteBuilderShell = ({
             currency={currency}
             editable
             lineItems={linesSnapshot}
-            onSave={handleEditorSave}
             saving={submitting || serviceExpanding}
             businessLineCode={builderState.businessLineCode}
             canViewCostStack={canSeeCostStack}
@@ -974,7 +966,7 @@ const QuoteBuilderShell = ({
 
           <Accordion
             elevation={0}
-            defaultExpanded={mode === 'create' || builderState.description.length > 0}
+            defaultExpanded={builderState.description.length > 0}
             sx={theme => ({
               border: `1px solid ${theme.palette.divider}`,
               borderRadius: `${theme.shape.customBorderRadius.lg}px`,
@@ -1035,11 +1027,18 @@ const QuoteBuilderShell = ({
           primaryCtaLabel={submitting ? GH_PRICING.builderSaving : GH_PRICING.summaryDock.primaryCta}
           primaryCtaIcon='tabler-device-floppy-filled'
           primaryCtaLoading={submitting}
-          primaryCtaDisabled={submitting || serviceExpanding}
+          primaryCtaDisabled={submitting || serviceExpanding || linesSnapshot.length === 0 || !organizationId}
           onPrimaryClick={() => handleSubmit(true)}
           marginClassification={marginClass}
           marginPct={marginPct}
           simulationError={dockSimulationError}
+          emptyStateMessage={
+            linesSnapshot.length === 0
+              ? !organizationId
+                ? 'Selecciona una organización y agrega ítems para calcular el total.'
+                : 'Agrega al menos un ítem para calcular el total.'
+              : null
+          }
         />
 
       </Box>

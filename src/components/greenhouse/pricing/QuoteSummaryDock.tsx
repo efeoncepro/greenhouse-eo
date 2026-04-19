@@ -42,6 +42,11 @@ export interface QuoteSummaryDockProps {
   /** Si hay un error del engine v2, se muestra como Alert inline en la parte
    * superior del dock (justo encima del bloque de totales). */
   simulationError?: string | null
+
+  /** Mensaje contextual cuando no hay datos suficientes para mostrar totales
+   * (ej. sin ítems agregados). Si está presente, reemplaza el bloque de
+   * totales por una leyenda informativa. */
+  emptyStateMessage?: string | null
 }
 
 const CURRENCY_LOCALE: Record<PricingOutputCurrency, string> = {
@@ -102,7 +107,8 @@ const QuoteSummaryDock = ({
   onSecondaryClick,
   marginClassification,
   marginPct,
-  simulationError
+  simulationError,
+  emptyStateMessage
 }: QuoteSummaryDockProps) => {
   const prefersReduced = useReducedMotion()
   const addonChipRef = useRef<HTMLDivElement | null>(null)
@@ -159,7 +165,20 @@ const QuoteSummaryDock = ({
         justifyContent='space-between'
         useFlexGap
       >
-        {/* Bloque de totales */}
+        {/* Bloque de totales — si empty, muestra leyenda en lugar de "—/—" */}
+        {emptyStateMessage ? (
+          <Stack direction='row' spacing={1.5} alignItems='center' useFlexGap>
+            <Box
+              component='i'
+              className='tabler-info-circle'
+              aria-hidden='true'
+              sx={{ fontSize: 20, color: 'text.secondary' }}
+            />
+            <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 500 }}>
+              {emptyStateMessage}
+            </Typography>
+          </Stack>
+        ) : (
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           spacing={{ xs: 1.5, sm: 3 }}
@@ -232,10 +251,11 @@ const QuoteSummaryDock = ({
             </Box>
           ) : null}
         </Stack>
+        )}
 
         {/* Bloque de acciones */}
         <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
-          {addonContent ? (
+          {addonContent && addonCount > 0 ? (
             <>
               <Box
                 ref={addonChipRef}

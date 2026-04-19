@@ -6,6 +6,7 @@ import Box from '@mui/material/Box'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
 import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
@@ -19,7 +20,7 @@ const STATUS_META: Record<
   QuoteStatus,
   { label: string; color: 'secondary' | 'info' | 'success' | 'error'; icon: string }
 > = {
-  draft: { label: GH_PRICING.identityStrip.draftLabel, color: 'secondary', icon: 'tabler-circle-dashed' },
+  draft: { label: GH_PRICING.identityStrip.draftLabel, color: 'secondary', icon: 'tabler-pencil' },
   sent: { label: GH_PRICING.identityStrip.sentLabel, color: 'info', icon: 'tabler-send' },
   approved: { label: GH_PRICING.identityStrip.approvedLabel, color: 'success', icon: 'tabler-circle-check' },
   expired: { label: GH_PRICING.identityStrip.expiredLabel, color: 'error', icon: 'tabler-circle-x' }
@@ -136,19 +137,27 @@ const QuoteIdentityStrip = ({
                 >
                   {title}
                 </Typography>
-                <Typography
-                  variant='body2'
-                  sx={{
-                    fontVariantNumeric: 'tabular-nums',
-                    color: 'text.secondary',
-                    px: 1,
-                    py: 0.25,
-                    borderRadius: 1,
-                    backgroundColor: 'action.hover'
-                  }}
+                <Tooltip
+                  title={quoteNumber ? '' : 'El número se asigna automáticamente al guardar'}
+                  placement='bottom-start'
+                  arrow
+                  disableInteractive
                 >
-                  {quoteNumber ?? GH_PRICING.identityStrip.numberPlaceholder}
-                </Typography>
+                  <Typography
+                    variant='body2'
+                    sx={{
+                      fontVariantNumeric: 'tabular-nums',
+                      color: 'text.secondary',
+                      px: 1,
+                      py: 0.25,
+                      borderRadius: 1,
+                      backgroundColor: 'action.hover',
+                      cursor: quoteNumber ? 'default' : 'help'
+                    }}
+                  >
+                    {quoteNumber ?? GH_PRICING.identityStrip.numberPlaceholder}
+                  </Typography>
+                </Tooltip>
                 <CustomChip
                   round='true'
                   size='small'
