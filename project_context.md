@@ -1,3 +1,15 @@
+## Delta 2026-04-19 TASK-477 formaliza role_modeled con provenance, confidence y batch worker
+
+- Runtime nuevo:
+  - migración `20260419151636951_task-477-role-modeled-cost-basis.sql`
+  - tabla `greenhouse_commercial.role_modeled_cost_basis_snapshots`
+  - helper `src/lib/commercial-cost-basis/role-modeled-cost-basis.ts`
+- Contrato operativo:
+  - `sellable_role_cost_components` sigue siendo el anchor editable del catálogo, pero ahora agrega `direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score` y columnas generadas `confidence_label`, `direct_overhead_amount_usd`, `shared_overhead_amount_usd`, `loaded_monthly_cost_usd`, `loaded_hourly_cost_usd`
+  - `pricing-engine-v2` mantiene la precedencia `role_blended -> role_modeled`; cuando cae a `role_modeled`, ya expone provenance/confidence explícitos desde el reader nuevo
+  - `commercial-cost-worker` scope `roles` deja de estar reservado y materializa snapshots `role_modeled` por período
+  - `Admin > Pricing Catalog > Roles > Componentes de costo` ya puede editar overhead directo/compartido y mostrar loaded cost + confidence/origen sin crear otra UI paralela
+
 ## Delta 2026-04-19 TASK-479 agrega el bridge persona -> rol comercial y el snapshot role_blended
 
 - Runtime nuevo:

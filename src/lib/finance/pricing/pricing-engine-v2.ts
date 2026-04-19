@@ -7,7 +7,6 @@ import {
   convertFteToHours
 } from '@/lib/commercial/pricing-governance-store'
 import {
-  getCurrentCost,
   getCurrentPricing,
   getSellableRoleBySku,
   listCompatibleEmploymentTypes
@@ -22,6 +21,7 @@ import {
   getPreferredRoleBlendedCostBasisByRoleId
 } from '@/lib/commercial-cost-basis/people-role-cost-basis'
 import { getPreferredToolProviderCostBasisByToolSku } from '@/lib/commercial-cost-basis/tool-provider-cost-basis-reader'
+import { getPreferredRoleModeledCostBasisByRoleId as getPreferredRoleModeledCostBasisByRoleIdFromModeled } from '@/lib/commercial-cost-basis/role-modeled-cost-basis'
 
 import { computeAddonChargeUsd, resolvePricingAddons } from './addon-resolver'
 import { classifyTierComplianceFromEntry } from './tier-compliance'
@@ -147,7 +147,6 @@ const convertUsdWithFallback = async ({
 const defaultPricingEngineV2Dependencies = {
   getSellableRoleBySku,
   listCompatibleEmploymentTypes,
-  getCurrentCost,
   getCurrentPricing,
   getRoleTierMargins,
   getCommercialModelMultiplier,
@@ -158,6 +157,7 @@ const defaultPricingEngineV2Dependencies = {
   listOverheadAddons,
   getPreferredMemberActualCostBasis,
   getPreferredRoleBlendedCostBasisByRoleId,
+  getPreferredRoleModeledCostBasisByRoleId: getPreferredRoleModeledCostBasisByRoleIdFromModeled,
   getPreferredToolProviderCostBasisByToolSku,
   convertUsdToPricingCurrency,
   convertCurrencyAmount,
@@ -169,7 +169,6 @@ const defaultPricingEngineV2Dependencies = {
 export interface PricingEngineV2Dependencies {
   getSellableRoleBySku: typeof getSellableRoleBySku
   listCompatibleEmploymentTypes: typeof listCompatibleEmploymentTypes
-  getCurrentCost: typeof getCurrentCost
   getCurrentPricing: typeof getCurrentPricing
   getRoleTierMargins: typeof getRoleTierMargins
   getCommercialModelMultiplier: typeof getCommercialModelMultiplier
@@ -180,6 +179,7 @@ export interface PricingEngineV2Dependencies {
   listOverheadAddons: typeof listOverheadAddons
   getPreferredMemberActualCostBasis: typeof getPreferredMemberActualCostBasis
   getPreferredRoleBlendedCostBasisByRoleId: typeof getPreferredRoleBlendedCostBasisByRoleId
+  getPreferredRoleModeledCostBasisByRoleId: typeof getPreferredRoleModeledCostBasisByRoleIdFromModeled
   getPreferredToolProviderCostBasisByToolSku: typeof getPreferredToolProviderCostBasisByToolSku
   convertUsdToPricingCurrency: typeof convertUsdToPricingCurrency
   convertCurrencyAmount: typeof convertCurrencyAmount
@@ -250,11 +250,19 @@ const resolveRoleLine = async ({
     }
   )
 
-  const costRow = blendedCostBasis
+  const modeledCostBasis = blendedCostBasis
     ? null
-    : await deps.getCurrentCost(role.roleId, resolvedEmploymentType?.employmentTypeCode ?? null, quoteDate)
+    : await deps.getPreferredRoleModeledCostBasisByRoleId(
+        role.roleId,
+        resolvedEmploymentType?.employmentTypeCode ?? null,
+        {
+          year: quotePeriod?.year ?? null,
+          month: quotePeriod?.month ?? null,
+          asOfDate: quoteDate
+        }
+      )
 
-  if (!blendedCostBasis && !costRow) {
+  if (!blendedCostBasis && !modeledCostBasis) {
     throw new Error(`Missing cost components for role ${input.roleSku}`)
   }
 
@@ -324,28 +332,31 @@ const resolveRoleLine = async ({
     costBasisConfidenceScore = blendedCostBasis.confidenceScore
     costBasisConfidenceLabel = blendedCostBasis.confidenceLabel
   } else {
-    const resolvedCostRow = costRow!
+    const resolvedModeledCost = modeledCostBasis!
 
     hourlyCostUsd =
-      resolvedCostRow.hourlyCostUsd ??
-      round2((resolvedCostRow.totalMonthlyCostUsd ?? 0) / Math.max(resolvedCostRow.hoursPerFteMonth, 1))
-    monthlyCostUsd = resolvedCostRow.totalMonthlyCostUsd ?? round2(hourlyCostUsd * resolvedCostRow.hoursPerFteMonth)
+      resolvedModeledCost.costPerHourAmount ??
+      round2(resolvedModeledCost.loadedCostAmount / Math.max(resolvedModeledCost.hoursPerFteMonth, 1))
+    monthlyCostUsd =
+      resolvedModeledCost.loadedCostAmount ?? round2(hourlyCostUsd * resolvedModeledCost.hoursPerFteMonth)
     roleCostBreakdown = {
-      baseSalaryUsd: resolvedCostRow.baseSalaryUsd,
-      bonusJitUsd: resolvedCostRow.bonusJitUsd,
-      bonusRpaUsd: resolvedCostRow.bonusRpaUsd,
-      bonusArUsd: resolvedCostRow.bonusArUsd,
-      bonusSobrecumplimientoUsd: resolvedCostRow.bonusSobrecumplimientoUsd,
-      gastosPrevisionalesUsd: resolvedCostRow.gastosPrevisionalesUsd,
-      feeDeelUsd: resolvedCostRow.feeDeelUsd,
-      feeEorUsd: resolvedCostRow.feeEorUsd
+      baseLaborCost: resolvedModeledCost.baseLaborCostAmount,
+      directOverhead: resolvedModeledCost.directOverheadAmount,
+      sharedOverhead: resolvedModeledCost.sharedOverheadAmount
     }
+    notes.push(
+      `Costo base desde role_modeled (${resolvedModeledCost.employmentTypeCode}, fuente ${resolvedModeledCost.sourceKind}, confianza ${resolvedModeledCost.confidenceLabel}).`
+    )
+    costBasisSourceRef = resolvedModeledCost.sourceRef
+    costBasisSnapshotDate = resolvedModeledCost.snapshotDate
+    costBasisConfidenceScore = resolvedModeledCost.confidenceScore
+    costBasisConfidenceLabel = resolvedModeledCost.confidenceLabel
   }
 
   const hoursPerPeriod = explicitHours
     ? input.hours!
     : (await deps.convertFteToHours(resolvedFteFraction, quoteDate))?.monthlyHours ??
-      (costRow?.hoursPerFteMonth ??
+      (modeledCostBasis?.hoursPerFteMonth ??
         (blendedCostBasis && blendedCostBasis.sampleSize > 0
           ? blendedCostBasis.weightedHours / blendedCostBasis.sampleSize
           : 160))

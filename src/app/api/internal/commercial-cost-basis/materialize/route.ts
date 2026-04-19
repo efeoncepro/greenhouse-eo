@@ -39,16 +39,6 @@ export async function POST(request: Request) {
       }
     })
 
-    if (requestInput.scope === 'roles') {
-      return NextResponse.json(
-        {
-          error: 'Role cost basis materialization is reserved for TASK-477.',
-          taskId: 'TASK-477'
-        },
-        { status: 501 }
-      )
-    }
-
     if (requestInput.monthsBack > 1) {
       return NextResponse.json(
         {

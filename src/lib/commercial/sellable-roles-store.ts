@@ -66,8 +66,18 @@ export interface SellableRoleCostEntry {
   feeDeelUsd: number
   feeEorUsd: number
   hoursPerFteMonth: number
+  directOverheadPct: number
+  sharedOverheadPct: number
+  directOverheadAmountUsd: number | null
+  sharedOverheadAmountUsd: number | null
   totalMonthlyCostUsd: number | null
   hourlyCostUsd: number | null
+  loadedMonthlyCostUsd: number | null
+  loadedHourlyCostUsd: number | null
+  sourceKind: string
+  sourceRef: string | null
+  confidenceScore: number | null
+  confidenceLabel: 'high' | 'medium' | 'low' | null
   notes: string | null
   createdAt: string
 }
@@ -123,6 +133,14 @@ const toStringTimestamp = (value: Date | string | null | undefined) => {
   return value.toISOString()
 }
 
+const toConfidenceLabel = (value: string | null | undefined): SellableRoleCostEntry['confidenceLabel'] => {
+  if (value === 'high' || value === 'medium' || value === 'low') {
+    return value
+  }
+
+  return null
+}
+
 const mapRole = (row: SellableRoleRow): SellableRoleEntry => ({
   roleId: row.role_id,
   roleSku: row.role_sku,
@@ -172,8 +190,18 @@ const mapCostRow = (row: SellableRoleCostRow): SellableRoleCostEntry => ({
   feeDeelUsd: toNumber(row.fee_deel_usd) ?? 0,
   feeEorUsd: toNumber(row.fee_eor_usd) ?? 0,
   hoursPerFteMonth: row.hours_per_fte_month,
+  directOverheadPct: toNumber(row.direct_overhead_pct) ?? 0,
+  sharedOverheadPct: toNumber(row.shared_overhead_pct) ?? 0,
+  directOverheadAmountUsd: toNumber(row.direct_overhead_amount_usd),
+  sharedOverheadAmountUsd: toNumber(row.shared_overhead_amount_usd),
   totalMonthlyCostUsd: toNumber(row.total_monthly_cost_usd),
   hourlyCostUsd: toNumber(row.hourly_cost_usd),
+  loadedMonthlyCostUsd: toNumber(row.loaded_monthly_cost_usd),
+  loadedHourlyCostUsd: toNumber(row.loaded_hourly_cost_usd),
+  sourceKind: row.source_kind,
+  sourceRef: row.source_ref,
+  confidenceScore: toNumber(row.confidence_score),
+  confidenceLabel: toConfidenceLabel(row.confidence_label),
   notes: row.notes,
   createdAt: toStringTimestamp(row.created_at)
 })
@@ -536,6 +564,11 @@ export const insertCostComponentsIfChanged = async (
   // phase-2) los envía explícitos cuando el rol los overridea.
   const feeEorUsd = seedRow.feeEorUsd ?? 0
   const hoursPerFteMonth = seedRow.hoursPerFteMonth ?? 180
+  const directOverheadPct = seedRow.directOverheadPct ?? 0
+  const sharedOverheadPct = seedRow.sharedOverheadPct ?? 0
+  const sourceKind = seedRow.sourceKind ?? 'catalog_seed'
+  const sourceRef = seedRow.sourceRef ?? null
+  const confidenceScore = seedRow.confidenceScore ?? (sourceKind === 'admin_manual' ? 0.75 : 0.6)
 
   const changed = !baseline ||
     numberChanged(toNumber(baseline.base_salary_usd), seedRow.baseSalaryUsd) ||
@@ -546,7 +579,12 @@ export const insertCostComponentsIfChanged = async (
     numberChanged(toNumber(baseline.gastos_previsionales_usd), seedRow.gastosPrevisionalesUsd) ||
     numberChanged(toNumber(baseline.fee_deel_usd), seedRow.feeDeelUsd) ||
     numberChanged(toNumber(baseline.fee_eor_usd), feeEorUsd) ||
-    baseline.hours_per_fte_month !== hoursPerFteMonth
+    baseline.hours_per_fte_month !== hoursPerFteMonth ||
+    numberChanged(toNumber(baseline.direct_overhead_pct), directOverheadPct) ||
+    numberChanged(toNumber(baseline.shared_overhead_pct), sharedOverheadPct) ||
+    (baseline.source_kind ?? 'catalog_seed') !== sourceKind ||
+    (baseline.source_ref ?? null) !== sourceRef ||
+    numberChanged(toNumber(baseline.confidence_score), confidenceScore)
 
   if (!changed) {
     return { changed: false, entry: mapCostRow(baseline) }
@@ -567,6 +605,11 @@ export const insertCostComponentsIfChanged = async (
       fee_deel_usd: seedRow.feeDeelUsd,
       fee_eor_usd: feeEorUsd,
       hours_per_fte_month: hoursPerFteMonth,
+      direct_overhead_pct: directOverheadPct,
+      shared_overhead_pct: sharedOverheadPct,
+      source_kind: sourceKind,
+      source_ref: sourceRef,
+      confidence_score: confidenceScore,
       notes: seedRow.driftWarnings.length > 0 ? `drift:${seedRow.driftWarnings.join(',')}` : null
     })
     .onConflict(oc => oc.columns(['role_id', 'employment_type_code', 'effective_from']).doUpdateSet({
@@ -579,6 +622,11 @@ export const insertCostComponentsIfChanged = async (
       fee_deel_usd: seedRow.feeDeelUsd,
       fee_eor_usd: feeEorUsd,
       hours_per_fte_month: hoursPerFteMonth,
+      direct_overhead_pct: directOverheadPct,
+      shared_overhead_pct: sharedOverheadPct,
+      source_kind: sourceKind,
+      source_ref: sourceRef,
+      confidence_score: confidenceScore,
       notes: seedRow.driftWarnings.length > 0 ? `drift:${seedRow.driftWarnings.join(',')}` : null
     }))
     .returningAll()

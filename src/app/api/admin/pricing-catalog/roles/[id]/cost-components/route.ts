@@ -27,8 +27,18 @@ interface CostComponentRow extends Record<string, unknown> {
   fee_deel_usd: string | number | null
   fee_eor_usd: string | number | null
   hours_per_fte_month: number
+  direct_overhead_pct: string | number | null
+  shared_overhead_pct: string | number | null
+  direct_overhead_amount_usd: string | number | null
+  shared_overhead_amount_usd: string | number | null
   total_monthly_cost_usd: string | number | null
   hourly_cost_usd: string | number | null
+  loaded_monthly_cost_usd: string | number | null
+  loaded_hourly_cost_usd: string | number | null
+  source_kind: string
+  source_ref: string | null
+  confidence_score: string | number | null
+  confidence_label: 'high' | 'medium' | 'low' | null
   notes: string | null
   created_at: string | Date
 }
@@ -50,6 +60,8 @@ interface PostCostComponentsBody {
   feeDeelUsd?: unknown
   feeEorUsd?: unknown
   hoursPerFteMonth?: unknown
+  directOverheadPct?: unknown
+  sharedOverheadPct?: unknown
   notes?: unknown
 }
 
@@ -59,6 +71,22 @@ const toNumberValue = (value: unknown): number | null => {
   const parsed = typeof value === 'number' ? value : Number(value)
 
   return Number.isFinite(parsed) ? parsed : null
+}
+
+const requirePct = (value: unknown, fieldName: string): number => {
+  const parsed = toNumberValue(value)
+
+  if (parsed === null || parsed < 0 || parsed > 10) {
+    throw new Error(`${fieldName} must be a number between 0 and 10.`)
+  }
+
+  return parsed
+}
+
+const optionalPct = (value: unknown, fieldName: string): number => {
+  if (value === undefined || value === null || value === '') return 0
+
+  return requirePct(value, fieldName)
 }
 
 const requireNumber = (value: unknown, fieldName: string): number => {
@@ -154,7 +182,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
             base_salary_usd, bonus_jit_usd, bonus_rpa_usd, bonus_ar_usd,
             bonus_sobrecumplimiento_usd, gastos_previsionales_usd,
             fee_deel_usd, fee_eor_usd, hours_per_fte_month,
-            total_monthly_cost_usd, hourly_cost_usd, notes, created_at
+            direct_overhead_pct, shared_overhead_pct,
+            direct_overhead_amount_usd, shared_overhead_amount_usd,
+            total_monthly_cost_usd, hourly_cost_usd,
+            loaded_monthly_cost_usd, loaded_hourly_cost_usd,
+            source_kind, source_ref, confidence_score, confidence_label,
+            notes, created_at
        FROM greenhouse_commercial.sellable_role_cost_components
        WHERE role_id = $1
        ORDER BY employment_type_code ASC, effective_from DESC`,
@@ -174,8 +207,18 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     feeDeelUsd: toNumberValue(row.fee_deel_usd) ?? 0,
     feeEorUsd: toNumberValue(row.fee_eor_usd) ?? 0,
     hoursPerFteMonth: row.hours_per_fte_month,
+    directOverheadPct: toNumberValue(row.direct_overhead_pct) ?? 0,
+    sharedOverheadPct: toNumberValue(row.shared_overhead_pct) ?? 0,
+    directOverheadAmountUsd: toNumberValue(row.direct_overhead_amount_usd),
+    sharedOverheadAmountUsd: toNumberValue(row.shared_overhead_amount_usd),
     totalMonthlyCostUsd: toNumberValue(row.total_monthly_cost_usd),
     hourlyCostUsd: toNumberValue(row.hourly_cost_usd),
+    loadedMonthlyCostUsd: toNumberValue(row.loaded_monthly_cost_usd),
+    loadedHourlyCostUsd: toNumberValue(row.loaded_hourly_cost_usd),
+    sourceKind: row.source_kind,
+    sourceRef: row.source_ref,
+    confidenceScore: toNumberValue(row.confidence_score),
+    confidenceLabel: row.confidence_label,
     notes: row.notes,
     createdAt: toIsoTimestamp(row.created_at as string | Date | null)
   }))
@@ -230,6 +273,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   let feeDeelUsd: number
   let feeEorUsd: number
   let hoursPerFteMonth: number
+  let directOverheadPct: number
+  let sharedOverheadPct: number
 
   try {
     baseSalaryUsd = requireNumber(body.baseSalaryUsd, 'baseSalaryUsd')
@@ -241,6 +286,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     feeDeelUsd = optionalNumber(body.feeDeelUsd, 'feeDeelUsd')
     feeEorUsd = optionalNumber(body.feeEorUsd, 'feeEorUsd')
     hoursPerFteMonth = requireNumber(body.hoursPerFteMonth, 'hoursPerFteMonth')
+    directOverheadPct = optionalPct(body.directOverheadPct, 'directOverheadPct')
+    sharedOverheadPct = optionalPct(body.sharedOverheadPct, 'sharedOverheadPct')
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Invalid numeric field.'
 
@@ -307,6 +354,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     feeDeelUsd,
     feeEorUsd,
     hoursPerFteMonth,
+    directOverheadPct,
+    sharedOverheadPct,
+    sourceKind: 'admin_manual',
+    sourceRef: 'pricing_catalog_admin',
+    confidenceScore: 0.75,
     totalMonthlyCostUsd: 0,
     hourlyCostUsd: 0,
     fteMonthlyCostUsd: 0,
@@ -354,6 +406,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         feeDeelUsd,
         feeEorUsd,
         hoursPerFteMonth,
+        directOverheadPct,
+        sharedOverheadPct,
+        sourceKind: 'admin_manual',
+        sourceRef: 'pricing_catalog_admin',
+        confidenceScore: 0.75,
         notes
       }
     },

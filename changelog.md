@@ -13,6 +13,14 @@
 - Docs: `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.23; `docs/documentation/finance/cotizador.md` → v3 con regla "A quién se le cotiza" explícita.
 - **Cerrada 2026-04-19** tras 7/7 smoke tests verdes en staging (POST validation, GET contacts real data, GET detail con `organization` + `contact` poblados). Fix intermedio en `resolveFinanceQuoteTenantOrganizationIds` (early-return de `efeonce_internal` al tope antes del self-check de `tenant.organizationId`) pusheado como parte del mismo tren (`48fd0ae6`).
 
+### 2026-04-19 — TASK-477 formaliza role_modeled con snapshots, overhead y worker batch
+
+- `greenhouse_commercial.sellable_role_cost_components` gana provenance y overhead explícitos: `direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score` y columnas generadas para `confidence_label`, montos de overhead y loaded cost mensual/hora.
+- Nace `greenhouse_commercial.role_modeled_cost_basis_snapshots` como read model por `role_id + employment_type_code + period`, con `snapshot_date`, `source_cost_component_effective_from`, `source_ref`, confidence y detail JSONB.
+- `pricing-engine-v2` mantiene la precedencia `role_blended` sobre `role_modeled`, pero cuando no existe evidencia factual ahora resuelve el lane modelado desde un reader explícito y emite metadata `costBasisSourceRef`, `costBasisSnapshotDate`, `costBasisConfidence*`.
+- `commercial-cost-worker` activa `POST /cost-basis/materialize/roles` y el fallback interno `/api/internal/commercial-cost-basis/materialize` ya acepta `scope='roles'`.
+- `Admin > Pricing Catalog` muestra y permite editar el costo loaded / overhead / provenance del catálogo de roles sin abrir un dominio paralelo.
+
 ### 2026-04-19 — fix(quotes): POST /api/finance/quotes now saves
 
 - `POST /api/finance/quotes` devolvía HTTP 500 con body vacío al guardar desde el builder full-page cuando no había `spaceId` explícito.

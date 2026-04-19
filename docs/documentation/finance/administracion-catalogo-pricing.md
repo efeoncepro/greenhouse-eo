@@ -143,15 +143,20 @@ La separación es intencional y canónica. El doc técnico `GREENHOUSE_TEAM_CAPA
 
 **Sinergia resuelta phase-2 (2026-04-19)**: el campo `hours_per_fte_month` en `sellable_role_cost_components` ahora funciona como **override per-role del `fte_hours_guide`**. El pricing engine v2 ya lo leía como fallback; antes estaba bloqueado porque el store hardcodeaba el valor a 180. Phase-2 lo desbloquea — el admin puede ahora especificar horas billable distintas para roles que lo necesiten (ej. un Senior Designer a 180h vs un Consultor a 160h). Mismo fix aplica a `fee_eor_usd` (antes hardcoded a 0). Stores aceptan defaults back-compat (180h / 0 fee) para CSVs de seed legacy que no los especifican. Regla: las dos capas siguen siendo distintas (160h capacity vs variable billable), pero ahora se coordinan explícitamente via el override per-role.
 
+**Sinergia resuelta phase-4 (2026-04-19, TASK-477)**: el mismo tab "Componentes de costo" ahora también administra el lane `role_modeled` completo. Además del breakdown base, cada modalidad puede guardar overhead directo/compartido, origen del supuesto y nivel de confianza. La UI muestra dos lecturas:
+- **Base**: costo mensual / hora antes de overhead extra
+- **Loaded**: costo mensual / hora ya cargado con overhead directo + compartido
+
+Esto evita crear otra pantalla paralela para "supuestos modelados". El cotizador sigue prefiriendo `role_blended` cuando existe evidencia real, pero cuando cae al catálogo ya puede explicar de dónde sale el costo modelado y con qué confianza.
+
 ## Aislamiento payroll
 
 La UI **NUNCA escribe** en `greenhouse_payroll.*`. Los campos de rates de payroll (AFP, previsional) son SOLO lectura cuando se muestran como referencia. Los 194 tests del módulo payroll se mantienen intactos — TASK-467 no los toca.
 
 > **Detalle técnico:** API routes en [src/app/api/admin/pricing-catalog/](../../../src/app/api/admin/pricing-catalog/). Views en [src/views/greenhouse/admin/pricing-catalog/](../../../src/views/greenhouse/admin/pricing-catalog/). Audit store en [src/lib/commercial/pricing-catalog-audit-store.ts](../../../src/lib/commercial/pricing-catalog-audit-store.ts). Permission helper `canAdministerPricingCatalog` en [src/lib/tenant/authorization.ts](../../../src/lib/tenant/authorization.ts).
 
-## Próximos pasos (follow-ups phase-3+)
+## Próximos pasos (follow-ups phase-5+)
 
-- **Desbloquear hours_per_fte_month y fee_eor_usd** en cost components (hoy el store los hardcodea)
 - **Role employment compatibility**: endpoint + UI para gestión full (hoy solo read-only en tab "Modalidades")
 - **Excel import con diff preview** si Efeonce lo pide (CSV re-seed sigue como fallback)
 - **Approval workflow** para cambios críticos (ej. bajar `margin_min` requiere aprobación de efeonce_admin)

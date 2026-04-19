@@ -61,6 +61,35 @@ Smoke T4 inicialmente falló con 403 porque el resolver `resolveFinanceQuoteTena
 
 ---
 
+## Sesion 2026-04-19 — TASK-477 Role Modeled Cost Basis Catalog (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama / worktree:** `task/TASK-477-role-cost-assumptions-catalog` en `/Users/jreye/Documents/greenhouse-eo-task-477`
+- **Colisión evitada:** se trabajó en worktree aislado porque Claude estaba moviendo el checkout principal en paralelo.
+- **Spec corregida antes de implementar:** la task asumía un catálogo paralelo y un lane `role_modeled` todavía implícito. Se reancló a la realidad del repo:
+  - `sellable_role_cost_components` ya era effective-dated
+  - `pricing-engine-v2` ya distinguía `role_blended` vs `role_modeled`
+  - `Admin > Pricing Catalog` ya existía y era el surface correcta
+  - `commercial-cost-worker` ya era el runtime batch correcto; `ops-worker` no debía absorber esta slice
+- **Entregables:**
+  - migración `20260419151636951_task-477-role-modeled-cost-basis.sql`
+  - tabla `greenhouse_commercial.role_modeled_cost_basis_snapshots`
+  - helper `src/lib/commercial-cost-basis/role-modeled-cost-basis.ts`
+  - `sellable_role_cost_components` extendida con overhead/provenance/confidence + loaded cost generado
+  - `pricing-engine-v2` ahora lee `role_modeled` desde un reader explícito con `sourceRef`, `snapshotDate` y `confidence`
+  - `commercial-cost-worker` scope `roles` implementado en Cloud Run scaffold + fallback interno Next
+  - admin pricing catalog de roles extendido para editar/ver overhead, loaded cost, origen y confianza
+- **Verificación ejecutada:**
+  - `pnpm pg:doctor` ok
+  - `pnpm exec tsx scripts/migrate.ts up --check-order=false` ok; `src/types/db.d.ts` regenerado
+  - `pnpm exec vitest run src/lib/finance/pricing/__tests__/pricing-engine-v2.test.ts` ok
+  - `pnpm exec tsc --noEmit` ok
+  - `pnpm lint` ok
+  - `pnpm build` ok
+  - `rg -n "new Pool\\(" src -S` -> solo `src/lib/postgres/client.ts`
+- **Nota operativa del worktree:** `pnpm build` con Turbopack fallaba por el symlink de `node_modules` apuntando fuera del root del worktree. Para validar el build se clonó localmente `node_modules` dentro del worktree; no hubo cambios versionados por eso.
+
 ## Sesion 2026-04-19 — ISSUE: Quote save 500 "could not determine data type of parameter $4" (Claude)
 
 - **Owner:** Claude

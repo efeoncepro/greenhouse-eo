@@ -9,6 +9,7 @@ Este worker separa del portal web las corridas pesadas que alimentan el programa
 ## Que materializa hoy
 
 - `people` -> refresca `member_capacity_economics`
+- `roles` -> materializa `role_modeled_cost_basis_snapshots`
 - `tools` -> refresca `provider_tooling_snapshots` + `tool_provider_cost_basis_snapshots`
 - `bundle` -> orquesta `people` + `tools` + `commercial_cost_attribution` + `client_economics`
 
@@ -16,7 +17,6 @@ Este worker separa del portal web las corridas pesadas que alimentan el programa
 
 Estos endpoints quedan reservados para las siguientes tasks del programa y hoy responden `501`:
 
-- `roles`
 - `quotes/reprice-bulk`
 - `margin-feedback/materialize`
 
@@ -30,7 +30,10 @@ Cada corrida deja dos rastros:
 2. `greenhouse_commercial.commercial_cost_basis_snapshots`
    - una fila por `scope + period + run`
    - guarda manifest de entrada, resumen, estado y tenant scope asociado
-3. `greenhouse_commercial.tool_provider_cost_basis_snapshots`
+3. `greenhouse_commercial.role_modeled_cost_basis_snapshots`
+   - una fila por `role_id + employment_type_code + period`
+   - guarda costo modelado loaded, provenance, confidence y detail del supuesto
+4. `greenhouse_commercial.tool_provider_cost_basis_snapshots`
    - una fila por `tool_id + provider_id + period + tenant_scope_key`
    - guarda costo resuelto, provenance, freshness, confidence y metadata FX
 
@@ -39,6 +42,7 @@ Cada corrida deja dos rastros:
 - `GET /health`
 - `POST /cost-basis/materialize`
 - `POST /cost-basis/materialize/people`
+- `POST /cost-basis/materialize/roles`
 - `POST /cost-basis/materialize/tools`
 - `POST /cost-basis/materialize/bundle`
 

@@ -81,8 +81,18 @@ interface CostComponentItem {
   feeDeelUsd: number
   feeEorUsd: number
   hoursPerFteMonth: number
+  directOverheadPct?: number | null
+  sharedOverheadPct?: number | null
+  directOverheadAmountUsd?: number | null
+  sharedOverheadAmountUsd?: number | null
   totalMonthlyCostUsd: number | null
   hourlyCostUsd: number | null
+  loadedMonthlyCostUsd?: number | null
+  loadedHourlyCostUsd?: number | null
+  sourceKind?: string | null
+  sourceRef?: string | null
+  confidenceScore?: number | null
+  confidenceLabel?: string | null
   notes: string | null
   createdAt: string
 }
@@ -178,6 +188,65 @@ const fmtDate = (value: string): string => {
   return value.slice(0, 10)
 }
 
+const formatSourceKindLabel = (value: string | null | undefined): string | null => {
+  if (!value) return null
+
+  const explicitLabels: Record<string, string> = {
+    catalog_seed: 'Semilla de catalogo',
+    admin_manual: 'Carga manual',
+    payroll_bridge: 'Bridge payroll',
+    modeled_formula: 'Modelo derivado',
+    backfill: 'Backfill',
+    role_modeled: 'Modelo por rol',
+    hybrid_modeled: 'Modelo híbrido',
+    people_blended: 'Blend de personas',
+    member_actual: 'Costo real',
+    member_capacity_economics: 'Capacidad real'
+  }
+
+  if (explicitLabels[value]) return explicitLabels[value]
+
+  return value
+    .split('_')
+    .filter(Boolean)
+    .map(token => token.charAt(0).toUpperCase() + token.slice(1))
+    .join(' ')
+}
+
+const getConfidenceMeta = (value: string | null | undefined) => {
+  switch (value) {
+    case 'high':
+      return { label: 'Alta', color: 'success' as const }
+    case 'medium':
+      return { label: 'Media', color: 'warning' as const }
+    case 'low':
+      return { label: 'Baja', color: 'default' as const }
+    default:
+      return null
+  }
+}
+
+const hasLoadedCosts = (item: CostComponentItem) =>
+  Number.isFinite(item.loadedMonthlyCostUsd) || Number.isFinite(item.loadedHourlyCostUsd)
+
+const getOverheadSummary = (item: CostComponentItem) => {
+  const parts: string[] = []
+
+  if (item.directOverheadPct != null || item.directOverheadAmountUsd != null) {
+    parts.push(
+      `Directo ${fmtPct(item.directOverheadPct)}${item.directOverheadAmountUsd != null ? ` (${fmtUsd(item.directOverheadAmountUsd)})` : ''}`
+    )
+  }
+
+  if (item.sharedOverheadPct != null || item.sharedOverheadAmountUsd != null) {
+    parts.push(
+      `Compartido ${fmtPct(item.sharedOverheadPct)}${item.sharedOverheadAmountUsd != null ? ` (${fmtUsd(item.sharedOverheadAmountUsd)})` : ''}`
+    )
+  }
+
+  return parts.length > 0 ? parts.join(' · ') : null
+}
+
 // ── Component ──────────────────────────────────────────────────────────
 
 const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellableRoleDrawerProps) => {
@@ -231,6 +300,8 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
     feeDeelUsd: '',
     feeEorUsd: '',
     hoursPerFteMonth: '180',
+    directOverheadPct: '',
+    sharedOverheadPct: '',
     notes: ''
   })
 
@@ -504,6 +575,8 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
       feeDeelUsd: '',
       feeEorUsd: '',
       hoursPerFteMonth: '180',
+      directOverheadPct: '',
+      sharedOverheadPct: '',
       notes: ''
     })
   }
@@ -521,6 +594,26 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
       toast.error('Ingresa un salario base en USD válido.')
 
       return
+    }
+
+    if (costForm.directOverheadPct !== '') {
+      const directOverheadPct = Number(costForm.directOverheadPct)
+
+      if (!Number.isFinite(directOverheadPct) || directOverheadPct < 0 || directOverheadPct > 1) {
+        toast.error('El overhead directo debe expresarse en decimal entre 0 y 1. Ejemplo: 0.08 = 8%.')
+
+        return
+      }
+    }
+
+    if (costForm.sharedOverheadPct !== '') {
+      const sharedOverheadPct = Number(costForm.sharedOverheadPct)
+
+      if (!Number.isFinite(sharedOverheadPct) || sharedOverheadPct < 0 || sharedOverheadPct > 1) {
+        toast.error('El overhead compartido debe expresarse en decimal entre 0 y 1. Ejemplo: 0.12 = 12%.')
+
+        return
+      }
     }
 
     setSavingCost(true)
@@ -545,6 +638,8 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
           feeDeelUsd: costForm.feeDeelUsd ? Number(costForm.feeDeelUsd) : 0,
           feeEorUsd: costForm.feeEorUsd ? Number(costForm.feeEorUsd) : 0,
           hoursPerFteMonth: Number(costForm.hoursPerFteMonth) || 180,
+          directOverheadPct: costForm.directOverheadPct === '' ? null : Number(costForm.directOverheadPct),
+          sharedOverheadPct: costForm.sharedOverheadPct === '' ? null : Number(costForm.sharedOverheadPct),
           notes: costForm.notes.trim() || null
         })
       })
@@ -1499,6 +1594,36 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                         />
                       </Grid>
 
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <CustomTextField
+                          fullWidth
+                          size='small'
+                          type='number'
+                          label='Overhead directo (decimal)'
+                          value={costForm.directOverheadPct}
+                          onChange={e =>
+                            setCostForm(prev => ({ ...prev, directOverheadPct: e.target.value }))
+                          }
+                          placeholder='0.08'
+                          helperText='Opcional. Usa decimal: 0.08 = 8%.'
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <CustomTextField
+                          fullWidth
+                          size='small'
+                          type='number'
+                          label='Overhead compartido (decimal)'
+                          value={costForm.sharedOverheadPct}
+                          onChange={e =>
+                            setCostForm(prev => ({ ...prev, sharedOverheadPct: e.target.value }))
+                          }
+                          placeholder='0.12'
+                          helperText='Opcional. Se suma al loaded cost como overhead compartido.'
+                        />
+                      </Grid>
+
                       <Grid size={{ xs: 12 }}>
                         <CustomTextField
                           fullWidth
@@ -1555,6 +1680,9 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                     const latest = group.items[0]
                     const history = group.items.slice(1)
                     const isExpanded = expandedGroups.has(group.code)
+                    const latestSourceKindLabel = formatSourceKindLabel(latest.sourceKind)
+                    const latestConfidenceMeta = getConfidenceMeta(latest.confidenceLabel)
+                    const latestOverheadSummary = getOverheadSummary(latest)
 
                     const totalBonos =
                       latest.bonusJitUsd +
@@ -1588,12 +1716,37 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                               vigente desde {fmtDate(latest.effectiveFrom)}
                             </Typography>
                           </Box>
-                          <Chip
-                            size='small'
-                            label={`${fmtUsd(latest.totalMonthlyCostUsd)}/mes · ${fmtUsd(latest.hourlyCostUsd)}/hora`}
-                            color='primary'
-                            variant='outlined'
-                          />
+                          <Stack direction='row' spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+                            <Chip
+                              size='small'
+                              label={`Base ${fmtUsd(latest.totalMonthlyCostUsd)}/mes · ${fmtUsd(latest.hourlyCostUsd)}/hora`}
+                              color='primary'
+                              variant='outlined'
+                            />
+                            {hasLoadedCosts(latest) && (
+                              <Chip
+                                size='small'
+                                label={`Loaded ${fmtUsd(latest.loadedMonthlyCostUsd)}/mes · ${fmtUsd(latest.loadedHourlyCostUsd)}/hora`}
+                                color='warning'
+                                variant='outlined'
+                              />
+                            )}
+                            {latestSourceKindLabel && (
+                              <Chip size='small' label={latestSourceKindLabel} variant='outlined' />
+                            )}
+                            {latestConfidenceMeta && (
+                              <Chip
+                                size='small'
+                                label={`Confianza ${latestConfidenceMeta.label}${
+                                  latest.confidenceScore != null
+                                    ? ` · ${Math.round(latest.confidenceScore * 100)}%`
+                                    : ''
+                                }`}
+                                color={latestConfidenceMeta.color}
+                                variant='outlined'
+                              />
+                            )}
+                          </Stack>
                         </Box>
                         <Divider />
                         <Box sx={{ overflowX: 'auto' }}>
@@ -1632,16 +1785,66 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                             <tbody>
                               <tr>
                                 <td>
-                                  <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                                    {fmtDate(latest.effectiveFrom)}
-                                  </Typography>
-                                  <Chip
-                                    size='small'
-                                    label='Vigente'
-                                    color='success'
-                                    variant='outlined'
-                                    sx={{ ml: 1, height: 18, fontSize: '0.65rem' }}
-                                  />
+                                  <Stack spacing={0.75}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                      <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                                        {fmtDate(latest.effectiveFrom)}
+                                      </Typography>
+                                      <Chip
+                                        size='small'
+                                        label='Vigente'
+                                        color='success'
+                                        variant='outlined'
+                                        sx={{ height: 18, fontSize: '0.65rem' }}
+                                      />
+                                    </Box>
+
+                                    {(latestSourceKindLabel || latestConfidenceMeta || latest.sourceRef) && (
+                                      <Stack direction='row' spacing={0.75} useFlexGap sx={{ flexWrap: 'wrap' }}>
+                                        {latestSourceKindLabel && (
+                                          <Chip
+                                            size='small'
+                                            label={`Origen: ${latestSourceKindLabel}`}
+                                            variant='outlined'
+                                            sx={{ maxWidth: '100%' }}
+                                          />
+                                        )}
+                                        {latestConfidenceMeta && (
+                                          <Chip
+                                            size='small'
+                                            label={`Confianza ${latestConfidenceMeta.label}`}
+                                            color={latestConfidenceMeta.color}
+                                            variant='outlined'
+                                          />
+                                        )}
+                                        {latest.sourceRef && (
+                                          <Tooltip title={latest.sourceRef}>
+                                            <Chip
+                                              size='small'
+                                              label={`Ref: ${latest.sourceRef}`}
+                                              variant='outlined'
+                                              sx={{
+                                                maxWidth: 220,
+                                                '& .MuiChip-label': {
+                                                  display: 'block',
+                                                  overflow: 'hidden',
+                                                  textOverflow: 'ellipsis',
+                                                  whiteSpace: 'nowrap',
+                                                  fontFamily: 'monospace'
+                                                }
+                                              }}
+                                            />
+                                          </Tooltip>
+                                        )}
+                                      </Stack>
+                                    )}
+
+                                    {latestOverheadSummary && (
+                                      <Typography variant='caption' color='text.secondary'>
+                                        Overhead: {latestOverheadSummary}
+                                      </Typography>
+                                    )}
+                                  </Stack>
                                 </td>
                                 <td>{fmtUsd(latest.baseSalaryUsd)}</td>
                                 <td>{fmtUsd(totalBonos)}</td>
@@ -1649,8 +1852,26 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                                 <td>{fmtUsd(latest.feeDeelUsd)}</td>
                                 <td>{fmtUsd(latest.feeEorUsd)}</td>
                                 <td>{latest.hoursPerFteMonth}</td>
-                                <td>{fmtUsd(latest.totalMonthlyCostUsd)}</td>
-                                <td>{fmtUsd(latest.hourlyCostUsd)}</td>
+                                <td>
+                                  <Stack spacing={0.5} sx={{ alignItems: 'flex-end' }}>
+                                    <Typography variant='body2'>{fmtUsd(latest.totalMonthlyCostUsd)}</Typography>
+                                    {hasLoadedCosts(latest) && (
+                                      <Typography variant='caption' color='text.secondary'>
+                                        Loaded {fmtUsd(latest.loadedMonthlyCostUsd)}
+                                      </Typography>
+                                    )}
+                                  </Stack>
+                                </td>
+                                <td>
+                                  <Stack spacing={0.5} sx={{ alignItems: 'flex-end' }}>
+                                    <Typography variant='body2'>{fmtUsd(latest.hourlyCostUsd)}</Typography>
+                                    {hasLoadedCosts(latest) && (
+                                      <Typography variant='caption' color='text.secondary'>
+                                        Loaded {fmtUsd(latest.loadedHourlyCostUsd)}
+                                      </Typography>
+                                    )}
+                                  </Stack>
+                                </td>
                               </tr>
                               {isExpanded &&
                                 history.map(h => {
@@ -1660,14 +1881,32 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                                     h.bonusArUsd +
                                     h.bonusSobrecumplimientoUsd
 
+                                  const historySourceKindLabel = formatSourceKindLabel(h.sourceKind)
+                                  const historyConfidenceMeta = getConfidenceMeta(h.confidenceLabel)
+                                  const historyOverheadSummary = getOverheadSummary(h)
+
                                   return (
                                     <tr
                                       key={`${h.employmentTypeCode}-${h.effectiveFrom}-${h.createdAt}`}
                                     >
                                       <td>
-                                        <Typography variant='body2' color='text.secondary'>
-                                          {fmtDate(h.effectiveFrom)}
-                                        </Typography>
+                                        <Stack spacing={0.5}>
+                                          <Typography variant='body2' color='text.secondary'>
+                                            {fmtDate(h.effectiveFrom)}
+                                          </Typography>
+                                          {(historySourceKindLabel || historyConfidenceMeta || h.sourceRef) && (
+                                            <Typography variant='caption' color='text.secondary'>
+                                              {[historySourceKindLabel, historyConfidenceMeta?.label && `Confianza ${historyConfidenceMeta.label}`, h.sourceRef && `Ref ${h.sourceRef}`]
+                                                .filter(Boolean)
+                                                .join(' · ')}
+                                            </Typography>
+                                          )}
+                                          {historyOverheadSummary && (
+                                            <Typography variant='caption' color='text.secondary'>
+                                              Overhead: {historyOverheadSummary}
+                                            </Typography>
+                                          )}
+                                        </Stack>
                                       </td>
                                       <td>{fmtUsd(h.baseSalaryUsd)}</td>
                                       <td>{fmtUsd(hBonos)}</td>
@@ -1675,8 +1914,26 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                                       <td>{fmtUsd(h.feeDeelUsd)}</td>
                                       <td>{fmtUsd(h.feeEorUsd)}</td>
                                       <td>{h.hoursPerFteMonth}</td>
-                                      <td>{fmtUsd(h.totalMonthlyCostUsd)}</td>
-                                      <td>{fmtUsd(h.hourlyCostUsd)}</td>
+                                      <td>
+                                        <Stack spacing={0.5} sx={{ alignItems: 'flex-end' }}>
+                                          <Typography variant='body2'>{fmtUsd(h.totalMonthlyCostUsd)}</Typography>
+                                          {hasLoadedCosts(h) && (
+                                            <Typography variant='caption' color='text.secondary'>
+                                              Loaded {fmtUsd(h.loadedMonthlyCostUsd)}
+                                            </Typography>
+                                          )}
+                                        </Stack>
+                                      </td>
+                                      <td>
+                                        <Stack spacing={0.5} sx={{ alignItems: 'flex-end' }}>
+                                          <Typography variant='body2'>{fmtUsd(h.hourlyCostUsd)}</Typography>
+                                          {hasLoadedCosts(h) && (
+                                            <Typography variant='caption' color='text.secondary'>
+                                              Loaded {fmtUsd(h.loadedHourlyCostUsd)}
+                                            </Typography>
+                                          )}
+                                        </Stack>
+                                      </td>
                                     </tr>
                                   )
                                 })}

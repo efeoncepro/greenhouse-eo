@@ -13,6 +13,7 @@ import { materializeToolProviderCostBasisSnapshotsForPeriod } from '@/lib/commer
 import {
   materializePeopleCostBasisSnapshotsForPeriod
 } from '@/lib/commercial-cost-basis/people-role-cost-basis'
+import { materializeRoleModeledCostBasisSnapshotsForPeriod } from '@/lib/commercial-cost-basis/role-modeled-cost-basis'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { materializeMemberCapacityEconomicsForPeriod } from '@/lib/sync/projections/member-capacity-economics'
 
@@ -182,7 +183,7 @@ const publishCommercialCostBasisEvent = async ({
   snapshotCount,
   payload
 }: {
-  scope: Extract<CommercialCostBasisScope, 'people' | 'tools' | 'bundle'>
+  scope: Extract<CommercialCostBasisScope, 'people' | 'tools' | 'bundle' | 'roles'>
   period: CommercialCostBasisPeriod
   snapshotCount: number
   payload: Record<string, unknown>
@@ -192,7 +193,9 @@ const publishCommercialCostBasisEvent = async ({
       ? EVENT_TYPES.commercialCostBasisPeoplePeriodMaterialized
       : scope === 'tools'
         ? EVENT_TYPES.commercialCostBasisToolsPeriodMaterialized
-        : EVENT_TYPES.commercialCostBasisBundlePeriodMaterialized
+        : scope === 'roles'
+          ? EVENT_TYPES.commercialCostBasisRolesPeriodMaterialized
+          : EVENT_TYPES.commercialCostBasisBundlePeriodMaterialized
 
   await publishPeriodMaterializedEvent({
     aggregateType: AGGREGATE_TYPES.commercialCostBasis,
@@ -334,6 +337,29 @@ const materializeBundleScope = async (period: CommercialCostBasisPeriod, request
   }
 }
 
+const materializeRolesScope = async (period: CommercialCostBasisPeriod) => {
+  const modeledSnapshots = await materializeRoleModeledCostBasisSnapshotsForPeriod(period.year, period.month)
+
+  await publishCommercialCostBasisEvent({
+    scope: 'roles',
+    period,
+    snapshotCount: modeledSnapshots.length,
+    payload: {
+      modeledSnapshots: modeledSnapshots.length
+    }
+  })
+
+  return {
+    recordsRead: modeledSnapshots.length,
+    recordsWritten: modeledSnapshots.length,
+    recordsFailed: 0,
+    eventsPublished: 1,
+    summary: {
+      modeledSnapshots: modeledSnapshots.length
+    }
+  }
+}
+
 const materializeScopeForPeriod = async (request: CommercialCostBasisRequest, period: CommercialCostBasisPeriod) => {
   switch (request.scope) {
     case 'people':
@@ -343,7 +369,7 @@ const materializeScopeForPeriod = async (request: CommercialCostBasisRequest, pe
     case 'bundle':
       return materializeBundleScope(period, request)
     case 'roles':
-      throw new Error('Role cost basis materialization is reserved for TASK-477 and not implemented yet.')
+      return materializeRolesScope(period)
   }
 }
 

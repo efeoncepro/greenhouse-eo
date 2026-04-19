@@ -244,6 +244,7 @@ export const EVENT_TYPES = {
   commercialCostBasisPeoplePeriodMaterialized: 'commercial_cost_basis.people.period_materialized',
   commercialCostBasisToolsPeriodMaterialized: 'commercial_cost_basis.tools.period_materialized',
   commercialCostBasisBundlePeriodMaterialized: 'commercial_cost_basis.bundle.period_materialized',
+  commercialCostBasisRolesPeriodMaterialized: 'commercial_cost_basis.roles.period_materialized',
 
   // AI Tooling structural events
   aiToolCreated: 'ai_tool.created',

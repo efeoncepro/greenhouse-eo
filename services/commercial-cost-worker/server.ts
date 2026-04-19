@@ -8,11 +8,11 @@
  *   GET  /health
  *   POST /cost-basis/materialize
  *   POST /cost-basis/materialize/people
+ *   POST /cost-basis/materialize/roles
  *   POST /cost-basis/materialize/tools
  *   POST /cost-basis/materialize/bundle
  *
  * Reserved endpoints:
- *   POST /cost-basis/materialize/roles
  *   POST /quotes/reprice-bulk
  *   POST /margin-feedback/materialize
  *
@@ -136,8 +136,8 @@ const server = createServer(async (req, res) => {
 
   if (pathname === '/health') {
     if (method !== 'GET') return methodNotAllowed(res, req.method)
-    
-return handleHealth(req, res)
+
+    return handleHealth(req, res)
   }
 
   if (!isAuthorized(req)) {
@@ -148,42 +148,38 @@ return handleHealth(req, res)
 
   if (pathname === '/cost-basis/materialize') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
-    
-return handleMaterialize(req, res, null)
+
+    return handleMaterialize(req, res, null)
   }
 
   if (pathname === '/cost-basis/materialize/people') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
-    
-return handleMaterialize(req, res, 'people')
-  }
 
-  if (pathname === '/cost-basis/materialize/tools') {
-    if (method !== 'POST') return methodNotAllowed(res, req.method)
-    
-return handleMaterialize(req, res, 'tools')
-  }
-
-  if (pathname === '/cost-basis/materialize/bundle') {
-    if (method !== 'POST') return methodNotAllowed(res, req.method)
-    
-return handleMaterialize(req, res, 'bundle')
+    return handleMaterialize(req, res, 'people')
   }
 
   if (pathname === '/cost-basis/materialize/roles') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
-    
-return notImplemented(
-      res,
-      pathname,
-      'Reserved for role cost assumptions and role-level basis materialization.'
-    )
+
+    return handleMaterialize(req, res, 'roles')
+  }
+
+  if (pathname === '/cost-basis/materialize/tools') {
+    if (method !== 'POST') return methodNotAllowed(res, req.method)
+
+    return handleMaterialize(req, res, 'tools')
+  }
+
+  if (pathname === '/cost-basis/materialize/bundle') {
+    if (method !== 'POST') return methodNotAllowed(res, req.method)
+
+    return handleMaterialize(req, res, 'bundle')
   }
 
   if (pathname === '/quotes/reprice-bulk') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
-    
-return notImplemented(
+
+    return notImplemented(
       res,
       pathname,
       'Reserved for quote repricing orchestration over the commercial cost basis engine.'
@@ -192,8 +188,8 @@ return notImplemented(
 
   if (pathname === '/margin-feedback/materialize') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
-    
-return notImplemented(
+
+    return notImplemented(
       res,
       pathname,
       'Reserved for downstream margin feedback materialization after cost basis stabilization.'

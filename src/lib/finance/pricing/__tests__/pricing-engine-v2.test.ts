@@ -83,23 +83,37 @@ describe('buildPricingEngineOutputV2', () => {
             employmentType: null
           }
         ]),
-        getCurrentCost: vi.fn().mockResolvedValue({
+        getPreferredRoleModeledCostBasisByRoleId: vi.fn().mockResolvedValue({
+          snapshotId: 'EO-RMS-000001',
+          snapshotKey: 'role_modeled:role-1:contractor:2026-04',
           roleId: 'role-1',
+          roleSku: 'ECG-001',
+          roleCode: 'strategist',
+          roleLabel: 'Estratega',
           employmentTypeCode: 'contractor',
-          effectiveFrom: '2026-04-18',
-          baseSalaryUsd: 700,
-          bonusJitUsd: 0,
-          bonusRpaUsd: 0,
-          bonusArUsd: 0,
-          bonusSobrecumplimientoUsd: 0,
-          gastosPrevisionalesUsd: 0,
-          feeDeelUsd: 0,
-          feeEorUsd: 0,
+          periodYear: 2026,
+          periodMonth: 4,
+          periodId: '2026-04',
+          snapshotDate: '2026-04-18',
+          sourceCostComponentEffectiveFrom: '2026-04-18',
+          sourceKind: 'admin_manual',
+          sourceRef: 'pricing_catalog_admin',
+          resolvedCurrency: 'USD',
+          baseLaborCostAmount: 700,
+          directOverheadPct: 0.2,
+          sharedOverheadPct: 0.1,
+          directOverheadAmount: 200,
+          sharedOverheadAmount: 100,
+          loadedCostAmount: 1000,
+          costPerHourAmount: 10,
           hoursPerFteMonth: 100,
-          totalMonthlyCostUsd: 1000,
-          hourlyCostUsd: 10,
-          notes: null,
-          createdAt: '2026-04-18T00:00:00.000Z'
+          confidenceScore: 0.75,
+          confidenceLabel: 'medium',
+          snapshotStatus: 'complete',
+          detail: {},
+          materializedAt: '2026-04-18T00:00:00.000Z',
+          createdAt: '2026-04-18T00:00:00.000Z',
+          updatedAt: '2026-04-18T00:00:00.000Z'
         }),
         getCurrentPricing: vi.fn().mockResolvedValue({
           roleId: 'role-1',
@@ -349,23 +363,37 @@ describe('buildPricingEngineOutputV2', () => {
   })
 
   it('prefers role_blended snapshots before modeled role costs when blended evidence exists', async () => {
-    const getCurrentCost = vi.fn().mockResolvedValue({
+    const getPreferredRoleModeledCostBasisByRoleId = vi.fn().mockResolvedValue({
+      snapshotId: 'EO-RMS-000002',
+      snapshotKey: 'role_modeled:role-1:contractor:2026-04',
       roleId: 'role-1',
+      roleSku: 'ECG-001',
+      roleCode: 'strategist',
+      roleLabel: 'Estratega',
       employmentTypeCode: 'contractor',
-      effectiveFrom: '2026-04-18',
-      baseSalaryUsd: 1000,
-      bonusJitUsd: 0,
-      bonusRpaUsd: 0,
-      bonusArUsd: 0,
-      bonusSobrecumplimientoUsd: 0,
-      gastosPrevisionalesUsd: 0,
-      feeDeelUsd: 0,
-      feeEorUsd: 0,
+      periodYear: 2026,
+      periodMonth: 4,
+      periodId: '2026-04',
+      snapshotDate: '2026-04-18',
+      sourceCostComponentEffectiveFrom: '2026-04-18',
+      sourceKind: 'admin_manual',
+      sourceRef: 'pricing_catalog_admin',
+      resolvedCurrency: 'USD',
+      baseLaborCostAmount: 2000,
+      directOverheadPct: 0.05,
+      sharedOverheadPct: 0.05,
+      directOverheadAmount: 100,
+      sharedOverheadAmount: 100,
+      loadedCostAmount: 2200,
+      costPerHourAmount: 13.75,
       hoursPerFteMonth: 160,
-      totalMonthlyCostUsd: 2200,
-      hourlyCostUsd: 13.75,
-      notes: null,
-      createdAt: '2026-04-18T00:00:00.000Z'
+      confidenceScore: 0.7,
+      confidenceLabel: 'medium',
+      snapshotStatus: 'complete',
+      detail: {},
+      materializedAt: '2026-04-18T00:00:00.000Z',
+      createdAt: '2026-04-18T00:00:00.000Z',
+      updatedAt: '2026-04-18T00:00:00.000Z'
     })
 
     const result = await buildPricingEngineOutputV2(
@@ -412,7 +440,7 @@ describe('buildPricingEngineOutputV2', () => {
             employmentType: null
           }
         ]),
-        getCurrentCost,
+        getPreferredRoleModeledCostBasisByRoleId,
         getCurrentPricing: vi.fn().mockResolvedValue({
           roleId: 'role-1',
           currencyCode: 'USD',
@@ -524,7 +552,7 @@ describe('buildPricingEngineOutputV2', () => {
     expect(result.lines[0]?.costStack.costBasisKind).toBe('role_blended')
     expect(result.lines[0]?.costStack.costBasisConfidenceLabel).toBe('high')
     expect(result.lines[0]?.costStack.totalCostUsd).toBe(1500)
-    expect(getCurrentCost).not.toHaveBeenCalled()
+    expect(getPreferredRoleModeledCostBasisByRoleId).not.toHaveBeenCalled()
   })
 
   it('surfaces member_actual metadata when resolving person lines', async () => {
@@ -593,7 +621,7 @@ describe('buildPricingEngineOutputV2', () => {
         getOverheadAddonBySku: vi.fn(),
         getSellableRoleBySku: vi.fn(),
         listCompatibleEmploymentTypes: vi.fn(),
-        getCurrentCost: vi.fn(),
+        getPreferredRoleModeledCostBasisByRoleId: vi.fn(),
         getCurrentPricing: vi.fn(),
         getRoleTierMargins: vi.fn(),
         getToolBySku: vi.fn(),

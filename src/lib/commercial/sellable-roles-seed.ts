@@ -141,6 +141,11 @@ export interface SellableRoleSeedRow {
   // sirve como fallback del fte_hours_guide y como divisor de hourly cost.
   feeEorUsd?: number | null
   hoursPerFteMonth?: number | null
+  directOverheadPct?: number | null
+  sharedOverheadPct?: number | null
+  sourceKind?: 'catalog_seed' | 'admin_manual' | 'payroll_bridge' | 'modeled_formula' | 'backfill' | null
+  sourceRef?: string | null
+  confidenceScore?: number | null
 
   totalMonthlyCostUsd: number
   hourlyCostUsd: number

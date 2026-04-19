@@ -769,6 +769,39 @@ export interface GreenhouseCommercialRoleEmploymentCompatibility {
   role_id: string;
 }
 
+export interface GreenhouseCommercialRoleModeledCostBasisSnapshots {
+  base_labor_cost_amount: Generated<Numeric>;
+  confidence_label: string;
+  confidence_score: Generated<Numeric>;
+  cost_per_hour_amount: Numeric | null;
+  created_at: Generated<Timestamp>;
+  detail_jsonb: Generated<Json>;
+  direct_overhead_amount: Generated<Numeric>;
+  direct_overhead_pct: Generated<Numeric>;
+  employment_type_code: string;
+  hours_per_fte_month: Generated<number>;
+  loaded_cost_amount: Generated<Numeric>;
+  materialized_at: Generated<Timestamp>;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  resolved_currency: Generated<string>;
+  role_code: string;
+  role_id: string;
+  role_label: string;
+  role_sku: string;
+  shared_overhead_amount: Generated<Numeric>;
+  shared_overhead_pct: Generated<Numeric>;
+  snapshot_date: Timestamp;
+  snapshot_id: Generated<string>;
+  snapshot_key: string;
+  snapshot_status: Generated<string>;
+  source_cost_component_effective_from: Timestamp;
+  source_kind: string;
+  source_ref: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialRoleRateCards {
   business_line_code: string | null;
   created_at: Generated<Timestamp>;
@@ -801,7 +834,11 @@ export interface GreenhouseCommercialSellableRoleCostComponents {
   bonus_jit_usd: Generated<Numeric>;
   bonus_rpa_usd: Generated<Numeric>;
   bonus_sobrecumplimiento_usd: Generated<Numeric>;
+  confidence_label: Generated<string | null>;
+  confidence_score: Generated<Numeric>;
   created_at: Generated<Timestamp>;
+  direct_overhead_amount_usd: Generated<Numeric | null>;
+  direct_overhead_pct: Generated<Numeric>;
   effective_from: Timestamp;
   employment_type_code: string;
   fee_deel_usd: Generated<Numeric>;
@@ -809,8 +846,14 @@ export interface GreenhouseCommercialSellableRoleCostComponents {
   gastos_previsionales_usd: Generated<Numeric>;
   hourly_cost_usd: Generated<Numeric | null>;
   hours_per_fte_month: Generated<number>;
+  loaded_hourly_cost_usd: Generated<Numeric | null>;
+  loaded_monthly_cost_usd: Generated<Numeric | null>;
   notes: string | null;
   role_id: string;
+  shared_overhead_amount_usd: Generated<Numeric | null>;
+  shared_overhead_pct: Generated<Numeric>;
+  source_kind: Generated<string>;
+  source_ref: string | null;
   total_monthly_cost_usd: Generated<Numeric | null>;
 }
 
@@ -5554,6 +5597,7 @@ export interface DB {
   "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
   "greenhouse_commercial.role_blended_cost_basis_snapshots": GreenhouseCommercialRoleBlendedCostBasisSnapshots;
   "greenhouse_commercial.role_employment_compatibility": GreenhouseCommercialRoleEmploymentCompatibility;
+  "greenhouse_commercial.role_modeled_cost_basis_snapshots": GreenhouseCommercialRoleModeledCostBasisSnapshots;
   "greenhouse_commercial.role_rate_cards": GreenhouseCommercialRoleRateCards;
   "greenhouse_commercial.role_tier_margins": GreenhouseCommercialRoleTierMargins;
   "greenhouse_commercial.sellable_role_cost_components": GreenhouseCommercialSellableRoleCostComponents;

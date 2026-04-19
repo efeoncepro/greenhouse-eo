@@ -23,6 +23,23 @@
 - `pricing-engine-v2` debe preferir `role_blended` cuando la cotización pide costo por rol y solo caer a `role_modeled` cuando no existe evidencia real reusable para el período.
 - Consumers People/Person 360 no deben leer columnas inventadas de `member_capacity_economics`; consumen el reader compartido para evitar drift.
 
+## Delta 2026-04-19 — TASK-477 formaliza role_modeled como lane explícito y materializable
+
+- `greenhouse_commercial.sellable_role_cost_components` deja de ser solo un breakdown editable y pasa a ser también el source estructurado del lane `role_modeled`:
+  - nuevos campos persistidos: `direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score`
+  - nuevas columnas generadas: `confidence_label`, `direct_overhead_amount_usd`, `shared_overhead_amount_usd`, `loaded_monthly_cost_usd`, `loaded_hourly_cost_usd`
+- Runtime nuevo:
+  - `greenhouse_commercial.role_modeled_cost_basis_snapshots`
+  - helper `src/lib/commercial-cost-basis/role-modeled-cost-basis.ts`
+  - scope `roles` en `src/lib/commercial-cost-worker/materialize.ts`
+- Regla operativa:
+  - `role_blended` sigue ganando cuando existe evidencia factual reusable para el período
+  - `role_modeled` ya no debe resolverse leyendo inline el breakdown crudo desde cualquier consumer; el lane canónico es el reader de snapshots modelados con provenance/confidence
+  - la materialización batch de `role_modeled` vive en `commercial-cost-worker`, no en `ops-worker` ni en recomputes ad hoc desde request-response
+- Implicación para quotation pricing:
+  - el engine puede exponer `costBasisSourceRef`, `costBasisSnapshotDate`, `costBasisConfidenceScore` y `costBasisConfidenceLabel` sin inventar metadata auxiliar
+  - country sigue resuelto por `employment_types.country_code` y la seniority sigue baked-in en el `sellable_role` / SKU; esta task no duplica esas dimensiones
+
 ## Delta 2026-04-19 — Currency & FX Platform Foundation (TASK-475)
 
 - Se formalizó la matriz canónica de monedas por dominio + política FX + contrato de readiness. El contrato vive en `src/lib/finance/currency-domain.ts` + `currency-registry.ts` y lo consumen el engine, las APIs y los futuros consumers client-facing.

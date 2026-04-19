@@ -15,12 +15,12 @@ Active endpoints:
 - `GET /health`
 - `POST /cost-basis/materialize`
 - `POST /cost-basis/materialize/people`
+- `POST /cost-basis/materialize/roles`
 - `POST /cost-basis/materialize/tools`
 - `POST /cost-basis/materialize/bundle`
 
 Reserved endpoints that currently return `501` JSON:
 
-- `POST /cost-basis/materialize/roles`
 - `POST /quotes/reprice-bulk`
 - `POST /margin-feedback/materialize`
 
@@ -31,6 +31,7 @@ Reserved endpoints that currently return `501` JSON:
 The scoped endpoints force the following `scope` values before normalization:
 
 - `/cost-basis/materialize/people` -> `people`
+- `/cost-basis/materialize/roles` -> `roles`
 - `/cost-basis/materialize/tools` -> `tools`
 - `/cost-basis/materialize/bundle` -> `bundle`
 
