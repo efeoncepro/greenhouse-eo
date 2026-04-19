@@ -267,7 +267,22 @@ export interface PricingEngineInputV2 {
   outputCurrency: PricingOutputCurrency
   quoteDate: string
   lines: PricingLineInputV2[]
-  autoResolveAddons?: boolean
+
+  /**
+   * Control sobre el auto-resolve de addons por parte del engine.
+   *
+   * - `true` (default, legacy): auto-resuelve TODOS los addons aplicables al
+   *   contexto, tanto internos como visibles al cliente. Suman al total.
+   * - `false`: no auto-resuelve ninguno. Solo los addons que vengan como
+   *   líneas explícitas `overhead_addon` en `lines` se aplican.
+   * - `'internal_only'`: auto-resuelve SOLO los addons internos
+   *   (`visibleToClient: false`) — son estructura de costos (overhead %, fee
+   *   EOR, etc.). Los addons visibles al cliente NO se auto-suman; se espera
+   *   que el comercial los promueva a líneas `overhead_addon` explícitas vía
+   *   el panel de sugerencias del builder. Transparencia total con el cliente
+   *   en el PDF de la cotización.
+   */
+  autoResolveAddons?: boolean | 'internal_only'
 }
 
 export interface PricingCostStackV2 {
@@ -359,7 +374,16 @@ export interface PricingWarning {
 
 export interface PricingEngineOutputV2 {
   lines: PricingLineOutputV2[]
+
+  /** Addons auto-aplicados por el engine (summed al total). Con
+   *  `autoResolveAddons: 'internal_only'` solo incluye `visibleToClient: false`. */
   addons: PricingAddonOutputV2[]
+
+  /** Addons visibles al cliente que aplicarían al contexto pero que NO están
+   *  auto-sumados (solo con `autoResolveAddons: 'internal_only'`). La UI los
+   *  ofrece como propuestas en el panel de "Addons sugeridos" — al tildarlos,
+   *  se promueven a líneas `overhead_addon` explícitas. */
+  suggestedVisibleAddons?: PricingAddonOutputV2[]
   totals: {
     subtotalUsd: number
     overheadUsd: number

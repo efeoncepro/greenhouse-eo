@@ -181,7 +181,12 @@ export const buildQuotePricingInput = (
     outputCurrency: currency,
     quoteDate: context.quoteDate,
     lines: pricingLines,
-    autoResolveAddons: true
+
+    // 'internal_only': el engine auto-suma solo los addons internos (overhead,
+    // fee EOR). Los visibles al cliente llegan como sugerencias en
+    // `output.suggestedVisibleAddons` — el comercial decide desde el panel
+    // tildar para promoverlos a líneas `overhead_addon` explícitas.
+    autoResolveAddons: 'internal_only'
   }
 }
 

@@ -556,3 +556,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-500` | `complete` | Quote Builder Quantity↔Periods Sync + EmpType Dropdown | `docs/tasks/complete/TASK-500-quote-builder-quantity-periods-sync.md` |
 | `TASK-501` | `complete` | Quote Builder Unit Price UX + Fresh Simulate-on-Save | `docs/tasks/complete/TASK-501-quote-builder-unit-price-ux-and-fresh-simulate.md` |
 | `TASK-502` | `complete` | Fix Role Double-Count + Derived Unit Price + Read-Only Catalog Prices | `docs/tasks/complete/TASK-502-quote-role-double-count-and-derived-unit-price.md` |
+| `TASK-503` | `complete` | Quote Addon Toggle = Line Item (autoResolveAddons: 'internal_only') | `docs/tasks/complete/TASK-503-quote-addon-toggle-as-line-items.md` |
+| `TASK-504` | `to-do` | Commercial Quotation Issuance Lifecycle & Approval-by-Exception | `docs/tasks/to-do/TASK-504-commercial-quotation-issued-lifecycle-approval-by-exception.md` |

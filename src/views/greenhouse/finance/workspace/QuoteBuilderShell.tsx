@@ -299,7 +299,6 @@ const QuoteBuilderShell = ({
   )
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
-  const [excludedAddons, setExcludedAddons] = useState<Set<string>>(new Set())
   const [linesSnapshot, setLinesSnapshot] = useState<QuoteLineItem[]>(initialLines)
   const [submitting, setSubmitting] = useState(false)
   const [serviceExpanding, setServiceExpanding] = useState(false)
@@ -474,21 +473,105 @@ const QuoteBuilderShell = ({
   // Solo mostrar simulationError en el dock si NO pudo anclarse a una fila
   const dockSimulationError = lineAnchoredError ? null : simulationError
 
+  // includedSkus deriva del snapshot: un addon está "incluido" si hay una
+  // línea overhead_addon con ese sku. Una única fuente de verdad — ver un
+  // checkbox tildado equivale a ver una fila en la tabla.
   const includedAddonSkus = useMemo(
-    () => (simulation?.addons ?? []).map(a => a.sku).filter(sku => !excludedAddons.has(sku)),
-    [simulation?.addons, excludedAddons]
+    () =>
+      linesSnapshot
+        .filter(line => line.metadata?.pricingV2LineType === 'overhead_addon')
+        .map(line => line.metadata?.sku ?? '')
+        .filter(sku => sku.length > 0),
+    [linesSnapshot]
   )
 
-  const handleAddonToggle = useCallback((sku: string, include: boolean) => {
-    setExcludedAddons(prev => {
-      const next = new Set(prev)
+  // Sugerencias que aún NO están como línea. El engine solo llena
+  // suggestedVisibleAddons cuando autoResolveAddons === 'internal_only', y
+  // devuelve los visibles que aplicarían al contexto + que no están ya como
+  // línea explícita.
+  const addonSuggestions = useMemo(
+    () => simulation?.suggestedVisibleAddons ?? [],
+    [simulation?.suggestedVisibleAddons]
+  )
 
-      if (include) next.delete(sku)
-      else next.add(sku)
+  // Entries del panel: mezcla las sugerencias no aplicadas con los addons que
+  // ya son línea explícita (para poder destildarlos). Cada entry incluye
+  // la info necesaria (nombre + monto) para renderizar el checkbox.
+  const addonPanelEntries = useMemo(() => {
+    const applied = linesSnapshot
+      .map((line, idx) => ({ line, idx }))
+      .filter(({ line }) => line.metadata?.pricingV2LineType === 'overhead_addon')
+      .map(({ line, idx }) => {
+        const sku = line.metadata?.sku ?? ''
+        const simLine = simulation?.lines?.[idx] ?? null
 
-      return next
-    })
-  }, [])
+        const amountOutputCurrency =
+          simLine?.suggestedBillRate?.totalBillOutputCurrency ?? 0
+
+        const amountUsd = simLine?.suggestedBillRate?.totalBillUsd ?? 0
+
+        return {
+          sku,
+          addonName: line.label,
+          appliedReason: '',
+          amountOutputCurrency,
+          amountUsd,
+          visibleToClient: true
+        }
+      })
+
+    return [...applied, ...addonSuggestions]
+  }, [linesSnapshot, simulation?.lines, addonSuggestions])
+
+  const handleAddonToggle = useCallback(
+    (sku: string, include: boolean) => {
+      if (include) {
+        // Promote suggestion → explicit overhead_addon line. El engine v2 la
+        // trata como línea normal: bill suma al total, persiste como line item,
+        // aparece en el PDF del cliente.
+        const suggestion = addonSuggestions.find(a => a.sku === sku)
+
+        if (!suggestion) return
+
+        editorRef.current?.appendLines([
+          {
+            label: suggestion.addonName,
+            description: null,
+            lineType: 'direct_cost',
+            unit: 'unit',
+            quantity: 1,
+            unitPrice: null,
+            subtotalPrice: null,
+            subtotalAfterDiscount: null,
+            roleCode: null,
+            memberId: null,
+            productId: null,
+            discountType: null,
+            discountValue: null,
+            source: 'catalog',
+            metadata: {
+              pricingV2LineType: 'overhead_addon',
+              sku
+            }
+          }
+        ])
+
+        return
+      }
+
+      // Destildar → remover la línea overhead_addon con ese sku del snapshot.
+      setLinesSnapshot(prev =>
+        prev.filter(
+          line =>
+            !(
+              line.metadata?.pricingV2LineType === 'overhead_addon' &&
+              line.metadata?.sku === sku
+            )
+        )
+      )
+    },
+    [addonSuggestions]
+  )
 
   const openCatalogPicker = useCallback(() => {
     setPickerMode('catalog')
@@ -908,14 +991,15 @@ const QuoteBuilderShell = ({
     }
   }, [simulation?.lines])
 
-  // Delta de los addons al total output — preview para el chip
+  // Delta preview del chip del dock: suma de los addons visibles SUGERIDOS
+  // (no incluidos aún como línea). Representa cuánto más podría cobrarse al
+  // cliente si el comercial decide tildarlos todos. Los ya tildados ya están
+  // reflejados en el subtotal/total de la cotización.
   const addonTotalDelta = useMemo(() => {
-    const addons = simulation?.addons ?? []
+    if (addonSuggestions.length === 0) return null
 
-    if (addons.length === 0) return null
-
-    return addons.reduce((sum, a) => sum + (a.amountOutputCurrency ?? 0), 0)
-  }, [simulation?.addons])
+    return addonSuggestions.reduce((sum, a) => sum + (a.amountOutputCurrency ?? 0), 0)
+  }, [addonSuggestions])
 
   // Save state indicator: dirty si lines diff vs initial, clean cuando submitted
   const initialFingerprint = useMemo(() => JSON.stringify(initialLines), [initialLines])
@@ -1077,17 +1161,15 @@ const QuoteBuilderShell = ({
           total={totalOutputCurrency}
           currency={currency}
           loading={simulating}
-          addonCount={simulation?.addons?.length ?? 0}
+          addonCount={addonSuggestions.length}
           addonContent={
-            canSeeCostStack ? (
-              <AddonSuggestionsPanel
-                suggestions={simulation?.addons ?? []}
-                includedSkus={includedAddonSkus}
-                onToggle={handleAddonToggle}
-                outputCurrency={currency}
-                loading={simulating}
-              />
-            ) : undefined
+            <AddonSuggestionsPanel
+              suggestions={addonPanelEntries}
+              includedSkus={includedAddonSkus}
+              onToggle={handleAddonToggle}
+              outputCurrency={currency}
+              loading={simulating}
+            />
           }
           primaryCtaLabel={submitting ? GH_PRICING.builderSaving : GH_PRICING.summaryDock.primaryCta}
           primaryCtaIcon='tabler-device-floppy-filled'
