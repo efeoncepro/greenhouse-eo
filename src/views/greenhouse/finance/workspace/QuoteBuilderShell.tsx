@@ -1291,7 +1291,7 @@ const QuoteBuilderShell = ({
               loading={simulating}
             />
           }
-          primaryCtaLabel={submitting ? GH_PRICING.builderSaving : GH_PRICING.summaryDock.primaryCta}
+          primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}
           primaryCtaIcon='tabler-file-check'
           primaryCtaLoading={submitting}
           primaryCtaDisabled={issueActionDisabled}

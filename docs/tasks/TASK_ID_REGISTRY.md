@@ -558,3 +558,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-502` | `complete` | Fix Role Double-Count + Derived Unit Price + Read-Only Catalog Prices | `docs/tasks/complete/TASK-502-quote-role-double-count-and-derived-unit-price.md` |
 | `TASK-503` | `complete` | Quote Addon Toggle = Line Item (autoResolveAddons: 'internal_only') | `docs/tasks/complete/TASK-503-quote-addon-toggle-as-line-items.md` |
 | `TASK-504` | `complete` | Commercial Quotation Issuance Lifecycle & Approval-by-Exception | `docs/tasks/complete/TASK-504-commercial-quotation-issued-lifecycle-approval-by-exception.md` |
+| `TASK-505` | `complete` | Quote Summary Dock v2 — Enterprise Hierarchy + Primitives | `docs/tasks/complete/TASK-505-quote-summary-dock-v2-hierarchy.md` |
