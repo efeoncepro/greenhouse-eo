@@ -79,7 +79,7 @@ const QuoteLineWarning = ({ warnings, rowIndex, rowElementId }: QuoteLineWarning
                   variant='outlined'
                   color='secondary'
                   label={warning.code}
-                  sx={{ fontFamily: 'monospace', height: 18, fontSize: '0.65rem' }}
+                  sx={{ fontVariantNumeric: 'tabular-nums', height: 18, fontSize: '0.65rem' }}
                 />
               </Stack>
             </Stack>

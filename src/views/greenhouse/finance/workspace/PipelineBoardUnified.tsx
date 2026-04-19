@@ -523,14 +523,14 @@ const PipelineBoardUnified = ({
                           <Typography
                             variant='caption'
                             color='text.secondary'
-                            sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}
+                            sx={{ fontVariantNumeric: 'tabular-nums', fontSize: '0.7rem' }}
                           >
                             {row.stage}
                           </Typography>
                         )}
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums' }}>
                           {formatCLP(row.amountClp)}
                         </Typography>
                       </TableCell>

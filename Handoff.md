@@ -1,5 +1,58 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-488 Design Tokens + UI Governance Hardening (Claude)
+
+- **Owner:** Claude
+- **Estado:** **`complete` — cerrada 2026-04-19**. tsc 0 errors · lint clean · build compiled.
+- **Rama:** `task/TASK-488-design-tokens-ui-governance-hardening`.
+- **Scope entregado:**
+  - **Doc canónica** `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` (16 secciones): typography scale extraída de `src/@core/theme/typography.ts`, spacing 4px base, borderRadius tokens {2/4/6/8/10}, icon sizes {14/16/18/20/22}, color semantics reserved-for-states, interaction cost caps (≤2 clicks selector), 12 anti-patterns detectados, 15 reference patterns de `full-version/` con paths exactos.
+  - **3 skills robustecidas**:
+    - `~/.claude/skills/greenhouse-ux/skill.md` extendida con sección "Canonical Tokens — MANDATORY reference" + pre-spec checklist (apendada, no reescrita para no romper).
+    - `.claude/skills/modern-ui/SKILL.md` NUEVO overlay local — 10 pinned decisions Greenhouse-specific que override el modern-ui global (DM Sans + Poppins, no OKLCH; `customBorderRadius.*`; semantic colors solo para estados; max 2 font families; `CustomAutocomplete` no `Popover > Select`).
+    - `.claude/skills/greenhouse-ui-review/SKILL.md` NUEVA — 13 secciones pre-commit gate (typography, spacing, radius, elevation, icons, color, wrappers, layout, interaction cost, motion, a11y, states, anti-pattern sweep). 3 severities: 🔴 blocker, 🟡 modern bar, 🟢 polish. Hard-stop en blockers.
+  - **Quote Builder refactor** aplicando los tokens:
+    - `ContextChip` reescrito: ahora un primitive polimórfico con dos modes — `select` (default, usa `Autocomplete` inline dentro del popover con `autoFocus` + `openOnFocus` + búsqueda + 2 clicks verdaderos) y `custom` (preserva el API anterior para inputs nativos como duration/date). `QuoteContextStrip` migra los 6 selects (Org, Contacto, BL, Modelo, País, Moneda) al nuevo mode `select`.
+    - Monospace eliminado: `sed` barrido en `src/components/greenhouse/pricing/` y `src/views/greenhouse/finance/workspace/` — 19 ocurrencias reemplazadas por `fontVariantNumeric: 'tabular-nums'`. Preserva alineación numérica sin la estética "técnica/legacy".
+    - BorderRadius a tokens: `customBorderRadius.lg` (8px) en document card, dock, accordion — no más multipliers arbitrarios.
+    - Empty state `QuoteLineItemsEditor`: 1 primary contained + 2 tonal `color='secondary'` (gris neutro). Removidos `color='success'` y `color='info'` del carnaval.
+- **Archivos tocados**:
+  - `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` (nuevo, 450+ líneas)
+  - `docs/tasks/in-progress/TASK-488-design-tokens-ui-governance-hardening.md` → movido a `complete/`
+  - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` sincronizados
+  - `.claude/skills/modern-ui/SKILL.md` (nuevo)
+  - `.claude/skills/greenhouse-ui-review/SKILL.md` (nuevo)
+  - `~/.claude/skills/greenhouse-ux/skill.md` (sección agregada)
+  - `src/components/greenhouse/primitives/ContextChip.tsx` (reescrito con Autocomplete)
+  - `src/components/greenhouse/pricing/QuoteContextStrip.tsx` (migrado a mode `select`)
+  - `src/components/greenhouse/pricing/QuoteSummaryDock.tsx` (monospace → tabular-nums + borderRadius tokens)
+  - `src/components/greenhouse/pricing/QuoteIdentityStrip.tsx` (monospace → tabular-nums)
+  - `src/components/greenhouse/pricing/SellableItemRow.tsx`, `CostStackPanel.tsx`, `QuoteLineWarning.tsx` (monospace barrido)
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` (accordion borderRadius tokens)
+  - `src/views/greenhouse/finance/workspace/QuoteLineItemsEditor.tsx` (empty state CTAs, borderRadius tokens, monospace barrido)
+  - `src/views/greenhouse/finance/workspace/QuoteTotalsFooter.tsx`, `AddonSuggestionsPanel.tsx`, `QuoteDocumentChain.tsx`, `QuoteTemplatePickerDrawer.tsx`, `PipelineBoardUnified.tsx` (monospace barrido en quote-related views)
+
+### Verificación
+
+- `npx tsc --noEmit` → 0 errors
+- `pnpm lint` → clean
+- `pnpm build` → compiled
+
+### Impacto
+
+- **Todas las futuras tareas UI** del portal consumen los tokens canónicos — Quote Builder es el primer consumidor, pero los tokens son repo-wide.
+- Las 3 skills evolucionan: `greenhouse-ux` se usa en diseño, `modern-ui` overlay carga automáticamente cuando se invoca modern-ui en este repo, `greenhouse-ui-review` es invocable pre-commit en cualquier PR UI.
+- `ContextChip` ahora es reusable para cualquier builder (invoice, PO, contract, etc.) con soporte de search built-in.
+
+### Follow-ups declarados en la task
+
+- **TASK-489 candidate**: migrar monospace del resto del repo (agency, hr, admin) a `tabular-nums`
+- **TASK-490 candidate**: tests visuales Playwright + axe para quote builder, finance dashboard, payroll
+- **TASK-491 candidate**: extender pattern ContextChip a invoice/PO/contract builders
+- Review del doc de tokens por designer senior cuando esté disponible
+
+---
+
 ## Sesion 2026-04-19 — TASK-487 Quote Builder Command Bar Redesign (Enterprise Pattern) (Claude)
 
 - **Owner:** Claude

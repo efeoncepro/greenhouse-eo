@@ -139,7 +139,7 @@ const QuoteIdentityStrip = ({
                 <Typography
                   variant='body2'
                   sx={{
-                    fontFamily: 'monospace',
+                    fontVariantNumeric: 'tabular-nums',
                     color: 'text.secondary',
                     px: 1,
                     py: 0.25,

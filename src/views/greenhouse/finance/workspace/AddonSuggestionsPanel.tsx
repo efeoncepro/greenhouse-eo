@@ -101,7 +101,7 @@ const AddonSuggestionsPanel = ({
                       <Typography variant='caption' color='text.secondary'>
                         {suggestion.appliedReason}
                       </Typography>
-                      <Typography variant='caption' sx={{ fontFamily: 'monospace' }}>
+                      <Typography variant='caption' sx={{ fontVariantNumeric: 'tabular-nums' }}>
                         {formatOutputMoney(suggestion.amountOutputCurrency, outputCurrency)}
                         {' · '}
                         {formatOutputMoney(suggestion.amountUsd, 'USD')}

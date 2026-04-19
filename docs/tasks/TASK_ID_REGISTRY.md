@@ -541,3 +541,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-485` | `to-do`       | FX Coverage Rollout (manual_only → auto_synced) | `docs/tasks/to-do/TASK-485-fx-coverage-rollout.md` |
 | `TASK-486` | `complete`    | Commercial Quotation Canonical Anchor (Organization + Contact) | `docs/tasks/complete/TASK-486-commercial-quotation-canonical-anchor.md` |
 | `TASK-487` | `complete` | Quote Builder Command Bar Redesign (Enterprise Pattern) | `docs/tasks/complete/TASK-487-quote-builder-command-bar-redesign.md` |
+| `TASK-488` | `complete` | Design Tokens + UI Governance Hardening | `docs/tasks/complete/TASK-488-design-tokens-ui-governance-hardening.md` |

@@ -481,7 +481,7 @@ const QuoteDocumentChain = ({
                                 Orden de compra
                               </Typography>
                               <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 0.5 }}>
-                                <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                                <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
                                   {po.poNumber}
                                 </Typography>
                                 <CustomChip
@@ -583,7 +583,7 @@ const QuoteDocumentChain = ({
                                 Hoja de entrada
                               </Typography>
                               <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 0.5, flexWrap: 'wrap' }}>
-                                <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                                <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
                                   {hes.hesNumber}
                                 </Typography>
                                 <CustomChip
@@ -684,7 +684,7 @@ const QuoteDocumentChain = ({
                                 Factura
                               </Typography>
                               <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 0.5, flexWrap: 'wrap' }}>
-                                <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                                <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
                                   {income.invoiceNumber ?? 'Sin número'}
                                 </Typography>
                                 <CustomChip
@@ -699,7 +699,7 @@ const QuoteDocumentChain = ({
                                 <Typography
                                   variant='caption'
                                   color='text.secondary'
-                                  sx={{ display: 'block', mt: 0.5, fontFamily: 'monospace' }}
+                                  sx={{ display: 'block', mt: 0.5, fontVariantNumeric: 'tabular-nums' }}
                                 >
                                   DTE folio: {income.dteFolio}
                                 </Typography>

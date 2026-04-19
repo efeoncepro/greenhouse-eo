@@ -139,7 +139,7 @@ const QuoteTemplatePickerDrawer = ({
                           </Typography>
                           <Typography
                             variant='caption'
-                            sx={{ fontFamily: 'monospace', color: 'text.secondary' }}
+                            sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }}
                           >
                             {template.templateCode}
                           </Typography>

@@ -164,7 +164,7 @@ const Row = ({ label, value }: { label: string; value: string }) => (
     <Typography variant='body2' color='text.secondary'>
       {label}
     </Typography>
-    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+    <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
       {value}
     </Typography>
   </Box>

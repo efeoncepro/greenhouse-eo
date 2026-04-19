@@ -2,6 +2,18 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-488 Design Tokens + UI Governance Hardening
+
+- **Nuevo doc canónico** `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` como fuente de verdad de design tokens Greenhouse. Documenta typography scale (base 13.125px, h1..overline), spacing 4px base, borderRadius tokens {xs=2, sm=4, md=6, lg=8, xl=10}, icon sizes {14/16/18/20/22}, semantic colors reserved for states, interaction cost caps, 12 anti-patterns detectados + 15 reference patterns con paths a `full-version/`.
+- **3 skills robustecidas**: `greenhouse-ux` (user-level) extendida con Canonical Tokens section + pre-spec checklist; nuevo `modern-ui` overlay local `.claude/skills/modern-ui/SKILL.md` con 10 pinned decisions Greenhouse-specific (DM Sans + Poppins, MUI palette no OKLCH, `customBorderRadius.*`, semantic-colors-as-states, `CustomAutocomplete` no `Popover > Select`); nueva `greenhouse-ui-review` `.claude/skills/greenhouse-ui-review/SKILL.md` con 13-section pre-commit gate (blockers/modern-bar/polish severities).
+- **Quote Builder refactor** como primer consumidor de los tokens:
+  - `ContextChip` reescrito con dos modes — `select` default usa `Autocomplete` inline con `autoFocus` + `openOnFocus` + búsqueda (2 clicks verdaderos); `custom` mode preserva API para inputs como duration/date.
+  - Monospace eliminado en todo el Quote Builder → `fontVariantNumeric: 'tabular-nums'`. 19 ocurrencias corregidas.
+  - BorderRadius a tokens `customBorderRadius.lg` (8px) en document card, summary dock, accordion.
+  - Empty state 3 CTAs rebalanceado: 1 primary contained + 2 tonal `color='secondary'` (gris neutro). Eliminados `color='success'` y `color='info'` que creaban efecto carnaval.
+- Verificación: tsc 0 errors · lint clean · build compiled.
+- Impacto global: futuras tareas UI parten con restricciones design-time; las 3 skills se cargan automáticamente según contexto. Reusabilidad: `ContextChip` con search disponible para invoice/PO/contract builders.
+
 ### 2026-04-19 — TASK-487 Quote Builder Command Bar Redesign (Enterprise Pattern)
 
 - `/finance/quotes/new` y `/finance/quotes/[id]/edit` migran al patrón Command Bar enterprise (Linear/Stripe/Ramp/Pilot). 4 layers verticales apilados — Identity Strip, Context Chips Strip, Document Surface, Floating Summary Dock — reemplazan el Grid 8/4 con sidebar vertical. El documento gana ~33% de ancho disponible (de ~700px a ~1200px en 1440 viewport).

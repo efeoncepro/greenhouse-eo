@@ -3,20 +3,17 @@
 import { useMemo } from 'react'
 
 import Box from '@mui/material/Box'
-import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-import ContextChip from '@/components/greenhouse/primitives/ContextChip'
+import ContextChip, { type ContextChipOption } from '@/components/greenhouse/primitives/ContextChip'
 import ContextChipStrip from '@/components/greenhouse/primitives/ContextChipStrip'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
-
-import CurrencySwitcher from './CurrencySwitcher'
 
 export interface QuoteContextOrganizationOption {
   organizationId: string
@@ -84,14 +81,19 @@ export interface QuoteContextStripProps extends QuoteContextStripHandlers {
   values: QuoteContextStripValues
   options: QuoteContextStripOptions
   disabled?: boolean
-
-  /** Cuando se esta en modo edit, la organizacion queda locked (no se puede cambiar
-   * despues de crear el quote, por contrato del modelo canonico) */
   organizationLocked?: boolean
-
   stickyOffset?: number
   invalidFields?: Partial<Record<keyof QuoteContextStripValues, string>>
 }
+
+const CURRENCY_OPTIONS: ContextChipOption[] = [
+  { value: 'CLP', label: 'CLP', secondary: 'Peso chileno' },
+  { value: 'USD', label: 'USD', secondary: 'Dólar estadounidense' },
+  { value: 'CLF', label: 'CLF', secondary: 'Unidad de fomento' },
+  { value: 'COP', label: 'COP', secondary: 'Peso colombiano' },
+  { value: 'MXN', label: 'MXN', secondary: 'Peso mexicano' },
+  { value: 'PEN', label: 'PEN', secondary: 'Sol peruano' }
+]
 
 const formatMultiplier = (pct: number): string => {
   const signed = pct >= 0 ? `+${pct}` : `${pct}`
@@ -102,10 +104,9 @@ const formatMultiplier = (pct: number): string => {
 const formatFactor = (factor: number): string => factor.toFixed(2)
 
 /**
- * Row 2 del patron Command Bar: strip horizontal con los 7 chips de contexto
- * (Organizacion, Contacto, Business Line, Modelo Comercial, Pais, Moneda,
- * Duracion, Valida Hasta). Cada chip abre un Popover con el editor correspondiente.
- * Reemplaza la sidebar vertical de QuoteBuilderActions.
+ * Row 2 del patron Command Bar: strip horizontal con 8 ContextChips con Autocomplete
+ * inline (2 clicks para seleccionar). Organizacion, Contacto, BL, Modelo comercial,
+ * Pais, Moneda = mode 'select'. Duracion y Valida hasta = mode 'custom' (inputs nativos).
  */
 const QuoteContextStrip = ({
   values,
@@ -123,6 +124,59 @@ const QuoteContextStrip = ({
   onDurationChange,
   onValidUntilChange
 }: QuoteContextStripProps) => {
+  const orgOptions = useMemo<ContextChipOption[]>(
+    () =>
+      options.organizations.map(org => ({
+        value: org.organizationId,
+        label: org.organizationName
+      })),
+    [options.organizations]
+  )
+
+  const contactOptions = useMemo<ContextChipOption[]>(
+    () =>
+      options.contacts.map(c => {
+        const primary = c.fullName ?? c.canonicalEmail ?? c.identityProfileId
+
+        const secondary =
+          c.canonicalEmail && c.fullName
+            ? c.canonicalEmail
+            : c.jobTitle ?? c.roleLabel ?? undefined
+
+        return {
+          value: c.identityProfileId,
+          label: c.isPrimary ? `${primary} · ${GH_PRICING.contextChips.contact.primaryBadge}` : primary,
+          secondary
+        }
+      }),
+    [options.contacts]
+  )
+
+  const businessLineOptions = useMemo<ContextChipOption[]>(
+    () => options.businessLines.map(bl => ({ value: bl.code, label: bl.label })),
+    [options.businessLines]
+  )
+
+  const commercialModelOptions = useMemo<ContextChipOption[]>(
+    () =>
+      options.commercialModels.map(m => ({
+        value: m.code,
+        label: m.label,
+        secondary: `${formatMultiplier(m.multiplierPct)} sobre tarifa base`
+      })),
+    [options.commercialModels]
+  )
+
+  const countryFactorOptions = useMemo<ContextChipOption[]>(
+    () =>
+      options.countryFactors.map(c => ({
+        value: c.code,
+        label: c.label,
+        secondary: `Factor ×${formatFactor(c.factor)}`
+      })),
+    [options.countryFactors]
+  )
+
   const selectedOrganization = useMemo(
     () => options.organizations.find(o => o.organizationId === values.organizationId) ?? null,
     [options.organizations, values.organizationId]
@@ -149,7 +203,7 @@ const QuoteContextStrip = ({
   )
 
   const contactValue = selectedContact
-    ? `${selectedContact.fullName ?? selectedContact.canonicalEmail ?? selectedContact.identityProfileId}${selectedContact.isPrimary ? ' · Principal' : ''}`
+    ? `${selectedContact.fullName ?? selectedContact.canonicalEmail ?? selectedContact.identityProfileId}${selectedContact.isPrimary ? ' · ' + GH_PRICING.contextChips.contact.primaryBadge : ''}`
     : null
 
   const commercialModelValue = selectedCommercialModel
@@ -191,7 +245,7 @@ const QuoteContextStrip = ({
       })}
     >
       <ContextChipStrip ariaLabel={GH_PRICING.contextChips.ariaLabel}>
-        {/* Organizacion */}
+        {/* Organizacion — 2 clicks con Autocomplete */}
         <ContextChip
           icon={GH_PRICING.contextChips.organization.icon}
           label={GH_PRICING.contextChips.organization.label}
@@ -201,44 +255,14 @@ const QuoteContextStrip = ({
           disabled={disabled}
           status={organizationLocked ? 'locked' : undefined}
           errorMessage={invalidFields.organizationId}
-          popoverWidth={360}
-          popoverContent={({ close }) => (
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>{GH_PRICING.contextChips.organization.label}</Typography>
-              <Typography variant='caption' color='text.secondary'>
-                {GH_PRICING.contextChips.organization.hint}
-              </Typography>
-              {organizationLocked ? (
-                <Typography variant='caption' color='text.secondary'>
-                  {GH_PRICING.contextChips.lockedHint}
-                </Typography>
-              ) : null}
-              <CustomTextField
-                select
-                fullWidth
-                size='small'
-                value={values.organizationId ?? ''}
-                onChange={event => {
-                  onOrganizationChange(event.target.value || null)
-
-                  if (event.target.value) close()
-                }}
-                disabled={disabled || organizationLocked}
-                aria-label={GH_PRICING.contextChips.organization.label}
-                autoFocus
-              >
-                <MenuItem value=''>{GH_PRICING.contextChips.organization.placeholder}</MenuItem>
-                {options.organizations.map(org => (
-                  <MenuItem key={org.organizationId} value={org.organizationId}>
-                    {org.organizationName}
-                  </MenuItem>
-                ))}
-              </CustomTextField>
-            </Stack>
-          )}
+          options={orgOptions}
+          selectedValue={values.organizationId}
+          onSelectChange={onOrganizationChange}
+          searchPlaceholder='Buscar organización…'
+          noOptionsText='Sin organizaciones'
         />
 
-        {/* Contacto */}
+        {/* Contacto — 2 clicks con Autocomplete */}
         <ContextChip
           icon={GH_PRICING.contextChips.contact.icon}
           label={GH_PRICING.contextChips.contact.label}
@@ -249,69 +273,17 @@ const QuoteContextStrip = ({
               : GH_PRICING.contextChips.contact.placeholder
           }
           disabled={disabled || !values.organizationId}
-          popoverWidth={380}
-          popoverContent={({ close }) => (
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>{GH_PRICING.contextChips.contact.label}</Typography>
-              <Typography variant='caption' color='text.secondary'>
-                {GH_PRICING.contextChips.contact.hint}
-              </Typography>
-              {!values.organizationId ? (
-                <Typography variant='caption' color='text.secondary'>
-                  {GH_PRICING.contextChips.contact.noOrgFirst}
-                </Typography>
-              ) : options.contactsLoading ? (
-                <Typography variant='caption' color='text.secondary'>
-                  {GH_PRICING.contextChips.contact.loading}
-                </Typography>
-              ) : options.contacts.length === 0 ? (
-                <Typography variant='caption' color='text.secondary'>
-                  {GH_PRICING.contextChips.contact.empty}
-                </Typography>
-              ) : (
-                <CustomTextField
-                  select
-                  fullWidth
-                  size='small'
-                  value={values.contactIdentityProfileId ?? ''}
-                  onChange={event => {
-                    onContactChange(event.target.value || null)
-
-                    if (event.target.value) close()
-                  }}
-                  disabled={disabled}
-                  aria-label={GH_PRICING.contextChips.contact.label}
-                  autoFocus
-                >
-                  <MenuItem value=''>{GH_PRICING.contextChips.contact.placeholder}</MenuItem>
-                  {options.contacts.map(contact => {
-                    const primary = contact.fullName ?? contact.canonicalEmail ?? contact.identityProfileId
-
-                    const secondary =
-                      contact.canonicalEmail && contact.fullName
-                        ? contact.canonicalEmail
-                        : contact.jobTitle ?? contact.roleLabel ?? null
-
-                    return (
-                      <MenuItem key={contact.identityProfileId} value={contact.identityProfileId}>
-                        <Stack spacing={0}>
-                          <Typography variant='body2' sx={{ lineHeight: 1.3 }}>
-                            {primary}
-                            {contact.isPrimary ? ` · ${GH_PRICING.contextChips.contact.primaryBadge}` : ''}
-                          </Typography>
-                          {secondary ? (
-                            <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2 }}>
-                              {secondary}
-                            </Typography>
-                          ) : null}
-                        </Stack>
-                      </MenuItem>
-                    )
-                  })}
-                </CustomTextField>
-              )}
-            </Stack>
-          )}
+          options={contactOptions}
+          selectedValue={values.contactIdentityProfileId}
+          onSelectChange={onContactChange}
+          searchPlaceholder='Buscar contacto…'
+          loading={options.contactsLoading}
+          loadingText={GH_PRICING.contextChips.contact.loading}
+          noOptionsText={
+            !values.organizationId
+              ? GH_PRICING.contextChips.contact.noOrgFirst
+              : GH_PRICING.contextChips.contact.empty
+          }
         />
 
         {/* Business line */}
@@ -321,32 +293,11 @@ const QuoteContextStrip = ({
           value={selectedBusinessLine?.label ?? null}
           placeholder={GH_PRICING.contextChips.businessLine.placeholder}
           disabled={disabled}
-          popoverContent={({ close }) => (
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>{GH_PRICING.contextChips.businessLine.label}</Typography>
-              <CustomTextField
-                select
-                fullWidth
-                size='small'
-                value={values.businessLineCode ?? ''}
-                onChange={event => {
-                  onBusinessLineChange(event.target.value || null)
-
-                  if (event.target.value) close()
-                }}
-                disabled={disabled}
-                aria-label={GH_PRICING.contextChips.businessLine.label}
-                autoFocus
-              >
-                <MenuItem value=''>{GH_PRICING.contextChips.businessLine.placeholder}</MenuItem>
-                {options.businessLines.map(bl => (
-                  <MenuItem key={bl.code} value={bl.code}>
-                    {bl.label}
-                  </MenuItem>
-                ))}
-              </CustomTextField>
-            </Stack>
-          )}
+          options={businessLineOptions}
+          selectedValue={values.businessLineCode}
+          onSelectChange={onBusinessLineChange}
+          searchPlaceholder='Buscar business line…'
+          noOptionsText='Sin business lines activas'
         />
 
         {/* Modelo comercial */}
@@ -356,37 +307,11 @@ const QuoteContextStrip = ({
           value={commercialModelValue}
           placeholder={GH_PRICING.contextChips.commercialModel.placeholder}
           disabled={disabled}
-          popoverContent={({ close }) => (
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>{GH_PRICING.contextChips.commercialModel.label}</Typography>
-              <CustomTextField
-                select
-                fullWidth
-                size='small'
-                value={values.commercialModel}
-                onChange={event => {
-                  onCommercialModelChange(event.target.value as CommercialModelCode)
-                  close()
-                }}
-                disabled={disabled}
-                aria-label={GH_PRICING.contextChips.commercialModel.label}
-                autoFocus
-              >
-                {options.commercialModels.map(model => (
-                  <MenuItem key={model.code} value={model.code}>
-                    <Stack>
-                      <Typography variant='body2' sx={{ lineHeight: 1.3 }}>
-                        {model.label}
-                      </Typography>
-                      <Typography variant='caption' color='text.secondary'>
-                        {formatMultiplier(model.multiplierPct)} sobre tarifa base
-                      </Typography>
-                    </Stack>
-                  </MenuItem>
-                ))}
-              </CustomTextField>
-            </Stack>
-          )}
+          options={commercialModelOptions}
+          selectedValue={values.commercialModel}
+          onSelectChange={value => value && onCommercialModelChange(value as CommercialModelCode)}
+          searchPlaceholder='Buscar modelo…'
+          noOptionsText='Sin modelos'
         />
 
         {/* Pais / factor */}
@@ -396,37 +321,11 @@ const QuoteContextStrip = ({
           value={countryFactorValue}
           placeholder={GH_PRICING.contextChips.countryFactor.placeholder}
           disabled={disabled}
-          popoverContent={({ close }) => (
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>{GH_PRICING.contextChips.countryFactor.label}</Typography>
-              <CustomTextField
-                select
-                fullWidth
-                size='small'
-                value={values.countryFactorCode}
-                onChange={event => {
-                  onCountryFactorChange(event.target.value)
-                  close()
-                }}
-                disabled={disabled}
-                aria-label={GH_PRICING.contextChips.countryFactor.label}
-                autoFocus
-              >
-                {options.countryFactors.map(factor => (
-                  <MenuItem key={factor.code} value={factor.code}>
-                    <Stack>
-                      <Typography variant='body2' sx={{ lineHeight: 1.3 }}>
-                        {factor.label}
-                      </Typography>
-                      <Typography variant='caption' color='text.secondary'>
-                        Factor ×{formatFactor(factor.factor)}
-                      </Typography>
-                    </Stack>
-                  </MenuItem>
-                ))}
-              </CustomTextField>
-            </Stack>
-          )}
+          options={countryFactorOptions}
+          selectedValue={values.countryFactorCode}
+          onSelectChange={value => value && onCountryFactorChange(value)}
+          searchPlaceholder='Buscar país…'
+          noOptionsText='Sin países'
         />
 
         {/* Moneda */}
@@ -435,35 +334,25 @@ const QuoteContextStrip = ({
           label={GH_PRICING.contextChips.currency.label}
           value={values.outputCurrency}
           disabled={disabled}
-          popoverWidth={300}
-          popoverContent={({ close }) => (
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>{GH_PRICING.contextChips.currency.label}</Typography>
-              <CurrencySwitcher
-                value={values.outputCurrency}
-                onChange={value => {
-                  onCurrencyChange(value)
-                  close()
-                }}
-                disabled={disabled}
-                size='small'
-                fullWidth
-              />
-            </Stack>
-          )}
+          options={CURRENCY_OPTIONS}
+          selectedValue={values.outputCurrency}
+          onSelectChange={value => value && onCurrencyChange(value as PricingOutputCurrency)}
+          searchPlaceholder='Buscar moneda…'
+          popoverWidth={320}
         />
 
-        {/* Duracion */}
+        {/* Duracion — custom input (number) */}
         <ContextChip
+          mode='custom'
           icon={GH_PRICING.contextChips.duration.icon}
           label={GH_PRICING.contextChips.duration.label}
           value={durationValue}
           placeholder={GH_PRICING.contextChips.duration.placeholder}
           disabled={disabled}
-          popoverWidth={300}
+          popoverWidth={280}
           popoverContent={() => (
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>{GH_PRICING.contextChips.duration.label}</Typography>
+            <Stack spacing={1.5}>
+              <Typography variant='subtitle1'>{GH_PRICING.contextChips.duration.label}</Typography>
               <CustomTextField
                 fullWidth
                 size='small'
@@ -484,17 +373,18 @@ const QuoteContextStrip = ({
           )}
         />
 
-        {/* Valida hasta */}
+        {/* Valida hasta — custom input (date) */}
         <ContextChip
+          mode='custom'
           icon={GH_PRICING.contextChips.validUntil.icon}
           label={GH_PRICING.contextChips.validUntil.label}
           value={validUntilValue}
           placeholder={GH_PRICING.contextChips.validUntil.placeholder}
           disabled={disabled}
-          popoverWidth={300}
+          popoverWidth={280}
           popoverContent={() => (
-            <Stack spacing={2}>
-              <Typography variant='subtitle2'>{GH_PRICING.contextChips.validUntil.label}</Typography>
+            <Stack spacing={1.5}>
+              <Typography variant='subtitle1'>{GH_PRICING.contextChips.validUntil.label}</Typography>
               <CustomTextField
                 fullWidth
                 size='small'

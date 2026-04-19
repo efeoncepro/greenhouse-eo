@@ -203,7 +203,7 @@ const TotalsBlock = ({
     ) : (
       <Typography
         variant={emphasized ? 'h6' : 'body1'}
-        sx={{ fontFamily: 'monospace', fontWeight: emphasized ? 600 : 500, lineHeight: 1.2 }}
+        sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: emphasized ? 600 : 500, lineHeight: 1.2 }}
       >
         {primary}
       </Typography>

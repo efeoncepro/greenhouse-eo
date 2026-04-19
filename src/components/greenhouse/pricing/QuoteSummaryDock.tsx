@@ -137,7 +137,7 @@ const QuoteSummaryDock = ({
         backdropFilter: 'saturate(180%) blur(10px)',
         WebkitBackdropFilter: 'saturate(180%) blur(10px)',
         border: `1px solid ${theme.palette.divider}`,
-        borderRadius: 3,
+        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
         boxShadow: `0 12px 32px -12px ${alpha(theme.palette.common.black, 0.22)}`
       })}
     >
@@ -195,7 +195,7 @@ const QuoteSummaryDock = ({
             <Typography
               component='span'
               variant='h5'
-              sx={{ fontFamily: 'monospace', fontWeight: 700, lineHeight: 1.1, color: 'primary.main' }}
+              sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700, lineHeight: 1.1, color: 'primary.main' }}
               aria-label={`${GH_PRICING.summaryDock.totalLabel} ${formatMoney(total, currency)}`}
             >
               {loading ? (
@@ -364,7 +364,7 @@ const SummaryBlock = ({
       <Typography
         variant='body1'
         sx={{
-          fontFamily: 'monospace',
+          fontVariantNumeric: 'tabular-nums',
           fontWeight: 500,
           lineHeight: 1.2,
           color: variant === 'muted' ? 'text.secondary' : 'text.primary'

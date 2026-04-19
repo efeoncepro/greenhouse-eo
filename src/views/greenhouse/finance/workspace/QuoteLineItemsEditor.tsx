@@ -497,7 +497,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
 
   if (!editable) {
     return (
-      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, borderRadius: 3 }}>
+      <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
         <CardHeader
           title={`Ítems de la cotización (${lineItems.length})`}
           avatar={
@@ -569,12 +569,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                         <Typography variant='body2' color='text.secondary'>{UNIT_LABELS[line.unit]}</Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums' }}>
                           {formatCurrency(resolvedUnitPrice, currency)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                        <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
                           {formatCurrency(subtotal, currency)}
                         </Typography>
                       </TableCell>
@@ -596,7 +596,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   }
 
   return (
-    <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, borderRadius: 3 }}>
+    <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
       <CardHeader
         title={`Ítems de la cotización (${draftLines.length})`}
         subheader='Agrega ítems vendibles desde el catálogo o crea una línea manual.'
@@ -631,7 +631,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 {emptyCtaLabels.secondary && onAddFromService ? (
                   <Button
                     variant='tonal'
-                    color='success'
+                    color='secondary'
                     startIcon={<i className='tabler-package' aria-hidden='true' />}
                     onClick={onAddFromService}
                     disabled={saving}
@@ -643,7 +643,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 {emptyCtaLabels.tertiary && onAddFromTemplate ? (
                   <Button
                     variant='tonal'
-                    color='info'
+                    color='secondary'
                     startIcon={<i className='tabler-template' aria-hidden='true' />}
                     onClick={onAddFromTemplate}
                     disabled={saving}
@@ -781,7 +781,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                             <Typography
                               variant='caption'
                               color='text.secondary'
-                              sx={{ fontFamily: 'monospace' }}
+                              sx={{ fontVariantNumeric: 'tabular-nums' }}
                               aria-label='Precio sugerido por el motor de pricing'
                             >
                               Sugerido {formatCurrency(enginePrice, currency)}
@@ -810,11 +810,11 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                         {simulating && !isManualOverride && subtotal === 0 ? (
                           <Skeleton variant='text' width={90} height={22} sx={{ ml: 'auto' }} aria-label='Calculando subtotal' />
                         ) : subtotal === 0 && enginePrice === null && !isManualOverride ? (
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', color: 'text.secondary' }} aria-label='Subtotal sin datos suficientes'>
+                          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }} aria-label='Subtotal sin datos suficientes'>
                             —
                           </Typography>
                         ) : (
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
                             {formatCurrency(subtotal, currency)}
                           </Typography>
                         )}
@@ -891,11 +891,11 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
           {simulating && previewTotal === 0 ? (
             <Skeleton variant='text' width={140} height={24} />
           ) : previewTotal === 0 && draftLines.every(l => l.unitPrice === null || l.unitPrice === undefined) ? (
-            <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+            <Typography variant='subtitle2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }}>
               —
             </Typography>
           ) : (
-            <Typography variant='subtitle2' sx={{ fontFamily: 'monospace' }}>
+            <Typography variant='subtitle2' sx={{ fontVariantNumeric: 'tabular-nums' }}>
               {formatCurrency(previewTotal, currency)}
             </Typography>
           )}

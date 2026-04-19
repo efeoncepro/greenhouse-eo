@@ -977,11 +977,11 @@ const QuoteBuilderShell = ({
             defaultExpanded={mode === 'create' || builderState.description.length > 0}
             sx={theme => ({
               border: `1px solid ${theme.palette.divider}`,
-              borderRadius: 3,
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
               '&:before': { display: 'none' },
               '&.Mui-expanded': { margin: 0 },
-              '&:first-of-type': { borderRadius: 3 },
-              '&:last-of-type': { borderRadius: 3 }
+              '&:first-of-type': { borderRadius: `${theme.shape.customBorderRadius.lg}px` },
+              '&:last-of-type': { borderRadius: `${theme.shape.customBorderRadius.lg}px` }
             })}
           >
             <AccordionSummary

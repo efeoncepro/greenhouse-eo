@@ -118,7 +118,7 @@ const SellableItemRow = ({
 
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 0.25 }}>
-          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'text.secondary' }}>
+          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontSize: '0.75rem', color: 'text.secondary' }}>
             {sku}
           </Typography>
           {category ? <Chip size='small' label={category} sx={{ height: 18, fontSize: '0.65rem' }} /> : null}
@@ -144,7 +144,7 @@ const SellableItemRow = ({
       </Box>
 
       {priceLabel ? (
-        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500, whiteSpace: 'nowrap' }}>
+        <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500, whiteSpace: 'nowrap' }}>
           {priceLabel}
         </Typography>
       ) : null}
