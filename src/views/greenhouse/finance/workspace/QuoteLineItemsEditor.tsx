@@ -840,41 +840,41 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       </TableCell>
                       <TableCell align='right'>
                         <Stack spacing={0.5} alignItems='flex-end'>
-                          <CustomTextField
-                            size='small'
-                            type='number'
-                            value={line.unitPrice ?? ''}
-                            placeholder={enginePrice !== null ? formatCurrency(enginePrice, currency) : undefined}
-                            onChange={event => {
-                              const raw = event.target.value
+                          {/*
+                            Patrón enterprise (Stripe Billing / Ramp / Linear):
+                            el input siempre muestra un valor concreto.
+                            - Si el usuario tiene override → muestra line.unitPrice.
+                            - Si no, muestra el precio del engine (catalog-backed).
+                            - Mientras el engine no responda en first-load, skeleton.
+                            Al cambiar cantidad el enginePrice se actualiza y el
+                            input refleja el nuevo valor en vivo, sin pisar overrides.
+                          */}
+                          {simulating && enginePrice === null && !isManualOverride ? (
+                            <Skeleton variant='rounded' width={140} height={32} aria-label='Calculando precio del catálogo' />
+                          ) : (
+                            <CustomTextField
+                              size='small'
+                              type='number'
+                              value={line.unitPrice ?? (enginePrice !== null ? enginePrice : '')}
+                              onChange={event => {
+                                const raw = event.target.value
 
-                              updateLine(index, { unitPrice: raw === '' ? null : Number(raw) })
-                            }}
-                            disabled={saving}
-                            aria-label={`Precio unitario del ítem ${index + 1}`}
-                          />
-                          {simulating && !isManualOverride ? (
-                            <Skeleton variant='text' width={120} height={18} aria-label='Calculando precio sugerido' />
-                          ) : enginePrice !== null && !isManualOverride ? (
-                            <Typography
-                              variant='caption'
-                              color='text.secondary'
-                              sx={{ fontVariantNumeric: 'tabular-nums' }}
-                              aria-label='Precio sugerido por el motor de pricing'
-                            >
-                              Sugerido {formatCurrency(enginePrice, currency)}
-                            </Typography>
-                          ) : null}
+                                updateLine(index, { unitPrice: raw === '' ? null : Number(raw) })
+                              }}
+                              disabled={saving}
+                              aria-label={`Precio unitario del ítem ${index + 1}`}
+                            />
+                          )}
                           {isManualOverride && enginePrice !== null ? (
                             <Stack direction='row' spacing={0.5} alignItems='center'>
                               <CustomChip round='true' size='small' variant='outlined' color='warning' label='Override' />
-                              <Tooltip title='Volver al precio sugerido'>
+                              <Tooltip title={`Volver al precio del catálogo (${formatCurrency(enginePrice, currency)})`}>
                                 <span>
                                   <IconButton
                                     size='small'
                                     onClick={() => updateLine(index, { unitPrice: null })}
                                     disabled={saving}
-                                    aria-label='Volver al precio sugerido'
+                                    aria-label='Volver al precio del catálogo'
                                   >
                                     <i className='tabler-refresh' style={{ fontSize: 16 }} />
                                   </IconButton>

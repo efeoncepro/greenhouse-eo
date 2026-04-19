@@ -19,6 +19,8 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type {
+  PricingEngineInputV2,
+  PricingLineOutputV2,
   PricingOutputCurrency,
   PricingV2LineType,
   PricingWarning
@@ -629,14 +631,46 @@ const QuoteBuilderShell = ({
         }
       }
 
+      // Fresh-simulate on submit: el hook usePricingSimulation debouncea,
+      // así que el `simulation` cacheado puede estar desfasado vs el draft
+      // que el usuario acaba de tocar. Antes de persistir pedimos al engine
+      // un output fresco sobre la SNAPSHOT ACTUAL. Cero race condition.
+      let freshSimulationLines: PricingLineOutputV2[] | null = null
+      let freshSimulationError: string | null = null
+
+      if (!selectedTemplateId) {
+        const freshInput = buildQuotePricingInput(builderState, currency, draftLines)
+
+        if (freshInput) {
+          try {
+            const simRes = await fetch('/api/finance/quotes/pricing/simulate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(freshInput satisfies PricingEngineInputV2)
+            })
+
+            if (!simRes.ok) {
+              const simBody = (await simRes.json().catch(() => ({}))) as { error?: string }
+
+              freshSimulationError = simBody.error ?? 'No pudimos recalcular el pricing antes de guardar.'
+            } else {
+              const simBody = (await simRes.json()) as { lines?: PricingLineOutputV2[] }
+
+              freshSimulationLines = simBody.lines ?? null
+            }
+          } catch {
+            freshSimulationError = 'No pudimos conectar con el motor de pricing. Revisa tu conexión.'
+          }
+        }
+      }
+
       const persistedLineItems = selectedTemplateId
         ? []
         : buildPersistedQuoteLineItems({
             lines: draftLines,
             currency,
-            simulationLines: simulation?.lines ?? null,
-            missingPriceMessage:
-              simulationError ?? UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE
+            simulationLines: freshSimulationLines,
+            missingPriceMessage: freshSimulationError ?? UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE
           })
 
       if (onSubmit) {
@@ -750,18 +784,11 @@ const QuoteBuilderShell = ({
     selectedTemplateId,
     organizationId,
     contactIdentityProfileId,
-    builderState.description,
-    builderState.contractDurationMonths,
-    builderState.validUntil,
-    builderState.businessLineCode,
-    builderState.commercialModel,
-    builderState.countryFactorCode,
+    builderState,
     pricingModel,
     currency,
     billingFrequency,
     linesSnapshot,
-    simulation?.lines,
-    simulationError,
     router
   ])
 
@@ -925,10 +952,10 @@ const QuoteBuilderShell = ({
               color='primary'
               startIcon={<i className='tabler-device-floppy' aria-hidden='true' />}
               onClick={() => handleSubmit(false)}
-              disabled={submitting || serviceExpanding}
+              disabled={submitting || serviceExpanding || simulating}
               sx={{ minHeight: 44 }}
             >
-              {submitting ? GH_PRICING.builderSaving : GH_PRICING.builderSaveDraft}
+              {submitting ? GH_PRICING.builderSaving : simulating ? 'Calculando pricing…' : GH_PRICING.builderSaveDraft}
             </Button>
           </>
         }
@@ -1065,7 +1092,7 @@ const QuoteBuilderShell = ({
           primaryCtaLabel={submitting ? GH_PRICING.builderSaving : GH_PRICING.summaryDock.primaryCta}
           primaryCtaIcon='tabler-device-floppy-filled'
           primaryCtaLoading={submitting}
-          primaryCtaDisabled={submitting || serviceExpanding || linesSnapshot.length === 0 || !organizationId}
+          primaryCtaDisabled={submitting || serviceExpanding || simulating || linesSnapshot.length === 0 || !organizationId}
           onPrimaryClick={() => handleSubmit(true)}
           marginClassification={marginClass}
           marginPct={marginPct}
