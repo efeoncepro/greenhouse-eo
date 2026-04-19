@@ -2,6 +2,15 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-475 formaliza la foundation FX + currency por dominio
+
+- Se crea una matriz canónica de monedas por dominio (`finance_core`, `pricing_output`, `reporting`, `analytics`) + FX policy enum + readiness contract. Toda la lógica vive en `src/lib/finance/currency-domain.ts` y `currency-registry.ts`, con un único resolver `resolveFxReadiness` que consumers (engine, APIs, UI futura) deben usar en vez de resolver tasas inline.
+- `finance_core` mantiene `['CLP', 'USD']` (no se expande). `pricing_output` soporta `['USD', 'CLP', 'CLF', 'COP', 'MXN', 'PEN']`. `reporting` y `analytics` quedan `['CLP']` por contrato. Agregar una moneda nueva requiere 3 edits en archivos declarativos — no hay hardcodes dispersos que tocar.
+- El pricing engine v2 ahora consulta readiness antes de cotizar en una moneda no-USD y emite `fx_fallback` structured warning con severidad calibrada (`critical` si la tasa no está disponible, `warning` si está stale, `info` si se compuso vía USD). El `QuotePricingWarningsPanel` del builder lo renderiza automáticamente.
+- Las monedas `CLF/COP/MXN/PEN` quedan declaradas como `manual_only` en el currency registry: operadores pueden upsertar tasas manuales, pero el pricing engine avisa al AE que el pair no tiene sync automático. Cuando el negocio requiera, agregar un provider es un cambio contenido.
+- Nuevo endpoint `GET /api/finance/exchange-rates/readiness?from=X&to=Y&domain=pricing_output` para que cualquier consumer (backend o UI) pregunte cobertura sin duplicar lógica. Cache private 60s.
+- TASK-466 reanclada: consume este readiness gate + `CLIENT_FACING_STALENESS_THRESHOLD_DAYS` antes de permitir el envío client-facing, snapshot a `quotations.exchange_rates` en el momento del send.
+
 ### 2026-04-19 — TASK-473 migra el quote builder a superficies full-page
 
 - El CTA "Nueva cotización" deja de abrir un drawer sobredenso y ahora navega a `/finance/quotes/new`, una surface full-page dedicada con layout de 2 columnas (composición + rail comercial sticky).
