@@ -1161,8 +1161,10 @@ export const buildPricingEngineOutputV2 = async (
 
   const explicitAddonSkus = new Set(explicitAddonLines.map(line => line.line.addonSku))
 
-  const autoResolvedAddons =
-    input.autoResolveAddons === false
+  const autoResolveMode = input.autoResolveAddons ?? true
+
+  const resolvedAddonsPool =
+    autoResolveMode === false
       ? []
       : await deps.resolvePricingAddons({
           commercialModel: input.commercialModel,
@@ -1173,6 +1175,15 @@ export const buildPricingEngineOutputV2 = async (
             roleCanSellAsStaff: entry.roleCanSellAsStaff
           }))
         })
+
+  // Con 'internal_only' filtramos los addons visibles al cliente: esos son
+  // decisión del comercial (se promueven a líneas explícitas desde el builder)
+  // y no deben auto-sumarse al total. Los internos (visibleToClient=false)
+  // siguen corriendo — son estructura de costos.
+  const autoResolvedAddons =
+    autoResolveMode === 'internal_only'
+      ? resolvedAddonsPool.filter(entry => entry.addon.visibleToClient === false)
+      : resolvedAddonsPool
 
   const autoAddonOutputs = []
 
@@ -1262,6 +1273,45 @@ export const buildPricingEngineOutputV2 = async (
     })
   }
 
+  // Con 'internal_only', los addons visibles aplicables al contexto que NO
+  // están ya como línea explícita ni tampoco auto-sumados viajan como
+  // propuestas para el panel. Se calcula el charge pero no se agrega al total.
+  const suggestedVisibleAddonOutputs: typeof autoAddonOutputs = []
+
+  if (autoResolveMode === 'internal_only') {
+    const suggestedPool = resolvedAddonsPool.filter(
+      entry =>
+        entry.addon.visibleToClient === true &&
+        !explicitAddonSkus.has(entry.addon.addonSku)
+    )
+
+    for (const resolvedAddon of suggestedPool) {
+      const charge = computeAddonChargeUsd({
+        addon: resolvedAddon.addon,
+        basisSubtotalUsd: baseSubtotalUsd,
+        resourceMonthlyCostUsd
+      })
+
+      const amountOutputCurrency = await convertUsdWithFallback({
+        amountUsd: charge.amountUsd,
+        outputCurrency: input.outputCurrency,
+        quoteDate: input.quoteDate,
+        notes: [],
+        convertUsdToPricingCurrencyFn: deps.convertUsdToPricingCurrency
+      })
+
+      suggestedVisibleAddonOutputs.push({
+        sku: resolvedAddon.addon.addonSku,
+        addonName: resolvedAddon.addon.addonName,
+        appliedReason: resolvedAddon.appliedReason,
+        amountUsd: charge.amountUsd,
+        amountOutputCurrency,
+        visibleToClient: true,
+        costUsd: charge.costUsd
+      })
+    }
+  }
+
   return {
     lines: lineOutputs,
     addons: autoAddonOutputs.map(addon => ({
@@ -1271,6 +1321,14 @@ export const buildPricingEngineOutputV2 = async (
       amountUsd: addon.amountUsd,
       amountOutputCurrency: addon.amountOutputCurrency,
       visibleToClient: addon.visibleToClient
+    })),
+    suggestedVisibleAddons: suggestedVisibleAddonOutputs.map(addon => ({
+      sku: addon.sku,
+      addonName: addon.addonName,
+      appliedReason: addon.appliedReason,
+      amountUsd: addon.amountUsd,
+      amountOutputCurrency: addon.amountOutputCurrency,
+      visibleToClient: true
     })),
     totals: {
       subtotalUsd,

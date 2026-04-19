@@ -664,4 +664,175 @@ describe('buildPricingEngineOutputV2', () => {
     expect(result.lines[0]?.costStack.employmentTypeCode).toBe('contractor')
     expect(result.lines[0]?.costStack.totalCostUsd).toBe(1200)
   })
+
+  it("autoResolveAddons='internal_only' only auto-sums internal addons; visible ones go to suggestedVisibleAddons", async () => {
+    // Dos addons aplicables al mismo contexto: uno interno, uno visible.
+    // En 'internal_only' el interno se auto-suma (result.addons) y el visible
+    // viaja como propuesta (result.suggestedVisibleAddons) sin sumar al total.
+    // Los SKUs usan los rule matchers del addon-resolver (EFO-003 para
+    // commercial_model=on_demand; EFO-005 para role con canSellAsStaff).
+    const addonCatalog = [
+      buildAddon('EFO-003', { visibleToClient: false, finalPricePct: 0.1 }),
+      buildAddon('EFO-005', { visibleToClient: true, finalPricePct: 0.05 })
+    ]
+
+    const result = await buildPricingEngineOutputV2(
+      {
+        businessLineCode: 'wave',
+        commercialModel: 'on_demand',
+        countryFactorCode: 'international_usd',
+        outputCurrency: 'USD',
+        quoteDate: '2026-04-18',
+        autoResolveAddons: 'internal_only',
+        lines: [
+          {
+            lineType: 'role',
+            roleSku: 'ECG-001',
+            fteFraction: 1,
+            periods: 1
+          }
+        ]
+      },
+      {
+        getSellableRoleBySku: vi.fn().mockResolvedValue({
+          roleId: 'role-1',
+          roleSku: 'ECG-001',
+          roleCode: 'strategist',
+          roleLabelEs: 'Estratega',
+          roleLabelEn: null,
+          category: 'strategy',
+          tier: '3',
+          tierLabel: 'Estrategico',
+          canSellAsStaff: true,
+          canSellAsServiceComponent: true,
+          active: true,
+          notes: null,
+          createdAt: '2026-04-18T00:00:00.000Z',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        listCompatibleEmploymentTypes: vi.fn().mockResolvedValue([
+          {
+            roleId: 'role-1',
+            employmentTypeCode: 'contractor',
+            isDefault: true,
+            allowed: true,
+            notes: null,
+            createdAt: '2026-04-18T00:00:00.000Z',
+            employmentType: null
+          }
+        ]),
+        getPreferredRoleModeledCostBasisByRoleId: vi.fn().mockResolvedValue({
+          snapshotId: 'EO-RMS-000002',
+          snapshotKey: 'role_modeled:role-1:contractor:2026-04',
+          roleId: 'role-1',
+          roleSku: 'ECG-001',
+          roleCode: 'strategist',
+          roleLabel: 'Estratega',
+          employmentTypeCode: 'contractor',
+          periodYear: 2026,
+          periodMonth: 4,
+          periodId: '2026-04',
+          snapshotDate: '2026-04-18',
+          sourceCostComponentEffectiveFrom: '2026-04-18',
+          sourceKind: 'admin_manual',
+          sourceRef: 'pricing_catalog_admin',
+          resolvedCurrency: 'USD',
+          baseLaborCostAmount: 700,
+          directOverheadPct: 0.2,
+          sharedOverheadPct: 0.1,
+          directOverheadAmount: 200,
+          sharedOverheadAmount: 100,
+          loadedCostAmount: 1000,
+          costPerHourAmount: 10,
+          hoursPerFteMonth: 100,
+          confidenceScore: 0.75,
+          confidenceLabel: 'medium',
+          snapshotStatus: 'complete',
+          detail: {},
+          materializedAt: '2026-04-18T00:00:00.000Z',
+          createdAt: '2026-04-18T00:00:00.000Z',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getCurrentPricing: vi.fn().mockResolvedValue({
+          roleId: 'role-1',
+          currencyCode: 'USD',
+          effectiveFrom: '2026-04-18',
+          marginPct: 0.5,
+          hourlyPrice: 20,
+          fteMonthlyPrice: 2000,
+          notes: null,
+          createdAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getRoleTierMargins: vi.fn().mockResolvedValue({
+          tier: '3',
+          tierLabel: 'Estrategico',
+          marginMin: 0.4,
+          marginOpt: 0.5,
+          marginMax: 0.6,
+          effectiveFrom: '2026-04-18',
+          notes: null,
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getCommercialModelMultiplier: vi.fn().mockResolvedValue({
+          modelCode: 'on_demand',
+          modelLabel: 'On-Demand',
+          multiplierPct: 0,
+          description: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getCountryPricingFactor: vi.fn().mockResolvedValue({
+          factorCode: 'international_usd',
+          factorLabel: 'International',
+          factorMin: 1,
+          factorOpt: 1,
+          factorMax: 1,
+          appliesWhen: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        convertFteToHours: vi.fn().mockResolvedValue({
+          fteFraction: 1,
+          fteLabel: '1.0',
+          monthlyHours: 100,
+          recommendedDescription: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        resolvePricingAddons: vi.fn().mockImplementation(input =>
+          Promise.resolve(resolvePricingAddonsFromCatalog(input, addonCatalog as never))
+        ),
+        resolvePricingOutputExchangeRate: vi.fn().mockResolvedValue(1),
+        resolvePricingOutputFxReadiness: vi.fn().mockResolvedValue({
+          fromCurrency: 'USD',
+          toCurrency: 'USD',
+          rateDate: '2026-04-18',
+          domain: 'pricing_output',
+          state: 'supported',
+          rate: 1,
+          rateDateResolved: '2026-04-18',
+          source: 'identity',
+          ageDays: 0,
+          stalenessThresholdDays: 7,
+          composedViaUsd: false,
+          message: 'USD baseline.'
+        }),
+        convertUsdToPricingCurrency: vi.fn().mockImplementation(({ amountUsd }) => Promise.resolve(amountUsd)),
+        convertCurrencyAmount: vi.fn().mockImplementation(({ amount }) => Promise.resolve(amount)),
+        getToolBySku: vi.fn(),
+        getOverheadAddonBySku: vi.fn(),
+        listOverheadAddons: vi.fn().mockResolvedValue(addonCatalog),
+        getPreferredMemberActualCostBasis: vi.fn(),
+        getPreferredRoleBlendedCostBasisByRoleId: vi.fn().mockResolvedValue(null)
+      }
+    )
+
+    // Addons auto-sumados (result.addons): solo el interno.
+    expect(result.addons.map(a => a.sku)).toEqual(['EFO-003'])
+    expect(result.addons.every(a => a.visibleToClient === false)).toBe(true)
+
+    // Addons propuestos (result.suggestedVisibleAddons): solo el visible.
+    expect(result.suggestedVisibleAddons?.map(a => a.sku)).toEqual(['EFO-005'])
+    expect(result.suggestedVisibleAddons?.every(a => a.visibleToClient === true)).toBe(true)
+  })
 })

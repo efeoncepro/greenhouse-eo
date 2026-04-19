@@ -2,7 +2,6 @@
 
 import Box from '@mui/material/Box'
 import Checkbox from '@mui/material/Checkbox'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
@@ -16,13 +15,17 @@ import { formatOutputMoney } from './QuoteTotalsFooter'
 
 export interface AddonSuggestionsPanelProps {
 
-  /** Addons auto-resueltos por el engine v2 (output.addons) */
+  /** Addons visibles al cliente, mezclados: los ya aplicados (como línea) y
+   *  las sugerencias aún no aplicadas. El checkbox representa si están
+   *  tildados (incluidos como línea). */
   suggestions: PricingAddonOutputV2[]
 
-  /** SKUs actualmente incluidos en la quote (active) */
+  /** SKUs de addons que ya están incluidos como línea overhead_addon en la
+   *  cotización. Determina el estado marcado/desmarcado del checkbox. */
   includedSkus: string[]
 
-  /** Toggle de un addon: incluirlo o excluirlo */
+  /** Toggle: al tildar se promueve a línea overhead_addon; al destildar la
+   *  línea se remueve del snapshot. */
   onToggle: (sku: string, include: boolean) => void
 
   /** Moneda output de la quote */
@@ -56,19 +59,22 @@ const AddonSuggestionsPanel = ({
         minWidth: 280
       })}
     >
-      <Typography variant='subtitle2' sx={{ mb: 1 }}>
-        Addons sugeridos
+      <Typography variant='subtitle2' sx={{ mb: 0.5 }}>
+        Addons para el cliente
+      </Typography>
+      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1.5 }}>
+        Tildar agrega el cargo como línea en la cotización.
       </Typography>
 
       {loading ? (
         <Typography variant='body2' color='text.secondary'>
-          Calculando addons aplicables...
+          Calculando addons aplicables…
         </Typography>
       ) : suggestions.length === 0 ? (
         <EmptyState
           icon='tabler-checkbox'
-          title='Ningún addon sugerido'
-          description='El engine no encontró addons aplicables para este contexto.'
+          title='Sin addons sugeridos'
+          description='No hay cargos adicionales aplicables a este contexto.'
         />
       ) : (
         <Stack spacing={1.5} divider={<Divider flexItem />}>
@@ -87,24 +93,15 @@ const AddonSuggestionsPanel = ({
                   }
                   label={
                     <Stack spacing={0.25} sx={{ flex: 1 }}>
-                      <Stack direction='row' spacing={1} alignItems='center'>
-                        <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                          {suggestion.addonName}
-                        </Typography>
-                        <Chip
-                          size='small'
-                          label={suggestion.visibleToClient ? 'Cliente' : 'Interno'}
-                          color={suggestion.visibleToClient ? 'primary' : 'default'}
-                          sx={{ height: 18, fontSize: '0.65rem' }}
-                        />
-                      </Stack>
-                      <Typography variant='caption' color='text.secondary'>
-                        {suggestion.appliedReason}
+                      <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                        {suggestion.addonName}
                       </Typography>
-                      <Typography variant='caption' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      <Typography
+                        variant='caption'
+                        color='text.secondary'
+                        sx={{ fontVariantNumeric: 'tabular-nums' }}
+                      >
                         {formatOutputMoney(suggestion.amountOutputCurrency, outputCurrency)}
-                        {' · '}
-                        {formatOutputMoney(suggestion.amountUsd, 'USD')}
                       </Typography>
                     </Stack>
                   }
