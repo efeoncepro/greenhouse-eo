@@ -274,16 +274,38 @@ Dos agentes en la misma rama crean confusión operacional aunque estén en carpe
 
 Cada worktree debe commitear solo sus archivos.
 
-### 4. No correr limpieza destructiva mientras otro agente sigue trabajando
+### 4. Eliminar tu propio worktree al cerrar una task (obligatorio)
+
+Cuando cierras una task (PR merged a develop), **tú mismo debes eliminar el worktree dedicado que usaste**. Si dejas el worktree vivo con `develop` checkeado, bloqueas al primary del operador humano para hacer `git checkout develop`.
+
+Observado repetidamente 2026-04-19: Codex cerró TASK-455, TASK-456 via PR merge pero dejó sus worktrees (`greenhouse-eo-task-455/`, `greenhouse-eo-task-456/`) con `develop` locked. El operador no pudo volver a develop en su primary sin cleanup manual del otro agente.
+
+Protocolo de cierre del owner del worktree:
+
+```bash
+# Dentro de tu worktree, antes de salir:
+git checkout develop     # puede fallar si otro ya tiene develop
+# Si falla, checkout detached o a otra branch no disputada
+cd /Users/jreye/Documents/greenhouse-eo-primary   # o donde sea
+git worktree remove ../greenhouse-eo-<task-slug>
+```
+
+Excepciones explícitas:
+- Si vas a seguir trabajando la misma task (no cerrada todavía), el worktree queda vivo en su task branch — no en develop
+- Si tu worktree quedó en detached HEAD o en una branch no-`develop`, no bloquea a nadie — puedes dejarlo para la próxima sesión
+
+Regla dura: **ningún agente deja `develop` checkeado en su worktree dedicado al cerrar una task**.
+
+### 5. No correr limpieza destructiva mientras otro agente sigue trabajando
 
 Evitar durante sesiones activas de otros agentes:
 
-- `git worktree remove` sobre carpetas ajenas
+- `git worktree remove` sobre carpetas ajenas (excepto worktrees huérfanos documentados en regla #4)
 - `git branch -D` de ramas en uso
 - `git worktree prune` sin saber qué worktrees siguen vivos
 - `git gc` manual como “mantenimiento”
 
-### 5. Resolver integración después, no durante
+### 6. Resolver integración después, no durante
 
 Los worktrees aíslan el trabajo, no eliminan conflictos lógicos.
 
@@ -305,11 +327,14 @@ Antes de cerrar una sesión en un worktree:
    - validación ejecutada
    - riesgos abiertos
 
-Si el worktree queda listo para cerrar:
+Si el worktree queda listo para cerrar (task merged a develop):
 
 1. verificar que no haya cambios sin commitear
-2. remover el worktree
-3. borrar la rama local solo si ya no hace falta
+2. **obligatorio**: hacer `git checkout` a algo que NO sea `develop` (detached HEAD o otra branch) para no bloquear al operador humano
+3. remover el worktree (`git worktree remove ../<carpeta>`)
+4. borrar la rama local solo si ya no hace falta
+
+No dejar el worktree dedicado con `develop` checkeado — es la causa documentada de que el primary no pueda volver a develop sin cleanup manual del otro agente (ver regla #4).
 
 ## Rollback y reversibilidad
 
