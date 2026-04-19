@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — Quote-to-cash conversion transaction convergence (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `fix/codex-quote-conversion-lock`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-quote-conversion-lock`
+- **Problema corregido:**
+  - en la tab `Cadena documental`, el CTA `Convertir a factura` podía quedarse indefinidamente en `Convirtiendo…` aunque la cotización ya estuviera emitida.
+  - el backend no materializaba `income` ni actualizaba `converted_to_income_id`; la cadena seguía sin factura.
+  - la causa estructural era la mezcla de transacciones: `materializeInvoiceFromApprovedQuotation` / `materializeInvoiceFromApprovedHes` abrían una transacción y luego llamaban a `ensureContractForQuotation`, que a su vez abría otra `withTransaction` separada sobre el mismo flujo quote-to-cash.
+- **Solución aplicada:**
+  - `src/lib/commercial/contract-lifecycle.ts` ahora acepta un `client` opcional en `ensureContractForQuotation` y reutiliza el boundary transaccional existente cuando lo recibe.
+  - los materializadores de factura (`simple` y `enterprise`) ahora pasan el mismo `client` activo al lifecycle contractual para evitar transacciones anidadas y esperas por locks/FKs sobre la misma cotización.
+  - se agregan regresiones en:
+    - `src/lib/commercial/contract-lifecycle.test.ts`
+    - `src/lib/finance/quote-to-cash/materialize-invoice-from-quotation.test.ts`
+    - `src/lib/finance/quote-to-cash/materialize-invoice-from-hes.test.ts`
+- **Tests / validación:**
+  - `pnpm test -- src/lib/commercial/contract-lifecycle.test.ts src/lib/finance/quote-to-cash/materialize-invoice-from-quotation.test.ts src/lib/finance/quote-to-cash/materialize-invoice-from-hes.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de coordinación:**
+  - no se volvió a convertir la cotización del usuario durante el fix; el diagnóstico se hizo leyendo staging y code path.
+  - la cotización inspeccionada (`qt-d5c9a4b5-ba51-4267-a54b-ac721eb46a6c`) seguía `issued` con `convertedToIncomeId = null` mientras se investigaba, así que el bug estaba en conversión, no en emisión.
+
 ## Sesion 2026-04-19 — Quote issuance sales-context lock fix (Codex)
 
 - **Owner:** Codex
