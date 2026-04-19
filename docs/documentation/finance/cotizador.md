@@ -3,13 +3,60 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 3.2
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-19 por Codex (v3.2 — issue lifecycle y approval-by-exception)
+> **Ultima actualizacion:** 2026-04-19 por Claude (v3.2 — TASK-500/501/502/503 builder UX closure) y Codex (v3.2 — TASK-504 issue lifecycle & approval-by-exception)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.2 (2026-04-19 — TASK-500 / TASK-501 / TASK-502 / TASK-503)
+
+Bundle enfocado en cerrar las últimas fricciones del Quote Builder post-TASK-488. Cuatro ejes:
+
+### Cantidad semántica para roles y personas (TASK-500 + TASK-502)
+
+- En líneas de **rol** y **persona**, la columna **Cantidad** ahora representa **meses facturables**, no un multiplicador genérico. Un caption "meses facturables" lo explicita debajo del input.
+- Al cambiar la cantidad, el engine re-simula inmediatamente y el total se actualiza en vivo (sin tener que abrir el popover Ajustes).
+- **Bug de doble conteo corregido**: antes el engine recibía `quantity` y `periods` con el mismo valor y multiplicaba dos veces. Ahora `quantity = 1` siempre para role/person, y el multiplicador real es `periods`. Resultado: con 0.5 meses a FTE=1, el subtotal es `0.5 × unitPrice` (no `0.25 × unitPrice` como antes).
+- Para **tools / deliverables / direct_cost** la semántica de Cantidad es la tradicional (cuántas unidades); sin cambios.
+
+### Unidad read-only para role/person (TASK-500)
+
+- La columna **Unidad** para rol/persona queda fijada en "Mes" como chip read-only. El engine usa base mensual para esas líneas y ofrecer el dropdown era engañoso.
+- Otras líneas (tool, direct_cost) mantienen el dropdown `Hora / Mes / Unidad / Proyecto`.
+
+### Precio unitario: catálogo = read-only, manual = editable (TASK-501 + TASK-502)
+
+- Para **items de catálogo** (rol, persona, herramienta, overhead_addon): la celda "Precio unitario" ahora es **texto read-only** con el precio efectivo. El catálogo es la única fuente de verdad; permitir override desde la UI corrompía la consistencia.
+- Para **rol/persona**, el precio mostrado se ajusta por FTE: si `FTE=0.5`, el precio visible es la mitad del rate del catálogo, así `subtotal = meses × precioMostrado` cuadra a ojo.
+- Para **líneas manuales** (`direct_cost` sin `pricingV2LineType`): el input de precio unitario sigue editable. Si necesitas un precio distinto al del catálogo, creas una línea manual.
+- Un **chip "FTE 1.0×"** junto al precio en filas rol/persona abre el popover Ajustes al click (descubribilidad del knob FTE sin gastar columna nueva).
+
+### Ajustes popover: solo FTE + Tipo de contratación (TASK-500)
+
+- El popover de la columna de acciones (ícono `tabler-adjustments`) ahora tiene dos campos:
+  - **FTE** (0.1 a 1.0).
+  - **Tipo de contratación** — dropdown poblado desde `/api/finance/quotes/pricing/config` (`catalog.employmentTypes`). Antes era un text field libre donde los typos generaban errores silenciosos del engine.
+- El campo "Períodos (meses)" se eliminó del popover: es redundante con la columna Cantidad.
+
+### Guardar: fresh-simulate + botón gated mientras el engine calcula (TASK-501)
+
+- El botón "Guardar" (header + dock) se **deshabilita mientras el engine está recalculando** (copy en el header pasa a "Calculando pricing…").
+- Al hacer submit, el shell dispara una **simulación fresca** contra `/api/finance/quotes/pricing/simulate` con la snapshot actual del draft, y usa **esa respuesta** para resolver los precios a persistir. Elimina la race condition de raíz: antes, si el usuario clickeaba Guardar antes del debounce del hook, se comparaba una snapshot vieja y el save fallaba con "no hay precio".
+- Si al final del fresh-simulate aún falta precio para una línea catalog-backed, el error nombra la línea específica ("Creative Operations Lead (ECG-001): sin precio sugerido, revisa tier margin").
+
+### Addons: tildar = línea, destildar = quitar (TASK-503)
+
+- Antes los "Addons sugeridos" mostraban checkboxes pero el toggle era cosmético: el engine seguía auto-sumando todos los addons aplicables al total y el usuario no tenía control real.
+- Ahora el engine corre en modo **`autoResolveAddons: 'internal_only'`** (nuevo valor). Semántica:
+  - Addons **internos** (`visibleToClient: false` — overhead, fee EOR, markup estructural) siguen corriendo automáticamente como parte del cost stack. No son decisión comercial.
+  - Addons **visibles al cliente** (`visibleToClient: true`) llegan al panel como **propuestas**. Al tildar, se agregan como **línea `overhead_addon` explícita en la tabla**, visible al cliente en el PDF. Al destildar, se quitan.
+- Regla central del modelo: **lo que el cliente paga es lo que ve en la tabla**. Cero markup oculto al cliente.
+- El panel del dock renombrado a "Addons para el cliente". Ya no muestra el `appliedReason` raw del engine (strings como `staffing_model=named_resources` eran debug técnico, no user-facing). Solo nombre del addon + monto en moneda output.
+- El chip del dock cuenta addons aplicados + propuestos (antes solo propuestos). Si tildabas todos, el chip desaparecía y no se podía destildar.
+- El panel es idempotente: dobles clicks, race condition con el debounce del engine, y entries duplicados quedan manejados client-side con dedupe por sku + guard en el toggle handler.
 
 ## Cambios v3 (2026-04-19 — TASK-486)
 
@@ -102,12 +149,26 @@ Además de las 4 cards del source selector (Catálogo / Servicio / Template / Ma
 Los botones +Rol / +Persona / +Herramienta / +Overhead abren el picker drawer en el tab correspondiente. El source selector del área principal (más prominente) es equivalente pero con UX más clara para composición nueva; los botones quick-add están pensados para agregar una línea adicional a una quote ya en curso.
 
 ### 5. Ajustar contexto de pricing por línea
-Para líneas de **rol** y **persona** aparece una fila debajo con:
-- **FTE** (fracción 0.1 → 1.0)
-- **Períodos** (meses)
-- **Tipo de contratación** (ej. `indefinido_clp`, `contractor_deel_usd`, vacío = usa el default del rol)
 
-El motor recalcula el precio automáticamente cada vez que cambias algo (debounce 500ms).
+**Para líneas de rol y persona** (catalog-backed, base mensual):
+
+- La columna **Cantidad** representa meses facturables. Cambiarla re-simula el subtotal en vivo.
+- La columna **Unidad** queda fijada en "Mes" (chip read-only). El engine no usa ese campo para rol/persona.
+- La columna **Precio unitario** muestra el precio efectivo ajustado por FTE como **texto read-only**. El catálogo es la fuente de verdad.
+- Al lado del precio aparece un chip **"FTE 1.0×"** que al click abre el popover Ajustes con:
+  - **FTE** (0.1 a 1.0).
+  - **Tipo de contratación** (dropdown desde el catálogo — ej. `indefinido_clp`, `contractor_deel_usd`, vacío = usa el default del rol).
+
+**Para líneas de herramienta y overhead**:
+
+- Cantidad y Unidad editables.
+- Precio unitario read-only (también catalog-backed).
+
+**Para líneas manuales** (`direct_cost`):
+
+- Cantidad, Unidad y Precio unitario editables — el usuario define el precio.
+
+El motor recalcula automáticamente cada vez que cambias cualquier campo (debounce 500ms).
 
 ### 6. Ver totales en tiempo real
 Debajo del drawer, un **footer sticky** muestra:
@@ -117,8 +178,16 @@ Debajo del drawer, un **footer sticky** muestra:
 - **Multiplicadores aplicados** (comercial × país)
 - **Chip de margen**: Saludable / Atención / Crítico con color
 
-### 7. Panel de addons sugeridos (derecha, solo finance/admin)
-Si el motor detecta addons aplicables al contexto (ej. "Management fee" para retainers), aparecen como checkboxes. Los toggles disparan nueva simulación.
+### 7. Panel "Addons para el cliente" (dock sticky-bottom)
+
+El engine v2 corre en modo `autoResolveAddons: 'internal_only'`:
+
+- **Addons internos** (`visibleToClient: false` — overhead, fee EOR estructural) corren automáticamente como parte del cost stack. Afectan margen. No se muestran al cliente.
+- **Addons visibles al cliente** (`visibleToClient: true`) aparecen en el panel como **propuestas**. Tildar uno lo **agrega como línea `overhead_addon`** en la tabla con su precio del catálogo. Destildar lo quita.
+
+El chip del dock muestra el count total de addons en juego (aplicados + propuestos). Cuando quedan sugerencias sin aplicar, muestra "+$X" con el delta potencial al total.
+
+Regla: **lo que el cliente paga es lo que ve en la tabla**. Los addons aplicados son líneas visibles en el PDF. Cero markup oculto.
 
 ### 8. Cost stack por línea (solo finance/admin)
 Cada línea, si tienes rol `efeonce_admin`, `finance_admin` o `finance_analyst`, muestra un acordeón con:
@@ -151,15 +220,20 @@ Si cotizas en una moneda distinta a USD o CLP (CLF / COP / MXN / PEN), el engine
 
 El detalle de política FX (umbrales, composición cross-pair vía USD, coverage por moneda) vive en [monedas-y-tipos-de-cambio](./monedas-y-tipos-de-cambio.md).
 
-## Override del precio unitario
+## Precio unitario: catálogo vs manual
 
-Cuando agregas una línea de rol desde catálogo, el **precio unitario viene sugerido por el engine** (cost stack × margin × multiplicadores × factor país). Tienes 3 caminos:
+**Items de catálogo** (rol, persona, herramienta, overhead_addon): el precio viene del engine y se muestra como **texto read-only** en la tabla. No se edita. El catálogo es la única fuente de verdad. Si necesitas un precio distinto, creas una línea manual.
 
-1. **Aceptar el sugerido** (default) — no escribes nada en el campo "Precio unitario". La UI muestra "Sugerido $X" debajo del input.
-2. **Override manual** — escribes un precio distinto. Aparece chip "Override" amarillo + botón refresh para volver al sugerido.
-3. **Volver al sugerido** — click en el botón refresh al lado del chip Override → limpia el override, el engine vuelve a mandar.
+Para **rol/persona**, el precio mostrado se escala por FTE: `precioMostrado = catalogPrice × fteFraction`. Así el subtotal visible es `meses × precioMostrado` — aritmética lineal auditable a ojo.
 
-El subtotal de cada línea respeta el override si existe; si no, usa el cálculo del engine. El footer de totales suma consistente con cualquiera de los dos modos.
+**Líneas manuales** (`direct_cost` sin `pricingV2LineType`): el input de "Precio unitario" sigue editable. El usuario define el monto y el subtotal es `quantity × unitPrice`.
+
+**Override histórico eliminado**: en versiones anteriores el usuario podía escribir un precio sobre una línea de catálogo (aparecía chip "Override" + botón refresh). Esto rompía la consistencia catálogo ↔ cotización persistida y confundía al comercial. Ahora, ajustes sobre una línea de catálogo se hacen cambiando el knob correcto:
+
+- Cantidad de meses → columna Cantidad.
+- Porcentaje de dedicación → chip FTE en la celda del precio (abre popover Ajustes).
+- Tipo de contratación → dropdown en el popover.
+- Excepción puntual de precio → línea manual direct_cost (el cliente verá "Ajuste comercial" explícito).
 
 ## Edit de una cotización existente
 
@@ -174,7 +248,7 @@ El botón **Guardar** persiste la quote canónica en PostgreSQL como **Borrador*
 
 ## Qué NO hace (todavía)
 
-- **No edita quotes existentes con este UI** — la primera versión solo crea. La edición con el builder nuevo queda para V2.
+- **Edit de quote existente**: disponible en `/finance/quotes/[id]/edit` (mismo shell que create). Precarga el quote + líneas; respeta `quoteDate` y `businessLineCode` originales para re-simulación estable (TASK-501).
 - **No guarda composiciones como template** — TASK-465 agrega el 5to tab de servicios empaquetados.
 - **No muestra historial de cambios en el drawer** — se ve en la vista detalle de la quote.
 - **No sincroniza en tiempo real entre múltiples usuarios** — follow-up de colaboración.
