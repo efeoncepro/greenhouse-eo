@@ -31,6 +31,7 @@ import { accountBalancesProjection } from './account-balances'
 import { serviceSlaComplianceProjection } from './service-sla-compliance'
 import { quotationPipelineProjection } from './quotation-pipeline'
 import { quotationProfitabilityProjection } from './quotation-profitability'
+import { quotationHubSpotOutboundProjection } from './quotation-hubspot-outbound'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -72,4 +73,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(serviceSlaComplianceProjection)
   registerProjection(quotationPipelineProjection)
   registerProjection(quotationProfitabilityProjection)
+  registerProjection(quotationHubSpotOutboundProjection)
 }

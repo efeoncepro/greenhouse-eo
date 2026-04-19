@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.13
+> **Version:** 2.14
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-18 — v2.14: TASK-463 unified quote builder + bidirectional HubSpot bridge. Drawer legacy "HubSpot" eliminado de `QuotesListView.tsx` — queda un solo botón "+ Nueva cotización" que persiste al canónico y propaga a HubSpot vía reactive projection `quotationHubSpotOutbound`. Nuevo helper `push-canonical-quote.ts` adapta el quote canónico al payload legacy del Cloud Run service. Endpoint legacy `/api/finance/quotes/hubspot` deprecado a HTTP 410. Dos eventos canónicos nuevos: `commercial.quotation.pushed_to_hubspot` y `commercial.quotation.hubspot_sync_failed`. Outbound idempotente: skip si no hay `hubspot_deal_id`, create si no hay `hubspot_quote_id`, update si ya existe (stub MVP).
 > **Updated:** 2026-04-18 — v2.13: TASK-455 quote sales context snapshot. `greenhouse_commercial.quotations` agrega `sales_context_at_sent jsonb` como snapshot histórico e inmutable del contexto comercial al primer `sent` (`lifecyclestage`, `dealstage`, `deal_id`, `hubspot_deal_id`, `category_at_sent`). La captura ocurre en el mismo flujo transaccional que marca `status='sent'`, cubriendo tanto `/send` directo como el cierre del approval workflow. `GET /api/finance/quotes/[id]` ahora lo expone como `salesContextAtSent`. El snapshot sirve para trazabilidad/analytics y NO reemplaza el classifier vivo de TASK-457.
 > **Updated:** 2026-04-18 — v2.12: TASK-464c tool catalog + overhead addons foundation implementada. `greenhouse_ai.tool_catalog` se extiende con `tool_sku`, prorrateo, `applicable_business_lines`, `applicability_tags`, `includes_in_addon` y `notes_for_quoting`; se crea `greenhouse_commercial.overhead_addons` con 9 addons canonizados (`EFO-001..009`). Nuevos módulos `tool-catalog-store.ts`, `overhead-addons-store.ts`, `tool-catalog-events.ts` y seeders idempotentes `scripts/seed-tool-catalog.ts` / `scripts/seed-overhead-addons.ts`. El catálogo comercial sigue conviviendo con AI tooling sin romper consumers existentes.
 > **Updated:** 2026-04-18 — v2.11: TASK-464b pricing governance tables implementada. Nuevas tablas `role_tier_margins`, `service_tier_margins`, `commercial_model_multipliers`, `country_pricing_factors` y `fte_hours_guide` en `greenhouse_commercial`, con versionado liviano por `effective_from`, readers cacheados en `pricing-governance-store.ts` y seeder idempotente `scripts/seed-pricing-governance.ts`. El seed real dejó `21` drifts rol→tier auditados contra `TASK-464a`; el catálogo canónico sigue ganando y la reconciliación queda para consumers posteriores.
@@ -37,6 +38,63 @@
   - el classifier operativo del pipeline híbrido sigue leyendo estado vivo (`clients.lifecyclestage` + `greenhouse_commercial.deals.dealstage`)
 - Índice nuevo:
   - `idx_quotations_sales_context_category` sobre `(space_id, sales_context_at_sent ->> 'category_at_sent', sent_at DESC)` parcial para quotes con snapshot
+
+---
+
+## Delta 2026-04-18 — TASK-463 Unified Quote Builder + Bidirectional HubSpot Bridge
+
+### Problema que cerró
+
+La UI `/finance/quotes` tenía dos botones de creación ("HubSpot" legacy vs "+ Nueva cotización" canónico) que producían estados divergentes: el legacy creaba quote en HubSpot pero el canónico nunca propagaba a HubSpot. Resultado: el Account Lead tenía que elegir entre "quote local rica con governance" o "quote que aparece en HubSpot", cuando debería ser siempre ambos.
+
+### Ship
+
+- **UI unificada**: `src/views/greenhouse/finance/QuotesListView.tsx` — eliminado el drawer `CreateQuoteDrawer` inline (284 líneas) + botón "HubSpot" + state `hubspotDrawerOpen`. Queda solo "+ Nueva cotización" con `QuoteCreateDrawer` canónico.
+- **Reactive projection**: `src/lib/sync/projections/quotation-hubspot-outbound.ts` (domain `cost_intelligence`). Trigger events: `quotationCreated`, `quotationSent`, `quotationApproved`, `quotationRejected`, `quotationVersionCreated`. Extract scope: `quotationId`. Refresh: llama `pushCanonicalQuoteToHubSpot`.
+- **Helper outbound**: `src/lib/hubspot/push-canonical-quote.ts` — adapter entre canonical `greenhouse_commercial.quotations` + `quotation_line_items` y el helper legacy `createHubSpotQuote()`. Skip si falta `hubspot_deal_id` / `organization_id`. Create si no hay `hubspot_quote_id`. Update (stub) si ya existe.
+- **Helper update stub**: `src/lib/hubspot/update-hubspot-quote.ts` — PATCH al Cloud Run service `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`. Fallback a `{ success:false, error:'update_not_supported' }` si el endpoint downstream aún no existe (MVP acceptable — el create path funciona completo).
+- **Eventos nuevos**: `commercial.quotation.pushed_to_hubspot` y `commercial.quotation.hubspot_sync_failed` — agregados en `event-catalog.ts` + publishers en `quotation-events.ts`.
+- **Endpoint deprecado**: `POST /api/finance/quotes/hubspot` → HTTP 410 Gone con migrationUrl `/api/finance/quotes`. Telemetría vía `console.warn` para rastrear callers legacy durante la ventana de coexistencia.
+
+### Flujo operativo
+
+```
+User → [+ Nueva cotización] → QuoteCreateDrawer (canónico)
+  └─► POST /api/finance/quotes
+      ├─► INSERT greenhouse_commercial.quotations + line_items
+      └─► publishQuoteCreated (outbox)
+          └─► commercial.quotation.created (outbox event)
+               └─► ops-worker (cron /reactive/process)
+                    └─► projection quotationHubSpotOutbound.refresh()
+                         └─► pushCanonicalQuoteToHubSpot(quotationId)
+                              ├─► createHubSpotQuote() [si !hubspot_quote_id]
+                              ├─► updateHubSpotQuote() [si hubspot_quote_id existe]
+                              └─► publishQuotationPushedToHubSpot (result='created'|'updated'|'skipped')
+```
+
+Downstream lifecycle (sent/approved/rejected/version_created) disparan la misma projection, que detecta que ya existe `hubspot_quote_id` y va por update path. Idempotente por construcción.
+
+### Observabilidad
+
+- Outbox event `commercial.quotation.pushed_to_hubspot` con campos `result`, `reason` (para skipped), `hubspotQuoteId`, `hubspotDealId`, `direction: 'outbound'`
+- Outbox event `commercial.quotation.hubspot_sync_failed` en catch branch con `errorMessage`, `attemptedAction`
+- Retries automáticos vía ops-worker projection registry (`maxRetries: 2` para tolerar 429/502 transient de HubSpot)
+
+### Migration impact
+
+- **Zero schema change**: columnas `hubspot_quote_id`, `hubspot_deal_id`, `hubspot_last_synced_at` ya existían en `greenhouse_commercial.quotations`
+- Inbound sync (`sync-hubspot-quotes.ts`, cron 6h) sigue funcionando sin cambio; la natural key `hubspot_quote_id` cierra el loop outbound/inbound sin duplicar
+
+### Verificación
+
+- `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm build` → green
+- Tests: 3 escenarios de `pushCanonicalQuoteToHubSpot` (skip, create, update) en `src/lib/hubspot/__tests__/push-canonical-quote.test.ts`. 282/282 tests passing (194 payroll + 21 pricing + 64 commercial/hubspot + 3 nuevos)
+
+### Follow-ups explícitos
+
+- Implementar el endpoint PATCH real en el Cloud Run service para que `updateHubSpotQuote` deje de ser stub
+- Dropear `greenhouse_finance.quotes` legacy completo cuando termine la ventana de coexistencia (hoy vive como compat view read-only via `syncCanonicalFinanceQuote`)
+- Webhook subscription HubSpot `quote.propertyChange` para sync casi-real-time inbound (hoy es polling 6h)
 
 ---
 

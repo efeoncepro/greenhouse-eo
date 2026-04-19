@@ -362,6 +362,10 @@ export const EVENT_TYPES = {
   quotationPipelineMaterialized: 'commercial.quotation.pipeline_materialized',
   quotationProfitabilityMaterialized: 'commercial.quotation.profitability_materialized',
 
+  // Unified Quote Builder HubSpot bidirectional outbound (TASK-463)
+  quotationPushedToHubSpot: 'commercial.quotation.pushed_to_hubspot',
+  quotationHubSpotSyncFailed: 'commercial.quotation.hubspot_sync_failed',
+
   // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
   productCreated: 'finance.product.created',

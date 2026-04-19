@@ -791,3 +791,69 @@ export const publishQuotationProfitabilityMaterialized = async (
     client
   )
 }
+
+// ═══════════════════════════════════════════════════════════════
+// TASK-463 — Unified Quote Builder HubSpot bidirectional publishers
+// ═══════════════════════════════════════════════════════════════
+
+interface QuotationPushedToHubSpotParams {
+  quotationId: string
+  hubspotQuoteId: string | null
+  hubspotDealId: string | null
+  direction: 'outbound'
+  result: 'created' | 'updated' | 'skipped'
+  reason?: string | null
+  actorId?: string | null
+}
+
+export const publishQuotationPushedToHubSpot = async (
+  params: QuotationPushedToHubSpotParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationPushedToHubSpot,
+      payload: {
+        quotationId: params.quotationId,
+        hubspotQuoteId: params.hubspotQuoteId,
+        hubspotDealId: params.hubspotDealId,
+        direction: params.direction,
+        result: params.result,
+        reason: params.reason ?? null,
+        actorId: params.actorId ?? null
+      }
+    },
+    client
+  )
+}
+
+interface QuotationHubSpotSyncFailedParams {
+  quotationId: string
+  hubspotDealId: string | null
+  errorMessage: string
+  attemptedAction: 'create' | 'update'
+  actorId?: string | null
+}
+
+export const publishQuotationHubSpotSyncFailed = async (
+  params: QuotationHubSpotSyncFailedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationHubSpotSyncFailed,
+      payload: {
+        quotationId: params.quotationId,
+        hubspotDealId: params.hubspotDealId,
+        errorMessage: params.errorMessage,
+        attemptedAction: params.attemptedAction,
+        actorId: params.actorId ?? null
+      }
+    },
+    client
+  )
+}
