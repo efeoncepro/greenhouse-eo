@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -79,10 +79,19 @@ export interface QuoteLineItemsEditorProps {
   canViewCostStack?: boolean
 
   /** Output del engine v2 por línea, indexado por posición. Cuando está disponible
-   * y el viewer tiene permisos, se renderiza el QuoteLineCostStack debajo de cada
-   * línea con tier compliance y breakdown interno. */
+   * - los precios unitarios y subtotales vienen del engine (fuente canónica)
+   * - el user puede overridear escribiendo en el campo de precio unitario
+   * - si el viewer tiene `canViewCostStack`, se renderiza el cost stack con tier
+   *   compliance y breakdown interno debajo de cada línea
+   */
   simulationLines?: PricingLineOutputV2[] | null
   outputCurrency?: PricingOutputCurrency | null
+
+  /** Se dispara en cada mutación del draft (append, update, remove). Permite al
+   * shell mantener su snapshot sincronizado sin necesidad de llamar manualmente
+   * a `getDraft()`. Imprescindible para que el pricing simulation re-calcule en
+   * tiempo real al editar cantidad/contexto. */
+  onDraftChange?: (lines: QuoteLineItem[]) => void
 }
 
 const LINE_TYPE_OPTIONS: Array<{ value: QuoteLineItem['lineType']; label: string; color: 'primary' | 'info' | 'success' | 'warning' }> = [
@@ -176,6 +185,50 @@ const computeRowSubtotalAfterDiscount = (line: QuoteLineItem): number => {
   }
 
   return subtotal
+}
+
+// Resolución canónica de precio unitario visible:
+//   1. Override manual (line.unitPrice explícito) gana sobre cualquier engine output
+//   2. Si hay engine output para esta línea, usar suggestedBillRate.unitPriceOutputCurrency
+//   3. null → la UI muestra "—" / empty state
+const resolveDisplayUnitPrice = (
+  line: QuoteLineItem,
+  simulationLine: PricingLineOutputV2 | null
+): number | null => {
+  if (line.unitPrice !== null && line.unitPrice !== undefined) return line.unitPrice
+  if (simulationLine?.suggestedBillRate) return simulationLine.suggestedBillRate.unitPriceOutputCurrency
+
+  return null
+}
+
+// Resolución canónica de subtotal visible:
+//   1. Si hay override manual de precio, usar computeRowSubtotalAfterDiscount (qty × override - discounts)
+//   2. Si hay engine output, usar suggestedBillRate.totalBillOutputCurrency directo
+//      (el engine ya considera qty, periods, FTE, tier margin, country factor, commercial multiplier)
+//   3. 0 → fallback cuando no hay precio ni engine output
+const resolveDisplaySubtotal = (
+  line: QuoteLineItem,
+  simulationLine: PricingLineOutputV2 | null
+): number => {
+  if (line.unitPrice !== null && line.unitPrice !== undefined) {
+    return computeRowSubtotalAfterDiscount(line)
+  }
+
+  if (simulationLine?.suggestedBillRate) {
+    const engineTotal = simulationLine.suggestedBillRate.totalBillOutputCurrency
+
+    if (line.discountType === 'percentage' && line.discountValue) {
+      return engineTotal - engineTotal * (line.discountValue / 100)
+    }
+
+    if (line.discountType === 'fixed_amount' && line.discountValue) {
+      return engineTotal - line.discountValue
+    }
+
+    return engineTotal
+  }
+
+  return 0
 }
 
 const cloneLineItems = (items: QuoteLineItem[]): QuoteLineItem[] => items.map(item => ({ ...item }))
@@ -314,7 +367,8 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     businessLineCode = null,
     canViewCostStack: canViewCostStackProp = false,
     simulationLines = null,
-    outputCurrency = null
+    outputCurrency = null,
+    onDraftChange
   },
   ref
 ) {
@@ -323,17 +377,36 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerInitialTab, setPickerInitialTab] = useState<SellableItemPickerTab>('roles')
 
+  // Ref al último onDraftChange para no invalidar callbacks cada render.
+  const onDraftChangeRef = useRef(onDraftChange)
+
+  useEffect(() => {
+    onDraftChangeRef.current = onDraftChange
+  }, [onDraftChange])
+
+  // Aplica una mutación al draft y notifica al shell en el mismo tick.
+  // Evita setState encadenado: el shell recibe el next state consistente.
+  const mutateDraft = useCallback((updater: (prev: QuoteLineItem[]) => QuoteLineItem[]) => {
+    setDraftLines(prev => {
+      const next = updater(prev)
+
+      onDraftChangeRef.current?.(next)
+
+      return next
+    })
+    setDirty(true)
+  }, [])
+
   useImperativeHandle(
     ref,
     () => ({
       appendLines: (lines: QuoteLineItem[]) => {
         if (!lines || lines.length === 0) return
-        setDraftLines(prev => [...prev, ...cloneLineItems(lines)])
-        setDirty(true)
+        mutateDraft(prev => [...prev, ...cloneLineItems(lines)])
       },
       getDraft: () => cloneLineItems(draftLines)
     }),
-    [draftLines]
+    [draftLines, mutateDraft]
   )
 
   useEffect(() => {
@@ -343,15 +416,14 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   }, [lineItems, dirty])
 
   const updateLine = useCallback((index: number, patch: Partial<QuoteLineItem>) => {
-    setDraftLines(prev => {
+    mutateDraft(prev => {
       const next = cloneLineItems(prev)
 
       next[index] = { ...next[index], ...patch }
 
       return next
     })
-    setDirty(true)
-  }, [])
+  }, [mutateDraft])
 
   const handleOpenPicker = useCallback((tab: SellableItemPickerTab) => {
     setPickerInitialTab(tab)
@@ -361,18 +433,19 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   const handlePickerSelect = useCallback((selections: SellableSelection[]) => {
     if (selections.length === 0) return
 
-    setDraftLines(prev => [...prev, ...selections.map(mapSelectionToLine)])
-    setDirty(true)
-  }, [])
+    mutateDraft(prev => [...prev, ...selections.map(mapSelectionToLine)])
+  }, [mutateDraft])
 
   const handleRemoveLine = useCallback((index: number) => {
-    setDraftLines(prev => prev.filter((_, i) => i !== index))
-    setDirty(true)
-  }, [])
+    mutateDraft(prev => prev.filter((_, i) => i !== index))
+  }, [mutateDraft])
 
   const handleDiscard = useCallback(() => {
-    setDraftLines(cloneLineItems(lineItems))
+    const reverted = cloneLineItems(lineItems)
+
+    setDraftLines(reverted)
     setDirty(false)
+    onDraftChangeRef.current?.(reverted)
   }, [lineItems])
 
   const handleSave = useCallback(async () => {
@@ -391,8 +464,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   const totalRows = draftLines.length
 
   const previewTotal = useMemo(
-    () => draftLines.reduce((acc, line) => acc + computeRowSubtotalAfterDiscount(line), 0),
-    [draftLines]
+    () =>
+      draftLines.reduce(
+        (acc, line, idx) => acc + resolveDisplaySubtotal(line, simulationLines?.[idx] ?? null),
+        0
+      ),
+    [draftLines, simulationLines]
   )
 
   if (!editable) {
@@ -428,7 +505,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
               </TableHead>
               <TableBody>
                 {lineItems.map((line, idx) => {
-                  const subtotal = line.subtotalAfterDiscount ?? line.subtotalPrice ?? computeRowSubtotalAfterDiscount(line)
+                  const simulationLine = simulationLines?.[idx] ?? null
+                  const resolvedUnitPrice = resolveDisplayUnitPrice(line, simulationLine)
+
+                  const subtotal =
+                    line.subtotalAfterDiscount ?? line.subtotalPrice ?? resolveDisplaySubtotal(line, simulationLine)
+
                   const typeMeta = LINE_TYPE_META[line.lineType]
 
                   return (
@@ -465,7 +547,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       </TableCell>
                       <TableCell align='right'>
                         <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                          {formatCurrency(line.unitPrice, currency)}
+                          {formatCurrency(resolvedUnitPrice, currency)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
@@ -540,8 +622,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
             color='secondary'
             startIcon={<i className='tabler-edit' />}
             onClick={() => {
-              setDraftLines(prev => [...prev, makeBlankManualLine()])
-              setDirty(true)
+              mutateDraft(prev => [...prev, makeBlankManualLine()])
             }}
             disabled={saving}
           >
@@ -576,9 +657,11 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
               </TableRow>
             ) : (
               draftLines.map((line, index) => {
-                const subtotal = computeRowSubtotalAfterDiscount(line)
-                const typeMeta = LINE_TYPE_META[line.lineType]
                 const simulationLine = simulationLines?.[index] ?? null
+                const enginePrice = simulationLine?.suggestedBillRate?.unitPriceOutputCurrency ?? null
+                const isManualOverride = line.unitPrice !== null && line.unitPrice !== undefined
+                const subtotal = resolveDisplaySubtotal(line, simulationLine)
+                const typeMeta = LINE_TYPE_META[line.lineType]
                 const showCostStack = canViewCostStackProp && simulationLine && outputCurrency
                 const needsPricingContext = line.lineType === 'role' || line.lineType === 'person'
                 const tierMeta = simulationLine ? TIER_STATUS_META[simulationLine.tierCompliance.status] : null
@@ -660,18 +743,48 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                         </CustomTextField>
                       </TableCell>
                       <TableCell align='right'>
-                        <CustomTextField
-                          size='small'
-                          type='number'
-                          value={line.unitPrice ?? ''}
-                          onChange={event => {
-                            const raw = event.target.value
+                        <Stack spacing={0.5} alignItems='flex-end'>
+                          <CustomTextField
+                            size='small'
+                            type='number'
+                            value={line.unitPrice ?? ''}
+                            placeholder={enginePrice !== null ? formatCurrency(enginePrice, currency) : undefined}
+                            onChange={event => {
+                              const raw = event.target.value
 
-                            updateLine(index, { unitPrice: raw === '' ? null : Number(raw) })
-                          }}
-                          disabled={saving}
-                          aria-label={`Precio unitario del ítem ${index + 1}`}
-                        />
+                              updateLine(index, { unitPrice: raw === '' ? null : Number(raw) })
+                            }}
+                            disabled={saving}
+                            aria-label={`Precio unitario del ítem ${index + 1}`}
+                          />
+                          {enginePrice !== null && !isManualOverride ? (
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                              sx={{ fontFamily: 'monospace' }}
+                              aria-label='Precio sugerido por el motor de pricing'
+                            >
+                              Sugerido {formatCurrency(enginePrice, currency)}
+                            </Typography>
+                          ) : null}
+                          {isManualOverride && enginePrice !== null ? (
+                            <Stack direction='row' spacing={0.5} alignItems='center'>
+                              <CustomChip round='true' size='small' variant='outlined' color='warning' label='Override' />
+                              <Tooltip title='Volver al precio sugerido'>
+                                <span>
+                                  <IconButton
+                                    size='small'
+                                    onClick={() => updateLine(index, { unitPrice: null })}
+                                    disabled={saving}
+                                    aria-label='Volver al precio sugerido'
+                                  >
+                                    <i className='tabler-refresh' style={{ fontSize: 16 }} />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                            </Stack>
+                          ) : null}
+                        </Stack>
                       </TableCell>
                       <TableCell align='right'>
                         <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 500 }}>
