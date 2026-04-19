@@ -13,6 +13,7 @@ type CanonicalQuoteListRow = {
   quote_id: string
   client_id: string | null
   client_name: string | null
+  business_line_code: string | null
   quote_number: string | null
   quote_date: string | Date | null
   due_date: string | Date | null
@@ -267,6 +268,7 @@ export const listFinanceQuotesFromCanonical = async ({
        COALESCE(q.finance_quote_id, q.quotation_id) AS quote_id,
        q.client_id,
        COALESCE(q.client_name_cache, org.organization_name, org.legal_name) AS client_name,
+       q.business_line_code,
        q.quotation_number AS quote_number,
        q.quote_date,
        q.due_date,
@@ -321,6 +323,7 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        ip.canonical_email AS contact_canonical_email,
        contact_membership.role_label AS contact_role_label,
        COALESCE(q.client_name_cache, org.organization_name, org.legal_name) AS client_name,
+       q.business_line_code,
        q.quotation_number AS quote_number,
        q.quote_date,
        q.due_date,
@@ -1131,6 +1134,7 @@ export const mapCanonicalQuoteListRow = (row: CanonicalQuoteListRow) => ({
   quoteId: String(row.quote_id),
   clientId: row.client_id ? String(row.client_id) : null,
   clientName: row.client_name ? String(row.client_name) : null,
+  businessLineCode: row.business_line_code ? String(row.business_line_code) : null,
   quoteNumber: row.quote_number ? String(row.quote_number) : null,
   quoteDate: row.quote_date ? new Date(String(row.quote_date)).toISOString().slice(0, 10) : null,
   dueDate: row.due_date ? new Date(String(row.due_date)).toISOString().slice(0, 10) : null,
@@ -1173,6 +1177,7 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
       }
     : null,
   clientName: row.client_name ? String(row.client_name) : null,
+  businessLineCode: row.business_line_code ? String(row.business_line_code) : null,
   quoteNumber: row.quote_number ? String(row.quote_number) : null,
   quoteDate: row.quote_date ? new Date(String(row.quote_date)).toISOString().slice(0, 10) : null,
   dueDate: row.due_date ? new Date(String(row.due_date)).toISOString().slice(0, 10) : null,

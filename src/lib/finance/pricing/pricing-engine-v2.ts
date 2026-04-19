@@ -391,6 +391,14 @@ const resolveRoleLine = async ({
   const totalCostUsd = round2(baseUnitCostUsd * totalUnits)
   const totalBillUsd = round2(unitPriceUsd * totalUnits)
 
+  const unitCostOutputCurrency = await convertUsdWithFallback({
+    amountUsd: baseUnitCostUsd,
+    outputCurrency,
+    quoteDate,
+    notes,
+    convertUsdToPricingCurrencyFn: deps.convertUsdToPricingCurrency
+  })
+
   const rolePricingForOutput =
     outputCurrency !== 'USD'
       ? await deps.getCurrentPricing(role.roleId, outputCurrency as never, quoteDate)
@@ -438,7 +446,10 @@ const resolveRoleLine = async ({
     line: {
       lineInput: input,
       costStack: {
+        unitCostUsd: baseUnitCostUsd,
+        unitCostOutputCurrency,
         totalCostUsd,
+        totalCostOutputCurrency: round2(unitCostOutputCurrency * totalUnits),
         breakdown: roleCostBreakdown,
         employmentTypeCode: resolvedEmploymentType?.employmentTypeCode ?? null,
         employmentTypeSource: input.employmentTypeCode ? 'explicit_input' : 'role_default',
@@ -560,6 +571,14 @@ const resolvePersonLine = async ({
   const totalCostUsd = round2(baseUnitCostUsd * totalUnits)
   const totalBillUsd = round2(unitPriceUsd * totalUnits)
 
+  const unitCostOutputCurrency = await convertUsdWithFallback({
+    amountUsd: baseUnitCostUsd,
+    outputCurrency,
+    quoteDate,
+    notes,
+    convertUsdToPricingCurrencyFn: deps.convertUsdToPricingCurrency
+  })
+
   const unitPriceOutputCurrency = await convertUsdWithFallback({
     amountUsd: unitPriceUsd,
     outputCurrency,
@@ -574,7 +593,10 @@ const resolvePersonLine = async ({
     line: {
       lineInput: input,
       costStack: {
+        unitCostUsd: baseUnitCostUsd,
+        unitCostOutputCurrency,
         totalCostUsd,
+        totalCostOutputCurrency: round2(unitCostOutputCurrency * totalUnits),
         breakdown: {
           totalLaborCostTarget: snapshot.totalLaborCostAmount ?? 0,
           directOverheadTarget: snapshot.directOverheadAmount ?? 0,
@@ -710,6 +732,14 @@ const resolveToolLine = async ({
   const totalCostUsd = round2(unitCostUsd * totalUnits)
   const totalBillUsd = round2(unitPriceUsd * totalUnits)
 
+  const unitCostOutputCurrency = await convertUsdWithFallback({
+    amountUsd: unitCostUsd,
+    outputCurrency,
+    quoteDate,
+    notes,
+    convertUsdToPricingCurrencyFn: deps.convertUsdToPricingCurrency
+  })
+
   const unitPriceOutputCurrency = await convertUsdWithFallback({
     amountUsd: unitPriceUsd,
     outputCurrency,
@@ -722,7 +752,10 @@ const resolveToolLine = async ({
     line: {
       lineInput: input,
       costStack: {
+        unitCostUsd,
+        unitCostOutputCurrency,
         totalCostUsd,
+        totalCostOutputCurrency: round2(unitCostOutputCurrency * totalUnits),
         breakdown: {
           proratedCostUsd: tool.proratedCostUsd ?? 0,
           subscriptionAmount: tool.subscriptionAmount ?? 0,
@@ -795,6 +828,14 @@ const resolveDirectCostLine = async ({
   const totalCostUsd = round2(normalizedAmount * quantity)
   const unitPriceUsd = round2(normalizedAmount)
 
+  const unitCostOutputCurrency = await convertUsdWithFallback({
+    amountUsd: normalizedAmount,
+    outputCurrency,
+    quoteDate,
+    notes,
+    convertUsdToPricingCurrencyFn: deps.convertUsdToPricingCurrency
+  })
+
   const unitPriceOutputCurrency = await convertUsdWithFallback({
     amountUsd: unitPriceUsd,
     outputCurrency,
@@ -807,7 +848,10 @@ const resolveDirectCostLine = async ({
     line: {
       lineInput: input,
       costStack: {
+        unitCostUsd: normalizedAmount,
+        unitCostOutputCurrency,
         totalCostUsd,
+        totalCostOutputCurrency: round2(unitCostOutputCurrency * quantity),
         breakdown: {
           directCostUsd: normalizedAmount
         }
@@ -867,9 +911,18 @@ const resolveExplicitAddonLine = async ({
     resourceMonthlyCostUsd
   })
 
+  const unitCostUsd = round2(charge.costUsd)
   const unitBillUsd = round2(charge.amountUsd)
   const totalBillUsd = round2(unitBillUsd * quantity)
-  const totalCostUsd = round2(charge.costUsd * quantity)
+  const totalCostUsd = round2(unitCostUsd * quantity)
+
+  const unitCostOutputCurrency = await convertUsdWithFallback({
+    amountUsd: unitCostUsd,
+    outputCurrency,
+    quoteDate,
+    notes,
+    convertUsdToPricingCurrencyFn: deps.convertUsdToPricingCurrency
+  })
 
   const unitPriceOutputCurrency = await convertUsdWithFallback({
     amountUsd: unitBillUsd,
@@ -883,9 +936,12 @@ const resolveExplicitAddonLine = async ({
     line: {
       lineInput: input,
       costStack: {
+        unitCostUsd,
+        unitCostOutputCurrency,
         totalCostUsd,
+        totalCostOutputCurrency: round2(unitCostOutputCurrency * quantity),
         breakdown: {
-          addonInternalCostUsd: charge.costUsd
+          addonInternalCostUsd: unitCostUsd
         }
       },
       suggestedBillRate: {

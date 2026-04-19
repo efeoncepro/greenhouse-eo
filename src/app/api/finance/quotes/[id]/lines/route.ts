@@ -19,6 +19,7 @@ import {
   type QuotationLineInput,
   type QuotationPricingCurrency
 } from '@/lib/finance/pricing'
+import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
 
@@ -202,55 +203,69 @@ export async function POST(
     }
   }
 
-  const snapshot = await persistQuotationPricing(
-    {
-      quotationId: identity.quotationId,
-      versionNumber: row.current_version,
-      businessLineCode: row.business_line_code,
-      quoteCurrency: (row.currency as QuotationPricingCurrency) || 'CLP',
-      quoteDate,
-      billingFrequency: (row.billing_frequency as QuotationBillingFrequency) || 'one_time',
-      contractDurationMonths: row.contract_duration_months,
-      exchangeRates,
-      exchangeSnapshotDate:
-        row.exchange_snapshot_date instanceof Date
-          ? row.exchange_snapshot_date.toISOString().slice(0, 10)
-          : row.exchange_snapshot_date?.slice(0, 10) ?? null,
-      globalDiscountType: row.global_discount_type as QuotationDiscountType | null,
-      globalDiscountValue:
-        row.global_discount_value != null ? Number(row.global_discount_value) : null,
-      marginTargetPct: row.target_margin_pct != null ? Number(row.target_margin_pct) : null,
-      marginFloorPct: row.margin_floor_pct != null ? Number(row.margin_floor_pct) : null,
-      lineItems: body.lineItems,
-      createdBy: tenant.userId
-    },
-    {
-      createVersion: body.createVersion ?? false,
-      versionNotes: body.createVersion ? 'Line items replaced via API.' : null
-    }
-  )
+  try {
+    const snapshot = await persistQuotationPricing(
+      {
+        quotationId: identity.quotationId,
+        versionNumber: row.current_version,
+        businessLineCode: row.business_line_code,
+        quoteCurrency: (row.currency as QuotationPricingCurrency) || 'CLP',
+        quoteDate,
+        billingFrequency: (row.billing_frequency as QuotationBillingFrequency) || 'one_time',
+        contractDurationMonths: row.contract_duration_months,
+        exchangeRates,
+        exchangeSnapshotDate:
+          row.exchange_snapshot_date instanceof Date
+            ? row.exchange_snapshot_date.toISOString().slice(0, 10)
+            : row.exchange_snapshot_date?.slice(0, 10) ?? null,
+        globalDiscountType: row.global_discount_type as QuotationDiscountType | null,
+        globalDiscountValue:
+          row.global_discount_value != null ? Number(row.global_discount_value) : null,
+        marginTargetPct: row.target_margin_pct != null ? Number(row.target_margin_pct) : null,
+        marginFloorPct: row.margin_floor_pct != null ? Number(row.margin_floor_pct) : null,
+        lineItems: body.lineItems,
+        createdBy: tenant.userId
+      },
+      {
+        createVersion: body.createVersion ?? false,
+        versionNotes: body.createVersion ? 'Line items replaced via API.' : null
+      }
+    )
 
-  return NextResponse.json({
-    quotationId: identity.quotationId,
-    versionNumber: snapshot.versionNumber,
-    totals: snapshot.totals,
-    revenue: snapshot.revenue,
-    marginResolution: snapshot.marginResolution,
-    health: snapshot.health,
-    lineItems: snapshot.lineItems.map(line => ({
-      lineItemId: line.lineItemId ?? null,
-      label: line.label,
-      lineType: line.lineType,
-      quantity: line.quantity,
-      unitCost: line.unitCost,
-      unitPrice: line.unitPrice,
-      subtotalCost: line.subtotalCost,
-      subtotalPrice: line.subtotalPrice,
-      discountAmount: line.discountAmount,
-      subtotalAfterDiscount: line.subtotalAfterDiscount,
-      effectiveMarginPct: line.effectiveMarginPct,
-      recurrenceType: line.recurrenceType,
-      resolutionNotes: line.resolutionNotes
-    }))
-  })
+    return NextResponse.json({
+      quotationId: identity.quotationId,
+      versionNumber: snapshot.versionNumber,
+      totals: snapshot.totals,
+      revenue: snapshot.revenue,
+      marginResolution: snapshot.marginResolution,
+      health: snapshot.health,
+      lineItems: snapshot.lineItems.map(line => ({
+        lineItemId: line.lineItemId ?? null,
+        label: line.label,
+        lineType: line.lineType,
+        quantity: line.quantity,
+        unitCost: line.unitCost,
+        unitPrice: line.unitPrice,
+        subtotalCost: line.subtotalCost,
+        subtotalPrice: line.subtotalPrice,
+        discountAmount: line.discountAmount,
+        subtotalAfterDiscount: line.subtotalAfterDiscount,
+        effectiveMarginPct: line.effectiveMarginPct,
+        recurrenceType: line.recurrenceType,
+        resolutionNotes: line.resolutionNotes
+      }))
+    })
+  } catch (error) {
+    if (isUnpricedQuotationLineItemsError(error)) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          quotationId: identity.quotationId
+        },
+        { status: 422 }
+      )
+    }
+
+    throw error
+  }
 }

@@ -1,5 +1,6 @@
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type {
+  CostComponentBreakdown,
   PricingEngineInputV2,
   PricingLineInputV2,
   PricingLineOutputV2,
@@ -12,6 +13,7 @@ import type { QuoteLineItem, QuoteLineSource } from './QuoteLineItemsEditor'
 const AUTO_PRICED_LINE_TYPES = new Set<PricingV2LineType>(['role', 'person', 'tool', 'overhead_addon'])
 
 export interface QuoteBuilderPricingContext {
+  quoteDate: string
   businessLineCode: string | null
   commercialModel: CommercialModelCode
   countryFactorCode: string
@@ -23,11 +25,14 @@ export interface PersistedQuoteLineItem {
   unit: QuoteLineItem['unit']
   quantity: number
   unitPrice: number
+  manualUnitCost: number | null
   roleCode: string | null
   memberId: string | null
   source: QuoteLineSource | null
   serviceSku: string | null
   metadata: QuoteLineItem['metadata'] | null
+  resolvedCostBreakdown: CostComponentBreakdown | null
+  resolvedCostNotes: string[] | null
 }
 
 const isPopulatedLine = (line: QuoteLineItem) => line.label.trim().length > 0 && line.quantity > 0
@@ -42,6 +47,39 @@ const normalizePositiveNumber = (value: number | null | undefined) => {
 }
 
 const serializePricingLineInput = (input: PricingLineInputV2) => JSON.stringify(input)
+
+const buildResolvedCostBreakdown = (
+  simulationLine: PricingLineOutputV2,
+  outputCurrency: PricingOutputCurrency
+): CostComponentBreakdown => ({
+  salaryComponent: null,
+  employerCosts: null,
+  directOverhead: null,
+  structuralOverhead: null,
+  loadedTotal: simulationLine.costStack.unitCostOutputCurrency,
+  costPerHour:
+    simulationLine.suggestedBillRate.pricingBasis === 'hour'
+      ? simulationLine.costStack.unitCostOutputCurrency
+      : null,
+  sourcePeriod: null,
+  sourceCompensationVersionId: null,
+  sourcePayrollPeriodId: null,
+  fxRateApplied: null,
+  fxRateDate: null,
+  sourceCurrency: outputCurrency,
+  targetCurrency: outputCurrency,
+  snapshotSource: 'pricing_engine_v2',
+  notes: simulationLine.resolutionNotes.join(' | '),
+  pricingV2CostBasisKind: simulationLine.costStack.costBasisKind ?? null,
+  pricingV2CostBasisSourceRef: simulationLine.costStack.costBasisSourceRef ?? null,
+  pricingV2CostBasisSnapshotDate: simulationLine.costStack.costBasisSnapshotDate ?? null,
+  pricingV2CostBasisConfidenceScore: simulationLine.costStack.costBasisConfidenceScore ?? null,
+  pricingV2CostBasisConfidenceLabel: simulationLine.costStack.costBasisConfidenceLabel ?? null,
+  pricingV2UnitCostUsd: simulationLine.costStack.unitCostUsd,
+  pricingV2UnitCostOutputCurrency: simulationLine.costStack.unitCostOutputCurrency,
+  pricingV2TotalCostUsd: simulationLine.costStack.totalCostUsd,
+  pricingV2TotalCostOutputCurrency: simulationLine.costStack.totalCostOutputCurrency
+})
 
 export const lineRequiresSuggestedPrice = (line: QuoteLineItem) => {
   const v2Type = line.metadata?.pricingV2LineType
@@ -125,7 +163,7 @@ export const buildQuotePricingInput = (
     commercialModel: context.commercialModel,
     countryFactorCode: context.countryFactorCode,
     outputCurrency: currency,
-    quoteDate: new Date().toISOString().slice(0, 10),
+    quoteDate: context.quoteDate,
     lines: pricingLines,
     autoResolveAddons: true
   }
@@ -148,6 +186,10 @@ export const buildPersistedQuoteLineItems = ({
     const expectedPricingLine = buildQuotePricingLineInput(line, currency)
     const simulationLine = expectedPricingLine ? simulationLines?.[simulationIndex++] ?? null : null
     const explicitUnitPrice = normalizePositiveNumber(line.unitPrice)
+
+    const resolvedUnitCost = normalizePositiveNumber(
+      simulationLine?.costStack.unitCostOutputCurrency
+    )
 
     const suggestedUnitPrice = normalizePositiveNumber(
       simulationLine?.suggestedBillRate?.unitPriceOutputCurrency
@@ -179,11 +221,20 @@ export const buildPersistedQuoteLineItems = ({
       unit: line.unit,
       quantity: line.quantity,
       unitPrice,
+      manualUnitCost: lineRequiresSuggestedPrice(line) ? (resolvedUnitCost ?? null) : null,
       roleCode: line.roleCode ?? null,
       memberId: line.memberId ?? null,
       source: line.source ?? null,
       serviceSku: line.serviceSku ?? null,
-      metadata: line.metadata ?? null
+      metadata: line.metadata ?? null,
+      resolvedCostBreakdown:
+        lineRequiresSuggestedPrice(line) && simulationLine
+          ? buildResolvedCostBreakdown(simulationLine, currency)
+          : null,
+      resolvedCostNotes:
+        lineRequiresSuggestedPrice(line) && simulationLine
+          ? simulationLine.resolutionNotes
+          : null
     }
   })
 }
