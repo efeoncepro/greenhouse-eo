@@ -828,6 +828,56 @@ export interface GreenhouseCommercialTermsLibrary {
   version: Generated<number>;
 }
 
+export interface GreenhouseCommercialToolProviderCostBasisSnapshots {
+  active_license_count: Generated<number>;
+  active_member_count: Generated<number>;
+  active_wallet_count: Generated<number>;
+  client_id: string | null;
+  confidence_label: Generated<string>;
+  confidence_score: Generated<Numeric>;
+  created_at: Generated<Timestamp>;
+  detail_jsonb: Generated<Json>;
+  fallback_catalog_cost_usd: Numeric | null;
+  finance_expense_count: Generated<number>;
+  freshness_days: Generated<number>;
+  freshness_status: Generated<string>;
+  fx_rate_date: Timestamp | null;
+  fx_rate_to_clp: Numeric | null;
+  latest_observed_expense_date: Timestamp | null;
+  latest_tooling_activity_at: Timestamp | null;
+  materialized_at: Generated<Timestamp>;
+  modeled_subscription_cost_clp: Generated<Numeric>;
+  modeled_usage_cost_clp: Generated<Numeric>;
+  observed_cost_clp: Generated<Numeric>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  provider_id: string;
+  provider_name: string;
+  provider_snapshot_id: string | null;
+  refresh_reason: string | null;
+  resolved_amount: Generated<Numeric>;
+  resolved_amount_clp: Generated<Numeric>;
+  resolved_currency: Generated<string>;
+  snapshot_date: Timestamp;
+  snapshot_id: Generated<string>;
+  snapshot_key: string;
+  snapshot_status: Generated<string>;
+  source_amount: Generated<Numeric>;
+  source_currency: Generated<string>;
+  source_kind: string;
+  source_ref: string | null;
+  space_id: string | null;
+  supplier_id: string | null;
+  tenant_scope_key: Generated<string>;
+  tool_id: string;
+  tool_name: string;
+  tool_sku: string | null;
+  updated_at: Generated<Timestamp>;
+  wallet_count: Generated<number>;
+}
+
 export interface GreenhouseContextContextDocumentQuarantine {
   client_id: string | null;
   context_kind: string | null;
@@ -5428,6 +5478,7 @@ export interface DB {
   "greenhouse_commercial.service_tier_margins": GreenhouseCommercialServiceTierMargins;
   "greenhouse_commercial.service_tool_recipe": GreenhouseCommercialServiceToolRecipe;
   "greenhouse_commercial.terms_library": GreenhouseCommercialTermsLibrary;
+  "greenhouse_commercial.tool_provider_cost_basis_snapshots": GreenhouseCommercialToolProviderCostBasisSnapshots;
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;

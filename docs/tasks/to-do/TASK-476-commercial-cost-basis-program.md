@@ -92,7 +92,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/tasks/to-do/TASK-477-role-cost-assumptions-catalog.md`
-- `docs/tasks/to-do/TASK-478-tool-provider-cost-basis-snapshots.md`
+- `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md`
 - `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md`
 - `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
 - `docs/tasks/to-do/TASK-481-quote-builder-suggested-cost-override-governance.md`

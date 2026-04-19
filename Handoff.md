@@ -56,6 +56,30 @@
 - **Secret provisioning**: publicar `BANXICO_SIE_TOKEN` en GCP Secret Manager + Vercel env (scalar crudo, sin comillas/`\n`) **antes** del flip de MXN. Hasta entonces MXN degrada a Frankfurter → Fawaz Ahmed.
 - **Admin UI** `GET /api/admin/fx/health` opcional para operadores (qué provider está activo, circuit breaker state, últimas corridas) — queda como nice-to-have fuera de scope de este PR.
 
+## Sesion 2026-04-19 — TASK-478 tool/provider cost basis snapshots (Codex)
+
+- **Owner:** Codex
+- **Estado:** complete; branch empujada y merge a `develop` en ejecución
+- **Rama / worktree:** `task/TASK-478-tool-provider-cost-basis-snapshots` en `/Users/jreye/Documents/greenhouse-eo-task-478`
+- **Colisión evitada:** no se tocó el checkout principal porque estaba siendo movido por Claude; esta task se hizo en worktree aislado.
+- **Entregables:**
+  - migración `20260419132037430_task-478-tool-provider-cost-basis-snapshots.sql`
+  - tabla `greenhouse_commercial.tool_provider_cost_basis_snapshots`
+  - helpers `src/lib/commercial-cost-basis/tool-provider-cost-basis.ts` y `tool-provider-cost-basis-reader.ts`
+  - `commercial-cost-worker` scope `tools` ahora materializa `provider_tooling_snapshots` + `tool_provider_cost_basis_snapshots`
+  - `pricing-engine-v2` ahora consume snapshot fino por `toolSku + period` antes de caer al catálogo
+  - `GET /api/finance/suppliers/[id]` expone `providerToolCostBasis`
+- **Verificación ejecutada:**
+  - `pnpm exec vitest run src/lib/finance/pricing/__tests__/pricing-engine-v2.test.ts` ok
+  - `pnpm exec eslint ...` sobre archivos tocados ok
+  - `pnpm exec tsc --noEmit` ok
+  - `pnpm migrate:up --no-check-order` ok con Cloud SQL Proxy en sesión controlada; `src/types/db.d.ts` regenerado
+  - verificación `TASK-462` en `public.pgmigrations` -> ya estaba aplicada; no hubo que rerunearla
+  - `pnpm build` ok
+  - `pnpm lint` ok
+  - `rg -n "new Pool\\(" src | rg -v "src/lib/postgres/client.ts"` -> sin matches
+- **Nota operativa importante:** en este worktree hubo que reemplazar el symlink `node_modules` por un `node_modules` real porque Turbopack rechazaba el symlink fuera de la raíz al correr `pnpm build`.
+
 ## Sesion 2026-04-19 — TASK-483 cerrada con deploy WIF + smoke real (Codex)
 
 - **Owner:** Codex

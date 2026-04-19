@@ -10,6 +10,13 @@
 - Admin endpoint `POST /api/admin/fx/sync-pair` para trigger manual con dry-run default; `scripts/backfill-fx-rates.ts` CLI para backfills históricos.
 - Coverage flip (`manual_only → auto_synced`) queda para PR separado post-24-48h dry-run; el pricing engine sigue emitiendo `fx_fallback` warnings para CLF/COP/MXN/PEN en producción hasta entonces.
 
+### 2026-04-19 — TASK-478 materializa snapshots comerciales finos por herramienta/proveedor
+
+- Nace `greenhouse_commercial.tool_provider_cost_basis_snapshots` como read model reusable por `tool_id + provider_id + period + tenant_scope_key`, con `source_kind`, `source_ref`, `snapshot_date`, freshness, confidence y metadata FX.
+- `commercial-cost-worker` extiende su scope `tools`: ya no refresca solo `provider_tooling_snapshots`, sino tambien el snapshot fino que consume pricing y supplier detail.
+- El pricing engine v2 ahora intenta resolver el costo de una tool desde el snapshot fino del periodo antes de caer al costo/prorrateo crudo de `greenhouse_ai.tool_catalog`.
+- `GET /api/finance/suppliers/[id]` agrega `providerToolCostBasis` para exponer el detalle fino por provider sin recalcular joins pesados on-read.
+
 ### 2026-04-19 — commercial-cost-worker adopta auto-deploy WIF
 
 - Se agrega `.github/workflows/commercial-cost-worker-deploy.yml` para desplegar el worker dedicado de cost basis a Cloud Run usando el baseline GitHub Actions -> WIF -> `github-actions-deployer`, sin llaves estáticas nuevas.

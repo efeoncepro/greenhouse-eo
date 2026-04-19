@@ -9,7 +9,7 @@ Este worker separa del portal web las corridas pesadas que alimentan el programa
 ## Que materializa hoy
 
 - `people` -> refresca `member_capacity_economics`
-- `tools` -> refresca `provider_tooling_snapshots`
+- `tools` -> refresca `provider_tooling_snapshots` + `tool_provider_cost_basis_snapshots`
 - `bundle` -> orquesta `people` + `tools` + `commercial_cost_attribution` + `client_economics`
 
 ## Que aun no implementa
@@ -30,6 +30,9 @@ Cada corrida deja dos rastros:
 2. `greenhouse_commercial.commercial_cost_basis_snapshots`
    - una fila por `scope + period + run`
    - guarda manifest de entrada, resumen, estado y tenant scope asociado
+3. `greenhouse_commercial.tool_provider_cost_basis_snapshots`
+   - una fila por `tool_id + provider_id + period + tenant_scope_key`
+   - guarda costo resuelto, provenance, freshness, confidence y metadata FX
 
 ## Endpoints activos
 

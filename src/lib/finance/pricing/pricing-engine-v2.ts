@@ -21,6 +21,7 @@ import {
   readLatestMemberCapacityEconomicsSnapshot,
   readMemberCapacityEconomicsSnapshot
 } from '@/lib/member-capacity-economics/store'
+import { getPreferredToolProviderCostBasisByToolSku } from '@/lib/commercial-cost-basis/tool-provider-cost-basis-reader'
 
 import { computeAddonChargeUsd, resolvePricingAddons } from './addon-resolver'
 import { classifyTierComplianceFromEntry } from './tier-compliance'
@@ -157,6 +158,7 @@ const defaultPricingEngineV2Dependencies = {
   listOverheadAddons,
   readLatestMemberCapacityEconomicsSnapshot,
   readMemberCapacityEconomicsSnapshot,
+  getPreferredToolProviderCostBasisByToolSku,
   convertUsdToPricingCurrency,
   convertCurrencyAmount,
   resolvePricingAddons,
@@ -178,6 +180,7 @@ export interface PricingEngineV2Dependencies {
   listOverheadAddons: typeof listOverheadAddons
   readLatestMemberCapacityEconomicsSnapshot: typeof readLatestMemberCapacityEconomicsSnapshot
   readMemberCapacityEconomicsSnapshot: typeof readMemberCapacityEconomicsSnapshot
+  getPreferredToolProviderCostBasisByToolSku: typeof getPreferredToolProviderCostBasisByToolSku
   convertUsdToPricingCurrency: typeof convertUsdToPricingCurrency
   convertCurrencyAmount: typeof convertCurrencyAmount
   resolvePricingAddons: typeof resolvePricingAddons
@@ -519,6 +522,7 @@ const resolveToolLine = async ({
 }): Promise<Omit<ResolvedLineAccumulator, 'originalIndex'>> => {
   const notes: string[] = []
   const tool = await deps.getToolBySku(input.toolSku)
+  const quotePeriod = extractQuotePeriod(quoteDate)
 
   if (!tool) {
     throw new Error(`Unknown tool SKU: ${input.toolSku}`)
@@ -527,16 +531,52 @@ const resolveToolLine = async ({
   const quantity = normalizePositiveNumber(input.quantity, 1)
   const periods = normalizePositiveNumber(input.periods, 1)
 
-  const unitCostUsd =
-    tool.proratedCostUsd ??
-    (tool.subscriptionAmount != null && tool.subscriptionCurrency
-      ? await deps.convertCurrencyAmount({
-          amount: tool.subscriptionAmount,
-          fromCurrency: tool.subscriptionCurrency,
-          toCurrency: 'USD',
-          rateDate: quoteDate
-        })
-      : null)
+  const costBasisSnapshot = await deps.getPreferredToolProviderCostBasisByToolSku(input.toolSku, {
+    year: quotePeriod?.year ?? null,
+    month: quotePeriod?.month ?? null
+  })
+
+  let unitCostUsd: number | null = null
+
+  if (costBasisSnapshot && costBasisSnapshot.resolvedAmountClp > 0) {
+    unitCostUsd =
+      costBasisSnapshot.resolvedCurrency === 'USD'
+        ? costBasisSnapshot.resolvedAmount
+        : await deps.convertCurrencyAmount({
+            amount: costBasisSnapshot.resolvedAmount,
+            fromCurrency: costBasisSnapshot.resolvedCurrency,
+            toCurrency: 'USD',
+            rateDate: costBasisSnapshot.snapshotDate
+          })
+
+    if (unitCostUsd != null) {
+      notes.push(
+        `Costo base desde snapshot ${costBasisSnapshot.periodId} (${costBasisSnapshot.sourceKind}, confianza ${costBasisSnapshot.confidenceLabel}).`
+      )
+
+      if (
+        quotePeriod &&
+        (costBasisSnapshot.periodYear !== quotePeriod.year || costBasisSnapshot.periodMonth !== quotePeriod.month)
+      ) {
+        notes.push(
+          `No existía snapshot exacto para ${quotePeriod.year}-${String(quotePeriod.month).padStart(2, '0')}; se reutilizó ${costBasisSnapshot.periodId}.`
+        )
+      }
+    }
+  }
+
+  if (unitCostUsd == null) {
+    unitCostUsd =
+      tool.proratedCostUsd ??
+      (tool.subscriptionAmount != null && tool.subscriptionCurrency
+        ? await deps.convertCurrencyAmount({
+            amount: tool.subscriptionAmount,
+            fromCurrency: tool.subscriptionCurrency,
+            toCurrency: 'USD',
+            rateDate: quoteDate
+          })
+        : null)
+  }
 
   if (unitCostUsd == null) {
     throw new Error(`Missing tool cost for ${input.toolSku}`)
@@ -575,7 +615,8 @@ const resolveToolLine = async ({
         totalCostUsd,
         breakdown: {
           proratedCostUsd: tool.proratedCostUsd ?? 0,
-          subscriptionAmount: tool.subscriptionAmount ?? 0
+          subscriptionAmount: tool.subscriptionAmount ?? 0,
+          snapshotResolvedAmountClp: costBasisSnapshot?.resolvedAmountClp ?? 0
         }
       },
       suggestedBillRate: {

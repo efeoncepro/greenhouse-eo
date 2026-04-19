@@ -994,6 +994,7 @@ Current implemented shape:
 - `greenhouse_ai.tool_catalog` points to `provider_id`
 - `greenhouse_ai.member_tool_licenses`, `credit_wallets` and `credit_ledger` extend the same graph indirectly through tools
 - `greenhouse_serving.provider_tooling_snapshots` materializes provider-centric monthly tooling + finance + payroll exposure
+- `greenhouse_commercial.tool_provider_cost_basis_snapshots` materializes the tool/provider commercial cost basis with provenance, freshness and confidence
 - `greenhouse_serving.provider_tooling_360` exposes the latest provider-centric operational summary
 
 Architectural rule:

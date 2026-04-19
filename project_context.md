@@ -147,6 +147,18 @@
   - endpoints `roles`, `quote repricing` y `margin feedback` quedan reservados como contrato de futuro, no implementados en este corte
   - cualquier worker Cloud Run nuevo que reuse `src/lib/` sin auth interactiva debe replicar el patron esbuild + shims ESM/CJS
 
+## Delta 2026-04-19 TASK-478 agrega snapshots finos de costo comercial por herramienta/proveedor
+
+- Runtime nuevo:
+  - migración `20260419132037430_task-478-tool-provider-cost-basis-snapshots.sql`
+  - tabla `greenhouse_commercial.tool_provider_cost_basis_snapshots`
+  - helpers `src/lib/commercial-cost-basis/tool-provider-cost-basis.ts` y `tool-provider-cost-basis-reader.ts`
+- Contrato operativo:
+  - `provider_tooling_snapshots` sigue resolviendo el agregado provider-level
+  - `tool_provider_cost_basis_snapshots` es la capa fina reusable para pricing y supplier detail
+  - `commercial-cost-worker` scope `tools` materializa ambas capas en batch
+  - el pricing engine v2 intenta primero snapshot fino por `toolSku + period`; solo si no existe vuelve al costo crudo del catálogo
+
 ## Delta 2026-04-17 TASK-345 materializa el bridge canónico de quotations
 
 - `greenhouse_commercial` ya existe físicamente con:

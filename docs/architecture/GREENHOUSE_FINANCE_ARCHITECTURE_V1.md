@@ -58,6 +58,18 @@ Implicación para el backlog:
   - el worker nuevo orquesta people/tools/bundle y publica eventos coarse-grained de periodo; no recalcula metricas ICO inline
   - la siguiente ola (`roles`, `quote repricing`, `margin feedback`) debe acoplarse a este runtime en vez de colgar endpoints pesados nuevos en Vercel
 
+## Delta 2026-04-19 — TASK-478 agrega el read model fino de costo comercial por tool/provider
+
+- `provider_tooling_snapshots` deja de ser la unica capa tools/provider reutilizable: ahora convive con `greenhouse_commercial.tool_provider_cost_basis_snapshots` para granularidad `tool_id + provider_id + period`.
+- Contrato nuevo:
+  - `provider_tooling_snapshots` sigue siendo el agregado mensual provider-level
+  - `tool_provider_cost_basis_snapshots` resuelve costo comercial reusable por herramienta con `source_kind`, `source_ref`, `snapshot_date`, freshness, confidence y metadata FX
+  - el worker `commercial-cost-worker` monta ambos cortes dentro del scope `tools`
+- Regla operativa:
+  - pricing y supplier detail deben preferir este read model fino antes de caer al costo crudo del catálogo
+  - el catálogo `greenhouse_ai.tool_catalog` sigue siendo anchor de identidad/prorrateo, no snapshot ni ledger de costo
+  - las corridas tenant-aware pueden estampar `organization_id` / `client_id` / `space_id`, pero el baseline actual sigue siendo `global` mientras no exista una asignación tool-cost por tenant más precisa en upstreams
+
 ## Delta 2026-04-18 — TASK-464c Tool Catalog + Overhead Addons Foundation
 
 - Finance quotation pricing gana la capa de costos directos y fees complementarios que faltaba para el engine v2:

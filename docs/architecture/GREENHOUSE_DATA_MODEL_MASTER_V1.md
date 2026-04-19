@@ -426,6 +426,10 @@ Current views:
 Current materialized serving tables:
 - `provider_tooling_snapshots` — monthly provider-centric tooling + finance + payroll exposure snapshot
 
+Current commercial cost-basis tables:
+- `commercial_cost_basis_snapshots` — manifest/ledger por `scope + period + run`
+- `tool_provider_cost_basis_snapshots` — snapshot comercial fino por `tool_id + provider_id + period + tenant_scope_key`
+
 Target views (with Finance Slice 2):
 - `income_360` — invoice with client context, payment status, factoring status, collection summary
 

@@ -189,4 +189,162 @@ describe('buildPricingEngineOutputV2', () => {
     ])
     expect(result.aggregateMargin.classification).toBe('healthy')
   })
+
+  it('prefers tool provider cost basis snapshots before falling back to the raw catalog cost', async () => {
+    const result = await buildPricingEngineOutputV2(
+      {
+        businessLineCode: 'wave',
+        commercialModel: 'on_demand',
+        countryFactorCode: 'international_usd',
+        outputCurrency: 'USD',
+        quoteDate: '2026-04-18',
+        lines: [
+          {
+            lineType: 'tool',
+            toolSku: 'EAI-OPENAI-001',
+            quantity: 2,
+            periods: 1
+          }
+        ]
+      },
+      {
+        getCommercialModelMultiplier: vi.fn().mockResolvedValue({
+          modelCode: 'on_demand',
+          modelLabel: 'On-Demand',
+          multiplierPct: 0.1,
+          description: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getCountryPricingFactor: vi.fn().mockResolvedValue({
+          factorCode: 'international_usd',
+          factorLabel: 'International',
+          factorMin: 0.85,
+          factorOpt: 1,
+          factorMax: 1,
+          appliesWhen: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        resolvePricingOutputExchangeRate: vi.fn().mockResolvedValue(1),
+        resolvePricingOutputFxReadiness: vi.fn().mockResolvedValue({
+          fromCurrency: 'USD',
+          toCurrency: 'USD',
+          rateDate: '2026-04-18',
+          domain: 'pricing_output',
+          state: 'supported',
+          rate: 1,
+          rateDateResolved: '2026-04-18',
+          source: 'identity',
+          ageDays: 0,
+          stalenessThresholdDays: 7,
+          composedViaUsd: false,
+          message: 'USD baseline.'
+        }),
+        convertUsdToPricingCurrency: vi.fn().mockImplementation(({ amountUsd }) => Promise.resolve(amountUsd)),
+        convertCurrencyAmount: vi.fn().mockImplementation(({ amount, fromCurrency, toCurrency }) => {
+          if (fromCurrency === 'CLP' && toCurrency === 'USD') {
+            return Promise.resolve(amount / 1000)
+          }
+
+          if (fromCurrency === 'USD' && toCurrency === 'USD') {
+            return Promise.resolve(amount)
+          }
+
+          return Promise.resolve(amount)
+        }),
+        getToolBySku: vi.fn().mockResolvedValue({
+          toolId: 'tool-openai-001',
+          toolSku: 'EAI-OPENAI-001',
+          toolName: 'OpenAI Platform',
+          providerId: 'provider-openai',
+          vendor: 'OpenAI',
+          toolCategory: 'ai_platform',
+          toolSubcategory: null,
+          costModel: 'hybrid',
+          subscriptionAmount: 30,
+          subscriptionCurrency: 'USD',
+          subscriptionBillingCycle: 'monthly',
+          subscriptionSeats: 1,
+          proratingQty: 1,
+          proratingUnit: 'seat',
+          proratedCostUsd: 30,
+          proratedPriceUsd: null,
+          applicableBusinessLines: ['wave'],
+          applicabilityTags: [],
+          includesInAddon: false,
+          notesForQuoting: null,
+          description: null,
+          websiteUrl: null,
+          iconUrl: null,
+          isActive: true,
+          sortOrder: 1,
+          createdAt: '2026-04-18T00:00:00.000Z',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getPreferredToolProviderCostBasisByToolSku: vi.fn().mockResolvedValue({
+          snapshotId: 'EO-TPB-000001',
+          snapshotKey: 'tpb:tool-openai-001:provider-openai:2026-04:global',
+          toolId: 'tool-openai-001',
+          toolSku: 'EAI-OPENAI-001',
+          toolName: 'OpenAI Platform',
+          providerId: 'provider-openai',
+          providerName: 'OpenAI',
+          supplierId: 'supplier-openai',
+          organizationId: null,
+          clientId: null,
+          spaceId: null,
+          tenantScopeKey: 'global',
+          periodYear: 2026,
+          periodMonth: 4,
+          periodId: '2026-04',
+          snapshotDate: '2026-04-18',
+          sourceKind: 'hybrid_modeled',
+          sourceRef: 'tool-openai-001',
+          sourceCurrency: 'CLP',
+          sourceAmount: 20000,
+          resolvedCurrency: 'CLP',
+          resolvedAmount: 20000,
+          resolvedAmountClp: 20000,
+          observedCostClp: 0,
+          modeledSubscriptionCostClp: 12000,
+          modeledUsageCostClp: 8000,
+          fallbackCatalogCostUsd: 30,
+          fxRateToClp: 1000,
+          fxRateDate: '2026-04-18',
+          freshnessDays: 0,
+          freshnessStatus: 'fresh',
+          confidenceScore: 0.82,
+          confidenceLabel: 'high',
+          activeLicenseCount: 3,
+          activeMemberCount: 2,
+          walletCount: 1,
+          activeWalletCount: 1,
+          financeExpenseCount: 0,
+          providerSnapshotId: 'snapshot-openai-2026-04',
+          latestObservedExpenseDate: null,
+          latestToolingActivityAt: '2026-04-18T00:00:00.000Z',
+          snapshotStatus: 'complete',
+          refreshReason: 'test',
+          detail: {},
+          materializedAt: '2026-04-18T00:00:00.000Z',
+          createdAt: '2026-04-18T00:00:00.000Z',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        resolvePricingAddons: vi.fn().mockResolvedValue([]),
+        listOverheadAddons: vi.fn().mockResolvedValue([]),
+        getOverheadAddonBySku: vi.fn(),
+        readLatestMemberCapacityEconomicsSnapshot: vi.fn(),
+        readMemberCapacityEconomicsSnapshot: vi.fn()
+      }
+    )
+
+    expect(result.lines).toHaveLength(1)
+    expect(result.lines[0]?.costStack.totalCostUsd).toBe(40)
+    expect(result.lines[0]?.suggestedBillRate.totalBillUsd).toBe(46)
+    expect(result.lines[0]?.resolutionNotes).toContain(
+      'Costo base desde snapshot 2026-04 (hybrid_modeled, confianza high).'
+    )
+    expect(result.lines[0]?.effectiveMarginPct).toBeCloseTo(0.1304, 4)
+  })
 })

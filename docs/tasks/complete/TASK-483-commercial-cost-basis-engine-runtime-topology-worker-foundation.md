@@ -78,7 +78,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`
 - `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md`
-- `docs/tasks/to-do/TASK-478-tool-provider-cost-basis-snapshots.md`
+- `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md`
 - `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md`
 - `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
 - `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md`

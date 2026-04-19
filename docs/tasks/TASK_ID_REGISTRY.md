@@ -531,7 +531,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-475` | `complete` | Greenhouse FX & Currency Platform Foundation | `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md` |
 | `TASK-476` | `to-do`       | Commercial Cost Basis Program | `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md` |
 | `TASK-477` | `to-do`       | Role Cost Assumptions Catalog & Effective-Dated Modeling | `docs/tasks/to-do/TASK-477-role-cost-assumptions-catalog.md` |
-| `TASK-478` | `to-do`       | Tool & Provider Cost Basis Snapshots | `docs/tasks/to-do/TASK-478-tool-provider-cost-basis-snapshots.md` |
+| `TASK-478` | `complete`    | Tool & Provider Cost Basis Snapshots | `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md` |
 | `TASK-479` | `to-do`       | People Actual Cost + Blended Role Cost Snapshots | `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md` |
 | `TASK-480` | `to-do`       | Pricing Engine Cost Resolver, Provenance & Confidence | `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md` |
 | `TASK-481` | `to-do`       | Quote Builder Suggested Cost UX & Override Governance | `docs/tasks/to-do/TASK-481-quote-builder-suggested-cost-override-governance.md` |

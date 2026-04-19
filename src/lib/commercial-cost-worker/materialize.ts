@@ -9,6 +9,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishPeriodMaterializedEvent } from '@/lib/sync/publish-event'
 import { materializeCommercialCostAttributionForPeriod } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { materializeProviderToolingSnapshotsForPeriod } from '@/lib/providers/provider-tooling-snapshots'
+import { materializeToolProviderCostBasisSnapshotsForPeriod } from '@/lib/commercial-cost-basis/tool-provider-cost-basis'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { materializeMemberCapacityEconomicsForPeriod } from '@/lib/sync/projections/member-capacity-economics'
 
@@ -231,32 +232,43 @@ const materializePeopleScope = async (period: CommercialCostBasisPeriod) => {
   }
 }
 
-const materializeToolsScope = async (period: CommercialCostBasisPeriod, reason: string) => {
+const materializeToolsScope = async (
+  period: CommercialCostBasisPeriod,
+  reason: string,
+  tenantScope: CommercialCostBasisTenantScope
+) => {
   const snapshots = await materializeProviderToolingSnapshotsForPeriod(period.year, period.month, reason)
+
+  const toolProviderSnapshots = await materializeToolProviderCostBasisSnapshotsForPeriod(period.year, period.month, {
+    reason,
+    tenantScope
+  })
 
   await publishCommercialCostBasisEvent({
     scope: 'tools',
     period,
-    snapshotCount: snapshots.length,
+    snapshotCount: toolProviderSnapshots.length,
     payload: {
-      providerSnapshots: snapshots.length
+      providerSnapshots: snapshots.length,
+      toolProviderSnapshots: toolProviderSnapshots.length
     }
   })
 
   return {
-    recordsRead: snapshots.length,
-    recordsWritten: snapshots.length,
+    recordsRead: snapshots.length + toolProviderSnapshots.length,
+    recordsWritten: snapshots.length + toolProviderSnapshots.length,
     recordsFailed: 0,
     eventsPublished: 1,
     summary: {
-      providerSnapshots: snapshots.length
+      providerSnapshots: snapshots.length,
+      toolProviderSnapshots: toolProviderSnapshots.length
     }
   }
 }
 
 const materializeBundleScope = async (period: CommercialCostBasisPeriod, request: CommercialCostBasisRequest) => {
   const people = await materializePeopleScope(period)
-  const tools = await materializeToolsScope(period, `${request.triggerSource}:bundle`)
+  const tools = await materializeToolsScope(period, `${request.triggerSource}:bundle`, request.tenantScope)
 
   const attribution = await materializeCommercialCostAttributionForPeriod(
     period.year,
@@ -278,7 +290,8 @@ const materializeBundleScope = async (period: CommercialCostBasisPeriod, request
     snapshotCount: people.recordsWritten + tools.recordsWritten + attribution.replaced + economicsRecomputed,
     payload: {
       refreshedMembers: people.recordsWritten,
-      providerSnapshots: tools.recordsWritten,
+      providerSnapshots: Number(tools.summary.providerSnapshots ?? 0),
+      toolProviderSnapshots: Number(tools.summary.toolProviderSnapshots ?? 0),
       attributedAllocations: attribution.replaced,
       economicsRecomputed
     }
@@ -291,7 +304,8 @@ const materializeBundleScope = async (period: CommercialCostBasisPeriod, request
     eventsPublished: people.eventsPublished + tools.eventsPublished + 1,
     summary: {
       refreshedMembers: people.recordsWritten,
-      providerSnapshots: tools.recordsWritten,
+      providerSnapshots: Number(tools.summary.providerSnapshots ?? 0),
+      toolProviderSnapshots: Number(tools.summary.toolProviderSnapshots ?? 0),
       attributedAllocations: attribution.replaced,
       economicsRecomputed
     }
@@ -303,7 +317,7 @@ const materializeScopeForPeriod = async (request: CommercialCostBasisRequest, pe
     case 'people':
       return materializePeopleScope(period)
     case 'tools':
-      return materializeToolsScope(period, request.triggerSource)
+      return materializeToolsScope(period, request.triggerSource, request.tenantScope)
     case 'bundle':
       return materializeBundleScope(period, request)
     case 'roles':
