@@ -51,6 +51,40 @@ export interface PipelineSnapshotRow {
   materializedAt: string
 }
 
+export interface DealPipelineSnapshotRow {
+  dealId: string
+  hubspotDealId: string
+  clientId: string | null
+  organizationId: string | null
+  spaceId: string | null
+
+  dealName: string
+  dealstage: string
+  dealstageLabel: string | null
+  pipelineName: string | null
+  dealType: string | null
+
+  amount: number | null
+  amountClp: number | null
+  currency: string | null
+  probabilityPct: number | null
+  closeDate: string | null
+  daysUntilClose: number | null
+  isOpen: boolean
+  isWon: boolean
+
+  dealOwnerEmail: string | null
+
+  latestQuoteId: string | null
+  latestQuoteStatus: string | null
+  quoteCount: number
+  approvedQuoteCount: number
+  totalQuotesAmountClp: number | null
+
+  snapshotSourceEvent: string | null
+  materializedAt: string
+}
+
 export type DriftSeverity = 'aligned' | 'warning' | 'critical'
 
 export interface DriftDrivers {

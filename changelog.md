@@ -1,5 +1,14 @@
 # changelog.md
 
+## 2026-04-19
+
+### 2026-04-19 — TASK-456 materializa el pipeline comercial correcto a grain deal
+
+- Nace `greenhouse_serving.deal_pipeline_snapshots` como projection canónica para forecasting comercial: una fila por deal no borrado, sin duplicar oportunidades por cantidad de quotes.
+- El materializer nuevo `src/lib/commercial-intelligence/deal-pipeline-materializer.ts` resuelve `is_open` / `is_won` desde `greenhouse_commercial.hubspot_deal_pipeline_config`, persiste la `probability_pct` real del deal y agrega rollup de quotes (`latest_quote_id`, `quote_count`, `approved_quote_count`, `total_quotes_amount_clp`).
+- La projection reactiva `deal_pipeline` queda registrada en domain `cost_intelligence` y se refresca tanto por eventos de deal como por eventos de quotation, incluso cuando el evento solo trae `quotationId`.
+- Nuevo reader/API `GET /api/finance/commercial-intelligence/deal-pipeline` expone lectura tenant-safe con filtros por cliente, organización, etapa y estado, lista para TASK-457.
+
 ## 2026-04-18
 
 ### 2026-04-18 — TASK-455 captura snapshot histórico del contexto comercial al enviar cotizaciones

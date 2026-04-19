@@ -1,3 +1,18 @@
+## Delta 2026-04-19 TASK-456 materializa forecasting comercial canónico a grain deal
+
+- Greenhouse ya no debe usar `quotation_pipeline_snapshots` como aproximación del pipeline comercial real cuando la pregunta es forecasting por oportunidad.
+- Runtime nuevo:
+  - migración `20260419003219480_task-456-deal-pipeline-snapshots.sql`
+  - tabla `greenhouse_serving.deal_pipeline_snapshots`
+  - helper `src/lib/commercial-intelligence/deal-pipeline-materializer.ts`
+  - projection reactiva `src/lib/sync/projections/deal-pipeline.ts`
+  - endpoint `GET /api/finance/commercial-intelligence/deal-pipeline`
+- Contrato operativo:
+  - el grain canónico de forecasting comercial pasa a ser deal, no quote
+  - `is_open` / `is_won` deben resolverse desde `greenhouse_commercial.hubspot_deal_pipeline_config`, no desde nombres literales de stage
+  - `probability_pct` puede venir `NULL`; los agregados ponderados deben tratarlo como `0` sin inventar una probabilidad persistida
+  - un deal con `0` quotes sigue siendo una oportunidad válida y debe existir en la projection
+
 ## Delta 2026-04-18 Iconify generated CSS queda endurecido para worktrees y gates locales
 
 - El portal ya no debe asumir que `src/assets/iconify-icons/generated-icons.css` existe solo porque alguna vez corrió `postinstall`.
