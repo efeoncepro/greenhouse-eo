@@ -10,6 +10,7 @@ import { publishQuotationProfitabilityMaterialized } from '@/lib/commercial/quot
 import type { ProjectionDefinition } from '../projection-registry'
 
 export const QUOTATION_PROFITABILITY_TRIGGER_EVENTS = [
+  EVENT_TYPES.quotationIssued,
   EVENT_TYPES.quotationApproved,
   EVENT_TYPES.quotationConverted,
   EVENT_TYPES.quotationPurchaseOrderLinked,

@@ -137,6 +137,8 @@ const QuoteApprovalsPanel = ({
           subheader={
             quotationStatus === 'pending_approval'
               ? `Esperando decisión en ${pending.length} paso${pending.length === 1 ? '' : 's'}`
+              : quotationStatus === 'issued' && steps.length === 0
+                ? 'Esta cotización fue emitida sin requerir aprobación por excepción.'
               : steps.length === 0
                 ? 'Esta cotización no requiere aprobación por excepción.'
                 : 'Historial de decisiones registradas.'
@@ -150,7 +152,7 @@ const QuoteApprovalsPanel = ({
                 disabled={requesting}
                 onClick={onRequestApproval}
               >
-                {requesting ? 'Evaluando…' : 'Evaluar aprobación'}
+                {requesting ? 'Evaluando…' : 'Evaluar excepción'}
               </Button>
             ) : null
           }

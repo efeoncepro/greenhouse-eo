@@ -420,7 +420,7 @@ interface ApprovalDecidedParams {
   decidedBy: string
   conditionLabel: string
   notes?: string | null
-  resultingStatus: 'draft' | 'sent' | 'pending_approval' | null
+  resultingStatus: 'draft' | 'pending_approval' | 'approval_rejected' | 'issued' | null
 }
 
 export const publishQuotationApprovalDecided = async (
@@ -446,23 +446,6 @@ export const publishQuotationApprovalDecided = async (
     client
   )
 
-  if (params.resultingStatus === 'sent' && params.decision === 'approved') {
-    await publishOutboxEvent(
-      {
-        aggregateType: AGGREGATE_TYPES.quotation,
-        aggregateId: params.quotationId,
-        eventType: EVENT_TYPES.quotationSent,
-        payload: {
-          quotationId: params.quotationId,
-          versionNumber: params.versionNumber,
-          sentBy: params.decidedBy,
-          postApproval: true
-        }
-      },
-      client
-    )
-  }
-
   if (params.decision === 'rejected') {
     await publishOutboxEvent(
       {
@@ -482,16 +465,48 @@ export const publishQuotationApprovalDecided = async (
   }
 }
 
+interface QuotationIssuedParams extends DeliveryModelContext {
+  quotationId: string
+  versionNumber: number
+  issuedBy: string
+  postApproval?: boolean
+  emitLegacySent?: boolean
+}
+
 interface QuotationSentParams extends DeliveryModelContext {
   quotationId: string
   versionNumber: number
   sentBy: string
+  postApproval?: boolean
+  emitLegacySent?: boolean
 }
 
-export const publishQuotationSent = async (
-  params: QuotationSentParams,
+export const publishQuotationIssued = async (
+  params: QuotationIssuedParams,
   client?: QueryableClient
 ) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationIssued,
+      payload: {
+        quotationId: params.quotationId,
+        versionNumber: params.versionNumber,
+        issuedBy: params.issuedBy,
+        postApproval: params.postApproval ?? false,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
+      }
+    },
+    client
+  )
+
+  if (params.emitLegacySent === false) {
+    return
+  }
+
   await publishOutboxEvent(
     {
       aggregateType: AGGREGATE_TYPES.quotation,
@@ -500,8 +515,8 @@ export const publishQuotationSent = async (
       payload: {
         quotationId: params.quotationId,
         versionNumber: params.versionNumber,
-        sentBy: params.sentBy,
-        postApproval: false,
+        sentBy: params.issuedBy,
+        postApproval: params.postApproval ?? false,
         pricingModel: params.pricingModel ?? null,
         commercialModel: params.commercialModel ?? null,
         staffingModel: params.staffingModel ?? null
@@ -510,6 +525,24 @@ export const publishQuotationSent = async (
     client
   )
 }
+
+export const publishQuotationSent = async (
+  params: QuotationSentParams,
+  client?: QueryableClient
+) =>
+  publishQuotationIssued(
+    {
+      quotationId: params.quotationId,
+      versionNumber: params.versionNumber,
+      issuedBy: params.sentBy,
+      postApproval: params.postApproval,
+      emitLegacySent: params.emitLegacySent,
+      pricingModel: params.pricingModel,
+      commercialModel: params.commercialModel,
+      staffingModel: params.staffingModel
+    },
+    client
+  )
 
 interface QuotationApprovedParams extends DeliveryModelContext {
   quotationId: string

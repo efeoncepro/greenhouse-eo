@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.25
+> **Version:** 2.26
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-19 — v2.26: TASK-504 separa lifecycle documental de quotations entre borrador, aprobación por excepción y emisión oficial. `greenhouse_commercial.quotations` suma `issued_at`, `issued_by`, `approval_rejected_at` y `approval_rejected_by`; el contrato canónico pasa a `draft | pending_approval | approval_rejected | issued | expired | converted`. Nace el comando `/api/finance/quotes/[id]/issue`; `/send` queda como wrapper de compatibilidad. Cuando la quote cumple policy se emite directo como `issued`; cuando requiere excepción pasa por approval y al aprobarse también termina `issued`. Rechazo ya no vuelve silenciosamente a `draft`, sino que queda explícito en `approval_rejected`. Nuevo evento canónico `commercial.quotation.issued`, mientras `commercial.quotation.sent` se sigue emitiendo como bridge legacy para consumers todavía no migrados. Quote-to-cash, contract lifecycle, HubSpot sync y las proyecciones de pipeline/rentabilidad leen ya el nuevo contrato sin reabrir ambigüedad entre emitir y distribuir.
 > **Updated:** 2026-04-19 — v2.25: TASK-461 introduce `greenhouse_commercial.master_agreements` como umbrella legal reusable y aterriza la lane MSA end-to-end. Nacen `master_agreements`, `clause_library` y `master_agreement_clauses`, con FK real `greenhouse_commercial.contracts.msa_id -> master_agreements(msa_id)` y seed bilingue de cláusulas legales estándar. `contracts-store` deja de filtrar solo por `space_id` y adopta scope híbrido `organization_id OR space_id`, alineando contracts/MSA con el cutover canónico de quotations de TASK-486. Nuevos stores: `master-agreements-store.ts`, `master-agreement-clauses-store.ts`, `contract-tenant-scope.ts`, `msa-events.ts`; nuevos eventos: `commercial.master_agreement.created|updated|clauses_changed` y `commercial.contract.msa_linked`. Nuevas routes: `GET/POST /api/finance/master-agreements`, `GET/PUT /api/finance/master-agreements/[id]`, `GET/PUT /api/finance/master-agreements/[id]/clauses`, CRUD de clause library, `GET/PUT /api/finance/contracts/[id]/msa`, `GET/POST /api/finance/master-agreements/[id]/signature-requests` y webhook `POST /api/webhooks/zapsign`. Asset system extendido con contextos privados `master_agreement_draft` y `master_agreement`; el PDF firmado se persiste en `greenhouse_core.assets` y no queda delegado a URLs efímeras del proveedor. UI nueva: `/finance/master-agreements` y `/finance/master-agreements/[id]`, además de surfacing `msaId/msaNumber/msaTitle` dentro de `/finance/contracts`. ZapSign queda integrado en modo productivo vía `ZAPSIGN_API_TOKEN` + webhook shared secret; sandbox no forma parte del contrato actual porque el token operativo validado corresponde al entorno productivo.
 > **Updated:** 2026-04-19 — v2.23: TASK-486 Canonical Anchor (Organization + Contact). `greenhouse_commercial.quotations` adopta `organization_id` como anchor canónico y suma `contact_identity_profile_id` (FK `greenhouse_core.identity_profiles(profile_id)`). `space_id` y `space_resolution_source` quedan deprecated en el write path del builder y del HubSpot sync (columnas preservadas por compatibilidad con quote-to-cash legacy readers — no drop físico en v1). Tenant scoping de quotes migró de `q.space_id = ANY(...)` a `q.organization_id = ANY(...)` via `resolveFinanceQuoteTenantOrganizationIds`; consumidores actualizados: `listFinanceQuotesFromCanonical`, `getFinanceQuoteDetailFromCanonical`, `listFinanceQuoteLinesFromCanonical`, `pricing-catalog-impact-analysis.loadOpenQuoteRows` + sus 4 preview-impact endpoints. `POST /api/finance/quotes` exige `organizationId` (400 si falta, 404 si la org no existe o está inactiva) y acepta `contactIdentityProfileId` opcional validado contra `person_memberships` activa con `membership_type IN ('client_contact','client_user','contact','billing','partner','advisor')` — `team_member` y `contractor` se excluyen porque no aplican como contacto comercial. `PUT /api/finance/quotes/[id]` replica la validación y permite set/clear del contacto. Nuevo endpoint `GET /api/commercial/organizations/[id]/contacts` devuelve los candidatos filtrados por membership_type + tenant isolation. Quote Builder UI: label "Espacio destinatario" → "Organización (cliente o prospecto)"; segundo dropdown "Contacto" con fetch async al seleccionar la org (ordenado por `is_primary DESC`, marcador "Principal" en el item). HubSpot sync simplificado: `resolveSpaceForCompany` → `resolveOrganizationForCompany`; payload de `quote.synced` deja de llevar `spaceId` (siempre null). Detail response del GET canonical expone objetos `organization` y `contact` completos via join a `identity_profiles` + `person_memberships`. `organization_id` queda NULLABLE a nivel DB (backfill preservó legacy orphans sin data loss); enforcement en la capa API. Follow-up data remediation task cerrará orphans antes de un v2 `SET NOT NULL`. Sinergia: TASK-466 (multi-currency quote send) usará el contrato "org + contact" como pre-requisito mínimo; TASK-481 (Quote Builder Suggested Cost UX) se integra post-TASK-486 sin colisión.
 > **Updated:** 2026-04-19 — v2.24: TASK-477 formaliza `role_modeled` sobre el catálogo real. `sellable_role_cost_components` gana overhead/provenance/confidence (`direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score`) y columnas generadas para loaded cost / confidence label. Nace `greenhouse_commercial.role_modeled_cost_basis_snapshots`, `pricing-engine-v2` consume el lane modelado via reader explícito manteniendo precedencia `role_blended -> role_modeled`, y `commercial-cost-worker` activa `POST /cost-basis/materialize/roles`. El admin pricing catalog reutiliza el mismo drawer de roles para editar overhead y mostrar loaded cost + confidence.
@@ -24,6 +25,37 @@
 > **Updated:** 2026-04-18 — v2.8: TASK-453 canonical deal bridge. Nuevo mirror `greenhouse_commercial.deals` + `hubspot_deal_pipeline_config`, sync cron `/api/cron/hubspot-deals-sync`, bridge desde `greenhouse_crm.deals` hacia canon comercial, helper `resolveDealForQuote()` y eventos `commercial.deal.created|synced|stage_changed|won|lost`. Esto deja explícita la convivencia: `greenhouse_crm.deals` sigue siendo staging/runtime inbound y `greenhouse_commercial.deals` pasa a ser la entidad comercial canónica para forecast y revenue pipeline híbrido.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-19 — TASK-504 Quotation Issuance Lifecycle & Approval-by-Exception
+
+- El lifecycle documental de quotations deja de colapsar emisión, aprobación y distribución en el viejo `sent`:
+  - estados canónicos operativos: `draft | pending_approval | approval_rejected | issued | expired | converted`
+  - `sent` y `approved` quedan como valores legacy tolerados por algunos readers y bridges, no como contrato objetivo del módulo
+- `issued` pasa a representar la versión oficial emitida:
+  - tiene `issued_at` + `issued_by`
+  - conserva snapshot comercial en `sales_context_at_sent` por compatibilidad histórica de naming
+  - habilita PDF, email, share y quote-to-cash sin mutar otra vez el estado documental principal
+- La aprobación queda explícitamente **por excepción**:
+  - `POST /api/finance/quotes/[id]/issue` evalúa margin health + discount health
+  - si no hay excepción, la quote pasa de `draft` a `issued`
+  - si hay excepción, pasa a `pending_approval`, crea approval steps y recién al aprobar todos emite `issued`
+  - si un aprobador rechaza, la quote queda en `approval_rejected` con metadata de rechazo; no vuelve silenciosamente a `draft`
+- Compatibilidad de rutas:
+  - `/api/finance/quotes/[id]/send` se mantiene como wrapper de compatibilidad y delega al comando de issue
+  - las superficies visibles migran el CTA primario de "Enviar" a "Emitir"
+- Compatibilidad de eventos:
+  - nuevo evento canónico `commercial.quotation.issued`
+  - el publisher sigue emitiendo `commercial.quotation.sent` como bridge legacy mientras existan consumers no migrados
+  - approval runtime distingue ahora `issue_requested`, `approval_requested`, `approval_decided`, `approval_rejected` e `issued`
+- Consumers downstream alineados:
+  - quote-to-cash acepta `issued` como precondición canónica de conversión
+  - contract lifecycle usa `issued_at` para derivar start dates sin asumir que `sent_at` es la única evidencia de formalización
+  - pipeline, profitability, deal pipeline, HubSpot outbound y capacity/open quote readers ya mapean `issued` y `approval_rejected` sin reasignar semántica
+- Boundary explícito:
+  - descargar PDF, enviarlo por mail, compartir link o registrar viewed son acciones de distribución/document chain
+  - ninguna de esas acciones redefine por sí sola el lifecycle documental de la cotización
 
 ---
 

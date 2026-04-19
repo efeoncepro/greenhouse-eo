@@ -354,6 +354,7 @@ export const EVENT_TYPES = {
   quotationVersionCreated: 'commercial.quotation.version_created',
   quotationApprovalRequested: 'commercial.quotation.approval_requested',
   quotationApprovalDecided: 'commercial.quotation.approval_decided',
+  quotationIssued: 'commercial.quotation.issued',
   quotationSent: 'commercial.quotation.sent',
   quotationApproved: 'commercial.quotation.approved',
   quotationRejected: 'commercial.quotation.rejected',

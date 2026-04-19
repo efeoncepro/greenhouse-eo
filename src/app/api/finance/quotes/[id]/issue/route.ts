@@ -10,6 +10,22 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
+const resolveErrorStatus = (message: string) => {
+  if (message.includes('not found')) return 404
+
+  if (
+    message.includes('ya fue emitida') ||
+    message.includes('ya fue convertida') ||
+    message.includes('está en aprobación') ||
+    message.includes('Estado inválido') ||
+    message.includes('expirada')
+  ) {
+    return 409
+  }
+
+  return 400
+}
+
 export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -46,24 +62,10 @@ export async function POST(
       actor: { userId: tenant.userId, name: tenant.clientName || tenant.userId }
     })
 
-    return NextResponse.json(result, {
-      headers: {
-        'X-Greenhouse-Compatibility-Route': 'issue'
-      }
-    })
+    return NextResponse.json(result)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'No pudimos emitir la cotización.'
 
-    const status = message.includes('not found')
-      ? 404
-      : message.includes('ya fue emitida') ||
-          message.includes('ya fue convertida') ||
-          message.includes('está en aprobación') ||
-          message.includes('expirada') ||
-          message.includes('Estado inválido')
-        ? 409
-        : 400
-
-    return NextResponse.json({ error: message }, { status })
+    return NextResponse.json({ error: message }, { status: resolveErrorStatus(message) })
   }
 }

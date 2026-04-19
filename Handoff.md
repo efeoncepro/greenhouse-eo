@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-504 quotation issued lifecycle + approval-by-exception (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `task/TASK-504-quotation-issued-lifecycle-approval-by-exception`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-504`
+- **Problema corregido:**
+  - la semántica `draft / sent / approved` mezclaba borrador, emisión oficial, aprobación por excepción y distribución, dejando quotes emitidas visibles como borrador o usando `sent` como alias ambiguo.
+  - el approval runtime rechazado volvía implícitamente a `draft`, y PDF/email/share seguían demasiado acoplados al lifecycle documental.
+- **Solución aplicada:**
+  - migración `20260419212111960_task-504-quotation-issued-lifecycle-approval-by-exception.sql`:
+    - nuevas columnas `issued_at`, `issued_by`, `approval_rejected_at`, `approval_rejected_by`
+    - contrato canónico `draft | pending_approval | approval_rejected | issued | expired | converted`
+    - backfill desde estados legacy y refresh de check constraints/audit actions
+  - nuevo comando `src/lib/commercial/quotation-issue-command.ts` + helper `quotation-issuance.ts`
+    - `POST /api/finance/quotes/[id]/issue` emite directo si no hay excepción o gatilla approval por excepción si corresponde
+    - `/send` queda como wrapper de compatibilidad
+  - approval runtime:
+    - aprobación exitosa emite `issued`
+    - rechazo deja `approval_rejected`
+    - audit trail ahora distingue `issue_requested`, `issued` y `approval_rejected`
+  - downstream alineado:
+    - quote detail, lista, tabs governance, document chain y builder shell
+    - quote-to-cash y contract lifecycle
+    - HubSpot sync/status bridge
+    - projections de pipeline/rentabilidad/deal pipeline y readers de open quotes
+- **Tests / validación:**
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm pg:connect:migrate`
+- **Notas de coordinación:**
+  - `commercial.quotation.sent` se sigue emitiendo como bridge legacy además de `commercial.quotation.issued` para no romper consumers todavía no migrados.
+  - la columna `sales_context_at_sent` se conserva por compatibilidad histórica de naming aunque el lifecycle visible ahora sea `issued`.
+
 ## Sesion 2026-04-19 — Quote detail governance org-first hardening (Codex)
 
 - **Owner:** Codex

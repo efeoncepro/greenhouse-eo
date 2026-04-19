@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional]`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`

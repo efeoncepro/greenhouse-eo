@@ -40,9 +40,12 @@ const ACTION_LABELS: Record<string, { label: string; icon: string; color: string
   terms_changed: { label: 'Términos actualizados', icon: 'tabler-file-text', color: 'info.main' },
   version_created: { label: 'Nueva versión', icon: 'tabler-git-branch', color: 'primary.main' },
   pdf_generated: { label: 'PDF generado', icon: 'tabler-file-download', color: 'info.main' },
+  issue_requested: { label: 'Emisión solicitada', icon: 'tabler-file-check', color: 'warning.main' },
+  issued: { label: 'Cotización emitida', icon: 'tabler-rosette-discount-check', color: 'info.main' },
   sent: { label: 'Enviada', icon: 'tabler-send', color: 'info.main' },
   approval_requested: { label: 'Aprobación solicitada', icon: 'tabler-shield-check', color: 'warning.main' },
   approval_decided: { label: 'Aprobación resuelta', icon: 'tabler-shield', color: 'success.main' },
+  approval_rejected: { label: 'Aprobación rechazada', icon: 'tabler-shield-x', color: 'error.main' },
   po_received: { label: 'OC recibida', icon: 'tabler-receipt', color: 'success.main' },
   hes_received: { label: 'HES recibida', icon: 'tabler-clipboard-check', color: 'success.main' },
   invoice_triggered: { label: 'Facturación', icon: 'tabler-cash', color: 'success.main' },
@@ -77,6 +80,18 @@ const summarizeDetails = (action: string, details: Record<string, unknown>): str
       return `${steps.length} paso(s) pendientes`
     }
 
+    case 'issue_requested': {
+      const approvalRequired = details.approvalRequired === true
+
+      return approvalRequired ? 'La emisión activó aprobación por excepción' : 'Solicitud de emisión registrada'
+    }
+
+    case 'issued': {
+      const postApproval = details.postApproval === true
+
+      return postApproval ? 'Emitida después de aprobar la excepción' : 'Emitida sin aprobación previa'
+    }
+
     case 'approval_decided': {
       const decision = typeof details.decision === 'string' ? details.decision : null
       const label = typeof details.conditionLabel === 'string' ? details.conditionLabel : null
@@ -96,6 +111,12 @@ const summarizeDetails = (action: string, details: Record<string, unknown>): str
       const code = typeof details.templateCode === 'string' ? details.templateCode : null
 
       return code ? `Template ${code}` : null
+    }
+
+    case 'approval_rejected': {
+      const reason = typeof details.notes === 'string' ? details.notes : null
+
+      return reason ? `Se requiere nueva revisión — ${reason}` : 'Se requiere una nueva revisión antes de emitir'
     }
 
     default:

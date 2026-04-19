@@ -21,6 +21,7 @@ import type { ProjectionDefinition } from '../projection-registry'
  */
 export const QUOTATION_HUBSPOT_OUTBOUND_TRIGGER_EVENTS = [
   EVENT_TYPES.quotationCreated,
+  EVENT_TYPES.quotationIssued,
   EVENT_TYPES.quotationSent,
   EVENT_TYPES.quotationApproved,
   EVENT_TYPES.quotationRejected,
@@ -45,6 +46,8 @@ const extractActorId = (payload: Record<string, unknown>): string | null => {
     payload.approved_by,
     payload.sentBy,
     payload.sent_by,
+    payload.issuedBy,
+    payload.issued_by,
     payload.rejectedBy,
     payload.rejected_by
   ]

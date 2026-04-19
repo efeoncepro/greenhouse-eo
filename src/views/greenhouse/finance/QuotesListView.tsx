@@ -51,10 +51,12 @@ interface Quote {
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'primary' | 'secondary' | 'warning' }> = {
   draft: { label: 'Borrador', color: 'secondary' },
   pending_approval: { label: 'En aprobación', color: 'warning' },
+  approval_rejected: { label: 'Revisión requerida', color: 'error' },
+  issued: { label: 'Emitida', color: 'info' },
   sent: { label: 'Enviada', color: 'info' },
-  approved: { label: 'Aprobada', color: 'success' },
+  approved: { label: 'Emitida', color: 'info' },
   accepted: { label: 'Aceptada', color: 'success' },
-  rejected: { label: 'Rechazada', color: 'error' },
+  rejected: { label: 'Revisión requerida', color: 'error' },
   expired: { label: 'Vencida', color: 'secondary' },
   converted: { label: 'Facturada', color: 'primary' }
 }
@@ -63,9 +65,8 @@ const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
   { value: 'draft', label: 'Borradores' },
   { value: 'pending_approval', label: 'En aprobación' },
-  { value: 'sent', label: 'Enviadas' },
-  { value: 'approved', label: 'Aprobadas' },
-  { value: 'rejected', label: 'Rechazadas' },
+  { value: 'approval_rejected', label: 'Revisión requerida' },
+  { value: 'issued', label: 'Emitidas' },
   { value: 'expired', label: 'Vencidas' },
   { value: 'converted', label: 'Facturadas' }
 ]

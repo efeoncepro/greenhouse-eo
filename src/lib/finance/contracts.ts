@@ -11,9 +11,8 @@ export type QuotationLegacyStatus = (typeof QUOTATION_LEGACY_STATUSES)[number]
 export const QUOTATION_CANONICAL_STATUSES = [
   'draft',
   'pending_approval',
-  'sent',
-  'approved',
-  'rejected',
+  'approval_rejected',
+  'issued',
   'expired',
   'converted'
 ] as const

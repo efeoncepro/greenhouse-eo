@@ -22,6 +22,7 @@ interface QuotationRow extends Record<string, unknown> {
   commercial_model: string | null
   staffing_model: string | null
   quote_date: string | Date | null
+  issued_at: string | Date | null
   sent_at: string | Date | null
   approved_at: string | Date | null
   converted_at: string | Date | null
@@ -67,11 +68,13 @@ const deriveStage = (status: string): PipelineStage => {
     case 'pending_approval':
     case 'in_review':
       return 'in_review'
+    case 'issued':
     case 'sent':
       return 'sent'
+    case 'approval_rejected':
     case 'approved':
     case 'accepted':
-      return 'approved'
+      return status === 'approval_rejected' ? 'rejected' : 'approved'
     case 'converted':
       return 'converted'
     case 'rejected':
@@ -101,13 +104,13 @@ const stageEnteredAt = (row: QuotationRow): string | null => {
 
   switch (stage) {
     case 'converted':
-      return toIsoTimestamp(row.converted_at) ?? toIsoTimestamp(row.approved_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.converted_at) ?? toIsoTimestamp(row.approved_at) ?? toIsoTimestamp(row.issued_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'approved':
-      return toIsoTimestamp(row.approved_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.approved_at) ?? toIsoTimestamp(row.issued_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'sent':
-      return toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.issued_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'rejected':
-      return toIsoTimestamp(row.updated_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.updated_at) ?? toIsoTimestamp(row.issued_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'expired':
       return toIsoTimestamp(row.expired_at) ?? toIsoDate(row.expiry_date) ?? toIsoDate(row.quote_date)
     default:
@@ -134,7 +137,7 @@ export const buildPipelineSnapshot = async ({
             status, legacy_status, total_price, total_amount_clp, currency,
             effective_margin_pct, target_margin_pct, business_line_code, pricing_model,
             commercial_model, staffing_model,
-            quote_date, sent_at, approved_at, converted_at, expired_at, expiry_date,
+            quote_date, issued_at, sent_at, approved_at, converted_at, expired_at, expiry_date,
             updated_at
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1
@@ -198,7 +201,7 @@ export const buildPipelineSnapshot = async ({
     currency: quote.currency ? String(quote.currency) : null,
 
     quoteDate: toIsoDate(quote.quote_date),
-    sentAt: toIsoTimestamp(quote.sent_at),
+    sentAt: toIsoTimestamp(quote.issued_at) ?? toIsoTimestamp(quote.sent_at),
     approvedAt: toIsoTimestamp(quote.approved_at),
     expiryDate: expiryIso,
     convertedAt: toIsoTimestamp(quote.converted_at),

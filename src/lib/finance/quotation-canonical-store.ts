@@ -109,13 +109,8 @@ const runQuery = async <T extends Record<string, unknown>>(
   return query<T>(text, values)
 }
 
-const normalizeStatusForFinance = (status: string | null, legacyStatus: string | null) => {
-  if (status === 'approved') {
-    return 'accepted'
-  }
-
-  return legacyStatus || status || 'draft'
-}
+const normalizeStatusForFinance = (status: string | null, legacyStatus: string | null) =>
+  status || legacyStatus || 'draft'
 
 export const resolveFinanceQuoteTenantSpaceIds = async (tenant: TenantContext) => {
   const explicitSpaceId = tenant.spaceId?.trim()
@@ -251,7 +246,7 @@ export const listFinanceQuotesFromCanonical = async ({
 
   if (status) {
     values.push(status)
-    conditions.push(`COALESCE(q.legacy_status, q.status) = $${values.length}`)
+    conditions.push(`(q.status = $${values.length} OR q.legacy_status = $${values.length})`)
   }
 
   if (clientId) {
@@ -983,10 +978,10 @@ export const syncCanonicalFinanceQuote = async ({
        $3,
        $4,
        CASE
-         WHEN q.status = 'accepted' THEN 'approved'
+         WHEN q.status = 'accepted' THEN 'issued'
          WHEN q.status = 'draft' THEN 'draft'
-         WHEN q.status = 'sent' THEN 'sent'
-         WHEN q.status = 'rejected' THEN 'rejected'
+         WHEN q.status = 'sent' THEN 'issued'
+         WHEN q.status = 'rejected' THEN 'approval_rejected'
          WHEN q.status = 'expired' THEN 'expired'
          WHEN q.status = 'converted' THEN 'converted'
          ELSE 'draft'

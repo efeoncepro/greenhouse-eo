@@ -243,10 +243,18 @@ interface BuilderContextState extends QuoteBuilderPricingContext {
 
 const resolveQuoteStatus = (status: string | undefined): QuoteStatus => {
   switch (status) {
+    case 'pending_approval':
+      return 'pending_approval'
+    case 'approval_rejected':
+      return 'approval_rejected'
+    case 'issued':
+      return 'issued'
     case 'sent':
       return 'sent'
     case 'approved':
       return 'approved'
+    case 'converted':
+      return 'converted'
     case 'expired':
       return 'expired'
     default:

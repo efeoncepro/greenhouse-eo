@@ -9,8 +9,7 @@ import {
 } from '@/lib/commercial/governance/approval-steps-store'
 import {
   publishQuotationApprovalDecided,
-  publishQuotationApprovalRequested,
-  publishQuotationApproved
+  publishQuotationApprovalRequested
 } from '@/lib/commercial/quotation-events'
 import {
   checkDiscountHealth,
@@ -222,7 +221,7 @@ export async function POST(
         quotationId: identity.quotationId,
         steps: [],
         approvalRequired: false,
-        message: 'No se cumplió ninguna condición de aprobación. La cotización puede enviarse sin aprobación previa.'
+        message: 'No se cumplió ninguna condición de aprobación. La cotización puede emitirse sin aprobación previa.'
       })
     }
 
@@ -282,13 +281,6 @@ export async function POST(
         notes: body.notes ?? null,
         resultingStatus: decision.quotationNewStatus
       })
-
-      if (decision.quotationNewStatus === 'sent') {
-        await publishQuotationApproved({
-          quotationId: decision.quotationId,
-          approvedBy: tenant.userId
-        })
-      }
 
       return NextResponse.json({
         quotationId: decision.quotationId,

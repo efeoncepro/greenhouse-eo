@@ -625,6 +625,14 @@ export interface GreenhouseCommercialQuotationRenewalReminders {
 
 export interface GreenhouseCommercialQuotations {
   acv: Numeric | null;
+  /**
+   * Timestamp del rechazo por aprobación de excepción para la versión vigente.
+   */
+  approval_rejected_at: Timestamp | null;
+  /**
+   * Actor que rechazó la aprobación por excepción de la versión vigente.
+   */
+  approval_rejected_by: string | null;
   approved_at: Timestamp | null;
   approved_by: string | null;
   arr: Numeric | null;
@@ -666,6 +674,14 @@ export interface GreenhouseCommercialQuotations {
   hubspot_last_synced_at: Timestamp | null;
   hubspot_quote_id: string | null;
   internal_notes: string | null;
+  /**
+   * Timestamp canónico de emisión documental. `sent_at` queda como columna legacy de compatibilidad mientras los consumers migran.
+   */
+  issued_at: Timestamp | null;
+  /**
+   * Actor que emitió la versión documental oficial.
+   */
+  issued_by: string | null;
   legacy_status: string | null;
   margin_floor_pct: Numeric | null;
   mrr: Numeric | null;
@@ -686,7 +702,7 @@ export interface GreenhouseCommercialQuotations {
   quote_date: Timestamp | null;
   revenue_type: Generated<string>;
   /**
-   * Immutable snapshot of lifecycle/deal context captured when the quotation first reaches sent status.
+   * Snapshot histórico del contexto comercial al momento de emisión documental. El nombre del campo queda legacy por compatibilidad con TASK-455.
    */
   sales_context_at_sent: Json | null;
   sent_at: Timestamp | null;

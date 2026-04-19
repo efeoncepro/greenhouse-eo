@@ -1,9 +1,9 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.0
+> **Version:** 3.2
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-19 por Codex (v3.1 — pricing persistence hardening)
+> **Ultima actualizacion:** 2026-04-19 por Codex (v3.2 — issue lifecycle y approval-by-exception)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
@@ -28,9 +28,17 @@
 - **`businessLineCode` vuelve a hidratarse en edit**: el quote canonical detail vuelve a entregar la línea de negocio, así que editar y guardar ya no la pisa a `null`.
 - **Errores de pricing explícitos**: si una línea de catálogo llega sin precio resuelto, create/edit devuelven un `422` con mensaje claro en vez de un `500` vacío.
 
+## Cambios v3.2 (2026-04-19 — emisión oficial + aprobación por excepción)
+
+- **Guardar ya no equivale a emitir**: al guardar una cotización el documento sigue en **Borrador**. El momento oficial ahora es la acción **Emitir cotización**.
+- **`Emitida` es el estado documental correcto**: si la quote cumple política financiera, pasa directo a `Emitida` sin pedir aprobación. Si rompe una regla de excepción, pasa a `En aprobación` y, cuando todos los pasos quedan aprobados, termina también en `Emitida`.
+- **Rechazo explícito**: si Finance o el aprobador rechaza una excepción, la quote queda en **Revisión requerida** (`approval_rejected`). No vuelve silenciosamente a borrador.
+- **PDF / email / share ya no cambian el lifecycle**: descargar el PDF, guardarlo localmente o decidir después si la envías al cliente no cambia el estado documental. Todo eso opera sobre una quote ya emitida.
+- **Nueva versión cuando cambia el contenido oficial**: una quote emitida ya no se edita en el mismo documento. Si necesitas cambiar precio, alcance o condiciones materiales, el flujo correcto es crear una nueva versión.
+
 ## Cambios v2 (2026-04-19)
 
-- **Surfaces full-page**: el cotizador ya no vive en un drawer lateral. Ahora usas `/finance/quotes/new` para crear y `/finance/quotes/[id]/edit` para editar. `/finance/quotes/[id]` queda solo para revisión y governance (approvals, document chain, PDF, send).
+- **Surfaces full-page**: el cotizador ya no vive en un drawer lateral. Ahora usas `/finance/quotes/new` para crear y `/finance/quotes/[id]/edit` para editar. `/finance/quotes/[id]` queda solo para revisión y governance (approvals, document chain, PDF, issue).
 - **Source selector first-class**: 4 cards visibles — **Catálogo** / **Servicio** / **Template** / **Manual**. El patrón "manual-first" del drawer legacy quedó atrás.
 - **Servicios compuestos (EFG-XXX)**: al elegir un servicio empaquetado se auto-expande a múltiples líneas (roles + herramientas) con pricing canónico. Cada línea conserva chip "Servicio EFG-XXX" para trazabilidad.
 - **Provenance chip por línea**: cada línea muestra de dónde salió (`Catálogo` / `Servicio` / `Template` / `Manual`). No se pierde el origen al editarla.
@@ -39,7 +47,7 @@
 
 ## Para qué sirve
 
-El **cotizador** es la pantalla donde cualquier Account Lead arma una cotización y la envía al cliente — sin copiar Excels, sin calcular márgenes a mano y sin adivinar qué cobrar por un diseñador senior dedicado 4 meses en Chile vs México.
+El **cotizador** es la pantalla donde cualquier Account Lead arma una cotización y la emite como propuesta oficial — sin copiar Excels, sin calcular márgenes a mano y sin adivinar qué cobrar por un diseñador senior dedicado 4 meses en Chile vs México.
 
 El cotizador reemplaza la hoja de cálculo. Lo que antes eran 40 minutos de copiar-pegar, ahora son 6 clics. El margen sale bien sin que el Account Lead piense en él, y Finance puede revisar cómo se armó sin pedirle el Excel al comercial.
 
@@ -155,14 +163,14 @@ El subtotal de cada línea respeta el override si existe; si no, usa el cálculo
 
 ## Edit de una cotización existente
 
-El botón **Editar** en el header del detail view (visible solo si el quote está en estado `draft` y el viewer tiene permisos) navega a `/finance/quotes/[id]/edit`. La surface de edit es **la misma shell** que create — mismo layout, mismo source selector, mismos controles. La diferencia es que precarga el quote + líneas existentes.
+El botón **Editar** en el header del detail view (visible solo si el quote está en estado `draft` o `approval_rejected` y el viewer tiene permisos) navega a `/finance/quotes/[id]/edit`. La surface de edit es **la misma shell** que create — mismo layout, mismo source selector, mismos controles. La diferencia es que precarga el quote + líneas existentes.
 
-Si intentas acceder directamente a `/edit` de un quote no editable (estado distinto a `draft` o sin permisos), redirige al detail view con `?denied=edit`.
+Si intentas acceder directamente a `/edit` de un quote no editable (estado distinto a `draft` / `approval_rejected` o sin permisos), redirige al detail view con `?denied=edit`.
 
-`QuoteDetailView` (`/finance/quotes/[id]`) queda exclusivamente para review, governance (approvals, terms, audit, document chain), envío al cliente, PDF, "Guardar como template". **No** contiene edición estructural.
+`QuoteDetailView` (`/finance/quotes/[id]`) queda exclusivamente para review, governance (approvals, terms, audit, document chain), emisión, PDF, "Guardar como template" y acciones de distribución posteriores. **No** contiene edición estructural.
 
 ### 10. Guardar
-El botón **Crear cotización** persiste la quote canónica en PostgreSQL. Se propaga a HubSpot (vía TASK-463) si aplica.
+El botón **Guardar** persiste la quote canónica en PostgreSQL como **Borrador**. Cuando el comercial decide formalizarla usa **Emitir cotización** desde el detail; si la quote cumple policy pasa directo a `Emitida`, y si no, entra a aprobación por excepción. Se propaga a HubSpot (vía TASK-463) si aplica.
 
 ## Qué NO hace (todavía)
 

@@ -47,11 +47,11 @@ const resolveScenario = (
     return { kind: 'approval_in_progress', canConfirm: false }
   }
 
-  if (quotationStatus === 'draft' && healthSummary?.requiresApproval) {
+  if ((quotationStatus === 'draft' || quotationStatus === 'approval_rejected') && healthSummary?.requiresApproval) {
     return { kind: 'needs_approval', canConfirm: true }
   }
 
-  if (quotationStatus === 'approved' || quotationStatus === 'draft' || quotationStatus === 'pending_approval') {
+  if (quotationStatus === 'draft' || quotationStatus === 'approval_rejected') {
     return { kind: 'ready', canConfirm: true }
   }
 
@@ -84,7 +84,7 @@ const QuoteSendDialog = ({
     try {
       await onConfirm()
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'No se pudo enviar la cotización.'
+      const message = err instanceof Error ? err.message : 'No se pudo emitir la cotización.'
 
       setConfirmError(message)
     }
@@ -102,15 +102,15 @@ const QuoteSendDialog = ({
       onClose={handleClose}
       fullWidth
       maxWidth='sm'
-      aria-labelledby='quote-send-dialog-title'
+        aria-labelledby='quote-send-dialog-title'
     >
-      <DialogTitle id='quote-send-dialog-title'>Enviar cotización</DialogTitle>
+      <DialogTitle id='quote-send-dialog-title'>Emitir cotización</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {scenario.kind === 'needs_approval' && (
             <>
               <Alert severity='warning' role='status'>
-                Esta cotización requiere aprobación. Al enviarla se crearán los pasos necesarios y quedará en estado «En aprobación».
+                Esta cotización requiere aprobación. Al solicitar la emisión se crearán los pasos necesarios y quedará en estado «En aprobación».
               </Alert>
               {healthSummary && (
                 <Box>
@@ -138,8 +138,8 @@ const QuoteSendDialog = ({
             <>
               <Alert severity='warning' role='alert'>
                 {pendingApprovalSteps === 1
-                  ? 'Hay 1 paso pendiente de aprobación. Resuélvelo antes de enviar.'
-                  : `Hay ${pendingApprovalSteps} pasos pendientes de aprobación. Resuélvelos antes de enviar.`}
+                  ? 'Hay 1 paso pendiente de aprobación. Resuélvelo antes de emitir.'
+                  : `Hay ${pendingApprovalSteps} pasos pendientes de aprobación. Resuélvelos antes de emitir.`}
               </Alert>
               <Typography variant='body2' color='text.secondary'>
                 Revisa la pestaña «Aprobaciones» para registrar las decisiones requeridas.
@@ -150,7 +150,7 @@ const QuoteSendDialog = ({
           {scenario.kind === 'ready' && (
             <>
               <Alert severity='info' role='status'>
-                La cotización pasará a estado «Enviada» y se registrará en auditoría.
+                La cotización pasará a estado «Emitida» y se registrará en auditoría.
               </Alert>
               {healthSummary && healthSummary.marginPct !== null && (
                 <Box>
@@ -176,7 +176,7 @@ const QuoteSendDialog = ({
 
           {scenario.kind === 'blocked' && (
             <Alert severity='error' role='alert'>
-              La cotización está en un estado que no permite envío. Verifica su ciclo de vida antes de continuar.
+              La cotización está en un estado que no permite emisión. Verifica su ciclo de vida antes de continuar.
             </Alert>
           )}
 
@@ -194,10 +194,10 @@ const QuoteSendDialog = ({
         <Button
           onClick={handleConfirm}
           variant='contained'
-          startIcon={<i className='tabler-send' />}
+          startIcon={<i className='tabler-file-check' />}
           disabled={submitting || !scenario.canConfirm}
         >
-          {submitting ? 'Enviando…' : 'Enviar cotización'}
+          {submitting ? 'Emitiendo…' : 'Emitir cotización'}
         </Button>
       </DialogActions>
     </Dialog>

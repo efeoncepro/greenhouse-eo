@@ -120,9 +120,12 @@ const formatDate = (iso: string | null): string => {
 const QUOTATION_STATUS_META: Record<string, { label: string; color: SemanticColor }> = {
   draft: { label: 'Borrador', color: 'secondary' },
   in_review: { label: 'En revisión', color: 'info' },
-  sent: { label: 'Enviada', color: 'info' },
-  approved: { label: 'Aprobada', color: 'success' },
-  rejected: { label: 'Rechazada', color: 'error' },
+  pending_approval: { label: 'En aprobación', color: 'warning' },
+  approval_rejected: { label: 'Revisión requerida', color: 'error' },
+  issued: { label: 'Emitida', color: 'info' },
+  sent: { label: 'Emitida', color: 'info' },
+  approved: { label: 'Emitida', color: 'info' },
+  rejected: { label: 'Revisión requerida', color: 'error' },
   expired: { label: 'Expirada', color: 'warning' },
   cancelled: { label: 'Cancelada', color: 'secondary' },
   converted: { label: 'Convertida', color: 'success' }

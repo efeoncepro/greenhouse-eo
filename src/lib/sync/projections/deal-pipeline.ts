@@ -17,6 +17,7 @@ export const DEAL_PIPELINE_TRIGGER_EVENTS = [
   EVENT_TYPES.dealLost,
   EVENT_TYPES.quotationCreated,
   EVENT_TYPES.quotationSynced,
+  EVENT_TYPES.quotationIssued,
   EVENT_TYPES.quotationSent,
   EVENT_TYPES.quotationApproved,
   EVENT_TYPES.quotationRejected,

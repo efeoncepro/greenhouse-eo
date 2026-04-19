@@ -57,6 +57,8 @@ interface DealQuoteRollup {
 const ACTIVE_QUOTE_STATUSES = new Set([
   'draft',
   'pending_approval',
+  'approval_rejected',
+  'issued',
   'sent',
   'approved',
   'converted'
@@ -226,7 +228,7 @@ const listQuoteRollupRows = async ({
       q.total_amount_clp AS "totalAmountClp",
       q.created_at AS "createdAt",
       CASE
-        WHEN q.status = 'approved' THEN TRUE
+        WHEN q.status IN ('issued', 'approved') THEN TRUE
         WHEN EXISTS (
           SELECT 1
           FROM greenhouse_commercial.approval_steps AS s
