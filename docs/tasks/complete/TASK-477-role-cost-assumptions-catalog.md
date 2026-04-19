@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Auditada contra repo; requiere ajuste de spec antes de implementar`
-- Rank: `TBD`
+- Status real: `Implementada, mergeada a develop y cerrada documentalmente`
+- Rank: `complete`
 - Domain: `finance`
 - Blocked by: `none`
 - Branch: `task/TASK-477-role-cost-assumptions-catalog`
@@ -142,15 +142,24 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] El catálogo comercial de roles soporta costo modelado effective-dated sin crear un dominio paralelo.
-- [ ] El costo modelado por rol es explicable por componentes y no solo por un valor final.
-- [ ] El engine puede consumir un reader comercial estable para roles sin persona real, con provenance/confidence explícitos.
-- [ ] `role_blended` sigue ganando precedencia sobre `role_modeled` cuando exista evidencia factual para el período.
-- [ ] `POST /cost-basis/materialize/roles` deja de estar reservado y queda implementado sobre `commercial-cost-worker`.
-- [ ] El ownership factual de payroll sigue intacto.
+- [x] El catálogo comercial de roles soporta costo modelado effective-dated sin crear un dominio paralelo.
+- [x] El costo modelado por rol es explicable por componentes y no solo por un valor final.
+- [x] El engine puede consumir un reader comercial estable para roles sin persona real, con provenance/confidence explícitos.
+- [x] `role_blended` sigue ganando precedencia sobre `role_modeled` cuando exista evidencia factual para el período.
+- [x] `POST /cost-basis/materialize/roles` deja de estar reservado y queda implementado sobre `commercial-cost-worker`.
+- [x] El ownership factual de payroll sigue intacto.
 
 ## Verification
 
 - `pnpm lint`
 - `pnpm tsc --noEmit`
 - `pnpm test`
+
+## Completion Notes
+
+- Migración aplicada: `20260419151636951_task-477-role-modeled-cost-basis.sql`
+- Reader/modelado nuevo: `src/lib/commercial-cost-basis/role-modeled-cost-basis.ts`
+- Engine actualizado: `src/lib/finance/pricing/pricing-engine-v2.ts`
+- Worker `roles` activado en `commercial-cost-worker`
+- Admin pricing catalog extendido para overhead, loaded cost, provenance y confidence
+- Mergeado a `develop`: `0ebfd7a1`
