@@ -18,8 +18,10 @@ import type {
   RoleRateSeniorityLevel
 } from './contracts'
 import { resolveLineItemCost } from './costing-engine'
+import { convertCurrencyAmount, getExchangeRateOnOrBefore } from './currency-converter'
 import { aggregateQuotationTotals, computeLineItemTotals } from './line-item-totals'
 import { checkDiscountHealth } from './margin-health'
+import { ensureQuotationLineInputsArePriced } from './quotation-line-input-validation'
 import {
   resolveMarginTarget,
   resolveRevenueMetricConfig
@@ -59,6 +61,10 @@ export interface QuotationLineInput {
   recurrenceType?: LineRecurrenceType
   currency?: QuotationPricingCurrency | null
   notes?: string | null
+  metadata?: {
+    pricingV2LineType?: 'role' | 'person' | 'tool' | 'overhead_addon' | 'direct_cost'
+    sku?: string | null
+  } | null
 }
 
 export interface QuotationPricingInput {
@@ -262,8 +268,29 @@ export const persistQuotationPricing = async (
   input: QuotationPricingInput,
   options: PersistQuotationPricingOptions = {}
 ): Promise<QuotationPricingSnapshot> => {
+  ensureQuotationLineInputsArePriced(input.lineItems)
+
   const snapshot = await buildQuotationPricingSnapshot(input)
   const createVersion = options.createVersion ?? false
+
+  const exchangeRateToClp =
+    input.quoteCurrency === 'CLP'
+      ? 1
+      : await getExchangeRateOnOrBefore({
+          fromCurrency: input.quoteCurrency,
+          toCurrency: 'CLP',
+          rateDate: input.quoteDate
+        })
+
+  const totalAmountClp =
+    input.quoteCurrency === 'CLP'
+      ? snapshot.totals.totalPrice
+      : await convertCurrencyAmount({
+          amount: snapshot.totals.totalPrice,
+          fromCurrency: input.quoteCurrency,
+          toCurrency: 'CLP',
+          rateDate: input.quoteDate
+        })
 
   await withTransaction(async client => {
     await client.query(
@@ -289,6 +316,10 @@ export const persistQuotationPricing = async (
              tcv = $20,
              acv = $21,
              current_version = $22,
+             subtotal = $23,
+             total_amount = $24,
+             total_amount_clp = $25,
+             exchange_rate_to_clp = $26,
              updated_at = CURRENT_TIMESTAMP
          WHERE quotation_id = $1`,
       [
@@ -313,7 +344,11 @@ export const persistQuotationPricing = async (
         snapshot.revenue.arr,
         snapshot.revenue.tcv,
         snapshot.revenue.acv,
-        input.versionNumber
+        input.versionNumber,
+        snapshot.totals.totalPriceBeforeDiscount,
+        snapshot.totals.totalPrice,
+        totalAmountClp,
+        exchangeRateToClp
       ]
     )
 

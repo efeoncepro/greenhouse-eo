@@ -2,6 +2,14 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — Quote Builder persisted pricing hardening
+
+- El Quote Builder deja de guardar líneas auto-valorizadas con `unit_price = 0` cuando el usuario cotiza desde catálogo, personas, tools u overheads. El submit ahora persiste el precio resuelto por el pricing engine v2, no solo el valor manual del draft.
+- Se agrega un guard server-side en `persistQuotationPricing` para rechazar cualquier línea catalog-backed sin precio calculado en vez de dejar cotizaciones corruptas con total y margen en cero.
+- El snapshot comercial sincroniza de nuevo `subtotal`, `total_amount`, `total_amount_clp` y `exchange_rate_to_clp` con `total_price`, reduciendo drift entre el write path canónico y readers legacy que todavía consumen columnas históricas.
+- La lectura canónica de quotes endurece el fallback de `total_amount` para no preferir un `0` stale sobre `total_price` cuando el header quedó desalineado.
+- Se agregan tests de regresión para la serialización del Quote Builder y para la validación de líneas sin precio calculado.
+
 ### 2026-04-19 — EPIC-001 Document Vault + Signature Orchestration Platform
 
 - Nace la primera taxonomía `EPIC-###` del repo: `docs/epics/README.md`, `docs/epics/EPIC_TEMPLATE.md` y `docs/epics/EPIC_ID_REGISTRY.md`.

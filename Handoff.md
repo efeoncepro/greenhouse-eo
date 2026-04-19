@@ -1,5 +1,34 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — Quote Builder persisted pricing hardening (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `fix/codex-quote-persisted-pricing`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-quote-pricing`
+- **Problema corregido:**
+  - el Quote Builder mostraba el precio sugerido del pricing engine v2 en pantalla, pero al guardar serializaba `line.unitPrice ?? 0`, por lo que roles/personas/tools auto-valorizados quedaban persistidos con `unit_price = 0` y la vista de detalle terminaba mostrando montos/margen en cero.
+- **Solución aplicada:**
+  - nuevo helper compartido `src/views/greenhouse/finance/workspace/quote-builder-pricing.ts` para centralizar:
+    - construcción del input al pricing engine
+    - resolución del `unitPrice` persistible usando `simulation.lines`
+    - rechazo de simulaciones stale que ya no corresponden al draft actual
+  - `QuoteBuilderShell.tsx` deja de serializar `unitPrice ?? 0` a ciegas y ahora persiste el precio calculado real para líneas `role`, `person`, `tool` y `overhead_addon`.
+  - nuevo guard server-side `src/lib/finance/pricing/quotation-line-input-validation.ts`: cualquier caller de `persistQuotationPricing` que intente persistir líneas catalog-backed sin precio calculado falla con error explícito en vez de dejar una quote corrupta.
+  - `persistQuotationPricing` ahora sincroniza también `subtotal`, `total_amount`, `total_amount_clp` y `exchange_rate_to_clp` con el snapshot canónico, para no depender de que `total_price` quede huérfano mientras otros readers siguen consumiendo columnas legacy.
+  - `quotation-canonical-store.ts` endurece list/detail para no preferir `total_amount = 0` sobre `total_price` cuando el campo legacy quedó stale.
+- **Tests agregados:**
+  - `src/views/greenhouse/finance/workspace/__tests__/quote-builder-pricing.test.ts`
+  - `src/lib/finance/pricing/__tests__/quotation-line-input-validation.test.ts`
+- **Verificación:**
+  - `pnpm exec vitest run src/views/greenhouse/finance/workspace/__tests__/quote-builder-pricing.test.ts src/lib/finance/pricing/__tests__/quotation-line-input-validation.test.ts`
+  - `pnpm test` (suite completa) → green
+  - `pnpm lint` → green
+  - `pnpm build` → green
+- **Notas de coordinación:**
+  - este fix se hizo en worktree separado para no tocar el checkout principal que sigue con cambios paralelos de UI (`TASK-496`, `data/api_zapsign.txt`, etc.).
+  - el build de Next 16 no toleró `node_modules` symlink fuera del root; en este worktree se resolvió con `pnpm install --frozen-lockfile` local para validar de forma real.
+
 ## Sesion 2026-04-19 — EPIC-001 + taxonomía de epics + programa documental transversal (Codex)
 
 - **Owner:** Codex

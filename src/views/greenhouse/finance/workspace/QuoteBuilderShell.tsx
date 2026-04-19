@@ -19,12 +19,11 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type {
-  PricingEngineInputV2,
-  PricingLineInputV2,
   PricingOutputCurrency,
   PricingV2LineType,
   PricingWarning
 } from '@/lib/finance/pricing/contracts'
+import { UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE } from '@/lib/finance/pricing/quotation-line-input-validation'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 
@@ -54,6 +53,12 @@ import type {
   QuoteCreateOrganization,
   QuoteCreateTemplate
 } from './quote-builder-types'
+import {
+  buildPersistedQuoteLineItems,
+  buildQuotePricingInput,
+  type PersistedQuoteLineItem,
+  type QuoteBuilderPricingContext
+} from './quote-builder-pricing'
 
 export type QuoteBuilderMode = 'create' | 'edit'
 
@@ -91,7 +96,7 @@ export interface QuoteBuilderShellSubmitPayload {
   businessLineCode: string | null
   commercialModel: CommercialModelCode
   countryFactorCode: string
-  lineItems: QuoteLineItem[]
+  lineItems: PersistedQuoteLineItem[]
 }
 
 // TASK-486: contactos canónicos anclables a la cotización.
@@ -163,8 +168,6 @@ const coercePricingModel = (value: string | null | undefined): QuoteBuilderPrici
   return 'project'
 }
 
-const todayIso = (): string => new Date().toISOString().slice(0, 10)
-
 const mapLineTypeFromV2 = (lineType: PricingV2LineType): QuoteLineItem['lineType'] => {
   switch (lineType) {
     case 'role':
@@ -224,7 +227,7 @@ const mapServiceLineToQuoteLine = (
   }
 }
 
-interface BuilderContextState {
+interface BuilderContextState extends QuoteBuilderPricingContext {
   businessLineCode: string | null
   commercialModel: CommercialModelCode
   countryFactorCode: string
@@ -232,79 +235,6 @@ interface BuilderContextState {
   contractDurationMonths: number | null
   validUntil: string | null
   description: string
-}
-
-const buildPricingInput = (
-  builderState: BuilderContextState,
-  currency: PricingOutputCurrency,
-  lines: QuoteLineItem[]
-): PricingEngineInputV2 | null => {
-  const pricingLines: PricingLineInputV2[] = lines
-    .filter(line => line.label.trim().length > 0 && line.quantity > 0)
-    .map(line => {
-      const v2Type = line.metadata?.pricingV2LineType
-      const sku = line.metadata?.sku ?? line.roleCode ?? line.memberId ?? null
-
-      if (v2Type === 'role' && sku) {
-        return {
-          lineType: 'role',
-          roleSku: sku,
-          hours: null,
-          fteFraction: line.metadata?.fteFraction ?? 1,
-          periods: line.metadata?.periods ?? 1,
-          quantity: line.quantity,
-          employmentTypeCode: line.metadata?.employmentTypeCode ?? null
-        }
-      }
-
-      if (v2Type === 'person' && line.memberId) {
-        return {
-          lineType: 'person',
-          memberId: line.memberId,
-          hours: null,
-          fteFraction: line.metadata?.fteFraction ?? 1,
-          periods: line.metadata?.periods ?? 1,
-          quantity: line.quantity
-        }
-      }
-
-      if (v2Type === 'tool' && sku) {
-        return {
-          lineType: 'tool',
-          toolSku: sku,
-          quantity: line.quantity,
-          periods: line.metadata?.periods ?? 1
-        }
-      }
-
-      if (v2Type === 'overhead_addon' && sku) {
-        return {
-          lineType: 'overhead_addon',
-          addonSku: sku,
-          quantity: line.quantity
-        }
-      }
-
-      return {
-        lineType: 'direct_cost',
-        label: line.label.trim(),
-        amount: line.unitPrice ?? 0,
-        currency,
-        quantity: line.quantity
-      }
-    })
-
-  if (pricingLines.length === 0) return null
-
-  return {
-    businessLineCode: builderState.businessLineCode,
-    commercialModel: builderState.commercialModel,
-    countryFactorCode: builderState.countryFactorCode,
-    outputCurrency: currency,
-    quoteDate: todayIso(),
-    lines: pricingLines,
-    autoResolveAddons: true
-  }
 }
 
 const resolveQuoteStatus = (status: string | undefined): QuoteStatus => {
@@ -483,7 +413,7 @@ const QuoteBuilderShell = ({
   const currency = builderState.outputCurrency
 
   const pricingInput = useMemo(
-    () => buildPricingInput(builderState, currency, linesSnapshot),
+    () => buildQuotePricingInput(builderState, currency, linesSnapshot),
     [builderState, currency, linesSnapshot]
   )
 
@@ -694,6 +624,16 @@ const QuoteBuilderShell = ({
         }
       }
 
+      const persistedLineItems = selectedTemplateId
+        ? []
+        : buildPersistedQuoteLineItems({
+            lines: draftLines,
+            currency,
+            simulationLines: simulation?.lines ?? null,
+            missingPriceMessage:
+              simulationError ?? UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE
+          })
+
       if (onSubmit) {
         const result = await onSubmit({
           mode,
@@ -710,7 +650,7 @@ const QuoteBuilderShell = ({
           businessLineCode: builderState.businessLineCode,
           commercialModel: builderState.commercialModel,
           countryFactorCode: builderState.countryFactorCode,
-          lineItems: draftLines
+          lineItems: persistedLineItems
         })
 
         const targetId = result?.quotationId ?? quote?.quotationId ?? null
@@ -736,20 +676,7 @@ const QuoteBuilderShell = ({
             businessLineCode: builderState.businessLineCode,
             commercialModel: builderState.commercialModel,
             contactIdentityProfileId,
-            lineItems: selectedTemplateId
-              ? []
-              : draftLines.map(line => ({
-                  label: line.label,
-                  lineType: line.lineType,
-                  unit: line.unit,
-                  quantity: line.quantity,
-                  unitPrice: line.unitPrice ?? 0,
-                  roleCode: line.roleCode ?? null,
-                  memberId: line.memberId ?? null,
-                  source: line.source ?? null,
-                  serviceSku: line.serviceSku ?? null,
-                  metadata: line.metadata ?? null
-                }))
+            lineItems: persistedLineItems
           })
         })
 
@@ -793,18 +720,7 @@ const QuoteBuilderShell = ({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            lineItems: draftLines.map(line => ({
-              label: line.label,
-              lineType: line.lineType,
-              unit: line.unit,
-              quantity: line.quantity,
-              unitPrice: line.unitPrice ?? 0,
-              roleCode: line.roleCode ?? null,
-              memberId: line.memberId ?? null,
-              source: line.source ?? null,
-              serviceSku: line.serviceSku ?? null,
-              metadata: line.metadata ?? null
-            }))
+            lineItems: persistedLineItems
           })
         })
 
@@ -839,6 +755,8 @@ const QuoteBuilderShell = ({
     currency,
     billingFrequency,
     linesSnapshot,
+    simulation?.lines,
+    simulationError,
     router
   ])
 
