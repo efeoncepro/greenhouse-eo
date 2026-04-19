@@ -1702,3 +1702,85 @@ export const GH_PRICING = {
   errorLoadCatalog: 'No pudimos cargar el catálogo. Intenta de nuevo.',
   errorLoadQuote: 'No pudimos cargar esta cotización. Verifica el enlace e intenta de nuevo.'
 } as const
+
+// ────────────────────────────────────────────────────────────────
+// TASK-457 — Revenue Pipeline comercial (unificado: deals + quotes)
+// ────────────────────────────────────────────────────────────────
+export const GH_PIPELINE_COMMERCIAL = {
+  // Outer tab label (FinanceIntelligenceView)
+  outerTabLabel: 'Pipeline comercial',
+
+  // Sub-tab label (CommercialIntelligenceView)
+  subtabPipelineLabel: 'Pipeline',
+  subtabPipelineDescription:
+    'Oportunidades comerciales activas — deals de HubSpot, contratos standalone y pre-sales.',
+
+  // KPIs
+  kpiOpenPipelineLabel: 'Pipeline abierto',
+  kpiOpenPipelineSubtitle: 'Total de oportunidades activas',
+  kpiOpenPipelineTooltip:
+    'Monto agregado de deals abiertos, contratos vigentes y pre-sales en negociación.',
+
+  kpiWeightedPipelineLabel: 'Pipeline ponderado',
+  kpiWeightedPipelineSubtitle: 'Monto × probabilidad',
+  kpiWeightedPipelineTooltip:
+    'Revenue forecast ajustado por la probabilidad de cada oportunidad.',
+
+  kpiMtdWonLabel: 'Ganado (mes)',
+  kpiMtdWonSubtitle: 'Deals cerrados este mes',
+  kpiMtdWonTooltip:
+    'Suma de montos de deals cerrados como ganados con fecha de cierre en el mes actual.',
+
+  kpiMtdLostLabel: 'Perdido (mes)',
+  kpiMtdLostSubtitle: 'Deals cerrados sin ganar',
+  kpiMtdLostTooltip:
+    'Suma de montos de deals cerrados como perdidos en el mes actual.',
+
+  // Category chips
+  categoryDealLabel: 'Deal',
+  categoryDealDescription: 'Oportunidad activa en HubSpot (deal abierto).',
+  categoryContractLabel: 'Contrato',
+  categoryContractDescription:
+    'Cotización standalone con cliente activo o deal ya ganado (revenue en ejecución).',
+  categoryPreSalesLabel: 'Pre-sales',
+  categoryPreSalesDescription:
+    'Cotización standalone a lead o prospecto en etapa temprana.',
+
+  // Filters
+  filterCategoryLabel: 'Categoría',
+  filterStageLabel: 'Etapa',
+  filterLifecyclestageLabel: 'Estado del cliente',
+  filterBusinessLineLabel: 'Unidad de negocio',
+  filterAllCategories: 'Todas las categorías',
+  filterAllStages: 'Todas las etapas',
+  filterAllLifecycleStages: 'Todos los estados del cliente',
+  filterAllBusinessLines: 'Todas las unidades',
+  filterClearAll: 'Limpiar filtros',
+
+  // Column headers
+  colCategory: 'Categoría',
+  colEntity: 'Oportunidad',
+  colClient: 'Cliente',
+  colStage: 'Etapa',
+  colAmount: 'Monto',
+  colProbability: 'Probabilidad',
+  colCloseDate: 'Vence/Cierra',
+  colQuoteCount: 'Cotizaciones',
+  colAction: 'Acción',
+
+  // Row actions
+  actionView: 'Ver',
+
+  // States
+  loadingText: 'Cargando pipeline...',
+  errorText: 'No pudimos cargar el pipeline. Reintenta o avisa a finance-ops.',
+  emptyTitle: 'Pipeline vacío',
+  emptyDescription:
+    'Aún no hay deals abiertos ni cotizaciones standalone activas.',
+
+  // Onboarding note (Slice 1 precondition): recordatorio al convertir lead → deal
+  presalesOnboardingTitle: 'Recordatorio al convertir leads',
+  presalesOnboardingNote:
+    'Cuando conviertas un lead en deal, asocia la cotización al deal nuevo en HubSpot. Sin ese paso, la cotización queda colgada como pre-sales aunque el lead ya sea customer.',
+  presalesOnboardingDismiss: 'Entendido'
+} as const

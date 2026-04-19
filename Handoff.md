@@ -1,5 +1,40 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-457 UI Revenue Pipeline Hybrid (cierre)
+
+- **Owner:** Claude
+- **Estado:** shipped, pending PR merge
+- **Branch:** `task/TASK-457-ui-revenue-pipeline-hybrid` desde develop con TASK-467 phase-3 + TASK-460 + TASK-471 spec merged
+- **Plan original cerrado**: TASK-457 era la continuación natural de TASK-456 (que Codex shipped). Completa la Ola 4 con valor visible al CEO/Finance (pipeline unificado).
+- **Entregables shipped:**
+  - **Reader** `src/lib/commercial-intelligence/revenue-pipeline-reader.ts` con `listRevenuePipelineUnified()` + types `UnifiedPipelineRow | UnifiedPipelineCategory | RevenuePipelineTotals`
+  - **Endpoint** `GET /api/finance/commercial-intelligence/revenue-pipeline` tenant-scoped con filters `clientId/organizationId/businessLineCode/category/stage/lifecyclestage`
+  - **Classifier** cross-layer: categoría `deal | contract | pre-sales` según reglas explícitas (deal open → deal, deal closedwon → contract, deal closedlost excluido, standalone con lifecyclestage=customer → contract, lifecyclestage=lead/MQL/SQL/opportunity → pre-sales, default → pre-sales conservador)
+  - **Anti-double-counting**: exclusión de "deal open + quote linked" (deviation del spec, documentada — el deal grain ya representa esa oportunidad)
+  - **Totals**: openPipelineClp, weightedPipelineClp, MTD won/lost desde `deal_pipeline_snapshots.close_date >= date_trunc('month', CURRENT_DATE)`, byCategory record
+  - **Componente UI** `PipelineBoardUnified.tsx` con 4 KPIs (`HorizontalWithSubtitle`), filtros MUI dropdown (categoría/etapa/lifecyclestage/BU), tabla 9 columnas, chips por categoría, onboarding Alert dismissible con localStorage persistente
+  - **Refactors**:
+    - `FinanceIntelligenceView.tsx`: outer tab "Cotizaciones" → "Pipeline comercial" (value intacto)
+    - `CommercialIntelligenceView.tsx`: sub-tab "Cotizaciones en curso" (TASK-458 label) → "Pipeline", reemplazó `PipelineTab` legacy con `PipelineBoardUnified`, eliminó Alert de TASK-458. Rentabilidad + Renovaciones intactas
+  - **Copy**: bloque nuevo `GH_PIPELINE_COMMERCIAL` en `greenhouse-nomenclature.ts`
+  - **Tests**: 5/5 passing cubriendo los edge cases del classifier
+  - **Doc funcional** nuevo: `docs/documentation/finance/pipeline-comercial.md`
+  - **Architecture doc** v2.20 con Delta completo
+- **Zero schema change**: todos los snapshots/tables existían (TASK-351/453/454/456)
+- **Gates verdes**:
+  - `pnpm lint` clean
+  - `npx tsc --noEmit` clean
+  - `pnpm test` → 289/289 (194 payroll baseline intacto)
+  - `pnpm build` compiled exit 0 (17.9s)
+  - Zero `new Pool()` rogue
+- **Follow-ups pendientes**:
+  - Drill-down deal → lista de quotes asociadas con document chain
+  - Forecast revenue editable por stage-weighted amounts
+  - Snapshot histórico del pipeline (week-over-week comparison)
+  - Export a Excel/PDF
+  - Widget del pipeline en home ejecutiva
+- **Endpoint legacy `/pipeline` quote-grain**: sigue existiendo por si hay otros consumers. View nuevo ya no lo consume.
+
 ## Sesion 2026-04-19 — TASK-467 phase-3 + TASK-470 spec (cierre del UI de pricing catalog)
 
 - **Owner:** Claude
