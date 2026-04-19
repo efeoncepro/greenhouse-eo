@@ -169,6 +169,13 @@ export const buildQuotePricingInput = (
   }
 }
 
+const describeLine = (line: QuoteLineItem): string => {
+  const sku = line.metadata?.sku ?? line.roleCode ?? line.memberId ?? null
+  const label = line.label.trim().length > 0 ? line.label : 'ítem sin nombre'
+
+  return sku ? `${label} (${sku})` : label
+}
+
 export const buildPersistedQuoteLineItems = ({
   lines,
   currency,
@@ -198,20 +205,24 @@ export const buildPersistedQuoteLineItems = ({
     let unitPrice = normalizeFiniteNumber(line.unitPrice) ?? 0
 
     if (lineRequiresSuggestedPrice(line)) {
-      if (
-        !expectedPricingLine ||
-        !simulationLine ||
-        serializePricingLineInput(simulationLine.lineInput) !== serializePricingLineInput(expectedPricingLine)
-      ) {
-        throw new Error(missingPriceMessage)
-      }
-
+      // El override manual gana sobre el sugerido; si hay un valor positivo explícito,
+      // lo usamos sin mirar la simulación (respeta la intención del comercial).
       if (explicitUnitPrice != null) {
         unitPrice = explicitUnitPrice
-      } else if (suggestedUnitPrice != null) {
-        unitPrice = suggestedUnitPrice
       } else {
-        throw new Error(missingPriceMessage)
+        if (
+          !expectedPricingLine ||
+          !simulationLine ||
+          serializePricingLineInput(simulationLine.lineInput) !== serializePricingLineInput(expectedPricingLine)
+        ) {
+          throw new Error(`${missingPriceMessage} — revisa la línea: ${describeLine(line)}.`)
+        }
+
+        if (suggestedUnitPrice != null) {
+          unitPrice = suggestedUnitPrice
+        } else {
+          throw new Error(`${missingPriceMessage} — revisa la línea: ${describeLine(line)}.`)
+        }
       }
     }
 
