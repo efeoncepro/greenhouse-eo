@@ -1,5 +1,48 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-473 Quote Builder Full-Page Surface Migration (Claude)
+
+- **Owner:** Claude
+- **Estado:** `in-progress` → listo para PR
+- **Rama:** `task/TASK-473-quote-builder-full-page-surface-migration`
+- **Scope respetado:** migración estructural de surfaces. No hay migraciones de schema, no hay backend nuevo. `QuoteCreateDrawer` se mantiene vivo como legacy pero ya no es el flujo principal.
+
+### Entregables
+
+- **Rutas full-page nuevas**:
+  - `GET /finance/quotes/new` — create surface canónica
+  - `GET /finance/quotes/[id]/edit` — edit surface (mismo shell, precarga quote + lines). Redirige a `/finance/quotes/[id]?denied=edit` si el estado no es `draft` o el viewer no puede editar.
+- **Shell reusable**:
+  - `src/views/greenhouse/finance/QuoteBuilderPageView.tsx` — wrapper thin para create + edit
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` (~850 LOC) — core: 2-col layout, `QuoteSourceSelector` + `QuoteLineItemsEditor` main, rail sticky con `QuoteBuilderActions` + `AddonSuggestionsPanel` + `QuoteTotalsFooter`. Submit: POST /api/finance/quotes (create) o PUT /[id] + POST /[id]/lines (edit).
+  - `src/views/greenhouse/finance/workspace/QuoteSourceSelector.tsx` — 4 cards first-class: **Catálogo** / **Servicio** / **Template** / **Manual**. Reemplaza el patrón manual-first del drawer legacy.
+  - `src/views/greenhouse/finance/workspace/QuoteTemplatePickerDrawer.tsx` — drawer para elegir template.
+- **Trazabilidad visual de origen**: `QuoteLineItem` gana `source: 'catalog' | 'service' | 'template' | 'manual'`. Chip outlined por fila. `mapSelectionToLine` etiqueta automáticamente según tab del picker; `makeBlankManualLine()` crea línea vacía. Servicio dispara `POST /api/finance/quotes/from-service` y expande a N líneas con `source: 'service'` + `serviceSku`.
+- **QuoteLineItemsEditor** ahora es `forwardRef<QuoteLineItemsEditorHandle>` con API imperativa `{ appendLines(lines), getDraft() }` para que el shell inyecte líneas desde el source selector sin lift de estado. Nuevo botón "+ Manual" en el quick-add bar.
+- **QuotesListView**: CTA "Nueva cotización" → `router.push('/finance/quotes/new')`. Drawer legacy desmontado del list view.
+- **QuoteDetailView**: nuevo botón "Editar" en header (visible solo si `viewer.canEdit && status==='draft'`) → `/finance/quotes/[id]/edit`.
+- **Copy nuevo** en `GH_PRICING` bajo `builderSources`, `builderSaveAndClose`, `builderCancel`, `builderTemplatePicker*`, validaciones.
+
+### Verificación
+
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → clean
+- `pnpm build` → Compiled successfully en 16.0s; rutas `/finance/quotes/new` y `/finance/quotes/[id]/edit` registradas en el manifest.
+
+### Cross-impact
+
+- **TASK-465** → desbloqueada la integración primaria del picker: las 2 nuevas surfaces consumen `/api/finance/quotes/from-service` y `lookup?type=service`.
+- **TASK-466** / **TASK-475** → desbloqueadas estructuralmente: ya hay surface correcta para montar preview + PDF sobre el builder.
+- **TASK-474** → preparada pero no requerida por ahora; las 4 source cards ya son first-class.
+
+## Sesion 2026-04-19 — TASK-475 creada para foundation FX/currency Greenhouse (Codex)
+
+- **Owner:** Codex
+- **Estado:** backlog/documentación ajustada; sin cambios de runtime
+- **Decisión de programa:** `TASK-466` ya no debe intentar resolver por sí sola la deuda plataforma de multicurrency/Fx. Se crea `TASK-475 — Greenhouse FX & Currency Platform Foundation` para endurecer el contrato de monedas por dominio, coverage/freshness de `greenhouse_finance.exchange_rates` y guardrails shared para quotes/pricing/reporting.
+- **Ajuste asociado:** `TASK-466` queda reanclada explícitamente a `TASK-475` además de `TASK-473`, evitando que un agente futuro implemente multi-currency client-facing sobre supuestos incompletos o ad hoc.
+- **Criterio rector:** solución robusta y escalable; no expandir `FinanceCurrency` ni CLP-normalized consumers a ciegas solo porque quotes quiera vender en más monedas.
+
 
 ## Sesion 2026-04-19 — TASK-465 Service Composition Catalog + Admin UI + Expand API (Claude)
 

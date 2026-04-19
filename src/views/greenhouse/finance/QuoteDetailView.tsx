@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -187,6 +187,7 @@ const fetchViewerContext = async (): Promise<QuoteViewerContext> => {
 
 const QuoteDetailView = () => {
   const params = useParams()
+  const router = useRouter()
   const quoteId = params.id as string
 
   const [loading, setLoading] = useState(true)
@@ -769,6 +770,17 @@ const QuoteDetailView = () => {
             >
               PDF
             </Button>
+            {viewer.canEdit && quote.status === 'draft' && (
+              <Button
+                variant='outlined'
+                size='small'
+                color='primary'
+                startIcon={<i className='tabler-edit' />}
+                onClick={() => router.push(`/finance/quotes/${quoteId}/edit`)}
+              >
+                Editar
+              </Button>
+            )}
             {viewer.canEdit && quote.status === 'draft' && (
               <Button
                 variant='outlined'
