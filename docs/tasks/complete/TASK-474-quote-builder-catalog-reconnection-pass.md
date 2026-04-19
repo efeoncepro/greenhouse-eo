@@ -1,12 +1,31 @@
 # TASK-474 — Quote Builder Catalog / Service Reconnection Pass
 
+## Delta 2026-04-19 — Cerrada sin trabajo incremental (absorbida por TASK-473)
+
+Esta task se creó como red de seguridad para absorber una posible integración UX incompleta entre TASK-465 y TASK-473 que aterrizaban en paralelo. Al cerrar TASK-473 con smoke test autenticado contra staging (agent user `user-agent-e2e-001`), los 4 acceptance criteria quedaron cumplidos en el mismo PR:
+
+| AC | Estado | Evidencia |
+|----|--------|-----------|
+| Builder expone `catálogo`/`servicio`/`template`/`manual` como fuentes explícitas | ✅ | `QuoteSourceSelector.tsx` renderiza 4 cards first-class; HTML de staging `/finance/quotes/new` contiene "Catálogo", "Servicio", "Template", "Manual" |
+| Service composition invocable sin control secundario oculto | ✅ | Card "Servicio" al mismo nivel jerárquico que las otras 3 en `QuoteSourceSelector`. Click → abre `SellableItemPickerDrawer` en tab `services` → `POST /from-service` expande a N líneas |
+| Líneas con trazabilidad visible de origen | ✅ | `QuoteLineItem.source: 'catalog' \| 'service' \| 'template' \| 'manual'` + chip outlined con `SOURCE_META` por fila (both read-only + editable branches en `QuoteLineItemsEditor`) |
+| Editar línea derivada conserva noción de origen | ✅ | Chip de source persiste en modo editable junto a los controles de edición de la fila |
+
+**Verificación staging confirmada (2026-04-19):**
+- `GET /finance/quotes/new` → 200 con labels de source selector presentes
+- `GET /api/finance/quotes/pricing/lookup?type=service` → 200 con 7 servicios EFG-001..007
+- `POST /api/finance/quotes/from-service` con `EFG-001` → 200, expande a 7 líneas (2 roles + 5 tools), pricing engine v2 calcula subtotal $3,890.33 USD, margen 71.2%
+
+**Conclusión:** no existe el gap UX que esta task habría absorbido. El trabajo queda cerrado sin PR incremental. Si aparece un bug específico post-merge en el quote builder, se documenta como `ISSUE-###` en vez de reabrir este scope.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

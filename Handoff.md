@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-474 cerrada sin trabajo incremental (Claude)
+
+- **Owner:** Claude
+- **Estado:** `to-do` → `complete` (sin PR incremental)
+- **Motivo:** TASK-474 era la red de seguridad para absorber una posible integración UX incompleta entre TASK-465 y TASK-473. Tras mergear TASK-473 a develop y deployar a staging, smoke test autenticado con agent user `user-agent-e2e-001` verificó que los 4 AC ya están cumplidos en el PR de TASK-473.
+- **Evidencia:**
+  - `GET /finance/quotes/new` → 200 con labels "Catálogo", "Servicio", "Template", "Manual" presentes en el HTML streaming.
+  - `QuoteSourceSelector.tsx` renderiza 4 source cards first-class (onCatalog/onService/onTemplate/onManual).
+  - `QuoteLineItem.source` + chip outlined por fila en read-only y editable branches de `QuoteLineItemsEditor`.
+  - `POST /api/finance/quotes/from-service` con `EFG-001` → 200 expandiendo a 7 líneas con pricing engine v2 (subtotal $3890.33 USD, margen 71.2%).
+  - `GET /api/finance/quotes/pricing/lookup?type=service` → 200 con los 7 servicios EFG-001..007.
+- **Acción:** archivo movido a `docs/tasks/complete/` con Delta de cierre; README sincronizado. Si aparece un bug específico post-merge en el quote builder, se documenta como `ISSUE-###` en lugar de reabrir este scope.
+
 ## Sesion 2026-04-19 — TASK-473 Quote Builder Full-Page Surface Migration (Claude)
 
 - **Owner:** Claude
