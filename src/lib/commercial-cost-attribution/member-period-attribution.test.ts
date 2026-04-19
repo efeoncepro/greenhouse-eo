@@ -334,6 +334,21 @@ describe('readCommercialCostAttributionForPeriod', () => {
     )
   })
 
+  it('builds the labor allocation query with an explicit table alias to avoid ambiguous client_id joins', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+
+    await readCommercialCostAttributionForPeriod(2026, 6)
+
+    const laborAllocationQuery = String(mockRunGreenhousePostgresQuery.mock.calls[1]?.[0] ?? '')
+
+    expect(laborAllocationQuery).toContain('FROM greenhouse_serving.client_labor_cost_allocation cla')
+    expect(laborAllocationQuery).toContain('cla.client_id')
+    expect(laborAllocationQuery).toContain('ON cb.client_id = cla.client_id')
+    expect(laborAllocationQuery).toContain('WHERE cla.period_year = $1')
+  })
+
   it('reads client summaries directly for a period', async () => {
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([

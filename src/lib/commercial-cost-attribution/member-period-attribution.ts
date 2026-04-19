@@ -205,20 +205,21 @@ export const computeCommercialCostAttributionForPeriod = async (
         ORDER BY s.client_id, s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
       )
       SELECT
-        member_id,
-        client_id,
+        cla.member_id,
+        cla.client_id,
         cb.organization_id,
-        client_name,
-        period_year,
-        period_month,
-        total_fte,
-        fte_contribution,
-        allocated_labor_clp
-      FROM greenhouse_serving.client_labor_cost_allocation
+        cla.client_name,
+        cla.period_year,
+        cla.period_month,
+        cla.total_fte,
+        cla.fte_contribution,
+        cla.allocated_labor_clp
+      FROM greenhouse_serving.client_labor_cost_allocation cla
       LEFT JOIN client_bridge cb
-        ON cb.client_id = greenhouse_serving.client_labor_cost_allocation.client_id
-      WHERE period_year = $1 AND period_month = $2
-        AND allocated_labor_clp IS NOT NULL
+        ON cb.client_id = cla.client_id
+      WHERE cla.period_year = $1
+        AND cla.period_month = $2
+        AND cla.allocated_labor_clp IS NOT NULL
       `,
       [year, month]
     ).catch((error: unknown) => {
