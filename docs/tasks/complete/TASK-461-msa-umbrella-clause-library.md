@@ -11,6 +11,7 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Epic: `EPIC-001`
 - Status real: `Complete`
 - Rank: `TBD`
 - Domain: `finance`
@@ -317,6 +318,12 @@ export const resolveContractClauses = async ({
 - Contract-specific clause overrides UI (hoy solo MSA-level)
 - Additional providers de firma electrónica beyond ZapSign
 - Alerting cuando MSA expira < 90 días
+- `TASK-495` para converger la document chain comercial/legal a la plataforma documental y de firma transversal
+
+## Delta 2026-04-19
+
+- `TASK-461` queda anclada a `EPIC-001` como foundation comercial/legal ya entregada.
+- La continuidad documental y de firma sale del caso especial MSA y se reexpresa en `TASK-495`.
 
 ## Open Questions
 

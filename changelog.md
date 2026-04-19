@@ -2,6 +2,14 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — EPIC-001 Document Vault + Signature Orchestration Platform
+
+- Nace la primera taxonomía `EPIC-###` del repo: `docs/epics/README.md`, `docs/epics/EPIC_TEMPLATE.md` y `docs/epics/EPIC_ID_REGISTRY.md`.
+- Se documenta el contrato operativo de epics en `docs/operations/EPIC_OPERATING_MODEL_V1.md`, incluyendo lifecycle, cuándo usar epics y cómo se conectan con `TASK-###`.
+- Se crea `EPIC-001 — Document Vault + Signature Orchestration Platform` como programa transversal para document registry, versionado, rendering, firma electrónica y gestor documental shared.
+- Quedan reservadas y documentadas las child tasks `TASK-489` a `TASK-495`, que dividen la estrategia en registry/versioning, signature orchestration, adapter ZapSign, UI/access model, rendering/templates, convergencia HR y convergencia Finance/Legal.
+- `TASK-027` y `TASK-461` se reanclan documentalmente a `EPIC-001` para que HR y MSA no evolucionen como soluciones documentales paralelas.
+
 ### 2026-04-19 — TASK-488 Design Tokens + UI Governance Hardening
 
 - **Nuevo doc canónico** `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` como fuente de verdad de design tokens Greenhouse. Documenta typography scale (base 13.125px, h1..overline), spacing 4px base, borderRadius tokens {xs=2, sm=4, md=6, lg=8, xl=10}, icon sizes {14/16/18/20/22}, semantic colors reserved for states, interaction cost caps, 12 anti-patterns detectados + 15 reference patterns con paths a `full-version/`.

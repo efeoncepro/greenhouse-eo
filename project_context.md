@@ -1,3 +1,21 @@
+## Delta 2026-04-19 EPIC-001 introduce taxonomía canónica de epics y el programa documental transversal
+
+- El repo ya no usa solo `umbrella task` para coordinar programas grandes: nace `docs/epics/` con `EPIC-###`, `EPIC_TEMPLATE.md` y `EPIC_ID_REGISTRY.md`.
+- Regla nueva:
+  - `EPIC-###` se usa para programas cross-domain o multi-task
+  - las tasks siguen siendo la unidad ejecutable
+  - una task puede declarar `Epic: EPIC-###` en `## Status`
+- Fuente operativa canónica:
+  - `docs/operations/EPIC_OPERATING_MODEL_V1.md`
+- Primer epic creado:
+  - `EPIC-001 — Document Vault + Signature Orchestration Platform`
+  - child tasks oficiales: `TASK-489` a `TASK-495`
+- Implicación arquitectónica:
+  - la estrategia documental futura del repo deja de fragmentarse por módulo
+  - GCS + `greenhouse_core.assets` sigue siendo la foundation binaria
+  - ZapSign queda posicionado como provider de firma, no como source of truth documental
+  - `TASK-027` (HR) y `TASK-461` (MSA) pasan a considerarse lanes convergentes de un mismo programa
+
 ## Delta 2026-04-19 TASK-461 introduce MSA, clause library y firma electrónica ZapSign para contratos marco
 
 - Runtime nuevo:

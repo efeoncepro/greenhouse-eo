@@ -13,10 +13,12 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Convencion documental vigente:
   - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
   - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
+  - `docs/epics/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/epics/README.md`.
+  - los epics nuevos deben usar ID estable `EPIC-###` y `docs/epics/EPIC_TEMPLATE.md`; sirven para programas cross-domain o multi-task y no reemplazan la ejecucion por tasks.
   - `docs/mini-tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/mini-tasks/README.md`.
   - las mini-tasks nuevas deben usar ID estable `MINI-###` y `docs/mini-tasks/MINI_TASK_TEMPLATE.md`; el modelo operativo vive en `docs/operations/MINI_TASK_OPERATING_MODEL_V1.md`.
   - `docs/tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/tasks/README.md`.
-  - las tasks nuevas deben nacer con ID estable `TASK-###` y usar `docs/tasks/TASK_TEMPLATE.md` como plantilla copiable. El protocolo de ejecucion (Plan Mode, Skill, Subagent, Checkpoint/Mode) vive en `docs/tasks/TASK_PROCESS.md`.
+  - las tasks nuevas deben nacer con ID estable `TASK-###` y usar `docs/tasks/TASK_TEMPLATE.md` como plantilla copiable. Si una task cuelga de un programa mayor, debe declarar `Epic: EPIC-###` en `## Status`. El protocolo de ejecucion (Plan Mode, Skill, Subagent, Checkpoint/Mode) vive en `docs/tasks/TASK_PROCESS.md`.
   - los briefs `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion y deben vivir versionados dentro de `docs/tasks/**`; el patron ignorado en raiz queda solo para scratch local fuera de la taxonomia documental.
 
 ## Prioridades

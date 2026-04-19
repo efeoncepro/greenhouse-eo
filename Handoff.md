@@ -1,5 +1,31 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — EPIC-001 + taxonomía de epics + programa documental transversal (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete` a nivel documental. No hubo cambios de runtime ni de UI.
+- **Scope entregado:**
+  - nueva taxonomía `docs/epics/` con:
+    - `docs/epics/README.md`
+    - `docs/epics/EPIC_TEMPLATE.md`
+    - `docs/epics/EPIC_ID_REGISTRY.md`
+    - `docs/epics/to-do/EPIC-001-document-vault-signature-orchestration-platform.md`
+    - `docs/operations/EPIC_OPERATING_MODEL_V1.md`
+  - nuevas tasks oficiales de `EPIC-001`:
+    - `TASK-489` Document Registry & Versioning Foundation
+    - `TASK-490` Signature Orchestration Foundation
+    - `TASK-491` ZapSign Adapter + Webhook Convergence
+    - `TASK-492` Document Manager, Access Model & UI Foundation
+    - `TASK-493` Document Rendering & Template Catalog Foundation
+    - `TASK-494` HR Document Vault Convergence
+    - `TASK-495` Commercial & Legal Document Chain Convergence
+  - `TASK-027` y `TASK-461` quedan ancladas documentalmente a `EPIC-001`
+- **Notas de coordinación:**
+  - No se tocaron los archivos TSX en curso de Claude (`QuoteBuilderShell`, `QuoteSummaryDock`, etc.).
+  - Las menciones previas en handoff a "`TASK-489 candidate`", "`TASK-490 candidate`" y "`TASK-491 candidate`" dentro de la sesión de TASK-488 eran placeholders informales; desde esta sesión esos IDs quedan oficialmente reservados para el programa documental.
+  - Ya existe un source of truth operativo para epics: lifecycle, uso correcto y relación epic -> task quedaron documentados en `docs/operations/EPIC_OPERATING_MODEL_V1.md`.
+  - No se hizo commit ni push todavía, para no mutar Git mientras el checkout principal tiene cambios vivos de UI en paralelo.
+
 ## Sesion 2026-04-19 — TASK-488 Design Tokens + UI Governance Hardening (Claude)
 
 - **Owner:** Claude

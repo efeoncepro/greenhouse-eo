@@ -542,3 +542,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-486` | `complete`    | Commercial Quotation Canonical Anchor (Organization + Contact) | `docs/tasks/complete/TASK-486-commercial-quotation-canonical-anchor.md` |
 | `TASK-487` | `complete` | Quote Builder Command Bar Redesign (Enterprise Pattern) | `docs/tasks/complete/TASK-487-quote-builder-command-bar-redesign.md` |
 | `TASK-488` | `complete` | Design Tokens + UI Governance Hardening | `docs/tasks/complete/TASK-488-design-tokens-ui-governance-hardening.md` |
+| `TASK-489` | `to-do` | Document Registry & Versioning Foundation | `docs/tasks/to-do/TASK-489-document-registry-versioning-foundation.md` |
+| `TASK-490` | `to-do` | Signature Orchestration Foundation | `docs/tasks/to-do/TASK-490-signature-orchestration-foundation.md` |
+| `TASK-491` | `to-do` | ZapSign Adapter + Webhook Convergence | `docs/tasks/to-do/TASK-491-zapsign-adapter-webhook-convergence.md` |
+| `TASK-492` | `to-do` | Document Manager, Access Model & UI Foundation | `docs/tasks/to-do/TASK-492-document-manager-access-model-ui-foundation.md` |
+| `TASK-493` | `to-do` | Document Rendering & Template Catalog Foundation | `docs/tasks/to-do/TASK-493-document-rendering-template-catalog-foundation.md` |
+| `TASK-494` | `to-do` | HR Document Vault Convergence | `docs/tasks/to-do/TASK-494-hr-document-vault-convergence.md` |
+| `TASK-495` | `to-do` | Commercial & Legal Document Chain Convergence | `docs/tasks/to-do/TASK-495-commercial-legal-document-chain-convergence.md` |
+| `TASK-496` | `in-progress` | Quote Builder Deep Polish Sprint 1 | `docs/tasks/in-progress/TASK-496-quote-builder-deep-polish-sprint-1.md` |

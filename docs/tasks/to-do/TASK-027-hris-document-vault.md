@@ -13,6 +13,7 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Epic: `EPIC-001`
 - Status real: `Diseno rebaselined al runtime 2026`
 - Rank: `TBD`
 - Domain: `hr`
@@ -294,6 +295,11 @@ La implementación puede conservar snapshots de nombre/tamaño/mime para resilie
 - Task rebaselined al runtime actual del repo.
 - Se elimina la lectura legacy de bucket propio, `file_url` y signed URLs de dominio.
 - La task ahora consume explícitamente la foundation shared de `private assets` y convive con `TASK-313`.
+
+## Delta 2026-04-19
+
+- La task queda formalmente anclada a `EPIC-001`.
+- Su ejecución objetivo converge con `TASK-489`, `TASK-492` y `TASK-494` para evitar que HR implemente un vault documental aislado del programa transversal.
 
 ## Open Questions
 
