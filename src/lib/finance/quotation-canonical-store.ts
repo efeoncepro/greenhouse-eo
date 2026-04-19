@@ -57,6 +57,8 @@ type CanonicalQuoteLineRow = {
   line_item_id: string
   quote_id: string
   product_id: string | null
+  tool_id: string | null
+  addon_id: string | null
   source_system: string | null
   line_number: number | null
   name: string
@@ -307,6 +309,8 @@ export const listFinanceQuoteLinesFromCanonical = async ({
        COALESCE(qli.finance_line_item_id, qli.line_item_id) AS line_item_id,
        COALESCE(q.finance_quote_id, q.quotation_id) AS quote_id,
        COALESCE(qli.finance_product_id, pc.finance_product_id, pc.product_id) AS product_id,
+       qli.tool_id,
+       qli.addon_id,
        qli.source_system,
        qli.line_number,
        qli.label AS name,
@@ -748,7 +752,9 @@ const refreshCanonicalQuotationSnapshot = async ({
              'subtotalAfterDiscount', qli.subtotal_after_discount,
              'sourceSystem', qli.source_system,
              'financeProductId', qli.finance_product_id,
-             'productId', qli.product_id
+             'productId', qli.product_id,
+             'toolId', qli.tool_id,
+             'addonId', qli.addon_id
            )
            ORDER BY qli.sort_order ASC, qli.created_at ASC
          ) FILTER (WHERE qli.line_item_id IS NOT NULL),
@@ -1088,6 +1094,8 @@ export const mapCanonicalQuoteLineRow = (row: CanonicalQuoteLineRow) => ({
   lineItemId: String(row.line_item_id),
   quoteId: String(row.quote_id),
   productId: row.product_id ? String(row.product_id) : null,
+  toolId: row.tool_id ? String(row.tool_id) : null,
+  addonId: row.addon_id ? String(row.addon_id) : null,
   source: String(row.source_system || 'manual'),
   lineNumber: row.line_number ? Number(row.line_number) : null,
   name: String(row.name),

@@ -185,6 +185,8 @@ export const createNewVersion = async (
       finance_quote_id: string | null
       product_id: string | null
       finance_product_id: string | null
+      tool_id: string | null
+      addon_id: string | null
       hubspot_line_item_id: string | null
       hubspot_product_id: string | null
       source_system: string
@@ -228,6 +230,7 @@ export const createNewVersion = async (
       await client.query(
         `INSERT INTO greenhouse_commercial.quotation_line_items (
            quotation_id, version_number, product_id, finance_product_id,
+           tool_id, addon_id,
            hubspot_line_item_id, hubspot_product_id, source_system, line_type,
            sort_order, line_number, label, description, member_id, role_code,
            fte_allocation, hours_estimated, unit, quantity, unit_cost,
@@ -237,14 +240,16 @@ export const createNewVersion = async (
            legacy_tax_amount, legacy_total_amount, notes
          ) VALUES (
            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,
-           $17, $18, $19, $20::jsonb, $21, $22, $23, $24, $25, $26, $27, $28, $29,
-           $30, $31, $32, $33, $34
+           $17, $18, $19, $20, $21, $22::jsonb, $23, $24, $25, $26, $27, $28, $29,
+           $30, $31, $32, $33, $34, $35, $36
          )`,
         [
           params.quotationId,
           newVersion,
           line.product_id,
           line.finance_product_id,
+          line.tool_id,
+          line.addon_id,
           line.hubspot_line_item_id,
           line.hubspot_product_id,
           line.source_system,

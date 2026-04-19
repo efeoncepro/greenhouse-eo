@@ -239,6 +239,9 @@ export async function POST(
     health: snapshot.health,
     lineItems: snapshot.lineItems.map(line => ({
       lineItemId: line.lineItemId ?? null,
+      productId: line.productId ?? null,
+      toolId: line.toolId ?? null,
+      addonId: line.addonId ?? null,
       label: line.label,
       lineType: line.lineType,
       quantity: line.quantity,

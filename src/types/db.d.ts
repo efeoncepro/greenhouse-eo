@@ -433,6 +433,7 @@ export interface GreenhouseCommercialQuotationAuditLog {
 }
 
 export interface GreenhouseCommercialQuotationLineItems {
+  addon_id: string | null;
   cost_breakdown: Generated<Json>;
   created_at: Generated<Timestamp>;
   currency: string | null;
@@ -467,6 +468,7 @@ export interface GreenhouseCommercialQuotationLineItems {
   subtotal_after_discount: Numeric | null;
   subtotal_cost: Numeric | null;
   subtotal_price: Numeric | null;
+  tool_id: string | null;
   unit: Generated<string>;
   unit_cost: Numeric | null;
   unit_price: Numeric | null;

@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.19
+> **Version:** 2.20
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-19 — v2.20: `greenhouse_commercial.quotation_line_items` ahora materializa la relación canónica opcional con `greenhouse_ai.tool_catalog` (`tool_id`) y `greenhouse_commercial.overhead_addons` (`addon_id`). La relación es mutuamente excluyente por línea, persiste en snapshots/versiones y se expone en los readers canónicos de Finance para trazabilidad e impacto de catálogo sin depender de metadata ad hoc.
 > **Updated:** 2026-04-19 — v2.19: TASK-467 phase-3 completado. Tab "Modalidades de contrato" del EditSellableRoleDrawer ahora es editable (antes read-only placeholder). Nuevo endpoint `GET/PUT /api/admin/pricing-catalog/roles/[id]/compatibility` con replace atómico via `withTransaction` + validación de no-duplicados, exactly-1-default + default-must-be-allowed + employment_types existentes/activos. Audit emit con `compatibility_updated + employment_types_allowed + default_employment_type`. Split conceptual materializado: TASK-467 cerrada (UI self-service completa); TASK-470 abierto (backend enterprise hardening — optimistic locking + business constraint validator + impact analysis + overcommit detector).
 > **Updated:** 2026-04-19 — v2.18: TASK-467 phase-2 completado. Edit drawers con tabs para roles (Info / Modalidades / Componentes de costo / Pricing por moneda), edit drawers completos para tools y overheads, admin UI de employment types (list + create + edit drawer), audit timeline page (`/admin/pricing-catalog/audit-log`) con MUI Lab Timeline + filtros por entidad/actor. 3 endpoints nuevos: `/roles/[id]/cost-components`, `/roles/[id]/pricing`, extensión de `/governance` para `type: 'employment_type'`. Home pricing catalog actualizada con counts reales y link a audit-log. **Sinergia FTE resuelta**: `SellableRoleSeedRow` extendido con `feeEorUsd?` y `hoursPerFteMonth?` opcionales; `insertCostComponentsIfChanged` deja de hardcodear 0/180 y los usa del seedRow con defaults back-compat. El pricing engine v2 ya consumía `hours_per_fte_month` como fallback del `fte_hours_guide` y divisor de hourly cost — ahora el admin UI puede overridearlo per-role. Dos capas FTE claramente distintas (capacity operacional `CAPACITY_HOURS_PER_FTE=160h` del módulo Agency Team vs billable `fte_hours_guide` + override per-role) coordinadas explícitamente via el override.
 > **Updated:** 2026-04-19 — v2.19: TASK-460 contract/SOW canonical entity. `greenhouse_commercial.contracts` nace como anchor post-sale tenant-safe con tabla join `contract_quotes`, `contract_id` propagado a `purchase_orders`, `service_entry_sheets` e `income`, API `/api/finance/contracts/**`, detail UI en `/finance/contracts`, materialización `contract_profitability_snapshots` y sweep `contract_renewal_reminders`. La convivencia `quotation_id + contract_id` queda explícita durante la transición; MSA sigue diferida a TASK-461.
@@ -212,6 +213,7 @@ Downstream lifecycle (sent/approved/rejected/version_created) disparan la misma 
   - `scripts/seed-overhead-addons.ts` consume `overhead-addons.csv` y deja `9` rows sembradas
   - rerun idempotente verificado (`0 inserted / 0 updated` en ambos)
 - Coexistencia:
+  - `quotation_line_items` puede referenciar directamente una herramienta (`tool_id`) o un addon (`addon_id`) cuando la línea representa catálogo comercial y no un producto clásico
   - AI tooling readers y `provider_tooling_snapshots` siguen usando `greenhouse_ai.tool_catalog`
   - `TASK-464d` toma este catálogo extendido como foundation del engine, no reinterpreta CSVs ni reconstruye tooling
 
@@ -881,6 +883,8 @@ CREATE TABLE greenhouse_commercial.quotation_line_items (
 
   -- Origen
   product_id           TEXT REFERENCES greenhouse_commercial.product_catalog(product_id),
+  tool_id              TEXT REFERENCES greenhouse_ai.tool_catalog(tool_id),
+  addon_id             TEXT REFERENCES greenhouse_commercial.overhead_addons(addon_id),
   hubspot_line_item_id TEXT,                -- sync bidireccional
   line_type            TEXT NOT NULL CHECK (line_type IN ('person', 'role', 'deliverable', 'direct_cost')),
   sort_order           INTEGER NOT NULL DEFAULT 0,
@@ -931,6 +935,8 @@ CREATE TABLE greenhouse_commercial.quotation_line_items (
 );
 
 CREATE INDEX idx_qli_quotation ON greenhouse_commercial.quotation_line_items (quotation_id, version_number);
+CREATE INDEX idx_qli_tool ON greenhouse_commercial.quotation_line_items (tool_id) WHERE tool_id IS NOT NULL;
+CREATE INDEX idx_qli_addon ON greenhouse_commercial.quotation_line_items (addon_id) WHERE addon_id IS NOT NULL;
 ```
 
 ### 3.7. Purchase orders (OC)

@@ -1,3 +1,12 @@
+## Delta 2026-04-19 Quote lines ya pueden referenciar tool catalog y overhead addons de forma canónica
+
+- `greenhouse_commercial.quotation_line_items` ahora materializa `tool_id` y `addon_id` como anchors opcionales para líneas de catálogo comercial.
+- Contrato operativo:
+  - una línea puede apuntar a `product_id`, o a `tool_id`, o a `addon_id` según su origen comercial
+  - `tool_id` y `addon_id` son mutuamente excluyentes en la misma línea
+  - snapshots/versiones de quote y readers canónicos de Finance ya exponen ambos campos
+  - esto reemplaza la necesidad de metadata ad hoc para trazabilidad de herramientas/addons en cotizaciones
+
 ## Delta 2026-04-19 TASK-460 materializa contract como entidad canónica post-venta
 
 - Greenhouse ya no debe tratar `quotation_id` como único anchor válido para todo el lifecycle comercial después de la aceptación.

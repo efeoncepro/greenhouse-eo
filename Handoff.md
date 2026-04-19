@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — Quote line canonical relation to tool/addon (Codex)
+
+- **Owner:** Codex
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-quote-line-link`
+- **Rama:** `fix/codex-quote-line-catalog-link`
+- **Estado:** implementado y validado localmente
+- **Cambio principal:**
+  - `greenhouse_commercial.quotation_line_items` ahora materializa `tool_id` -> `greenhouse_ai.tool_catalog(tool_id)` y `addon_id` -> `greenhouse_commercial.overhead_addons(addon_id)` como relaciones canónicas opcionales y mutuamente excluyentes
+- **Entregables:**
+  - migración `20260419080928005_task-quote-line-tool-addon-links.sql`
+  - persistencia + recalculation en `src/lib/finance/pricing/quotation-pricing-orchestrator.ts`
+  - clonación de versiones en `src/lib/commercial/governance/versions-store.ts`
+  - readers/snapshot canónicos en `src/lib/finance/quotation-canonical-store.ts`
+  - surfacing API en `src/app/api/finance/quotes/route.ts` y `src/app/api/finance/quotes/[id]/lines/route.ts`
+  - docs actualizadas en `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+- **Validaciones corridas:**
+  - `pnpm lint`
+  - `pnpm pg:connect:migrate` (incluye regeneración de `src/types/db.d.ts`)
+  - `pnpm exec tsc --noEmit --incremental false`
+- **Nota operativa:**
+  - durante la primera corrida faltaba el marker `-- Up Migration` en la migración nueva; se corrigió el archivo, se eliminó el registro erróneo en `public.pgmigrations` local y se re-ejecutó la migración correctamente antes de regenerar tipos
+
 ## Sesion 2026-04-19 — TASK-467 phase-3 + TASK-470 spec (cierre del UI de pricing catalog)
 
 - **Owner:** Claude
