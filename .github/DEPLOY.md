@@ -188,5 +188,7 @@ stores any secret material — the trust chain is purely attribute-based.
 ## Related files
 
 - [`.github/workflows/ops-worker-deploy.yml`](workflows/ops-worker-deploy.yml) — the first workflow using this setup
+- [`.github/workflows/ico-batch-deploy.yml`](workflows/ico-batch-deploy.yml) — same WIF pattern for ICO/Finance batch lanes
+- [`.github/workflows/commercial-cost-worker-deploy.yml`](workflows/commercial-cost-worker-deploy.yml) — WIF deploy for the dedicated commercial cost basis worker
 - [`scripts/setup-github-actions-wif.sh`](../scripts/setup-github-actions-wif.sh) — idempotent provisioning script
 - [`services/ops-worker/deploy.sh`](../services/ops-worker/deploy.sh) — the actual deploy shell script the workflow runs

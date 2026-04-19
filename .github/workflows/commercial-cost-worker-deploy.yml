@@ -1,0 +1,126 @@
+name: Commercial Cost Worker Deploy
+
+# TASK-483 follow-up — eliminate deployment drift between the monorepo and the
+# dedicated commercial-cost-worker Cloud Run runtime.
+#
+# The worker reuses shared src/lib code (people cost snapshots, provider
+# tooling snapshots, cost attribution, client economics, run tracking) but is
+# deployed separately from Vercel. This workflow keeps the Cloud Run service in
+# lockstep with develop/main using the same WIF contract already standardized
+# for ops-worker and ico-batch-worker.
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - '.github/workflows/commercial-cost-worker-deploy.yml'
+      - 'services/commercial-cost-worker/**'
+      - 'src/lib/commercial-cost-worker/**'
+      - 'src/lib/commercial-cost-attribution/**'
+      - 'src/lib/providers/**'
+      - 'src/lib/db/**'
+      - 'src/lib/structured-context/**'
+      - 'src/lib/finance/postgres-store-intelligence.ts'
+      - 'src/lib/finance/reporting.ts'
+      - 'src/lib/sync/event-catalog.ts'
+      - 'src/lib/sync/publish-event.ts'
+      - 'src/lib/sync/projections/member-capacity-economics.ts'
+      - 'src/types/db.d.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: commercial-cost-worker-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy commercial-cost-worker to Cloud Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    environment: >-
+      ${{
+        github.event_name == 'workflow_dispatch'
+          && github.event.inputs.environment
+          || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+      }}
+
+    env:
+      ENV: >-
+        ${{
+          github.event_name == 'workflow_dispatch'
+            && github.event.inputs.environment
+            || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+        }}
+      GCP_PROJECT_ID: efeonce-group
+      GCP_REGION: us-east4
+      DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+      RUNTIME_SERVICE_ACCOUNT: greenhouse-portal@efeonce-group.iam.gserviceaccount.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Verify gcloud account
+        run: |
+          gcloud config list --format='value(core.project,core.account)'
+          gcloud auth list
+
+      - name: Deploy commercial-cost-worker
+        run: |
+          bash services/commercial-cost-worker/deploy.sh
+        env:
+          ENV: ${{ env.ENV }}
+
+      - name: Verify deployment health
+        run: |
+          REVISION="$(gcloud run services describe commercial-cost-worker \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.latestReadyRevisionName)')"
+          READY="$(gcloud run services describe commercial-cost-worker \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.conditions[0].status)')"
+          echo "Latest ready revision: ${REVISION}"
+          echo "Service ready: ${READY}"
+          if [ "${READY}" != "True" ]; then
+            echo "::warning::Service reports not-ready. Check Cloud Run logs."
+          fi
+          echo "✓ commercial-cost-worker deploy verified (revision ${REVISION})"
+
+      - name: Record deployment commit
+        run: |
+          echo "Deployed commit: ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"

@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — commercial-cost-worker auto-deploy via GitHub Actions + WIF (Codex)
+
+- **Owner:** Codex
+- **Estado:** workflow y contrato de deploy implementados; pendiente primera corrida verde en GitHub Actions
+- **Scope:** endurecer el deploy del `commercial-cost-worker` para que no dependa de pasos manuales fuera de excepción operativa.
+- **Entregables:**
+  - workflow nuevo `.github/workflows/commercial-cost-worker-deploy.yml`
+  - `services/commercial-cost-worker/deploy.sh` alineado con readiness explícita + comentarios de topología
+  - docs actualizados en `.github/DEPLOY.md`, `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`, `docs/documentation/operations/commercial-cost-worker.md`, `project_context.md`
+- **Decisión operativa:** el worker reutiliza el mismo baseline WIF del repo (`github-actions-deployer@efeonce-group.iam.gserviceaccount.com` + `GCP_WORKLOAD_IDENTITY_PROVIDER`). No se crea SA/pool/provider nuevo.
+- **Trigger set del workflow:** cubre `services/commercial-cost-worker/**` y librerías compartidas que alteran su runtime real (`commercial-cost-worker`, `commercial-cost-attribution`, `providers`, `db`, `structured-context`, `sync`, `db.d.ts`, lockfile, `tsconfig`).
+- **Pendiente explícito:** como el servicio aún no existe en Cloud Run, la primera corrida del workflow será la que materialice por primera vez `commercial-cost-worker`. Verificar en Actions que la revisión quede `ready=True`.
+
 ## Sesion 2026-04-19 — TASK-475 Greenhouse FX & Currency Platform Foundation (Claude)
 
 - **Owner:** Claude

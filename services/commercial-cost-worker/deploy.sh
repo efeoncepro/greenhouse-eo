@@ -2,14 +2,16 @@
 #
 # Commercial Cost Worker — Cloud Run Deployment
 #
+set -euo pipefail
+
 # Usage:
 #   ENV=staging    bash services/commercial-cost-worker/deploy.sh
 #   ENV=production bash services/commercial-cost-worker/deploy.sh
 #
-# Re-running is safe. The script builds the image, deploys the service,
-# and creates or updates a daily Cloud Scheduler job.
-
-set -euo pipefail
+# ENV is REQUIRED — there is no silent default. Like ops-worker, this deploy
+# currently targets a single canonical Cloud Run service name. The environment
+# switch exists to select the secret contract deliberately when the workflow
+# runs from develop/main or when an operator invokes it manually.
 
 if [ -z "${ENV:-}" ]; then
   echo "ERROR: ENV must be set explicitly — 'staging' or 'production'."
@@ -27,6 +29,13 @@ REGION="us-east4"
 SERVICE_NAME="commercial-cost-worker"
 SERVICE_ACCOUNT="greenhouse-portal@${PROJECT_ID}.iam.gserviceaccount.com"
 
+# Cloud Run settings — start conservative until role/reprice/feedback lanes land.
+# Rationale:
+#   - min=0 keeps cost low while the worker is mostly cron/manual.
+#   - max=2 and concurrency=1 serialize heavy bundle runs and reduce accidental
+#     overlap until the wider program proves end-to-end idempotency at scale.
+#   - cpu=2 / memory=2Gi / timeout=900s leaves headroom for multi-period
+#     materialization plus downstream cost attribution / client economics refresh.
 MIN_INSTANCES="0"
 MAX_INSTANCES="2"
 MEMORY="2Gi"
@@ -188,6 +197,18 @@ SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
 
 echo "=== Service deployed at: ${SERVICE_URL} ==="
 
+READY="$(gcloud run services describe "${SERVICE_NAME}" \
+  --project="${PROJECT_ID}" \
+  --region="${REGION}" \
+  --format='value(status.conditions[0].status)')"
+
+REVISION="$(gcloud run services describe "${SERVICE_NAME}" \
+  --project="${PROJECT_ID}" \
+  --region="${REGION}" \
+  --format='value(status.latestReadyRevisionName)')"
+
+echo "=== Ready revision: ${REVISION} (service ready=${READY}) ==="
+
 echo "=== Ensuring ${SERVICE_ACCOUNT} has roles/run.invoker ==="
 gcloud run services add-iam-policy-binding "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
@@ -197,7 +218,7 @@ gcloud run services add-iam-policy-binding "${SERVICE_NAME}" \
   --quiet >/dev/null
 
 if [ -n "${GITHUB_ACTIONS:-}" ]; then
-  echo "=== Skipping health check (CI mode) ==="
+  echo "=== Skipping health check (CI mode — workflow handles this separately) ==="
 else
   echo "=== Running health check ==="
 
@@ -273,6 +294,8 @@ echo "  -> commercial-cost-materialize-daily: 5:00 AM ${SCHEDULER_TZ}"
 echo ""
 echo "=== Deployment complete ==="
 echo "Service:    ${SERVICE_URL}"
+echo "Revision:   ${REVISION}"
+echo "Ready:      ${READY}"
 echo "Region:     ${REGION}"
 echo "Memory:     ${MEMORY}"
 echo "CPU:        ${CPU}"

@@ -1,3 +1,15 @@
+## Delta 2026-04-19 TASK-483 endurece el deploy del commercial-cost-worker con WIF
+
+- `commercial-cost-worker` deja de depender solo de deploy manual y adopta workflow GitHub Actions con el baseline WIF del repo.
+- Source of truth:
+  - `.github/workflows/commercial-cost-worker-deploy.yml`
+  - `services/commercial-cost-worker/deploy.sh`
+  - `.github/DEPLOY.md`
+- Contrato operativo:
+  - reusar `github-actions-deployer@efeonce-group.iam.gserviceaccount.com`
+  - no crear pool/provider/SA nuevos para este worker
+  - el workflow observa tanto `services/commercial-cost-worker/**` como librerías compartidas que alteran su runtime efectivo
+
 ## Delta 2026-04-19 TASK-460 materializa contract como entidad canónica post-venta
 
 - Greenhouse ya no debe tratar `quotation_id` como único anchor válido para todo el lifecycle comercial después de la aceptación.

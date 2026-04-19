@@ -6,6 +6,19 @@
 
 ---
 
+## Delta 2026-04-19 — commercial-cost-worker adopta pipeline WIF via GitHub Actions
+
+- El runtime `commercial-cost-worker` ya no debe depender de deploy manual como condición normal de operación.
+- Runtime/CD actualizado:
+  - workflow `.github/workflows/commercial-cost-worker-deploy.yml`
+  - autenticación GitHub Actions -> GCP via el mismo pool/provider WIF canónico del repo
+  - impersonación del mismo deployer SA `github-actions-deployer@efeonce-group.iam.gserviceaccount.com`
+  - verificación post-deploy via `gcloud run services describe`
+- Regla operativa:
+  - no crear un deployer SA nuevo para este worker
+  - el path trigger debe cubrir tanto `services/commercial-cost-worker/**` como librerías compartidas que alteran su runtime (`commercial-cost-worker`, `commercial-cost-attribution`, `providers`, `db`, `structured-context`, `sync`, `src/types/db.d.ts`, lockfile / tsconfig)
+  - producción sigue gateada por GitHub Environment `production`; `develop` despliega a `staging`
+
 ## Delta 2026-04-19 — TASK-483 separa el commercial cost basis engine en Cloud Run dedicado
 
 - Greenhouse ya no debe seguir creciendo el `ops-worker` como runtime catch-all para costeo comercial.
@@ -944,7 +957,7 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 
 ### 11.1 Overview
 
-Los deploys de servicios Cloud Run (actualmente `ops-worker`, extensible a futuros servicios) se automatizan via GitHub Actions con autenticacion **Workload Identity Federation (WIF)** — sin llaves de service account persistentes en ningun sistema.
+Los deploys de servicios Cloud Run (actualmente `ops-worker`, `ico-batch-worker` y `commercial-cost-worker`) se automatizan via GitHub Actions con autenticacion **Workload Identity Federation (WIF)** — sin llaves de service account persistentes en ningun sistema.
 
 ```
 Push a develop/main (paths match)
@@ -1063,6 +1076,37 @@ on:
 - Manual dispatch → environment seleccionado
 
 **Concurrency:** `ops-worker-deploy-${{ github.ref }}` — un deploy a la vez por branch.
+
+### 11.5b Workflow: commercial-cost-worker-deploy.yml
+
+**Triggers principales:**
+
+```yaml
+on:
+  push:
+    branches: [develop, main]
+    paths:
+      - '.github/workflows/commercial-cost-worker-deploy.yml'
+      - 'services/commercial-cost-worker/**'
+      - 'src/lib/commercial-cost-worker/**'
+      - 'src/lib/commercial-cost-attribution/**'
+      - 'src/lib/providers/**'
+      - 'src/lib/db/**'
+      - 'src/lib/structured-context/**'
+      - 'src/lib/finance/postgres-store-intelligence.ts'
+      - 'src/lib/finance/reporting.ts'
+      - 'src/lib/sync/event-catalog.ts'
+      - 'src/lib/sync/publish-event.ts'
+      - 'src/lib/sync/projections/member-capacity-economics.ts'
+      - 'src/types/db.d.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
+```
+
+**Criterio operativo:** el trigger cubre no solo el servicio, sino el set mínimo de librerías compartidas que cambian su runtime real. Esto evita drift entre el monorepo y el worker cuando cambian `db`, publishing de eventos, tracking de corridas o materializadores reutilizados.
+
+**Concurrency:** `commercial-cost-worker-deploy-${{ github.ref }}` — un deploy a la vez por branch.
 
 ### 11.6 Cloud Build — async submit + polling
 

@@ -2,6 +2,12 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — commercial-cost-worker adopta auto-deploy WIF
+
+- Se agrega `.github/workflows/commercial-cost-worker-deploy.yml` para desplegar el worker dedicado de cost basis a Cloud Run usando el baseline GitHub Actions -> WIF -> `github-actions-deployer`, sin llaves estáticas nuevas.
+- El workflow observa no solo `services/commercial-cost-worker/**`, sino también las librerías compartidas que cambian el runtime efectivo del worker (`commercial-cost-worker`, `commercial-cost-attribution`, `providers`, `db`, `structured-context`, `sync`, `src/types/db.d.ts`, lockfile y `tsconfig`), reduciendo drift entre monorepo y Cloud Run.
+- `services/commercial-cost-worker/deploy.sh` ahora deja visible la `latestReadyRevisionName` y el estado `ready` después del deploy, y documenta explícitamente la topología / capacidad conservadora del worker.
+
 ### 2026-04-19 — TASK-483 crea el commercial-cost-worker y el ledger de cost basis
 
 - Nace `services/commercial-cost-worker/` como runtime Cloud Run dedicado para la base de costos comercial. Expone `POST /cost-basis/materialize`, `/people`, `/tools` y `/bundle`, y reserva `/roles`, `/quotes/reprice-bulk` y `/margin-feedback/materialize` para las siguientes tasks del programa.

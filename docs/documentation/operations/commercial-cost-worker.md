@@ -51,6 +51,8 @@ La topologia objetivo es:
 ## Operacion
 
 - Deploy: `ENV=staging bash services/commercial-cost-worker/deploy.sh`
+- Auto-deploy Cloud Run: `.github/workflows/commercial-cost-worker-deploy.yml`
+- Auth de deploy: GitHub Actions + Workload Identity Federation usando el mismo `github-actions-deployer@efeonce-group.iam.gserviceaccount.com` del baseline del repo
 - Scheduler base: `commercial-cost-materialize-daily`
 - Region: `us-east4`
 - Auth: IAM de Cloud Run con fallback opcional `CRON_SECRET`
