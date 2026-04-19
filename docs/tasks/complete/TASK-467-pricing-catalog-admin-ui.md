@@ -1,5 +1,47 @@
 # TASK-467 — Pricing Catalog Admin UI (Self-Service CRUD)
 
+## Delta 2026-04-19 (phase-2 close-out)
+
+**Phase-2 shipped.** Todas las capacidades que quedaron fuera del MVP inicial se completaron en `task/TASK-467-phase-2`.
+
+### Entregables phase-2
+
+- **3 endpoints nuevos**:
+  - `GET/POST /api/admin/pricing-catalog/roles/[id]/cost-components` — fetch y versionado de componentes de costo por employment_type usando `insertCostComponentsIfChanged` store helper
+  - `GET/POST /api/admin/pricing-catalog/roles/[id]/pricing` — fetch y versionado batch de pricing por las 6 monedas usando `insertPricingRowsIfChanged` store helper
+  - Extensión del PATCH de `/governance` para aceptar `type: 'employment_type'` dispatch a `upsertEmploymentType`
+- **Edit drawers UI**:
+  - `EditSellableRoleDrawer.tsx` — 4 tabs (Info general / Modalidades de contrato read-only / Componentes de costo / Pricing por moneda) con MUI Lab `TabContext` + `TabPanel`. Cost tab agrupa rows por `employmentTypeCode` con historial expandible; Pricing tab con form batch para 6 monedas
+  - `EditToolDrawer.tsx` — form completo con 23 campos + conditional fields según `costModel`
+  - `EditOverheadDrawer.tsx` — form con 17 campos + conditional fields según `addon_type`
+- **Employment types admin page** `/admin/pricing-catalog/employment-types` con list view + bi-modal Create/Edit drawer (el `employmentTypeCode` es inmutable en edit mode)
+- **Audit timeline page** `/admin/pricing-catalog/audit-log` con MUI Lab Timeline, filtros por entityType / entityId / actorUserId, TimelineDot coloreado por acción, Accordion expandible por entry con JSON del `changeSummary`
+- **Home updates**: tarjeta "Modalidades de contrato" ahora apunta a la página real con count; tarjeta "Historial de cambios" agregada
+
+### Limitaciones documentadas
+
+- `insertCostComponentsIfChanged` hardcodea `hours_per_fte_month=180` y `fee_eor_usd=0` a nivel del store. Los forms exponen los campos pero el backend los ignora con helper text "disponible en próxima iteración". Follow-up phase-3 para extender el store.
+- Role employment compatibility: tab "Modalidades de contrato" es read-only con badge "Con costo cargado" / "Sin costo cargado". Gestión full (assign/deassign/default) queda como follow-up.
+- Diff viewer del audit: muestra JSON raw del `changeSummary`. Visual side-by-side diff queda como follow-up.
+
+### Fix aplicado durante verification
+
+El subagent del role edit drawer importó `SELLABLE_ROLE_PRICING_CURRENCIES` desde `src/lib/commercial/sellable-roles-seed.ts` — ese módulo usa `node:fs/promises` y rompía el build del client bundle. Fix: inlineé la constante en el drawer (6 monedas fijas).
+
+### Gates phase-2
+
+- `pnpm lint` clean
+- `npx tsc --noEmit` clean
+- `pnpm test` → 284/284 (194 payroll baseline intacto + 21 pricing + 64 commercial/hubspot + resto)
+- `pnpm build` compiled exit 0 (15.2s)
+- Zero `new Pool()` rogue
+
+### Payroll isolation mantenida
+
+Ningún write a `greenhouse_payroll.*`. Los 194 tests de payroll se mantienen intactos.
+
+---
+
 ## Delta 2026-04-19 (close-out MVP)
 
 **Status real: complete (MVP).** Shipped con scope acotado vs spec original:

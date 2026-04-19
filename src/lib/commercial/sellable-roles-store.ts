@@ -523,6 +523,12 @@ export const insertCostComponentsIfChanged = async (
 
   const baseline = currentEffective ?? latest
 
+  // Defaults back-compat: CSVs de seed histórico no traen estos campos
+  // (se asumieron 180h/mes y 0 fee EOR desde TASK-464a). Admin UI (TASK-467
+  // phase-2) los envía explícitos cuando el rol los overridea.
+  const feeEorUsd = seedRow.feeEorUsd ?? 0
+  const hoursPerFteMonth = seedRow.hoursPerFteMonth ?? 180
+
   const changed = !baseline ||
     numberChanged(toNumber(baseline.base_salary_usd), seedRow.baseSalaryUsd) ||
     numberChanged(toNumber(baseline.bonus_jit_usd), seedRow.bonusJitUsd) ||
@@ -531,8 +537,8 @@ export const insertCostComponentsIfChanged = async (
     numberChanged(toNumber(baseline.bonus_sobrecumplimiento_usd), seedRow.bonusSobrecumplimientoUsd) ||
     numberChanged(toNumber(baseline.gastos_previsionales_usd), seedRow.gastosPrevisionalesUsd) ||
     numberChanged(toNumber(baseline.fee_deel_usd), seedRow.feeDeelUsd) ||
-    numberChanged(toNumber(baseline.fee_eor_usd), 0) ||
-    baseline.hours_per_fte_month !== 180
+    numberChanged(toNumber(baseline.fee_eor_usd), feeEorUsd) ||
+    baseline.hours_per_fte_month !== hoursPerFteMonth
 
   if (!changed) {
     return { changed: false, entry: mapCostRow(baseline) }
@@ -551,8 +557,8 @@ export const insertCostComponentsIfChanged = async (
       bonus_sobrecumplimiento_usd: seedRow.bonusSobrecumplimientoUsd,
       gastos_previsionales_usd: seedRow.gastosPrevisionalesUsd,
       fee_deel_usd: seedRow.feeDeelUsd,
-      fee_eor_usd: 0,
-      hours_per_fte_month: 180,
+      fee_eor_usd: feeEorUsd,
+      hours_per_fte_month: hoursPerFteMonth,
       notes: seedRow.driftWarnings.length > 0 ? `drift:${seedRow.driftWarnings.join(',')}` : null
     })
     .onConflict(oc => oc.columns(['role_id', 'employment_type_code', 'effective_from']).doUpdateSet({
@@ -563,8 +569,8 @@ export const insertCostComponentsIfChanged = async (
       bonus_sobrecumplimiento_usd: seedRow.bonusSobrecumplimientoUsd,
       gastos_previsionales_usd: seedRow.gastosPrevisionalesUsd,
       fee_deel_usd: seedRow.feeDeelUsd,
-      fee_eor_usd: 0,
-      hours_per_fte_month: 180,
+      fee_eor_usd: feeEorUsd,
+      hours_per_fte_month: hoursPerFteMonth,
       notes: seedRow.driftWarnings.length > 0 ? `drift:${seedRow.driftWarnings.join(',')}` : null
     }))
     .returningAll()

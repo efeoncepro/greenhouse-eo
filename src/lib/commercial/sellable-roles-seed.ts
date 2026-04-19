@@ -134,6 +134,14 @@ export interface SellableRoleSeedRow {
   bonusSobrecumplimientoUsd: number
   gastosPrevisionalesUsd: number
   feeDeelUsd: number
+
+  // Overrides per-role (TASK-467 phase-2): si se especifican desde el admin UI,
+  // sobre-escriben los defaults (feeEor=0, hoursPerFteMonth=180). El pricing
+  // engine v2 ya los usa: `feeEorUsd` va al cost stack, `hoursPerFteMonth`
+  // sirve como fallback del fte_hours_guide y como divisor de hourly cost.
+  feeEorUsd?: number | null
+  hoursPerFteMonth?: number | null
+
   totalMonthlyCostUsd: number
   hourlyCostUsd: number
   fteMonthlyCostUsd: number

@@ -38,6 +38,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import tableStyles from '@core/styles/table.module.css'
 
 import CreateToolDrawer from './drawers/CreateToolDrawer'
+import EditToolDrawer from './drawers/EditToolDrawer'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -76,7 +77,8 @@ const columnHelper = createColumnHelper<ToolItem>()
 
 const buildColumns = (
   onToggleActive: (tool: ToolItem, next: boolean) => void,
-  togglingId: string | null
+  togglingId: string | null,
+  onEdit: (tool: ToolItem) => void
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ColumnDef<ToolItem, any>[] => [
@@ -165,6 +167,24 @@ const buildColumns = (
       )
     },
     meta: { align: 'center' }
+  }),
+  columnHelper.display({
+    id: 'actions',
+    header: 'Acciones',
+    cell: ({ row }) => (
+      <Stack direction='row' spacing={1} alignItems='center' onClick={e => e.stopPropagation()}>
+        <Tooltip title='Editar herramienta'>
+          <IconButton
+            size='small'
+            onClick={() => onEdit(row.original)}
+            aria-label={`Editar ${row.original.toolName}`}
+          >
+            <i className='tabler-edit' style={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+    ),
+    meta: { align: 'center' }
   })
 ]
 
@@ -180,6 +200,8 @@ const ToolCatalogListView = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'toolName', desc: false }])
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false)
+  const [editingToolId, setEditingToolId] = useState<string | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -282,9 +304,14 @@ const ToolCatalogListView = () => {
     })
   }, [data, searchDebounced, categoryFilter, statusFilter])
 
+  const handleEdit = useCallback((tool: ToolItem) => {
+    setEditingToolId(tool.toolId)
+    setEditDrawerOpen(true)
+  }, [])
+
   const columns = useMemo(
-    () => buildColumns(handleToggleActive, togglingId),
-    [handleToggleActive, togglingId]
+    () => buildColumns(handleToggleActive, togglingId, handleEdit),
+    [handleToggleActive, togglingId, handleEdit]
   )
 
   const table = useReactTable({
@@ -485,6 +512,16 @@ const ToolCatalogListView = () => {
       <CreateToolDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
+        onSuccess={() => void loadData()}
+      />
+
+      <EditToolDrawer
+        open={editDrawerOpen}
+        toolId={editingToolId}
+        onClose={() => {
+          setEditDrawerOpen(false)
+          setEditingToolId(null)
+        }}
         onSuccess={() => void loadData()}
       />
     </Grid>

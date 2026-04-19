@@ -11,7 +11,7 @@ import {
   listRoleTierMargins,
   listServiceTierMargins
 } from '@/lib/commercial/pricing-governance-store'
-import { listSellableRoles } from '@/lib/commercial/sellable-roles-store'
+import { listEmploymentTypes, listSellableRoles } from '@/lib/commercial/sellable-roles-store'
 import { listToolCatalog } from '@/lib/commercial/tool-catalog-store'
 import { canAdministerPricingCatalog } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
@@ -40,7 +40,8 @@ const Page = async () => {
     serviceTierMargins,
     commercialModelMultipliers,
     countryPricingFactors,
-    fteHoursGuide
+    fteHoursGuide,
+    employmentTypes
   ] = await Promise.all([
     listSellableRoles({ activeOnly: false }),
     listToolCatalog({ active: false }),
@@ -49,7 +50,8 @@ const Page = async () => {
     listServiceTierMargins(),
     listCommercialModelMultipliers(),
     listCountryPricingFactors(),
-    listFteHoursGuide()
+    listFteHoursGuide(),
+    listEmploymentTypes({ activeOnly: false })
   ])
 
   const counts: PricingCatalogCounts = {
@@ -59,7 +61,8 @@ const Page = async () => {
     tiers: roleTierMargins.length + serviceTierMargins.length,
     commercialModels: commercialModelMultipliers.length,
     countryFactors: countryPricingFactors.length,
-    fteHours: fteHoursGuide.length
+    fteHours: fteHoursGuide.length,
+    employmentTypes: employmentTypes.filter(e => e.active).length
   }
 
   return <PricingCatalogHomeView counts={counts} />

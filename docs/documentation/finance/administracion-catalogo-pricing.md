@@ -1,9 +1,9 @@
 # Administración del Catálogo de Pricing
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-19 por Claude (TASK-467)
-> **Ultima actualizacion:** 2026-04-19 por Claude
+> **Ultima actualizacion:** 2026-04-19 por Claude (TASK-467 phase-2)
 > **Documentacion tecnica:**
 > - Spec: [TASK-467](../../tasks/complete/TASK-467-pricing-catalog-admin-ui.md)
 > - Catálogos base: [TASK-464a](../../tasks/complete/TASK-464a-sellable-roles-catalog-canonical.md), [TASK-464b](../../tasks/complete/TASK-464b-pricing-governance-tables.md), [TASK-464c](../../tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md)
@@ -94,11 +94,54 @@ La UI de consulta del log está disponible via `GET /api/admin/pricing-catalog/a
 
 ## Qué NO hace (MVP)
 
-- **No edita cost components ni pricing per currency**: esos tabs con sub-tabs por employment_type son scope grande (6 components × 6 employment_types × 6 currencies). Follow-up TASK-467-phase-2.
-- **No edita employment types**: placeholder en home. Baja frecuencia de cambio; queda como follow-up.
 - **No importa Excel bulk**: el re-seed CSV sigue siendo el path para bulk updates masivas. Follow-up si Efeonce lo pide.
-- **No tiene diff viewer visual del audit**: el audit log se consulta via API. UI con timeline queda como follow-up.
 - **No tiene approval workflow**: V1 confía que admins saben lo que hacen. El audit garantiza traceability.
+- **Cost components tiene dos campos con limitación de backend actual**: `hours_per_fte_month` y `fee_eor_usd` se muestran editables en el drawer pero el store `insertCostComponentsIfChanged` los hardcodea a 180 / 0. Helper text en el form aclara esto. Queda como phase-3 cuando se extienda el store.
+
+## Novedades phase-2 (2026-04-19)
+
+Se agregaron las capacidades que quedaron fuera del MVP inicial:
+
+### Edit drawer de roles con 4 tabs
+1. **Info general**: edita label, categoría, tier, tipo (staff/servicio) y estado activo
+2. **Modalidades de contrato**: vista de employment types asociados al rol con badge "Con costo cargado" / "Sin costo cargado" (gestión de compatibility full llega en próxima iteración)
+3. **Componentes de costo**: agrupados por employment_type, historial por `effective_from`. Botón "+ Nueva versión" crea entries para salario + bonos + gastos previsionales + fees (Deel/EOR)
+4. **Pricing por moneda**: las 6 monedas (USD/CLP/CLF/COP/MXN/PEN) con margin%, hourly price y fte monthly price editables. Una fila mínima requerida.
+
+### Edit drawers para tools y overheads
+- Tools: form completo con 23 campos; conditional fields según `costModel` (subscription vs fixed vs one_time); arrays (applicable_business_lines, applicability_tags) via comma-separated inputs
+- Overheads: form con 17 campos; conditional fields según `addon_type` (overhead_fixed vs fee_percentage vs resource_month vs adjustment_pct)
+
+### Employment types admin UI
+Página `/admin/pricing-catalog/employment-types` con:
+- List view: tabla con code, label, currency, country, previsional%, fee, sourceOfTruth, active
+- Create drawer: form con toggles condicionales (previsional → muestra %), sourceOfTruth como dropdown conocido + opción "Otra"
+- Edit drawer: mismo shape, code inmutable (es PK)
+
+### Audit timeline UI
+Página `/admin/pricing-catalog/audit-log` con:
+- Filtros por entityType, entityId, actorUserId
+- Timeline cronológico (MUI Lab Timeline) con dots por acción (verde=created/reactivated, azul=updated/cost_updated/pricing_updated, naranja=deactivated)
+- Cada entry muestra entity + SKU + actor + fecha + diff expandible (JSON del changeSummary)
+
+## Aclaración importante: las "horas por FTE" de pricing NO son las horas de capacity operacional
+
+Greenhouse tiene **dos capas FTE distintas** que el admin debe entender para no confundir lo que edita:
+
+| Capa | Dónde vive | Valor | Para qué |
+|---|---|---|---|
+| **Capacity operacional** | `greenhouse_core.client_team_assignments` + snapshot `greenhouse_serving.member_capacity_economics`. Constante `CAPACITY_HOURS_PER_FTE = 160h` en `src/lib/team-capacity/units.ts` | **160h por FTE** (fijo) | Agency / Delivery / Person Intelligence: mide lo que una persona **puede entregar** operacionalmente |
+| **Billable para cotización** | `greenhouse_commercial.fte_hours_guide` (editable desde el admin UI de pricing, tab "Gobierno de márgenes") | **Variable por fracción** (ej. 0.25 FTE → 45h, 0.5 FTE → 90h, 1.0 FTE → 180h) | Pricing engine v2: horas que se **cobran al cliente** según la fracción vendida |
+
+**Regla clave**: si cambias `fte_hours_guide` en el admin UI, afectas **solo cotizaciones nuevas** (via pricing engine v2). **No cambia** la capacidad operacional — eso sigue con el 160h canónico que consume el ICO Engine, el módulo de Agency Team y las proyecciones de `member_capacity_economics`.
+
+**¿Por qué dos valores?** Porque no son lo mismo:
+- "1 FTE de Senior Designer" operacionalmente = 160h/mes que puede trabajar
+- "1 FTE de Senior Designer" comercialmente = 180h/mes que se cotizan al cliente (incluye buffer de revisiones, meetings, etc.)
+
+La separación es intencional y canónica. El doc técnico `GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md` especifica el 160h como baseline operacional; `fte_hours_guide` es específico del módulo comercial.
+
+**Sinergia resuelta phase-2 (2026-04-19)**: el campo `hours_per_fte_month` en `sellable_role_cost_components` ahora funciona como **override per-role del `fte_hours_guide`**. El pricing engine v2 ya lo leía como fallback; antes estaba bloqueado porque el store hardcodeaba el valor a 180. Phase-2 lo desbloquea — el admin puede ahora especificar horas billable distintas para roles que lo necesiten (ej. un Senior Designer a 180h vs un Consultor a 160h). Mismo fix aplica a `fee_eor_usd` (antes hardcoded a 0). Stores aceptan defaults back-compat (180h / 0 fee) para CSVs de seed legacy que no los especifican. Regla: las dos capas siguen siendo distintas (160h capacity vs variable billable), pero ahora se coordinan explícitamente via el override per-role.
 
 ## Aislamiento payroll
 
@@ -106,12 +149,12 @@ La UI **NUNCA escribe** en `greenhouse_payroll.*`. Los campos de rates de payrol
 
 > **Detalle técnico:** API routes en [src/app/api/admin/pricing-catalog/](../../../src/app/api/admin/pricing-catalog/). Views en [src/views/greenhouse/admin/pricing-catalog/](../../../src/views/greenhouse/admin/pricing-catalog/). Audit store en [src/lib/commercial/pricing-catalog-audit-store.ts](../../../src/lib/commercial/pricing-catalog-audit-store.ts). Permission helper `canAdministerPricingCatalog` en [src/lib/tenant/authorization.ts](../../../src/lib/tenant/authorization.ts).
 
-## Próximos pasos (follow-ups)
+## Próximos pasos (follow-ups phase-3+)
 
-- **TASK-467-phase-2**: edit completo de cost components per employment_type + pricing per currency
-- Admin UI de employment types
-- Excel import con diff preview
-- Audit timeline UI con diff viewer visual
-- Approval workflow para cambios críticos (ej. bajar `margin_min` requiere aprobación de efeonce_admin)
-- Bulk edit (seleccionar 10 roles + ajustar salary +5% todos)
-- Preview de impacto: "¿cuántas cotizaciones activas se verían afectadas si subo este rate?"
+- **Desbloquear hours_per_fte_month y fee_eor_usd** en cost components (hoy el store los hardcodea)
+- **Role employment compatibility**: endpoint + UI para gestión full (hoy solo read-only en tab "Modalidades")
+- **Excel import con diff preview** si Efeonce lo pide (CSV re-seed sigue como fallback)
+- **Approval workflow** para cambios críticos (ej. bajar `margin_min` requiere aprobación de efeonce_admin)
+- **Bulk edit** (seleccionar 10 roles + ajustar salary +5% todos)
+- **Preview de impacto**: "¿cuántas cotizaciones activas se verían afectadas si subo este rate?"
+- **Diff viewer mejorado** en el audit timeline (hoy muestra JSON raw; próximo: diff visual side-by-side)

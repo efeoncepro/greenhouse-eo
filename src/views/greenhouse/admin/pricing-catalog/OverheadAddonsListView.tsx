@@ -38,6 +38,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import tableStyles from '@core/styles/table.module.css'
 
 import CreateOverheadDrawer from './drawers/CreateOverheadDrawer'
+import EditOverheadDrawer from './drawers/EditOverheadDrawer'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -107,7 +108,8 @@ const columnHelper = createColumnHelper<OverheadItem>()
 
 const buildColumns = (
   onToggleActive: (overhead: OverheadItem, next: boolean) => void,
-  togglingId: string | null
+  togglingId: string | null,
+  onEdit: (overhead: OverheadItem) => void
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ColumnDef<OverheadItem, any>[] => [
@@ -203,6 +205,24 @@ const buildColumns = (
       )
     },
     meta: { align: 'center' }
+  }),
+  columnHelper.display({
+    id: 'actions',
+    header: 'Acciones',
+    cell: ({ row }) => (
+      <Stack direction='row' spacing={1} alignItems='center' onClick={e => e.stopPropagation()}>
+        <Tooltip title='Editar overhead'>
+          <IconButton
+            size='small'
+            onClick={() => onEdit(row.original)}
+            aria-label={`Editar ${row.original.addonName}`}
+          >
+            <i className='tabler-edit' style={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+    ),
+    meta: { align: 'center' }
   })
 ]
 
@@ -219,6 +239,8 @@ const OverheadAddonsListView = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'addonName', desc: false }])
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false)
+  const [editingOverheadId, setEditingOverheadId] = useState<string | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -321,9 +343,14 @@ const OverheadAddonsListView = () => {
     })
   }, [data, searchDebounced, categoryFilter, typeFilter, statusFilter])
 
+  const handleEdit = useCallback((overhead: OverheadItem) => {
+    setEditingOverheadId(overhead.addonId)
+    setEditDrawerOpen(true)
+  }, [])
+
   const columns = useMemo(
-    () => buildColumns(handleToggleActive, togglingId),
-    [handleToggleActive, togglingId]
+    () => buildColumns(handleToggleActive, togglingId, handleEdit),
+    [handleToggleActive, togglingId, handleEdit]
   )
 
   const table = useReactTable({
@@ -542,6 +569,16 @@ const OverheadAddonsListView = () => {
       <CreateOverheadDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
+        onSuccess={() => void loadData()}
+      />
+
+      <EditOverheadDrawer
+        open={editDrawerOpen}
+        overheadId={editingOverheadId}
+        onClose={() => {
+          setEditDrawerOpen(false)
+          setEditingOverheadId(null)
+        }}
         onSuccess={() => void loadData()}
       />
     </Grid>
