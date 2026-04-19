@@ -1,12 +1,52 @@
 # TASK-457 — UI Revenue Pipeline Hybrid
 
+## Delta 2026-04-19 (close-out)
+
+**Status real: complete.** Shipped en branch `task/TASK-457-ui-revenue-pipeline-hybrid`.
+
+### Entregables
+
+- **Reader canonical**: `src/lib/commercial-intelligence/revenue-pipeline-reader.ts` con `listRevenuePipelineUnified()` + types `UnifiedPipelineRow | UnifiedPipelineCategory | RevenuePipelineTotals | UnifiedPipelineFilters | UnifiedPipelineResult`. Reusa `listDealPipelineSnapshots` existente + raw SQL JOIN para standalone quotes con `lifecyclestage` vivo de `clients`.
+- **Classifier**: categoría `deal | contract | pre-sales` según reglas explícitas (deal closedlost excluido, deal closedwon → contract, lifecyclestage vivo para standalone). Exclusión de open+linked para evitar double-counting (deviation del spec, documentada).
+- **Endpoint**: `GET /api/finance/commercial-intelligence/revenue-pipeline` con filters `clientId, organizationId, businessLineCode, category, stage, lifecyclestage`. Tenant-scoped via `requireFinanceTenantContext`.
+- **Totales**: `openPipelineClp`, `weightedPipelineClp`, `mtdWonClp`, `mtdLostClp`, `byCategory` record. MTD computado desde `deal_pipeline_snapshots.close_date >= date_trunc('month', CURRENT_DATE)`.
+- **Componente UI**: `src/views/greenhouse/finance/workspace/PipelineBoardUnified.tsx` con 4 KPIs (`HorizontalWithSubtitle`), filtros MUI dropdown, tabla con 9 columnas, chips de categoría, onboarding Alert dismissible.
+- **Refactor CommercialIntelligenceView**: sub-tab "Cotizaciones en curso" → "Pipeline". Eliminado `PipelineTab` legacy + Alert de TASK-458. Rentabilidad + Renovaciones intactas.
+- **Refactor FinanceIntelligenceView**: outer tab "Cotizaciones" → "Pipeline comercial" (value='quotations' preservado).
+- **Copy**: bloque nuevo `GH_PIPELINE_COMMERCIAL` en `greenhouse-nomenclature.ts`.
+- **Tests**: 5/5 passing en `src/lib/commercial-intelligence/__tests__/revenue-pipeline-reader.test.ts`:
+  1. Deal open → categoría `deal`
+  2. Deal closedlost con quote approved → excluido
+  3. Deal closedwon + quote → categoría `contract`
+  4. Quote standalone + lifecyclestage=customer → categoría `contract`
+  5. Quote standalone + lifecyclestage=lead → categoría `pre-sales`
+- **Doc funcional**: `docs/documentation/finance/pipeline-comercial.md` (nuevo).
+- **Architecture doc**: `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` v2.20.
+
+### Deviations técnicas documentadas
+
+1. **`deal_pipeline_snapshots.is_closed` no existe** — el reader deriva `deal_is_open = (deals.is_closed = FALSE)` en el JOIN (la tabla canónica `greenhouse_commercial.deals` sí tiene `is_closed`; el snapshot solo tiene `is_open`).
+2. **Exclusión extendida del spec**: además de "deal closedlost + quote approved" (spec), excluyo también **"deal open + quote linked"** porque el deal grain ya representa esa oportunidad y emitir ambas causa double-counting en los totales.
+3. **Stage labels inline**: el reader tiene `QUOTE_STAGE_LABELS` map inline (Spanish) para evitar cross-import de helpers de presentación a un módulo `server-only`.
+4. **Lifecyclestage default conservador**: `customer` → `contract`, todo lo demás (incluyendo `unknown`, `subscriber`) → `pre-sales`.
+5. **Endpoint legacy `/pipeline` quote-grain no borrado** — sigue existiendo por si otros consumers lo usan. El view nuevo ya no lo consume.
+
+### Gates
+
+- `pnpm lint` clean
+- `npx tsc --noEmit` clean
+- `pnpm test` → 289/289 (194 payroll baseline + 5 TASK-457 nuevos + resto)
+- `pnpm build` compiled exit 0 (17.9s)
+
+### Payroll isolation mantenida
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
