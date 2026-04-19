@@ -485,7 +485,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     [structuredWarnings]
   )
 
-  const handleAdjustOpen = useCallback((event: ReactMouseEvent<HTMLButtonElement>, index: number) => {
+  const handleAdjustOpen = useCallback((event: ReactMouseEvent<HTMLElement>, index: number) => {
     setAdjustAnchor(event.currentTarget)
     setAdjustIndex(index)
   }, [])
@@ -691,11 +691,34 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
               {draftLines.map((line, index) => {
                 const simulationLine = simulationLines?.[index] ?? null
                 const enginePrice = simulationLine?.suggestedBillRate?.unitPriceOutputCurrency ?? null
-                const isManualOverride = line.unitPrice !== null && line.unitPrice !== undefined
                 const subtotal = resolveDisplaySubtotal(line, simulationLine)
                 const typeMeta = LINE_TYPE_META[line.lineType]
                 const showCostStack = canViewCostStackProp && simulationLine && outputCurrency
                 const needsPricingContext = line.lineType === 'role' || line.lineType === 'person'
+                const v2LineType = line.metadata?.pricingV2LineType ?? null
+
+                // Catalog-priced: precio SIEMPRE viene del engine, input read-only.
+                // Matches lineRequiresSuggestedPrice en quote-builder-pricing.ts.
+                const isCatalogPriced =
+                  v2LineType === 'role' ||
+                  v2LineType === 'person' ||
+                  v2LineType === 'tool' ||
+                  v2LineType === 'overhead_addon'
+
+                const fteFraction = line.metadata?.fteFraction ?? 1
+
+                // Precio efectivo mostrado al usuario. Para role/person lo escalamos
+                // por FTE para que el subtotal = meses × precioMostrado sea lineal y
+                // auditable a ojo. Para tool/overhead no aplica FTE.
+                const displayedUnitPrice =
+                  enginePrice === null
+                    ? null
+                    : needsPricingContext
+                      ? enginePrice * fteFraction
+                      : enginePrice
+
+                // Manual override solo aplica a líneas NO catalog-backed (direct_cost).
+                const hasManualPrice = !isCatalogPriced && line.unitPrice !== null && line.unitPrice !== undefined
                 const tierMeta = simulationLine ? TIER_STATUS_META[simulationLine.tierCompliance.status] : null
                 const rowWarnings = warningsByLine.get(index) ?? []
                 const rowId = line.lineItemId ?? `draft-row-${index}`
@@ -777,18 +800,21 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                           <CustomTextField
                             size='small'
                             type='number'
-                            value={line.quantity}
+                            value={needsPricingContext
+                              ? (line.metadata?.periods ?? 1)
+                              : line.quantity
+                            }
                             onChange={event => {
                               const raw = event.target.value
                               const next = raw === '' ? 0 : Number(raw)
                               const parsed = Number.isFinite(next) ? next : 0
 
-                              // Para lineas period-based (role/person) sincronizamos
-                              // metadata.periods con quantity: la engine multiplica
-                              // por periods, no por quantity, cuando la base es mensual.
+                              // Para role/person la Cantidad visible representa meses
+                              // (periods). Mutamos solo metadata.periods; line.quantity
+                              // permanece en 1 para evitar el doble-conteo en el engine
+                              // (bill = unitPrice × fte × periods × quantity).
                               updateLine(index, needsPricingContext
                                 ? {
-                                    quantity: parsed,
                                     metadata: {
                                       ...(line.metadata ?? {}),
                                       periods: parsed
@@ -798,7 +824,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                               )
                             }}
                             disabled={saving}
-                            aria-label={`Cantidad del ítem ${index + 1}`}
+                            aria-label={needsPricingContext ? `Meses del ítem ${index + 1}` : `Cantidad del ítem ${index + 1}`}
                           />
                           {needsPricingContext ? (
                             <Typography variant='caption' color='text.secondary'>
@@ -840,22 +866,55 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       </TableCell>
                       <TableCell align='right'>
                         <Stack spacing={0.5} alignItems='flex-end'>
-                          {/*
-                            Patrón enterprise (Stripe Billing / Ramp / Linear):
-                            el input siempre muestra un valor concreto.
-                            - Si el usuario tiene override → muestra line.unitPrice.
-                            - Si no, muestra el precio del engine (catalog-backed).
-                            - Mientras el engine no responda en first-load, skeleton.
-                            Al cambiar cantidad el enginePrice se actualiza y el
-                            input refleja el nuevo valor en vivo, sin pisar overrides.
-                          */}
-                          {simulating && enginePrice === null && !isManualOverride ? (
-                            <Skeleton variant='rounded' width={140} height={32} aria-label='Calculando precio del catálogo' />
+                          {isCatalogPriced ? (
+
+                            /*
+                              Items de catálogo (role / person / tool / overhead_addon):
+                              el catálogo es SoT; el precio no se edita desde la UI.
+                              Se muestra como Typography read-only, FTE-ajustado en
+                              role/person para que el subtotal (meses × precio) sea
+                              lineal y auditable a ojo. Si el usuario necesita un
+                              precio distinto, crea una línea manual (direct_cost).
+                            */
+                            simulating && enginePrice === null ? (
+                              <Skeleton variant='text' width={110} height={22} aria-label='Calculando precio del catálogo' />
+                            ) : displayedUnitPrice !== null ? (
+                              <Stack spacing={0.25} alignItems='flex-end'>
+                                <Typography
+                                  variant='body2'
+                                  sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}
+                                  aria-label={`Precio unitario del ítem ${index + 1}, precio del catálogo`}
+                                >
+                                  {formatCurrency(displayedUnitPrice, currency)}
+                                </Typography>
+                                {needsPricingContext ? (
+                                  <Tooltip title='Ajustar FTE y tipo de contratación'>
+                                    <span>
+                                      <CustomChip
+                                        round='true'
+                                        size='small'
+                                        variant='tonal'
+                                        color={fteFraction !== 1 ? 'primary' : 'secondary'}
+                                        label={`FTE ${fteFraction.toFixed(2).replace(/\.?0+$/, '')}×`}
+                                        onClick={event => handleAdjustOpen(event, index)}
+                                        sx={{ cursor: 'pointer' }}
+                                      />
+                                    </span>
+                                  </Tooltip>
+                                ) : null}
+                              </Stack>
+                            ) : (
+                              <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                                —
+                              </Typography>
+                            )
                           ) : (
+
+                            /* Líneas manuales (direct_cost sin pricingV2LineType): editable. */
                             <CustomTextField
                               size='small'
                               type='number'
-                              value={line.unitPrice ?? (enginePrice !== null ? enginePrice : '')}
+                              value={line.unitPrice ?? ''}
                               onChange={event => {
                                 const raw = event.target.value
 
@@ -865,29 +924,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                               aria-label={`Precio unitario del ítem ${index + 1}`}
                             />
                           )}
-                          {isManualOverride && enginePrice !== null ? (
-                            <Stack direction='row' spacing={0.5} alignItems='center'>
-                              <CustomChip round='true' size='small' variant='outlined' color='warning' label='Override' />
-                              <Tooltip title={`Volver al precio del catálogo (${formatCurrency(enginePrice, currency)})`}>
-                                <span>
-                                  <IconButton
-                                    size='small'
-                                    onClick={() => updateLine(index, { unitPrice: null })}
-                                    disabled={saving}
-                                    aria-label='Volver al precio del catálogo'
-                                  >
-                                    <i className='tabler-refresh' style={{ fontSize: 16 }} />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                            </Stack>
-                          ) : null}
                         </Stack>
                       </TableCell>
                       <TableCell align='right'>
-                        {simulating && !isManualOverride && subtotal === 0 ? (
+                        {simulating && !hasManualPrice && subtotal === 0 ? (
                           <Skeleton variant='text' width={90} height={22} sx={{ ml: 'auto' }} aria-label='Calculando subtotal' />
-                        ) : subtotal === 0 && enginePrice === null && !isManualOverride ? (
+                        ) : subtotal === 0 && enginePrice === null && !hasManualPrice ? (
                           <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }} aria-label='Subtotal sin datos suficientes'>
                             —
                           </Typography>

@@ -35,7 +35,19 @@ export interface PersistedQuoteLineItem {
   resolvedCostNotes: string[] | null
 }
 
-const isPopulatedLine = (line: QuoteLineItem) => line.label.trim().length > 0 && line.quantity > 0
+const isPopulatedLine = (line: QuoteLineItem) => {
+  if (line.label.trim().length === 0) return false
+
+  // role/person: el multiplicador real es periods (la Cantidad visible en UI),
+  // line.quantity queda fijo en 1. Para el resto de líneas el check es sobre quantity.
+  const v2Type = line.metadata?.pricingV2LineType
+
+  if (v2Type === 'role' || v2Type === 'person') {
+    return (line.metadata?.periods ?? 0) > 0
+  }
+
+  return line.quantity > 0
+}
 
 const normalizeFiniteNumber = (value: number | null | undefined) =>
   value != null && Number.isFinite(value) ? value : null
@@ -99,13 +111,17 @@ export const buildQuotePricingLineInput = (
   const sku = line.metadata?.sku ?? line.roleCode ?? line.memberId ?? null
 
   if (v2Type === 'role' && sku) {
+    // Para role/person la "Cantidad" que ve el usuario es meses (periods).
+    // Mandamos siempre quantity=1 al engine para evitar doble conteo —
+    // el engine bill = unitPrice × fteFraction × periods × quantity, así que
+    // cualquier valor ≠ 1 en quantity multiplicaría dos veces por lo mismo.
     return {
       lineType: 'role',
       roleSku: sku,
       hours: null,
       fteFraction: line.metadata?.fteFraction ?? 1,
       periods: line.metadata?.periods ?? 1,
-      quantity: line.quantity,
+      quantity: 1,
       employmentTypeCode: line.metadata?.employmentTypeCode ?? null
     }
   }
@@ -117,7 +133,7 @@ export const buildQuotePricingLineInput = (
       hours: null,
       fteFraction: line.metadata?.fteFraction ?? 1,
       periods: line.metadata?.periods ?? 1,
-      quantity: line.quantity
+      quantity: 1
     }
   }
 
@@ -192,7 +208,6 @@ export const buildPersistedQuoteLineItems = ({
   return lines.map(line => {
     const expectedPricingLine = buildQuotePricingLineInput(line, currency)
     const simulationLine = expectedPricingLine ? simulationLines?.[simulationIndex++] ?? null : null
-    const explicitUnitPrice = normalizePositiveNumber(line.unitPrice)
 
     const resolvedUnitCost = normalizePositiveNumber(
       simulationLine?.costStack.unitCostOutputCurrency
@@ -205,24 +220,21 @@ export const buildPersistedQuoteLineItems = ({
     let unitPrice = normalizeFiniteNumber(line.unitPrice) ?? 0
 
     if (lineRequiresSuggestedPrice(line)) {
-      // El override manual gana sobre el sugerido; si hay un valor positivo explícito,
-      // lo usamos sin mirar la simulación (respeta la intención del comercial).
-      if (explicitUnitPrice != null) {
-        unitPrice = explicitUnitPrice
-      } else {
-        if (
-          !expectedPricingLine ||
-          !simulationLine ||
-          serializePricingLineInput(simulationLine.lineInput) !== serializePricingLineInput(expectedPricingLine)
-        ) {
-          throw new Error(`${missingPriceMessage} — revisa la línea: ${describeLine(line)}.`)
-        }
+      // Items de catálogo: el precio SIEMPRE viene del engine. No honramos
+      // overrides del usuario (el catálogo es SoT; si necesita un precio
+      // distinto, se usa una línea manual de direct_cost).
+      if (
+        !expectedPricingLine ||
+        !simulationLine ||
+        serializePricingLineInput(simulationLine.lineInput) !== serializePricingLineInput(expectedPricingLine)
+      ) {
+        throw new Error(`${missingPriceMessage} — revisa la línea: ${describeLine(line)}.`)
+      }
 
-        if (suggestedUnitPrice != null) {
-          unitPrice = suggestedUnitPrice
-        } else {
-          throw new Error(`${missingPriceMessage} — revisa la línea: ${describeLine(line)}.`)
-        }
+      if (suggestedUnitPrice != null) {
+        unitPrice = suggestedUnitPrice
+      } else {
+        throw new Error(`${missingPriceMessage} — revisa la línea: ${describeLine(line)}.`)
       }
     }
 

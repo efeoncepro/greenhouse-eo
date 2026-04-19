@@ -102,9 +102,12 @@ describe('buildPersistedQuoteLineItems', () => {
 
   it('rejects stale simulation output that no longer matches the draft line', () => {
     const line = roleLine()
+
     const staleSimulation = roleSimulationLine()
 
-    staleSimulation.lineInput.quantity = 2
+    // role lineInput siempre tiene `periods`; el cast nos libra del narrowing
+    // sobre la union de PricingLineInputV2.
+    ;(staleSimulation.lineInput as { periods: number }).periods = 2
 
     expect(() =>
       buildPersistedQuoteLineItems({
@@ -114,5 +117,22 @@ describe('buildPersistedQuoteLineItems', () => {
         missingPriceMessage: 'pricing missing'
       })
     ).toThrow('pricing missing')
+  })
+
+  it('ignores user-provided unitPrice on catalog-backed lines (engine is SoT)', () => {
+    const line = roleLine()
+
+    // Un intento de override directo sobre una línea de catálogo debe ser
+    // ignorado; el catálogo es la única fuente de verdad para role/person/tool/overhead.
+    line.unitPrice = 999999
+
+    const items = buildPersistedQuoteLineItems({
+      lines: [line],
+      currency: 'CLP',
+      simulationLines: [roleSimulationLine()],
+      missingPriceMessage: 'pricing missing'
+    })
+
+    expect(items[0]?.unitPrice).toBe(1750000)
   })
 })
