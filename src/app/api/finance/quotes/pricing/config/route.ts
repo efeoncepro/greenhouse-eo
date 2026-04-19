@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { loadBusinessLineMetadata } from '@/lib/business-line/metadata'
 import { listOverheadAddons } from '@/lib/commercial/overhead-addons-store'
 import {
   listCommercialModelMultipliers,
@@ -49,7 +50,8 @@ export async function GET() {
     countryPricingFactors,
     fteHoursGuide,
     toolCatalog,
-    overheadAddons
+    overheadAddons,
+    businessLines
   ] = await Promise.all([
     listMarginTargets(),
     listRoleRateCards(),
@@ -62,7 +64,8 @@ export async function GET() {
     listCountryPricingFactors(),
     listFteHoursGuide(),
     listToolCatalog({ active: true }),
-    listOverheadAddons({ active: true })
+    listOverheadAddons({ active: true }),
+    loadBusinessLineMetadata()
   ])
 
   return NextResponse.json({
@@ -78,7 +81,8 @@ export async function GET() {
       countryPricingFactors,
       fteHoursGuide,
       toolCatalog,
-      overheadAddons
+      overheadAddons,
+      businessLines
     },
     canEdit: canEditPricingConfig(tenant)
   })

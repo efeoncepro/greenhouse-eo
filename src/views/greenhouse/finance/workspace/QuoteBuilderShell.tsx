@@ -334,6 +334,7 @@ const QuoteBuilderShell = ({
           catalog?: {
             commercialModelMultipliers?: Array<{ modelCode: CommercialModelCode; modelLabel: string; multiplierPct: number }>
             countryPricingFactors?: Array<{ factorCode: string; factorLabel: string; factorOpt: number }>
+            businessLines?: Array<{ moduleCode: string; label: string; isActive?: boolean; sortOrder?: number }>
           }
         }
 
@@ -349,8 +350,12 @@ const QuoteBuilderShell = ({
           factor: Number(f.factorOpt)
         }))
 
+        const businessLines = payload.catalog?.businessLines
+          ?.filter(bl => bl.isActive !== false)
+          .map(bl => ({ code: bl.moduleCode, label: bl.label }))
+
         setBuilderOptions(prev => ({
-          businessLines: prev.businessLines,
+          businessLines: businessLines && businessLines.length > 0 ? businessLines : prev.businessLines,
           commercialModels: commercialModels && commercialModels.length > 0 ? commercialModels : prev.commercialModels,
           countryFactors: countryFactors && countryFactors.length > 0 ? countryFactors : prev.countryFactors
         }))
