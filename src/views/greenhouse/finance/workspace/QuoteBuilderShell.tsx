@@ -764,6 +764,7 @@ const QuoteBuilderShell = ({
               canViewCostStack={canSeeCostStack}
               simulationLines={simulation?.lines ?? null}
               outputCurrency={currency}
+              onDraftChange={setLinesSnapshot}
             />
           </Stack>
         </Grid>
