@@ -53,6 +53,30 @@
 - Admin UI para upsertar tasas manuales (hoy via API). Queda fuera de scope.
 - TASK-466 consume esta foundation para client-facing send gate.
 
+## Sesion 2026-04-19 — TASK-483 commercial cost worker foundation (Codex)
+
+- **Owner:** Codex
+- **Estado:** foundation implementada en branch dedicada; merge directo a `develop` en curso
+- **Colisión evitada:** no se tocó el checkout principal porque Claude ya había movido rama allí; TASK-483 se trabajó en worktree aislado `/Users/jreye/Documents/greenhouse-eo-codex-task-483`
+- **Runtime creado:**
+  - migración `20260419120945432_task-483-commercial-cost-worker-foundation.sql`
+  - ledger `greenhouse_commercial.commercial_cost_basis_snapshots`
+  - helpers `src/lib/commercial-cost-worker/{contracts,run-tracker,materialize}.ts`
+  - fallback route `src/app/api/internal/commercial-cost-basis/materialize/route.ts`
+  - scaffold Cloud Run `services/commercial-cost-worker/**`
+- **Decisión arquitectónica:** `ops-worker` no escala como hogar del programa de commercial cost basis. Se deja `commercial-cost-worker` como runtime objetivo para `people`, `tools` y `bundle`; `roles`, `reprice` y `margin feedback` quedan reservados con `501`.
+- **Verificación corrida:**
+  - `pnpm migrate:create task-483-commercial-cost-worker-foundation` ok
+  - `pnpm exec tsc --noEmit` ok
+  - `pnpm exec tsx scripts/migrate.ts up --no-check-order` ok con Cloud SQL Proxy local; también aplicó una migration pendiente previa (`20260419094152047_task-465-pricing-catalog-audit-service-support`) por drift conocido de orden en DB
+  - `pnpm lint` ok
+  - `pnpm build` ok
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'` → sin matches
+  - `bash -n services/commercial-cost-worker/deploy.sh` ok
+- **Riesgos / follow-up inmediato:**
+  - `docker build -f services/commercial-cost-worker/Dockerfile .` no se pudo correr porque el daemon Docker no estaba disponible en esta máquina (`/var/run/docker.sock` ausente)
+  - el estado en Cloud Run debe verificarse o desplegarse con credenciales `gcloud` vigentes; la implementación local no garantiza deploy remoto automático
+
 ## Sesion 2026-04-19 — TASK-483 ajustada a worker dedicado para Commercial Cost Basis (Codex)
 
 - **Owner:** Codex

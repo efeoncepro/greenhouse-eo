@@ -2,6 +2,14 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-483 crea el commercial-cost-worker y el ledger de cost basis
+
+- Nace `services/commercial-cost-worker/` como runtime Cloud Run dedicado para la base de costos comercial. Expone `POST /cost-basis/materialize`, `/people`, `/tools` y `/bundle`, y reserva `/roles`, `/quotes/reprice-bulk` y `/margin-feedback/materialize` para las siguientes tasks del programa.
+- Se agrega la migración `20260419120945432_task-483-commercial-cost-worker-foundation.sql` con `greenhouse_commercial.commercial_cost_basis_snapshots`, un ledger/manifiesto por `scope + period + run` que enlaza cada corrida con `greenhouse_sync.source_sync_runs`.
+- `src/lib/commercial-cost-worker/materialize.ts` orquesta `member_capacity_economics`, `provider_tooling_snapshots`, `commercial_cost_attribution` y `client_economics` sin recalcular métricas ICO inline, y publica eventos coarse-grained por periodo para `people`, `tools` y `bundle`.
+- Se agrega el fallback admin `POST /api/internal/commercial-cost-basis/materialize`, bloqueado por defecto para evitar que Vercel se use como ruta primaria de cómputo pesado.
+- `ops-worker` deja de ser la topología objetivo para la expansión del programa de cost basis: mantiene `POST /cost-attribution/materialize` como lane existente/fallback, mientras el resto del runtime comercial pesado se separa al worker nuevo.
+
 ### 2026-04-19 — TASK-475 formaliza la foundation FX + currency por dominio
 
 - Se crea una matriz canónica de monedas por dominio (`finance_core`, `pricing_output`, `reporting`, `analytics`) + FX policy enum + readiness contract. Toda la lógica vive en `src/lib/finance/currency-domain.ts` y `currency-registry.ts`, con un único resolver `resolveFxReadiness` que consumers (engine, APIs, UI futura) deben usar en vez de resolver tasas inline.

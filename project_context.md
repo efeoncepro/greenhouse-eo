@@ -118,6 +118,23 @@
 
 # project_context.md
 
+## Delta 2026-04-19 TASK-483 crea runtime dedicado para commercial cost basis
+
+- Greenhouse ya no debe tratar `ops-worker` como destino por defecto de toda materializacion financiera/comercial pesada.
+- Runtime nuevo:
+  - migración `20260419120945432_task-483-commercial-cost-worker-foundation.sql`
+  - tabla `greenhouse_commercial.commercial_cost_basis_snapshots`
+  - helpers `src/lib/commercial-cost-worker/contracts.ts`, `run-tracker.ts`, `materialize.ts`
+  - route fallback `POST /api/internal/commercial-cost-basis/materialize`
+  - servicio Cloud Run `services/commercial-cost-worker/`
+- Contrato operativo:
+  - `commercial-cost-worker` es la topologia objetivo para cost basis comercial por `people`, `tools` y `bundle`
+  - `ops-worker` mantiene su endpoint de `cost-attribution` como lane existente/fallback, pero no debe absorber el resto del programa de cost basis
+  - toda corrida del worker escribe a `greenhouse_sync.source_sync_runs` con `source_system='commercial_cost_worker'`
+  - la trazabilidad por periodo y scope vive en `greenhouse_commercial.commercial_cost_basis_snapshots`
+  - endpoints `roles`, `quote repricing` y `margin feedback` quedan reservados como contrato de futuro, no implementados en este corte
+  - cualquier worker Cloud Run nuevo que reuse `src/lib/` sin auth interactiva debe replicar el patron esbuild + shims ESM/CJS
+
 ## Delta 2026-04-17 TASK-345 materializa el bridge canónico de quotations
 
 - `greenhouse_commercial` ya existe físicamente con:

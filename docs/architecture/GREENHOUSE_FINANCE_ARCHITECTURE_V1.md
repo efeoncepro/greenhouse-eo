@@ -43,6 +43,21 @@ Implicación para el backlog:
 - `TASK-477` a `TASK-482` ya no se interpretan como mejoras puramente in-app.
 - La evolución del pricing lane debe respetar el split `interactive lane` vs `compute lane`.
 
+## Delta 2026-04-19 — TASK-483 formaliza la runtime topology del commercial cost basis engine
+
+- Finance/commercial ya no debe asumir que toda materializacion pesada de costo cabe en Vercel o debe vivir dentro de `ops-worker`.
+- Runtime nuevo:
+  - tabla `greenhouse_commercial.commercial_cost_basis_snapshots` como manifest/ledger por `scope + period + run`
+  - helper `src/lib/commercial-cost-worker/materialize.ts`
+  - fallback admin route `POST /api/internal/commercial-cost-basis/materialize`
+  - worker dedicado `services/commercial-cost-worker/`
+- Contrato operativo:
+  - `member_capacity_economics` sigue siendo la fuente people-level
+  - `provider_tooling_snapshots` sigue siendo la fuente tools/provider-level
+  - `commercial_cost_attribution` y `client_economics` siguen siendo los downstreams de margen/costo real
+  - el worker nuevo orquesta people/tools/bundle y publica eventos coarse-grained de periodo; no recalcula metricas ICO inline
+  - la siguiente ola (`roles`, `quote repricing`, `margin feedback`) debe acoplarse a este runtime en vez de colgar endpoints pesados nuevos en Vercel
+
 ## Delta 2026-04-18 — TASK-464c Tool Catalog + Overhead Addons Foundation
 
 - Finance quotation pricing gana la capa de costos directos y fees complementarios que faltaba para el engine v2:

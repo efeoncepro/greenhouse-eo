@@ -528,3 +528,12 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-472` | `to-do`       | Fix `/my/profile` SSR 500 in staging (resuelve ISSUE-054) | `docs/tasks/to-do/TASK-472-my-profile-ssr-500-fix.md` |
 | `TASK-473` | `to-do`       | Quote Builder Full-Page Surface Migration & Flow Recomposition | `docs/tasks/to-do/TASK-473-quote-builder-full-page-surface-migration.md` |
 | `TASK-474` | `to-do`       | Quote Builder Catalog / Service Reconnection Pass | `docs/tasks/to-do/TASK-474-quote-builder-catalog-reconnection-pass.md` |
+| `TASK-475` | `complete` | Greenhouse FX & Currency Platform Foundation | `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md` |
+| `TASK-476` | `to-do`       | Commercial Cost Basis Program | `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md` |
+| `TASK-477` | `to-do`       | Role Cost Assumptions Catalog & Effective-Dated Modeling | `docs/tasks/to-do/TASK-477-role-cost-assumptions-catalog.md` |
+| `TASK-478` | `to-do`       | Tool & Provider Cost Basis Snapshots | `docs/tasks/to-do/TASK-478-tool-provider-cost-basis-snapshots.md` |
+| `TASK-479` | `to-do`       | People Actual Cost + Blended Role Cost Snapshots | `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md` |
+| `TASK-480` | `to-do`       | Pricing Engine Cost Resolver, Provenance & Confidence | `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md` |
+| `TASK-481` | `to-do`       | Quote Builder Suggested Cost UX & Override Governance | `docs/tasks/to-do/TASK-481-quote-builder-suggested-cost-override-governance.md` |
+| `TASK-482` | `to-do`       | Quoted vs Actual Margin Feedback Loop | `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md` |
+| `TASK-483` | `in-progress` | Commercial Cost Basis Engine Runtime Topology & Worker Foundation | `docs/tasks/in-progress/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md` |

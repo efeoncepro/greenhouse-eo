@@ -125,6 +125,7 @@ export const AGGREGATE_TYPES = {
   commercialCostAttribution: 'commercial_cost_attribution',
   operationalPl: 'operational_pl',
   marginAlert: 'margin_alert',
+  commercialCostBasis: 'commercial_cost_basis',
   staffAugPlacement: 'staff_aug_placement',
   staffAugOnboardingItem: 'staff_aug_onboarding_item',
   staffAugPlacementSnapshot: 'staff_aug_placement_snapshot',
@@ -240,6 +241,9 @@ export const EVENT_TYPES = {
   providerUpserted: 'provider.upserted',
   providerToolingSnapshotMaterialized: 'provider.tooling_snapshot.materialized',
   providerToolingSnapshotPeriodMaterialized: 'provider.tooling_snapshot.period_materialized',
+  commercialCostBasisPeoplePeriodMaterialized: 'commercial_cost_basis.people.period_materialized',
+  commercialCostBasisToolsPeriodMaterialized: 'commercial_cost_basis.tools.period_materialized',
+  commercialCostBasisBundlePeriodMaterialized: 'commercial_cost_basis.bundle.period_materialized',
 
   // AI Tooling structural events
   aiToolCreated: 'ai_tool.created',

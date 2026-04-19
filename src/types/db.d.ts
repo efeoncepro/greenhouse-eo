@@ -189,6 +189,34 @@ export interface GreenhouseCommercialApprovalSteps {
   version_number: number;
 }
 
+export interface GreenhouseCommercialCommercialCostBasisSnapshots {
+  basis_scope: string;
+  client_id: string | null;
+  context_id: string | null;
+  created_at: Generated<Timestamp>;
+  engine_version: Generated<string>;
+  finished_at: Timestamp | null;
+  input_hash: string | null;
+  input_manifest_json: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  public_id: Generated<string>;
+  records_failed: Generated<number>;
+  records_read: Generated<number>;
+  records_written: Generated<number>;
+  snapshot_key: string;
+  source_sync_run_id: string;
+  space_id: string | null;
+  started_at: Generated<Timestamp>;
+  status: Generated<string>;
+  summary_jsonb: Generated<Json>;
+  trigger_source: string | null;
+  triggered_by: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialCommercialModelMultipliers {
   description: string | null;
   effective_from: Generated<Timestamp>;
@@ -5365,6 +5393,7 @@ export interface DB {
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
+  "greenhouse_commercial.commercial_cost_basis_snapshots": GreenhouseCommercialCommercialCostBasisSnapshots;
   "greenhouse_commercial.commercial_model_multipliers": GreenhouseCommercialCommercialModelMultipliers;
   "greenhouse_commercial.contract_quotes": GreenhouseCommercialContractQuotes;
   "greenhouse_commercial.contract_renewal_reminders": GreenhouseCommercialContractRenewalReminders;

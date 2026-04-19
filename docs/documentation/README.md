@@ -47,6 +47,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 - [Account Complete 360](agency/cuenta-completa-360.md) — datos completos de una cuenta u organizacion: facetas, autorizacion, endpoint unificado
 - [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
+- [Commercial Cost Worker](operations/commercial-cost-worker.md) — worker Cloud Run dedicado para la base de costos comercial, su ledger de corridas por periodo/scope y la separacion respecto de `ops-worker`
 - [Acceso Programatico a Staging](operations/acceso-programatico-staging.md) — como agentes y CI acceden a Staging, bypass de SSO, comando `staging:request`, troubleshooting
 
 ### Delivery
