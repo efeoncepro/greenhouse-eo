@@ -2,6 +2,12 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — Quote issuance sales-context lock stops tripping on LEFT JOINs
+
+- Emitir una cotización desde `/finance/quotes/[id]` ya no falla con `FOR UPDATE cannot be applied to the nullable side of an outer join` cuando el flujo captura `sales_context_at_sent`.
+- El lock transaccional se separa de la lectura enriquecida del snapshot comercial: primero se bloquea solo la fila de `greenhouse_commercial.quotations`, y luego se resuelve el contexto con `LEFT JOIN` sin arrastrar locks inválidos sobre relaciones opcionales.
+- Se agrega una prueba de regresión para asegurar que futuros cambios en el reader de sales context no vuelvan a mezclar `FOR UPDATE` con joins opcionales.
+
 ### 2026-04-19 — Quote issuance actions converge across builder, detail and superadmin access
 
 - El cotizador deja explícitos dos intents distintos: **Guardar borrador** y **Guardar y emitir**. Emitir desde `/finance/quotes/new` o `/finance/quotes/[id]/edit` reutiliza el mismo comando canónico `POST /api/finance/quotes/[id]/issue`, en vez de depender de que el usuario guarde y luego descubra otra pantalla.

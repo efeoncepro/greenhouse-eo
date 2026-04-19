@@ -92,6 +92,10 @@ LEFT JOIN greenhouse_commercial.deals AS d
  )
 WHERE q.quotation_id = $1`
 
+const SALES_CONTEXT_LOCK_SQL = `SELECT q.quotation_id
+FROM greenhouse_commercial.quotations AS q
+WHERE q.quotation_id = $1`
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
@@ -180,8 +184,25 @@ const loadSalesContextSource = async ({
     startIndex: 2
   })
 
-  const sql = `${SALES_CONTEXT_SOURCE_SQL}${scope.sql}${lockForUpdate ? '\nFOR UPDATE' : ''}`
   const params: unknown[] = [quotationId, ...scope.params]
+
+  if (client && lockForUpdate) {
+    const lockSql = `${SALES_CONTEXT_LOCK_SQL}${scope.sql}\nFOR UPDATE`
+    const lockResult = await client.query<{ quotation_id: string }>(lockSql, params)
+
+    if (lockResult.rows.length === 0) {
+      return null
+    }
+
+    const result = await client.query<SalesContextSourceRow>(
+      `${SALES_CONTEXT_SOURCE_SQL}${scope.sql}`,
+      params
+    )
+
+    return result.rows[0] ?? null
+  }
+
+  const sql = `${SALES_CONTEXT_SOURCE_SQL}${scope.sql}`
 
   if (client) {
     const result = await client.query<SalesContextSourceRow>(sql, params)
