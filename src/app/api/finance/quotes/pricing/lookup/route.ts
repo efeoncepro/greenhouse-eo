@@ -4,13 +4,14 @@ import { NextResponse } from 'next/server'
 
 import { listOverheadAddons } from '@/lib/commercial/overhead-addons-store'
 import { listEmploymentTypes, listSellableRoles } from '@/lib/commercial/sellable-roles-store'
+import { listServiceCatalog } from '@/lib/commercial/service-catalog-store'
 import { listToolCatalog } from '@/lib/commercial/tool-catalog-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
-const LOOKUP_TYPES = ['role', 'tool', 'addon', 'person', 'employment_type'] as const
+const LOOKUP_TYPES = ['role', 'tool', 'addon', 'person', 'employment_type', 'service'] as const
 
 type LookupType = (typeof LOOKUP_TYPES)[number]
 
@@ -48,6 +49,7 @@ const lookupRoles = async (query: string): Promise<LookupItem[]> => {
       description: row.roleLabelEn ?? null,
       category: row.category,
       metadata: {
+        roleId: row.roleId,
         tier: row.tier,
         tierLabel: row.tierLabel,
         canSellAsStaff: row.canSellAsStaff,
@@ -86,6 +88,7 @@ const lookupTools = async (query: string, businessLineCode: string | null): Prom
       description: row.vendor,
       category: row.toolCategory,
       metadata: {
+        toolId: row.toolId,
         costModel: row.costModel,
         subscriptionAmount: row.subscriptionAmount,
         subscriptionCurrency: row.subscriptionCurrency,
@@ -136,6 +139,43 @@ const lookupEmploymentTypes = async (query: string): Promise<LookupItem[]> => {
         paymentCurrency: row.paymentCurrency,
         appliesPrevisional: row.appliesPrevisional,
         appliesBonuses: row.appliesBonuses
+      }
+    }))
+}
+
+const lookupServices = async (query: string, businessLineCode: string | null): Promise<LookupItem[]> => {
+  const rows = await listServiceCatalog({ activeOnly: true })
+
+  return rows
+    .filter(row => {
+      const textMatch =
+        matches(row.serviceSku, query) ||
+        matches(row.moduleName, query) ||
+        matches(row.displayName, query) ||
+        matches(row.serviceCategory, query)
+
+      if (!textMatch) return false
+      if (!businessLineCode) return true
+      if (!row.businessLineCode) return true
+
+      return row.businessLineCode === businessLineCode
+    })
+    .map(row => ({
+      sku: row.serviceSku,
+      label: row.displayName ?? row.moduleName,
+      description: row.defaultDescription ?? row.serviceType,
+      category: row.serviceCategory,
+      metadata: {
+        moduleId: row.moduleId,
+        moduleCode: row.moduleCode,
+        tier: row.tier,
+        commercialModel: row.commercialModel,
+        serviceUnit: row.serviceUnit,
+        serviceType: row.serviceType,
+        defaultDurationMonths: row.defaultDurationMonths,
+        businessLineCode: row.businessLineCode,
+        roleRecipeCount: row.roleRecipeCount,
+        toolRecipeCount: row.toolRecipeCount
       }
     }))
 }
@@ -202,6 +242,7 @@ export async function GET(request: Request) {
     else if (type === 'addon') items = await lookupAddons(query)
     else if (type === 'employment_type') items = await lookupEmploymentTypes(query)
     else if (type === 'person') items = await lookupPeople(query, limit)
+    else if (type === 'service') items = await lookupServices(query, businessLineCode)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Lookup failed.'
 

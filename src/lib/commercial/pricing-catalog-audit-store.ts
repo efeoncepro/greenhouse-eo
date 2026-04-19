@@ -12,6 +12,7 @@ export type PricingCatalogEntityType =
   | 'country_pricing_factor'
   | 'fte_hours_guide'
   | 'employment_type'
+  | 'service_catalog'
 
 export type PricingCatalogAction =
   | 'created'
@@ -21,6 +22,8 @@ export type PricingCatalogAction =
   | 'cost_updated'
   | 'pricing_updated'
   | 'bulk_imported'
+  | 'recipe_updated'
+  | 'deleted'
 
 export interface PricingCatalogAuditEntry {
   auditId: string
@@ -59,7 +62,8 @@ const PRICING_CATALOG_ENTITY_TYPES: readonly PricingCatalogEntityType[] = [
   'commercial_model_multiplier',
   'country_pricing_factor',
   'fte_hours_guide',
-  'employment_type'
+  'employment_type',
+  'service_catalog'
 ]
 
 const PRICING_CATALOG_ACTIONS: readonly PricingCatalogAction[] = [
@@ -69,7 +73,9 @@ const PRICING_CATALOG_ACTIONS: readonly PricingCatalogAction[] = [
   'reactivated',
   'cost_updated',
   'pricing_updated',
-  'bulk_imported'
+  'bulk_imported',
+  'recipe_updated',
+  'deleted'
 ]
 
 const toChangeSummary = (value: unknown): Record<string, unknown> => {

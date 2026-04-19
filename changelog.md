@@ -2,6 +2,15 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-465 canonicaliza el catálogo de servicios compuestos (EFG-XXX)
+
+- Los servicios vendibles ahora se extienden sobre la identidad canónica `greenhouse_core.service_modules` (no se crea un `service_catalog` paralelo): la capa comercial vive en `greenhouse_commercial.service_pricing` con PK = `module_id` 1:1 al modulo y `service_sku` (`EFG-XXX`) autogenerado vía sequence + `generate_service_sku()` — admin puede dar de alta EFG-008+ sin migración.
+- Los recipes `service_role_recipe` + `service_tool_recipe` quedan anclados al `module_id` canónico y apuntan a `sellable_roles.role_id` / `ai.tool_catalog.tool_id`. `quotation_line_items` gana `module_id` (FK robusto a renames), `service_sku` (denormalizado para display) y `service_line_order` (preserva orden del recipe para diffs histórico-vs-actual).
+- `POST /api/finance/quotes/from-service` expande un servicio al formato `PricingEngineInputV2` y delega en el engine v2 (sin duplicar lógica de costeo). Soporta overrides por `lineOrder` (hours / quantity / excluded) y `commercialModelOverride`. Devuelve lines + totals multi-currency.
+- Admin UI en `/admin/pricing-catalog/services`: lista filtrable (tier / categoría / BL / estado), drawers de crear/editar con recipe editor que reusa `/api/finance/quotes/pricing/lookup?type=role|tool`, keyboard-only reorder (WCAG 2.5.7), sección "Simular precio". `canAdministerPricingCatalog` gate + `If-Match` optimistic locking + audit log (`service_catalog` entity + `created`/`updated`/`deactivated`/`reactivated`/`recipe_updated`/`deleted` actions).
+- El tab "Servicios" de `SellableItemPickerDrawer` se activa contra el lookup real y queda como subflujo reusable; la integración primaria en el quote builder aterriza sobre TASK-473 (builder full-page) — esta task no profundiza `QuoteCreateDrawer`.
+- Seeder `pnpm seed:service-catalog --apply` resuelve roles/tools por label, UPSERT idempotente en `service_modules` + `service_pricing` + recipes. Seedea los 7 EFG activos (EFG-001..007); placeholders EFG-008..048 se skip.
+
 ### 2026-04-19 — TASK-470 endurece Pricing Catalog para operación enterprise
 
 - `Admin > Pricing Catalog` deja de depender de last-write-wins silencioso: los handlers mutables ya soportan optimistic locking con `If-Match`, `ETag` y `409 Conflict` cuando el recurso cambió desde la última lectura.

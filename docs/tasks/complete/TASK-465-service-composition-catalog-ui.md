@@ -41,7 +41,11 @@ El resto de la spec (pricing engine v2 integration, picker drawer, reporting hoo
 
 ## Status
 
+<<<<<<<< HEAD:docs/tasks/in-progress/TASK-465-service-composition-catalog-ui.md
 - Lifecycle: `in-progress`
+========
+- Lifecycle: `complete`
+>>>>>>>> task/TASK-465-service-composition-catalog-ui:docs/tasks/complete/TASK-465-service-composition-catalog-ui.md
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
