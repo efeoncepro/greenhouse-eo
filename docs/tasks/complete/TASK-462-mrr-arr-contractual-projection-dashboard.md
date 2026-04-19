@@ -1,12 +1,62 @@
 # TASK-462 — MRR/ARR Contractual Projection & Dashboard
 
+## Delta 2026-04-19 (close-out)
+
+**Status real: complete.** Shipped en branch `task/TASK-462-mrr-arr-contractual-projection-dashboard`.
+
+### Entregables
+
+- **Migration** `20260419083556852_task-462-mrr-arr-schema.sql` — tabla `greenhouse_serving.contract_mrr_arr_snapshots` con PK compuesto `(period_year, period_month, contract_id)`, columnas generadas `arr_clp = mrr_clp × 12` + `mrr_delta_clp = mrr_clp - COALESCE(previous_mrr_clp, 0)`, CHECK constraint movement_type, 3 índices (tenant, client, movement partial).
+- **Materializer** `src/lib/commercial-intelligence/mrr-arr-materializer.ts`:
+  - `buildMrrArrSnapshotsForPeriod({ year, month })` — filtra `commercial_model='retainer' AND status='active'` con overlap de ventana, compara contra snapshot previo para clasificar movement, UPSERT con ON CONFLICT
+  - `backfillMrrArrFromFirstContract()` — loop cronológico desde primer contract hasta mes actual
+  - Detecta churn comparando con snapshot previa (contract no aparece en current → churn registrado con currentMrr=0)
+- **Store** `src/lib/commercial-intelligence/mrr-arr-store.ts`:
+  - `listMrrArrByPeriod`, `getMrrArrPeriodTotals`, `getMrrArrSeries`, `computeNrr`, `listMrrArrMovements`
+  - JOINs a `greenhouse_commercial.contracts` (contract_number) + `greenhouse_core.clients` (client_name)
+  - NRR computation: starting 12m ago + expansion + reactivation − contraction − churn
+- **Reactive projection** `src/lib/sync/projections/contract-mrr-arr.ts` domain `cost_intelligence`, triggers `commercial.contract.{created,activated,renewed,modified,terminated,completed}`, scope `finance_period:YYYY-MM`, maxRetries=1. Registrada en `projections/index.ts`.
+- **3 endpoints** bajo `/api/finance/commercial-intelligence/mrr-arr/`:
+  - `GET ?year=Y&month=M` → `{ period, totals, items, count }`
+  - `GET /timeline?months=12` → `{ range, series, nrr }`
+  - `GET /movements?year=Y&month=M&movementType=X` → `{ period, items, count }`
+  - Todos con `requireFinanceTenantContext` + `tenant.spaceId` scope
+- **UI** nuevo outer tab "MRR/ARR" (4º) en `FinanceIntelligenceView` con `MrrArrDashboardView.tsx`:
+  - 4 KPIs con `HorizontalWithSubtitle` (MRR, ARR, NRR con color semáforo, contratos activos)
+  - Timeline ApexCharts bar stacked 12-month por movement type (positivos arriba, contraction+churn negativos)
+  - 3 breakdown cards (commercial_model, staffing_model, business_line con top 5 + "+ N más")
+  - Top 10 contracts tabla con trend color + movement chip
+  - Period switcher (mes anterior/siguiente)
+- **Copy** bloque nuevo `GH_MRR_ARR_DASHBOARD` en `greenhouse-nomenclature.ts` con 40+ entries.
+- **Tests**: 15/15 passing en `src/lib/commercial-intelligence/__tests__/mrr-arr-materializer.test.ts` — classifier (6 scenarios), filters SQL, backfill cronológico, período inválido.
+- **Doc funcional** nuevo `docs/documentation/finance/mrr-arr.md`.
+- **Architecture doc** `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` v2.21.
+
+### Deviations técnicas documentadas
+
+1. **Opción A escogida** (tab outer separado en `FinanceIntelligenceView` en vez de sub-tab dentro de "Pipeline comercial"). Razón narrativa: MRR/ARR = revenue firmado recurrente; Pipeline = forecast futuro. Conceptos distintos, tabs distintos.
+2. **Migration timestamp bumped** de `20260419082522263` → `20260419083556852` porque Codex (TASK-470) aplicó una migración WIP `20260419080928005_task-quote-line-tool-addon-links` a la DB sin push del file. Solucionado con `pnpm migrate:create` fresh + `--no-check-order` una sola vez.
+3. **Codex WIP stashed aside** para mantener branch limpia: `src/lib/commercial/{capacity-overcommit-events,pricing-catalog-constraints,pricing-catalog-impact-analysis}.ts` + `src/lib/tenant/optimistic-locking.ts` + modifications a admin pricing-catalog routes + event-catalog. Stash preservado para restore post-merge.
+4. **UI subagent timed out** en la fase UI; completé el `MrrArrDashboardView.tsx` directamente en el hilo principal invocando `greenhouse-dev` + `greenhouse-ux-writing` skills.
+
+### Gates verdes
+
+- `pnpm lint` clean
+- `npx tsc --noEmit` clean
+- `pnpm test` → 209/209 (194 payroll baseline intacto + 15 TASK-462 nuevos)
+- `pnpm build` compiled exit 0 (17.0s)
+- Migration aplicada + types regenerados (252 tables)
+- Zero `new Pool()` rogue
+
+### Payroll isolation mantenida
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
