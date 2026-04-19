@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseño`
+- Status real: `En implementacion`
 - Rank: `TBD`
 - Domain: `finance / commercial`
 - Blocked by: `none` (foundation ya existe)
@@ -127,7 +127,7 @@ Reglas obligatorias:
 ### Slice 1 — Migración schema + backfill
 
 - Crear migración `task-486-quotation-canonical-anchor`:
-  - `ALTER TABLE greenhouse_commercial.quotations ADD COLUMN contact_identity_profile_id TEXT REFERENCES greenhouse_core.identity_profiles(identity_profile_id) ON DELETE SET NULL`
+  - `ALTER TABLE greenhouse_commercial.quotations ADD COLUMN contact_identity_profile_id TEXT REFERENCES greenhouse_core.identity_profiles(profile_id) ON DELETE SET NULL` (FK target es `profile_id`, no `identity_profile_id` — convención del codebase es nombrar columnas FK con prefijo semántico pero apuntar al PK `profile_id`)
   - `CREATE INDEX idx_commercial_quotations_contact ON greenhouse_commercial.quotations (contact_identity_profile_id) WHERE contact_identity_profile_id IS NOT NULL`
   - `ALTER TABLE greenhouse_commercial.quotations ALTER COLUMN organization_id SET NOT NULL` — **con backfill previo** desde `client_profiles` join: organizations donde tenga match por client_id legacy.
   - Mantener `space_id` existente como nullable; agregar COMMENT explicando "deprecated: post-conversion operational scope only, not canonical anchor".
@@ -267,7 +267,7 @@ Response detail adds:
 ### UI contract
 
 - Dropdown 1: "Organización (cliente o prospecto)" — busca sobre `greenhouse_core.organizations WHERE organization_type IN ('client','supplier','both','other')`. Required.
-- Dropdown 2: "Contacto" — typeahead sobre `identity_profiles` con `person_memberships.organization_id = <selected_org>` y `membership_type IN ('contact','client_user','billing')`. Optional. Empty state: "Ningún contacto registrado. Puedes agregar uno en el detalle de la organización."
+- Dropdown 2: "Contacto" — typeahead sobre `identity_profiles` con `person_memberships.organization_id = <selected_org>` y `membership_type IN ('client_contact','client_user','contact','billing','partner','advisor')` (excluye `team_member` y `contractor` porque no aplican como contacto comercial de cotización). Optional. Empty state: "Ningún contacto registrado. Puedes agregar uno en el detalle de la organización."
 
 ## Acceptance Criteria
 

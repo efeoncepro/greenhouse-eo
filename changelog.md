@@ -2,6 +2,17 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-486 Commercial Quotation Canonical Anchor (Organization + Contact)
+
+- `greenhouse_commercial.quotations` adopta **Organización + Contacto (identity_profile)** como anchor canónico. `space_id` queda deprecated en el write path (columnas preservadas vía COMMENT por compatibilidad con quote-to-cash legacy readers — no drop físico en v1).
+- Migración `20260419144036463_task-486-quotation-canonical-anchor.sql`: nueva columna `contact_identity_profile_id` FK a `identity_profiles(profile_id)`, backfill de `organization_id` desde `client_profiles` + `spaces`, index `idx_commercial_quotations_organization_status` para tenant scoping. `organization_id` queda NULLABLE a nivel DB (enforcement en API); follow-up data remediation cerrará orphans antes de un v2 `SET NOT NULL`.
+- Tenant scoping de quotes refactorizado: nueva función `resolveFinanceQuoteTenantOrganizationIds` reemplaza `SpaceIds` en `listFinanceQuotesFromCanonical`, `getFinanceQuoteDetailFromCanonical`, `listFinanceQuoteLinesFromCanonical` y `pricing-catalog-impact-analysis.loadOpenQuoteRows`. Los 4 `preview-impact` endpoints resuelven ambos (`spaceIds` + `organizationIds`) para compatibilidad con deals/contracts legacy.
+- `POST /api/finance/quotes` exige `organizationId`; valida `contactIdentityProfileId` opcional contra `person_memberships` activa con `membership_type IN ('client_contact','client_user','contact','billing','partner','advisor')`. `PUT /[id]` replica. Nuevo endpoint `GET /api/commercial/organizations/[id]/contacts` devuelve candidatos filtrados + tenant isolation.
+- HubSpot sync simplificado: `resolveSpaceForCompany` → `resolveOrganizationForCompany`. Gate ahora es "company tiene org mapeada" no "tiene space mapeado"; payload de `quote.synced` deja de llevar `spaceId`.
+- Quote Builder UI: label "Espacio destinatario" → "Organización (cliente o prospecto)"; segundo dropdown "Contacto" con fetch async al seleccionar org (ordenado `is_primary DESC`, marcador "Principal"). Payload del save incluye `contactIdentityProfileId`. Detail response del GET canonical expone `organization` + `contact` como objetos.
+- Docs: `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.23; `docs/documentation/finance/cotizador.md` → v3 con regla "A quién se le cotiza" explícita.
+- Pending: smoke staging post-deploy (task sigue en `in-progress` hasta verificación end-to-end con agent-session).
+
 ### 2026-04-19 — fix(quotes): POST /api/finance/quotes now saves
 
 - `POST /api/finance/quotes` devolvía HTTP 500 con body vacío al guardar desde el builder full-page cuando no había `spaceId` explícito.

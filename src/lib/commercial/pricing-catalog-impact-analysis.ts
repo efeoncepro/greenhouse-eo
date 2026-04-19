@@ -11,8 +11,12 @@ export type PricingCatalogImpactEntityType =
   | 'country_pricing_factor'
 
 export interface PricingCatalogImpactPreviewInput {
+
+  // TASK-486: spaceIds siguen aceptándose porque deal_pipeline_snapshots (proyección separada)
+  // se scopea por space_id. Pero las queries de quotations ahora filtran por organization_id.
   spaceId?: string | null
   spaceIds?: string[] | null
+  organizationIds?: string[] | null
   entityType: PricingCatalogImpactEntityType
   entityId?: string | null
   entitySku?: string | null
@@ -184,11 +188,24 @@ const resolveSpaceIds = (input: PricingCatalogImpactPreviewInput) => {
   return [...ids]
 }
 
+// TASK-486: quotation filtering switched to organization_id; deal_pipeline_snapshots aún por space_id.
+const resolveOrganizationIds = (input: PricingCatalogImpactPreviewInput) => {
+  const ids = new Set<string>()
+
+  for (const candidate of input.organizationIds ?? []) {
+    const trimmed = candidate?.trim()
+
+    if (trimmed) ids.add(trimmed)
+  }
+
+  return [...ids]
+}
+
 const extractSelector = (input: PricingCatalogImpactPreviewInput) =>
   input.entityCode?.trim() || input.entitySku?.trim() || input.entityId?.trim() || ''
 
-const loadOpenQuoteRows = async (spaceIds: string[]) => {
-  if (spaceIds.length === 0) return [] as QuoteLineEvidenceRow[]
+const loadOpenQuoteRows = async (organizationIds: string[]) => {
+  if (organizationIds.length === 0) return [] as QuoteLineEvidenceRow[]
 
   return query<QuoteLineEvidenceRow>(
     `SELECT
@@ -226,10 +243,10 @@ const loadOpenQuoteRows = async (spaceIds: string[]) => {
      LEFT JOIN greenhouse_commercial.product_catalog pc
        ON pc.product_id = qli.product_id
        OR pc.finance_product_id = qli.product_id
-     WHERE q.space_id = ANY($1::text[])
+     WHERE q.organization_id = ANY($1::text[])
        AND COALESCE(q.legacy_status, q.status) = ANY($2::text[])
      ORDER BY q.quote_date DESC NULLS LAST, q.updated_at DESC, q.quotation_id ASC, qli.sort_order ASC, qli.created_at ASC`,
-    [spaceIds, OPEN_QUOTE_STATUSES]
+    [organizationIds, OPEN_QUOTE_STATUSES]
   )
 }
 
@@ -511,6 +528,7 @@ export const previewPricingCatalogImpact = async (
   const asOfDate = toIsoDate(input.asOfDate) ?? new Date().toISOString().slice(0, 10)
   const sampleLimit = Math.max(1, Math.min(10, input.sampleLimit ?? 5))
   const spaceIds = resolveSpaceIds(input)
+  const organizationIds = resolveOrganizationIds(input)
 
   const [
     quoteRows,
@@ -522,7 +540,7 @@ export const previewPricingCatalogImpact = async (
     countryTarget,
     tierMarginTarget
   ] = await Promise.all([
-    loadOpenQuoteRows(spaceIds),
+    loadOpenQuoteRows(organizationIds),
     input.entityType === 'sellable_role' ? loadSellableRoleTarget(selector) : Promise.resolve(null),
     input.entityType === 'role_tier_margin' ? loadRolesForTier(selector) : Promise.resolve([] as SellableRoleTargetRow[]),
     input.entityType === 'tool_catalog' ? loadToolTarget(selector) : Promise.resolve(null),

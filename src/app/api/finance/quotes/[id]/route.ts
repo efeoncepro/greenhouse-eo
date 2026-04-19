@@ -171,9 +171,20 @@ export async function GET(
   }
 }
 
+// TASK-486: mirror del set en POST route.ts. Mantener sincronizado.
+const QUOTE_CONTACT_MEMBERSHIP_TYPES = [
+  'client_contact',
+  'client_user',
+  'contact',
+  'billing',
+  'partner',
+  'advisor'
+] as const
+
 interface UpdateQuotationPayload {
   quotationNumber?: string | null
   status?: string | null
+  contactIdentityProfileId?: string | null
   businessLineCode?: string | null
   currency?: string | null
   billingFrequency?: string | null
@@ -272,6 +283,62 @@ export async function PUT(
   }
 
   if (body.exchangeSnapshotDate !== undefined) push('exchange_snapshot_date', body.exchangeSnapshotDate, '::date')
+
+  // TASK-486: contacto canónico asociable en update. null = clear contact; string = set con validación.
+  if (body.contactIdentityProfileId !== undefined) {
+    const contactId =
+      typeof body.contactIdentityProfileId === 'string' && body.contactIdentityProfileId.trim()
+        ? body.contactIdentityProfileId.trim()
+        : null
+
+    if (contactId !== null) {
+      const quoteOrgRows = await query<{ organization_id: string | null }>(
+        `SELECT organization_id
+           FROM greenhouse_commercial.quotations
+           WHERE quotation_id = $1
+           LIMIT 1`,
+        [identity.quotationId]
+      )
+
+      const quoteOrgId = quoteOrgRows[0]?.organization_id ?? null
+
+      if (!quoteOrgId) {
+        return NextResponse.json(
+          { error: 'Esta cotización no tiene organización; asigna una antes de setear contacto.' },
+          { status: 400 }
+        )
+      }
+
+      const membershipRows = await query<{ membership_type: string }>(
+        `SELECT pm.membership_type
+           FROM greenhouse_core.person_memberships pm
+           WHERE pm.profile_id = $1
+             AND pm.organization_id = $2
+             AND pm.active = TRUE
+           LIMIT 1`,
+        [contactId, quoteOrgId]
+      )
+
+      if (membershipRows.length === 0) {
+        return NextResponse.json(
+          { error: 'contactIdentityProfileId no tiene membership activa en la organización de esta cotización.' },
+          { status: 400 }
+        )
+      }
+
+      const membershipType = membershipRows[0].membership_type
+
+      if (!QUOTE_CONTACT_MEMBERSHIP_TYPES.includes(membershipType as typeof QUOTE_CONTACT_MEMBERSHIP_TYPES[number])) {
+        return NextResponse.json(
+          { error: `membership_type='${membershipType}' no aplica como contacto comercial (admitidos: ${QUOTE_CONTACT_MEMBERSHIP_TYPES.join(', ')}).` },
+          { status: 400 }
+        )
+      }
+    }
+
+    push('contact_identity_profile_id', contactId)
+  }
+
   if (body.description !== undefined) push('description', body.description)
   if (body.internalNotes !== undefined) push('internal_notes', body.internalNotes)
   if (body.notes !== undefined) push('notes', body.notes)

@@ -58,6 +58,7 @@ export interface QuoteBuilderShellQuote {
   quotationNumber: string | null
   clientId: string | null
   organizationId: string | null
+  contactIdentityProfileId?: string | null
   description: string | null
   currency: string
   status: string
@@ -76,6 +77,7 @@ export interface QuoteBuilderShellSubmitPayload {
   quotationId: string | null
   templateId: string | null
   organizationId: string | null
+  contactIdentityProfileId: string | null
   description: string
   pricingModel: QuoteBuilderPricingModel
   currency: PricingOutputCurrency
@@ -86,6 +88,18 @@ export interface QuoteBuilderShellSubmitPayload {
   commercialModel: CommercialModelCode
   countryFactorCode: string
   lineItems: QuoteLineItem[]
+}
+
+// TASK-486: contactos canónicos anclables a la cotización. Se hidratan client-side
+// vía GET /api/commercial/organizations/[id]/contacts al seleccionar organización.
+interface QuoteOrganizationContact {
+  identityProfileId: string
+  fullName: string | null
+  canonicalEmail: string | null
+  jobTitle: string | null
+  roleLabel: string | null
+  membershipType: string
+  isPrimary: boolean
 }
 
 export interface QuoteBuilderShellProps {
@@ -296,6 +310,13 @@ const QuoteBuilderShell = ({
   const [builderState, setBuilderState] = useState<QuoteBuilderState>(initialBuilderState)
   const [organizationId, setOrganizationId] = useState<string | null>(quote?.organizationId ?? null)
 
+  const [contactIdentityProfileId, setContactIdentityProfileId] = useState<string | null>(
+    quote?.contactIdentityProfileId ?? null
+  )
+
+  const [orgContacts, setOrgContacts] = useState<QuoteOrganizationContact[]>([])
+  const [contactsLoading, setContactsLoading] = useState(false)
+
   const [pricingModel, setPricingModel] = useState<QuoteBuilderPricingModel>(
     coercePricingModel(quote?.pricingModel ?? null)
   )
@@ -367,6 +388,49 @@ const QuoteBuilderShell = ({
 
     return () => controller.abort()
   }, [])
+
+  // TASK-486: al cambiar de organización recargar la lista de contactos anclables. Si la
+  // organización se deselecciona, vaciar la lista. El reset del contacto seleccionado lo
+  // maneja el onChange del dropdown (para no invalidar el contactId pre-hidratado en edit).
+  useEffect(() => {
+    if (!organizationId) {
+      setOrgContacts([])
+      setContactsLoading(false)
+
+      return
+    }
+
+    const controller = new AbortController()
+
+    setContactsLoading(true)
+
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/commercial/organizations/${organizationId}/contacts`, {
+          signal: controller.signal
+        })
+
+        if (!res.ok) {
+          console.warn(`[QuoteBuilderShell] contacts fetch failed: ${res.status}`)
+          setOrgContacts([])
+
+          return
+        }
+
+        const payload = (await res.json()) as { items?: QuoteOrganizationContact[] }
+
+        setOrgContacts(payload.items ?? [])
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return
+        console.warn('[QuoteBuilderShell] contacts fetch error', err)
+        setOrgContacts([])
+      } finally {
+        setContactsLoading(false)
+      }
+    })()
+
+    return () => controller.abort()
+  }, [organizationId])
 
   const refreshLinesSnapshot = useCallback(() => {
     const draft = editorRef.current?.getDraft()
@@ -547,6 +611,7 @@ const QuoteBuilderShell = ({
           quotationId: quote?.quotationId ?? null,
           templateId: selectedTemplateId,
           organizationId,
+          contactIdentityProfileId,
           description: builderState.description.trim(),
           pricingModel,
           currency,
@@ -584,6 +649,7 @@ const QuoteBuilderShell = ({
             validUntil: builderState.validUntil,
             businessLineCode: builderState.businessLineCode,
             commercialModel: builderState.commercialModel,
+            contactIdentityProfileId,
             lineItems: selectedTemplateId
               ? []
               : draftLines.map(line => ({
@@ -626,7 +692,8 @@ const QuoteBuilderShell = ({
             validUntil: builderState.validUntil,
             businessLineCode: builderState.businessLineCode,
             pricingModel,
-            commercialModel: builderState.commercialModel
+            commercialModel: builderState.commercialModel,
+            contactIdentityProfileId
           })
         })
 
@@ -675,6 +742,7 @@ const QuoteBuilderShell = ({
     quote?.quotationId,
     selectedTemplateId,
     organizationId,
+    contactIdentityProfileId,
     builderState.description,
     builderState.contractDurationMonths,
     builderState.validUntil,
@@ -790,23 +858,80 @@ const QuoteBuilderShell = ({
               select
               fullWidth
               size='small'
-              label='Espacio destinatario'
+              label='Organización (cliente o prospecto)'
               value={organizationId ?? ''}
-              onChange={event => setOrganizationId(event.target.value || null)}
+              onChange={event => {
+                const nextId = event.target.value || null
+
+                setOrganizationId(nextId)
+
+                // TASK-486: el contacto está ligado a la organización; al cambiarla, limpiar.
+                setContactIdentityProfileId(null)
+              }}
               disabled={submitting || mode === 'edit'}
-              aria-label='Espacio de la cotización'
+              aria-label='Organización de la cotización'
               helperText={
                 mode === 'edit' && selectedOrganization
                   ? selectedOrganization.organizationName
-                  : 'El espacio no se puede cambiar después de crear la cotización'
+                  : 'La organización no se puede cambiar después de crear la cotización'
               }
             >
-              <MenuItem value=''>Selecciona un espacio…</MenuItem>
+              <MenuItem value=''>Selecciona una organización…</MenuItem>
               {organizations.map(org => (
                 <MenuItem key={org.organizationId} value={org.organizationId}>
                   {org.organizationName}
                 </MenuItem>
               ))}
+            </CustomTextField>
+
+            <CustomTextField
+              select
+              fullWidth
+              size='small'
+              label='Contacto'
+              value={contactIdentityProfileId ?? ''}
+              onChange={event => setContactIdentityProfileId(event.target.value || null)}
+              disabled={submitting || !organizationId || contactsLoading}
+              aria-label='Contacto de la cotización'
+              placeholder={!organizationId ? 'Selecciona una organización primero' : undefined}
+              helperText={
+                !organizationId
+                  ? 'Selecciona una organización primero'
+                  : contactsLoading
+                    ? 'Cargando contactos…'
+                    : 'Persona de la organización responsable de esta cotización'
+              }
+            >
+              <MenuItem value=''>Sin contacto asignado</MenuItem>
+              {organizationId && !contactsLoading && orgContacts.length === 0 ? (
+                <MenuItem value='' disabled>
+                  Sin contactos registrados en esta organización
+                </MenuItem>
+              ) : null}
+              {orgContacts.map(contact => {
+                const primary = contact.fullName ?? contact.canonicalEmail ?? contact.identityProfileId
+
+                const secondary =
+                  contact.canonicalEmail && contact.fullName
+                    ? contact.canonicalEmail
+                    : contact.jobTitle ?? contact.roleLabel ?? null
+
+                return (
+                  <MenuItem key={contact.identityProfileId} value={contact.identityProfileId}>
+                    <Stack spacing={0}>
+                      <Typography variant='body2' sx={{ lineHeight: 1.3 }}>
+                        {primary}
+                        {contact.isPrimary ? ' · Principal' : ''}
+                      </Typography>
+                      {secondary ? (
+                        <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2 }}>
+                          {secondary}
+                        </Typography>
+                      ) : null}
+                    </Stack>
+                  </MenuItem>
+                )
+              })}
             </CustomTextField>
 
             <QuoteBuilderActions

@@ -1,5 +1,57 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-486 Commercial Quotation Canonical Anchor (Organization + Contact) (Claude)
+
+- **Owner:** Claude
+- **Estado:** `in-progress` — implementación completa, pending smoke test en staging post-deploy.
+- **Rama:** `develop`.
+- **Scope entregado:**
+  - **Migration** `20260419144036463_task-486-quotation-canonical-anchor.sql`: agrega `greenhouse_commercial.quotations.contact_identity_profile_id` con FK a `greenhouse_core.identity_profiles(profile_id)` (ON DELETE SET NULL) + index parcial. Backfill de `organization_id` desde `client_profiles` + `spaces` para legacy rows. `space_id` y `space_resolution_source` marcadas DEPRECATED via COMMENT (no drop físico — quote-to-cash legacy readers aún leen space_id post-conversion). `organization_id` queda NULLABLE a nivel DB (backfill preservó orphans legacy sin data loss); enforcement se mueve a la capa API. Index nuevo `idx_commercial_quotations_organization_status`.
+  - **Incidental fix**: ported migration `20260419080928005_task-quote-line-tool-addon-links.sql` de la rama Codex (aplicada a staging DB pero sin merge) para alinear local ↔ DB y correr `migrate:up` limpio.
+  - **Store refactor** `src/lib/finance/quotation-canonical-store.ts`: nueva función `resolveFinanceQuoteTenantOrganizationIds(tenant)` reemplaza el filtrado por `space_id` en las 3 queries de quotes canónicos (list, detail, lines). El `resolveFinanceQuoteTenantSpaceIds` original sigue vivo porque lo consume `contracts-store` (filtra contracts por space — otro dominio). Detail query ahora incluye join a `identity_profiles` + LATERAL a `person_memberships` para exponer `organization` + `contact` como objetos en el mapper. `syncCanonicalFinanceQuote` dejó de derivar space_id en el INSERT (va NULL siempre).
+  - **HubSpot sync** `src/lib/hubspot/sync-hubspot-quotes.ts`: `resolveSpaceForCompany` → `resolveOrganizationForCompany`. Gate del sync ahora es "company tiene org mapeada" no "company tiene space mapeado". Payload de `quote.synced` deja de llevar `spaceId`.
+  - **Pricing catalog impact analysis** `src/lib/commercial/pricing-catalog-impact-analysis.ts`: input ganó `organizationIds?: string[]`. `loadOpenQuoteRows` filtra por `q.organization_id = ANY(...)`. Los 4 endpoints `preview-impact` resuelven ambos (`spaceIds` + `organizationIds`) y los pasan.
+  - **API routes**:
+    - POST `/api/finance/quotes`: valida `organizationId` requerido (400), verifica que existe + activa (404), valida `contactIdentityProfileId` opcional contra `person_memberships` activa con `membership_type IN ('client_contact','client_user','contact','billing','partner','advisor')`. INSERT actualizado: saca `space_id` + `space_resolution_source` del column list; agrega `contact_identity_profile_id`.
+    - PUT `/api/finance/quotes/[id]`: acepta `contactIdentityProfileId` con la misma validación.
+  - **Nuevo endpoint** `src/app/api/commercial/organizations/[id]/contacts/route.ts`: GET con identity_profiles filtrados por membership comercial + tenant isolation (403 si la org no es visible al tenant).
+  - **Builder UI** `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx`:
+    - Label dropdown 1: "Espacio destinatario" → "Organización (cliente o prospecto)".
+    - Nuevo dropdown 2 "Contacto": disabled hasta tener org; fetch async a `/api/commercial/organizations/[orgId]/contacts`; empty state explícito; marcador "Principal" para `is_primary`.
+    - Payload del save (POST create + PUT edit + onSubmit) incluye `contactIdentityProfileId`. Edit page hidrata desde `detail.contact?.identityProfileId`.
+  - **Docs**: `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.23. `docs/documentation/finance/cotizador.md` → v3 con sección "Cambios v3".
+
+### Verificación
+
+- `npx tsc --noEmit` → 0 errors
+- `pnpm lint` → clean
+- `pnpm test` → 1535/1535 passing (3 tests ajustados en `pricing-catalog-impact-analysis.test.ts` para pasar `organizationIds`)
+- `pnpm build` → compiled successfully 14.8s
+- Migración aplicada en staging DB (via `pg:connect:migrate`)
+- Tipos regenerados via `pnpm db:generate-types`
+
+### Pending post-deploy
+
+- **Smoke staging**: crear quote end-to-end con agent-session verificando 201 + objeto `contact` en response. Confirmar builder UI muestra los dos dropdowns en `dev-greenhouse.efeoncepro.com/finance/quotes/new`.
+- **HubSpot sync dry-run**: validar que el próximo sync no rompe por falta de space mapping.
+
+### Cross-impact
+
+- **TASK-466** (multi-currency quote output) desbloqueada para consumir el contrato "org + contact" como pre-requisito del send gate.
+- **TASK-473 follow-ups**, **TASK-481** sin colisión.
+- **Quote-to-cash lane**: intocada. Siguen leyendo `quotation.space_id` post-conversion. Follow-up no-bloqueante: auditar si necesitan resolver space_id por su cuenta cuando el quote no lo tiene.
+- **Contracts store**: intocado (filtra `contracts.space_id`, otro dominio).
+
+### Follow-ups (tasks futuras)
+
+- **Data remediation** para orphans con `organization_id IS NULL` preservadas en el backfill. Post-cierre, migración v2 puede flipear `SET NOT NULL` a nivel DB.
+- **Drop físico de `space_id` + `space_resolution_source`** del canonical quotations cuando quote-to-cash migre.
+- **Backfill de contactos desde HubSpot deals**: iterar deals activos, resolver primary contact → poblar `contact_identity_profile_id`.
+- **UI para reasignar contact** en el quote detail (drawer/inline action).
+- **Evento outbox `commercial.quotation.contact_changed`** si proyecciones downstream lo necesitan.
+
+---
+
 ## Sesion 2026-04-19 — ISSUE: Quote save 500 "could not determine data type of parameter $4" (Claude)
 
 - **Owner:** Claude

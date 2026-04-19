@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { previewPricingCatalogImpact } from '@/lib/commercial/pricing-catalog-impact-analysis'
 import { query } from '@/lib/db'
-import { resolveFinanceQuoteTenantSpaceIds } from '@/lib/finance/quotation-canonical-store'
+import {
+  resolveFinanceQuoteTenantOrganizationIds,
+  resolveFinanceQuoteTenantSpaceIds
+} from '@/lib/finance/quotation-canonical-store'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -46,11 +49,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     body = {}
   }
 
-  const spaceIds = await resolveFinanceQuoteTenantSpaceIds(tenant)
+  const [spaceIds, organizationIds] = await Promise.all([
+    resolveFinanceQuoteTenantSpaceIds(tenant),
+    resolveFinanceQuoteTenantOrganizationIds(tenant)
+  ])
+
   const role = rows[0]
 
   const result = await previewPricingCatalogImpact({
     spaceIds,
+    organizationIds,
     entityType: 'sellable_role',
     entityId: role.role_id,
     entityCode: role.role_code,

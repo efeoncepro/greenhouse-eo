@@ -143,6 +143,7 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
     quotationNumber: detail.quoteNumber,
     clientId: detail.clientId,
     organizationId: detail.organizationId,
+    contactIdentityProfileId: detail.contact?.identityProfileId ?? null,
     description: detail.description,
     currency: detail.currency,
     status: detail.status,

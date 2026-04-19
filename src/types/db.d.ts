@@ -562,6 +562,10 @@ export interface GreenhouseCommercialQuotations {
   client_name_cache: string | null;
   commercial_model: Generated<string>;
   conditions_text: string | null;
+  /**
+   * Canonical contact (persona) associated with the quotation. FK to greenhouse_core.identity_profiles. Added in TASK-486. Optional — quotes may have no contact set yet (prospect stage). Consumers should resolve full contact data via join to identity_profiles (+ person_memberships if role_label / organization context is needed).
+   */
+  contact_identity_profile_id: string | null;
   contract_duration_months: number | null;
   converted_at: Timestamp | null;
   converted_to_income_id: string | null;
@@ -599,6 +603,9 @@ export interface GreenhouseCommercialQuotations {
   nubox_emitted_at: Timestamp | null;
   nubox_last_synced_at: Timestamp | null;
   nubox_sii_track_id: string | null;
+  /**
+   * Canonical anchor of the quotation (client or prospect). FK to greenhouse_core.organizations. Backfilled from client_profiles / spaces for legacy rows during TASK-486 (2026-04-19). Still NULLABLE at DB level because existing orphan rows (HubSpot quotes without org mapping) exist pre-migration. Canonical enforcement lives in the API layer: POST /api/finance/quotes requires organizationId. A follow-up data remediation task will close remaining orphans and then flip SET NOT NULL at DB level.
+   */
   organization_id: string | null;
   payment_terms_days: Generated<number>;
   pricing_model: Generated<string>;
@@ -613,7 +620,13 @@ export interface GreenhouseCommercialQuotations {
   sent_at: Timestamp | null;
   source_quote_id: string | null;
   source_system: Generated<string>;
+  /**
+   * DEPRECATED (TASK-486, 2026-04-19): post-conversion operational scope only, not canonical anchor. Canonical anchor is organization_id + contact_identity_profile_id. Still populated by legacy readers (quote-to-cash lane) via lateral subquery post-conversion. New writes from the builder / canonical sync set this to NULL. Will be dropped in a follow-up v2 task once all readers migrate.
+   */
   space_id: string | null;
+  /**
+   * DEPRECATED (TASK-486, 2026-04-19): audit trail of legacy space resolution logic. No longer populated on new inserts from the canonical path (derived in JS as 'unresolved'). Kept for backwards compat with existing rows.
+   */
   space_resolution_source: Generated<string>;
   staffing_model: Generated<string>;
   status: Generated<string>;

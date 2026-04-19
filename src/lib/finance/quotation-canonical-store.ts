@@ -36,6 +36,12 @@ type CanonicalQuoteListRow = {
 
 type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
   organization_id: string | null
+  organization_name: string | null
+  organization_type: string | null
+  contact_identity_profile_id: string | null
+  contact_full_name: string | null
+  contact_canonical_email: string | null
+  contact_role_label: string | null
   expiry_date: string | Date | null
   description: string | null
   subtotal: string | number | null
@@ -74,6 +80,7 @@ type CanonicalQuoteLineRow = {
 }
 
 type TenantSpaceRow = { space_id: string }
+type TenantOrganizationRow = { organization_id: string }
 
 const runQuery = async <T extends Record<string, unknown>>(
   text: string,
@@ -153,6 +160,59 @@ export const resolveFinanceQuoteTenantSpaceIds = async (tenant: TenantContext) =
   return rows.map(row => row.space_id)
 }
 
+/**
+ * Canonical tenant scoping for commercial quotations (TASK-486).
+ *
+ * Returns the set of `organization_id`s the tenant can see. Quotations now anchor
+ * on `organization_id` (canonical) rather than the derived `space_id` field, so
+ * every quotation-table reader (list, detail, lines, impact analysis) must scope
+ * by this instead of `resolveFinanceQuoteTenantSpaceIds`.
+ *
+ * Resolution rules (mirror the space variant for transition parity):
+ *   - efeonce_internal users with finance access see all active organizations.
+ *   - Tenants with an explicit `organizationId` in session see that one org only.
+ *   - Tenants with only `clientId` resolve orgs via `greenhouse_core.spaces`
+ *     (active spaces owned by that client → their organization_ids).
+ *   - No scope hints → empty array (quotations effectively invisible).
+ */
+export const resolveFinanceQuoteTenantOrganizationIds = async (tenant: TenantContext) => {
+  const organizationId = tenant.organizationId?.trim()
+  const clientId = tenant.clientId?.trim()
+
+  if (organizationId) {
+    return [organizationId]
+  }
+
+  if (tenant.tenantType === 'efeonce_internal') {
+    const rows = await query<TenantOrganizationRow>(
+      `SELECT organization_id
+       FROM greenhouse_core.organizations
+       WHERE active = TRUE
+       ORDER BY organization_id ASC`
+    )
+
+    return rows.map(row => row.organization_id)
+  }
+
+  if (!clientId) {
+    return [] as string[]
+  }
+
+  // Client-tenant scoping: follow the client → spaces → organization graph.
+  // A single client can back multiple organizations (multi-entity setups).
+  const rows = await query<TenantOrganizationRow>(
+    `SELECT DISTINCT s.organization_id
+     FROM greenhouse_core.spaces s
+     WHERE s.active = TRUE
+       AND s.client_id = $1
+       AND s.organization_id IS NOT NULL
+     ORDER BY s.organization_id ASC`,
+    [clientId]
+  )
+
+  return rows.map(row => row.organization_id)
+}
+
 export const listFinanceQuotesFromCanonical = async ({
   tenant,
   status,
@@ -164,14 +224,14 @@ export const listFinanceQuotesFromCanonical = async ({
   clientId?: string | null
   source?: string | null
 }) => {
-  const spaceIds = await resolveFinanceQuoteTenantSpaceIds(tenant)
+  const organizationIds = await resolveFinanceQuoteTenantOrganizationIds(tenant)
 
-  if (spaceIds.length === 0) {
+  if (organizationIds.length === 0) {
     return [] as CanonicalQuoteListRow[]
   }
 
-  const values: unknown[] = [spaceIds]
-  const conditions = ['q.space_id = ANY($1::text[])']
+  const values: unknown[] = [organizationIds]
+  const conditions = ['q.organization_id = ANY($1::text[])']
 
   if (status) {
     values.push(status)
@@ -229,9 +289,9 @@ export const getFinanceQuoteDetailFromCanonical = async ({
   tenant: TenantContext
   quoteId: string
 }) => {
-  const spaceIds = await resolveFinanceQuoteTenantSpaceIds(tenant)
+  const organizationIds = await resolveFinanceQuoteTenantOrganizationIds(tenant)
 
-  if (spaceIds.length === 0) {
+  if (organizationIds.length === 0) {
     return null as CanonicalQuoteDetailRow | null
   }
 
@@ -240,6 +300,12 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        COALESCE(q.finance_quote_id, q.quotation_id) AS quote_id,
        q.client_id,
        q.organization_id,
+       org.organization_name,
+       org.organization_type,
+       q.contact_identity_profile_id,
+       ip.full_name AS contact_full_name,
+       ip.canonical_email AS contact_canonical_email,
+       contact_membership.role_label AS contact_role_label,
        COALESCE(q.client_name_cache, org.organization_name, org.legal_name) AS client_name,
        q.quotation_number AS quote_number,
        q.quote_date,
@@ -275,7 +341,19 @@ export const getFinanceQuoteDetailFromCanonical = async ({
      FROM greenhouse_commercial.quotations q
      LEFT JOIN greenhouse_core.organizations org
        ON org.organization_id = q.organization_id
-     WHERE q.space_id = ANY($1::text[])
+     LEFT JOIN greenhouse_core.identity_profiles ip
+       ON ip.profile_id = q.contact_identity_profile_id
+      AND ip.active = TRUE
+     LEFT JOIN LATERAL (
+       SELECT pm.role_label
+       FROM greenhouse_core.person_memberships pm
+       WHERE pm.profile_id = q.contact_identity_profile_id
+         AND pm.organization_id = q.organization_id
+         AND pm.active = TRUE
+       ORDER BY pm.is_primary DESC, pm.updated_at DESC
+       LIMIT 1
+     ) contact_membership ON TRUE
+     WHERE q.organization_id = ANY($1::text[])
        AND (
          q.finance_quote_id = $2
          OR q.quotation_id = $2
@@ -283,7 +361,7 @@ export const getFinanceQuoteDetailFromCanonical = async ({
          OR q.nubox_document_id = $2
        )
      LIMIT 1`,
-    [spaceIds, quoteId]
+    [organizationIds, quoteId]
   )
 
   return rows[0] ?? null
@@ -296,9 +374,9 @@ export const listFinanceQuoteLinesFromCanonical = async ({
   tenant: TenantContext
   quoteId: string
 }) => {
-  const spaceIds = await resolveFinanceQuoteTenantSpaceIds(tenant)
+  const organizationIds = await resolveFinanceQuoteTenantOrganizationIds(tenant)
 
-  if (spaceIds.length === 0) {
+  if (organizationIds.length === 0) {
     return [] as CanonicalQuoteLineRow[]
   }
 
@@ -326,7 +404,7 @@ export const listFinanceQuoteLinesFromCanonical = async ({
        ON q.quotation_id = qli.quotation_id
      LEFT JOIN greenhouse_commercial.product_catalog pc
        ON pc.product_id = qli.product_id
-     WHERE q.space_id = ANY($1::text[])
+     WHERE q.organization_id = ANY($1::text[])
        AND (
          q.finance_quote_id = $2
          OR q.quotation_id = $2
@@ -334,7 +412,7 @@ export const listFinanceQuoteLinesFromCanonical = async ({
          OR q.nubox_document_id = $2
        )
      ORDER BY qli.sort_order ASC, qli.created_at ASC`,
-    [spaceIds, quoteId]
+    [organizationIds, quoteId]
   )
 }
 
@@ -866,8 +944,12 @@ export const syncCanonicalFinanceQuote = async ({
        COALESCE(NULLIF(trim(q.quote_number), ''), 'EO-QUO-' || upper(substr(md5(q.quote_id), 1, 12))),
        q.status,
        q.client_name,
+       -- TASK-486: quotation se ancla a organization_id; se deriva desde spaces como fallback
+       -- para legacy sync rows donde q.organization_id viene null.
        COALESCE(q.organization_id, scope.organization_id),
-       scope.space_id,
+       -- TASK-486: space_id queda NULL en el canonical write path. Quote-to-cash legacy readers
+       -- que aún necesiten Space lo resuelven post-conversion por su cuenta.
+       NULL,
        q.client_id,
        $2,
        $3,
@@ -929,11 +1011,9 @@ export const syncCanonicalFinanceQuote = async ({
        q.dte_folio,
        q.nubox_emitted_at,
        q.nubox_last_synced_at,
-       CASE
-         WHEN scope.space_id IS NOT NULL AND q.organization_id IS NOT NULL THEN 'organization'
-         WHEN scope.space_id IS NOT NULL AND q.client_id IS NOT NULL THEN 'client'
-         ELSE 'unresolved'
-       END,
+       -- TASK-486: space_resolution_source queda como 'unresolved' en writes nuevos.
+       -- La columna está deprecated; ver COMMENT en el DDL.
+       'unresolved',
        COALESCE(NULLIF(trim(q.created_by), ''), 'task-345-bridge'),
        COALESCE(q.created_at, CURRENT_TIMESTAMP),
        COALESCE(q.updated_at, CURRENT_TIMESTAMP)
@@ -964,7 +1044,9 @@ export const syncCanonicalFinanceQuote = async ({
        legacy_status = EXCLUDED.legacy_status,
        client_name_cache = EXCLUDED.client_name_cache,
        organization_id = EXCLUDED.organization_id,
-       space_id = EXCLUDED.space_id,
+       -- TASK-486: space_id no se sobrescribe en resync (quote-to-cash legacy puede haber
+       -- escrito un valor post-conversion; no queremos pisarlo). El INSERT path lo deja NULL
+       -- para quotes nuevas y ON CONFLICT aquí lo preserva.
        client_id = EXCLUDED.client_id,
        pricing_model = EXCLUDED.pricing_model,
        commercial_model = EXCLUDED.commercial_model,
@@ -1006,7 +1088,8 @@ export const syncCanonicalFinanceQuote = async ({
        dte_folio = EXCLUDED.dte_folio,
        nubox_emitted_at = EXCLUDED.nubox_emitted_at,
        nubox_last_synced_at = EXCLUDED.nubox_last_synced_at,
-       space_resolution_source = EXCLUDED.space_resolution_source,
+       -- TASK-486: space_resolution_source queda preservado en resync (deprecated, no
+       -- se sobreescribe desde el bridge).
        updated_at = EXCLUDED.updated_at`,
     [
       quoteId,
@@ -1051,6 +1134,21 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
   quoteId: String(row.quote_id),
   clientId: row.client_id ? String(row.client_id) : null,
   organizationId: row.organization_id ? String(row.organization_id) : null,
+  organization: row.organization_id
+    ? {
+        organizationId: String(row.organization_id),
+        organizationName: row.organization_name ? String(row.organization_name) : null,
+        organizationType: row.organization_type ? String(row.organization_type) : null
+      }
+    : null,
+  contact: row.contact_identity_profile_id
+    ? {
+        identityProfileId: String(row.contact_identity_profile_id),
+        fullName: row.contact_full_name ? String(row.contact_full_name) : null,
+        canonicalEmail: row.contact_canonical_email ? String(row.contact_canonical_email) : null,
+        roleLabel: row.contact_role_label ? String(row.contact_role_label) : null
+      }
+    : null,
   clientName: row.client_name ? String(row.client_name) : null,
   quoteNumber: row.quote_number ? String(row.quote_number) : null,
   quoteDate: row.quote_date ? new Date(String(row.quote_date)).toISOString().slice(0, 10) : null,

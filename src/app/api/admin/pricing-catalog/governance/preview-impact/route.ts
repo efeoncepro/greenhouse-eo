@@ -4,7 +4,10 @@ import {
   previewPricingCatalogImpact,
   type PricingCatalogImpactEntityType
 } from '@/lib/commercial/pricing-catalog-impact-analysis'
-import { resolveFinanceQuoteTenantSpaceIds } from '@/lib/finance/quotation-canonical-store'
+import {
+  resolveFinanceQuoteTenantOrganizationIds,
+  resolveFinanceQuoteTenantSpaceIds
+} from '@/lib/finance/quotation-canonical-store'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -61,10 +64,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'id, code, or sku is required.' }, { status: 400 })
   }
 
-  const spaceIds = await resolveFinanceQuoteTenantSpaceIds(tenant)
+  const [spaceIds, organizationIds] = await Promise.all([
+    resolveFinanceQuoteTenantSpaceIds(tenant),
+    resolveFinanceQuoteTenantOrganizationIds(tenant)
+  ])
 
   const result = await previewPricingCatalogImpact({
     spaceIds,
+    organizationIds,
     entityType: entityType as PricingCatalogImpactEntityType,
     entityId: selector,
     entityCode: selector,
