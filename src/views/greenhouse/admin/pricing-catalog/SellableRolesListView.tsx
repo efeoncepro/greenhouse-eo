@@ -40,6 +40,7 @@ import tableStyles from '@core/styles/table.module.css'
 import { PRICING_TIER_LABELS, type PricingTierCode } from '@/lib/commercial/pricing-governance-types'
 
 import CreateSellableRoleDrawer from './drawers/CreateSellableRoleDrawer'
+import EditSellableRoleDrawer from './drawers/EditSellableRoleDrawer'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -86,7 +87,8 @@ const columnHelper = createColumnHelper<SellableRoleItem>()
 
 const buildColumns = (
   onToggleActive: (role: SellableRoleItem, next: boolean) => void,
-  togglingId: string | null
+  togglingId: string | null,
+  onEdit: (role: SellableRoleItem) => void
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ColumnDef<SellableRoleItem, any>[] => [
@@ -180,6 +182,24 @@ const buildColumns = (
       )
     },
     meta: { align: 'center' }
+  }),
+  columnHelper.display({
+    id: 'actions',
+    header: 'Acciones',
+    cell: ({ row }) => (
+      <Stack direction='row' spacing={0} alignItems='center' onClick={e => e.stopPropagation()}>
+        <Tooltip title='Editar rol'>
+          <IconButton
+            size='small'
+            onClick={() => onEdit(row.original)}
+            aria-label={`Editar ${row.original.roleLabelEs}`}
+          >
+            <i className='tabler-edit' style={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+    ),
+    meta: { align: 'center' }
   })
 ]
 
@@ -195,6 +215,7 @@ const SellableRolesListView = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'roleLabelEs', desc: false }])
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [editingRoleId, setEditingRoleId] = useState<string | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -292,9 +313,13 @@ const SellableRolesListView = () => {
     })
   }, [data, searchDebounced, categoryFilter, statusFilter])
 
+  const handleEdit = useCallback((role: SellableRoleItem) => {
+    setEditingRoleId(role.roleId)
+  }, [])
+
   const columns = useMemo(
-    () => buildColumns(handleToggleActive, togglingId),
-    [handleToggleActive, togglingId]
+    () => buildColumns(handleToggleActive, togglingId, handleEdit),
+    [handleToggleActive, togglingId, handleEdit]
   )
 
   const table = useReactTable({
@@ -498,6 +523,13 @@ const SellableRolesListView = () => {
       <CreateSellableRoleDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
+        onSuccess={() => void loadData()}
+      />
+
+      <EditSellableRoleDrawer
+        open={editingRoleId !== null}
+        roleId={editingRoleId}
+        onClose={() => setEditingRoleId(null)}
         onSuccess={() => void loadData()}
       />
     </Grid>

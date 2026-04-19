@@ -14,6 +14,7 @@ export interface PricingCatalogCounts {
   commercialModels: number
   countryFactors: number
   fteHours: number
+  employmentTypes: number
 }
 
 interface Props {
@@ -55,20 +56,12 @@ const PricingCatalogHomeView = ({ counts }: Props) => {
       description: 'Tiers de rol, servicio y multiplicadores'
     },
     {
-      href: '#',
-      label: 'Modalidades de contrato',
-      count: '—',
+      href: '/admin/pricing-catalog/employment-types',
+      label: GH_PRICING.adminEmploymentTypes,
+      count: counts.employmentTypes,
       icon: 'tabler-contract',
-      color: 'secondary' as const,
-      description: 'Disponible pronto'
-    },
-    {
-      href: '/admin/pricing-catalog/governance',
-      label: GH_PRICING.adminServices,
-      count: '—',
-      icon: 'tabler-package',
-      color: 'secondary' as const,
-      description: 'Disponible pronto'
+      color: 'primary' as const,
+      description: 'Modalidades de contrato, moneda y fees por país'
     },
     {
       href: '/admin/pricing-catalog/governance',
@@ -77,6 +70,14 @@ const PricingCatalogHomeView = ({ counts }: Props) => {
       icon: 'tabler-flag',
       color: 'error' as const,
       description: 'Ajustes de precio por país'
+    },
+    {
+      href: '/admin/pricing-catalog/audit-log',
+      label: GH_PRICING.adminAudit,
+      count: '—',
+      icon: 'tabler-history',
+      color: 'info' as const,
+      description: 'Línea de tiempo de cambios en el catálogo'
     }
   ]
 

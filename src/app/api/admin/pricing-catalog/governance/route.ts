@@ -29,6 +29,8 @@ import {
   COUNTRY_PRICING_FACTOR_CODES,
   PRICING_TIER_CODES
 } from '@/lib/commercial/pricing-governance-types'
+import type { EmploymentTypeSeedRow } from '@/lib/commercial/sellable-roles-seed'
+import { listEmploymentTypes, upsertEmploymentType } from '@/lib/commercial/sellable-roles-store'
 import {
   recordPricingCatalogAudit,
   type PricingCatalogEntityType
@@ -44,13 +46,15 @@ type GovernanceType =
   | 'commercial_model_multiplier'
   | 'country_pricing_factor'
   | 'fte_hours_guide'
+  | 'employment_type'
 
 const TYPE_TO_ENTITY: Record<GovernanceType, PricingCatalogEntityType> = {
   role_tier_margin: 'role_tier_margin',
   service_tier_margin: 'service_tier_margin',
   commercial_model_multiplier: 'commercial_model_multiplier',
   country_pricing_factor: 'country_pricing_factor',
-  fte_hours_guide: 'fte_hours_guide'
+  fte_hours_guide: 'fte_hours_guide',
+  employment_type: 'employment_type'
 }
 
 const resolveActorName = async (fallback: string): Promise<string> => {
@@ -103,13 +107,15 @@ export async function GET() {
     serviceTierMargins,
     commercialModelMultipliers,
     countryPricingFactors,
-    fteHoursGuide
+    fteHoursGuide,
+    employmentTypes
   ] = await Promise.all([
     listRoleTierMargins(),
     listServiceTierMargins(),
     listCommercialModelMultipliers(),
     listCountryPricingFactors(),
-    listFteHoursGuide()
+    listFteHoursGuide(),
+    listEmploymentTypes({ activeOnly: false })
   ])
 
   return NextResponse.json({
@@ -117,7 +123,8 @@ export async function GET() {
     serviceTierMargins,
     commercialModelMultipliers,
     countryPricingFactors,
-    fteHoursGuide
+    fteHoursGuide,
+    employmentTypes
   })
 }
 
@@ -375,6 +382,61 @@ export async function PATCH(request: Request) {
       }
 
       return NextResponse.json({ action: result.action, entry: result.entry })
+    }
+
+    if (type === 'employment_type') {
+      const employmentTypeCode = pickString(payload.employmentTypeCode)
+      const labelEs = pickString(payload.labelEs)
+      const labelEn = pickString(payload.labelEn)
+      const paymentCurrency = pickString(payload.paymentCurrency)
+      const countryCode = pickString(payload.countryCode)
+      const appliesPrevisional = payload.appliesPrevisional === true
+      const previsionalPctDefault = pickNumber(payload.previsionalPctDefault)
+      const feeMonthlyUsdDefault = pickNumber(payload.feeMonthlyUsdDefault) ?? 0
+      const feePctDefault = pickNumber(payload.feePctDefault)
+      const appliesBonuses = payload.appliesBonuses === true
+      const sourceOfTruth = pickString(payload.sourceOfTruth)
+      const notes = pickString(payload.notes)
+
+      if (!employmentTypeCode || !labelEs || !paymentCurrency || !countryCode || !sourceOfTruth) {
+        return NextResponse.json(
+          {
+            error:
+              'employmentTypeCode, labelEs, paymentCurrency, countryCode, sourceOfTruth are required.'
+          },
+          { status: 400 }
+        )
+      }
+
+      const input = {
+        employmentTypeCode,
+        labelEs,
+        labelEn,
+        paymentCurrency,
+        countryCode,
+        appliesPrevisional,
+        previsionalPctDefault,
+        feeMonthlyUsdDefault,
+        feePctDefault,
+        appliesBonuses,
+        sourceOfTruth,
+        notes
+      } as unknown as EmploymentTypeSeedRow
+
+      const result = await upsertEmploymentType(input)
+
+      await recordPricingCatalogAudit({
+        entityType,
+        entityId: employmentTypeCode,
+        entitySku: employmentTypeCode,
+        action: result.created ? 'created' : 'updated',
+        actorUserId: tenant.userId,
+        actorName,
+        changeSummary: { new_values: { ...input, effectiveFrom } },
+        effectiveFrom
+      })
+
+      return NextResponse.json({ action: result.created ? 'inserted' : 'updated', entry: result })
     }
 
     return NextResponse.json({ error: `Unsupported governance type: ${type}` }, { status: 400 })

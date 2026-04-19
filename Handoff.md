@@ -36,6 +36,51 @@
 - **Heads-up:**
   - `pnpm build` siguió mostrando warnings preexistentes de Dynamic Server Usage por `headers()` en múltiples routes bajo `(dashboard)`, pero terminó exit `0`
 
+## Sesion 2026-04-19 — TASK-467 phase-2 + operating model worktree cleanup rule
+
+- **Owner:** Claude
+- **Estado:** shipped, pending PR merge
+- **Branch:** `task/TASK-467-phase-2` (desde develop con TASK-456 + MVP TASK-467 ya merged)
+- **Scope phase-2 shipped:**
+  - 3 endpoints nuevos: `/roles/[id]/cost-components` (GET+POST), `/roles/[id]/pricing` (GET+POST), `/governance` extendido para `type: 'employment_type'`
+  - **Edit drawers**:
+    - `EditSellableRoleDrawer.tsx` — 4 tabs (Info / Modalidades read-only / Componentes de costo / Pricing por moneda) con MUI Lab TabContext
+    - `EditToolDrawer.tsx` — form completo con 23 campos + conditional fields según costModel
+    - `EditOverheadDrawer.tsx` — form con 17 campos + conditional fields según addon_type
+  - **Employment types admin** `/admin/pricing-catalog/employment-types` con list + bi-modal Create/Edit drawer
+  - **Audit timeline** `/admin/pricing-catalog/audit-log` con MUI Lab Timeline + filtros + Accordion expandible con JSON del changeSummary
+  - **Home updates**: placeholder de employment types + link a audit-log con counts reales
+  - **Doc funcional** actualizado v1.1 + architecture doc v2.17 + task file con Delta phase-2
+
+- **Sinergia FTE/capacity cerrada (no solo documentada)**:
+  - Greenhouse tiene **dos capas FTE intencionalmente distintas**:
+    - **Capacity operacional**: `CAPACITY_HOURS_PER_FTE = 160h` en `src/lib/team-capacity/units.ts`, materializado en `greenhouse_serving.member_capacity_economics`. Para Agency/Delivery/Person Intelligence (lo que una persona puede entregar)
+    - **Billable**: `greenhouse_commercial.fte_hours_guide` con 11 filas variables (0.25 FTE → 45h, 1.0 FTE → 180h). Para pricing engine v2 (lo que se cobra al cliente)
+  - **Fix robusto aplicado**: el campo `sellable_role_cost_components.hours_per_fte_month` era un campo "semi-huérfano" — el pricing engine v2 YA lo leía como fallback + divisor, pero el store `insertCostComponentsIfChanged` lo hardcodeaba a 180, bloqueando al admin UI. Ahora `SellableRoleSeedRow` acepta `hoursPerFteMonth?` y `feeEorUsd?` opcionales con defaults back-compat, el store los propaga al INSERT/UPDATE, y el admin UI puede overridearlo per-role. Resultado: admin UI, store, pricing engine y capacity layer ahora coordinan explícitamente sin ambigüedad
+  - Helper text del drawer actualizado: "Horas billable por FTE. Default 180. El pricing engine usa este valor cuando la fracción FTE no está en fte_hours_guide y como divisor del hourly cost. No confundir con capacity operacional (160h)"
+  - Governance view tiene alert aclaratorio en la sección FTE hours guide
+  - Doc funcional y architecture doc v2.17 documentan las dos capas + el override per-role
+
+- **Operating model update**: regla #4 agregada al `MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — agentes deben eliminar su worktree dedicado al cerrar una task. Committed direct a develop en `5c5db951` (doc-only). Codex dejó worktrees huérfanos con develop locked en TASK-455 y TASK-456 — ahora está documentado como regla obligatoria.
+
+- **Fix aplicado durante verification**: `EditSellableRoleDrawer` importó `SELLABLE_ROLE_PRICING_CURRENCIES` de `sellable-roles-seed.ts` que usa `node:fs/promises`. Rompía el client bundle de Turbopack. Fix: inlineé la constante (6 monedas) en el drawer.
+
+- **Gates verdes**:
+  - `pnpm lint` clean
+  - `npx tsc --noEmit` clean
+  - `pnpm test` → 284/284 (194 payroll baseline intacto)
+  - `pnpm build` compiled exit 0 (15.2s)
+  - Zero `new Pool()` rogue
+
+- **Follow-ups pendientes (phase-3)**:
+  - Desbloquear `hours_per_fte_month` + `fee_eor_usd` en `insertCostComponentsIfChanged` (hoy hardcoded)
+  - Role employment compatibility: endpoint + UI full (hoy read-only)
+  - Excel import si Efeonce lo pide
+  - Approval workflow para cambios críticos
+  - Diff viewer visual side-by-side en audit timeline (hoy JSON raw)
+  - Bulk edit
+  - Preview de impacto de cambios de rate en cotizaciones vigentes
+
 ## Sesion 2026-04-19 — TASK-467 Pricing Catalog Admin UI MVP (cierre)
 
 - **Owner:** Claude

@@ -685,7 +685,7 @@ const GovernanceInlineView = () => {
             </AccordionSummary>
             <AccordionDetails sx={{ p: 0 }}>
               <Alert severity='info' sx={{ m: 3 }}>
-                Tabla de solo lectura. Los valores son referenciales y no se editan desde esta vista.
+                Tabla de solo lectura. Son las horas mensuales <strong>que se cobran al cliente</strong> según la fracción de FTE vendida. Distinto de la capacidad operacional del módulo Agency Team (160h/FTE fijo). Los valores son referenciales y no se editan desde esta vista.
               </Alert>
               <TableContainer>
                 <Table size='small'>
