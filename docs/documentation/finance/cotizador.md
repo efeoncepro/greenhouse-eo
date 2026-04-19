@@ -1,13 +1,24 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 2.0
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-18 por Claude
+> **Ultima actualizacion:** 2026-04-19 por Claude (post TASK-473 full-page + TASK-465 service catalog + TASK-475 FX foundation + structured warnings)
 > **Documentacion tecnica:**
-> - Spec funcional: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md)
-> - Plano UI: [TASK-469 — Commercial Pricing UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+> - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
+> - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
+> - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
+> - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v2 (2026-04-19)
+
+- **Surfaces full-page**: el cotizador ya no vive en un drawer lateral. Ahora usas `/finance/quotes/new` para crear y `/finance/quotes/[id]/edit` para editar. `/finance/quotes/[id]` queda solo para revisión y governance (approvals, document chain, PDF, send).
+- **Source selector first-class**: 4 cards visibles — **Catálogo** / **Servicio** / **Template** / **Manual**. El patrón "manual-first" del drawer legacy quedó atrás.
+- **Servicios compuestos (EFG-XXX)**: al elegir un servicio empaquetado se auto-expande a múltiples líneas (roles + herramientas) con pricing canónico. Cada línea conserva chip "Servicio EFG-XXX" para trazabilidad.
+- **Provenance chip por línea**: cada línea muestra de dónde salió (`Catálogo` / `Servicio` / `Template` / `Manual`). No se pierde el origen al editarla.
+- **Avisos del pricing engine**: panel nuevo en el rail que muestra cualquier fallback silencioso (modelo comercial desconocido, factor país ausente, tasa FX stale, rol sin tier margin, etc.) con severidad (Crítico / Atención / Info).
+- **FX foundation integrada**: cotizar en MXN/COP/PEN/CLF sin tasa cargada ya no produce totales silenciosamente mal — el panel avisa `fx_fallback — Crítico` y el AE sabe que hay que pedir tasa manual a Finance Admin.
 
 ## Para qué sirve
 
@@ -26,11 +37,20 @@ El cotizador reemplaza la hoja de cálculo. Lo que antes eran 40 minutos de copi
 ## Cómo se usa (flujo típico)
 
 ### 1. Abrir el drawer de nueva cotización
-En la lista de cotizaciones (`/finance/quotes`), el botón **+ Nueva cotización** abre un panel lateral.
+En la lista de cotizaciones (`/finance/quotes`), el botón **+ Nueva cotización** navega a `/finance/quotes/new` — una pantalla full-page dedicada con dos columnas: composición a la izquierda, rail comercial a la derecha.
 
 ### 2. Elegir punto de partida
-- **Desde cero** → armas el scope desde el catálogo
-- **Desde template** → heredas ítems + modelo de un template aprobado (Ej. "Staff Aug Designer 6 meses")
+
+El cotizador expone 4 fuentes de composición como cards first-class en el área principal. Ya no hay un "+ Agregar item" genérico — la UI invita primero a partir del catálogo o de un servicio antes que a crear líneas a mano.
+
+| Fuente | Cuándo usarla | Qué hace |
+|---|---|---|
+| **Catálogo** | Armar quote puntual pick-and-pack | Abre el picker con roles / personas / herramientas / overhead del pricing catalog |
+| **Servicio** | Vender un servicio empaquetado Efeonce (EFG-001..007) | Elige un EFG y se expande a N líneas (roles + herramientas) con composición pre-aprobada |
+| **Template** | Partir de una cotización reutilizable ya aprobada | Carga defaults comerciales + items del template |
+| **Manual** | Agregar una línea en blanco para editarla a mano | Crea una fila vacía con source=`manual` |
+
+Cada línea resultante muestra un chip con su origen (`Catálogo` azul, `Servicio` verde, `Template` info, `Manual` secundario). Editar los campos no borra el chip — el origen se preserva para la auditoría posterior.
 
 ### 3. Contexto del cliente (sidebar derecho)
 El sidebar pide los datos que el motor necesita para cotizar:
@@ -46,14 +66,15 @@ El sidebar pide los datos que el motor necesita para cotizar:
 | **Descripción** | Alcance resumen que ve el cliente |
 
 ### 4. Agregar ítems al scope
-Arriba de la tabla de líneas tienes 4 botones:
+Además de las 4 cards del source selector (Catálogo / Servicio / Template / Manual), dentro del editor de líneas tienes una barra de quick-add con 5 botones:
 
-- **+ Rol** — Elegir del catálogo de los 33 roles sellables de Efeonce (ej. "Senior Visual Designer"). Se crea una línea con `fteFraction=1.0` y `periods=1` por default.
-- **+ Persona** — Elegir un colaborador específico (ej. "María González"). Se conecta al catálogo de team members activos.
-- **+ Herramienta** — Elegir una tool del catálogo (ej. "Adobe Creative Cloud"). Se prorratea el precio.
-- **+ Overhead** — Elegir un add-on (ej. "Client Management 15%"). Puede ser fee fijo o porcentaje.
+- **+ Rol** — Catálogo de los 33 roles sellables (ej. "Senior Visual Designer"). Se crea una línea con `fteFraction=1.0` y `periods=1` por default.
+- **+ Persona** — Colaborador específico del team. Conectado al catálogo de team members activos.
+- **+ Herramienta** — Tool del catálogo (ej. "Adobe Creative Cloud"). Se prorratea el precio.
+- **+ Overhead** — Add-on (ej. "Client Management 15%"). Puede ser fee fijo o porcentaje.
+- **+ Manual** — Línea en blanco para capturar algo que no está en el catálogo.
 
-El botón abre un drawer con tabs. Buscas por nombre o SKU, seleccionas uno o varios, confirmas y vuelves a la tabla con las líneas agregadas.
+Los botones +Rol / +Persona / +Herramienta / +Overhead abren el picker drawer en el tab correspondiente. El source selector del área principal (más prominente) es equivalente pero con UX más clara para composición nueva; los botones quick-add están pensados para agregar una línea adicional a una quote ya en curso.
 
 ### 5. Ajustar contexto de pricing por línea
 Para líneas de **rol** y **persona** aparece una fila debajo con:
@@ -83,6 +104,45 @@ Cada línea, si tienes rol `efeonce_admin`, `finance_admin` o `finance_analyst`,
 
 ### 9. Chip de tier compliance visible para todos
 Al lado del tipo de línea aparece un chip con el estado del tier. Incluso sin ver el cost stack, el Account Lead sabe si el margen está en rango.
+
+### 10. Panel de avisos del pricing engine (nuevo)
+
+Entre Addons y Totales aparece un panel con los avisos estructurados que emitió el engine durante la simulación. Cada aviso tiene:
+
+- **Severidad**: `Crítico` (rojo) / `Atención` (amarillo) / `Info` (azul)
+- **Código estable**: `unknown_commercial_model`, `unknown_country_factor`, `missing_tier_margin`, `tool_price_default_margin`, `fx_fallback`, `tier_below_min`, `legacy_rate_card_used`
+- **Mensaje en español** y el número de línea afectada cuando aplica
+
+Los críticos bloquean el envío al cliente. Los amarillos permiten enviar con confirmación. Los info son transparencia (ej. "la tasa USD→MXN se derivó vía USD composition"). Corregir el catálogo (agregar el tier margin faltante, cargar la tasa FX, etc.) elimina el aviso automáticamente en la siguiente simulación.
+
+### 11. FX readiness (nuevo)
+
+Si cotizas en una moneda distinta a USD o CLP (CLF / COP / MXN / PEN), el engine consulta la **foundation FX** antes de calcular:
+
+- Si hay tasa fresca → el total usa esa tasa, el panel queda limpio.
+- Si la tasa existe pero está vieja (> 7 días) → aviso `fx_fallback — Atención`. Envío permitido con aviso visible.
+- Si no hay tasa cargada → aviso `fx_fallback — Crítico`. Finance Admin debe cargar tasa manual.
+- Si la moneda no está soportada por el dominio `pricing_output` → aviso `fx_fallback — Crítico` con mensaje explícito.
+
+El detalle de política FX (umbrales, composición cross-pair vía USD, coverage por moneda) vive en [monedas-y-tipos-de-cambio](./monedas-y-tipos-de-cambio.md).
+
+## Override del precio unitario
+
+Cuando agregas una línea de rol desde catálogo, el **precio unitario viene sugerido por el engine** (cost stack × margin × multiplicadores × factor país). Tienes 3 caminos:
+
+1. **Aceptar el sugerido** (default) — no escribes nada en el campo "Precio unitario". La UI muestra "Sugerido $X" debajo del input.
+2. **Override manual** — escribes un precio distinto. Aparece chip "Override" amarillo + botón refresh para volver al sugerido.
+3. **Volver al sugerido** — click en el botón refresh al lado del chip Override → limpia el override, el engine vuelve a mandar.
+
+El subtotal de cada línea respeta el override si existe; si no, usa el cálculo del engine. El footer de totales suma consistente con cualquiera de los dos modos.
+
+## Edit de una cotización existente
+
+El botón **Editar** en el header del detail view (visible solo si el quote está en estado `draft` y el viewer tiene permisos) navega a `/finance/quotes/[id]/edit`. La surface de edit es **la misma shell** que create — mismo layout, mismo source selector, mismos controles. La diferencia es que precarga el quote + líneas existentes.
+
+Si intentas acceder directamente a `/edit` de un quote no editable (estado distinto a `draft` o sin permisos), redirige al detail view con `?denied=edit`.
+
+`QuoteDetailView` (`/finance/quotes/[id]`) queda exclusivamente para review, governance (approvals, terms, audit, document chain), envío al cliente, PDF, "Guardar como template". **No** contiene edición estructural.
 
 ### 10. Guardar
 El botón **Crear cotización** persiste la quote canónica en PostgreSQL. Se propaga a HubSpot (vía TASK-463) si aplica.
