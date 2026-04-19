@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 
-import { ROLE_CODES } from '@/config/role-codes'
 import { getOrganizationList } from '@/lib/account-360/organization-store'
 import { listTemplates } from '@/lib/commercial/governance/templates-store'
 import {
@@ -13,8 +12,11 @@ import {
   mapCanonicalQuoteLineRow
 } from '@/lib/finance/quotation-canonical-store'
 import {
+  canAccessFinanceQuotes,
+  isEditableFinanceQuotationStatus
+} from '@/lib/finance/quotation-access'
+import {
   canViewCostStack,
-  hasAuthorizedViewCode,
   requireTenantContext
 } from '@/lib/tenant/authorization'
 import QuoteBuilderPageView from '@/views/greenhouse/finance/QuoteBuilderPageView'
@@ -71,13 +73,7 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
     redirect('/login')
   }
 
-  const hasAccess = hasAuthorizedViewCode({
-    tenant,
-    viewCode: 'finanzas.cotizaciones',
-    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
-  })
-
-  if (!hasAccess) {
+  if (!canAccessFinanceQuotes(tenant)) {
     redirect(tenant.portalHomePath)
   }
 
@@ -89,7 +85,7 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
 
   const detail = mapCanonicalQuoteDetailRow(detailRow)
 
-  if (detail.status !== 'draft') {
+  if (!isEditableFinanceQuotationStatus(detail.status)) {
     redirect(`/finance/quotes/${detail.quoteId}?denied=edit`)
   }
 

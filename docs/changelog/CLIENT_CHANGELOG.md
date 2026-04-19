@@ -42,6 +42,32 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.23
+
+**Canal:** Beta
+**Fecha:** 2026-04-19
+**Disponible para:** internal
+**Módulos:** Finanzas / Cotizaciones
+
+### Novedades
+
+- El cotizador ahora muestra **Guardar y emitir** dentro del mismo flujo de creación y edición, además de **Guardar borrador**.
+
+### Mejoras
+
+- La pantalla de detalle vuelve a mostrar acciones operativas como **Editar**, **Guardar como template** y **Emitir** a usuarios con acceso financiero real, incluyendo superadministradores.
+- Las cotizaciones que quedan en **Revisión requerida** se pueden volver a editar desde su flujo normal para corregirlas y reemitirlas.
+
+### Correcciones
+
+- Crear o editar una cotización ya no te deja atrapado en un borrador solo porque la acción de emisión no estaba visible en la UI correspondiente.
+
+### Notas
+
+- Emitir sigue usando aprobación por excepción: si la quote rompe la policy financiera, quedará `En aprobación` en vez de emitirse directo.
+
+---
+
 ## 2026.04-beta.22
 
 **Canal:** Beta

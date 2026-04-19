@@ -2,6 +2,12 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — Quote issuance actions converge across builder, detail and superadmin access
+
+- El cotizador deja explícitos dos intents distintos: **Guardar borrador** y **Guardar y emitir**. Emitir desde `/finance/quotes/new` o `/finance/quotes/[id]/edit` reutiliza el mismo comando canónico `POST /api/finance/quotes/[id]/issue`, en vez de depender de que el usuario guarde y luego descubra otra pantalla.
+- El detalle de la quote deja de ocultar **Editar**, **Guardar como template** y **Emitir** a usuarios válidos por un bug de sesión cliente. La regla visible ahora converge sobre un helper compartido que lee `authorizedViews`, `routeGroups` y el override de `efeonce_admin`.
+- La edición vuelve a aceptar quotes en `approval_rejected`, alineando el server page con el lifecycle introducido por TASK-504 y evitando que una quote “Revisión requerida” quede bloqueada de facto.
+
 ### 2026-04-19 — TASK-504 quotation issuance lifecycle + approval-by-exception
 
 - Las cotizaciones ya no quedan atrapadas en el limbo semántico de `draft/sent/approved`. El lifecycle canónico pasa a `draft -> issued` cuando cumple policy, o `draft -> pending_approval -> issued` cuando requiere excepción.

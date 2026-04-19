@@ -24,6 +24,7 @@ interface ShortcutRow {
 const SHORTCUTS: ShortcutRow[] = [
   { keys: ['⌘', 'S'], description: 'Guardar borrador (quedarse en edit)', group: 'save' },
   { keys: ['⌘', '⏎'], description: 'Guardar y cerrar', group: 'save' },
+  { keys: ['⌘', '⇧', '⏎'], description: 'Guardar y emitir', group: 'save' },
   { keys: ['⌘', 'N'], description: 'Agregar ítem desde catálogo', group: 'item' },
   { keys: ['Esc'], description: 'Cerrar popover / picker actual', group: 'nav' },
   { keys: ['⌘', '/'], description: 'Mostrar/ocultar esta ayuda', group: 'nav' }
