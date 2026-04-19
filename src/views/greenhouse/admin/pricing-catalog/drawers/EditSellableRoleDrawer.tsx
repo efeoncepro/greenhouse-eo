@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 
 import Alert from '@mui/material/Alert'
+import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
@@ -16,9 +17,11 @@ import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
+import Radio from '@mui/material/Radio'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Tab from '@mui/material/Tab'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 
@@ -101,6 +104,32 @@ interface EmploymentTypeOption {
   country: string | null
 }
 
+interface CompatibilityApiItem {
+  roleId: string
+  employmentTypeCode: string
+  isDefault: boolean
+  allowed: boolean
+  notes: string | null
+  createdAt: string
+  employmentType: {
+    employmentTypeCode: string
+    labelEs: string
+    labelEn: string | null
+    paymentCurrency: string
+    countryCode: string
+  } | null
+}
+
+interface CompatibilityRow {
+  employmentTypeCode: string
+  labelEs: string
+  countryCode: string
+  paymentCurrency: string
+  allowed: boolean
+  isDefault: boolean
+  notes: string
+}
+
 interface PricingRowInput {
   currencyCode: SellableRolePricingCurrency
   marginPct: string
@@ -175,6 +204,15 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
   const [employmentTypes, setEmploymentTypes] = useState<EmploymentTypeOption[]>([])
   const [loadingEmploymentTypes, setLoadingEmploymentTypes] = useState(false)
 
+  // Compatibility tab — editable state
+  const [compatibility, setCompatibility] = useState<CompatibilityRow[]>([])
+  const [compatibilityLoaded, setCompatibilityLoaded] = useState(false)
+  const [loadingCompatibility, setLoadingCompatibility] = useState(false)
+  const [compatibilityError, setCompatibilityError] = useState<string | null>(null)
+  const [savingCompatibility, setSavingCompatibility] = useState(false)
+  const [addCompatOpen, setAddCompatOpen] = useState(false)
+  const [addCompatValue, setAddCompatValue] = useState<EmploymentTypeOption | null>(null)
+
   // Cost components tab
   const [costItems, setCostItems] = useState<CostComponentItem[]>([])
   const [loadingCost, setLoadingCost] = useState(false)
@@ -226,6 +264,11 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
     setCostItems([])
     setPricingItems([])
     setExpandedGroups(new Set())
+    setCompatibility([])
+    setCompatibilityLoaded(false)
+    setCompatibilityError(null)
+    setAddCompatOpen(false)
+    setAddCompatValue(null)
   }, [])
 
   const handleClose = useCallback(() => {
@@ -595,6 +638,188 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
     }
   }
 
+  // ── Compatibility tab: load + submit ─────────────────────────────────
+
+  const loadCompatibility = useCallback(async () => {
+    if (!roleId) return
+
+    setLoadingCompatibility(true)
+    setCompatibilityError(null)
+
+    try {
+      const res = await fetch(`/api/admin/pricing-catalog/roles/${roleId}/compatibility`)
+
+      if (!res.ok) {
+        setCompatibilityError(`No pudimos cargar las modalidades (HTTP ${res.status}).`)
+
+        return
+      }
+
+      const payload = (await res.json()) as { items: CompatibilityApiItem[] }
+
+      setCompatibility(
+        payload.items.map(item => ({
+          employmentTypeCode: item.employmentTypeCode,
+          labelEs: item.employmentType?.labelEs ?? item.employmentTypeCode,
+          countryCode: item.employmentType?.countryCode ?? '',
+          paymentCurrency: item.employmentType?.paymentCurrency ?? '',
+          allowed: item.allowed,
+          isDefault: item.isDefault,
+          notes: item.notes ?? ''
+        }))
+      )
+      setCompatibilityLoaded(true)
+    } catch {
+      setCompatibilityError('No se pudo conectar al servidor. Verifica tu conexión.')
+    } finally {
+      setLoadingCompatibility(false)
+    }
+  }, [roleId])
+
+  useEffect(() => {
+    if (open && roleId && tab === 'employment' && !compatibilityLoaded) {
+      void loadCompatibility()
+    }
+  }, [open, roleId, tab, compatibilityLoaded, loadCompatibility])
+
+  const handleToggleAllowed = (code: string, allowed: boolean) => {
+    setCompatibility(prev =>
+      prev.map(row => {
+        if (row.employmentTypeCode !== code) return row
+
+        // If turning off allowed on the default row, also clear isDefault
+        if (!allowed && row.isDefault) {
+          return { ...row, allowed, isDefault: false }
+        }
+
+        return { ...row, allowed }
+      })
+    )
+  }
+
+  const handleSetDefault = (code: string) => {
+    // Default must also be allowed — force allowed=true on the selected row
+    setCompatibility(prev =>
+      prev.map(row => ({
+        ...row,
+        isDefault: row.employmentTypeCode === code,
+        allowed: row.employmentTypeCode === code ? true : row.allowed
+      }))
+    )
+  }
+
+  const handleUpdateNotes = (code: string, notes: string) => {
+    setCompatibility(prev =>
+      prev.map(row => (row.employmentTypeCode === code ? { ...row, notes } : row))
+    )
+  }
+
+  const handleRemoveCompat = (code: string) => {
+    if (!window.confirm('¿Quitar esta modalidad? Cotizaciones existentes que la usen no se ven afectadas.')) {
+      return
+    }
+
+    setCompatibility(prev => prev.filter(row => row.employmentTypeCode !== code))
+  }
+
+  const handleAddCompat = () => {
+    if (!addCompatValue) return
+
+    if (compatibility.some(row => row.employmentTypeCode === addCompatValue.code)) {
+      toast.error('Esta modalidad ya está agregada.')
+
+      return
+    }
+
+    // Find full details from employmentTypes
+    const et = employmentTypes.find(e => e.code === addCompatValue.code)
+
+    setCompatibility(prev => [
+      ...prev,
+      {
+        employmentTypeCode: addCompatValue.code,
+        labelEs: et?.label ?? addCompatValue.code,
+        countryCode: et?.country ?? '',
+        paymentCurrency: '',
+        allowed: true,
+        isDefault: false,
+        notes: ''
+      }
+    ])
+
+    setAddCompatValue(null)
+    setAddCompatOpen(false)
+  }
+
+  const handleSaveCompatibility = async () => {
+    if (!roleId) return
+
+    // Client-side validation: at least 1 default if list is non-empty
+    if (compatibility.length > 0) {
+      const defaults = compatibility.filter(row => row.isDefault)
+
+      if (defaults.length !== 1) {
+        toast.error('No pudimos guardar las modalidades. Revisa que haya exactamente una marcada como default.')
+
+        return
+      }
+
+      if (!defaults[0].allowed) {
+        toast.error('La modalidad default debe estar marcada como permitida.')
+
+        return
+      }
+    }
+
+    setSavingCompatibility(true)
+
+    try {
+      const res = await fetch(`/api/admin/pricing-catalog/roles/${roleId}/compatibility`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          compatibility: compatibility.map(row => ({
+            employmentTypeCode: row.employmentTypeCode,
+            allowed: row.allowed,
+            isDefault: row.isDefault,
+            notes: row.notes.trim() || null
+          }))
+        })
+      })
+
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}))
+
+        toast.error(
+          payload.error || 'No pudimos guardar las modalidades. Revisa que haya exactamente una marcada como default.'
+        )
+
+        return
+      }
+
+      const payload = (await res.json()) as { items: CompatibilityApiItem[] }
+
+      setCompatibility(
+        payload.items.map(item => ({
+          employmentTypeCode: item.employmentTypeCode,
+          labelEs: item.employmentType?.labelEs ?? item.employmentTypeCode,
+          countryCode: item.employmentType?.countryCode ?? '',
+          paymentCurrency: item.employmentType?.paymentCurrency ?? '',
+          allowed: item.allowed,
+          isDefault: item.isDefault,
+          notes: item.notes ?? ''
+        }))
+      )
+
+      toast.success('Modalidades actualizadas')
+      onSuccess?.()
+    } catch {
+      toast.error('No se pudo conectar al servidor.')
+    } finally {
+      setSavingCompatibility(false)
+    }
+  }
+
   // ── Derived: group cost items by employment type ─────────────────────
 
   const costGroups = useMemo(() => {
@@ -864,67 +1089,221 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
             </Stack>
           </TabPanel>
 
-          {/* ── Employment types tab ─────────────────────────────── */}
+          {/* ── Employment types tab (editable compatibility) ────── */}
           <TabPanel value='employment' sx={{ p: 4, overflowY: 'auto', flex: 1 }}>
             <Stack spacing={3}>
-              <Alert severity='info' icon={<i className='tabler-info-circle' />}>
-                Gestión de compatibilidad disponible en próxima iteración. Por ahora solo lectura.
-              </Alert>
+              {compatibilityError && (
+                <Alert severity='error' onClose={() => setCompatibilityError(null)}>
+                  {compatibilityError}
+                </Alert>
+              )}
 
               <Typography variant='body2' color='text.secondary'>
-                Modalidades de contrato disponibles en el catálogo. Las que tienen versiones de costo
-                cargadas para este rol aparecen marcadas como compatibles.
+                Las modalidades marcadas como <strong>permitidas</strong> aparecen en el cotizador al
+                agregar este rol. La marcada como <strong>default</strong> se pre-selecciona.
               </Typography>
 
-              {loadingEmploymentTypes ? (
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}
+              >
+                <Typography variant='caption' color='text.secondary'>
+                  {compatibility.length === 0
+                    ? 'Sin modalidades asignadas'
+                    : `${compatibility.length} modalidad${compatibility.length === 1 ? '' : 'es'} · ${compatibility.filter(r => r.allowed).length} permitida${compatibility.filter(r => r.allowed).length === 1 ? '' : 's'}`}
+                </Typography>
+                <Button
+                  variant='outlined'
+                  size='small'
+                  startIcon={<i className='tabler-plus' />}
+                  onClick={() => setAddCompatOpen(prev => !prev)}
+                  disabled={loadingCompatibility || loadingEmploymentTypes}
+                  sx={{ whiteSpace: 'nowrap' }}
+                >
+                  Agregar modalidad
+                </Button>
+              </Box>
+
+              {addCompatOpen && (
+                <Paper
+                  variant='outlined'
+                  sx={{ p: 3, borderLeft: t => `4px solid ${t.palette.primary.main}` }}
+                >
+                  <Stack spacing={2}>
+                    <Typography variant='subtitle2'>Agregar modalidad</Typography>
+                    <Autocomplete
+                      size='small'
+                      options={employmentTypes.filter(
+                        et => !compatibility.some(row => row.employmentTypeCode === et.code)
+                      )}
+                      getOptionLabel={opt => `${opt.label} (${opt.code})`}
+                      value={addCompatValue}
+                      onChange={(_, value) => setAddCompatValue(value)}
+                      renderInput={params => (
+                        <CustomTextField
+                          {...params}
+                          label='Modalidad'
+                          placeholder='Busca por nombre o código'
+                        />
+                      )}
+                      noOptionsText='No quedan modalidades disponibles'
+                    />
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                      <Button
+                        variant='outlined'
+                        color='secondary'
+                        size='small'
+                        onClick={() => {
+                          setAddCompatOpen(false)
+                          setAddCompatValue(null)
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                      <Button
+                        variant='contained'
+                        size='small'
+                        onClick={handleAddCompat}
+                        disabled={!addCompatValue}
+                      >
+                        Agregar
+                      </Button>
+                    </Box>
+                  </Stack>
+                </Paper>
+              )}
+
+              {loadingCompatibility ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                   <CircularProgress size={24} />
                 </Box>
-              ) : employmentTypes.length === 0 ? (
-                <Typography variant='body2' color='text.secondary'>
-                  No encontramos modalidades de contrato en el catálogo.
-                </Typography>
+              ) : compatibility.length === 0 ? (
+                <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
+                  <Typography variant='body2' color='text.secondary'>
+                    Este rol aún no tiene modalidades asignadas. Agrega al menos una para que aparezca
+                    en el cotizador.
+                  </Typography>
+                </Box>
               ) : (
-                <Stack spacing={1}>
-                  {employmentTypes.map(et => {
-                    const hasCost = costItems.some(ci => ci.employmentTypeCode === et.code)
-
-                    return (
-                      <Paper
-                        key={et.code}
-                        variant='outlined'
-                        sx={{
-                          p: 2,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: 2
-                        }}
-                      >
-                        <Box>
-                          <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                            {et.label}
-                          </Typography>
-                          <Typography
-                            variant='caption'
-                            color='text.secondary'
-                            sx={{ fontFamily: 'monospace' }}
-                          >
-                            {et.code}
-                            {et.country ? ` · ${et.country}` : ''}
-                          </Typography>
-                        </Box>
-                        <Chip
-                          size='small'
-                          label={hasCost ? 'Con costo cargado' : 'Sin costo cargado'}
-                          color={hasCost ? 'success' : 'default'}
-                          variant={hasCost ? 'filled' : 'outlined'}
-                        />
-                      </Paper>
-                    )
-                  })}
-                </Stack>
+                <Box sx={{ overflowX: 'auto' }}>
+                  <Box
+                    component='table'
+                    sx={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      '& th, & td': {
+                        p: 1.5,
+                        fontSize: '0.8rem',
+                        borderBottom: t => `1px solid ${t.palette.divider}`,
+                        verticalAlign: 'middle'
+                      },
+                      '& th': {
+                        fontWeight: 600,
+                        color: 'text.secondary',
+                        bgcolor: 'action.hover',
+                        textAlign: 'left',
+                        whiteSpace: 'nowrap'
+                      }
+                    }}
+                  >
+                    <thead>
+                      <tr>
+                        <th>Modalidad</th>
+                        <th style={{ textAlign: 'center' }}>Permitida</th>
+                        <th style={{ textAlign: 'center' }}>Default</th>
+                        <th>Notas</th>
+                        <th />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {compatibility.map(row => (
+                        <tr key={row.employmentTypeCode}>
+                          <td>
+                            <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                              {row.labelEs}
+                            </Typography>
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                              sx={{ fontFamily: 'monospace' }}
+                            >
+                              {row.employmentTypeCode}
+                              {row.countryCode ? ` · ${row.countryCode}` : ''}
+                              {row.paymentCurrency ? ` · ${row.paymentCurrency}` : ''}
+                            </Typography>
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <Switch
+                              size='small'
+                              checked={row.allowed}
+                              onChange={e =>
+                                handleToggleAllowed(row.employmentTypeCode, e.target.checked)
+                              }
+                              inputProps={{
+                                'aria-label': `Permitir ${row.labelEs}`
+                              }}
+                            />
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            <Tooltip
+                              title={
+                                row.allowed
+                                  ? 'Marcar como default'
+                                  : 'Solo modalidades permitidas pueden ser default'
+                              }
+                            >
+                              <span>
+                                <Radio
+                                  size='small'
+                                  checked={row.isDefault}
+                                  onChange={() => handleSetDefault(row.employmentTypeCode)}
+                                  disabled={!row.allowed}
+                                  inputProps={{
+                                    'aria-label': `Default: ${row.labelEs}`
+                                  }}
+                                />
+                              </span>
+                            </Tooltip>
+                          </td>
+                          <td style={{ minWidth: 200 }}>
+                            <CustomTextField
+                              fullWidth
+                              size='small'
+                              value={row.notes}
+                              onChange={e =>
+                                handleUpdateNotes(row.employmentTypeCode, e.target.value)
+                              }
+                              placeholder='Notas (opcional)'
+                            />
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <IconButton
+                              size='small'
+                              onClick={() => handleRemoveCompat(row.employmentTypeCode)}
+                              aria-label={`Quitar ${row.labelEs}`}
+                            >
+                              <i className='tabler-trash' style={{ fontSize: 18 }} />
+                            </IconButton>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Box>
+                </Box>
               )}
+
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={handleSaveCompatibility}
+                  disabled={savingCompatibility || loadingCompatibility}
+                  startIcon={
+                    savingCompatibility ? <CircularProgress size={16} color='inherit' /> : undefined
+                  }
+                >
+                  {savingCompatibility ? 'Guardando...' : 'Guardar modalidades'}
+                </Button>
+              </Box>
             </Stack>
           </TabPanel>
 
