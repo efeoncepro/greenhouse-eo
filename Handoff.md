@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — Quote issuance actions + superadmin visibility alignment (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `fix/codex-quote-issuance-permissions`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-quote-issuance-permissions`
+- **Problema corregido:**
+  - el detalle de cotización podía ocultar `Editar`, `Guardar como template` y `Emitir` incluso a un superadministrador porque el cliente estaba leyendo `session.roleCodes` en vez de `session.user.roleCodes`.
+  - el builder full-page no exponía un intent explícito de emisión; guardar seguía siendo el único camino visible y dejaba la quote en `Borrador`.
+  - la página server-side de edición seguía aceptando solo `draft`, dejando fuera `approval_rejected` aunque TASK-504 ya había formalizado `Revisión requerida` como estado editable.
+- **Solución aplicada:**
+  - nuevo helper compartido `src/lib/finance/quotation-access.ts`:
+    - access surface `finanzas.cotizaciones` sobre ambos planos `authorizedViews + routeGroups`, con override canónico `efeonce_admin`
+    - helpers reutilizables `canAccessFinanceQuotes`, `canManageFinanceQuotes`, `canDecideFinanceQuotationApproval`, `isEditableFinanceQuotationStatus`
+  - `QuoteDetailView.tsx` ahora consume ese helper, parsea la sesión correcta (`session.user.*`) y alinea todas las acciones editables/issueables con la misma regla.
+  - `/finance/quotes/new` y `/finance/quotes/[id]/edit` reutilizan el helper de acceso; el edit page ahora acepta `draft` y `approval_rejected`.
+  - `QuoteBuilderShell.tsx` separa intents de submit:
+    - `Guardar borrador`
+    - `Guardar y cerrar`
+    - `Guardar y emitir`
+    - `⌘⇧⏎` agregado como shortcut para emitir desde el builder
+  - `QuoteSendDialog.tsx` también usa el helper de estados issueables para no seguir hardcodeando strings duplicados.
+  - documentación/changelog actualizados para dejar explícito que emitir ya es una acción first-class del builder y del detalle.
+- **Tests / validación:**
+  - `pnpm exec vitest run src/lib/finance/__tests__/quotation-access.test.ts src/views/greenhouse/finance/workspace/__tests__/quote-builder-pricing.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de coordinación:**
+  - el build pasó con warnings esperados de `NEXTAUTH_SECRET` ausente en build-time estático; no bloquea el artefacto.
+  - no se tocó `data/api_zapsign.txt` ni el checkout principal sobre `develop`; todo el fix vive en worktree aislado listo para merge directo a `develop`.
+
 ## Sesion 2026-04-19 — TASK-504 quotation issued lifecycle + approval-by-exception (Codex)
 
 - **Owner:** Codex

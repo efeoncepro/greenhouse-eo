@@ -12,6 +12,8 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
+
 interface QuoteSendHealthAlert {
   level: 'error' | 'warning' | 'info'
   message: string
@@ -47,11 +49,11 @@ const resolveScenario = (
     return { kind: 'approval_in_progress', canConfirm: false }
   }
 
-  if ((quotationStatus === 'draft' || quotationStatus === 'approval_rejected') && healthSummary?.requiresApproval) {
+  if (isIssueableFinanceQuotationStatus(quotationStatus) && healthSummary?.requiresApproval) {
     return { kind: 'needs_approval', canConfirm: true }
   }
 
-  if (quotationStatus === 'draft' || quotationStatus === 'approval_rejected') {
+  if (isIssueableFinanceQuotationStatus(quotationStatus)) {
     return { kind: 'ready', canConfirm: true }
   }
 

@@ -3,12 +3,11 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 
-import { ROLE_CODES } from '@/config/role-codes'
 import { getOrganizationList } from '@/lib/account-360/organization-store'
 import { listTemplates } from '@/lib/commercial/governance/templates-store'
+import { canAccessFinanceQuotes } from '@/lib/finance/quotation-access'
 import {
   canViewCostStack,
-  hasAuthorizedViewCode,
   requireTenantContext
 } from '@/lib/tenant/authorization'
 import QuoteBuilderPageView from '@/views/greenhouse/finance/QuoteBuilderPageView'
@@ -31,13 +30,7 @@ const QuoteBuilderNewPage = async () => {
     redirect('/login')
   }
 
-  const hasAccess = hasAuthorizedViewCode({
-    tenant,
-    viewCode: 'finanzas.cotizaciones',
-    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
-  })
-
-  if (!hasAccess) {
+  if (!canAccessFinanceQuotes(tenant)) {
     redirect(tenant.portalHomePath)
   }
 

@@ -78,8 +78,10 @@ Bundle enfocado en cerrar las últimas fricciones del Quote Builder post-TASK-48
 ## Cambios v3.2 (2026-04-19 — emisión oficial + aprobación por excepción)
 
 - **Guardar ya no equivale a emitir**: al guardar una cotización el documento sigue en **Borrador**. El momento oficial ahora es la acción **Emitir cotización**.
+- **El builder ya deja emitir sin salir a ciegas**: en `/finance/quotes/new` y `/finance/quotes/[id]/edit` existen dos intents distintos — **Guardar borrador** para seguir trabajando y **Guardar y emitir** para cerrar la versión documental oficial desde el mismo builder. El dock inferior también usa esa misma separación.
 - **`Emitida` es el estado documental correcto**: si la quote cumple política financiera, pasa directo a `Emitida` sin pedir aprobación. Si rompe una regla de excepción, pasa a `En aprobación` y, cuando todos los pasos quedan aprobados, termina también en `Emitida`.
 - **Rechazo explícito**: si Finance o el aprobador rechaza una excepción, la quote queda en **Revisión requerida** (`approval_rejected`). No vuelve silenciosamente a borrador.
+- **Detalle y builder comparten la misma regla de acceso**: la visibilidad de **Editar**, **Guardar como template** y **Emitir** se resuelve desde el surface financiero canónico (`authorizedViews` + `routeGroups` + override de `efeonce_admin`), así que un superadministrador o un usuario con acceso real a Finanzas ya no queda sin acciones por leer mal la sesión del cliente.
 - **PDF / email / share ya no cambian el lifecycle**: descargar el PDF, guardarlo localmente o decidir después si la envías al cliente no cambia el estado documental. Todo eso opera sobre una quote ya emitida.
 - **Nueva versión cuando cambia el contenido oficial**: una quote emitida ya no se edita en el mismo documento. Si necesitas cambiar precio, alcance o condiciones materiales, el flujo correcto es crear una nueva versión.
 

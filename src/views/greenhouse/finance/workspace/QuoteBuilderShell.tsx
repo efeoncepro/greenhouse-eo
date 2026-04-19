@@ -26,6 +26,7 @@ import type {
   PricingWarning
 } from '@/lib/finance/pricing/contracts'
 import { UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE } from '@/lib/finance/pricing/quotation-line-input-validation'
+import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 
@@ -228,6 +229,11 @@ const mapServiceLineToQuoteLine = (
       serviceLineOrder: typeof raw.lineOrder === 'number' ? raw.lineOrder : null
     }
   }
+}
+
+interface QuoteBuilderSubmitOptions {
+  closeAfter?: boolean
+  issueAfterSave?: boolean
 }
 
 interface BuilderContextState extends QuoteBuilderPricingContext {
@@ -723,7 +729,7 @@ const QuoteBuilderShell = ({
     return null
   }, [builderState.description, organizationId, selectedTemplateId, linesSnapshot])
 
-  const handleSubmit = useCallback(async (closeAfter: boolean = true) => {
+  const handleSubmit = useCallback(async ({ closeAfter = true, issueAfterSave = false }: QuoteBuilderSubmitOptions = {}) => {
     const validation = validate()
 
     if (validation) {
@@ -738,19 +744,51 @@ const QuoteBuilderShell = ({
     try {
       const draftLines = editorRef.current?.getDraft() ?? linesSnapshot
 
-      const resolveRedirect = (id: string | null) => {
+      const resolveSavedRedirect = (id: string | null) => {
         if (!id) return
 
-        toast.success(
-          mode === 'create' ? 'Cotización creada' : 'Cambios guardados',
-          { autoClose: 2400, position: 'bottom-right' }
-        )
+        toast.success(mode === 'create' ? GH_PRICING.builderCreated : GH_PRICING.builderSaved, {
+          autoClose: 2400,
+          position: 'bottom-right'
+        })
 
-        if (closeAfter) {
-          router.push(`/finance/quotes/${id}`)
-        } else {
-          router.push(`/finance/quotes/${id}/edit`)
+        router.push(closeAfter ? `/finance/quotes/${id}` : `/finance/quotes/${id}/edit`)
+      }
+
+      const resolveIssuedRedirect = async (quotationId: string | null) => {
+        if (!quotationId) return
+
+        const issueRes = await fetch(`/api/finance/quotes/${quotationId}/issue`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        })
+
+        const issueBody = (await issueRes.json().catch(() => ({}))) as {
+          approvalRequired?: boolean
+          error?: string
         }
+
+        if (!issueRes.ok) {
+          toast.error(issueBody.error ?? GH_PRICING.builderIssueErrorFallback, {
+            autoClose: 4200,
+            position: 'bottom-right'
+          })
+          router.push(`/finance/quotes/${quotationId}`)
+
+          return
+        }
+
+        toast.success(
+          issueBody.approvalRequired
+            ? GH_PRICING.builderIssueRequested
+            : GH_PRICING.builderIssued,
+          {
+            autoClose: 2600,
+            position: 'bottom-right'
+          }
+        )
+        router.push(`/finance/quotes/${quotationId}`)
       }
 
       // Fresh-simulate on submit: el hook usePricingSimulation debouncea,
@@ -816,7 +854,11 @@ const QuoteBuilderShell = ({
 
         const targetId = result?.quotationId ?? quote?.quotationId ?? null
 
-        resolveRedirect(targetId)
+        if (issueAfterSave) {
+          await resolveIssuedRedirect(targetId)
+        } else {
+          resolveSavedRedirect(targetId)
+        }
 
         return
       }
@@ -849,7 +891,13 @@ const QuoteBuilderShell = ({
 
         const created = (await res.json()) as { quotationId?: string }
 
-        resolveRedirect(created.quotationId ?? null)
+        const createdQuotationId = created.quotationId ?? null
+
+        if (issueAfterSave) {
+          await resolveIssuedRedirect(createdQuotationId)
+        } else {
+          resolveSavedRedirect(createdQuotationId)
+        }
 
         return
       }
@@ -891,7 +939,11 @@ const QuoteBuilderShell = ({
           throw new Error(body.error ?? GH_PRICING.builderSubmitErrorGeneric)
         }
 
-        resolveRedirect(quote.quotationId)
+        if (issueAfterSave) {
+          await resolveIssuedRedirect(quote.quotationId)
+        } else {
+          resolveSavedRedirect(quote.quotationId)
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : GH_PRICING.builderSubmitErrorGeneric)
@@ -933,16 +985,23 @@ const QuoteBuilderShell = ({
         target?.tagName === 'TEXTAREA' ||
         target?.isContentEditable === true
 
+      if (modifier && e.shiftKey && e.key === 'Enter') {
+        e.preventDefault()
+        void handleSubmit({ issueAfterSave: true })
+
+        return
+      }
+
       if (modifier && e.key === 's') {
         e.preventDefault()
-        void handleSubmit(false)
+        void handleSubmit({ closeAfter: false })
 
         return
       }
 
       if (modifier && e.key === 'Enter') {
         e.preventDefault()
-        void handleSubmit(true)
+        void handleSubmit()
 
         return
       }
@@ -981,6 +1040,7 @@ const QuoteBuilderShell = ({
 
   const subtitle = mode === 'edit' ? GH_PRICING.builderSubtitleEdit : GH_PRICING.builderSubtitleCreate
   const quoteStatus = resolveQuoteStatus(quote?.status)
+  const canIssueFromBuilder = mode === 'create' || isIssueableFinanceQuotationStatus(quote?.status ?? 'draft')
 
   const contextValues = useMemo(
     () => ({
@@ -1053,6 +1113,15 @@ const QuoteBuilderShell = ({
         ? { kind: 'clean' }
         : null
 
+  const hasSubmittableContent = selectedTemplateId !== null || linesSnapshot.length > 0
+  const saveDraftDisabled = submitting || serviceExpanding || simulating
+
+  const issueActionDisabled =
+    saveDraftDisabled ||
+    !hasSubmittableContent ||
+    !organizationId ||
+    !canIssueFromBuilder
+
   return (
     <Box>
       <QuoteIdentityStrip
@@ -1074,12 +1143,24 @@ const QuoteBuilderShell = ({
               variant='tonal'
               color='primary'
               startIcon={<i className='tabler-device-floppy' aria-hidden='true' />}
-              onClick={() => handleSubmit(false)}
-              disabled={submitting || serviceExpanding || simulating}
+              onClick={() => handleSubmit({ closeAfter: false })}
+              disabled={saveDraftDisabled}
               sx={{ minHeight: 44 }}
             >
               {submitting ? GH_PRICING.builderSaving : simulating ? 'Calculando pricing…' : GH_PRICING.builderSaveDraft}
             </Button>
+            {canIssueFromBuilder ? (
+              <Button
+                variant='contained'
+                color='primary'
+                startIcon={<i className='tabler-file-check' aria-hidden='true' />}
+                onClick={() => handleSubmit({ issueAfterSave: true })}
+                disabled={issueActionDisabled}
+                sx={{ minHeight: 44 }}
+              >
+                {submitting ? GH_PRICING.builderSaving : GH_PRICING.builderSaveAndIssue}
+              </Button>
+            ) : null}
           </>
         }
       />
@@ -1211,10 +1292,13 @@ const QuoteBuilderShell = ({
             />
           }
           primaryCtaLabel={submitting ? GH_PRICING.builderSaving : GH_PRICING.summaryDock.primaryCta}
-          primaryCtaIcon='tabler-device-floppy-filled'
+          primaryCtaIcon='tabler-file-check'
           primaryCtaLoading={submitting}
-          primaryCtaDisabled={submitting || serviceExpanding || simulating || linesSnapshot.length === 0 || !organizationId}
-          onPrimaryClick={() => handleSubmit(true)}
+          primaryCtaDisabled={issueActionDisabled}
+          onPrimaryClick={() => handleSubmit({ issueAfterSave: true })}
+          secondaryCtaLabel={GH_PRICING.builderSaveAndClose}
+          secondaryCtaDisabled={saveDraftDisabled || !hasSubmittableContent || !organizationId}
+          onSecondaryClick={() => handleSubmit()}
           marginClassification={marginClass}
           marginPct={marginPct}
           marginTierRange={marginTierRange}

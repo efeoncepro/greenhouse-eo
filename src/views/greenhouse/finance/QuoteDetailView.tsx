@@ -36,6 +36,11 @@ import QuoteDocumentChain from './workspace/QuoteDocumentChain'
 import QuoteHealthCard from './workspace/QuoteHealthCard'
 import QuoteSaveAsTemplateDialog from './workspace/QuoteSaveAsTemplateDialog'
 import QuoteSendDialog from './workspace/QuoteSendDialog'
+import {
+  canDecideFinanceQuotationApproval,
+  canManageFinanceQuotes,
+  isEditableFinanceQuotationStatus
+} from '@/lib/finance/quotation-access'
 
 // ── Types ──
 
@@ -161,24 +166,24 @@ const fetchViewerContext = async (): Promise<QuoteViewerContext> => {
     }
 
     const session = (await res.json()) as {
-      user?: { id?: string }
-      roleCodes?: string[]
+      user?: {
+        id?: string
+        roleCodes?: string[]
+        routeGroups?: string[]
+        authorizedViews?: string[]
+      }
     }
 
-    const roleCodes = Array.isArray(session.roleCodes) ? session.roleCodes : []
-
-    const canDecideApproval =
-      roleCodes.includes('finance') ||
-      roleCodes.includes('finance_admin') ||
-      roleCodes.includes('efeonce_admin')
-
-    const canEdit = canDecideApproval || roleCodes.includes('efeonce_operations')
+    const roleCodes = Array.isArray(session.user?.roleCodes) ? session.user.roleCodes : []
+    const routeGroups = Array.isArray(session.user?.routeGroups) ? session.user.routeGroups : []
+    const authorizedViews = Array.isArray(session.user?.authorizedViews) ? session.user.authorizedViews : []
+    const accessSubject = { roleCodes, routeGroups, authorizedViews }
 
     return {
       userId: session.user?.id ?? null,
       roleCodes,
-      canEdit,
-      canDecideApproval
+      canEdit: canManageFinanceQuotes(accessSubject),
+      canDecideApproval: canDecideFinanceQuotationApproval(accessSubject)
     }
   } catch {
     return { userId: null, roleCodes: [], canEdit: false, canDecideApproval: false }
@@ -737,6 +742,7 @@ const QuoteDetailView = () => {
   })()
 
   const currentVersion = quote.currentVersion ?? (versions[0]?.versionNumber ?? null)
+  const canManageCurrentQuote = viewer.canEdit && isEditableFinanceQuotationStatus(quote.status)
 
   return (
     <Stack spacing={4}>
@@ -772,7 +778,7 @@ const QuoteDetailView = () => {
             >
               PDF
             </Button>
-            {viewer.canEdit && (quote.status === 'draft' || quote.status === 'approval_rejected') && (
+            {canManageCurrentQuote && (
               <Button
                 variant='outlined'
                 size='small'
@@ -783,7 +789,7 @@ const QuoteDetailView = () => {
                 Editar
               </Button>
             )}
-            {viewer.canEdit && (quote.status === 'draft' || quote.status === 'approval_rejected') && (
+            {canManageCurrentQuote && (
               <Button
                 variant='outlined'
                 size='small'
@@ -796,7 +802,7 @@ const QuoteDetailView = () => {
                 Guardar como template
               </Button>
             )}
-            {viewer.canEdit && (quote.status === 'draft' || quote.status === 'approval_rejected') && (
+            {canManageCurrentQuote && (
               <Button
                 variant='contained'
                 size='small'
@@ -859,7 +865,7 @@ const QuoteDetailView = () => {
               targetMarginPct={health.marginTargetPct}
               floorMarginPct={health.marginFloorPct}
               alerts={health.alerts}
-              canRequestApproval={viewer.canEdit && (quote.status === 'draft' || quote.status === 'approval_rejected')}
+              canRequestApproval={canManageCurrentQuote}
               onRequestApproval={handleOpenSendDialog}
             />
           )}
@@ -1185,7 +1191,7 @@ const QuoteDetailView = () => {
           error={approvalsError}
           steps={approvals}
           quotationStatus={quote.status}
-          canRequestApproval={viewer.canEdit && (quote.status === 'draft' || quote.status === 'approval_rejected')}
+          canRequestApproval={canManageCurrentQuote}
           canDecide={viewer.canDecideApproval}
           approverRoleCodes={viewer.roleCodes}
           requesting={requestingApproval}
@@ -1199,7 +1205,7 @@ const QuoteDetailView = () => {
           loading={termsLoading}
           error={termsError}
           terms={terms}
-          canEdit={viewer.canEdit && (quote.status === 'draft' || quote.status === 'approval_rejected')}
+          canEdit={canManageCurrentQuote}
           saving={savingTerms}
           onSave={handleSaveTerms}
         />
