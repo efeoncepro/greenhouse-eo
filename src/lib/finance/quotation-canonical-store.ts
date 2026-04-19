@@ -176,13 +176,9 @@ export const resolveFinanceQuoteTenantSpaceIds = async (tenant: TenantContext) =
  *   - No scope hints → empty array (quotations effectively invisible).
  */
 export const resolveFinanceQuoteTenantOrganizationIds = async (tenant: TenantContext) => {
-  const organizationId = tenant.organizationId?.trim()
-  const clientId = tenant.clientId?.trim()
-
-  if (organizationId) {
-    return [organizationId]
-  }
-
+  // efeonce_internal users with finance access see every active organization. El resolver debe
+  // chequear esto ANTES de mirar tenant.organizationId — porque un internal user puede tener
+  // seteada su propia org (ej. Efeonce Group) en session y no queremos limitar su scope a esa.
   if (tenant.tenantType === 'efeonce_internal') {
     const rows = await query<TenantOrganizationRow>(
       `SELECT organization_id
@@ -192,6 +188,13 @@ export const resolveFinanceQuoteTenantOrganizationIds = async (tenant: TenantCon
     )
 
     return rows.map(row => row.organization_id)
+  }
+
+  const organizationId = tenant.organizationId?.trim()
+  const clientId = tenant.clientId?.trim()
+
+  if (organizationId) {
+    return [organizationId]
   }
 
   if (!clientId) {
