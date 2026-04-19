@@ -1,17 +1,29 @@
 'use client'
 
-import { forwardRef, useId, useRef, useState, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useId,
+  useRef,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+  type SyntheticEvent
+} from 'react'
 
 import Autocomplete from '@mui/material/Autocomplete'
+import type { AutocompleteCloseReason } from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
+import ClickAwayListener from '@mui/material/ClickAwayListener'
 import InputAdornment from '@mui/material/InputAdornment'
+import InputBase from '@mui/material/InputBase'
+import Paper from '@mui/material/Paper'
 import Popover from '@mui/material/Popover'
+import Popper from '@mui/material/Popper'
 import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
+import { alpha, styled } from '@mui/material/styles'
 
 export type ContextChipStatus = 'empty' | 'filled' | 'invalid' | 'locked'
 
@@ -45,7 +57,7 @@ interface ContextChipSelectProps extends ContextChipCommonProps {
   loadingText?: string
   searchPlaceholder?: string
 
-  /** Popover width. Default 360. */
+  /** Popper width. Default 360. */
   popoverWidth?: number
 }
 
@@ -60,6 +72,36 @@ export type ContextChipProps = ContextChipSelectProps | ContextChipCustomProps
 const isCustomMode = (props: ContextChipProps): props is ContextChipCustomProps =>
   props.mode === 'custom'
 
+/**
+ * Styled search input that lives at the top of the popper.
+ * Borderless — the Paper provides the visual boundary.
+ */
+const StyledSearchInput = styled(InputBase)(({ theme }) => ({
+  padding: theme.spacing(1.25, 1.5),
+  width: '100%',
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  '& input': {
+    borderRadius: 0,
+    padding: 0,
+    fontSize: '0.875rem',
+    fontFamily: theme.typography.fontFamily
+  }
+}))
+
+/**
+ * Context chip — compact display + popover editor for one contextual field.
+ *
+ * Built on MUI's GitHub Picker pattern (Autocomplete with `open` forced true
+ * inside a Popper anchored to the chip). Delivers enterprise-grade keyboard
+ * navigation (arrow keys, Enter, Escape), screen-reader a11y, search, and
+ * option grouping out-of-the-box.
+ *
+ * Modes:
+ * - `select` (default): Popper + Autocomplete with inline search input and
+ *   filterable options. Click chip → popper opens → option renders → click
+ *   or Enter → selects and closes. 2 clicks total.
+ * - `custom`: Popover with arbitrary content (number/date inputs).
+ */
 const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function ContextChip(props, ref) {
   const {
     icon,
@@ -88,10 +130,21 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
     setOpen(true)
   }
 
-  const handleClose = () => setOpen(false)
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleAutocompleteClose = (_event: SyntheticEvent, reason: AutocompleteCloseReason) => {
+    if (reason === 'escape') handleClose()
+  }
 
   const resolvedValue = value ?? ''
   const displayText = resolvedValue.length > 0 ? resolvedValue : placeholder ?? ''
+
+  const selectedOption =
+    !isCustomMode(props) && props.selectedValue
+      ? props.options.find(o => o.value === props.selectedValue) ?? null
+      : null
 
   return (
     <>
@@ -146,7 +199,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             maxWidth: 320,
             px: 1.75,
             py: 1,
-            borderRadius: theme.shape.customBorderRadius.lg,
+            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
             border: status === 'empty' ? `1px dashed ${borderColor}` : `1px solid ${borderColor}`,
             backgroundColor: bgColor,
             color: textColor,
@@ -157,9 +210,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform'], {
               duration: theme.transitions.duration.shortest
             }),
-            '@media (prefers-reduced-motion: reduce)': {
-              transition: 'none'
-            },
+            '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
             '&:hover': isInteractive
               ? {
                   borderColor: theme.palette.primary.main,
@@ -171,10 +222,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
               outline: `2px solid ${theme.palette.primary.main}`,
               outlineOffset: 2
             },
-            '&.Mui-disabled': {
-              opacity: 1,
-              pointerEvents: 'none'
-            }
+            '&.Mui-disabled': { opacity: 1, pointerEvents: 'none' }
           }
         }}
       >
@@ -266,7 +314,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 mt: 1,
                 width: props.popoverWidth ?? 320,
                 maxWidth: 'calc(100vw - 32px)',
-                borderRadius: theme.shape.customBorderRadius.md,
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
                 border: `1px solid ${theme.palette.divider}`,
                 boxShadow: theme.shadows[6]
               })
@@ -280,104 +328,124 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           </Box>
         </Popover>
       ) : (
-        <Popover
+        <Popper
           open={open && isInteractive}
           anchorEl={anchorRef.current}
-          onClose={handleClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-          slotProps={{
-            paper: {
-              sx: theme => ({
-                mt: 1,
+          placement='bottom-start'
+          sx={{ zIndex: theme => theme.zIndex.modal }}
+          modifiers={[
+            { name: 'offset', options: { offset: [0, 4] } },
+            { name: 'preventOverflow', options: { padding: 16 } }
+          ]}
+        >
+          <ClickAwayListener onClickAway={handleClose}>
+            <Paper
+              elevation={0}
+              sx={theme => ({
                 width: props.popoverWidth ?? 360,
                 maxWidth: 'calc(100vw - 32px)',
-                borderRadius: theme.shape.customBorderRadius.md,
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
                 border: `1px solid ${theme.palette.divider}`,
-                boxShadow: theme.shadows[6]
-              })
-            }
-          }}
-        >
-          <Box sx={{ p: 1.5 }} role='dialog' aria-labelledby={labelId}>
-            <Autocomplete<ContextChipOption, false, false, false>
-              options={props.options}
-              value={props.options.find(o => o.value === props.selectedValue) ?? null}
-              open
-              disablePortal
-              autoHighlight
-              openOnFocus
-              getOptionLabel={option => option.label}
-              isOptionEqualToValue={(opt, val) => opt.value === val.value}
-              getOptionDisabled={opt => opt.disabled === true}
-              loading={props.loading}
-              loadingText={props.loadingText ?? 'Cargando…'}
-              noOptionsText={props.noOptionsText ?? 'Sin resultados'}
-              onChange={(_, newVal) => {
-                props.onSelectChange(newVal?.value ?? null)
-                handleClose()
-              }}
-              renderOption={(optionProps, option) => (
-                <Box
-                  component='li'
-                  {...optionProps}
-                  sx={{
-                    display: 'flex !important',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start !important',
-                    gap: 0.25
-                  }}
-                >
-                  <Typography variant='body2' sx={{ fontWeight: 500, lineHeight: 1.3 }}>
-                    {option.label}
-                  </Typography>
-                  {option.secondary ? (
-                    <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2 }}>
-                      {option.secondary}
+                boxShadow: theme.shadows[6],
+                overflow: 'hidden'
+              })}
+              role='dialog'
+              aria-labelledby={labelId}
+            >
+              <Autocomplete<ContextChipOption, false, true, false>
+                open
+                onClose={handleAutocompleteClose}
+                disablePortal
+                disableCloseOnSelect={false}
+                autoHighlight
+                value={selectedOption ?? undefined}
+                onChange={(_event, newValue) => {
+                  props.onSelectChange(newValue?.value ?? null)
+                  handleClose()
+                }}
+                options={props.options}
+                getOptionLabel={option => option.label}
+                getOptionDisabled={option => option.disabled === true}
+                isOptionEqualToValue={(opt, val) => opt.value === val.value}
+                loading={props.loading}
+                loadingText={props.loadingText ?? 'Cargando…'}
+                noOptionsText={props.noOptionsText ?? 'Sin resultados'}
+                filterOptions={(options, { inputValue }) => {
+                  const query = inputValue.trim().toLowerCase()
+
+                  if (!query) return options
+
+                  return options.filter(
+                    o =>
+                      o.label.toLowerCase().includes(query) ||
+                      (o.secondary ? o.secondary.toLowerCase().includes(query) : false) ||
+                      o.value.toLowerCase().includes(query)
+                  )
+                }}
+                renderInput={params => (
+                  <StyledSearchInput
+                    ref={params.InputProps.ref}
+                    inputProps={params.inputProps}
+                    autoFocus
+                    placeholder={props.searchPlaceholder ?? 'Buscar…'}
+                    startAdornment={
+                      <InputAdornment position='start' sx={{ mr: 1 }}>
+                        <i className='tabler-search' aria-hidden='true' style={{ fontSize: 18 }} />
+                      </InputAdornment>
+                    }
+                  />
+                )}
+                renderOption={(optionProps: HTMLAttributes<HTMLLIElement>, option) => (
+                  <li
+                    {...optionProps}
+                    key={option.value}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      gap: 2
+                    }}
+                  >
+                    <Typography variant='body2' sx={{ fontWeight: 500, lineHeight: 1.3, width: '100%' }}>
+                      {option.label}
                     </Typography>
-                  ) : null}
-                </Box>
-              )}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  autoFocus
-                  placeholder={props.searchPlaceholder ?? 'Buscar…'}
-                  size='small'
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      startAdornment: (
-                        <InputAdornment position='start'>
-                          <i className='tabler-search' aria-hidden='true' style={{ fontSize: 18 }} />
-                        </InputAdornment>
-                      )
+                    {option.secondary ? (
+                      <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2, width: '100%' }}>
+                        {option.secondary}
+                      </Typography>
+                    ) : null}
+                  </li>
+                )}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      boxShadow: 'none',
+                      borderRadius: 0,
+                      margin: 0,
+                      border: 'none'
                     }
-                  }}
-                />
-              )}
-              slotProps={{
-                paper: {
-                  elevation: 0,
-                  sx: { boxShadow: 'none', m: 0, mt: 0.5 }
-                },
-                listbox: {
-                  sx: {
-                    maxHeight: 320,
-                    p: 0,
-                    '& .MuiAutocomplete-option': {
-                      px: 2,
-                      py: 1.25,
-                      borderRadius: 1,
-                      mx: 0.5,
-                      my: 0.25
-                    }
+                  },
+                  listbox: {
+                    sx: theme => ({
+                      maxHeight: 320,
+                      padding: theme.spacing(0.5),
+                      '& .MuiAutocomplete-option': {
+                        borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                        padding: theme.spacing(1.25, 1.75),
+                        margin: theme.spacing(0.25, 0),
+                        alignItems: 'flex-start !important'
+                      },
+                      '& .MuiAutocomplete-option[aria-selected="true"]': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                        color: theme.palette.primary.main
+                      }
+                    })
                   }
-                }
-              }}
-            />
-          </Box>
-        </Popover>
+                }}
+              />
+            </Paper>
+          </ClickAwayListener>
+        </Popper>
       )}
     </>
   )
