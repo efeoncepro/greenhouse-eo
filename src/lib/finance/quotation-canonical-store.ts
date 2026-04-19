@@ -3,6 +3,7 @@ import 'server-only'
 import type { PoolClient, QueryResult } from 'pg'
 
 import { query } from '@/lib/db'
+import { normalizeQuoteSalesContext } from '@/lib/commercial/sales-context'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 type QueryableClient = Pick<PoolClient, 'query'>
@@ -45,6 +46,7 @@ type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
   current_version: number | null
   created_at: string | Date | null
   updated_at: string | Date | null
+  sales_context_at_sent: unknown | null
 }
 
 type CanonicalQuoteLineRow = {
@@ -258,6 +260,7 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        q.current_version,
        q.created_at,
        q.updated_at,
+       q.sales_context_at_sent,
        q.legacy_status
      FROM greenhouse_commercial.quotations q
      LEFT JOIN greenhouse_core.organizations org
@@ -1045,7 +1048,8 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
   notes: row.notes ? String(row.notes) : null,
   currentVersion: row.current_version !== null && row.current_version !== undefined ? Number(row.current_version) : null,
   createdAt: row.created_at ? String(row.created_at) : null,
-  updatedAt: row.updated_at ? String(row.updated_at) : null
+  updatedAt: row.updated_at ? String(row.updated_at) : null,
+  salesContextAtSent: normalizeQuoteSalesContext(row.sales_context_at_sent)
 })
 
 export const mapCanonicalQuoteLineRow = (row: CanonicalQuoteLineRow) => ({

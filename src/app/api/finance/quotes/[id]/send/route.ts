@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { query, withTransaction } from '@/lib/db'
+import { captureSalesContextAtSent } from '@/lib/commercial/sales-context'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { requestApproval } from '@/lib/commercial/governance/approval-steps-store'
 import {
@@ -69,13 +70,21 @@ export async function POST(
     return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
   }
 
+  if (!identity.spaceId) {
+    return NextResponse.json(
+      { error: 'La cotización no tiene un scope tenant válido.' },
+      { status: 409 }
+    )
+  }
+
   const headerRows = await query<QuotationHeaderRow>(
     `SELECT business_line_code, pricing_model, total_cost, total_price_before_discount,
             total_discount, total_price, effective_margin_pct, target_margin_pct,
             margin_floor_pct, current_version, quote_date, status
        FROM greenhouse_commercial.quotations
-       WHERE quotation_id = $1`,
-    [identity.quotationId]
+       WHERE quotation_id = $1
+         AND space_id = $2`,
+    [identity.quotationId, identity.spaceId]
   )
 
   const header = headerRows[0]
@@ -180,6 +189,7 @@ export async function POST(
     const result = await requestApproval({
       quotationId: identity.quotationId,
       versionNumber: header.current_version,
+      spaceId: identity.spaceId,
       actor: { userId: tenant.userId, name: tenant.clientName || tenant.userId },
       evaluationInput: {
         businessLineCode: header.business_line_code,
@@ -232,13 +242,20 @@ export async function POST(
 
   // Health OK — transition to sent atomically.
   await withTransaction(async client => {
+    await captureSalesContextAtSent({
+      quotationId: identity.quotationId,
+      spaceId: identity.spaceId as string,
+      client
+    })
+
     await client.query(
       `UPDATE greenhouse_commercial.quotations
          SET status = 'sent',
              sent_at = CURRENT_TIMESTAMP,
              updated_at = CURRENT_TIMESTAMP
-         WHERE quotation_id = $1`,
-      [identity.quotationId]
+         WHERE quotation_id = $1
+           AND space_id = $2`,
+      [identity.quotationId, identity.spaceId]
     )
   })
 

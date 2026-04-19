@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesion 2026-04-18 — TASK-455 Quote Sales Context Snapshot (Codex)
+
+- **Owner:** Codex
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-455`
+- **Rama:** `task/TASK-455-quote-sales-context-snapshot`
+- **Estado:** implementado y validado localmente; pendiente solo cierre Git/merge
+- **Decisión operativa clave:**
+  - la spec original asumía que bastaba enganchar `/send`, pero el runtime real tiene dos caminos a `sent`
+  - el snapshot quedó histórico e inmutable en `greenhouse_commercial.quotations`, pero la clasificación viva del pipeline híbrido sigue usando `clients.lifecyclestage + commercial.deals.dealstage`
+- **Entregables:**
+  - migración `20260418235105189_task-455-quote-sales-context-snapshot.sql`
+  - `src/lib/commercial/sales-context.ts`
+  - `src/lib/commercial/sales-context.test.ts`
+  - extensiones en `src/app/api/finance/quotes/[id]/send/route.ts`
+  - extensiones en `src/app/api/finance/quotes/[id]/approve/route.ts`
+  - ajustes en `src/lib/commercial/governance/approval-steps-store.ts`
+  - exposición en `src/lib/finance/quotation-canonical-store.ts` y `src/app/api/finance/quotes/[id]/route.ts`
+  - docs actualizadas en arquitectura, data model, changelog, project context y task index
+- **Resultado operativo:**
+  - `greenhouse_commercial.quotations` ahora materializa `sales_context_at_sent`
+  - la captura reutiliza `greenhouse_core.clients.lifecyclestage` y `greenhouse_commercial.deals`
+  - el helper `captureSalesContextAtSent(...)` asegura idempotencia e inmutabilidad del snapshot
+  - `GET /api/finance/quotes/[id]` ya devuelve `salesContextAtSent`
+- **Validaciones corridas:**
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec vitest run src/lib/commercial/sales-context.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` -> sin matches
+- **Heads-up local de worktree:**
+  - para pasar `pnpm build` en este worktree fue necesario materializar `node_modules` localmente; Turbopack falló con el symlink fuera del filesystem root
+  - no hay cambio de repo asociado a ese workaround
+
 ## Sesion 2026-04-18 — TASK-454 tomada en worktree aislado (Codex)
 
 - **Owner:** Codex

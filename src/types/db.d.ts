@@ -475,6 +475,10 @@ export interface GreenhouseCommercialQuotations {
   quotation_number: string;
   quote_date: Timestamp | null;
   revenue_type: Generated<string>;
+  /**
+   * Immutable snapshot of lifecycle/deal context captured when the quotation first reaches sent status.
+   */
+  sales_context_at_sent: Json | null;
   sent_at: Timestamp | null;
   source_quote_id: string | null;
   source_system: Generated<string>;
