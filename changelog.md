@@ -2,6 +2,17 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-487 Quote Builder Command Bar Redesign (Enterprise Pattern)
+
+- `/finance/quotes/new` y `/finance/quotes/[id]/edit` migran al patrón Command Bar enterprise (Linear/Stripe/Ramp/Pilot). 4 layers verticales apilados — Identity Strip, Context Chips Strip, Document Surface, Floating Summary Dock — reemplazan el Grid 8/4 con sidebar vertical. El documento gana ~33% de ancho disponible (de ~700px a ~1200px en 1440 viewport).
+- Nuevos primitivos reusables (invoice/PO/contract builders futuros): `ContextChip` + `ContextChipStrip` en `src/components/greenhouse/primitives/`. Chip con popover para edicion, 4 estados (empty/filled/invalid/locked), 44px touch target, `aria-haspopup="dialog"`, focus ring 2px, respeta `prefers-reduced-motion`.
+- Nuevos componentes de quote: `QuoteIdentityStrip` (sticky top con logo, Nº Q-XXX, chip de estado, validez, CTAs), `QuoteContextStrip` (8 chips wireados: Organización, Contacto, Business Line, Modelo Comercial, País, Moneda, Duración, Válida hasta), `AddLineSplitButton` (ButtonGroup + Menu que consolida los 4 orígenes de línea), `QuoteSummaryDock` (sticky bottom con `AnimatedCounter` en Total, factor, IVA, chip de addons con Popper, indicador de margen semáforo), `QuoteLineWarning` (Alert inline anclado a la fila que originó el warning via `aria-describedby`).
+- `QuoteLineItemsEditor` pierde las 5 pills de agregar, pierde la sub-row "Contexto de pricing" (FTE/Períodos/EmpType ahora en Popover por fila via `IconButton tabler-adjustments`), gana empty state real via `EmptyState` con 3 CTAs jerárquicas (Catálogo/Servicio/Template), warnings inline por fila. El shell le pasa el `AddLineSplitButton` como slot `headerAction`.
+- `QuoteBuilderShell` pierde el Grid 8/4, gana layout vertical en `Container maxWidth='lg'`, mueve la descripción a un Accordion "Detalle y notas" colapsado por defecto, expone un único CTA "Guardar y cerrar" (elimina la ambigüedad del doble save entre el top bar y el footer del editor).
+- Eliminados: `QuoteSourceSelector.tsx` (reemplazado por `AddLineSplitButton`), `QuotePricingWarningsPanel.tsx` (reemplazado por `QuoteLineWarning` inline). `QuoteBuilderActions.tsx` sigue vivo porque lo consume `QuoteCreateDrawer` (drawer legacy de creación rápida).
+- `GH_PRICING` extendido con 7 bloques: `identityStrip`, `contextChips`, `summaryDock`, `addMenu`, `lineWarning`, `emptyItems`, `adjustPopover`, `detailAccordion`. Todo copy en español tuteo, sin colisiones con keys existentes.
+- API contracts y pricing engine v2 intactos — zero cambio de backend.
+
 ### 2026-04-19 — TASK-486 Commercial Quotation Canonical Anchor (Organization + Contact)
 
 - `greenhouse_commercial.quotations` adopta **Organización + Contacto (identity_profile)** como anchor canónico. `space_id` queda deprecated en el write path (columnas preservadas vía COMMENT por compatibilidad con quote-to-cash legacy readers — no drop físico en v1).

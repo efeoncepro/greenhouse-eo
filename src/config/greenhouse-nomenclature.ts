@@ -1887,7 +1887,129 @@ export const GH_PRICING = {
   toastQuoteSent: (email: string) => `Cotización enviada a ${email}`,
   toastRoleUpdated: (label: string) => `${label} actualizado`,
   errorLoadCatalog: 'No pudimos cargar el catálogo. Intenta de nuevo.',
-  errorLoadQuote: 'No pudimos cargar esta cotización. Verifica el enlace e intenta de nuevo.'
+  errorLoadQuote: 'No pudimos cargar esta cotización. Verifica el enlace e intenta de nuevo.',
+
+  // Builder Command Bar redesign (TASK-487)
+  identityStrip: {
+    draftLabel: 'Borrador',
+    sentLabel: 'Enviada',
+    approvedLabel: 'Aprobada',
+    expiredLabel: 'Vencida',
+    numberPlaceholder: 'Q-NUEVO',
+    validUntilLabel: 'Válida hasta',
+    validUntilEmpty: 'Sin fecha',
+    ariaLabel: 'Identidad de la cotización'
+  },
+  contextChips: {
+    ariaLabel: 'Contexto de la cotización',
+    overflowLabel: 'Más opciones',
+    requiredBadge: 'Requerido',
+    lockedHint: 'No se puede cambiar después de crear la cotización',
+    organization: {
+      label: 'Organización',
+      placeholder: 'Seleccionar organización',
+      icon: 'tabler-building',
+      hint: 'Cliente o prospecto de la cotización'
+    },
+    contact: {
+      label: 'Contacto',
+      placeholder: 'Sin contacto asignado',
+      icon: 'tabler-user',
+      hint: 'Persona de la organización responsable',
+      noOrgFirst: 'Selecciona una organización primero',
+      loading: 'Cargando contactos…',
+      empty: 'Sin contactos registrados en esta organización',
+      primaryBadge: 'Principal'
+    },
+    businessLine: {
+      label: 'Business line',
+      placeholder: 'Sin BL',
+      icon: 'tabler-target'
+    },
+    commercialModel: {
+      label: 'Modelo comercial',
+      placeholder: 'Seleccionar modelo',
+      icon: 'tabler-briefcase'
+    },
+    countryFactor: {
+      label: 'País',
+      placeholder: 'Seleccionar país',
+      icon: 'tabler-world'
+    },
+    currency: {
+      label: 'Moneda',
+      placeholder: 'CLP',
+      icon: 'tabler-currency-dollar'
+    },
+    duration: {
+      label: 'Duración',
+      placeholder: 'Meses',
+      icon: 'tabler-clock',
+      hint: 'Requerido para retainer o híbrido',
+      unit: (n: number) => (n === 1 ? '1 mes' : `${n} meses`)
+    },
+    validUntil: {
+      label: 'Válida hasta',
+      placeholder: 'dd/mm/aaaa',
+      icon: 'tabler-calendar-event'
+    }
+  },
+  summaryDock: {
+    ariaLabel: 'Resumen de la cotización',
+    subtotalLabel: 'Subtotal',
+    factorLabel: 'Factor',
+    ivaLabel: 'IVA',
+    totalLabel: 'Total',
+    addonsChip: (n: number) => (n === 1 ? '1 addon sugerido' : `${n} addons sugeridos`),
+    addonsChipEmpty: 'Sin addons sugeridos',
+    primaryCta: 'Guardar y cerrar',
+    previewCta: 'Vista previa',
+    loadingLabel: 'Calculando…',
+    collapsedLabelPrefix: 'Total',
+    collapsedExpandLabel: 'Ver detalle',
+    mobileTotalLabel: 'Total de la cotización'
+  },
+  addMenu: {
+    triggerLabel: 'Agregar ítem',
+    defaultAriaLabel: 'Agregar ítem desde catálogo',
+    caretAriaLabel: 'Más opciones de agregado',
+    items: {
+      catalog: 'Desde catálogo',
+      service: 'Desde servicio empaquetado',
+      template: 'Desde template',
+      manual: 'Línea manual'
+    }
+  },
+  lineWarning: {
+    ariaPrefix: 'Advertencia en fila',
+    scrollAnchorLabel: 'Ir a la fila',
+    genericTitle: 'Atención requerida',
+    dismissLabel: 'Ocultar advertencia'
+  },
+  emptyItems: {
+    title: 'Comencemos la cotización',
+    subtitle: 'Agrega roles, servicios, templates o líneas manuales. El motor calcula precios y márgenes en tiempo real.',
+    ctaPrimary: 'Agregar desde catálogo',
+    ctaSecondary: 'Desde servicio empaquetado',
+    ctaTertiary: 'Desde template'
+  },
+  adjustPopover: {
+    triggerLabel: 'Ajustes de pricing',
+    title: 'Ajustes de pricing',
+    subtitle: 'Dedicación, períodos y tipo de contratación aplicados a esta línea.',
+    fteLabel: 'FTE',
+    fteHelper: '0.1 a 1.0 (fracción dedicada)',
+    periodsLabel: 'Períodos (meses)',
+    employmentTypeLabel: 'Tipo de contratación',
+    employmentTypePlaceholder: 'Default del rol si vacío',
+    applyLabel: 'Aplicar',
+    closeLabel: 'Cerrar'
+  },
+  detailAccordion: {
+    title: 'Detalle y notas',
+    descriptionLabel: 'Descripción',
+    descriptionPlaceholder: 'Alcance del servicio, contexto, notas internas…'
+  }
 } as const
 
 // ────────────────────────────────────────────────────────────────

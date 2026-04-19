@@ -4,11 +4,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import MenuItem from '@mui/material/MenuItem'
+import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -24,26 +26,25 @@ import type {
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 
+import AddLineSplitButton from '@/components/greenhouse/pricing/AddLineSplitButton'
+import QuoteContextStrip from '@/components/greenhouse/pricing/QuoteContextStrip'
+import QuoteIdentityStrip, {
+  type QuoteStatus
+} from '@/components/greenhouse/pricing/QuoteIdentityStrip'
+import QuoteSummaryDock from '@/components/greenhouse/pricing/QuoteSummaryDock'
 import SellableItemPickerDrawer, {
   type SellableItemPickerTab,
   type SellableSelection
 } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
 
 import AddonSuggestionsPanel from './AddonSuggestionsPanel'
-import QuotePricingWarningsPanel from './QuotePricingWarningsPanel'
-import QuoteBuilderActions, {
-  type QuoteBuilderActionsOptions,
-  type QuoteBuilderState
-} from './QuoteBuilderActions'
 import QuoteLineItemsEditor, {
   mapSelectionToLine,
   makeBlankManualLine,
   type QuoteLineItem,
   type QuoteLineItemsEditorHandle
 } from './QuoteLineItemsEditor'
-import QuoteSourceSelector from './QuoteSourceSelector'
 import QuoteTemplatePickerDrawer from './QuoteTemplatePickerDrawer'
-import QuoteTotalsFooter from './QuoteTotalsFooter'
 import type {
   QuoteBuilderBillingFrequency,
   QuoteBuilderPricingModel,
@@ -90,8 +91,7 @@ export interface QuoteBuilderShellSubmitPayload {
   lineItems: QuoteLineItem[]
 }
 
-// TASK-486: contactos canónicos anclables a la cotización. Se hidratan client-side
-// vía GET /api/commercial/organizations/[id]/contacts al seleccionar organización.
+// TASK-486: contactos canónicos anclables a la cotización.
 interface QuoteOrganizationContact {
   identityProfileId: string
   fullName: string | null
@@ -112,14 +112,26 @@ export interface QuoteBuilderShellProps {
   onSubmit?: (payload: QuoteBuilderShellSubmitPayload) => Promise<{ quotationId: string } | void>
 }
 
-const DEFAULT_COMMERCIAL_MODELS: QuoteBuilderActionsOptions['commercialModels'] = [
+interface CommercialModelOption {
+  code: CommercialModelCode
+  label: string
+  multiplierPct: number
+}
+
+interface CountryFactorOption {
+  code: string
+  label: string
+  factor: number
+}
+
+const DEFAULT_COMMERCIAL_MODELS: CommercialModelOption[] = [
   { code: 'on_going', label: 'On-Going', multiplierPct: 0 },
   { code: 'on_demand', label: 'On-Demand', multiplierPct: 15 },
   { code: 'hybrid', label: 'Híbrido', multiplierPct: 10 },
   { code: 'license_consulting', label: 'Licencia / Consultoría', multiplierPct: 5 }
 ]
 
-const DEFAULT_COUNTRY_FACTORS: QuoteBuilderActionsOptions['countryFactors'] = [
+const DEFAULT_COUNTRY_FACTORS: CountryFactorOption[] = [
   { code: 'chile_corporate', label: 'Chile Corporate', factor: 1.0 },
   { code: 'chile_pyme', label: 'Chile PYME', factor: 0.85 },
   { code: 'colombia_latam', label: 'Colombia / PYME LATAM', factor: 0.7 },
@@ -209,8 +221,18 @@ const mapServiceLineToQuoteLine = (
   }
 }
 
+interface BuilderContextState {
+  businessLineCode: string | null
+  commercialModel: CommercialModelCode
+  countryFactorCode: string
+  outputCurrency: PricingOutputCurrency
+  contractDurationMonths: number | null
+  validUntil: string | null
+  description: string
+}
+
 const buildPricingInput = (
-  builderState: QuoteBuilderState,
+  builderState: BuilderContextState,
   currency: PricingOutputCurrency,
   lines: QuoteLineItem[]
 ): PricingEngineInputV2 | null => {
@@ -282,6 +304,19 @@ const buildPricingInput = (
   }
 }
 
+const resolveQuoteStatus = (status: string | undefined): QuoteStatus => {
+  switch (status) {
+    case 'sent':
+      return 'sent'
+    case 'approved':
+      return 'approved'
+    case 'expired':
+      return 'expired'
+    default:
+      return 'draft'
+  }
+}
+
 const QuoteBuilderShell = ({
   mode,
   quote,
@@ -294,7 +329,7 @@ const QuoteBuilderShell = ({
   const router = useRouter()
   const editorRef = useRef<QuoteLineItemsEditorHandle>(null)
 
-  const initialBuilderState = useMemo<QuoteBuilderState>(
+  const initialBuilderState = useMemo<BuilderContextState>(
     () => ({
       businessLineCode: quote?.businessLineCode ?? null,
       commercialModel: (quote?.commercialModel as CommercialModelCode | null) ?? 'on_going',
@@ -307,7 +342,7 @@ const QuoteBuilderShell = ({
     [quote]
   )
 
-  const [builderState, setBuilderState] = useState<QuoteBuilderState>(initialBuilderState)
+  const [builderState, setBuilderState] = useState<BuilderContextState>(initialBuilderState)
   const [organizationId, setOrganizationId] = useState<string | null>(quote?.organizationId ?? null)
 
   const [contactIdentityProfileId, setContactIdentityProfileId] = useState<string | null>(
@@ -337,7 +372,11 @@ const QuoteBuilderShell = ({
   const [pickerMode, setPickerMode] = useState<'catalog' | 'service'>('catalog')
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false)
 
-  const [builderOptions, setBuilderOptions] = useState<QuoteBuilderActionsOptions>({
+  const [builderOptions, setBuilderOptions] = useState<{
+    businessLines: Array<{ code: string; label: string }>
+    commercialModels: CommercialModelOption[]
+    countryFactors: CountryFactorOption[]
+  }>({
     businessLines: [],
     commercialModels: DEFAULT_COMMERCIAL_MODELS,
     countryFactors: DEFAULT_COUNTRY_FACTORS
@@ -389,9 +428,7 @@ const QuoteBuilderShell = ({
     return () => controller.abort()
   }, [])
 
-  // TASK-486: al cambiar de organización recargar la lista de contactos anclables. Si la
-  // organización se deselecciona, vaciar la lista. El reset del contacto seleccionado lo
-  // maneja el onChange del dropdown (para no invalidar el contactId pre-hidratado en edit).
+  // TASK-486: al cambiar de organización recargar la lista de contactos anclables.
   useEffect(() => {
     if (!organizationId) {
       setOrgContacts([])
@@ -436,10 +473,6 @@ const QuoteBuilderShell = ({
     const draft = editorRef.current?.getDraft()
 
     if (draft) setLinesSnapshot(draft)
-  }, [])
-
-  const handleBuilderChange = useCallback((patch: Partial<QuoteBuilderState>) => {
-    setBuilderState(prev => ({ ...prev, ...patch }))
   }, [])
 
   const currency = builderState.outputCurrency
@@ -633,7 +666,6 @@ const QuoteBuilderShell = ({
         return
       }
 
-      // Fallback interno: create mode => POST /api/finance/quotes; edit => PUT + lines
       if (mode === 'create') {
         const res = await fetch('/api/finance/quotes', {
           method: 'POST',
@@ -760,188 +792,189 @@ const QuoteBuilderShell = ({
     router.push('/finance/quotes')
   }, [router])
 
-  const breadcrumbLast =
-    mode === 'edit' && quote?.quotationNumber
-      ? `Editar ${quote.quotationNumber}`
-      : GH_PRICING.builderTitleNew
+  const title = mode === 'edit' && quote?.quotationNumber
+    ? `Editar ${quote.quotationNumber}`
+    : GH_PRICING.builderTitleNew
 
   const subtitle = mode === 'edit' ? GH_PRICING.builderSubtitleEdit : GH_PRICING.builderSubtitleCreate
+  const quoteStatus = resolveQuoteStatus(quote?.status)
 
-  const selectedOrganization = useMemo(
-    () => organizations.find(o => o.organizationId === organizationId) ?? null,
-    [organizations, organizationId]
+  const contextValues = useMemo(
+    () => ({
+      organizationId,
+      contactIdentityProfileId,
+      businessLineCode: builderState.businessLineCode,
+      commercialModel: builderState.commercialModel,
+      countryFactorCode: builderState.countryFactorCode,
+      outputCurrency: builderState.outputCurrency,
+      contractDurationMonths: builderState.contractDurationMonths,
+      validUntil: builderState.validUntil
+    }),
+    [
+      organizationId,
+      contactIdentityProfileId,
+      builderState.businessLineCode,
+      builderState.commercialModel,
+      builderState.countryFactorCode,
+      builderState.outputCurrency,
+      builderState.contractDurationMonths,
+      builderState.validUntil
+    ]
   )
 
+  const totalOutputCurrency = simulation?.totals.totalOutputCurrency ?? null
+  const subtotalOutputCurrency = simulation?.totals.totalOutputCurrency ?? null // same for now — engine returns consolidated totalOutputCurrency
+  const factorApplied = simulation?.totals.countryFactorApplied ?? null
+  const marginPct = simulation?.aggregateMargin.marginPct ?? null
+  const marginClass = simulation?.aggregateMargin.classification ?? null
+
   return (
-    <Stack spacing={4}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-        <Box>
-          <Typography variant='caption' color='text.secondary'>
-            {GH_PRICING.builderBreadcrumbRoot} › {GH_PRICING.builderBreadcrumbList} › {breadcrumbLast}
-          </Typography>
-          <Typography variant='h5' sx={{ fontWeight: 600, mt: 0.5 }}>
-            {breadcrumbLast}
-          </Typography>
-          <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
-            {subtitle}
-          </Typography>
-        </Box>
-        <Stack direction='row' spacing={1}>
-          <Button variant='tonal' color='secondary' onClick={handleCancel} disabled={submitting}>
-            {GH_PRICING.builderCancel}
-          </Button>
-          <Button
-            variant='contained'
-            startIcon={<i className='tabler-device-floppy' aria-hidden='true' />}
-            onClick={handleSubmit}
-            disabled={submitting || serviceExpanding}
-          >
-            {submitting ? GH_PRICING.builderSaving : GH_PRICING.builderSaveAndClose}
-          </Button>
-        </Stack>
-      </Box>
-
-      {error ? (
-        <Alert severity='error' role='alert' onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      ) : null}
-
-      <Grid container spacing={4}>
-        {/* Columna izquierda: selector + editor */}
-        <Grid size={{ xs: 12, md: 8 }}>
-          <Stack spacing={4}>
-            <QuoteSourceSelector
-              onCatalog={openCatalogPicker}
-              onService={openServicePicker}
-              onTemplate={() => setTemplatePickerOpen(true)}
-              onManual={handleManualLine}
+    <Box>
+      <QuoteIdentityStrip
+        breadcrumbs={[
+          { label: GH_PRICING.builderBreadcrumbRoot, href: '/finance' },
+          { label: GH_PRICING.builderBreadcrumbList, href: '/finance/quotes' },
+          { label: title }
+        ]}
+        title={title}
+        subtitle={subtitle}
+        quoteNumber={quote?.quotationNumber ?? null}
+        status={quoteStatus}
+        validUntil={builderState.validUntil}
+        actions={
+          <>
+            <Button variant='tonal' color='secondary' onClick={handleCancel} disabled={submitting}>
+              {GH_PRICING.builderCancel}
+            </Button>
+            <Button
+              variant='contained'
+              startIcon={<i className='tabler-device-floppy' aria-hidden='true' />}
+              onClick={handleSubmit}
               disabled={submitting || serviceExpanding}
-            />
+              sx={{ minHeight: 44 }}
+            >
+              {submitting ? GH_PRICING.builderSaving : GH_PRICING.builderSaveAndClose}
+            </Button>
+          </>
+        }
+      />
 
-            {selectedTemplateId ? (
-              <Alert severity='info' role='status'>
-                Template seleccionado. Los ítems del template se crearán al guardar.
-              </Alert>
-            ) : null}
+      <QuoteContextStrip
+        values={contextValues}
+        options={{
+          organizations,
+          contacts: orgContacts,
+          contactsLoading,
+          businessLines: builderOptions.businessLines,
+          commercialModels: builderOptions.commercialModels,
+          countryFactors: builderOptions.countryFactors
+        }}
+        disabled={submitting}
+        organizationLocked={mode === 'edit'}
+        onOrganizationChange={nextId => {
+          setOrganizationId(nextId)
+          setContactIdentityProfileId(null)
+        }}
+        onContactChange={setContactIdentityProfileId}
+        onBusinessLineChange={code => setBuilderState(prev => ({ ...prev, businessLineCode: code }))}
+        onCommercialModelChange={code => setBuilderState(prev => ({ ...prev, commercialModel: code }))}
+        onCountryFactorChange={code => setBuilderState(prev => ({ ...prev, countryFactorCode: code }))}
+        onCurrencyChange={value => setBuilderState(prev => ({ ...prev, outputCurrency: value }))}
+        onDurationChange={months => setBuilderState(prev => ({ ...prev, contractDurationMonths: months }))}
+        onValidUntilChange={iso => setBuilderState(prev => ({ ...prev, validUntil: iso }))}
+      />
 
-            <QuoteLineItemsEditor
-              ref={editorRef}
-              quotationId={quote?.quotationId ?? ''}
-              currency={currency}
-              editable
-              lineItems={linesSnapshot}
-              onSave={handleEditorSave}
-              saving={submitting || serviceExpanding}
-              businessLineCode={builderState.businessLineCode}
-              canViewCostStack={canSeeCostStack}
-              simulationLines={simulation?.lines ?? null}
-              outputCurrency={currency}
-              onDraftChange={setLinesSnapshot}
-            />
-          </Stack>
-        </Grid>
+      <Container maxWidth='lg' sx={{ py: { xs: 3, md: 4 } }}>
+        <Stack spacing={3}>
+          {error ? (
+            <Alert severity='error' role='alert' onClose={() => setError(null)}>
+              {error}
+            </Alert>
+          ) : null}
 
-        {/* Columna derecha: contexto + addons + totales */}
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Box
+          {selectedTemplateId ? (
+            <Alert severity='info' role='status' variant='outlined'>
+              Template seleccionado. Los ítems del template se crearán al guardar.
+            </Alert>
+          ) : null}
+
+          <QuoteLineItemsEditor
+            ref={editorRef}
+            quotationId={quote?.quotationId ?? ''}
+            currency={currency}
+            editable
+            lineItems={linesSnapshot}
+            onSave={handleEditorSave}
+            saving={submitting || serviceExpanding}
+            businessLineCode={builderState.businessLineCode}
+            canViewCostStack={canSeeCostStack}
+            simulationLines={simulation?.lines ?? null}
+            outputCurrency={currency}
+            structuredWarnings={simulation?.structuredWarnings ?? null}
+            onDraftChange={setLinesSnapshot}
+            headerAction={
+              <AddLineSplitButton
+                onCatalog={openCatalogPicker}
+                onService={openServicePicker}
+                onTemplate={() => setTemplatePickerOpen(true)}
+                onManual={handleManualLine}
+                disabled={submitting || serviceExpanding}
+              />
+            }
+            onAddFromCatalog={openCatalogPicker}
+            onAddFromService={openServicePicker}
+            onAddFromTemplate={() => setTemplatePickerOpen(true)}
+          />
+
+          <Accordion
+            elevation={0}
+            defaultExpanded={builderState.description.length > 0}
             sx={theme => ({
-              position: { md: 'sticky' },
-              top: { md: theme.spacing(10) },
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: 2,
+              '&:before': { display: 'none' },
+              '&.Mui-expanded': { margin: 0 }
             })}
           >
-            <CustomTextField
-              select
-              fullWidth
-              size='small'
-              label='Organización (cliente o prospecto)'
-              value={organizationId ?? ''}
-              onChange={event => {
-                const nextId = event.target.value || null
-
-                setOrganizationId(nextId)
-
-                // TASK-486: el contacto está ligado a la organización; al cambiarla, limpiar.
-                setContactIdentityProfileId(null)
-              }}
-              disabled={submitting || mode === 'edit'}
-              aria-label='Organización de la cotización'
-              helperText={
-                mode === 'edit' && selectedOrganization
-                  ? selectedOrganization.organizationName
-                  : 'La organización no se puede cambiar después de crear la cotización'
-              }
+            <AccordionSummary
+              expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}
+              aria-controls='quote-detail-content'
+              id='quote-detail-header'
             >
-              <MenuItem value=''>Selecciona una organización…</MenuItem>
-              {organizations.map(org => (
-                <MenuItem key={org.organizationId} value={org.organizationId}>
-                  {org.organizationName}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              <Stack direction='row' spacing={1.5} alignItems='center'>
+                <i className='tabler-notes' aria-hidden='true' style={{ fontSize: 20 }} />
+                <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                  {GH_PRICING.detailAccordion.title}
+                </Typography>
+              </Stack>
+            </AccordionSummary>
+            <AccordionDetails id='quote-detail-content'>
+              <CustomTextField
+                fullWidth
+                multiline
+                minRows={3}
+                size='small'
+                label={GH_PRICING.detailAccordion.descriptionLabel}
+                value={builderState.description}
+                disabled={submitting}
+                onChange={event =>
+                  setBuilderState(prev => ({ ...prev, description: event.target.value }))
+                }
+                placeholder={GH_PRICING.detailAccordion.descriptionPlaceholder}
+              />
+            </AccordionDetails>
+          </Accordion>
+        </Stack>
 
-            <CustomTextField
-              select
-              fullWidth
-              size='small'
-              label='Contacto'
-              value={contactIdentityProfileId ?? ''}
-              onChange={event => setContactIdentityProfileId(event.target.value || null)}
-              disabled={submitting || !organizationId || contactsLoading}
-              aria-label='Contacto de la cotización'
-              placeholder={!organizationId ? 'Selecciona una organización primero' : undefined}
-              helperText={
-                !organizationId
-                  ? 'Selecciona una organización primero'
-                  : contactsLoading
-                    ? 'Cargando contactos…'
-                    : 'Persona de la organización responsable de esta cotización'
-              }
-            >
-              <MenuItem value=''>Sin contacto asignado</MenuItem>
-              {organizationId && !contactsLoading && orgContacts.length === 0 ? (
-                <MenuItem value='' disabled>
-                  Sin contactos registrados en esta organización
-                </MenuItem>
-              ) : null}
-              {orgContacts.map(contact => {
-                const primary = contact.fullName ?? contact.canonicalEmail ?? contact.identityProfileId
-
-                const secondary =
-                  contact.canonicalEmail && contact.fullName
-                    ? contact.canonicalEmail
-                    : contact.jobTitle ?? contact.roleLabel ?? null
-
-                return (
-                  <MenuItem key={contact.identityProfileId} value={contact.identityProfileId}>
-                    <Stack spacing={0}>
-                      <Typography variant='body2' sx={{ lineHeight: 1.3 }}>
-                        {primary}
-                        {contact.isPrimary ? ' · Principal' : ''}
-                      </Typography>
-                      {secondary ? (
-                        <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2 }}>
-                          {secondary}
-                        </Typography>
-                      ) : null}
-                    </Stack>
-                  </MenuItem>
-                )
-              })}
-            </CustomTextField>
-
-            <QuoteBuilderActions
-              state={builderState}
-              onChange={handleBuilderChange}
-              options={builderOptions}
-              disabled={submitting}
-            />
-
-            {canSeeCostStack ? (
+        <QuoteSummaryDock
+          subtotal={subtotalOutputCurrency}
+          factor={factorApplied}
+          total={totalOutputCurrency}
+          currency={currency}
+          loading={simulating}
+          addonCount={simulation?.addons?.length ?? 0}
+          addonContent={
+            canSeeCostStack ? (
               <AddonSuggestionsPanel
                 suggestions={simulation?.addons ?? []}
                 includedSkus={includedAddonSkus}
@@ -949,19 +982,23 @@ const QuoteBuilderShell = ({
                 outputCurrency={currency}
                 loading={simulating}
               />
-            ) : null}
+            ) : undefined
+          }
+          primaryCtaLabel={submitting ? GH_PRICING.builderSaving : GH_PRICING.summaryDock.primaryCta}
+          primaryCtaIcon='tabler-device-floppy'
+          primaryCtaLoading={submitting}
+          primaryCtaDisabled={submitting || serviceExpanding}
+          onPrimaryClick={handleSubmit}
+          marginClassification={marginClass}
+          marginPct={marginPct}
+        />
 
-            <QuotePricingWarningsPanel warnings={simulation?.structuredWarnings ?? null} />
-
-            <QuoteTotalsFooter
-              output={simulation}
-              outputCurrency={currency}
-              loading={simulating}
-              error={simulationError}
-            />
-          </Box>
-        </Grid>
-      </Grid>
+        {simulationError ? (
+          <Alert severity='error' role='alert' sx={{ mt: 2 }}>
+            {simulationError}
+          </Alert>
+        ) : null}
+      </Container>
 
       <SellableItemPickerDrawer
         open={pickerOpen}
@@ -977,7 +1014,7 @@ const QuoteBuilderShell = ({
         onSelect={handleTemplateSelect}
         templates={templates}
       />
-    </Stack>
+    </Box>
   )
 }
 

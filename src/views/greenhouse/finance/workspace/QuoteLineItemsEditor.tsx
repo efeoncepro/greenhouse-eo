@@ -1,6 +1,17 @@
 'use client'
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import {
+  Fragment,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode
+} from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -11,6 +22,7 @@ import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
+import Popover from '@mui/material/Popover'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -23,12 +35,17 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { PricingLineOutputV2, PricingOutputCurrency, PricingV2LineType } from '@/lib/finance/pricing/contracts'
+import EmptyState from '@/components/greenhouse/EmptyState'
+import type {
+  PricingLineOutputV2,
+  PricingOutputCurrency,
+  PricingV2LineType,
+  PricingWarning
+} from '@/lib/finance/pricing/contracts'
+import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 
-import SellableItemPickerDrawer, {
-  type SellableItemPickerTab,
-  type SellableSelection
-} from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
+import type { SellableSelection } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
+import QuoteLineWarning from '@/components/greenhouse/pricing/QuoteLineWarning'
 
 import QuoteLineCostStack from './QuoteLineCostStack'
 
@@ -74,24 +91,26 @@ export interface QuoteLineItemsEditorProps {
   saving: boolean
   businessLineCode?: string | null
 
-  /** Gating del cost stack (solo finance/admin). El caller es responsable de
-   * computar este flag con `canViewCostStack(tenant)`. */
+  /** Gating del cost stack (solo finance/admin). */
   canViewCostStack?: boolean
 
-  /** Output del engine v2 por línea, indexado por posición. Cuando está disponible
-   * - los precios unitarios y subtotales vienen del engine (fuente canónica)
-   * - el user puede overridear escribiendo en el campo de precio unitario
-   * - si el viewer tiene `canViewCostStack`, se renderiza el cost stack con tier
-   *   compliance y breakdown interno debajo de cada línea
-   */
+  /** Output del engine v2 por línea, indexado por posición. */
   simulationLines?: PricingLineOutputV2[] | null
   outputCurrency?: PricingOutputCurrency | null
 
-  /** Se dispara en cada mutación del draft (append, update, remove). Permite al
-   * shell mantener su snapshot sincronizado sin necesidad de llamar manualmente
-   * a `getDraft()`. Imprescindible para que el pricing simulation re-calcule en
-   * tiempo real al editar cantidad/contexto. */
+  /** Warnings del engine, con `lineIndex` para anclar a la fila */
+  structuredWarnings?: PricingWarning[] | null
+
+  /** Se dispara en cada mutación del draft */
   onDraftChange?: (lines: QuoteLineItem[]) => void
+
+  /** Slot del header para inyectar el AddLineSplitButton desde el shell */
+  headerAction?: ReactNode
+
+  /** Handlers del EmptyState — desde el shell para que abra los pickers correctos */
+  onAddFromCatalog?: () => void
+  onAddFromService?: () => void
+  onAddFromTemplate?: () => void
 }
 
 const LINE_TYPE_OPTIONS: Array<{ value: QuoteLineItem['lineType']; label: string; color: 'primary' | 'info' | 'success' | 'warning' }> = [
@@ -131,16 +150,6 @@ const SOURCE_META: Record<QuoteLineSource, { label: string; color: 'primary' | '
   manual: { label: 'Manual', color: 'secondary', icon: 'tabler-edit' }
 }
 
-export interface QuoteLineItemsEditorHandle {
-
-  /** Añade líneas desde una fuente externa (source selector del shell).
-   * Marca el draft como dirty para que la lista no se resetee si cambia `lineItems`. */
-  appendLines: (lines: QuoteLineItem[]) => void
-
-  /** Devuelve el snapshot actual del draft (útil para submit externo). */
-  getDraft: () => QuoteLineItem[]
-}
-
 const TIER_STATUS_META: Record<
   'below_min' | 'in_range' | 'at_optimum' | 'above_max' | 'unknown',
   { label: string; color: 'error' | 'warning' | 'success' | 'info' }
@@ -150,6 +159,11 @@ const TIER_STATUS_META: Record<
   at_optimum: { label: 'Óptimo', color: 'success' },
   above_max: { label: 'Sobre rango', color: 'warning' },
   unknown: { label: 'Tier sin definir', color: 'info' }
+}
+
+export interface QuoteLineItemsEditorHandle {
+  appendLines: (lines: QuoteLineItem[]) => void
+  getDraft: () => QuoteLineItem[]
 }
 
 const formatCurrency = (amount: number | null, currency: string): string => {
@@ -187,10 +201,6 @@ const computeRowSubtotalAfterDiscount = (line: QuoteLineItem): number => {
   return subtotal
 }
 
-// Resolución canónica de precio unitario visible:
-//   1. Override manual (line.unitPrice explícito) gana sobre cualquier engine output
-//   2. Si hay engine output para esta línea, usar suggestedBillRate.unitPriceOutputCurrency
-//   3. null → la UI muestra "—" / empty state
 const resolveDisplayUnitPrice = (
   line: QuoteLineItem,
   simulationLine: PricingLineOutputV2 | null
@@ -201,11 +211,6 @@ const resolveDisplayUnitPrice = (
   return null
 }
 
-// Resolución canónica de subtotal visible:
-//   1. Si hay override manual de precio, usar computeRowSubtotalAfterDiscount (qty × override - discounts)
-//   2. Si hay engine output, usar suggestedBillRate.totalBillOutputCurrency directo
-//      (el engine ya considera qty, periods, FTE, tier margin, country factor, commercial multiplier)
-//   3. 0 → fallback cuando no hay precio ni engine output
 const resolveDisplaySubtotal = (
   line: QuoteLineItem,
   simulationLine: PricingLineOutputV2 | null
@@ -233,11 +238,6 @@ const resolveDisplaySubtotal = (
 
 const cloneLineItems = (items: QuoteLineItem[]): QuoteLineItem[] => items.map(item => ({ ...item }))
 
-// Mapea una selección del SellableItemPickerDrawer a un QuoteLineItem persistible.
-// engine v2 usa 5 line types; la tabla actual persiste 4 (person/role/deliverable/direct_cost).
-// Para tool y overhead_addon, aplanamos a direct_cost + metadata.pricingV2LineType + metadata.sku
-// (TASK-464e Delta 2026-04-18).
-// TASK-473 añade `source` para trazabilidad visual del origen de la línea.
 export const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
   switch (selection.tab) {
     case 'roles':
@@ -364,28 +364,31 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     lineItems,
     onSave,
     saving,
-    businessLineCode = null,
     canViewCostStack: canViewCostStackProp = false,
     simulationLines = null,
     outputCurrency = null,
-    onDraftChange
+    structuredWarnings = null,
+    onDraftChange,
+    headerAction,
+    onAddFromCatalog,
+    onAddFromService,
+    onAddFromTemplate
   },
   ref
 ) {
   const [draftLines, setDraftLines] = useState<QuoteLineItem[]>(() => cloneLineItems(lineItems))
   const [dirty, setDirty] = useState(false)
-  const [pickerOpen, setPickerOpen] = useState(false)
-  const [pickerInitialTab, setPickerInitialTab] = useState<SellableItemPickerTab>('roles')
 
-  // Ref al último onDraftChange para no invalidar callbacks cada render.
+  // Popover "Ajustes" por fila — un solo popover global abierto a la vez
+  const [adjustAnchor, setAdjustAnchor] = useState<HTMLElement | null>(null)
+  const [adjustIndex, setAdjustIndex] = useState<number | null>(null)
+
   const onDraftChangeRef = useRef(onDraftChange)
 
   useEffect(() => {
     onDraftChangeRef.current = onDraftChange
   }, [onDraftChange])
 
-  // Aplica una mutación al draft y notifica al shell en el mismo tick.
-  // Evita setState encadenado: el shell recibe el next state consistente.
   const mutateDraft = useCallback((updater: (prev: QuoteLineItem[]) => QuoteLineItem[]) => {
     setDraftLines(prev => {
       const next = updater(prev)
@@ -425,17 +428,6 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     })
   }, [mutateDraft])
 
-  const handleOpenPicker = useCallback((tab: SellableItemPickerTab) => {
-    setPickerInitialTab(tab)
-    setPickerOpen(true)
-  }, [])
-
-  const handlePickerSelect = useCallback((selections: SellableSelection[]) => {
-    if (selections.length === 0) return
-
-    mutateDraft(prev => [...prev, ...selections.map(mapSelectionToLine)])
-  }, [mutateDraft])
-
   const handleRemoveLine = useCallback((index: number) => {
     mutateDraft(prev => prev.filter((_, i) => i !== index))
   }, [mutateDraft])
@@ -453,16 +445,6 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     setDirty(false)
   }, [draftLines, onSave])
 
-  const excludedSkus = useMemo(
-    () =>
-      draftLines
-        .map(line => line.metadata?.sku ?? line.roleCode ?? line.productId ?? null)
-        .filter((sku): sku is string => typeof sku === 'string'),
-    [draftLines]
-  )
-
-  const totalRows = draftLines.length
-
   const previewTotal = useMemo(
     () =>
       draftLines.reduce(
@@ -471,6 +453,42 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
       ),
     [draftLines, simulationLines]
   )
+
+  // Agrupar warnings por lineIndex para anclarlos a la row correspondiente
+  const warningsByLine = useMemo(() => {
+    const map = new Map<number, PricingWarning[]>()
+
+    if (!structuredWarnings) return map
+
+    for (const w of structuredWarnings) {
+      if (typeof w.lineIndex === 'number') {
+        const list = map.get(w.lineIndex) ?? []
+
+        list.push(w)
+        map.set(w.lineIndex, list)
+      }
+    }
+
+    return map
+  }, [structuredWarnings])
+
+  // Warnings globales (sin lineIndex) se muestran fuera del grid
+  const globalWarnings = useMemo(
+    () => (structuredWarnings ?? []).filter(w => typeof w.lineIndex !== 'number'),
+    [structuredWarnings]
+  )
+
+  const handleAdjustOpen = useCallback((event: ReactMouseEvent<HTMLButtonElement>, index: number) => {
+    setAdjustAnchor(event.currentTarget)
+    setAdjustIndex(index)
+  }, [])
+
+  const handleAdjustClose = useCallback(() => {
+    setAdjustAnchor(null)
+    setAdjustIndex(null)
+  }, [])
+
+  const currentAdjustLine = adjustIndex !== null ? draftLines[adjustIndex] ?? null : null
 
   if (!editable) {
     return (
@@ -566,97 +584,90 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     )
   }
 
+  const emptyCtaLabels = {
+    primary: onAddFromCatalog ? GH_PRICING.emptyItems.ctaPrimary : null,
+    secondary: onAddFromService ? GH_PRICING.emptyItems.ctaSecondary : null,
+    tertiary: onAddFromTemplate ? GH_PRICING.emptyItems.ctaTertiary : null
+  }
+
   return (
     <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
       <CardHeader
-        title={`Ítems de la cotización (${totalRows})`}
+        title={`Ítems de la cotización (${draftLines.length})`}
         subheader='Agrega ítems vendibles desde el catálogo o crea una línea manual.'
         avatar={
           <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
             <i className='tabler-list-details' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
           </Avatar>
         }
+        action={headerAction}
       />
       <Divider />
-      <Box sx={{ p: 3 }}>
-        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-          <Button
-            variant='outlined'
-            size='small'
-            startIcon={<i className='tabler-user-star' />}
-            onClick={() => handleOpenPicker('roles')}
-            disabled={saving}
-          >
-            + Rol
-          </Button>
-          <Button
-            variant='outlined'
-            size='small'
-            startIcon={<i className='tabler-user' />}
-            onClick={() => handleOpenPicker('people')}
-            disabled={saving}
-          >
-            + Persona
-          </Button>
-          <Button
-            variant='outlined'
-            size='small'
-            startIcon={<i className='tabler-tool' />}
-            onClick={() => handleOpenPicker('tools')}
-            disabled={saving}
-          >
-            + Herramienta
-          </Button>
-          <Button
-            variant='outlined'
-            size='small'
-            startIcon={<i className='tabler-receipt' />}
-            onClick={() => handleOpenPicker('overhead')}
-            disabled={saving}
-          >
-            + Overhead
-          </Button>
-          <Button
-            variant='outlined'
-            size='small'
-            color='secondary'
-            startIcon={<i className='tabler-edit' />}
-            onClick={() => {
-              mutateDraft(prev => [...prev, makeBlankManualLine()])
-            }}
-            disabled={saving}
-          >
-            + Manual
-          </Button>
-        </Stack>
-      </Box>
-      <Divider />
-      <Box sx={{ overflowX: 'auto' }}>
-        <Table size='small'>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ minWidth: 220 }}>Ítem</TableCell>
-              <TableCell sx={{ minWidth: 140 }}>Tipo</TableCell>
-              <TableCell sx={{ minWidth: 90 }} align='right'>Cantidad</TableCell>
-              <TableCell sx={{ minWidth: 110 }}>Unidad</TableCell>
-              <TableCell sx={{ minWidth: 130 }} align='right'>Precio unitario</TableCell>
-              <TableCell sx={{ minWidth: 110 }} align='right'>Subtotal</TableCell>
-              <TableCell sx={{ minWidth: 60 }} />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {draftLines.length === 0 ? (
+
+      {draftLines.length === 0 ? (
+        <CardContent>
+          <EmptyState
+            icon='tabler-clipboard-list'
+            title={GH_PRICING.emptyItems.title}
+            description={GH_PRICING.emptyItems.subtitle}
+            action={
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} useFlexGap flexWrap='wrap' justifyContent='center'>
+                {emptyCtaLabels.primary && onAddFromCatalog ? (
+                  <Button
+                    variant='contained'
+                    startIcon={<i className='tabler-books' aria-hidden='true' />}
+                    onClick={onAddFromCatalog}
+                    disabled={saving}
+                    sx={{ minHeight: 44 }}
+                  >
+                    {emptyCtaLabels.primary}
+                  </Button>
+                ) : null}
+                {emptyCtaLabels.secondary && onAddFromService ? (
+                  <Button
+                    variant='tonal'
+                    color='success'
+                    startIcon={<i className='tabler-package' aria-hidden='true' />}
+                    onClick={onAddFromService}
+                    disabled={saving}
+                    sx={{ minHeight: 44 }}
+                  >
+                    {emptyCtaLabels.secondary}
+                  </Button>
+                ) : null}
+                {emptyCtaLabels.tertiary && onAddFromTemplate ? (
+                  <Button
+                    variant='tonal'
+                    color='info'
+                    startIcon={<i className='tabler-template' aria-hidden='true' />}
+                    onClick={onAddFromTemplate}
+                    disabled={saving}
+                    sx={{ minHeight: 44 }}
+                  >
+                    {emptyCtaLabels.tertiary}
+                  </Button>
+                ) : null}
+              </Stack>
+            }
+            minHeight={260}
+          />
+        </CardContent>
+      ) : (
+        <Box sx={{ overflowX: 'auto' }}>
+          <Table size='small'>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={7}>
-                  <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
-                    <Typography variant='body2' color='text.secondary'>
-                      Aún no agregaste ítems. Usa los botones de arriba para elegir del catálogo.
-                    </Typography>
-                  </Box>
-                </TableCell>
+                <TableCell sx={{ minWidth: 220 }}>Ítem</TableCell>
+                <TableCell sx={{ minWidth: 140 }}>Tipo</TableCell>
+                <TableCell sx={{ minWidth: 90 }} align='right'>Cantidad</TableCell>
+                <TableCell sx={{ minWidth: 110 }}>Unidad</TableCell>
+                <TableCell sx={{ minWidth: 130 }} align='right'>Precio unitario</TableCell>
+                <TableCell sx={{ minWidth: 110 }} align='right'>Subtotal</TableCell>
+                <TableCell sx={{ minWidth: 96 }} align='right'>Acciones</TableCell>
               </TableRow>
-            ) : (
-              draftLines.map((line, index) => {
+            </TableHead>
+            <TableBody>
+              {draftLines.map((line, index) => {
                 const simulationLine = simulationLines?.[index] ?? null
                 const enginePrice = simulationLine?.suggestedBillRate?.unitPriceOutputCurrency ?? null
                 const isManualOverride = line.unitPrice !== null && line.unitPrice !== undefined
@@ -665,10 +676,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 const showCostStack = canViewCostStackProp && simulationLine && outputCurrency
                 const needsPricingContext = line.lineType === 'role' || line.lineType === 'person'
                 const tierMeta = simulationLine ? TIER_STATUS_META[simulationLine.tierCompliance.status] : null
+                const rowWarnings = warningsByLine.get(index) ?? []
+                const rowId = line.lineItemId ?? `draft-row-${index}`
 
                 return (
-                  <>
-                    <TableRow key={line.lineItemId ?? `draft-${index}`} hover>
+                  <Fragment key={rowId}>
+                    <TableRow id={rowId} hover>
                       <TableCell>
                         <Stack spacing={1}>
                           <CustomTextField
@@ -792,99 +805,69 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Tooltip title='Eliminar ítem'>
-                          <span>
-                            <IconButton
-                              size='small'
-                              color='error'
-                              onClick={() => handleRemoveLine(index)}
-                              disabled={saving}
-                              aria-label={`Eliminar ítem ${index + 1}`}
-                            >
-                              <i className='tabler-trash' />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
+                        <Stack direction='row' spacing={0.25} justifyContent='flex-end'>
+                          {needsPricingContext ? (
+                            <Tooltip title={GH_PRICING.adjustPopover.triggerLabel}>
+                              <span>
+                                <IconButton
+                                  size='small'
+                                  onClick={event => handleAdjustOpen(event, index)}
+                                  disabled={saving}
+                                  aria-label={`${GH_PRICING.adjustPopover.triggerLabel} · ítem ${index + 1}`}
+                                >
+                                  <i className='tabler-adjustments' style={{ fontSize: 18 }} />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          ) : null}
+                          <Tooltip title='Eliminar ítem'>
+                            <span>
+                              <IconButton
+                                size='small'
+                                color='error'
+                                onClick={() => handleRemoveLine(index)}
+                                disabled={saving}
+                                aria-label={`Eliminar ítem ${index + 1}`}
+                              >
+                                <i className='tabler-trash' style={{ fontSize: 18 }} />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        </Stack>
                       </TableCell>
                     </TableRow>
-                    {needsPricingContext ? (
-                      <TableRow key={`${line.lineItemId ?? `draft-${index}`}-ctx`}>
+
+                    {rowWarnings.length > 0 ? (
+                      <TableRow>
                         <TableCell colSpan={7} sx={{ py: 1, bgcolor: 'background.default' }}>
-                          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }}>
-                            <Typography variant='caption' color='text.secondary' sx={{ minWidth: 140 }}>
-                              Contexto de pricing
-                            </Typography>
-                            <CustomTextField
-                              size='small'
-                              type='number'
-                              label='FTE'
-                              value={line.metadata?.fteFraction ?? ''}
-                              onChange={event => {
-                                const raw = event.target.value
-                                const next = raw === '' ? null : Number(raw)
-
-                                updateLine(index, {
-                                  metadata: { ...(line.metadata ?? {}), fteFraction: Number.isFinite(next) ? next : null }
-                                })
-                              }}
-                              helperText='0.1 a 1.0 (fracción dedicada)'
-                              sx={{ maxWidth: 160 }}
-                              disabled={saving}
-                              aria-label={`FTE del ítem ${index + 1}`}
-                            />
-                            <CustomTextField
-                              size='small'
-                              type='number'
-                              label='Períodos (meses)'
-                              value={line.metadata?.periods ?? ''}
-                              onChange={event => {
-                                const raw = event.target.value
-                                const next = raw === '' ? null : Number(raw)
-
-                                updateLine(index, {
-                                  metadata: { ...(line.metadata ?? {}), periods: Number.isFinite(next) ? next : null }
-                                })
-                              }}
-                              sx={{ maxWidth: 160 }}
-                              disabled={saving}
-                              aria-label={`Períodos del ítem ${index + 1}`}
-                            />
-                            <CustomTextField
-                              size='small'
-                              label='Tipo de contratación'
-                              value={line.metadata?.employmentTypeCode ?? ''}
-                              onChange={event => {
-                                updateLine(index, {
-                                  metadata: {
-                                    ...(line.metadata ?? {}),
-                                    employmentTypeCode: event.target.value || null
-                                  }
-                                })
-                              }}
-                              placeholder='Default del rol si vacío'
-                              sx={{ maxWidth: 240 }}
-                              disabled={saving}
-                              aria-label={`Tipo de contratación del ítem ${index + 1}`}
-                            />
-                          </Stack>
+                          <QuoteLineWarning warnings={rowWarnings} rowIndex={index} rowElementId={rowId} />
                         </TableCell>
                       </TableRow>
                     ) : null}
+
                     {showCostStack && simulationLine && outputCurrency ? (
-                      <TableRow key={`${line.lineItemId ?? `draft-${index}`}-cost`}>
+                      <TableRow>
                         <TableCell colSpan={7} sx={{ py: 1, bgcolor: 'background.default' }}>
                           <QuoteLineCostStack lineOutput={simulationLine} outputCurrency={outputCurrency} />
                         </TableCell>
                       </TableRow>
                     ) : null}
-                  </>
+                  </Fragment>
                 )
-              })
-            )}
-          </TableBody>
-        </Table>
-      </Box>
+              })}
+            </TableBody>
+          </Table>
+        </Box>
+      )}
+
+      {globalWarnings.length > 0 ? (
+        <Box sx={{ px: 3, py: 2, bgcolor: 'background.default' }}>
+          <QuoteLineWarning warnings={globalWarnings} rowIndex={-1} />
+        </Box>
+      ) : null}
+
       <Divider />
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, p: 3 }}>
         <Box>
           <Typography variant='caption' color='text.secondary'>
@@ -914,14 +897,107 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
         </Stack>
       </Box>
 
-      <SellableItemPickerDrawer
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        onSelect={handlePickerSelect}
-        initialTab={pickerInitialTab}
-        businessLineCode={businessLineCode}
-        excludeSkus={excludedSkus}
-      />
+      {/* Popover Ajustes de pricing por fila */}
+      <Popover
+        open={Boolean(adjustAnchor) && currentAdjustLine !== null}
+        anchorEl={adjustAnchor}
+        onClose={handleAdjustClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{
+          paper: {
+            sx: theme => ({
+              mt: 1,
+              width: 360,
+              maxWidth: 'calc(100vw - 32px)',
+              borderRadius: 2,
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: theme.shadows[6]
+            })
+          }
+        }}
+      >
+        {currentAdjustLine && adjustIndex !== null ? (
+          <Box sx={{ p: 2.5 }} role='dialog' aria-label={GH_PRICING.adjustPopover.title}>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant='subtitle2'>{GH_PRICING.adjustPopover.title}</Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  {GH_PRICING.adjustPopover.subtitle}
+                </Typography>
+              </Box>
+              <CustomTextField
+                size='small'
+                type='number'
+                fullWidth
+                label={GH_PRICING.adjustPopover.fteLabel}
+                value={currentAdjustLine.metadata?.fteFraction ?? ''}
+                onChange={event => {
+                  const raw = event.target.value
+                  const next = raw === '' ? null : Number(raw)
+
+                  updateLine(adjustIndex, {
+                    metadata: {
+                      ...(currentAdjustLine.metadata ?? {}),
+                      fteFraction: Number.isFinite(next) ? next : null
+                    }
+                  })
+                }}
+                helperText={GH_PRICING.adjustPopover.fteHelper}
+                disabled={saving}
+                aria-label={GH_PRICING.adjustPopover.fteLabel}
+                autoFocus
+              />
+              <CustomTextField
+                size='small'
+                type='number'
+                fullWidth
+                label={GH_PRICING.adjustPopover.periodsLabel}
+                value={currentAdjustLine.metadata?.periods ?? ''}
+                onChange={event => {
+                  const raw = event.target.value
+                  const next = raw === '' ? null : Number(raw)
+
+                  updateLine(adjustIndex, {
+                    metadata: {
+                      ...(currentAdjustLine.metadata ?? {}),
+                      periods: Number.isFinite(next) ? next : null
+                    }
+                  })
+                }}
+                disabled={saving}
+                aria-label={GH_PRICING.adjustPopover.periodsLabel}
+              />
+              <CustomTextField
+                size='small'
+                fullWidth
+                label={GH_PRICING.adjustPopover.employmentTypeLabel}
+                value={currentAdjustLine.metadata?.employmentTypeCode ?? ''}
+                onChange={event => {
+                  updateLine(adjustIndex, {
+                    metadata: {
+                      ...(currentAdjustLine.metadata ?? {}),
+                      employmentTypeCode: event.target.value || null
+                    }
+                  })
+                }}
+                placeholder={GH_PRICING.adjustPopover.employmentTypePlaceholder}
+                disabled={saving}
+                aria-label={GH_PRICING.adjustPopover.employmentTypeLabel}
+              />
+              <Stack direction='row' spacing={1} justifyContent='flex-end'>
+                <Button variant='tonal' color='secondary' onClick={handleAdjustClose}>
+                  {GH_PRICING.adjustPopover.closeLabel}
+                </Button>
+                <Button variant='contained' onClick={handleAdjustClose}>
+                  {GH_PRICING.adjustPopover.applyLabel}
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        ) : null}
+      </Popover>
+
     </Card>
   )
 })

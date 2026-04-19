@@ -1,5 +1,44 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-487 Quote Builder Command Bar Redesign (Enterprise Pattern) (Claude)
+
+- **Owner:** Claude
+- **Estado:** **`in-progress`** — implementacion frontend completa, pendiente smoke staging + screenshot antes/despues.
+- **Rama:** `task/TASK-487-quote-builder-command-bar-redesign`.
+- **Scope entregado:**
+  - **Patron UX**: `/finance/quotes/new` y `/finance/quotes/[id]/edit` migraron de Grid 8/4 con sidebar vertical a un patron Command Bar enterprise (4 layers verticales apilados): Identity Strip sticky → Context Chips Strip sticky → Document Surface centrada → Floating Summary Dock sticky bottom. Patron convergente en Linear (issue create), Stripe (invoice create), Ramp (bill approval), Pilot (vendor payment).
+  - **Primitivos reusables** (`src/components/greenhouse/primitives/`):
+    - `ContextChip.tsx`: boton con 4 estados (empty/filled/invalid/locked), abre Popover con editor arbitrario. Reusable en invoice/PO/contract builders. `aria-haspopup="dialog"`, `aria-expanded`, keyboard Enter/Space, 44px min target, focus ring 2px.
+    - `ContextChipStrip.tsx`: container horizontal con overflow-x scroll nativo en mobile + shadow edges cuando hay overflow.
+  - **Componentes de quote** (`src/components/greenhouse/pricing/`):
+    - `QuoteIdentityStrip.tsx`: Row 1 sticky con breadcrumb, titulo, Nº Q-XXX, chip de estado (Borrador/Enviada/Aprobada/Vencida) con icon+color, validez, CTAs primary/secondary (Cancelar/Guardar).
+    - `QuoteContextStrip.tsx`: Row 2 sticky con 8 ContextChips (Org, Contacto, BL, Modelo, Pais, Moneda, Duracion, Valida Hasta) completamente wireados a los stores existentes.
+    - `AddLineSplitButton.tsx`: ButtonGroup + Menu Popper que consolida los 4 origenes (Catalogo/Servicio/Template/Manual) y reemplaza `QuoteSourceSelector` + las 5 pills del editor.
+    - `QuoteSummaryDock.tsx`: Row 4 sticky bottom con AnimatedCounter en Total (respeta `useReducedMotion`), factor, IVA, chip de addons + Popper con AddonSuggestionsPanel embebido, primary CTA, indicador de margen con semaforo.
+    - `QuoteLineWarning.tsx`: Alert inline anclado a la fila que origino el warning (`aria-describedby` al row id). Reemplaza el banner huerfano que vivia al fondo de la sidebar.
+  - **Refactor**:
+    - `QuoteBuilderShell.tsx`: reestructurado a layout vertical con Container `maxWidth='lg'`. Elimina Grid 8/4. Agrega Accordion "Detalle y notas" para la descripcion.
+    - `QuoteLineItemsEditor.tsx`: elimina las 5 pills (+Rol/+Persona/+Herramienta/+Overhead/+Manual), elimina sub-row "Contexto de pricing", agrega `IconButton tabler-adjustments` por fila con Popover (FTE/Periodos/EmploymentType), empty state real via `EmptyState` con 3 CTAs jerarquicas, warnings inline via `QuoteLineWarning`, table usa `Fragment` keys para evitar nested tbody.
+    - `greenhouse-nomenclature.ts`: extendido `GH_PRICING` con 7 nuevos bloques (identityStrip, contextChips, summaryDock, addMenu, lineWarning, emptyItems, adjustPopover, detailAccordion).
+  - **Eliminados**:
+    - `QuoteSourceSelector.tsx` — reemplazado por `AddLineSplitButton`.
+    - `QuotePricingWarningsPanel.tsx` — reemplazado por `QuoteLineWarning` inline por fila.
+  - **Preservado intacto**: `QuoteBuilderActions.tsx` sigue vivo porque lo usa `QuoteCreateDrawer.tsx` (el drawer legacy de creacion rapida), `QuoteTemplatePickerDrawer`, `SellableItemPickerDrawer`, `QuoteLineCostStack`, pricing engine, API contracts, schemas.
+
+### Verificacion
+
+- `npx tsc --noEmit` → 0 errors
+- `pnpm lint` → clean
+- `pnpm test` → 1535/1535 passing
+- `pnpm build` → en ejecucion
+
+### Pendiente
+
+- Smoke staging: flujo end-to-end crear borrador → agregar rol → cost stack → cambiar chip Modelo → total recalcular con AnimatedCounter → guardar y cerrar.
+- Screenshot comparativo antes/despues anexado al close.
+
+---
+
 ## Sesion 2026-04-19 — TASK-486 Commercial Quotation Canonical Anchor (Organization + Contact) (Claude)
 
 - **Owner:** Claude
