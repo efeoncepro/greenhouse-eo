@@ -5,6 +5,7 @@ import type { PoolClient } from 'pg'
 import { withTransaction } from '@/lib/db'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { publishQuotationServiceEntryLinked } from '@/lib/commercial/quotation-events'
+import { getContractIdByQuotationId } from '@/lib/commercial/contracts-store'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -41,6 +42,7 @@ interface QuotationRow extends Record<string, unknown> {
   quotation_id: string
   client_id: string | null
   organization_id: string | null
+  space_id: string | null
   current_version: number | null
 }
 
@@ -73,7 +75,7 @@ export const linkServiceEntryToQuotation = async (
     }
 
     const quotationResult = (await client.query(
-      `SELECT quotation_id, client_id, organization_id, current_version
+      `SELECT quotation_id, client_id, organization_id, space_id, current_version
          FROM greenhouse_commercial.quotations
          WHERE quotation_id = $1
          LIMIT 1`,
@@ -102,11 +104,18 @@ export const linkServiceEntryToQuotation = async (
       )
     }
 
+    const contractId = await getContractIdByQuotationId(
+      quotationId,
+      quotation.space_id ? String(quotation.space_id) : null
+    )
+
     await client.query(
       `UPDATE greenhouse_finance.service_entry_sheets
-         SET quotation_id = $1, updated_at = NOW()
+         SET quotation_id = $1,
+             contract_id = COALESCE($3, contract_id),
+             updated_at = NOW()
          WHERE hes_id = $2`,
-      [quotationId, hesId]
+      [quotationId, hesId, contractId]
     )
 
     const amountAuthorizedClp =

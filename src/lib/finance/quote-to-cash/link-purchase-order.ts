@@ -5,6 +5,7 @@ import type { PoolClient } from 'pg'
 import { withTransaction } from '@/lib/db'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { publishQuotationPurchaseOrderLinked } from '@/lib/commercial/quotation-events'
+import { getContractIdByQuotationId } from '@/lib/commercial/contracts-store'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -102,11 +103,18 @@ export const linkPurchaseOrderToQuotation = async (
       )
     }
 
+    const contractId = await getContractIdByQuotationId(
+      quotationId,
+      quotation.space_id ? String(quotation.space_id) : null
+    )
+
     await client.query(
       `UPDATE greenhouse_finance.purchase_orders
-         SET quotation_id = $1, updated_at = NOW()
+         SET quotation_id = $1,
+             contract_id = COALESCE($3, contract_id),
+             updated_at = NOW()
          WHERE po_id = $2`,
-      [quotationId, poId]
+      [quotationId, poId, contractId]
     )
 
     const authorizedAmountClp =

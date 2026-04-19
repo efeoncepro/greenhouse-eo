@@ -4,6 +4,7 @@
 > **Created:** 2026-04-09
 > **Updated:** 2026-04-19 — v2.19: TASK-467 phase-3 completado. Tab "Modalidades de contrato" del EditSellableRoleDrawer ahora es editable (antes read-only placeholder). Nuevo endpoint `GET/PUT /api/admin/pricing-catalog/roles/[id]/compatibility` con replace atómico via `withTransaction` + validación de no-duplicados, exactly-1-default + default-must-be-allowed + employment_types existentes/activos. Audit emit con `compatibility_updated + employment_types_allowed + default_employment_type`. Split conceptual materializado: TASK-467 cerrada (UI self-service completa); TASK-470 abierto (backend enterprise hardening — optimistic locking + business constraint validator + impact analysis + overcommit detector).
 > **Updated:** 2026-04-19 — v2.18: TASK-467 phase-2 completado. Edit drawers con tabs para roles (Info / Modalidades / Componentes de costo / Pricing por moneda), edit drawers completos para tools y overheads, admin UI de employment types (list + create + edit drawer), audit timeline page (`/admin/pricing-catalog/audit-log`) con MUI Lab Timeline + filtros por entidad/actor. 3 endpoints nuevos: `/roles/[id]/cost-components`, `/roles/[id]/pricing`, extensión de `/governance` para `type: 'employment_type'`. Home pricing catalog actualizada con counts reales y link a audit-log. **Sinergia FTE resuelta**: `SellableRoleSeedRow` extendido con `feeEorUsd?` y `hoursPerFteMonth?` opcionales; `insertCostComponentsIfChanged` deja de hardcodear 0/180 y los usa del seedRow con defaults back-compat. El pricing engine v2 ya consumía `hours_per_fte_month` como fallback del `fte_hours_guide` y divisor de hourly cost — ahora el admin UI puede overridearlo per-role. Dos capas FTE claramente distintas (capacity operacional `CAPACITY_HOURS_PER_FTE=160h` del módulo Agency Team vs billable `fte_hours_guide` + override per-role) coordinadas explícitamente via el override.
+> **Updated:** 2026-04-19 — v2.19: TASK-460 contract/SOW canonical entity. `greenhouse_commercial.contracts` nace como anchor post-sale tenant-safe con tabla join `contract_quotes`, `contract_id` propagado a `purchase_orders`, `service_entry_sheets` e `income`, API `/api/finance/contracts/**`, detail UI en `/finance/contracts`, materialización `contract_profitability_snapshots` y sweep `contract_renewal_reminders`. La convivencia `quotation_id + contract_id` queda explícita durante la transición; MSA sigue diferida a TASK-461.
 > **Updated:** 2026-04-19 — v2.17: TASK-459 delivery model refinement. `greenhouse_commercial.quotations` desambiguada con `commercial_model` (`retainer | project | one_off`) + `staffing_model` (`named_resources | outcome_based | hybrid`) sin reusar el `CommercialModelCode` del pricing engine. `pricing_model` queda como alias legacy derivado. Se extiende `sales_context_at_sent`, `quotation_pipeline_snapshots`, `quotation_profitability_snapshots` y `deal_pipeline_snapshots` para surfacing downstream de ambos ejes.
 > **Updated:** 2026-04-19 — v2.16: TASK-467 pricing catalog admin UI (MVP). Nueva tabla `greenhouse_commercial.pricing_catalog_audit_log` + store `pricing-catalog-audit-store.ts` para audit de cambios en catálogo. 8 API routes bajo `/api/admin/pricing-catalog/{roles,tools,overheads,governance,audit-log}` con gate `canAdministerPricingCatalog` (efeonce_admin + finance_admin). UI bajo `/admin/pricing-catalog` con home (7 nav cards), list views con toggle active (roles/tools/overheads) + create drawers que consumen las DEFAULT sequences (auto-gen ECG/ETG/EFO), governance inline edit page para tier margins + commercial models + country factors + FTE hours. Scope MVP: cost/pricing multi-tab, Excel import, employment types admin, diff viewer de historial se difieren a follow-up TASK-467-phase-2. Bypass intencional de upsert stores (que esperan shape de seed CSV) con INSERT/UPDATE directos para respetar la DEFAULT sequence del SKU.
 > **Updated:** 2026-04-19 — v2.15: TASK-456 deal pipeline snapshots projection. Nueva tabla `greenhouse_serving.deal_pipeline_snapshots` (1 fila por deal canónico no borrado) como capa deal-grain para forecast comercial. Materializer reactivo `deal-pipeline-materializer.ts`, projection `deal_pipeline` en domain `cost_intelligence` y route `GET /api/finance/commercial-intelligence/deal-pipeline`. La fila conserva `is_open`/`is_won`, usa `probability_pct` real del deal (nullable cuando no hay override en `hubspot_deal_pipeline_config`) y rolea-up quotes asociadas por `hubspot_deal_id` (`latest_quote_id`, `quote_count`, `approved_quote_count`, `total_quotes_amount_clp`).
@@ -41,6 +42,40 @@
   - `greenhouse_serving.quotation_pipeline_snapshots` y `greenhouse_serving.quotation_profitability_snapshots` materializan ambos ejes
   - `greenhouse_serving.deal_pipeline_snapshots` agrega `latest_quote_pricing_model`, `latest_quote_commercial_model` y `latest_quote_staffing_model`
   - renewals/pipeline/profitability/deal-pipeline ya pueden surfacing el split sin releer la quote raw
+
+---
+
+## Delta 2026-04-19 — TASK-460 Contract / SOW Canonical Entity
+
+- `greenhouse_commercial.contracts` pasa a ser la entidad canónica post-venta para ejecución, rentabilidad y renovación:
+  - identidad técnica `contract_id`
+  - identificador visible `contract_number` con convención `EO-CTR-*`
+  - herencia inicial de `commercial_model` + `staffing_model` desde la quote originadora
+  - lifecycle persistido: `draft | active | paused | terminated | completed | renewed`
+- La coexistencia queda explícita:
+  - `quotation` sigue siendo el artefacto pre-venta y de pricing
+  - `contract` pasa a ser el anchor operativo post-aceptación
+  - ambos conviven durante la transición mediante `contract_quotes`
+- Runtime nuevo materializado:
+  - `greenhouse_commercial.contracts`
+  - `greenhouse_commercial.contract_quotes`
+  - `greenhouse_serving.contract_profitability_snapshots`
+  - `greenhouse_commercial.contract_renewal_reminders`
+- Doble anchor document chain:
+  - `greenhouse_finance.purchase_orders.contract_id`
+  - `greenhouse_finance.service_entry_sheets.contract_id`
+  - `greenhouse_finance.income.contract_id`
+  - `quotation_id` se mantiene por retrocompat; el reader nuevo `readContractDocumentChain({ contractId })` agrega toda la cadena del contrato
+- Activación operativa:
+  - al materializar invoice desde quote o HES, el flujo asegura que exista un contract para la quote y propaga `contract_id` hacia PO / HES / income
+  - `GET /api/finance/contracts`, `GET /api/finance/contracts/[id]`, `GET /api/finance/contracts/[id]/document-chain` y `GET /api/finance/contracts/[id]/profitability` exponen lecturas tenant-safe
+  - `/finance/contracts` y `/finance/contracts/[id]` surfacing inicializan la lane visible del contrato sin reemplazar todavía `/finance/intelligence`
+- Renovaciones y profitability:
+  - `contract_profitability_snapshots` usa grain `(contract_id, period_year, period_month)` y convive con `quotation_profitability_snapshots`
+  - `contract_renewal_reminders` dedupea avisos contract-level sin apagar aún el sweep quote-level legado
+- Boundary explícito:
+  - `msa_id` queda reservado como referencia futura; no hay FK real hasta TASK-461
+  - el schema snapshot baseline no refleja esta lane; la verdad operativa para contracts es migración + `db.d.ts`
 
 ---
 

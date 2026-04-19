@@ -7,6 +7,8 @@ import type { PoolClient } from 'pg'
 import { withTransaction } from '@/lib/db'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { publishQuotationInvoiceEmitted } from '@/lib/commercial/quotation-events'
+import { ensureContractForQuotation } from '@/lib/commercial/contract-lifecycle'
+import { materializeContractProfitabilitySnapshots } from '@/lib/commercial-intelligence/contract-profitability-materializer'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -24,6 +26,7 @@ export interface MaterializeInvoiceFromHesParams {
 export interface MaterializeInvoiceFromHesResult {
   incomeId: string
   quotationId: string
+  contractId: string
   sourceHesId: string
   totalAmountClp: number
 }
@@ -106,7 +109,7 @@ export const materializeInvoiceFromApprovedHes = async (
 ): Promise<MaterializeInvoiceFromHesResult> => {
   const { hesId, actor } = params
 
-  return withTransaction(async (client: QueryableClient) => {
+  const result = await withTransaction(async (client: QueryableClient) => {
     const hesResult = (await client.query(
       `SELECT hes_id, hes_number, purchase_order_id, client_id, organization_id, space_id,
               service_description, amount, currency, amount_clp, amount_authorized_clp,
@@ -171,6 +174,11 @@ export const materializeInvoiceFromApprovedHes = async (
       quotation.client_name_cache
     )
 
+    const contract = await ensureContractForQuotation({
+      quotationId,
+      actor
+    })
+
     await client.query(
       `INSERT INTO greenhouse_finance.income (
          income_id, client_id, organization_id, space_id,
@@ -178,7 +186,7 @@ export const materializeInvoiceFromApprovedHes = async (
          currency, subtotal, total_amount, total_amount_clp,
          payment_status, amount_paid,
          hes_id, hes_number, purchase_order_id,
-         quotation_id, source_hes_id,
+         quotation_id, contract_id, source_hes_id,
          created_by_user_id,
          created_at, updated_at
        ) VALUES (
@@ -187,8 +195,8 @@ export const materializeInvoiceFromApprovedHes = async (
          $10, $11, $12, $13,
          'pending', 0,
          $14, $15, $16,
-         $17, $18,
-         $19,
+         $17, $18, $19,
+         $20,
          CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
        )`,
       [
@@ -209,6 +217,7 @@ export const materializeInvoiceFromApprovedHes = async (
         hes.hes_number,
         hes.purchase_order_id,
         quotationId,
+        contract.contractId,
         hes.hes_id,
         actor.userId
       ]
@@ -216,9 +225,12 @@ export const materializeInvoiceFromApprovedHes = async (
 
     await client.query(
       `UPDATE greenhouse_finance.service_entry_sheets
-         SET income_id = $1, invoiced = TRUE, updated_at = NOW()
+         SET income_id = $1,
+             contract_id = COALESCE($3, contract_id),
+             invoiced = TRUE,
+             updated_at = NOW()
          WHERE hes_id = $2`,
-      [incomeId, hesId]
+      [incomeId, hesId, contract.contractId]
     )
 
     const alreadyConverted = Boolean(quotation.converted_to_income_id) || quotation.status === 'converted'
@@ -285,8 +297,13 @@ export const materializeInvoiceFromApprovedHes = async (
     return {
       incomeId,
       quotationId,
+      contractId: contract.contractId,
       sourceHesId: hesId,
       totalAmountClp
     }
   })
+
+  await materializeContractProfitabilitySnapshots({ contractId: result.contractId })
+
+  return result
 }
