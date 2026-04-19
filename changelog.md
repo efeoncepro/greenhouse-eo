@@ -2,6 +2,14 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-484 wires FX provider platform (ready for rollout)
+
+- Plataforma de 9 FX provider adapters (Mindicador, OpenER, Banxico SIE, TRM Colombia, SUNAT Perú, BCRP, Frankfurter, Fawaz Ahmed, CLF from UF indicator) con sync orchestrator registry-driven.
+- USD/CLP sync existente refactoreado a adapter pattern sin cambio de comportamiento — cron 23:05 UTC idéntico.
+- 3 cron routes nuevas (COP 09:00 UTC / PEN 14:00 UTC / MXN 22:00 UTC) que leen `CURRENCY_REGISTRY` y ejecutan primary → fallbacks chain con circuit breaker (3 fallas en 5min → skip 15min).
+- Admin endpoint `POST /api/admin/fx/sync-pair` para trigger manual con dry-run default; `scripts/backfill-fx-rates.ts` CLI para backfills históricos.
+- Coverage flip (`manual_only → auto_synced`) queda para PR separado post-24-48h dry-run; el pricing engine sigue emitiendo `fx_fallback` warnings para CLF/COP/MXN/PEN en producción hasta entonces.
+
 ### 2026-04-19 — commercial-cost-worker adopta auto-deploy WIF
 
 - Se agrega `.github/workflows/commercial-cost-worker-deploy.yml` para desplegar el worker dedicado de cost basis a Cloud Run usando el baseline GitHub Actions -> WIF -> `github-actions-deployer`, sin llaves estáticas nuevas.

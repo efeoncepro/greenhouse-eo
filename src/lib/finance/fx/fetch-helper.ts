@@ -35,7 +35,7 @@ export const fetchWithRetry = async (
       }
 
       // 5xx: retry with backoff
-    } catch (error) {
+    } catch {
       // Network error / timeout — retry with backoff
       if (attempt === maxRetries - 1) return null
     }

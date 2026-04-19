@@ -1,5 +1,61 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-484 FX Provider Adapter Platform (Claude)
+
+- **Owner:** Claude
+- **Estado:** `in-progress` → listo para PR a develop. Rollout (flip `coverage` a `auto_synced`) **deferido a PR separado** post-24-48h dry-run en staging.
+- **Rama:** `task/TASK-484-fx-provider-adapter-platform`
+- **Scope:** platform adapter-driven con 9 providers. USD/CLP sync preservado idéntico.
+
+### Entregables
+
+- **9 provider adapters** en `src/lib/finance/fx/providers/`:
+  - `mindicador.ts` (USD↔CLP, existente refactoreado sin cambio de comportamiento)
+  - `open-er-api.ts` (legacy fallback USD↔any, sin histórico)
+  - `banxico-sie.ts` (USD↔MXN primario, serie FIX SF43718, requiere `BANXICO_SIE_TOKEN`)
+  - `datos-gov-co-trm.ts` (USD↔COP primario, Socrata 32sa-8pi3 con window expansion)
+  - `apis-net-pe-sunat.ts` (USD↔PEN primario, SUNAT SBS venta, per-day iteration)
+  - `bcrp.ts` (USD↔PEN histórico por rango, para backfills)
+  - `frankfurter.ts` (USD↔MXN fallback ECB)
+  - `fawaz-ahmed.ts` (universal fallback CDN, any pair)
+  - `clf-from-indicators.ts` (CLP↔CLF leyendo `greenhouse_finance.economic_indicators.UF`)
+- **Orchestrator foundation** en `src/lib/finance/fx/`:
+  - `sync-orchestrator.ts` con `syncCurrencyPair()` primary → fallbacks chain, upsert transaccional vía `upsertFinanceExchangeRateInPostgres`, dry-run, `overrideProviderCode`, `triggeredBy` tracking en `source_sync_runs` (`source_system = 'fx_sync_orchestrator'`)
+  - `circuit-breaker.ts` — 3 fallas en 5min → skip 15min por `(provider, from, to)`
+  - `provider-adapter.ts` + `provider-index.ts` — contrato compartido + registro central
+  - helper fetch compartido (timeouts 5s, retries x3 exponential backoff para 5xx/network, no retry en 4xx, validación row-level `rate > 0 && isFinite(rate)`)
+- **Currency registry extension**: `currency-registry.ts` gana `providers: { primary, fallbacks[], historical? }` en cada entrada (reemplaza el string único legacy). Registry sigue siendo la única fuente de verdad para la cadena por par.
+- **Event catalog**: 2 eventos nuevos en `src/lib/sync/event-catalog.ts`:
+  - `finance.fx_sync.provider_fallback` (emitido en cada transición primary → fallback)
+  - `finance.fx_sync.all_providers_failed` (emitido cuando se agota la cadena)
+  - `finance.exchange_rate.upserted` (existente) se reutiliza en success path
+- **Admin endpoint**: `POST /api/admin/fx/sync-pair` con `canAdministerPricingCatalog` gate, dryRun default `true`, devuelve `runId` para correlación con `source_sync_runs`
+- **Cron routes**: `GET /api/cron/fx-sync-latam?window=morning|midday|evening` + 3 entradas en `vercel.json` a 09:00 / 14:00 / 22:00 UTC. La cron 23:05 UTC existente de economic-indicators quedó intocada.
+- **Backfill CLI**: `scripts/backfill-fx-rates.ts` — range-based (`--from YYYY-MM-DD --to YYYY-MM-DD --pair USD-MXN`), respeta `supportsHistorical` por adapter, `--dry-run` opcional
+- **Tests**: 29/29 vitest passing (circuit-breaker, provider-adapter helpers, sync-orchestrator)
+
+### Verificación
+
+- `npx tsc --noEmit` → 0 errors
+- `pnpm lint` → clean
+- `pnpm build` → compiled successfully 14.8s
+- `pnpm exec vitest run src/lib/finance/fx/__tests__` → 29/29 passing
+
+### Cross-impact
+
+- **TASK-466** (multi-currency quote output): desbloqueada **tras el flip PR**. El send gate tendrá cobertura FX real en producción sólo cuando `CURRENCY_REGISTRY[code].coverage` pase a `auto_synced` para CLF/COP/MXN/PEN.
+- **TASK-475**: cero cambios al contrato de readiness ni al resolver. El orchestrator sólo pobla la tabla `greenhouse_finance.exchange_rates` más densamente; `resolveFxReadiness` sigue leyendo igual.
+- **TASK-483** (Codex, Commercial Cost Basis worker): cero overlap. FX sync vive en Vercel cron, no en el worker. Si en el futuro el worker necesita FX, consume `resolveFxReadiness` igual que el pricing engine.
+- **USD↔CLP cron 23:05 UTC**: **intocado operativamente**. Sólo cambia por dentro (Mindicador corre ahora vía adapter), mismo endpoint, misma hora, misma cadena Mindicador → OpenER.
+
+### Follow-ups
+
+- **Rollout PR (separado, post 24–48h dry-run staging):**
+  - Set env `FX_SYNC_DRY_RUN=true` en staging por 24–48h, verificar `source_sync_runs` limpio.
+  - Flipear `CURRENCY_REGISTRY[code].coverage` de `manual_only` a `auto_synced` **una moneda por vez** en el orden: CLF → COP → PEN → MXN (MXN último porque depende del token).
+- **Secret provisioning**: publicar `BANXICO_SIE_TOKEN` en GCP Secret Manager + Vercel env (scalar crudo, sin comillas/`\n`) **antes** del flip de MXN. Hasta entonces MXN degrada a Frankfurter → Fawaz Ahmed.
+- **Admin UI** `GET /api/admin/fx/health` opcional para operadores (qué provider está activo, circuit breaker state, últimas corridas) — queda como nice-to-have fuera de scope de este PR.
+
 ## Sesion 2026-04-19 — commercial-cost-worker auto-deploy via GitHub Actions + WIF (Codex)
 
 - **Owner:** Codex

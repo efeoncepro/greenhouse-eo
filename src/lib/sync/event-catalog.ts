@@ -423,6 +423,11 @@ export const EVENT_TYPES = {
   financeLicenseCostUpdated: 'finance.license_cost.updated',
   financeToolingCostUpdated: 'finance.tooling_cost.updated',
 
+  // TASK-484 FX sync observability (non-persistent events — emitted only
+  // when the orchestrator needs to surface a degraded condition)
+  financeFxSyncProviderFallback: 'finance.fx_sync.provider_fallback',
+  financeFxSyncAllProvidersFailed: 'finance.fx_sync.all_providers_failed',
+
   // Cost Intelligence
   accountingPeriodClosed: 'accounting.period_closed',
   accountingPeriodReopened: 'accounting.period_reopened',

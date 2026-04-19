@@ -13,6 +13,7 @@
 // need a change.
 
 import type { CurrencyDomain, FxPolicy, PlatformCurrency } from './currency-domain'
+import type { FxProviderCode } from './fx/provider-adapter'
 
 // Coverage classification. Consumers that need to refuse actions on
 // unsupported currencies should check `coverage === 'auto_synced'` before
@@ -37,6 +38,16 @@ export const CURRENCY_COVERAGE_CLASSES = [
 
 export type CurrencyCoverageClass = (typeof CURRENCY_COVERAGE_CLASSES)[number]
 
+// Provider chain: primary tried first, then ordered fallbacks. `historical`
+// is an optional adapter dedicated to backfill / bulk range queries
+// (typically a central bank API where the `primary` is optimized for
+// latest-day queries).
+export interface CurrencyProviderChain {
+  primary: FxProviderCode
+  fallbacks: readonly FxProviderCode[]
+  historical?: FxProviderCode
+}
+
 export interface CurrencyRegistryEntry {
   code: PlatformCurrency
 
@@ -47,9 +58,16 @@ export interface CurrencyRegistryEntry {
    *  non-ISO accounting unit). */
   countryCode: string | null
 
-  /** Provider that feeds the automatic sync, or null if coverage is not
-   *  `auto_synced`. */
-  provider: 'mindicador' | 'open_er_api' | 'manual' | null
+  /** @deprecated Use `providers.primary` instead. Kept for backwards-compat
+   *  with readers that haven't migrated yet. Derived automatically from
+   *  `providers.primary` at export time. */
+  provider: FxProviderCode | null
+
+  /** Canonical chain of FX providers for this currency. Orchestrator tries
+   *  `primary` first, then each entry in `fallbacks` in order. If
+   *  `historical` is set, the backfill script uses it instead of `primary`
+   *  for range queries. */
+  providers: CurrencyProviderChain
 
   /** Permissible fallback strategies when the direct rate is missing:
    *   - `inverse`: try `to → from` and invert.
@@ -83,18 +101,20 @@ export const CURRENCY_REGISTRY: Record<PlatformCurrency, CurrencyRegistryEntry> 
     label: 'Peso chileno',
     countryCode: 'CL',
     provider: 'mindicador',
+    providers: { primary: 'mindicador', fallbacks: ['open_er_api'] },
     fallbackStrategies: ['inverse', 'usd_composition'],
     syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_event',
     coverage: 'auto_synced',
     domains: ['finance_core', 'pricing_output', 'reporting', 'analytics'],
-    notes: 'Base currency of the Chilean finance core. Synced daily via Mindicador; USD↔CLP is bidirectional.'
+    notes: 'Base currency of the Chilean finance core. Synced daily via Mindicador; USD↔CLP is bidirectional. Fallback to OpenER when Mindicador is down.'
   },
   USD: {
     code: 'USD',
     label: 'Dólar estadounidense',
     countryCode: 'US',
     provider: 'mindicador',
+    providers: { primary: 'mindicador', fallbacks: ['open_er_api'] },
     fallbackStrategies: ['inverse', 'usd_composition'],
     syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_event',
@@ -106,49 +126,53 @@ export const CURRENCY_REGISTRY: Record<PlatformCurrency, CurrencyRegistryEntry> 
     code: 'CLF',
     label: 'Unidad de Fomento',
     countryCode: null,
-    provider: null,
+    provider: 'clf_from_indicators',
+    providers: { primary: 'clf_from_indicators', fallbacks: ['fawaz_ahmed'] },
     fallbackStrategies: ['inverse', 'usd_composition'],
-    syncCadence: null,
+    syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_send',
     coverage: 'manual_only',
     domains: ['pricing_output'],
-    notes: 'UF is a Chilean accounting unit. Mindicador exposes it as an economic indicator (greenhouse_finance.economic_indicators) but not as a direct exchange rate pair. Manual rate upserts are accepted until a dedicated provider is wired.'
+    notes: 'UF is a Chilean accounting unit. Synced from greenhouse_finance.economic_indicators (UF indicator) — TASK-484 wires this as an FX pair without fetching. Coverage stays manual_only until post-deploy 24-48h dry-run verification (TASK-484 Slice 5).'
   },
   COP: {
     code: 'COP',
     label: 'Peso colombiano',
     countryCode: 'CO',
-    provider: null,
+    provider: 'datos_gov_co_trm',
+    providers: { primary: 'datos_gov_co_trm', fallbacks: ['fawaz_ahmed'] },
     fallbackStrategies: ['usd_composition'],
-    syncCadence: null,
+    syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_send',
     coverage: 'manual_only',
     domains: ['pricing_output'],
-    notes: 'Declared for pricing_output; no automatic sync yet. Acceptable fallback: compose USD→COP via OpenER manual upload. Follow-up task required to wire an automatic provider before volume grows.'
+    notes: 'Colombian TRM via datos.gov.co Socrata dataset 32sa-8pi3 (BanRep official). Fallback to Fawaz Ahmed CDN. Coverage stays manual_only until post-deploy dry-run verification.'
   },
   MXN: {
     code: 'MXN',
     label: 'Peso mexicano',
     countryCode: 'MX',
-    provider: null,
+    provider: 'banxico_sie',
+    providers: { primary: 'banxico_sie', fallbacks: ['frankfurter', 'fawaz_ahmed'] },
     fallbackStrategies: ['usd_composition'],
-    syncCadence: null,
+    syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_send',
     coverage: 'manual_only',
     domains: ['pricing_output'],
-    notes: 'Declared for pricing_output; no automatic sync yet. Same treatment as COP.'
+    notes: 'Mexican FIX rate via Banxico SIE series SF43718 (requires BANXICO_SIE_TOKEN secret). Fallbacks: Frankfurter (ECB), Fawaz Ahmed (CDN). Coverage stays manual_only until post-deploy dry-run verification.'
   },
   PEN: {
     code: 'PEN',
     label: 'Sol peruano',
     countryCode: 'PE',
-    provider: null,
+    provider: 'apis_net_pe_sunat',
+    providers: { primary: 'apis_net_pe_sunat', fallbacks: ['fawaz_ahmed'], historical: 'bcrp' },
     fallbackStrategies: ['usd_composition'],
-    syncCadence: null,
+    syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_send',
     coverage: 'manual_only',
     domains: ['pricing_output'],
-    notes: 'Declared for pricing_output; no automatic sync yet. Same treatment as COP.'
+    notes: 'Peruvian SUNAT SBS venta via apis.net.pe (canonical rate for SUNAT invoicing). Fallback Fawaz Ahmed. Historical backfills use BCRP series PD04640PD. Coverage stays manual_only until post-deploy dry-run verification.'
   }
 }
 

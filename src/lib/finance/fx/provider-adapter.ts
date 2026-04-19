@@ -51,6 +51,7 @@ export const FX_PUBLISHED_DAY_PATTERNS = [
 export type FxPublishedDayPattern = (typeof FX_PUBLISHED_DAY_PATTERNS)[number]
 
 export interface FxRateFetchResult {
+
   /** Currency the caller requested (FROM side of the pair). */
   fromCurrency: string
 
@@ -110,6 +111,7 @@ export interface FxProviderPingResult {
 }
 
 export interface FxProviderAdapter {
+
   /** Stable machine code used by registry + outbox events. */
   readonly code: FxProviderCode
 
@@ -173,6 +175,7 @@ export const normalizeRateDate = (value: string | null | undefined): string | nu
       Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
       Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
     }
+
     const month = months[bcrpMatch[2]]
 
     if (!month) return null
