@@ -13,6 +13,8 @@ import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { toast } from 'react-toastify'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
@@ -31,6 +33,7 @@ import QuoteContextStrip from '@/components/greenhouse/pricing/QuoteContextStrip
 import QuoteIdentityStrip, {
   type QuoteStatus
 } from '@/components/greenhouse/pricing/QuoteIdentityStrip'
+import QuoteShortcutPalette from '@/components/greenhouse/pricing/QuoteShortcutPalette'
 import QuoteSummaryDock from '@/components/greenhouse/pricing/QuoteSummaryDock'
 import SellableItemPickerDrawer, {
   type SellableItemPickerTab,
@@ -671,6 +674,11 @@ const QuoteBuilderShell = ({
       const resolveRedirect = (id: string | null) => {
         if (!id) return
 
+        toast.success(
+          mode === 'create' ? 'Cotización creada' : 'Cambios guardados',
+          { autoClose: 2400, position: 'bottom-right' }
+        )
+
         if (closeAfter) {
           router.push(`/finance/quotes/${id}`)
         } else {
@@ -830,9 +838,66 @@ const QuoteBuilderShell = ({
     router.push('/finance/quotes')
   }, [router])
 
-  const title = mode === 'edit' && quote?.quotationNumber
+  const [shortcutPaletteOpen, setShortcutPaletteOpen] = useState(false)
+
+  // Keyboard shortcuts globales para el builder (macOS ⌘ + Windows/Linux Ctrl)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const modifier = e.metaKey || e.ctrlKey
+
+      // Ignorar cuando focus está en input/textarea/contenteditable (excepto Esc)
+      const target = e.target as HTMLElement | null
+
+      const inInput =
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable === true
+
+      if (modifier && e.key === 's') {
+        e.preventDefault()
+        void handleSubmit(false)
+
+        return
+      }
+
+      if (modifier && e.key === 'Enter') {
+        e.preventDefault()
+        void handleSubmit(true)
+
+        return
+      }
+
+      if (modifier && (e.key === 'n' || e.key === 'N')) {
+        if (inInput) return
+        e.preventDefault()
+        openCatalogPicker()
+
+        return
+      }
+
+      if (modifier && e.key === '/') {
+        e.preventDefault()
+        setShortcutPaletteOpen(prev => !prev)
+
+        return
+      }
+    }
+
+    window.addEventListener('keydown', handler)
+
+    return () => window.removeEventListener('keydown', handler)
+  }, [handleSubmit, openCatalogPicker])
+
+  const selectedOrgName = useMemo(
+    () => organizations.find(o => o.organizationId === organizationId)?.organizationName ?? null,
+    [organizations, organizationId]
+  )
+
+  const baseTitle = mode === 'edit' && quote?.quotationNumber
     ? `Editar ${quote.quotationNumber}`
     : GH_PRICING.builderTitleNew
+
+  const title = selectedOrgName ? `${baseTitle} · ${selectedOrgName}` : baseTitle
 
   const subtitle = mode === 'edit' ? GH_PRICING.builderSubtitleEdit : GH_PRICING.builderSubtitleCreate
   const quoteStatus = resolveQuoteStatus(quote?.status)
@@ -865,6 +930,47 @@ const QuoteBuilderShell = ({
   const factorApplied = simulation?.totals.countryFactorApplied ?? null
   const marginPct = simulation?.aggregateMargin.marginPct ?? null
   const marginClass = simulation?.aggregateMargin.classification ?? null
+
+  // Tier range para tooltip del margen (derivado de la primera línea con tier definido)
+  const marginTierRange = useMemo(() => {
+    const line = simulation?.lines?.find(
+      l => l.tierCompliance && l.tierCompliance.marginMin !== null && l.tierCompliance.marginMax !== null
+    )
+
+    if (!line || !line.tierCompliance) return null
+    const tc = line.tierCompliance
+
+    if (tc.marginMin === null || tc.marginOpt === null || tc.marginMax === null) return null
+
+    return {
+      min: Number(tc.marginMin),
+      opt: Number(tc.marginOpt),
+      max: Number(tc.marginMax),
+      tierLabel: tc.tier ? `Tier ${tc.tier}` : undefined
+    }
+  }, [simulation?.lines])
+
+  // Delta de los addons al total output — preview para el chip
+  const addonTotalDelta = useMemo(() => {
+    const addons = simulation?.addons ?? []
+
+    if (addons.length === 0) return null
+
+    return addons.reduce((sum, a) => sum + (a.amountOutputCurrency ?? 0), 0)
+  }, [simulation?.addons])
+
+  // Save state indicator: dirty si lines diff vs initial, clean cuando submitted
+  const initialFingerprint = useMemo(() => JSON.stringify(initialLines), [initialLines])
+  const currentFingerprint = useMemo(() => JSON.stringify(linesSnapshot), [linesSnapshot])
+  const isDirty = initialFingerprint !== currentFingerprint
+
+  const saveState: { kind: 'clean' | 'dirty' | 'saving' | 'saved'; changeCount?: number } | null = submitting
+    ? { kind: 'saving' }
+    : isDirty
+      ? { kind: 'dirty' }
+      : mode === 'edit'
+        ? { kind: 'clean' }
+        : null
 
   return (
     <Box>
@@ -1031,6 +1137,9 @@ const QuoteBuilderShell = ({
           onPrimaryClick={() => handleSubmit(true)}
           marginClassification={marginClass}
           marginPct={marginPct}
+          marginTierRange={marginTierRange}
+          addonTotalDelta={addonTotalDelta}
+          saveState={saveState}
           simulationError={dockSimulationError}
           emptyStateMessage={
             linesSnapshot.length === 0
@@ -1056,6 +1165,11 @@ const QuoteBuilderShell = ({
         onClose={() => setTemplatePickerOpen(false)}
         onSelect={handleTemplateSelect}
         templates={templates}
+      />
+
+      <QuoteShortcutPalette
+        open={shortcutPaletteOpen}
+        onClose={() => setShortcutPaletteOpen(false)}
       />
     </Box>
   )

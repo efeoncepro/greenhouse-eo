@@ -11,6 +11,7 @@ import Paper from '@mui/material/Paper'
 import Popper from '@mui/material/Popper'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
@@ -38,6 +39,15 @@ export interface QuoteSummaryDockProps {
   onSecondaryClick?: () => void
   marginClassification?: 'healthy' | 'warning' | 'critical' | null
   marginPct?: number | null
+
+  /** Target tier range, usado para tooltip del margen. */
+  marginTierRange?: { min: number; opt: number; max: number; tierLabel?: string } | null
+
+  /** Delta que los addons agregan al total, para preview en el chip. */
+  addonTotalDelta?: number | null
+
+  /** Save state indicator en la parte izquierda del dock. */
+  saveState?: { kind: 'clean' | 'dirty' | 'saving' | 'saved'; changeCount?: number; lastSavedAt?: Date | null } | null
 
   /** Si hay un error del engine v2, se muestra como Alert inline en la parte
    * superior del dock (justo encima del bloque de totales). */
@@ -107,6 +117,9 @@ const QuoteSummaryDock = ({
   onSecondaryClick,
   marginClassification,
   marginPct,
+  marginTierRange,
+  addonTotalDelta,
+  saveState,
   simulationError,
   emptyStateMessage
 }: QuoteSummaryDockProps) => {
@@ -158,6 +171,42 @@ const QuoteSummaryDock = ({
         </Alert>
       ) : null}
 
+      {saveState ? (
+        <Stack direction='row' spacing={0.75} alignItems='center' sx={{ mb: 1 }} aria-live='polite'>
+          <Box
+            component='span'
+            sx={theme => ({
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              flexShrink: 0,
+              backgroundColor:
+                saveState.kind === 'saving'
+                  ? theme.palette.info.main
+                  : saveState.kind === 'dirty'
+                    ? theme.palette.warning.main
+                    : saveState.kind === 'saved'
+                      ? theme.palette.success.main
+                      : theme.palette.action.disabled
+            })}
+            aria-hidden='true'
+          />
+          <Typography variant='caption' color='text.secondary'>
+            {saveState.kind === 'saving'
+              ? 'Guardando…'
+              : saveState.kind === 'dirty'
+                ? saveState.changeCount && saveState.changeCount > 0
+                  ? `Sin guardar · ${saveState.changeCount} cambio${saveState.changeCount === 1 ? '' : 's'}`
+                  : 'Sin guardar'
+                : saveState.kind === 'saved'
+                  ? saveState.lastSavedAt
+                    ? `Guardado · ${formatRelativeTime(saveState.lastSavedAt)}`
+                    : 'Guardado'
+                  : 'Sin cambios'}
+          </Typography>
+        </Stack>
+      ) : null}
+
       <Stack
         direction={{ xs: 'column', md: 'row' }}
         spacing={2}
@@ -189,7 +238,7 @@ const QuoteSummaryDock = ({
             label={GH_PRICING.summaryDock.subtotalLabel}
             value={loading ? null : formatMoney(subtotal, currency)}
           />
-          {factor !== null && factor !== undefined ? (
+          {factor !== null && factor !== undefined && factor !== 1 ? (
             <SummaryBlock
               label={GH_PRICING.summaryDock.factorLabel}
               value={loading ? null : `×${factor.toFixed(2)}`}
@@ -230,25 +279,37 @@ const QuoteSummaryDock = ({
           </Box>
 
           {marginMeta && marginPct !== null && marginPct !== undefined && !loading ? (
-            <Box
-              sx={theme => ({
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.75,
-                px: 1.25,
-                py: 0.5,
-                borderRadius: 1,
-                backgroundColor: alpha(theme.palette[marginMeta.color].main, 0.12),
-                color: theme.palette[marginMeta.color].main,
-                border: `1px solid ${alpha(theme.palette[marginMeta.color].main, 0.24)}`
-              })}
-              aria-label={`${marginMeta.label}: ${(marginPct * 100).toFixed(1)}%`}
+            <Tooltip
+              title={
+                marginTierRange
+                  ? `${marginMeta.label} · ${(marginPct * 100).toFixed(1)}%. Target ${(marginTierRange.min * 100).toFixed(0)}–${(marginTierRange.max * 100).toFixed(0)}%${marginTierRange.tierLabel ? ` (${marginTierRange.tierLabel})` : ''}.`
+                  : `${marginMeta.label}: ${(marginPct * 100).toFixed(1)}%`
+              }
+              arrow
+              placement='top'
+              disableInteractive
             >
-              <i className={marginMeta.icon} aria-hidden='true' style={{ fontSize: 14 }} />
-              <Typography variant='caption' sx={{ fontWeight: 600 }}>
-                {(marginPct * 100).toFixed(1)}%
-              </Typography>
-            </Box>
+              <Box
+                sx={theme => ({
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  px: 1.25,
+                  py: 0.5,
+                  borderRadius: 1,
+                  backgroundColor: alpha(theme.palette[marginMeta.color].main, 0.12),
+                  color: theme.palette[marginMeta.color].main,
+                  border: `1px solid ${alpha(theme.palette[marginMeta.color].main, 0.24)}`,
+                  cursor: 'help'
+                })}
+                aria-label={`${marginMeta.label}: ${(marginPct * 100).toFixed(1)}%`}
+              >
+                <i className={marginMeta.icon} aria-hidden='true' style={{ fontSize: 14 }} />
+                <Typography variant='caption' sx={{ fontWeight: 600 }}>
+                  {(marginPct * 100).toFixed(1)}%
+                </Typography>
+              </Box>
+            </Tooltip>
           ) : null}
         </Stack>
         )}
@@ -304,6 +365,14 @@ const QuoteSummaryDock = ({
                     ? GH_PRICING.summaryDock.addonsChip(addonCount)
                     : GH_PRICING.summaryDock.addonsChipEmpty}
                 </Typography>
+                {addonTotalDelta !== null && addonTotalDelta !== undefined && addonTotalDelta > 0 ? (
+                  <Typography
+                    variant='caption'
+                    sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', ml: 0.5 }}
+                  >
+                    +{formatMoney(addonTotalDelta, currency)}
+                  </Typography>
+                ) : null}
               </Box>
               <Popper
                 open={addonsOpen}
@@ -395,5 +464,22 @@ const SummaryBlock = ({
     )}
   </Box>
 )
+
+const formatRelativeTime = (date: Date): string => {
+  const now = Date.now()
+  const delta = Math.max(0, now - date.getTime())
+  const seconds = Math.floor(delta / 1000)
+
+  if (seconds < 5) return 'ahora'
+  if (seconds < 60) return `hace ${seconds}s`
+  const minutes = Math.floor(seconds / 60)
+
+  if (minutes < 60) return `hace ${minutes}m`
+  const hours = Math.floor(minutes / 60)
+
+  if (hours < 24) return `hace ${hours}h`
+
+  return date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })
+}
 
 export default QuoteSummaryDock

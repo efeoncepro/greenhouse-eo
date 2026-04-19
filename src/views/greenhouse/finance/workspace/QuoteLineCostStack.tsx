@@ -2,6 +2,10 @@
 
 import { useMemo } from 'react'
 
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+
 import type { PricingLineOutputV2, PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
 import CostStackPanel, {
@@ -9,6 +13,7 @@ import CostStackPanel, {
   type CostStackPanelProps,
   type CostStackTierFit
 } from '@/components/greenhouse/pricing/CostStackPanel'
+import TierMarginSparkline from '@/components/greenhouse/pricing/TierMarginSparkline'
 
 export interface QuoteLineCostStackProps {
 
@@ -87,15 +92,55 @@ const QuoteLineCostStack = ({ lineOutput, outputCurrency, defaultExpanded = fals
     }
   }, [lineOutput.tierCompliance])
 
+  const compliance = lineOutput.tierCompliance
+
+  const showSparkline =
+    compliance &&
+    compliance.marginMin !== null &&
+    compliance.marginMin !== undefined &&
+    compliance.marginOpt !== null &&
+    compliance.marginOpt !== undefined &&
+    compliance.marginMax !== null &&
+    compliance.marginMax !== undefined
+
   return (
-    <CostStackPanel
-      lines={lines}
-      totals={totals}
-      tierFit={tierFit}
-      currency={outputCurrency}
-      variant='quote-builder'
-      defaultExpanded={defaultExpanded}
-    />
+    <Stack spacing={1.5}>
+      {showSparkline ? (
+        <Box sx={{ px: 1, py: 0.5 }}>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <Box sx={{ flex: 1, minWidth: 160 }}>
+              <TierMarginSparkline
+                actualPct={lineOutput.effectiveMarginPct}
+                minPct={Number(compliance.marginMin)}
+                optPct={Number(compliance.marginOpt)}
+                maxPct={Number(compliance.marginMax)}
+                status={compliance.status}
+                size='md'
+              />
+            </Box>
+            <Box sx={{ minWidth: 72, textAlign: 'right' }}>
+              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', lineHeight: 1 }}>
+                Margen línea
+              </Typography>
+              <Typography
+                variant='body2'
+                sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', lineHeight: 1.2 }}
+              >
+                {(lineOutput.effectiveMarginPct * 100).toFixed(1)}%
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
+      ) : null}
+      <CostStackPanel
+        lines={lines}
+        totals={totals}
+        tierFit={tierFit}
+        currency={outputCurrency}
+        variant='quote-builder'
+        defaultExpanded={defaultExpanded}
+      />
+    </Stack>
   )
 }
 

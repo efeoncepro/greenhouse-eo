@@ -1989,7 +1989,7 @@ export const GH_PRICING = {
   },
   emptyItems: {
     title: 'Comencemos la cotización',
-    subtitle: 'Agrega roles, servicios, templates o líneas manuales. El motor calcula precios y márgenes en tiempo real.',
+    subtitle: 'Agrega ítems para ver el total y el margen calculados en tiempo real.',
     ctaPrimary: 'Agregar desde catálogo',
     ctaSecondary: 'Desde servicio empaquetado',
     ctaTertiary: 'Desde template'

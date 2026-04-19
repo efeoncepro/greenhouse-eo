@@ -381,10 +381,23 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
 ) {
   const [draftLines, setDraftLines] = useState<QuoteLineItem[]>(() => cloneLineItems(lineItems))
   const [dirty, setDirty] = useState(false)
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null)
 
   // Popover "Ajustes" por fila — un solo popover global abierto a la vez
   const [adjustAnchor, setAdjustAnchor] = useState<HTMLElement | null>(null)
   const [adjustIndex, setAdjustIndex] = useState<number | null>(null)
+
+  const toggleRowExpanded = useCallback((index: number) => {
+    setExpandedRows(prev => {
+      const next = new Set(prev)
+
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+
+      return next
+    })
+  }, [])
 
   const onDraftChangeRef = useRef(onDraftChange)
 
@@ -591,7 +604,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
             />
           </Stack>
         }
-        subheader='Agrega ítems vendibles desde el catálogo o crea una línea manual.'
+        subheader={draftLines.length === 0 ? undefined : 'Agrega ítems vendibles desde el catálogo o crea una línea manual.'}
         avatar={
           <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity', width: 40, height: 40 }}>
             <i className='tabler-list-details' style={{ fontSize: 20, color: 'var(--mui-palette-primary-main)' }} />
@@ -604,7 +617,8 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
       {draftLines.length === 0 ? (
         <CardContent>
           <EmptyState
-            icon='tabler-clipboard-list'
+            icon='tabler-file-invoice'
+            animatedIcon='/animations/empty-chart.json'
             title={GH_PRICING.emptyItems.title}
             description={GH_PRICING.emptyItems.subtitle}
             action={
@@ -659,13 +673,14 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
           <Table size='small'>
             <TableHead>
               <TableRow>
+                <TableCell sx={{ width: 32, minWidth: 32 }} aria-label='Expandir detalle' />
                 <TableCell sx={{ minWidth: 220 }}>Ítem</TableCell>
                 <TableCell sx={{ minWidth: 140 }}>Tipo</TableCell>
                 <TableCell sx={{ minWidth: 90 }} align='right'>Cantidad</TableCell>
                 <TableCell sx={{ minWidth: 110 }}>Unidad</TableCell>
                 <TableCell sx={{ minWidth: 130 }} align='right'>Precio unitario</TableCell>
                 <TableCell sx={{ minWidth: 110 }} align='right'>Subtotal</TableCell>
-                <TableCell sx={{ minWidth: 96 }} align='right'>Acciones</TableCell>
+                <TableCell sx={{ minWidth: 80 }} align='right' aria-label='Acciones' />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -681,9 +696,37 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 const rowWarnings = warningsByLine.get(index) ?? []
                 const rowId = line.lineItemId ?? `draft-row-${index}`
 
+                const hasDetails = Boolean(needsPricingContext || showCostStack)
+                const isExpanded = expandedRows.has(index)
+                const isHovered = hoveredRow === index
+
                 return (
                   <Fragment key={rowId}>
-                    <TableRow id={rowId} hover>
+                    <TableRow
+                      id={rowId}
+                      hover
+                      onMouseEnter={() => setHoveredRow(index)}
+                      onMouseLeave={() => setHoveredRow(prev => (prev === index ? null : prev))}
+                    >
+                      <TableCell sx={{ width: 32, minWidth: 32, pr: 0 }}>
+                        {hasDetails ? (
+                          <Tooltip title={isExpanded ? 'Ocultar detalle' : 'Ver detalle'} disableInteractive>
+                            <IconButton
+                              size='small'
+                              onClick={() => toggleRowExpanded(index)}
+                              aria-expanded={isExpanded}
+                              aria-label={isExpanded ? 'Ocultar detalle de pricing' : 'Ver detalle de pricing'}
+                              sx={{
+                                transition: 'transform 150ms ease-out',
+                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+                              }}
+                            >
+                              <i className='tabler-chevron-right' style={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Tooltip>
+                        ) : null}
+                      </TableCell>
                       <TableCell>
                         <Stack spacing={1}>
                           <CustomTextField
@@ -819,7 +862,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       <TableCell align='right'>
                         <Stack direction='row' spacing={0.25} justifyContent='flex-end'>
                           {needsPricingContext ? (
-                            <Tooltip title={GH_PRICING.adjustPopover.triggerLabel}>
+                            <Tooltip title={GH_PRICING.adjustPopover.triggerLabel} disableInteractive>
                               <span>
                                 <IconButton
                                   size='small'
@@ -832,7 +875,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                               </span>
                             </Tooltip>
                           ) : null}
-                          <Tooltip title='Eliminar ítem'>
+                          <Tooltip title='Eliminar ítem' disableInteractive>
                             <span>
                               <IconButton
                                 size='small'
@@ -840,6 +883,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                                 onClick={() => handleRemoveLine(index)}
                                 disabled={saving}
                                 aria-label={`Eliminar ítem ${index + 1}`}
+                                sx={{
+                                  opacity: isHovered ? 1 : 0,
+                                  transition: 'opacity 150ms ease-out',
+                                  '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+                                  '&:focus-visible': { opacity: 1 }
+                                }}
                               >
                                 <i className='tabler-trash' style={{ fontSize: 18 }} />
                               </IconButton>
@@ -851,15 +900,22 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
 
                     {rowWarnings.length > 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} sx={{ py: 1, bgcolor: 'background.default' }}>
+                        <TableCell colSpan={8} sx={{ py: 1, bgcolor: 'background.default' }}>
                           <QuoteLineWarning warnings={rowWarnings} rowIndex={index} rowElementId={rowId} />
                         </TableCell>
                       </TableRow>
                     ) : null}
 
-                    {showCostStack && simulationLine && outputCurrency ? (
+                    {isExpanded && showCostStack && simulationLine && outputCurrency ? (
                       <TableRow>
-                        <TableCell colSpan={7} sx={{ py: 1, bgcolor: 'background.default' }}>
+                        <TableCell
+                          colSpan={8}
+                          sx={theme => ({
+                            py: 1.5,
+                            bgcolor: 'background.default',
+                            borderLeft: `3px solid ${theme.palette.primary.main}`
+                          })}
+                        >
                           <QuoteLineCostStack lineOutput={simulationLine} outputCurrency={outputCurrency} />
                         </TableCell>
                       </TableRow>
