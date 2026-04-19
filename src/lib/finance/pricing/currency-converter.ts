@@ -2,6 +2,9 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 
+import type { FxReadiness } from '@/lib/finance/currency-domain'
+import { resolveFxReadiness } from '@/lib/finance/fx-readiness'
+
 import type { PricingOutputCurrency } from './contracts'
 
 type FxRateRow = {
@@ -184,4 +187,30 @@ export const resolvePricingOutputExchangeRate = async ({
   })
 
   return rate && rate > 0 ? rate : 1
+}
+
+// Readiness-aware resolver for the pricing engine.
+//
+// Unlike `resolvePricingOutputExchangeRate` (which returns a silent `1` on
+// missing rates), this helper surfaces the full `FxReadiness` shape so the
+// engine can emit a structured warning (`fx_fallback`) and the UI can render
+// a meaningful message.
+//
+// Consumers that need the numeric rate for computation should still call
+// `resolvePricingOutputExchangeRate`; the engine orchestrator calls this
+// helper once at the top of the pipeline and forwards the readiness to
+// `structuredWarnings`.
+export const resolvePricingOutputFxReadiness = async ({
+  currency,
+  rateDate
+}: {
+  currency: PricingOutputCurrency
+  rateDate?: string | null
+}): Promise<FxReadiness> => {
+  return resolveFxReadiness({
+    fromCurrency: 'USD',
+    toCurrency: currency,
+    rateDate: rateDate ?? null,
+    domain: 'pricing_output'
+  })
 }

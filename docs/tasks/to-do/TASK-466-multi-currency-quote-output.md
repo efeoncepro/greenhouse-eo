@@ -14,6 +14,27 @@ La spec original asumía que el selector de `output_currency` vivía y seguiría
 3. El PDF/email client-facing sigue siendo ownership de esta task, pero la integración UI en create/edit queda bloqueada por `TASK-473`.
 4. El selector interno de moneda y cualquier preview de salida debe montarse en el builder full-page y reutilizar la boundary nueva entre build/edit vs review/lifecycle.
 
+## Delta 2026-04-19 — Dependencia explícita de foundation FX Greenhouse
+
+La spec asumía que la cobertura multi-moneda para `CLF/COP/MXN/PEN` podía resolverse dentro del lane de quotes. Ese supuesto ya no es suficiente: el repo tiene una capa pricing más amplia, pero finance core, sync operativo y varios consumers siguen contratos distintos.
+
+**Ajuste canónico:**
+
+1. `TASK-466` deja de cargar con la deuda de plataforma FX/currency.
+2. La robustez y escalabilidad de monedas y tipos de cambio se mueve a `TASK-475`.
+3. Esta task consume esa foundation para output client-facing, snapshot y render, en vez de inventar reglas locales en quotes.
+
+## Delta 2026-04-19 — Foundation FX landed (TASK-475 cerrada)
+
+TASK-475 ya mergeada. Esta task debe consumir explícitamente:
+
+1. **Readiness gate antes de snapshot**: llamar `GET /api/finance/exchange-rates/readiness?from=USD&to=<outputCurrency>&domain=pricing_output` antes de permitir el "Enviar cotización" client-facing. Si `state === 'unsupported'`, bloquear. Si `supported_but_stale` o `temporarily_unavailable`, permitir con warning visible en el dialog de envío.
+2. **Threshold client-facing stricter**: usar `CLIENT_FACING_STALENESS_THRESHOLD_DAYS = 3` (exportado de `src/lib/finance/currency-domain.ts`) para decidir si avisar al AE antes de enviar, aunque el engine consider`supported` al threshold default 7d.
+3. **Snapshot en `quotations.exchange_rates`**: congelar el payload de `FxReadiness.rate` + `rateDateResolved` + `source` en el momento del send. PDF/email consumen ese snapshot, no vuelven a resolver FX.
+4. **Composición vía USD visible**: cuando `readiness.composedViaUsd === true`, surfacear chip "Tasa derivada vía USD" en el preview para que el AE sepa que no hay tasa directa.
+5. **`fx_fallback` warnings del engine**: el preview de cotización ya los muestra en `QuotePricingWarningsPanel` (TASK-473). El flujo de envío debe re-chequearlos y bloquear si algún warning tiene `severity === 'critical'`.
+6. **Monedas `manual_only`** (hoy `CLF/COP/MXN/PEN`): TASK-466 no implementa providers automáticos. Si el AE necesita enviar en esas monedas, un admin de finance debe upsertar la tasa manualmente — la UI debe hacer visible ese paso.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -28,7 +49,7 @@ La spec original asumía que el selector de `output_currency` vivía y seguiría
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-464d (engine v2 with multi-currency output), TASK-464e (UI with currency selector), TASK-473 (builder full-page surface migration)`
+- Blocked by: `TASK-464d (engine v2 with multi-currency output), TASK-464e (UI with currency selector), TASK-473 (builder full-page surface migration), TASK-475 (Greenhouse FX & currency platform foundation)`
 - Branch: `task/TASK-466-multi-currency-quote-output`
 - Legacy ID: `parte de revenue pricing program`
 - GitHub Issue: `none`
@@ -117,7 +138,7 @@ Reglas obligatorias:
 - Quote no persiste `output_currency` ni `exchange_rate_snapshot`
 - PDF/email siempre en CLP hardcoded
 - No hay toggle internal USD/local
-- Exchange rates para COP/MXN/PEN pueden no estar en la tabla (verificar)
+- Exchange rates para COP/MXN/PEN pueden no estar en la tabla y esa cobertura ya no debe resolverse ad hoc dentro de quotes
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC

@@ -151,6 +151,20 @@ describe('buildPricingEngineOutputV2', () => {
           Promise.resolve(resolvePricingAddonsFromCatalog(input, addonCatalog as never))
         ),
         resolvePricingOutputExchangeRate: vi.fn().mockResolvedValue(20),
+        resolvePricingOutputFxReadiness: vi.fn().mockResolvedValue({
+          fromCurrency: 'USD',
+          toCurrency: 'CLP',
+          rateDate: '2026-04-18',
+          domain: 'pricing_output',
+          state: 'supported',
+          rate: 20,
+          rateDateResolved: '2026-04-18',
+          source: 'mindicador',
+          ageDays: 0,
+          stalenessThresholdDays: 7,
+          composedViaUsd: false,
+          message: 'Tasa USD→CLP disponible (hace 0 días).'
+        }),
         convertUsdToPricingCurrency: vi.fn().mockImplementation(({ amountUsd }) => Promise.resolve(amountUsd * 20)),
         convertCurrencyAmount: vi.fn().mockImplementation(({ amount }) => Promise.resolve(amount)),
         getToolBySku: vi.fn(),

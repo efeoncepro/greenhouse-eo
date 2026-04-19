@@ -2,9 +2,46 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
+> **Last updated:** 2026-04-19
 > **Audience:** Backend engineers, finance product owners, agents implementing finance features
 
 ---
+
+## Delta 2026-04-19 — Currency & FX Platform Foundation (TASK-475)
+
+- Se formalizó la matriz canónica de monedas por dominio + política FX + contrato de readiness. El contrato vive en `src/lib/finance/currency-domain.ts` + `currency-registry.ts` y lo consumen el engine, las APIs y los futuros consumers client-facing.
+- **Matriz por dominio** (`CURRENCY_DOMAIN_SUPPORT`):
+  - `finance_core`: `['CLP', 'USD']` — estable, alineado con `FinanceCurrency` transaccional. NO se expande en esta task.
+  - `pricing_output`: `['USD', 'CLP', 'CLF', 'COP', 'MXN', 'PEN']` — superficie comercial multi-moneda.
+  - `reporting`: `['CLP']` — CLP-normalizado por contrato (P&L, metric registry).
+  - `analytics`: `['CLP']` — CLP-normalizado (`operational_pl`, `member_capacity_economics`, cost intelligence).
+- **FX policy matrix** (`FX_POLICY_DEFAULT_BY_DOMAIN`):
+  - `finance_core` → `rate_at_event` (snapshot al reconocer la transacción).
+  - `pricing_output` → `rate_at_send` (congela tasa al emitir el artefacto client-facing).
+  - `reporting`/`analytics` → `rate_at_period_close` (normaliza al cierre del período).
+- **Readiness contract** (`FxReadiness`): estados `supported | supported_but_stale | unsupported | temporarily_unavailable`. Incluye `rate`, `rateDateResolved`, `source`, `ageDays`, `stalenessThresholdDays`, `composedViaUsd`, `message`.
+- **Currency registry** (`src/lib/finance/currency-registry.ts`): policy declarativa por moneda — provider, fallback strategies (`inverse`, `usd_composition`, `none`), sync cadence, coverage class (`auto_synced` | `manual_only` | `declared_only`). Hoy `USD`/`CLP` = `auto_synced` (Mindicador + OpenER). `CLF`/`COP`/`MXN`/`PEN` = `manual_only` (pending provider wire-up).
+- **Resolver canónico** (`src/lib/finance/fx-readiness.ts`): `resolveFxReadiness({from, to, rateDate, domain})`. Chain: identity → domain gate → direct lookup → inverse (si registry permite) → composición vía USD (si registry permite) → clasificación por threshold. Endpoint HTTP: `GET /api/finance/exchange-rates/readiness?from=X&to=Y&domain=pricing_output`.
+- **Engine integration**: el pricing engine v2 llama a `resolvePricingOutputFxReadiness` al inicio del pipeline y emite structured warnings `fx_fallback` (`critical` si unsupported/temporarily_unavailable, `warning` si stale, `info` si composed via USD). El fallback silencioso `?? 1` queda como compat path pero el engine ya no depende de él para decidir; siempre pasa por readiness.
+- **Compatibility rule**: los consumers CLP-normalizados existentes (`operational_pl`, `member_capacity_economics`, `tool-cost-reader` target CLP, payroll CLP/USD) NO cambian. Esta task solo endurece el contrato compartido y sus readers.
+- **Escalabilidad**: agregar una moneda nueva requiere 3 edits: `CURRENCIES_ALL`, `CURRENCY_DOMAIN_SUPPORT[domain]` y una entrada en `CURRENCY_REGISTRY`. No hay hardcodes en engine/UI que tocar.
+
+## Delta 2026-04-19 — Pricing / Commercial Cost Basis runtime split formalized
+
+- Finance quotation pricing no debe absorber toda la carga de `Commercial Cost Basis` dentro de request-response.
+- Contrato nuevo del lane:
+  - `src/lib/finance/pricing/quotation-pricing-orchestrator.ts` y sus consumers siguen siendo el carril de preview interactivo y composición de pricing en portal.
+  - la materialización de snapshots role/tool/people/provider, el repricing batch y el feedback quoted-vs-actual pertenecen a un worker dedicado de Cloud Run.
+- Regla operativa:
+  - el quote builder puede leer snapshots, provenance y confidence ya resueltos;
+  - no debe disparar recomputes pesados cross-domain cada vez que un usuario cambia una línea o variante comercial;
+  - cualquier expansión del engine hacia workloads batch debe seguir la topología definida por `TASK-483`;
+  - `ops-worker` no es el runtime base del lane comercial; su scope sigue siendo reactivo/operativo.
+
+Implicación para el backlog:
+
+- `TASK-477` a `TASK-482` ya no se interpretan como mejoras puramente in-app.
+- La evolución del pricing lane debe respetar el split `interactive lane` vs `compute lane`.
 
 ## Delta 2026-04-18 — TASK-464c Tool Catalog + Overhead Addons Foundation
 

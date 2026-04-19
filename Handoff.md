@@ -1,5 +1,84 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-475 Greenhouse FX & Currency Platform Foundation (Claude)
+
+- **Owner:** Claude
+- **Estado:** `in-progress` → `complete` (PR merged to develop)
+- **Rama:** `task/TASK-475-greenhouse-fx-currency-platform-foundation`
+- **Scope:** contratos plataforma de monedas + FX policy + readiness; no migra consumers CLP-normalizados.
+
+### Entregables
+
+- **Tipos canónicos**: `src/lib/finance/currency-domain.ts`
+  - `CURRENCY_DOMAINS`, `CURRENCIES_ALL`, `CURRENCY_DOMAIN_SUPPORT` (matriz por dominio)
+  - `FX_POLICIES`, `FX_POLICY_DEFAULT_BY_DOMAIN`
+  - `FX_READINESS_STATES`, `FxReadiness`
+  - `FX_STALENESS_THRESHOLD_DAYS`, `CLIENT_FACING_STALENESS_THRESHOLD_DAYS`
+  - Helpers `isSupportedCurrencyForDomain`, `assertSupportedCurrencyForDomain`, `narrowToDomainCurrency`, `toFinanceCurrency`
+- **Currency registry**: `src/lib/finance/currency-registry.ts`
+  - Policy declarativa por moneda: provider, fallback strategies, sync cadence, coverage class, fxPolicyDefault, domains
+  - `USD`/`CLP` = `auto_synced` (Mindicador + OpenER); `CLF`/`COP`/`MXN`/`PEN` = `manual_only` (pending provider wire-up)
+  - Helpers `getCurrencyRegistryEntry`, `isAutoSyncedCurrency`, `allowsUsdComposition`
+- **Readiness resolver**: `src/lib/finance/fx-readiness.ts`
+  - `resolveFxReadiness({from, to, rateDate, domain})` con chain identity → domain gate → direct → inverse → USD composition → classify by threshold
+  - NEVER throws; devuelve estado clasificado (`supported | supported_but_stale | unsupported | temporarily_unavailable`)
+- **API HTTP**: `GET /api/finance/exchange-rates/readiness?from=X&to=Y&domain=pricing_output&rateDate=YYYY-MM-DD` — finance tenant gate, cacheable 60s
+- **Engine integration**: `src/lib/finance/pricing/currency-converter.ts` expone `resolvePricingOutputFxReadiness`; `pricing-engine-v2.ts` llama al inicio del pipeline y emite `fx_fallback` structured warning (critical si unsupported/unavailable, warning si stale, info si composed via USD)
+- **Tests**: `src/lib/finance/__tests__/currency-domain.test.ts` (14 asserts) + `fx-readiness.test.ts` (12 asserts); pricing-engine-v2 mock actualizado
+
+### Verificación
+
+- `npx tsc --noEmit` → 0 errors
+- `pnpm lint` → clean
+- `pnpm build` → Compiled successfully 17.3s
+- `pnpm exec vitest run src/lib/finance/__tests__ src/lib/finance/pricing/__tests__ src/lib/commercial/__tests__/service-catalog-expand.test.ts` → 37 passed / 37
+
+### Cross-impact
+
+- **TASK-466** (multi-currency quote output): Delta añadido documentando cómo consumir el readiness gate + CLIENT_FACING threshold + snapshot a `quotations.exchange_rates`. Desbloqueada.
+- **TASK-397** (management accounting): consumer futuro del readiness layer para costos financieros/treasury.
+- **TASK-429** (locale-aware formatting): formatting multi-moneda ahora tiene currency/fxPolicy contract sólido.
+- **TASK-417** (metric registry foundation): puede declarar `fxPolicy` por métrica usando el enum `FX_POLICIES`.
+- **CLP-normalized consumers** (`operational_pl`, `member_capacity_economics`, `tool-cost-reader`, payroll): sin cambios. Boundary declarada en `CURRENCY_DOMAIN_SUPPORT[reporting|analytics]`.
+
+### Compatibility
+
+- `FinanceCurrency = 'CLP' | 'USD'` NO se expande — compliance rule #5 del spec respetada.
+- `resolvePricingOutputExchangeRate` sigue existiendo (compat path) pero el engine ya no depende de su fallback silencioso.
+- Structured warnings infraestructura de TASK previa reutilizada — `fx_fallback` ya estaba en `PRICING_WARNING_CODES` enum.
+
+### Follow-ups
+
+- Wire providers automáticos para `COP/MXN/PEN` cuando el negocio lo requiera — cambiar su entrada en `CURRENCY_REGISTRY` de `manual_only` a `auto_synced` + implementar fetch. No urgente.
+- Admin UI para upsertar tasas manuales (hoy via API). Queda fuera de scope.
+- TASK-466 consume esta foundation para client-facing send gate.
+
+## Sesion 2026-04-19 — TASK-483 ajustada a worker dedicado para Commercial Cost Basis (Codex)
+
+- **Owner:** Codex
+- **Estado:** backlog + arquitectura actualizados; sin cambios de runtime
+- **Decisión registrada:** el motor `Commercial Cost Basis` no debe crecer como cómputo pesado dentro del portal ni montarse sobre `ops-worker` como hogar permanente. `TASK-483 — Commercial Cost Basis Engine Runtime Topology & Worker Foundation` queda ajustada para formalizar el split:
+  - `portal interactive lane` para preview, composición y lectura de snapshots,
+  - `Cloud Run compute lane` en worker dedicado para materializaciones, repricing batch, backfills y feedback loop.
+- **Rationale:** `ops-worker` ya concentra lanes reactivos y jobs operativos compartidos; sumar ahí el engine comercial mezclaría blast radius, recursos y cadence de deploy.
+- **Docs sincronizados:** `docs/tasks/to-do/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`, `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`, `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`, `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`.
+- **Importante para siguientes agentes:** `TASK-477` a `TASK-482` ya no deben asumir implementación puramente in-app ni montarse en `ops-worker`; revisar `TASK-483` antes de tocar worker placement o jobs batch.
+
+## Sesion 2026-04-19 — Programa Commercial Cost Basis registrado (Codex)
+
+- **Owner:** Codex
+- **Estado:** backlog/documentación ajustada; sin cambios de runtime
+- **Decisión de arquitectura/backlog:** se registró una línea nueva `TASK-476` a `TASK-482` para llevar pricing a un modelo data-driven sin reinventar foundations ya existentes.
+- **Regla explícita del programa:** reusar anchors canónicos del repo:
+  - personas/capacidad: `member_capacity_economics`
+  - payroll factual: `compensation_versions`
+  - roles comerciales: `sellable_roles` + `sellable_role_cost_components`
+  - tooling: `greenhouse_ai.tool_catalog`
+  - vendors: `greenhouse_core.providers`
+  - servicios: `service_pricing` + recipes
+  - FX: `TASK-475`
+- **Importante:** `TASK-471` se endureció como UI/admin polish solamente. No absorbe `Commercial Cost Basis`.
+
 ## Sesion 2026-04-19 — TASK-474 cerrada sin trabajo incremental (Claude)
 
 - **Owner:** Claude

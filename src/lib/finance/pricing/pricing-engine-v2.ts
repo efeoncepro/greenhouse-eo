@@ -27,7 +27,8 @@ import { classifyTierComplianceFromEntry } from './tier-compliance'
 import {
   convertCurrencyAmount,
   convertUsdToPricingCurrency,
-  resolvePricingOutputExchangeRate
+  resolvePricingOutputExchangeRate,
+  resolvePricingOutputFxReadiness
 } from './currency-converter'
 import type {
   DirectCostPricingLineInputV2,
@@ -159,7 +160,8 @@ const defaultPricingEngineV2Dependencies = {
   convertUsdToPricingCurrency,
   convertCurrencyAmount,
   resolvePricingAddons,
-  resolvePricingOutputExchangeRate
+  resolvePricingOutputExchangeRate,
+  resolvePricingOutputFxReadiness
 }
 
 export interface PricingEngineV2Dependencies {
@@ -180,6 +182,7 @@ export interface PricingEngineV2Dependencies {
   convertCurrencyAmount: typeof convertCurrencyAmount
   resolvePricingAddons: typeof resolvePricingAddons
   resolvePricingOutputExchangeRate: typeof resolvePricingOutputExchangeRate
+  resolvePricingOutputFxReadiness: typeof resolvePricingOutputFxReadiness
 }
 
 interface ResolvedLineAccumulator {
@@ -792,6 +795,53 @@ export const buildPricingEngineOutputV2 = async (
       severity: 'critical',
       message: `Factor país "${input.countryFactorCode}" no está en el catálogo. Se aplicó factor neutral (1.00).`,
       context: { attempted: input.countryFactorCode, fallback: 1 }
+    })
+  }
+
+  // FX readiness gate for the output currency (pricing_output domain).
+  // This is the canonical call — do not reimplement the USD→target lookup
+  // inline. If the readiness layer declares the pair unsupported, stale, or
+  // temporarily unavailable, emit a structured warning so the UI can decide
+  // whether to block the send.
+  const fxReadiness = await deps.resolvePricingOutputFxReadiness({
+    currency: input.outputCurrency,
+    rateDate: input.quoteDate
+  })
+
+  if (fxReadiness.state !== 'supported') {
+    const severity =
+      fxReadiness.state === 'unsupported' || fxReadiness.state === 'temporarily_unavailable'
+        ? 'critical'
+        : 'warning'
+
+    pushWarning({
+      code: 'fx_fallback',
+      severity,
+      message: fxReadiness.message,
+      context: {
+        fromCurrency: fxReadiness.fromCurrency,
+        toCurrency: fxReadiness.toCurrency,
+        state: fxReadiness.state,
+        ageDays: fxReadiness.ageDays,
+        stalenessThresholdDays: fxReadiness.stalenessThresholdDays,
+        rateDateResolved: fxReadiness.rateDateResolved,
+        source: fxReadiness.source,
+        composedViaUsd: fxReadiness.composedViaUsd
+      }
+    })
+  } else if (fxReadiness.composedViaUsd) {
+    // Even when supported, surface composition as an `info` note so the user
+    // can verify the inferred rate against their expectation.
+    pushWarning({
+      code: 'fx_fallback',
+      severity: 'info',
+      message: fxReadiness.message,
+      context: {
+        fromCurrency: fxReadiness.fromCurrency,
+        toCurrency: fxReadiness.toCurrency,
+        composedViaUsd: true,
+        rateDateResolved: fxReadiness.rateDateResolved
+      }
     })
   }
 
