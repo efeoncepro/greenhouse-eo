@@ -343,6 +343,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             icon: 'tabler-file-check',
             children: [
               { label: nl(GH_FINANCE_NAV.quotes), href: '/finance/quotes' },
+              { label: nl(GH_FINANCE_NAV.masterAgreements), href: '/finance/master-agreements', icon: 'tabler-file-certificate' },
               { label: nl(GH_FINANCE_NAV.purchaseOrders), href: '/finance/purchase-orders' },
               { label: nl(GH_FINANCE_NAV.hes), href: '/finance/hes' },
               { label: nl(GH_FINANCE_NAV.reconciliation), href: '/finance/reconciliation' }

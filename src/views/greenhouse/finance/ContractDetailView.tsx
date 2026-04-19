@@ -32,6 +32,9 @@ interface ContractDetail {
   contractId: string
   contractNumber: string
   clientName: string | null
+  msaId: string | null
+  msaNumber: string | null
+  msaTitle: string | null
   status: string
   commercialModel: string | null
   staffingModel: string | null
@@ -148,6 +151,9 @@ const normalizeContract = (value: unknown): ContractDetail => {
     contractId: String(row.contractId ?? row.contract_id ?? ''),
     contractNumber: String(row.contractNumber ?? row.contract_number ?? row.contract_id ?? '—'),
     clientName: toStringOrNull(row.clientName ?? row.client_name),
+    msaId: toStringOrNull(row.msaId ?? row.msa_id),
+    msaNumber: toStringOrNull(row.msaNumber ?? row.msa_number),
+    msaTitle: toStringOrNull(row.msaTitle ?? row.msa_title),
     status: String(row.status ?? 'draft'),
     commercialModel: toStringOrNull(row.commercialModel ?? row.commercial_model),
     staffingModel: toStringOrNull(row.staffingModel ?? row.staffing_model),
@@ -303,8 +309,25 @@ const ContractDetailView = () => {
             <CustomChip label={statusMeta.label} color={statusMeta.color} variant='tonal' />
           </Stack>
           <Typography color='text.secondary'>
-            {contract.clientName ?? 'Sin cliente'} · {contract.commercialModel ?? 'Sin commercial model'}
+            {contract.clientName ?? 'Sin cliente'} · {contract.commercialModel ?? 'Sin modelo comercial'}
           </Typography>
+          {contract.msaId && contract.msaNumber ? (
+            <Stack direction='row' spacing={1} alignItems='center' mt={1} flexWrap='wrap'>
+              <Link href={`/finance/master-agreements/${contract.msaId}`} style={{ textDecoration: 'none' }}>
+                <CustomChip
+                  label={`MSA ${contract.msaNumber}`}
+                  color='info'
+                  size='small'
+                  variant='tonal'
+                />
+              </Link>
+              {contract.msaTitle ? (
+                <Typography variant='body2' color='text.secondary'>
+                  {contract.msaTitle}
+                </Typography>
+              ) : null}
+            </Stack>
+          ) : null}
         </Box>
 
         <Link href='/finance/contracts' style={{ textDecoration: 'none' }}>
@@ -379,6 +402,7 @@ const ContractDetailView = () => {
                       <Typography><strong>Cliente:</strong> {contract.clientName ?? 'Sin cliente'}</Typography>
                       <Typography><strong>Modelo comercial:</strong> {contract.commercialModel ?? '—'}</Typography>
                       <Typography><strong>Staffing model:</strong> {contract.staffingModel ?? '—'}</Typography>
+                      <Typography><strong>MSA asociado:</strong> {contract.msaNumber ? `MSA ${contract.msaNumber}` : '—'}</Typography>
                       <Typography><strong>Quote originadora:</strong> {contract.originatorQuoteNumber ?? '—'}</Typography>
                       <Typography><strong>Firmado:</strong> {formatDate(contract.signedAt)}</Typography>
                       <Typography><strong>Renovado:</strong> {formatDate(contract.renewedAt)}</Typography>

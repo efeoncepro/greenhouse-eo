@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.24
+> **Version:** 2.25
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-19 — v2.25: TASK-461 introduce `greenhouse_commercial.master_agreements` como umbrella legal reusable y aterriza la lane MSA end-to-end. Nacen `master_agreements`, `clause_library` y `master_agreement_clauses`, con FK real `greenhouse_commercial.contracts.msa_id -> master_agreements(msa_id)` y seed bilingue de cláusulas legales estándar. `contracts-store` deja de filtrar solo por `space_id` y adopta scope híbrido `organization_id OR space_id`, alineando contracts/MSA con el cutover canónico de quotations de TASK-486. Nuevos stores: `master-agreements-store.ts`, `master-agreement-clauses-store.ts`, `contract-tenant-scope.ts`, `msa-events.ts`; nuevos eventos: `commercial.master_agreement.created|updated|clauses_changed` y `commercial.contract.msa_linked`. Nuevas routes: `GET/POST /api/finance/master-agreements`, `GET/PUT /api/finance/master-agreements/[id]`, `GET/PUT /api/finance/master-agreements/[id]/clauses`, CRUD de clause library, `GET/PUT /api/finance/contracts/[id]/msa`, `GET/POST /api/finance/master-agreements/[id]/signature-requests` y webhook `POST /api/webhooks/zapsign`. Asset system extendido con contextos privados `master_agreement_draft` y `master_agreement`; el PDF firmado se persiste en `greenhouse_core.assets` y no queda delegado a URLs efímeras del proveedor. UI nueva: `/finance/master-agreements` y `/finance/master-agreements/[id]`, además de surfacing `msaId/msaNumber/msaTitle` dentro de `/finance/contracts`. ZapSign queda integrado en modo productivo vía `ZAPSIGN_API_TOKEN` + webhook shared secret; sandbox no forma parte del contrato actual porque el token operativo validado corresponde al entorno productivo.
 > **Updated:** 2026-04-19 — v2.23: TASK-486 Canonical Anchor (Organization + Contact). `greenhouse_commercial.quotations` adopta `organization_id` como anchor canónico y suma `contact_identity_profile_id` (FK `greenhouse_core.identity_profiles(profile_id)`). `space_id` y `space_resolution_source` quedan deprecated en el write path del builder y del HubSpot sync (columnas preservadas por compatibilidad con quote-to-cash legacy readers — no drop físico en v1). Tenant scoping de quotes migró de `q.space_id = ANY(...)` a `q.organization_id = ANY(...)` via `resolveFinanceQuoteTenantOrganizationIds`; consumidores actualizados: `listFinanceQuotesFromCanonical`, `getFinanceQuoteDetailFromCanonical`, `listFinanceQuoteLinesFromCanonical`, `pricing-catalog-impact-analysis.loadOpenQuoteRows` + sus 4 preview-impact endpoints. `POST /api/finance/quotes` exige `organizationId` (400 si falta, 404 si la org no existe o está inactiva) y acepta `contactIdentityProfileId` opcional validado contra `person_memberships` activa con `membership_type IN ('client_contact','client_user','contact','billing','partner','advisor')` — `team_member` y `contractor` se excluyen porque no aplican como contacto comercial. `PUT /api/finance/quotes/[id]` replica la validación y permite set/clear del contacto. Nuevo endpoint `GET /api/commercial/organizations/[id]/contacts` devuelve los candidatos filtrados por membership_type + tenant isolation. Quote Builder UI: label "Espacio destinatario" → "Organización (cliente o prospecto)"; segundo dropdown "Contacto" con fetch async al seleccionar la org (ordenado por `is_primary DESC`, marcador "Principal" en el item). HubSpot sync simplificado: `resolveSpaceForCompany` → `resolveOrganizationForCompany`; payload de `quote.synced` deja de llevar `spaceId` (siempre null). Detail response del GET canonical expone objetos `organization` y `contact` completos via join a `identity_profiles` + `person_memberships`. `organization_id` queda NULLABLE a nivel DB (backfill preservó legacy orphans sin data loss); enforcement en la capa API. Follow-up data remediation task cerrará orphans antes de un v2 `SET NOT NULL`. Sinergia: TASK-466 (multi-currency quote send) usará el contrato "org + contact" como pre-requisito mínimo; TASK-481 (Quote Builder Suggested Cost UX) se integra post-TASK-486 sin colisión.
 > **Updated:** 2026-04-19 — v2.24: TASK-477 formaliza `role_modeled` sobre el catálogo real. `sellable_role_cost_components` gana overhead/provenance/confidence (`direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score`) y columnas generadas para loaded cost / confidence label. Nace `greenhouse_commercial.role_modeled_cost_basis_snapshots`, `pricing-engine-v2` consume el lane modelado via reader explícito manteniendo precedencia `role_blended -> role_modeled`, y `commercial-cost-worker` activa `POST /cost-basis/materialize/roles`. El admin pricing catalog reutiliza el mismo drawer de roles para editar overhead y mostrar loaded cost + confidence.
 > **Updated:** 2026-04-19 — v2.22: TASK-470 enterprise hardening del pricing catalog backend. Se agregan `ETag` + `If-Match` en routes admin de catálogo con deprecation header `X-Deprecated-No-If-Match`, validator central `pricing-catalog-constraints.ts`, dry-run `preview-impact` para roles/tools/overheads/governance y scope tenant-safe via `resolveFinanceQuoteTenantSpaceIds()`. El blast radius de `tool_catalog` queda heurístico por texto de line items y `country_pricing_factor` sigue conservador hasta que exista un bridge quote↔country.
@@ -81,6 +82,40 @@
 - Boundary explícito:
   - `msa_id` queda reservado como referencia futura; no hay FK real hasta TASK-461
   - el schema snapshot baseline no refleja esta lane; la verdad operativa para contracts es migración + `db.d.ts`
+
+---
+
+## Delta 2026-04-19 — TASK-461 Master Agreements / Clause Library / ZapSign
+
+- Nueva lane legal-commercial sobre el dominio contractual:
+  - `greenhouse_commercial.master_agreements`
+  - `greenhouse_commercial.clause_library`
+  - `greenhouse_commercial.master_agreement_clauses`
+- `master_agreements` modela el umbrella legal reusable:
+  - `msa_id`, `msa_number`
+  - `organization_id` + `client_id`
+  - `effective_date`, `expiration_date`, renovación y metadata legal
+  - estado `draft | active | expired | terminated | superseded`
+  - asset firmado + metadata de firma electrónica (`signature_provider`, `signature_document_token`, `signature_status`, `signature_payload`)
+- `clause_library` queda como catálogo versionado por `clause_code + version + language`, con categorías legales y variables por plantilla.
+- `master_agreement_clauses` pincha versión/language exactos al momento de asociar el MSA y permite body override + variables resueltas.
+- Contrato operativo actualizado:
+  - `greenhouse_commercial.contracts.msa_id` ya tiene FK real
+  - `resolveContractClauses(contractId)` resuelve la herencia efectiva de cláusulas desde el MSA
+  - readers de contracts dejan de depender solo de `space_id` y pasan a resolver tenant scope híbrido `organization_id OR space_id`
+- Eventos nuevos:
+  - `commercial.master_agreement.created`
+  - `commercial.master_agreement.updated`
+  - `commercial.master_agreement.clauses_changed`
+  - `commercial.contract.msa_linked`
+- Superficies nuevas:
+  - `/finance/master-agreements`
+  - `/finance/master-agreements/[id]`
+  - chips y links de MSA dentro de `/finance/contracts` y `/finance/contracts/[id]`
+- Firma electrónica:
+  - `POST /api/finance/master-agreements/[id]/signature-requests` crea o consulta solicitudes de firma en ZapSign
+  - `POST /api/webhooks/zapsign` sincroniza estado y captura el PDF firmado como asset privado Greenhouse
+  - el runtime usa `ZAPSIGN_API_TOKEN` y `ZAPSIGN_WEBHOOK_SHARED_SECRET`; el token operativo validado corresponde a producción, no sandbox
 
 ---
 

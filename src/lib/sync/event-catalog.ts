@@ -102,6 +102,7 @@ export const AGGREGATE_TYPES = {
   commercialCapacity: 'commercial_capacity',
   contract: 'contract',
   contractQuote: 'contract_quote',
+  masterAgreement: 'master_agreement',
   deal: 'deal',
   productCatalog: 'product_catalog',
   sellableRole: 'sellable_role',
@@ -380,6 +381,10 @@ export const EVENT_TYPES = {
   contractCompleted: 'commercial.contract.completed',
   contractRenewalDue: 'commercial.contract.renewal_due',
   contractProfitabilityMaterialized: 'commercial.contract.profitability_materialized',
+  masterAgreementCreated: 'commercial.master_agreement.created',
+  masterAgreementUpdated: 'commercial.master_agreement.updated',
+  masterAgreementClausesChanged: 'commercial.master_agreement.clauses_changed',
+  contractMsaLinked: 'commercial.contract.msa_linked',
 
   // Unified Quote Builder HubSpot bidirectional outbound (TASK-463)
   quotationPushedToHubSpot: 'commercial.quotation.pushed_to_hubspot',

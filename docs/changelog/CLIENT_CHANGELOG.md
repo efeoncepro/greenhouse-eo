@@ -42,6 +42,30 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.21
+
+**Canal:** Beta
+**Fecha:** 2026-04-19
+**Disponible para:** internal
+**Módulos:** Finanzas / Contratos / Acuerdos marco
+
+### Novedades
+
+- Finanzas ahora tiene una lane nueva de **Acuerdos marco** para registrar el marco legal reusable de clientes enterprise y ver qué contratos operan bajo ese acuerdo.
+
+### Mejoras
+
+- La ficha de contrato ahora puede mostrar el MSA asociado y enlazarlo directamente, en vez de dejar esa relación fuera del portal.
+- El acuerdo marco conserva sus cláusulas legales versionadas y el documento firmado dentro del vault privado de Greenhouse.
+
+### Correcciones
+
+- Los contratos post-venta ya no quedan amarrados solo a un `space` legacy cuando el anchor comercial vigente es la organización del cliente.
+
+### Notas
+
+- La base de firma electrónica queda integrada con ZapSign para ambientes que publiquen sus credenciales; el rollout visible depende de la configuración de secretos en cada entorno.
+
 ## 2026.04-beta.20
 
 **Canal:** Beta

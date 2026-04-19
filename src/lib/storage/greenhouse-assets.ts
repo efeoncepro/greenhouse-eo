@@ -51,9 +51,10 @@ type AssetRow = {
 const PRIVATE_USER_ALLOWED_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
 const SYSTEM_ALLOWED_MIME_TYPES = new Set([...PRIVATE_USER_ALLOWED_MIME_TYPES, 'text/csv', 'text/csv; charset=utf-8'])
 
-const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>, number> = {
+const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'>, number> = {
   leave_request_draft: 10 * 1024 * 1024,
   purchase_order_draft: 10 * 1024 * 1024,
+  master_agreement_draft: 25 * 1024 * 1024,
   certification_draft: 10 * 1024 * 1024,
   evidence_draft: 10 * 1024 * 1024
 }
@@ -63,6 +64,8 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   leave_request: 'hr_leave',
   purchase_order_draft: 'finance_purchase_order',
   purchase_order: 'finance_purchase_order',
+  master_agreement_draft: 'document_vault',
+  master_agreement: 'document_vault',
   payroll_receipt: 'payroll_receipt',
   payroll_export_pdf: 'payroll_export',
   payroll_export_csv: 'payroll_export',
@@ -77,6 +80,8 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   leave_request: 'leave',
   purchase_order_draft: 'purchase-orders',
   purchase_order: 'purchase-orders',
+  master_agreement_draft: 'master-agreements',
+  master_agreement: 'master-agreements',
   payroll_receipt: 'payroll-receipts',
   payroll_export_pdf: 'payroll-export-packages',
   payroll_export_csv: 'payroll-export-packages',
@@ -257,7 +262,7 @@ const assertPrivateAssetUpload = ({
   contentType,
   sizeBytes
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'>
   contentType: string
   sizeBytes: number
 }) => {
@@ -322,7 +327,7 @@ export const createPrivatePendingAsset = async ({
   ownerMemberId,
   metadata
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'>
   uploadedByUserId: string
   fileName: string
   contentType: string
@@ -556,7 +561,10 @@ export const upsertSystemGeneratedAsset = async ({
   metadata
 }: {
   assetId?: string | null
-  ownerAggregateType: Extract<GreenhouseAssetContext, 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv'>
+  ownerAggregateType: Extract<
+    GreenhouseAssetContext,
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv'
+  >
   ownerAggregateId: string
   ownerClientId?: string | null
   ownerSpaceId?: string | null
@@ -652,6 +660,74 @@ export const upsertSystemGeneratedAsset = async ({
   return mapAssetRow(rows[0])
 }
 
+export const storeSystemGeneratedPrivateAsset = async ({
+  assetId,
+  ownerAggregateType,
+  ownerAggregateId,
+  ownerClientId,
+  ownerSpaceId,
+  ownerMemberId,
+  fileName,
+  mimeType,
+  bytes,
+  actorUserId,
+  metadata
+}: {
+  assetId?: string | null
+  ownerAggregateType: Extract<
+    GreenhouseAssetContext,
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv'
+  >
+  ownerAggregateId: string
+  ownerClientId?: string | null
+  ownerSpaceId?: string | null
+  ownerMemberId?: string | null
+  fileName: string
+  mimeType: string
+  bytes: ArrayBuffer | Uint8Array | Buffer
+  actorUserId?: string | null
+  metadata?: Record<string, unknown>
+}) => {
+  const nextAssetId = assetId || buildAssetId()
+
+  const objectPath = buildObjectPath({
+    contextType: ownerAggregateType,
+    assetId: nextAssetId,
+    fileName
+  })
+
+  const bucketName = getGreenhousePrivateAssetsBucket()
+
+  await uploadGreenhouseStorageObject({
+    bucketName,
+    objectName: objectPath,
+    contentType: mimeType,
+    bytes
+  })
+
+  const sizeBytes = Buffer.isBuffer(bytes)
+    ? bytes.byteLength
+    : bytes instanceof Uint8Array
+      ? bytes.byteLength
+      : bytes.byteLength
+
+  return upsertSystemGeneratedAsset({
+    assetId: nextAssetId,
+    ownerAggregateType,
+    ownerAggregateId,
+    ownerClientId,
+    ownerSpaceId,
+    ownerMemberId,
+    bucketName,
+    objectPath,
+    fileName,
+    mimeType,
+    sizeBytes,
+    actorUserId,
+    metadata
+  })
+}
+
 const canAccessLeaveAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
   if (asset.ownerMemberId && tenant.memberId && asset.ownerMemberId === tenant.memberId) {
     return true
@@ -661,6 +737,9 @@ const canAccessLeaveAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord
 }
 
 const canAccessPurchaseOrderAsset = (tenant: TenantContext) =>
+  hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
+const canAccessMasterAgreementAsset = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 const canAccessPayrollReceiptAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
@@ -696,6 +775,9 @@ export const canTenantAccessAsset = ({
     case 'purchase_order_draft':
     case 'purchase_order':
       return canAccessPurchaseOrderAsset(tenant)
+    case 'master_agreement_draft':
+    case 'master_agreement':
+      return canAccessMasterAgreementAsset(tenant)
     case 'payroll_receipt':
       return canAccessPayrollReceiptAsset(tenant, asset)
     case 'payroll_export_pdf':

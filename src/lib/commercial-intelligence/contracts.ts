@@ -154,6 +154,9 @@ export interface ContractListRow {
   contractNumber: string
   clientId: string | null
   clientName: string | null
+  msaId: string | null
+  msaNumber: string | null
+  msaTitle: string | null
   organizationId: string | null
   spaceId: string | null
   status: ContractStatus

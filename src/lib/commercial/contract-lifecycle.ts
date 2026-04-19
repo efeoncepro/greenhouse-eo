@@ -235,8 +235,8 @@ export const ensureContractForQuotation = async ({
       throw new Error(`Quotation ${quotationId} not found.`)
     }
 
-    if (!quote.space_id) {
-      throw new Error(`Quotation ${quotationId} has no space_id; cannot promote to contract.`)
+    if (!quote.organization_id && !quote.space_id) {
+      throw new Error(`Quotation ${quotationId} has no organization_id or space_id; cannot promote to contract.`)
     }
 
     const derivedStatus = deriveContractStatus(String(quote.status))

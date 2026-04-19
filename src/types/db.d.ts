@@ -189,6 +189,25 @@ export interface GreenhouseCommercialApprovalSteps {
   version_number: number;
 }
 
+export interface GreenhouseCommercialClauseLibrary {
+  active: Generated<boolean>;
+  body_template: string;
+  category: string;
+  clause_code: string;
+  clause_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  default_variables: Generated<Json>;
+  language: Generated<string>;
+  required: Generated<boolean>;
+  sort_order: Generated<number>;
+  summary: string | null;
+  title: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string | null;
+  version: Generated<number>;
+}
+
 export interface GreenhouseCommercialCommercialCostBasisSnapshots {
   basis_scope: string;
   client_id: string | null;
@@ -381,6 +400,59 @@ export interface GreenhouseCommercialMarginTargets {
   target_id: Generated<string>;
   target_margin_pct: Numeric;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialMasterAgreementClauses {
+  body_override: string | null;
+  clause_code: string;
+  clause_id: string;
+  clause_language: Generated<string>;
+  clause_version: number;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  effective_from: Timestamp | null;
+  effective_to: Timestamp | null;
+  included: Generated<boolean>;
+  msa_clause_id: Generated<string>;
+  msa_id: string;
+  notes: string | null;
+  sort_order: Generated<number>;
+  updated_at: Generated<Timestamp>;
+  updated_by: string | null;
+  variables_json: Generated<Json>;
+}
+
+export interface GreenhouseCommercialMasterAgreements {
+  auto_renewal: Generated<boolean>;
+  client_id: string | null;
+  counterparty_name: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  currency: Generated<string>;
+  effective_date: Timestamp;
+  expiration_date: Timestamp | null;
+  governing_law: string | null;
+  internal_notes: string | null;
+  jurisdiction: string | null;
+  msa_id: Generated<string>;
+  msa_number: string;
+  organization_id: string;
+  payment_terms_days: number | null;
+  renewal_frequency_months: number | null;
+  renewal_notice_days: Generated<number>;
+  signature_document_token: string | null;
+  signature_last_synced_at: Timestamp | null;
+  signature_payload: Generated<Json>;
+  signature_provider: string | null;
+  signature_status: string | null;
+  signed_at: Timestamp | null;
+  signed_by_client: string | null;
+  signed_by_efeonce: string | null;
+  signed_document_asset_id: string | null;
+  status: Generated<string>;
+  title: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string | null;
 }
 
 export interface GreenhouseCommercialMemberRoleCostBasisSnapshots {
@@ -5570,6 +5642,7 @@ export interface DB {
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
+  "greenhouse_commercial.clause_library": GreenhouseCommercialClauseLibrary;
   "greenhouse_commercial.commercial_cost_basis_snapshots": GreenhouseCommercialCommercialCostBasisSnapshots;
   "greenhouse_commercial.commercial_model_multipliers": GreenhouseCommercialCommercialModelMultipliers;
   "greenhouse_commercial.contract_quotes": GreenhouseCommercialContractQuotes;
@@ -5582,6 +5655,8 @@ export interface DB {
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
+  "greenhouse_commercial.master_agreement_clauses": GreenhouseCommercialMasterAgreementClauses;
+  "greenhouse_commercial.master_agreements": GreenhouseCommercialMasterAgreements;
   "greenhouse_commercial.member_role_cost_basis_snapshots": GreenhouseCommercialMemberRoleCostBasisSnapshots;
   "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;

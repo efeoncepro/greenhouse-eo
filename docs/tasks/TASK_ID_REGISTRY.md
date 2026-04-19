@@ -510,7 +510,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-458` | `to-do`       | Honest-label quick fix — reframe "Pipeline" sub-tab (TASK-351 follow-up) | `docs/tasks/to-do/TASK-458-honest-label-pipeline-fix.md` |
 | `TASK-459` | `to-do`       | Delivery Model Refinement (commercial + staffing orthogonal) | `docs/tasks/to-do/TASK-459-delivery-model-refinement.md` |
 | `TASK-460` | `complete`    | Contract/SOW Canonical Entity & Lifecycle | `docs/tasks/complete/TASK-460-contract-sow-canonical-entity.md` |
-| `TASK-461` | `to-do`       | MSA Umbrella Entity & Clause Library | `docs/tasks/to-do/TASK-461-msa-umbrella-clause-library.md` |
+| `TASK-461` | `complete` | MSA Umbrella Entity & Clause Library | `docs/tasks/complete/TASK-461-msa-umbrella-clause-library.md` |
 | `TASK-462` | `to-do`       | MRR/ARR Contractual Projection & Dashboard | `docs/tasks/to-do/TASK-462-mrr-arr-contractual-projection-dashboard.md` |
 | `TASK-463` | `to-do`       | Unified Quote Builder + Bidirectional HubSpot Bridge | `docs/tasks/to-do/TASK-463-unified-quote-builder-hubspot-bidirectional.md` |
 | `TASK-464a` | `to-do`      | Sellable Roles Catalog Canonical + Seed | `docs/tasks/to-do/TASK-464a-sellable-roles-catalog-canonical.md` |

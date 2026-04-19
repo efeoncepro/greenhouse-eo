@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
-import { resolveFinanceQuoteTenantSpaceIds } from '@/lib/finance/quotation-canonical-store'
+import { resolveFinanceContractTenantScope } from '@/lib/commercial/contract-tenant-scope'
 import type {
   ContractDetailRow,
   ContractListRow,
@@ -19,6 +19,9 @@ interface ContractListDbRow extends Record<string, unknown> {
   contract_number: string
   client_id: string | null
   client_name: string | null
+  msa_id: string | null
+  msa_number: string | null
+  msa_title: string | null
   organization_id: string | null
   space_id: string | null
   status: string
@@ -131,6 +134,9 @@ const mapContractListRow = (row: ContractListDbRow): ContractListRow => ({
   contractNumber: String(row.contract_number),
   clientId: row.client_id ? String(row.client_id) : null,
   clientName: row.client_name ? String(row.client_name) : null,
+  msaId: row.msa_id ? String(row.msa_id) : null,
+  msaNumber: row.msa_number ? String(row.msa_number) : null,
+  msaTitle: row.msa_title ? String(row.msa_title) : null,
   organizationId: row.organization_id ? String(row.organization_id) : null,
   spaceId: row.space_id ? String(row.space_id) : null,
   status: String(row.status) as ContractStatus,
@@ -198,14 +204,8 @@ const mapProfitabilityRow = (row: ContractProfitabilityDbRow): ContractProfitabi
   materializedAt: toIsoTs(row.materialized_at) ?? new Date().toISOString()
 })
 
-const buildTenantSpaceScope = async (tenant: TenantContext) => {
-  const spaceIds = await resolveFinanceQuoteTenantSpaceIds(tenant)
-
-  return {
-    spaceIds,
-    hasScope: spaceIds.length > 0
-  }
-}
+const buildContractScope = async (tenant: TenantContext) =>
+  resolveFinanceContractTenantScope(tenant)
 
 export const listFinanceContracts = async ({
   tenant,
@@ -216,12 +216,24 @@ export const listFinanceContracts = async ({
   status?: ContractStatus | null
   clientId?: string | null
 }): Promise<ContractListRow[]> => {
-  const { spaceIds, hasScope } = await buildTenantSpaceScope(tenant)
+  const { organizationIds, spaceIds, hasScope } = await buildContractScope(tenant)
 
   if (!hasScope) return []
 
-  const values: unknown[] = [spaceIds]
-  const conditions = ['c.space_id = ANY($1::text[])']
+  const values: unknown[] = []
+  const scopeConditions: string[] = []
+
+  if (organizationIds.length > 0) {
+    values.push(organizationIds)
+    scopeConditions.push(`c.organization_id = ANY($${values.length}::text[])`)
+  }
+
+  if (spaceIds.length > 0) {
+    values.push(spaceIds)
+    scopeConditions.push(`c.space_id = ANY($${values.length}::text[])`)
+  }
+
+  const conditions = [`(${scopeConditions.join(' OR ')})`]
 
   if (status) {
     values.push(status)
@@ -239,6 +251,9 @@ export const listFinanceContracts = async ({
        c.contract_number,
        c.client_id,
        cl.client_name,
+       c.msa_id,
+       ma.msa_number,
+       ma.title AS msa_title,
        c.organization_id,
        c.space_id,
        c.status,
@@ -269,6 +284,8 @@ export const listFinanceContracts = async ({
      FROM greenhouse_commercial.contracts c
      LEFT JOIN greenhouse_core.clients cl
        ON cl.client_id = c.client_id
+     LEFT JOIN greenhouse_commercial.master_agreements ma
+       ON ma.msa_id = c.msa_id
      LEFT JOIN greenhouse_commercial.quotations q
        ON q.quotation_id = c.originator_quote_id
      WHERE ${conditions.join(' AND ')}
@@ -289,9 +306,22 @@ export const getFinanceContractDetail = async ({
   tenant: TenantContext
   contractId: string
 }): Promise<ContractDetailRow | null> => {
-  const { spaceIds, hasScope } = await buildTenantSpaceScope(tenant)
+  const { organizationIds, spaceIds, hasScope } = await buildContractScope(tenant)
 
   if (!hasScope) return null
+
+  const values: unknown[] = [contractId]
+  const scopeConditions: string[] = []
+
+  if (organizationIds.length > 0) {
+    values.push(organizationIds)
+    scopeConditions.push(`c.organization_id = ANY($${values.length}::text[])`)
+  }
+
+  if (spaceIds.length > 0) {
+    values.push(spaceIds)
+    scopeConditions.push(`c.space_id = ANY($${values.length}::text[])`)
+  }
 
   const rows = await query<ContractListDbRow>(
     `SELECT
@@ -299,6 +329,9 @@ export const getFinanceContractDetail = async ({
        c.contract_number,
        c.client_id,
        cl.client_name,
+       c.msa_id,
+       ma.msa_number,
+       ma.title AS msa_title,
        c.organization_id,
        c.space_id,
        c.status,
@@ -334,12 +367,14 @@ export const getFinanceContractDetail = async ({
      FROM greenhouse_commercial.contracts c
      LEFT JOIN greenhouse_core.clients cl
        ON cl.client_id = c.client_id
+     LEFT JOIN greenhouse_commercial.master_agreements ma
+       ON ma.msa_id = c.msa_id
      LEFT JOIN greenhouse_commercial.quotations q
        ON q.quotation_id = c.originator_quote_id
      WHERE c.contract_id = $1
-       AND c.space_id = ANY($2::text[])
+       AND (${scopeConditions.join(' OR ')})
      LIMIT 1`,
-    [contractId, spaceIds]
+    values
   )
 
   const contract = rows[0]
@@ -411,12 +446,24 @@ export const listContractProfitabilitySnapshots = async ({
   periodMonth?: number | null
   driftSeverity?: DriftSeverity | null
 }): Promise<ContractProfitabilitySnapshotRow[]> => {
-  const { spaceIds, hasScope } = await buildTenantSpaceScope(tenant)
+  const { organizationIds, spaceIds, hasScope } = await buildContractScope(tenant)
 
   if (!hasScope) return []
 
-  const values: unknown[] = [spaceIds]
-  const conditions = ['s.space_id = ANY($1::text[])']
+  const values: unknown[] = []
+  const scopeConditions: string[] = []
+
+  if (organizationIds.length > 0) {
+    values.push(organizationIds)
+    scopeConditions.push(`s.organization_id = ANY($${values.length}::text[])`)
+  }
+
+  if (spaceIds.length > 0) {
+    values.push(spaceIds)
+    scopeConditions.push(`s.space_id = ANY($${values.length}::text[])`)
+  }
+
+  const conditions = [`(${scopeConditions.join(' OR ')})`]
 
   if (contractId) {
     values.push(contractId)

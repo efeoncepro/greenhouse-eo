@@ -14,6 +14,15 @@
 - Verificación: tsc 0 errors · lint clean · build compiled.
 - Impacto global: futuras tareas UI parten con restricciones design-time; las 3 skills se cargan automáticamente según contexto. Reusabilidad: `ContextChip` con search disponible para invoice/PO/contract builders.
 
+### 2026-04-19 — TASK-461 MSA Umbrella Entity & Clause Library
+
+- Nace la lane de **Acuerdos marco** en Finance: `/finance/master-agreements` y `/finance/master-agreements/[id]`, con lista, detalle, cláusulas versionadas, contratos vinculados y metadata legal del MSA.
+- Se crean `greenhouse_commercial.master_agreements`, `clause_library` y `master_agreement_clauses`, además de la FK real `greenhouse_commercial.contracts.msa_id -> master_agreements(msa_id)`. El seed inicial deja 24 cláusulas bilingües sobre 12 códigos legales estándar.
+- `contracts-store` deja de depender solo de `space_id` y pasa a filtrar con scope híbrido `organization_id OR space_id`, alineando los contratos post-venta con el anchor canónico por organización introducido en TASK-486.
+- Nuevo backend: stores `master-agreements-store.ts` + `master-agreement-clauses-store.ts`, eventos `commercial.master_agreement.created|updated|clauses_changed` y `commercial.contract.msa_linked`, APIs `/api/finance/master-agreements/**` y `/api/finance/contracts/[id]/msa`.
+- Asset system extendido con contextos privados `master_agreement_draft` y `master_agreement`. Los contratos pueden adjuntar PDF borrador y persistir el PDF firmado como asset privado canónico.
+- Base de firma electrónica con ZapSign: cliente oficial encapsulado en `src/lib/integrations/zapsign/client.ts`, endpoint `POST /api/finance/master-agreements/[id]/signature-requests` y webhook `POST /api/webhooks/zapsign` que guarda el firmado en Greenhouse. El token operativo validado corresponde a producción, no sandbox.
+
 ### 2026-04-19 — TASK-487 Quote Builder Command Bar Redesign (Enterprise Pattern)
 
 - `/finance/quotes/new` y `/finance/quotes/[id]/edit` migran al patrón Command Bar enterprise (Linear/Stripe/Ramp/Pilot). 4 layers verticales apilados — Identity Strip, Context Chips Strip, Document Surface, Floating Summary Dock — reemplazan el Grid 8/4 con sidebar vertical. El documento gana ~33% de ancho disponible (de ~700px a ~1200px en 1440 viewport).

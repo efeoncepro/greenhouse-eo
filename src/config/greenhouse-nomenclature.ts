@@ -73,6 +73,7 @@ export const GH_FINANCE_NAV = {
   intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
   quotes: { label: 'Cotizaciones', subtitle: 'Cotizaciones de Nubox y HubSpot en un solo lugar' },
   contracts: { label: 'Contratos', subtitle: 'SOWs, renovaciones y ejecución comercial activa' },
+  masterAgreements: { label: 'Acuerdos marco', subtitle: 'MSAs, cláusulas maestras y contratos vinculados' },
   products: { label: 'Productos', subtitle: 'Catalogo de productos y servicios sincronizado con HubSpot' },
   purchaseOrders: { label: 'Órdenes de compra', subtitle: 'OC de clientes, saldos y consumo' },
   hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' },

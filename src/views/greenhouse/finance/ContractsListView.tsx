@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
@@ -30,6 +31,9 @@ interface ContractListItem {
   contractId: string
   contractNumber: string
   clientName: string | null
+  msaId: string | null
+  msaNumber: string | null
+  msaTitle: string | null
   status: ContractStatus | string
   commercialModel: string | null
   staffingModel: string | null
@@ -105,6 +109,9 @@ const normalizeContract = (value: unknown): ContractListItem => {
     contractId: String(row.contractId ?? row.contract_id ?? ''),
     contractNumber: String(row.contractNumber ?? row.contract_number ?? row.contract_id ?? '—'),
     clientName: toStringOrNull(row.clientName ?? row.client_name),
+    msaId: toStringOrNull(row.msaId ?? row.msa_id),
+    msaNumber: toStringOrNull(row.msaNumber ?? row.msa_number),
+    msaTitle: toStringOrNull(row.msaTitle ?? row.msa_title),
     status: String(row.status ?? 'draft'),
     commercialModel: toStringOrNull(row.commercialModel ?? row.commercial_model),
     staffingModel: toStringOrNull(row.staffingModel ?? row.staffing_model),
@@ -284,11 +291,28 @@ const ContractsListView = () => {
                                 <Box>
                                   <Typography fontWeight={600}>{item.contractNumber}</Typography>
                                   <Typography variant='body2' color='text.secondary'>
-                                    {item.staffingModel ? `Staffing ${item.staffingModel.replace(/_/g, ' ')}` : 'Sin staffing model'}
+                                    {item.staffingModel ? `Modelo de staffing ${item.staffingModel.replace(/_/g, ' ')}` : 'Sin modelo de staffing'}
                                   </Typography>
+                                  {item.msaId && item.msaNumber ? (
+                                    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
+                                      <Link href={`/finance/master-agreements/${item.msaId}`} style={{ textDecoration: 'none' }}>
+                                        <CustomChip
+                                          label={`MSA ${item.msaNumber}`}
+                                          color='info'
+                                          size='small'
+                                          variant='tonal'
+                                        />
+                                      </Link>
+                                      {item.msaTitle ? (
+                                        <Typography variant='caption' color='text.secondary'>
+                                          {item.msaTitle}
+                                        </Typography>
+                                      ) : null}
+                                    </Stack>
+                                  ) : null}
                                 </Box>
                               </Stack>
-                              <CustomChip label={statusMeta.label} color={statusMeta.color} size='small' variant='tonal' />
+                            <CustomChip label={statusMeta.label} color={statusMeta.color} size='small' variant='tonal' />
                             </Stack>
                           </TableCell>
                           <TableCell>{item.clientName ?? 'Sin cliente'}</TableCell>

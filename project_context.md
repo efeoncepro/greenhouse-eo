@@ -1,3 +1,23 @@
+## Delta 2026-04-19 TASK-461 introduce MSA, clause library y firma electrónica ZapSign para contratos marco
+
+- Runtime nuevo:
+  - migración `20260419170002315_task-461-msa-umbrella-clause-library.sql`
+  - tablas `greenhouse_commercial.master_agreements`, `greenhouse_commercial.clause_library` y `greenhouse_commercial.master_agreement_clauses`
+  - FK real `greenhouse_commercial.contracts.msa_id -> greenhouse_commercial.master_agreements(msa_id)`
+  - stores `src/lib/commercial/master-agreements-store.ts`, `src/lib/commercial/master-agreement-clauses-store.ts`, `src/lib/commercial/contract-tenant-scope.ts`
+  - integración `src/lib/integrations/zapsign/client.ts`
+- Contrato operativo:
+  - `contract` deja de depender solo de `space_id` para tenant scoping y resuelve un scope híbrido `organization_id OR space_id` mientras convive con contratos legacy
+  - `master_agreement` pasa a ser el umbrella legal reusable para múltiples SOWs, con cláusulas versionadas y PDF firmado como asset privado
+  - la chain documental de MSA usa `greenhouse_core.assets` con contextos `master_agreement_draft` y `master_agreement`
+  - ZapSign queda integrado en modo productivo via API + webhook (`/api/webhooks/zapsign`); el runtime debe usar `ZAPSIGN_API_TOKEN` y `ZAPSIGN_WEBHOOK_SHARED_SECRET` desde env o Secret Manager, nunca desde `data/`
+- Variables nuevas:
+  - `ZAPSIGN_API_BASE_URL` (default `https://api.zapsign.com.br`)
+  - `ZAPSIGN_API_TOKEN`
+  - `ZAPSIGN_API_TOKEN_SECRET_REF`
+  - `ZAPSIGN_WEBHOOK_SHARED_SECRET`
+  - `ZAPSIGN_WEBHOOK_SHARED_SECRET_SECRET_REF`
+
 ## Delta 2026-04-19 TASK-477 formaliza role_modeled con provenance, confidence y batch worker
 
 - Runtime nuevo:

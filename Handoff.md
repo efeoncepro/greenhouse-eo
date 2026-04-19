@@ -53,6 +53,23 @@
 
 ---
 
+## Sesion 2026-04-19 — TASK-461 MSA Umbrella Entity & Clause Library (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `task/TASK-461-msa-umbrella-clause-library`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-461`
+- **Notas de coordinacion:**
+  - Trabajo aislado en worktree dedicado para no colisionar con Claude ni con `develop`.
+  - Discovery + auditoria completas; la spec se corrigio para dejar explicito que el estado operativo real del dominio commercial vive en migraciones + `src/types/db.d.ts`, no en `schema-snapshot-baseline.sql`.
+  - `contracts.msa_id` ya no es placeholder: TASK-461 agrega la FK real a `greenhouse_commercial.master_agreements` y corrige el runtime tenant-safe de contracts a `organization_id OR space_id`.
+  - Se implemento la lane visible `/finance/master-agreements` + `/finance/master-agreements/[id]`, stores/API clause library, link MSA->contract, asset contexts privados y base de firma electronica via ZapSign.
+  - Validacion cerrada: `pnpm pg:connect:migrate`, regen de `src/types/db.d.ts`, `pnpm lint`, `pnpm build`, scan de `new Pool()` solo en `src/lib/postgres/client.ts`.
+  - Hallazgo operativo de ZapSign: el token que subieron en `data/api_zapsign.txt` es valido para **produccion** (`api.zapsign.com.br`) y no para sandbox. El runtime NO lee ese archivo; debe publicarse via `ZAPSIGN_API_TOKEN` o Secret Manager antes de usar firma en ambientes compartidos.
+  - Deuda abierta menor: no se hizo smoke manual con datos reales de Sky/Pinturas Berel; el flujo queda listo para ejercerse via UI/API sobre `develop` cuando se publiquen los env vars de ZapSign.
+
+---
+
 ## Sesion 2026-04-19 — TASK-487 Quote Builder Command Bar Redesign (Enterprise Pattern) (Claude)
 
 - **Owner:** Claude

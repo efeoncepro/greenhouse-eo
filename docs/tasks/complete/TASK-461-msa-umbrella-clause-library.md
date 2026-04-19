@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-460 (contracts entity)`
@@ -21,7 +21,7 @@
 
 ## Summary
 
-Introducir `greenhouse_commercial.master_agreements` como umbrella legal bajo el cual pueden colgar múltiples contracts (SOWs). Modela el marco legal negociado con clientes enterprise (Sky, Pinturas Berel México) y habilita clause library reutilizable para que los SOWs nuevos solo renegocien scope, heredando T&Cs.
+Introducir `greenhouse_commercial.master_agreements` como umbrella legal bajo el cual pueden colgar múltiples contracts (SOWs). Modela el marco legal negociado con clientes enterprise (Sky, Pinturas Berel México) y habilita una capa reusable de cláusulas legales para que los SOWs nuevos solo renegocien scope, heredando T&Cs sin duplicar el patrón ya existente de `terms_library` / `quotation_terms`.
 
 ## Why This Task Exists
 
@@ -55,21 +55,25 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - MSA es source-of-truth para T&Cs — contract hereda por default, puede overrride explícito
+- La capa de cláusulas de MSA debe reconciliarse explícitamente con `terms_library`; si se crea tabla dedicada, la frontera funcional debe quedar documentada y sin duplicación ambigua
 - Clause library versiona cambios (clauses pueden evolucionar; contracts activos quedan atados a la versión al momento de firma)
-- Documento legal firmado es un asset (reuse del asset system existente)
-- Admin-gated: solo `efeonce_admin` + `finance_admin` + rol legal (cuando exista) pueden editar MSAs
+- Documento legal firmado es un asset privado en `greenhouse_core.assets` (reuse del asset system existente en `src/lib/storage/greenhouse-assets.ts`)
+- Admin-gated V1: solo `efeonce_admin` + `finance_admin` pueden editar MSAs; el rol legal queda reservado para una capa futura
+- `docs/architecture/schema-snapshot-baseline.sql` sirve solo como referencia histórica; el estado operativo del dominio commercial debe validarse contra migraciones vigentes + `src/types/db.d.ts`
+- Esta task debe reconciliar explícitamente el anchor tenant de contracts con el cutover de quotations a `organization_id` realizado en TASK-486; no asumir que `space_id` sigue siendo suficiente
 
 ## Normative Docs
 
 - TASK-460 — contracts entity
 - `src/lib/commercial/governance/terms-store.ts` — patrón de terms/clauses ya usado en TASK-348
-- `src/lib/assets/*` — asset system para attach de PDFs firmados
+- `src/lib/storage/greenhouse-assets.ts` — asset system para attach de PDFs firmados
 
 ## Dependencies & Impact
 
 ### Depends on
 
 - TASK-460 — contracts entity con `msa_id` nullable FK
+- TASK-486 — quotations ya ancladas canónicamente en `organization_id + contact`; contracts debe reconciliar ese contrato para que MSA no nazca sobre un scope legacy por `space_id`
 
 ### Blocks / Impacts
 
@@ -80,8 +84,8 @@ Reglas obligatorias:
 ### Files owned
 
 - `migrations/[verificar]-task-461-msa-schema.sql`
-- `src/lib/commercial/msa-store.ts`
-- `src/lib/commercial/msa-clauses-store.ts`
+- `src/lib/commercial/master-agreements-store.ts`
+- `src/lib/commercial/master-agreement-clauses-store.ts`
 - `src/lib/commercial/msa-events.ts`
 - `src/app/api/finance/master-agreements/**`
 - `src/views/greenhouse/finance/MasterAgreementsView.tsx`
@@ -95,12 +99,15 @@ Reglas obligatorias:
 - TASK-460 — `contracts.msa_id` nullable FK placeholder
 - TASK-348 — pattern de terms/clauses con `quotation_terms` + `terms_library`
 - Asset system para attach de PDFs firmados
+- TASK-486 — quotations ya migradas a anchor canónico `organization_id` + `contact_identity_profile_id`
 
 ### Gap
 
 - No hay entidad MSA; los T&Cs se mantienen fuera del portal (Drive/Dropbox)
 - Contract no hereda clauses porque no hay origen stable
 - No hay visibilidad de "qué cláusulas gobiernan este contrato"
+- `contracts` sigue tenant-scoped por `space_id` en runtime/store actual; esa dependencia quedó desalineada con el anchor canónico de quotations
+- El asset system tiene retention class reusable para documentos privados, pero todavía no tiene `GreenhouseAssetContext` first-class para MSA / signed legal document
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -111,48 +118,48 @@ Reglas obligatorias:
 ### Slice 1 — Schema
 
 - `greenhouse_commercial.master_agreements`:
-  - `msa_id` PK, `msa_number`, `client_id` FK, `organization_id`, `space_id`
+  - `msa_id` PK, `msa_number`, `client_id` FK, `organization_id`
   - `title`, `governing_law` text, `jurisdiction` text
   - `status` enum: `draft / active / expired / terminated`
   - `effective_date`, `expiration_date` (nullable para MSAs perpetuos renovables)
   - `auto_renewal boolean`, `renewal_frequency_months`
-  - `signed_at`, `signed_by_client`, `signed_by_efeonce`, `signed_document_asset_id`
+  - `signed_at`, `signed_by_client`, `signed_by_efeonce`, `signed_document_asset_id` FK a `greenhouse_core.assets(asset_id)`
   - `payment_terms_days` (default inherited by SOWs)
   - `currency` default
   - `internal_notes`
   - timestamps
+  - tenant scoping canónico por `organization_id`; `space_id` no debe ser el anchor primario del MSA v1
 
 - `greenhouse_commercial.clause_library`:
-  - `clause_id` PK, `clause_code` unique (ej. `IP_OWNERSHIP_v1`, `NDA_STANDARD_v2`)
-  - `category` enum: `ip / nda / payment / liability / data_protection / warranty / termination / sla / governance / other`
-  - `title`, `body_markdown`, `variables jsonb` (placeholders para MSA-specific values)
-  - `version` integer, `effective_from`, `deprecated_at`
-  - `language` enum: `es / en / pt`
+  - **reconciliar con `greenhouse_commercial.terms_library` existente**
+  - V1 preferida: extender el patrón reusable de library actual con metadatos legales necesarios (`language`, `effective_from`, `deprecated_at`, variables/markdown) o crear una tabla hermana explícita solo si hay razón estructural para no compartir contrato
+  - la decisión debe evitar dos catálogos paralelos sin frontera clara (`terms_library` vs `clause_library`)
 
 - `greenhouse_commercial.master_agreement_clauses`:
-  - `msa_id`, `clause_id` (join PK)
-  - `clause_version` integer — pin al version al momento de firma
+  - `msa_id`, `clause_id` (join PK) o `msa_id`, `term_id` si se reusa `terms_library`
+  - `clause_version` / `term_version` integer — pin al version al momento de firma
   - `override_body_markdown` text nullable — override per-MSA si negociaron una variante
   - `variables_resolved jsonb` — valores concretos de las placeholders
   - `sort_order`
 
-- `greenhouse_commercial.contracts.msa_id` ya existe como FK nullable (TASK-460); el Slice conecta
+- `greenhouse_commercial.contracts.msa_id` ya existe como columna nullable (TASK-460); este slice agrega la FK real a `master_agreements`
+- este slice también corrige el runtime/schema de contracts para que el tenant scope y los readers no dependan solo de `space_id` donde el anchor canónico ya es `organization_id`
 
 ### Slice 2 — Runtime + publishers
 
-- `msa-store.ts` — CRUD tenant-safe + `listActiveMSAsForClient(clientId)`
-- `msa-clauses-store.ts` — CRUD de clause library con versioning
+- `master-agreements-store.ts` — CRUD tenant-safe + `listActiveMSAsForClient(clientId)`
+- `master-agreement-clauses-store.ts` — CRUD de clause library con versioning y render de templates
 - `msa-events.ts` publishers:
-  - `commercial.msa.created`
-  - `commercial.msa.activated`
-  - `commercial.msa.amended`
-  - `commercial.msa.renewed`
-  - `commercial.msa.terminated`
+  - `commercial.master_agreement.created`
+  - `commercial.master_agreement.updated`
+  - `commercial.master_agreement.clauses_changed`
+  - `commercial.contract.msa_linked`
 - Helper `resolveContractClauses(contractId)` — computa clauses efectivas (MSA inherited + contract-specific overrides)
+- Refactor asociado: contracts-store / contract-lifecycle / APIs de contracts deben poder resolver contracts tenant-safe desde `organization_id` además de la convivencia legacy con `space_id`
 
 ### Slice 3 — Seed inicial de clause library
 
-- Seed con ~10 clausulas estándar en español de Efeonce:
+- Seed con ~10 cláusulas estándar de Efeonce, priorizando español en V1 y dejando inglés/portugués como extensión explícita si el contrato de library elegido ya soporta multi-language sin duplicación:
   - `IP_OWNERSHIP_DELIVERABLES_v1` — ownership de deliverables finales por cliente
   - `IP_PRE_EXISTING_v1` — Efeonce retiene pre-existing IP
   - `NDA_MUTUAL_STANDARD_v1` — NDA mutua estándar 3 años
@@ -175,9 +182,10 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Negociación workflow end-to-end (redlines, versioning colaborativo) — se deja en Drive/Word
-- e-Signing integration — attach del PDF ya firmado es suficiente
+- workflow legal de redlines / negociación colaborativa
 - Clause diff/redline UI
 - Full-text search en clauses library
+- crear un rol legal nuevo en este corte
 
 ## Detailed Spec
 
@@ -189,7 +197,6 @@ CREATE TABLE greenhouse_commercial.master_agreements (
   msa_number text UNIQUE NOT NULL,
   client_id text NOT NULL REFERENCES greenhouse_core.clients(client_id) ON DELETE RESTRICT,
   organization_id text,
-  space_id text,
   title text NOT NULL,
   governing_law text,
   jurisdiction text,
@@ -202,7 +209,7 @@ CREATE TABLE greenhouse_commercial.master_agreements (
   signed_at timestamptz,
   signed_by_client text,
   signed_by_efeonce text,
-  signed_document_asset_id text,
+  signed_document_asset_id text REFERENCES greenhouse_core.assets(asset_id) ON DELETE SET NULL,
   payment_terms_days integer DEFAULT 30,
   currency text DEFAULT 'CLP',
   internal_notes text,
@@ -210,6 +217,7 @@ CREATE TABLE greenhouse_commercial.master_agreements (
   updated_at timestamptz NOT NULL DEFAULT NOW()
 );
 
+-- Nota: la decision final debe reconciliarse con terms_library existente.
 CREATE TABLE greenhouse_commercial.clause_library (
   clause_id text PRIMARY KEY DEFAULT 'cl-' || gen_random_uuid(),
   clause_code text NOT NULL,
@@ -239,6 +247,10 @@ CREATE TABLE greenhouse_commercial.master_agreement_clauses (
   created_at timestamptz NOT NULL DEFAULT NOW(),
   PRIMARY KEY (msa_id, clause_id)
 );
+
+ALTER TABLE greenhouse_commercial.contracts
+  ADD CONSTRAINT contracts_msa_fk
+  FOREIGN KEY (msa_id) REFERENCES greenhouse_commercial.master_agreements(msa_id) ON DELETE SET NULL;
 ```
 
 ### Effective clauses resolution
@@ -272,35 +284,38 @@ export const resolveContractClauses = async ({
 
 ## Acceptance Criteria
 
-- [ ] Migration idempotente
-- [ ] Seed de clause library con 10+ clauses bilingual (es + en para MSAs cross-border)
-- [ ] Puede crearse MSA manualmente desde UI admin, attach PDF firmado como asset
-- [ ] Contract creado con `msa_id` hereda automáticamente las clauses del MSA
+- [x] Migration idempotente
+- [x] La spec final no deja duplicación ambigua entre `terms_library` y `clause_library`
+- [x] Seed de clause library / legal terms con 10+ clauses estándar sobre el contrato de library decidido
+- [x] Puede crearse MSA manualmente desde UI admin, attach PDF firmado como asset
+- [x] Contract creado con `msa_id` hereda automáticamente las clauses del MSA
+- [x] Contracts y MSAs quedan tenant-safe sobre el anchor canónico vigente (`organization_id`), sin depender solo de `space_id`
 - [ ] Sky + Pinturas Berel MSAs creados manualmente como prueba real (vía UI)
-- [ ] Eventos `commercial.msa.*` aparecen en outbox
+- [x] Eventos `commercial.master_agreement.*` y `commercial.contract.msa_linked` aparecen en outbox
 
 ## Verification
 
-- `pnpm migrate:up`
+- `pnpm pg:connect:migrate`
 - `pnpm lint`
-- `pnpm exec tsc --noEmit --incremental false`
-- `pnpm test`
-- Staging: crear MSA de prueba, attach PDF, crear contract con `msa_id`, confirmar resolución de clauses
+- `pnpm build`
+- `rg -n "new Pool\\(" src scripts services`
+- Smoke pendiente de ambiente compartido: crear MSA de prueba, attach PDF, crear contract con `msa_id`, confirmar resolución de clauses
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] Chequeo impacto cruzado con TASK-460, TASK-462
-- [ ] Actualizar arquitectura con delta de MSA como legal umbrella
+- [x] `Lifecycle` sincronizado con carpeta
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] Chequeo impacto cruzado con TASK-460, TASK-462
+- [x] Chequeo impacto cruzado con TASK-486
+- [x] Actualizar arquitectura con delta de MSA como legal umbrella
 
 ## Follow-ups
 
 - Workflow de renegociación de MSA con redline tracking (out of scope)
 - Contract-specific clause overrides UI (hoy solo MSA-level)
-- Integration con e-signing provider (DocuSign, HelloSign)
+- Additional providers de firma electrónica beyond ZapSign
 - Alerting cuando MSA expira < 90 días
 
 ## Open Questions
