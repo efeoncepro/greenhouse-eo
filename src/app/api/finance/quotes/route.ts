@@ -332,11 +332,24 @@ export async function POST(request: Request) {
       return insert.rows[0].quotation_id
     })
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('[POST /api/finance/quotes] quotations INSERT failed', {
+      businessLineCode: resolvedBusinessLineCode,
+      spaceId: body.spaceId ?? null,
+      organizationId: body.organizationId ?? null,
+      clientId: body.clientId ?? null,
+      pricingModel: resolvedDeliveryModel.pricingModel,
+      currency,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    })
+
     if (isFinanceSchemaDriftError(error)) {
       return financeSchemaDriftResponse('quotes_create', { error: 'Canonical quotation schema unavailable.' })
     }
 
-    throw error
+    const message = error instanceof Error ? error.message : 'Failed to create quotation.'
+
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 
   const bodyLineItems = Array.isArray(body.lineItems) ? body.lineItems : []
