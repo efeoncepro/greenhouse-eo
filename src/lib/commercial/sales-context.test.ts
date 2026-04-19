@@ -53,7 +53,10 @@ describe('sales-context', () => {
       hubspotDealId: null,
       hubspotLeadId: null,
       isStandalone: true,
-      categoryAtSent: 'contract'
+      categoryAtSent: 'contract',
+      pricingModel: 'project',
+      commercialModel: 'project',
+      staffingModel: 'outcome_based'
     })
   })
 })

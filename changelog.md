@@ -2,6 +2,14 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-459 separa el delivery model de quotation en dos ejes persistidos
+
+- `greenhouse_commercial.quotations` ahora materializa `commercial_model` y `staffing_model`, dejando `pricing_model` como alias legacy derivado para compatibility con governance/templates/terms.
+- `GET /api/finance/quotes` y `GET /api/finance/quotes/[id]` ya exponen `pricingModel`, `commercialModel` y `staffingModel`.
+- `sales_context_at_sent` preserva esos tres campos al primer `sent`, evitando perder el contexto comercial histórico de la quote.
+- `greenhouse_serving.quotation_pipeline_snapshots`, `quotation_profitability_snapshots` y `deal_pipeline_snapshots` quedaron extendidas para surfacing downstream del split sin recalcularlo inline.
+- La semántica quedó explícita: este `commercial_model` describe el contrato comercial del quote y NO reutiliza el `CommercialModelCode` del pricing engine v2.
+
 ### 2026-04-19 — TASK-456 materializa el pipeline comercial correcto a grain deal
 
 - Nace `greenhouse_serving.deal_pipeline_snapshots` como projection canónica para forecasting comercial: una fila por deal no borrado, sin duplicar oportunidades por cantidad de quotes.

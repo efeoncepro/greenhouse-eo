@@ -19,14 +19,20 @@ interface BaseQuoteContext {
   quotationId?: string | null
 }
 
-interface QuoteCreatedParams extends BaseQuoteContext {
+interface DeliveryModelContext {
+  pricingModel?: string | null
+  commercialModel?: string | null
+  staffingModel?: string | null
+}
+
+interface QuoteCreatedParams extends BaseQuoteContext, DeliveryModelContext {
   direction: Direction
   amount?: number | null
   currency?: string | null
   lineItemCount?: number | null
 }
 
-interface QuoteSyncedParams extends BaseQuoteContext {
+interface QuoteSyncedParams extends BaseQuoteContext, DeliveryModelContext {
   action: 'created' | 'updated' | 'skipped'
 }
 
@@ -86,7 +92,10 @@ export const publishQuoteCreated = async (
     spaceId: params.spaceId ?? null,
     amount: params.amount ?? null,
     currency: params.currency ?? null,
-    lineItemCount: params.lineItemCount ?? null
+    lineItemCount: params.lineItemCount ?? null,
+    pricingModel: params.pricingModel ?? null,
+    commercialModel: params.commercialModel ?? null,
+    staffingModel: params.staffingModel ?? null
   }
 
   await publishOutboxEvent(
@@ -126,7 +135,10 @@ export const publishQuoteSynced = async (
     sourceSystem: params.sourceSystem ?? null,
     action: params.action,
     organizationId: params.organizationId ?? null,
-    spaceId: params.spaceId ?? null
+    spaceId: params.spaceId ?? null,
+    pricingModel: params.pricingModel ?? null,
+    commercialModel: params.commercialModel ?? null,
+    staffingModel: params.staffingModel ?? null
   }
 
   await publishOutboxEvent(
@@ -470,7 +482,7 @@ export const publishQuotationApprovalDecided = async (
   }
 }
 
-interface QuotationSentParams {
+interface QuotationSentParams extends DeliveryModelContext {
   quotationId: string
   versionNumber: number
   sentBy: string
@@ -489,14 +501,17 @@ export const publishQuotationSent = async (
         quotationId: params.quotationId,
         versionNumber: params.versionNumber,
         sentBy: params.sentBy,
-        postApproval: false
+        postApproval: false,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
       }
     },
     client
   )
 }
 
-interface QuotationApprovedParams {
+interface QuotationApprovedParams extends DeliveryModelContext {
   quotationId: string
   approvedBy: string
 }
@@ -512,7 +527,10 @@ export const publishQuotationApproved = async (
       eventType: EVENT_TYPES.quotationApproved,
       payload: {
         quotationId: params.quotationId,
-        approvedBy: params.approvedBy
+        approvedBy: params.approvedBy,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
       }
     },
     client
@@ -668,7 +686,7 @@ export const publishTemplateSaved = async (
 // TASK-351 — Quotation Intelligence Automation publishers
 // ═══════════════════════════════════════════════════════════════
 
-interface QuotationExpiredParams {
+interface QuotationExpiredParams extends DeliveryModelContext {
   quotationId: string
   clientId: string | null
   organizationId: string | null
@@ -692,14 +710,17 @@ export const publishQuotationExpired = async (
         organizationId: params.organizationId,
         totalAmountClp: params.totalAmountClp,
         expiredAt: params.expiredAt,
-        daysSinceExpiry: params.daysSinceExpiry
+        daysSinceExpiry: params.daysSinceExpiry,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
       }
     },
     client
   )
 }
 
-interface QuotationRenewalDueParams {
+interface QuotationRenewalDueParams extends DeliveryModelContext {
   quotationId: string
   clientId: string | null
   organizationId: string | null
@@ -723,7 +744,10 @@ export const publishQuotationRenewalDue = async (
         organizationId: params.organizationId,
         totalAmountClp: params.totalAmountClp,
         expiryDate: params.expiryDate,
-        daysUntilExpiry: params.daysUntilExpiry
+        daysUntilExpiry: params.daysUntilExpiry,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
       }
     },
     client

@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-459 Delivery Model Refinement (Codex)
+
+- **Owner:** Codex
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-459`
+- **Rama:** `task/TASK-459-delivery-model-refinement`
+- **Estado:** implementado y validado localmente; listo para push / integración
+- **Decisión operativa clave:**
+  - el split de `pricing_model` se cerró como **delivery model de quotation** y no como reutilización del `CommercialModelCode` del pricing engine; ambos nombres coexisten pero viven en dominios distintos
+  - `pricing_model` queda como alias legacy derivado para no romper governance/templates/terms en este corte
+- **Entregables:**
+  - migración `20260419012226774_task-459-delivery-model-refinement.sql`
+  - helper común `src/lib/commercial/delivery-model.ts` + test `src/lib/commercial/__tests__/delivery-model.test.ts`
+  - extensiones en `src/lib/commercial/governance/contracts.ts`
+  - surfacing en `src/lib/finance/quotation-canonical-store.ts`, `src/app/api/finance/quotes/route.ts`, `src/app/api/finance/quotes/[id]/route.ts`
+  - snapshot histórico extendido en `src/lib/commercial/sales-context.ts`
+  - downstream actualizado en `pipeline-materializer.ts`, `profitability-materializer.ts`, `deal-pipeline-materializer.ts`, `intelligence-store.ts`, renewals route y lifecycle sweep
+  - payloads de eventos extendidos en `src/lib/commercial/quotation-events.ts`
+  - docs actualizadas en arquitectura comercial, data model master, task index y task file
+- **Resultado operativo:**
+  - `greenhouse_commercial.quotations` ahora materializa `commercial_model` + `staffing_model`
+  - `sales_context_at_sent` preserva `pricing_model`, `commercial_model` y `staffing_model`
+  - `GET /api/finance/quotes` y `GET /api/finance/quotes/[id]` exponen los tres campos
+  - `greenhouse_serving.quotation_pipeline_snapshots` y `quotation_profitability_snapshots` ya persisten ambos ejes
+  - `greenhouse_serving.deal_pipeline_snapshots` ahora lleva `latest_quote_pricing_model`, `latest_quote_commercial_model` y `latest_quote_staffing_model`
+  - renewals hereda el surfacing desde pipeline snapshots
+- **Validaciones corridas:**
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm vitest run src/lib/commercial/__tests__/delivery-model.test.ts src/lib/commercial-intelligence/deal-pipeline-materializer.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm pg:connect:migrate`
+  - query post-migración: `project × outcome_based = 27` quotes
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'` -> sin matches
+- **Heads-up:**
+  - `pnpm build` siguió mostrando warnings preexistentes de Dynamic Server Usage por `headers()` en múltiples routes bajo `(dashboard)`, pero terminó exit `0`
+
 ## Sesion 2026-04-19 — TASK-467 Pricing Catalog Admin UI MVP (cierre)
 
 - **Owner:** Claude

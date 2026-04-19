@@ -17,6 +17,9 @@ interface QuoteRow extends Record<string, unknown> {
   total_amount_clp: string | number | null
   effective_margin_pct: string | number | null
   target_margin_pct: string | number | null
+  pricing_model: string | null
+  commercial_model: string | null
+  staffing_model: string | null
   approved_at: string | Date | null
   converted_at: string | Date | null
   quote_date: string | Date | null
@@ -83,6 +86,9 @@ interface QuoteContext {
   spaceId: string | null
   quotedTotalClp: number | null
   quotedMarginPct: number | null
+  pricingModel: string | null
+  commercialModel: string | null
+  staffingModel: string | null
   authorizedTotalClp: number | null
   invoicedTotalClp: number | null
   earliestActivityDate: string | null
@@ -92,6 +98,7 @@ const loadQuoteContext = async (quotationId: string): Promise<QuoteContext | nul
   const rows = await query<QuoteRow>(
     `SELECT quotation_id, client_id, organization_id, space_id,
             total_price, total_amount_clp, effective_margin_pct, target_margin_pct,
+            pricing_model, commercial_model, staffing_model,
             approved_at, converted_at, quote_date
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1
@@ -117,6 +124,9 @@ const loadQuoteContext = async (quotationId: string): Promise<QuoteContext | nul
     spaceId: quote.space_id ? String(quote.space_id) : null,
     quotedTotalClp: toNum(quote.total_amount_clp) ?? toNum(quote.total_price),
     quotedMarginPct: toNum(quote.effective_margin_pct) ?? toNum(quote.target_margin_pct),
+    pricingModel: quote.pricing_model ? String(quote.pricing_model) : null,
+    commercialModel: quote.commercial_model ? String(quote.commercial_model) : null,
+    staffingModel: quote.staffing_model ? String(quote.staffing_model) : null,
     authorizedTotalClp: toNum(aggregates[0]?.authorized_clp),
     invoicedTotalClp: toNum(aggregates[0]?.invoiced_clp),
     earliestActivityDate:
@@ -306,6 +316,9 @@ const toProfitabilityRow = ({
 
     quotedTotalClp: round2(quote.quotedTotalClp),
     quotedMarginPct: round4(quote.quotedMarginPct),
+    pricingModel: quote.pricingModel,
+    commercialModel: quote.commercialModel,
+    staffingModel: quote.staffingModel,
     authorizedTotalClp: round2(quote.authorizedTotalClp),
     invoicedTotalClp: round2(quote.invoicedTotalClp),
     realizedRevenueClp: round2(revenueClp),
@@ -325,7 +338,7 @@ const upsertProfitabilityRow = async (row: ProfitabilitySnapshotRow): Promise<vo
     `INSERT INTO greenhouse_serving.quotation_profitability_snapshots (
        quotation_id, period_year, period_month,
        client_id, organization_id, space_id,
-       quoted_total_clp, quoted_margin_pct,
+       quoted_total_clp, quoted_margin_pct, pricing_model, commercial_model, staffing_model,
        authorized_total_clp, invoiced_total_clp,
        realized_revenue_clp, attributed_cost_clp,
        effective_margin_pct, margin_drift_pct, drift_severity, drift_drivers,
@@ -333,11 +346,11 @@ const upsertProfitabilityRow = async (row: ProfitabilitySnapshotRow): Promise<vo
      ) VALUES (
        $1, $2, $3,
        $4, $5, $6,
-       $7, $8,
-       $9, $10,
-       $11, $12,
-       $13, $14, $15, $16::jsonb,
-       $17::timestamptz
+       $7, $8, $9, $10, $11,
+       $12, $13,
+       $14, $15,
+       $16, $17, $18, $19::jsonb,
+       $20::timestamptz
      )
      ON CONFLICT (quotation_id, period_year, period_month) DO UPDATE SET
        client_id = EXCLUDED.client_id,
@@ -345,6 +358,9 @@ const upsertProfitabilityRow = async (row: ProfitabilitySnapshotRow): Promise<vo
        space_id = EXCLUDED.space_id,
        quoted_total_clp = EXCLUDED.quoted_total_clp,
        quoted_margin_pct = EXCLUDED.quoted_margin_pct,
+       pricing_model = EXCLUDED.pricing_model,
+       commercial_model = EXCLUDED.commercial_model,
+       staffing_model = EXCLUDED.staffing_model,
        authorized_total_clp = EXCLUDED.authorized_total_clp,
        invoiced_total_clp = EXCLUDED.invoiced_total_clp,
        realized_revenue_clp = EXCLUDED.realized_revenue_clp,
@@ -357,7 +373,7 @@ const upsertProfitabilityRow = async (row: ProfitabilitySnapshotRow): Promise<vo
     [
       row.quotationId, row.periodYear, row.periodMonth,
       row.clientId, row.organizationId, row.spaceId,
-      row.quotedTotalClp, row.quotedMarginPct,
+      row.quotedTotalClp, row.quotedMarginPct, row.pricingModel, row.commercialModel, row.staffingModel,
       row.authorizedTotalClp, row.invoicedTotalClp,
       row.realizedRevenueClp, row.attributedCostClp,
       row.effectiveMarginPct, row.marginDriftPct, row.driftSeverity, JSON.stringify(row.driftDrivers),

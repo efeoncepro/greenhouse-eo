@@ -444,6 +444,7 @@ export interface GreenhouseCommercialQuotations {
   business_line_code: string | null;
   client_id: string | null;
   client_name_cache: string | null;
+  commercial_model: Generated<string>;
   conditions_text: string | null;
   contract_duration_months: number | null;
   converted_at: Timestamp | null;
@@ -498,6 +499,7 @@ export interface GreenhouseCommercialQuotations {
   source_system: Generated<string>;
   space_id: string | null;
   space_resolution_source: Generated<string>;
+  staffing_model: Generated<string>;
   status: Generated<string>;
   subtotal: Numeric | null;
   target_margin_pct: Numeric | null;
@@ -3732,7 +3734,10 @@ export interface GreenhouseServingDealPipelineSnapshots {
   hubspot_deal_id: string;
   is_open: Generated<boolean>;
   is_won: Generated<boolean>;
+  latest_quote_commercial_model: string | null;
   latest_quote_id: string | null;
+  latest_quote_pricing_model: string | null;
+  latest_quote_staffing_model: string | null;
   latest_quote_status: string | null;
   materialized_at: Generated<Timestamp>;
   organization_id: string | null;
@@ -4563,6 +4568,7 @@ export interface GreenhouseServingQuotationPipelineSnapshots {
   authorized_amount_clp: Numeric | null;
   business_line_code: string | null;
   client_id: string | null;
+  commercial_model: string | null;
   converted_at: Timestamp | null;
   currency: string | null;
   days_in_stage: number | null;
@@ -4584,6 +4590,7 @@ export interface GreenhouseServingQuotationPipelineSnapshots {
   sent_at: Timestamp | null;
   snapshot_source_event: string | null;
   space_id: string | null;
+  staffing_model: string | null;
   status: string;
   total_amount_clp: Numeric | null;
 }
@@ -4592,6 +4599,7 @@ export interface GreenhouseServingQuotationProfitabilitySnapshots {
   attributed_cost_clp: Numeric | null;
   authorized_total_clp: Numeric | null;
   client_id: string | null;
+  commercial_model: string | null;
   drift_drivers: Generated<Json>;
   drift_severity: Generated<string>;
   effective_margin_pct: Numeric | null;
@@ -4601,11 +4609,13 @@ export interface GreenhouseServingQuotationProfitabilitySnapshots {
   organization_id: string | null;
   period_month: number;
   period_year: number;
+  pricing_model: string | null;
   quotation_id: string;
   quoted_margin_pct: Numeric | null;
   quoted_total_clp: Numeric | null;
   realized_revenue_clp: Numeric | null;
   space_id: string | null;
+  staffing_model: string | null;
 }
 
 export interface GreenhouseServingServiceSlaComplianceSnapshots {

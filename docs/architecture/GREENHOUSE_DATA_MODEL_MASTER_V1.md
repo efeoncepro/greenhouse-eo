@@ -1,5 +1,34 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-19 — Delivery model split formalized on canonical quotations
+
+`TASK-459` desambiguó el antiguo `pricing_model` de quotation en dos ejes persistidos.
+
+Tablas impactadas:
+- `greenhouse_commercial.quotations`
+- `greenhouse_serving.quotation_pipeline_snapshots`
+- `greenhouse_serving.quotation_profitability_snapshots`
+- `greenhouse_serving.deal_pipeline_snapshots`
+
+Campos nuevos:
+- `greenhouse_commercial.quotations.commercial_model`
+- `greenhouse_commercial.quotations.staffing_model`
+- `greenhouse_serving.quotation_pipeline_snapshots.commercial_model`
+- `greenhouse_serving.quotation_pipeline_snapshots.staffing_model`
+- `greenhouse_serving.quotation_profitability_snapshots.pricing_model`
+- `greenhouse_serving.quotation_profitability_snapshots.commercial_model`
+- `greenhouse_serving.quotation_profitability_snapshots.staffing_model`
+- `greenhouse_serving.deal_pipeline_snapshots.latest_quote_pricing_model`
+- `greenhouse_serving.deal_pipeline_snapshots.latest_quote_commercial_model`
+- `greenhouse_serving.deal_pipeline_snapshots.latest_quote_staffing_model`
+
+Regla vigente:
+- `pricing_model` sigue existiendo solo como alias legacy para compatibility con governance y templates
+- el source of truth nuevo para delivery del quote es `commercial_model + staffing_model`
+- el split no debe confundirse con `CommercialModelCode` del pricing engine comercial
+- `sales_context_at_sent` ahora puede persistir también los tres campos para trazabilidad histórica
+- las projections serving deben leer estos ejes desde quotation canonical, no recalcularlos inline
+
 ## Delta 2026-04-18 — Quote sales context snapshot formalized on canonical quotations
 
 `TASK-455` agrega un snapshot histórico explícito del contexto comercial al momento del primer `sent` de una cotización.

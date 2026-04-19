@@ -23,6 +23,8 @@ interface PipelineDbRow extends Record<string, unknown> {
   quoted_margin_pct: string | number | null
   business_line_code: string | null
   pricing_model: string | null
+  commercial_model: string | null
+  staffing_model: string | null
   currency: string | null
   quote_date: string | Date | null
   sent_at: string | Date | null
@@ -50,6 +52,9 @@ interface ProfitabilityDbRow extends Record<string, unknown> {
   space_id: string | null
   quoted_total_clp: string | number | null
   quoted_margin_pct: string | number | null
+  pricing_model: string | null
+  commercial_model: string | null
+  staffing_model: string | null
   authorized_total_clp: string | number | null
   invoiced_total_clp: string | number | null
   realized_revenue_clp: string | number | null
@@ -83,6 +88,9 @@ interface DealPipelineDbRow extends Record<string, unknown> {
   deal_owner_email: string | null
   latest_quote_id: string | null
   latest_quote_status: string | null
+  latest_quote_pricing_model: string | null
+  latest_quote_commercial_model: string | null
+  latest_quote_staffing_model: string | null
   quote_count: number | null
   approved_quote_count: number | null
   total_quotes_amount_clp: string | number | null
@@ -138,6 +146,8 @@ const mapPipeline = (row: PipelineDbRow): PipelineSnapshotRow => ({
   quotedMarginPct: toNum(row.quoted_margin_pct),
   businessLineCode: row.business_line_code ? String(row.business_line_code) : null,
   pricingModel: row.pricing_model ? String(row.pricing_model) : null,
+  commercialModel: row.commercial_model ? String(row.commercial_model) : null,
+  staffingModel: row.staffing_model ? String(row.staffing_model) : null,
   currency: row.currency ? String(row.currency) : null,
   quoteDate: toIsoDate(row.quote_date),
   sentAt: toIsoTs(row.sent_at),
@@ -165,6 +175,9 @@ const mapProfitability = (row: ProfitabilityDbRow): ProfitabilitySnapshotRow => 
   spaceId: row.space_id ? String(row.space_id) : null,
   quotedTotalClp: toNum(row.quoted_total_clp),
   quotedMarginPct: toNum(row.quoted_margin_pct),
+  pricingModel: row.pricing_model ? String(row.pricing_model) : null,
+  commercialModel: row.commercial_model ? String(row.commercial_model) : null,
+  staffingModel: row.staffing_model ? String(row.staffing_model) : null,
   authorizedTotalClp: toNum(row.authorized_total_clp),
   invoicedTotalClp: toNum(row.invoiced_total_clp),
   realizedRevenueClp: toNum(row.realized_revenue_clp),
@@ -198,6 +211,9 @@ const mapDealPipeline = (row: DealPipelineDbRow): DealPipelineSnapshotRow => ({
   dealOwnerEmail: row.deal_owner_email ? String(row.deal_owner_email) : null,
   latestQuoteId: row.latest_quote_id ? String(row.latest_quote_id) : null,
   latestQuoteStatus: row.latest_quote_status ? String(row.latest_quote_status) : null,
+  latestQuotePricingModel: row.latest_quote_pricing_model ? String(row.latest_quote_pricing_model) : null,
+  latestQuoteCommercialModel: row.latest_quote_commercial_model ? String(row.latest_quote_commercial_model) : null,
+  latestQuoteStaffingModel: row.latest_quote_staffing_model ? String(row.latest_quote_staffing_model) : null,
   quoteCount: row.quote_count ?? 0,
   approvedQuoteCount: row.approved_quote_count ?? 0,
   totalQuotesAmountClp: toNum(row.total_quotes_amount_clp),
@@ -248,7 +264,7 @@ export const listPipelineSnapshots = async (
   const rows = await query<PipelineDbRow>(
     `SELECT quotation_id, client_id, organization_id, space_id,
             status, pipeline_stage, probability_pct,
-            total_amount_clp, quoted_margin_pct, business_line_code, pricing_model, currency,
+            total_amount_clp, quoted_margin_pct, business_line_code, pricing_model, commercial_model, staffing_model, currency,
             quote_date, sent_at, approved_at, expiry_date, converted_at, rejected_at, expired_at,
             days_in_stage, days_until_expiry, is_renewal_due, is_expired,
             authorized_amount_clp, invoiced_amount_clp,
@@ -362,7 +378,9 @@ export const listDealPipelineSnapshots = async (
             deal_name, dealstage, dealstage_label, pipeline_name, deal_type,
             amount, amount_clp, currency, probability_pct, close_date, days_until_close,
             is_open, is_won, deal_owner_email,
-            latest_quote_id, latest_quote_status, quote_count, approved_quote_count,
+            latest_quote_id, latest_quote_status, latest_quote_pricing_model,
+            latest_quote_commercial_model, latest_quote_staffing_model,
+            quote_count, approved_quote_count,
             total_quotes_amount_clp, snapshot_source_event, materialized_at
        FROM greenhouse_serving.deal_pipeline_snapshots
        ${where}
@@ -470,6 +488,7 @@ export const listProfitabilitySnapshots = async (
     `SELECT quotation_id, period_year, period_month,
             client_id, organization_id, space_id,
             quoted_total_clp, quoted_margin_pct,
+            pricing_model, commercial_model, staffing_model,
             authorized_total_clp, invoiced_total_clp,
             realized_revenue_clp, attributed_cost_clp,
             effective_margin_pct, margin_drift_pct, drift_severity, drift_drivers,

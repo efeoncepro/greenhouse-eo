@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Done`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -21,7 +21,7 @@
 
 ## Summary
 
-Desambiguar el `pricing_model` actual de quotation en **dos dimensiones ortogonales**: `commercial_model` (retainer / project / one-off — cómo se cobra y cuándo expira) y `staffing_model` (named_resources / outcome_based / hybrid — qué se vende). Desbloquea interpretación correcta de retainer-con-staff-aug y analytics downstream sin refactor de entidades.
+Desambiguar el `pricing_model` actual de quotation en **dos dimensiones ortogonales**: `commercial_model` (`retainer` / `project` / `one_off` — cómo se cobra y cuándo expira) y `staffing_model` (`named_resources` / `outcome_based` / `hybrid` — qué se vende). Este split corresponde al **delivery model del quote** y es independiente del `CommercialModelCode` ya existente en pricing governance (`on_going` / `on_demand` / `hybrid` / `license_consulting`).
 
 ## Why This Task Exists
 
@@ -37,8 +37,7 @@ En un negocio 85% retainer como Efeonce, donde muchos retainers son staff-aug, e
 
 - `quotations` tiene `commercial_model` + `staffing_model` como campos separados
 - Valores legacy de `pricing_model` migrados heurísticamente (ver Detailed Spec)
-- APIs downstream exponen ambos ejes (pipeline, profitability, renewals)
-- UI filtros soportan los 2 ejes ortogonalmente
+- APIs downstream exponen ambos ejes (`quotes`, pipeline, profitability, renewals, deal pipeline)
 - Snapshots de TASK-455 capturan ambos
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -56,10 +55,12 @@ Reglas obligatorias:
 - Retrocompat: `pricing_model` legacy puede quedar como alias derivado pero dejar de ser fuente de verdad
 - Valores de enum **cerrados**: no permitir texto libre, para consistencia downstream
 - Migración idempotente + backfill heurístico documentado
+- No reutilizar ni mezclar el `commercialModel` del pricing engine v2; ese enum vive en otro dominio semántico
 
 ## Normative Docs
 
 - `src/types/db.d.ts` — current quotation schema
+- `src/lib/commercial/pricing-governance-types.ts` — `CommercialModelCode` de pricing governance (no reutilizable para esta task)
 - TASK-460 — Contract entity (usará estos campos)
 - TASK-462 — MRR/ARR (depende de `commercial_model=retainer`)
 
@@ -72,7 +73,7 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - TASK-455 — snapshot incluirá ambos campos
-- TASK-456 — deal_pipeline rollup expondrá ambos
+- TASK-456 — surface de deal pipeline queda afectada y debe poder exponer ambos ejes
 - TASK-457 — UI filtros + columnas
 - TASK-460 — Contract hereda `commercial_model` + `staffing_model` del quote
 - TASK-462 — MRR/ARR filtra por `commercial_model = 'retainer'`
@@ -91,11 +92,13 @@ Reglas obligatorias:
 
 - `greenhouse_commercial.quotations.pricing_model` con enum `staff_aug / retainer / project`
 - `QUOTATION_PRICING_MODELS` const en `src/lib/commercial/governance/contracts.ts`
+- `CommercialModelCode` en pricing governance con valores `on_going / on_demand / hybrid / license_consulting`
 
 ### Gap
 
 - Una quote retainer-con-staff-aug se modela como `pricing_model='staff_aug'` pierdiendo el hecho de que es recurrent; o como `pricing_model='retainer'` perdiendo el hecho de que es T&M.
 - Downstream (cost attribution, profitability, renewal) aplica una sola lógica por valor del enum, no puede diferenciar los cruces reales.
+- `quotation-canonical-store` todavía no expone `pricingModel` en list/detail y el path de sync canónico degrada algunos casos a `'project'`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -119,12 +122,14 @@ Reglas obligatorias:
 - Extender `QUOTATION_PRICING_MODELS` const y agregar `COMMERCIAL_MODELS` + `STAFFING_MODELS`
 - Extender `quotation-canonical-store.ts` reader + writer
 - Extender payload de publishers (TASK-347, TASK-351) con ambos campos
-- Incluir en response JSON de `/api/finance/quotes/[id]`
+- Incluir `pricingModel` legacy derivado + ambos campos nuevos en responses JSON de quotes
 
 ### Slice 3 — Downstream consumers
 
 - `quotation-pipeline-snapshots` — agregar columnas `commercial_model` + `staffing_model` (re-materialize for consistency)
 - `quotation-profitability-snapshots` — idem
+- `deal-pipeline-snapshots` — agregar rollup derivado desde la latest quote / latest active quote
+- `renewals` hereda el surfacing desde `quotation_pipeline_snapshots`
 - TASK-455 snapshot shape incluir ambos campos
 
 ## Out of Scope
@@ -165,6 +170,8 @@ ALTER TABLE greenhouse_commercial.quotations
 ```
 
 ### Semantic matrix
+
+`commercial_model` en esta task describe el contrato comercial del quote y **no** debe confundirse con `CommercialModelCode` del pricing engine.
 
 | `commercial_model` × `staffing_model` | Ejemplo Efeonce |
 |---|---|

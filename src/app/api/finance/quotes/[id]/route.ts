@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 
+import {
+  resolveQuoteDeliveryModel,
+  type CommercialModel,
+  type StaffingModel
+} from '@/lib/commercial/delivery-model'
 import { query } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
@@ -100,6 +105,9 @@ const getLegacyQuoteDetail = async (quoteId: string) => {
     source: String(r.source_system || 'manual'),
     hubspotQuoteId: r.hubspot_quote_id ? String(r.hubspot_quote_id) : null,
     hubspotDealId: r.hubspot_deal_id ? String(r.hubspot_deal_id) : null,
+    pricingModel: null,
+    commercialModel: null,
+    staffingModel: null,
     salesContextAtSent: null,
     notes: r.notes ? String(r.notes) : null,
     createdAt: r.created_at ? String(r.created_at) : null,
@@ -182,6 +190,9 @@ interface UpdateQuotationPayload {
   dueDate?: string | null
   validUntil?: string | null
   expiryDate?: string | null
+  pricingModel?: 'staff_aug' | 'retainer' | 'project' | null
+  commercialModel?: CommercialModel | null
+  staffingModel?: StaffingModel | null
   recalculatePricing?: boolean
   createVersion?: boolean
 }
@@ -267,6 +278,43 @@ export async function PUT(
   if (body.dueDate !== undefined) push('due_date', body.dueDate, '::date')
   if (body.validUntil !== undefined) push('valid_until', body.validUntil, '::date')
   if (body.expiryDate !== undefined) push('expiry_date', body.expiryDate, '::date')
+
+  if (
+    body.pricingModel !== undefined ||
+    body.commercialModel !== undefined ||
+    body.staffingModel !== undefined
+  ) {
+    const currentRows = await query<{
+      pricing_model: string | null
+      commercial_model: string | null
+      staffing_model: string | null
+    }>(
+      `SELECT pricing_model, commercial_model, staffing_model
+         FROM greenhouse_commercial.quotations
+         WHERE quotation_id = $1
+         LIMIT 1`,
+      [identity.quotationId]
+    )
+
+    const current = currentRows[0]
+
+    const fallback = resolveQuoteDeliveryModel({
+      pricingModel: current?.pricing_model,
+      commercialModel: current?.commercial_model,
+      staffingModel: current?.staffing_model
+    })
+
+    const resolvedDeliveryModel = resolveQuoteDeliveryModel({
+      pricingModel: body.pricingModel ?? undefined,
+      commercialModel: body.commercialModel ?? fallback.commercialModel,
+      staffingModel: body.staffingModel ?? fallback.staffingModel,
+      fallback
+    })
+
+    push('pricing_model', resolvedDeliveryModel.pricingModel)
+    push('commercial_model', resolvedDeliveryModel.commercialModel)
+    push('staffing_model', resolvedDeliveryModel.staffingModel)
+  }
 
   if (updates.length > 0) {
     updates.push('updated_at = CURRENT_TIMESTAMP')

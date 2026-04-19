@@ -2,6 +2,11 @@ import 'server-only'
 
 import type { PoolClient } from 'pg'
 
+import {
+  resolveQuoteDeliveryModel,
+  type CommercialModel,
+  type StaffingModel
+} from '@/lib/commercial/delivery-model'
 import { getDb } from '@/lib/db'
 import {
   normalizeHubSpotLifecycleStage,
@@ -23,6 +28,9 @@ export interface SalesContextSnapshot {
   dealId: string | null
   hubspotDealId: string | null
   hubspotLeadId: string | null
+  pricingModel: string
+  commercialModel: CommercialModel
+  staffingModel: StaffingModel
   isStandalone: boolean
   categoryAtSent: SalesContextCategory
 }
@@ -34,6 +42,9 @@ interface PersistedSalesContextSnapshot {
   deal_id: string | null
   hubspot_deal_id: string | null
   hubspot_lead_id: string | null
+  pricing_model: string
+  commercial_model: CommercialModel
+  staffing_model: StaffingModel
   is_standalone: boolean
   category_at_sent: SalesContextCategory
 }
@@ -44,6 +55,9 @@ interface SalesContextSourceRow {
   client_id: string | null
   hubspot_deal_id: string | null
   sales_context_at_sent: unknown
+  pricing_model: string | null
+  commercial_model: string | null
+  staffing_model: string | null
   lifecyclestage: string | null
   deal_id: string | null
   dealstage: string | null
@@ -55,6 +69,9 @@ const SALES_CONTEXT_SOURCE_SQL = `SELECT
   q.client_id,
   q.hubspot_deal_id,
   q.sales_context_at_sent,
+  q.pricing_model,
+  q.commercial_model,
+  q.staffing_model,
   c.lifecyclestage,
   d.deal_id,
   d.dealstage
@@ -95,6 +112,9 @@ const toPersistedSalesContextSnapshot = (
   deal_id: snapshot.dealId,
   hubspot_deal_id: snapshot.hubspotDealId,
   hubspot_lead_id: snapshot.hubspotLeadId,
+  pricing_model: snapshot.pricingModel,
+  commercial_model: snapshot.commercialModel,
+  staffing_model: snapshot.staffingModel,
   is_standalone: snapshot.isStandalone,
   category_at_sent: snapshot.categoryAtSent
 })
@@ -163,6 +183,27 @@ export const normalizeQuoteSalesContext = (
         ? value.hubspotLeadId
         : null
 
+  const deliveryModel = resolveQuoteDeliveryModel({
+    pricingModel:
+      typeof value.pricing_model === 'string'
+        ? value.pricing_model
+        : typeof value.pricingModel === 'string'
+          ? value.pricingModel
+          : undefined,
+    commercialModel:
+      typeof value.commercial_model === 'string'
+        ? value.commercial_model
+        : typeof value.commercialModel === 'string'
+          ? value.commercialModel
+          : undefined,
+    staffingModel:
+      typeof value.staffing_model === 'string'
+        ? value.staffing_model
+        : typeof value.staffingModel === 'string'
+          ? value.staffingModel
+          : undefined
+  })
+
   const isStandalone =
     typeof value.is_standalone === 'boolean'
       ? value.is_standalone
@@ -177,6 +218,9 @@ export const normalizeQuoteSalesContext = (
     dealId,
     hubspotDealId,
     hubspotLeadId,
+    pricingModel: deliveryModel.pricingModel,
+    commercialModel: deliveryModel.commercialModel,
+    staffingModel: deliveryModel.staffingModel,
     isStandalone,
     categoryAtSent: normalizeSalesContextCategory(
       value.category_at_sent ?? value.categoryAtSent
@@ -185,12 +229,27 @@ export const normalizeQuoteSalesContext = (
 }
 
 const buildSnapshotFromRow = (
-  row: Pick<SalesContextSourceRow, 'lifecyclestage' | 'deal_id' | 'dealstage' | 'hubspot_deal_id'>,
+  row: Pick<
+    SalesContextSourceRow,
+    | 'lifecyclestage'
+    | 'deal_id'
+    | 'dealstage'
+    | 'hubspot_deal_id'
+    | 'pricing_model'
+    | 'commercial_model'
+    | 'staffing_model'
+  >,
   capturedAt: string
 ): SalesContextSnapshot => {
   const lifecyclestage = normalizeHubSpotLifecycleStage(row.lifecyclestage)
   const dealId = row.deal_id
   const hubspotDealId = row.hubspot_deal_id
+
+  const deliveryModel = resolveQuoteDeliveryModel({
+    pricingModel: row.pricing_model,
+    commercialModel: row.commercial_model,
+    staffingModel: row.staffing_model
+  })
 
   return {
     capturedAt,
@@ -199,6 +258,9 @@ const buildSnapshotFromRow = (
     dealId,
     hubspotDealId,
     hubspotLeadId: null,
+    pricingModel: deliveryModel.pricingModel,
+    commercialModel: deliveryModel.commercialModel,
+    staffingModel: deliveryModel.staffingModel,
     isStandalone: !(dealId || hubspotDealId),
     categoryAtSent: deriveSalesContextCategory({
       lifecyclestage,
@@ -233,6 +295,9 @@ export const buildSalesContextSnapshot = async ({
       'q.client_id',
       'q.hubspot_deal_id',
       'q.sales_context_at_sent',
+      'q.pricing_model',
+      'q.commercial_model',
+      'q.staffing_model',
       'c.lifecyclestage',
       'd.deal_id',
       'd.dealstage'
