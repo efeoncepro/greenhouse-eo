@@ -152,6 +152,15 @@ export const listMarginTargets = async (): Promise<MarginTarget[]> => {
   return rows.map(mapMarginTarget)
 }
 
+/**
+ * @deprecated TASK-464a/d replaced role_rate_cards with the canonical
+ * `greenhouse_commercial.sellable_roles` + `sellable_role_cost_components` +
+ * `sellable_role_pricing_currency` triangle. Pricing engine v2 no longer
+ * reads rate cards. Legacy consumers remain (costing-engine.ts lineType='role')
+ * and emit a `legacy_rate_card_used` resolutionNote when they hit this path.
+ * Do not extend this table — migrate new pricing onto sellable_roles.
+ * Full deprecation tracked in TASK-476.
+ */
 export const listRoleRateCards = async (): Promise<RoleRateCard[]> => {
   const rows = await query<RoleRateCardRow>(
     `SELECT rate_card_id, business_line_code, role_code, seniority_level,

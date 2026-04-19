@@ -204,6 +204,10 @@ export const resolveLineItemCost = async (
       }
     }
 
+    notes.push(
+      `[legacy_rate_card_used] Esta quote cae al costing-engine legacy (role_rate_cards). Migrar a pricing-engine-v2 con lineType='role' via sellable_roles — los rate cards están deprecados y se removerán en un follow-up. Ref: TASK-464a, TASK-476.`
+    )
+
     const card = await resolveRoleRateCard({
       businessLineCode: input.businessLineCode,
       roleCode,

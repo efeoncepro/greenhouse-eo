@@ -302,6 +302,39 @@ export interface PricingAddonOutputV2 {
   visibleToClient: boolean
 }
 
+// Structured warnings for the pricing engine.
+//
+// The engine never hard-fails on unknown catalog inputs (unknown commercial
+// model, unknown country factor, missing tier margins, etc.) because that would
+// break quotes during legitimate catalog transitions (new BL onboarding,
+// migrations, edge-case data). Instead, every silent fallback emits a warning
+// so the UI can surface it and the user can decide whether to override.
+//
+// `code` is a stable machine-readable key for filtering / i18n / tests.
+// `severity` drives the UI affordance (critical → red, warning → amber, info → neutral).
+// `lineIndex` points at the offending line when the fallback is line-specific.
+// `context` carries arbitrary debug payload (attempted input, fallback applied).
+export const PRICING_WARNING_CODES = [
+  'unknown_commercial_model',
+  'unknown_country_factor',
+  'missing_tier_margin',
+  'tool_price_default_margin',
+  'fx_fallback',
+  'tier_below_min',
+  'legacy_rate_card_used'
+] as const
+
+export type PricingWarningCode = (typeof PRICING_WARNING_CODES)[number]
+export type PricingWarningSeverity = 'critical' | 'warning' | 'info'
+
+export interface PricingWarning {
+  code: PricingWarningCode
+  severity: PricingWarningSeverity
+  message: string
+  lineIndex?: number | null
+  context?: Record<string, unknown>
+}
+
 export interface PricingEngineOutputV2 {
   lines: PricingLineOutputV2[]
   addons: PricingAddonOutputV2[]
@@ -318,5 +351,14 @@ export interface PricingEngineOutputV2 {
     marginPct: number
     classification: 'healthy' | 'warning' | 'critical'
   }
+
+  /** Legacy plain-string warnings, derived from `structuredWarnings` for
+   *  backwards compatibility with older UI consumers. Prefer reading
+   *  `structuredWarnings` in new code. */
   warnings: string[]
+
+  /** Canonical structured warnings emitted by every silent fallback in the
+   *  engine. UI consumers should render these grouped by severity with a
+   *  "Volver al valor sugerido" affordance when applicable. */
+  structuredWarnings: PricingWarning[]
 }

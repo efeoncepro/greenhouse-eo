@@ -33,7 +33,8 @@ const makeEngineOutput = (): PricingEngineOutputV2 => ({
     marginPct: 0,
     classification: 'healthy'
   },
-  warnings: []
+  warnings: [],
+  structuredWarnings: []
 })
 
 const makeService = (overrides: Partial<ServiceCatalogDetail> = {}): ServiceCatalogDetail => ({

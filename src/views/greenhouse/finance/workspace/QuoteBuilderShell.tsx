@@ -30,6 +30,7 @@ import SellableItemPickerDrawer, {
 } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
 
 import AddonSuggestionsPanel from './AddonSuggestionsPanel'
+import QuotePricingWarningsPanel from './QuotePricingWarningsPanel'
 import QuoteBuilderActions, {
   type QuoteBuilderActionsOptions,
   type QuoteBuilderState
@@ -824,6 +825,8 @@ const QuoteBuilderShell = ({
                 loading={simulating}
               />
             ) : null}
+
+            <QuotePricingWarningsPanel warnings={simulation?.structuredWarnings ?? null} />
 
             <QuoteTotalsFooter
               output={simulation}

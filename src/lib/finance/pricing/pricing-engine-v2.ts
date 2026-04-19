@@ -37,6 +37,7 @@ import type {
   PricingLineInputV2,
   PricingLineOutputV2,
   PricingOutputCurrency,
+  PricingWarning,
   RolePricingLineInputV2,
   ToolPricingLineInputV2
 } from './contracts'
@@ -189,6 +190,11 @@ interface ResolvedLineAccumulator {
   totalBillOutputCurrency: number
   monthlyResourceCostUsd: number
   roleCanSellAsStaff: boolean
+
+  /** Structured warnings produced by this line's resolver (e.g. missing tier
+   *  margin, tool price falling back to cost×1.15). The orchestrator merges
+   *  these into the engine output with `lineIndex = originalIndex`. */
+  structuredWarnings?: PricingWarning[]
 }
 
 const resolveRoleLine = async ({
@@ -247,6 +253,17 @@ const resolveRoleLine = async ({
   const monthlyCostUsd = costRow.totalMonthlyCostUsd ?? round2(hourlyCostUsd * costRow.hoursPerFteMonth)
   const tierMargins = await deps.getRoleTierMargins(role.tier as never, quoteDate)
   const marginPct = normalizeMarginPct(input.overrideMarginPct, tierMargins?.marginOpt ?? 0.35)
+  const lineWarnings: PricingWarning[] = []
+
+  if (!tierMargins) {
+    lineWarnings.push({
+      code: 'missing_tier_margin',
+      severity: 'warning',
+      message: `Rol ${input.roleSku} tiene tier "${role.tier ?? 'sin definir'}" pero no hay margin policy cargada. Se aplicó margen default 35%.`,
+      context: { roleSku: input.roleSku, tier: role.tier, fallbackMarginPct: 0.35 }
+    })
+  }
+
   const pricingBasis: 'hour' | 'month' = explicitHours ? 'hour' : 'month'
   const baseUnitCostUsd = explicitHours ? hourlyCostUsd : round2(monthlyCostUsd * resolvedFteFraction)
 
@@ -336,7 +353,8 @@ const resolveRoleLine = async ({
     totalBillUsd,
     totalBillOutputCurrency,
     monthlyResourceCostUsd: round2(monthlyCostUsd * resolvedFteFraction * quantity),
-    roleCanSellAsStaff: role.canSellAsStaff
+    roleCanSellAsStaff: role.canSellAsStaff,
+    structuredWarnings: lineWarnings.length > 0 ? lineWarnings : undefined
   }
 }
 
@@ -521,7 +539,19 @@ const resolveToolLine = async ({
     throw new Error(`Missing tool cost for ${input.toolSku}`)
   }
 
+  const lineWarnings: PricingWarning[] = []
+  const hasExplicitPrice = tool.proratedPriceUsd != null
   const baseUnitPriceUsd = tool.proratedPriceUsd ?? round2(unitCostUsd * 1.15)
+
+  if (!hasExplicitPrice) {
+    lineWarnings.push({
+      code: 'tool_price_default_margin',
+      severity: 'info',
+      message: `Herramienta ${input.toolSku} no tiene precio explícito en el catálogo. Se aplicó margen default 15% sobre costo.`,
+      context: { toolSku: input.toolSku, unitCostUsd, fallbackMarkupPct: 0.15 }
+    })
+  }
+
   const unitPriceUsd = round2(baseUnitPriceUsd * countryFactorApplied)
   const totalUnits = quantity * periods
   const totalCostUsd = round2(unitCostUsd * totalUnits)
@@ -569,7 +599,8 @@ const resolveToolLine = async ({
     totalBillUsd,
     totalBillOutputCurrency: round2(unitPriceOutputCurrency * totalUnits),
     monthlyResourceCostUsd: 0,
-    roleCanSellAsStaff: false
+    roleCanSellAsStaff: false,
+    structuredWarnings: lineWarnings.length > 0 ? lineWarnings : undefined
   }
 }
 
@@ -736,8 +767,34 @@ export const buildPricingEngineOutputV2 = async (
   }
 
   const warnings = new Set<string>()
+  const structuredWarnings: PricingWarning[] = []
+
+  const pushWarning = (warning: PricingWarning) => {
+    structuredWarnings.push(warning)
+    warnings.add(warning.message)
+  }
+
   const commercialModel = await deps.getCommercialModelMultiplier(input.commercialModel as never, input.quoteDate)
   const countryFactor = await deps.getCountryPricingFactor(input.countryFactorCode as never, input.quoteDate)
+
+  if (!commercialModel) {
+    pushWarning({
+      code: 'unknown_commercial_model',
+      severity: 'critical',
+      message: `Modelo comercial "${input.commercialModel}" no está en el catálogo. Se aplicó multiplicador neutral (1.00).`,
+      context: { attempted: input.commercialModel, fallback: 1 }
+    })
+  }
+
+  if (!countryFactor) {
+    pushWarning({
+      code: 'unknown_country_factor',
+      severity: 'critical',
+      message: `Factor país "${input.countryFactorCode}" no está en el catálogo. Se aplicó factor neutral (1.00).`,
+      context: { attempted: input.countryFactorCode, fallback: 1 }
+    })
+  }
+
   const commercialMultiplierFactor = 1 + (commercialModel?.multiplierPct ?? 0)
   const countryFactorApplied = countryFactor?.factorOpt ?? 1
 
@@ -800,6 +857,13 @@ export const buildPricingEngineOutputV2 = async (
     }
 
     resolved.line.resolutionNotes.forEach(note => warnings.add(note))
+
+    if (resolved.structuredWarnings) {
+      for (const w of resolved.structuredWarnings) {
+        pushWarning({ ...w, lineIndex: entry.originalIndex })
+      }
+    }
+
     resolvedLineAccumulators.push({
       originalIndex: entry.originalIndex,
       ...resolved
@@ -820,6 +884,13 @@ export const buildPricingEngineOutputV2 = async (
     })
 
     resolved.line.resolutionNotes.forEach(note => warnings.add(note))
+
+    if (resolved.structuredWarnings) {
+      for (const w of resolved.structuredWarnings) {
+        pushWarning({ ...w, lineIndex: entry.originalIndex })
+      }
+    }
+
     resolvedLineAccumulators.push({
       originalIndex: entry.originalIndex,
       ...resolved
@@ -917,7 +988,16 @@ export const buildPricingEngineOutputV2 = async (
         : 'healthy'
 
   if (lineComplianceStatuses.includes('below_min')) {
-    warnings.add('One or more lines are below the tier minimum margin.')
+    const affectedIndexes = lineOutputs
+      .map((line, idx) => (line.tierCompliance.status === 'below_min' ? idx : -1))
+      .filter(idx => idx >= 0)
+
+    pushWarning({
+      code: 'tier_below_min',
+      severity: 'critical',
+      message: `Una o más líneas están bajo el margen mínimo del tier (líneas ${affectedIndexes.map(i => i + 1).join(', ')}).`,
+      context: { lineIndexes: affectedIndexes }
+    })
   }
 
   return {
@@ -946,6 +1026,7 @@ export const buildPricingEngineOutputV2 = async (
       marginPct: aggregateMarginPct,
       classification
     },
-    warnings: Array.from(warnings)
+    warnings: Array.from(warnings),
+    structuredWarnings
   }
 }
