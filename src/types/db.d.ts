@@ -331,6 +331,20 @@ export interface GreenhouseCommercialOverheadAddons {
   visible_to_client: Generated<boolean>;
 }
 
+export interface GreenhouseCommercialPricingCatalogAuditLog {
+  action: string;
+  actor_name: string;
+  actor_user_id: string;
+  audit_id: Generated<string>;
+  change_summary: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  effective_from: Timestamp | null;
+  entity_id: string;
+  entity_sku: string | null;
+  entity_type: string;
+  notes: string | null;
+}
+
 export interface GreenhouseCommercialProductCatalog {
   active: Generated<boolean>;
   business_line_code: string | null;
@@ -5208,6 +5222,7 @@ export interface DB {
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
+  "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;

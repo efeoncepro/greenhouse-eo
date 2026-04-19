@@ -84,6 +84,15 @@ export const canViewCostStack = (tenant: TenantContext) =>
   hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) ||
   hasRoleCode(tenant, ROLE_CODES.FINANCE_ANALYST)
 
+/**
+ * Gates el admin UI de pricing catalog (TASK-467).
+ * Finance admin y Efeonce admin pueden administrar el catálogo entero
+ * (crear roles, tools, overheads; ajustar governance tables).
+ */
+export const canAdministerPricingCatalog = (tenant: TenantContext) =>
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN)
+
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||

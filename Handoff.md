@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-467 Pricing Catalog Admin UI MVP (cierre)
+
+- **Owner:** Claude
+- **Estado:** shipped + closed (Lifecycle `complete`, archivo movido a `docs/tasks/complete/`)
+- **Branch:** `task/TASK-467-pricing-catalog-admin-ui` (rebased sobre develop con TASK-456 incluido)
+- **Scope MVP shipped:**
+  - Migration `20260419003745335_task-467-pricing-catalog-audit-log.sql` aplicada + tipos regenerados (247 tables)
+  - `greenhouse_commercial.pricing_catalog_audit_log` con 9 entity types + 7 actions + 3 índices
+  - Store `src/lib/commercial/pricing-catalog-audit-store.ts` (`recordPricingCatalogAudit` + `listPricingCatalogAudit`)
+  - Permission helper `canAdministerPricingCatalog` en `src/lib/tenant/authorization.ts` (efeonce_admin + finance_admin)
+  - 8 API routes `/api/admin/pricing-catalog/{roles,tools,overheads,governance,audit-log}` con gate unificado
+  - UI `/admin/pricing-catalog/` — home con 7 nav cards + 3 list views (roles/tools/overheads) con TanStack table, filtros, toggle active + 3 create drawers con SKU auto-generado via DEFAULT sequence + governance inline edit page (5 secciones accordion)
+  - Menu entry `adminPricingCatalog` en `GH_INTERNAL_NAV` + `VerticalMenu.tsx`
+  - Docs funcional `docs/documentation/finance/administracion-catalogo-pricing.md`
+  - Architecture doc `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` v2.16
+- **Scope fuera de MVP (follow-up TASK-467-phase-2):**
+  - Edit completo de cost components per employment_type (multi-tab)
+  - Pricing per currency edit
+  - Admin UI de employment types (placeholder en home)
+  - Excel import con diff preview
+  - Audit timeline UI con diff viewer visual
+  - Approval workflow para cambios críticos
+- **Desviaciones técnicas:**
+  - Bypass intencional de upsert stores (esperan shape de seed CSV) — INSERT/UPDATE directos para respetar DEFAULT sequence del SKU. Stores sin modificar; `list*` se siguen usando para GETs
+  - `actorName` resuelto vía `getServerAuthSession()` (TenantContext no expone displayName)
+  - Providers lookup en ToolDrawer: texto libre con helper text (no hay `/api/admin/providers` todavía)
+- **Gates verdes:**
+  - `pnpm lint` clean
+  - `npx tsc --noEmit` clean
+  - `pnpm test` → 284/284 (194 payroll baseline intacto + 21 pricing + 64 commercial/hubspot + 3 TASK-463 + 2 TASK-455)
+  - `pnpm build` compiled exit 0
+  - `pnpm migrate:up` aplicada limpio
+  - Zero `new Pool()` rogue
+- **Rebase context:** arranqué task branch desde develop ANTES de que Codex mergeara TASK-456 (`27be463e`). Durante migrate-up el timestamp check falló (TASK-456 ya aplicado en DB pero mi branch no tenía el archivo). Rebase clean sobre `origin/develop` + reintent migrate-up exitoso.
+- **Payroll isolation mantenida**: ningún write a `greenhouse_payroll.*`, 194 tests payroll intactos.
+
 ## Sesion 2026-04-19 — TASK-456 Deal Pipeline Snapshots Projection (Codex)
 
 - **Owner:** Codex

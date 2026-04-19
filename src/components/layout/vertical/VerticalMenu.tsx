@@ -423,6 +423,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminTalentReview), href: '/admin/talent-review', icon: 'tabler-rosette-discount-check' },
               { label: nl(GH_INTERNAL_NAV.adminTalentOps), href: '/admin/talent-ops', icon: 'tabler-heart-rate-monitor' },
               { label: nl(GH_INTERNAL_NAV.adminBusinessLines), href: '/admin/business-lines' },
+              { label: nl(GH_INTERNAL_NAV.adminPricingCatalog), href: '/admin/pricing-catalog' },
               { label: nl(GH_INTERNAL_NAV.adminServiceSlas), href: '/admin/service-slas', icon: 'tabler-shield-check' },
               { label: nl(GH_INTERNAL_NAV.adminPaymentInstruments), href: '/admin/payment-instruments' }
             ].filter(item => {
@@ -430,6 +431,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/talent-review') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/talent-ops') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/business-lines') return canSeeView('administracion.admin_center', true)
+              if (item.href === '/admin/pricing-catalog') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/service-slas') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/payment-instruments') return canSeeView('administracion.instrumentos_pago', true)
 
