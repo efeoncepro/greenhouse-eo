@@ -2,6 +2,14 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — fix(quotes): POST /api/finance/quotes now saves
+
+- `POST /api/finance/quotes` devolvía HTTP 500 con body vacío al guardar desde el builder full-page cuando no había `spaceId` explícito.
+- Root cause: reuse del mismo parameter (`$4 = space_id`) como columna VALUES y dentro de `CASE WHEN $4 IS NOT NULL` (space_resolution_source). Postgres no podía inferir tipo cuando `$4` era null untyped → "could not determine data type of parameter $4".
+- Fix canónico: `space_resolution_source` se deriva en JS y viaja como `$24` positional. SQL queda fully typed por column context. Zero cambio semántico.
+- Companion: error handler propio en los dos INSERTs (quotations + line items) con `console.error` estructurado. El 500 ya no puede volver a salir con body vacío.
+- Follow-up arquitectónico abierto como **TASK-486 — Commercial Quotation Canonical Anchor (Organization + Contact)**: deprecar `quotations.space_id`, agregar `contact_identity_profile_id`, renombrar el dropdown del builder. Space no pertenece en la identidad canónica de la quote.
+
 ### 2026-04-19 — TASK-484 wires FX provider platform (ready for rollout)
 
 - Plataforma de 9 FX provider adapters (Mindicador, OpenER, Banxico SIE, TRM Colombia, SUNAT Perú, BCRP, Frankfurter, Fawaz Ahmed, CLF from UF indicator) con sync orchestrator registry-driven.

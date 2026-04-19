@@ -1,5 +1,21 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — ISSUE: Quote save 500 "could not determine data type of parameter $4" (Claude)
+
+- **Owner:** Claude
+- **Estado:** Fijado en `develop` (commits `bddae660`, `e7d39146`, `2e237c07`, `10018007`). Staging verificado: empty quote + quote con role line devuelven HTTP 201.
+- **Root cause:** `POST /api/finance/quotes` reusaba `$4` (space_id) tanto como columna VALUES como dentro de `CASE WHEN $4 IS NOT NULL THEN 'explicit' ELSE 'unresolved' END` (space_resolution_source). Cuando el builder UI no envía `spaceId`, `$4` llega como null untyped; Postgres no podía unificar el tipo entre los dos contextos y abortaba con el error. El 500 salía con body vacío porque el `throw error` del catch inicial degradaba a generic 500 de Next.
+- **Fix canónico (no parche):** derivar `space_resolution_source` en JS (`body.spaceId != null ? 'explicit' : 'unresolved'`) y pasarlo como `$24` positional. Se eliminó el parameter reuse en contextos incompatibles. Misma semántica, SQL queda fully typed por column context.
+- **Companion hardening:** dos try/catch nuevos (INSERT quotations + persistQuotationPricing) que devuelven el mensaje real + structured console.error. Siempre. Next no puede volver a esconder un 500 con body vacío en este endpoint.
+
+### Follow-up arquitectónico identificado (no parche — task separada)
+
+Al investigar el bug quedó expuesto que `quotations` mezcla identidades: tiene `client_id`, `organization_id` y `space_id` en la misma fila, pero el builder UI etiqueta "Espacio destinatario" en un dropdown que **bindea a `organizationId`**. El nombre engaña y `space_id` siempre llega null desde la UI nueva. La regla canónica de Greenhouse es: una cotización se ancla a **Organización (cliente o prospecto) + Contacto (persona)**, no a Space. Space es proyección operativa post-conversión (delivery / pulse / ICO) — no pertenece en la quote canónica.
+
+**Creada TASK-486 — Commercial Quotation Canonical Anchor (Organization + Contact)** como spec del refactor enterprise. Alcance: deprecar `quotations.space_id`, agregar `contact_identity_profile_id` (FK a `greenhouse_core.identity_profiles`), renombrar label del builder, rehacer validación del POST para exigir `organizationId`. Task separada — no se mezcla con TASK-477 (domain distinto) ni con el bug fix actual.
+
+---
+
 ## Sesion 2026-04-19 — TASK-484 FX Provider Adapter Platform (Claude)
 
 - **Owner:** Claude
