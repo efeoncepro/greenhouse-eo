@@ -1,5 +1,79 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-465 Service Composition Catalog + Admin UI + Expand API (Claude)
+
+- **Owner:** Claude
+- **Estado:** `in-progress` → listo para PR (acceptance criteria cubiertos + re-scope de UI respetado)
+- **Rama:** `task/TASK-465-service-composition-catalog-ui`
+- **Scope respetado:** backend completo (schema + store + constraints + audit + seed + admin APIs + from-service expansion) + admin UI reusable. **Congelado:** cualquier extensión del `QuoteCreateDrawer` como surface principal. La integración final del picker en create/edit queda en `TASK-473`.
+
+### Entregables
+
+- **Schema canónico**: `migrations/20260419093339069_task-465-service-composition-catalog.sql`
+  - `greenhouse_commercial.service_pricing` con PK = `module_id` FK a `greenhouse_core.service_modules` (1:1). SKU auto-generado vía `generate_service_sku()` = `EFG-###`, sequence inicia en 8.
+  - `greenhouse_commercial.service_role_recipe(module_id, line_order PK, role_id FK sellable_roles, hours_per_period, quantity, is_optional, notes)`
+  - `greenhouse_commercial.service_tool_recipe(module_id, line_order PK, tool_id, tool_sku, quantity, is_optional, pass_through, notes)` — FK soft cross-schema a `greenhouse_ai.tool_catalog`
+  - `quotation_line_items` extendida con `module_id` FK + `service_sku` + `service_line_order` para trazabilidad robusta a renames
+  - Ownership `greenhouse_ops`; grants a runtime/migrator/app
+- **Audit extension**: `migrations/20260419094152047_task-465-pricing-catalog-audit-service-support.sql` extiende `pricing_catalog_audit_log` para aceptar `entity_type='service_catalog'` + acciones `recipe_updated`/`deleted`. TS side: `src/lib/commercial/pricing-catalog-audit-store.ts`.
+- **Store Kysely**: `src/lib/commercial/service-catalog-store.ts` (listServiceCatalog, getServiceByModuleId/ServiceBySku, createService [atomic service_modules+service_pricing], updateService, softDeleteService, replaceRoleRecipe, replaceToolRecipe, upsertServiceModule)
+- **Constraints**: `src/lib/commercial/service-catalog-constraints.ts` (validateServiceCatalog/RoleRecipeLine/ToolRecipeLine)
+- **Expansion**: `src/lib/commercial/service-catalog-expand.ts` (`expandServiceIntoQuoteLines`) → construye `PricingEngineInputV2.lines[]` reutilizando `buildPricingEngineOutputV2` del engine v2 sin duplicar lógica. Soporta overrides por lineOrder (hours/quantity/excluded) y `commercialModelOverride`.
+- **APIs admin**: `/api/admin/pricing-catalog/services/{,[id],[id]/recipe}` con `canAdministerPricingCatalog` gate + `If-Match` optimistic lock + audit log.
+- **API expand**: `POST /api/finance/quotes/from-service` (fin) y extensión del `/api/finance/quotes/pricing/lookup` con `type=service` (incluye `moduleId`, `tier`, `commercialModel`, `serviceUnit`, counts en metadata).
+- **Seed**: `scripts/seed-service-catalog.ts` + `pnpm seed:service-catalog --apply`. Seedea los 7 EFG activos (UPSERT idempotente en `service_modules` + `service_pricing` + recipes). Placeholders EFG-008..048 se skip (Open Question cerrada). Aplicado en dev: 7 services, 7 role lines, 14 tool lines.
+- **Admin UI** (reusable, NO acoplada al drawer legacy):
+  - Page `src/app/(dashboard)/admin/pricing-catalog/services/page.tsx`
+  - List view `ServiceCatalogListView.tsx`
+  - Drawers `CreateServiceDrawer.tsx` + `EditServiceDrawer.tsx` (sin tabs; secciones Detalle general / Receta de roles y herramientas / Simular precio)
+  - Recipe editor con keyboard-only reorder (WCAG 2.5.7)
+  - Card adicional en `PricingCatalogHomeView` (5ta card "Servicios empaquetados")
+- **Picker tab**: `SellableItemPickerDrawer` activa tab `services` contra el lookup real (queda como subflujo acotado reusable; NO se profundizó `QuoteCreateDrawer` per Delta 2026-04-19 de la spec).
+- **Tests** (Vitest): `service-catalog-constraints.test.ts` (20 asserts) + `service-catalog-expand.test.ts` (11 asserts). Corrieron limpios (31/31).
+
+### Verificación corrida
+
+- `pnpm migrate:up` → aplicada, tipos regenerados en `src/types/db.d.ts` (255 tablas)
+- `pnpm exec vitest run src/lib/commercial/__tests__/service-catalog-*.test.ts` → 31/31 PASS
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → clean después de `--fix` (padding-line autofixes)
+- `pnpm build` → Compiled successfully en 14.6s
+
+### Cross-impact (chequeo obligatorio al cerrar)
+
+- **TASK-462** (MRR/ARR): `quotation_line_items.module_id`/`service_sku` quedan disponibles como dimensión analítica cuando contratos hereden esos campos. No requiere cambios propios hoy; el hook aguas arriba ya está.
+- **TASK-460** (Contract): trazabilidad quote→contrato por `module_id` ahora es posible vía join; el campo `originator_service_sku` en contracts queda como follow-up menor si se desea denormalizar.
+- **TASK-473** (Builder full-page): este PR NO integra el picker en `QuoteCreateDrawer`. TASK-473 absorbe la integración primaria sobre `/finance/quotes/new` y `/finance/quotes/[id]/edit`, consumiendo `GET /api/finance/quotes/pricing/lookup?type=service` + `POST /api/finance/quotes/from-service` ya disponibles.
+- **TASK-466** (multi-currency): desbloqueada indirectamente — el output de `from-service` ya soporta `outputCurrency` parametrizable.
+
+### Seguimiento
+
+- Follow-up menor: cuando TASK-473 aterrice, reemplazar `SellableItemPickerDrawer` como surface principal por el picker full-page. El drawer se mantiene como sub-flujo bounded (p. ej. "Agregar servicio" en modal rápido).
+- Follow-up menor: documento funcional de `docs/documentation/finance/` (una vez el admin UI esté vivo en staging con datos reales).
+
+## Sesion 2026-04-19 — Realineamiento del programa de cotizaciones hacia builder full-page (Codex)
+
+- **Owner:** Codex
+- **Estado:** ajuste documental del programa; **sin cambios de runtime**
+- **Decisión de producto/UI:** el quote builder ya no debe seguir creciendo dentro de `QuoteCreateDrawer`. La dirección canónica vuelve a la Surface A de `TASK-469`: `/finance/quotes/new` y `/finance/quotes/[id]/edit` como builder full-page; `/finance/quotes/[id]` queda para review / governance / lifecycle.
+- **Task nueva creada:** `TASK-473 — Quote Builder Full-Page Surface Migration & Flow Recomposition`
+- **Backlog realineado:**
+  - `TASK-466` queda explícitamente bloqueada por `TASK-473` y se reancla al builder full-page + detail review
+  - `TASK-465` deja de referenciar `QuoteCreateDrawer` como surface principal y pasa a montar su picker dentro del builder canónico
+  - `TASK-473` endurece su contrato: el builder nuevo debe reconectar explícitamente catálogo, servicios, templates y manual como fuentes de composición
+  - `TASK-474` queda creada como red de seguridad post-merge si `TASK-465` y `TASK-473` aterrizan bien técnicamente pero todavía se perciben desconectadas en la UX final
+  - `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` quedaron sincronizados con `TASK-473`, `TASK-474` y con `TASK-465` en `in-progress`
+- **Importante:** `TASK-471` no se tocó a nivel de scope; sigue siendo pricing catalog admin polish, no quote-builder UX
+- **Riesgo evitado:** sin este ajuste, los follow-ons del módulo de cotizaciones seguían diseñándose sobre una surface transitoria y sobredensa
+
+## Sesion 2026-04-19 — TASK-470 formalmente cerrada (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Cierre formal:** la task ya no queda en `to-do`; se movió a `docs/tasks/complete/`.
+- **Validación final adicional corrida hoy:** `pnpm test` completo verde (`318` files, `1476` tests passed, `2` skipped).
+- **Conclusión:** no quedaba gap backend material en el scope de TASK-470; lo pendiente era sincronizar lifecycle/documentación con el estado real del repo.
+
 ## Sesion 2026-04-19 — E2E smoke test completo + ISSUE-054 detectado (Claude)
 
 - **Owner:** Claude

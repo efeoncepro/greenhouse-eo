@@ -457,12 +457,15 @@ export interface GreenhouseCommercialQuotationLineItems {
   line_type: Generated<string>;
   margin_pct: Numeric | null;
   member_id: string | null;
+  module_id: string | null;
   notes: string | null;
   product_id: string | null;
   quantity: Generated<Numeric>;
   quotation_id: string;
   recurrence_type: Generated<string>;
   role_code: string | null;
+  service_line_order: number | null;
+  service_sku: string | null;
   sort_order: Generated<number>;
   source_system: Generated<string>;
   subtotal_after_discount: Numeric | null;
@@ -727,12 +730,56 @@ export interface GreenhouseCommercialSellableRoles {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialServicePricing {
+  active: Generated<boolean>;
+  business_line_code: string | null;
+  commercial_model: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  default_description: string | null;
+  default_duration_months: number | null;
+  display_name: string | null;
+  module_id: string;
+  service_category: string | null;
+  service_sku: Generated<string>;
+  service_type: string | null;
+  service_unit: Generated<string>;
+  tier: string;
+  updated_at: Generated<Timestamp>;
+  updated_by_user_id: string | null;
+}
+
+export interface GreenhouseCommercialServiceRoleRecipe {
+  created_at: Generated<Timestamp>;
+  hours_per_period: Numeric;
+  is_optional: Generated<boolean>;
+  line_order: number;
+  module_id: string;
+  notes: string | null;
+  quantity: Generated<number>;
+  role_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialServiceTierMargins {
   description: string | null;
   effective_from: Generated<Timestamp>;
   margin_base: Numeric;
   tier: string;
   tier_label: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialServiceToolRecipe {
+  created_at: Generated<Timestamp>;
+  is_optional: Generated<boolean>;
+  line_order: number;
+  module_id: string;
+  notes: string | null;
+  pass_through: Generated<boolean>;
+  quantity: Generated<number>;
+  tool_id: string;
+  tool_sku: string;
   updated_at: Generated<Timestamp>;
 }
 
@@ -5347,7 +5394,10 @@ export interface DB {
   "greenhouse_commercial.sellable_role_cost_components": GreenhouseCommercialSellableRoleCostComponents;
   "greenhouse_commercial.sellable_role_pricing_currency": GreenhouseCommercialSellableRolePricingCurrency;
   "greenhouse_commercial.sellable_roles": GreenhouseCommercialSellableRoles;
+  "greenhouse_commercial.service_pricing": GreenhouseCommercialServicePricing;
+  "greenhouse_commercial.service_role_recipe": GreenhouseCommercialServiceRoleRecipe;
   "greenhouse_commercial.service_tier_margins": GreenhouseCommercialServiceTierMargins;
+  "greenhouse_commercial.service_tool_recipe": GreenhouseCommercialServiceToolRecipe;
   "greenhouse_commercial.terms_library": GreenhouseCommercialTermsLibrary;
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;

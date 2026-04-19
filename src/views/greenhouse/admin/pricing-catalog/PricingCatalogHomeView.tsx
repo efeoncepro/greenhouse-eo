@@ -10,6 +10,7 @@ export interface PricingCatalogCounts {
   roles: number
   tools: number
   overheads: number
+  services: number
   tiers: number
   commercialModels: number
   countryFactors: number
@@ -46,6 +47,14 @@ const PricingCatalogHomeView = ({ counts }: Props) => {
       icon: 'tabler-receipt',
       color: 'warning' as const,
       description: 'Fees, fondos y cargos adicionales'
+    },
+    {
+      href: '/admin/pricing-catalog/services',
+      label: GH_PRICING.adminServices.label,
+      count: counts.services,
+      icon: 'tabler-package',
+      color: 'success' as const,
+      description: GH_PRICING.adminServices.navDescription
     },
     {
       href: '/admin/pricing-catalog/governance',

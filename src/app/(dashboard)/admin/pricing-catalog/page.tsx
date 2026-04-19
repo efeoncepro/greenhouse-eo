@@ -12,6 +12,7 @@ import {
   listServiceTierMargins
 } from '@/lib/commercial/pricing-governance-store'
 import { listEmploymentTypes, listSellableRoles } from '@/lib/commercial/sellable-roles-store'
+import { listServiceCatalog } from '@/lib/commercial/service-catalog-store'
 import { listToolCatalog } from '@/lib/commercial/tool-catalog-store'
 import { canAdministerPricingCatalog } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
@@ -36,6 +37,7 @@ const Page = async () => {
     sellableRoles,
     toolCatalog,
     overheadAddons,
+    serviceCatalog,
     roleTierMargins,
     serviceTierMargins,
     commercialModelMultipliers,
@@ -46,6 +48,7 @@ const Page = async () => {
     listSellableRoles({ activeOnly: false }),
     listToolCatalog({ active: false }),
     listOverheadAddons({ active: false }),
+    listServiceCatalog({ activeOnly: false }),
     listRoleTierMargins(),
     listServiceTierMargins(),
     listCommercialModelMultipliers(),
@@ -58,6 +61,7 @@ const Page = async () => {
     roles: sellableRoles.filter(r => r.active).length,
     tools: toolCatalog.filter(t => t.isActive).length,
     overheads: overheadAddons.filter(o => o.active).length,
+    services: serviceCatalog.filter(s => s.active).length,
     tiers: roleTierMargins.length + serviceTierMargins.length,
     commercialModels: commercialModelMultipliers.length,
     countryFactors: countryPricingFactors.length,

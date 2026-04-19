@@ -107,15 +107,6 @@ const SellableItemPickerDrawer = ({
   useEffect(() => {
     if (!open) return
 
-    // "services" tab no tiene lookup todavía (TASK-465 lo agrega). Placeholder UX.
-    if (activeTab === 'services') {
-      setItems([])
-      setLoading(false)
-      setError(null)
-
-      return
-    }
-
     const controller = new AbortController()
 
     const timer = setTimeout(async () => {

@@ -1636,7 +1636,7 @@ export const GH_PRICING = {
   pickerSearchPlaceholder: 'Buscar por SKU o nombre...',
   pickerEmpty: 'No hay ítems activos para este filtro',
   pickerEmptyCta: 'Ir al catálogo',
-  pickerServicesPlaceholder: 'Los servicios empaquetados se habilitan en TASK-465.',
+  pickerServicesPlaceholder: 'Aún no hay servicios activos. Agrega uno en Admin › Catálogo de pricing › Servicios.',
   pickerLoadingAria: 'Cargando catálogo',
   pickerSelectionNone: 'Ningún ítem seleccionado',
   pickerSelectionCountOne: (n: number) => `${n} ítem seleccionado`,
@@ -1688,7 +1688,145 @@ export const GH_PRICING = {
   adminRoles: 'Roles vendibles',
   adminTools: 'Catálogo de herramientas',
   adminOverhead: 'Overhead add-ons',
-  adminServices: 'Servicios empaquetados',
+  adminServicesLabel: 'Servicios empaquetados',
+  adminServices: {
+    label: 'Servicios empaquetados',
+    title: 'Servicios empaquetados',
+    subtitle:
+      'Servicios reusables con recipe de roles y herramientas que se expanden automáticamente en cada cotización.',
+    navDescription: 'Catálogo de servicios compuestos con SKU EFG-XXX',
+    backToCatalog: 'Volver al catálogo',
+    createCta: 'Nuevo servicio',
+    createFirstCta: 'Crear primer servicio',
+    editCta: 'Editar servicio',
+    deactivateCta: 'Desactivar',
+    activateCta: 'Reactivar',
+    simulateCta: 'Simular precio',
+    saveRecipeCta: 'Guardar receta',
+    addRoleCta: 'Agregar rol',
+    addToolCta: 'Agregar herramienta',
+    moveUpLabel: 'Subir fila',
+    moveDownLabel: 'Bajar fila',
+    removeRowLabel: 'Eliminar fila',
+
+    // Columns
+    columns: {
+      sku: 'SKU',
+      name: 'Nombre',
+      category: 'Categoría',
+      tier: 'Tier',
+      commercialModel: 'Modelo comercial',
+      unit: 'Unidad',
+      duration: 'Duración',
+      businessLine: 'BL',
+      active: 'Estado',
+      roleCount: '# Roles',
+      toolCount: '# Tools',
+      actions: 'Acciones'
+    },
+
+    // Recipe columns
+    recipeRoleColumns: {
+      role: 'Rol',
+      hours: 'Horas/periodo',
+      quantity: 'Cantidad',
+      optional: 'Opcional',
+      notes: 'Notas'
+    },
+    recipeToolColumns: {
+      tool: 'Herramienta',
+      quantity: 'Cantidad',
+      optional: 'Opcional',
+      passThrough: 'Pass-through',
+      notes: 'Notas'
+    },
+
+    // Filters
+    filterTier: 'Tier',
+    filterCategory: 'Categoría',
+    filterBusinessLine: 'Unidad de negocio',
+    filterStatus: 'Estado',
+    filterAllTiers: 'Todos los tiers',
+    filterAllCategories: 'Todas las categorías',
+    filterAllBusinessLines: 'Todas las BL',
+    searchPlaceholder: 'Buscar por SKU o nombre...',
+
+    // Service units
+    serviceUnits: {
+      project: 'Proyecto',
+      monthly: 'Mensual (retainer)'
+    } as Record<string, string>,
+
+    // Commercial models
+    commercialModels: {
+      on_going: 'On-going (retainer)',
+      on_demand: 'On-demand (proyecto)',
+      hybrid: 'Híbrido',
+      license_consulting: 'Licencia + consultoría'
+    } as Record<string, string>,
+
+    // Tiers
+    tierOptions: {
+      '1': 'T1 · Junior',
+      '2': 'T2 · Mid',
+      '3': 'T3 · Senior',
+      '4': 'T4 · Lead'
+    } as Record<string, string>,
+
+    // Sections
+    sectionGeneral: 'Detalle general',
+    sectionRecipe: 'Receta de roles y herramientas',
+    sectionSimulate: 'Simular precio',
+    sectionRecipeRoles: 'Roles',
+    sectionRecipeTools: 'Herramientas',
+
+    // Empty states
+    emptyStateFirstTitle: 'Aún no tienes servicios empaquetados',
+    emptyStateFirstDescription:
+      'Los servicios agrupan roles y herramientas reusables. Al crearlos, se expanden en cada cotización sin armar desde cero.',
+    emptyStateNoResultsTitle: 'Sin resultados',
+    emptyStateNoResultsDescription:
+      'Ajusta los filtros o usa otras palabras para buscar.',
+    emptyRecipeRoles: 'Aún no hay roles en la receta. Agrega el primero para simular el servicio.',
+    emptyRecipeTools: 'Aún no hay herramientas en la receta.',
+
+    // Hints
+    moduleCodeHint: 'Identificador interno (auto-generado desde el nombre, editable).',
+    durationHint: 'Meses sugeridos para retainers; aplica solo si la unidad es Mensual.',
+    skuHint: 'Se asigna automáticamente al guardar (prefijo EFG).',
+    simulateHint: 'Calcula el precio total del servicio usando el motor de pricing v2.',
+
+    // Validation
+    validation: {
+      moduleNameRequired: 'Ingresa un nombre para el servicio.',
+      serviceUnitRequired: 'Selecciona la unidad de servicio.',
+      commercialModelRequired: 'Selecciona el modelo comercial.',
+      tierRequired: 'Selecciona el tier.',
+      durationRequiredForMonthly: 'Para servicios mensuales, ingresa la duración en meses.',
+      durationMustBePositive: 'La duración debe ser mayor o igual a 0.',
+      roleRequired: 'Selecciona un rol para esta fila.',
+      hoursMustBePositive: 'Las horas deben ser mayores a 0.',
+      quantityMustBePositive: 'La cantidad debe ser al menos 1.',
+      toolRequired: 'Selecciona una herramienta para esta fila.'
+    },
+
+    // Errors
+    errorSkuConflict: 'Ya existe un servicio con ese código. Usa otro identificador.',
+    errorConflict: 'El servicio cambió desde que lo abriste. Recarga para continuar.',
+    errorLoad: 'No pudimos cargar el servicio. Intenta de nuevo.',
+    errorLoadList: 'No pudimos cargar los servicios. Intenta de nuevo.',
+    errorSave: 'No pudimos guardar los cambios. Revisa los valores e intenta de nuevo.',
+    errorSaveRecipe: 'No pudimos guardar la receta. Revisa los valores e intenta de nuevo.',
+    errorSimulate: 'No pudimos simular el precio. Revisa la receta e intenta de nuevo.',
+
+    // Success toasts
+    toastCreated: (sku: string) => `Servicio creado — SKU ${sku} asignado`,
+    toastUpdated: 'Cambios guardados',
+    toastRecipeUpdated: 'Receta guardada',
+    toastDeactivated: (sku: string) =>
+      `Servicio ${sku} desactivado — no aparecerá en nuevas cotizaciones`,
+    toastReactivated: (sku: string) => `Servicio ${sku} reactivado`
+  },
   adminTiers: 'Tiers de rol',
   adminCommercialModels: 'Modelos comerciales',
   adminCountryFactors: 'Factores de país',

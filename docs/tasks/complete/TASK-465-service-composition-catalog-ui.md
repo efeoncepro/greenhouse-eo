@@ -1,5 +1,17 @@
 # TASK-465 — Service Composition Catalog + Admin UI + Quote Picker
 
+## Delta 2026-04-19 — Reanclaje al quote builder full-page
+
+La spec venía acoplada a `QuoteCreateDrawer`, pero el programa ya formaliza que el quote builder principal debe migrar a páginas dedicadas vía `TASK-473`.
+
+**Ajuste canónico:**
+
+1. El service picker sigue existiendo, pero su superficie primaria pasa a ser el builder full-page (`/finance/quotes/new` y `/finance/quotes/[id]/edit`).
+2. `SellableItemPickerDrawer` y cualquier `ServicePickerDrawer` siguen siendo válidos como sub-flujos acotados dentro del builder, no como surface principal del módulo.
+3. Esta task no debe seguir profundizando `QuoteCreateDrawer`; debe extender `QuoteBuilderShell` / `QuoteBuilderPageView` una vez que `TASK-473` deje esa boundary lista.
+4. El modelo de datos y el admin CRUD siguen intactos; el cambio aquí es de montaje UI y ownership de surface.
+5. Si por trabajo paralelo la integración final con el builder full-page queda incompleta o poco visible, ejecutar `TASK-474` como pass de reconexión UX post-merge.
+
 ## Delta 2026-04-18 — Reconciliación con modelo canónico
 
 Antes de arrancar implementación, reconciliación vs el 360 object model del CLAUDE.md (`Servicio → greenhouse_core.service_modules.module_id`) + la regla "módulos de dominio extienden estos objetos, no crean identidades paralelas".
@@ -29,7 +41,7 @@ El resto de la spec (pricing engine v2 integration, picker drawer, reporting hoo
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -37,14 +49,14 @@ El resto de la spec (pricing engine v2 integration, picker drawer, reporting hoo
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-464a, TASK-464c (tool catalog extension), TASK-464d (engine v2)`
+- Blocked by: `TASK-464a, TASK-464c (tool catalog extension), TASK-464d (engine v2), TASK-473 (builder full-page surface migration)`
 - Branch: `task/TASK-465-service-composition-catalog-ui`
 - Legacy ID: `parte de revenue pricing program`
 - GitHub Issue: `none`
 
 ## Summary
 
-Canonicalizar el catálogo de servicios compuestos de Efeonce (EFG-XXX SKU) — 7 servicios ya definidos en el Excel + expandible por admin. Cada servicio tiene un recipe de roles (quantity × hours) + tools (quantity) que al seleccionarlo en el cotizador auto-expande a líneas editables. Agrega admin UI para CRUD + service picker en `QuoteCreateDrawer`. Habilita MRR/ARR por servicio (TASK-462) y reportería de margin per service.
+Canonicalizar el catálogo de servicios compuestos de Efeonce (EFG-XXX SKU) — 7 servicios ya definidos en el Excel + expandible por admin. Cada servicio tiene un recipe de roles (quantity × hours) + tools (quantity) que al seleccionarlo en el cotizador auto-expande a líneas editables. Agrega admin UI para CRUD + service picker dentro del quote builder canónico. Habilita MRR/ARR por servicio (TASK-462) y reportería de margin per service.
 
 ## Why This Task Exists
 
@@ -63,7 +75,7 @@ TASK-349 tiene "templates de quote" (snapshots de line items anteriores), pero e
 - **Extender el modelo canónico**: `greenhouse_core.service_modules` (identidad) + `greenhouse_commercial.service_pricing` (capa comercial) + `service_role_recipe` + `service_tool_recipe`, todos con FK al `module_id` canónico
 - Seed de los 7 servicios EFG del Excel como SEED inicial (no límite) — admin UI soporta N servicios
 - Admin UI CRUD para finance/admin (crear / editar / activar / desactivar sin dev, sin migración)
-- Service picker en `QuoteCreateDrawer` como 5to modo (además de los 4 de TASK-464e: role/person/tool/overhead)
+- Service picker en el quote builder canónico como 5to modo (además de los 4 de TASK-464e: role/person/tool/overhead)
 - `quotation_line_items.module_id` FK canónico + `service_sku` columna derivada read-only (trazabilidad robusta a renames)
 - Reporting: MRR / profitability / margin por servicio
 
@@ -81,7 +93,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - **Extensión, no identidad paralela**: cualquier fila en `service_pricing` debe tener `module_id` que exista en `service_modules`. Admin UI crea ambos en transacción
-- Service al seleccionarse en drawer SNAPSHOT las líneas: cambios futuros al service recipe no afectan quotes emitidas (integrity histórica)
+- Service al seleccionarse en el builder SNAPSHOT las líneas: cambios futuros al service recipe no afectan quotes emitidas (integrity histórica)
 - `service_pricing` NO obliga — el cotizador sigue funcionando sin seleccionar service (Mode B/C/D/E de TASK-464e)
 - Admin CRUD gated a `finance_admin` + `efeonce_admin` (roles reales, ver role-codes.ts; la spec antigua decía `finance_manager` inexistente)
 - Consume pricing engine v2 (TASK-464d) para calcular total del service (no duplica logic)
@@ -100,13 +112,15 @@ Reglas obligatorias:
 - TASK-464a — `sellable_roles` existe para FK del recipe
 - TASK-464c — `ai.tool_catalog` extendido para FK
 - TASK-464d — pricing engine v2 para calcular totales
-- TASK-464e — `QuoteCreateDrawer` refactoreado (se extiende para agregar service picker)
+- TASK-464e — pickers base del quote builder ya expuestos
+- TASK-473 — full-page builder shell para montar el service picker en la surface correcta
 
 ### Blocks / Impacts
 
 - TASK-462 — MRR/ARR por servicio como dimensión analítica nueva
 - TASK-460 — Contract hereda `service_sku` del quote originator
 - Reporting comercial: margin per service como KPI ejecutivo
+- `docs/tasks/to-do/TASK-474-quote-builder-catalog-reconnection-pass.md`
 
 ### Files owned
 
@@ -119,7 +133,7 @@ Reglas obligatorias:
 - `src/app/api/finance/quotes/from-service/route.ts` (expand service → line items)
 - `src/views/greenhouse/finance/ServiceCatalogView.tsx`
 - `src/views/greenhouse/finance/workspace/ServicePickerDrawer.tsx`
-- Extensión de `QuoteCreateDrawer.tsx` con service picker
+- Extensión de `src/views/greenhouse/finance/QuoteBuilderPageView.tsx` / `QuoteBuilderShell.tsx` con service picker
 - `src/types/db.d.ts` (auto-regen)
 
 ## Current Repo State
@@ -134,9 +148,10 @@ Reglas obligatorias:
 ### Gap
 
 - No hay canonical service_catalog — solo quote templates (diferente: quote template es 1 snapshot, service_catalog es recipe evolucionable)
-- No hay service picker en drawer
+- No hay service picker montado en la surface canónica del quote builder
 - No hay admin UI para gestionar servicios
 - `quotation_line_items` no tiene `service_sku` field
+- Existe riesgo de que schema/admin/expansion cierren bien pero la experiencia final siga percibiéndose desconectada del builder
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -265,10 +280,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_commercial.service_tool_recip
 - Tab Preview: click "Simular precio" → llama engine v2 → muestra costo interno + precio multi-currency
 - Admin-only (gated por `efeonce_admin` + `finance_manager`)
 
-### Slice 5 — Service picker en QuoteCreateDrawer
+### Slice 5 — Service picker en builder full-page
 
 - Nuevo botón "+ Agregar servicio" en `QuoteLineItemsEditor` (además de los 4 de TASK-464e)
-- Click abre `ServicePickerDrawer`:
+- Click abre `ServicePickerDrawer` dentro del builder full-page:
   - Autocomplete / grid de servicios activos filtrados por BL del quote
   - Hover muestra recipe summary (roles + tools)
   - Click "Seleccionar" → invoca `/api/finance/quotes/from-service` → agrega las líneas al editor
@@ -322,7 +337,7 @@ Click en picker: auto-expand a 9 líneas en QuoteLineItemsEditor, engine v2 calc
 - [ ] Seeder inserta 7 servicios activos + 41 placeholders inactive
 - [ ] `POST /from-service` con `EFG-002` devuelve 9 líneas con totales correctos
 - [ ] Admin UI permite crear + editar service + recipe
-- [ ] QuoteCreateDrawer service picker funciona
+- [ ] Service picker funciona dentro del quote builder canónico (`/finance/quotes/new` / `/finance/quotes/[id]/edit`)
 - [ ] Quote creada desde service tiene líneas con `service_sku='EFG-002'` + `service_line_order` poblados
 - [ ] Service inactive no aparece en picker
 - [ ] `pnpm test` cubre CRUD + expand + recipe edit
