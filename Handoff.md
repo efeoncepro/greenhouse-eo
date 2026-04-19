@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-467 phase-3 + TASK-470 spec (cierre del UI de pricing catalog)
+
+- **Owner:** Claude
+- **Estado:** shipped, pending PR merge
+- **Branch:** `task/TASK-467-phase-3` desde develop con phase-2 + TASK-459 merged
+- **Split conceptual hecho**: TASK-467 cierra con el scope UI; TASK-470 abre como spec separada para backend hardening (optimistic locking + business constraint validator + impact analysis + overcommit detector). Task registry + README actualizados.
+- **Scope phase-3 shipped:**
+  - Endpoint nuevo `GET/PUT /api/admin/pricing-catalog/roles/[id]/compatibility` con replace atómico via `withTransaction`, validación completa (no-duplicados, exactly-1-default, default-must-be-allowed, employment_types existentes/activos), audit emit
+  - Tab "Modalidades de contrato" del EditSellableRoleDrawer ahora es editable: tabla con Switch de allowed + Radio exclusivo de default + inline notes + delete + Autocomplete "+ Agregar modalidad"
+  - Validación client-side coordinada con server-side
+  - Copy via `greenhouse-ux-writing`
+- **Gaps diferidos a phase-4 (UI)**:
+  - Diff viewer visual side-by-side en audit timeline
+  - Bulk edit (depende de TASK-470 impact preview backend)
+  - Impact preview UI (depende de TASK-470)
+  - Excel import con diff
+  - Maker-checker approval UI
+  - One-click revert desde audit timeline
+- **Gates verdes**:
+  - `pnpm lint` clean
+  - `npx tsc --noEmit` clean
+  - `pnpm test` → 282/282 (194 payroll baseline intacto)
+  - `pnpm build` compiled exit 0 (45s)
+  - Zero `new Pool()` rogue
+- **TASK-470 abierta**: backend enterprise hardening — spec completa en `docs/tasks/to-do/TASK-470-pricing-catalog-enterprise-hardening.md`, registrada en TASK_ID_REGISTRY + README, pushed direct a develop (commit `b222e85d`). Cubre los 4 gaps enterprise identificados en review con el usuario: optimistic locking, validator de constraints, impact analysis pre-change, overcommit detector cross-layer entre capacity operacional y billable commitments.
+- **WIP de Codex observado en primary**: `src/app/(dashboard)/finance/contracts/`, `data/zapsign.txt`, `ContractDetailView.tsx`, `ContractsListView.tsx`, modificaciones a `finance/layout.tsx`, `VerticalMenu.tsx`, `greenhouse-nomenclature.ts` — es TASK-460 WIP sin committear, no incluido en mi branch.
+
 ## Sesion 2026-04-19 — TASK-459 Delivery Model Refinement (Codex)
 
 - **Owner:** Codex

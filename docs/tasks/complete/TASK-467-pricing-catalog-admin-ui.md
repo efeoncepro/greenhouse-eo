@@ -1,5 +1,45 @@
 # TASK-467 — Pricing Catalog Admin UI (Self-Service CRUD)
 
+## Delta 2026-04-19 (phase-3 close-out)
+
+**Phase-3 shipped.** Continuación UI del MVP + phase-2. Se completa la tab "Modalidades de contrato" que antes era read-only placeholder.
+
+### Entregables phase-3
+
+- **Endpoint nuevo**: `GET/PUT /api/admin/pricing-catalog/roles/[id]/compatibility`
+  - GET: lista compatibility rows del rol con JOIN a `employment_types` (reusa `listCompatibleEmploymentTypes`)
+  - PUT: replace atómico via `withTransaction` — DELETE all + INSERT batch. Valida: no duplicados, exactly 1 `isDefault=true` (o 0 si vacío), default debe estar `allowed`, employment_type_codes deben existir y estar activos. Audit emit con `compatibility_updated + employment_types_allowed + default_employment_type`.
+- **Tab "Modalidades de contrato" del EditSellableRoleDrawer**: ahora editable
+  - Tabla con columnas: Modalidad | Permitida (Switch) | Default (Radio exclusivo) | Notas (inline) | Eliminar
+  - Autocomplete "+ Agregar modalidad" con employment_types aún no presentes
+  - Validación client-side: toggling default auto-sets allowed=true; toggling allowed off en default limpia el default
+  - Confirm delete con copy "¿Quitar esta modalidad? Cotizaciones existentes que la usen no se ven afectadas"
+  - State persiste cross-tab switches
+
+### Split conceptual
+
+Esta task (TASK-467) cierra con el scope UI completo. Los 4 gaps backend enterprise (concurrency, validation, impact analysis, overcommit) se movieron a **TASK-470** (pricing catalog enterprise hardening) — split intencional: TASK-467 = self-service UI, TASK-470 = robustez backend.
+
+### Gaps diferidos a phase-4 (follow-ups UI restantes)
+
+- Diff viewer visual side-by-side en audit timeline (hoy JSON raw)
+- Bulk edit (select N roles + apply change) — requiere impact preview de TASK-470
+- Impact preview UI — depende de endpoint `preview-impact` de TASK-470
+- Excel import con diff preview
+- Maker-checker approval workflow UI
+- One-click revert desde audit timeline
+
+### Gates phase-3
+
+- `pnpm lint` clean
+- `npx tsc --noEmit` clean
+- `pnpm test` → 282/282 (194 payroll baseline intacto)
+- `pnpm build` compiled exit 0
+
+### Payroll isolation mantenida
+
+---
+
 ## Delta 2026-04-19 (phase-2 close-out)
 
 **Phase-2 shipped.** Todas las capacidades que quedaron fuera del MVP inicial se completaron en `task/TASK-467-phase-2`.
