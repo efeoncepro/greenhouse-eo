@@ -97,6 +97,7 @@ describe('previewPricingCatalogImpact', () => {
 
     const result = await previewPricingCatalogImpact({
       spaceId: 'space-1',
+
       // TASK-486: quote filtering moved from space_id to organization_id.
       organizationIds: ['org-1'],
       entityType: 'sellable_role',
@@ -125,6 +126,7 @@ describe('previewPricingCatalogImpact', () => {
 
     const result = await previewPricingCatalogImpact({
       spaceId: 'space-1',
+
       // TASK-486: quote filtering moved from space_id to organization_id.
       organizationIds: ['org-1'],
       entityType: 'tool_catalog',
