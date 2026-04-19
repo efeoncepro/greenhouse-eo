@@ -2,6 +2,12 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-04-19
+
+- `TASK-470` agrega el aggregate type `commercial_capacity` y el evento `commercial.capacity.overcommit_detected`.
+- El payload canónico incluye `member_id`, `as_of_date`, período, `contracted_hours`, `commercial_availability_hours`, `commitment_hours`, `overcommit_hours`, `commitment_count` y el breakdown de commitments que causan el exceso.
+- El evento nace para observabilidad/reactividad downstream; en este corte no se registra como trigger reactivo obligatorio.
+
 ## Infraestructura
 
 | Componente | Ubicacion | Funcion |

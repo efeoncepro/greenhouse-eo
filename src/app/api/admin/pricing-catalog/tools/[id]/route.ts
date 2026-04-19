@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 
 import type { ToolCatalogEntry } from '@/lib/commercial/tool-catalog-store'
+import {
+  getBlockingConstraintIssues,
+  validateToolCatalog
+} from '@/lib/commercial/pricing-catalog-constraints'
 import { recordPricingCatalogAudit, type PricingCatalogAction } from '@/lib/commercial/pricing-catalog-audit-store'
 import { query } from '@/lib/db'
 import { getServerAuthSession } from '@/lib/auth'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireIfMatch, withOptimisticLockHeaders } from '@/lib/tenant/optimistic-locking'
 
 export const dynamic = 'force-dynamic'
 
@@ -184,6 +189,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'Tool catalog entry not found.' }, { status: 404 })
   }
 
+  const optimisticLock = requireIfMatch(request, previous.updated_at)
+
+  if (!optimisticLock.ok) {
+    return optimisticLock.response
+  }
+
   const fields: string[] = []
   const values: unknown[] = []
   const newValues: Record<string, unknown> = {}
@@ -312,6 +323,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'No fields to update.' }, { status: 400 })
   }
 
+  const issues = validateToolCatalog({
+    toolName: newValues.toolName ?? previous.tool_name,
+    toolCategory: newValues.toolCategory ?? previous.tool_category,
+    providerId: newValues.providerId ?? previous.provider_id,
+    costModel: newValues.costModel ?? previous.cost_model,
+    subscriptionAmount: newValues.subscriptionAmount ?? previous.subscription_amount,
+    subscriptionSeats: newValues.subscriptionSeats ?? previous.subscription_seats,
+    proratingQty: newValues.proratingQty ?? previous.prorating_qty,
+    proratedCostUsd: newValues.proratedCostUsd ?? previous.prorated_cost_usd,
+    proratedPriceUsd: newValues.proratedPriceUsd ?? previous.prorated_price_usd
+  })
+
+  if (getBlockingConstraintIssues(issues).length > 0) {
+    return NextResponse.json({ issues }, { status: 422 })
+  }
+
   fields.push('updated_at = CURRENT_TIMESTAMP')
   idx += 1
   values.push(id)
@@ -369,10 +396,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
   })
 
-  return NextResponse.json(mapRow(updated))
+  return withOptimisticLockHeaders(
+    NextResponse.json(mapRow(updated)),
+    updated.updated_at,
+    { missingIfMatch: optimisticLock.missingIfMatch }
+  )
 }
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) {
@@ -394,8 +425,16 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Tool catalog entry not found.' }, { status: 404 })
   }
 
+  const optimisticLock = requireIfMatch(request, previous.updated_at)
+
+  if (!optimisticLock.ok) {
+    return optimisticLock.response
+  }
+
   if (!previous.is_active) {
-    return new NextResponse(null, { status: 204 })
+    return withOptimisticLockHeaders(new NextResponse(null, { status: 204 }), previous.updated_at, {
+      missingIfMatch: optimisticLock.missingIfMatch
+    })
   }
 
   const rows = await query<ToolRow>(
@@ -432,5 +471,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     }
   })
 
-  return new NextResponse(null, { status: 204 })
+  return withOptimisticLockHeaders(new NextResponse(null, { status: 204 }), updated.updated_at, {
+    missingIfMatch: optimisticLock.missingIfMatch
+  })
 }

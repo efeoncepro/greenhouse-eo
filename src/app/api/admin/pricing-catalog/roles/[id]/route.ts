@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server'
 
 import type { SellableRoleEntry } from '@/lib/commercial/sellable-roles-store'
+import {
+  getBlockingConstraintIssues,
+  validateSellableRole
+} from '@/lib/commercial/pricing-catalog-constraints'
 import { recordPricingCatalogAudit, type PricingCatalogAction } from '@/lib/commercial/pricing-catalog-audit-store'
 import { query } from '@/lib/db'
 import { getServerAuthSession } from '@/lib/auth'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireIfMatch, withOptimisticLockHeaders } from '@/lib/tenant/optimistic-locking'
 
 export const dynamic = 'force-dynamic'
 
@@ -192,6 +197,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'Sellable role not found.' }, { status: 404 })
   }
 
+  const optimisticLock = requireIfMatch(request, previous.updated_at)
+
+  if (!optimisticLock.ok) {
+    return optimisticLock.response
+  }
+
   const updates: Parameters<typeof applyUpdate>[1] = {}
   const newValues: Record<string, unknown> = {}
   const fieldsChanged: string[] = []
@@ -295,6 +306,18 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ error: 'No fields to update.' }, { status: 400 })
   }
 
+  const issues = validateSellableRole({
+    roleLabelEs: updates.roleLabelEs ?? previous.role_label_es,
+    roleLabelEn: updates.roleLabelEn ?? previous.role_label_en,
+    category: updates.category ?? previous.category,
+    tier: updates.tier ?? previous.tier,
+    tierLabel: updates.tierLabel ?? previous.tier_label
+  })
+
+  if (getBlockingConstraintIssues(issues).length > 0) {
+    return NextResponse.json({ issues }, { status: 422 })
+  }
+
   const updated = await applyUpdate(id, updates)
 
   if (!updated) {
@@ -323,10 +346,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
   })
 
-  return NextResponse.json(mapRow(updated))
+  return withOptimisticLockHeaders(
+    NextResponse.json(mapRow(updated)),
+    updated.updated_at,
+    { missingIfMatch: optimisticLock.missingIfMatch }
+  )
 }
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) {
@@ -348,9 +375,17 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Sellable role not found.' }, { status: 404 })
   }
 
+  const optimisticLock = requireIfMatch(request, previous.updated_at)
+
+  if (!optimisticLock.ok) {
+    return optimisticLock.response
+  }
+
   if (!previous.active) {
     // Already deactivated — return 204 without audit (no-op).
-    return new NextResponse(null, { status: 204 })
+    return withOptimisticLockHeaders(new NextResponse(null, { status: 204 }), previous.updated_at, {
+      missingIfMatch: optimisticLock.missingIfMatch
+    })
   }
 
   const updated = await applyUpdate(id, { active: false })
@@ -375,5 +410,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     }
   })
 
-  return new NextResponse(null, { status: 204 })
+  return withOptimisticLockHeaders(new NextResponse(null, { status: 204 }), updated.updated_at, {
+    missingIfMatch: optimisticLock.missingIfMatch
+  })
 }

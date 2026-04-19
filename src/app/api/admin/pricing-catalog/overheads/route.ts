@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server'
 
 import { listOverheadAddons, type OverheadAddonEntry } from '@/lib/commercial/overhead-addons-store'
+import {
+  getBlockingConstraintIssues,
+  validateOverheadAddon
+} from '@/lib/commercial/pricing-catalog-constraints'
 import { recordPricingCatalogAudit } from '@/lib/commercial/pricing-catalog-audit-store'
 import { query } from '@/lib/db'
 import { getServerAuthSession } from '@/lib/auth'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { withOptimisticLockHeaders } from '@/lib/tenant/optimistic-locking'
 
 export const dynamic = 'force-dynamic'
+
+const maxUpdatedAt = (values: Array<string | null | undefined>) =>
+  values.filter((value): value is string => Boolean(value)).sort().at(-1) ?? null
 
 const ALLOWED_ADDON_TYPES = [
   'overhead_fixed',
@@ -152,7 +160,9 @@ export async function GET() {
 
   const items = await listOverheadAddons({ active: false })
 
-  return NextResponse.json({ items })
+  const updatedAt = maxUpdatedAt(items.map(item => item.updatedAt))
+
+  return withOptimisticLockHeaders(NextResponse.json({ items, updatedAt }), updatedAt)
 }
 
 export async function POST(request: Request) {
@@ -209,6 +219,20 @@ export async function POST(request: Request) {
   const conditions = pickString(body.conditions)
   const visibleToClient = body.visibleToClient !== false
   const notes = pickString(body.notes)
+
+  const issues = validateOverheadAddon({
+    costInternalUsd,
+    marginPct,
+    finalPriceUsd,
+    finalPricePct,
+    pctMin,
+    pctMax,
+    minimumAmountUsd
+  })
+
+  if (getBlockingConstraintIssues(issues).length > 0) {
+    return NextResponse.json({ issues }, { status: 422 })
+  }
 
   let inserted: OverheadRow
 
@@ -292,5 +316,5 @@ export async function POST(request: Request) {
     }
   })
 
-  return NextResponse.json(mapRow(inserted), { status: 201 })
+  return withOptimisticLockHeaders(NextResponse.json(mapRow(inserted), { status: 201 }), inserted.updated_at)
 }

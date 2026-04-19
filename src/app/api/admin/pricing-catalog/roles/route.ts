@@ -1,15 +1,23 @@
 import { NextResponse } from 'next/server'
 
 import { listSellableRoles, type SellableRoleEntry } from '@/lib/commercial/sellable-roles-store'
+import {
+  getBlockingConstraintIssues,
+  validateSellableRole
+} from '@/lib/commercial/pricing-catalog-constraints'
 import { recordPricingCatalogAudit } from '@/lib/commercial/pricing-catalog-audit-store'
 import { query } from '@/lib/db'
 import { getServerAuthSession } from '@/lib/auth'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { withOptimisticLockHeaders } from '@/lib/tenant/optimistic-locking'
 
 export const dynamic = 'force-dynamic'
 
 const ALLOWED_CATEGORIES = ['creativo', 'pr', 'performance', 'consultoria', 'tech'] as const
 const ALLOWED_TIERS = ['1', '2', '3', '4'] as const
+
+const maxUpdatedAt = (values: Array<string | null | undefined>) =>
+  values.filter((value): value is string => Boolean(value)).sort().at(-1) ?? null
 
 const slugify = (value: string) =>
   value
@@ -95,7 +103,9 @@ export async function GET() {
 
   const items = await listSellableRoles({ activeOnly: false })
 
-  return NextResponse.json({ items })
+  const updatedAt = maxUpdatedAt(items.map(item => item.updatedAt))
+
+  return withOptimisticLockHeaders(NextResponse.json({ items, updatedAt }), updatedAt)
 }
 
 export async function POST(request: Request) {
@@ -149,6 +159,18 @@ export async function POST(request: Request) {
 
   if (!tierLabel) {
     return NextResponse.json({ error: 'tierLabel is required.' }, { status: 400 })
+  }
+
+  const issues = validateSellableRole({
+    roleLabelEs,
+    roleLabelEn,
+    category,
+    tier,
+    tierLabel
+  })
+
+  if (getBlockingConstraintIssues(issues).length > 0) {
+    return NextResponse.json({ issues }, { status: 422 })
   }
 
   const roleCode = slugify(roleLabelEs)
@@ -209,5 +231,5 @@ export async function POST(request: Request) {
     }
   })
 
-  return NextResponse.json(mapRow(inserted), { status: 201 })
+  return withOptimisticLockHeaders(NextResponse.json(mapRow(inserted), { status: 201 }), inserted.updated_at)
 }

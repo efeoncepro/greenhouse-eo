@@ -2,6 +2,13 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-470 endurece Pricing Catalog para operación enterprise
+
+- `Admin > Pricing Catalog` deja de depender de last-write-wins silencioso: los handlers mutables ya soportan optimistic locking con `If-Match`, `ETag` y `409 Conflict` cuando el recurso cambió desde la última lectura.
+- Nace `pricing-catalog-constraints.ts` como validator central para reglas de negocio de catálogo (márgenes monotónicos, factores país monotónicos, rangos de FTE/horas, multiplicadores y montos no negativos) y las routes devuelven `422 { issues[] }` cuando el cambio rompe el contrato.
+- Aparece el dry-run `preview-impact` para roles, tools, overheads y governance (`role_tier_margin`, `commercial_model_multiplier`, `country_pricing_factor`) con conteo de quotes afectadas, monto CLP y pipeline impactado, siempre tenant-scoped por `space_id`.
+- Se agrega la lane de overcommit comercial: `detectMemberOvercommit()` / `detectAllOvercommits()` cruza commitments billables de `quotation_line_items` con `member_capacity_economics.contracted_hours` y publica `commercial.capacity.overcommit_detected` al outbox cuando un miembro queda sobre-vendido.
+
 ### 2026-04-19 — TASK-460 introduce Contracts como anchor canónico post-venta
 
 - Nace `greenhouse_commercial.contracts` como entidad operativa separada de quotation, con identificador visible `EO-CTR-*`, lifecycle propio y tabla join `contract_quotes` para convivir con múltiples quotes históricas bajo un mismo contrato lógico.

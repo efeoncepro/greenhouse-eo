@@ -99,6 +99,7 @@ export const AGGREGATE_TYPES = {
   // Commercial Quotation (canonical, TASK-347 cutover)
   quotation: 'quotation',
   quotationLineItem: 'quotation_line_item',
+  commercialCapacity: 'commercial_capacity',
   contract: 'contract',
   contractQuote: 'contract_quote',
   deal: 'deal',
@@ -363,6 +364,7 @@ export const EVENT_TYPES = {
   quotationRenewalDue: 'commercial.quotation.renewal_due',
   quotationPipelineMaterialized: 'commercial.quotation.pipeline_materialized',
   quotationProfitabilityMaterialized: 'commercial.quotation.profitability_materialized',
+  commercialCapacityOvercommitDetected: 'commercial.capacity.overcommit_detected',
 
   // Commercial Contracts (TASK-460)
   contractCreated: 'commercial.contract.created',

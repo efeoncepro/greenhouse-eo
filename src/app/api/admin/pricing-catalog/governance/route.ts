@@ -12,6 +12,14 @@ import {
   upsertRoleTierMargin,
   upsertServiceTierMargin
 } from '@/lib/commercial/pricing-governance-store'
+import {
+  getBlockingConstraintIssues,
+  validateCommercialModelMultiplier,
+  validateCountryPricingFactor,
+  validateEmploymentType,
+  validateFteHoursGuide,
+  validateRoleTierMargin
+} from '@/lib/commercial/pricing-catalog-constraints'
 import type {
   CommercialModelMultiplierSeedRow,
   CountryPricingFactorSeedRow,
@@ -37,6 +45,7 @@ import {
 } from '@/lib/commercial/pricing-catalog-audit-store'
 import { getServerAuthSession } from '@/lib/auth'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireIfMatch, withOptimisticLockHeaders } from '@/lib/tenant/optimistic-locking'
 
 export const dynamic = 'force-dynamic'
 
@@ -88,6 +97,9 @@ interface GovernancePatchBody {
 
 const todayIso = () => new Date().toISOString().slice(0, 10)
 
+const maxTimestamp = (values: Array<string | null | undefined>) =>
+  values.filter((value): value is string => Boolean(value)).sort().at(-1) ?? null
+
 export async function GET() {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
@@ -118,14 +130,27 @@ export async function GET() {
     listEmploymentTypes({ activeOnly: false })
   ])
 
-  return NextResponse.json({
-    roleTierMargins,
-    serviceTierMargins,
-    commercialModelMultipliers,
-    countryPricingFactors,
-    fteHoursGuide,
-    employmentTypes
-  })
+  const updatedAt = maxTimestamp([
+    ...roleTierMargins.map(entry => entry.updatedAt),
+    ...serviceTierMargins.map(entry => entry.updatedAt),
+    ...commercialModelMultipliers.map(entry => entry.updatedAt),
+    ...countryPricingFactors.map(entry => entry.updatedAt),
+    ...fteHoursGuide.map(entry => entry.updatedAt),
+    ...employmentTypes.map(entry => entry.updatedAt)
+  ])
+
+  return withOptimisticLockHeaders(
+    NextResponse.json({
+      roleTierMargins,
+      serviceTierMargins,
+      commercialModelMultipliers,
+      countryPricingFactors,
+      fteHoursGuide,
+      employmentTypes,
+      updatedAt
+    }),
+    updatedAt
+  )
 }
 
 export async function PATCH(request: Request) {
@@ -168,6 +193,60 @@ export async function PATCH(request: Request) {
   const actorName = await resolveActorName(tenant.clientName || tenant.userId)
   const entityType = TYPE_TO_ENTITY[type]
 
+  const resolveCurrentUpdatedAt = async (): Promise<string | null> => {
+    if (type === 'role_tier_margin') {
+      const tier = pickString(payload.tier) as PricingTierCode | null
+
+      if (!tier) return null
+
+      return (await listRoleTierMargins()).find(entry => entry.tier === tier)?.updatedAt ?? null
+    }
+
+    if (type === 'service_tier_margin') {
+      const tier = pickString(payload.tier) as PricingTierCode | null
+
+      if (!tier) return null
+
+      return (await listServiceTierMargins()).find(entry => entry.tier === tier)?.updatedAt ?? null
+    }
+
+    if (type === 'commercial_model_multiplier') {
+      const modelCode = pickString(payload.modelCode) as CommercialModelCode | null
+
+      if (!modelCode) return null
+
+      return (await listCommercialModelMultipliers()).find(entry => entry.modelCode === modelCode)?.updatedAt ?? null
+    }
+
+    if (type === 'country_pricing_factor') {
+      const factorCode = pickString(payload.factorCode) as CountryPricingFactorCode | null
+
+      if (!factorCode) return null
+
+      return (await listCountryPricingFactors()).find(entry => entry.factorCode === factorCode)?.updatedAt ?? null
+    }
+
+    if (type === 'fte_hours_guide') {
+      const fteFraction = pickNumber(payload.fteFraction)
+
+      if (fteFraction === null) return null
+
+      return (await listFteHoursGuide()).find(entry => entry.fteFraction === fteFraction)?.updatedAt ?? null
+    }
+
+    const employmentTypeCode = pickString(payload.employmentTypeCode)
+
+    if (!employmentTypeCode) return null
+
+    return (await listEmploymentTypes({ activeOnly: false })).find(entry => entry.employmentTypeCode === employmentTypeCode)?.updatedAt ?? null
+  }
+
+  const optimisticLock = requireIfMatch(request, await resolveCurrentUpdatedAt())
+
+  if (!optimisticLock.ok) {
+    return optimisticLock.response
+  }
+
   try {
     if (type === 'role_tier_margin') {
       const tier = pickString(payload.tier) as PricingTierCode | null
@@ -199,6 +278,12 @@ export async function PATCH(request: Request) {
         notes: pickString(payload.notes)
       }
 
+      const issues = validateRoleTierMargin(input as unknown as Record<string, unknown>)
+
+      if (getBlockingConstraintIssues(issues).length > 0) {
+        return NextResponse.json({ issues }, { status: 422 })
+      }
+
       const result = await upsertRoleTierMargin(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -214,7 +299,11 @@ export async function PATCH(request: Request) {
         })
       }
 
-      return NextResponse.json({ action: result.action, entry: result.entry })
+      return withOptimisticLockHeaders(
+        NextResponse.json({ action: result.action, entry: result.entry }),
+        result.entry.updatedAt,
+        { missingIfMatch: optimisticLock.missingIfMatch }
+      )
     }
 
     if (type === 'service_tier_margin') {
@@ -281,6 +370,12 @@ export async function PATCH(request: Request) {
         description: pickString(payload.description)
       }
 
+      const issues = validateCommercialModelMultiplier(input as unknown as Record<string, unknown>)
+
+      if (getBlockingConstraintIssues(issues).length > 0) {
+        return NextResponse.json({ issues }, { status: 422 })
+      }
+
       const result = await upsertCommercialModelMultiplier(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -296,7 +391,11 @@ export async function PATCH(request: Request) {
         })
       }
 
-      return NextResponse.json({ action: result.action, entry: result.entry })
+      return withOptimisticLockHeaders(
+        NextResponse.json({ action: result.action, entry: result.entry }),
+        result.entry.updatedAt,
+        { missingIfMatch: optimisticLock.missingIfMatch }
+      )
     }
 
     if (type === 'country_pricing_factor') {
@@ -329,6 +428,12 @@ export async function PATCH(request: Request) {
         appliesWhen: pickString(payload.appliesWhen)
       }
 
+      const issues = validateCountryPricingFactor(input as unknown as Record<string, unknown>)
+
+      if (getBlockingConstraintIssues(issues).length > 0) {
+        return NextResponse.json({ issues }, { status: 422 })
+      }
+
       const result = await upsertCountryPricingFactor(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -344,7 +449,11 @@ export async function PATCH(request: Request) {
         })
       }
 
-      return NextResponse.json({ action: result.action, entry: result.entry })
+      return withOptimisticLockHeaders(
+        NextResponse.json({ action: result.action, entry: result.entry }),
+        result.entry.updatedAt,
+        { missingIfMatch: optimisticLock.missingIfMatch }
+      )
     }
 
     if (type === 'fte_hours_guide') {
@@ -366,6 +475,15 @@ export async function PATCH(request: Request) {
         recommendedDescription: pickString(payload.recommendedDescription)
       }
 
+      const issues = validateFteHoursGuide({
+        fteFraction: input.fteFraction,
+        hoursPerMonth: input.monthlyHours
+      })
+
+      if (getBlockingConstraintIssues(issues).length > 0) {
+        return NextResponse.json({ issues }, { status: 422 })
+      }
+
       const result = await upsertFteHoursGuide(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -381,7 +499,11 @@ export async function PATCH(request: Request) {
         })
       }
 
-      return NextResponse.json({ action: result.action, entry: result.entry })
+      return withOptimisticLockHeaders(
+        NextResponse.json({ action: result.action, entry: result.entry }),
+        result.entry.updatedAt,
+        { missingIfMatch: optimisticLock.missingIfMatch }
+      )
     }
 
     if (type === 'employment_type') {
@@ -423,6 +545,16 @@ export async function PATCH(request: Request) {
         notes
       } as unknown as EmploymentTypeSeedRow
 
+      const issues = validateEmploymentType({
+        previsionalPctDefault,
+        feeMonthlyUsdDefault,
+        feePctDefault
+      })
+
+      if (getBlockingConstraintIssues(issues).length > 0) {
+        return NextResponse.json({ issues }, { status: 422 })
+      }
+
       const result = await upsertEmploymentType(input)
 
       await recordPricingCatalogAudit({
@@ -436,7 +568,13 @@ export async function PATCH(request: Request) {
         effectiveFrom
       })
 
-      return NextResponse.json({ action: result.created ? 'inserted' : 'updated', entry: result })
+      const updatedAt = await resolveCurrentUpdatedAt()
+
+      return withOptimisticLockHeaders(
+        NextResponse.json({ action: result.created ? 'inserted' : 'updated', entry: result }),
+        updatedAt,
+        { missingIfMatch: optimisticLock.missingIfMatch }
+      )
     }
 
     return NextResponse.json({ error: `Unsupported governance type: ${type}` }, { status: 400 })

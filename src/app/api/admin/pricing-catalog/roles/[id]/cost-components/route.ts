@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server'
 
 import { getServerAuthSession } from '@/lib/auth'
+import {
+  getBlockingConstraintIssues,
+  validateCostComponents
+} from '@/lib/commercial/pricing-catalog-constraints'
 import { recordPricingCatalogAudit } from '@/lib/commercial/pricing-catalog-audit-store'
 import type { SellableRoleSeedRow } from '@/lib/commercial/sellable-roles-seed'
 import { insertCostComponentsIfChanged } from '@/lib/commercial/sellable-roles-store'
 import { query } from '@/lib/db'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireIfMatch, withOptimisticLockHeaders } from '@/lib/tenant/optimistic-locking'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +35,7 @@ interface CostComponentRow extends Record<string, unknown> {
 
 interface RoleSkuRow extends Record<string, unknown> {
   role_sku: string
+  updated_at: string | Date
 }
 
 interface PostCostComponentsBody {
@@ -98,6 +104,30 @@ const toIsoDate = (value: string | Date | null): string => {
   return value.length >= 10 ? value.slice(0, 10) : value
 }
 
+const getRoleLockRow = async (roleId: string) => {
+  const rows = await query<RoleSkuRow>(
+    `SELECT role_sku, updated_at
+       FROM greenhouse_commercial.sellable_roles
+       WHERE role_id = $1
+       LIMIT 1`,
+    [roleId]
+  )
+
+  return rows[0] ?? null
+}
+
+const touchRoleUpdatedAt = async (roleId: string) => {
+  const rows = await query<{ updated_at: string | Date }>(
+    `UPDATE greenhouse_commercial.sellable_roles
+        SET updated_at = CURRENT_TIMESTAMP
+      WHERE role_id = $1
+      RETURNING updated_at`,
+    [roleId]
+  )
+
+  return rows[0]?.updated_at ?? null
+}
+
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
@@ -113,6 +143,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   const { id } = await params
+  const role = await getRoleLockRow(id)
+
+  if (!role) {
+    return NextResponse.json({ error: 'Sellable role not found.' }, { status: 404 })
+  }
 
   const rows = await query<CostComponentRow>(
     `SELECT role_id, employment_type_code, effective_from,
@@ -145,7 +180,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     createdAt: toIsoTimestamp(row.created_at as string | Date | null)
   }))
 
-  return NextResponse.json({ items })
+  return withOptimisticLockHeaders(
+    NextResponse.json({ items, updatedAt: toIsoTimestamp(role.updated_at) }),
+    role.updated_at
+  )
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -211,19 +249,35 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const notes = typeof body.notes === 'string' ? body.notes.trim() || null : null
 
-  const roleRows = await query<RoleSkuRow>(
-    `SELECT role_sku
-       FROM greenhouse_commercial.sellable_roles
-       WHERE role_id = $1
-       LIMIT 1`,
-    [id]
-  )
+  const role = await getRoleLockRow(id)
 
-  if (roleRows.length === 0) {
+  if (!role) {
     return NextResponse.json({ error: 'Sellable role not found.' }, { status: 404 })
   }
 
-  const roleSku = roleRows[0].role_sku
+  const optimisticLock = requireIfMatch(request, role.updated_at)
+
+  if (!optimisticLock.ok) {
+    return optimisticLock.response
+  }
+
+  const roleSku = role.role_sku
+
+  const issues = validateCostComponents({
+    baseSalaryUsd,
+    bonusJitUsd,
+    bonusRpaUsd,
+    bonusArUsd,
+    bonusSobrecumplimientoUsd,
+    gastosPrevisionalesUsd,
+    feeDeelUsd,
+    feeEorUsd,
+    hoursPerFteMonth
+  })
+
+  if (getBlockingConstraintIssues(issues).length > 0) {
+    return NextResponse.json({ issues }, { status: 422 })
+  }
 
   const driftWarnings: string[] = []
 
@@ -306,5 +360,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     effectiveFrom
   })
 
-  return NextResponse.json({ entry: result.entry, changed: result.changed }, { status: 201 })
+  const updatedAt = await touchRoleUpdatedAt(id)
+
+  return withOptimisticLockHeaders(
+    NextResponse.json({ entry: result.entry, changed: result.changed }, { status: 201 }),
+    updatedAt,
+    { missingIfMatch: optimisticLock.missingIfMatch }
+  )
 }

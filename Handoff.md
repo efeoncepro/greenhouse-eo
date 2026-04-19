@@ -16,7 +16,7 @@
 ## Sesion 2026-04-19 — TASK-470 Pricing Catalog Enterprise Hardening (Codex)
 
 - **Owner:** Codex
-- **Estado:** implemented and locally validated on shared `develop`; **no commit / no push** por trabajo paralelo con Claude en el mismo checkout
+- **Estado:** implemented y validado; promoción a rama/PR desde worktree aislado para no tocar el checkout compartido en `develop`
 - **Scope shipped:**
   - Helper nuevo `src/lib/tenant/optimistic-locking.ts` + test `optimistic-locking.test.ts`
   - Validator central `src/lib/commercial/pricing-catalog-constraints.ts` + tests para monotonicidad/rangos
@@ -40,7 +40,7 @@
   - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'` → sin matches
 - **Heads-up:**
   - `pnpm build` sigue mostrando warnings preexistentes de Dynamic Server Usage bajo `(dashboard)`, pero terminó exit `0`
-  - Como el checkout compartido está en `develop` y el user avisó trabajo paralelo con Claude, dejé el cambio listo sin `git commit`/`git push`
+  - El merge/cierre de esta task se hizo desde worktree aislado para convivir con trabajo paralelo de Claude en el checkout principal
 
 ## Sesion 2026-04-19 — TASK-462 MRR/ARR Contractual Projection & Dashboard (cierre)
 
