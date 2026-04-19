@@ -298,7 +298,7 @@ export async function POST(request: Request) {
            $18::date, $19::date, $20::date,
            $21, $22,
            'manual', $1,
-           CASE WHEN $4 IS NOT NULL THEN 'explicit' ELSE 'unresolved' END,
+           $24,
            $23
          )
          RETURNING quotation_id`,
@@ -325,7 +325,8 @@ export async function POST(request: Request) {
           body.validUntil ?? null,
           body.description ?? null,
           body.internalNotes ?? null,
-          createdBy
+          createdBy,
+          body.spaceId ? 'explicit' : 'unresolved'
         ]
       )
 
