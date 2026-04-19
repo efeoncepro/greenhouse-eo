@@ -170,8 +170,8 @@ describe('buildPricingEngineOutputV2', () => {
         getToolBySku: vi.fn(),
         getOverheadAddonBySku: vi.fn(),
         listOverheadAddons: vi.fn().mockResolvedValue(addonCatalog),
-        readLatestMemberCapacityEconomicsSnapshot: vi.fn(),
-        readMemberCapacityEconomicsSnapshot: vi.fn()
+        getPreferredMemberActualCostBasis: vi.fn(),
+        getPreferredRoleBlendedCostBasisByRoleId: vi.fn().mockResolvedValue(null)
       }
     )
 
@@ -334,8 +334,8 @@ describe('buildPricingEngineOutputV2', () => {
         resolvePricingAddons: vi.fn().mockResolvedValue([]),
         listOverheadAddons: vi.fn().mockResolvedValue([]),
         getOverheadAddonBySku: vi.fn(),
-        readLatestMemberCapacityEconomicsSnapshot: vi.fn(),
-        readMemberCapacityEconomicsSnapshot: vi.fn()
+        getPreferredMemberActualCostBasis: vi.fn(),
+        getPreferredRoleBlendedCostBasisByRoleId: vi.fn()
       }
     )
 
@@ -346,5 +346,294 @@ describe('buildPricingEngineOutputV2', () => {
       'Costo base desde snapshot 2026-04 (hybrid_modeled, confianza high).'
     )
     expect(result.lines[0]?.effectiveMarginPct).toBeCloseTo(0.1304, 4)
+  })
+
+  it('prefers role_blended snapshots before modeled role costs when blended evidence exists', async () => {
+    const getCurrentCost = vi.fn().mockResolvedValue({
+      roleId: 'role-1',
+      employmentTypeCode: 'contractor',
+      effectiveFrom: '2026-04-18',
+      baseSalaryUsd: 1000,
+      bonusJitUsd: 0,
+      bonusRpaUsd: 0,
+      bonusArUsd: 0,
+      bonusSobrecumplimientoUsd: 0,
+      gastosPrevisionalesUsd: 0,
+      feeDeelUsd: 0,
+      feeEorUsd: 0,
+      hoursPerFteMonth: 160,
+      totalMonthlyCostUsd: 2200,
+      hourlyCostUsd: 13.75,
+      notes: null,
+      createdAt: '2026-04-18T00:00:00.000Z'
+    })
+
+    const result = await buildPricingEngineOutputV2(
+      {
+        businessLineCode: 'wave',
+        commercialModel: 'on_demand',
+        countryFactorCode: 'international_usd',
+        outputCurrency: 'USD',
+        quoteDate: '2026-04-18',
+        lines: [
+          {
+            lineType: 'role',
+            roleSku: 'ECG-001',
+            fteFraction: 1,
+            periods: 1
+          }
+        ]
+      },
+      {
+        getSellableRoleBySku: vi.fn().mockResolvedValue({
+          roleId: 'role-1',
+          roleSku: 'ECG-001',
+          roleCode: 'strategist',
+          roleLabelEs: 'Estratega',
+          roleLabelEn: null,
+          category: 'strategy',
+          tier: '3',
+          tierLabel: 'Estrategico',
+          canSellAsStaff: true,
+          canSellAsServiceComponent: true,
+          active: true,
+          notes: null,
+          createdAt: '2026-04-18T00:00:00.000Z',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        listCompatibleEmploymentTypes: vi.fn().mockResolvedValue([
+          {
+            roleId: 'role-1',
+            employmentTypeCode: 'contractor',
+            isDefault: true,
+            allowed: true,
+            notes: null,
+            createdAt: '2026-04-18T00:00:00.000Z',
+            employmentType: null
+          }
+        ]),
+        getCurrentCost,
+        getCurrentPricing: vi.fn().mockResolvedValue({
+          roleId: 'role-1',
+          currencyCode: 'USD',
+          effectiveFrom: '2026-04-18',
+          marginPct: 0.5,
+          hourlyPrice: 0,
+          fteMonthlyPrice: 3600,
+          notes: null,
+          createdAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getRoleTierMargins: vi.fn().mockResolvedValue({
+          tier: '3',
+          tierLabel: 'Estrategico',
+          marginMin: 0.4,
+          marginOpt: 0.5,
+          marginMax: 0.6,
+          effectiveFrom: '2026-04-18',
+          notes: null,
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getCommercialModelMultiplier: vi.fn().mockResolvedValue({
+          modelCode: 'on_demand',
+          modelLabel: 'On-Demand',
+          multiplierPct: 0,
+          description: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getCountryPricingFactor: vi.fn().mockResolvedValue({
+          factorCode: 'international_usd',
+          factorLabel: 'International',
+          factorMin: 1,
+          factorOpt: 1,
+          factorMax: 1,
+          appliesWhen: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        convertFteToHours: vi.fn().mockResolvedValue({
+          fteFraction: 1,
+          fteLabel: '1.0',
+          monthlyHours: 160,
+          recommendedDescription: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        resolvePricingAddons: vi.fn().mockResolvedValue([]),
+        resolvePricingOutputExchangeRate: vi.fn().mockResolvedValue(1),
+        resolvePricingOutputFxReadiness: vi.fn().mockResolvedValue({
+          fromCurrency: 'USD',
+          toCurrency: 'USD',
+          rateDate: '2026-04-18',
+          domain: 'pricing_output',
+          state: 'supported',
+          rate: 1,
+          rateDateResolved: '2026-04-18',
+          source: 'identity',
+          ageDays: 0,
+          stalenessThresholdDays: 7,
+          composedViaUsd: false,
+          message: 'USD baseline.'
+        }),
+        convertUsdToPricingCurrency: vi.fn().mockImplementation(({ amountUsd }) => Promise.resolve(amountUsd)),
+        convertCurrencyAmount: vi.fn().mockImplementation(({ amount }) => Promise.resolve(amount)),
+        getToolBySku: vi.fn(),
+        getOverheadAddonBySku: vi.fn(),
+        listOverheadAddons: vi.fn().mockResolvedValue([]),
+        getPreferredMemberActualCostBasis: vi.fn(),
+        getPreferredRoleBlendedCostBasisByRoleId: vi.fn().mockResolvedValue({
+          snapshotId: 'rbs-1',
+          snapshotKey: 'rbs:role-1:contractor:2026-04',
+          roleId: 'role-1',
+          roleSku: 'ECG-001',
+          roleCode: 'strategist',
+          roleLabel: 'Estratega',
+          employmentTypeCode: 'contractor',
+          periodYear: 2026,
+          periodMonth: 4,
+          periodId: '2026-04',
+          snapshotDate: '2026-04-18',
+          sourceKind: 'people_blended',
+          sourceRef: 'mrb:2026-04',
+          resolvedCurrency: 'USD',
+          blendedLoadedCostAmount: 1500,
+          blendedCostPerHourAmount: 9.375,
+          blendedTotalLaborCostAmount: 1300,
+          blendedDirectOverheadAmount: 100,
+          blendedSharedOverheadAmount: 100,
+          weightedFte: 4,
+          weightedHours: 640,
+          sampleSize: 4,
+          memberCount: 4,
+          freshestMemberSnapshotAt: '2026-04-18T00:00:00.000Z',
+          oldestMemberSnapshotAt: '2026-04-18T00:00:00.000Z',
+          freshnessDays: 0,
+          freshnessStatus: 'fresh',
+          confidenceScore: 0.87,
+          confidenceLabel: 'high',
+          snapshotStatus: 'complete',
+          detail: {},
+          materializedAt: '2026-04-18T00:00:00.000Z',
+          createdAt: '2026-04-18T00:00:00.000Z',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getPreferredToolProviderCostBasisByToolSku: vi.fn()
+      }
+    )
+
+    expect(result.lines[0]?.costStack.costBasisKind).toBe('role_blended')
+    expect(result.lines[0]?.costStack.costBasisConfidenceLabel).toBe('high')
+    expect(result.lines[0]?.costStack.totalCostUsd).toBe(1500)
+    expect(getCurrentCost).not.toHaveBeenCalled()
+  })
+
+  it('surfaces member_actual metadata when resolving person lines', async () => {
+    const result = await buildPricingEngineOutputV2(
+      {
+        businessLineCode: 'wave',
+        commercialModel: 'on_demand',
+        countryFactorCode: 'international_usd',
+        outputCurrency: 'USD',
+        quoteDate: '2026-04-18',
+        lines: [
+          {
+            lineType: 'person',
+            memberId: 'member-1',
+            fteFraction: 1,
+            periods: 1
+          }
+        ]
+      },
+      {
+        getCommercialModelMultiplier: vi.fn().mockResolvedValue({
+          modelCode: 'on_demand',
+          modelLabel: 'On-Demand',
+          multiplierPct: 0,
+          description: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getCountryPricingFactor: vi.fn().mockResolvedValue({
+          factorCode: 'international_usd',
+          factorLabel: 'International',
+          factorMin: 1,
+          factorOpt: 1,
+          factorMax: 1,
+          appliesWhen: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        resolvePricingOutputExchangeRate: vi.fn().mockResolvedValue(1),
+        resolvePricingOutputFxReadiness: vi.fn().mockResolvedValue({
+          fromCurrency: 'USD',
+          toCurrency: 'USD',
+          rateDate: '2026-04-18',
+          domain: 'pricing_output',
+          state: 'supported',
+          rate: 1,
+          rateDateResolved: '2026-04-18',
+          source: 'identity',
+          ageDays: 0,
+          stalenessThresholdDays: 7,
+          composedViaUsd: false,
+          message: 'USD baseline.'
+        }),
+        convertUsdToPricingCurrency: vi.fn().mockImplementation(({ amountUsd }) => Promise.resolve(amountUsd)),
+        convertCurrencyAmount: vi.fn().mockImplementation(({ amount }) => Promise.resolve(amount)),
+        convertFteToHours: vi.fn().mockResolvedValue({
+          fteFraction: 1,
+          fteLabel: '1.0',
+          monthlyHours: 160,
+          recommendedDescription: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        resolvePricingAddons: vi.fn().mockResolvedValue([]),
+        listOverheadAddons: vi.fn().mockResolvedValue([]),
+        getOverheadAddonBySku: vi.fn(),
+        getSellableRoleBySku: vi.fn(),
+        listCompatibleEmploymentTypes: vi.fn(),
+        getCurrentCost: vi.fn(),
+        getCurrentPricing: vi.fn(),
+        getRoleTierMargins: vi.fn(),
+        getToolBySku: vi.fn(),
+        getPreferredToolProviderCostBasisByToolSku: vi.fn(),
+        getPreferredRoleBlendedCostBasisByRoleId: vi.fn(),
+        getPreferredMemberActualCostBasis: vi.fn().mockResolvedValue({
+          memberId: 'member-1',
+          periodYear: 2026,
+          periodMonth: 4,
+          periodId: '2026-04',
+          snapshotDate: '2026-04-18',
+          sourceKind: 'member_actual',
+          sourceRef: '2026-04',
+          currency: 'USD',
+          loadedCostAmount: 1200,
+          costPerHourAmount: 7.5,
+          totalLaborCostAmount: 1000,
+          directOverheadAmount: 100,
+          sharedOverheadAmount: 100,
+          contractedFte: 1,
+          contractedHours: 160,
+          commercialAvailabilityHours: 160,
+          snapshotStatus: 'complete',
+          confidenceScore: 0.95,
+          confidenceLabel: 'high',
+          sourceCompensationVersionId: 'cv-1',
+          sourcePayrollPeriodId: '2026-04',
+          roleId: 'role-1',
+          roleSku: 'ECG-001',
+          roleCode: 'strategist',
+          roleLabel: 'Estratega',
+          employmentTypeCode: 'contractor',
+          detail: {}
+        })
+      }
+    )
+
+    expect(result.lines[0]?.costStack.costBasisKind).toBe('member_actual')
+    expect(result.lines[0]?.costStack.costBasisSnapshotDate).toBe('2026-04-18')
+    expect(result.lines[0]?.costStack.employmentTypeCode).toBe('contractor')
+    expect(result.lines[0]?.costStack.totalCostUsd).toBe(1200)
   })
 })

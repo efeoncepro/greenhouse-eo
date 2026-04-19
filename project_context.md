@@ -1,3 +1,16 @@
+## Delta 2026-04-19 TASK-479 agrega el bridge persona -> rol comercial y el snapshot role_blended
+
+- Runtime nuevo:
+  - migración `20260419141717643_task-479-people-actual-cost-blended-role-snapshots.sql`
+  - tablas `greenhouse_commercial.member_role_cost_basis_snapshots` y `greenhouse_commercial.role_blended_cost_basis_snapshots`
+  - helper `src/lib/commercial-cost-basis/people-role-cost-basis.ts`
+- Contrato operativo:
+  - `member_capacity_economics` sigue siendo la fuente factual reusable de `member_actual`
+  - el bridge persona -> rol comercial ya no se resuelve inline en pricing; queda materializado con provenance/confidence por período
+  - `commercial-cost-worker` scope `people` materializa costo factual por persona + bridge persona/rol + `role_blended` en batch
+  - `pricing-engine-v2` prefiere `role_blended` antes de `role_modeled` cuando existe evidencia real reusable
+  - `active_role_codes` de Identity Access no debe usarse como source de rol comercial
+
 ## Delta 2026-04-19 TASK-483 endurece el deploy del commercial-cost-worker con WIF
 
 - `commercial-cost-worker` deja de depender solo de deploy manual y adopta workflow GitHub Actions con el baseline WIF del repo.

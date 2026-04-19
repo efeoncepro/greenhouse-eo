@@ -383,6 +383,40 @@ export interface GreenhouseCommercialMarginTargets {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialMemberRoleCostBasisSnapshots {
+  commercial_availability_hours: Generated<Numeric>;
+  confidence_label: Generated<string>;
+  confidence_score: Generated<Numeric>;
+  contracted_fte: Generated<Numeric>;
+  cost_per_hour_amount: Numeric | null;
+  created_at: Generated<Timestamp>;
+  detail_jsonb: Generated<Json>;
+  direct_overhead_amount: Numeric | null;
+  employment_type_code: string | null;
+  loaded_cost_amount: Numeric | null;
+  mapping_source: string;
+  mapping_source_ref: string | null;
+  materialized_at: Generated<Timestamp>;
+  member_id: string;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  resolved_currency: Generated<string>;
+  role_code: string | null;
+  role_id: string | null;
+  role_label: string | null;
+  role_sku: string | null;
+  shared_overhead_amount: Numeric | null;
+  snapshot_date: Timestamp;
+  snapshot_id: Generated<string>;
+  snapshot_key: string;
+  snapshot_status: Generated<string>;
+  source_kind: Generated<string>;
+  source_ref: string | null;
+  total_labor_cost_amount: Numeric | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialOverheadAddons {
   active: Generated<boolean>;
   addon_id: Generated<string>;
@@ -674,6 +708,43 @@ export interface GreenhouseCommercialRevenueMetricConfig {
   notes: string | null;
   pipeline_default_metric: Generated<string>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialRoleBlendedCostBasisSnapshots {
+  blended_cost_per_hour_amount: Numeric | null;
+  blended_direct_overhead_amount: Generated<Numeric>;
+  blended_loaded_cost_amount: Generated<Numeric>;
+  blended_shared_overhead_amount: Generated<Numeric>;
+  blended_total_labor_cost_amount: Numeric | null;
+  confidence_label: Generated<string>;
+  confidence_score: Generated<Numeric>;
+  created_at: Generated<Timestamp>;
+  detail_jsonb: Generated<Json>;
+  employment_type_code: string;
+  freshest_member_snapshot_at: Timestamp | null;
+  freshness_days: Generated<number>;
+  freshness_status: Generated<string>;
+  materialized_at: Generated<Timestamp>;
+  member_count: Generated<number>;
+  oldest_member_snapshot_at: Timestamp | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  resolved_currency: Generated<string>;
+  role_code: string;
+  role_id: string;
+  role_label: string;
+  role_sku: string;
+  sample_size: Generated<number>;
+  snapshot_date: Timestamp;
+  snapshot_id: Generated<string>;
+  snapshot_key: string;
+  snapshot_status: Generated<string>;
+  source_kind: Generated<string>;
+  source_ref: string | null;
+  updated_at: Generated<Timestamp>;
+  weighted_fte: Generated<Numeric>;
+  weighted_hours: Generated<Numeric>;
 }
 
 export interface GreenhouseCommercialRoleEmploymentCompatibility {
@@ -5455,6 +5526,7 @@ export interface DB {
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
+  "greenhouse_commercial.member_role_cost_basis_snapshots": GreenhouseCommercialMemberRoleCostBasisSnapshots;
   "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
@@ -5467,6 +5539,7 @@ export interface DB {
   "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
   "greenhouse_commercial.quote_templates": GreenhouseCommercialQuoteTemplates;
   "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
+  "greenhouse_commercial.role_blended_cost_basis_snapshots": GreenhouseCommercialRoleBlendedCostBasisSnapshots;
   "greenhouse_commercial.role_employment_compatibility": GreenhouseCommercialRoleEmploymentCompatibility;
   "greenhouse_commercial.role_rate_cards": GreenhouseCommercialRoleRateCards;
   "greenhouse_commercial.role_tier_margins": GreenhouseCommercialRoleTierMargins;

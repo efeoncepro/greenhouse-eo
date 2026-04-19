@@ -16,6 +16,31 @@ Al investigar el bug quedó expuesto que `quotations` mezcla identidades: tiene 
 
 ---
 
+## Sesion 2026-04-19 — TASK-479 People Actual Cost + Blended Role Cost Snapshots (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama / worktree:** `task/TASK-479-people-actual-cost-blended-role-snapshots` en `/Users/jreye/Documents/greenhouse-eo-task-479`
+- **Colisión evitada:** no se tocó el checkout principal porque había movimiento concurrente de rama; la task vive en worktree aislado.
+- **Discovery resuelto:** `member_capacity_economics` sí era la base factual correcta, pero faltaban dos contratos reales en el repo:
+  - bridge canónico persona -> `sellable_role`
+  - snapshot persistido `role_blended` por `role-period`
+- **Spec corregida y cerrada:** `TASK-479` quedó reanclada a `commercial-cost-worker` scope `people` y ahora vive como task completada.
+- **Entregables:**
+  - migración `20260419141717643_task-479-people-actual-cost-blended-role-snapshots.sql`
+  - tablas `greenhouse_commercial.member_role_cost_basis_snapshots` y `greenhouse_commercial.role_blended_cost_basis_snapshots`
+  - helper `src/lib/commercial-cost-basis/people-role-cost-basis.ts`
+  - `commercial-cost-worker` scope `people` ahora materializa bridge persona/rol + `role_blended`
+  - `pricing-engine-v2` ahora prefiere `role_blended` antes de `role_modeled` y emite metadata `member_actual` / `role_blended`
+  - `GET /api/people/[memberId]/finance-impact` y `person-360/facets/costs` endurecidos contra drift del schema real
+- **Verificación ejecutada:**
+  - `pnpm migrate:up --no-check-order` ok; `src/types/db.d.ts` regenerado
+  - `pnpm exec vitest run src/lib/finance/pricing/__tests__/pricing-engine-v2.test.ts` ok
+  - `pnpm exec tsc --noEmit` ok
+  - `pnpm lint` ok
+  - `pnpm build` ok
+  - `rg -n "new Pool\\(" src | rg -v "src/lib/postgres/client.ts"` sin matches
+
 ## Sesion 2026-04-19 — TASK-484 FX Provider Adapter Platform (Claude)
 
 - **Owner:** Claude

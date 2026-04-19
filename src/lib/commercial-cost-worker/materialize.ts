@@ -10,6 +10,9 @@ import { publishPeriodMaterializedEvent } from '@/lib/sync/publish-event'
 import { materializeCommercialCostAttributionForPeriod } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { materializeProviderToolingSnapshotsForPeriod } from '@/lib/providers/provider-tooling-snapshots'
 import { materializeToolProviderCostBasisSnapshotsForPeriod } from '@/lib/commercial-cost-basis/tool-provider-cost-basis'
+import {
+  materializePeopleCostBasisSnapshotsForPeriod
+} from '@/lib/commercial-cost-basis/people-role-cost-basis'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { materializeMemberCapacityEconomicsForPeriod } from '@/lib/sync/projections/member-capacity-economics'
 
@@ -212,22 +215,41 @@ const materializePeopleScope = async (period: CommercialCostBasisPeriod) => {
     month: period.month
   })
 
+  const { memberRoleSnapshots, roleBlendedSnapshots } = await materializePeopleCostBasisSnapshotsForPeriod(
+    period.year,
+    period.month
+  )
+
+  const mappedMembers = memberRoleSnapshots.filter(snapshot => snapshot.snapshotStatus === 'mapped').length
+  const partiallyMappedMembers = memberRoleSnapshots.filter(snapshot => snapshot.snapshotStatus === 'partial').length
+  const unresolvedMembers = memberRoleSnapshots.filter(snapshot => snapshot.snapshotStatus === 'unresolved').length
+
   await publishCommercialCostBasisEvent({
     scope: 'people',
     period,
-    snapshotCount: refreshedMembers,
+    snapshotCount: refreshedMembers + memberRoleSnapshots.length + roleBlendedSnapshots.length,
     payload: {
-      refreshedMembers
+      refreshedMembers,
+      memberRoleSnapshots: memberRoleSnapshots.length,
+      roleBlendedSnapshots: roleBlendedSnapshots.length,
+      mappedMembers,
+      partiallyMappedMembers,
+      unresolvedMembers
     }
   })
 
   return {
-    recordsRead: refreshedMembers,
-    recordsWritten: refreshedMembers,
+    recordsRead: refreshedMembers + memberRoleSnapshots.length,
+    recordsWritten: refreshedMembers + memberRoleSnapshots.length + roleBlendedSnapshots.length,
     recordsFailed: 0,
     eventsPublished: 1,
     summary: {
-      refreshedMembers
+      refreshedMembers,
+      memberRoleSnapshots: memberRoleSnapshots.length,
+      roleBlendedSnapshots: roleBlendedSnapshots.length,
+      mappedMembers,
+      partiallyMappedMembers,
+      unresolvedMembers
     }
   }
 }

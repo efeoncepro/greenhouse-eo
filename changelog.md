@@ -10,6 +10,13 @@
 - Companion: error handler propio en los dos INSERTs (quotations + line items) con `console.error` estructurado. El 500 ya no puede volver a salir con body vacío.
 - Follow-up arquitectónico abierto como **TASK-486 — Commercial Quotation Canonical Anchor (Organization + Contact)**: deprecar `quotations.space_id`, agregar `contact_identity_profile_id`, renombrar el dropdown del builder. Space no pertenece en la identidad canónica de la quote.
 
+### 2026-04-19 — TASK-479 materializa costo factual por persona + blended por rol
+
+- Nacen `greenhouse_commercial.member_role_cost_basis_snapshots` y `greenhouse_commercial.role_blended_cost_basis_snapshots` para cerrar el gap real entre `member_capacity_economics` y el catálogo comercial `sellable_roles`.
+- `commercial-cost-worker` extiende su scope `people`: ahora no solo refresca la evidencia factual persona-level, sino también el bridge persona -> rol comercial y el snapshot reusable `role_blended` por período.
+- El pricing engine v2 ya distingue `member_actual`, `role_blended`, `role_modeled` y `tool_snapshot`; para líneas por rol prefiere evidencia real `role_blended` antes de caer al costo modelado del catálogo.
+- `GET /api/people/[memberId]/finance-impact` y `person-360/facets/costs` quedan endurecidos contra drift del schema real y consumen el reader compartido en vez de columnas inexistentes de `member_capacity_economics`.
+
 ### 2026-04-19 — TASK-484 wires FX provider platform (ready for rollout)
 
 - Plataforma de 9 FX provider adapters (Mindicador, OpenER, Banxico SIE, TRM Colombia, SUNAT Perú, BCRP, Frankfurter, Fawaz Ahmed, CLF from UF indicator) con sync orchestrator registry-driven.

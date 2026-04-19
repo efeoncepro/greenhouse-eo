@@ -7,6 +7,22 @@
 
 ---
 
+## Delta 2026-04-19 — TASK-479 People Actual Cost + Blended Role Snapshots
+
+- `member_capacity_economics` se reafirma como la fuente factual reusable del lane `member_actual`; no nace una tabla paralela de costo persona-level.
+- Runtime nuevo en `greenhouse_commercial`:
+  - `member_role_cost_basis_snapshots`: bridge mensual persona -> `sellable_role` con `employment_type_code`, `mapping_source`, `source_ref`, freshness y confidence
+  - `role_blended_cost_basis_snapshots`: agregado mensual por `role_id + employment_type_code + period` con weighting por FTE/horas reales, `sample_size` y confidence agregada
+- Regla de matching explícita:
+  - Identity Access `active_role_codes` NO es source of truth de rol comercial
+  - el bridge se resuelve desde evidencia operativa/comercial existente (`assignment_role_title_override`, `person_membership.role_label`, `members.role_title`) contra el catálogo `sellable_roles`
+- `commercial-cost-worker` scope `people` ya no refresca solo `member_capacity_economics`; ahora orquesta:
+  - costo factual por persona (`member_actual`)
+  - bridge persona -> rol comercial
+  - snapshot `role_blended`
+- `pricing-engine-v2` debe preferir `role_blended` cuando la cotización pide costo por rol y solo caer a `role_modeled` cuando no existe evidencia real reusable para el período.
+- Consumers People/Person 360 no deben leer columnas inventadas de `member_capacity_economics`; consumen el reader compartido para evitar drift.
+
 ## Delta 2026-04-19 — Currency & FX Platform Foundation (TASK-475)
 
 - Se formalizó la matriz canónica de monedas por dominio + política FX + contrato de readiness. El contrato vive en `src/lib/finance/currency-domain.ts` + `currency-registry.ts` y lo consumen el engine, las APIs y los futuros consumers client-facing.

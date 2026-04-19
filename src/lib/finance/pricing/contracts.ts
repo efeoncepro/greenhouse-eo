@@ -266,6 +266,11 @@ export interface PricingCostStackV2 {
   breakdown: Record<string, number>
   employmentTypeCode?: string | null
   employmentTypeSource?: 'explicit_input' | 'role_default' | 'payroll_compensation_version'
+  costBasisKind?: 'member_actual' | 'role_blended' | 'role_modeled' | 'tool_snapshot' | 'manual'
+  costBasisSourceRef?: string | null
+  costBasisSnapshotDate?: string | null
+  costBasisConfidenceScore?: number | null
+  costBasisConfidenceLabel?: 'high' | 'medium' | 'low' | null
 }
 
 export interface TierComplianceV2 {

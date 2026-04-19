@@ -342,10 +342,13 @@ export const listCompatibleEmploymentTypes = async (
 
 export const getCurrentCost = async (
   roleId: string,
-  employmentTypeCode?: string | null
+  employmentTypeCode?: string | null,
+  asOfDate?: string | null
 ): Promise<SellableRoleCostEntry | null> => {
   const db = await getDb()
   let resolvedEmploymentTypeCode = employmentTypeCode?.trim() || null
+  const resolvedAsOfDate = asOfDate?.trim() || new Date().toISOString().slice(0, 10)
+  const effectiveDate = new Date(`${resolvedAsOfDate}T00:00:00.000Z`)
 
   if (!resolvedEmploymentTypeCode) {
     const compatibility = await db
@@ -366,6 +369,7 @@ export const getCurrentCost = async (
     .selectAll()
     .where('role_id', '=', roleId)
     .where('employment_type_code', '=', resolvedEmploymentTypeCode)
+    .where('effective_from', '<=', effectiveDate)
     .orderBy('effective_from', 'desc')
     .executeTakeFirst()
 
@@ -374,15 +378,19 @@ export const getCurrentCost = async (
 
 export const getCurrentPricing = async (
   roleId: string,
-  currencyCode: SellableRolePricingCurrency
+  currencyCode: SellableRolePricingCurrency,
+  asOfDate?: string | null
 ): Promise<SellableRolePricingEntry | null> => {
   const db = await getDb()
+  const resolvedAsOfDate = asOfDate?.trim() || new Date().toISOString().slice(0, 10)
+  const effectiveDate = new Date(`${resolvedAsOfDate}T00:00:00.000Z`)
 
   const row = await db
     .selectFrom('greenhouse_commercial.sellable_role_pricing_currency')
     .selectAll()
     .where('role_id', '=', roleId)
     .where('currency_code', '=', currencyCode)
+    .where('effective_from', '<=', effectiveDate)
     .orderBy('effective_from', 'desc')
     .executeTakeFirst()
 

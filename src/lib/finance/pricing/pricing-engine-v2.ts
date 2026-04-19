@@ -18,9 +18,9 @@ import {
   listOverheadAddons
 } from '@/lib/commercial/overhead-addons-store'
 import {
-  readLatestMemberCapacityEconomicsSnapshot,
-  readMemberCapacityEconomicsSnapshot
-} from '@/lib/member-capacity-economics/store'
+  getPreferredMemberActualCostBasis,
+  getPreferredRoleBlendedCostBasisByRoleId
+} from '@/lib/commercial-cost-basis/people-role-cost-basis'
 import { getPreferredToolProviderCostBasisByToolSku } from '@/lib/commercial-cost-basis/tool-provider-cost-basis-reader'
 
 import { computeAddonChargeUsd, resolvePricingAddons } from './addon-resolver'
@@ -156,8 +156,8 @@ const defaultPricingEngineV2Dependencies = {
   getToolBySku,
   getOverheadAddonBySku,
   listOverheadAddons,
-  readLatestMemberCapacityEconomicsSnapshot,
-  readMemberCapacityEconomicsSnapshot,
+  getPreferredMemberActualCostBasis,
+  getPreferredRoleBlendedCostBasisByRoleId,
   getPreferredToolProviderCostBasisByToolSku,
   convertUsdToPricingCurrency,
   convertCurrencyAmount,
@@ -178,8 +178,8 @@ export interface PricingEngineV2Dependencies {
   getToolBySku: typeof getToolBySku
   getOverheadAddonBySku: typeof getOverheadAddonBySku
   listOverheadAddons: typeof listOverheadAddons
-  readLatestMemberCapacityEconomicsSnapshot: typeof readLatestMemberCapacityEconomicsSnapshot
-  readMemberCapacityEconomicsSnapshot: typeof readMemberCapacityEconomicsSnapshot
+  getPreferredMemberActualCostBasis: typeof getPreferredMemberActualCostBasis
+  getPreferredRoleBlendedCostBasisByRoleId: typeof getPreferredRoleBlendedCostBasisByRoleId
   getPreferredToolProviderCostBasisByToolSku: typeof getPreferredToolProviderCostBasisByToolSku
   convertUsdToPricingCurrency: typeof convertUsdToPricingCurrency
   convertCurrencyAmount: typeof convertCurrencyAmount
@@ -227,6 +227,7 @@ const resolveRoleLine = async ({
 
   const compatibilities = await deps.listCompatibleEmploymentTypes(role.roleId)
   const allowedCompatibilities = compatibilities.filter(entry => entry.allowed)
+  const quotePeriod = extractQuotePeriod(quoteDate)
 
   const resolvedEmploymentType =
     (input.employmentTypeCode
@@ -240,9 +241,20 @@ const resolveRoleLine = async ({
     throw new Error(`Employment type ${input.employmentTypeCode} is not allowed for role ${input.roleSku}`)
   }
 
-  const costRow = await deps.getCurrentCost(role.roleId, resolvedEmploymentType?.employmentTypeCode ?? null)
+  const blendedCostBasis = await deps.getPreferredRoleBlendedCostBasisByRoleId(
+    role.roleId,
+    resolvedEmploymentType?.employmentTypeCode ?? null,
+    {
+      year: quotePeriod?.year ?? null,
+      month: quotePeriod?.month ?? null
+    }
+  )
 
-  if (!costRow) {
+  const costRow = blendedCostBasis
+    ? null
+    : await deps.getCurrentCost(role.roleId, resolvedEmploymentType?.employmentTypeCode ?? null, quoteDate)
+
+  if (!blendedCostBasis && !costRow) {
     throw new Error(`Missing cost components for role ${input.roleSku}`)
   }
 
@@ -251,12 +263,93 @@ const resolveRoleLine = async ({
   const resolvedFteFraction = normalizePositiveNumber(input.fteFraction, 1)
   const explicitHours = input.hours != null && Number.isFinite(input.hours) && input.hours > 0
 
+  let hourlyCostUsd: number | null = null
+  let monthlyCostUsd: number | null = null
+  let roleCostBreakdown: Record<string, number> = {}
+  let costBasisKind: 'role_blended' | 'role_modeled' = 'role_modeled'
+  let costBasisSourceRef: string | null = null
+  let costBasisSnapshotDate: string | null = null
+  let costBasisConfidenceScore: number | null = null
+  let costBasisConfidenceLabel: 'high' | 'medium' | 'low' | null = null
+
+  if (blendedCostBasis && blendedCostBasis.blendedLoadedCostAmount > 0) {
+    monthlyCostUsd =
+      blendedCostBasis.resolvedCurrency === 'USD'
+        ? blendedCostBasis.blendedLoadedCostAmount
+        : await deps.convertCurrencyAmount({
+            amount: blendedCostBasis.blendedLoadedCostAmount,
+            fromCurrency: blendedCostBasis.resolvedCurrency,
+            toCurrency: 'USD',
+            rateDate: blendedCostBasis.snapshotDate
+          })
+
+    hourlyCostUsd =
+      blendedCostBasis.blendedCostPerHourAmount != null
+        ? blendedCostBasis.resolvedCurrency === 'USD'
+          ? blendedCostBasis.blendedCostPerHourAmount
+          : await deps.convertCurrencyAmount({
+              amount: blendedCostBasis.blendedCostPerHourAmount,
+              fromCurrency: blendedCostBasis.resolvedCurrency,
+              toCurrency: 'USD',
+              rateDate: blendedCostBasis.snapshotDate
+            })
+        : null
+
+    if (monthlyCostUsd == null && hourlyCostUsd == null) {
+      throw new Error(`Could not normalize blended role snapshot for ${input.roleSku} to USD`)
+    }
+
+    notes.push(
+      `Costo base desde role_blended ${blendedCostBasis.periodId} (${blendedCostBasis.employmentTypeCode}, confianza ${blendedCostBasis.confidenceLabel}).`
+    )
+
+    if (
+      quotePeriod &&
+      (blendedCostBasis.periodYear !== quotePeriod.year || blendedCostBasis.periodMonth !== quotePeriod.month)
+    ) {
+      notes.push(
+        `No existía snapshot blended exacto para ${quotePeriod.year}-${String(quotePeriod.month).padStart(2, '0')}; se reutilizó ${blendedCostBasis.periodId}.`
+      )
+    }
+
+    roleCostBreakdown = {
+      blendedLaborCost: blendedCostBasis.blendedTotalLaborCostAmount ?? 0,
+      blendedDirectOverhead: blendedCostBasis.blendedDirectOverheadAmount,
+      blendedSharedOverhead: blendedCostBasis.blendedSharedOverheadAmount,
+      blendedSampleSize: blendedCostBasis.sampleSize
+    }
+    costBasisKind = 'role_blended'
+    costBasisSourceRef = blendedCostBasis.sourceRef
+    costBasisSnapshotDate = blendedCostBasis.snapshotDate
+    costBasisConfidenceScore = blendedCostBasis.confidenceScore
+    costBasisConfidenceLabel = blendedCostBasis.confidenceLabel
+  } else {
+    const resolvedCostRow = costRow!
+
+    hourlyCostUsd =
+      resolvedCostRow.hourlyCostUsd ??
+      round2((resolvedCostRow.totalMonthlyCostUsd ?? 0) / Math.max(resolvedCostRow.hoursPerFteMonth, 1))
+    monthlyCostUsd = resolvedCostRow.totalMonthlyCostUsd ?? round2(hourlyCostUsd * resolvedCostRow.hoursPerFteMonth)
+    roleCostBreakdown = {
+      baseSalaryUsd: resolvedCostRow.baseSalaryUsd,
+      bonusJitUsd: resolvedCostRow.bonusJitUsd,
+      bonusRpaUsd: resolvedCostRow.bonusRpaUsd,
+      bonusArUsd: resolvedCostRow.bonusArUsd,
+      bonusSobrecumplimientoUsd: resolvedCostRow.bonusSobrecumplimientoUsd,
+      gastosPrevisionalesUsd: resolvedCostRow.gastosPrevisionalesUsd,
+      feeDeelUsd: resolvedCostRow.feeDeelUsd,
+      feeEorUsd: resolvedCostRow.feeEorUsd
+    }
+  }
+
   const hoursPerPeriod = explicitHours
     ? input.hours!
-    : (await deps.convertFteToHours(resolvedFteFraction, quoteDate))?.monthlyHours ?? costRow.hoursPerFteMonth
+    : (await deps.convertFteToHours(resolvedFteFraction, quoteDate))?.monthlyHours ??
+      (costRow?.hoursPerFteMonth ??
+        (blendedCostBasis && blendedCostBasis.sampleSize > 0
+          ? blendedCostBasis.weightedHours / blendedCostBasis.sampleSize
+          : 160))
 
-  const hourlyCostUsd = costRow.hourlyCostUsd ?? round2((costRow.totalMonthlyCostUsd ?? 0) / Math.max(costRow.hoursPerFteMonth, 1))
-  const monthlyCostUsd = costRow.totalMonthlyCostUsd ?? round2(hourlyCostUsd * costRow.hoursPerFteMonth)
   const tierMargins = await deps.getRoleTierMargins(role.tier as never, quoteDate)
   const marginPct = normalizeMarginPct(input.overrideMarginPct, tierMargins?.marginOpt ?? 0.35)
   const lineWarnings: PricingWarning[] = []
@@ -271,7 +364,11 @@ const resolveRoleLine = async ({
   }
 
   const pricingBasis: 'hour' | 'month' = explicitHours ? 'hour' : 'month'
-  const baseUnitCostUsd = explicitHours ? hourlyCostUsd : round2(monthlyCostUsd * resolvedFteFraction)
+
+  const baseUnitCostUsd =
+    pricingBasis === 'hour'
+      ? hourlyCostUsd ?? round2((monthlyCostUsd ?? 0) / Math.max(hoursPerPeriod || 1, 1))
+      : round2((monthlyCostUsd ?? round2((hourlyCostUsd ?? 0) * hoursPerPeriod)) * resolvedFteFraction)
 
   const baseUnitBillUsd = applyMarginFormula({
     costUsd: baseUnitCostUsd,
@@ -285,7 +382,7 @@ const resolveRoleLine = async ({
 
   const rolePricingForOutput =
     outputCurrency !== 'USD'
-      ? await deps.getCurrentPricing(role.roleId, outputCurrency as never)
+      ? await deps.getCurrentPricing(role.roleId, outputCurrency as never, quoteDate)
       : null
 
   let unitPriceOutputCurrency = unitPriceUsd
@@ -331,18 +428,14 @@ const resolveRoleLine = async ({
       lineInput: input,
       costStack: {
         totalCostUsd,
-        breakdown: {
-          baseSalaryUsd: costRow.baseSalaryUsd,
-          bonusJitUsd: costRow.bonusJitUsd,
-          bonusRpaUsd: costRow.bonusRpaUsd,
-          bonusArUsd: costRow.bonusArUsd,
-          bonusSobrecumplimientoUsd: costRow.bonusSobrecumplimientoUsd,
-          gastosPrevisionalesUsd: costRow.gastosPrevisionalesUsd,
-          feeDeelUsd: costRow.feeDeelUsd,
-          feeEorUsd: costRow.feeEorUsd
-        },
+        breakdown: roleCostBreakdown,
         employmentTypeCode: resolvedEmploymentType?.employmentTypeCode ?? null,
-        employmentTypeSource: input.employmentTypeCode ? 'explicit_input' : 'role_default'
+        employmentTypeSource: input.employmentTypeCode ? 'explicit_input' : 'role_default',
+        costBasisKind,
+        costBasisSourceRef,
+        costBasisSnapshotDate,
+        costBasisConfidenceScore,
+        costBasisConfidenceLabel
       },
       suggestedBillRate: {
         pricingBasis,
@@ -358,7 +451,7 @@ const resolveRoleLine = async ({
     totalCostUsd,
     totalBillUsd,
     totalBillOutputCurrency,
-    monthlyResourceCostUsd: round2(monthlyCostUsd * resolvedFteFraction * quantity),
+    monthlyResourceCostUsd: round2((monthlyCostUsd ?? 0) * resolvedFteFraction * quantity),
     roleCanSellAsStaff: role.canSellAsStaff,
     structuredWarnings: lineWarnings.length > 0 ? lineWarnings : undefined
   }
@@ -381,22 +474,21 @@ const resolvePersonLine = async ({
 }): Promise<Omit<ResolvedLineAccumulator, 'originalIndex'>> => {
   const notes: string[] = []
   const period = extractQuotePeriod(quoteDate)
-  let snapshot =
-    period
-      ? await deps.readMemberCapacityEconomicsSnapshot(input.memberId, period.year, period.month)
-      : null
 
-  if (!snapshot) {
-    snapshot = await deps.readLatestMemberCapacityEconomicsSnapshot(input.memberId)
-
-    if (snapshot) {
-      notes.push(`Capacity snapshot fallback al periodo ${snapshot.periodYear}-${String(snapshot.periodMonth).padStart(2, '0')}.`)
-    }
-  }
+  const snapshot = await deps.getPreferredMemberActualCostBasis(input.memberId, {
+    year: period?.year ?? null,
+    month: period?.month ?? null
+  })
 
   if (!snapshot) {
     throw new Error(`Missing member capacity snapshot for ${input.memberId}`)
   }
+
+  if (period && (snapshot.periodYear !== period.year || snapshot.periodMonth !== period.month)) {
+    notes.push(`Capacity snapshot fallback al periodo ${snapshot.periodId}.`)
+  }
+
+  notes.push(`Costo base desde ${snapshot.sourceKind} ${snapshot.periodId} (confianza ${snapshot.confidenceLabel}).`)
 
   const periods = normalizePositiveNumber(input.periods, 1)
   const quantity = normalizePositiveNumber(input.quantity, 1)
@@ -405,27 +497,29 @@ const resolvePersonLine = async ({
 
   const hoursPerPeriod = explicitHours
     ? input.hours!
-    : (await deps.convertFteToHours(resolvedFteFraction, quoteDate))?.monthlyHours ?? snapshot.commercialAvailabilityHours ?? snapshot.contractedHours
+    : (await deps.convertFteToHours(resolvedFteFraction, quoteDate))?.monthlyHours ??
+      snapshot.commercialAvailabilityHours ??
+      snapshot.contractedHours
 
   const hourlyCostUsd =
-    snapshot.targetCurrency.toUpperCase() === 'USD'
-      ? snapshot.costPerHourTarget
-      : snapshot.costPerHourTarget != null
+    snapshot.currency.toUpperCase() === 'USD'
+      ? snapshot.costPerHourAmount
+      : snapshot.costPerHourAmount != null
         ? await deps.convertCurrencyAmount({
-            amount: snapshot.costPerHourTarget,
-            fromCurrency: snapshot.targetCurrency,
+            amount: snapshot.costPerHourAmount,
+            fromCurrency: snapshot.currency,
             toCurrency: 'USD',
             rateDate: quoteDate
           })
         : null
 
   const monthlyCostUsd =
-    snapshot.targetCurrency.toUpperCase() === 'USD'
-      ? snapshot.loadedCostTarget
-      : snapshot.loadedCostTarget != null
+    snapshot.currency.toUpperCase() === 'USD'
+      ? snapshot.loadedCostAmount
+      : snapshot.loadedCostAmount != null
         ? await deps.convertCurrencyAmount({
-            amount: snapshot.loadedCostTarget,
-            fromCurrency: snapshot.targetCurrency,
+            amount: snapshot.loadedCostAmount,
+            fromCurrency: snapshot.currency,
             toCurrency: 'USD',
             rateDate: quoteDate
           })
@@ -471,13 +565,18 @@ const resolvePersonLine = async ({
       costStack: {
         totalCostUsd,
         breakdown: {
-          totalLaborCostTarget: snapshot.totalLaborCostTarget ?? 0,
-          directOverheadTarget: snapshot.directOverheadTarget,
-          sharedOverheadTarget: snapshot.sharedOverheadTarget,
-          loadedCostTarget: snapshot.loadedCostTarget ?? 0
+          totalLaborCostTarget: snapshot.totalLaborCostAmount ?? 0,
+          directOverheadTarget: snapshot.directOverheadAmount ?? 0,
+          sharedOverheadTarget: snapshot.sharedOverheadAmount ?? 0,
+          loadedCostTarget: snapshot.loadedCostAmount ?? 0
         },
-        employmentTypeCode: null,
-        employmentTypeSource: 'payroll_compensation_version'
+        employmentTypeCode: snapshot.employmentTypeCode,
+        employmentTypeSource: 'payroll_compensation_version',
+        costBasisKind: 'member_actual',
+        costBasisSourceRef: snapshot.sourceRef,
+        costBasisSnapshotDate: snapshot.snapshotDate,
+        costBasisConfidenceScore: snapshot.confidenceScore,
+        costBasisConfidenceLabel: snapshot.confidenceLabel
       },
       suggestedBillRate: {
         pricingBasis,
@@ -617,7 +716,12 @@ const resolveToolLine = async ({
           proratedCostUsd: tool.proratedCostUsd ?? 0,
           subscriptionAmount: tool.subscriptionAmount ?? 0,
           snapshotResolvedAmountClp: costBasisSnapshot?.resolvedAmountClp ?? 0
-        }
+        },
+        costBasisKind: costBasisSnapshot ? 'tool_snapshot' : undefined,
+        costBasisSourceRef: costBasisSnapshot?.sourceRef ?? null,
+        costBasisSnapshotDate: costBasisSnapshot?.snapshotDate ?? null,
+        costBasisConfidenceScore: costBasisSnapshot?.confidenceScore ?? null,
+        costBasisConfidenceLabel: costBasisSnapshot?.confidenceLabel ?? null
       },
       suggestedBillRate: {
         pricingBasis: 'unit',
