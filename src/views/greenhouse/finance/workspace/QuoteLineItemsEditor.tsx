@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -32,6 +32,8 @@ import SellableItemPickerDrawer, {
 
 import QuoteLineCostStack from './QuoteLineCostStack'
 
+export type QuoteLineSource = 'catalog' | 'service' | 'template' | 'manual'
+
 export interface QuoteLineItem {
   lineItemId?: string
   label: string
@@ -47,12 +49,19 @@ export interface QuoteLineItem {
   memberId?: string | null
   discountType?: 'percentage' | 'fixed_amount' | null
   discountValue?: number | null
+  source?: QuoteLineSource
+  serviceSku?: string | null
+  serviceLineOrder?: number | null
   metadata?: {
     pricingV2LineType?: PricingV2LineType
     sku?: string
     fteFraction?: number | null
     periods?: number | null
     employmentTypeCode?: string | null
+    moduleId?: string | null
+    serviceSku?: string | null
+    serviceLineOrder?: number | null
+    templateItemId?: string | null
   } | null
 }
 
@@ -104,6 +113,23 @@ const UNIT_LABELS: Record<QuoteLineItem['unit'], string> = {
   month: 'Mes',
   unit: 'Unidad',
   project: 'Proyecto'
+}
+
+const SOURCE_META: Record<QuoteLineSource, { label: string; color: 'primary' | 'info' | 'success' | 'warning' | 'secondary'; icon: string }> = {
+  catalog: { label: 'Catálogo', color: 'primary', icon: 'tabler-books' },
+  service: { label: 'Servicio', color: 'success', icon: 'tabler-package' },
+  template: { label: 'Template', color: 'info', icon: 'tabler-template' },
+  manual: { label: 'Manual', color: 'secondary', icon: 'tabler-edit' }
+}
+
+export interface QuoteLineItemsEditorHandle {
+
+  /** Añade líneas desde una fuente externa (source selector del shell).
+   * Marca el draft como dirty para que la lista no se resetee si cambia `lineItems`. */
+  appendLines: (lines: QuoteLineItem[]) => void
+
+  /** Devuelve el snapshot actual del draft (útil para submit externo). */
+  getDraft: () => QuoteLineItem[]
 }
 
 const TIER_STATUS_META: Record<
@@ -158,7 +184,8 @@ const cloneLineItems = (items: QuoteLineItem[]): QuoteLineItem[] => items.map(it
 // engine v2 usa 5 line types; la tabla actual persiste 4 (person/role/deliverable/direct_cost).
 // Para tool y overhead_addon, aplanamos a direct_cost + metadata.pricingV2LineType + metadata.sku
 // (TASK-464e Delta 2026-04-18).
-const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
+// TASK-473 añade `source` para trazabilidad visual del origen de la línea.
+export const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
   switch (selection.tab) {
     case 'roles':
       return {
@@ -175,6 +202,7 @@ const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
         productId: null,
         discountType: null,
         discountValue: null,
+        source: 'catalog',
         metadata: { pricingV2LineType: 'role', sku: selection.sku, fteFraction: 1.0, periods: 1 }
       }
     case 'tools':
@@ -192,6 +220,7 @@ const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
         productId: null,
         discountType: null,
         discountValue: null,
+        source: 'catalog',
         metadata: { pricingV2LineType: 'tool', sku: selection.sku }
       }
     case 'overhead':
@@ -209,6 +238,7 @@ const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
         productId: null,
         discountType: null,
         discountValue: null,
+        source: 'catalog',
         metadata: { pricingV2LineType: 'overhead_addon', sku: selection.sku }
       }
     case 'people':
@@ -226,6 +256,7 @@ const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
         productId: null,
         discountType: null,
         discountValue: null,
+        source: 'catalog',
         metadata: { pricingV2LineType: 'person', sku: selection.sku, fteFraction: 1.0, periods: 1 }
       }
     case 'services':
@@ -244,26 +275,66 @@ const mapSelectionToLine = (selection: SellableSelection): QuoteLineItem => {
         productId: null,
         discountType: null,
         discountValue: null,
-        metadata: { sku: selection.sku }
+        source: 'service',
+        serviceSku: selection.sku,
+        metadata: {
+          sku: selection.sku,
+          moduleId: (selection.metadata?.moduleId as string | undefined) ?? null,
+          serviceSku: selection.sku
+        }
       }
   }
 }
 
-const QuoteLineItemsEditor = ({
-  currency,
-  editable,
-  lineItems,
-  onSave,
-  saving,
-  businessLineCode = null,
-  canViewCostStack: canViewCostStackProp = false,
-  simulationLines = null,
-  outputCurrency = null
-}: QuoteLineItemsEditorProps) => {
+export const makeBlankManualLine = (): QuoteLineItem => ({
+  label: '',
+  description: null,
+  lineType: 'deliverable',
+  unit: 'unit',
+  quantity: 1,
+  unitPrice: null,
+  subtotalPrice: null,
+  subtotalAfterDiscount: null,
+  roleCode: null,
+  memberId: null,
+  productId: null,
+  discountType: null,
+  discountValue: null,
+  source: 'manual',
+  metadata: null
+})
+
+const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineItemsEditorProps>(function QuoteLineItemsEditor(
+  {
+    currency,
+    editable,
+    lineItems,
+    onSave,
+    saving,
+    businessLineCode = null,
+    canViewCostStack: canViewCostStackProp = false,
+    simulationLines = null,
+    outputCurrency = null
+  },
+  ref
+) {
   const [draftLines, setDraftLines] = useState<QuoteLineItem[]>(() => cloneLineItems(lineItems))
   const [dirty, setDirty] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerInitialTab, setPickerInitialTab] = useState<SellableItemPickerTab>('roles')
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      appendLines: (lines: QuoteLineItem[]) => {
+        if (!lines || lines.length === 0) return
+        setDraftLines(prev => [...prev, ...cloneLineItems(lines)])
+        setDirty(true)
+      },
+      getDraft: () => cloneLineItems(draftLines)
+    }),
+    [draftLines]
+  )
 
   useEffect(() => {
     if (!dirty) {
@@ -373,7 +444,18 @@ const QuoteLineItemsEditor = ({
                         )}
                       </TableCell>
                       <TableCell>
-                        <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
+                        <Stack spacing={0.5} alignItems='flex-start'>
+                          <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
+                          {line.source ? (
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant='outlined'
+                              color={SOURCE_META[line.source].color}
+                              label={SOURCE_META[line.source].label}
+                            />
+                          ) : null}
+                        </Stack>
                       </TableCell>
                       <TableCell align='right'>
                         <Typography variant='body2'>{line.quantity}</Typography>
@@ -452,6 +534,19 @@ const QuoteLineItemsEditor = ({
           >
             + Overhead
           </Button>
+          <Button
+            variant='outlined'
+            size='small'
+            color='secondary'
+            startIcon={<i className='tabler-edit' />}
+            onClick={() => {
+              setDraftLines(prev => [...prev, makeBlankManualLine()])
+              setDirty(true)
+            }}
+            disabled={saving}
+          >
+            + Manual
+          </Button>
         </Stack>
       </Box>
       <Divider />
@@ -512,6 +607,15 @@ const QuoteLineItemsEditor = ({
                       <TableCell>
                         <Stack spacing={0.5}>
                           <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
+                          {line.source ? (
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant='outlined'
+                              color={SOURCE_META[line.source].color}
+                              label={SOURCE_META[line.source].label}
+                            />
+                          ) : null}
                           {tierMeta ? (
                             <CustomChip
                               round='true'
@@ -707,6 +811,6 @@ const QuoteLineItemsEditor = ({
       />
     </Card>
   )
-}
+})
 
 export default QuoteLineItemsEditor

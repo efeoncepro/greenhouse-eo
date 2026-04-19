@@ -2,6 +2,15 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — TASK-473 migra el quote builder a superficies full-page
+
+- El CTA "Nueva cotización" deja de abrir un drawer sobredenso y ahora navega a `/finance/quotes/new`, una surface full-page dedicada con layout de 2 columnas (composición + rail comercial sticky).
+- Aparece `/finance/quotes/[id]/edit` como entrada canónica para edición estructural (misma shell, precarga quote + lines). Si el estado no es `draft` o el viewer no puede editar, redirige a `/finance/quotes/[id]?denied=edit`. El botón "Editar" en el header del detail abre esta surface.
+- El nuevo `QuoteSourceSelector` hace first-class las 4 fuentes de composición — **Catálogo** / **Servicio** / **Template** / **Manual** — reemplazando el patrón manual-first del drawer legacy. El flujo de **Servicio** dispara `POST /api/finance/quotes/from-service` (TASK-465) y expande a N líneas editables con trazabilidad de origen.
+- Cada línea del cotizador ahora muestra un chip outlined con su origen (`Catálogo`, `Servicio`, `Template`, `Manual`). `QuoteLineItem` gana `source`, `serviceSku` y metadata extendida; `mapSelectionToLine` etiqueta automáticamente según tab del picker.
+- `QuoteDetailView` queda consolidado como review/governance/lifecycle: overview + health + versiones + aprobaciones + términos + document chain + audit + PDF + send. La edición estructural vive exclusivamente en `/edit`.
+- `QuoteCreateDrawer` sigue existiendo como archivo para sub-flujos acotados futuros, pero ya no se monta en `QuotesListView`.
+
 ### 2026-04-19 — TASK-465 canonicaliza el catálogo de servicios compuestos (EFG-XXX)
 
 - Los servicios vendibles ahora se extienden sobre la identidad canónica `greenhouse_core.service_modules` (no se crea un `service_catalog` paralelo): la capa comercial vive en `greenhouse_commercial.service_pricing` con PK = `module_id` 1:1 al modulo y `service_sku` (`EFG-XXX`) autogenerado vía sequence + `generate_service_sku()` — admin puede dar de alta EFG-008+ sin migración.

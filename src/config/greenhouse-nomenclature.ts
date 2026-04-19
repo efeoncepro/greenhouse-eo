@@ -1624,6 +1624,55 @@ export const GH_PRICING = {
   builderEmptyLineItems: 'Aún no has agregado ítems a esta cotización',
   builderEmptyLineItemsCta: 'Agregar rol',
 
+  // Builder shell (full-page surface, TASK-473)
+  builderBreadcrumbRoot: 'Finanzas',
+  builderBreadcrumbList: 'Cotizaciones',
+  builderSubtitleCreate: 'Arma la cotización combinando ítems del catálogo, servicios empaquetados, templates o líneas manuales.',
+  builderSubtitleEdit: 'Ajusta contexto, líneas y términos comerciales de esta cotización.',
+  builderSaveAndClose: 'Guardar y cerrar',
+  builderCancel: 'Cancelar',
+  builderSaving: 'Guardando…',
+  builderSourcesCardTitle: 'Agrega líneas a la cotización',
+  builderSourcesCardSubtitle: 'Elige cómo quieres componerla',
+  builderSources: {
+    catalog: {
+      title: 'Catálogo',
+      subtitle: 'Roles, herramientas y overhead del pricing catalog',
+      icon: 'tabler-books',
+      color: 'primary' as const
+    },
+    service: {
+      title: 'Servicio',
+      subtitle: 'Servicios empaquetados EFG-XXX que expanden a líneas completas',
+      icon: 'tabler-package',
+      color: 'success' as const
+    },
+    template: {
+      title: 'Template',
+      subtitle: 'Cotizaciones predefinidas con defaults comerciales',
+      icon: 'tabler-template',
+      color: 'info' as const
+    },
+    manual: {
+      title: 'Manual',
+      subtitle: 'Crea una línea en blanco y edítala a mano',
+      icon: 'tabler-edit',
+      color: 'secondary' as const
+    }
+  },
+  builderTemplatePickerTitle: 'Desde template',
+  builderTemplatePickerSubtitle: 'Elige una cotización reutilizable',
+  builderTemplatePickerEmpty: 'No hay templates disponibles',
+  builderTemplatePickerEmptyHint:
+    'Guarda una cotización como template desde su detalle para reutilizarla aquí.',
+  builderTemplateUsageOne: (n: number) => `Usado ${n} vez`,
+  builderTemplateUsageMany: (n: number) => `Usado ${n} veces`,
+  builderTemplateDefaultsLabel: 'Defaults',
+  builderValidationDescription: 'Agrega una descripción breve del alcance.',
+  builderValidationOrganization: 'Selecciona un espacio para la cotización.',
+  builderValidationLines: 'Agrega al menos un ítem a la cotización.',
+  builderSubmitErrorGeneric: 'No pudimos guardar la cotización. Intenta de nuevo.',
+
   // Sellable item picker (drawer con 5 tabs)
   pickerTitle: 'Agregar ítem',
   pickerTabs: {
