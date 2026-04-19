@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.0
+> **Version:** 1.1
 > **Created:** 2026-03-30
+> **Updated:** 2026-04-19 — v1.1: registry de primitives `src/components/greenhouse/primitives/` gana 3 componentes nuevos extraídos de `QuoteSummaryDock` (TASK-505). Ver Delta 2026-04-19 abajo.
 > **Audience:** Frontend engineers, UI/UX architects, agents implementing views
 
 ---
@@ -9,6 +10,95 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-04-19 — Summary dock primitives extraction (TASK-505)
+
+El rediseño del `QuoteSummaryDock` (sticky-bottom del Quote Builder) extrae 3 primitives reusables al registry canónico de primitives del platform:
+
+```
+src/components/greenhouse/primitives/
+├── ContextChip.tsx              # pre-existente (TASK-487)
+├── ContextChipStrip.tsx         # pre-existente (TASK-487)
+├── SaveStateIndicator.tsx       # nuevo (TASK-505)
+├── MarginHealthChip.tsx         # nuevo (TASK-505)
+├── TotalsLadder.tsx             # nuevo (TASK-505)
+└── index.ts
+```
+
+### `SaveStateIndicator`
+
+Indicador de save lifecycle para docks sticky-bottom o footers de forms enterprise. Render: dot semantic (8 px) + label principal (`body2`) + caption opcional con contexto.
+
+```tsx
+import { SaveStateIndicator, type SaveStateKind } from '@/components/greenhouse/primitives'
+
+<SaveStateIndicator
+  state='dirty'                    // 'clean' | 'dirty' | 'saving' | 'saved'
+  changeCount={2}                  // opcional, solo para 'dirty'
+  lastSavedAt={new Date()}         // opcional, solo para 'saved'
+/>
+```
+
+Estados y color del dot:
+- `clean` — gris `action.disabled`.
+- `dirty` — `warning.main`. Caption muestra `N cambios`.
+- `saving` — `info.main` + `@keyframes save-dot-pulse` 1200ms infinite. Respeta `prefers-reduced-motion` (cae a opacidad fija).
+- `saved` — `success.main`. Caption muestra `ahora` / `hace 12s` / `hace 5m` / fecha corta.
+
+A11y: `aria-live="polite"` en el root + `aria-label` full-sentence que combina label principal + caption.
+
+### `MarginHealthChip`
+
+Status chip semantic con 3 niveles (healthy / warning / critical) para KPIs de health (margen de cotización, contract profitability, pipeline margin, etc.). Pattern enterprise Stripe/Ramp: color + icon + label textual + valor + status word en un solo phrase.
+
+```tsx
+import { MarginHealthChip, type MarginClassification } from '@/components/greenhouse/primitives'
+
+<MarginHealthChip
+  classification='healthy'         // 'healthy' | 'warning' | 'critical'
+  marginPct={0.494}                // 0.0–1.0
+  tierRange={{ min: 0.4, opt: 0.5, max: 0.6, tierLabel: 'Tier 3' }}  // opcional
+/>
+```
+
+Render: `Margen · 49,4% · Óptimo` / `Margen · 32,1% · Atención` / `Margen · 12,5% · Crítico`. Background `alpha(color, 0.12)` + border `alpha(color, 0.28)`. Tooltip con tier range al hover si se pasa `tierRange`. Transitions 150 ms emphasized decelerate.
+
+A11y: `aria-label` con full sentence + tier range legible.
+
+### `TotalsLadder`
+
+Total prominent + adaptive ladder para docks de cotización, invoice, purchase order, contract summary. Single source of truth para "monto grande + ajustes opcionales debajo".
+
+```tsx
+import { TotalsLadder, type TotalsLadderCurrency } from '@/components/greenhouse/primitives'
+
+<TotalsLadder
+  subtotal={2923500}
+  factor={1.15}                    // factor país
+  ivaAmount={558345}               // IVA calculado
+  total={3921845}
+  currency='CLP'
+  loading={false}
+  totalLabel='Total CLP'           // override opcional
+/>
+```
+
+Render adaptive:
+- Si `total === subtotal && factor ∈ {null, 1} && !ivaAmount` → solo el Total.
+- Si hay al menos un ajuste → overline `Total {currency}` + `h4` monto (text.primary, tabular-nums, fontWeight 600) + caption muted one-liner: `Subtotal $X · Factor ×1,15 · IVA $Y`.
+
+Loading: `Skeleton variant='text' width=180 height=40`. Respeta `useReducedMotion()` — con reduced motion el total se renderiza estático en vez de con `AnimatedCounter`.
+
+### Regla de primitives
+
+Componentes bajo `src/components/greenhouse/primitives/`:
+1. **Sin domain logic** — no importan de `@/lib/finance`, `@/lib/hr`, `@/lib/commercial`. Toman primitivos tipados y renderizan UI.
+2. **Tipos se exportan desde `index.ts`** — consumers importan `{ SaveStateIndicator, type SaveStateKind }` del barrel.
+3. **Accessible-by-default** — aria-label, aria-live, prefers-reduced-motion.
+4. **Tokens canónicos** — no raw hex, no raw px. `theme.shape.customBorderRadius.*`, `theme.palette.*`, `theme.transitions.*`.
+5. **Reusables platform-wide** — nombrar en general, no `Quote*`. Si nace Quote-specific, vive en `src/components/greenhouse/pricing/`.
+
+Esta regla se formaliza con TASK-505 y aplica desde TASK-498 (Sprint 3) en adelante.
 
 ## Delta 2026-04-11 — Professional profile patterns and certificate preview (TASK-313)
 

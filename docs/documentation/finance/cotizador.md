@@ -1,15 +1,54 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.2
+> **Version:** 3.3
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-19 por Claude (v3.2 — TASK-500/501/502/503 builder UX closure) y Codex (v3.2 — TASK-504 issue lifecycle & approval-by-exception)
+> **Ultima actualizacion:** 2026-04-19 por Claude (v3.3 — TASK-505 Summary Dock v2: 3-zone hierarchy + 3 primitives extraction)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.3 (2026-04-19 — TASK-505 · Summary Dock v2)
+
+Rediseño del dock sticky-bottom con jerarquía enterprise y extracción de 3 primitives reusables al platform. El dock pasó de ser una barra plana de ~80 px con 9+ elementos compitiendo en una sola fila a una composición de 3 zonas que el ojo puede escanear de un vistazo.
+
+### Layout 3 zonas (≥ 960 px)
+
+```
+┌────────────────┬──────────────────────────┬──────────────────────────────┐
+│ Estado (3/12)  │ Totals ladder (5/12)     │ Acciones (4/12)              │
+├────────────────┼──────────────────────────┼──────────────────────────────┤
+│ ● Sin guardar  │ TOTAL CLP                │ [+1 addon] [Cancelar] [Save] │
+│   2 cambios    │ $2.967.816               │                              │
+│                │ Subtotal · Factor · IVA  │                              │
+│ ✓ Margen       │ (solo si hay ajustes)    │                              │
+│   49,4% · Ópt. │                          │                              │
+└────────────────┴──────────────────────────┴──────────────────────────────┘
+```
+
+En 600–960 px se reorganiza en 2 filas (totals arriba, estado + acciones abajo). En < 600 px colapsa a columna única con CTA full-width al final.
+
+### Cambios clave
+
+- **Total ya no usa el azul de marca**. El número grande queda en `text.primary`; el azul (`primary.main`) queda exclusivo para el botón "Guardar". Así el ojo distingue sin esfuerzo "valor destacado" de "acción".
+- **Subtotal redundante oculto**. Cuando `Subtotal === Total` (sin IVA, sin factor país ≠ 1, sin descuento) el dock muestra solo el Total. Cuando hay ajustes, aparece una ladder compacta muted debajo: `Subtotal $X · Factor ×1,15 · IVA $Y`.
+- **Margen chip con label completo**: de `49.4%` + ícono a `Margen · 49,4% · Óptimo` + ícono + color semantic. Cero ambigüedad, lee completo por screen reader en un solo phrase. Tooltip con tier range al hover.
+- **Save state con 2 líneas**: dot semantic + label principal ("Sin guardar") + caption con contexto ("2 cambios" o "hace 12s"). Pulsing animado cuando guardando, respeta `prefers-reduced-motion`.
+- **CTA copy invariante**. Antes el botón cambiaba de "Guardar y cerrar" → "Calculando pricing…" → "Guardando…". Ahora el copy queda fijo; loading = disabled + spinner. Alinea con patrón Stripe/Linear.
+- **AnimatedCounter 0.4 s → 0.25 s**. Más snappy en cambios frecuentes; respeta reduced-motion.
+
+### 3 primitives nuevos (reusables)
+
+Extraídos a `src/components/greenhouse/primitives/` para consumo futuro por invoice builder, purchase order footer, contract summary, cualquier dock con total + health status:
+
+- **`SaveStateIndicator`** — dot + label + caption con changeCount/lastSavedAt.
+- **`MarginHealthChip`** — chip semantic con icon + label + pct + status word + tooltip de tier range.
+- **`TotalsLadder`** — total prominent + ladder adaptativa de ajustes. Renderiza solo lo que aporta información.
+
+Esto converge con la estrategia de platform primitives de TASK-498 (Sprint 3) — el primer builder post-quotes podrá reutilizarlos sin re-implementar.
 
 ## Cambios v3.2 (2026-04-19 — TASK-500 / TASK-501 / TASK-502 / TASK-503)
 
@@ -172,13 +211,22 @@ Los botones +Rol / +Persona / +Herramienta / +Overhead abren el picker drawer en
 
 El motor recalcula automáticamente cada vez que cambias cualquier campo (debounce 500ms).
 
-### 6. Ver totales en tiempo real
-Debajo del drawer, un **footer sticky** muestra:
-- **Subtotal** en USD + moneda output
-- **Overhead** aplicado
-- **Total** en moneda output (grande)
-- **Multiplicadores aplicados** (comercial × país)
-- **Chip de margen**: Saludable / Atención / Crítico con color
+### 6. Dock sticky con totales (v2 post-TASK-505)
+
+Un **dock flotante sticky-bottom** con 3 zonas muestra el estado de la cotización sin robar espacio de la tabla:
+
+**Zona izquierda — Estado**:
+- Indicador de save (● Sin guardar / Guardando / Guardado hace Xs) con count de cambios.
+- Chip de margen "Margen · 49,4% · Óptimo/Atención/Crítico" con ícono + color semantic + tooltip de tier range al hover.
+
+**Zona central — Total**:
+- Monto grande en `text.primary` con currency inline en el label (ej. "Total CLP").
+- Debajo, una ladder muted aparece solo si hay ajustes que explicar: `Subtotal $X · Factor ×1,15 · IVA $Y`. Si Subtotal == Total, la ladder queda oculta.
+
+**Zona derecha — Acciones**:
+- Chip de addons (tildar/destildar agrega o quita líneas `overhead_addon` visibles al cliente).
+- "Cancelar" (tonal secondary).
+- "Guardar y cerrar" (primary, azul de marca). Loading = disabled + spinner, sin cambiar el texto del botón.
 
 ### 7. Panel "Addons para el cliente" (dock sticky-bottom)
 

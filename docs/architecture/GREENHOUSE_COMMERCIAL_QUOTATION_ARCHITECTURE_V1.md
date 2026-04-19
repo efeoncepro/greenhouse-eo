@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.27
+> **Version:** 2.28
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-19 — v2.28: TASK-505 Summary Dock v2. El `QuoteSummaryDock` sticky-bottom pasa de Stack flat a layout Grid de 3 zonas (`xs=12 / md=3+5+4`): Estado (save indicator + margin chip) / Totals ladder / Acciones (addons + Cancelar + Guardar). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`SaveStateIndicator`, `MarginHealthChip`, `TotalsLadder`) reusables platform-wide para invoice / PO / contract docks. Total visible migra de `color=primary.main` a `text.primary` — el azul de marca queda reservado a la CTA primaria. `TotalsLadder` oculta subtotal/factor/IVA cuando no aportan información (`total === subtotal && factor === 1 && !ivaAmount`); cuando sí aportan, renderiza caption muted one-liner debajo del Total. `MarginHealthChip` pasa de `49.4%` + ícono a `Margen · 49,4% · Óptimo/Atención/Crítico` + ícono + tooltip de tier range (cierra color-only-state warning). `SaveStateIndicator` gana segunda línea con `changeCount` o `formatRelativeTime(lastSavedAt)`; dot pulsing en saving respeta `prefers-reduced-motion`. CTA primaria deja de hacer copy-swap (`"Guardar y cerrar"` → `"Calculando pricing…"` → `"Guardando…"`) y pasa a loading pattern enterprise: copy invariante + `disabled` + `<CircularProgress size={16} />` en startIcon. Shell actualizado: `primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}` constante, `primaryCtaLoading={submitting}`. `AnimatedCounter` del total baja de `duration=0.4` a `0.25` (emphasized decelerate `cubic-bezier(0.2, 0, 0, 1)`). Alinea con la estrategia de platform primitives de TASK-498.
 > **Updated:** 2026-04-19 — v2.27: TASK-500 / TASK-501 / TASK-502 / TASK-503 cierran el ciclo de UX y contratos del Quote Builder post-TASK-488. `PricingEngineInputV2.autoResolveAddons` pasa de `boolean` a `boolean | 'internal_only'` (aditivo, backwards-compatible). En modo `'internal_only'` el engine auto-resuelve solo addons `visibleToClient: false` (overhead, fee EOR estructural) y expone los addons `visibleToClient: true` aplicables en un campo nuevo de output `PricingEngineOutputV2.suggestedVisibleAddons: PricingAddonOutputV2[]`. El Quote Builder los ofrece como propuestas en el panel "Addons para el cliente" y al tildar se promueven a líneas `overhead_addon` explícitas en `lineItems`. Regla del modelo: lo que el cliente paga es lo que ve en la tabla — cero markup oculto. Para role/person, la UI del shell fija `quantity: 1` en el input al engine; el multiplicador real es `metadata.periods`, bindeado a la columna "Cantidad" visible (meses facturables). Elimina el doble conteo que dejó TASK-500 cuando se sincronizó quantity↔periods sin ajustar el engine. Para líneas catalog-backed (`role | person | tool | overhead_addon`) la UI renderiza el precio unitario como Typography read-only (no input, no override chip); override sigue disponible solo para líneas manuales (`direct_cost` sin `pricingV2LineType`). El shell fuerza una simulación fresca contra `/api/finance/quotes/pricing/simulate` antes de persistir y gate el botón Guardar mientras `simulating=true` — elimina la race condition que hacía fallar el save con "no hay precio" cuando el debounce del hook `usePricingSimulation` no había validado la snapshot actual. Endpoint `/api/finance/quotes/pricing/config` expone `catalog.employmentTypes` (ya existía) que ahora alimenta el dropdown "Tipo de contratación" del popover Ajustes; `periodsLabel` removido de `GH_PRICING.adjustPopover` (quedaba huérfano). Copy del chip de addons en el dock simplificado de "N addons sugeridos" → "N addons" porque el count engloba aplicados + propuestos. Popper del panel de addons migrado de `anchorEl={ref.current}` (caía al top-left cuando el ref era null en el primer render) a anchor capturado desde `event.currentTarget` + `useState<HTMLElement | null>`; dedupe client-side por sku en las entries del panel + guard idempotente en `handleAddonToggle` protegen contra double-clicks y race conditions del debounce.
 > **Updated:** 2026-04-19 — v2.26: TASK-504 separa lifecycle documental de quotations entre borrador, aprobación por excepción y emisión oficial. `greenhouse_commercial.quotations` suma `issued_at`, `issued_by`, `approval_rejected_at` y `approval_rejected_by`; el contrato canónico pasa a `draft | pending_approval | approval_rejected | issued | expired | converted`. Nace el comando `/api/finance/quotes/[id]/issue`; `/send` queda como wrapper de compatibilidad. Cuando la quote cumple policy se emite directo como `issued`; cuando requiere excepción pasa por approval y al aprobarse también termina `issued`. Rechazo ya no vuelve silenciosamente a `draft`, sino que queda explícito en `approval_rejected`. Nuevo evento canónico `commercial.quotation.issued`, mientras `commercial.quotation.sent` se sigue emitiendo como bridge legacy para consumers todavía no migrados. Quote-to-cash, contract lifecycle, HubSpot sync y las proyecciones de pipeline/rentabilidad leen ya el nuevo contrato sin reabrir ambigüedad entre emitir y distribuir.
 > **Updated:** 2026-04-19 — v2.25: TASK-461 introduce `greenhouse_commercial.master_agreements` como umbrella legal reusable y aterriza la lane MSA end-to-end. Nacen `master_agreements`, `clause_library` y `master_agreement_clauses`, con FK real `greenhouse_commercial.contracts.msa_id -> master_agreements(msa_id)` y seed bilingue de cláusulas legales estándar. `contracts-store` deja de filtrar solo por `space_id` y adopta scope híbrido `organization_id OR space_id`, alineando contracts/MSA con el cutover canónico de quotations de TASK-486. Nuevos stores: `master-agreements-store.ts`, `master-agreement-clauses-store.ts`, `contract-tenant-scope.ts`, `msa-events.ts`; nuevos eventos: `commercial.master_agreement.created|updated|clauses_changed` y `commercial.contract.msa_linked`. Nuevas routes: `GET/POST /api/finance/master-agreements`, `GET/PUT /api/finance/master-agreements/[id]`, `GET/PUT /api/finance/master-agreements/[id]/clauses`, CRUD de clause library, `GET/PUT /api/finance/contracts/[id]/msa`, `GET/POST /api/finance/master-agreements/[id]/signature-requests` y webhook `POST /api/webhooks/zapsign`. Asset system extendido con contextos privados `master_agreement_draft` y `master_agreement`; el PDF firmado se persiste en `greenhouse_core.assets` y no queda delegado a URLs efímeras del proveedor. UI nueva: `/finance/master-agreements` y `/finance/master-agreements/[id]`, además de surfacing `msaId/msaNumber/msaTitle` dentro de `/finance/contracts`. ZapSign queda integrado en modo productivo vía `ZAPSIGN_API_TOKEN` + webhook shared secret; sandbox no forma parte del contrato actual porque el token operativo validado corresponde al entorno productivo.
@@ -59,6 +60,47 @@
   - ninguna de esas acciones redefine por sí sola el lifecycle documental de la cotización
 
 ---
+
+## Delta 2026-04-19 — TASK-505 Quote Summary Dock v2 + Primitives Extraction
+
+Rediseño del dock sticky-bottom del Quote Builder con jerarquía enterprise. Audit conjunto con los skills `modern-ui`, `greenhouse-ux` y `microinteractions-auditor` identificó 6 blockers y 4 issues modern-bar sobre el dock v1; esta task los cierra.
+
+### Problemas cerrados
+- Subtotal + Total renderizados side-by-side con peso equivalente aunque fueran el mismo número en la mayoría de quotes (violaba restraint).
+- Margen chip sin label explícito (`49.4%` + ícono era cryptic y fallaba color-only-state).
+- Total usaba `color=primary.main`, robando foco a la CTA primary.
+- Save state era un dot de 6-8 px sin contexto (no mostraba count ni lastSavedAt).
+- CTA copy cargaba el estado de loading ("Calculando pricing…" / "Guardando…"), mezclando rol semántico con feedback.
+- Jerarquía visual plana: 9+ elementos en una fila de ~80 px.
+
+### Layout v2
+`<Grid container columnSpacing={3}>` con 3 zonas:
+- `xs=12 md=3` — Estado: `<SaveStateIndicator>` + `<MarginHealthChip>` en Stack vertical.
+- `xs=12 md=5` — Totals: `<TotalsLadder>` adaptativa.
+- `xs=12 md=4` — Acciones: chip de addons + `Cancelar` tonal secondary + `Guardar y cerrar` contained primary.
+
+Responsive: en 600–960 px mantiene 3 zonas pero con breakpoint md=3+5+4 restructurado por Grid; bajo 600 px colapsa a columna única con CTA al final (el dock sticky-bottom ya provee affordance mobile).
+
+### Primitives extraídos a `src/components/greenhouse/primitives/`
+- **`SaveStateIndicator`** — `{ state: 'clean' | 'dirty' | 'saving' | 'saved', changeCount?, lastSavedAt?: Date | null }`. Dot semantic (8px) + label principal (`body2`) + caption muted (`changeCount` o `formatRelativeTime(lastSavedAt)`). `@keyframes save-dot-pulse` en estado `saving`, short-circuit a opacidad fija con `prefers-reduced-motion: reduce`. `aria-live="polite"` + `aria-label` consolidado. Re-exporta `SaveStateKind` type.
+- **`MarginHealthChip`** — `{ classification: 'healthy' | 'warning' | 'critical', marginPct: number, tierRange?: MarginTierRange | null }`. Tonal chip con alpha 0.12 bg + 0.28 border + icon (`tabler-circle-check` / `tabler-alert-circle` / `tabler-alert-triangle`). Copy `Margen · 49,4% · Óptimo` — pair color + icon + label textual + pct + status word. Tooltip con tier range al hover. `aria-label` full-sentence. `tabular-nums`.
+- **`TotalsLadder`** — `{ subtotal, factor, ivaAmount, total, currency, loading?, totalLabel? }`. Render: overline `Total {currency}` + `h4` total value (`tabular-nums`, `text.primary`, `fontWeight=600`) + opcional caption muted one-liner con ladder de ajustes. Lógica de visibilidad: ladder aparece solo cuando `hasFactorAdjustment || hasIvaAdjustment || hasSubtotalDelta`. `AnimatedCounter` integrado con `duration=0.25`, fallback a texto estático con `useReducedMotion()`. `Skeleton` width=180 height=40 durante `loading`.
+
+Los 3 primitives están listos para consumo por el próximo builder (invoice, purchase order, contract) sin re-implementación — converge con el objetivo de platform primitives de TASK-498.
+
+### Cambios en `QuoteSummaryDock.tsx`
+- Sustituye Stack flat por `<Grid container columnSpacing={{ xs: 0, md: 3 }} rowSpacing={{ xs: 1.5, md: 0 }}>`.
+- Elimina helpers locales `SummaryBlock`, `MARGIN_META`, `formatRelativeTime` (migrados a primitives).
+- Mantiene `Alert` de `simulationError` y `emptyStateMessage` render por separado.
+- CTA primaria: loading state = `disabled` + `<CircularProgress size={16} color='inherit' />` en `startIcon`, copy invariante desde `primaryCtaLabel`.
+- Chip de addons preserva el state-captured anchor de TASK-503 + dedupe client-side + guard idempotente en toggle.
+
+### Cambios en `QuoteBuilderShell.tsx`
+- `primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}` (constante; antes hacía copy-swap con `submitting`).
+- `primaryCtaLoading={submitting}` sigue siendo la señal operativa para disabled + spinner.
+
+### Regla canónica del dock
+El monto grande (`h4`, `text.primary`, `tabular-nums`) es el único valor destacado. El único `primary.main` del dock es la CTA contained. El margen chip y los addons usan colores semantic; el save state usa semantic por estado. Restraint > density.
 
 ## Delta 2026-04-19 — TASK-500 / TASK-501 / TASK-502 / TASK-503 Quote Builder UX & Engine Contract Closure
 
