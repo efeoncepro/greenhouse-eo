@@ -525,3 +525,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-469` | `complete`    | Commercial Pricing Program — UI Interface Plan & Vuexy Component Inventory | `docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md` |
 | `TASK-470` | `to-do`       | Pricing Catalog Enterprise Hardening (Concurrency + Validation + Impact + Overcommit) | `docs/tasks/to-do/TASK-470-pricing-catalog-enterprise-hardening.md` |
 | `TASK-471` | `to-do`       | Pricing Catalog Phase-4 UI Polish (Diff + Revert + Bulk + Impact + Maker-Checker + Excel) | `docs/tasks/to-do/TASK-471-pricing-catalog-phase-4-ui-polish.md` |
+| `TASK-472` | `to-do`       | Fix `/my/profile` SSR 500 in staging (resuelve ISSUE-054) | `docs/tasks/to-do/TASK-472-my-profile-ssr-500-fix.md` |

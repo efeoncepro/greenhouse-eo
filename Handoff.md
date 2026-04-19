@@ -1,5 +1,47 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — E2E smoke test completo + ISSUE-054 detectado (Claude)
+
+- **Owner:** Claude
+- **Contexto:** smoke test end-to-end post-TASK-462 con agent-session `agent@greenhouse.efeonce.org` (roles `efeonce_admin` + `collaborator`) cubriendo todas las Olas shippeadas.
+- **45 rutas verificadas en staging — todas HTTP 200 menos 1** (`/my/profile` → 500).
+- **Ola 1 (fundaciones)**: `/home`, `/dashboard`, `/internal/dashboard`, `/settings`, `/updates`, `/notifications`, `/reviews`, `/sprints`, `/proyectos`, `/spaces` — todos 200.
+- **Ola 2 (Person 360 + Capacity)**: `/people`, `/agency/{spaces,operations,capacity}`, `/hr/{payroll,leave,approvals,attendance,goals,departments,hierarchy,org-chart,evaluations,team}`, `/my/{payroll,performance,delivery,assignments,goals,leave,organization,evaluations}` — todos 200 excepto `/my/profile` → **500**.
+- **Ola 3 (ICO + Finance intelligence)**: `/finance/{quotes,contracts,intelligence,income,expenses,reconciliation,hes,purchase-orders,clients,providers,bank,economics,shareholder-account}` — todos 200.
+- **Ola 4 (Revenue pipeline + Pricing)**: tabs del `/finance/intelligence` (Cierre, Rentabilidad, Pipeline comercial TASK-457, MRR/ARR TASK-462) todos visibles post-rebuild. `/admin/pricing-catalog` + sub-rutas TASK-467 (roles/tools/overheads/governance/employment-types/audit-log) todas 200, 7 nav cards en home. APIs de MRR/ARR + revenue-pipeline + admin pricing-catalog responden 200 con shapes correctos (items vacíos porque contracts de staging aún no tienen `mrr_clp` populated).
+- **ISSUE-054 creado**: `/my/profile` devuelve 500 consistentemente, aislado (resto de `/my/*` OK). No es ISSUE-044 global — es página-específica. Documentado en `docs/issues/open/ISSUE-054-my-profile-500-staging.md`. Probables causas: (a) import server-only en client bundle (similar al fix de TASK-467 phase-2 con `SELLABLE_ROLE_PRICING_CURRENCIES`), o (b) endpoint `/api/people/profile` faltante que `MyProfileView` consume sin handling.
+- **TASK-472 creada** para Codex en `docs/tasks/to-do/TASK-472-my-profile-ssr-500-fix.md` (P2, Effort Bajo-Medio). Cubre diagnóstico + fix + regression test. Ownership Codex (domain identity/person-360 TASK-273/274 ha sido principalmente suyo). Registrada en TASK_ID_REGISTRY + tasks README.
+- **Interpretación del E2E**: la preocupación del usuario ("lo shippeado del programa no se está viendo") se disipó. Todo el programa visible end-to-end. El único rojo es `/my/profile` aislado, ya documentado + asignado.
+
+## Sesion 2026-04-19 — TASK-470 Pricing Catalog Enterprise Hardening (Codex)
+
+- **Owner:** Codex
+- **Estado:** implemented and locally validated on shared `develop`; **no commit / no push** por trabajo paralelo con Claude en el mismo checkout
+- **Scope shipped:**
+  - Helper nuevo `src/lib/tenant/optimistic-locking.ts` + test `optimistic-locking.test.ts`
+  - Validator central `src/lib/commercial/pricing-catalog-constraints.ts` + tests para monotonicidad/rangos
+  - Helper `src/lib/commercial/pricing-catalog-impact-analysis.ts` + endpoints `POST /api/admin/pricing-catalog/{roles,tools,overheads}/[id]/preview-impact` y `POST /api/admin/pricing-catalog/governance/preview-impact`
+  - Overcommit lane nueva: `src/lib/team-capacity/overcommit-detector.ts`, `src/lib/commercial/capacity-overcommit-events.ts`, evento `commercial.capacity.overcommit_detected` en `event-catalog.ts`
+  - Hardening de routes admin pricing catalog ya existentes:
+    - optimistic locking/deprecation header en `roles/[id]`, `tools/[id]`, `overheads/[id]`
+    - optimistic locking por `updated_at` del rol padre en `roles/[id]/{cost-components,pricing,compatibility}`
+    - governance con `If-Match` + validators en `role_tier_margin`, `commercial_model_multiplier`, `country_pricing_factor`, `fte_hours_guide`, `employment_type`
+    - collection routes `roles|tools|overheads` ahora validan create payloads y devuelven `ETag`
+- **Runtime notes:**
+  - preview-impact usa `resolveFinanceQuoteTenantSpaceIds()` para respetar tenant isolation cuando el finance user interno no trae `spaceId` explícito
+  - `tool_catalog` preview es heurístico por evidencia textual en line items
+  - `country_pricing_factor` preview es conservador y devuelve warning hasta que exista bridge canónico quote↔country
+  - `detectAllOvercommits()` publica un evento por miembro sobrecomprometido; no se agregó cron en este corte
+- **Validación corrida:**
+  - `pnpm exec vitest run src/lib/tenant/optimistic-locking.test.ts src/lib/commercial/__tests__/pricing-catalog-constraints.test.ts src/lib/commercial/__tests__/pricing-catalog-impact-analysis.test.ts src/lib/team-capacity/overcommit-detector.test.ts src/lib/sync/event-catalog.test.ts`
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src --glob '!src/lib/postgres/client.ts'` → sin matches
+- **Heads-up:**
+  - `pnpm build` sigue mostrando warnings preexistentes de Dynamic Server Usage bajo `(dashboard)`, pero terminó exit `0`
+  - Como el checkout compartido está en `develop` y el user avisó trabajo paralelo con Claude, dejé el cambio listo sin `git commit`/`git push`
+
 ## Sesion 2026-04-19 — TASK-462 MRR/ARR Contractual Projection & Dashboard (cierre)
 
 - **Owner:** Claude

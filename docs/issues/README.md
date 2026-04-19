@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-054`
+`ISSUE-055`
 
 ## Open
 
@@ -77,6 +77,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-048` | [Payroll compensation overview puede fallar o degradar por referencia ambigua a `member_id`](open/ISSUE-048-payroll-compensation-member-id-ambiguous-silent-degradation.md) | staging + runtime general | 2026-04-13 | open |
 | `ISSUE-049` | [Leave review puede fallar con acción stale y policy frágil de aprobación](open/ISSUE-049-leave-review-modal-stale-actions-and-brittle-approval-policy.md) | staging + runtime general | 2026-04-15 | open |
 | `ISSUE-050` | [Staging salta correos de permisos porque el runtime reactivo no tiene Resend configurado](open/ISSUE-050-staging-leave-emails-skipped-resend-not-configured-in-reactive-runtime.md) | staging | 2026-04-15 | open |
+| `ISSUE-054` | [`/my/profile` returns HTTP 500 in staging (sólo esa página, resto `/my/*` OK)](open/ISSUE-054-my-profile-500-staging.md) | staging | 2026-04-19 | open |
 
 ## Resolved
 
