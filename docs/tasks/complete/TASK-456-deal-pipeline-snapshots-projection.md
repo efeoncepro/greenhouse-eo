@@ -6,14 +6,14 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementacion validada`
 - Rank: `TBD`
-- Domain: `finance`
+- Domain: `cost_intelligence`
 - Blocked by: `TASK-453 (deal canonicalization)`
 - Branch: `task/TASK-456-deal-pipeline-snapshots-projection`
 - Legacy ID: `none`
@@ -21,7 +21,7 @@
 
 ## Summary
 
-Materializar `greenhouse_serving.deal_pipeline_snapshots` — 1 fila por deal abierto — como fuente correcta de forecast comercial. Cada fila rolea-up quotes asociadas (latest, approved count, total amount) y usa `dealstage` + `probability_pct` del deal real, no de la quote.
+Materializar `greenhouse_serving.deal_pipeline_snapshots` — 1 fila por deal no borrado — como fuente correcta de forecast comercial. Los readers de forecast filtran `is_open = true`; la tabla conserva también won/lost para evitar perder contexto de cierre y totales derivados. Cada fila rolea-up quotes asociadas (latest, approved count, total amount) y usa `dealstage` + `probability_pct` del deal real, no de la quote.
 
 ## Why This Task Exists
 
@@ -30,7 +30,7 @@ TASK-351 materializó pipeline a grain de quote, lo cual es incorrecto para fore
 ## Goal
 
 - Projection `deal_pipeline_snapshots` existe y se refresca reactivamente en cada cambio de deal o quote asociada
-- Fila por deal abierto con rollup de quotes (latest, approved_count, total_quotes_amount)
+- Fila por deal no borrado con rollup de quotes (latest, approved_count, total_quotes_amount) y flag `is_open`
 - Reader tenant-safe expone forecasting pipeline
 - Foundation para TASK-457 UI híbrida
 
@@ -43,7 +43,7 @@ TASK-351 materializó pipeline a grain de quote, lo cual es incorrecto para fore
 Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
-- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md`
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
 
 Reglas obligatorias:
@@ -53,6 +53,7 @@ Reglas obligatorias:
 - Grain = 1 fila por deal (no por quote) — la quote es metadata enriquecedora
 - Tenant scope aplicado vía `client_id` + `space_id` como en el resto de serving tables
 - **`is_open`/`is_won` resueltos via `greenhouse_commercial.hubspot_deal_pipeline_config`** (tabla creada en TASK-453), no via literal `dealstage = 'closedwon'`. HubSpot permite pipelines custom con stage names arbitrarios — rely en la config normalizada.
+- `probability_pct` se persiste con el valor real del deal (puede venir `NULL` para stages abiertos sin override); los totales ponderados deben tratar `NULL` como `0` y no inventar una probabilidad.
 - Deal con 0 quotes asociadas **debe aparecer en el pipeline** (fila legítima, representa oportunidad pre-quote). Materializer no filtra por `quote_count > 0`.
 
 ## Normative Docs
@@ -66,7 +67,7 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-453 — `greenhouse_commercial.deals` canonical
-- `greenhouse_commercial.quotations` con `hubspot_deal_id` activo
+- `greenhouse_commercial.quotations` con `hubspot_deal_id` persistido en los flujos que ya enlazan quote -> deal
 - Infra de reactive projections existente (ops-worker cron)
 
 ### Blocks / Impacts
@@ -90,11 +91,14 @@ Reglas obligatorias:
 - `src/lib/commercial-intelligence/pipeline-materializer.ts` (TASK-351) — pattern clonable
 - `src/lib/sync/projections/quotation-pipeline.ts` — registration pattern
 - Cron `ops-reactive-cost-intelligence` corriendo cada 10min en ops-worker
+- `greenhouse_commercial.deals` + `hubspot_deal_pipeline_config` ya tipados en `src/types/db.d.ts`
+- `greenhouse_commercial.quotations.sales_context_at_sent` ya existe por TASK-455
 
 ### Gap
 
 - No existe grain de deal en serving
 - TASK-457 no puede separar deal pipeline de quote pipeline sin este backend
+- `docs/architecture/schema-snapshot-baseline.sql` no refleja aun TASK-351 / TASK-453 / TASK-455; para DDL vigente usar migraciones + `src/types/db.d.ts`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -114,8 +118,8 @@ Reglas obligatorias:
 - Rollup logic:
   - `latest_quote_id` = quote más reciente por `created_at`
   - `quote_count` = total quotes asociadas
-  - `approved_quote_count` = quotes con status='approved'
-  - `total_quotes_amount_clp` = SUM de total_amount_clp de quotes activas
+  - `approved_quote_count` = quotes con evidencia de aprobación persistida hoy (`status='approved'` legacy o approval steps totalmente resueltos sin rechazo para la versión actual)
+  - `total_quotes_amount_clp` = SUM de `total_amount_clp` de quotes no descartadas (`status NOT IN ('rejected', 'expired')`)
 - `upsertDealPipelineSnapshot` + `materializeDealPipelineSnapshot`
 
 ### Slice 3 — Reactive projection
@@ -123,8 +127,10 @@ Reglas obligatorias:
 - `dealPipelineProjection` en domain `cost_intelligence`
 - Trigger events:
   - `commercial.deal.synced`, `commercial.deal.stage_changed`, `commercial.deal.won`, `commercial.deal.lost`, `commercial.deal.created`
-  - `commercial.quotation.created`, `.approved`, `.converted`, `.rejected`, `.po_linked`, `.invoice_emitted` — when `payload.hubspot_deal_id` present
-- Scope extraction: `{ entityType: 'deal', entityId: dealId }` (resolve via hubspot_deal_id si el evento solo trae eso)
+  - `commercial.quotation.created`, `.synced`, `.sent`, `.approved`, `.converted`, `.rejected`, `.version_created`, `.po_linked`, `.hes_linked`, `.invoice_emitted`
+- Scope extraction:
+  - deal events → `{ entityType: 'deal', entityId: dealId }`
+  - quote events → `{ entityType: 'quotation', entityId: quotationId }` y el refresh resuelve quote → deal desde DB cuando corresponda
 - Register en `src/lib/sync/projections/index.ts`
 
 ### Slice 4 — Reader + API
@@ -207,26 +213,28 @@ export const dealPipelineProjection: ProjectionDefinition = {
 - [ ] Migration idempotente
 - [ ] Proyección registrada en `src/lib/sync/projections/index.ts`
 - [ ] Reactiva: cambiar `dealstage` en HubSpot → evento fluye → fila actualizada en ≤10 min (cron cycle)
-- [ ] Rollup correcto: un deal con 3 quotes (1 approved + 2 draft) muestra `quote_count=3, approved_quote_count=1`
+- [ ] Rollup correcto: un deal con 3 quotes (1 con aprobación persistida + 2 draft) muestra `quote_count=3, approved_quote_count=1`
 - [ ] API endpoint responde 200 + scope correcto por tenant
 - [ ] `pnpm test` nuevos tests de materializer rollup
 
 ## Verification
 
-- `pnpm migrate:up`
+- `pnpm pg:connect:migrate`
+- `pnpm exec vitest run src/lib/commercial-intelligence/deal-pipeline-materializer.test.ts src/lib/sync/projections/deal-pipeline.test.ts`
 - `pnpm lint`
 - `pnpm exec tsc --noEmit --incremental false`
-- `pnpm test`
-- Staging smoke: trigger materialize manual via helper admin, verificar fila
+- `pnpm build`
+- `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'`
+- Staging smoke pendiente al deploy de `develop`
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] Chequeo de impacto cruzado con TASK-457
-- [ ] Actualizar `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` con delta de deal pipeline
+- [x] `Lifecycle` sincronizado con carpeta
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] Chequeo de impacto cruzado con TASK-457
+- [x] Actualizar `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` con delta de deal pipeline
 
 ## Follow-ups
 
@@ -234,4 +242,4 @@ export const dealPipelineProjection: ProjectionDefinition = {
 
 ## Open Questions
 
-- ¿Guardar también en el snapshot el `sales_context_at_sent` de la latest quote? Ayudaría a diferenciar por lead-origin vs customer-expansion. Inclinación: sí, pero agregarlo como `latest_quote_context` JSONB.
+- No se agrega `latest_quote_context` en este slice. TASK-455 ya dejó `sales_context_at_sent` en la quote canónica y TASK-457 puede decidir si lo proyecta o lo consume on-read.

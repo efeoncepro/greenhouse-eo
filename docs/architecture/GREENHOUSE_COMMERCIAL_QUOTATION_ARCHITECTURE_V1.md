@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.14
+> **Version:** 2.15
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-19 — v2.15: TASK-456 deal pipeline snapshots projection. Nueva tabla `greenhouse_serving.deal_pipeline_snapshots` (1 fila por deal canónico no borrado) como capa deal-grain para forecast comercial. Materializer reactivo `deal-pipeline-materializer.ts`, projection `deal_pipeline` en domain `cost_intelligence` y route `GET /api/finance/commercial-intelligence/deal-pipeline`. La fila conserva `is_open`/`is_won`, usa `probability_pct` real del deal (nullable cuando no hay override en `hubspot_deal_pipeline_config`) y rolea-up quotes asociadas por `hubspot_deal_id` (`latest_quote_id`, `quote_count`, `approved_quote_count`, `total_quotes_amount_clp`).
 > **Updated:** 2026-04-18 — v2.14: TASK-463 unified quote builder + bidirectional HubSpot bridge. Drawer legacy "HubSpot" eliminado de `QuotesListView.tsx` — queda un solo botón "+ Nueva cotización" que persiste al canónico y propaga a HubSpot vía reactive projection `quotationHubSpotOutbound`. Nuevo helper `push-canonical-quote.ts` adapta el quote canónico al payload legacy del Cloud Run service. Endpoint legacy `/api/finance/quotes/hubspot` deprecado a HTTP 410. Dos eventos canónicos nuevos: `commercial.quotation.pushed_to_hubspot` y `commercial.quotation.hubspot_sync_failed`. Outbound idempotente: skip si no hay `hubspot_deal_id`, create si no hay `hubspot_quote_id`, update si ya existe (stub MVP).
 > **Updated:** 2026-04-18 — v2.13: TASK-455 quote sales context snapshot. `greenhouse_commercial.quotations` agrega `sales_context_at_sent jsonb` como snapshot histórico e inmutable del contexto comercial al primer `sent` (`lifecyclestage`, `dealstage`, `deal_id`, `hubspot_deal_id`, `category_at_sent`). La captura ocurre en el mismo flujo transaccional que marca `status='sent'`, cubriendo tanto `/send` directo como el cierre del approval workflow. `GET /api/finance/quotes/[id]` ahora lo expone como `salesContextAtSent`. El snapshot sirve para trazabilidad/analytics y NO reemplaza el classifier vivo de TASK-457.
 > **Updated:** 2026-04-18 — v2.12: TASK-464c tool catalog + overhead addons foundation implementada. `greenhouse_ai.tool_catalog` se extiende con `tool_sku`, prorrateo, `applicable_business_lines`, `applicability_tags`, `includes_in_addon` y `notes_for_quoting`; se crea `greenhouse_commercial.overhead_addons` con 9 addons canonizados (`EFO-001..009`). Nuevos módulos `tool-catalog-store.ts`, `overhead-addons-store.ts`, `tool-catalog-events.ts` y seeders idempotentes `scripts/seed-tool-catalog.ts` / `scripts/seed-overhead-addons.ts`. El catálogo comercial sigue conviviendo con AI tooling sin romper consumers existentes.
@@ -37,7 +38,32 @@
   - el snapshot es solo para trazabilidad histórica, detalle y analytics
   - el classifier operativo del pipeline híbrido sigue leyendo estado vivo (`clients.lifecyclestage` + `greenhouse_commercial.deals.dealstage`)
 - Índice nuevo:
-  - `idx_quotations_sales_context_category` sobre `(space_id, sales_context_at_sent ->> 'category_at_sent', sent_at DESC)` parcial para quotes con snapshot
+- `idx_quotations_sales_context_category` sobre `(space_id, sales_context_at_sent ->> 'category_at_sent', sent_at DESC)` parcial para quotes con snapshot
+
+---
+
+## Delta 2026-04-19 — TASK-456 Deal Pipeline Snapshots Projection
+
+- Nueva tabla `greenhouse_serving.deal_pipeline_snapshots` como serving deal-grain del forecast comercial:
+  - key = `deal_id`
+  - 1 fila por deal canónico no borrado
+  - persiste `is_open`, `is_won`, `probability_pct`, `days_until_close`
+  - rolea-up quotes ligadas por `hubspot_deal_id` en `latest_quote_id`, `latest_quote_status`, `quote_count`, `approved_quote_count`, `total_quotes_amount_clp`
+- `probability_pct` ya no se inventa desde stage labels ni desde status de quote:
+  - se lee del deal canónico
+  - puede venir `NULL` para stages abiertos si `hubspot_deal_pipeline_config` no tiene override
+  - los totals ponderados tratan `NULL` como `0`
+- Projection reactiva nueva:
+  - `deal_pipeline`
+  - domain = `cost_intelligence`
+  - triggerEvents = `commercial.deal.*` + `commercial.quotation.created|synced|sent|approved|rejected|converted|version_created|po_linked|hes_linked|invoice_emitted`
+  - quote events resuelven `quotationId -> hubspot_deal_id -> deal`
+- Reader/API nuevo:
+  - `src/lib/commercial-intelligence/intelligence-store.ts` agrega `listDealPipelineSnapshots()` y `buildDealPipelineTotals()`
+  - `GET /api/finance/commercial-intelligence/deal-pipeline` expone snapshots + totals tenant-safe vía `requireFinanceTenantContext()`
+- Convivencia explícita:
+  - `quotation_pipeline_snapshots` sigue siendo la vista quote-grain
+  - `deal_pipeline_snapshots` pasa a ser la vista correcta para forecast y pipeline híbrido de TASK-457
 
 ---
 

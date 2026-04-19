@@ -3701,6 +3701,35 @@ export interface GreenhouseServingCommercialCostAttribution {
   source_of_truth: string;
 }
 
+export interface GreenhouseServingDealPipelineSnapshots {
+  amount: Numeric | null;
+  amount_clp: Numeric | null;
+  approved_quote_count: Generated<number>;
+  client_id: string | null;
+  close_date: Timestamp | null;
+  currency: string | null;
+  days_until_close: number | null;
+  deal_id: string;
+  deal_name: string;
+  deal_owner_email: string | null;
+  deal_type: string | null;
+  dealstage: string;
+  dealstage_label: string | null;
+  hubspot_deal_id: string;
+  is_open: Generated<boolean>;
+  is_won: Generated<boolean>;
+  latest_quote_id: string | null;
+  latest_quote_status: string | null;
+  materialized_at: Generated<Timestamp>;
+  organization_id: string | null;
+  pipeline_name: string | null;
+  probability_pct: Numeric | null;
+  quote_count: Generated<number>;
+  snapshot_source_event: string | null;
+  space_id: string | null;
+  total_quotes_amount_clp: Numeric | null;
+}
+
 export interface GreenhouseServingFinanceAiEnrichmentRuns {
   client_id: string | null;
   completed_at: Timestamp | null;
@@ -5341,6 +5370,7 @@ export interface DB {
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;
   "greenhouse_serving.commercial_cost_attribution": GreenhouseServingCommercialCostAttribution;
+  "greenhouse_serving.deal_pipeline_snapshots": GreenhouseServingDealPipelineSnapshots;
   "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
   "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;

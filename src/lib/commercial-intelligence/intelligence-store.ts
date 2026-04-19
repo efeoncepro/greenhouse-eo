@@ -3,6 +3,7 @@ import 'server-only'
 import { query } from '@/lib/db'
 
 import type {
+  DealPipelineSnapshotRow,
   DriftDrivers,
   DriftSeverity,
   PipelineSnapshotRow,
@@ -57,6 +58,35 @@ interface ProfitabilityDbRow extends Record<string, unknown> {
   margin_drift_pct: string | number | null
   drift_severity: string
   drift_drivers: unknown
+  materialized_at: string | Date
+}
+
+interface DealPipelineDbRow extends Record<string, unknown> {
+  deal_id: string
+  hubspot_deal_id: string
+  client_id: string | null
+  organization_id: string | null
+  space_id: string | null
+  deal_name: string
+  dealstage: string
+  dealstage_label: string | null
+  pipeline_name: string | null
+  deal_type: string | null
+  amount: string | number | null
+  amount_clp: string | number | null
+  currency: string | null
+  probability_pct: string | number | null
+  close_date: string | Date | null
+  days_until_close: number | null
+  is_open: boolean | null
+  is_won: boolean | null
+  deal_owner_email: string | null
+  latest_quote_id: string | null
+  latest_quote_status: string | null
+  quote_count: number | null
+  approved_quote_count: number | null
+  total_quotes_amount_clp: string | number | null
+  snapshot_source_event: string | null
   materialized_at: string | Date
 }
 
@@ -143,6 +173,35 @@ const mapProfitability = (row: ProfitabilityDbRow): ProfitabilitySnapshotRow => 
   marginDriftPct: toNum(row.margin_drift_pct),
   driftSeverity: String(row.drift_severity) as DriftSeverity,
   driftDrivers: parseDrivers(row.drift_drivers),
+  materializedAt: toIsoTs(row.materialized_at) ?? new Date().toISOString()
+})
+
+const mapDealPipeline = (row: DealPipelineDbRow): DealPipelineSnapshotRow => ({
+  dealId: String(row.deal_id),
+  hubspotDealId: String(row.hubspot_deal_id),
+  clientId: row.client_id ? String(row.client_id) : null,
+  organizationId: row.organization_id ? String(row.organization_id) : null,
+  spaceId: row.space_id ? String(row.space_id) : null,
+  dealName: String(row.deal_name),
+  dealstage: String(row.dealstage),
+  dealstageLabel: row.dealstage_label ? String(row.dealstage_label) : null,
+  pipelineName: row.pipeline_name ? String(row.pipeline_name) : null,
+  dealType: row.deal_type ? String(row.deal_type) : null,
+  amount: toNum(row.amount),
+  amountClp: toNum(row.amount_clp),
+  currency: row.currency ? String(row.currency) : null,
+  probabilityPct: toNum(row.probability_pct),
+  closeDate: toIsoDate(row.close_date),
+  daysUntilClose: row.days_until_close ?? null,
+  isOpen: Boolean(row.is_open),
+  isWon: Boolean(row.is_won),
+  dealOwnerEmail: row.deal_owner_email ? String(row.deal_owner_email) : null,
+  latestQuoteId: row.latest_quote_id ? String(row.latest_quote_id) : null,
+  latestQuoteStatus: row.latest_quote_status ? String(row.latest_quote_status) : null,
+  quoteCount: row.quote_count ?? 0,
+  approvedQuoteCount: row.approved_quote_count ?? 0,
+  totalQuotesAmountClp: toNum(row.total_quotes_amount_clp),
+  snapshotSourceEvent: row.snapshot_source_event ? String(row.snapshot_source_event) : null,
   materializedAt: toIsoTs(row.materialized_at) ?? new Date().toISOString()
 })
 
@@ -255,6 +314,113 @@ export const buildPipelineTotals = (rows: PipelineSnapshotRow[]): PipelineTotals
     } else if (row.pipelineStage === 'converted') {
       totals.wonClp += amount
     } else if (row.pipelineStage === 'rejected' || row.pipelineStage === 'expired') {
+      totals.lostClp += amount
+    }
+  }
+
+  totals.openPipelineClp = Math.round(totals.openPipelineClp * 100) / 100
+  totals.weightedPipelineClp = Math.round(totals.weightedPipelineClp * 100) / 100
+  totals.wonClp = Math.round(totals.wonClp * 100) / 100
+  totals.lostClp = Math.round(totals.lostClp * 100) / 100
+
+  return totals
+}
+
+export interface DealPipelineFilters {
+  clientId?: string | null
+  organizationId?: string | null
+  spaceId?: string | null
+  dealstage?: string | null
+  isOpenOnly?: boolean
+  wonOnly?: boolean
+}
+
+export const listDealPipelineSnapshots = async (
+  filters: DealPipelineFilters = {}
+): Promise<DealPipelineSnapshotRow[]> => {
+  const conditions: string[] = []
+  const values: unknown[] = []
+  let idx = 0
+
+  const push = (clause: string, value: unknown) => {
+    idx++
+    conditions.push(clause.replace('$$', `$${idx}`))
+    values.push(value)
+  }
+
+  if (filters.clientId) push('client_id = $$', filters.clientId)
+  if (filters.organizationId) push('organization_id = $$', filters.organizationId)
+  if (filters.spaceId) push('space_id = $$', filters.spaceId)
+  if (filters.dealstage) push('dealstage = $$', filters.dealstage)
+  if (filters.isOpenOnly) conditions.push('is_open = TRUE')
+  if (filters.wonOnly) conditions.push('is_won = TRUE')
+
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+  const rows = await query<DealPipelineDbRow>(
+    `SELECT deal_id, hubspot_deal_id, client_id, organization_id, space_id,
+            deal_name, dealstage, dealstage_label, pipeline_name, deal_type,
+            amount, amount_clp, currency, probability_pct, close_date, days_until_close,
+            is_open, is_won, deal_owner_email,
+            latest_quote_id, latest_quote_status, quote_count, approved_quote_count,
+            total_quotes_amount_clp, snapshot_source_event, materialized_at
+       FROM greenhouse_serving.deal_pipeline_snapshots
+       ${where}
+       ORDER BY is_open DESC, close_date ASC NULLS LAST, deal_name ASC`,
+    values
+  )
+
+  return rows.map(mapDealPipeline)
+}
+
+export interface DealPipelineTotals {
+  openPipelineClp: number
+  weightedPipelineClp: number
+  wonClp: number
+  lostClp: number
+  openDealCount: number
+  withQuotesCount: number
+  byStage: Record<string, { count: number; totalClp: number; weightedClp: number }>
+}
+
+const emptyDealTotals = (): DealPipelineTotals => ({
+  openPipelineClp: 0,
+  weightedPipelineClp: 0,
+  wonClp: 0,
+  lostClp: 0,
+  openDealCount: 0,
+  withQuotesCount: 0,
+  byStage: {}
+})
+
+export const buildDealPipelineTotals = (rows: DealPipelineSnapshotRow[]): DealPipelineTotals => {
+  const totals = emptyDealTotals()
+
+  for (const row of rows) {
+    const amount = row.amountClp ?? 0
+    const probability = row.probabilityPct ?? 0
+
+    if (!totals.byStage[row.dealstage]) {
+      totals.byStage[row.dealstage] = { count: 0, totalClp: 0, weightedClp: 0 }
+    }
+
+    const stageBucket = totals.byStage[row.dealstage]
+
+    stageBucket.count += 1
+    stageBucket.totalClp = Math.round((stageBucket.totalClp + amount) * 100) / 100
+    stageBucket.weightedClp = Math.round((stageBucket.weightedClp + amount * (probability / 100)) * 100) / 100
+
+    if (row.quoteCount > 0) {
+      totals.withQuotesCount += 1
+    }
+
+    if (row.isOpen) {
+      totals.openDealCount += 1
+      totals.openPipelineClp += amount
+      totals.weightedPipelineClp += amount * (probability / 100)
+    } else if (row.isWon) {
+      totals.wonClp += amount
+    } else {
       totals.lostClp += amount
     }
   }

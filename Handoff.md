@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — TASK-456 Deal Pipeline Snapshots Projection (Codex)
+
+- **Owner:** Codex
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-task-456`
+- **Rama:** `task/TASK-456-deal-pipeline-snapshots-projection`
+- **Estado:** implementado y validado localmente; listo para merge a `develop`
+- **Decisión operativa clave:**
+  - la spec original asumía un consumer/reactive contract de V1 y un `approved_quote_count` por status `approved`, pero el runtime real ya corre sobre playbook reactivo V2 y las quotes aprobadas pueden seguir en `sent`
+  - la projection se cerró como tabla a grain deal no borrado; los readers de forecast filtran `is_open = true`, pero se conservan won/lost para mantener contexto de cierre y totales derivados
+- **Entregables:**
+  - migración `20260419003219480_task-456-deal-pipeline-snapshots.sql`
+  - `src/lib/commercial-intelligence/deal-pipeline-materializer.ts`
+  - `src/lib/commercial-intelligence/deal-pipeline-materializer.test.ts`
+  - extensiones en `src/lib/commercial-intelligence/contracts.ts`
+  - extensiones en `src/lib/commercial-intelligence/intelligence-store.ts`
+  - `src/lib/sync/projections/deal-pipeline.ts`
+  - `src/lib/sync/projections/deal-pipeline.test.ts`
+  - registro en `src/lib/sync/projections/index.ts`
+  - `src/app/api/finance/commercial-intelligence/deal-pipeline/route.ts`
+  - docs actualizadas en arquitectura, task index, changelog y project context
+- **Resultado operativo:**
+  - `greenhouse_serving.deal_pipeline_snapshots` existe como source deal-grain para forecasting comercial
+  - el materializer resuelve `is_open` / `is_won` desde `hubspot_deal_pipeline_config`, persiste `probability_pct` real del deal y trata `NULL` como `0` solo en agregados ponderados
+  - el rollup de quotes ya expone `latest_quote_id`, `quote_count`, `approved_quote_count` y `total_quotes_amount_clp` sin duplicar deals
+  - la projection reactiva `deal_pipeline` refresca por eventos de deal y quote; cuando solo llega `quotationId`, resuelve el deal vía DB antes de materializar
+  - `GET /api/finance/commercial-intelligence/deal-pipeline` ya expone lectura tenant-safe con filtros por cliente, organización, etapa y estado
+- **Validaciones corridas:**
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec vitest run src/lib/commercial-intelligence/deal-pipeline-materializer.test.ts src/lib/sync/projections/deal-pipeline.test.ts`
+  - `pnpm lint`
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src -g '!src/lib/postgres/client.ts'` -> sin matches
+- **Heads-up menor:**
+  - smoke explícito en staging queda pendiente al deploy de `develop`; localmente la migration, los tests y el build quedaron verdes
+
 ## Sesion 2026-04-18 — TASK-455 Quote Sales Context Snapshot (Codex)
 
 - **Owner:** Codex
