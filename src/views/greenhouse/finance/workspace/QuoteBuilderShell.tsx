@@ -65,6 +65,7 @@ export type QuoteBuilderMode = 'create' | 'edit'
 export interface QuoteBuilderShellQuote {
   quotationId: string
   quotationNumber: string | null
+  quoteDate?: string | null
   clientId: string | null
   organizationId: string | null
   contactIdentityProfileId?: string | null
@@ -228,6 +229,7 @@ const mapServiceLineToQuoteLine = (
 }
 
 interface BuilderContextState extends QuoteBuilderPricingContext {
+  quoteDate: string
   businessLineCode: string | null
   commercialModel: CommercialModelCode
   countryFactorCode: string
@@ -264,6 +266,7 @@ const QuoteBuilderShell = ({
 
   const initialBuilderState = useMemo<BuilderContextState>(
     () => ({
+      quoteDate: quote?.quoteDate ?? new Date().toISOString().slice(0, 10),
       businessLineCode: quote?.businessLineCode ?? null,
       commercialModel: (quote?.commercialModel as CommercialModelCode | null) ?? 'on_going',
       countryFactorCode: quote?.countryFactorCode ?? 'chile_corporate',
@@ -530,6 +533,8 @@ const QuoteBuilderShell = ({
             body: JSON.stringify({
               serviceSku: selection.sku,
               outputCurrency: currency,
+              countryFactorCode: builderState.countryFactorCode,
+              quoteDate: builderState.quoteDate,
               commercialModelOverride: builderState.commercialModel
             })
           })
@@ -556,7 +561,7 @@ const QuoteBuilderShell = ({
         setServiceExpanding(false)
       }
     },
-    [builderState.commercialModel, currency]
+    [builderState.commercialModel, builderState.countryFactorCode, builderState.quoteDate, currency]
   )
 
   const handlePickerSelect = useCallback(

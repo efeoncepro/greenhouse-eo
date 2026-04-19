@@ -65,6 +65,8 @@ export interface QuotationLineInput {
     pricingV2LineType?: 'role' | 'person' | 'tool' | 'overhead_addon' | 'direct_cost'
     sku?: string | null
   } | null
+  resolvedCostBreakdown?: CostComponentBreakdown | null
+  resolvedCostNotes?: string[] | null
 }
 
 export interface QuotationPricingInput {
@@ -135,20 +137,30 @@ export const buildQuotationPricingSnapshot = async (
   const pricedLines: PricedLineItem[] = []
 
   for (const raw of input.lineItems) {
-    const costResolution: LineCostResolutionResult = await resolveLineItemCost({
-      lineType: raw.lineType,
-      quoteCurrency: input.quoteCurrency,
-      quoteDate: input.quoteDate,
-      businessLineCode: input.businessLineCode,
-      memberId: raw.memberId,
-      roleCode: raw.roleCode,
-      seniorityLevel: raw.seniorityLevel,
-      productId: raw.productId,
-      manualUnitCost: raw.manualUnitCost ?? null,
-      periodYear: input.periodYear ?? null,
-      periodMonth: input.periodMonth ?? null,
-      exchangeRates: input.exchangeRates
-    })
+    const costResolution: LineCostResolutionResult =
+      raw.manualUnitCost != null &&
+      Number.isFinite(raw.manualUnitCost) &&
+      raw.resolvedCostBreakdown
+        ? {
+            unitCost: round2(raw.manualUnitCost),
+            currency: input.quoteCurrency,
+            costBreakdown: raw.resolvedCostBreakdown,
+            resolutionNotes: raw.resolvedCostNotes ?? []
+          }
+        : await resolveLineItemCost({
+            lineType: raw.lineType,
+            quoteCurrency: input.quoteCurrency,
+            quoteDate: input.quoteDate,
+            businessLineCode: input.businessLineCode,
+            memberId: raw.memberId,
+            roleCode: raw.roleCode,
+            seniorityLevel: raw.seniorityLevel,
+            productId: raw.productId,
+            manualUnitCost: raw.manualUnitCost ?? null,
+            periodYear: input.periodYear ?? null,
+            periodMonth: input.periodMonth ?? null,
+            exchangeRates: input.exchangeRates
+          })
 
     const totals = computeLineItemTotals({
       lineItemId: raw.lineItemId,

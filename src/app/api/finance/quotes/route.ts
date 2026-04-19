@@ -27,6 +27,7 @@ import {
   type QuotationDiscountType,
   type QuotationLineInput
 } from '@/lib/finance/pricing'
+import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 
@@ -488,6 +489,13 @@ export async function POST(request: Request) {
       return financeSchemaDriftResponse('quotes_create_pricing', {
         error: 'Pricing persistence schema unavailable.'
       })
+    }
+
+    if (isUnpricedQuotationLineItemsError(error)) {
+      return NextResponse.json(
+        { error: error.message, quotationId },
+        { status: 422 }
+      )
     }
 
     const message = error instanceof Error ? error.message : 'Failed to persist quotation pricing.'

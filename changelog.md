@@ -5923,6 +5923,12 @@
 
 # Changelog
 
+## 2026-04-19
+
+- Finance / Quote Builder: el guardado de cotizaciones ya no mezcla precio del pricing engine v2 con costo recalculado por el resolver legacy. Las líneas auto-valorizadas ahora persisten también su costo resuelto del engine v2, por lo que el detail view mantiene `total`, `cost` y `margin` coherentes después de guardar.
+- Finance / Quote edit: al reabrir una cotización el builder ahora rehidrata `businessLineCode` desde la quote canónica y re-simula usando la `quoteDate` original en vez de la fecha actual, reduciendo drift silencioso en pricing.
+- Finance API: los intentos de guardar líneas catalog-backed sin pricing resuelto ya no revientan como `500` vacío; las rutas de quotes devuelven error JSON `422` con mensaje explícito para create/edit/autosave.
+
 ## 2026-04-13
 
 - Nubox sync hardening: el raw sync ya no depende solo de la ventana reciente; ahora combina hot window configurable con historical sweep rotativo persistido, para que documentos tardíos o rectificaciones históricas no queden fuera indefinidamente.

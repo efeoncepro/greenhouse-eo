@@ -98,10 +98,19 @@ export interface CostComponentBreakdown {
   fxRateDate: string | null
   sourceCurrency: string | null
   targetCurrency: string | null
-  snapshotSource: 'member_capacity_economics' | 'role_rate_card' | 'product_catalog' | 'manual'
+  snapshotSource: 'member_capacity_economics' | 'role_rate_card' | 'product_catalog' | 'manual' | 'pricing_engine_v2'
   roleCode?: string | null
   seniorityLevel?: RoleRateSeniorityLevel | null
   notes?: string | null
+  pricingV2CostBasisKind?: 'member_actual' | 'role_blended' | 'role_modeled' | 'tool_snapshot' | 'manual' | null
+  pricingV2CostBasisSourceRef?: string | null
+  pricingV2CostBasisSnapshotDate?: string | null
+  pricingV2CostBasisConfidenceScore?: number | null
+  pricingV2CostBasisConfidenceLabel?: 'high' | 'medium' | 'low' | null
+  pricingV2UnitCostUsd?: number | null
+  pricingV2UnitCostOutputCurrency?: number | null
+  pricingV2TotalCostUsd?: number | null
+  pricingV2TotalCostOutputCurrency?: number | null
 }
 
 export interface LineCostResolutionInput {
@@ -262,7 +271,10 @@ export interface PricingEngineInputV2 {
 }
 
 export interface PricingCostStackV2 {
+  unitCostUsd: number
+  unitCostOutputCurrency: number
   totalCostUsd: number
+  totalCostOutputCurrency: number
   breakdown: Record<string, number>
   employmentTypeCode?: string | null
   employmentTypeSource?: 'explicit_input' | 'role_default' | 'payroll_compensation_version'

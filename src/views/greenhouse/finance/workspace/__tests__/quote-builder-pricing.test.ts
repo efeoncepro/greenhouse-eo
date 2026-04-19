@@ -41,7 +41,10 @@ const roleSimulationLine = (): PricingLineOutputV2 => ({
     employmentTypeCode: null
   },
   costStack: {
+    unitCostUsd: 1200,
+    unitCostOutputCurrency: 1100000,
     totalCostUsd: 1200,
+    totalCostOutputCurrency: 1100000,
     breakdown: { compensation: 1200 }
   },
   suggestedBillRate: {
@@ -66,6 +69,9 @@ describe('buildPersistedQuoteLineItems', () => {
     })
 
     expect(items[0]?.unitPrice).toBe(1750000)
+    expect(items[0]?.manualUnitCost).toBeDefined()
+    expect(items[0]?.manualUnitCost).toBeGreaterThan(0)
+    expect(items[0]?.resolvedCostBreakdown?.snapshotSource).toBe('pricing_engine_v2')
   })
 
   it('preserves explicit manual prices for direct-cost lines', () => {

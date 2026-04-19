@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 3.0
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-19 por Claude (v3 — TASK-486 canonical anchor Organization + Contact)
+> **Ultima actualizacion:** 2026-04-19 por Codex (v3.1 — pricing persistence hardening)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
@@ -20,6 +20,13 @@
 - **`space_id` queda legacy**: columnas `space_id` y `space_resolution_source` se preservan en la base de datos para no romper lectores downstream de quote-to-cash (purchase orders, service entries, income materialization), pero el builder y el sync de HubSpot ya no las escriben. Se planifica una v2 que haga drop físico cuando todos los consumers migren.
 - **HubSpot sync más simple**: antes pedía que la company de HubSpot tuviera un Space mapeado para poder sincronizar. Ahora sólo pide que la company esté mapeada a una Organización. Si la org existe, la quote se sincroniza aunque no haya space.
 - **Response del detail**: `GET /api/finance/quotes/[id]` ahora devuelve dos objetos nuevos en la respuesta — `organization` (con id, nombre y tipo: cliente/prospecto) y `contact` (con id, nombre, email, cargo). Consumers como el PDF, el email de envío y el approval workflow los pueden usar sin resolver la identidad por separado.
+
+## Cambios v3.1 (2026-04-19 — hardening de persistencia y rehidratación)
+
+- **Precio y costo quedan amarrados al mismo motor**: cuando guardas una cotización con líneas auto-valorizadas (rol, persona, herramienta, overhead), el builder ya no persiste solo el precio final. Ahora también conserva el costo resuelto por el pricing engine v2, para que el detail view mantenga total, costo y margen coherentes después de guardar.
+- **Editar no re-simula con “la fecha de hoy”**: al reabrir una cotización existente, el builder reutiliza la `quoteDate` original para la simulación. Así no cambian silenciosamente factores, FX o multiplicadores solo por volver a entrar días después.
+- **`businessLineCode` vuelve a hidratarse en edit**: el quote canonical detail vuelve a entregar la línea de negocio, así que editar y guardar ya no la pisa a `null`.
+- **Errores de pricing explícitos**: si una línea de catálogo llega sin precio resuelto, create/edit devuelven un `422` con mensaje claro en vez de un `500` vacío.
 
 ## Cambios v2 (2026-04-19)
 

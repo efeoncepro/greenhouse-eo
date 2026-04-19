@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-19 — Quote Builder pricing/cost unification + edit rehydration hardening (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `fix/codex-quote-cost-unification`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-quote-cost-unification`
+- **Problema corregido:**
+  - el primer hardening de persisted pricing evitaba guardar `unit_price = 0`, pero el backend seguía recalculando costo/margen con el costing engine legacy (`role_rate_cards`). Para roles como `ECG-001`, el detalle quedaba con `totalCost = 0` y margen inválido aunque el precio ya se hubiera persistido bien.
+  - además, al reabrir una quote en edit se perdía `businessLineCode` y la simulación usaba `quoteDate = hoy`, generando drift silencioso en pricing.
+- **Solución aplicada:**
+  - `pricing-engine-v2` ahora expone `unitCostUsd`, `unitCostOutputCurrency` y `totalCostOutputCurrency` por línea para roles, personas, tools, direct costs y overhead addons.
+  - `quote-builder-pricing.ts` persiste no solo `unitPrice`, sino también `manualUnitCost`, `resolvedCostBreakdown` y `resolvedCostNotes` basados en la simulación real del engine v2.
+  - `quotation-pricing-orchestrator.ts` deja de resolver costo otra vez por el engine legacy cuando la línea ya trae costo resuelto del engine v2; usa ese snapshot como source of truth para totals y margen persistidos.
+  - `quotation-line-input-validation.ts` ahora expone un error tipado (`UnpricedQuotationLineItemsError`) y ambas rutas API (`POST /api/finance/quotes` y `POST /api/finance/quotes/[id]/lines`) responden `422` JSON cuando llega una línea catalog-backed sin pricing, en vez de un `500` vacío.
+  - `quotation-canonical-store.ts` vuelve a hidratar `businessLineCode` desde la quote canónica.
+  - `QuoteBuilderShell.tsx` + `quote-builder-pricing.ts` dejan de simular con la fecha del día al reabrir una quote; ahora reutilizan `quoteDate` real y propagan también `countryFactorCode`/`quoteDate` al expandir servicios.
+  - `QuoteBuilderEditPage` vuelve a inyectar `businessLineCode` y `quoteDate` al shell de edición.
+- **Tests / validación:**
+  - `pnpm exec vitest run src/views/greenhouse/finance/workspace/__tests__/quote-builder-pricing.test.ts src/lib/finance/pricing/__tests__/quotation-line-input-validation.test.ts src/lib/finance/pricing/__tests__/pricing-engine-v2.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de coordinación:**
+  - fix implementado y validado en worktree separado para no tocar el checkout principal ni la rama de Claude.
+  - sigue pendiente un follow-up mayor si se quiere persistir `countryFactorCode` como parte del header canónico de la cotización; hoy el hardening evita drift en edición dentro del builder, pero ese factor todavía no forma parte del contrato persistido del quote header.
+
 ## Sesion 2026-04-19 — Quote Builder persisted pricing hardening (Codex)
 
 - **Owner:** Codex

@@ -190,6 +190,7 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
   const quote: QuoteBuilderShellQuote = {
     quotationId: detail.quoteId,
     quotationNumber: detail.quoteNumber,
+    quoteDate: detail.quoteDate,
     clientId: detail.clientId,
     organizationId: detail.organizationId,
     contactIdentityProfileId: detail.contact?.identityProfileId ?? null,
@@ -201,7 +202,7 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
     validUntil: detail.expiryDate,
     pricingModel: coercePricingModel(detail.pricingModel),
     billingFrequency: coerceBillingFrequency(null),
-    businessLineCode: null,
+    businessLineCode: detail.businessLineCode ?? null,
     commercialModel: (detail.commercialModel as CommercialModelCode | null) ?? null,
     countryFactorCode: null
   }
