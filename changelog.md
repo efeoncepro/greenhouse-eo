@@ -2,6 +2,12 @@
 
 ## 2026-04-19
 
+### 2026-04-19 — Quote-to-cash invoice conversion reuses one transaction boundary
+
+- Convertir una cotización emitida a factura ya no mezcla transacciones anidadas entre `materializeInvoiceFromApprovedQuotation` / `materializeInvoiceFromApprovedHes` y `ensureContractForQuotation`.
+- El lifecycle contractual ahora puede reutilizar el `client` transaccional activo cuando la conversión corre dentro de un flujo quote-to-cash, evitando esperas indefinidas por locks/FKs sobre la misma cotización.
+- Se agregan regresiones para ambos caminos de materialización (`simple` y `enterprise`) y para `ensureContractForQuotation`, de modo que futuras refactorizaciones no vuelvan a abrir una segunda transacción dentro del mismo comando.
+
 ### 2026-04-19 — Quote issuance sales-context lock stops tripping on LEFT JOINs
 
 - Emitir una cotización desde `/finance/quotes/[id]` ya no falla con `FOR UPDATE cannot be applied to the nullable side of an outer join` cuando el flujo captura `sales_context_at_sent`.

@@ -176,7 +176,8 @@ export const materializeInvoiceFromApprovedHes = async (
 
     const contract = await ensureContractForQuotation({
       quotationId,
-      actor
+      actor,
+      client
     })
 
     await client.query(

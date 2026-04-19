@@ -204,23 +204,25 @@ export const ensureContractForQuotation = async ({
   quotationId,
   actor,
   startDate,
-  endDate
+  endDate,
+  client
 }: {
   quotationId: string
   actor: ContractLifecycleActor
   startDate?: string | null
   endDate?: string | null
+  client?: QueryableClient
 }): Promise<EnsureContractResult> => {
   void actor
 
-  return withTransaction(async client => {
-    const existing = await loadExistingContractForQuote(client, quotationId)
+  const run = async (txClient: QueryableClient) => {
+    const existing = await loadExistingContractForQuote(txClient, quotationId)
 
     if (existing) {
       await syncContractIdOnDocumentChain({
         quotationId,
         contractId: String(existing.contract_id),
-        client
+        client: txClient
       })
 
       return {
@@ -231,7 +233,7 @@ export const ensureContractForQuotation = async ({
       }
     }
 
-    const quote = await loadQuoteForContract(client, quotationId)
+    const quote = await loadQuoteForContract(txClient, quotationId)
 
     if (!quote) {
       throw new Error(`Quotation ${quotationId} not found.`)
@@ -250,7 +252,7 @@ export const ensureContractForQuotation = async ({
       quotationId
     })
 
-    const insert = await client.query(
+    const insert = await txClient.query(
       `INSERT INTO greenhouse_commercial.contracts (
          contract_number,
          client_id,
@@ -306,7 +308,7 @@ export const ensureContractForQuotation = async ({
 
     const contract = insert.rows[0]
 
-    await client.query(
+    await txClient.query(
       `INSERT INTO greenhouse_commercial.contract_quotes (
          contract_id, quotation_id, relationship_type, effective_from
        ) VALUES ($1, $2, 'originator', $3::date)
@@ -317,7 +319,7 @@ export const ensureContractForQuotation = async ({
     await syncContractIdOnDocumentChain({
       quotationId,
       contractId: contract.contract_id,
-      client
+      client: txClient
     })
 
     await publishContractCreated(
@@ -335,7 +337,7 @@ export const ensureContractForQuotation = async ({
         relationshipType: 'originator',
         effectiveAt: new Date().toISOString()
       },
-      client
+      txClient
     )
 
     if (contract.status === 'active') {
@@ -352,7 +354,7 @@ export const ensureContractForQuotation = async ({
           originatorQuoteId: quotationId,
           effectiveAt: new Date().toISOString()
         },
-        client
+        txClient
       )
     }
 
@@ -362,7 +364,13 @@ export const ensureContractForQuotation = async ({
       created: true,
       status: contract.status
     }
-  })
+  }
+
+  if (client) {
+    return run(client)
+  }
+
+  return withTransaction(run)
 }
 
 const attachQuotationToContract = async ({
