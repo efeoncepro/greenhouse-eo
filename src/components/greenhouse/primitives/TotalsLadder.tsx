@@ -1,5 +1,7 @@
 'use client'
 
+import { Fragment, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
+
 import Box from '@mui/material/Box'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
@@ -9,6 +11,21 @@ import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 export type TotalsLadderCurrency = 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN'
+
+export interface TotalsLadderAddonsSegment {
+
+  /** Número total de addons aplicados (>0 para renderizar el segmento). */
+  count: number
+
+  /** Monto aplicado al total en la moneda output. */
+  amount: number
+
+  /** Handler del click — abre típicamente un popover con el detalle. */
+  onClick: (event: ReactMouseEvent<HTMLElement>) => void
+
+  /** Reflejo del popover state para a11y. */
+  ariaExpanded?: boolean
+}
 
 export interface TotalsLadderProps {
   subtotal: number | null
@@ -20,6 +37,12 @@ export interface TotalsLadderProps {
 
   /** Copy override para el label del total. Default: "Total {currency}". */
   totalLabel?: string
+
+  /** Segmento interactivo de addons inline en la ladder. Patrón enterprise
+   *  (Notion/Linear/Stripe): acciones contextuales viven con sus datos, no
+   *  como chips flotantes aparte. Cuando count > 0, renderiza como botón
+   *  inline con hover/focus states y abre el popover al click. */
+  addonsSegment?: TotalsLadderAddonsSegment | null
 }
 
 const CURRENCY_LOCALE: Record<TotalsLadderCurrency, string> = {
@@ -55,15 +78,15 @@ const formatFactor = (factor: number) => `×${factor.toFixed(2).replace('.', ','
  * totals row):
  *
  * - Una única métrica prominente (h4, tabular-nums, text.primary) es el anchor.
- * - Subtotal, factor y IVA colapsan en un caption muted one-liner debajo
- *   **solo cuando aportan información** (total ≠ subtotal o hay factor ≠ 1
- *   o hay IVA). Si no, el ladder se oculta y queda solo el total.
+ * - Subtotal, factor, IVA y addons colapsan en un caption muted one-liner
+ *   debajo **solo cuando aportan información**. Addons son interactivos
+ *   (botón inline) cuando hay > 0 aplicados.
  *
  * Evita la redundancia de mostrar Subtotal y Total side-by-side con peso
  * equivalente cuando son el mismo número.
  *
- * Consumers: QuoteSummaryDock v2 (TASK-505). Reusable para invoice dock,
- * purchase order footer, contract summary.
+ * Consumers: QuoteSummaryDock v2 (TASK-505 + TASK-507). Reusable para invoice
+ * dock, purchase order footer, contract summary.
  */
 const TotalsLadder = ({
   subtotal,
@@ -72,7 +95,8 @@ const TotalsLadder = ({
   total,
   currency,
   loading = false,
-  totalLabel
+  totalLabel,
+  addonsSegment
 }: TotalsLadderProps) => {
   const prefersReduced = useReducedMotion()
 
@@ -82,14 +106,37 @@ const TotalsLadder = ({
   const hasFactorAdjustment = factor !== null && factor !== undefined && factor !== 1
   const hasIvaAdjustment = ivaAmount !== null && ivaAmount !== undefined && ivaAmount !== 0
   const hasSubtotalDelta = subtotal !== null && total !== null && subtotal !== total
+  const hasAddonsSegment = Boolean(addonsSegment && addonsSegment.count > 0)
 
-  const showLadder = hasFactorAdjustment || hasIvaAdjustment || hasSubtotalDelta
+  const showLadder = hasFactorAdjustment || hasIvaAdjustment || hasSubtotalDelta || hasAddonsSegment
 
-  const ladderSegments: string[] = []
+  type Segment =
+    | { kind: 'text'; key: string; text: string }
+    | { kind: 'addons'; key: string; addons: TotalsLadderAddonsSegment }
 
-  if (subtotal !== null) ladderSegments.push(`Subtotal ${formatMoney(subtotal, currency)}`)
-  if (hasFactorAdjustment && factor !== null && factor !== undefined) ladderSegments.push(`Factor ${formatFactor(factor)}`)
-  if (hasIvaAdjustment && ivaAmount !== null && ivaAmount !== undefined) ladderSegments.push(`IVA ${formatMoney(ivaAmount, currency)}`)
+  const segments: Segment[] = []
+
+  if (subtotal !== null) {
+    segments.push({ kind: 'text', key: 'subtotal', text: `Subtotal ${formatMoney(subtotal, currency)}` })
+  }
+
+  if (hasAddonsSegment && addonsSegment) {
+    segments.push({ kind: 'addons', key: 'addons', addons: addonsSegment })
+  }
+
+  if (hasFactorAdjustment && factor !== null && factor !== undefined) {
+    segments.push({ kind: 'text', key: 'factor', text: `Factor ${formatFactor(factor)}` })
+  }
+
+  if (hasIvaAdjustment && ivaAmount !== null && ivaAmount !== undefined) {
+    segments.push({ kind: 'text', key: 'iva', text: `IVA ${formatMoney(ivaAmount, currency)}` })
+  }
+
+  const renderSeparator = (): ReactNode => (
+    <Box component='span' aria-hidden='true' sx={{ mx: 0.75, color: 'text.secondary' }}>
+      ·
+    </Box>
+  )
 
   return (
     <Box>
@@ -125,28 +172,73 @@ const TotalsLadder = ({
         )}
       </Typography>
 
-      {showLadder && !loading && ladderSegments.length > 0 ? (
+      {showLadder && !loading && segments.length > 0 ? (
         <Stack
           direction='row'
           spacing={0}
           alignItems='center'
           sx={{ mt: 0.5, flexWrap: 'wrap', rowGap: 0.25 }}
         >
-          {ladderSegments.map((segment, idx) => (
-            <Typography
-              key={segment}
-              component='span'
-              variant='caption'
-              color='text.secondary'
-              sx={{ fontVariantNumeric: 'tabular-nums' }}
-            >
-              {idx > 0 ? (
-                <Box component='span' aria-hidden='true' sx={{ mx: 0.75 }}>
-                  ·
+          {segments.map((segment, idx) => (
+            <Fragment key={segment.key}>
+              {idx > 0 ? renderSeparator() : null}
+              {segment.kind === 'text' ? (
+                <Typography
+                  component='span'
+                  variant='caption'
+                  color='text.secondary'
+                  sx={{ fontVariantNumeric: 'tabular-nums' }}
+                >
+                  {segment.text}
+                </Typography>
+              ) : (
+                <Box
+                  component='button'
+                  type='button'
+                  onClick={segment.addons.onClick}
+                  aria-expanded={segment.addons.ariaExpanded ?? undefined}
+                  aria-haspopup='dialog'
+                  aria-label={`${segment.addons.count} addon${segment.addons.count === 1 ? '' : 's'} aplicado${segment.addons.count === 1 ? '' : 's'} por ${formatMoney(segment.addons.amount, currency)}. Abrir detalle.`}
+                  sx={theme => ({
+                    appearance: 'none',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    color: theme.palette.text.secondary,
+                    fontVariantNumeric: 'tabular-nums',
+                    fontSize: theme.typography.caption.fontSize,
+                    fontFamily: theme.typography.fontFamily,
+                    textDecoration: 'none',
+                    transition: theme.transitions.create(['color', 'text-decoration-color'], {
+                      duration: 150,
+                      easing: 'cubic-bezier(0.2, 0, 0, 1)'
+                    }),
+                    '&:hover': {
+                      color: theme.palette.primary.main,
+                      textDecoration: 'underline',
+                      textUnderlineOffset: '2px'
+                    },
+                    '&:focus-visible': {
+                      outline: `2px solid ${theme.palette.primary.main}`,
+                      outlineOffset: 2,
+                      borderRadius: `${theme.shape.customBorderRadius.xs}px`,
+                      color: theme.palette.primary.main
+                    },
+                    '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+                  })}
+                >
+                  <i className='tabler-sparkles' aria-hidden='true' style={{ fontSize: 14 }} />
+                  <span>
+                    {segment.addons.count} addon{segment.addons.count === 1 ? '' : 's'}
+                    {segment.addons.amount > 0 ? ` ${formatMoney(segment.addons.amount, currency)}` : ''}
+                  </span>
                 </Box>
-              ) : null}
-              {segment}
-            </Typography>
+              )}
+            </Fragment>
           ))}
         </Stack>
       ) : null}

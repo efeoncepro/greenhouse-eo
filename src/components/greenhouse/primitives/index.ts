@@ -11,4 +11,8 @@ export type {
   MarginTierRange
 } from './MarginHealthChip'
 export { default as TotalsLadder } from './TotalsLadder'
-export type { TotalsLadderCurrency, TotalsLadderProps } from './TotalsLadder'
+export type {
+  TotalsLadderAddonsSegment,
+  TotalsLadderCurrency,
+  TotalsLadderProps
+} from './TotalsLadder'
