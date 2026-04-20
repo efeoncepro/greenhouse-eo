@@ -2,6 +2,16 @@
 
 ## 2026-04-20
 
+### 2026-04-20 — TASK-481 Quote Builder suggested cost UX + override governance
+
+- El Quote Builder ahora expone provenance (source_kind), confidence (label + score), y freshness (días desde snapshot) del costo sugerido por línea cuando el engine v2 provee metadata. 3 chips compactos en cada cost stack + Floating UI popover con detalle, sourceRef monospace, resolution notes y disclaimers contextuales (fallback y manual). Aplica en detail post-emisión vía el mismo cost stack gateado por `canViewCostStack`.
+- Nuevo flujo de override governance por línea: dialog modal (MUI Dialog) captura categoría estructurada (6 valores: competitive_pressure, strategic_investment, roi_correction, error_correction, client_negotiation, other) + reason textarea con minLength adaptativo (15 chars / 30 si category=other), muestra suggested read-only con source chip, input override USD, delta preview live (CostDeltaChip con direction), impact hint y lista de últimos 5 overrides previos. Submit persiste en transacción única y emite outbox event.
+- Backend de persistencia extendido: `greenhouse_commercial.quotation_line_items` gana 7 columnas de governance (reason, category, by_user_id, at, delta_pct, suggested_unit_cost_usd, suggested_breakdown) con CHECK constraints + coherence check. Nueva tabla append-only `quotation_line_cost_override_history` con 4 indexes para lectura eficiente en dialog + audit.
+- Capability nueva `canOverrideQuoteCost` (solo `efeonce_admin + finance_admin`, más restrictiva que `canViewCostStack` — analysts leen, no mutan). Endpoint `POST /api/finance/quotes/[id]/lines/[lineItemId]/cost-override` enforza backend + GET para history.
+- Evento canónico nuevo `commercial.quotation_line.cost_overridden` en catálogo (domain `cost_intelligence`), payload rico con suggested + override + delta + actor + category + reason para downstream consumers (TASK-482 margin feedback, dashboards de audit).
+- Nomenclature `GH_PRICING.costProvenance` + `GH_PRICING.costOverride` con labels Chile ES tuteo, descripciones por source_kind / confidence bucket / category, formatter de freshness relativa y mensajes de error/éxito.
+- Slices A-E shipped en 5 commits + verificación final (lint + tsc + test 1569/1569 + build).
+
 ### 2026-04-20 — TASK-480 habilita bulk repricing seguro y replay fiel del pricing engine v2
 
 - `greenhouse_commercial.quotations` ahora persiste `pricing_context` y `quotation_line_items` persiste `pricing_input`, cerrando el hueco entre lo que el Quote Builder simula y lo que el runtime batch necesita para repricear sin adivinar.

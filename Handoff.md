@@ -1,5 +1,37 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — TASK-481 Quote Builder suggested cost UX + override governance (Claude Opus 4.7)
+
+- **Scope:** entregar la UX de provenance / confidence / freshness sobre la metadata que el engine v2 ya persiste, y gobernar el override manual con motivo + categoría + trazabilidad backend.
+- **Branch:** `task/TASK-481-quote-builder-suggested-cost-override-governance`
+- **Commits clave:**
+  - `0d21103d` slice 0 — schema + events + write path
+  - `273224e4` slice 1 — nomenclature extensions
+  - commits slices 2-4 — primitives + cost stack integration + override dialog
+  - `643c656d` slice 5 — verification + client/server boundary fix
+- **Delta al scope spec:** auditoria detectó que no existían columnas de override governance en `quotation_line_items`. Se amplió el scope con migration + tabla append-only + evento canónico nuevo + capability nueva + 5 primitives + dialog — todo documentado en el Delta de la task.
+- **Decisiones enterprise cerradas (open questions):**
+  1. Override reemplaza breakdown completo con `kind='manual'`; suggested breakdown queda snapshotted en columna JSONB.
+  2. Capability `canOverrideQuoteCost` restrictiva: solo `efeonce_admin + finance_admin`.
+  3. Reason minLength 30 chars si category=other, 15 si no; category obligatoria (enum estructurado).
+  4. Historial last-5 en dialog via tabla append-only `quotation_line_cost_override_history`.
+- **Runtime topology:** sin cambios — el override corre en Vercel serverless con `withTransaction` (lock pesimista + commit atómico + outbox emit). Worker cron-side no participa.
+- **Gotcha importante:** cuando client components importan tipos/constantes de un módulo `server-only`, Next.js intenta incluir deps server en el bundle cliente y el build falla con errores de `grpc-js` module-not-found. Fix: split en módulos types client-safe vs events server-only (aplicado en `quotation-line-cost-override-*.ts`). Pattern reusable para otros flows que compartan enums entre client y server.
+- **Verificación:** `pnpm lint` ✓, `pnpm tsc --noEmit` ✓, `pnpm test` 1569/1569 ✓, `pnpm build` ✓.
+- **Follow-ups:**
+  - Read-only variant de provenance en `QuoteDetailView` post-emisión (diferido; el builder ya cubre el caso activo).
+  - V2 threshold-based dual approval para deltas grandes — declarado en la capability comment.
+  - TASK-482 (quoted vs actual margin feedback) ya puede consumir el nuevo event `commercial.quotation_line.cost_overridden`.
+
+## Sesion 2026-04-20 — TASK-480 closure doc sync (Codex)
+
+- **Scope:** alinear la documentación de `TASK-480` con el estado real ya implementado en `develop`.
+- **Cambio documental:**
+  - `TASK-480` se movió a `docs/tasks/complete/`
+  - se actualizó el markdown de la task como closure doc con replay input, bulk repricing, taxonomía `tool_catalog_fallback` y downstream adoption ya cerrados
+  - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `TASK-476` y `TASK-483` quedaron sincronizados con la nueva ruta/estado
+- **Coordinación:** no se tocó el trabajo paralelo visible de `TASK-481`, `src/lib/sync/event-catalog.ts` ni `data/api_zapsign.txt`.
+
 ## Sesion 2026-04-20 — TASK-480 pricing replay context + bulk repricing (Codex)
 
 - **Scope:** cerrar el follow-on real de `TASK-480` sobre el codebase actual: replay input persistido, semántica final de provenance/fallback, worker batch de repricing y readers downstream sin recompute.

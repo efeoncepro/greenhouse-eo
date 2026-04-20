@@ -8,9 +8,29 @@ La revisión del repo confirma que esta task sigue vigente, pero más acotada:
 - el cost stack ya existe y está gateado por permiso
 - lo que falta es UX de provenance/confidence/freshness y gobernanza de override, no otro resolver backend
 
+## Delta 2026-04-20 — Scope extension post-audit
+
+La auditoria en Phase 1-2 revelo que la spec original asumia persistencia de override governance, pero en realidad NO existen columnas de audit en `quotation_line_items` (solo `manualUnitCost` como numero crudo dentro de JSONB). Para cumplir AC #3 "Override manual requiere motivo y deja trazabilidad" se agrega al scope:
+
+- **Migration nueva**: columnas `cost_override_reason`, `cost_override_by_user_id`, `cost_override_at`, `cost_override_delta_pct`, `cost_override_suggested_unit_cost_usd`, `cost_override_suggested_breakdown JSONB`, `cost_override_category` con CHECK en enum.
+- **Tabla append-only nueva**: `greenhouse_commercial.quotation_line_cost_override_history` para historial completo reutilizable por UI (últimos 5 en dialog) y audit dashboards futuros.
+- **Evento canonico nuevo**: `commercial.quotation_line.cost_overridden`.
+- **Capability nueva**: `canOverrideQuoteCost(tenant)` restrictiva a `efeonce_admin + finance_admin` (analyst lee, no muta).
+- **Nomenclature extension**: secciones `GH_PRICING.costProvenance` y `GH_PRICING.costOverride`.
+- **Primitives nuevos**: `CostSourceChip`, `CostConfidenceChip`, `CostFreshnessBadge`, `CostProvenancePopover`, `CostDeltaChip`, `CostOverrideDialog`.
+
+Resolucion de open questions con criterio enterprise:
+
+1. Override replace-completo (`pricingV2CostBasisKind='manual'`), snapshot de breakdown original en JSONB.
+2. Capability restrictiva (admin + finance_admin only); threshold-based dual approval queda como follow-up V2.
+3. minLength 30 chars (15 si category aporta contexto); category enum obligatorio.
+4. History append-only + mostrar ultimos 5 en dialog.
+
+TASK-480 confirmado NO bloqueante (core resolver + persistencia ya existen; sus gaps son downstream).
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

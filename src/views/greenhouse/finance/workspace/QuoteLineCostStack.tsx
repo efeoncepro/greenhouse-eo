@@ -8,6 +8,10 @@ import Typography from '@mui/material/Typography'
 
 import type { PricingLineOutputV2, PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
+import CostConfidenceChip from '@/components/greenhouse/pricing/CostConfidenceChip'
+import CostFreshnessBadge from '@/components/greenhouse/pricing/CostFreshnessBadge'
+import CostProvenancePopover from '@/components/greenhouse/pricing/CostProvenancePopover'
+import CostSourceChip from '@/components/greenhouse/pricing/CostSourceChip'
 import CostStackPanel, {
   type CostStackLine,
   type CostStackPanelProps,
@@ -103,8 +107,35 @@ const QuoteLineCostStack = ({ lineOutput, outputCurrency, defaultExpanded = fals
     compliance.marginMax !== null &&
     compliance.marginMax !== undefined
 
+  const provenance = lineOutput.costStack
+  const resolutionNotes = Array.isArray(lineOutput.resolutionNotes) ? lineOutput.resolutionNotes : null
+  const showProvenanceRow = Boolean(provenance.costBasisKind)
+
   return (
     <Stack spacing={1.5}>
+      {showProvenanceRow ? (
+        <Box sx={{ px: 1, py: 0.5 }}>
+          <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap' useFlexGap>
+            <CostSourceChip sourceKind={provenance.costBasisKind ?? null} compact />
+            <CostConfidenceChip
+              confidenceLabel={provenance.costBasisConfidenceLabel ?? null}
+              confidenceScore={provenance.costBasisConfidenceScore ?? null}
+              compact
+            />
+            <CostFreshnessBadge snapshotDate={provenance.costBasisSnapshotDate ?? null} compact />
+            <Box sx={{ ml: 'auto' }}>
+              <CostProvenancePopover
+                sourceKind={provenance.costBasisKind ?? null}
+                confidenceLabel={provenance.costBasisConfidenceLabel ?? null}
+                confidenceScore={provenance.costBasisConfidenceScore ?? null}
+                snapshotDate={provenance.costBasisSnapshotDate ?? null}
+                sourceRef={provenance.costBasisSourceRef ?? null}
+                resolutionNotes={resolutionNotes}
+              />
+            </Box>
+          </Stack>
+        </Box>
+      ) : null}
       {showSparkline ? (
         <Box sx={{ px: 1, py: 0.5 }}>
           <Stack direction='row' spacing={2} alignItems='center'>

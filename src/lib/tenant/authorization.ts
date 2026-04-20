@@ -93,6 +93,19 @@ export const canAdministerPricingCatalog = (tenant: TenantContext) =>
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
   hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN)
 
+/**
+ * Gates override manual de costo sugerido por línea en el Quote Builder (TASK-481).
+ * Más restrictivo que canViewCostStack: finance_analyst puede leer el cost stack
+ * para investigar márgenes pero NO puede mutar con overrides — eso queda en
+ * efeonce_admin + finance_admin. Alineado con el patrón de pricing catalog admin
+ * (TASK-467/TASK-470).
+ *
+ * Follow-up V2: threshold-based dual approval para deltas > umbral.
+ */
+export const canOverrideQuoteCost = (tenant: TenantContext) =>
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN)
+
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
