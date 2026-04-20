@@ -1,0 +1,696 @@
+# Greenhouse EO — Commercial Product Catalog Sync Architecture V1
+
+> **Version:** 1.0
+> **Created:** 2026-04-20 por Claude (Opus 4.7)
+> **Audience:** Backend engineers, product owners, agentes que implementen features de catalog management, pricing, quote builder o HubSpot sync
+> **Related:** `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+> **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## 1. Resumen ejecutivo
+
+Greenhouse hoy tiene cinco catálogos canónicos para cosas vendibles —`sellable_roles` (ECG), `tool_catalog` (ETG), `overhead_addons` (EFO), `service_pricing` (EFG) y `product_catalog` (PRD)— pero solo uno (`product_catalog`) sincroniza con HubSpot, y solo en modo CREATE. No hay UPDATE outbound, no hay proyección reactiva, no hay drift detection, y los cuatro catálogos fuente viven aislados del anchor de distribución. Consecuencia: crear un role en Greenhouse no lo hace seleccionable como line item en HubSpot, cambiar pricing local no propaga, y el operador queda con un catálogo fragmentado que inevitablemente drifta.
+
+Este spec formaliza un **modelo de dos capas** — autoría (5 catálogos fuente) vs distribución (`product_catalog` como anchor único outbound) — conectadas por **reactive materializers** que convierten eventos de los catálogos fuente en upserts al `product_catalog`, y una **proyección outbound `productHubSpotOutbound`** (clonada del patrón de `quotationHubSpotOutbound` TASK-463) que pushea a HubSpot Products via Cloud Run. Completa el loop con drift detection nocturno, archival semántico (no delete), field authority con Greenhouse como owner estricto, y policy enforcement que bloquea la creación de productos directamente en HubSpot.
+
+Es un programa complementario al de Commercial Party Lifecycle (TASK-534): mientras ese formaliza el **quién** (la party que recibe la cotización), este formaliza el **qué** (el catálogo de lo que se cotiza). Juntos cierran el loop quote-to-HubSpot end-to-end.
+
+---
+
+## 2. Problema que este spec resuelve
+
+### 2.1 Síntoma reportado (operación, 2026-04-20)
+
+- Al crear un role nuevo (`sellable_roles`), no aparece como opción en HubSpot Deals/Quotes como line item.
+- Al ajustar pricing de una tool (`tool_catalog`), HubSpot no se entera.
+- Al deactivar un overhead addon, sigue apareciendo en HubSpot y en quotes nuevas se puede seleccionar por error.
+- El operador no tiene claridad de qué productos de HubSpot son gestionados por Greenhouse y cuáles son huérfanos creados manualmente.
+
+### 2.2 Causa raíz arquitectónica
+
+Cinco catálogos fuente existen como tablas canónicas maduras (cada una con SKU propio, governance, cost basis, versioning), pero ninguno tiene un hook reactivo que sincronice su estado al `product_catalog`. El `product_catalog` a su vez tiene `hubspot_product_id` y `sync_status` pero nunca se popula desde los catálogos fuente — solo se popula manualmente via `create-hubspot-product.ts` o por import HubSpot → Greenhouse. No hay proyección reactiva análoga a `quotationHubSpotOutbound` que cierre el loop.
+
+El resultado es que **`product_catalog` no es realmente el source of truth de distribución** — es un catálogo más, desconectado. Y HubSpot termina siendo una fuente paralela no gestionada.
+
+### 2.3 Impacto de no resolverlo
+
+- **Fricción operativa**: sales selecciona productos incorrectos o desactualizados en HubSpot; quotes llegan con descripciones/precios que no matchean el pricing governance.
+- **Dual-write invisible**: alguien edita un producto en HubSpot para "arreglar rápido" y el siguiente sync o push lo sobrescribe, perdiendo el fix.
+- **Drift acumulativo**: sin reconciler, cada mes el catálogo HubSpot se aleja más del canónico.
+- **Bloqueador de Kortex**: la plataforma paralela de CRM necesita el mismo modelo — sin sync unificado, cada cliente externo replica la fragmentación.
+- **Bloqueador de reporting**: revenue attribution por producto/role/tool es imposible si HubSpot tiene productos no mapeados.
+- **Bloqueador de TASK-474 (Quote Builder Catalog Reconnection)**: el reconnection no puede asumir coherencia si el catalog HubSpot drifta.
+
+---
+
+## 3. Scope y non-goals
+
+### 3.1 In scope
+
+- Modelo conceptual de dos capas: autoría vs distribución.
+- Extender `product_catalog` con `source_kind` + `source_id` + FK a cualquiera de las 5 fuentes.
+- Materializers reactivos desde los 4 source catalogs (roles, tools, overheads, services) hacia `product_catalog`.
+- Proyección outbound `productHubSpotOutbound` que consume eventos de `product_catalog` y pushea a HubSpot.
+- Extensión del Cloud Run `hubspot-greenhouse-integration` con `POST /products`, `PATCH /products/:id`, `POST /products/:id/archive`.
+- Archival semántico (no hard delete) con preservación de quotes históricas.
+- Drift detection nocturno + tabla `product_sync_conflicts` + Admin Center surface.
+- Field authority table (Greenhouse owns pricing/description/code; HubSpot owns product ID interno).
+- Policy enforcement strict: productos nacen en Greenhouse, no en HubSpot.
+- Feature flags por source catalog para rollout incremental.
+- Runbook operacional de reconciliation manual.
+
+### 3.2 Non-goals
+
+- **No** se recrean los catálogos fuente — cada uno (roles, tools, overheads, services) mantiene su modelo, sus reglas de pricing, su governance.
+- **No** se migra el anchor de distribución a una tabla nueva; `product_catalog` sigue siendo la capa outbound.
+- **No** se resuelve el contrato de **line items** end-to-end — `quotation_line_items` ya referencia `product_id` y eso sigue igual. Se valida que funcione tras el enrollment de todos los sources, nada más.
+- **No** se cubre sync bi-direccional de campos owned por HubSpot (product internal id, created_at HubSpot).
+- **No** se aborda contratos multi-portal HubSpot (misma open question que TASK-534 §12).
+- **No** se cubre pricing discovery o product recommendation (fuera de alcance — está en roadmap de Nexa).
+- **No** se migra la nomenclatura de SKU existentes — ECG/ETG/EFO/EFG/PRD se mantienen.
+
+---
+
+## 4. Modelo conceptual
+
+### 4.1 Dos capas: autoría vs distribución
+
+```
+┌──────────────────────────────────────┐        ┌──────────────────────────────────┐
+│         AUTORÍA (internal)           │        │    DISTRIBUCIÓN (HubSpot face)   │
+│  ──────────────────────────────────  │        │  ──────────────────────────────  │
+│                                      │        │                                  │
+│  sellable_roles       (ECG-xxx)  ───┐│        │                                  │
+│  tool_catalog         (ETG-xxx)  ───┤│        │                                  │
+│  overhead_addons      (EFO-xxx)  ───┼┼──────→ │   product_catalog (PRD-xxx)      │
+│  service_pricing      (EFG-xxx)  ───┤│        │   (single outbound anchor)       │
+│  [manual products]    (PRD-xxx)  ───┘│        │                                  │
+│                                      │        │              │                   │
+│  Responsabilidad:                    │        │              │                   │
+│  - pricing governance                │        │              ▼                   │
+│  - cost basis                        │        │    HubSpot Products ──→ Line     │
+│  - versioning                        │        │    (custom prop: gh_product_code)│
+│  - capacity model                    │        │                                  │
+│  - margin tiers                      │        │    Responsabilidad:              │
+│                                      │        │    - sales UX (autocomplete)     │
+│                                      │        │    - deal/quote line items       │
+│                                      │        │    - reporting HubSpot           │
+└──────────────────────────────────────┘        └──────────────────────────────────┘
+```
+
+La capa de autoría es **donde se piensa**: qué roles existen, cuánto cuestan, qué tiers, qué governance. La capa de distribución es **donde se vende**: qué cosas aparecen en HubSpot como seleccionables.
+
+La separación permite:
+- Roles/tools pueden existir en Greenhouse sin exponerse a HubSpot (internal tools, roles de shadow staffing).
+- Un mismo source puede proyectarse a múltiples products si hay variantes (un role con 3 tiers = 3 products).
+- La governance interna (TASK-464, TASK-467, TASK-470) no se contamina con lógica HubSpot.
+
+### 4.2 Reglas de materialización
+
+| Source catalog | Cuándo crear product_catalog row | Product code | Archival trigger |
+|---|---|---|---|
+| `sellable_roles` (ECG) | Al crear role activo | `product_code = role.sku` (ECG-xxx) | `role.active=false` |
+| `tool_catalog` (ETG) | Al crear tool activa con `sellable=true` | `product_code = tool.tool_sku` (ETG-xxx) | `tool.active=false` o `sellable=false` |
+| `overhead_addons` (EFO) | Al crear addon con `visibleToClient=true` | `product_code = addon.addon_sku` (EFO-xxx) | `addon.active=false` o `visibleToClient=false` |
+| `service_pricing` (EFG) | Al crear service_pricing active | `product_code = service.service_sku` (EFG-xxx) | `service.active=false` |
+| Manual (PRD) | Creación directa desde Admin Center | `product_code = manual.PRD-xxx` | Admin action |
+
+**Regla clave**: `product_code` es el **business key estable** — independiente de `hubspot_product_id` (asignado por HubSpot). Si HubSpot pierde un product y lo recrea, el sync lo re-asocia vía `gh_product_code` custom property.
+
+### 4.3 Relaciones
+
+```
+product_catalog
+├── product_id (PK, PRD-xxx internal)
+├── source_kind      ← NUEVO: 'sellable_role' | 'tool' | 'overhead_addon' | 'service' | 'manual'
+├── source_id        ← NUEVO: role_id | tool_id | addon_id | pricing_id | null
+├── product_code     ← business key (ECG/ETG/EFO/EFG/PRD-xxx)
+├── hubspot_product_id
+├── sync_status
+├── sync_direction   ← 'greenhouse_only' por default post-spec
+├── is_archived      ← NUEVO: soft-archive flag
+├── archived_at
+└── ...
+```
+
+**Constraint**: `UNIQUE(source_kind, source_id)` donde `source_id IS NOT NULL` — previene doble-materialización. `product_code` también UNIQUE globalmente.
+
+### 4.4 Un source, múltiples products (variantes)
+
+Caso que el modelo debe soportar: un role con 3 tiers puede querer 3 HubSpot products separados (Senior Consultant $X, Mid $Y, Junior $Z). Opciones:
+
+- **Opción A (recomendada)**: 1 product_catalog row por `(source_kind, source_id)`. Si hay variantes, se crean rows adicionales con `source_kind='sellable_role_variant'` y `source_id=role_id` + `variant_key='tier_senior'`. `product_code` compuesto: `ECG-xxx-SR`.
+- **Opción B**: 1 product_catalog row representa "el role" y HubSpot tiene un solo product con pricing tiers (HubSpot lo soporta parcialmente).
+
+Opción A es más extensible y mapea 1:1 con cómo HubSpot modela productos. Opción B requiere menos rows pero acopla el variant management a HubSpot.
+
+**Decisión**: ir con A. Los variants nacen en TASK-547 (Fase B), no ahora.
+
+---
+
+## 5. Contrato de datos
+
+### 5.1 Extensión de `product_catalog`
+
+```sql
+ALTER TABLE greenhouse_commercial.product_catalog
+  ADD COLUMN source_kind TEXT
+    CHECK (source_kind IN (
+      'sellable_role',
+      'sellable_role_variant',
+      'tool',
+      'overhead_addon',
+      'service',
+      'manual',
+      'hubspot_imported'  -- para orphans adoptados
+    )),
+  ADD COLUMN source_id TEXT,         -- id canónico de la fuente; null si source='manual'
+  ADD COLUMN source_variant_key TEXT, -- para variantes
+  ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT FALSE,
+  ADD COLUMN archived_at TIMESTAMPTZ,
+  ADD COLUMN archived_by TEXT,
+  ADD COLUMN last_outbound_sync_at TIMESTAMPTZ,
+  ADD COLUMN last_drift_check_at TIMESTAMPTZ,
+  ADD COLUMN gh_owned_fields_checksum TEXT; -- para drift detection eficiente
+
+-- Constraints
+ALTER TABLE greenhouse_commercial.product_catalog
+  ADD CONSTRAINT uq_product_catalog_source UNIQUE (source_kind, source_id, source_variant_key)
+    WHERE source_kind IS NOT NULL AND source_kind <> 'manual';
+
+-- Index para search por source
+CREATE INDEX idx_product_catalog_source ON greenhouse_commercial.product_catalog (source_kind, source_id) WHERE source_kind IS NOT NULL;
+CREATE INDEX idx_product_catalog_archived ON greenhouse_commercial.product_catalog (is_archived) WHERE is_archived = FALSE;
+```
+
+### 5.2 Tabla de conflictos
+
+```sql
+CREATE TABLE greenhouse_commercial.product_sync_conflicts (
+  conflict_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id TEXT REFERENCES greenhouse_commercial.product_catalog(product_id),
+  hubspot_product_id TEXT,
+  conflict_type TEXT NOT NULL
+    CHECK (conflict_type IN (
+      'orphan_in_hubspot',       -- existe en HubSpot, no en Greenhouse
+      'orphan_in_greenhouse',    -- existe en Greenhouse, no en HubSpot
+      'field_drift',             -- ambos existen, campos divergen
+      'sku_collision',           -- mismo product_code en dos rows
+      'archive_mismatch'         -- archived state divergent
+    )),
+  detected_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  conflicting_fields JSONB,
+  resolution_status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (resolution_status IN ('pending', 'resolved_greenhouse_wins', 'resolved_hubspot_wins', 'ignored')),
+  resolution_applied_at TIMESTAMPTZ,
+  resolved_by TEXT,
+  metadata JSONB DEFAULT '{}'::jsonb
+);
+
+CREATE INDEX idx_product_sync_conflicts_unresolved ON greenhouse_commercial.product_sync_conflicts (detected_at DESC) WHERE resolution_status = 'pending';
+```
+
+### 5.3 Contrato de `source_kind` y `source_id`
+
+| `source_kind` | `source_id` apunta a | Event trigger (al materializar) |
+|---|---|---|
+| `sellable_role` | `greenhouse_commercial.sellable_roles.role_id` | `commercial.sellable_role.{created,updated,deactivated}` |
+| `tool` | `greenhouse_ai.tool_catalog.tool_id` | `commercial.tool.{created,updated,deactivated}` |
+| `overhead_addon` | `greenhouse_commercial.overhead_addons.addon_id` | `commercial.overhead_addon.{created,updated,deactivated}` |
+| `service` | `greenhouse_commercial.service_pricing.pricing_id` | `commercial.service.{created,updated,deactivated}` |
+| `manual` | null | Admin action direct |
+| `hubspot_imported` | null | Import from HubSpot orphan |
+
+---
+
+## 6. Materializers reactivos (source → product_catalog)
+
+### 6.1 Patrón
+
+Cada source catalog emite eventos canónicos al outbox en create/update/deactivate. Un materializer único `sourceToProductCatalog` los consume y upserte la fila correspondiente en `product_catalog`.
+
+```typescript
+// src/lib/sync/projections/source-to-product-catalog.ts
+export const sourceToProductCatalogProjection = registerProjection({
+  name: 'source_to_product_catalog',
+  domain: 'cost_intelligence',
+  events: [
+    'commercial.sellable_role.created',
+    'commercial.sellable_role.updated',
+    'commercial.sellable_role.deactivated',
+    'commercial.tool.created',
+    'commercial.tool.updated',
+    'commercial.tool.deactivated',
+    'commercial.overhead_addon.created',
+    'commercial.overhead_addon.updated',
+    'commercial.overhead_addon.deactivated',
+    'commercial.service.created',
+    'commercial.service.updated',
+    'commercial.service.deactivated',
+  ],
+  consumer: async (event, { tx }) => {
+    const handler = resolveSourceHandler(event.eventType);
+    const payload = handler.extract(event);
+    await upsertProductCatalogFromSource(tx, payload);
+  },
+});
+```
+
+### 6.2 Handlers por source
+
+Cada source tiene un handler dedicado que traduce su shape interno al contrato común de `product_catalog`:
+
+```typescript
+// src/lib/sync/handlers/sellable-role-to-product.ts
+export const sellableRoleHandler = {
+  extract(event) {
+    const role = event.payload;
+    return {
+      sourceKind: 'sellable_role',
+      sourceId: role.roleId,
+      productCode: role.sku,            // ECG-xxx
+      productName: role.roleName,
+      productType: 'service',
+      pricingModel: 'staff_aug',
+      defaultUnit: 'hour',
+      defaultUnitPrice: role.defaultBillRateUsd,
+      defaultCurrency: 'USD',
+      description: role.description,
+      businessLineCode: role.defaultBusinessLine,
+      isArchived: !role.active,
+    };
+  },
+};
+```
+
+Handlers análogos para tool, overhead_addon, service.
+
+### 6.3 Invariantes del materializer
+
+1. **Idempotencia**: correr el mismo event dos veces es no-op si nada cambió.
+2. **Atomic**: upsert + emit outbox evento `commercial.product_catalog.{created,updated,archived}` en la misma transacción.
+3. **Field ownership**: solo escribe campos owned por el source; no toca `hubspot_product_id`, `sync_status`, campos de archival manual.
+4. **No cascade delete**: un source deactivation archiva el product, no lo borra.
+5. **Variant spawn**: si el source emite metadata de variants (tiers, currencies), el handler decide si crea rows adicionales.
+
+### 6.4 Eventos que debe emitir cada source catalog
+
+| Source | Eventos hoy | Eventos a agregar |
+|---|---|---|
+| `sellable_roles` | parcial (pricing, cost changes) | `.created`, `.updated`, `.deactivated` explícitos con payload canónico |
+| `tool_catalog` | parcial | igual |
+| `overhead_addons` | parcial | igual |
+| `service_pricing` | sí (TASK-465 done) | validar que coincidan contrato |
+| Manual | ya emite | `.created`, `.updated`, `.archived` |
+
+Sub-task de la Fase B: auditar y homogeneizar los eventos de cada source para que el materializer consuma un contrato único.
+
+---
+
+## 7. Proyección outbound (product_catalog → HubSpot)
+
+### 7.1 Patrón (clonado de `quotationHubSpotOutbound`)
+
+```typescript
+// src/lib/sync/projections/product-hubspot-outbound.ts
+export const productHubSpotOutboundProjection = registerProjection({
+  name: 'product_hubspot_outbound',
+  domain: 'cost_intelligence',
+  events: [
+    'commercial.product_catalog.created',
+    'commercial.product_catalog.updated',
+    'commercial.product_catalog.archived',
+    'commercial.product_catalog.unarchived',
+  ],
+  consumer: async (event, { tx }) => {
+    const product = await getProductById(tx, event.payload.productId);
+    if (product.syncDirection === 'greenhouse_only' || product.syncDirection === 'bidirectional') {
+      await pushProductToHubSpot(product, { eventType: event.eventType });
+    }
+  },
+});
+```
+
+### 7.2 Lógica de push
+
+```
+event type                   → HubSpot action
+──────────────────────────────────────────────────
+product_catalog.created      → POST /products (si no existe hubspot_product_id)
+product_catalog.updated      → PATCH /products/:hubspot_product_id
+product_catalog.archived     → POST /products/:hubspot_product_id/archive
+product_catalog.unarchived   → PATCH /products/:hubspot_product_id (active=true)
+```
+
+Idempotencia: si `hubspot_product_id` ya existe en un `.created`, degrada a `.updated`. Si no existe en `.updated`, crea.
+
+### 7.3 Anti-ping-pong
+
+Igual que TASK-540: marcar `gh_last_write_at` custom property en HubSpot en cada outbound. El inbound sync skipea si Greenhouse escribió en los últimos 60s.
+
+### 7.4 Resultados
+
+Cada push emite un evento de resultado:
+
+- `commercial.product_catalog.hubspot_synced_out` (éxito)
+- `commercial.product_catalog.hubspot_sync_failed` (error — retry con exponential backoff; tras 5 fallos → DLQ + alert)
+
+### 7.5 Payload contract al Cloud Run
+
+```typescript
+type PushProductPayload = {
+  productId: string;
+  productCode: string;        // ECG-xxx, ETG-xxx, etc.
+  productName: string;
+  productType: string;
+  description?: string;
+  defaultPrice: number;
+  defaultCurrency: 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN';
+  defaultUnit: 'hour' | 'month' | 'unit' | 'project';
+  businessLine?: string;
+  sourceKind: string;          // para tagging en HubSpot
+  ghProductCode: string;       // custom property estable
+  ghLastWriteAt: string;       // ISO timestamp
+  isArchived: boolean;
+  existingHubspotProductId?: string; // si ya conocido
+};
+```
+
+---
+
+## 8. Cloud Run integration endpoints
+
+### 8.1 Nuevos endpoints en `hubspot-greenhouse-integration`
+
+| Method | Path | Propósito |
+|---|---|---|
+| `POST` | `/products` | Crear product en HubSpot. Retorna `{ hubspotProductId, createdAt }` |
+| `PATCH` | `/products/:hubspotProductId` | Update fields. Retorna `{ hubspotProductId, updatedFields }` |
+| `POST` | `/products/:hubspotProductId/archive` | Archive (active=false). Retorna `{ hubspotProductId, archivedAt }` |
+| `GET` | `/products/reconcile` | Batch snapshot de products en HubSpot (para drift cron). Retorna todos los products con custom props `gh_product_code`, `gh_last_write_at` |
+
+### 8.2 Custom properties HubSpot obligatorias
+
+Creadas idempotentemente por script (usar skill `hubspot-ops`):
+
+- `gh_product_code` (TEXT) — SKU canónico Greenhouse (ECG/ETG/EFO/EFG/PRD-xxx)
+- `gh_source_kind` (TEXT) — para analytics en HubSpot side
+- `gh_last_write_at` (TIMESTAMP) — anti-ping-pong
+- `gh_business_line` (TEXT) — BU code
+- `gh_archived_by_greenhouse` (BOOL) — útil en filtered views
+
+### 8.3 Rate limiting y retry
+
+- HubSpot API limit: 100 req/10s por portal. El Cloud Run implementa bucket + exponential backoff.
+- Batch operations: usar HubSpot batch API (`POST /products/batch/create`) cuando el outbound procese >5 events simultáneos.
+
+---
+
+## 9. Line items resolution (ya funciona, validación)
+
+El contrato actual (`quotation_line_items.product_id` FK a `product_catalog`) no cambia. El push de quote a HubSpot:
+
+1. Lee line items canónicas con `product_id`.
+2. Por cada line, resuelve `product_id → hubspot_product_id` via join.
+3. Si `hubspot_product_id IS NULL`, **bloquea el push** y emite `commercial.quotation.hubspot_sync_blocked` con razón `missing_product_sync`. Esto fuerza resolución antes de push.
+4. HubSpot crea line item con reference al product.
+
+**Nuevo guard**: si `product.is_archived=true`, bloquear también — no se pueden cotizar productos archivados. El quote builder debe impedirlo UI-side también.
+
+---
+
+## 10. Drift detection y reconciliation
+
+### 10.1 Cron nocturno
+
+```
+schedule: 0 4 * * *  America/Santiago
+endpoint: ops-worker /product-catalog/drift-detect
+```
+
+Steps:
+
+1. Fetch snapshot completo de products HubSpot via `GET /products/reconcile`.
+2. Cross-join con `product_catalog` local.
+3. Detectar:
+   - **Orphans en HubSpot**: products en HubSpot sin `gh_product_code` o con `gh_product_code` no matcheable en Greenhouse.
+   - **Orphans en Greenhouse**: products activos en Greenhouse sin `hubspot_product_id` o con id no matcheable.
+   - **Field drift**: ambos existen, pero `name/price/description/archived` difieren.
+   - **SKU collision**: dos rows en Greenhouse con mismo `product_code` (bug).
+4. Insertar rows en `product_sync_conflicts`.
+5. Alert si > N conflicts no resueltos en 24h.
+
+### 10.2 Resolution policies
+
+| Conflict type | Default action | Operator override |
+|---|---|---|
+| `orphan_in_hubspot` | Alert; operador decide adoptar (materializar como `source_kind='hubspot_imported'`) o archivar en HubSpot | Admin Center CTA |
+| `orphan_in_greenhouse` | Re-trigger outbound automático (self-healing) | Admin Center retry button |
+| `field_drift` | Greenhouse wins (owner de pricing/name/description); re-push | Admin Center "accept HubSpot value" (exception) |
+| `sku_collision` | Bloquear outbound de ambos; alert P0 (es bug) | Manual fix |
+| `archive_mismatch` | Greenhouse state wins | Admin override con razón |
+
+### 10.3 Auto-heal vs manual
+
+**Auto-heal** (`orphan_in_greenhouse`, `field_drift` con Greenhouse win): el cron puede disparar re-push automático si el conflict persiste > 2 iteraciones y no hay intervención.
+
+**Manual obligatorio** (`orphan_in_hubspot`, `sku_collision`): requieren operador; el auto-heal es peligroso porque puede borrar data legítima.
+
+---
+
+## 11. Governance y field authority
+
+### 11.1 Field authority table
+
+```typescript
+const PRODUCT_FIELD_AUTHORITY: Record<string, FieldOwnerRule> = {
+  product_code:        () => 'greenhouse',  // inmutable post-create
+  product_name:        () => 'greenhouse',
+  description:         () => 'greenhouse',
+  default_unit_price:  () => 'greenhouse',
+  default_currency:    () => 'greenhouse',
+  default_unit:        () => 'greenhouse',
+  product_type:        () => 'greenhouse',
+  pricing_model:       () => 'greenhouse',
+  business_line_code:  () => 'greenhouse',
+  is_archived:         () => 'greenhouse',
+  hubspot_product_id:  () => 'hubspot',     // HubSpot assigns internal id
+  hubspot_created_at:  () => 'hubspot',
+};
+```
+
+Cualquier cambio en HubSpot a fields owned por Greenhouse es **rollback automático** en el próximo reconciler.
+
+### 11.2 Autorización
+
+| Acción | Capability |
+|---|---|
+| Crear product manual | `commercial.product_catalog.create_manual` (default: `efeonce_admin`, `finance_admin`) |
+| Editar product (cualquier source) | `commercial.product_catalog.edit` (default: `finance_admin`, `commercial_admin`) |
+| Archivar product | `commercial.product_catalog.archive` |
+| Adoptar orphan HubSpot | `commercial.product_catalog.adopt_orphan` (default: `efeonce_admin`) |
+| Resolver conflict manualmente | `commercial.product_catalog.resolve_conflict` |
+
+### 11.3 Audit trail
+
+Toda escritura queda en `pricing_catalog_audit_log` (ya existe, TASK-467) con `entity_type='product_catalog'` + correlation_id si es parte de un materializer chain.
+
+### 11.4 Policy: strict Greenhouse-origin
+
+Decisión cerrada en este spec:
+
+- **Productos nacen en Greenhouse, no en HubSpot**.
+- El inbound sync de products queda **deprecado** tras el rollout (sigue corriendo en read-only para detección de orphans, pero no crea rows en `product_catalog` automáticamente).
+- Orphans detectados en HubSpot: admin tiene 2 opciones — adoptar (materializar como `hubspot_imported` + promover a uno de los sources si aplica) o borrar en HubSpot.
+- **No** se permite `sync_direction='hubspot_only'` nuevo (se mantiene para legacy rows durante migration; post-cleanup se remueve el valor enum).
+
+---
+
+## 12. Migración y rollout (5 fases)
+
+### Fase A — Schema extension + materializer foundation
+
+- Migración DDL sobre `product_catalog` (columnas nuevas, constraints, indexes).
+- Tabla `product_sync_conflicts`.
+- Scaffolding del materializer `sourceToProductCatalog` (sin handlers aún).
+- Script de backfill de `source_kind`/`source_id` para rows actuales (heurística por `product_code` prefix).
+- Feature flag `GREENHOUSE_PRODUCT_CATALOG_UNIFIED` off.
+
+### Fase B — Source handlers + event homogenization
+
+- Auditoría de eventos emitidos por cada source catalog.
+- Normalizar contrato de eventos `commercial.{sellable_role,tool,overhead_addon,service}.{created,updated,deactivated}`.
+- Handlers por source + tests unitarios exhaustivos.
+- Activar materializer en domain `cost_intelligence`.
+- Rollout por source: primero roles, después tools, después overheads, después services (cada uno detrás de su sub-flag).
+
+### Fase C — Outbound proyección + Cloud Run endpoints
+
+- Cloud Run gana `POST /products`, `PATCH`, `archive`, `GET /reconcile`.
+- Custom properties HubSpot creadas via script.
+- Proyección `productHubSpotOutbound` registrada.
+- Anti-ping-pong guard.
+- Tests E2E: crear role → aparece en HubSpot en ≤2 min.
+
+### Fase D — Drift detection + Admin Center
+
+- Cron nocturno + reconciler logic.
+- Admin Center surface `/admin/commercial/product-sync-conflicts` con resolution UI.
+- Auto-heal para orphans_in_greenhouse y field_drift.
+- Alertas Slack ops.
+
+### Fase E — Policy enforcement + legacy cleanup
+
+- Deprecar inbound auto-adopt de HubSpot products (solo detection, no materialize).
+- Remover `sync_direction='hubspot_only'` como valor enum válido.
+- Cleanup de feature flags.
+- Runbook publicado + doc funcional.
+- TASK-474 (Quote Builder Catalog Reconnection) desbloqueada.
+
+---
+
+## 13. Eventos de outbox (extensión del catálogo)
+
+Nuevos eventos canónicos a añadir en `GREENHOUSE_EVENT_CATALOG_V1.md`:
+
+| Event | Domain | Emitido por |
+|---|---|---|
+| `commercial.product_catalog.created` | `cost_intelligence` | materializer + Admin manual |
+| `commercial.product_catalog.updated` | `cost_intelligence` | materializer |
+| `commercial.product_catalog.archived` | `cost_intelligence` | materializer + Admin manual |
+| `commercial.product_catalog.unarchived` | `cost_intelligence` | Admin manual |
+| `commercial.product_catalog.hubspot_synced_out` | `cost_intelligence` | `productHubSpotOutbound` |
+| `commercial.product_catalog.hubspot_sync_failed` | `cost_intelligence` | proyección error path |
+| `commercial.product_catalog.drift_detected` | `cost_intelligence` | reconciler cron |
+| `commercial.product_catalog.conflict_resolved` | `cost_intelligence` | Admin action |
+| `commercial.product_catalog.orphan_adopted` | `cost_intelligence` | Admin action |
+| `commercial.sellable_role.created/updated/deactivated` | `cost_intelligence` | sellable_roles store (nuevos si no existen) |
+| `commercial.tool.created/updated/deactivated` | `cost_intelligence` | tool_catalog store (nuevos si no existen) |
+| `commercial.overhead_addon.created/updated/deactivated` | `cost_intelligence` | overhead_addons store (nuevos si no existen) |
+| `commercial.service.created/updated/deactivated` | `cost_intelligence` | service_pricing store (validar existentes TASK-465) |
+
+---
+
+## 14. Dependencies & impact
+
+### 14.1 Depende de
+
+- `greenhouse_commercial.product_catalog` (existe, TASK-345)
+- `sellable_roles`, `tool_catalog`, `overhead_addons`, `service_pricing` (existen, TASK-464a/b/c/d, TASK-465)
+- `hubspot-greenhouse-integration` Cloud Run service
+- `quotationHubSpotOutbound` proyección (template, TASK-463 cerrada)
+- Outbox + reactive worker
+
+### 14.2 Impacta a
+
+- **TASK-474** (Quote Builder Catalog Reconnection) — desbloquea; post-TASK-534 este sync puede correr coherente
+- **TASK-466** (Multi-currency quote output) — sin cambio, ortogonal
+- **TASK-467** (Pricing Catalog Admin UI) — Admin Center gana surfaces para product_catalog + conflict resolution
+- **TASK-534** (Commercial Party Lifecycle) — complementario; juntos cierran quote-to-HubSpot end-to-end
+- **Kortex platform** — desbloquea el modelo unificado para clientes externos
+- **Reporting por product/role/tool** — habilita revenue attribution consistente
+
+### 14.3 Archivos que nacerán (para chequeo cruzado de tasks)
+
+- `migrations/YYYYMMDD_task-###-product-catalog-extension.sql`
+- `migrations/YYYYMMDD_task-###-product-sync-conflicts-table.sql`
+- `src/lib/sync/projections/source-to-product-catalog.ts`
+- `src/lib/sync/projections/product-hubspot-outbound.ts`
+- `src/lib/sync/handlers/sellable-role-to-product.ts`
+- `src/lib/sync/handlers/tool-to-product.ts`
+- `src/lib/sync/handlers/overhead-addon-to-product.ts`
+- `src/lib/sync/handlers/service-to-product.ts`
+- `src/lib/commercial/product-catalog-commands/`
+- `src/app/api/admin/commercial/product-sync-conflicts/**`
+- `services/hubspot-greenhouse-integration/routes/products.ts` (extensión)
+- `scripts/create-hubspot-product-custom-properties.ts`
+- `scripts/backfill-product-catalog-source.ts`
+- `src/app/(admin)/admin/commercial/product-sync/**`
+- `docs/operations/product-catalog-sync-runbook.md`
+- `docs/documentation/admin-center/product-catalog-sync.md`
+
+---
+
+## 15. Preguntas abiertas
+
+1. **Variants granularity (§4.4)**: ¿variants se crean on-demand solo si HubSpot los necesita, o siempre que existan tiers en el source? Decisión recomendada: on-demand via flag `export_variants` en el source row. Resolver en Fase B.
+2. **Inbound deprecation timing**: ¿cuándo apagar completamente el auto-create inbound? Propuesta: tras 4 semanas de Fase E en production sin issues. Resolver en Fase E.
+3. **Pricing snapshot vs live**: HubSpot acepta `price` como campo único por product. Si tenemos pricing efective-dated (TASK-421) con cambios programados, ¿pushamos solo el current o usamos HubSpot custom prop `gh_next_price_at`?
+4. **Multi-currency products en HubSpot**: HubSpot Enterprise soporta multi-currency pero requiere tier suficiente. Si no, ¿creamos 1 product por currency (ECG-xxx-USD, ECG-xxx-CLP) o dejamos `default_currency` y que el quote lo convierta?
+5. **Archive vs delete en HubSpot**: HubSpot permite delete si no hay line items referencian. ¿Policy conservadora (siempre archive) o pragmática (delete si es posible)? Recomendado: siempre archive.
+6. **Service composition complex products**: TASK-465 entregó `service_pricing` con recipes (role + tool). ¿Cómo se expone en HubSpot — un solo product "service" con description del recipe, o un bundle/kit? HubSpot soporta "product bundle" custom. Diferir a Fase B+.
+7. **Performance del materializer**: si un cambio masivo en pricing governance (ej. actualización de tier margins) dispara 500 eventos simultáneos → 500 product_catalog upserts → 500 HubSpot pushes = rate limit. ¿Implementar coalescing (de-duplicar eventos en ventana de 30s)? Recomendado: sí, patrón estándar.
+
+---
+
+## 16. Diagrama de flujo end-to-end
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│ AUTHORING LAYER                                                            │
+│                                                                            │
+│  sellable_roles  ──┐                                                       │
+│  tool_catalog    ──┤ emit events                                           │
+│  overhead_addons ──┼──────────────┐                                        │
+│  service_pricing ──┤              │                                        │
+│  manual products ──┘              │                                        │
+│                                   ▼                                        │
+│                         ┌───────────────────┐                              │
+│                         │ sourceToProduct   │  materializer reactivo       │
+│                         │   Catalog         │  (fase A/B)                  │
+│                         │   projection      │                              │
+│                         └────────┬──────────┘                              │
+│                                  │ upsert                                  │
+│                                  ▼                                         │
+│                         ┌───────────────────┐                              │
+│                         │  product_catalog  │  ← single outbound anchor    │
+│                         │   (canonical)     │                              │
+│                         └────────┬──────────┘                              │
+│                                  │ emit commercial.product_catalog.*       │
+└──────────────────────────────────┼─────────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────┼─────────────────────────────────────────┐
+│ DISTRIBUTION LAYER               │                                         │
+│                                  ▼                                         │
+│                         ┌───────────────────┐                              │
+│                         │ productHubSpot    │  proyección outbound         │
+│                         │   Outbound        │  (fase C)                    │
+│                         │   projection      │                              │
+│                         └────────┬──────────┘                              │
+│                                  │ POST/PATCH/archive                      │
+│                                  ▼                                         │
+│                         ┌───────────────────┐                              │
+│                         │ Cloud Run         │  hubspot-greenhouse-         │
+│                         │  /products        │    integration (extensión)   │
+│                         └────────┬──────────┘                              │
+│                                  │                                         │
+│                                  ▼                                         │
+│                         ┌───────────────────┐                              │
+│                         │ HubSpot Products  │  custom property             │
+│                         │                   │  gh_product_code (SKU canon) │
+│                         └────────┬──────────┘                              │
+│                                  │ used as line items                      │
+│                                  ▼                                         │
+│                         ┌───────────────────┐                              │
+│                         │ HubSpot Deals/    │                              │
+│                         │  Quotes line items│                              │
+│                         └───────────────────┘                              │
+│                                                                            │
+│                                                                            │
+│  ┌─────────────────────────────────────────────────────────────┐           │
+│  │ RECONCILER (fase D)                                         │           │
+│  │                                                             │           │
+│  │  nightly cron → GET /products/reconcile from HubSpot        │           │
+│  │  → cross-join with product_catalog                          │           │
+│  │  → insert into product_sync_conflicts                       │           │
+│  │  → auto-heal where safe; alert ops when manual required     │           │
+│  └─────────────────────────────────────────────────────────────┘           │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 17. Changelog
+
+- **v1.0 — 2026-04-20:** Spec inicial. Define el modelo de dos capas (autoría vs distribución), contratos de materializer reactivo desde 4 source catalogs hacia `product_catalog`, proyección outbound hacia HubSpot vía Cloud Run, drift detection, governance con Greenhouse como owner estricto, y plan de rollout por 5 fases (A-E). Complementa `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` para cerrar el loop quote-to-HubSpot end-to-end (quién + qué).
