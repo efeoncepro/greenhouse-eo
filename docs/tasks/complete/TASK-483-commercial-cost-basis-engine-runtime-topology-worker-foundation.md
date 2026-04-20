@@ -80,7 +80,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md`
 - `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md`
 - `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md`
-- `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
+- `docs/tasks/complete/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
 - `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md`
 - `docs/tasks/complete/TASK-254-operational-cron-durable-worker-migration.md`
 - `docs/tasks/complete/TASK-346-quotation-pricing-costing-margin-health-core.md`

@@ -32,9 +32,8 @@ La revisión contra codebase confirma que esta umbrella ya no debe seguir abiert
 - `TASK-479` cerró `member_actual` + `role_blended`
 - `TASK-483` cerró la topología runtime y el worker dedicado
 
-Con eso, `TASK-476` deja de ser una unidad ejecutable y pasa a ser closure/index del programa. Los follow-ons activos reales quedan reducidos a:
+Con eso, `TASK-476` deja de ser una unidad ejecutable y pasa a ser closure/index del programa. Tras el cierre posterior de `TASK-480`, los follow-ons activos reales quedan reducidos a:
 
-- `TASK-480` — bulk repricing + semantic cleanup del resolver
 - `TASK-481` — UX/gobernanza de suggested cost y override
 - `TASK-482` — phase 2 del feedback loop quoted-vs-actual
 
@@ -109,7 +108,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-477-role-cost-assumptions-catalog.md`
 - `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md`
 - `docs/tasks/complete/TASK-479-people-actual-cost-blended-role-snapshots.md`
-- `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
+- `docs/tasks/complete/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
 - `docs/tasks/to-do/TASK-481-quote-builder-suggested-cost-override-governance.md`
 - `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md`
 
@@ -177,6 +176,5 @@ Reglas obligatorias:
 ## Follow-ups
 
 - `TASK-452`
-- `TASK-480`
 - `TASK-481`
 - `TASK-482`

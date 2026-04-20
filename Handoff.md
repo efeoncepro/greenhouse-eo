@@ -1,5 +1,14 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — TASK-480 closure doc sync (Codex)
+
+- **Scope:** alinear la documentación de `TASK-480` con el estado real ya implementado en `develop`.
+- **Cambio documental:**
+  - `TASK-480` se movió a `docs/tasks/complete/`
+  - se actualizó el markdown de la task como closure doc con replay input, bulk repricing, taxonomía `tool_catalog_fallback` y downstream adoption ya cerrados
+  - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `TASK-476` y `TASK-483` quedaron sincronizados con la nueva ruta/estado
+- **Coordinación:** no se tocó el trabajo paralelo visible de `TASK-481`, `src/lib/sync/event-catalog.ts` ni `data/api_zapsign.txt`.
+
 ## Sesion 2026-04-20 — TASK-480 pricing replay context + bulk repricing (Codex)
 
 - **Scope:** cerrar el follow-on real de `TASK-480` sobre el codebase actual: replay input persistido, semántica final de provenance/fallback, worker batch de repricing y readers downstream sin recompute.
