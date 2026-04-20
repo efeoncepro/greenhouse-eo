@@ -49,8 +49,13 @@ export interface QuoteSummaryDockProps {
   /** Target tier range, usado para tooltip del margen. */
   marginTierRange?: MarginTierRange | null
 
-  /** Delta que los addons agregan al total, para preview en el chip. */
+  /** Delta de los addons sugeridos (aún no aplicados) al total. Preview para
+   *  decir "si los tildas todos, el total sube en +$X". */
   addonTotalDelta?: number | null
+
+  /** Suma de los addons ya aplicados como línea overhead_addon. Se muestra en
+   *  el chip como contexto cuantitativo cuando > 0. */
+  appliedAddonsTotal?: number | null
 
   /** Save state indicator en la parte izquierda del dock. */
   saveState?: { kind: SaveStateKind; changeCount?: number; lastSavedAt?: Date | null } | null
@@ -128,6 +133,7 @@ const QuoteSummaryDock = ({
   marginPct,
   marginTierRange,
   addonTotalDelta,
+  appliedAddonsTotal,
   saveState,
   simulationError,
   emptyStateMessage
@@ -177,7 +183,7 @@ const QuoteSummaryDock = ({
       ) : null}
 
       <Grid container columnSpacing={{ xs: 0, md: 3 }} rowSpacing={{ xs: 1.5, md: 0 }} alignItems='center'>
-        {/* ───────────── ZONA 1: Estado ───────────── */}
+        {/* ───────────── ZONA 1: Estado (md=3) ───────────── */}
         <Grid size={{ xs: 12, md: 3 }}>
           <Stack spacing={1} alignItems='flex-start'>
             {saveState ? (
@@ -197,8 +203,8 @@ const QuoteSummaryDock = ({
           </Stack>
         </Grid>
 
-        {/* ───────────── ZONA 2: Totals ladder ───────────── */}
-        <Grid size={{ xs: 12, md: 5 }}>
+        {/* ───────────── ZONA 2: Totals ladder (md=6) ───────────── */}
+        <Grid size={{ xs: 12, md: 6 }}>
           {emptyStateMessage ? (
             <Stack direction='row' spacing={1.5} alignItems='center' useFlexGap>
               <Box
@@ -223,8 +229,8 @@ const QuoteSummaryDock = ({
           )}
         </Grid>
 
-        {/* ───────────── ZONA 3: Acciones ───────────── */}
-        <Grid size={{ xs: 12, md: 4 }}>
+        {/* ───────────── ZONA 3: Acciones (md=3) ───────────── */}
+        <Grid size={{ xs: 12, md: 3 }}>
           <Stack
             direction='row'
             spacing={1.5}
@@ -281,10 +287,27 @@ const QuoteSummaryDock = ({
                   <Typography variant='caption' sx={{ fontWeight: 500 }}>
                     {GH_PRICING.summaryDock.addonsChip(addonCount)}
                   </Typography>
-                  {addonTotalDelta !== null && addonTotalDelta !== undefined && addonTotalDelta > 0 ? (
+                  {/* Monto aplicado: cuando hay addons ya tildados, se muestra
+                      su contribución al total como contexto cuantitativo. */}
+                  {appliedAddonsTotal !== null && appliedAddonsTotal !== undefined && appliedAddonsTotal > 0 ? (
                     <Typography
                       variant='caption'
                       sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', ml: 0.5 }}
+                    >
+                      · {formatMoney(appliedAddonsTotal, currency)}
+                    </Typography>
+                  ) : null}
+                  {/* Delta de sugerencias no aplicadas: preview de cuánto
+                      subiría el total si el comercial tildara las pendientes. */}
+                  {addonTotalDelta !== null && addonTotalDelta !== undefined && addonTotalDelta > 0 ? (
+                    <Typography
+                      variant='caption'
+                      sx={{
+                        fontWeight: 500,
+                        fontVariantNumeric: 'tabular-nums',
+                        ml: 0.5,
+                        color: 'text.secondary'
+                      }}
                     >
                       +{formatMoney(addonTotalDelta, currency)}
                     </Typography>
