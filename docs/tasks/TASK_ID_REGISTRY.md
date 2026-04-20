@@ -587,3 +587,13 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-531` | `to-do` | Income / Invoice Tax Convergence | `docs/tasks/to-do/TASK-531-income-invoice-tax-convergence.md` |
 | `TASK-532` | `to-do` | Purchase VAT Recoverability | `docs/tasks/to-do/TASK-532-purchase-vat-recoverability.md` |
 | `TASK-533` | `to-do` | Chile VAT Ledger & Monthly Position | `docs/tasks/to-do/TASK-533-chile-vat-ledger-monthly-position.md` |
+| `TASK-534` | `to-do` | Commercial Party Lifecycle & Quote-to-Cash Program (umbrella) | `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md` |
+| `TASK-535` | `to-do` | Party Lifecycle Schema & Commands Foundation (Fase A) | `docs/tasks/to-do/TASK-535-party-lifecycle-schema-commands-foundation.md` |
+| `TASK-536` | `to-do` | HubSpot Companies Inbound Prospect Sync (Fase B) | `docs/tasks/to-do/TASK-536-hubspot-companies-inbound-prospect-sync.md` |
+| `TASK-537` | `to-do` | Party Search & Adoption Endpoints (Fase C) | `docs/tasks/to-do/TASK-537-party-search-adoption-endpoints.md` |
+| `TASK-538` | `to-do` | Quote Builder Unified Party Selector (Fase D) | `docs/tasks/to-do/TASK-538-quote-builder-unified-party-selector.md` |
+| `TASK-539` | `to-do` | Inline Deal Creation from Quote Builder (Fase E) | `docs/tasks/to-do/TASK-539-inline-deal-creation-quote-builder.md` |
+| `TASK-540` | `to-do` | HubSpot Lifecycle Outbound Sync (Fase F) | `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md` |
+| `TASK-541` | `to-do` | Quote-to-Cash Atomic Choreography (Fase G) | `docs/tasks/to-do/TASK-541-quote-to-cash-atomic-choreography.md` |
+| `TASK-542` | `to-do` | Party Lifecycle Admin Dashboards (Fase H) | `docs/tasks/to-do/TASK-542-party-lifecycle-admin-dashboards.md` |
+| `TASK-543` | `to-do` | Party Lifecycle Deprecation & Flag Cleanup (Fase I) | `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md` |
