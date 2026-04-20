@@ -564,3 +564,16 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-508` | `complete` | Line row polish: chip consolidation + warning inline + density | `docs/tasks/complete/TASK-508-line-row-polish.md` |
 | `TASK-509` | `complete` | Floating UI en TotalsLadder (addons primitive self-contained) | `docs/tasks/complete/TASK-509-floating-ui-addons-primitive.md` |
 | `TASK-510` | `to-do` | Platform-wide Floating UI migration | `docs/tasks/to-do/TASK-510-floating-ui-platform-migration.md` |
+| `TASK-511` | `to-do` | Stack Modernization Roadmap (Linear/Stripe/Vercel 2026 bar) | `docs/tasks/to-do/TASK-511-stack-modernization-roadmap.md` |
+| `TASK-512` | `to-do` | react-toastify → sonner | `docs/tasks/to-do/TASK-512-toastify-to-sonner.md` |
+| `TASK-513` | `to-do` | @tanstack/react-query adoption (server state) | `docs/tasks/to-do/TASK-513-tanstack-react-query-adoption.md` |
+| `TASK-514` | `to-do` | ESLint 8 → 9 flat config migration | `docs/tasks/to-do/TASK-514-eslint-9-flat-config.md` |
+| `TASK-515` | `to-do` | jsonwebtoken → jose | `docs/tasks/to-do/TASK-515-jsonwebtoken-to-jose.md` |
+| `TASK-516` | `to-do` | NextAuth v4 → Auth.js v5 migration | `docs/tasks/to-do/TASK-516-nextauth-v4-to-authjs-v5.md` |
+| `TASK-517` | `to-do` | Playwright E2E smoke suite | `docs/tasks/to-do/TASK-517-playwright-e2e-smoke-suite.md` |
+| `TASK-518` | `to-do` | ApexCharts deprecation; consolidate on Recharts | `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md` |
+| `TASK-519` | `to-do` | react-datepicker → MUI X DatePicker | `docs/tasks/to-do/TASK-519-datepicker-to-mui-x.md` |
+| `TASK-520` | `to-do` | mapbox-gl → maplibre-gl | `docs/tasks/to-do/TASK-520-mapbox-to-maplibre.md` |
+| `TASK-521` | `to-do` | classnames → clsx + tailwind-merge | `docs/tasks/to-do/TASK-521-classnames-to-clsx-tailwind-merge.md` |
+| `TASK-522` | `to-do` | Install MSW (Mock Service Worker) for tests | `docs/tasks/to-do/TASK-522-msw-mock-layer.md` |
+| `TASK-523` | `to-do` | bcryptjs → @node-rs/argon2 (with re-hash policy) | `docs/tasks/to-do/TASK-523-bcryptjs-to-argon2.md` |

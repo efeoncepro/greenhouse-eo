@@ -22,7 +22,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-505`
+- siguiente ID disponible: `TASK-524`
 - `EPIC-001` 🆕 — Document Vault + Signature Orchestration Platform. Primer epic del repo. Reordena la estrategia documental para Greenhouse sobre assets privados + document registry + signature orchestration + gestor documental shared, con ZapSign como primer provider de firma. Child tasks oficiales: `TASK-489` a `TASK-495`. Spec: `../epics/to-do/EPIC-001-document-vault-signature-orchestration-platform.md`.
 - `TASK-495` — Commercial & Legal Document Chain Convergence. Reancla MSA/SOW/work orders a la nueva plataforma documental y de firma para que `TASK-461` no quede como un caso especial permanente. P1, Muy alto. Spec: `to-do/TASK-495-commercial-legal-document-chain-convergence.md`.
 - `TASK-494` — HR Document Vault Convergence. Absorbe funcionalmente `TASK-027` sobre la plataforma documental shared y habilita `/my/documents`, `/hr/documents` y People 360 sin storage paralelo. P1, Alto. Spec: `to-do/TASK-494-hr-document-vault-convergence.md`.
