@@ -566,9 +566,53 @@ export interface GreenhouseCommercialQuotationAuditLog {
   version_number: number | null;
 }
 
+export interface GreenhouseCommercialQuotationLineCostOverrideHistory {
+  category: string;
+  delta_pct: Numeric | null;
+  history_id: Generated<string>;
+  line_item_id: string;
+  metadata: Generated<Json>;
+  overridden_at: Generated<Timestamp>;
+  overridden_by_user_id: string | null;
+  override_breakdown: Json | null;
+  override_unit_cost_usd: Numeric;
+  quotation_id: string;
+  reason: string;
+  suggested_breakdown: Json | null;
+  suggested_unit_cost_usd: Numeric | null;
+}
+
 export interface GreenhouseCommercialQuotationLineItems {
   addon_id: string | null;
   cost_breakdown: Generated<Json>;
+  /**
+   * Timestamp of the override action. Null when the line has never been overridden.
+   */
+  cost_override_at: Timestamp | null;
+  /**
+   * User profile id of the actor who performed the override. Soft FK to greenhouse_core.identity_profiles.
+   */
+  cost_override_by_user_id: string | null;
+  /**
+   * Structured category for the override (competitive_pressure | strategic_investment | roi_correction | error_correction | client_negotiation | other) to enable analytics on override patterns.
+   */
+  cost_override_category: string | null;
+  /**
+   * Signed delta percentage between override_unit_cost and suggested_unit_cost at the moment of override. Positive = override above suggested.
+   */
+  cost_override_delta_pct: Numeric | null;
+  /**
+   * Required free-text justification for a manual cost override on this line. 15-500 chars (shorter if category is not other).
+   */
+  cost_override_reason: string | null;
+  /**
+   * Full snapshot of the suggested cost_breakdown JSONB (provenance, confidence, freshness) at the moment of override. Immutable for audit integrity.
+   */
+  cost_override_suggested_breakdown: Json | null;
+  /**
+   * Snapshot of the system-suggested unit cost (USD) at the moment of override. Immutable for audit integrity even if the source catalog changes.
+   */
+  cost_override_suggested_unit_cost_usd: Numeric | null;
   created_at: Generated<Timestamp>;
   currency: string | null;
   description: string | null;
@@ -5734,6 +5778,7 @@ export interface DB {
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
+  "greenhouse_commercial.quotation_line_cost_override_history": GreenhouseCommercialQuotationLineCostOverrideHistory;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;
   "greenhouse_commercial.quotation_renewal_reminders": GreenhouseCommercialQuotationRenewalReminders;
   "greenhouse_commercial.quotation_terms": GreenhouseCommercialQuotationTerms;

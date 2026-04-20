@@ -99,6 +99,7 @@ export const AGGREGATE_TYPES = {
   // Commercial Quotation (canonical, TASK-347 cutover)
   quotation: 'quotation',
   quotationLineItem: 'quotation_line_item',
+  quotationLineCostOverride: 'quotation_line_cost_override',
   commercialCapacity: 'commercial_capacity',
   contract: 'contract',
   contractQuote: 'contract_quote',
@@ -392,6 +393,9 @@ export const EVENT_TYPES = {
   // Unified Quote Builder HubSpot bidirectional outbound (TASK-463)
   quotationPushedToHubSpot: 'commercial.quotation.pushed_to_hubspot',
   quotationHubSpotSyncFailed: 'commercial.quotation.hubspot_sync_failed',
+
+  // Quote Builder Suggested Cost Override Governance (TASK-481)
+  quotationLineCostOverridden: 'commercial.quotation_line.cost_overridden',
 
   // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
