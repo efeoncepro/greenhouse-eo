@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — TASK-480 pricing replay context + bulk repricing (Codex)
+
+- **Scope:** cerrar el follow-on real de `TASK-480` sobre el codebase actual: replay input persistido, semántica final de provenance/fallback, worker batch de repricing y readers downstream sin recompute.
+- **Cambios principales:**
+  - migración `20260420131341856_task-480-quote-pricing-v2-replay-input.sql`
+  - `greenhouse_commercial.quotations.pricing_context`
+  - `greenhouse_commercial.quotation_line_items.pricing_input`
+  - `services/commercial-cost-worker/server.ts` ya activa `POST /quotes/reprice-bulk`
+  - helper nuevo `src/lib/commercial-cost-worker/quote-reprice-bulk.ts`
+  - `quotation-pricing-orchestrator.ts` ahora soporta `strictReplay`, reusa `pricing_input` y lanza `UnsupportedQuotationReplayError` cuando una quote no tiene contexto suficiente
+  - edit/read paths de quotes ya exponen e hidratan `pricingInput` + provenance persistida
+- **Decisiones importantes:**
+  - no se repricingean quotes legacy “a ciegas” en batch; se marcan `skipped`
+  - el fallback catalog-level de tools queda explícito como `tool_catalog_fallback`
+  - `schema-snapshot-baseline.sql` sigue stale para esta zona; la referencia operativa fue migraciones + `src/types/db.d.ts`
+- **Validación corrida:**
+  - `pnpm test -- src/lib/finance/pricing/__tests__/pricing-engine-v2.test.ts src/views/greenhouse/finance/workspace/__tests__/quote-builder-pricing.test.ts` ok
+  - `pnpm exec tsc --noEmit` ok
+  - `pnpm lint` ok
+  - `pnpm pg:connect:migrate` ok
+  - `pnpm build` ok
+- **Nota de entorno:** `pnpm build` sigue mostrando los warnings conocidos de `Dynamic server usage` por rutas que usan `headers`; el build termina exitosamente y no fue introducido por esta task.
+
 ## Sesion 2026-04-20 — TASK-452 service attribution foundation (Codex)
 
 - **Owner:** Codex

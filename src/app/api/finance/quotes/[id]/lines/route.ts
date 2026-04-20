@@ -23,6 +23,7 @@ import {
 import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
+import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 
 export const dynamic = 'force-dynamic'
 
@@ -127,8 +128,19 @@ export async function GET(
 
 interface ReplaceLinesPayload {
   lineItems: QuotationLineInput[]
+  pricingContext?: {
+    commercialModelCode?: string | null
+    countryFactorCode?: string | null
+    autoResolveAddons?: boolean | 'internal_only' | null
+  } | null
   createVersion?: boolean
 }
+
+const isPricingEngineCommercialModel = (value: unknown): value is CommercialModelCode =>
+  value === 'on_going' ||
+  value === 'on_demand' ||
+  value === 'hybrid' ||
+  value === 'license_consulting'
 
 export async function POST(
   request: Request,
@@ -224,6 +236,17 @@ export async function POST(
           row.global_discount_value != null ? Number(row.global_discount_value) : null,
         marginTargetPct: row.target_margin_pct != null ? Number(row.target_margin_pct) : null,
         marginFloorPct: row.margin_floor_pct != null ? Number(row.margin_floor_pct) : null,
+        pricingContext: body.pricingContext
+          ? {
+              commercialModelCode: isPricingEngineCommercialModel(
+                body.pricingContext.commercialModelCode
+              )
+                ? body.pricingContext.commercialModelCode
+                : null,
+              countryFactorCode: body.pricingContext.countryFactorCode ?? null,
+              autoResolveAddons: body.pricingContext.autoResolveAddons ?? 'internal_only'
+            }
+          : null,
         lineItems: body.lineItems,
         createdBy: tenant.userId
       },

@@ -2,10 +2,24 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-04-19
+> **Last updated:** 2026-04-20
 > **Audience:** Backend engineers, finance product owners, agents implementing finance features
 
 ---
+
+## Delta 2026-04-20 — TASK-480 cierra replay input + bulk repricing seguro
+
+- `TASK-480` deja explícito que provenance/confidence no basta por sí sola para repricing fiel: el canon ahora persiste también el contrato mínimo de replay del pricing engine v2.
+- Runtime nuevo en `greenhouse_commercial`:
+  - `quotations.pricing_context` guarda `commercialModelCode`, `countryFactorCode` y flags de replay del engine
+  - `quotation_line_items.pricing_input` guarda el `PricingLineInputV2` persistido por línea
+- Regla operativa:
+  - `commercial-cost-worker` ya no deja `POST /quotes/reprice-bulk` reservado; ahora ejecuta repricing batch tenant-scoped usando `strictReplay`
+  - quotes sin `pricing_context` o sin `pricing_input` suficiente no se repricingean a ciegas: quedan `skipped`
+  - el fallback catalog-level de tools deja de quedar implícito; el engine emite `tool_catalog_fallback` como `costBasisKind` explícito
+- Read-side:
+  - el edit path de quotations rehidrata `pricingInput`/metadata real en vez de deducirla solo desde columnas degradadas
+  - document chain y APIs de líneas ya exponen provenance persistida sin recomputar costo inline
 
 ## Delta 2026-04-20 — TASK-452 agrega la foundation reusable de attribution por servicio
 

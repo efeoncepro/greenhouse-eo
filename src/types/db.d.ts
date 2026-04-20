@@ -593,6 +593,10 @@ export interface GreenhouseCommercialQuotationLineItems {
   member_id: string | null;
   module_id: string | null;
   notes: string | null;
+  /**
+   * Persisted pricing-engine-v2 line input for faithful repricing/replay outside the interactive builder.
+   */
+  pricing_input: Json | null;
   product_id: string | null;
   quantity: Generated<Numeric>;
   quotation_id: string;
@@ -696,6 +700,10 @@ export interface GreenhouseCommercialQuotations {
    */
   organization_id: string | null;
   payment_terms_days: Generated<number>;
+  /**
+   * Replay context for pricing-engine-v2 (commercial model code, country factor and related controls).
+   */
+  pricing_context: Generated<Json>;
   pricing_model: Generated<string>;
   quotation_id: Generated<string>;
   quotation_number: string;

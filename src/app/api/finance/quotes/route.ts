@@ -35,6 +35,7 @@ import {
 import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
+import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 
 export const dynamic = 'force-dynamic'
 
@@ -201,8 +202,16 @@ interface CreateQuotationPayload {
   pricingModel?: 'staff_aug' | 'retainer' | 'project'
   commercialModel?: CommercialModel
   staffingModel?: StaffingModel
+  pricingEngineCommercialModel?: string | null
+  countryFactorCode?: string | null
   templateId?: string | null
 }
+
+const isPricingEngineCommercialModel = (value: unknown): value is CommercialModelCode =>
+  value === 'on_going' ||
+  value === 'on_demand' ||
+  value === 'hybrid' ||
+  value === 'license_consulting'
 
 const generateQuotationNumber = () => {
   const now = new Date()
@@ -522,6 +531,13 @@ export async function POST(request: Request) {
         globalDiscountValue: body.globalDiscountValue ?? null,
         marginTargetPct: body.targetMarginPct ?? null,
         marginFloorPct: body.marginFloorPct ?? null,
+        pricingContext: {
+          commercialModelCode: isPricingEngineCommercialModel(body.pricingEngineCommercialModel)
+            ? body.pricingEngineCommercialModel
+            : null,
+          countryFactorCode: body.countryFactorCode ?? null,
+          autoResolveAddons: 'internal_only'
+        },
         lineItems,
         createdBy
       },

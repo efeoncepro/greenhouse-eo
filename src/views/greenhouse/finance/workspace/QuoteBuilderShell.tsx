@@ -988,6 +988,8 @@ const QuoteBuilderShell = ({
             validUntil: builderState.validUntil,
             businessLineCode: builderState.businessLineCode,
             commercialModel: builderState.commercialModel,
+            pricingEngineCommercialModel: builderState.commercialModel,
+            countryFactorCode: builderState.countryFactorCode,
             contactIdentityProfileId,
             hubspotDealId,
             lineItems: persistedLineItems
@@ -1041,7 +1043,12 @@ const QuoteBuilderShell = ({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            lineItems: persistedLineItems
+            lineItems: persistedLineItems,
+            pricingContext: {
+              commercialModelCode: builderState.commercialModel,
+              countryFactorCode: builderState.countryFactorCode,
+              autoResolveAddons: 'internal_only'
+            }
           })
         })
 

@@ -1,5 +1,21 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-20 — TASK-480 formaliza replay input del pricing engine en quotations
+
+Tablas impactadas:
+- `greenhouse_commercial.quotations`
+- `greenhouse_commercial.quotation_line_items`
+
+Campos nuevos:
+- `greenhouse_commercial.quotations.pricing_context`
+- `greenhouse_commercial.quotation_line_items.pricing_input`
+
+Regla vigente:
+- `pricing_context` guarda el contexto mínimo de replay del engine (`commercialModelCode`, `countryFactorCode`, flags)
+- `pricing_input` guarda el `PricingLineInputV2` persistido por línea; no reemplaza `cost_breakdown`, lo complementa
+- `cost_breakdown` sigue siendo el snapshot de output/provenance; `pricing_input` es el input necesario para replay fiel
+- consumers batch como `commercial-cost-worker` deben usar estos campos antes de caer a paths legacy
+
 ## Delta 2026-04-19 — Delivery model split formalized on canonical quotations
 
 `TASK-459` desambiguó el antiguo `pricing_model` de quotation en dos ejes persistidos.

@@ -31,6 +31,7 @@ export interface PersistedQuoteLineItem {
   source: QuoteLineSource | null
   serviceSku: string | null
   metadata: QuoteLineItem['metadata'] | null
+  pricingInput: PricingLineInputV2 | null
   resolvedCostBreakdown: CostComponentBreakdown | null
   resolvedCostNotes: string[] | null
 }
@@ -255,6 +256,7 @@ export const buildPersistedQuoteLineItems = ({
       source: line.source ?? null,
       serviceSku: line.serviceSku ?? null,
       metadata: line.metadata ?? null,
+      pricingInput: expectedPricingLine,
       resolvedCostBreakdown:
         lineRequiresSuggestedPrice(line) && simulationLine
           ? buildResolvedCostBreakdown(simulationLine, currency)

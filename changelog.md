@@ -2,6 +2,13 @@
 
 ## 2026-04-20
 
+### 2026-04-20 — TASK-480 habilita bulk repricing seguro y replay fiel del pricing engine v2
+
+- `greenhouse_commercial.quotations` ahora persiste `pricing_context` y `quotation_line_items` persiste `pricing_input`, cerrando el hueco entre lo que el Quote Builder simula y lo que el runtime batch necesita para repricear sin adivinar.
+- `commercial-cost-worker` activa `POST /quotes/reprice-bulk` con tenant scope + run tracking en `source_sync_runs`; las quotes sin replay suficiente se reportan como `skipped` en vez de recalcularse a ciegas.
+- El pricing engine v2 explicita `tool_catalog_fallback` cuando una tool no tiene snapshot provider-level y cae al costo crudo del catálogo.
+- El edit path y los readers canónicos de cotizaciones ya rehidratan `pricingInput`/provenance persistida, y document chain expone un resumen de replay/provenance sin recomputar costo inline.
+
 ### 2026-04-20 — TASK-452 service attribution foundation
 
 - Nace la capa factual canónica `greenhouse_serving.service_attribution_facts` junto a `greenhouse_serving.service_attribution_unresolved`, para aterrizar revenue, direct cost y commercial labor/overhead por `service_id + period` con trazabilidad de source, method, confidence y evidencia.

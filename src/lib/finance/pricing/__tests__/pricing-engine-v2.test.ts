@@ -362,6 +362,104 @@ describe('buildPricingEngineOutputV2', () => {
     expect(result.lines[0]?.effectiveMarginPct).toBeCloseTo(0.1304, 4)
   })
 
+  it('marks tool catalog fallback explicitly when no provider snapshot exists', async () => {
+    const result = await buildPricingEngineOutputV2(
+      {
+        businessLineCode: 'wave',
+        commercialModel: 'on_demand',
+        countryFactorCode: 'international_usd',
+        outputCurrency: 'USD',
+        quoteDate: '2026-04-18',
+        lines: [
+          {
+            lineType: 'tool',
+            toolSku: 'EAI-OPENAI-001',
+            quantity: 1,
+            periods: 1
+          }
+        ]
+      },
+      {
+        getCommercialModelMultiplier: vi.fn().mockResolvedValue({
+          modelCode: 'on_demand',
+          modelLabel: 'On-Demand',
+          multiplierPct: 0.1,
+          description: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getCountryPricingFactor: vi.fn().mockResolvedValue({
+          factorCode: 'international_usd',
+          factorLabel: 'International',
+          factorMin: 0.85,
+          factorOpt: 1,
+          factorMax: 1,
+          appliesWhen: null,
+          effectiveFrom: '2026-04-18',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        resolvePricingOutputExchangeRate: vi.fn().mockResolvedValue(1),
+        resolvePricingOutputFxReadiness: vi.fn().mockResolvedValue({
+          fromCurrency: 'USD',
+          toCurrency: 'USD',
+          rateDate: '2026-04-18',
+          domain: 'pricing_output',
+          state: 'supported',
+          rate: 1,
+          rateDateResolved: '2026-04-18',
+          source: 'identity',
+          ageDays: 0,
+          stalenessThresholdDays: 7,
+          composedViaUsd: false,
+          message: 'USD baseline.'
+        }),
+        convertUsdToPricingCurrency: vi.fn().mockImplementation(({ amountUsd }) => Promise.resolve(amountUsd)),
+        convertCurrencyAmount: vi.fn().mockImplementation(({ amount }) => Promise.resolve(amount)),
+        getToolBySku: vi.fn().mockResolvedValue({
+          toolId: 'tool-openai-001',
+          toolSku: 'EAI-OPENAI-001',
+          toolName: 'OpenAI Platform',
+          providerId: 'provider-openai',
+          vendor: 'OpenAI',
+          toolCategory: 'ai_platform',
+          toolSubcategory: null,
+          costModel: 'hybrid',
+          subscriptionAmount: 30,
+          subscriptionCurrency: 'USD',
+          subscriptionBillingCycle: 'monthly',
+          subscriptionSeats: 1,
+          proratingQty: 1,
+          proratingUnit: 'seat',
+          proratedCostUsd: 30,
+          proratedPriceUsd: null,
+          applicableBusinessLines: ['wave'],
+          applicabilityTags: [],
+          includesInAddon: false,
+          notesForQuoting: null,
+          description: null,
+          websiteUrl: null,
+          iconUrl: null,
+          isActive: true,
+          sortOrder: 1,
+          createdAt: '2026-04-18T00:00:00.000Z',
+          updatedAt: '2026-04-18T00:00:00.000Z'
+        }),
+        getPreferredToolProviderCostBasisByToolSku: vi.fn().mockResolvedValue(null),
+        resolvePricingAddons: vi.fn().mockResolvedValue([]),
+        listOverheadAddons: vi.fn().mockResolvedValue([]),
+        getOverheadAddonBySku: vi.fn(),
+        getPreferredMemberActualCostBasis: vi.fn(),
+        getPreferredRoleBlendedCostBasisByRoleId: vi.fn(),
+        getSellableRoleBySku: vi.fn(),
+        listCompatibleEmploymentTypes: vi.fn(),
+        getPreferredRoleModeledCostBasisByRoleId: vi.fn(),
+        getCurrentPricing: vi.fn()
+      }
+    )
+
+    expect(result.lines[0]?.costStack.costBasisKind).toBe('tool_catalog_fallback')
+  })
+
   it('prefers role_blended snapshots before modeled role costs when blended evidence exists', async () => {
     const getPreferredRoleModeledCostBasisByRoleId = vi.fn().mockResolvedValue({
       snapshotId: 'EO-RMS-000002',

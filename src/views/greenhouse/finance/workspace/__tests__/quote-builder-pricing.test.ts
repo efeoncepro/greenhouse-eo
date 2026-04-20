@@ -71,6 +71,7 @@ describe('buildPersistedQuoteLineItems', () => {
     expect(items[0]?.unitPrice).toBe(1750000)
     expect(items[0]?.manualUnitCost).toBeDefined()
     expect(items[0]?.manualUnitCost).toBeGreaterThan(0)
+    expect(items[0]?.pricingInput).toEqual(roleSimulationLine().lineInput)
     expect(items[0]?.resolvedCostBreakdown?.snapshotSource).toBe('pricing_engine_v2')
   })
 

@@ -761,7 +761,7 @@ const resolveToolLine = async ({
           subscriptionAmount: tool.subscriptionAmount ?? 0,
           snapshotResolvedAmountClp: costBasisSnapshot?.resolvedAmountClp ?? 0
         },
-        costBasisKind: costBasisSnapshot ? 'tool_snapshot' : undefined,
+        costBasisKind: costBasisSnapshot ? 'tool_snapshot' : 'tool_catalog_fallback',
         costBasisSourceRef: costBasisSnapshot?.sourceRef ?? null,
         costBasisSnapshotDate: costBasisSnapshot?.snapshotDate ?? null,
         costBasisConfidenceScore: costBasisSnapshot?.confidenceScore ?? null,

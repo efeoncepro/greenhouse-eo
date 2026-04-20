@@ -23,10 +23,12 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
 import {
+  normalizeQuoteRepriceBulkRequest,
   normalizeCommercialCostBasisRequest,
-  runCommercialCostBasisMaterialization,
   type CommercialCostBasisScope
-} from '@/lib/commercial-cost-worker/materialize'
+} from '@/lib/commercial-cost-worker/contracts'
+import { runCommercialCostBasisMaterialization } from '@/lib/commercial-cost-worker/materialize'
+import { runQuoteRepriceBulk } from '@/lib/commercial-cost-worker/quote-reprice-bulk'
 
 import { checkAuthorization } from './auth'
 
@@ -129,6 +131,30 @@ const handleMaterialize = async (
   }
 }
 
+const handleQuoteRepriceBulk = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  try {
+    const normalizedRequest = normalizeQuoteRepriceBulkRequest(body)
+    const result = await runQuoteRepriceBulk(normalizedRequest)
+
+    json(res, 200, {
+      service: 'commercial-cost-worker',
+      timestamp: now(),
+      result
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[commercial-cost-worker] quote repricing failed:', message)
+
+    json(res, 502, {
+      error: message,
+      timestamp: now()
+    })
+  }
+}
+
 const server = createServer(async (req, res) => {
   const method = req.method || 'GET'
   const url = new URL(req.url || '/', 'http://localhost')
@@ -179,11 +205,7 @@ const server = createServer(async (req, res) => {
   if (pathname === '/quotes/reprice-bulk') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
 
-    return notImplemented(
-      res,
-      pathname,
-      'Reserved for quote repricing orchestration over the commercial cost basis engine.'
-    )
+    return handleQuoteRepriceBulk(req, res)
   }
 
   if (pathname === '/margin-feedback/materialize') {

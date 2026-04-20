@@ -11,8 +11,15 @@ La auditoría del repo mostró que el núcleo de esta task ya aterrizó:
 Por lo tanto, `TASK-480` deja de ser "introducir el resolver" y pasa a ser el follow-on que cierra los gaps restantes:
 
 1. habilitar `POST /quotes/reprice-bulk` en `commercial-cost-worker`
-2. normalizar semántica final de source kinds/fallbacks/manual override
-3. endurecer consumers downstream que todavía dependen de drift semántico o recalculan de más
+2. persistir replay input suficiente para que el bulk repricing pueda reconstruir líneas `pricing-v2` con fidelidad
+3. normalizar semántica final de source kinds/fallbacks/manual override
+4. endurecer consumers downstream que hoy no exponen la metadata persistida o recalculan de más
+
+Hallazgos que corrigen supuestos previos:
+
+- `docs/architecture/schema-snapshot-baseline.sql` no refleja todavía el DDL real de esta zona; la referencia operativa para `TASK-480` es `migrations/` + `src/types/db.d.ts`
+- `quotation_line_items` persiste `cost_breakdown`, pero no persiste todavía un payload suficiente para rehidratar todos los casos `pricing-v2` en replay batch
+- varios consumers downstream siguen sin exponer provenance/confidence aunque la metadata ya se guarda
 
 ## Status
 
@@ -44,8 +51,9 @@ Las foundations `TASK-477`, `TASK-478`, `TASK-479` y el pricing engine ya conver
 ## Goal
 
 - habilitar repricing bulk batch sobre el runtime dedicado
+- dejar persistido por línea el input mínimo que permita replay fiel de `pricing-v2`
 - dejar una semántica final y explícita de provenance/fallback/manual override
-- endurecer los consumers downstream para que no recalculen ni dependan de drift de naming
+- endurecer los consumers downstream para que lean la metadata persistida sin recomputar ni depender de drift de naming
 
 ## Architecture Alignment
 
@@ -99,8 +107,9 @@ Reglas obligatorias:
 ### Gap
 
 - `POST /quotes/reprice-bulk` sigue reservado
+- el schema persistido no guarda todavía un replay input suficiente para reconstruir todos los line types `pricing-v2` fuera del builder interactivo
 - no toda la semántica de fallback/sourceKind está cerrada y documentada de forma final
-- algunos consumers downstream todavía pueden rearmar o interpretar distinto la metadata ya persistida
+- algunos consumers downstream todavía no exponen ni leen de forma consistente la metadata ya persistida
 
 ## Scope
 
@@ -109,17 +118,25 @@ Reglas obligatorias:
 - Cerrar la taxonomía final de `costBasisKind` y de los casos fallback/manual.
 - Evitar drift entre lo que emite `pricing-engine-v2`, lo que persiste `quotation-pricing-orchestrator` y lo que lee UI/document chain.
 - Documentar explícitamente qué casos siguen siendo `manual`.
+- Hacer explícito el caso fallback de catálogo cuando no exista `tool_snapshot`.
 
-### Slice 2 — Bulk repricing runtime
+### Slice 2 — Replay input persistence
+
+- Persistir por línea el input mínimo que permita rehidratar `pricing-v2` en recálculos y replay batch.
+- Reusar el contrato ya armado por el builder antes de degradarlo al schema canónico.
+- Mantener compatibilidad con líneas legacy o manuales que no tengan replay input disponible.
+
+### Slice 3 — Bulk repricing runtime
 
 - Implementar `POST /quotes/reprice-bulk` en `commercial-cost-worker`.
 - Aceptar scope acotado por quote set / periodo / criterio de replay.
 - Registrar runs y resultados en el patrón del worker dedicado.
+- Saltar y reportar de forma explícita quotes legacy que todavía no tengan replay input suficiente.
 
-### Slice 3 — Downstream adoption hardening
+### Slice 4 — Downstream adoption hardening
 
-- Endurecer readers/consumers para que lean la metadata persistida sin recomputar.
-- Alinear document chain, replay y otras lecturas históricas al contrato final del resolver.
+- Endurecer readers/consumers para que lean y expongan la metadata persistida sin recomputar.
+- Alinear document chain, quote detail/read models y otras lecturas históricas al contrato final del resolver.
 
 ## Out of Scope
 
@@ -130,9 +147,11 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [ ] `POST /quotes/reprice-bulk` deja de responder `501` y corre en `commercial-cost-worker`
+- [ ] `quotation_line_items` persiste replay input suficiente para que el worker pueda reconstruir líneas `pricing-v2` sin depender del builder interactivo
 - [ ] La taxonomía final de `costBasisKind` queda cerrada y documentada sin drift entre engine/orchestrator/consumers
 - [ ] Override manual sigue soportado, pero como caso explícito y explicable
-- [ ] Document chain y consumers downstream leen la metadata persistida sin recalcular costo en runtime
+- [ ] Quotes sin replay input suficiente no se repricingean a ciegas: se reportan como `skipped` o equivalente
+- [ ] Document chain y consumers downstream leen o exponen la metadata persistida sin recalcular costo en runtime
 
 ## Verification
 
