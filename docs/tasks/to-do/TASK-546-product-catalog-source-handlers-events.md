@@ -252,3 +252,9 @@ async function upsertProductCatalogFromSource(tx, input: HandlerOutput) {
 - Variants on-demand (open question #1) — evaluar tras Fase C cuando haya feedback.
 - Coalescing de eventos masivos (open question #7) — agregar si aparece performance issue.
 - Service bundle HubSpot (open question #6) — diferir.
+
+## Delta 2026-04-20
+
+- **Runtime topology confirmada**: la proyeccion `sourceToProductCatalog` corre en `ops-worker` Cloud Run (mismo carril que el resto de reactive consumers de outbox en domain `cost_intelligence` y que `quotationHubSpotOutbound` TASK-463), NO en `commercial-cost-worker`.
+- Razon: `commercial-cost-worker` es domain-specific para cost basis materialization (bundles heavy sobre `src/lib/commercial-cost-worker/materialize.ts`) + endpoints reservados para bulk commercial computations (`quotes/reprice-bulk`, `margin-feedback/materialize`). Las proyecciones reactivas de sync y materializers de catalogo no son cost computations y no pertenecen ahi.
+- Consecuencia operativa: Discovery de esta task NO debe proponer montar el handler en `commercial-cost-worker`. Si el volumen justifica spin-off futuro de un `commercial-sync-worker` dedicado, abrir task nueva — no mezclar scope con el cost basis engine.

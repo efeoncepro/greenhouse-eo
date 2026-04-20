@@ -246,3 +246,12 @@ async function pushProductToHubSpot(product: ProductCatalogRow, ctx: PushContext
 
 - Coalescing si aparece performance issue (open question #7).
 - Variants para multi-currency si Enterprise tier no disponible.
+
+## Delta 2026-04-20
+
+- **Runtime topology confirmada** (tres servicios Cloud Run + Vercel, separacion explicita de concerns):
+  - `ops-worker` — ejecuta la proyeccion reactiva `productHubSpotOutbound` (mismo patron y domain `cost_intelligence` que `quotationHubSpotOutbound` TASK-463). Consume eventos `commercial.product_catalog.*` del outbox y dispara pushes.
+  - `hubspot-greenhouse-integration` — HTTP facade a HubSpot API: gana los endpoints nuevos `POST /products`, `PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile`. La proyeccion de `ops-worker` llama aqui.
+  - `commercial-cost-worker` — NO participa en este sync. Queda reservado para cost basis materialization y bulk commercial computations (endpoints reservados `quotes/reprice-bulk`, `margin-feedback/materialize`).
+- Razon de la separacion: reactive sync/projection (ops-worker) es proceso de datos; HTTP facade (integration) es adapter de API externa; cost basis (cost-worker) es computacion heavy de dominio. Mezclar scopes crea workers polymorphic y deploys de blast radius mayor.
+- Consecuencia operativa: Discovery de esta task debe verificar contratos de auth OIDC entre `ops-worker` y `hubspot-greenhouse-integration` (el outbound pasa por el HTTP facade, no llama HubSpot directo desde el worker).
