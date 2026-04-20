@@ -1090,16 +1090,6 @@ const QuoteBuilderShell = ({
     }
   }, [simulation?.lines])
 
-  // Delta preview del chip del dock: suma de los addons visibles SUGERIDOS
-  // (no incluidos aún como línea). Representa cuánto más podría cobrarse al
-  // cliente si el comercial decide tildarlos todos. Los ya tildados ya están
-  // reflejados en el subtotal/total de la cotización.
-  const addonTotalDelta = useMemo(() => {
-    if (addonSuggestions.length === 0) return null
-
-    return addonSuggestions.reduce((sum, a) => sum + (a.amountOutputCurrency ?? 0), 0)
-  }, [addonSuggestions])
-
   // Suma de los addons ya aplicados como línea overhead_addon. El chip del
   // dock muestra este monto para dar contexto cuantitativo: "1 addon ·
   // $44.316" cuando hay addons aplicados, en vez de solo "1 addon".
@@ -1328,7 +1318,6 @@ const QuoteBuilderShell = ({
           marginClassification={marginClass}
           marginPct={marginPct}
           marginTierRange={marginTierRange}
-          addonTotalDelta={addonTotalDelta}
           appliedAddonsTotal={appliedAddonsTotal}
           saveState={saveState}
           simulationError={dockSimulationError}

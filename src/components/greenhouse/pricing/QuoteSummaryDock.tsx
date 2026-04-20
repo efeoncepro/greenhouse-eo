@@ -3,7 +3,6 @@
 import { type MouseEvent as ReactMouseEvent, type ReactNode, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
-import Badge from '@mui/material/Badge'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -49,12 +48,8 @@ export interface QuoteSummaryDockProps {
   /** Target tier range, usado para tooltip del margen. */
   marginTierRange?: MarginTierRange | null
 
-  /** Delta de los addons sugeridos (aún no aplicados) al total. Preview para
-   *  decir "si los tildas todos, el total sube en +$X". */
-  addonTotalDelta?: number | null
-
   /** Suma de los addons ya aplicados como línea overhead_addon. Se muestra en
-   *  el chip como contexto cuantitativo cuando > 0. */
+   *  el segmento inline de la ladder como contexto cuantitativo cuando > 0. */
   appliedAddonsTotal?: number | null
 
   /** Save state indicator en la parte izquierda del dock. */
@@ -68,31 +63,6 @@ export interface QuoteSummaryDockProps {
    * (ej. sin ítems agregados). Si está presente, reemplaza el bloque de
    * totales por una leyenda informativa. */
   emptyStateMessage?: string | null
-}
-
-const CURRENCY_LOCALE: Record<PricingOutputCurrency, string> = {
-  CLP: 'es-CL',
-  USD: 'en-US',
-  CLF: 'es-CL',
-  COP: 'es-CO',
-  MXN: 'es-MX',
-  PEN: 'es-PE'
-}
-
-const formatMoney = (amount: number | null, currency: PricingOutputCurrency): string => {
-  if (amount === null || Number.isNaN(amount)) return '—'
-
-  const locale = CURRENCY_LOCALE[currency] ?? 'es-CL'
-
-  try {
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
-  } catch {
-    return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(amount)} ${currency}`
-  }
 }
 
 /**
@@ -132,7 +102,6 @@ const QuoteSummaryDock = ({
   marginClassification,
   marginPct,
   marginTierRange,
-  addonTotalDelta,
   appliedAddonsTotal,
   saveState,
   simulationError,
@@ -225,6 +194,16 @@ const QuoteSummaryDock = ({
               total={total}
               currency={currency}
               loading={loading}
+              addonsSegment={
+                addonContent && addonCount > 0
+                  ? {
+                      count: addonCount,
+                      amount: appliedAddonsTotal ?? 0,
+                      onClick: handleAddonsToggle,
+                      ariaExpanded: addonsOpen
+                    }
+                  : null
+              }
             />
           )}
         </Grid>
@@ -239,105 +218,6 @@ const QuoteSummaryDock = ({
             flexWrap='wrap'
             useFlexGap
           >
-            {addonContent && addonCount > 0 ? (
-              <>
-                <Box
-                  component='button'
-                  type='button'
-                  onClick={handleAddonsToggle}
-                  aria-expanded={addonsOpen}
-                  aria-haspopup='dialog'
-                  aria-label={GH_PRICING.summaryDock.addonsChip(addonCount)}
-                  sx={theme => ({
-                    appearance: 'none',
-                    border: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: alpha(theme.palette.primary.main, 0.06),
-                    color: theme.palette.primary.main,
-                    borderRadius: 999,
-                    px: 1.5,
-                    py: 0.75,
-                    minHeight: 36,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.75,
-                    cursor: 'pointer',
-                    transition: theme.transitions.create(['background-color', 'border-color'], {
-                      duration: 150,
-                      easing: 'cubic-bezier(0.2, 0, 0, 1)'
-                    }),
-                    '&:hover': {
-                      borderColor: theme.palette.primary.main,
-                      backgroundColor: alpha(theme.palette.primary.main, 0.1)
-                    },
-                    '&:focus-visible': {
-                      outline: `2px solid ${theme.palette.primary.main}`,
-                      outlineOffset: 2
-                    },
-                    '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
-                  })}
-                >
-                  <Badge
-                    badgeContent={addonCount}
-                    color='primary'
-                    invisible={addonCount === 0}
-                    sx={{ '& .MuiBadge-badge': { fontSize: 10, height: 16, minWidth: 16 } }}
-                  >
-                    <i className='tabler-sparkles' aria-hidden='true' style={{ fontSize: 16 }} />
-                  </Badge>
-                  <Typography variant='caption' sx={{ fontWeight: 500 }}>
-                    {GH_PRICING.summaryDock.addonsChip(addonCount)}
-                  </Typography>
-                  {/* Monto aplicado: cuando hay addons ya tildados, se muestra
-                      su contribución al total como contexto cuantitativo. */}
-                  {appliedAddonsTotal !== null && appliedAddonsTotal !== undefined && appliedAddonsTotal > 0 ? (
-                    <Typography
-                      variant='caption'
-                      sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', ml: 0.5 }}
-                    >
-                      · {formatMoney(appliedAddonsTotal, currency)}
-                    </Typography>
-                  ) : null}
-                  {/* Delta de sugerencias no aplicadas: preview de cuánto
-                      subiría el total si el comercial tildara las pendientes. */}
-                  {addonTotalDelta !== null && addonTotalDelta !== undefined && addonTotalDelta > 0 ? (
-                    <Typography
-                      variant='caption'
-                      sx={{
-                        fontWeight: 500,
-                        fontVariantNumeric: 'tabular-nums',
-                        ml: 0.5,
-                        color: 'text.secondary'
-                      }}
-                    >
-                      +{formatMoney(addonTotalDelta, currency)}
-                    </Typography>
-                  ) : null}
-                </Box>
-                <Popper
-                  open={addonsOpen}
-                  anchorEl={addonAnchor}
-                  placement='top-end'
-                  sx={{ zIndex: theme => theme.zIndex.modal + 1 }}
-                >
-                  <ClickAwayListener onClickAway={handleAddonsClose}>
-                    <Paper
-                      elevation={6}
-                      sx={theme => ({
-                        mb: 1,
-                        p: 2,
-                        width: 380,
-                        maxWidth: 'calc(100vw - 32px)',
-                        borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                        border: `1px solid ${theme.palette.divider}`
-                      })}
-                    >
-                      {addonContent}
-                    </Paper>
-                  </ClickAwayListener>
-                </Popper>
-              </>
-            ) : null}
-
             {secondaryCtaLabel && onSecondaryClick ? (
               <Button
                 variant='tonal'
@@ -370,6 +250,36 @@ const QuoteSummaryDock = ({
           </Stack>
         </Grid>
       </Grid>
+
+      {/*
+        Popper del panel de addons — vive como sibling del Grid para poder
+        anclarse al segmento inline de la ladder (zone 2). El anchor se
+        captura desde event.currentTarget al click, no via ref.
+      */}
+      {addonContent && addonCount > 0 ? (
+        <Popper
+          open={addonsOpen}
+          anchorEl={addonAnchor}
+          placement='top-start'
+          sx={{ zIndex: theme => theme.zIndex.modal + 1 }}
+        >
+          <ClickAwayListener onClickAway={handleAddonsClose}>
+            <Paper
+              elevation={6}
+              sx={theme => ({
+                mb: 1,
+                p: 2,
+                width: 380,
+                maxWidth: 'calc(100vw - 32px)',
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                border: `1px solid ${theme.palette.divider}`
+              })}
+            >
+              {addonContent}
+            </Paper>
+          </ClickAwayListener>
+        </Popper>
+      ) : null}
     </Box>
   )
 }
