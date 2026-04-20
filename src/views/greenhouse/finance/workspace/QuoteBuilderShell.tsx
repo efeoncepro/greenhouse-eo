@@ -1100,15 +1100,44 @@ const QuoteBuilderShell = ({
     return addonSuggestions.reduce((sum, a) => sum + (a.amountOutputCurrency ?? 0), 0)
   }, [addonSuggestions])
 
-  // Save state indicator: dirty si lines diff vs initial, clean cuando submitted
+  // Suma de los addons ya aplicados como línea overhead_addon. El chip del
+  // dock muestra este monto para dar contexto cuantitativo: "1 addon ·
+  // $44.316" cuando hay addons aplicados, en vez de solo "1 addon".
+  const appliedAddonsTotal = useMemo(() => {
+    const simLines = simulation?.lines ?? []
+    let total = 0
+    let hasApplied = false
+
+    linesSnapshot.forEach((line, idx) => {
+      if (line.metadata?.pricingV2LineType !== 'overhead_addon') return
+      hasApplied = true
+      const simLine = simLines[idx] ?? null
+
+      total += simLine?.suggestedBillRate?.totalBillOutputCurrency ?? 0
+    })
+
+    return hasApplied ? total : null
+  }, [linesSnapshot, simulation?.lines])
+
+  // Save state indicator: dirty si lines diff vs initial, clean cuando submitted.
+  // changeCount = diferencia en cantidad de líneas (mínimo confiable sin diff
+  // semántico deep); cuando es 0 pero sigue dirty (edit de campos existentes)
+  // cae a undefined y el SaveStateIndicator muestra solo "Sin guardar".
   const initialFingerprint = useMemo(() => JSON.stringify(initialLines), [initialLines])
   const currentFingerprint = useMemo(() => JSON.stringify(linesSnapshot), [linesSnapshot])
   const isDirty = initialFingerprint !== currentFingerprint
 
+  const changeCount = useMemo(() => {
+    if (!isDirty) return undefined
+    const delta = Math.abs(linesSnapshot.length - initialLines.length)
+
+    return delta > 0 ? delta : undefined
+  }, [isDirty, linesSnapshot.length, initialLines.length])
+
   const saveState: { kind: 'clean' | 'dirty' | 'saving' | 'saved'; changeCount?: number } | null = submitting
     ? { kind: 'saving' }
     : isDirty
-      ? { kind: 'dirty' }
+      ? { kind: 'dirty', changeCount }
       : mode === 'edit'
         ? { kind: 'clean' }
         : null
@@ -1296,13 +1325,11 @@ const QuoteBuilderShell = ({
           primaryCtaLoading={submitting}
           primaryCtaDisabled={issueActionDisabled}
           onPrimaryClick={() => handleSubmit({ issueAfterSave: true })}
-          secondaryCtaLabel={GH_PRICING.builderSaveAndClose}
-          secondaryCtaDisabled={saveDraftDisabled || !hasSubmittableContent || !organizationId}
-          onSecondaryClick={() => handleSubmit()}
           marginClassification={marginClass}
           marginPct={marginPct}
           marginTierRange={marginTierRange}
           addonTotalDelta={addonTotalDelta}
+          appliedAddonsTotal={appliedAddonsTotal}
           saveState={saveState}
           simulationError={dockSimulationError}
           emptyStateMessage={
