@@ -35,6 +35,8 @@ import type { TimelineProps } from '@mui/lab/Timeline'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import AuditDiffViewer from '@/components/greenhouse/pricing/AuditDiffViewer'
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 type EntityType =
@@ -481,24 +483,10 @@ const AuditLogTimelineView = () => {
                               </Typography>
                             </AccordionSummary>
                             <AccordionDetails sx={{ pt: 0 }}>
-                              <Box
-                                component='pre'
-                                sx={{
-                                  m: 0,
-                                  p: 2,
-                                  fontSize: '0.75rem',
-                                  fontFamily: 'monospace',
-                                  bgcolor: t =>
-                                    t.palette.mode === 'dark'
-                                      ? 'rgba(255,255,255,0.04)'
-                                      : 'rgba(0,0,0,0.03)',
-                                  borderRadius: 1,
-                                  overflow: 'auto',
-                                  maxHeight: 240
-                                }}
-                              >
-                                {JSON.stringify(entry.changeSummary, null, 2)}
-                              </Box>
+                              <AuditDiffViewer
+                                action={entry.action}
+                                changeSummary={entry.changeSummary}
+                              />
                             </AccordionDetails>
                           </Accordion>
                         )}
