@@ -2094,7 +2094,9 @@ export const GH_PRICING = {
       if (days < 30) return `hace ${days} días`
       if (days < 60) return 'hace más de un mes'
       const months = Math.floor(days / 30)
-      return `hace ${months} meses`
+
+      
+return `hace ${months} meses`
     },
 
     fallbackDisclaimerTitle: 'Costo de fallback en uso',
