@@ -36,7 +36,8 @@ El roadmap prioriza por **valor / esfuerzo / riesgo** — empezar con los wins r
 - @tanstack/react-table 8 ✓
 - cmdk 1.1 (command palette) ✓
 - kysely 0.28 ✓
-- framer-motion 12 ✓
+- framer-motion 12 ✓ (motion programático React — extendido por TASK-525/526/527 con View Transitions, auto-animate y Rive)
+- lottie-react 2.4 ✓ (animaciones ilustrativas unidireccionales)
 - date-fns 4 ✓
 - Tiptap 3.14 ✓
 - recharts 3.6 ✓
@@ -81,6 +82,16 @@ El roadmap prioriza por **valor / esfuerzo / riesgo** — empezar con los wins r
 | Task | Cambio | Por qué |
 |---|---|---|
 | **TASK-523** | `bcryptjs` → `@node-rs/argon2` | Argon2 es state-of-the-art. Requiere re-hash de passwords existentes al próximo login (política de transición). |
+
+### Ola 6 — Motion additions (foundation para UX enterprise 2026)
+
+Extensión posterior al audit; complementa framer-motion 12 + Lottie que ya están en el stack. **No reemplaza — adiciona.**
+
+| Task | Cambio | Por qué |
+|---|---|---|
+| **TASK-525** | Adoptar View Transitions API nativa en Next 16 | Zero bundle. Usado por Vercel, Astro, GitHub Issues, Next docs. Cierra el gap de transiciones de ruta sin librería. |
+| **TASK-526** | Instalar `@formkit/auto-animate` | 2 KB drop-in. Anima add/remove/reorder en listas mutables sin orchestration manual. Respeta reduced-motion nativo. |
+| **TASK-527** | Instalar Rive (`@rive-app/react-canvas`) | Next-gen Lottie para illustrations interactivas (state machines + archivos 10× más chicos). Lottie sigue para animaciones unidireccionales. |
 
 ## Dependencias entre olas
 
