@@ -561,3 +561,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-505` | `complete` | Quote Summary Dock v2 — Enterprise Hierarchy + Primitives | `docs/tasks/complete/TASK-505-quote-summary-dock-v2-hierarchy.md` |
 | `TASK-506` | `complete` | Quote Builder Dock: CTA simplification + addons chip amount | `docs/tasks/complete/TASK-506-dock-cta-simplification.md` |
 | `TASK-507` | `complete` | Addons inline en la TotalsLadder (zone 3 = CTA-only) | `docs/tasks/complete/TASK-507-addons-inline-ladder.md` |
+| `TASK-508` | `complete` | Line row polish: chip consolidation + warning inline + density | `docs/tasks/complete/TASK-508-line-row-polish.md` |
