@@ -1676,7 +1676,11 @@ export const GH_PRICING = {
   builderTemplateUsageMany: (n: number) => `Usado ${n} veces`,
   builderTemplateDefaultsLabel: 'Defaults',
   builderValidationDescription: 'Agrega una descripción breve del alcance.',
-  builderValidationOrganization: 'Selecciona un espacio para la cotización.',
+  builderValidationOrganization: 'Selecciona una organización para la cotización.',
+  builderValidationHubspotContact:
+    'Las cotizaciones sincronizadas con HubSpot requieren un contacto activo de esa organización.',
+  builderValidationHubspotDeal:
+    'Las cotizaciones sincronizadas con HubSpot requieren un deal vinculado.',
   builderValidationLines: 'Agrega al menos un ítem a la cotización.',
   builderSubmitErrorGeneric: 'No pudimos guardar la cotización. Intenta de nuevo.',
 
@@ -1927,6 +1931,15 @@ export const GH_PRICING = {
       loading: 'Cargando contactos…',
       empty: 'Sin contactos registrados en esta organización',
       primaryBadge: 'Principal'
+    },
+    deal: {
+      label: 'Deal HubSpot',
+      placeholder: 'Sin deal vinculado',
+      icon: 'tabler-briefcase-2',
+      hint: 'Vincula la cotización a una oportunidad de HubSpot. Requiere contacto comercial.',
+      noOrgFirst: 'Selecciona una organización primero',
+      loading: 'Cargando deals…',
+      empty: 'Sin deals disponibles para esta organización'
     },
     businessLine: {
       label: 'Business line',

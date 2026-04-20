@@ -5,6 +5,9 @@ import {
   type CommercialModel,
   type StaffingModel
 } from '@/lib/commercial/delivery-model'
+import { getCommercialDealByHubSpotId } from '@/lib/commercial/deals-store'
+import { validateHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
+import { publishQuotationUpdated } from '@/lib/commercial/quotation-events'
 import { query } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
@@ -185,6 +188,7 @@ interface UpdateQuotationPayload {
   quotationNumber?: string | null
   status?: string | null
   contactIdentityProfileId?: string | null
+  hubspotDealId?: string | null
   businessLineCode?: string | null
   currency?: string | null
   billingFrequency?: string | null
@@ -245,6 +249,31 @@ export async function PUT(
   const updates: string[] = []
   const values: unknown[] = [identity.quotationId]
   let idx = 1
+  const changedFields: string[] = []
+
+  const currentQuoteRows = await query<{
+    organization_id: string | null
+    contact_identity_profile_id: string | null
+    hubspot_deal_id: string | null
+    hubspot_quote_id: string | null
+    source_system: string | null
+    hubspot_company_id: string | null
+  }>(
+    `SELECT q.organization_id,
+            q.contact_identity_profile_id,
+            q.hubspot_deal_id,
+            q.hubspot_quote_id,
+            q.source_system,
+            org.hubspot_company_id
+       FROM greenhouse_commercial.quotations q
+       LEFT JOIN greenhouse_core.organizations org
+         ON org.organization_id = q.organization_id
+      WHERE q.quotation_id = $1
+      LIMIT 1`,
+    [identity.quotationId]
+  )
+
+  const currentQuote = currentQuoteRows[0]
 
   const push = (column: string, value: unknown, cast?: string) => {
     idx += 1
@@ -252,6 +281,7 @@ export async function PUT(
 
     updates.push(`${column} = ${ref}`)
     values.push(value)
+    changedFields.push(column)
   }
 
   if (body.quotationNumber !== undefined) push('quotation_number', body.quotationNumber)
@@ -291,15 +321,7 @@ export async function PUT(
         : null
 
     if (contactId !== null) {
-      const quoteOrgRows = await query<{ organization_id: string | null }>(
-        `SELECT organization_id
-           FROM greenhouse_commercial.quotations
-           WHERE quotation_id = $1
-           LIMIT 1`,
-        [identity.quotationId]
-      )
-
-      const quoteOrgId = quoteOrgRows[0]?.organization_id ?? null
+      const quoteOrgId = currentQuote?.organization_id ?? null
 
       if (!quoteOrgId) {
         return NextResponse.json(
@@ -336,6 +358,69 @@ export async function PUT(
     }
 
     push('contact_identity_profile_id', contactId)
+  }
+
+  if (body.hubspotDealId !== undefined) {
+    const hubspotDealId =
+      typeof body.hubspotDealId === 'string' && body.hubspotDealId.trim()
+        ? body.hubspotDealId.trim()
+        : null
+
+    if (hubspotDealId !== null) {
+      const quoteOrgId = currentQuote?.organization_id ?? null
+
+      if (!quoteOrgId) {
+        return NextResponse.json(
+          { error: 'Esta cotización no tiene organización; asigna una antes de vincular un deal de HubSpot.' },
+          { status: 400 }
+        )
+      }
+
+      const deal = await getCommercialDealByHubSpotId(hubspotDealId)
+
+      if (!deal) {
+        return NextResponse.json(
+          { error: `HubSpot deal ${hubspotDealId} no existe en el runtime comercial sincronizado.` },
+          { status: 404 }
+        )
+      }
+
+      if (deal.organizationId !== quoteOrgId) {
+        return NextResponse.json(
+          { error: 'El HubSpot deal seleccionado no pertenece a la organización de esta cotización.' },
+          { status: 400 }
+        )
+      }
+    }
+
+    push('hubspot_deal_id', hubspotDealId)
+  }
+
+  const nextContactIdentityProfileId =
+    body.contactIdentityProfileId !== undefined
+      ? typeof body.contactIdentityProfileId === 'string' && body.contactIdentityProfileId.trim()
+        ? body.contactIdentityProfileId.trim()
+        : null
+      : currentQuote?.contact_identity_profile_id ?? null
+
+  const nextHubspotDealId =
+    body.hubspotDealId !== undefined
+      ? typeof body.hubspotDealId === 'string' && body.hubspotDealId.trim()
+        ? body.hubspotDealId.trim()
+        : null
+      : currentQuote?.hubspot_deal_id ?? null
+
+  const hubspotContextError = validateHubSpotQuoteCommercialContext({
+    organizationId: currentQuote?.organization_id ?? null,
+    hubspotCompanyId: currentQuote?.hubspot_company_id ?? null,
+    contactIdentityProfileId: nextContactIdentityProfileId,
+    hubspotDealId: nextHubspotDealId,
+    sourceSystem: currentQuote?.source_system ?? null,
+    hubspotQuoteId: currentQuote?.hubspot_quote_id ?? null
+  })
+
+  if (hubspotContextError) {
+    return NextResponse.json({ error: hubspotContextError }, { status: 400 })
   }
 
   if (body.description !== undefined) push('description', body.description)
@@ -405,6 +490,47 @@ export async function PUT(
       createVersion: body.createVersion ?? false
     })
 
+    if (updates.length > 0) {
+      const quotationRows = await query<{
+        hubspot_quote_id: string | null
+        hubspot_deal_id: string | null
+        source_system: string | null
+        organization_id: string | null
+        pricing_model: string | null
+        commercial_model: string | null
+        staffing_model: string | null
+      }>(
+        `SELECT hubspot_quote_id,
+                hubspot_deal_id,
+                source_system,
+                organization_id,
+                pricing_model,
+                commercial_model,
+                staffing_model
+           FROM greenhouse_commercial.quotations
+          WHERE quotation_id = $1
+          LIMIT 1`,
+        [identity.quotationId]
+      )
+
+      const quotation = quotationRows[0]
+
+      await publishQuotationUpdated({
+        quotationId: identity.quotationId,
+        quoteId: identity.financeQuoteId ?? identity.quotationId,
+        hubspotQuoteId: quotation?.hubspot_quote_id ?? null,
+        hubspotDealId: quotation?.hubspot_deal_id ?? null,
+        sourceSystem: quotation?.source_system ?? null,
+        organizationId: quotation?.organization_id ?? null,
+        spaceId: null,
+        updatedBy: tenant.userId,
+        changedFields,
+        pricingModel: quotation?.pricing_model ?? null,
+        commercialModel: quotation?.commercial_model ?? null,
+        staffingModel: quotation?.staffing_model ?? null
+      })
+    }
+
     return NextResponse.json({
       quotationId: identity.quotationId,
       updated: true,
@@ -412,6 +538,47 @@ export async function PUT(
       revenue: snapshot.revenue,
       marginResolution: snapshot.marginResolution,
       health: snapshot.health
+    })
+  }
+
+  if (updates.length > 0) {
+    const quotationRows = await query<{
+      hubspot_quote_id: string | null
+      hubspot_deal_id: string | null
+      source_system: string | null
+      organization_id: string | null
+      pricing_model: string | null
+      commercial_model: string | null
+      staffing_model: string | null
+    }>(
+      `SELECT hubspot_quote_id,
+              hubspot_deal_id,
+              source_system,
+              organization_id,
+              pricing_model,
+              commercial_model,
+              staffing_model
+         FROM greenhouse_commercial.quotations
+        WHERE quotation_id = $1
+        LIMIT 1`,
+      [identity.quotationId]
+    )
+
+    const quotation = quotationRows[0]
+
+    await publishQuotationUpdated({
+      quotationId: identity.quotationId,
+      quoteId: identity.financeQuoteId ?? identity.quotationId,
+      hubspotQuoteId: quotation?.hubspot_quote_id ?? null,
+      hubspotDealId: quotation?.hubspot_deal_id ?? null,
+      sourceSystem: quotation?.source_system ?? null,
+      organizationId: quotation?.organization_id ?? null,
+      spaceId: null,
+      updatedBy: tenant.userId,
+      changedFields,
+      pricingModel: quotation?.pricing_model ?? null,
+      commercialModel: quotation?.commercial_model ?? null,
+      staffingModel: quotation?.staffing_model ?? null
     })
   }
 

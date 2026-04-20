@@ -42,6 +42,32 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.24
+
+**Canal:** Beta
+**Fecha:** 2026-04-20
+**Disponible para:** internal
+**Módulos:** Finanzas / Cotizaciones / HubSpot
+
+### Novedades
+
+- El cotizador ahora permite vincular una cotización a un **Deal HubSpot** específico desde el mismo builder cuando la organización ya tiene oportunidades comerciales cargadas.
+
+### Mejoras
+
+- Una cotización vinculada a un deal puede volver a sincronizar cambios de contexto y de líneas sin depender de recrearla ni de que “magicamente” se asocie por company.
+- La lista de deals disponibles se filtra por la organización elegida, así que el comercial ve solo oportunidades coherentes con ese cliente o prospecto.
+
+### Correcciones
+
+- Las cotizaciones creadas manualmente en Greenhouse ya no quedan huérfanas para HubSpot por falta de un anchor bidireccional.
+
+### Notas
+
+- Una cotización standalone puede seguir existiendo sin deal; simplemente no se sincroniza con HubSpot hasta quedar vinculada a una oportunidad.
+
+---
+
 ## 2026.04-beta.23
 
 **Canal:** Beta

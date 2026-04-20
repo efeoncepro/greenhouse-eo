@@ -18,6 +18,7 @@ import { toast } from 'react-toastify'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
+import { requiresHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
 import type {
   PricingEngineInputV2,
   PricingLineOutputV2,
@@ -72,9 +73,12 @@ export interface QuoteBuilderShellQuote {
   clientId: string | null
   organizationId: string | null
   contactIdentityProfileId?: string | null
+  hubspotDealId?: string | null
+  hubspotQuoteId?: string | null
   description: string | null
   currency: string
   status: string
+  source?: string | null
   businessLineCode?: string | null
   commercialModel?: CommercialModelCode | null
   countryFactorCode?: string | null
@@ -91,6 +95,7 @@ export interface QuoteBuilderShellSubmitPayload {
   templateId: string | null
   organizationId: string | null
   contactIdentityProfileId: string | null
+  hubspotDealId: string | null
   description: string
   pricingModel: QuoteBuilderPricingModel
   currency: PricingOutputCurrency
@@ -112,6 +117,16 @@ interface QuoteOrganizationContact {
   roleLabel: string | null
   membershipType: string
   isPrimary: boolean
+}
+
+interface QuoteOrganizationDeal {
+  hubspotDealId: string
+  dealName: string
+  dealstage: string
+  dealstageLabel: string | null
+  pipelineName: string | null
+  isClosed: boolean
+  isWon: boolean
 }
 
 export interface QuoteBuilderShellProps {
@@ -301,8 +316,12 @@ const QuoteBuilderShell = ({
     quote?.contactIdentityProfileId ?? null
   )
 
+  const [hubspotDealId, setHubspotDealId] = useState<string | null>(quote?.hubspotDealId ?? null)
+
   const [orgContacts, setOrgContacts] = useState<QuoteOrganizationContact[]>([])
   const [contactsLoading, setContactsLoading] = useState(false)
+  const [orgDeals, setOrgDeals] = useState<QuoteOrganizationDeal[]>([])
+  const [dealsLoading, setDealsLoading] = useState(false)
 
   const [pricingModel, setPricingModel] = useState<QuoteBuilderPricingModel>(
     coercePricingModel(quote?.pricingModel ?? null)
@@ -422,6 +441,50 @@ const QuoteBuilderShell = ({
         setOrgContacts([])
       } finally {
         setContactsLoading(false)
+      }
+    })()
+
+    return () => controller.abort()
+  }, [organizationId])
+
+  useEffect(() => {
+    if (!organizationId) {
+      setOrgDeals([])
+      setDealsLoading(false)
+
+      return
+    }
+
+    const controller = new AbortController()
+
+    setDealsLoading(true)
+
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/commercial/organizations/${organizationId}/deals`, {
+          signal: controller.signal
+        })
+
+        if (!res.ok) {
+          console.warn(`[QuoteBuilderShell] deals fetch failed: ${res.status}`)
+          setOrgDeals([])
+
+          return
+        }
+
+        const payload = (await res.json()) as { items?: QuoteOrganizationDeal[] }
+        const items = payload.items ?? []
+
+        setOrgDeals(items)
+        setHubspotDealId(current =>
+          current && items.some(item => item.hubspotDealId === current) ? current : null
+        )
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return
+        console.warn('[QuoteBuilderShell] deals fetch error', err)
+        setOrgDeals([])
+      } finally {
+        setDealsLoading(false)
       }
     })()
 
@@ -726,8 +789,54 @@ const QuoteBuilderShell = ({
       return GH_PRICING.builderValidationLines
     }
 
+    const requiresHubSpotContext = requiresHubSpotQuoteCommercialContext({
+      hubspotDealId,
+      hubspotQuoteId: quote?.hubspotQuoteId ?? null,
+      sourceSystem: quote?.source ?? null
+    })
+
+    if (requiresHubSpotContext && !contactIdentityProfileId) {
+      return GH_PRICING.builderValidationHubspotContact
+    }
+
+    if (requiresHubSpotContext && !hubspotDealId) {
+      return GH_PRICING.builderValidationHubspotDeal
+    }
+
     return null
-  }, [builderState.description, organizationId, selectedTemplateId, linesSnapshot])
+  }, [
+    builderState.description,
+    contactIdentityProfileId,
+    hubspotDealId,
+    linesSnapshot,
+    organizationId,
+    quote?.hubspotQuoteId,
+    quote?.source,
+    selectedTemplateId
+  ])
+
+  const invalidFields = useMemo(() => {
+    const requiresHubSpotContext = requiresHubSpotQuoteCommercialContext({
+      hubspotDealId,
+      hubspotQuoteId: quote?.hubspotQuoteId ?? null,
+      sourceSystem: quote?.source ?? null
+    })
+
+    return {
+      organizationId: !organizationId && !selectedTemplateId ? GH_PRICING.builderValidationOrganization : undefined,
+      contactIdentityProfileId:
+        requiresHubSpotContext && !contactIdentityProfileId ? GH_PRICING.builderValidationHubspotContact : undefined,
+      hubspotDealId:
+        requiresHubSpotContext && !hubspotDealId ? GH_PRICING.builderValidationHubspotDeal : undefined
+    }
+  }, [
+    contactIdentityProfileId,
+    hubspotDealId,
+    organizationId,
+    quote?.hubspotQuoteId,
+    quote?.source,
+    selectedTemplateId
+  ])
 
   const handleSubmit = useCallback(async ({ closeAfter = true, issueAfterSave = false }: QuoteBuilderSubmitOptions = {}) => {
     const validation = validate()
@@ -840,6 +949,7 @@ const QuoteBuilderShell = ({
           templateId: selectedTemplateId,
           organizationId,
           contactIdentityProfileId,
+          hubspotDealId,
           description: builderState.description.trim(),
           pricingModel,
           currency,
@@ -879,6 +989,7 @@ const QuoteBuilderShell = ({
             businessLineCode: builderState.businessLineCode,
             commercialModel: builderState.commercialModel,
             contactIdentityProfileId,
+            hubspotDealId,
             lineItems: persistedLineItems
           })
         })
@@ -915,7 +1026,8 @@ const QuoteBuilderShell = ({
             businessLineCode: builderState.businessLineCode,
             pricingModel,
             commercialModel: builderState.commercialModel,
-            contactIdentityProfileId
+            contactIdentityProfileId,
+            hubspotDealId
           })
         })
 
@@ -958,6 +1070,7 @@ const QuoteBuilderShell = ({
     selectedTemplateId,
     organizationId,
     contactIdentityProfileId,
+    hubspotDealId,
     builderState,
     pricingModel,
     currency,
@@ -1046,6 +1159,7 @@ const QuoteBuilderShell = ({
     () => ({
       organizationId,
       contactIdentityProfileId,
+      hubspotDealId,
       businessLineCode: builderState.businessLineCode,
       commercialModel: builderState.commercialModel,
       countryFactorCode: builderState.countryFactorCode,
@@ -1056,6 +1170,7 @@ const QuoteBuilderShell = ({
     [
       organizationId,
       contactIdentityProfileId,
+      hubspotDealId,
       builderState.businessLineCode,
       builderState.commercialModel,
       builderState.countryFactorCode,
@@ -1190,17 +1305,22 @@ const QuoteBuilderShell = ({
           organizations,
           contacts: orgContacts,
           contactsLoading,
+          deals: orgDeals,
+          dealsLoading,
           businessLines: builderOptions.businessLines,
           commercialModels: builderOptions.commercialModels,
           countryFactors: builderOptions.countryFactors
         }}
+        invalidFields={invalidFields}
         disabled={submitting}
         organizationLocked={mode === 'edit'}
         onOrganizationChange={nextId => {
           setOrganizationId(nextId)
           setContactIdentityProfileId(null)
+          setHubspotDealId(null)
         }}
         onContactChange={setContactIdentityProfileId}
+        onDealChange={setHubspotDealId}
         onBusinessLineChange={code => setBuilderState(prev => ({ ...prev, businessLineCode: code }))}
         onCommercialModelChange={code => setBuilderState(prev => ({ ...prev, commercialModel: code }))}
         onCountryFactorChange={code => setBuilderState(prev => ({ ...prev, countryFactorCode: code }))}

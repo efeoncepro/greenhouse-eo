@@ -74,6 +74,21 @@ export interface CommercialDealEntry {
   updatedAt: string
 }
 
+export interface CommercialDealListItem {
+  dealId: string
+  hubspotDealId: string
+  organizationId: string | null
+  dealName: string
+  dealstage: string
+  dealstageLabel: string | null
+  pipelineName: string | null
+  amountClp: number | null
+  currency: string
+  isClosed: boolean
+  isWon: boolean
+  updatedAt: string
+}
+
 export interface DealQuoteLinkEntry {
   quotationId: string
   financeQuoteId: string | null
@@ -572,6 +587,38 @@ export const getCommercialDealByHubSpotId = async (
     .executeTakeFirst()
 
   return row ? mapDeal(row) : null
+}
+
+export const listCommercialDealsForOrganization = async (
+  organizationId: string
+): Promise<CommercialDealListItem[]> => {
+  const rows = await query<DealRow>(
+    `SELECT *
+       FROM greenhouse_commercial.deals
+      WHERE organization_id = $1
+        AND is_deleted = FALSE
+      ORDER BY is_closed ASC, is_won DESC, updated_at DESC NULLS LAST, deal_name ASC`,
+    [organizationId]
+  )
+
+  return rows.map(row => {
+    const deal = mapDeal(row)
+
+    return {
+      dealId: deal.dealId,
+      hubspotDealId: deal.hubspotDealId,
+      organizationId: deal.organizationId,
+      dealName: deal.dealName,
+      dealstage: deal.dealstage,
+      dealstageLabel: deal.dealstageLabel,
+      pipelineName: deal.pipelineName,
+      amountClp: deal.amountClp,
+      currency: deal.currency,
+      isClosed: deal.isClosed,
+      isWon: deal.isWon,
+      updatedAt: deal.updatedAt
+    }
+  })
 }
 
 export const resolveDealForQuote = async (

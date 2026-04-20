@@ -1,5 +1,14 @@
 # changelog.md
 
+## 2026-04-20
+
+### 2026-04-20 — HubSpot quote sync deja de depender de quotes “huérfanas” sin deal
+
+- El Quote Builder y las APIs canónicas de create/edit ahora pueden persistir `hubspotDealId` validado contra la misma organización, en vez de dejar quotes manuales sin un anchor comercial real para HubSpot.
+- Nace `GET /api/commercial/organizations/[id]/deals` para poblar el selector de oportunidades en el builder con tenant isolation y prioridad a deals abiertos.
+- El outbox comercial suma `commercial.quotation.updated` y el outbound projection de HubSpot lo consume, de modo que editar header o líneas vuelve a empujar cambios a HubSpot sin depender solo de la emisión o de bridges legacy.
+- El write path canónico de `POST /api/finance/quotes` vuelve a publicar `commercial.quotation.created`, cerrando el hueco entre cotizaciones creadas desde Greenhouse y el pipeline reactivo downstream.
+
 ## 2026-04-19
 
 ### 2026-04-19 — Quote-to-cash invoice conversion reuses one transaction boundary

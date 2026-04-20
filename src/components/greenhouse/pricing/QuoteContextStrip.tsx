@@ -34,6 +34,15 @@ export interface QuoteContextBusinessLineOption {
   label: string
 }
 
+export interface QuoteContextDealOption {
+  hubspotDealId: string
+  dealName: string
+  dealstageLabel: string | null
+  pipelineName: string | null
+  isClosed: boolean
+  isWon: boolean
+}
+
 export interface QuoteContextCommercialModelOption {
   code: CommercialModelCode
   label: string
@@ -49,6 +58,7 @@ export interface QuoteContextCountryFactorOption {
 export interface QuoteContextStripValues {
   organizationId: string | null
   contactIdentityProfileId: string | null
+  hubspotDealId: string | null
   businessLineCode: string | null
   commercialModel: CommercialModelCode
   countryFactorCode: string
@@ -60,6 +70,7 @@ export interface QuoteContextStripValues {
 export interface QuoteContextStripHandlers {
   onOrganizationChange: (organizationId: string | null) => void
   onContactChange: (contactIdentityProfileId: string | null) => void
+  onDealChange: (hubspotDealId: string | null) => void
   onBusinessLineChange: (code: string | null) => void
   onCommercialModelChange: (code: CommercialModelCode) => void
   onCountryFactorChange: (code: string) => void
@@ -72,6 +83,8 @@ export interface QuoteContextStripOptions {
   organizations: QuoteContextOrganizationOption[]
   contacts: QuoteContextContactOption[]
   contactsLoading: boolean
+  deals: QuoteContextDealOption[]
+  dealsLoading: boolean
   businessLines: QuoteContextBusinessLineOption[]
   commercialModels: QuoteContextCommercialModelOption[]
   countryFactors: QuoteContextCountryFactorOption[]
@@ -117,6 +130,7 @@ const QuoteContextStrip = ({
   invalidFields = {},
   onOrganizationChange,
   onContactChange,
+  onDealChange,
   onBusinessLineChange,
   onCommercialModelChange,
   onCountryFactorChange,
@@ -150,6 +164,22 @@ const QuoteContextStrip = ({
         }
       }),
     [options.contacts]
+  )
+
+  const dealOptions = useMemo<ContextChipOption[]>(
+    () =>
+      options.deals.map(deal => ({
+        value: deal.hubspotDealId,
+        label: deal.dealName,
+        secondary: [
+          deal.dealstageLabel,
+          deal.pipelineName,
+          deal.isClosed ? (deal.isWon ? 'Cerrado ganado' : 'Cerrado') : 'Abierto'
+        ]
+          .filter(Boolean)
+          .join(' · ')
+      })),
+    [options.deals]
   )
 
   const businessLineOptions = useMemo<ContextChipOption[]>(
@@ -187,6 +217,11 @@ const QuoteContextStrip = ({
     [options.contacts, values.contactIdentityProfileId]
   )
 
+  const selectedDeal = useMemo(
+    () => options.deals.find(d => d.hubspotDealId === values.hubspotDealId) ?? null,
+    [options.deals, values.hubspotDealId]
+  )
+
   const selectedBusinessLine = useMemo(
     () => options.businessLines.find(bl => bl.code === values.businessLineCode) ?? null,
     [options.businessLines, values.businessLineCode]
@@ -204,6 +239,16 @@ const QuoteContextStrip = ({
 
   const contactValue = selectedContact
     ? `${selectedContact.fullName ?? selectedContact.canonicalEmail ?? selectedContact.identityProfileId}${selectedContact.isPrimary ? ' · ' + GH_PRICING.contextChips.contact.primaryBadge : ''}`
+    : null
+
+  const dealValue = selectedDeal
+    ? [
+        selectedDeal.dealName,
+        selectedDeal.dealstageLabel,
+        selectedDeal.isClosed ? (selectedDeal.isWon ? 'Cerrado ganado' : 'Cerrado') : null
+      ]
+        .filter(Boolean)
+        .join(' · ')
     : null
 
   const commercialModelValue = selectedCommercialModel
@@ -273,6 +318,7 @@ const QuoteContextStrip = ({
               : GH_PRICING.contextChips.contact.placeholder
           }
           disabled={disabled || !values.organizationId}
+          errorMessage={invalidFields.contactIdentityProfileId}
           options={contactOptions}
           selectedValue={values.contactIdentityProfileId}
           onSelectChange={onContactChange}
@@ -283,6 +329,31 @@ const QuoteContextStrip = ({
             !values.organizationId
               ? GH_PRICING.contextChips.contact.noOrgFirst
               : GH_PRICING.contextChips.contact.empty
+          }
+        />
+
+        {/* Deal HubSpot */}
+        <ContextChip
+          icon={GH_PRICING.contextChips.deal.icon}
+          label={GH_PRICING.contextChips.deal.label}
+          value={dealValue}
+          placeholder={
+            !values.organizationId
+              ? GH_PRICING.contextChips.deal.noOrgFirst
+              : GH_PRICING.contextChips.deal.placeholder
+          }
+          disabled={disabled || !values.organizationId}
+          errorMessage={invalidFields.hubspotDealId}
+          options={dealOptions}
+          selectedValue={values.hubspotDealId}
+          onSelectChange={onDealChange}
+          searchPlaceholder='Buscar deal…'
+          loading={options.dealsLoading}
+          loadingText={GH_PRICING.contextChips.deal.loading}
+          noOptionsText={
+            !values.organizationId
+              ? GH_PRICING.contextChips.deal.noOrgFirst
+              : GH_PRICING.contextChips.deal.empty
           }
         />
 

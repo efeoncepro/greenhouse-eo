@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { publishQuotationUpdated } from '@/lib/commercial/quotation-events'
 import { query } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
@@ -231,6 +232,45 @@ export async function POST(
         versionNotes: body.createVersion ? 'Line items replaced via API.' : null
       }
     )
+
+    const quotationRows = await query<{
+      hubspot_quote_id: string | null
+      hubspot_deal_id: string | null
+      source_system: string | null
+      organization_id: string | null
+      pricing_model: string | null
+      commercial_model: string | null
+      staffing_model: string | null
+    }>(
+      `SELECT hubspot_quote_id,
+              hubspot_deal_id,
+              source_system,
+              organization_id,
+              pricing_model,
+              commercial_model,
+              staffing_model
+         FROM greenhouse_commercial.quotations
+        WHERE quotation_id = $1
+        LIMIT 1`,
+      [identity.quotationId]
+    )
+
+    const quotation = quotationRows[0]
+
+    await publishQuotationUpdated({
+      quotationId: identity.quotationId,
+      quoteId: identity.financeQuoteId ?? identity.quotationId,
+      hubspotQuoteId: quotation?.hubspot_quote_id ?? null,
+      hubspotDealId: quotation?.hubspot_deal_id ?? null,
+      sourceSystem: quotation?.source_system ?? null,
+      organizationId: quotation?.organization_id ?? null,
+      spaceId: null,
+      updatedBy: tenant.userId,
+      changedFields: ['line_items'],
+      pricingModel: quotation?.pricing_model ?? null,
+      commercialModel: quotation?.commercial_model ?? null,
+      staffingModel: quotation?.staffing_model ?? null
+    })
 
     return NextResponse.json({
       quotationId: identity.quotationId,

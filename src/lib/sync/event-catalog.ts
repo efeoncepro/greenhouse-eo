@@ -338,6 +338,7 @@ export const EVENT_TYPES = {
   // Commercial Quotation (canonical, TASK-347)
   // Emitted alongside finance.quote.* during cutover so consumers can migrate gradually.
   quotationCreated: 'commercial.quotation.created',
+  quotationUpdated: 'commercial.quotation.updated',
   quotationSynced: 'commercial.quotation.synced',
   quotationConverted: 'commercial.quotation.converted',
   quotationLineItemsSynced: 'commercial.quotation.line_items_synced',

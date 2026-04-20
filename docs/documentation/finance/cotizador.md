@@ -1,15 +1,23 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.5
+> **Version:** 3.6
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
 > **Ultima actualizacion:** 2026-04-20 por Claude (v3.5 — TASK-507 addons inline en la ladder + TASK-508 line row polish: chip consolidation, warning inline, density)
+> **Ultima actualizacion:** 2026-04-20 por Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.6 (2026-04-20 — HubSpot quote sync hardening)
+
+- **Nuevo contexto comercial "Deal HubSpot"**: el rail derecho del builder ahora deja elegir la oportunidad comercial vinculada a la organización seleccionada. La lista se carga on-demand desde `/api/commercial/organizations/[id]/deals`, ordenada para privilegiar deals abiertos y respetando tenant isolation.
+- **El anchor de sync deja de ser implícito**: antes una quote manual podía nacer sin `hubspot_deal_id`, lo que dejaba la sincronización outbound sin destino real. Ahora create/edit persisten `hubspotDealId` cuando existe y validan que el deal pertenezca a la misma organización.
+- **Contacto obligatorio cuando la quote vive en HubSpot**: si una cotización ya está vinculada a HubSpot, o si el usuario la vincula a un deal, el builder y las APIs exigen también un contacto activo de esa organización. Company + contacto + deal quedan alineados como contexto comercial mínimo para una sync robusta.
+- **Las actualizaciones ya no dependen solo de emisión**: cambios en header y líneas publican `commercial.quotation.updated`, así que HubSpot puede re-sincronizar total, metadata y attachment cuando la quote ya existe.
 
 ## Cambios v3.5 (2026-04-20 — TASK-507 + TASK-508)
 
@@ -153,6 +161,7 @@ Bundle enfocado en cerrar las últimas fricciones del Quote Builder post-TASK-48
 - **Validación en el POST**: si no mandas `organizationId` al guardar, el endpoint devuelve 400 con "organizationId es obligatorio". Si mandas un `contactIdentityProfileId` que no tiene membership activa en esa organización, 400 con "El contacto no tiene membership activa en esa organización". Con esto el modelo canónico se respeta siempre, no por convención.
 - **`space_id` queda legacy**: columnas `space_id` y `space_resolution_source` se preservan en la base de datos para no romper lectores downstream de quote-to-cash (purchase orders, service entries, income materialization), pero el builder y el sync de HubSpot ya no las escriben. Se planifica una v2 que haga drop físico cuando todos los consumers migren.
 - **HubSpot sync más simple**: antes pedía que la company de HubSpot tuviera un Space mapeado para poder sincronizar. Ahora sólo pide que la company esté mapeada a una Organización. Si la org existe, la quote se sincroniza aunque no haya space.
+- **Deal HubSpot como ancla de sincronización**: además de la organización y el contacto, el builder puede guardar `hubspotDealId` sobre la quote. Eso resuelve el caso real en que la company existe pero la quote no sabe a qué oportunidad empujar updates, stages o attachments en HubSpot.
 - **Response del detail**: `GET /api/finance/quotes/[id]` ahora devuelve dos objetos nuevos en la respuesta — `organization` (con id, nombre y tipo: cliente/prospecto) y `contact` (con id, nombre, email, cargo). Consumers como el PDF, el email de envío y el approval workflow los pueden usar sin resolver la identidad por separado.
 
 ## Cambios v3.1 (2026-04-19 — hardening de persistencia y rehidratación)

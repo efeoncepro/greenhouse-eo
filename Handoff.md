@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — HubSpot quote sync hardening (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `fix/codex-hubspot-quote-sync`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-hubspot-quote-sync`
+- **Problema corregido:**
+  - las cotizaciones creadas manualmente desde Greenhouse podían existir sin `hubspot_deal_id`, por lo que el sync outbound no tenía anchor bidireccional real en HubSpot.
+  - `POST /api/finance/quotes` no publicaba `commercial.quotation.created`, y las ediciones de header/líneas tampoco emitían un evento canónico de update para re-sincronizar.
+  - el builder no ofrecía seleccionar deal HubSpot aunque la organización sí tuviera oportunidades comerciales activas.
+- **Solución aplicada:**
+  - nuevo endpoint tenant-safe `GET /api/commercial/organizations/[id]/deals` apoyado en `listCommercialDealsForOrganization`.
+  - `QuoteBuilderShell` + `QuoteContextStrip` agregan selector **Deal HubSpot** con fetch async por organización; create/edit envían `hubspotDealId`.
+  - `POST /api/finance/quotes` y `PUT /api/finance/quotes/[id]` validan que el deal exista y pertenezca a la misma organización antes de persistir `hubspot_deal_id`.
+  - el outbox comercial suma `commercial.quotation.updated`; el outbound de HubSpot ahora escucha ese evento y el write path canónico vuelve a publicar `commercial.quotation.created`.
+  - `POST /api/finance/quotes/[id]/lines` publica update después de persistir pricing para que cambios en line items re-sincronicen HubSpot.
+- **Tests / validación:**
+  - `pnpm exec vitest run src/lib/commercial/__tests__/quotation-events.test.ts src/lib/hubspot/__tests__/push-canonical-quote.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de coordinación:**
+  - fix hecho en worktree aislado para no colisionar con el checkout principal, que sigue con cambios paralelos de UI.
+  - diagnóstico confirmado en staging sobre `qt-d5c9a4b5-ba51-4267-a54b-ac721eb46a6c`: la quote estaba `source='manual'`, `hubspotQuoteId = null`, `hubspotDealId = null`; no era falla de HubSpot sino ausencia de anchor comercial desde Greenhouse.
+
 ## Sesion 2026-04-19 — Quote-to-cash conversion transaction convergence (Codex)
 
 - **Owner:** Codex

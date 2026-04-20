@@ -32,6 +32,18 @@ interface QuoteCreatedParams extends BaseQuoteContext, DeliveryModelContext {
   lineItemCount?: number | null
 }
 
+interface QuotationUpdatedParams extends DeliveryModelContext {
+  quotationId: string
+  quoteId?: string | null
+  hubspotQuoteId?: string | null
+  hubspotDealId?: string | null
+  sourceSystem?: string | null
+  organizationId?: string | null
+  spaceId?: string | null
+  updatedBy?: string | null
+  changedFields?: string[]
+}
+
 interface QuoteSyncedParams extends BaseQuoteContext, DeliveryModelContext {
   action: 'created' | 'updated' | 'skipped'
 }
@@ -122,6 +134,34 @@ export const publishQuoteCreated = async (
       client
     )
   }
+}
+
+export const publishQuotationUpdated = async (
+  params: QuotationUpdatedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationUpdated,
+      payload: {
+        quotationId: params.quotationId,
+        quoteId: params.quoteId ?? params.quotationId,
+        hubspotQuoteId: params.hubspotQuoteId ?? null,
+        hubspotDealId: params.hubspotDealId ?? null,
+        sourceSystem: params.sourceSystem ?? null,
+        organizationId: params.organizationId ?? null,
+        spaceId: params.spaceId ?? null,
+        updatedBy: params.updatedBy ?? null,
+        changedFields: params.changedFields ?? [],
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
+      }
+    },
+    client
+  )
 }
 
 export const publishQuoteSynced = async (
