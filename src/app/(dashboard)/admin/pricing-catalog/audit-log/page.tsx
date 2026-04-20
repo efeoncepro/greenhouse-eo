@@ -2,7 +2,10 @@ import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
 
-import { canAdministerPricingCatalog } from '@/lib/tenant/authorization'
+import {
+  canAdministerPricingCatalog,
+  canRevertPricingCatalogChange
+} from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 import AuditLogTimelineView from '@/views/greenhouse/admin/pricing-catalog/AuditLogTimelineView'
@@ -19,7 +22,7 @@ const Page = async () => {
   if (!tenant) redirect('/login')
   if (!canAdministerPricingCatalog(tenant)) redirect(tenant.portalHomePath)
 
-  return <AuditLogTimelineView />
+  return <AuditLogTimelineView canRevert={canRevertPricingCatalogChange(tenant)} />
 }
 
 export default Page

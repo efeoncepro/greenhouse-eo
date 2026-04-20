@@ -515,6 +515,9 @@ export interface GreenhouseCommercialOverheadAddons {
 }
 
 export interface GreenhouseCommercialPricingCatalogAuditLog {
+  /**
+   * Acción auditada. 12 valores: 9 operacionales (created, updated, deactivated, reactivated, cost_updated, pricing_updated, bulk_imported, recipe_updated, deleted) + 3 governance (reverted, approval_applied, bulk_edited) agregados en TASK-471.
+   */
   action: string;
   actor_name: string;
   actor_user_id: string;
