@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — TASK-452 service attribution foundation (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `task/TASK-452-service-attribution-foundation`
+- **Implementación ya aterrizada:**
+  - migración `20260420123025804_task-452-service-attribution-foundation.sql`
+  - migración correctiva `20260420124700528_task-452-service-attribution-foundation-repair.sql` para reparar el caso donde el SQL inicial quedó registrado en `pgmigrations` sin ejecutar el DDL por un encabezado `Up/Down` duplicado
+  - tablas `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`
+  - helper/materializer `src/lib/service-attribution/materialize.ts`
+  - tests `src/lib/service-attribution/materialize.test.ts`
+  - projection reactiva `src/lib/sync/projections/service-attribution.ts`
+  - wiring en `src/lib/sync/projections/index.ts` y catálogo de eventos
+- **Contrato operativo resuelto:**
+  - attribution por servicio usa anchors fuertes (`quotation`, `contract`, `purchase_order`, `service_entry_sheet`, `hubspot_deal`) antes de caer a `service_line`
+  - `commercial_cost_attribution` no cambia de grain; labor/overhead por servicio se deriva downstream
+  - los casos ambiguos persisten en unresolved; no se fuerzan en runtime
+- **Validación corrida hasta ahora:**
+  - `pnpm exec vitest run src/lib/service-attribution/materialize.test.ts`
+  - `pnpm exec eslint src/lib/service-attribution/materialize.ts src/lib/service-attribution/materialize.test.ts src/lib/sync/projections/service-attribution.ts src/lib/sync/projections/index.ts src/lib/sync/event-catalog.ts`
+  - `pnpm exec tsc --noEmit`
+  - `pnpm pg:connect:migrate` (ok; regeneró `src/types/db.d.ts`)
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de cierre:**
+  - `pnpm build` cerró `exit 0`; durante el build aparecieron logs conocidos de `Dynamic server usage` por rutas que usan `headers`, pero no bloquearon la compilación ni nacen de este corte
+  - `src/types/db.d.ts` ya incluye ambas tablas nuevas de `greenhouse_serving`
+
 ## Sesion 2026-04-20 — Backlog alignment TASK-452/466/471/476/480/481/482/485 (Codex)
 
 - **Owner:** Codex

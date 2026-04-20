@@ -193,6 +193,21 @@
 
 # project_context.md
 
+## Delta 2026-04-20 TASK-452 formaliza la foundation canónica de service attribution
+
+- Greenhouse ya no debe tratar el P&L por servicio como inferencia oportunista desde readers de Space, quotes o commercial cost.
+- Runtime nuevo:
+  - migración `20260420123025804_task-452-service-attribution-foundation.sql`
+  - tablas `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`
+  - helper `src/lib/service-attribution/materialize.ts`
+  - projection reactiva `src/lib/sync/projections/service-attribution.ts`
+  - evento `accounting.service_attribution.period_materialized`
+- Contrato operativo:
+  - revenue/direct cost/labor-overhead por servicio se resuelven `evidence-first` desde quotation / contract / PO / HES / deal cuando existe anchor suficiente
+  - `commercial_cost_attribution` sigue siendo truth layer `member + client + period`; el split a `service_id` ocurre downstream y deja `method`, `confidence` y `evidence_json`
+  - los casos ambiguos no se fuerzan; quedan en `service_attribution_unresolved`
+  - `TASK-146`, `TASK-147` y profitability per service ya tienen foundation factual, pero la UI client-facing aún no debe fabricar `service_economics` mientras no exista el read model derivado
+
 ## Delta 2026-04-19 TASK-483 crea runtime dedicado para commercial cost basis
 
 - Greenhouse ya no debe tratar `ops-worker` como destino por defecto de toda materializacion financiera/comercial pesada.

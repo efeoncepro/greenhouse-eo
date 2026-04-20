@@ -151,6 +151,17 @@ Regla:
 - `client_labor_cost_allocation` sigue existiendo, pero pasa a ser bridge/input interno
 - la capa consumible por Finance y Cost Intelligence ya es `commercial_cost_attribution`
 
+## Delta 2026-04-20 — TASK-452 consume commercial cost attribution downstream sin cambiar su grain canónico
+
+- `commercial_cost_attribution` sigue siendo la truth layer comercial por `member + client + period`.
+- Regla nueva:
+  - `service_attribution_facts` puede consumir esta capa como input para labor/overhead atribuible por servicio
+  - ese consumer downstream no reescribe ni ensancha el grain canónico de `commercial_cost_attribution`
+  - cualquier split a `service_id` debe quedar auditable con `method`, `confidence` y evidencia explícita en la tabla downstream
+- Consecuencia:
+  - `commercial_cost_attribution` sigue siendo reusable para Finance base, Person Finance, Cost Intelligence y explain comercial
+  - el P&L por servicio futuro se apoya en un layer derivado adicional, no en mutar esta truth layer
+
 ## Delta 2026-04-02 — persisted organization context
 
 `TASK-192` deja explícita la compatibilidad org-first en la serving table:
@@ -191,6 +202,10 @@ La política correcta es:
 - Agency / economics por space
   - debe seguir leyendo `operational_pl_snapshots`
   - no debe saltarse la capa a `commercial_cost_attribution` salvo para surfaces de auditoría futura
+- Service attribution foundation
+  - debe consumir `commercial_cost_attribution` para labor/overhead
+  - no debe reinterpretar esta tabla como si ya estuviera keyed por `service_id`
+  - debe persistir unresolved cuando el split por servicio no sea auditable
 - Organization 360
   - economics resumida puede seguir sobre `operational_pl_snapshots`
   - fallbacks on-read deben quedar alineados al reader shared, no al bridge histórico

@@ -8,6 +8,20 @@ Revisión contra el repo al 2026-04-20:
 - `quotation_profitability_snapshots` y `contract_profitability_snapshots` ya consumen costo atribuido agregado, pero todavía no pueden explicar desvío o rentabilidad a grain servicio sin esta foundation.
 - Esta task **sigue vigente sin recorte de scope**. No debe cerrarse por la mera existencia de snapshots comerciales o profitability readers posteriores.
 
+## Delta 2026-04-20 — Corrección de supuestos upstream y tenancy
+
+Validación adicional contra schema/migrations/runtime:
+
+- `space_id` sigue siendo obligatorio como contexto operativo del fact nuevo, pero ya no puede tratarse como el único anchor canónico upstream del lane comercial/finance. El repo actual tiene carriles `organization-first` y documentos financieros/comerciales relevantes sin `space_id` directo.
+- Los bridges fuertes a priorizar ya no son solo `service_line`, `client_id`, `space_id` y `hubspot_deal_id`. El runtime actual también ofrece anchors más robustos que esta spec debe considerar explícitamente:
+  - `contract_id`
+  - `quotation_id`
+  - `source_hes_id`
+  - `purchase_order_id`
+  - `hubspot_deal_id`
+- `service_line` sigue siendo evidencia blanda; no puede promoverse a identidad ni a matching automático cuando compite más de un `service_id` dentro del mismo `space_id` o `organization_id`.
+- No existe hoy una tabla/queue persistida para `unresolved service attribution`; esta task debe definirla o dejar un storage explícito equivalente dentro del mismo contrato.
+
 ## Metadata
 - **Task ID:** TASK-452
 - **Type:** implementation
@@ -17,7 +31,7 @@ Revisión contra el repo al 2026-04-20:
 - **Status:** to-do
 - **Area:** data
 - **Repos:** starter-kit
-- **Dependencies:** greenhouse_core.services, greenhouse_finance.income, greenhouse_finance.expenses, greenhouse_finance.cost_allocations, greenhouse_serving.commercial_cost_attribution, greenhouse_serving.operational_pl_snapshots, src/lib/cost-intelligence/compute-operational-pl.ts, src/lib/sync/projections/operational-pl.ts
+- **Dependencies:** greenhouse_core.services, greenhouse_finance.income, greenhouse_finance.expenses, greenhouse_finance.cost_allocations, greenhouse_finance.purchase_orders, greenhouse_finance.service_entry_sheets, greenhouse_commercial.quotations, greenhouse_commercial.contracts, greenhouse_serving.commercial_cost_attribution, greenhouse_serving.operational_pl_snapshots, src/lib/cost-intelligence/compute-operational-pl.ts, src/lib/sync/projections/operational-pl.ts
 - **Blocks:** TASK-146, TASK-147, TASK-351
 - **Branch Name:** task/TASK-452-service-attribution-foundation
 - **Effort:** Alto
@@ -35,7 +49,7 @@ El audit de `TASK-146` confirmó que el runtime actual solo materializa economic
 - con que evidencia y nivel de confianza se hizo esa asignacion;
 - que filas quedan sin resolver y requieren remediacion.
 
-Aunque existen señales parciales (`service_line`, `hubspot_deal_id`, `client_id`, `space_id`, `commercial_cost_attribution`, `services.total_cost`, `services.amount_paid`), ninguna de ellas es hoy un `service_id` canonico y auditable de punta a punta. Implementar `service_economics` encima del estado actual fabricaria margen por servicio a partir de joins ambiguos.
+Aunque existen señales parciales (`service_line`, `hubspot_deal_id`, `client_id`, `space_id`, `commercial_cost_attribution`, `services.total_cost`, `services.amount_paid`), ninguna de ellas es hoy un `service_id` canonico y auditable de punta a punta. Ademas, el runtime actual ya expone anchors mejores que esta spec original no explicitaba (`contract_id`, `quotation_id`, `source_hes_id`, `purchase_order_id`). Implementar `service_economics` encima del estado actual fabricaria margen por servicio a partir de joins ambiguos.
 
 Esta task crea la fundacion para que `TASK-146` pueda construir `greenhouse_serving.service_economics` sobre hechos confiables, idempotentes y tenant-safe.
 
@@ -50,7 +64,7 @@ Al cerrar esta task, el sistema debe poder responder de forma trazable y reprodu
 
 ## Scope
 ### In scope
-- Diseñar el contrato canonico de atribucion por servicio con `space_id` como aislamiento de tenant.
+- Diseñar el contrato canonico de atribucion por servicio con `space_id` como aislamiento de tenant y `organization_id` como contexto complementario cuando el upstream ya opere en carril org-first.
 - Crear el storage y/o projection fact table donde vivan las atribuciones por servicio y periodo.
 - Implementar resolvers que intenten ligar fuentes financieras/comerciales a `service_id` con evidencia auditable.
 - Persistir `source_domain`, `source_type`, `source_id`, `amount_kind`, `amount`, `attribution_method`, `confidence` y metadata de evidencia.
@@ -83,7 +97,7 @@ Planos afectados:
 - **Entitlements / capabilities:** ninguno nuevo salvo que se agregue una surface minima de remediacion manual en una task posterior.
 
 ## Constraints
-- Toda query y toda fila persistida debe conservar `space_id`.
+- Toda fila persistida debe conservar `space_id`. Cuando la fuente upstream no lo traiga directo, el resolver debe derivarlo desde el bridge canónico más fuerte disponible y marcar `unresolved` si no logra resolverlo sin ambigüedad.
 - `service_id` es el ancla canonica. `service_line` puede ser evidencia, nunca identidad suficiente por si sola cuando existe ambiguedad.
 - No calcular rentabilidad final en UI.
 - Reutilizar `getDb`, `query`, `withTransaction`; nunca crear `new Pool()`.
@@ -91,6 +105,7 @@ Planos afectados:
 - Mantener domain-per-schema; evitar tablas nuevas fuera del schema correcto.
 - Las materializaciones deben ser idempotentes y re-ejecutables por periodo.
 - Los casos ambiguos deben quedar marcados como `unresolved` o equivalente; no asignarlos arbitrariamente.
+- La prioridad de matching debe reconocer los anchors documentales/comerciales ya presentes en runtime (`contract_id`, `quotation_id`, `source_hes_id`, `purchase_order_id`, `hubspot_deal_id`) antes de caer a señales blandas.
 
 ## Proposed Deliverables
 1. Migracion para tabla(s) de atribucion por servicio y sus indices.
@@ -114,9 +129,9 @@ Planos afectados:
 - Evaluar si la tabla vive mejor en `greenhouse_serving` como fact table transversal o en otro schema del dominio economico, pero dejar una decision explicita y justificada.
 - Priorizar joins canonicos fuertes en este orden, segun disponibilidad real:
   1. `service_id` directo;
-  2. puentes documentales canonicos ya implementados;
+  2. puentes documentales canonicos ya implementados (`contract_id`, `quotation_id`, `source_hes_id`, `purchase_order_id`);
   3. `hubspot_deal_id` o referencias comerciales equivalentes;
-  4. señales blandas (`service_line`, labels) solo cuando el match sea univoco dentro de `space_id`.
+  4. señales blandas (`service_line`, labels) solo cuando el match sea univoco dentro de `space_id` y tambien dentro de `organization_id`.
 - Si una fuente upstream todavia no entrega suficiente granularidad, registrarla como `unresolved` en vez de inventar atribucion.
 
 ## Verification

@@ -1,5 +1,19 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-20 — TASK-452 formaliza la foundation canónica de service attribution
+
+- Greenhouse ya no debe tratar el P&L por servicio como un problema que se resuelve on-read desde `income`, `expenses` o `commercial_cost_attribution`.
+- Runtime nuevo:
+  - tablas `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`
+  - materializer `src/lib/service-attribution/materialize.ts`
+  - projection reactiva `src/lib/sync/projections/service-attribution.ts`
+  - evento coarse-grained `accounting.service_attribution.period_materialized`
+- Regla arquitectónica nueva:
+  - la atribución por `service_id` es `evidence-first`: quotation / contract / PO / HES / HubSpot deal primero; `service_line` o scope activo solo como fallback conservador y auditable
+  - los casos ambiguos o sin anchor suficiente no deben forzarse; quedan en `service_attribution_unresolved`
+  - futuros consumers de economics por servicio deben leer esta foundation o su serving derivado; no deben repartir revenue/costo inline desde surfaces o APIs
+  - `commercial_cost_attribution` mantiene su grain `member + client + period`; el split a `service_id` ocurre downstream en esta capa, no reescribiendo la truth layer comercial
+
 ## Delta 2026-04-11 — Sister platforms now have a canonical peer-system integration contract
 
 - Greenhouse ya no debe pensar repos hermanos como consumers informales de branding, datos o tooling.

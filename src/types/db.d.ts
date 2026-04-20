@@ -5053,6 +5053,54 @@ export interface GreenhouseServingQuotationProfitabilitySnapshots {
   staffing_model: string | null;
 }
 
+export interface GreenhouseServingServiceAttributionFacts {
+  amount_clp: Numeric;
+  amount_kind: string;
+  attribution_id: string;
+  attribution_method: string;
+  client_id: string | null;
+  confidence_label: string;
+  confidence_score: Generated<Numeric>;
+  evidence_json: Generated<Json>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  service_id: string;
+  source_amount: Numeric | null;
+  source_currency: string | null;
+  source_domain: string;
+  source_id: string;
+  source_type: string;
+  space_id: string;
+}
+
+export interface GreenhouseServingServiceAttributionUnresolved {
+  amount_clp: Numeric;
+  amount_kind: string;
+  attempted_method: string | null;
+  candidate_service_ids: Generated<string[]>;
+  candidate_space_ids: Generated<string[]>;
+  client_id: string | null;
+  confidence_label: Generated<string>;
+  confidence_score: Generated<Numeric>;
+  evidence_json: Generated<Json>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  reason_code: string;
+  source_amount: Numeric | null;
+  source_currency: string | null;
+  source_domain: string;
+  source_id: string;
+  source_type: string;
+  space_id: string | null;
+  unresolved_id: string;
+}
+
 export interface GreenhouseServingServiceSlaComplianceSnapshots {
   actual_value: Numeric | null;
   breach_threshold: Numeric | null;
@@ -5879,6 +5927,8 @@ export interface DB {
   "greenhouse_serving.provider_tooling_snapshots": GreenhouseServingProviderToolingSnapshots;
   "greenhouse_serving.quotation_pipeline_snapshots": GreenhouseServingQuotationPipelineSnapshots;
   "greenhouse_serving.quotation_profitability_snapshots": GreenhouseServingQuotationProfitabilitySnapshots;
+  "greenhouse_serving.service_attribution_facts": GreenhouseServingServiceAttributionFacts;
+  "greenhouse_serving.service_attribution_unresolved": GreenhouseServingServiceAttributionUnresolved;
   "greenhouse_serving.service_sla_compliance_snapshots": GreenhouseServingServiceSlaComplianceSnapshots;
   "greenhouse_serving.session_360": GreenhouseServingSession360;
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;

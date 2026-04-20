@@ -1,5 +1,17 @@
 # Greenhouse 360 Object Model V1
 
+## Delta 2026-04-20 — Service now has a canonical attribution extension before full Service Economics
+
+- Greenhouse ya no debe saltar directo de `Service` a `ServiceEconomics` sin una capa factual reusable entre medio.
+- Regla nueva:
+  - `ServiceAttributionFact` es una extensión factual materializada del objeto `Service`
+  - vive en `greenhouse_serving.service_attribution_facts`
+  - persiste revenue, direct cost y commercial labor/overhead atribuidos por `service_id + period + source`
+  - `ServiceAttributionUnresolved` vive en `greenhouse_serving.service_attribution_unresolved` para los casos sin evidencia suficiente
+- Consecuencia:
+  - `Service` ya tiene foundation económica auditable
+  - `ServiceEconomics` sigue siendo un read model futuro/derivado (`TASK-146`), no una tabla que deba inventarse antes de tiempo
+
 ## Delta 2026-04-11 — Assigned Team formalized as a governed client workforce portfolio lens
 
 - Greenhouse ya debe tratar `Equipo asignado` como una lens canónica cliente-facing sobre objetos existentes y no como una página suelta.

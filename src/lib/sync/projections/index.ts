@@ -19,6 +19,7 @@ import { payrollReceiptsProjection } from './payroll-receipts'
 import { payrollExportReadyProjection } from './payroll-export-ready'
 import { periodClosureStatusProjection } from './period-closure-status'
 import { commercialCostAttributionProjection } from './commercial-cost-attribution'
+import { serviceAttributionProjection } from './service-attribution'
 import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
@@ -68,6 +69,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(accountBalancesProjection)
   registerProjection(staffAugPlacementProjection)
   registerProjection(commercialCostAttributionProjection)
+  registerProjection(serviceAttributionProjection)
   registerProjection(operationalPlProjection)
   registerProjection(agencyPerformanceReportProjection)
   registerProjection(icoAiSignalsProjection)

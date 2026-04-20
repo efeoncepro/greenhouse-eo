@@ -124,6 +124,7 @@ export const AGGREGATE_TYPES = {
   // Cost Intelligence
   periodClosure: 'period_closure',
   commercialCostAttribution: 'commercial_cost_attribution',
+  serviceAttribution: 'service_attribution',
   operationalPl: 'operational_pl',
   marginAlert: 'margin_alert',
   commercialCostBasis: 'commercial_cost_basis',
@@ -441,6 +442,7 @@ export const EVENT_TYPES = {
   accountingPeriodReopened: 'accounting.period_reopened',
   accountingCommercialCostAttributionMaterialized: 'accounting.commercial_cost_attribution.materialized',
   accountingCommercialCostAttributionPeriodMaterialized: 'accounting.commercial_cost_attribution.period_materialized',
+  accountingServiceAttributionPeriodMaterialized: 'accounting.service_attribution.period_materialized',
   accountingPlSnapshotMaterialized: 'accounting.pl_snapshot.materialized',
   accountingPlSnapshotPeriodMaterialized: 'accounting.pl_snapshot.period_materialized',
   accountingMarginAlertTriggered: 'accounting.margin_alert.triggered',

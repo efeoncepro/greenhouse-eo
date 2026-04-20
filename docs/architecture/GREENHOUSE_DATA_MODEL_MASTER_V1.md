@@ -656,6 +656,37 @@ Non-negotiable rule:
 - no debe seguir naciendo como contrato consumidor directo para módulos nuevos
 - consumers de margen/rentabilidad resumida deben preferir serving derivado como `operational_pl_snapshots`
 
+## Service Attribution
+
+Canonical anchors:
+- `greenhouse_serving.service_attribution_facts`
+- `greenhouse_serving.service_attribution_unresolved`
+
+Required meaning:
+- capa factual canónica para aterrizar revenue, direct cost y costo comercial atribuible a `greenhouse_core.services.service_id`
+- no reemplaza `commercial_cost_attribution` ni `operational_pl_snapshots`
+- deja trazabilidad por fuente, método y confidence
+
+Required relationships:
+- `service_id -> greenhouse_core.services.service_id`
+- `space_id -> greenhouse_core.spaces.space_id`
+- anchors de evidencia reutilizables:
+  - `quotation_id -> greenhouse_commercial.quotations.quotation_id`
+  - `contract_id -> greenhouse_commercial.contracts.contract_id`
+  - `purchase_order_id -> greenhouse_finance.purchase_orders.po_id`
+  - `hes_id -> greenhouse_finance.service_entry_sheets.hes_id`
+  - `hubspot_deal_id -> greenhouse_commercial.deals.hubspot_deal_id`
+
+Required semantics:
+- preferir anchors documentales/comerciales fuertes antes de `service_line`
+- permitir prorrateo auditable cuando una fuente aplica a múltiples servicios
+- persistir unresolved cuando la evidencia no alcanza o la ambigüedad sigue abierta
+
+Non-negotiable rule:
+- consumers nuevos de P&L por servicio no deben repartir montos inline desde `income`, `expenses` o `commercial_cost_attribution`
+- el grain de `commercial_cost_attribution` sigue siendo `member + client + period`; la descomposición por servicio ocurre downstream en esta foundation
+- `TASK-146` y follow-ons similares deben apoyarse en esta capa antes de crear read models client-facing
+
 ## Provider
 
 Canonical anchor:

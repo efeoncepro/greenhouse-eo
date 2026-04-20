@@ -2,6 +2,12 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-04-20
+
+- `TASK-452` agrega el aggregate type `service_attribution` y el evento `accounting.service_attribution.period_materialized`.
+- La projection reactiva `service_attribution` ya escucha anchors de Finance, Services y Commercial (`income`, `expense`, `quotation`, `contract`, `deal`, `membership`, `assignment`, `service`).
+- El evento nace como coarse-grained v2 para observabilidad y desacople de futuros consumers por servicio; en este corte no agrega un downstream reactivo obligatorio.
+
 ## Delta 2026-04-19
 
 - `TASK-470` agrega el aggregate type `commercial_capacity` y el evento `commercial.capacity.overcommit_detected`.
@@ -62,6 +68,7 @@ Los payloads del outbox siguen dos versiones que coexisten durante el rollout de
 |---|---|---|---|
 | `provider_tooling_snapshot` | `provider.tooling_snapshot.period_materialized` | `src/lib/sync/projections/provider-tooling.ts` | `staff_augmentation_placements` |
 | `commercial_cost_attribution` | `accounting.commercial_cost_attribution.period_materialized` | `src/lib/sync/projections/commercial-cost-attribution.ts` | `client_economics`, `operational_pl` |
+| `service_attribution` | `accounting.service_attribution.period_materialized` | `src/lib/sync/projections/service-attribution.ts` | — |
 | `pl_snapshot` | `accounting.pl_snapshot.period_materialized` | `src/lib/sync/projections/operational-pl.ts` | `operational_pl_rollup` |
 | `staff_aug_placement_snapshot` | `staff_aug.placement_snapshot.period_materialized` | `src/lib/sync/projections/staff-augmentation.ts` | Downstream de staff augmentation |
 
@@ -71,8 +78,8 @@ Los payloads del outbox siguen dos versiones que coexisten durante el rollout de
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `income` | `income.created`, `income.updated`, `income.deleted` | `finance/postgres-store.ts` | `{ incomeId, clientProfileId, amount, currency }` | — |
-| `expense` | `expense.created`, `expense.updated`, `expense.deleted` | `finance/postgres-store.ts` | `{ expenseId, amount, currency }` | — |
+| `income` | `income.created`, `income.updated`, `income.deleted` | `finance/postgres-store.ts` | `{ incomeId, clientProfileId, amount, currency }` | `service_attribution` |
+| `expense` | `expense.created`, `expense.updated`, `expense.deleted` | `finance/postgres-store.ts` | `{ expenseId, amount, currency }` | `service_attribution` |
 | `account` | `account.created`, `account.updated` | `finance/postgres-store-slice2.ts` | `{ accountId }` | — |
 | `supplier` | `supplier.created`, `supplier.updated` | `finance/postgres-store-slice2.ts` | `{ supplierId }` | — |
 | `exchange_rate` | `exchange_rate.updated` | `finance/postgres-store-slice2.ts` | `{ currency, rate }` | — |
@@ -98,28 +105,29 @@ consumers can migrate gradually. Canonical events are scoped to the commercial
 |---|---|---|---|---|
 | `quotation` | `commercial.quotation.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-quote.ts`, outbound) | `{ quotationId, quoteId, hubspotQuoteId, direction, organizationId, spaceId, amount, currency, lineItemCount }` | — |
 | `quotation` | `commercial.quotation.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-quotes.ts`, inbound) | `{ quotationId, quoteId, hubspotQuoteId, hubspotDealId, action, organizationId, spaceId }` | — |
+| `quotation` | `commercial.quotation.updated` | `commercial/quotation-events.ts` (update path canónico) | `{ quotationId, quoteId, hubspotDealId, organizationId, spaceId, changedFields }` | `service_attribution` |
 | `quotation` | `commercial.quotation.converted` | (futuro: quote-to-cash bridge, TASK-350) | `{ quotationId, quoteId, incomeId }` | — |
-| `quotation` | `commercial.quotation.po_linked` (TASK-350) | `finance/quote-to-cash/link-purchase-order.ts`, `api/finance/purchase-orders` POST/PUT | `{ quotationId, poId, poNumber, authorizedAmountClp, linkedBy }` | Audit log (quotation_audit_log `po_received`), profitability tracking (TASK-351) |
-| `quotation` | `commercial.quotation.hes_linked` (TASK-350) | `finance/quote-to-cash/link-service-entry.ts`, `api/finance/hes` POST | `{ quotationId, hesId, hesNumber, amountAuthorizedClp, linkedBy }` | Audit log (`hes_received`), profitability tracking |
+| `quotation` | `commercial.quotation.po_linked` (TASK-350) | `finance/quote-to-cash/link-purchase-order.ts`, `api/finance/purchase-orders` POST/PUT | `{ quotationId, poId, poNumber, authorizedAmountClp, linkedBy }` | Audit log (quotation_audit_log `po_received`), profitability tracking (TASK-351), `service_attribution` |
+| `quotation` | `commercial.quotation.hes_linked` (TASK-350) | `finance/quote-to-cash/link-service-entry.ts`, `api/finance/hes` POST | `{ quotationId, hesId, hesNumber, amountAuthorizedClp, linkedBy }` | Audit log (`hes_received`), profitability tracking, `service_attribution` |
 | `quotation` | `commercial.quotation.invoice_emitted` (TASK-350) | `finance/quote-to-cash/materialize-invoice-from-{quotation,hes}.ts` | `{ quotationId, incomeId, sourceHesId \| null, totalAmountClp, emittedBy }` | Audit log (`invoice_triggered`), pipeline projection, Nubox emission follow-up |
 | `quotation` | `commercial.quotation.expired` (TASK-351) | `commercial-intelligence/renewal-lifecycle.ts` | `{ quotationId, clientId, organizationId, totalAmountClp, expiredAt, daysSinceExpiry }` | `quotation_pipeline` projection, audit log (`action: 'expired'`), notifications |
 | `quotation` | `commercial.quotation.renewal_due` (TASK-351) | `commercial-intelligence/renewal-lifecycle.ts` | `{ quotationId, clientId, organizationId, totalAmountClp, expiryDate, daysUntilExpiry }` | `quotation_pipeline` projection, notifications (`finance_alert` + `metadata.subtype: quotation_renewal`) |
 | `quotation` | `commercial.quotation.pipeline_materialized` (TASK-351) | `commercial/quotation-events.ts` (from `quotation_pipeline` projection) | `{ quotationId, pipelineStage, status, totalAmountClp, probabilityPct }` | observability/dashboards |
 | `quotation` | `commercial.quotation.profitability_materialized` (TASK-351) | `commercial/quotation-events.ts` (from `quotation_profitability` projection) | `{ quotationId, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity }` | observability/dashboards |
 | `quotation_line_item` | `commercial.quotation.line_items_synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-line-items.ts`) | `{ quotationId, quoteId, hubspotQuoteId, created, updated }` | — |
-| `contract` | `commercial.contract.created` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status }` | `contract_profitability`, `contract_renewal` y futuros consumers de MRR/ARR |
-| `contract` | `commercial.contract.activated` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status, activatedAt }` | `contract_profitability`, `contract_renewal`, observability |
+| `contract` | `commercial.contract.created` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status }` | `contract_profitability`, `contract_renewal`, `service_attribution` y futuros consumers de MRR/ARR |
+| `contract` | `commercial.contract.activated` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status, activatedAt }` | `contract_profitability`, `contract_renewal`, `service_attribution`, observability |
 | `contract` | `commercial.contract.renewed` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, quotationId?, relationshipType, renewedAt, nextEndDate?, spaceId }` | `contract_renewal`, timeline UI, futuros consumers de MRR/ARR |
-| `contract` | `commercial.contract.modified` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, quotationId, relationshipType, modifiedAt, spaceId }` | detail UI, audit timeline |
+| `contract` | `commercial.contract.modified` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, quotationId, relationshipType, modifiedAt, spaceId }` | detail UI, audit timeline, `service_attribution` |
 | `contract` | `commercial.contract.terminated` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, terminatedAt, terminatedReason?, clientId, organizationId, spaceId }` | `contract_renewal`, futuros consumers de churn |
 | `contract` | `commercial.contract.completed` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, completedAt, clientId, organizationId, spaceId }` | `contract_renewal`, observability |
 | `contract` | `commercial.contract.renewal_due` (TASK-460) | `commercial/contract-events.ts` (from `commercial-intelligence/contract-renewal-lifecycle.ts`) | `{ contractId, contractNumber, clientId, organizationId, spaceId, endDate, daysUntilEndDate }` | notifications, renewals UI, futuros dashboards de ARR en riesgo |
 | `contract` | `commercial.contract.profitability_materialized` (TASK-460) | `commercial/contract-events.ts` (from `commercial-intelligence/contract-profitability-materializer.ts`) | `{ contractId, contractNumber, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity, spaceId }` | observability, dashboards de rentabilidad contractual |
-| `deal` | `commercial.deal.created` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, currency, closeDate }` | `deal_pipeline` projection (TASK-456), foundation for TASK-457 |
-| `deal` | `commercial.deal.synced` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, action, amountClp, currency, closeDate, isClosed, isWon, changedFields }` | `deal_pipeline` projection (TASK-456), foundation for TASK-457 |
-| `deal` | `commercial.deal.stage_changed` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, previousPipelineId, previousDealstage, previousStageLabel, currentStageLabel }` | `deal_pipeline` projection (TASK-456) |
-| `deal` | `commercial.deal.won` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, closeDate }` | `deal_pipeline` projection (TASK-456), forecast |
-| `deal` | `commercial.deal.lost` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, closeDate }` | `deal_pipeline` projection (TASK-456), forecast |
+| `deal` | `commercial.deal.created` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, currency, closeDate }` | `deal_pipeline` projection (TASK-456), `service_attribution`, foundation for TASK-457 |
+| `deal` | `commercial.deal.synced` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, action, amountClp, currency, closeDate, isClosed, isWon, changedFields }` | `deal_pipeline` projection (TASK-456), `service_attribution`, foundation for TASK-457 |
+| `deal` | `commercial.deal.stage_changed` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, previousPipelineId, previousDealstage, previousStageLabel, currentStageLabel }` | `deal_pipeline` projection (TASK-456), `service_attribution` |
+| `deal` | `commercial.deal.won` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, closeDate }` | `deal_pipeline` projection (TASK-456), `service_attribution`, forecast |
+| `deal` | `commercial.deal.lost` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, closeDate }` | `deal_pipeline` projection (TASK-456), `service_attribution`, forecast |
 | `quotation` | `commercial.discount.health_alert` | `finance/pricing/quotation-pricing-orchestrator.ts` (TASK-346) | `{ quotationId, versionNumber, marginPct, floorPct, targetPct, alerts, createdBy }` | `notifications` (Finance approvals), audit log |
 | `quotation` | `commercial.quotation.pushed_to_hubspot` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` invocado por projection `quotationHubSpotOutbound`) | `{ quotationId, hubspotQuoteId, hubspotDealId, direction: 'outbound', result: 'created' \| 'updated' \| 'skipped', reason?, actorId? }` | observability del bridge outbound + retry audit |
 | `quotation` | `commercial.quotation.hubspot_sync_failed` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` catch branch) | `{ quotationId, hubspotDealId, errorMessage, attemptedAction: 'create' \| 'update', actorId? }` | ops-worker retry, Finance alerting |
@@ -160,10 +168,10 @@ Notas:
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `payroll_period` | `payroll_period.created`, `payroll_period.updated`, `payroll_period.calculated`, `payroll_period.approved`, `payroll_period.exported` | `payroll/postgres-store.ts` | `{ periodId, month, year, status? }` | `member_capacity_economics`, `person_intelligence`, `client_economics` |
-| `payroll_entry` | `payroll_entry.upserted` | `payroll/postgres-store.ts` | `{ entryId, periodId, memberId, currency, grossTotal, netTotal }` | `member_capacity_economics`, `person_intelligence`, `client_economics` |
-| `payroll_entry` | `payroll_entry.reliquidated` | `payroll/postgres-store.ts` (supersede path) | `{ entryId, periodId, operationalYear, operationalMonth, memberId, version, previousVersion, previousEntryId, previousGrossTotal, previousNetTotal, newGrossTotal, newNetTotal, deltaGross, deltaNet, currency, reopenAuditId, reason }` | `payroll_reliquidation_delta`, `commercial_cost_attribution`, `client_economics` |
-| `compensation_version` | `compensation_version.created`, `compensation_version.updated` | `payroll/postgres-store.ts` | `{ versionId, memberId, effectiveFrom, payRegime, currency, baseSalary }` | `member_capacity_economics`, `person_intelligence` |
+| `payroll_period` | `payroll_period.created`, `payroll_period.updated`, `payroll_period.calculated`, `payroll_period.approved`, `payroll_period.exported` | `payroll/postgres-store.ts` | `{ periodId, month, year, status? }` | `member_capacity_economics`, `person_intelligence`, `client_economics`, `service_attribution` |
+| `payroll_entry` | `payroll_entry.upserted` | `payroll/postgres-store.ts` | `{ entryId, periodId, memberId, currency, grossTotal, netTotal }` | `member_capacity_economics`, `person_intelligence`, `client_economics`, `service_attribution` |
+| `payroll_entry` | `payroll_entry.reliquidated` | `payroll/postgres-store.ts` (supersede path) | `{ entryId, periodId, operationalYear, operationalMonth, memberId, version, previousVersion, previousEntryId, previousGrossTotal, previousNetTotal, newGrossTotal, newNetTotal, deltaGross, deltaNet, currency, reopenAuditId, reason }` | `payroll_reliquidation_delta`, `commercial_cost_attribution`, `client_economics`, `service_attribution` |
+| `compensation_version` | `compensation_version.created`, `compensation_version.updated` | `payroll/postgres-store.ts` | `{ versionId, memberId, effectiveFrom, payRegime, currency, baseSalary }` | `member_capacity_economics`, `person_intelligence`, `service_attribution` |
 
 Notas:
 - `payroll_period.exported` sigue siendo el cierre canónico de nómina y también alimenta el intake reactivo de `Finance > Expenses`.
@@ -218,9 +226,9 @@ Notas:
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
 | `organization` | `organization.updated` | `account-360/organization-store.ts` | `{ organizationId, updatedFields }` | — |
-| `membership` | `membership.created` | `account-360/organization-store.ts` | `{ membershipId, profileId, organizationId, spaceId }` | `invalidateOrganization360` |
-| `membership` | `membership.updated` | `account-360/organization-store.ts` | `{ membershipId, updatedFields }` | `invalidateOrganization360` |
-| `membership` | `membership.deactivated` | `account-360/organization-store.ts` | `{ membershipId }` | `invalidateOrganization360` |
+| `membership` | `membership.created` | `account-360/organization-store.ts` | `{ membershipId, profileId, organizationId, spaceId }` | `invalidateOrganization360`, `service_attribution` |
+| `membership` | `membership.updated` | `account-360/organization-store.ts` | `{ membershipId, updatedFields }` | `invalidateOrganization360`, `service_attribution` |
+| `membership` | `membership.deactivated` | `account-360/organization-store.ts` | `{ membershipId }` | `invalidateOrganization360`, `service_attribution` |
 
 ### CRM Company Lifecycle (TASK-454)
 
@@ -235,9 +243,9 @@ Notas:
 | `member` | `member.created` | `team-admin/mutate-team.ts` | `{ memberId, email, displayName }` | — |
 | `member` | `member.updated` | `team-admin/mutate-team.ts` | `{ memberId, updatedFields }` | — |
 | `member` | `member.deactivated` | `team-admin/mutate-team.ts` | `{ memberId }` | — |
-| `assignment` | `assignment.created` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId, fteAllocation }` | `invalidateOrganization360` |
-| `assignment` | `assignment.updated` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId, updatedFields }` | `invalidateOrganization360` |
-| `assignment` | `assignment.removed` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId }` | `invalidateOrganization360` |
+| `assignment` | `assignment.created` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId, fteAllocation }` | `invalidateOrganization360`, `service_attribution` |
+| `assignment` | `assignment.updated` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId, updatedFields }` | `invalidateOrganization360`, `service_attribution` |
+| `assignment` | `assignment.removed` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId }` | `invalidateOrganization360`, `service_attribution` |
 
 ### Identity (nuevo)
 
@@ -300,9 +308,9 @@ Consumer: none yet (future: admin alerts, delivery health metrics)
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `service` | `service.created` | `services/service-store.ts` | `{ serviceId, spaceId, organizationId, lineaDeServicio }` | — |
-| `service` | `service.updated` | `services/service-store.ts` | `{ serviceId, updatedFields }` | — |
-| `service` | `service.deactivated` | `services/service-store.ts` | `{ serviceId }` | — |
+| `service` | `service.created` | `services/service-store.ts` | `{ serviceId, spaceId, organizationId, lineaDeServicio }` | `service_attribution` |
+| `service` | `service.updated` | `services/service-store.ts` | `{ serviceId, updatedFields }` | `service_attribution` |
+| `service` | `service.deactivated` | `services/service-store.ts` | `{ serviceId }` | `service_attribution` |
 
 ## Consumer reactivo — Projection Registry
 
@@ -314,6 +322,7 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `notification_dispatch` | notifications | service.created, identity.reconciliation.approved, finance.dte.discrepancy_found, identity.profile.linked | Despacha notificacion in-app + email via NotificationService |
 | `ico_member_metrics` | people | member.*, assignment.* | Refresh dirigido: pull member data BQ → Postgres |
 | `client_economics` | finance | membership.*, assignment.* | Recompute snapshots del periodo actual |
+| `service_attribution` | finance | income.*, expense.*, payroll_entry.*, membership.*, assignment.*, commercial.quotation.created, commercial.quotation.synced, commercial.quotation.po_linked, commercial.quotation.hes_linked, commercial.contract.created, commercial.contract.activated, commercial.contract.modified, commercial.deal.created, commercial.deal.synced, commercial.deal.stage_changed, service.* | Materializa attribution factual por `service_id + period` y persiste unresolved auditable |
 | `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.expense.created, finance.expense.updated, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
 | `person_intelligence` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated, ico.materialization.completed | Materializa inteligencia operativa/capacidad/costo por miembro y también soporta fanout por `finance_period` |
 | `projected_payroll` | people | compensation_version.*, payroll_entry.*, payroll_period.calculated, finance.exchange_rate.upserted, ico.materialization.completed | Refresca snapshots de nómina proyectada del período cuando cambia compensación, FX o quedan materializados KPI `ICO` |

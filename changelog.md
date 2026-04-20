@@ -2,6 +2,14 @@
 
 ## 2026-04-20
 
+### 2026-04-20 — TASK-452 service attribution foundation
+
+- Nace la capa factual canónica `greenhouse_serving.service_attribution_facts` junto a `greenhouse_serving.service_attribution_unresolved`, para aterrizar revenue, direct cost y commercial labor/overhead por `service_id + period` con trazabilidad de source, method, confidence y evidencia.
+- El materializer `src/lib/service-attribution/materialize.ts` resuelve attribution `evidence-first`: quotation / contract / purchase order / HES / HubSpot deal primero, `service_line` o scope activo solo como fallback conservador.
+- Se registra la projection reactiva `service_attribution` y el evento coarse-grained `accounting.service_attribution.period_materialized`, de modo que la foundation ya puede refrescarse sin depender de recomputes ad hoc.
+- Los casos ambiguos o sin anchor suficiente ya no se fuerzan silenciosamente: quedan materializados como unresolved auditable.
+- Esto desbloquea técnicamente `TASK-146`, `TASK-147` y follow-ons de profitability por servicio, pero la UI sigue sin fabricar `service_economics` client-facing hasta que exista el read model derivado.
+
 ### 2026-04-20 — HubSpot quote sync deja de depender de quotes “huérfanas” sin deal
 
 - El Quote Builder y las APIs canónicas de create/edit ahora pueden persistir `hubspotDealId` validado contra la misma organización, en vez de dejar quotes manuales sin un anchor comercial real para HubSpot.

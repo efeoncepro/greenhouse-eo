@@ -7,6 +7,20 @@
 
 ---
 
+## Delta 2026-04-20 — TASK-452 agrega la foundation reusable de attribution por servicio
+
+- Finance/commercial ya no debe intentar derivar P&L por servicio leyendo `income`, `expenses` y `commercial_cost_attribution` directamente desde cada consumer.
+- Runtime nuevo:
+  - `greenhouse_serving.service_attribution_facts`
+  - `greenhouse_serving.service_attribution_unresolved`
+  - helper/materializer `src/lib/service-attribution/materialize.ts`
+  - projection reactiva `service_attribution`
+  - evento `accounting.service_attribution.period_materialized`
+- Regla operativa:
+  - revenue y direct cost se atribuyen con anchors documentales/comerciales fuertes cuando existen
+  - labor/overhead comercial sigue naciendo en `commercial_cost_attribution`; el split a `service_id` ocurre downstream usando share de revenue y fallback conservador
+  - Agency y surfaces client-facing siguen sin fabricar `service_economics` hasta que exista el read model derivado (`TASK-146`)
+
 ## Delta 2026-04-19 — TASK-479 People Actual Cost + Blended Role Snapshots
 
 - `member_capacity_economics` se reafirma como la fuente factual reusable del lane `member_actual`; no nace una tabla paralela de costo persona-level.
@@ -730,10 +744,12 @@ Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 arc
 | `bank_statement_rows`         | Postgres                                | `fin_bank_statement_rows` (fallback)    | Migrado                                                                     |
 | `dte_emission_queue`          | Postgres only                           | No                                      | TASK-139                                                                    |
 | `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No                                      | Canónico materializado; persiste `organization_id` + `client_id` compat     |
+| `service_attribution_facts`   | Serving Postgres (`greenhouse_serving`) | No                                      | Foundation factual por `service_id + period + source`; desbloquea `service_economics` |
 
 Nota operativa:
 
 - `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema, pero su DDL base sigue asegurado por runtime/store code además de las migraciones incrementales; todavía no vive como create-table canónico separado dentro de `scripts/` o una migración histórica dedicada.
+- `service_attribution_unresolved` acompaña a `service_attribution_facts` como cola auditable de casos ambiguos o sin evidencia suficiente; no debe tratarse como error silencioso ni como fallback inventado en UI.
 
 ### BigQuery Cutover Plan
 
