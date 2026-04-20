@@ -2028,6 +2028,197 @@ export const GH_PRICING = {
     title: 'Detalle y notas',
     descriptionLabel: 'Descripción',
     descriptionPlaceholder: 'Alcance del servicio, contexto, notas internas…'
+  },
+
+  // ────────────────────────────────────────────────────────────────
+  // TASK-481 — Cost provenance (source_kind + confidence + freshness)
+  // ────────────────────────────────────────────────────────────────
+  costProvenance: {
+    sectionTitle: 'Trazabilidad del costo',
+    sourceLabel: 'Fuente',
+    confidenceLabel: 'Confianza',
+    freshnessLabel: 'Vigencia',
+    sourceRefLabel: 'Referencia',
+    snapshotDateLabel: 'Snapshot',
+
+    sourceKinds: {
+      member_actual: {
+        label: 'Costo real del miembro',
+        shortDescription: 'Costo observado en compensación de la persona asignada.'
+      },
+      role_blended: {
+        label: 'Promedio blended del rol',
+        shortDescription: 'Promedio ponderado del costo observado en todas las personas del rol.'
+      },
+      role_modeled: {
+        label: 'Modelo del rol',
+        shortDescription: 'Modelado desde rate cards cuando no hay costo real del rol todavía.'
+      },
+      tool_snapshot: {
+        label: 'Snapshot de herramienta',
+        shortDescription: 'Costo observado en la última materialización del proveedor.'
+      },
+      tool_catalog_fallback: {
+        label: 'Catálogo como fallback',
+        shortDescription: 'Sin snapshot disponible; se usa el costo de catálogo como referencia.'
+      },
+      manual: {
+        label: 'Override manual',
+        shortDescription: 'Costo ingresado manualmente con motivo registrado.'
+      }
+    } as Record<string, { label: string; shortDescription: string }>,
+
+    confidenceBuckets: {
+      high: {
+        label: 'Alta',
+        shortDescription: 'Datos recientes y consistentes; úsalo como sugerencia principal.'
+      },
+      medium: {
+        label: 'Media',
+        shortDescription: 'Datos parciales o con algo de desfase; revísalo si la línea es crítica.'
+      },
+      low: {
+        label: 'Baja',
+        shortDescription: 'Datos escasos o desactualizados; considera override si el monto es relevante.'
+      }
+    } as Record<string, { label: string; shortDescription: string }>,
+
+    freshnessLabelFresh: 'Reciente',
+    freshnessLabelStale: 'Desactualizado',
+    freshnessLabelVeryStale: 'Muy desactualizado',
+    freshnessLabelUnknown: 'Sin fecha',
+    freshnessValueFormatter: (days: number | null) => {
+      if (days === null || !Number.isFinite(days)) return 'sin fecha'
+      if (days <= 0) return 'hoy'
+      if (days === 1) return 'hace 1 día'
+      if (days < 30) return `hace ${days} días`
+      if (days < 60) return 'hace más de un mes'
+      const months = Math.floor(days / 30)
+      return `hace ${months} meses`
+    },
+
+    fallbackDisclaimerTitle: 'Costo de fallback en uso',
+    fallbackDisclaimerBody:
+      'No hay snapshot reciente para esta línea. El motor usó el catálogo como referencia. Si el monto es relevante, considera un override con motivo.',
+    manualDisclaimerTitle: 'Costo override',
+    manualDisclaimerBody:
+      'Este costo fue ingresado manualmente por el equipo comercial. Revisa el motivo en el historial antes de emitir.',
+
+    popoverTitle: 'Detalle de trazabilidad',
+    popoverOpenAria: 'Abrir detalle de trazabilidad del costo',
+    popoverCloseAria: 'Cerrar detalle de trazabilidad',
+    resolutionNotesLabel: 'Notas del motor',
+    resolutionNotesEmpty: 'Sin notas adicionales.',
+    noProvenanceState: 'Aún no hay metadata de trazabilidad para esta línea.'
+  },
+
+  // ────────────────────────────────────────────────────────────────
+  // TASK-481 — Cost override governance (dialog + validation + history)
+  // ────────────────────────────────────────────────────────────────
+  costOverride: {
+    ctaLabel: 'Override costo',
+    ctaLabelShort: 'Override',
+    ctaDisabledTooltip:
+      'No tienes permiso para aplicar overrides. Contacta a finance_admin.',
+
+    dialogTitle: 'Aplicar override de costo',
+    dialogSubtitle:
+      'Reemplaza el costo sugerido por un valor manual. Queda registrado con motivo y actor.',
+    dialogAriaLabel: 'Override manual del costo de la línea',
+    cancelCta: 'Cancelar',
+    submitCta: 'Aplicar override',
+    submittingCta: 'Aplicando…',
+    closeLabel: 'Cerrar',
+
+    suggestedLabel: 'Costo sugerido',
+    suggestedMissing: 'Sin sugerencia',
+    suggestedProvenancePrefix: 'Fuente: ',
+
+    overrideLabel: 'Nuevo costo por unidad',
+    overrideHelper: 'Monto en USD. Se aplica al costo unitario de la línea.',
+    overridePlaceholder: 'ej. 120.00',
+    overrideRequiredError: 'Ingresa un costo mayor o igual a 0.',
+    overrideInvalidError: 'El costo debe ser un número válido.',
+
+    categoryLabel: 'Motivo del override',
+    categoryPlaceholder: 'Selecciona una categoría',
+    categoryRequiredError: 'Selecciona una categoría para continuar.',
+    categoryAriaDescription:
+      'Selecciona el motivo principal del override para análisis posterior.',
+    categories: {
+      competitive_pressure: {
+        label: 'Presión competitiva',
+        shortDescription: 'Ajuste por oferta competitiva o match de precio.'
+      },
+      strategic_investment: {
+        label: 'Inversión estratégica',
+        shortDescription: 'Proyecto que invertimos deliberadamente por valor futuro.'
+      },
+      roi_correction: {
+        label: 'Corrección de ROI',
+        shortDescription: 'Ajuste porque el cálculo original sobre/sub estima el ROI real.'
+      },
+      error_correction: {
+        label: 'Corrección por error',
+        shortDescription: 'Fix a un dato de catálogo o snapshot incorrecto.'
+      },
+      client_negotiation: {
+        label: 'Negociación con cliente',
+        shortDescription: 'Acuerdo puntual con el cliente que amerita registrarse.'
+      },
+      other: {
+        label: 'Otro motivo',
+        shortDescription: 'Detalla el motivo en el campo de texto.'
+      }
+    } as Record<string, { label: string; shortDescription: string }>,
+
+    reasonLabel: 'Detalle del motivo',
+    reasonHelperShort: '15 caracteres mínimo. Para auditoría y análisis de patrones.',
+    reasonHelperOther: '30 caracteres mínimo cuando la categoría es "Otro motivo".',
+    reasonPlaceholder:
+      'Ej. Match de oferta de Acme por USD 10.000/mes para cerrar Q2.',
+    reasonAriaDescription: 'Texto libre que describe por qué se aplica el override.',
+    reasonTooShortError: (min: number, current: number) =>
+      `Mínimo ${min} caracteres. Llevas ${current}.`,
+    reasonTooLongError: 'Máximo 500 caracteres.',
+    reasonCounter: (current: number, max: number) => `${current} / ${max}`,
+
+    deltaLabel: 'Variación vs sugerido',
+    deltaAbove: (pct: number) => `+${pct}% sobre sugerido`,
+    deltaBelow: (pct: number) => `${pct}% bajo sugerido`,
+    deltaEqual: 'Igual al sugerido',
+    deltaNoBaseline: 'Sin sugerencia para comparar',
+
+    impactLabel: 'Impacto estimado',
+    impactMarginHintAbove: 'Un costo mayor reduce el margen de la línea.',
+    impactMarginHintBelow: 'Un costo menor aumenta el margen de la línea.',
+    impactLineTotalPrefix: 'Nuevo total de línea: ',
+
+    historyTitle: 'Overrides previos',
+    historyEmpty: 'Esta línea no tiene overrides previos.',
+    historyCountOne: '1 override previo',
+    historyCountMany: (n: number) => `${n} overrides previos`,
+    historyEntryByActor: (actorLabel: string, dateLabel: string) =>
+      `${actorLabel} · ${dateLabel}`,
+    historyEntryActorSystem: 'Sistema',
+    historyEntryActorFallback: 'Actor desconocido',
+    historyLoadingLabel: 'Cargando historial…',
+    historyLoadError: 'No pudimos cargar el historial. Intenta de nuevo.',
+
+    confirmTitle: 'Confirmar override',
+    confirmBody: (from: string, to: string, pct: string) =>
+      `Vas a reemplazar el costo sugerido de ${from} por ${to} (${pct}). Queda registrado con tu motivo.`,
+    confirmBodyNoBaseline: (to: string) =>
+      `Vas a fijar el costo en ${to} manualmente. Queda registrado con tu motivo.`,
+
+    successToast: 'Override aplicado. El costo de la línea ahora es manual.',
+    errorToastGeneric:
+      'No pudimos aplicar el override. Revisa el motivo e intenta de nuevo.',
+    errorToastForbidden: 'No tienes permiso para aplicar este override.',
+    errorToastNotFound: 'La línea ya no existe. Recarga la cotización.',
+
+    noPermissionBanner:
+      'Solo roles finance_admin o efeonce_admin pueden aplicar overrides.'
   }
 } as const
 
