@@ -1,15 +1,39 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.5
+> **Version:** 3.6
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-20 por Claude (v3.5 — TASK-507 addons inline en la ladder + TASK-508 line row polish: chip consolidation, warning inline, density)
+> **Ultima actualizacion:** 2026-04-20 por Claude (v3.6 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.6 (2026-04-20 — TASK-509 · Floating UI)
+
+Fix de un bug donde el popover de addons aparecía en el top-left del viewport en vez de anclado al segmento inline. Causa raíz: state del anchor cruzaba boundaries entre dock y primitive, y el re-render del button al cambiar `count`/`amount` dejaba el DOM node cacheado stale → MUI Popper fallback a `0,0`.
+
+### Fix robusto + upgrade de stack
+
+Instalamos **Floating UI** (`@floating-ui/react`) — el stack moderno de positioning que usan Linear, Stripe, Radix, shadcn, Notion. Sustituye MUI Popper (basado en popper.js v2, legacy 2019) en el primitive `TotalsLadder`.
+
+Beneficios para el usuario:
+- Popover anclado correctamente al segmento **siempre** — `autoUpdate` de Floating UI monitorea el reference element con ResizeObserver + IntersectionObserver y recupera si el anchor se mueve o re-renderiza.
+- **Auto-flip** cuando el popover no cabe en el viewport (ej. scroll cerca del borde → flip automático al lado opuesto).
+- **Escape + click afuera** cierran el popover sin boilerplate (antes lo cosíamos con `ClickAwayListener` a mano).
+- **Focus management** integral — al abrir, focus va al primer elemento del panel; al cerrar con escape, focus vuelve al segmento.
+
+### Arquitectura
+
+El primitive `TotalsLadder` ahora **encapsula el popover internamente**:
+- El dock le pasa `addonsSegment.content: ReactNode` (el `AddonSuggestionsPanel`).
+- El primitive gestiona anchor, state, positioning, focus, dismiss.
+- Zero state leak entre componentes.
+- Consumers futuros (invoice dock, PO footer, contract summary) heredan el comportamiento sin reimplementar.
+
+TASK-510 (backlog) migrará el resto de popovers del portal al mismo stack (ContextChip, Ajustes popover, warnings, etc.) para consistencia platform-wide.
 
 ## Cambios v3.5 (2026-04-20 — TASK-507 + TASK-508)
 

@@ -1,15 +1,12 @@
 'use client'
 
-import { type MouseEvent as ReactMouseEvent, type ReactNode, useState } from 'react'
+import { type ReactNode, useEffect, useRef } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Grid from '@mui/material/Grid'
-import Paper from '@mui/material/Paper'
-import Popper from '@mui/material/Popper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
@@ -68,18 +65,18 @@ export interface QuoteSummaryDockProps {
 /**
  * QuoteSummaryDock v2 — sticky-bottom cockpit para el Quote Builder.
  *
- * Jerarquía 3-zonas (Grid 3/5/4 en md+):
- *   [Estado]        [Totals ladder]                 [Acciones]
- *   Save state      Total CLP                       Addons · Cancelar · Guardar
- *   Margen chip     $X — subtotal · factor · IVA
+ * Jerarquía 3-zonas (Grid 3/6/3 en md+):
+ *   [Estado]        [Totals ladder + addons inline]       [Acción terminal]
+ *   Save state      Total CLP                              Guardar y emitir
+ *   Margen chip     $X — subtotal · addon · factor · IVA
  *
  * Principios:
- * - Total en text.primary (no primary.main). El azul de marca se reserva para
- *   la CTA primaria — así el ojo distingue "valor destacado" de "acción".
- * - Subtotal/Factor/IVA colapsan en caption muted debajo del Total solo cuando
- *   aportan info (factor≠1 o IVA>0 o delta real con subtotal). Si no, oculto.
- * - Margen chip con label completo "Margen · N,N% · Óptimo" (no color-only).
- * - CTA copy invariante; el estado de loading se comunica con disabled+spinner.
+ * - Total en text.primary. El azul de marca queda exclusivo para la CTA.
+ * - Subtotal/Factor/IVA/addons colapsan en caption muted debajo del Total
+ *   solo cuando aportan info. El segmento de addons es interactivo y abre
+ *   un popover con el detalle — self-contained en el primitive (TASK-509,
+ *   via Floating UI).
+ * - CTA copy invariante; loading state = disabled + spinner.
  * - Live region a11y consolidada en el root aside.
  */
 const QuoteSummaryDock = ({
@@ -107,17 +104,12 @@ const QuoteSummaryDock = ({
   simulationError,
   emptyStateMessage
 }: QuoteSummaryDockProps) => {
-  // Anchor capturado desde el evento click, no via ref. El Popper queda atado
-  // al elemento DOM real y sobrevive re-renders. Si usáramos ref.current, en
-  // el primer click ref puede ser null (orden de ejecución) y el Popper caería
-  // al top-left del viewport.
-  const [addonAnchor, setAddonAnchor] = useState<HTMLElement | null>(null)
-  const addonsOpen = addonAnchor !== null
+  // Guarda la diferencia clave del "before/after" para re-animar counter sólo cuando el valor cambia material
+  const lastTotalRef = useRef<number | null>(null)
 
-  const handleAddonsToggle = (event: ReactMouseEvent<HTMLElement>) =>
-    setAddonAnchor(prev => (prev ? null : event.currentTarget))
-
-  const handleAddonsClose = () => setAddonAnchor(null)
+  useEffect(() => {
+    if (total !== null) lastTotalRef.current = total
+  }, [total])
 
   return (
     <Box
@@ -199,8 +191,7 @@ const QuoteSummaryDock = ({
                   ? {
                       count: addonCount,
                       amount: appliedAddonsTotal ?? 0,
-                      onClick: handleAddonsToggle,
-                      ariaExpanded: addonsOpen
+                      content: addonContent
                     }
                   : null
               }
@@ -250,36 +241,6 @@ const QuoteSummaryDock = ({
           </Stack>
         </Grid>
       </Grid>
-
-      {/*
-        Popper del panel de addons — vive como sibling del Grid para poder
-        anclarse al segmento inline de la ladder (zone 2). El anchor se
-        captura desde event.currentTarget al click, no via ref.
-      */}
-      {addonContent && addonCount > 0 ? (
-        <Popper
-          open={addonsOpen}
-          anchorEl={addonAnchor}
-          placement='top-start'
-          sx={{ zIndex: theme => theme.zIndex.modal + 1 }}
-        >
-          <ClickAwayListener onClickAway={handleAddonsClose}>
-            <Paper
-              elevation={6}
-              sx={theme => ({
-                mb: 1,
-                p: 2,
-                width: 380,
-                maxWidth: 'calc(100vw - 32px)',
-                borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                border: `1px solid ${theme.palette.divider}`
-              })}
-            >
-              {addonContent}
-            </Paper>
-          </ClickAwayListener>
-        </Popper>
-      ) : null}
     </Box>
   )
 }

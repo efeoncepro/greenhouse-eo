@@ -1,11 +1,26 @@
 'use client'
 
-import { Fragment, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
+import { Fragment, useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+
+import {
+  FloatingFocusManager,
+  FloatingPortal,
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole
+} from '@floating-ui/react'
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import useReducedMotion from '@/hooks/useReducedMotion'
@@ -20,11 +35,9 @@ export interface TotalsLadderAddonsSegment {
   /** Monto aplicado al total en la moneda output. */
   amount: number
 
-  /** Handler del click — abre típicamente un popover con el detalle. */
-  onClick: (event: ReactMouseEvent<HTMLElement>) => void
-
-  /** Reflejo del popover state para a11y. */
-  ariaExpanded?: boolean
+  /** Contenido del popover que se abre al click del segmento. El primitive
+   *  se encarga del positioning, focus management, dismiss y a11y. */
+  content: ReactNode
 }
 
 export interface TotalsLadderProps {
@@ -40,8 +53,9 @@ export interface TotalsLadderProps {
 
   /** Segmento interactivo de addons inline en la ladder. Patrón enterprise
    *  (Notion/Linear/Stripe): acciones contextuales viven con sus datos, no
-   *  como chips flotantes aparte. Cuando count > 0, renderiza como botón
-   *  inline con hover/focus states y abre el popover al click. */
+   *  como chips flotantes aparte. El primitive encapsula el popover usando
+   *  Floating UI — autoUpdate + flip + shift middleware aseguran posicionamiento
+   *  correcto aún si el anchor re-renderiza o se mueve. */
   addonsSegment?: TotalsLadderAddonsSegment | null
 }
 
@@ -80,13 +94,13 @@ const formatFactor = (factor: number) => `×${factor.toFixed(2).replace('.', ','
  * - Una única métrica prominente (h4, tabular-nums, text.primary) es el anchor.
  * - Subtotal, factor, IVA y addons colapsan en un caption muted one-liner
  *   debajo **solo cuando aportan información**. Addons son interactivos
- *   (botón inline) cuando hay > 0 aplicados.
+ *   (botón inline + popover) cuando hay > 0 aplicados.
+ * - El popover está self-contained: anchor + state + positioning + a11y viven
+ *   dentro del primitive usando Floating UI (@floating-ui/react). Consumers
+ *   pasan el contenido del popover como `addonsSegment.content`.
  *
- * Evita la redundancia de mostrar Subtotal y Total side-by-side con peso
- * equivalente cuando son el mismo número.
- *
- * Consumers: QuoteSummaryDock v2 (TASK-505 + TASK-507). Reusable para invoice
- * dock, purchase order footer, contract summary.
+ * Consumers: QuoteSummaryDock v2 (TASK-505 / TASK-507 / TASK-509). Reusable
+ * para invoice dock, purchase order footer, contract summary.
  */
 const TotalsLadder = ({
   subtotal,
@@ -192,57 +206,129 @@ const TotalsLadder = ({
                   {segment.text}
                 </Typography>
               ) : (
-                <Box
-                  component='button'
-                  type='button'
-                  onClick={segment.addons.onClick}
-                  aria-expanded={segment.addons.ariaExpanded ?? undefined}
-                  aria-haspopup='dialog'
-                  aria-label={`${segment.addons.count} addon${segment.addons.count === 1 ? '' : 's'} aplicado${segment.addons.count === 1 ? '' : 's'} por ${formatMoney(segment.addons.amount, currency)}. Abrir detalle.`}
-                  sx={theme => ({
-                    appearance: 'none',
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    color: theme.palette.text.secondary,
-                    fontVariantNumeric: 'tabular-nums',
-                    fontSize: theme.typography.caption.fontSize,
-                    fontFamily: theme.typography.fontFamily,
-                    textDecoration: 'none',
-                    transition: theme.transitions.create(['color', 'text-decoration-color'], {
-                      duration: 150,
-                      easing: 'cubic-bezier(0.2, 0, 0, 1)'
-                    }),
-                    '&:hover': {
-                      color: theme.palette.primary.main,
-                      textDecoration: 'underline',
-                      textUnderlineOffset: '2px'
-                    },
-                    '&:focus-visible': {
-                      outline: `2px solid ${theme.palette.primary.main}`,
-                      outlineOffset: 2,
-                      borderRadius: `${theme.shape.customBorderRadius.xs}px`,
-                      color: theme.palette.primary.main
-                    },
-                    '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
-                  })}
-                >
-                  <i className='tabler-sparkles' aria-hidden='true' style={{ fontSize: 14 }} />
-                  <span>
-                    {segment.addons.count} addon{segment.addons.count === 1 ? '' : 's'}
-                    {segment.addons.amount > 0 ? ` ${formatMoney(segment.addons.amount, currency)}` : ''}
-                  </span>
-                </Box>
+                <AddonsSegmentButton
+                  count={segment.addons.count}
+                  amount={segment.addons.amount}
+                  content={segment.addons.content}
+                  currency={currency}
+                />
               )}
             </Fragment>
           ))}
         </Stack>
       ) : null}
     </Box>
+  )
+}
+
+/**
+ * Inline button + popover para el segmento de addons. Encapsula Floating UI:
+ * autoUpdate detecta cambios del anchor (scroll, resize, re-render) y mantiene
+ * la posición correcta; flip + shift evitan que el popover se salga del
+ * viewport; useDismiss gestiona escape + outside-click; FloatingFocusManager
+ * maneja focus trap ligero + return focus.
+ */
+const AddonsSegmentButton = ({
+  count,
+  amount,
+  content,
+  currency
+}: {
+  count: number
+  amount: number
+  content: ReactNode
+  currency: TotalsLadderCurrency
+}) => {
+  const [open, setOpen] = useState(false)
+
+  const { refs, floatingStyles, context, isPositioned } = useFloating<HTMLButtonElement>({
+    open,
+    onOpenChange: setOpen,
+    placement: 'top-start',
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(8), flip({ fallbackAxisSideDirection: 'end' }), shift({ padding: 16 })]
+  })
+
+  const click = useClick(context)
+  const dismiss = useDismiss(context, { outsidePress: true, escapeKey: true })
+  const role = useRole(context, { role: 'dialog' })
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role])
+
+  return (
+    <>
+      <Box
+        component='button'
+        type='button'
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        aria-label={`${count} addon${count === 1 ? '' : 's'} aplicado${count === 1 ? '' : 's'}${amount > 0 ? ` por ${formatMoney(amount, currency)}` : ''}. Abrir detalle.`}
+        sx={theme => ({
+          appearance: 'none',
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 0.5,
+          color: open ? theme.palette.primary.main : theme.palette.text.secondary,
+          fontVariantNumeric: 'tabular-nums',
+          fontSize: theme.typography.caption.fontSize,
+          fontFamily: theme.typography.fontFamily,
+          textDecoration: open ? 'underline' : 'none',
+          textUnderlineOffset: '2px',
+          transition: theme.transitions.create(['color', 'text-decoration-color'], {
+            duration: 150,
+            easing: 'cubic-bezier(0.2, 0, 0, 1)'
+          }),
+          '&:hover': {
+            color: theme.palette.primary.main,
+            textDecoration: 'underline',
+            textUnderlineOffset: '2px'
+          },
+          '&:focus-visible': {
+            outline: `2px solid ${theme.palette.primary.main}`,
+            outlineOffset: 2,
+            borderRadius: `${theme.shape.customBorderRadius.xs}px`,
+            color: theme.palette.primary.main
+          },
+          '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+        })}
+      >
+        <i className='tabler-sparkles' aria-hidden='true' style={{ fontSize: 14 }} />
+        <span>
+          {count} addon{count === 1 ? '' : 's'}
+          {amount > 0 ? ` ${formatMoney(amount, currency)}` : ''}
+        </span>
+      </Box>
+
+      {open ? (
+        <FloatingPortal>
+          <FloatingFocusManager context={context} modal={false} returnFocus>
+            <Paper
+              ref={refs.setFloating}
+              elevation={6}
+              style={floatingStyles}
+              {...getFloatingProps()}
+              sx={theme => ({
+                width: 380,
+                maxWidth: 'calc(100vw - 32px)',
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                border: `1px solid ${theme.palette.divider}`,
+                p: 2,
+                zIndex: theme.zIndex.modal + 1,
+                opacity: isPositioned ? 1 : 0,
+                transition: 'opacity 150ms cubic-bezier(0.2, 0, 0, 1)',
+                '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+              })}
+            >
+              {content}
+            </Paper>
+          </FloatingFocusManager>
+        </FloatingPortal>
+      ) : null}
+    </>
   )
 }
 
