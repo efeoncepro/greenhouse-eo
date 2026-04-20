@@ -56,6 +56,7 @@ describe('computeOverrideDelta (TASK-481)', () => {
       expect(result.deltaPct).toBeNull()
       expect(result.direction).toBeNull()
     }
+
     expect(undefinedOverride.hasSuggestedBaseline).toBe(true)
   })
 

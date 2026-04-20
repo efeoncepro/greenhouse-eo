@@ -3,31 +3,24 @@ import 'server-only'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+// Re-export client-safe types + enums so server-side callers can keep using
+// a single import path. Client-side callers should import directly from
+// `./quotation-line-cost-override-types` to avoid server-only barrel.
+export {
+  QUOTATION_LINE_COST_OVERRIDE_CATEGORIES,
+  type QuotationLineCostOverrideCategory
+} from './quotation-line-cost-override-types'
+
+import type { QuotationLineCostOverrideCategory as Category } from './quotation-line-cost-override-types'
+
 interface QueryableClient {
   query: (text: string, values?: unknown[]) => Promise<unknown>
 }
 
-export type QuotationLineCostOverrideCategory =
-  | 'competitive_pressure'
-  | 'strategic_investment'
-  | 'roi_correction'
-  | 'error_correction'
-  | 'client_negotiation'
-  | 'other'
-
-export const QUOTATION_LINE_COST_OVERRIDE_CATEGORIES: readonly QuotationLineCostOverrideCategory[] = [
-  'competitive_pressure',
-  'strategic_investment',
-  'roi_correction',
-  'error_correction',
-  'client_negotiation',
-  'other'
-]
-
 export interface QuotationLineCostOverriddenPayload {
   quotationId: string
   lineItemId: string
-  category: QuotationLineCostOverrideCategory
+  category: Category
   reason: string
   suggestedUnitCostUsd: number | null
   overrideUnitCostUsd: number

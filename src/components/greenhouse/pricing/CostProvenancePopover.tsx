@@ -85,6 +85,7 @@ const CostProvenancePopover = ({
 
   const hasAnyProvenance =
     typeof sourceKind === 'string' && NO_DATA_KEY_SET.has(sourceKind)
+
   const notes = Array.isArray(resolutionNotes) ? resolutionNotes.filter(Boolean) : []
 
   return (

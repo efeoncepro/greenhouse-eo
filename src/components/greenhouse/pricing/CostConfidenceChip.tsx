@@ -27,7 +27,9 @@ const isKnownBucket = (value: unknown): value is CostConfidenceLabel =>
 const formatScore = (score: number | null | undefined): string | null => {
   if (score === null || score === undefined || !Number.isFinite(score)) return null
   const clamped = Math.max(0, Math.min(1, score))
-  return `${Math.round(clamped * 100)}%`
+
+  
+return `${Math.round(clamped * 100)}%`
 }
 
 /**

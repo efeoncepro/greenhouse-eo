@@ -25,7 +25,7 @@ import { computeOverrideDelta } from '@/lib/finance/pricing/override-delta'
 import {
   QUOTATION_LINE_COST_OVERRIDE_CATEGORIES,
   type QuotationLineCostOverrideCategory
-} from '@/lib/commercial/quotation-line-cost-override-events'
+} from '@/lib/commercial/quotation-line-cost-override-types'
 
 const OVERRIDE_CATEGORIES = QUOTATION_LINE_COST_OVERRIDE_CATEGORIES
 
@@ -75,24 +75,31 @@ export interface CostOverrideDialogProps {
 const parseAmount = (raw: string): number | null => {
   if (!raw || !raw.trim()) return null
   const parsed = Number.parseFloat(raw.replace(',', '.'))
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null
+
+  
+return Number.isFinite(parsed) && parsed >= 0 ? parsed : null
 }
 
 const formatUsd = (value: number | null | undefined): string => {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—'
-  return `USD ${value.toFixed(2)}`
+  
+return `USD ${value.toFixed(2)}`
 }
 
 const formatRelativeDate = (iso: string): string => {
   const date = new Date(iso)
+
   if (Number.isNaN(date.getTime())) return iso
   const diffSec = Math.floor((Date.now() - date.getTime()) / 1000)
+
   if (diffSec < 60) return 'hace unos segundos'
   if (diffSec < 3600) return `hace ${Math.floor(diffSec / 60)} min`
   if (diffSec < 86400) return `hace ${Math.floor(diffSec / 3600)} h`
   const days = Math.floor(diffSec / 86400)
+
   if (days < 30) return `hace ${days} día${days === 1 ? '' : 's'}`
-  return date.toLocaleDateString('es-CL')
+  
+return date.toLocaleDateString('es-CL')
 }
 
 /**
@@ -144,7 +151,8 @@ const CostOverrideDialog = ({
   useEffect(() => {
     if (!open) {
       resetForm()
-      return
+      
+return
     }
 
     let cancelled = false
@@ -152,19 +160,23 @@ const CostOverrideDialog = ({
     const loadHistory = async () => {
       setHistoryLoading(true)
       setHistoryError(null)
+
       try {
         const response = await fetch(
           `/api/finance/quotes/${encodeURIComponent(quotationId)}/lines/${encodeURIComponent(lineItemId)}/cost-override?limit=5`,
           { credentials: 'same-origin' }
         )
+
         if (!response.ok) {
           throw new Error(`Unexpected status ${response.status}`)
         }
+
         const data = (await response.json()) as CostOverrideHistoryResponse
+
         if (!cancelled) {
           setHistory(Array.isArray(data.history) ? data.history : [])
         }
-      } catch (err) {
+      } catch {
         if (!cancelled) {
           setHistoryError(GH_PRICING.costOverride.historyLoadError)
           setHistory([])
@@ -194,6 +206,7 @@ const CostOverrideDialog = ({
 
   const reasonTrimmed = reason.trim()
   const reasonMin = category === 'other' ? REASON_MIN_OTHER : REASON_MIN_STANDARD
+
   const reasonHelper =
     category === 'other'
       ? GH_PRICING.costOverride.reasonHelperOther
@@ -235,22 +248,29 @@ const CostOverrideDialog = ({
 
       if (response.status === 403) {
         setSubmitError(GH_PRICING.costOverride.errorToastForbidden)
-        return
+        
+return
       }
+
       if (response.status === 404) {
         setSubmitError(GH_PRICING.costOverride.errorToastNotFound)
-        return
+        
+return
       }
+
       if (!response.ok) {
         const text = await response.text().catch(() => '')
+
         setSubmitError(text || GH_PRICING.costOverride.errorToastGeneric)
-        return
+        
+return
       }
 
       const data = (await response.json()) as { override: CostOverrideDialogSuccessResult }
+
       onSuccess(data.override)
       onClose()
-    } catch (err) {
+    } catch {
       setSubmitError(GH_PRICING.costOverride.errorToastGeneric)
     } finally {
       setSubmitting(false)
@@ -338,7 +358,9 @@ const CostOverrideDialog = ({
             </MenuItem>
             {OVERRIDE_CATEGORIES.map(key => {
               const meta = GH_PRICING.costOverride.categories[key]
-              return (
+
+              
+return (
                 <MenuItem key={key} value={key}>
                   <Stack spacing={0.25}>
                     <Typography variant='body2' sx={{ fontWeight: 600 }}>
@@ -427,10 +449,13 @@ const CostOverrideDialog = ({
                 {history.map(entry => {
                   const actorLabel =
                     entry.overriddenByUserId ?? GH_PRICING.costOverride.historyEntryActorFallback
+
                   const dateLabel = formatRelativeDate(entry.overriddenAt)
                   const entryHeader = GH_PRICING.costOverride.historyEntryByActor(actorLabel, dateLabel)
                   const categoryLabel = GH_PRICING.costOverride.categories[entry.category]?.label ?? entry.category
-                  return (
+
+                  
+return (
                     <Box
                       key={entry.historyId}
                       sx={theme => ({

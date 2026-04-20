@@ -66,6 +66,7 @@ const assertValidCategory = (value: unknown): QuotationLineCostOverrideCategory 
   if (typeof value !== 'string') {
     throw new QuotationLineCostOverrideValidationError('category is required.', 400, 'category_missing')
   }
+
   if (!QUOTATION_LINE_COST_OVERRIDE_CATEGORIES.includes(value as QuotationLineCostOverrideCategory)) {
     throw new QuotationLineCostOverrideValidationError(
       `category must be one of ${QUOTATION_LINE_COST_OVERRIDE_CATEGORIES.join(', ')}.`,
@@ -73,15 +74,19 @@ const assertValidCategory = (value: unknown): QuotationLineCostOverrideCategory 
       'category_invalid'
     )
   }
-  return value as QuotationLineCostOverrideCategory
+
+  
+return value as QuotationLineCostOverrideCategory
 }
 
 const assertReason = (value: unknown, category: QuotationLineCostOverrideCategory): string => {
   if (typeof value !== 'string') {
     throw new QuotationLineCostOverrideValidationError('reason is required.', 400, 'reason_missing')
   }
+
   const trimmed = value.trim()
   const minLength = category === 'other' ? 30 : 15
+
   if (trimmed.length < minLength) {
     throw new QuotationLineCostOverrideValidationError(
       `reason must be at least ${minLength} characters when category is "${category}".`,
@@ -89,6 +94,7 @@ const assertReason = (value: unknown, category: QuotationLineCostOverrideCategor
       'reason_too_short'
     )
   }
+
   if (trimmed.length > 500) {
     throw new QuotationLineCostOverrideValidationError(
       'reason must be 500 characters or fewer.',
@@ -96,7 +102,9 @@ const assertReason = (value: unknown, category: QuotationLineCostOverrideCategor
       'reason_too_long'
     )
   }
-  return trimmed
+
+  
+return trimmed
 }
 
 const assertOverrideUnitCost = (value: unknown): number => {
@@ -107,7 +115,9 @@ const assertOverrideUnitCost = (value: unknown): number => {
       'override_unit_cost_invalid'
     )
   }
-  return Math.round(value * 10000) / 10000
+
+  
+return Math.round(value * 10000) / 10000
 }
 
 interface LineRow {
@@ -120,36 +130,51 @@ interface LineRow {
 const toNullableNumber = (value: unknown): number | null => {
   if (value === null || value === undefined) return null
   if (typeof value === 'number') return Number.isFinite(value) ? value : null
+
   if (typeof value === 'string') {
     const parsed = Number(value)
-    return Number.isFinite(parsed) ? parsed : null
+
+    
+return Number.isFinite(parsed) ? parsed : null
   }
-  return null
+
+  
+return null
 }
 
 const extractSuggestedUnitCostUsd = (row: LineRow): number | null => {
   const persistedV2 = toNullableNumber(row.pricing_v2_unit_cost_usd)
+
   if (persistedV2 !== null) return persistedV2
 
   const breakdown = row.cost_breakdown
+
   if (breakdown && typeof breakdown === 'object' && !Array.isArray(breakdown)) {
     const withKey = breakdown as Record<string, unknown>
+
     const candidate =
       withKey.pricingV2UnitCostUsd ??
       withKey.pricing_v2_unit_cost_usd ??
       withKey.loadedTotal ??
       withKey.loaded_total
-    return toNullableNumber(candidate)
+
+    
+return toNullableNumber(candidate)
   }
-  return null
+
+  
+return null
 }
 
 const extractSuggestedBreakdown = (row: LineRow): Record<string, unknown> | null => {
   const breakdown = row.cost_breakdown
+
   if (breakdown && typeof breakdown === 'object' && !Array.isArray(breakdown)) {
     return { ...(breakdown as Record<string, unknown>) }
   }
-  return null
+
+  
+return null
 }
 
 /**
@@ -180,6 +205,7 @@ export const applyQuotationLineCostOverride = async (
   if (!input.quotationId || typeof input.quotationId !== 'string') {
     throw new QuotationLineCostOverrideValidationError('quotationId is required.', 400, 'quotation_id_missing')
   }
+
   if (!input.lineItemId || typeof input.lineItemId !== 'string') {
     throw new QuotationLineCostOverrideValidationError('lineItemId is required.', 400, 'line_item_id_missing')
   }

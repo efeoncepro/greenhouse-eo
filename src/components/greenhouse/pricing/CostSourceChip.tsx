@@ -60,6 +60,7 @@ const CostSourceChip = ({ sourceKind, compact }: CostSourceChipProps) => {
   const copy = GH_PRICING.costProvenance.sourceKinds[sourceKind]
   const labelText = copy?.label ?? sourceKind
   const description = copy?.shortDescription ?? ''
+
   const tooltipTitle = description
     ? `${GH_PRICING.costProvenance.sourceLabel}: ${labelText}. ${description}`
     : `${GH_PRICING.costProvenance.sourceLabel}: ${labelText}`

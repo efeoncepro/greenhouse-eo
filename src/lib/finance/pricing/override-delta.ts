@@ -1,9 +1,12 @@
-import 'server-only'
-
 /**
  * Pure domain helper for computing the signed delta between a system-suggested
  * unit cost and a manual override. Used by the Quote Builder override UI (live
  * preview) and by the write path (persistence + event payload).
+ *
+ * Note: NO `server-only` import — this module is consumed by both the server
+ * store (`applyQuotationLineCostOverride`) and the client dialog
+ * (`CostOverrideDialog`) for live delta preview. Pure function, no side
+ * effects, safe to bundle on either side.
  *
  * Contract (TASK-481):
  *   - Inputs must be finite, non-negative numbers in the same currency (USD).
@@ -29,7 +32,9 @@ export interface OverrideDeltaResult {
 
 const round = (value: number, decimals: number): number => {
   const factor = 10 ** decimals
-  return Math.round(value * factor) / factor
+
+  
+return Math.round(value * factor) / factor
 }
 
 const isFiniteNonNegative = (value: number | null | undefined): value is number =>
@@ -61,6 +66,7 @@ export const computeOverrideDelta = (input: OverrideDeltaInput): OverrideDeltaRe
   const deltaPct = suggested === 0 ? null : round(((override - suggested) / suggested) * 100, 4)
 
   let direction: OverrideDeltaDirection
+
   if (deltaAbsolute > 0) {
     direction = 'above'
   } else if (deltaAbsolute < 0) {

@@ -34,6 +34,7 @@ export async function POST(
   { params }: { params: Promise<RouteParams> }
 ) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
+
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -48,6 +49,7 @@ export async function POST(
   const { id: quotationId, lineItemId } = await params
 
   let body: unknown
+
   try {
     body = await request.json()
   } catch {
@@ -82,8 +84,10 @@ export async function POST(
         { status: error.statusCode }
       )
     }
+
     console.error('[TASK-481] Failed to apply quotation line cost override', error)
-    return NextResponse.json(
+    
+return NextResponse.json(
       { error: 'Failed to apply cost override.' },
       { status: 500 }
     )
@@ -108,6 +112,7 @@ export async function GET(
   { params }: { params: Promise<RouteParams> }
 ) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
+
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -126,7 +131,8 @@ export async function GET(
     return NextResponse.json({ history })
   } catch (error) {
     console.error('[TASK-481] Failed to list quotation line cost override history', error)
-    return NextResponse.json(
+    
+return NextResponse.json(
       { error: 'Failed to list cost override history.' },
       { status: 500 }
     )

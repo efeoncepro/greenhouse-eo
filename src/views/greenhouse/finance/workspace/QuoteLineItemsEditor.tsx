@@ -1278,14 +1278,19 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
       {overrideDialogIndex !== null
         ? (() => {
             const line = draftLines[overrideDialogIndex]
+
             if (!line || !line.lineItemId) return null
             const simLine = simulationLines?.[overrideDialogIndex] ?? null
+
             const suggestedUsd =
               simLine?.costStack?.unitCostUsd !== undefined && simLine?.costStack?.unitCostUsd !== null
                 ? simLine.costStack.unitCostUsd
                 : null
+
             const sourceKind = simLine?.costStack?.costBasisKind ?? null
-            return (
+
+            
+return (
               <CostOverrideDialog
                 open
                 onClose={() => setOverrideDialogIndex(null)}

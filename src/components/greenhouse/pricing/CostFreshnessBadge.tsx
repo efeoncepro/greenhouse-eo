@@ -38,17 +38,21 @@ const resolveTierLabel = (tier: FreshnessTier): string => {
 const computeDaysSince = (raw: string | Date | null | undefined): number | null => {
   if (!raw) return null
   const date = raw instanceof Date ? raw : new Date(raw)
+
   if (Number.isNaN(date.getTime())) return null
   const diffMs = Date.now() - date.getTime()
+
   if (diffMs < 0) return 0
-  return Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  
+return Math.floor(diffMs / (1000 * 60 * 60 * 24))
 }
 
 const resolveTier = (days: number | null): FreshnessTier => {
   if (days === null) return 'unknown'
   if (days < 30) return 'fresh'
   if (days < 60) return 'stale'
-  return 'very_stale'
+  
+return 'very_stale'
 }
 
 /**
@@ -114,6 +118,7 @@ const CostFreshnessBadge = ({ snapshotDate, compact }: CostFreshnessBadgeProps) 
       </Box>
     </Tooltip>
   )
+
   // colorKey reserved if consumers end up needing the raw palette key
   void colorKey
 }

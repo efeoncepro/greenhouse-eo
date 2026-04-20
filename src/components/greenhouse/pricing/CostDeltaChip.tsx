@@ -23,7 +23,9 @@ const META: Record<OverrideDeltaDirection, { color: 'warning' | 'success' | 'inf
 const formatPct = (pct: number | null | undefined): string => {
   if (pct === null || pct === undefined || !Number.isFinite(pct)) return '—'
   const rounded = Math.round(pct * 100) / 100
-  return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(2).replace(/\.?0+$/, '')
+
+  
+return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(2).replace(/\.?0+$/, '')
 }
 
 /**
@@ -56,12 +58,14 @@ const CostDeltaChip = ({
 
   const meta = META[direction]
   const pctLabel = formatPct(deltaPct !== null && deltaPct !== undefined ? Math.abs(deltaPct) : deltaPct)
+
   const label =
     direction === 'equal'
       ? GH_PRICING.costOverride.deltaEqual
       : direction === 'above'
         ? GH_PRICING.costOverride.deltaAbove(Number(pctLabel))
         : GH_PRICING.costOverride.deltaBelow(Number(pctLabel))
+
   const ariaLabel = `${GH_PRICING.costOverride.deltaLabel}: ${label}`
 
   return (
