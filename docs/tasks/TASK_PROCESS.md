@@ -24,6 +24,7 @@ Para la plantilla copiable, ver [`TASK_TEMPLATE.md`](TASK_TEMPLATE.md).
 - Si la task nace desde un brief legacy, agregar:
   - `- Legacy ID: CODEX_TASK_Finance_Dashboard_Calculation_Correction_v1`
 - Consultar `docs/tasks/TASK_ID_REGISTRY.md` para reservar el siguiente ID disponible antes de crear una task nueva
+- Si la task pertenece a un programa mayor, declarar `Epic: EPIC-###` dentro de `## Status` y sincronizarla con `docs/epics/`
 - Branch convention: `task/TASK-###-short-slug` (e.g., `task/TASK-003-finance-dashboard-fix`)
 
 ---
@@ -78,6 +79,7 @@ Usar estos campos dentro de `## Status`:
 - `Impact`: `Muy alto`, `Alto`, `Medio`
 - `Effort`: `Bajo`, `Medio`, `Alto`
 - `Type`: `implementation`, `umbrella`, `policy`
+- `Epic`: `EPIC-###` cuando la task pertenece a un programa cross-domain; `optional` cuando es standalone
 - `Status real`: `Diseno`, `Parcial`, `Avanzada`, `Cerrada`, `Referencia`
 - `Rank`: posicion actual en backlog operativo
 - `Domain`: modulo o area principal

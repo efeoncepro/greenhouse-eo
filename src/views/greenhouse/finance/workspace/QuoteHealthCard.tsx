@@ -208,9 +208,9 @@ const QuoteHealthCard = ({
                   <Alert key={alert.code} severity={alert.level} icon={false} role='status'>
                     <Typography variant='body2'>{alert.message}</Typography>
                     {alert.requiredApproval === 'finance' && (
-                      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
-                        Requiere aprobación de Finanzas antes de enviar.
-                      </Typography>
+                    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
+                        Requiere aprobación de Finanzas antes de emitir.
+                    </Typography>
                     )}
                   </Alert>
                 ))}

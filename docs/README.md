@@ -99,6 +99,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_REPO_ECOSYSTEM_V1.md](operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md)
 - [GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md](operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md)
 - [GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md](operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md)
+- [EPIC_OPERATING_MODEL_V1.md](operations/EPIC_OPERATING_MODEL_V1.md)
 - [HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md](operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md)
 - [RELEASE_CHANNELS_OPERATING_MODEL_V1.md](operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md)
 
@@ -108,6 +109,17 @@ Indice maestro de la documentacion no operativa del repo.
 
 ### Tasks
 
+- [Epic Index](epics/README.md)
+- [Epic Template](epics/EPIC_TEMPLATE.md) — plantilla copiable para epics nuevas
+- [Epic ID Registry](epics/EPIC_ID_REGISTRY.md)
+- Paneles activos bajo `docs/epics/`:
+  - `in-progress/`
+  - `to-do/`
+  - `complete/`
+- Regla obligatoria:
+  - `EPIC-###` se usa para programas cross-domain o multi-task que coordinan varias piezas
+  - un epic no reemplaza la ejecución: las tasks siguen siendo la unidad implementable
+  - las tasks hijas pueden declarar `Epic: EPIC-###` en `## Status`
 - [Mini Task Index](mini-tasks/README.md)
 - [Mini Task Template](mini-tasks/MINI_TASK_TEMPLATE.md) — plantilla copiable para mini-tasks nuevas
 - [Mini Task ID Registry](mini-tasks/MINI_TASK_ID_REGISTRY.md)

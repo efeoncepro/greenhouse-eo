@@ -45,16 +45,30 @@ const AnimatedCounter = ({
   const ref = useRef<HTMLSpanElement>(null)
   const isInView = useInView(ref, { once: true })
   const prefersReduced = useReducedMotion()
+  const isFirstMountRef = useRef(true)
 
   const fmt = (n: number) => (formatter ? formatter(n) : formatNumber(n, format, currency, locale))
 
-  const motionValue = useMotionValue(0)
+  // Inicia motion value al valor actual en el primer mount — evita la animación
+  // "0 → value" cuando el componente aparece con datos ya presentes.
+  // En actualizaciones posteriores (value cambia), spring interpola del valor
+  // anterior al nuevo naturalmente.
+  const motionValue = useMotionValue(value)
   const spring = useSpring(motionValue, { duration: duration * 1000, bounce: 0 })
 
   useEffect(() => {
-    if (isInView && !prefersReduced) {
-      motionValue.set(value)
+    if (!isInView || prefersReduced) return
+
+    if (isFirstMountRef.current) {
+      // Primer render: fija el valor sin animación
+      motionValue.jump(value)
+      isFirstMountRef.current = false
+
+      return
     }
+
+    // Actualización: spring interpola desde el valor actual
+    motionValue.set(value)
   }, [isInView, value, prefersReduced, motionValue])
 
   useEffect(() => {
@@ -68,7 +82,7 @@ const AnimatedCounter = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spring, format, currency, locale, formatter])
 
-  return <span ref={ref}>{fmt(prefersReduced ? value : 0)}</span>
+  return <span ref={ref}>{fmt(value)}</span>
 }
 
 export default AnimatedCounter

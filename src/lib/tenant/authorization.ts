@@ -70,6 +70,29 @@ export const canAccessBankTreasury = (tenant: TenantContext) =>
   hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) ||
   hasRoleCode(tenant, ROLE_CODES.FINANCE_ANALYST)
 
+/**
+ * Gates visibility of the internal cost stack in the commercial pricing builder
+ * (TASK-464e §Permission gating rule). Hidden to account/ops/client roles so that
+ * bill rates + margins remain visible but hourly cost breakdown + markup stays internal.
+ *
+ * Aligned with canAccessBankTreasury (finance admin + finance analyst + efeonce admin).
+ * Reconciled from TASK-464e spec which used `finance_manager` (not a runtime role code
+ * in this repo) and `finance` (not a role code, it's a route group).
+ */
+export const canViewCostStack = (tenant: TenantContext) =>
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ANALYST)
+
+/**
+ * Gates el admin UI de pricing catalog (TASK-467).
+ * Finance admin y Efeonce admin pueden administrar el catálogo entero
+ * (crear roles, tools, overheads; ajustar governance tables).
+ */
+export const canAdministerPricingCatalog = (tenant: TenantContext) =>
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN)
+
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||

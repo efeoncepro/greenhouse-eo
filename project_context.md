@@ -1,3 +1,151 @@
+## Delta 2026-04-19 EPIC-001 introduce taxonomía canónica de epics y el programa documental transversal
+
+- El repo ya no usa solo `umbrella task` para coordinar programas grandes: nace `docs/epics/` con `EPIC-###`, `EPIC_TEMPLATE.md` y `EPIC_ID_REGISTRY.md`.
+- Regla nueva:
+  - `EPIC-###` se usa para programas cross-domain o multi-task
+  - las tasks siguen siendo la unidad ejecutable
+  - una task puede declarar `Epic: EPIC-###` en `## Status`
+- Fuente operativa canónica:
+  - `docs/operations/EPIC_OPERATING_MODEL_V1.md`
+- Primer epic creado:
+  - `EPIC-001 — Document Vault + Signature Orchestration Platform`
+  - child tasks oficiales: `TASK-489` a `TASK-495`
+- Implicación arquitectónica:
+  - la estrategia documental futura del repo deja de fragmentarse por módulo
+  - GCS + `greenhouse_core.assets` sigue siendo la foundation binaria
+  - ZapSign queda posicionado como provider de firma, no como source of truth documental
+  - `TASK-027` (HR) y `TASK-461` (MSA) pasan a considerarse lanes convergentes de un mismo programa
+
+## Delta 2026-04-19 TASK-461 introduce MSA, clause library y firma electrónica ZapSign para contratos marco
+
+- Runtime nuevo:
+  - migración `20260419170002315_task-461-msa-umbrella-clause-library.sql`
+  - tablas `greenhouse_commercial.master_agreements`, `greenhouse_commercial.clause_library` y `greenhouse_commercial.master_agreement_clauses`
+  - FK real `greenhouse_commercial.contracts.msa_id -> greenhouse_commercial.master_agreements(msa_id)`
+  - stores `src/lib/commercial/master-agreements-store.ts`, `src/lib/commercial/master-agreement-clauses-store.ts`, `src/lib/commercial/contract-tenant-scope.ts`
+  - integración `src/lib/integrations/zapsign/client.ts`
+- Contrato operativo:
+  - `contract` deja de depender solo de `space_id` para tenant scoping y resuelve un scope híbrido `organization_id OR space_id` mientras convive con contratos legacy
+  - `master_agreement` pasa a ser el umbrella legal reusable para múltiples SOWs, con cláusulas versionadas y PDF firmado como asset privado
+  - la chain documental de MSA usa `greenhouse_core.assets` con contextos `master_agreement_draft` y `master_agreement`
+  - ZapSign queda integrado en modo productivo via API + webhook (`/api/webhooks/zapsign`); el runtime debe usar `ZAPSIGN_API_TOKEN` y `ZAPSIGN_WEBHOOK_SHARED_SECRET` desde env o Secret Manager, nunca desde `data/`
+- Variables nuevas:
+  - `ZAPSIGN_API_BASE_URL` (default `https://api.zapsign.com.br`)
+  - `ZAPSIGN_API_TOKEN`
+  - `ZAPSIGN_API_TOKEN_SECRET_REF`
+  - `ZAPSIGN_WEBHOOK_SHARED_SECRET`
+  - `ZAPSIGN_WEBHOOK_SHARED_SECRET_SECRET_REF`
+
+## Delta 2026-04-19 TASK-477 formaliza role_modeled con provenance, confidence y batch worker
+
+- Runtime nuevo:
+  - migración `20260419151636951_task-477-role-modeled-cost-basis.sql`
+  - tabla `greenhouse_commercial.role_modeled_cost_basis_snapshots`
+  - helper `src/lib/commercial-cost-basis/role-modeled-cost-basis.ts`
+- Contrato operativo:
+  - `sellable_role_cost_components` sigue siendo el anchor editable del catálogo, pero ahora agrega `direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score` y columnas generadas `confidence_label`, `direct_overhead_amount_usd`, `shared_overhead_amount_usd`, `loaded_monthly_cost_usd`, `loaded_hourly_cost_usd`
+  - `pricing-engine-v2` mantiene la precedencia `role_blended -> role_modeled`; cuando cae a `role_modeled`, ya expone provenance/confidence explícitos desde el reader nuevo
+  - `commercial-cost-worker` scope `roles` deja de estar reservado y materializa snapshots `role_modeled` por período
+  - `Admin > Pricing Catalog > Roles > Componentes de costo` ya puede editar overhead directo/compartido y mostrar loaded cost + confidence/origen sin crear otra UI paralela
+
+## Delta 2026-04-19 TASK-479 agrega el bridge persona -> rol comercial y el snapshot role_blended
+
+- Runtime nuevo:
+  - migración `20260419141717643_task-479-people-actual-cost-blended-role-snapshots.sql`
+  - tablas `greenhouse_commercial.member_role_cost_basis_snapshots` y `greenhouse_commercial.role_blended_cost_basis_snapshots`
+  - helper `src/lib/commercial-cost-basis/people-role-cost-basis.ts`
+- Contrato operativo:
+  - `member_capacity_economics` sigue siendo la fuente factual reusable de `member_actual`
+  - el bridge persona -> rol comercial ya no se resuelve inline en pricing; queda materializado con provenance/confidence por período
+  - `commercial-cost-worker` scope `people` materializa costo factual por persona + bridge persona/rol + `role_blended` en batch
+  - `pricing-engine-v2` prefiere `role_blended` antes de `role_modeled` cuando existe evidencia real reusable
+  - `active_role_codes` de Identity Access no debe usarse como source de rol comercial
+
+## Delta 2026-04-19 TASK-483 endurece el deploy del commercial-cost-worker con WIF
+
+- `commercial-cost-worker` deja de depender solo de deploy manual y adopta workflow GitHub Actions con el baseline WIF del repo.
+- Source of truth:
+  - `.github/workflows/commercial-cost-worker-deploy.yml`
+  - `services/commercial-cost-worker/deploy.sh`
+  - `.github/DEPLOY.md`
+- Contrato operativo:
+  - reusar `github-actions-deployer@efeonce-group.iam.gserviceaccount.com`
+  - no crear pool/provider/SA nuevos para este worker
+  - el workflow observa tanto `services/commercial-cost-worker/**` como librerías compartidas que alteran su runtime efectivo
+
+## Delta 2026-04-19 TASK-460 materializa contract como entidad canónica post-venta
+
+- Greenhouse ya no debe tratar `quotation_id` como único anchor válido para todo el lifecycle comercial después de la aceptación.
+- Runtime nuevo:
+  - migración `20260419071250347_task-460-contract-sow-canonical-entity.sql`
+  - tablas `greenhouse_commercial.contracts`, `greenhouse_commercial.contract_quotes`, `greenhouse_serving.contract_profitability_snapshots`, `greenhouse_commercial.contract_renewal_reminders`
+  - columnas `contract_id` en `greenhouse_finance.purchase_orders`, `greenhouse_finance.service_entry_sheets` e `greenhouse_finance.income`
+  - helpers `src/lib/commercial/contracts-store.ts`, `src/lib/commercial/contract-lifecycle.ts`
+  - endpoints `GET/POST /api/finance/contracts`, `GET /api/finance/contracts/[id]`, `GET /api/finance/contracts/[id]/document-chain`, `GET /api/finance/contracts/[id]/profitability`
+- Contrato operativo:
+  - `quotation` sigue siendo el artefacto pre-venta y de pricing
+  - `contract` pasa a ser el anchor canónico post-venta para document chain, profitability y renewals
+  - durante la transición ambos anchors coexisten y los consumers nuevos deben preferir `contract_id` cuando el caso de uso sea ejecución/rentabilidad/renovación
+  - `msa_id` queda reservado como referencia futura; no hay FK real hasta TASK-461
+  - toda lectura portal sigue tenant-scoped por `space_id`
+
+## Delta 2026-04-19 TASK-459 separa delivery model de quotation en dos ejes canónicos
+
+- Greenhouse ya no debe tratar `pricing_model` como source of truth suficiente para leer cómo se vende una quote.
+- Runtime nuevo:
+  - migración `20260419012226774_task-459-delivery-model-refinement.sql`
+  - helper `src/lib/commercial/delivery-model.ts`
+  - columnas `greenhouse_commercial.quotations.commercial_model` y `staffing_model`
+  - surfacing en `GET /api/finance/quotes`, `GET /api/finance/quotes/[id]`
+  - extensions en `quotation_pipeline_snapshots`, `quotation_profitability_snapshots` y `deal_pipeline_snapshots`
+- Contrato operativo:
+  - `commercial_model + staffing_model` pasa a ser la verdad canónica del delivery contract del quote
+  - `pricing_model` queda como alias legacy derivado para governance/templates/terms
+  - este `commercial_model` NO debe confundirse con `CommercialModelCode` del pricing engine comercial
+  - `sales_context_at_sent` ya preserva los tres campos para trazabilidad histórica
+
+## Delta 2026-04-19 TASK-456 materializa forecasting comercial canónico a grain deal
+
+- Greenhouse ya no debe usar `quotation_pipeline_snapshots` como aproximación del pipeline comercial real cuando la pregunta es forecasting por oportunidad.
+- Runtime nuevo:
+  - migración `20260419003219480_task-456-deal-pipeline-snapshots.sql`
+  - tabla `greenhouse_serving.deal_pipeline_snapshots`
+  - helper `src/lib/commercial-intelligence/deal-pipeline-materializer.ts`
+  - projection reactiva `src/lib/sync/projections/deal-pipeline.ts`
+  - endpoint `GET /api/finance/commercial-intelligence/deal-pipeline`
+- Contrato operativo:
+  - el grain canónico de forecasting comercial pasa a ser deal, no quote
+  - `is_open` / `is_won` deben resolverse desde `greenhouse_commercial.hubspot_deal_pipeline_config`, no desde nombres literales de stage
+  - `probability_pct` puede venir `NULL`; los agregados ponderados deben tratarlo como `0` sin inventar una probabilidad persistida
+  - un deal con `0` quotes sigue siendo una oportunidad válida y debe existir en la projection
+
+## Delta 2026-04-18 Iconify generated CSS queda endurecido para worktrees y gates locales
+
+- El portal ya no debe asumir que `src/assets/iconify-icons/generated-icons.css` existe solo porque alguna vez corrió `postinstall`.
+- Contrato operativo actualizado:
+  - `src/assets/iconify-icons/generated-icons.css` sigue siendo un artefacto generado y no versionado
+  - `pnpm dev`, `pnpm lint` y `pnpm build` ahora regeneran el bundle antes de ejecutar su comando principal vía `predev`, `prelint` y `prebuild`
+  - esto evita drift en worktrees que reutilizan `node_modules` sin correr `pnpm install`
+- Source of truth:
+  - `src/assets/iconify-icons/bundle-icons-css.ts` sigue siendo la fuente canónica del bundle
+  - `package.json` gobierna la regeneración automática
+
+## Delta 2026-04-18 TASK-455 materializa snapshot histórico del contexto comercial en quotations
+
+- Greenhouse ya no debe inferir ex post el contexto comercial de una quote enviada usando solo estado vivo del cliente o del deal.
+- Runtime actualizado:
+  - migración `20260418235105189_task-455-quote-sales-context-snapshot.sql`
+  - columna `greenhouse_commercial.quotations.sales_context_at_sent`
+  - helper `src/lib/commercial/sales-context.ts`
+  - extensión de `POST /api/finance/quotes/[id]/send`
+  - extensión del flujo `POST /api/finance/quotes/[id]/approve`
+  - exposición en `GET /api/finance/quotes/[id]`
+- Contrato operativo:
+  - el snapshot es histórico e immutable
+  - se construye solo con runtime local ya sincronizado
+  - el campo `hubspot_lead_id` queda reservado pero hoy se persiste como `null` por falta de source canónico local
+  - TASK-457 y cualquier classifier vivo deben seguir leyendo estado actual, no este snapshot
+
 ## Delta 2026-04-17 TASK-143 Agency Economics queda activada sobre serving canónico
 
 - `Agency > Economía` ya no debe tratarse como una vista legacy client-first ni como placeholder.
@@ -12,7 +160,67 @@
 - Decisión UI:
   - la surface nueva reutiliza componentes Vuexy/MUI nativos del repo como referencia principal, no componentes inventados ad hoc
 
+## Delta 2026-04-18 TASK-337 materializa la base runtime persona ↔ entidad legal
+
+- Greenhouse ya no deja esta relación solo como semántica documental.
+- Runtime nuevo:
+  - migración `20260418020712679_task-337-person-legal-entity-foundation.sql`
+  - tabla `greenhouse_core.person_legal_entity_relationships`
+  - helper `src/lib/account-360/person-legal-entity-relationships.ts`
+  - route `GET /api/people/[memberId]/legal-entity-relationships`
+  - proyección reactiva `src/lib/sync/projections/operating-entity-legal-relationship.ts`
+- Contrato operativo:
+  - la raíz humana sigue siendo `identity_profiles.profile_id`
+  - la contraparte legal v1 queda anclada explícitamente en `legal_entity_organization_id`, reutilizando `greenhouse_core.organizations`
+  - `person_memberships` no reemplaza esta capa; sigue representando contexto organizacional y operativo
+  - el backfill inicial solo materializa relaciones con fuente verificable en runtime actual: `employee` y `shareholder_current_account_holder`
+  - las lecturas portal filtran por `space_id` cuando existe tenant scope
+
+## Delta 2026-04-18 TASK-454 materializa lifecyclestage HubSpot como bridge runtime en clients
+
+- Greenhouse ya no debe tratar `lifecyclestage` como dato disponible solo por live read a HubSpot o por el projection CRM detallado.
+- Runtime actualizado:
+  - migración `20260418232659019_task-454-hubspot-company-lifecycle-stage.sql`
+  - columnas `greenhouse_core.clients.lifecyclestage`, `lifecyclestage_source`, `lifecyclestage_updated_at`
+  - helper `src/lib/hubspot/company-lifecycle-store.ts`
+  - sync `src/lib/hubspot/sync-hubspot-company-lifecycle.ts`
+  - cron `GET /api/cron/hubspot-company-lifecycle-sync`
+- Contrato operativo:
+  - la raíz canónica de company sigue repartida entre `organizations`, `spaces`, `client_profiles` y `greenhouse_crm.companies`
+  - `greenhouse_core.clients` solo materializa un bridge client-scoped de compatibilidad para downstreams que aún operan por `client_id`
+  - el sync respeta `manual_override`, puede dejar `unknown` cuando HubSpot no informa stage y usa `nubox_fallback` solo para rows legacy con evidencia económica runtime
+  - el evento `crm.company.lifecyclestage_changed` existe para follow-ons del pipeline comercial, pero este corte no agrega consumer reactivo
+
 # project_context.md
+
+## Delta 2026-04-19 TASK-483 crea runtime dedicado para commercial cost basis
+
+- Greenhouse ya no debe tratar `ops-worker` como destino por defecto de toda materializacion financiera/comercial pesada.
+- Runtime nuevo:
+  - migración `20260419120945432_task-483-commercial-cost-worker-foundation.sql`
+  - tabla `greenhouse_commercial.commercial_cost_basis_snapshots`
+  - helpers `src/lib/commercial-cost-worker/contracts.ts`, `run-tracker.ts`, `materialize.ts`
+  - route fallback `POST /api/internal/commercial-cost-basis/materialize`
+  - servicio Cloud Run `services/commercial-cost-worker/`
+- Contrato operativo:
+  - `commercial-cost-worker` es la topologia objetivo para cost basis comercial por `people`, `tools` y `bundle`
+  - `ops-worker` mantiene su endpoint de `cost-attribution` como lane existente/fallback, pero no debe absorber el resto del programa de cost basis
+  - toda corrida del worker escribe a `greenhouse_sync.source_sync_runs` con `source_system='commercial_cost_worker'`
+  - la trazabilidad por periodo y scope vive en `greenhouse_commercial.commercial_cost_basis_snapshots`
+  - endpoints `roles`, `quote repricing` y `margin feedback` quedan reservados como contrato de futuro, no implementados en este corte
+  - cualquier worker Cloud Run nuevo que reuse `src/lib/` sin auth interactiva debe replicar el patron esbuild + shims ESM/CJS
+
+## Delta 2026-04-19 TASK-478 agrega snapshots finos de costo comercial por herramienta/proveedor
+
+- Runtime nuevo:
+  - migración `20260419132037430_task-478-tool-provider-cost-basis-snapshots.sql`
+  - tabla `greenhouse_commercial.tool_provider_cost_basis_snapshots`
+  - helpers `src/lib/commercial-cost-basis/tool-provider-cost-basis.ts` y `tool-provider-cost-basis-reader.ts`
+- Contrato operativo:
+  - `provider_tooling_snapshots` sigue resolviendo el agregado provider-level
+  - `tool_provider_cost_basis_snapshots` es la capa fina reusable para pricing y supplier detail
+  - `commercial-cost-worker` scope `tools` materializa ambas capas en batch
+  - el pricing engine v2 intenta primero snapshot fino por `toolSku + period`; solo si no existe vuelve al costo crudo del catálogo
 
 ## Delta 2026-04-17 TASK-345 materializa el bridge canónico de quotations
 

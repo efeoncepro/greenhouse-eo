@@ -1,9 +1,9 @@
 # Cotizaciones multi-source — Nubox y HubSpot
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-07 por Claude (TASK-210)
-> **Ultima actualizacion:** 2026-04-17 por Codex (TASK-345)
+> **Ultima actualizacion:** 2026-04-19 por Codex (TASK-504)
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 ## Que es
@@ -46,11 +46,11 @@ Las cotizaciones de HubSpot usan un sistema de estados distinto. Greenhouse los 
 | Estado HubSpot | Estado Greenhouse | Significado |
 |----------------|-------------------|-------------|
 | `DRAFT` | Borrador | Cotizacion en edicion |
-| `PENDING_APPROVAL` | Enviada | Esperando aprobacion interna |
-| `APPROVAL_NOT_NEEDED` | Enviada | Publicada sin aprobacion |
-| `APPROVED` | Aceptada | Aprobada internamente |
-| `REJECTED` | Rechazada | Rechazada internamente |
-| `SIGNED` | Aceptada | Firmada por el cliente |
+| `PENDING_APPROVAL` | En aprobación | Esperando aprobacion interna |
+| `APPROVAL_NOT_NEEDED` | Emitida | Emitida sin aprobacion |
+| `APPROVED` | Emitida | Aprobada internamente y ya emitida |
+| `REJECTED` | Revisión requerida | Rechazada internamente |
+| `SIGNED` | Emitida | Firmada por el cliente sobre una quote ya emitida |
 | `LOST` | Rechazada | Perdida |
 | `EXPIRED` | Vencida | Paso la fecha de expiracion |
 
@@ -68,7 +68,7 @@ Las cotizaciones de HubSpot usan un sistema de estados distinto. Greenhouse los 
 
 ## Filtros disponibles
 
-- **Estado**: todos, borradores, enviadas, aceptadas, rechazadas, vencidas, facturadas
+- **Estado**: todos, borradores, en aprobación, revisión requerida, emitidas, rechazadas, vencidas, facturadas
 - **Fuente**: todas, Nubox, HubSpot, manual
 
 ## Crear cotizacion en HubSpot

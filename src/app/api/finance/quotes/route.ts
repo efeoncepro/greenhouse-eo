@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 
-import { withTransaction } from '@/lib/db'
+import {
+  resolveQuoteDeliveryModel,
+  type CommercialModel,
+  type StaffingModel
+} from '@/lib/commercial/delivery-model'
+import { query, withTransaction } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { seedQuotationDefaultTerms } from '@/lib/commercial/governance/terms-store'
@@ -22,6 +27,7 @@ import {
   type QuotationDiscountType,
   type QuotationLineInput
 } from '@/lib/finance/pricing'
+import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 
@@ -99,6 +105,9 @@ const getLegacyQuotes = async ({
     source: String(r.source_system || 'manual'),
     hubspotQuoteId: r.hubspot_quote_id ? String(r.hubspot_quote_id) : null,
     hubspotDealId: r.hubspot_deal_id ? String(r.hubspot_deal_id) : null,
+    pricingModel: null,
+    commercialModel: null,
+    staffingModel: null,
     isFromNubox: Boolean(r.nubox_document_id)
   }))
 }
@@ -148,16 +157,30 @@ export async function GET(request: Request) {
   }
 }
 
+// TASK-486: Contact membership_type values admitidas para asociar un contacto a una quote.
+// Excluye `team_member` y `contractor` porque no aplican como contacto comercial de cotización
+// (team_member es interno Efeonce; contractor es vendor/proveedor, no cliente).
+const QUOTE_CONTACT_MEMBERSHIP_TYPES = [
+  'client_contact',
+  'client_user',
+  'contact',
+  'billing',
+  'partner',
+  'advisor'
+] as const
+
 interface CreateQuotationPayload {
   quotationNumber?: string
   clientId?: string | null
   organizationId?: string | null
-  spaceId?: string | null
+  contactIdentityProfileId?: string | null
+  spaceId?: string | null // TASK-486: aceptado por backwards compat; ignorado al inserta (queda NULL).
   businessLineCode?: string | null
   currency?: QuotationPricingCurrency
   quoteDate?: string | null
   dueDate?: string | null
   validUntil?: string | null
+  expiryDate?: string | null
   billingFrequency?: QuotationBillingFrequency
   contractDurationMonths?: number | null
   exchangeRates?: Record<string, number>
@@ -170,6 +193,8 @@ interface CreateQuotationPayload {
   internalNotes?: string | null
   lineItems?: QuotationLineInput[]
   pricingModel?: 'staff_aug' | 'retainer' | 'project'
+  commercialModel?: CommercialModel
+  staffingModel?: StaffingModel
   templateId?: string | null
 }
 
@@ -195,6 +220,78 @@ export async function POST(request: Request) {
     body = (await request.json()) as CreateQuotationPayload
   } catch {
     return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 })
+  }
+
+  // TASK-486: validación canónica del anchor. organizationId es requerido; contactIdentityProfileId
+  // es opcional pero, si viene, debe resolver a una membership comercial activa en esa org.
+  const organizationId = typeof body.organizationId === 'string' ? body.organizationId.trim() : ''
+
+  if (!organizationId) {
+    return NextResponse.json(
+      { error: 'organizationId es obligatorio. Cada cotización se ancla a una organización (cliente o prospecto).' },
+      { status: 400 }
+    )
+  }
+
+  const orgExists = await query<{ organization_id: string }>(
+    `SELECT organization_id
+     FROM greenhouse_core.organizations
+     WHERE organization_id = $1
+       AND active = TRUE
+     LIMIT 1`,
+    [organizationId]
+  )
+
+  if (orgExists.length === 0) {
+    return NextResponse.json(
+      { error: `Organization ${organizationId} no existe o está inactiva.` },
+      { status: 404 }
+    )
+  }
+
+  const contactIdentityProfileId =
+    typeof body.contactIdentityProfileId === 'string' && body.contactIdentityProfileId.trim()
+      ? body.contactIdentityProfileId.trim()
+      : null
+
+  if (contactIdentityProfileId) {
+    const membershipRows = await query<{ membership_id: string; membership_type: string }>(
+      `SELECT pm.membership_id, pm.membership_type
+       FROM greenhouse_core.person_memberships pm
+       WHERE pm.profile_id = $1
+         AND pm.organization_id = $2
+         AND pm.active = TRUE
+       LIMIT 1`,
+      [contactIdentityProfileId, organizationId]
+    )
+
+    if (membershipRows.length === 0) {
+      return NextResponse.json(
+        {
+          error:
+            'contactIdentityProfileId no tiene una membership activa en esa organización. Un contacto debe estar asociado a la organización antes de cotizarle.'
+        },
+        { status: 400 }
+      )
+    }
+
+    const membershipType = membershipRows[0].membership_type
+
+    if (!QUOTE_CONTACT_MEMBERSHIP_TYPES.includes(membershipType as typeof QUOTE_CONTACT_MEMBERSHIP_TYPES[number])) {
+      return NextResponse.json(
+        {
+          error: `membership_type='${membershipType}' no aplica como contacto comercial (admitidos: ${QUOTE_CONTACT_MEMBERSHIP_TYPES.join(', ')}).`
+        },
+        { status: 400 }
+      )
+    }
+  }
+
+  // TASK-486: spaceId legacy se ignora. Nuevos writes lo dejan NULL; Space vuelve a ser
+  // proyección operativa post-conversion.
+  if (body.spaceId) {
+    // eslint-disable-next-line no-console
+    console.warn('[POST /api/finance/quotes] spaceId in body ignored (TASK-486: quotations anchor on organization_id, not space_id). Received:', body.spaceId)
   }
 
   // Optional template resolution — when `templateId` is passed, pull defaults
@@ -226,13 +323,18 @@ export async function POST(request: Request) {
     'one_time') as QuotationBillingFrequency
 
   const quoteDate = (body.quoteDate || new Date().toISOString().slice(0, 10)).slice(0, 10)
+  const resolvedExpiryDate = body.expiryDate ?? body.validUntil ?? null
   const quotationNumber = body.quotationNumber?.trim() || generateQuotationNumber()
   const createdBy = tenant.userId
 
-  const pricingModel =
-    body.pricingModel ||
-    (templateSnapshot?.defaults.pricingModel as 'staff_aug' | 'retainer' | 'project' | undefined) ||
-    'project'
+  const templatePricingModel =
+    templateSnapshot?.defaults.pricingModel as 'staff_aug' | 'retainer' | 'project' | undefined
+
+  const resolvedDeliveryModel = resolveQuoteDeliveryModel({
+    pricingModel: body.pricingModel ?? templatePricingModel ?? 'project',
+    commercialModel: body.commercialModel,
+    staffingModel: body.staffingModel
+  })
 
   const contractDurationMonths =
     body.contractDurationMonths !== undefined
@@ -248,9 +350,11 @@ export async function POST(request: Request) {
            quotation_number,
            client_id,
            organization_id,
-           space_id,
+           contact_identity_profile_id,
            business_line_code,
            pricing_model,
+           commercial_model,
+           staffing_model,
            status,
            current_version,
            currency,
@@ -268,31 +372,32 @@ export async function POST(request: Request) {
            quote_date,
            due_date,
            valid_until,
+           expiry_date,
            description,
            internal_notes,
            source_system,
            source_quote_id,
-           space_resolution_source,
            created_by
          ) VALUES (
-           $1, $2, $3, $4, $5, $6, 'draft', 1,
-           $7, NULL, $8::jsonb, $9::date,
-           $10, $11, $12, $13,
-           'one_time', $14, 30, $15,
-           $16::date, $17::date, $18::date,
-           $19, $20,
+           $1, $2, $3, $4, $5, $6, $7, $8, 'draft', 1,
+           $9, NULL, $10::jsonb, $11::date,
+           $12, $13, $14, $15,
+           'one_time', $16, 30, $17,
+           $18::date, $19::date, $20::date, $21::date,
+           $22, $23,
            'manual', $1,
-           CASE WHEN $4 IS NOT NULL THEN 'explicit' ELSE 'unresolved' END,
-           $21
+           $24
          )
          RETURNING quotation_id`,
         [
           quotationNumber,
           body.clientId ?? null,
-          body.organizationId ?? null,
-          body.spaceId ?? null,
+          organizationId,
+          contactIdentityProfileId,
           resolvedBusinessLineCode,
-          pricingModel,
+          resolvedDeliveryModel.pricingModel,
+          resolvedDeliveryModel.commercialModel,
+          resolvedDeliveryModel.staffingModel,
           currency,
           JSON.stringify(body.exchangeRates ?? {}),
           body.exchangeSnapshotDate ?? null,
@@ -304,7 +409,8 @@ export async function POST(request: Request) {
           contractDurationMonths,
           quoteDate,
           body.dueDate ?? null,
-          body.validUntil ?? null,
+          resolvedExpiryDate,
+          resolvedExpiryDate,
           body.description ?? null,
           body.internalNotes ?? null,
           createdBy
@@ -314,11 +420,24 @@ export async function POST(request: Request) {
       return insert.rows[0].quotation_id
     })
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('[POST /api/finance/quotes] quotations INSERT failed', {
+      businessLineCode: resolvedBusinessLineCode,
+      organizationId,
+      contactIdentityProfileId,
+      clientId: body.clientId ?? null,
+      pricingModel: resolvedDeliveryModel.pricingModel,
+      currency,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    })
+
     if (isFinanceSchemaDriftError(error)) {
       return financeSchemaDriftResponse('quotes_create', { error: 'Canonical quotation schema unavailable.' })
     }
 
-    throw error
+    const message = error instanceof Error ? error.message : 'Failed to create quotation.'
+
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 
   const bodyLineItems = Array.isArray(body.lineItems) ? body.lineItems : []
@@ -339,33 +458,64 @@ export async function POST(request: Request) {
         }))
       : bodyLineItems
 
-  const snapshot = await persistQuotationPricing(
-    {
+  let snapshot: Awaited<ReturnType<typeof persistQuotationPricing>>
+
+  try {
+    snapshot = await persistQuotationPricing(
+      {
+        quotationId,
+        versionNumber: 1,
+        businessLineCode: resolvedBusinessLineCode,
+        quoteCurrency: currency,
+        quoteDate,
+        billingFrequency,
+        contractDurationMonths,
+        exchangeRates: body.exchangeRates ?? {},
+        exchangeSnapshotDate: body.exchangeSnapshotDate ?? null,
+        globalDiscountType: body.globalDiscountType ?? null,
+        globalDiscountValue: body.globalDiscountValue ?? null,
+        marginTargetPct: body.targetMarginPct ?? null,
+        marginFloorPct: body.marginFloorPct ?? null,
+        lineItems,
+        createdBy
+      },
+      { createVersion: true, versionNotes: 'Draft created via API.' }
+    )
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('[POST /api/finance/quotes] persistQuotationPricing failed', {
       quotationId,
-      versionNumber: 1,
-      businessLineCode: resolvedBusinessLineCode,
-      quoteCurrency: currency,
-      quoteDate,
-      billingFrequency,
-      contractDurationMonths,
-      exchangeRates: body.exchangeRates ?? {},
-      exchangeSnapshotDate: body.exchangeSnapshotDate ?? null,
-      globalDiscountType: body.globalDiscountType ?? null,
-      globalDiscountValue: body.globalDiscountValue ?? null,
-      marginTargetPct: body.targetMarginPct ?? null,
-      marginFloorPct: body.marginFloorPct ?? null,
-      lineItems,
-      createdBy
-    },
-    { createVersion: true, versionNotes: 'Draft created via API.' }
-  )
+      lineItemsCount: lineItems.length,
+      error: error instanceof Error ? { message: error.message, stack: error.stack } : error
+    })
+
+    if (isFinanceSchemaDriftError(error)) {
+      return financeSchemaDriftResponse('quotes_create_pricing', {
+        error: 'Pricing persistence schema unavailable.'
+      })
+    }
+
+    if (isUnpricedQuotationLineItemsError(error)) {
+      return NextResponse.json(
+        { error: error.message, quotationId },
+        { status: 422 }
+      )
+    }
+
+    const message = error instanceof Error ? error.message : 'Failed to persist quotation pricing.'
+
+    return NextResponse.json(
+      { error: message, quotationId },
+      { status: 500 }
+    )
+  }
 
   // When a template is used, seed its default terms (templates carry a list
   // of term_ids; the terms store picks them up and resolves variables).
   if (templateSnapshot && templateSnapshot.defaults.termIds.length > 0) {
     await seedQuotationDefaultTerms({
       quotationId,
-      pricingModel,
+      pricingModel: resolvedDeliveryModel.pricingModel,
       businessLineCode: resolvedBusinessLineCode,
       variables: {
         paymentTermsDays: templateSnapshot.defaults.paymentTermsDays,
@@ -405,6 +555,9 @@ export async function POST(request: Request) {
     {
       quotationId,
       quotationNumber,
+      pricingModel: resolvedDeliveryModel.pricingModel,
+      commercialModel: resolvedDeliveryModel.commercialModel,
+      staffingModel: resolvedDeliveryModel.staffingModel,
       currentVersion: snapshot.versionNumber,
       totals: snapshot.totals,
       revenue: snapshot.revenue,

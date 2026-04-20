@@ -19,7 +19,10 @@ interface QuotationRow extends Record<string, unknown> {
   target_margin_pct: string | number | null
   business_line_code: string | null
   pricing_model: string | null
+  commercial_model: string | null
+  staffing_model: string | null
   quote_date: string | Date | null
+  issued_at: string | Date | null
   sent_at: string | Date | null
   approved_at: string | Date | null
   converted_at: string | Date | null
@@ -65,11 +68,13 @@ const deriveStage = (status: string): PipelineStage => {
     case 'pending_approval':
     case 'in_review':
       return 'in_review'
+    case 'issued':
     case 'sent':
       return 'sent'
+    case 'approval_rejected':
     case 'approved':
     case 'accepted':
-      return 'approved'
+      return status === 'approval_rejected' ? 'rejected' : 'approved'
     case 'converted':
       return 'converted'
     case 'rejected':
@@ -99,13 +104,13 @@ const stageEnteredAt = (row: QuotationRow): string | null => {
 
   switch (stage) {
     case 'converted':
-      return toIsoTimestamp(row.converted_at) ?? toIsoTimestamp(row.approved_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.converted_at) ?? toIsoTimestamp(row.approved_at) ?? toIsoTimestamp(row.issued_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'approved':
-      return toIsoTimestamp(row.approved_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.approved_at) ?? toIsoTimestamp(row.issued_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'sent':
-      return toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.issued_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'rejected':
-      return toIsoTimestamp(row.updated_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
+      return toIsoTimestamp(row.updated_at) ?? toIsoTimestamp(row.issued_at) ?? toIsoTimestamp(row.sent_at) ?? toIsoDate(row.quote_date)
     case 'expired':
       return toIsoTimestamp(row.expired_at) ?? toIsoDate(row.expiry_date) ?? toIsoDate(row.quote_date)
     default:
@@ -131,7 +136,8 @@ export const buildPipelineSnapshot = async ({
     `SELECT quotation_id, client_id, organization_id, space_id,
             status, legacy_status, total_price, total_amount_clp, currency,
             effective_margin_pct, target_margin_pct, business_line_code, pricing_model,
-            quote_date, sent_at, approved_at, converted_at, expired_at, expiry_date,
+            commercial_model, staffing_model,
+            quote_date, issued_at, sent_at, approved_at, converted_at, expired_at, expiry_date,
             updated_at
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1
@@ -190,10 +196,12 @@ export const buildPipelineSnapshot = async ({
     quotedMarginPct: toNum(quote.effective_margin_pct),
     businessLineCode: quote.business_line_code ? String(quote.business_line_code) : null,
     pricingModel: quote.pricing_model ? String(quote.pricing_model) : null,
+    commercialModel: quote.commercial_model ? String(quote.commercial_model) : null,
+    staffingModel: quote.staffing_model ? String(quote.staffing_model) : null,
     currency: quote.currency ? String(quote.currency) : null,
 
     quoteDate: toIsoDate(quote.quote_date),
-    sentAt: toIsoTimestamp(quote.sent_at),
+    sentAt: toIsoTimestamp(quote.issued_at) ?? toIsoTimestamp(quote.sent_at),
     approvedAt: toIsoTimestamp(quote.approved_at),
     expiryDate: expiryIso,
     convertedAt: toIsoTimestamp(quote.converted_at),
@@ -224,7 +232,7 @@ export const upsertPipelineSnapshot = async (row: PipelineSnapshotRow): Promise<
     `INSERT INTO greenhouse_serving.quotation_pipeline_snapshots (
        quotation_id, client_id, organization_id, space_id,
        status, pipeline_stage, probability_pct,
-       total_amount_clp, quoted_margin_pct, business_line_code, pricing_model, currency,
+       total_amount_clp, quoted_margin_pct, business_line_code, pricing_model, commercial_model, staffing_model, currency,
        quote_date, sent_at, approved_at, expiry_date, converted_at, rejected_at, expired_at,
        days_in_stage, days_until_expiry, is_renewal_due, is_expired,
        authorized_amount_clp, invoiced_amount_clp,
@@ -232,11 +240,11 @@ export const upsertPipelineSnapshot = async (row: PipelineSnapshotRow): Promise<
      ) VALUES (
        $1, $2, $3, $4,
        $5, $6, $7,
-       $8, $9, $10, $11, $12,
-       $13::date, $14::timestamptz, $15::timestamptz, $16::date, $17::timestamptz, $18::timestamptz, $19::timestamptz,
-       $20, $21, $22, $23,
-       $24, $25,
-       $26, $27::timestamptz
+       $8, $9, $10, $11, $12, $13, $14,
+       $15::date, $16::timestamptz, $17::timestamptz, $18::date, $19::timestamptz, $20::timestamptz, $21::timestamptz,
+       $22, $23, $24, $25,
+       $26, $27,
+       $28, $29::timestamptz
      )
      ON CONFLICT (quotation_id) DO UPDATE SET
        client_id = EXCLUDED.client_id,
@@ -249,6 +257,8 @@ export const upsertPipelineSnapshot = async (row: PipelineSnapshotRow): Promise<
        quoted_margin_pct = EXCLUDED.quoted_margin_pct,
        business_line_code = EXCLUDED.business_line_code,
        pricing_model = EXCLUDED.pricing_model,
+       commercial_model = EXCLUDED.commercial_model,
+       staffing_model = EXCLUDED.staffing_model,
        currency = EXCLUDED.currency,
        quote_date = EXCLUDED.quote_date,
        sent_at = EXCLUDED.sent_at,
@@ -268,7 +278,7 @@ export const upsertPipelineSnapshot = async (row: PipelineSnapshotRow): Promise<
     [
       row.quotationId, row.clientId, row.organizationId, row.spaceId,
       row.status, row.pipelineStage, row.probabilityPct,
-      row.totalAmountClp, row.quotedMarginPct, row.businessLineCode, row.pricingModel, row.currency,
+      row.totalAmountClp, row.quotedMarginPct, row.businessLineCode, row.pricingModel, row.commercialModel, row.staffingModel, row.currency,
       row.quoteDate, row.sentAt, row.approvedAt, row.expiryDate, row.convertedAt, row.rejectedAt, row.expiredAt,
       row.daysInStage, row.daysUntilExpiry, row.isRenewalDue, row.isExpired,
       row.authorizedAmountClp, row.invoicedAmountClp,

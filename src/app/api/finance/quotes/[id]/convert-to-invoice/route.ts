@@ -58,6 +58,7 @@ export async function POST(
       {
         incomeId: result.incomeId,
         quotationId: result.quotationId,
+        contractId: result.contractId,
         quotationStatus: result.quotationStatus,
         totalAmountClp: result.totalAmountClp
       },

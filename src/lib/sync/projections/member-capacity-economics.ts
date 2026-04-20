@@ -721,7 +721,7 @@ export const refreshMemberCapacityEconomicsForMember = async (
   return snapshot
 }
 
-const refreshAllMembersForPeriod = async (period: Period): Promise<number> => {
+export const materializeMemberCapacityEconomicsForPeriod = async (period: Period): Promise<number> => {
   const members = await runGreenhousePostgresQuery<{ member_id: string }>(
     `
       SELECT member_id
@@ -782,7 +782,7 @@ export const memberCapacityEconomicsProjection: ProjectionDefinition = {
     const period = getPeriodOrCurrent(payload)
 
     if (scope.entityType === 'finance_period') {
-      const refreshed = await refreshAllMembersForPeriod(period)
+      const refreshed = await materializeMemberCapacityEconomicsForPeriod(period)
 
       return `refreshed member_capacity_economics for ${refreshed} members in ${scope.entityId}`
     }

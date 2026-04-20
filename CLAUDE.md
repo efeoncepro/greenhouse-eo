@@ -106,6 +106,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `GREENHOUSE_EVENT_CATALOG_V1.md` — catálogo de eventos outbox
 - `GREENHOUSE_INTERNAL_IDENTITY_V1.md` — separación auth principal vs canonical identity
 - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — módulo Finance: P&L engine, dual-store, outbox, allocations
+- `GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md` — matriz canónica de monedas por dominio, FX policy, readiness contract, currency registry
 - `GREENHOUSE_UI_PLATFORM_V1.md` — stack UI, librerías disponibles, patrones de componentes
 - `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` — infraestructura de webhooks inbound/outbound
 - `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` — playbook de proyecciones reactivas + recovery

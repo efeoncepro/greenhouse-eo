@@ -1,5 +1,71 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-19 — Delivery model split formalized on canonical quotations
+
+`TASK-459` desambiguó el antiguo `pricing_model` de quotation en dos ejes persistidos.
+
+Tablas impactadas:
+- `greenhouse_commercial.quotations`
+- `greenhouse_serving.quotation_pipeline_snapshots`
+- `greenhouse_serving.quotation_profitability_snapshots`
+- `greenhouse_serving.deal_pipeline_snapshots`
+
+Campos nuevos:
+- `greenhouse_commercial.quotations.commercial_model`
+- `greenhouse_commercial.quotations.staffing_model`
+- `greenhouse_serving.quotation_pipeline_snapshots.commercial_model`
+- `greenhouse_serving.quotation_pipeline_snapshots.staffing_model`
+- `greenhouse_serving.quotation_profitability_snapshots.pricing_model`
+- `greenhouse_serving.quotation_profitability_snapshots.commercial_model`
+- `greenhouse_serving.quotation_profitability_snapshots.staffing_model`
+- `greenhouse_serving.deal_pipeline_snapshots.latest_quote_pricing_model`
+- `greenhouse_serving.deal_pipeline_snapshots.latest_quote_commercial_model`
+- `greenhouse_serving.deal_pipeline_snapshots.latest_quote_staffing_model`
+
+Regla vigente:
+- `pricing_model` sigue existiendo solo como alias legacy para compatibility con governance y templates
+- el source of truth nuevo para delivery del quote es `commercial_model + staffing_model`
+- el split no debe confundirse con `CommercialModelCode` del pricing engine comercial
+- `sales_context_at_sent` ahora puede persistir también los tres campos para trazabilidad histórica
+- las projections serving deben leer estos ejes desde quotation canonical, no recalcularlos inline
+
+## Delta 2026-04-18 — Quote sales context snapshot formalized on canonical quotations
+
+`TASK-455` agrega un snapshot histórico explícito del contexto comercial al momento del primer `sent` de una cotización.
+
+Tablas impactadas:
+- `greenhouse_commercial.quotations`
+
+Campo nuevo en `greenhouse_commercial.quotations`:
+- `sales_context_at_sent`
+
+Regla vigente:
+- el snapshot vive en el canon de quotations, no en `greenhouse_crm.*`
+- se construye solo con runtime local ya materializado (`clients.lifecyclestage` + `greenhouse_commercial.deals`)
+- es immutable una vez capturado
+- sirve para trazabilidad histórica y analytics
+- no reemplaza el classifier vivo del pipeline híbrido ni debe usarse para UI operativa live
+
+
+## Delta 2026-04-18 — Client lifecycle bridge formalized on top of canonical company runtime
+
+`TASK-454` agrega un bridge runtime explícito para `lifecyclestage` sin recentralizar el modelo de company.
+
+Tablas impactadas:
+- `greenhouse_core.clients`
+- `greenhouse_sync.outbox_events`
+
+Campos nuevos en `greenhouse_core.clients`:
+- `lifecyclestage`
+- `lifecyclestage_source`
+- `lifecyclestage_updated_at`
+
+Regla vigente:
+- `organizations`, `spaces`, `client_profiles` y `greenhouse_crm.companies` siguen definiendo el runtime canónico repartido de Company
+- `clients.lifecyclestage` existe solo como compatibility bridge para consumers client-scoped
+- `lifecyclestage_source` distingue `hubspot_sync`, `nubox_fallback`, `manual_override` y `unknown`
+- cualquier consumer nuevo que necesite detalle CRM sigue leyendo `greenhouse_crm.companies`; este bridge expone solo el stage actual y su metadata mínima
+- los cambios efectivos de stage publican `crm.company.lifecyclestage_changed` al outbox para follow-ons comerciales
 ## Delta 2026-04-04 — AI Core serving cache and prediction backbone
 
 `TASK-118` activa la foundation backend/pipeline de AI Core sobre el runtime real de `ICO`.
@@ -359,6 +425,10 @@ Current views:
 
 Current materialized serving tables:
 - `provider_tooling_snapshots` — monthly provider-centric tooling + finance + payroll exposure snapshot
+
+Current commercial cost-basis tables:
+- `commercial_cost_basis_snapshots` — manifest/ledger por `scope + period + run`
+- `tool_provider_cost_basis_snapshots` — snapshot comercial fino por `tool_id + provider_id + period + tenant_scope_key`
 
 Target views (with Finance Slice 2):
 - `income_360` — invoice with client context, payment status, factoring status, collection summary

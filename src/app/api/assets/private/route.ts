@@ -8,14 +8,14 @@ import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
-const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'> =>
-  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'certification_draft' || value === 'evidence_draft'
+const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'> =>
+  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'master_agreement_draft' || value === 'certification_draft' || value === 'evidence_draft'
 
 const canUploadForContext = ({
   contextType,
   tenant
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'>
   tenant: Awaited<ReturnType<typeof requireTenantContext>>['tenant']
 }) => {
   if (!tenant) {

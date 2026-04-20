@@ -1,5 +1,19 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-04-18 — TASK-468: Payroll contract_type sigue aislado; commercial resuelve por bridge externo
+
+- `greenhouse_payroll.compensation_versions.contract_type` mantiene su semántica actual como snapshot factual de compensación; no recibe FK ni rewrite desde el programa comercial de pricing.
+- Regla explícita para integraciones cross-domain:
+  - si commercial necesita mapear `contract_type` a un catálogo canónico (`employment_types`), debe hacerlo fuera de payroll, mediante tabla de aliases y readers read-only
+  - payroll expone datos de referencia (`chile_afp_rates`, `chile_previred_indicators`, `chile_tax_brackets`) solo por consumo `SELECT`; no existe sincronización bidireccional automática con commercial en este corte
+- Artefactos nuevos del bridge, del lado commercial:
+  - `greenhouse_commercial.employment_type_aliases`
+  - `src/lib/commercial/payroll-rates-bridge.ts`
+  - `scripts/audit-payroll-contract-types.ts`
+- Guardrail operativo confirmado:
+  - baseline regression gate: `29` files / `194` tests payroll passing
+  - `TASK-468` no modifica `src/lib/payroll/**` ni `greenhouse_payroll.*`
+
 ## Delta 2026-04-15 — TASK-409: Reliquidación de nómina — spec técnica completa
 
 ### Correcciones a §9 (Lifecycle del período)

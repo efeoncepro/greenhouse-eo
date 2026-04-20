@@ -18,6 +18,8 @@ vi.mock('@/lib/postgres/client', () => ({
 
 vi.mock('@/lib/member-capacity-economics/store', () => ({
   ensureMemberCapacityEconomicsSchema: vi.fn(),
+  readLatestMemberCapacityEconomicsSnapshot: vi.fn(),
+  readMemberCapacityEconomicsSnapshot: vi.fn(),
   upsertMemberCapacityEconomicsSnapshot: (...args: unknown[]) => mockUpsertMemberCapacityEconomicsSnapshot(...args)
 }))
 

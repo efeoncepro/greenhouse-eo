@@ -24,6 +24,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
   - `docs/architecture/`
   - `docs/api/`
   - `docs/changelog/`
+  - `docs/epics/`
   - `docs/mini-tasks/`
   - `docs/ui/`
   - `docs/roadmap/`
@@ -69,6 +70,13 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
 - Aqui vive el changelog client-facing del producto.
 - No debe duplicar el detalle tecnico de `changelog.md`.
 - Solo debe registrar cambios visibles para usuarios, canales de release y disponibilidad real de capacidades.
+
+### 7. Programas operativos
+- `docs/epics/`
+- Aqui viven los programas `EPIC-###` cuando el trabajo cruza varios dominios o requiere varias tasks hijas.
+- El contrato canónico de lifecycle y relación epic -> task vive en:
+  - `docs/operations/EPIC_OPERATING_MODEL_V1.md`
+- Los epics coordinan; las tasks siguen ejecutando.
 
 ## Regla de compresion
 

@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
+import { finalizeQuotationIssued } from '@/lib/commercial/quotation-issuance'
 
 import { recordAudit } from './audit-log'
 import {
@@ -51,13 +52,26 @@ const mapStep = (row: StepRow): ApprovalStep => ({
 
 export const listApprovalSteps = async (
   quotationId: string,
+  spaceId?: string,
   versionNumber?: number
 ): Promise<ApprovalStep[]> => {
   const params: unknown[] = [quotationId]
   let filter = 'quotation_id = $1'
 
+  if (spaceId) {
+    params.push(spaceId)
+    filter += ` AND EXISTS (
+      SELECT 1
+      FROM greenhouse_commercial.quotations q
+      WHERE q.quotation_id = greenhouse_commercial.approval_steps.quotation_id
+        AND q.space_id = $2
+    )`
+  }
+
   if (typeof versionNumber === 'number') {
-    filter += ' AND version_number = $2'
+    const placeholder = params.length + 1
+
+    filter += ` AND version_number = $${placeholder}`
     params.push(versionNumber)
   }
 
@@ -82,8 +96,11 @@ export interface RequestApprovalResult {
 export interface RequestApprovalParams {
   quotationId: string
   versionNumber: number
+  spaceId?: string | null
   actor: { userId: string; name: string }
   evaluationInput: ApprovalEvaluationInput
+  requestOrigin?: 'manual' | 'issue'
+  issueContext?: Record<string, unknown>
 }
 
 export const requestApproval = async (
@@ -133,21 +150,37 @@ export const requestApproval = async (
       created.push(mapStep(inserted.rows[0]))
     }
 
-    await client.query(
-      `UPDATE greenhouse_commercial.quotations
-          SET status = 'pending_approval', updated_at = CURRENT_TIMESTAMP
-          WHERE quotation_id = $1`,
-      [params.quotationId]
-    )
+    if (params.spaceId) {
+      await client.query(
+        `UPDATE greenhouse_commercial.quotations
+            SET status = 'pending_approval', updated_at = CURRENT_TIMESTAMP
+            WHERE quotation_id = $1
+              AND space_id = $2`,
+        [params.quotationId, params.spaceId]
+      )
+    } else {
+      await client.query(
+        `UPDATE greenhouse_commercial.quotations
+            SET status = 'pending_approval', updated_at = CURRENT_TIMESTAMP
+            WHERE quotation_id = $1`,
+        [params.quotationId]
+      )
+    }
 
     await recordAudit(
       {
         quotationId: params.quotationId,
         versionNumber: params.versionNumber,
-        action: 'approval_requested',
+        action: params.requestOrigin === 'issue' ? 'issue_requested' : 'approval_requested',
         actorUserId: params.actor.userId,
         actorName: params.actor.name,
         details: {
+          ...(params.requestOrigin === 'issue'
+            ? {
+                approvalRequired: true,
+                ...params.issueContext
+              }
+            : {}),
           steps: created.map(step => ({
             stepId: step.stepId,
             requiredRole: step.requiredRole,
@@ -157,6 +190,26 @@ export const requestApproval = async (
       },
       client
     )
+
+    if (params.requestOrigin === 'issue') {
+      await recordAudit(
+        {
+          quotationId: params.quotationId,
+          versionNumber: params.versionNumber,
+          action: 'approval_requested',
+          actorUserId: params.actor.userId,
+          actorName: params.actor.name,
+          details: {
+            steps: created.map(step => ({
+              stepId: step.stepId,
+              requiredRole: step.requiredRole,
+              conditionLabel: step.conditionLabel
+            }))
+          }
+        },
+        client
+      )
+    }
 
     return created
   })
@@ -168,6 +221,8 @@ export interface DecideApprovalParams {
   stepId: string
   decision: 'approved' | 'rejected'
   actor: { userId: string; name: string; roleCodes: string[] }
+  organizationId?: string | null
+  spaceId?: string | null
   notes?: string | null
 }
 
@@ -175,7 +230,7 @@ export interface DecideApprovalResult {
   step: ApprovalStep
   allResolved: boolean
   anyRejected: boolean
-  quotationNewStatus: 'sent' | 'draft' | null
+  quotationNewStatus: 'issued' | 'approval_rejected' | null
   versionNumber: number
   quotationId: string
 }
@@ -184,11 +239,20 @@ export const decideApprovalStep = async (
   params: DecideApprovalParams
 ): Promise<DecideApprovalResult> => {
   return withTransaction(async client => {
-    const stepRows = await client.query<StepRow & { actor_role_required: string }>(
-      `SELECT step_id, quotation_id, version_number, policy_id, step_order,
-              required_role, assigned_to, condition_label, status,
-              decided_by, decided_at, notes, created_at
-         FROM greenhouse_commercial.approval_steps
+    const stepRows = await client.query<
+      StepRow & {
+        quotation_organization_id: string | null
+        quotation_space_id: string | null
+      }
+    >(
+      `SELECT s.step_id, s.quotation_id, s.version_number, s.policy_id, s.step_order,
+              s.required_role, s.assigned_to, s.condition_label, s.status,
+              s.decided_by, s.decided_at, s.notes, s.created_at,
+              q.organization_id AS quotation_organization_id,
+              q.space_id AS quotation_space_id
+         FROM greenhouse_commercial.approval_steps s
+         JOIN greenhouse_commercial.quotations q
+           ON q.quotation_id = s.quotation_id
          WHERE step_id = $1
          FOR UPDATE`,
       [params.stepId]
@@ -211,6 +275,11 @@ export const decideApprovalStep = async (
     if (!hasRole) {
       throw new Error(`Actor does not hold required role: ${row.required_role}`)
     }
+
+    const effectiveOrganizationId =
+      params.organizationId ?? row.quotation_organization_id
+
+    const effectiveSpaceId = params.spaceId ?? row.quotation_space_id
 
     const updated = await client.query<StepRow>(
       `UPDATE greenhouse_commercial.approval_steps
@@ -237,26 +306,32 @@ export const decideApprovalStep = async (
     const anyRejected = statuses.includes('rejected')
     const allResolved = statuses.every(status => status !== 'pending')
 
-    let quotationNewStatus: 'sent' | 'draft' | null = null
+    let quotationNewStatus: 'issued' | 'approval_rejected' | null = null
 
     if (anyRejected) {
-      quotationNewStatus = 'draft'
+      quotationNewStatus = 'approval_rejected'
 
       await client.query(
         `UPDATE greenhouse_commercial.quotations
-            SET status = 'draft', updated_at = CURRENT_TIMESTAMP
+            SET status = 'approval_rejected',
+                approval_rejected_at = CURRENT_TIMESTAMP,
+                approval_rejected_by = $2,
+                updated_at = CURRENT_TIMESTAMP
             WHERE quotation_id = $1`,
-        [step.quotationId]
+        [step.quotationId, params.actor.userId]
       )
     } else if (allResolved) {
-      quotationNewStatus = 'sent'
+      quotationNewStatus = 'issued'
 
-      await client.query(
-        `UPDATE greenhouse_commercial.quotations
-            SET status = 'sent', sent_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-            WHERE quotation_id = $1`,
-        [step.quotationId]
-      )
+      await finalizeQuotationIssued({
+        quotationId: step.quotationId,
+        versionNumber: step.versionNumber,
+        actor: { userId: params.actor.userId, name: params.actor.name },
+        organizationId: effectiveOrganizationId,
+        spaceId: effectiveSpaceId,
+        viaApproval: true,
+        client
+      })
     }
 
     await recordAudit(
@@ -276,6 +351,24 @@ export const decideApprovalStep = async (
       },
       client
     )
+
+    if (quotationNewStatus === 'approval_rejected') {
+      await recordAudit(
+        {
+          quotationId: step.quotationId,
+          versionNumber: step.versionNumber,
+          action: 'approval_rejected',
+          actorUserId: params.actor.userId,
+          actorName: params.actor.name,
+          details: {
+            stepId: step.stepId,
+            conditionLabel: step.conditionLabel,
+            notes: params.notes ?? null
+          }
+        },
+        client
+      )
+    }
 
     return {
       step,

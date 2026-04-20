@@ -98,10 +98,19 @@ export interface CostComponentBreakdown {
   fxRateDate: string | null
   sourceCurrency: string | null
   targetCurrency: string | null
-  snapshotSource: 'member_capacity_economics' | 'role_rate_card' | 'product_catalog' | 'manual'
+  snapshotSource: 'member_capacity_economics' | 'role_rate_card' | 'product_catalog' | 'manual' | 'pricing_engine_v2'
   roleCode?: string | null
   seniorityLevel?: RoleRateSeniorityLevel | null
   notes?: string | null
+  pricingV2CostBasisKind?: 'member_actual' | 'role_blended' | 'role_modeled' | 'tool_snapshot' | 'manual' | null
+  pricingV2CostBasisSourceRef?: string | null
+  pricingV2CostBasisSnapshotDate?: string | null
+  pricingV2CostBasisConfidenceScore?: number | null
+  pricingV2CostBasisConfidenceLabel?: 'high' | 'medium' | 'low' | null
+  pricingV2UnitCostUsd?: number | null
+  pricingV2UnitCostOutputCurrency?: number | null
+  pricingV2TotalCostUsd?: number | null
+  pricingV2TotalCostOutputCurrency?: number | null
 }
 
 export interface LineCostResolutionInput {
@@ -188,3 +197,214 @@ export interface DiscountHealthInput {
 }
 
 export type Currency = FinanceCurrency | 'CLF'
+
+export const PRICING_OUTPUT_CURRENCIES = ['USD', 'CLP', 'CLF', 'COP', 'MXN', 'PEN'] as const
+export type PricingOutputCurrency = (typeof PRICING_OUTPUT_CURRENCIES)[number]
+
+export const PRICING_V2_LINE_TYPES = [
+  'role',
+  'person',
+  'tool',
+  'overhead_addon',
+  'direct_cost'
+] as const
+export type PricingV2LineType = (typeof PRICING_V2_LINE_TYPES)[number]
+
+export interface RolePricingLineInputV2 {
+  lineType: 'role'
+  roleSku: string
+  employmentTypeCode?: string | null
+  hours?: number | null
+  fteFraction?: number | null
+  periods?: number | null
+  quantity?: number | null
+  overrideMarginPct?: number | null
+}
+
+export interface PersonPricingLineInputV2 {
+  lineType: 'person'
+  memberId: string
+  hours?: number | null
+  fteFraction?: number | null
+  periods?: number | null
+  quantity?: number | null
+  overrideMarginPct?: number | null
+}
+
+export interface ToolPricingLineInputV2 {
+  lineType: 'tool'
+  toolSku: string
+  quantity: number
+  periods?: number | null
+}
+
+export interface OverheadAddonPricingLineInputV2 {
+  lineType: 'overhead_addon'
+  addonSku: string
+  basisSubtotal?: number | null
+  quantity?: number | null
+}
+
+export interface DirectCostPricingLineInputV2 {
+  lineType: 'direct_cost'
+  label: string
+  amount: number
+  currency: string
+  quantity?: number | null
+}
+
+export type PricingLineInputV2 =
+  | RolePricingLineInputV2
+  | PersonPricingLineInputV2
+  | ToolPricingLineInputV2
+  | OverheadAddonPricingLineInputV2
+  | DirectCostPricingLineInputV2
+
+export interface PricingEngineInputV2 {
+  businessLineCode: string | null
+  commercialModel: 'on_going' | 'on_demand' | 'hybrid' | 'license_consulting'
+  countryFactorCode: string
+  outputCurrency: PricingOutputCurrency
+  quoteDate: string
+  lines: PricingLineInputV2[]
+
+  /**
+   * Control sobre el auto-resolve de addons por parte del engine.
+   *
+   * - `true` (default, legacy): auto-resuelve TODOS los addons aplicables al
+   *   contexto, tanto internos como visibles al cliente. Suman al total.
+   * - `false`: no auto-resuelve ninguno. Solo los addons que vengan como
+   *   líneas explícitas `overhead_addon` en `lines` se aplican.
+   * - `'internal_only'`: auto-resuelve SOLO los addons internos
+   *   (`visibleToClient: false`) — son estructura de costos (overhead %, fee
+   *   EOR, etc.). Los addons visibles al cliente NO se auto-suman; se espera
+   *   que el comercial los promueva a líneas `overhead_addon` explícitas vía
+   *   el panel de sugerencias del builder. Transparencia total con el cliente
+   *   en el PDF de la cotización.
+   */
+  autoResolveAddons?: boolean | 'internal_only'
+}
+
+export interface PricingCostStackV2 {
+  unitCostUsd: number
+  unitCostOutputCurrency: number
+  totalCostUsd: number
+  totalCostOutputCurrency: number
+  breakdown: Record<string, number>
+  employmentTypeCode?: string | null
+  employmentTypeSource?: 'explicit_input' | 'role_default' | 'payroll_compensation_version'
+  costBasisKind?: 'member_actual' | 'role_blended' | 'role_modeled' | 'tool_snapshot' | 'manual'
+  costBasisSourceRef?: string | null
+  costBasisSnapshotDate?: string | null
+  costBasisConfidenceScore?: number | null
+  costBasisConfidenceLabel?: 'high' | 'medium' | 'low' | null
+}
+
+export interface TierComplianceV2 {
+  tier?: string | null
+  status: 'below_min' | 'in_range' | 'at_optimum' | 'above_max' | 'unknown'
+  marginMin?: number | null
+  marginOpt?: number | null
+  marginMax?: number | null
+}
+
+export interface PricingSuggestedBillRateV2 {
+  pricingBasis: 'hour' | 'month' | 'unit'
+  unitPriceUsd: number
+  unitPriceOutputCurrency: number
+  totalBillUsd: number
+  totalBillOutputCurrency: number
+}
+
+export interface PricingLineOutputV2 {
+  lineInput: PricingLineInputV2
+  costStack: PricingCostStackV2
+  suggestedBillRate: PricingSuggestedBillRateV2
+  effectiveMarginPct: number
+  tierCompliance: TierComplianceV2
+  resolutionNotes: string[]
+}
+
+export interface PricingAddonOutputV2 {
+  sku: string
+  addonName: string
+  appliedReason: string
+  amountUsd: number
+  amountOutputCurrency: number
+  visibleToClient: boolean
+}
+
+// Structured warnings for the pricing engine.
+//
+// The engine never hard-fails on unknown catalog inputs (unknown commercial
+// model, unknown country factor, missing tier margins, etc.) because that would
+// break quotes during legitimate catalog transitions (new BL onboarding,
+// migrations, edge-case data). Instead, every silent fallback emits a warning
+// so the UI can surface it and the user can decide whether to override.
+//
+// `code` is a stable machine-readable key for filtering / i18n / tests.
+// `severity` drives the UI affordance (critical → red, warning → amber, info → neutral).
+// `lineIndex` points at the offending line when the fallback is line-specific.
+// `context` carries arbitrary debug payload (attempted input, fallback applied).
+export const PRICING_WARNING_CODES = [
+  'unknown_commercial_model',
+  'unknown_country_factor',
+  'missing_tier_margin',
+  'tool_price_default_margin',
+  'fx_fallback',
+  'tier_below_min',
+  'legacy_rate_card_used',
+
+  // Synthetic UI-only code (TASK-487): emitted by the frontend when the engine
+  // returns an HTTP 422 with a message that mentions an SKU, so the warning can
+  // anchor to the originating row instead of floating in the dock.
+  'engine_error'
+] as const
+
+export type PricingWarningCode = (typeof PRICING_WARNING_CODES)[number]
+export type PricingWarningSeverity = 'critical' | 'warning' | 'info'
+
+export interface PricingWarning {
+  code: PricingWarningCode
+  severity: PricingWarningSeverity
+  message: string
+  lineIndex?: number | null
+  context?: Record<string, unknown>
+}
+
+export interface PricingEngineOutputV2 {
+  lines: PricingLineOutputV2[]
+
+  /** Addons auto-aplicados por el engine (summed al total). Con
+   *  `autoResolveAddons: 'internal_only'` solo incluye `visibleToClient: false`. */
+  addons: PricingAddonOutputV2[]
+
+  /** Addons visibles al cliente que aplicarían al contexto pero que NO están
+   *  auto-sumados (solo con `autoResolveAddons: 'internal_only'`). La UI los
+   *  ofrece como propuestas en el panel de "Addons sugeridos" — al tildarlos,
+   *  se promueven a líneas `overhead_addon` explícitas. */
+  suggestedVisibleAddons?: PricingAddonOutputV2[]
+  totals: {
+    subtotalUsd: number
+    overheadUsd: number
+    totalUsd: number
+    totalOutputCurrency: number
+    commercialMultiplierApplied: number
+    countryFactorApplied: number
+    exchangeRateUsed: number
+  }
+  aggregateMargin: {
+    marginPct: number
+    classification: 'healthy' | 'warning' | 'critical'
+  }
+
+  /** Legacy plain-string warnings, derived from `structuredWarnings` for
+   *  backwards compatibility with older UI consumers. Prefer reading
+   *  `structuredWarnings` in new code. */
+  warnings: string[]
+
+  /** Canonical structured warnings emitted by every silent fallback in the
+   *  engine. UI consumers should render these grouped by severity with a
+   *  "Volver al valor sugerido" affordance when applicable. */
+  structuredWarnings: PricingWarning[]
+}

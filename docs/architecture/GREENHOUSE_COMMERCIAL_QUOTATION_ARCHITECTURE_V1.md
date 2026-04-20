@@ -1,11 +1,487 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.8
+> **Version:** 2.29
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-19 — v2.29: TASK-506 simplifica CTAs del Quote Summary Dock. El dock pasa de 2 CTAs (`Guardar y cerrar` tonal + `Guardar y emitir` contained) a 1 sola CTA terminal (`Guardar y emitir`). "Guardar y cerrar" se elimina del dock — el "Guardar borrador" del header absorbe el rol de save sin cerrar (2 saves en la página en vez de 3). Grid zones ajustadas de 3/5/4 a 3/6/3: zone 2 (total ladder) gana ancho, zone 3 (acciones) queda compacta con el addons chip + 1 CTA horizontal sin wrap vertical. `QuoteSummaryDockProps` gana prop nuevo `appliedAddonsTotal?: number | null` — cuando > 0 el chip de addons muestra `N addons · $applied` como contexto cuantitativo; si también hay `addonTotalDelta > 0` (sugerencias no aplicadas), añade `+$delta` muted al final. Shell computa `appliedAddonsTotal` sumando `simulation.lines[i].suggestedBillRate.totalBillOutputCurrency` para líneas con `metadata.pricingV2LineType === 'overhead_addon'`. `changeCount` del `SaveStateIndicator` ahora se deriva del delta entre `initialLines.length` y `linesSnapshot.length`, mostrando "Sin guardar · N cambios" cuando la cantidad de líneas cambió. El wrapper preserva `secondaryCtaLabel`/`onSecondaryClick`/`secondaryCtaDisabled` para consumers futuros (invoice/PO docks); el quote shell simplemente no los pasa.
+> **Updated:** 2026-04-19 — v2.28: TASK-505 Summary Dock v2. El `QuoteSummaryDock` sticky-bottom pasa de Stack flat a layout Grid de 3 zonas (`xs=12 / md=3+5+4`): Estado (save indicator + margin chip) / Totals ladder / Acciones (addons + Cancelar + Guardar). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`SaveStateIndicator`, `MarginHealthChip`, `TotalsLadder`) reusables platform-wide para invoice / PO / contract docks. Total visible migra de `color=primary.main` a `text.primary` — el azul de marca queda reservado a la CTA primaria. `TotalsLadder` oculta subtotal/factor/IVA cuando no aportan información (`total === subtotal && factor === 1 && !ivaAmount`); cuando sí aportan, renderiza caption muted one-liner debajo del Total. `MarginHealthChip` pasa de `49.4%` + ícono a `Margen · 49,4% · Óptimo/Atención/Crítico` + ícono + tooltip de tier range (cierra color-only-state warning). `SaveStateIndicator` gana segunda línea con `changeCount` o `formatRelativeTime(lastSavedAt)`; dot pulsing en saving respeta `prefers-reduced-motion`. CTA primaria deja de hacer copy-swap (`"Guardar y cerrar"` → `"Calculando pricing…"` → `"Guardando…"`) y pasa a loading pattern enterprise: copy invariante + `disabled` + `<CircularProgress size={16} />` en startIcon. Shell actualizado: `primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}` constante, `primaryCtaLoading={submitting}`. `AnimatedCounter` del total baja de `duration=0.4` a `0.25` (emphasized decelerate `cubic-bezier(0.2, 0, 0, 1)`). Alinea con la estrategia de platform primitives de TASK-498.
+> **Updated:** 2026-04-19 — v2.27: TASK-500 / TASK-501 / TASK-502 / TASK-503 cierran el ciclo de UX y contratos del Quote Builder post-TASK-488. `PricingEngineInputV2.autoResolveAddons` pasa de `boolean` a `boolean | 'internal_only'` (aditivo, backwards-compatible). En modo `'internal_only'` el engine auto-resuelve solo addons `visibleToClient: false` (overhead, fee EOR estructural) y expone los addons `visibleToClient: true` aplicables en un campo nuevo de output `PricingEngineOutputV2.suggestedVisibleAddons: PricingAddonOutputV2[]`. El Quote Builder los ofrece como propuestas en el panel "Addons para el cliente" y al tildar se promueven a líneas `overhead_addon` explícitas en `lineItems`. Regla del modelo: lo que el cliente paga es lo que ve en la tabla — cero markup oculto. Para role/person, la UI del shell fija `quantity: 1` en el input al engine; el multiplicador real es `metadata.periods`, bindeado a la columna "Cantidad" visible (meses facturables). Elimina el doble conteo que dejó TASK-500 cuando se sincronizó quantity↔periods sin ajustar el engine. Para líneas catalog-backed (`role | person | tool | overhead_addon`) la UI renderiza el precio unitario como Typography read-only (no input, no override chip); override sigue disponible solo para líneas manuales (`direct_cost` sin `pricingV2LineType`). El shell fuerza una simulación fresca contra `/api/finance/quotes/pricing/simulate` antes de persistir y gate el botón Guardar mientras `simulating=true` — elimina la race condition que hacía fallar el save con "no hay precio" cuando el debounce del hook `usePricingSimulation` no había validado la snapshot actual. Endpoint `/api/finance/quotes/pricing/config` expone `catalog.employmentTypes` (ya existía) que ahora alimenta el dropdown "Tipo de contratación" del popover Ajustes; `periodsLabel` removido de `GH_PRICING.adjustPopover` (quedaba huérfano). Copy del chip de addons en el dock simplificado de "N addons sugeridos" → "N addons" porque el count engloba aplicados + propuestos. Popper del panel de addons migrado de `anchorEl={ref.current}` (caía al top-left cuando el ref era null en el primer render) a anchor capturado desde `event.currentTarget` + `useState<HTMLElement | null>`; dedupe client-side por sku en las entries del panel + guard idempotente en `handleAddonToggle` protegen contra double-clicks y race conditions del debounce.
+> **Updated:** 2026-04-19 — v2.26: TASK-504 separa lifecycle documental de quotations entre borrador, aprobación por excepción y emisión oficial. `greenhouse_commercial.quotations` suma `issued_at`, `issued_by`, `approval_rejected_at` y `approval_rejected_by`; el contrato canónico pasa a `draft | pending_approval | approval_rejected | issued | expired | converted`. Nace el comando `/api/finance/quotes/[id]/issue`; `/send` queda como wrapper de compatibilidad. Cuando la quote cumple policy se emite directo como `issued`; cuando requiere excepción pasa por approval y al aprobarse también termina `issued`. Rechazo ya no vuelve silenciosamente a `draft`, sino que queda explícito en `approval_rejected`. Nuevo evento canónico `commercial.quotation.issued`, mientras `commercial.quotation.sent` se sigue emitiendo como bridge legacy para consumers todavía no migrados. Quote-to-cash, contract lifecycle, HubSpot sync y las proyecciones de pipeline/rentabilidad leen ya el nuevo contrato sin reabrir ambigüedad entre emitir y distribuir.
+> **Updated:** 2026-04-19 — v2.25: TASK-461 introduce `greenhouse_commercial.master_agreements` como umbrella legal reusable y aterriza la lane MSA end-to-end. Nacen `master_agreements`, `clause_library` y `master_agreement_clauses`, con FK real `greenhouse_commercial.contracts.msa_id -> master_agreements(msa_id)` y seed bilingue de cláusulas legales estándar. `contracts-store` deja de filtrar solo por `space_id` y adopta scope híbrido `organization_id OR space_id`, alineando contracts/MSA con el cutover canónico de quotations de TASK-486. Nuevos stores: `master-agreements-store.ts`, `master-agreement-clauses-store.ts`, `contract-tenant-scope.ts`, `msa-events.ts`; nuevos eventos: `commercial.master_agreement.created|updated|clauses_changed` y `commercial.contract.msa_linked`. Nuevas routes: `GET/POST /api/finance/master-agreements`, `GET/PUT /api/finance/master-agreements/[id]`, `GET/PUT /api/finance/master-agreements/[id]/clauses`, CRUD de clause library, `GET/PUT /api/finance/contracts/[id]/msa`, `GET/POST /api/finance/master-agreements/[id]/signature-requests` y webhook `POST /api/webhooks/zapsign`. Asset system extendido con contextos privados `master_agreement_draft` y `master_agreement`; el PDF firmado se persiste en `greenhouse_core.assets` y no queda delegado a URLs efímeras del proveedor. UI nueva: `/finance/master-agreements` y `/finance/master-agreements/[id]`, además de surfacing `msaId/msaNumber/msaTitle` dentro de `/finance/contracts`. ZapSign queda integrado en modo productivo vía `ZAPSIGN_API_TOKEN` + webhook shared secret; sandbox no forma parte del contrato actual porque el token operativo validado corresponde al entorno productivo.
+> **Updated:** 2026-04-19 — v2.23: TASK-486 Canonical Anchor (Organization + Contact). `greenhouse_commercial.quotations` adopta `organization_id` como anchor canónico y suma `contact_identity_profile_id` (FK `greenhouse_core.identity_profiles(profile_id)`). `space_id` y `space_resolution_source` quedan deprecated en el write path del builder y del HubSpot sync (columnas preservadas por compatibilidad con quote-to-cash legacy readers — no drop físico en v1). Tenant scoping de quotes migró de `q.space_id = ANY(...)` a `q.organization_id = ANY(...)` via `resolveFinanceQuoteTenantOrganizationIds`; consumidores actualizados: `listFinanceQuotesFromCanonical`, `getFinanceQuoteDetailFromCanonical`, `listFinanceQuoteLinesFromCanonical`, `pricing-catalog-impact-analysis.loadOpenQuoteRows` + sus 4 preview-impact endpoints. `POST /api/finance/quotes` exige `organizationId` (400 si falta, 404 si la org no existe o está inactiva) y acepta `contactIdentityProfileId` opcional validado contra `person_memberships` activa con `membership_type IN ('client_contact','client_user','contact','billing','partner','advisor')` — `team_member` y `contractor` se excluyen porque no aplican como contacto comercial. `PUT /api/finance/quotes/[id]` replica la validación y permite set/clear del contacto. Nuevo endpoint `GET /api/commercial/organizations/[id]/contacts` devuelve los candidatos filtrados por membership_type + tenant isolation. Quote Builder UI: label "Espacio destinatario" → "Organización (cliente o prospecto)"; segundo dropdown "Contacto" con fetch async al seleccionar la org (ordenado por `is_primary DESC`, marcador "Principal" en el item). HubSpot sync simplificado: `resolveSpaceForCompany` → `resolveOrganizationForCompany`; payload de `quote.synced` deja de llevar `spaceId` (siempre null). Detail response del GET canonical expone objetos `organization` y `contact` completos via join a `identity_profiles` + `person_memberships`. `organization_id` queda NULLABLE a nivel DB (backfill preservó legacy orphans sin data loss); enforcement en la capa API. Follow-up data remediation task cerrará orphans antes de un v2 `SET NOT NULL`. Sinergia: TASK-466 (multi-currency quote send) usará el contrato "org + contact" como pre-requisito mínimo; TASK-481 (Quote Builder Suggested Cost UX) se integra post-TASK-486 sin colisión.
+> **Updated:** 2026-04-19 — v2.24: TASK-477 formaliza `role_modeled` sobre el catálogo real. `sellable_role_cost_components` gana overhead/provenance/confidence (`direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score`) y columnas generadas para loaded cost / confidence label. Nace `greenhouse_commercial.role_modeled_cost_basis_snapshots`, `pricing-engine-v2` consume el lane modelado via reader explícito manteniendo precedencia `role_blended -> role_modeled`, y `commercial-cost-worker` activa `POST /cost-basis/materialize/roles`. El admin pricing catalog reutiliza el mismo drawer de roles para editar overhead y mostrar loaded cost + confidence.
+> **Updated:** 2026-04-19 — v2.22: TASK-470 enterprise hardening del pricing catalog backend. Se agregan `ETag` + `If-Match` en routes admin de catálogo con deprecation header `X-Deprecated-No-If-Match`, validator central `pricing-catalog-constraints.ts`, dry-run `preview-impact` para roles/tools/overheads/governance y scope tenant-safe via `resolveFinanceQuoteTenantSpaceIds()`. El blast radius de `tool_catalog` queda heurístico por texto de line items y `country_pricing_factor` sigue conservador hasta que exista un bridge quote↔country.
+> **Updated:** 2026-04-19 — v2.21: TASK-462 MRR/ARR Contractual Projection & Dashboard completado. Nueva tabla `greenhouse_serving.contract_mrr_arr_snapshots` con PK compuesto `(period_year, period_month, contract_id)`, columnas generadas `arr_clp = mrr_clp × 12` y `mrr_delta_clp`, classifier `movement_type` (new/expansion/contraction/churn/reactivation/unchanged). Materializer `mrr-arr-materializer.ts` con `buildMrrArrSnapshotsForPeriod` + `backfillMrrArrFromFirstContract`, filtra `commercial_model='retainer' AND status='active'` + overlap de ventana + detecta churn comparando con snapshot previa. Store `mrr-arr-store.ts` con `listMrrArrByPeriod | getMrrArrPeriodTotals | getMrrArrSeries | computeNrr | listMrrArrMovements` (NRR computation con starting 12m ago + expansion + reactivation − contraction − churn). Reactive projection `contractMrrArrProjection` en domain `cost_intelligence` consume `commercial.contract.{created,activated,renewed,modified,terminated,completed}`. 3 endpoints: `/mrr-arr?year=Y&month=M`, `/timeline?months=12`, `/movements?year=Y&month=M&movementType=X`. Nuevo outer tab "MRR/ARR" en `FinanceIntelligenceView` (4º tab post Ola 4) con `MrrArrDashboardView`: 4 KPIs (MRR actual, ARR, NRR 12m, contratos activos) + timeline ApexCharts bar stacked 12-month por movement type + 3 breakdown cards (commercial_model, staffing_model, business_line) + Top 10 contracts. Doc funcional nuevo en `docs/documentation/finance/mrr-arr.md`. 15/15 tests passing del classifier. Zero impacto en payroll (194 tests baseline intactos).
+> **Updated:** 2026-04-19 — v2.20: TASK-457 UI Revenue Pipeline Hybrid completado. Outer tab "Cotizaciones" de `FinanceIntelligenceView` renombrado a **"Pipeline comercial"**. Sub-tab "Cotizaciones en curso" (quote-grain, TASK-458 quick fix) reemplazado por **"Pipeline"** con `PipelineBoardUnified.tsx` que combina deal-grain (de `deal_pipeline_snapshots` TASK-456) + standalone-quote-grain (de `quotation_pipeline_snapshots` TASK-351) con classifier cross-layer usando `clients.lifecyclestage` vivo (TASK-454). Nuevo reader `revenue-pipeline-reader.ts` con types `UnifiedPipelineRow | RevenuePipelineTotals`, categoría `deal | contract | pre-sales`, exclusión de deal closedlost con quote approved, deal closedwon → contract. Endpoint `GET /api/finance/commercial-intelligence/revenue-pipeline` expone el reader. Sub-tabs "Rentabilidad" y "Renovaciones" intactos (quote-level correcto). MTD won/lost computados desde `deal_pipeline_snapshots.close_date >= date_trunc('month', CURRENT_DATE)`. Doc funcional nuevo en `docs/documentation/finance/pipeline-comercial.md`.
+> **Updated:** 2026-04-19 — v2.19: TASK-467 phase-3 completado. Tab "Modalidades de contrato" del EditSellableRoleDrawer ahora es editable (antes read-only placeholder). Nuevo endpoint `GET/PUT /api/admin/pricing-catalog/roles/[id]/compatibility` con replace atómico via `withTransaction` + validación de no-duplicados, exactly-1-default + default-must-be-allowed + employment_types existentes/activos. Audit emit con `compatibility_updated + employment_types_allowed + default_employment_type`. Split conceptual materializado: TASK-467 cerrada (UI self-service completa); TASK-470 abierto (backend enterprise hardening — optimistic locking + business constraint validator + impact analysis + overcommit detector).
+> **Updated:** 2026-04-19 — v2.18: TASK-467 phase-2 completado. Edit drawers con tabs para roles (Info / Modalidades / Componentes de costo / Pricing por moneda), edit drawers completos para tools y overheads, admin UI de employment types (list + create + edit drawer), audit timeline page (`/admin/pricing-catalog/audit-log`) con MUI Lab Timeline + filtros por entidad/actor. 3 endpoints nuevos: `/roles/[id]/cost-components`, `/roles/[id]/pricing`, extensión de `/governance` para `type: 'employment_type'`. Home pricing catalog actualizada con counts reales y link a audit-log. **Sinergia FTE resuelta**: `SellableRoleSeedRow` extendido con `feeEorUsd?` y `hoursPerFteMonth?` opcionales; `insertCostComponentsIfChanged` deja de hardcodear 0/180 y los usa del seedRow con defaults back-compat. El pricing engine v2 ya consumía `hours_per_fte_month` como fallback del `fte_hours_guide` y divisor de hourly cost — ahora el admin UI puede overridearlo per-role. Dos capas FTE claramente distintas (capacity operacional `CAPACITY_HOURS_PER_FTE=160h` del módulo Agency Team vs billable `fte_hours_guide` + override per-role) coordinadas explícitamente via el override.
+> **Updated:** 2026-04-19 — v2.19: TASK-460 contract/SOW canonical entity. `greenhouse_commercial.contracts` nace como anchor post-sale tenant-safe con tabla join `contract_quotes`, `contract_id` propagado a `purchase_orders`, `service_entry_sheets` e `income`, API `/api/finance/contracts/**`, detail UI en `/finance/contracts`, materialización `contract_profitability_snapshots` y sweep `contract_renewal_reminders`. La convivencia `quotation_id + contract_id` queda explícita durante la transición; MSA sigue diferida a TASK-461.
+> **Updated:** 2026-04-19 — v2.17: TASK-459 delivery model refinement. `greenhouse_commercial.quotations` desambiguada con `commercial_model` (`retainer | project | one_off`) + `staffing_model` (`named_resources | outcome_based | hybrid`) sin reusar el `CommercialModelCode` del pricing engine. `pricing_model` queda como alias legacy derivado. Se extiende `sales_context_at_sent`, `quotation_pipeline_snapshots`, `quotation_profitability_snapshots` y `deal_pipeline_snapshots` para surfacing downstream de ambos ejes.
+> **Updated:** 2026-04-19 — v2.16: TASK-467 pricing catalog admin UI (MVP). Nueva tabla `greenhouse_commercial.pricing_catalog_audit_log` + store `pricing-catalog-audit-store.ts` para audit de cambios en catálogo. 8 API routes bajo `/api/admin/pricing-catalog/{roles,tools,overheads,governance,audit-log}` con gate `canAdministerPricingCatalog` (efeonce_admin + finance_admin). UI bajo `/admin/pricing-catalog` con home (7 nav cards), list views con toggle active (roles/tools/overheads) + create drawers que consumen las DEFAULT sequences (auto-gen ECG/ETG/EFO), governance inline edit page para tier margins + commercial models + country factors + FTE hours. Scope MVP: cost/pricing multi-tab, Excel import, employment types admin, diff viewer de historial se difieren a follow-up TASK-467-phase-2. Bypass intencional de upsert stores (que esperan shape de seed CSV) con INSERT/UPDATE directos para respetar la DEFAULT sequence del SKU.
+> **Updated:** 2026-04-19 — v2.15: TASK-456 deal pipeline snapshots projection. Nueva tabla `greenhouse_serving.deal_pipeline_snapshots` (1 fila por deal canónico no borrado) como capa deal-grain para forecast comercial. Materializer reactivo `deal-pipeline-materializer.ts`, projection `deal_pipeline` en domain `cost_intelligence` y route `GET /api/finance/commercial-intelligence/deal-pipeline`. La fila conserva `is_open`/`is_won`, usa `probability_pct` real del deal (nullable cuando no hay override en `hubspot_deal_pipeline_config`) y rolea-up quotes asociadas por `hubspot_deal_id` (`latest_quote_id`, `quote_count`, `approved_quote_count`, `total_quotes_amount_clp`).
+> **Updated:** 2026-04-18 — v2.14: TASK-463 unified quote builder + bidirectional HubSpot bridge. Drawer legacy "HubSpot" eliminado de `QuotesListView.tsx` — queda un solo botón "+ Nueva cotización" que persiste al canónico y propaga a HubSpot vía reactive projection `quotationHubSpotOutbound`. Nuevo helper `push-canonical-quote.ts` adapta el quote canónico al payload legacy del Cloud Run service. Endpoint legacy `/api/finance/quotes/hubspot` deprecado a HTTP 410. Dos eventos canónicos nuevos: `commercial.quotation.pushed_to_hubspot` y `commercial.quotation.hubspot_sync_failed`. Outbound idempotente: skip si no hay `hubspot_deal_id`, create si no hay `hubspot_quote_id`, update si ya existe (stub MVP).
+> **Updated:** 2026-04-18 — v2.13: TASK-455 quote sales context snapshot. `greenhouse_commercial.quotations` agrega `sales_context_at_sent jsonb` como snapshot histórico e inmutable del contexto comercial al primer `sent` (`lifecyclestage`, `dealstage`, `deal_id`, `hubspot_deal_id`, `category_at_sent`). La captura ocurre en el mismo flujo transaccional que marca `status='sent'`, cubriendo tanto `/send` directo como el cierre del approval workflow. `GET /api/finance/quotes/[id]` ahora lo expone como `salesContextAtSent`. El snapshot sirve para trazabilidad/analytics y NO reemplaza el classifier vivo de TASK-457.
+> **Updated:** 2026-04-18 — v2.12: TASK-464c tool catalog + overhead addons foundation implementada. `greenhouse_ai.tool_catalog` se extiende con `tool_sku`, prorrateo, `applicable_business_lines`, `applicability_tags`, `includes_in_addon` y `notes_for_quoting`; se crea `greenhouse_commercial.overhead_addons` con 9 addons canonizados (`EFO-001..009`). Nuevos módulos `tool-catalog-store.ts`, `overhead-addons-store.ts`, `tool-catalog-events.ts` y seeders idempotentes `scripts/seed-tool-catalog.ts` / `scripts/seed-overhead-addons.ts`. El catálogo comercial sigue conviviendo con AI tooling sin romper consumers existentes.
+> **Updated:** 2026-04-18 — v2.11: TASK-464b pricing governance tables implementada. Nuevas tablas `role_tier_margins`, `service_tier_margins`, `commercial_model_multipliers`, `country_pricing_factors` y `fte_hours_guide` en `greenhouse_commercial`, con versionado liviano por `effective_from`, readers cacheados en `pricing-governance-store.ts` y seeder idempotente `scripts/seed-pricing-governance.ts`. El seed real dejó `21` drifts rol→tier auditados contra `TASK-464a`; el catálogo canónico sigue ganando y la reconciliación queda para consumers posteriores.
+> **Updated:** 2026-04-18 — v2.10: TASK-468 commercial-side payroll employment type bridge. Nueva tabla `greenhouse_commercial.employment_type_aliases` para resolver vocabulario factual de payroll (`contract_type`) hacia `employment_types` canónicos sin tocar `greenhouse_payroll.*`. Nuevos módulos `employment-type-alias-store.ts`, `employment-type-alias-normalization.ts`, `payroll-rates-bridge.ts` y script `scripts/audit-payroll-contract-types.ts`. El bridge queda read-only y auditable; el cutover del engine sigue diferido a TASK-464d.
+> **Updated:** 2026-04-18 — v2.10: TASK-464d pricing engine v2 implementado como capa aditiva en `src/lib/finance/pricing/pricing-engine-v2.ts` con `tier-compliance.ts`, `addon-resolver.ts` y `currency-converter.ts`. El flujo persistente legacy de quotations (`QuotationPricingInput`, `resolveLineItemCost`, `quotation-pricing-orchestrator.ts`) sigue conviviendo con `role_rate_cards` / `margin_targets`, mientras el endpoint `GET /api/finance/quotes/pricing/config` ya expone también el catálogo canónico de roles, employment types, governance, tools y overhead addons.
 > **Updated:** 2026-04-18 — v2.8: TASK-351 quotation intelligence automation. Reactive projections `quotation_pipeline` + `quotation_profitability` en domain `cost_intelligence`. Daily lifecycle sweep (`/api/cron/quotation-lifecycle` + ops-worker `/quotation-lifecycle/sweep`) que expira cotizaciones vencidas y emite `renewal_due` con dedup. 4 eventos canónicos nuevos (`expired`, `renewal_due`, `pipeline_materialized`, `profitability_materialized`). Nueva tab "Cotizaciones" en `/finance/intelligence` con Pipeline + Rentabilidad + Renovaciones.
-> **Updated:** 2026-04-17 — v2.7: TASK-350 quotation-to-cash document chain bridge. FK explícitas `purchase_orders.quotation_id`, `service_entry_sheets.quotation_id`/`amount_authorized_clp`, `income.quotation_id`/`source_hes_id`. Nuevo módulo `src/lib/finance/quote-to-cash/` con link helpers, reader de cadena documental y materializers para ramas simple (quote → income) y enterprise (HES → income). 3 eventos outbox nuevos: `commercial.quotation.po_linked`, `commercial.quotation.hes_linked`, `commercial.quotation.invoice_emitted`. Nueva tab "Cadena documental" en QuoteDetailView con KPIs Cotizado/Autorizado/Facturado + delta chips.
+> **Updated:** 2026-04-18 — v2.8: TASK-453 canonical deal bridge. Nuevo mirror `greenhouse_commercial.deals` + `hubspot_deal_pipeline_config`, sync cron `/api/cron/hubspot-deals-sync`, bridge desde `greenhouse_crm.deals` hacia canon comercial, helper `resolveDealForQuote()` y eventos `commercial.deal.created|synced|stage_changed|won|lost`. Esto deja explícita la convivencia: `greenhouse_crm.deals` sigue siendo staging/runtime inbound y `greenhouse_commercial.deals` pasa a ser la entidad comercial canónica para forecast y revenue pipeline híbrido.
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+---
+
+## Delta 2026-04-19 — TASK-504 Quotation Issuance Lifecycle & Approval-by-Exception
+
+- El lifecycle documental de quotations deja de colapsar emisión, aprobación y distribución en el viejo `sent`:
+  - estados canónicos operativos: `draft | pending_approval | approval_rejected | issued | expired | converted`
+  - `sent` y `approved` quedan como valores legacy tolerados por algunos readers y bridges, no como contrato objetivo del módulo
+- `issued` pasa a representar la versión oficial emitida:
+  - tiene `issued_at` + `issued_by`
+  - conserva snapshot comercial en `sales_context_at_sent` por compatibilidad histórica de naming
+  - habilita PDF, email, share y quote-to-cash sin mutar otra vez el estado documental principal
+- La aprobación queda explícitamente **por excepción**:
+  - `POST /api/finance/quotes/[id]/issue` evalúa margin health + discount health
+  - si no hay excepción, la quote pasa de `draft` a `issued`
+  - si hay excepción, pasa a `pending_approval`, crea approval steps y recién al aprobar todos emite `issued`
+  - si un aprobador rechaza, la quote queda en `approval_rejected` con metadata de rechazo; no vuelve silenciosamente a `draft`
+- Compatibilidad de rutas:
+  - `/api/finance/quotes/[id]/send` se mantiene como wrapper de compatibilidad y delega al comando de issue
+  - las superficies visibles migran el CTA primario de "Enviar" a "Emitir"
+- Compatibilidad de eventos:
+  - nuevo evento canónico `commercial.quotation.issued`
+  - el publisher sigue emitiendo `commercial.quotation.sent` como bridge legacy mientras existan consumers no migrados
+  - approval runtime distingue ahora `issue_requested`, `approval_requested`, `approval_decided`, `approval_rejected` e `issued`
+- Consumers downstream alineados:
+  - quote-to-cash acepta `issued` como precondición canónica de conversión
+  - contract lifecycle usa `issued_at` para derivar start dates sin asumir que `sent_at` es la única evidencia de formalización
+  - pipeline, profitability, deal pipeline, HubSpot outbound y capacity/open quote readers ya mapean `issued` y `approval_rejected` sin reasignar semántica
+- Boundary explícito:
+  - descargar PDF, enviarlo por mail, compartir link o registrar viewed son acciones de distribución/document chain
+  - ninguna de esas acciones redefine por sí sola el lifecycle documental de la cotización
+
+---
+
+## Delta 2026-04-19 — TASK-506 Dock CTA Simplification + Addons Chip Amount
+
+Post-TASK-505 el dock quedó con layout enterprise pero heredó de TASK-504 dos CTAs en zone 3 que creaban 3 problemas:
+
+### Problemas cerrados
+- **Cognitive collision**: `Guardar y cerrar` + `Guardar y emitir` compartían prefijo verbal. Violación de restraint (modern-ui).
+- **Wrap vertical del dock**: zone 3 (md=4) no aguantaba 2 CTAs horizontales → `flexWrap='wrap'` los apilaba → dock crecía de ~80 px a ~110 px, desbalanceando las 3 zonas.
+- **3 saves en la página**: header tenía "Guardar borrador", dock tenía "Guardar y cerrar" + "Guardar y emitir". Mental model fragmentado.
+
+### Cambios
+
+**Shell (`QuoteBuilderShell.tsx`)**:
+- Elimina `secondaryCtaLabel={GH_PRICING.builderSaveAndClose}`, `secondaryCtaDisabled`, `onSecondaryClick` del render del dock. El "Guardar borrador" del header (tonal primary) absorbe el rol de save sin cerrar.
+- Nuevo `appliedAddonsTotal: number | null` computado sobre `linesSnapshot.filter(line => line.metadata?.pricingV2LineType === 'overhead_addon')` + `simulation.lines[i].suggestedBillRate.totalBillOutputCurrency`. Devuelve `null` si no hay addons aplicados.
+- Nuevo `changeCount` derivado de `Math.abs(linesSnapshot.length - initialLines.length)`; `undefined` cuando el delta es 0 (edits de fields sin change de cantidad de líneas).
+
+**Dock (`QuoteSummaryDock.tsx`)**:
+- Grid zones: `{ xs: 12, md: 3 }` / `{ xs: 12, md: 6 }` / `{ xs: 12, md: 3 }`. Zone 2 (Total ladder) gana ancho; zone 3 (acciones) queda compacta.
+- Nueva prop `appliedAddonsTotal?: number | null`. Cuando > 0, el chip renderiza `· ${formatMoney(appliedAddonsTotal)}` en el mismo peso visual que el count.
+- `addonTotalDelta` sigue presente pero se renderiza en `color=text.secondary` (muted) como preview de sugerencias — ya no compite visualmente con el monto aplicado.
+- Secondary CTA props (`secondaryCtaLabel`, `secondaryCtaDisabled`, `onSecondaryClick`) siguen existiendo en el contrato para consumers futuros (invoice dock, PO footer, contract summary); el render se omite cuando no se pasan.
+
+### Contrato del chip de addons
+
+Lectura visual del chip según estado:
+- `{n} addons` — ningún addon aplicado, ninguna sugerencia.
+- `{n} addons · $applied` — hay addons aplicados, no hay sugerencias sin aplicar.
+- `{n} addons · +$delta` — no hay addons aplicados aún, hay sugerencias sin aplicar.
+- `{n} addons · $applied · +$delta` — hay aplicados y sugerencias pendientes simultáneamente.
+
+Con esto el comercial siempre sabe cuánto está cobrando en addons al cliente sin hacer matemática mental.
+
+### Regla del dock
+La lectura es "estado (izq) → total (centro) → acción terminal (der)". La acción terminal es única. Las acciones de preservación (guardar borrador, cancelar) viven en el header donde no compiten con la acción terminal.
+
+## Delta 2026-04-19 — TASK-505 Quote Summary Dock v2 + Primitives Extraction
+
+Rediseño del dock sticky-bottom del Quote Builder con jerarquía enterprise. Audit conjunto con los skills `modern-ui`, `greenhouse-ux` y `microinteractions-auditor` identificó 6 blockers y 4 issues modern-bar sobre el dock v1; esta task los cierra.
+
+### Problemas cerrados
+- Subtotal + Total renderizados side-by-side con peso equivalente aunque fueran el mismo número en la mayoría de quotes (violaba restraint).
+- Margen chip sin label explícito (`49.4%` + ícono era cryptic y fallaba color-only-state).
+- Total usaba `color=primary.main`, robando foco a la CTA primary.
+- Save state era un dot de 6-8 px sin contexto (no mostraba count ni lastSavedAt).
+- CTA copy cargaba el estado de loading ("Calculando pricing…" / "Guardando…"), mezclando rol semántico con feedback.
+- Jerarquía visual plana: 9+ elementos en una fila de ~80 px.
+
+### Layout v2
+`<Grid container columnSpacing={3}>` con 3 zonas:
+- `xs=12 md=3` — Estado: `<SaveStateIndicator>` + `<MarginHealthChip>` en Stack vertical.
+- `xs=12 md=5` — Totals: `<TotalsLadder>` adaptativa.
+- `xs=12 md=4` — Acciones: chip de addons + `Cancelar` tonal secondary + `Guardar y cerrar` contained primary.
+
+Responsive: en 600–960 px mantiene 3 zonas pero con breakpoint md=3+5+4 restructurado por Grid; bajo 600 px colapsa a columna única con CTA al final (el dock sticky-bottom ya provee affordance mobile).
+
+### Primitives extraídos a `src/components/greenhouse/primitives/`
+- **`SaveStateIndicator`** — `{ state: 'clean' | 'dirty' | 'saving' | 'saved', changeCount?, lastSavedAt?: Date | null }`. Dot semantic (8px) + label principal (`body2`) + caption muted (`changeCount` o `formatRelativeTime(lastSavedAt)`). `@keyframes save-dot-pulse` en estado `saving`, short-circuit a opacidad fija con `prefers-reduced-motion: reduce`. `aria-live="polite"` + `aria-label` consolidado. Re-exporta `SaveStateKind` type.
+- **`MarginHealthChip`** — `{ classification: 'healthy' | 'warning' | 'critical', marginPct: number, tierRange?: MarginTierRange | null }`. Tonal chip con alpha 0.12 bg + 0.28 border + icon (`tabler-circle-check` / `tabler-alert-circle` / `tabler-alert-triangle`). Copy `Margen · 49,4% · Óptimo` — pair color + icon + label textual + pct + status word. Tooltip con tier range al hover. `aria-label` full-sentence. `tabular-nums`.
+- **`TotalsLadder`** — `{ subtotal, factor, ivaAmount, total, currency, loading?, totalLabel? }`. Render: overline `Total {currency}` + `h4` total value (`tabular-nums`, `text.primary`, `fontWeight=600`) + opcional caption muted one-liner con ladder de ajustes. Lógica de visibilidad: ladder aparece solo cuando `hasFactorAdjustment || hasIvaAdjustment || hasSubtotalDelta`. `AnimatedCounter` integrado con `duration=0.25`, fallback a texto estático con `useReducedMotion()`. `Skeleton` width=180 height=40 durante `loading`.
+
+Los 3 primitives están listos para consumo por el próximo builder (invoice, purchase order, contract) sin re-implementación — converge con el objetivo de platform primitives de TASK-498.
+
+### Cambios en `QuoteSummaryDock.tsx`
+- Sustituye Stack flat por `<Grid container columnSpacing={{ xs: 0, md: 3 }} rowSpacing={{ xs: 1.5, md: 0 }}>`.
+- Elimina helpers locales `SummaryBlock`, `MARGIN_META`, `formatRelativeTime` (migrados a primitives).
+- Mantiene `Alert` de `simulationError` y `emptyStateMessage` render por separado.
+- CTA primaria: loading state = `disabled` + `<CircularProgress size={16} color='inherit' />` en `startIcon`, copy invariante desde `primaryCtaLabel`.
+- Chip de addons preserva el state-captured anchor de TASK-503 + dedupe client-side + guard idempotente en toggle.
+
+### Cambios en `QuoteBuilderShell.tsx`
+- `primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}` (constante; antes hacía copy-swap con `submitting`).
+- `primaryCtaLoading={submitting}` sigue siendo la señal operativa para disabled + spinner.
+
+### Regla canónica del dock
+El monto grande (`h4`, `text.primary`, `tabular-nums`) es el único valor destacado. El único `primary.main` del dock es la CTA contained. El margen chip y los addons usan colores semantic; el save state usa semantic por estado. Restraint > density.
+
+## Delta 2026-04-19 — TASK-500 / TASK-501 / TASK-502 / TASK-503 Quote Builder UX & Engine Contract Closure
+
+Bundle final del Quote Builder post-TASK-488. Cuatro task concatenados que cierran el modelo canónico de composición + addons sin romper contratos existentes.
+
+### TASK-500 — Cantidad↔periods semantic sync + employment type dropdown
+- La columna UI "Cantidad" para rol/persona ahora representa meses facturables (`metadata.periods`). `line.quantity` queda fijo en `1` para esas líneas y deja de existir en el input del engine como multiplicador independiente.
+- `GH_PRICING.adjustPopover.periodsLabel` eliminado del catálogo (quedaba huérfano). El campo "Períodos" del popover también eliminado — redundante con la columna Cantidad.
+- "Tipo de contratación" del popover pasa de text field libre a `CustomTextField select` poblado desde `GET /api/finance/quotes/pricing/config` → `catalog.employmentTypes: EmploymentTypeEntry[]`.
+
+### TASK-501 — Unit price UX + fresh simulate-on-save
+- Input del precio unitario (cuando era editable) pasa a mostrar `line.unitPrice ?? enginePrice ?? ''` en vez de placeholder con caption duplicado "Sugerido $X" debajo. Eliminado en TASK-502 para líneas catalog-backed (ver abajo); queda vigente para manuales.
+- Shell añade fresh-simulate síncrono antes de `buildPersistedQuoteLineItems`: `POST /api/finance/quotes/pricing/simulate` con la snapshot actual, y usa el output fresco para resolver `unitPrice`. Cero race condition.
+- `primaryCtaDisabled` del `QuoteSummaryDock` y el botón "Guardar" del header gate en `simulating=true`. Copy del header cambia a "Calculando pricing…" durante la simulación.
+- `buildPersistedQuoteLineItems` ahora produce error específico con nombre + sku de la línea cuando falta precio: `${missingPriceMessage} — revisa la línea: Creative Operations Lead (ECG-001).`.
+
+### TASK-502 — Double-count fix + derived unit price + read-only catalog price
+- **Critical bug fix**: antes TASK-500 sincronizó `line.quantity` con `metadata.periods` pero el engine v2 multiplicaba por ambos (`totalBill = unitPrice × fteFraction × periods × quantity`). Con Cantidad=0.5 el subtotal era `0.25 × unitPrice` (correcto esperado: `0.5 × unitPrice`). Fix: `buildQuotePricingLineInput` para role/person envía `quantity: 1` siempre; el multiplicador real es `periods`.
+- Precio unitario mostrado para rol/persona: `enginePrice × fteFraction`. Para tool/overhead: `enginePrice`. Resultado: subtotal `meses × precioMostrado` cuadra aritméticamente a ojo.
+- Para `lineRequiresSuggestedPrice(line)` (rol, persona, tool, overhead_addon) el precio se renderiza como `<Typography>` read-only. El input y el chip Override + reset se eliminan de esa rama. Para `direct_cost` el input sigue editable.
+- `buildPersistedQuoteLineItems` ignora `line.unitPrice` para items catalog-backed: siempre usa el `suggestedBillRate.unitPriceOutputCurrency` del engine. Override solo aplica para manual direct_cost.
+- Chip "FTE N×" al lado del precio en rol/persona dispara `handleAdjustOpen` al click.
+
+### TASK-503 — Addon toggle as line item + `autoResolveAddons: 'internal_only'`
+- **Contract change (aditivo)**: `PricingEngineInputV2.autoResolveAddons` pasa de `boolean` a `boolean | 'internal_only'`.
+  - `true` (legacy default): auto-resuelve todos los addons aplicables. Sin cambio.
+  - `false`: no auto-resuelve ninguno.
+  - `'internal_only'` (nuevo): auto-resuelve solo `visibleToClient: false`. Los visibles al cliente llegan al output como propuestas.
+- **Contract change (aditivo)**: `PricingEngineOutputV2` gana `suggestedVisibleAddons?: PricingAddonOutputV2[]`. Solo se popula cuando `autoResolveAddons === 'internal_only'`. Contiene los addons `visibleToClient: true` aplicables al contexto que NO están ya como línea `overhead_addon` explícita (dedupe contra `explicitAddonSkus` del mismo engine).
+- **Builder shell**: pasa `autoResolveAddons: 'internal_only'` en `buildQuotePricingInput`. Las sugerencias visibles se ofrecen en el panel `AddonSuggestionsPanel`. Tildar → `editorRef.current.appendLines([{ lineType: 'direct_cost', metadata: { pricingV2LineType: 'overhead_addon', sku } }])`. Destildar → filter out del `linesSnapshot` por sku.
+- **Estado del checkbox** deriva de `linesSnapshot` (single source of truth); `excludedAddons: Set<string>` eliminado (era código muerto).
+- **Panel copy**: renombrado de "Addons sugeridos" a "Addons para el cliente". `appliedReason` (string de debug del engine) oculto. `formatOutputMoney(amountUsd, 'USD')` dual display eliminado (solo currency output).
+- **Addon anchor bug fix**: `QuoteSummaryDock` migrado de `anchorEl={addonChipRef.current}` a `useState<HTMLElement | null>` capturando `event.currentTarget` en el click handler. El Popper siempre se ancla al DOM node clickeado, sin depender del timing de `useRef`.
+- **Idempotent toggle + dedupe**: durante la ventana del debounce del engine (500-800ms), un mismo sku puede aparecer simultáneamente en `linesSnapshot` (applied) y en `suggestion.suggestedVisibleAddons` (engine output cacheado del run anterior). Fix: `addonPanelEntries` dedupe por sku (applied tiene prioridad). `handleAddonToggle(sku, include=true)` short-circuits si el sku ya está como línea. Protege double-clicks + race conditions.
+
+### Regla canónica del modelo
+**Lo que el cliente paga es lo que ve en la tabla.** Los line items son la única fuente de verdad de lo cotizado. Los addons internos (overhead, fee EOR) afectan margen pero no son cargos visibles al cliente — viven en el cost stack (solo finance/admin). Los addons visibles al cliente se promueven a líneas explícitas al tildar. Cero markup oculto en el PDF.
+
+### Contratos actualizados
+- `PricingEngineInputV2.autoResolveAddons: boolean | 'internal_only'` (antes `boolean`)
+- `PricingEngineOutputV2.suggestedVisibleAddons?: PricingAddonOutputV2[]` (nuevo)
+- `GH_PRICING.adjustPopover.periodsLabel` (eliminado)
+- `GH_PRICING.summaryDock.addonsChip(n)` devuelve "N addons" en vez de "N addons sugeridos"
+
+### Tests cubren
+- `pricing-engine-v2.test.ts`: nuevo `autoResolveAddons='internal_only' only auto-sums internal addons; visible ones go to suggestedVisibleAddons`.
+- `quote-builder-pricing.test.ts`: tests actualizados para reflejar `quantity=1` en role lineInput; nuevo test `ignores user-provided unitPrice on catalog-backed lines (engine is SoT)`.
+
+### Legacy
+- Quotes abiertas antes de `'internal_only'` que dependían del auto-resolve completo: al reabrir en edit mode, los addons visibles ya no se auto-suman; el usuario los tildea manualmente para recuperar el total previo. El snapshot persistido se mantiene hasta guardar. No hay migración automática on-read; si aparece necesidad real, task dedicada.
+
+## Delta 2026-04-19 — TASK-459 Delivery Model Refinement
+
+- `greenhouse_commercial.quotations` ahora persiste dos ejes ortogonales de delivery:
+  - `commercial_model`: `retainer | project | one_off`
+  - `staffing_model`: `named_resources | outcome_based | hybrid`
+- `pricing_model` legacy no se elimina en este corte:
+  - sigue existiendo por compatibilidad con governance/templates/terms
+  - pasa a comportarse como alias derivado
+  - mapping vigente:
+    - `retainer + named_resources` -> `staff_aug`
+    - `retainer + outcome_based|hybrid` -> `retainer`
+    - `project|one_off + *` -> `project`
+- Regla crítica:
+  - este `commercial_model` describe el delivery contract del quote
+  - NO es el mismo dominio que `CommercialModelCode` del pricing engine (`on_going | on_demand | hybrid | license_consulting`)
+- Downstream actualizado:
+  - `GET /api/finance/quotes` y `GET /api/finance/quotes/[id]` exponen `pricingModel`, `commercialModel` y `staffingModel`
+  - `sales_context_at_sent` captura los tres campos para snapshot histórico
+  - `greenhouse_serving.quotation_pipeline_snapshots` y `greenhouse_serving.quotation_profitability_snapshots` materializan ambos ejes
+  - `greenhouse_serving.deal_pipeline_snapshots` agrega `latest_quote_pricing_model`, `latest_quote_commercial_model` y `latest_quote_staffing_model`
+  - renewals/pipeline/profitability/deal-pipeline ya pueden surfacing el split sin releer la quote raw
+
+---
+
+## Delta 2026-04-19 — TASK-460 Contract / SOW Canonical Entity
+
+- `greenhouse_commercial.contracts` pasa a ser la entidad canónica post-venta para ejecución, rentabilidad y renovación:
+  - identidad técnica `contract_id`
+  - identificador visible `contract_number` con convención `EO-CTR-*`
+  - herencia inicial de `commercial_model` + `staffing_model` desde la quote originadora
+  - lifecycle persistido: `draft | active | paused | terminated | completed | renewed`
+- La coexistencia queda explícita:
+  - `quotation` sigue siendo el artefacto pre-venta y de pricing
+  - `contract` pasa a ser el anchor operativo post-aceptación
+  - ambos conviven durante la transición mediante `contract_quotes`
+- Runtime nuevo materializado:
+  - `greenhouse_commercial.contracts`
+  - `greenhouse_commercial.contract_quotes`
+  - `greenhouse_serving.contract_profitability_snapshots`
+  - `greenhouse_commercial.contract_renewal_reminders`
+- Doble anchor document chain:
+  - `greenhouse_finance.purchase_orders.contract_id`
+  - `greenhouse_finance.service_entry_sheets.contract_id`
+  - `greenhouse_finance.income.contract_id`
+  - `quotation_id` se mantiene por retrocompat; el reader nuevo `readContractDocumentChain({ contractId })` agrega toda la cadena del contrato
+- Activación operativa:
+  - al materializar invoice desde quote o HES, el flujo asegura que exista un contract para la quote y propaga `contract_id` hacia PO / HES / income
+  - `GET /api/finance/contracts`, `GET /api/finance/contracts/[id]`, `GET /api/finance/contracts/[id]/document-chain` y `GET /api/finance/contracts/[id]/profitability` exponen lecturas tenant-safe
+  - `/finance/contracts` y `/finance/contracts/[id]` surfacing inicializan la lane visible del contrato sin reemplazar todavía `/finance/intelligence`
+- Renovaciones y profitability:
+  - `contract_profitability_snapshots` usa grain `(contract_id, period_year, period_month)` y convive con `quotation_profitability_snapshots`
+  - `contract_renewal_reminders` dedupea avisos contract-level sin apagar aún el sweep quote-level legado
+- Boundary explícito:
+  - `msa_id` queda reservado como referencia futura; no hay FK real hasta TASK-461
+  - el schema snapshot baseline no refleja esta lane; la verdad operativa para contracts es migración + `db.d.ts`
+
+---
+
+## Delta 2026-04-19 — TASK-461 Master Agreements / Clause Library / ZapSign
+
+- Nueva lane legal-commercial sobre el dominio contractual:
+  - `greenhouse_commercial.master_agreements`
+  - `greenhouse_commercial.clause_library`
+  - `greenhouse_commercial.master_agreement_clauses`
+- `master_agreements` modela el umbrella legal reusable:
+  - `msa_id`, `msa_number`
+  - `organization_id` + `client_id`
+  - `effective_date`, `expiration_date`, renovación y metadata legal
+  - estado `draft | active | expired | terminated | superseded`
+  - asset firmado + metadata de firma electrónica (`signature_provider`, `signature_document_token`, `signature_status`, `signature_payload`)
+- `clause_library` queda como catálogo versionado por `clause_code + version + language`, con categorías legales y variables por plantilla.
+- `master_agreement_clauses` pincha versión/language exactos al momento de asociar el MSA y permite body override + variables resueltas.
+- Contrato operativo actualizado:
+  - `greenhouse_commercial.contracts.msa_id` ya tiene FK real
+  - `resolveContractClauses(contractId)` resuelve la herencia efectiva de cláusulas desde el MSA
+  - readers de contracts dejan de depender solo de `space_id` y pasan a resolver tenant scope híbrido `organization_id OR space_id`
+- Eventos nuevos:
+  - `commercial.master_agreement.created`
+  - `commercial.master_agreement.updated`
+  - `commercial.master_agreement.clauses_changed`
+  - `commercial.contract.msa_linked`
+- Superficies nuevas:
+  - `/finance/master-agreements`
+  - `/finance/master-agreements/[id]`
+  - chips y links de MSA dentro de `/finance/contracts` y `/finance/contracts/[id]`
+- Firma electrónica:
+  - `POST /api/finance/master-agreements/[id]/signature-requests` crea o consulta solicitudes de firma en ZapSign
+  - `POST /api/webhooks/zapsign` sincroniza estado y captura el PDF firmado como asset privado Greenhouse
+  - el runtime usa `ZAPSIGN_API_TOKEN` y `ZAPSIGN_WEBHOOK_SHARED_SECRET`; el token operativo validado corresponde a producción, no sandbox
+
+---
+
+## Delta 2026-04-18 — TASK-455 Quote Sales Context Snapshot
+
+- `greenhouse_commercial.quotations` incorpora `sales_context_at_sent jsonb` como snapshot histórico e inmutable del contexto comercial al momento en que la quote queda `sent`.
+- Shape persistido actual:
+  - `captured_at`
+  - `lifecyclestage`
+  - `dealstage`
+  - `deal_id`
+  - `hubspot_deal_id`
+  - `hubspot_lead_id` (hoy `null` por falta de source canónico local)
+  - `is_standalone`
+  - `category_at_sent` (`deal | contract | pre-sales`)
+- Regla de captura:
+  - no hace live lookup a HubSpot
+  - reutiliza runtime local ya materializado en `greenhouse_core.clients.lifecyclestage` y `greenhouse_commercial.deals`
+  - se persiste en el mismo flujo transaccional que marca `status='sent'`
+  - cubre ambos caminos reales a `sent`: `POST /api/finance/quotes/[id]/send` y la resolución final del approval workflow
+- Regla de lectura:
+  - `GET /api/finance/quotes/[id]` expone `salesContextAtSent`
+  - el snapshot es solo para trazabilidad histórica, detalle y analytics
+  - el classifier operativo del pipeline híbrido sigue leyendo estado vivo (`clients.lifecyclestage` + `greenhouse_commercial.deals.dealstage`)
+- Índice nuevo:
+- `idx_quotations_sales_context_category` sobre `(space_id, sales_context_at_sent ->> 'category_at_sent', sent_at DESC)` parcial para quotes con snapshot
+
+---
+
+## Delta 2026-04-19 — TASK-456 Deal Pipeline Snapshots Projection
+
+- Nueva tabla `greenhouse_serving.deal_pipeline_snapshots` como serving deal-grain del forecast comercial:
+  - key = `deal_id`
+  - 1 fila por deal canónico no borrado
+  - persiste `is_open`, `is_won`, `probability_pct`, `days_until_close`
+  - rolea-up quotes ligadas por `hubspot_deal_id` en `latest_quote_id`, `latest_quote_status`, `quote_count`, `approved_quote_count`, `total_quotes_amount_clp`
+- `probability_pct` ya no se inventa desde stage labels ni desde status de quote:
+  - se lee del deal canónico
+  - puede venir `NULL` para stages abiertos si `hubspot_deal_pipeline_config` no tiene override
+  - los totals ponderados tratan `NULL` como `0`
+- Projection reactiva nueva:
+  - `deal_pipeline`
+  - domain = `cost_intelligence`
+  - triggerEvents = `commercial.deal.*` + `commercial.quotation.created|synced|sent|approved|rejected|converted|version_created|po_linked|hes_linked|invoice_emitted`
+  - quote events resuelven `quotationId -> hubspot_deal_id -> deal`
+- Reader/API nuevo:
+  - `src/lib/commercial-intelligence/intelligence-store.ts` agrega `listDealPipelineSnapshots()` y `buildDealPipelineTotals()`
+  - `GET /api/finance/commercial-intelligence/deal-pipeline` expone snapshots + totals tenant-safe vía `requireFinanceTenantContext()`
+- Convivencia explícita:
+  - `quotation_pipeline_snapshots` sigue siendo la vista quote-grain
+  - `deal_pipeline_snapshots` pasa a ser la vista correcta para forecast y pipeline híbrido de TASK-457
+
+---
+
+## Delta 2026-04-18 — TASK-463 Unified Quote Builder + Bidirectional HubSpot Bridge
+
+### Problema que cerró
+
+La UI `/finance/quotes` tenía dos botones de creación ("HubSpot" legacy vs "+ Nueva cotización" canónico) que producían estados divergentes: el legacy creaba quote en HubSpot pero el canónico nunca propagaba a HubSpot. Resultado: el Account Lead tenía que elegir entre "quote local rica con governance" o "quote que aparece en HubSpot", cuando debería ser siempre ambos.
+
+### Ship
+
+- **UI unificada**: `src/views/greenhouse/finance/QuotesListView.tsx` — eliminado el drawer `CreateQuoteDrawer` inline (284 líneas) + botón "HubSpot" + state `hubspotDrawerOpen`. Queda solo "+ Nueva cotización" con `QuoteCreateDrawer` canónico.
+- **Reactive projection**: `src/lib/sync/projections/quotation-hubspot-outbound.ts` (domain `cost_intelligence`). Trigger events: `quotationCreated`, `quotationSent`, `quotationApproved`, `quotationRejected`, `quotationVersionCreated`. Extract scope: `quotationId`. Refresh: llama `pushCanonicalQuoteToHubSpot`.
+- **Helper outbound**: `src/lib/hubspot/push-canonical-quote.ts` — adapter entre canonical `greenhouse_commercial.quotations` + `quotation_line_items` y el helper legacy `createHubSpotQuote()`. Skip si falta `hubspot_deal_id` / `organization_id`. Create si no hay `hubspot_quote_id`. Update (stub) si ya existe.
+- **Helper update stub**: `src/lib/hubspot/update-hubspot-quote.ts` — PATCH al Cloud Run service `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`. Fallback a `{ success:false, error:'update_not_supported' }` si el endpoint downstream aún no existe (MVP acceptable — el create path funciona completo).
+- **Eventos nuevos**: `commercial.quotation.pushed_to_hubspot` y `commercial.quotation.hubspot_sync_failed` — agregados en `event-catalog.ts` + publishers en `quotation-events.ts`.
+- **Endpoint deprecado**: `POST /api/finance/quotes/hubspot` → HTTP 410 Gone con migrationUrl `/api/finance/quotes`. Telemetría vía `console.warn` para rastrear callers legacy durante la ventana de coexistencia.
+
+### Flujo operativo
+
+```
+User → [+ Nueva cotización] → QuoteCreateDrawer (canónico)
+  └─► POST /api/finance/quotes
+      ├─► INSERT greenhouse_commercial.quotations + line_items
+      └─► publishQuoteCreated (outbox)
+          └─► commercial.quotation.created (outbox event)
+               └─► ops-worker (cron /reactive/process)
+                    └─► projection quotationHubSpotOutbound.refresh()
+                         └─► pushCanonicalQuoteToHubSpot(quotationId)
+                              ├─► createHubSpotQuote() [si !hubspot_quote_id]
+                              ├─► updateHubSpotQuote() [si hubspot_quote_id existe]
+                              └─► publishQuotationPushedToHubSpot (result='created'|'updated'|'skipped')
+```
+
+Downstream lifecycle (sent/approved/rejected/version_created) disparan la misma projection, que detecta que ya existe `hubspot_quote_id` y va por update path. Idempotente por construcción.
+
+### Observabilidad
+
+- Outbox event `commercial.quotation.pushed_to_hubspot` con campos `result`, `reason` (para skipped), `hubspotQuoteId`, `hubspotDealId`, `direction: 'outbound'`
+- Outbox event `commercial.quotation.hubspot_sync_failed` en catch branch con `errorMessage`, `attemptedAction`
+- Retries automáticos vía ops-worker projection registry (`maxRetries: 2` para tolerar 429/502 transient de HubSpot)
+
+### Migration impact
+
+- **Zero schema change**: columnas `hubspot_quote_id`, `hubspot_deal_id`, `hubspot_last_synced_at` ya existían en `greenhouse_commercial.quotations`
+- Inbound sync (`sync-hubspot-quotes.ts`, cron 6h) sigue funcionando sin cambio; la natural key `hubspot_quote_id` cierra el loop outbound/inbound sin duplicar
+
+### Verificación
+
+- `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm build` → green
+- Tests: 3 escenarios de `pushCanonicalQuoteToHubSpot` (skip, create, update) en `src/lib/hubspot/__tests__/push-canonical-quote.test.ts`. 282/282 tests passing (194 payroll + 21 pricing + 64 commercial/hubspot + 3 nuevos)
+
+### Follow-ups explícitos
+
+- Implementar el endpoint PATCH real en el Cloud Run service para que `updateHubSpotQuote` deje de ser stub
+- Dropear `greenhouse_finance.quotes` legacy completo cuando termine la ventana de coexistencia (hoy vive como compat view read-only via `syncCanonicalFinanceQuote`)
+- Webhook subscription HubSpot `quote.propertyChange` para sync casi-real-time inbound (hoy es polling 6h)
+
+---
+
+## Delta 2026-04-18 — TASK-464c Tool Catalog Extension + Overhead Addons
+
+- `greenhouse_ai.tool_catalog` pasa a ser también el catálogo comercial runtime de herramientas, sin moverlo de schema ni romper AI tooling:
+  - columnas nuevas: `tool_sku`, `prorating_qty`, `prorating_unit`, `prorated_cost_usd`, `prorated_price_usd`, `applicable_business_lines`, `applicability_tags`, `includes_in_addon`, `notes_for_quoting`
+  - secuencia `greenhouse_ai.tool_sku_seq` + `generate_tool_sku()` para altas futuras `ETG-027+`
+  - índices nuevos: unique parcial por `tool_sku` y GIN para `applicable_business_lines` / `applicability_tags`
+- Nuevo catálogo complementario `greenhouse_commercial.overhead_addons`:
+  - secuencia `overhead_addon_sku_seq` + `generate_overhead_addon_sku()`
+  - 9 addons canonizados `EFO-001..009`
+  - enum operativo actual: `overhead_fixed`, `fee_percentage`, `fee_fixed`, `resource_month`, `adjustment_pct`
+- Contrato de normalización nuevo:
+  - business lines canónicas viven en `applicable_business_lines`
+  - tags no-BL (`all_business_lines`, `staff_augmentation`, `internal_ops`) viven en `applicability_tags`
+  - `provider_id` queda siempre resuelto y no puede degradar a `NULL`
+  - filas placeholder y vacías del CSV no crean registros ni avanzan secuencias
+- Runtime nuevo disponible para consumers:
+  - `src/lib/commercial/tool-catalog-store.ts`
+  - `src/lib/commercial/overhead-addons-store.ts`
+  - `src/lib/commercial/tool-catalog-events.ts`
+  - `resolveApplicableAddons()` ya resuelve `named_resources` -> `EFO-003/EFO-004/EFO-005`
+- Seeder contract:
+  - `scripts/seed-tool-catalog.ts` consume `tool-catalog.csv` y deja `26` rows activas sembradas
+  - `scripts/seed-overhead-addons.ts` consume `overhead-addons.csv` y deja `9` rows sembradas
+  - rerun idempotente verificado (`0 inserted / 0 updated` en ambos)
+- Coexistencia:
+  - AI tooling readers y `provider_tooling_snapshots` siguen usando `greenhouse_ai.tool_catalog`
+  - `TASK-464d` toma este catálogo extendido como foundation del engine, no reinterpreta CSVs ni reconstruye tooling
+
+---
+
+## Delta 2026-04-18 — TASK-464b Pricing Governance Tables
+
+- `greenhouse_commercial` incorpora cinco lookup tables versionadas por `effective_from`:
+  - `role_tier_margins`
+  - `service_tier_margins`
+  - `commercial_model_multipliers`
+  - `country_pricing_factors`
+  - `fte_hours_guide`
+- Contrato runtime nuevo:
+  - readers canónicos en `src/lib/commercial/pricing-governance-store.ts`
+  - cache in-memory TTL 5 min para lookups de config
+  - resolución por fecha efectiva (`latest effective_from <= asOfDate`)
+- Seeder nuevo:
+  - `scripts/seed-pricing-governance.ts`
+  - parser en `src/lib/commercial/pricing-governance-seed.ts`
+  - consume los 5 CSVs de `data/pricing/seed/`
+  - normaliza rango país (`0.85-0.9` -> `0.85 / 0.875 / 0.90`)
+  - re-seed sobre la misma fecha es idempotente (`0 inserted / 0 updated` en rerun verificado)
+- Drift contract:
+  - `role-tier-margins.csv` no muta `sellable_roles.tier`
+  - el catálogo de `TASK-464a` gana cualquier contradicción
+  - el seed actual dejó `21` drifts (`tier_mismatch`, `csv_only`, `catalog_only`) exportados en artifact para reconciliación manual o futura
+- Regla de coexistencia:
+  - `margin_targets` y `role_rate_cards` siguen vivos como compat hasta `TASK-464d`
+  - `TASK-348` no consume aún `role_tier_margins`; el condition type nuevo queda como follow-up
+
+---
+
+## Delta 2026-04-18 — TASK-468 Payroll Employment Type Bridge
+
+- `greenhouse_commercial` incorpora `employment_type_aliases` como capa persistente de resolución para vocabulario externo/factual.
+- El source inicial cubre `greenhouse_payroll.contract_type` y aliases legacy explícitos, con PK por `(source_system, source_value_normalized)`, `resolution_status`, `confidence` y target `employment_type_code`.
+- Regla nueva:
+  - commercial resuelve `contract_type` de payroll mediante alias table y **no** mediante FK, rewrite ni constraint sobre `greenhouse_payroll.*`
+  - el read path de tasas payroll vive en `src/lib/commercial/payroll-rates-bridge.ts` y solo hace `SELECT`
+  - cualquier writeback o sincronización bidireccional queda fuera de este corte
+- Contrato para consumers futuros:
+  - `TASK-467` / `TASK-463` pueden leer alias coverage y drift desde el bridge
+  - `TASK-464d` puede consumir `payroll-rates-bridge` sin acoplarse a `src/lib/payroll/**`
+
+---
+
+## Delta 2026-04-18 — TASK-464a Sellable Roles Catalog Foundation
+
+- Pricing comercial deja de depender solo de `role_rate_cards` como fuente de costo/precio por rol.
+- Foundation nueva en `greenhouse_commercial`:
+  - `sellable_roles` — catálogo canónico por SKU `ECG-XXX`, categoría, tier y flags `can_sell_as_staff` / `can_sell_as_service_component`.
+  - `employment_types` — vocabulario comercial versionado e independiente de payroll (`indefinido_clp`, `honorarios_clp`, `contractor_deel_usd`, etc.).
+  - `sellable_role_cost_components` — stack de costo por `(role_id, employment_type_code, effective_from)` con salario base, 4 bonos, previsional, Deel/EOR y columnas generadas `total_monthly_cost_usd` / `hourly_cost_usd`.
+  - `role_employment_compatibility` — compatibilidad/default por rol sin tocar `greenhouse_payroll.*`.
+  - `sellable_role_pricing_currency` — precio vigente por rol y moneda (`USD`, `CLP`, `CLF`, `COP`, `MXN`, `PEN`).
+- Seeder operativo:
+  - `scripts/seed-sellable-roles.ts` consume `data/pricing/seed/sellable-roles-pricing.csv`.
+  - Es **resumable e idempotente**: usa upserts por PK compuesta para resembrar el mismo `effective_from` sin duplicados.
+  - Distingue `skipped_placeholder`, `rejected`, `needs_review` y exporta artifact local para las filas ambiguas.
+  - Inferencia de `employment_type` es conservadora; los casos ambiguos no crean compatibilidad automática.
+- Eventos nuevos:
+  - `commercial.sellable_role.created`
+  - `commercial.sellable_role.cost_updated`
+  - `commercial.sellable_role.pricing_updated`
+- Regla de coexistencia:
+  - `role_rate_cards` sigue como compatibilidad para callers legacy del engine TASK-346.
+  - `pricing-engine-v2.ts` es la superficie nueva para callers backend/UI que ya hablen en SKUs y output currencies extendidas.
+  - la deprecación efectiva de `role_rate_cards` queda supeditada al cutover completo de quotations/UI; no ocurre en el mismo merge de 464d.
 
 ---
 
@@ -160,7 +636,7 @@ Una quote se considera `converted` cuando `converted_to_income_id` deja de ser N
 | Método | Ruta | Responsabilidad |
 |---|---|---|
 | `GET` | `/api/finance/quotes/[id]/pdf` | Render client-safe del PDF usando `@react-pdf/renderer`. Excluye `unit_cost`, `subtotal_cost`, `margin_pct`, `effective_margin_pct`, `cost_breakdown`, metadata de approvals. `?download=1` cambia `Content-Disposition` de `inline` a `attachment`. Registra `pdf_generated` en audit_log (sin outbox event — es señal interna). |
-| `POST` | `/api/finance/quotes/[id]/send` | Transiciona `draft → sent` (directo si health OK) o `draft → pending_approval` (si health requiere aprobación; crea approval_steps). Bloquea transiciones desde `sent`/`approved`/`pending_approval`/`rejected`/`converted`/`expired` con 409. Emite `commercial.quotation.sent` o `commercial.quotation.approval_requested` según corresponda. Actualiza `sent_at`. |
+| `POST` | `/api/finance/quotes/[id]/send` | Transiciona `draft → sent` (directo si health OK) o `draft → pending_approval` (si health requiere aprobación; crea approval_steps). Bloquea transiciones desde `sent`/`approved`/`pending_approval`/`rejected`/`converted`/`expired` con 409. Emite `commercial.quotation.sent` o `commercial.quotation.approval_requested` según corresponda. Actualiza `sent_at` y captura `sales_context_at_sent` cuando la quote efectivamente queda `sent`. |
 | `POST` | `/api/finance/quotes/[id]/save-as-template` | Crea template en `greenhouse_commercial.quote_templates` desde la quote actual: copia pricing_model, currency, billing_frequency, payment_terms, contract_duration; mapea current-version line items a `quote_template_items` (strip `member_id`, keep role_code); extrae `default_term_ids` de `quotation_terms` con `included=true`. Emite `commercial.quotation.template_saved`. |
 
 ### POST `/api/finance/quotes` extendido
@@ -310,7 +786,8 @@ Comportamiento idéntico al anterior cuando `templateId` es null/undefined.
   - `revenue_metric_config` (business_line_code nullable, hubspot_amount_metric + pipeline_default_metric)
 - Runtime pricing helpers en `src/lib/finance/pricing/`:
   - `pricing-config-store.ts` — resolvers con herencia `quotation_override → business_line → global_default`.
-  - `costing-engine.ts` — `resolveLineItemCost` es la única puerta para obtener costo de un line item.
+  - `costing-engine.ts` — puerta legacy para `QuotationPricingInput` / line items históricos.
+  - `pricing-engine-v2.ts` — puerta canónica nueva para role/person/tool/overhead/direct_cost con tier compliance, FX y addon resolver.
   - `margin-health.ts` — clasifica alertas (blocking / finance-approval / warning / info).
   - `revenue-metrics.ts` — resuelve `recurrence_type = 'inherit'` según `billing_frequency` y calcula MRR/ARR/TCV/ACV.
   - `quotation-pricing-orchestrator.ts` — `buildQuotationPricingSnapshot` / `persistQuotationPricing` /
@@ -337,7 +814,7 @@ Comportamiento idéntico al anterior cuando `templateId` es null/undefined.
   - `POST /api/finance/quotes/[id]/lines` — replace line items + recompute
   - `POST /api/finance/quotes/[id]/recalculate` — force re-read del backbone
   - `GET /api/finance/quotes/[id]/health` — discount health server-side
-  - `GET/PUT /api/finance/quotes/pricing/config` — PUT gated a `finance_admin` / `efeonce_admin`
+  - `GET/PUT /api/finance/quotes/pricing/config` — PUT gated a `finance_admin` / `efeonce_admin`; GET ahora expone tanto config legacy como catálogo canónico de pricing.
 - El namespace de eventos sigue en `finance.quote.*` para compat (converge a `commercial.quotation.*`
   en TASK-347). TASK-346 suma el nuevo evento `commercial.discount.health_alert` al outbox.
 
@@ -541,6 +1018,7 @@ CREATE TABLE greenhouse_commercial.quotations (
 
   -- Integraciones
   hubspot_deal_id      TEXT,                 -- sync bidireccional
+  sales_context_at_sent JSONB,              -- snapshot historico del contexto comercial al primer send
 
   -- Auditoria
   created_by           TEXT NOT NULL,
@@ -556,6 +1034,22 @@ CREATE TABLE greenhouse_commercial.quotations (
 CREATE INDEX idx_quotations_org ON greenhouse_commercial.quotations (organization_id);
 CREATE INDEX idx_quotations_status ON greenhouse_commercial.quotations (status);
 CREATE INDEX idx_quotations_hs_deal ON greenhouse_commercial.quotations (hubspot_deal_id) WHERE hubspot_deal_id IS NOT NULL;
+
+### 3.4. Deals canónicos comerciales (TASK-453)
+
+El pipeline inbound de HubSpot ya materializaba deals en `greenhouse_crm.deals` como proyección operational/runtime, pero faltaba la entidad comercial de primer orden para forecast y revenue pipeline. Desde TASK-453 conviven dos capas con propósito distinto:
+
+- `greenhouse_crm.deals`:
+  - proyección runtime derivada del carril raw/conformed de HubSpot
+  - foco: ingest, staging, trazabilidad source-sync
+- `greenhouse_commercial.deals`:
+  - mirror canónico comercial consumido por quoting, sales context y pipeline híbrido
+  - resuelve `client_id`, `organization_id`, `space_id`, FX a CLP y stage normalization
+  - publica eventos `commercial.deal.*`
+
+`greenhouse_commercial.deals` se vincula con quotes por `hubspot_deal_id` como **soft link**: no hay FK física desde `quotations.hubspot_deal_id`, pero sí helpers de reconciliación (`resolveDealForQuote`, `listQuotesForDeal`) y constraint lógica de unicidad en `deals.hubspot_deal_id`.
+
+`hubspot_deal_pipeline_config` desacopla el significado de `dealstage` de nombres literales HubSpot y permite custom pipelines. El sync canónico bootstrappea stages observados desde `greenhouse_crm.deals`, pero el contrato admite overrides manuales/versionados para probability, `is_closed` e `is_won`.
 ```
 
 ### 3.5. Quotation versions
@@ -934,6 +1428,12 @@ interface VersionDiff {
 ## 9. Integraciones
 
 ### 9.1. HubSpot — deals y line items
+
+**Estado runtime actual (TASK-453):**
+
+- El canon comercial de deals se alimenta desde `greenhouse_crm.deals` mediante `/api/cron/hubspot-deals-sync`.
+- No reemplaza el carril raw/conformed ni obliga todavía a un endpoint nuevo en Cloud Run para deals.
+- Los eventos `commercial.deal.*` quedan disponibles para TASK-455/456/457 sin romper el reader quote-first existente.
 
 **Sync bidireccional de deals:**
 
@@ -1728,7 +2228,7 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | Evento | Trigger | Consumers |
 |--------|---------|-----------|
 | `commercial.quotation.created` | Crear draft | Notifications → Account Lead, audit log |
-| `commercial.quotation.sent` | Enviar al cliente | HubSpot sync (deal stage), Notifications |
+| `commercial.quotation.sent` | Enviar al cliente | HubSpot sync (deal stage), Notifications, readers históricos del quote detail |
 | `commercial.quotation.approved` | Aprobada (post-approval) | HubSpot sync, crear service module, crear assignments |
 | `commercial.quotation.rejected` | Rechazada | HubSpot sync, Notifications |
 | `commercial.quotation.expired` | Vencida sin renovacion | Notifications → Account Lead + Finance |
@@ -1937,3 +2437,19 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | **Revenue metric config** | Configuracion por BL de que metrica se usa como `amount` en HubSpot y como default en pipeline |
 | **Terms library** | Catalogo de clausulas legales/comerciales reutilizables con variables de template |
 | **Renewal** | Cotizacion de renovacion generada automatica o manualmente al vencer un contrato |
+| **Service package (EFG-XXX)** | Servicio compuesto reusable (TASK-465). Vive en `greenhouse_commercial.service_pricing` como extensión 1:1 de la identidad canónica `greenhouse_core.service_modules.module_id`. Tiene recipe de roles (`service_role_recipe`) + tools (`service_tool_recipe`). Al seleccionarlo en el quote builder auto-expande a líneas editables via `POST /api/finance/quotes/from-service` (reutiliza pricing engine v2). SKU autogenerado por sequence `service_sku_seq` → `EFG-001..N`. Admin CRUD en `/admin/pricing-catalog/services`. Picker primario aterriza en TASK-473 (builder full-page); `SellableItemPickerDrawer` queda como subflujo bounded |
+## Delta 2026-04-19 — TASK-477 Role Modeled Cost Basis
+
+- `role_modeled` deja de ser solo una caída implícita al catálogo y pasa a tener un contrato reusable:
+  - source editable: `greenhouse_commercial.sellable_role_cost_components`
+  - read model: `greenhouse_commercial.role_modeled_cost_basis_snapshots`
+  - runtime batch: `POST /cost-basis/materialize/roles` en `commercial-cost-worker`
+- El catálogo de costo por rol ahora soporta explícitamente:
+  - overhead directo / compartido
+  - provenance (`source_kind`, `source_ref`)
+  - confidence (`confidence_score`, `confidence_label`)
+  - loaded cost mensual / por hora calculado, no escrito a mano
+- Reglas que quedan fijas:
+  - `role_blended` sigue siendo la primera opción cuando existe evidencia factual reusable
+  - `role_modeled` no duplica `country` ni `seniority`; ambos siguen resueltos por `employment_types` + identidad del `sellable_role`
+  - la UI de admin pricing catalog se extiende; no nace otro surface para supuestos de rol

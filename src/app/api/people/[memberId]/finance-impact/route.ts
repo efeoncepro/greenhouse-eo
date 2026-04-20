@@ -1,28 +1,18 @@
 import { NextResponse } from 'next/server'
 
+import { roundCurrency, toNumber } from '@/lib/finance/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { getPreferredMemberActualCostBasis } from '@/lib/commercial-cost-basis/people-role-cost-basis'
 import { assertMemberVisibleInPeopleScope, assertPeopleCapability, getPersonAccessForTenant } from '@/lib/people/access-scope'
 import { resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
 import { toPeopleErrorResponse } from '@/lib/people/shared'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
-import { roundCurrency, toNumber } from '@/lib/finance/shared'
 
 export const dynamic = 'force-dynamic'
 
-interface CapacityRow extends Record<string, unknown> {
-  member_id: string
-  period_year: string | number
-  period_month: string | number
+interface PeriodClosureRow extends Record<string, unknown> {
   closure_status: string | null
   period_closed: boolean | null
-  base_salary_clp: string | number
-  total_bonus_clp: string | number
-  total_allowance_clp: string | number
-  loaded_cost_target: string | number
-  total_labor_cost_target: string | number | null
-  direct_overhead_target: string | number
-  shared_overhead_target: string | number
-  total_fte: string | number
 }
 
 interface AssignmentRevenueRow extends Record<string, unknown> {
@@ -36,8 +26,7 @@ interface AssignmentRevenueRow extends Record<string, unknown> {
  * GET /api/people/[memberId]/finance-impact
  *
  * Returns the financial impact of a team member:
- * - Monthly cost breakdown (salary, bonus, allowance, overhead)
- * - Loaded cost target
+ * - Monthly commercial cost basis
  * - Revenue attributed via FTE-weighted client assignments
  * - Cost/revenue ratio
  */
@@ -63,16 +52,28 @@ export async function GET(
       accessContext
     })
 
-    // Get latest capacity economics for this member
     let costData: {
-      baseSalaryClp: number
-      totalBonusClp: number
-      totalAllowanceClp: number
+      baseSalaryClp: number | null
+      totalBonusClp: number | null
+      totalAllowanceClp: number | null
       loadedCostTarget: number
       laborCostTarget: number
       directOverheadClp: number
       sharedOverheadClp: number
       totalFte: number
+      contractedHours: number
+      commercialAvailabilityHours: number
+      costPerHourTarget: number | null
+      sourceKind: string
+      sourceRef: string | null
+      snapshotDate: string
+      confidenceScore: number
+      confidenceLabel: string
+      snapshotStatus: string
+      currency: string
+      roleCode: string | null
+      roleLabel: string | null
+      employmentTypeCode: string | null
       periodYear: number
       periodMonth: number
       closureStatus: string | null
@@ -80,54 +81,55 @@ export async function GET(
     } | null = null
 
     try {
-      const rows = await runGreenhousePostgresQuery<CapacityRow>(
-        `SELECT
-           mce.member_id,
-           mce.period_year,
-           mce.period_month,
-           pcs.closure_status,
-           COALESCE(pcs.closure_status = 'closed', FALSE) AS period_closed,
-           mce.base_salary_clp,
-           mce.total_bonus_clp,
-           mce.total_allowance_clp,
-           mce.loaded_cost_target,
-           mce.total_labor_cost_target,
-           mce.direct_overhead_target,
-           mce.shared_overhead_target,
-           mce.total_fte
-         FROM greenhouse_serving.member_capacity_economics mce
-         LEFT JOIN greenhouse_serving.period_closure_status pcs
-           ON pcs.period_year = mce.period_year
-          AND pcs.period_month = mce.period_month
-         WHERE mce.member_id = $1
-         ORDER BY mce.period_year DESC, mce.period_month DESC
-         LIMIT 1`,
-        [memberId]
-      )
+      const actualCost = await getPreferredMemberActualCostBasis(memberId)
 
-      if (rows[0]) {
-        const r = rows[0]
+      if (actualCost) {
+        const periodClosureRows = await runGreenhousePostgresQuery<PeriodClosureRow>(
+          `SELECT
+             closure_status,
+             COALESCE(closure_status = 'closed', FALSE) AS period_closed
+           FROM greenhouse_serving.period_closure_status
+           WHERE period_year = $1
+             AND period_month = $2
+           LIMIT 1`,
+          [actualCost.periodYear, actualCost.periodMonth]
+        )
+
+        const closure = periodClosureRows[0]
 
         costData = {
-          baseSalaryClp: roundCurrency(toNumber(r.base_salary_clp)),
-          totalBonusClp: roundCurrency(toNumber(r.total_bonus_clp)),
-          totalAllowanceClp: roundCurrency(toNumber(r.total_allowance_clp)),
-          loadedCostTarget: roundCurrency(toNumber(r.loaded_cost_target)),
-          laborCostTarget: roundCurrency(toNumber(r.total_labor_cost_target)),
-          directOverheadClp: roundCurrency(toNumber(r.direct_overhead_target)),
-          sharedOverheadClp: roundCurrency(toNumber(r.shared_overhead_target)),
-          totalFte: toNumber(r.total_fte),
-          periodYear: toNumber(r.period_year),
-          periodMonth: toNumber(r.period_month),
-          closureStatus: r.closure_status ? String(r.closure_status) : null,
-          periodClosed: r.period_closed === true
+          baseSalaryClp: null,
+          totalBonusClp: null,
+          totalAllowanceClp: null,
+          loadedCostTarget: roundCurrency(toNumber(actualCost.loadedCostAmount)),
+          laborCostTarget: roundCurrency(toNumber(actualCost.totalLaborCostAmount)),
+          directOverheadClp: roundCurrency(toNumber(actualCost.directOverheadAmount)),
+          sharedOverheadClp: roundCurrency(toNumber(actualCost.sharedOverheadAmount)),
+          totalFte: toNumber(actualCost.contractedFte),
+          contractedHours: roundCurrency(toNumber(actualCost.contractedHours)),
+          commercialAvailabilityHours: roundCurrency(toNumber(actualCost.commercialAvailabilityHours)),
+          costPerHourTarget:
+            actualCost.costPerHourAmount != null ? roundCurrency(toNumber(actualCost.costPerHourAmount)) : null,
+          sourceKind: actualCost.sourceKind,
+          sourceRef: actualCost.sourceRef,
+          snapshotDate: actualCost.snapshotDate,
+          confidenceScore: actualCost.confidenceScore,
+          confidenceLabel: actualCost.confidenceLabel,
+          snapshotStatus: actualCost.snapshotStatus,
+          currency: actualCost.currency,
+          roleCode: actualCost.roleCode,
+          roleLabel: actualCost.roleLabel,
+          employmentTypeCode: actualCost.employmentTypeCode,
+          periodYear: actualCost.periodYear,
+          periodMonth: actualCost.periodMonth,
+          closureStatus: closure?.closure_status ? String(closure.closure_status) : null,
+          periodClosed: closure?.period_closed === true
         }
       }
     } catch {
-      // member_capacity_economics may not exist or member may not have data
+      // Cost basis may not exist yet for this member.
     }
 
-    // Get revenue attributed via FTE-weighted assignments
     let assignmentRevenue: Array<{
       clientId: string
       clientName: string | null
@@ -176,17 +178,17 @@ export async function GET(
         organizationId ? [memberId, year, month, organizationId] : [memberId, year, month]
       )
 
-      assignmentRevenue = rows.map(r => ({
-        clientId: String(r.client_id),
-        clientName: r.client_name ? String(r.client_name) : null,
-        fteWeight: toNumber(r.fte_weight),
-        revenueClp: roundCurrency(toNumber(r.revenue_clp))
+      assignmentRevenue = rows.map(row => ({
+        clientId: String(row.client_id),
+        clientName: row.client_name ? String(row.client_name) : null,
+        fteWeight: toNumber(row.fte_weight),
+        revenueClp: roundCurrency(toNumber(row.revenue_clp))
       }))
     } catch {
-      // Assignments or income tables may not be available
+      // Assignments or P&L snapshots may not be available.
     }
 
-    const totalRevenueAttributed = roundCurrency(assignmentRevenue.reduce((sum, a) => sum + a.revenueClp, 0))
+    const totalRevenueAttributed = roundCurrency(assignmentRevenue.reduce((sum, item) => sum + item.revenueClp, 0))
     const totalCost = costData?.loadedCostTarget ?? 0
 
     const costRevenueRatio = totalRevenueAttributed > 0

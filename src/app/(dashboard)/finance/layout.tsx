@@ -15,18 +15,19 @@ export default async function FinanceLayout({ children }: { children: ReactNode 
 
   const hasAccess = hasAnyAuthorizedViewCode({
     tenant,
-      viewCodes: [
-        'finanzas.resumen',
-        'finanzas.ingresos',
-        'finanzas.egresos',
-        'finanzas.conciliacion',
-        'finanzas.banco',
-        'finanzas.cuenta_corriente_accionista',
-        'finanzas.clientes',
-        'finanzas.proveedores',
-        'finanzas.inteligencia',
-        'finanzas.asignaciones_costos',
-        'finanzas.cotizaciones',
+    viewCodes: [
+      'finanzas.resumen',
+      'finanzas.ingresos',
+      'finanzas.egresos',
+      'finanzas.conciliacion',
+      'finanzas.banco',
+      'finanzas.cuenta_corriente_accionista',
+      'finanzas.clientes',
+      'finanzas.proveedores',
+      'finanzas.inteligencia',
+      'finanzas.asignaciones_costos',
+      'finanzas.cotizaciones',
+      'finanzas.contratos',
       'finanzas.ordenes_compra',
       'finanzas.hes'
     ],

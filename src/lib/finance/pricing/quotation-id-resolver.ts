@@ -6,6 +6,7 @@ export interface QuotationIdentityRow {
   quotationId: string
   financeQuoteId: string | null
   currentVersion: number
+  organizationId: string | null
   spaceId: string | null
 }
 
@@ -16,9 +17,10 @@ export const resolveQuotationIdentity = async (
     quotation_id: string
     finance_quote_id: string | null
     current_version: number
+    organization_id: string | null
     space_id: string | null
   }>(
-    `SELECT quotation_id, finance_quote_id, current_version, space_id
+    `SELECT quotation_id, finance_quote_id, current_version, organization_id, space_id
      FROM greenhouse_commercial.quotations
      WHERE quotation_id = $1 OR finance_quote_id = $1
      LIMIT 1`,
@@ -33,6 +35,7 @@ export const resolveQuotationIdentity = async (
     quotationId: row.quotation_id,
     financeQuoteId: row.finance_quote_id,
     currentVersion: row.current_version,
+    organizationId: row.organization_id,
     spaceId: row.space_id
   }
 }

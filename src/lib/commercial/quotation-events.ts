@@ -19,14 +19,20 @@ interface BaseQuoteContext {
   quotationId?: string | null
 }
 
-interface QuoteCreatedParams extends BaseQuoteContext {
+interface DeliveryModelContext {
+  pricingModel?: string | null
+  commercialModel?: string | null
+  staffingModel?: string | null
+}
+
+interface QuoteCreatedParams extends BaseQuoteContext, DeliveryModelContext {
   direction: Direction
   amount?: number | null
   currency?: string | null
   lineItemCount?: number | null
 }
 
-interface QuoteSyncedParams extends BaseQuoteContext {
+interface QuoteSyncedParams extends BaseQuoteContext, DeliveryModelContext {
   action: 'created' | 'updated' | 'skipped'
 }
 
@@ -86,7 +92,10 @@ export const publishQuoteCreated = async (
     spaceId: params.spaceId ?? null,
     amount: params.amount ?? null,
     currency: params.currency ?? null,
-    lineItemCount: params.lineItemCount ?? null
+    lineItemCount: params.lineItemCount ?? null,
+    pricingModel: params.pricingModel ?? null,
+    commercialModel: params.commercialModel ?? null,
+    staffingModel: params.staffingModel ?? null
   }
 
   await publishOutboxEvent(
@@ -126,7 +135,10 @@ export const publishQuoteSynced = async (
     sourceSystem: params.sourceSystem ?? null,
     action: params.action,
     organizationId: params.organizationId ?? null,
-    spaceId: params.spaceId ?? null
+    spaceId: params.spaceId ?? null,
+    pricingModel: params.pricingModel ?? null,
+    commercialModel: params.commercialModel ?? null,
+    staffingModel: params.staffingModel ?? null
   }
 
   await publishOutboxEvent(
@@ -408,7 +420,7 @@ interface ApprovalDecidedParams {
   decidedBy: string
   conditionLabel: string
   notes?: string | null
-  resultingStatus: 'draft' | 'sent' | 'pending_approval' | null
+  resultingStatus: 'draft' | 'pending_approval' | 'approval_rejected' | 'issued' | null
 }
 
 export const publishQuotationApprovalDecided = async (
@@ -434,23 +446,6 @@ export const publishQuotationApprovalDecided = async (
     client
   )
 
-  if (params.resultingStatus === 'sent' && params.decision === 'approved') {
-    await publishOutboxEvent(
-      {
-        aggregateType: AGGREGATE_TYPES.quotation,
-        aggregateId: params.quotationId,
-        eventType: EVENT_TYPES.quotationSent,
-        payload: {
-          quotationId: params.quotationId,
-          versionNumber: params.versionNumber,
-          sentBy: params.decidedBy,
-          postApproval: true
-        }
-      },
-      client
-    )
-  }
-
   if (params.decision === 'rejected') {
     await publishOutboxEvent(
       {
@@ -470,16 +465,48 @@ export const publishQuotationApprovalDecided = async (
   }
 }
 
-interface QuotationSentParams {
+interface QuotationIssuedParams extends DeliveryModelContext {
+  quotationId: string
+  versionNumber: number
+  issuedBy: string
+  postApproval?: boolean
+  emitLegacySent?: boolean
+}
+
+interface QuotationSentParams extends DeliveryModelContext {
   quotationId: string
   versionNumber: number
   sentBy: string
+  postApproval?: boolean
+  emitLegacySent?: boolean
 }
 
-export const publishQuotationSent = async (
-  params: QuotationSentParams,
+export const publishQuotationIssued = async (
+  params: QuotationIssuedParams,
   client?: QueryableClient
 ) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationIssued,
+      payload: {
+        quotationId: params.quotationId,
+        versionNumber: params.versionNumber,
+        issuedBy: params.issuedBy,
+        postApproval: params.postApproval ?? false,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
+      }
+    },
+    client
+  )
+
+  if (params.emitLegacySent === false) {
+    return
+  }
+
   await publishOutboxEvent(
     {
       aggregateType: AGGREGATE_TYPES.quotation,
@@ -488,15 +515,36 @@ export const publishQuotationSent = async (
       payload: {
         quotationId: params.quotationId,
         versionNumber: params.versionNumber,
-        sentBy: params.sentBy,
-        postApproval: false
+        sentBy: params.issuedBy,
+        postApproval: params.postApproval ?? false,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
       }
     },
     client
   )
 }
 
-interface QuotationApprovedParams {
+export const publishQuotationSent = async (
+  params: QuotationSentParams,
+  client?: QueryableClient
+) =>
+  publishQuotationIssued(
+    {
+      quotationId: params.quotationId,
+      versionNumber: params.versionNumber,
+      issuedBy: params.sentBy,
+      postApproval: params.postApproval,
+      emitLegacySent: params.emitLegacySent,
+      pricingModel: params.pricingModel,
+      commercialModel: params.commercialModel,
+      staffingModel: params.staffingModel
+    },
+    client
+  )
+
+interface QuotationApprovedParams extends DeliveryModelContext {
   quotationId: string
   approvedBy: string
 }
@@ -512,7 +560,10 @@ export const publishQuotationApproved = async (
       eventType: EVENT_TYPES.quotationApproved,
       payload: {
         quotationId: params.quotationId,
-        approvedBy: params.approvedBy
+        approvedBy: params.approvedBy,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
       }
     },
     client
@@ -668,7 +719,7 @@ export const publishTemplateSaved = async (
 // TASK-351 — Quotation Intelligence Automation publishers
 // ═══════════════════════════════════════════════════════════════
 
-interface QuotationExpiredParams {
+interface QuotationExpiredParams extends DeliveryModelContext {
   quotationId: string
   clientId: string | null
   organizationId: string | null
@@ -692,14 +743,17 @@ export const publishQuotationExpired = async (
         organizationId: params.organizationId,
         totalAmountClp: params.totalAmountClp,
         expiredAt: params.expiredAt,
-        daysSinceExpiry: params.daysSinceExpiry
+        daysSinceExpiry: params.daysSinceExpiry,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
       }
     },
     client
   )
 }
 
-interface QuotationRenewalDueParams {
+interface QuotationRenewalDueParams extends DeliveryModelContext {
   quotationId: string
   clientId: string | null
   organizationId: string | null
@@ -723,7 +777,10 @@ export const publishQuotationRenewalDue = async (
         organizationId: params.organizationId,
         totalAmountClp: params.totalAmountClp,
         expiryDate: params.expiryDate,
-        daysUntilExpiry: params.daysUntilExpiry
+        daysUntilExpiry: params.daysUntilExpiry,
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
       }
     },
     client
@@ -786,6 +843,72 @@ export const publishQuotationProfitabilityMaterialized = async (
         quotedMarginPct: params.quotedMarginPct,
         marginDriftPct: params.marginDriftPct,
         driftSeverity: params.driftSeverity
+      }
+    },
+    client
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TASK-463 — Unified Quote Builder HubSpot bidirectional publishers
+// ═══════════════════════════════════════════════════════════════
+
+interface QuotationPushedToHubSpotParams {
+  quotationId: string
+  hubspotQuoteId: string | null
+  hubspotDealId: string | null
+  direction: 'outbound'
+  result: 'created' | 'updated' | 'skipped'
+  reason?: string | null
+  actorId?: string | null
+}
+
+export const publishQuotationPushedToHubSpot = async (
+  params: QuotationPushedToHubSpotParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationPushedToHubSpot,
+      payload: {
+        quotationId: params.quotationId,
+        hubspotQuoteId: params.hubspotQuoteId,
+        hubspotDealId: params.hubspotDealId,
+        direction: params.direction,
+        result: params.result,
+        reason: params.reason ?? null,
+        actorId: params.actorId ?? null
+      }
+    },
+    client
+  )
+}
+
+interface QuotationHubSpotSyncFailedParams {
+  quotationId: string
+  hubspotDealId: string | null
+  errorMessage: string
+  attemptedAction: 'create' | 'update'
+  actorId?: string | null
+}
+
+export const publishQuotationHubSpotSyncFailed = async (
+  params: QuotationHubSpotSyncFailedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationHubSpotSyncFailed,
+      payload: {
+        quotationId: params.quotationId,
+        hubspotDealId: params.hubspotDealId,
+        errorMessage: params.errorMessage,
+        attemptedAction: params.attemptedAction,
+        actorId: params.actorId ?? null
       }
     },
     client

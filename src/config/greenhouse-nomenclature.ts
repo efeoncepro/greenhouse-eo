@@ -34,6 +34,7 @@ export const GH_INTERNAL_NAV = {
   adminIntegrationGovernance: { label: 'Integration Governance', subtitle: 'Registro, taxonomia, readiness y ownership de integraciones nativas' },
   adminAccounts: { label: 'Cuentas', subtitle: 'Organizaciones, spaces y gobierno de identidad' },
   adminPaymentInstruments: { label: 'Instrumentos de pago', subtitle: 'Cuentas bancarias, tarjetas, fintech y plataformas' },
+  adminPricingCatalog: { label: 'Catálogo de pricing', subtitle: 'Roles, tools, overheads y gobierno comercial' },
   adminTalentReview: { label: 'Verificación de talento', subtitle: 'Skills, herramientas y certificaciones por revisar' },
   adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' },
   adminIdentityAccess: { label: 'Identidad y acceso', subtitle: 'Usuarios, roles, vistas y cuentas' },
@@ -71,6 +72,8 @@ export const GH_FINANCE_NAV = {
   reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' },
   intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
   quotes: { label: 'Cotizaciones', subtitle: 'Cotizaciones de Nubox y HubSpot en un solo lugar' },
+  contracts: { label: 'Contratos', subtitle: 'SOWs, renovaciones y ejecución comercial activa' },
+  masterAgreements: { label: 'Acuerdos marco', subtitle: 'MSAs, cláusulas maestras y contratos vinculados' },
   products: { label: 'Productos', subtitle: 'Catalogo de productos y servicios sincronizado con HubSpot' },
   purchaseOrders: { label: 'Órdenes de compra', subtitle: 'OC de clientes, saldos y consumo' },
   hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' },
@@ -1605,4 +1608,580 @@ export const GH_CLIENT_TALENT = {
   // Loading / error
   loading_profiles: 'Cargando perfiles...',
   error_profiles: 'No pudimos cargar los perfiles del equipo. Intenta de nuevo.'
+} as const
+
+/* ─────────────────── Commercial Pricing ─────────────────── */
+// Copy canónico para el programa de pricing comercial (TASK-463..468).
+// Inventariado y especificado en docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md §4.
+// No usar copy hardcoded en componentes de src/components/greenhouse/pricing/ — siempre desde aquí.
+
+export const GH_PRICING = {
+  // Builder
+  builderTitleNew: 'Nueva cotización',
+  builderTitleEdit: 'Editar cotización',
+  builderSaveDraft: 'Guardar borrador',
+  builderSendToClient: 'Enviar al cliente',
+  builderPreview: 'Vista previa',
+  builderEmptyLineItems: 'Aún no has agregado ítems a esta cotización',
+  builderEmptyLineItemsCta: 'Agregar rol',
+
+  // Builder shell (full-page surface, TASK-473)
+  builderBreadcrumbRoot: 'Finanzas',
+  builderBreadcrumbList: 'Cotizaciones',
+  builderSubtitleCreate: 'Arma la cotización combinando ítems del catálogo, servicios empaquetados, templates o líneas manuales.',
+  builderSubtitleEdit: 'Ajusta contexto, líneas y términos comerciales de esta cotización.',
+  builderCreated: 'Cotización creada',
+  builderSaved: 'Cambios guardados',
+  builderSaveAndClose: 'Guardar y cerrar',
+  builderSaveAndIssue: 'Guardar y emitir',
+  builderCancel: 'Cancelar',
+  builderSaving: 'Guardando…',
+  builderIssued: 'Cotización emitida',
+  builderIssueRequested: 'La cotización quedó en aprobación',
+  builderIssueErrorFallback: 'No pudimos emitir la cotización. La dejamos guardada para que la revises.',
+  builderSourcesCardTitle: 'Agrega líneas a la cotización',
+  builderSourcesCardSubtitle: 'Elige cómo quieres componerla',
+  builderSources: {
+    catalog: {
+      title: 'Catálogo',
+      subtitle: 'Roles, herramientas y overhead del pricing catalog',
+      icon: 'tabler-books',
+      color: 'primary' as const
+    },
+    service: {
+      title: 'Servicio',
+      subtitle: 'Servicios empaquetados EFG-XXX que expanden a líneas completas',
+      icon: 'tabler-package',
+      color: 'success' as const
+    },
+    template: {
+      title: 'Template',
+      subtitle: 'Cotizaciones predefinidas con defaults comerciales',
+      icon: 'tabler-template',
+      color: 'info' as const
+    },
+    manual: {
+      title: 'Manual',
+      subtitle: 'Crea una línea en blanco y edítala a mano',
+      icon: 'tabler-edit',
+      color: 'secondary' as const
+    }
+  },
+  builderTemplatePickerTitle: 'Desde template',
+  builderTemplatePickerSubtitle: 'Elige una cotización reutilizable',
+  builderTemplatePickerEmpty: 'No hay templates disponibles',
+  builderTemplatePickerEmptyHint:
+    'Guarda una cotización como template desde su detalle para reutilizarla aquí.',
+  builderTemplateUsageOne: (n: number) => `Usado ${n} vez`,
+  builderTemplateUsageMany: (n: number) => `Usado ${n} veces`,
+  builderTemplateDefaultsLabel: 'Defaults',
+  builderValidationDescription: 'Agrega una descripción breve del alcance.',
+  builderValidationOrganization: 'Selecciona un espacio para la cotización.',
+  builderValidationLines: 'Agrega al menos un ítem a la cotización.',
+  builderSubmitErrorGeneric: 'No pudimos guardar la cotización. Intenta de nuevo.',
+
+  // Sellable item picker (drawer con 5 tabs)
+  pickerTitle: 'Agregar ítem',
+  pickerTabs: {
+    roles: 'Roles',
+    people: 'Personas',
+    tools: 'Herramientas',
+    overhead: 'Overhead',
+    services: 'Servicios'
+  } as Record<string, string>,
+  pickerSearchPlaceholder: 'Buscar por SKU o nombre...',
+  pickerEmpty: 'No hay ítems activos para este filtro',
+  pickerEmptyCta: 'Ir al catálogo',
+  pickerServicesPlaceholder: 'Aún no hay servicios activos. Agrega uno en Admin › Catálogo de pricing › Servicios.',
+  pickerLoadingAria: 'Cargando catálogo',
+  pickerSelectionNone: 'Ningún ítem seleccionado',
+  pickerSelectionCountOne: (n: number) => `${n} ítem seleccionado`,
+  pickerSelectionCountMany: (n: number) => `${n} ítems seleccionados`,
+  pickerSubmit: 'Agregar seleccionados',
+  pickerCancel: 'Cancelar',
+  pickerClose: 'Cerrar',
+  pickerTabsAriaLabel: 'Categorías de ítems vendibles',
+
+  // Cost stack (gated: solo finance/admin)
+  costStackTitle: 'Detalle de costo (solo interno)',
+  costStackTotalCost: 'Costo total',
+  costStackPriceToClient: 'Precio cliente',
+  costStackGrossMargin: 'Margen bruto',
+  costStackTierFit: 'Tier fit',
+
+  // Margin semaphore
+  marginLabels: {
+    critical: 'Crítico',
+    attention: 'Atención',
+    optimal: 'Óptimo',
+    overshoot: 'Sobre meta'
+  } as Record<string, string>,
+
+  // Commercial model + country factor + currency + employment type
+  commercialModelLabel: 'Modelo comercial',
+  countryFactorLabel: 'País del cliente',
+  currencyLabel: 'Moneda',
+  employmentTypeLabel: 'Tipo de contratación',
+
+  // Send quote drawer
+  sendDrawerTitle: 'Enviar cotización',
+  sendDrawerTo: 'Destinatario',
+  sendDrawerCc: 'Con copia',
+  sendDrawerSubject: 'Asunto',
+  sendDrawerMessage: 'Mensaje',
+  sendDrawerSubmit: 'Enviar cotización',
+  sendDrawerSaveOnly: 'Guardar sin enviar',
+
+  // Quote list
+  listKpiDrafts: 'Borradores',
+  listKpiSent: 'Enviadas',
+  listKpiApproved: 'Aprobadas',
+  listKpiExpired: 'Vencidas',
+  listNew: 'Nueva cotización',
+
+  // Pricing catalog admin
+  adminTitle: 'Catálogo de pricing',
+  adminRoles: 'Roles vendibles',
+  adminTools: 'Catálogo de herramientas',
+  adminOverhead: 'Overhead add-ons',
+  adminServicesLabel: 'Servicios empaquetados',
+  adminServices: {
+    label: 'Servicios empaquetados',
+    title: 'Servicios empaquetados',
+    subtitle:
+      'Servicios reusables con recipe de roles y herramientas que se expanden automáticamente en cada cotización.',
+    navDescription: 'Catálogo de servicios compuestos con SKU EFG-XXX',
+    backToCatalog: 'Volver al catálogo',
+    createCta: 'Nuevo servicio',
+    createFirstCta: 'Crear primer servicio',
+    editCta: 'Editar servicio',
+    deactivateCta: 'Desactivar',
+    activateCta: 'Reactivar',
+    simulateCta: 'Simular precio',
+    saveRecipeCta: 'Guardar receta',
+    addRoleCta: 'Agregar rol',
+    addToolCta: 'Agregar herramienta',
+    moveUpLabel: 'Subir fila',
+    moveDownLabel: 'Bajar fila',
+    removeRowLabel: 'Eliminar fila',
+
+    // Columns
+    columns: {
+      sku: 'SKU',
+      name: 'Nombre',
+      category: 'Categoría',
+      tier: 'Tier',
+      commercialModel: 'Modelo comercial',
+      unit: 'Unidad',
+      duration: 'Duración',
+      businessLine: 'BL',
+      active: 'Estado',
+      roleCount: '# Roles',
+      toolCount: '# Tools',
+      actions: 'Acciones'
+    },
+
+    // Recipe columns
+    recipeRoleColumns: {
+      role: 'Rol',
+      hours: 'Horas/periodo',
+      quantity: 'Cantidad',
+      optional: 'Opcional',
+      notes: 'Notas'
+    },
+    recipeToolColumns: {
+      tool: 'Herramienta',
+      quantity: 'Cantidad',
+      optional: 'Opcional',
+      passThrough: 'Pass-through',
+      notes: 'Notas'
+    },
+
+    // Filters
+    filterTier: 'Tier',
+    filterCategory: 'Categoría',
+    filterBusinessLine: 'Unidad de negocio',
+    filterStatus: 'Estado',
+    filterAllTiers: 'Todos los tiers',
+    filterAllCategories: 'Todas las categorías',
+    filterAllBusinessLines: 'Todas las BL',
+    searchPlaceholder: 'Buscar por SKU o nombre...',
+
+    // Service units
+    serviceUnits: {
+      project: 'Proyecto',
+      monthly: 'Mensual (retainer)'
+    } as Record<string, string>,
+
+    // Commercial models
+    commercialModels: {
+      on_going: 'On-going (retainer)',
+      on_demand: 'On-demand (proyecto)',
+      hybrid: 'Híbrido',
+      license_consulting: 'Licencia + consultoría'
+    } as Record<string, string>,
+
+    // Tiers
+    tierOptions: {
+      '1': 'T1 · Junior',
+      '2': 'T2 · Mid',
+      '3': 'T3 · Senior',
+      '4': 'T4 · Lead'
+    } as Record<string, string>,
+
+    // Sections
+    sectionGeneral: 'Detalle general',
+    sectionRecipe: 'Receta de roles y herramientas',
+    sectionSimulate: 'Simular precio',
+    sectionRecipeRoles: 'Roles',
+    sectionRecipeTools: 'Herramientas',
+
+    // Empty states
+    emptyStateFirstTitle: 'Aún no tienes servicios empaquetados',
+    emptyStateFirstDescription:
+      'Los servicios agrupan roles y herramientas reusables. Al crearlos, se expanden en cada cotización sin armar desde cero.',
+    emptyStateNoResultsTitle: 'Sin resultados',
+    emptyStateNoResultsDescription:
+      'Ajusta los filtros o usa otras palabras para buscar.',
+    emptyRecipeRoles: 'Aún no hay roles en la receta. Agrega el primero para simular el servicio.',
+    emptyRecipeTools: 'Aún no hay herramientas en la receta.',
+
+    // Hints
+    moduleCodeHint: 'Identificador interno (auto-generado desde el nombre, editable).',
+    durationHint: 'Meses sugeridos para retainers; aplica solo si la unidad es Mensual.',
+    skuHint: 'Se asigna automáticamente al guardar (prefijo EFG).',
+    simulateHint: 'Calcula el precio total del servicio usando el motor de pricing v2.',
+
+    // Validation
+    validation: {
+      moduleNameRequired: 'Ingresa un nombre para el servicio.',
+      serviceUnitRequired: 'Selecciona la unidad de servicio.',
+      commercialModelRequired: 'Selecciona el modelo comercial.',
+      tierRequired: 'Selecciona el tier.',
+      durationRequiredForMonthly: 'Para servicios mensuales, ingresa la duración en meses.',
+      durationMustBePositive: 'La duración debe ser mayor o igual a 0.',
+      roleRequired: 'Selecciona un rol para esta fila.',
+      hoursMustBePositive: 'Las horas deben ser mayores a 0.',
+      quantityMustBePositive: 'La cantidad debe ser al menos 1.',
+      toolRequired: 'Selecciona una herramienta para esta fila.'
+    },
+
+    // Errors
+    errorSkuConflict: 'Ya existe un servicio con ese código. Usa otro identificador.',
+    errorConflict: 'El servicio cambió desde que lo abriste. Recarga para continuar.',
+    errorLoad: 'No pudimos cargar el servicio. Intenta de nuevo.',
+    errorLoadList: 'No pudimos cargar los servicios. Intenta de nuevo.',
+    errorSave: 'No pudimos guardar los cambios. Revisa los valores e intenta de nuevo.',
+    errorSaveRecipe: 'No pudimos guardar la receta. Revisa los valores e intenta de nuevo.',
+    errorSimulate: 'No pudimos simular el precio. Revisa la receta e intenta de nuevo.',
+
+    // Success toasts
+    toastCreated: (sku: string) => `Servicio creado — SKU ${sku} asignado`,
+    toastUpdated: 'Cambios guardados',
+    toastRecipeUpdated: 'Receta guardada',
+    toastDeactivated: (sku: string) =>
+      `Servicio ${sku} desactivado — no aparecerá en nuevas cotizaciones`,
+    toastReactivated: (sku: string) => `Servicio ${sku} reactivado`
+  },
+  adminTiers: 'Tiers de rol',
+  adminCommercialModels: 'Modelos comerciales',
+  adminCountryFactors: 'Factores de país',
+  adminEmploymentTypes: 'Tipos de contratación',
+  adminAudit: 'Historial de cambios',
+
+  // Success / error toasts
+  toastQuoteSaved: 'Borrador guardado',
+  toastQuoteSent: (email: string) => `Cotización enviada a ${email}`,
+  toastRoleUpdated: (label: string) => `${label} actualizado`,
+  errorLoadCatalog: 'No pudimos cargar el catálogo. Intenta de nuevo.',
+  errorLoadQuote: 'No pudimos cargar esta cotización. Verifica el enlace e intenta de nuevo.',
+
+  // Builder Command Bar redesign (TASK-487)
+  identityStrip: {
+    draftLabel: 'Borrador',
+    sentLabel: 'Enviada',
+    approvedLabel: 'Aprobada',
+    expiredLabel: 'Vencida',
+    numberPlaceholder: 'Q-NUEVO',
+    validUntilLabel: 'Válida hasta',
+    validUntilEmpty: 'Sin fecha',
+    ariaLabel: 'Identidad de la cotización'
+  },
+  contextChips: {
+    ariaLabel: 'Contexto de la cotización',
+    overflowLabel: 'Más opciones',
+    requiredBadge: 'Requerido',
+    lockedHint: 'No se puede cambiar después de crear la cotización',
+    organization: {
+      label: 'Organización',
+      placeholder: 'Seleccionar organización',
+      icon: 'tabler-building',
+      hint: 'Cliente o prospecto de la cotización'
+    },
+    contact: {
+      label: 'Contacto',
+      placeholder: 'Sin contacto asignado',
+      icon: 'tabler-user',
+      hint: 'Persona de la organización responsable',
+      noOrgFirst: 'Selecciona una organización primero',
+      loading: 'Cargando contactos…',
+      empty: 'Sin contactos registrados en esta organización',
+      primaryBadge: 'Principal'
+    },
+    businessLine: {
+      label: 'Business line',
+      placeholder: 'Sin BL',
+      icon: 'tabler-target'
+    },
+    commercialModel: {
+      label: 'Modelo comercial',
+      placeholder: 'Seleccionar modelo',
+      icon: 'tabler-briefcase'
+    },
+    countryFactor: {
+      label: 'País',
+      placeholder: 'Seleccionar país',
+      icon: 'tabler-world'
+    },
+    currency: {
+      label: 'Moneda',
+      placeholder: 'CLP',
+      icon: 'tabler-currency-dollar'
+    },
+    duration: {
+      label: 'Duración',
+      placeholder: 'Meses',
+      icon: 'tabler-clock',
+      hint: 'Requerido para retainer o híbrido',
+      unit: (n: number) => (n === 1 ? '1 mes' : `${n} meses`)
+    },
+    validUntil: {
+      label: 'Válida hasta',
+      placeholder: 'dd/mm/aaaa',
+      icon: 'tabler-calendar-event'
+    }
+  },
+  summaryDock: {
+    ariaLabel: 'Resumen de la cotización',
+    subtotalLabel: 'Subtotal',
+    factorLabel: 'Factor',
+    ivaLabel: 'IVA',
+    totalLabel: 'Total',
+    addonsChip: (n: number) => (n === 1 ? '1 addon' : `${n} addons`),
+    addonsChipEmpty: 'Sin addons',
+    primaryCta: 'Guardar y emitir',
+    previewCta: 'Vista previa',
+    loadingLabel: 'Calculando…',
+    collapsedLabelPrefix: 'Total',
+    collapsedExpandLabel: 'Ver detalle',
+    mobileTotalLabel: 'Total de la cotización'
+  },
+  addMenu: {
+    triggerLabel: 'Agregar ítem',
+    defaultAriaLabel: 'Agregar ítem desde catálogo',
+    caretAriaLabel: 'Más opciones de agregado',
+    items: {
+      catalog: 'Desde catálogo',
+      service: 'Desde servicio empaquetado',
+      template: 'Desde template',
+      manual: 'Línea manual'
+    }
+  },
+  lineWarning: {
+    ariaPrefix: 'Advertencia en fila',
+    scrollAnchorLabel: 'Ir a la fila',
+    genericTitle: 'Atención requerida',
+    dismissLabel: 'Ocultar advertencia'
+  },
+  emptyItems: {
+    title: 'Comencemos la cotización',
+    subtitle: 'Agrega ítems para ver el total y el margen calculados en tiempo real.',
+    ctaPrimary: 'Agregar desde catálogo',
+    ctaSecondary: 'Desde servicio empaquetado',
+    ctaTertiary: 'Desde template'
+  },
+  adjustPopover: {
+    triggerLabel: 'Ajustes de pricing',
+    title: 'Ajustes de pricing',
+    subtitle: 'Dedicación y tipo de contratación aplicados a esta línea. Los períodos se controlan desde la columna Cantidad.',
+    fteLabel: 'FTE',
+    fteHelper: '0.1 a 1.0 (fracción dedicada)',
+    employmentTypeLabel: 'Tipo de contratación',
+    employmentTypePlaceholder: 'Default del rol si vacío',
+    applyLabel: 'Aplicar',
+    closeLabel: 'Cerrar'
+  },
+  detailAccordion: {
+    title: 'Detalle y notas',
+    descriptionLabel: 'Descripción',
+    descriptionPlaceholder: 'Alcance del servicio, contexto, notas internas…'
+  }
+} as const
+
+// ────────────────────────────────────────────────────────────────
+// TASK-457 — Revenue Pipeline comercial (unificado: deals + quotes)
+// ────────────────────────────────────────────────────────────────
+export const GH_PIPELINE_COMMERCIAL = {
+  // Outer tab label (FinanceIntelligenceView)
+  outerTabLabel: 'Pipeline comercial',
+
+  // Sub-tab label (CommercialIntelligenceView)
+  subtabPipelineLabel: 'Pipeline',
+  subtabPipelineDescription:
+    'Oportunidades comerciales activas — deals de HubSpot, contratos standalone y pre-sales.',
+
+  // KPIs
+  kpiOpenPipelineLabel: 'Pipeline abierto',
+  kpiOpenPipelineSubtitle: 'Total de oportunidades activas',
+  kpiOpenPipelineTooltip:
+    'Monto agregado de deals abiertos, contratos vigentes y pre-sales en negociación.',
+
+  kpiWeightedPipelineLabel: 'Pipeline ponderado',
+  kpiWeightedPipelineSubtitle: 'Monto × probabilidad',
+  kpiWeightedPipelineTooltip:
+    'Revenue forecast ajustado por la probabilidad de cada oportunidad.',
+
+  kpiMtdWonLabel: 'Ganado (mes)',
+  kpiMtdWonSubtitle: 'Deals cerrados este mes',
+  kpiMtdWonTooltip:
+    'Suma de montos de deals cerrados como ganados con fecha de cierre en el mes actual.',
+
+  kpiMtdLostLabel: 'Perdido (mes)',
+  kpiMtdLostSubtitle: 'Deals cerrados sin ganar',
+  kpiMtdLostTooltip:
+    'Suma de montos de deals cerrados como perdidos en el mes actual.',
+
+  // Category chips
+  categoryDealLabel: 'Deal',
+  categoryDealDescription: 'Oportunidad activa en HubSpot (deal abierto).',
+  categoryContractLabel: 'Contrato',
+  categoryContractDescription:
+    'Cotización standalone con cliente activo o deal ya ganado (revenue en ejecución).',
+  categoryPreSalesLabel: 'Pre-sales',
+  categoryPreSalesDescription:
+    'Cotización standalone a lead o prospecto en etapa temprana.',
+
+  // Filters
+  filterCategoryLabel: 'Categoría',
+  filterStageLabel: 'Etapa',
+  filterLifecyclestageLabel: 'Estado del cliente',
+  filterBusinessLineLabel: 'Unidad de negocio',
+  filterAllCategories: 'Todas las categorías',
+  filterAllStages: 'Todas las etapas',
+  filterAllLifecycleStages: 'Todos los estados del cliente',
+  filterAllBusinessLines: 'Todas las unidades',
+  filterClearAll: 'Limpiar filtros',
+
+  // Column headers
+  colCategory: 'Categoría',
+  colEntity: 'Oportunidad',
+  colClient: 'Cliente',
+  colStage: 'Etapa',
+  colAmount: 'Monto',
+  colProbability: 'Probabilidad',
+  colCloseDate: 'Vence/Cierra',
+  colQuoteCount: 'Cotizaciones',
+  colAction: 'Acción',
+
+  // Row actions
+  actionView: 'Ver',
+
+  // States
+  loadingText: 'Cargando pipeline...',
+  errorText: 'No pudimos cargar el pipeline. Reintenta o avisa a finance-ops.',
+  emptyTitle: 'Pipeline vacío',
+  emptyDescription:
+    'Aún no hay deals abiertos ni cotizaciones standalone activas.',
+
+  // Onboarding note (Slice 1 precondition): recordatorio al convertir lead → deal
+  presalesOnboardingTitle: 'Recordatorio al convertir leads',
+  presalesOnboardingNote:
+    'Cuando conviertas un lead en deal, asocia la cotización al deal nuevo en HubSpot. Sin ese paso, la cotización queda colgada como pre-sales aunque el lead ya sea customer.',
+  presalesOnboardingDismiss: 'Entendido'
+} as const
+
+// ────────────────────────────────────────────────────────────────
+// TASK-462 — MRR/ARR Contractual Projection Dashboard
+// ────────────────────────────────────────────────────────────────
+export const GH_MRR_ARR_DASHBOARD = {
+  outerTabLabel: 'MRR/ARR',
+
+  headerTitle: 'Proyección contractual MRR/ARR',
+  headerSubtitle:
+    'Revenue recurrente a partir de contratos retainer vigentes: tendencia, movimientos y retención.',
+
+  // KPIs
+  kpiMrrLabel: 'MRR actual',
+  kpiMrrTooltip:
+    'Monthly Recurring Revenue — suma de mrr_clp de contracts retainer activos este mes.',
+  kpiMrrDeltaMomLabel: 'vs mes anterior',
+
+  kpiArrLabel: 'ARR anualizado',
+  kpiArrTooltip:
+    'Annual Recurring Revenue = MRR × 12. Convención SaaS estándar, no deriva de fechas de close.',
+
+  kpiNrrLabel: 'NRR 12 meses',
+  kpiNrrTooltip:
+    'Net Revenue Retention — cuánto creció el MRR desde el cohort de hace 12 meses, incluyendo expansion y reactivación menos churn y contracción.',
+  kpiNrrSubtitleAbove: 'Sobre el 100% — cohort creciendo',
+  kpiNrrSubtitleHealthy: 'Cohort saludable',
+  kpiNrrSubtitleRisk: 'Bajo umbral — revisar churn',
+  kpiNrrNoData: 'Sin datos suficientes',
+
+  kpiContractsCountLabel: 'Contratos activos',
+  kpiContractsCountTooltip:
+    'Cantidad de contracts retainer activos con MRR configurado este mes.',
+  kpiContractsCountSubtitle: 'Con MRR configurado',
+
+  // Chart
+  timelineChartTitle: 'Movimiento MRR — últimos 12 meses',
+  timelineChartSubtitle:
+    'Descomposición por tipo de movimiento: nuevos, expansion, churn, contracción y reactivación.',
+  movementNew: 'Nuevo',
+  movementExpansion: 'Expansion',
+  movementContraction: 'Contracción',
+  movementChurn: 'Churn',
+  movementReactivation: 'Reactivación',
+  movementUnchanged: 'Sin cambio',
+
+  // Breakdowns
+  breakdownByCommercialModelTitle: 'Por modelo comercial',
+  breakdownByStaffingModelTitle: 'Por modelo de staffing',
+  breakdownByBusinessLineTitle: 'Por unidad de negocio',
+  breakdownColMrr: 'MRR',
+  breakdownColCount: 'Contratos',
+  breakdownMoreItems: (n: number) => `+ ${n} más`,
+  breakdownEmpty: 'Sin datos para este corte.',
+
+  // Top 10
+  topContractsTitle: 'Top 10 contratos por MRR',
+  topContractsSubtitle: 'Los mayores contribuyentes al revenue recurrente del mes.',
+  colContract: 'Contrato',
+  colCommercialModel: 'Modelo',
+  colStaffingModel: 'Staffing',
+  colMrr: 'MRR',
+  colArr: 'ARR',
+  colDelta: 'Δ vs mes anterior',
+  colMovement: 'Tipo',
+
+  // Movements panel
+  movementsPanelTitle: 'Movimientos del mes',
+  movementsPanelSubtitle:
+    'Detalle de contracts que entraron, expandieron, se redujeron o churnearon.',
+  movementsEmpty: 'No hay contratos en esta categoría para el período seleccionado.',
+  movementsError:
+    'No pudimos cargar los movimientos. Reintenta o avisa a finance-ops.',
+  movementsLoading: 'Cargando movimientos...',
+
+  // States
+  loadingText: 'Cargando MRR/ARR...',
+  errorText: 'No pudimos cargar el dashboard MRR/ARR. Reintenta o avisa a finance-ops.',
+  emptyTitle: 'Sin snapshots todavía',
+  emptyDescription:
+    'Aún no hay snapshots de MRR/ARR para este período. Verifica que haya contracts retainer activos con mrr_clp configurado. Los snapshots se materializan reactivamente cuando hay eventos de contract lifecycle.',
+
+  // Period switcher
+  periodPickerLabel: 'Período',
+  prevMonthButton: 'Mes anterior',
+  nextMonthButton: 'Mes siguiente'
 } as const

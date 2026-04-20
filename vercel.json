@@ -69,12 +69,32 @@
       "schedule": "0 */6 * * *"
     },
     {
+      "path": "/api/cron/hubspot-company-lifecycle-sync",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/hubspot-deals-sync",
+      "schedule": "0 */4 * * *"
+    },
+    {
       "path": "/api/cron/hubspot-products-sync",
       "schedule": "0 8 * * *"
     },
     {
       "path": "/api/cron/quotation-lifecycle",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/fx-sync-latam?window=morning",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/fx-sync-latam?window=midday",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/fx-sync-latam?window=evening",
+      "schedule": "0 22 * * *"
     }
   ]
 }

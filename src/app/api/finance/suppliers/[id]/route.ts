@@ -4,6 +4,7 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
 import { resolveCanonicalProviderId } from '@/lib/providers/postgres'
 import { getLatestProviderToolingSnapshot } from '@/lib/providers/provider-tooling-snapshots'
+import { listPreferredToolProviderCostBasisByProvider } from '@/lib/commercial-cost-basis/tool-provider-cost-basis-reader'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import { ensureOrganizationContactMembership, getOrganizationMemberships } from '@/lib/account-360/organization-store'
@@ -112,12 +113,18 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const { id: supplierId } = await params
 
+  const tenantScope = {
+    organizationId: tenant.organizationId ?? null,
+    clientId: tenant.clientId ?? null,
+    spaceId: tenant.spaceId ?? null
+  }
+
   // ── Postgres-first path ──
   try {
     const supplier = await getFinanceSupplierFromPostgres(supplierId)
 
     if (supplier) {
-      const [expenses, providerTooling, organizationContacts] = await Promise.all([
+      const [expenses, providerTooling, providerToolCostBasis, organizationContacts] = await Promise.all([
         listFinanceExpensesFromPostgres({
           supplierId,
           page: 1,
@@ -126,6 +133,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         supplier.providerId
           ? getLatestProviderToolingSnapshot(supplier.providerId).catch(() => null)
           : Promise.resolve(null),
+        supplier.providerId
+          ? listPreferredToolProviderCostBasisByProvider(supplier.providerId, { tenantScope }).catch(() => [])
+          : Promise.resolve([]),
         toSupplierOrganizationContacts(supplier.organizationId).catch(() => [])
       ])
 
@@ -133,6 +143,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         ...supplier,
         organizationContacts,
         providerTooling,
+        providerToolCostBasis,
         paymentHistory: expenses.items.map(expense => ({
           expenseId: expense.expenseId,
           amount: expense.totalAmount,
@@ -169,7 +180,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const row = rows[0]
 
-  const [expenses, providerTooling] = await Promise.all([
+  const [expenses, providerTooling, providerToolCostBasis] = await Promise.all([
     runFinanceQuery<ExpenseHistoryRow>(`
       SELECT expense_id, total_amount, currency, payment_date, document_date, due_date, payment_method, document_number, description
       FROM \`${projectId}.greenhouse.fin_expenses\`
@@ -179,7 +190,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     `, { supplierId }),
     row.provider_id
       ? getLatestProviderToolingSnapshot(normalizeString(row.provider_id)).catch(() => null)
-      : Promise.resolve(null)
+      : Promise.resolve(null),
+    row.provider_id
+      ? listPreferredToolProviderCostBasisByProvider(normalizeString(row.provider_id), { tenantScope }).catch(() => [])
+      : Promise.resolve([])
   ])
 
   return NextResponse.json({
@@ -212,6 +226,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null),
     organizationContacts: [],
     providerTooling,
+    providerToolCostBasis,
     paymentHistory: expenses.map(e => ({
       expenseId: normalizeString(e.expense_id),
       amount: toNumber(e.total_amount),

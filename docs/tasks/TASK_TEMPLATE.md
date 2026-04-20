@@ -36,6 +36,7 @@ Plantilla copiable para crear tasks nuevas. Para el protocolo completo (Plan Mod
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Epic: `[optional EPIC-###]`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `[finance|hr|platform|identity|ui|data|ops|content|crm|delivery|agency]`

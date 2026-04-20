@@ -26,7 +26,14 @@ Usar junto con:
 
 Contrato vigente desde 2026-04-11.
 
-Este documento no describe todavía un schema runtime nuevo obligatorio. Formaliza la semántica canónica que debe gobernar arquitectura, docs, tasks y futuras implementaciones cross-module.
+Delta 2026-04-18:
+
+- existe runtime base en `greenhouse_core.person_legal_entity_relationships`
+- el ancla `legal_entity` v1 reutiliza `greenhouse_core.organizations.organization_id` mediante la columna explícita `legal_entity_organization_id`
+- `person_memberships` sigue representando contexto organizacional; no reemplaza la relación legal
+- el backfill inicial materializa solo relaciones con fuente verificable en runtime actual:
+  - `employee` para personas activas del operating entity
+  - `shareholder_current_account_holder` para perfiles con `shareholder_accounts`
 
 ## Core Thesis
 
@@ -65,6 +72,7 @@ Regla semántica:
 
 - aunque hoy el runtime ya institucionaliza a `Efeonce Group SpA` como `operating entity` dentro de `greenhouse_core.organizations`, la semántica que debe leer el sistema es **entidad legal**
 - `organization`, `space`, `tenant` y `operating organization` no son sinónimos automáticos de `legal entity`
+- mientras no exista una tabla separada `legal_entities`, el runtime v1 usa `legal_entity_organization_id` como ancla explícita para evitar esa ambigüedad
 
 ### Operational Actor
 
@@ -162,6 +170,39 @@ Cada relación debería poder expresar al menos:
 - `created_by`
 - `created_at`
 
+### Runtime V1 materializado
+
+Tabla:
+
+- `greenhouse_core.person_legal_entity_relationships`
+
+Campos canónicos v1:
+
+- `relationship_id`
+- `public_id`
+- `profile_id`
+- `legal_entity_organization_id`
+- `space_id`
+- `relationship_type`
+- `status`
+- `source_of_truth`
+- `source_record_type`
+- `source_record_id`
+- `role_label`
+- `effective_from`
+- `effective_to`
+- `metadata_json`
+- `created_by_user_id`
+- `created_at`
+- `updated_at`
+
+Reglas v1:
+
+- `profile_id` sigue siendo la raíz humana canónica
+- `legal_entity_organization_id` explicita el ancla jurídica/económica sin inventar todavía un catálogo separado de entidades legales
+- `space_id` existe como boundary de tenancy y lectura portal, no como reemplazo del vínculo persona ↔ entidad legal
+- cada relación activa se deduplica por `profile_id + legal_entity_organization_id + relationship_type`
+
 ### Cardinalidad
 
 - una persona puede tener múltiples relaciones activas con la misma entidad legal
@@ -222,6 +263,11 @@ No como:
 - extensión del `user`
 - extensión del `member`
 - sustituto de la relación societaria
+
+Delta runtime 2026-04-18:
+
+- cuando existe `greenhouse_finance.shareholder_accounts.profile_id`, el sistema puede materializar la relación `shareholder_current_account_holder`
+- ese runtime no prueba por sí solo `shareholder`; solo prueba la existencia del instrumento financiero derivado
 
 ### Regla de ownership
 

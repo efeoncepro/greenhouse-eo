@@ -2,9 +2,145 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
+> **Last updated:** 2026-04-19
 > **Audience:** Backend engineers, finance product owners, agents implementing finance features
 
 ---
+
+## Delta 2026-04-19 — TASK-479 People Actual Cost + Blended Role Snapshots
+
+- `member_capacity_economics` se reafirma como la fuente factual reusable del lane `member_actual`; no nace una tabla paralela de costo persona-level.
+- Runtime nuevo en `greenhouse_commercial`:
+  - `member_role_cost_basis_snapshots`: bridge mensual persona -> `sellable_role` con `employment_type_code`, `mapping_source`, `source_ref`, freshness y confidence
+  - `role_blended_cost_basis_snapshots`: agregado mensual por `role_id + employment_type_code + period` con weighting por FTE/horas reales, `sample_size` y confidence agregada
+- Regla de matching explícita:
+  - Identity Access `active_role_codes` NO es source of truth de rol comercial
+  - el bridge se resuelve desde evidencia operativa/comercial existente (`assignment_role_title_override`, `person_membership.role_label`, `members.role_title`) contra el catálogo `sellable_roles`
+- `commercial-cost-worker` scope `people` ya no refresca solo `member_capacity_economics`; ahora orquesta:
+  - costo factual por persona (`member_actual`)
+  - bridge persona -> rol comercial
+  - snapshot `role_blended`
+- `pricing-engine-v2` debe preferir `role_blended` cuando la cotización pide costo por rol y solo caer a `role_modeled` cuando no existe evidencia real reusable para el período.
+- Consumers People/Person 360 no deben leer columnas inventadas de `member_capacity_economics`; consumen el reader compartido para evitar drift.
+
+## Delta 2026-04-19 — TASK-477 formaliza role_modeled como lane explícito y materializable
+
+- `greenhouse_commercial.sellable_role_cost_components` deja de ser solo un breakdown editable y pasa a ser también el source estructurado del lane `role_modeled`:
+  - nuevos campos persistidos: `direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score`
+  - nuevas columnas generadas: `confidence_label`, `direct_overhead_amount_usd`, `shared_overhead_amount_usd`, `loaded_monthly_cost_usd`, `loaded_hourly_cost_usd`
+- Runtime nuevo:
+  - `greenhouse_commercial.role_modeled_cost_basis_snapshots`
+  - helper `src/lib/commercial-cost-basis/role-modeled-cost-basis.ts`
+  - scope `roles` en `src/lib/commercial-cost-worker/materialize.ts`
+- Regla operativa:
+  - `role_blended` sigue ganando cuando existe evidencia factual reusable para el período
+  - `role_modeled` ya no debe resolverse leyendo inline el breakdown crudo desde cualquier consumer; el lane canónico es el reader de snapshots modelados con provenance/confidence
+  - la materialización batch de `role_modeled` vive en `commercial-cost-worker`, no en `ops-worker` ni en recomputes ad hoc desde request-response
+- Implicación para quotation pricing:
+  - el engine puede exponer `costBasisSourceRef`, `costBasisSnapshotDate`, `costBasisConfidenceScore` y `costBasisConfidenceLabel` sin inventar metadata auxiliar
+  - country sigue resuelto por `employment_types.country_code` y la seniority sigue baked-in en el `sellable_role` / SKU; esta task no duplica esas dimensiones
+
+## Delta 2026-04-19 — Currency & FX Platform Foundation (TASK-475)
+
+- Se formalizó la matriz canónica de monedas por dominio + política FX + contrato de readiness. El contrato vive en `src/lib/finance/currency-domain.ts` + `currency-registry.ts` y lo consumen el engine, las APIs y los futuros consumers client-facing.
+- **Matriz por dominio** (`CURRENCY_DOMAIN_SUPPORT`):
+  - `finance_core`: `['CLP', 'USD']` — estable, alineado con `FinanceCurrency` transaccional. NO se expande en esta task.
+  - `pricing_output`: `['USD', 'CLP', 'CLF', 'COP', 'MXN', 'PEN']` — superficie comercial multi-moneda.
+  - `reporting`: `['CLP']` — CLP-normalizado por contrato (P&L, metric registry).
+  - `analytics`: `['CLP']` — CLP-normalizado (`operational_pl`, `member_capacity_economics`, cost intelligence).
+- **FX policy matrix** (`FX_POLICY_DEFAULT_BY_DOMAIN`):
+  - `finance_core` → `rate_at_event` (snapshot al reconocer la transacción).
+  - `pricing_output` → `rate_at_send` (congela tasa al emitir el artefacto client-facing).
+  - `reporting`/`analytics` → `rate_at_period_close` (normaliza al cierre del período).
+- **Readiness contract** (`FxReadiness`): estados `supported | supported_but_stale | unsupported | temporarily_unavailable`. Incluye `rate`, `rateDateResolved`, `source`, `ageDays`, `stalenessThresholdDays`, `composedViaUsd`, `message`.
+- **Currency registry** (`src/lib/finance/currency-registry.ts`): policy declarativa por moneda — provider, fallback strategies (`inverse`, `usd_composition`, `none`), sync cadence, coverage class (`auto_synced` | `manual_only` | `declared_only`). Hoy `USD`/`CLP` = `auto_synced` (Mindicador + OpenER). `CLF`/`COP`/`MXN`/`PEN` = `manual_only` (pending provider wire-up).
+- **Resolver canónico** (`src/lib/finance/fx-readiness.ts`): `resolveFxReadiness({from, to, rateDate, domain})`. Chain: identity → domain gate → direct lookup → inverse (si registry permite) → composición vía USD (si registry permite) → clasificación por threshold. Endpoint HTTP: `GET /api/finance/exchange-rates/readiness?from=X&to=Y&domain=pricing_output`.
+- **Engine integration**: el pricing engine v2 llama a `resolvePricingOutputFxReadiness` al inicio del pipeline y emite structured warnings `fx_fallback` (`critical` si unsupported/temporarily_unavailable, `warning` si stale, `info` si composed via USD). El fallback silencioso `?? 1` queda como compat path pero el engine ya no depende de él para decidir; siempre pasa por readiness.
+- **Compatibility rule**: los consumers CLP-normalizados existentes (`operational_pl`, `member_capacity_economics`, `tool-cost-reader` target CLP, payroll CLP/USD) NO cambian. Esta task solo endurece el contrato compartido y sus readers.
+- **Escalabilidad**: agregar una moneda nueva requiere 3 edits: `CURRENCIES_ALL`, `CURRENCY_DOMAIN_SUPPORT[domain]` y una entrada en `CURRENCY_REGISTRY`. No hay hardcodes en engine/UI que tocar.
+
+## Delta 2026-04-19 — Pricing / Commercial Cost Basis runtime split formalized
+
+- Finance quotation pricing no debe absorber toda la carga de `Commercial Cost Basis` dentro de request-response.
+- Contrato nuevo del lane:
+  - `src/lib/finance/pricing/quotation-pricing-orchestrator.ts` y sus consumers siguen siendo el carril de preview interactivo y composición de pricing en portal.
+  - la materialización de snapshots role/tool/people/provider, el repricing batch y el feedback quoted-vs-actual pertenecen a un worker dedicado de Cloud Run.
+- Regla operativa:
+  - el quote builder puede leer snapshots, provenance y confidence ya resueltos;
+  - no debe disparar recomputes pesados cross-domain cada vez que un usuario cambia una línea o variante comercial;
+  - cualquier expansión del engine hacia workloads batch debe seguir la topología definida por `TASK-483`;
+  - `ops-worker` no es el runtime base del lane comercial; su scope sigue siendo reactivo/operativo.
+
+Implicación para el backlog:
+
+- `TASK-477` a `TASK-482` ya no se interpretan como mejoras puramente in-app.
+- La evolución del pricing lane debe respetar el split `interactive lane` vs `compute lane`.
+
+## Delta 2026-04-19 — TASK-483 formaliza la runtime topology del commercial cost basis engine
+
+- Finance/commercial ya no debe asumir que toda materializacion pesada de costo cabe en Vercel o debe vivir dentro de `ops-worker`.
+- Runtime nuevo:
+  - tabla `greenhouse_commercial.commercial_cost_basis_snapshots` como manifest/ledger por `scope + period + run`
+  - helper `src/lib/commercial-cost-worker/materialize.ts`
+  - fallback admin route `POST /api/internal/commercial-cost-basis/materialize`
+  - worker dedicado `services/commercial-cost-worker/`
+- Contrato operativo:
+  - `member_capacity_economics` sigue siendo la fuente people-level
+  - `provider_tooling_snapshots` sigue siendo la fuente tools/provider-level
+  - `commercial_cost_attribution` y `client_economics` siguen siendo los downstreams de margen/costo real
+  - el worker nuevo orquesta people/tools/bundle y publica eventos coarse-grained de periodo; no recalcula metricas ICO inline
+  - la siguiente ola (`roles`, `quote repricing`, `margin feedback`) debe acoplarse a este runtime en vez de colgar endpoints pesados nuevos en Vercel
+
+## Delta 2026-04-19 — TASK-478 agrega el read model fino de costo comercial por tool/provider
+
+- `provider_tooling_snapshots` deja de ser la unica capa tools/provider reutilizable: ahora convive con `greenhouse_commercial.tool_provider_cost_basis_snapshots` para granularidad `tool_id + provider_id + period`.
+- Contrato nuevo:
+  - `provider_tooling_snapshots` sigue siendo el agregado mensual provider-level
+  - `tool_provider_cost_basis_snapshots` resuelve costo comercial reusable por herramienta con `source_kind`, `source_ref`, `snapshot_date`, freshness, confidence y metadata FX
+  - el worker `commercial-cost-worker` monta ambos cortes dentro del scope `tools`
+- Regla operativa:
+  - pricing y supplier detail deben preferir este read model fino antes de caer al costo crudo del catálogo
+  - el catálogo `greenhouse_ai.tool_catalog` sigue siendo anchor de identidad/prorrateo, no snapshot ni ledger de costo
+  - las corridas tenant-aware pueden estampar `organization_id` / `client_id` / `space_id`, pero el baseline actual sigue siendo `global` mientras no exista una asignación tool-cost por tenant más precisa en upstreams
+
+## Delta 2026-04-18 — TASK-464c Tool Catalog + Overhead Addons Foundation
+
+- Finance quotation pricing gana la capa de costos directos y fees complementarios que faltaba para el engine v2:
+  - `greenhouse_ai.tool_catalog` ahora expone `tool_sku`, prorrateo, business lines y tags de aplicabilidad
+  - `greenhouse_commercial.overhead_addons` modela los 9 fees/overheads de Efeonce fuera del catálogo de tools
+- Implicación operativa:
+  - el runtime actual de TASK-346 no cambia todavía su cálculo legacy
+  - `TASK-464d` ya puede consumir herramientas y overheads desde stores canónicos, sin volver al Excel ni mezclar tool costs con markups/fees
+- Guardrails explícitos:
+  - el catálogo de tools sigue compartido con AI tooling; no se crea identidad paralela en Finance
+  - los addons no viven en `greenhouse_finance.*`; se tratan como inputs comerciales del quote engine
+  - reseed idempotente ya verificado para `26` tools activas y `9` addons
+
+## Delta 2026-04-18 — TASK-464b Pricing Governance Tables
+
+- Finance quotation pricing sigue sin cutover inmediato, pero gana la capa de governance que el engine v2 ya puede consumir:
+  - `role_tier_margins`
+  - `service_tier_margins`
+  - `commercial_model_multipliers`
+  - `country_pricing_factors`
+  - `fte_hours_guide`
+- Implicación operativa:
+  - el runtime actual de TASK-346 no cambia su surface ni su storage legacy
+  - `TASK-464d` ya puede resolver margen óptimo por tier, multiplicador comercial, factor país y equivalencia FTE↔horas sin volver al Excel
+- Hallazgo relevante para downstream:
+  - el seed dejó `21` drifts entre `role-tier-margins.csv` y `sellable_roles.tier`
+  - esos drifts se tratan como señal de reconciliación, no como motivo para sobrescribir el catálogo canónico
+
+## Delta 2026-04-18 — TASK-464a Sellable Roles Catalog Foundation
+
+- Finance quotation pricing gana un backbone comercial más rico, pero sin cutover inmediato:
+  - `greenhouse_commercial.role_rate_cards` sigue siendo la fuente consumida por el engine vigente de TASK-346.
+  - `greenhouse_commercial.sellable_roles`, `employment_types`, `sellable_role_cost_components`, `role_employment_compatibility` y `sellable_role_pricing_currency` quedan listas para el refactor de TASK-464d.
+- Implicación operativa:
+  - Finance mantiene su contrato estable actual.
+  - El programa pricing/revenue pipeline ya puede modelar costo por SKU `ECG-XXX`, modalidad contractual y moneda de venta sin crear identidades paralelas fuera del schema comercial.
+- Guardrail explícito:
+  - la foundation comercial no toca `greenhouse_payroll.*`; la convergencia de vocabulario con payroll queda aislada en TASK-468.
 
 ## Delta 2026-04-17 — TASK-345 Quotation canonical bridge materialized
 

@@ -3,6 +3,40 @@
 ## Overview
 Greenhouse uses a multi-layer sync architecture to move data between external sources (Notion, HubSpot, Frame.io), BigQuery (warehouse), PostgreSQL (operational store), and the Next.js application.
 
+## Delta 2026-04-19 — FX sync coverage matrix (TASK-475 + TASK-484)
+
+Fuente de verdad operativa de tasas: `greenhouse_finance.exchange_rates` (PostgreSQL dual-write con BigQuery `greenhouse.fin_exchange_rates` como fallback). Cobertura por moneda, declarada en `src/lib/finance/currency-registry.ts`:
+
+| Moneda | Coverage class (post TASK-484 merge) | Providers (primary → fallbacks) | Sync cadence | Fallback strategies |
+|--------|--------------------------------------|--------------------------------|--------------|---------------------|
+| `CLP` | `auto_synced` | `mindicador` → `open_er_api` | daily 23:05 UTC | `inverse`, `usd_composition` |
+| `USD` | `auto_synced` | `mindicador` → `open_er_api` | daily 23:05 UTC | `inverse`, `usd_composition` |
+| `CLF` | `manual_only` (flip pendiente TASK-484 rollout PR) | `clf_from_indicators` (lee `economic_indicators.UF`) | on-demand vía orchestrator | `inverse`, `usd_composition` |
+| `COP` | `manual_only` (flip pendiente TASK-484 rollout PR) | `datos_gov_co_trm` → `fawaz_ahmed` | daily 09:00 UTC (pendiente flip) | `usd_composition` |
+| `MXN` | `manual_only` (flip pendiente TASK-484 rollout PR) | `banxico_sie` → `frankfurter` → `fawaz_ahmed` | daily 22:00 UTC (pendiente flip + `BANXICO_SIE_TOKEN`) | `usd_composition` |
+| `PEN` | `manual_only` (flip pendiente TASK-484 rollout PR) | `apis_net_pe_sunat` → `bcrp` → `fawaz_ahmed` | daily 14:00 UTC (pendiente flip) | `usd_composition` |
+
+**Sync flow (multi-pair, adapter-driven post TASK-484):**
+
+- **USD↔CLP** — sin cambios operativos. Entry point sigue siendo `/api/finance/economic-indicators/sync` (23:05 UTC Vercel cron) que sync el indicator `USD_CLP` y upserta `exchange_rates`. El fetch de Mindicador ahora corre a través del adapter `providers/mindicador.ts`, pero el comportamiento externo es idéntico (misma hora, mismo endpoint, misma cadena Mindicador → OpenER).
+- **COP / PEN / MXN** — nuevas cron routes `/api/cron/fx-sync-latam?window=morning|midday|evening` a 09:00 / 14:00 / 22:00 UTC respectivamente. Cada route lee `CURRENCY_REGISTRY`, resuelve `providers.primary` + `providers.fallbacks`, y llama `syncCurrencyPair()` en `src/lib/finance/fx/sync-orchestrator.ts`.
+- **CLF** — materializado desde `greenhouse_finance.economic_indicators.UF` vía adapter `clf_from_indicators` (no tiene cron propio; se dispara via orchestrator cuando el pricing engine o admin endpoint lo pide, o como efecto secundario del window morning).
+- **Environment flag `FX_SYNC_DRY_RUN=true`** fuerza al orchestrator a modo dry-run durante las primeras 24–48h post-deploy sin requerir cambio de código: se ejecuta el fetch + validación pero no se hace upsert ni se emite el evento de éxito. Permite verificar en staging que los adapters posten sin errores antes de flipear `coverage` a `auto_synced`.
+- Persist (modo normal): dual-write PG + BQ, emite outbox event `finance.exchange_rate.upserted` (existente). En modo fallback chain, emite además `finance.fx_sync.provider_fallback` y, si toda la cadena falla, `finance.fx_sync.all_providers_failed` (nuevos).
+
+**Readiness contract (consumers backend):**
+- Helper: `resolveFxReadiness({from, to, rateDate, domain})` — `src/lib/finance/fx-readiness.ts`. Clasifica `supported | supported_but_stale | unsupported | temporarily_unavailable` con threshold por dominio (7d pricing/finance_core, 31d reporting/analytics).
+- HTTP: `GET /api/finance/exchange-rates/readiness?from=X&to=Y&domain=pricing_output` — `src/app/api/finance/exchange-rates/readiness/route.ts`.
+- Consumer primario: pricing engine v2 (al inicio del pipeline, emite `fx_fallback` structured warning si readiness !== `supported`).
+
+**Política de expansión**: agregar una moneda nueva al sync automático requiere (en orden):
+1. Entrada en `CURRENCY_REGISTRY` con `coverage: 'auto_synced'` + provider.
+2. Implementar el fetch del provider en `src/lib/finance/exchange-rates.ts`.
+3. Sumar la moneda a `CURRENCY_DOMAIN_SUPPORT[pricing_output]` si aún no está.
+4. Backfill histórico mínimo (7-30 días) — el cron diario mantiene el rolling fresh.
+
+Mientras una moneda siga `manual_only`: operadores pueden upsertar filas vía la API existente, pero el pricing engine emitirá `fx_fallback` warning (`temporarily_unavailable`) si no hay tasa. No se auto-popula.
+
 ## Delta 2026-04-03 — TASK-209 production closure
 
 El carril `Notion -> notion_ops -> greenhouse_conformed -> ICO` quedó cerrado con el contrato runtime real de producción.

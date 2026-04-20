@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto'
 
+import type { Kysely, Transaction } from 'kysely'
+import { sql } from 'kysely'
+
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import type { DB } from '@/types/db'
 
 import type { AggregateType, EventType } from './event-catalog'
 
@@ -17,6 +21,12 @@ interface QueryableClient {
   query: (text: string, values?: unknown[]) => Promise<unknown>
 }
 
+type DbLike = Kysely<DB> | Transaction<DB>
+type PublisherClient = QueryableClient | DbLike
+
+const isDbLike = (client: PublisherClient): client is DbLike =>
+  typeof (client as DbLike).insertInto === 'function'
+
 // ── Publisher ──
 
 /**
@@ -30,30 +40,61 @@ interface QueryableClient {
  */
 export async function publishOutboxEvent(
   event: OutboxEvent,
-  client?: QueryableClient
+  client?: PublisherClient
 ): Promise<string> {
   const eventId = `outbox-${randomUUID()}`
 
-  const sql = `
-    INSERT INTO greenhouse_sync.outbox_events (
-      event_id, aggregate_type, aggregate_id,
-      event_type, payload_json, status, occurred_at
-    )
-    VALUES ($1, $2, $3, $4, $5::jsonb, 'pending', CURRENT_TIMESTAMP)
-  `
-
-  const values = [
-    eventId,
-    event.aggregateType,
-    event.aggregateId,
-    event.eventType,
-    JSON.stringify(event.payload)
-  ]
-
   if (client) {
-    await client.query(sql, values)
+    if (isDbLike(client)) {
+      await client
+        .insertInto('greenhouse_sync.outbox_events')
+        .values({
+          event_id: eventId,
+          aggregate_type: event.aggregateType,
+          aggregate_id: event.aggregateId,
+          event_type: event.eventType,
+          payload_json: event.payload as never,
+          status: 'pending',
+          occurred_at: sql`CURRENT_TIMESTAMP`
+        })
+        .execute()
+    } else {
+      const statement = `
+        INSERT INTO greenhouse_sync.outbox_events (
+          event_id, aggregate_type, aggregate_id,
+          event_type, payload_json, status, occurred_at
+        )
+        VALUES ($1, $2, $3, $4, $5::jsonb, 'pending', CURRENT_TIMESTAMP)
+      `
+
+      const values = [
+        eventId,
+        event.aggregateType,
+        event.aggregateId,
+        event.eventType,
+        JSON.stringify(event.payload)
+      ]
+
+      await client.query(statement, values)
+    }
   } else {
-    await runGreenhousePostgresQuery(sql, values)
+    const statement = `
+      INSERT INTO greenhouse_sync.outbox_events (
+        event_id, aggregate_type, aggregate_id,
+        event_type, payload_json, status, occurred_at
+      )
+      VALUES ($1, $2, $3, $4, $5::jsonb, 'pending', CURRENT_TIMESTAMP)
+    `
+
+    const values = [
+      eventId,
+      event.aggregateType,
+      event.aggregateId,
+      event.eventType,
+      JSON.stringify(event.payload)
+    ]
+
+    await runGreenhousePostgresQuery(statement, values)
   }
 
   return eventId
@@ -108,7 +149,7 @@ interface PeriodMaterializedEventInput {
  */
 export async function publishPeriodMaterializedEvent(
   input: PeriodMaterializedEventInput,
-  client?: QueryableClient
+  client?: PublisherClient
 ): Promise<string> {
   const payload: Record<string, unknown> = {
     ...(input.payload ?? {}),

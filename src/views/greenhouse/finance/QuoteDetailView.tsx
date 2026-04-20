@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -36,6 +36,11 @@ import QuoteDocumentChain from './workspace/QuoteDocumentChain'
 import QuoteHealthCard from './workspace/QuoteHealthCard'
 import QuoteSaveAsTemplateDialog from './workspace/QuoteSaveAsTemplateDialog'
 import QuoteSendDialog from './workspace/QuoteSendDialog'
+import {
+  canDecideFinanceQuotationApproval,
+  canManageFinanceQuotes,
+  isEditableFinanceQuotationStatus
+} from '@/lib/finance/quotation-access'
 
 // ── Types ──
 
@@ -113,10 +118,12 @@ interface QuoteViewerContext {
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'primary' | 'secondary' | 'warning' }> = {
   draft: { label: 'Borrador', color: 'secondary' },
   pending_approval: { label: 'En aprobación', color: 'warning' },
-  sent: { label: 'Enviada', color: 'info' },
-  approved: { label: 'Aprobada', color: 'success' },
+  approval_rejected: { label: 'Revisión requerida', color: 'error' },
+  issued: { label: 'Emitida', color: 'info' },
+  sent: { label: 'Emitida', color: 'info' },
+  approved: { label: 'Emitida', color: 'info' },
   accepted: { label: 'Aceptada', color: 'success' },
-  rejected: { label: 'Rechazada', color: 'error' },
+  rejected: { label: 'Revisión requerida', color: 'error' },
   expired: { label: 'Vencida', color: 'secondary' },
   converted: { label: 'Facturada', color: 'primary' }
 }
@@ -159,24 +166,24 @@ const fetchViewerContext = async (): Promise<QuoteViewerContext> => {
     }
 
     const session = (await res.json()) as {
-      user?: { id?: string }
-      roleCodes?: string[]
+      user?: {
+        id?: string
+        roleCodes?: string[]
+        routeGroups?: string[]
+        authorizedViews?: string[]
+      }
     }
 
-    const roleCodes = Array.isArray(session.roleCodes) ? session.roleCodes : []
-
-    const canDecideApproval =
-      roleCodes.includes('finance') ||
-      roleCodes.includes('finance_admin') ||
-      roleCodes.includes('efeonce_admin')
-
-    const canEdit = canDecideApproval || roleCodes.includes('efeonce_operations')
+    const roleCodes = Array.isArray(session.user?.roleCodes) ? session.user.roleCodes : []
+    const routeGroups = Array.isArray(session.user?.routeGroups) ? session.user.routeGroups : []
+    const authorizedViews = Array.isArray(session.user?.authorizedViews) ? session.user.authorizedViews : []
+    const accessSubject = { roleCodes, routeGroups, authorizedViews }
 
     return {
       userId: session.user?.id ?? null,
       roleCodes,
-      canEdit,
-      canDecideApproval
+      canEdit: canManageFinanceQuotes(accessSubject),
+      canDecideApproval: canDecideFinanceQuotationApproval(accessSubject)
     }
   } catch {
     return { userId: null, roleCodes: [], canEdit: false, canDecideApproval: false }
@@ -187,6 +194,7 @@ const fetchViewerContext = async (): Promise<QuoteViewerContext> => {
 
 const QuoteDetailView = () => {
   const params = useParams()
+  const router = useRouter()
   const quoteId = params.id as string
 
   const [loading, setLoading] = useState(true)
@@ -462,7 +470,7 @@ const QuoteDetailView = () => {
     setSendError(null)
 
     try {
-      const res = await fetch(`/api/finance/quotes/${quoteId}/send`, {
+      const res = await fetch(`/api/finance/quotes/${quoteId}/issue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
@@ -475,7 +483,7 @@ const QuoteDetailView = () => {
       }
 
       if (!res.ok) {
-        setSendError(body.error || 'No pudimos enviar la cotización.')
+        setSendError(body.error || 'No pudimos emitir la cotización.')
 
         return
       }
@@ -484,7 +492,7 @@ const QuoteDetailView = () => {
       setActionMessage(
         body.approvalRequired
           ? 'La cotización quedó en aprobación. Notificamos a los aprobadores correspondientes.'
-          : 'Cotización enviada.'
+          : 'Cotización emitida.'
       )
       await Promise.all([fetchData(), fetchApprovals(), fetchHealth()])
     } catch {
@@ -734,6 +742,7 @@ const QuoteDetailView = () => {
   })()
 
   const currentVersion = quote.currentVersion ?? (versions[0]?.versionNumber ?? null)
+  const canManageCurrentQuote = viewer.canEdit && isEditableFinanceQuotationStatus(quote.status)
 
   return (
     <Stack spacing={4}>
@@ -769,7 +778,18 @@ const QuoteDetailView = () => {
             >
               PDF
             </Button>
-            {viewer.canEdit && quote.status === 'draft' && (
+            {canManageCurrentQuote && (
+              <Button
+                variant='outlined'
+                size='small'
+                color='primary'
+                startIcon={<i className='tabler-edit' />}
+                onClick={() => router.push(`/finance/quotes/${quoteId}/edit`)}
+              >
+                Editar
+              </Button>
+            )}
+            {canManageCurrentQuote && (
               <Button
                 variant='outlined'
                 size='small'
@@ -782,15 +802,15 @@ const QuoteDetailView = () => {
                 Guardar como template
               </Button>
             )}
-            {viewer.canEdit && (quote.status === 'draft' || quote.status === 'pending_approval' || quote.status === 'approved') && (
+            {canManageCurrentQuote && (
               <Button
                 variant='contained'
                 size='small'
-                startIcon={<i className='tabler-send' />}
+                startIcon={<i className='tabler-file-check' />}
                 onClick={handleOpenSendDialog}
                 disabled={sending}
               >
-                Enviar
+                Emitir
               </Button>
             )}
             {quote.hubspotQuoteId && (
@@ -845,7 +865,7 @@ const QuoteDetailView = () => {
               targetMarginPct={health.marginTargetPct}
               floorMarginPct={health.marginFloorPct}
               alerts={health.alerts}
-              canRequestApproval={viewer.canEdit && quote.status === 'draft'}
+              canRequestApproval={canManageCurrentQuote}
               onRequestApproval={handleOpenSendDialog}
             />
           )}
@@ -1086,7 +1106,7 @@ const QuoteDetailView = () => {
 
         const canConvertSimple =
           viewer.canEdit &&
-          (quote.status === 'approved' || quote.status === 'sent') &&
+          (quote.status === 'issued' || quote.status === 'approved' || quote.status === 'sent') &&
           pos.length === 0 &&
           !ses.some(h => (h as { status?: string }).status === 'approved') &&
           incs.length === 0
@@ -1171,7 +1191,7 @@ const QuoteDetailView = () => {
           error={approvalsError}
           steps={approvals}
           quotationStatus={quote.status}
-          canRequestApproval={viewer.canEdit && quote.status === 'draft'}
+          canRequestApproval={canManageCurrentQuote}
           canDecide={viewer.canDecideApproval}
           approverRoleCodes={viewer.roleCodes}
           requesting={requestingApproval}
@@ -1185,7 +1205,7 @@ const QuoteDetailView = () => {
           loading={termsLoading}
           error={termsError}
           terms={terms}
-          canEdit={viewer.canEdit && quote.status === 'draft'}
+          canEdit={canManageCurrentQuote}
           saving={savingTerms}
           onSave={handleSaveTerms}
         />

@@ -14,6 +14,9 @@ interface SweepRow extends Record<string, unknown> {
   client_id: string | null
   organization_id: string | null
   status: string
+  pricing_model: string | null
+  commercial_model: string | null
+  staffing_model: string | null
   total_amount_clp: string | number | null
   expiry_date: string | Date | null
   converted_at: string | Date | null
@@ -74,6 +77,7 @@ export const runQuotationLifecycleSweep = async ({
 
   const candidates = await query<SweepRow>(
     `SELECT quotation_id, client_id, organization_id, status,
+            pricing_model, commercial_model, staffing_model,
             total_amount_clp, expiry_date, converted_at
        FROM greenhouse_commercial.quotations
        WHERE expiry_date IS NOT NULL
@@ -108,7 +112,10 @@ export const runQuotationLifecycleSweep = async ({
             organizationId: row.organization_id ? String(row.organization_id) : null,
             totalAmountClp: toNum(row.total_amount_clp),
             expiredAt: now.toISOString(),
-            daysSinceExpiry: Math.abs(days)
+            daysSinceExpiry: Math.abs(days),
+            pricingModel: row.pricing_model ? String(row.pricing_model) : null,
+            commercialModel: row.commercial_model ? String(row.commercial_model) : null,
+            staffingModel: row.staffing_model ? String(row.staffing_model) : null
           },
           client
         )
@@ -155,7 +162,10 @@ export const runQuotationLifecycleSweep = async ({
             organizationId: row.organization_id ? String(row.organization_id) : null,
             totalAmountClp: toNum(row.total_amount_clp),
             expiryDate: expiryIso,
-            daysUntilExpiry: days
+            daysUntilExpiry: days,
+            pricingModel: row.pricing_model ? String(row.pricing_model) : null,
+            commercialModel: row.commercial_model ? String(row.commercial_model) : null,
+            staffingModel: row.staffing_model ? String(row.staffing_model) : null
           },
           client
         )

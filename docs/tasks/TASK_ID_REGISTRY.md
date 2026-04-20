@@ -502,3 +502,61 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-450` | `to-do`       | Agency ICO Serving & Performance Hardening | `docs/tasks/to-do/TASK-450-agency-ico-serving-performance-hardening.md` |
 | `TASK-451` | `complete`    | Blindar `password_hash` contra rotaciones automáticas de batch/sync | `docs/tasks/complete/TASK-451-password-hash-mutation-guardrails.md` |
 | `TASK-452` | `to-do`       | Service Attribution Foundation | `docs/tasks/to-do/TASK-452-service-attribution-foundation.md` |
+| `TASK-453` | `to-do`       | Deal Canonicalization & Commercial Bridge | `docs/tasks/to-do/TASK-453-deal-canonicalization-commercial-bridge.md` |
+| `TASK-454` | `to-do`       | HubSpot lifecyclestage sync on canonical Company | `docs/tasks/to-do/TASK-454-lifecyclestage-sync-company-contact.md` |
+| `TASK-455` | `to-do`       | Quote Sales Context Snapshot | `docs/tasks/to-do/TASK-455-quote-sales-context-snapshot.md` |
+| `TASK-456` | `to-do`       | Deal Pipeline Snapshots Projection | `docs/tasks/to-do/TASK-456-deal-pipeline-snapshots-projection.md` |
+| `TASK-457` | `to-do`       | UI Revenue Pipeline Hybrid | `docs/tasks/to-do/TASK-457-ui-revenue-pipeline-hybrid.md` |
+| `TASK-458` | `to-do`       | Honest-label quick fix — reframe "Pipeline" sub-tab (TASK-351 follow-up) | `docs/tasks/to-do/TASK-458-honest-label-pipeline-fix.md` |
+| `TASK-459` | `to-do`       | Delivery Model Refinement (commercial + staffing orthogonal) | `docs/tasks/to-do/TASK-459-delivery-model-refinement.md` |
+| `TASK-460` | `complete`    | Contract/SOW Canonical Entity & Lifecycle | `docs/tasks/complete/TASK-460-contract-sow-canonical-entity.md` |
+| `TASK-461` | `complete` | MSA Umbrella Entity & Clause Library | `docs/tasks/complete/TASK-461-msa-umbrella-clause-library.md` |
+| `TASK-462` | `to-do`       | MRR/ARR Contractual Projection & Dashboard | `docs/tasks/to-do/TASK-462-mrr-arr-contractual-projection-dashboard.md` |
+| `TASK-463` | `to-do`       | Unified Quote Builder + Bidirectional HubSpot Bridge | `docs/tasks/to-do/TASK-463-unified-quote-builder-hubspot-bidirectional.md` |
+| `TASK-464a` | `to-do`      | Sellable Roles Catalog Canonical + Seed | `docs/tasks/to-do/TASK-464a-sellable-roles-catalog-canonical.md` |
+| `TASK-464b` | `to-do`      | Pricing Governance Tables (tiers + commercial models + country factors + FTE) | `docs/tasks/to-do/TASK-464b-pricing-governance-tables.md` |
+| `TASK-464c` | `complete` | Tool Catalog Extension + Overhead Addons Canonical | `docs/tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md` |
+| `TASK-464d` | `to-do`      | Pricing Engine Full-Model Refactor (v2) | `docs/tasks/to-do/TASK-464d-pricing-engine-full-model-refactor.md` |
+| `TASK-464e` | `to-do`      | Quote Builder UI Exposure (role/tool/addon pickers + gated cost stack) | `docs/tasks/to-do/TASK-464e-quote-builder-ui-exposure.md` |
+| `TASK-465` | `in-progress` | Service Composition Catalog + Admin UI + Quote Picker | `docs/tasks/in-progress/TASK-465-service-composition-catalog-ui.md` |
+| `TASK-466` | `to-do`       | Multi-Currency Quote Output (client view + PDF + email) | `docs/tasks/to-do/TASK-466-multi-currency-quote-output.md` |
+| `TASK-467` | `to-do`       | Pricing Catalog Admin UI (self-service CRUD) | `docs/tasks/to-do/TASK-467-pricing-catalog-admin-ui.md` |
+| `TASK-468` | `to-do`       | Payroll ↔ Commercial Employment Types Unification | `docs/tasks/to-do/TASK-468-payroll-commercial-employment-types-unification.md` |
+| `TASK-469` | `complete`    | Commercial Pricing Program — UI Interface Plan & Vuexy Component Inventory | `docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md` |
+| `TASK-470` | `complete`    | Pricing Catalog Enterprise Hardening (Concurrency + Validation + Impact + Overcommit) | `docs/tasks/complete/TASK-470-pricing-catalog-enterprise-hardening.md` |
+| `TASK-471` | `to-do`       | Pricing Catalog Phase-4 UI Polish (Diff + Revert + Bulk + Impact + Maker-Checker + Excel) | `docs/tasks/to-do/TASK-471-pricing-catalog-phase-4-ui-polish.md` |
+| `TASK-472` | `to-do`       | Fix `/my/profile` SSR 500 in staging (resuelve ISSUE-054) | `docs/tasks/to-do/TASK-472-my-profile-ssr-500-fix.md` |
+| `TASK-473` | `to-do`       | Quote Builder Full-Page Surface Migration & Flow Recomposition | `docs/tasks/to-do/TASK-473-quote-builder-full-page-surface-migration.md` |
+| `TASK-474` | `to-do`       | Quote Builder Catalog / Service Reconnection Pass | `docs/tasks/to-do/TASK-474-quote-builder-catalog-reconnection-pass.md` |
+| `TASK-475` | `complete` | Greenhouse FX & Currency Platform Foundation | `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md` |
+| `TASK-476` | `to-do`       | Commercial Cost Basis Program | `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md` |
+| `TASK-477` | `to-do`       | Role Cost Assumptions Catalog & Effective-Dated Modeling | `docs/tasks/to-do/TASK-477-role-cost-assumptions-catalog.md` |
+| `TASK-478` | `complete`    | Tool & Provider Cost Basis Snapshots | `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md` |
+| `TASK-479` | `to-do`       | People Actual Cost + Blended Role Cost Snapshots | `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md` |
+| `TASK-480` | `to-do`       | Pricing Engine Cost Resolver, Provenance & Confidence | `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md` |
+| `TASK-481` | `to-do`       | Quote Builder Suggested Cost UX & Override Governance | `docs/tasks/to-do/TASK-481-quote-builder-suggested-cost-override-governance.md` |
+| `TASK-482` | `to-do`       | Quoted vs Actual Margin Feedback Loop | `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md` |
+| `TASK-483` | `complete` | Commercial Cost Basis Engine Runtime Topology & Worker Foundation | `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md` |
+| `TASK-484` | `complete`    | FX Provider Adapter Platform | `docs/tasks/complete/TASK-484-fx-provider-adapter-platform.md` |
+| `TASK-485` | `to-do`       | FX Coverage Rollout (manual_only → auto_synced) | `docs/tasks/to-do/TASK-485-fx-coverage-rollout.md` |
+| `TASK-486` | `complete`    | Commercial Quotation Canonical Anchor (Organization + Contact) | `docs/tasks/complete/TASK-486-commercial-quotation-canonical-anchor.md` |
+| `TASK-487` | `complete` | Quote Builder Command Bar Redesign (Enterprise Pattern) | `docs/tasks/complete/TASK-487-quote-builder-command-bar-redesign.md` |
+| `TASK-488` | `complete` | Design Tokens + UI Governance Hardening | `docs/tasks/complete/TASK-488-design-tokens-ui-governance-hardening.md` |
+| `TASK-489` | `to-do` | Document Registry & Versioning Foundation (EPIC-001) | `docs/tasks/to-do/TASK-489-document-registry-versioning-foundation.md` |
+| `TASK-490` | `to-do` | Signature Orchestration Foundation (EPIC-001) | `docs/tasks/to-do/TASK-490-signature-orchestration-foundation.md` |
+| `TASK-491` | `to-do` | ZapSign Adapter + Webhook Convergence (EPIC-001) | `docs/tasks/to-do/TASK-491-zapsign-adapter-webhook-convergence.md` |
+| `TASK-492` | `to-do` | Document Manager, Access Model & UI Foundation (EPIC-001) | `docs/tasks/to-do/TASK-492-document-manager-access-model-ui-foundation.md` |
+| `TASK-493` | `to-do` | Document Rendering & Template Catalog Foundation (EPIC-001) | `docs/tasks/to-do/TASK-493-document-rendering-template-catalog-foundation.md` |
+| `TASK-494` | `to-do` | HR Document Vault Convergence (EPIC-001) | `docs/tasks/to-do/TASK-494-hr-document-vault-convergence.md` |
+| `TASK-495` | `to-do` | Commercial & Legal Document Chain Convergence (EPIC-001) | `docs/tasks/to-do/TASK-495-commercial-legal-document-chain-convergence.md` |
+| `TASK-496` | `complete` | Quote Builder Deep Polish Sprint 1 | `docs/tasks/complete/TASK-496-quote-builder-deep-polish-sprint-1.md` |
+| `TASK-497` | `to-do` | Quote Builder Autosave + react-hook-form Migration (Sprint 2) | `docs/tasks/to-do/TASK-497-quote-builder-autosave-react-hook-form.md` |
+| `TASK-498` | `to-do` | UI Primitives Platform Extraction (Sprint 3) | `docs/tasks/to-do/TASK-498-ui-primitives-platform-extraction.md` |
+| `TASK-499` | `to-do` | Quote Builder Polish Backlog (audit remanente) | `docs/tasks/to-do/TASK-499-quote-builder-polish-backlog.md` |
+| `TASK-500` | `complete` | Quote Builder Quantity↔Periods Sync + EmpType Dropdown | `docs/tasks/complete/TASK-500-quote-builder-quantity-periods-sync.md` |
+| `TASK-501` | `complete` | Quote Builder Unit Price UX + Fresh Simulate-on-Save | `docs/tasks/complete/TASK-501-quote-builder-unit-price-ux-and-fresh-simulate.md` |
+| `TASK-502` | `complete` | Fix Role Double-Count + Derived Unit Price + Read-Only Catalog Prices | `docs/tasks/complete/TASK-502-quote-role-double-count-and-derived-unit-price.md` |
+| `TASK-503` | `complete` | Quote Addon Toggle = Line Item (autoResolveAddons: 'internal_only') | `docs/tasks/complete/TASK-503-quote-addon-toggle-as-line-items.md` |
+| `TASK-504` | `complete` | Commercial Quotation Issuance Lifecycle & Approval-by-Exception | `docs/tasks/complete/TASK-504-commercial-quotation-issued-lifecycle-approval-by-exception.md` |
+| `TASK-505` | `complete` | Quote Summary Dock v2 — Enterprise Hierarchy + Primitives | `docs/tasks/complete/TASK-505-quote-summary-dock-v2-hierarchy.md` |
+| `TASK-506` | `complete` | Quote Builder Dock: CTA simplification + addons chip amount | `docs/tasks/complete/TASK-506-dock-cta-simplification.md` |

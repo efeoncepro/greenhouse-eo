@@ -1,5 +1,12 @@
 # Greenhouse Team Capacity Architecture V1
 
+## Delta 2026-04-19
+
+- `TASK-470` agrega la lane `overcommit-detector.ts` para cruzar commitments billables de `greenhouse_commercial.quotation_line_items` (`line_type='person'`) contra `greenhouse_serving.member_capacity_economics`.
+- Regla explícita: el denominador canónico del detector es `contracted_hours`; `commercial_availability_hours` se expone como contexto pero no reemplaza la base contractual.
+- Si un line item no trae `hours_estimated`, el detector resuelve horas con `convertFteToHours()` y cae a `160h` operativas solo como respaldo defensivo.
+- Cuando `detectAllOvercommits()` encuentra casos `>100%`, publica el evento outbox `commercial.capacity.overcommit_detected`; este corte no agrega acciones correctivas automáticas ni writes a payroll.
+
 ## Delta 2026-03-26
 
 - `direct_overhead_target` ya tiene baseline canónica desde AI tooling:

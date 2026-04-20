@@ -42,6 +42,82 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.23
+
+**Canal:** Beta
+**Fecha:** 2026-04-19
+**Disponible para:** internal
+**Módulos:** Finanzas / Cotizaciones
+
+### Novedades
+
+- El cotizador ahora muestra **Guardar y emitir** dentro del mismo flujo de creación y edición, además de **Guardar borrador**.
+
+### Mejoras
+
+- La pantalla de detalle vuelve a mostrar acciones operativas como **Editar**, **Guardar como template** y **Emitir** a usuarios con acceso financiero real, incluyendo superadministradores.
+- Las cotizaciones que quedan en **Revisión requerida** se pueden volver a editar desde su flujo normal para corregirlas y reemitirlas.
+
+### Correcciones
+
+- Crear o editar una cotización ya no te deja atrapado en un borrador solo porque la acción de emisión no estaba visible en la UI correspondiente.
+
+### Notas
+
+- Emitir sigue usando aprobación por excepción: si la quote rompe la policy financiera, quedará `En aprobación` en vez de emitirse directo.
+
+---
+
+## 2026.04-beta.22
+
+**Canal:** Beta
+**Fecha:** 2026-04-19
+**Disponible para:** internal
+**Módulos:** Finanzas / Cotizaciones
+
+### Novedades
+
+- Las cotizaciones ahora tienen un estado oficial **Emitida**. Guardar sigue dejando un borrador; emitir formaliza la versión documental que luego puedes descargar, compartir o convertir.
+
+### Mejoras
+
+- La aprobación queda por excepción: si la quote cumple política financiera, se emite directo; si no, entra a `En aprobación` y al aprobarse termina igual en `Emitida`.
+- Una cotización rechazada por governance queda en **Revisión requerida**, en vez de volver silenciosamente a borrador.
+
+### Correcciones
+
+- PDF, email y acciones de distribución ya no cambian el lifecycle principal de la cotización ni la dejan en un estado ambiguo.
+
+### Notas
+
+- La semántica legacy `sent/approved` sigue tolerada en bridges de compatibilidad mientras terminan de migrar los consumers downstream.
+
+---
+
+## 2026.04-beta.21
+
+**Canal:** Beta
+**Fecha:** 2026-04-19
+**Disponible para:** internal
+**Módulos:** Finanzas / Contratos / Acuerdos marco
+
+### Novedades
+
+- Finanzas ahora tiene una lane nueva de **Acuerdos marco** para registrar el marco legal reusable de clientes enterprise y ver qué contratos operan bajo ese acuerdo.
+
+### Mejoras
+
+- La ficha de contrato ahora puede mostrar el MSA asociado y enlazarlo directamente, en vez de dejar esa relación fuera del portal.
+- El acuerdo marco conserva sus cláusulas legales versionadas y el documento firmado dentro del vault privado de Greenhouse.
+
+### Correcciones
+
+- Los contratos post-venta ya no quedan amarrados solo a un `space` legacy cuando el anchor comercial vigente es la organización del cliente.
+
+### Notas
+
+- La base de firma electrónica queda integrada con ZapSign para ambientes que publiquen sus credenciales; el rollout visible depende de la configuración de secretos en cada entorno.
+
 ## 2026.04-beta.20
 
 **Canal:** Beta

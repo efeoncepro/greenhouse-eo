@@ -1,0 +1,37 @@
+SKU,Categoría,Nombre de la Herramienta,Tipo,Unidad,Costo Total (USD),Frecuencia,Prorrateo Estimado,Tipo de prorrateo,Costo Prorrateado (USD),Precio Prorrateado,Aplicable a,Incluye en Add-on,Comentarios
+ETG-001,Creatividad,Adobe Creative Cloud,SaaS / Licencia,Mes,80,Mensual,4,Proyectos/mes,20,23,Globe,✅,"Incluye Photoshop, Illustrator, After Effects"
+ETG-002,Creatividad,Envato Elements,Recurso / Banco,Mes,33,Mensual,4,Proyectos/mes,8.25,9.487499999999999,Globe,✅,"Stock, plantillas, fuentes"
+ETG-003,Social / Medios,Metricool,SaaS / Licencia,Mes,54,Mensual,15,Clientes activos,3.6,4.14,Reach / Globe,✅,Licencia Multiaccount
+ETG-004,Analítica / Performance,SEMrush,SaaS,Mes,120,Mensual,3,Proyectos,40,46,Wave,✅,"Auditoría SEO, Keywords"
+ETG-005,MarTech / HubSpot,HubSpot,Plataforma,Mes,N/A,Mensual,,,N/A,,Efeonce / Wave,❌,Incluido como partner
+ETG-006,Automatización / Integraciones,Zapier,SaaS,Mes,49,Mensual,5,Automatizaciones,9.8,11.27,Wave / Efeonce,✅,Costo compartido
+ETG-007,IA / Contenido,ChatGPT Plus,SaaS,Mes,20,Mensual,4,Proyectos,5,5.75,Globe / Efeonce,✅,Incluye uso Promptcraft
+ETG-008,IA / Diseño,Midjourney,SaaS,Mes,30,Mensual,6,Proyectos,5,5.75,Globe,✅,Uso en renders creativos
+ETG-009,Hosting,Cloudways VPS,Hosting,Año,240,Anual,1,Clientes activos,240,276,Wave,✅,Hosting cliente / sitio web
+ETG-010,Plugins / CMS,Elementor Pro,Plugin,Año,100,Anual,3,Clientes activos,33.333333333333336,38.333333333333336,Wave,✅,Webs WordPress
+ETG-011,Plugins / CMS,WP Rocket,Plugin,Año,59,Anual,3,Clientes activos,19.666666666666668,22.616666666666667,Wave,✅,Optimización de velocidad
+ETG-012,Plugins / CMS,Crocoblock Suite,Plugin,Año,130,Anual,12,Usuarios/mes,10.833333333333334,12.458333333333334,Wave,✅,Webs dinámicas
+ETG-013,Infraestructura / Data,GTM Server-side,Infraestructura,Mes,60,Mensual,3,Proyectos,20,23,Wave,✅,Tracking avanzado
+ETG-014,Infraestructura / Data,BigQuery,Plataforma,Mes,50,Mensual,5,Proyectos,10,11.5,Wave / Efeonce,✅,Análisis de datos
+ETG-015,Gestión Interna,Notion,SaaS,Mes,144,Mensual,6,Usuarios/mes,24,27.599999999999998,Todos,❌,Costo operativo
+ETG-016,Gestión Interna,Microsoft 365,SaaS,Mes,80,Mensual,5,Clientes activos,16,18.4,Todos,❌,Cuentas corporativas
+ETG-017,Gestión Financiera,Deel,Plataforma,Usuario,49,Mensual,4,Clientes activos,12.25,14.087499999999999,Staff Augmentation,✅,Fee por colaborador externo (gestión global de pagos y contratos internacionales).
+ETG-018,IA / Contenido,Gemini,SaaS,Mes,23,Mensual,4,Proyectos/mes,5.75,6.6125,Globe,✅,"Asistente de IA generativa para prompts, textos y soporte creativo (IA generativa Google)."
+ETG-019,IA / Contenido,Figma,SaaS,Mes,60,Mensual,3,Proyectos/mes,20,23,Wave,✅,Plataforma de diseño colaborativo UI/UX y prototipado para Globe y Wave.
+ETG-020,Social / Medios,Shutterstock,Recurso / Banco,Mes,29,Mensual,6,Proyectos/mes,4.833333333333333,5.558333333333333,Globe,✅,Banco de imágenes y videos premium con licencia comercial.
+ETG-021,Social / Medios,Freepik,Recurso / Banco,Mes,33,Mensual,4,Proyectos/mes,8.25,9.487499999999999,Globe,✅,"Recurso gráfico complementario (vectores, íconos, plantillas)."
+ETG-022,Social / Medios,Frame.io,Plataforma,Mes,75,Mensual,5,Proyectos/mes,15,17.25,Globe,✅,Plataforma de revisión colaborativa de video y control de versiones.
+ETG-023,IA / Contenido,Eleven Labs,SaaS / Licencia,Mes,5,Mensual,3,Proyectos/mes,1.6666666666666667,1.9166666666666665,Globe,✅,Generación de voz con IA para contenidos multimedia o campañas.
+ETG-024,IA / Contenido,Github Copilot,SaaS / Licencia,Mes,36,Mensual,6,Proyectos/mes,6,6.8999999999999995,Wave,✅,Asistente de codificación IA para automatización de desarrollo (Wave).
+ETG-025,Social / Medios,Adobe Express,SaaS / Licencia,Mes,24,Mensual,4,Proyectos/mes,6,6.8999999999999995,Globe,✅,Herramienta de diseño rápido para social media y piezas simples.
+ETG-026,Social / Medios,Favikon,SaaS,Mes,199,Mensual,5,Proyectos/mes,39.8,45.769999999999996,Globe,✅,
+ETG-027,,,,,,,,,0,0,,,
+ETG-028,,,,,,,,,0,0,,,
+ETG-029,,,,,,,,,0,0,,,
+ETG-030,,,,,,,,,0,0,,,
+ETG-031,,,,,,,,,0,0,,,
+ETG-032,,,,,,,,,0,0,,,
+ETG-033,,,,,,,,,0,0,,,
+,,,,,,,,,0,0,,,
+,,,,,,,,,0,0,,,
+,,,,,,,,,0,0,,,

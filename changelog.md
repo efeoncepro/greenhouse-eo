@@ -1,5 +1,242 @@
 # changelog.md
 
+## 2026-04-19
+
+### 2026-04-19 — Quote-to-cash invoice conversion reuses one transaction boundary
+
+- Convertir una cotización emitida a factura ya no mezcla transacciones anidadas entre `materializeInvoiceFromApprovedQuotation` / `materializeInvoiceFromApprovedHes` y `ensureContractForQuotation`.
+- El lifecycle contractual ahora puede reutilizar el `client` transaccional activo cuando la conversión corre dentro de un flujo quote-to-cash, evitando esperas indefinidas por locks/FKs sobre la misma cotización.
+- Se agregan regresiones para ambos caminos de materialización (`simple` y `enterprise`) y para `ensureContractForQuotation`, de modo que futuras refactorizaciones no vuelvan a abrir una segunda transacción dentro del mismo comando.
+
+### 2026-04-19 — Quote issuance sales-context lock stops tripping on LEFT JOINs
+
+- Emitir una cotización desde `/finance/quotes/[id]` ya no falla con `FOR UPDATE cannot be applied to the nullable side of an outer join` cuando el flujo captura `sales_context_at_sent`.
+- El lock transaccional se separa de la lectura enriquecida del snapshot comercial: primero se bloquea solo la fila de `greenhouse_commercial.quotations`, y luego se resuelve el contexto con `LEFT JOIN` sin arrastrar locks inválidos sobre relaciones opcionales.
+- Se agrega una prueba de regresión para asegurar que futuros cambios en el reader de sales context no vuelvan a mezclar `FOR UPDATE` con joins opcionales.
+
+### 2026-04-19 — Quote issuance actions converge across builder, detail and superadmin access
+
+- El cotizador deja explícitos dos intents distintos: **Guardar borrador** y **Guardar y emitir**. Emitir desde `/finance/quotes/new` o `/finance/quotes/[id]/edit` reutiliza el mismo comando canónico `POST /api/finance/quotes/[id]/issue`, en vez de depender de que el usuario guarde y luego descubra otra pantalla.
+- El detalle de la quote deja de ocultar **Editar**, **Guardar como template** y **Emitir** a usuarios válidos por un bug de sesión cliente. La regla visible ahora converge sobre un helper compartido que lee `authorizedViews`, `routeGroups` y el override de `efeonce_admin`.
+- La edición vuelve a aceptar quotes en `approval_rejected`, alineando el server page con el lifecycle introducido por TASK-504 y evitando que una quote “Revisión requerida” quede bloqueada de facto.
+
+### 2026-04-19 — TASK-504 quotation issuance lifecycle + approval-by-exception
+
+- Las cotizaciones ya no quedan atrapadas en el limbo semántico de `draft/sent/approved`. El lifecycle canónico pasa a `draft -> issued` cuando cumple policy, o `draft -> pending_approval -> issued` cuando requiere excepción.
+- Se crea el comando `issue` (`POST /api/finance/quotes/[id]/issue`) y `/send` queda solo como wrapper de compatibilidad. PDF, email y share dejan de redefinir el estado documental principal.
+- `greenhouse_commercial.quotations` ahora persiste `issued_at`, `issued_by`, `approval_rejected_at` y `approval_rejected_by`; rechazo de aprobación queda explícito como `approval_rejected`, no como retorno silencioso a borrador.
+- Se agrega el evento canónico `commercial.quotation.issued`; `commercial.quotation.sent` sigue publicándose temporalmente como bridge legacy para consumers no migrados.
+- Quote detail, list, governance tabs, quote-to-cash, contract lifecycle, HubSpot status mapping y proyecciones comerciales convergen sobre `issued` como documento oficial.
+
+### 2026-04-19 — Quote Builder persisted pricing hardening
+
+- El Quote Builder deja de guardar líneas auto-valorizadas con `unit_price = 0` cuando el usuario cotiza desde catálogo, personas, tools u overheads. El submit ahora persiste el precio resuelto por el pricing engine v2, no solo el valor manual del draft.
+- Se agrega un guard server-side en `persistQuotationPricing` para rechazar cualquier línea catalog-backed sin precio calculado en vez de dejar cotizaciones corruptas con total y margen en cero.
+- El snapshot comercial sincroniza de nuevo `subtotal`, `total_amount`, `total_amount_clp` y `exchange_rate_to_clp` con `total_price`, reduciendo drift entre el write path canónico y readers legacy que todavía consumen columnas históricas.
+- La lectura canónica de quotes endurece el fallback de `total_amount` para no preferir un `0` stale sobre `total_price` cuando el header quedó desalineado.
+- Se agregan tests de regresión para la serialización del Quote Builder y para la validación de líneas sin precio calculado.
+
+### 2026-04-19 — EPIC-001 Document Vault + Signature Orchestration Platform
+
+- Nace la primera taxonomía `EPIC-###` del repo: `docs/epics/README.md`, `docs/epics/EPIC_TEMPLATE.md` y `docs/epics/EPIC_ID_REGISTRY.md`.
+- Se documenta el contrato operativo de epics en `docs/operations/EPIC_OPERATING_MODEL_V1.md`, incluyendo lifecycle, cuándo usar epics y cómo se conectan con `TASK-###`.
+- Se crea `EPIC-001 — Document Vault + Signature Orchestration Platform` como programa transversal para document registry, versionado, rendering, firma electrónica y gestor documental shared.
+- Quedan reservadas y documentadas las child tasks `TASK-489` a `TASK-495`, que dividen la estrategia en registry/versioning, signature orchestration, adapter ZapSign, UI/access model, rendering/templates, convergencia HR y convergencia Finance/Legal.
+- `TASK-027` y `TASK-461` se reanclan documentalmente a `EPIC-001` para que HR y MSA no evolucionen como soluciones documentales paralelas.
+
+### 2026-04-19 — TASK-488 Design Tokens + UI Governance Hardening
+
+- **Nuevo doc canónico** `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` como fuente de verdad de design tokens Greenhouse. Documenta typography scale (base 13.125px, h1..overline), spacing 4px base, borderRadius tokens {xs=2, sm=4, md=6, lg=8, xl=10}, icon sizes {14/16/18/20/22}, semantic colors reserved for states, interaction cost caps, 12 anti-patterns detectados + 15 reference patterns con paths a `full-version/`.
+- **3 skills robustecidas**: `greenhouse-ux` (user-level) extendida con Canonical Tokens section + pre-spec checklist; nuevo `modern-ui` overlay local `.claude/skills/modern-ui/SKILL.md` con 10 pinned decisions Greenhouse-specific (DM Sans + Poppins, MUI palette no OKLCH, `customBorderRadius.*`, semantic-colors-as-states, `CustomAutocomplete` no `Popover > Select`); nueva `greenhouse-ui-review` `.claude/skills/greenhouse-ui-review/SKILL.md` con 13-section pre-commit gate (blockers/modern-bar/polish severities).
+- **Quote Builder refactor** como primer consumidor de los tokens:
+  - `ContextChip` reescrito con dos modes — `select` default usa `Autocomplete` inline con `autoFocus` + `openOnFocus` + búsqueda (2 clicks verdaderos); `custom` mode preserva API para inputs como duration/date.
+  - Monospace eliminado en todo el Quote Builder → `fontVariantNumeric: 'tabular-nums'`. 19 ocurrencias corregidas.
+  - BorderRadius a tokens `customBorderRadius.lg` (8px) en document card, summary dock, accordion.
+  - Empty state 3 CTAs rebalanceado: 1 primary contained + 2 tonal `color='secondary'` (gris neutro). Eliminados `color='success'` y `color='info'` que creaban efecto carnaval.
+- Verificación: tsc 0 errors · lint clean · build compiled.
+- Impacto global: futuras tareas UI parten con restricciones design-time; las 3 skills se cargan automáticamente según contexto. Reusabilidad: `ContextChip` con search disponible para invoice/PO/contract builders.
+
+### 2026-04-19 — TASK-461 MSA Umbrella Entity & Clause Library
+
+- Nace la lane de **Acuerdos marco** en Finance: `/finance/master-agreements` y `/finance/master-agreements/[id]`, con lista, detalle, cláusulas versionadas, contratos vinculados y metadata legal del MSA.
+- Se crean `greenhouse_commercial.master_agreements`, `clause_library` y `master_agreement_clauses`, además de la FK real `greenhouse_commercial.contracts.msa_id -> master_agreements(msa_id)`. El seed inicial deja 24 cláusulas bilingües sobre 12 códigos legales estándar.
+- `contracts-store` deja de depender solo de `space_id` y pasa a filtrar con scope híbrido `organization_id OR space_id`, alineando los contratos post-venta con el anchor canónico por organización introducido en TASK-486.
+- Nuevo backend: stores `master-agreements-store.ts` + `master-agreement-clauses-store.ts`, eventos `commercial.master_agreement.created|updated|clauses_changed` y `commercial.contract.msa_linked`, APIs `/api/finance/master-agreements/**` y `/api/finance/contracts/[id]/msa`.
+- Asset system extendido con contextos privados `master_agreement_draft` y `master_agreement`. Los contratos pueden adjuntar PDF borrador y persistir el PDF firmado como asset privado canónico.
+- Base de firma electrónica con ZapSign: cliente oficial encapsulado en `src/lib/integrations/zapsign/client.ts`, endpoint `POST /api/finance/master-agreements/[id]/signature-requests` y webhook `POST /api/webhooks/zapsign` que guarda el firmado en Greenhouse. El token operativo validado corresponde a producción, no sandbox.
+
+### 2026-04-19 — TASK-487 Quote Builder Command Bar Redesign (Enterprise Pattern)
+
+- `/finance/quotes/new` y `/finance/quotes/[id]/edit` migran al patrón Command Bar enterprise (Linear/Stripe/Ramp/Pilot). 4 layers verticales apilados — Identity Strip, Context Chips Strip, Document Surface, Floating Summary Dock — reemplazan el Grid 8/4 con sidebar vertical. El documento gana ~33% de ancho disponible (de ~700px a ~1200px en 1440 viewport).
+- Nuevos primitivos reusables (invoice/PO/contract builders futuros): `ContextChip` + `ContextChipStrip` en `src/components/greenhouse/primitives/`. Chip con popover para edicion, 4 estados (empty/filled/invalid/locked), 44px touch target, `aria-haspopup="dialog"`, focus ring 2px, respeta `prefers-reduced-motion`.
+- Nuevos componentes de quote: `QuoteIdentityStrip` (sticky top con logo, Nº Q-XXX, chip de estado, validez, CTAs), `QuoteContextStrip` (8 chips wireados: Organización, Contacto, Business Line, Modelo Comercial, País, Moneda, Duración, Válida hasta), `AddLineSplitButton` (ButtonGroup + Menu que consolida los 4 orígenes de línea), `QuoteSummaryDock` (sticky bottom con `AnimatedCounter` en Total, factor, IVA, chip de addons con Popper, indicador de margen semáforo), `QuoteLineWarning` (Alert inline anclado a la fila que originó el warning via `aria-describedby`).
+- `QuoteLineItemsEditor` pierde las 5 pills de agregar, pierde la sub-row "Contexto de pricing" (FTE/Períodos/EmpType ahora en Popover por fila via `IconButton tabler-adjustments`), gana empty state real via `EmptyState` con 3 CTAs jerárquicas (Catálogo/Servicio/Template), warnings inline por fila. El shell le pasa el `AddLineSplitButton` como slot `headerAction`.
+- `QuoteBuilderShell` pierde el Grid 8/4, gana layout vertical en `Container maxWidth='lg'`, mueve la descripción a un Accordion "Detalle y notas" colapsado por defecto, expone un único CTA "Guardar y cerrar" (elimina la ambigüedad del doble save entre el top bar y el footer del editor).
+- Eliminados: `QuoteSourceSelector.tsx` (reemplazado por `AddLineSplitButton`), `QuotePricingWarningsPanel.tsx` (reemplazado por `QuoteLineWarning` inline). `QuoteBuilderActions.tsx` sigue vivo porque lo consume `QuoteCreateDrawer` (drawer legacy de creación rápida).
+- `GH_PRICING` extendido con 7 bloques: `identityStrip`, `contextChips`, `summaryDock`, `addMenu`, `lineWarning`, `emptyItems`, `adjustPopover`, `detailAccordion`. Todo copy en español tuteo, sin colisiones con keys existentes.
+- API contracts y pricing engine v2 intactos — zero cambio de backend.
+
+### 2026-04-19 — TASK-486 Commercial Quotation Canonical Anchor (Organization + Contact)
+
+- `greenhouse_commercial.quotations` adopta **Organización + Contacto (identity_profile)** como anchor canónico. `space_id` queda deprecated en el write path (columnas preservadas vía COMMENT por compatibilidad con quote-to-cash legacy readers — no drop físico en v1).
+- Migración `20260419144036463_task-486-quotation-canonical-anchor.sql`: nueva columna `contact_identity_profile_id` FK a `identity_profiles(profile_id)`, backfill de `organization_id` desde `client_profiles` + `spaces`, index `idx_commercial_quotations_organization_status` para tenant scoping. `organization_id` queda NULLABLE a nivel DB (enforcement en API); follow-up data remediation cerrará orphans antes de un v2 `SET NOT NULL`.
+- Tenant scoping de quotes refactorizado: nueva función `resolveFinanceQuoteTenantOrganizationIds` reemplaza `SpaceIds` en `listFinanceQuotesFromCanonical`, `getFinanceQuoteDetailFromCanonical`, `listFinanceQuoteLinesFromCanonical` y `pricing-catalog-impact-analysis.loadOpenQuoteRows`. Los 4 `preview-impact` endpoints resuelven ambos (`spaceIds` + `organizationIds`) para compatibilidad con deals/contracts legacy.
+- `POST /api/finance/quotes` exige `organizationId`; valida `contactIdentityProfileId` opcional contra `person_memberships` activa con `membership_type IN ('client_contact','client_user','contact','billing','partner','advisor')`. `PUT /[id]` replica. Nuevo endpoint `GET /api/commercial/organizations/[id]/contacts` devuelve candidatos filtrados + tenant isolation.
+- HubSpot sync simplificado: `resolveSpaceForCompany` → `resolveOrganizationForCompany`. Gate ahora es "company tiene org mapeada" no "tiene space mapeado"; payload de `quote.synced` deja de llevar `spaceId`.
+- Quote Builder UI: label "Espacio destinatario" → "Organización (cliente o prospecto)"; segundo dropdown "Contacto" con fetch async al seleccionar org (ordenado `is_primary DESC`, marcador "Principal"). Payload del save incluye `contactIdentityProfileId`. Detail response del GET canonical expone `organization` + `contact` como objetos.
+- Docs: `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.23; `docs/documentation/finance/cotizador.md` → v3 con regla "A quién se le cotiza" explícita.
+- **Cerrada 2026-04-19** tras 7/7 smoke tests verdes en staging (POST validation, GET contacts real data, GET detail con `organization` + `contact` poblados). Fix intermedio en `resolveFinanceQuoteTenantOrganizationIds` (early-return de `efeonce_internal` al tope antes del self-check de `tenant.organizationId`) pusheado como parte del mismo tren (`48fd0ae6`).
+
+### 2026-04-19 — TASK-477 formaliza role_modeled con snapshots, overhead y worker batch
+
+- `greenhouse_commercial.sellable_role_cost_components` gana provenance y overhead explícitos: `direct_overhead_pct`, `shared_overhead_pct`, `source_kind`, `source_ref`, `confidence_score` y columnas generadas para `confidence_label`, montos de overhead y loaded cost mensual/hora.
+- Nace `greenhouse_commercial.role_modeled_cost_basis_snapshots` como read model por `role_id + employment_type_code + period`, con `snapshot_date`, `source_cost_component_effective_from`, `source_ref`, confidence y detail JSONB.
+- `pricing-engine-v2` mantiene la precedencia `role_blended` sobre `role_modeled`, pero cuando no existe evidencia factual ahora resuelve el lane modelado desde un reader explícito y emite metadata `costBasisSourceRef`, `costBasisSnapshotDate`, `costBasisConfidence*`.
+- `commercial-cost-worker` activa `POST /cost-basis/materialize/roles` y el fallback interno `/api/internal/commercial-cost-basis/materialize` ya acepta `scope='roles'`.
+- `Admin > Pricing Catalog` muestra y permite editar el costo loaded / overhead / provenance del catálogo de roles sin abrir un dominio paralelo.
+
+### 2026-04-19 — fix(quotes): POST /api/finance/quotes now saves
+
+- `POST /api/finance/quotes` devolvía HTTP 500 con body vacío al guardar desde el builder full-page cuando no había `spaceId` explícito.
+- Root cause: reuse del mismo parameter (`$4 = space_id`) como columna VALUES y dentro de `CASE WHEN $4 IS NOT NULL` (space_resolution_source). Postgres no podía inferir tipo cuando `$4` era null untyped → "could not determine data type of parameter $4".
+- Fix canónico: `space_resolution_source` se deriva en JS y viaja como `$24` positional. SQL queda fully typed por column context. Zero cambio semántico.
+- Companion: error handler propio en los dos INSERTs (quotations + line items) con `console.error` estructurado. El 500 ya no puede volver a salir con body vacío.
+- Follow-up arquitectónico abierto como **TASK-486 — Commercial Quotation Canonical Anchor (Organization + Contact)**: deprecar `quotations.space_id`, agregar `contact_identity_profile_id`, renombrar el dropdown del builder. Space no pertenece en la identidad canónica de la quote.
+
+### 2026-04-19 — TASK-479 materializa costo factual por persona + blended por rol
+
+- Nacen `greenhouse_commercial.member_role_cost_basis_snapshots` y `greenhouse_commercial.role_blended_cost_basis_snapshots` para cerrar el gap real entre `member_capacity_economics` y el catálogo comercial `sellable_roles`.
+- `commercial-cost-worker` extiende su scope `people`: ahora no solo refresca la evidencia factual persona-level, sino también el bridge persona -> rol comercial y el snapshot reusable `role_blended` por período.
+- El pricing engine v2 ya distingue `member_actual`, `role_blended`, `role_modeled` y `tool_snapshot`; para líneas por rol prefiere evidencia real `role_blended` antes de caer al costo modelado del catálogo.
+- `GET /api/people/[memberId]/finance-impact` y `person-360/facets/costs` quedan endurecidos contra drift del schema real y consumen el reader compartido en vez de columnas inexistentes de `member_capacity_economics`.
+
+### 2026-04-19 — TASK-484 wires FX provider platform (ready for rollout)
+
+- Plataforma de 9 FX provider adapters (Mindicador, OpenER, Banxico SIE, TRM Colombia, SUNAT Perú, BCRP, Frankfurter, Fawaz Ahmed, CLF from UF indicator) con sync orchestrator registry-driven.
+- USD/CLP sync existente refactoreado a adapter pattern sin cambio de comportamiento — cron 23:05 UTC idéntico.
+- 3 cron routes nuevas (COP 09:00 UTC / PEN 14:00 UTC / MXN 22:00 UTC) que leen `CURRENCY_REGISTRY` y ejecutan primary → fallbacks chain con circuit breaker (3 fallas en 5min → skip 15min).
+- Admin endpoint `POST /api/admin/fx/sync-pair` para trigger manual con dry-run default; `scripts/backfill-fx-rates.ts` CLI para backfills históricos.
+- Coverage flip (`manual_only → auto_synced`) queda para PR separado post-24-48h dry-run; el pricing engine sigue emitiendo `fx_fallback` warnings para CLF/COP/MXN/PEN en producción hasta entonces.
+
+### 2026-04-19 — TASK-478 materializa snapshots comerciales finos por herramienta/proveedor
+
+- Nace `greenhouse_commercial.tool_provider_cost_basis_snapshots` como read model reusable por `tool_id + provider_id + period + tenant_scope_key`, con `source_kind`, `source_ref`, `snapshot_date`, freshness, confidence y metadata FX.
+- `commercial-cost-worker` extiende su scope `tools`: ya no refresca solo `provider_tooling_snapshots`, sino tambien el snapshot fino que consume pricing y supplier detail.
+- El pricing engine v2 ahora intenta resolver el costo de una tool desde el snapshot fino del periodo antes de caer al costo/prorrateo crudo de `greenhouse_ai.tool_catalog`.
+- `GET /api/finance/suppliers/[id]` agrega `providerToolCostBasis` para exponer el detalle fino por provider sin recalcular joins pesados on-read.
+
+### 2026-04-19 — commercial-cost-worker adopta auto-deploy WIF
+
+- Se agrega `.github/workflows/commercial-cost-worker-deploy.yml` para desplegar el worker dedicado de cost basis a Cloud Run usando el baseline GitHub Actions -> WIF -> `github-actions-deployer`, sin llaves estáticas nuevas.
+- El workflow observa no solo `services/commercial-cost-worker/**`, sino también las librerías compartidas que cambian el runtime efectivo del worker (`commercial-cost-worker`, `commercial-cost-attribution`, `providers`, `db`, `structured-context`, `sync`, `src/types/db.d.ts`, lockfile y `tsconfig`), reduciendo drift entre monorepo y Cloud Run.
+- `services/commercial-cost-worker/deploy.sh` ahora deja visible la `latestReadyRevisionName` y el estado `ready` después del deploy, y documenta explícitamente la topología / capacidad conservadora del worker.
+
+### 2026-04-19 — TASK-483 cierra con smoke real del commercial-cost-worker
+
+- `commercial-cost-worker` queda validado como runtime base del programa `Commercial Cost Basis`: Cloud Run desplegado en `us-east4`, scheduler `commercial-cost-materialize-daily` habilitado y smoke real exitoso sobre la revisión `commercial-cost-worker-00002-9xj`.
+- La primera corrida detectó una ambigüedad SQL real en la materialización `bundle`; el fix endurece `src/lib/commercial-cost-attribution/member-period-attribution.ts` con alias explícito y agrega test de regresión para blindar futuros joins sobre `client_labor_cost_allocation`.
+- `TASK-476` a `TASK-482` quedan actualizadas para consumir este runtime foundation existente y no reabrir el debate de topología ni desviar batch work hacia `ops-worker`.
+
+### 2026-04-19 — TASK-483 crea el commercial-cost-worker y el ledger de cost basis
+
+- Nace `services/commercial-cost-worker/` como runtime Cloud Run dedicado para la base de costos comercial. Expone `POST /cost-basis/materialize`, `/people`, `/tools` y `/bundle`, y reserva `/roles`, `/quotes/reprice-bulk` y `/margin-feedback/materialize` para las siguientes tasks del programa.
+- Se agrega la migración `20260419120945432_task-483-commercial-cost-worker-foundation.sql` con `greenhouse_commercial.commercial_cost_basis_snapshots`, un ledger/manifiesto por `scope + period + run` que enlaza cada corrida con `greenhouse_sync.source_sync_runs`.
+- `src/lib/commercial-cost-worker/materialize.ts` orquesta `member_capacity_economics`, `provider_tooling_snapshots`, `commercial_cost_attribution` y `client_economics` sin recalcular métricas ICO inline, y publica eventos coarse-grained por periodo para `people`, `tools` y `bundle`.
+- Se agrega el fallback admin `POST /api/internal/commercial-cost-basis/materialize`, bloqueado por defecto para evitar que Vercel se use como ruta primaria de cómputo pesado.
+- `ops-worker` deja de ser la topología objetivo para la expansión del programa de cost basis: mantiene `POST /cost-attribution/materialize` como lane existente/fallback, mientras el resto del runtime comercial pesado se separa al worker nuevo.
+
+### 2026-04-19 — TASK-475 formaliza la foundation FX + currency por dominio
+
+- Se crea una matriz canónica de monedas por dominio (`finance_core`, `pricing_output`, `reporting`, `analytics`) + FX policy enum + readiness contract. Toda la lógica vive en `src/lib/finance/currency-domain.ts` y `currency-registry.ts`, con un único resolver `resolveFxReadiness` que consumers (engine, APIs, UI futura) deben usar en vez de resolver tasas inline.
+- `finance_core` mantiene `['CLP', 'USD']` (no se expande). `pricing_output` soporta `['USD', 'CLP', 'CLF', 'COP', 'MXN', 'PEN']`. `reporting` y `analytics` quedan `['CLP']` por contrato. Agregar una moneda nueva requiere 3 edits en archivos declarativos — no hay hardcodes dispersos que tocar.
+- El pricing engine v2 ahora consulta readiness antes de cotizar en una moneda no-USD y emite `fx_fallback` structured warning con severidad calibrada (`critical` si la tasa no está disponible, `warning` si está stale, `info` si se compuso vía USD). El `QuotePricingWarningsPanel` del builder lo renderiza automáticamente.
+- Las monedas `CLF/COP/MXN/PEN` quedan declaradas como `manual_only` en el currency registry: operadores pueden upsertar tasas manuales, pero el pricing engine avisa al AE que el pair no tiene sync automático. Cuando el negocio requiera, agregar un provider es un cambio contenido.
+- Nuevo endpoint `GET /api/finance/exchange-rates/readiness?from=X&to=Y&domain=pricing_output` para que cualquier consumer (backend o UI) pregunte cobertura sin duplicar lógica. Cache private 60s.
+- TASK-466 reanclada: consume este readiness gate + `CLIENT_FACING_STALENESS_THRESHOLD_DAYS` antes de permitir el envío client-facing, snapshot a `quotations.exchange_rates` en el momento del send.
+
+### 2026-04-19 — TASK-473 migra el quote builder a superficies full-page
+
+- El CTA "Nueva cotización" deja de abrir un drawer sobredenso y ahora navega a `/finance/quotes/new`, una surface full-page dedicada con layout de 2 columnas (composición + rail comercial sticky).
+- Aparece `/finance/quotes/[id]/edit` como entrada canónica para edición estructural (misma shell, precarga quote + lines). Si el estado no es `draft` o el viewer no puede editar, redirige a `/finance/quotes/[id]?denied=edit`. El botón "Editar" en el header del detail abre esta surface.
+- El nuevo `QuoteSourceSelector` hace first-class las 4 fuentes de composición — **Catálogo** / **Servicio** / **Template** / **Manual** — reemplazando el patrón manual-first del drawer legacy. El flujo de **Servicio** dispara `POST /api/finance/quotes/from-service` (TASK-465) y expande a N líneas editables con trazabilidad de origen.
+- Cada línea del cotizador ahora muestra un chip outlined con su origen (`Catálogo`, `Servicio`, `Template`, `Manual`). `QuoteLineItem` gana `source`, `serviceSku` y metadata extendida; `mapSelectionToLine` etiqueta automáticamente según tab del picker.
+- `QuoteDetailView` queda consolidado como review/governance/lifecycle: overview + health + versiones + aprobaciones + términos + document chain + audit + PDF + send. La edición estructural vive exclusivamente en `/edit`.
+- `QuoteCreateDrawer` sigue existiendo como archivo para sub-flujos acotados futuros, pero ya no se monta en `QuotesListView`.
+
+### 2026-04-19 — TASK-465 canonicaliza el catálogo de servicios compuestos (EFG-XXX)
+
+- Los servicios vendibles ahora se extienden sobre la identidad canónica `greenhouse_core.service_modules` (no se crea un `service_catalog` paralelo): la capa comercial vive en `greenhouse_commercial.service_pricing` con PK = `module_id` 1:1 al modulo y `service_sku` (`EFG-XXX`) autogenerado vía sequence + `generate_service_sku()` — admin puede dar de alta EFG-008+ sin migración.
+- Los recipes `service_role_recipe` + `service_tool_recipe` quedan anclados al `module_id` canónico y apuntan a `sellable_roles.role_id` / `ai.tool_catalog.tool_id`. `quotation_line_items` gana `module_id` (FK robusto a renames), `service_sku` (denormalizado para display) y `service_line_order` (preserva orden del recipe para diffs histórico-vs-actual).
+- `POST /api/finance/quotes/from-service` expande un servicio al formato `PricingEngineInputV2` y delega en el engine v2 (sin duplicar lógica de costeo). Soporta overrides por `lineOrder` (hours / quantity / excluded) y `commercialModelOverride`. Devuelve lines + totals multi-currency.
+- Admin UI en `/admin/pricing-catalog/services`: lista filtrable (tier / categoría / BL / estado), drawers de crear/editar con recipe editor que reusa `/api/finance/quotes/pricing/lookup?type=role|tool`, keyboard-only reorder (WCAG 2.5.7), sección "Simular precio". `canAdministerPricingCatalog` gate + `If-Match` optimistic locking + audit log (`service_catalog` entity + `created`/`updated`/`deactivated`/`reactivated`/`recipe_updated`/`deleted` actions).
+- El tab "Servicios" de `SellableItemPickerDrawer` se activa contra el lookup real y queda como subflujo reusable; la integración primaria en el quote builder aterriza sobre TASK-473 (builder full-page) — esta task no profundiza `QuoteCreateDrawer`.
+- Seeder `pnpm seed:service-catalog --apply` resuelve roles/tools por label, UPSERT idempotente en `service_modules` + `service_pricing` + recipes. Seedea los 7 EFG activos (EFG-001..007); placeholders EFG-008..048 se skip.
+
+### 2026-04-19 — TASK-470 endurece Pricing Catalog para operación enterprise
+
+- `Admin > Pricing Catalog` deja de depender de last-write-wins silencioso: los handlers mutables ya soportan optimistic locking con `If-Match`, `ETag` y `409 Conflict` cuando el recurso cambió desde la última lectura.
+- Nace `pricing-catalog-constraints.ts` como validator central para reglas de negocio de catálogo (márgenes monotónicos, factores país monotónicos, rangos de FTE/horas, multiplicadores y montos no negativos) y las routes devuelven `422 { issues[] }` cuando el cambio rompe el contrato.
+- Aparece el dry-run `preview-impact` para roles, tools, overheads y governance (`role_tier_margin`, `commercial_model_multiplier`, `country_pricing_factor`) con conteo de quotes afectadas, monto CLP y pipeline impactado, siempre tenant-scoped por `space_id`.
+- Se agrega la lane de overcommit comercial: `detectMemberOvercommit()` / `detectAllOvercommits()` cruza commitments billables de `quotation_line_items` con `member_capacity_economics.contracted_hours` y publica `commercial.capacity.overcommit_detected` al outbox cuando un miembro queda sobre-vendido.
+
+### 2026-04-19 — TASK-460 introduce Contracts como anchor canónico post-venta
+
+- Nace `greenhouse_commercial.contracts` como entidad operativa separada de quotation, con identificador visible `EO-CTR-*`, lifecycle propio y tabla join `contract_quotes` para convivir con múltiples quotes históricas bajo un mismo contrato lógico.
+- El document chain deja de depender solo de `quotation_id`: `purchase_orders`, `service_entry_sheets` e `income` ahora materializan también `contract_id`, y el reader nuevo `readContractDocumentChain({ contractId })` agrega toda la cadena del contrato.
+- La lane de rentabilidad y renovaciones ya tiene grain contractual: `greenhouse_serving.contract_profitability_snapshots`, `greenhouse_commercial.contract_renewal_reminders` y eventos `commercial.contract.*`.
+- Aparecen APIs tenant-safe `/api/finance/contracts/**` y la surface inicial `/finance/contracts`, con overview, quotes relacionadas, document chain y rentabilidad del contrato.
+- La convivencia queda explícita: quotation sigue siendo el artefacto pre-venta; contract pasa a ser el anchor post-aceptación para execution, renewal y futuras métricas de MRR/ARR.
+
+### 2026-04-19 — TASK-459 separa el delivery model de quotation en dos ejes persistidos
+
+- `greenhouse_commercial.quotations` ahora materializa `commercial_model` y `staffing_model`, dejando `pricing_model` como alias legacy derivado para compatibility con governance/templates/terms.
+- `GET /api/finance/quotes` y `GET /api/finance/quotes/[id]` ya exponen `pricingModel`, `commercialModel` y `staffingModel`.
+- `sales_context_at_sent` preserva esos tres campos al primer `sent`, evitando perder el contexto comercial histórico de la quote.
+- `greenhouse_serving.quotation_pipeline_snapshots`, `quotation_profitability_snapshots` y `deal_pipeline_snapshots` quedaron extendidas para surfacing downstream del split sin recalcularlo inline.
+- La semántica quedó explícita: este `commercial_model` describe el contrato comercial del quote y NO reutiliza el `CommercialModelCode` del pricing engine v2.
+
+### 2026-04-19 — TASK-456 materializa el pipeline comercial correcto a grain deal
+
+- Nace `greenhouse_serving.deal_pipeline_snapshots` como projection canónica para forecasting comercial: una fila por deal no borrado, sin duplicar oportunidades por cantidad de quotes.
+- El materializer nuevo `src/lib/commercial-intelligence/deal-pipeline-materializer.ts` resuelve `is_open` / `is_won` desde `greenhouse_commercial.hubspot_deal_pipeline_config`, persiste la `probability_pct` real del deal y agrega rollup de quotes (`latest_quote_id`, `quote_count`, `approved_quote_count`, `total_quotes_amount_clp`).
+- La projection reactiva `deal_pipeline` queda registrada en domain `cost_intelligence` y se refresca tanto por eventos de deal como por eventos de quotation, incluso cuando el evento solo trae `quotationId`.
+- Nuevo reader/API `GET /api/finance/commercial-intelligence/deal-pipeline` expone lectura tenant-safe con filtros por cliente, organización, etapa y estado, lista para TASK-457.
+
+## 2026-04-18
+
+### 2026-04-18 — TASK-455 captura snapshot histórico del contexto comercial al enviar cotizaciones
+
+- `greenhouse_commercial.quotations` agrega `sales_context_at_sent` como JSONB histórico e inmutable para guardar el contexto comercial local al primer `sent`.
+- El snapshot reutiliza `greenhouse_core.clients.lifecyclestage` y `greenhouse_commercial.deals.dealstage`; no hace lecturas live a HubSpot en el hot path.
+- La captura ya cubre ambos caminos reales a `sent`: envío directo (`POST /api/finance/quotes/[id]/send`) y cierre del flujo de aprobación (`POST /api/finance/quotes/[id]/approve`).
+- `GET /api/finance/quotes/[id]` ahora devuelve `salesContextAtSent` para detalle y consumers analíticos.
+- El contrato queda explícito: este snapshot sirve para trazabilidad histórica y reporting, no para reemplazar la clasificación viva del pipeline híbrido.
+
+### 2026-04-18 — TASK-454 materializa lifecyclestage HubSpot como bridge runtime client-scoped
+
+- `greenhouse_core.clients` agrega `lifecyclestage`, `lifecyclestage_source` y `lifecyclestage_updated_at` como bridge de compatibilidad para consumers legacy que siguen leyendo por `client_id`.
+- Nuevo sync inbound `src/lib/hubspot/sync-hubspot-company-lifecycle.ts` recorre `organizations.hubspot_company_id`, deriva `space_id`/`client_id`, lee `lifecyclestage` desde HubSpot y respeta `manual_override`.
+- Nuevo cron `GET /api/cron/hubspot-company-lifecycle-sync` cada 6 horas.
+- El outbox incorpora `crm.company.lifecyclestage_changed` bajo aggregate `crm_company`, sin consumer reactivo en este corte.
+- `getClientLifecycleStage(clientId)` expone lectura runtime simple para Finance y próximas tasks del pipeline híbrido.
+
+### 2026-04-18 — TASK-464c: foundation canónica de tools comerciales y overhead addons
+
+- `greenhouse_ai.tool_catalog` se extiende sin romper AI tooling: ahora soporta `tool_sku`, prorrateo, business lines/tags de aplicabilidad, `includes_in_addon` y `notes_for_quoting`.
+- Nace `greenhouse_commercial.overhead_addons` con 9 addons canonizados (`EFO-001..009`) para fees/markups/ajustes que no son tools individuales.
+- Nuevos stores backend `tool-catalog-store.ts` y `overhead-addons-store.ts`, más `tool-catalog-events.ts` para publicar `ai_tool.created/updated` y refrescar costos de licencias cuando cambia el pricing del catálogo.
+- Seeders nuevos `scripts/seed-tool-catalog.ts` y `scripts/seed-overhead-addons.ts` consumen los CSVs pricing de Efeonce y quedaron verificados como idempotentes.
+- Se corrige un gap de permisos en secuencias (`tool_sku_seq`, `overhead_addon_sku_seq`) con migración adicional de grants para que los reseeds runtime puedan resincronizar secuencias sin fallar.
+
+### 2026-04-18 — TASK-337 materializa la capa runtime persona ↔ entidad legal
+
+- Se crea `greenhouse_core.person_legal_entity_relationships` como foundation explícita para modelar vínculos `identity_profile ↔ legal entity`, sin colgar esa semántica de `user`, `member`, `space` ni `organization_type`.
+- El runtime v1 reutiliza `greenhouse_core.organizations` como ancla jurídica mediante `legal_entity_organization_id`, dejando documentado el boundary semántico en vez de seguir tratándolo como alias implícito de `organization`.
+- Nuevo helper canónico `src/lib/account-360/person-legal-entity-relationships.ts` con readers tenant-aware y sync reactivo del vínculo `employee` contra el operating entity.
+- Nueva proyección `operating_entity_legal_relationship` y eventos outbox `person_legal_entity_relationship.created|updated|deactivated`.
+- Nuevo endpoint `GET /api/people/[memberId]/legal-entity-relationships` para exponer la relación legal dentro del lane `People`.
+- Backfill inicial deliberadamente conservador: `employee` para miembros activos del operating entity y `shareholder_current_account_holder` para perfiles con `shareholder_accounts`.
+
 ## 2026-04-17
 
 ### 2026-04-17 — Quotation workspace: builder canónico, health card y PDF client-safe (TASK-349)
@@ -5711,6 +5948,12 @@
 - La validación funcional quedó cubierta con `dryRun` real para `Marzo 2026`, resolviendo el target page existente sin sobrescribir el contenido histórico durante la verificación.
 
 # Changelog
+
+## 2026-04-19
+
+- Finance / Quote Builder: el guardado de cotizaciones ya no mezcla precio del pricing engine v2 con costo recalculado por el resolver legacy. Las líneas auto-valorizadas ahora persisten también su costo resuelto del engine v2, por lo que el detail view mantiene `total`, `cost` y `margin` coherentes después de guardar.
+- Finance / Quote edit: al reabrir una cotización el builder ahora rehidrata `businessLineCode` desde la quote canónica y re-simula usando la `quoteDate` original en vez de la fecha actual, reduciendo drift silencioso en pricing.
+- Finance API: los intentos de guardar líneas catalog-backed sin pricing resuelto ya no revientan como `500` vacío; las rutas de quotes devuelven error JSON `422` con mensaje explícito para create/edit/autosave.
 
 ## 2026-04-13
 

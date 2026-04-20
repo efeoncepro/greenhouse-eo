@@ -11,6 +11,7 @@ import { icoOrganizationProjection } from './ico-organization-metrics'
 import { organizationOperationalProjection } from './organization-operational'
 import { memberCapacityEconomicsProjection } from './member-capacity-economics'
 import { assignmentMembershipSyncProjection } from './assignment-membership-sync'
+import { operatingEntityLegalRelationshipProjection } from './operating-entity-legal-relationship'
 import { operatingEntityMembershipProjection } from './operating-entity-membership'
 import { projectedPayrollProjection } from './projected-payroll'
 import { leavePayrollRecalculationProjection } from './leave-payroll-recalculation'
@@ -30,6 +31,9 @@ import { accountBalancesProjection } from './account-balances'
 import { serviceSlaComplianceProjection } from './service-sla-compliance'
 import { quotationPipelineProjection } from './quotation-pipeline'
 import { quotationProfitabilityProjection } from './quotation-profitability'
+import { quotationHubSpotOutboundProjection } from './quotation-hubspot-outbound'
+import { dealPipelineProjection } from './deal-pipeline'
+import { contractMrrArrProjection } from './contract-mrr-arr'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -51,6 +55,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(organizationOperationalProjection)
   registerProjection(memberCapacityEconomicsProjection)
   registerProjection(assignmentMembershipSyncProjection)
+  registerProjection(operatingEntityLegalRelationshipProjection)
   registerProjection(operatingEntityMembershipProjection)
   registerProjection(projectedPayrollProjection)
   registerProjection(leavePayrollRecalculationProjection)
@@ -70,4 +75,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(serviceSlaComplianceProjection)
   registerProjection(quotationPipelineProjection)
   registerProjection(quotationProfitabilityProjection)
+  registerProjection(quotationHubSpotOutboundProjection)
+  registerProjection(dealPipelineProjection)
+  registerProjection(contractMrrArrProjection)
 }

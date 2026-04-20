@@ -1,10 +1,37 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
-> **Version:** 1.5
-> **Last updated:** 2026-04-16
+> **Version:** 1.6
+> **Last updated:** 2026-04-19
 > **Audience:** Platform engineers, DevOps, on-call operators
 
 ---
+
+## Delta 2026-04-19 — commercial-cost-worker adopta pipeline WIF via GitHub Actions
+
+- El runtime `commercial-cost-worker` ya no debe depender de deploy manual como condición normal de operación.
+- Runtime/CD actualizado:
+  - workflow `.github/workflows/commercial-cost-worker-deploy.yml`
+  - autenticación GitHub Actions -> GCP via el mismo pool/provider WIF canónico del repo
+  - impersonación del mismo deployer SA `github-actions-deployer@efeonce-group.iam.gserviceaccount.com`
+  - verificación post-deploy via `gcloud run services describe`
+- Regla operativa:
+  - no crear un deployer SA nuevo para este worker
+  - el path trigger debe cubrir tanto `services/commercial-cost-worker/**` como librerías compartidas que alteran su runtime (`commercial-cost-worker`, `commercial-cost-attribution`, `providers`, `db`, `structured-context`, `sync`, `src/types/db.d.ts`, lockfile / tsconfig)
+  - producción sigue gateada por GitHub Environment `production`; `develop` despliega a `staging`
+
+## Delta 2026-04-19 — TASK-483 separa el commercial cost basis engine en Cloud Run dedicado
+
+- Greenhouse ya no debe seguir creciendo el `ops-worker` como runtime catch-all para costeo comercial.
+- Runtime nuevo:
+  - servicio dedicado `commercial-cost-worker` en `us-east4`
+  - source `services/commercial-cost-worker/`
+  - Dockerfile con el mismo patron esbuild + shims ESM/CJS usado por `ops-worker`
+  - scheduler diario `commercial-cost-materialize-daily` -> `POST /cost-basis/materialize`
+- Contrato operativo:
+  - `ops-worker` sigue materializando `commercial_cost_attribution` como fallback/manual lane existente
+  - `commercial-cost-worker` pasa a ser la topologia objetivo para la base de costos comercial (people + tools + bundle)
+  - `roles`, `quote repricing` y `margin feedback` quedan reservados en el worker como endpoints `501` hasta las tasks del programa que los completen
+  - el worker persiste trazabilidad por corrida en `greenhouse_sync.source_sync_runs` (`source_system='commercial_cost_worker'`) y por periodo/scope en `greenhouse_commercial.commercial_cost_basis_snapshots`
 
 ## Delta 2026-04-16 — CI/CD pipeline for ops-worker via GitHub Actions + WIF
 
@@ -636,6 +663,30 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 
 **Health check:** The deploy script uses `gcloud run services proxy` on a local port (does not require SA impersonation) instead of `gcloud auth print-identity-token --audiences=` which requires additional IAM permissions.
 
+#### 10. commercial-cost-worker (us-east4)
+
+> Delta 2026-04-19 via TASK-483: foundation dedicada para materializacion de cost basis comercial y futura reprice/feedback lane.
+
+| Property      | Value                                                                                                                                                      |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type          | Custom Cloud Run service                                                                                                                                   |
+| Runtime       | Node.js 22 (esbuild bundle)                                                                                                                                |
+| Region        | `us-east4` (co-located with Cloud SQL)                                                                                                                     |
+| Memory        | 2 GiB                                                                                                                                                      |
+| CPU           | 2                                                                                                                                                          |
+| Timeout       | 900 s (15 min)                                                                                                                                            |
+| Max instances | 2                                                                                                                                                          |
+| Concurrency   | 1                                                                                                                                                          |
+| Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                                         |
+| Source        | `services/commercial-cost-worker/` (monorepo, reuses `src/lib/`)                                                                                          |
+| Purpose       | Materialize la base de costos comercial por periodo y scope (`people`, `tools`, `bundle`) fuera de Vercel. Reserva endpoints para `roles`, `reprice` y `margin feedback`. |
+| Endpoints     | `GET /health`, `POST /cost-basis/materialize`, `POST /cost-basis/materialize/people`, `POST /cost-basis/materialize/tools`, `POST /cost-basis/materialize/bundle` |
+| Reserved      | `POST /cost-basis/materialize/roles`, `POST /quotes/reprice-bulk`, `POST /margin-feedback/materialize`                                                   |
+| SA            | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`                                                                                                  |
+| Image         | `gcr.io/efeonce-group/commercial-cost-worker`                                                                                                              |
+| Tracking      | `greenhouse_sync.source_sync_runs` + `greenhouse_commercial.commercial_cost_basis_snapshots`                                                              |
+| TASK          | TASK-483                                                                                                                                                   |
+
 ### Staging Services
 
 | #   | Service                               | Mirrors                       |
@@ -668,6 +719,7 @@ Staging services share the same configuration as their production counterparts b
 | `ops-reactive-cost-intelligence`| `*/10 * * * *` (every 10 min)                        | `ops-worker` (us-east4)       | America/Santiago |
 | `ops-reactive-recover`          | `*/15 * * * *` (every 15 min)                        | `ops-worker` (us-east4)       | America/Santiago |
 | `ops-nexa-weekly-digest`        | `0 7 * * 1` (lunes 7:00 AM)                          | `ops-worker` (us-east4)       | America/Santiago |
+| `commercial-cost-materialize-daily` | `0 5 * * *` (daily at 5:00 AM)                   | `commercial-cost-worker` (us-east4) | America/Santiago |
 
 The 7-minute offset on `notion-hubspot-reverse-poll` prevents overlap with the forward sync job, reducing contention on shared Notion API rate limits.
 
@@ -905,7 +957,7 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 
 ### 11.1 Overview
 
-Los deploys de servicios Cloud Run (actualmente `ops-worker`, extensible a futuros servicios) se automatizan via GitHub Actions con autenticacion **Workload Identity Federation (WIF)** — sin llaves de service account persistentes en ningun sistema.
+Los deploys de servicios Cloud Run (actualmente `ops-worker`, `ico-batch-worker` y `commercial-cost-worker`) se automatizan via GitHub Actions con autenticacion **Workload Identity Federation (WIF)** — sin llaves de service account persistentes en ningun sistema.
 
 ```
 Push a develop/main (paths match)
@@ -1024,6 +1076,37 @@ on:
 - Manual dispatch → environment seleccionado
 
 **Concurrency:** `ops-worker-deploy-${{ github.ref }}` — un deploy a la vez por branch.
+
+### 11.5b Workflow: commercial-cost-worker-deploy.yml
+
+**Triggers principales:**
+
+```yaml
+on:
+  push:
+    branches: [develop, main]
+    paths:
+      - '.github/workflows/commercial-cost-worker-deploy.yml'
+      - 'services/commercial-cost-worker/**'
+      - 'src/lib/commercial-cost-worker/**'
+      - 'src/lib/commercial-cost-attribution/**'
+      - 'src/lib/providers/**'
+      - 'src/lib/db/**'
+      - 'src/lib/structured-context/**'
+      - 'src/lib/finance/postgres-store-intelligence.ts'
+      - 'src/lib/finance/reporting.ts'
+      - 'src/lib/sync/event-catalog.ts'
+      - 'src/lib/sync/publish-event.ts'
+      - 'src/lib/sync/projections/member-capacity-economics.ts'
+      - 'src/types/db.d.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
+```
+
+**Criterio operativo:** el trigger cubre no solo el servicio, sino el set mínimo de librerías compartidas que cambian su runtime real. Esto evita drift entre el monorepo y el worker cuando cambian `db`, publishing de eventos, tracking de corridas o materializadores reutilizados.
+
+**Concurrency:** `commercial-cost-worker-deploy-${{ github.ref }}` — un deploy a la vez por branch.
 
 ### 11.6 Cloud Build — async submit + polling
 

@@ -25,6 +25,10 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 - [Cotizaciones multi-source](finance/cotizaciones-multi-source.md) — cotizaciones de Nubox y HubSpot unificadas, sync automatico, creacion outbound, mapeo de estados
 - [Cotizaciones — Gobernanza, versiones, aprobaciones y templates](finance/cotizaciones-gobernanza.md) — runtime de gobernanza interna: versiones con diff, approval por excepción conectado al margin health, terms library con variables, templates reutilizables y audit inmutable
+- [Contratos comerciales](finance/contratos-comerciales.md) — contratos/SOW como entidad canónica post-venta: relación con quotes, document chain, rentabilidad, renovaciones y lane `/finance/contracts`
+- [Pricing Comercial — Catálogo, Motor y Builder de Cotizaciones](finance/pricing-comercial.md) — **programa en diseño** (TASK-463..468): catálogo canónico de roles/tools/overhead/services, engine v2 multi-moneda con tier compliance, builder con cost stack gated, admin self-service y aislamiento payroll
+- [Cotizador — Builder full-page de cotizaciones](finance/cotizador.md) — pantalla canónica `/finance/quotes/new` y `/edit` con source selector (catálogo / servicio / template / manual), provenance chips, avisos del pricing engine, FX readiness y override de precio unitario
+- [Monedas y Tipos de Cambio — Foundation Plataforma](finance/monedas-y-tipos-de-cambio.md) — matriz canónica de monedas por dominio, política FX por dominio, readiness contract (supported/stale/unsupported/unavailable), registro declarativo de monedas y runbook operativo
 - [HES — Recepción y validación de servicio](finance/hes-recepcion-y-validacion.md) — hoja de entrada de servicio como respaldo recibido del cliente, estados visibles y herencia documental desde la OC
 - [Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), tesoreria por instrumento, cuenta corriente accionista y diferencia devengado vs caja
 
@@ -43,6 +47,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 - [Account Complete 360](agency/cuenta-completa-360.md) — datos completos de una cuenta u organizacion: facetas, autorizacion, endpoint unificado
 - [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
+- [Commercial Cost Worker](operations/commercial-cost-worker.md) — worker Cloud Run dedicado para la base de costos comercial, su ledger de corridas por periodo/scope y la separacion respecto de `ops-worker`
 - [Acceso Programatico a Staging](operations/acceso-programatico-staging.md) — como agentes y CI acceden a Staging, bypass de SSO, comando `staging:request`, troubleshooting
 
 ### Delivery

@@ -208,7 +208,7 @@ Regla simple:
 
 - fetch siempre antes de iniciar una sesión larga
 - rebase o merge desde la rama base correcta dentro del worktree correcto
-- nunca usar el checkout del otro agente para “ponerse al día”
+- nunca usar el checkout del otro agente para "ponerse al día"
 
 Ejemplo:
 
@@ -218,6 +218,47 @@ git rebase origin/develop
 ```
 
 Si la rama está basada en `main`, usar `origin/main`.
+
+### Layout canónico de worktrees
+
+| Worktree | Propósito | Rama |
+|---|---|---|
+| `greenhouse-eo/` (primary) | **Home base del operador humano.** Vive en `develop`. Entre tasks queda ahí; cuando arranca una task nueva se checkoutea `task/TASK-xxx-*` desde aquí; al cerrar la task vuelve a `develop` | `develop` (default) o `task/TASK-xxx-*` en curso |
+| `greenhouse-eo-codex*/` | Worktrees dedicadas del agente Codex para trabajo paralelo | `task/TASK-xxx-*` |
+| `greenhouse-eo-<task>/` | Worktrees temporales para tasks específicas cuando se necesita aislamiento | `task/TASK-xxx-*` |
+
+Regla dura: **`develop` vive en el primary worktree**. No crear una worktree dedicada `-develop/` paralela — eso secuestra la rama del operador y fuerza al primary a detached HEAD.
+
+### Script de sincronización
+
+Para mantener todas las worktrees al día sin ir carpeta por carpeta:
+
+```bash
+# Status de todas las worktrees (ahead/behind/dirty, no toca refs)
+pnpm worktrees:status
+
+# Sync agresivo — intenta ff-merge en TODAS las worktrees con upstream
+pnpm worktrees:sync-all
+
+# Sync de una worktree específica
+bash scripts/worktree-sync.sh --path ../greenhouse-eo-codex
+```
+
+El script (`scripts/worktree-sync.sh`) es estricto: solo aplica `git merge --ff-only`, nunca fuerza nada, salta worktrees dirty, respeta detached HEADs. Seguro para correr en paralelo con sesiones activas de otros agentes. El modo `default` (`pnpm worktrees:sync`) quedó histórico de cuando existía el mirror `-develop/` — usa `--all` o `--path` según el caso.
+
+### Doc-only commits van directo a develop
+
+Para cambios que no tocan código runtime (specs de task, `Handoff.md`, `docs/**`, `CLAUDE.md`, `AGENTS.md`):
+
+```bash
+# Primary está en develop — estás listo para commit directo
+git pull origin develop                        # asegura estar al día
+git add <file>
+git commit -m "docs(...): ..."
+git push origin develop
+```
+
+Para cambios que tocan código (`src/`, `scripts/`, `migrations/`, `services/`): **siempre** branch + PR + squash merge desde una task branch, nunca direct a develop. La preferencia doc-only-direct no es licencia para saltarse review de código.
 
 ## Reglas de convivencia
 
@@ -233,16 +274,38 @@ Dos agentes en la misma rama crean confusión operacional aunque estén en carpe
 
 Cada worktree debe commitear solo sus archivos.
 
-### 4. No correr limpieza destructiva mientras otro agente sigue trabajando
+### 4. Eliminar tu propio worktree al cerrar una task (obligatorio)
+
+Cuando cierras una task (PR merged a develop), **tú mismo debes eliminar el worktree dedicado que usaste**. Si dejas el worktree vivo con `develop` checkeado, bloqueas al primary del operador humano para hacer `git checkout develop`.
+
+Observado repetidamente 2026-04-19: Codex cerró TASK-455, TASK-456 via PR merge pero dejó sus worktrees (`greenhouse-eo-task-455/`, `greenhouse-eo-task-456/`) con `develop` locked. El operador no pudo volver a develop en su primary sin cleanup manual del otro agente.
+
+Protocolo de cierre del owner del worktree:
+
+```bash
+# Dentro de tu worktree, antes de salir:
+git checkout develop     # puede fallar si otro ya tiene develop
+# Si falla, checkout detached o a otra branch no disputada
+cd /Users/jreye/Documents/greenhouse-eo-primary   # o donde sea
+git worktree remove ../greenhouse-eo-<task-slug>
+```
+
+Excepciones explícitas:
+- Si vas a seguir trabajando la misma task (no cerrada todavía), el worktree queda vivo en su task branch — no en develop
+- Si tu worktree quedó en detached HEAD o en una branch no-`develop`, no bloquea a nadie — puedes dejarlo para la próxima sesión
+
+Regla dura: **ningún agente deja `develop` checkeado en su worktree dedicado al cerrar una task**.
+
+### 5. No correr limpieza destructiva mientras otro agente sigue trabajando
 
 Evitar durante sesiones activas de otros agentes:
 
-- `git worktree remove` sobre carpetas ajenas
+- `git worktree remove` sobre carpetas ajenas (excepto worktrees huérfanos documentados en regla #4)
 - `git branch -D` de ramas en uso
 - `git worktree prune` sin saber qué worktrees siguen vivos
 - `git gc` manual como “mantenimiento”
 
-### 5. Resolver integración después, no durante
+### 6. Resolver integración después, no durante
 
 Los worktrees aíslan el trabajo, no eliminan conflictos lógicos.
 
@@ -264,11 +327,14 @@ Antes de cerrar una sesión en un worktree:
    - validación ejecutada
    - riesgos abiertos
 
-Si el worktree queda listo para cerrar:
+Si el worktree queda listo para cerrar (task merged a develop):
 
 1. verificar que no haya cambios sin commitear
-2. remover el worktree
-3. borrar la rama local solo si ya no hace falta
+2. **obligatorio**: hacer `git checkout` a algo que NO sea `develop` (detached HEAD o otra branch) para no bloquear al operador humano
+3. remover el worktree (`git worktree remove ../<carpeta>`)
+4. borrar la rama local solo si ya no hace falta
+
+No dejar el worktree dedicado con `develop` checkeado — es la causa documentada de que el primary no pueda volver a develop sin cleanup manual del otro agente (ver regla #4).
 
 ## Rollback y reversibilidad
 

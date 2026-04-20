@@ -2,6 +2,12 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-04-19
+
+- `TASK-470` agrega el aggregate type `commercial_capacity` y el evento `commercial.capacity.overcommit_detected`.
+- El payload canónico incluye `member_id`, `as_of_date`, período, `contracted_hours`, `commercial_availability_hours`, `commitment_hours`, `overcommit_hours`, `commitment_count` y el breakdown de commitments que causan el exceso.
+- El evento nace para observabilidad/reactividad downstream; en este corte no se registra como trigger reactivo obligatorio.
+
 ## Infraestructura
 
 | Componente | Ubicacion | Funcion |
@@ -101,7 +107,22 @@ consumers can migrate gradually. Canonical events are scoped to the commercial
 | `quotation` | `commercial.quotation.pipeline_materialized` (TASK-351) | `commercial/quotation-events.ts` (from `quotation_pipeline` projection) | `{ quotationId, pipelineStage, status, totalAmountClp, probabilityPct }` | observability/dashboards |
 | `quotation` | `commercial.quotation.profitability_materialized` (TASK-351) | `commercial/quotation-events.ts` (from `quotation_profitability` projection) | `{ quotationId, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity }` | observability/dashboards |
 | `quotation_line_item` | `commercial.quotation.line_items_synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-line-items.ts`) | `{ quotationId, quoteId, hubspotQuoteId, created, updated }` | — |
+| `contract` | `commercial.contract.created` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status }` | `contract_profitability`, `contract_renewal` y futuros consumers de MRR/ARR |
+| `contract` | `commercial.contract.activated` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status, activatedAt }` | `contract_profitability`, `contract_renewal`, observability |
+| `contract` | `commercial.contract.renewed` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, quotationId?, relationshipType, renewedAt, nextEndDate?, spaceId }` | `contract_renewal`, timeline UI, futuros consumers de MRR/ARR |
+| `contract` | `commercial.contract.modified` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, quotationId, relationshipType, modifiedAt, spaceId }` | detail UI, audit timeline |
+| `contract` | `commercial.contract.terminated` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, terminatedAt, terminatedReason?, clientId, organizationId, spaceId }` | `contract_renewal`, futuros consumers de churn |
+| `contract` | `commercial.contract.completed` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, completedAt, clientId, organizationId, spaceId }` | `contract_renewal`, observability |
+| `contract` | `commercial.contract.renewal_due` (TASK-460) | `commercial/contract-events.ts` (from `commercial-intelligence/contract-renewal-lifecycle.ts`) | `{ contractId, contractNumber, clientId, organizationId, spaceId, endDate, daysUntilEndDate }` | notifications, renewals UI, futuros dashboards de ARR en riesgo |
+| `contract` | `commercial.contract.profitability_materialized` (TASK-460) | `commercial/contract-events.ts` (from `commercial-intelligence/contract-profitability-materializer.ts`) | `{ contractId, contractNumber, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity, spaceId }` | observability, dashboards de rentabilidad contractual |
+| `deal` | `commercial.deal.created` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, currency, closeDate }` | `deal_pipeline` projection (TASK-456), foundation for TASK-457 |
+| `deal` | `commercial.deal.synced` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, action, amountClp, currency, closeDate, isClosed, isWon, changedFields }` | `deal_pipeline` projection (TASK-456), foundation for TASK-457 |
+| `deal` | `commercial.deal.stage_changed` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, previousPipelineId, previousDealstage, previousStageLabel, currentStageLabel }` | `deal_pipeline` projection (TASK-456) |
+| `deal` | `commercial.deal.won` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, closeDate }` | `deal_pipeline` projection (TASK-456), forecast |
+| `deal` | `commercial.deal.lost` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, closeDate }` | `deal_pipeline` projection (TASK-456), forecast |
 | `quotation` | `commercial.discount.health_alert` | `finance/pricing/quotation-pricing-orchestrator.ts` (TASK-346) | `{ quotationId, versionNumber, marginPct, floorPct, targetPct, alerts, createdBy }` | `notifications` (Finance approvals), audit log |
+| `quotation` | `commercial.quotation.pushed_to_hubspot` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` invocado por projection `quotationHubSpotOutbound`) | `{ quotationId, hubspotQuoteId, hubspotDealId, direction: 'outbound', result: 'created' \| 'updated' \| 'skipped', reason?, actorId? }` | observability del bridge outbound + retry audit |
+| `quotation` | `commercial.quotation.hubspot_sync_failed` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` catch branch) | `{ quotationId, hubspotDealId, errorMessage, attemptedAction: 'create' \| 'update', actorId? }` | ops-worker retry, Finance alerting |
 
 ### Products — legacy finance namespace (TASK-211, kept during cutover)
 
@@ -200,6 +221,12 @@ Notas:
 | `membership` | `membership.created` | `account-360/organization-store.ts` | `{ membershipId, profileId, organizationId, spaceId }` | `invalidateOrganization360` |
 | `membership` | `membership.updated` | `account-360/organization-store.ts` | `{ membershipId, updatedFields }` | `invalidateOrganization360` |
 | `membership` | `membership.deactivated` | `account-360/organization-store.ts` | `{ membershipId }` | `invalidateOrganization360` |
+
+### CRM Company Lifecycle (TASK-454)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `crm_company` | `crm.company.lifecyclestage_changed` | `hubspot/company-lifecycle-events.ts` (from `hubspot/sync-hubspot-company-lifecycle.ts`) | `{ clientId, organizationId, spaceId, hubspotCompanyId, fromStage, toStage, source }` | — |
 
 ### HR Core / People (nuevo)
 

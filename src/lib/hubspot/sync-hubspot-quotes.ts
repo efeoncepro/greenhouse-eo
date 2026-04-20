@@ -14,32 +14,45 @@ import { syncQuoteLineItems } from '@/lib/hubspot/sync-hubspot-line-items'
 
 const HUBSPOT_STATUS_MAP: Record<string, string> = {
   DRAFT: 'draft',
-  PENDING_APPROVAL: 'sent',
-  APPROVAL_NOT_NEEDED: 'sent',
-  APPROVED: 'accepted',
-  REJECTED: 'rejected',
-  SIGNED: 'accepted',
-  LOST: 'rejected',
+  PENDING_APPROVAL: 'pending_approval',
+  APPROVAL_NOT_NEEDED: 'issued',
+  APPROVED: 'issued',
+  REJECTED: 'approval_rejected',
+  SIGNED: 'issued',
+  LOST: 'approval_rejected',
   EXPIRED: 'expired'
 }
 
 const mapHubSpotStatus = (hsStatus: string | null): string =>
   (hsStatus && HUBSPOT_STATUS_MAP[hsStatus]) || 'draft'
 
-// ── Space resolution (same pattern as service-sync.ts) ──
+// ── Organization resolution (TASK-486) ──
+// Quotes ahora anclan a organization_id como identidad canónica (ver TASK-486). La resolución
+// previa era vía spaces, pero el Space es un concepto operativo post-conversión y no pertenece
+// al modelo canónico de la cotización. Este resolver devuelve la organization (cliente o prospecto)
+// linkeada al HubSpot company + el client_id legacy asociado si existe.
 
-interface SpaceRow extends Record<string, unknown> {
-  space_id: string
-  client_id: string
-  organization_id: string | null
+interface OrganizationRow extends Record<string, unknown> {
+  organization_id: string
+  client_id: string | null
 }
 
-const resolveSpaceForCompany = async (hubspotCompanyId: string): Promise<SpaceRow | null> => {
-  const rows = await runGreenhousePostgresQuery<SpaceRow>(
-    `SELECT s.space_id, s.client_id, s.organization_id
-     FROM greenhouse_core.spaces s
-     JOIN greenhouse_core.organizations o ON o.organization_id = s.organization_id
+const resolveOrganizationForCompany = async (hubspotCompanyId: string): Promise<OrganizationRow | null> => {
+  const rows = await runGreenhousePostgresQuery<OrganizationRow>(
+    `SELECT
+       o.organization_id,
+       (
+         SELECT s.client_id
+         FROM greenhouse_core.spaces s
+         WHERE s.organization_id = o.organization_id
+           AND s.active = TRUE
+           AND s.client_id IS NOT NULL
+         ORDER BY s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST
+         LIMIT 1
+       ) AS client_id
+     FROM greenhouse_core.organizations o
      WHERE o.hubspot_company_id = $1
+       AND o.active = TRUE
      LIMIT 1`,
     [hubspotCompanyId]
   )
@@ -73,7 +86,7 @@ const resolveClientName = async (clientId: string): Promise<string | null> => {
 
 const upsertQuoteFromHubSpot = async (
   quote: HubSpotGreenhouseQuoteProfile,
-  space: SpaceRow,
+  organization: OrganizationRow,
   clientName: string | null
 ): Promise<'created' | 'updated' | 'skipped'> => {
   const hubspotQuoteId = quote.identity.hubspotQuoteId
@@ -129,7 +142,7 @@ const upsertQuoteFromHubSpot = async (
       updated_at = NOW()
     RETURNING CASE WHEN xmax = 0 THEN 'created' ELSE 'updated' END AS action`,
     [
-      quoteId, space.client_id, space.organization_id, clientName,
+      quoteId, organization.client_id, organization.organization_id, clientName,
       quoteNumber, createDate, expirationDate, title,
       currency, amount, currency === 'CLP' ? amount : 0, status,
       hubspotQuoteId, dealId
@@ -157,15 +170,15 @@ export interface QuoteSyncResult {
 export const syncHubSpotQuotesForCompany = async (hubspotCompanyId: string): Promise<QuoteSyncResult> => {
   const result: QuoteSyncResult = { hubspotCompanyId, created: 0, updated: 0, skipped: 0, errors: [] }
 
-  const space = await resolveSpaceForCompany(hubspotCompanyId)
+  const organization = await resolveOrganizationForCompany(hubspotCompanyId)
 
-  if (!space) {
-    result.errors.push(`No space found for HubSpot company ${hubspotCompanyId}`)
+  if (!organization) {
+    result.errors.push(`No organization mapped for HubSpot company ${hubspotCompanyId}`)
 
     return result
   }
 
-  const clientName = await resolveClientName(space.client_id)
+  const clientName = organization.client_id ? await resolveClientName(organization.client_id) : null
 
   let quotes: HubSpotGreenhouseQuoteProfile[]
 
@@ -181,7 +194,7 @@ export const syncHubSpotQuotesForCompany = async (hubspotCompanyId: string): Pro
 
   for (const quote of quotes) {
     try {
-      const action = await upsertQuoteFromHubSpot(quote, space, clientName)
+      const action = await upsertQuoteFromHubSpot(quote, organization, clientName)
 
       if (action === 'created') result.created++
       else if (action === 'updated') result.updated++
@@ -230,8 +243,11 @@ export const syncHubSpotQuotesForCompany = async (hubspotCompanyId: string): Pro
             hubspotDealId: quote.associations.dealId ?? null,
             sourceSystem: 'hubspot',
             action,
-            organizationId: space.organization_id,
-            spaceId: space.space_id
+            organizationId: organization.organization_id,
+
+            // TASK-486: space_id eliminated from canonical write path; payload ya no lo carry.
+            // Downstream consumers (delivery/pulse) resuelven Space post-conversion por su cuenta.
+            spaceId: null
           })
         } catch (publishErr) {
           result.errors.push(`Quote ${quoteId} publish: ${publishErr instanceof Error ? publishErr.message : String(publishErr)}`)

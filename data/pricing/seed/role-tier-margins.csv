@@ -1,0 +1,37 @@
+Rol,Tier,Margen MIN,Margen OPT,Margen MAX
+TIER 1: COMMODITIZADO,,,,
+Community Manager,1,0.2,0.3,0.35
+Social Media Manager,1,0.2,0.3,0.35
+Content Creator,1,0.2,0.3,0.35
+UGC Creator,1,0.2,0.3,0.35
+Creative Designer (Jr/Mid),1,0.2,0.3,0.35
+TIER 2: ESPECIALIZADO,,,,
+Copywriter,2,0.3,0.4,0.45
+Senior Visual Designer,2,0.3,0.4,0.45
+Video Editor/Motion Graphics,2,0.3,0.4,0.45
+UX/UI Designer,2,0.3,0.4,0.45
+Desarrollador WordPress,2,0.3,0.4,0.45
+Desarrollador Full Stack Jr/Mid,2,0.3,0.4,0.45
+Paid Media Specialist,2,0.3,0.4,0.45
+Media Buyer,2,0.3,0.4,0.45
+SEO Specialist,2,0.3,0.4,0.45
+Influencer Manager,2,0.3,0.4,0.45
+PR Analyst,2,0.3,0.4,0.45
+Content Manager,2,0.3,0.4,0.45
+TIER 3: ESTRATÉGICO,,,,
+Creative Operations Lead,3,0.4,0.5,0.6
+Director de Arte,3,0.4,0.5,0.6
+Project Manager,3,0.4,0.5,0.6
+Data Analyst,3,0.4,0.5,0.6
+CRO Specialist,3,0.4,0.5,0.6
+Growth Hacker,3,0.4,0.5,0.6
+Marketing Automation Specialist,3,0.4,0.5,0.6
+Analista GA4/GTM/Looker,3,0.4,0.5,0.6
+Desarrollador Full Stack Senior,3,0.4,0.5,0.6
+Implementador HubSpot,3,0.4,0.5,0.6
+Desarrollador HubSpot,3,0.4,0.5,0.6
+Periodista PR Digital,3,0.4,0.5,0.6
+TIER 4: IP PROPIETARIA,,,,
+Consultor HubSpot,4,0.6,0.7,0.8
+Estrategia AEO,4,0.6,0.7,0.8
+Globe OS (futuro),4,0.6,0.7,0.8

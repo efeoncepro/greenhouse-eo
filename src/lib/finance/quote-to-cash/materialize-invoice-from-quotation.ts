@@ -7,6 +7,8 @@ import type { PoolClient } from 'pg'
 import { withTransaction } from '@/lib/db'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { publishQuotationInvoiceEmitted } from '@/lib/commercial/quotation-events'
+import { ensureContractForQuotation } from '@/lib/commercial/contract-lifecycle'
+import { materializeContractProfitabilitySnapshots } from '@/lib/commercial-intelligence/contract-profitability-materializer'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -24,6 +26,7 @@ export interface MaterializeInvoiceFromQuotationParams {
 export interface MaterializeInvoiceFromQuotationResult {
   incomeId: string
   quotationId: string
+  contractId: string
   totalAmountClp: number
   quotationStatus: 'converted'
 }
@@ -81,12 +84,12 @@ const resolveClientName = async (
 }
 
 /**
- * Materializes an income row (invoice) directly from an approved quotation,
+ * Materializes an income row (invoice) directly from an issued quotation,
  * bypassing the OC/HES enterprise branch. This is the "simple branch" for
  * quote-to-cash — typical of non-enterprise clients without procurement chain.
  *
  * Preconditions:
- *  - Quotation status must be 'approved' or 'sent'
+ *  - Quotation status must be 'issued' (legacy: 'approved'/'sent')
  *  - Quotation must NOT already be converted
  *  - No POs or approved HES may be linked to this quotation (use enterprise branch)
  */
@@ -95,7 +98,7 @@ export const materializeInvoiceFromApprovedQuotation = async (
 ): Promise<MaterializeInvoiceFromQuotationResult> => {
   const { quotationId, actor } = params
 
-  return withTransaction(async (client: QueryableClient) => {
+  const result = await withTransaction(async (client: QueryableClient) => {
     const quotationResult = (await client.query(
       `SELECT quotation_id, quotation_number, client_id, organization_id, space_id,
               client_name_cache, status, legacy_status, converted_to_income_id,
@@ -119,11 +122,11 @@ export const materializeInvoiceFromApprovedQuotation = async (
       )
     }
 
-    const allowedStatuses = new Set(['approved', 'sent'])
+    const allowedStatuses = new Set(['issued', 'approved', 'sent'])
 
     if (!allowedStatuses.has(quotation.status)) {
       throw new Error(
-        `Quotation ${quotationId} must be in status 'approved' or 'sent' (current: ${quotation.status}).`
+        `Quotation ${quotationId} must be in status 'issued' (legacy: 'approved' or 'sent') (current: ${quotation.status}).`
       )
     }
 
@@ -178,12 +181,27 @@ export const materializeInvoiceFromApprovedQuotation = async (
     )
 
     await client.query(
+      `UPDATE greenhouse_commercial.quotations
+         SET status = 'converted',
+             converted_at = CURRENT_TIMESTAMP,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE quotation_id = $1`,
+      [quotationId]
+    )
+
+    const contract = await ensureContractForQuotation({
+      quotationId,
+      actor,
+      client
+    })
+
+    await client.query(
       `INSERT INTO greenhouse_finance.income (
          income_id, client_id, organization_id, space_id,
          client_name, invoice_number, invoice_date, due_date, description,
          currency, subtotal, total_amount, total_amount_clp,
          payment_status, amount_paid,
-         quotation_id,
+         quotation_id, contract_id,
          created_by_user_id,
          created_at, updated_at
        ) VALUES (
@@ -191,8 +209,8 @@ export const materializeInvoiceFromApprovedQuotation = async (
          $5, $6, $7::date, $8::date, $9,
          $10, $11, $12, $13,
          'pending', 0,
-         $14,
-         $15,
+         $14, $15,
+         $16,
          CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
        )`,
       [
@@ -210,15 +228,14 @@ export const materializeInvoiceFromApprovedQuotation = async (
         totalAmount,
         totalAmountClp,
         quotationId,
+        contract.contractId,
         actor.userId
       ]
     )
 
     await client.query(
       `UPDATE greenhouse_commercial.quotations
-         SET status = 'converted',
-             converted_to_income_id = $1,
-             converted_at = CURRENT_TIMESTAMP,
+         SET converted_to_income_id = $1,
              updated_at = CURRENT_TIMESTAMP
          WHERE quotation_id = $2`,
       [incomeId, quotationId]
@@ -270,8 +287,13 @@ export const materializeInvoiceFromApprovedQuotation = async (
     return {
       incomeId,
       quotationId,
+      contractId: contract.contractId,
       totalAmountClp,
       quotationStatus: 'converted' as const
     }
   })
+
+  await materializeContractProfitabilitySnapshots({ contractId: result.contractId })
+
+  return result
 }

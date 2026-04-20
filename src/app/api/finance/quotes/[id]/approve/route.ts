@@ -9,14 +9,17 @@ import {
 } from '@/lib/commercial/governance/approval-steps-store'
 import {
   publishQuotationApprovalDecided,
-  publishQuotationApprovalRequested,
-  publishQuotationApproved
+  publishQuotationApprovalRequested
 } from '@/lib/commercial/quotation-events'
 import {
   checkDiscountHealth,
   resolveMarginTarget,
   resolveQuotationIdentity
 } from '@/lib/finance/pricing'
+import {
+  quotationIdentityHasTenantAnchor,
+  tenantCanAccessQuotationIdentity
+} from '@/lib/finance/pricing/quotation-tenant-access'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -24,6 +27,8 @@ export const dynamic = 'force-dynamic'
 interface QuotationGovernanceRow extends Record<string, unknown> {
   business_line_code: string | null
   pricing_model: string
+  commercial_model: string | null
+  staffing_model: string | null
   total_cost: string | number | null
   total_price_before_discount: string | number | null
   total_discount: string | number | null
@@ -67,7 +72,18 @@ export async function GET(
     return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
   }
 
-  const steps = await listApprovalSteps(identity.quotationId)
+  if (!quotationIdentityHasTenantAnchor(identity)) {
+    return NextResponse.json(
+      { error: 'La cotización no tiene un scope tenant válido.' },
+      { status: 409 }
+    )
+  }
+
+  if (!(await tenantCanAccessQuotationIdentity({ tenant, identity }))) {
+    return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
+  }
+
+  const steps = await listApprovalSteps(identity.quotationId, identity.spaceId ?? undefined)
 
   return NextResponse.json({ quotationId: identity.quotationId, items: steps, total: steps.length })
 }
@@ -96,6 +112,17 @@ export async function POST(
     return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
   }
 
+  if (!quotationIdentityHasTenantAnchor(identity)) {
+    return NextResponse.json(
+      { error: 'La cotización no tiene un scope tenant válido.' },
+      { status: 409 }
+    )
+  }
+
+  if (!(await tenantCanAccessQuotationIdentity({ tenant, identity }))) {
+    return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
+  }
+
   let body: DecideBody
 
   try {
@@ -114,12 +141,16 @@ export async function POST(
 
   if (action === 'request') {
     const headerRows = await query<QuotationGovernanceRow>(
-      `SELECT business_line_code, pricing_model, total_cost, total_price_before_discount,
+      `SELECT business_line_code, pricing_model, commercial_model, staffing_model, total_cost, total_price_before_discount,
               total_discount, total_price, effective_margin_pct, target_margin_pct,
               margin_floor_pct, current_version, quote_date, status
          FROM greenhouse_commercial.quotations
-         WHERE quotation_id = $1`,
-      [identity.quotationId]
+         WHERE quotation_id = $1
+           AND (
+             ($2::text IS NOT NULL AND organization_id = $2)
+             OR ($3::text IS NOT NULL AND space_id = $3)
+           )`,
+      [identity.quotationId, identity.organizationId, identity.spaceId]
     )
 
     const header = headerRows[0]
@@ -172,6 +203,7 @@ export async function POST(
     const result = await requestApproval({
       quotationId: identity.quotationId,
       versionNumber: header.current_version,
+      spaceId: identity.spaceId,
       actor: { userId: actor.userId, name: actor.name },
       evaluationInput: {
         businessLineCode: header.business_line_code,
@@ -189,7 +221,7 @@ export async function POST(
         quotationId: identity.quotationId,
         steps: [],
         approvalRequired: false,
-        message: 'No se cumplió ninguna condición de aprobación. La cotización puede enviarse sin aprobación previa.'
+        message: 'No se cumplió ninguna condición de aprobación. La cotización puede emitirse sin aprobación previa.'
       })
     }
 
@@ -234,6 +266,8 @@ export async function POST(
         stepId: body.stepId,
         decision: body.decision,
         actor,
+        organizationId: identity.organizationId,
+        spaceId: identity.spaceId,
         notes: body.notes ?? null
       })
 
@@ -247,13 +281,6 @@ export async function POST(
         notes: body.notes ?? null,
         resultingStatus: decision.quotationNewStatus
       })
-
-      if (decision.quotationNewStatus === 'sent') {
-        await publishQuotationApproved({
-          quotationId: decision.quotationId,
-          approvedBy: tenant.userId
-        })
-      }
 
       return NextResponse.json({
         quotationId: decision.quotationId,

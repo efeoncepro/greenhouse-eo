@@ -20,6 +20,8 @@ export type GreenhouseAssetContext =
   | 'leave_request'
   | 'purchase_order_draft'
   | 'purchase_order'
+  | 'master_agreement_draft'
+  | 'master_agreement'
   | 'payroll_receipt'
   | 'payroll_export_pdf'
   | 'payroll_export_csv'
@@ -64,7 +66,7 @@ export interface PrivateAssetUploadResponse {
 
 export type DraftUploadContext = Extract<
   GreenhouseAssetContext,
-  'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'
+  'leave_request_draft' | 'purchase_order_draft' | 'master_agreement_draft' | 'certification_draft' | 'evidence_draft'
 >
 
 export interface UploadPrivateAssetInput {

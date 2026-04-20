@@ -52,6 +52,8 @@ export const AGGREGATE_TYPES = {
   organization: 'organization',
   space: 'space',
   membership: 'membership',
+  crmCompany: 'crm_company',
+  personLegalEntityRelationship: 'person_legal_entity_relationship',
 
   // HR Core / People
   member: 'member',
@@ -97,7 +99,14 @@ export const AGGREGATE_TYPES = {
   // Commercial Quotation (canonical, TASK-347 cutover)
   quotation: 'quotation',
   quotationLineItem: 'quotation_line_item',
+  commercialCapacity: 'commercial_capacity',
+  contract: 'contract',
+  contractQuote: 'contract_quote',
+  masterAgreement: 'master_agreement',
+  deal: 'deal',
   productCatalog: 'product_catalog',
+  sellableRole: 'sellable_role',
+  employmentType: 'employment_type',
 
   // Products (legacy finance namespace)
   product: 'product',
@@ -117,6 +126,7 @@ export const AGGREGATE_TYPES = {
   commercialCostAttribution: 'commercial_cost_attribution',
   operationalPl: 'operational_pl',
   marginAlert: 'margin_alert',
+  commercialCostBasis: 'commercial_cost_basis',
   staffAugPlacement: 'staff_aug_placement',
   staffAugOnboardingItem: 'staff_aug_onboarding_item',
   staffAugPlacementSnapshot: 'staff_aug_placement_snapshot',
@@ -158,6 +168,10 @@ export const EVENT_TYPES = {
   membershipCreated: 'membership.created',
   membershipUpdated: 'membership.updated',
   membershipDeactivated: 'membership.deactivated',
+  companyLifecycleStageChanged: 'crm.company.lifecyclestage_changed',
+  personLegalEntityRelationshipCreated: 'person_legal_entity_relationship.created',
+  personLegalEntityRelationshipUpdated: 'person_legal_entity_relationship.updated',
+  personLegalEntityRelationshipDeactivated: 'person_legal_entity_relationship.deactivated',
 
   // HR Core / People
   memberCreated: 'member.created',
@@ -228,6 +242,10 @@ export const EVENT_TYPES = {
   providerUpserted: 'provider.upserted',
   providerToolingSnapshotMaterialized: 'provider.tooling_snapshot.materialized',
   providerToolingSnapshotPeriodMaterialized: 'provider.tooling_snapshot.period_materialized',
+  commercialCostBasisPeoplePeriodMaterialized: 'commercial_cost_basis.people.period_materialized',
+  commercialCostBasisToolsPeriodMaterialized: 'commercial_cost_basis.tools.period_materialized',
+  commercialCostBasisBundlePeriodMaterialized: 'commercial_cost_basis.bundle.period_materialized',
+  commercialCostBasisRolesPeriodMaterialized: 'commercial_cost_basis.roles.period_materialized',
 
   // AI Tooling structural events
   aiToolCreated: 'ai_tool.created',
@@ -325,10 +343,18 @@ export const EVENT_TYPES = {
   quotationLineItemsSynced: 'commercial.quotation.line_items_synced',
   quotationDiscountHealthAlert: 'commercial.discount.health_alert',
 
+  // Commercial Deals (TASK-453)
+  dealSynced: 'commercial.deal.synced',
+  dealCreated: 'commercial.deal.created',
+  dealStageChanged: 'commercial.deal.stage_changed',
+  dealWon: 'commercial.deal.won',
+  dealLost: 'commercial.deal.lost',
+
   // Commercial Quotation Governance (TASK-348)
   quotationVersionCreated: 'commercial.quotation.version_created',
   quotationApprovalRequested: 'commercial.quotation.approval_requested',
   quotationApprovalDecided: 'commercial.quotation.approval_decided',
+  quotationIssued: 'commercial.quotation.issued',
   quotationSent: 'commercial.quotation.sent',
   quotationApproved: 'commercial.quotation.approved',
   quotationRejected: 'commercial.quotation.rejected',
@@ -345,6 +371,25 @@ export const EVENT_TYPES = {
   quotationRenewalDue: 'commercial.quotation.renewal_due',
   quotationPipelineMaterialized: 'commercial.quotation.pipeline_materialized',
   quotationProfitabilityMaterialized: 'commercial.quotation.profitability_materialized',
+  commercialCapacityOvercommitDetected: 'commercial.capacity.overcommit_detected',
+
+  // Commercial Contracts (TASK-460)
+  contractCreated: 'commercial.contract.created',
+  contractActivated: 'commercial.contract.activated',
+  contractRenewed: 'commercial.contract.renewed',
+  contractModified: 'commercial.contract.modified',
+  contractTerminated: 'commercial.contract.terminated',
+  contractCompleted: 'commercial.contract.completed',
+  contractRenewalDue: 'commercial.contract.renewal_due',
+  contractProfitabilityMaterialized: 'commercial.contract.profitability_materialized',
+  masterAgreementCreated: 'commercial.master_agreement.created',
+  masterAgreementUpdated: 'commercial.master_agreement.updated',
+  masterAgreementClausesChanged: 'commercial.master_agreement.clauses_changed',
+  contractMsaLinked: 'commercial.contract.msa_linked',
+
+  // Unified Quote Builder HubSpot bidirectional outbound (TASK-463)
+  quotationPushedToHubSpot: 'commercial.quotation.pushed_to_hubspot',
+  quotationHubSpotSyncFailed: 'commercial.quotation.hubspot_sync_failed',
 
   // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
@@ -353,6 +398,9 @@ export const EVENT_TYPES = {
   // Commercial Product Catalog (canonical, TASK-347)
   productCatalogSynced: 'commercial.product_catalog.synced',
   productCatalogCreated: 'commercial.product_catalog.created',
+  sellableRoleCreated: 'commercial.sellable_role.created',
+  sellableRoleCostUpdated: 'commercial.sellable_role.cost_updated',
+  sellableRolePricingUpdated: 'commercial.sellable_role.pricing_updated',
 
   // Purchase Orders & HES
   purchaseOrderCreated: 'finance.purchase_order.created',
@@ -381,6 +429,11 @@ export const EVENT_TYPES = {
   financeOverheadUpdated: 'finance.overhead.updated',
   financeLicenseCostUpdated: 'finance.license_cost.updated',
   financeToolingCostUpdated: 'finance.tooling_cost.updated',
+
+  // TASK-484 FX sync observability (non-persistent events — emitted only
+  // when the orchestrator needs to surface a degraded condition)
+  financeFxSyncProviderFallback: 'finance.fx_sync.provider_fallback',
+  financeFxSyncAllProvidersFailed: 'finance.fx_sync.all_providers_failed',
 
   // Cost Intelligence
   accountingPeriodClosed: 'accounting.period_closed',
@@ -449,6 +502,9 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.membershipCreated,
   EVENT_TYPES.membershipUpdated,
   EVENT_TYPES.membershipDeactivated,
+  EVENT_TYPES.personLegalEntityRelationshipCreated,
+  EVENT_TYPES.personLegalEntityRelationshipUpdated,
+  EVENT_TYPES.personLegalEntityRelationshipDeactivated,
   EVENT_TYPES.financeIncomeCreated,
   EVENT_TYPES.financeIncomeUpdated,
   EVENT_TYPES.financeExpenseCreated,

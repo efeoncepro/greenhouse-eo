@@ -11,6 +11,7 @@ import type { ProjectionDefinition } from '../projection-registry'
 export const QUOTATION_PIPELINE_TRIGGER_EVENTS = [
   EVENT_TYPES.quotationCreated,
   EVENT_TYPES.quotationSynced,
+  EVENT_TYPES.quotationIssued,
   EVENT_TYPES.quotationSent,
   EVENT_TYPES.quotationApproved,
   EVENT_TYPES.quotationRejected,

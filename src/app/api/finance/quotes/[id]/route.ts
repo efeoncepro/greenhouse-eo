@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 
+import {
+  resolveQuoteDeliveryModel,
+  type CommercialModel,
+  type StaffingModel
+} from '@/lib/commercial/delivery-model'
 import { query } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
@@ -100,6 +105,10 @@ const getLegacyQuoteDetail = async (quoteId: string) => {
     source: String(r.source_system || 'manual'),
     hubspotQuoteId: r.hubspot_quote_id ? String(r.hubspot_quote_id) : null,
     hubspotDealId: r.hubspot_deal_id ? String(r.hubspot_deal_id) : null,
+    pricingModel: null,
+    commercialModel: null,
+    staffingModel: null,
+    salesContextAtSent: null,
     notes: r.notes ? String(r.notes) : null,
     createdAt: r.created_at ? String(r.created_at) : null,
     updatedAt: r.updated_at ? String(r.updated_at) : null
@@ -162,9 +171,20 @@ export async function GET(
   }
 }
 
+// TASK-486: mirror del set en POST route.ts. Mantener sincronizado.
+const QUOTE_CONTACT_MEMBERSHIP_TYPES = [
+  'client_contact',
+  'client_user',
+  'contact',
+  'billing',
+  'partner',
+  'advisor'
+] as const
+
 interface UpdateQuotationPayload {
   quotationNumber?: string | null
   status?: string | null
+  contactIdentityProfileId?: string | null
   businessLineCode?: string | null
   currency?: string | null
   billingFrequency?: string | null
@@ -181,6 +201,9 @@ interface UpdateQuotationPayload {
   dueDate?: string | null
   validUntil?: string | null
   expiryDate?: string | null
+  pricingModel?: 'staff_aug' | 'retainer' | 'project' | null
+  commercialModel?: CommercialModel | null
+  staffingModel?: StaffingModel | null
   recalculatePricing?: boolean
   createVersion?: boolean
 }
@@ -188,9 +211,8 @@ interface UpdateQuotationPayload {
 const ALLOWED_STATUS_TRANSITIONS = new Set([
   'draft',
   'pending_approval',
-  'sent',
-  'approved',
-  'rejected',
+  'approval_rejected',
+  'issued',
   'expired',
   'converted'
 ])
@@ -260,12 +282,110 @@ export async function PUT(
   }
 
   if (body.exchangeSnapshotDate !== undefined) push('exchange_snapshot_date', body.exchangeSnapshotDate, '::date')
+
+  // TASK-486: contacto canónico asociable en update. null = clear contact; string = set con validación.
+  if (body.contactIdentityProfileId !== undefined) {
+    const contactId =
+      typeof body.contactIdentityProfileId === 'string' && body.contactIdentityProfileId.trim()
+        ? body.contactIdentityProfileId.trim()
+        : null
+
+    if (contactId !== null) {
+      const quoteOrgRows = await query<{ organization_id: string | null }>(
+        `SELECT organization_id
+           FROM greenhouse_commercial.quotations
+           WHERE quotation_id = $1
+           LIMIT 1`,
+        [identity.quotationId]
+      )
+
+      const quoteOrgId = quoteOrgRows[0]?.organization_id ?? null
+
+      if (!quoteOrgId) {
+        return NextResponse.json(
+          { error: 'Esta cotización no tiene organización; asigna una antes de setear contacto.' },
+          { status: 400 }
+        )
+      }
+
+      const membershipRows = await query<{ membership_type: string }>(
+        `SELECT pm.membership_type
+           FROM greenhouse_core.person_memberships pm
+           WHERE pm.profile_id = $1
+             AND pm.organization_id = $2
+             AND pm.active = TRUE
+           LIMIT 1`,
+        [contactId, quoteOrgId]
+      )
+
+      if (membershipRows.length === 0) {
+        return NextResponse.json(
+          { error: 'contactIdentityProfileId no tiene membership activa en la organización de esta cotización.' },
+          { status: 400 }
+        )
+      }
+
+      const membershipType = membershipRows[0].membership_type
+
+      if (!QUOTE_CONTACT_MEMBERSHIP_TYPES.includes(membershipType as typeof QUOTE_CONTACT_MEMBERSHIP_TYPES[number])) {
+        return NextResponse.json(
+          { error: `membership_type='${membershipType}' no aplica como contacto comercial (admitidos: ${QUOTE_CONTACT_MEMBERSHIP_TYPES.join(', ')}).` },
+          { status: 400 }
+        )
+      }
+    }
+
+    push('contact_identity_profile_id', contactId)
+  }
+
   if (body.description !== undefined) push('description', body.description)
   if (body.internalNotes !== undefined) push('internal_notes', body.internalNotes)
   if (body.notes !== undefined) push('notes', body.notes)
   if (body.dueDate !== undefined) push('due_date', body.dueDate, '::date')
-  if (body.validUntil !== undefined) push('valid_until', body.validUntil, '::date')
-  if (body.expiryDate !== undefined) push('expiry_date', body.expiryDate, '::date')
+
+  if (body.validUntil !== undefined || body.expiryDate !== undefined) {
+    const resolvedExpiryDate = body.expiryDate ?? body.validUntil ?? null
+
+    push('valid_until', resolvedExpiryDate, '::date')
+    push('expiry_date', resolvedExpiryDate, '::date')
+  }
+
+  if (
+    body.pricingModel !== undefined ||
+    body.commercialModel !== undefined ||
+    body.staffingModel !== undefined
+  ) {
+    const currentRows = await query<{
+      pricing_model: string | null
+      commercial_model: string | null
+      staffing_model: string | null
+    }>(
+      `SELECT pricing_model, commercial_model, staffing_model
+         FROM greenhouse_commercial.quotations
+         WHERE quotation_id = $1
+         LIMIT 1`,
+      [identity.quotationId]
+    )
+
+    const current = currentRows[0]
+
+    const fallback = resolveQuoteDeliveryModel({
+      pricingModel: current?.pricing_model,
+      commercialModel: current?.commercial_model,
+      staffingModel: current?.staffing_model
+    })
+
+    const resolvedDeliveryModel = resolveQuoteDeliveryModel({
+      pricingModel: body.pricingModel ?? undefined,
+      commercialModel: body.commercialModel ?? fallback.commercialModel,
+      staffingModel: body.staffingModel ?? fallback.staffingModel,
+      fallback
+    })
+
+    push('pricing_model', resolvedDeliveryModel.pricingModel)
+    push('commercial_model', resolvedDeliveryModel.commercialModel)
+    push('staffing_model', resolvedDeliveryModel.staffingModel)
+  }
 
   if (updates.length > 0) {
     updates.push('updated_at = CURRENT_TIMESTAMP')
