@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.28
+> **Version:** 2.29
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-19 — v2.29: TASK-506 simplifica CTAs del Quote Summary Dock. El dock pasa de 2 CTAs (`Guardar y cerrar` tonal + `Guardar y emitir` contained) a 1 sola CTA terminal (`Guardar y emitir`). "Guardar y cerrar" se elimina del dock — el "Guardar borrador" del header absorbe el rol de save sin cerrar (2 saves en la página en vez de 3). Grid zones ajustadas de 3/5/4 a 3/6/3: zone 2 (total ladder) gana ancho, zone 3 (acciones) queda compacta con el addons chip + 1 CTA horizontal sin wrap vertical. `QuoteSummaryDockProps` gana prop nuevo `appliedAddonsTotal?: number | null` — cuando > 0 el chip de addons muestra `N addons · $applied` como contexto cuantitativo; si también hay `addonTotalDelta > 0` (sugerencias no aplicadas), añade `+$delta` muted al final. Shell computa `appliedAddonsTotal` sumando `simulation.lines[i].suggestedBillRate.totalBillOutputCurrency` para líneas con `metadata.pricingV2LineType === 'overhead_addon'`. `changeCount` del `SaveStateIndicator` ahora se deriva del delta entre `initialLines.length` y `linesSnapshot.length`, mostrando "Sin guardar · N cambios" cuando la cantidad de líneas cambió. El wrapper preserva `secondaryCtaLabel`/`onSecondaryClick`/`secondaryCtaDisabled` para consumers futuros (invoice/PO docks); el quote shell simplemente no los pasa.
 > **Updated:** 2026-04-19 — v2.28: TASK-505 Summary Dock v2. El `QuoteSummaryDock` sticky-bottom pasa de Stack flat a layout Grid de 3 zonas (`xs=12 / md=3+5+4`): Estado (save indicator + margin chip) / Totals ladder / Acciones (addons + Cancelar + Guardar). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`SaveStateIndicator`, `MarginHealthChip`, `TotalsLadder`) reusables platform-wide para invoice / PO / contract docks. Total visible migra de `color=primary.main` a `text.primary` — el azul de marca queda reservado a la CTA primaria. `TotalsLadder` oculta subtotal/factor/IVA cuando no aportan información (`total === subtotal && factor === 1 && !ivaAmount`); cuando sí aportan, renderiza caption muted one-liner debajo del Total. `MarginHealthChip` pasa de `49.4%` + ícono a `Margen · 49,4% · Óptimo/Atención/Crítico` + ícono + tooltip de tier range (cierra color-only-state warning). `SaveStateIndicator` gana segunda línea con `changeCount` o `formatRelativeTime(lastSavedAt)`; dot pulsing en saving respeta `prefers-reduced-motion`. CTA primaria deja de hacer copy-swap (`"Guardar y cerrar"` → `"Calculando pricing…"` → `"Guardando…"`) y pasa a loading pattern enterprise: copy invariante + `disabled` + `<CircularProgress size={16} />` en startIcon. Shell actualizado: `primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}` constante, `primaryCtaLoading={submitting}`. `AnimatedCounter` del total baja de `duration=0.4` a `0.25` (emphasized decelerate `cubic-bezier(0.2, 0, 0, 1)`). Alinea con la estrategia de platform primitives de TASK-498.
 > **Updated:** 2026-04-19 — v2.27: TASK-500 / TASK-501 / TASK-502 / TASK-503 cierran el ciclo de UX y contratos del Quote Builder post-TASK-488. `PricingEngineInputV2.autoResolveAddons` pasa de `boolean` a `boolean | 'internal_only'` (aditivo, backwards-compatible). En modo `'internal_only'` el engine auto-resuelve solo addons `visibleToClient: false` (overhead, fee EOR estructural) y expone los addons `visibleToClient: true` aplicables en un campo nuevo de output `PricingEngineOutputV2.suggestedVisibleAddons: PricingAddonOutputV2[]`. El Quote Builder los ofrece como propuestas en el panel "Addons para el cliente" y al tildar se promueven a líneas `overhead_addon` explícitas en `lineItems`. Regla del modelo: lo que el cliente paga es lo que ve en la tabla — cero markup oculto. Para role/person, la UI del shell fija `quantity: 1` en el input al engine; el multiplicador real es `metadata.periods`, bindeado a la columna "Cantidad" visible (meses facturables). Elimina el doble conteo que dejó TASK-500 cuando se sincronizó quantity↔periods sin ajustar el engine. Para líneas catalog-backed (`role | person | tool | overhead_addon`) la UI renderiza el precio unitario como Typography read-only (no input, no override chip); override sigue disponible solo para líneas manuales (`direct_cost` sin `pricingV2LineType`). El shell fuerza una simulación fresca contra `/api/finance/quotes/pricing/simulate` antes de persistir y gate el botón Guardar mientras `simulating=true` — elimina la race condition que hacía fallar el save con "no hay precio" cuando el debounce del hook `usePricingSimulation` no había validado la snapshot actual. Endpoint `/api/finance/quotes/pricing/config` expone `catalog.employmentTypes` (ya existía) que ahora alimenta el dropdown "Tipo de contratación" del popover Ajustes; `periodsLabel` removido de `GH_PRICING.adjustPopover` (quedaba huérfano). Copy del chip de addons en el dock simplificado de "N addons sugeridos" → "N addons" porque el count engloba aplicados + propuestos. Popper del panel de addons migrado de `anchorEl={ref.current}` (caía al top-left cuando el ref era null en el primer render) a anchor capturado desde `event.currentTarget` + `useState<HTMLElement | null>`; dedupe client-side por sku en las entries del panel + guard idempotente en `handleAddonToggle` protegen contra double-clicks y race conditions del debounce.
 > **Updated:** 2026-04-19 — v2.26: TASK-504 separa lifecycle documental de quotations entre borrador, aprobación por excepción y emisión oficial. `greenhouse_commercial.quotations` suma `issued_at`, `issued_by`, `approval_rejected_at` y `approval_rejected_by`; el contrato canónico pasa a `draft | pending_approval | approval_rejected | issued | expired | converted`. Nace el comando `/api/finance/quotes/[id]/issue`; `/send` queda como wrapper de compatibilidad. Cuando la quote cumple policy se emite directo como `issued`; cuando requiere excepción pasa por approval y al aprobarse también termina `issued`. Rechazo ya no vuelve silenciosamente a `draft`, sino que queda explícito en `approval_rejected`. Nuevo evento canónico `commercial.quotation.issued`, mientras `commercial.quotation.sent` se sigue emitiendo como bridge legacy para consumers todavía no migrados. Quote-to-cash, contract lifecycle, HubSpot sync y las proyecciones de pipeline/rentabilidad leen ya el nuevo contrato sin reabrir ambigüedad entre emitir y distribuir.
@@ -60,6 +61,41 @@
   - ninguna de esas acciones redefine por sí sola el lifecycle documental de la cotización
 
 ---
+
+## Delta 2026-04-19 — TASK-506 Dock CTA Simplification + Addons Chip Amount
+
+Post-TASK-505 el dock quedó con layout enterprise pero heredó de TASK-504 dos CTAs en zone 3 que creaban 3 problemas:
+
+### Problemas cerrados
+- **Cognitive collision**: `Guardar y cerrar` + `Guardar y emitir` compartían prefijo verbal. Violación de restraint (modern-ui).
+- **Wrap vertical del dock**: zone 3 (md=4) no aguantaba 2 CTAs horizontales → `flexWrap='wrap'` los apilaba → dock crecía de ~80 px a ~110 px, desbalanceando las 3 zonas.
+- **3 saves en la página**: header tenía "Guardar borrador", dock tenía "Guardar y cerrar" + "Guardar y emitir". Mental model fragmentado.
+
+### Cambios
+
+**Shell (`QuoteBuilderShell.tsx`)**:
+- Elimina `secondaryCtaLabel={GH_PRICING.builderSaveAndClose}`, `secondaryCtaDisabled`, `onSecondaryClick` del render del dock. El "Guardar borrador" del header (tonal primary) absorbe el rol de save sin cerrar.
+- Nuevo `appliedAddonsTotal: number | null` computado sobre `linesSnapshot.filter(line => line.metadata?.pricingV2LineType === 'overhead_addon')` + `simulation.lines[i].suggestedBillRate.totalBillOutputCurrency`. Devuelve `null` si no hay addons aplicados.
+- Nuevo `changeCount` derivado de `Math.abs(linesSnapshot.length - initialLines.length)`; `undefined` cuando el delta es 0 (edits de fields sin change de cantidad de líneas).
+
+**Dock (`QuoteSummaryDock.tsx`)**:
+- Grid zones: `{ xs: 12, md: 3 }` / `{ xs: 12, md: 6 }` / `{ xs: 12, md: 3 }`. Zone 2 (Total ladder) gana ancho; zone 3 (acciones) queda compacta.
+- Nueva prop `appliedAddonsTotal?: number | null`. Cuando > 0, el chip renderiza `· ${formatMoney(appliedAddonsTotal)}` en el mismo peso visual que el count.
+- `addonTotalDelta` sigue presente pero se renderiza en `color=text.secondary` (muted) como preview de sugerencias — ya no compite visualmente con el monto aplicado.
+- Secondary CTA props (`secondaryCtaLabel`, `secondaryCtaDisabled`, `onSecondaryClick`) siguen existiendo en el contrato para consumers futuros (invoice dock, PO footer, contract summary); el render se omite cuando no se pasan.
+
+### Contrato del chip de addons
+
+Lectura visual del chip según estado:
+- `{n} addons` — ningún addon aplicado, ninguna sugerencia.
+- `{n} addons · $applied` — hay addons aplicados, no hay sugerencias sin aplicar.
+- `{n} addons · +$delta` — no hay addons aplicados aún, hay sugerencias sin aplicar.
+- `{n} addons · $applied · +$delta` — hay aplicados y sugerencias pendientes simultáneamente.
+
+Con esto el comercial siempre sabe cuánto está cobrando en addons al cliente sin hacer matemática mental.
+
+### Regla del dock
+La lectura es "estado (izq) → total (centro) → acción terminal (der)". La acción terminal es única. Las acciones de preservación (guardar borrador, cancelar) viven en el header donde no compiten con la acción terminal.
 
 ## Delta 2026-04-19 — TASK-505 Quote Summary Dock v2 + Primitives Extraction
 

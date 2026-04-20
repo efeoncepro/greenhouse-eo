@@ -1,15 +1,32 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.3
+> **Version:** 3.4
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-19 por Claude (v3.3 — TASK-505 Summary Dock v2: 3-zone hierarchy + 3 primitives extraction)
+> **Ultima actualizacion:** 2026-04-19 por Claude (v3.4 — TASK-506 dock CTA simplification: una sola CTA terminal + addons chip cuantitativo)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.4 (2026-04-19 — TASK-506 · Dock CTA simplification)
+
+TASK-505 dejó el dock con layout enterprise pero heredó de TASK-504 dos CTAs en la zona derecha (`Guardar y cerrar` + `Guardar y emitir`) que creaban tres problemas:
+
+- **Cognitive collision**: ambos empezaban con "Guardar", el usuario parseaba el verbo dos veces antes de leer el diferenciador.
+- **Wrap vertical**: en pantallas normales las 2 CTAs no cabían side-by-side en la zona 3 (md=4) y se apilaban — el dock crecía de ~80 px a ~110 px.
+- **Mental model fragmentado**: entre el header ("Guardar borrador") y el dock había **tres puntos para guardar** en una misma pantalla.
+
+### Cambios v3.4
+
+1. **Dock con una sola CTA terminal**: `Guardar y emitir`. El "Guardar y cerrar" del dock se eliminó — el "Guardar borrador" del header ya cumple el rol de "persist sin cerrar". 2 saves en la página en vez de 3.
+2. **Grid zones ajustadas a 3/6/3**: la zona del Total gana ancho para la ladder de ajustes; la zona de acciones queda compacta con el chip de addons + 1 CTA horizontal sin wrap.
+3. **Chip de addons con contexto cuantitativo**: cuando hay addons aplicados, el chip muestra `1 addon · $44.316` (el monto aportado al total). Si además hay sugerencias sin aplicar, suma `+$X` muted al final como preview.
+4. **Save indicator con count**: cuando el draft tiene cambios sin guardar y la cantidad de líneas cambió, el indicador muestra "Sin guardar · 2 cambios" (antes solo "Sin guardar").
+
+El wrapper `QuoteSummaryDock` preserva el soporte para CTA secundaria — los docks futuros (invoice, purchase order, contract summary) pueden pasar ambas si el caso lo requiere. El shell del cotizador simplemente no las pasa.
 
 ## Cambios v3.3 (2026-04-19 — TASK-505 · Summary Dock v2)
 
