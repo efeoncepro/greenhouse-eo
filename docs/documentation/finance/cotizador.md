@@ -1,15 +1,46 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.4
+> **Version:** 3.5
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-19 por Claude (v3.4 — TASK-506 dock CTA simplification: una sola CTA terminal + addons chip cuantitativo)
+> **Ultima actualizacion:** 2026-04-20 por Claude (v3.5 — TASK-507 addons inline en la ladder + TASK-508 line row polish: chip consolidation, warning inline, density)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.5 (2026-04-20 — TASK-507 + TASK-508)
+
+Cierre del polish enterprise del dock y la tabla de ítems. Dos cambios conectados:
+
+### TASK-507 — Addons inline en la Total ladder
+
+Problema post-v3.4: el chip de addons vivía en la zona 3 (acciones) y con un solo CTA ya no había lugar horizontal para ambos — el chip wrapeaba visualmente encima del botón "Guardar y emitir". Mala experiencia.
+
+Root cause conceptual: los addons **son ajustes al total**, no acciones independientes. Patrón enterprise (Stripe Billing / Notion / Linear): acciones contextuales viven con sus datos, no como chips flotantes.
+
+Solución: el addon pasa a ser un **segmento inline interactivo dentro de la Total ladder** (zona 2). Render:
+
+```
+TOTAL CLP
+$2.132.384
+Subtotal $1.936.250  ·  ✨ 1 addon $196.134  ·  Factor ×1,15
+                         ↑ hover: primary color + underline, click: popover
+```
+
+El segmento tiene el mismo peso visual que "Subtotal" o "Factor" (caption muted) pero con affordance de botón (hover, focus-visible, aria-expanded). La zona 3 queda **100% ocupada por la CTA primary** — cero wrap vertical posible.
+
+### TASK-508 — Polish de line item rows
+
+Tres mejoras modern-bar en la tabla de ítems:
+
+1. **Consolidación de chips**: la columna "Tipo" antes mostraba 3 chips apilados (Tipo / Source / Tier). Ahora son 2 chips horizontales (Tipo + Tier), y el origen (Catálogo/Servicio/Template/Manual) pasa a ser un **ícono prefijo en la celda Ítem** con tooltip. Menos ruido visual, misma información.
+
+2. **Warnings inline**: los avisos del engine antes rompían la grid de la tabla con una fila extra `<Alert>` full-width debajo de la row afectada. Ahora el warning aparece como **icon-button en la celda de acciones** (color semantic: error/warning/info según severity más alta); click abre un Popover con el detalle. La grid queda intacta, la tabla no se fragmenta.
+
+3. **Row density reducida**: padding vertical de body cells de default (~16px) a `py: 0.75` (~6px), alineando con la densidad enterprise de Linear / Notion / GitHub Issues. Rows pasan de ~60-70px a ~48-52px — más ítems visibles por scroll.
 
 ## Cambios v3.4 (2026-04-19 — TASK-506 · Dock CTA simplification)
 

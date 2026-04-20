@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.29
+> **Version:** 2.30
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-20 — v2.30: TASK-507 mueve el chip de addons de la zona 3 del dock a un segmento inline dentro del `TotalsLadder` primitive (zona 2). Razón: los addons son ajustes al total, no acciones independientes — patrón enterprise (Stripe Billing / Notion / Linear). `TotalsLadder` gana prop opcional `addonsSegment?: { count, amount, onClick, ariaExpanded } | null`. Render inline entre Subtotal y Factor con affordance de botón (hover primary color + underline, focus-visible, aria-expanded). `QuoteSummaryDock` elimina el chip redondo + Badge de zone 3; el popper queda como sibling del Grid y el anchor se captura desde el inline button. Zone 3 queda 100% ocupada por la CTA primary — cero wrap vertical posible. Props obsoletas removidas: `addonTotalDelta` (del dock + shell); cleanup de imports `Badge`, `formatMoney`, `CURRENCY_LOCALE`. TASK-508 cierra 3 polish items en `QuoteLineItemsEditor`: (a) columna "Tipo" reduce de 3 chips apilados (Tipo/Source/Tier) a 2 chips horizontales (Tipo + Tier); el source se degrada a ícono prefijo en la celda Ítem con tooltip. (b) warnings inline: antes renderizaban como `<TableRow colSpan=8>` con Alert full-width debajo de la row afectada, rompiendo la grid; ahora son un `IconButton` en la celda de acciones con color semantic según severity (critical=error, warning=warning, info=info), click abre un `Popover` con el `QuoteLineWarning` completo. Nuevo state `warningAnchor` + `warningIndex` sigue el mismo pattern que el popover de Ajustes (event.currentTarget, no ref). (c) density reducida: `.MuiTableBody-root .MuiTableCell-root { py: 0.75 }` + header `py: 1`, rows pasan de ~60-70px a ~48-52px, alineado con enterprise table density (Linear / Notion / GitHub Issues).
 > **Updated:** 2026-04-19 — v2.29: TASK-506 simplifica CTAs del Quote Summary Dock. El dock pasa de 2 CTAs (`Guardar y cerrar` tonal + `Guardar y emitir` contained) a 1 sola CTA terminal (`Guardar y emitir`). "Guardar y cerrar" se elimina del dock — el "Guardar borrador" del header absorbe el rol de save sin cerrar (2 saves en la página en vez de 3). Grid zones ajustadas de 3/5/4 a 3/6/3: zone 2 (total ladder) gana ancho, zone 3 (acciones) queda compacta con el addons chip + 1 CTA horizontal sin wrap vertical. `QuoteSummaryDockProps` gana prop nuevo `appliedAddonsTotal?: number | null` — cuando > 0 el chip de addons muestra `N addons · $applied` como contexto cuantitativo; si también hay `addonTotalDelta > 0` (sugerencias no aplicadas), añade `+$delta` muted al final. Shell computa `appliedAddonsTotal` sumando `simulation.lines[i].suggestedBillRate.totalBillOutputCurrency` para líneas con `metadata.pricingV2LineType === 'overhead_addon'`. `changeCount` del `SaveStateIndicator` ahora se deriva del delta entre `initialLines.length` y `linesSnapshot.length`, mostrando "Sin guardar · N cambios" cuando la cantidad de líneas cambió. El wrapper preserva `secondaryCtaLabel`/`onSecondaryClick`/`secondaryCtaDisabled` para consumers futuros (invoice/PO docks); el quote shell simplemente no los pasa.
 > **Updated:** 2026-04-19 — v2.28: TASK-505 Summary Dock v2. El `QuoteSummaryDock` sticky-bottom pasa de Stack flat a layout Grid de 3 zonas (`xs=12 / md=3+5+4`): Estado (save indicator + margin chip) / Totals ladder / Acciones (addons + Cancelar + Guardar). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`SaveStateIndicator`, `MarginHealthChip`, `TotalsLadder`) reusables platform-wide para invoice / PO / contract docks. Total visible migra de `color=primary.main` a `text.primary` — el azul de marca queda reservado a la CTA primaria. `TotalsLadder` oculta subtotal/factor/IVA cuando no aportan información (`total === subtotal && factor === 1 && !ivaAmount`); cuando sí aportan, renderiza caption muted one-liner debajo del Total. `MarginHealthChip` pasa de `49.4%` + ícono a `Margen · 49,4% · Óptimo/Atención/Crítico` + ícono + tooltip de tier range (cierra color-only-state warning). `SaveStateIndicator` gana segunda línea con `changeCount` o `formatRelativeTime(lastSavedAt)`; dot pulsing en saving respeta `prefers-reduced-motion`. CTA primaria deja de hacer copy-swap (`"Guardar y cerrar"` → `"Calculando pricing…"` → `"Guardando…"`) y pasa a loading pattern enterprise: copy invariante + `disabled` + `<CircularProgress size={16} />` en startIcon. Shell actualizado: `primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}` constante, `primaryCtaLoading={submitting}`. `AnimatedCounter` del total baja de `duration=0.4` a `0.25` (emphasized decelerate `cubic-bezier(0.2, 0, 0, 1)`). Alinea con la estrategia de platform primitives de TASK-498.
 > **Updated:** 2026-04-19 — v2.27: TASK-500 / TASK-501 / TASK-502 / TASK-503 cierran el ciclo de UX y contratos del Quote Builder post-TASK-488. `PricingEngineInputV2.autoResolveAddons` pasa de `boolean` a `boolean | 'internal_only'` (aditivo, backwards-compatible). En modo `'internal_only'` el engine auto-resuelve solo addons `visibleToClient: false` (overhead, fee EOR estructural) y expone los addons `visibleToClient: true` aplicables en un campo nuevo de output `PricingEngineOutputV2.suggestedVisibleAddons: PricingAddonOutputV2[]`. El Quote Builder los ofrece como propuestas en el panel "Addons para el cliente" y al tildar se promueven a líneas `overhead_addon` explícitas en `lineItems`. Regla del modelo: lo que el cliente paga es lo que ve en la tabla — cero markup oculto. Para role/person, la UI del shell fija `quantity: 1` en el input al engine; el multiplicador real es `metadata.periods`, bindeado a la columna "Cantidad" visible (meses facturables). Elimina el doble conteo que dejó TASK-500 cuando se sincronizó quantity↔periods sin ajustar el engine. Para líneas catalog-backed (`role | person | tool | overhead_addon`) la UI renderiza el precio unitario como Typography read-only (no input, no override chip); override sigue disponible solo para líneas manuales (`direct_cost` sin `pricingV2LineType`). El shell fuerza una simulación fresca contra `/api/finance/quotes/pricing/simulate` antes de persistir y gate el botón Guardar mientras `simulating=true` — elimina la race condition que hacía fallar el save con "no hay precio" cuando el debounce del hook `usePricingSimulation` no había validado la snapshot actual. Endpoint `/api/finance/quotes/pricing/config` expone `catalog.employmentTypes` (ya existía) que ahora alimenta el dropdown "Tipo de contratación" del popover Ajustes; `periodsLabel` removido de `GH_PRICING.adjustPopover` (quedaba huérfano). Copy del chip de addons en el dock simplificado de "N addons sugeridos" → "N addons" porque el count engloba aplicados + propuestos. Popper del panel de addons migrado de `anchorEl={ref.current}` (caía al top-left cuando el ref era null en el primer render) a anchor capturado desde `event.currentTarget` + `useState<HTMLElement | null>`; dedupe client-side por sku en las entries del panel + guard idempotente en `handleAddonToggle` protegen contra double-clicks y race conditions del debounce.
@@ -61,6 +62,55 @@
   - ninguna de esas acciones redefine por sí sola el lifecycle documental de la cotización
 
 ---
+
+## Delta 2026-04-20 — TASK-507 + TASK-508 Dock Addons Inline + Line Row Polish
+
+### TASK-507 — Addons inline en la TotalsLadder
+
+Post-TASK-506 el dock quedó con 1 CTA + chip de addons en zona 3, pero la zona (md=3) no acomodaba ambos horizontalmente → wrap → chip sentado sobre el botón. Root cause: el chip estaba en la zona equivocada semánticamente.
+
+**Cambios**:
+
+- `TotalsLadder` (`src/components/greenhouse/primitives/TotalsLadder.tsx`) acepta prop nueva:
+  ```ts
+  addonsSegment?: {
+    count: number
+    amount: number
+    onClick: (event: ReactMouseEvent<HTMLElement>) => void
+    ariaExpanded?: boolean
+  } | null
+  ```
+- Cuando `count > 0`, renderiza un segmento inline en la ladder entre Subtotal y Factor con el mismo peso visual (caption muted, tabular-nums) pero con affordance de botón: hover → primary color + `textDecoration: underline`, focus-visible outline primary, aria-expanded. Copy: `N addon{s} $amount` si `amount > 0`; `N addon{s}` si `amount === 0`.
+- Ícono `tabler-sparkles` (14px) prefija el texto.
+- `QuoteSummaryDock` elimina el `<Box component='button'>` chip con Badge + el branch condicional de zone 3. El `<Popper>` queda como sibling del `<Grid>` (no dentro de zone 3). Anchor consumido desde el segmento inline de la ladder vía `handleAddonsToggle`.
+- Prop `addonTotalDelta` removida del dock + del shell (dead code tras TASK-506).
+- Imports cleanup: `Badge`, `formatMoney` local, `CURRENCY_LOCALE` local (ya no necesarios en el dock — `TotalsLadder` tiene su propio format).
+
+### TASK-508 — Line item row polish
+
+Audit módulo identificó 3 mejoras modern-bar en la tabla de items.
+
+**Chip consolidation**:
+- Columna "Tipo" antes: `<Stack spacing=0.5>` con 3 `<CustomChip>` verticales (Tipo tonal / Source outlined / Tier tonal). ~60px vertical por row de solo chips.
+- Ahora: `<Stack direction='row' spacing={0.5}>` con 2 chips (Tipo + Tier). Source pasa a ícono prefijo en la celda Ítem: `<Tooltip><Box><i className={SOURCE_META[source].icon} /></Box></Tooltip>` al lado del `SKU XXX` caption.
+- Columna "Tipo" `minWidth: 140` → `160` (acomoda el stack horizontal).
+
+**Warning inline**:
+- Antes: `<TableRow><TableCell colSpan={8}><QuoteLineWarning ... /></TableCell></TableRow>` debajo de la row afectada. Rompía grid + aumentaba altura de la tabla.
+- Ahora: `<IconButton>` al inicio de la celda de acciones (antes del Ajustes button). Color semantic derivado de la severity más alta de los warnings de la row (`critical → error`, `warning → warning`, `info → info`). Ícono: `tabler-alert-triangle` / `tabler-alert-circle` / `tabler-info-circle`. Click dispara `handleWarningOpen(event, index)` capturando `event.currentTarget` como anchor.
+- Nuevo `<Popover>` al final del editor (sibling del Ajustes Popover) abre con el `<QuoteLineWarning>` completo. aria-haspopup='dialog', aria-expanded.
+- Warnings globales (sin `lineIndex`) siguen como `<Alert>` arriba del dock, sin cambio.
+- State: `warningAnchor: HTMLElement | null`, `warningIndex: number | null`, `currentWarnings = warningIndex !== null ? warningsByLine.get(warningIndex) ?? [] : []`.
+
+**Row density**:
+- `<Box sx={{ overflowX: 'auto', '& .MuiTableBody-root .MuiTableCell-root': { py: 0.75 }, '& .MuiTableHead-root .MuiTableCell-root': { py: 1 } }}>`.
+- Default MUI `Table size='small'` da `py: 1.5` (~12px). Ahora `py: 0.75` (~6px) en body, `py: 1` (~8px) en header.
+- Target: ~48-52px row height (Linear / Notion / GitHub Issues convention).
+- Columna acciones `minWidth: 80` → `100` (acomoda el nuevo warning IconButton).
+
+### Regla canónica del dock (refinada post-TASK-507)
+
+"Estado (izq) → Total + ajustes inline (centro) → Acción terminal (der)". El Total es el anchor visual; los ajustes (subtotal, factor, IVA, addons) son caption muted inline **solo cuando aportan información**. Los addons son el único segmento interactivo de la ladder — click abre el popover de detalle. La zona de acciones contiene solo la CTA terminal de la cotización.
 
 ## Delta 2026-04-19 — TASK-506 Dock CTA Simplification + Addons Chip Amount
 
