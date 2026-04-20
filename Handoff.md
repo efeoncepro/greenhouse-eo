@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — Chile tax layer task stack registered (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete` (docs-only)
+- **Rama:** `docs/codex-chile-tax-layer-tasks`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-hubspot-quote-sync`
+- **Cambio documental:**
+  - se registro `TASK-528` como programa paraguas para la capa tributaria Chile/IVA.
+  - se registraron las tasks hijas `TASK-529` a `TASK-533` para foundation tributaria, quotes, income/invoice, compras con recuperabilidad y ledger mensual.
+- **Decisiones de diseno resueltas:**
+  - el contrato base es `tax_code + tax_rate_snapshot + tax_amount + recoverability`, no solo `tax_rate`.
+  - `income` no debe seguir naciendo con IVA implicito `0.19`.
+  - el IVA compra debe distinguir recuperable vs no recuperable para no contaminar costos.
+  - la posicion mensual de IVA debe vivir en proyecciones financieras sobre `ops-worker` o un worker tributario dedicado; no en el commercial worker.
+- **Notas de coordinacion:**
+  - antes de registrar las tasks se hizo `rebase` sobre `origin/develop` para absorber `TASK-525`, `TASK-526` y `TASK-527` ya creadas por Claude y evitar colisiones de numeracion.
+
 ## Sesion 2026-04-20 — TASK-524 invoice sync contract registered (Codex)
 
 - **Owner:** Codex

@@ -581,3 +581,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-525` | `to-do` | View Transitions API rollout (navegación animada nativa) | `docs/tasks/to-do/TASK-525-view-transitions-api-rollout.md` |
 | `TASK-526` | `to-do` | @formkit/auto-animate para list motion zero-config | `docs/tasks/to-do/TASK-526-auto-animate-list-motion.md` |
 | `TASK-527` | `to-do` | Rive interactive illustrations (next-gen Lottie) | `docs/tasks/to-do/TASK-527-rive-interactive-illustrations.md` |
+| `TASK-528` | `to-do` | Chile Tax / IVA Program | `docs/tasks/to-do/TASK-528-chile-tax-iva-program.md` |
+| `TASK-529` | `to-do` | Chile Tax Code Foundation | `docs/tasks/to-do/TASK-529-chile-tax-code-foundation.md` |
+| `TASK-530` | `to-do` | Quote Tax Explicitness (Chile IVA) | `docs/tasks/to-do/TASK-530-quote-tax-explicitness-chile-iva.md` |
+| `TASK-531` | `to-do` | Income / Invoice Tax Convergence | `docs/tasks/to-do/TASK-531-income-invoice-tax-convergence.md` |
+| `TASK-532` | `to-do` | Purchase VAT Recoverability | `docs/tasks/to-do/TASK-532-purchase-vat-recoverability.md` |
+| `TASK-533` | `to-do` | Chile VAT Ledger & Monthly Position | `docs/tasks/to-do/TASK-533-chile-vat-ledger-monthly-position.md` |
