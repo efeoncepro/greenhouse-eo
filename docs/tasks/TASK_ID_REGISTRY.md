@@ -577,3 +577,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-521` | `to-do` | classnames → clsx + tailwind-merge | `docs/tasks/to-do/TASK-521-classnames-to-clsx-tailwind-merge.md` |
 | `TASK-522` | `to-do` | Install MSW (Mock Service Worker) for tests | `docs/tasks/to-do/TASK-522-msw-mock-layer.md` |
 | `TASK-523` | `to-do` | bcryptjs → @node-rs/argon2 (with re-hash policy) | `docs/tasks/to-do/TASK-523-bcryptjs-to-argon2.md` |
+| `TASK-524` | `to-do` | Income → HubSpot Invoice Bridge | `docs/tasks/to-do/TASK-524-income-hubspot-invoice-bridge.md` |

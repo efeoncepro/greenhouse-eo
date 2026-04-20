@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — TASK-524 invoice sync contract registered (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete` (docs-only)
+- **Rama:** `task/TASK-524-income-hubspot-invoice-bridge`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-hubspot-quote-sync`
+- **Cambio documental:**
+  - se registró `TASK-524 — Income → HubSpot Invoice Bridge`.
+  - se resolvieron las open questions de diseño con contrato explícito:
+    - HubSpot `invoice` object como espejo canónico del `income`
+    - `hs_invoice_billable = false` como modo base para no delegar la cobranza a HubSpot
+    - sync en dos fases: mirror financiero en `finance.income.created|updated`; PDF/XML/DTE como file+note en `finance.income.nubox_synced`
+    - asociación a contacto `best-effort`; `company + deal` siguen siendo los anchors obligatorios cuando existen
+- **Fuentes usadas para la decisión:**
+  - docs oficiales HubSpot Invoices API
+  - docs oficiales HubSpot Notes API
+  - docs oficiales HubSpot Files API
+- **Notas de coordinación:**
+  - la task se movió de `TASK-511` a `TASK-524` para no colisionar con el stack roadmap que Claude ya registró en `develop`.
+
 ## Sesion 2026-04-20 — HubSpot quote sync hardening (Codex)
 
 - **Owner:** Codex
