@@ -2,6 +2,7 @@
 
 > **Version:** 2.31
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-20 — v2.31: TASK-509 encapsula el popover de addons dentro del primitive `TotalsLadder` usando Floating UI (`@floating-ui/react` 0.27) — el stack moderno de positioning que reemplaza popper.js v2 (MUI Popper). Motivación: el anchor cruzaba boundaries entre `QuoteSummaryDock` (state) y `TotalsLadder` (button DOM), y el re-render del button al cambiar `count`/`amount` dejaba el cached anchor stale → MUI Popper fallback a viewport `0,0` (popover en top-left). Con Floating UI el primitive es self-contained: `useFloating({ open, onOpenChange, placement: 'top-start', whileElementsMounted: autoUpdate, middleware: [offset(8), flip(), shift({ padding: 16 })] })` + `useInteractions([useClick(context), useDismiss(context, { outsidePress: true, escapeKey: true }), useRole(context, { role: 'dialog' })])` + `<FloatingPortal><FloatingFocusManager modal={false} returnFocus><Paper ref={refs.setFloating} style={floatingStyles}>{content}</Paper></FloatingFocusManager></FloatingPortal>`. `autoUpdate` mantiene el positioning vivo ante resize/scroll/mutation del anchor; `flip` + `shift` evitan overflow del viewport; `FloatingFocusManager returnFocus` devuelve el foco al segmento al cerrar. API contractual del primitive: `addonsSegment?: { count, amount, content: ReactNode } | null` (removida prop `onClick` + `ariaExpanded` — el primitive los gestiona). `QuoteSummaryDock` pierde state `addonAnchor` / `addonsOpen` / `handleAddonsToggle` / `handleAddonsClose` + imports Popper/Paper/ClickAwayListener/useState/ReactMouseEvent. Pasa solo el contenido. TASK-510 pendiente (backlog) para migrar el resto de popovers del portal (ContextChip, Ajustes, Warning) al mismo stack.
 > **Updated:** 2026-04-20 — v2.30: TASK-507 mueve el chip de addons de la zona 3 del dock a un segmento inline dentro del `TotalsLadder` primitive (zona 2). Razón: los addons son ajustes al total, no acciones independientes — patrón enterprise (Stripe Billing / Notion / Linear). `TotalsLadder` gana prop opcional `addonsSegment?: { count, amount, onClick, ariaExpanded } | null`. Render inline entre Subtotal y Factor con affordance de botón (hover primary color + underline, focus-visible, aria-expanded). `QuoteSummaryDock` elimina el chip redondo + Badge de zone 3; el popper queda como sibling del Grid y el anchor se captura desde el inline button. Zone 3 queda 100% ocupada por la CTA primary — cero wrap vertical posible. Props obsoletas removidas: `addonTotalDelta` (del dock + shell); cleanup de imports `Badge`, `formatMoney`, `CURRENCY_LOCALE`. TASK-508 cierra 3 polish items en `QuoteLineItemsEditor`: (a) columna "Tipo" reduce de 3 chips apilados (Tipo/Source/Tier) a 2 chips horizontales (Tipo + Tier); el source se degrada a ícono prefijo en la celda Ítem con tooltip. (b) warnings inline: antes renderizaban como `<TableRow colSpan=8>` con Alert full-width debajo de la row afectada, rompiendo la grid; ahora son un `IconButton` en la celda de acciones con color semantic según severity (critical=error, warning=warning, info=info), click abre un `Popover` con el `QuoteLineWarning` completo. Nuevo state `warningAnchor` + `warningIndex` sigue el mismo pattern que el popover de Ajustes (event.currentTarget, no ref). (c) density reducida: `.MuiTableBody-root .MuiTableCell-root { py: 0.75 }` + header `py: 1`, rows pasan de ~60-70px a ~48-52px, alineado con enterprise table density (Linear / Notion / GitHub Issues).
 > **Updated:** 2026-04-20 — v2.30: HubSpot quote sync hardening. `POST /api/finance/quotes` y `PUT /api/finance/quotes/[id]` aceptan/persisten `hubspotDealId` validado contra `greenhouse_commercial.deals` de la misma `organization_id`; el builder agrega selector async `Deal HubSpot` via `GET /api/commercial/organizations/[id]/deals` (tenant-safe, open deals first). Create outbound vuelve a publicar `commercial.quotation.created` incluso cuando la quote nace desde el write path canónico de Finance, y cambios posteriores de header / deal / líneas emiten `commercial.quotation.updated`. La proyección outbound de HubSpot escucha ahora `commercial.quotation.updated` además de `created/sent/approved/rejected/version_created`, eliminando el hueco donde una quote manual existía pero no tenía ancla `hubspot_deal_id` ni evento de actualización para re-sync. Regla operativa: `hubspot_company_id` resuelve organización; `hubspot_deal_id` resuelve la sync bidireccional de la cotización.
 > **Updated:** 2026-04-19 — v2.29: TASK-506 simplifica CTAs del Quote Summary Dock. El dock pasa de 2 CTAs (`Guardar y cerrar` tonal + `Guardar y emitir` contained) a 1 sola CTA terminal (`Guardar y emitir`). "Guardar y cerrar" se elimina del dock — el "Guardar borrador" del header absorbe el rol de save sin cerrar (2 saves en la página en vez de 3). Grid zones ajustadas de 3/5/4 a 3/6/3: zone 2 (total ladder) gana ancho, zone 3 (acciones) queda compacta con el addons chip + 1 CTA horizontal sin wrap vertical. `QuoteSummaryDockProps` gana prop nuevo `appliedAddonsTotal?: number | null` — cuando > 0 el chip de addons muestra `N addons · $applied` como contexto cuantitativo; si también hay `addonTotalDelta > 0` (sugerencias no aplicadas), añade `+$delta` muted al final. Shell computa `appliedAddonsTotal` sumando `simulation.lines[i].suggestedBillRate.totalBillOutputCurrency` para líneas con `metadata.pricingV2LineType === 'overhead_addon'`. `changeCount` del `SaveStateIndicator` ahora se deriva del delta entre `initialLines.length` y `linesSnapshot.length`, mostrando "Sin guardar · N cambios" cuando la cantidad de líneas cambió. El wrapper preserva `secondaryCtaLabel`/`onSecondaryClick`/`secondaryCtaDisabled` para consumers futuros (invoice/PO docks); el quote shell simplemente no los pasa.
@@ -63,6 +64,83 @@
   - ninguna de esas acciones redefine por sí sola el lifecycle documental de la cotización
 
 ---
+
+## Delta 2026-04-20 — TASK-509 Floating UI en `TotalsLadder` (addons primitive self-contained)
+
+Post-TASK-507 el segmento inline de addons tenía su state de popover repartido entre el dock (anchor + open) y el primitive (button). Al cambiar `count`/`amount` del segmento (ej. tildar un addon), el re-render del botón dejaba el anchor cacheado stale → MUI Popper fallaba a viewport `0,0` (popover en top-left).
+
+### Cambio de stack
+
+Se introduce `@floating-ui/react` (v0.27.16) como nueva dependencia — stack de positioning moderno, sucesor de popper.js v2 que usa MUI Popper. Es el primer consumer; TASK-510 (backlog) migra el resto de popovers del portal.
+
+### API del primitive
+
+```ts
+export interface TotalsLadderAddonsSegment {
+  count: number
+  amount: number
+  content: ReactNode   // ← self-contained: primitive maneja anchor/state/a11y
+}
+```
+
+Props `onClick` + `ariaExpanded` removidas — el primitive las maneja internamente. Consumers pasan el contenido del popover (típicamente `<AddonSuggestionsPanel>`) y listo.
+
+### Implementación interna (`AddonsSegmentButton`)
+
+```tsx
+const [open, setOpen] = useState(false)
+const { refs, floatingStyles, context, isPositioned } = useFloating<HTMLButtonElement>({
+  open,
+  onOpenChange: setOpen,
+  placement: 'top-start',
+  whileElementsMounted: autoUpdate,
+  middleware: [offset(8), flip({ fallbackAxisSideDirection: 'end' }), shift({ padding: 16 })]
+})
+
+const { getReferenceProps, getFloatingProps } = useInteractions([
+  useClick(context),
+  useDismiss(context, { outsidePress: true, escapeKey: true }),
+  useRole(context, { role: 'dialog' })
+])
+
+return (
+  <>
+    <Box component='button' ref={refs.setReference} {...getReferenceProps()} sx={{ ... }}>
+      <i className='tabler-sparkles' />
+      {count} addon{count === 1 ? '' : 's'}{amount > 0 ? ` ${formatMoney(amount)}` : ''}
+    </Box>
+    {open && (
+      <FloatingPortal>
+        <FloatingFocusManager context={context} modal={false} returnFocus>
+          <Paper ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+            {content}
+          </Paper>
+        </FloatingFocusManager>
+      </FloatingPortal>
+    )}
+  </>
+)
+```
+
+### Qué gana el portal con Floating UI
+
+- **Stale-anchor recovery**: `autoUpdate` detecta cambios del reference element (resize, scroll, mutation) y recomputa positioning — bug que MUI Popper no recupera.
+- **Auto-flip + shift**: si el popover no cabe en el viewport, flip automático al lado opuesto o shift constrained dentro del viewport con padding de 16px.
+- **A11y integral**: `useRole({ role: 'dialog' })` + `useDismiss` + `useClick` + `FloatingFocusManager returnFocus` — reemplaza el boilerplate manual de aria-haspopup, escape handling, outside-click, y focus return.
+- **Portal-based rendering**: `FloatingPortal` renderiza al document.body evitando conflictos de z-index / stacking context.
+
+### Cambios en `QuoteSummaryDock`
+
+Removidos:
+- State: `addonAnchor`, `addonsOpen`, `handleAddonsToggle`, `handleAddonsClose`.
+- Imports: `Popper`, `Paper`, `ClickAwayListener`, `useState`, `MouseEvent as ReactMouseEvent`.
+- JSX del `<Popper>` sibling del Grid.
+
+Dock pasa a `addonsSegment={{ count, amount, content: <AddonSuggestionsPanel ... /> }}` — 3 props en vez de 4 (sin `onClick`, sin `ariaExpanded`). El primitive se encarga del resto.
+
+### Regla canónica de primitives
+
+A partir de TASK-509, un primitive con popover interno **es dueño** del state del popover (anchor + open + dismiss + focus). Consumers pasan solo el contenido. TASK-510 formaliza esto en `GREENHOUSE_UI_PLATFORM_V1.md` como pattern estándar.
 
 ## Delta 2026-04-20 — TASK-507 + TASK-508 Dock Addons Inline + Line Row Polish
 

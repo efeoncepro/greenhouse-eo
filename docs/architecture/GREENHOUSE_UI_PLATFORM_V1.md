@@ -1,7 +1,8 @@
 # Greenhouse EO — UI Platform Architecture V1
 
-> **Version:** 1.2
+> **Version:** 1.3
 > **Created:** 2026-03-30
+> **Updated:** 2026-04-20 — v1.3: Floating UI (`@floating-ui/react` 0.27) introducido como stack oficial de positioning para popovers (TASK-509). Primer consumer: `TotalsLadder`. TASK-510 backlog migra el resto. Ver Delta 2026-04-20b abajo.
 > **Updated:** 2026-04-20 — v1.2: `TotalsLadder` primitive extiende su API con `addonsSegment?: { count, amount, onClick, ariaExpanded } | null` (TASK-507) para renderizar un segmento interactivo inline dentro de la ladder de ajustes. Pattern: acciones contextuales viven con sus datos, no como chips flotantes separados. Ver Delta 2026-04-20 abajo.
 > **Updated:** 2026-04-19 — v1.1: registry de primitives `src/components/greenhouse/primitives/` gana 3 componentes nuevos extraídos de `QuoteSummaryDock` (TASK-505). Ver Delta 2026-04-19 abajo.
 > **Audience:** Frontend engineers, UI/UX architects, agents implementing views
@@ -11,6 +12,91 @@
 ## Overview
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
+
+## Delta 2026-04-20b — Floating UI como stack oficial de popovers (TASK-509 / TASK-510)
+
+### Decisión de plataforma
+
+`@floating-ui/react` (v0.27+) pasa a ser el stack canónico para cualquier popover nuevo en el portal. Reemplaza progresivamente a `@mui/material/Popper` (basado en popper.js v2, legacy 2019). Es el stack que usan en 2024-2026 Linear, Stripe, Vercel, Radix, shadcn, Notion.
+
+**Motivación**:
+- Recuperación de stale-anchor vía `autoUpdate` (ResizeObserver + IntersectionObserver + MutationObserver).
+- Middleware composable: `offset`, `flip`, `shift`, `size`, `arrow`, `hide`.
+- A11y hooks integrados: `useRole`, `useDismiss`, `useClick`, `useHover`, `useFocus`.
+- `FloatingFocusManager` con `returnFocus` — reemplaza boilerplate manual.
+- `FloatingPortal` — render al document.body evitando stacking context issues.
+
+### Regla canónica
+
+Un primitive con popover interno **es dueño** del state del popover (anchor + open + dismiss + focus). Consumers pasan solo el contenido como `ReactNode`. Never leak state/anchor across component boundaries.
+
+### Pattern estándar para popover primitive
+
+```tsx
+import {
+  FloatingFocusManager,
+  FloatingPortal,
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useInteractions,
+  useRole
+} from '@floating-ui/react'
+
+const MyPopoverPrimitive = ({ content, ...triggerProps }) => {
+  const [open, setOpen] = useState(false)
+
+  const { refs, floatingStyles, context, isPositioned } = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement: 'top-start',
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(8), flip({ fallbackAxisSideDirection: 'end' }), shift({ padding: 16 })]
+  })
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    useClick(context),
+    useDismiss(context, { outsidePress: true, escapeKey: true }),
+    useRole(context, { role: 'dialog' })
+  ])
+
+  return (
+    <>
+      <Trigger ref={refs.setReference} {...getReferenceProps()} {...triggerProps} />
+      {open && (
+        <FloatingPortal>
+          <FloatingFocusManager context={context} modal={false} returnFocus>
+            <Paper ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+              {content}
+            </Paper>
+          </FloatingFocusManager>
+        </FloatingPortal>
+      )}
+    </>
+  )
+}
+```
+
+### Middleware defaults
+
+Para popovers enterprise del portal:
+- `offset(8)` — separación de 8px entre reference y floating.
+- `flip({ fallbackAxisSideDirection: 'end' })` — si no cabe top-start, cae a bottom-end antes que centrar.
+- `shift({ padding: 16 })` — mantiene 16px de viewport padding al hacer shift.
+
+Para tooltips (TASK-510 futuro): agregar `hide()` middleware y `useHover` interaction.
+
+### Convivencia temporal
+
+Hasta que TASK-510 complete la migración platform-wide, `@mui/material/Popper` sigue vigente en: `ContextChip`, `AddLineSplitButton`, `AjustesPopover` (del QuoteLineItemsEditor), `QuoteShortcutPalette`. TASK-510 los absorbe uno por uno.
+
+### Consumers actuales (2026-04-20)
+
+- `TotalsLadder` (TASK-509) — segmento inline de addons.
 
 ## Delta 2026-04-20 — TotalsLadder `addonsSegment` prop (TASK-507)
 
