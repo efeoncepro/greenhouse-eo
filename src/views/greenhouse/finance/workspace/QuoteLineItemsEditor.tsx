@@ -392,6 +392,10 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   const [adjustAnchor, setAdjustAnchor] = useState<HTMLElement | null>(null)
   const [adjustIndex, setAdjustIndex] = useState<number | null>(null)
 
+  // Popover de warnings por fila (TASK-508) — reemplaza el Alert full-row.
+  const [warningAnchor, setWarningAnchor] = useState<HTMLElement | null>(null)
+  const [warningIndex, setWarningIndex] = useState<number | null>(null)
+
   const toggleRowExpanded = useCallback((index: number) => {
     setExpandedRows(prev => {
       const next = new Set(prev)
@@ -495,7 +499,18 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     setAdjustIndex(null)
   }, [])
 
+  const handleWarningOpen = useCallback((event: ReactMouseEvent<HTMLElement>, index: number) => {
+    setWarningAnchor(event.currentTarget)
+    setWarningIndex(index)
+  }, [])
+
+  const handleWarningClose = useCallback(() => {
+    setWarningAnchor(null)
+    setWarningIndex(null)
+  }, [])
+
   const currentAdjustLine = adjustIndex !== null ? draftLines[adjustIndex] ?? null : null
+  const currentWarnings = warningIndex !== null ? warningsByLine.get(warningIndex) ?? [] : []
 
   if (!editable) {
     return (
@@ -673,18 +688,27 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
           />
         </CardContent>
       ) : (
-        <Box sx={{ overflowX: 'auto' }}>
+        <Box
+          sx={{
+            overflowX: 'auto',
+
+            // Density post-TASK-508: reduce padding vertical de body cells
+            // para llegar a ~48px por row (target enterprise Linear/Notion).
+            '& .MuiTableBody-root .MuiTableCell-root': { py: 0.75 },
+            '& .MuiTableHead-root .MuiTableCell-root': { py: 1 }
+          }}
+        >
           <Table size='small'>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ width: 32, minWidth: 32 }} aria-label='Expandir detalle' />
                 <TableCell sx={{ minWidth: 220 }}>Ítem</TableCell>
-                <TableCell sx={{ minWidth: 140 }}>Tipo</TableCell>
+                <TableCell sx={{ minWidth: 160 }}>Tipo</TableCell>
                 <TableCell sx={{ minWidth: 90 }} align='right'>Cantidad</TableCell>
                 <TableCell sx={{ minWidth: 110 }}>Unidad</TableCell>
                 <TableCell sx={{ minWidth: 130 }} align='right'>Precio unitario</TableCell>
                 <TableCell sx={{ minWidth: 110 }} align='right'>Subtotal</TableCell>
-                <TableCell sx={{ minWidth: 80 }} align='right' aria-label='Acciones' />
+                <TableCell sx={{ minWidth: 100 }} align='right' aria-label='Acciones' />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -765,25 +789,36 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                             disabled={saving}
                             aria-label={`Etiqueta del ítem ${index + 1}`}
                           />
-                          {line.metadata?.sku && (
-                            <Typography variant='caption' color='text.secondary'>
-                              SKU {line.metadata.sku}
-                            </Typography>
-                          )}
+                          <Stack direction='row' spacing={1} alignItems='center' useFlexGap>
+                            {line.source ? (
+                              <Tooltip title={`Origen: ${SOURCE_META[line.source].label}`} disableInteractive>
+                                <Box
+                                  component='span'
+                                  aria-label={`Origen: ${SOURCE_META[line.source].label}`}
+                                  sx={theme => ({
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    color: theme.palette.text.secondary
+                                  })}
+                                >
+                                  <i className={SOURCE_META[line.source].icon} aria-hidden='true' style={{ fontSize: 14 }} />
+                                </Box>
+                              </Tooltip>
+                            ) : null}
+                            {line.metadata?.sku ? (
+                              <Typography variant='caption' color='text.secondary'>
+                                SKU {line.metadata.sku}
+                              </Typography>
+                            ) : null}
+                          </Stack>
                         </Stack>
                       </TableCell>
                       <TableCell>
-                        <Stack spacing={0.5}>
+                        {/* Consolidación post-TASK-508: tipo + tier en una columna
+                            compacta. Source (catálogo/servicio/template/manual)
+                            se muestra como ícono prefijo en la celda Ítem. */}
+                        <Stack spacing={0.5} direction='row' alignItems='center' flexWrap='wrap' useFlexGap>
                           <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
-                          {line.source ? (
-                            <CustomChip
-                              round='true'
-                              size='small'
-                              variant='outlined'
-                              color={SOURCE_META[line.source].color}
-                              label={SOURCE_META[line.source].label}
-                            />
-                          ) : null}
                           {tierMeta ? (
                             <CustomChip
                               round='true'
@@ -941,6 +976,49 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       </TableCell>
                       <TableCell align='right'>
                         <Stack direction='row' spacing={0.25} justifyContent='flex-end'>
+                          {rowWarnings.length > 0 ? (
+                            (() => {
+                              const worstSeverity = rowWarnings.some(w => w.severity === 'critical')
+                                ? 'critical'
+                                : rowWarnings.some(w => w.severity === 'warning')
+                                  ? 'warning'
+                                  : 'info'
+
+                              const iconClass =
+                                worstSeverity === 'critical'
+                                  ? 'tabler-alert-triangle'
+                                  : worstSeverity === 'warning'
+                                    ? 'tabler-alert-circle'
+                                    : 'tabler-info-circle'
+
+                              const iconColor =
+                                worstSeverity === 'critical'
+                                  ? 'error'
+                                  : worstSeverity === 'warning'
+                                    ? 'warning'
+                                    : 'info'
+
+                              return (
+                                <Tooltip
+                                  title={`${rowWarnings.length} aviso${rowWarnings.length === 1 ? '' : 's'} del engine`}
+                                  disableInteractive
+                                >
+                                  <span>
+                                    <IconButton
+                                      size='small'
+                                      color={iconColor}
+                                      onClick={event => handleWarningOpen(event, index)}
+                                      aria-label={`Ver ${rowWarnings.length} aviso${rowWarnings.length === 1 ? '' : 's'} del ítem ${index + 1}`}
+                                      aria-haspopup='dialog'
+                                      aria-expanded={warningIndex === index}
+                                    >
+                                      <i className={iconClass} style={{ fontSize: 18 }} />
+                                    </IconButton>
+                                  </span>
+                                </Tooltip>
+                              )
+                            })()
+                          ) : null}
                           {needsPricingContext ? (
                             <Tooltip title={GH_PRICING.adjustPopover.triggerLabel} disableInteractive>
                               <span>
@@ -977,14 +1055,6 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                         </Stack>
                       </TableCell>
                     </TableRow>
-
-                    {rowWarnings.length > 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={8} sx={{ py: 1, bgcolor: 'background.default' }}>
-                          <QuoteLineWarning warnings={rowWarnings} rowIndex={index} rowElementId={rowId} />
-                        </TableCell>
-                      </TableRow>
-                    ) : null}
 
                     {isExpanded && showCostStack && simulationLine && outputCurrency ? (
                       <TableRow>
@@ -1126,6 +1196,35 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 </Button>
               </Stack>
             </Stack>
+          </Box>
+        ) : null}
+      </Popover>
+
+      {/* Popover de warnings por fila (TASK-508) — reemplaza el Alert
+          full-row con un ícono en la columna de acciones + popover con
+          el detalle. Mantiene la grid de la tabla intacta. */}
+      <Popover
+        open={Boolean(warningAnchor) && currentWarnings.length > 0}
+        anchorEl={warningAnchor}
+        onClose={handleWarningClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{
+          paper: {
+            sx: theme => ({
+              mt: 1,
+              width: 420,
+              maxWidth: 'calc(100vw - 32px)',
+              borderRadius: 2,
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: theme.shadows[6]
+            })
+          }
+        }}
+      >
+        {warningIndex !== null && currentWarnings.length > 0 ? (
+          <Box sx={{ p: 2 }} role='dialog' aria-label='Avisos del motor de pricing'>
+            <QuoteLineWarning warnings={currentWarnings} rowIndex={warningIndex} />
           </Box>
         ) : null}
       </Popover>
