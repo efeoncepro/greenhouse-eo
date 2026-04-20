@@ -18,6 +18,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 const COST_MODELS = [
@@ -558,6 +560,11 @@ const EditToolDrawer = ({ open, toolId, onClose, onSuccess }: Props) => {
       </Stack>
 
       <Divider />
+      {toolId ? (
+        <Box sx={{ px: 4, py: 2 }}>
+          <ImpactPreviewPanel entityType='tool_catalog' entityId={toolId} />
+        </Box>
+      ) : null}
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
         <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>
           Cancelar
