@@ -1,5 +1,13 @@
 # TASK-485 — FX Coverage Rollout (manual_only → auto_synced)
 
+## Delta 2026-04-20 — Validada contra codebase real
+
+La revisión del repo confirma que esta task **sigue abierta sin recorte**:
+
+- `CURRENCY_REGISTRY.CLF`, `COP`, `MXN` y `PEN` siguen en `coverage: 'manual_only'`
+- el rollout no se puede dar por hecho solo porque `TASK-484` ya cerró
+- el gap ahora es puramente operativo/evidencial, no de implementación base
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -14,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD — post 24-48h de dry-run verification de TASK-484`
 - Domain: `finance`
-- Blocked by: `TASK-484 (merged to develop, deploy to staging required)`
+- Blocked by: `evidencia de staging dry-run + BANXICO_SIE_TOKEN para MXN`
 - Branch: `task/TASK-485-fx-coverage-rollout`
 - Legacy ID: `none`
 - GitHub Issue: `none`

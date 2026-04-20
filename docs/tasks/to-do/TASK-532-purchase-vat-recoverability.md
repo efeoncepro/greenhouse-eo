@@ -57,7 +57,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`
+- `docs/tasks/complete/TASK-476-commercial-cost-basis-program.md`
 - `project_context.md`
 
 ## Dependencies & Impact
@@ -172,4 +172,3 @@ Casos minimos:
 ## Follow-ups
 
 - `TASK-533`
-

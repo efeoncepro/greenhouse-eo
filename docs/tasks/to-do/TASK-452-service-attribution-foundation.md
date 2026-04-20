@@ -1,5 +1,13 @@
 # TASK-452 - Service Attribution Foundation
 
+## Delta 2026-04-20 — Validada contra codebase real
+
+Revisión contra el repo al 2026-04-20:
+
+- `greenhouse_serving.commercial_cost_attribution` y `operational_pl_snapshots` ya existen, pero siguen siendo capas agregadas por cliente/periodo y no una attribution fact canónica por `service_id`.
+- `quotation_profitability_snapshots` y `contract_profitability_snapshots` ya consumen costo atribuido agregado, pero todavía no pueden explicar desvío o rentabilidad a grain servicio sin esta foundation.
+- Esta task **sigue vigente sin recorte de scope**. No debe cerrarse por la mera existencia de snapshots comerciales o profitability readers posteriores.
+
 ## Metadata
 - **Task ID:** TASK-452
 - **Type:** implementation

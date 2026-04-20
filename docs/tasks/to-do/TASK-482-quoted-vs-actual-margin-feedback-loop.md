@@ -1,33 +1,50 @@
 # TASK-482 — Quoted vs Actual Margin Feedback Loop
 
+## Delta 2026-04-20 — Reanclaje contra codebase real
+
+La revisión del repo mostró que el loop base ya existe:
+
+- `greenhouse_serving.quotation_profitability_snapshots` ya compara margen cotizado vs ejecución atribuida a nivel quote
+- `greenhouse_serving.contract_profitability_snapshots` ya existe para el anchor contractual
+
+Por eso esta task deja de ser "crear el feedback loop" y pasa a ser el follow-on que:
+
+1. converge esos snapshots bajo el worker dedicado
+2. los mejora con grain servicio cuando `TASK-452` exista
+3. deja señales de calibración más explícitas para cost basis
+
 ## Status
 
 - Lifecycle: `to-do`
 - Priority: `P2`
 - Impact: `Alto`
-- Effort: `Alto`
+- Effort: `Medio`
 - Type: `implementation`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-452`, `TASK-480`
+- Blocked by: `TASK-452`
 - Branch: `task/TASK-482-quoted-vs-actual-margin-feedback-loop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Cerrar el loop entre lo cotizado y lo ejecutado para que Greenhouse pueda comparar margen esperado versus margen real usando la capa `Commercial Cost Basis` y la foundation de atribución por servicio. Esta task no recalcula el quote builder; construye la lectura posterior que permite aprender y recalibrar supuestos.
+Converger y profundizar el feedback loop de rentabilidad ya existente. Esta task ya no crea desde cero la comparación quoted-vs-actual; la endurece sobre `commercial-cost-worker`, la acerca a grain servicio y deja señales más útiles para recalibrar cost basis y pricing assumptions.
 
 ## Why This Task Exists
 
-Sin feedback loop, el programa cost basis mejora la cotización pero no aprende de la realidad. Greenhouse necesita saber cuánto margen esperaba al cotizar, cuánto costó realmente ejecutar y qué supuestos fallaron.
+Greenhouse ya tiene snapshots de profitability por quote y por contract, pero todavía faltan tres cosas:
+
+- una materialización batch explícita en `commercial-cost-worker`
+- convergencia con atribución por servicio para explicar drift con mayor precisión
+- señales de calibración más reutilizables para follow-ons del lane comercial
 
 ## Goal
 
-- Comparar margen cotizado versus margen ejecutado.
-- Reusar service attribution y financial consumers existentes.
-- Dejar evidencia para recalibrar assumptions y blended costs.
+- materializar el feedback loop en el worker dedicado
+- mejorar la explicación del drift con servicio/atribución cuando exista `TASK-452`
+- dejar outputs consumibles para recalibración posterior
 
 ## Architecture Alignment
 
@@ -48,11 +65,11 @@ Reglas obligatorias:
 
 ### Depends on
 
+- `src/lib/commercial-intelligence/profitability-materializer.ts`
+- `src/lib/commercial-intelligence/contract-profitability-materializer.ts`
 - `src/lib/finance/quotation-canonical-store.ts`
 - `src/lib/commercial/contracts-store.ts`
-- `src/lib/finance/quote-to-cash/document-chain-reader.ts`
-- `src/lib/cost-intelligence/compute-operational-pl.ts`
-- `src/lib/finance/postgres-store-intelligence.ts`
+- `services/commercial-cost-worker/server.ts`
 
 ### Blocks / Impacts
 
@@ -60,52 +77,52 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib/finance/quotation-canonical-store.ts`
-- `src/lib/commercial/contracts-store.ts`
-- `src/lib/finance/quote-to-cash/document-chain-reader.ts`
-- `src/lib/cost-intelligence/compute-operational-pl.ts`
-- `src/lib/finance/postgres-store-intelligence.ts`
+- `src/lib/commercial-intelligence/profitability-materializer.ts`
+- `src/lib/commercial-intelligence/contract-profitability-materializer.ts`
+- `services/commercial-cost-worker/server.ts`
+- `docs/documentation/operations/commercial-cost-worker.md`
 
 ## Current Repo State
 
 ### Already exists
 
-- quote and contract anchors
-- document chain
-- cost intelligence consumers
-- service attribution foundation planificada
-- `TASK-483` ya dejó `commercial-cost-worker` operativo y reservó `POST /margin-feedback/materialize` como runtime target para esta task.
+- `quotation_profitability_snapshots`
+- `contract_profitability_snapshots`
+- quote y contract anchors ya convergidos
+- `TASK-483` ya dejó `commercial-cost-worker` operativo y reservó `POST /margin-feedback/materialize` como runtime target para esta task
 
 ### Gap
 
-- No existe una lectura explícita de margen cotizado vs real.
-- Los supuestos del pricing lane no tienen feedback loop formal hacia su calibración.
+- El endpoint batch dedicado sigue reservado
+- El drift todavía se explica sin grain servicio
+- No existe una salida consolidada de calibración posterior al snapshot base
 
 ## Scope
 
 ### Slice 1 — Comparison contract
 
-- Definir qué campos comparan `quoted` vs `actual`.
+- Converger los contratos quote/contract profitability en una salida batch explícita para margin feedback.
 
 ### Slice 2 — Read model
 
-- Construir el reader o snapshot que una quote/contract con ejecución atribuida.
+- Extender la comparación para aprovechar `TASK-452` cuando exista attribution fact por `service_id`.
 
 ### Slice 3 — Calibration signals
 
-- Dejar outputs consumibles para recalibrar assumptions/modeling futuros.
+- Dejar outputs consumibles para recalibrar assumptions/modeling futuros sin mutar el catálogo automáticamente.
 
 ## Out of Scope
 
 - UI completa de analytics.
 - Recalibración automática del catálogo.
+- Rehacer los snapshots base ya implementados.
 
 ## Acceptance Criteria
 
-- [ ] Existe una lectura confiable de margen cotizado vs real.
-- [ ] La comparación se apoya en `TASK-452` y no en heurísticas inline.
-- [ ] El sistema puede explicar desvíos con suficiente provenance.
-- [ ] Queda base para recalibrar assumptions comerciales posteriores.
+- [ ] `POST /margin-feedback/materialize` deja de estar reservado y corre en `commercial-cost-worker`
+- [ ] El feedback loop reutiliza las snapshots de profitability ya existentes en vez de duplicarlas
+- [ ] La comparación aprovecha `TASK-452` cuando exista attribution fact por servicio
+- [ ] Queda base para recalibrar assumptions comerciales posteriores
 
 ## Verification
 

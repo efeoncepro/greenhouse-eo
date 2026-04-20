@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — Backlog alignment TASK-452/466/471/476/480/481/482/485 (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete` (docs-only)
+- **Rama:** `docs/codex-backlog-alignment-commercial-cost-fx`
+- **Cambio documental:**
+  - `TASK-476` se cerró y movió a `docs/tasks/complete/` como closure doc del programa `Commercial Cost Basis`.
+  - `TASK-480`, `TASK-481` y `TASK-482` quedaron reancladas al runtime real: ya no prometen foundations que el repo ya aterrizó y ahora describen solo los follow-ons pendientes.
+  - `TASK-466` quedó recortada al gap client-facing real (`currency + exchange_rates` + snapshot en send/issue + PDF/email/detail/document-chain), sin abrir una columna paralela `output_currency` mientras la arquitectura no cambie.
+  - `TASK-471` quedó explícitamente como follow-on UI/gobernanza del pricing catalog; ya no depende de backend pendiente porque `TASK-470` ya lo cubrió.
+  - `TASK-452` y `TASK-485` quedaron validadas como todavía necesarias sin recorte de scope.
+  - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y referencias cruzadas de `TASK-528`, `TASK-532` y `TASK-483` quedaron sincronizadas con el cierre de `TASK-476`.
+- **Validación:**
+  - revisión documental y contraste contra codebase
+  - sin cambios de runtime
+  - sin build/lint/test porque el trabajo fue docs-only
+
 ## Sesion 2026-04-20 — Chile tax layer task stack registered (Codex)
 
 - **Owner:** Codex
@@ -716,7 +733,7 @@ Al investigar el bug quedó expuesto que `quotations` mezcla identidades: tiene 
   - `portal interactive lane` para preview, composición y lectura de snapshots,
   - `Cloud Run compute lane` en worker dedicado para materializaciones, repricing batch, backfills y feedback loop.
 - **Rationale:** `ops-worker` ya concentra lanes reactivos y jobs operativos compartidos; sumar ahí el engine comercial mezclaría blast radius, recursos y cadence de deploy.
-- **Docs sincronizados:** `docs/tasks/to-do/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`, `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`, `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`, `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`.
+- **Docs sincronizados:** `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`, `docs/tasks/complete/TASK-476-commercial-cost-basis-program.md`, `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`, `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`.
 - **Importante para siguientes agentes:** `TASK-477` a `TASK-482` ya no deben asumir implementación puramente in-app ni montarse en `ops-worker`; revisar `TASK-483` antes de tocar worker placement o jobs batch.
 
 ## Sesion 2026-04-19 — Programa Commercial Cost Basis registrado (Codex)

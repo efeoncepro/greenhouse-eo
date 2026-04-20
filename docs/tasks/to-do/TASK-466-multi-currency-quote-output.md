@@ -35,6 +35,15 @@ TASK-475 ya mergeada. Esta task debe consumir explícitamente:
 5. **`fx_fallback` warnings del engine**: el preview de cotización ya los muestra en `QuotePricingWarningsPanel` (TASK-473). El flujo de envío debe re-chequearlos y bloquear si algún warning tiene `severity === 'critical'`.
 6. **Monedas `manual_only`** (hoy `CLF/COP/MXN/PEN`): TASK-466 no implementa providers automáticos. Si el AE necesita enviar en esas monedas, un admin de finance debe upsertar la tasa manualmente — la UI debe hacer visible ese paso.
 
+## Delta 2026-04-20 — Revisión contra codebase real
+
+La revisión contra el repo confirma que parte relevante de la foundation ya aterrizó y la task debe recortarse al gap real:
+
+1. El builder full-page ya expone `outputCurrency` en `QuoteBuilderActions`, `QuoteBuilderShell` y `QuoteContextStrip`; esa parte no hay que rediseñarla.
+2. La quote canónica ya persiste `currency`, `exchange_rates` y `exchange_snapshot_date`; esta task **no debe abrir una segunda capa paralela** `output_currency` mientras el contrato activo siga siendo ese.
+3. El gap vigente es client-facing: snapshot al emitir/enviar, PDF, email, detail/review toggle y document chain alineados a la moneda de salida.
+4. `TASK-473`, `TASK-475`, `TASK-464d` y `TASK-464e` ya no bloquean el trabajo documental. El único condicionante operativo vigente para CLF/COP/MXN/PEN en producción sigue siendo `TASK-485`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -49,31 +58,33 @@ TASK-475 ya mergeada. Esta task debe consumir explícitamente:
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-464d (engine v2 with multi-currency output), TASK-464e (UI with currency selector), TASK-473 (builder full-page surface migration), TASK-475 (Greenhouse FX & currency platform foundation)`
+- Blocked by: `TASK-485 (solo para rollout auto_synced CLF/COP/MXN/PEN en producción)`
 - Branch: `task/TASK-466-multi-currency-quote-output`
 - Legacy ID: `parte de revenue pricing program`
 - GitHub Issue: `none`
 
 ## Summary
 
-Propagar multi-currency output al cliente: la quote se persiste en USD (canonical) + `output_currency` seleccionado (CLP/CLF/COP/MXN/PEN). El cliente la ve, recibe el PDF y el email en SU moneda (ej. Pinturas Berel en MXN, Sky en CLP). Internal users ven ambas (USD + local). Footer del documento muestra exchange rate usado + fecha para transparencia. La integración UI debe vivir en el builder full-page y en la vista de review, no en el drawer legacy.
+Cerrar el rendering client-facing multi-moneda de la quote canónica actual. La quote ya persiste `currency` + `exchange_rates`; esta task debe congelar y consumir ese snapshot al emitir/enviar para que PDF, email, detail/review y document chain hablen el mismo contrato y el cliente vea la cotización en su moneda.
 
 ## Why This Task Exists
 
-TASK-464d genera output multi-currency desde el engine; TASK-464e expuso la selección de `output_currency`, pero el **rendering al cliente** todavía está hardcoded a CLP (default Efeonce Chile). Un cliente México recibe quote en CLP y no sabe convertir. Un cliente Colombia igual. Europa USD recibe USD pero no ve tabla de conversión.
+El engine y el builder ya soportan la selección de moneda de salida, pero el **rendering client-facing** todavía no quedó convergido al contrato canónico. Hoy el repo sigue resolviendo PDF, detail y document chain principalmente desde `currency`, y el snapshot FX todavía no se endurece de forma consistente al emitir/enviar.
 
-Además, la surface de composición actual quedó anclada al drawer legacy; `TASK-473` corrige eso moviendo el builder a páginas dedicadas. `TASK-466` debe aterrizar directamente sobre esa surface correcta para no invertir esfuerzo en una UI transitoria.
+El riesgo real ya no es el drawer legacy; ese corte quedó atrás con `TASK-473`. El riesgo ahora es dejar dos verdades:
+
+- builder interno mostrando una moneda,
+- documento/email/detalle usando otra resolución o reconsultando FX tarde.
 
 Con 85% retainer recurrente + Pinturas Berel México cerrándose + expansion LATAM, la multi-currency output es UX crítica para experiencia profesional.
 
 ## Goal
 
-- `greenhouse_commercial.quotations` tiene `output_currency` + `exchange_rate_snapshot` + `exchange_rate_date`
-- API responses incluyen precios en la moneda de output
-- PDF renderiza en output_currency con footer explicativo
-- Email renderiza igual + breakdown currency summary
-- Internal viewers ven toggle "USD / Cliente currency" en `QuoteDetailView`
-- Create/edit surfaces (`/finance/quotes/new`, `/finance/quotes/[id]/edit`) exponen preview consistente con la moneda de salida
+- `greenhouse_commercial.quotations` usa de forma consistente `currency` + `exchange_rates` + `exchange_snapshot_date` como snapshot client-facing
+- `POST /api/finance/quotes/[id]/issue` y/o `/send` congelan y validan el FX snapshot antes de exponer la quote al cliente
+- PDF renderiza en la moneda snapshot con footer explicativo cuando corresponde
+- Email/send flow reutiliza el mismo snapshot y el mismo gating de readiness
+- Internal viewers ven toggle `"USD / moneda cliente"` en `QuoteDetailView` sin mutar el documento histórico
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -89,7 +100,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - Exchange rate se **snapshotea** al momento de send (immutable) — quote ya enviada NO se regenera con rate nuevo
-- Canonical storage sigue en USD + exchange_rate_snapshot
+- Mientras el contrato canónico siga siendo `currency + exchange_rates + exchange_snapshot_date`, esta task no crea una columna paralela `output_currency`
 - PDF + email usan output_currency, con `conversion note` en footer: "Tipo de cambio USD→MXN: 20.50 al 2026-04-18 (Fuente: BCR)"
 
 ## Normative Docs
@@ -102,10 +113,14 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-464d — engine v2 con multi-currency
-- TASK-464e — UI currency selector
-- TASK-473 — builder full-page como surface correcta de create/edit
-- `greenhouse_finance.exchange_rates` poblado con rates recientes
+- `src/app/api/finance/quotes/[id]/issue/route.ts`
+- `src/app/api/finance/quotes/[id]/send/route.ts`
+- `src/app/api/finance/quotes/[id]/pdf/route.ts`
+- `src/lib/finance/quotation-canonical-store.ts`
+- `src/lib/finance/quote-to-cash/document-chain-reader.ts`
+- `src/lib/finance/currency-domain.ts`
+- `src/lib/finance/fx-readiness.ts`
+- `TASK-485` solo como rollout operacional para `auto_synced` en CLF/COP/MXN/PEN
 
 ### Blocks / Impacts
 
@@ -116,29 +131,36 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/[verificar]-task-466-quote-output-currency.sql`
-- `src/lib/finance/pdf/render-quotation-pdf.tsx` (refactor para output_currency)
-- `src/lib/finance/pdf/quotation-pdf-document.tsx` (idem)
-- `src/lib/email/templates/quote-sent.tsx` (refactor)
-- `src/lib/finance/quote-to-cash/document-chain-reader.ts` (retornar en output_currency + USD)
-- `src/views/greenhouse/finance/QuoteBuilderPageView.tsx` (preview/switching interno en full-page)
-- `src/views/greenhouse/finance/QuoteDetailView.tsx` (toggle USD / local)
-- `src/types/db.d.ts` (auto-regen)
+- `src/app/api/finance/quotes/[id]/issue/route.ts`
+- `src/app/api/finance/quotes/[id]/send/route.ts`
+- `src/app/api/finance/quotes/[id]/pdf/route.ts`
+- `src/lib/finance/pdf/render-quotation-pdf.ts`
+- `src/lib/finance/pdf/quotation-pdf-document.tsx`
+- `src/lib/finance/quote-to-cash/document-chain-reader.ts`
+- `src/lib/finance/quotation-canonical-store.ts`
+- `src/views/greenhouse/finance/QuoteBuilderPageView.tsx`
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx`
+- `src/views/greenhouse/finance/workspace/QuoteBuilderActions.tsx`
+- `src/views/greenhouse/finance/workspace/QuoteSendDialog.tsx`
+- `src/views/greenhouse/finance/QuoteDetailView.tsx`
+- `src/types/db.d.ts`
 
 ## Current Repo State
 
 ### Already exists
 
-- TASK-349 PDF rendering client-safe
-- Engine v2 (TASK-464d) retorna multi-currency output
-- `greenhouse_finance.exchange_rates` con rates CLP/CLF/USD
+- selector de moneda de salida en builder full-page
+- endpoint `GET /api/finance/exchange-rates/readiness`
+- `pricing-engine-v2` emite warnings `fx_fallback`
+- quote canónica persiste `currency`, `exchange_rates` y `exchange_snapshot_date`
+- PDF runtime existente sobre `src/lib/finance/pdf/*`
 
 ### Gap
 
-- Quote no persiste `output_currency` ni `exchange_rate_snapshot`
-- PDF/email siempre en CLP hardcoded
-- No hay toggle internal USD/local
-- Exchange rates para COP/MXN/PEN pueden no estar en la tabla y esa cobertura ya no debe resolverse ad hoc dentro de quotes
+- Falta endurecer el snapshot FX client-facing al emitir/enviar
+- PDF y document chain siguen leyendo un contrato single-currency sin explicación de snapshot
+- No existe todavía una surface consistente `"USD / moneda cliente"` en review/detail
+- No existe template outbound de quote claramente anclado al mismo snapshot histórico
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -157,71 +179,33 @@ Esta task implementa UI descrita en **[TASK-469](TASK-469-commercial-pricing-ui-
 
 ## Scope
 
-### Slice 1 — Schema + snapshot
+### Slice 1 — Snapshot y gating en send/issue
 
-```sql
-ALTER TABLE greenhouse_commercial.quotations
-  ADD COLUMN IF NOT EXISTS output_currency text DEFAULT 'CLP'
-    CHECK (output_currency IN ('USD', 'CLP', 'CLF', 'COP', 'MXN', 'PEN')),
-  ADD COLUMN IF NOT EXISTS exchange_rate_snapshot numeric(14,6),
-  ADD COLUMN IF NOT EXISTS exchange_rate_date date,
-  ADD COLUMN IF NOT EXISTS exchange_rate_source text;        -- 'bcr' | 'pre_calculated' | 'manual_override'
+- Reusar `quotations.currency`, `exchange_rates` y `exchange_snapshot_date` como snapshot histórico client-facing.
+- Antes de `issue/send`, llamar readiness endpoint y endurecer el gate:
+  - `unsupported` => bloquea
+  - `supported_but_stale` / `temporarily_unavailable` => warning explícito
+  - `fx_fallback.severity === 'critical'` => bloquea
+- Si el snapshot actual no alcanza para explicar fuente/fecha/composed-via-USD, extender el objeto `exchange_rates` y no crear columnas paralelas innecesarias.
 
--- Totales en output currency (pre-calculados para performance)
-ALTER TABLE greenhouse_commercial.quotations
-  ADD COLUMN IF NOT EXISTS total_output_currency numeric(18,2),
-  ADD COLUMN IF NOT EXISTS subtotal_output_currency numeric(18,2),
-  ADD COLUMN IF NOT EXISTS tax_output_currency numeric(18,2);
+### Slice 2 — PDF y review/detail alineados
 
--- Nota: total_amount_clp sigue siendo canonical porque muchos callers lo consumen;
--- total_output_currency es derived para display, refresheable
-```
+- `render-quotation-pdf.ts` y `quotation-pdf-document.tsx` deben consumir el snapshot persistido y no recalcular FX on demand.
+- Footer explicativo:
+  - visible cuando la moneda snapshot no es USD o cuando la tasa fue compuesta vía USD
+  - omisible cuando no agrega información
+- `QuoteDetailView` agrega toggle interno `"USD / moneda cliente"` sin mutar el documento histórico.
 
-### Slice 2 — Exchange rate backfill
+### Slice 3 — Send dialog y outbound client-facing
 
-- Verificar cobertura de `greenhouse_finance.exchange_rates` para USD/CLP/CLF/COP/MXN/PEN
-- Si falta alguna moneda:
-  - Extender cron `economic-indicators-sync` para traer rates de BCR Chile + Banxico + BCRP Perú + Banrep Colombia
-  - Fallback: usar precios pre-calculados del `sellable_role_pricing_currency` (TASK-464a) como "expected rate snapshot" cuando la tabla exchange_rates no tenga el par
+- `QuoteSendDialog.tsx` hace visible freshness, composición vía USD y warnings críticos antes de issue/send.
+- Si todavía no existe template outbound de quote, esta task debe crear el contrato mínimo reutilizando el mismo snapshot del PDF.
+- El payload que sale al cliente y el PDF deben leer exactamente el mismo snapshot.
 
-### Slice 3 — Engine integration
+### Slice 4 — Document chain y downstream
 
-- Cuando se crea quote (`POST /api/finance/quotes`), captura `exchange_rate_snapshot` del día actual:
-  ```typescript
-  const rate = await getExchangeRate({ from: 'USD', to: outputCurrency, date: today })
-  // persist quote with exchange_rate_snapshot = rate, exchange_rate_date = today
-  ```
-- Al enviar quote (`/send`): **refresca** el exchange_rate si passaron >3 días desde creación (opcional, configurable)
-
-### Slice 4 — PDF refactor
-
-- `render-quotation-pdf.tsx`:
-  - Acepta `outputCurrency` + `exchangeRateSnapshot` + `exchangeRateDate` en contracts
-  - Renderiza línea items en output_currency (format localization)
-  - Footer fiscal agrega: "Precios en {outputCurrency} al tipo de cambio USD 1 = {exchangeRateSnapshot} {outputCurrency}, {exchangeRateDate}"
-  - Si outputCurrency=CLP: mantiene formato actual (no cambia UX existente)
-  - Si outputCurrency=USD: oculta footer de conversion
-- PDF preview rendering al crear quote: usa la misma lógica → AE ve cómo lo recibe el cliente
-
-### Slice 5 — Email refactor
-
-- `quote-sent.tsx` template:
-  - Subject line incluye currency si ≠ CLP: "Cotización #XXX — MXN $XX.XXX"
-  - Body renderiza totales en output_currency
-  - Footer similar al PDF con conversion rate
-
-### Slice 6 — UI internal toggle
-
-- `QuoteBuilderPageView.tsx` y `QuoteDetailView.tsx`:
-  - Para internal users (finance/admin): toggle "Ver en USD" / "Ver en {outputCurrency}"
-  - En create/edit el preview usa la misma regla que el documento emitido
-  - En detail/review el default es `output_currency` (lo que ve el cliente)
-  - Switch muestra mismo data en USD para reconciliación/comparación
-
-### Slice 7 — Document chain + downstream
-
-- TASK-350 document chain reader: retornar montos en output_currency + USD
-- TASK-462 MRR/ARR: agrupable por output_currency como dimensión
+- `document-chain-reader` debe exponer montos y metadata suficientes para mostrar la moneda client-facing sin perder el ancla USD interna.
+- `QuoteBuilderPageView` / `QuoteBuilderShell` deben mostrar preview consistente con la moneda de salida ya seleccionada, sin rediseñar el selector existente.
 
 ## Out of Scope
 
@@ -266,18 +250,16 @@ Margin efectivo:     45%
 
 ## Acceptance Criteria
 
-- [ ] Migration idempotente
-- [ ] Exchange rates disponibles para USD/CLP/CLF/COP/MXN/PEN
-- [ ] Quote creada con output_currency='MXN' persiste `exchange_rate_snapshot` + `exchange_rate_date`
+- [ ] La quote emitida/enviada persiste un snapshot FX reutilizable usando el contrato canónico vigente (`currency`, `exchange_rates`, `exchange_snapshot_date` o su extensión explícita)
+- [ ] Exchange rates disponibles para USD/CLP/CLF/COP/MXN/PEN o bien la UI deja explícito el bloqueo/warning correspondiente
 - [ ] PDF genera en MXN con footer de conversion para quote MXN
 - [ ] PDF genera en CLP normal para quote CLP (no cambia UX actual)
-- [ ] Email renderiza subject + body en output currency
+- [ ] Send/email client-facing reutiliza el mismo snapshot del PDF
 - [ ] Toggle "Ver en USD / Ver en {cliente}" funciona en QuoteDetailView
 - [ ] Re-abrir quote 1 semana después: exchange_rate_snapshot NO cambia (immutable)
 
 ## Verification
 
-- `pnpm migrate:up`
 - `pnpm lint`
 - `pnpm exec tsc --noEmit --incremental false`
 - `pnpm test`
@@ -303,4 +285,4 @@ Margin efectivo:     45%
 
 - ¿Exchange rate date es `today` al crear o `quote_date` del quote? Propuesta: `today` (práctico — rate del día de envío al cliente es el justo).
 - ¿Para USD clients internacionales: mostramos solo USD sin conversion? Propuesta: sí — footer omite conversion.
-- ¿El total_output_currency persistido se refresca si AE cambia el currency mid-edit? Propuesta: sí, re-snapshot cada vez que se guarda el quote (hasta que se envía — luego es immutable).
+- ¿Hace falta una columna explícita `output_currency` o alcanza con endurecer `currency + exchange_rates`? Propuesta actual: **alcanza con el contrato vigente** mientras no exista decisión arquitectónica que separe moneda interna de moneda client-facing.

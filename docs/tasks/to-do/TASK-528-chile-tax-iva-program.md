@@ -70,7 +70,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `docs/tasks/to-do/TASK-466-multi-currency-quote-output.md`
-- `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`
+- `docs/tasks/complete/TASK-476-commercial-cost-basis-program.md`
 - `docs/tasks/to-do/TASK-524-income-hubspot-invoice-bridge.md`
 - `src/app/api/finance/income/route.ts`
 - `src/app/api/finance/expenses/route.ts`
@@ -191,4 +191,3 @@ Decision de arquitectura cerrada por esta umbrella:
 - `TASK-531`
 - `TASK-532`
 - `TASK-533`
-

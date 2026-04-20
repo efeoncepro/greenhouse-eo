@@ -1,5 +1,15 @@
 # TASK-471 — Pricing Catalog Phase-4 UI Polish (Diff Viewer + Revert + Bulk + Impact UI + Maker-Checker + Excel)
 
+## Delta 2026-04-20 — Revisión contra codebase real
+
+La revisión del repo confirma que esta task **sigue vigente**, pero ya no debe presentarse como dependiente de foundations backend pendientes:
+
+1. `TASK-470` ya está cerrada y los endpoints/validators de `preview-impact` ya existen.
+2. `AuditLogTimelineView.tsx` sigue mostrando `JSON.stringify(changeSummary)` y no hay diff viewer ni revert UI.
+3. No existen todavía `BulkEditDrawer`, `ApprovalsQueueView`, roundtrip Excel ni integración visual del impact preview.
+
+Conclusión: esta task queda como **follow-on UI/gobernanza** del catálogo, no como hardening backend.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -14,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-467 (complete)`; items 2 y 3 **bloqueados adicionalmente por TASK-470**
+- Blocked by: `none`
 - Branch: `task/TASK-471-pricing-catalog-phase-4-ui`
 - Legacy ID: `follow-on UI de TASK-467 phase-4 (split de TASK-467 y TASK-470)`
 - GitHub Issue: `none`
@@ -67,11 +77,7 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-467 shipped completo (MVP + phase-2 + phase-3) ✅
-- **TASK-470** (opcional pero recomendado):
-  - Slice 3 (bulk edit) necesita impact-preview endpoint de TASK-470
-  - Slice 4 (impact preview UI) consume directamente TASK-470
-  - Slice 5 (maker-checker) se beneficia del business constraint validator de TASK-470 para validar approvals
-  - Slices 1, 2, 6 son **independientes** de TASK-470 — se pueden entregar antes
+- `TASK-470` ya dejó disponibles los endpoints `preview-impact` y el validator central que esta UI debe consumir, no volver a implementar
 
 ### Blocks / Impacts
 
@@ -127,7 +133,7 @@ Reglas obligatorias:
 - No hay diff visual — timeline muestra JSON dump
 - No hay revert action — cambios erróneos requieren DB manual
 - No hay multi-select en list views
-- Drawers editan sin visibility de blast radius
+- Drawers editan sin visibility de blast radius aunque el backend ya lo puede calcular
 - No hay approval queue
 - No hay Excel roundtrip
 

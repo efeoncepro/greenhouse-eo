@@ -529,7 +529,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-473` | `to-do`       | Quote Builder Full-Page Surface Migration & Flow Recomposition | `docs/tasks/to-do/TASK-473-quote-builder-full-page-surface-migration.md` |
 | `TASK-474` | `to-do`       | Quote Builder Catalog / Service Reconnection Pass | `docs/tasks/to-do/TASK-474-quote-builder-catalog-reconnection-pass.md` |
 | `TASK-475` | `complete` | Greenhouse FX & Currency Platform Foundation | `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md` |
-| `TASK-476` | `to-do`       | Commercial Cost Basis Program | `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md` |
+| `TASK-476` | `complete`    | Commercial Cost Basis Program | `docs/tasks/complete/TASK-476-commercial-cost-basis-program.md` |
 | `TASK-477` | `to-do`       | Role Cost Assumptions Catalog & Effective-Dated Modeling | `docs/tasks/to-do/TASK-477-role-cost-assumptions-catalog.md` |
 | `TASK-478` | `complete`    | Tool & Provider Cost Basis Snapshots | `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md` |
 | `TASK-479` | `to-do`       | People Actual Cost + Blended Role Cost Snapshots | `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md` |

@@ -6,26 +6,41 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `Diseno consolidado; runtime foundation cerrada en TASK-483`
+- Status real: `Cerrada como programa documental; la foundation y las child tasks principales ya aterrizaron`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-475`
-- Branch: `task/TASK-476-commercial-cost-basis-program`
+- Blocked by: `none`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Coordinar el programa que convierte el pricing lane de Greenhouse en una capa data-driven basada en costo real y modelado reutilizando foundations ya existentes de personas, payroll, providers, tooling, servicios y FX. El programa introduce `Commercial Cost Basis` como capa shared para que el quote builder y el pricing engine dejen de depender de montos manuales como camino principal.
+Coordinar el programa que convirtió el pricing lane de Greenhouse en una capa data-driven basada en costo real y modelado reutilizando foundations ya existentes de personas, payroll, providers, tooling, servicios y FX. La umbrella ya cumplió su función de ordenar el programa; el trabajo ejecutable restante vive ahora en tasks follow-on más específicas.
+
+## Closure Delta 2026-04-20
+
+La revisión contra codebase confirma que esta umbrella ya no debe seguir abierta:
+
+- `TASK-477` cerró `role_modeled`
+- `TASK-478` cerró tooling/provider snapshots
+- `TASK-479` cerró `member_actual` + `role_blended`
+- `TASK-483` cerró la topología runtime y el worker dedicado
+
+Con eso, `TASK-476` deja de ser una unidad ejecutable y pasa a ser closure/index del programa. Los follow-ons activos reales quedan reducidos a:
+
+- `TASK-480` — bulk repricing + semantic cleanup del resolver
+- `TASK-481` — UX/gobernanza de suggested cost y override
+- `TASK-482` — phase 2 del feedback loop quoted-vs-actual
 
 ## Why This Task Exists
 
-El repo ya tiene piezas sólidas, pero repartidas:
+El repo ya tenía piezas sólidas, pero repartidas:
 
 - personas/capacidad: `greenhouse_serving.member_capacity_economics`
 - payroll factual: `greenhouse_payroll.compensation_versions`
@@ -34,7 +49,7 @@ El repo ya tiene piezas sólidas, pero repartidas:
 - servicios compuestos: `greenhouse_commercial.service_pricing`, `service_role_recipe`, `service_tool_recipe`
 - FX: `greenhouse_finance.exchange_rates` y `TASK-475`
 
-Lo que falta no es otro catálogo maestro, sino una capa que orqueste esas foundations y responda de forma consistente cuál es la mejor base de costo disponible para cada línea, con provenance, confidence y effective dating.
+Lo que faltaba no era otro catálogo maestro, sino una capa que orquestara esas foundations y respondiera de forma consistente cuál es la mejor base de costo disponible para cada línea, con provenance, confidence y effective dating.
 
 ## Goal
 
@@ -43,7 +58,7 @@ Lo que falta no es otro catálogo maestro, sino una capa que orqueste esas found
 - Registrar child tasks ejecutables para roles, tools, personas, engine, UI y feedback loop.
 - Aislar el runtime pesado del programa en un worker dedicado y no en `ops-worker`.
 - Consumir el runtime foundation ya cerrado en `TASK-483` en vez de rediscutir topología en cada child task.
-- Proteger el resto del backlog de pricing para que no absorba este scope por accidente.
+- Proteger el resto del backlog de pricing para que no absorbiera este scope por accidente.
 
 ## Architecture Alignment
 
@@ -70,7 +85,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md`
 - `docs/tasks/complete/TASK-468-payroll-commercial-employment-types-unification.md`
 - `docs/tasks/to-do/TASK-452-service-attribution-foundation.md`
-- `docs/tasks/to-do/TASK-475-greenhouse-fx-currency-platform-foundation.md`
+- `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md`
 
 ## Dependencies & Impact
 
@@ -91,9 +106,9 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-477-role-cost-assumptions-catalog.md`
+- `docs/tasks/complete/TASK-477-role-cost-assumptions-catalog.md`
 - `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md`
-- `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md`
+- `docs/tasks/complete/TASK-479-people-actual-cost-blended-role-snapshots.md`
 - `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md`
 - `docs/tasks/to-do/TASK-481-quote-builder-suggested-cost-override-governance.md`
 - `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md`
@@ -108,8 +123,8 @@ Reglas obligatorias:
 
 ### Gap
 
-- La umbrella todavía no traduce el runtime ya creado en un roadmap operativo detallado por child task.
-- Falta una jerarquía única de resolución y una semántica shared de provenance/confidence/freshness.
+- La umbrella ya no concentra trabajo ejecutable propio.
+- El backlog activo real quedó reducido a follow-ons específicos sobre resolver, UX y feedback loop.
 
 ## Scope
 
@@ -140,29 +155,28 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe una umbrella task que define `Commercial Cost Basis` y sus boundaries.
-- [ ] Las child tasks del programa quedan registradas con dependencias claras.
-- [ ] El programa deja explícito qué foundations existentes se reutilizan y cuáles no deben duplicarse.
-- [ ] `TASK-471` y el resto del pricing lane quedan protegidos contra scope bleed accidental.
+- [x] Existe una umbrella task que definió `Commercial Cost Basis` y sus boundaries.
+- [x] Las child tasks del programa quedaron registradas con dependencias claras.
+- [x] El programa dejó explícito qué foundations existentes se reutilizan y cuáles no deben duplicarse.
+- [x] El runtime foundation quedó aislado en worker dedicado vía `TASK-483`.
+- [x] El backlog activo quedó recortado a follow-ons específicos y ya no depende de esta umbrella abierta.
 
 ## Verification
 
 - revisión manual de consistencia documental del backlog
+- contraste contra codebase del estado real de `TASK-477`, `TASK-478`, `TASK-479` y `TASK-483`
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado con el ajuste documental
+- [x] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
 
 ## Follow-ups
 
-- `TASK-483`
-- `TASK-477`
-- `TASK-478`
-- `TASK-479`
+- `TASK-452`
 - `TASK-480`
 - `TASK-481`
 - `TASK-482`

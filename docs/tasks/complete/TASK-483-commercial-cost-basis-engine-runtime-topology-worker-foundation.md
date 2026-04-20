@@ -76,7 +76,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`
+- `docs/tasks/complete/TASK-476-commercial-cost-basis-program.md`
 - `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md`
 - `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md`
 - `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md`
