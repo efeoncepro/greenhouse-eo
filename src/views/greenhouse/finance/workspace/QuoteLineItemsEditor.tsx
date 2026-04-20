@@ -46,6 +46,9 @@ import type {
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 
 import type { SellableSelection } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
+import CostOverrideDialog, {
+  type CostOverrideDialogSuccessResult
+} from '@/components/greenhouse/pricing/CostOverrideDialog'
 import QuoteLineWarning from '@/components/greenhouse/pricing/QuoteLineWarning'
 
 import QuoteLineCostStack from './QuoteLineCostStack'
@@ -93,6 +96,22 @@ export interface QuoteLineItemsEditorProps {
 
   /** Gating del cost stack (solo finance/admin). */
   canViewCostStack?: boolean
+
+  /**
+   * Gating del trigger de override manual del costo por línea (TASK-481).
+   * El dialog en sí es más restrictivo que ver el cost stack: solo
+   * `finance_admin + efeonce_admin` pueden aplicarlo. Aunque el prop venga
+   * en true para un `finance_analyst`, el endpoint backend responde 403
+   * y el dialog muestra el banner "sin permiso".
+   */
+  canOverrideCost?: boolean
+
+  /**
+   * Callback disparado cuando el dialog de override persiste exitosamente.
+   * El shell debería usarlo para re-simular pricing y refrescar la UI,
+   * porque el cost_breakdown cambió en backend.
+   */
+  onCostOverrideApplied?: (result: CostOverrideDialogSuccessResult) => void
 
   /** Output del engine v2 por línea, indexado por posición. */
   simulationLines?: PricingLineOutputV2[] | null
@@ -370,6 +389,8 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     lineItems,
     saving,
     canViewCostStack: canViewCostStackProp = false,
+    canOverrideCost = false,
+    onCostOverrideApplied,
     simulationLines = null,
     outputCurrency = null,
     structuredWarnings = null,
@@ -379,7 +400,8 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     headerAction,
     onAddFromCatalog,
     onAddFromService,
-    onAddFromTemplate
+    onAddFromTemplate,
+    quotationId
   },
   ref
 ) {
@@ -395,6 +417,9 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   // Popover de warnings por fila (TASK-508) — reemplaza el Alert full-row.
   const [warningAnchor, setWarningAnchor] = useState<HTMLElement | null>(null)
   const [warningIndex, setWarningIndex] = useState<number | null>(null)
+
+  // Override dialog (TASK-481) — controla qué línea tiene el dialog abierto.
+  const [overrideDialogIndex, setOverrideDialogIndex] = useState<number | null>(null)
 
   const toggleRowExpanded = useCallback((index: number) => {
     setExpandedRows(prev => {
@@ -1033,6 +1058,27 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                               </span>
                             </Tooltip>
                           ) : null}
+                          {line.lineItemId && canViewCostStackProp ? (
+                            <Tooltip
+                              title={
+                                canOverrideCost
+                                  ? GH_PRICING.costOverride.ctaLabel
+                                  : GH_PRICING.costOverride.ctaDisabledTooltip
+                              }
+                              disableInteractive
+                            >
+                              <span>
+                                <IconButton
+                                  size='small'
+                                  onClick={() => setOverrideDialogIndex(index)}
+                                  disabled={saving || !canOverrideCost}
+                                  aria-label={`${GH_PRICING.costOverride.ctaLabel} · ítem ${index + 1}`}
+                                >
+                                  <i className='tabler-hand-stop' style={{ fontSize: 18 }} />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          ) : null}
                           <Tooltip title='Eliminar ítem' disableInteractive>
                             <span>
                               <IconButton
@@ -1228,6 +1274,35 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
           </Box>
         ) : null}
       </Popover>
+
+      {overrideDialogIndex !== null
+        ? (() => {
+            const line = draftLines[overrideDialogIndex]
+            if (!line || !line.lineItemId) return null
+            const simLine = simulationLines?.[overrideDialogIndex] ?? null
+            const suggestedUsd =
+              simLine?.costStack?.unitCostUsd !== undefined && simLine?.costStack?.unitCostUsd !== null
+                ? simLine.costStack.unitCostUsd
+                : null
+            const sourceKind = simLine?.costStack?.costBasisKind ?? null
+            return (
+              <CostOverrideDialog
+                open
+                onClose={() => setOverrideDialogIndex(null)}
+                quotationId={quotationId}
+                lineItemId={line.lineItemId}
+                lineLabel={line.label}
+                suggestedUnitCostUsd={suggestedUsd}
+                suggestedCostBasisKind={sourceKind}
+                canOverride={canOverrideCost}
+                onSuccess={result => {
+                  setOverrideDialogIndex(null)
+                  onCostOverrideApplied?.(result)
+                }}
+              />
+            )
+          })()
+        : null}
 
     </Card>
   )

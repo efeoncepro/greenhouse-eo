@@ -1359,6 +1359,13 @@ const QuoteBuilderShell = ({
             saving={submitting || serviceExpanding}
             businessLineCode={builderState.businessLineCode}
             canViewCostStack={canSeeCostStack}
+            canOverrideCost={canSeeCostStack}
+            onCostOverrideApplied={() => {
+              // TASK-481: refresh pricing después del override; re-seteamos
+              // el snapshot para que el hook de simulación recompute cost
+              // breakdown + margen con la metadata nueva persistida.
+              setLinesSnapshot(current => current.map(line => ({ ...line })))
+            }}
             simulationLines={simulation?.lines ?? null}
             outputCurrency={currency}
             structuredWarnings={mergedStructuredWarnings.length > 0 ? mergedStructuredWarnings : null}
