@@ -597,3 +597,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-541` | `to-do` | Quote-to-Cash Atomic Choreography (Fase G) | `docs/tasks/to-do/TASK-541-quote-to-cash-atomic-choreography.md` |
 | `TASK-542` | `to-do` | Party Lifecycle Admin Dashboards (Fase H) | `docs/tasks/to-do/TASK-542-party-lifecycle-admin-dashboards.md` |
 | `TASK-543` | `to-do` | Party Lifecycle Deprecation & Flag Cleanup (Fase I) | `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md` |
+| `TASK-544` | `to-do` | Commercial Product Catalog Sync Program (umbrella) | `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md` |
+| `TASK-545` | `to-do` | Product Catalog Schema & Materializer Foundation (Fase A) | `docs/tasks/to-do/TASK-545-product-catalog-schema-materializer-foundation.md` |
+| `TASK-546` | `to-do` | Product Catalog Source Handlers & Event Homogenization (Fase B) | `docs/tasks/to-do/TASK-546-product-catalog-source-handlers-events.md` |
+| `TASK-547` | `to-do` | Product Catalog HubSpot Outbound Projection (Fase C) | `docs/tasks/to-do/TASK-547-product-catalog-hubspot-outbound.md` |
+| `TASK-548` | `to-do` | Product Catalog Drift Detection & Admin Center (Fase D) | `docs/tasks/to-do/TASK-548-product-catalog-drift-detection-admin.md` |
+| `TASK-549` | `to-do` | Product Catalog Policy Enforcement & Legacy Cleanup (Fase E) | `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md` |
