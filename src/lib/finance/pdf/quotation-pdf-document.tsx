@@ -208,6 +208,27 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: COLOR_PRIMARY
   },
+  fxNoteBlock: {
+    marginBottom: 12,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingHorizontal: 10,
+    borderRadius: 3,
+    borderWidth: 0.6,
+    borderColor: COLOR_BORDER,
+    borderStyle: 'solid'
+  },
+  fxNoteTitle: {
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 8,
+    color: COLOR_TEXT,
+    marginBottom: 2
+  },
+  fxNoteLine: {
+    fontSize: 8,
+    color: COLOR_TEXT_MUTED,
+    lineHeight: 1.4
+  },
   termsBlock: {
     marginBottom: 12
   },
@@ -291,6 +312,12 @@ const formatQuantity = (value: number): string => {
     maximumFractionDigits: 2
   }).format(value)
 }
+
+const formatRate = (value: number): string =>
+  new Intl.NumberFormat('es-CL', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 6
+  }).format(value)
 
 const todayLabel = (): string => {
   const now = new Date()
@@ -426,6 +453,27 @@ export const QuotationPdfDocument = ({ input }: QuotationPdfDocumentProps) => {
             </Text>
           </View>
         </View>
+
+        {input.fxFooter ? (
+          <View style={styles.fxNoteBlock} wrap={false}>
+            <Text style={styles.fxNoteTitle}>Tipo de cambio aplicado</Text>
+            <Text style={styles.fxNoteLine}>
+              {input.fxFooter.baseCurrency} 1 = {input.fxFooter.outputCurrency} {formatRate(input.fxFooter.rate)}
+              {input.fxFooter.rateDateResolved
+                ? ` · fecha ${formatDateDMY(input.fxFooter.rateDateResolved)}`
+                : ''}
+              {input.fxFooter.source ? ` · fuente ${input.fxFooter.source}` : ''}
+            </Text>
+            {input.fxFooter.composedViaUsd ? (
+              <Text style={styles.fxNoteLine}>
+                Tasa derivada por composición vía USD.
+              </Text>
+            ) : null}
+            <Text style={styles.fxNoteLine}>
+              El monto en {input.fxFooter.outputCurrency} queda fijado a esta tasa durante la vigencia de la cotización.
+            </Text>
+          </View>
+        ) : null}
 
         {orderedTerms.length > 0 ? (
           <View style={styles.termsBlock}>

@@ -2,6 +2,13 @@ import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
 import { finalizeQuotationIssued } from '@/lib/commercial/quotation-issuance'
+import { assertSupportedCurrencyForDomain } from '@/lib/finance/currency-domain'
+import { resolveFxReadiness } from '@/lib/finance/fx-readiness'
+import {
+  buildQuotationFxSnapshot,
+  type QuotationFxSnapshot
+} from '@/lib/finance/quotation-fx-snapshot'
+import { evaluateQuotationFxReadinessGate } from '@/lib/finance/quotation-fx-readiness-gate'
 
 import { recordAudit } from './audit-log'
 import {
@@ -10,6 +17,11 @@ import {
 } from './approval-evaluator'
 
 import type { ApprovalStep, ApprovalStepStatus } from './contracts'
+
+// TASK-466 — Anchor currency for FX snapshot resolution. Must match the
+// base used by `quotation-issue-command` so the payload shape is consistent
+// between direct issuance and approval-gated issuance.
+const QUOTATION_FX_BASE_CURRENCY = 'USD' as const
 
 interface StepRow extends Record<string, unknown> {
   step_id: string
@@ -323,6 +335,70 @@ export const decideApprovalStep = async (
     } else if (allResolved) {
       quotationNewStatus = 'issued'
 
+      // TASK-466 — Resolve FX readiness at approval time so the snapshot
+      // stays faithful to the moment the quote actually becomes `issued`.
+      // The gate was already enforced at request time; here we re-resolve
+      // but do NOT block on client-facing staleness (the reviewer has
+      // already validated the quote on merit). Any degraded severity is
+      // captured in the audit trail.
+      let fxSnapshot: QuotationFxSnapshot | null = null
+      let fxGateDecisionSummary: Record<string, unknown> | null = null
+
+      const quotationCurrencyRow = await client.query<{ currency: string | null; quote_date: string | Date | null }>(
+        `SELECT currency, quote_date
+           FROM greenhouse_commercial.quotations
+           WHERE quotation_id = $1`,
+        [step.quotationId]
+      )
+
+      const rawCurrency = quotationCurrencyRow.rows[0]?.currency ?? 'CLP'
+      const rawQuoteDate = quotationCurrencyRow.rows[0]?.quote_date ?? null
+
+      const rateDate =
+        rawQuoteDate instanceof Date
+          ? rawQuoteDate.toISOString().slice(0, 10)
+          : typeof rawQuoteDate === 'string'
+            ? rawQuoteDate.slice(0, 10)
+            : null
+
+      try {
+        const outputCurrency = assertSupportedCurrencyForDomain(rawCurrency, 'pricing_output')
+
+        const readiness = await resolveFxReadiness({
+          fromCurrency: QUOTATION_FX_BASE_CURRENCY,
+          toCurrency: outputCurrency,
+          rateDate,
+          domain: 'pricing_output'
+        })
+
+        const decision = evaluateQuotationFxReadinessGate({
+          readiness,
+          blockOnClientFacingStale: false
+        })
+
+        fxGateDecisionSummary = {
+          code: decision.code,
+          severity: decision.severity,
+          allowed: decision.allowed,
+          message: decision.message
+        }
+
+        if (readiness.state !== 'unsupported') {
+          fxSnapshot = buildQuotationFxSnapshot({
+            readiness,
+            outputCurrency,
+            baseCurrency: QUOTATION_FX_BASE_CURRENCY
+          })
+        }
+      } catch (error) {
+        fxGateDecisionSummary = {
+          code: 'unsupported_pair',
+          severity: 'critical',
+          allowed: false,
+          message: error instanceof Error ? error.message : 'FX readiness failed'
+        }
+      }
+
       await finalizeQuotationIssued({
         quotationId: step.quotationId,
         versionNumber: step.versionNumber,
@@ -330,8 +406,25 @@ export const decideApprovalStep = async (
         organizationId: effectiveOrganizationId,
         spaceId: effectiveSpaceId,
         viaApproval: true,
-        client
+        client,
+        fxSnapshot
       })
+
+      if (fxGateDecisionSummary) {
+        await recordAudit(
+          {
+            quotationId: step.quotationId,
+            versionNumber: step.versionNumber,
+            action: 'issued',
+            actorUserId: params.actor.userId,
+            actorName: params.actor.name,
+            details: {
+              fxReadiness: fxGateDecisionSummary
+            }
+          },
+          client
+        )
+      }
     }
 
     await recordAudit(

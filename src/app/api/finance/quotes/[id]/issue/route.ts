@@ -6,6 +6,7 @@ import {
   quotationIdentityHasTenantAnchor,
   tenantCanAccessQuotationIdentity
 } from '@/lib/finance/pricing/quotation-tenant-access'
+import { QuotationFxReadinessError } from '@/lib/finance/quotation-fx-readiness-gate'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -64,6 +65,18 @@ export async function POST(
 
     return NextResponse.json(result)
   } catch (error) {
+    if (error instanceof QuotationFxReadinessError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          code: error.code,
+          severity: error.severity,
+          readiness: error.readiness
+        },
+        { status: error.statusCode }
+      )
+    }
+
     const message = error instanceof Error ? error.message : 'No pudimos emitir la cotización.'
 
     return NextResponse.json({ error: message }, { status: resolveErrorStatus(message) })

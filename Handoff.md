@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — TASK-466 Multi-Currency Quote Output (Claude Opus 4.7)
+
+- **Scope:** convergir el rendering client-facing multi-moneda de la quote canónica al contrato `currency + exchange_rates + exchange_snapshot_date`. Branch `task/TASK-466-multi-currency-quote-output`.
+- **Migración prerequisito (obligatoria antes del deploy):** `20260421011323497_task-466-expand-quotation-currency-constraint.sql` relaja el CHECK de `greenhouse_commercial.quotations.currency` y tablas hermanas (`quotation_defaults.default_currency`, `role_rate_cards.currency`, `approval_policies.default_currency`) de `{CLP, USD, CLF}` a `{CLP, USD, CLF, COP, MXN, PEN}` alineado con `CURRENCY_DOMAIN_SUPPORT.pricing_output`. Sin esto Postgres rechaza cualquier quote en MXN/COP/PEN aunque el builder las permita seleccionar.
+- **Contrato canónico del snapshot:** `exchange_rates` JSONB ahora persiste `{__snapshot: QuotationFxSnapshot, <outputCurrency>: rate, CLP: rate}`. La clave `__snapshot` es la fuente de verdad (versionada, con rate, rateDateResolved, source, composedViaUsd, readinessState, ageDays, frozenAt, domain). Las keys currency-indexadas quedan para readers legacy que iteran `Object.entries` (ej. `src/app/api/finance/quotes/[id]/lines/route.ts`).
+- **Readiness gate:** todo issue/send pasa por `resolveFxReadiness(USD→currency, pricing_output)` + `evaluateQuotationFxReadinessGate`. Policies: `unsupported_pair` y `no_rate_available` bloquean con HTTP 422; `rate_is_stale_for_domain` o `rate_exceeds_client_facing_threshold` (>3d) también bloquean en path directo. En approval path la readiness se re-resuelve pero no re-bloquea para no invalidar una aprobación ya decidida; `blockOnClientFacingStale=false` degrada a warning registrado en audit.
+- **Surfaces tocadas:**
+  - `requestQuotationIssue` (+ gate + snapshot freeze + audit detail).
+  - `decideApproval` en `approval-steps-store` (re-resuelve FX al marcar `allResolved`, construye snapshot best-effort, audit extra).
+  - `finalizeQuotationIssued` acepta `fxSnapshot?` y escribe en el mismo `withTransaction`.
+  - `/api/finance/quotes/[id]/issue` y `/send` traducen `QuotationFxReadinessError` a 422 con body `{error, code, severity, readiness}`.
+  - `/api/finance/quotes/[id]/pdf` lee `exchange_rates`, extrae snapshot, pasa `fxFooter` al renderer.
+  - `quotation-pdf-document.tsx` agrega bloque "Tipo de cambio aplicado" con rate, fecha, fuente y nota "Derivada por composición vía USD" cuando aplica.
+  - Nuevo endpoint read-only `GET /api/finance/quotes/[id]/fx-snapshot` devuelve snapshot + derivados USD/moneda cliente.
+  - Nuevo componente `QuoteCurrencyView` (en `src/views/greenhouse/finance/workspace/`) con `ToggleButtonGroup` USD/moneda cliente, integrado en `QuoteDetailView` debajo del health card.
+  - `QuoteSendDialog` acepta `fxReadiness?` opcional; renderiza Alert con severity del gate y deshabilita el CTA si `blocking=true`. `QuoteDetailView.handleOpenSendDialog` prefetch readiness al abrir.
+  - `QuotationDocumentChain.quotation` expone `fxSnapshot: QuotationFxSnapshot | null`.
+- **Verificación local:** `pnpm tsc --noEmit` 0 errores · `pnpm lint` limpio (solo warning pre-existente de BulkEditDrawer) · `pnpm test` 1569/1569 · `pnpm build` OK.
+- **Post-merge operativo:** correr la migración via Cloud SQL Proxy antes del deploy (`pnpm pg:connect:migrate`). CLF/COP/MXN/PEN siguen `manual_only` en `currency-registry`: un admin de finance debe hacer `POST /api/admin/fx/sync-pair` con la tasa manual antes del primer send real. El flip a `auto_synced` sigue siendo TASK-485.
+- **Pendiente explícito (fuera de scope V1):** template Resend/@react-email para outbound client-facing completo (Slice 3 cubrió gating + snapshot reutilizable; el template mismo queda como task nueva cuando se decida branding), bidirectional currency conversion, lock rate por cliente, historia FX a nivel línea.
+
+## Sesion 2026-04-20 — Resend deliverability hardening para permisos/correos reactivos (Codex)
+
+- **Scope:** endurecer el circuito de trazabilidad email después de un reporte de permisos donde el usuario percibía que “no llegó el correo” aunque la entrega inicial a Resend sí existía.
+- **Hallazgos operativos:**
+  - para la solicitud/aprobación reciente de Andrés Carlosama, `greenhouse_notifications.email_deliveries` ya mostraba `leave_request_submitted`, `leave_request_pending_review`, `leave_request_decision` y `leave_review_confirmation` en `status='sent'` con `resend_id` real
+  - el mail de solicitud pendiente no iba a Julio Reyes sino a la reviewer efectiva de esa solicitud; el problema observado no era solo “falló el envío”, también había una expectativa de routing distinta
+  - el hueco real del sistema era de observabilidad/deliverability: no quedaba persistido si Resend confirmaba `delivered`, `bounced` o `complained`
+- **Cambios aplicados:**
+  - migración `20260421005352134_email-delivery-webhook-lifecycle-timestamps.sql`
+  - `src/lib/resend.ts` ahora resuelve `RESEND_WEBHOOK_SIGNING_SECRET` vía helper canónico
+  - `src/app/api/webhooks/resend/route.ts` persiste `delivered_at`, `bounced_at`, `complained_at`
+  - `/api/admin/email-deliveries` + admin UI distinguen `delivered` / `bounced` / `complained` como estado efectivo
+  - `/api/cron/email-deliverability-monitor` dejó de leer una query rota basada en `source_entity`
+- **Pendiente de verificación post-deploy:** confirmar que el webhook de Resend esté realmente configurado con el signing secret correcto y que nuevos correos de permisos pasen de `sent` a `delivered` cuando corresponda.
+
 ## Sesion 2026-04-20 — TASK-471 V1 gap completion (Claude Opus 4.7)
 
 - **Scope**: cerrar los 5 gaps V1 honestamente declarados al cierre del shipping inicial de TASK-471. Branch: `task/TASK-471-phase-4-gaps-completion` → merge `547106ed` en `develop`.

@@ -2,6 +2,19 @@
 
 ## 2026-04-20
 
+### 2026-04-20 — TASK-466 Multi-Currency Quote Output cerrada
+
+- Migración `20260421011323497_task-466-expand-quotation-currency-constraint.sql` relaja el CHECK de `greenhouse_commercial.quotations.currency` (y `quotation_defaults`, `role_rate_cards`, `approval_policies`) de `{CLP, USD, CLF}` a las 6 monedas `pricing_output` (`CLP, USD, CLF, COP, MXN, PEN`). Sin esto Postgres rechazaba quotes en MXN/COP/PEN.
+- Nuevos módulos puros: `src/lib/finance/quotation-fx-snapshot.ts` (shape canónico `QuotationFxSnapshot`, serializer JSONB, reader permisivo) y `src/lib/finance/quotation-fx-readiness-gate.ts` (policy gate client-facing con `CLIENT_FACING_STALENESS_THRESHOLD_DAYS = 3d` + `QuotationFxReadinessError` → HTTP 422).
+- `requestQuotationIssue` resuelve `resolveFxReadiness(USD→currency, pricing_output)` y aplica el gate antes de abrir approval steps. `finalizeQuotationIssued` acepta `fxSnapshot` y escribe `exchange_rates.__snapshot` + `exchange_snapshot_date` en la misma transacción. Approval path re-resuelve FX al aprobar y registra la decisión en audit sin re-bloquear.
+- Rutas `POST /api/finance/quotes/[id]/issue` y `/send` traducen `QuotationFxReadinessError` a `422` con body `{error, code, severity, readiness}`.
+- `GET /api/finance/quotes/[id]/pdf` consume el snapshot persistido; `QuotationPdfDocument` agrega footer "Tipo de cambio aplicado" con rate + fecha + fuente + nota de composición vía USD cuando aplica.
+- Nuevo endpoint read-only `GET /api/finance/quotes/[id]/fx-snapshot` y nuevo componente `QuoteCurrencyView` con `ToggleButtonGroup` USD/moneda cliente, integrado en `QuoteDetailView` sin mutar el documento histórico.
+- `QuoteSendDialog` acepta `fxReadiness?` opcional, muestra Alert con severity del gate (`critical|warning|info`) y deshabilita el CTA cuando el gate bloquea. `QuoteDetailView.handleOpenSendDialog` prefetch readiness vía el endpoint existente.
+- `QuotationDocumentChain.quotation` expone `fxSnapshot: QuotationFxSnapshot | null` para downstream.
+- Verificación: `pnpm tsc --noEmit` 0 errores · `pnpm lint` limpio (solo warning pre-existente en BulkEditDrawer) · `pnpm test` 1569/1569 · `pnpm build` OK.
+- Follow-ups explícitos: template Resend/@react-email para outbound client-facing, bidirectional FX conversion, lock rate por cliente, historia FX a nivel línea. Blocker operacional: CLF/COP/MXN/PEN siguen `manual_only` hasta TASK-485, por lo que el primer send real en esas monedas requiere que un admin de finance haga `POST /api/admin/fx/sync-pair` previo.
+
 ### 2026-04-20 — TASK-471 V1 gap completion (Gap-1 a Gap-5, merge 547106ed)
 
 - **Gap-1 Approval auto-apply**: `decideApproval(decision='approved')` ahora aplica el cambio al target entity + emite audit row `action='approval_applied'` en la misma transacción. Rollback atómico si el apply falla.
@@ -616,6 +629,14 @@
 - Se agrega `RESEND_API_KEY_SECRET_REF` al contrato documentado del repo (`.env.example`, `project_context.md`) para evitar drift entre runtimes que procesan email.
 - `services/ops-worker/deploy.sh` ahora propaga `EMAIL_FROM` y acepta `RESEND_API_KEY_SECRET_REF` para que el worker reactivo pueda emitir correos con el mismo contrato de secretos del portal.
 - La corrección apunta al incidente de staging donde las solicitudes de permisos sí generaban eventos y notificaciones in-app, pero los correos quedaban `failed/skipped` por ausencia de configuración efectiva de Resend en el runtime reactivo.
+
+### 2026-04-20 — Email deliverability deja de depender solo de `status='sent'`
+
+- `src/lib/resend.ts` ahora resuelve también `RESEND_WEBHOOK_SIGNING_SECRET` vía `Secret Manager -> env fallback`, alineando el webhook de Resend con la postura canónica de secretos del repo.
+- Nueva migración `20260421005352134_email-delivery-webhook-lifecycle-timestamps.sql` agrega `delivered_at`, `bounced_at` y `complained_at` a `greenhouse_notifications.email_deliveries`.
+- `src/app/api/webhooks/resend/route.ts` ahora persiste esos timestamps al recibir `email.delivered`, `email.bounced` y `email.complained`.
+- `/api/admin/email-deliveries` y la UI admin ya distinguen `sent` vs `delivered` vs `bounced` vs `complained`, evitando que un correo “aceptado por Resend” parezca automáticamente “entregado”.
+- `/api/cron/email-deliverability-monitor` deja de usar la query rota basada en `source_entity` y pasa a medir rebotes/complaints desde los timestamps reales del webhook.
 
 ## 2026-04-13
 

@@ -32,10 +32,12 @@ import QuoteApprovalsPanel, { type ApprovalStep } from './governance/QuoteApprov
 import QuoteAuditTrail, { type AuditEntry } from './governance/QuoteAuditTrail'
 import QuoteTermsSection, { type QuotationTerm } from './governance/QuoteTermsSection'
 import QuoteVersionsTimeline, { type VersionHistoryEntry } from './governance/QuoteVersionsTimeline'
+import QuoteCurrencyView from './workspace/QuoteCurrencyView'
 import QuoteDocumentChain from './workspace/QuoteDocumentChain'
 import QuoteHealthCard from './workspace/QuoteHealthCard'
 import QuoteSaveAsTemplateDialog from './workspace/QuoteSaveAsTemplateDialog'
 import QuoteSendDialog from './workspace/QuoteSendDialog'
+import type { FxReadiness } from '@/lib/finance/currency-domain'
 import {
   canDecideFinanceQuotationApproval,
   canManageFinanceQuotes,
@@ -233,6 +235,8 @@ const QuoteDetailView = () => {
   const [sendOpen, setSendOpen] = useState(false)
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
+
+  const [fxReadiness, setFxReadiness] = useState<FxReadiness | null>(null)
 
   const [chain, setChain] = useState<{
     purchaseOrders: Array<Record<string, unknown>>
@@ -460,10 +464,37 @@ const QuoteDetailView = () => {
     }
   }, [quoteId])
 
-  const handleOpenSendDialog = useCallback(() => {
+  const handleOpenSendDialog = useCallback(async () => {
     setSendError(null)
     setSendOpen(true)
-  }, [])
+
+    // TASK-466 — Prefetch FX readiness so the dialog shows the client-facing
+    // gate decision before the user clicks "Emitir". The endpoint already
+    // applies tenant scope; a failure here just degrades the alert — the
+    // backend command still enforces the gate at submit time.
+    if (quote?.currency) {
+      try {
+        const outputCurrency = quote.currency.toUpperCase()
+        const from = 'USD'
+
+        const res = await fetch(
+          `/api/finance/exchange-rates/readiness?from=${encodeURIComponent(from)}&to=${encodeURIComponent(outputCurrency)}&domain=pricing_output`
+        )
+
+        if (res.ok) {
+          const payload = (await res.json()) as FxReadiness
+
+          setFxReadiness(payload)
+        } else {
+          setFxReadiness(null)
+        }
+      } catch {
+        setFxReadiness(null)
+      }
+    } else {
+      setFxReadiness(null)
+    }
+  }, [quote?.currency])
 
   const handleConfirmSend = useCallback(async () => {
     setSending(true)
@@ -870,6 +901,13 @@ const QuoteDetailView = () => {
             />
           )}
 
+          {/* ── Currency + FX snapshot (TASK-466) ── */}
+          <QuoteCurrencyView
+            quotationId={quote.quoteId}
+            outputCurrency={quote.currency}
+            totalAmountOutput={quote.totalPrice ?? quote.totalAmount ?? null}
+          />
+
           {/* ── KPIs ── */}
           <Grid container spacing={6}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -1230,6 +1268,7 @@ const QuoteDetailView = () => {
         pendingApprovalSteps={approvals.filter(step => step.status === 'pending').length}
         submitting={sending}
         error={sendError}
+        fxReadiness={fxReadiness}
         onClose={() => setSendOpen(false)}
         onConfirm={handleConfirmSend}
       />
