@@ -23,7 +23,10 @@ import Switch from '@mui/material/Switch'
 import Tab from '@mui/material/Tab'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+
 import { TabContext, TabList, TabPanel } from '@mui/lab'
+
+import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -2241,6 +2244,11 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
       ) : null}
 
       <Divider />
+      {roleId ? (
+        <Box sx={{ px: 4, py: 2 }}>
+          <ImpactPreviewPanel entityType='sellable_role' entityId={roleId} />
+        </Box>
+      ) : null}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 4 }}>
         <Button variant='outlined' color='secondary' onClick={handleClose}>
           Cerrar

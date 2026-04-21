@@ -514,7 +514,28 @@ export interface GreenhouseCommercialOverheadAddons {
   visible_to_client: Generated<boolean>;
 }
 
+export interface GreenhouseCommercialPricingCatalogApprovalQueue {
+  approval_id: Generated<string>;
+  criticality: string;
+  entity_id: string;
+  entity_sku: string | null;
+  entity_type: string;
+  justification: string | null;
+  proposed_at: Generated<Timestamp>;
+  proposed_by_name: string;
+  proposed_by_user_id: string;
+  proposed_changes: Json;
+  review_comment: string | null;
+  reviewed_at: Timestamp | null;
+  reviewed_by_name: string | null;
+  reviewed_by_user_id: string | null;
+  status: Generated<string>;
+}
+
 export interface GreenhouseCommercialPricingCatalogAuditLog {
+  /**
+   * Acción auditada. 12 valores: 9 operacionales (created, updated, deactivated, reactivated, cost_updated, pricing_updated, bulk_imported, recipe_updated, deleted) + 3 governance (reverted, approval_applied, bulk_edited) agregados en TASK-471.
+   */
   action: string;
   actor_name: string;
   actor_user_id: string;
@@ -5775,6 +5796,7 @@ export interface DB {
   "greenhouse_commercial.master_agreements": GreenhouseCommercialMasterAgreements;
   "greenhouse_commercial.member_role_cost_basis_snapshots": GreenhouseCommercialMemberRoleCostBasisSnapshots;
   "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
+  "greenhouse_commercial.pricing_catalog_approval_queue": GreenhouseCommercialPricingCatalogApprovalQueue;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;

@@ -16,7 +16,7 @@ Conclusión: esta task queda como **follow-on UI/gobernanza** del catálogo, no 
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2` (valor incremental UX, no bloqueante operativo)
 - Impact: `Medio`
 - Effort: `Alto` (múltiples features UI independientes)

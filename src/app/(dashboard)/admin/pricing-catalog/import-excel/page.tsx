@@ -2,18 +2,15 @@ import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
 
-import {
-  canAdministerPricingCatalog,
-  canRevertPricingCatalogChange
-} from '@/lib/tenant/authorization'
+import { canAdministerPricingCatalog } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
-import AuditLogTimelineView from '@/views/greenhouse/admin/pricing-catalog/AuditLogTimelineView'
+import ExcelImportView from '@/views/greenhouse/admin/pricing-catalog/ExcelImportView'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Historial de cambios — Catálogo de pricing'
+  title: 'Importar catálogo — Pricing'
 }
 
 const Page = async () => {
@@ -22,7 +19,7 @@ const Page = async () => {
   if (!tenant) redirect('/login')
   if (!canAdministerPricingCatalog(tenant)) redirect(tenant.portalHomePath)
 
-  return <AuditLogTimelineView canRevert={canRevertPricingCatalogChange(tenant)} />
+  return <ExcelImportView />
 }
 
 export default Page

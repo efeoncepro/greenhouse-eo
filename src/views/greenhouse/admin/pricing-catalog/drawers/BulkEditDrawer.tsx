@@ -1,0 +1,156 @@
+'use client'
+
+import { useCallback, useState } from 'react'
+
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Divider from '@mui/material/Divider'
+import Drawer from '@mui/material/Drawer'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+
+import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+
+export interface BulkEditDrawerProps {
+  open: boolean
+  roleIds: string[]
+  onClose: () => void
+  onSuccess: (result: { applied: number; failed: number }) => void
+}
+
+const BulkEditDrawer = ({ open, roleIds, onClose, onSuccess }: BulkEditDrawerProps) => {
+  const [active, setActive] = useState<'unchanged' | 'activate' | 'deactivate'>('unchanged')
+  const [notes, setNotes] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleClose = () => {
+    if (submitting) return
+    setActive('unchanged')
+    setNotes('')
+    setError(null)
+    onClose()
+  }
+
+  const handleSubmit = useCallback(async () => {
+    const updates: Record<string, unknown> = {}
+
+    if (active === 'activate') updates.active = true
+    if (active === 'deactivate') updates.active = false
+
+    const notesAppend = notes.trim()
+
+    if (Object.keys(updates).length === 0 && !notesAppend) {
+      setError(GH_PRICING_GOVERNANCE.bulkEdit.emptyChangesetError)
+
+      return
+    }
+
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/admin/pricing-catalog/roles/bulk', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roleIds, updates, notesAppend: notesAppend || undefined })
+      })
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => ({}))) as { error?: string }
+
+        setError(payload.error || GH_PRICING_GOVERNANCE.bulkEdit.errorToast)
+
+        return
+      }
+
+      const data = (await response.json()) as { applied: number; failed: number }
+
+      onSuccess(data)
+      handleClose()
+    } catch {
+      setError(GH_PRICING_GOVERNANCE.bulkEdit.errorToast)
+    } finally {
+      setSubmitting(false)
+    }
+  }, [active, notes, onSuccess, roleIds])
+
+  return (
+    <Drawer anchor='right' open={open} onClose={handleClose} PaperProps={{ sx: { width: 480 } }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 3 }}>
+        <Stack spacing={0.25}>
+          <Typography variant='h6' sx={{ fontWeight: 700 }}>
+            {GH_PRICING_GOVERNANCE.bulkEdit.drawerTitle}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {GH_PRICING_GOVERNANCE.bulkEdit.drawerSubtitle(roleIds.length)}
+          </Typography>
+        </Stack>
+        <IconButton onClick={handleClose} size='small' disabled={submitting} aria-label='Cerrar'>
+          <i className='tabler-x' />
+        </IconButton>
+      </Box>
+      <Divider />
+
+      <Stack spacing={3} sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
+        <Box>
+          <Typography variant='caption' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: 'text.secondary', display: 'block', mb: 1 }}>
+            {GH_PRICING_GOVERNANCE.bulkEdit.activeFieldLabel}
+          </Typography>
+          <Stack direction='row' spacing={2}>
+            <FormControlLabel
+              control={<Switch checked={active === 'activate'} onChange={(_, c) => setActive(c ? 'activate' : 'unchanged')} />}
+              label='Activar'
+            />
+            <FormControlLabel
+              control={<Switch checked={active === 'deactivate'} color='warning' onChange={(_, c) => setActive(c ? 'deactivate' : 'unchanged')} />}
+              label='Desactivar'
+            />
+          </Stack>
+        </Box>
+
+        <TextField
+          label={GH_PRICING_GOVERNANCE.bulkEdit.notesFieldLabel}
+          placeholder={GH_PRICING_GOVERNANCE.bulkEdit.notesFieldPlaceholder}
+          value={notes}
+          onChange={e => setNotes(e.target.value.slice(0, 500))}
+          multiline
+          minRows={2}
+          maxRows={4}
+          size='small'
+          fullWidth
+          disabled={submitting}
+        />
+
+        {error ? <Alert severity='error'>{error}</Alert> : null}
+      </Stack>
+
+      <Divider />
+      <Box sx={{ display: 'flex', gap: 2, p: 3 }}>
+        <Button variant='outlined' onClick={handleClose} fullWidth disabled={submitting}>
+          {GH_PRICING_GOVERNANCE.bulkEdit.cancelCta}
+        </Button>
+        <Button
+          variant='contained'
+          onClick={() => void handleSubmit()}
+          fullWidth
+          disabled={submitting || roleIds.length === 0}
+          startIcon={submitting ? <CircularProgress size={16} color='inherit' /> : null}
+        >
+          {submitting
+            ? GH_PRICING_GOVERNANCE.bulkEdit.applyingCtaLabel
+            : GH_PRICING_GOVERNANCE.bulkEdit.applyCtaLabel}
+        </Button>
+      </Box>
+    </Drawer>
+  )
+}
+
+export default BulkEditDrawer

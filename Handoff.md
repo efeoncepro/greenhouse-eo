@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — TASK-471 Pricing Catalog Phase-4 UI Polish (Claude Opus 4.7)
+
+- **Scope**: 6 slices shippeados en una sola sesión sobre `task/TASK-471-pricing-catalog-phase-4-ui`.
+- **Slices entregados**: (1) AuditDiffViewer primitive, (2) one-click revert + migration + capability + dialog, (3) bulk edit roles, (4) ImpactPreviewPanel wired en 3 drawers, (5) maker-checker approval queue, (6) Excel export/import/apply.
+- **Decisiones enterprise cerradas (4 open questions resueltas)**:
+  1. Revert → nueva capability `canRevertPricingCatalogChange` restrictiva a `efeonce_admin` only.
+  2. Revert of revert → permitido (cada audit es immutable, chain finito).
+  3. Reason dialog → obligatorio minLength 15 chars.
+  4. Diff viewer → handle todos los 9+ action types, no solo 'updated'.
+- **2 migrations**: `audit-action-governance-extension` (extiende enum con reverted/approval_applied/bulk_edited) + `pricing-catalog-approval-queue` (tabla nueva).
+- **V1 scope honesto**: Revert backend V1 = sellable_role, tool_catalog, overhead_addon (3 de 10 entity types; governance types + service_catalog = follow-up). Bulk edit V1 = solo roles. Excel apply V1 = solo sellable_role update (create/delete + tools/overheads = follow-up). Approval queue persiste pero no auto-apply al approve (slice 5b = follow-up).
+- **Nomenclature**: nuevo namespace `GH_PRICING_GOVERNANCE` con copy ES completo (6 sub-objetos).
+- **Verification**: `pnpm lint` 0 errores, `pnpm tsc --noEmit` clean, `pnpm test` 1569/1569 passed, `pnpm build` OK.
+- **Follow-ups (phase-5)**:
+  - Auto-apply al approve en queue
+  - Extensión revert + bulk + excel apply a tools/overheads + governance
+  - Notificaciones Slack/email de approvals
+  - Auto-gate de high-impact confirmation en edit drawers (hoy el checkbox es informativo)
+  - Consumer reactivo de overcommit event en dashboard de delivery
+
 ## Sesion 2026-04-20 — TASK-481 Quote Builder suggested cost UX + override governance (Claude Opus 4.7)
 
 - **Scope:** entregar la UX de provenance / confidence / freshness sobre la metadata que el engine v2 ya persiste, y gobernar el override manual con motivo + categoría + trazabilidad backend.
