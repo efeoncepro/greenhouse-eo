@@ -9,6 +9,7 @@ export interface RevertTargetDescriptor {
   method: 'PATCH' | 'PUT'
   pathname: string
   payload: Record<string, unknown>
+
   /**
    * Acción semántica original que estamos revirtiendo. El endpoint de revert
    * puede usarla para decidir si el revert es aceptable (ej. bulk_imported
@@ -121,6 +122,7 @@ export const buildRevertPayload = (entry: PricingCatalogAuditEntry): RevertTarge
     tool_catalog: 'tools',
     overhead_addon: 'overheads',
     service_catalog: 'services',
+
     // Governance types handled above; these fall through defensively.
     role_tier_margin: 'governance',
     service_tier_margin: 'governance',

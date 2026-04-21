@@ -24,11 +24,6 @@ export interface BulkEditDrawerProps {
   onSuccess: (result: { applied: number; failed: number }) => void
 }
 
-interface BulkUpdates {
-  active?: boolean
-  notesAppend?: string
-}
-
 const BulkEditDrawer = ({ open, roleIds, onClose, onSuccess }: BulkEditDrawerProps) => {
   const [active, setActive] = useState<'unchanged' | 'activate' | 'deactivate'>('unchanged')
   const [notes, setNotes] = useState('')

@@ -103,6 +103,7 @@ const ImpactPreviewPanel = ({
 
     try {
       const pathSegment = entityPathMap[entityType]
+
       const response = await fetch(
         `/api/admin/pricing-catalog/${pathSegment}/${encodeURIComponent(entityId)}/preview-impact`,
         {

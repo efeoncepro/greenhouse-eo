@@ -525,11 +525,13 @@ const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) 
                                   'pricing_updated',
                                   'recipe_updated'
                                 ]
+
                                 const revertibleEntities: EntityType[] = [
                                   'sellable_role',
                                   'tool_catalog',
                                   'overhead_addon'
                                 ]
+
                                 const actionOk = revertibleActions.includes(entry.action)
                                 const entityOk = revertibleEntities.includes(entry.entityType)
                                 const alreadyReverted = revertedIds.has(entry.auditId)
@@ -584,11 +586,15 @@ const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) 
           onSuccess={({ newAuditId }) => {
             setRevertedIds(prev => {
               const next = new Set(prev)
+
               next.add(revertTarget.auditId)
-              return next
+              
+return next
             })
+
             // Remove unused var hint
             void newAuditId
+
             // Refresh timeline to pick up the new revert entry on top.
             setAppliedFilters(current => ({ ...current }))
           }}

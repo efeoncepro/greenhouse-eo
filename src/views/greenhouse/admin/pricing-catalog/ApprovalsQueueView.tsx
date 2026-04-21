@@ -74,9 +74,11 @@ const ApprovalsQueueView = () => {
   const [items, setItems] = useState<ApprovalEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
   const [decisionTarget, setDecisionTarget] = useState<
     { entry: ApprovalEntry; decision: 'approved' | 'rejected' | 'cancelled' } | null
   >(null)
+
   const [comment, setComment] = useState('')
   const [submitting, setSubmitting] = useState(false)
 

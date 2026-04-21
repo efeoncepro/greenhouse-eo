@@ -101,9 +101,11 @@ export async function POST(request: Request) {
         }
 
         const entityId = typeof diff.entityId === 'string' ? diff.entityId : null
+
         const newValues = diff.newValues && typeof diff.newValues === 'object'
           ? (diff.newValues as Record<string, unknown>)
           : null
+
         const fieldsChanged = Array.isArray(diff.fieldsChanged)
           ? diff.fieldsChanged.filter((f): f is string => typeof f === 'string')
           : []

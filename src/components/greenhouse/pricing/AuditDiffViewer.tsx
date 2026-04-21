@@ -94,6 +94,7 @@ const formatValue = (value: unknown): string => {
   if (typeof value === 'boolean') return value ? 'true' : 'false'
   if (typeof value === 'number') return String(value)
   if (typeof value === 'string') return value
+
   if (Array.isArray(value)) {
     if (value.length === 0) return '[]'
 
@@ -112,6 +113,7 @@ const computeNumberDelta = (previous: unknown, next: unknown): string | null => 
   if (absolute === 0) return GH_PRICING_GOVERNANCE.auditDiff.deltaZero
 
   const absoluteStr = Math.abs(absolute).toFixed(Math.abs(absolute) % 1 === 0 ? 0 : 2)
+
   const pctStr =
     previous === 0 ? '∞' : (((next - previous) / Math.abs(previous)) * 100).toFixed(2).replace(/\.?0+$/, '')
 
@@ -273,8 +275,10 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
   const unchangedKeys = useMemo(() => allKeys.filter(k => !changedKeys.has(k)), [allKeys, changedKeys])
 
   const showSideBySide = Boolean(parsed.previousValues) && Boolean(parsed.newValues)
+
   const showOnlyNew =
     !showSideBySide && Boolean(parsed.newValues) && (action === 'created' || action === 'bulk_imported')
+
   const showOnlyPrevious =
     !showSideBySide && Boolean(parsed.previousValues) && (action === 'deactivated' || action === 'deleted')
 
@@ -361,6 +365,7 @@ const AuditDiffViewer = ({ action, changeSummary }: AuditDiffViewerProps) => {
               const previous = parsed.previousValues?.[key]
               const next = parsed.newValues?.[key]
               const numberDelta = computeNumberDelta(previous, next)
+
               const arrayDiff =
                 Array.isArray(previous) || Array.isArray(next)
                   ? computeArrayDiff(previous, next)

@@ -24,8 +24,9 @@ import Tab from '@mui/material/Tab'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
+
+import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
 
 import CustomTextField from '@core/components/mui/TextField'
 

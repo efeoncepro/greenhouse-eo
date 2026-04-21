@@ -68,14 +68,17 @@ const AuditRevertConfirmDialog = ({
   // Inverse preview: swap previous_values ↔ new_values.
   const invertedSummary = useMemo(() => {
     if (!changeSummary) return null
+
     const prev = (changeSummary.previous_values ?? changeSummary.previousValues) as
       | Record<string, unknown>
       | null
       | undefined
+
     const next = (changeSummary.new_values ?? changeSummary.newValues) as
       | Record<string, unknown>
       | null
       | undefined
+
     const fields = (changeSummary.fields_changed ?? changeSummary.fieldsChanged) as
       | string[]
       | undefined

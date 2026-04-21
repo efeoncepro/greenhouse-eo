@@ -73,10 +73,12 @@ export async function POST(request: Request) {
   const entityType = typeof body.entityType === 'string' ? body.entityType : null
   const entityId = typeof body.entityId === 'string' ? body.entityId : null
   const entitySku = typeof body.entitySku === 'string' ? body.entitySku : null
+
   const proposedChanges =
     body.proposedChanges && typeof body.proposedChanges === 'object' && !Array.isArray(body.proposedChanges)
       ? (body.proposedChanges as Record<string, unknown>)
       : null
+
   const justification = typeof body.justification === 'string' ? body.justification.trim() : null
 
   if (!entityType || !entityId || !proposedChanges) {

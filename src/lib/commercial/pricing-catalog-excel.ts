@@ -56,6 +56,7 @@ export const buildPricingCatalogWorkbook = async (
   // ── Roles sheet ──
   const roles = await listSellableRoles({})
   const rolesSheet = workbook.addWorksheet('Roles')
+
   const rolesHeaders = [
     'role_id',
     'role_sku',
@@ -99,6 +100,7 @@ export const buildPricingCatalogWorkbook = async (
   // ── Tools sheet ──
   const tools = await listToolCatalog({})
   const toolsSheet = workbook.addWorksheet('Tools')
+
   const toolsHeaders = [
     'tool_id',
     'tool_sku',
@@ -136,6 +138,7 @@ export const buildPricingCatalogWorkbook = async (
   // ── Overheads sheet ──
   const overheads = await listOverheadAddons({})
   const overheadsSheet = workbook.addWorksheet('Overheads')
+
   const overheadsHeaders = [
     'addon_id',
     'addon_sku',
@@ -213,6 +216,7 @@ const parseRoleRow = (row: ExcelJS.Row): Record<string, unknown> | null => {
   if (!roleId || typeof roleId !== 'string') return null
 
   const toBool = (v: ExcelJS.CellValue): boolean => v === true || v === 'true' || v === 1
+
   const toStr = (v: ExcelJS.CellValue): string | null => {
     if (v === null || v === undefined || v === '') return null
 
@@ -288,6 +292,7 @@ export const previewPricingCatalogExcelImport = async (
         result.metadata.rolesProcessed += 1
 
         const current = currentById.get(parsed.role_id as string)
+
         const currentValues = current
           ? {
               role_id: current.roleId,

@@ -171,6 +171,7 @@ export async function POST(request: Request, { params }: { params: Promise<Route
   }
 
   let descriptor
+
   try {
     descriptor = buildRevertPayload(entry)
   } catch (error) {
@@ -215,6 +216,7 @@ export async function POST(request: Request, { params }: { params: Promise<Route
   }
 
   const session = await getServerAuthSession()
+
   const actorName =
     session?.user?.name || session?.user?.email || tenant.clientName || tenant.userId || 'unknown'
 

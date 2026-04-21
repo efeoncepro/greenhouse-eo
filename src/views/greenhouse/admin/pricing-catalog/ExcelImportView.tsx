@@ -130,6 +130,7 @@ const ExcelImportView = () => {
       const data = (await response.json()) as PreviewResponse
 
       setPreview(data)
+
       // Preselect updates (skip noop by default).
       const preselected = new Set<string>()
 
