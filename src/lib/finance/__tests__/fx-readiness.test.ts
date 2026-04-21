@@ -59,6 +59,7 @@ describe('resolveFxReadiness', () => {
     expect(result.ageDays).toBe(0)
     expect(result.source).toBe('mindicador')
     expect(result.composedViaUsd).toBe(false)
+    expect(result.compositionHub).toBe(null)
     expect(mockQuery).toHaveBeenCalledTimes(1)
   })
 
@@ -117,7 +118,76 @@ describe('resolveFxReadiness', () => {
     expect(result.state).toBe('supported')
     expect(result.rate).toBeCloseTo(0.005, 4)
     expect(result.composedViaUsd).toBe(true)
+    expect(result.compositionHub).toBe('USD')
     expect(result.source).toMatch(/composed_via_usd/)
+  })
+
+  it('composes USD→CLF via CLP hub (UF is a CLP-indexed unit, no direct USD rate)', async () => {
+    // Registry: CLF.compositionHub = 'CLP'. Resolver tries:
+    //   direct USD→CLF → empty
+    //   inverse CLF→USD → USD registry allows inverse, but still empty
+    //   hub composition (hub=CLP): USD→CLP + CLP→CLF ✅
+    mockQuery
+      .mockResolvedValueOnce([]) // direct USD→CLF
+      .mockResolvedValueOnce([]) // inverse CLF→USD (USD registry allows inverse)
+      .mockResolvedValueOnce([{ rate: 886.32, rate_date: '2026-04-20', source: 'mindicador' }]) // USD→CLP
+      .mockResolvedValueOnce([{ rate: 1 / 38500, rate_date: '2026-04-20', source: 'clf_from_indicators' }]) // CLP→CLF
+
+    const result = await resolveFxReadiness({
+      fromCurrency: 'USD',
+      toCurrency: 'CLF',
+      rateDate: '2026-04-20',
+      domain: 'pricing_output'
+    })
+
+    expect(result.state).toBe('supported')
+    expect(result.rate).toBeCloseTo(886.32 / 38500, 6)
+    expect(result.compositionHub).toBe('CLP')
+    expect(result.composedViaUsd).toBe(false)
+    expect(result.source).toMatch(/composed_via_clp/)
+    expect(result.source).toMatch(/mindicador/)
+    expect(result.source).toMatch(/clf_from_indicators/)
+    expect(result.message).toMatch(/vía CLP/)
+  })
+
+  it('composes CLF→USD via CLP hub (origin-side hub when destination is itself a hub)', async () => {
+    // Destination USD has no compositionHub (it IS a hub). The resolver
+    // falls back to the origin's hub (CLF.compositionHub='CLP').
+    mockQuery
+      .mockResolvedValueOnce([]) // direct CLF→USD
+      .mockResolvedValueOnce([]) // inverse USD→CLF
+      .mockResolvedValueOnce([{ rate: 38500, rate_date: '2026-04-20', source: 'clf_from_indicators' }]) // CLF→CLP
+      .mockResolvedValueOnce([{ rate: 1 / 886.32, rate_date: '2026-04-20', source: 'mindicador' }]) // CLP→USD
+
+    const result = await resolveFxReadiness({
+      fromCurrency: 'CLF',
+      toCurrency: 'USD',
+      rateDate: '2026-04-20',
+      domain: 'pricing_output'
+    })
+
+    expect(result.state).toBe('supported')
+    expect(result.rate).toBeCloseTo(38500 / 886.32, 2)
+    expect(result.compositionHub).toBe('CLP')
+    expect(result.composedViaUsd).toBe(false)
+  })
+
+  it('keeps direct lookups free of compositionHub (no false-positive for fresh direct rates)', async () => {
+    mockQuery.mockResolvedValueOnce([
+      { rate: 17.35, rate_date: '2026-04-20', source: 'frankfurter' }
+    ])
+
+    const result = await resolveFxReadiness({
+      fromCurrency: 'USD',
+      toCurrency: 'MXN',
+      rateDate: '2026-04-20',
+      domain: 'pricing_output'
+    })
+
+    expect(result.state).toBe('supported')
+    expect(result.rate).toBe(17.35)
+    expect(result.composedViaUsd).toBe(false)
+    expect(result.compositionHub).toBe(null)
   })
 
   it('returns temporarily_unavailable when no direct / inverse / composition can be resolved', async () => {

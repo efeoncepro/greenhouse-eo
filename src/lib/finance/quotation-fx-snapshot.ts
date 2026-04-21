@@ -38,6 +38,11 @@ export interface QuotationFxSnapshot {
   rateDateResolved: string | null
   source: string | null
   composedViaUsd: boolean
+
+  /** Pivot hub used when the rate was composed (`USD`, `CLP`…) or null when
+   *  direct / inverse / identity. New in TASK-466 follow-up; legacy snapshots
+   *  restored from DB return null here until re-issued. */
+  compositionHub: string | null
   readinessState: FxReadinessState
   stalenessThresholdDays: number
   clientFacingThresholdDays: number
@@ -76,6 +81,7 @@ export const buildQuotationFxSnapshot = ({
     rateDateResolved: readiness.rateDateResolved,
     source: readiness.source,
     composedViaUsd: readiness.composedViaUsd,
+    compositionHub: readiness.compositionHub,
     readinessState: readiness.state,
     stalenessThresholdDays: readiness.stalenessThresholdDays,
     clientFacingThresholdDays: CLIENT_FACING_STALENESS_THRESHOLD_DAYS,
@@ -140,6 +146,11 @@ const normalizeSnapshotCandidate = (candidate: unknown): QuotationFxSnapshot | n
     rateDateResolved: typeof candidate.rateDateResolved === 'string' ? candidate.rateDateResolved : null,
     source: typeof candidate.source === 'string' ? candidate.source : null,
     composedViaUsd: candidate.composedViaUsd === true,
+
+    // Pre-TASK-466 followup snapshots don't have this field. Null is the
+    // safe default; consumers fall back to `composedViaUsd ? 'USD' : null`
+    // when they need a display hub.
+    compositionHub: typeof candidate.compositionHub === 'string' ? candidate.compositionHub : null,
     readinessState:
       typeof candidate.readinessState === 'string'
         ? (candidate.readinessState as FxReadinessState)
