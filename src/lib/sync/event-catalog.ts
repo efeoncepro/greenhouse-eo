@@ -231,6 +231,9 @@ export const EVENT_TYPES = {
   // Finance
   financeIncomeCreated: 'finance.income.created',
   financeIncomeUpdated: 'finance.income.updated',
+  financeIncomeHubspotSynced: 'finance.income.hubspot_synced',
+  financeIncomeHubspotSyncFailed: 'finance.income.hubspot_sync_failed',
+  financeIncomeHubspotArtifactAttached: 'finance.income.hubspot_artifact_attached',
   financeExpenseCreated: 'finance.expense.created',
   financeExpenseUpdated: 'finance.expense.updated',
   financeShareholderAccountCreated: 'finance.shareholder_account.created',

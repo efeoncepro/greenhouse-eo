@@ -452,6 +452,98 @@ export const createHubSpotGreenhouseQuote = async (payload: HubSpotGreenhouseCre
   return (await response.json()) as HubSpotGreenhouseCreateQuoteResponse
 }
 
+// ── Invoice client methods (TASK-524) ──
+//
+// Mirror of `greenhouse_finance.income` into HubSpot's native `invoice`
+// object as a **non-billable** reflection. The endpoint is not live in the
+// Cloud Run service yet; `upsertHubSpotGreenhouseInvoice` returns a
+// structured `endpoint_not_deployed` result on 404 so the reactive bridge
+// records the trace without throwing.
+
+export interface HubSpotGreenhouseInvoiceLineItemPayload {
+  description: string
+  quantity: number
+  unitPrice: number
+  discountPercent?: number | null
+  isExempt?: boolean | null
+}
+
+export interface HubSpotGreenhouseInvoiceAssociations {
+  hubspotCompanyId: string | null
+  hubspotDealId: string | null
+  hubspotContactId?: string | null
+}
+
+export interface HubSpotGreenhouseUpsertInvoiceRequest {
+
+  /** Greenhouse-side id; the Cloud Run service uses it as idempotency key. */
+  incomeId: string
+
+  /** Present on UPDATE; absent on CREATE. */
+  hubspotInvoiceId: string | null
+  invoiceNumber: string | null
+  invoiceDate: string
+  dueDate: string | null
+  currency: string
+  subtotal: number
+  taxAmount: number | null
+  totalAmount: number
+  totalAmountClp: number | null
+  exchangeRateToClp: number | null
+  description: string | null
+  isBillable: false
+  associations: HubSpotGreenhouseInvoiceAssociations
+  lineItems: HubSpotGreenhouseInvoiceLineItemPayload[]
+}
+
+export interface HubSpotGreenhouseUpsertInvoiceResponse {
+  status: 'created' | 'updated' | 'endpoint_not_deployed'
+  hubspotInvoiceId: string | null
+  invoiceNumber?: string | null
+  associations?: {
+    hubspotCompanyId?: string | null
+    hubspotDealId?: string | null
+    hubspotContactId?: string | null
+  }
+  message?: string
+}
+
+export const upsertHubSpotGreenhouseInvoice = async (
+  payload: HubSpotGreenhouseUpsertInvoiceRequest
+): Promise<HubSpotGreenhouseUpsertInvoiceResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/invoices`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  // Graceful degradation: while the Cloud Run service ships the /invoices
+  // route in a later deploy, the bridge records `endpoint_not_deployed` so
+  // ops can detect the backlog without Sentry noise.
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotInvoiceId: payload.hubspotInvoiceId,
+      message: 'HubSpot integration service does not expose /invoices yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for POST /invoices: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseUpsertInvoiceResponse
+}
+
 export const getHubSpotGreenhouseLiveContext = async (
   hubspotCompanyId: string | null
 ): Promise<HubSpotGreenhouseLiveContext> => {

@@ -3,6 +3,57 @@
 > **Version:** 1.0
 > **Created:** 2026-03-30
 > **Last updated:** 2026-04-21
+
+## Delta 2026-04-21 — Income → HubSpot Invoice Bridge (TASK-524)
+
+`greenhouse_finance.income` es espejado reactivamente a HubSpot como objeto nativo `invoice` (**non-billable mirror**, `hs_invoice_billable=false`). Nubox sigue siendo el emisor tributario; HubSpot es una proyección read-only para continuidad CRM.
+
+### Nuevas columnas en `greenhouse_finance.income`
+
+| Columna | Uso |
+|---|---|
+| `hubspot_invoice_id` | Id del objeto `invoice` en HubSpot (UNIQUE parcial). |
+| `hubspot_last_synced_at` | Timestamp del último attempt (success o failure). |
+| `hubspot_sync_status` | `pending` · `synced` · `failed` · `endpoint_not_deployed` · `skipped_no_anchors` |
+| `hubspot_sync_error` | Último mensaje de error (limpiado al siguiente success). |
+| `hubspot_sync_attempt_count` | Counter monotónico para backoff del retry worker. |
+| `hubspot_artifact_note_id` | Id del engagement/note que attacha el DTE (Fase 2 del contrato). |
+| `hubspot_artifact_synced_at` | Timestamp del artifact attach. |
+
+### Inheritance de anchors desde quote-to-cash
+
+`materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` ahora **heredan** `hubspot_deal_id` (directo de la quote) + `hubspot_company_id` (via `organizations.hubspot_company_id` join). El income nace anclado al mismo hilo comercial que la quote.
+
+### Projection reactiva
+
+`src/lib/sync/projections/income-hubspot-outbound.ts` (domain `cost_intelligence`) escucha `finance.income.created`, `finance.income.updated` y `finance.income.nubox_synced`. Delega a `pushIncomeToHubSpot(incomeId)` que:
+
+1. Guard: sin `hubspot_company_id` ni `hubspot_deal_id` → `skipped_no_anchors` (trace + evento, sin call).
+2. Construye payload con `line_items` reales (si hay en `greenhouse_finance.income_line_items`) o synthetic single-line desde `total_amount`.
+3. Llama a `upsertHubSpotGreenhouseInvoice()` del Cloud Run service.
+4. Si 404 → `endpoint_not_deployed` (sin rethrow, retry worker lo toma cuando aterrice la ruta).
+5. Si 5xx/network → `failed` (trace + evento + rethrow para retry backoff).
+6. Success → `synced` + persist `hubspot_invoice_id` + emit `finance.income.hubspot_synced`.
+
+### Eventos nuevos emitidos
+
+- `finance.income.hubspot_synced`
+- `finance.income.hubspot_sync_failed` (con campo `status` distinguiendo failed / endpoint_not_deployed / skipped_no_anchors)
+- `finance.income.hubspot_artifact_attached` (reservado Fase 2)
+
+### Archivos clave
+
+- `src/lib/finance/income-hubspot/` — types, events, bridge
+- `src/lib/sync/projections/income-hubspot-outbound.ts` — projection
+- `src/lib/integrations/hubspot-greenhouse-service.ts` — `upsertHubSpotGreenhouseInvoice()` con fallback stateless de endpoint_not_deployed
+- Migration: `20260421125353997_task-524-income-hubspot-invoice-trace.sql`
+
+### Follow-ups
+
+- Fase 2 del contrato: al `finance.income.nubox_synced` adjuntar PDF/XML/DTE como engagement/note al invoice + deal + company.
+- Contact association best-effort via `contact_identity_profile_id` en la quote cuando exista el campo.
+- Admin Center surface para listar rows con `hubspot_sync_status ∈ (failed, endpoint_not_deployed, skipped_no_anchors)`.
+- Deploy de la ruta `/invoices` en `hubspot-greenhouse-integration` Cloud Run service.
 > **Audience:** Backend engineers, finance product owners, agents implementing finance features
 
 ---

@@ -2,6 +2,19 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-524 Income → HubSpot Invoice Bridge shipped
+
+- Cierra la continuidad comercial `quote → income → HubSpot invoice` con contrato resuelto en TASK-524.
+- **Migration** (`20260421125353997_...invoice-trace.sql`): `greenhouse_finance.income` gana 7 columnas de trazabilidad (`hubspot_invoice_id` UNIQUE parcial, `hubspot_last_synced_at`, `hubspot_sync_status` CHECK enum, `hubspot_sync_error`, `hubspot_sync_attempt_count`, `hubspot_artifact_note_id`, `hubspot_artifact_synced_at`) + consistency check + índice parcial por status (retry worker) + índice parcial por invoice_id (webhook reverse-lookup).
+- **Inheritance de anchors:** `materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` ahora heredan `hubspot_company_id` (via JOIN a `organizations`) y `hubspot_deal_id` (directo de la quotation) al insertar el income. Corta el gap donde la conversión perdía el hilo CRM.
+- **Módulo nuevo** (`src/lib/finance/income-hubspot/`): types + eventos + bridge `pushIncomeToHubSpot`. Bridge idempotente con 5 paths explícitos (`skipped_no_anchors`, `endpoint_not_deployed`, `failed` con rethrow para retry backoff, `synced`, y el default `pending`). Line items se construyen desde `income_line_items` o synthetic single-line.
+- **Projection reactiva** (`src/lib/sync/projections/income-hubspot-outbound.ts`, domain `cost_intelligence`): escucha `finance.income.{created,updated,nubox_synced}`, delega al bridge, registrada en el ensure hook.
+- **Cloud Run client extendido**: `upsertHubSpotGreenhouseInvoice()` con fallback stateless `endpoint_not_deployed` cuando la ruta `/invoices` 404a — permite shippear trazabilidad completa mientras la ruta aterriza en el service.
+- **Eventos nuevos**: `finance.income.hubspot_synced`, `finance.income.hubspot_sync_failed` (con campo `status` que distingue failed/endpoint_not_deployed/skipped_no_anchors), `finance.income.hubspot_artifact_attached` (reservado Fase 2 post-Nubox).
+- **Contrato HubSpot:** el mirror es un `invoice` nativo **non-billable** (`hs_invoice_billable=false`) — Nubox sigue siendo el emisor tributario; HubSpot es solo reflejo CRM. Association mínima: company + deal (obligatorios cuando existan); contact best-effort follow-up.
+- **Verificación:** `pnpm migrate:up` + regenerate types OK · `pnpm lint` clean · `npx tsc --noEmit` clean · 15/15 tests passing.
+- **Follow-ups:** Fase 2 del contrato (attachar PDF/XML/DTE como note al invoice cuando Nubox emita); contact association vía `contact_identity_profile_id` cuando exista el campo; Admin Center surface para rows en degraded status; deploy de `/invoices` en el Cloud Run service.
+
 ### 2026-04-21 — TASK-545 Product Catalog Schema & Materializer Foundation (Fase A) shipped
 
 - Fase A del programa Product Catalog Sync (paraguas TASK-544) shipped. Desbloquea TASK-546 (handlers) + TASK-547 (outbound) + TASK-548 (drift) + TASK-549 (policy cleanup).

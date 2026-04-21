@@ -78,7 +78,11 @@ Los payloads del outbox siguen dos versiones que coexisten durante el rollout de
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `income` | `income.created`, `income.updated`, `income.deleted` | `finance/postgres-store.ts` | `{ incomeId, clientProfileId, amount, currency }` | `service_attribution` |
+| `income` | `income.created`, `income.updated`, `income.deleted` | `finance/postgres-store.ts` | `{ incomeId, clientProfileId, amount, currency }` | `service_attribution`, `income_hubspot_outbound` |
+| `income` | `finance.income.nubox_synced` | `nubox/sync-nubox-to-postgres.ts` | `{ incomeId, nuboxDocumentId, emissionStatus, dteFolio }` | `income_hubspot_outbound` (re-run + prepare artifact attach) |
+| `income` | `finance.income.hubspot_synced` | `finance/income-hubspot/income-hubspot-events.ts` (from reactive projection `income_hubspot_outbound`) | `{ incomeId, hubspotInvoiceId, hubspotCompanyId, hubspotDealId, syncedAt, attemptCount }` | audit, analytics BigQuery |
+| `income` | `finance.income.hubspot_sync_failed` | `finance/income-hubspot/income-hubspot-events.ts` | `{ incomeId, hubspotInvoiceId?, status: 'failed'\|'endpoint_not_deployed'\|'skipped_no_anchors', errorMessage, failedAt, attemptCount }` | alerting, retry worker, soporte ops |
+| `income` | `finance.income.hubspot_artifact_attached` | `finance/income-hubspot/income-hubspot-events.ts` (Fase 2 — post-Nubox attach) | `{ incomeId, hubspotInvoiceId, hubspotArtifactNoteId, attachedAt, artifactKind }` | audit |
 | `expense` | `expense.created`, `expense.updated`, `expense.deleted` | `finance/postgres-store.ts` | `{ expenseId, amount, currency }` | `service_attribution` |
 | `account` | `account.created`, `account.updated` | `finance/postgres-store-slice2.ts` | `{ accountId }` | — |
 | `supplier` | `supplier.created`, `supplier.updated` | `finance/postgres-store-slice2.ts` | `{ supplierId }` | — |

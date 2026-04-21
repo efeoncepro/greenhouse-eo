@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — Arquitectura Comercial vs Finanzas + programa EPIC-002 (Codex)
+
+- **Scope:** formalizar antes de implementar la separacion de dominio entre `Comercial` y `Finanzas`, para decidir si el cambio cabe en una sola task o requiere programa multi-task.
+- **Documentacion nueva:**
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`
+- **Decision canonica registrada:**
+  - `Comercial` y `Finanzas` deben operar como dominios hermanos del portal.
+  - `Quotes`, `Contracts`, `SOW`, `Master Agreements`, `Products` y `Pipeline` pertenecen a `Comercial` como owner domain.
+  - la primera separacion debe ocurrir en `sidebar + surfaces + access model`, **sin** mover de inmediato las URLs legacy `/finance/...`.
+  - el cambio toca ambos planos de acceso: `views/authorizedViews/view_code` y `entitlements/routeGroups`; no basta con mover links.
+- **Conclusion de arquitectura:** esto **no cabe** de forma sana en una sola task. Se formalizo como programa multi-task:
+  - `EPIC-002 — Commercial Domain Separation from Finance`
+  - `TASK-554` navegación/sidebar
+  - `TASK-555` access model foundation (`routeGroup commercial`, `comercial.*`, compat legacy)
+  - `TASK-556` adopción de surfaces comerciales sobre paths `/finance/...`
+  - `TASK-557` extracción de `Pipeline comercial` desde `Finance > Intelligence`
+- **Docs sincronizadas:** `docs/README.md`, `docs/epics/*`, `docs/tasks/*`, `project_context.md`.
+- **Validacion:** documental únicamente; no se tocaron rutas ni código runtime en esta sesión.
+
+## Sesion 2026-04-21 — TASK-524 Income → HubSpot Invoice Bridge (Claude Opus 4.7)
+
+- **Scope:** cerrar la continuidad comercial quote→income→HubSpot. Desbloquea el hilo full CRM (deal → quote → income visible en HubSpot invoice object).
+- **Migration shipped + aplicada en dev:** `20260421125353997_task-524-income-hubspot-invoice-trace.sql` agrega 7 columnas a `greenhouse_finance.income`: `hubspot_invoice_id`, `hubspot_last_synced_at`, `hubspot_sync_status` (CHECK enum `pending|synced|failed|endpoint_not_deployed|skipped_no_anchors`), `hubspot_sync_error`, `hubspot_sync_attempt_count` (default 0), `hubspot_artifact_note_id`, `hubspot_artifact_synced_at`. Consistency check `hubspot_invoice_id IS NOT NULL ⇒ hubspot_last_synced_at IS NOT NULL`. 2 indexes: partial por `hubspot_sync_status` para retry worker; UNIQUE parcial por `hubspot_invoice_id` para webhook reverse-lookup.
+- **Corrección al audit inicial:** el agent explorador reportó que `hubspot_last_synced_at` ya existía en `income`; en realidad **no existía**. La migration la incluye.
+- **Materializers actualizados (ambas ramas):**
+  - `materialize-invoice-from-quotation.ts` — SELECT enriquecido con `LEFT JOIN greenhouse_core.organizations` para traer `organization_hubspot_company_id`; INSERT income ahora incluye `hubspot_company_id` y `hubspot_deal_id`.
+  - `materialize-invoice-from-hes.ts` — mismo patrón; ambas ramas usan `FOR UPDATE OF q` para lockear solo quotations, no organizations.
+- **Módulo nuevo `src/lib/finance/income-hubspot/`** (5 archivos + barrel):
+  - `types.ts` — `IncomeHubSpotSyncStatus` union (5 valores, alineada con CHECK), `IncomeHubSpotMirrorPayload`, `IncomeHubSpotSyncTrace`, error classes (`IncomeHubSpotBridgeError`, `IncomeNotFoundError`).
+  - `income-hubspot-events.ts` — 3 publishers (`publishIncomeHubSpotSynced`, `publishIncomeHubSpotSyncFailed`, `publishIncomeHubSpotArtifactAttached`) bajo aggregate `income`.
+  - `push-income-to-hubspot.ts` — bridge idempotente con 5 paths explícitos: `skipped_no_anchors` (sin anchors → trace + evento failed, no call), `endpoint_not_deployed` (404 del Cloud Run → trace, no rethrow), `failed` (5xx → trace + rethrow para retry backoff), `synced` (success → persist `hubspot_invoice_id` + evento synced). Construye line_items desde `greenhouse_finance.income_line_items` o synthetic single-line desde `total_amount`.
+  - `index.ts` — barrel.
+- **Projection nueva** (`src/lib/sync/projections/income-hubspot-outbound.ts`): domain `cost_intelligence`, listener `finance.income.{created,updated,nubox_synced}`, refresh delega a `pushIncomeToHubSpot`. Registrada en `projections/index.ts`.
+- **Cloud Run service client extendido** (`src/lib/integrations/hubspot-greenhouse-service.ts`): nuevo `upsertHubSpotGreenhouseInvoice(payload)` con tipos `HubSpotGreenhouseUpsertInvoiceRequest` (anchors, lineItems, `isBillable: false`) y `HubSpotGreenhouseUpsertInvoiceResponse` (status `created | updated | endpoint_not_deployed`). El 404 se atrapa y retorna shape estructurado en lugar de throw — permite que la projection no queme retries cuando la ruta `/invoices` aún no está deployada en prod.
+- **Event catalog extendido**: 3 event types nuevos (`finance.income.hubspot_synced`, `finance.income.hubspot_sync_failed`, `finance.income.hubspot_artifact_attached`) bajo el aggregate `income` existente.
+- **Tests:** 15/15 passing (push-income-to-hubspot 7, income-hubspot-events 3, projection 5).
+- **Docs:** `GREENHOUSE_EVENT_CATALOG_V1.md` sección Finance reescrita con los 5 events del income aggregate. `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` gana sección "Delta 2026-04-21 — Income → HubSpot Invoice Bridge (TASK-524)".
+- **Verificación:** `pnpm migrate:up` OK + types regenerados · `pnpm lint` clean · `npx tsc --noEmit` clean.
+- **Cross-impact:** TASK-463 (bidirectional quote sync) no colisiona; TASK-486/TASK-504 ya cerrados; TASK-528/529 Chile tax compatible; TASK-547 Product Catalog Outbound usa mismo patrón.
+- **Out of scope (follow-ups):** Fase 2 attachar PDF/XML/DTE como note al invoice en `finance.income.nubox_synced`; contact association best-effort; Admin Center surface para rows en status degradado; deploy de `/invoices` en el Cloud Run.
+
 ## Sesion 2026-04-21 — TASK-545 Product Catalog Schema & Materializer Foundation (Claude Opus 4.7)
 
 - **Scope:** Fase A del programa Commercial Product Catalog Sync (paraguas TASK-544). Desbloquea TASK-546 (Fase B handlers). Branch: `develop`.

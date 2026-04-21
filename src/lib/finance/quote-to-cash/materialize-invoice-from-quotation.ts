@@ -47,6 +47,8 @@ interface QuotationRow extends Record<string, unknown> {
   total_amount_clp: string | number | null
   currency: string | null
   description: string | null
+  hubspot_deal_id: string | null
+  organization_hubspot_company_id: string | null
   subtotal: string | number | null
 }
 
@@ -99,14 +101,22 @@ export const materializeInvoiceFromApprovedQuotation = async (
   const { quotationId, actor } = params
 
   const result = await withTransaction(async (client: QueryableClient) => {
+    // TASK-524: resolve HubSpot anchors so the materialized income inherits
+    // the commercial thread. `organization_hubspot_company_id` joins through
+    // greenhouse_core.organizations because quotations don't carry
+    // `hubspot_company_id` directly — only `hubspot_deal_id`.
     const quotationResult = (await client.query(
-      `SELECT quotation_id, quotation_number, client_id, organization_id, space_id,
-              client_name_cache, status, legacy_status, converted_to_income_id,
-              current_version, total_price, total_amount, total_amount_clp,
-              currency, description, subtotal
-         FROM greenhouse_commercial.quotations
-         WHERE quotation_id = $1
-         FOR UPDATE`,
+      `SELECT q.quotation_id, q.quotation_number, q.client_id, q.organization_id, q.space_id,
+              q.client_name_cache, q.status, q.legacy_status, q.converted_to_income_id,
+              q.current_version, q.total_price, q.total_amount, q.total_amount_clp,
+              q.currency, q.description, q.subtotal,
+              q.hubspot_deal_id,
+              o.hubspot_company_id AS organization_hubspot_company_id
+         FROM greenhouse_commercial.quotations q
+         LEFT JOIN greenhouse_core.organizations o
+           ON o.organization_id = q.organization_id
+         WHERE q.quotation_id = $1
+         FOR UPDATE OF q`,
       [quotationId]
     )) as { rows: QuotationRow[] }
 
@@ -202,6 +212,7 @@ export const materializeInvoiceFromApprovedQuotation = async (
          currency, subtotal, total_amount, total_amount_clp,
          payment_status, amount_paid,
          quotation_id, contract_id,
+         hubspot_company_id, hubspot_deal_id,
          created_by_user_id,
          created_at, updated_at
        ) VALUES (
@@ -210,7 +221,8 @@ export const materializeInvoiceFromApprovedQuotation = async (
          $10, $11, $12, $13,
          'pending', 0,
          $14, $15,
-         $16,
+         $16, $17,
+         $18,
          CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
        )`,
       [
@@ -229,6 +241,8 @@ export const materializeInvoiceFromApprovedQuotation = async (
         totalAmountClp,
         quotationId,
         contract.contractId,
+        quotation.organization_hubspot_company_id,
+        quotation.hubspot_deal_id,
         actor.userId
       ]
     )

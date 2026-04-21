@@ -57,6 +57,8 @@ interface QuotationRow extends Record<string, unknown> {
   status: string
   converted_to_income_id: string | null
   current_version: number | null
+  hubspot_deal_id: string | null
+  organization_hubspot_company_id: string | null
 }
 
 interface ClientNameRow extends Record<string, unknown> {
@@ -142,12 +144,18 @@ export const materializeInvoiceFromApprovedHes = async (
 
     const quotationId = hes.quotation_id
 
+    // TASK-524: resolve HubSpot anchors from the quotation + its organization
+    // so the materialized income inherits the commercial thread.
     const quotationResult = (await client.query(
-      `SELECT quotation_id, client_id, organization_id, space_id, client_name_cache,
-              status, converted_to_income_id, current_version
-         FROM greenhouse_commercial.quotations
-         WHERE quotation_id = $1
-         FOR UPDATE`,
+      `SELECT q.quotation_id, q.client_id, q.organization_id, q.space_id, q.client_name_cache,
+              q.status, q.converted_to_income_id, q.current_version,
+              q.hubspot_deal_id,
+              o.hubspot_company_id AS organization_hubspot_company_id
+         FROM greenhouse_commercial.quotations q
+         LEFT JOIN greenhouse_core.organizations o
+           ON o.organization_id = q.organization_id
+         WHERE q.quotation_id = $1
+         FOR UPDATE OF q`,
       [quotationId]
     )) as { rows: QuotationRow[] }
 
@@ -188,6 +196,7 @@ export const materializeInvoiceFromApprovedHes = async (
          payment_status, amount_paid,
          hes_id, hes_number, purchase_order_id,
          quotation_id, contract_id, source_hes_id,
+         hubspot_company_id, hubspot_deal_id,
          created_by_user_id,
          created_at, updated_at
        ) VALUES (
@@ -197,7 +206,8 @@ export const materializeInvoiceFromApprovedHes = async (
          'pending', 0,
          $14, $15, $16,
          $17, $18, $19,
-         $20,
+         $20, $21,
+         $22,
          CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
        )`,
       [
@@ -220,6 +230,8 @@ export const materializeInvoiceFromApprovedHes = async (
         quotationId,
         contract.contractId,
         hes.hes_id,
+        quotation.organization_hubspot_company_id,
+        quotation.hubspot_deal_id,
         actor.userId
       ]
     )

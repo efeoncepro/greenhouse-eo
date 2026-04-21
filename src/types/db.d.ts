@@ -3060,8 +3060,33 @@ export interface GreenhouseFinanceIncome {
   exempt_amount: Numeric | null;
   hes_id: string | null;
   hes_number: string | null;
+  /**
+   * Id of the HubSpot engagement/note that attached the Nubox-emitted PDF/XML/DTE to the invoice + deal + company. Populated in the second sync phase (on finance.income.nubox_synced).
+   */
+  hubspot_artifact_note_id: string | null;
+  /**
+   * Timestamp of the artifact attach run. NULL until the Nubox document is linked into HubSpot.
+   */
+  hubspot_artifact_synced_at: Timestamp | null;
   hubspot_company_id: string | null;
   hubspot_deal_id: string | null;
+  /**
+   * Id of the mirror invoice object in HubSpot (non-billable). Populated by the reactive outbound bridge in src/lib/finance/income-hubspot/.
+   */
+  hubspot_invoice_id: string | null;
+  hubspot_last_synced_at: Timestamp | null;
+  /**
+   * Monotonic counter of outbound attempts (success or failure). Used by retry worker to apply backoff.
+   */
+  hubspot_sync_attempt_count: Generated<number>;
+  /**
+   * Short error message from the last failed outbound attempt. Cleared on the next successful sync.
+   */
+  hubspot_sync_error: string | null;
+  /**
+   * Last outbound attempt status: pending | synced | failed | endpoint_not_deployed | skipped_no_anchors. NULL == never attempted.
+   */
+  hubspot_sync_status: string | null;
   income_id: string;
   income_type: Generated<string | null>;
   invoice_date: Timestamp;
