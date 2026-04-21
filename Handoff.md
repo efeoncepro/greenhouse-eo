@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-545 Product Catalog Schema & Materializer Foundation (Claude Opus 4.7)
+
+- **Scope:** Fase A del programa Commercial Product Catalog Sync (paraguas TASK-544). Desbloquea TASK-546 (Fase B handlers). Branch: `develop`.
+- **Migraciones shipped y aplicadas en dev (types regenerados):**
+  - `20260421122806370_task-545-product-catalog-extension.sql` — 9 columnas nuevas en `greenhouse_commercial.product_catalog`: `source_kind` (CHECK de 7 valores), `source_id`, `source_variant_key`, `is_archived NOT NULL DEFAULT FALSE`, `archived_at`, `archived_by`, `last_outbound_sync_at`, `last_drift_check_at`, `gh_owned_fields_checksum`. UNIQUE parcial `(source_kind, source_id, COALESCE(source_variant_key, ''))` solo para rows no-manual/no-hubspot-imported. 3 indexes hot-path: por `(source_kind, source_id)`, por `(active, is_archived) WHERE is_archived=FALSE`, por `last_outbound_sync_at NULLS FIRST`.
+  - `20260421122812484_task-545-product-sync-conflicts-table.sql` — `product_sync_conflicts` con 5 conflict types (`orphan_in_hubspot/greenhouse`, `field_drift`, `sku_collision`, `archive_mismatch`), 4 resolution statuses (`pending`, `resolved_greenhouse_wins`, `resolved_hubspot_wins`, `ignored`), anchor-present check, resolution-consistency check, 3 indexes (unresolved hot path + dedup por producto/hubspot). Grants: SELECT/INSERT/UPDATE a runtime, no DELETE.
+  - `20260421122820579_task-545-product-catalog-source-backfill.sql` — 6 passes idempotentes por prefix (ECG→sellable_role, ETG→tool, EFO→overhead_addon, EFG→service, PRD→manual sin source_id, fallback hubspot_imported si tiene `hubspot_product_id`). DO block final levanta `NOTICE` con sample de ambiguous rows si quedan.
+- **Correcciones críticas a la spec §5.3:** `service_pricing` PK es `module_id` (no `pricing_id`), joinear por `service_sku` y usar `module_id` como `source_id`. Documentado en el delta V1.
+- **Módulo nuevo `src/lib/commercial/product-catalog/`** (5 archivos + barrel):
+  - `types.ts` — `PRODUCT_SOURCE_KINDS` (7), `PRODUCT_SYNC_CONFLICT_TYPES` (5), `PRODUCT_SYNC_CONFLICT_RESOLUTIONS` (4), `GhOwnedFieldsSnapshot`, `ProductSyncConflictRow`, error classes (`ProductCatalogError`, `ProductSourceKindMismatchError`, `ProductAlreadyArchivedError`, `ProductNotArchivedError`).
+  - `checksum.ts` — `computeGhOwnedFieldsChecksum(snapshot)` SHA-256 con orden inmutable documentado en `GH_OWNED_FIELDS_CHECKSUM_ORDER`. **NULL ≡ empty string** (evita drift falso por normalización de HubSpot), **boolean → `"true"`/`"false"`** (no 1/0).
+  - `product-catalog-events.ts` — 6 publishers: `publishProductCatalog{Created,Updated,Archived,Unarchived}` sobre aggregate `product_catalog`; `publishProductSyncConflict{Detected,Resolved}` sobre aggregate `product_sync_conflict`.
+  - `product-sync-conflicts-store.ts` — Kysely-first CRUD minimo (`insertProductSyncConflict`, `listUnresolvedProductSyncConflicts` con filtros, `countUnresolvedProductSyncConflictsByType`). Fase A solo usa insert + list; handlers vienen en TASK-548.
+  - `index.ts` — barrel.
+- **Projection scaffolding** (`src/lib/sync/projections/source-to-product-catalog.ts`):
+  - Registrada en `projections/index.ts` → `ensureProjectionsRegistered()`.
+  - Domain `cost_intelligence`, listener de eventos **reales**: `commercial.sellable_role.{created,cost_updated,pricing_updated}` + `ai_tool.{created,updated}` + `service.{created,updated,deactivated}`. TODO Fase B: agregar `overhead_addon.*` cuando aterrice publisher en `overhead-addons-store`.
+  - `extractScope` resuelve el id desde el payload; `refresh` es **no-op** en Fase A (log informativo en dev, retorna null). Fase B lo reemplaza con el upsert real + emit.
+- **Event catalog extendido** (`src/lib/sync/event-catalog.ts`): aggregate `product_sync_conflict` + 5 event types (`commercial.product_catalog.{updated,archived,unarchived}`, `commercial.product_sync_conflict.{detected,resolved}`). Los 2 preexistentes (`created`, `synced`) siguen.
+- **Backfill CLI** (`scripts/backfill-product-catalog-source.ts`): `--dry-run` preview, `--force` reclasifica rows ya clasificados. Dist-by-kind en stdout; lista los ambiguous rows (hasta 10) y sale con `exitCode=2` si quedan.
+- **Store extension** (`src/lib/commercial/product-catalog-store.ts`): `listCommercialProductCatalog` gana filtros `sourceKind` + `includeArchived`. **Default: `is_archived=FALSE`** (selectors ocultan archived); callers explícitos (Admin Center, drift reconciler) pasan `includeArchived: true`. Orden nuevo: `is_archived ASC, active DESC, product_name ASC`.
+- **Tests** — 17 tests passing en `src/lib/commercial/product-catalog/__tests__/**` (checksum 6, events 4) + `src/lib/sync/projections/__tests__/source-to-product-catalog.test.ts` (7). Cubren: determinismo del checksum, drift por campo único, NULL/empty string equivalencia, boolean normalization, reorder-independence, event publishers (aggregate + eventType + payload), projection registry + extractScope (multiple id fields) + refresh no-op.
+- **Docs:** `GREENHOUSE_EVENT_CATALOG_V1.md` sección "Commercial Product Catalog — canonical namespace (TASK-347 + TASK-545 sync foundation)" reescrita con los 7 events + invariantes. `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` tiene sección "Delta 2026-04-21 — Fase A shipped" al tope con correcciones a §5.3 (service_pricing PK) y §6 (event type namespaces reales).
+- **Verificación local:** `pnpm migrate:up` aplicó las 3 migraciones + regeneró `src/types/db.d.ts` (270 tables, +columnas + tabla nueva). `pnpm lint` clean (solo warning preexistente en `BulkEditDrawer.tsx`). `npx tsc --noEmit` clean. 17/17 tests del módulo + 17 dentro de la suite general passing.
+- **Cross-impact:**
+  - **TASK-467** (pricing-catalog-audit-store) — no colisiona.
+  - **TASK-474** — sigue bloqueada por Fase E.
+  - **TASK-544 umbrella** — Fase A cerrada formalmente; TASK-546 lista para arrancar.
+  - **TASK-535 (Party Lifecycle)** — patron gemelo (foundation schema + CQRS-adjacent + scaffolded projection + env-var override), ambos en `develop`.
+- **Out of scope (fases siguientes):** handlers Fase B (TASK-546), outbound Cloud Run (TASK-547), drift cron + Admin Center UI (TASK-548), policy enforcement + drop `sync_direction='hubspot_only'` (TASK-549).
+
 ## Sesion 2026-04-21 — TASK-535 Party Lifecycle Schema & Commands Foundation (Claude Opus 4.7)
 
 - **Scope:** Fase A del programa Commercial Party Lifecycle (paraguas TASK-534). Desbloquea TASK-536 (Fase B). Branch: `develop` (trabajo directo en rama principal por falta de worktree separado; commit único consolidado).

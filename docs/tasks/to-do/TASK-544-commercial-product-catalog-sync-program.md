@@ -24,6 +24,10 @@
 
 Programa oficial para convertir a Greenhouse en source of truth del catalogo que HubSpot expone como line items. Introduce un modelo de dos capas — autoria (5 catalogos fuente: roles, tools, overhead addons, services, manual) vs distribucion (`product_catalog` como single outbound anchor) — conectadas por reactive materializers y proyeccion outbound hacia HubSpot via Cloud Run. Cierra el gap donde crear un role en Greenhouse no lo hace seleccionable en HubSpot, updates no propagan, y no hay drift detection.
 
+## Progreso
+
+- **Fase A cerrada.** `TASK-545` completada 2026-04-21: DDL extension (9 cols nuevas en `product_catalog`) + tabla `product_sync_conflicts` + backfill heurístico idempotente + scaffolding del materializer (`sourceToProductCatalog` registrada con refresh no-op) + 6 event publishers + checksum helper + store filters. 17/17 tests. Ver `complete/TASK-545-product-catalog-schema-materializer-foundation.md`. Desbloquea Fase B.
+
 ## Why This Task Exists
 
 Hoy `greenhouse_commercial.product_catalog` tiene `hubspot_product_id` y `sync_status` pero nunca se popula desde los 4 source catalogs (`sellable_roles`, `tool_catalog`, `overhead_addons`, `service_pricing`) — solo via CREATE manual o import HubSpot. No hay UPDATE outbound (`create-hubspot-product.ts` crea pero no actualiza), no hay proyeccion reactiva analoga a `quotationHubSpotOutbound`, y no hay drift detection. Consecuencia: cada source catalog vive aislado, HubSpot drifta con cada edit manual, y la promesa "Greenhouse source of truth" no se cumple. Complementa TASK-534 (Party Lifecycle) cerrando el "que" del quote-to-HubSpot end-to-end.

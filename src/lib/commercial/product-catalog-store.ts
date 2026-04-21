@@ -2,6 +2,8 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 
+import type { ProductSourceKind } from './product-catalog/types'
+
 export interface CommercialProductCatalogEntry {
   productId: string
   financeProductId: string | null
@@ -21,6 +23,15 @@ export interface CommercialProductCatalogEntry {
   syncStatus: string
   syncDirection: string
   sourceSystem: string
+  sourceKind: ProductSourceKind | null
+  sourceId: string | null
+  sourceVariantKey: string | null
+  isArchived: boolean
+  archivedAt: string | null
+  archivedBy: string | null
+  lastOutboundSyncAt: string | null
+  lastDriftCheckAt: string | null
+  ghOwnedFieldsChecksum: string | null
   legacySku: string | null
   legacyCategory: string | null
   lastSyncedAt: string | null
@@ -47,6 +58,15 @@ type CommercialProductCatalogRow = {
   sync_status: string
   sync_direction: string
   source_system: string
+  source_kind: string | null
+  source_id: string | null
+  source_variant_key: string | null
+  is_archived: boolean
+  archived_at: string | Date | null
+  archived_by: string | null
+  last_outbound_sync_at: string | Date | null
+  last_drift_check_at: string | Date | null
+  gh_owned_fields_checksum: string | null
   legacy_sku: string | null
   legacy_category: string | null
   last_synced_at: string | Date | null
@@ -88,6 +108,15 @@ const mapRow = (row: CommercialProductCatalogRow): CommercialProductCatalogEntry
   syncStatus: row.sync_status,
   syncDirection: row.sync_direction,
   sourceSystem: row.source_system,
+  sourceKind: (row.source_kind as ProductSourceKind | null) ?? null,
+  sourceId: row.source_id,
+  sourceVariantKey: row.source_variant_key,
+  isArchived: Boolean(row.is_archived),
+  archivedAt: toTimestampString(row.archived_at),
+  archivedBy: row.archived_by,
+  lastOutboundSyncAt: toTimestampString(row.last_outbound_sync_at),
+  lastDriftCheckAt: toTimestampString(row.last_drift_check_at),
+  ghOwnedFieldsChecksum: row.gh_owned_fields_checksum,
   legacySku: row.legacy_sku,
   legacyCategory: row.legacy_category,
   lastSyncedAt: toTimestampString(row.last_synced_at),
@@ -100,6 +129,8 @@ export interface ListCommercialProductCatalogInput {
   source?: string | null
   active?: boolean | null
   businessLineCode?: string | null
+  sourceKind?: ProductSourceKind | null
+  includeArchived?: boolean
   limit?: number | null
   offset?: number | null
 }
@@ -132,6 +163,14 @@ export const listCommercialProductCatalog = async (
   if (input.source) push('source_system = $?', input.source)
   if (input.active != null) push('active = $?', input.active)
   if (input.businessLineCode) push('business_line_code = $?', input.businessLineCode)
+  if (input.sourceKind) push('source_kind = $?', input.sourceKind)
+
+  // Default behavior: hide archived products from selectors and lists.
+  // Callers must pass `includeArchived: true` explicitly to surface them
+  // (Admin Center, drift reconciler).
+  if (!input.includeArchived) {
+    conditions.push('is_archived = FALSE')
+  }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
   const limit = Math.max(1, Math.min(500, input.limit ?? 200))
@@ -141,11 +180,13 @@ export const listCommercialProductCatalog = async (
     `SELECT product_id, finance_product_id, hubspot_product_id, product_code, product_name,
             product_type, pricing_model, business_line_code, default_currency, default_unit_price,
             default_unit, suggested_role_code, suggested_hours, description, active,
-            sync_status, sync_direction, source_system, legacy_sku, legacy_category,
+            sync_status, sync_direction, source_system, source_kind, source_id, source_variant_key,
+            is_archived, archived_at, archived_by, last_outbound_sync_at, last_drift_check_at,
+            gh_owned_fields_checksum, legacy_sku, legacy_category,
             last_synced_at, created_at, updated_at
      FROM greenhouse_commercial.product_catalog
      ${whereClause}
-     ORDER BY active DESC, product_name ASC
+     ORDER BY is_archived ASC, active DESC, product_name ASC
      LIMIT ${limit} OFFSET ${offset}`,
     values
   )
@@ -169,7 +210,9 @@ export const getCommercialProduct = async (
     `SELECT product_id, finance_product_id, hubspot_product_id, product_code, product_name,
             product_type, pricing_model, business_line_code, default_currency, default_unit_price,
             default_unit, suggested_role_code, suggested_hours, description, active,
-            sync_status, sync_direction, source_system, legacy_sku, legacy_category,
+            sync_status, sync_direction, source_system, source_kind, source_id, source_variant_key,
+            is_archived, archived_at, archived_by, last_outbound_sync_at, last_drift_check_at,
+            gh_owned_fields_checksum, legacy_sku, legacy_category,
             last_synced_at, created_at, updated_at
      FROM greenhouse_commercial.product_catalog
      WHERE product_id = $1 OR finance_product_id = $1

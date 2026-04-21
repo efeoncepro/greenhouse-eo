@@ -159,12 +159,19 @@ Eventos adicionales del programa TASK-534 planificados para Fases posteriores:
 | `product` | `finance.product.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`) | `{ productId, hubspotProductId, name, sku, action }` | — |
 | `product` | `finance.product.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-product.ts`) | `{ productId, hubspotProductId, name, sku, direction }` | — |
 
-### Commercial Product Catalog — canonical namespace (TASK-347)
+### Commercial Product Catalog — canonical namespace (TASK-347 + TASK-545 sync foundation)
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `product_catalog` | `commercial.product_catalog.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-product.ts`) | `{ commercialProductId, productId, hubspotProductId, name, sku, direction }` | — |
-| `product_catalog` | `commercial.product_catalog.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`) | `{ commercialProductId, productId, hubspotProductId, name, sku, action }` | — |
+| `product_catalog` | `commercial.product_catalog.created` | `commercial/product-catalog/product-catalog-events.ts` (from TASK-546 materializer handlers; legacy `commercial/quotation-events.ts` still emits for HubSpot-driven creation during cutover) | `{ productId, sourceKind, sourceId, productCode, productName, defaultUnitPrice, defaultCurrency, defaultUnit, businessLineCode, hubspotProductId, ghOwnedFieldsChecksum, isArchived }` | `source_to_product_catalog` (Fase A scaffolded no-op), TASK-547 outbound (Fase C) |
+| `product_catalog` | `commercial.product_catalog.updated` | `commercial/product-catalog/product-catalog-events.ts` (from TASK-546 handlers) | `{ ...created payload, changedFields, previousChecksum }` | TASK-547 outbound, TASK-548 drift |
+| `product_catalog` | `commercial.product_catalog.archived` | `commercial/product-catalog/product-catalog-events.ts` | `{ productId, sourceKind, sourceId, productCode, archivedAt, archivedBy, reason? }` | TASK-547 archive HubSpot |
+| `product_catalog` | `commercial.product_catalog.unarchived` | `commercial/product-catalog/product-catalog-events.ts` | `{ productId, sourceKind, sourceId, productCode, unarchivedAt, unarchivedBy }` | TASK-547 unarchive HubSpot |
+| `product_catalog` | `commercial.product_catalog.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`) | `{ commercialProductId, productId, hubspotProductId, name, sku, action }` | legacy, retained during cutover |
+| `product_sync_conflict` | `commercial.product_sync_conflict.detected` | `commercial/product-catalog/product-catalog-events.ts` (emitted by TASK-548 drift cron) | `{ conflictId, productId?, hubspotProductId?, conflictType, detectedAt, conflictingFields?, metadata? }` | TASK-548 Admin Center alerts |
+| `product_sync_conflict` | `commercial.product_sync_conflict.resolved` | `commercial/product-catalog/product-catalog-events.ts` (emitted by Admin Center resolution handler) | `{ conflictId, productId?, hubspotProductId?, conflictType, resolutionStatus, resolvedBy, resolutionAppliedAt }` | audit trail |
+
+TASK-545 Fase A (shipped 2026-04-21) adds the `source_kind` + `source_id` linkage, `is_archived` archival semantics, and `gh_owned_fields_checksum` drift primitives to `greenhouse_commercial.product_catalog`, plus the `product_sync_conflicts` table. The publishers + `source_to_product_catalog` projection are **scaffolded but inactive** — handlers land in TASK-546 (Fase B), outbound in TASK-547, drift detection in TASK-548. See `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1`.
 
 ### Nubox
 

@@ -110,6 +110,7 @@ export const AGGREGATE_TYPES = {
   masterAgreement: 'master_agreement',
   deal: 'deal',
   productCatalog: 'product_catalog',
+  productSyncConflict: 'product_sync_conflict',
   sellableRole: 'sellable_role',
   employmentType: 'employment_type',
 
@@ -418,9 +419,14 @@ export const EVENT_TYPES = {
   productSynced: 'finance.product.synced',
   productCreated: 'finance.product.created',
 
-  // Commercial Product Catalog (canonical, TASK-347)
+  // Commercial Product Catalog (canonical, TASK-347 + TASK-545 sync foundation)
   productCatalogSynced: 'commercial.product_catalog.synced',
   productCatalogCreated: 'commercial.product_catalog.created',
+  productCatalogUpdated: 'commercial.product_catalog.updated',
+  productCatalogArchived: 'commercial.product_catalog.archived',
+  productCatalogUnarchived: 'commercial.product_catalog.unarchived',
+  productSyncConflictDetected: 'commercial.product_sync_conflict.detected',
+  productSyncConflictResolved: 'commercial.product_sync_conflict.resolved',
   sellableRoleCreated: 'commercial.sellable_role.created',
   sellableRoleCostUpdated: 'commercial.sellable_role.cost_updated',
   sellableRolePricingUpdated: 'commercial.sellable_role.pricing_updated',

@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado — 2026-04-21`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none`
@@ -223,3 +223,48 @@ Se calcula en el commit del store (TASK-546+ lo usan; aqui solo scaffolding del 
 
 - Resolver ambiguos del backfill (si los hay) → task de hygiene.
 - Si el backfill dejo orphans HubSpot, agregarlos como candidatos para TASK-548.
+- Agregar publisher para `overhead_addons` antes de Fase B (TASK-546) si se quiere materializar desde overhead_addons.
+- Normalizar enum `sync_direction` en TASK-549 (remover `hubspot_only`).
+
+## Closing Summary — 2026-04-21
+
+### Artefactos entregados
+
+- **Migraciones** (`migrations/`):
+  - `20260421122806370_task-545-product-catalog-extension.sql` — 9 columnas nuevas en `greenhouse_commercial.product_catalog` + CHECK de `source_kind` + UNIQUE parcial + 3 indexes hot-path.
+  - `20260421122812484_task-545-product-sync-conflicts-table.sql` — `product_sync_conflicts` con 5 conflict types, 4 resolution statuses, indexes.
+  - `20260421122820579_task-545-product-catalog-source-backfill.sql` — backfill idempotente heuristico con NOTICE sobre rows ambiguos.
+- **Domain module** (`src/lib/commercial/product-catalog/`):
+  - `types.ts` — unions + error classes
+  - `checksum.ts` — `computeGhOwnedFieldsChecksum` SHA-256 con orden canonico
+  - `product-catalog-events.ts` — 6 publishers (4 catalog + 2 conflict)
+  - `product-sync-conflicts-store.ts` — CRUD minimo (insert, list unresolved, count by type)
+  - `index.ts` — barrel
+- **Projection scaffold** — `src/lib/sync/projections/source-to-product-catalog.ts` registrada (cost_intelligence domain, refresh no-op hasta Fase B).
+- **Event catalog** — `src/lib/sync/event-catalog.ts` extendido con aggregate `product_sync_conflict` + 5 event types nuevos.
+- **Backfill CLI** — `scripts/backfill-product-catalog-source.ts` (`--dry-run` / `--force`).
+- **Store extension** — `product-catalog-store.ts` gana filtros `sourceKind` + `includeArchived`.
+- **Tests** — 17 tests passing (checksum 6, events 4, projection 7).
+- **Spec docs** — `GREENHOUSE_EVENT_CATALOG_V1.md` + `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` sincronizados con Fase A.
+
+### Verificacion
+
+- `pnpm migrate:up` — 3 migraciones aplicadas en dev + types regenerados.
+- `pnpm exec vitest run src/lib/commercial/product-catalog src/lib/sync/projections/__tests__/source-to-product-catalog.test.ts` → 17/17 passing.
+- `pnpm lint` → 0 errors (warning preexistente en `BulkEditDrawer.tsx` no relacionado).
+- `npx tsc --noEmit` → clean.
+
+### Cross-impact chequeado
+
+- **TASK-467 pricing catalog audit log** — no colisiona; `product_catalog` no es el mismo scope que `pricing_catalog_audit_log`.
+- **TASK-474** — sigue bloqueada por Fase E (TASK-549); Fase A no la desbloquea aun.
+- **TASK-544 umbrella** — Fase A cerrada; TASK-546 (Fase B) desbloqueada.
+- **TASK-535 (Party Lifecycle)** — complementaria. Ambos son foundations de sync Greenhouse→HubSpot; comparten patron (outbox events + scaffolded projection + env-var override).
+
+### Robustez del checksum
+
+`computeGhOwnedFieldsChecksum` tiene contrato versionable:
+- Orden de campos documentado en `GH_OWNED_FIELDS_CHECKSUM_ORDER` (10 campos canonicos).
+- NULL y empty string → mismo hash (evita drift falso por normalizacion de HubSpot).
+- Boolean → literal `"true"`/`"false"` (no `1/0`).
+- Agregar un nuevo campo owned requiere: (a) extender `GhOwnedFieldsSnapshot`, (b) anadirlo al final de `CHECKSUM_FIELD_ORDER`, (c) invalidar todos los hashes almacenados via re-materialize batch.

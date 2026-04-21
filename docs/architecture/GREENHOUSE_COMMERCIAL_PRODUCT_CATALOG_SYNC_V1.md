@@ -1,10 +1,70 @@
 # Greenhouse EO — Commercial Product Catalog Sync Architecture V1
 
-> **Version:** 1.0
+> **Version:** 1.1
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
+> **Ultima actualizacion:** 2026-04-21 por Claude (Opus 4.7) — Fase A shipped
 > **Audience:** Backend engineers, product owners, agentes que implementen features de catalog management, pricing, quote builder o HubSpot sync
 > **Related:** `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## Delta 2026-04-21 — Fase A shipped (TASK-545)
+
+Foundation del programa en `develop`. Lo que vive en el repo hoy vs. lo que este spec describe en su forma completa.
+
+### Implementado en Fase A
+
+| Area | Artefacto |
+|---|---|
+| DDL extension | `migrations/20260421122806370_task-545-product-catalog-extension.sql` — 9 columnas nuevas en `product_catalog` + CHECK de `source_kind` + UNIQUE parcial + 3 indexes |
+| Conflicts table | `migrations/20260421122812484_task-545-product-sync-conflicts-table.sql` — `product_sync_conflicts` con check constraints + indexes |
+| Backfill | `migrations/20260421122820579_task-545-product-catalog-source-backfill.sql` — clasificacion heuristica por SKU prefix (ECG/ETG/EFO/EFG/PRD), fallback `hubspot_imported`, NOTICE sobre ambiguous rows |
+| CLI | `scripts/backfill-product-catalog-source.ts` con `--dry-run` / `--force` |
+| Types + helpers | `src/lib/commercial/product-catalog/{types,checksum,product-catalog-events,product-sync-conflicts-store,index}.ts` |
+| Event catalog | `commercial.product_catalog.{updated,archived,unarchived}` + `commercial.product_sync_conflict.{detected,resolved}` + aggregate `product_sync_conflict` |
+| Projection scaffold | `src/lib/sync/projections/source-to-product-catalog.ts` registrada; refresh es no-op hasta Fase B |
+| Store extension | `listCommercialProductCatalog` gana filtros `sourceKind` + `includeArchived` (default oculta archived) |
+| Tests | 17 tests passing en `src/lib/commercial/product-catalog/__tests__/**` + `src/lib/sync/projections/__tests__/source-to-product-catalog.test.ts` |
+
+### Correcciones a §5.3 (schema real de source catalogs)
+
+| Spec §5.3 dice | Realidad (2026-04-21) |
+|---|---|
+| `service_pricing.pricing_id` como PK | La PK es `module_id`; `service_sku` es la columna SKU. El backfill + handlers Fase B deben joinar por `service_sku` y referenciar `module_id` como `source_id`. |
+| `sellable_roles.sku` | Columna real es `role_sku`; match por SKU funciona. |
+| `tool_catalog.tool_sku` NULLABLE | Confirmado — rows sin SKU no se mapean y caen a `hubspot_imported` si tienen `hubspot_product_id`. |
+
+### Correcciones al catalogo de eventos §6
+
+La spec lista triggers `commercial.tool.*`, `commercial.overhead_addon.*`, `commercial.service.*`. En la realidad hoy existen:
+
+- `commercial.sellable_role.{created,cost_updated,pricing_updated}` — usados en el registration real.
+- `ai_tool.{created,updated}` — NOT `commercial.tool.*`.
+- `service.{created,updated,deactivated}` — NOT `commercial.service.*`.
+- `commercial.overhead_addon.*` — **no existen** publishers todavia.
+
+La projection scaffolded se registra con los **event types reales** (mas cercanos al spec que los documentados). Fase B (TASK-546) decide si:
+- Agregar publishers `commercial.overhead_addon.*` en `overhead-addons-store` + actualizar la lista de triggers, o
+- Mantener los namespaces `ai_tool.*` / `service.*` y mapear 1:1 en los handlers.
+
+### Correcciones a §8 (`sync_direction`)
+
+La spec menciona valores `greenhouse_only` / `bidirectional` / `hubspot_only`. Hoy `product_catalog.sync_direction` ya existe pero con valores legacy (`inbound`, `outbound`, `bidirectional` segun rows historicos). Fase A NO toca el campo; TASK-549 (Fase E) es quien normaliza el enum y elimina `hubspot_only`.
+
+### Robustez operacional anadida
+
+- **Drift-safe checksum order:** `computeGhOwnedFieldsChecksum` usa un orden **inmutable** documentado en `GH_OWNED_FIELDS_CHECKSUM_ORDER`. Cambiar el orden invalida todos los hashes almacenados — tests unitarios detectan drift.
+- **NULL vs empty string:** el checksum los trata como equivalentes (documentado en `checksum.ts`), evitando drift falso cuando HubSpot normaliza `description = ''` vs `NULL`.
+- **`is_archived` default hidden:** `listCommercialProductCatalog` oculta archived por default. Admin Center + drift cron pasan `includeArchived: true`.
+
+### Gaps reconocidos para fases siguientes
+
+1. **Handlers por source** — scaffolded pero no activos. TASK-546 los implementa.
+2. **Publisher de overhead_addons** — no existe; TASK-546 lo agrega antes de activar el materializer.
+3. **Outbound HubSpot** — leera `commercial.product_catalog.{created,updated,archived,unarchived}` y hará PUT a HubSpot Products API; llega en TASK-547.
+4. **Drift cron** — escribe `product_sync_conflicts` comparando `gh_owned_fields_checksum` contra HubSpot; llega en TASK-548.
+5. **Rows ambiguas** — el backfill deja `source_kind=NULL` para rows sin prefix reconocible ni `hubspot_product_id`. Requiere review operacional (via CLI `--force`) o task de hygiene.
 
 ---
 

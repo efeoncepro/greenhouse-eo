@@ -551,6 +551,8 @@ export interface GreenhouseCommercialPricingCatalogAuditLog {
 
 export interface GreenhouseCommercialProductCatalog {
   active: Generated<boolean>;
+  archived_at: Timestamp | null;
+  archived_by: string | null;
   business_line_code: string | null;
   created_at: Generated<Timestamp>;
   created_by: Generated<string>;
@@ -559,7 +561,23 @@ export interface GreenhouseCommercialProductCatalog {
   default_unit_price: Numeric | null;
   description: string | null;
   finance_product_id: string | null;
+  /**
+   * SHA-256 of the Greenhouse-owned fields joined with | — used by drift detection to compare against HubSpot snapshot. Recomputed on every commit. NULL until first materialize.
+   */
+  gh_owned_fields_checksum: string | null;
   hubspot_product_id: string | null;
+  /**
+   * Soft-archive flag. Archived products are hidden from selectors but preserved for historical quotations/contracts.
+   */
+  is_archived: Generated<boolean>;
+  /**
+   * Timestamp of the most recent drift detection pass (TASK-548). NULL until first cron run.
+   */
+  last_drift_check_at: Timestamp | null;
+  /**
+   * Timestamp of the most recent successful HubSpot outbound push (TASK-547). NULL until first sync.
+   */
+  last_outbound_sync_at: Timestamp | null;
   last_synced_at: Timestamp | null;
   legacy_category: string | null;
   legacy_sku: string | null;
@@ -568,12 +586,37 @@ export interface GreenhouseCommercialProductCatalog {
   product_id: Generated<string>;
   product_name: string;
   product_type: Generated<string>;
+  /**
+   * PK of the source row in the owning catalog (role_id / tool_id / addon_id / module_id). NULL for source_kind in (manual, hubspot_imported).
+   */
+  source_id: string | null;
+  /**
+   * Which source catalog owns this row. One of sellable_role, sellable_role_variant, tool, overhead_addon, service, manual, hubspot_imported. See GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1 §5.
+   */
+  source_kind: string | null;
   source_system: Generated<string>;
+  /**
+   * Reserved for sellable_role_variant — deterministic key differentiating variants of the same role. Always NULL in Fase A.
+   */
+  source_variant_key: string | null;
   suggested_hours: Numeric | null;
   suggested_role_code: string | null;
   sync_direction: Generated<string>;
   sync_status: Generated<string>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProductSyncConflicts {
+  conflict_id: Generated<string>;
+  conflict_type: string;
+  conflicting_fields: Json | null;
+  detected_at: Generated<Timestamp>;
+  hubspot_product_id: string | null;
+  metadata: Generated<Json>;
+  product_id: string | null;
+  resolution_applied_at: Timestamp | null;
+  resolution_status: Generated<string>;
+  resolved_by: string | null;
 }
 
 export interface GreenhouseCommercialQuotationAuditLog {
@@ -5885,6 +5928,7 @@ export interface DB {
   "greenhouse_commercial.pricing_catalog_approval_queue": GreenhouseCommercialPricingCatalogApprovalQueue;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
+  "greenhouse_commercial.product_sync_conflicts": GreenhouseCommercialProductSyncConflicts;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
   "greenhouse_commercial.quotation_line_cost_override_history": GreenhouseCommercialQuotationLineCostOverrideHistory;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;

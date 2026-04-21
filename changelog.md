@@ -2,6 +2,25 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-545 Product Catalog Schema & Materializer Foundation (Fase A) shipped
+
+- Fase A del programa Product Catalog Sync (paraguas TASK-544) shipped. Desbloquea TASK-546 (handlers) + TASK-547 (outbound) + TASK-548 (drift) + TASK-549 (policy cleanup).
+- **DDL extension** (`20260421122806370_...ddl.sql`): `greenhouse_commercial.product_catalog` gana 9 columnas (`source_kind` CHECK con 7 valores, `source_id`, `source_variant_key`, `is_archived NOT NULL`, `archived_at/by`, `last_outbound_sync_at`, `last_drift_check_at`, `gh_owned_fields_checksum`), UNIQUE parcial por `(source_kind, source_id, variant_key)` para rows no-manual/no-hubspot-imported, 3 indexes hot-path.
+- **Conflicts table** (`20260421122812484_...conflicts-table.sql`): `greenhouse_commercial.product_sync_conflicts` con 5 conflict types (`orphan_in_hubspot/greenhouse`, `field_drift`, `sku_collision`, `archive_mismatch`) + 4 resolution statuses (`pending`, `resolved_greenhouse_wins`, `resolved_hubspot_wins`, `ignored`). Anchor-present + resolution-consistency checks.
+- **Backfill** (`20260421122820579_...backfill.sql`): 6 passes heurísticos idempotentes por SKU prefix (ECG→sellable_role via `role_sku→role_id`, ETG→tool, EFO→overhead_addon, EFG→service `service_sku→module_id`, PRD→manual, fallback hubspot_imported). DO block emite NOTICE con sample de ambiguous rows. Spec §5.3 corregida: `service_pricing` PK real es `module_id`, no `pricing_id`.
+- **Módulo nuevo** (`src/lib/commercial/product-catalog/`):
+  - `types.ts` — unions + 4 error classes
+  - `checksum.ts` — `computeGhOwnedFieldsChecksum` SHA-256 con orden inmutable, NULL ≡ empty string, boolean → `"true"`/`"false"`
+  - `product-catalog-events.ts` — 6 publishers (4 catalog + 2 conflict)
+  - `product-sync-conflicts-store.ts` — Kysely-first CRUD (insert + list unresolved + count by type)
+  - `index.ts` — barrel
+- **Event catalog**: aggregate `product_sync_conflict` + 5 event types nuevos (`commercial.product_catalog.{updated,archived,unarchived}` + `commercial.product_sync_conflict.{detected,resolved}`). Spec `GREENHOUSE_EVENT_CATALOG_V1.md` sincronizado.
+- **Projection scaffolding**: `src/lib/sync/projections/source-to-product-catalog.ts` registrada (domain `cost_intelligence`). Listener de eventos **reales** existentes (`commercial.sellable_role.*`, `ai_tool.*`, `service.*`). Refresh no-op en Fase A; Fase B (TASK-546) lo reemplaza con el upsert + emit real.
+- **Backfill CLI** (`scripts/backfill-product-catalog-source.ts`): `--dry-run` para preview, `--force` para reclasificar. Lista ambiguous rows en stdout.
+- **Store extension**: `listCommercialProductCatalog` gana filtros `sourceKind` + `includeArchived`. Default hide-archived en selectors.
+- **Verificación**: `pnpm migrate:up` aplicó + regeneró types · `pnpm lint` clean · `npx tsc --noEmit` clean · 17/17 tests del módulo passing.
+- **Out of scope (fases siguientes):** handlers por source (TASK-546), outbound HubSpot via Cloud Run (TASK-547), drift cron + Admin Center UI (TASK-548), enforcement + deprecar `sync_direction='hubspot_only'` (TASK-549).
+
 ### 2026-04-21 — TASK-535 Commercial Party Lifecycle foundation (Fase A) shipped
 
 - Migraciones aplicadas en dev: `20260421113910459_task-535-organization-lifecycle-ddl.sql` agrega 6 columnas a `greenhouse_core.organizations` (`lifecycle_stage` + source/since/by + `is_dual_role` + `commercial_party_id` UUID unique) con CHECK constraints por dominio y partial index del funnel activo; crea `organization_lifecycle_history` append-only con trigger que bloquea UPDATE/DELETE a nivel DB. `20260421114006586_task-535-organization-lifecycle-backfill.sql` clasifica cada organization (reglas §10.1 adaptadas a schema real: bridge via `fin_client_profiles.organization_id` + `clients.hubspot_company_id`, active contracts en `greenhouse_commercial.contracts`, ingresos recientes en `greenhouse_finance.income`). Sanity guard DO block falla si queda alguna org sin history row.
