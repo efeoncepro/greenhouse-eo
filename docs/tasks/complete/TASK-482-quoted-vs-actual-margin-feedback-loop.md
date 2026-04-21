@@ -1,5 +1,39 @@
 # TASK-482 — Quoted vs Actual Margin Feedback Loop
 
+## Delta 2026-04-21 — Cierre V1 (Claude Opus 4.7)
+
+Merge candidate en rama `task/TASK-482-quoted-vs-actual-margin-feedback-loop`. Cubre Slice 1 y Slice 3 completos; Slice 2 queda como stub activable cuando TASK-452 aterrice.
+
+**Qué aterrizó:**
+
+- `src/lib/commercial-intelligence/margin-feedback-materializer.ts` — orchestrator `runMarginFeedbackBatch({year?, month?, monthsBack?})` que invoca `materializeProfitabilityForPeriod` + `materializeContractProfitabilityForPeriod` por ventana de períodos (idempotente, UPSERT preservado en ambos).
+- Lectura agregada post-materialización: drift p50/p90/maxAbs/sampleSize + bucket counts por `drift_severity` + `topDriftByPricingModel` (top 5 por drift medio absoluto) tanto para quotation como contract. **Sin tabla nueva** — las señales viajan en el outbox event.
+- `publishMarginFeedbackBatchCompleted` en `quotation-events.ts` con payload `{runId, periods, quotationCount, contractCount, calibrationSignals, serviceGrainAvailable}`. Nuevo aggregateType `margin_feedback` + eventType `commercial.margin_feedback.batch_completed` registrados en event catalog.
+- Worker glue en `src/lib/commercial-cost-worker/margin-feedback.ts` (normalizer + runner) siguiendo el patrón de `materialize.ts` y `quote-reprice-bulk.ts`.
+- `services/commercial-cost-worker/server.ts` — reemplaza el stub 501 de `/margin-feedback/materialize` con handler real `handleMarginFeedback`. Elimina el helper `notImplemented` ya sin uso.
+- `services/commercial-cost-worker/deploy.sh` — nuevo scheduler `margin-feedback-materialize-daily` cron `10 5 * * *` (10min post cost-basis bundle), timezone `America/Santiago`.
+- Docs funcionales en `docs/documentation/operations/commercial-cost-worker.md` sección "Margin Feedback Loop (TASK-482)" con body, response shape, notas operativas y trigger manual vía `pnpm staging:request`.
+
+**Decisiones pinned:**
+
+- No se abre tabla nueva. Las calibration signals viajan en el outbox event; consumers que necesiten historial persistido arman su propia proyección.
+- Slice 2 (grain service_id) queda detrás de un probe runtime (`information_schema.tables` chequea existencia de `greenhouse_serving.service_attribution`). Flipea a `serviceGrainAvailable: true` automáticamente cuando TASK-452 materialice la tabla — no necesita deploy intermedio.
+- Scheduler offset +10min vs cost-basis base: garantiza `commercial_cost_attribution` fresca cuando el feedback loop calcula drift. Si el base retrasa, el feedback usa el snapshot previo y converge en el siguiente run.
+- `runId = mfb-{uuid}` para correlacionar con `greenhouse_sync.source_sync_runs` futuro y con el event payload downstream.
+
+**Verificación local:** `pnpm tsc --noEmit` clean · `pnpm lint` clean (solo warning pre-existente en BulkEditDrawer) · `pnpm test` **1572/1572** · `pnpm build` OK.
+
+**Out of scope confirmado:**
+
+- UI analytics del feedback loop (dashboard dedicado) — follow-up cuando el consumer demande visualización.
+- Recalibración automática del catálogo — declarado out-of-scope en la spec original.
+- Persistencia histórica de calibration signals — el outbox event es la capa de distribución; proyecciones viven en consumers.
+
+**Follow-ups derivados:**
+
+- Cuando TASK-452 cierre, extender `margin-feedback-materializer.ts` con `loadServiceDrift(periods)` + `topDriftByServiceModel` en calibrationSignals. El probe `serviceGrainAvailable` ya soporta el flip.
+- Consumer reactivo (admin dashboard o alertas Slack) del evento `commercial.margin_feedback.batch_completed` — fuera del scope de esta task.
+
 ## Delta 2026-04-20 — Reanclaje contra codebase real
 
 La revisión del repo mostró que el loop base ya existe:
@@ -15,7 +49,7 @@ Por eso esta task deja de ser "crear el feedback loop" y pasa a ser el follow-on
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
