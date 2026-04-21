@@ -4,6 +4,67 @@
 > **Created:** 2026-03-30
 > **Last updated:** 2026-04-21
 
+## Delta 2026-04-21 — Chile VAT Ledger & Monthly Position (TASK-533)
+
+Greenhouse ya puede materializar una posicion mensual de IVA Chile por `space_id` sin recalcular inline en UI ni depender de planillas manuales.
+
+### Nuevas tablas
+
+| Tabla | Uso |
+|---|---|
+| `greenhouse_finance.vat_ledger_entries` | Ledger tributario por documento y bucket (`debit_fiscal`, `credito_fiscal`, `iva_no_recuperable`). |
+| `greenhouse_finance.vat_monthly_positions` | Snapshot mensual consolidado por `space_id` + periodo (`year`, `month`). |
+
+El ledger usa como source canonica:
+
+- `greenhouse_finance.income.tax_snapshot_json` para débito fiscal de ventas.
+- `greenhouse_finance.expenses.tax_snapshot_json` + `recoverable_tax_amount` + `non_recoverable_tax_amount` para crédito fiscal y IVA no recuperable de compras.
+
+### Runtime nuevo
+
+- Helper central: `src/lib/finance/vat-ledger.ts`
+  - `materializeVatLedgerForPeriod(year, month, reason)`
+  - `materializeAllAvailableVatPeriods(reason)`
+  - readers `getVatMonthlyPosition`, `listVatMonthlyPositions`, `listVatLedgerEntries`
+- Projection reactiva: `src/lib/sync/projections/vat-monthly-position.ts`
+  - escucha `finance.income.{created,updated,nubox_synced}`
+  - escucha `finance.expense.{created,updated,nubox_synced}`
+  - publica `finance.vat_position.period_materialized`
+- `ops-worker` gana `POST /vat-ledger/materialize` como lane canónica de recomputo/backfill pesado fuera de Vercel serverless.
+
+### Serving y surface mínima
+
+- `GET /api/finance/vat/monthly-position`
+  - scope tenant-safe vía `requireFinanceTenantContext()`
+  - responde snapshot del periodo, periodos recientes y ledger entries
+  - soporta `format=csv` para export operativo
+- `POST /api/internal/vat-ledger-materialize`
+  - requiere contexto admin
+  - permite recomputo de un periodo o backfill bulk
+- `FinanceDashboardView` incorpora una card de posición mensual con:
+  - débito fiscal
+  - crédito fiscal
+  - IVA no recuperable
+  - saldo fiscal del periodo
+  - export CSV
+
+### Reglas operativas
+
+- El ledger se consolida por `space_id`; ningún reader mensual debe mezclar tenants.
+- El débito fiscal nace solo desde ventas con snapshot tributario explícito.
+- El crédito fiscal nace solo desde `recoverable_tax_amount`; el IVA no recuperable queda separado y no incrementa crédito.
+- `vat_common_use_amount` sigue entrando hoy como recoverability parcial ya resuelta en `expenses`; una política tributaria más fina de prorrata futura queda como follow-up y no altera el contrato actual del ledger.
+
+### Archivos clave
+
+- `src/lib/finance/vat-ledger.ts`
+- `src/lib/sync/projections/vat-monthly-position.ts`
+- `src/app/api/finance/vat/monthly-position/route.ts`
+- `src/app/api/internal/vat-ledger-materialize/route.ts`
+- `src/views/greenhouse/finance/components/VatMonthlyPositionCard.tsx`
+- `services/ops-worker/server.ts`
+- Migration: `20260421200121412_task-533-chile-vat-ledger-monthly-position.sql`
+
 ## Delta 2026-04-21 — Purchase VAT Recoverability (TASK-532)
 
 `greenhouse_finance.expenses` deja de tratar el IVA de compras como un `tax_rate` suelto y persiste una semántica contable explícita: crédito fiscal recuperable vs IVA no recuperable que debe capitalizarse en costo.

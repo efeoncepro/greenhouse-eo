@@ -2,6 +2,25 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-533 Chile VAT Ledger & Monthly Position shipped
+
+- Greenhouse ya materializa el libro IVA mensual por `space_id`: débito fiscal de ventas, crédito fiscal recuperable de compras, IVA no recuperable y saldo fiscal del periodo.
+- **Migration** (`20260421200121412_task-533-chile-vat-ledger-monthly-position.sql`): crea `greenhouse_finance.vat_ledger_entries` y `greenhouse_finance.vat_monthly_positions` con índices por tenant, periodo y bucket para serving, replay y auditoría.
+- **Helper nuevo** (`src/lib/finance/vat-ledger.ts`): materializa por periodo o en bulk usando:
+  - `income.tax_snapshot_json` como source de débito fiscal
+  - `expenses.recoverable_tax_amount` como crédito fiscal
+  - `expenses.non_recoverable_tax_amount` como IVA separado no acreditable
+- **Reactive + worker**:
+  - projection `src/lib/sync/projections/vat-monthly-position.ts` sobre `finance.income.{created,updated,nubox_synced}` y `finance.expense.{created,updated,nubox_synced}`
+  - evento coarse-grained `finance.vat_position.period_materialized`
+  - `ops-worker` gana `POST /vat-ledger/materialize` como lane canónica de recompute/backfill fuera de Vercel serverless
+- **Serving / UI**:
+  - `GET /api/finance/vat/monthly-position` devuelve snapshot del periodo, periodos recientes, ledger entries y export CSV
+  - `POST /api/internal/vat-ledger-materialize` habilita recompute admin-only
+  - el dashboard de Finance muestra una card mínima con débito, crédito, IVA no recuperable y saldo del mes
+- **Verificación**: `pnpm migrate:up` + regen de `src/types/db.d.ts` · `pnpm lint` OK (solo warning legacy preexistente) · `pnpm test` OK (`1768` passing, `2` skipped) · `pnpm build` compila correctamente
+- **Cross-impact**: cierra el cuarto eslabón del programa Chile IVA (TASK-529/530/531/532), formaliza `finance.expense.nubox_synced` en el catálogo documental y deja listo el carril para surfaces fiscales más amplias sin recalcular inline.
+
 ### 2026-04-21 — TASK-532 Purchase VAT Recoverability shipped
 
 - `expenses` ya no trata el IVA de compras como un `tax_rate` suelto. El agregado ahora persiste `tax_code`, `tax_recoverability`, `tax_snapshot_json`, `tax_snapshot_frozen_at` y buckets explícitos de `recoverable_tax_amount`, `non_recoverable_tax_amount` y `effective_cost_amount`.

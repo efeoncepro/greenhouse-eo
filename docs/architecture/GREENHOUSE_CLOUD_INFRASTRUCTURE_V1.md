@@ -1,8 +1,17 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
 > **Version:** 1.6
-> **Last updated:** 2026-04-19
+> **Last updated:** 2026-04-21
 > **Audience:** Platform engineers, DevOps, on-call operators
+
+## Delta 2026-04-21 — ops-worker materializa VAT ledger mensual (TASK-533)
+
+- El `ops-worker` gana `POST /vat-ledger/materialize` como lane tributaria para recomputo y backfill del libro IVA mensual fuera de Vercel serverless.
+- Contrato operativo:
+  - acepta `{ year, month }` para recomputar un periodo
+  - acepta `{}` para backfill bulk de todos los periodos disponibles
+  - reutiliza el mismo patrón de `source_sync_runs` y el mismo bundle/shims del worker actual
+- No se agrega scheduler nuevo en esta iteración: el trigger normal nace desde la projection reactiva `vat_monthly_position`; el endpoint queda como lane manual y de replay operativo.
 
 ---
 
@@ -652,8 +661,8 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 | Concurrency   | 4 (TASK-379)                                                                                                                                                                              |
 | Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                                                                        |
 | Source        | `services/ops-worker/` (monorepo, reuses `src/lib/`)                                                                                                                                      |
-| Purpose       | Durable reactive worker V2: processes outbox reactive events with scope coalescing and circuit breaker (TASK-379), domain-specific reactive events, recovers orphaned projection refreshes, materializes commercial cost attribution, and entrega el digest ejecutivo semanal de Nexa. Replaces Vercel crons that risked 120s timeout. |
-| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`, `GET /reactive/queue-depth`, `POST /nexa/weekly-digest` |
+| Purpose       | Durable reactive worker V2: processes outbox reactive events with scope coalescing and circuit breaker (TASK-379), domain-specific reactive events, recovers orphaned projection refreshes, materializes commercial cost attribution, materializes the monthly Chile VAT ledger, and entrega el digest ejecutivo semanal de Nexa. Replaces Vercel crons that risked 120s timeout. |
+| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`, `POST /vat-ledger/materialize`, `GET /reactive/queue-depth`, `POST /nexa/weekly-digest` |
 | SA            | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` (runs as + `roles/run.invoker` for scheduler OIDC)                                                                              |
 | Image         | `gcr.io/efeonce-group/ops-worker` (Cloud Build)                                                                                                                                           |
 | Build         | esbuild two-stage Dockerfile with 9 `--alias` shims for ESM/CJS interop (see note below)                                                                                                 |

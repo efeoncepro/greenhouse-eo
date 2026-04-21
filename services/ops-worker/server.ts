@@ -12,6 +12,7 @@
  *   POST /reactive/recover          → Recover orphaned projection queue items (replaces projection-recovery cron)
  *   GET  /reactive/queue-depth      → Queue depth + oldest-event lag, optionally filtered by ?domain=<x>
  *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
+ *   POST /vat-ledger/materialize       → Materialize Chile VAT ledger + monthly position
  *   POST /quotation-lifecycle/sweep    → Daily sweep: expire overdue quotes + emit renewal_due events (TASK-351)
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
@@ -37,6 +38,7 @@ import {
   materializeAllAvailablePeriods
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
+import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
@@ -394,6 +396,50 @@ const handleCostAttributionMaterialize = async (req: IncomingMessage, res: Serve
 }
 
 /**
+ * POST /vat-ledger/materialize
+ * Materializes Chile VAT ledger entries + monthly VAT position.
+ *
+ * Body:
+ *   { year?: number, month?: number }
+ *   - If year+month provided: single period
+ *   - If omitted: all periods with source fiscal data
+ */
+const handleVatLedgerMaterialize = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const year = typeof body.year === 'number' ? body.year : undefined
+  const month = typeof body.month === 'number' ? body.month : undefined
+  const startMs = Date.now()
+
+  console.log(`[ops-worker] POST /vat-ledger/materialize — year=${year ?? 'all'} month=${month ?? 'all'}`)
+
+  try {
+    if (year && month) {
+      const summary = await materializeVatLedgerForPeriod(year, month, 'ops-worker-trigger')
+
+      json(res, 200, {
+        periods: 1,
+        summaries: [summary],
+        durationMs: Date.now() - startMs
+      })
+
+      return
+    }
+
+    const result = await materializeAllAvailableVatPeriods('ops-worker-trigger-all')
+
+    json(res, 200, {
+      ...result,
+      durationMs: Date.now() - startMs
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /vat-ledger/materialize failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
  * POST /quotation-lifecycle/sweep
  * TASK-351: Daily quotation lifecycle sweep.
  * - Flips quotations past `expiry_date` to `status='expired'` + emits `commercial.quotation.expired`.
@@ -621,6 +667,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/cost-attribution/materialize') {
       await handleCostAttributionMaterialize(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/vat-ledger/materialize') {
+      await handleVatLedgerMaterialize(req, res)
 
       return
     }

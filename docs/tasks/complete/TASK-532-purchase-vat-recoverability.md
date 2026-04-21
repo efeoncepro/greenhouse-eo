@@ -66,7 +66,7 @@ Reglas obligatorias:
 
 - `docs/tasks/complete/TASK-529-chile-tax-code-foundation.md`
 - `docs/tasks/complete/TASK-531-income-invoice-tax-convergence.md`
-- `docs/tasks/to-do/TASK-533-chile-vat-ledger-monthly-position.md`
+- `docs/tasks/complete/TASK-533-chile-vat-ledger-monthly-position.md`
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
 - `src/app/api/finance/expenses/route.ts`
 - `src/app/api/finance/expenses/[id]/route.ts`

@@ -12,6 +12,7 @@ export const AGGREGATE_TYPES = {
   financeSettlementLeg: 'finance_settlement_leg',
   financeReconciliationPeriod: 'finance_reconciliation_period',
   economicIndicator: 'economic_indicator',
+  vatPosition: 'vat_position',
   provider: 'provider',
   providerToolingSnapshot: 'provider_tooling_snapshot',
 
@@ -233,11 +234,14 @@ export const EVENT_TYPES = {
   // Finance
   financeIncomeCreated: 'finance.income.created',
   financeIncomeUpdated: 'finance.income.updated',
+  financeIncomeNuboxSynced: 'finance.income.nubox_synced',
   financeIncomeHubspotSynced: 'finance.income.hubspot_synced',
   financeIncomeHubspotSyncFailed: 'finance.income.hubspot_sync_failed',
   financeIncomeHubspotArtifactAttached: 'finance.income.hubspot_artifact_attached',
   financeExpenseCreated: 'finance.expense.created',
   financeExpenseUpdated: 'finance.expense.updated',
+  financeExpenseNuboxSynced: 'finance.expense.nubox_synced',
+  financeVatPositionPeriodMaterialized: 'finance.vat_position.period_materialized',
   financeShareholderAccountCreated: 'finance.shareholder_account.created',
   financeShareholderAccountMovementRecorded: 'finance.shareholder_account_movement.recorded',
   financeSupplierCreated: 'finance.supplier.created',

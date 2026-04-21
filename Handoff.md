@@ -1,5 +1,43 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-533 Chile VAT Ledger & Monthly Position (Codex)
+
+- **Scope:** materializar el libro IVA mensual y la posición fiscal por `space_id` usando los snapshots tributarios ya convergidos en `income` y `expenses`, con runtime pesado en `ops-worker`, serving en Finance y surface mínima exportable.
+- **Migration shipped + aplicada en dev:** `20260421200121412_task-533-chile-vat-ledger-monthly-position.sql`
+  - crea `greenhouse_finance.vat_ledger_entries`
+  - crea `greenhouse_finance.vat_monthly_positions`
+  - indexes por `space_id`, periodo y bucket para serving / replay / auditoría
+- **Helper nuevo:** `src/lib/finance/vat-ledger.ts`
+  - materializa por periodo o en bulk
+  - consolida tres buckets: `debit_fiscal`, `credito_fiscal`, `iva_no_recuperable`
+  - resuelve el `space_id` de ventas desde la cotización o, en fallback, desde el bridge cliente→space
+- **Reactive + worker**
+  - nueva projection `src/lib/sync/projections/vat-monthly-position.ts`
+  - triggers: `finance.income.{created,updated,nubox_synced}` + `finance.expense.{created,updated,nubox_synced}`
+  - publica `finance.vat_position.period_materialized`
+  - `services/ops-worker/server.ts` gana `POST /vat-ledger/materialize` para replay/backfill manual
+- **Serving / UI**
+  - `GET /api/finance/vat/monthly-position` responde posición del periodo, periodos recientes y ledger entries; soporta `format=csv`
+  - `POST /api/internal/vat-ledger-materialize` expone recompute admin-only
+  - `FinanceDashboardView` muestra una card de IVA mensual con débito, crédito, IVA no recuperable, saldo y exportación CSV
+- **Docs actualizadas**
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+  - `docs/documentation/finance/libro-iva-posicion-mensual.md`
+  - `docs/documentation/operations/ops-worker-reactive-crons.md`
+  - `project_context.md`
+  - spec `TASK-533`
+- **Verificación ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm test` OK (`355` files, `1768` passing, `2` skipped)
+  - `CI=1 pnpm build` OK
+- **Decisión operativa**
+  - no se agregó scheduler dedicado para VAT en esta iteración; el trigger normal nace de la projection reactiva y el endpoint del worker queda como lane manual/backfill
+- **Follow-up explícito**
+  - una prorrata tributaria más fina para `vat_common_use_amount` sigue pendiente; el ledger actual usa la recoverability ya persistida en `expenses`
+
 ## Sesion 2026-04-21 — TASK-532 Purchase VAT Recoverability (Codex)
 
 - **Scope:** converger compras/gastos al contrato tributario canónico Chile IVA para distinguir crédito fiscal recuperable vs IVA no recuperable capitalizado a costo, y propagar esa semántica a P&L / economics / service attribution.

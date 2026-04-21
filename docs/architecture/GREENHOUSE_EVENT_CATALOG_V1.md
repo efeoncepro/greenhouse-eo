@@ -2,6 +2,12 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-04-21
+
+- `TASK-533` agrega el aggregate type `vat_position` y el evento `finance.vat_position.period_materialized`.
+- La projection reactiva `vat_monthly_position` consume `finance.income.{created,updated,nubox_synced}` y `finance.expense.{created,updated,nubox_synced}` para recomputar la posicion mensual de IVA por `space_id`.
+- El catálogo también se alinea a la realidad runtime de Nubox: `finance.expense.nubox_synced` ya existe como familia emitida/consumible y queda formalizado en esta versión documental.
+
 ## Delta 2026-04-20
 
 - `TASK-452` agrega el aggregate type `service_attribution` y el evento `accounting.service_attribution.period_materialized`.
@@ -71,6 +77,7 @@ Los payloads del outbox siguen dos versiones que coexisten durante el rollout de
 | `service_attribution` | `accounting.service_attribution.period_materialized` | `src/lib/sync/projections/service-attribution.ts` | — |
 | `pl_snapshot` | `accounting.pl_snapshot.period_materialized` | `src/lib/sync/projections/operational-pl.ts` | `operational_pl_rollup` |
 | `staff_aug_placement_snapshot` | `staff_aug.placement_snapshot.period_materialized` | `src/lib/sync/projections/staff-augmentation.ts` | Downstream de staff augmentation |
+| `vat_position` | `finance.vat_position.period_materialized` | `src/lib/sync/projections/vat-monthly-position.ts` | observability, serving VAT mensual, futuros cierres fiscales |
 
 ## Catalogo de eventos
 
@@ -84,6 +91,8 @@ Los payloads del outbox siguen dos versiones que coexisten durante el rollout de
 | `income` | `finance.income.hubspot_sync_failed` | `finance/income-hubspot/income-hubspot-events.ts` | `{ incomeId, hubspotInvoiceId?, status: 'failed'\|'endpoint_not_deployed'\|'skipped_no_anchors', errorMessage, failedAt, attemptCount }` | alerting, retry worker, soporte ops |
 | `income` | `finance.income.hubspot_artifact_attached` | `finance/income-hubspot/income-hubspot-events.ts` (Fase 2 — post-Nubox attach) | `{ incomeId, hubspotInvoiceId, hubspotArtifactNoteId, attachedAt, artifactKind }` | audit |
 | `expense` | `expense.created`, `expense.updated`, `expense.deleted` | `finance/postgres-store.ts` | `{ expenseId, amount, currency }` | `service_attribution` |
+| `expense` | `finance.expense.nubox_synced` | `nubox/sync-nubox-to-postgres.ts` | `{ nubox_purchase_id, document_status }` | `vat_monthly_position`, futuros consumers de conciliacion tributaria |
+| `vat_position` | `finance.vat_position.period_materialized` | `sync/projections/vat-monthly-position.ts` | `{ schemaVersion: 2, periodId, periodYear, periodMonth, snapshotCount, source: 'vat_monthly_position', triggerEventType, scope }` | observability, audit fiscal, serving readers |
 | `account` | `account.created`, `account.updated` | `finance/postgres-store-slice2.ts` | `{ accountId }` | — |
 | `supplier` | `supplier.created`, `supplier.updated` | `finance/postgres-store-slice2.ts` | `{ supplierId }` | — |
 | `exchange_rate` | `exchange_rate.updated` | `finance/postgres-store-slice2.ts` | `{ currency, rate }` | — |

@@ -586,7 +586,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-530` | `to-do` | Quote Tax Explicitness (Chile IVA) | `docs/tasks/to-do/TASK-530-quote-tax-explicitness-chile-iva.md` |
 | `TASK-531` | `complete` | Income / Invoice Tax Convergence | `docs/tasks/complete/TASK-531-income-invoice-tax-convergence.md` |
 | `TASK-532` | `to-do` | Purchase VAT Recoverability | `docs/tasks/to-do/TASK-532-purchase-vat-recoverability.md` |
-| `TASK-533` | `to-do` | Chile VAT Ledger & Monthly Position | `docs/tasks/to-do/TASK-533-chile-vat-ledger-monthly-position.md` |
+| `TASK-533` | `complete` | Chile VAT Ledger & Monthly Position | `docs/tasks/complete/TASK-533-chile-vat-ledger-monthly-position.md` |
 | `TASK-534` | `to-do` | Commercial Party Lifecycle & Quote-to-Cash Program (umbrella) | `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md` |
 | `TASK-535` | `to-do` | Party Lifecycle Schema & Commands Foundation (Fase A) | `docs/tasks/to-do/TASK-535-party-lifecycle-schema-commands-foundation.md` |
 | `TASK-536` | `to-do` | HubSpot Companies Inbound Prospect Sync (Fase B) | `docs/tasks/to-do/TASK-536-hubspot-companies-inbound-prospect-sync.md` |

@@ -3694,6 +3694,63 @@ export interface GreenhouseFinanceTaxCodes {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceVatLedgerEntries {
+  amount_clp: Generated<Numeric>;
+  amount_document: Generated<Numeric>;
+  client_id: string | null;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  exchange_rate_to_clp: Numeric | null;
+  ledger_entry_id: string;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  source_date: Timestamp;
+  source_id: string;
+  source_kind: string;
+  source_public_ref: string | null;
+  space_id: string;
+  /**
+   * How tenant isolation was resolved for the source row: quotation, client_bridge, or expense.
+   */
+  space_resolution_source: string;
+  tax_code: string;
+  tax_recoverability: string | null;
+  tax_snapshot_json: Json;
+  taxable_amount: Generated<Numeric>;
+  updated_at: Generated<Timestamp>;
+  /**
+   * Fiscal bucket for the entry: debit_fiscal, credito_fiscal, or iva_no_recuperable.
+   */
+  vat_bucket: string;
+}
+
+export interface GreenhouseFinanceVatMonthlyPositions {
+  client_id: string | null;
+  credit_document_count: Generated<number>;
+  credit_fiscal_amount_clp: Generated<Numeric>;
+  debit_document_count: Generated<number>;
+  debit_fiscal_amount_clp: Generated<Numeric>;
+  ledger_entry_count: Generated<number>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  metadata: Generated<Json>;
+  /**
+   * Monthly VAT payable position in CLP: debit_fiscal_amount_clp - credit_fiscal_amount_clp.
+   */
+  net_vat_position_clp: Generated<Numeric>;
+  non_recoverable_document_count: Generated<number>;
+  non_recoverable_vat_amount_clp: Generated<Numeric>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  space_id: string;
+  vat_position_id: string;
+}
+
 export interface GreenhouseHrEvalAssignments {
   assignment_id: string;
   created_at: Generated<Timestamp>;
@@ -6234,6 +6291,8 @@ export interface DB {
   "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
+  "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
+  "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
   "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
   "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
   "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;

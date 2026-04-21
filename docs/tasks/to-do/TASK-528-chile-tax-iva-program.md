@@ -90,7 +90,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-530-quote-tax-explicitness-chile-iva.md`
 - `docs/tasks/to-do/TASK-531-income-invoice-tax-convergence.md`
 - `docs/tasks/to-do/TASK-532-purchase-vat-recoverability.md`
-- `docs/tasks/to-do/TASK-533-chile-vat-ledger-monthly-position.md`
+- `docs/tasks/complete/TASK-533-chile-vat-ledger-monthly-position.md`
 
 ## Current Repo State
 

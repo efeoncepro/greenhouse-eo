@@ -1,3 +1,19 @@
+## Delta 2026-04-21 TASK-533 materializa libro IVA mensual y posicion fiscal por tenant
+
+- Greenhouse ya puede consolidar IVA mensual por `space_id` sin calcular inline en UI.
+- Contrato nuevo:
+  - tablas `greenhouse_finance.vat_ledger_entries` y `greenhouse_finance.vat_monthly_positions`
+  - helper `src/lib/finance/vat-ledger.ts`
+  - projection reactiva `vat_monthly_position`
+  - evento coarse-grained `finance.vat_position.period_materialized`
+  - endpoint Cloud Run `POST /vat-ledger/materialize` en `ops-worker`
+  - serving route `GET /api/finance/vat/monthly-position` con export CSV
+- Reglas operativas:
+  - el débito fiscal nace desde `income.tax_snapshot_json`
+  - el crédito fiscal nace solo desde `expenses.recoverable_tax_amount`
+  - `non_recoverable_tax_amount` queda separado y no incrementa crédito
+  - toda lectura mensual debe filtrar por `space_id`
+
 ## Delta 2026-04-21 TASK-532 formaliza IVA de compras como contrato explícito de costo
 
 - `greenhouse_finance.expenses` ya no debe leerse solo como `subtotal + tax_amount + total_amount`.

@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Completo`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-529, TASK-531, TASK-532`
+- Blocked by: `none — TASK-529, TASK-531 y TASK-532 ya completadas`
 - Branch: `task/TASK-533-chile-vat-ledger-monthly-position`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
@@ -26,7 +26,7 @@ Materializar el ledger de IVA Chile y la posicion mensual de debito/credito fisc
 
 ## Why This Task Exists
 
-Aunque quotes, income y expenses ya manejan datos tributarios parciales, Greenhouse no puede responder de forma canonica cuanto IVA debito genero, cuanto credito fiscal acumulo, ni cual es la posicion del mes. Esa ausencia impacta cierre financiero, conciliacion con Nubox y lectura ejecutiva de Finance.
+ Aunque quotations, income y expenses ya persisten snapshots tributarios canónicos, Greenhouse todavía no puede responder de forma canonica cuanto IVA debito genero, cuanto credito fiscal recuperable acumulo, cuanto IVA no recuperable capitalizo y cual es la posicion consolidada del mes. Esa ausencia impacta cierre financiero, conciliacion con Nubox y lectura ejecutiva de Finance.
 
 ## Goal
 
@@ -52,7 +52,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - La posicion mensual se materializa por eventos/proyecciones, no por calculo inline en UI.
-- El runtime inicial debe correr fuera del commercial worker; el camino preferido es `ops-worker` con posibilidad de escalar a worker tributario dedicado.
+- El runtime inicial debe correr fuera del commercial worker; el carril obligatorio para la primera iteracion es `ops-worker`, con posibilidad de escalar despues a un worker tributario dedicado sin cambiar el contrato.
 - Debe existir recomputo por periodo y backfill historico.
 - Las lecturas de posicion mensual deben distinguir ventas, compras recuperables, compras no recuperables y saldo resultante.
 
@@ -66,9 +66,9 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-529-chile-tax-code-foundation.md`
-- `docs/tasks/to-do/TASK-531-income-invoice-tax-convergence.md`
-- `docs/tasks/to-do/TASK-532-purchase-vat-recoverability.md`
+- `docs/tasks/complete/TASK-529-chile-tax-code-foundation.md`
+- `docs/tasks/complete/TASK-531-income-invoice-tax-convergence.md`
+- `docs/tasks/complete/TASK-532-purchase-vat-recoverability.md`
 - `services/ops-worker/`
 - `src/lib/sync/`
 
@@ -92,7 +92,9 @@ Reglas obligatorias:
 ### Already exists
 
 - `ops-worker` ya procesa carriles reactivos/materializaciones financieras.
-- `finance.income.*` y writes de expenses ya existen como hechos operativos reutilizables.
+- `greenhouse_finance.tax_codes` ya existe como catalogo canonico Chile-first.
+- `finance.income.*` ya persiste `tax_code`, `tax_snapshot_json` e `is_tax_exempt` como source canonica de debito fiscal.
+- `greenhouse_finance.expenses` ya persiste `tax_code`, `tax_recoverability`, `tax_snapshot_json`, `recoverable_tax_amount`, `non_recoverable_tax_amount` y `effective_cost_amount`.
 - Finance tiene surfaces donde se puede injertar una lectura minima de posicion mensual.
 
 ### Gap
@@ -100,6 +102,7 @@ Reglas obligatorias:
 - No hay ledger tributario mensual canonico.
 - No existe recomputo/backfill de IVA por periodo.
 - No existe una surface minima para ver debito, credito y saldo.
+- `vat_common_use_amount` ya queda marcado como recoverability parcial en expenses, pero aun no existe una politica mensual materializada que lo consolide en la posicion fiscal.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -158,26 +161,27 @@ Decision de runtime resuelta:
 
 ## Acceptance Criteria
 
-- [ ] Existe ledger mensual de IVA recomputable por periodo.
-- [ ] Finance puede ver debito fiscal, credito fiscal y saldo mensual de forma canonica.
-- [ ] El runtime de materializacion queda fuera del commercial worker y con trazabilidad operativa.
+- [x] Existe ledger mensual de IVA recomputable por periodo.
+- [x] Finance puede ver debito fiscal, credito fiscal y saldo mensual de forma canonica.
+- [x] El runtime de materializacion queda fuera del commercial worker y con trazabilidad operativa.
 
 ## Verification
 
+- `pnpm migrate:up`
 - `pnpm lint`
-- `pnpm tsc --noEmit`
 - `pnpm test`
-- verificacion manual o automatizada del worker/materialization
+- `pnpm build`
+- verificacion manual del contrato `ops-worker` / `vat-ledger-materialize`
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios o decisiones
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] quedaron documentados replay y backfill por periodo
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios o decisiones
+- [x] `changelog.md` quedo actualizado si cambio comportamiento visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] quedaron documentados replay y backfill por periodo
 
 ## Follow-ups
 
