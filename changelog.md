@@ -1,5 +1,15 @@
 # changelog.md
 
+## 2026-04-21
+
+### 2026-04-21 — TASK-452 Service Attribution Foundation cerrada (cierre formal)
+
+- Task cerrada formalmente: lifecycle flipeado a `complete`, archivo movido a `docs/tasks/complete/`, README sincronizado, cross-impact con TASK-482 verificado.
+- Código ya estaba en `develop` (shipped por Codex en commits previos); esta sesión solo formaliza el cierre documental.
+- **Qué vive en develop:** migraciones `20260420123025804` + `20260420124700528` crean `greenhouse_serving.service_attribution_facts` + `service_attribution_unresolved`; materializer Kysely-first en `src/lib/service-attribution/materialize.ts` (1,546 líneas) con jerarquía de matching canónica (service_id directo → document bridges HES/PO/quotation/contract → hubspot_deal_id → service_line unívoco); projection reactiva con 20+ trigger events publicando `accounting.service_attribution.period_materialized`; readers `readServiceAttributionFactsForPeriod` + `readServiceAttributionByServiceForPeriod` + `readServiceAttributionUnresolvedForPeriod` listos para que TASK-146 construya `service_economics`.
+- **TASK-482 beneficiado:** el probe runtime `serviceGrainAvailable` del margin feedback batch flipeará automáticamente a `true` porque la tabla ya existe en la DB — sin deploy intermedio.
+- Docs de arquitectura tocadas (ya estaban): finance, 360 object model, agency layer v2, event catalog, commercial cost attribution.
+
 ## 2026-04-20
 
 ### 2026-04-20 — TASK-466 Multi-Currency Quote Output cerrada
