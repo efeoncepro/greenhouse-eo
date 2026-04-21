@@ -51,6 +51,7 @@ type EntityType =
   | 'country_pricing_factor'
   | 'fte_hours_guide'
   | 'employment_type'
+  | 'service_catalog'
 
 type ActionType =
   | 'created'
@@ -95,7 +96,8 @@ const ENTITY_LABELS: Record<EntityType, string> = {
   commercial_model_multiplier: 'Modelo comercial',
   country_pricing_factor: 'Factor país',
   fte_hours_guide: 'Guía FTE',
-  employment_type: 'Modalidad de contrato'
+  employment_type: 'Modalidad de contrato',
+  service_catalog: 'Servicio empaquetado'
 }
 
 const ACTION_LABELS: Record<ActionType, string> = {
@@ -529,7 +531,8 @@ const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) 
                                 const revertibleEntities: EntityType[] = [
                                   'sellable_role',
                                   'tool_catalog',
-                                  'overhead_addon'
+                                  'overhead_addon',
+                                  'service_catalog'
                                 ]
 
                                 const actionOk = revertibleActions.includes(entry.action)
