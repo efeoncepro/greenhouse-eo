@@ -15,6 +15,8 @@ SECRET_FLAGS=()
 HAVE_HUBSPOT_SECRET="false"
 HAVE_GREENHOUSE_SECRET="false"
 HAVE_HUBSPOT_WEBHOOK_SECRET="false"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+ENV_SOURCE_FILE=".env.yaml"
 
 cleanup() {
   if [[ -n "${TMP_ENV_FILE}" && -f "${TMP_ENV_FILE}" ]]; then
@@ -50,16 +52,22 @@ if gcloud secrets describe "${HUBSPOT_WEBHOOK_SECRET_NAME}" >/dev/null 2>&1; the
   HAVE_HUBSPOT_WEBHOOK_SECRET="true"
 fi
 
+if [[ ! -f "${ENV_SOURCE_FILE}" && -f ".env.example.yaml" ]]; then
+  ENV_SOURCE_FILE=".env.example.yaml"
+fi
+
 TMP_ENV_FILE="$(mktemp)"
 HAVE_HUBSPOT_SECRET="${HAVE_HUBSPOT_SECRET}" \
 HAVE_GREENHOUSE_SECRET="${HAVE_GREENHOUSE_SECRET}" \
 HAVE_HUBSPOT_WEBHOOK_SECRET="${HAVE_HUBSPOT_WEBHOOK_SECRET}" \
-python - <<'PY' > "${TMP_ENV_FILE}"
+ENV_SOURCE_FILE="${ENV_SOURCE_FILE}" \
+"${PYTHON_BIN}" - <<'PY' > "${TMP_ENV_FILE}"
 from pathlib import Path
 import os
 
 env = {}
-for raw_line in Path(".env.yaml").read_text(encoding="utf-8").splitlines():
+env_source_file = Path(os.environ.get("ENV_SOURCE_FILE", ".env.yaml"))
+for raw_line in env_source_file.read_text(encoding="utf-8").splitlines():
     line = raw_line.strip()
     if not line or line.startswith("#") or ":" not in line:
         continue
