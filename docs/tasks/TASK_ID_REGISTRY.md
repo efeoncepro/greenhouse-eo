@@ -603,3 +603,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-547` | `to-do` | Product Catalog HubSpot Outbound Projection (Fase C) | `docs/tasks/to-do/TASK-547-product-catalog-hubspot-outbound.md` |
 | `TASK-548` | `to-do` | Product Catalog Drift Detection & Admin Center (Fase D) | `docs/tasks/to-do/TASK-548-product-catalog-drift-detection-admin.md` |
 | `TASK-549` | `to-do` | Product Catalog Policy Enforcement & Legacy Cleanup (Fase E) | `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md` |
+| `TASK-550` | `to-do` | Pricing Catalog Phase-5 Follow-ups (governance revert + tab gating + notifications + excel create/delete) | `docs/tasks/to-do/TASK-550-pricing-catalog-phase-5-followups.md` |
