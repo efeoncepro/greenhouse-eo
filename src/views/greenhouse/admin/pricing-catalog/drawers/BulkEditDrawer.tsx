@@ -19,6 +19,7 @@ import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 
 export interface BulkEditDrawerProps {
   open: boolean
+
   /** @deprecated use entityIds + entityType */
   roleIds?: string[]
   entityType?: 'sellable_role' | 'tool_catalog' | 'overhead_addon' | 'service_catalog'

@@ -103,6 +103,7 @@ export async function POST(request: Request) {
           diff.newValues && typeof diff.newValues === 'object' && !Array.isArray(diff.newValues)
             ? (diff.newValues as Record<string, unknown>)
             : null
+
         const fieldsChanged = Array.isArray(diff.fieldsChanged)
           ? diff.fieldsChanged.filter((f): f is string => typeof f === 'string')
           : []

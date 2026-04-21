@@ -32,6 +32,8 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 
+import Checkbox from '@mui/material/Checkbox'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -40,7 +42,6 @@ import tableStyles from '@core/styles/table.module.css'
 import CreateToolDrawer from './drawers/CreateToolDrawer'
 import EditToolDrawer from './drawers/EditToolDrawer'
 import BulkEditDrawer from './drawers/BulkEditDrawer'
-import Checkbox from '@mui/material/Checkbox'
 import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 
 // ── Types ──────────────────────────────────────────────────────────────

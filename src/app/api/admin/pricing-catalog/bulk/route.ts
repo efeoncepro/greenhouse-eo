@@ -93,6 +93,7 @@ export async function POST(request: Request) {
     body.updates && typeof body.updates === 'object' && !Array.isArray(body.updates)
       ? (body.updates as Record<string, unknown>)
       : {}
+
   const notesAppend = typeof body.notesAppend === 'string' ? body.notesAppend.trim() : ''
 
   if (Object.keys(updatesRaw).length === 0 && !notesAppend) {
@@ -117,6 +118,7 @@ export async function POST(request: Request) {
           // notesAppend handled via raw SQL to preserve existing notes.
           if (notesAppend) {
             const whitelist = PRICING_CATALOG_ENTITY_WHITELIST[entityType]
+
             const notesRes = await client.query<{ notes: string | null }>(
               `SELECT notes FROM ${whitelist.schema}.${whitelist.table} WHERE ${whitelist.pk} = $1`,
               [entityId]
@@ -143,6 +145,7 @@ export async function POST(request: Request) {
 
           // Read entity_sku for audit row.
           const whitelist = PRICING_CATALOG_ENTITY_WHITELIST[entityType]
+
           const skuField =
             entityType === 'sellable_role'
               ? 'role_sku'
@@ -156,6 +159,7 @@ export async function POST(request: Request) {
             `SELECT ${skuField} AS sku FROM ${whitelist.schema}.${whitelist.table} WHERE ${whitelist.pk} = $1`,
             [entityId]
           )
+
           const entitySku = skuRes.rows[0]?.sku ?? null
 
           await client.query(
