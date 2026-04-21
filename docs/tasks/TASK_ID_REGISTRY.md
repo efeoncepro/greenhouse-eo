@@ -604,3 +604,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-548` | `to-do` | Product Catalog Drift Detection & Admin Center (Fase D) | `docs/tasks/to-do/TASK-548-product-catalog-drift-detection-admin.md` |
 | `TASK-549` | `to-do` | Product Catalog Policy Enforcement & Legacy Cleanup (Fase E) | `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md` |
 | `TASK-550` | `to-do` | Pricing Catalog Phase-5 Follow-ups (governance revert + tab gating + notifications + excel create/delete) | `docs/tasks/to-do/TASK-550-pricing-catalog-phase-5-followups.md` |
+| `TASK-551` | `to-do` | Outbox Reactive Decoupling from Analytics Publish | `docs/tasks/to-do/TASK-551-outbox-reactive-decoupling.md` |
+| `TASK-552` | `to-do` | Multi-Currency Quote Output Follow-ups (email + bidirectional FX + locked rates + line history + drift alerts + client portal) | `docs/tasks/to-do/TASK-552-multi-currency-quote-output-followups.md` |
