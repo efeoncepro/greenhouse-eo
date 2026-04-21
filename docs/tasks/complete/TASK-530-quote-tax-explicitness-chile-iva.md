@@ -171,6 +171,7 @@ Principios:
 
 ## Follow-ups
 
-- `TASK-531`
-- `TASK-533`
+- `TASK-531` (downstream consumer: income/invoice tax inheritance)
+- `TASK-533` (downstream consumer: VAT ledger mensual)
+- `TASK-562` (follow-ups consolidados: UI selector de `tax_code` en header, per-line override, email template con tax snapshot, multi-jurisdiction seeding MX/CO/PE)
 

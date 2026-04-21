@@ -615,3 +615,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-559` | `to-do` | Ops Registry Validation, Query CLI & Generated Outputs | `docs/tasks/to-do/TASK-559-ops-registry-validation-query-cli-generated-outputs.md` |
 | `TASK-560` | `to-do` | Ops Registry Human + Agent Surfaces | `docs/tasks/to-do/TASK-560-ops-registry-human-agent-surfaces.md` |
 | `TASK-561` | `to-do` | Ops Registry Federation Contract for Sister Repos | `docs/tasks/to-do/TASK-561-ops-registry-federation-contract-sister-repos.md` |
+| `TASK-562` | `to-do` | Quote Tax Explicitness Follow-ups (UI Selector + Per-Line Override + Email Integration + Multi-Jurisdiction) | `docs/tasks/to-do/TASK-562-quote-tax-explicitness-followups.md` |
