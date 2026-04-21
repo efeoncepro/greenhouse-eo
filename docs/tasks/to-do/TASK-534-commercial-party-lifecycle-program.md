@@ -100,7 +100,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/tasks/to-do/TASK-535-party-lifecycle-schema-commands-foundation.md`
-- `docs/tasks/to-do/TASK-536-hubspot-companies-inbound-prospect-sync.md`
+- `docs/tasks/complete/TASK-536-hubspot-companies-inbound-prospect-sync.md`
 - `docs/tasks/to-do/TASK-537-party-search-adoption-endpoints.md`
 - `docs/tasks/to-do/TASK-538-quote-builder-unified-party-selector.md`
 - `docs/tasks/to-do/TASK-539-inline-deal-creation-quote-builder.md`
@@ -148,7 +148,7 @@ Reglas obligatorias:
 
 ### Slice 2 — HubSpot inbound extension
 
-- Crear `TASK-536` (Fase B): extender inbound sync para crear `organization` como `prospect` desde companies con `lifecyclestage ∈ {lead, mql, sql, opportunity, customer}`. Flag `GREENHOUSE_PARTY_LIFECYCLE_SYNC`.
+- `TASK-536` (Fase B) cerrada: inbound `greenhouse_crm.companies -> organizations` con cron incremental/full, tracking `source_sync_runs`/watermarks y flag `GREENHOUSE_PARTY_LIFECYCLE_SYNC`.
 
 ### Slice 3 — Party search + adoption endpoints
 
@@ -195,7 +195,7 @@ Programa oficial en 9 fases (A-I) con dependencias causales. Las fases A-G son o
 ### Orden de ejecucion
 
 1. `TASK-535` (Fase A) — Foundation: schema, comandos, backfill. **Bloqueante para todo lo demas.**
-2. `TASK-536` (Fase B) — HubSpot inbound extension. Depende de A.
+2. `TASK-536` (Fase B) — HubSpot inbound extension. Completada 2026-04-21.
 3. `TASK-537` (Fase C) — Party search + adopt endpoints. Depende de A. Puede ir paralelo a B.
 4. `TASK-538` (Fase D) — Quote Builder selector unificado. Depende de C.
 5. `TASK-539` (Fase E) — Inline deal creation. Depende de A; se puede implementar paralelo a D.
@@ -259,7 +259,7 @@ Estas preguntas se resuelven durante Discovery de las tasks hijas correspondient
 ## Follow-ups
 
 - `TASK-535` Fase A — Schema + commands foundation
-- `TASK-536` Fase B — HubSpot inbound prospect scope
+- `TASK-536` Fase B — HubSpot inbound prospect scope (cerrada 2026-04-21)
 - `TASK-537` Fase C — Party search + adoption endpoints
 - `TASK-538` Fase D — Quote Builder unified selector
 - `TASK-539` Fase E — Inline deal creation from quote builder

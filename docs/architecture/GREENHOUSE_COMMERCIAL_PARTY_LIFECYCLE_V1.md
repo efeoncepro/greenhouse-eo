@@ -9,6 +9,28 @@
 
 ---
 
+## Delta 2026-04-21 — Fase B shipped (TASK-536)
+
+HubSpot Companies ya no entra al lifecycle comercial solo por `closed-won` o bootstrap manual. El inbound `src/lib/hubspot/sync-hubspot-companies.ts` materializa `organizations` desde `greenhouse_crm.companies` cuando el `lifecyclestage` cae en el mapping canónico (`lead/mql/sql -> prospect`, `opportunity -> opportunity`, `customer/evangelist -> active_client`).
+
+### Implementado
+
+| Área | Artefacto |
+|---|---|
+| Trigger | `GET /api/cron/hubspot-companies-sync` incremental cada 10 min + `?full=true` nocturno |
+| Source-of-work | `greenhouse_crm.companies` |
+| Writer de creación | `createPartyFromHubSpotCompany()` |
+| Writer de transición | `promoteParty()` |
+| Invariante `active_client` | `instantiateClientForParty()` si falta `client_id` |
+| Tracking | `greenhouse_sync.source_sync_runs` + `greenhouse_sync.source_sync_watermarks` |
+| Guard rail | flag `GREENHOUSE_PARTY_LIFECYCLE_SYNC` |
+
+### Notas de diseño
+
+1. Este corte no introduce un webhook HubSpot Companies dedicado; el lane realtime queda como follow-up sobre el gateway genérico existente.
+2. `provider_only`, `disqualified` y `churned` se respetan como stages protegidos para evitar degradación desde CRM.
+3. El sync nuevo convive con `sync-hubspot-company-lifecycle.ts`: uno materializa party lifecycle sobre `organizations`; el otro mantiene el bridge legacy `clients.lifecyclestage`.
+
 ## Delta 2026-04-21 — Fase G shipped (TASK-541)
 
 Quote-to-cash atómico aterriza. Un solo comando transaccional compone quote → contract → client → party → deal-won con audit correlation y rollback completo.

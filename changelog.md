@@ -21,6 +21,14 @@
 - **Verificación**: `pnpm migrate:up` + regen de `src/types/db.d.ts` · `pnpm lint` OK (solo warning legacy preexistente) · `pnpm test` OK (`1768` passing, `2` skipped) · `pnpm build` compila correctamente
 - **Cross-impact**: cierra el cuarto eslabón del programa Chile IVA (TASK-529/530/531/532), formaliza `finance.expense.nubox_synced` en el catálogo documental y deja listo el carril para surfaces fiscales más amplias sin recalcular inline.
 
+### 2026-04-21 — TASK-536 extiende HubSpot Companies inbound al lifecycle comercial
+
+- Nuevo helper `src/lib/hubspot/sync-hubspot-companies.ts` materializa `greenhouse_core.organizations` desde `greenhouse_crm.companies` con watermark incremental (`greenhouse_sync.source_sync_watermarks`) y tracking en `greenhouse_sync.source_sync_runs`.
+- Nuevo cron `GET /api/cron/hubspot-companies-sync` en Vercel: incremental cada 10 minutos + full resync nocturno (`?full=true` a las 03:00).
+- El inbound reutiliza los comandos canónicos del Party Lifecycle: `createPartyFromHubSpotCompany` para altas, `promoteParty` para transiciones y `instantiateClientForParty` cuando HubSpot ya resuelve a `active_client`.
+- El sync protege stages locales `provider_only`, `disqualified` y `churned` para evitar degradaciones desde CRM, y queda detrás de `GREENHOUSE_PARTY_LIFECYCLE_SYNC` (default off).
+- Los tests de `postgres-store-slice2` dejaron de depender de payloads tributarios hardcodeados y ahora construyen snapshots canónicos via `buildIncomeTaxWriteFields` / `buildExpenseTaxWriteFields`, cerrando de forma escalable el drift que rompía `tsc --noEmit`.
+
 ### 2026-04-21 — TASK-532 Purchase VAT Recoverability shipped
 
 - `expenses` ya no trata el IVA de compras como un `tax_rate` suelto. El agregado ahora persiste `tax_code`, `tax_recoverability`, `tax_snapshot_json`, `tax_snapshot_frozen_at` y buckets explícitos de `recoverable_tax_amount`, `non_recoverable_tax_amount` y `effective_cost_amount`.

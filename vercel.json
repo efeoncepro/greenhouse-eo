@@ -73,6 +73,14 @@
       "schedule": "0 */6 * * *"
     },
     {
+      "path": "/api/cron/hubspot-companies-sync",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/hubspot-companies-sync?full=true",
+      "schedule": "0 3 * * *"
+    },
+    {
       "path": "/api/cron/hubspot-deals-sync",
       "schedule": "0 */4 * * *"
     },

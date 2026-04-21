@@ -273,6 +273,22 @@
   - el sync respeta `manual_override`, puede dejar `unknown` cuando HubSpot no informa stage y usa `nubox_fallback` solo para rows legacy con evidencia económica runtime
   - el evento `crm.company.lifecyclestage_changed` existe para follow-ons del pipeline comercial, pero este corte no agrega consumer reactivo
 
+## Delta 2026-04-21 TASK-536 extiende HubSpot Companies inbound al Party Lifecycle
+
+- Greenhouse ya no debe esperar `closed-won` para conocer una contraparte comercial de HubSpot.
+- Runtime nuevo:
+  - helper `src/lib/hubspot/sync-hubspot-companies.ts`
+  - cron `GET /api/cron/hubspot-companies-sync`
+  - schedule Vercel `*/10 * * * *` incremental + `0 3 * * *` full (`?full=true`)
+  - flag runtime `GREENHOUSE_PARTY_LIFECYCLE_SYNC` (default off)
+- Contrato operativo:
+  - el source-of-work local es `greenhouse_crm.companies`, no un full-list live read a Cloud Run
+  - toda alta de party sigue pasando por `createPartyFromHubSpotCompany`
+  - toda promoción posterior sigue pasando por `promoteParty`
+  - si HubSpot mapea a `active_client`, el pipeline instancia `client_id` con `instantiateClientForParty` para respetar el invariante del lifecycle
+  - el tracking queda en `greenhouse_sync.source_sync_runs` + `greenhouse_sync.source_sync_watermarks`
+  - `provider_only`, `disqualified` y `churned` quedan protegidos contra degradación inbound
+
 # project_context.md
 
 ## Delta 2026-04-20 TASK-452 formaliza la foundation canónica de service attribution

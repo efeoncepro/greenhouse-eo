@@ -1987,6 +1987,27 @@ Al investigar el bug quedó expuesto que `quotations` mezcla identidades: tiene 
 - **Riesgo / pendiente menor:**
   - la validación explícita en staging queda atada al deploy de `develop` después del merge; localmente la cron route ya respondió `200`
 
+## Sesion 2026-04-21 — TASK-536 HubSpot Companies Inbound Prospect Sync (Codex)
+
+- **Owner:** Codex
+- **Estado:** implementación local avanzada; pendiente validación final/commit
+- **Entregables nuevos:**
+  - `src/lib/hubspot/sync-hubspot-companies.ts`
+  - `src/app/api/cron/hubspot-companies-sync/route.ts`
+  - `src/app/api/cron/hubspot-companies-sync/route.test.ts`
+  - `vercel.json` con cron incremental + full resync nocturno
+- **Decisión operativa clave:**
+  - la spec asumía `source_sync_pipelines`, webhook dedicado y dependencia dura de live reads a Cloud Run; el runtime real se cerró sobre `greenhouse_crm.companies` + `source_sync_runs`/`source_sync_watermarks`
+  - este corte no implementa lane realtime dedicada; el webhook HubSpot Companies queda como follow-up sobre el gateway genérico
+- **Contrato implementado:**
+  - `GREENHOUSE_PARTY_LIFECYCLE_SYNC` gobierna el pipeline
+  - incremental cada 10 minutos; full nightly a las 03:00
+  - `createPartyFromHubSpotCompany` crea prospects/opportunities/active_client idempotentes por `hubspot_company_id`
+  - `promoteParty` solo avanza stage; no degrada `provider_only`, `disqualified` ni `churned`
+  - si HubSpot llega como `customer/evangelist`, se materializa `client_id` vía `instantiateClientForParty`
+- **Hardening colateral resuelto durante la sesión:**
+  - el rojo de `tsc --noEmit` en `src/lib/finance/__tests__/postgres-store-slice2.test.ts` ya no depende de fixtures fiscales legacy; el test ahora usa builders canónicos (`buildIncomeTaxWriteFields` / `buildExpenseTaxWriteFields`) para absorber futuras extensiones del contrato tributario sin drift por columnas nuevas
+
 ## Sesion 2026-04-18 — TASK-464e Quote Builder UI Exposure (cierre Ola 4 completa)
 
 - **Owner:** Claude

@@ -1,5 +1,31 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-21 — TASK-536 extiende HubSpot Companies inbound a Party Lifecycle
+
+Nuevo pipeline inbound: `greenhouse_crm.companies -> greenhouse_core.organizations` para materializar prospects y oportunidades comerciales antes del closed-won.
+
+### Topologia
+
+```text
+HubSpot Companies raw/conformed snapshot
+  -> greenhouse_crm.companies
+    -> sync-hubspot-companies.ts
+      -> greenhouse_core.organizations
+      -> greenhouse_core.organization_lifecycle_history
+      -> greenhouse_core.clients (solo si el stage resuelve a active_client)
+      -> greenhouse_sync.outbox_events (commercial.party.created/promoted, commercial.client.instantiated)
+      -> greenhouse_sync.source_sync_runs + source_sync_watermarks
+```
+
+### Reglas
+
+1. El inbound nuevo usa `greenhouse_crm.companies` como source-of-work local; no depende de un list endpoint live del servicio `hubspot-greenhouse-integration`.
+2. La cadencia canónica queda en `*/10 * * * *` para incremental y `0 3 * * *` para full resync, ambos detrás de `GREENHOUSE_PARTY_LIFECYCLE_SYNC`.
+3. Toda creación de organization pasa por `createPartyFromHubSpotCompany`; toda promoción posterior pasa por `promoteParty`.
+4. `provider_only`, `disqualified` y `churned` se tratan como stages protegidos: el inbound no los degrada.
+5. Si HubSpot resuelve a `active_client`, el pipeline respeta el invariante del modelo y materializa `client_id` vía `instantiateClientForParty`.
+6. El tracking operativo vive en `greenhouse_sync.source_sync_runs` y `greenhouse_sync.source_sync_watermarks`; no existe una tabla viva `source_sync_pipelines` que haya que sembrar para este corte.
+
 ## Delta 2026-04-18 — TASK-454 adds a lightweight HubSpot lifecycle bridge sync
 
 Nuevo pipeline inbound liviano: `HubSpot company lifecycle -> greenhouse_core.clients`.
