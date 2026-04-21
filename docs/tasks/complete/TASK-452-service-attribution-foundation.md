@@ -1,5 +1,48 @@
 # TASK-452 - Service Attribution Foundation
 
+## Delta 2026-04-21 — Cierre V1 (Claude Opus 4.7)
+
+Auditoría contra el repo al 2026-04-21 confirma que **la task está funcionalmente shipped**. Codex implementó el trabajo en commits previos; faltaba solo el cierre formal del lifecycle. Esta entrada formaliza el cierre.
+
+**Qué está en develop (ya operativo):**
+
+- **Migraciones aplicadas:** `20260420123025804_task-452-service-attribution-foundation.sql` + `20260420124700528_task-452-service-attribution-foundation-repair.sql`. Crean `greenhouse_serving.service_attribution_facts` (fact table con UNIQUE constraint sobre `service_id + period + source_domain + source_type + source_id + amount_kind`) y `greenhouse_serving.service_attribution_unresolved` (cola auditable para remediación).
+- **Materializer canónico:** `src/lib/service-attribution/materialize.ts` (1,546 líneas, Kysely-first) con:
+  - `materializeServiceAttributionForPeriod(year, month, reason?)` — idempotente; limpia y re-upsert por período.
+  - `materializeAllAvailableServiceAttributionPeriods(reason?)` — batch cross-period.
+  - Readers: `readServiceAttributionFactsForPeriod`, `readServiceAttributionUnresolvedForPeriod`, `readServiceAttributionByServiceForPeriod` — listos para que TASK-146 construya `service_economics` sin recalcular joins.
+  - Helpers puros exportados: `buildServiceIndexes`, `distributeAmountByWeights`, `resolveServiceCandidates`.
+- **Jerarquía de matching canónica** (respeta constraint de la spec):
+  1. `service_id` directo cuando viene del upstream.
+  2. Bridges documentales: `source_hes_id` → `purchase_order_id` → `quotation_id` (transitivo) y vía `contract_id`.
+  3. `hubspot_deal_id` como ancla comercial.
+  4. `service_line` como señal blanda sólo cuando el match es unívoco dentro de `space_id` **y** `organization_id`; si no, deja las filas en `unresolved` con `candidate_service_ids` para remediación.
+- **Projection reactiva:** `src/lib/sync/projections/service-attribution.ts` registrada en el registry con 20+ trigger events (`finance.income/expense/cost_allocation`, `commercial.quotation/contract/deal`, `payroll_period/entry`, `assignment/membership`, `commercial_cost_basis.*.period_materialized`). Publica `accounting.service_attribution.period_materialized` (schema v2) vía `publishPeriodMaterializedEvent`.
+- **Event catalog:** `aggregateType: 'service_attribution'` + `accountingServiceAttributionPeriodMaterialized` registrados en `src/lib/sync/event-catalog.ts`.
+- **Types Kysely:** `GreenhouseServingServiceAttributionFacts` + `GreenhouseServingServiceAttributionUnresolved` generados en `src/types/db.d.ts`.
+- **Tests:** `src/lib/service-attribution/materialize.test.ts` — 4/4 pass (weight distribution, hubspot_deal_id bridge, HES→PO→quotation transitive bridge, service_line ambiguity retention en `candidate_service_ids`).
+- **Docs de arquitectura actualizados:**
+  - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` líneas 28-32 + 761-766 (fact + unresolved + projection + evento + tabla de serving).
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md` líneas 8-10.
+  - `GREENHOUSE_AGENCY_LAYER_V2.md` líneas 15-17.
+  - `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md` línea 158 (bridge hacia labor/overhead input).
+  - `GREENHOUSE_EVENT_CATALOG_V1.md` líneas 7-8, 71, 81-82, 108-119 (event entries + subscribers).
+
+**Impacto cruzado confirmado:**
+
+- **TASK-482** (ya cerrada 2026-04-21): el probe runtime `serviceGrainAvailable` en `margin-feedback-materializer.ts` chequea `information_schema.tables` para `greenhouse_serving.service_attribution`. Como las tablas ya existen en la DB (migración aplicada en dev/staging/prod — instancia única `greenhouse-pg-dev`), el probe flipea automáticamente a `true` en el próximo run del margin feedback batch — sin deploy intermedio. Esto desbloquea el upgrade futuro del feedback loop a grain servicio.
+- **TASK-146** (Service Economics): desbloqueada a nivel de contrato de datos. Puede construir `greenhouse_serving.service_economics` encima de `readServiceAttributionFactsForPeriod` sin recalcular joins.
+- **TASK-147** (Campaign-Service Bridge): puede reutilizar el mismo contrato `service_attribution_facts` agregando su propio `source_domain` si necesita puentes campaign-service con impacto económico.
+- **TASK-351** (ya cerrada): Commercial Intelligence profitability snapshots siguen intactos; este fact los complementa, no los reemplaza.
+
+**Verificación local (2026-04-21):** `pnpm tsc --noEmit` clean · `pnpm lint` clean (solo warning pre-existente BulkEditDrawer) · `pnpm test` **1572/1572** (incluye los 4 de service-attribution) · `pnpm build` OK.
+
+**Follow-ups derivados (no bloqueantes para cerrar):**
+
+- TASK-146 (service_economics) puede proceder con contratos de datos ya estables.
+- TASK-147 (campaign-service bridge con impacto económico) cuando el lane de campaigns pida el bridge.
+- Surface UI de remediación manual para `service_attribution_unresolved` — declarado explícitamente como out-of-scope V1 en la spec original. Abrir task separada cuando el volumen de unresolved justifique la inversión.
+
 ## Delta 2026-04-20 — Validada contra codebase real
 
 Revisión contra el repo al 2026-04-20:
@@ -28,7 +71,7 @@ Validación adicional contra schema/migrations/runtime:
 - **Priority:** P1
 - **Severity:** High
 - **Owner:** Codex
-- **Status:** to-do
+- **Status:** complete
 - **Area:** data
 - **Repos:** starter-kit
 - **Dependencies:** greenhouse_core.services, greenhouse_finance.income, greenhouse_finance.expenses, greenhouse_finance.cost_allocations, greenhouse_finance.purchase_orders, greenhouse_finance.service_entry_sheets, greenhouse_commercial.quotations, greenhouse_commercial.contracts, greenhouse_serving.commercial_cost_attribution, greenhouse_serving.operational_pl_snapshots, src/lib/cost-intelligence/compute-operational-pl.ts, src/lib/sync/projections/operational-pl.ts

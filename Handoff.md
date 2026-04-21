@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-452 Service Attribution Foundation — cierre formal (Claude Opus 4.7)
+
+- **Scope:** cerrar formalmente TASK-452. Auditoría contra el repo confirma que la foundation ya está shipped por Codex en commits previos; el único gap era documental/lifecycle. El branch `task/TASK-452-service-attribution-foundation` estaba desalineado (behind develop por 5 commits post TASK-466/482); lo recreé desde develop actual.
+- **Estado shipped en develop (sin cambios de código en esta sesión):**
+  - Migraciones `20260420123025804_task-452-service-attribution-foundation.sql` + `20260420124700528_task-452-service-attribution-foundation-repair.sql` → tablas `greenhouse_serving.service_attribution_facts` + `service_attribution_unresolved`.
+  - Materializer `src/lib/service-attribution/materialize.ts` (1,546 líneas, Kysely-first) con `materializeServiceAttributionForPeriod`, `materializeAllAvailableServiceAttributionPeriods`, readers por período / por servicio / por unresolved, helpers puros (`buildServiceIndexes`, `distributeAmountByWeights`, `resolveServiceCandidates`).
+  - Matching canónico respetado: service_id directo → document bridges (HES→PO→quotation, contract) → hubspot_deal_id → service_line sólo unívoco dentro de space+org.
+  - Projection reactiva `src/lib/sync/projections/service-attribution.ts` registrada con 20+ trigger events. Publica `accounting.service_attribution.period_materialized` (schema v2).
+  - Types Kysely generados para ambas tablas en `src/types/db.d.ts`.
+  - Tests `src/lib/service-attribution/materialize.test.ts` — 4/4 pass.
+  - Docs de arquitectura actualizados (finance, 360 object model, agency, event catalog, commercial cost attribution).
+- **Impacto cruzado verificado:**
+  - **TASK-482 (cerrada 2026-04-21):** probe runtime `serviceGrainAvailable` en `margin-feedback-materializer.ts` chequea `information_schema.tables` para `greenhouse_serving.service_attribution`. Como la tabla ya existe en la DB (instancia única `greenhouse-pg-dev` sirve dev+staging+prod), el probe flipea automáticamente a `true` en el próximo run del margin feedback batch (scheduler 5:10 AM Santiago). Sin deploy intermedio.
+  - **TASK-146** (service_economics) desbloqueada a nivel contrato: puede construir la tabla final encima de `readServiceAttributionFactsForPeriod` sin recalcular joins.
+  - **TASK-147** (campaign-service bridge): mismo contrato reusable si se necesita.
+- **Verificación local 2026-04-21:** tsc clean · lint clean (solo warning pre-existente BulkEditDrawer) · **1572/1572 tests** · build OK.
+- **Out of scope V1 confirmado:** UI backoffice de remediación manual para `service_attribution_unresolved` — queda como follow-up cuando el volumen justifique.
+
 ## Sesion 2026-04-20 — TASK-466 Multi-Currency Quote Output (Claude Opus 4.7)
 
 - **Scope:** convergir el rendering client-facing multi-moneda de la quote canónica al contrato `currency + exchange_rates + exchange_snapshot_date`. Branch `task/TASK-466-multi-currency-quote-output`.
