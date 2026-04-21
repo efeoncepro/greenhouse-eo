@@ -1920,7 +1920,15 @@ export const GH_PRICING = {
       label: 'Organización',
       placeholder: 'Seleccionar organización',
       icon: 'tabler-building',
-      hint: 'Cliente o prospecto de la cotización'
+      hint: 'Cliente o prospecto de la cotización',
+      unifiedSearchPlaceholder: 'Buscar por nombre o dominio…',
+      unifiedMinQuery: 'Escribe al menos 2 caracteres para buscar.',
+      unifiedEmpty: 'No encontramos organizaciones con ese nombre o dominio.',
+      unifiedError: 'No pudimos actualizar los resultados ahora mismo.',
+      unifiedRetry: 'Reintentar',
+      unifiedAdopting: 'Adoptando organización desde HubSpot…',
+      unifiedAdopted: 'Organización adoptada desde HubSpot',
+      unifiedNoAdoptPermission: 'Sin permiso para adoptar'
     },
     contact: {
       label: 'Contacto',

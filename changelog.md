@@ -2,6 +2,19 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-538 Quote Builder Unified Party Selector shipped
+
+- Fase D del programa Party Lifecycle queda expuesta en la primera surface visible: el chip contextual **Organización** del Quote Builder ahora puede buscar organizations materializadas y candidates HubSpot desde `/api/commercial/parties/search`.
+- **Integración UI**:
+  - `QuoteContextStrip` y `ContextChip` se extienden para soportar búsqueda remota controlada, render rico por opción, `aria-live` y retry inline
+  - `QuoteBuilderShell` resuelve flag, search/adopt y hace upsert local de la organization para no romper el handshake downstream del builder
+  - nuevo hook `useParties()` encapsula debounce 250 ms, loading/error/rate limit y `POST /api/commercial/parties/adopt`
+- **Contrato preservado**:
+  - el builder sigue trabajando con `organizationId` como anchor canónico hacia contactos, deals y persistencia
+  - con `GREENHOUSE_PARTY_SELECTOR_UNIFIED` apagado, el selector vuelve al carril legacy de organizaciones activas
+  - en V1 los `hubspot_candidate` siguen visibles solo para `efeonce_internal`; tenants externos no cambian de scope
+- **Verificacion**: test focal del flag helper OK · `pnpm exec tsc --noEmit --pretty false` OK · `pnpm test` OK (`1785` passing, `2` skipped) · `pnpm lint` OK con 1 warning legacy preexistente · `pnpm build` OK.
+
 ### 2026-04-21 — TASK-537 Party Search & Adoption Endpoints shipped
 
 - Fase C del programa Party Lifecycle queda cerrada: Greenhouse ya expone `GET /api/commercial/parties/search` y `POST /api/commercial/parties/adopt` como foundation backend para el selector unificado del Quote Builder (TASK-538).

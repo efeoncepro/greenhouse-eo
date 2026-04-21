@@ -1,13 +1,34 @@
 # Greenhouse EO — Commercial Party Lifecycle Architecture V1
 
-> **Version:** 1.1
+> **Version:** 1.2
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
-> **Ultima actualizacion:** 2026-04-21 por Claude (Opus 4.7) — Fase A shipped
+> **Ultima actualizacion:** 2026-04-21 por Codex — Fase D shipped
 > **Audience:** Backend engineers, product owners, agentes que implementen features de pre-venta, quote builder, HubSpot sync o revenue pipeline
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`, `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
 
 ---
+
+## Delta 2026-04-21 — Fase D shipped (TASK-538)
+
+La primera surface visible del programa ya consume el carril unificado: el `Quote Builder` resuelve "Organización" desde `/api/commercial/parties/search` y adopta `hubspot_candidate` vía `/api/commercial/parties/adopt` sin salir a HubSpot.
+
+### Implementado
+
+| Área | Artefacto |
+|---|---|
+| UI shell | `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` |
+| Surface contextual | `src/components/greenhouse/pricing/QuoteContextStrip.tsx` |
+| Primitive extendido | `src/components/greenhouse/primitives/ContextChip.tsx` |
+| Hook cliente | `src/hooks/useParties.ts` |
+| Flag | `GREENHOUSE_PARTY_SELECTOR_UNIFIED` leída desde `session.user.featureFlags` |
+
+### Notas de diseño
+
+1. La integración reutiliza el patrón vigente `QuoteContextStrip -> ContextChip`; no nace una UI paralela.
+2. `organizationId` sigue siendo el anchor canónico hacia contactos, deals y persistencia de la cotización.
+3. V1 mantiene el branch `hubspot_candidate` solo para `efeonce_internal`; tenants externos siguen viendo parties ya materializadas.
+4. El flujo de edit permanece bloqueado (`organizationLocked`), por lo que el nuevo selector impacta principalmente create.
 
 ## Delta 2026-04-21 — Fase B shipped (TASK-536)
 

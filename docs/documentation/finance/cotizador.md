@@ -1,15 +1,23 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.7
+> **Version:** 3.8
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-20 por Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
+> **Ultima actualizacion:** 2026-04-21 por Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.8 (2026-04-21 — TASK-538 · Selector unificado de parties)
+
+- **La organización ya no depende solo del preload local**: el chip contextual "Organización" del Quote Builder puede buscar por nombre o dominio usando `/api/commercial/parties/search`.
+- **Adopción transparente de candidates HubSpot**: si el resultado todavía no existe como `organization` materializada, seleccionar el item dispara `/api/commercial/parties/adopt` y deja el `organizationId` listo para seguir cotizando sin salir a HubSpot.
+- **Fallback legacy preservado**: el carril nuevo queda detrás de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`. Si el flag está apagado, el builder vuelve al selector legacy de organizaciones activas.
+- **Regla V1 importante**: los `hubspot_candidate` solo aparecen en tenants `efeonce_internal`. Tenants externos siguen viendo únicamente organizations ya visibles en su scope.
+- **Sin romper el resto del flujo**: contactos y deals siguen dependiendo del mismo `organizationId`; el builder no cambia su handshake downstream.
 
 ## Cambios v3.7 (2026-04-20 — TASK-509 · Floating UI)
 

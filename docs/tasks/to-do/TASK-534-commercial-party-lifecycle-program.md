@@ -102,7 +102,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-535-party-lifecycle-schema-commands-foundation.md`
 - `docs/tasks/complete/TASK-536-hubspot-companies-inbound-prospect-sync.md`
 - `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md`
-- `docs/tasks/to-do/TASK-538-quote-builder-unified-party-selector.md`
+- `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md`
 - `docs/tasks/to-do/TASK-539-inline-deal-creation-quote-builder.md`
 - `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md`
 - `docs/tasks/to-do/TASK-541-quote-to-cash-atomic-choreography.md`
@@ -156,7 +156,7 @@ Reglas obligatorias:
 
 ### Slice 4 — Quote Builder unified selector
 
-- Crear `TASK-538` (Fase D): Quote Builder consume el selector unificado. Flag UI `GREENHOUSE_PARTY_SELECTOR_UNIFIED`. Banner "Prospecto" para candidates HubSpot.
+- `TASK-538` (Fase D) shipped: Quote Builder consume el selector unificado. Flag UI `GREENHOUSE_PARTY_SELECTOR_UNIFIED`. Candidates HubSpot se adoptan on-select y solo aparecen en V1 para `efeonce_internal`.
 
 ### Slice 5 — Inline deal creation
 

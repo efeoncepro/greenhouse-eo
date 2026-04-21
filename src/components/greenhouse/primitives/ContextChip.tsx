@@ -13,6 +13,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete'
 import type { AutocompleteCloseReason } from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import ButtonBase from '@mui/material/ButtonBase'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import InputAdornment from '@mui/material/InputAdornment'
@@ -32,6 +33,7 @@ export interface ContextChipOption {
   label: string
   secondary?: string
   disabled?: boolean
+  meta?: Record<string, unknown>
 }
 
 interface ContextChipCommonProps {
@@ -47,15 +49,29 @@ interface ContextChipCommonProps {
   ariaLabel?: string
 }
 
+interface ContextChipPopoverNotice {
+  tone?: 'default' | 'info' | 'warning' | 'error'
+  message: string
+  actionLabel?: string
+  onAction?: () => void
+}
+
 interface ContextChipSelectProps extends ContextChipCommonProps {
   mode?: 'select'
   options: ContextChipOption[]
   selectedValue?: string | null
   onSelectChange: (value: string | null) => void
+  onOptionSelect?: (option: ContextChipOption | null) => void
   noOptionsText?: string
   loading?: boolean
   loadingText?: string
   searchPlaceholder?: string
+  inputValue?: string
+  onInputValueChange?: (value: string) => void
+  filterOptions?: (options: ContextChipOption[], inputValue: string) => ContextChipOption[]
+  renderOption?: (option: ContextChipOption) => ReactNode
+  popoverNotice?: ContextChipPopoverNotice
+  liveMessage?: string
 
   /** Popper width. Default 360. */
   popoverWidth?: number
@@ -118,9 +134,11 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
 
   const labelId = useId()
   const errorId = useId()
+  const liveRegionId = useId()
 
   const anchorRef = useRef<HTMLButtonElement | null>(null)
   const [open, setOpen] = useState(false)
+  const [internalInputValue, setInternalInputValue] = useState('')
 
   const status: ContextChipStatus = statusProp ?? (value ? 'filled' : 'empty')
   const isInteractive = status !== 'locked' && !disabled
@@ -146,6 +164,8 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
       ? props.options.find(o => o.value === props.selectedValue) ?? null
       : null
 
+  const inputValue = !isCustomMode(props) ? (props.inputValue ?? internalInputValue) : ''
+
   return (
     <>
       <ButtonBase
@@ -159,7 +179,9 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
         aria-haspopup={isCustomMode(props) ? 'dialog' : 'listbox'}
         aria-expanded={open}
         aria-label={ariaLabel ?? `${label}${value ? `: ${value}` : ''}`}
-        aria-describedby={errorMessage ? errorId : undefined}
+        aria-describedby={[errorMessage ? errorId : null, !isCustomMode(props) && props.liveMessage ? liveRegionId : null]
+          .filter(Boolean)
+          .join(' ') || undefined}
         aria-invalid={status === 'invalid'}
         aria-labelledby={labelId}
         aria-required={required}
@@ -301,6 +323,17 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
         </Tooltip>
       ) : null}
 
+      {!isCustomMode(props) && props.liveMessage ? (
+        <Box
+          id={liveRegionId}
+          component='span'
+          aria-live='polite'
+          sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}
+        >
+          {props.liveMessage}
+        </Box>
+      ) : null}
+
       {isCustomMode(props) ? (
         <Popover
           open={open && isInteractive}
@@ -359,8 +392,17 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 disableCloseOnSelect={false}
                 autoHighlight
                 value={selectedOption ?? undefined}
+                inputValue={inputValue}
+                onInputChange={(_event, nextInputValue) => {
+                  if (props.onInputValueChange) {
+                    props.onInputValueChange(nextInputValue)
+                  } else {
+                    setInternalInputValue(nextInputValue)
+                  }
+                }}
                 onChange={(_event, newValue) => {
                   props.onSelectChange(newValue?.value ?? null)
+                  props.onOptionSelect?.(newValue ?? null)
                   handleClose()
                 }}
                 options={props.options}
@@ -371,6 +413,10 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 loadingText={props.loadingText ?? 'Cargando…'}
                 noOptionsText={props.noOptionsText ?? 'Sin resultados'}
                 filterOptions={(options, { inputValue }) => {
+                  if (props.filterOptions) {
+                    return props.filterOptions(options, inputValue)
+                  }
+
                   const query = inputValue.trim().toLowerCase()
 
                   if (!query) return options
@@ -395,27 +441,37 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                     }
                   />
                 )}
-                renderOption={(optionProps: HTMLAttributes<HTMLLIElement>, option) => (
-                  <li
-                    {...optionProps}
-                    key={option.value}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      gap: 2
-                    }}
-                  >
-                    <Typography variant='body2' sx={{ fontWeight: 500, lineHeight: 1.3, width: '100%' }}>
-                      {option.label}
-                    </Typography>
-                    {option.secondary ? (
-                      <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2, width: '100%' }}>
-                        {option.secondary}
+                renderOption={(optionProps: HTMLAttributes<HTMLLIElement>, option) => {
+                  const optionContent = props.renderOption ? (
+                    props.renderOption(option)
+                  ) : (
+                    <>
+                      <Typography variant='body2' sx={{ fontWeight: 500, lineHeight: 1.3, width: '100%' }}>
+                        {option.label}
                       </Typography>
-                    ) : null}
-                  </li>
-                )}
+                      {option.secondary ? (
+                        <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2, width: '100%' }}>
+                          {option.secondary}
+                        </Typography>
+                      ) : null}
+                    </>
+                  )
+
+                  return (
+                    <li
+                      {...optionProps}
+                      key={option.value}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        gap: 2
+                      }}
+                    >
+                      {optionContent}
+                    </li>
+                  )
+                }}
                 slotProps={{
                   paper: {
                     sx: {
@@ -443,6 +499,42 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                   }
                 }}
               />
+              {props.popoverNotice ? (
+                <Stack
+                  direction='row'
+                  spacing={1}
+                  alignItems='flex-start'
+                  justifyContent='space-between'
+                  sx={theme => ({
+                    px: 1.5,
+                    py: 1.25,
+                    borderTop: `1px solid ${theme.palette.divider}`,
+                    backgroundColor:
+                      props.popoverNotice?.tone === 'error'
+                        ? alpha(theme.palette.error.main, 0.06)
+                        : props.popoverNotice?.tone === 'warning'
+                          ? alpha(theme.palette.warning.main, 0.08)
+                          : props.popoverNotice?.tone === 'info'
+                            ? alpha(theme.palette.info.main, 0.08)
+                            : alpha(theme.palette.text.primary, 0.03)
+                  })}
+                >
+                  <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.4 }}>
+                    {props.popoverNotice.message}
+                  </Typography>
+                  {props.popoverNotice.actionLabel && props.popoverNotice.onAction ? (
+                    <Button
+                      size='small'
+                      variant='text'
+                      color={props.popoverNotice.tone === 'error' ? 'error' : 'primary'}
+                      onClick={props.popoverNotice.onAction}
+                      sx={{ minWidth: 'auto', px: 0.5, alignSelf: 'center' }}
+                    >
+                      {props.popoverNotice.actionLabel}
+                    </Button>
+                  ) : null}
+                </Stack>
+              ) : null}
             </Paper>
           </ClickAwayListener>
         </Popper>

@@ -1,5 +1,43 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-538 Quote Builder Unified Party Selector (Codex)
+
+- **Scope:** cerrar la Fase D del programa Party Lifecycle exponiendo el selector unificado directamente en el Quote Builder, con fallback legacy y adopción transparente de candidates HubSpot.
+- **Correccion de spec antes de implementar**
+  - el selector actual no vivía solo en `QuoteBuilderShell`; el carril real era `QuoteContextStrip -> ContextChip`
+  - `docs/architecture/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` estaba mal referenciado; el path correcto era `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+  - `src/lib/flags/greenhouse-flags.ts` no existía; el gate real del rollout quedó sobre `session.user.featureFlags`
+  - los skills mencionados en la spec estaban desactualizados; el trabajo se hizo con `greenhouse-agent`, `greenhouse-ui-orchestrator`, `greenhouse-vuexy-ui-expert` y `greenhouse-ux-content-accessibility`
+- **Implementacion shipped**
+  - `src/hooks/useParties.ts` — search con debounce 250 ms, parse de rate limit/error y adopción de candidates
+  - `src/lib/commercial/party/feature-flags.ts` + test — helper del flag `GREENHOUSE_PARTY_SELECTOR_UNIFIED`
+  - `src/components/greenhouse/primitives/ContextChip.tsx` — soporte para search remoto controlado, render rico de options, `aria-live` y notice con retry
+  - `src/components/greenhouse/pricing/QuoteContextStrip.tsx` — integración del selector unificado dentro del chip de Organización, con badges de lifecycle / HubSpot
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — wiring de flag, search/adopt, upsert local de organization y preservación del handshake downstream `organizationId -> contactos/deals`
+  - `src/config/greenhouse-nomenclature.ts` — copy del selector unificado
+- **Contrato operativo**
+  - con flag OFF: fallback 100% legacy usando el preload de organizaciones activas
+  - con flag ON: create usa `/api/commercial/parties/search`; edit sigue `organizationLocked`
+  - `hubspot_candidate` sigue visible solo para `efeonce_internal` porque el backend V1 no lo expone a tenants externos
+- **Docs actualizadas**
+  - `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/documentation/finance/cotizador.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/lib/commercial/party/feature-flags.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1785` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+- **Riesgo abierto no bloqueante**
+  - el rollout real depende de habilitar `GREENHOUSE_PARTY_SELECTOR_UNIFIED` sobre tenants concretos; sin ese flag la UI seguirá usando el selector legacy aunque el código nuevo ya esté deployado
+
 ## Sesion 2026-04-21 — TASK-537 Party Search & Adoption Endpoints (Codex)
 
 - **Scope:** cerrar la Fase C del programa Party Lifecycle con los endpoints backend `GET /api/commercial/parties/search` y `POST /api/commercial/parties/adopt`, reutilizando el mirror local `greenhouse_crm.companies` y los comandos canónicos de lifecycle.
@@ -36,7 +74,7 @@
   - `docs/tasks/README.md`
   - `docs/tasks/TASK_ID_REGISTRY.md`
   - `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md`
-  - `docs/tasks/to-do/TASK-538-quote-builder-unified-party-selector.md`
+  - `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md`
   - `project_context.md`
   - `changelog.md`
 - **Verificacion ejecutada**

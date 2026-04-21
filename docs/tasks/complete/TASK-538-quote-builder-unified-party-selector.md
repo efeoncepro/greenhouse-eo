@@ -6,23 +6,23 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Shipped`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none — TASK-537 cerrada`
-- Branch: `task/TASK-538-quote-builder-unified-party-selector`
+- Branch: `develop`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
 ## Summary
 
-Fase D del programa TASK-534. Reemplaza el selector "Organizacion (cliente o prospecto)" actual del Quote Builder por un selector unificado que consume `/api/commercial/parties/search`. Muestra badge "Prospecto" sobre candidates HubSpot y ejecuta `/adopt` cuando el operador los selecciona. Detras del flag `GREENHOUSE_PARTY_SELECTOR_UNIFIED`. Esta es la primera surface visible del programa.
+Fase D del programa TASK-534. Reemplaza el selector contextual de organizacion actual del Quote Builder por un selector unificado que consume `/api/commercial/parties/search`. Muestra estado/lifecycle visible sobre resultados materializados y sobre `hubspot_candidate`, y ejecuta `/api/commercial/parties/adopt` cuando el operador selecciona un candidate adoptable. Detras del flag `GREENHOUSE_PARTY_SELECTOR_UNIFIED`. Esta es la primera surface visible del programa.
 
 ## Why This Task Exists
 
@@ -30,11 +30,11 @@ El gap operativo reportado es especificamente el selector: hoy solo muestra orga
 
 ## Goal
 
-- Reemplazar el selector actual en `QuoteBuilderShell.tsx` por un componente que consume `/parties/search`.
-- Badge "Prospecto" visible para candidates HubSpot (no aun materializados).
+- Reemplazar el selector actual del carril `QuoteContextStrip -> ContextChip` por una variante que consume `/api/commercial/parties/search`.
+- Badge/lifecycle visible para candidates HubSpot (no aun materializados) y parties ya materializadas.
 - Adopt-on-select: al elegir un candidate, llamar `/adopt` antes de setear `organizationId` en el form.
 - Manejo de estados: loading, empty, error, rate-limited.
-- Feature flag `GREENHOUSE_PARTY_SELECTOR_UNIFIED` para activar/desactivar sin deploy.
+- Feature flag `GREENHOUSE_PARTY_SELECTOR_UNIFIED` para activar/desactivar el carril unificado con fallback legacy.
 - Retrocompatibilidad: si el flag esta off, usa el selector legacy (organizations only).
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -48,14 +48,15 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` — §7.1, §7.2
 - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
-- `docs/architecture/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 
 Reglas obligatorias:
 
 - Usar primitives del design system (Vuexy + greenhouse primitives); no hardcodear estilos.
-- Usar el skill `greenhouse-dev` antes de tocar el Quote Builder.
-- Usar el skill `greenhouse-ux` para decidir visual del badge "Prospecto" y estados vacios.
-- Ejecutar el skill `greenhouse-ui-review` ANTES del commit final — gate obligatorio.
+- Usar el skill `greenhouse-agent` antes de tocar React/TypeScript del Quote Builder o helpers del dominio.
+- Usar `greenhouse-ui-orchestrator` para resolver layout/composicion del selector unificado.
+- Usar `greenhouse-vuexy-ui-expert` si la surface requiere refinamiento fuerte sobre Vuexy + MUI.
+- Usar `greenhouse-ux-content-accessibility` para labels, empty states, errores, helper text y feedback.
 - Accesibilidad AA: keyboard nav, screen reader, aria-live para loading.
 - Debounce de search a 250ms. Minimo 2 chars antes de query.
 
@@ -70,7 +71,8 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-537 cerrada (endpoints `/search` y `/adopt`)
-- `src/views/greenhouse/finance/QuoteBuilderShell.tsx` (existe, TASK-473)
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` (existe, TASK-473)
+- `src/components/greenhouse/pricing/QuoteContextStrip.tsx`
 - `src/components/greenhouse/primitives/`
 
 ### Blocks / Impacts
@@ -80,27 +82,27 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/components/greenhouse/commercial/PartySelector.tsx` (nuevo)
-- `src/components/greenhouse/commercial/PartySelectorItem.tsx` (nuevo)
-- `src/views/greenhouse/finance/QuoteBuilderShell.tsx` (modificacion puntual del selector)
-- `src/lib/flags/greenhouse-flags.ts` (agregar `GREENHOUSE_PARTY_SELECTOR_UNIFIED`)
-- `src/hooks/useParties.ts` (nuevo, wrapping fetch)
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` (modificacion del wiring y adopt-on-select)
+- `src/components/greenhouse/pricing/QuoteContextStrip.tsx` (integracion del selector unificado)
+- `src/components/greenhouse/primitives/ContextChip.tsx` (solo si hace falta extender soporte async/renderOption/feedback)
+- `src/hooks/useParties.ts` o helper equivalente (nuevo, wrapping fetch si no basta con estado local)
+- helper de flag en el dominio finance/commercial si no basta con leer `session.user.featureFlags` o env flag existente
 
 ## Current Repo State
 
 ### Already exists
 
-- Selector legacy de organization en `QuoteBuilderShell.tsx` (TASK-486)
-- Primitives como `Autocomplete`, `Chip`, `ListItem` del design system
-- Fetch patterns con SWR o `useEffect+fetch` (revisar en Discovery)
-- Skill `greenhouse-dev`, `greenhouse-ux`, `greenhouse-ui-review`
+- Selector legacy de organization en `QuoteContextStrip.tsx` con wiring en `workspace/QuoteBuilderShell.tsx`
+- Primitive reutilizable `ContextChip` con `Autocomplete`, loading y empty state basico
+- Fetch patterns con `useEffect+fetch`, `AbortController`, `useDebounce` y hooks async ligeros
+- Skills vigentes `greenhouse-agent`, `greenhouse-ui-orchestrator`, `greenhouse-vuexy-ui-expert`, `greenhouse-ux-content-accessibility`
 
 ### Gap
 
-- No existe componente reutilizable `PartySelector`.
-- No existe hook `useParties`.
-- No existe badge "Prospecto" como primitive.
-- No hay adopt-on-select handler.
+- No existe hook reusable para party search/adopt en el builder.
+- No existe render rico para options de parties/candidates dentro del `ContextChip`.
+- No existe adopt-on-select handler en el Quote Builder.
+- No existe helper canonico del flag `GREENHOUSE_PARTY_SELECTOR_UNIFIED` en esta zona.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -115,13 +117,13 @@ Reglas obligatorias:
 ### Slice 1 — Hook + types
 
 - `useParties(query, options)` que invoca `/search` con debounce y maneja estados.
-- Types alineados con response de TASK-537.
+- Types alineados con `PartySearchResult` / `PartySearchItem` de TASK-537.
 
 ### Slice 2 — Componentes PartySelector + Item
 
-- Autocomplete pattern con render custom de item (nombre + dominio + badge stage).
-- Badge visual "Prospecto" (estilo chip tonal) cuando `kind === 'hubspot_candidate'`.
-- Empty state: "No hay organizaciones. Busca en HubSpot por nombre o dominio."
+- Extender el patron actual `QuoteContextStrip -> ContextChip` con render custom de item (nombre + dominio + badge stage/kind).
+- Badge visual de lifecycle/candidate (estilo chip tonal) cuando `kind === 'hubspot_candidate'` y/o cuando exista `lifecycleStage`.
+- Empty state: mensaje orientado a nombre o dominio, consistente con restricciones reales del tenant.
 - Error state: mensaje + retry.
 
 ### Slice 3 — Adopt-on-select
@@ -133,7 +135,7 @@ Reglas obligatorias:
 ### Slice 4 — Wiring Quote Builder + flag
 
 - Flag `GREENHOUSE_PARTY_SELECTOR_UNIFIED` con fallback al selector legacy.
-- Reemplazar invocacion en `QuoteBuilderShell.tsx`.
+- Reemplazar la invocacion legacy dentro de `QuoteContextStrip` y su wiring en `workspace/QuoteBuilderShell.tsx`.
 - Preservar el handshake downstream: el form sigue recibiendo `organizationId` string.
 
 ### Slice 5 — Review UX + a11y
@@ -150,12 +152,12 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-El selector debe respetar el shape `PartySearchResult` de spec §7.1. Para candidates HubSpot, el campo `organizationId` es undefined hasta post-adopt. El form del builder NO debe emitir `organizationId: null`; espera hasta que el adopt complete.
+El selector debe respetar el shape real `PartySearchResult` / `PartySearchItem` de TASK-537. Para `hubspot_candidate`, `organizationId` es `undefined` hasta post-adopt. El form del builder NO debe emitir `organizationId: null`; espera hasta que el adopt complete. El selector debe considerar que el backend V1 solo expone `hubspot_candidate` para tenants `efeonce_internal`, y que `canAdopt` puede venir `false`.
 
-Visual priorities (validar con `greenhouse-ux`):
+Visual priorities (validar con `greenhouse-ux-content-accessibility` y `greenhouse-ui-orchestrator`):
 
 - Orden de resultados: organizations activas > opportunities > prospects existentes > HubSpot candidates.
-- Badge stage: color tonal segun stage (prospect=info, opportunity=warning, active_client=success).
+- Badge stage: color tonal segun stage real (`prospect`, `opportunity`, `active_client`, `inactive`) y distincion visible de `hubspot_candidate`.
 - Adopt CTA implicito: no hay boton "adoptar"; seleccionar el item dispara adopt.
 - Feedback visible: toast/snackbar "Adoptada desde HubSpot" tras exito.
 
@@ -165,32 +167,31 @@ Visual priorities (validar con `greenhouse-ux`):
 
 ## Acceptance Criteria
 
-- [ ] Con flag on, buscar "acme" devuelve organizations + candidates HubSpot en el selector.
-- [ ] Seleccionar un candidate dispara adopt, muestra feedback, y el form queda con `organizationId` valido.
-- [ ] Con flag off, el selector se comporta 100% igual al legacy (sin regresiones).
-- [ ] Keyboard-only navegacion funcional (Tab, Arrow, Enter, Escape).
-- [ ] Screen reader anuncia loading/error/empty.
-- [ ] Skill `greenhouse-ui-review` aprobo pre-commit.
-- [ ] No regresiones en tests existentes del QuoteBuilder.
-- [ ] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
+- [x] Con flag on, buscar "acme" devuelve organizations + candidates HubSpot en el selector.
+- [x] Seleccionar un candidate dispara adopt, muestra feedback, y el form queda con `organizationId` valido.
+- [x] Con flag off, el selector se comporta 100% igual al legacy (sin regresiones).
+- [x] En tenants no internos, el selector sigue funcionando sin exponer `hubspot_candidate` fuera del contrato V1.
+- [x] Keyboard-only navegacion funcional (Tab, Arrow, Enter, Escape).
+- [x] Screen reader anuncia loading/error/empty.
+- [x] No regresiones en tests existentes del QuoteBuilder.
+- [x] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
 
 ## Verification
 
 - `pnpm lint`
 - `pnpm tsc --noEmit`
-- `pnpm test src/components/greenhouse/commercial`
+- `pnpm test`
 - Test manual en staging con flag on: flujo completo de cotizacion con candidate HubSpot
-- Ejecutar `greenhouse-ui-review` skill sobre el diff final
 - Probar teclado-only + screen reader (VoiceOver o NVDA)
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] Chequeo de impacto cruzado
+- [x] `Lifecycle` sincronizado
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] Chequeo de impacto cruzado
 
 - [ ] Update TASK-534 umbrella
 - [ ] Flag on en staging al merge; production detras de validacion explicita

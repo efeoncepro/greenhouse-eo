@@ -121,18 +121,16 @@ Todos los eventos incluyen `commercial_party_id` — un identificador **estable 
 - **Validacion de transicion**: promover de `prospect` a `inactive` (ilegal) se rechaza antes de tocar la base de datos.
 - **Side-effects controlados**: al entrar a `active_client`, el sistema crea automaticamente el `client_id` y su perfil financiero con defaults (CLP + 30 dias de pago). Si ya existe un cliente, lo reutiliza sin duplicar.
 
-## Que falta todavia (fases siguientes)
-
-Esta foundation (Fase A, TASK-535) desbloquea el resto del programa:
+## Estado del programa
 
 | Fase | Task | Que trae |
 |---|---|---|
-| B | TASK-536 | Sync inbound: HubSpot companies nuevas se materializan como `prospect` automaticamente |
-| C | TASK-537 | Endpoints `GET /parties/search` + `POST /parties/adopt` ya listos. V1 usa `greenhouse_crm.companies` y expone `hubspot_candidate` solo para carril interno |
-| D | TASK-538 | Quote Builder: selector unificado con prospects incluidos (primera UI visible) |
-| E | TASK-539 | Crear deal desde Greenhouse sin saltar a HubSpot |
+| B | TASK-536 | Shipped. HubSpot companies nuevas se materializan como `prospect` automaticamente |
+| C | TASK-537 | Shipped. `GET /parties/search` + `POST /parties/adopt` ya listos. V1 usa `greenhouse_crm.companies` y expone `hubspot_candidate` solo para carril interno |
+| D | TASK-538 | Shipped. Quote Builder ya consume el selector unificado detras de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`; adopta candidates HubSpot on-select y mantiene fallback legacy |
+| E | TASK-539 | Shipped. Crear deal desde Greenhouse sin saltar a HubSpot |
 | F | TASK-540 | Sync outbound: cuando Greenhouse promueve, HubSpot se entera |
-| G | TASK-541 | Quote-to-cash atomico: firmar contrato + promover a cliente + crear income, todo en una transaccion |
+| G | TASK-541 | Shipped. Quote-to-cash atomico: firmar contrato + promover a cliente + crear income, todo en una transaccion |
 | H | TASK-542 | Admin Center: dashboards de funnel, conflictos de sync, sweep de inactivos |
 | I | TASK-543 | Deprecar flags y codigo legacy |
 

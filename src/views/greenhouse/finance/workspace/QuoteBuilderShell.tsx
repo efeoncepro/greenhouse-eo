@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import { useSession } from 'next-auth/react'
+
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
@@ -18,6 +20,7 @@ import { toast } from 'react-toastify'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
+import { isUnifiedPartySelectorEnabled } from '@/lib/commercial/party/feature-flags'
 import { requiresHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
 import type {
   PricingEngineInputV2,
@@ -28,12 +31,15 @@ import type {
 } from '@/lib/finance/pricing/contracts'
 import { UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
+import useParties, { type PartySearchError, type PartySearchItem } from '@/hooks/useParties'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 import { previewChileTaxAmounts } from '@/lib/finance/pricing/quotation-tax-constants'
 
 import AddLineSplitButton from '@/components/greenhouse/pricing/AddLineSplitButton'
-import QuoteContextStrip from '@/components/greenhouse/pricing/QuoteContextStrip'
+import QuoteContextStrip, {
+  type QuoteContextPartySelectorOption
+} from '@/components/greenhouse/pricing/QuoteContextStrip'
 import QuoteIdentityStrip, {
   type QuoteStatus
 } from '@/components/greenhouse/pricing/QuoteIdentityStrip'
@@ -189,6 +195,31 @@ const coercePricingModel = (value: string | null | undefined): QuoteBuilderPrici
   return 'project'
 }
 
+const upsertOrganization = (
+  organizations: QuoteCreateOrganization[],
+  nextOrganization: QuoteCreateOrganization
+): QuoteCreateOrganization[] => {
+  const existingIndex = organizations.findIndex(org => org.organizationId === nextOrganization.organizationId)
+
+  if (existingIndex === -1) {
+    return [nextOrganization, ...organizations]
+  }
+
+  const next = [...organizations]
+
+  next[existingIndex] = nextOrganization
+
+  return next
+}
+
+const formatPartySelectorError = (error: PartySearchError): string => {
+  if (error.retryAfterSeconds && error.retryAfterSeconds > 0) {
+    return `${error.message} Intenta de nuevo en ${error.retryAfterSeconds}s.`
+  }
+
+  return error.message
+}
+
 const mapLineTypeFromV2 = (lineType: PricingV2LineType): QuoteLineItem['lineType'] => {
   switch (lineType) {
     case 'role':
@@ -295,6 +326,7 @@ const QuoteBuilderShell = ({
   onSubmit
 }: QuoteBuilderShellProps) => {
   const router = useRouter()
+  const { data: session } = useSession()
   const editorRef = useRef<QuoteLineItemsEditorHandle>(null)
 
   const initialBuilderState = useMemo<BuilderContextState>(
@@ -312,7 +344,9 @@ const QuoteBuilderShell = ({
   )
 
   const [builderState, setBuilderState] = useState<BuilderContextState>(initialBuilderState)
+  const [localOrganizations, setLocalOrganizations] = useState<QuoteCreateOrganization[]>(() => organizations)
   const [organizationId, setOrganizationId] = useState<string | null>(quote?.organizationId ?? null)
+  const [pendingOrganizationLabel, setPendingOrganizationLabel] = useState<string | null>(null)
 
   const [contactIdentityProfileId, setContactIdentityProfileId] = useState<string | null>(
     quote?.contactIdentityProfileId ?? null
@@ -358,6 +392,150 @@ const QuoteBuilderShell = ({
     countryFactors: DEFAULT_COUNTRY_FACTORS,
     employmentTypes: []
   })
+
+  const unifiedPartySelectorEnabled =
+    mode === 'create' && isUnifiedPartySelectorEnabled(session?.user?.featureFlags)
+
+  const {
+    query: partySearchQuery,
+    setQuery: setPartySearchQuery,
+    parties: partySearchResults,
+    hasMore: partySearchHasMore,
+    loading: partySearchLoading,
+    searchError: partySearchError,
+    adoptingCompanyId,
+    retrySearch: retryPartySearch,
+    clearSearch: clearPartySearch,
+    adoptParty
+  } = useParties({ enabled: unifiedPartySelectorEnabled })
+
+  const setOrganizationContext = useCallback((nextOrganizationId: string | null) => {
+    setOrganizationId(nextOrganizationId)
+    setContactIdentityProfileId(null)
+    setHubspotDealId(null)
+  }, [])
+
+  const partySelectorOptions = useMemo<QuoteContextPartySelectorOption[]>(
+    () =>
+      partySearchResults.map(result => ({
+        kind: result.kind,
+        organizationId: result.organizationId,
+        commercialPartyId: result.commercialPartyId,
+        hubspotCompanyId: result.hubspotCompanyId,
+        displayName: result.displayName,
+        lifecycleStage: result.lifecycleStage,
+        domain: result.domain ?? null,
+        canAdopt: result.canAdopt
+      })),
+    [partySearchResults]
+  )
+
+  const partySelectorLiveMessage = useMemo(() => {
+    if (!unifiedPartySelectorEnabled) return undefined
+
+    if (adoptingCompanyId) {
+      return GH_PRICING.contextChips.organization.unifiedAdopting
+    }
+
+    if (partySearchLoading) {
+      return 'Buscando organizaciones…'
+    }
+
+    if (partySearchError) {
+      return formatPartySelectorError(partySearchError)
+    }
+
+    const trimmedQuery = partySearchQuery.trim()
+
+    if (trimmedQuery.length < 2) {
+      return GH_PRICING.contextChips.organization.unifiedMinQuery
+    }
+
+    if (partySearchResults.length === 0) {
+      return GH_PRICING.contextChips.organization.unifiedEmpty
+    }
+
+    return partySearchHasMore
+      ? `${partySearchResults.length} resultados parciales disponibles.`
+      : `${partySearchResults.length} resultados disponibles.`
+  }, [
+    adoptingCompanyId,
+    partySearchError,
+    partySearchHasMore,
+    partySearchLoading,
+    partySearchQuery,
+    partySearchResults.length,
+    unifiedPartySelectorEnabled
+  ])
+
+  const handleOrganizationChange = useCallback(
+    (nextOrganizationId: string | null) => {
+      setPendingOrganizationLabel(null)
+      setOrganizationContext(nextOrganizationId)
+    },
+    [setOrganizationContext]
+  )
+
+  const handlePartySelection = useCallback(async (party: QuoteContextPartySelectorOption | null) => {
+    if (!party) {
+      setPendingOrganizationLabel(null)
+      setOrganizationContext(null)
+
+      return
+    }
+
+    if (party.kind === 'party' && party.organizationId) {
+      setPendingOrganizationLabel(null)
+      setLocalOrganizations(current =>
+        upsertOrganization(current, {
+          organizationId: party.organizationId as string,
+          organizationName: party.displayName
+        })
+      )
+      setOrganizationContext(party.organizationId)
+      clearPartySearch()
+
+      return
+    }
+
+    if (party.kind !== 'hubspot_candidate') {
+      return
+    }
+
+    setPendingOrganizationLabel(party.displayName)
+
+    try {
+      const adopted = await adoptParty(party as PartySearchItem)
+
+      if (!adopted) return
+
+      setLocalOrganizations(current =>
+        upsertOrganization(current, {
+          organizationId: adopted.organizationId,
+          organizationName: party.displayName
+        })
+      )
+      setOrganizationContext(adopted.organizationId)
+      clearPartySearch()
+      toast.success(GH_PRICING.contextChips.organization.unifiedAdopted, {
+        autoClose: 2400,
+        position: 'bottom-right'
+      })
+    } catch (caught) {
+      const nextError =
+        caught && typeof caught === 'object' && 'message' in caught
+          ? formatPartySelectorError(caught as PartySearchError)
+          : GH_PRICING.contextChips.organization.unifiedError
+
+      setError(nextError)
+      toast.error(nextError, {
+        autoClose: 4200,
+        position: 'bottom-right'
+      })
+    } finally {
+      setPendingOrganizationLabel(null)
+    }
+  }, [adoptParty, clearPartySearch, setOrganizationContext])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -1153,8 +1331,8 @@ const QuoteBuilderShell = ({
   }, [handleSubmit, openCatalogPicker])
 
   const selectedOrgName = useMemo(
-    () => organizations.find(o => o.organizationId === organizationId)?.organizationName ?? null,
-    [organizations, organizationId]
+    () => localOrganizations.find(o => o.organizationId === organizationId)?.organizationName ?? pendingOrganizationLabel ?? null,
+    [localOrganizations, organizationId, pendingOrganizationLabel]
   )
 
   const baseTitle = mode === 'edit' && quote?.quotationNumber
@@ -1327,7 +1505,7 @@ const QuoteBuilderShell = ({
       <QuoteContextStrip
         values={contextValues}
         options={{
-          organizations,
+          organizations: localOrganizations,
           contacts: orgContacts,
           contactsLoading,
           deals: orgDeals,
@@ -1336,14 +1514,37 @@ const QuoteBuilderShell = ({
           commercialModels: builderOptions.commercialModels,
           countryFactors: builderOptions.countryFactors
         }}
+        organizationSelector={
+          unifiedPartySelectorEnabled
+            ? {
+                enabled: true,
+                searchValue: partySearchQuery,
+                selectedLabel: pendingOrganizationLabel,
+                options: partySelectorOptions,
+                loading: partySearchLoading || Boolean(adoptingCompanyId),
+                liveMessage: partySelectorLiveMessage,
+                errorMessage: partySearchError ? formatPartySelectorError(partySearchError) : null,
+                retryActionLabel: GH_PRICING.contextChips.organization.unifiedRetry,
+                minQueryMessage: GH_PRICING.contextChips.organization.unifiedMinQuery,
+                emptyMessage: partySearchHasMore
+                  ? `${GH_PRICING.contextChips.organization.unifiedEmpty} Hay más resultados disponibles.`
+                  : GH_PRICING.contextChips.organization.unifiedEmpty,
+                loadingText: adoptingCompanyId
+                  ? GH_PRICING.contextChips.organization.unifiedAdopting
+                  : 'Buscando organizaciones…',
+                searchPlaceholder: GH_PRICING.contextChips.organization.unifiedSearchPlaceholder,
+                onSearchChange: setPartySearchQuery,
+                onSelectParty: party => {
+                  void handlePartySelection(party)
+                },
+                onRetry: retryPartySearch
+              }
+            : undefined
+        }
         invalidFields={invalidFields}
         disabled={submitting}
         organizationLocked={mode === 'edit'}
-        onOrganizationChange={nextId => {
-          setOrganizationId(nextId)
-          setContactIdentityProfileId(null)
-          setHubspotDealId(null)
-        }}
+        onOrganizationChange={handleOrganizationChange}
         onContactChange={setContactIdentityProfileId}
         onDealChange={setHubspotDealId}
         onBusinessLineChange={code => setBuilderState(prev => ({ ...prev, businessLineCode: code }))}

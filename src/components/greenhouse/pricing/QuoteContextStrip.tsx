@@ -7,6 +7,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
+import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import ContextChip, { type ContextChipOption } from '@/components/greenhouse/primitives/ContextChip'
@@ -18,6 +19,17 @@ import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 export interface QuoteContextOrganizationOption {
   organizationId: string
   organizationName: string
+}
+
+export interface QuoteContextPartySelectorOption {
+  kind: 'party' | 'hubspot_candidate'
+  organizationId?: string
+  commercialPartyId?: string
+  hubspotCompanyId?: string
+  displayName: string
+  lifecycleStage?: 'prospect' | 'opportunity' | 'active_client' | 'inactive'
+  domain?: string | null
+  canAdopt: boolean
 }
 
 export interface QuoteContextContactOption {
@@ -90,9 +102,28 @@ export interface QuoteContextStripOptions {
   countryFactors: QuoteContextCountryFactorOption[]
 }
 
+export interface QuoteContextOrganizationSelectorConfig {
+  enabled: boolean
+  searchValue: string
+  selectedLabel?: string | null
+  options: QuoteContextPartySelectorOption[]
+  loading: boolean
+  liveMessage?: string
+  errorMessage?: string | null
+  retryActionLabel?: string
+  minQueryMessage?: string
+  emptyMessage?: string
+  loadingText?: string
+  searchPlaceholder?: string
+  onSearchChange: (value: string) => void
+  onSelectParty: (party: QuoteContextPartySelectorOption | null) => void
+  onRetry?: () => void
+}
+
 export interface QuoteContextStripProps extends QuoteContextStripHandlers {
   values: QuoteContextStripValues
   options: QuoteContextStripOptions
+  organizationSelector?: QuoteContextOrganizationSelectorConfig
   disabled?: boolean
   organizationLocked?: boolean
   stickyOffset?: number
@@ -116,6 +147,23 @@ const formatMultiplier = (pct: number): string => {
 
 const formatFactor = (factor: number): string => factor.toFixed(2)
 
+const PARTY_STAGE_LABEL: Record<NonNullable<QuoteContextPartySelectorOption['lifecycleStage']>, string> = {
+  prospect: 'Prospecto',
+  opportunity: 'Oportunidad',
+  active_client: 'Cliente activo',
+  inactive: 'Inactiva'
+}
+
+const PARTY_STAGE_COLOR: Record<
+  NonNullable<QuoteContextPartySelectorOption['lifecycleStage']>,
+  'success' | 'warning' | 'info' | 'secondary'
+> = {
+  prospect: 'warning',
+  opportunity: 'info',
+  active_client: 'success',
+  inactive: 'secondary'
+}
+
 /**
  * Row 2 del patron Command Bar: strip horizontal con 8 ContextChips con Autocomplete
  * inline (2 clicks para seleccionar). Organizacion, Contacto, BL, Modelo comercial,
@@ -124,6 +172,7 @@ const formatFactor = (factor: number): string => factor.toFixed(2)
 const QuoteContextStrip = ({
   values,
   options,
+  organizationSelector,
   disabled = false,
   organizationLocked = false,
   stickyOffset = 0,
@@ -145,6 +194,23 @@ const QuoteContextStrip = ({
         label: org.organizationName
       })),
     [options.organizations]
+  )
+
+  const unifiedPartyOptions = useMemo<ContextChipOption[]>(
+    () =>
+      organizationSelector?.options.map(party => ({
+        value: party.organizationId ?? party.hubspotCompanyId ?? party.displayName,
+        label: party.displayName,
+        secondary: party.domain ?? undefined,
+        disabled: party.kind === 'hubspot_candidate' && !party.canAdopt,
+        meta: {
+          kind: party.kind,
+          lifecycleStage: party.lifecycleStage,
+          canAdopt: party.canAdopt,
+          domain: party.domain ?? null
+        }
+      })) ?? [],
+    [organizationSelector?.options]
   )
 
   const contactOptions = useMemo<ContextChipOption[]>(
@@ -294,17 +360,112 @@ const QuoteContextStrip = ({
         <ContextChip
           icon={GH_PRICING.contextChips.organization.icon}
           label={GH_PRICING.contextChips.organization.label}
-          value={selectedOrganization?.organizationName ?? null}
+          value={organizationSelector?.selectedLabel ?? selectedOrganization?.organizationName ?? null}
           placeholder={GH_PRICING.contextChips.organization.placeholder}
           required
           disabled={disabled}
           status={organizationLocked ? 'locked' : undefined}
           errorMessage={invalidFields.organizationId}
-          options={orgOptions}
+          options={organizationSelector?.enabled ? unifiedPartyOptions : orgOptions}
           selectedValue={values.organizationId}
-          onSelectChange={onOrganizationChange}
-          searchPlaceholder='Buscar organización…'
-          noOptionsText='Sin organizaciones'
+          onSelectChange={organizationSelector?.enabled ? () => undefined : onOrganizationChange}
+          onOptionSelect={
+            organizationSelector?.enabled
+              ? option => {
+                  if (!option) {
+                    organizationSelector.onSelectParty(null)
+
+                    return
+                  }
+
+                  const party = organizationSelector.options.find(
+                    candidate =>
+                      (candidate.organizationId ?? candidate.hubspotCompanyId ?? candidate.displayName) === option.value
+                  )
+
+                  organizationSelector.onSelectParty(party ?? null)
+                }
+              : undefined
+          }
+          inputValue={organizationSelector?.enabled ? organizationSelector.searchValue : undefined}
+          onInputValueChange={organizationSelector?.enabled ? organizationSelector.onSearchChange : undefined}
+          loading={organizationSelector?.enabled ? organizationSelector.loading : undefined}
+          loadingText={organizationSelector?.enabled ? organizationSelector.loadingText : undefined}
+          liveMessage={organizationSelector?.enabled ? organizationSelector.liveMessage : undefined}
+          filterOptions={organizationSelector?.enabled ? options => options : undefined}
+          renderOption={
+            organizationSelector?.enabled
+              ? option => {
+                  const lifecycleStage = option.meta?.lifecycleStage as QuoteContextPartySelectorOption['lifecycleStage'] | undefined
+                  const kind = option.meta?.kind as QuoteContextPartySelectorOption['kind'] | undefined
+                  const canAdopt = option.meta?.canAdopt as boolean | undefined
+                  const domain = typeof option.meta?.domain === 'string' ? option.meta.domain : null
+
+                  const badgeLabel =
+                    kind === 'hubspot_candidate'
+                      ? lifecycleStage
+                        ? `HubSpot · ${PARTY_STAGE_LABEL[lifecycleStage]}`
+                        : 'HubSpot'
+                      : lifecycleStage
+                        ? PARTY_STAGE_LABEL[lifecycleStage]
+                        : null
+
+                  const badgeColor =
+                    lifecycleStage && PARTY_STAGE_COLOR[lifecycleStage]
+                      ? PARTY_STAGE_COLOR[lifecycleStage]
+                      : kind === 'hubspot_candidate'
+                        ? 'warning'
+                        : 'secondary'
+
+                  return (
+                    <Stack spacing={0.75} sx={{ width: '100%' }}>
+                      <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between'>
+                        <Typography variant='body2' sx={{ fontWeight: 600, lineHeight: 1.3 }}>
+                          {option.label}
+                        </Typography>
+                        {badgeLabel ? (
+                          <CustomChip size='small' variant='tonal' color={badgeColor} label={badgeLabel} />
+                        ) : null}
+                      </Stack>
+                      <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                        {domain ? (
+                          <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.3 }}>
+                            {domain}
+                          </Typography>
+                        ) : null}
+                        {kind === 'hubspot_candidate' && canAdopt === false ? (
+                          <Typography variant='caption' color='warning.main' sx={{ lineHeight: 1.3 }}>
+                            {GH_PRICING.contextChips.organization.unifiedNoAdoptPermission}
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                    </Stack>
+                  )
+                }
+              : undefined
+          }
+          popoverNotice={
+            organizationSelector?.enabled && organizationSelector.errorMessage
+              ? {
+                  tone: 'error',
+                  message: organizationSelector.errorMessage,
+                  actionLabel: organizationSelector.retryActionLabel,
+                  onAction: organizationSelector.onRetry
+                }
+              : undefined
+          }
+          searchPlaceholder={
+            organizationSelector?.enabled
+              ? organizationSelector.searchPlaceholder
+              : 'Buscar organización…'
+          }
+          noOptionsText={
+            organizationSelector?.enabled
+              ? organizationSelector.searchValue.trim().length < 2
+                ? organizationSelector.minQueryMessage ?? GH_PRICING.contextChips.organization.unifiedMinQuery
+                : organizationSelector.emptyMessage ?? GH_PRICING.contextChips.organization.unifiedEmpty
+              : 'Sin organizaciones'
+          }
         />
 
         {/* Contacto — 2 clicks con Autocomplete */}
