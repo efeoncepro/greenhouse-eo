@@ -544,6 +544,80 @@ export const upsertHubSpotGreenhouseInvoice = async (
   return (await response.json()) as HubSpotGreenhouseUpsertInvoiceResponse
 }
 
+// ── Deals client methods (TASK-539) ──
+//
+// Creates a deal in HubSpot against an existing company. Same graceful-404
+// semantics as the invoice bridge — while the Cloud Run service ships the
+// `/deals` POST route, clients record the attempt as `endpoint_not_deployed`
+// and retry on the next deploy.
+
+export interface HubSpotGreenhouseCreateDealRequest {
+
+  /** Greenhouse-side idempotency key; the Cloud Run service dedupes on this. */
+  idempotencyKey: string
+  hubspotCompanyId: string
+  dealName: string
+  amount?: number | null
+  currency?: string | null
+  pipelineId?: string | null
+  stageId?: string | null
+  ownerHubspotUserId?: string | null
+  closeDate?: string | null
+  businessLineCode?: string | null
+
+  /** Origin marker written as a HubSpot custom property (`gh_deal_origin`). */
+  origin: 'greenhouse_quote_builder'
+
+  /** Optional correlation id for cross-service tracing. */
+  correlationId?: string
+
+  /** Optional contact id to associate at creation. */
+  hubspotContactId?: string | null
+}
+
+export interface HubSpotGreenhouseCreateDealResponse {
+  status: 'created' | 'endpoint_not_deployed'
+  hubspotDealId: string | null
+  pipelineUsed?: string | null
+  stageUsed?: string | null
+  ownerUsed?: string | null
+  message?: string
+}
+
+export const createHubSpotGreenhouseDeal = async (
+  payload: HubSpotGreenhouseCreateDealRequest
+): Promise<HubSpotGreenhouseCreateDealResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/deals`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotDealId: null,
+      message:
+        'HubSpot integration service does not expose POST /deals yet. Attempt persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for POST /deals: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseCreateDealResponse
+}
+
 export const getHubSpotGreenhouseLiveContext = async (
   hubspotCompanyId: string | null
 ): Promise<HubSpotGreenhouseLiveContext> => {

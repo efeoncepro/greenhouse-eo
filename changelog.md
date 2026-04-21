@@ -2,6 +2,21 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-539 Inline Deal Creation from Quote Builder (Fase E) shipped
+
+- Fase E del programa Party Lifecycle (paraguas TASK-534) shipped. Elimina el context-switch a HubSpot para crear deals durante la cotización — el pain point principal del programa. Desbloquea TASK-540 (outbound) + TASK-541 (quote-to-cash atómico).
+- **Migration** (`20260421143050333_..deal-create-attempts.sql`): tabla `greenhouse_commercial.deal_create_attempts` con idempotency key UNIQUE parcial, 6 status enum (`pending`/`completed`/`pending_approval`/`rate_limited`/`failed`/`endpoint_not_deployed`), 3 CHECK constraints, 5 indexes hot-path para rate limit + fingerprint dedupe + reverse lookup.
+- **Comando CQRS** (`src/lib/commercial/party/commands/create-deal-from-quote-context.ts`): pipeline idempotente validate → rate-limit (20/min user, 100/h tenant) → fingerprint dedupe → threshold check ($50M CLP) → Cloud Run POST → transactional upsert deal + `promoteParty(prospect→opportunity)` + emit events → finalize. 5 error classes dedicadas.
+- **Endpoint**: `POST /api/commercial/organizations/[id]/deals` con capability gate `commercial.deal.create`, tenant isolation, 429 con `Retry-After`, 201/202 según status.
+- **Cloud Run client**: `createHubSpotGreenhouseDeal()` con graceful fallback `endpoint_not_deployed` cuando la ruta `/deals` aún no está deployada (mismo patrón que TASK-524 invoice bridge).
+- **UI**: `CreateDealDrawer.tsx` (MUI v7 Drawer minimal, 3 inputs + threshold warning) + `useCreateDeal.ts` hook (fetch + AbortController) + integración en `QuoteBuilderShell` con CTA "+ Crear deal nuevo" visible cuando hay org sin deal asociado. Optimistic update del selector.
+- **Eventos**: 3 tipos nuevos en aggregate `deal`: `commercial.deal.create_requested` (siempre), `commercial.deal.create_approval_requested` (>$50M CLP), `commercial.deal.created_from_greenhouse` (happy path, distingue origen vs sync inbound).
+- **Auto-promotion**: si la organization estaba en `prospect`, se promueve automáticamente a `opportunity` en la misma transacción.
+- **Threshold**: deals > $50M CLP quedan en `pending_approval` sin llegar a HubSpot; se emite evento para workflow de aprobación genérico (follow-up).
+- **Tests**: 9/9 passing — happy path, idempotency key, fingerprint dedupe, rate limit, threshold, endpoint_not_deployed fallback, Cloud Run 5xx con rethrow, promotion skip.
+- **Docs**: `GREENHOUSE_EVENT_CATALOG_V1.md` + `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` Delta Fase E + doc funcional nueva `docs/documentation/finance/crear-deal-desde-quote-builder.md` (flujo operativo, 6 estados, threshold, defaults, FAQ).
+- **Follow-ups**: deploy `POST /deals` en Cloud Run `hubspot-greenhouse-integration`; crear `gh_deal_origin` custom property en HubSpot portal; workflow genérico de approval; resolver `ownerHubspotUserId` via `identity_profile_source_links`; Admin Center para retry de intentos `failed`/`endpoint_not_deployed`; bidirectional update.
+
 ### 2026-04-21 — Ops Registry queda formalizado como framework operativo del repo
 
 - Se formaliza `Ops Registry` como la próxima capa operativa repo-native de Greenhouse para indexar, validar, relacionar y consultar la documentación viva del framework de desarrollo sin mover la source of truth fuera de Git.

@@ -104,3 +104,86 @@ export const publishDealLost = async (
     },
     client
   )
+
+// ── TASK-539: inline deal creation publishers ─────────────────────────────
+
+export interface DealCreatedFromGreenhousePayload {
+  dealId: string
+  hubspotDealId: string
+  organizationId: string
+  hubspotCompanyId: string | null
+  dealName: string
+  amount: number | null
+  amountClp: number | null
+  currency: string
+  pipelineId: string | null
+  stageId: string | null
+  ownerHubspotUserId: string | null
+  actorUserId: string
+  quotationId?: string | null
+  origin: 'greenhouse_quote_builder'
+  attemptId: string
+}
+
+export interface DealCreateRequestedPayload {
+  attemptId: string
+  organizationId: string
+  hubspotCompanyId: string | null
+  actorUserId: string
+  dealName: string
+  amountClp: number | null
+  idempotencyKey: string | null
+}
+
+export interface DealCreateApprovalRequestedPayload {
+  attemptId: string
+  organizationId: string
+  hubspotCompanyId: string | null
+  actorUserId: string
+  dealName: string
+  amountClp: number
+  thresholdClp: number
+  approvalId: string
+}
+
+export const publishDealCreatedFromGreenhouse = async (
+  payload: DealCreatedFromGreenhousePayload,
+  client?: PublishClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.deal,
+      aggregateId: payload.dealId,
+      eventType: EVENT_TYPES.dealCreatedFromGreenhouse,
+      payload: { ...payload }
+    },
+    client
+  )
+
+export const publishDealCreateRequested = async (
+  payload: DealCreateRequestedPayload,
+  client?: PublishClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.deal,
+      aggregateId: payload.attemptId,
+      eventType: EVENT_TYPES.dealCreateRequested,
+      payload: { ...payload }
+    },
+    client
+  )
+
+export const publishDealCreateApprovalRequested = async (
+  payload: DealCreateApprovalRequestedPayload,
+  client?: PublishClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.deal,
+      aggregateId: payload.attemptId,
+      eventType: EVENT_TYPES.dealCreateApprovalRequested,
+      payload: { ...payload }
+    },
+    client
+  )

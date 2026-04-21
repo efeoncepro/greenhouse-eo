@@ -44,6 +44,7 @@ import SellableItemPickerDrawer, {
 } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
 
 import AddonSuggestionsPanel from './AddonSuggestionsPanel'
+import CreateDealDrawer from './CreateDealDrawer'
 import QuoteLineItemsEditor, {
   mapSelectionToLine,
   makeBlankManualLine,
@@ -322,6 +323,9 @@ const QuoteBuilderShell = ({
   const [contactsLoading, setContactsLoading] = useState(false)
   const [orgDeals, setOrgDeals] = useState<QuoteOrganizationDeal[]>([])
   const [dealsLoading, setDealsLoading] = useState(false)
+
+  // TASK-539: inline deal creation from the Quote Builder
+  const [createDealDrawerOpen, setCreateDealDrawerOpen] = useState(false)
 
   const [pricingModel, setPricingModel] = useState<QuoteBuilderPricingModel>(
     coercePricingModel(quote?.pricingModel ?? null)
@@ -1334,6 +1338,56 @@ const QuoteBuilderShell = ({
         onCurrencyChange={value => setBuilderState(prev => ({ ...prev, outputCurrency: value }))}
         onDurationChange={months => setBuilderState(prev => ({ ...prev, contractDurationMonths: months }))}
         onValidUntilChange={iso => setBuilderState(prev => ({ ...prev, validUntil: iso }))}
+      />
+
+      {/* TASK-539: inline deal creation CTA — only visible when an organization
+          is selected and no deal is attached yet. Keeps the context strip
+          uncluttered and mirrors the "adopt prospect" pattern that TASK-538
+          lands in Fase D. */}
+      {organizationId && !hubspotDealId ? (
+        <Box sx={{ px: { xs: 2, md: 3 }, pb: 1 }}>
+          <Button
+            size='small'
+            variant='text'
+            startIcon={<i className='tabler-plus' aria-hidden='true' />}
+            onClick={() => setCreateDealDrawerOpen(true)}
+            disabled={submitting}
+          >
+            Crear deal nuevo
+          </Button>
+        </Box>
+      ) : null}
+
+      <CreateDealDrawer
+        open={createDealDrawerOpen}
+        onClose={() => setCreateDealDrawerOpen(false)}
+        organizationId={organizationId ?? ''}
+        organizationName={selectedOrgName}
+        quotationId={quote?.quotationId ?? null}
+        defaultCurrency={currency as 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN'}
+        onSuccess={response => {
+          // Immediately bind the new hubspot deal so the quote ties to it.
+          if (response.hubspotDealId) {
+            setHubspotDealId(response.hubspotDealId)
+
+            // Optimistic insert so the selector shows the new deal without a roundtrip.
+            setOrgDeals(current => {
+              const next: QuoteOrganizationDeal = {
+                hubspotDealId: response.hubspotDealId as string,
+                dealName: 'Nuevo deal',
+                dealstage: 'appointmentscheduled',
+                dealstageLabel: null,
+                pipelineName: null,
+                isClosed: false,
+                isWon: false
+              }
+
+              return current.some(d => d.hubspotDealId === next.hubspotDealId)
+                ? current
+                : [next, ...current]
+            })
+          }
+        }}
       />
 
       <Box sx={{ px: { xs: 2, md: 3 }, py: { xs: 2, md: 3 } }}>

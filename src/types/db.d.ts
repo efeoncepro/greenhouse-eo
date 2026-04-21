@@ -305,6 +305,41 @@ export interface GreenhouseCommercialCountryPricingFactors {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialDealCreateAttempts {
+  actor_user_id: string;
+  amount: Numeric | null;
+  amount_clp: Numeric | null;
+  approval_id: string | null;
+  attempt_id: Generated<string>;
+  business_line_code: string | null;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  currency: string | null;
+  deal_id: string | null;
+  deal_name: string;
+  error_code: string | null;
+  error_message: string | null;
+  hubspot_company_id: string | null;
+  hubspot_deal_id: string | null;
+  /**
+   * Caller-supplied key; UNIQUE partial index dedupes retries within the default window.
+   */
+  idempotency_key: string | null;
+  metadata: Generated<Json>;
+  organization_id: string;
+  owner_hubspot_user_id: string | null;
+  pipeline_id: string | null;
+  stage_id: string | null;
+  /**
+   * pending (in-flight) · completed (deal created + persisted) · pending_approval (>threshold, awaiting approval) · rate_limited (refused) · failed (Cloud Run error) · endpoint_not_deployed (graceful fallback while /deals ships)
+   */
+  status: Generated<string>;
+  /**
+   * Canonical tenant bucket for rate limiting — tenantType + clientId joined. Kept as text to avoid cross-schema FK.
+   */
+  tenant_scope: string;
+}
+
 export interface GreenhouseCommercialDeals {
   amount: Numeric | null;
   amount_clp: Numeric | null;
@@ -5940,6 +5975,7 @@ export interface DB {
   "greenhouse_commercial.contract_renewal_reminders": GreenhouseCommercialContractRenewalReminders;
   "greenhouse_commercial.contracts": GreenhouseCommercialContracts;
   "greenhouse_commercial.country_pricing_factors": GreenhouseCommercialCountryPricingFactors;
+  "greenhouse_commercial.deal_create_attempts": GreenhouseCommercialDealCreateAttempts;
   "greenhouse_commercial.deals": GreenhouseCommercialDeals;
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;

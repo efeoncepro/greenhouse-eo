@@ -27,6 +27,23 @@ export type { InstantiateClientForPartyInput } from './commands/instantiate-clie
 export { promoteParty } from './commands/promote-party'
 export type { PromotePartyInput } from './commands/promote-party'
 
+export { createDealFromQuoteContext } from './commands/create-deal-from-quote-context'
+export {
+  DEAL_CREATE_APPROVAL_THRESHOLD_CLP,
+  DEAL_CREATE_ATTEMPT_STATUSES,
+  DealCreateError,
+  DealCreateInsufficientPermissionsError,
+  DealCreateRateLimitError,
+  DealCreateValidationError,
+  OrganizationHasNoCompanyError
+} from './commands/create-deal-types'
+export type {
+  CreateDealFromQuoteContextInput,
+  CreateDealFromQuoteContextResult,
+  DealActor,
+  DealCreateAttemptStatus
+} from './commands/create-deal-types'
+
 export {
   ALLOWED_TRANSITIONS,
   getAllowedNextStages,

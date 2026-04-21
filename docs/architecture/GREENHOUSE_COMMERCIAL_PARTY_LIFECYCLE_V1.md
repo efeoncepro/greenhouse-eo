@@ -9,6 +9,41 @@
 
 ---
 
+## Delta 2026-04-21 — Fase E shipped (TASK-539)
+
+Inline deal creation desde el Quote Builder aterriza — se elimina el context-switch a HubSpot.
+
+### Implementado
+
+| Área | Artefacto |
+|---|---|
+| Migration | `20260421143050333_task-539-deal-create-attempts.sql` — tabla `deal_create_attempts` con idempotency key UNIQUE parcial, 6 status canónicos (`pending`/`completed`/`pending_approval`/`rate_limited`/`failed`/`endpoint_not_deployed`) + 5 indexes hot-path (rate limit por usuario/tenant, reverse lookup por `hubspot_deal_id`, fingerprint dedupe). |
+| Comando CQRS | `src/lib/commercial/party/commands/create-deal-from-quote-context.ts` — pipeline explícito: validate → rate-limit (20/min user, 100/h tenant) → idempotency/fingerprint dedupe → threshold check (>$50M CLP → `pending_approval`, no HubSpot) → Cloud Run POST → transactional upsert `deals` + `promoteParty(prospect→opportunity)` + emit 3 eventos. |
+| Cloud Run client | `createHubSpotGreenhouseDeal` en `hubspot-greenhouse-service.ts` con fallback `endpoint_not_deployed` en 404 (mismo patrón que TASK-524). |
+| API route | `POST /api/commercial/organizations/[id]/deals` — capability gate (`commercial.deal.create`), tenant isolation, 429 con `Retry-After` en rate limit, 201/202 según status. |
+| Eventos | 3 eventos nuevos: `commercial.deal.create_requested` (siempre), `commercial.deal.create_approval_requested` (cuando supera threshold), `commercial.deal.created_from_greenhouse` (happy path; distingue origen vs sync inbound). |
+| UI Drawer | `CreateDealDrawer.tsx` — MUI v7 Drawer minimal con 3 inputs (name / amount / currency), aviso de threshold, feedback via `react-toastify`, optimistic update del selector de deals. |
+| Hook | `useCreateDeal.ts` — fetch + AbortController + error shape alineado con el route. |
+| Integración | `QuoteBuilderShell` gana CTA "+ Crear deal nuevo" visible cuando hay org seleccionada pero no hay deal; al éxito bindea `hubspotDealId` al quote form y refresca `orgDeals`. |
+| Tests | 9 unit tests del comando (happy path, idempotency, fingerprint, rate limit, threshold, endpoint_not_deployed, Cloud Run 5xx con rethrow, promotion skip cuando ya es opportunity). |
+
+### Correcciones a la spec §6.4
+
+1. **Endpoint Cloud Run `/deals`**: la spec asume existe; hoy **no está deployado**. El cliente TS implementa graceful fallback (`endpoint_not_deployed`). Task derivada: deploy en repo `hubspot-greenhouse-integration`.
+2. **Custom property `gh_deal_origin`**: la spec la asume creada en HubSpot; no está. Se envía como parte del payload bajo `origin: 'greenhouse_quote_builder'`; el Cloud Run service debe crear el custom property al deploy.
+3. **Approval workflow**: el workflow canónico de TASK-504 está atado a quotations, no a deals. Fase E persiste la attempt en `pending_approval` y emite `commercial.deal.create_approval_requested` como hook para el workflow genérico (task derivada).
+4. **Rate limit**: no existía helper genérico (el de email es email-only). Fase E lo implementa in-module contando `deal_create_attempts` por `actor_user_id` (60s) y `tenant_scope` (1h).
+5. **`identity_profiles.hubspot_user_id`**: no existe directamente. El input `ownerHubspotUserId` es opcional; si no se provee, el Cloud Run usa el default del pipeline.
+
+### Gaps reconocidos para follow-ups
+
+1. Deploy de `POST /deals` en el Cloud Run `hubspot-greenhouse-integration`.
+2. Crear custom property `gh_deal_origin` en el HubSpot portal.
+3. Workflow genérico de approval para deals (hoy persiste trace pero sin aprobador).
+4. Resolver `ownerHubspotUserId` automáticamente desde `identity_profile_source_links`.
+5. Edición inline de deal post-create (diferida a TASK-540+).
+6. Dual approval $100M CLP (diferido a TASK-541).
+
 ## Delta 2026-04-21 — Fase A shipped (TASK-535)
 
 La foundation del programa esta en `develop` (commit `c20a33bf`). Esto es **lo que vive en el repo hoy** vs. **lo que este spec describe en su forma completa**.

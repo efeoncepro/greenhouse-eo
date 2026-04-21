@@ -365,6 +365,9 @@ export const EVENT_TYPES = {
   // Commercial Deals (TASK-453)
   dealSynced: 'commercial.deal.synced',
   dealCreated: 'commercial.deal.created',
+  dealCreatedFromGreenhouse: 'commercial.deal.created_from_greenhouse',
+  dealCreateRequested: 'commercial.deal.create_requested',
+  dealCreateApprovalRequested: 'commercial.deal.create_approval_requested',
   dealStageChanged: 'commercial.deal.stage_changed',
   dealWon: 'commercial.deal.won',
   dealLost: 'commercial.deal.lost',
