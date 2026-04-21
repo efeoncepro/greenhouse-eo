@@ -2,6 +2,24 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-537 Party Search & Adoption Endpoints shipped
+
+- Fase C del programa Party Lifecycle queda cerrada: Greenhouse ya expone `GET /api/commercial/parties/search` y `POST /api/commercial/parties/adopt` como foundation backend para el selector unificado del Quote Builder (TASK-538).
+- **Source of truth corregida**: V1 no usa `greenhouse_sync.hubspot_companies_cache` ni search live contra HubSpot. El carril real lee el mirror local `greenhouse_crm.companies` y reusa los comandos canónicos del lifecycle.
+- **Search**:
+  - une organizations visibles por tenant con candidates HubSpot no materializados
+  - scopea organizations via `resolveFinanceQuoteTenantOrganizationIds()`
+  - exige `q >= 2`, dedupea por `hubspot_company_id`, ordena por stage/actividad y nunca devuelve PII cruda
+  - en V1 los `hubspot_candidate` solo se exponen a `efeonce_internal`, porque aun no existe anchor tenant-safe para tenants externos
+- **Adopt**:
+  - `POST /api/commercial/parties/adopt` exige `commercial.party.create`
+  - es idempotente por `hubspot_company_id`
+  - reutiliza `createPartyFromHubSpotCompany`
+  - si el mapping HubSpot resuelve `active_client`, completa tambien `instantiateClientForParty` o reutiliza el cliente ya existente
+- **Migration** (`20260421210212616_task-537-party-endpoint-request-log.sql`): crea `greenhouse_commercial.party_endpoint_requests` para auditoria/rate limit simple de `/search` y `/adopt`.
+- **Verificacion**: `pnpm migrate:up` + regen de `src/types/db.d.ts` · `pnpm test` OK (`1781` passing, `2` skipped) · `pnpm lint` OK con 1 warning legacy preexistente · `pnpm build` OK.
+- **Cross-impact**: deja a `TASK-538` lista para enfocarse solo en UX/selector y formaliza que el branch de candidates externos queda diferido hasta tener tenant anchors reales.
+
 ### 2026-04-21 — TASK-533 Chile VAT Ledger & Monthly Position shipped
 
 - Greenhouse ya materializa el libro IVA mensual por `space_id`: débito fiscal de ventas, crédito fiscal recuperable de compras, IVA no recuperable y saldo fiscal del periodo.

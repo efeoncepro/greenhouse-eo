@@ -519,12 +519,12 @@ Rollback: si cualquier step falla, toda la transacción abortea; no hay estados 
 
 ### 7.1 Selector unificado del Quote Builder
 
-Hoy: `GET /api/commercial/organizations` retorna solo organizations existentes.
+Hoy: no existe `GET /api/commercial/parties/search`; las surfaces relacionadas solo leen organizations ya materializadas (`GET /api/organizations` en admin/internal y `GET /api/commercial/organizations/[id]/contacts` para el Quote Builder).
 
 Target: **`GET /api/commercial/parties/search?q=&includeStages=`** unifica dos fuentes:
 
 1. Organizations ya materializadas en PG (todos los stages excepto `churned`, `disqualified`, `provider_only` por default).
-2. HubSpot companies NO aún sincronizadas — query directo al sync pipeline cache (`greenhouse_sync.hubspot_companies_cache`, proyección actualizada cada 5min).
+2. HubSpot companies NO aún sincronizadas — query al mirror local `greenhouse_crm.companies` que ya hidrata TASK-536. V1 no agrega `greenhouse_sync.hubspot_companies_cache` ni fallback live a la API de HubSpot.
 
 Response:
 
@@ -549,7 +549,7 @@ type PartySearchResult = {
 
 ### 7.2 Endpoint de adopción
 
-`POST /api/commercial/parties/adopt { hubspotCompanyId }` — llama `createPartyFromHubSpotCompany` y retorna el `organizationId` listo para usar. El Quote Builder lo invoca cuando el operador selecciona un candidate de HubSpot.
+`POST /api/commercial/parties/adopt { hubspotCompanyId }` — llama `createPartyFromHubSpotCompany` y, si el lifecycle resuelve a `active_client`, completa tambien `instantiateClientForParty` antes de responder. Retorna el `organizationId` listo para usar. El Quote Builder lo invoca cuando el operador selecciona un candidate de HubSpot.
 
 ### 7.3 Endpoint de creación de deal inline
 

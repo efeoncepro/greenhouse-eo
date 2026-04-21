@@ -128,7 +128,7 @@ Esta foundation (Fase A, TASK-535) desbloquea el resto del programa:
 | Fase | Task | Que trae |
 |---|---|---|
 | B | TASK-536 | Sync inbound: HubSpot companies nuevas se materializan como `prospect` automaticamente |
-| C | TASK-537 | Endpoints `GET /parties/search` + `POST /parties/adopt` |
+| C | TASK-537 | Endpoints `GET /parties/search` + `POST /parties/adopt` ya listos. V1 usa `greenhouse_crm.companies` y expone `hubspot_candidate` solo para carril interno |
 | D | TASK-538 | Quote Builder: selector unificado con prospects incluidos (primera UI visible) |
 | E | TASK-539 | Crear deal desde Greenhouse sin saltar a HubSpot |
 | F | TASK-540 | Sync outbound: cuando Greenhouse promueve, HubSpot se entera |

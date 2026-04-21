@@ -15,7 +15,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-537`
+- Blocked by: `none — TASK-537 cerrada`
 - Branch: `task/TASK-538-quote-builder-unified-party-selector`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`

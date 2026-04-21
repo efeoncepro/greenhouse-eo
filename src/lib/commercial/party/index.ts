@@ -91,6 +91,15 @@ export {
 } from './party-store'
 export type { OrganizationLifecycleRow } from './party-store'
 
+export { buildTenantEntitlementSubject } from './route-entitlement-subject'
+
+export { searchParties, mergePartySearchItems } from './party-search-reader'
+export type {
+  PartySearchFilters,
+  PartySearchItem,
+  PartySearchResult
+} from './party-search-reader'
+
 export {
   InsufficientPermissionsError,
   InvalidTransitionError,

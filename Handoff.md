@@ -1,5 +1,54 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-537 Party Search & Adoption Endpoints (Codex)
+
+- **Scope:** cerrar la Fase C del programa Party Lifecycle con los endpoints backend `GET /api/commercial/parties/search` y `POST /api/commercial/parties/adopt`, reutilizando el mirror local `greenhouse_crm.companies` y los comandos canónicos de lifecycle.
+- **Correccion de spec/arquitectura antes de implementar**
+  - la spec asumia `greenhouse_sync.hubspot_companies_cache`, pero el source real V1 es `greenhouse_crm.companies`
+  - no existe search live contra HubSpot en este repo; V1 queda 100% local
+  - `/adopt` no puede asumir siempre `prospect`: cuando el mapping HubSpot resuelve `active_client`, el route debe tambien ejecutar `instantiateClientForParty`
+  - como los candidates no materializados aun no tienen anchor tenant-safe, el branch `hubspot_candidate` queda **solo para `efeonce_internal`** en esta iteracion
+- **Migration shipped + aplicada en dev:** `20260421210212616_task-537-party-endpoint-request-log.sql`
+  - crea `greenhouse_commercial.party_endpoint_requests`
+  - log append-only para `/search` y `/adopt` con `actor_user_id`, `tenant_scope`, `hubspot_company_id`, fingerprint/query y `response_status`
+  - sirve como substrate simple de rate limit y auditoria operacional
+- **Helpers nuevos**
+  - `src/lib/commercial/party/route-entitlement-subject.ts` — adapta `TenantContext` a `TenantEntitlementSubject`
+  - `src/lib/commercial/party/party-endpoint-rate-limit.ts` — rate limit + request logging (`60/min` search, `10/min` adopt)
+  - `src/lib/commercial/party/hubspot-candidate-reader.ts` — lee candidates desde `greenhouse_crm.companies`, excluye orgs ya materializadas y resuelve domain / lifecycle
+  - `src/lib/commercial/party/party-search-reader.ts` — une organizations visibles + candidates HubSpot, dedupea por `hubspot_company_id` y ordena por stage/actividad
+- **Routes nuevas**
+  - `GET /api/commercial/parties/search`
+    - usa `requireFinanceTenantContext`
+    - scopea organizations via `resolveFinanceQuoteTenantOrganizationIds()`
+    - exige minimo `q.length >= 2`
+    - candidates HubSpot solo para `efeonce_internal`
+    - `canAdopt` se apaga si el actor no tiene `commercial.party.create`
+  - `POST /api/commercial/parties/adopt`
+    - exige `commercial.party.create`
+    - hace idempotent hit por `hubspot_company_id`
+    - reutiliza `createPartyFromHubSpotCompany`
+    - si el stage resuelve `active_client`, completa `instantiateClientForParty` o reutiliza el cliente existente
+- **Docs actualizadas**
+  - `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md`
+  - `docs/tasks/to-do/TASK-538-quote-builder-unified-party-selector.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `pnpm migrate:up` OK (regenero `src/types/db.d.ts`)
+  - tests focales + suite completa via `pnpm test` OK (`1781` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+- **Siguiente paso natural**
+  - `TASK-538` ya puede consumir `/api/commercial/parties/search` y `/api/commercial/parties/adopt` sin inventar contratos nuevos; debe respetar que los `hubspot_candidate` solo existen en V1 para carril interno
+- **Riesgo abierto no bloqueante**
+  - el rate limit actual vive sobre log en Postgres; suficiente para V1 interna, pero si la surface se expande fuera de `efeonce_internal` conviene migrarlo a helper compartido o redis/cache dedicado
+
 ## Sesion 2026-04-21 — TASK-533 Chile VAT Ledger & Monthly Position (Codex)
 
 - **Scope:** materializar el libro IVA mensual y la posición fiscal por `space_id` usando los snapshots tributarios ya convergidos en `income` y `expenses`, con runtime pesado en `ops-worker`, serving en Finance y surface mínima exportable.

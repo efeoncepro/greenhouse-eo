@@ -577,6 +577,22 @@ export interface GreenhouseCommercialOverheadAddons {
   visible_to_client: Generated<boolean>;
 }
 
+export interface GreenhouseCommercialPartyEndpointRequests {
+  actor_user_id: string;
+  created_at: Generated<Timestamp>;
+  endpoint_key: string;
+  hubspot_company_id: string | null;
+  metadata: Generated<Json>;
+  party_endpoint_request_id: Generated<string>;
+  /**
+   * Normalized lowercase search term used only for audit/debug. Not unique.
+   */
+  query_fingerprint: string | null;
+  query_text: string | null;
+  response_status: number;
+  tenant_scope: string;
+}
+
 export interface GreenhouseCommercialPricingCatalogApprovalQueue {
   approval_id: Generated<string>;
   criticality: string;
@@ -6159,6 +6175,7 @@ export interface DB {
   "greenhouse_commercial.master_agreements": GreenhouseCommercialMasterAgreements;
   "greenhouse_commercial.member_role_cost_basis_snapshots": GreenhouseCommercialMemberRoleCostBasisSnapshots;
   "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
+  "greenhouse_commercial.party_endpoint_requests": GreenhouseCommercialPartyEndpointRequests;
   "greenhouse_commercial.pricing_catalog_approval_queue": GreenhouseCommercialPricingCatalogApprovalQueue;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;

@@ -590,7 +590,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-534` | `to-do` | Commercial Party Lifecycle & Quote-to-Cash Program (umbrella) | `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md` |
 | `TASK-535` | `to-do` | Party Lifecycle Schema & Commands Foundation (Fase A) | `docs/tasks/to-do/TASK-535-party-lifecycle-schema-commands-foundation.md` |
 | `TASK-536` | `complete` | HubSpot Companies Inbound Prospect Sync (Fase B) | `docs/tasks/complete/TASK-536-hubspot-companies-inbound-prospect-sync.md` |
-| `TASK-537` | `to-do` | Party Search & Adoption Endpoints (Fase C) | `docs/tasks/to-do/TASK-537-party-search-adoption-endpoints.md` |
+| `TASK-537` | `complete` | Party Search & Adoption Endpoints (Fase C) | `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md` |
 | `TASK-538` | `to-do` | Quote Builder Unified Party Selector (Fase D) | `docs/tasks/to-do/TASK-538-quote-builder-unified-party-selector.md` |
 | `TASK-539` | `to-do` | Inline Deal Creation from Quote Builder (Fase E) | `docs/tasks/to-do/TASK-539-inline-deal-creation-quote-builder.md` |
 | `TASK-540` | `to-do` | HubSpot Lifecycle Outbound Sync (Fase F) | `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md` |

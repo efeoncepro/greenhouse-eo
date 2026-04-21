@@ -1,3 +1,18 @@
+## Delta 2026-04-21 TASK-537 cierra la Fase C de party lifecycle con search/adopt backend-only
+
+- Greenhouse ya tiene carril backend para buscar y adoptar parties comerciales antes de la UI unificada del Quote Builder.
+- Contrato nuevo:
+  - `GET /api/commercial/parties/search`
+  - `POST /api/commercial/parties/adopt`
+  - tabla `greenhouse_commercial.party_endpoint_requests`
+  - helpers `party-search-reader`, `hubspot-candidate-reader`, `party-endpoint-rate-limit`
+- Reglas operativas:
+  - V1 usa `greenhouse_crm.companies` como mirror local de HubSpot companies; no hay search live contra la API de HubSpot
+  - toda organization materializada se scopea por tenant usando `resolveFinanceQuoteTenantOrganizationIds()`
+  - los `hubspot_candidate` no materializados solo se exponen a `efeonce_internal`, porque aun no existe anchor tenant-safe para mostrarlos a tenants externos
+  - `/adopt` es idempotente por `hubspot_company_id` y, si el lifecycle mapea a `active_client`, completa tambien `instantiateClientForParty`
+  - `TASK-538` debe consumir estos endpoints tal cual y no reimplementar merge/search inline
+
 ## Delta 2026-04-21 TASK-533 materializa libro IVA mensual y posicion fiscal por tenant
 
 - Greenhouse ya puede consolidar IVA mensual por `space_id` sin calcular inline en UI.

@@ -101,7 +101,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-535-party-lifecycle-schema-commands-foundation.md`
 - `docs/tasks/complete/TASK-536-hubspot-companies-inbound-prospect-sync.md`
-- `docs/tasks/to-do/TASK-537-party-search-adoption-endpoints.md`
+- `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md`
 - `docs/tasks/to-do/TASK-538-quote-builder-unified-party-selector.md`
 - `docs/tasks/to-do/TASK-539-inline-deal-creation-quote-builder.md`
 - `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md`
@@ -152,7 +152,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Party search + adoption endpoints
 
-- Crear `TASK-537` (Fase C): endpoints `GET /api/commercial/parties/search` (unifica PG + HubSpot cache) y `POST /api/commercial/parties/adopt`. Todavia no expuestos en UI.
+- `TASK-537` (Fase C) cerrada: endpoints `GET /api/commercial/parties/search` y `POST /api/commercial/parties/adopt` ya listos sobre `greenhouse_crm.companies`. Todavia no expuestos en UI.
 
 ### Slice 4 — Quote Builder unified selector
 
@@ -196,7 +196,7 @@ Programa oficial en 9 fases (A-I) con dependencias causales. Las fases A-G son o
 
 1. `TASK-535` (Fase A) — Foundation: schema, comandos, backfill. **Bloqueante para todo lo demas.**
 2. `TASK-536` (Fase B) — HubSpot inbound extension. Completada 2026-04-21.
-3. `TASK-537` (Fase C) — Party search + adopt endpoints. Depende de A. Puede ir paralelo a B.
+3. `TASK-537` (Fase C) — Party search + adopt endpoints. Completada 2026-04-21.
 4. `TASK-538` (Fase D) — Quote Builder selector unificado. Depende de C.
 5. `TASK-539` (Fase E) — Inline deal creation. Depende de A; se puede implementar paralelo a D.
 6. `TASK-540` (Fase F) — HubSpot lifecycle outbound. Depende de A, idealmente despues de F/G para dogfooding interno.
@@ -260,7 +260,7 @@ Estas preguntas se resuelven durante Discovery de las tasks hijas correspondient
 
 - `TASK-535` Fase A — Schema + commands foundation
 - `TASK-536` Fase B — HubSpot inbound prospect scope (cerrada 2026-04-21)
-- `TASK-537` Fase C — Party search + adoption endpoints
+- `TASK-537` Fase C — Party search + adoption endpoints (cerrada 2026-04-21)
 - `TASK-538` Fase D — Quote Builder unified selector
 - `TASK-539` Fase E — Inline deal creation from quote builder
 - `TASK-540` Fase F — HubSpot lifecycle outbound sync
