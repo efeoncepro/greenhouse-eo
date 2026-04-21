@@ -23,7 +23,7 @@
   - el inbound `sync-hubspot-company-lifecycle.ts` ya usa `gh_last_write_at` para skippear loopbacks de Greenhouse dentro de 60s
   - si el servicio externo aún no tiene deployado `PATCH /companies/:id/lifecycle`, el resultado se degrada a `endpoint_not_deployed` y queda trazado sin romper el reactor
 - **Dependencia restante**
-  - sigue pendiente el merge/deploy del repo hermano `hubspot-bigquery` para cerrar el loop real contra Cloud Run; por eso `TASK-540` todavía no se movió a `complete`
+  - resuelta: el repo hermano `hubspot-bigquery` quedó desplegado a `hubspot-greenhouse-integration-00013-hpl`
 - **Verificacion ejecutada**
   - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
   - `pnpm exec vitest run src/lib/sync/__tests__/field-authority.test.ts src/lib/sync/__tests__/anti-ping-pong.test.ts src/lib/sync/event-catalog.test.ts src/lib/hubspot/sync-hubspot-company-lifecycle.test.ts` OK
@@ -31,6 +31,10 @@
   - `pnpm test` OK (`1793` passing, `2` skipped)
   - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
   - `pnpm build` OK
+  - HubSpot properties de Company creadas con labels visibles en lenguaje natural
+  - smoke directo Cloud Run `PATCH /companies/30825221458/lifecycle` OK
+  - smoke end-to-end `pushPartyLifecycleToHubSpot({ organizationId: 'org-b9977f96-f7ef-4afb-bb26-7355d78c981f' })` → `status: synced`
+  - smoke anti-ping-pong inbound `syncHubSpotCompanyLifecycles()` → `skippedRecentGreenhouseWrites: 1`
 
 ## Sesion 2026-04-21 — TASK-538 Quote Builder Unified Party Selector (Codex)
 

@@ -588,19 +588,19 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-532` | `to-do` | Purchase VAT Recoverability | `docs/tasks/to-do/TASK-532-purchase-vat-recoverability.md` |
 | `TASK-533` | `complete` | Chile VAT Ledger & Monthly Position | `docs/tasks/complete/TASK-533-chile-vat-ledger-monthly-position.md` |
 | `TASK-534` | `to-do` | Commercial Party Lifecycle & Quote-to-Cash Program (umbrella) | `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md` |
-| `TASK-535` | `to-do` | Party Lifecycle Schema & Commands Foundation (Fase A) | `docs/tasks/to-do/TASK-535-party-lifecycle-schema-commands-foundation.md` |
+| `TASK-535` | `complete` | Party Lifecycle Schema & Commands Foundation (Fase A) | `docs/tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md` |
 | `TASK-536` | `complete` | HubSpot Companies Inbound Prospect Sync (Fase B) | `docs/tasks/complete/TASK-536-hubspot-companies-inbound-prospect-sync.md` |
 | `TASK-537` | `complete` | Party Search & Adoption Endpoints (Fase C) | `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md` |
 | `TASK-538` | `complete` | Quote Builder Unified Party Selector (Fase D) | `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md` |
-| `TASK-539` | `to-do` | Inline Deal Creation from Quote Builder (Fase E) | `docs/tasks/to-do/TASK-539-inline-deal-creation-quote-builder.md` |
-| `TASK-540` | `to-do` | HubSpot Lifecycle Outbound Sync (Fase F) — foundation local implementada; deploy externo pendiente | `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md` |
-| `TASK-541` | `to-do` | Quote-to-Cash Atomic Choreography (Fase G) | `docs/tasks/to-do/TASK-541-quote-to-cash-atomic-choreography.md` |
+| `TASK-539` | `complete` | Inline Deal Creation from Quote Builder (Fase E) | `docs/tasks/complete/TASK-539-inline-deal-creation-quote-builder.md` |
+| `TASK-540` | `complete` | HubSpot Lifecycle Outbound Sync (Fase F) | `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md` |
+| `TASK-541` | `complete` | Quote-to-Cash Atomic Choreography (Fase G) | `docs/tasks/complete/TASK-541-quote-to-cash-atomic-choreography.md` |
 | `TASK-542` | `to-do` | Party Lifecycle Admin Dashboards (Fase H) | `docs/tasks/to-do/TASK-542-party-lifecycle-admin-dashboards.md` |
 | `TASK-543` | `to-do` | Party Lifecycle Deprecation & Flag Cleanup (Fase I) | `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md` |
 | `TASK-544` | `to-do` | Commercial Product Catalog Sync Program (umbrella) | `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md` |
 | `TASK-545` | `to-do` | Product Catalog Schema & Materializer Foundation (Fase A) | `docs/tasks/to-do/TASK-545-product-catalog-schema-materializer-foundation.md` |
 | `TASK-546` | `to-do` | Product Catalog Source Handlers & Event Homogenization (Fase B) | `docs/tasks/to-do/TASK-546-product-catalog-source-handlers-events.md` |
-| `TASK-547` | `to-do` | Product Catalog HubSpot Outbound Projection (Fase C) | `docs/tasks/to-do/TASK-547-product-catalog-hubspot-outbound.md` |
+| `TASK-547` | `complete` | Product Catalog HubSpot Outbound Projection (Fase C) | `docs/tasks/complete/TASK-547-product-catalog-hubspot-outbound.md` |
 | `TASK-548` | `to-do` | Product Catalog Drift Detection & Admin Center (Fase D) | `docs/tasks/to-do/TASK-548-product-catalog-drift-detection-admin.md` |
 | `TASK-549` | `to-do` | Product Catalog Policy Enforcement & Legacy Cleanup (Fase E) | `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md` |
 | `TASK-550` | `to-do` | Pricing Catalog Phase-5 Follow-ups (governance revert + tab gating + notifications + excel create/delete) | `docs/tasks/to-do/TASK-550-pricing-catalog-phase-5-followups.md` |

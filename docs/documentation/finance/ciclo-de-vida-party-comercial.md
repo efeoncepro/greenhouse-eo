@@ -153,7 +153,7 @@ Todos los eventos incluyen `commercial_party_id` — un identificador **estable 
 | C | TASK-537 | Shipped. `GET /parties/search` + `POST /parties/adopt` ya listos. V1 usa `greenhouse_crm.companies` y expone `hubspot_candidate` solo para carril interno |
 | D | TASK-538 | Shipped. Quote Builder ya consume el selector unificado detras de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`; adopta candidates HubSpot on-select y mantiene fallback legacy |
 | E | TASK-539 | Shipped. Crear deal desde Greenhouse sin saltar a HubSpot |
-| F | TASK-540 | Implementada localmente. Greenhouse ya emite outbound lifecycle y evita ping-pong; falta el deploy del endpoint externo para cerrar el loop real |
+| F | TASK-540 | Shipped. Greenhouse ya propaga lifecycle a HubSpot, valida anti-ping-pong y deja trazabilidad de conflictos |
 | G | TASK-541 | Shipped. Quote-to-cash atomico: firmar contrato + promover a cliente + crear income, todo en una transaccion |
 | H | TASK-542 | Admin Center: dashboards de funnel, conflictos de sync, sweep de inactivos |
 | I | TASK-543 | Deprecar flags y codigo legacy |

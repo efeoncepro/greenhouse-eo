@@ -70,7 +70,7 @@ Reglas obligatorias:
 - `docs/operations/hubspot-custom-properties-products.md` — runbook operativo paso a paso (ya shipped en TASK-547)
 - `docs/tasks/complete/TASK-547-product-catalog-hubspot-outbound.md` — contrato shipped que este task destraba
 - `docs/tasks/complete/TASK-546-product-catalog-source-handlers-events.md` — materialización que emite los events
-- `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md` — aguas arriba del refactor anti-ping-pong
+- `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md` — aguas arriba del refactor anti-ping-pong
 - `docs/tasks/to-do/TASK-548-product-catalog-drift-detection-admin.md` — consumer del `reconcileHubSpotGreenhouseProducts`; Slice 1 de este task es prerequisito
 
 ## Dependencies & Impact

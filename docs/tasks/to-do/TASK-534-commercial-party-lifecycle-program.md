@@ -40,8 +40,17 @@ Programa oficial para formalizar el lifecycle canonico de la parte comercial (pr
 - Decisión V1 de compliance:
   - se exporta `gh_mrr_tier`
   - `gh_mrr_clp` queda fuera del payload mientras la decisión formal siga abierta
-- Dependencia restante:
-  - el loop real HubSpot ↔ Greenhouse todavía depende del merge/deploy del endpoint externo `PATCH /companies/:id/lifecycle` en `hubspot-greenhouse-integration`
+- Estado de cierre:
+  - el loop real HubSpot ↔ Greenhouse quedó cerrado con el deploy validado del endpoint externo `PATCH /companies/:id/lifecycle` en `hubspot-greenhouse-integration`
+
+## Delta 2026-04-21 — Fase F cerrada end-to-end
+
+- `TASK-540` quedó cerrada:
+  - custom properties HubSpot Companies creadas (`gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_active_contracts_count`, `gh_last_write_at`, `gh_mrr_tier`)
+  - `hubspot-greenhouse-integration` desplegado en revisión `hubspot-greenhouse-integration-00013-hpl`
+  - smoke directo `PATCH /companies/30825221458/lifecycle` OK
+  - smoke end-to-end desde Greenhouse OK
+  - inbound `syncHubSpotCompanyLifecycles()` validó `skippedRecentGreenhouseWrites: 1`
 
 ## Why This Task Exists
 
@@ -113,13 +122,13 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-535-party-lifecycle-schema-commands-foundation.md`
+- `docs/tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md`
 - `docs/tasks/complete/TASK-536-hubspot-companies-inbound-prospect-sync.md`
 - `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md`
 - `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md`
-- `docs/tasks/to-do/TASK-539-inline-deal-creation-quote-builder.md`
-- `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md`
-- `docs/tasks/to-do/TASK-541-quote-to-cash-atomic-choreography.md`
+- `docs/tasks/complete/TASK-539-inline-deal-creation-quote-builder.md`
+- `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md`
+- `docs/tasks/complete/TASK-541-quote-to-cash-atomic-choreography.md`
 - `docs/tasks/to-do/TASK-542-party-lifecycle-admin-dashboards.md`
 - `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md`
 
@@ -178,7 +187,7 @@ Reglas obligatorias:
 
 ### Slice 6 — HubSpot lifecycle outbound
 
-- `TASK-540` (Fase F) ya implementó la foundation local en Greenhouse EO: proyeccion reactiva `partyHubSpotOutbound` + conflict resolution + anti-ping-pong + cliente hacia `PATCH /companies/:id/lifecycle`. El cierre end-to-end sigue pendiente del deploy externo.
+- `TASK-540` (Fase F) cerrada: proyeccion reactiva `partyHubSpotOutbound` + conflict resolution + anti-ping-pong + cliente hacia `PATCH /companies/:id/lifecycle` con servicio externo ya desplegado y smokeado.
 
 ### Slice 7 — Quote-to-cash choreography
 
@@ -213,7 +222,7 @@ Programa oficial en 9 fases (A-I) con dependencias causales. Las fases A-G son o
 3. `TASK-537` (Fase C) — Party search + adopt endpoints. Completada 2026-04-21.
 4. `TASK-538` (Fase D) — Quote Builder selector unificado. Depende de C.
 5. `TASK-539` (Fase E) — Inline deal creation. Depende de A; se puede implementar paralelo a D.
-6. `TASK-540` (Fase F) — HubSpot lifecycle outbound. Foundation local implementada 2026-04-21; el deploy externo sigue pendiente para dogfooding real end-to-end.
+6. `TASK-540` (Fase F) — HubSpot lifecycle outbound. Cerrada 2026-04-21 con loop end-to-end validado.
 7. `TASK-541` (Fase G) — Quote-to-cash choreography. Depende de A + `TASK-460` (Contracts).
 8. `TASK-542` (Fase H) — Admin dashboards. Depende de A, B, F.
 9. `TASK-543` (Fase I) — Deprecation + cleanup. Depende de todas las anteriores.

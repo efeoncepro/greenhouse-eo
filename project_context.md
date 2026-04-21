@@ -12,7 +12,7 @@
   - el outbound solo escribe campos Greenhouse-owned; HubSpot sigue siendo owner de `name`, `domain`, `industry`, address y phone
   - `gh_last_write_at` es el anchor canónico del anti-ping-pong; el inbound `sync-hubspot-company-lifecycle.ts` ya lo consume para skippear loopbacks
   - el write HTTP usa `GREENHOUSE_INTEGRATION_API_TOKEN` contra el servicio externo `hubspot-greenhouse-integration`
-  - si el servicio externo aún no expone o no tiene deployado `PATCH /companies/:id/lifecycle`, Greenhouse degrada a `endpoint_not_deployed` sin romper el reactor
+  - el servicio externo `hubspot-greenhouse-integration` ya expone `PATCH /companies/:id/lifecycle`; `endpoint_not_deployed` queda como degraded path defensivo
   - la decisión V1 de compliance es exportar `gh_mrr_tier`; no se empuja monto bruto `gh_mrr_clp`
 
 ## Delta 2026-04-21 TASK-537 cierra la Fase C de party lifecycle con search/adopt backend-only

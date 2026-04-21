@@ -18,7 +18,7 @@ export const COMPANY_HUBSPOT_CUSTOM_PROPERTIES: HubSpotCompanyCustomPropertyDefi
   {
     objectType: 'company',
     name: 'gh_commercial_party_id',
-    label: 'Greenhouse Commercial Party ID',
+    label: 'ID de Party Comercial Greenhouse',
     description:
       'Identificador canónico de la party comercial en Greenhouse. Read-only: sólo Greenhouse escribe este campo.',
     groupName: 'greenhouse_sync',
@@ -31,7 +31,7 @@ export const COMPANY_HUBSPOT_CUSTOM_PROPERTIES: HubSpotCompanyCustomPropertyDefi
   {
     objectType: 'company',
     name: 'gh_last_quote_at',
-    label: 'Last Greenhouse Quote Issued At',
+    label: 'Última Cotización Emitida en Greenhouse',
     description:
       'Timestamp ISO 8601 de la última cotización emitida por Greenhouse para esta organización.',
     groupName: 'greenhouse_sync',
@@ -44,7 +44,7 @@ export const COMPANY_HUBSPOT_CUSTOM_PROPERTIES: HubSpotCompanyCustomPropertyDefi
   {
     objectType: 'company',
     name: 'gh_last_contract_at',
-    label: 'Last Greenhouse Contract At',
+    label: 'Último Contrato Registrado en Greenhouse',
     description:
       'Timestamp ISO 8601 del último contrato creado o activado en Greenhouse para esta organización.',
     groupName: 'greenhouse_sync',
@@ -57,7 +57,7 @@ export const COMPANY_HUBSPOT_CUSTOM_PROPERTIES: HubSpotCompanyCustomPropertyDefi
   {
     objectType: 'company',
     name: 'gh_active_contracts_count',
-    label: 'Greenhouse Active Contracts Count',
+    label: 'Cantidad de Contratos Activos en Greenhouse',
     description:
       'Cantidad de contratos activos asociados a la organización en Greenhouse.',
     groupName: 'greenhouse_sync',
@@ -70,7 +70,7 @@ export const COMPANY_HUBSPOT_CUSTOM_PROPERTIES: HubSpotCompanyCustomPropertyDefi
   {
     objectType: 'company',
     name: 'gh_last_write_at',
-    label: 'Last Greenhouse Outbound Write',
+    label: 'Última Sincronización Saliente de Greenhouse',
     description:
       'Timestamp ISO 8601 del último write outbound exitoso desde Greenhouse. Usado como anti-ping-pong guard.',
     groupName: 'greenhouse_sync',
@@ -83,14 +83,14 @@ export const COMPANY_HUBSPOT_CUSTOM_PROPERTIES: HubSpotCompanyCustomPropertyDefi
   {
     objectType: 'company',
     name: 'gh_mrr_tier',
-    label: 'Greenhouse MRR Tier',
+    label: 'Tier de MRR Greenhouse',
     description:
       'Tier de MRR expuesto por Greenhouse cuando compliance no permite exportar el monto crudo. Valores iniciales mínimos para Fase F.',
     groupName: 'greenhouse_sync',
     type: 'enumeration',
     fieldType: 'select',
     options: [
-      { label: 'Active Client', value: 'active_client', displayOrder: 0 },
+      { label: 'Cliente Activo', value: 'active_client', displayOrder: 0 },
       { label: 'Pipeline', value: 'pipeline', displayOrder: 1 }
     ],
     formField: false,

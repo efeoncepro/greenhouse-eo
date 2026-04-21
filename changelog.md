@@ -2,9 +2,9 @@
 
 ## 2026-04-21
 
-### 2026-04-21 — TASK-540 aterriza la foundation outbound de Party Lifecycle
+### 2026-04-21 — TASK-540 cierra el outbound de Party Lifecycle end-to-end
 
-- Greenhouse EO ya tiene el carril local Greenhouse → HubSpot para lifecycle comercial sobre Companies, aunque el cierre real del loop aún depende del deploy del endpoint externo `PATCH /companies/:id/lifecycle` en `hubspot-greenhouse-integration`.
+- Greenhouse EO ya tiene el loop Greenhouse → HubSpot → inbound guard completamente operativo para lifecycle comercial sobre Companies.
 - **Reactive outbound**:
   - nueva projection `partyHubSpotOutbound` en `domain: cost_intelligence`
   - helper `push-party-lifecycle.ts` que resuelve snapshot de organization, field authority y payload outbound
@@ -15,11 +15,17 @@
   - el inbound `sync-hubspot-company-lifecycle.ts` ya consume `gh_last_write_at` para skippear loopbacks recientes escritos por Greenhouse
 - **Wire contract real**:
   - `src/lib/integrations/hubspot-greenhouse-service.ts` gana `updateHubSpotGreenhouseCompanyLifecycle()`
-  - el fallback canónico para servicio externo no deployado es `endpoint_not_deployed`, no un hard fail del reactor
+  - el fallback canónico `endpoint_not_deployed` quedó implementado para degradación segura
   - la auth outbound reutiliza `GREENHOUSE_INTEGRATION_API_TOKEN`
 - **Decision V1**:
   - se exporta `gh_mrr_tier`
   - no se empuja `gh_mrr_clp` mientras siga abierta la decisión de compliance
+- **Cierre externo**:
+  - custom properties HubSpot Companies creadas con labels visibles en lenguaje natural
+  - `hubspot-greenhouse-integration` desplegado en revisión `hubspot-greenhouse-integration-00013-hpl`
+  - smoke directo `PATCH /companies/30825221458/lifecycle` OK
+  - smoke end-to-end desde Greenhouse OK
+  - inbound confirmó `skippedRecentGreenhouseWrites: 1`
 - **Verificación**: `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`) · `pnpm exec tsc --noEmit --pretty false` OK · tests focales OK · `pnpm test` OK (`1793` passing, `2` skipped) · `pnpm lint` OK con 1 warning legacy preexistente · `pnpm build` OK.
 
 ### 2026-04-21 — TASK-538 Quote Builder Unified Party Selector shipped

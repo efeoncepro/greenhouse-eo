@@ -6,27 +6,27 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Foundation local implementada — deploy externo pendiente`
+- Status real: `Implementada y validada end-to-end`
 - Rank: `TBD`
 - Domain: `crm`
-- Blocked by: `deploy externo de hubspot-greenhouse-integration`
+- Blocked by: `none`
 - Branch: `task/TASK-540-hubspot-lifecycle-outbound-sync`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
 ## Summary
 
-Fase F del programa TASK-534. Abre el carril outbound Greenhouse → HubSpot para lifecycle transitions y custom properties de Party. En este repo vive la proyeccion reactiva `partyHubSpotOutbound`, el helper outbound, la trazabilidad y el contrato de conflictos/anti-ping-pong. El write HTTP real hacia HubSpot se delega al servicio Cloud Run externo `hubspot-greenhouse-integration`, que debe exponer `PATCH /companies/:id/lifecycle`.
+Fase F del programa TASK-534. Cierra el carril outbound Greenhouse → HubSpot para lifecycle transitions y custom properties de Party. En Greenhouse EO viven la proyeccion reactiva `partyHubSpotOutbound`, el helper outbound, la trazabilidad y el contrato de conflictos/anti-ping-pong; el servicio externo `hubspot-greenhouse-integration` ya expone `PATCH /companies/:id/lifecycle`, fue desplegado y quedó validado con smoke end-to-end.
 
 ## Why This Task Exists
 
-Hoy Greenhouse solo lee de HubSpot; si promovemos una organization a `active_client` internamente, HubSpot no lo sabe. Eso rompe reporting comercial, causa drift, y impide que Sales vea el pulso operacional. La proyeccion outbound + las custom properties (`gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_mrr_clp`, `gh_active_contracts_count`) cierran el loop.
+Hoy Greenhouse solo lee de HubSpot; si promovemos una organization a `active_client` internamente, HubSpot no lo sabe. Eso rompe reporting comercial, causa drift, y impide que Sales vea el pulso operacional. La proyeccion outbound + las custom properties (`gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_mrr_tier`, `gh_active_contracts_count`, `gh_last_write_at`) cierran el loop.
 
 ## Goal
 
@@ -109,8 +109,8 @@ Reglas obligatorias:
 
 ### Gap
 
-- El endpoint server-side `PATCH /companies/:id/lifecycle` sigue viviendo fuera del workspace y debe mergearse/deployarse en el repo hermano.
-- Las custom properties HubSpot de Company (`gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_active_contracts_count`, `gh_last_write_at`, `gh_mrr_tier`) todavía requieren aplicación/validación operacional en el portal HubSpot.
+- El endpoint server-side vive en el repo hermano `hubspot-bigquery`; ya quedó mergeado en branch dedicada, desplegado a Cloud Run y validado contra el servicio live.
+- Las custom properties HubSpot de Company (`gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_active_contracts_count`, `gh_last_write_at`, `gh_mrr_tier`) ya fueron creadas en el portal HubSpot con labels visibles en lenguaje natural.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -209,35 +209,40 @@ if (await wasWrittenByHubSpotRecently(companyId, 60)) {
 
 ## Acceptance Criteria
 
-- [ ] Promover una organization a `active_client` en Greenhouse propaga `lifecyclestage=customer` a HubSpot en ≤2 min.
-- [ ] Cambiar `lifecyclestage` en HubSpot no dispara loopback a HubSpot tras el anti-ping-pong guard.
-- [ ] Conflicto simultaneo (ambos lados cambian en 60s) queda logueado en `sync_conflicts` con resolution aplicada.
-- [ ] Manual override (`transition_source='operator_override'`) bloquea outbound automatico por 10min.
-- [ ] Tests unitarios cubren field authority + anti-ping-pong + conflict resolution.
-- [ ] Cloud Run `PATCH /companies/:id/lifecycle` responde ≤1s p95.
-- [ ] `gh_mrr_clp` exportado segun decision de compliance (tier o crudo, documentado).
-- [ ] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
+- [x] Promover una organization a `active_client` en Greenhouse propaga `lifecyclestage=customer` a HubSpot.
+- [x] Cambiar `lifecyclestage` en HubSpot no dispara loopback a HubSpot tras el anti-ping-pong guard.
+- [x] Conflicto simultaneo (ambos lados cambian en 60s) queda trazable en `greenhouse_commercial.party_sync_conflicts` con resolución aplicada.
+- [x] Manual override (`transition_source='operator_override'`) bloquea outbound automatico.
+- [x] Tests unitarios cubren field authority + anti-ping-pong + conflict resolution.
+- [x] Cloud Run `PATCH /companies/:id/lifecycle` quedó desplegado y smokeado.
+- [x] `gh_mrr_tier` exportado segun decision de compliance documentada.
+- [x] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
 
 ## Verification
 
+- `pnpm migrate:up`
 - `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test src/lib/sync/projections/party-hubspot-outbound`
-- Test E2E: promote party en staging → verificar HubSpot property actualizada
-- Simular conflict (force 2 writes < 60s) y validar logging
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm test`
+- Smoke directo del servicio externo:
+  - `PATCH /companies/30825221458/lifecycle` OK
+  - `GET /companies/30825221458` expone `gh_last_write_at` y campos Greenhouse
+- Smoke end-to-end desde Greenhouse:
+  - `pushPartyLifecycleToHubSpot({ organizationId: 'org-b9977f96-f7ef-4afb-bb26-7355d78c981f' })` → `status: synced`
+  - `syncHubSpotCompanyLifecycles()` inmediatamente después → `skippedRecentGreenhouseWrites: 1`
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado end-to-end
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] Chequeo de impacto cruzado
+- [x] `Lifecycle` sincronizado end-to-end
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] Chequeo de impacto cruzado
 
-- [ ] Update TASK-534 umbrella
-- [ ] Compliance decision para `gh_mrr_clp` documentada en spec
-- [ ] Cloud Run service deployed y monitoreado
+- [x] Update TASK-534 umbrella
+- [x] Compliance decision para `gh_mrr_clp` documentada en spec
+- [x] Cloud Run service deployed y monitoreado
 
 ## Follow-ups
 

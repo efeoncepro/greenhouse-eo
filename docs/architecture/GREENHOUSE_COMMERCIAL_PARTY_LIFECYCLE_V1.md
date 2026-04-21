@@ -801,6 +801,6 @@ Orden recomendado para minimizar blast radius:
 - Contrato operativo:
   - el write HTTP real sigue delegándose al servicio hermano `hubspot-greenhouse-integration` vía `PATCH /companies/:id/lifecycle`
   - en Greenhouse EO el cliente canónico es `updateHubSpotGreenhouseCompanyLifecycle()`
-  - si el endpoint externo aún no está deployado, el outbound degrada a `endpoint_not_deployed` sin romper el reactor
+  - el endpoint externo ya quedó desplegado y smokeado; `endpoint_not_deployed` se conserva como degraded path defensivo
   - el inbound `sync-hubspot-company-lifecycle.ts` ya consume `gh_last_write_at` para evitar loopbacks
   - la decisión V1 de compliance es exportar `gh_mrr_tier`; no se empuja `gh_mrr_clp`
