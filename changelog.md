@@ -2,6 +2,36 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-547 Product Catalog HubSpot Outbound Projection (Fase C) shipped
+
+- Fase C del programa Product Catalog Sync (TASK-544 umbrella). Cierra el loop Greenhouse → HubSpot: los eventos emitidos por la materialización de TASK-546 ahora disparan pushes reactivos a HubSpot Products via Cloud Run. Desbloquea TASK-548 (drift detection).
+- **Migration** (`20260421180531865_task-547-product-catalog-hubspot-sync-trace.sql`): 4 columnas de trace en `product_catalog` (`hubspot_sync_status`, `hubspot_sync_error`, `hubspot_sync_attempt_count`, `hubspot_last_write_at`) + CHECK enum del status + CHECK consistencia `hubspot_product_id → last_outbound_sync_at` + 2 indexes (retryable + last-write) + backfill defensivo para rows legacy con `hubspot_product_id` sin `last_outbound_sync_at`.
+- **Event catalog**: 2 events nuevos — `commercial.product.hubspot_synced_out` + `commercial.product.hubspot_sync_failed` sobre aggregate `product_catalog`.
+- **Cloud Run client extensions** (`src/lib/integrations/hubspot-greenhouse-service.ts`): 3 métodos nuevos con graceful `endpoint_not_deployed` fallback en HTTP 404 (patrón TASK-524/539):
+  - `updateHubSpotGreenhouseProduct(hubspotProductId, payload)` → PATCH `/products/:id`
+  - `archiveHubSpotGreenhouseProduct(hubspotProductId, reason?)` → POST `/products/:id/archive`
+  - `reconcileHubSpotGreenhouseProducts({cursor, limit, includeArchived})` → GET `/products/reconcile` (lista para TASK-548)
+  - `HubSpotGreenhouseCreateProductRequest` tipada con `createdBy` + `customProperties` (antes requerían cast).
+- **Payload adapter** (`src/lib/hubspot/hubspot-product-payload-adapter.ts`): mapea snapshot canónico a payload HubSpot con 5 custom properties (`gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`, `gh_business_line`). Pasa por `sanitizeHubSpotProductPayload` (TASK-347 guard) como defense-in-depth.
+- **Push helper** (`src/lib/hubspot/push-product-to-hubspot.ts`): pipeline idempotente con:
+  - Anti-ping-pong guard: `hubspot_last_write_at` < 60s → skip con status `skipped_no_anchors`
+  - Action derivation: `created`/`updated`/`archived`/`unarchived`/`noop` según estado
+  - Trace persisting: 5 estados de `hubspot_sync_status` + error + attempt count
+  - 3 outcomes: `synced` (ACK), `endpoint_not_deployed` (persist + emit, no throw), `failed` (persist + emit + rethrow para retry)
+  - Create path atómico via `withTransaction`
+- **Projection** (`src/lib/sync/projections/product-hubspot-outbound.ts`): domain `cost_intelligence`, triggers sobre los 4 lifecycle events del materializer. Registrada en el index.
+- **Custom properties**: `scripts/create-hubspot-product-custom-properties.ts` con 5 property definitions + runbook operativo `docs/operations/hubspot-custom-properties-products.md` para aplicar offline via skill `hubspot-ops` (sandbox → production).
+- **Decisiones vs spec:**
+  - Cloud Run service `hubspot-greenhouse-integration` NO vive en este repo; cliente con `endpoint_not_deployed` fallback. Deploy de 3 endpoints pendientes (PATCH/archive/reconcile) queda como follow-up del repo externo.
+  - TASK-540 anti-ping-pong helper compartido aún pendiente; implementación inline en push helper (refactor futuro).
+  - `sync_status` legacy finance (`local_only|pending_sync|synced`) NO tocada; nueva columna `hubspot_sync_status` específica del bridge.
+  - Batch API HubSpot coalescing deferido; E2E tests contra HubSpot sandbox deferidos a staging smoke.
+  - Multi-currency products: USD-only por ahora; variants (`source_variant_key`) se desbloquean con TASK-421.
+- **Tests**: 30 passing — 6 payload adapter, 13 push helper (happy + skip + anti-ping-pong + degraded modes + errors), 11 projection.
+- **Docs**: architecture spec bumped a v1.3 con Delta Fase C + doc funcional ampliada con sección completa "Sincronización automática a HubSpot".
+- **Rollout plan**: deploy Cloud Run endpoints externo → runbook sandbox → staging activation → validación 48h → production.
+- **Follow-ups**: deploy externo de endpoints, TASK-540 helper refactor, batch coalescing, E2E staging, TASK-421 multi-currency.
+
 ### 2026-04-21 — TASK-546 Product Catalog Source Handlers & Event Homogenization (Fase B) shipped
 
 - Fase B del programa Product Catalog Sync (TASK-544 umbrella) shipped. Activa el materializer scaffolded en TASK-545. Los 4 catálogos fuente (sellable_roles, tool_catalog, overhead_addons, service_pricing) ahora alimentan `greenhouse_commercial.product_catalog` automáticamente vía reactive projection en Cloud Run ops-worker. Desbloquea TASK-547 (outbound HubSpot) y TASK-548 (drift detection).

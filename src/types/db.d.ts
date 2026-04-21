@@ -628,7 +628,23 @@ export interface GreenhouseCommercialProductCatalog {
    * SHA-256 of the Greenhouse-owned fields joined with | — used by drift detection to compare against HubSpot snapshot. Recomputed on every commit. NULL until first materialize.
    */
   gh_owned_fields_checksum: string | null;
+  /**
+   * TASK-547: timestamp of the last successful outbound write to HubSpot. Inbound sync (TASK-548) consults this to skip pushes received within 60s (anti-ping-pong guard).
+   */
+  hubspot_last_write_at: Timestamp | null;
   hubspot_product_id: string | null;
+  /**
+   * TASK-547: monotonic counter of outbound attempts since last success. Reset to 0 on synced.
+   */
+  hubspot_sync_attempt_count: Generated<number>;
+  /**
+   * TASK-547: short error message from the last failed outbound attempt. Cleared on the next successful sync.
+   */
+  hubspot_sync_error: string | null;
+  /**
+   * TASK-547: last outbound attempt status (pending | synced | failed | endpoint_not_deployed | skipped_no_anchors). NULL == never attempted.
+   */
+  hubspot_sync_status: string | null;
   /**
    * Soft-archive flag. Archived products are hidden from selectors but preserved for historical quotations/contracts.
    */

@@ -257,6 +257,20 @@ export interface HubSpotGreenhouseCreateProductRequest {
   isRecurring?: boolean
   billingFrequency?: string
   billingPeriodCount?: number
+
+  // TASK-547 Fase C — outbound bridge annotations. The Cloud Run service
+  // forwards these as HubSpot custom properties (`gh_product_code`,
+  // `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`,
+  // `gh_business_line`). `createdBy` is an audit tag persisted into HubSpot's
+  // default audit trail.
+  createdBy?: string
+  customProperties?: Partial<{
+    gh_product_code: string
+    gh_source_kind: string
+    gh_last_write_at: string
+    gh_archived_by_greenhouse: boolean
+    gh_business_line: string | null
+  }>
 }
 
 export interface HubSpotGreenhouseCreateProductResponse {
@@ -419,6 +433,184 @@ export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseC
   }
 
   return (await response.json()) as HubSpotGreenhouseCreateProductResponse
+}
+
+// ── Product outbound extensions (TASK-547) ──
+//
+// PATCH / archive / reconcile endpoints on the Cloud Run service have NOT
+// shipped yet. Follow the TASK-524 invoice and TASK-539 deal patterns: return
+// a structured `endpoint_not_deployed` result on 404 so the reactive outbound
+// bridge records the trace without throwing. When the Cloud Run routes ship,
+// the existing retry worker picks up the pending rows and replays.
+
+export interface HubSpotGreenhouseProductCustomProperties {
+  gh_product_code: string
+  gh_source_kind: string
+  gh_last_write_at: string
+  gh_archived_by_greenhouse: boolean
+  gh_business_line?: string | null
+}
+
+export interface HubSpotGreenhouseUpdateProductRequest {
+  name?: string | null
+  description?: string | null
+  unitPrice?: number | null
+  sku?: string | null
+  isArchived?: boolean | null
+  customProperties?: Partial<HubSpotGreenhouseProductCustomProperties>
+}
+
+export interface HubSpotGreenhouseUpdateProductResponse {
+  status: 'updated' | 'endpoint_not_deployed'
+  hubspotProductId: string | null
+  message?: string
+}
+
+export const updateHubSpotGreenhouseProduct = async (
+  hubspotProductId: string,
+  payload: HubSpotGreenhouseUpdateProductRequest
+): Promise<HubSpotGreenhouseUpdateProductResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  // TASK-347 defense-in-depth: the sanitizer guarantees cost fields never leave
+  // Greenhouse. Strip any leakage at the wire boundary as well.
+  const safePayload: Record<string, unknown> = { ...payload }
+
+  delete safePayload.costOfGoodsSold
+
+  const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(safePayload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotProductId,
+      message:
+        'HubSpot integration service does not expose PATCH /products/:id yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for PATCH /products/${hubspotProductId}: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseUpdateProductResponse
+}
+
+export interface HubSpotGreenhouseArchiveProductResponse {
+  status: 'archived' | 'endpoint_not_deployed'
+  hubspotProductId: string | null
+  message?: string
+}
+
+export const archiveHubSpotGreenhouseProduct = async (
+  hubspotProductId: string,
+  reason?: string
+): Promise<HubSpotGreenhouseArchiveProductResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}/archive`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reason: reason ?? 'source_deactivated_in_greenhouse' }),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotProductId,
+      message:
+        'HubSpot integration service does not expose POST /products/:id/archive yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for POST /products/${hubspotProductId}/archive: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseArchiveProductResponse
+}
+
+export interface HubSpotGreenhouseReconcileProductsRequest {
+  cursor?: string | null
+  limit?: number
+  includeArchived?: boolean
+}
+
+export interface HubSpotGreenhouseReconcileProductItem {
+  hubspotProductId: string
+  gh_product_code: string | null
+  gh_source_kind: string | null
+  gh_last_write_at: string | null
+  name: string | null
+  sku: string | null
+  price: number | null
+  description: string | null
+  isArchived: boolean
+}
+
+export interface HubSpotGreenhouseReconcileProductsResponse {
+  status: 'ok' | 'endpoint_not_deployed'
+  items: HubSpotGreenhouseReconcileProductItem[]
+  nextCursor?: string | null
+  message?: string
+}
+
+export const reconcileHubSpotGreenhouseProducts = async (
+  input: HubSpotGreenhouseReconcileProductsRequest = {}
+): Promise<HubSpotGreenhouseReconcileProductsResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const params = new URLSearchParams()
+
+  if (input.cursor) params.set('cursor', input.cursor)
+  if (typeof input.limit === 'number' && input.limit > 0) params.set('limit', String(input.limit))
+  if (input.includeArchived) params.set('includeArchived', 'true')
+
+  const query = params.toString() ? `?${params.toString()}` : ''
+
+  const response = await fetch(`${baseUrl}/products/reconcile${query}`, {
+    method: 'GET',
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      items: [],
+      message:
+        'HubSpot integration service does not expose GET /products/reconcile yet. TASK-548 drift detector should treat this as an empty batch.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for GET /products/reconcile: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseReconcileProductsResponse
 }
 
 // ── Line Items client methods (TASK-211) ──

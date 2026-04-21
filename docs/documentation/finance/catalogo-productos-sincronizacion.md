@@ -155,13 +155,73 @@ Los nuevos lifecycle publishers están expuestos también para que futuros flujo
 
 Los overhead addons ya emiten correctamente desde `upsertOverheadAddonEntry` cuando el upsert detecta transiciones.
 
+## Sincronización automática a HubSpot (Fase C — TASK-547 shipped)
+
+Desde TASK-547, cada evento de lifecycle que emite la materialización (`commercial.product_catalog.{created,updated,archived,unarchived}`) dispara automáticamente un push a HubSpot via el bridge `productHubSpotOutbound`.
+
+### Qué pasa al escribir un producto
+
+1. El materializer de TASK-546 emite un evento con el `productId`.
+2. El reactive worker (Cloud Run `ops-worker`) consume el evento, domain `cost_intelligence`.
+3. La proyección `productHubSpotOutbound` invoca `pushProductToHubSpot(productId)`.
+4. El helper:
+   - Lee la fila actual de `product_catalog`.
+   - **Anti-ping-pong**: si `hubspot_last_write_at` fue hace menos de 60s, skippea (evita echo de un webhook inbound que llegó justo después de un outbound).
+   - Decide la acción según el estado: `create` (sin hubspot_product_id), `update` (con id), `archive` (flag archived + id), `unarchive` (flag false + id), `noop` (archive sin id).
+   - Adapta el payload con 5 custom properties Greenhouse (`gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`, `gh_business_line`).
+   - Llama al Cloud Run `hubspot-greenhouse-integration`.
+   - Persiste el trace: `hubspot_sync_status`, `hubspot_sync_error`, `hubspot_sync_attempt_count`, `last_outbound_sync_at`, `hubspot_last_write_at`, `hubspot_product_id`.
+   - Emite `commercial.product.hubspot_synced_out` o `commercial.product.hubspot_sync_failed`.
+
+### Estados de sync
+
+| `hubspot_sync_status` | Significado |
+|---|---|
+| `NULL` | Nunca intentado (rows pre-TASK-547 o recién creadas sin trigger aún) |
+| `synced` | Último push exitoso; HubSpot tiene el estado actual |
+| `pending` | Enqueued pero aún no procesado (estado transitorio raro) |
+| `failed` | 5xx o error inesperado; retry worker lo reintenta con backoff |
+| `endpoint_not_deployed` | El endpoint del Cloud Run aún no existe (patrón TASK-524); trace persiste, retry worker lo recoge cuando shipa |
+| `skipped_no_anchors` | Skipped por anti-ping-pong o archive sin hubspot_product_id (no hay acción útil) |
+
+### Los 3 endpoints del Cloud Run
+
+El servicio `hubspot-greenhouse-integration` (repo externo) debe exponer:
+
+- `POST /products` — create (ya deployado).
+- `PATCH /products/:hubspotProductId` — update fields respetando field authority.
+- `POST /products/:hubspotProductId/archive` — archival; HubSpot marca el product inactive.
+- `GET /products/reconcile` — batch read para que TASK-548 (drift) compare checksums.
+
+Los últimos 3 aún no están deployados — el cliente handle 404 como `endpoint_not_deployed` y el retry worker reprocessa cuando shipan.
+
+### 5 custom properties en HubSpot
+
+Crear via runbook `docs/operations/hubspot-custom-properties-products.md` antes de activar el bridge.
+
+| Property | Tipo | Para qué |
+|---|---|---|
+| `gh_product_code` | string (read-only) | SKU canónico (ECG/ETG/EFO/EFG) para joinear con Greenhouse |
+| `gh_source_kind` | enum (read-only) | Catálogo fuente Greenhouse |
+| `gh_last_write_at` | datetime (read-only) | Anti-ping-pong timestamp |
+| `gh_archived_by_greenhouse` | bool (read-only) | Distingue archival operativo vs manual |
+| `gh_business_line` | string | BU owner |
+
+### Guarantees
+
+- **Idempotencia**: llamar al bridge 2 veces con el mismo estado es no-op en HubSpot + refresh del trace.
+- **Field authority**: `sanitizeHubSpotProductPayload` (TASK-347 guard) strip 14 campos cost/margin. Greenhouse NUNCA emite internal costing.
+- **Atomicidad trace + emit**: el UPDATE del trace y el publishing del outbox event corren en la misma transacción para create path. Update/archive/unarchive usan persist + emit secuencial (no requieren atomicidad porque solo tocan el propio producto).
+- **Retry gracioso**: 5xx → reactive worker retry; 404 → persist `endpoint_not_deployed` sin retry (hasta que deploy shipa y el worker de retry lo despierte).
+
 ## Qué NO hace esta task (out of scope)
 
-- **TASK-547 (Fase C)**: push a HubSpot Products API. Los eventos ya están, falta la proyección outbound.
-- **TASK-548 (Fase D)**: drift detection cron. Comparar `gh_owned_fields_checksum` con HubSpot + Admin Center para resolution.
+- **TASK-548 (Fase D)**: drift detection cron. Comparar `gh_owned_fields_checksum` con HubSpot + Admin Center para resolution. El cliente `reconcileHubSpotGreenhouseProducts` ya está listo para consumir.
 - **TASK-549 (Fase E)**: deprecar inbound auto-adopt + remover flags + drop `sync_direction='hubspot_only'`.
 - **Variantes del mismo producto** (sellable_role_variant) — scaffolded en schema pero sin handler.
 - **Service bundle en HubSpot** — deferido.
+- **Multi-currency variants** — depende de TASK-421. Hoy 1 product en USD por source entity.
+- **Batch API HubSpot** (coalescing ≥5 events en ventana 30s) — deferido; requiere cambios cross-projection en el reactive worker.
 
 ## Preguntas frecuentes
 

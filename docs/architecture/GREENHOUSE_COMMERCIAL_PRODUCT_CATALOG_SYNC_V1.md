@@ -1,11 +1,80 @@
 # Greenhouse EO — Commercial Product Catalog Sync Architecture V1
 
-> **Version:** 1.2
+> **Version:** 1.3
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
-> **Ultima actualizacion:** 2026-04-21 por Claude (Opus 4.7) — Fase B shipped (TASK-546)
+> **Ultima actualizacion:** 2026-04-21 por Claude (Opus 4.7) — Fase C shipped (TASK-547)
 > **Audience:** Backend engineers, product owners, agentes que implementen features de catalog management, pricing, quote builder o HubSpot sync
 > **Related:** `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## Delta 2026-04-21 — Fase C shipped (TASK-547)
+
+Outbound bridge reactivo `product_catalog → HubSpot Products` cerrando el loop Greenhouse-first. Los eventos emitidos por la materialización de Fase B ahora disparan pushes a HubSpot vía Cloud Run.
+
+### Implementado en Fase C
+
+| Area | Artefacto |
+|---|---|
+| Migration | `migrations/20260421180531865_task-547-product-catalog-hubspot-sync-trace.sql` — 4 columnas nuevas en `product_catalog` (`hubspot_sync_status`, `hubspot_sync_error`, `hubspot_sync_attempt_count`, `hubspot_last_write_at`) + CHECK constraint del status enum + CHECK consistencia `hubspot_product_id → last_outbound_sync_at` + 2 indexes (retryable, last_write) + backfill defensivo para rows legacy con `hubspot_product_id` sin `last_outbound_sync_at` |
+| Event catalog | `commercial.product.hubspot_synced_out` + `commercial.product.hubspot_sync_failed` sobre aggregate `product_catalog` |
+| Publishers | `src/lib/hubspot/product-hubspot-events.ts` — `publishProductHubSpotSynced` + `publishProductHubSpotSyncFailed` |
+| Types | `src/lib/hubspot/product-hubspot-types.ts` — `ProductHubSpotSyncStatus` union + `ProductHubSpotPushAction` + `ProductHubSpotPushResult` + `ProductNotFoundError` |
+| Cloud Run client extensions | 3 métodos nuevos en `src/lib/integrations/hubspot-greenhouse-service.ts`: `updateHubSpotGreenhouseProduct`, `archiveHubSpotGreenhouseProduct`, `reconcileHubSpotGreenhouseProducts`. Todos con graceful fallback `endpoint_not_deployed` en 404 (patrón TASK-524/539) — los endpoints server-side viven en el repo externo `hubspot-greenhouse-integration` y se deploy-ean por separado. La interfaz `HubSpotGreenhouseCreateProductRequest` gana `createdBy` + `customProperties` typed. |
+| Payload adapter | `src/lib/hubspot/hubspot-product-payload-adapter.ts` — `adaptProductCatalogToHubSpot{Create,Update}Payload` mapean el snapshot canónico a payload HubSpot con 5 custom properties (`gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`, `gh_business_line`). Pasa por `sanitizeHubSpotProductPayload` (TASK-347 guard) como defense-in-depth |
+| Push helper | `src/lib/hubspot/push-product-to-hubspot.ts` — pipeline idempotente: `readRow → antiPingPongCheck → deriveAction → callCloudRun → persistTrace → emit`. Anti-ping-pong skippea cuando `hubspot_last_write_at` < 60s. Cada path de degradación (`endpoint_not_deployed`, `skipped_no_anchors`, `failed`) persiste el trace + emite el evento apropiado; solo 5xx rethrow para retry del reactive worker |
+| Projection | `src/lib/sync/projections/product-hubspot-outbound.ts` — domain `cost_intelligence`, `maxRetries: 2`, consume los 4 eventos `commercial.product_catalog.{created,updated,archived,unarchived}` |
+| Registry | `src/lib/sync/projections/index.ts` ganó `registerProjection(productHubSpotOutboundProjection)` |
+| Custom properties spec | `scripts/create-hubspot-product-custom-properties.ts` — array de 5 property definitions + helper `planCustomPropertyCreation` idempotente. NO mutator directo (este repo no tiene creds HubSpot); aplicación offline via skill `hubspot-ops` |
+| Operations runbook | `docs/operations/hubspot-custom-properties-products.md` — cuándo correr, validación sandbox→prod, troubleshooting, rollback |
+| Tests | 30 tests: 6 payload adapter (create/update mapping, null handling, custom props stability), 13 push helper (happy paths, skip paths, anti-ping-pong, endpoint_not_deployed, error paths), 11 projection (registration, scope extraction, dispatch, eventType drop) |
+
+### Decisiones vs spec §7-§8
+
+| Spec asume | Decisión pragmática |
+|---|---|
+| Cloud Run service `hubspot-greenhouse-integration` vive en `services/` de este repo | Vive en repo externo. Este repo implementa el **cliente** con graceful `endpoint_not_deployed` fallback en los 3 endpoints pendientes (PATCH/archive/reconcile). Deploy del service queda como follow-up del repo `hubspot-greenhouse-integration` |
+| Anti-ping-pong helper compartido de TASK-540 | TASK-540 aún `to-do`. Implementado inline en `push-product-to-hubspot.ts`: lectura de `hubspot_last_write_at` + ventana 60s. Cuando TASK-540 llegue con el helper canónico, refactor |
+| Columna nueva `gh_last_write_at` | No necesaria: `hubspot_last_write_at` (migration TASK-547) cumple esa función; `last_outbound_sync_at` (TASK-545) sigue como el ACK timestamp para UI display |
+| `sync_status` granular (5 estados) | Columna legacy `sync_status` es `local_only | pending_sync | synced`. NO se toca. En su lugar 4 cols nuevas específicas del bridge HubSpot (espejo del patrón TASK-524 income), con CHECK constraint enforced |
+| Batch API HubSpot para ≥5 events en 30s | Deferido. El reactive worker procesa events 1:1 hoy; introducir coalescing requiere cambios cross-projection. Follow-up explícito post-producción |
+| Tests E2E contra HubSpot sandbox | Deferido a post-deploy. Los 30 unit tests cubren todos los paths del push helper + adapter + projection con mocks; E2E contra HubSpot real queda para staging smoke test post-activación del flag |
+
+### Runtime topology confirmada
+
+- **ops-worker** (Cloud Run) — corre `productHubSpotOutboundProjection` del outbox. Consume eventos `commercial.product_catalog.*` emitidos por la materialización de TASK-546. Mismo carril que `quotationHubSpotOutbound` (TASK-463) y `incomeHubSpotOutbound` (TASK-524).
+- **hubspot-greenhouse-integration** (Cloud Run, repo externo) — HTTP facade a HubSpot Products API. Expone `POST /products` (ya deployado), y **necesita deploy** de `PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile`. El cliente de este repo handle 404 como `endpoint_not_deployed` y el retry worker reprocessa cuando el service ship los endpoints.
+- **commercial-cost-worker** — NO participa. Reservado para cost basis materialization.
+
+### Decisión multi-currency (open question #4 resuelta)
+
+**Decisión**: 1 product por sellable entity, pricing en **USD** (moneda canónica de Greenhouse hoy). Multi-currency products vía `source_variant_key` (ej. ECG-001 → `ECG-001-CLP`, `ECG-001-USD`) se difiere hasta TASK-421 (Finance Multi-Currency Expansion).
+
+Rationale:
+- El schema de `product_catalog` ya soporta `source_variant_key` como discriminador — no hay blocker técnico.
+- HubSpot Enterprise tier soporta multi-currency native en products, pero introducir esa complejidad sin primero estabilizar el loop unidireccional USD genera deuda.
+- Greenhouse pricing engine ya es USD-first en los handlers de TASK-546.
+
+Cuando TASK-421 desbloquee multi-currency, el adapter + materializer extenderán para emitir 1 product per (source, currency) tuple, con `source_variant_key = currency_code`.
+
+### Rollout plan
+
+1. **Deploy del service externo**: el repo `hubspot-greenhouse-integration` debe shipear `PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile` antes de activar el bridge. Mientras tanto, el cliente handle 404 como `endpoint_not_deployed` y el retry worker reprocessa cuando shipa.
+2. **Custom properties**: correr runbook `docs/operations/hubspot-custom-properties-products.md` contra sandbox HubSpot, validar, replicar en production.
+3. **Staging activation**: con los flags `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}` ya ON de TASK-546, los eventos fluirán. Monitorear:
+   - `greenhouse_commercial.product_catalog.hubspot_sync_status` distribución
+   - Outbox lag (eventos `commercial.product_catalog.*` con edad >5min)
+   - `hubspot_sync_attempt_count` max per product (alerta si >3)
+4. **Production activation**: replicar tras 48h de staging sin errores.
+
+### Gaps reconocidos para fases siguientes
+
+1. **TASK-548 (Fase D)** — drift cron: consume `reconcileHubSpotGreenhouseProducts` para comparar `gh_owned_fields_checksum` con snapshot HubSpot; escribe `product_sync_conflicts`. La capa client está lista.
+2. **TASK-549 (Fase E)** — policy enforcement: deprecar inbound auto-adopt y drop `sync_direction='hubspot_only'`.
+3. **Follow-up outbound service**: deploy de `PATCH/archive/reconcile` endpoints en `hubspot-greenhouse-integration`.
+4. **Batch API coalescing** — si el volumen justifica, agregar window-based batching de eventos 30s en el reactive worker.
+5. **Multi-currency variants** — se desbloquea con TASK-421.
 
 ---
 

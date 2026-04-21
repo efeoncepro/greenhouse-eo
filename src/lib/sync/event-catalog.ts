@@ -439,6 +439,10 @@ export const EVENT_TYPES = {
   productCatalogUpdated: 'commercial.product_catalog.updated',
   productCatalogArchived: 'commercial.product_catalog.archived',
   productCatalogUnarchived: 'commercial.product_catalog.unarchived',
+
+  // Product Catalog HubSpot Outbound (TASK-547)
+  productHubSpotSynced: 'commercial.product.hubspot_synced_out',
+  productHubSpotSyncFailed: 'commercial.product.hubspot_sync_failed',
   productSyncConflictDetected: 'commercial.product_sync_conflict.detected',
   productSyncConflictResolved: 'commercial.product_sync_conflict.resolved',
   sellableRoleCreated: 'commercial.sellable_role.created',

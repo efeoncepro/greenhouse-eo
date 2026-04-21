@@ -36,6 +36,7 @@ import { quotationHubSpotOutboundProjection } from './quotation-hubspot-outbound
 import { dealPipelineProjection } from './deal-pipeline'
 import { contractMrrArrProjection } from './contract-mrr-arr'
 import { sourceToProductCatalogProjection } from './source-to-product-catalog'
+import { productHubSpotOutboundProjection } from './product-hubspot-outbound'
 import { incomeHubSpotOutboundProjection } from './income-hubspot-outbound'
 import { quoteToCashAutopromoterProjection } from './quote-to-cash-autopromoter'
 
@@ -84,6 +85,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(dealPipelineProjection)
   registerProjection(contractMrrArrProjection)
   registerProjection(sourceToProductCatalogProjection)
+  registerProjection(productHubSpotOutboundProjection)
   registerProjection(incomeHubSpotOutboundProjection)
   registerProjection(quoteToCashAutopromoterProjection)
 }
