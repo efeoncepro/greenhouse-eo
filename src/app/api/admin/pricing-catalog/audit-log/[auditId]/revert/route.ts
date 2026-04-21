@@ -13,6 +13,11 @@ import {
   PricingCatalogRevertNotSupportedError
 } from '@/lib/commercial/pricing-catalog-revert'
 import {
+  applyPricingCatalogEntityChanges,
+  EntityWriterError,
+  PRICING_CATALOG_ENTITY_WHITELIST
+} from '@/lib/commercial/pricing-catalog-entity-writer'
+import {
   canRevertPricingCatalogChange,
   requireAdminTenantContext
 } from '@/lib/tenant/authorization'
@@ -29,65 +34,6 @@ interface RevertRequestBody {
 
 const REASON_MIN_LENGTH = 15
 const REASON_MAX_LENGTH = 500
-
-// Whitelist of columns that the revert endpoint is allowed to restore per entity_type.
-// Avoids accidental writes to timestamps, sku sequences, computed columns, FKs managed by
-// separate stores (cost components, pricing rows, compatibility), etc.
-const REVERT_COLUMN_WHITELIST: Record<string, { schema: string; table: string; pk: string; columns: string[] }> = {
-  sellable_role: {
-    schema: 'greenhouse_commercial',
-    table: 'sellable_roles',
-    pk: 'role_id',
-    columns: [
-      'role_label_es',
-      'role_label_en',
-      'role_category',
-      'role_tier',
-      'tier_label',
-      'can_sell_as_staff',
-      'can_sell_as_service_component',
-      'active',
-      'notes'
-    ]
-  },
-  tool_catalog: {
-    schema: 'greenhouse_ai',
-    table: 'tool_catalog',
-    pk: 'tool_id',
-    columns: [
-      'tool_name',
-      'tool_category',
-      'cost_model',
-      'subscription_amount',
-      'subscription_currency',
-      'subscription_billing_cycle',
-      'is_active',
-      'notes'
-    ]
-  },
-  overhead_addon: {
-    schema: 'greenhouse_commercial',
-    table: 'overhead_addons',
-    pk: 'addon_id',
-    columns: [
-      'addon_name',
-      'category',
-      'addon_type',
-      'cost_internal_usd',
-      'margin_pct',
-      'final_price_usd',
-      'pct_min',
-      'final_price_pct',
-      'pct_max',
-      'visible_to_client',
-      'active',
-      'notes'
-    ]
-  }
-}
-
-const snakeCase = (camel: string): string =>
-  camel.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
 
 /**
  * POST /api/admin/pricing-catalog/audit-log/[auditId]/revert
@@ -182,34 +128,11 @@ export async function POST(request: Request, { params }: { params: Promise<Route
     throw error
   }
 
-  const whitelist = REVERT_COLUMN_WHITELIST[entry.entityType]
-
-  if (!whitelist) {
+  if (!PRICING_CATALOG_ENTITY_WHITELIST[entry.entityType]) {
     return NextResponse.json(
       {
         error: `Revert not supported for entity_type "${entry.entityType}" in V1.`,
         code: 'revert_entity_not_supported'
-      },
-      { status: 400 }
-    )
-  }
-
-  // Filter payload to whitelisted columns only. Support both snake_case and camelCase keys.
-  const updates: Record<string, unknown> = {}
-
-  for (const [key, value] of Object.entries(descriptor.payload)) {
-    const snakeKey = key.includes('_') ? key : snakeCase(key)
-
-    if (whitelist.columns.includes(snakeKey)) {
-      updates[snakeKey] = value
-    }
-  }
-
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json(
-      {
-        error: 'No revertible fields in audit entry (all fields are outside the revert whitelist).',
-        code: 'revert_no_whitelisted_fields'
       },
       { status: 400 }
     )
@@ -222,31 +145,17 @@ export async function POST(request: Request, { params }: { params: Promise<Route
 
   try {
     const result = await withTransaction(async (client: PoolClient) => {
-      // Build UPDATE statement with positional params.
-      const setClauses: string[] = []
-      const values: unknown[] = []
-
-      Object.entries(updates).forEach(([col, val], index) => {
-        setClauses.push(`"${col}" = $${index + 1}`)
-        values.push(val)
+      const applyResult = await applyPricingCatalogEntityChanges({
+        client,
+        entityType: entry.entityType,
+        entityId: entry.entityId,
+        changeset: descriptor.payload
       })
 
-      values.push(entry.entityId)
+      const updates: Record<string, unknown> = {}
 
-      const updateRes = await client.query(
-        `UPDATE ${whitelist.schema}.${whitelist.table}
-            SET ${setClauses.join(', ')},
-                updated_at = NOW()
-          WHERE ${whitelist.pk} = $${values.length}
-          RETURNING ${whitelist.pk}`,
-        values
-      )
-
-      if (updateRes.rowCount === 0) {
-        throw new PricingCatalogRevertNotSupportedError(
-          'Entity no longer exists; cannot revert.',
-          'entity_gone'
-        )
+      for (const field of applyResult.updatedFields) {
+        updates[field] = descriptor.payload[field] ?? descriptor.payload[field.replace(/_([a-z])/g, (_, c) => c.toUpperCase())]
       }
 
       const auditInsert = await client.query<{ audit_id: string }>(
@@ -281,6 +190,10 @@ export async function POST(request: Request, { params }: { params: Promise<Route
 
     return NextResponse.json({ reverted: true, ...result }, { status: 200 })
   } catch (error) {
+    if (error instanceof EntityWriterError) {
+      return NextResponse.json({ error: error.message, code: error.code }, { status: error.statusCode })
+    }
+
     if (error instanceof PricingCatalogRevertNotSupportedError) {
       const status = error.code === 'entity_gone' ? 409 : 400
 

@@ -239,6 +239,81 @@ const parseRoleRow = (row: ExcelJS.Row): Record<string, unknown> | null => {
   }
 }
 
+const parseToolRow = (row: ExcelJS.Row): Record<string, unknown> | null => {
+  const cells = row.values as Array<ExcelJS.CellValue> | undefined
+
+  if (!cells || cells.length < 9) return null
+
+  const toolId = cells[1]
+
+  if (!toolId || typeof toolId !== 'string') return null
+
+  const toBool = (v: ExcelJS.CellValue): boolean => v === true || v === 'true' || v === 1
+
+  const toStr = (v: ExcelJS.CellValue): string | null => {
+    if (v === null || v === undefined || v === '') return null
+
+    return String(v)
+  }
+
+  const toNum = (v: ExcelJS.CellValue): number | null => {
+    if (v === null || v === undefined || v === '') return null
+    const n = typeof v === 'number' ? v : Number(v)
+
+    return Number.isFinite(n) ? n : null
+  }
+
+  return {
+    tool_id: toolId,
+    tool_sku: toStr(cells[2]),
+    tool_name: toStr(cells[3]),
+    tool_category: toStr(cells[4]),
+    cost_model: toStr(cells[5]),
+    subscription_amount: toNum(cells[6]),
+    subscription_currency: toStr(cells[7]),
+    subscription_billing_cycle: toStr(cells[8]),
+    is_active: toBool(cells[9])
+  }
+}
+
+const parseOverheadRow = (row: ExcelJS.Row): Record<string, unknown> | null => {
+  const cells = row.values as Array<ExcelJS.CellValue> | undefined
+
+  if (!cells || cells.length < 10) return null
+
+  const addonId = cells[1]
+
+  if (!addonId || typeof addonId !== 'string') return null
+
+  const toBool = (v: ExcelJS.CellValue): boolean => v === true || v === 'true' || v === 1
+
+  const toStr = (v: ExcelJS.CellValue): string | null => {
+    if (v === null || v === undefined || v === '') return null
+
+    return String(v)
+  }
+
+  const toNum = (v: ExcelJS.CellValue): number | null => {
+    if (v === null || v === undefined || v === '') return null
+    const n = typeof v === 'number' ? v : Number(v)
+
+    return Number.isFinite(n) ? n : null
+  }
+
+  return {
+    addon_id: addonId,
+    addon_sku: toStr(cells[2]),
+    addon_name: toStr(cells[3]),
+    category: toStr(cells[4]),
+    addon_type: toStr(cells[5]),
+    cost_internal_usd: toNum(cells[6]),
+    margin_pct: toNum(cells[7]),
+    final_price_usd: toNum(cells[8]),
+    visible_to_client: toBool(cells[9]),
+    active: toBool(cells[10])
+  }
+}
+
 const diffFields = (
   current: Record<string, unknown> | null,
   next: Record<string, unknown>
@@ -266,7 +341,6 @@ export const previewPricingCatalogExcelImport = async (
     metadata: { rolesProcessed: 0, toolsProcessed: 0, overheadsProcessed: 0, errors: [] }
   }
 
-  // Roles only for V1 import preview. Tools + overheads export-only.
   const rolesSheet = workbook.getWorksheet('Roles')
 
   if (rolesSheet) {
@@ -325,6 +399,123 @@ export const previewPricingCatalogExcelImport = async (
       } catch (err) {
         result.metadata.errors.push({
           sheet: 'Roles',
+          row: rowNumber,
+          message: err instanceof Error ? err.message : 'Error parseando fila.'
+        })
+      }
+    })
+  }
+
+  const toolsSheet = workbook.getWorksheet('Tools')
+
+  if (toolsSheet) {
+    const currentTools = await listToolCatalog({})
+    const currentById = new Map(currentTools.map(t => [t.toolId, t]))
+
+    toolsSheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return
+
+      try {
+        const parsed = parseToolRow(row)
+
+        if (!parsed) {
+          result.metadata.errors.push({ sheet: 'Tools', row: rowNumber, message: 'Fila sin tool_id; omitida.' })
+
+          return
+        }
+
+        result.metadata.toolsProcessed += 1
+
+        const current = currentById.get(parsed.tool_id as string)
+
+        const currentValues = current
+          ? {
+              tool_id: current.toolId,
+              tool_sku: current.toolSku,
+              tool_name: current.toolName,
+              tool_category: current.toolCategory ?? null,
+              cost_model: current.costModel ?? null,
+              subscription_amount: current.subscriptionAmount ?? null,
+              subscription_currency: current.subscriptionCurrency ?? null,
+              subscription_billing_cycle: current.subscriptionBillingCycle ?? null,
+              is_active: current.isActive
+            }
+          : null
+
+        const { action, fieldsChanged } = diffFields(currentValues, parsed)
+
+        result.diffs.push({
+          entityType: 'tool_catalog',
+          entityId: parsed.tool_id as string,
+          entitySku: (parsed.tool_sku as string | null) ?? current?.toolSku ?? null,
+          action,
+          currentValues,
+          newValues: parsed,
+          fieldsChanged,
+          warnings: []
+        })
+      } catch (err) {
+        result.metadata.errors.push({
+          sheet: 'Tools',
+          row: rowNumber,
+          message: err instanceof Error ? err.message : 'Error parseando fila.'
+        })
+      }
+    })
+  }
+
+  const overheadsSheet = workbook.getWorksheet('Overheads')
+
+  if (overheadsSheet) {
+    const currentOverheads = await listOverheadAddons({})
+    const currentById = new Map(currentOverheads.map(o => [o.addonId, o]))
+
+    overheadsSheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return
+
+      try {
+        const parsed = parseOverheadRow(row)
+
+        if (!parsed) {
+          result.metadata.errors.push({ sheet: 'Overheads', row: rowNumber, message: 'Fila sin addon_id; omitida.' })
+
+          return
+        }
+
+        result.metadata.overheadsProcessed += 1
+
+        const current = currentById.get(parsed.addon_id as string)
+
+        const currentValues = current
+          ? {
+              addon_id: current.addonId,
+              addon_sku: current.addonSku,
+              addon_name: current.addonName,
+              category: current.category ?? null,
+              addon_type: current.addonType ?? null,
+              cost_internal_usd: current.costInternalUsd ?? null,
+              margin_pct: current.marginPct ?? null,
+              final_price_usd: current.finalPriceUsd ?? null,
+              visible_to_client: current.visibleToClient,
+              active: current.active
+            }
+          : null
+
+        const { action, fieldsChanged } = diffFields(currentValues, parsed)
+
+        result.diffs.push({
+          entityType: 'overhead_addon',
+          entityId: parsed.addon_id as string,
+          entitySku: (parsed.addon_sku as string | null) ?? current?.addonSku ?? null,
+          action,
+          currentValues,
+          newValues: parsed,
+          fieldsChanged,
+          warnings: []
+        })
+      } catch (err) {
+        result.metadata.errors.push({
+          sheet: 'Overheads',
           row: rowNumber,
           message: err instanceof Error ? err.message : 'Error parseando fila.'
         })

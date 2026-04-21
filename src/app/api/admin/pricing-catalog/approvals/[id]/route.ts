@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { getServerAuthSession } from '@/lib/auth'
 import {
+  ApprovalApplyError,
   ApprovalNotPendingError,
   ApprovalSelfReviewError,
   decideApproval
@@ -68,7 +69,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       comment
     })
 
-    return NextResponse.json({ approval: result })
+    return NextResponse.json({
+      approval: result.approval,
+      applied: result.applied,
+      appliedFields: result.appliedFields,
+      newAuditId: result.newAuditId
+    })
   } catch (error) {
     if (error instanceof ApprovalSelfReviewError) {
       return NextResponse.json({ error: error.message, code: 'self_review' }, { status: 403 })
@@ -76,6 +82,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
     if (error instanceof ApprovalNotPendingError) {
       return NextResponse.json({ error: error.message, code: 'not_pending' }, { status: 409 })
+    }
+
+    if (error instanceof ApprovalApplyError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode }
+      )
     }
 
     console.error('[TASK-471] Failed to decide approval', error)

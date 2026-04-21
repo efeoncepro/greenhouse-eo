@@ -32,6 +32,8 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 
+import Checkbox from '@mui/material/Checkbox'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -39,6 +41,8 @@ import tableStyles from '@core/styles/table.module.css'
 
 import CreateToolDrawer from './drawers/CreateToolDrawer'
 import EditToolDrawer from './drawers/EditToolDrawer'
+import BulkEditDrawer from './drawers/BulkEditDrawer'
+import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -78,10 +82,40 @@ const columnHelper = createColumnHelper<ToolItem>()
 const buildColumns = (
   onToggleActive: (tool: ToolItem, next: boolean) => void,
   togglingId: string | null,
-  onEdit: (tool: ToolItem) => void
+  onEdit: (tool: ToolItem) => void,
+  selectedIds: Set<string>,
+  onToggleSelect: (toolId: string, checked: boolean) => void,
+  onToggleSelectAll: (checked: boolean) => void,
+  allSelectedIds: string[]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ColumnDef<ToolItem, any>[] => [
+  columnHelper.display({
+    id: 'select',
+    size: 40,
+    header: () => {
+      const allSelected = allSelectedIds.length > 0 && allSelectedIds.every(id => selectedIds.has(id))
+      const someSelected = allSelectedIds.some(id => selectedIds.has(id))
+
+      return (
+        <Checkbox
+          size='small'
+          checked={allSelected}
+          indeterminate={!allSelected && someSelected}
+          onChange={(_, checked) => onToggleSelectAll(checked)}
+          aria-label={GH_PRICING_GOVERNANCE.bulkEdit.selectAllLabel}
+        />
+      )
+    },
+    cell: ({ row }) => (
+      <Checkbox
+        size='small'
+        checked={selectedIds.has(row.original.toolId)}
+        onChange={(_, checked) => onToggleSelect(row.original.toolId, checked)}
+        aria-label={`Seleccionar ${row.original.toolSku}`}
+      />
+    )
+  }),
   columnHelper.accessor('toolSku', {
     header: 'SKU',
     cell: ({ getValue }) => (
@@ -309,9 +343,40 @@ const ToolCatalogListView = () => {
     setEditDrawerOpen(true)
   }, [])
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDrawerOpen, setBulkDrawerOpen] = useState(false)
+
+  const handleToggleSelect = useCallback((toolId: string, checked: boolean) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+
+      if (checked) next.add(toolId)
+      else next.delete(toolId)
+
+      return next
+    })
+  }, [])
+
+  const handleToggleSelectAll = useCallback(
+    (checked: boolean) => {
+      setSelectedIds(checked ? new Set(data?.items.map(i => i.toolId) ?? []) : new Set())
+    },
+    [data]
+  )
+
+  const allFilteredIds = useMemo(() => data?.items.map(i => i.toolId) ?? [], [data])
+
   const columns = useMemo(
-    () => buildColumns(handleToggleActive, togglingId, handleEdit),
-    [handleToggleActive, togglingId, handleEdit]
+    () => buildColumns(
+      handleToggleActive,
+      togglingId,
+      handleEdit,
+      selectedIds,
+      handleToggleSelect,
+      handleToggleSelectAll,
+      allFilteredIds
+    ),
+    [handleToggleActive, togglingId, handleEdit, selectedIds, handleToggleSelect, handleToggleSelectAll, allFilteredIds]
   )
 
   const table = useReactTable({
@@ -524,6 +589,53 @@ const ToolCatalogListView = () => {
         }}
         onSuccess={() => void loadData()}
       />
+
+      <BulkEditDrawer
+        open={bulkDrawerOpen}
+        entityType='tool_catalog'
+        entityIds={Array.from(selectedIds)}
+        onClose={() => setBulkDrawerOpen(false)}
+        onSuccess={result => {
+          toast.success(GH_PRICING_GOVERNANCE.bulkEdit.successToast(result.applied))
+          setSelectedIds(new Set())
+          void loadData()
+        }}
+      />
+
+      {selectedIds.size > 0 ? (
+        <Box
+          sx={theme => ({
+            position: 'fixed',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: theme.zIndex.snackbar,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            padding: '8px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            boxShadow: theme.shadows[6]
+          })}
+        >
+          <Typography variant='caption' sx={{ fontWeight: 600 }}>
+            {GH_PRICING_GOVERNANCE.bulkEdit.selectedCountLabel(selectedIds.size)}
+          </Typography>
+          <Button size='small' variant='text' onClick={() => setSelectedIds(new Set())}>
+            {GH_PRICING_GOVERNANCE.bulkEdit.clearSelectionLabel}
+          </Button>
+          <Button
+            size='small'
+            variant='contained'
+            startIcon={<i className='tabler-edit' />}
+            onClick={() => setBulkDrawerOpen(true)}
+          >
+            {GH_PRICING_GOVERNANCE.bulkEdit.bulkEditCta}
+          </Button>
+        </Box>
+      ) : null}
     </Grid>
   )
 }

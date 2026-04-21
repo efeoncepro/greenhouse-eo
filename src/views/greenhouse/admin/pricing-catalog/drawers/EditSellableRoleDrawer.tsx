@@ -271,6 +271,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
   const [notes, setNotes] = useState('')
   const [savingInfo, setSavingInfo] = useState(false)
   const [infoError, setInfoError] = useState<string | null>(null)
+  const [impactBlocking, setImpactBlocking] = useState(false)
 
   // Employment tab
   const [employmentTypes, setEmploymentTypes] = useState<EmploymentTypeOption[]>([])
@@ -1178,10 +1179,14 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                   variant='contained'
                   color='primary'
                   onClick={handleSaveInfo}
-                  disabled={savingInfo}
+                  disabled={savingInfo || impactBlocking}
                   startIcon={savingInfo ? <CircularProgress size={16} color='inherit' /> : undefined}
                 >
-                  {savingInfo ? 'Guardando...' : 'Guardar cambios'}
+                  {savingInfo
+                    ? 'Guardando...'
+                    : impactBlocking
+                      ? 'Confirmar impacto alto'
+                      : 'Guardar cambios'}
                 </Button>
               </Box>
             </Stack>
@@ -2246,7 +2251,11 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
       <Divider />
       {roleId ? (
         <Box sx={{ px: 4, py: 2 }}>
-          <ImpactPreviewPanel entityType='sellable_role' entityId={roleId} />
+          <ImpactPreviewPanel
+            entityType='sellable_role'
+            entityId={roleId}
+            onBlockingStateChange={setImpactBlocking}
+          />
         </Box>
       ) : null}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 4 }}>

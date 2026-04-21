@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -44,6 +44,17 @@ export interface ImpactPreviewPanelProps {
   changeset?: Record<string, unknown>
   requireHighImpactConfirmation?: boolean
   onConfirmationChange?: (confirmed: boolean) => void
+
+  /**
+   * Fires whenever the panel's "should-block-submit" state changes.
+   * `blocking=true` when the preview has loaded AND impact is high AND user
+   * has NOT yet checked the confirmation box. Once confirmed (or if impact
+   * is low, or if preview not loaded yet), fires `false`.
+   *
+   * Caller uses this to disable the drawer's Save CTA until confirmation
+   * is explicitly given for high-impact changes (TASK-471 Gap-2).
+   */
+  onBlockingStateChange?: (blocking: boolean) => void
 }
 
 const formatClp = (value: number): string => {
@@ -88,7 +99,8 @@ const ImpactPreviewPanel = ({
   entityId,
   changeset,
   requireHighImpactConfirmation = true,
-  onConfirmationChange
+  onConfirmationChange,
+  onBlockingStateChange
 }: ImpactPreviewPanelProps) => {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<ImpactPreviewResult | null>(null)
@@ -139,6 +151,14 @@ const ImpactPreviewPanel = ({
       (result.affectedQuotes.count >= HIGH_IMPACT_QUOTES_THRESHOLD ||
         result.affectedQuotes.totalAmountClp >= HIGH_IMPACT_CLP_THRESHOLD)
   )
+
+  // Emit blocking state whenever impact/confirmation status changes.
+  // Blocking = true when preview loaded + high impact + not confirmed yet.
+  useEffect(() => {
+    const blocking = Boolean(result && isHighImpact && requireHighImpactConfirmation && !confirmed)
+
+    onBlockingStateChange?.(blocking)
+  }, [result, isHighImpact, requireHighImpactConfirmation, confirmed, onBlockingStateChange])
 
   const handleConfirm = (value: boolean) => {
     setConfirmed(value)

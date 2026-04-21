@@ -1,6 +1,10 @@
 import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
+import {
+  applyPricingCatalogEntityChanges,
+  EntityWriterError
+} from './pricing-catalog-entity-writer'
 
 export type ApprovalCriticality = 'low' | 'medium' | 'high' | 'critical'
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
@@ -235,15 +239,41 @@ export class ApprovalNotPendingError extends Error {
   }
 }
 
+export class ApprovalApplyError extends Error {
+  code: string
+  statusCode: number
+
+  constructor(message: string, code = 'apply_failed', statusCode = 500) {
+    super(message)
+    this.name = 'ApprovalApplyError'
+    this.code = code
+    this.statusCode = statusCode
+  }
+}
+
+export interface DecideApprovalResult {
+  approval: PricingCatalogApprovalEntry
+  applied: boolean
+  appliedFields: string[] | null
+  newAuditId: string | null
+}
+
 /**
  * Transitions an approval to approved/rejected/cancelled. Enforces proposer ≠ reviewer
  * (unless decision='cancelled' by the proposer themselves).
- * Returns the updated approval entry; caller is responsible for applying the actual
- * change to the entity (separate concern — requires the entity store writer).
+ *
+ * When `decision='approved'`, this function ALSO auto-applies the proposed changes
+ * to the target entity (TASK-471 Gap-1) via `applyPricingCatalogEntityChanges`,
+ * and emits an audit row with action='approval_applied' in the same transaction.
+ * The entire flow is atomic: if the apply step fails (whitelist mismatch, entity
+ * gone, etc.), the approval status is also rolled back.
+ *
+ * Returns the approval entry + apply metadata (whether it was applied, updated
+ * fields, new audit id).
  */
 export const decideApproval = async (
   input: DecideApprovalInput
-): Promise<PricingCatalogApprovalEntry> => {
+): Promise<DecideApprovalResult> => {
   return withTransaction(async client => {
     const existing = await client.query<ApprovalRow>(
       `SELECT * FROM greenhouse_commercial.pricing_catalog_approval_queue
@@ -277,6 +307,64 @@ export const decideApproval = async (
       [input.decision, input.reviewerUserId, input.reviewerName, input.comment, input.approvalId]
     )
 
-    return mapRow(updated.rows[0])
+    const approval = mapRow(updated.rows[0])
+
+    // Auto-apply: only on approved decisions.
+    if (input.decision !== 'approved') {
+      return { approval, applied: false, appliedFields: null, newAuditId: null }
+    }
+
+    const proposedChanges = approval.proposedChanges
+
+    if (!proposedChanges || typeof proposedChanges !== 'object') {
+      return { approval, applied: false, appliedFields: null, newAuditId: null }
+    }
+
+    try {
+      const result = await applyPricingCatalogEntityChanges({
+        client,
+        entityType: approval.entityType,
+        entityId: approval.entityId,
+        changeset: proposedChanges
+      })
+
+      const auditRes = await client.query<{ audit_id: string }>(
+        `INSERT INTO greenhouse_commercial.pricing_catalog_audit_log (
+           entity_type, entity_id, entity_sku, action,
+           actor_user_id, actor_name, change_summary
+         ) VALUES ($1, $2, $3, 'approval_applied', $4, $5, $6::jsonb)
+         RETURNING audit_id`,
+        [
+          approval.entityType,
+          approval.entityId,
+          approval.entitySku,
+          input.reviewerUserId,
+          input.reviewerName,
+          JSON.stringify({
+            approval_id: approval.approvalId,
+            proposed_by_user_id: approval.proposedByUserId,
+            proposed_by_name: approval.proposedByName,
+            justification: approval.justification,
+            new_values: proposedChanges,
+            fields_changed: result.updatedFields,
+            criticality: approval.criticality,
+            review_comment: input.comment
+          })
+        ]
+      )
+
+      return {
+        approval,
+        applied: true,
+        appliedFields: result.updatedFields,
+        newAuditId: auditRes.rows[0]?.audit_id ?? null
+      }
+    } catch (error) {
+      if (error instanceof EntityWriterError) {
+        throw new ApprovalApplyError(error.message, error.code, error.statusCode)
+      }
+
+      throw error
+    }
   })
 }
