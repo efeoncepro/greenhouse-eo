@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Complete — 2026-04-21`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -165,26 +165,62 @@ Decision de escalabilidad:
 
 ## Acceptance Criteria
 
-- [ ] Existe foundation canonica de `tax_code` y snapshots tributarios en `greenhouse_finance`.
-- [ ] El repo tiene helpers reutilizables para resolver IVA Chile sin defaults hardcodeados por modulo.
-- [ ] Los tax codes semilla de Chile quedan testeados y documentados.
+- [x] Existe foundation canonica de `tax_code` y snapshots tributarios en `greenhouse_finance` — tabla `tax_codes` + JSONB snapshot shape versionado (`ChileTaxSnapshot` v1).
+- [x] El repo tiene helpers reutilizables para resolver IVA Chile sin defaults hardcodeados por modulo — `src/lib/tax/chile/` expone `loadChileTaxCodes`, `resolveChileTaxCode`, `tryResolveChileTaxCode`, `computeChileTaxAmounts`, `computeChileTaxSnapshot`, `validateChileTaxSnapshot`.
+- [x] Los tax codes semilla de Chile quedan testeados y documentados — 5 seeds aplicados y verificados via pg client; tests `compute.test.ts` (15) + `resolver.test.ts` (6) = 21 pass; doc delta en `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test`
-- `pnpm migrate:up`
+- [x] `pnpm lint` — 0 errores (solo warning pre-existente en `BulkEditDrawer.tsx`).
+- [x] `npx tsc --noEmit` — 0 errores.
+- [x] `pnpm test` — 1593/1593 pass + 2 skipped (21 nuevos tests sumados al baseline de 1572).
+- [x] `pnpm migrate:up` — aplicó `20260421011323497_task-466` (con hotfix idempotente) + `20260421105127894_task-529` secuencial; Kysely types regenerados automáticamente.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios o decisiones
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento o contrato
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] migracion y `src/types/db.d.ts` quedaron commiteados juntos
+- [x] `Lifecycle` del markdown sincronizado con el estado real (`complete`).
+- [x] Archivo vive en `docs/tasks/complete/`.
+- [ ] `docs/tasks/README.md` sincronizado con el cierre — TASK-511..550 no están registradas en el índice; omitido por consistencia con las otras del roadmap Ola 2/3.
+- [x] `Handoff.md` actualizado con la sesión TASK-529.
+- [ ] `changelog.md` — no existe `changelog.md` en el repo; la spec hace referencia pero el artefacto no fue creado aún. Deferred.
+- [x] Chequeo de impacto cruzado ejecutado: TASK-466 migration tenía bug bloqueante (tabla/columna inexistentes); hotfix shipped + ISSUE-056 abierta. TASK-530/531/532/533 quedan desbloqueadas (este era su gate).
+- [x] Migración y `src/types/db.d.ts` commiteados juntos.
+
+## Implementation Notes — 2026-04-21 (Claude Opus 4.7)
+
+**Archivos creados:**
+
+- `migrations/20260421105127894_task-529-chile-tax-code-foundation.sql` — tabla `greenhouse_finance.tax_codes` (18 columnas, 4 CHECK constraints, 4 índices, 5 seeds Chile v1).
+- `src/lib/tax/chile/types.ts` — shape canónico: `ChileTaxCodeId`, `TaxCodeKind`, `TaxRecoverability`, `TaxCodeRecord`, `ChileTaxSnapshot` v1, `ChileTaxAmounts`.
+- `src/lib/tax/chile/catalog.ts` — `loadChileTaxCodes` con Kysely + cache in-memory 5min + dedup tenant-override > global.
+- `src/lib/tax/chile/resolver.ts` — `resolveChileTaxCode` (hard) / `tryResolveChileTaxCode` (soft) + `ChileTaxCodeNotFoundError`.
+- `src/lib/tax/chile/compute.ts` — `computeChileTaxAmounts` / `computeChileTaxSnapshot` / `validateChileTaxSnapshot` + rounding CLP 2 decimales + `ChileTaxComputeError`.
+- `src/lib/tax/chile/index.ts` — barrel export.
+- `src/lib/tax/chile/compute.test.ts` (15 tests) + `src/lib/tax/chile/resolver.test.ts` (6 tests) = 21 unit tests verdes.
+- `docs/issues/open/ISSUE-056-missing-quotation-defaults-ddl-task-466.md` — incidente encontrado durante descubrimiento.
+
+**Archivos modificados:**
+
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — delta 2026-04-21 con runtime nuevo + helpers + contrato downstream + out-of-scope.
+- `docs/issues/README.md` — registro de ISSUE-056 + next ID 057.
+- `migrations/20260421011323497_task-466-expand-quotation-currency-constraint.sql` — hotfix `ALTER TABLE IF EXISTS` + DO block con chequeo `information_schema.columns` para desbloquear pipeline.
+- `src/types/db.d.ts` — regenerado automáticamente por `pnpm migrate:up` (incluye `GreenhouseFinanceTaxCodes`).
+- `Handoff.md` — sesión TASK-529 agregada al tope.
+
+**Sinergia con ecosistema:**
+
+- **TASK-530/531/532/533 desbloqueadas:** todas pueden ahora adoptar `ChileTaxSnapshot` como shape canónico + `resolveChileTaxCode` + `computeChileTaxAmounts`. No hay más razones para que cada módulo calcule IVA inline con default hardcoded 19%.
+- **TASK-466:** desbloqueada. La migración que llevaba días sin aplicarse a DB ahora corre idempotente.
+- **Patrón reutilizado:** el diseño sigue el mismo patrón que `src/lib/finance/quotation-fx-snapshot.ts` (FX snapshot versión 1 con `frozenAt`, immutable post-issuance). Consistencia cross-domain.
+- **No emite eventos outbox, no toca DDL downstream, no calcula métricas.** Es foundation pura; el valor es el contrato compartido.
+
+**Decisiones no-obvias:**
+
+1. **Tabla jurisdiction-agnostic (no `chile_tax_codes`):** shape soporta múltiples jurisdicciones desde el día 1 pero sólo Chile está seedeada. Evita rediseño cuando se agregue jurisdicción nueva. El spec mismo lo mandataba ("desacoplado para soportar nuevas jurisdicciones sin rediseñar aggregates").
+2. **`space_id` nullable con partial unique indexes:** global (`NULL`) vs tenant-scoped conviven sin colisión usando `WHERE space_id IS NULL` / `WHERE space_id IS NOT NULL`. Evita el approach feo de `COALESCE(space_id, uuid_nil)`.
+3. **`recoverability` como enum explícito (no derivado de `kind`):** TASK-532 quiere separar `partial` recoverability (vehículos uso mixto) en el futuro; inferir por kind ahora obligaría a mudar el contrato después. Cost bajo, optionalidad alta.
+4. **`ChileTaxComputeError` + `ChileTaxCodeNotFoundError` son hard errors:** no hay fallback silencioso a 19%. La spec dice "sin defaults hardcodeados por módulo" — consumers deben fallar temprano si el tax_code no aplica.
+5. **Resolver usa `query()` ni `Kysely`?** Kysely, usando `sql` literal para cast de fechas. DB types regenerados correctamente. Cero uso de `new Pool`.
 
 ## Follow-ups
 

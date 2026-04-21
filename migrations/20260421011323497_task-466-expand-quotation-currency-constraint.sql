@@ -27,10 +27,14 @@ ALTER TABLE greenhouse_commercial.quotations
     )
   );
 
-ALTER TABLE greenhouse_commercial.quotation_defaults
+-- NOTE (TASK-529 fix): `greenhouse_commercial.quotation_defaults` no tiene DDL
+-- en el repo (ni migracion ni setup script). Se guarda IF EXISTS para que la
+-- ampliacion del CHECK sea idempotente si la tabla aparece en el futuro sin
+-- romper migraciones downstream. Ver docs/issues/open/ISSUE-001-missing-quotation-defaults-ddl.md
+ALTER TABLE IF EXISTS greenhouse_commercial.quotation_defaults
   DROP CONSTRAINT IF EXISTS quotation_defaults_default_currency_check;
 
-ALTER TABLE greenhouse_commercial.quotation_defaults
+ALTER TABLE IF EXISTS greenhouse_commercial.quotation_defaults
   ADD CONSTRAINT quotation_defaults_default_currency_check
   CHECK (
     default_currency = ANY (
@@ -49,16 +53,30 @@ ALTER TABLE greenhouse_commercial.role_rate_cards
     )
   );
 
-ALTER TABLE greenhouse_commercial.approval_policies
-  DROP CONSTRAINT IF EXISTS approval_policies_default_currency_check;
+-- NOTE (TASK-529 fix): `greenhouse_commercial.approval_policies.default_currency`
+-- no existe en el schema actual (la tabla si existe pero la columna no). Se envuelve
+-- en DO block con chequeo a information_schema para que la migracion sea idempotente.
+-- Ver docs/issues/open/ISSUE-056-missing-quotation-defaults-ddl-task-466.md
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'greenhouse_commercial'
+      AND table_name = 'approval_policies'
+      AND column_name = 'default_currency'
+  ) THEN
+    ALTER TABLE greenhouse_commercial.approval_policies
+      DROP CONSTRAINT IF EXISTS approval_policies_default_currency_check;
 
-ALTER TABLE greenhouse_commercial.approval_policies
-  ADD CONSTRAINT approval_policies_default_currency_check
-  CHECK (
-    default_currency = ANY (
-      ARRAY['CLP'::text, 'USD'::text, 'CLF'::text, 'COP'::text, 'MXN'::text, 'PEN'::text]
-    )
-  );
+    ALTER TABLE greenhouse_commercial.approval_policies
+      ADD CONSTRAINT approval_policies_default_currency_check
+      CHECK (
+        default_currency = ANY (
+          ARRAY['CLP'::text, 'USD'::text, 'CLF'::text, 'COP'::text, 'MXN'::text, 'PEN'::text]
+        )
+      );
+  END IF;
+END $$;
 
 -- Down Migration
 --

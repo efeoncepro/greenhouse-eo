@@ -3402,6 +3402,48 @@ export interface GreenhouseFinanceSuppliers {
   website_url: string | null;
 }
 
+export interface GreenhouseFinanceTaxCodes {
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  /**
+   * First day the code is applicable. Snapshots frozen at issuance time reference this window.
+   */
+  effective_from: Timestamp;
+  /**
+   * Exclusive upper bound. NULL means currently active.
+   */
+  effective_to: Timestamp | null;
+  id: Generated<string>;
+  /**
+   * ISO 3166-1 alpha-2 country code (uppercase). Chile = CL.
+   */
+  jurisdiction: string;
+  /**
+   * Semantic classification: vat_output (charged on sales), vat_input_credit (recoverable on purchases), vat_input_non_recoverable, vat_exempt, vat_non_billable.
+   */
+  kind: string;
+  label_en: string | null;
+  label_es: string;
+  metadata: Generated<Json>;
+  /**
+   * Decimal rate (0.19 = 19%). NULL for exempt / non-billable codes.
+   */
+  rate: Numeric | null;
+  /**
+   * full | partial | none | not_applicable. not_applicable applies to output taxes and exempt/non-billable.
+   */
+  recoverability: string;
+  /**
+   * NULL = global default (Chile seed). Populated = tenant-specific override for the same (tax_code, jurisdiction, effective_from).
+   */
+  space_id: string | null;
+  /**
+   * Stable human identifier, e.g. cl_vat_19, cl_input_vat_credit_19. Consumers reference by this string.
+   */
+  tax_code: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHrEvalAssignments {
   assignment_id: string;
   created_at: Generated<Timestamp>;
@@ -5937,6 +5979,7 @@ export interface DB {
   "greenhouse_finance.shareholder_account_movements": GreenhouseFinanceShareholderAccountMovements;
   "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
+  "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
   "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
   "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;
