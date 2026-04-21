@@ -23,6 +23,17 @@ Ahora, toda factura materializada desde una cotizacion:
 2. **Se espeja a HubSpot** como un objeto `invoice` nativo — visible en el deal, en la company y en el contacto.
 3. **Deja trazabilidad completa** de cada intento de sync (estado, timestamp, error, contador de reintentos).
 
+## Delta TASK-531 — Contrato tributario explicito tambien en income
+
+Desde 2026-04-21, el bridge ya no depende de asumir que toda factura lleva IVA 19% por default:
+
+- `income` persiste `tax_code`, `tax_snapshot_json`, `is_tax_exempt` y `tax_snapshot_frozen_at`
+- los materializers quote→invoice heredan el snapshot tributario desde la cotizacion
+- si hay `income_line_items`, el bridge usa `tax_code` / `is_tax_exempt` reales de cada linea
+- si no hay desglose y se construye una linea sintetica, el bridge usa el `tax_code` del header para decidir si la linea es exenta o no afecta
+
+Con eso, HubSpot deja de reinterpretar impuestos por fuera de Finance: consume la semantica tributaria ya resuelta por Greenhouse.
+
 ## Que NO es este sincronizador
 
 - **No reemplaza a Nubox como emisor tributario.** Chile sigue teniendo su factura oficial emitida en Nubox con DTE + SII. HubSpot es un **reflejo CRM**, no un sistema de cobranza.

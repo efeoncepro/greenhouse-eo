@@ -14,6 +14,7 @@ import {
   assertNonEmptyString,
   assertValidCurrency,
   normalizeString,
+  roundCurrency,
   toDateString,
   toNumber,
   toTimestampString,
@@ -24,6 +25,11 @@ import {
   type ServiceLine
 } from '@/lib/finance/shared'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
+import {
+  buildIncomeTaxWriteFields,
+  parsePersistedIncomeTaxSnapshot,
+  serializeIncomeTaxSnapshot
+} from '@/lib/finance/income-tax-snapshot'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,6 +47,12 @@ interface IncomeDetailRow {
   subtotal: unknown
   tax_rate: unknown
   tax_amount: unknown
+  tax_code?: string | null
+  tax_rate_snapshot?: unknown
+  tax_amount_snapshot?: unknown
+  tax_snapshot_json?: unknown | null
+  is_tax_exempt?: boolean
+  tax_snapshot_frozen_at?: unknown
   total_amount: unknown
   exchange_rate_to_clp: unknown
   total_amount_clp: unknown
@@ -89,6 +101,12 @@ const normalizeIncomeDetail = (row: IncomeDetailRow) => ({
   subtotal: toNumber(row.subtotal),
   taxRate: toNumber(row.tax_rate),
   taxAmount: toNumber(row.tax_amount),
+  taxCode: row.tax_code ? normalizeString(row.tax_code) : null,
+  taxRateSnapshot: row.tax_rate_snapshot != null ? toNumber(row.tax_rate_snapshot) : null,
+  taxAmountSnapshot: row.tax_amount_snapshot != null ? toNumber(row.tax_amount_snapshot) : null,
+  taxSnapshot: parsePersistedIncomeTaxSnapshot(row.tax_snapshot_json),
+  isTaxExempt: Boolean(row.is_tax_exempt),
+  taxSnapshotFrozenAt: toTimestampString(row.tax_snapshot_frozen_at as string | { value?: string } | null),
   totalAmount: toNumber(row.total_amount),
   exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
   totalAmountClp: toNumber(row.total_amount_clp),
@@ -161,6 +179,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   try {
     const { id: incomeId } = await params
     const body = await request.json()
+    let existingIncome: Awaited<ReturnType<typeof getFinanceIncomeFromPostgres>> | ReturnType<typeof normalizeIncomeDetail> | null =
+      null
+    let shouldSkipPostgresWrite = false
 
     // ── Build validated update payload ──
 
@@ -203,9 +224,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     if (body.currency !== undefined) pgUpdates.currency = assertValidCurrency(body.currency)
 
     const numericFields: [string, string][] = [
-      ['subtotal', 'subtotal'], ['taxRate', 'taxRate'], ['taxAmount', 'taxAmount'],
-      ['totalAmount', 'totalAmount'], ['exchangeRateToClp', 'exchangeRateToClp'],
-      ['totalAmountClp', 'totalAmountClp'], ['amountPaid', 'amountPaid']
+      ['exchangeRateToClp', 'exchangeRateToClp'],
+      ['totalAmountClp', 'totalAmountClp'],
+      ['amountPaid', 'amountPaid']
     ]
 
     for (const [bodyKey, pgKey] of numericFields) {
@@ -230,33 +251,117 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     if (body.hubspotDealId !== undefined) pgUpdates.hubspotDealId = body.hubspotDealId ? normalizeString(body.hubspotDealId) : null
     if (body.incomeType !== undefined) pgUpdates.incomeType = body.incomeType ? normalizeString(body.incomeType) : null
 
+    const taxRelevantKeys = ['subtotal', 'taxCode', 'taxRate', 'taxAmount', 'totalAmount', 'invoiceDate']
+
+    const shouldRecomputeTax = taxRelevantKeys.some(key => body[key] !== undefined)
+
+    if (shouldRecomputeTax) {
+      try {
+        existingIncome = await getFinanceIncomeFromPostgres(incomeId)
+      } catch (error) {
+        if (!shouldFallbackFromFinancePostgres(error)) {
+          throw error
+        }
+
+        shouldSkipPostgresWrite = true
+      }
+
+      if (!existingIncome) {
+        await ensureFinanceInfrastructure()
+        const projectId = getFinanceProjectId()
+
+        const rows = await runFinanceQuery<IncomeDetailRow>(`
+          SELECT *
+          FROM \`${projectId}.greenhouse.fin_income\`
+          WHERE income_id = @incomeId
+        `, { incomeId })
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+          return NextResponse.json({ error: 'Income record not found' }, { status: 404 })
+        }
+
+        existingIncome = normalizeIncomeDetail(rows[0])
+      }
+
+      const subtotal =
+        body.subtotal !== undefined
+          ? toNumber(body.subtotal)
+          : existingIncome.subtotal
+
+      const taxWriteFields = await buildIncomeTaxWriteFields({
+        subtotal,
+        taxCode: body.taxCode ?? existingIncome.taxCode,
+        taxRate: body.taxRate !== undefined ? toNumber(body.taxRate) : existingIncome.taxRate,
+        taxAmount: body.taxAmount !== undefined ? toNumber(body.taxAmount) : existingIncome.taxAmount,
+        totalAmount: body.totalAmount !== undefined ? toNumber(body.totalAmount) : existingIncome.totalAmount,
+        sourceSnapshot:
+          body.taxCode === undefined
+          && body.taxRate === undefined
+          && body.taxAmount === undefined
+          && body.totalAmount === undefined
+            ? existingIncome.taxSnapshot
+            : null,
+        issuedAt: existingIncome.taxSnapshotFrozenAt ?? existingIncome.invoiceDate ?? undefined
+      })
+
+      pgUpdates.subtotal = subtotal
+      pgUpdates.taxRate = taxWriteFields.taxRate
+      pgUpdates.taxAmount = taxWriteFields.taxAmount
+      pgUpdates.taxCode = taxWriteFields.taxCode
+      pgUpdates.taxRateSnapshot = taxWriteFields.taxRateSnapshot
+      pgUpdates.taxAmountSnapshot = taxWriteFields.taxAmountSnapshot
+      pgUpdates.taxSnapshotJson = serializeIncomeTaxSnapshot(taxWriteFields.taxSnapshot)
+      pgUpdates.isTaxExempt = taxWriteFields.isTaxExempt
+      pgUpdates.taxSnapshotFrozenAt = taxWriteFields.taxSnapshotFrozenAt
+      pgUpdates.totalAmount = taxWriteFields.totalAmount
+
+      const exchangeRateToClp =
+        pgUpdates.exchangeRateToClp !== undefined
+          ? toNumber(pgUpdates.exchangeRateToClp)
+          : existingIncome.exchangeRateToClp
+
+      if (body.totalAmountClp === undefined && Number.isFinite(exchangeRateToClp)) {
+        pgUpdates.totalAmountClp = roundCurrency(taxWriteFields.totalAmount * exchangeRateToClp)
+      }
+    }
+
     if (Object.keys(pgUpdates).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
 
     // ── Postgres-first path ──
-    try {
-      const result = await updateFinanceIncomeInPostgres(incomeId, pgUpdates)
+    if (!shouldSkipPostgresWrite) {
+      try {
+        const result = await updateFinanceIncomeInPostgres(incomeId, pgUpdates)
 
-      if (!result) {
-        return NextResponse.json({ error: 'Income record not found' }, { status: 404 })
-      }
+        if (!result) {
+          return NextResponse.json({ error: 'Income record not found' }, { status: 404 })
+        }
 
-      return NextResponse.json({ incomeId, updated: true })
-    } catch (error) {
-      if (!shouldFallbackFromFinancePostgres(error)) {
-        throw error
-      }
+        return NextResponse.json({ incomeId, updated: true })
+      } catch (error) {
+        if (!shouldFallbackFromFinancePostgres(error)) {
+          throw error
+        }
 
-      if (!isFinanceBigQueryWriteEnabled()) {
-        return NextResponse.json(
-          {
-            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
-            code: 'FINANCE_BQ_WRITE_DISABLED'
-          },
-          { status: 503 }
-        )
+        if (!isFinanceBigQueryWriteEnabled()) {
+          return NextResponse.json(
+            {
+              error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+              code: 'FINANCE_BQ_WRITE_DISABLED'
+            },
+            { status: 503 }
+          )
+        }
       }
+    } else if (!isFinanceBigQueryWriteEnabled()) {
+      return NextResponse.json(
+        {
+          error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+          code: 'FINANCE_BQ_WRITE_DISABLED'
+        },
+        { status: 503 }
+      )
     }
 
     // ── BigQuery fallback ──
@@ -282,7 +387,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         hubspotCompanyId: 'hubspot_company_id', hubspotDealId: 'hubspot_deal_id', clientName: 'client_name',
         invoiceNumber: 'invoice_number', invoiceDate: 'invoice_date', dueDate: 'due_date',
         description: 'description', currency: 'currency', subtotal: 'subtotal', taxRate: 'tax_rate',
-        taxAmount: 'tax_amount', totalAmount: 'total_amount', exchangeRateToClp: 'exchange_rate_to_clp',
+        taxAmount: 'tax_amount', taxCode: 'tax_code', taxRateSnapshot: 'tax_rate_snapshot',
+        taxAmountSnapshot: 'tax_amount_snapshot', taxSnapshotJson: 'tax_snapshot_json', isTaxExempt: 'is_tax_exempt',
+        taxSnapshotFrozenAt: 'tax_snapshot_frozen_at', totalAmount: 'total_amount', exchangeRateToClp: 'exchange_rate_to_clp',
         totalAmountClp: 'total_amount_clp', paymentStatus: 'payment_status', amountPaid: 'amount_paid',
         poNumber: 'po_number', hesNumber: 'hes_number', serviceLine: 'service_line', incomeType: 'income_type',
         notes: 'notes'
@@ -291,7 +398,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       const col = colMap[key]
 
       if (col) {
-        bqUpdates.push(`${col} = @${key}`)
+        if (col === 'tax_snapshot_json') {
+          bqUpdates.push(`${col} = PARSE_JSON(@${key})`)
+        } else if (col === 'tax_snapshot_frozen_at') {
+          bqUpdates.push(`${col} = TIMESTAMP(@${key})`)
+        } else if (col === 'invoice_date' || col === 'due_date') {
+          bqUpdates.push(`${col} = CAST(@${key} AS DATE)`)
+        } else {
+          bqUpdates.push(`${col} = @${key}`)
+        }
+
         bqParams[key] = value
       }
     }

@@ -19,8 +19,10 @@ import {
   toNullableNumber,
   toTimestampString
 } from '@/lib/finance/shared'
+import { parsePersistedIncomeTaxSnapshot } from '@/lib/finance/income-tax-snapshot'
 import { resolveAutoAllocation, type AutoAllocationInput } from '@/lib/finance/auto-allocation-rules'
 import { ensureOrganizationForClient } from '@/lib/account-360/organization-identity'
+import type { ChileTaxSnapshot } from '@/lib/tax/chile'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -64,6 +66,12 @@ type PostgresIncomeRow = {
   subtotal: unknown
   tax_rate: unknown
   tax_amount: unknown
+  tax_code: string | null
+  tax_rate_snapshot: unknown
+  tax_amount_snapshot: unknown
+  tax_snapshot_json: unknown | null
+  is_tax_exempt: boolean
+  tax_snapshot_frozen_at: string | Date | null
   total_amount: unknown
   exchange_rate_to_clp: unknown
   total_amount_clp: unknown
@@ -233,6 +241,12 @@ export type FinanceIncomeRecord = {
   subtotal: number
   taxRate: number
   taxAmount: number
+  taxCode: string | null
+  taxRateSnapshot: number | null
+  taxAmountSnapshot: number | null
+  taxSnapshot: ChileTaxSnapshot | null
+  isTaxExempt: boolean
+  taxSnapshotFrozenAt: string | null
   totalAmount: number
   exchangeRateToClp: number
   totalAmountClp: number
@@ -462,6 +476,12 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
     subtotal: toNumber(row.subtotal),
     taxRate: toNumber(row.tax_rate),
     taxAmount: toNumber(row.tax_amount),
+    taxCode: str(row.tax_code),
+    taxRateSnapshot: toNullableNumber(row.tax_rate_snapshot),
+    taxAmountSnapshot: toNullableNumber(row.tax_amount_snapshot),
+    taxSnapshot: parsePersistedIncomeTaxSnapshot(row.tax_snapshot_json),
+    isTaxExempt: normalizeBoolean(row.is_tax_exempt),
+    taxSnapshotFrozenAt: toTimestampString(row.tax_snapshot_frozen_at as string | { value?: string } | null),
     totalAmount,
     exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
     totalAmountClp: toNumber(row.total_amount_clp),
@@ -830,7 +850,9 @@ export const listFinanceIncomeFromPostgres = async ({
       SELECT
         income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date, description,
-        currency, subtotal, tax_rate, tax_amount, total_amount,
+        currency, subtotal, tax_rate, tax_amount,
+        tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        total_amount,
         exchange_rate_to_clp, total_amount_clp, payment_status, amount_paid,
         collection_method, po_number, hes_number, service_line, income_type,
         is_reconciled, reconciliation_id,
@@ -1188,7 +1210,9 @@ export const getFinanceIncomeFromPostgres = async (incomeId: string) => {
       SELECT
         income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date, description,
-        currency, subtotal, tax_rate, tax_amount, total_amount,
+        currency, subtotal, tax_rate, tax_amount,
+        tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        total_amount,
         exchange_rate_to_clp, total_amount_clp, payment_status, amount_paid,
         collection_method, po_number, hes_number, service_line, income_type,
         is_reconciled, reconciliation_id,
@@ -1249,10 +1273,21 @@ export const createFinanceIncomeInPostgres = async ({
   subtotal,
   taxRate,
   taxAmount,
+  taxCode,
+  taxRateSnapshot,
+  taxAmountSnapshot,
+  taxSnapshotJson,
+  isTaxExempt,
+  taxSnapshotFrozenAt,
   totalAmount,
   exchangeRateToClp,
   totalAmountClp,
   paymentStatus,
+  quotationId,
+  contractId,
+  sourceHesId,
+  purchaseOrderId,
+  hesId,
   poNumber,
   hesNumber,
   serviceLine,
@@ -1280,10 +1315,21 @@ export const createFinanceIncomeInPostgres = async ({
   subtotal: number
   taxRate: number
   taxAmount: number
+  taxCode: string | null
+  taxRateSnapshot: number | null
+  taxAmountSnapshot: number | null
+  taxSnapshotJson: string | null
+  isTaxExempt: boolean
+  taxSnapshotFrozenAt: string
   totalAmount: number
   exchangeRateToClp: number
   totalAmountClp: number
   paymentStatus: string
+  quotationId?: string | null
+  contractId?: string | null
+  sourceHesId?: string | null
+  purchaseOrderId?: string | null
+  hesId?: string | null
   poNumber: string | null
   hesNumber: string | null
   serviceLine: string | null
@@ -1295,18 +1341,21 @@ export const createFinanceIncomeInPostgres = async ({
   netAfterPartner: number | null
   notes: string | null
   actorUserId: string | null
-}) => {
+}, opts?: { client?: PoolClient }) => {
   await assertFinanceSlice2PostgresReady()
 
-  return withGreenhousePostgresTransaction(async client => {
+  const run = async (client: PoolClient) => {
     const rows = await queryRows<PostgresIncomeRow>(
       `
         INSERT INTO greenhouse_finance.income (
           income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
           client_name, invoice_number, invoice_date, due_date, description,
-          currency, subtotal, tax_rate, tax_amount, total_amount,
+          currency, subtotal, tax_rate, tax_amount,
+          tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+          total_amount,
           exchange_rate_to_clp, total_amount_clp,
           payment_status, amount_paid,
+          quotation_id, contract_id, source_hes_id, purchase_order_id, hes_id,
           po_number, hes_number, service_line, income_type,
           is_reconciled,
           partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
@@ -1316,13 +1365,16 @@ export const createFinanceIncomeInPostgres = async ({
         VALUES (
           $1, $2, $3, $4, $5, $6,
           $7, $8, $9::date, $10::date, $11,
-          $12, $13, $14, $15, $16,
-          $17, $18,
-          $19, 0,
-          $20, $21, $22, $23,
+          $12, $13, $14,
+          $15, $16, $17, $18::jsonb, $19, $20::timestamptz,
+          $21,
+          $22, $23,
+          $24, 0,
+          $25, $26, $27, $28, $29,
+          $30, $31, $32, $33,
           FALSE,
-          $24, $25, $26, $27, $28,
-          $29, $30,
+          $34, $35, $36, $37, $38,
+          $39, $40,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -1330,9 +1382,12 @@ export const createFinanceIncomeInPostgres = async ({
       [
         incomeId, clientId, organizationId, clientProfileId, hubspotCompanyId, hubspotDealId,
         clientName, invoiceNumber, invoiceDate, dueDate, description,
-        currency, subtotal, taxRate, taxAmount, totalAmount,
+        currency, subtotal, taxRate, taxAmount,
+        taxCode, taxRateSnapshot, taxAmountSnapshot, taxSnapshotJson, isTaxExempt, taxSnapshotFrozenAt,
+        totalAmount,
         exchangeRateToClp, totalAmountClp,
         paymentStatus,
+        quotationId, contractId, sourceHesId, purchaseOrderId, hesId,
         poNumber, hesNumber, serviceLine, incomeType,
         partnerId, partnerName, partnerSharePercent, partnerShareAmount, netAfterPartner,
         notes, actorUserId
@@ -1351,7 +1406,13 @@ export const createFinanceIncomeInPostgres = async ({
     })
 
     return created
-  })
+  }
+
+  if (opts?.client) {
+    return run(opts.client)
+  }
+
+  return withGreenhousePostgresTransaction(run)
 }
 
 // ─── Income: update ─────────────────────────────────────────────────
@@ -1378,6 +1439,12 @@ export const updateFinanceIncomeInPostgres = async (
     subtotal: 'subtotal',
     taxRate: 'tax_rate',
     taxAmount: 'tax_amount',
+    taxCode: 'tax_code',
+    taxRateSnapshot: 'tax_rate_snapshot',
+    taxAmountSnapshot: 'tax_amount_snapshot',
+    taxSnapshotJson: 'tax_snapshot_json',
+    isTaxExempt: 'is_tax_exempt',
+    taxSnapshotFrozenAt: 'tax_snapshot_frozen_at',
     totalAmount: 'total_amount',
     exchangeRateToClp: 'exchange_rate_to_clp',
     totalAmountClp: 'total_amount_clp',

@@ -92,6 +92,12 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
       subtotal NUMERIC NOT NULL,
       tax_rate NUMERIC,
       tax_amount NUMERIC NOT NULL,
+      tax_code STRING,
+      tax_rate_snapshot NUMERIC,
+      tax_amount_snapshot NUMERIC,
+      tax_snapshot_json JSON,
+      is_tax_exempt BOOL,
+      tax_snapshot_frozen_at TIMESTAMP,
       total_amount NUMERIC NOT NULL,
       exchange_rate_to_clp NUMERIC,
       total_amount_clp NUMERIC NOT NULL,
@@ -198,7 +204,13 @@ const FINANCE_COLUMN_REQUIREMENTS: Record<string, Record<string, string>> = {
     dte_type_code: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS dte_type_code STRING',
     dte_folio: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS dte_folio STRING',
     nubox_emitted_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_emitted_at TIMESTAMP',
-    nubox_last_synced_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_last_synced_at TIMESTAMP'
+    nubox_last_synced_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_last_synced_at TIMESTAMP',
+    tax_code: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_code STRING',
+    tax_rate_snapshot: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_rate_snapshot NUMERIC',
+    tax_amount_snapshot: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_amount_snapshot NUMERIC',
+    tax_snapshot_json: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_snapshot_json JSON',
+    is_tax_exempt: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS is_tax_exempt BOOL',
+    tax_snapshot_frozen_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_snapshot_frozen_at TIMESTAMP'
   },
   fin_expenses: {
     client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS client_id STRING',

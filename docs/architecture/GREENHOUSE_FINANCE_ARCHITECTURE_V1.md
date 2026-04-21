@@ -58,6 +58,65 @@ Migración backfilla rows existentes: `tax_rate ≈ 0.19` → `cl_vat_19`; `tax_
 3. Per-line override de tax_code cuando haya casos mixtos (schema ya soporta; UI pendiente).
 4. Integración con income bridge (TASK-524 / TASK-531): el income hereda `tax_code` del quote al materializarse.
 
+## Delta 2026-04-21 — Income / Invoice Tax Convergence (TASK-531)
+
+`greenhouse_finance.income` y `income_line_items` convergen al mismo contrato tributario canonico que quotations. El write path manual, la materialización quote→invoice y los bridges downstream dejan de depender de `tax_rate = 0.19` como semántica implícita.
+
+### Nuevas columnas
+
+En `greenhouse_finance.income`:
+
+| Columna | Uso |
+|---|---|
+| `tax_code` | Canonical code (`cl_vat_19` / `cl_vat_exempt` / `cl_vat_non_billable`). |
+| `tax_rate_snapshot` | Tasa congelada (null para exento / no facturable). |
+| `tax_amount_snapshot` | Monto tributario congelado. |
+| `tax_snapshot_json` | Snapshot completo `ChileTaxSnapshot` v1 persistido en el agregado. |
+| `is_tax_exempt` | Derivado para filtros / bridges downstream. |
+| `tax_snapshot_frozen_at` | Timestamp de congelamiento del snapshot. |
+
+En `greenhouse_finance.income_line_items`:
+
+| Columna | Uso |
+|---|---|
+| `tax_code` | Carrier tributario por línea. |
+| `tax_rate_snapshot` | Tasa congelada por línea. |
+| `tax_amount_snapshot` | Monto tributario por línea. |
+| `tax_snapshot_json` | Snapshot degradado o explícito por línea. |
+| `is_tax_exempt` | Reemplaza el rol exclusivo de `is_exempt`. |
+
+### Runtime nuevo
+
+- `POST /api/finance/income` y `PUT /api/finance/income/[id]` pasan por `buildIncomeTaxWriteFields()`: ya no aceptan el default implícito `0.19`; resuelven `tax_code` y congelan snapshot al momento del write.
+- `materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` heredan el snapshot tributario de la quotation y lo persisten congelado en `income`.
+- `createFinanceIncomeInPostgres()` se vuelve el writer común del agregado para que los materializers publiquen también `finance.income.created`.
+- `income_hubspot_outbound` consume `tax_code` / `is_tax_exempt` de header y líneas; el synthetic line item deja de asumir gravado por default.
+- `sync-nubox-to-postgres` publica `incomeId` en `finance.income.nubox_synced` y las filas nuevas creadas desde ventas Nubox nacen con `tax_code` + snapshot persistidos.
+
+### Backfill
+
+La migración `20260421183955091_task-531-income-tax-convergence.sql` backfillea:
+
+- header `income`: heurísticas sobre `tax_amount`, `tax_rate`, `dte_type_code`, `exempt_amount`
+- `income_line_items`: asignación degradada desde el header y `is_exempt`
+
+El contrato resultante es: `tax_code ⇔ tax_snapshot_json ⇔ tax_snapshot_frozen_at` en header, y `tax_code ⇔ tax_snapshot_json` en line items.
+
+### Archivos clave
+
+- `src/lib/finance/income-tax-snapshot.ts`
+- `src/app/api/finance/income/{route,[id]/route,[id]/lines/route}.ts`
+- `src/lib/finance/quote-to-cash/materialize-invoice-from-{quotation,hes}.ts`
+- `src/lib/finance/income-hubspot/push-income-to-hubspot.ts`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
+- Migration: `20260421183955091_task-531-income-tax-convergence.sql`
+
+### Follow-ups
+
+1. Exponer selector explícito de `tax_code` en la UI de income cuando el flujo manual lo necesite.
+2. Endurecer line items nuevos de `income` para que nazcan con snapshot detallado, no solo degradado por backfill.
+3. VAT ledger mensual (TASK-533) debe consumir `income.tax_snapshot_json` como source canónica de débito fiscal.
+
 ## Delta 2026-04-21 — Income → HubSpot Invoice Bridge (TASK-524)
 
 `greenhouse_finance.income` es espejado reactivamente a HubSpot como objeto nativo `invoice` (**non-billable mirror**, `hs_invoice_billable=false`). Nubox sigue siendo el emisor tributario; HubSpot es una proyección read-only para continuidad CRM.

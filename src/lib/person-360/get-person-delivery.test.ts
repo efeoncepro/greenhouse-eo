@@ -4,7 +4,8 @@ const mockRunGreenhousePostgresQuery = vi.fn()
 const mockResolvePersonIdentifier = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
+  withGreenhousePostgresTransaction: vi.fn()
 }))
 
 vi.mock('@/lib/person-360/resolve-eo-id', () => ({

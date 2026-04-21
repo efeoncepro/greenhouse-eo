@@ -4,7 +4,8 @@ const mockRunGreenhousePostgresQuery = vi.fn()
 const mockRunIcoEngineQuery = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
+  withGreenhousePostgresTransaction: vi.fn()
 }))
 
 vi.mock('@/lib/ico-engine/shared', () => ({

@@ -3193,6 +3193,10 @@ export interface GreenhouseFinanceIncome {
   is_annulled: Generated<boolean | null>;
   is_reconciled: Generated<boolean>;
   /**
+   * Derived flag for quick filters. True when the applied tax code is exempt or non-billable.
+   */
+  is_tax_exempt: Generated<boolean>;
+  /**
    * total_amount minus partner_share_amount
    */
   net_after_partner: Numeric | null;
@@ -3239,7 +3243,18 @@ export interface GreenhouseFinanceIncome {
   source_hes_id: string | null;
   subtotal: Numeric;
   tax_amount: Generated<Numeric>;
+  tax_amount_snapshot: Numeric | null;
+  /**
+   * Canonical Chile tax code applied to the invoice/income (cl_vat_19 / cl_vat_exempt / cl_vat_non_billable). Downstream integrations consume this instead of inferring taxes from raw tax_rate.
+   */
+  tax_code: string | null;
   tax_rate: Numeric | null;
+  tax_rate_snapshot: Numeric | null;
+  tax_snapshot_frozen_at: Timestamp | null;
+  /**
+   * Frozen ChileTaxSnapshot (version=1) persisted on the financial aggregate. Immutable after issuance/materialization.
+   */
+  tax_snapshot_json: Json | null;
   total_amount: Numeric;
   total_amount_clp: Numeric;
   updated_at: Generated<Timestamp>;
@@ -3252,9 +3267,14 @@ export interface GreenhouseFinanceIncomeLineItems {
   discount_percent: Numeric | null;
   income_id: string;
   is_exempt: Generated<boolean | null>;
+  is_tax_exempt: Generated<boolean>;
   line_item_id: string;
   line_number: number;
   quantity: Numeric | null;
+  tax_amount_snapshot: Numeric | null;
+  tax_code: string | null;
+  tax_rate_snapshot: Numeric | null;
+  tax_snapshot_json: Json | null;
   total_amount: Numeric | null;
   unit_price: Numeric | null;
 }

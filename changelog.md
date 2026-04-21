@@ -2,6 +2,24 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-531 Income / Invoice Tax Convergence shipped
+
+- `income` deja de depender del IVA implícito `0.19` en el write path manual y converge al mismo contrato tributario canónico que quotations.
+- **Migration** (`20260421183955091_task-531-income-tax-convergence.sql`): `greenhouse_finance.income` gana `tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`; `income_line_items` gana el mismo carrier tributario (sin `frozen_at`). Incluye CHECKs de dominio/coherencia y backfill idempotente sobre histórico.
+- **Helper nuevo** (`src/lib/finance/income-tax-snapshot.ts`): resuelve snapshots tributarios de income manual o heredado; incorpora fallback estático para los 3 tax codes Chile canónicos y evita depender del catálogo DB en paths estándar.
+- **API**:
+  - `POST /api/finance/income` ya no hace `taxRate ?? 0.19`; persiste snapshot completo en Postgres y BigQuery fallback.
+  - `PUT /api/finance/income/[id]` solo rehidrata el registro existente cuando el update toca campos fiscales; eso preserva el fail-closed correcto si Postgres cae y el cambio no es tributario.
+  - `GET /api/finance/income/[id]/lines` expone `taxCode`, `taxRateSnapshot`, `taxAmountSnapshot`, `taxSnapshot`, `isTaxExempt`.
+- **Materialización quote→invoice**:
+  - `materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` heredan el snapshot tributario de la quotation y escriben el income vía `createFinanceIncomeInPostgres()`.
+  - Efecto importante: esos materializers vuelven a entrar al writer canónico del agregado y ahora sí emiten `finance.income.created`, cerrando el bypass downstream detectado en TASK-524.
+- **Downstream**:
+  - `push-income-to-hubspot.ts` usa `tax_code` / `is_tax_exempt` reales de header y line items; la línea sintética ya no asume factura gravada por default.
+  - `sync-nubox-to-postgres.ts` publica `incomeId` en `finance.income.nubox_synced` y las filas nuevas creadas desde ventas Nubox nacen con snapshot tributario persistido.
+- **Verificación**: `pnpm migrate:up` + regen de `src/types/db.d.ts` · `pnpm lint` OK (solo warning legacy preexistente) · `pnpm test` OK (`1764` passing, `2` skipped) · `pnpm build` OK.
+- **Cross-impact**: cierra el eslabón entre TASK-530 (quotes) y TASK-524 (HubSpot invoice bridge), y deja a TASK-533 listo para consumir `income.tax_snapshot_json` como source tributaria.
+
 ### 2026-04-21 — TASK-547 Product Catalog HubSpot Outbound Projection (Fase C) shipped
 
 - Fase C del programa Product Catalog Sync (TASK-544 umbrella). Cierra el loop Greenhouse → HubSpot: los eventos emitidos por la materialización de TASK-546 ahora disparan pushes reactivos a HubSpot Products via Cloud Run. Desbloquea TASK-548 (drift detection).

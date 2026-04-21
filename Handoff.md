@@ -1,5 +1,43 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-531 Income / Invoice Tax Convergence (Codex)
+
+- **Scope:** cerrar la convergencia tributaria del agregado `income`: schema + API + materializers + readiness downstream para HubSpot/Nubox, alineado a TASK-529/TASK-530/TASK-524/TASK-541.
+- **Migration shipped + aplicada en dev:** `20260421183955091_task-531-income-tax-convergence.sql`
+  - `greenhouse_finance.income` gana `tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`
+  - `greenhouse_finance.income_line_items` gana `tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`
+  - CHECKs de dominio + consistencia (`tax_code ⇔ snapshot`)
+  - backfill idempotente sobre rows legacy de income y line items
+- **Helper nuevo:** `src/lib/finance/income-tax-snapshot.ts`
+  - `buildIncomeTaxWriteFields()` resuelve el snapshot tributario canónico para income manual o heredado
+  - fallback estático para los 3 tax codes Chile canónicos (`cl_vat_19`, `cl_vat_exempt`, `cl_vat_non_billable`) para no depender del catálogo DB en paths comunes/tests
+- **Write path manual (`/api/finance/income`)**
+  - `POST` ya no usa `body.taxRate ?? 0.19`
+  - persiste snapshot completo en Postgres y BigQuery fallback
+  - `PUT /api/finance/income/[id]` solo carga el `income` existente cuando el update realmente toca campos tributarios; evita depender de BigQuery para edits no fiscales y preserva el fail-closed correcto cuando Postgres cae
+  - `/api/finance/income/[id]/lines` expone `taxCode`, `taxRateSnapshot`, `taxAmountSnapshot`, `taxSnapshot`, `isTaxExempt`
+- **Quote-to-cash materializers**
+  - `materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` heredan el snapshot tributario de la quotation y escriben el income via `createFinanceIncomeInPostgres(...)`
+  - efecto colateral importante: esos write paths ahora emiten también `finance.income.created` porque pasan por el writer canónico del agregado
+  - además se elimina el write legacy de `income.space_id`, consistente con el schema real live
+- **Downstream**
+  - `push-income-to-hubspot.ts` ahora consume `tax_code` / `is_tax_exempt` reales de header y line items; la línea sintética deja de asumir factura gravada por default
+  - `sync-nubox-to-postgres.ts` publica `incomeId` en `finance.income.nubox_synced` y las filas nuevas creadas desde ventas Nubox nacen con `tax_code` + snapshot persistidos
+- **Docs actualizadas**
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/documentation/finance/sincronizacion-facturas-hubspot.md`
+  - spec `TASK-531`
+- **Verificación ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm test` OK (`354` files, `1764` tests passing, `2` skipped)
+  - `pnpm build` OK
+- **Cross-impact**
+  - cierra el gap downstream detectado en TASK-524: los incomes materializados desde quotation/HES ya no bypassan `finance.income.created`
+  - deja a TASK-533 listo para consumir `income.tax_snapshot_json` como source de débito fiscal
+  - deja explícito que `convertQuoteToCash` (TASK-541) sigue sin crear invoice; la materialización documental continúa separada
+
+
 ## Sesion 2026-04-21 — TASK-547 Product Catalog HubSpot Outbound Projection (Claude Opus 4.7)
 
 - **Scope:** Fase C del programa Product Catalog Sync (TASK-544 umbrella). Cierra el loop Greenhouse → HubSpot: los 4 eventos `commercial.product_catalog.{created,updated,archived,unarchived}` emitidos por la materialización de TASK-546 ahora disparan pushes reactivos a HubSpot Products via Cloud Run.

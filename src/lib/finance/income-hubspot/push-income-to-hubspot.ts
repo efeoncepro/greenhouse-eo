@@ -49,6 +49,8 @@ interface IncomeSnapshot extends Record<string, unknown> {
   currency: string
   subtotal: string | number | null
   tax_amount: string | number | null
+  tax_code: string | null
+  is_tax_exempt: boolean | null
   total_amount: string | number
   total_amount_clp: string | number | null
   exchange_rate_to_clp: string | number | null
@@ -61,6 +63,8 @@ interface LineItemRow extends Record<string, unknown> {
   unit_price: string | number | null
   discount_percent: string | number | null
   is_exempt: boolean | null
+  tax_code: string | null
+  is_tax_exempt: boolean | null
   total_amount: string | number | null
 }
 
@@ -79,6 +83,24 @@ const toNullableNum = (value: unknown): number | null => {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+const resolveTaxExemptFlag = ({
+  taxCode,
+  isTaxExempt,
+  legacyIsExempt
+}: {
+  taxCode?: string | null
+  isTaxExempt?: boolean | null
+  legacyIsExempt?: boolean | null
+}): boolean => {
+  const directFlag = isTaxExempt ?? legacyIsExempt
+
+  if (directFlag !== null && directFlag !== undefined) {
+    return directFlag
+  }
+
+  return taxCode === 'cl_vat_exempt' || taxCode === 'cl_vat_non_billable'
+}
+
 const loadIncomeSnapshot = async (incomeId: string): Promise<IncomeSnapshot | null> => {
   const rows = await query<IncomeSnapshot>(
     `SELECT
@@ -93,6 +115,8 @@ const loadIncomeSnapshot = async (incomeId: string): Promise<IncomeSnapshot | nu
        currency,
        subtotal,
        tax_amount,
+       tax_code,
+       is_tax_exempt,
        total_amount,
        total_amount_clp,
        exchange_rate_to_clp,
@@ -108,7 +132,7 @@ const loadIncomeSnapshot = async (incomeId: string): Promise<IncomeSnapshot | nu
 
 const loadIncomeLineItems = async (incomeId: string): Promise<IncomeHubSpotLineItem[]> => {
   const rows = await query<LineItemRow>(
-    `SELECT description, quantity, unit_price, discount_percent, is_exempt, total_amount
+    `SELECT description, quantity, unit_price, discount_percent, is_exempt, tax_code, is_tax_exempt, total_amount
      FROM greenhouse_finance.income_line_items
      WHERE income_id = $1
      ORDER BY line_number ASC`,
@@ -120,7 +144,11 @@ const loadIncomeLineItems = async (incomeId: string): Promise<IncomeHubSpotLineI
     quantity: toNum(row.quantity) || 1,
     unitPrice: toNum(row.unit_price) || toNum(row.total_amount),
     discountPercent: toNullableNum(row.discount_percent),
-    isExempt: row.is_exempt ?? false
+    isExempt: resolveTaxExemptFlag({
+      taxCode: row.tax_code,
+      isTaxExempt: row.is_tax_exempt,
+      legacyIsExempt: row.is_exempt
+    })
   }))
 }
 
@@ -129,7 +157,10 @@ const syntheticLineItem = (snapshot: IncomeSnapshot): IncomeHubSpotLineItem => (
   quantity: 1,
   unitPrice: toNum(snapshot.total_amount),
   discountPercent: null,
-  isExempt: false
+  isExempt: resolveTaxExemptFlag({
+    taxCode: snapshot.tax_code,
+    isTaxExempt: snapshot.is_tax_exempt
+  })
 })
 
 const persistTrace = async (

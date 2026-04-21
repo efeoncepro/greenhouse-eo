@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-529`
+- Blocked by: `TASK-529, TASK-530`
 - Branch: `task/TASK-531-income-invoice-tax-convergence`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
@@ -57,7 +57,9 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-524-income-hubspot-invoice-bridge.md`
+- `docs/tasks/complete/TASK-524-income-hubspot-invoice-bridge.md`
+- `docs/tasks/complete/TASK-530-quote-tax-explicitness-chile-iva.md`
+- `docs/tasks/complete/TASK-541-quote-to-cash-atomic-choreography.md`
 - `project_context.md`
 
 ## Dependencies & Impact
@@ -65,11 +67,14 @@ Reglas obligatorias:
 ### Depends on
 
 - `docs/tasks/to-do/TASK-529-chile-tax-code-foundation.md`
-- `docs/tasks/to-do/TASK-530-quote-tax-explicitness-chile-iva.md`
+- `docs/tasks/complete/TASK-530-quote-tax-explicitness-chile-iva.md`
 - `src/app/api/finance/income/route.ts`
+- `src/app/api/finance/income/[id]/route.ts`
 - `src/app/api/finance/income/[id]/lines/route.ts`
 - `src/lib/finance/quote-to-cash/materialize-invoice-from-quotation.ts`
 - `src/lib/finance/quote-to-cash/materialize-invoice-from-hes.ts`
+- `src/lib/finance/income-hubspot/push-income-to-hubspot.ts`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
 
 ### Blocks / Impacts
 
@@ -90,7 +95,8 @@ Reglas obligatorias:
 
 - `src/app/api/finance/income/route.ts` calcula `taxRate`, `taxAmount` y `totalAmount`.
 - `src/app/api/finance/income/[id]/lines/route.ts` ya expone `is_exempt` en line items.
-- quote-to-cash ya materializa `income` desde quotes emitidas.
+- `materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` siguen siendo los write paths reales que crean `income`.
+- `convertQuoteToCash` (TASK-541) no crea `income`; deja la coreografia comercial separada de la materializacion documental de invoice.
 
 ### Gap
 
@@ -113,10 +119,11 @@ Reglas obligatorias:
 - Persistir `tax_code` y snapshot tributario en `greenhouse_finance.income` y/o sus line items.
 - Endurecer create/update para exigir snapshot explicito o resolverlo desde foundation, nunca por default invisible.
 
-### Slice 2 — Quote-to-cash inheritance
+### Slice 2 — Invoice materialization inheritance
 
 - Hacer que `materializeInvoiceFromApprovedQuotation` y la rama HES hereden el mismo snapshot tributario del upstream.
 - Congelar ese snapshot al crear `income`.
+- Mantener el boundary con `convertQuoteToCash`: la choreografia atomica no se expande para crear invoice en esta task.
 
 ### Slice 3 — Downstream readiness
 
@@ -159,6 +166,13 @@ Reglas de negocio:
 - `pnpm test`
 - prueba manual de create income + quote-to-cash
 
+Resultado de cierre 2026-04-21:
+
+- `pnpm migrate:up` aplicado y `src/types/db.d.ts` regenerado
+- `pnpm lint` OK (solo warning legacy en `BulkEditDrawer.tsx`, sin errores)
+- `pnpm test` OK
+- `pnpm build` OK
+
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real
@@ -172,4 +186,3 @@ Reglas de negocio:
 ## Follow-ups
 
 - `TASK-533`
-
