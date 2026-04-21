@@ -22,7 +22,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-558`
+- siguiente ID disponible: `TASK-562`
 - `TASK-528` — Chile Tax / IVA Program. Programa paraguas para formalizar la capa tributaria Chile-first del portal y ordenar foundation, quotes, income, compras y ledger mensual. Spec: `to-do/TASK-528-chile-tax-iva-program.md`.
 - `TASK-529` — Chile Tax Code Foundation. Crea catalogo canonico de tax codes/snapshots para IVA Chile y deja lista la semantica de recuperabilidad para el resto de Finance. Spec: `to-do/TASK-529-chile-tax-code-foundation.md`.
 - `TASK-530` — Quote Tax Explicitness (Chile IVA). Hace explicito `Neto + IVA + Total` en quote builder/detail/PDF/email sin contaminar el pricing engine neto. Spec: `to-do/TASK-530-quote-tax-explicitness-chile-iva.md`.
@@ -53,6 +53,10 @@ Primer bloque operativo asignado:
 - `TASK-555` 🆕 — Commercial Access Model Foundation. Formaliza `routeGroup: commercial`, namespace `comercial.*` para surfaces y compat transicional con `finanzas.*` sobre paths legacy. Spec: `to-do/TASK-555-commercial-access-model-foundation.md`.
 - `TASK-556` 🆕 — Commercial Surface Adoption over Legacy Finance Paths. Alinea quotes, contracts, SOW, master agreements y products como surfaces comerciales aunque sigan temporalmente bajo `/finance/...`. Spec: `to-do/TASK-556-commercial-surface-adoption-over-legacy-finance-paths.md`.
 - `TASK-557` 🆕 — Commercial Pipeline Lane Extraction. Saca `Pipeline comercial` del framing `Finance > Intelligence` y le da un entrypoint/lane comercial propio con compat temporal. Spec: `to-do/TASK-557-commercial-pipeline-lane-extraction.md`.
+- `TASK-558` 🆕 — Ops Registry Schema, Parser & Repo Config Foundation. Define el schema común del registry, el parser markdown y el contrato de configuración por repo para que el sistema nazca federable y no hardcodeado a Greenhouse EO. Spec: `to-do/TASK-558-ops-registry-schema-parser-repo-config-foundation.md`.
+- `TASK-559` 🆕 — Ops Registry Validation, Query CLI & Generated Outputs. Agrega validaciones automáticas, CLI de consulta y outputs derivados (`registry`, `graph`, `validation`, `stale`) como base operativa del sistema. Spec: `to-do/TASK-559-ops-registry-validation-query-cli-generated-outputs.md`.
+- `TASK-560` 🆕 — Ops Registry Human + Agent Surfaces. Expone una surface humana en el portal y una surface JSON-first para agentes montadas sobre el mismo contrato derivado. Spec: `to-do/TASK-560-ops-registry-human-agent-surfaces.md`.
+- `TASK-561` 🆕 — Ops Registry Federation Contract for Sister Repos. Formaliza identidad compuesta, outputs comunes y separación entre core compartido y policy local para escalar el framework a repos hermanos. Spec: `to-do/TASK-561-ops-registry-federation-contract-sister-repos.md`.
 - `EPIC-001` 🆕 — Document Vault + Signature Orchestration Platform. Primer epic del repo. Reordena la estrategia documental para Greenhouse sobre assets privados + document registry + signature orchestration + gestor documental shared, con ZapSign como primer provider de firma. Child tasks oficiales: `TASK-489` a `TASK-495`. Spec: `../epics/to-do/EPIC-001-document-vault-signature-orchestration-platform.md`.
 - `TASK-495` — Commercial & Legal Document Chain Convergence. Reancla MSA/SOW/work orders a la nueva plataforma documental y de firma para que `TASK-461` no quede como un caso especial permanente. P1, Muy alto. Spec: `to-do/TASK-495-commercial-legal-document-chain-convergence.md`.
 - `TASK-494` — HR Document Vault Convergence. Absorbe funcionalmente `TASK-027` sobre la plataforma documental shared y habilita `/my/documents`, `/hr/documents` y People 360 sin storage paralelo. P1, Alto. Spec: `to-do/TASK-494-hr-document-vault-convergence.md`.

@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — Ops Registry architecture + EPIC-003 bootstrap (Codex)
+
+- **Scope:** definir el mini sistema interno para operar specs, arquitectura, tasks, epics, mini-tasks e issues sin sacar la truth del repo, y decidir si esto cabe en una sola task o en un programa federado.
+- **Documentacion nueva:**
+  - `docs/architecture/GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md`
+  - `docs/epics/to-do/EPIC-003-ops-registry-federated-operational-framework.md`
+  - `docs/tasks/to-do/TASK-558-ops-registry-schema-parser-repo-config-foundation.md`
+  - `docs/tasks/to-do/TASK-559-ops-registry-validation-query-cli-generated-outputs.md`
+  - `docs/tasks/to-do/TASK-560-ops-registry-human-agent-surfaces.md`
+  - `docs/tasks/to-do/TASK-561-ops-registry-federation-contract-sister-repos.md`
+- **Decision canonica registrada:**
+  - `Ops Registry` debe ser repo-native y read-first; la source of truth sigue en markdown/Git.
+  - V1 debe montarse sobre `TypeScript + Node.js`, `unified + remark-parse`, `zod`, sin base externa obligatoria.
+  - outputs derivados mínimos: `registry.json`, `graph.json`, `validation-report.json`, `stale-report.json`.
+  - el sistema debe ser dual: surface humana y surface JSON-first para agentes.
+  - la escalabilidad buscada es por federación entre repos hermanos, no por centralización temprana.
+- **Conclusion de programa:** esto **no cabe** sanamente en una sola task. Se formalizo como `EPIC-003` con 4 child tasks:
+  - `TASK-558` foundation de schema/parser/repo-config
+  - `TASK-559` validaciones + CLI + outputs derivados
+  - `TASK-560` surfaces humano + agente
+  - `TASK-561` contrato federado para repos hermanos
+- **Docs sincronizadas:** `docs/README.md`, `docs/epics/*`, `docs/tasks/*`, `project_context.md`, `changelog.md`.
+- **Validacion:** documental únicamente; no se tocaron rutas runtime ni código de aplicación en esta sesión.
+
 ## Sesion 2026-04-21 — Arquitectura Comercial vs Finanzas + programa EPIC-002 (Codex)
 
 - **Scope:** formalizar antes de implementar la separacion de dominio entre `Comercial` y `Finanzas`, para decidir si el cambio cabe en una sola task o requiere programa multi-task.

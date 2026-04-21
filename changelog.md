@@ -2,6 +2,24 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — Ops Registry queda formalizado como framework operativo del repo
+
+- Se formaliza `Ops Registry` como la próxima capa operativa repo-native de Greenhouse para indexar, validar, relacionar y consultar la documentación viva del framework de desarrollo sin mover la source of truth fuera de Git.
+- **Arquitectura nueva**: `docs/architecture/GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md` define principios, mounting técnico, schema común, outputs derivados, surfaces humano + agente y estrategia de federación a repos hermanos.
+- **Mounting V1 acordado**:
+  - `src/lib/ops-registry/**` para parser/schema/graph/validators/query layer
+  - `scripts/ops-registry-*.mjs` para CLI y generación
+  - `.generated/ops-registry/**` para outputs derivados
+  - `src/app/api/internal/ops-registry/**` para endpoints JSON-first
+  - `src/app/(dashboard)/admin/ops-registry/**` para la surface humana futura
+- **Stack recomendado**: `TypeScript + Node.js`, `unified + remark-parse`, `zod`; V1 sin base externa obligatoria.
+- **Programa nuevo**: `EPIC-003 — Ops Registry Federated Operational Framework` con 4 child tasks:
+  - `TASK-558` schema/parser/repo-config foundation
+  - `TASK-559` validation/query CLI/generated outputs
+  - `TASK-560` surfaces humano + agente
+  - `TASK-561` federation contract para repos hermanos
+- **Decisión clave**: Notion puede ser espejo operacional futuro, pero no source of truth primaria del sistema técnico.
+
 ### 2026-04-21 — TASK-524 Income → HubSpot Invoice Bridge shipped
 
 - Cierra la continuidad comercial `quote → income → HubSpot invoice` con contrato resuelto en TASK-524.

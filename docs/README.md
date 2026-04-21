@@ -40,6 +40,8 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md](architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md)
 - [GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md](architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md)
 - [GREENHOUSE_SERVICE_MODULES_V1.md](architecture/GREENHOUSE_SERVICE_MODULES_V1.md)
+- [GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md](architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md)
+- [GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md](architecture/GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md)
 - [FINANCE_CANONICAL_360_V1.md](architecture/FINANCE_CANONICAL_360_V1.md)
 - [Greenhouse_Capabilities_Architecture_v1.md](architecture/Greenhouse_Capabilities_Architecture_v1.md)
 - [Greenhouse_Nomenclatura_Portal_v3.md](architecture/Greenhouse_Nomenclatura_Portal_v3.md)

@@ -1,3 +1,51 @@
+## Delta 2026-04-21 EPIC-003 formaliza Ops Registry como framework operativo repo-native y federable
+
+- Greenhouse ya no debe pensar la operacion del framework documental solo como una colección de markdowns navegados manualmente.
+- Decision canonica nueva:
+  - nace `Ops Registry` como capa derivada para indexar, validar, relacionar y consultar `architecture`, `tasks`, `epics`, `mini-tasks`, `issues`, `project_context`, `Handoff` y `changelog`
+  - la source of truth sigue en Git y en markdown local a cada repo
+  - el sistema debe servir tanto a humanos como a agentes
+  - el diseño base debe escalar a repos hermanos por federacion, no por centralizacion
+- Mounting técnico objetivo:
+  - `src/lib/ops-registry/**`
+  - `scripts/ops-registry-*.mjs`
+  - `.generated/ops-registry/**`
+  - `src/app/api/internal/ops-registry/**`
+  - `src/app/(dashboard)/admin/ops-registry/**`
+- Stack recomendado:
+  - `TypeScript + Node.js`
+  - `unified + remark-parse`
+  - `zod`
+  - JSON derivados como contrato V1; base externa opcional solo como cache futura, nunca como truth primaria
+- Artefactos derivados mínimos:
+  - `registry.json`
+  - `graph.json`
+  - `validation-report.json`
+  - `stale-report.json`
+- Programa operativo:
+  - `EPIC-003 — Ops Registry Federated Operational Framework`
+  - child tasks iniciales: `TASK-558` a `TASK-561`
+
+## Delta 2026-04-21 EPIC-002 formaliza la separacion canonica Comercial vs Finanzas
+
+- Greenhouse ya no debe tratar `Finance` como owner primario de quotes, contracts, SOW, master agreements, products y pipeline comercial solo porque varias rutas legacy sigan bajo `/finance/...`.
+- Decision canonica nueva:
+  - `Comercial` y `Finanzas` pasan a ser dominios hermanos del portal
+  - la primera separacion ocurre en `navegacion + surfaces + autorizacion`
+  - la primera separacion **no** obliga a migrar paths legacy `/finance/...`
+- Fuente especializada:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`
+- Contrato operativo:
+  - `Comercial` es owner de `pipeline`, `deals`, `cotizaciones`, `contratos`, `SOW`, `acuerdos marco` y `productos`
+  - `Finanzas` conserva ownership de `ingresos`, `egresos`, `cobros`, `pagos`, `banco`, `posicion de caja`, `conciliacion`, `asignaciones` y `economia`
+  - el access model objetivo requiere los dos planos:
+    - `views` / `authorizedViews` / `view_code` con namespace `comercial.*`
+    - `entitlements` / `routeGroup: commercial` con compat temporal a `finanzas.*`
+- Implicacion de ejecucion:
+  - este corte no cabe sanamente en una sola task
+  - nace `EPIC-002 — Commercial Domain Separation from Finance`
+  - child tasks iniciales: `TASK-554` a `TASK-557`
+
 ## Delta 2026-04-19 EPIC-001 introduce taxonomía canónica de epics y el programa documental transversal
 
 - El repo ya no usa solo `umbrella task` para coordinar programas grandes: nace `docs/epics/` con `EPIC-###`, `EPIC_TEMPLATE.md` y `EPIC_ID_REGISTRY.md`.
