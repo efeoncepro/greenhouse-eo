@@ -5,6 +5,11 @@ import type { PoolClient } from 'pg'
 import { getServerAuthSession } from '@/lib/auth'
 import { withTransaction } from '@/lib/db'
 import {
+  applyPricingCatalogEntityChanges,
+  EntityWriterError,
+  PRICING_CATALOG_ENTITY_WHITELIST
+} from '@/lib/commercial/pricing-catalog-entity-writer'
+import {
   canAdministerPricingCatalog,
   requireAdminTenantContext
 } from '@/lib/tenant/authorization'
@@ -14,6 +19,7 @@ export const dynamic = 'force-dynamic'
 interface ApplyDiffInput {
   entityType?: unknown
   entityId?: unknown
+  entitySku?: unknown
   action?: unknown
   newValues?: unknown
   fieldsChanged?: unknown
@@ -23,28 +29,16 @@ interface ApplyRequestBody {
   diffsToApply?: unknown
 }
 
-const ROLE_WHITELIST = [
-  'role_label_es',
-  'role_label_en',
-  'category',
-  'tier',
-  'tier_label',
-  'can_sell_as_staff',
-  'can_sell_as_service_component',
-  'active',
-  'notes'
-] as const
-
 /**
  * POST /api/admin/pricing-catalog/import-excel/apply
  *
- * TASK-471 slice 6 — aplica selectivamente los diffs del preview. Cada
- * diff aplicado genera un audit row con action='bulk_imported'. V1 soporta
- * solo `action='update'` sobre `sellable_role` (no create/delete en
- * bulk hasta que tengamos workflow de approval).
+ * TASK-471 slice 6 + Gap-5 — aplica selectivamente los diffs del preview.
+ * V1 scope: solo action='update' sobre las entidades del shared writer
+ * whitelist (sellable_role, tool_catalog, overhead_addon, service_catalog).
+ * Create/delete se diferen a follow-up porque requieren workflow de approval.
  *
- * Body:
- *   { diffsToApply: Array<{ entityType, entityId, action, newValues, fieldsChanged }> }
+ * Body: { diffsToApply: Array<{ entityType, entityId, entitySku?, action,
+ *         newValues, fieldsChanged }> }
  */
 export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
@@ -73,7 +67,7 @@ export async function POST(request: Request) {
   const actorName = session?.user?.name || session?.user?.email || tenant.userId || 'unknown'
 
   const applied: string[] = []
-  const failed: Array<{ entityId: string; message: string }> = []
+  const failed: Array<{ entityId: string; message: string; code: string }> = []
 
   try {
     await withTransaction(async (client: PoolClient) => {
@@ -81,11 +75,15 @@ export async function POST(request: Request) {
         if (!rawDiff || typeof rawDiff !== 'object') continue
 
         const diff = rawDiff as ApplyDiffInput
+        const entityType = typeof diff.entityType === 'string' ? diff.entityType : null
+        const entityId = typeof diff.entityId === 'string' ? diff.entityId : null
+        const entitySku = typeof diff.entitySku === 'string' ? diff.entitySku : null
 
-        if (diff.entityType !== 'sellable_role') {
+        if (!entityType || !PRICING_CATALOG_ENTITY_WHITELIST[entityType]) {
           failed.push({
-            entityId: typeof diff.entityId === 'string' ? diff.entityId : 'unknown',
-            message: 'Only sellable_role imports are supported in V1.'
+            entityId: entityId ?? 'unknown',
+            message: `Entity type "${String(entityType)}" not supported.`,
+            code: 'entity_not_supported'
           })
 
           continue
@@ -93,65 +91,47 @@ export async function POST(request: Request) {
 
         if (diff.action !== 'update') {
           failed.push({
-            entityId: typeof diff.entityId === 'string' ? diff.entityId : 'unknown',
-            message: `Action "${String(diff.action)}" not supported in V1 (only update).`
+            entityId: entityId ?? 'unknown',
+            message: `Action "${String(diff.action)}" not supported in V1 (only update).`,
+            code: 'action_not_supported'
           })
 
           continue
         }
 
-        const entityId = typeof diff.entityId === 'string' ? diff.entityId : null
-
-        const newValues = diff.newValues && typeof diff.newValues === 'object'
-          ? (diff.newValues as Record<string, unknown>)
-          : null
-
+        const newValues =
+          diff.newValues && typeof diff.newValues === 'object' && !Array.isArray(diff.newValues)
+            ? (diff.newValues as Record<string, unknown>)
+            : null
         const fieldsChanged = Array.isArray(diff.fieldsChanged)
           ? diff.fieldsChanged.filter((f): f is string => typeof f === 'string')
           : []
 
         if (!entityId || !newValues) {
-          failed.push({ entityId: entityId ?? 'unknown', message: 'Missing entityId or newValues.' })
+          failed.push({
+            entityId: entityId ?? 'unknown',
+            message: 'Missing entityId or newValues.',
+            code: 'missing_fields'
+          })
 
           continue
         }
 
-        // Whitelist fields to update.
-        const setClauses: string[] = []
-        const values: unknown[] = []
+        // Only apply the fields explicitly flagged as changed (avoid resetting
+        // unchanged fields to their old value — which the diff might include).
+        const changeset: Record<string, unknown> = {}
 
         for (const field of fieldsChanged) {
-          if ((ROLE_WHITELIST as readonly string[]).includes(field)) {
-            setClauses.push(`"${field}" = $${values.length + 1}`)
-            values.push(newValues[field])
-          }
+          if (field in newValues) changeset[field] = newValues[field]
         }
-
-        if (setClauses.length === 0) {
-          failed.push({ entityId, message: 'No whitelisted fields to update.' })
-
-          continue
-        }
-
-        values.push(entityId)
 
         try {
-          const res = await client.query(
-            `UPDATE greenhouse_commercial.sellable_roles
-                SET ${setClauses.join(', ')},
-                    updated_at = NOW()
-              WHERE role_id = $${values.length}
-              RETURNING role_id, role_sku`,
-            values
-          )
-
-          if (res.rowCount === 0) {
-            failed.push({ entityId, message: 'Role not found.' })
-
-            continue
-          }
-
-          const { role_sku: roleSku } = res.rows[0] as { role_sku: string }
+          const result = await applyPricingCatalogEntityChanges({
+            client,
+            entityType,
+            entityId,
+            changeset
+          })
 
           await client.query(
             `INSERT INTO greenhouse_commercial.pricing_catalog_audit_log (
@@ -159,14 +139,14 @@ export async function POST(request: Request) {
                actor_user_id, actor_name, change_summary
              ) VALUES ($1, $2, $3, 'bulk_imported', $4, $5, $6::jsonb)`,
             [
-              'sellable_role',
+              entityType,
               entityId,
-              roleSku,
+              entitySku,
               tenant.userId,
               actorName,
               JSON.stringify({
-                new_values: newValues,
-                fields_changed: fieldsChanged,
+                new_values: changeset,
+                fields_changed: result.updatedFields,
                 source: 'excel_import'
               })
             ]
@@ -174,10 +154,15 @@ export async function POST(request: Request) {
 
           applied.push(entityId)
         } catch (err) {
-          failed.push({
-            entityId,
-            message: err instanceof Error ? err.message : 'Unknown error.'
-          })
+          if (err instanceof EntityWriterError) {
+            failed.push({ entityId, message: err.message, code: err.code })
+          } else {
+            failed.push({
+              entityId,
+              message: err instanceof Error ? err.message : 'Unknown error.',
+              code: 'unknown_error'
+            })
+          }
         }
       }
     })
@@ -187,7 +172,12 @@ export async function POST(request: Request) {
     console.error('[TASK-471] Failed to apply Excel import diffs', error)
 
     return NextResponse.json(
-      { error: 'Failed to apply import.', applied: applied.length, failed: failed.length, errors: failed },
+      {
+        error: 'Failed to apply import.',
+        applied: applied.length,
+        failed: failed.length,
+        errors: failed
+      },
       { status: 500 }
     )
   }
