@@ -2,6 +2,19 @@
 
 ## 2026-04-20
 
+### 2026-04-20 — TASK-471 Pricing Catalog Phase-4 UI Polish shipped (6 slices)
+
+- **Slice 1 — AuditDiffViewer primitive**: reemplaza `<pre>{JSON.stringify(changeSummary)}</pre>` en el audit timeline. Soporta 12 action types con render contextual (side-by-side para updates, single-column para create/delete, state banner por acción). Deltas numéricos con pct, set diff para arrays, collapse de campos sin cambios, copy JSON clipboard.
+- **Slice 2 — One-click Revert**: migration agrega 3 action values nuevos (`reverted`, `approval_applied`, `bulk_edited`). Capability restrictiva `canRevertPricingCatalogChange` (solo efeonce_admin). Helper `pricing-catalog-revert.ts` con dispatcher por entity_type. Endpoint POST `/audit-log/[auditId]/revert` con column whitelist + transactional UPDATE + new audit row. Dialog con inverse preview + reason obligatorio.
+- **Slice 3 — Bulk Edit**: multi-select en `SellableRolesListView` (checkbox column + select-all + indeterminate) con action bar fixed-bottom. Drawer `BulkEditDrawer` para activar/desactivar + notesAppend. Endpoint `/roles/bulk` con transactional UPDATE + audit row `bulk_edited` por role.
+- **Slice 4 — ImpactPreviewPanel**: componente que consume los 3 preview-impact endpoints (TASK-470), muestra affected quotes + deals + sample + warnings. High-impact threshold (≥20 quotes o ≥$100M CLP) con checkbox obligatorio de confirmación. Wired en los 3 edit drawers (SellableRole, Tool, Overhead).
+- **Slice 5 — Maker-Checker Approval Queue**: migration `pricing_catalog_approval_queue`. Store con `detectApprovalCriticality` (critical/high/medium/low por entity_type + campos cambiados), `proposeApproval`, `listApprovals`, `decideApproval` con enforcement proposer≠reviewer (ApprovalSelfReviewError). Endpoints GET/POST `/approvals` + PATCH `/approvals/[id]`. View `ApprovalsQueueView` con cards por entry, criticality chip + status chip, AuditDiffViewer reutilizado, Dialog de decisión con comment obligatorio.
+- **Slice 6 — Excel Roundtrip**: helper `pricing-catalog-excel.ts` con `buildPricingCatalogWorkbook` (Roles + Tools + Overheads + Metadata multi-sheet) y `previewPricingCatalogExcelImport` (parse workbook.xlsx.load + diff contra DB). 3 endpoints: GET `/export-excel` (buffer download), POST `/import-excel/preview` (multipart file), POST `/import-excel/apply` (selective apply). View `ExcelImportView` con export button + file upload + diff table + checkbox per diff + confirm apply. Page `/admin/pricing-catalog/import-excel`.
+- **Nomenclature**: nuevo namespace `GH_PRICING_GOVERNANCE` con copy completo ES para las 6 subareas (auditDiff, auditRevert, bulkEdit, impactPreview, approvals, excel).
+- **Verification**: lint 0 errors, tsc clean, 1569/1569 tests passed, build OK.
+- **V1 scope**: Revert + Bulk + Excel apply cubren solo `sellable_role` en el backend. Tools + overheads apply son follow-up (mismo pattern, duplicación de whitelist). Slice 5 queue se persiste pero el auto-apply al approve queda como slice 5b.
+
+
 ### 2026-04-20 — TASK-481 Quote Builder suggested cost UX + override governance
 
 - El Quote Builder ahora expone provenance (source_kind), confidence (label + score), y freshness (días desde snapshot) del costo sugerido por línea cuando el engine v2 provee metadata. 3 chips compactos en cada cost stack + Floating UI popover con detalle, sourceRef monospace, resolution notes y disclaimers contextuales (fallback y manual). Aplica en detail post-emisión vía el mismo cost stack gateado por `canViewCostStack`.
