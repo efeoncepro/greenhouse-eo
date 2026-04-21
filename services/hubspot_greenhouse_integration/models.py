@@ -71,6 +71,12 @@ def build_company_profile(
             "lifecyclestage": props.get("lifecyclestage"),
             "hs_current_customer": props.get("hs_current_customer"),
             "hubspotTeamId": props.get("hubspot_team_id"),
+            "ghCommercialPartyId": props.get("gh_commercial_party_id"),
+            "ghLastQuoteAt": props.get("gh_last_quote_at"),
+            "ghLastContractAt": props.get("gh_last_contract_at"),
+            "ghActiveContractsCount": _safe_number(props.get("gh_active_contracts_count")),
+            "ghLastWriteAt": props.get("gh_last_write_at"),
+            "ghMrrTier": props.get("gh_mrr_tier"),
         },
         "capabilities": {
             "businessLines": split_multivalue(props.get(business_line_prop)),

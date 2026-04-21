@@ -66,6 +66,20 @@ class HubSpotClient:
             )
         return response.json()
 
+    def update_company(self, company_id: str, properties: dict[str, Any]) -> dict[str, Any]:
+        response = self.session.patch(
+            f"{HUBSPOT_API}/crm/v3/objects/companies/{company_id}",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
     def get_owner(self, owner_id: str) -> dict[str, Any]:
         response = self.session.get(
             f"{HUBSPOT_API}/crm/v3/owners/{owner_id}",

@@ -1,3 +1,6 @@
+from hmac import compare_digest
+from typing import Any
+
 from flask import Flask, jsonify, request
 
 try:
@@ -53,6 +56,24 @@ def create_app() -> Flask:
             api_token=app.config["greenhouse_integration_api_token"],
             timeout_seconds=app.config["timeout_seconds"],
         )
+
+    def _extract_integration_token() -> str | None:
+        authorization = request.headers.get("Authorization", "").strip()
+        if authorization.lower().startswith("bearer "):
+            return authorization[len("bearer ") :].strip() or None
+
+        return request.headers.get("x-greenhouse-integration-key", "").strip() or None
+
+    def _require_integration_write_auth():
+        expected = app.config["greenhouse_integration_api_token"].strip()
+        if not expected:
+            return jsonify({"error": "GREENHOUSE_INTEGRATION_API_TOKEN is not set"}), 500
+
+        provided = _extract_integration_token()
+        if not provided or not compare_digest(provided, expected):
+            return jsonify({"error": "Unauthorized"}), 401
+
+        return None
 
     @app.get("/health")
     def health():
@@ -191,6 +212,48 @@ def create_app() -> Flask:
                     "hubspotCompanyId": company_id,
                     "count": len(ordered_services),
                     "services": ordered_services,
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.patch("/companies/<company_id>/lifecycle")
+    def update_company_lifecycle(company_id: str):
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
+        try:
+            body = request.get_json(force=True) or {}
+            props: dict[str, Any] = {}
+
+            if body.get("lifecycleStage"):
+                props["lifecyclestage"] = body["lifecycleStage"]
+            if body.get("commercialPartyId"):
+                props["gh_commercial_party_id"] = body["commercialPartyId"]
+            if body.get("lastQuoteAt"):
+                props["gh_last_quote_at"] = body["lastQuoteAt"]
+            if body.get("lastContractAt"):
+                props["gh_last_contract_at"] = body["lastContractAt"]
+            if body.get("activeContractsCount") is not None:
+                props["gh_active_contracts_count"] = body["activeContractsCount"]
+            if body.get("ghLastWriteAt"):
+                props["gh_last_write_at"] = body["ghLastWriteAt"]
+            if body.get("mrrTier"):
+                props["gh_mrr_tier"] = body["mrrTier"]
+
+            if not props:
+                return jsonify({"error": "No lifecycle fields to update"}), 400
+
+            _client().update_company(company_id, props)
+
+            return jsonify(
+                {
+                    "status": "updated",
+                    "hubspotCompanyId": company_id,
+                    "fieldsWritten": list(props.keys()),
                 }
             )
         except HubSpotIntegrationError as exc:
