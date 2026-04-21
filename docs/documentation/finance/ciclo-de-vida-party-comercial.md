@@ -155,7 +155,7 @@ Todos los eventos incluyen `commercial_party_id` — un identificador **estable 
 | E | TASK-539 | Shipped. Crear deal desde Greenhouse sin saltar a HubSpot |
 | F | TASK-540 | Shipped. Greenhouse ya propaga lifecycle a HubSpot, valida anti-ping-pong y deja trazabilidad de conflictos |
 | G | TASK-541 | Shipped. Quote-to-cash atomico: firmar contrato + promover a cliente + crear income, todo en una transaccion |
-| H | TASK-542 | Admin Center: dashboards de funnel, conflictos de sync, sweep de inactivos |
+| H | TASK-542 | Shipped. Admin Center: dashboards de funnel, conflictos de sync, detalle por party, transiciones manuales y sweep de inactivos |
 | I | TASK-543 | Deprecar flags y codigo legacy |
 
 ## Ejemplos practicos
@@ -211,7 +211,7 @@ Cada org tiene al menos una fila en `organization_lifecycle_history` con `transi
 
 **¿Puedo cambiar el estado de una empresa desde la UI?**
 
-Todavia no — la Fase A solo ship el backend. La UI llegara en Fase H (TASK-542 Admin Center).
+Si, pero solo desde Admin Center y con permisos altos. La surface `Commercial Parties` en `/admin/commercial/parties` deja revisar el detalle por party, resolver conflictos de sync y forzar una transición manual cuando el actor tiene la capability `commercial.party.override_lifecycle`. Toda intervención deja rastro en `organization_lifecycle_history` con `source='operator_override'` y razón obligatoria.
 
 **¿Que hago si HubSpot agrega un stage nuevo que no esta mapeado?**
 

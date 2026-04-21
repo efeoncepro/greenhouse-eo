@@ -2,6 +2,25 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-542 cierra la surface administrativa de Party Lifecycle
+
+- Greenhouse ya tiene la Fase H del programa Party Lifecycle operativa en Admin Center con una surface real de gestión y observabilidad.
+- **Admin Center / UI**:
+  - nueva navegación `Commercial Parties` en `/admin/commercial/parties`
+  - lista operativa con filtros, stage chips, sync health, backlog HubSpot y conflictos recientes
+  - detalle `/admin/commercial/parties/:id` con timeline de history, panel espejo HubSpot, conflictos y CTA de transición manual
+  - override manual protegido por capability `commercial.party.override_lifecycle`
+- **Projection + backend**:
+  - migration `20260422003000000_task-542-party-lifecycle-snapshots.sql` crea `greenhouse_serving.party_lifecycle_snapshots`
+  - store `party-lifecycle-snapshot-store.ts` materializa snapshot, detalle, funnel metrics y serving SSR/API
+  - projection reactiva `partyLifecycleSnapshot` mantiene la tabla al día frente a eventos comerciales, contratos, cotizaciones y conflictos
+  - `sync-conflicts-store.ts` ahora soporta listado, lookup y resolución admin
+- **Operación**:
+  - `ops-worker` gana `/party-lifecycle/sweep` para barrer `active_client -> inactive` con criterio de 6 meses sin contrato activo ni quote reciente
+  - runbook nuevo `docs/operations/party-lifecycle-runbook.md`
+  - documentación funcional nueva `docs/documentation/admin-center/commercial-parties.md`
+- **Verificación**: `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`) · tests focales OK (12 passing) · `pnpm exec tsc --noEmit --pretty false` OK · `pnpm test` OK (`1805` passing, `2` skipped) · `pnpm lint` OK con 1 warning legacy preexistente · `pnpm build` OK.
+
 ### 2026-04-21 — TASK-540 cierra el outbound de Party Lifecycle end-to-end
 
 - Greenhouse EO ya tiene el loop Greenhouse → HubSpot → inbound guard completamente operativo para lifecycle comercial sobre Companies.

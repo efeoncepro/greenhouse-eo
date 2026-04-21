@@ -260,6 +260,25 @@ const buildDomainCards = ({
     ]
   },
   {
+    id: 'commercial-parties',
+    title: GH_INTERNAL_NAV.adminCommercialParties.label,
+    subtitle: GH_INTERNAL_NAV.adminCommercialParties.subtitle,
+    icon: 'tabler-building-community',
+    avatarColor: 'warning',
+    status: {
+      label: 'Lifecycle',
+      color: 'info'
+    },
+    href: '/admin/commercial/parties',
+    primaryAction: 'Abrir commercial parties',
+    routes: ['/admin/commercial/parties'],
+    points: [
+      'Embudo prospect → opportunity → active_client sobre organizations materializadas',
+      'Conflictos de sync HubSpot y señales anti ping-pong visibles desde Admin',
+      'Detalle por party con timeline, anclas comerciales y bridge financiero'
+    ]
+  },
+  {
     id: 'ops-health',
     title: 'Ops Health',
     subtitle: GH_INTERNAL_NAV.adminOpsHealth.subtitle,

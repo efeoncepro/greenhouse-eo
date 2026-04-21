@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { getDb } from '@/lib/db'
+import { getDb, query } from '@/lib/db'
 
 export const PARTY_SYNC_CONFLICT_TYPES = [
   'field_authority',
@@ -33,7 +33,12 @@ export interface PartySyncConflictRow {
   metadata: Record<string, unknown>
 }
 
-interface DbConflictRow {
+export interface PartySyncConflictListItem extends PartySyncConflictRow {
+  organizationName: string | null
+  lifecycleStage: string | null
+}
+
+interface DbConflictRow extends Record<string, unknown> {
   conflict_id: string
   organization_id: string | null
   commercial_party_id: string | null
@@ -45,6 +50,11 @@ interface DbConflictRow {
   resolution_applied_at: Date | null
   resolved_by: string | null
   metadata: Record<string, unknown> | null
+}
+
+interface DbConflictListRow extends DbConflictRow {
+  organization_name: string | null
+  lifecycle_stage: string | null
 }
 
 const normalizeRow = (row: DbConflictRow): PartySyncConflictRow => ({
@@ -61,6 +71,12 @@ const normalizeRow = (row: DbConflictRow): PartySyncConflictRow => ({
   metadata: row.metadata ?? {}
 })
 
+const normalizeListRow = (row: DbConflictListRow): PartySyncConflictListItem => ({
+  ...normalizeRow(row),
+  organizationName: row.organization_name ?? null,
+  lifecycleStage: row.lifecycle_stage ?? null
+})
+
 export interface InsertPartySyncConflictInput {
   organizationId?: string | null
   commercialPartyId?: string | null
@@ -70,6 +86,13 @@ export interface InsertPartySyncConflictInput {
   resolutionStatus?: PartySyncConflictResolution
   resolvedBy?: string | null
   metadata?: Record<string, unknown>
+}
+
+export interface ListPartySyncConflictsOptions {
+  unresolvedOnly?: boolean
+  query?: string | null
+  limit?: number
+  offset?: number
 }
 
 export const insertPartySyncConflict = async (
@@ -99,4 +122,155 @@ export const insertPartySyncConflict = async (
     .executeTakeFirstOrThrow()
 
   return normalizeRow(inserted as unknown as DbConflictRow)
+}
+
+export const getPartySyncConflictById = async (
+  conflictId: string
+): Promise<PartySyncConflictRow | null> => {
+  const rows = await query<DbConflictRow>(
+    `SELECT
+       conflict_id,
+       organization_id,
+       commercial_party_id,
+       hubspot_company_id,
+       conflict_type,
+       detected_at,
+       conflicting_fields,
+       resolution_status,
+       resolution_applied_at,
+       resolved_by,
+       metadata
+     FROM greenhouse_commercial.party_sync_conflicts
+     WHERE conflict_id = $1
+     LIMIT 1`,
+    [conflictId]
+  )
+
+  return rows[0] ? normalizeRow(rows[0]) : null
+}
+
+export const listPartySyncConflicts = async (
+  options: ListPartySyncConflictsOptions = {}
+): Promise<{ items: PartySyncConflictListItem[]; total: number }> => {
+  const conditions: string[] = []
+  const values: unknown[] = []
+  let idx = 0
+
+  const push = (fragment: string, value: unknown) => {
+    idx += 1
+    conditions.push(fragment.replaceAll('?', String(idx)))
+    values.push(value)
+  }
+
+  if (options.unresolvedOnly !== false) {
+    conditions.push(`c.resolution_status = 'pending'`)
+  }
+
+  const q = options.query?.trim()
+
+  if (q) {
+    push(
+      `(COALESCE(s.organization_name, o.organization_name, '') ILIKE $? OR COALESCE(c.hubspot_company_id, '') ILIKE $? OR COALESCE(c.commercial_party_id, '') ILIKE $? OR COALESCE(c.organization_id, '') ILIKE $?)`,
+      `%${q}%`
+    )
+    values.push(`%${q}%`, `%${q}%`, `%${q}%`)
+    idx += 3
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+  const limit = Math.max(1, Math.min(options.limit ?? 50, 200))
+  const offset = Math.max(0, options.offset ?? 0)
+
+  const countRows = await query<{ total: string | number }>(
+    `SELECT COUNT(*)::bigint AS total
+       FROM greenhouse_commercial.party_sync_conflicts c
+       LEFT JOIN greenhouse_serving.party_lifecycle_snapshots s
+         ON s.organization_id = c.organization_id
+       LEFT JOIN greenhouse_core.organizations o
+         ON o.organization_id = c.organization_id
+       ${whereClause}`,
+    values
+  )
+
+  const rows = await query<DbConflictListRow>(
+    `SELECT
+       c.conflict_id,
+       c.organization_id,
+       c.commercial_party_id,
+       c.hubspot_company_id,
+       c.conflict_type,
+       c.detected_at,
+       c.conflicting_fields,
+       c.resolution_status,
+       c.resolution_applied_at,
+       c.resolved_by,
+       c.metadata,
+       COALESCE(s.organization_name, o.organization_name) AS organization_name,
+       s.lifecycle_stage
+     FROM greenhouse_commercial.party_sync_conflicts c
+     LEFT JOIN greenhouse_serving.party_lifecycle_snapshots s
+       ON s.organization_id = c.organization_id
+     LEFT JOIN greenhouse_core.organizations o
+       ON o.organization_id = c.organization_id
+     ${whereClause}
+     ORDER BY c.detected_at DESC, c.conflict_id DESC
+     LIMIT $${idx + 1}
+     OFFSET $${idx + 2}`,
+    [...values, limit, offset]
+  )
+
+  return {
+    items: rows.map(normalizeListRow),
+    total: Number(countRows[0]?.total ?? 0)
+  }
+}
+
+export const updatePartySyncConflictResolution = async ({
+  conflictId,
+  resolutionStatus,
+  resolvedBy,
+  metadataPatch
+}: {
+  conflictId: string
+  resolutionStatus: PartySyncConflictResolution
+  resolvedBy: string | null
+  metadataPatch?: Record<string, unknown>
+}): Promise<PartySyncConflictRow | null> => {
+  const rows = await query<DbConflictRow>(
+    `UPDATE greenhouse_commercial.party_sync_conflicts
+        SET resolution_status = $2,
+            resolution_applied_at = CASE
+              WHEN $2 = 'pending' THEN NULL
+              ELSE NOW()
+            END,
+            resolved_by = CASE
+              WHEN $2 = 'pending' THEN NULL
+              ELSE $3
+            END,
+            metadata = CASE
+              WHEN $4::jsonb IS NULL THEN metadata
+              ELSE COALESCE(metadata, '{}'::jsonb) || $4::jsonb
+            END
+      WHERE conflict_id = $1
+      RETURNING
+        conflict_id,
+        organization_id,
+        commercial_party_id,
+        hubspot_company_id,
+        conflict_type,
+        detected_at,
+        conflicting_fields,
+        resolution_status,
+        resolution_applied_at,
+        resolved_by,
+        metadata`,
+    [
+      conflictId,
+      resolutionStatus,
+      resolvedBy,
+      metadataPatch ? JSON.stringify(metadataPatch) : null
+    ]
+  )
+
+  return rows[0] ? normalizeRow(rows[0]) : null
 }

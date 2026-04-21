@@ -1,5 +1,47 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-542 Party Lifecycle Admin Dashboards (Codex)
+
+- **Scope:** cerrar la Fase H del programa Party Lifecycle con surface administrativa real en Admin Center, snapshot serving canonico, resolución de conflictos, override manual y sweep operativo en `ops-worker`.
+- **Correccion de spec antes de implementar**
+  - la spec apuntaba a paths UI y skills desactualizados; se alineó a los paths reales del repo y a los skills vigentes
+  - el surface real no era un page suelto sino el patrón `Admin Center -> card -> list/detail`
+  - la regla de APIs admin quedó explícita sobre `requireAdminTenantContext()` y no sobre guards laxos
+- **Implementacion shipped**
+  - migración `20260422003000000_task-542-party-lifecycle-snapshots.sql`
+  - projection reactiva `src/lib/sync/projections/party-lifecycle-snapshot.ts`
+  - store `src/lib/commercial/party/party-lifecycle-snapshot-store.ts`
+  - sweep `src/lib/commercial/party/party-lifecycle-sweep.ts`
+  - comandos admin `override-party-lifecycle.ts` y `resolve-party-sync-conflict.ts`
+  - APIs admin `/api/admin/commercial/parties/**`
+  - surfaces `/admin/commercial/parties` y `/admin/commercial/parties/[id]`
+  - card nueva en `AdminCenterView`
+- **Contrato operativo**
+  - list/funnel/detail SSR consumen la snapshot `greenhouse_serving.party_lifecycle_snapshots`; el backlog de candidates HubSpot sigue leyendo `greenhouse_crm.companies`
+  - la resolución admin de conflictos soporta `force_outbound`, `force_inbound` e `ignore`
+  - las transiciones manuales generan history con `source='operator_override'`
+  - el sweep mueve `active_client -> inactive` cuando no hay contrato activo ni quote reciente en 6 meses
+- **Docs actualizadas**
+  - `docs/tasks/complete/TASK-542-party-lifecycle-admin-dashboards.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+  - `docs/documentation/admin-center/commercial-parties.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `docs/operations/party-lifecycle-runbook.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm exec vitest run src/app/api/admin/commercial/parties/route.test.ts 'src/app/api/admin/commercial/parties/[partyId]/transition/route.test.ts' 'src/app/api/admin/commercial/parties/conflicts/[conflictId]/resolve/route.test.ts' src/lib/commercial/party/__tests__/party-lifecycle-sweep.test.ts src/lib/commercial/party/__tests__/resolve-party-sync-conflict.test.ts src/lib/sync/projections/party-lifecycle-snapshot.test.ts` OK (`12` passing)
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1805` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+  - sin `new Pool()` nuevos fuera de `src/lib/postgres/client.ts`
+
 ## Sesion 2026-04-21 — TASK-540 HubSpot Lifecycle Outbound Sync (Codex)
 
 - **Scope:** aterrizar la foundation local de Fase F del programa Party Lifecycle para devolver lifecycle/commercial party metadata desde Greenhouse a HubSpot Companies vía carril reactivo, sin romper tenant isolation ni el sync inbound existente.

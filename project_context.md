@@ -1,3 +1,20 @@
+## Delta 2026-04-21 TASK-542 cierra la surface administrativa de Party Lifecycle
+
+- Greenhouse ya tiene surface administrativa canonica para lifecycle comercial en Admin Center.
+- Contrato nuevo:
+  - navegación `Commercial Parties` en `/admin/commercial/parties`
+  - detail `/admin/commercial/parties/:id`
+  - projection `src/lib/sync/projections/party-lifecycle-snapshot.ts`
+  - tabla `greenhouse_serving.party_lifecycle_snapshots`
+  - store `src/lib/commercial/party/party-lifecycle-snapshot-store.ts`
+  - comandos admin `override-party-lifecycle.ts` y `resolve-party-sync-conflict.ts`
+  - endpoint `POST /party-lifecycle/sweep` en `services/ops-worker/server.ts`
+- Reglas operativas:
+  - la lectura de funnel/velocity debe consumir la snapshot, no queries ad-hoc
+  - las transiciones manuales solo pasan por `promoteParty` con `source='operator_override'` y razón obligatoria
+  - la resolución de conflictos vive sobre `greenhouse_commercial.party_sync_conflicts`
+  - el sweep de inactividad corre en `ops-worker`, no en Vercel serverless
+
 ## Delta 2026-04-21 TASK-540 aterriza la foundation outbound de Party Lifecycle
 
 - Greenhouse ya tiene carril reactivo local para devolver lifecycle comercial hacia HubSpot Companies.

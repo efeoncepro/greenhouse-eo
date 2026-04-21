@@ -595,7 +595,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-539` | `complete` | Inline Deal Creation from Quote Builder (Fase E) | `docs/tasks/complete/TASK-539-inline-deal-creation-quote-builder.md` |
 | `TASK-540` | `complete` | HubSpot Lifecycle Outbound Sync (Fase F) | `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md` |
 | `TASK-541` | `complete` | Quote-to-Cash Atomic Choreography (Fase G) | `docs/tasks/complete/TASK-541-quote-to-cash-atomic-choreography.md` |
-| `TASK-542` | `to-do` | Party Lifecycle Admin Dashboards (Fase H) | `docs/tasks/to-do/TASK-542-party-lifecycle-admin-dashboards.md` |
+| `TASK-542` | `complete` | Party Lifecycle Admin Dashboards (Fase H) | `docs/tasks/complete/TASK-542-party-lifecycle-admin-dashboards.md` |
 | `TASK-543` | `to-do` | Party Lifecycle Deprecation & Flag Cleanup (Fase I) | `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md` |
 | `TASK-544` | `to-do` | Commercial Product Catalog Sync Program (umbrella) | `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md` |
 | `TASK-545` | `to-do` | Product Catalog Schema & Materializer Foundation (Fase A) | `docs/tasks/to-do/TASK-545-product-catalog-schema-materializer-foundation.md` |

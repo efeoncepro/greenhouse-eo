@@ -299,6 +299,11 @@ describe('AdminCenterView', () => {
       <AdminCenterView access={access} tenants={tenants} controlTower={controlTower} operations={operations} />
     )
 
+    expect(screen.getByRole('link', { name: /abrir commercial parties/i })).toHaveAttribute(
+      'href',
+      '/admin/commercial/parties'
+    )
+    expect(screen.getAllByText('Commercial Parties').length).toBeGreaterThan(0)
     expect(screen.getByRole('heading', { level: 2, name: 'Requiere atencion' })).toBeInTheDocument()
     expect(screen.getByText('2 handlers degradados')).toBeInTheDocument()
     expect(screen.getByText('128 backlog reactivo oculto')).toBeInTheDocument()

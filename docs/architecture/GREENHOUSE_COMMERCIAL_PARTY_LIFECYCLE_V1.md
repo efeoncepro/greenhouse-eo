@@ -82,7 +82,7 @@ Quote-to-cash atómico aterriza. Un solo comando transaccional compone quote →
 2. Outbound de `deal.won` hacia HubSpot (TASK-540 Fase F).
 3. Income materialization reactiva a `quote_to_cash.completed`.
 4. Reversal (unconvert) — evaluar post-V1.
-5. Dashboard funnel/velocity → TASK-542 Admin Center.
+5. Dashboard funnel/velocity → shipped en `TASK-542` via Admin Center.
 
 ## Delta 2026-04-21 — Fase E shipped (TASK-539)
 
@@ -154,7 +154,7 @@ La spec lista 5 comandos (`promoteParty`, `createPartyFromHubSpotCompany`, `inst
 
 ### Correcciones al catalogo de eventos (§spec lista 9 party events)
 
-La spec lista 9 eventos party (`created`, `promoted`, `demoted`, `hubspot_synced_in`, `hubspot_synced_out`, `sync_conflict`, `merged`, `inactivated`, `churned`). **Fase A shippea 4** (`created`, `promoted`, `demoted`, `lifecycle_backfilled`) + `commercial.client.instantiated`. Los eventos de sync (`synced_in/out`, `sync_conflict`) pertenecen a Fase B/F (TASK-536/540). Los de sweep (`inactivated`, `churned`-by-sweep) pertenecen al sweep cron diferido (TASK-542 o follow-up de Fase A). `merged` depende de open question #2 (party merge policy).
+La spec lista 9 eventos party (`created`, `promoted`, `demoted`, `hubspot_synced_in`, `hubspot_synced_out`, `sync_conflict`, `merged`, `inactivated`, `churned`). **Fase A shippeó 4** (`created`, `promoted`, `demoted`, `lifecycle_backfilled`) + `commercial.client.instantiated`. Los eventos de sync (`synced_in/out`, `sync_conflict`) quedaron en Fase B/F (`TASK-536/540`). Los de sweep (`inactivated`, `churned`-by-sweep) ya corren en `TASK-542`. `merged` sigue dependiendo de open question #2 (party merge policy).
 
 ### Robustez operacional anadida vs spec original
 
@@ -688,12 +688,12 @@ Orden recomendado para minimizar blast radius:
 5. **PR-E**: endpoint `/organizations/:id/deals` + drawer "Crear deal nuevo" en Quote Builder.
 6. **PR-F**: outbound sync HubSpot lifecycle property + projection.
 7. **PR-G**: comando `convertQuoteToCash` + wiring desde `contract.created` y `deal.won`.
-8. **PR-H**: dashboards en Admin Center para Ops Health + party lifecycle funnel metrics.
+8. **PR-H**: dashboards en Admin Center para Ops Health + party lifecycle funnel metrics. Shipped 2026-04-21 por `TASK-542`: ruta `/admin/commercial/parties`, detail `/admin/commercial/parties/:id`, projection `greenhouse_serving.party_lifecycle_snapshots`, conflict resolution admin y sweep `/party-lifecycle/sweep` en `ops-worker`.
 9. **PR-I**: deprecación del endpoint viejo y remoción de flags tras validación en staging.
 
 ### 10.3 Operational readiness
 
-- Runbook en `docs/operations/party-lifecycle-runbook.md`: diagnostico de conflictos, forzar transición manual, replay de sync fallido.
+- Runbook en `docs/operations/party-lifecycle-runbook.md`: diagnostico de conflictos, forzar transición manual, replay de sync fallido. Publicado en `TASK-542`.
 - Alertas: >10 sync_conflicts sin resolver en 24h → slack #ops-alerts; >5 deals creados con error 5xx en HubSpot en 1h → page oncall.
 - Dashboards: velocity de conversión (`prospect → opportunity → active_client`), time-in-stage, funnel drop-off.
 

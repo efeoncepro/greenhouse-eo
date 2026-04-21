@@ -129,7 +129,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-539-inline-deal-creation-quote-builder.md`
 - `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md`
 - `docs/tasks/complete/TASK-541-quote-to-cash-atomic-choreography.md`
-- `docs/tasks/to-do/TASK-542-party-lifecycle-admin-dashboards.md`
+- `docs/tasks/complete/TASK-542-party-lifecycle-admin-dashboards.md`
 - `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md`
 
 ## Current Repo State
@@ -195,7 +195,7 @@ Reglas obligatorias:
 
 ### Slice 8 — Admin dashboards
 
-- Crear `TASK-542` (Fase H): surfaces en Admin Center para party lifecycle funnel metrics, velocity de conversion, sync conflicts sin resolver, time-in-stage.
+- `TASK-542` (Fase H) cerrada: Admin Center ya expone surfaces para funnel metrics, velocity, sync conflicts, detail por party, override manual y sweep operativo.
 
 ### Slice 9 — Deprecation + flag cleanup
 
@@ -224,7 +224,7 @@ Programa oficial en 9 fases (A-I) con dependencias causales. Las fases A-G son o
 5. `TASK-539` (Fase E) — Inline deal creation. Depende de A; se puede implementar paralelo a D.
 6. `TASK-540` (Fase F) — HubSpot lifecycle outbound. Cerrada 2026-04-21 con loop end-to-end validado.
 7. `TASK-541` (Fase G) — Quote-to-cash choreography. Depende de A + `TASK-460` (Contracts).
-8. `TASK-542` (Fase H) — Admin dashboards. Depende de A, B, F.
+8. `TASK-542` (Fase H) — Admin dashboards. Cerrada 2026-04-21. Dependía de A, B, F.
 9. `TASK-543` (Fase I) — Deprecation + cleanup. Depende de todas las anteriores.
 
 ### Decisiones de arquitectura cerradas por esta umbrella
@@ -288,7 +288,7 @@ Estas preguntas se resuelven durante Discovery de las tasks hijas correspondient
 - `TASK-539` Fase E — Inline deal creation from quote builder
 - `TASK-540` Fase F — HubSpot lifecycle outbound sync
 - `TASK-541` Fase G — Quote-to-cash atomic choreography
-- `TASK-542` Fase H — Admin Center party lifecycle dashboards
+- `TASK-542` Fase H — Admin Center party lifecycle dashboards (shipped)
 - `TASK-543` Fase I — Deprecation + feature flag cleanup
 
 ## Open Questions

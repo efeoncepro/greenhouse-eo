@@ -101,6 +101,61 @@ export type {
 } from './party-search-reader'
 
 export {
+  getPartyLifecycleDetail,
+  getPartyLifecycleFunnelMetrics,
+  listPartyLifecycleSnapshots,
+  materializeAllPartyLifecycleSnapshots,
+  materializePartyLifecycleSnapshot,
+  materializePartyLifecycleSnapshots,
+  resolvePartyLifecycleOrganizationId
+} from './party-lifecycle-snapshot-store'
+export type {
+  ListPartyLifecycleSnapshotsOptions,
+  PartyLifecycleConflictEntry,
+  PartyLifecycleContractSummary,
+  PartyLifecycleDealSummary,
+  PartyLifecycleDetail,
+  PartyLifecycleFunnelMetrics,
+  PartyLifecycleHistoryEntry,
+  PartyLifecycleListItem,
+  PartyLifecycleQuotationSummary,
+  PartyLifecycleSnapshotRecord
+} from './party-lifecycle-snapshot-store'
+
+export {
+  listPartyLifecycleSweepCandidates,
+  runPartyLifecycleInactivitySweep
+} from './party-lifecycle-sweep'
+export type {
+  PartyLifecycleSweepCandidate,
+  RunPartyLifecycleSweepOptions,
+  RunPartyLifecycleSweepResult
+} from './party-lifecycle-sweep'
+
+export { overridePartyLifecycle } from './commands/override-party-lifecycle'
+export type { OverridePartyLifecycleInput } from './commands/override-party-lifecycle'
+
+export { resolvePartySyncConflict } from './commands/resolve-party-sync-conflict'
+export type {
+  ResolvePartySyncConflictAction,
+  ResolvePartySyncConflictInput,
+  ResolvePartySyncConflictResult
+} from './commands/resolve-party-sync-conflict'
+
+export {
+  getPartySyncConflictById,
+  listPartySyncConflicts,
+  updatePartySyncConflictResolution
+} from './sync-conflicts-store'
+export type {
+  ListPartySyncConflictsOptions,
+  PartySyncConflictListItem,
+  PartySyncConflictResolution,
+  PartySyncConflictRow,
+  PartySyncConflictType
+} from './sync-conflicts-store'
+
+export {
   InsufficientPermissionsError,
   InvalidTransitionError,
   LIFECYCLE_STAGES,

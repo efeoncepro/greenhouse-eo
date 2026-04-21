@@ -170,8 +170,8 @@ Eventos adicionales del programa TASK-534:
 
 - `commercial.party.hubspot_synced_in` — reservado para follow-up inbound más rico sobre TASK-536.
 - `commercial.party.hubspot_synced_out` / `commercial.party.sync_conflict` — shipped por TASK-540 (`hubspot/party-hubspot-events.ts`).
-- `commercial.party.merged` — TASK-542 (merge resolution).
-- `commercial.party.inactivated` / `churned` — TASK-542 (sweep cron).
+- `commercial.party.merged` — future follow-up de merge resolution.
+- `commercial.party.inactivated` / `churned` — emitidos por el sweep operativo de `TASK-542`.
 - `commercial.party.lifecycle_backfilled` — reservado en `EVENT_TYPES` para futuros runs ad-hoc del backfill script.
 
 ### Products — legacy finance namespace (TASK-211, kept during cutover)
@@ -303,7 +303,7 @@ Invariants:
 - Same-stage writes are no-ops — no event is emitted, no history row written.
 - Side effect: `promoteParty` with `toStage=active_client` invokes `instantiateClientForParty`; `ORGANIZATION_ALREADY_HAS_CLIENT` is swallowed so the promotion stays valid on double-bootstrap.
 - HubSpot → Greenhouse stage mapping (§4.5) lives in `src/lib/commercial/party/hubspot-lifecycle-mapping.ts` with an env-var override (`HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE`) for custom HubSpot portals.
-- Events not emitted in Fase A (sync-conflict, merged, hubspot_synced_in/out, inactivated, churned-by-sweep) belong to Fases B/F and will be added by TASK-536 / TASK-540 / TASK-542.
+- Events not emitted in Fase A (sync-conflict, merged, hubspot_synced_in/out, inactivated, churned-by-sweep) quedaron distribuidos entre Fases B/F/H: `TASK-536`, `TASK-540` y `TASK-542`.
 
 ### HR Core / People (nuevo)
 

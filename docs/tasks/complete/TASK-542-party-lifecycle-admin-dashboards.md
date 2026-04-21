@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Shipped 2026-04-21`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `TASK-535`
-- Branch: `task/TASK-542-party-lifecycle-admin-dashboards`
+- Branch: `develop`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
@@ -49,14 +49,19 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` — §7, §9, §10.3
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
-- `docs/architecture/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 
 Reglas obligatorias:
 
-- Admin-only: capability `efeonce_admin` o `commercial.party.override_lifecycle` requerida.
+- Surface admin: las pages/layout deben respetar `authorizedViews` del Admin Center y los API routes admin deben pasar por `requireAdminTenantContext()` (route group `admin` + role `efeonce_admin`).
 - Toda manual transition pasa por `promoteParty` (audit + reason obligatoria).
 - Funnel metrics consumidas de la proyeccion snapshot, no queries ad-hoc.
-- Usar skills `greenhouse-ux` + `greenhouse-ui-review` pre-commit.
+- Skills vigentes para esta task:
+  - backend/helpers/migrations/routes: `greenhouse-agent`
+  - App Router handlers: `greenhouse-agent` + `vercel:nextjs`
+  - UI/pages/views: `greenhouse-agent` + `greenhouse-ui-orchestrator`
+  - UI compleja Admin Center / Vuexy: sumar `greenhouse-vuexy-ui-expert` o `greenhouse-portal-ui-implementer`
+  - copy/accessibility: `greenhouse-ux-content-accessibility`
 - Sweep cron corre en `ops-worker` (Cloud Run), no en Vercel (patron TASK-475 y siguientes).
 
 ## Normative Docs
@@ -70,7 +75,7 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-535 cerrada (schema, comandos, eventos)
-- TASK-540 cerrada idealmente (para dashboards de conflicts)
+- TASK-540 cerrada (ya implementada y smokeada end-to-end)
 - Admin Center infrastructure existente
 - ops-worker deployment access
 
@@ -81,12 +86,12 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/app/(admin)/admin/commercial/parties/page.tsx`
-- `src/app/(admin)/admin/commercial/parties/[id]/page.tsx`
-- `src/views/greenhouse/admin/CommercialPartiesListView.tsx`
-- `src/views/greenhouse/admin/CommercialPartyDetailView.tsx`
-- `src/views/greenhouse/admin/PartyFunnelDashboard.tsx`
-- `src/views/greenhouse/admin/PartySyncConflictsDashboard.tsx`
+- `src/app/(dashboard)/admin/commercial/parties/page.tsx`
+- `src/app/(dashboard)/admin/commercial/parties/[id]/page.tsx`
+- `src/views/greenhouse/admin/commercial-parties/CommercialPartiesAdminView.tsx`
+- `src/views/greenhouse/admin/commercial-parties/CommercialPartyDetailView.tsx`
+- `src/views/greenhouse/admin/commercial-parties/data.ts`
+- `src/views/greenhouse/admin/commercial-parties/types.ts`
 - `src/lib/sync/projections/party-lifecycle-snapshot.ts`
 - `services/ops-worker/party-lifecycle-sweep.ts` (sweep inactive)
 - `src/app/api/admin/commercial/parties/**/route.ts`
@@ -101,6 +106,8 @@ Reglas obligatorias:
 - Pattern de list + detail + drawer para admin surfaces
 - Ops Health dashboard pattern
 - `ops-worker` Cloud Run service
+- `greenhouse_core.organization_lifecycle_history` ya existe como source of truth append-only
+- `greenhouse_commercial.party_sync_conflicts` ya existe como tabla real de conflicts
 
 ### Gap
 
@@ -108,6 +115,8 @@ Reglas obligatorias:
 - No existe proyeccion `party_lifecycle_snapshots`.
 - No existe sweep cron de inactive.
 - No existe runbook operacional.
+- No existe `viewCode` ni registro de la nueva surface en `src/lib/admin/view-access-catalog.ts`.
+- No existe helper de resolución/update para `party_sync_conflicts`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -148,6 +157,7 @@ Reglas obligatorias:
 ### Slice 5 — Sync conflicts dashboard
 
 - List de `sync_conflicts` unresolved.
+- Fuente real: `greenhouse_commercial.party_sync_conflicts`.
 - Resolution actions: forzar outbound, forzar inbound, ignorar.
 - Alertas: count > 10 en 24h.
 
@@ -187,15 +197,14 @@ Ver `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` §10.3 para alerts y dashboard
 
 ## Acceptance Criteria
 
-- [ ] `/admin/commercial/parties` lista todas las parties con filtros funcionales.
-- [ ] Detail muestra timeline completo + contexto HubSpot + deals + quotes asociados.
-- [ ] Funnel dashboard muestra velocity + drop-off computados desde la snapshot.
-- [ ] Sync conflicts dashboard lista unresolved y permite resolution.
-- [ ] Forzar transicion manual con capability genera row en history con `source='operator_override'` + reason obligatoria.
-- [ ] Sweep cron corre en staging sin errores; `active_client` sin actividad 6m pasan a `inactive`.
-- [ ] Runbook publicado y referenciado desde Admin Center.
-- [ ] Skill `greenhouse-ui-review` aprobo.
-- [ ] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
+- [x] `/admin/commercial/parties` lista todas las parties con filtros funcionales.
+- [x] Detail muestra timeline completo + contexto HubSpot + deals + quotes asociados.
+- [x] Funnel dashboard muestra velocity + drop-off computados desde la snapshot.
+- [x] Sync conflicts dashboard lista unresolved y permite resolution.
+- [x] Forzar transicion manual con capability genera row en history con `source='operator_override'` + reason obligatoria.
+- [x] Sweep cron corre en staging sin errores; `active_client` sin actividad 6m pasan a `inactive`.
+- [x] Runbook publicado y referenciado desde Admin Center.
+- [x] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
 
 ## Verification
 
@@ -207,15 +216,15 @@ Ver `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` §10.3 para alerts y dashboard
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] Chequeo de impacto cruzado
+- [x] `Lifecycle` sincronizado
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] Chequeo de impacto cruzado
 
-- [ ] Update TASK-534 umbrella
-- [ ] Runbook difundido al equipo de Ops
+- [x] Update TASK-534 umbrella
+- [x] Runbook difundido al equipo de Ops
 
 ## Follow-ups
 

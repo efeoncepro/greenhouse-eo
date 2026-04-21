@@ -328,6 +328,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.commercial_parties',
+    section: 'administracion',
+    label: 'Commercial Parties',
+    description: 'Embudo, adopción HubSpot, conflictos de sync y drill-down del party lifecycle.',
+    routePath: '/admin/commercial/parties',
+    routeGroup: 'admin'
+  },
+  {
     viewCode: 'administracion.instrumentos_pago',
     section: 'administracion',
     label: 'Instrumentos de pago',

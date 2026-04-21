@@ -166,7 +166,7 @@ O filtra eventos del outbox por `correlation_id` para ver la cadena completa.
 1. **Workflow genérico de approvals**: hoy el `pending_approval` queda en el audit pero no hay UI para resolver. Task derivada.
 2. **Outbound HubSpot para `deal.won`**: TASK-540 Fase F.
 3. **Income materialization reactiva**: escuchar `commercial.quote_to_cash.completed` para disparar `materializeInvoiceFromApprovedQuotation` automáticamente.
-4. **Admin Center para funnel / velocity**: dashboard de conversiones completadas / pending / failed — TASK-542 Fase H.
+4. **Admin Center para funnel / velocity**: shipped en TASK-542 con la surface `Commercial Parties`.
 5. **Reversal (unconvert)**: post-V1, solo si aparece necesidad operativa real.
 
 > Detalle tecnico:

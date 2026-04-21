@@ -13,6 +13,7 @@
  *   GET  /reactive/queue-depth      → Queue depth + oldest-event lag, optionally filtered by ?domain=<x>
  *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
  *   POST /vat-ledger/materialize       → Materialize Chile VAT ledger + monthly position
+ *   POST /party-lifecycle/sweep        → Daily sweep: active_client → inactive on stale parties (TASK-542)
  *   POST /quotation-lifecycle/sweep    → Daily sweep: expire overdue quotes + emit renewal_due events (TASK-351)
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
@@ -37,6 +38,7 @@ import {
   materializeCommercialCostAttributionForPeriod,
   materializeAllAvailablePeriods
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
+import { runPartyLifecycleInactivitySweep } from '@/lib/commercial/party'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
@@ -440,6 +442,40 @@ const handleVatLedgerMaterialize = async (req: IncomingMessage, res: ServerRespo
 }
 
 /**
+ * POST /party-lifecycle/sweep
+ * TASK-542: daily inactivity sweep for commercial parties.
+ */
+const handlePartyLifecycleSweep = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const dryRun = body.dryRun !== false
+  const limit = typeof body.limit === 'number' ? body.limit : undefined
+  const inactivityMonths = typeof body.inactivityMonths === 'number' ? body.inactivityMonths : undefined
+  const startMs = Date.now()
+
+  console.log(
+    `[ops-worker] POST /party-lifecycle/sweep — dryRun=${dryRun} limit=${limit ?? 'default'} inactivityMonths=${inactivityMonths ?? 6}`
+  )
+
+  try {
+    const result = await runPartyLifecycleInactivitySweep({
+      dryRun,
+      limit,
+      inactivityMonths
+    })
+
+    json(res, 200, {
+      ...result,
+      durationMs: Date.now() - startMs
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /party-lifecycle/sweep failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
  * POST /quotation-lifecycle/sweep
  * TASK-351: Daily quotation lifecycle sweep.
  * - Flips quotations past `expiry_date` to `status='expired'` + emits `commercial.quotation.expired`.
@@ -673,6 +709,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/vat-ledger/materialize') {
       await handleVatLedgerMaterialize(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/party-lifecycle/sweep') {
+      await handlePartyLifecycleSweep(req, res)
 
       return
     }

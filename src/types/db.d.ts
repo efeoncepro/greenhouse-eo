@@ -5132,6 +5132,39 @@ export interface GreenhouseServingOrganizationOperationalMetrics {
   throughput_count: number | null;
 }
 
+export interface GreenhouseServingPartyLifecycleSnapshots {
+  active_client_at: Timestamp | null;
+  active_contracts_count: Generated<number>;
+  active_quotes_count: Generated<number>;
+  churned_at: Timestamp | null;
+  commercial_party_id: string;
+  disqualified_at: Timestamp | null;
+  first_seen_at: Timestamp;
+  hubspot_company_id: string | null;
+  inactive_at: Timestamp | null;
+  last_conflict_at: Timestamp | null;
+  last_conflict_type: string | null;
+  last_contract_at: Timestamp | null;
+  last_quote_at: Timestamp | null;
+  latest_history_id: string | null;
+  latest_reason: string | null;
+  latest_transition_at: Timestamp;
+  latest_transition_by: string | null;
+  latest_transition_source: string | null;
+  lifecycle_stage: string;
+  lifecycle_stage_by: string | null;
+  lifecycle_stage_since: Timestamp;
+  lifecycle_stage_source: string;
+  materialized_at: Generated<Timestamp>;
+  opportunity_at: Timestamp | null;
+  organization_id: string;
+  organization_name: string;
+  prospect_at: Timestamp | null;
+  provider_only_at: Timestamp | null;
+  total_transitions: Generated<number>;
+  unresolved_conflicts_count: Generated<number>;
+}
+
 export interface GreenhouseServingPeriodClosureStatus {
   closure_status: string;
   expenses_closed: Generated<boolean>;
@@ -6389,6 +6422,7 @@ export interface DB {
   "greenhouse_serving.operational_pl_snapshots": GreenhouseServingOperationalPlSnapshots;
   "greenhouse_serving.organization_360": GreenhouseServingOrganization360;
   "greenhouse_serving.organization_operational_metrics": GreenhouseServingOrganizationOperationalMetrics;
+  "greenhouse_serving.party_lifecycle_snapshots": GreenhouseServingPartyLifecycleSnapshots;
   "greenhouse_serving.period_closure_status": GreenhouseServingPeriodClosureStatus;
   "greenhouse_serving.person_360": GreenhouseServingPerson360;
   "greenhouse_serving.person_delivery_360": GreenhouseServingPersonDelivery360;
