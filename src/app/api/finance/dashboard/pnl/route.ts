@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     // Income for the period (accrual: by invoice_date)
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
-         COALESCE(SUM(total_amount_clp), 0) AS total_clp,
+         COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_clp,
          COUNT(*) AS record_count,
          COALESCE(SUM(partner_share_amount * COALESCE(exchange_rate_to_clp, 1)), 0) AS partner_share_clp
        FROM greenhouse_finance.income
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
          cost_category,
-         COALESCE(SUM(total_amount_clp), 0) AS total_clp,
+         COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_clp,
          COUNT(*) AS record_count
        FROM greenhouse_finance.expenses
        WHERE COALESCE(document_date, payment_date) >= $1::date
@@ -97,7 +97,7 @@ export async function GET(request: Request) {
 
     // Expenses already linked to payroll entries (to avoid double-counting)
     runGreenhousePostgresQuery<PnlRow>(
-      `SELECT COALESCE(SUM(total_amount_clp), 0) AS linked_clp
+      `SELECT COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS linked_clp
        FROM greenhouse_finance.expenses
        WHERE payroll_entry_id IS NOT NULL
          AND COALESCE(document_date, payment_date) >= $1::date

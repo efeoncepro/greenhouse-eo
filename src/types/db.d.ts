@@ -3015,6 +3015,11 @@ export interface GreenhouseFinanceExpenses {
   dte_folio: string | null;
   dte_type_code: string | null;
   due_date: Timestamp | null;
+  /**
+   * Canonical operational cost in document currency: subtotal + non_recoverable_tax_amount.
+   */
+  effective_cost_amount: Numeric | null;
+  effective_cost_amount_clp: Numeric | null;
   exchange_rate_to_clp: Numeric | null;
   exempt_amount: Numeric | null;
   expense_id: string;
@@ -3022,10 +3027,16 @@ export interface GreenhouseFinanceExpenses {
   is_annulled: Generated<boolean | null>;
   is_reconciled: Generated<boolean>;
   is_recurring: Generated<boolean>;
+  is_tax_exempt: boolean | null;
   linked_income_id: string | null;
   member_id: string | null;
   member_name: string | null;
   miscellaneous_category: string | null;
+  /**
+   * Portion of expense tax amount capitalized into cost/gasto.
+   */
+  non_recoverable_tax_amount: Numeric | null;
+  non_recoverable_tax_amount_clp: Numeric | null;
   notes: string | null;
   nubox_document_status: string | null;
   nubox_last_synced_at: Timestamp | null;
@@ -3055,6 +3066,11 @@ export interface GreenhouseFinanceExpenses {
   purchase_type: string | null;
   receipt_date: Timestamp | null;
   reconciliation_id: string | null;
+  /**
+   * Portion of expense tax amount that remains fiscal credit and must not inflate operational cost.
+   */
+  recoverable_tax_amount: Numeric | null;
+  recoverable_tax_amount_clp: Numeric | null;
   recurrence_frequency: string | null;
   /**
    * FK to greenhouse_payroll.payroll_period_reopen_audit for expense rows that represent a reliquidación delta (TASK-411). NULL for every other expense.
@@ -3078,9 +3094,24 @@ export interface GreenhouseFinanceExpenses {
   supplier_invoice_number: string | null;
   supplier_name: string | null;
   tax_amount: Numeric | null;
+  tax_amount_snapshot: Numeric | null;
+  /**
+   * Canonical purchase tax code. Mirrors greenhouse_finance.tax_codes and replaces tax_rate as first-class semantics for expenses.
+   */
+  tax_code: string | null;
   tax_form_number: string | null;
   tax_period: string | null;
   tax_rate: Numeric | null;
+  tax_rate_snapshot: Numeric | null;
+  /**
+   * Resolved recoverability persisted on the expense row for fast filters and downstream cost consumers.
+   */
+  tax_recoverability: string | null;
+  tax_snapshot_frozen_at: Timestamp | null;
+  /**
+   * Frozen ChileTaxSnapshot (version=1) for purchases. Never re-derived from live catalog at read time.
+   */
+  tax_snapshot_json: Json | null;
   tax_type: string | null;
   total_amount: Numeric;
   total_amount_clp: Numeric;

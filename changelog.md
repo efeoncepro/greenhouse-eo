@@ -2,6 +2,26 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-532 Purchase VAT Recoverability shipped
+
+- `expenses` ya no trata el IVA de compras como un `tax_rate` suelto. El agregado ahora persiste `tax_code`, `tax_recoverability`, `tax_snapshot_json`, `tax_snapshot_frozen_at` y buckets explícitos de `recoverable_tax_amount`, `non_recoverable_tax_amount` y `effective_cost_amount`.
+- **Migration** (`20260421192902964_task-532-purchase-vat-recoverability.sql`): extiende `greenhouse_finance.expenses` con 13 columnas nuevas, agrega CHECKs de dominio/coherencia (`tax_code`, `tax_recoverability`, `tax_code ⇔ snapshot`) e indexes por `tax_code` / `tax_recoverability`. Incluye backfill idempotente del histórico usando `tax_amount`, `dte_type_code`, `exempt_amount`, `vat_unrecoverable_amount` y `vat_common_use_amount`.
+- **Helper nuevo** (`src/lib/finance/expense-tax-snapshot.ts`): resuelve el contrato tributario de compras, congela snapshot Chile IVA y deriva:
+  - `recoverableTaxAmount`
+  - `nonRecoverableTaxAmount`
+  - `effectiveCostAmount`
+  - espejos `*_clp`
+- **API / writers**:
+  - `POST /api/finance/expenses`, `PUT /api/finance/expenses/[id]` y `POST /api/finance/expenses/bulk` escriben el snapshot y recalculan el costo efectivo cuando cambia un campo fiscal.
+  - `sync-nubox-to-postgres.ts` crea compras nuevas con el mismo contrato y buckets persistidos.
+  - `payroll-expense-reactive.ts` adapta sus gastos system-generated al nuevo writer con `cl_vat_non_billable`.
+  - El fallback BigQuery de `expenses` ya persiste y rehidrata también `space_id`, `source_type`, payment provider/rail y metadata de compras para no degradar el contrato cuando cae Postgres.
+- **Downstream**:
+  - `compute-operational-pl`, `postgres-store-intelligence`, `service-attribution`, `member-capacity-economics`, dashboards P&L y readers de provider/tooling pasan a sumar `COALESCE(effective_cost_amount_clp, total_amount_clp)`.
+  - El IVA recuperable deja de inflar costo operativo; solo el IVA no recuperable entra al costo efectivo.
+- **Verificación**: `pnpm migrate:up` + regen de `src/types/db.d.ts` · `pnpm lint` OK (solo warning legacy preexistente) · test focal `expense-tax-snapshot.test.ts` OK · `pnpm build` OK. `pnpm test` completo también vuelve a verde tras ajustar el helper a degraded mode sin catálogo DB y actualizar el mock legacy de `@/lib/db`.
+- **Cross-impact**: cierra el eslabón de compras del programa Chile IVA (TASK-528), deja a TASK-533 listo para consumir buckets recoverable/non-recoverable como source de crédito fiscal, y evita que economics/service attribution mezclen impuesto recuperable con costo.
+
 ### 2026-04-21 — TASK-531 Income / Invoice Tax Convergence shipped
 
 - `income` deja de depender del IVA implícito `0.19` en el write path manual y converge al mismo contrato tributario canónico que quotations.

@@ -331,7 +331,7 @@ export const materializeProviderToolingMonthlySnapshot = async (
       finance_summary AS (
         SELECT
           COUNT(*)::int AS finance_expense_count,
-          COALESCE(SUM(COALESCE(e.total_amount_clp, 0)), 0)::numeric(14,2) AS finance_observed_cost_clp,
+          COALESCE(SUM(COALESCE(e.effective_cost_amount_clp, e.total_amount_clp, 0)), 0)::numeric(14,2) AS finance_observed_cost_clp,
           MAX(COALESCE(e.document_date, e.payment_date)) AS latest_finance_expense_date
         FROM greenhouse_finance.expenses AS e
         INNER JOIN greenhouse_finance.suppliers AS s

@@ -72,7 +72,7 @@ export async function GET() {
         `SELECT
            service_line,
            cost_category,
-           COALESCE(SUM(total_amount_clp), 0) AS total_clp
+           COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_clp
          FROM greenhouse_finance.expenses
          WHERE cost_category IS NOT NULL
          GROUP BY service_line, cost_category`

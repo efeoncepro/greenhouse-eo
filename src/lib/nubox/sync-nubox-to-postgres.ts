@@ -7,6 +7,10 @@ import {
   buildIncomeTaxWriteFields,
   serializeIncomeTaxSnapshot
 } from '@/lib/finance/income-tax-snapshot'
+import {
+  buildExpenseTaxWriteFields,
+  serializeExpenseTaxSnapshot
+} from '@/lib/finance/expense-tax-snapshot'
 import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
 import { recordPayment } from '@/lib/finance/payment-ledger'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
@@ -475,12 +479,29 @@ const upsertExpenseFromPurchase = async (
   const expenseId = `EXP-NB-${purchase.nubox_purchase_id}`
 
   const isExpenseAnnulled = purchase.is_annulled === true
+  const exchangeRateToClp = 1
+
+  const taxWriteFields = await buildExpenseTaxWriteFields({
+    subtotal: safeNum(purchase.net_amount) ?? 0,
+    exchangeRateToClp,
+    taxAmount: safeNum(purchase.tax_vat_amount) ?? 0,
+    totalAmount: safeNum(purchase.total_amount) ?? 0,
+    dteTypeCode: purchase.dte_type_code,
+    exemptAmount: safeNum(purchase.exempt_amount),
+    vatUnrecoverableAmount: safeNum(purchase.vat_unrecoverable_amount),
+    vatCommonUseAmount: safeNum(purchase.vat_common_use_amount),
+    vatFixedAssetsAmount: safeNum(purchase.vat_fixed_assets_amount),
+    issuedAt: purchase.emission_date ?? undefined
+  })
 
   await withGreenhousePostgresTransaction(async client => {
     await client.query(
       `INSERT INTO greenhouse_finance.expenses (
         expense_id, expense_type, description,
-        currency, subtotal, tax_rate, tax_amount, total_amount,
+        currency, subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
+        tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
+        effective_cost_amount, effective_cost_amount_clp, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_status, document_number, document_date, due_date,
         supplier_id, supplier_name,
@@ -494,17 +515,20 @@ const upsertExpenseFromPurchase = async (
         created_by_user_id, created_at, updated_at
       ) VALUES (
         $1, 'supplier', $2,
-        'CLP', $3, 0.19, $4, $5,
-        1, $5,
-        $6, $7, $8, $9,
-        $10, $11,
-        $12, $13, $14,
-        $15, $16, $33::timestamptz,
-        $17, $18, $19::date, $20,
-        $21, $22, $23, $24,
-        $25, $26, $27,
-        $28, $29, $30,
-        $31, $32,
+        'CLP', $3, $4, $5, $6, $7, $8, $9,
+        $10::jsonb, $11, $12::timestamptz,
+        $13, $14, $15, $16,
+        $17, $18, $19,
+        1, $19,
+        $20, $21, $22, $23,
+        $24, $25,
+        $26, $27, $28,
+        $29, $30, $31::timestamptz,
+        $32, $33, $34::date, $35,
+        $36, $37, $38, $39,
+        $40, $41, $42,
+        $43, $44, $45,
+        $46, $47,
         NULL, NOW(), NOW()
       )
       ON CONFLICT (expense_id) DO NOTHING`,
@@ -512,8 +536,22 @@ const upsertExpenseFromPurchase = async (
         expenseId,
         `${purchase.dte_type_name || 'Factura'} — ${purchase.supplier_trade_name || 'Unknown'}`,
         safeNum(purchase.net_amount) ?? 0,
-        safeNum(purchase.tax_vat_amount) ?? 0,
-        safeNum(purchase.total_amount) ?? 0,
+        taxWriteFields.taxRate,
+        taxWriteFields.taxAmount,
+        taxWriteFields.taxCode,
+        taxWriteFields.taxRecoverability,
+        taxWriteFields.taxRateSnapshot,
+        taxWriteFields.taxAmountSnapshot,
+        serializeExpenseTaxSnapshot(taxWriteFields.taxSnapshot),
+        taxWriteFields.isTaxExempt,
+        taxWriteFields.taxSnapshotFrozenAt,
+        taxWriteFields.recoverableTaxAmount,
+        taxWriteFields.recoverableTaxAmountClp,
+        taxWriteFields.nonRecoverableTaxAmount,
+        taxWriteFields.nonRecoverableTaxAmountClp,
+        taxWriteFields.effectiveCostAmount,
+        taxWriteFields.effectiveCostAmountClp,
+        taxWriteFields.totalAmount,
         isExpenseAnnulled ? 'written_off' : ((safeNum(purchase.balance) ?? -1) === 0 ? 'paid' : 'pending'),
         purchase.folio,
         purchase.emission_date,
@@ -525,6 +563,7 @@ const upsertExpenseFromPurchase = async (
         purchase.supplier_rut,
         purchase.supplier_trade_name,
         purchase.origin_name,
+        purchase.source_last_ingested_at,
         isExpenseAnnulled,
         purchase.document_status_name,
         purchase.receipt_date,
@@ -540,8 +579,7 @@ const upsertExpenseFromPurchase = async (
         safeNum(purchase.total_other_taxes_amount),
         safeNum(purchase.total_withholding_amount),
         purchase.period_year,
-        purchase.period_month,
-        purchase.source_last_ingested_at
+        purchase.period_month
       ]
     )
 

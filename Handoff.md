@@ -1,5 +1,43 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-532 Purchase VAT Recoverability (Codex)
+
+- **Scope:** converger compras/gastos al contrato tributario canónico Chile IVA para distinguir crédito fiscal recuperable vs IVA no recuperable capitalizado a costo, y propagar esa semántica a P&L / economics / service attribution.
+- **Migration shipped + aplicada en dev:** `20260421192902964_task-532-purchase-vat-recoverability.sql`
+  - `greenhouse_finance.expenses` gana `tax_code`, `tax_recoverability`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`
+  - gana también `recoverable_tax_amount`, `recoverable_tax_amount_clp`, `non_recoverable_tax_amount`, `non_recoverable_tax_amount_clp`, `effective_cost_amount`, `effective_cost_amount_clp`
+  - CHECKs de dominio/coherencia + backfill idempotente sobre histórico usando `dte_type_code`, `exempt_amount`, `vat_unrecoverable_amount` y `vat_common_use_amount`
+- **Helper nuevo:** `src/lib/finance/expense-tax-snapshot.ts`
+  - `buildExpenseTaxWriteFields()` resuelve `tax_code`, snapshot y buckets recoverable/non-recoverable/effective cost
+  - degraded mode intencional: si el catálogo DB no está disponible, cae a los 4 códigos Chile canónicos de compras para mantener estables tests y runtimes locales
+- **Write path**
+  - `POST /api/finance/expenses`, `PUT /api/finance/expenses/[id]` y `POST /api/finance/expenses/bulk` persisten el contrato nuevo
+  - `PUT` solo rehidrata el gasto existente cuando el update toca campos fiscales y recalcula el snapshot/costo efectivo de forma determinística
+  - `GET /api/finance/expenses` y `GET /api/finance/expenses/[id]` ya exponen también los campos tributarios nuevos en el fallback BigQuery
+- **BigQuery fallback**
+  - `fin_expenses` ahora garantiza `space_id`, `source_type`, `payment_provider`, `payment_rail`, `receipt_date`, `purchase_type`, buckets IVA y metadata tributaria de compra
+  - POST/PUT ya escriben esas columnas para no degradar el contrato cuando Postgres cae
+- **Nubox / payroll**
+  - `sync-nubox-to-postgres.ts` crea compras nuevas con snapshot tributario y buckets persistidos
+  - `payroll-expense-reactive.ts` adapta los gastos generados por nómina al writer nuevo con `cl_vat_non_billable`
+- **Downstream**
+  - `compute-operational-pl`, `postgres-store-intelligence`, `service-attribution`, `member-capacity-economics`, dashboards P&L y readers de provider/tooling ahora consumen `COALESCE(effective_cost_amount_clp, total_amount_clp)`
+  - resultado: el IVA recuperable deja de inflar costo operativo; solo el IVA no recuperable entra a costo efectivo
+- **Docs actualizadas**
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/documentation/finance/iva-compras-recuperabilidad.md`
+  - `docs/documentation/README.md`
+  - spec `TASK-532`
+- **Verificación ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - test focal `src/lib/finance/expense-tax-snapshot.test.ts` OK
+  - `pnpm build` OK
+  - `pnpm test` OK (`355` files, `1768` tests passing, `2` skipped)
+- **Cross-impact**
+  - deja a `TASK-533` listo para consumir `expenses.tax_snapshot_json` + buckets recoverable/non-recoverable como source de crédito fiscal
+  - cierra el gap downstream detectado en economics/cost readers que todavía sumaban `total_amount_clp` bruto
+
 ## Sesion 2026-04-21 — TASK-531 Income / Invoice Tax Convergence (Codex)
 
 - **Scope:** cerrar la convergencia tributaria del agregado `income`: schema + API + materializers + readiness downstream para HubSpot/Nubox, alineado a TASK-529/TASK-530/TASK-524/TASK-541.

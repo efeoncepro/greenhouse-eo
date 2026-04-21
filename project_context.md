@@ -1,3 +1,17 @@
+## Delta 2026-04-21 TASK-532 formaliza IVA de compras como contrato explícito de costo
+
+- `greenhouse_finance.expenses` ya no debe leerse solo como `subtotal + tax_amount + total_amount`.
+- Contrato nuevo:
+  - `tax_code` + `tax_snapshot_json` + `tax_snapshot_frozen_at`
+  - `tax_recoverability`
+  - buckets `recoverable_tax_amount`, `non_recoverable_tax_amount`, `effective_cost_amount`
+- Regla operativa:
+  - IVA recuperable NO entra a costo operativo
+  - IVA no recuperable SÍ entra a costo/gasto
+  - consumers downstream de P&L/economics deben preferir `COALESCE(effective_cost_amount_clp, total_amount_clp)` sobre `total_amount_clp` bruto
+- Nubox purchases y payroll-generated expenses ya escriben el mismo contrato.
+- `TASK-533` debe consumir estos buckets como base del ledger mensual de IVA.
+
 ## Delta 2026-04-21 EPIC-003 formaliza Ops Registry como framework operativo repo-native y federable
 
 - Greenhouse ya no debe pensar la operacion del framework documental solo como una colección de markdowns navegados manualmente.

@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `TASK-529`
+- Blocked by: `none`
 - Branch: `task/TASK-532-purchase-vat-recoverability`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
@@ -64,24 +64,34 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-529-chile-tax-code-foundation.md`
+- `docs/tasks/complete/TASK-529-chile-tax-code-foundation.md`
+- `docs/tasks/complete/TASK-531-income-invoice-tax-convergence.md`
+- `docs/tasks/to-do/TASK-533-chile-vat-ledger-monthly-position.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
 - `src/app/api/finance/expenses/route.ts`
 - `src/app/api/finance/expenses/[id]/route.ts`
 - `src/lib/finance/postgres-store-slice2.ts`
 - `src/lib/finance/expense-taxonomy.ts`
+- `src/lib/tax/chile/*`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
 
 ### Blocks / Impacts
 
 - cost basis y economics
 - compras/proveedores
 - ledger mensual de IVA
+- service attribution y P&L operacional
 
 ### Files owned
 
 - `src/app/api/finance/expenses/*`
 - `src/lib/finance/postgres-store-slice2.ts`
 - `src/lib/finance/expense-taxonomy.ts`
+- `src/lib/tax/chile/*`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
 - `src/lib/commercial-cost-attribution/*`
+- `src/lib/cost-intelligence/*`
+- `src/lib/service-attribution/*`
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 
 ## Current Repo State
@@ -91,12 +101,16 @@ Reglas obligatorias:
 - `src/app/api/finance/expenses/route.ts` y `src/app/api/finance/expenses/[id]/route.ts` ya persisten campos tributarios.
 - `src/lib/finance/postgres-store-slice2.ts` concentra parte importante del write path financiero.
 - `src/lib/finance/expense-taxonomy.ts` ya define vocabulario financiero de gastos.
+- `TASK-529` ya creo la foundation canonica de `tax_code`, `recoverability` y `ChileTaxSnapshot`.
+- `TASK-531` ya convergio `income` al patron canonico `tax_code + tax_snapshot_json + tax_snapshot_frozen_at`.
+- Nubox ya expone `vat_unrecoverable_amount`, `vat_fixed_assets_amount` y `vat_common_use_amount` en compras.
 
 ### Gap
 
 - No existe `recoverability` tributaria explicita.
 - No existe separacion formal entre neto gasto, IVA credito fiscal e IVA no recuperable.
 - Cost basis/commercial no tienen una fuente confiable para distinguir ambos casos.
+- Los consumers downstream siguen leyendo `total_amount_clp` bruto y hoy pueden inflar costo operativo con IVA recuperable.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -110,7 +124,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Expense tax contract
 
-- Persistir `tax_code`, `recoverability` y montos derivados en expenses.
+- Persistir `tax_code` y snapshot tributario canonico en expenses.
+- Exponer `recoverability` desde el snapshot persistido y mantener compatibilidad degradada con `tax_rate` / `tax_amount`.
 - Mapear `tax_type` legacy hacia el nuevo contrato donde aplique.
 
 ### Slice 2 — Cost treatment
@@ -122,6 +137,7 @@ Reglas obligatorias:
 
 - Preparar ingestion futura desde DTE/Nubox/proveedores sobre el mismo contrato.
 - Exponer payloads claros para attribution/materialization downstream.
+- Alinear `expenses` con el mismo patron documental ya usado por quotations e income.
 
 ### Slice 4 — Tests and docs
 
@@ -141,6 +157,7 @@ Casos minimos:
 1. Compra con IVA recuperable: el costo efectivo operativo permanece neto.
 2. Compra con IVA no recuperable: el costo efectivo incorpora ese impuesto.
 3. Compra exenta: no genera credito fiscal ni impuesto sobre el documento.
+4. El ledger mensual de IVA puede distinguir compras con credito fiscal vs IVA capitalizado a costo sin heuristicas downstream.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

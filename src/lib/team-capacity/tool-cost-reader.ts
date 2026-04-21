@@ -126,7 +126,7 @@ export const readMemberDirectToolCosts = async (
     safeQuery(runGreenhousePostgresQuery<MemberDirectExpenseRow>(
       `
         SELECT
-          COALESCE(SUM(COALESCE(total_amount_clp, 0)), 0) AS total_direct_expense_clp
+          COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp, 0)), 0) AS total_direct_expense_clp
         FROM greenhouse_finance.expenses
         WHERE direct_overhead_member_id = $1
           AND direct_overhead_scope = 'member_direct'

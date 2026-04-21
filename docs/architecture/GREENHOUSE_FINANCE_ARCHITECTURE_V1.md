@@ -4,6 +4,73 @@
 > **Created:** 2026-03-30
 > **Last updated:** 2026-04-21
 
+## Delta 2026-04-21 — Purchase VAT Recoverability (TASK-532)
+
+`greenhouse_finance.expenses` deja de tratar el IVA de compras como un `tax_rate` suelto y persiste una semántica contable explícita: crédito fiscal recuperable vs IVA no recuperable que debe capitalizarse en costo.
+
+### Nuevas columnas
+
+En `greenhouse_finance.expenses`:
+
+| Columna | Uso |
+|---|---|
+| `tax_code` | Código canónico de compra (`cl_input_vat_credit_19` / `cl_input_vat_non_recoverable_19` / `cl_vat_exempt` / `cl_vat_non_billable`). |
+| `tax_recoverability` | Recoverability persistida en la fila (`full` / `partial` / `none` / `not_applicable`). |
+| `tax_rate_snapshot` | Tasa congelada (19% o `null`). |
+| `tax_amount_snapshot` | Monto tributario congelado en moneda del documento. |
+| `tax_snapshot_json` | Snapshot `ChileTaxSnapshot` v1 del documento de compra. |
+| `is_tax_exempt` | Derivado rápido para filtros y bridges. |
+| `tax_snapshot_frozen_at` | Timestamp de congelamiento del snapshot. |
+| `recoverable_tax_amount` | Parte del IVA que permanece como crédito fiscal. |
+| `non_recoverable_tax_amount` | Parte del IVA que se capitaliza a costo/gasto. |
+| `effective_cost_amount` | Costo operativo canónico: `subtotal + non_recoverable_tax_amount`. |
+| `*_clp` | Espejo CLP de recoverable / non-recoverable / effective cost para consumers downstream. |
+
+### Runtime nuevo
+
+- `POST /api/finance/expenses`, `PUT /api/finance/expenses/[id]` y `POST /api/finance/expenses/bulk` pasan por `buildExpenseTaxWriteFields()`.
+- El helper resuelve `tax_code`, congela el snapshot y deriva tres buckets:
+  - `recoverableTaxAmount`
+  - `nonRecoverableTaxAmount`
+  - `effectiveCostAmount`
+- `payroll-expense-reactive` y las compras nuevas creadas desde Nubox también escriben el contrato nuevo; los gastos de nómina nacen como `cl_vat_non_billable`.
+- El fallback BigQuery de `expenses` ahora persiste y rehidrata el mismo contrato tributario y la metadata relevante (`space_id`, `source_type`, payment provider/rail y purchase metadata).
+
+### Regla operativa
+
+- IVA recuperable NO infla costo operativo.
+- IVA no recuperable SÍ entra al costo efectivo.
+- `tax_recoverability = 'partial'` conserva la parte recuperable fuera del costo y solo capitaliza `vat_unrecoverable_amount`.
+- `vat_common_use_amount` marca recoverability parcial, pero no se capitaliza a costo hasta que el ledger mensual (TASK-533) materialice el tratamiento completo.
+
+### Downstream
+
+- `compute-operational-pl`, `postgres-store-intelligence`, `service-attribution`, `member-capacity-economics`, dashboards P&L y readers de provider/tooling dejan de sumar `expenses.total_amount_clp` bruto y pasan a leer `COALESCE(effective_cost_amount_clp, total_amount_clp)`.
+- El contrato nuevo desacopla:
+  - **ledger tributario**: `recoverable_tax_amount*`
+  - **costo operativo**: `effective_cost_amount*`
+- `TASK-533` debe consumir `expenses.tax_snapshot_json` + buckets recoverable/non-recoverable como source canónica de crédito fiscal de compras.
+
+### Backfill
+
+La migración `20260421192902964_task-532-purchase-vat-recoverability.sql` backfillea el histórico usando `tax_amount`, `dte_type_code`, `exempt_amount`, `vat_unrecoverable_amount` y `vat_common_use_amount`, y deja `effective_cost_amount` listo para consumers existentes sin recalcular inline.
+
+### Archivos clave
+
+- `src/lib/finance/expense-tax-snapshot.ts`
+- `src/app/api/finance/expenses/{route,[id]/route,bulk/route}.ts`
+- `src/lib/finance/postgres-store-slice2.ts`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
+- `src/lib/finance/payroll-expense-reactive.ts`
+- `src/lib/cost-intelligence/compute-operational-pl.ts`
+- `src/lib/service-attribution/materialize.ts`
+- Migration: `20260421192902964_task-532-purchase-vat-recoverability.sql`
+
+### Follow-ups
+
+1. `TASK-533` debe materializar el ledger mensual de IVA sobre los buckets persistidos y resolver explícitamente el tratamiento de `vat_common_use_amount`.
+2. Las surfaces UI de compras pueden exponer más adelante `effectiveCostAmount` y `taxRecoverability` como campos visibles si Finance lo necesita operativamente.
+
 ## Delta 2026-04-21 — Quote Tax Explicitness Chile IVA (TASK-530)
 
 `greenhouse_commercial.quotations` y `quotation_line_items` ahora persisten un snapshot tributario inmutable por versión. El pricing engine sigue trabajando en **neto**; el IVA se añade como contrato documental en builder / detail / PDF.

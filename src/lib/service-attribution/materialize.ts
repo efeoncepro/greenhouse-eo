@@ -717,8 +717,8 @@ const loadPeriodContext = async (year: number, month: number) => {
           e.linked_income_id,
           e.service_line,
           e.currency,
-          e.total_amount,
-          e.total_amount_clp,
+          COALESCE(e.effective_cost_amount, e.total_amount) AS total_amount,
+          COALESCE(e.effective_cost_amount_clp, e.total_amount_clp) AS total_amount_clp,
           COALESCE(e.document_date, e.payment_date)::text AS effective_date
         FROM greenhouse_finance.expenses e
         LEFT JOIN greenhouse_core.spaces s

@@ -398,7 +398,7 @@ export const materializeToolProviderCostBasisSnapshotsForPeriod = async (
       SELECT
         t.tool_id,
         COUNT(e.expense_id)::integer AS finance_expense_count,
-        COALESCE(SUM(COALESCE(e.total_amount_clp, 0)), 0)::numeric(14,2) AS observed_cost_clp,
+        COALESCE(SUM(COALESCE(e.effective_cost_amount_clp, e.total_amount_clp, 0)), 0)::numeric(14,2) AS observed_cost_clp,
         MAX(COALESCE(e.document_date, e.payment_date)) AS latest_observed_expense_date
       FROM tool_candidates AS t
       CROSS JOIN params

@@ -519,7 +519,7 @@ export const computeClientEconomicsSnapshots = async (
      SELECT
        allocated_client_id,
        COALESCE(es.organization_id, cb.organization_id) AS organization_id,
-       COALESCE(SUM(total_amount_clp), 0) AS total_direct_clp
+       COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_direct_clp
      FROM greenhouse_finance.expenses
      LEFT JOIN greenhouse_core.spaces es
        ON es.space_id = greenhouse_finance.expenses.space_id
@@ -626,7 +626,7 @@ export const computeClientEconomicsSnapshots = async (
   }>(
     `SELECT
        allocated_client_id,
-       COALESCE(SUM(total_amount_clp), 0) AS acquisition_cost_clp
+       COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS acquisition_cost_clp
      FROM greenhouse_finance.expenses
      WHERE cost_category = 'client_acquisition'
        AND allocated_client_id IS NOT NULL
