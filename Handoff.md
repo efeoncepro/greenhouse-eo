@@ -16,11 +16,13 @@
   - outputs derivados mínimos: `registry.json`, `graph.json`, `validation-report.json`, `stale-report.json`.
   - el sistema debe ser dual: surface humana y surface JSON-first para agentes.
   - la escalabilidad buscada es por federación entre repos hermanos, no por centralización temprana.
-- **Conclusion de programa:** esto **no cabe** sanamente en una sola task. Se formalizo como `EPIC-003` con 4 child tasks:
+  - la arquitectura fue ampliada para incluir API HTTP, MCP server y write plane seguro: crear/actualizar artefactos vía comandos materializados en markdown en lugar de edición libre.
+  - además quedó formalizada una `Artifact Policy Layer`: `Ops Registry` debe respetar templates, registries, índices y procesos del repo por tipo de artefacto.
+  - **Conclusion de programa:** esto **no cabe** sanamente en una sola task. Se formalizo como `EPIC-003` con 4 child tasks:
   - `TASK-558` foundation de schema/parser/repo-config
   - `TASK-559` validaciones + CLI + outputs derivados
-  - `TASK-560` surfaces humano + agente
-  - `TASK-561` contrato federado para repos hermanos
+  - `TASK-560` surfaces humano + agente + API/MCP + write-safe commands
+  - `TASK-561` contrato federado para repos hermanos incluyendo operación cross-repo
 - **Docs sincronizadas:** `docs/README.md`, `docs/epics/*`, `docs/tasks/*`, `project_context.md`, `changelog.md`.
 - **Validacion:** documental únicamente; no se tocaron rutas runtime ni código de aplicación en esta sesión.
 

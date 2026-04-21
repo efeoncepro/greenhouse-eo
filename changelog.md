@@ -11,14 +11,18 @@
   - `scripts/ops-registry-*.mjs` para CLI y generación
   - `.generated/ops-registry/**` para outputs derivados
   - `src/app/api/internal/ops-registry/**` para endpoints JSON-first
+  - `src/mcp/ops-registry/**` para el MCP server oficial del dominio
   - `src/app/(dashboard)/admin/ops-registry/**` para la surface humana futura
 - **Stack recomendado**: `TypeScript + Node.js`, `unified + remark-parse`, `zod`; V1 sin base externa obligatoria.
 - **Programa nuevo**: `EPIC-003 — Ops Registry Federated Operational Framework` con 4 child tasks:
   - `TASK-558` schema/parser/repo-config foundation
   - `TASK-559` validation/query CLI/generated outputs
-  - `TASK-560` surfaces humano + agente
+  - `TASK-560` surfaces humano + agente + API/MCP + write plane
   - `TASK-561` federation contract para repos hermanos
-- **Decisión clave**: Notion puede ser espejo operacional futuro, pero no source of truth primaria del sistema técnico.
+- **Decisión clave**:
+  - Notion puede ser espejo operacional futuro, pero no source of truth primaria del sistema técnico
+  - `Ops Registry` no solo leerá artefactos; también debe crear/actualizar tasks, epics, issues, docs de arquitectura y handoff mediante comandos seguros materializados en markdown
+  - el sistema debe entender las policies reales del repo por tipo de artefacto, no solo generar archivos: `TASK_TEMPLATE`, `TASK_PROCESS`, `EPIC_TEMPLATE`, `MINI_TASK_TEMPLATE` y el modelo de issues pasan a ser inputs canónicos del diseño
 
 ### 2026-04-21 — TASK-524 Income → HubSpot Invoice Bridge shipped
 

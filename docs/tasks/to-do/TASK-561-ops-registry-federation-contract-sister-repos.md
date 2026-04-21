@@ -18,7 +18,7 @@
 
 ## Summary
 
-Formalizar el contrato federado de `Ops Registry` para repos hermanos: identidad compuesta, config local por repo, outputs comunes y estrategia de agregación futura sin centralizar la source of truth.
+Formalizar el contrato federado de `Ops Registry` para repos hermanos: identidad compuesta, config local por repo, outputs comunes, API/MCP compatibles y estrategia de operación/agregación futura sin centralizar la source of truth.
 
 ## Why This Task Exists
 
@@ -29,6 +29,8 @@ Greenhouse no quiere un helper local que solo sirva en este repo. Si el framewor
 - definir el contrato cross-repo
 - dejar claro qué es core compartido y qué es policy local por repo
 - preparar un agregador futuro sin introducirlo todavía
+- definir cómo se enrutan comandos de lectura y escritura entre repos
+- definir cómo se versionan y overridian templates/policies por repo sin romper compatibilidad
 
 ## Architecture Alignment
 
@@ -41,6 +43,8 @@ Reglas obligatorias:
 
 - identidad cross-repo compuesta `repoId:artifactId`
 - federación por outputs derivados, no por centralización prematura
+- API y MCP deben ser compatibles entre repos hermanos
+- cada repo puede overridear templates/policies solo mediante config explícita y versionada
 
 ## Dependencies & Impact
 
@@ -68,12 +72,19 @@ Reglas obligatorias:
 - outputs comunes por repo
 - reglas de compatibilidad mínimas
 
-### Slice 2 — Shared core vs local policy
+### Slice 2 — Cross-repo API / MCP contract
+
+- shape común para lectura
+- shape común para comandos write-safe
+- estrategia de routing al repo dueño del artefacto
+
+### Slice 3 — Shared core vs local policy
 
 - separar core reusable de validaciones específicas por repo
 - definir policy packs o equivalente
+- separar `artifact policy core` de overrides locales por repo
 
-### Slice 3 — Aggregation contract
+### Slice 4 — Aggregation contract
 
 - shape esperado para un agregador futuro
 - límites explícitos de V1 para no construirlo antes de tiempo
@@ -89,6 +100,8 @@ Reglas obligatorias:
 - [ ] Existe contrato explícito de federación para repos hermanos
 - [ ] Queda definido qué parte vive en core compartido y qué parte en config/policies del repo
 - [ ] El diseño deja claro cómo crecer a agregación cross-repo sin romper la truth local
+- [ ] El contrato deja explícito cómo consultar y mutar artefactos entre repos vía API/MCP compatibles
+- [ ] El contrato deja explícito cómo repos hermanos comparten o overridean templates/procesos por tipo de artefacto
 
 ## Verification
 

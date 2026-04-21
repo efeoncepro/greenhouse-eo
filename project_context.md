@@ -6,12 +6,16 @@
   - la source of truth sigue en Git y en markdown local a cada repo
   - el sistema debe servir tanto a humanos como a agentes
   - el diseño base debe escalar a repos hermanos por federacion, no por centralizacion
+  - el sistema debe exponer API HTTP y MCP para LLMs/agents
+  - el sistema no solo lee: debe poder crear y actualizar artefactos mediante comandos write-safe materializados en markdown
+  - el sistema debe ser template-aware y process-aware: respetar `TASK_TEMPLATE`, `TASK_PROCESS`, `EPIC_TEMPLATE`, `MINI_TASK_TEMPLATE` y el modelo de issues
 - Mounting técnico objetivo:
   - `src/lib/ops-registry/**`
   - `scripts/ops-registry-*.mjs`
   - `.generated/ops-registry/**`
   - `src/app/api/internal/ops-registry/**`
   - `src/app/(dashboard)/admin/ops-registry/**`
+  - `src/mcp/ops-registry/**`
 - Stack recomendado:
   - `TypeScript + Node.js`
   - `unified + remark-parse`

@@ -29,6 +29,8 @@ Sin schema común y sin `repo config`, el registry quedaría como un script loca
 - definir el schema común de artefactos y relaciones
 - implementar parser markdown inicial
 - definir `ops-registry.config.*` como contrato local por repo
+- definir schema tipado para comandos write-safe
+- definir `artifact policies` por tipo respetando templates y operating models del repo
 
 ## Architecture Alignment
 
@@ -42,6 +44,7 @@ Reglas obligatorias:
 
 - source of truth sigue en markdown versionado
 - el core no debe hardcodear paths Greenhouse-only sin pasar por config de repo
+- el diseño debe incorporar `TASK_TEMPLATE`, `TASK_PROCESS`, `EPIC_TEMPLATE`, `MINI_TASK_TEMPLATE` y el modelo de issues como policy inputs formales
 
 ## Dependencies & Impact
 
@@ -68,6 +71,8 @@ Reglas obligatorias:
 
 - definir `artifactType`, `artifactId`, `repoId`, `relationships` y shape mínima común
 - validar con `zod` o equivalente canónico del repo
+- definir `commandType`, payload mínimo y contratos `dry_run` para create/update
+- definir `policyKind`, `templateSource`, `processSource` y `writeCapabilities`
 
 ### Slice 2 — Markdown parser
 
@@ -77,6 +82,11 @@ Reglas obligatorias:
 ### Slice 3 — Repo config
 
 - definir contrato de configuración por repo para paths, taxonomías y reglas locales
+
+### Slice 4 — Artifact policy layer
+
+- modelar políticas para `task`, `epic`, `mini-task`, `issue` y `architecture`
+- mapear template + registry + index + lifecycle + process hooks por tipo
 
 ## Out of Scope
 
@@ -90,6 +100,8 @@ Reglas obligatorias:
 - [ ] Existe un schema común de artefactos para `Ops Registry`
 - [ ] El parser soporta al menos los tipos documentales canónicos del framework
 - [ ] El repo define un contrato local de configuración reutilizable por repos hermanos
+- [ ] Existe schema común para comandos de escritura segura sobre artefactos
+- [ ] Existe una `Artifact Policy Layer` que respeta templates y procesos del framework operativo actual
 
 ## Verification
 

@@ -15,7 +15,7 @@
 
 ## Summary
 
-Crear `Ops Registry` como capa operativa repo-native para Greenhouse: indexa, valida y relaciona artefactos vivos del framework de desarrollo, expone surfaces amigables para humanos y agentes, y deja un contrato federable para repos hermanos.
+Crear `Ops Registry` como control plane operativo repo-native para Greenhouse: indexa, valida, relaciona, crea y actualiza artefactos vivos del framework de desarrollo, expone surfaces amigables para humanos y agentes por UI/API/MCP, y deja un contrato federable para repos hermanos.
 
 ## Why This Epic Exists
 
@@ -26,13 +26,15 @@ Resolver eso bien requiere más de una task porque mezcla:
 - arquitectura y schema compartido
 - parser/indexador/validator/query layer
 - surfaces humano + agente
+- API + MCP
+- write plane y materialización segura
 - contrato federado para repos hermanos
 
 ## Outcome
 
 - Greenhouse EO cuenta con una capa operativa derivada y consultable sobre su documentación viva.
 - Humanos encuentran rápido source of truth, blockers, dependencias y drift.
-- Agentes consumen salidas JSON y endpoints internos en vez de adivinar contexto.
+- Agentes consumen salidas JSON, API y MCP, y pueden proponer/ejecutar mutaciones estructuradas en vez de editar markdown a mano.
 - El framework queda listo para extenderse a repos hermanos sin duplicar el diseño.
 
 ## Architecture Alignment
@@ -50,8 +52,8 @@ Resolver eso bien requiere más de una task porque mezcla:
 
 - `TASK-558` — schema, parser y repo config foundation
 - `TASK-559` — validation, query CLI y generated outputs
-- `TASK-560` — surfaces humano + agente
-- `TASK-561` — federation contract para repos hermanos
+- `TASK-560` — surfaces humano + agente + API/MCP + comandos de escritura
+- `TASK-561` — federation contract para repos hermanos incluyendo operación cross-repo
 
 ## Existing Related Work
 
@@ -66,6 +68,7 @@ Resolver eso bien requiere más de una task porque mezcla:
 - [ ] Existe un schema común de artefactos y relaciones para el framework operativo
 - [ ] El repo puede generar outputs derivados consultables (`registry`, `graph`, `validation`, `stale`)
 - [ ] Hay una surface legible para humanos y una surface estructurada para agentes
+- [ ] Existe API HTTP y MCP server para lectura y escritura segura
 - [ ] El contrato deja explícito cómo escalarlo a repos hermanos
 
 ## Non-goals
@@ -77,4 +80,4 @@ Resolver eso bien requiere más de una task porque mezcla:
 
 ## Delta 2026-04-21
 
-Epic creado para formalizar `Ops Registry` como framework operativo federado. Se declara explícitamente que el sistema debe montarse sobre el repo, ser friendly para humanos y agentes, y escalar a repos hermanos con schema común + config local por repo.
+Epic creado para formalizar `Ops Registry` como framework operativo federado. Se declara explícitamente que el sistema debe montarse sobre el repo, ser friendly para humanos y agentes, soportar API + MCP + write-safe materialization, y escalar a repos hermanos con schema común + config local por repo.

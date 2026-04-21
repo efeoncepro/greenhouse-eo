@@ -18,7 +18,7 @@
 
 ## Summary
 
-Exponer `Ops Registry` en dos surfaces claras: una humana dentro del portal y otra JSON-first para agentes, ambas montadas sobre los outputs derivados del sistema.
+Exponer `Ops Registry` en dos surfaces claras: una humana dentro del portal y otra estructurada para agentes vía API/MCP, ambas montadas sobre los outputs derivados del sistema y con soporte para comandos de escritura segura.
 
 ## Why This Task Exists
 
@@ -27,7 +27,10 @@ Si el sistema solo genera JSON su valor queda escondido. Si solo hay UI, los age
 ## Goal
 
 - crear una surface humana mínima para exploración y descubrimiento
-- crear endpoints internos JSON-first para agentes y tooling
+- crear API interna JSON-first para agentes y tooling
+- crear MCP server oficial para Claude y otros LLMs
+- exponer comandos de escritura segura para crear/actualizar artefactos
+- exponer flows process-aware para tasks (`take`, `start-plan`, `attach-plan`, `close`)
 
 ## Architecture Alignment
 
@@ -40,6 +43,8 @@ Reglas obligatorias:
 
 - la UI no reemplaza la lectura del markdown canónico
 - la surface de agentes debe exponer IDs, relaciones y warnings de validación
+- la escritura debe ser por comandos seguros/materializados, no por edición libre de markdown
+- los comandos de task deben respetar `TASK_TEMPLATE` y `TASK_PROCESS`
 
 ## Dependencies & Impact
 
@@ -72,23 +77,39 @@ Reglas obligatorias:
 - impacto por path
 - acceso a validation/stale reports
 
+### Slice 3 — API + MCP write-safe
+
+- endpoints `create/update/sync`
+- tools MCP de lectura y escritura
+- respuestas con `dry_run`, `changedFiles` y `validationSummary`
+
+### Slice 4 — Task process-aware flows
+
+- `take_task`
+- `start_plan_mode`
+- `attach_plan`
+- `close_task`
+- previews y validación específica de proceso
+
 ## Out of Scope
 
-- edición de docs desde la UI
+- edición libre de docs desde la UI
 - workflow de comentarios
 - approvals o asignaciones tipo PM tool
 
 ## Acceptance Criteria
 
 - [ ] Existe una surface humana mínima para navegar el registry
-- [ ] Existen endpoints internos JSON-first para agentes
+- [ ] Existen API HTTP y MCP para agentes
+- [ ] La capa agente soporta lectura y comandos write-safe sobre artefactos
+- [ ] La capa agente soporta flows process-aware de tasks alineados con `TASK_PROCESS.md`
 - [ ] Ambas surfaces consumen el mismo contrato derivado del registry
 
 ## Verification
 
 - `pnpm lint`
 - `pnpm tsc --noEmit`
-- validación manual local de UI y endpoints internos
+- validación manual local de UI, API y MCP
 
 ## Closing Protocol
 

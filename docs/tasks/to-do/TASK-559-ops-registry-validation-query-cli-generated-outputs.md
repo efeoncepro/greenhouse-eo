@@ -29,6 +29,7 @@ El valor real del sistema aparece cuando deja de ser solo parser y empieza a con
 - implementar validaciones operativas principales
 - exponer una CLI útil
 - generar outputs derivados estables en `.generated/ops-registry/`
+- preparar validación y preview para comandos de escritura
 
 ## Architecture Alignment
 
@@ -69,6 +70,7 @@ Reglas obligatorias:
 - links rotos
 - paths inexistentes
 - drift básico entre arquitectura y tasks
+- validación estructural previa a `create/update/sync`
 
 ### Slice 2 — Query CLI
 
@@ -85,6 +87,7 @@ Reglas obligatorias:
 - `graph.json`
 - `validation-report.json`
 - `stale-report.json`
+- previews estructurados de mutación cuando aplique `dry_run`
 
 ## Out of Scope
 
@@ -97,6 +100,7 @@ Reglas obligatorias:
 - [ ] El repo puede generar outputs derivados consumibles
 - [ ] Existen validaciones automáticas para las reglas operativas mínimas
 - [ ] La CLI permite consultar artefactos, impacto y drift sin leer manualmente todos los docs
+- [ ] La capa de validación soporta `dry_run` y preview antes de materializar comandos write-safe
 
 ## Verification
 
