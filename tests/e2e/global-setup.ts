@@ -7,6 +7,12 @@ const STORAGE_PATH = resolve(process.env.AGENT_AUTH_STORAGE_PATH || '.auth/stora
 const MAX_STORAGE_AGE_MS = 20 * 60 * 1000
 const SKIP_AUTH_SETUP = process.env.PLAYWRIGHT_SKIP_AUTH_SETUP === 'true'
 
+const RESOLVED_BASE_URL =
+  process.env.PLAYWRIGHT_BASE_URL ||
+  process.env.AGENT_AUTH_BASE_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  'http://localhost:3000'
+
 export default async function globalSetup() {
   if (SKIP_AUTH_SETUP) {
     if (!existsSync(STORAGE_PATH)) {
@@ -39,7 +45,10 @@ function runAuthSetup(): Promise<void> {
   return new Promise((resolvePromise, rejectPromise) => {
     const child = spawn('node', ['scripts/playwright-auth-setup.mjs'], {
       stdio: 'inherit',
-      env: process.env
+      env: {
+        ...process.env,
+        AGENT_AUTH_BASE_URL: RESOLVED_BASE_URL
+      }
     })
 
     child.on('error', rejectPromise)
