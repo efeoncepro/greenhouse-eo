@@ -2,6 +2,17 @@
 
 ## 2026-04-20
 
+### 2026-04-20 — TASK-471 V1 gap completion (Gap-1 a Gap-5, merge 547106ed)
+
+- **Gap-1 Approval auto-apply**: `decideApproval(decision='approved')` ahora aplica el cambio al target entity + emite audit row `action='approval_applied'` en la misma transacción. Rollback atómico si el apply falla.
+- **Gap-2 High-impact gate efectivo**: `ImpactPreviewPanel` expone `onBlockingStateChange`. Los 3 edit drawers gate su save button cuando high-impact no confirmado; copy → "Confirmar impacto alto".
+- **Gap-3 Revert refactor + service_catalog**: revert route usa el shared `pricing-catalog-entity-writer.ts` (eliminando duplicación). `service_catalog` agregado al whitelist y al timeline revertible entities.
+- **Gap-4 Bulk edit tools + overheads**: nuevo endpoint generalizado `/api/admin/pricing-catalog/bulk` por entityType. `BulkEditDrawer` generalizado con prop `entityType`. Multi-select + action bar en `ToolCatalogListView` + `OverheadAddonsListView`.
+- **Gap-5 Excel apply tools + overheads**: parser procesa las 3 sheets. Apply route usa shared writer → 4 entity types end-to-end.
+- **Nuevo shared module** `src/lib/commercial/pricing-catalog-entity-writer.ts`: whitelist central + `applyPricingCatalogEntityChanges` + `EntityWriterError` tipado. Reusado por revert, approval-apply, bulk, excel-apply.
+- Verificación: lint 0 errors, tsc clean, 1569/1569 tests, build OK.
+- Follow-ups phase-5 restantes: governance types revert (composite keys), Slack/email notifications, Excel create/delete, high-impact gate en los otros 3 tabs del SellableRoleDrawer.
+
 ### 2026-04-20 — TASK-471 Pricing Catalog Phase-4 UI Polish shipped (6 slices)
 
 - **Slice 1 — AuditDiffViewer primitive**: reemplaza `<pre>{JSON.stringify(changeSummary)}</pre>` en el audit timeline. Soporta 12 action types con render contextual (side-by-side para updates, single-column para create/delete, state banner por acción). Deltas numéricos con pct, set diff para arrays, collapse de campos sin cambios, copy JSON clipboard.

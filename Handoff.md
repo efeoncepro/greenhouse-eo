@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-20 — TASK-471 V1 gap completion (Claude Opus 4.7)
+
+- **Scope**: cerrar los 5 gaps V1 honestamente declarados al cierre del shipping inicial de TASK-471. Branch: `task/TASK-471-phase-4-gaps-completion` → merge `547106ed` en `develop`.
+- **Gaps cerrados**:
+  - Gap-1 Approval auto-apply — queue approvals aprobadas persisten al target + emiten audit en la misma transacción (atómico).
+  - Gap-2 High-impact gate efectivo — `onBlockingStateChange` callback en `ImpactPreviewPanel`; 3 drawers gate save.
+  - Gap-3 Revert refactor + service_catalog — shared writer (elimina duplicación), 4 entity types V1.
+  - Gap-4 Bulk edit tools + overheads — endpoint generalizado `/bulk` + BulkEditDrawer generalizado + multi-select en 2 list views adicionales.
+  - Gap-5 Excel apply tools + overheads — parser de 3 sheets + apply via shared writer.
+- **Decisión arquitectónica**: nuevo módulo shared `pricing-catalog-entity-writer.ts` centraliza whitelist + writer + error typing. Reutilizado por revert, approval-apply, bulk, excel-apply. Antes el whitelist vivía duplicado en 3 endpoints; ahora un solo lugar.
+- **Verificación**: `pnpm lint` 0 errores, `pnpm tsc --noEmit` clean, `pnpm test` 1569/1569, `pnpm build` OK.
+- **Follow-ups phase-5 reales (fuera de TASK-471)**:
+  - Governance types revert: tablas con composite keys + effective-dating (role_tier_margin, service_tier_margin, commercial_model_multiplier, country_pricing_factor, employment_type). Requieren PATCH al governance router en vez de UPDATE por PK.
+  - High-impact gate extendido a tabs compat/cost/pricing del SellableRoleDrawer.
+  - Slack/email notifications para approvals.
+  - Excel create/delete actions (hoy solo update).
+
 ## Sesion 2026-04-20 — TASK-471 Pricing Catalog Phase-4 UI Polish (Claude Opus 4.7)
 
 - **Scope**: 6 slices shippeados en una sola sesión sobre `task/TASK-471-pricing-catalog-phase-4-ui`.

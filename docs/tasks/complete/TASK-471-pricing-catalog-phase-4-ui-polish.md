@@ -1,5 +1,31 @@
 # TASK-471 — Pricing Catalog Phase-4 UI Polish (Diff Viewer + Revert + Bulk + Impact UI + Maker-Checker + Excel)
 
+## Delta 2026-04-20 — V1 gap completion (Gap-1 to Gap-5)
+
+Los 5 gaps V1 declarados al cierre del shipping inicial quedaron resueltos en una sesion de follow-up. Branch: `task/TASK-471-phase-4-gaps-completion` → merge commit `547106ed` en `develop`.
+
+- **Gap-1 — Approval auto-apply** (slice 5b): queue approvals aprobadas ahora persisten el cambio al target entity + emiten audit row `action='approval_applied'` en la misma transaccion. Rollback atomico si apply falla. `ApprovalApplyError` envuelve `EntityWriterError` preservando statusCode.
+- **Gap-2 — High-impact gate efectivo**: `ImpactPreviewPanel` expone nuevo callback `onBlockingStateChange(blocking)`. Los 3 edit drawers (SellableRole tab Info + Tool + Overhead) disable el save cuando high-impact no esta confirmado; copy del CTA cambia a `"Confirmar impacto alto"`.
+- **Gap-3 — Revert refactor + service_catalog**: revert route ahora usa `applyPricingCatalogEntityChanges` del shared entity-writer (eliminando ~60 lineas de whitelist duplicado). `service_catalog` agregado al whitelist + al timeline `revertibleEntities` (4 entity types V1).
+- **Gap-4 — Bulk edit extension**: nuevo endpoint generalizado `POST /api/admin/pricing-catalog/bulk` via shared writer. `BulkEditDrawer` generalizado con props `entityType + entityIds` (backward compat con `roleIds`). Multi-select + action bar fixed-bottom en `ToolCatalogListView` + `OverheadAddonsListView`.
+- **Gap-5 — Excel apply extension**: parser extendido con `parseToolRow` + `parseOverheadRow`. `previewPricingCatalogExcelImport` procesa las 3 sheets (Roles + Tools + Overheads). Apply route usa shared writer → cualquier entity type en el whitelist.
+
+Nuevo modulo shared [`pricing-catalog-entity-writer.ts`](../../src/lib/commercial/pricing-catalog-entity-writer.ts) centraliza:
+- `PRICING_CATALOG_ENTITY_WHITELIST` — 4 entity types con columnas legales
+- `filterChangesetByWhitelist` — normalization camelCase/snake_case
+- `applyPricingCatalogEntityChanges` — UPDATE + typed errors
+- `EntityWriterError` con `code` + `statusCode`
+
+Usado por: revert route, approval decide store, bulk route, excel apply route. Un solo lugar donde mantener whitelists (antes duplicado en 3 endpoints).
+
+Verificacion: `pnpm lint` 0 errors, `pnpm tsc --noEmit` clean, `pnpm test` 1569/1569, `pnpm build` OK.
+
+Follow-up real phase-5 (queda fuera de TASK-471):
+- Governance types revert (role_tier_margin, service_tier_margin, commercial_model_multiplier, country_pricing_factor, employment_type): tablas con composite keys + effective-dating; requiere PATCH al governance router, no simple UPDATE por PK.
+- High-impact gate extendido a los 3 tabs adicionales del SellableRoleDrawer (compatibility, cost, pricing).
+- Slack/email notifications para approvals.
+- Excel create/delete actions (hoy solo update).
+
 ## Delta 2026-04-20 — Revisión contra codebase real
 
 La revisión del repo confirma que esta task **sigue vigente**, pero ya no debe presentarse como dependiente de foundations backend pendientes:
