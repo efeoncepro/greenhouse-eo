@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-541 Quote-to-Cash Atomic Choreography (Claude Opus 4.7)
+
+- **Scope:** Fase G del programa Commercial Party Lifecycle (paraguas TASK-534). Cierra el loop end-to-end quote→contract→party→client→deal-won en un solo comando atómico con `correlation_id` UNIQUE propagado a todos los eventos. Desbloquea MRR materializer consumir triggers consistentes.
+- **Migration shipped + aplicada en dev:** `20260421150625283_task-541-commercial-operations-audit.sql` crea `greenhouse_commercial.commercial_operations_audit` con PK `operation_id` UUID, UNIQUE `correlation_id` UUID (propagado a payload de todos los eventos downstream), 3 CHECK constraints (operation_type, status de 5 valores, trigger_source de 4 valores), 4 indexes hot-path (quotation_id + started_at, status in `('started','pending_approval')`, contract_id, hubspot_deal_id). Runtime grants INSERT/UPDATE/SELECT.
+- **Comando CQRS** (`src/lib/commercial/party/commands/convert-quote-to-cash.ts`): pipeline transaccional explícito:
+  1. `FOR UPDATE OF q` sobre `quotations` joineado a `organizations` para leer `lifecycle_stage`
+  2. Idempotency check: si ya `converted` con audit previo → retorna `idempotent_hit`; sin audit → sintetiza row `legacy_converted_quote_with_no_audit`
+  3. Validación `CONVERTIBLE_STATUSES = {issued, sent, approved}`
+  4. Guard `organization_id` presente
+  5. `startCorrelatedOperation` + emit `quote_to_cash.started`
+  6. Threshold gate: `total_amount_clp > $100M` → `pending_approval` + emit `approval_requested` + throw (sin mutar nada más)
+  7. UPDATE quote status → `converted`
+  8. `ensureContractForQuotation` (TASK-460 reusado)
+  9. `promoteParty(active_client)` si no ya está en ese stage (instancia client por side-effect)
+  10. Fallback: `instantiateClientForParty` si la promoción se saltó y no hay client_id
+  11. `publishQuotationConvertedEvent` directo (no via publishQuoteConverted porque ese requiere incomeId que no creamos aquí)
+  12. `publishDealWon` LOCAL solo si trigger ≠ `deal_won_hubspot` (anti-duplicado con sync inbound)
+  13. `completeOperation(completed)` + emit `quote_to_cash.completed`
+  14. Try/catch outer: `completeOperation(failed)` + emit `quote_to_cash.failed` + rethrow (la tx rollea todo de igual forma — los eventos solo llegan al outbox si antes fueron INSERT; el failed event es best-effort)
+- **Correcciones a spec §6.5:**
+  - `markDealWon(tx, hubspotDealId)` outbound a HubSpot NO se implementa (TASK-540 Fase F). Emito solo evento local y anti-duplicado cuando el trigger viene del sync inbound.
+  - `publishQuoteConverted` requiere `incomeId` que no creamos aquí → emito `commercial.quotation.converted` directo con `correlationId` en payload.
+  - Wiring reactivo sobre `commercial.contract.created` sería circular (el comando emite ese evento). Solo escucho `commercial.deal.won`.
+  - Dual approval genérico no existe; gate simple detecta threshold y persiste `pending_approval` + evento (follow-up para workflow completo).
+  - Income materialization separada — sigue en `materializeInvoiceFromApprovedQuotation` (endpoint manual). Posible reactivización como follow-up.
+- **Event catalog extendido**: aggregate nuevo `commercial_operation` + 4 event types (`commercial.quote_to_cash.{started,completed,failed,approval_requested}`).
+- **Projection reactiva** (`quote-to-cash-autopromoter.ts`): domain `cost_intelligence`, trigger `commercial.deal.won`, extractScope por `hubspotDealId`, busca quotation convertible (issued/sent/approved sin converted_to_income_id), invoca comando con trigger `deal_won_hubspot`. Swallows `QUOTE_TO_CASH_APPROVAL_REQUIRED` para no quemar retries.
+- **API route** (`POST /api/commercial/quotations/[id]/convert-to-cash`): capability gate `commercial.quote_to_cash.execute` (bindeada a `efeonce_admin` + `finance_admin`), traducción explícita de errores: 404 not found, 409 not convertible/missing anchors, 202 con `approvalId` cuando threshold gate dispara, 200 para completed/idempotent_hit, 500 fallback.
+- **Types + errors**: 4 error classes dedicadas (`QuotationNotFoundError`, `QuotationNotConvertibleError`, `QuoteToCashApprovalRequiredError`, `QuoteToCashMissingAnchorsError`), enums (`ConversionTriggeredBy`, `CommercialOperationStatus`), threshold constante `QUOTE_TO_CASH_DUAL_APPROVAL_THRESHOLD_CLP = 100_000_000`.
+- **Tests**: 9/9 passing — not found, not convertible, missing anchors, idempotent hit, threshold gate, bypass via `skipApprovalGate`, happy path con promote, trigger=deal_won_hubspot suprime re-emit local, skip promote cuando ya es active_client.
+- **Docs**: `GREENHOUSE_EVENT_CATALOG_V1.md` sección Commercial Deals extendida con los 4 events del aggregate `commercial_operation` + el `quotation.converted` re-emitido con correlationId. `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` gana sección "Delta 2026-04-21 — Fase G shipped (TASK-541)". Doc funcional nueva `docs/documentation/finance/quote-to-cash-atomico.md` explica flujo operativo, 12 pasos, 5 estados, threshold, correlation ID, trigger reactivo, FAQ.
+- **Verificación:** `pnpm migrate:up` + types regen OK · `pnpm lint` clean · `npx tsc --noEmit` clean · 9/9 tests passing.
+- **Cross-impact:**
+  - **TASK-535 (Party Lifecycle)** — usa `promoteParty` + `instantiateClientForParty`.
+  - **TASK-460 (Contracts)** — reusa `ensureContractForQuotation` tal cual.
+  - **TASK-504 (Quotation Governance)** — respeta status enum; el comando converge quotes `approved`/`issued`/`sent` sin re-aplicar approval del workflow propio.
+  - **TASK-539 (Inline Deal)** — los deals creados allí entran al pipeline y pueden ser convertidos via trigger `deal_won_hubspot` o operador.
+  - **TASK-540 (Outbound Fase F)** — consumirá los eventos `party.promoted`, `deal.won`, `contract.activated` con el mismo `correlationId` para propagar a HubSpot.
+  - **TASK-462 (MRR/ARR)** — `contract.activated` emitido desde el comando dispara la materialización correctamente.
+- **Out of scope (follow-ups):** workflow genérico de approvals para resolver `pending_approval`; outbound Fase F; income materialization reactiva al `quote_to_cash.completed`; Admin Center funnel/velocity dashboard (TASK-542); reversal/unconvert post-V1.
+
 ## Sesion 2026-04-21 — TASK-539 Inline Deal Creation from Quote Builder (Claude Opus 4.7)
 
 - **Scope:** Fase E del programa Commercial Party Lifecycle (paraguas TASK-534). Elimina el context-switch HubSpot desde el cotizador — el pain point principal declarado del programa. Desbloquea TASK-540 (outbound) y TASK-541 (quote-to-cash).

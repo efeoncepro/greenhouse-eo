@@ -9,6 +9,38 @@
 
 ---
 
+## Delta 2026-04-21 — Fase G shipped (TASK-541)
+
+Quote-to-cash atómico aterriza. Un solo comando transaccional compone quote → contract → client → party → deal-won con audit correlation y rollback completo.
+
+### Implementado
+
+| Área | Artefacto |
+|---|---|
+| Migration | `20260421150625283_task-541-commercial-operations-audit.sql` — tabla `greenhouse_commercial.commercial_operations_audit` con `correlation_id` UNIQUE UUID (propagado a todos los eventos), status enum (5 valores), trigger_source enum (4 valores: operator / contract_signed / deal_won_hubspot / reactive_auto), 4 indexes hot-path. |
+| Comando | `src/lib/commercial/party/commands/convert-quote-to-cash.ts` — pipeline en `withTransaction`: lock quote → idempotency check → threshold gate ($100M CLP) → state transition → `ensureContractForQuotation` → `promoteParty(active_client)` → `instantiateClientForParty` (si falta) → `publishDealWon` (cuando aplica) → eventos canónicos con `correlationId` → finalize audit. |
+| Audit helper | `commercial-operations-audit.ts` — `startCorrelatedOperation`, `completeOperation`, `findCompletedOperationForQuotation`. |
+| Event catalog | Aggregate nuevo `commercial_operation` + 4 event types (`commercial.quote_to_cash.started/completed/failed/approval_requested`). |
+| Projection reactiva | `quote-to-cash-autopromoter.ts` — escucha `commercial.deal.won`, resuelve la quotation convertible (issued/sent/approved + no converted), invoca el comando con trigger `deal_won_hubspot`. |
+| API route | `POST /api/commercial/quotations/[id]/convert-to-cash` — capability `commercial.quote_to_cash.execute` + traducción de errores del comando a 400/403/404/409/202. |
+| Tests | 9 unit tests del comando (not found, not convertible, no anchors, idempotent hit, threshold, bypass, happy path, deal_won_hubspot no re-emite, skip promote). |
+
+### Correcciones a spec §6.5
+
+1. **`markDealWon` outbound a HubSpot**: la spec dice "markDealWon(tx, hubspotDealId)" pero no existe write path outbound (TASK-540 Fase F lo shippea). **Decisión:** Fase G emite `commercial.deal.won` como evento **local** solo cuando el trigger NO fue `deal_won_hubspot` (para no duplicar con el sync). Outbound real queda a TASK-540.
+2. **`publishQuoteConverted` helper requiere `incomeId`**: el income no se crea en esta fase. **Decisión:** Fase G emite `commercial.quotation.converted` directo vía `publishOutboxEvent` con payload que incluye `correlationId` y `source: 'quote_to_cash_choreography'`. El helper legacy queda intacto para callers que sí creen income.
+3. **Dual approval $100M**: el workflow de TASK-504 es quotation-specific y no genérico. **Decisión:** Fase G implementa el gate de forma defensiva — si `total_amount_clp > $100M` y no hay `skipApprovalGate`, persiste `pending_approval` + emite `commercial.quote_to_cash.approval_requested` + throws `QuoteToCashApprovalRequiredError`. Cuando aterrice el workflow genérico, llama al comando con `skipApprovalGate: true`.
+4. **Trigger reactivo sobre `commercial.contract.created`**: spec lo lista pero crearía loop (el comando emite ese evento). **Decisión:** auto-promoter solo escucha `commercial.deal.won`. Los flujos "contract signed" manuales se disparan con trigger `operator` vía API.
+5. **Income materialization reactiva**: spec menciona "downstream reactivo"; Fase G NO materializa income. El income sigue siendo responsabilidad de `materializeInvoiceFromApprovedQuotation` (endpoint manual) o un follow-up que escuche `commercial.quote_to_cash.completed`.
+
+### Gaps reconocidos para follow-ups
+
+1. Workflow genérico de approvals (para que `pending_approval` se resuelva desde UI). Hoy audit persiste + evento se emite pero no hay UI.
+2. Outbound de `deal.won` hacia HubSpot (TASK-540 Fase F).
+3. Income materialization reactiva a `quote_to_cash.completed`.
+4. Reversal (unconvert) — evaluar post-V1.
+5. Dashboard funnel/velocity → TASK-542 Admin Center.
+
 ## Delta 2026-04-21 — Fase E shipped (TASK-539)
 
 Inline deal creation desde el Quote Builder aterriza — se elimina el context-switch a HubSpot.

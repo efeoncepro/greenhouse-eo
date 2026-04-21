@@ -37,6 +37,7 @@ import { dealPipelineProjection } from './deal-pipeline'
 import { contractMrrArrProjection } from './contract-mrr-arr'
 import { sourceToProductCatalogProjection } from './source-to-product-catalog'
 import { incomeHubSpotOutboundProjection } from './income-hubspot-outbound'
+import { quoteToCashAutopromoterProjection } from './quote-to-cash-autopromoter'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -84,4 +85,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(contractMrrArrProjection)
   registerProjection(sourceToProductCatalogProjection)
   registerProjection(incomeHubSpotOutboundProjection)
+  registerProjection(quoteToCashAutopromoterProjection)
 }

@@ -27,6 +27,25 @@ export type { InstantiateClientForPartyInput } from './commands/instantiate-clie
 export { promoteParty } from './commands/promote-party'
 export type { PromotePartyInput } from './commands/promote-party'
 
+export { convertQuoteToCash } from './commands/convert-quote-to-cash'
+export {
+  CONVERT_QUOTE_TO_CASH_TRIGGERS,
+  COMMERCIAL_OPERATION_STATUSES,
+  QUOTE_TO_CASH_DUAL_APPROVAL_THRESHOLD_CLP,
+  QuoteToCashApprovalRequiredError,
+  QuoteToCashError,
+  QuoteToCashMissingAnchorsError,
+  QuotationNotConvertibleError,
+  QuotationNotFoundError
+} from './commands/convert-quote-to-cash-types'
+export type {
+  CommercialOperationStatus,
+  ConversionTriggeredBy,
+  ConvertQuoteToCashActor,
+  ConvertQuoteToCashInput,
+  ConvertQuoteToCashResult
+} from './commands/convert-quote-to-cash-types'
+
 export { createDealFromQuoteContext } from './commands/create-deal-from-quote-context'
 export {
   DEAL_CREATE_APPROVAL_THRESHOLD_CLP,

@@ -58,6 +58,7 @@ export const AGGREGATE_TYPES = {
   // Commercial Party Lifecycle (TASK-535)
   commercialParty: 'commercial_party',
   commercialClient: 'commercial_client',
+  commercialOperation: 'commercial_operation',
 
   // HR Core / People
   member: 'member',
@@ -371,6 +372,12 @@ export const EVENT_TYPES = {
   dealStageChanged: 'commercial.deal.stage_changed',
   dealWon: 'commercial.deal.won',
   dealLost: 'commercial.deal.lost',
+
+  // Commercial Quote-to-Cash choreography (TASK-541, Fase G)
+  quoteToCashStarted: 'commercial.quote_to_cash.started',
+  quoteToCashCompleted: 'commercial.quote_to_cash.completed',
+  quoteToCashFailed: 'commercial.quote_to_cash.failed',
+  quoteToCashApprovalRequested: 'commercial.quote_to_cash.approval_requested',
 
   // Commercial Quotation Governance (TASK-348)
   quotationVersionCreated: 'commercial.quotation.version_created',

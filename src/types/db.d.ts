@@ -245,6 +245,34 @@ export interface GreenhouseCommercialCommercialModelMultipliers {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialCommercialOperationsAudit {
+  actor_user_id: string;
+  approval_id: string | null;
+  client_id: string | null;
+  completed_at: Timestamp | null;
+  contract_id: string | null;
+  /**
+   * UNIQUE uuid emitted in every outbox event payload produced during this operation — ties party/client/contract/deal events into a single narrative for support + replay.
+   */
+  correlation_id: string;
+  error_code: string | null;
+  error_message: string | null;
+  hubspot_deal_id: string | null;
+  metadata: Generated<Json>;
+  operation_id: Generated<string>;
+  operation_type: string;
+  organization_id: string | null;
+  quotation_id: string | null;
+  started_at: Generated<Timestamp>;
+  status: Generated<string>;
+  tenant_scope: string;
+  total_amount_clp: Numeric | null;
+  /**
+   * operator (explicit API) · contract_signed (reserved for reactive future) · deal_won_hubspot (inbound deal sync triggered auto-promoter) · reactive_auto (other projections).
+   */
+  trigger_source: string;
+}
+
 export interface GreenhouseCommercialContractQuotes {
   contract_id: string;
   created_at: Generated<Timestamp>;
@@ -5971,6 +5999,7 @@ export interface DB {
   "greenhouse_commercial.clause_library": GreenhouseCommercialClauseLibrary;
   "greenhouse_commercial.commercial_cost_basis_snapshots": GreenhouseCommercialCommercialCostBasisSnapshots;
   "greenhouse_commercial.commercial_model_multipliers": GreenhouseCommercialCommercialModelMultipliers;
+  "greenhouse_commercial.commercial_operations_audit": GreenhouseCommercialCommercialOperationsAudit;
   "greenhouse_commercial.contract_quotes": GreenhouseCommercialContractQuotes;
   "greenhouse_commercial.contract_renewal_reminders": GreenhouseCommercialContractRenewalReminders;
   "greenhouse_commercial.contracts": GreenhouseCommercialContracts;
