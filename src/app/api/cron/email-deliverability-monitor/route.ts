@@ -28,14 +28,8 @@ export async function POST(request: Request) {
     const rows = await runGreenhousePostgresQuery<RateRow & Record<string, unknown>>(`
       SELECT
         COUNT(*) FILTER (WHERE status IN ('sent', 'delivered'))::text AS total_sent,
-        COUNT(*) FILTER (
-          WHERE source_entity = 'email_delivery.undeliverable_marked'
-            AND created_at > NOW() - INTERVAL '7 days'
-        )::text AS hard_bounces,
-        COUNT(*) FILTER (
-          WHERE source_entity = 'email_delivery.complained'
-            AND created_at > NOW() - INTERVAL '7 days'
-        )::text AS complaints
+        COUNT(*) FILTER (WHERE bounced_at IS NOT NULL AND bounced_at > NOW() - INTERVAL '7 days')::text AS hard_bounces,
+        COUNT(*) FILTER (WHERE complained_at IS NOT NULL AND complained_at > NOW() - INTERVAL '7 days')::text AS complaints
       FROM greenhouse_notifications.email_deliveries
       WHERE created_at > NOW() - INTERVAL '7 days'
     `)

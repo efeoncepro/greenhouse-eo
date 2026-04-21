@@ -535,7 +535,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-479` | `to-do`       | People Actual Cost + Blended Role Cost Snapshots | `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md` |
 | `TASK-480` | `complete`    | Pricing Engine Cost Resolver, Provenance & Confidence | `docs/tasks/complete/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md` |
 | `TASK-481` | `complete`    | Quote Builder Suggested Cost UX & Override Governance | `docs/tasks/complete/TASK-481-quote-builder-suggested-cost-override-governance.md` |
-| `TASK-482` | `to-do`       | Quoted vs Actual Margin Feedback Loop | `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md` |
+| `TASK-482` | `in-progress` | Quoted vs Actual Margin Feedback Loop | `docs/tasks/in-progress/TASK-482-quoted-vs-actual-margin-feedback-loop.md` |
 | `TASK-483` | `complete` | Commercial Cost Basis Engine Runtime Topology & Worker Foundation | `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md` |
 | `TASK-484` | `complete`    | FX Provider Adapter Platform | `docs/tasks/complete/TASK-484-fx-provider-adapter-platform.md` |
 | `TASK-485` | `to-do`       | FX Coverage Rollout (manual_only → auto_synced) | `docs/tasks/to-do/TASK-485-fx-coverage-rollout.md` |
