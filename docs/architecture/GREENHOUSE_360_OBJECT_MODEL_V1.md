@@ -1,5 +1,24 @@
 # Greenhouse 360 Object Model V1
 
+## Delta 2026-04-21 — Organization gains canonical commercial lifecycle + stable `commercial_party_id`
+
+- Greenhouse ya no trata `Cliente` como estado terminal post-venta. `Organization` ahora es el anchor del lifecycle comercial completo (`prospect → opportunity → active_client → inactive → churned`) via columnas canonicas en `greenhouse_core.organizations`.
+- Regla nueva:
+  - `Organization` gana `lifecycle_stage`, `lifecycle_stage_since`, `lifecycle_stage_source`, `is_dual_role`, y `commercial_party_id` (UUID unique, estable, surfaceable). `organization_id` sigue siendo PK tecnica.
+  - `commercial_party_id` es el identificador **publico** que se emite en outbox events y cruza modulos; nunca cambia aunque `organization_id` se reasigne.
+  - `Cliente` (`greenhouse_core.clients`) sigue siendo extension financiera — solo existe cuando la org entra a `active_client` o se bootstrappea manualmente. `instantiateClientForParty` es el unico write path autorizado.
+  - `OrganizationLifecycleHistory` (`greenhouse_core.organization_lifecycle_history`) es append-only — trigger bloquea UPDATE/DELETE a nivel DB. Cada transicion deja una fila con `from_stage`, `to_stage`, `transition_source`, `trigger_entity_*`.
+- Contratos canonicos nuevos (via `src/lib/commercial/party/**`):
+  - `promoteParty({organizationId, toStage, source, actor, triggerEntity?})` — unico write path legal para `lifecycle_stage`.
+  - `createPartyFromHubSpotCompany({hubspotCompanyId, ...})` — upsert idempotente.
+  - `instantiateClientForParty({organizationId, triggerEntity, actor})` — side-effect de `promoteParty → active_client`.
+- Documento canonico de referencia:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` (Fase A shipped 2026-04-21 en TASK-535).
+- Consecuencia:
+  - El selector de Organizations en Quote Builder (Fase D) podra incluir prospects sin esperar clientizacion.
+  - HubSpot companies pueden sincronizarse desde `lifecyclestage=lead|mql|sql|opportunity` (Fase B, TASK-536), no solo desde closed-won.
+  - Cualquier modulo que lea `organizations` puede filtrar por `lifecycle_stage` para excluir `provider_only`/`churned`/`disqualified` del funnel comercial.
+
 ## Delta 2026-04-20 — Service now has a canonical attribution extension before full Service Economics
 
 - Greenhouse ya no debe saltar directo de `Service` a `ServiceEconomics` sin una capa factual reusable entre medio.

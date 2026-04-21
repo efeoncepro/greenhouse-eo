@@ -23,6 +23,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Finanzas
 
+- [Ciclo de Vida de Parties Comerciales — Del Prospecto al Cliente Activo](finance/ciclo-de-vida-party-comercial.md) — lifecycle canonico de `Organization` (`prospect → opportunity → active_client → inactive → churned`), comandos CQRS, history inmutable, mapeo HubSpot con env override, eventos outbox, permisos. Fase A shipped en TASK-535; desbloquea sync inbound y selector unificado en Quote Builder.
 - [Cotizaciones multi-source](finance/cotizaciones-multi-source.md) — cotizaciones de Nubox y HubSpot unificadas, sync automatico, creacion outbound, mapeo de estados
 - [Cotizaciones — Gobernanza, versiones, aprobaciones y templates](finance/cotizaciones-gobernanza.md) — runtime de gobernanza interna: versiones con diff, approval por excepción conectado al margin health, terms library con variables, templates reutilizables y audit inmutable
 - [Contratos comerciales](finance/contratos-comerciales.md) — contratos/SOW como entidad canónica post-venta: relación con quotes, document chain, rentabilidad, renovaciones y lane `/finance/contracts`

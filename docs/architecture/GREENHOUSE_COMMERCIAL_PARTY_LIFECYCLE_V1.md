@@ -1,10 +1,68 @@
 # Greenhouse EO — Commercial Party Lifecycle Architecture V1
 
-> **Version:** 1.0
+> **Version:** 1.1
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
+> **Ultima actualizacion:** 2026-04-21 por Claude (Opus 4.7) — Fase A shipped
 > **Audience:** Backend engineers, product owners, agentes que implementen features de pre-venta, quote builder, HubSpot sync o revenue pipeline
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`, `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## Delta 2026-04-21 — Fase A shipped (TASK-535)
+
+La foundation del programa esta en `develop` (commit `c20a33bf`). Esto es **lo que vive en el repo hoy** vs. **lo que este spec describe en su forma completa**.
+
+### Implementado en Fase A
+
+| Area | Artefacto |
+|---|---|
+| DDL | `migrations/20260421113910459_task-535-organization-lifecycle-ddl.sql` — 6 columnas nuevas en `organizations` + `organization_lifecycle_history` append-only (trigger bloquea UPDATE/DELETE) |
+| Backfill | `migrations/20260421114006586_task-535-organization-lifecycle-backfill.sql` + `scripts/backfill-organization-lifecycle.ts` (CLI con `--dry-run` / `--force`) |
+| Comandos CQRS | `src/lib/commercial/party/commands/{promote-party,create-party-from-hubspot-company,instantiate-client-for-party}.ts` |
+| State machine | `src/lib/commercial/party/lifecycle-state-machine.ts` |
+| Eventos outbox | `commercial.party.{created,promoted,demoted,lifecycle_backfilled}` + `commercial.client.instantiated` en `src/lib/sync/event-catalog.ts` |
+| HubSpot mapping | `src/lib/commercial/party/hubspot-lifecycle-mapping.ts` con env override `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE` |
+| Entitlements | Modulo `commercial` + 6 capabilities en `src/config/entitlements-catalog.ts`; bindings a `efeonce_admin` + `finance_admin` en `src/lib/entitlements/runtime.ts` |
+| Tests | 36 tests unit passing en `src/lib/commercial/party/__tests__/**` |
+
+### Correcciones a la spec §10.1 (adaptaciones al schema real)
+
+La spec §10.1 asumia `organizations.client_id` y `organizations.is_provider`. Ninguna existe en el schema actual. La reglas de backfill se reexpresaron en la implementacion:
+
+| Regla spec §10.1 | Implementacion real (migrations + CLI) |
+|---|---|
+| `organization HAS client_id + contratos activos` | `EXISTS via fin_client_profiles.organization_id OR shared hubspot_company_id` **AND** `EXISTS greenhouse_commercial.contracts.status='active'` |
+| `organization HAS client_id + sin income 6m` | mismo check de client-link **AND** `NOT EXISTS greenhouse_finance.income con invoice_date > NOW()-6m` |
+| `organization es provider sin cliente` | **no implementable hoy** — `organizations` no tiene flag de provider. Todo org sin client-link cae a `prospect`. Follow-up: exponer `is_provider` en la tabla o cargar desde `greenhouse_core.providers` cuando haya FK. |
+| `organization sin client ni provider, sin deals` | `prospect` default |
+| `organization sin client, sin provider, con deals` | Fase A no inspecciona `greenhouse_commercial.deals` — quedara cubierto cuando TASK-536 (inbound sync) y TASK-539 (inline deal) se crucen con el lifecycle. Por ahora cualquier org con deal pero sin client-link tambien cae a `prospect` (forward-compatible: promoveParty la llevara a `opportunity` cuando llegue el primer deal event). |
+
+### Correcciones a la spec §6 (contratos de comandos)
+
+La spec lista 5 comandos (`promoteParty`, `createPartyFromHubSpotCompany`, `instantiateClientForParty`, `createDealFromQuoteContext`, `convertQuoteToCash`). **Fase A shippea los primeros 3**. Los otros dos pertenecen a Fase E/G (TASK-539/541).
+
+### Correcciones al catalogo de eventos (§spec lista 9 party events)
+
+La spec lista 9 eventos party (`created`, `promoted`, `demoted`, `hubspot_synced_in`, `hubspot_synced_out`, `sync_conflict`, `merged`, `inactivated`, `churned`). **Fase A shippea 4** (`created`, `promoted`, `demoted`, `lifecycle_backfilled`) + `commercial.client.instantiated`. Los eventos de sync (`synced_in/out`, `sync_conflict`) pertenecen a Fase B/F (TASK-536/540). Los de sweep (`inactivated`, `churned`-by-sweep) pertenecen al sweep cron diferido (TASK-542 o follow-up de Fase A). `merged` depende de open question #2 (party merge policy).
+
+### Robustez operacional anadida vs spec original
+
+`hubspot-lifecycle-mapping.ts` introduce una capa que la spec no contemplaba: los stages de HubSpot son free-text y los portales pueden renombrar built-ins o shippear custom labels. El resolver expone:
+
+- **Env override** `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE` (JSON) con precedencia sobre defaults — permite mapear stages custom sin redeploy.
+- **Ad-hoc overrides** por call site (tests, pipelines puntuales).
+- **Unknown fallback configurable** (default `prospect`) + hook `onUnknown` para observabilidad.
+- Helpers `isKnownHubSpotStage` + `getEffectiveHubSpotStageMap` para diagnostics.
+
+Esto se incorpora en §4.5 como contrato canonico para toda Fase B y F.
+
+### Gaps reconocidos para fases siguientes
+
+1. **Roles `sales` / `sales_lead`** no existen en `src/config/role-codes.ts`. Las 6 capabilities estan bindeadas a `efeonce_admin` + `finance_admin` solamente. Cuando el role family aterrice (TASK-536+), `src/lib/entitlements/runtime.ts` se extiende sin cambiar catalogo.
+2. **Sweep cron `active_client → inactive`** diferido. El source `inactivity_sweep` esta registrado en el CHECK constraint pero ningun cron lo emite todavia.
+3. **Outbound HubSpot** (Fase F, TASK-540) leera el outbox y escribira `lifecyclestage` en HubSpot companies; Fase A solo publica los eventos.
+4. **Dual-role** (`is_dual_role=true`): la columna existe y el CHECK la acepta, pero Fase A no clasifica ninguna org como dual-role. Requiere data real post-backfill para cerrar open question #1 del spec.
 
 ---
 
