@@ -1,5 +1,31 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-529 Chile Tax Code Foundation (Claude Opus 4.7)
+
+- **Scope:** foundation canónica de tax codes Chile-first + helpers + seeds. Desbloquea TASK-530/531/532/533. Branch `task/TASK-529-chile-tax-code-foundation`.
+- **Migración shipped:** `20260421105127894_task-529-chile-tax-code-foundation.sql`:
+  - Tabla `greenhouse_finance.tax_codes` (jurisdiction-agnostic, effective dating, `space_id` nullable para overrides tenant-specific futuros).
+  - Unique constraints: `(tax_code, jurisdiction, effective_from)` global via partial index WHERE `space_id IS NULL`, scoped via partial index WHERE `space_id IS NOT NULL`.
+  - CHECK `tax_codes_kind_check` (5 valores), `tax_codes_recoverability_check` (4 valores), `tax_codes_effective_window_check`, `tax_codes_rate_nonnegative_check`.
+  - Seed Chile v1: `cl_vat_19`, `cl_vat_exempt`, `cl_vat_non_billable`, `cl_input_vat_credit_19`, `cl_input_vat_non_recoverable_19`, todos `jurisdiction='CL'`, `effective_from='2026-01-01'`, global.
+- **Kysely types regenerados automáticamente** por `pnpm migrate:up` (el script tiene post-hook `pnpm db:generate-types`). `GreenhouseFinanceTaxCodes` aparece en `src/types/db.d.ts:3405`.
+- **Helpers nuevos en `src/lib/tax/chile/`** (5 archivos):
+  - `types.ts` — `ChileTaxCodeId`, `TaxCodeKind`, `TaxRecoverability`, `TaxCodeRecord`, `ChileTaxSnapshot`, `ChileTaxAmounts`.
+  - `catalog.ts` — `loadChileTaxCodes(context)` con cache in-memory 5 min + dedup tenant-override > global.
+  - `resolver.ts` — `resolveChileTaxCode(id, context)` lanza `ChileTaxCodeNotFoundError`; `tryResolveChileTaxCode` devuelve `null`.
+  - `compute.ts` — `computeChileTaxAmounts`, `computeChileTaxSnapshot`, `validateChileTaxSnapshot`. Rounding CLP 2 decimales. Tolerancia 1 peso en validate.
+  - `index.ts` — barrel exports.
+- **Tests:** `compute.test.ts` (15 tests: 19%, exempt, non-billable, rounding, input credit/non-recoverable simetría, error handling, snapshot freeze, validate drift/tolerance) + `resolver.test.ts` (6 tests mockeando catalog: match, not found, space propagation, tryResolve). 21/21 pass.
+- **Contrato canónico adoptable por downstream:**
+  - `tax_rate` deja de ser first-class; el que manda es `tax_code` + snapshot persistido.
+  - `ChileTaxSnapshot` versión `1` incluye `taxCode`, `jurisdiction`, `kind`, `rate`, `recoverability`, `labelEs`, `effectiveFrom`, `frozenAt`, amounts, metadata.
+  - Re-renders (PDF quote, email, portal cliente) leen del snapshot, nunca del catálogo live.
+  - Recoverability es first-class — TASK-532 la usará para separar crédito fiscal vs no recuperable sin inferir por signo.
+- **Bloqueador encontrado + hotfix shipped:** TASK-466 migration (`20260421011323497`) referenciaba tabla `quotation_defaults` (no existe en DB ni en repo) y columna `approval_policies.default_currency` (la columna no existe). Fix surgical con `ALTER TABLE IF EXISTS` + DO block de chequeo a `information_schema.columns`. El constraint de `quotations.currency` y `role_rate_cards.currency` SÍ se aplicó correctamente a las 6 monedas `{CLP, USD, CLF, COP, MXN, PEN}`. ISSUE-056 creado documentando el gap — pendiente decidir si `quotation_defaults` debe crearse o si fue leftover.
+- **Docs arquitectura:** sección `## Delta 2026-04-21 — TASK-529 Chile Tax Code Foundation` agregada al tope de `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`. Incluye runtime nuevo, helpers, contrato para downstream, out-of-scope.
+- **Out of scope (para 530/531/532/533):** UI tributaria, re-anclar income/expenses/quotes a snapshots persistidos, retenciones/boletas/regímenes fuera de IVA v1, multi-country real (shape lo soporta, sólo Chile seedeada).
+- **Verificación local:** `pnpm migrate:up` verde (aplicó 466 + 529 secuencial) · 5 seed rows confirmados via pg client directo · tax tests 21/21 · Kysely types incluyen `GreenhouseFinanceTaxCodes`.
+
 ## Sesion 2026-04-21 — TASK-517 Playwright E2E smoke suite (Claude Opus 4.7)
 
 - **Scope:** instalar Playwright + smoke suite autenticado via agent-auth, CI workflow manual/push-develop, docs ops. Primera task completada de Ola 2 (`TASK-511 Stack Modernization Roadmap`). Branch `task/TASK-517-playwright-e2e-smoke`.

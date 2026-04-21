@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-056`
+`ISSUE-057`
 
 ## Open
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-056` | [Missing `greenhouse_commercial.quotation_defaults` DDL blocks TASK-466 migration](open/ISSUE-056-missing-quotation-defaults-ddl-task-466.md) | dev + staging + production | 2026-04-21 | open |
 | `ISSUE-044` | [Dashboard pages 500 via agent headless](open/ISSUE-044-dashboard-ssr-500-agent-headless.md)                                  | staging              | 2026-04-11 | open   |
 | `ISSUE-046` | [Deliverability monitor siempre devuelve 0 bounces y 0 complaints](open/ISSUE-046-deliverability-monitor-query-rota.md) | production + staging | 2026-04-13 | open   |
 | `ISSUE-047` | [Kill switch de email sin endpoint CRUD — solo operable por SQL directo](open/ISSUE-047-email-kill-switch-sin-endpoint-crud.md) | production + staging | 2026-04-13 | open   |

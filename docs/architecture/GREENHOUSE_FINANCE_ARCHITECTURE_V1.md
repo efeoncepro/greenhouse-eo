@@ -2,8 +2,56 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-04-20
+> **Last updated:** 2026-04-21
 > **Audience:** Backend engineers, finance product owners, agents implementing finance features
+
+---
+
+## Delta 2026-04-21 — TASK-529 Chile Tax Code Foundation
+
+- `TASK-529` crea la capa canónica de tax codes Chile-first sobre la que `TASK-530/531/532/533` van a persistir snapshots de IVA.
+- Hasta ahora `tax_rate` (19% hardcoded) era el contrato primario en `income`, `expenses`, `quotes` y `quotations`. A partir de esta task pasa a ser un snapshot derivado de un `tax_code` canónico — la tasa suelta deja de ser first-class semantics.
+
+**Runtime nuevo en `greenhouse_finance`:**
+
+- Tabla `greenhouse_finance.tax_codes` — catálogo jurisdiction-agnostic con effective dating:
+  - `tax_code` (ID humano, ej. `cl_vat_19`), `jurisdiction` (`CL`), `kind` (`vat_output` | `vat_input_credit` | `vat_input_non_recoverable` | `vat_exempt` | `vat_non_billable`)
+  - `rate` NUMERIC(6,4) nullable (NULL para exempt/non-billable)
+  - `recoverability` (`full` | `partial` | `none` | `not_applicable`) — first-class, no inferida
+  - `effective_from` / `effective_to` para versionado regulatorio
+  - `space_id` nullable: `NULL` = catálogo global; populado = override tenant-specific
+  - Unique constraints por `(tax_code, jurisdiction, effective_from)` global + `(tax_code, jurisdiction, effective_from, space_id)` scoped
+- Seed Chile v1 (effective_from `2026-01-01`, global):
+  - `cl_vat_19` — IVA output 19%
+  - `cl_vat_exempt` — IVA exento (DL 825 art.12)
+  - `cl_vat_non_billable` — operación no afecta
+  - `cl_input_vat_credit_19` — IVA crédito fiscal 19%
+  - `cl_input_vat_non_recoverable_19` — IVA sin derecho a crédito
+
+**Helpers canónicos en `src/lib/tax/chile/`:**
+
+- `loadChileTaxCodes(context)` — lee el catálogo aplicando overrides por `spaceId` y filtro `effective_from/to`; cache in-memory 5 min.
+- `resolveChileTaxCode(taxCode, context)` — lookup por ID con precedence tenant-scoped > global; lanza `ChileTaxCodeNotFoundError` (dura).
+- `computeChileTaxAmounts({ code, netAmount })` → `{ taxableAmount, taxAmount, totalAmount }` — aplica la tasa, redondea a 2 decimales (CLP).
+- `computeChileTaxSnapshot({ code, netAmount, issuedAt })` → `ChileTaxSnapshot` — congela la tasa + etiqueta + metadata al momento del issue. Los aggregates downstream persisten este shape verbatim para que re-renders/audits reproduzcan la foto original.
+- `validateChileTaxSnapshot(snapshot)` — re-compute vs persisted; tolerancia 1 peso; úsalo en audit pipelines (TASK-533).
+- `ChileTaxSnapshot` versión `1`: `{ version, taxCode, jurisdiction, kind, rate, recoverability, labelEs, effectiveFrom, frozenAt, taxableAmount, taxAmount, totalAmount, metadata }`.
+
+**Contrato para aggregates downstream (TASK-530/531/532/533):**
+
+1. Todo documento financiero que soporte impuestos debe persistir `tax_code` explícito más el `ChileTaxSnapshot` (JSONB, junto al registro) en lugar de una columna `tax_rate` suelta.
+2. Re-renders (PDF de quote, email, portal cliente) leen del snapshot, no del catálogo live. Un cambio regulatorio posterior no muta documentos ya emitidos.
+3. Recoverability se lee del snapshot (`recoverability`), no se infiere por signo ni por tipo de documento. Esto es lo que TASK-532 va a usar para separar IVA crédito fiscal vs. no recuperable en expenses.
+4. Sin `tax_code` el documento no se puede emitir — el resolver lanza `ChileTaxCodeNotFoundError` y la aprobación debe fallar antes de persistir.
+
+**Out of scope de TASK-529 (queda para 530–533):**
+
+- UI tributaria del builder / detail / PDF.
+- Re-anclar `income.tax_rate` / `expenses.tax_rate` a snapshots persistidos.
+- Retenciones (honorarios), boletas, regímenes especiales fuera de IVA v1.
+- Multi-country — el shape soporta múltiples jurisdicciones pero sólo Chile está seedeada.
+
+**Referencia:** `src/lib/tax/chile/index.ts` · migración `20260421105127894_task-529-chile-tax-code-foundation.sql` · tests `src/lib/tax/chile/*.test.ts`.
 
 ---
 
