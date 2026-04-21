@@ -14,8 +14,10 @@
   - `docs/operations/PLAYWRIGHT_E2E.md` V1 (stack, env, local/staging/CI how-to, troubleshooting, convenciones).
 - **Archivos modificados:** `package.json` (3 scripts + dep), `.env.example` (3 env vars), `.gitignore` (4 paths).
 - **Asserts del suite:** smoke deliberadamente minimalista — `status < 400`, `<body>` visible, sin error text, sin redirect a `/login`. No testea copy ni UI específica (integration/visual regression son out of scope V1).
-- **Verificación local 2026-04-21:** `pnpm lint` clean (solo warning pre-existente en BulkEditDrawer) · `npx tsc --noEmit` 0 errores · `pnpm test` 1572/1572 + 2 skipped (sin regresión) · `pnpm exec playwright test --list` parsea las 10 specs.
-- **Pendiente V1:** green run real contra localhost o staging (requiere `AGENT_AUTH_SECRET` en `.env.local` o GitHub Secrets configurados). Config y specs están listos; falta solo inyectar el secret.
+- **Verificación local 2026-04-21:** `pnpm lint` clean (solo warning pre-existente en BulkEditDrawer) · `npx tsc --noEmit` 0 errores · `pnpm test` 1572/1572 + 2 skipped (sin regresión).
+- **Green run real 2026-04-21** contra `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`: **10/10 tests pass en 11.3s**. storageState autogenerado con cookie `__Secure-next-auth.session-token` del usuario `user-agent-e2e-001` via `/api/auth/agent-session` con bypass header.
+- **Follow-up commit `f72f11c3`:** `playwright.config.ts` carga `.env.local` automático, `global-setup.ts` propaga `AGENT_AUTH_BASE_URL` al subprocess, y `scripts/playwright-auth-setup.mjs` agregó soporte backward-compat para el header `x-vercel-protection-bypass`.
+- **GitHub Secrets sembrados** via `gh secret set`: `PLAYWRIGHT_BASE_URL`, `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL`, `VERCEL_AUTOMATION_BYPASS_SECRET`. Vercel Production NO fue tocado — el endpoint agent-session está production-blocked por diseño, el smoke suite corre contra staging only.
 - **Sinergia con TASK-516:** el test de cookie ya lista ambos nombres (`next-auth.session-token` + `authjs.session-token`) para sobrevivir la migración. `storageState.json` se regenera automáticamente en cada run.
 - **Follow-ups explícitos:** multi-browser matrix (Firefox + WebKit), visual regression (Chromatic/Percy), integration tests de mutación, Preview-deployment E2E hook por PR.
 

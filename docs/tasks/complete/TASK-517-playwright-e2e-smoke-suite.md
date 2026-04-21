@@ -51,7 +51,8 @@ Playwright es el estándar 2024-2026 (Linear, Vercel, Stripe, GitHub). Superó a
 - [x] Scripts: `pnpm test:e2e`, `pnpm test:e2e:ui`, `pnpm test:e2e:setup`.
 - [x] Docs ops en `docs/operations/PLAYWRIGHT_E2E.md` (stack, env, how-to local + staging + CI, troubleshooting, convenciones para nuevos tests).
 - [x] Gates tsc/lint/test/build verdes (solo warning pre-existente en `BulkEditDrawer.tsx`).
-- [ ] Green run real contra localhost/staging queda pendiente de validación runtime — requiere `AGENT_AUTH_SECRET` configurado en `.env.local` y dev server corriendo, o GitHub Secrets configurados para el workflow.
+- [x] Green run real contra staging confirmado 2026-04-21: 10/10 tests pass en 11.3s contra `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`, cookie `__Secure-next-auth.session-token` del usuario `user-agent-e2e-001` obtenida vía `/api/auth/agent-session` con bypass header.
+- [x] GitHub Secrets sembrados (`PLAYWRIGHT_BASE_URL`, `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL`, `VERCEL_AUTOMATION_BYPASS_SECRET`) para que `.github/workflows/playwright.yml` pase el guard en push-to-develop y workflow_dispatch.
 
 ## Implementation Notes — 2026-04-21 (Claude Opus 4.7)
 
@@ -103,6 +104,16 @@ No se asserta copy ni estructura visual — eso pertenece a integration/visual r
 - No multi-browser (Firefox/WebKit).
 - No integration tests de mutación (creación de quote, payroll close).
 - No run en cada PR (decisión costo/beneficio: push-to-develop + workflow_dispatch es suficiente para V1; Preview deployment hook es follow-up).
+
+## Post-merge follow-up commits — 2026-04-21
+
+Tres fixes post-merge para cerrar el green run local/CI (commit `f72f11c3`):
+
+- `playwright.config.ts` ahora carga `.env.local` / `.env` automáticamente vía un parser inline minimal (sin agregar `dotenv` como dep). Permite que `pnpm test:e2e` funcione local sin export manual de secretos.
+- `tests/e2e/global-setup.ts` propaga el BASE_URL resuelto como `AGENT_AUTH_BASE_URL` al subprocess `scripts/playwright-auth-setup.mjs`, corrigiendo que el script caía a `http://localhost:3000` cuando la config apuntaba a staging.
+- `scripts/playwright-auth-setup.mjs` adopta el header `x-vercel-protection-bypass` cuando `VERCEL_AUTOMATION_BYPASS_SECRET` está presente, alineado con el patrón de `scripts/staging-request.mjs`. Cambio backward-compatible: sin la env var el script se comporta igual que antes.
+
+GitHub Secrets sembrados via `gh secret set` desde `.env.local` para que el workflow de CI pase el guard step. Vercel Production explícitamente NO fue tocado — el endpoint `/api/auth/agent-session` está production-blocked por diseño (403 salvo `AGENT_AUTH_ALLOW_PRODUCTION=true`), y el smoke suite corre contra staging, no prod.
 
 ## Scope
 
