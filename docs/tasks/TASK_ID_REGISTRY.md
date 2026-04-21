@@ -616,3 +616,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-560` | `to-do` | Ops Registry Human + Agent Surfaces | `docs/tasks/to-do/TASK-560-ops-registry-human-agent-surfaces.md` |
 | `TASK-561` | `to-do` | Ops Registry Federation Contract for Sister Repos | `docs/tasks/to-do/TASK-561-ops-registry-federation-contract-sister-repos.md` |
 | `TASK-562` | `to-do` | Quote Tax Explicitness Follow-ups (UI Selector + Per-Line Override + Email Integration + Multi-Jurisdiction) | `docs/tasks/to-do/TASK-562-quote-tax-explicitness-followups.md` |
+| `TASK-563` | `to-do` | Product Catalog HubSpot Outbound Follow-ups (External Service Deploy + Custom Properties Apply + Anti-Ping-Pong Refactor + Batch Coalescing + E2E Staging) | `docs/tasks/to-do/TASK-563-product-catalog-hubspot-outbound-followups.md` |

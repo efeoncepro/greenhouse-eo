@@ -244,8 +244,9 @@ async function pushProductToHubSpot(product: ProductCatalogRow, ctx: PushContext
 
 ## Follow-ups
 
-- Coalescing si aparece performance issue (open question #7).
-- Variants para multi-currency si Enterprise tier no disponible.
+- `TASK-563` — follow-ups consolidados: deploy de 3 endpoints en Cloud Run externo `hubspot-greenhouse-integration` (PATCH/archive/reconcile), aplicación de 5 custom properties en HubSpot sandbox + production via runbook, refactor anti-ping-pong al helper canónico cuando TASK-540 aterrice, batch API para burst scenarios, y suite E2E contra HubSpot sandbox. Prerequisito directo de TASK-548 y gate para activar flags en production.
+- Variants para multi-currency tracked por `TASK-421`.
+- Bundle products HubSpot — open question #6 del programa, deferido.
 
 ## Delta 2026-04-20
 
