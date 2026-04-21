@@ -4,6 +4,12 @@ import type { Selectable } from 'kysely'
 import { getDb, query, withTransaction } from '@/lib/db'
 import type { DB } from '@/types/db'
 
+import {
+  publishOverheadAddonCreated,
+  publishOverheadAddonDeactivated,
+  publishOverheadAddonReactivated,
+  publishOverheadAddonUpdated
+} from './overhead-addon-events'
 import type { OverheadAddonSeedRow } from './overhead-addons-seed'
 
 type OverheadAddonRow = Selectable<DB['greenhouse_commercial.overhead_addons']>
@@ -238,6 +244,21 @@ export const upsertOverheadAddonEntry = async (row: OverheadAddonSeedRow): Promi
 
       const addonId = result.rows[0]?.addon_id || ''
 
+      // TASK-546 Fase B — emit `.created` so the materializer can pick it up.
+      if (addonId) {
+        await publishOverheadAddonCreated(
+          {
+            addonId,
+            addonSku: row.addonSku,
+            addonName: row.addonName,
+            addonType: row.addonType,
+            visibleToClient: row.visibleToClient,
+            active: row.active
+          },
+          client
+        )
+      }
+
       return {
         addonId,
         addonSku: row.addonSku,
@@ -322,6 +343,43 @@ export const upsertOverheadAddonEntry = async (row: OverheadAddonSeedRow): Promi
       row.notes
       ]
     )
+
+    // TASK-546 Fase B — emit lifecycle transitions so the materializer can
+    // sync archival state. The `.updated` event carries the fresh snapshot;
+    // `.deactivated` / `.reactivated` fire only on active-flag transitions.
+    const now = new Date().toISOString()
+
+    if (existing.active && !row.active) {
+      await publishOverheadAddonDeactivated(
+        {
+          addonId: existing.addon_id,
+          addonSku: row.addonSku,
+          deactivatedAt: now
+        },
+        client
+      )
+    } else if (!existing.active && row.active) {
+      await publishOverheadAddonReactivated(
+        {
+          addonId: existing.addon_id,
+          addonSku: row.addonSku,
+          reactivatedAt: now
+        },
+        client
+      )
+    } else {
+      await publishOverheadAddonUpdated(
+        {
+          addonId: existing.addon_id,
+          addonSku: row.addonSku,
+          addonName: row.addonName,
+          addonType: row.addonType,
+          visibleToClient: row.visibleToClient,
+          active: row.active
+        },
+        client
+      )
+    }
 
     return {
       addonId: existing.addon_id,

@@ -113,6 +113,7 @@ export const AGGREGATE_TYPES = {
   productCatalog: 'product_catalog',
   productSyncConflict: 'product_sync_conflict',
   sellableRole: 'sellable_role',
+  overheadAddon: 'overhead_addon',
   employmentType: 'employment_type',
 
   // Products (legacy finance namespace)
@@ -443,6 +444,18 @@ export const EVENT_TYPES = {
   sellableRoleCreated: 'commercial.sellable_role.created',
   sellableRoleCostUpdated: 'commercial.sellable_role.cost_updated',
   sellableRolePricingUpdated: 'commercial.sellable_role.pricing_updated',
+  sellableRoleDeactivated: 'commercial.sellable_role.deactivated',
+  sellableRoleReactivated: 'commercial.sellable_role.reactivated',
+
+  // AI Tool lifecycle (deactivation added in TASK-546 Fase B)
+  aiToolDeactivated: 'ai_tool.deactivated',
+  aiToolReactivated: 'ai_tool.reactivated',
+
+  // Overhead Addon lifecycle (publishers added in TASK-546 Fase B)
+  overheadAddonCreated: 'commercial.overhead_addon.created',
+  overheadAddonUpdated: 'commercial.overhead_addon.updated',
+  overheadAddonDeactivated: 'commercial.overhead_addon.deactivated',
+  overheadAddonReactivated: 'commercial.overhead_addon.reactivated',
 
   // Purchase Orders & HES
   purchaseOrderCreated: 'finance.purchase_order.created',

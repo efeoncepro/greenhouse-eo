@@ -2,6 +2,36 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-546 Product Catalog Source Handlers & Event Homogenization (Fase B) shipped
+
+- Fase B del programa Product Catalog Sync (TASK-544 umbrella) shipped. Activa el materializer scaffolded en TASK-545. Los 4 catálogos fuente (sellable_roles, tool_catalog, overhead_addons, service_pricing) ahora alimentan `greenhouse_commercial.product_catalog` automáticamente vía reactive projection en Cloud Run ops-worker. Desbloquea TASK-547 (outbound HubSpot) y TASK-548 (drift detection).
+- **Sin schema migrations**: TASK-545 cubrió el DDL completo. Este task es 100% TypeScript + event catalog registrations.
+- **Event catalog extendido** (`src/lib/sync/event-catalog.ts`): aggregate nuevo `overheadAddon` + 8 events nuevos — `sellable_role.{deactivated,reactivated}`, `ai_tool.{deactivated,reactivated}`, `commercial.overhead_addon.{created,updated,deactivated,reactivated}`.
+- **Publishers faltantes**:
+  - `sellable-role-events.ts` ganó `publishSellableRole{Deactivated,Reactivated}`.
+  - `tool-catalog-events.ts` ganó `publishAiTool{Deactivated,Reactivated}`.
+  - Nuevo `overhead-addon-events.ts` con 4 publishers (antes el store hacía silent upsert).
+- **Lifecycle helpers** en los 3 stores:
+  - `deactivate/reactivateSellableRole(roleId)` + `deactivate/reactivateToolCatalogEntry(toolId)` — exponen los publishers canónicamente para Admin Center o migraciones futuras.
+  - `upsertOverheadAddonEntry` ahora emite `.created` / `.updated` / `.deactivated` / `.reactivated` según transición real de `active`, pasando el client transaccional al publisher.
+- **Foundation `src/lib/commercial/product-catalog/`**:
+  - `flags.ts` — 4 sub-flags `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}`, default OFF. Dispatcher `isProductSyncEnabled(sourceKind)`. Pattern decentralizado (match con `bigquery-write-flag.ts`).
+  - `source-readers.ts` — 4 readers defensivos que re-query las source tables (eventos llevan solo IDs, lo cual evita stale data en retries).
+  - `upsert-product-catalog-from-source.ts` — **corazón del materializer**. Lock con `FOR UPDATE` por `(source_kind, source_id, source_variant_key)`, compute checksum SHA-256, compara contra el persistido, decide entre 5 outcomes (`created`/`updated`/`archived`/`unarchived`/`noop`), upsert, emit evento downstream en la misma transacción.
+- **4 handlers** (`src/lib/sync/handlers/`):
+  - **sellable-role-to-product**: `product_type=service`, `pricing_model=staff_aug`, `default_unit=hour`, `default_currency=USD`, `default_unit_price` desde último `sellable_role_pricing_currency` USD.
+  - **tool-to-product**: `product_type=license`, `pricing_model=fixed`, `default_unit=month`, `business_line_code` = primer elemento de `applicable_business_lines`. Skip si `tool_sku IS NULL` (interpretación pragmática de "sellable").
+  - **overhead-addon-to-product**: `product_type=service`, `pricing_model=fixed`, `default_unit=unit`. Archivo cuando `active=false` **OR** `visible_to_client=false`.
+  - **service-to-product**: `default_unit_price=null` (servicios compositivos, pricing por quote). Maps `commercial_model`: `on_going/on_demand→retainer`, `hybrid→project`, `license_consulting→fixed`.
+- **Projection refresh body** (`source-to-product-catalog.ts`): reemplazado el no-op de Fase A por dispatcher que valida kind + flag + abre `withTransaction` + invoca handler + retorna string descriptivo. Trigger events ampliado de 8 a 16 (agrega `.deactivated`/`.reactivated` de cada source).
+- **Correcciones a spec §6.2:**
+  - DB CHECK constraints son más estrictos: `product_type ∈ {service, deliverable, license, infrastructure}`, `pricing_model ∈ {staff_aug, retainer, project, fixed}`, `default_currency ∈ {CLP, USD, CLF}`. Mapping pragmático documentado en el Delta del spec.
+  - Handler refactor a función pura + delegate al helper compartido (vs la pseudo-spec `{extract, commit}` class-style) — evita duplicar el transaction flow.
+- **Tests**: 55/55 passing — 7 upsert paths (create/update/archive/unarchive/noop/lock-key/variant-normalization), 14 mapper tests, 10 flags tests, 13 projection tests con mocks, + 11 preservados de Fase A.
+- **Rollout plan**: staging enable flag por flag cada 48h (roles → tools → overheads → services), luego replicar en production. Rollback seguro: flag=false → skip silencioso, no rollback de DDL necesario.
+- **Docs**: `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` bumped a v1.2 con Delta Fase B + doc funcional nueva `docs/documentation/finance/catalogo-productos-sincronizacion.md` (flujo básico, handlers, idempotencia, sub-flags, FAQ, rollout).
+- **Follow-ups**: variantes on-demand (open question #1), coalescing de eventos masivos (open question #7), service bundle HubSpot (open question #6).
+
 ### 2026-04-21 — TASK-530 Quote Tax Explicitness Chile IVA shipped
 
 - IVA Chile queda como contrato de primer nivel en el write path canónico de cotizaciones: quotation header y line items persisten snapshot tributario inmutable (tax_code + rate + amount + jsonb completo + frozen_at), el builder muestra Neto/IVA/Total en vivo, el detail expone el snapshot via canonical store, y el PDF renderiza la línea de IVA entre Subtotal y Total. Desbloquea TASK-466 (multi-currency PDF) y TASK-533 (VAT ledger).

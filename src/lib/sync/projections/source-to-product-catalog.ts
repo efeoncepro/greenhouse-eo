@@ -1,73 +1,75 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
+import { withTransaction } from '@/lib/db'
+import {
+  isAutoMaterializableSourceKind,
+  isProductSyncEnabled,
+  type AutoMaterializableSourceKind
+} from '@/lib/commercial/product-catalog/flags'
+import type { UpsertProductCatalogFromSourceResult } from '@/lib/commercial/product-catalog/upsert-product-catalog-from-source'
+import { handleOverheadAddonToProduct } from '@/lib/sync/handlers/overhead-addon-to-product'
+import { handleSellableRoleToProduct } from '@/lib/sync/handlers/sellable-role-to-product'
+import { handleServiceToProduct } from '@/lib/sync/handlers/service-to-product'
+import { handleToolToProduct } from '@/lib/sync/handlers/tool-to-product'
+
 import type { ProjectionDefinition } from '../projection-registry'
 
-// TASK-545 Fase A: scaffolding for the source → product_catalog materializer.
+// TASK-546 Fase B — replaces the TASK-545 scaffolded no-op. This projection
+// listens to every source catalog event that creates / updates / retires a
+// row in `greenhouse_commercial.product_catalog` and dispatches to the
+// corresponding per-source handler under a feature sub-flag.
 //
-// This projection listens to every source-catalog event that can create,
-// update, or retire a row in `greenhouse_commercial.product_catalog`. In Fase
-// A the consumer is intentionally a no-op: registering the projection is
-// enough to prove the pipeline wires through, and handlers only get plugged
-// in Fase B (TASK-546).
+// Runtime topology: Cloud Run ops-worker (`cost_intelligence` domain). The
+// reactive consumer picks up outbox events matching the trigger list and
+// invokes `refresh(scope, payload)` for each.
 //
-// Design contract for Fase B handlers:
+// Sub-flags (OFF by default):
+//   GREENHOUSE_PRODUCT_SYNC_ROLES
+//   GREENHOUSE_PRODUCT_SYNC_TOOLS
+//   GREENHOUSE_PRODUCT_SYNC_OVERHEADS
+//   GREENHOUSE_PRODUCT_SYNC_SERVICES
 //
-//   type SourceHandler = {
-//     sourceKind: ProductSourceKind
-//     extract(event): GhOwnedFieldsSnapshot & { sourceId: string }
-//     commit(tx, snapshot): Promise<{ created: boolean; productId: string }>
-//   }
-//
-// Fase B will replace the stub consumer below with a switch on `eventType`
-// that dispatches to the correct handler, computes the checksum via
-// `computeGhOwnedFieldsChecksum`, performs the upsert, and emits
-// `commercial.product_catalog.{created,updated,archived,unarchived}` via the
-// publishers in `src/lib/commercial/product-catalog/product-catalog-events.ts`.
-//
-// Today the projection is deliberately event-complete (every source emit is
-// listed as a trigger) but refresh is a no-op — the reactive worker will see
-// each trigger event and log a ' scoped by source_ref' line without mutating
-// anything. This is load-bearing for Fase A tests: the point is to verify the
-// registry accepts the projection and the trigger list matches reality.
+// Enrollment plan: roles first, validate 48h, then tools, then overheads,
+// then services. Each sub-flag can be toggled independently.
 
-// ── Trigger event list ─────────────────────────────────────────────────────
-// Only events that ACTUALLY EXIST today are listed. `commercial.tool.*` and
-// `commercial.overhead_addon.*` + `commercial.service.*` are flagged as TODO
-// because the publishers don't exist yet:
-//   - tool-catalog uses `ai_tool.created` / `ai_tool.updated` via the aiTool
-//     aggregate (from seed runs).
-//   - overhead_addons-store upserts silently — no publisher today.
-//   - service-catalog-store uses `service.created`, `service.updated`,
-//     `service.deactivated` under the `service` aggregate.
-//
-// Fase B will either (a) add the missing publishers before swapping to the
-// `commercial.*` namespace, or (b) map existing event types 1:1. For now we
-// register the real ones.
+// ── Trigger event list ────────────────────────────────────────────────────
+// Includes every lifecycle event emitted by the 4 source catalogs that
+// impacts the product_catalog snapshot. Sellable role pricing events trigger
+// rematerialization because the role's `default_unit_price` is sourced from
+// the latest USD pricing row.
 
 const SOURCE_TRIGGER_EVENTS: readonly string[] = [
-  // Sellable roles — existing publishers in sellable-roles-store.
+  // Sellable roles
   'commercial.sellable_role.created',
   'commercial.sellable_role.cost_updated',
   'commercial.sellable_role.pricing_updated',
+  'commercial.sellable_role.deactivated',
+  'commercial.sellable_role.reactivated',
 
-  // Tools — existing publishers via tool-catalog-seed.
+  // AI Tools
   'ai_tool.created',
   'ai_tool.updated',
+  'ai_tool.deactivated',
+  'ai_tool.reactivated',
 
-  // Services — existing publishers via service-catalog-store.
+  // Overhead Addons (TASK-546 added full lifecycle publishers)
+  'commercial.overhead_addon.created',
+  'commercial.overhead_addon.updated',
+  'commercial.overhead_addon.deactivated',
+  'commercial.overhead_addon.reactivated',
+
+  // Services
   'service.created',
   'service.updated',
   'service.deactivated'
-
-  // TODO Fase B (TASK-546): wire up once overhead-addons gains a publisher.
-  // 'commercial.overhead_addon.created',
-  // 'commercial.overhead_addon.updated',
-  // 'commercial.overhead_addon.deactivated'
 ] as const
 
 // ── Scope extraction ──────────────────────────────────────────────────────
-// Pull the source id from the payload based on the event family. Returning
-// null tells the reactive worker to skip without logging a failure.
+// Map the event payload to a `{entityType, entityId}` tuple that the worker
+// uses for logging and dedupe keys. The entityType aligns with
+// `AutoMaterializableSourceKind` so the refresh dispatcher can cast safely.
 const extractScope = (
   payload: Record<string, unknown>
 ): { entityType: string; entityId: string } | null => {
@@ -98,30 +100,66 @@ const extractScope = (
   return null
 }
 
-// ── Refresh (no-op in Fase A) ──────────────────────────────────────────────
-// The reactive worker logs `[source_to_product_catalog] scaffolded no-op for
-// ${entityType}:${entityId}` and returns null (no downstream key to schedule).
-// Fase B replaces this body with the actual upsert + publisher emit.
+// ── Handler dispatcher ────────────────────────────────────────────────────
+type HandlerResult = {
+  status: 'applied' | 'skipped_not_found' | 'skipped_not_sellable'
+  result?: UpsertProductCatalogFromSourceResult
+}
+
+const runHandler = async (
+  client: PoolClient,
+  sourceKind: AutoMaterializableSourceKind,
+  entityId: string
+): Promise<HandlerResult> => {
+  switch (sourceKind) {
+    case 'sellable_role':
+      return handleSellableRoleToProduct(client, entityId)
+    case 'tool':
+      return handleToolToProduct(client, entityId)
+    case 'overhead_addon':
+      return handleOverheadAddonToProduct(client, entityId)
+    case 'service':
+      return handleServiceToProduct(client, entityId)
+  }
+}
+
+// ── Refresh ──────────────────────────────────────────────────────────────
+// The second parameter (payload) is declared by `ProjectionDefinition` but
+// unused here: handlers re-query the source table by id rather than trusting
+// the outbox payload (which carries only the id anyway).
 const refresh = async (
   scope: { entityType: string; entityId: string },
-  payload: Record<string, unknown>
+  _payload: Record<string, unknown>
 ): Promise<string | null> => {
-  if (process.env.NODE_ENV !== 'production') {
-    const eventType = typeof payload.eventType === 'string' ? payload.eventType : 'unknown'
+  void _payload
 
-    // eslint-disable-next-line no-console
-    console.info(
-      `[source_to_product_catalog] scaffolded no-op (Fase A) for ${scope.entityType}:${scope.entityId} triggered by ${eventType}`
-    )
+
+  if (!isAutoMaterializableSourceKind(scope.entityType)) {
+    return `skip:unknown_source_kind:${scope.entityType}`
   }
 
-  return null
+  if (!isProductSyncEnabled(scope.entityType)) {
+    return `skip:flag_disabled:${scope.entityType}`
+  }
+
+  const handlerResult = await withTransaction(async client =>
+    runHandler(client, scope.entityType as AutoMaterializableSourceKind, scope.entityId)
+  )
+
+  if (handlerResult.status !== 'applied') {
+    return `skip:${handlerResult.status}:${scope.entityType}:${scope.entityId}`
+  }
+
+  const outcome = handlerResult.result?.outcome ?? 'unknown'
+  const productId = handlerResult.result?.productId ?? 'unknown'
+
+  return `${outcome}:${scope.entityType}:${scope.entityId}:${productId}`
 }
 
 export const sourceToProductCatalogProjection: ProjectionDefinition = {
   name: 'source_to_product_catalog',
   description:
-    'TASK-545 Fase A scaffolding: materialize greenhouse_commercial.product_catalog rows from the 4 source catalogs. Consumer is a no-op until TASK-546 plugs in the per-source handlers.',
+    'TASK-546 Fase B: materialize greenhouse_commercial.product_catalog rows from the 4 source catalogs (sellable_roles, tool_catalog, overhead_addons, service_pricing). Gated by per-source sub-flags.',
   domain: 'cost_intelligence',
   triggerEvents: [...SOURCE_TRIGGER_EVENTS],
   extractScope,
@@ -129,7 +167,7 @@ export const sourceToProductCatalogProjection: ProjectionDefinition = {
   maxRetries: 2
 }
 
-// Exposed for tests + Fase B reference. Callers should NEVER import this to
+// Exposed for tests + Fase C reference. Callers should NEVER import this to
 // run the projection — they should depend on `sourceToProductCatalogProjection`
 // and go through the reactive worker.
 export const SOURCE_TO_PRODUCT_CATALOG_TRIGGER_EVENTS = SOURCE_TRIGGER_EVENTS

@@ -1,11 +1,63 @@
 # Greenhouse EO — Commercial Product Catalog Sync Architecture V1
 
-> **Version:** 1.1
+> **Version:** 1.2
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
-> **Ultima actualizacion:** 2026-04-21 por Claude (Opus 4.7) — Fase A shipped
+> **Ultima actualizacion:** 2026-04-21 por Claude (Opus 4.7) — Fase B shipped (TASK-546)
 > **Audience:** Backend engineers, product owners, agentes que implementen features de catalog management, pricing, quote builder o HubSpot sync
 > **Related:** `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## Delta 2026-04-21 — Fase B shipped (TASK-546)
+
+Handlers por source materializados + event homogenization + sub-flag rollout.
+
+### Implementado en Fase B
+
+| Area | Artefacto |
+|---|---|
+| Event catalog | `commercial.sellable_role.{deactivated,reactivated}` + `ai_tool.{deactivated,reactivated}` + `commercial.overhead_addon.{created,updated,deactivated,reactivated}` + nuevo aggregate `overhead_addon` |
+| Publishers faltantes | `publishSellableRole{Deactivated,Reactivated}`, `publishAiTool{Deactivated,Reactivated}`, archivo nuevo `src/lib/commercial/overhead-addon-events.ts` con 4 publishers |
+| Lifecycle helpers | `deactivate/reactivateSellableRole(roleId)` en `sellable-roles-store.ts`, `deactivate/reactivateToolCatalogEntry(toolId)` en `tool-catalog-store.ts`. `upsertOverheadAddonEntry` ahora emite `.created` / `.updated` / `.deactivated` / `.reactivated` según transición de `active` |
+| Sub-flags | `src/lib/commercial/product-catalog/flags.ts` — `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}`. Pattern decentralizado (match con `isFinanceBigQueryWriteEnabled`); default OFF. `isProductSyncEnabled(sourceKind)` despacha por kind |
+| Upsert helper | `src/lib/commercial/product-catalog/upsert-product-catalog-from-source.ts` — lock por `(source_kind, source_id, source_variant_key)` + checksum compare + 5 outcomes (`created`/`updated`/`archived`/`unarchived`/`noop`) + emit en la misma transacción |
+| Source readers | `src/lib/commercial/product-catalog/source-readers.ts` — 4 readers defensivos (`readSellableRoleForSync`, `readToolForSync`, `readOverheadAddonForSync`, `readServiceForSync`); se re-query la source table para evitar stale payload |
+| Handlers | `src/lib/sync/handlers/{sellable-role,tool,overhead-addon,service}-to-product.ts` — puros (map source row → `GhOwnedFieldsSnapshot`), delegan upsert al helper compartido |
+| Projection | `source-to-product-catalog.ts` refresh body reemplazado; trigger events extendido a 16 (era 8); dispatcher con flag gating |
+| Tests | 55 tests passing: 7 en `upsert-product-catalog-from-source.test.ts`, 14 en `handler-mappers.test.ts`, 10 en `flags.test.ts`, 13 en `source-to-product-catalog.test.ts` (reescrito con mocks), + 11 preservados de Fase A |
+
+### Correcciones a §6.2 (Handler contract) vs realidad del schema
+
+| Spec §6.2 asume | Realidad 2026-04-21 |
+|---|---|
+| `product_type ∈ {'service','tool','addon','component'}` | DB CHECK acepta solo `{'service','deliverable','license','infrastructure'}`. Handlers mapean: tools → `license`, addons → `service`, services → `service`, sellable roles → `service` |
+| `pricing_model ∈ {'staff_aug','time_and_materials','fixed','subscription','composition'}` | DB CHECK acepta solo `{'staff_aug','retainer','project','fixed'}`. Handlers mapean: tools → `fixed`, addons → `fixed`, sellable roles → `staff_aug`, services → derivado de `commercial_model` (`on_going`/`on_demand`→`retainer`, `hybrid`→`project`, `license_consulting`→`fixed`, default `project`) |
+| `default_currency` flexible | DB CHECK acepta solo `{'CLP','USD','CLF'}`. Handlers usan `USD` por default (pricing Chile-first: roles en USD, tools en USD, addons en USD) |
+| `default_unit ∈ {'hour','month','unit','project'}` | Confirmado. Handler mapea `service_unit='monthly'` → `'month'`; fallback a `'project'` |
+| `tool.sellable=true` como flag | Columna no existe. Handler interpreta sellable = `tool_sku IS NOT NULL AND is_active=true`. Tools sin sku no materializan |
+| Handlers reciben payload rico con todos los campos | Publishers actuales emiten **solo ids** (`roleId`, `toolId`, `moduleId`, `addonId`). Handlers re-query source table con `readXxxForSync` antes de materializar — evita stale payload en retries |
+| `commit(tx, snapshot)` como método del handler | Refactor a helper compartido `upsertProductCatalogFromSource(tx, {sourceKind, sourceId, snapshot})`. Handlers son funciones puras extract + delegate |
+
+### Runtime topology
+
+Projection corre en **Cloud Run ops-worker** (domain `cost_intelligence`), NO en `commercial-cost-worker` (decisión Delta 2026-04-20 preservada). El refresh body es transaccional: un `withTransaction` envuelve lock + checksum + upsert + emit.
+
+### Rollout plan
+
+1. **Staging**: enable `GREENHOUSE_PRODUCT_SYNC_ROLES=true`. Validar 48h en `product_catalog` que roles emiten rows consistentes + eventos downstream.
+2. **Staging**: enable `..._TOOLS=true`, validar 48h.
+3. **Staging**: enable `..._OVERHEADS=true`, validar 48h.
+4. **Staging**: enable `..._SERVICES=true`, validar 48h.
+5. **Production**: replicar flag por flag tras validación en staging.
+
+Cada fase se puede revertir (set flag a `false`) sin rollback de schema; rows ya materializadas persisten.
+
+### Gaps reconocidos para fases siguientes
+
+1. **TASK-547 (Fase C)** — outbound HubSpot: proyección `productHubSpotOutbound` escucha `commercial.product_catalog.{created,updated,archived,unarchived}` y pushea a HubSpot Products API.
+2. **TASK-548 (Fase D)** — drift cron: compara `gh_owned_fields_checksum` contra snapshot HubSpot; escribe `product_sync_conflicts`.
+3. **TASK-549 (Fase E)** — policy enforcement: deprecar inbound auto-adopt, remover flags, drop `sync_direction='hubspot_only'`.
 
 ---
 

@@ -1,5 +1,45 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-546 Product Catalog Source Handlers & Event Homogenization (Claude Opus 4.7)
+
+- **Scope:** Fase B del programa Product Catalog Sync (TASK-544 umbrella). Activa el materializer scaffolded en TASK-545, conectando los 4 catálogos fuente (sellable_roles, tool_catalog, overhead_addons, service_pricing) al `product_catalog` canónico vía reactive projection + handlers idempotentes. Sin cambios de schema: TASK-545 ya cubría el DDL completo.
+- **Event catalog extendido** (`src/lib/sync/event-catalog.ts`): agregado aggregate `overheadAddon` + 6 events nuevos — `sellableRoleDeactivated`/`Reactivated`, `aiToolDeactivated`/`Reactivated`, `overheadAddonCreated`/`Updated`/`Deactivated`/`Reactivated`.
+- **Publishers faltantes creados:**
+  - Extendido `sellable-role-events.ts` con `publishSellableRole{Deactivated,Reactivated}`.
+  - Extendido `tool-catalog-events.ts` con `publishAiTool{Deactivated,Reactivated}`.
+  - Nuevo `overhead-addon-events.ts` con 4 publishers (antes overhead-addons hacía silent upsert sin eventos).
+- **Lifecycle helpers en stores:**
+  - `deactivateSellableRole(roleId)` / `reactivateSellableRole(roleId)` en `sellable-roles-store.ts`.
+  - `deactivateToolCatalogEntry(toolId)` / `reactivateToolCatalogEntry(toolId)` en `tool-catalog-store.ts`.
+  - `upsertOverheadAddonEntry` ahora emite `.created` al insertar; en update emite `.deactivated` / `.reactivated` según transición de `active`, o `.updated` si solo cambiaron otros campos.
+- **Foundation helpers** (`src/lib/commercial/product-catalog/`):
+  - `flags.ts` — `isProductSyncEnabled(sourceKind)` despacha a 4 env vars `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}`. Default OFF. Pattern decentralizado (match con `bigquery-write-flag.ts`).
+  - `source-readers.ts` — 4 readers defensivos. Cada handler re-query la source table (los events tienen payload delgado: solo IDs) para evitar stale data en retries.
+  - `upsert-product-catalog-from-source.ts` — corazón del materializer. Lock con `FOR UPDATE` por `(source_kind, source_id, source_variant_key)`, compute checksum SHA-256, compare contra el persistido, decide outcome entre 5 (`created`/`updated`/`archived`/`unarchived`/`noop`), upsert, emit evento en la misma transacción.
+- **Handlers** (`src/lib/sync/handlers/`):
+  - `sellable-role-to-product.ts` → `product_type=service`, `pricing_model=staff_aug`, `default_unit=hour`, `default_currency=USD`, `default_unit_price` desde último pricing USD en `sellable_role_pricing_currency`.
+  - `tool-to-product.ts` → `product_type=license`, `pricing_model=fixed`, `default_unit=month`, `business_line_code` = primer elemento de `applicable_business_lines`. Skip si `tool_sku IS NULL` (interpretación pragmática de "sellable" porque la columna no existe en schema).
+  - `overhead-addon-to-product.ts` → `product_type=service`, `pricing_model=fixed`, `default_unit=unit` por default. Archivo cuando `active=false` **OR** `visible_to_client=false`.
+  - `service-to-product.ts` → `default_unit_price=null` (servicios son compositivos, pricing por quote). `pricing_model` derivado de `commercial_model`: `on_going/on_demand→retainer`, `hybrid→project`, `license_consulting→fixed`, default `project`.
+- **Projection refresh body** (`source-to-product-catalog.ts`): reemplazado el no-op por dispatcher que:
+  1. Chequea si el `entityType` es auto-materializable (excluye `manual`/`hubspot_imported`/`sellable_role_variant`)
+  2. Chequea el sub-flag correspondiente
+  3. Abre `withTransaction` e invoca el handler
+  4. Retorna string descriptivo (`created:sellable_role:role-1:prd-abc` / `skip:flag_disabled:tool` / etc)
+  - Trigger events ampliado de 8 a 16: suma los `.deactivated`/`.reactivated` de cada source.
+- **Tests**: 55/55 pasando — 7 upsert paths (create/update/archive/unarchive/noop/lock-key/variant-normalization), 14 mapper tests (4 handlers), 10 flags tests (per-source + dispatcher + env coerción), 13 projection tests (trigger list + scope extraction + dispatching con mocks), + 11 preservados de Fase A.
+- **Decisiones vs spec §6.2:**
+  - DB CHECK constraints son más estrictos que la pseudo-spec. Mapping pragmático documentado en el Delta del doc de arquitectura.
+  - `tool.sellable=true` no existe como columna → interpretación pragmática `tool_sku IS NOT NULL AND is_active=true`.
+  - Handler NO es `{extract, commit}` class-style; es función pura + delegate al helper compartido. Evita duplicar el transaction flow en 4 lugares.
+  - Events de publishers emiten solo IDs (payload delgado); handlers re-query source tables. Defensivo contra stale data.
+- **Rollout plan** (documentado en la doc funcional):
+  1. Staging: `ROLES=true` → validar 48h → `TOOLS=true` → 48h → `OVERHEADS=true` → 48h → `SERVICES=true` → 48h.
+  2. Production: replicar flag por flag tras validación.
+  3. Rollback seguro: flag=false → handler skippea silenciosamente. Rows materializadas persisten (no hay DDL rollback necesario).
+- **Cross-impact:** TASK-547 (Fase C outbound HubSpot) desbloqueada — ya hay eventos `commercial.product_catalog.{created,updated,archived,unarchived}` consistentes que puede consumir. TASK-548 (Fase D drift) también aprovecha el checksum canonical de TASK-545.
+- **Out of scope explícito:** outbound Cloud Run (TASK-547), drift cron (TASK-548), Admin UI (TASK-548), variants on-demand, service bundle en HubSpot.
+
 ## Sesion 2026-04-21 — TASK-530 Quote Tax Explicitness Chile IVA (Claude Opus 4.7)
 
 - **Scope:** hace explícito el IVA Chile en cotizaciones — schema persiste snapshot tributario inmutable por versión, builder/PDF muestran Neto/IVA/Total, pricing engine sigue neto. Apoyado en TASK-529 (tax code foundation).
