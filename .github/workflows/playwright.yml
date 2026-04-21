@@ -1,0 +1,86 @@
+name: Playwright E2E smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL to hit (leave empty to use PLAYWRIGHT_BASE_URL secret)'
+        required: false
+        default: ''
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playwright-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Chromium smoke suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+      NEXT_TELEMETRY_DISABLED: 1
+      PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.base_url || secrets.PLAYWRIGHT_BASE_URL }}
+      AGENT_AUTH_SECRET: ${{ secrets.AGENT_AUTH_SECRET }}
+      AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.org' }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      - name: Guard — require base URL + agent secret
+        run: |
+          if [ -z "$PLAYWRIGHT_BASE_URL" ]; then
+            echo "::error::PLAYWRIGHT_BASE_URL is empty. Set repo secret PLAYWRIGHT_BASE_URL or pass via workflow_dispatch input."
+            exit 1
+          fi
+          if [ -z "$AGENT_AUTH_SECRET" ]; then
+            echo "::error::AGENT_AUTH_SECRET secret missing."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Playwright smoke suite
+        run: pnpm test:e2e
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          if-no-files-found: warn
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload results JSON + traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          if-no-files-found: warn
+          path: |
+            artifacts/playwright/**
+            test-results/**
+          retention-days: 14
