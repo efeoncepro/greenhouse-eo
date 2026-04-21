@@ -1772,15 +1772,47 @@ export interface GreenhouseCoreOperationalResponsibilities {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreOrganizationLifecycleHistory {
+  commercial_party_id: string;
+  from_stage: string | null;
+  history_id: Generated<string>;
+  metadata: Generated<Json>;
+  organization_id: string;
+  to_stage: string;
+  transition_source: string;
+  transitioned_at: Generated<Timestamp>;
+  transitioned_by: string | null;
+  trigger_entity_id: string | null;
+  trigger_entity_type: string | null;
+}
+
 export interface GreenhouseCoreOrganizations {
   active: Generated<boolean>;
+  /**
+   * Stable surfaceable identifier for the party — used in outbox events and cross-module projections.
+   */
+  commercial_party_id: Generated<string>;
   country: Generated<string | null>;
   created_at: Generated<Timestamp>;
   hubspot_company_id: string | null;
   industry: string | null;
+  /**
+   * Marks the rare organization that is simultaneously a commercial target and a provider (§4.2 invariant 7).
+   */
+  is_dual_role: Generated<boolean>;
   is_operating_entity: Generated<boolean>;
   legal_address: string | null;
   legal_name: string | null;
+  /**
+   * Canonical party lifecycle stage — source of truth for commercial state. See GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1 §4.
+   */
+  lifecycle_stage: Generated<string>;
+  lifecycle_stage_by: string | null;
+  lifecycle_stage_since: Generated<Timestamp>;
+  /**
+   * Which command/pipeline drove the most recent transition (bootstrap, hubspot_sync, manual, …).
+   */
+  lifecycle_stage_source: Generated<string>;
   notes: string | null;
   organization_id: string;
   organization_name: string;
@@ -5906,6 +5938,7 @@ export interface DB {
   "greenhouse_core.notion_workspace_source_bindings": GreenhouseCoreNotionWorkspaceSourceBindings;
   "greenhouse_core.notion_workspaces": GreenhouseCoreNotionWorkspaces;
   "greenhouse_core.operational_responsibilities": GreenhouseCoreOperationalResponsibilities;
+  "greenhouse_core.organization_lifecycle_history": GreenhouseCoreOrganizationLifecycleHistory;
   "greenhouse_core.organizations": GreenhouseCoreOrganizations;
   "greenhouse_core.permission_sets": GreenhouseCorePermissionSets;
   "greenhouse_core.person_legal_entity_relationships": GreenhouseCorePersonLegalEntityRelationships;

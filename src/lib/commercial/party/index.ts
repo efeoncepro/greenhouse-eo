@@ -1,0 +1,77 @@
+import 'server-only'
+
+// TASK-535: single public entrypoint for the Commercial Party Lifecycle
+// foundation. Downstream modules (TASK-536 sync, TASK-537 endpoints,
+// TASK-538 selector, TASK-541 quote-to-cash) should import from here
+// instead of reaching into individual files.
+
+export {
+  createPartyFromHubSpotCompany,
+  HUBSPOT_STAGE_MAP,
+  mapHubSpotStage
+} from './commands/create-party-from-hubspot-company'
+export type { CreatePartyFromHubSpotCompanyInput } from './commands/create-party-from-hubspot-company'
+
+export {
+  DEFAULT_HUBSPOT_STAGE_MAP,
+  getEffectiveHubSpotStageMap,
+  isKnownHubSpotStage,
+  normalizeHubSpotStage,
+  resolveHubSpotStage
+} from './hubspot-lifecycle-mapping'
+export type { ResolveHubSpotStageOptions } from './hubspot-lifecycle-mapping'
+
+export { instantiateClientForParty } from './commands/instantiate-client-for-party'
+export type { InstantiateClientForPartyInput } from './commands/instantiate-client-for-party'
+
+export { promoteParty } from './commands/promote-party'
+export type { PromotePartyInput } from './commands/promote-party'
+
+export {
+  ALLOWED_TRANSITIONS,
+  getAllowedNextStages,
+  isTerminalStage,
+  isTransitionAllowed,
+  parseLifecycleStage
+} from './lifecycle-state-machine'
+
+export {
+  publishClientInstantiated,
+  publishPartyCreated,
+  publishPartyDemoted,
+  publishPartyPromoted
+} from './party-events'
+export type {
+  ClientInstantiatedPayload,
+  PartyCreatedPayload,
+  PartyDemotedPayload,
+  PartyPromotedPayload
+} from './party-events'
+
+export {
+  findOrganizationByHubSpotCompany,
+  organizationHasClient,
+  selectOrganizationForLifecycleUpdate
+} from './party-store'
+export type { OrganizationLifecycleRow } from './party-store'
+
+export {
+  InsufficientPermissionsError,
+  InvalidTransitionError,
+  LIFECYCLE_STAGES,
+  LIFECYCLE_TRANSITION_SOURCES,
+  OrganizationAlreadyHasClientError,
+  OrganizationNotFoundError,
+  PartyLifecycleError
+} from './types'
+export type {
+  ClientInstantiationResult,
+  LifecycleStage,
+  LifecycleTransitionSource,
+  LifecycleTriggerEntity,
+  LifecycleTriggerEntityType,
+  PartyActor,
+  PartyCreationResult,
+  PartyPromotionResult,
+  PromoteDirection
+} from './types'

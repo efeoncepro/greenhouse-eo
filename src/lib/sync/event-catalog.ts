@@ -55,6 +55,10 @@ export const AGGREGATE_TYPES = {
   crmCompany: 'crm_company',
   personLegalEntityRelationship: 'person_legal_entity_relationship',
 
+  // Commercial Party Lifecycle (TASK-535)
+  commercialParty: 'commercial_party',
+  commercialClient: 'commercial_client',
+
   // HR Core / People
   member: 'member',
   memberSkill: 'member_skill',
@@ -168,6 +172,13 @@ export const EVENT_TYPES = {
   // Account 360
   organizationCreated: 'organization.created',
   organizationUpdated: 'organization.updated',
+
+  // Commercial Party Lifecycle (TASK-535)
+  commercialPartyCreated: 'commercial.party.created',
+  commercialPartyPromoted: 'commercial.party.promoted',
+  commercialPartyDemoted: 'commercial.party.demoted',
+  commercialPartyLifecycleBackfilled: 'commercial.party.lifecycle_backfilled',
+  commercialClientInstantiated: 'commercial.client.instantiated',
   membershipCreated: 'membership.created',
   membershipUpdated: 'membership.updated',
   membershipDeactivated: 'membership.deactivated',

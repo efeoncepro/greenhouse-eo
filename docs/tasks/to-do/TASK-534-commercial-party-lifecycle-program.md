@@ -24,6 +24,11 @@
 
 Programa oficial para formalizar el lifecycle canonico de la parte comercial (prospect → opportunity → active_client → inactive → churned, mas provider_only y disqualified) sobre `greenhouse_core.organizations` + `greenhouse_core.clients`, habilitar sync bi-direccional con HubSpot companies desde pre-venta (no solo closed-won), permitir creacion de deal inline desde el Quote Builder y cerrar la coreografia quote-to-cash atomica. Cierra el gap que hoy obliga al operador a saltar a HubSpot para cada cotizacion nueva.
 
+## Delta 2026-04-21
+
+- **Fase A cerrada.** `TASK-535` completada: schema DDL + comandos CQRS (`promoteParty`, `createPartyFromHubSpotCompany`, `instantiateClientForParty`) + backfill idempotente + 5 eventos outbox + 6 capabilities + HubSpot mapping con env override. Desbloquea Fase B. Ver `docs/tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md`.
+- Open question #1 (dual-role) queda diferida: `is_dual_role` expuesto en schema (default false); decisión final post-backfill en data real.
+
 ## Why This Task Exists
 
 Greenhouse trata al `Cliente` como un estado terminal: una empresa es cliente solo despues de closed-won o cuando es proveedor. Eso rompe la pre-venta porque el selector del Quote Builder solo muestra organizations que ya existen, y las organizations se crean unicamente cuando llega un deal ganado desde HubSpot o al registrar un proveedor. Consecuencia: para cotizar a una empresa nueva el operador (1) abre HubSpot, (2) crea Company, (3) crea Deal, (4) espera al sync de Greenhouse, (5) vuelve al builder. Minutos por cotizacion, dual-write invisible, typos que generan duplicados, revenue pipeline ciego a prospects, y bloqueo estructural para Kortex. El gap arquitectonico es de vocabulario: no existe un estado canonico para "empresa que esta en el funnel pero todavia no es cliente".

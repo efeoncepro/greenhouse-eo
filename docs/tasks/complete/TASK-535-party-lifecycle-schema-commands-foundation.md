@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado — 2026-04-21`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none`
@@ -246,3 +246,48 @@ Para cada row backfilled, insertar en history con `from_stage=NULL, to_stage=<co
 - Sweep cron `active_client → inactive` (deferred; decidir en Discovery si va aqui o en TASK-542).
 - Resolver open question #1 (dual-role) con data real post-backfill.
 - Documentar runbook operacional (`docs/operations/party-lifecycle-runbook.md`) — delegable a TASK-542.
+- Provisionar roles `sales` + `sales_lead` + bindear capabilities commercial.* cuando aterrice el role family (TASK-536+).
+- Spec §10.1 asumia `organizations.client_id` + `organizations.is_provider`; la implementacion real usa `fin_client_profiles.organization_id` + `clients.hubspot_company_id` bridge. Proveedores no son detectables hoy desde `organizations`; todos los orgs sin client link caen a `prospect` por default.
+
+## Closing Summary — 2026-04-21
+
+### Artefactos entregados
+
+- **Migraciones** (`migrations/`):
+  - `20260421113910459_task-535-organization-lifecycle-ddl.sql` — ALTER organizations (6 columnas + CHECKs + unique) + CREATE organization_lifecycle_history (append-only via trigger que bloquea UPDATE/DELETE) + 3 indexes.
+  - `20260421114006586_task-535-organization-lifecycle-backfill.sql` — backfill idempotente con guard fail-fast de orphans.
+- **Domain module** (`src/lib/commercial/party/`):
+  - `types.ts` (unions + result types + error classes)
+  - `lifecycle-state-machine.ts` (tabla de transiciones + helpers)
+  - `party-events.ts` (4 publishers transaccionales)
+  - `party-store.ts` (reads pesimistas + helpers de bridge)
+  - `hubspot-lifecycle-mapping.ts` (§4.5 + env override `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE` + unknown fallback observable)
+  - `commands/promote-party.ts`, `commands/create-party-from-hubspot-company.ts`, `commands/instantiate-client-for-party.ts`
+  - `index.ts` (barrel)
+- **Event catalog** (`src/lib/sync/event-catalog.ts`): 2 aggregates (`commercial_party`, `commercial_client`) + 5 event types.
+- **Entitlements** (`src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts`): modulo `commercial` + 6 capabilities bindeadas a `efeonce_admin` + `finance_admin`.
+- **Backfill CLI** (`scripts/backfill-organization-lifecycle.ts`): `--dry-run` / `--force` soportados.
+- **Tests** (`src/lib/commercial/party/__tests__/`): 4 test files, 36 tests passing (state machine, promoteParty, createPartyFromHubSpotCompany, hubspot-lifecycle-mapping).
+- **Spec docs**: `GREENHOUSE_EVENT_CATALOG_V1.md` extendido con sección "Commercial Party Lifecycle (TASK-535, Fase A)".
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/commercial/party` → 4 test files, 36 tests passing.
+- `pnpm lint` → 0 errors (warning preexistente en `BulkEditDrawer.tsx` no relacionado).
+- `npx tsc --noEmit` → clean.
+
+### Cross-impact chequeado
+
+- TASK-454 (hubspot company lifecycle bridge): no colisiona; `clients.lifecyclestage` sigue operativo como bridge para consumers legacy.
+- TASK-457 / TASK-462: no tocados por esta fase.
+- TASK-460 (contracts): leido para la backfill rule (`greenhouse_commercial.contracts.organization_id`) — sin cambios.
+- TASK-534 (umbrella): Fase A cerrada; TASK-536 (Fase B) desbloqueada.
+
+### Robustez del mapping HubSpot
+
+`hubspot-lifecycle-mapping.ts` expone `resolveHubSpotStage(rawStage, options)`:
+
+- Env var `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE` (JSON) permite mapear stages custom sin deploy.
+- Unknown stages → warn log + fallback configurable (default `prospect`), nunca throw.
+- `isKnownHubSpotStage` + `getEffectiveHubSpotStageMap` para ops/diagnostics.
+- Cubierto por 9 tests unitarios.

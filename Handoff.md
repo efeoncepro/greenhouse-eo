@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-535 Party Lifecycle Schema & Commands Foundation (Claude Opus 4.7)
+
+- **Scope:** Fase A del programa Commercial Party Lifecycle (paraguas TASK-534). Desbloquea TASK-536 (Fase B). Branch: `develop` (trabajo directo en rama principal por falta de worktree separado; commit único consolidado).
+- **Migraciones shipped:**
+  - `20260421113910459_task-535-organization-lifecycle-ddl.sql` — ALTER `organizations` con 6 columnas (`lifecycle_stage`, `lifecycle_stage_since`, `lifecycle_stage_source`, `lifecycle_stage_by`, `is_dual_role`, `commercial_party_id` UUID unique), CHECK constraints por dominio, partial index activo (excluye terminal stages), CREATE TABLE `organization_lifecycle_history` append-only con trigger que bloquea UPDATE/DELETE a nivel DB.
+  - `20260421114006586_task-535-organization-lifecycle-backfill.sql` — backfill idempotente (WHERE `lifecycle_stage_source='bootstrap'` AND no history yet) con CTE que detecta `has_client_link` via `fin_client_profiles.organization_id` + `clients.hubspot_company_id` bridge, `has_active_contract` en `greenhouse_commercial.contracts`, `has_recent_income` en `greenhouse_finance.income` (últimos 6 meses). Incluye guard fail-fast DO block.
+- **Spec §10.1 corregida:** los campos `organizations.client_id` y `organizations.is_provider` que la spec asumía no existen en el schema real; la implementación usa los bridges reales + providers no detectables → todos los sin client link caen a `prospect` por default (documentado como follow-up).
+- **Módulo nuevo `src/lib/commercial/party/`** (8 archivos):
+  - `types.ts` — `LifecycleStage`, `LifecycleTransitionSource`, `PartyActor`, `PartyPromotionResult`, `PartyLifecycleError` + subclases (`InvalidTransitionError`, `OrganizationNotFoundError`, `OrganizationAlreadyHasClientError`, `InsufficientPermissionsError`).
+  - `lifecycle-state-machine.ts` — `ALLOWED_TRANSITIONS` canónico §4.2 + `isTransitionAllowed` / `getAllowedNextStages` / `isTerminalStage` / `parseLifecycleStage`.
+  - `party-events.ts` — 4 publishers transaccionales (`publishPartyCreated`, `publishPartyPromoted`, `publishPartyDemoted`, `publishClientInstantiated`).
+  - `party-store.ts` — `selectOrganizationForLifecycleUpdate` (lock pesimista), `findOrganizationByHubSpotCompany`, `organizationHasClient` (detecta via 2 paths).
+  - `hubspot-lifecycle-mapping.ts` — `DEFAULT_HUBSPOT_STAGE_MAP` canónico §4.5 + `resolveHubSpotStage(raw, opts)` con env override `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE` (JSON) + unknown-stage warn + fallback configurable. `isKnownHubSpotStage` + `getEffectiveHubSpotStageMap` para ops.
+  - `commands/promote-party.ts` — lock + validar state machine + insert history + update org + side-effect `instantiateClientForParty` (si target=active_client, swallow `ORGANIZATION_ALREADY_HAS_CLIENT`) + emit promoted o demoted según rank.
+  - `commands/create-party-from-hubspot-company.ts` — upsert idempotente por `hubspot_company_id` (skip si ya existe) + mapping via resolver + history + emit created.
+  - `commands/instantiate-client-for-party.ts` — crea row en `clients` + bootstrap `fin_client_profiles` defaults (CLP + 30d) + emit instantiated.
+  - `index.ts` — barrel export.
+- **Event catalog extendido** (`src/lib/sync/event-catalog.ts`): 2 aggregates nuevos (`commercial_party`, `commercial_client`) + 5 event types (`commercial.party.created`, `.promoted`, `.demoted`, `.lifecycle_backfilled`, `commercial.client.instantiated`).
+- **Entitlements**: módulo `commercial` agregado a `ENTITLEMENT_MODULES`; 6 capabilities nuevas (`commercial.party.create/promote_to_client/churn/override_lifecycle`, `commercial.deal.create`, `commercial.quote_to_cash.execute`) bindeadas a `efeonce_admin` (6/6) + `finance_admin` (promote_to_client + quote_to_cash). Roles `sales`/`sales_lead` NO existen en repo — follow-up documentado para TASK-536+.
+- **Backfill CLI** (`scripts/backfill-organization-lifecycle.ts`): `--dry-run` para preview, `--force` para re-clasificar. Duplica la lógica de M2 para correr contra snapshots refrescados sin migrate down/up.
+- **Robustez HubSpot stages** (ask explícito del usuario): `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE='{"partner":"active_client"}'` en Vercel env permite mapear stages custom sin deploy. Unknown stages → warn log (no throw) + fallback configurable. Precedencia: ad-hoc overrides > env > defaults > fallback. 9 tests dedicados al resolver.
+- **Tests** (36 passing en `src/lib/commercial/party/__tests__/`): 4 archivos: state machine (transiciones válidas/inválidas/override), promoteParty (unknown org, illegal transition, same-stage no-op, active_client side-effect, demotion, swallow double-client), createPartyFromHubSpotCompany (idempotencia, first-sync, empty id), hubspot-lifecycle-mapping (defaults, env override, malformed JSON, ad-hoc override, known/unknown).
+- **Spec docs:** `GREENHOUSE_EVENT_CATALOG_V1.md` extendido con sección "Commercial Party Lifecycle (TASK-535, Fase A)" — 5 eventos con payload + invariantes + referencia a env override.
+- **Verificación local:** `pnpm lint` → 0 errors · `npx tsc --noEmit` → clean · 36/36 tests party passing · 1629/1629 tests suite completa passing.
+- **Out of scope (diferido a fases B+):** sync HubSpot inbound, endpoints HTTP, UI del selector unificado, sweep cron, outbound sync, quote-to-cash atomic. Ver TASK-536..543.
+- **Migraciones aplicadas:** M1 + M2 corrieron contra `greenhouse-pg-dev` vía `pnpm migrate:up` (proxy Cloud SQL en `127.0.0.1:15432`). Sanity guard de M2 pasó (0 organizations sin history row). `src/types/db.d.ts` regenerado automáticamente (269 tablas introspectadas).
+
 ## Sesion 2026-04-21 — TASK-529 Chile Tax Code Foundation (Claude Opus 4.7)
 
 - **Scope:** foundation canónica de tax codes Chile-first + helpers + seeds. Desbloquea TASK-530/531/532/533. Branch `task/TASK-529-chile-tax-code-foundation`.

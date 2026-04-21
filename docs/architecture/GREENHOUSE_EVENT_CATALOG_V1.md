@@ -132,6 +132,26 @@ consumers can migrate gradually. Canonical events are scoped to the commercial
 | `quotation` | `commercial.quotation.pushed_to_hubspot` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` invocado por projection `quotationHubSpotOutbound`) | `{ quotationId, hubspotQuoteId, hubspotDealId, direction: 'outbound', result: 'created' \| 'updated' \| 'skipped', reason?, actorId? }` | observability del bridge outbound + retry audit |
 | `quotation` | `commercial.quotation.hubspot_sync_failed` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` catch branch) | `{ quotationId, hubspotDealId, errorMessage, attemptedAction: 'create' \| 'update', actorId? }` | ops-worker retry, Finance alerting |
 
+### Commercial Party Lifecycle (TASK-535)
+
+Fase A del programa TASK-534. Eventos emitidos por los 3 comandos CQRS en
+`commercial/party/commands/*`. Nuevos aggregate types: `commercial_party` y
+`commercial_client`.
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `commercial_party` | `commercial.party.created` (TASK-535) | `commercial/party/party-events.ts` (from `commands/create-party-from-hubspot-company.ts`) | `{ commercialPartyId, organizationId, initialStage, source: 'hubspot_sync', hubspotCompanyId }` | TASK-536 inbound sync, TASK-540 outbound HubSpot, TASK-538 selector projection |
+| `commercial_party` | `commercial.party.promoted` (TASK-535) | `commercial/party/party-events.ts` (from `commands/promote-party.ts`) | `{ commercialPartyId, organizationId, fromStage, toStage, source, triggerEntity?, actorUserId?, reason? }` | TASK-540 outbound HubSpot (write-back lifecyclestage), TASK-541 quote-to-cash, analytics |
+| `commercial_party` | `commercial.party.demoted` (TASK-535) | `commercial/party/party-events.ts` (from `commands/promote-party.ts`) | `{ commercialPartyId, organizationId, fromStage, toStage, source, direction: 'demote', triggerEntity?, actorUserId?, reason? }` | TASK-540 outbound, analytics |
+| `commercial_client` | `commercial.client.instantiated` (TASK-535) | `commercial/party/party-events.ts` (from `commands/instantiate-client-for-party.ts`, side-effect de `promoteParty → active_client`) | `{ clientId, clientProfileId, organizationId, commercialPartyId, triggerEntity, actorUserId? }` | Finance bootstrap (profile ya creado en misma transacción), ICO/attribution pipelines, TASK-541 |
+
+Eventos adicionales del programa TASK-534 planificados para Fases posteriores:
+
+- `commercial.party.hubspot_synced_in` / `hubspot_synced_out` / `sync_conflict` — TASK-540 (outbound) / TASK-536 (inbound).
+- `commercial.party.merged` — TASK-542 (merge resolution).
+- `commercial.party.inactivated` / `churned` — TASK-542 (sweep cron).
+- `commercial.party.lifecycle_backfilled` — reservado en `EVENT_TYPES` para futuros runs ad-hoc del backfill script.
+
 ### Products — legacy finance namespace (TASK-211, kept during cutover)
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
@@ -235,6 +255,26 @@ Notas:
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
 | `crm_company` | `crm.company.lifecyclestage_changed` | `hubspot/company-lifecycle-events.ts` (from `hubspot/sync-hubspot-company-lifecycle.ts`) | `{ clientId, organizationId, spaceId, hubspotCompanyId, fromStage, toStage, source }` | — |
+
+### Commercial Party Lifecycle (TASK-535, Fase A)
+
+Domain: `cost_intelligence`. Canonical source of truth for the commercial state of every organization — `greenhouse_core.organizations.lifecycle_stage`. Every write passes through the CQRS commands in `src/lib/commercial/party/commands/**`; direct UPDATEs to `lifecycle_stage` are not permitted.
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `commercial_party` | `commercial.party.created` | `party/party-events.ts` (from `createPartyFromHubSpotCompany`) | `{ commercialPartyId, organizationId, initialStage, source, hubspotCompanyId? }` | TASK-536 inbound sync materialization, TASK-538 selector cache |
+| `commercial_party` | `commercial.party.promoted` | `party/party-events.ts` (from `promoteParty`) | `{ commercialPartyId, organizationId, fromStage, toStage, source, triggerEntity?, actorUserId?, reason? }` | TASK-540 HubSpot outbound, TASK-541 quote-to-cash |
+| `commercial_party` | `commercial.party.demoted` | `party/party-events.ts` (from `promoteParty` when the stage rank drops) | `{ …promoted payload, direction: 'demote' }` | TASK-540 HubSpot outbound |
+| `commercial_party` | `commercial.party.lifecycle_backfilled` | Reserved for the operational backfill runbook (M2 migration + CLI). Not emitted in Fase A. | `{ commercialPartyId, organizationId, toStage, batchId }` | — |
+| `commercial_client` | `commercial.client.instantiated` | `party/party-events.ts` (from `instantiateClientForParty`, invoked as side-effect of promoteParty → active_client) | `{ clientId, clientProfileId, organizationId, commercialPartyId, triggerEntity, actorUserId? }` | Finance (`fin_client_profiles` bootstrap is already in-transaction), ICO / cost attribution pipelines |
+
+Invariants:
+
+- Every transition appends exactly one row to `greenhouse_core.organization_lifecycle_history` (append-only; trigger blocks UPDATE/DELETE).
+- Same-stage writes are no-ops — no event is emitted, no history row written.
+- Side effect: `promoteParty` with `toStage=active_client` invokes `instantiateClientForParty`; `ORGANIZATION_ALREADY_HAS_CLIENT` is swallowed so the promotion stays valid on double-bootstrap.
+- HubSpot → Greenhouse stage mapping (§4.5) lives in `src/lib/commercial/party/hubspot-lifecycle-mapping.ts` with an env-var override (`HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE`) for custom HubSpot portals.
+- Events not emitted in Fase A (sync-conflict, merged, hubspot_synced_in/out, inactivated, churned-by-sweep) belong to Fases B/F and will be added by TASK-536 / TASK-540 / TASK-542.
 
 ### HR Core / People (nuevo)
 

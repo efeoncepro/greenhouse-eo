@@ -24,6 +24,10 @@
 
 Fase B del programa TASK-534. Extiende el sync HubSpot → Greenhouse para que cree `organization` como `prospect` desde companies con `lifecyclestage ∈ {lead, mql, sql, opportunity, customer}`, no solo en closed-won o provider. Detras del flag `GREENHOUSE_PARTY_LIFECYCLE_SYNC`. Usa el comando `createPartyFromHubSpotCompany` entregado en Fase A.
 
+## Delta 2026-04-21
+
+- **Fase A shipped (TASK-535 cerrada).** Bloqueo levantado. `createPartyFromHubSpotCompany` ya vive en `src/lib/commercial/party/commands/create-party-from-hubspot-company.ts` (idempotente por `hubspot_company_id`, emite `commercial.party.created`). Mapping §4.5 con env override en `src/lib/commercial/party/hubspot-lifecycle-mapping.ts`. Esta task puede arrancar sin retrabajo de schema.
+
 ## Why This Task Exists
 
 Hoy las organizations se crean tarde — solo cuando un deal gana o cuando registramos un proveedor. Esa decision empuja al operador a HubSpot porque Greenhouse no conoce la existencia del prospect. Extender el sync a prospects cierra el loop: todas las companies de HubSpot que cumplen criterios comerciales aparecen como organizations con lifecycle_stage apropiado, listas para cotizar.

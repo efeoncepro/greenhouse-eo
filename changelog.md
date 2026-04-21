@@ -2,6 +2,16 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-535 Commercial Party Lifecycle foundation (Fase A) shipped
+
+- Migraciones aplicadas en dev: `20260421113910459_task-535-organization-lifecycle-ddl.sql` agrega 6 columnas a `greenhouse_core.organizations` (`lifecycle_stage` + source/since/by + `is_dual_role` + `commercial_party_id` UUID unique) con CHECK constraints por dominio y partial index del funnel activo; crea `organization_lifecycle_history` append-only con trigger que bloquea UPDATE/DELETE a nivel DB. `20260421114006586_task-535-organization-lifecycle-backfill.sql` clasifica cada organization (reglas §10.1 adaptadas a schema real: bridge via `fin_client_profiles.organization_id` + `clients.hubspot_company_id`, active contracts en `greenhouse_commercial.contracts`, ingresos recientes en `greenhouse_finance.income`). Sanity guard DO block falla si queda alguna org sin history row.
+- Módulo nuevo `src/lib/commercial/party/` con los 3 comandos CQRS: `promoteParty` (lock pesimista + state machine + history + side-effect `instantiateClientForParty` si target=active_client), `createPartyFromHubSpotCompany` (upsert idempotente por `hubspot_company_id` + mapping §4.5), `instantiateClientForParty` (bootstrap `clients` + `fin_client_profiles` CLP/30d). Plus `lifecycle-state-machine.ts`, `hubspot-lifecycle-mapping.ts` (con env override `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE` para stages custom sin deploy), `party-events.ts`, `party-store.ts`, `types.ts`.
+- Event catalog extendido: 2 aggregates (`commercial_party`, `commercial_client`) + 5 events (`commercial.party.created/promoted/demoted/lifecycle_backfilled`, `commercial.client.instantiated`). Spec `GREENHOUSE_EVENT_CATALOG_V1.md` sincronizado.
+- Entitlements: módulo `commercial` agregado + 6 capabilities seed (`commercial.party.create/promote_to_client/churn/override_lifecycle`, `commercial.deal.create`, `commercial.quote_to_cash.execute`) bindeadas en runtime a `efeonce_admin` (6/6) + `finance_admin` (2/6). Roles `sales`/`sales_lead` no existen en repo → follow-up documentado para TASK-536+.
+- CLI `scripts/backfill-organization-lifecycle.ts` con `--dry-run` + `--force` para re-correr contra snapshots refrescados sin migrate down/up.
+- Verificación: `pnpm lint` clean · `npx tsc --noEmit` clean · 36/36 party tests + 1629/1629 suite completa · `pnpm build` compila en 15s. Nada UI (§Out of Scope).
+- Desbloquea TASK-536..541 (inbound sync, endpoints, selector, quote-to-cash).
+
 ### 2026-04-21 — TASK-452 Service Attribution Foundation cerrada (cierre formal)
 
 - Task cerrada formalmente: lifecycle flipeado a `complete`, archivo movido a `docs/tasks/complete/`, README sincronizado, cross-impact con TASK-482 verificado.
