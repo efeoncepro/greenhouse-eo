@@ -128,6 +128,7 @@ export const AGGREGATE_TYPES = {
   serviceAttribution: 'service_attribution',
   operationalPl: 'operational_pl',
   marginAlert: 'margin_alert',
+  marginFeedback: 'margin_feedback',
   commercialCostBasis: 'commercial_cost_basis',
   staffAugPlacement: 'staff_aug_placement',
   staffAugOnboardingItem: 'staff_aug_onboarding_item',
@@ -385,6 +386,11 @@ export const EVENT_TYPES = {
   contractCompleted: 'commercial.contract.completed',
   contractRenewalDue: 'commercial.contract.renewal_due',
   contractProfitabilityMaterialized: 'commercial.contract.profitability_materialized',
+
+  // Margin Feedback Loop (TASK-482) — batch-level convergence of the
+  // quotation + contract profitability snapshots plus calibration signals
+  // for downstream cost basis recalibration.
+  marginFeedbackBatchCompleted: 'commercial.margin_feedback.batch_completed',
   masterAgreementCreated: 'commercial.master_agreement.created',
   masterAgreementUpdated: 'commercial.master_agreement.updated',
   masterAgreementClausesChanged: 'commercial.master_agreement.clauses_changed',

@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 
 interface EmailDelivery {
+  effectiveStatus: string
   deliveryId: string
   batchId: string
   emailType: string
@@ -26,12 +27,18 @@ interface EmailDelivery {
   actorEmail: string | null
   errorMessage: string | null
   attemptNumber: number
+  deliveredAt: string | null
+  bouncedAt: string | null
+  complainedAt: string | null
   createdAt: string
   updatedAt: string
 }
 
 const EMAIL_STATUS_MAP: Record<string, { label: string; color: 'success' | 'error' | 'warning' | 'secondary' }> = {
   sent: { label: 'Enviado', color: 'success' },
+  delivered: { label: 'Entregado', color: 'success' },
+  bounced: { label: 'Rebotado', color: 'error' },
+  complained: { label: 'Spam', color: 'warning' },
   failed: { label: 'Fallido', color: 'error' },
   pending: { label: 'Pendiente', color: 'warning' },
   skipped: { label: 'Omitido', color: 'secondary' }
@@ -88,7 +95,7 @@ interface Props {
 const EmailDeliveryDetailDrawer = ({ open, delivery, onClose, onRetry }: Props) => {
   if (!delivery) return null
 
-  const statusInfo = EMAIL_STATUS_MAP[delivery.status] ?? { label: delivery.status, color: 'secondary' as const }
+  const statusInfo = EMAIL_STATUS_MAP[delivery.effectiveStatus] ?? { label: delivery.effectiveStatus, color: 'secondary' as const }
   const canRetry = delivery.status === 'failed' && delivery.attemptNumber < 3
 
   return (
@@ -123,7 +130,11 @@ const EmailDeliveryDetailDrawer = ({ open, delivery, onClose, onRetry }: Props) 
         <DetailRow label='Evento origen' value={delivery.sourceEventId} mono />
         <DetailRow label='Entidad origen' value={delivery.sourceEntity} mono />
         <DetailRow label='Enviado por' value={delivery.actorEmail} />
-        <DetailRow label='Fecha' value={formatAbsoluteTime(delivery.createdAt)} />
+        <DetailRow label='Creado' value={formatAbsoluteTime(delivery.createdAt)} />
+        <DetailRow label='Último cambio' value={formatAbsoluteTime(delivery.updatedAt)} />
+        <DetailRow label='Entregado' value={delivery.deliveredAt ? formatAbsoluteTime(delivery.deliveredAt) : null} />
+        <DetailRow label='Rebote' value={delivery.bouncedAt ? formatAbsoluteTime(delivery.bouncedAt) : null} />
+        <DetailRow label='Spam' value={delivery.complainedAt ? formatAbsoluteTime(delivery.complainedAt) : null} />
 
         {delivery.errorMessage && (
           <>

@@ -4901,6 +4901,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `RESEND_API_KEY`
 - `RESEND_API_KEY_SECRET_REF`
+- `RESEND_WEBHOOK_SIGNING_SECRET`
+- `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF`
 - `EMAIL_FROM`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 - `AGENT_AUTH_SECRET` — shared secret para autenticación headless de agentes y E2E (generar con `openssl rand -hex 32`). Sin esta variable el endpoint `/api/auth/agent-session` responde 404.
@@ -4926,6 +4928,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` habilitan Google SSO en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `RESEND_API_KEY` y `EMAIL_FROM` quedan reservadas para el sistema de emails transaccionales; no deben commitearse con valores reales y deben existir al menos en `Development`, `Preview`, `Staging` y `Production` si ese flujo se habilita.
 - `RESEND_API_KEY_SECRET_REF` es el contrato canónico recomendado cuando el mismo flujo de email puede correr en más de un runtime (por ejemplo Vercel + Cloud Run); el valor directo `RESEND_API_KEY` queda como fallback legacy.
+- `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF` es el contrato canónico recomendado para el webhook de Resend; el valor directo `RESEND_WEBHOOK_SIGNING_SECRET` queda como fallback legacy.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.

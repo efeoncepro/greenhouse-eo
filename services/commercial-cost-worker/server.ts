@@ -11,10 +11,8 @@
  *   POST /cost-basis/materialize/roles
  *   POST /cost-basis/materialize/tools
  *   POST /cost-basis/materialize/bundle
- *
- * Reserved endpoints:
  *   POST /quotes/reprice-bulk
- *   POST /margin-feedback/materialize
+ *   POST /margin-feedback/materialize           (TASK-482)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle
@@ -27,6 +25,10 @@ import {
   normalizeCommercialCostBasisRequest,
   type CommercialCostBasisScope
 } from '@/lib/commercial-cost-worker/contracts'
+import {
+  normalizeMarginFeedbackRequest,
+  runMarginFeedback
+} from '@/lib/commercial-cost-worker/margin-feedback'
 import { runCommercialCostBasisMaterialization } from '@/lib/commercial-cost-worker/materialize'
 import { runQuoteRepriceBulk } from '@/lib/commercial-cost-worker/quote-reprice-bulk'
 
@@ -75,14 +77,6 @@ const notFound = (res: ServerResponse, pathname: string) => {
   json(res, 404, {
     error: 'NOT_FOUND',
     path: pathname
-  })
-}
-
-const notImplemented = (res: ServerResponse, pathname: string, reason: string) => {
-  json(res, 501, {
-    error: 'NOT_IMPLEMENTED',
-    path: pathname,
-    reason
   })
 }
 
@@ -155,6 +149,30 @@ const handleQuoteRepriceBulk = async (req: IncomingMessage, res: ServerResponse)
   }
 }
 
+const handleMarginFeedback = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  try {
+    const normalizedRequest = normalizeMarginFeedbackRequest(body)
+    const result = await runMarginFeedback(normalizedRequest)
+
+    json(res, 200, {
+      service: 'commercial-cost-worker',
+      timestamp: now(),
+      result
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[commercial-cost-worker] margin feedback failed:', message)
+
+    json(res, 502, {
+      error: message,
+      timestamp: now()
+    })
+  }
+}
+
 const server = createServer(async (req, res) => {
   const method = req.method || 'GET'
   const url = new URL(req.url || '/', 'http://localhost')
@@ -211,11 +229,7 @@ const server = createServer(async (req, res) => {
   if (pathname === '/margin-feedback/materialize') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
 
-    return notImplemented(
-      res,
-      pathname,
-      'Reserved for downstream margin feedback materialization after cost basis stabilization.'
-    )
+    return handleMarginFeedback(req, res)
   }
 
   return notFound(res, pathname)

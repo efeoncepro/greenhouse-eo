@@ -15,10 +15,7 @@ Este worker separa del portal web las corridas pesadas que alimentan el programa
 
 ## Que aun no implementa
 
-Estos endpoints quedan reservados para las siguientes tasks del programa y hoy responden `501`:
-
-- `quotes/reprice-bulk`
-- `margin-feedback/materialize`
+Todos los endpoints reservados originalmente ya están activos. No queda ningún `501` publicado.
 
 ## Trazabilidad operativa
 
@@ -45,6 +42,85 @@ Cada corrida deja dos rastros:
 - `POST /cost-basis/materialize/roles`
 - `POST /cost-basis/materialize/tools`
 - `POST /cost-basis/materialize/bundle`
+- `POST /quotes/reprice-bulk`
+- `POST /margin-feedback/materialize` (TASK-482)
+
+## Margin Feedback Loop (TASK-482)
+
+`POST /margin-feedback/materialize` converge el feedback de rentabilidad ya
+existente: reutiliza los materializers de quotation y contract sin duplicarlos,
+genera señales de calibración y emite el evento canónico
+`commercial.margin_feedback.batch_completed` para consumers downstream.
+
+Body aceptado (todos los campos opcionales):
+
+```json
+{
+  "year": 2026,
+  "month": 4,
+  "monthsBack": 1
+}
+```
+
+Defaults: si no se indica período, usa el mes actual; `monthsBack` cae a `1`
+(re-materializa mes actual + mes anterior) y se clampa a `[0, 12]`.
+
+Respuesta (200):
+
+```json
+{
+  "service": "commercial-cost-worker",
+  "timestamp": "2026-04-21T22:00:00.000Z",
+  "result": {
+    "runId": "mfb-…",
+    "periods": [{ "year": 2026, "month": 3 }, { "year": 2026, "month": 4 }],
+    "quotationCount": 12,
+    "contractCount": 3,
+    "calibrationSignals": {
+      "quotationDriftDistribution": {
+        "p50Pct": -1.2, "p90Pct": -8.4, "maxAbsPct": 14.3, "sampleSize": 12
+      },
+      "quotationDriftBucketCounts": { "aligned": 7, "warning": 4, "critical": 1 },
+      "contractDriftDistribution": { "p50Pct": 0.5, "p90Pct": -4.1, "maxAbsPct": 6.8, "sampleSize": 3 },
+      "contractDriftBucketCounts": { "aligned": 2, "warning": 1, "critical": 0 },
+      "topDriftByPricingModel": [
+        { "pricingModel": "retainer", "commercialModel": "retainer", "meanDriftPct": -6.3, "sampleSize": 4 }
+      ]
+    },
+    "serviceGrainAvailable": false,
+    "startedAt": "2026-04-21T22:00:00.000Z",
+    "completedAt": "2026-04-21T22:00:04.120Z",
+    "durationMs": 4120
+  }
+}
+```
+
+Notas operativas:
+
+- Es **idempotente** — delega a los materializers que UPSERT por
+  `(quotation_id|contract_id, period_year, period_month)`. Re-ejecutar el
+  mismo período sobrescribe el snapshot con las cifras más recientes.
+- **No muta el catálogo comercial.** Los `calibrationSignals` son lecturas
+  agregadas sobre los snapshots; la recalibración manual de assumptions vive
+  en el lane comercial y se decide fuera del worker.
+- **`serviceGrainAvailable: false`** mientras TASK-452 no cierre
+  (`greenhouse_serving.service_attribution` no existe). El probe chequea
+  `information_schema` y flipea automáticamente cuando la tabla aparezca;
+  el enriquecimiento de drift por servicio se agrega entonces en un
+  follow-up sin romper el contrato actual.
+- Scheduler: `margin-feedback-materialize-daily` corre a las **5:10 AM
+  America/Santiago**, 10 minutos después del `commercial-cost-materialize-daily`
+  para que `commercial_cost_attribution` esté fresca antes de calcular
+  drift. Si el cost-basis base retrasa, el feedback loop levanta las cifras
+  del snapshot previo — sin error — y la severidad se alinea cuando el
+  próximo run re-materialize.
+
+Manual trigger contra staging vía `pnpm staging:request`:
+
+```bash
+pnpm staging:request POST '/margin-feedback/materialize' '{"monthsBack":2}'
+```
+
 
 ## Relacion con ops-worker
 

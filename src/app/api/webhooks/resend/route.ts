@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from 'crypto'
 
 import { NextResponse } from 'next/server'
 
+import { getResendWebhookSigningSecret } from '@/lib/resend'
 import { removeSubscriber } from '@/lib/email/subscriptions'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -12,7 +13,7 @@ export const dynamic = 'force-dynamic'
 // ── Helpers ──
 
 const getWebhookSecret = (): string | null => {
-  const secret = process.env.RESEND_WEBHOOK_SIGNING_SECRET?.trim()
+  const secret = getResendWebhookSigningSecret()
 
   return secret || null
 }
@@ -132,6 +133,16 @@ export async function POST(request: Request) {
         const bounceType = event.data.bounce?.type || 'unknown'
         const reason = event.data.bounce?.message || 'Bounce received'
 
+        if (resendId) {
+          await runGreenhousePostgresQuery(
+            `UPDATE greenhouse_notifications.email_deliveries
+             SET bounced_at = COALESCE(bounced_at, NOW()),
+                 updated_at = NOW()
+             WHERE resend_id = $1`,
+            [resendId]
+          )
+        }
+
         if (bounceType === 'hard') {
           // Mark recipient as undeliverable in client_users
           await runGreenhousePostgresQuery(
@@ -161,6 +172,16 @@ export async function POST(request: Request) {
 
       case 'email.complained': {
         const reason = event.data.complaint?.message || 'Complaint received'
+
+        if (resendId) {
+          await runGreenhousePostgresQuery(
+            `UPDATE greenhouse_notifications.email_deliveries
+             SET complained_at = COALESCE(complained_at, NOW()),
+                 updated_at = NOW()
+             WHERE resend_id = $1`,
+            [resendId]
+          )
+        }
 
         // Look up the email type from the delivery record to auto-unsubscribe
         if (resendId) {
@@ -192,8 +213,10 @@ export async function POST(request: Request) {
         if (resendId) {
           await runGreenhousePostgresQuery(
             `UPDATE greenhouse_notifications.email_deliveries
-             SET status = 'delivered', updated_at = NOW()
-             WHERE resend_id = $1 AND status = 'sent'`,
+             SET status = 'delivered',
+                 delivered_at = COALESCE(delivered_at, NOW()),
+                 updated_at = NOW()
+             WHERE resend_id = $1 AND status IN ('sent', 'delivered')`,
             [resendId]
           )
         }

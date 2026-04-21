@@ -3655,11 +3655,23 @@ export interface GreenhouseNotificationsEmailDeliveries {
   actor_email: string | null;
   attempt_number: Generated<number>;
   batch_id: string;
+  /**
+   * Timestamp confirmed by Resend webhook email.bounced.
+   */
+  bounced_at: Timestamp | null;
+  /**
+   * Timestamp confirmed by Resend webhook email.complained.
+   */
+  complained_at: Timestamp | null;
   created_at: Generated<Timestamp>;
   /**
    * Set when delivery_payload and PII fields are anonymized for GDPR/data retention
    */
   data_redacted_at: Timestamp | null;
+  /**
+   * Timestamp confirmed by Resend webhook email.delivered.
+   */
+  delivered_at: Timestamp | null;
   delivery_id: Generated<string>;
   delivery_payload: Generated<Json>;
   domain: string;

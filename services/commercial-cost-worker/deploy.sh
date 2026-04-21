@@ -291,6 +291,17 @@ upsert_scheduler_job \
   '{"scope":"bundle","monthsBack":1}'
 echo "  -> commercial-cost-materialize-daily: 5:00 AM ${SCHEDULER_TZ}"
 
+# TASK-482 — Margin Feedback Loop batch run. Fires 10 minutes after the
+# cost-basis bundle so attributed cost is already fresh; materializes
+# quotation + contract profitability snapshots and emits calibration
+# signals via commercial.margin_feedback.batch_completed.
+upsert_scheduler_job \
+  "margin-feedback-materialize-daily" \
+  "10 5 * * *" \
+  "/margin-feedback/materialize" \
+  '{"monthsBack":1}'
+echo "  -> margin-feedback-materialize-daily: 5:10 AM ${SCHEDULER_TZ}"
+
 echo ""
 echo "=== Deployment complete ==="
 echo "Service:    ${SERVICE_URL}"
@@ -301,3 +312,4 @@ echo "Memory:     ${MEMORY}"
 echo "CPU:        ${CPU}"
 echo "Timeout:    ${TIMEOUT}s"
 echo "Scheduler:  commercial-cost-materialize-daily -> POST /cost-basis/materialize"
+echo "            margin-feedback-materialize-daily -> POST /margin-feedback/materialize"
