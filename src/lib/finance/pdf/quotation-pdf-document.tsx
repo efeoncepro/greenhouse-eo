@@ -435,7 +435,7 @@ export const QuotationPdfDocument = ({ input }: QuotationPdfDocumentProps) => {
 
         <View style={styles.totalsBlock}>
           <View style={styles.totalsRow}>
-            <Text style={styles.totalsLabel}>Subtotal</Text>
+            <Text style={styles.totalsLabel}>Subtotal (neto)</Text>
             <Text style={styles.totalsValue}>{formatCurrency(input.totals.subtotal, currency)}</Text>
           </View>
           {input.totals.totalDiscount > 0 ? (
@@ -443,6 +443,17 @@ export const QuotationPdfDocument = ({ input }: QuotationPdfDocumentProps) => {
               <Text style={styles.totalsLabel}>Descuento</Text>
               <Text style={styles.totalsValue}>
                 -{formatCurrency(input.totals.totalDiscount, currency)}
+              </Text>
+            </View>
+          ) : null}
+          {/* TASK-530: explicit IVA breakdown */}
+          {input.totals.tax ? (
+            <View style={styles.totalsRow}>
+              <Text style={styles.totalsLabel}>{input.totals.tax.label}</Text>
+              <Text style={styles.totalsValue}>
+                {input.totals.tax.isExempt
+                  ? '—'
+                  : formatCurrency(input.totals.tax.amount, currency)}
               </Text>
             </View>
           ) : null}

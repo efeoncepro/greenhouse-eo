@@ -32,6 +32,8 @@ import {
   resolveRevenueMetricConfig
 } from './pricing-config-store'
 import { computeRevenueMetrics } from './revenue-metrics'
+import { buildQuotationTaxSnapshot } from './quotation-tax-snapshot'
+import { computeChileTaxSnapshot } from '@/lib/tax/chile'
 
 const round2 = (value: number): number => {
   if (!Number.isFinite(value)) return 0
@@ -228,6 +230,15 @@ export interface QuotationPricingInput {
   pricingContext?: QuotationPricingReplayContext | null
   lineItems: QuotationLineInput[]
   createdBy: string
+
+  /**
+   * TASK-530: canonical Chile tax code for the header (defaults to
+   * `cl_vat_19`). Passed through to the tax snapshot builder.
+   */
+  taxCode?: string | null
+
+  /** TASK-530: optional space override for tenant-scoped tax catalogue. */
+  spaceId?: string | null
 }
 
 export interface PricedLineItem extends Omit<QuotationLineInput, 'recurrenceType'> {
@@ -446,6 +457,16 @@ export const persistQuotationPricing = async (
           rateDate: input.quoteDate
         })
 
+  // TASK-530: compute the Chile tax snapshot from the net subtotal so the
+  // quote header persists `Neto / IVA / Total` explicitly and consistently
+  // across builder / detail / PDF / email.
+  const taxResolution = await buildQuotationTaxSnapshot({
+    netAmount: snapshot.totals.totalPrice,
+    taxCode: input.taxCode ?? null,
+    spaceId: input.spaceId ?? null,
+    issuedAt: input.quoteDate
+  })
+
   await withTransaction(async client => {
     await client.query(
       `UPDATE greenhouse_commercial.quotations
@@ -475,6 +496,12 @@ export const persistQuotationPricing = async (
              total_amount_clp = $25,
              exchange_rate_to_clp = $26,
              pricing_context = $27::jsonb,
+             tax_code = $28,
+             tax_rate_snapshot = $29,
+             tax_amount_snapshot = $30,
+             tax_snapshot_json = $31::jsonb,
+             is_tax_exempt = $32,
+             tax_snapshot_frozen_at = NOW(),
              updated_at = CURRENT_TIMESTAMP
          WHERE quotation_id = $1`,
       [
@@ -504,7 +531,12 @@ export const persistQuotationPricing = async (
         snapshot.totals.totalPrice,
         totalAmountClp,
         exchangeRateToClp,
-        JSON.stringify(input.pricingContext ?? {})
+        JSON.stringify(input.pricingContext ?? {}),
+        taxResolution.taxCode,
+        taxResolution.rateSnapshot,
+        taxResolution.taxAmountSnapshot,
+        JSON.stringify(taxResolution.snapshot),
+        taxResolution.isTaxExempt
       ]
     )
 
@@ -519,6 +551,18 @@ export const persistQuotationPricing = async (
 
     for (const line of snapshot.lineItems) {
       sortCounter += 1
+
+      // TASK-530: every line inherits the header tax code. Per-line override
+      // is a follow-up; today the UI only edits the header. We still compute
+      // a per-line snapshot so PDF/detail can render IVA line-by-line if
+      // needed, and the header total remains the sum of the lines.
+      const lineNetAmount = Math.max(0, round2(line.subtotalAfterDiscount ?? line.subtotalPrice ?? 0))
+
+      const lineTaxSnapshot = computeChileTaxSnapshot({
+        code: taxResolution.record,
+        netAmount: lineNetAmount,
+        issuedAt: input.quoteDate
+      })
 
       await client.query(
         `INSERT INTO greenhouse_commercial.quotation_line_items (
@@ -556,13 +600,19 @@ export const persistQuotationPricing = async (
            effective_margin_pct,
            recurrence_type,
            currency,
-           notes
+           notes,
+           tax_code,
+           tax_rate_snapshot,
+           tax_amount_snapshot,
+           tax_snapshot_json,
+           is_tax_exempt
          ) VALUES (
            COALESCE($1, 'qli-' || gen_random_uuid()::text),
            $2, $3,
            (SELECT finance_quote_id FROM greenhouse_commercial.quotations WHERE quotation_id = $4),
            $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
-           $15, $16, $17, $18, $19, $20, $21, $22::jsonb, $23::jsonb, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34
+           $15, $16, $17, $18, $19, $20, $21, $22::jsonb, $23::jsonb, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34,
+           $35, $36, $37, $38::jsonb, $39
          )`,
         [
           line.lineItemId ?? null,
@@ -598,7 +648,12 @@ export const persistQuotationPricing = async (
           line.effectiveMarginPct,
           line.recurrenceType,
           line.currencyResolved,
-          line.notes ?? null
+          line.notes ?? null,
+          taxResolution.taxCode,
+          taxResolution.rateSnapshot,
+          lineTaxSnapshot.taxAmount,
+          JSON.stringify(lineTaxSnapshot),
+          taxResolution.isTaxExempt
         ]
       )
     }

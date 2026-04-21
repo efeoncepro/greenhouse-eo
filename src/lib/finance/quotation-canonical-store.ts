@@ -5,6 +5,7 @@ import type { PoolClient, QueryResult } from 'pg'
 import { resolveQuoteDeliveryModel } from '@/lib/commercial/delivery-model'
 import { query } from '@/lib/db'
 import { normalizeQuoteSalesContext } from '@/lib/commercial/sales-context'
+import { parsePersistedTaxSnapshot } from '@/lib/finance/pricing/quotation-tax-snapshot'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 type QueryableClient = Pick<PoolClient, 'query'>
@@ -49,6 +50,12 @@ type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
   subtotal: string | number | null
   tax_rate: string | number | null
   tax_amount: string | number | null
+  tax_code: string | null
+  tax_rate_snapshot: string | number | null
+  tax_amount_snapshot: string | number | null
+  tax_snapshot_json: unknown | null
+  is_tax_exempt: boolean | null
+  tax_snapshot_frozen_at: string | Date | null
   exchange_rate_to_clp: string | number | null
   nubox_sii_track_id: string | null
   nubox_emission_status: string | null
@@ -333,6 +340,12 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        q.subtotal,
        q.tax_rate,
        q.tax_amount,
+       q.tax_code,
+       q.tax_rate_snapshot,
+       q.tax_amount_snapshot,
+       q.tax_snapshot_json,
+       q.is_tax_exempt,
+       q.tax_snapshot_frozen_at,
        COALESCE(NULLIF(q.total_amount, 0), q.total_price, q.total_amount) AS total_amount,
        COALESCE(q.total_amount_clp, q.total_amount, q.total_price) AS total_amount_clp,
        q.exchange_rate_to_clp,
@@ -1194,6 +1207,18 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
   subtotal: row.subtotal !== null ? Number(row.subtotal) : null,
   taxRate: row.tax_rate !== null ? Number(row.tax_rate) : null,
   taxAmount: row.tax_amount !== null ? Number(row.tax_amount) : null,
+  taxCode: row.tax_code ?? null,
+  taxRateSnapshot: row.tax_rate_snapshot !== null && row.tax_rate_snapshot !== undefined
+    ? Number(row.tax_rate_snapshot)
+    : null,
+  taxAmountSnapshot: row.tax_amount_snapshot !== null && row.tax_amount_snapshot !== undefined
+    ? Number(row.tax_amount_snapshot)
+    : null,
+  taxSnapshot: parsePersistedTaxSnapshot(row.tax_snapshot_json),
+  isTaxExempt: Boolean(row.is_tax_exempt),
+  taxSnapshotFrozenAt: row.tax_snapshot_frozen_at
+    ? new Date(String(row.tax_snapshot_frozen_at)).toISOString()
+    : null,
   totalAmount: Number(row.total_amount ?? 0),
   totalAmountClp: Number(row.total_amount_clp ?? row.total_amount ?? 0),
   exchangeRateToClp: row.exchange_rate_to_clp !== null ? Number(row.exchange_rate_to_clp) : null,

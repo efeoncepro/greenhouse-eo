@@ -754,6 +754,7 @@ export interface GreenhouseCommercialQuotationLineItems {
   hours_estimated: Numeric | null;
   hubspot_line_item_id: string | null;
   hubspot_product_id: string | null;
+  is_tax_exempt: Generated<boolean>;
   label: string;
   legacy_tax_amount: Numeric | null;
   legacy_total_amount: Numeric | null;
@@ -780,6 +781,10 @@ export interface GreenhouseCommercialQuotationLineItems {
   subtotal_after_discount: Numeric | null;
   subtotal_cost: Numeric | null;
   subtotal_price: Numeric | null;
+  tax_amount_snapshot: Numeric | null;
+  tax_code: string | null;
+  tax_rate_snapshot: Numeric | null;
+  tax_snapshot_json: Json | null;
   tool_id: string | null;
   unit: Generated<string>;
   unit_cost: Numeric | null;
@@ -850,6 +855,10 @@ export interface GreenhouseCommercialQuotations {
   hubspot_quote_id: string | null;
   internal_notes: string | null;
   /**
+   * Derived flag for fast filtering — true when tax_code IN (cl_vat_exempt, cl_vat_non_billable).
+   */
+  is_tax_exempt: Generated<boolean>;
+  /**
    * Timestamp canónico de emisión documental. `sent_at` queda como columna legacy de compatibilidad mientras los consumers migran.
    */
   issued_at: Timestamp | null;
@@ -900,7 +909,18 @@ export interface GreenhouseCommercialQuotations {
   subtotal: Numeric | null;
   target_margin_pct: Numeric | null;
   tax_amount: Numeric | null;
+  tax_amount_snapshot: Numeric | null;
+  /**
+   * Canonical Chile tax code applied to the quote (cl_vat_19 / cl_vat_exempt / cl_vat_non_billable). See GREENHOUSE_FINANCE_ARCHITECTURE_V1 Delta 2026-04-21 (Chile tax foundation).
+   */
+  tax_code: string | null;
   tax_rate: Numeric | null;
+  tax_rate_snapshot: Numeric | null;
+  tax_snapshot_frozen_at: Timestamp | null;
+  /**
+   * Frozen ChileTaxSnapshot (version=1) with the rate, label, recoverability and amounts captured at issuance. Immutable — never recalculated retroactively.
+   */
+  tax_snapshot_json: Json | null;
   tcv: Numeric | null;
   total_amount: Numeric | null;
   total_amount_clp: Numeric | null;

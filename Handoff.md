@@ -1,5 +1,55 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-530 Quote Tax Explicitness Chile IVA (Claude Opus 4.7)
+
+- **Scope:** hace explícito el IVA Chile en cotizaciones — schema persiste snapshot tributario inmutable por versión, builder/PDF muestran Neto/IVA/Total, pricing engine sigue neto. Apoyado en TASK-529 (tax code foundation).
+- **Migration shipped + aplicada en dev:** `20260421162238991_task-530-quote-tax-snapshot.sql`:
+  - Extiende `greenhouse_commercial.quotations` con 6 columnas (`tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`).
+  - Extiende `greenhouse_commercial.quotation_line_items` con 5 columnas (mismo shape sin `frozen_at`).
+  - CHECK constraints: `tax_code ∈ {cl_vat_19, cl_vat_exempt, cl_vat_non_billable}`; `tax_code ⇔ snapshot ⇔ frozen_at` coherencia.
+  - Index parcial por `tax_code` para reports (filtro exentos mensuales).
+  - Backfill idempotente: rate≈0.19 → cl_vat_19, rate=0 → cl_vat_exempt, rate IS NULL → cl_vat_non_billable. Cada row obtiene snapshot sintético preservando legacy `tax_amount` con `metadata.backfillSource = 'TASK-530'`.
+- **Helpers nuevos** (`src/lib/finance/pricing/`):
+  - `quotation-tax-snapshot.ts` — server-only; expone `buildQuotationTaxSnapshot({netAmount, taxCode?, spaceId?, issuedAt?})` que llama a `resolveChileTaxCode` + `computeChileTaxSnapshot` (TASK-529). Default code `cl_vat_19`. Retorna `{snapshot, taxCode, isTaxExempt, rateSnapshot, taxAmountSnapshot, record}`. También `parsePersistedTaxSnapshot(raw)` defensivo para reads.
+  - `quotation-tax-constants.ts` — cliente-safe (sin `server-only`); expone `DEFAULT_CHILE_IVA_RATE = 0.19`, `QUOTE_TAX_CODE_{VALUES,RATES,LABELS}`, `isQuoteTaxCodeValue`, `previewChileTaxAmounts(netAmount, taxCode)`. Usado por el builder para preview optimista antes de que el server re-resuelva el catálogo.
+- **Orchestrator actualizado** (`quotation-pricing-orchestrator.ts`):
+  - `QuotationPricingInput` gana `taxCode?: string | null` + `spaceId?: string | null`.
+  - UPDATE del header escribe las 6 columnas nuevas en la misma transacción del pricing.
+  - INSERT de line items hereda `tax_code` del header y computa snapshot per-line proporcional a `subtotalAfterDiscount` usando `computeChileTaxSnapshot({code, netAmount, issuedAt})`.
+  - El pricing engine sigue retornando **neto** — el IVA es post-engine.
+- **Canonical store actualizado** (`quotation-canonical-store.ts`):
+  - `QuotationHeaderRow` + reads exponen `tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`.
+  - Mapper retorna `taxCode`, `taxRateSnapshot`, `taxAmountSnapshot`, `taxSnapshot: ChileTaxSnapshot | null`, `isTaxExempt`, `taxSnapshotFrozenAt`. Usa `parsePersistedTaxSnapshot` para tolerar rows legacy.
+- **UI wiring** (`QuoteBuilderShell` + `QuoteSummaryDock`):
+  - `QuoteBuilderShell` computa `taxPreview = previewChileTaxAmounts(subtotalOutputCurrency, 'cl_vat_19')` inline.
+  - `QuoteSummaryDock` recibe `ivaAmount={ivaAmountPreview}` + `total={totalWithIvaPreview}`. `subtotal` sigue siendo neto. El `TotalsLadder` ya tenía soporte para `ivaAmount` — solo faltaba el wiring.
+- **PDF** (`src/lib/finance/pdf/`):
+  - `contracts.ts` — `QuotationPdfTotals.tax` opcional con `{code, label, rate, amount, isExempt}`.
+  - `quotation-pdf-document.tsx` — renderiza una línea explícita entre Subtotal y Total: "IVA 19%" con monto, o "IVA Exento" / "No Afecto a IVA" con `—`.
+  - `src/app/api/finance/quotes/[id]/pdf/route.ts` — `QuotationHeaderRow` lee las 4 columnas tributarias; construye `totals.tax` con la etiqueta correcta + ajusta `total` para incluir IVA (engine returns net, invoice shows net+IVA).
+- **Tests (22/22 passing)**:
+  - `quotation-tax-constants.test.ts` (14 tests) — constantes, type guard, `previewChileTaxAmounts` para los 3 códigos + rounding + defensive inputs.
+  - `quotation-tax-snapshot.test.ts` (8 tests) — `buildQuotationTaxSnapshot` con default code, exempt code, frozenAt propagation, spaceId scope; `parsePersistedTaxSnapshot` con inválidos, wrong version, happy path, numeric coercion.
+- **Decisiones clave vs spec §Detailed Spec:**
+  - **Email template**: spec decía "PDF y email"; no existe template de quote email todavía. Shippeamos PDF; email queda como follow-up explícito (crear el template completo expande scope más allá de "tax explicitness").
+  - **UI selector de tax_code**: hoy el builder siempre graba `cl_vat_19` (default). Dropdown para elegir entre IVA / Exento / No Afecto queda como follow-up UI.
+  - **Per-line tax override**: schema soporta (cada línea tiene sus 5 columnas) pero UI solo edita el header V1.
+  - **Multi-currency**: el snapshot se computa sobre la moneda del quote (CLP/USD/CLF/etc.); no se convierte.
+- **Correcciones al audit inicial:** el subagente reportó `li.total_price` (no existe) — la columna real es `subtotal_price`. La migration corrigió el backfill antes de aplicar.
+- **Docs:**
+  - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — Delta TASK-530 al tope con columnas + flujo + backfill + cliente-safe module + follow-ups.
+  - `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` — bump a v2.32 con el Update del 2026-04-21.
+  - `docs/documentation/finance/iva-explicito-cotizaciones.md` — doc funcional nuevo explicando flujo operativo, 3 códigos, inmutabilidad, multi-currency, exento/no-afecto, FAQ.
+  - `docs/documentation/README.md` — link nuevo en la sección Finanzas.
+- **Verificación:** `pnpm migrate:up` + types regen OK · `pnpm lint` clean · `npx tsc --noEmit` clean · 22/22 tests passing.
+- **Cross-impact:**
+  - **TASK-529 (Chile Tax Foundation)** — consumidor principal; valida que el helper funciona con el catálogo real.
+  - **TASK-466 (Multi-Currency Quote Output)** — ahora puede leer el snapshot tributario al renderizar multi-moneda.
+  - **TASK-531 (Income tax inheritance)** — downstream; el income que nace del quote hereda `tax_code` + snapshot.
+  - **TASK-541 (Quote-to-cash)** — la choreography preserva el snapshot intacto durante la conversión (no recalcula).
+  - **TASK-533 (VAT Ledger mensual)** — consumidor futuro de los snapshots para consolidar débito/crédito fiscal.
+- **Out of scope (follow-ups):** dropdown de tax_code en builder; email template con breakdown IVA; per-line override UI; multi-jurisdiction (solo Chile V1); tests E2E del write path.
+
 ## Sesion 2026-04-21 — TASK-541 Quote-to-Cash Atomic Choreography (Claude Opus 4.7)
 
 - **Scope:** Fase G del programa Commercial Party Lifecycle (paraguas TASK-534). Cierra el loop end-to-end quote→contract→party→client→deal-won en un solo comando atómico con `correlation_id` UNIQUE propagado a todos los eventos. Desbloquea MRR materializer consumir triggers consistentes.

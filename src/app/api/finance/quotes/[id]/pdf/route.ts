@@ -28,6 +28,10 @@ interface QuotationHeaderRow extends Record<string, unknown> {
   total_discount: string | number | null
   total_price: string | number | null
   exchange_rates: unknown
+  tax_code: string | null
+  tax_rate_snapshot: string | number | null
+  tax_amount_snapshot: string | number | null
+  is_tax_exempt: boolean | null
 }
 
 interface QuotationOrgRow extends Record<string, unknown> {
@@ -98,7 +102,8 @@ export async function GET(
     `SELECT quotation_number, current_version, currency, quote_date, valid_until,
             description, client_name_cache, organization_id,
             total_price_before_discount, total_discount, total_price,
-            exchange_rates
+            exchange_rates,
+            tax_code, tax_rate_snapshot, tax_amount_snapshot, is_tax_exempt
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1`,
     [identity.quotationId]
@@ -193,7 +198,27 @@ export async function GET(
     totals: {
       subtotal: toNumberSafe(header.total_price_before_discount),
       totalDiscount: toNumberSafe(header.total_discount),
-      total: toNumberSafe(header.total_price)
+
+      // TASK-530: total INCLUDES IVA — the quotation header `total_price` is
+      // net (no IVA) per pricing engine contract. We add the snapshot amount
+      // so the PDF headline matches the invoice that will follow.
+      total: toNumberSafe(header.total_price) + toNumberSafe(header.tax_amount_snapshot),
+      tax: header.tax_code
+        ? {
+            code: header.tax_code,
+            label:
+              header.tax_code === 'cl_vat_19'
+                ? `IVA ${Number(header.tax_rate_snapshot ?? 0.19) * 100}%`
+                : header.tax_code === 'cl_vat_exempt'
+                  ? 'IVA Exento'
+                  : 'No Afecto a IVA',
+            rate: header.tax_rate_snapshot !== null && header.tax_rate_snapshot !== undefined
+              ? Number(header.tax_rate_snapshot)
+              : null,
+            amount: toNumberSafe(header.tax_amount_snapshot),
+            isExempt: Boolean(header.is_tax_exempt)
+          }
+        : null
     },
     terms: includedTerms,
     fxFooter

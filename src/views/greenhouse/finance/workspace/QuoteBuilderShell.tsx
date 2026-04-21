@@ -30,6 +30,7 @@ import { UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE } from '@/lib/finance/pricing/quo
 import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { previewChileTaxAmounts } from '@/lib/finance/pricing/quotation-tax-constants'
 
 import AddLineSplitButton from '@/components/greenhouse/pricing/AddLineSplitButton'
 import QuoteContextStrip from '@/components/greenhouse/pricing/QuoteContextStrip'
@@ -1193,6 +1194,19 @@ const QuoteBuilderShell = ({
 
   const totalOutputCurrency = simulation?.totals.totalOutputCurrency ?? null
   const subtotalOutputCurrency = simulation?.totals.totalOutputCurrency ?? null // same for now — engine returns consolidated totalOutputCurrency
+
+  // TASK-530: preview IVA amount + total-con-IVA client-side so the summary
+  // dock shows Neto / IVA / Total. Uses the default Chile 19% rate; the
+  // server re-resolves the canonical rate from the catalogue at issue time.
+  // Engine output is NET (no IVA) — subtotal prop stays net; total prop
+  // becomes net + IVA so the dock headline matches the invoice.
+  const taxPreview = subtotalOutputCurrency !== null
+    ? previewChileTaxAmounts(subtotalOutputCurrency, 'cl_vat_19')
+    : null
+
+  const ivaAmountPreview = taxPreview?.taxAmount ?? null
+  const totalWithIvaPreview = taxPreview?.totalAmount ?? totalOutputCurrency
+
   const factorApplied = simulation?.totals.countryFactorApplied ?? null
   const marginPct = simulation?.aggregateMargin.marginPct ?? null
   const marginClass = simulation?.aggregateMargin.classification ?? null
@@ -1485,7 +1499,8 @@ const QuoteBuilderShell = ({
         <QuoteSummaryDock
           subtotal={subtotalOutputCurrency}
           factor={factorApplied}
-          total={totalOutputCurrency}
+          ivaAmount={ivaAmountPreview}
+          total={totalWithIvaPreview}
           currency={currency}
           loading={simulating}
           addonCount={addonPanelEntries.length}

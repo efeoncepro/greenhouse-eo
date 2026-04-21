@@ -2,6 +2,25 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-530 Quote Tax Explicitness Chile IVA shipped
+
+- IVA Chile queda como contrato de primer nivel en el write path canónico de cotizaciones: quotation header y line items persisten snapshot tributario inmutable (tax_code + rate + amount + jsonb completo + frozen_at), el builder muestra Neto/IVA/Total en vivo, el detail expone el snapshot via canonical store, y el PDF renderiza la línea de IVA entre Subtotal y Total. Desbloquea TASK-466 (multi-currency PDF) y TASK-533 (VAT ledger).
+- **Migration** (`20260421162238991_..quote-tax-snapshot.sql`): 6 columnas nuevas en `quotations` (`tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`) + 5 en `quotation_line_items` + 2 CHECK constraints (tax_code whitelist de 3 canónicos + tax_rate_snapshot >= 0) + backfill idempotente clasificando histórico por rate: 0.19→cl_vat_19, 0→cl_vat_exempt, NULL→cl_vat_non_billable con `metadata.backfillSource='TASK-530'`.
+- **Helper server-side** (`src/lib/finance/pricing/quotation-tax-snapshot.ts`): `buildQuotationTaxSnapshot({netAmount, taxCode, spaceId, issuedAt})` resuelve código via `resolveChileTaxCode` (TASK-529 foundation) + computa snapshot via `computeChileTaxSnapshot` + congela con `frozenAt`. `parsePersistedTaxSnapshot` valida jsonb inmutable con version guard, coerción numérica y fallback a metadata vacío. `DEFAULT_QUOTE_TAX_CODE='cl_vat_19'`.
+- **Constants client-safe** (`quotation-tax-constants.ts`, NO `server-only`): `previewChileTaxAmounts(netAmount, taxCode)` sincrónico para preview UI sin importar server-only. `QUOTE_TAX_CODE_RATES` + `QUOTE_TAX_CODE_LABELS` para render client-side.
+- **Orchestrator** (`quotation-pricing-orchestrator.ts`): `QuotationPricingInput` gana `taxCode?` + `spaceId?`. Al persistir header hace UPDATE con 5 cols nuevas; para cada line item computa snapshot proporcional con `computeChileTaxSnapshot` (misma tasa/código, netAmount = line subtotal) en el INSERT. Pricing engine sigue 100% neto — tax es capa post-pricing documental.
+- **Canonical store** (`quotation-canonical-store.ts`): `CanonicalQuoteRow` expone `taxCode`, `taxRateSnapshot`, `taxAmountSnapshot`, `taxSnapshot` (parseado), `isTaxExempt`, `taxSnapshotFrozenAt` para downstream consumers (PDF, detail, email futuro).
+- **UI Quote Builder** (`QuoteBuilderShell.tsx`): import `previewChileTaxAmounts` client-safe, computa `taxPreview` + `ivaAmountPreview` + `totalWithIvaPreview`, pasa `ivaAmount` y `total` (con IVA incluido) al `QuoteSummaryDock`. Headline ya refleja total con IVA 19% default.
+- **PDF** (`pdf/contracts.ts` + `quotation-pdf-document.tsx` + `/api/finance/quotes/[id]/pdf/route.ts`): `QuotationPdfTotals.tax` opcional — render muestra "IVA 19% · $X" para gravado o "IVA Exento · —" para exento/no-afecto. Dynamic label desde el snapshot (no hardcoded 0.19).
+- **Tests**: 22/22 passing — 14 para constants (preview, coerción, exento, non-billable, edge cases) + 8 para helper (default code, exento, frozenAt, spaceId override, parsePersistedTaxSnapshot validation).
+- **Decisiones vs spec:**
+  - Spec pedía "UI para editar tax_code por line item"; entregado solo default `cl_vat_19` en header. Dropdown queda como follow-up UI — schema ya lo soporta.
+  - Spec pedía "PDF y email"; email template no existe aún — cuando se cree debe leer `quotation.taxSnapshot`.
+  - Pricing engine 100% neto confirmado — IVA nunca contamina margin reporting ni ICO engine.
+- **Cross-impact**: income materialization (TASK-531) hereda `tax_code` desde quotation snapshot. Quote-to-cash (TASK-541) preserva snapshot en la choreography atómica. VAT ledger (TASK-533) consumirá `tax_snapshot_json` para consolidación mensual.
+- **Docs**: `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta TASK-530 + `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` bump a v2.32 + doc funcional nueva `docs/documentation/finance/iva-explicito-cotizaciones.md` (neto/IVA/total, 3 códigos canónicos, inmutabilidad, multi-moneda, exentos, FAQ).
+- **Follow-ups**: dropdown UI de tax_code en QuoteContextStrip; per-line tax override UI; email template con contract de Neto/IVA/Total; multi-jurisdiction seeding; E2E del write path + rehidratación.
+
 ### 2026-04-21 — TASK-541 Quote-to-Cash Atomic Choreography (Fase G) shipped
 
 - Fase G del programa Party Lifecycle (paraguas TASK-534) shipped. Cierra el loop quote→contract→party→client→deal-won en una sola transacción atómica. Desbloquea MRR/ARR materializer, cost attribution, y outbound bidirectional (TASK-540).

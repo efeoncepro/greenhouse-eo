@@ -4,6 +4,60 @@
 > **Created:** 2026-03-30
 > **Last updated:** 2026-04-21
 
+## Delta 2026-04-21 — Quote Tax Explicitness Chile IVA (TASK-530)
+
+`greenhouse_commercial.quotations` y `quotation_line_items` ahora persisten un snapshot tributario inmutable por versión. El pricing engine sigue trabajando en **neto**; el IVA se añade como contrato documental en builder / detail / PDF.
+
+### Nuevas columnas
+
+En `greenhouse_commercial.quotations` y `quotation_line_items`:
+
+| Columna | Uso |
+|---|---|
+| `tax_code` | Canonical code (`cl_vat_19` / `cl_vat_exempt` / `cl_vat_non_billable`). |
+| `tax_rate_snapshot` | Tasa congelada (null para exento / no-facturable). |
+| `tax_amount_snapshot` | Monto de IVA en moneda del quote. |
+| `tax_snapshot_json` | Snapshot completo `ChileTaxSnapshot` v1 con `frozenAt`. |
+| `is_tax_exempt` | Derivado — true para `vat_exempt`/`vat_non_billable`. |
+| `tax_snapshot_frozen_at` (solo header) | Timestamp del congelamiento. |
+
+CHECK constraints aseguran: `tax_code ∈ {cl_vat_19, cl_vat_exempt, cl_vat_non_billable}` y coherencia `tax_code ⇔ tax_snapshot_json ⇔ tax_snapshot_frozen_at`.
+
+### Flujo de persistencia
+
+`persistQuotationPricing` llama a `buildQuotationTaxSnapshot({ netAmount, taxCode?, spaceId?, issuedAt })` (default `cl_vat_19`) y graba las 5 columnas del header. Cada line item hereda el `tax_code` y graba su propio snapshot proporcional a `subtotalAfterDiscount`. El pricing engine sigue retornando **neto**; el IVA se computa post-engine.
+
+### UI / PDF
+
+- **Builder**: el `QuoteSummaryDock` recibe `ivaAmount` (preview cliente-side con `previewChileTaxAmounts` — 19% Chile default). `subtotal` neto, `total` con IVA. `TotalsLadder` renderiza `Subtotal · IVA · Total` cuando hay IVA.
+- **PDF**: `RenderQuotationPdfInput.totals.tax` (opcional) con `{ code, label, rate, amount, isExempt }`. El documento muestra una línea explícita "IVA 19%" / "IVA Exento" / "No Afecto a IVA" entre Subtotal y Total.
+- **Detail**: el canonical store expone `taxCode`, `taxRate`, `taxAmount`, `taxSnapshot`, `isTaxExempt` vía `getFinanceQuoteDetailFromCanonical`.
+
+### Backfill
+
+Migración backfilla rows existentes: `tax_rate ≈ 0.19` → `cl_vat_19`; `tax_rate = 0` → `cl_vat_exempt`; `tax_rate IS NULL` → `cl_vat_non_billable`. Cada row obtiene un snapshot sintético que preserva el legacy `tax_amount`.
+
+### Cliente-safe module
+
+`src/lib/finance/pricing/quotation-tax-constants.ts` expone `DEFAULT_CHILE_IVA_RATE`, `QUOTE_TAX_CODE_LABELS`, `QUOTE_TAX_CODE_RATES`, `previewChileTaxAmounts()` sin `server-only` para que builder / dock / detail / PDF renderer hagan preview optimista antes de persistir. El server siempre re-resuelve el rate real desde el catálogo (`resolveChileTaxCode`) al issue time.
+
+### Archivos clave
+
+- `src/lib/finance/pricing/quotation-tax-snapshot.ts` — server helper + serializer.
+- `src/lib/finance/pricing/quotation-tax-constants.ts` — client preview constants.
+- `src/lib/finance/pricing/quotation-pricing-orchestrator.ts` — writes persisten snapshot.
+- `src/lib/finance/quotation-canonical-store.ts` — reads exponen snapshot.
+- `src/lib/finance/pdf/{contracts,quotation-pdf-document}.tsx` — PDF renderiza IVA.
+- `src/components/greenhouse/pricing/QuoteSummaryDock.tsx` — dock wiring.
+- Migration: `20260421162238991_task-530-quote-tax-snapshot.sql`.
+
+### Follow-ups
+
+1. Selector explícito de `tax_code` en el builder (dropdown con IVA 19% / Exento / No Afecto). Hoy el default es `cl_vat_19`; el operador no lo puede cambiar sin edit post-issue.
+2. Email template que incluya el breakdown de IVA (`src/emails/` no tiene template de quote aún).
+3. Per-line override de tax_code cuando haya casos mixtos (schema ya soporta; UI pendiente).
+4. Integración con income bridge (TASK-524 / TASK-531): el income hereda `tax_code` del quote al materializarse.
+
 ## Delta 2026-04-21 — Income → HubSpot Invoice Bridge (TASK-524)
 
 `greenhouse_finance.income` es espejado reactivamente a HubSpot como objeto nativo `invoice` (**non-billable mirror**, `hs_invoice_billable=false`). Nubox sigue siendo el emisor tributario; HubSpot es una proyección read-only para continuidad CRM.
