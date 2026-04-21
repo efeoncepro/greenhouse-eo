@@ -11,6 +11,16 @@ import {
   checkDiscountHealth,
   resolveMarginTarget
 } from '@/lib/finance/pricing'
+import { assertSupportedCurrencyForDomain } from '@/lib/finance/currency-domain'
+import { resolveFxReadiness } from '@/lib/finance/fx-readiness'
+import {
+  buildQuotationFxSnapshot,
+  type QuotationFxSnapshot
+} from '@/lib/finance/quotation-fx-snapshot'
+import {
+  evaluateQuotationFxReadinessGate,
+  QuotationFxReadinessError
+} from '@/lib/finance/quotation-fx-readiness-gate'
 
 interface QuotationHeaderRow extends Record<string, unknown> {
   business_line_code: string | null
@@ -27,7 +37,15 @@ interface QuotationHeaderRow extends Record<string, unknown> {
   current_version: number
   quote_date: string | Date | null
   status: string
+  currency: string | null
 }
+
+// Canonical internal anchor for quotation FX snapshots. The pricing engine
+// surfaces quote totals in the output currency, but the readiness matrix
+// for pricing_output is bound to USD as the base comparator (see
+// GREENHOUSE_FX_CURRENCY_PLATFORM_V1). Resolving USD→outputCurrency keeps
+// the snapshot payload aligned with the resolver contract.
+const QUOTATION_FX_BASE_CURRENCY = 'USD' as const
 
 interface QuotationLineRow extends Record<string, unknown> {
   line_item_id: string
@@ -67,6 +85,7 @@ export interface RequestQuotationIssueResult {
   newStatus: 'issued' | 'pending_approval'
   steps?: ApprovalStep[]
   health: ReturnType<typeof checkDiscountHealth>
+  fxSnapshot?: QuotationFxSnapshot | null
 }
 
 export const requestQuotationIssue = async (
@@ -75,7 +94,7 @@ export const requestQuotationIssue = async (
   const headerRows = await query<QuotationHeaderRow>(
     `SELECT business_line_code, pricing_model, commercial_model, staffing_model, total_cost, total_price_before_discount,
             total_discount, total_price, effective_margin_pct, target_margin_pct,
-            margin_floor_pct, current_version, quote_date, status
+            margin_floor_pct, current_version, quote_date, status, currency
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1
          AND (
@@ -109,6 +128,29 @@ export const requestQuotationIssue = async (
 
   if (!ISSUE_ALLOWED_STATUSES.has(header.status)) {
     throw new Error(`Estado inválido para emisión: ${header.status}.`)
+  }
+
+  // ── FX readiness gate (TASK-466) ──────────────────────────────────────
+  // Resolve the output currency against the canonical resolver and enforce
+  // the client-facing stricter policy BEFORE opening approval steps. This
+  // prevents wasting a reviewer's time on a quote that couldn't be sent to
+  // the client anyway because the pair is unsupported or the rate is stale.
+  const outputCurrency = assertSupportedCurrencyForDomain(
+    header.currency ?? 'CLP',
+    'pricing_output'
+  )
+
+  const fxReadiness = await resolveFxReadiness({
+    fromCurrency: QUOTATION_FX_BASE_CURRENCY,
+    toCurrency: outputCurrency,
+    rateDate: toIsoDate(header.quote_date),
+    domain: 'pricing_output'
+  })
+
+  const gateDecision = evaluateQuotationFxReadinessGate({ readiness: fxReadiness })
+
+  if (!gateDecision.allowed) {
+    throw new QuotationFxReadinessError(fxReadiness, gateDecision)
   }
 
   const lineRows = await query<QuotationLineRow>(
@@ -192,9 +234,20 @@ export const requestQuotationIssue = async (
       approvalRequired: true,
       newStatus: 'pending_approval',
       steps: result.steps,
-      health
+      health,
+
+      // Snapshot is NOT frozen yet; it will be resolved again at approval
+      // time so the rate stays faithful to the moment the quote actually
+      // becomes `issued`. The readiness gate has already cleared.
+      fxSnapshot: null
     }
   }
+
+  const fxSnapshot = buildQuotationFxSnapshot({
+    readiness: fxReadiness,
+    outputCurrency,
+    baseCurrency: QUOTATION_FX_BASE_CURRENCY
+  })
 
   await recordAudit({
     quotationId: params.quotationId,
@@ -207,7 +260,17 @@ export const requestQuotationIssue = async (
       marginPct: health.quotationMarginPct,
       marginFloorPct: health.marginFloorPct,
       marginTargetPct: health.marginTargetPct,
-      currentStatus: header.status
+      currentStatus: header.status,
+      fxReadiness: {
+        outputCurrency,
+        state: fxReadiness.state,
+        rate: fxReadiness.rate,
+        rateDateResolved: fxReadiness.rateDateResolved,
+        source: fxReadiness.source,
+        composedViaUsd: fxReadiness.composedViaUsd,
+        gateCode: gateDecision.code,
+        gateSeverity: gateDecision.severity
+      }
     }
   })
 
@@ -220,7 +283,8 @@ export const requestQuotationIssue = async (
     pricingModel: header.pricing_model,
     commercialModel: header.commercial_model,
     staffingModel: header.staffing_model,
-    viaApproval: false
+    viaApproval: false,
+    fxSnapshot
   })
 
   return {
@@ -229,6 +293,7 @@ export const requestQuotationIssue = async (
     sent: true,
     approvalRequired: false,
     newStatus: 'issued',
-    health
+    health,
+    fxSnapshot
   }
 }

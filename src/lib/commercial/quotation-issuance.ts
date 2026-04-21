@@ -9,6 +9,8 @@ import {
   publishQuotationIssued,
   publishQuotationApproved
 } from '@/lib/commercial/quotation-events'
+import type { QuotationFxSnapshot } from '@/lib/finance/quotation-fx-snapshot'
+import { serializeQuotationFxSnapshotForJsonb } from '@/lib/finance/quotation-fx-snapshot'
 
 import { captureSalesContextAtSent } from './sales-context'
 
@@ -30,6 +32,15 @@ export interface FinalizeQuotationIssuedParams {
   staffingModel?: string | null
   viaApproval?: boolean
   client?: QueryableClient
+
+  /**
+   * TASK-466 — Canonical FX snapshot frozen at issue time. When present,
+   * `persistIssuedState` writes it into `quotations.exchange_rates` (JSONB)
+   * and updates `exchange_snapshot_date` so PDF/email/detail consumers read
+   * the same payload without re-resolving FX later. Null/undefined means
+   * leave the existing FX payload untouched (legacy path).
+   */
+  fxSnapshot?: QuotationFxSnapshot | null
 }
 
 const persistIssuedState = async (
@@ -64,6 +75,22 @@ const persistIssuedState = async (
     [params.quotationId, params.actor.userId, params.viaApproval === true]
   )
 
+  if (params.fxSnapshot) {
+    const payload = serializeQuotationFxSnapshotForJsonb(params.fxSnapshot)
+
+    const snapshotDate =
+      params.fxSnapshot.rateDateResolved ?? params.fxSnapshot.frozenAt.slice(0, 10)
+
+    await client.query(
+      `UPDATE greenhouse_commercial.quotations
+          SET exchange_rates = $2::jsonb,
+              exchange_snapshot_date = $3::date,
+              updated_at = CURRENT_TIMESTAMP
+        WHERE quotation_id = $1`,
+      [params.quotationId, JSON.stringify(payload), snapshotDate]
+    )
+  }
+
   await recordAudit(
     {
       quotationId: params.quotationId,
@@ -72,7 +99,19 @@ const persistIssuedState = async (
       actorUserId: params.actor.userId,
       actorName: params.actor.name,
       details: {
-        viaApproval: params.viaApproval === true
+        viaApproval: params.viaApproval === true,
+        fxSnapshot: params.fxSnapshot
+          ? {
+              outputCurrency: params.fxSnapshot.outputCurrency,
+              baseCurrency: params.fxSnapshot.baseCurrency,
+              rate: params.fxSnapshot.rate,
+              rateDateResolved: params.fxSnapshot.rateDateResolved,
+              source: params.fxSnapshot.source,
+              composedViaUsd: params.fxSnapshot.composedViaUsd,
+              readinessState: params.fxSnapshot.readinessState,
+              ageDays: params.fxSnapshot.ageDays
+            }
+          : null
       }
     },
     client

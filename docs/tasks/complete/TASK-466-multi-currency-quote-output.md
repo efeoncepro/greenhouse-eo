@@ -1,5 +1,30 @@
 # TASK-466 — Multi-Currency Quote Output (Client View + PDF + Email)
 
+## Delta 2026-04-20 — Cierre V1 (Claude Opus 4.7)
+
+Merge-candidate en rama `task/TASK-466-multi-currency-quote-output`. Cubre los 4 slices del scope:
+
+1. **Snapshot + gating en issue** — `requestQuotationIssue` resuelve `resolveFxReadiness(USD→currency, pricing_output)` y aplica `evaluateQuotationFxReadinessGate` con threshold cliente-facing (3 días) antes de abrir approval steps. Si el gate bloquea, responde HTTP 422 con `QuotationFxReadinessError`. `finalizeQuotationIssued` congela `QuotationFxSnapshot` canónico en `exchange_rates.__snapshot` + `exchange_snapshot_date`, manteniendo backward-compat para readers que iteran `Object.entries(exchange_rates)`. Approval flow re-resuelve FX al aprobar (no bloquea en stale, registra warning en audit).
+2. **PDF alineado al snapshot** — `quotation-pdf-document.tsx` agrega footer "Tipo de cambio aplicado" cuando `outputCurrency !== baseCurrency` o `composedViaUsd`. PDF y endpoint `/pdf` leen snapshot persistido sin re-resolver FX.
+3. **Send dialog readiness warnings** — `QuoteSendDialog` acepta `fxReadiness?` y muestra Alert con severidad mapeada al `FxReadinessGateDecision`. `QuoteDetailView` hace prefetch del readiness en `handleOpenSendDialog`. Bloquea el botón de emitir cuando `blocking=true`.
+4. **Detail toggle + document chain** — nuevo componente `QuoteCurrencyView` con toggle USD/moneda cliente consumiendo `/api/finance/quotes/[id]/fx-snapshot` (endpoint nuevo, read-only). `QuotationDocumentChain.quotation` expone `fxSnapshot` para downstream.
+
+**Prerequisito SQL**: migración `20260421011323497_task-466-expand-quotation-currency-constraint.sql` relaja el CHECK de `greenhouse_commercial.quotations.currency` (y tablas hermanas) a las 6 monedas `pricing_output` declaradas. Sin esta migración Postgres rechazaba cualquier quote en `MXN/COP/PEN`.
+
+**Decisiones pinned:**
+
+- No se abrió columna `output_currency` — el contrato vive en `currency + exchange_rates + exchange_snapshot_date`.
+- Shape canónico del JSONB: `{__snapshot: QuotationFxSnapshot, <outputCurrency>: rate, CLP: rate}`. La clave `__snapshot` es la fuente de verdad; las keys currency-indexadas quedan para readers legacy.
+- Gate client-facing más estricto que el domain threshold: `CLIENT_FACING_STALENESS_THRESHOLD_DAYS = 3d` vs `pricing_output = 7d`.
+- `QuotationFxReadinessError` traducido como HTTP 422 en `/issue` y `/send` (no 400) con body `{error, code, severity, readiness}`.
+- Approval path: resolver readiness a la hora de aprobar, construir snapshot "best effort" aunque gate haya degradado de supported a stale (no re-bloquear approval). Audit captura la decisión.
+
+**Verificación**: `pnpm tsc --noEmit` 0 errores · `pnpm lint` sólo 1 warning pre-existente en BulkEditDrawer (no nuestro) · `pnpm test` 1569/1569 pasan · `pnpm build` OK.
+
+**Out of scope de V1 confirmado**: (a) template email outbound client-facing completo (Slice 3 cubrió gating y snapshot reutilizable; el template Resend/@react-email es task separada cuando se decida el branding), (b) bidirectional currency conversion, (c) lock rate por cliente, (d) historia FX a nivel línea.
+
+**Blocker operacional remanente (no merge-blocker)**: CLF/COP/MXN/PEN siguen `manual_only` hasta TASK-485. Para emitir quotes en esas monedas en staging/prod un admin de finance debe `POST /api/admin/fx/sync-pair` con la tasa manual.
+
 ## Delta 2026-04-19 — Reanclaje a builder full-page
 
 La spec original asumía que el selector de `output_currency` vivía y seguiría viviendo en `QuoteCreateDrawer`. Esa superficie ya quedó chica para el quote builder y el programa ahora formaliza el pivot en `TASK-473`.
@@ -50,7 +75,7 @@ La revisión contra el repo confirma que parte relevante de la foundation ya ate
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`

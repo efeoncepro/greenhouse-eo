@@ -27,6 +27,21 @@ export interface QuotationPdfTerm {
   sortOrder: number
 }
 
+/**
+ * TASK-466 — Optional FX snapshot footer. Rendered by the PDF document when
+ * the quote output currency required a conversion (i.e. the snapshot differs
+ * from the canonical USD anchor, or was composed via USD). For USD-direct or
+ * pure-CLP quotes this field may be omitted.
+ */
+export interface QuotationPdfFxFooter {
+  outputCurrency: string
+  baseCurrency: string
+  rate: number
+  rateDateResolved: string | null
+  source: string | null
+  composedViaUsd: boolean
+}
+
 export interface RenderQuotationPdfInput {
   quotationId: string
   quotationNumber: string
@@ -40,4 +55,5 @@ export interface RenderQuotationPdfInput {
   lineItems: QuotationPdfLineItem[]
   totals: QuotationPdfTotals
   terms: QuotationPdfTerm[]
+  fxFooter?: QuotationPdfFxFooter | null
 }

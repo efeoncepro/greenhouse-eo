@@ -6,6 +6,7 @@ import {
   quotationIdentityHasTenantAnchor,
   tenantCanAccessQuotationIdentity
 } from '@/lib/finance/pricing/quotation-tenant-access'
+import { QuotationFxReadinessError } from '@/lib/finance/quotation-fx-readiness-gate'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -52,6 +53,23 @@ export async function POST(
       }
     })
   } catch (error) {
+    if (error instanceof QuotationFxReadinessError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          code: error.code,
+          severity: error.severity,
+          readiness: error.readiness
+        },
+        {
+          status: error.statusCode,
+          headers: {
+            'X-Greenhouse-Compatibility-Route': 'issue'
+          }
+        }
+      )
+    }
+
     const message = error instanceof Error ? error.message : 'No pudimos emitir la cotización.'
 
     const status = message.includes('not found')

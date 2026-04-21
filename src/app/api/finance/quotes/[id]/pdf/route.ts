@@ -6,7 +6,11 @@ import { listQuotationTerms } from '@/lib/commercial/governance/terms-store'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
 import { getFinanceQuoteDetailFromCanonical } from '@/lib/finance/quotation-canonical-store'
 import { renderQuotationPdf } from '@/lib/finance/pdf/render-quotation-pdf'
-import type { RenderQuotationPdfInput } from '@/lib/finance/pdf/contracts'
+import type {
+  QuotationPdfFxFooter,
+  RenderQuotationPdfInput
+} from '@/lib/finance/pdf/contracts'
+import { extractQuotationFxSnapshot } from '@/lib/finance/quotation-fx-snapshot'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -23,6 +27,7 @@ interface QuotationHeaderRow extends Record<string, unknown> {
   total_price_before_discount: string | number | null
   total_discount: string | number | null
   total_price: string | number | null
+  exchange_rates: unknown
 }
 
 interface QuotationOrgRow extends Record<string, unknown> {
@@ -92,7 +97,8 @@ export async function GET(
   const headerRows = await query<QuotationHeaderRow>(
     `SELECT quotation_number, current_version, currency, quote_date, valid_until,
             description, client_name_cache, organization_id,
-            total_price_before_discount, total_discount, total_price
+            total_price_before_discount, total_discount, total_price,
+            exchange_rates
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1`,
     [identity.quotationId]
@@ -143,6 +149,29 @@ export async function GET(
   const versionNumber = Number(header.current_version ?? 1)
   const currency = String(header.currency || 'CLP').toUpperCase()
 
+  // TASK-466 — Build FX footer from the snapshot frozen at issue time. The
+  // footer is only shown when the output currency required conversion
+  // (non-USD output OR composed via USD). For USD-direct or CLP quotes with
+  // no snapshot the footer is omitted.
+  const fxSnapshot = extractQuotationFxSnapshot(header.exchange_rates)
+  let fxFooter: QuotationPdfFxFooter | null = null
+
+  if (fxSnapshot) {
+    const shouldRenderFooter =
+      fxSnapshot.outputCurrency !== fxSnapshot.baseCurrency || fxSnapshot.composedViaUsd
+
+    if (shouldRenderFooter) {
+      fxFooter = {
+        outputCurrency: fxSnapshot.outputCurrency,
+        baseCurrency: fxSnapshot.baseCurrency,
+        rate: fxSnapshot.rate,
+        rateDateResolved: fxSnapshot.rateDateResolved,
+        source: fxSnapshot.source,
+        composedViaUsd: fxSnapshot.composedViaUsd
+      }
+    }
+  }
+
   const pdfInput: RenderQuotationPdfInput = {
     quotationId: identity.quotationId,
     quotationNumber,
@@ -166,7 +195,8 @@ export async function GET(
       totalDiscount: toNumberSafe(header.total_discount),
       total: toNumberSafe(header.total_price)
     },
-    terms: includedTerms
+    terms: includedTerms,
+    fxFooter
   }
 
   const pdfBuffer = await renderQuotationPdf(pdfInput)

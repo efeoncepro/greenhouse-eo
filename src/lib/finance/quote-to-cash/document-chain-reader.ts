@@ -1,6 +1,10 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import {
+  extractQuotationFxSnapshot,
+  type QuotationFxSnapshot
+} from '@/lib/finance/quotation-fx-snapshot'
 
 export interface QuotationDocumentChainPurchaseOrder {
   poId: string
@@ -58,6 +62,13 @@ export interface QuotationDocumentChain {
     number: string | null
     status: string
     currency: string
+
+    /**
+     * TASK-466 — Canonical FX snapshot frozen at issue time. Null for quotes
+     * emitted before TASK-466 landed or for quotes still in `draft`. Downstream
+     * UIs can surface the rate/source/composedViaUsd without re-resolving FX.
+     */
+    fxSnapshot: QuotationFxSnapshot | null
     pricingProvenance: {
       lineCount: number
       replayableLineCount: number
@@ -111,6 +122,7 @@ interface QuotationRow extends Record<string, unknown> {
   total_price: string | number | null
   total_amount: string | number | null
   total_amount_clp: string | number | null
+  exchange_rates: unknown
 }
 
 interface PoRow extends Record<string, unknown> {
@@ -228,7 +240,7 @@ export const readQuotationDocumentChain = async ({
 }): Promise<QuotationDocumentChain> => {
   const quotationRows = await query<QuotationRow>(
     `SELECT quotation_id, quotation_number, status, currency,
-            total_price, total_amount, total_amount_clp
+            total_price, total_amount, total_amount_clp, exchange_rates
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1
        LIMIT 1`,
@@ -359,6 +371,7 @@ export const readQuotationDocumentChain = async ({
           number: quotation.quotation_number ? String(quotation.quotation_number) : null,
           status: String(quotation.status),
           currency: String(quotation.currency || 'CLP'),
+          fxSnapshot: extractQuotationFxSnapshot(quotation.exchange_rates),
           pricingProvenance: {
             lineCount: num(pricingProvenance?.line_count),
             replayableLineCount: num(pricingProvenance?.replayable_line_count),
