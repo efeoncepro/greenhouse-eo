@@ -1,3 +1,20 @@
+## Delta 2026-04-21 TASK-540 aterriza la foundation outbound de Party Lifecycle
+
+- Greenhouse ya tiene carril reactivo local para devolver lifecycle comercial hacia HubSpot Companies.
+- Contrato nuevo:
+  - projection `src/lib/sync/projections/party-hubspot-outbound.ts`
+  - helper `src/lib/hubspot/push-party-lifecycle.ts`
+  - tabla `greenhouse_commercial.party_sync_conflicts`
+  - helpers `src/lib/sync/field-authority.ts` y `src/lib/sync/anti-ping-pong.ts`
+  - eventos `commercial.party.hubspot_synced_out` y `commercial.party.sync_conflict`
+  - script `scripts/create-hubspot-company-custom-properties.ts`
+- Reglas operativas:
+  - el outbound solo escribe campos Greenhouse-owned; HubSpot sigue siendo owner de `name`, `domain`, `industry`, address y phone
+  - `gh_last_write_at` es el anchor canónico del anti-ping-pong; el inbound `sync-hubspot-company-lifecycle.ts` ya lo consume para skippear loopbacks
+  - el write HTTP usa `GREENHOUSE_INTEGRATION_API_TOKEN` contra el servicio externo `hubspot-greenhouse-integration`
+  - si el servicio externo aún no expone o no tiene deployado `PATCH /companies/:id/lifecycle`, Greenhouse degrada a `endpoint_not_deployed` sin romper el reactor
+  - la decisión V1 de compliance es exportar `gh_mrr_tier`; no se empuja monto bruto `gh_mrr_clp`
+
 ## Delta 2026-04-21 TASK-537 cierra la Fase C de party lifecycle con search/adopt backend-only
 
 - Greenhouse ya tiene carril backend para buscar y adoptar parties comerciales antes de la UI unificada del Quote Builder.
@@ -5018,6 +5035,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF`
 - `EMAIL_FROM`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+- `GREENHOUSE_INTEGRATION_API_TOKEN` — token compartido para autenticar writes Greenhouse → servicio externo `hubspot-greenhouse-integration` (`PATCH /companies/:id/lifecycle`, `/deals`, y futuros endpoints outbound).
 - `AGENT_AUTH_SECRET` — shared secret para autenticación headless de agentes y E2E (generar con `openssl rand -hex 32`). Sin esta variable el endpoint `/api/auth/agent-session` responde 404.
 - `AGENT_AUTH_EMAIL` — email del usuario a autenticar en modo headless. Debe existir en la tabla de acceso de tenants.
 - `AGENT_AUTH_ALLOW_PRODUCTION` — `true` para permitir agent auth en production (no recomendado). Por defecto bloqueado cuando `VERCEL_ENV === 'production'`.
@@ -5043,6 +5061,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `RESEND_API_KEY_SECRET_REF` es el contrato canónico recomendado cuando el mismo flujo de email puede correr en más de un runtime (por ejemplo Vercel + Cloud Run); el valor directo `RESEND_API_KEY` queda como fallback legacy.
 - `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF` es el contrato canónico recomendado para el webhook de Resend; el valor directo `RESEND_WEBHOOK_SIGNING_SECRET` queda como fallback legacy.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
+- `GREENHOUSE_INTEGRATION_API_TOKEN` debe existir al menos en `Development`, `Preview`, `Staging` y `Production`; autentica los writes outbound de Greenhouse hacia el servicio externo HubSpot y no debe quedar solo en overrides por branch.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.
 

@@ -70,6 +70,13 @@ describe('event catalog', () => {
     expect(REACTIVE_EVENT_TYPES).not.toContain('crm.company.lifecyclestage_changed')
   })
 
+  it('includes party lifecycle outbound result events as non-reactive catalog events', () => {
+    expect(EVENT_TYPES.commercialPartyHubSpotSyncedOut).toBe('commercial.party.hubspot_synced_out')
+    expect(EVENT_TYPES.commercialPartySyncConflict).toBe('commercial.party.sync_conflict')
+    expect(REACTIVE_EVENT_TYPES).not.toContain('commercial.party.hubspot_synced_out')
+    expect(REACTIVE_EVENT_TYPES).not.toContain('commercial.party.sync_conflict')
+  })
+
   it('includes ICO AI LLM enrichment events in the catalog and reactive trigger list', () => {
     expect(EVENT_TYPES.icoAiLlmEnrichmentsMaterialized).toBe('ico.ai_llm_enrichments.materialized')
     expect(REACTIVE_EVENT_TYPES).toContain('ico.ai_llm_enrichments.materialized')

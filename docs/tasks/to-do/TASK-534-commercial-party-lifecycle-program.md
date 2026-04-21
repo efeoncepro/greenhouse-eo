@@ -29,6 +29,20 @@ Programa oficial para formalizar el lifecycle canonico de la parte comercial (pr
 - **Fase A cerrada.** `TASK-535` completada: schema DDL + comandos CQRS (`promoteParty`, `createPartyFromHubSpotCompany`, `instantiateClientForParty`) + backfill idempotente + 5 eventos outbox + 6 capabilities + HubSpot mapping con env override. Desbloquea Fase B. Ver `docs/tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md`.
 - Open question #1 (dual-role) queda diferida: `is_dual_role` expuesto en schema (default false); decisión final post-backfill en data real.
 
+## Delta 2026-04-21 — Fase F aterriza localmente
+
+- **TASK-540** ya implementó la foundation local outbound en Greenhouse EO:
+  - projection `partyHubSpotOutbound`
+  - helper `push-party-lifecycle.ts`
+  - tabla `greenhouse_commercial.party_sync_conflicts`
+  - helpers `field-authority.ts` y `anti-ping-pong.ts`
+  - eventos `commercial.party.hubspot_synced_out` y `commercial.party.sync_conflict`
+- Decisión V1 de compliance:
+  - se exporta `gh_mrr_tier`
+  - `gh_mrr_clp` queda fuera del payload mientras la decisión formal siga abierta
+- Dependencia restante:
+  - el loop real HubSpot ↔ Greenhouse todavía depende del merge/deploy del endpoint externo `PATCH /companies/:id/lifecycle` en `hubspot-greenhouse-integration`
+
 ## Why This Task Exists
 
 Greenhouse trata al `Cliente` como un estado terminal: una empresa es cliente solo despues de closed-won o cuando es proveedor. Eso rompe la pre-venta porque el selector del Quote Builder solo muestra organizations que ya existen, y las organizations se crean unicamente cuando llega un deal ganado desde HubSpot o al registrar un proveedor. Consecuencia: para cotizar a una empresa nueva el operador (1) abre HubSpot, (2) crea Company, (3) crea Deal, (4) espera al sync de Greenhouse, (5) vuelve al builder. Minutos por cotizacion, dual-write invisible, typos que generan duplicados, revenue pipeline ciego a prospects, y bloqueo estructural para Kortex. El gap arquitectonico es de vocabulario: no existe un estado canonico para "empresa que esta en el funnel pero todavia no es cliente".
@@ -164,7 +178,7 @@ Reglas obligatorias:
 
 ### Slice 6 — HubSpot lifecycle outbound
 
-- Crear `TASK-540` (Fase F): proyeccion reactiva `partyHubSpotOutbound` + Cloud Run `PATCH /companies/:id/lifecycle` + conflict resolution + anti-ping-pong.
+- `TASK-540` (Fase F) ya implementó la foundation local en Greenhouse EO: proyeccion reactiva `partyHubSpotOutbound` + conflict resolution + anti-ping-pong + cliente hacia `PATCH /companies/:id/lifecycle`. El cierre end-to-end sigue pendiente del deploy externo.
 
 ### Slice 7 — Quote-to-cash choreography
 
@@ -199,7 +213,7 @@ Programa oficial en 9 fases (A-I) con dependencias causales. Las fases A-G son o
 3. `TASK-537` (Fase C) — Party search + adopt endpoints. Completada 2026-04-21.
 4. `TASK-538` (Fase D) — Quote Builder selector unificado. Depende de C.
 5. `TASK-539` (Fase E) — Inline deal creation. Depende de A; se puede implementar paralelo a D.
-6. `TASK-540` (Fase F) — HubSpot lifecycle outbound. Depende de A, idealmente despues de F/G para dogfooding interno.
+6. `TASK-540` (Fase F) — HubSpot lifecycle outbound. Foundation local implementada 2026-04-21; el deploy externo sigue pendiente para dogfooding real end-to-end.
 7. `TASK-541` (Fase G) — Quote-to-cash choreography. Depende de A + `TASK-460` (Contracts).
 8. `TASK-542` (Fase H) — Admin dashboards. Depende de A, B, F.
 9. `TASK-543` (Fase I) — Deprecation + cleanup. Depende de todas las anteriores.
@@ -209,7 +223,7 @@ Programa oficial en 9 fases (A-I) con dependencias causales. Las fases A-G son o
 - **Extension, no reemplazo**: se agrega `lifecycle_stage` + `commercial_party_id` + `organization_lifecycle_history` sobre el modelo existente.
 - **Anchor sigue siendo `organization_id`** en el Quote Builder; `commercial_party_id` es UUID estable para eventos y proyecciones.
 - **Finance no cambia**: `client_id` sigue siendo el anchor contable. Se instancia al cruzar a `active_client`.
-- **Conflict resolution HubSpot ↔ Greenhouse**: Greenhouse owns `lifecyclestage` si existe quote/contract activo; HubSpot owns en cualquier otro caso. Timestamp tiebreak en 60s.
+- **Conflict resolution HubSpot ↔ Greenhouse**: Greenhouse owns `lifecyclestage` si existe quote/contract activo; HubSpot owns en cualquier otro caso. Timestamp tiebreak en 60s y persistencia domain-specific en `greenhouse_commercial.party_sync_conflicts`.
 - **Feature flags**: rollout por fases detras de flags explicitos, permitiendo rollback quirurgico.
 - **Backfill idempotente**: script determinista que puede re-correr sin side effects.
 

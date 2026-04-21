@@ -183,6 +183,8 @@ export const EVENT_TYPES = {
   commercialPartyDemoted: 'commercial.party.demoted',
   commercialPartyLifecycleBackfilled: 'commercial.party.lifecycle_backfilled',
   commercialClientInstantiated: 'commercial.client.instantiated',
+  commercialPartyHubSpotSyncedOut: 'commercial.party.hubspot_synced_out',
+  commercialPartySyncConflict: 'commercial.party.sync_conflict',
   membershipCreated: 'membership.created',
   membershipUpdated: 'membership.updated',
   membershipDeactivated: 'membership.deactivated',

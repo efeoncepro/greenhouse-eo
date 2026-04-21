@@ -1,5 +1,37 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-540 HubSpot Lifecycle Outbound Sync (Codex)
+
+- **Scope:** aterrizar la foundation local de Fase F del programa Party Lifecycle para devolver lifecycle/commercial party metadata desde Greenhouse a HubSpot Companies vía carril reactivo, sin romper tenant isolation ni el sync inbound existente.
+- **Correccion de spec antes de implementar**
+  - la spec asumía una tabla global `greenhouse_sync.sync_conflicts`, pero el patrón vivo del repo es conflicto domain-specific; se corrigió a `greenhouse_commercial.party_sync_conflicts`
+  - la spec asumía `source_sync_pipelines` como tabla viva; el tracking real del repo usa outbox/reactive + `source_sync_runs` y trazas por módulo
+  - la decisión V1 de compliance quedó en `gh_mrr_tier`; no se empuja `gh_mrr_clp`
+  - el endpoint server-side `PATCH /companies/:id/lifecycle` no vive en este repo; el contrato local se implementó con fallback `endpoint_not_deployed`
+- **Implementacion local shipped**
+  - migración `20260421220244374_task-540-party-sync-conflicts.sql`
+  - helper store `src/lib/commercial/party/sync-conflicts-store.ts`
+  - helpers compartidos `src/lib/sync/field-authority.ts` y `src/lib/sync/anti-ping-pong.ts`
+  - publishers `src/lib/hubspot/party-hubspot-events.ts`
+  - push helper `src/lib/hubspot/push-party-lifecycle.ts`
+  - projection `src/lib/sync/projections/party-hubspot-outbound.ts`
+  - cliente outbound `updateHubSpotGreenhouseCompanyLifecycle()` en `src/lib/integrations/hubspot-greenhouse-service.ts`
+  - test nuevo `src/lib/hubspot/sync-hubspot-company-lifecycle.test.ts`
+- **Contrato operativo**
+  - outbound escribe solo campos Greenhouse-owned (`lifecyclestage` cuando Greenhouse gana field authority, `gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_active_contracts_count`, `gh_last_write_at`, `gh_mrr_tier`)
+  - `operator_override` local bloquea outbound automático y deja conflicto `operator_override_hold`
+  - el inbound `sync-hubspot-company-lifecycle.ts` ya usa `gh_last_write_at` para skippear loopbacks de Greenhouse dentro de 60s
+  - si el servicio externo aún no tiene deployado `PATCH /companies/:id/lifecycle`, el resultado se degrada a `endpoint_not_deployed` y queda trazado sin romper el reactor
+- **Dependencia restante**
+  - sigue pendiente el merge/deploy del repo hermano `hubspot-bigquery` para cerrar el loop real contra Cloud Run; por eso `TASK-540` todavía no se movió a `complete`
+- **Verificacion ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm exec vitest run src/lib/sync/__tests__/field-authority.test.ts src/lib/sync/__tests__/anti-ping-pong.test.ts src/lib/sync/event-catalog.test.ts src/lib/hubspot/sync-hubspot-company-lifecycle.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1793` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+
 ## Sesion 2026-04-21 — TASK-538 Quote Builder Unified Party Selector (Codex)
 
 - **Scope:** cerrar la Fase D del programa Party Lifecycle exponiendo el selector unificado directamente en el Quote Builder, con fallback legacy y adopción transparente de candidates HubSpot.
@@ -236,7 +268,7 @@
 - **Tests**: 30 passing — 6 payload adapter (mapping create/update, null handling, custom props stability), 13 push helper (4 happy paths, 3 skip paths, 2 anti-ping-pong, 2 endpoint_not_deployed, 3 error paths), 11 projection (registration, scope extraction variantes, dispatch con mocks, eventType drop de valores no canónicos).
 - **Decisiones vs spec:**
   - Cloud Run service `hubspot-greenhouse-integration` NO vive en este repo (está en repo externo). Spec asumía `services/hubspot-greenhouse-integration/routes/products.ts`; en su lugar implementamos el cliente con `endpoint_not_deployed` fallback. Deploy del service queda como follow-up del repo externo.
-  - TASK-540 anti-ping-pong helper compartido aún `to-do`. Implementado inline en el push helper (60s window). Refactor futuro cuando TASK-540 ship.
+  - TASK-540 ya aterrizó el helper compartido `src/lib/sync/anti-ping-pong.ts`; el push helper de products sigue inline y `TASK-563` debe refactorizarlo al canonical.
   - `gh_last_write_at` columna nueva no necesaria: `hubspot_last_write_at` (migration TASK-547) + `last_outbound_sync_at` (TASK-545) cubren el caso de uso.
   - `sync_status` legacy de finance (`local_only|pending_sync|synced`) NO tocada. Nueva columna `hubspot_sync_status` específica del bridge, CHECK-constrained.
   - Batch API HubSpot (coalescing ≥5 events/30s) deferido — requiere cambios cross-projection en el reactive worker. Follow-up explícito.

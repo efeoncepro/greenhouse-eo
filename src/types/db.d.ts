@@ -593,6 +593,20 @@ export interface GreenhouseCommercialPartyEndpointRequests {
   tenant_scope: string;
 }
 
+export interface GreenhouseCommercialPartySyncConflicts {
+  commercial_party_id: string | null;
+  conflict_id: Generated<string>;
+  conflict_type: string;
+  conflicting_fields: Json | null;
+  detected_at: Generated<Timestamp>;
+  hubspot_company_id: string | null;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  resolution_applied_at: Timestamp | null;
+  resolution_status: Generated<string>;
+  resolved_by: string | null;
+}
+
 export interface GreenhouseCommercialPricingCatalogApprovalQueue {
   approval_id: Generated<string>;
   criticality: string;
@@ -6176,6 +6190,7 @@ export interface DB {
   "greenhouse_commercial.member_role_cost_basis_snapshots": GreenhouseCommercialMemberRoleCostBasisSnapshots;
   "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
   "greenhouse_commercial.party_endpoint_requests": GreenhouseCommercialPartyEndpointRequests;
+  "greenhouse_commercial.party_sync_conflicts": GreenhouseCommercialPartySyncConflicts;
   "greenhouse_commercial.pricing_catalog_approval_queue": GreenhouseCommercialPricingCatalogApprovalQueue;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;

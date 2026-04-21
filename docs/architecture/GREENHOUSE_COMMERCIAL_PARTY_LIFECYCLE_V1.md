@@ -383,8 +383,9 @@ Propiedades HubSpot escritas por Greenhouse:
 - `gh_commercial_party_id` (custom property; id canónico de Greenhouse)
 - `gh_last_quote_at` (timestamp última cotización emitida)
 - `gh_last_contract_at`
-- `gh_mrr_clp` (solo si `active_client`)
+- `gh_mrr_tier` (V1; `gh_mrr_clp` queda diferido por compliance)
 - `gh_active_contracts_count`
+- `gh_last_write_at`
 
 **NO** se escriben por Greenhouse:
 
@@ -397,15 +398,18 @@ Propiedades HubSpot escritas por Greenhouse:
 Cuando ambos lados editan `lifecyclestage` casi simultáneamente:
 
 1. **Authoritative field owner table** (`src/lib/sync/field-authority.ts`): cada property tiene owner declarado. Para `lifecyclestage`, owner = **Greenhouse si existe quote/contract activo; HubSpot en cualquier otro caso**. Esto respeta la intuición operativa: si ya hay compromiso comercial, Greenhouse es la verdad; antes de eso, el comercial decide en HubSpot.
-2. **Timestamp tiebreak**: si ambos editaron dentro de 60s, gana el más reciente; se loguea conflicto en `greenhouse_sync.sync_conflicts`.
+2. **Timestamp tiebreak**: si ambos editaron dentro de 60s, gana el más reciente; el conflicto se persiste en `greenhouse_commercial.party_sync_conflicts` con `conflict_type`, `resolution_status` y `metadata`.
 3. **Manual override**: el operador puede forzar un estado con `transition_source='operator_override'` y razón auditada; bloquea el sync automático por 10 minutos con un flag `lifecycle_stage_frozen_until`.
 4. **Anti-ping-pong guard**: cada outbound escribe `gh_last_write_at` en HubSpot; el inbound skipea si el cambio detectado fue escrito por Greenhouse en los últimos 60s.
 
 ### 5.4 Impacto en el pipeline de sync existente
 
-- `source_sync_pipelines` gana 2 nuevos records: `hubspot_companies_full` (inbound), `hubspot_companies_lifecycle_outbound` (outbound).
-- Ambos reportan en `source_sync_runs` como siempre.
-- Admin Center > Ops Health muestra run status, última transition exitosa, conflictos sin resolver.
+- El carril inbound sigue reportando en `source_sync_runs`/watermarks.
+- El outbound se orquesta desde `greenhouse_sync.outbox_events` y la projection reactiva `partyHubSpotOutbound`; su evidencia operativa vive en:
+  - eventos resultado `commercial.party.hubspot_synced_out` y `commercial.party.sync_conflict`
+  - tabla `greenhouse_commercial.party_sync_conflicts`
+  - trazas de retry/degraded path cuando el cliente devuelve `endpoint_not_deployed`
+- Admin Center > Ops Health / follow-ups futuros deben leer estas trazas, no asumir una tabla viva `source_sync_pipelines`.
 
 ---
 
@@ -783,3 +787,20 @@ Orden recomendado para minimizar blast radius:
 ## 14. Changelog
 
 - **v1.0 — 2026-04-20:** Spec inicial. Define modelo canónico de Commercial Party Lifecycle, contratos de sync bi-direccional con HubSpot, comandos CQRS, coreografía quote-to-cash, governance, y plan de rollout por fases.
+## Delta 2026-04-21 — TASK-540 aterriza la Fase F local en Greenhouse EO
+
+- Greenhouse ya tiene la foundation local del outbound `organizations/commercial_party -> HubSpot companies`.
+- Runtime nuevo:
+  - projection `src/lib/sync/projections/party-hubspot-outbound.ts`
+  - helper `src/lib/hubspot/push-party-lifecycle.ts`
+  - migration `20260421220244374_task-540-party-sync-conflicts.sql`
+  - tabla `greenhouse_commercial.party_sync_conflicts`
+  - helpers compartidos `src/lib/sync/field-authority.ts` y `src/lib/sync/anti-ping-pong.ts`
+  - eventos `commercial.party.hubspot_synced_out` y `commercial.party.sync_conflict`
+  - script operativo `scripts/create-hubspot-company-custom-properties.ts`
+- Contrato operativo:
+  - el write HTTP real sigue delegándose al servicio hermano `hubspot-greenhouse-integration` vía `PATCH /companies/:id/lifecycle`
+  - en Greenhouse EO el cliente canónico es `updateHubSpotGreenhouseCompanyLifecycle()`
+  - si el endpoint externo aún no está deployado, el outbound degrada a `endpoint_not_deployed` sin romper el reactor
+  - el inbound `sync-hubspot-company-lifecycle.ts` ya consume `gh_last_write_at` para evitar loopbacks
+  - la decisión V1 de compliance es exportar `gh_mrr_tier`; no se empuja `gh_mrr_clp`

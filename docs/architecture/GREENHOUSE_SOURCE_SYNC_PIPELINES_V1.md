@@ -1,5 +1,29 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-21 — TASK-540 agrega Party Lifecycle outbound a HubSpot
+
+Nuevo lane outbound: `greenhouse_core.organizations / commercial_party -> HubSpot Companies`.
+
+### Topologia
+
+```text
+greenhouse_sync.outbox_events
+  -> partyHubSpotOutbound
+    -> push-party-lifecycle.ts
+      -> PATCH /companies/:id/lifecycle (hubspot-greenhouse-integration)
+        -> HubSpot company properties
+          -> gh_last_write_at
+            -> sync-hubspot-company-lifecycle.ts (inbound guard anti-ping-pong)
+```
+
+### Reglas
+
+1. El outbound solo escribe campos Greenhouse-owned; `name`, `domain`, `industry`, address y phone siguen owned por HubSpot.
+2. `gh_last_write_at` es el anchor canónico del anti-ping-pong entre outbound Greenhouse e inbound lifecycle sync.
+3. Si el servicio externo responde `404`, Greenhouse trata el resultado como `endpoint_not_deployed`; no se considera hard fail de todo el reactor.
+4. Los conflictos operativos se persisten en `greenhouse_commercial.party_sync_conflicts`; no existe una tabla viva `source_sync_pipelines` para este lane.
+5. La decisión V1 de compliance es exportar `gh_mrr_tier` y no monto bruto `gh_mrr_clp`.
+
 ## Delta 2026-04-21 — TASK-536 extiende HubSpot Companies inbound a Party Lifecycle
 
 Nuevo pipeline inbound: `greenhouse_crm.companies -> greenhouse_core.organizations` para materializar prospects y oportunidades comerciales antes del closed-won.

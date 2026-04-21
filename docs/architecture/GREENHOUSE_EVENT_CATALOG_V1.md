@@ -166,9 +166,10 @@ Fase A del programa TASK-534. Eventos emitidos por los 3 comandos CQRS en
 | `commercial_party` | `commercial.party.demoted` (TASK-535) | `commercial/party/party-events.ts` (from `commands/promote-party.ts`) | `{ commercialPartyId, organizationId, fromStage, toStage, source, direction: 'demote', triggerEntity?, actorUserId?, reason? }` | TASK-540 outbound, analytics |
 | `commercial_client` | `commercial.client.instantiated` (TASK-535) | `commercial/party/party-events.ts` (from `commands/instantiate-client-for-party.ts`, side-effect de `promoteParty → active_client`) | `{ clientId, clientProfileId, organizationId, commercialPartyId, triggerEntity, actorUserId? }` | Finance bootstrap (profile ya creado en misma transacción), ICO/attribution pipelines, TASK-541 |
 
-Eventos adicionales del programa TASK-534 planificados para Fases posteriores:
+Eventos adicionales del programa TASK-534:
 
-- `commercial.party.hubspot_synced_in` / `hubspot_synced_out` / `sync_conflict` — TASK-540 (outbound) / TASK-536 (inbound).
+- `commercial.party.hubspot_synced_in` — reservado para follow-up inbound más rico sobre TASK-536.
+- `commercial.party.hubspot_synced_out` / `commercial.party.sync_conflict` — shipped por TASK-540 (`hubspot/party-hubspot-events.ts`).
 - `commercial.party.merged` — TASK-542 (merge resolution).
 - `commercial.party.inactivated` / `churned` — TASK-542 (sweep cron).
 - `commercial.party.lifecycle_backfilled` — reservado en `EVENT_TYPES` para futuros runs ad-hoc del backfill script.

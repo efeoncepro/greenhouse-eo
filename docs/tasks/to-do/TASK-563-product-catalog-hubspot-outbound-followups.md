@@ -22,7 +22,7 @@
 
 ## Summary
 
-Cerrar los 5 items que TASK-547 dejó fuera del V1 — dos bloqueantes para producción real (deploy de los 3 endpoints nuevos en el Cloud Run externo `hubspot-greenhouse-integration` + aplicación de 5 custom properties en HubSpot sandbox→production via skill `hubspot-ops`) y tres mejoras de robustez (refactor del anti-ping-pong guard cuando TASK-540 aterrice, batch API coalescing para burst scenarios, y suite E2E contra HubSpot sandbox). El bridge `productHubSpotOutbound` en Greenhouse EO ya está shipped, testeado con mocks y listo para activarse; este task destraba la activación real end-to-end.
+Cerrar los 5 items que TASK-547 dejó fuera del V1 — dos bloqueantes para producción real (deploy de los 3 endpoints nuevos en el Cloud Run externo `hubspot-greenhouse-integration` + aplicación de 5 custom properties en HubSpot sandbox→production via skill `hubspot-ops`) y tres mejoras de robustez (refactor del anti-ping-pong guard al helper compartido que TASK-540 ya aterrizó, batch API coalescing para burst scenarios, y suite E2E contra HubSpot sandbox). El bridge `productHubSpotOutbound` en Greenhouse EO ya está shipped, testeado con mocks y listo para activarse; este task destraba la activación real end-to-end.
 
 ## Why This Task Exists
 
@@ -30,7 +30,7 @@ TASK-547 convergió el contrato outbound Greenhouse-first (migration trace + pub
 
 1. **Los 3 endpoints Cloud Run no existen todavía**. El repo externo `hubspot-greenhouse-integration` expone `POST /products` desde TASK-211, pero no `PATCH /products/:id`, ni `POST /products/:id/archive`, ni `GET /products/reconcile`. Mientras falten, el bridge opera en degraded mode (`hubspot_sync_status='endpoint_not_deployed'`) para updates/archives. La primera cotización en HubSpot con un product actualizado en Greenhouse va a ser stale hasta que estos shipan.
 2. **Las 5 custom properties HubSpot no están creadas en ningún portal**. El runbook operativo `docs/operations/hubspot-custom-properties-products.md` describe el proceso pero nadie lo ha ejecutado. Sin las properties, TASK-548 (drift cron) no puede comparar `gh_owned_fields_checksum`, y el anti-ping-pong del sync inbound no tiene `gh_last_write_at` para leer.
-3. **El anti-ping-pong guard vive inline en `push-product-to-hubspot.ts`**. Es la primera implementación en el repo (TASK-540 aún `to-do`). Cuando TASK-540 ship con el helper canónico compartido, este helper inline debe refactorizarse para consumir el canonical o genera divergencia silenciosa en el behavior cross-bridge (incomes, deals, quotes, products).
+3. **El anti-ping-pong guard vive inline en `push-product-to-hubspot.ts`**. TASK-540 ya aterrizó el helper canónico compartido en `src/lib/sync/anti-ping-pong.ts`; este helper inline debe refactorizarse para consumir el canonical o genera divergencia silenciosa en el behavior cross-bridge (incomes, deals, quotes, products).
 4. **El reactive worker procesa events 1:1 sin coalescing**. Si un bulk edit dispara 100 events de `commercial.sellable_role.pricing_updated` en ventana de 30s, se hacen 100 round-trips HTTP a HubSpot (o 100 intentos cuando los endpoints aterricen). El patrón `POST /products/batch/create` y `PATCH /products/batch/update` de HubSpot existe pero no se usa — es deuda de performance latente.
 5. **No hay E2E real**. Los 30 unit tests pasan con mocks contra `createHubSpotGreenhouseProduct` / `updateHubSpotGreenhouseProduct` / etc. Antes de activar los flags en production necesitamos un ciclo completo staging: crear un role → ver aparecer un product en HubSpot sandbox con `gh_product_code=ECG-xxx` ≤ 2min → editar el role → product actualizado ≤ 2min → desactivar role → product archived en HubSpot ≤ 2min.
 
@@ -54,7 +54,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` — v1.3 con Delta Fase C (contrato cliente + custom properties + 5 status del trace)
 - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` — reglas del reactive worker, rate limiting, DLQ, retry
 - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` — topology Cloud Run (`ops-worker` + `hubspot-greenhouse-integration`)
-- `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` — §5.3 patrón anti-ping-pong (cuando TASK-540 aterrice)
+- `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` — §5.3 patrón anti-ping-pong (ya aterrizado por TASK-540)
 
 Reglas obligatorias:
 
@@ -116,7 +116,7 @@ Reglas obligatorias:
 
 - Los 3 endpoints server-side (`PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile`) NO están deployados en `hubspot-greenhouse-integration` (Cloud Run externo).
 - Las 5 custom properties NO existen en HubSpot (ni sandbox ni production).
-- Anti-ping-pong inline NO está alineado con TASK-540 porque TASK-540 aún no shipped.
+- Anti-ping-pong inline NO está alineado todavía con el helper canónico que TASK-540 ya aterrizó en `src/lib/sync/anti-ping-pong.ts`.
 - Batch API coalescing NO existe; el reactive worker procesa events 1:1 sin window-based batching.
 - NO hay E2E real contra HubSpot sandbox.
 - Feature flags `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}` están ON en staging desde TASK-546, pero sin los items arriba no se pueden activar en production sin perder eventos o corromper state en HubSpot.

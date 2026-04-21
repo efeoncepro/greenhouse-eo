@@ -2,6 +2,26 @@
 
 ## 2026-04-21
 
+### 2026-04-21 — TASK-540 aterriza la foundation outbound de Party Lifecycle
+
+- Greenhouse EO ya tiene el carril local Greenhouse → HubSpot para lifecycle comercial sobre Companies, aunque el cierre real del loop aún depende del deploy del endpoint externo `PATCH /companies/:id/lifecycle` en `hubspot-greenhouse-integration`.
+- **Reactive outbound**:
+  - nueva projection `partyHubSpotOutbound` en `domain: cost_intelligence`
+  - helper `push-party-lifecycle.ts` que resuelve snapshot de organization, field authority y payload outbound
+  - nuevos eventos `commercial.party.hubspot_synced_out` y `commercial.party.sync_conflict`
+- **Conflict + anti-ping-pong**:
+  - migration `20260421220244374_task-540-party-sync-conflicts.sql` crea `greenhouse_commercial.party_sync_conflicts`
+  - helper compartido `anti-ping-pong.ts` centraliza la ventana de 60s
+  - el inbound `sync-hubspot-company-lifecycle.ts` ya consume `gh_last_write_at` para skippear loopbacks recientes escritos por Greenhouse
+- **Wire contract real**:
+  - `src/lib/integrations/hubspot-greenhouse-service.ts` gana `updateHubSpotGreenhouseCompanyLifecycle()`
+  - el fallback canónico para servicio externo no deployado es `endpoint_not_deployed`, no un hard fail del reactor
+  - la auth outbound reutiliza `GREENHOUSE_INTEGRATION_API_TOKEN`
+- **Decision V1**:
+  - se exporta `gh_mrr_tier`
+  - no se empuja `gh_mrr_clp` mientras siga abierta la decisión de compliance
+- **Verificación**: `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`) · `pnpm exec tsc --noEmit --pretty false` OK · tests focales OK · `pnpm test` OK (`1793` passing, `2` skipped) · `pnpm lint` OK con 1 warning legacy preexistente · `pnpm build` OK.
+
 ### 2026-04-21 — TASK-538 Quote Builder Unified Party Selector shipped
 
 - Fase D del programa Party Lifecycle queda expuesta en la primera surface visible: el chip contextual **Organización** del Quote Builder ahora puede buscar organizations materializadas y candidates HubSpot desde `/api/commercial/parties/search`.
@@ -119,14 +139,14 @@
 - **Custom properties**: `scripts/create-hubspot-product-custom-properties.ts` con 5 property definitions + runbook operativo `docs/operations/hubspot-custom-properties-products.md` para aplicar offline via skill `hubspot-ops` (sandbox → production).
 - **Decisiones vs spec:**
   - Cloud Run service `hubspot-greenhouse-integration` NO vive en este repo; cliente con `endpoint_not_deployed` fallback. Deploy de 3 endpoints pendientes (PATCH/archive/reconcile) queda como follow-up del repo externo.
-  - TASK-540 anti-ping-pong helper compartido aún pendiente; implementación inline en push helper (refactor futuro).
+  - TASK-540 ya aterrizó el helper compartido `src/lib/sync/anti-ping-pong.ts`; el push helper de products sigue inline y `TASK-563` conserva ese refactor como follow-up.
   - `sync_status` legacy finance (`local_only|pending_sync|synced`) NO tocada; nueva columna `hubspot_sync_status` específica del bridge.
   - Batch API HubSpot coalescing deferido; E2E tests contra HubSpot sandbox deferidos a staging smoke.
   - Multi-currency products: USD-only por ahora; variants (`source_variant_key`) se desbloquean con TASK-421.
 - **Tests**: 30 passing — 6 payload adapter, 13 push helper (happy + skip + anti-ping-pong + degraded modes + errors), 11 projection.
 - **Docs**: architecture spec bumped a v1.3 con Delta Fase C + doc funcional ampliada con sección completa "Sincronización automática a HubSpot".
 - **Rollout plan**: deploy Cloud Run endpoints externo → runbook sandbox → staging activation → validación 48h → production.
-- **Follow-ups**: deploy externo de endpoints, TASK-540 helper refactor, batch coalescing, E2E staging, TASK-421 multi-currency.
+- **Follow-ups**: deploy externo de endpoints, refactor del push helper de products al helper canónico de TASK-540, batch coalescing, E2E staging, TASK-421 multi-currency.
 
 ### 2026-04-21 — TASK-546 Product Catalog Source Handlers & Event Homogenization (Fase B) shipped
 

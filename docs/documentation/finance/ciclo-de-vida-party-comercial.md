@@ -97,6 +97,28 @@ Stages desconocidos **nunca rompen** el sync — caen a `prospect` por default y
 
 > Detalle tecnico: [src/lib/commercial/party/hubspot-lifecycle-mapping.ts](../../../src/lib/commercial/party/hubspot-lifecycle-mapping.ts). Ver tambien `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1` §4.5.
 
+### Sync bi-direccional controlado
+
+Greenhouse ya no solo recibe lifecycle desde HubSpot. Tambien devuelve a HubSpot, cuando Greenhouse gana la autoridad del campo:
+
+- `lifecyclestage`
+- `gh_commercial_party_id`
+- `gh_last_quote_at`
+- `gh_last_contract_at`
+- `gh_active_contracts_count`
+- `gh_last_write_at`
+- `gh_mrr_tier`
+
+HubSpot sigue siendo owner de:
+
+- `name`
+- `domain`
+- `industry`
+- `address`
+- `phone`
+
+Si ambos lados escriben casi al mismo tiempo, Greenhouse registra el conflicto y evita loopback usando `gh_last_write_at` como guard anti-ping-pong.
+
 ## Que eventos se emiten
 
 Cada cambio de estado genera un evento en el outbox que puede ser consumido por otros modulos:
@@ -106,6 +128,8 @@ Cada cambio de estado genera un evento en el outbox que puede ser consumido por 
 | `commercial.party.created` | Al crear una Party nueva (inbound HubSpot o manual) | Materializacion del selector (Fase D), outbound sync (Fase F) |
 | `commercial.party.promoted` | Promocion hacia adelante (p.ej. `prospect → opportunity`) | Sync outbound a HubSpot, quote-to-cash, analytics |
 | `commercial.party.demoted` | Movimiento hacia atras (p.ej. `opportunity → prospect` por perder deals) | Sync outbound, analytics |
+| `commercial.party.hubspot_synced_out` | Cuando Greenhouse logra o intenta cerrar el write outbound hacia HubSpot | Observabilidad del bridge outbound, retry/degraded paths |
+| `commercial.party.sync_conflict` | Cuando field authority, anti-ping-pong u override bloquean o resuelven un write | Admin Center, runbooks operacionales, auditoria |
 | `commercial.party.lifecycle_backfilled` | Migracion inicial o re-clasificacion bulk | Auditoria operacional |
 | `commercial.client.instantiated` | Cuando se crea automaticamente el `client_id` + perfil financiero | Finance, pipelines de atribucion de costos, ICO |
 
@@ -129,14 +153,14 @@ Todos los eventos incluyen `commercial_party_id` — un identificador **estable 
 | C | TASK-537 | Shipped. `GET /parties/search` + `POST /parties/adopt` ya listos. V1 usa `greenhouse_crm.companies` y expone `hubspot_candidate` solo para carril interno |
 | D | TASK-538 | Shipped. Quote Builder ya consume el selector unificado detras de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`; adopta candidates HubSpot on-select y mantiene fallback legacy |
 | E | TASK-539 | Shipped. Crear deal desde Greenhouse sin saltar a HubSpot |
-| F | TASK-540 | Sync outbound: cuando Greenhouse promueve, HubSpot se entera |
+| F | TASK-540 | Implementada localmente. Greenhouse ya emite outbound lifecycle y evita ping-pong; falta el deploy del endpoint externo para cerrar el loop real |
 | G | TASK-541 | Shipped. Quote-to-cash atomico: firmar contrato + promover a cliente + crear income, todo en una transaccion |
 | H | TASK-542 | Admin Center: dashboards de funnel, conflictos de sync, sweep de inactivos |
 | I | TASK-543 | Deprecar flags y codigo legacy |
 
 ## Ejemplos practicos
 
-### Caso 1 — Company nueva desde HubSpot (Fase B, aun no implementado)
+### Caso 1 — Company nueva desde HubSpot (Fase B)
 
 Cuando aterrice la Fase B:
 

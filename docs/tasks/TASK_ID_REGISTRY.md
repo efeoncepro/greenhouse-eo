@@ -593,7 +593,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-537` | `complete` | Party Search & Adoption Endpoints (Fase C) | `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md` |
 | `TASK-538` | `complete` | Quote Builder Unified Party Selector (Fase D) | `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md` |
 | `TASK-539` | `to-do` | Inline Deal Creation from Quote Builder (Fase E) | `docs/tasks/to-do/TASK-539-inline-deal-creation-quote-builder.md` |
-| `TASK-540` | `to-do` | HubSpot Lifecycle Outbound Sync (Fase F) | `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md` |
+| `TASK-540` | `to-do` | HubSpot Lifecycle Outbound Sync (Fase F) — foundation local implementada; deploy externo pendiente | `docs/tasks/to-do/TASK-540-hubspot-lifecycle-outbound-sync.md` |
 | `TASK-541` | `to-do` | Quote-to-Cash Atomic Choreography (Fase G) | `docs/tasks/to-do/TASK-541-quote-to-cash-atomic-choreography.md` |
 | `TASK-542` | `to-do` | Party Lifecycle Admin Dashboards (Fase H) | `docs/tasks/to-do/TASK-542-party-lifecycle-admin-dashboards.md` |
 | `TASK-543` | `to-do` | Party Lifecycle Deprecation & Flag Cleanup (Fase I) | `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md` |

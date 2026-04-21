@@ -35,7 +35,7 @@ Outbound bridge reactivo `product_catalog → HubSpot Products` cerrando el loop
 | Spec asume | Decisión pragmática |
 |---|---|
 | Cloud Run service `hubspot-greenhouse-integration` vive en `services/` de este repo | Vive en repo externo. Este repo implementa el **cliente** con graceful `endpoint_not_deployed` fallback en los 3 endpoints pendientes (PATCH/archive/reconcile). Deploy del service queda como follow-up del repo `hubspot-greenhouse-integration` |
-| Anti-ping-pong helper compartido de TASK-540 | TASK-540 aún `to-do`. Implementado inline en `push-product-to-hubspot.ts`: lectura de `hubspot_last_write_at` + ventana 60s. Cuando TASK-540 llegue con el helper canónico, refactor |
+| Anti-ping-pong helper compartido de TASK-540 | TASK-540 ya aterrizó `src/lib/sync/anti-ping-pong.ts`. `push-product-to-hubspot.ts` sigue inline leyendo `hubspot_last_write_at` + ventana 60s; `TASK-563` debe refactorizarlo al helper canónico |
 | Columna nueva `gh_last_write_at` | No necesaria: `hubspot_last_write_at` (migration TASK-547) cumple esa función; `last_outbound_sync_at` (TASK-545) sigue como el ACK timestamp para UI display |
 | `sync_status` granular (5 estados) | Columna legacy `sync_status` es `local_only | pending_sync | synced`. NO se toca. En su lugar 4 cols nuevas específicas del bridge HubSpot (espejo del patrón TASK-524 income), con CHECK constraint enforced |
 | Batch API HubSpot para ≥5 events en 30s | Deferido. El reactive worker procesa events 1:1 hoy; introducir coalescing requiere cambios cross-projection. Follow-up explícito post-producción |

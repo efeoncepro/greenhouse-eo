@@ -12,17 +12,17 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Foundation local implementada — deploy externo pendiente`
 - Rank: `TBD`
 - Domain: `crm`
-- Blocked by: `TASK-535`
+- Blocked by: `deploy externo de hubspot-greenhouse-integration`
 - Branch: `task/TASK-540-hubspot-lifecycle-outbound-sync`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
 ## Summary
 
-Fase F del programa TASK-534. Abre el carril outbound Greenhouse → HubSpot para lifecycle transitions y custom properties de Party. Implementa la proyeccion reactiva `partyHubSpotOutbound` que consume eventos `commercial.party.*` y escribe a HubSpot Company properties via Cloud Run. Incluye conflict resolution con field authority table y anti-ping-pong guard. Extiende el Cloud Run `hubspot-greenhouse-integration` con `PATCH /companies/:id/lifecycle`.
+Fase F del programa TASK-534. Abre el carril outbound Greenhouse → HubSpot para lifecycle transitions y custom properties de Party. En este repo vive la proyeccion reactiva `partyHubSpotOutbound`, el helper outbound, la trazabilidad y el contrato de conflictos/anti-ping-pong. El write HTTP real hacia HubSpot se delega al servicio Cloud Run externo `hubspot-greenhouse-integration`, que debe exponer `PATCH /companies/:id/lifecycle`.
 
 ## Why This Task Exists
 
@@ -34,7 +34,7 @@ Hoy Greenhouse solo lee de HubSpot; si promovemos una organization a `active_cli
 - Cloud Run endpoint `PATCH /companies/:id/lifecycle` en `hubspot-greenhouse-integration`.
 - Field authority table (`src/lib/sync/field-authority.ts`) que declara owner por property.
 - Anti-ping-pong guard (60s window).
-- Conflict resolution + logging en `greenhouse_sync.sync_conflicts`.
+- Conflict resolution + logging en `greenhouse_commercial.party_sync_conflicts`.
 - Creacion/validacion de custom properties HubSpot requeridas.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -46,7 +46,7 @@ Hoy Greenhouse solo lee de HubSpot; si promovemos una organization a `active_cli
 Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` — §5.2, §5.3, §5.4
-- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md`
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 
@@ -56,8 +56,8 @@ Reglas obligatorias:
 - `lifecyclestage` outbound respeta field authority: Greenhouse owns si existe quote/contract activo.
 - Anti-ping-pong: si `gh_last_write_at` de Greenhouse < 60s, skip inbound sync; si inbound cambio property en los ultimos 60s, skip outbound.
 - Idempotencia: reintentar con exponential backoff + DLQ tras 5 fallos.
-- Logs estructurados en `sync_conflicts` para cada conflicto detectado.
-- **Compliance review obligatorio** antes de activar outbound de `gh_mrr_clp` (open question #6 del spec).
+- Logs estructurados en una tabla de conflictos del dominio Party Lifecycle.
+- `gh_mrr_clp` queda como decision abierta del programa; si no hay acuerdo de compliance al implementar, exportar `mrr_tier` o dejar el campo fuera del payload V1.
 
 ## Normative Docs
 
@@ -72,7 +72,7 @@ Reglas obligatorias:
 - TASK-535 cerrada (eventos `commercial.party.*`)
 - TASK-536 cerrada (sync inbound — necesario para anti-ping-pong)
 - `greenhouse_sync.outbox_events` + reactive worker
-- Cloud Run `hubspot-greenhouse-integration` deployment
+- Repo/deploy externo `hubspot-greenhouse-integration` con contrato `PATCH /companies/:id/lifecycle`
 
 ### Blocks / Impacts
 
@@ -85,7 +85,8 @@ Reglas obligatorias:
 - `src/lib/sync/field-authority.ts`
 - `src/lib/sync/anti-ping-pong.ts`
 - `src/lib/hubspot/push-party-lifecycle.ts`
-- `services/hubspot-greenhouse-integration/routes/companies.ts` (nuevo endpoint PATCH)
+- `src/lib/integrations/hubspot-greenhouse-service.ts` (extensión cliente para endpoint externo)
+- `services/hubspot-greenhouse-integration/routes/companies.ts` (**repo externo**, nuevo endpoint PATCH)
 - `migrations/YYYYMMDDHHMMSS_task-540-sync-conflicts-table.sql`
 - `scripts/create-hubspot-custom-properties.ts`
 
@@ -95,16 +96,21 @@ Reglas obligatorias:
 
 - Reactive projection infrastructure (`src/lib/sync/projections/`)
 - Proyeccion outbound previa `quotationHubSpotOutbound` (TASK-463) como referencia de patron
-- Cloud Run service `hubspot-greenhouse-integration`
+- Cloud Run service `hubspot-greenhouse-integration` (externo a este repo)
 - HubSpot API client + OIDC auth entre Vercel y Cloud Run
+- Pattern reciente de outbound HubSpot con anti-ping-pong y conflictos domain-specific (`TASK-547`)
+- Foundation local TASK-540 ya aterrizada en Greenhouse EO:
+  - `src/lib/sync/projections/party-hubspot-outbound.ts`
+  - `src/lib/hubspot/push-party-lifecycle.ts`
+  - `src/lib/sync/field-authority.ts`
+  - `src/lib/sync/anti-ping-pong.ts`
+  - `src/lib/commercial/party/sync-conflicts-store.ts`
+  - migration `20260421220244374_task-540-party-sync-conflicts.sql`
 
 ### Gap
 
-- No existe projection `partyHubSpotOutbound`.
-- Cloud Run no tiene `PATCH /companies/:id/lifecycle`.
-- No existe `field-authority.ts` ni `anti-ping-pong.ts`.
-- Tabla `sync_conflicts` puede no existir en el schema `greenhouse_sync` (validar).
-- Custom properties HubSpot: `gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_mrr_clp`, `gh_active_contracts_count`, `gh_last_write_at`, `gh_deal_origin` (creado en TASK-539) — pueden no existir todas.
+- El endpoint server-side `PATCH /companies/:id/lifecycle` sigue viviendo fuera del workspace y debe mergearse/deployarse en el repo hermano.
+- Las custom properties HubSpot de Company (`gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_active_contracts_count`, `gh_last_write_at`, `gh_mrr_tier`) todavía requieren aplicación/validación operacional en el portal HubSpot.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -124,7 +130,7 @@ Reglas obligatorias:
 
 ### Slice 2 — Tabla sync_conflicts
 
-- Migracion `greenhouse_sync.sync_conflicts` (entity_type, entity_id, conflicting_fields, detected_at, resolution_applied, resolved_at).
+- Migracion de tabla de conflictos domain-specific para Party Lifecycle (no asumir tabla global inexistente).
 - Helper `logSyncConflict()`.
 
 ### Slice 3 — Field authority + anti-ping-pong helpers
@@ -135,7 +141,7 @@ Reglas obligatorias:
 
 ### Slice 4 — Cloud Run `PATCH /companies/:id/lifecycle`
 
-- Endpoint que acepta `{ organizationId, lifecycleStage, mrrClp?, activeContractsCount?, lastQuoteAt?, lastContractAt? }`.
+- Endpoint que acepta `{ organizationId?, commercialPartyId?, lifecycleStage?, activeContractsCount?, lastQuoteAt?, lastContractAt?, ghLastWriteAt, mrrTier? }`.
 - Escribe via HubSpot API + persistir `gh_last_write_at`.
 - Retornar `{ hubspotResponseStatus, fieldsWritten }`.
 
@@ -148,13 +154,11 @@ Reglas obligatorias:
 
 ### Slice 6 — Decision compliance `gh_mrr_clp`
 
-- Reunion con legal/stakeholder comercial.
-- Default: exportar solo `mrr_tier` (1..5) en lugar de monto crudo.
-- Documentar decision en spec delta.
+- Decision efectiva V1: exportar `gh_mrr_tier`; excluir `gh_mrr_clp` del payload hasta cerrar compliance.
 
 ### Slice 7 — Observabilidad + Admin Center
 
-- Agregar pipeline `hubspot_companies_lifecycle_outbound` a `source_sync_pipelines`.
+- No asumir tabla `source_sync_pipelines`; registrar tracking en `source_sync_runs` o en trazabilidad específica del módulo, siguiendo el patrón vigente.
 - Exponer conflicts count + last successful outbound en Admin > Ops Health (patron existente).
 
 ## Out of Scope
@@ -224,7 +228,7 @@ if (await wasWrittenByHubSpotRecently(companyId, 60)) {
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
+- [ ] `Lifecycle` sincronizado end-to-end
 - [ ] Archivo en carpeta correcta
 - [ ] `docs/tasks/README.md` sincronizado
 - [ ] `Handoff.md` actualizado

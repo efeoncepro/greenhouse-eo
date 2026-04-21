@@ -31,6 +31,12 @@ export interface HubSpotGreenhouseCompanyProfile {
     lifecyclestage: string | null
     hs_current_customer: string | null
     hubspotTeamId: string | null
+    ghCommercialPartyId: string | null
+    ghLastQuoteAt: string | null
+    ghLastContractAt: string | null
+    ghActiveContractsCount: number | null
+    ghLastWriteAt: string | null
+    ghMrrTier: string | null
   }
   capabilities: {
     businessLines: string[]
@@ -120,6 +126,24 @@ export interface HubSpotGreenhouseCompanyServicesResponse {
   hubspotCompanyId: string
   services: HubSpotGreenhouseServiceProfile[]
   count: number
+}
+
+export interface HubSpotGreenhouseUpdateCompanyLifecycleRequest {
+  organizationId?: string
+  commercialPartyId?: string | null
+  lifecycleStage?: string | null
+  activeContractsCount?: number | null
+  lastQuoteAt?: string | null
+  lastContractAt?: string | null
+  ghLastWriteAt: string
+  mrrTier?: string | null
+}
+
+export interface HubSpotGreenhouseUpdateCompanyLifecycleResponse {
+  status: 'updated' | 'endpoint_not_deployed'
+  hubspotCompanyId: string | null
+  fieldsWritten: string[]
+  message?: string
 }
 
 // ── Quotes (TASK-210) ──
@@ -344,13 +368,33 @@ const parseTimeoutMs = (value: string | undefined) => {
 
 const getServiceConfig = () => ({
   baseUrl: normalizeBaseUrl(process.env.HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL),
-  timeoutMs: parseTimeoutMs(process.env.HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_MS)
+  timeoutMs: parseTimeoutMs(process.env.HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_MS),
+  integrationToken: process.env.GREENHOUSE_INTEGRATION_API_TOKEN?.trim() || null
 })
+
+const buildServiceHeaders = (
+  extraHeaders?: Record<string, string>,
+  includeIntegrationAuth = false
+) => {
+  const { integrationToken } = getServiceConfig()
+
+  const headers: Record<string, string> = {
+    ...(extraHeaders ?? {})
+  }
+
+  if (includeIntegrationAuth && integrationToken) {
+    headers.Authorization = `Bearer ${integrationToken}`
+    headers['x-greenhouse-integration-key'] = integrationToken
+  }
+
+  return headers
+}
 
 const fetchJson = async <T>(path: string): Promise<T> => {
   const { baseUrl, timeoutMs } = getServiceConfig()
 
   const response = await fetch(`${baseUrl}${path}`, {
+    headers: buildServiceHeaders(),
     cache: 'no-store',
     next: { revalidate: 0 },
     signal: AbortSignal.timeout(timeoutMs)
@@ -400,6 +444,42 @@ export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: stri
     }
   }
 
+export const updateHubSpotGreenhouseCompanyLifecycle = async (
+  hubspotCompanyId: string,
+  payload: HubSpotGreenhouseUpdateCompanyLifecycleRequest
+): Promise<HubSpotGreenhouseUpdateCompanyLifecycleResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/companies/${encodeURIComponent(hubspotCompanyId)}/lifecycle`, {
+    method: 'PATCH',
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }, true),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotCompanyId,
+      fieldsWritten: [],
+      message:
+        'HubSpot integration service does not expose PATCH /companies/:id/lifecycle yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for PATCH /companies/${hubspotCompanyId}/lifecycle: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseUpdateCompanyLifecycleResponse
+}
+
 // ── Products client methods (TASK-211) ──
 
 export const getHubSpotGreenhouseProductCatalog = async () =>
@@ -419,7 +499,7 @@ export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseC
 
   const response = await fetch(`${baseUrl}/products`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(safePayload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -480,7 +560,7 @@ export const updateHubSpotGreenhouseProduct = async (
 
   const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(safePayload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -521,7 +601,7 @@ export const archiveHubSpotGreenhouseProduct = async (
 
   const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}/archive`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({ reason: reason ?? 'source_deactivated_in_greenhouse' }),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -628,7 +708,7 @@ export const createHubSpotGreenhouseQuote = async (payload: HubSpotGreenhouseCre
 
   const response = await fetch(`${baseUrl}/quotes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -707,7 +787,7 @@ export const upsertHubSpotGreenhouseInvoice = async (
 
   const response = await fetch(`${baseUrl}/invoices`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -783,7 +863,7 @@ export const createHubSpotGreenhouseDeal = async (
 
   const response = await fetch(`${baseUrl}/deals`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },

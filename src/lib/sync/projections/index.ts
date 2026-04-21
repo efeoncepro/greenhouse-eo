@@ -40,6 +40,7 @@ import { productHubSpotOutboundProjection } from './product-hubspot-outbound'
 import { incomeHubSpotOutboundProjection } from './income-hubspot-outbound'
 import { quoteToCashAutopromoterProjection } from './quote-to-cash-autopromoter'
 import { vatMonthlyPositionProjection } from './vat-monthly-position'
+import { partyHubSpotOutboundProjection } from './party-hubspot-outbound'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -88,6 +89,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(sourceToProductCatalogProjection)
   registerProjection(productHubSpotOutboundProjection)
   registerProjection(incomeHubSpotOutboundProjection)
+  registerProjection(partyHubSpotOutboundProjection)
   registerProjection(quoteToCashAutopromoterProjection)
   registerProjection(vatMonthlyPositionProjection)
 }
