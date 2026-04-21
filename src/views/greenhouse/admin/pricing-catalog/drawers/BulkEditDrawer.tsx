@@ -19,12 +19,25 @@ import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 
 export interface BulkEditDrawerProps {
   open: boolean
-  roleIds: string[]
+  /** @deprecated use entityIds + entityType */
+  roleIds?: string[]
+  entityType?: 'sellable_role' | 'tool_catalog' | 'overhead_addon' | 'service_catalog'
+  entityIds?: string[]
   onClose: () => void
   onSuccess: (result: { applied: number; failed: number }) => void
 }
 
-const BulkEditDrawer = ({ open, roleIds, onClose, onSuccess }: BulkEditDrawerProps) => {
+const BulkEditDrawer = ({
+  open,
+  roleIds,
+  entityType: entityTypeProp,
+  entityIds: entityIdsProp,
+  onClose,
+  onSuccess
+}: BulkEditDrawerProps) => {
+  const entityType = entityTypeProp ?? 'sellable_role'
+  const entityIds = entityIdsProp ?? roleIds ?? []
+
   const [active, setActive] = useState<'unchanged' | 'activate' | 'deactivate'>('unchanged')
   const [notes, setNotes] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -41,8 +54,16 @@ const BulkEditDrawer = ({ open, roleIds, onClose, onSuccess }: BulkEditDrawerPro
   const handleSubmit = useCallback(async () => {
     const updates: Record<string, unknown> = {}
 
-    if (active === 'activate') updates.active = true
-    if (active === 'deactivate') updates.active = false
+    if (active === 'activate') {
+      // tool_catalog usa is_active, otros active
+      if (entityType === 'tool_catalog') updates.is_active = true
+      else updates.active = true
+    }
+
+    if (active === 'deactivate') {
+      if (entityType === 'tool_catalog') updates.is_active = false
+      else updates.active = false
+    }
 
     const notesAppend = notes.trim()
 
@@ -56,11 +77,16 @@ const BulkEditDrawer = ({ open, roleIds, onClose, onSuccess }: BulkEditDrawerPro
     setError(null)
 
     try {
-      const response = await fetch('/api/admin/pricing-catalog/roles/bulk', {
+      const response = await fetch('/api/admin/pricing-catalog/bulk', {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roleIds, updates, notesAppend: notesAppend || undefined })
+        body: JSON.stringify({
+          entityType,
+          entityIds,
+          updates,
+          notesAppend: notesAppend || undefined
+        })
       })
 
       if (!response.ok) {
@@ -80,7 +106,7 @@ const BulkEditDrawer = ({ open, roleIds, onClose, onSuccess }: BulkEditDrawerPro
     } finally {
       setSubmitting(false)
     }
-  }, [active, notes, onSuccess, roleIds])
+  }, [active, entityIds, entityType, notes, onSuccess])
 
   return (
     <Drawer anchor='right' open={open} onClose={handleClose} PaperProps={{ sx: { width: 480 } }}>
@@ -90,7 +116,7 @@ const BulkEditDrawer = ({ open, roleIds, onClose, onSuccess }: BulkEditDrawerPro
             {GH_PRICING_GOVERNANCE.bulkEdit.drawerTitle}
           </Typography>
           <Typography variant='caption' color='text.secondary'>
-            {GH_PRICING_GOVERNANCE.bulkEdit.drawerSubtitle(roleIds.length)}
+            {GH_PRICING_GOVERNANCE.bulkEdit.drawerSubtitle(entityIds.length)}
           </Typography>
         </Stack>
         <IconButton onClick={handleClose} size='small' disabled={submitting} aria-label='Cerrar'>
@@ -141,7 +167,7 @@ const BulkEditDrawer = ({ open, roleIds, onClose, onSuccess }: BulkEditDrawerPro
           variant='contained'
           onClick={() => void handleSubmit()}
           fullWidth
-          disabled={submitting || roleIds.length === 0}
+          disabled={submitting || entityIds.length === 0}
           startIcon={submitting ? <CircularProgress size={16} color='inherit' /> : null}
         >
           {submitting

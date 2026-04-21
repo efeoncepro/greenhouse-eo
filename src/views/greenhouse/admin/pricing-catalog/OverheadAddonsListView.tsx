@@ -39,6 +39,9 @@ import tableStyles from '@core/styles/table.module.css'
 
 import CreateOverheadDrawer from './drawers/CreateOverheadDrawer'
 import EditOverheadDrawer from './drawers/EditOverheadDrawer'
+import BulkEditDrawer from './drawers/BulkEditDrawer'
+import Checkbox from '@mui/material/Checkbox'
+import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -109,10 +112,40 @@ const columnHelper = createColumnHelper<OverheadItem>()
 const buildColumns = (
   onToggleActive: (overhead: OverheadItem, next: boolean) => void,
   togglingId: string | null,
-  onEdit: (overhead: OverheadItem) => void
+  onEdit: (overhead: OverheadItem) => void,
+  selectedIds: Set<string>,
+  onToggleSelect: (addonId: string, checked: boolean) => void,
+  onToggleSelectAll: (checked: boolean) => void,
+  allSelectedIds: string[]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ColumnDef<OverheadItem, any>[] => [
+  columnHelper.display({
+    id: 'select',
+    size: 40,
+    header: () => {
+      const allSelected = allSelectedIds.length > 0 && allSelectedIds.every(id => selectedIds.has(id))
+      const someSelected = allSelectedIds.some(id => selectedIds.has(id))
+
+      return (
+        <Checkbox
+          size='small'
+          checked={allSelected}
+          indeterminate={!allSelected && someSelected}
+          onChange={(_, checked) => onToggleSelectAll(checked)}
+          aria-label={GH_PRICING_GOVERNANCE.bulkEdit.selectAllLabel}
+        />
+      )
+    },
+    cell: ({ row }) => (
+      <Checkbox
+        size='small'
+        checked={selectedIds.has(row.original.addonId)}
+        onChange={(_, checked) => onToggleSelect(row.original.addonId, checked)}
+        aria-label={`Seleccionar ${row.original.addonSku}`}
+      />
+    )
+  }),
   columnHelper.accessor('addonSku', {
     header: 'SKU',
     cell: ({ getValue }) => (
@@ -348,9 +381,40 @@ const OverheadAddonsListView = () => {
     setEditDrawerOpen(true)
   }, [])
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDrawerOpen, setBulkDrawerOpen] = useState(false)
+
+  const handleToggleSelect = useCallback((addonId: string, checked: boolean) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+
+      if (checked) next.add(addonId)
+      else next.delete(addonId)
+
+      return next
+    })
+  }, [])
+
+  const handleToggleSelectAll = useCallback(
+    (checked: boolean) => {
+      setSelectedIds(checked ? new Set(filteredItems.map(i => i.addonId)) : new Set())
+    },
+    [filteredItems]
+  )
+
+  const allFilteredIds = useMemo(() => filteredItems.map(i => i.addonId), [filteredItems])
+
   const columns = useMemo(
-    () => buildColumns(handleToggleActive, togglingId, handleEdit),
-    [handleToggleActive, togglingId, handleEdit]
+    () => buildColumns(
+      handleToggleActive,
+      togglingId,
+      handleEdit,
+      selectedIds,
+      handleToggleSelect,
+      handleToggleSelectAll,
+      allFilteredIds
+    ),
+    [handleToggleActive, togglingId, handleEdit, selectedIds, handleToggleSelect, handleToggleSelectAll, allFilteredIds]
   )
 
   const table = useReactTable({
@@ -581,6 +645,53 @@ const OverheadAddonsListView = () => {
         }}
         onSuccess={() => void loadData()}
       />
+
+      <BulkEditDrawer
+        open={bulkDrawerOpen}
+        entityType='overhead_addon'
+        entityIds={Array.from(selectedIds)}
+        onClose={() => setBulkDrawerOpen(false)}
+        onSuccess={result => {
+          toast.success(GH_PRICING_GOVERNANCE.bulkEdit.successToast(result.applied))
+          setSelectedIds(new Set())
+          void loadData()
+        }}
+      />
+
+      {selectedIds.size > 0 ? (
+        <Box
+          sx={theme => ({
+            position: 'fixed',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: theme.zIndex.snackbar,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            padding: '8px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            boxShadow: theme.shadows[6]
+          })}
+        >
+          <Typography variant='caption' sx={{ fontWeight: 600 }}>
+            {GH_PRICING_GOVERNANCE.bulkEdit.selectedCountLabel(selectedIds.size)}
+          </Typography>
+          <Button size='small' variant='text' onClick={() => setSelectedIds(new Set())}>
+            {GH_PRICING_GOVERNANCE.bulkEdit.clearSelectionLabel}
+          </Button>
+          <Button
+            size='small'
+            variant='contained'
+            startIcon={<i className='tabler-edit' />}
+            onClick={() => setBulkDrawerOpen(true)}
+          >
+            {GH_PRICING_GOVERNANCE.bulkEdit.bulkEditCta}
+          </Button>
+        </Box>
+      ) : null}
     </Grid>
   )
 }
