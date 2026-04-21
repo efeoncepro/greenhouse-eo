@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-517 Playwright E2E smoke suite (Claude Opus 4.7)
+
+- **Scope:** instalar Playwright + smoke suite autenticado via agent-auth, CI workflow manual/push-develop, docs ops. Primera task completada de Ola 2 (`TASK-511 Stack Modernization Roadmap`). Branch `task/TASK-517-playwright-e2e-smoke`.
+- **Decisión de secuencia:** se hace antes que TASK-516 (NextAuth v4 → Auth.js v5) porque 516 está bloqueado por 515 (jose) y la acceptance de 516 es literalmente el smoke login→session→/finance/quotes que esta task automatiza. 517 da red de seguridad para la migración.
+- **Stack:** `@playwright/test@1.59.1`, Chromium only V1 (Firefox/WebKit follow-up), reuso de `scripts/playwright-auth-setup.mjs` + `/api/auth/agent-session` sin modificarlos.
+- **Archivos creados:**
+  - `playwright.config.ts` (Chromium project, baseURL por env, storageState, bypass header auto, webServer opcional por flag).
+  - `tests/e2e/global-setup.ts` (regenera storageState cuando pasa de 20 min).
+  - `tests/e2e/fixtures/auth.ts` (helpers `expectAuthenticated` + `gotoAuthenticated`).
+  - `tests/e2e/smoke/*.spec.ts` × 6 → 10 tests: login-session, home, finance-quotes, hr-payroll, people-360, admin-nav.
+  - `.github/workflows/playwright.yml` (workflow_dispatch + push develop, guard fail-fast, HTML/JSON/trace artifacts).
+  - `docs/operations/PLAYWRIGHT_E2E.md` V1 (stack, env, local/staging/CI how-to, troubleshooting, convenciones).
+- **Archivos modificados:** `package.json` (3 scripts + dep), `.env.example` (3 env vars), `.gitignore` (4 paths).
+- **Asserts del suite:** smoke deliberadamente minimalista — `status < 400`, `<body>` visible, sin error text, sin redirect a `/login`. No testea copy ni UI específica (integration/visual regression son out of scope V1).
+- **Verificación local 2026-04-21:** `pnpm lint` clean (solo warning pre-existente en BulkEditDrawer) · `npx tsc --noEmit` 0 errores · `pnpm test` 1572/1572 + 2 skipped (sin regresión) · `pnpm exec playwright test --list` parsea las 10 specs.
+- **Pendiente V1:** green run real contra localhost o staging (requiere `AGENT_AUTH_SECRET` en `.env.local` o GitHub Secrets configurados). Config y specs están listos; falta solo inyectar el secret.
+- **Sinergia con TASK-516:** el test de cookie ya lista ambos nombres (`next-auth.session-token` + `authjs.session-token`) para sobrevivir la migración. `storageState.json` se regenera automáticamente en cada run.
+- **Follow-ups explícitos:** multi-browser matrix (Firefox + WebKit), visual regression (Chromatic/Percy), integration tests de mutación, Preview-deployment E2E hook por PR.
+
 ## Sesion 2026-04-21 — TASK-452 Service Attribution Foundation — cierre formal (Claude Opus 4.7)
 
 - **Scope:** cerrar formalmente TASK-452. Auditoría contra el repo confirma que la foundation ya está shipped por Codex en commits previos; el único gap era documental/lifecycle. El branch `task/TASK-452-service-attribution-foundation` estaba desalineado (behind develop por 5 commits post TASK-466/482); lo recreé desde develop actual.
