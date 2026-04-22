@@ -60,6 +60,13 @@ interface ContextChipCommonProps {
 
   /** Micro-label shown below the chip when status='blocking-empty' (e.g. "Requerido"). */
   requiredHint?: string
+
+  /**
+   * When true, the chip fills 100% of its parent width and drops the 40ch cap.
+   * Use only when wrapping the chip in a sized flex/grid cell that controls width.
+   * Only applies to `prominence='primary'`; ignored for `inline`.
+   */
+  fullWidth?: boolean
 }
 
 interface ContextChipPopoverNotice {
@@ -144,7 +151,8 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
     testId,
     ariaLabel,
     prominence = 'primary',
-    requiredHint
+    requiredHint,
+    fullWidth = false
   } = props
 
   const labelId = useId()
@@ -279,7 +287,12 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           return {
             minHeight: 44,
             minWidth: 0,
-            maxWidth: '40ch',
+
+            // fullWidth makes the chip claim 100% of its parent flex/grid cell and
+            // drops the natural 40ch content-cap so a distributed-row layout can
+            // balance 3 chips across the strip instead of leaving dead space.
+            width: fullWidth ? '100%' : undefined,
+            maxWidth: fullWidth ? 'none' : '40ch',
             px: 1.75,
             py: 1,
             borderRadius: `${theme.shape.customBorderRadius.md}px`,

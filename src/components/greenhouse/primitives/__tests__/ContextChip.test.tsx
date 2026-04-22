@@ -91,4 +91,19 @@ describe('ContextChip', () => {
     // The asterisk is inside a <span> with color=error.main — look for the raw '*' char
     expect(container.textContent).toContain('*')
   })
+
+  it('accepts fullWidth without breaking the render', () => {
+    // fullWidth swaps the inline sx to `width: '100%'` + `maxWidth: 'none'`.
+    // We can't reliably read emotion-injected CSS in jsdom, so we verify the
+    // component renders without throwing and exposes the button role as usual.
+    const { getByRole, rerender } = renderWithTheme(
+      <ContextChip {...baseSelectProps} value='Acme' fullWidth />
+    )
+
+    expect(getByRole('button', { name: /Organización/ })).toBeInTheDocument()
+
+    // Toggling fullWidth back off should not crash either.
+    rerender(<ContextChip {...baseSelectProps} value='Acme' fullWidth={false} />)
+    expect(getByRole('button', { name: /Organización/ })).toBeInTheDocument()
+  })
 })

@@ -14,7 +14,6 @@ import ContextChip, {
   type ContextChipOption,
   type ContextChipStatus
 } from '@/components/greenhouse/primitives/ContextChip'
-import ContextChipStrip from '@/components/greenhouse/primitives/ContextChipStrip'
 import FieldsProgressChip from '@/components/greenhouse/primitives/FieldsProgressChip'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { motion } from '@/libs/FramerMotion'
@@ -440,18 +439,33 @@ const QuoteContextStrip = ({
     >
       <Stack spacing={2} aria-label={GH_PRICING.contextChips.ariaLabel}>
         {/* ────────────────────────────────────────────────────────────────
-            Tier 1 — Party (prominence='primary'). Cajas visibles.
+            Tier 1 — Party (prominence='primary'). Flex-distributed chips
+            + right-anchored progress counter. Balances the strip so the
+            content is not left-crammed with a big empty right half.
             ──────────────────────────────────────────────────────────────── */}
         <Box component='fieldset' sx={FIELDSET_RESET_SX}>
           <Typography component='legend' sx={SR_ONLY_SX}>
             {GH_PRICING.contextChips.groupLabels.party}
           </Typography>
-          <ContextChipStrip
-            ariaLabel={GH_PRICING.contextChips.groupLabels.party}
-            scrollMobile={true}
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={{ xs: 1.5, md: 2 }}
+            alignItems={{ xs: 'stretch', md: 'center' }}
+            justifyContent='space-between'
+            useFlexGap
           >
+            <Stack
+              direction='row'
+              spacing={1.5}
+              rowGap={1.5}
+              flexWrap='wrap'
+              useFlexGap
+              sx={{ flex: 1, minWidth: 0 }}
+            >
         {/* Organizacion — 2 clicks con Autocomplete */}
+        <Box sx={{ flex: 1, minWidth: 180 }}>
         <ContextChip
+          fullWidth
           prominence='primary'
           icon={GH_PRICING.contextChips.organization.icon}
           label={GH_PRICING.contextChips.organization.label}
@@ -562,9 +576,12 @@ const QuoteContextStrip = ({
               : 'Sin organizaciones'
           }
         />
+        </Box>
 
         {/* Contacto — 2 clicks con Autocomplete */}
+        <Box sx={{ flex: 1, minWidth: 180 }}>
         <ContextChip
+          fullWidth
           prominence='primary'
           icon={GH_PRICING.contextChips.contact.icon}
           label={GH_PRICING.contextChips.contact.label}
@@ -588,14 +605,17 @@ const QuoteContextStrip = ({
               : GH_PRICING.contextChips.contact.empty
           }
         />
+        </Box>
 
         {/* Deal HubSpot */}
+        <Box sx={{ flex: 1, minWidth: 180 }}>
         <motion.div
-          style={{ display: 'inline-block' }}
+          style={{ display: 'block' }}
           animate={dealShouldPulse ? { opacity: [1, 0.88, 1, 0.88, 1] } : { opacity: 1 }}
           transition={{ duration: 2.4, ease: 'easeInOut', times: [0, 0.25, 0.5, 0.75, 1] }}
         >
           <ContextChip
+            fullWidth
             prominence='primary'
             icon={GH_PRICING.contextChips.deal.icon}
             label={GH_PRICING.contextChips.deal.label}
@@ -632,7 +652,19 @@ const QuoteContextStrip = ({
           }
         />
         </motion.div>
-          </ContextChipStrip>
+        </Box>
+            </Stack>
+            {/* Progress counter anchored top-right, aligned to Tier 1 row for balance. */}
+            <Box sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', md: 'center' } }}>
+              <FieldsProgressChip
+                filled={progressFilled}
+                total={progressTotal}
+                suffix={GH_PRICING.contextChips.progress.suffix}
+                srLabel={GH_PRICING.contextChips.progress.ariaLive}
+                testId='quote-context-progress'
+              />
+            </Box>
+          </Stack>
         </Box>
 
         {/* ────────────────────────────────────────────────────────────────
@@ -718,7 +750,8 @@ const QuoteContextStrip = ({
         </Box>
 
         {/* ────────────────────────────────────────────────────────────────
-            Tier 3 — Timing (prominence='inline') + progress counter.
+            Tier 3 — Timing (prominence='inline'). Progress counter live
+            anchors at Tier 1 top-right, not here.
             ──────────────────────────────────────────────────────────────── */}
         <Box component='fieldset' sx={FIELDSET_RESET_SX}>
           <Typography component='legend' sx={SR_ONLY_SX}>
@@ -729,18 +762,9 @@ const QuoteContextStrip = ({
             spacing={0.5}
             flexWrap='wrap'
             rowGap={0.5}
-            alignItems='center'
-            justifyContent='space-between'
+            alignItems='baseline'
             useFlexGap
           >
-            <Stack
-              direction='row'
-              spacing={0.5}
-              flexWrap='wrap'
-              rowGap={0.5}
-              alignItems='baseline'
-              useFlexGap
-            >
             {/* Duracion — custom input (number) */}
             <ContextChip
               prominence='inline'
@@ -802,14 +826,6 @@ const QuoteContextStrip = ({
                   />
                 </Stack>
               )}
-            />
-            </Stack>
-            <FieldsProgressChip
-              filled={progressFilled}
-              total={progressTotal}
-              suffix={GH_PRICING.contextChips.progress.suffix}
-              srLabel={GH_PRICING.contextChips.progress.ariaLive}
-              testId='quote-context-progress'
             />
           </Stack>
         </Box>
