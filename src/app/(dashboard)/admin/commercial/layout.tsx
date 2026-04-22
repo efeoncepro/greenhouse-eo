@@ -14,7 +14,11 @@ export default async function AdminCommercialLayout({ children }: { children: Re
 
   const hasAccess = hasAnyAuthorizedViewCode({
     tenant,
-    viewCodes: ['administracion.admin_center', 'administracion.commercial_parties'],
+    viewCodes: [
+      'administracion.admin_center',
+      'administracion.commercial_parties',
+      'administracion.product_sync_conflicts'
+    ],
     fallback: tenant.routeGroups.includes('admin')
   })
 

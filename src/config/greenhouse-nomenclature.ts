@@ -34,6 +34,7 @@ export const GH_INTERNAL_NAV = {
   adminIntegrationGovernance: { label: 'Integration Governance', subtitle: 'Registro, taxonomia, readiness y ownership de integraciones nativas' },
   adminAccounts: { label: 'Cuentas', subtitle: 'Organizaciones, spaces y gobierno de identidad' },
   adminCommercialParties: { label: 'Commercial Parties', subtitle: 'Embudo, adopción HubSpot y conflictos del party lifecycle' },
+  adminProductSyncConflicts: { label: 'Product Sync Conflicts', subtitle: 'Drift del catálogo comercial, auto-heal y resolución operativa con HubSpot Products' },
   adminPaymentInstruments: { label: 'Instrumentos de pago', subtitle: 'Cuentas bancarias, tarjetas, fintech y plataformas' },
   adminPricingCatalog: { label: 'Catálogo de pricing', subtitle: 'Roles, tools, overheads y gobierno comercial' },
   adminTalentReview: { label: 'Verificación de talento', subtitle: 'Skills, herramientas y certificaciones por revisar' },

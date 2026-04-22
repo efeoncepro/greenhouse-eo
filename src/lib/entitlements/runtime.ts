@@ -329,6 +329,7 @@ export const getTenantEntitlements = (subject: TenantEntitlementSubject): Tenant
     addEntitlement(entries, { module: 'commercial', capability: 'commercial.party.override_lifecycle', action: 'update', scope: 'tenant', source: 'role' })
     addEntitlement(entries, { module: 'commercial', capability: 'commercial.deal.create', action: 'create', scope: 'tenant', source: 'role' })
     addEntitlement(entries, { module: 'commercial', capability: 'commercial.quote_to_cash.execute', action: 'approve', scope: 'tenant', source: 'role' })
+    addEntitlement(entries, { module: 'commercial', capability: 'commercial.product_catalog.resolve_conflict', action: 'update', scope: 'all', source: 'role' })
   }
 
   if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN)) {

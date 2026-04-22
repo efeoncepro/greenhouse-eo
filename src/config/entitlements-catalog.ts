@@ -175,6 +175,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'commercial',
     actions: ['approve'] as const,
     defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.product_catalog.resolve_conflict',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'all'
   }
 ] as const
 

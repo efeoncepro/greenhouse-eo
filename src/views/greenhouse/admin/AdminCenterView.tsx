@@ -279,6 +279,25 @@ const buildDomainCards = ({
     ]
   },
   {
+    id: 'product-sync-conflicts',
+    title: GH_INTERNAL_NAV.adminProductSyncConflicts.label,
+    subtitle: GH_INTERNAL_NAV.adminProductSyncConflicts.subtitle,
+    icon: 'tabler-arrows-shuffle',
+    avatarColor: 'warning',
+    status: {
+      label: 'Catálogo',
+      color: 'info'
+    },
+    href: '/admin/commercial/product-sync-conflicts',
+    primaryAction: 'Abrir conflictos de producto',
+    routes: ['/admin/commercial/product-sync-conflicts'],
+    points: [
+      'Drift nightly entre product_catalog y HubSpot Products',
+      'Auto-heal seguro para orphans en Greenhouse, field drift y archive mismatch',
+      'Resolución manual auditable cuando HubSpot o el operador deben ganar'
+    ]
+  },
+  {
     id: 'ops-health',
     title: 'Ops Health',
     subtitle: GH_INTERNAL_NAV.adminOpsHealth.subtitle,

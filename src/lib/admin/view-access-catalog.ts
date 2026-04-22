@@ -336,6 +336,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.product_sync_conflicts',
+    section: 'administracion',
+    label: 'Product Sync Conflicts',
+    description: 'Drift del catálogo comercial, auto-heal y resolución operativa de conflictos con HubSpot Products.',
+    routePath: '/admin/commercial/product-sync-conflicts',
+    routeGroup: 'admin'
+  },
+  {
     viewCode: 'administracion.instrumentos_pago',
     section: 'administracion',
     label: 'Instrumentos de pago',
