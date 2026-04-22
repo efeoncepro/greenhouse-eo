@@ -450,7 +450,7 @@ const QuoteContextStrip = ({
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             spacing={{ xs: 1.5, md: 2 }}
-            alignItems={{ xs: 'stretch', md: 'center' }}
+            alignItems='stretch'
             justifyContent='space-between'
             useFlexGap
           >
@@ -460,6 +460,7 @@ const QuoteContextStrip = ({
               rowGap={1.5}
               flexWrap='wrap'
               useFlexGap
+              alignItems='stretch'
               sx={{ flex: 1, minWidth: 0 }}
             >
         {/* Organizacion — 2 clicks con Autocomplete */}
@@ -610,7 +611,7 @@ const QuoteContextStrip = ({
         {/* Deal HubSpot */}
         <Box sx={{ flex: 1, minWidth: 180 }}>
         <motion.div
-          style={{ display: 'block' }}
+          style={{ display: 'block', height: '100%' }}
           animate={dealShouldPulse ? { opacity: [1, 0.88, 1, 0.88, 1] } : { opacity: 1 }}
           transition={{ duration: 2.4, ease: 'easeInOut', times: [0, 0.25, 0.5, 0.75, 1] }}
         >
@@ -626,9 +627,6 @@ const QuoteContextStrip = ({
               : GH_PRICING.contextChips.deal.placeholder
           }
           status={dealStatus}
-          requiredHint={
-            dealStatus === 'blocking-empty' ? GH_PRICING.contextChips.requiredBadge : undefined
-          }
           disabled={disabled || !values.organizationId}
           errorMessage={invalidFields.hubspotDealId}
           options={dealOptions}
@@ -654,8 +652,15 @@ const QuoteContextStrip = ({
         </motion.div>
         </Box>
             </Stack>
-            {/* Progress counter anchored top-right, aligned to Tier 1 row for balance. */}
-            <Box sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', md: 'center' } }}>
+            {/* Progress counter anchored right, vertically centered on Tier 1. */}
+            <Box
+              sx={{
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                alignSelf: { xs: 'flex-start', md: 'stretch' }
+              }}
+            >
               <FieldsProgressChip
                 filled={progressFilled}
                 total={progressTotal}
