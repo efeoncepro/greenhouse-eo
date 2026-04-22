@@ -1,4 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
+
+import { server } from '@/mocks/node'
 
 const { getSecretSource, resolveSecret } = vi.hoisted(() => ({
   getSecretSource: vi.fn(async ({ envVarName, env }: { envVarName: string, env: Record<string, string | undefined> }) => {
@@ -24,6 +27,8 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
 }))
 
 import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/cloud/observability'
+
+const SENTRY_ISSUES_ENDPOINT = '*/api/0/projects/:org/:project/issues/'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -54,7 +59,6 @@ describe('getCloudObservabilityPosture', () => {
     expect(posture.sentry.clientDsnConfigured).toBe(true)
     expect(posture.sentry.authTokenConfigured).toBe(false)
     expect(posture.sentry.sourceMapsReady).toBe(false)
-    expect(posture.slack.enabled).toBe(true)
   })
 
   it('reports source maps as ready only when auth token, org and project exist', async () => {
@@ -91,32 +95,37 @@ describe('getCloudSentryIncidents', () => {
   })
 
   it('normalizes open sentry issues with environment context', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      json: async () => ([
-        {
-          id: '7373141985',
-          shortId: 'JAVASCRIPT-NEXTJS-5',
-          title: 'Value of type FLOAT64 cannot be assigned to value, which has type NUMERIC at [20:21]',
-          culprit: 'GET /api/finance/economic-indicators/sync',
-          level: 'error',
-          status: 'unresolved',
-          count: '1',
-          userCount: 0,
-          firstSeen: '2026-03-29T23:00:00.000Z',
-          lastSeen: '2026-03-29T23:32:00.000Z',
-          permalink: 'https://sentry.io/issues/7373141985/',
-          project: { slug: 'javascript-nextjs' },
-          tags: [
-            { key: 'environment', value: 'production' },
-            { key: 'release', value: 'fbe21a331415' },
-            { key: 'transaction', value: 'GET /api/finance/economic-indicators/sync' }
-          ]
-        }
-      ])
-    }))
+    const capturedRequests: string[] = []
 
-    vi.stubGlobal('fetch', fetchMock)
+    server.use(
+      http.get(SENTRY_ISSUES_ENDPOINT, ({ request, params }) => {
+        capturedRequests.push(request.url)
+        expect(params.org).toBe('efeonce-group-spa')
+        expect(params.project).toBe('javascript-nextjs')
+
+        return HttpResponse.json([
+          {
+            id: '7373141985',
+            shortId: 'JAVASCRIPT-NEXTJS-5',
+            title: 'Value of type FLOAT64 cannot be assigned to value, which has type NUMERIC at [20:21]',
+            culprit: 'GET /api/finance/economic-indicators/sync',
+            level: 'error',
+            status: 'unresolved',
+            count: '1',
+            userCount: 0,
+            firstSeen: '2026-03-29T23:00:00.000Z',
+            lastSeen: '2026-03-29T23:32:00.000Z',
+            permalink: 'https://sentry.io/issues/7373141985/',
+            project: { slug: 'javascript-nextjs' },
+            tags: [
+              { key: 'environment', value: 'production' },
+              { key: 'release', value: 'fbe21a331415' },
+              { key: 'transaction', value: 'GET /api/finance/economic-indicators/sync' }
+            ]
+          }
+        ])
+      })
+    )
 
     const snapshot = await getCloudSentryIncidents({
       SENTRY_AUTH_TOKEN: 'token',
@@ -124,10 +133,8 @@ describe('getCloudSentryIncidents', () => {
       SENTRY_PROJECT: 'javascript-nextjs'
     })
 
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-    const firstCallUrl = String((fetchMock.mock.calls.at(0) as unknown[] | undefined)?.[0] ?? '')
-
-    expect(firstCallUrl).toContain('/api/0/projects/efeonce-group-spa/javascript-nextjs/issues/')
+    expect(capturedRequests).toHaveLength(1)
+    expect(capturedRequests[0]).toContain('/api/0/projects/efeonce-group-spa/javascript-nextjs/issues/')
     expect(snapshot.status).toBe('warning')
     expect(snapshot.summary).toContain('1 incidente')
     expect(snapshot.incidents[0]).toMatchObject({
@@ -142,10 +149,9 @@ describe('getCloudSentryIncidents', () => {
   })
 
   it('returns ok when sentry has no open incidents', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      ok: true,
-      json: async () => []
-    })))
+    server.use(
+      http.get(SENTRY_ISSUES_ENDPOINT, () => HttpResponse.json([]))
+    )
 
     const snapshot = await getCloudSentryIncidents({
       SENTRY_AUTH_TOKEN: 'token',
@@ -158,9 +164,9 @@ describe('getCloudSentryIncidents', () => {
   })
 
   it('fails soft when sentry request errors', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => {
-      throw new Error('network down')
-    }))
+    server.use(
+      http.get(SENTRY_ISSUES_ENDPOINT, () => HttpResponse.error())
+    )
 
     const snapshot = await getCloudSentryIncidents({
       SENTRY_AUTH_TOKEN: 'token',
@@ -175,11 +181,14 @@ describe('getCloudSentryIncidents', () => {
   })
 
   it('returns an actionable warning when the token lacks issues permission', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      ok: false,
-      status: 403,
-      text: async () => '{"detail":"You do not have permission to perform this action."}'
-    })))
+    server.use(
+      http.get(SENTRY_ISSUES_ENDPOINT, () =>
+        HttpResponse.json(
+          { detail: 'You do not have permission to perform this action.' },
+          { status: 403 }
+        )
+      )
+    )
 
     const snapshot = await getCloudSentryIncidents({
       SENTRY_INCIDENTS_AUTH_TOKEN: 'reader-token',

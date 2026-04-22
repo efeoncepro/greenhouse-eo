@@ -3,13 +3,14 @@
 import type { ReactElement } from 'react'
 
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 
-import PersonActivityTab from './PersonActivityTab'
+import { server } from '@/mocks/node'
 
-const fetchMock = vi.fn()
+import PersonActivityTab from './PersonActivityTab'
 
 const testTheme = createTheme({
   palette: {
@@ -46,69 +47,54 @@ vi.mock('@/components/greenhouse/NexaInsightsBlock', () => ({
 }))
 
 describe('PersonActivityTab', () => {
-  beforeEach(() => {
-    fetchMock.mockReset()
-    vi.stubGlobal('fetch', fetchMock)
-  })
-
   afterEach(() => {
     cleanup()
-    vi.unstubAllGlobals()
   })
 
   it('renders Nexa insights at the top of the activity surface from the intelligence snapshot', async () => {
-    fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
-      const url = String(input)
+    server.use(
+      http.get('*/api/ico-engine/context', () =>
+        HttpResponse.json({
+          context: {
+            totalTasks: 4,
+            completedTasks: 2,
+            activeTasks: 1,
+            carryOverTasks: 1
+          },
+          metrics: [
+            { metricId: 'rpa', value: 1.7, zone: null },
+            { metricId: 'otd_pct', value: 72, zone: null },
+            { metricId: 'ftr_pct', value: 88, zone: null },
+            { metricId: 'throughput', value: 14, zone: null },
+            { metricId: 'cycle_time', value: 3.2, zone: null },
+            { metricId: 'stuck_assets', value: 1, zone: null },
+            { metricId: 'pipeline_velocity', value: 0.8, zone: null }
+          ],
+          cscDistribution: []
+        })
+      ),
+      http.get('*/api/people/:memberId/intelligence', ({ params }) => {
+        expect(params.memberId).toBe('member-1')
 
-      if (url.includes('/api/ico-engine/context')) {
-        return {
-          ok: true,
-          json: async () => ({
-            context: {
-              totalTasks: 4,
-              completedTasks: 2,
-              activeTasks: 1,
-              carryOverTasks: 1
-            },
-            metrics: [
-              { metricId: 'rpa', value: 1.7, zone: null },
-              { metricId: 'otd_pct', value: 72, zone: null },
-              { metricId: 'ftr_pct', value: 88, zone: null },
-              { metricId: 'throughput', value: 14, zone: null },
-              { metricId: 'cycle_time', value: 3.2, zone: null },
-              { metricId: 'stuck_assets', value: 1, zone: null },
-              { metricId: 'pipeline_velocity', value: 0.8, zone: null }
-            ],
-            cscDistribution: []
-          })
-        }
-      }
-
-      if (url.includes('/api/people/member-1/intelligence')) {
-        return {
-          ok: true,
-          json: async () => ({
-            nexaInsights: {
-              totalAnalyzed: 2,
-              lastAnalysis: '2026-03-26T15:00:00.000Z',
-              runStatus: 'succeeded',
-              insights: [
-                {
-                  id: 'EO-AIE-0001',
-                  signalType: 'root_cause',
-                  metricId: 'rpa',
-                  severity: 'critical',
-                  explanation: '@[Ana Perez](member:member-2) está concentrando el cuello de botella en RpA.',
-                  recommendedAction: 'Redistribuir carga con @[Space Alpha](space:space-1).'
-                }
-              ]
-            }
-          })
-        }
-      }
-
-      throw new Error(`Unexpected fetch call: ${url}`)
-    })
+        return HttpResponse.json({
+          nexaInsights: {
+            totalAnalyzed: 2,
+            lastAnalysis: '2026-03-26T15:00:00.000Z',
+            runStatus: 'succeeded',
+            insights: [
+              {
+                id: 'EO-AIE-0001',
+                signalType: 'root_cause',
+                metricId: 'rpa',
+                severity: 'critical',
+                explanation: '@[Ana Perez](member:member-2) está concentrando el cuello de botella en RpA.',
+                recommendedAction: 'Redistribuir carga con @[Space Alpha](space:space-1).'
+              }
+            ]
+          }
+        })
+      })
+    )
 
     const { container } = renderWithTheme(<PersonActivityTab memberId='member-1' />)
 

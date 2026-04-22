@@ -1,4 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { http, HttpResponse } from 'msw'
+
+import { server } from '@/mocks/node'
 
 const { resolveSecret } = vi.hoisted(() => ({
   resolveSecret: vi.fn()
@@ -10,14 +13,14 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
 
 import { alertCronFailure, sendSlackAlert } from '@/lib/alerts/slack-notify'
 
+const WEBHOOK_URL = 'https://hooks.slack.test/123'
+
 describe('slack alerts', () => {
   beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn())
     resolveSecret.mockReset()
   })
 
   afterEach(() => {
-    vi.unstubAllGlobals()
     vi.unstubAllEnvs()
   })
 
@@ -36,14 +39,23 @@ describe('slack alerts', () => {
   it('posts alerts to the resolved webhook', async () => {
     resolveSecret.mockResolvedValue({
       source: 'secret_manager',
-      value: 'https://hooks.slack.test/123',
+      value: WEBHOOK_URL,
       envVarName: 'SLACK_ALERTS_WEBHOOK_URL',
       secretRefEnvVarName: 'SLACK_ALERTS_WEBHOOK_URL_SECRET_REF',
       secretRef: 'projects/efeonce-group/secrets/slack-alerts/versions/latest'
     })
-    vi.mocked(fetch).mockResolvedValue(new Response(null, { status: 200 }))
+
+    const capturedBodies: unknown[] = []
+
+    server.use(
+      http.post(WEBHOOK_URL, async ({ request }) => {
+        capturedBodies.push(await request.json())
+
+        return new HttpResponse(null, { status: 200 })
+      })
+    )
 
     await expect(alertCronFailure('outbox-publish', new Error('boom'))).resolves.toBe(true)
-    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(capturedBodies).toHaveLength(1)
   })
 })
