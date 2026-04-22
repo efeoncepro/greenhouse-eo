@@ -8,6 +8,14 @@ Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se
 - La projection reactiva `vat_monthly_position` consume `finance.income.{created,updated,nubox_synced}` y `finance.expense.{created,updated,nubox_synced}` para recomputar la posicion mensual de IVA por `space_id`.
 - El catálogo también se alinea a la realidad runtime de Nubox: `finance.expense.nubox_synced` ya existe como familia emitida/consumible y queda formalizado en esta versión documental.
 
+## Delta 2026-04-22
+
+- `TASK-550` agrega el aggregate type `pricing_catalog_approval`.
+- Se formalizan dos eventos nuevos:
+  - `commercial.pricing_catalog_approval.proposed`
+  - `commercial.pricing_catalog_approval.decided`
+- La proyección reactiva `pricing_catalog_approval_notifier` consume ambos eventos para despachar notificaciones in-app, email y Slack del approval workflow del pricing catalog.
+
 ## Delta 2026-04-20
 
 - `TASK-452` agrega el aggregate type `service_attribution` y el evento `accounting.service_attribution.period_materialized`.
@@ -152,6 +160,8 @@ consumers can migrate gradually. Canonical events are scoped to the commercial
 | `quotation` | `commercial.discount.health_alert` | `finance/pricing/quotation-pricing-orchestrator.ts` (TASK-346) | `{ quotationId, versionNumber, marginPct, floorPct, targetPct, alerts, createdBy }` | `notifications` (Finance approvals), audit log |
 | `quotation` | `commercial.quotation.pushed_to_hubspot` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` invocado por projection `quotationHubSpotOutbound`) | `{ quotationId, hubspotQuoteId, hubspotDealId, direction: 'outbound', result: 'created' \| 'updated' \| 'skipped', reason?, actorId? }` | observability del bridge outbound + retry audit |
 | `quotation` | `commercial.quotation.hubspot_sync_failed` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` catch branch) | `{ quotationId, hubspotDealId, errorMessage, attemptedAction: 'create' \| 'update', actorId? }` | ops-worker retry, Finance alerting |
+| `pricing_catalog_approval` | `commercial.pricing_catalog_approval.proposed` (TASK-550) | `commercial/pricing-catalog-approvals.ts` (from `proposeApproval`) | `{ approvalId, entityType, entityId, entitySku, proposedByUserId, proposedByName, criticality, justification, proposedAt, proposalMeta? }` | `pricing_catalog_approval_notifier`, audit/observability |
+| `pricing_catalog_approval` | `commercial.pricing_catalog_approval.decided` (TASK-550) | `commercial/pricing-catalog-approvals.ts` (from `decideApproval`) | `{ approvalId, entityType, entityId, entitySku, proposedByUserId, proposedByName, criticality, decision, decidedByUserId, decidedByName, decidedAt, comment, applied, appliedFields, newAuditId, proposalMeta? }` | `pricing_catalog_approval_notifier`, audit/observability |
 
 ### Commercial Party Lifecycle (TASK-535)
 

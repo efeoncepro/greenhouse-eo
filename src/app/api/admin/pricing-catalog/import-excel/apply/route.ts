@@ -90,10 +90,14 @@ export async function POST(request: Request) {
         }
 
         if (diff.action !== 'update') {
+          const requiresApproval = diff.action === 'create' || diff.action === 'delete'
+
           failed.push({
             entityId: entityId ?? 'unknown',
-            message: `Action "${String(diff.action)}" not supported in V1 (only update).`,
-            code: 'action_not_supported'
+            message: requiresApproval
+              ? `Action "${String(diff.action)}" requires approval before apply.`
+              : `Action "${String(diff.action)}" not supported in V1 (only update).`,
+            code: requiresApproval ? 'needs_approval' : 'action_not_supported'
           })
 
           continue

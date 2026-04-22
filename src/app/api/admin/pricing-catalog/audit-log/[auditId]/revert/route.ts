@@ -13,6 +13,10 @@ import {
   PricingCatalogRevertNotSupportedError
 } from '@/lib/commercial/pricing-catalog-revert'
 import {
+  applyPricingCatalogGovernanceRevert,
+  PricingCatalogGovernanceRevertError
+} from '@/lib/commercial/pricing-catalog-governance-writer'
+import {
   applyPricingCatalogEntityChanges,
   EntityWriterError,
   PRICING_CATALOG_ENTITY_WHITELIST
@@ -23,6 +27,14 @@ import {
 } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
+
+const GOVERNANCE_REVERT_ENTITY_TYPES = new Set([
+  'role_tier_margin',
+  'service_tier_margin',
+  'commercial_model_multiplier',
+  'country_pricing_factor',
+  'employment_type'
+])
 
 interface RouteParams {
   auditId: string
@@ -128,7 +140,9 @@ export async function POST(request: Request, { params }: { params: Promise<Route
     throw error
   }
 
-  if (!PRICING_CATALOG_ENTITY_WHITELIST[entry.entityType]) {
+  const isGovernanceRevert = GOVERNANCE_REVERT_ENTITY_TYPES.has(entry.entityType)
+
+  if (!isGovernanceRevert && !PRICING_CATALOG_ENTITY_WHITELIST[entry.entityType]) {
     return NextResponse.json(
       {
         error: `Revert not supported for entity_type "${entry.entityType}" in V1.`,
@@ -144,6 +158,28 @@ export async function POST(request: Request, { params }: { params: Promise<Route
     session?.user?.name || session?.user?.email || tenant.clientName || tenant.userId || 'unknown'
 
   try {
+    if (isGovernanceRevert) {
+      const governanceResult = await applyPricingCatalogGovernanceRevert({
+        entry,
+        changeset: descriptor.payload,
+        audit: {
+          actorUserId: tenant.userId,
+          actorName,
+          reason: reasonRaw
+        }
+      })
+
+      return NextResponse.json(
+        {
+          reverted: true,
+          newAuditId: governanceResult.newAuditId,
+          entityId: governanceResult.entityId,
+          entityType: entry.entityType
+        },
+        { status: 200 }
+      )
+    }
+
     const result = await withTransaction(async (client: PoolClient) => {
       const applyResult = await applyPricingCatalogEntityChanges({
         client,
@@ -190,6 +226,10 @@ export async function POST(request: Request, { params }: { params: Promise<Route
 
     return NextResponse.json({ reverted: true, ...result }, { status: 200 })
   } catch (error) {
+    if (error instanceof PricingCatalogGovernanceRevertError) {
+      return NextResponse.json({ error: error.message, code: error.code }, { status: error.statusCode })
+    }
+
     if (error instanceof EntityWriterError) {
       return NextResponse.json({ error: error.message, code: error.code }, { status: error.statusCode })
     }
@@ -208,4 +248,3 @@ export async function POST(request: Request, { params }: { params: Promise<Route
     )
   }
 }
-

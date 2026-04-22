@@ -284,6 +284,7 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ issues }, { status: 422 })
       }
 
+      const previousEntry = (await listRoleTierMargins()).find(entry => entry.tier === tier) ?? null
       const result = await upsertRoleTierMargin(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -291,10 +292,22 @@ export async function PATCH(request: Request) {
           entityType,
           entityId: `${tier}:${effectiveFrom}`,
           entitySku: null,
-          action: result.action === 'inserted' ? 'created' : 'updated',
+          action: previousEntry ? 'updated' : 'created',
           actorUserId: tenant.userId,
           actorName,
-          changeSummary: { new_values: { ...input, effectiveFrom } },
+          changeSummary: {
+            previous_values: previousEntry
+              ? {
+                  tier: previousEntry.tier,
+                  tierLabel: previousEntry.tierLabel,
+                  marginMin: previousEntry.marginMin,
+                  marginOpt: previousEntry.marginOpt,
+                  marginMax: previousEntry.marginMax,
+                  notes: previousEntry.notes
+                }
+              : null,
+            new_values: { ...input, effectiveFrom }
+          },
           effectiveFrom
         })
       }
@@ -329,6 +342,7 @@ export async function PATCH(request: Request) {
         description: pickString(payload.description)
       }
 
+      const previousEntry = (await listServiceTierMargins()).find(entry => entry.tier === tier) ?? null
       const result = await upsertServiceTierMargin(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -336,10 +350,20 @@ export async function PATCH(request: Request) {
           entityType,
           entityId: `${tier}:${effectiveFrom}`,
           entitySku: null,
-          action: result.action === 'inserted' ? 'created' : 'updated',
+          action: previousEntry ? 'updated' : 'created',
           actorUserId: tenant.userId,
           actorName,
-          changeSummary: { new_values: { ...input, effectiveFrom } },
+          changeSummary: {
+            previous_values: previousEntry
+              ? {
+                  tier: previousEntry.tier,
+                  tierLabel: previousEntry.tierLabel,
+                  marginBase: previousEntry.marginBase,
+                  description: previousEntry.description
+                }
+              : null,
+            new_values: { ...input, effectiveFrom }
+          },
           effectiveFrom
         })
       }
@@ -376,6 +400,9 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ issues }, { status: 422 })
       }
 
+      const previousEntry =
+        (await listCommercialModelMultipliers()).find(entry => entry.modelCode === modelCode) ?? null
+
       const result = await upsertCommercialModelMultiplier(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -383,10 +410,20 @@ export async function PATCH(request: Request) {
           entityType,
           entityId: `${modelCode}:${effectiveFrom}`,
           entitySku: null,
-          action: result.action === 'inserted' ? 'created' : 'updated',
+          action: previousEntry ? 'updated' : 'created',
           actorUserId: tenant.userId,
           actorName,
-          changeSummary: { new_values: { ...input, effectiveFrom } },
+          changeSummary: {
+            previous_values: previousEntry
+              ? {
+                  modelCode: previousEntry.modelCode,
+                  modelLabel: previousEntry.modelLabel,
+                  multiplierPct: previousEntry.multiplierPct,
+                  description: previousEntry.description
+                }
+              : null,
+            new_values: { ...input, effectiveFrom }
+          },
           effectiveFrom
         })
       }
@@ -434,6 +471,9 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ issues }, { status: 422 })
       }
 
+      const previousEntry =
+        (await listCountryPricingFactors()).find(entry => entry.factorCode === factorCode) ?? null
+
       const result = await upsertCountryPricingFactor(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -441,10 +481,22 @@ export async function PATCH(request: Request) {
           entityType,
           entityId: `${factorCode}:${effectiveFrom}`,
           entitySku: null,
-          action: result.action === 'inserted' ? 'created' : 'updated',
+          action: previousEntry ? 'updated' : 'created',
           actorUserId: tenant.userId,
           actorName,
-          changeSummary: { new_values: { ...input, effectiveFrom } },
+          changeSummary: {
+            previous_values: previousEntry
+              ? {
+                  factorCode: previousEntry.factorCode,
+                  factorLabel: previousEntry.factorLabel,
+                  factorMin: previousEntry.factorMin,
+                  factorOpt: previousEntry.factorOpt,
+                  factorMax: previousEntry.factorMax,
+                  appliesWhen: previousEntry.appliesWhen
+                }
+              : null,
+            new_values: { ...input, effectiveFrom }
+          },
           effectiveFrom
         })
       }
@@ -484,6 +536,9 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ issues }, { status: 422 })
       }
 
+      const previousEntry =
+        (await listFteHoursGuide()).find(entry => entry.fteFraction === fteFraction) ?? null
+
       const result = await upsertFteHoursGuide(input, effectiveFrom)
 
       if (result.action !== 'unchanged') {
@@ -491,10 +546,20 @@ export async function PATCH(request: Request) {
           entityType,
           entityId: `${fteFraction}:${effectiveFrom}`,
           entitySku: null,
-          action: result.action === 'inserted' ? 'created' : 'updated',
+          action: previousEntry ? 'updated' : 'created',
           actorUserId: tenant.userId,
           actorName,
-          changeSummary: { new_values: { ...input, effectiveFrom } },
+          changeSummary: {
+            previous_values: previousEntry
+              ? {
+                  fteFraction: previousEntry.fteFraction,
+                  fteLabel: previousEntry.fteLabel,
+                  monthlyHours: previousEntry.monthlyHours,
+                  recommendedDescription: previousEntry.recommendedDescription
+                }
+              : null,
+            new_values: { ...input, effectiveFrom }
+          },
           effectiveFrom
         })
       }
@@ -555,16 +620,38 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ issues }, { status: 422 })
       }
 
+      const previousEntry =
+        (await listEmploymentTypes({ activeOnly: false }))
+          .find(entry => entry.employmentTypeCode === employmentTypeCode) ?? null
+
       const result = await upsertEmploymentType(input)
 
       await recordPricingCatalogAudit({
         entityType,
         entityId: employmentTypeCode,
         entitySku: employmentTypeCode,
-        action: result.created ? 'created' : 'updated',
+        action: previousEntry ? 'updated' : 'created',
         actorUserId: tenant.userId,
         actorName,
-        changeSummary: { new_values: { ...input, effectiveFrom } },
+        changeSummary: {
+          previous_values: previousEntry
+            ? {
+                employmentTypeCode: previousEntry.employmentTypeCode,
+                labelEs: previousEntry.labelEs,
+                labelEn: previousEntry.labelEn,
+                paymentCurrency: previousEntry.paymentCurrency,
+                countryCode: previousEntry.countryCode,
+                appliesPrevisional: previousEntry.appliesPrevisional,
+                previsionalPctDefault: previousEntry.previsionalPctDefault,
+                feeMonthlyUsdDefault: previousEntry.feeMonthlyUsdDefault,
+                feePctDefault: previousEntry.feePctDefault,
+                appliesBonuses: previousEntry.appliesBonuses,
+                sourceOfTruth: previousEntry.sourceOfTruth,
+                notes: previousEntry.notes
+              }
+            : null,
+          new_values: { ...input, effectiveFrom }
+        },
         effectiveFrom
       })
 

@@ -1,5 +1,43 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — TASK-550 Pricing Catalog Phase-5 Follow-ups (Codex)
+
+- **Scope:** cerrar los 4 follow-ups que habían quedado explícitamente fuera del scope V1 de TASK-471: revert governance, gate de impacto alto multi-tab, notificaciones de approval queue y Excel create/delete vía approval workflow.
+- **Correccion de spec antes de implementar**
+  - la spec asumía que el tenant scope broad del módulo seguía siendo `space_id`; el código vivo ya usa `organization_id` para quotations y conserva `space_id` solo en proyecciones legacy
+  - `AuditDiffViewer` y `ApprovalsQueueView` ya existían; el gap real estaba en el wiring, no en crear esas surfaces
+  - `employment_type` no escribía en `pricing-governance-store.ts`, sino en `sellable-roles-store.ts`
+- **Implementacion shipped**
+  - helper nuevo `src/lib/commercial/pricing-catalog-governance-writer.ts` para revert efectivo-dateado de governance
+  - route `/api/admin/pricing-catalog/audit-log/[auditId]/revert` extendida para governance types
+  - `/api/admin/pricing-catalog/governance` ahora persiste `previous_values` para que los cambios futuros sean revertibles
+  - helper nuevo `src/lib/commercial/pricing-catalog-excel-approval.ts`
+  - route nueva `POST /api/admin/pricing-catalog/import-excel/propose`
+  - approval queue extendida para aplicar proposals Excel create/delete al aprobar
+  - eventos nuevos `commercial.pricing_catalog_approval.proposed` y `.decided`
+  - proyección nueva `src/lib/sync/projections/pricing-catalog-approval-notifier.ts`
+  - `ExcelImportView` separa apply directo (`update`) de proposal flow (`create/delete`)
+  - `EditSellableRoleDrawer` aplica gate `impactBlocking` en las 4 tabs guardables
+  - `BulkEditDrawer` quedó saneado para dejar `eslint` sin warnings
+- **Contrato operativo**
+  - `create/delete` desde Excel no persisten directo: siempre pasan por approval queue
+  - `delete` es soft delete (`active=false` o `is_active=false`)
+  - la approval queue sigue siendo source of truth aunque Slack/email falle; el dispatch reactivo es best-effort
+  - el flag `GREENHOUSE_PRICING_APPROVAL_NOTIFICATIONS` gobierna solo las notificaciones, no el flujo de approvals
+- **Docs actualizadas**
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+  - `docs/documentation/finance/administracion-catalogo-pricing.md`
+  - `project_context.md`
+  - `changelog.md`
+  - trackers de task (`docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, task moved a `complete`)
+- **Verificacion ejecutada**
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1813` passing, `2` skipped)
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - sin `new Pool()` nuevos fuera de `src/lib/postgres/client.ts`
+
 ## Sesion 2026-04-21 — TASK-548 Product Catalog Drift Detection & Admin Center (Codex)
 
 - **Scope:** cerrar la Fase D del programa Product Catalog Sync con reconciler nocturno, resolution commands auditables, surface admin de conflictos y tracking operativo end-to-end.

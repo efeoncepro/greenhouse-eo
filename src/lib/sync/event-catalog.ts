@@ -111,6 +111,7 @@ export const AGGREGATE_TYPES = {
   contractQuote: 'contract_quote',
   masterAgreement: 'master_agreement',
   deal: 'deal',
+  pricingCatalogApproval: 'pricing_catalog_approval',
   productCatalog: 'product_catalog',
   productSyncConflict: 'product_sync_conflict',
   sellableRole: 'sellable_role',
@@ -434,6 +435,10 @@ export const EVENT_TYPES = {
 
   // Quote Builder Suggested Cost Override Governance (TASK-481)
   quotationLineCostOverridden: 'commercial.quotation_line.cost_overridden',
+
+  // Pricing Catalog Approvals (TASK-550)
+  pricingCatalogApprovalProposed: 'commercial.pricing_catalog_approval.proposed',
+  pricingCatalogApprovalDecided: 'commercial.pricing_catalog_approval.decided',
 
   // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',

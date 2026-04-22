@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -37,20 +37,20 @@ const BulkEditDrawer = ({
   onSuccess
 }: BulkEditDrawerProps) => {
   const entityType = entityTypeProp ?? 'sellable_role'
-  const entityIds = entityIdsProp ?? roleIds ?? []
+  const entityIds = useMemo(() => entityIdsProp ?? roleIds ?? [], [entityIdsProp, roleIds])
 
   const [active, setActive] = useState<'unchanged' | 'activate' | 'deactivate'>('unchanged')
   const [notes, setNotes] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (submitting) return
     setActive('unchanged')
     setNotes('')
     setError(null)
     onClose()
-  }
+  }, [onClose, submitting])
 
   const handleSubmit = useCallback(async () => {
     const updates: Record<string, unknown> = {}
@@ -107,7 +107,7 @@ const BulkEditDrawer = ({
     } finally {
       setSubmitting(false)
     }
-  }, [active, entityIds, entityType, notes, onSuccess])
+  }, [active, entityIds, entityType, handleClose, notes, onSuccess])
 
   return (
     <Drawer anchor='right' open={open} onClose={handleClose} PaperProps={{ sx: { width: 480 } }}>

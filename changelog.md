@@ -1,5 +1,32 @@
 # changelog.md
 
+## 2026-04-22
+
+### 2026-04-22 — TASK-550 cierra los follow-ups enterprise del Pricing Catalog
+
+- El Admin Pricing Catalog ya quedó convergido respecto de los gaps declarados al cerrar TASK-471.
+- **Governance revert**:
+  - el audit timeline ahora permite revertir `role_tier_margin`, `service_tier_margin`, `commercial_model_multiplier`, `country_pricing_factor` y `employment_type`
+  - el revert usa los write paths canónicos del módulo y deja un nuevo audit `action='reverted'`
+  - `fte_hours_guide` queda explícitamente read-only en esta versión
+- **High-impact gate**:
+  - el `EditSellableRoleDrawer` aplica la confirmación de impacto alto en Info, Modalidades, Componentes de costo y Pricing por moneda
+  - se cierra el bypass que existía cambiando de tab antes de guardar
+- **Approval workflow + notificaciones**:
+  - nuevos eventos `commercial.pricing_catalog_approval.proposed` y `.decided`
+  - nueva proyección reactiva `pricing_catalog_approval_notifier`
+  - envío in-app + email + Slack detrás del flag `GREENHOUSE_PRICING_APPROVAL_NOTIFICATIONS`
+- **Excel import gobernado**:
+  - `update` sigue siendo apply directo
+  - `create` y `delete` pasan a `Proponer aprobación` → approval queue → auto-apply con audit por fila
+  - `delete` sigue siendo soft delete
+- **Docs**:
+  - `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` → v2.34
+  - `GREENHOUSE_EVENT_CATALOG_V1.md` actualizado con el aggregate `pricing_catalog_approval`
+  - `docs/documentation/finance/administracion-catalogo-pricing.md` → v1.2
+  - `project_context.md` + `Handoff.md` alineados al nuevo contrato
+- **Verificación**: `pnpm test` OK (`1813` passing, `2` skipped) · `pnpm lint` OK · `pnpm build` OK.
+
 ## 2026-04-21
 
 ### 2026-04-21 — TASK-542 cierra la surface administrativa de Party Lifecycle

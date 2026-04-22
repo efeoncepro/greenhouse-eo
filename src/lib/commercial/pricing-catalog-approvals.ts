@@ -1,10 +1,17 @@
 import 'server-only'
 
 import { query, withTransaction } from '@/lib/db'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import {
   applyPricingCatalogEntityChanges,
   EntityWriterError
 } from './pricing-catalog-entity-writer'
+import {
+  applyPricingCatalogExcelProposal,
+  isPricingCatalogExcelApprovalPayload,
+  PricingCatalogExcelApprovalError
+} from './pricing-catalog-excel-approval'
 
 export type ApprovalCriticality = 'low' | 'medium' | 'high' | 'critical'
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
@@ -88,6 +95,57 @@ const mapRow = (row: ApprovalRow): PricingCatalogApprovalEntry => ({
   criticality: row.criticality as ApprovalCriticality
 })
 
+const toProposalMeta = (proposedChanges: Record<string, unknown>) => {
+  const meta = proposedChanges.__meta
+
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
+    return null
+  }
+
+  return meta as Record<string, unknown>
+}
+
+const buildApprovalProposedEventPayload = (approval: PricingCatalogApprovalEntry) => ({
+  approvalId: approval.approvalId,
+  entityType: approval.entityType,
+  entityId: approval.entityId,
+  entitySku: approval.entitySku,
+  proposedByUserId: approval.proposedByUserId,
+  proposedByName: approval.proposedByName,
+  criticality: approval.criticality,
+  justification: approval.justification,
+  proposedAt: approval.proposedAt,
+  proposalMeta: toProposalMeta(approval.proposedChanges)
+})
+
+const buildApprovalDecidedEventPayload = (input: {
+  approval: PricingCatalogApprovalEntry
+  decision: DecideApprovalInput['decision']
+  decidedByUserId: string
+  decidedByName: string
+  comment: string
+  applied: boolean
+  appliedFields: string[] | null
+  newAuditId: string | null
+}) => ({
+  approvalId: input.approval.approvalId,
+  entityType: input.approval.entityType,
+  entityId: input.approval.entityId,
+  entitySku: input.approval.entitySku,
+  proposedByUserId: input.approval.proposedByUserId,
+  proposedByName: input.approval.proposedByName,
+  criticality: input.approval.criticality,
+  decision: input.decision,
+  decidedByUserId: input.decidedByUserId,
+  decidedByName: input.decidedByName,
+  decidedAt: input.approval.reviewedAt,
+  comment: input.comment,
+  applied: input.applied,
+  appliedFields: input.appliedFields,
+  newAuditId: input.newAuditId,
+  proposalMeta: toProposalMeta(input.approval.proposedChanges)
+})
+
 /**
  * Criticality detector: given an entity_type + proposed_changes object,
  * returns the criticality level. Low changes bypass the approval queue and
@@ -156,27 +214,41 @@ export const proposeApproval = async (
     proposedChanges: input.proposedChanges
   })
 
-  const rows = await query<ApprovalRow>(
-    `INSERT INTO greenhouse_commercial.pricing_catalog_approval_queue (
-       entity_type, entity_id, entity_sku, proposed_changes,
-       proposed_by_user_id, proposed_by_name, justification, status, criticality
-     ) VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, 'pending', $8)
-     RETURNING *`,
-    [
-      input.entityType,
-      input.entityId,
-      input.entitySku ?? null,
-      JSON.stringify(input.proposedChanges),
-      input.proposedByUserId,
-      input.proposedByName,
-      input.justification ?? null,
-      criticality
-    ]
-  )
+  return withTransaction(async client => {
+    const inserted = await client.query<ApprovalRow>(
+      `INSERT INTO greenhouse_commercial.pricing_catalog_approval_queue (
+         entity_type, entity_id, entity_sku, proposed_changes,
+         proposed_by_user_id, proposed_by_name, justification, status, criticality
+       ) VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, 'pending', $8)
+       RETURNING *`,
+      [
+        input.entityType,
+        input.entityId,
+        input.entitySku ?? null,
+        JSON.stringify(input.proposedChanges),
+        input.proposedByUserId,
+        input.proposedByName,
+        input.justification ?? null,
+        criticality
+      ]
+    )
 
-  if (rows.length === 0) throw new Error('Failed to insert approval row')
+    if (inserted.rowCount === 0) throw new Error('Failed to insert approval row')
 
-  return mapRow(rows[0])
+    const approval = mapRow(inserted.rows[0])
+
+    await publishOutboxEvent(
+      {
+        aggregateType: AGGREGATE_TYPES.pricingCatalogApproval,
+        aggregateId: approval.approvalId,
+        eventType: EVENT_TYPES.pricingCatalogApprovalProposed,
+        payload: buildApprovalProposedEventPayload(approval)
+      },
+      client
+    )
+
+    return approval
+  })
 }
 
 export interface ListApprovalsInput {
@@ -311,55 +383,144 @@ export const decideApproval = async (
 
     // Auto-apply: only on approved decisions.
     if (input.decision !== 'approved') {
-      return { approval, applied: false, appliedFields: null, newAuditId: null }
+      const result = { approval, applied: false, appliedFields: null, newAuditId: null }
+
+      await publishOutboxEvent(
+        {
+          aggregateType: AGGREGATE_TYPES.pricingCatalogApproval,
+          aggregateId: approval.approvalId,
+          eventType: EVENT_TYPES.pricingCatalogApprovalDecided,
+          payload: buildApprovalDecidedEventPayload({
+            approval,
+            decision: input.decision,
+            decidedByUserId: input.reviewerUserId,
+            decidedByName: input.reviewerName,
+            comment: input.comment,
+            applied: result.applied,
+            appliedFields: result.appliedFields,
+            newAuditId: result.newAuditId
+          })
+        },
+        client
+      )
+
+      return result
     }
 
     const proposedChanges = approval.proposedChanges
 
     if (!proposedChanges || typeof proposedChanges !== 'object') {
-      return { approval, applied: false, appliedFields: null, newAuditId: null }
+      const result = { approval, applied: false, appliedFields: null, newAuditId: null }
+
+      await publishOutboxEvent(
+        {
+          aggregateType: AGGREGATE_TYPES.pricingCatalogApproval,
+          aggregateId: approval.approvalId,
+          eventType: EVENT_TYPES.pricingCatalogApprovalDecided,
+          payload: buildApprovalDecidedEventPayload({
+            approval,
+            decision: input.decision,
+            decidedByUserId: input.reviewerUserId,
+            decidedByName: input.reviewerName,
+            comment: input.comment,
+            applied: result.applied,
+            appliedFields: result.appliedFields,
+            newAuditId: result.newAuditId
+          })
+        },
+        client
+      )
+
+      return result
     }
 
     try {
-      const result = await applyPricingCatalogEntityChanges({
-        client,
-        entityType: approval.entityType,
-        entityId: approval.entityId,
-        changeset: proposedChanges
-      })
+      const isExcelApproval = isPricingCatalogExcelApprovalPayload(proposedChanges)
+      let appliedFields: string[] = []
+      let auditId: string | null = null
 
-      const auditRes = await client.query<{ audit_id: string }>(
-        `INSERT INTO greenhouse_commercial.pricing_catalog_audit_log (
-           entity_type, entity_id, entity_sku, action,
-           actor_user_id, actor_name, change_summary
-         ) VALUES ($1, $2, $3, 'approval_applied', $4, $5, $6::jsonb)
-         RETURNING audit_id`,
-        [
-          approval.entityType,
-          approval.entityId,
-          approval.entitySku,
-          input.reviewerUserId,
-          input.reviewerName,
-          JSON.stringify({
-            approval_id: approval.approvalId,
-            proposed_by_user_id: approval.proposedByUserId,
-            proposed_by_name: approval.proposedByName,
-            justification: approval.justification,
-            new_values: proposedChanges,
-            fields_changed: result.updatedFields,
-            criticality: approval.criticality,
-            review_comment: input.comment
-          })
-        ]
-      )
+      if (isExcelApproval) {
+        const excelResult = await applyPricingCatalogExcelProposal({
+          client,
+          approvalId: approval.approvalId,
+          reviewerUserId: input.reviewerUserId,
+          reviewerName: input.reviewerName,
+          diff: proposedChanges.diff
+        })
 
-      return {
+        appliedFields = excelResult.appliedFields
+        auditId = excelResult.auditId
+      } else {
+        const applyResult = await applyPricingCatalogEntityChanges({
+          client,
+          entityType: approval.entityType,
+          entityId: approval.entityId,
+          changeset: proposedChanges
+        })
+
+        appliedFields = applyResult.updatedFields
+        auditId = (
+          await client.query<{ audit_id: string }>(
+            `INSERT INTO greenhouse_commercial.pricing_catalog_audit_log (
+               entity_type, entity_id, entity_sku, action,
+               actor_user_id, actor_name, change_summary
+             ) VALUES ($1, $2, $3, 'approval_applied', $4, $5, $6::jsonb)
+             RETURNING audit_id`,
+            [
+              approval.entityType,
+              approval.entityId,
+              approval.entitySku,
+              input.reviewerUserId,
+              input.reviewerName,
+              JSON.stringify({
+                approval_id: approval.approvalId,
+                proposed_by_user_id: approval.proposedByUserId,
+                proposed_by_name: approval.proposedByName,
+                justification: approval.justification,
+                new_values: proposedChanges,
+                fields_changed: appliedFields,
+                criticality: approval.criticality,
+                review_comment: input.comment,
+                source: 'approval_queue',
+                proposal_action: 'update'
+              })
+            ]
+          )
+        ).rows[0]?.audit_id ?? null
+      }
+
+      const result: DecideApprovalResult = {
         approval,
         applied: true,
-        appliedFields: result.updatedFields,
-        newAuditId: auditRes.rows[0]?.audit_id ?? null
+        appliedFields,
+        newAuditId: auditId
       }
+
+      await publishOutboxEvent(
+        {
+          aggregateType: AGGREGATE_TYPES.pricingCatalogApproval,
+          aggregateId: approval.approvalId,
+          eventType: EVENT_TYPES.pricingCatalogApprovalDecided,
+          payload: buildApprovalDecidedEventPayload({
+            approval,
+            decision: input.decision,
+            decidedByUserId: input.reviewerUserId,
+            decidedByName: input.reviewerName,
+            comment: input.comment,
+            applied: result.applied,
+            appliedFields: result.appliedFields,
+            newAuditId: result.newAuditId
+          })
+        },
+        client
+      )
+
+      return result
     } catch (error) {
+      if (error instanceof PricingCatalogExcelApprovalError) {
+        throw new ApprovalApplyError(error.message, error.code, error.statusCode)
+      }
+
       if (error instanceof EntityWriterError) {
         throw new ApprovalApplyError(error.message, error.code, error.statusCode)
       }

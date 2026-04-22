@@ -20,8 +20,8 @@ const HEADER_FONT = 'FFFFFFFF'
  * Import: parsea un workbook y devuelve un diff contra el estado actual de DB.
  *         NO persiste. El caller decide qué diffs aplicar via el endpoint de apply.
  *
- * V1 scope: solo Roles soporta import apply (columna whitelist tight). Tools y
- * overheads se exportan pero su import queda "preview-only" (follow-up).
+ * V1 scope: preview multi-sheet para Roles, Tools y Overheads. Los `update`
+ * pueden aplicar directo; `create`/`delete` deben pasar por approval workflow.
  */
 
 export interface ExcelExportMetadata {
@@ -105,6 +105,7 @@ export const buildPricingCatalogWorkbook = async (
     'tool_id',
     'tool_sku',
     'tool_name',
+    'provider_id',
     'tool_category',
     'cost_model',
     'subscription_amount',
@@ -123,6 +124,7 @@ export const buildPricingCatalogWorkbook = async (
       tool.toolId,
       tool.toolSku,
       tool.toolName,
+      tool.providerId,
       tool.toolCategory ?? '',
       tool.costModel ?? '',
       tool.subscriptionAmount ?? 0,
@@ -242,7 +244,7 @@ const parseRoleRow = (row: ExcelJS.Row): Record<string, unknown> | null => {
 const parseToolRow = (row: ExcelJS.Row): Record<string, unknown> | null => {
   const cells = row.values as Array<ExcelJS.CellValue> | undefined
 
-  if (!cells || cells.length < 9) return null
+  if (!cells || cells.length < 10) return null
 
   const toolId = cells[1]
 
@@ -267,12 +269,13 @@ const parseToolRow = (row: ExcelJS.Row): Record<string, unknown> | null => {
     tool_id: toolId,
     tool_sku: toStr(cells[2]),
     tool_name: toStr(cells[3]),
-    tool_category: toStr(cells[4]),
-    cost_model: toStr(cells[5]),
-    subscription_amount: toNum(cells[6]),
-    subscription_currency: toStr(cells[7]),
-    subscription_billing_cycle: toStr(cells[8]),
-    is_active: toBool(cells[9])
+    provider_id: toStr(cells[4]),
+    tool_category: toStr(cells[5]),
+    cost_model: toStr(cells[6]),
+    subscription_amount: toNum(cells[7]),
+    subscription_currency: toStr(cells[8]),
+    subscription_billing_cycle: toStr(cells[9]),
+    is_active: toBool(cells[10])
   }
 }
 
@@ -329,6 +332,9 @@ const diffFields = (
   return { action: fieldsChanged.length === 0 ? 'noop' : 'update', fieldsChanged }
 }
 
+const getDiffWarnings = (action: PricingCatalogExcelDiffAction): string[] =>
+  action === 'create' || action === 'delete' ? ['needs_approval'] : []
+
 export const previewPricingCatalogExcelImport = async (
   buffer: Buffer
 ): Promise<PricingCatalogExcelPreviewResult> => {
@@ -346,6 +352,7 @@ export const previewPricingCatalogExcelImport = async (
   if (rolesSheet) {
     const currentRoles = await listSellableRoles({})
     const currentById = new Map(currentRoles.map(role => [role.roleId, role]))
+    const seenRoleIds = new Set<string>()
 
     rolesSheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber === 1) return // header
@@ -364,6 +371,7 @@ export const previewPricingCatalogExcelImport = async (
         }
 
         result.metadata.rolesProcessed += 1
+        seenRoleIds.add(parsed.role_id as string)
 
         const current = currentById.get(parsed.role_id as string)
 
@@ -394,7 +402,7 @@ export const previewPricingCatalogExcelImport = async (
           currentValues,
           newValues: parsed,
           fieldsChanged,
-          warnings: []
+          warnings: getDiffWarnings(action)
         })
       } catch (err) {
         result.metadata.errors.push({
@@ -404,6 +412,34 @@ export const previewPricingCatalogExcelImport = async (
         })
       }
     })
+
+    currentRoles.forEach(current => {
+      if (seenRoleIds.has(current.roleId)) return
+
+      result.diffs.push({
+        entityType: 'sellable_role',
+        entityId: current.roleId,
+        entitySku: current.roleSku,
+        action: 'delete',
+        currentValues: {
+          role_id: current.roleId,
+          role_sku: current.roleSku,
+          role_code: current.roleCode,
+          role_label_es: current.roleLabelEs,
+          role_label_en: current.roleLabelEn ?? null,
+          role_category: current.category,
+          role_tier: current.tier ?? null,
+          tier_label: current.tierLabel ?? null,
+          can_sell_as_staff: current.canSellAsStaff,
+          can_sell_as_service_component: current.canSellAsServiceComponent,
+          active: current.active,
+          notes: current.notes ?? null
+        },
+        newValues: null,
+        fieldsChanged: ['active'],
+        warnings: ['needs_approval']
+      })
+    })
   }
 
   const toolsSheet = workbook.getWorksheet('Tools')
@@ -411,6 +447,7 @@ export const previewPricingCatalogExcelImport = async (
   if (toolsSheet) {
     const currentTools = await listToolCatalog({})
     const currentById = new Map(currentTools.map(t => [t.toolId, t]))
+    const seenToolIds = new Set<string>()
 
     toolsSheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber === 1) return
@@ -425,6 +462,7 @@ export const previewPricingCatalogExcelImport = async (
         }
 
         result.metadata.toolsProcessed += 1
+        seenToolIds.add(parsed.tool_id as string)
 
         const current = currentById.get(parsed.tool_id as string)
 
@@ -433,6 +471,7 @@ export const previewPricingCatalogExcelImport = async (
               tool_id: current.toolId,
               tool_sku: current.toolSku,
               tool_name: current.toolName,
+              provider_id: current.providerId,
               tool_category: current.toolCategory ?? null,
               cost_model: current.costModel ?? null,
               subscription_amount: current.subscriptionAmount ?? null,
@@ -452,7 +491,7 @@ export const previewPricingCatalogExcelImport = async (
           currentValues,
           newValues: parsed,
           fieldsChanged,
-          warnings: []
+          warnings: getDiffWarnings(action)
         })
       } catch (err) {
         result.metadata.errors.push({
@@ -462,6 +501,32 @@ export const previewPricingCatalogExcelImport = async (
         })
       }
     })
+
+    currentTools.forEach(current => {
+      if (seenToolIds.has(current.toolId)) return
+
+      result.diffs.push({
+        entityType: 'tool_catalog',
+        entityId: current.toolId,
+        entitySku: current.toolSku,
+        action: 'delete',
+        currentValues: {
+          tool_id: current.toolId,
+          tool_sku: current.toolSku,
+          tool_name: current.toolName,
+          provider_id: current.providerId,
+          tool_category: current.toolCategory ?? null,
+          cost_model: current.costModel ?? null,
+          subscription_amount: current.subscriptionAmount ?? null,
+          subscription_currency: current.subscriptionCurrency ?? null,
+          subscription_billing_cycle: current.subscriptionBillingCycle ?? null,
+          is_active: current.isActive
+        },
+        newValues: null,
+        fieldsChanged: ['is_active'],
+        warnings: ['needs_approval']
+      })
+    })
   }
 
   const overheadsSheet = workbook.getWorksheet('Overheads')
@@ -469,6 +534,7 @@ export const previewPricingCatalogExcelImport = async (
   if (overheadsSheet) {
     const currentOverheads = await listOverheadAddons({})
     const currentById = new Map(currentOverheads.map(o => [o.addonId, o]))
+    const seenOverheadIds = new Set<string>()
 
     overheadsSheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber === 1) return
@@ -483,6 +549,7 @@ export const previewPricingCatalogExcelImport = async (
         }
 
         result.metadata.overheadsProcessed += 1
+        seenOverheadIds.add(parsed.addon_id as string)
 
         const current = currentById.get(parsed.addon_id as string)
 
@@ -511,7 +578,7 @@ export const previewPricingCatalogExcelImport = async (
           currentValues,
           newValues: parsed,
           fieldsChanged,
-          warnings: []
+          warnings: getDiffWarnings(action)
         })
       } catch (err) {
         result.metadata.errors.push({
@@ -520,6 +587,32 @@ export const previewPricingCatalogExcelImport = async (
           message: err instanceof Error ? err.message : 'Error parseando fila.'
         })
       }
+    })
+
+    currentOverheads.forEach(current => {
+      if (seenOverheadIds.has(current.addonId)) return
+
+      result.diffs.push({
+        entityType: 'overhead_addon',
+        entityId: current.addonId,
+        entitySku: current.addonSku,
+        action: 'delete',
+        currentValues: {
+          addon_id: current.addonId,
+          addon_sku: current.addonSku,
+          addon_name: current.addonName,
+          category: current.category ?? null,
+          addon_type: current.addonType ?? null,
+          cost_internal_usd: current.costInternalUsd ?? null,
+          margin_pct: current.marginPct ?? null,
+          final_price_usd: current.finalPriceUsd ?? null,
+          visible_to_client: current.visibleToClient,
+          active: current.active
+        },
+        newValues: null,
+        fieldsChanged: ['active'],
+        warnings: ['needs_approval']
+      })
     })
   }
 

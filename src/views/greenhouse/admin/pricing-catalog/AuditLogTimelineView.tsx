@@ -155,6 +155,29 @@ const ACTION_ICONS: Record<ActionType, string> = {
   bulk_edited: 'tabler-table-options'
 }
 
+const REVERTIBLE_ACTIONS: ActionType[] = [
+  'updated',
+  'deactivated',
+  'reactivated',
+  'cost_updated',
+  'pricing_updated',
+  'recipe_updated'
+]
+
+const REVERTIBLE_ENTITIES: EntityType[] = [
+  'sellable_role',
+  'tool_catalog',
+  'overhead_addon',
+  'service_catalog',
+  'role_tier_margin',
+  'service_tier_margin',
+  'commercial_model_multiplier',
+  'country_pricing_factor',
+  'employment_type'
+]
+
+const READ_ONLY_REVERT_ENTITIES: EntityType[] = ['fte_hours_guide']
+
 // ── Styled ─────────────────────────────────────────────────────────────
 
 const Timeline = styled(MuiTimeline)<TimelineProps>({
@@ -519,32 +542,27 @@ const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) 
                                 changeSummary={entry.changeSummary}
                               />
                               {(() => {
-                                const revertibleActions: ActionType[] = [
-                                  'updated',
-                                  'deactivated',
-                                  'reactivated',
-                                  'cost_updated',
-                                  'pricing_updated',
-                                  'recipe_updated'
-                                ]
+                                const actionOk = REVERTIBLE_ACTIONS.includes(entry.action)
 
-                                const revertibleEntities: EntityType[] = [
-                                  'sellable_role',
-                                  'tool_catalog',
-                                  'overhead_addon',
-                                  'service_catalog'
-                                ]
+                                const entityOk =
+                                  REVERTIBLE_ENTITIES.includes(entry.entityType) ||
+                                  READ_ONLY_REVERT_ENTITIES.includes(entry.entityType)
 
-                                const actionOk = revertibleActions.includes(entry.action)
-                                const entityOk = revertibleEntities.includes(entry.entityType)
                                 const alreadyReverted = revertedIds.has(entry.auditId)
+
+                                const isReadOnlyEntity = READ_ONLY_REVERT_ENTITIES.includes(
+                                  entry.entityType
+                                )
+
                                 const canShowButton = actionOk && entityOk && !alreadyReverted
 
                                 if (!canShowButton) return null
 
-                                const tooltipTitle = !canRevert
-                                  ? GH_PRICING_GOVERNANCE.auditRevert.triggerDisabledNoPermission
-                                  : GH_PRICING_GOVERNANCE.auditRevert.triggerLabel
+                                const tooltipTitle = isReadOnlyEntity
+                                  ? GH_PRICING_GOVERNANCE.auditRevert.triggerDisabledFteGuideReadOnly
+                                  : !canRevert
+                                    ? GH_PRICING_GOVERNANCE.auditRevert.triggerDisabledNoPermission
+                                    : GH_PRICING_GOVERNANCE.auditRevert.triggerLabel
 
                                 return (
                                   <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
@@ -556,7 +574,7 @@ const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) 
                                           color='warning'
                                           startIcon={<i className='tabler-arrow-back-up' />}
                                           onClick={() => setRevertTarget(entry)}
-                                          disabled={!canRevert}
+                                          disabled={isReadOnlyEntity || !canRevert}
                                         >
                                           {GH_PRICING_GOVERNANCE.auditRevert.triggerLabel}
                                         </Button>

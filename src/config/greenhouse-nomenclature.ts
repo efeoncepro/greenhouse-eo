@@ -2449,6 +2449,8 @@ export const GH_PRICING_GOVERNANCE = {
     triggerDisabledAlreadyReverted: 'Este cambio ya fue revertido',
     triggerDisabledBulk: 'Los cambios masivos no se pueden revertir con un click',
     triggerDisabledReadOnly: 'Esta entidad no soporta revert automático',
+    triggerDisabledFteGuideReadOnly:
+      'La guía FTE sigue siendo solo lectura. Revísala desde governance antes de corregirla manualmente.',
     triggerDisabledEntityGone: 'La entidad ya no existe',
     triggerDisabledNoPermission: 'Solo efeonce_admin puede revertir cambios del catálogo',
     dialogTitle: 'Revertir cambio',
@@ -2516,6 +2518,8 @@ export const GH_PRICING_GOVERNANCE = {
     warningsLabel: 'Advertencias del validador',
     highImpactLabel: 'Impacto alto — requiere confirmación',
     highImpactCheckboxLabel: 'Entiendo el impacto y quiero continuar',
+    blockingSaveCta: 'Confirmar impacto alto',
+    blockingSaveToast: 'Confirma el impacto alto en el panel antes de guardar en esta pestaña.',
     refreshLabel: 'Recalcular',
     errorLoadingLabel: 'No pudimos calcular el impacto. Intenta de nuevo.'
   },
@@ -2583,14 +2587,48 @@ export const GH_PRICING_GOVERNANCE = {
     diffActionUpdate: 'Actualizar',
     diffActionDelete: 'Eliminar',
     diffActionNoop: 'Sin cambios',
+    diffStatusApplyNow: 'Aplicable ahora',
+    diffStatusNeedsFollowup: 'Requiere follow-up',
+    diffStatusNoChanges: 'Sin acción',
     selectDiffLabel: 'Aplicar',
     skipDiffLabel: 'Saltar',
     applySelectedCta: 'Aplicar cambios seleccionados',
+    proposeApprovalCta: 'Proponer aprobación',
     applyingLabel: 'Aplicando…',
+    proposingLabel: 'Proponiendo…',
+    diffSummaryProcessedLabel: (processed: number) =>
+      `${processed} fila${processed === 1 ? '' : 's'} procesada${processed === 1 ? '' : 's'}`,
+    diffSummaryApplicableLabel: (count: number) =>
+      `${count} update${count === 1 ? '' : 's'} aplicable${count === 1 ? '' : 's'} ahora`,
+    diffSummaryProposalLabel: (count: number) =>
+      `${count} cambio${count === 1 ? '' : 's'} listo${count === 1 ? '' : 's'} para aprobación`,
+    diffSummaryNeedsFollowupLabel: (count: number) =>
+      `${count} cambio${count === 1 ? '' : 's'} requiere${count === 1 ? '' : 'n'} otra vía`,
+    updatesOnlyBannerTitle: 'Esta pantalla aplica solo updates sobre entidades existentes',
+    updatesOnlyBannerBody: (approvalReady: number) =>
+      approvalReady > 0
+        ? 'Los updates seleccionados aplican directo. Las altas y bajas seleccionadas van por propuesta de aprobación antes de persistirse.'
+        : 'Los updates seleccionados aplican directo. Las altas y bajas necesitan pasar por propuesta de aprobación antes de persistirse.',
+    approvalFollowupTitle: 'El batch incluye cambios que no se aplican desde Excel',
+    approvalFollowupBody: (createCount: number, deleteCount: number) => {
+      const parts = []
+
+      if (createCount > 0) parts.push(`${createCount} alta${createCount === 1 ? '' : 's'}`)
+      if (deleteCount > 0) parts.push(`${deleteCount} baja${deleteCount === 1 ? '' : 's'}`)
+
+      return `${parts.join(' y ')} requieren revisión desde Admin / governance antes de persistirlas. Selecciónalas y usa "Proponer aprobación" para enviarlas a la cola.`
+    },
+    approvalQueueCta: 'Abrir cola de aprobaciones',
+    followupCreateLabel: 'Alta nueva: selecciónala para mandarla a aprobación.',
+    followupDeleteLabel: 'Eliminación pendiente: selecciónala para mandarla a aprobación.',
+    applyReadyHelper: 'Update sobre una entidad existente.',
     applySuccessToast: (n: number) => `${n} ${n === 1 ? 'cambio aplicado' : 'cambios aplicados'}.`,
     applyPartialToast: (ok: number, failed: number) =>
       `${ok} aplicados, ${failed} con error.`,
     applyErrorToast: 'No pudimos aplicar los cambios. Intenta de nuevo.',
+    proposeSuccessToast: (n: number) =>
+      `${n} ${n === 1 ? 'propuesta enviada a aprobación' : 'propuestas enviadas a aprobación'}.`,
+    proposeErrorToast: 'No pudimos crear las propuestas de aprobación. Intenta de nuevo.',
     sheetLabels: {
       roles: 'Roles',
       tools: 'Herramientas',

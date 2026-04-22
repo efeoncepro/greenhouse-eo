@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
-- Branch: `task/TASK-550-pricing-catalog-phase-5-followups`
+- Branch: `feature/codex-task-550-pricing-catalog-followups`
 - Legacy ID: `phase-5 follow-up de TASK-471 (post V1 gap completion)`
 - GitHub Issue: `none`
 
@@ -24,24 +24,34 @@
 
 Cuatro items que quedaron honestamente declarados como fuera del scope V1 de TASK-471 al cerrar su gap completion. Cada uno toca un dominio distinto y es independiente del resto: se pueden shippear como slices separadas dentro de la misma task, o spawnearse en tasks hijas si un slice crece en alcance.
 
+## Delta 2026-04-22 — Corrección post-auditoría
+
+La auditoría del codebase corrigió varios supuestos de esta spec para que la implementación se apoye en el estado real del repo:
+
+- `AuditDiffViewer` y `ApprovalsQueueView` ya existen; el gap no es crear esas surfaces, sino completar los follow-ups pendientes alrededor de revert governance, notificaciones y Excel apply.
+- El revert de governance no requiere inventar un writer paralelo desde cero si los write paths reales ya existen en `pricing-governance-store.ts` y `sellable-roles-store.ts`; el gap real es enrutar correctamente el revert hacia esos helpers en vez de pasar por el shared writer whitelist.
+- `employment_type` no escribe en `pricing-governance-store.ts`; su upsert real vive en `src/lib/commercial/sellable-roles-store.ts`.
+- El parser Excel hoy confirma `create/update/noop`; no quedó validado un detector real de `delete` en el helper actual, por lo que el alcance debe tratar `delete` como condicional a verificación durante implementación.
+- El tenant scope del impacto de pricing catalog ya no es `space_id` como regla broad: quotations se filtran por `organization_id`; `space_id` se mantiene solo para proyecciones legacy que todavía lo exigen (`deal_pipeline_snapshots`).
+
 ## Why This Task Exists
 
 TASK-471 cerró V1 con scope honesto en changelog + Handoff. Los siguientes 4 items quedaron explicitos como no-entregados:
 
-1. **Governance types no se pueden revertir con un click** — sus tablas (role_tier_margin, service_tier_margin, commercial_model_multiplier, country_pricing_factor, employment_type) tienen composite keys (effective_from + entity_code) y effective-dating, por lo que el shared writer `applyPricingCatalogEntityChanges` (que asume PK simple + `updated_at = NOW()`) no sirve. Operador debe revertir manualmente via PATCH al governance router.
+1. **Governance types no se pueden revertir con un click** — hoy el backend sabe construir payloads de revert para governance, pero la route termina bloqueándolos porque valida contra el shared writer `applyPricingCatalogEntityChanges` (PK simple + `updated_at = NOW()`). Operador debe revertir manualmente via PATCH al governance router aunque ya existan write helpers reales para governance.
 
 2. **High-impact gate sólo bloquea 1 de 4 tabs del SellableRoleDrawer** — la señal `impactBlocking` se propaga al CTA del tab Info pero no a `handleSubmitCost` (tab Componentes de costo), `handleSaveCompatibility` (tab Modalidades), `handleSubmitPricing` (tab Pricing por moneda). Un admin puede saltarse el gate cambiando de tab antes de confirmar.
 
 3. **Approval queue persiste propuestas sin notificar** — cuando un efeonce_admin crea una propuesta high/critical, los otros efeonce_admin no se enteran salvo que visiten manualmente `/admin/pricing-catalog/approvals`. Esto mata el tiempo-a-aprobar en la práctica.
 
-4. **Excel import apply sólo soporta updates** — el parser de TASK-471 detecta correctamente rows nuevas (`action='create'`) y faltantes (`action='delete'`) pero el apply endpoint las rechaza con `action_not_supported`. Adopción masiva inicial desde Excel requiere creates en bulk; cleanup de catálogos stale requiere deletes.
+4. **Excel import apply sólo soporta updates** — el parser de TASK-471 ya detecta rows nuevas (`action='create'`) y el apply endpoint las rechaza con `action_not_supported`. La detección de `delete` debe revalidarse en el helper actual antes de incluirla como comportamiento obligatorio. Adopción masiva inicial desde Excel requiere al menos creates en bulk; cleanup de catálogos stale podrá incluir soft deletes si la detección queda confirmada.
 
 ## Goal
 
 - Governance types soportan revert desde el timeline del audit log con la misma UX que los 4 entity types ya cubiertos (sellable_role, tool_catalog, overhead_addon, service_catalog).
 - `impactBlocking` bloquea los 4 save CTAs del SellableRoleDrawer (Info + Compat + Cost + Pricing).
 - Nuevo cambio high/critical en la queue notifica a los otros efeonce_admin via Slack y/o email.
-- Excel import apply soporta `action='create'` y `action='delete'` con workflow de approval antes de persistir.
+- Excel import apply soporta `action='create'` y, si el helper confirma detección real, también `action='delete'`, siempre con workflow de approval antes de persistir.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -62,7 +72,8 @@ Reglas obligatorias:
 - **Payroll isolation**: ningún write a `greenhouse_payroll.*`. Tests baseline mantenidos.
 - **Audit coherente**: cada write emite `pricing_catalog_audit_log` con `action` canónico. Slice 4 usa `action='bulk_imported'` + metadata `source='excel_import'`; slice 1 usa `action='reverted'` con `change_summary.reverts_audit_id`.
 - **Governance writes** NO usan el shared writer `applyPricingCatalogEntityChanges` porque las tablas governance tienen composite keys. Usar `pricing-governance-store.ts` helpers existentes o PATCH al governance router.
-- **Copy via `greenhouse-ux-writing`** para cualquier string nuevo (mensajes de notificación, labels de create/delete en Excel view).
+- **Tenant scope**: usar `organization_id` en quotations y `space_id` solo donde la proyección legacy todavía lo requiera. No imponer `space_id` como regla broad del módulo.
+- **Copy via `greenhouse-ux-content-accessibility`** para cualquier string nuevo (mensajes de notificación, labels de create/delete en Excel view).
 - **Capability gates**: `canRevertPricingCatalogChange` (ya existe, efeonce_admin) reutilizable para slice 1. `canReviewPricingCatalogApproval` (ya existe) reutilizable para slice 3. Slice 4 respeta `canAdministerPricingCatalog`.
 - **Secretos Slack/email** vía Secret Manager + `*_SECRET_REF` pattern; nunca hardcodear webhooks.
 
@@ -80,6 +91,7 @@ Reglas obligatorias:
 - `src/lib/commercial/pricing-catalog-entity-writer.ts` — shared writer para entity types con PK simple (slice 4 lo extiende para create/delete; slice 1 lo SUSTITUYE con un path paralelo para governance)
 - `src/lib/commercial/pricing-catalog-approvals.ts` — store + `decideApproval` ya tienen auto-apply (TASK-471 Gap-1); slice 3 añade notification emit
 - `src/lib/commercial/pricing-governance-store.ts` — helpers existentes para writes a tablas governance (slice 1 los consume)
+- `src/lib/commercial/sellable-roles-store.ts` — write path real de `employment_type`
 - `src/app/api/admin/pricing-catalog/governance/route.ts` — governance router existente (slice 1 puede invocarlo)
 - `greenhouse_commercial.pricing_catalog_approval_queue` — tabla ya existe (slice 4 la usa para gated creates/deletes)
 - `GH_PRICING_GOVERNANCE` nomenclature ya existe en `src/config/greenhouse-nomenclature.ts` — extender con entries nuevas no reemplazar
@@ -95,8 +107,7 @@ Reglas obligatorias:
 
 **Slice 1 — Governance revert:**
 - `src/lib/commercial/pricing-catalog-revert.ts` (modificación — extender `REVERT_DISABLED_ACTIONS` fuera de governance + whitelist gov types como revertibles)
-- `src/lib/commercial/pricing-catalog-governance-writer.ts` [nuevo — path paralelo al entity-writer que entiende composite keys + effective-dating]
-- `src/app/api/admin/pricing-catalog/audit-log/[auditId]/revert/route.ts` (modificación — detectar governance entity_type y routear al governance-writer)
+- `src/app/api/admin/pricing-catalog/audit-log/[auditId]/revert/route.ts` (modificación — detectar governance entity_type y routear al write path real de governance/employment type)
 - `src/views/greenhouse/admin/pricing-catalog/AuditLogTimelineView.tsx` (modificación — extender `revertibleEntities` con los 5 governance types)
 
 **Slice 2 — Tab gating:**
@@ -106,13 +117,13 @@ Reglas obligatorias:
 - `src/lib/commercial/pricing-catalog-approvals.ts` (modificación — emit evento outbox `commercial.pricing_catalog_approval.proposed` + `.decided` en `proposeApproval` + `decideApproval`)
 - `src/lib/sync/event-catalog.ts` (modificación — declarar los 2 eventos canónicos)
 - `src/lib/sync/projections/pricing-catalog-approval-notifier.ts` [nuevo — proyección reactiva que envía Slack + email cuando entra un `proposed`]
-- `src/lib/integrations/slack-webhook.ts` [verificar — ver si existe integración Slack en el repo; si no, crearla mínima]
+- `src/lib/alerts/slack-notify.ts` (reutilizar o adaptar helper existente para Slack)
 - Resend email template: `src/emails/PricingCatalogApprovalRequested.tsx` [nuevo]
 - Resend email template: `src/emails/PricingCatalogApprovalDecided.tsx` [nuevo]
 
 **Slice 4 — Excel create/delete:**
-- `src/lib/commercial/pricing-catalog-excel.ts` (modificación — parser ya detecta create/delete; hoy no emite warnings. Agregar warnings obligatorios de review)
-- `src/app/api/admin/pricing-catalog/import-excel/apply/route.ts` (modificación — aceptar `action='create' | 'delete'` pero SOLO si vienen con `approvalId` válido resolved + approved. Si no, rechazar 400 `needs_approval`.)
+- `src/lib/commercial/pricing-catalog-excel.ts` (modificación — parser ya detecta create; verificar delete. Agregar warnings obligatorios de review)
+- `src/app/api/admin/pricing-catalog/import-excel/apply/route.ts` (modificación — aceptar `action='create'` y, si aplica, `action='delete'`, pero SOLO si vienen con `approvalId` válido resolved + approved. Si no, rechazar 400 `needs_approval`.)
 - `src/lib/commercial/pricing-catalog-entity-writer.ts` (modificación opcional — agregar `createPricingCatalogEntity` + `softDeletePricingCatalogEntity` respetando whitelists, o hacer esos métodos dedicados en el apply route)
 - `src/views/greenhouse/admin/pricing-catalog/ExcelImportView.tsx` (modificación — diffs con action create/delete muestran banner "Requiere aprobación antes de aplicar" + botón "Proponer aprobación" que crea un approval_queue entry con los diffs como `proposed_changes.excel_batch`)
 
@@ -124,7 +135,7 @@ Reglas obligatorias:
 - `pricing-governance-store.ts` con stores para las 5 governance tables (role_tier_margin, etc.)
 - Approval queue table + store + endpoints (`proposeApproval`, `decideApproval` con auto-apply)
 - Approval queue UI (`/admin/pricing-catalog/approvals`) operativa
-- Excel parser detecta create/update/delete/noop correctamente (solo update tiene apply handler)
+- Excel parser detecta create/update/noop; `delete` queda por revalidar durante implementación (solo update tiene apply handler)
 - `ImpactPreviewPanel` con `onBlockingStateChange` callback
 - `SellableRoleDrawer` tiene `impactBlocking` state + gate del tab Info (`handleSaveInfo`)
 - `GH_PRICING_GOVERNANCE.auditRevert`, `approvals`, `excel` nomenclature entries
@@ -135,13 +146,13 @@ Reglas obligatorias:
 ### Gap
 
 - Governance entity types (`role_tier_margin`, `service_tier_margin`, `commercial_model_multiplier`, `country_pricing_factor`, `employment_type`) + `fte_hours_guide` NO están en `PRICING_CATALOG_ENTITY_WHITELIST` y NO se pueden revertir (el revert route 400s con `revert_entity_not_supported`).
-- `REVERT_DISABLED_ACTIONS` en `pricing-catalog-revert.ts` incluye governance como "not supported" — hay que cambiar esa semántica para algunos.
+- El bloqueo real del revert governance está en la route/shared writer whitelist; `REVERT_DISABLED_ACTIONS` no es la causa principal.
 - Los 3 save handlers (`handleSubmitCost`, `handleSaveCompatibility`, `handleSubmitPricing`) en EditSellableRoleDrawer NO consultan `impactBlocking` antes de ejecutar el write.
 - `proposeApproval` + `decideApproval` NO emiten eventos al outbox — la tabla approval_queue queda como sink silencioso.
 - No existe proyección reactiva `pricing-catalog-approval-notifier.ts`.
-- No existe integración Slack concreta para approvals (buscar patterns en `src/lib/integrations/` [verificar]).
-- Excel parser reporta diffs con `action='create'` / `'delete'` pero apply route 400s con `action_not_supported`.
-- `ExcelImportView` muestra chips create/delete pero el flujo de aprobación previo no existe.
+- No existe integración Slack específica para approvals; el helper reutilizable actual es `src/lib/alerts/slack-notify.ts`.
+- Excel parser reporta diffs con `action='create'`; la detección de `delete` debe verificarse antes de prometerla. El apply route 400s con `action_not_supported` para cualquier `action !== 'update'`.
+- `ExcelImportView` muestra chips create/delete en UI, pero el flujo de aprobación previo no existe.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

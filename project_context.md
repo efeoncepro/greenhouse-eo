@@ -1,3 +1,24 @@
+## Delta 2026-04-22 TASK-550 cierra los follow-ups enterprise del pricing catalog
+
+- El Admin Pricing Catalog ya no tiene gaps abiertos respecto del cierre de TASK-471:
+  - revert one-click para governance types (`role_tier_margin`, `service_tier_margin`, `commercial_model_multiplier`, `country_pricing_factor`, `employment_type`)
+  - gate de impacto alto en los 4 tabs guardables del `EditSellableRoleDrawer`
+  - notificaciones reactivas para la approval queue del catálogo
+  - Excel import con proposal/apply split: `update` directo, `create/delete` vía approval workflow
+- Contrato runtime nuevo:
+  - route `POST /api/admin/pricing-catalog/import-excel/propose`
+  - helper `src/lib/commercial/pricing-catalog-excel-approval.ts`
+  - projection `src/lib/sync/projections/pricing-catalog-approval-notifier.ts`
+  - eventos `commercial.pricing_catalog_approval.proposed` y `commercial.pricing_catalog_approval.decided`
+- Flag nuevo:
+  - `GREENHOUSE_PRICING_APPROVAL_NOTIFICATIONS`
+  - default recomendado: `false` hasta validar entrega en el ambiente objetivo
+  - cuando está apagado, la approval queue sigue operando normalmente; solo se omite el dispatch reactivo de email/Slack/in-app
+- Aclaración arquitectónica vigente:
+  - el tenant scope del pricing impact analysis ya no debe describirse como broad `space_id`
+  - el scope canónico para quotations/commercial readers actuales es `organization_id`
+  - `space_id` se conserva solo donde una proyección legacy aún lo exige (`deal_pipeline_snapshots`)
+
 ## Delta 2026-04-21 TASK-542 cierra la surface administrativa de Party Lifecycle
 
 - Greenhouse ya tiene surface administrativa canonica para lifecycle comercial en Admin Center.
