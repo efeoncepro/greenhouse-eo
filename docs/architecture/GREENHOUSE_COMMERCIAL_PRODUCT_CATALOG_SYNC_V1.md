@@ -70,11 +70,45 @@ Cuando TASK-421 desbloquee multi-currency, el adapter + materializer extenderán
 
 ### Gaps reconocidos para fases siguientes
 
-1. **TASK-548 (Fase D)** — drift cron: consume `reconcileHubSpotGreenhouseProducts` para comparar `gh_owned_fields_checksum` con snapshot HubSpot; escribe `product_sync_conflicts`. La capa client está lista.
+1. **TASK-548 (Fase D)** — drift cron: consume `reconcileHubSpotGreenhouseProducts` para comparar `gh_owned_fields_checksum` con snapshot HubSpot; escribe `product_sync_conflicts`. Shipped 2026-04-21: cron `ops-product-catalog-drift-detect`, comandos admin, routes `/api/admin/commercial/product-sync-conflicts/**`, Admin Center surface y Slack alerting.
 2. **TASK-549 (Fase E)** — policy enforcement: deprecar inbound auto-adopt y drop `sync_direction='hubspot_only'`.
 3. **Follow-up outbound service**: deploy de `PATCH/archive/reconcile` endpoints en `hubspot-greenhouse-integration`.
 4. **Batch API coalescing** — si el volumen justifica, agregar window-based batching de eventos 30s en el reactive worker.
 5. **Multi-currency variants** — se desbloquea con TASK-421.
+
+---
+
+## Delta 2026-04-21 — Fase D shipped (TASK-548)
+
+Drift detection operativo + resolution UI administrativa + observabilidad mínima.
+
+### Implementado en Fase D
+
+| Area | Artefacto |
+|---|---|
+| Reconciler | `src/lib/commercial/product-catalog/drift-reconciler.ts` — detecta `orphan_in_hubspot`, `orphan_in_greenhouse`, `field_drift`, `sku_collision`, `archive_mismatch`; auto-heal seguro vía `replay_greenhouse`; degrada a `endpoint_not_deployed` si el servicio externo aún no expone `/products/reconcile` |
+| Tracking de runs | `src/lib/commercial/product-catalog/drift-run-tracker.ts` — escribe en `greenhouse_sync.source_sync_runs` con `source_system='product_catalog_drift_detect'`, `source_object_type='hubspot_products'`, `sync_mode='batch'` |
+| Resolution commands | `src/lib/commercial/product-catalog/conflict-resolution-commands.ts` — `adopt_hubspot_product`, `archive_hubspot_product`, `replay_greenhouse`, `accept_hubspot_field`, `ignore` con audit en `pricing_catalog_audit_log` |
+| Admin APIs | `src/app/api/admin/commercial/product-sync-conflicts/**/route.ts` — list, detail y resolve bajo `requireAdminTenantContext()` + capability `commercial.product_catalog.resolve_conflict` |
+| Admin UI | `src/app/(dashboard)/admin/commercial/product-sync-conflicts/**` + `src/views/greenhouse/admin/product-sync-conflicts/**` — list/detail, diff viewer, CTAs auditables y estados operativos |
+| Ops worker | `services/ops-worker/product-catalog-drift-detect.ts`, `services/ops-worker/server.ts`, `services/ops-worker/deploy.sh` — endpoint `POST /product-catalog/drift-detect` + scheduler `ops-product-catalog-drift-detect` |
+| Tests | `drift-reconciler.test.ts` + admin route tests (`GET /api/admin/commercial/product-sync-conflicts`, `POST /resolve`) |
+
+### Correcciones a la spec de drift vs runtime shipped
+
+| Spec previa | Runtime 2026-04-21 |
+|---|---|
+| `0 4 * * *` | scheduler final `0 3 * * *` (`America/Santiago`) |
+| registrar en `source_sync_pipelines` + `source_sync_runs` | V1 escribe solo en `source_sync_runs`; no se agregó control plane paralelo |
+| UI bajo `src/app/(admin)/...` | la route real vive en `src/app/(dashboard)/admin/commercial/product-sync-conflicts/**` |
+| aislamiento por tabla asumido | `greenhouse_commercial.product_catalog` y `product_sync_conflicts` siguen siendo surfaces global-operativos; V1 se protege por `requireAdminTenantContext()` + capability auditada, no por `space_id` en estas tablas |
+
+### Contrato operativo de resolución
+
+- `replay_greenhouse` es el único auto-heal V1; lo usa tanto el cron como la UI para casos con Greenhouse authoritativo.
+- `accept_hubspot_field` solo aplica a `source_kind in ('manual', 'hubspot_imported')`.
+- `adopt_hubspot_product` materializa una nueva row local con `source_kind='hubspot_imported'`, `sync_direction='bidirectional'` y checksum recalculado.
+- `archive_hubspot_product` y `ignore` cierran el conflicto con audit trail explícito.
 
 ---
 
@@ -606,7 +640,7 @@ El contrato actual (`quotation_line_items.product_id` FK a `product_catalog`) no
 ### 10.1 Cron nocturno
 
 ```
-schedule: 0 4 * * *  America/Santiago
+schedule: 0 3 * * *  America/Santiago
 endpoint: ops-worker /product-catalog/drift-detect
 ```
 
@@ -620,7 +654,8 @@ Steps:
    - **Field drift**: ambos existen, pero `name/price/description/archived` difieren.
    - **SKU collision**: dos rows en Greenhouse con mismo `product_code` (bug).
 4. Insertar rows en `product_sync_conflicts`.
-5. Alert si > N conflicts no resueltos en 24h.
+5. Alert si >10 conflicts detectados en 24h o >3 `sku_collision` sin resolver.
+6. Si `GET /products/reconcile` responde `404`, registrar el run como degradado/cancelled, actualizar `last_drift_check_at` local y no crear conflicts falsos.
 
 ### 10.2 Resolution policies
 
@@ -720,6 +755,7 @@ Decisión cerrada en este spec:
 - Admin Center surface `/admin/commercial/product-sync-conflicts` con resolution UI.
 - Auto-heal para orphans_in_greenhouse y field_drift.
 - Alertas Slack ops.
+- `pricing_catalog_audit_log` acepta `entity_type='product_catalog'` para auditar resoluciones administrativas.
 
 ### Fase E — Policy enforcement + legacy cleanup
 

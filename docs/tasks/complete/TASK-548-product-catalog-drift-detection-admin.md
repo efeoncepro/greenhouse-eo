@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
-- Domain: `ui`
-- Blocked by: `TASK-547`
+- Domain: `commercial`
+- Blocked by: `none`
 - Branch: `task/TASK-548-product-catalog-drift-detection-admin`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
@@ -47,7 +47,10 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` — §10, §11
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
-- `docs/architecture/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 
 Reglas obligatorias:
 
@@ -55,13 +58,15 @@ Reglas obligatorias:
 - Toda resolution pasa por comandos auditables; no direct DB writes.
 - Auto-heal solo para casos donde Greenhouse es authoritative sin ambiguedad.
 - Sweep corre en `ops-worker` Cloud Run, no en Vercel.
-- Usar skills `greenhouse-ux` + `greenhouse-ui-review` pre-commit.
+- Las routes admin usan `requireAdminTenantContext()` + entitlement runtime.
+- El catálogo comercial de productos es actualmente un surface global-operativo; el schema baseline vigente no expone `space_id` en `greenhouse_commercial.product_catalog` ni en `greenhouse_commercial.product_sync_conflicts`, por lo que este slice se aísla por access surface + capability auditada y no por tenant FK a nivel tabla.
 
 ## Normative Docs
 
 - `project_context.md`
 - `Handoff.md`
 - `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md`
+- `docs/operations/product-catalog-sync-runbook.md` (si existe durante implementación)
 
 ## Dependencies & Impact
 
@@ -71,6 +76,7 @@ Reglas obligatorias:
 - TASK-547 cerrada (Cloud Run `GET /products/reconcile`)
 - Admin Center infrastructure
 - `ops-worker` Cloud Run service
+- `source_sync_runs` como tracking operacional existente
 
 ### Blocks / Impacts
 
@@ -82,10 +88,9 @@ Reglas obligatorias:
 - `services/ops-worker/product-catalog-drift-detect.ts`
 - `src/lib/commercial/product-catalog/drift-reconciler.ts`
 - `src/lib/commercial/product-catalog/conflict-resolution-commands.ts`
-- `src/app/(admin)/admin/commercial/product-sync-conflicts/page.tsx`
-- `src/app/(admin)/admin/commercial/product-sync-conflicts/[id]/page.tsx`
-- `src/views/greenhouse/admin/ProductSyncConflictsListView.tsx`
-- `src/views/greenhouse/admin/ProductSyncConflictDetailView.tsx`
+- `src/app/(dashboard)/admin/commercial/product-sync-conflicts/page.tsx`
+- `src/app/(dashboard)/admin/commercial/product-sync-conflicts/[conflictId]/page.tsx`
+- `src/views/greenhouse/admin/product-sync-conflicts/**`
 - `src/app/api/admin/commercial/product-sync-conflicts/**/route.ts`
 - `docs/operations/product-catalog-sync-runbook.md`
 - `docs/documentation/admin-center/product-catalog-sync.md`
@@ -96,7 +101,9 @@ Reglas obligatorias:
 
 - Admin Center routing + list/detail patterns
 - `ops-worker` Cloud Run
-- Pattern de sync conflicts de TASK-540 (partial reference)
+- Pattern de sync conflicts de TASK-540 / TASK-542 (reference)
+- Event publishing para `product.sync_conflict.*`
+- Reconcile reader HubSpot `GET /products/reconcile`
 
 ### Gap
 
@@ -105,6 +112,7 @@ Reglas obligatorias:
 - Admin Center no tiene vista de conflicts.
 - Commands de resolution no existen.
 - Runbook no existe.
+- No existe aislamiento por `space_id` en el schema del catálogo comercial; no asumirlo en este slice.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -133,8 +141,8 @@ Reglas obligatorias:
 ### Slice 3 — ops-worker endpoint + cron
 
 - `services/ops-worker/product-catalog-drift-detect.ts`.
-- Cloud Scheduler job `product-catalog-drift-detect` con schedule `0 4 * * *` America/Santiago.
-- Registrar en `source_sync_pipelines` + `source_sync_runs`.
+- Cloud Scheduler job `ops-product-catalog-drift-detect` con schedule `0 3 * * *` America/Santiago.
+- Registrar en `source_sync_runs` usando `source_system='product_catalog_drift_detect'`.
 
 ### Slice 4 — Commands de resolution
 
@@ -147,7 +155,7 @@ Reglas obligatorias:
 ### Slice 5 — Admin Center vistas
 
 - List `/admin/commercial/product-sync-conflicts` — filterable por type, age, resolution_status.
-- Detail `/admin/commercial/product-sync-conflicts/[id]` — diff viewer + action buttons.
+- Detail `/admin/commercial/product-sync-conflicts/[conflictId]` — diff viewer + action buttons.
 - Pattern de resolution UI segun spec §10.2.
 
 ### Slice 6 — Alertas + observability
@@ -203,24 +211,27 @@ const skuCollisions = groupBy(localProducts, 'product_code').filter(g => g.lengt
 
 ## Acceptance Criteria
 
-- [ ] Cron corre a las 03:00 America/Santiago y registra en `source_sync_runs`.
-- [ ] Detecta 5 tipos de conflict correctamente con fixtures de test.
-- [ ] Auto-heal funciona para `orphan_in_greenhouse`, `field_drift` GH win, `archive_mismatch`.
-- [ ] Auto-heal NO toca `orphan_in_hubspot` ni `sku_collision`.
-- [ ] Admin Center muestra lista filtrable + detail con diff.
-- [ ] Resolution actions con capability check; sin capability → 403.
-- [ ] Slack alert dispara para umbrales definidos.
-- [ ] Runbook publicado y referenciado.
-- [ ] Skill `greenhouse-ui-review` aprobo.
-- [ ] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
+- [x] Cron corre a las 03:00 America/Santiago y registra en `source_sync_runs`.
+- [x] Detecta 5 tipos de conflict correctamente con fixtures de test.
+- [x] Auto-heal funciona para `orphan_in_greenhouse`, `field_drift` GH win, `archive_mismatch`.
+- [x] Auto-heal NO toca `orphan_in_hubspot` ni `sku_collision`.
+- [x] Admin Center muestra lista filtrable + detail con diff.
+- [x] Resolution actions con capability check; sin capability → 403.
+- [x] Si `GET /products/reconcile` responde `endpoint_not_deployed`, el run queda registrado como `cancelled`/degraded sin crear conflicts falsos.
+- [x] Slack alert dispara para umbrales definidos.
+- [x] Runbook publicado y referenciado.
+- [x] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
 
 ## Verification
 
+- `pnpm pg:connect:migrate`
 - `pnpm lint`
 - `pnpm tsc --noEmit`
 - `pnpm test`
+- `pnpm build`
 - Staging: forzar drift (edit manual en HubSpot) → validar detection + auto-heal
 - Test alertas con threshold bajo
+- Confirmar que la degradación `endpoint_not_deployed` no crea conflicts nuevos y sí actualiza `last_drift_check_at`
 
 ## Closing Protocol
 

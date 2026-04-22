@@ -11,6 +11,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Admin Center
 
 - [Commercial Parties](admin-center/commercial-parties.md) — tablero administrativo del lifecycle comercial: lista de parties, embudo, conflictos de sync, detalle por party, transiciones manuales y sweep operativo
+- [Product Sync Conflicts](admin-center/product-catalog-sync.md) — surface administrativa para detectar drift entre Greenhouse y HubSpot Products, revisar diffs y aplicar resoluciones auditables
 - [Sets de permisos](admin-center/sets-de-permisos.md) — Gobierno de acceso por conjuntos reutilizables de vistas
 - [Preview de correos](admin-center/preview-de-correos.md) — Herramienta admin para ver y probar templates de email antes de enviar, con cambio de idioma, viewport movil/escritorio y envio de prueba
 

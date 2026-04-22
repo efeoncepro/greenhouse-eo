@@ -97,7 +97,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-545-product-catalog-schema-materializer-foundation.md`
 - `docs/tasks/to-do/TASK-546-product-catalog-source-handlers-events.md`
 - `docs/tasks/to-do/TASK-547-product-catalog-hubspot-outbound.md`
-- `docs/tasks/to-do/TASK-548-product-catalog-drift-detection-admin.md`
+- `docs/tasks/complete/TASK-548-product-catalog-drift-detection-admin.md`
 - `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md`
 
 ## Current Repo State
@@ -145,7 +145,7 @@ Reglas obligatorias:
 
 ### Slice 4 — Drift detection + Admin Center
 
-- Crear `TASK-548` (Fase D): cron nocturno reconciler, `/admin/commercial/product-sync-conflicts` UI, auto-heal para casos seguros, alertas Slack ops.
+- `TASK-548` (Fase D) cerrada 2026-04-21: cron nocturno reconciler, `/admin/commercial/product-sync-conflicts` UI, auto-heal para casos seguros, alertas Slack ops y runbook.
 
 ### Slice 5 — Policy enforcement + legacy cleanup
 
@@ -168,7 +168,7 @@ Programa oficial en 5 fases (A-E) con dependencias causales. Todas bloqueadas po
 1. `TASK-545` (Fase A) — Foundation schema + scaffolding. **Bloqueante.**
 2. `TASK-546` (Fase B) — Source handlers. Depende de A.
 3. `TASK-547` (Fase C) — Outbound + Cloud Run. Depende de A; puede paralelo a B si hay coordinacion.
-4. `TASK-548` (Fase D) — Drift detection + Admin. Depende de A, C.
+4. `TASK-548` (Fase D) — Drift detection + Admin. ✅ Cerrada 2026-04-21.
 5. `TASK-549` (Fase E) — Policy enforcement + cleanup. Depende de todas las anteriores + ≥4 semanas en production.
 
 ### Decisiones arquitectonicas cerradas por esta umbrella
@@ -225,7 +225,7 @@ Las 7 open questions del spec §15 quedan heredadas por este programa:
 - `TASK-545` Fase A — Schema extension + materializer foundation
 - `TASK-546` Fase B — Source handlers + event homogenization
 - `TASK-547` Fase C — Outbound projection + Cloud Run endpoints
-- `TASK-548` Fase D — Drift detection + Admin Center
+- `TASK-548` Fase D — Drift detection + Admin Center ✅
 - `TASK-549` Fase E — Policy enforcement + legacy cleanup
 
 ## Open Questions

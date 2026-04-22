@@ -6354,6 +6354,12 @@
 
 # Changelog
 
+## 2026-04-21
+
+- Admin Center / Commercial: nueva surface `/admin/commercial/product-sync-conflicts` para vigilar drift del catálogo comercial contra HubSpot Products, con lista operativa, detalle por conflicto, diff Greenhouse vs HubSpot y acciones auditables (`adopt`, `archive`, `replay`, `accept remote`, `ignore`).
+- Product Catalog Sync: nuevo reconciler nocturno en `ops-worker` (`POST /product-catalog/drift-detect`, scheduler `0 3 * * *` `America/Santiago`) que detecta `orphan_in_hubspot`, `orphan_in_greenhouse`, `field_drift`, `sku_collision` y `archive_mismatch`, registra runs en `source_sync_runs` y dispara alertas Slack por umbral.
+- Governance comercial: las resoluciones manuales de conflictos ahora escriben audit trail en `greenhouse_commercial.pricing_catalog_audit_log` con `entity_type='product_catalog'`, cerrando el loop entre catálogo, drift y operación admin.
+
 ## 2026-04-19
 
 - Finance / Quote Builder: el guardado de cotizaciones ya no mezcla precio del pricing engine v2 con costo recalculado por el resolver legacy. Las líneas auto-valorizadas ahora persisten también su costo resuelto del engine v2, por lo que el detail view mantiene `total`, `cost` y `margin` coherentes después de guardar.

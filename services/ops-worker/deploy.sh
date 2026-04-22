@@ -422,6 +422,13 @@ upsert_scheduler_job \
 echo "  -> ops-nexa-weekly-digest: 0 7 * * 1 (weekly Nexa executive digest)"
 
 upsert_scheduler_job \
+  "ops-product-catalog-drift-detect" \
+  "0 3 * * *" \
+  "/product-catalog/drift-detect" \
+  '{}'
+echo "  -> ops-product-catalog-drift-detect: 0 3 * * * (nightly HubSpot product drift detect, TASK-548)"
+
+upsert_scheduler_job \
   "ops-quotation-lifecycle" \
   "0 7 * * *" \
   "/quotation-lifecycle/sweep" \

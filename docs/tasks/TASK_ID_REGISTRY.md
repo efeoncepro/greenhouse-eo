@@ -601,7 +601,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-545` | `to-do` | Product Catalog Schema & Materializer Foundation (Fase A) | `docs/tasks/to-do/TASK-545-product-catalog-schema-materializer-foundation.md` |
 | `TASK-546` | `to-do` | Product Catalog Source Handlers & Event Homogenization (Fase B) | `docs/tasks/to-do/TASK-546-product-catalog-source-handlers-events.md` |
 | `TASK-547` | `complete` | Product Catalog HubSpot Outbound Projection (Fase C) | `docs/tasks/complete/TASK-547-product-catalog-hubspot-outbound.md` |
-| `TASK-548` | `to-do` | Product Catalog Drift Detection & Admin Center (Fase D) | `docs/tasks/to-do/TASK-548-product-catalog-drift-detection-admin.md` |
+| `TASK-548` | `complete` | Product Catalog Drift Detection & Admin Center (Fase D) | `docs/tasks/complete/TASK-548-product-catalog-drift-detection-admin.md` |
 | `TASK-549` | `to-do` | Product Catalog Policy Enforcement & Legacy Cleanup (Fase E) | `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md` |
 | `TASK-550` | `to-do` | Pricing Catalog Phase-5 Follow-ups (governance revert + tab gating + notifications + excel create/delete) | `docs/tasks/to-do/TASK-550-pricing-catalog-phase-5-followups.md` |
 | `TASK-551` | `to-do` | Outbox Reactive Decoupling from Analytics Publish | `docs/tasks/to-do/TASK-551-outbox-reactive-decoupling.md` |

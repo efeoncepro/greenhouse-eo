@@ -13,6 +13,7 @@ export type PricingCatalogEntityType =
   | 'fte_hours_guide'
   | 'employment_type'
   | 'service_catalog'
+  | 'product_catalog'
 
 export type PricingCatalogAction =
   | 'created'
@@ -66,7 +67,8 @@ const PRICING_CATALOG_ENTITY_TYPES: readonly PricingCatalogEntityType[] = [
   'country_pricing_factor',
   'fte_hours_guide',
   'employment_type',
-  'service_catalog'
+  'service_catalog',
+  'product_catalog'
 ]
 
 const PRICING_CATALOG_ACTIONS: readonly PricingCatalogAction[] = [

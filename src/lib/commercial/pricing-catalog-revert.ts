@@ -118,6 +118,7 @@ export const buildRevertPayload = (entry: PricingCatalogAuditEntry): RevertTarge
   }
 
   const entitySegmentMap: Record<PricingCatalogEntityType, string> = {
+    product_catalog: 'products',
     sellable_role: 'roles',
     tool_catalog: 'tools',
     overhead_addon: 'overheads',

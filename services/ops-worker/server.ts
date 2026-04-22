@@ -46,6 +46,7 @@ import { sendEmail } from '@/lib/email/delivery'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
+import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -476,6 +477,29 @@ const handlePartyLifecycleSweep = async (req: IncomingMessage, res: ServerRespon
 }
 
 /**
+ * POST /product-catalog/drift-detect
+ * TASK-548: nightly product catalog drift detect against HubSpot Products.
+ */
+const handleProductCatalogDriftDetect = async (_req: IncomingMessage, res: ServerResponse) => {
+  console.log('[ops-worker] POST /product-catalog/drift-detect')
+
+  try {
+    const result = await runProductCatalogDriftDetectJob()
+
+    console.log(
+      `[ops-worker] /product-catalog/drift-detect done — status=${result.status} conflicts=${result.conflictsDetected} autoHealed=${result.autoHealed} ${result.durationMs}ms`
+    )
+
+    json(res, 200, result)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /product-catalog/drift-detect failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
  * POST /quotation-lifecycle/sweep
  * TASK-351: Daily quotation lifecycle sweep.
  * - Flips quotations past `expiry_date` to `status='expired'` + emits `commercial.quotation.expired`.
@@ -715,6 +739,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/party-lifecycle/sweep') {
       await handlePartyLifecycleSweep(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/product-catalog/drift-detect') {
+      await handleProductCatalogDriftDetect(req, res)
 
       return
     }

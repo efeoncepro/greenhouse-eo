@@ -193,7 +193,7 @@ Eventos adicionales del programa TASK-534:
 | `product_sync_conflict` | `commercial.product_sync_conflict.detected` | `commercial/product-catalog/product-catalog-events.ts` (emitted by TASK-548 drift cron) | `{ conflictId, productId?, hubspotProductId?, conflictType, detectedAt, conflictingFields?, metadata? }` | TASK-548 Admin Center alerts |
 | `product_sync_conflict` | `commercial.product_sync_conflict.resolved` | `commercial/product-catalog/product-catalog-events.ts` (emitted by Admin Center resolution handler) | `{ conflictId, productId?, hubspotProductId?, conflictType, resolutionStatus, resolvedBy, resolutionAppliedAt }` | audit trail |
 
-TASK-545 Fase A (shipped 2026-04-21) adds the `source_kind` + `source_id` linkage, `is_archived` archival semantics, and `gh_owned_fields_checksum` drift primitives to `greenhouse_commercial.product_catalog`, plus the `product_sync_conflicts` table. The publishers + `source_to_product_catalog` projection are **scaffolded but inactive** — handlers land in TASK-546 (Fase B), outbound in TASK-547, drift detection in TASK-548. See `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1`.
+TASK-545 Fase A (shipped 2026-04-21) adds the `source_kind` + `source_id` linkage, `is_archived` archival semantics, and `gh_owned_fields_checksum` drift primitives to `greenhouse_commercial.product_catalog`, plus the `product_sync_conflicts` table. TASK-546 (same date) activates the source handlers/materializer; TASK-547 wires HubSpot outbound; TASK-548 closes the loop with drift detection, Admin Center resolution UI, and `source_sync_runs` tracking for the nightly reconciler. See `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1`.
 
 ### Nubox
 

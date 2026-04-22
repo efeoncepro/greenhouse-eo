@@ -5143,3 +5143,21 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.
 - `Handoff.md` es la fuente de continuidad entre turnos.
 - `AGENTS.md` define las reglas del repositorio y prevalece como guia operativa local.
+## Delta 2026-04-21 TASK-548 cierra el loop operativo de Product Catalog Sync
+
+- Greenhouse ya tiene detección nocturna de drift para `product_catalog` frente a HubSpot Products.
+- Runtime nuevo:
+  - `src/lib/commercial/product-catalog/drift-reconciler.ts`
+  - `src/lib/commercial/product-catalog/drift-run-tracker.ts`
+  - `src/lib/commercial/product-catalog/conflict-resolution-commands.ts`
+  - `services/ops-worker/product-catalog-drift-detect.ts`
+  - APIs admin `/api/admin/commercial/product-sync-conflicts/**`
+  - surface `/admin/commercial/product-sync-conflicts`
+- Contrato operativo:
+  - el scheduler canónico es `ops-product-catalog-drift-detect` a las `03:00` `America/Santiago`
+  - los runs se registran en `greenhouse_sync.source_sync_runs` con `source_system='product_catalog_drift_detect'`
+  - si el servicio externo aún no expone `GET /products/reconcile`, el lane degrada a `endpoint_not_deployed`/`cancelled` sin crear conflicts falsos
+  - las resoluciones admin (`adopt_hubspot_product`, `archive_hubspot_product`, `replay_greenhouse`, `accept_hubspot_field`, `ignore`) dejan audit trail en `pricing_catalog_audit_log`
+  - `accept_hubspot_field` solo aplica a productos `manual` o `hubspot_imported`
+- Restricción explícita:
+  - `greenhouse_commercial.product_catalog` y `greenhouse_commercial.product_sync_conflicts` siguen sin `space_id` en el schema vigente; este slice se aísla por access surface admin + capability `commercial.product_catalog.resolve_conflict`, no por FK tenant-aware a nivel tabla

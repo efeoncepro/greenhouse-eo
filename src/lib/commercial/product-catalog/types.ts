@@ -38,6 +38,26 @@ export const PRODUCT_SYNC_CONFLICT_RESOLUTIONS = [
 
 export type ProductSyncConflictResolution = (typeof PRODUCT_SYNC_CONFLICT_RESOLUTIONS)[number]
 
+export const PRODUCT_SYNC_CONFLICT_ACTIONS = [
+  'adopt_hubspot_product',
+  'archive_hubspot_product',
+  'replay_greenhouse',
+  'accept_hubspot_field',
+  'ignore'
+] as const
+
+export type ProductSyncConflictAction = (typeof PRODUCT_SYNC_CONFLICT_ACTIONS)[number]
+
+export const PRODUCT_SYNC_CONFLICT_FIELDS = [
+  'productName',
+  'description',
+  'defaultUnitPrice',
+  'isArchived',
+  'all'
+] as const
+
+export type ProductSyncConflictField = (typeof PRODUCT_SYNC_CONFLICT_FIELDS)[number]
+
 // ── Shape of the fields used to compute gh_owned_fields_checksum ───────────
 // Order is load-bearing — changing it invalidates every existing checksum.
 // See GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1 §5.1 and
@@ -67,6 +87,34 @@ export interface ProductSyncConflictRow {
   resolutionAppliedAt: string | null
   resolvedBy: string | null
   metadata: Record<string, unknown>
+}
+
+export interface ProductSyncConflictListItem extends ProductSyncConflictRow {
+  productCode: string | null
+  productName: string | null
+  sourceKind: ProductSourceKind | null
+  hubspotSyncStatus: string | null
+  isArchived: boolean | null
+  autoHealEligible: boolean
+}
+
+export interface ProductSyncConflictDetail extends ProductSyncConflictListItem {
+  financeProductId: string | null
+  sourceId: string | null
+  sourceVariantKey: string | null
+  lastOutboundSyncAt: string | null
+  lastDriftCheckAt: string | null
+}
+
+export interface ProductSyncConflictSummary {
+  totalUnresolved: number
+  byType: Record<ProductSyncConflictType, number>
+}
+
+export interface ProductSyncConflictActor {
+  userId: string | null
+  actorName: string
+  reason?: string | null
 }
 
 // ── Error classes ──────────────────────────────────────────────────────────

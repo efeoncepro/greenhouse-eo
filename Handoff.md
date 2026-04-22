@@ -1,5 +1,37 @@
 # Handoff.md
 
+## Sesion 2026-04-21 — TASK-548 Product Catalog Drift Detection & Admin Center (Codex)
+
+- **Scope:** cerrar la Fase D del programa Product Catalog Sync con reconciler nocturno, resolution commands auditables, surface admin de conflictos y tracking operativo end-to-end.
+- **Correccion de spec antes de implementar**
+  - la spec apuntaba a paths UI viejos (`(admin)`), scheduler `0 4 * * *`, doc path UI incorrecto y skills desactualizados
+  - la spec asumía aislamiento por `space_id`, pero el schema vigente de `greenhouse_commercial.product_catalog` y `product_sync_conflicts` sigue siendo global-operativo; V1 queda protegido por `requireAdminTenantContext()` + capability `commercial.product_catalog.resolve_conflict`
+  - el tracking real del repo para este lane es `source_sync_runs`, no `source_sync_pipelines`
+- **Implementacion shipped**
+  - migración `20260422011657625_task-548-product-catalog-audit-entity.sql`
+  - reconciler `src/lib/commercial/product-catalog/drift-reconciler.ts`
+  - tracker `src/lib/commercial/product-catalog/drift-run-tracker.ts`
+  - commands `src/lib/commercial/product-catalog/conflict-resolution-commands.ts`
+  - extensión del store `product-sync-conflicts-store.ts` para list/detail/summary/update
+  - APIs admin `/api/admin/commercial/product-sync-conflicts`, `/[conflictId]`, `/[conflictId]/resolve`
+  - surface `/admin/commercial/product-sync-conflicts` con list/detail en `src/views/greenhouse/admin/product-sync-conflicts/**`
+  - lane `ops-worker` `POST /product-catalog/drift-detect` + scheduler `ops-product-catalog-drift-detect`
+  - docs: arquitectura, event catalog, doc funcional admin, runbook, project context, changelog, task docs
+- **Contrato operativo**
+  - el reconciler detecta `orphan_in_hubspot`, `orphan_in_greenhouse`, `field_drift`, `sku_collision`, `archive_mismatch`
+  - auto-heal V1 usa solo `replay_greenhouse`; `orphan_in_hubspot` y `sku_collision` siguen manuales
+  - si el servicio externo responde `endpoint_not_deployed`, el run queda degradado/cancelled sin crear conflicts falsos y se actualiza `last_drift_check_at`
+  - las resoluciones admin escriben audit trail en `pricing_catalog_audit_log` con `entity_type='product_catalog'`
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/lib/commercial/product-catalog/drift-reconciler.test.ts src/app/api/admin/commercial/product-sync-conflicts/route.test.ts 'src/app/api/admin/commercial/product-sync-conflicts/[conflictId]/resolve/route.test.ts'` OK
+  - `pnpm pg:connect:migrate` OK (aplicó la migración y regeneró `src/types/db.d.ts`)
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1813` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+- **Nota de integración**
+  - `pnpm build` volvió a ajustar `tsconfig.json` para incluir paths generados de `.next-local`; validar si ese diff ya era esperado antes de commitear cualquier cambio ahí
+
 ## Sesion 2026-04-21 — TASK-542 Party Lifecycle Admin Dashboards (Codex)
 
 - **Scope:** cerrar la Fase H del programa Party Lifecycle con surface administrativa real en Admin Center, snapshot serving canonico, resolución de conflictos, override manual y sweep operativo en `ops-worker`.
