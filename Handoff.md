@@ -16971,3 +16971,22 @@ Fase 4 completada:
 - **Notas**
   - `pnpm build` volvió a imprimir los warnings esperados de `Dynamic server usage` en rutas que usan `headers`; el build terminó exit code `0`
   - `TASK-549` NO está cerrada todavía: falta cleanup final de flags/carriles legacy/documentación, pero el cutover de identidad ya quedó hecho
+
+## Sesion 2026-04-22 — Deal create staging auth hardening para hubspot-greenhouse-integration (Codex)
+
+- **Síntoma real:** `POST /api/commercial/organizations/:id/deals` seguía fallando en staging con `500`, pero el stack runtime mostró que el root cause era `401 Unauthorized` desde `hubspot-greenhouse-integration` al llamar `POST /deals`.
+- **Hallazgo operativo:** el servicio externo y el token live estaban sanos; el drift estaba en cómo el runtime de Vercel resolvía el token para writes outbound de Greenhouse.
+- **Fix shipped**
+  - `src/lib/integrations/hubspot-greenhouse-service.ts`
+    - los writes outbound (`/companies/:id/lifecycle`, `/products*`, `/quotes`, `/deals`) ya no dependen solo de `process.env.GREENHOUSE_INTEGRATION_API_TOKEN`
+    - ahora resuelven el token vía `resolveSecret({ envVarName: 'GREENHOUSE_INTEGRATION_API_TOKEN' })`
+    - si no existe `GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF`, el cliente cae al secret canónico `greenhouse-integration-api-token`
+- **Validación**
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - deploy directo a `staging` con el patch local OK
+  - smoke real OK:
+    - `POST /api/commercial/organizations/org-b8e5a481-4cfd-447d-afce-ddb0179408f7/deals`
+    - `HTTP 201`
+    - `attemptId=e97cb047-6bcd-48d1-98e8-3a0b9d7693c9`
+    - `dealId=dl-b4c2fca0-3cdc-4955-befa-332633af16f8`
+    - `hubspotDealId=59448087991`

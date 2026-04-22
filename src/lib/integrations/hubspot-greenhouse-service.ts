@@ -1,9 +1,11 @@
 import 'server-only'
 
 import { resolveContactDisplayName } from '@/lib/contacts/contact-display'
+import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 const DEFAULT_BASE_URL = 'https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app'
 const DEFAULT_TIMEOUT_MS = 4000
+const DEFAULT_INTEGRATION_TOKEN_SECRET_REF = 'greenhouse-integration-api-token'
 
 export interface HubSpotGreenhouseServiceContract {
   service: string
@@ -383,30 +385,44 @@ const parseTimeoutMs = (value: string | undefined) => {
 
 const getServiceConfig = () => ({
   baseUrl: normalizeBaseUrl(process.env.HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL),
-  timeoutMs: parseTimeoutMs(process.env.HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_MS),
-  integrationToken: process.env.GREENHOUSE_INTEGRATION_API_TOKEN?.trim() || null
+  timeoutMs: parseTimeoutMs(process.env.HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_MS)
 })
 
-const buildServiceHeaders = (
-  extraHeaders?: Record<string, string>,
-  includeIntegrationAuth = false
-) => {
-  const { integrationToken } = getServiceConfig()
-
+const buildServiceHeaders = (extraHeaders?: Record<string, string>) => {
   const headers: Record<string, string> = {
     ...(extraHeaders ?? {})
   }
 
-  if (includeIntegrationAuth && !integrationToken) {
+  return headers
+}
+
+const resolveIntegrationToken = async () => {
+  const { value } = await resolveSecret({
+    envVarName: 'GREENHOUSE_INTEGRATION_API_TOKEN',
+    env: {
+      ...process.env,
+      GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF:
+        process.env.GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF?.trim()
+        || DEFAULT_INTEGRATION_TOKEN_SECRET_REF
+    }
+  })
+
+  return value?.trim() || null
+}
+
+const buildWriteServiceHeaders = async (extraHeaders?: Record<string, string>) => {
+  const integrationToken = await resolveIntegrationToken()
+
+  if (!integrationToken) {
     throw new Error(
       'Missing GREENHOUSE_INTEGRATION_API_TOKEN for HubSpot integration service write request.'
     )
   }
 
-  if (includeIntegrationAuth && integrationToken) {
-    headers.Authorization = `Bearer ${integrationToken}`
-    headers['x-greenhouse-integration-key'] = integrationToken
-  }
+  const headers = buildServiceHeaders(extraHeaders)
+
+  headers.Authorization = `Bearer ${integrationToken}`
+  headers['x-greenhouse-integration-key'] = integrationToken
 
   return headers
 }
@@ -494,7 +510,7 @@ export const updateHubSpotGreenhouseCompanyLifecycle = async (
 
   const response = await fetch(`${baseUrl}/companies/${encodeURIComponent(hubspotCompanyId)}/lifecycle`, {
     method: 'PATCH',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }, true),
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -541,7 +557,7 @@ export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseC
 
   const response = await fetch(`${baseUrl}/products`, {
     method: 'POST',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }, true),
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(safePayload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -601,7 +617,7 @@ export const updateHubSpotGreenhouseProduct = async (
 
   const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}`, {
     method: 'PATCH',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }, true),
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(safePayload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -642,7 +658,7 @@ export const archiveHubSpotGreenhouseProduct = async (
 
   const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}/archive`, {
     method: 'POST',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }, true),
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({ reason: reason ?? 'source_deactivated_in_greenhouse' }),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -749,7 +765,7 @@ export const createHubSpotGreenhouseQuote = async (payload: HubSpotGreenhouseCre
 
   const response = await fetch(`${baseUrl}/quotes`, {
     method: 'POST',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -904,7 +920,7 @@ export const createHubSpotGreenhouseDeal = async (
 
   const response = await fetch(`${baseUrl}/deals`, {
     method: 'POST',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
