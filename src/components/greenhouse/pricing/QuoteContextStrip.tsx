@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { visuallyHidden } from '@mui/utils'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -149,18 +150,6 @@ const CURRENCY_OPTIONS: ContextChipOption[] = [
   { value: 'MXN', label: 'MXN', secondary: 'Peso mexicano' },
   { value: 'PEN', label: 'PEN', secondary: 'Sol peruano' }
 ]
-
-const SR_ONLY_SX = {
-  position: 'absolute',
-  width: 1,
-  height: 1,
-  padding: 0,
-  margin: -1,
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  whiteSpace: 'nowrap',
-  borderWidth: 0
-} as const
 
 const FIELDSET_RESET_SX = {
   border: 0,
@@ -448,7 +437,7 @@ const QuoteContextStrip = ({
             content is not left-crammed with a big empty right half.
             ──────────────────────────────────────────────────────────────── */}
         <Box component='fieldset' sx={FIELDSET_RESET_SX}>
-          <Typography component='legend' sx={SR_ONLY_SX}>
+          <Typography component='legend' sx={visuallyHidden}>
             {GH_PRICING.contextChips.groupLabels.party}
           </Typography>
           <Stack
@@ -688,7 +677,7 @@ const QuoteContextStrip = ({
             strip horizontally (Stripe / Linear / GitHub convention).
             ──────────────────────────────────────────────────────────────── */}
         <Box component='fieldset' sx={FIELDSET_RESET_SX}>
-          <Typography component='legend' sx={SR_ONLY_SX}>
+          <Typography component='legend' sx={visuallyHidden}>
             {GH_PRICING.contextChips.groupLabels.termsAndTiming}
           </Typography>
           <Stack

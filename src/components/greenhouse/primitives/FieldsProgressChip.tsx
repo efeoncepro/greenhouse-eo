@@ -5,6 +5,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
+import { visuallyHidden } from '@mui/utils'
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 
@@ -96,18 +97,7 @@ const FieldsProgressChip = ({
         </Box>
         {suffix(total)}
       </Typography>
-      <Box
-        component='span'
-        aria-hidden='false'
-        sx={{
-          position: 'absolute',
-          width: 1,
-          height: 1,
-          overflow: 'hidden',
-          clip: 'rect(0 0 0 0)',
-          whiteSpace: 'nowrap'
-        }}
-      >
+      <Box component='span' sx={visuallyHidden}>
         {srLabel(filled, total)}
       </Box>
     </Stack>

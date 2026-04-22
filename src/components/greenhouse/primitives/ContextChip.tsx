@@ -28,6 +28,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha, styled, useTheme } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
+import { visuallyHidden } from '@mui/utils'
 
 export type ContextChipStatus = 'empty' | 'filled' | 'invalid' | 'locked' | 'blocking-empty'
 
@@ -585,22 +586,14 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           placement='bottom-start'
           disableInteractive
         >
-          <span
-            id={errorId}
-            style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}
-          >
+          <Box component='span' id={errorId} sx={visuallyHidden}>
             {errorMessage}
-          </span>
+          </Box>
         </Tooltip>
       ) : null}
 
       {!isCustomMode(props) && props.liveMessage ? (
-        <Box
-          id={liveRegionId}
-          component='span'
-          aria-live='polite'
-          sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}
-        >
+        <Box id={liveRegionId} component='span' aria-live='polite' sx={visuallyHidden}>
           {props.liveMessage}
         </Box>
       ) : null}
