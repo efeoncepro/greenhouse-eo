@@ -1996,7 +1996,8 @@ export const GH_PRICING = {
     groupLabels: {
       party: 'Cliente',
       terms: 'Términos comerciales',
-      timing: 'Plazos'
+      timing: 'Plazos',
+      termsAndTiming: 'Términos y plazos'
     }
   },
   summaryDock: {

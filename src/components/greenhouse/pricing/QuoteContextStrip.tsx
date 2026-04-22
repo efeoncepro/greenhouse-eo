@@ -437,7 +437,7 @@ const QuoteContextStrip = ({
         borderBottom: `1px solid ${theme.palette.divider}`
       })}
     >
-      <Stack spacing={2} aria-label={GH_PRICING.contextChips.ariaLabel}>
+      <Stack spacing={1.5} aria-label={GH_PRICING.contextChips.ariaLabel}>
         {/* ────────────────────────────────────────────────────────────────
             Tier 1 — Party (prominence='primary'). Flex-distributed chips
             + right-anchored progress counter. Balances the strip so the
@@ -668,20 +668,30 @@ const QuoteContextStrip = ({
         </Box>
 
         {/* ────────────────────────────────────────────────────────────────
-            Tier 2 — Commercial terms (prominence='inline'). Sin cajas.
+            Tier 2 — Terms + Timing, a single row with space-between. Left
+            subgroup = commercial terms; right subgroup = timing. Keeps the
+            inline narrative read within each subgroup while balancing the
+            strip horizontally (Stripe / Linear / GitHub convention).
             ──────────────────────────────────────────────────────────────── */}
         <Box component='fieldset' sx={FIELDSET_RESET_SX}>
           <Typography component='legend' sx={SR_ONLY_SX}>
-            {GH_PRICING.contextChips.groupLabels.terms}
+            {GH_PRICING.contextChips.groupLabels.termsAndTiming}
           </Typography>
           <Stack
-            direction='row'
-            spacing={0.5}
-            flexWrap='wrap'
-            rowGap={0.5}
-            alignItems='baseline'
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={{ xs: 1, md: 0 }}
+            justifyContent='space-between'
+            alignItems={{ xs: 'flex-start', md: 'baseline' }}
             useFlexGap
           >
+            <Stack
+              direction='row'
+              spacing={0.5}
+              flexWrap='wrap'
+              rowGap={0.5}
+              alignItems='baseline'
+              useFlexGap
+            >
             {/* Business line */}
             <ContextChip
               prominence='inline'
@@ -746,25 +756,17 @@ const QuoteContextStrip = ({
               searchPlaceholder='Buscar moneda…'
               popoverWidth={320}
             />
-          </Stack>
-        </Box>
+            </Stack>
 
-        {/* ────────────────────────────────────────────────────────────────
-            Tier 3 — Timing (prominence='inline'). Progress counter live
-            anchors at Tier 1 top-right, not here.
-            ──────────────────────────────────────────────────────────────── */}
-        <Box component='fieldset' sx={FIELDSET_RESET_SX}>
-          <Typography component='legend' sx={SR_ONLY_SX}>
-            {GH_PRICING.contextChips.groupLabels.timing}
-          </Typography>
-          <Stack
-            direction='row'
-            spacing={0.5}
-            flexWrap='wrap'
-            rowGap={0.5}
-            alignItems='baseline'
-            useFlexGap
-          >
+            {/* Timing subgroup — right-anchored on desktop, stacked under on mobile. */}
+            <Stack
+              direction='row'
+              spacing={0.5}
+              flexWrap='wrap'
+              rowGap={0.5}
+              alignItems='baseline'
+              useFlexGap
+            >
             {/* Duracion — custom input (number) */}
             <ContextChip
               prominence='inline'
@@ -827,6 +829,7 @@ const QuoteContextStrip = ({
                 </Stack>
               )}
             />
+            </Stack>
           </Stack>
         </Box>
       </Stack>
