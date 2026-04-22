@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
@@ -10,8 +10,14 @@ import { alpha } from '@mui/material/styles'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import ContextChip, { type ContextChipOption } from '@/components/greenhouse/primitives/ContextChip'
+import ContextChip, {
+  type ContextChipOption,
+  type ContextChipStatus
+} from '@/components/greenhouse/primitives/ContextChip'
 import ContextChipStrip from '@/components/greenhouse/primitives/ContextChipStrip'
+import FieldsProgressChip from '@/components/greenhouse/primitives/FieldsProgressChip'
+import useReducedMotion from '@/hooks/useReducedMotion'
+import { motion } from '@/libs/FramerMotion'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
@@ -139,6 +145,25 @@ const CURRENCY_OPTIONS: ContextChipOption[] = [
   { value: 'PEN', label: 'PEN', secondary: 'Sol peruano' }
 ]
 
+const SR_ONLY_SX = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+  borderWidth: 0
+} as const
+
+const FIELDSET_RESET_SX = {
+  border: 0,
+  margin: 0,
+  padding: 0,
+  minWidth: 0
+} as const
+
 const formatMultiplier = (pct: number): string => {
   const signed = pct >= 0 ? `+${pct}` : `${pct}`
 
@@ -165,9 +190,19 @@ const PARTY_STAGE_COLOR: Record<
 }
 
 /**
- * Row 2 del patron Command Bar: strip horizontal con 8 ContextChips con Autocomplete
- * inline (2 clicks para seleccionar). Organizacion, Contacto, BL, Modelo comercial,
- * Pais, Moneda = mode 'select'. Duracion y Valida hasta = mode 'custom' (inputs nativos).
+ * Row 2 del patron Command Bar.
+ *
+ * TASK-565 modernization (2026-04-22):
+ * - Rediseñado a 3 tiers jerarquicos en vez de 8 chips iguales en linea.
+ * - Tier 1 (Party, prominence='primary'): Organizacion, Contacto, Deal HubSpot.
+ *   Cajas visibles, 44px touch target, status 'blocking-empty' con warning tinted
+ *   cuando la organizacion esta seleccionada pero el chip requerido downstream aun no.
+ * - Tier 2 (Terms, prominence='inline'): Business line, Modelo comercial, Pais, Moneda.
+ *   Tokens inline con subrayado on-hover, popover identico al primary.
+ * - Tier 3 (Timing, prominence='inline'): Duracion, Valida hasta. Custom-mode popovers.
+ *
+ * Cada grupo vive dentro de un <fieldset> + <legend sr-only> para semantica a11y.
+ * Las strings provienen de GH_PRICING.contextChips.*.
  */
 const QuoteContextStrip = ({
   values,
@@ -341,6 +376,54 @@ const QuoteContextStrip = ({
       })()
     : null
 
+  // TASK-565: blocking-empty tension only when organization is set but required
+  // downstream chip (Deal HubSpot) is still empty. Keeps the CTA silent for the
+  // very first load (no organization → no tension yet).
+  const dealStatus: ContextChipStatus | undefined =
+    invalidFields.hubspotDealId
+      ? 'invalid'
+      : values.organizationId && !values.hubspotDealId
+        ? 'blocking-empty'
+        : undefined
+
+  // TASK-565: completion counter. 6 fields the user must explicitly pick (the
+  // other 3 — commercial model / country / currency — ship with defaults so
+  // they are always "filled" from the user's perspective). Keep this aligned
+  // with the Tier 1/3 chips that actually require a decision.
+  const progressTotal = 6
+
+  const progressFilled =
+    (values.organizationId ? 1 : 0) +
+    (values.contactIdentityProfileId ? 1 : 0) +
+    (values.hubspotDealId ? 1 : 0) +
+    (values.businessLineCode ? 1 : 0) +
+    (values.contractDurationMonths ? 1 : 0) +
+    (values.validUntil ? 1 : 0)
+
+  // TASK-565: fire a single "attention" pulse on the Deal chip the first time
+  // the user picks an organization with no deal attached. Gated by reduced-motion.
+  const prefersReduced = useReducedMotion()
+  const previousOrganizationIdRef = useRef<string | null>(values.organizationId)
+  const [dealShouldPulse, setDealShouldPulse] = useState(false)
+
+  useEffect(() => {
+    const previous = previousOrganizationIdRef.current
+    const current = values.organizationId
+
+    if (!previous && current && !values.hubspotDealId && !prefersReduced) {
+      setDealShouldPulse(true)
+      const timer = window.setTimeout(() => setDealShouldPulse(false), 2600)
+
+      previousOrganizationIdRef.current = current
+
+      return () => window.clearTimeout(timer)
+    }
+
+    previousOrganizationIdRef.current = current
+
+    return undefined
+  }, [values.organizationId, values.hubspotDealId, prefersReduced])
+
   return (
     <Box
       sx={theme => ({
@@ -355,9 +438,21 @@ const QuoteContextStrip = ({
         borderBottom: `1px solid ${theme.palette.divider}`
       })}
     >
-      <ContextChipStrip ariaLabel={GH_PRICING.contextChips.ariaLabel}>
+      <Stack spacing={2} aria-label={GH_PRICING.contextChips.ariaLabel}>
+        {/* ────────────────────────────────────────────────────────────────
+            Tier 1 — Party (prominence='primary'). Cajas visibles.
+            ──────────────────────────────────────────────────────────────── */}
+        <Box component='fieldset' sx={FIELDSET_RESET_SX}>
+          <Typography component='legend' sx={SR_ONLY_SX}>
+            {GH_PRICING.contextChips.groupLabels.party}
+          </Typography>
+          <ContextChipStrip
+            ariaLabel={GH_PRICING.contextChips.groupLabels.party}
+            scrollMobile={true}
+          >
         {/* Organizacion — 2 clicks con Autocomplete */}
         <ContextChip
+          prominence='primary'
           icon={GH_PRICING.contextChips.organization.icon}
           label={GH_PRICING.contextChips.organization.label}
           value={organizationSelector?.selectedLabel ?? selectedOrganization?.organizationName ?? null}
@@ -470,6 +565,7 @@ const QuoteContextStrip = ({
 
         {/* Contacto — 2 clicks con Autocomplete */}
         <ContextChip
+          prominence='primary'
           icon={GH_PRICING.contextChips.contact.icon}
           label={GH_PRICING.contextChips.contact.label}
           value={contactValue}
@@ -494,14 +590,24 @@ const QuoteContextStrip = ({
         />
 
         {/* Deal HubSpot */}
-        <ContextChip
-          icon={GH_PRICING.contextChips.deal.icon}
-          label={GH_PRICING.contextChips.deal.label}
-          value={dealValue}
+        <motion.div
+          style={{ display: 'inline-block' }}
+          animate={dealShouldPulse ? { opacity: [1, 0.88, 1, 0.88, 1] } : { opacity: 1 }}
+          transition={{ duration: 2.4, ease: 'easeInOut', times: [0, 0.25, 0.5, 0.75, 1] }}
+        >
+          <ContextChip
+            prominence='primary'
+            icon={GH_PRICING.contextChips.deal.icon}
+            label={GH_PRICING.contextChips.deal.label}
+            value={dealValue}
           placeholder={
             !values.organizationId
               ? GH_PRICING.contextChips.deal.noOrgFirst
               : GH_PRICING.contextChips.deal.placeholder
+          }
+          status={dealStatus}
+          requiredHint={
+            dealStatus === 'blocking-empty' ? GH_PRICING.contextChips.requiredBadge : undefined
           }
           disabled={disabled || !values.organizationId}
           errorMessage={invalidFields.hubspotDealId}
@@ -516,122 +622,198 @@ const QuoteContextStrip = ({
               ? GH_PRICING.contextChips.deal.noOrgFirst
               : GH_PRICING.contextChips.deal.empty
           }
+          popoverNotice={
+            dealStatus === 'blocking-empty' && dealOptions.length === 0
+              ? {
+                  tone: 'warning',
+                  message: GH_PRICING.contextChips.deal.emptyHelper
+                }
+              : undefined
+          }
         />
+        </motion.div>
+          </ContextChipStrip>
+        </Box>
 
-        {/* Business line */}
-        <ContextChip
-          icon={GH_PRICING.contextChips.businessLine.icon}
-          label={GH_PRICING.contextChips.businessLine.label}
-          value={selectedBusinessLine?.label ?? null}
-          placeholder={GH_PRICING.contextChips.businessLine.placeholder}
-          disabled={disabled}
-          options={businessLineOptions}
-          selectedValue={values.businessLineCode}
-          onSelectChange={onBusinessLineChange}
-          searchPlaceholder='Buscar business line…'
-          noOptionsText='Sin business lines activas'
-        />
+        {/* ────────────────────────────────────────────────────────────────
+            Tier 2 — Commercial terms (prominence='inline'). Sin cajas.
+            ──────────────────────────────────────────────────────────────── */}
+        <Box component='fieldset' sx={FIELDSET_RESET_SX}>
+          <Typography component='legend' sx={SR_ONLY_SX}>
+            {GH_PRICING.contextChips.groupLabels.terms}
+          </Typography>
+          <Stack
+            direction='row'
+            spacing={0.5}
+            flexWrap='wrap'
+            rowGap={0.5}
+            alignItems='baseline'
+            useFlexGap
+          >
+            {/* Business line */}
+            <ContextChip
+              prominence='inline'
+              icon={GH_PRICING.contextChips.businessLine.icon}
+              label={GH_PRICING.contextChips.businessLine.label}
+              value={selectedBusinessLine?.label ?? null}
+              placeholder={GH_PRICING.contextChips.businessLine.placeholder}
+              disabled={disabled}
+              options={businessLineOptions}
+              selectedValue={values.businessLineCode}
+              onSelectChange={onBusinessLineChange}
+              searchPlaceholder='Buscar business line…'
+              noOptionsText='Sin business lines activas'
+            />
+            <Typography component='span' variant='body2' sx={{ color: 'text.disabled', px: 0.5 }}>
+              ·
+            </Typography>
+            {/* Modelo comercial */}
+            <ContextChip
+              prominence='inline'
+              icon={GH_PRICING.contextChips.commercialModel.icon}
+              label={GH_PRICING.contextChips.commercialModel.label}
+              value={commercialModelValue}
+              placeholder={GH_PRICING.contextChips.commercialModel.placeholder}
+              disabled={disabled}
+              options={commercialModelOptions}
+              selectedValue={values.commercialModel}
+              onSelectChange={value => value && onCommercialModelChange(value as CommercialModelCode)}
+              searchPlaceholder='Buscar modelo…'
+              noOptionsText='Sin modelos'
+            />
+            <Typography component='span' variant='body2' sx={{ color: 'text.disabled', px: 0.5 }}>
+              ·
+            </Typography>
+            {/* Pais / factor */}
+            <ContextChip
+              prominence='inline'
+              icon={GH_PRICING.contextChips.countryFactor.icon}
+              label={GH_PRICING.contextChips.countryFactor.label}
+              value={countryFactorValue}
+              placeholder={GH_PRICING.contextChips.countryFactor.placeholder}
+              disabled={disabled}
+              options={countryFactorOptions}
+              selectedValue={values.countryFactorCode}
+              onSelectChange={value => value && onCountryFactorChange(value)}
+              searchPlaceholder='Buscar país…'
+              noOptionsText='Sin países'
+            />
+            <Typography component='span' variant='body2' sx={{ color: 'text.disabled', px: 0.5 }}>
+              ·
+            </Typography>
+            {/* Moneda */}
+            <ContextChip
+              prominence='inline'
+              icon={GH_PRICING.contextChips.currency.icon}
+              label={GH_PRICING.contextChips.currency.label}
+              value={values.outputCurrency}
+              disabled={disabled}
+              options={CURRENCY_OPTIONS}
+              selectedValue={values.outputCurrency}
+              onSelectChange={value => value && onCurrencyChange(value as PricingOutputCurrency)}
+              searchPlaceholder='Buscar moneda…'
+              popoverWidth={320}
+            />
+          </Stack>
+        </Box>
 
-        {/* Modelo comercial */}
-        <ContextChip
-          icon={GH_PRICING.contextChips.commercialModel.icon}
-          label={GH_PRICING.contextChips.commercialModel.label}
-          value={commercialModelValue}
-          placeholder={GH_PRICING.contextChips.commercialModel.placeholder}
-          disabled={disabled}
-          options={commercialModelOptions}
-          selectedValue={values.commercialModel}
-          onSelectChange={value => value && onCommercialModelChange(value as CommercialModelCode)}
-          searchPlaceholder='Buscar modelo…'
-          noOptionsText='Sin modelos'
-        />
+        {/* ────────────────────────────────────────────────────────────────
+            Tier 3 — Timing (prominence='inline') + progress counter.
+            ──────────────────────────────────────────────────────────────── */}
+        <Box component='fieldset' sx={FIELDSET_RESET_SX}>
+          <Typography component='legend' sx={SR_ONLY_SX}>
+            {GH_PRICING.contextChips.groupLabels.timing}
+          </Typography>
+          <Stack
+            direction='row'
+            spacing={0.5}
+            flexWrap='wrap'
+            rowGap={0.5}
+            alignItems='center'
+            justifyContent='space-between'
+            useFlexGap
+          >
+            <Stack
+              direction='row'
+              spacing={0.5}
+              flexWrap='wrap'
+              rowGap={0.5}
+              alignItems='baseline'
+              useFlexGap
+            >
+            {/* Duracion — custom input (number) */}
+            <ContextChip
+              prominence='inline'
+              mode='custom'
+              icon={GH_PRICING.contextChips.duration.icon}
+              label={GH_PRICING.contextChips.duration.label}
+              value={durationValue}
+              placeholder={GH_PRICING.contextChips.duration.placeholder}
+              disabled={disabled}
+              popoverWidth={280}
+              popoverContent={() => (
+                <Stack spacing={1.5}>
+                  <Typography variant='subtitle1'>{GH_PRICING.contextChips.duration.label}</Typography>
+                  <CustomTextField
+                    fullWidth
+                    size='small'
+                    type='number'
+                    value={values.contractDurationMonths ?? ''}
+                    onChange={event => {
+                      const parsed = Number.parseInt(event.target.value, 10)
 
-        {/* Pais / factor */}
-        <ContextChip
-          icon={GH_PRICING.contextChips.countryFactor.icon}
-          label={GH_PRICING.contextChips.countryFactor.label}
-          value={countryFactorValue}
-          placeholder={GH_PRICING.contextChips.countryFactor.placeholder}
-          disabled={disabled}
-          options={countryFactorOptions}
-          selectedValue={values.countryFactorCode}
-          onSelectChange={value => value && onCountryFactorChange(value)}
-          searchPlaceholder='Buscar país…'
-          noOptionsText='Sin países'
-        />
-
-        {/* Moneda */}
-        <ContextChip
-          icon={GH_PRICING.contextChips.currency.icon}
-          label={GH_PRICING.contextChips.currency.label}
-          value={values.outputCurrency}
-          disabled={disabled}
-          options={CURRENCY_OPTIONS}
-          selectedValue={values.outputCurrency}
-          onSelectChange={value => value && onCurrencyChange(value as PricingOutputCurrency)}
-          searchPlaceholder='Buscar moneda…'
-          popoverWidth={320}
-        />
-
-        {/* Duracion — custom input (number) */}
-        <ContextChip
-          mode='custom'
-          icon={GH_PRICING.contextChips.duration.icon}
-          label={GH_PRICING.contextChips.duration.label}
-          value={durationValue}
-          placeholder={GH_PRICING.contextChips.duration.placeholder}
-          disabled={disabled}
-          popoverWidth={280}
-          popoverContent={() => (
-            <Stack spacing={1.5}>
-              <Typography variant='subtitle1'>{GH_PRICING.contextChips.duration.label}</Typography>
-              <CustomTextField
-                fullWidth
-                size='small'
-                type='number'
-                value={values.contractDurationMonths ?? ''}
-                onChange={event => {
-                  const parsed = Number.parseInt(event.target.value, 10)
-
-                  onDurationChange(Number.isFinite(parsed) ? parsed : null)
-                }}
-                inputProps={{ min: 1, max: 120, step: 1 }}
-                helperText={GH_PRICING.contextChips.duration.hint}
-                disabled={disabled}
-                aria-label={GH_PRICING.contextChips.duration.label}
-                autoFocus
-              />
+                      onDurationChange(Number.isFinite(parsed) ? parsed : null)
+                    }}
+                    inputProps={{ min: 1, max: 120, step: 1 }}
+                    helperText={GH_PRICING.contextChips.duration.hint}
+                    disabled={disabled}
+                    aria-label={GH_PRICING.contextChips.duration.label}
+                    autoFocus
+                  />
+                </Stack>
+              )}
+            />
+            <Typography component='span' variant='body2' sx={{ color: 'text.disabled', px: 0.5 }}>
+              ·
+            </Typography>
+            {/* Valida hasta — custom input (date) */}
+            <ContextChip
+              prominence='inline'
+              mode='custom'
+              icon={GH_PRICING.contextChips.validUntil.icon}
+              label={GH_PRICING.contextChips.validUntil.label}
+              value={validUntilValue}
+              placeholder={GH_PRICING.contextChips.validUntil.placeholder}
+              disabled={disabled}
+              popoverWidth={280}
+              popoverContent={() => (
+                <Stack spacing={1.5}>
+                  <Typography variant='subtitle1'>{GH_PRICING.contextChips.validUntil.label}</Typography>
+                  <CustomTextField
+                    fullWidth
+                    size='small'
+                    type='date'
+                    value={values.validUntil ?? ''}
+                    onChange={event => onValidUntilChange(event.target.value || null)}
+                    InputLabelProps={{ shrink: true }}
+                    disabled={disabled}
+                    aria-label={GH_PRICING.contextChips.validUntil.label}
+                    autoFocus
+                  />
+                </Stack>
+              )}
+            />
             </Stack>
-          )}
-        />
-
-        {/* Valida hasta — custom input (date) */}
-        <ContextChip
-          mode='custom'
-          icon={GH_PRICING.contextChips.validUntil.icon}
-          label={GH_PRICING.contextChips.validUntil.label}
-          value={validUntilValue}
-          placeholder={GH_PRICING.contextChips.validUntil.placeholder}
-          disabled={disabled}
-          popoverWidth={280}
-          popoverContent={() => (
-            <Stack spacing={1.5}>
-              <Typography variant='subtitle1'>{GH_PRICING.contextChips.validUntil.label}</Typography>
-              <CustomTextField
-                fullWidth
-                size='small'
-                type='date'
-                value={values.validUntil ?? ''}
-                onChange={event => onValidUntilChange(event.target.value || null)}
-                InputLabelProps={{ shrink: true }}
-                disabled={disabled}
-                aria-label={GH_PRICING.contextChips.validUntil.label}
-                autoFocus
-              />
-            </Stack>
-          )}
-        />
-      </ContextChipStrip>
+            <FieldsProgressChip
+              filled={progressFilled}
+              total={progressTotal}
+              suffix={GH_PRICING.contextChips.progress.suffix}
+              srLabel={GH_PRICING.contextChips.progress.ariaLive}
+              testId='quote-context-progress'
+            />
+          </Stack>
+        </Box>
+      </Stack>
     </Box>
   )
 }

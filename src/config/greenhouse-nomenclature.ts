@@ -1934,7 +1934,7 @@ export const GH_PRICING = {
     },
     contact: {
       label: 'Contacto',
-      placeholder: 'Sin contacto asignado',
+      placeholder: 'Agregar contacto',
       icon: 'tabler-user',
       hint: 'Persona de la organización responsable',
       noOrgFirst: 'Selecciona una organización primero',
@@ -1944,12 +1944,13 @@ export const GH_PRICING = {
     },
     deal: {
       label: 'Deal HubSpot',
-      placeholder: 'Sin deal vinculado',
+      placeholder: 'Vincular deal',
       icon: 'tabler-briefcase-2',
       hint: 'Vincula la cotización a una oportunidad de HubSpot. Requiere contacto comercial.',
       noOrgFirst: 'Selecciona una organización primero',
       loading: 'Cargando deals…',
-      empty: 'Sin deals disponibles para esta organización'
+      empty: 'Sin deals disponibles para esta organización',
+      emptyHelper: 'Vincula una Company HubSpot o crea un deal nuevo'
     },
     businessLine: {
       label: 'Business line',
@@ -1982,6 +1983,20 @@ export const GH_PRICING = {
       label: 'Válida hasta',
       placeholder: 'dd/mm/aaaa',
       icon: 'tabler-calendar-event'
+    },
+    progress: {
+      suffix: (total: number) => `de ${total} campos`,
+      ariaLive: (filled: number, total: number) => {
+        const percent = total > 0 ? Math.round((filled / total) * 100) : 0
+        const missing = Math.max(0, total - filled)
+
+        return `Cotización completa en ${percent}%. Faltan ${missing} campos.`
+      }
+    },
+    groupLabels: {
+      party: 'Cliente',
+      terms: 'Términos comerciales',
+      timing: 'Plazos'
     }
   },
   summaryDock: {
