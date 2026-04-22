@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -431,9 +430,10 @@ const QuoteContextStrip = ({
         zIndex: theme.zIndex.appBar - 2,
         py: 1.5,
         px: { xs: 2, md: 3 },
-        backgroundColor: alpha(theme.palette.background.paper, 0.9),
-        backdropFilter: 'saturate(180%) blur(8px)',
-        WebkitBackdropFilter: 'saturate(180%) blur(8px)',
+
+        // Solid subtle bg + crisp border-bottom — 2026 enterprise pattern
+        // (Stripe Dashboard, Vercel, Linear). Glass-morphism skipped on purpose.
+        backgroundColor: theme.palette.background.paper,
         borderBottom: `1px solid ${theme.palette.divider}`
       })}
     >
@@ -711,7 +711,7 @@ const QuoteContextStrip = ({
               searchPlaceholder='Buscar business line…'
               noOptionsText='Sin business lines activas'
             />
-            <Typography component='span' variant='body2' sx={{ color: 'text.disabled', px: 0.5 }}>
+            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
               ·
             </Typography>
             {/* Modelo comercial */}
@@ -728,7 +728,7 @@ const QuoteContextStrip = ({
               searchPlaceholder='Buscar modelo…'
               noOptionsText='Sin modelos'
             />
-            <Typography component='span' variant='body2' sx={{ color: 'text.disabled', px: 0.5 }}>
+            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
               ·
             </Typography>
             {/* Pais / factor */}
@@ -745,7 +745,7 @@ const QuoteContextStrip = ({
               searchPlaceholder='Buscar país…'
               noOptionsText='Sin países'
             />
-            <Typography component='span' variant='body2' sx={{ color: 'text.disabled', px: 0.5 }}>
+            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
               ·
             </Typography>
             {/* Moneda */}
@@ -804,7 +804,7 @@ const QuoteContextStrip = ({
                 </Stack>
               )}
             />
-            <Typography component='span' variant='body2' sx={{ color: 'text.disabled', px: 0.5 }}>
+            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
               ·
             </Typography>
             {/* Valida hasta — custom input (date) */}

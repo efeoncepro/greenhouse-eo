@@ -1,19 +1,12 @@
 'use client'
 
-import { useMemo } from 'react'
-
-import dynamic from 'next/dynamic'
-
 import Box from '@mui/material/Box'
+import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
-import useReducedMotion from '@/hooks/useReducedMotion'
-
-// ApexCharts wrapper — dynamic import, no SSR (matches platform rule).
-const Chart = dynamic(() => import('@/libs/ApexCharts'), { ssr: false })
 
 export interface FieldsProgressChipProps {
   filled: number
@@ -36,12 +29,19 @@ const resolveColor = (percent: number): 'success' | 'warning' | 'error' => {
 }
 
 /**
- * Compact completion counter.
+ * Enterprise-grade form completion counter.
  *
- * Renders a 20px radial (ApexCharts) + AnimatedCounter + "N de M campos" label,
- * and announces progress via an `role='status'` + `aria-live='polite'` region.
- * Color of the radial shifts from error (<50%) → warning (50-79%) → success (≥80%)
- * so the counter carries semantic signal on top of the numeric progress.
+ * Uses a short LinearProgress bar (60x3px) + AnimatedCounter + "N de M campos"
+ * label in a single compact row. Replaces the earlier 24px ApexCharts radial
+ * that was too small to carry visual signal cleanly. This is the pattern
+ * shipped by Stripe / GitHub / Linear for inline progress indicators.
+ *
+ * Announces progress via `role='status'` + `aria-live='polite'` so screen
+ * readers get the full context (`"Cotización completa en X%. Faltan Y campos."`).
+ *
+ * Color of the bar + counter text shifts from error (<50%) → warning (50-79%)
+ * → success (≥80%) so the counter carries semantic signal in addition to the
+ * numeric progress.
  */
 const FieldsProgressChip = ({
   filled,
@@ -51,76 +51,63 @@ const FieldsProgressChip = ({
   testId
 }: FieldsProgressChipProps) => {
   const theme = useTheme()
-  const prefersReduced = useReducedMotion()
 
   const percent = total > 0 ? Math.round((filled / total) * 100) : 0
   const colorKey = resolveColor(percent)
-  const radialColor = theme.palette[colorKey].main
+  const progressColor = theme.palette[colorKey].main
   const trackColor = alpha(theme.palette.text.primary, 0.08)
-
-  const chartOptions = useMemo(
-    () => ({
-      chart: {
-        type: 'radialBar' as const,
-        sparkline: { enabled: true },
-        animations: { enabled: !prefersReduced }
-      },
-      colors: [radialColor],
-      plotOptions: {
-        radialBar: {
-          hollow: { size: '54%' },
-          track: { background: trackColor, strokeWidth: '100%' },
-          dataLabels: { show: false }
-        }
-      },
-      stroke: { lineCap: 'round' as const },
-      states: { hover: { filter: { type: 'none' } } }
-    }),
-    [prefersReduced, radialColor, trackColor]
-  )
 
   return (
     <Stack
       direction='row'
-      spacing={1}
+      spacing={1.25}
       alignItems='center'
       role='status'
       aria-live='polite'
       aria-atomic='true'
       data-testid={testId}
       sx={{
-        pl: 0.5,
-        pr: 1,
+        px: 0.5,
         py: 0.25,
         color: 'text.secondary'
       }}
     >
-      <Box
+      <LinearProgress
         aria-hidden='true'
+        variant='determinate'
+        value={percent}
         sx={{
-          width: 24,
-          height: 24,
-          flexShrink: 0,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center'
+          width: 56,
+          height: 3,
+          borderRadius: 999,
+          backgroundColor: trackColor,
+          '& .MuiLinearProgress-bar': {
+            backgroundColor: progressColor,
+            borderRadius: 999
+          }
         }}
+      />
+      <Typography
+        variant='caption'
+        sx={{ lineHeight: 1.2, color: 'text.secondary', whiteSpace: 'nowrap' }}
       >
-        <Chart
-          type='radialBar'
-          series={[percent]}
-          options={chartOptions}
-          width={24}
-          height={24}
-        />
-      </Box>
-      <Typography variant='caption' sx={{ lineHeight: 1.2, color: 'text.secondary' }}>
         <Box component='span' sx={{ color: 'text.primary', fontWeight: 500, mr: 0.5 }}>
           <AnimatedCounter value={filled} format='integer' />
         </Box>
         {suffix(total)}
       </Typography>
-      <Box component='span' aria-hidden='false' sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>
+      <Box
+        component='span'
+        aria-hidden='false'
+        sx={{
+          position: 'absolute',
+          width: 1,
+          height: 1,
+          overflow: 'hidden',
+          clip: 'rect(0 0 0 0)',
+          whiteSpace: 'nowrap'
+        }}
+      >
         {srLabel(filled, total)}
       </Box>
     </Stack>

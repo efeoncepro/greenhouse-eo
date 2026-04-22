@@ -296,10 +296,11 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             px: 1.75,
             py: 1,
             borderRadius: `${theme.shape.customBorderRadius.md}px`,
-            border:
-              status === 'empty'
-                ? `1px dashed ${borderColor}`
-                : `1px solid ${borderColor}`,
+
+            // Solid border on all states (2026 enterprise — Linear, Stripe).
+            // Dashed empty borders read as "broken field"; solid + subtle
+            // divider alpha reads as "unpopulated field ready for input".
+            border: `1px solid ${borderColor}`,
             backgroundColor: bgColor,
             color: textColor,
             display: 'inline-flex',
