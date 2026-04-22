@@ -1548,25 +1548,8 @@ const QuoteBuilderShell = ({
         onCurrencyChange={value => setBuilderState(prev => ({ ...prev, outputCurrency: value }))}
         onDurationChange={months => setBuilderState(prev => ({ ...prev, contractDurationMonths: months }))}
         onValidUntilChange={iso => setBuilderState(prev => ({ ...prev, validUntil: iso }))}
+        onCreateDeal={submitting ? undefined : () => setCreateDealDrawerOpen(true)}
       />
-
-      {/* TASK-539: inline deal creation CTA — only visible when an organization
-          is selected and no deal is attached yet. Keeps the context strip
-          uncluttered and mirrors the "adopt prospect" pattern that TASK-538
-          lands in Fase D. */}
-      {organizationId && !hubspotDealId ? (
-        <Box sx={{ px: { xs: 2, md: 3 }, pb: 1 }}>
-          <Button
-            size='small'
-            variant='text'
-            startIcon={<i className='tabler-plus' aria-hidden='true' />}
-            onClick={() => setCreateDealDrawerOpen(true)}
-            disabled={submitting}
-          >
-            Crear deal nuevo
-          </Button>
-        </Box>
-      ) : null}
 
       <CreateDealDrawer
         open={createDealDrawerOpen}

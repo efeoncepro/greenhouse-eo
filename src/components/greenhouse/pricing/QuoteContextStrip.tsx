@@ -93,6 +93,13 @@ export interface QuoteContextStripHandlers {
   onCurrencyChange: (currency: PricingOutputCurrency) => void
   onDurationChange: (months: number | null) => void
   onValidUntilChange: (iso: string | null) => void
+
+  /**
+   * Opens the Create Deal drawer. When provided, the Deal HubSpot chip popover
+   * footer renders an inline "Crear deal nuevo" action instead of relying on
+   * a floating button outside the strip. Optional for backwards compatibility.
+   */
+  onCreateDeal?: () => void
 }
 
 export interface QuoteContextStripOptions {
@@ -218,7 +225,8 @@ const QuoteContextStrip = ({
   onCountryFactorChange,
   onCurrencyChange,
   onDurationChange,
-  onValidUntilChange
+  onValidUntilChange,
+  onCreateDeal
 }: QuoteContextStripProps) => {
   const orgOptions = useMemo<ContextChipOption[]>(
     () =>
@@ -637,10 +645,15 @@ const QuoteContextStrip = ({
               : GH_PRICING.contextChips.deal.empty
           }
           popoverNotice={
-            dealStatus === 'blocking-empty' && dealOptions.length === 0
+            values.organizationId && !values.hubspotDealId && onCreateDeal
               ? {
-                  tone: 'warning',
-                  message: GH_PRICING.contextChips.deal.emptyHelper
+                  tone: dealOptions.length === 0 ? 'warning' : 'info',
+                  message:
+                    dealOptions.length === 0
+                      ? GH_PRICING.contextChips.deal.emptyHelper
+                      : GH_PRICING.contextChips.deal.searchFooterPrompt,
+                  actionLabel: GH_PRICING.contextChips.deal.createNewLabel,
+                  onAction: onCreateDeal
                 }
               : undefined
           }

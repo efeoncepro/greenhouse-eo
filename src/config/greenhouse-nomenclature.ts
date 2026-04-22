@@ -1950,7 +1950,9 @@ export const GH_PRICING = {
       noOrgFirst: 'Selecciona una organización primero',
       loading: 'Cargando deals…',
       empty: 'Sin deals disponibles para esta organización',
-      emptyHelper: 'Vincula una Company HubSpot o crea un deal nuevo'
+      emptyHelper: 'Vincula una Company HubSpot o crea un deal nuevo',
+      searchFooterPrompt: '¿No encontrás el deal que buscás?',
+      createNewLabel: 'Crear deal nuevo'
     },
     businessLine: {
       label: 'Business line',

@@ -623,3 +623,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-567` | `to-do` | Typography Code Sweep + ESLint Governance Rule (EPIC-004 child 2/4) | `docs/tasks/to-do/TASK-567-typography-code-sweep-eslint-rule.md` |
 | `TASK-568` | `to-do` | Typography in Delivery Surfaces: Email Stack + PDF Font Registration (EPIC-004 child 3/4) | `docs/tasks/to-do/TASK-568-typography-email-pdf-font-registration.md` |
 | `TASK-569` | `to-do` | Typography Visual Regression + Figma Alignment + Skills/Docs Cleanup (EPIC-004 child 4/4) | `docs/tasks/to-do/TASK-569-typography-visual-regression-figma-docs.md` |
+| `TASK-570` | `complete` | Move "Crear deal nuevo" CTA into Deal Chip Popover Footer | `docs/tasks/complete/TASK-570-create-deal-cta-in-popover-footer.md` |
