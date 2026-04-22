@@ -12,6 +12,8 @@
 
 Greenhouse es la fuente de verdad del catálogo; HubSpot distribuye como line items en deals. Para cerrar el loop bidireccional sin drift necesitamos 5 señales persistidas en HubSpot:
 
+Importante: el `name` interno de cada property se mantiene con prefijo `gh_*` para integración y joins técnicos, pero el `label` visible en HubSpot debe quedar en lenguaje natural para operadores CRM.
+
 | Propiedad | Propósito |
 |---|---|
 | `gh_product_code` | SKU canónico (ECG/ETG/EFO/EFG/PRD) para joinear con `greenhouse_commercial.product_catalog`. |
@@ -39,21 +41,35 @@ Todas (excepto `gh_business_line`) son **read-only** desde la UI de HubSpot — 
 ### 1. Revisar las definiciones
 
 ```bash
-pnpm tsx scripts/create-hubspot-product-custom-properties.ts
+pnpm hubspot:product-properties
 ```
 
 Imprime el JSON de las 5 propiedades. Cada entry incluye `name`, `label`, `description`, `type`, `fieldType`, `groupName`, `formField`, `displayOrder`, y `readOnlyValue`.
 
-### 2. Aplicar en sandbox
+Labels visibles esperados:
+- `gh_product_code` → `Codigo de Producto Greenhouse`
+- `gh_source_kind` → `Origen del Producto en Greenhouse`
+- `gh_last_write_at` → `Ultima Sincronizacion desde Greenhouse`
+- `gh_archived_by_greenhouse` → `Archivado por Greenhouse`
+- `gh_business_line` → `Linea de Negocio Greenhouse`
 
-Usar la skill `hubspot-ops` para crear cada property. La skill:
-- Lista las properties existentes en el portal destino
-- Compara contra las 5 de `PRODUCT_HUBSPOT_CUSTOM_PROPERTIES`
-- Crea solo las que falten (idempotencia garantizada por el helper `planCustomPropertyCreation`)
+### 2. Dry-run live o apply en sandbox
 
-Comando de referencia (ajustar al signature exacto de `hubspot-ops`):
+Opciones soportadas desde Greenhouse:
+- Dry-run local con token real: `HUBSPOT_ACCESS_TOKEN=... pnpm hubspot:product-properties`
+- Apply real e idempotente: `HUBSPOT_ACCESS_TOKEN=... pnpm hubspot:product-properties --apply`
+
+El script:
+- asegura el group `greenhouse_sync`
+- lista las properties existentes del objeto `products`
+- compara contra las 5 definiciones canónicas
+- crea las faltantes y hace `PATCH` sobre las drifted cuando corres con `--apply`
+
+Si prefieres operar vía skill, el JSON sigue siendo reutilizable por `hubspot-ops`.
+
+Comando de referencia:
 ```bash
-hubspot-ops create-property --portal sandbox --object-type product --spec-file scripts/create-hubspot-product-custom-properties.ts
+HUBSPOT_ACCESS_TOKEN=... pnpm hubspot:product-properties --apply
 ```
 
 ### 3. Validar en sandbox

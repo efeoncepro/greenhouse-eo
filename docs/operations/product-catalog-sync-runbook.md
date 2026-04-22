@@ -64,7 +64,16 @@ pnpm exec vitest run \
   src/lib/commercial/product-catalog/drift-reconciler.test.ts \
   src/app/api/admin/commercial/product-sync-conflicts/route.test.ts \
   'src/app/api/admin/commercial/product-sync-conflicts/[conflictId]/resolve/route.test.ts'
+
+# Smoke E2E inicial outbound (TASK-563)
+pnpm tsx scripts/e2e-product-hubspot-outbound.ts
 ```
+
+## Smoke staging
+
+- Reporte operativo: `docs/operations/product-hubspot-outbound-e2e-report.md`
+- El smoke actual cubre `create -> update -> archive` vía staging + sandbox.
+- Batch multi-product sigue deferido hasta que el worker reactive soporte algo más que coalescing por scope.
 
 ## Escalación
 

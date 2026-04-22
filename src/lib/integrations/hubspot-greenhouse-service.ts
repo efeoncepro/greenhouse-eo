@@ -499,7 +499,7 @@ export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseC
 
   const response = await fetch(`${baseUrl}/products`, {
     method: 'POST',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }, true),
     body: JSON.stringify(safePayload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -517,11 +517,10 @@ export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseC
 
 // ── Product outbound extensions (TASK-547) ──
 //
-// PATCH / archive / reconcile endpoints on the Cloud Run service have NOT
-// shipped yet. Follow the TASK-524 invoice and TASK-539 deal patterns: return
-// a structured `endpoint_not_deployed` result on 404 so the reactive outbound
-// bridge records the trace without throwing. When the Cloud Run routes ship,
-// the existing retry worker picks up the pending rows and replays.
+// PATCH / archive / reconcile may still hit older deployments while rollout is
+// in flight. Follow the TASK-524 invoice and TASK-539 deal patterns: return a
+// structured `endpoint_not_deployed` result on 404 so the reactive outbound
+// bridge records the trace without throwing.
 
 export interface HubSpotGreenhouseProductCustomProperties {
   gh_product_code: string
@@ -560,7 +559,7 @@ export const updateHubSpotGreenhouseProduct = async (
 
   const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}`, {
     method: 'PATCH',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }, true),
     body: JSON.stringify(safePayload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -601,7 +600,7 @@ export const archiveHubSpotGreenhouseProduct = async (
 
   const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}/archive`, {
     method: 'POST',
-    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }, true),
     body: JSON.stringify({ reason: reason ?? 'source_deactivated_in_greenhouse' }),
     cache: 'no-store',
     next: { revalidate: 0 },

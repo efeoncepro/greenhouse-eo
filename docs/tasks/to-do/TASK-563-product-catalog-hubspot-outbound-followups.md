@@ -15,31 +15,31 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `crm + platform`
-- Blocked by: `none` (TASK-547 Fase C ya shipped; estos items quedan fuera del V1 por tres razones: repo externo, coordinación HubSpot real, y decisiones cross-projection)
+- Blocked by: `deploy externo + acceso operativo HubSpot`
 - Branch: `task/TASK-563-product-catalog-hubspot-outbound-followups`
 - Legacy ID: `follow-up de TASK-547`
 - GitHub Issue: `none`
 
 ## Summary
 
-Cerrar los 5 items que TASK-547 dejó fuera del V1 — dos bloqueantes para producción real (deploy de los 3 endpoints nuevos en el Cloud Run externo `hubspot-greenhouse-integration` + aplicación de 5 custom properties en HubSpot sandbox→production via skill `hubspot-ops`) y tres mejoras de robustez (refactor del anti-ping-pong guard al helper compartido que TASK-540 ya aterrizó, batch API coalescing para burst scenarios, y suite E2E contra HubSpot sandbox). El bridge `productHubSpotOutbound` en Greenhouse EO ya está shipped, testeado con mocks y listo para activarse; este task destraba la activación real end-to-end.
+Cerrar los follow-ups que TASK-547 dejó fuera del V1 y que hoy están partidos entre este repo y el repo hermano `cesargrowth11/hubspot-bigquery` (`services/hubspot_greenhouse_integration/`). El bridge `productHubSpotOutbound` en Greenhouse EO ya está shipped, testeado con mocks y listo para activarse, pero el service externo todavía necesita completar y endurecer su contrato de productos (`POST`/`PATCH` hardening + `archive` + `reconcile`), el apply/validación real de las custom properties en HubSpot sigue pendiente, y el repo local aún debe refactorizar el anti-ping-pong y definir honestamente qué hacer con el batch/coalescing.
 
 ## Why This Task Exists
 
 TASK-547 convergió el contrato outbound Greenhouse-first (migration trace + publishers + client + payload adapter + push helper idempotente + projection) y entregó 30 unit tests contra mocks, pero dejó 5 items que la arquitectura necesita para cerrar el loop end-to-end:
 
-1. **Los 3 endpoints Cloud Run no existen todavía**. El repo externo `hubspot-greenhouse-integration` expone `POST /products` desde TASK-211, pero no `PATCH /products/:id`, ni `POST /products/:id/archive`, ni `GET /products/reconcile`. Mientras falten, el bridge opera en degraded mode (`hubspot_sync_status='endpoint_not_deployed'`) para updates/archives. La primera cotización en HubSpot con un product actualizado en Greenhouse va a ser stale hasta que estos shipan.
-2. **Las 5 custom properties HubSpot no están creadas en ningún portal**. El runbook operativo `docs/operations/hubspot-custom-properties-products.md` describe el proceso pero nadie lo ha ejecutado. Sin las properties, TASK-548 (drift cron) no puede comparar `gh_owned_fields_checksum`, y el anti-ping-pong del sync inbound no tiene `gh_last_write_at` para leer.
+1. **El contrato server-side de products sigue incompleto**. El repo externo real (`cesargrowth11/hubspot-bigquery`, path `services/hubspot_greenhouse_integration/`) ya expone `POST /products` y `PATCH /products/:id`, pero ambos endpoints todavía están por debajo del contrato que Greenhouse EO ya envía: hoy no procesan `customProperties`, no exigen auth de integración como `PATCH /companies/:id/lifecycle`, y el `PATCH` responde con `build_product_profile(...)` en vez de `{status:'updated', hubspotProductId, ...}`. Además siguen faltando `POST /products/:id/archive` y `GET /products/reconcile`.
+2. **Las 5 custom properties HubSpot siguen como deuda operativa no verificada**. El runbook operativo `docs/operations/hubspot-custom-properties-products.md` describe el proceso, pero desde este repo no hay evidencia verificable de que ya estén aplicadas en sandbox/production. Sin esas properties, el drift loop queda incompleto y el anti-ping-pong del sync inbound no tiene `gh_last_write_at` confiable para leer.
 3. **El anti-ping-pong guard vive inline en `push-product-to-hubspot.ts`**. TASK-540 ya aterrizó el helper canónico compartido en `src/lib/sync/anti-ping-pong.ts`; este helper inline debe refactorizarse para consumir el canonical o genera divergencia silenciosa en el behavior cross-bridge (incomes, deals, quotes, products).
 4. **El reactive worker procesa events 1:1 sin coalescing**. Si un bulk edit dispara 100 events de `commercial.sellable_role.pricing_updated` en ventana de 30s, se hacen 100 round-trips HTTP a HubSpot (o 100 intentos cuando los endpoints aterricen). El patrón `POST /products/batch/create` y `PATCH /products/batch/update` de HubSpot existe pero no se usa — es deuda de performance latente.
 5. **No hay E2E real**. Los 30 unit tests pasan con mocks contra `createHubSpotGreenhouseProduct` / `updateHubSpotGreenhouseProduct` / etc. Antes de activar los flags en production necesitamos un ciclo completo staging: crear un role → ver aparecer un product en HubSpot sandbox con `gh_product_code=ECG-xxx` ≤ 2min → editar el role → product actualizado ≤ 2min → desactivar role → product archived en HubSpot ≤ 2min.
 
 ## Goal
 
-- 3 endpoints nuevos deployados en Cloud Run `hubspot-greenhouse-integration` con contratos que matcheen el client Greenhouse (`PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile`)
+- Service externo de products alineado al contrato que Greenhouse EO ya consume: `POST /products` y `PATCH /products/:id` hardenizados + `POST /products/:id/archive` + `GET /products/reconcile`
 - 5 custom properties (`gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`, `gh_business_line`) creadas en HubSpot sandbox, validadas, replicadas en production via skill `hubspot-ops`
 - Anti-ping-pong inline refactorizado a consumir el helper canónico de TASK-540 (o documentar explícitamente que TASK-540 adopta el patrón inline como canonical)
-- Batch API HubSpot (`POST /products/batch/create`, `PATCH /products/batch/update`) activado cuando el reactive worker procesa ≥5 events en ventana 30s
+- Batch API HubSpot activado solo si cabe sanamente en la arquitectura reactiva actual; si no, dejar el defer explícito con performance budget documentado
 - Suite E2E contra HubSpot sandbox cubriendo los 4 flows críticos (create / update / archive / unarchive) + anti-ping-pong + rate limit backoff
 - Feature flags `GREENHOUSE_PRODUCT_SYNC_*` activos en staging 48h sin errors, luego en production
 
@@ -52,16 +52,16 @@ TASK-547 convergió el contrato outbound Greenhouse-first (migration trace + pub
 Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` — v1.3 con Delta Fase C (contrato cliente + custom properties + 5 status del trace)
-- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` — reglas del reactive worker, rate limiting, DLQ, retry
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md` — reglas vigentes del reactive worker, coalescing por scope, recovery y retry
 - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` — topology Cloud Run (`ops-worker` + `hubspot-greenhouse-integration`)
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` — §5.3 patrón anti-ping-pong (ya aterrizado por TASK-540)
 
 Reglas obligatorias:
 
-- NO tocar el contrato TypeScript del cliente (`updateHubSpotGreenhouseProduct`/`archiveHubSpotGreenhouseProduct`/`reconcileHubSpotGreenhouseProducts`). El service externo debe matchear lo que el repo Greenhouse ya envía.
+- NO romper el contrato TypeScript del cliente (`updateHubSpotGreenhouseProduct`/`archiveHubSpotGreenhouseProduct`/`reconcileHubSpotGreenhouseProducts`). Si el service externo hoy responde distinto, el service debe alinearse a Greenhouse y no al revés.
 - NO modificar `sanitizeHubSpotProductPayload` (guard TASK-347) — el bridge Greenhouse-side es defense-in-depth; el service externo es el segundo anillo.
 - Anti-ping-pong refactor NO debe cambiar el behavior (60s window, skip con `skipped_no_anchors` status, emit `synced:noop` con reason `anti_ping_pong_window`).
-- Custom properties `gh_*` son **read-only** en HubSpot UI. Operadores HubSpot no deben editarlas.
+- `gh_product_code`, `gh_source_kind`, `gh_last_write_at` y `gh_archived_by_greenhouse` deben tratarse como read-only en HubSpot UI. `gh_business_line` hoy está definida como editable en la spec/script y debe confirmarse si se mantiene así o se endurece.
 - Batch coalescing NO debe bypass el trace por producto — cada row de `product_catalog` sigue recibiendo su UPDATE individual de `hubspot_sync_status`.
 - E2E staging usa el portal HubSpot sandbox, NO production.
 
@@ -90,7 +90,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- Repo externo `hubspot-greenhouse-integration/routes/products.ts` (Slice 1 — NOT in this repo)
+- Repo externo `cesargrowth11/hubspot-bigquery/services/hubspot_greenhouse_integration/` (Slice 1 — NOT in this repo)
 - HubSpot admin settings (Slice 2 — custom properties, via skill CLI)
 - `src/lib/hubspot/push-product-to-hubspot.ts` (Slice 3 refactor; Slice 4 batch logic)
 - `src/lib/sync/projections/product-hubspot-outbound.ts` (Slice 4 coalescing window)
@@ -110,15 +110,18 @@ Reglas obligatorias:
 - Projection `productHubSpotOutbound` registrada (TASK-547)
 - 30 unit tests passing contra mocks (TASK-547)
 - Runbook de custom properties documentado (TASK-547)
-- Skill `hubspot-ops` disponible en el entorno del operador
+- Repo externo real localizado via GitHub CLI: `cesargrowth11/hubspot-bigquery/services/hubspot_greenhouse_integration/`
+- El service externo YA expone `POST /products` y `PATCH /products/:id`
+- Infra staging/E2E reutilizable ya existe en este repo (`staging-request`, Playwright auth, APIs admin para roles)
 
 ### Gap
 
-- Los 3 endpoints server-side (`PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile`) NO están deployados en `hubspot-greenhouse-integration` (Cloud Run externo).
-- Las 5 custom properties NO existen en HubSpot (ni sandbox ni production).
+- `POST /products` y `PATCH /products/:id` existen en el service externo pero todavía no matchean el contrato Greenhouse: no procesan `customProperties`, no exigen integration auth y el `PATCH` no responde con el shape esperado por el cliente local.
+- `POST /products/:id/archive` y `GET /products/reconcile` siguen faltando en el service externo.
+- El estado real de las 5 custom properties en HubSpot no está verificado; el apply/validación operativa sigue pendiente.
 - Anti-ping-pong inline NO está alineado todavía con el helper canónico que TASK-540 ya aterrizó en `src/lib/sync/anti-ping-pong.ts`.
-- Batch API coalescing NO existe; el reactive worker procesa events 1:1 sin window-based batching.
-- NO hay E2E real contra HubSpot sandbox.
+- Batch API/coalescing multi-producto NO cabe hoy en la arquitectura reactiva actual sin cambio mayor del worker o explicit defer.
+- No hay E2E específica de product outbound contra HubSpot sandbox.
 - Feature flags `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}` están ON en staging desde TASK-546, pero sin los items arriba no se pueden activar en production sin perder eventos o corromper state en HubSpot.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -131,27 +134,28 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Cloud Run externo: deploy de 3 endpoints
+### Slice 1 — Repo externo: hardening de `POST` / `PATCH` + nuevos endpoints `archive` / `reconcile`
 
-- Repo externo `hubspot-greenhouse-integration` gana:
-  - `PATCH /products/:hubspotProductId` — body matchea `HubSpotGreenhouseUpdateProductRequest`. Traduce `customProperties.gh_*` a HubSpot properties API. Respond con `{status: 'updated', hubspotProductId, message?}`.
+- Repo externo `cesargrowth11/hubspot-bigquery/services/hubspot_greenhouse_integration/` gana:
+  - `POST /products` — endpoint ya existente, pero debe procesar `customProperties.gh_*`, exigir integration auth y preservar el contrato de create que Greenhouse EO ya usa.
+  - `PATCH /products/:hubspotProductId` — endpoint ya existente, pero debe endurecerse para matchear `HubSpotGreenhouseUpdateProductRequest`: traducir `customProperties.gh_*` a HubSpot properties API, exigir integration auth igual que `/companies/:id/lifecycle`, y responder `{status: 'updated', hubspotProductId, message?}`.
   - `POST /products/:hubspotProductId/archive` — body `{reason?}`. Llama HubSpot `crm/v3/objects/products/:id/archive` o equivalent. Respond con `{status: 'archived', hubspotProductId}`.
   - `GET /products/reconcile?cursor&limit&includeArchived` — lista HubSpot Products con custom props Greenhouse + archived flag. Respond con `{status: 'ok', items: [{hubspotProductId, gh_product_code, gh_source_kind, gh_last_write_at, name, sku, price, description, isArchived}], nextCursor?}`.
-- Auth OIDC del service (mismo patrón de `POST /products` / `POST /quotes`).
+- Auth del write path consistente con el service actual (`Authorization: Bearer` o `x-greenhouse-integration-key`) y con el patrón de `PATCH /companies/:id/lifecycle`.
 - Rate limit bucket + exponential backoff + DLQ config consistente con los endpoints existentes.
 - Deploy a staging primero, luego production.
-- Acceptance: el cliente Greenhouse deja de recibir `endpoint_not_deployed` y las rows marcadas así quedan en `pending` o `synced` tras el siguiente intento del retry worker.
+- Acceptance: el cliente Greenhouse deja de recibir `endpoint_not_deployed` para update/archive/reconcile y las rows marcadas así quedan en `pending` o `synced` tras el siguiente intento del retry worker.
 
 ### Slice 2 — Aplicar 5 custom properties en HubSpot (sandbox + production)
 
-- Ejecutar runbook `docs/operations/hubspot-custom-properties-products.md` via skill `hubspot-ops`:
+- Ejecutar runbook `docs/operations/hubspot-custom-properties-products.md` con acceso operativo real a HubSpot:
   1. Dry-run contra sandbox mostrando las 5 properties a crear + las ya existentes.
   2. Apply en sandbox.
   3. Validación UI: group `Greenhouse Sync`, labels correctos, flags read-only, enum options de `gh_source_kind`.
   4. Smoke test: trigger manual de un `commercial.sellable_role.created` → verificar product en sandbox con `gh_product_code=ECG-xxx`.
   5. Replicar apply en production tras 48h de sandbox sin errores.
 - Actualizar el runbook con fechas de aplicación en sandbox y production.
-- Si alguna property ya existía pre-TASK-547 con conflicto de shape (tipo diferente, label diferente), documentar la resolution.
+- Si alguna property ya existía pre-TASK-547 con conflicto de shape (tipo diferente, label diferente o `readOnlyValue` distinto), documentar la resolution.
 
 ### Slice 3 — Refactor anti-ping-pong a helper canónico
 
@@ -163,16 +167,13 @@ Reglas obligatorias:
 - Tests pasan sin cambios (el behavior es idéntico).
 - Si TASK-540 adopta el patrón inline como canonical (no helper), cerrar Slice 3 documentando esa decisión en el spec — no hay refactor.
 
-### Slice 4 — Batch API HubSpot (coalescing ≥5 events/30s)
+### Slice 4 — Batch API HubSpot (solo si no rompe la arquitectura reactiva actual)
 
 - Extender el client con:
   - `createHubSpotGreenhouseProductBatch(payloads: HubSpotGreenhouseCreateProductRequest[])` → `POST /products/batch/create` (si el service externo lo expone; sino `endpoint_not_deployed`).
   - `updateHubSpotGreenhouseProductBatch(updates: Array<{hubspotProductId, payload}>)` → `PATCH /products/batch/update`.
-- Modificar la projection `productHubSpotOutbound` para buffer events en ventana de 30s:
-  - Si en ventana hay ≥5 events del mismo tipo (`create` o `update`) para distintos `productId`, hacer batch call.
-  - Si hay <5 o mixed, seguir con calls individuales.
-  - Trace por producto se preserva (cada fila UPDATE su `hubspot_sync_status` individualmente post-batch).
-- **Alternativa menor**: si introducir buffering cross-event requiere cambios en el reactive worker, deferirlo explícitamente y documentar performance budget observado en Slice 5.
+- Modificar la projection `productHubSpotOutbound` para batching multi-product solo si cabe sin violar el contrato actual del reactive worker.
+- **Alternativa preferida si no cabe**: deferir explícitamente el slice, documentar por qué el worker actual solo coalescea por mismo scope `(projection + entityType + entityId)` y registrar performance budget observado en Slice 5.
 - Tests: 3 nuevos — batch create path, batch update path, fallback a single cuando batch endpoint `endpoint_not_deployed`.
 
 ### Slice 5 — E2E contra HubSpot sandbox
@@ -251,13 +252,13 @@ refresh: async (scope, payload) => {
 
 ## Acceptance Criteria
 
-- [ ] Cliente `updateHubSpotGreenhouseProduct` deja de recibir 404 en sandbox → responde con `{status: 'updated'}`.
+- [ ] Cliente `updateHubSpotGreenhouseProduct` recibe respuesta contract-compatible en sandbox (`{status: 'updated', hubspotProductId, ...}`) y procesa `customProperties` correctamente.
 - [ ] Cliente `archiveHubSpotGreenhouseProduct` deja de recibir 404 en sandbox → responde con `{status: 'archived'}`.
 - [ ] Cliente `reconcileHubSpotGreenhouseProducts` deja de recibir 404 en sandbox → responde con `{status: 'ok', items: [...]}`.
-- [ ] Las 5 custom properties existen en HubSpot sandbox con labels, types y read-only flags correctos.
+- [ ] Las 5 custom properties quedan verificadas/aplicadas en HubSpot sandbox con labels, types y flags correctos.
 - [ ] Las 5 custom properties existen en HubSpot production tras validación 48h.
 - [ ] Anti-ping-pong refactorizado al helper de TASK-540 (o decisión documentada si TASK-540 adopta inline).
-- [ ] Batch API activado cuando outbound procesa ≥5 events en 30s (o performance budget documentado si deferido).
+- [ ] Batch API activado cuando outbound procesa ≥5 events en 30s, o defer explícito documentado con performance budget.
 - [ ] E2E staging E2E report shipped con 4 flows críticos ✅.
 - [ ] Rate limit burst (20 roles/10s) sin 429 spurios.
 - [ ] Feature flags `GREENHOUSE_PRODUCT_SYNC_*` activos en production post-validación.

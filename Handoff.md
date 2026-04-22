@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — TASK-544 Product Catalog Sync umbrella realignment (Codex)
+
+- **Scope:** corregir la umbrella `TASK-544`, la task hija `TASK-549` y los trackers vivos (`README`, `TASK_ID_REGISTRY`) para que reflejen el runtime real del programa Product Catalog Sync.
+- **Correccion de spec antes de implementar**
+  - `TASK-544` seguía describiendo como gaps varias piezas ya shippeadas en A-D (`sourceToProductCatalog`, `productHubSpotOutbound`, drift cron, Admin Center conflicts)
+  - `TASK-549` seguía mezclando cleanup interno de Fase E con supuestos rotos: `TASK-474` ya está cerrada y el “auto-adopt” relevante que sobrevive hoy es el carril legacy alrededor de `greenhouse_finance.products`, no un auto-adopt directo del canon `product_catalog`
+  - `TASK_ID_REGISTRY` estaba desalineado con `README`: `TASK-474` y `TASK-546` seguían en `to-do` y con paths incorrectos
+- **Decision documental nueva**
+  - `TASK-544` queda marcada como programa `in-progress`: Fases A-D cerradas, Fase E pendiente
+  - el cierre honesto del programa queda explícitamente bloqueado por `TASK-563` + validación real en production
+  - `TASK-549` se redefine como cleanup final de flags/legacy surfaces/`sync_direction`, no como desbloqueo de `TASK-474`
+
 ## Sesion 2026-04-22 — TASK-550 Pricing Catalog Phase-5 Follow-ups (Codex)
 
 - **Scope:** cerrar los 4 follow-ups que habían quedado explícitamente fuera del scope V1 de TASK-471: revert governance, gate de impacto alto multi-tab, notificaciones de approval queue y Excel create/delete vía approval workflow.

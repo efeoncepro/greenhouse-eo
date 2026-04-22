@@ -30,6 +30,7 @@
     "migrate:status": "tsx scripts/migrate.ts status",
     "db:generate-types": "tsx scripts/generate-db-types.ts",
     "backfill:hubspot-contact-names": "tsx scripts/backfill-hubspot-contact-names.ts",
+    "hubspot:product-properties": "tsx scripts/create-hubspot-product-custom-properties.ts",
     "backfill:portal-home-contract": "tsx scripts/backfill-portal-home-contract.ts",
     "backfill:efeonce-microsoft-aliases": "tsx scripts/backfill-efeonce-microsoft-aliases.ts",
     "backfill:internal-identity-profiles": "tsx scripts/backfill-internal-identity-profiles.ts",

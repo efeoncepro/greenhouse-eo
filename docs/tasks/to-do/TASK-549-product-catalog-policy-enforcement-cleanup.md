@@ -12,31 +12,31 @@
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Bloqueada por activacion real`
 - Rank: `TBD`
-- Domain: `platform`
-- Blocked by: `TASK-548`
+- Domain: `crm + platform`
+- Blocked by: `TASK-563` + `validacion >=4 semanas en production`
 - Branch: `task/TASK-549-product-catalog-policy-enforcement-cleanup`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
 
 ## Summary
 
-Fase E del programa TASK-544. Deprecacion del inbound auto-adopt (HubSpot products ya no se crean automaticamente en `product_catalog`; solo se detectan como orphans). Remocion de feature flags (`GREENHOUSE_PRODUCT_CATALOG_UNIFIED`, `..._ROLES`, `..._TOOLS`, `..._OVERHEADS`, `..._SERVICES`). Remocion del valor enum `sync_direction='hubspot_only'`. Cleanup de codigo legacy (`create-hubspot-product.ts` single-purpose). Doc funcional publicada. Cierra el programa.
+Fase E del programa TASK-544. Cleanup final del carril Product Catalog Sync una vez que la activacion real ya esté validada: remover los 4 sub-flags `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}`, normalizar el contrato legacy de `sync_direction`, y decidir el retiro o resignificación de los carriles legacy `sync-hubspot-products.ts` / `create-hubspot-product.ts` que todavía operan sobre `greenhouse_finance.products`. Cierra el programa sin dejar drift entre el runtime canónico `product_catalog` y las surfaces heredadas.
 
 ## Why This Task Exists
 
-Tras ≥4 semanas de validacion en production de las Fases A-D, mantener flags + branches legacy + inbound auto-adopt es deuda y fuente de bugs sutiles. Esta fase estabiliza el contrato y marca el programa como "cerrado y en regimen".
+Tras ≥4 semanas de validación en production de las Fases A-D y con `TASK-563` cerrada, mantener flags + superficies legacy + contrato histórico de `sync_direction` es deuda y fuente de bugs sutiles. Esta fase estabiliza el contrato y marca el programa como "cerrado y en régimen".
 
 ## Goal
 
 - Remover feature flags del programa.
-- Deprecar inbound auto-adopt: `sync-hubspot-products.ts` sigue corriendo para drift detection pero NO crea rows nuevas en `product_catalog`.
+- Decidir el cierre del inbound legacy `sync-hubspot-products.ts`, que hoy sigue manteniendo `greenhouse_finance.products` y el bridge legacy hacia el canon comercial.
 - Remover `sync_direction='hubspot_only'` como valor enum permitido (migrate existing rows a `greenhouse_only` o `bidirectional`).
-- Cleanup: `create-hubspot-product.ts` reemplazado por `push-product-to-hubspot.ts` (TASK-547).
+- Cleanup: `create-hubspot-product.ts` reemplazado, deprecado o explicitamente preservado como surface legacy documentada.
 - Runbook operacional finalizado.
 - Doc funcional en `docs/documentation/`.
-- TASK-474 (Quote Builder Catalog Reconnection) desbloqueada explicitamente.
+- Cerrar la umbrella `TASK-544` sin supuestos/documentación rotos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -52,6 +52,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - No remover flags antes de ≥4 semanas de validacion con traffic real en production.
+- `TASK-563` debe estar cerrada antes: endpoints externos deployados, custom properties aplicadas, E2E staging y activacion real.
 - Consumers externos del `create-hubspot-product.ts` (si los hay) migran antes.
 - Rows con `sync_direction='hubspot_only'` se migran antes del enum drop.
 - Tests legacy obsoletos se remueven.
@@ -66,41 +67,47 @@ Reglas obligatorias:
 
 ### Depends on
 
-- TASK-545 a TASK-548 completadas y validadas en production ≥4 semanas
+- TASK-545 a TASK-548 completadas
+- `TASK-563` cerrada
+- Validación real en production ≥4 semanas
 - No ISSUE-### open contra Fases A-D
 - Consumers legacy migrados
 
 ### Blocks / Impacts
 
 - Reduccion de superficie de codigo
-- TASK-474 desbloqueada
 - Simplificacion de onboarding del equipo
+- Cierre honesto del programa TASK-544
 
 ### Files owned
 
-- `src/lib/flags/greenhouse-flags.ts` (remocion de 5 flags)
-- `src/lib/hubspot/sync-hubspot-products.ts` (modificacion: no auto-adopt)
+- `src/lib/commercial/product-catalog/flags.ts`
+- `src/lib/sync/projections/source-to-product-catalog.ts`
+- `src/lib/hubspot/sync-hubspot-products.ts`
 - `src/lib/hubspot/create-hubspot-product.ts` (remocion o wrapper)
 - `migrations/YYYYMMDDHHMMSS_task-549-drop-hubspot-only-sync-direction.sql`
 - Tests legacy
-- `docs/documentation/admin-center/product-catalog-sync.md` (sin menciones a flag)
-- `docs/operations/product-catalog-sync-runbook.md` (finalizado)
+- `docs/documentation/finance/catalogo-productos-sincronizacion.md`
+- `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md`
 
 ## Current Repo State
 
 ### Already exists
 
-- 5 flags operativos en staging + production
-- Inbound sync `sync-hubspot-products.ts` con auto-adopt activo
-- `create-hubspot-product.ts` reemplazable
+- 4 sub-flags operativos (`GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}`)
+- Carril canónico `product_catalog` ya materializado y bridge outbound/drift/admin ya cerrados
+- Cron legacy `sync-hubspot-products.ts` todavía activo sobre `greenhouse_finance.products`
+- `create-hubspot-product.ts` todavía expuesto por `POST /api/finance/products/hubspot`
 - Rows con `sync_direction='hubspot_only'` posiblemente (legacy TASK-345)
+- `TASK-474` ya está cerrada en `docs/tasks/complete/TASK-474-quote-builder-catalog-reconnection-pass.md`
 
 ### Gap
 
 - Flags no removidos.
-- Inbound auto-adopt activo.
+- Carriles legacy de products todavía activos y no documentados como deprecados/canonizados.
 - Enum `hubspot_only` sigue valido.
 - `create-hubspot-product.ts` no deprecado explicitamente.
+- La documentación todavía mezcla cleanup interno de Fase E con follow-ups externos que hoy viven en `TASK-563`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -120,14 +127,14 @@ Reglas obligatorias:
 
 ### Slice 2 — Remove flags
 
-- Eliminar las 5 flags del registry.
+- Eliminar las 4 sub-flags del rollout.
 - Limpiar Vercel env vars.
 - Documentar en changelog.
 
-### Slice 3 — Deprecate inbound auto-adopt
+### Slice 3 — Resolver carril inbound legacy
 
-- Modify `sync-hubspot-products.ts`: fetch sigue, cross-check sigue, pero NO inserta en `product_catalog` automaticamente. En su lugar, registra orphan en `product_sync_conflicts` para Admin resolution.
-- Alternativa: borrar el sync inbound automatico y dejar solo el `GET /products/reconcile` que usa TASK-548. Decidir en Discovery.
+- Decidir si `sync-hubspot-products.ts` se retira, se reduce a compatibilidad explícita para `greenhouse_finance.products`, o se reemplaza por un contrato read-only/documentado.
+- No asumir ya un “auto-adopt” directo sobre `product_catalog`: el runtime actual de conflictos/adopción manual vive en `product_sync_conflicts` + `conflict-resolution-commands.ts`.
 
 ### Slice 4 — Cleanup legacy code
 
@@ -144,9 +151,9 @@ Reglas obligatorias:
 - Runbook completo con casos reales observados.
 - Doc funcional sin menciones a flag.
 
-### Slice 7 — Desbloquear TASK-474
+### Slice 7 — Corregir referencias obsoletas
 
-- Marcar TASK-474 como no-mas-bloqueada; agregar delta en su archivo.
+- Eliminado del scope: `TASK-474` ya está cerrada; solo corregir cualquier referencia obsoleta.
 
 ## Out of Scope
 
@@ -164,13 +171,12 @@ Lightweight — scope suficiente.
 
 ## Acceptance Criteria
 
-- [ ] 5 flags removidas; grep retorna 0 hits.
-- [ ] Inbound sync no crea rows nuevas en `product_catalog` automaticamente.
+- [ ] Los 4 sub-flags removidos; grep retorna 0 hits funcionales del rollout.
+- [ ] El carril legacy `sync-hubspot-products.ts` queda retirado o documentado explícitamente como compatibilidad.
 - [ ] Legacy rows con `hubspot_only` migradas.
 - [ ] Enum check constraint sin `hubspot_only`.
 - [ ] `create-hubspot-product.ts` removido o convertido en wrapper con deprecation warning.
 - [ ] Runbook y doc funcional publicados.
-- [ ] TASK-474 delta agrega fecha de desbloqueo.
 - [ ] Staging + production verdes 48h post-deploy.
 - [ ] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
 
@@ -189,7 +195,7 @@ Lightweight — scope suficiente.
 - [ ] `docs/tasks/README.md` sincronizado
 - [ ] `Handoff.md` actualizado
 - [ ] `changelog.md` actualizado con "Product Catalog Sync program closed"
-- [ ] Chequeo de impacto cruzado (TASK-474)
+- [ ] Chequeo de impacto cruzado (`TASK-563`, rutas legacy de products)
 
 - [ ] Update TASK-544 umbrella a `complete`
 - [ ] 7 open questions del spec con respuesta documentada (o task follow-up)

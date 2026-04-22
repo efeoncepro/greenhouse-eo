@@ -6,6 +6,7 @@ import {
   createHubSpotGreenhouseProduct,
   updateHubSpotGreenhouseProduct
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { wasWrittenByHubSpotRecently } from '@/lib/sync/anti-ping-pong'
 
 import {
   adaptProductCatalogToHubSpotCreatePayload,
@@ -39,8 +40,6 @@ import {
 //   5. Respects anti-ping-pong guard via `hubspot_last_write_at`: if the row
 //      was written by Greenhouse within the last 60s, skip to avoid echoing
 //      HubSpot webhook inbound writes.
-
-const ANTI_PING_PONG_WINDOW_MS = 60_000
 
 interface ProductCatalogRow extends Record<string, unknown> {
   product_id: string
@@ -78,14 +77,6 @@ const toAttemptCount = (value: unknown): number => {
   }
 
   return 0
-}
-
-const toTimestampMs = (value: string | Date | null): number | null => {
-  if (!value) return null
-  if (value instanceof Date) return value.getTime()
-  const parsed = Date.parse(value)
-
-  return Number.isFinite(parsed) ? parsed : null
 }
 
 const readProductCatalogRow = async (productId: string): Promise<ProductCatalogRow | null> => {
@@ -176,11 +167,7 @@ const deriveAction = (
 }
 
 const hitsAntiPingPong = (row: ProductCatalogRow): boolean => {
-  const lastWriteMs = toTimestampMs(row.hubspot_last_write_at)
-
-  if (lastWriteMs === null) return false
-
-  return Date.now() - lastWriteMs < ANTI_PING_PONG_WINDOW_MS
+  return wasWrittenByHubSpotRecently(row.hubspot_last_write_at)
 }
 
 export const pushProductToHubSpot = async (
