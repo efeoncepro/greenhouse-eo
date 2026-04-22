@@ -5182,3 +5182,25 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `accept_hubspot_field` solo aplica a productos `manual` o `hubspot_imported`
 - Restricción explícita:
   - `greenhouse_commercial.product_catalog` y `greenhouse_commercial.product_sync_conflicts` siguen sin `space_id` en el schema vigente; este slice se aísla por access surface admin + capability `commercial.product_catalog.resolve_conflict`, no por FK tenant-aware a nivel tabla
+## Delta 2026-04-22 — HubSpot custom properties now use a canonical declarative reconcile layer
+
+- Greenhouse ya no debe manejar custom properties HubSpot con scripts aislados por task.
+- Contrato nuevo:
+  - manifest canónico: `src/lib/hubspot/custom-properties.ts`
+  - reconcile live/idempotente: `scripts/ensure-hubspot-custom-properties.ts`
+  - wrappers por objeto:
+    - `pnpm hubspot:company-properties`
+    - `pnpm hubspot:contact-properties`
+    - `pnpm hubspot:deal-properties`
+    - `pnpm hubspot:product-properties`
+    - `pnpm hubspot:service-properties`
+    - `pnpm hubspot:properties` para multi-objeto
+- Objetos soportados hoy:
+  - `companies` (`gh_*` party lifecycle)
+  - `deals` (`gh_deal_origin`)
+  - `products` (`gh_*` product catalog)
+  - `services` (`ef_*`)
+  - `contacts` soportado por el engine pero sin suite activa todavía
+- Regla operativa:
+  - si una property HubSpot nueva pertenece al contrato Greenhouse, debe declararse primero en el manifest canónico y no en un script ad-hoc
+  - cuando HubSpot no refleje un atributo de metadata de forma confiable (ej. `readOnlyValue`), el manifiesto debe converger contra el estado verificable live y la restricción queda documentada como policy operativa

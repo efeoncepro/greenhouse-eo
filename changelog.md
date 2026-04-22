@@ -6440,3 +6440,9 @@
 ## 2026-04-08
 
 - Finance UX: `Cobros` y `Pagos` ya no muestran `Pendiente` para movimientos de caja ya ejecutados solo porque aun no estan conciliados. La tabla ahora separa `Estado` (`Cobrado` / `Pagado`) de `Conciliacion` (`Conciliado` / `Por conciliar`).
+## 2026-04-22
+
+- Added a canonical declarative HubSpot custom-properties layer in Greenhouse: `src/lib/hubspot/custom-properties.ts` + `scripts/ensure-hubspot-custom-properties.ts` now govern `companies`, `deals`, `products`, and `services`, with `contacts` scaffolded as a supported object type.
+- Kept backward-compatible object wrappers and new `pnpm` entrypoints (`hubspot:properties`, `hubspot:company-properties`, `hubspot:contact-properties`, `hubspot:deal-properties`, `hubspot:product-properties`, `hubspot:service-properties`) so operations no longer depend on one-off scripts per task.
+- Applied and verified the live HubSpot converge for `companies`, `deals`, and `products`; confirmed `services` was already aligned and left `contacts` intentionally empty until a canonical property contract exists.
+- Documented that HubSpot is not reflecting `readOnlyValue=true` reliably on these objects, so Greenhouse now treats field ownership as an operational policy rather than a persistent API-enforced flag.

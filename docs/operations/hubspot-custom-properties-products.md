@@ -7,6 +7,8 @@
 > **Objeto:** HubSpot `product`.
 >
 > **Group name:** `greenhouse_sync` (compartido con otras properties `gh_*` de TASK-524/539).
+>
+> **Baseline canónico:** [`docs/operations/hubspot-custom-properties.md`](/Users/jreye/Documents/greenhouse-eo/docs/operations/hubspot-custom-properties.md)
 
 ## Por qué necesitamos estas properties
 
@@ -22,7 +24,7 @@ Importante: el `name` interno de cada property se mantiene con prefijo `gh_*` pa
 | `gh_archived_by_greenhouse` | Distingue archival operativo desde Greenhouse (role desactivado, addon oculto, etc) vs archival manual en HubSpot. |
 | `gh_business_line` | BU owner del producto (globe, efeonce_digital, reach, wave, crm_solutions). Segmentación CRM. |
 
-Todas (excepto `gh_business_line`) son **read-only** desde la UI de HubSpot — operadores HubSpot no las deben tocar; Greenhouse las gestiona.
+Todas (excepto `gh_business_line`) deben tratarse como **Greenhouse-owned** — operadores HubSpot no las deben tocar. Hoy la API de HubSpot no está reflejando `readOnlyValue=true` de forma verificable en este objeto, así que la restricción queda como regla operativa y no como enforcement confiable del proveedor.
 
 ## Cuándo correr
 
@@ -71,6 +73,7 @@ Labels visibles esperados:
 Opciones soportadas desde Greenhouse:
 - Dry-run local con token real: `HUBSPOT_ACCESS_TOKEN=... pnpm hubspot:product-properties`
 - Apply real e idempotente: `HUBSPOT_ACCESS_TOKEN=... pnpm hubspot:product-properties --apply`
+- Reconcile genérico multi-objeto: `HUBSPOT_ACCESS_TOKEN=... pnpm hubspot:properties -- --object products --apply`
 
 El script:
 - asegura el group `greenhouse_sync`
@@ -90,7 +93,7 @@ HUBSPOT_ACCESS_TOKEN=... pnpm hubspot:product-properties --apply
 1. En HubSpot UI, navegar a **Settings → Objects → Products → Manage properties**.
 2. Filtrar por group `Greenhouse Sync`.
 3. Confirmar que las 5 propiedades aparecen con los labels correctos.
-4. Verificar que `gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse` tienen el flag "read-only" activo.
+4. Verificar que `gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse` queden claramente documentadas/entendidas como Greenhouse-owned aunque HubSpot no exponga el flag `readOnlyValue` de forma consistente.
 
 ### 4. Smoke test del bridge
 

@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — HubSpot custom properties declarative reconcile hardening (Codex)
+
+- **Scope:** unificar el provisioning de custom properties HubSpot en Greenhouse y cerrar el gap histórico entre properties de `companies`, `deals`, `products` y `services`, dejando `contacts` soportado por el engine sin inventar un contrato inexistente.
+- **Implementacion shipped**
+  - manifest canónico `src/lib/hubspot/custom-properties.ts`
+  - reconciler idempotente multi-objeto `scripts/ensure-hubspot-custom-properties.ts`
+  - wrappers compatibles:
+    - `scripts/create-hubspot-company-custom-properties.ts`
+    - `scripts/create-hubspot-contact-custom-properties.ts`
+    - `scripts/create-hubspot-deal-custom-properties.ts`
+    - `scripts/create-hubspot-product-custom-properties.ts`
+    - `scripts/create-hubspot-service-custom-properties.ts`
+  - scripts `package.json` nuevos: `hubspot:properties`, `hubspot:{company,contact,deal,product,service}-properties`
+  - tests nuevos: `scripts/__tests__/hubspot-custom-properties.test.ts`
+- **Estado live verificado y aplicado en HubSpot**
+  - `companies`: 6 properties `gh_*` convergen limpio en `companyinformation`
+  - `deals`: `gh_deal_origin` creada y converge limpio en `dealinformation`
+  - `products`: 5 properties `gh_*` convergen limpio en `greenhouse_sync`
+  - `services`: 15 properties `ef_*` ya existían y convergen limpio en `service_information`
+  - `contacts`: objeto soportado por el engine, sin properties canónicas activas todavía
+- **Decision operativa importante**
+  - las tasks/specs viejas hablaban de `readOnlyValue=true`, pero la API live de HubSpot no lo refleja para `companies`, `deals` ni `products`; el manifiesto quedó alineado al estado verificable para evitar drift perpetuo
+  - la ownership rule sigue siendo operativa/documental: los campos `gh_*` y `ef_*` Greenhouse-owned no deben editarse manualmente en HubSpot aunque el proveedor no exponga el flag read-only de forma confiable
+
 ## Sesion 2026-04-22 — TASK-544 Product Catalog Sync umbrella realignment (Codex)
 
 - **Scope:** corregir la umbrella `TASK-544`, la task hija `TASK-549` y los trackers vivos (`README`, `TASK_ID_REGISTRY`) para que reflejen el runtime real del programa Product Catalog Sync.

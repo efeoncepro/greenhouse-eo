@@ -105,7 +105,7 @@ Inline deal creation desde el Quote Builder aterriza — se elimina el context-s
 ### Correcciones a la spec §6.4
 
 1. **Endpoint Cloud Run `/deals`**: la spec asume existe; hoy **no está deployado**. El cliente TS implementa graceful fallback (`endpoint_not_deployed`). Task derivada: deploy en repo `hubspot-greenhouse-integration`.
-2. **Custom property `gh_deal_origin`**: la spec la asume creada en HubSpot; no está. Se envía como parte del payload bajo `origin: 'greenhouse_quote_builder'`; el Cloud Run service debe crear el custom property al deploy.
+2. **Custom property `gh_deal_origin`**: el contrato vive en el manifest canónico `src/lib/hubspot/custom-properties.ts` y se aplica con `scripts/ensure-hubspot-custom-properties.ts` / `pnpm hubspot:deal-properties`.
 3. **Approval workflow**: el workflow canónico de TASK-504 está atado a quotations, no a deals. Fase E persiste la attempt en `pending_approval` y emite `commercial.deal.create_approval_requested` como hook para el workflow genérico (task derivada).
 4. **Rate limit**: no existía helper genérico (el de email es email-only). Fase E lo implementa in-module contando `deal_create_attempts` por `actor_user_id` (60s) y `tenant_scope` (1h).
 5. **`identity_profiles.hubspot_user_id`**: no existe directamente. El input `ownerHubspotUserId` es opcional; si no se provee, el Cloud Run usa el default del pipeline.
@@ -113,7 +113,7 @@ Inline deal creation desde el Quote Builder aterriza — se elimina el context-s
 ### Gaps reconocidos para follow-ups
 
 1. Deploy de `POST /deals` en el Cloud Run `hubspot-greenhouse-integration`.
-2. Crear custom property `gh_deal_origin` en el HubSpot portal.
+2. Aplicar custom property `gh_deal_origin` en el HubSpot portal via el reconcile canónico (`pnpm hubspot:deal-properties`).
 3. Workflow genérico de approval para deals (hoy persiste trace pero sin aprobador).
 4. Resolver `ownerHubspotUserId` automáticamente desde `identity_profile_source_links`.
 5. Edición inline de deal post-create (diferida a TASK-540+).
@@ -798,6 +798,7 @@ Orden recomendado para minimizar blast radius:
   - helpers compartidos `src/lib/sync/field-authority.ts` y `src/lib/sync/anti-ping-pong.ts`
   - eventos `commercial.party.hubspot_synced_out` y `commercial.party.sync_conflict`
   - script operativo `scripts/create-hubspot-company-custom-properties.ts`
+  - reconcile genérico `scripts/ensure-hubspot-custom-properties.ts`
 - Contrato operativo:
   - el write HTTP real sigue delegándose al servicio hermano `hubspot-greenhouse-integration` vía `PATCH /companies/:id/lifecycle`
   - en Greenhouse EO el cliente canónico es `updateHubSpotGreenhouseCompanyLifecycle()`

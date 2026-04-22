@@ -75,7 +75,8 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/operations/hubspot-custom-properties-products.md` — runbook operativo paso a paso (ya shipped en TASK-547)
+- `docs/operations/hubspot-custom-properties.md` — operating model canónico multi-objeto
+- `docs/operations/hubspot-custom-properties-products.md` — runbook operativo específico de products
 - `docs/tasks/complete/TASK-547-product-catalog-hubspot-outbound.md` — contrato shipped que este task destraba
 - `docs/tasks/complete/TASK-546-product-catalog-source-handlers-events.md` — materialización que emite los events
 - `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md` — aguas arriba del refactor anti-ping-pong
@@ -117,7 +118,7 @@ Reglas obligatorias:
 - Push helper con anti-ping-pong inline 60s (TASK-547)
 - Projection `productHubSpotOutbound` registrada (TASK-547)
 - 30 unit tests passing contra mocks (TASK-547)
-- Runbook de custom properties documentado (TASK-547)
+- Runbook de custom properties documentado (TASK-547) y reconciler canónico multi-objeto en `scripts/ensure-hubspot-custom-properties.ts`
 - Repo externo real localizado via GitHub CLI: `cesargrowth11/hubspot-bigquery/services/hubspot_greenhouse_integration/`
 - El service externo YA expone `POST /products` y `PATCH /products/:id`
 - Infra staging/E2E reutilizable ya existe en este repo (`staging-request`, Playwright auth, APIs admin para roles)

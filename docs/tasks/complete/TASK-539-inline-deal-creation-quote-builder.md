@@ -108,7 +108,7 @@ Reglas obligatorias:
 - Cloud Run no tiene `POST /deals`.
 - Drawer UI no existe.
 - Tabla de idempotencia `deal_create_attempts` no existe.
-- Custom property HubSpot `gh_deal_origin` puede no estar creada — validar con `hubspot-ops` skill.
+- Custom property HubSpot `gh_deal_origin` queda gobernada por el manifest canónico `src/lib/hubspot/custom-properties.ts` y el reconcile `scripts/ensure-hubspot-custom-properties.ts`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -156,7 +156,7 @@ Reglas obligatorias:
 
 ### Slice 6 — Custom properties HubSpot + docs
 
-- Validar/crear `gh_deal_origin` custom property en HubSpot (usar skill `hubspot-ops`).
+- Validar/aplicar `gh_deal_origin` via `pnpm hubspot:deal-properties` o `pnpm hubspot:properties -- --object deals`.
 - Documentar en `docs/documentation/finance/crear-deal-desde-quote-builder.md` el flujo funcional.
 
 ## Out of Scope

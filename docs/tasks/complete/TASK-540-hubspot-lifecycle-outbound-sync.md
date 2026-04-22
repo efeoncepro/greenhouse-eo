@@ -88,7 +88,8 @@ Reglas obligatorias:
 - `src/lib/integrations/hubspot-greenhouse-service.ts` (extensión cliente para endpoint externo)
 - `services/hubspot-greenhouse-integration/routes/companies.ts` (**repo externo**, nuevo endpoint PATCH)
 - `migrations/YYYYMMDDHHMMSS_task-540-sync-conflicts-table.sql`
-- `scripts/create-hubspot-custom-properties.ts`
+- `scripts/create-hubspot-company-custom-properties.ts`
+- `scripts/ensure-hubspot-custom-properties.ts`
 
 ## Current Repo State
 
@@ -124,7 +125,7 @@ Reglas obligatorias:
 
 ### Slice 1 — Custom properties HubSpot
 
-- Script `create-hubspot-custom-properties.ts` idempotente (skip si existen).
+- Script `create-hubspot-company-custom-properties.ts` compat + reconcile canónico `ensure-hubspot-custom-properties.ts` idempotente (skip si existen).
 - Usar skill `hubspot-ops` para validar cuotas y formatting.
 - Documentar en `docs/operations/hubspot-custom-properties.md`.
 

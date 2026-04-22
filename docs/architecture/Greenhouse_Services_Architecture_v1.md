@@ -145,6 +145,12 @@ Greenhouse: resolución de capabilities + módulos + métricas
 | Space ID | `ef_space_id` | STRING | — | ID del Space de Greenhouse una vez sincronizado. Permite el bridge Space→Organization |
 | Organization ID | `ef_organization_id` | STRING | — | ID de Organization en Greenhouse (query rápido, evita JOIN con spaces) |
 
+Provisioning operativo actual:
+
+- manifest canónico: `src/lib/hubspot/custom-properties.ts`
+- wrapper por objeto: `scripts/create-hubspot-service-custom-properties.ts`
+- reconcile genérico: `scripts/ensure-hubspot-custom-properties.ts`
+
 ### 3.4 Catálogo de servicios específicos
 
 Estos son los 14 servicios que Efeonce ofrece, mapeados desde el catálogo de Products de HubSpot:
