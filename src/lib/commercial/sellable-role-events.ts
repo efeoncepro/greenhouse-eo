@@ -24,6 +24,28 @@ export const publishSellableRoleCreated = async (
     client
   )
 
+export const publishSellableRoleUpdated = async (
+  params: {
+    roleId: string
+    roleSku: string
+    roleCode: string
+    roleLabelEs: string
+    category: string
+    tier: string
+    active: boolean
+  },
+  client?: PublishClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.sellableRole,
+      aggregateId: params.roleId,
+      eventType: EVENT_TYPES.sellableRoleUpdated,
+      payload: params
+    },
+    client
+  )
+
 export const publishSellableRoleCostUpdated = async (
   params: {
     roleId: string

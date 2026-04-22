@@ -2,6 +2,8 @@ import 'server-only'
 
 import type { PoolClient } from 'pg'
 
+import { publishSellableRoleProjectionEvent } from './sellable-role-sync-events'
+
 export type PricingCatalogExcelApprovalEntityType = 'sellable_role' | 'tool_catalog' | 'overhead_addon'
 export type PricingCatalogExcelApprovalAction = 'create' | 'delete'
 
@@ -213,12 +215,21 @@ const applyCreateRole = async (
 
   const roleSku = pickString(values.role_sku)
 
-  const inserted = await client.query<{ role_id: string; role_sku: string | null }>(
+  const inserted = await client.query<{
+    role_id: string
+    role_sku: string
+    role_code: string
+    role_label_es: string
+    category: string
+    tier: string
+    active: boolean
+    updated_at: string | Date
+  }>(
     `INSERT INTO greenhouse_commercial.sellable_roles (
        role_id, role_sku, role_code, role_label_es, role_label_en, category, tier, tier_label,
        can_sell_as_staff, can_sell_as_service_component, active, notes, updated_at
      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP)
-     RETURNING role_id, role_sku`,
+     RETURNING role_id, role_sku, role_code, role_label_es, category, tier, active, updated_at`,
     [
       entityId,
       roleSku,
@@ -235,10 +246,12 @@ const applyCreateRole = async (
     ]
   )
 
+  const insertedRole = inserted.rows[0]
+
   const auditId = await insertAuditRow(client, {
     entityType: 'sellable_role',
-    entityId: inserted.rows[0]?.role_id ?? entityId,
-    entitySku: inserted.rows[0]?.role_sku ?? roleSku,
+    entityId: insertedRole?.role_id ?? entityId,
+    entitySku: insertedRole?.role_sku ?? roleSku,
     action: 'created',
     reviewerUserId,
     reviewerName,
@@ -248,8 +261,12 @@ const applyCreateRole = async (
     fieldsChanged: Object.keys(values)
   })
 
+  if (insertedRole) {
+    await publishSellableRoleProjectionEvent('created', insertedRole, client)
+  }
+
   return {
-    entityId: inserted.rows[0]?.role_id ?? entityId,
+    entityId: insertedRole?.role_id ?? entityId,
     appliedFields: Object.keys(values),
     auditId
   }
@@ -399,13 +416,22 @@ const applySoftDelete = async (
   }
 
   if (diff.entityType === 'sellable_role') {
-    const res = await client.query<{ role_id: string }>(
+    const res = await client.query<{
+      role_id: string
+      role_sku: string
+      role_code: string
+      role_label_es: string
+      category: string
+      tier: string
+      active: boolean
+      updated_at: string | Date
+    }>(
       `UPDATE greenhouse_commercial.sellable_roles
           SET active = FALSE,
               updated_at = CURRENT_TIMESTAMP
         WHERE role_id = $1
           AND active = TRUE
-      RETURNING role_id`,
+      RETURNING role_id, role_sku, role_code, role_label_es, category, tier, active, updated_at`,
       [entityId]
     )
 
@@ -429,6 +455,10 @@ const applySoftDelete = async (
       newValues: { active: false },
       fieldsChanged: ['active']
     })
+
+    if (res.rows[0]) {
+      await publishSellableRoleProjectionEvent('deactivated', res.rows[0], client)
+    }
 
     return { entityId, appliedFields: ['active'], auditId }
   }

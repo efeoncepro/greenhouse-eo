@@ -45,9 +45,10 @@ describe('sourceToProductCatalogProjection registration', () => {
     expect(sourceToProductCatalogProjection.domain).toBe('cost_intelligence')
   })
 
-  it('lists the full Fase B trigger set (5 sellable_role + 4 ai_tool + 4 overhead_addon + 3 service)', () => {
+  it('lists the full Fase B trigger set (6 sellable_role + 4 ai_tool + 4 overhead_addon + 3 service)', () => {
     expect(SOURCE_TO_PRODUCT_CATALOG_TRIGGER_EVENTS).toEqual([
       'commercial.sellable_role.created',
+      'commercial.sellable_role.updated',
       'commercial.sellable_role.cost_updated',
       'commercial.sellable_role.pricing_updated',
       'commercial.sellable_role.deactivated',

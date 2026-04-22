@@ -6,6 +6,11 @@ import {
   validateSellableRole
 } from '@/lib/commercial/pricing-catalog-constraints'
 import { recordPricingCatalogAudit, type PricingCatalogAction } from '@/lib/commercial/pricing-catalog-audit-store'
+import {
+  publishSellableRoleDeactivated,
+  publishSellableRoleReactivated,
+  publishSellableRoleUpdated
+} from '@/lib/commercial/sellable-role-events'
 import { query } from '@/lib/db'
 import { getServerAuthSession } from '@/lib/auth'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
@@ -72,6 +77,44 @@ interface PatchRoleBody {
   tier?: unknown
   tierLabel?: unknown
   notes?: unknown
+}
+
+const publishRoleChangeEvent = async (
+  previous: SellableRoleRow,
+  updated: SellableRoleRow,
+  fieldsChanged: string[]
+) => {
+  if (previous.active !== updated.active) {
+    if (updated.active) {
+      await publishSellableRoleReactivated({
+        roleId: updated.role_id,
+        roleSku: updated.role_sku,
+        reactivatedAt: toTimestamp(updated.updated_at)
+      })
+    } else {
+      await publishSellableRoleDeactivated({
+        roleId: updated.role_id,
+        roleSku: updated.role_sku,
+        deactivatedAt: toTimestamp(updated.updated_at)
+      })
+    }
+
+    return
+  }
+
+  if (fieldsChanged.length === 0) {
+    return
+  }
+
+  await publishSellableRoleUpdated({
+    roleId: updated.role_id,
+    roleSku: updated.role_sku,
+    roleCode: updated.role_code,
+    roleLabelEs: updated.role_label_es,
+    category: updated.category,
+    tier: updated.tier,
+    active: updated.active
+  })
 }
 
 const getRoleById = async (roleId: string): Promise<SellableRoleRow | null> => {
@@ -346,6 +389,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
   })
 
+  await publishRoleChangeEvent(previous, updated, fieldsChanged)
+
   return withOptimisticLockHeaders(
     NextResponse.json(mapRow(updated)),
     updated.updated_at,
@@ -408,6 +453,12 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       new_values: { active: false },
       fields_changed: ['active']
     }
+  })
+
+  await publishSellableRoleDeactivated({
+    roleId: updated.role_id,
+    roleSku: updated.role_sku,
+    deactivatedAt: toTimestamp(updated.updated_at)
   })
 
   return withOptimisticLockHeaders(new NextResponse(null, { status: 204 }), updated.updated_at, {

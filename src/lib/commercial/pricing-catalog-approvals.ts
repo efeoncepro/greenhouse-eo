@@ -12,6 +12,10 @@ import {
   isPricingCatalogExcelApprovalPayload,
   PricingCatalogExcelApprovalError
 } from './pricing-catalog-excel-approval'
+import {
+  getSellableRoleProjectionEventRow,
+  publishSellableRoleProjectionEvent
+} from './sellable-role-sync-events'
 
 export type ApprovalCriticality = 'low' | 'medium' | 'high' | 'critical'
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
@@ -487,6 +491,27 @@ export const decideApproval = async (
             ]
           )
         ).rows[0]?.audit_id ?? null
+
+        if (approval.entityType === 'sellable_role' && applyResult.updatedFields.length > 0) {
+          const role = await getSellableRoleProjectionEventRow(client, approval.entityId)
+
+          if (role) {
+            const activeValue = proposedChanges.active
+
+            const activeChanged =
+              applyResult.updatedFields.includes('active') && typeof activeValue === 'boolean'
+
+            if (activeChanged) {
+              await publishSellableRoleProjectionEvent(
+                activeValue ? 'reactivated' : 'deactivated',
+                role,
+                client
+              )
+            } else {
+              await publishSellableRoleProjectionEvent('updated', role, client)
+            }
+          }
+        }
       }
 
       const result: DecideApprovalResult = {

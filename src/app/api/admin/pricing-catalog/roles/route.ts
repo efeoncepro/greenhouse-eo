@@ -6,6 +6,7 @@ import {
   validateSellableRole
 } from '@/lib/commercial/pricing-catalog-constraints'
 import { recordPricingCatalogAudit } from '@/lib/commercial/pricing-catalog-audit-store'
+import { publishSellableRoleCreated } from '@/lib/commercial/sellable-role-events'
 import { query } from '@/lib/db'
 import { getServerAuthSession } from '@/lib/auth'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
@@ -229,6 +230,15 @@ export async function POST(request: Request) {
         notes
       }
     }
+  })
+
+  await publishSellableRoleCreated({
+    roleId: inserted.role_id,
+    roleSku: inserted.role_sku,
+    roleCode: inserted.role_code,
+    roleLabelEs: inserted.role_label_es,
+    category: inserted.category,
+    tier: inserted.tier
   })
 
   return withOptimisticLockHeaders(NextResponse.json(mapRow(inserted), { status: 201 }), inserted.updated_at)

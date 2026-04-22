@@ -10,6 +10,10 @@ import {
   PRICING_CATALOG_ENTITY_WHITELIST
 } from '@/lib/commercial/pricing-catalog-entity-writer'
 import {
+  getSellableRoleProjectionEventRow,
+  publishSellableRoleProjectionEvent
+} from '@/lib/commercial/sellable-role-sync-events'
+import {
   canAdministerPricingCatalog,
   requireAdminTenantContext
 } from '@/lib/tenant/authorization'
@@ -156,6 +160,24 @@ export async function POST(request: Request) {
               })
             ]
           )
+
+          if (entityType === 'sellable_role' && result.updatedFields.length > 0) {
+            const role = await getSellableRoleProjectionEventRow(client, entityId)
+
+            if (role) {
+              const activeChanged = result.updatedFields.includes('active') && typeof changeset.active === 'boolean'
+
+              if (activeChanged) {
+                await publishSellableRoleProjectionEvent(
+                  changeset.active ? 'reactivated' : 'deactivated',
+                  role,
+                  client
+                )
+              } else {
+                await publishSellableRoleProjectionEvent('updated', role, client)
+              }
+            }
+          }
 
           applied.push(entityId)
         } catch (err) {

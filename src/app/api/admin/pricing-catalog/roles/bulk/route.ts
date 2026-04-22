@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import type { PoolClient } from 'pg'
 
 import { getServerAuthSession } from '@/lib/auth'
+import { publishSellableRoleProjectionEvent } from '@/lib/commercial/sellable-role-sync-events'
 import { withTransaction } from '@/lib/db'
 import {
   canAdministerPricingCatalog,
@@ -96,6 +97,31 @@ export async function POST(request: Request) {
     await withTransaction(async (client: PoolClient) => {
       for (const roleId of roleIds) {
         try {
+          const previousResult = await client.query<{
+            role_id: string
+            role_sku: string
+            role_code: string
+            role_label_es: string
+            category: string
+            tier: string
+            active: boolean
+            updated_at: string | Date
+          }>(
+            `SELECT role_id, role_sku, role_code, role_label_es, category, tier, active, updated_at
+               FROM greenhouse_commercial.sellable_roles
+              WHERE role_id = $1
+              LIMIT 1`,
+            [roleId]
+          )
+
+          if (previousResult.rowCount === 0) {
+            failed.push({ roleId, message: 'Role not found.' })
+
+            continue
+          }
+
+          const previous = previousResult.rows[0]
+
           // Build UPDATE statement.
           const setClauses: string[] = []
           const values: unknown[] = []
@@ -114,12 +140,21 @@ export async function POST(request: Request) {
 
           values.push(roleId)
 
-          const res = await client.query<{ role_id: string; role_sku: string }>(
+          const res = await client.query<{
+            role_id: string
+            role_sku: string
+            role_code: string
+            role_label_es: string
+            category: string
+            tier: string
+            active: boolean
+            updated_at: string | Date
+          }>(
             `UPDATE greenhouse_commercial.sellable_roles
                 SET ${setClauses.join(', ')},
                     updated_at = NOW()
               WHERE role_id = $${values.length}
-              RETURNING role_id, role_sku`,
+              RETURNING role_id, role_sku, role_code, role_label_es, category, tier, active, updated_at`,
             values
           )
 
@@ -129,7 +164,8 @@ export async function POST(request: Request) {
             continue
           }
 
-          const { role_sku: roleSku } = res.rows[0]
+          const updated = res.rows[0]
+          const { role_sku: roleSku } = updated
 
           await client.query(
             `INSERT INTO greenhouse_commercial.pricing_catalog_audit_log (
@@ -152,6 +188,21 @@ export async function POST(request: Request) {
               })
             ]
           )
+
+          if (previous.active !== updated.active) {
+            await publishSellableRoleProjectionEvent(
+              updated.active ? 'reactivated' : 'deactivated',
+              updated,
+              client
+            )
+          } else if (
+            notesAppend ||
+            previous.category !== updated.category ||
+            previous.tier !== updated.tier ||
+            previous.role_label_es !== updated.role_label_es
+          ) {
+            await publishSellableRoleProjectionEvent('updated', updated, client)
+          }
 
           applied.push(roleId)
         } catch (err) {

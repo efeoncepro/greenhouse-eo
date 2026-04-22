@@ -457,6 +457,7 @@ export const EVENT_TYPES = {
   productSyncConflictDetected: 'commercial.product_sync_conflict.detected',
   productSyncConflictResolved: 'commercial.product_sync_conflict.resolved',
   sellableRoleCreated: 'commercial.sellable_role.created',
+  sellableRoleUpdated: 'commercial.sellable_role.updated',
   sellableRoleCostUpdated: 'commercial.sellable_role.cost_updated',
   sellableRolePricingUpdated: 'commercial.sellable_role.pricing_updated',
   sellableRoleDeactivated: 'commercial.sellable_role.deactivated',

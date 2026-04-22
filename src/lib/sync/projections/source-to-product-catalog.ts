@@ -43,6 +43,7 @@ import type { ProjectionDefinition } from '../projection-registry'
 const SOURCE_TRIGGER_EVENTS: readonly string[] = [
   // Sellable roles
   'commercial.sellable_role.created',
+  'commercial.sellable_role.updated',
   'commercial.sellable_role.cost_updated',
   'commercial.sellable_role.pricing_updated',
   'commercial.sellable_role.deactivated',

@@ -68,6 +68,11 @@ const PRODUCT_SOURCE_KIND_OPTIONS: HubSpotPropertyOption[] = [
   { label: 'Importado desde HubSpot', value: 'hubspot_imported', displayOrder: 5 }
 ]
 
+const BOOLEAN_OPTIONS: HubSpotPropertyOption[] = [
+  { label: 'Si', value: 'true', displayOrder: 0 },
+  { label: 'No', value: 'false', displayOrder: 1 }
+]
+
 export const PRODUCT_HUBSPOT_CUSTOM_PROPERTIES: HubSpotCustomPropertyDefinition[] = [
   {
     objectType: 'product',
@@ -118,6 +123,7 @@ export const PRODUCT_HUBSPOT_CUSTOM_PROPERTIES: HubSpotCustomPropertyDefinition[
     groupName: HUBSPOT_GROUP_NAME,
     type: 'bool',
     fieldType: 'booleancheckbox',
+    options: BOOLEAN_OPTIONS,
     formField: false,
     displayOrder: 4,
     readOnlyValue: true
