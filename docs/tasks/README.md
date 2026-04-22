@@ -22,7 +22,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-565`
+- siguiente ID disponible: `TASK-566`
 - `TASK-528` — Chile Tax / IVA Program. Programa paraguas para formalizar la capa tributaria Chile-first del portal y ordenar foundation, quotes, income, compras y ledger mensual. Spec: `to-do/TASK-528-chile-tax-iva-program.md`.
 - `TASK-529` — Chile Tax Code Foundation. Crea catalogo canonico de tax codes/snapshots para IVA Chile y deja lista la semantica de recuperabilidad para el resto de Finance. Spec: `to-do/TASK-529-chile-tax-code-foundation.md`.
 - `TASK-530` ✅ — Quote Tax Explicitness (Chile IVA). Completado 2026-04-21. Snapshots tributarios inmutables en `quotations` + `line_items`, orchestrator congela IVA per versión, dock + PDF muestran `Neto / IVA / Total`. Pricing engine sigue neto. 22 tests. Spec: `complete/TASK-530-quote-tax-explicitness-chile-iva.md`.
