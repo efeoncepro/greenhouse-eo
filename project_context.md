@@ -1,3 +1,9 @@
+## Delta 2026-04-22 Quote Builder contact hydration converge via canonical read-through
+
+- `GET /api/commercial/organizations/[id]/contacts` sigue siendo el contrato canónico downstream del `organizationId`, pero ya no asume que el mirror local de contactos está precargado.
+- Si la organization tiene `hubspot_company_id` y todavía no existen `person_memberships` comerciales locales, el endpoint ejecuta una primera hidratación canónica desde HubSpot y luego responde desde Greenhouse.
+- La lane admin `POST /api/organizations/[id]/hubspot-sync` quedó convergida sobre el mismo helper `src/lib/account-360/sync-organization-hubspot-contacts.ts`.
+
 ## Delta 2026-04-22 TASK-550 cierra los follow-ups enterprise del pricing catalog
 
 - El Admin Pricing Catalog ya no tiene gaps abiertos respecto del cierre de TASK-471:

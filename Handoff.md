@@ -1,5 +1,37 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — Quote Builder contact hydration for adopted HubSpot organizations (Codex)
+
+- **Scope:** cerrar el gap donde el Quote Builder ya podia adoptar companies HubSpot nuevas, pero el dropdown de `Contacto` quedaba vacío porque `GET /api/commercial/organizations/[id]/contacts` solo leia `person_memberships` locales sin materializar los contactos asociados desde HubSpot.
+- **Implementacion shipped**
+  - `src/lib/account-360/sync-organization-hubspot-contacts.ts`
+    - helper canónico reusable para sync organization + contactos HubSpot
+    - actualiza `organizationName` / `industry` / `country` cuando HubSpot trae valores mas frescos
+    - materializa contactos en `identity_profiles` + `person_memberships(contact)` usando `ensureOrganizationContactMembership`
+    - evita duplicados por email ya materializado en la organization
+  - `src/app/api/commercial/organizations/[id]/contacts/route.ts`
+    - sigue siendo el contrato canónico del Quote Builder
+    - ahora hace read-through hydration: local read → si no hay contactos y existe `hubspot_company_id`, sync canónico → re-read local
+  - `src/app/api/organizations/[id]/hubspot-sync/route.ts`
+    - deja de duplicar lógica manual
+    - reutiliza el mismo helper canónico para el sync admin on-demand
+- **Decision arquitectonica**
+  - el selector de contactos **no** consulta HubSpot live directamente desde la UI
+  - Greenhouse sigue siendo la surface canónica de lectura (`identity_profiles` + `person_memberships`)
+  - HubSpot solo se usa como source puntual de hidratación cuando el mirror local aun no converge
+- **Docs alineadas**
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+  - `docs/documentation/finance/cotizador.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/lib/account-360/sync-organization-hubspot-contacts.test.ts 'src/app/api/commercial/organizations/[id]/contacts/route.test.ts'` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+
 ## Sesion 2026-04-22 — Commercial Party search mirror/live hardening (Codex)
 
 - **Scope:** corregir el gap donde el selector de organización del Quote Builder no encontraba companies HubSpot existentes como prospects (ej. Carozzi) porque `greenhouse_crm.companies` venía incompleto y `/api/commercial/parties/search` dependía ciegamente del mirror.

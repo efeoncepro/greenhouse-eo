@@ -1,11 +1,24 @@
 # Greenhouse EO — Commercial Party Lifecycle Architecture V1
 
-> **Version:** 1.3
+> **Version:** 1.4
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
-> **Ultima actualizacion:** 2026-04-22 por Codex — TASK-543 cleanup de flags post-rollout
+> **Ultima actualizacion:** 2026-04-22 por Codex — read-through contact hydration para Quote Builder; 2026-04-22 por Codex — TASK-543 cleanup de flags post-rollout
 > **Audience:** Backend engineers, product owners, agentes que implementen features de pre-venta, quote builder, HubSpot sync o revenue pipeline
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`, `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## Delta 2026-04-22 — Quote Builder contact hydration via canonical read-through
+
+La adopción de una `hubspot_candidate` ya no deja el selector de contactos vacío mientras el mirror local converge. `GET /api/commercial/organizations/[id]/contacts` sigue siendo el contrato canónico downstream del `organizationId`, pero ahora hace read-through materialization cuando la organization ya tiene `hubspot_company_id` y todavía no existen `person_memberships` comerciales locales.
+
+### Efecto operativo
+
+1. El dropdown de contactos del Quote Builder sigue leyendo Greenhouse local, no payloads live arbitrarios de HubSpot.
+2. Si la org recién adoptada todavía no tiene contactos materializados, el endpoint ejecuta una primera hidratación canónica desde HubSpot y vuelve a leer local antes de responder.
+3. La lane manual/admin `POST /api/organizations/[id]/hubspot-sync` ya no duplica lógica: reutiliza el mismo helper canónico de sync organization + contacts.
+4. Una vez materializados, los contactos quedan reutilizables para futuras cotizaciones y otras surfaces que lean `person_memberships`.
 
 ---
 

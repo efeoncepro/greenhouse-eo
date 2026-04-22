@@ -2,6 +2,12 @@
 
 ## 2026-04-22
 
+### 2026-04-22 — Quote Builder ya hidrata contactos HubSpot al primer uso
+
+- `GET /api/commercial/organizations/[id]/contacts` sigue siendo el contrato canónico del selector de contacto, pero ahora hace read-through materialization cuando la organización ya tiene `hubspot_company_id` y todavía no existen `person_memberships` comerciales locales.
+- La lógica de sync `HubSpot company contacts -> identity_profiles/person_memberships` queda extraída a `src/lib/account-360/sync-organization-hubspot-contacts.ts`.
+- `POST /api/organizations/[id]/hubspot-sync` deja de duplicar lógica y reutiliza el mismo helper canónico del bridge de contactos.
+
 ### 2026-04-22 — Commercial Party search deja de depender ciegamente del mirror local
 
 - `GET /api/commercial/parties/search` y `POST /api/commercial/parties/adopt` ya no quedan bloqueados cuando `greenhouse_crm.companies` viene atrasado respecto de HubSpot.

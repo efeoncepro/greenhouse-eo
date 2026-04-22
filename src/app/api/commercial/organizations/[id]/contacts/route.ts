@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { getOrganizationDetail } from '@/lib/account-360/organization-store'
+import { syncOrganizationHubSpotContacts } from '@/lib/account-360/sync-organization-hubspot-contacts'
 import { query } from '@/lib/db'
 import { resolveFinanceQuoteTenantOrganizationIds } from '@/lib/finance/quotation-canonical-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
@@ -33,6 +35,28 @@ interface ContactRow extends Record<string, unknown> {
   is_primary: boolean
 }
 
+const listQuoteOrganizationContacts = async (organizationId: string) =>
+  query<ContactRow>(
+    `SELECT
+       ip.profile_id AS identity_profile_id,
+       ip.full_name,
+       ip.canonical_email,
+       ip.job_title,
+       pm.role_label,
+       pm.department,
+       pm.membership_type,
+       pm.is_primary
+     FROM greenhouse_core.person_memberships pm
+     JOIN greenhouse_core.identity_profiles ip
+       ON ip.profile_id = pm.profile_id
+      AND ip.active = TRUE
+     WHERE pm.organization_id = $1
+       AND pm.active = TRUE
+       AND pm.membership_type = ANY($2::text[])
+     ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST`,
+    [organizationId, QUOTE_CONTACT_MEMBERSHIP_TYPES]
+  )
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -57,26 +81,24 @@ export async function GET(
     return NextResponse.json({ error: 'Organization not visible to this tenant.' }, { status: 403 })
   }
 
-  const rows = await query<ContactRow>(
-    `SELECT
-       ip.profile_id AS identity_profile_id,
-       ip.full_name,
-       ip.canonical_email,
-       ip.job_title,
-       pm.role_label,
-       pm.department,
-       pm.membership_type,
-       pm.is_primary
-     FROM greenhouse_core.person_memberships pm
-     JOIN greenhouse_core.identity_profiles ip
-       ON ip.profile_id = pm.profile_id
-      AND ip.active = TRUE
-     WHERE pm.organization_id = $1
-       AND pm.active = TRUE
-       AND pm.membership_type = ANY($2::text[])
-     ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST`,
-    [organizationId.trim(), QUOTE_CONTACT_MEMBERSHIP_TYPES]
-  )
+  const normalizedOrganizationId = organizationId.trim()
+  let rows = await listQuoteOrganizationContacts(normalizedOrganizationId)
+
+  if (rows.length === 0) {
+    const organization = await getOrganizationDetail(normalizedOrganizationId)
+
+    if (organization?.hubspotCompanyId) {
+      try {
+        await syncOrganizationHubSpotContacts({ organizationId: normalizedOrganizationId })
+        rows = await listQuoteOrganizationContacts(normalizedOrganizationId)
+      } catch (error) {
+        console.warn('[commercial organization contacts] hubspot read-through sync failed', {
+          organizationId: normalizedOrganizationId,
+          error: error instanceof Error ? error.message : String(error)
+        })
+      }
+    }
+  }
 
   const items = rows.map(row => ({
     identityProfileId: String(row.identity_profile_id),

@@ -1,9 +1,9 @@
 # Ciclo de Vida de Parties Comerciales — Del Prospecto al Cliente Activo
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-21 por Claude (Opus 4.7) — TASK-535
-> **Ultima actualizacion:** 2026-04-21 por Claude
+> **Ultima actualizacion:** 2026-04-22 por Codex — hidratacion de contactos HubSpot en el Quote Builder; 2026-04-21 por Claude
 > **Documentacion tecnica:**
 > - Spec: [GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1](../../architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md)
 > - Task: [TASK-535](../../tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md)
@@ -157,6 +157,10 @@ Todos los eventos incluyen `commercial_party_id` — un identificador **estable 
 | G | TASK-541 | Shipped. Quote-to-cash atomico: firmar contrato + promover a cliente + crear income, todo en una transaccion |
 | H | TASK-542 | Shipped. Admin Center: dashboards de funnel, conflictos de sync, detalle por party, transiciones manuales y sweep de inactivos |
 | I | TASK-543 | Cleanup post-rollout: remover flags y branches legacy del selector/sync inbound |
+
+### Nota operativa nueva
+
+Cuando el Quote Builder adopta una company HubSpot que todavía no trae contactos locales, el dropdown "Contacto" ya no queda vacío por depender de un mirror precargado. `GET /api/commercial/organizations/[id]/contacts` hace una primera hidratación canónica desde HubSpot hacia `identity_profiles` + `person_memberships` y luego vuelve a leer desde Greenhouse. La surface admin `POST /api/organizations/[id]/hubspot-sync` reutiliza el mismo helper para no duplicar lógica.
 
 ## Ejemplos practicos
 
