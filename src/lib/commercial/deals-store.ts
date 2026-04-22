@@ -639,6 +639,329 @@ export const resolveDealForQuote = async (
   return rows[0] ? mapDeal(rows[0]) : null
 }
 
+export type DealPipelineDefaultScope = 'global' | 'tenant' | 'business_line'
+
+export interface DealCreationContextStage {
+  stageId: string
+  label: string
+  displayOrder: number | null
+  isClosed: boolean
+  isWon: boolean
+  isSelectableForCreate: boolean
+  isDefault: boolean
+}
+
+export interface DealCreationContextPipeline {
+  pipelineId: string
+  label: string
+  displayOrder: number | null
+  active: boolean
+  isDefault: boolean
+  stages: DealCreationContextStage[]
+}
+
+export interface DealCreationContextDefaultsSource {
+  pipeline: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'single_option' | 'first_active' | 'none'
+  stage: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'pipeline_default' | 'first_open_stage' | 'single_option' | 'none'
+  owner: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'none'
+}
+
+export interface DealCreationContext {
+  defaultPipelineId: string | null
+  defaultStageId: string | null
+  defaultOwnerHubspotUserId: string | null
+  defaultsSource: DealCreationContextDefaultsSource
+  pipelines: DealCreationContextPipeline[]
+}
+
+interface PipelineStageRow extends Record<string, unknown> {
+  pipeline_id: string
+  pipeline_label: string | null
+  pipeline_display_order: number | null
+  pipeline_active: boolean
+  stage_id: string
+  stage_label: string
+  stage_display_order: number | null
+  is_open_selectable: boolean
+  is_closed: boolean
+  is_won: boolean
+  is_default_for_create: boolean
+}
+
+interface PipelineDefaultRow extends Record<string, unknown> {
+  scope: DealPipelineDefaultScope
+  scope_key: string
+  pipeline_id: string
+  stage_id: string | null
+  owner_hubspot_user_id: string | null
+}
+
+const GLOBAL_DEFAULT_SCOPE_KEY = '__global__'
+
+export interface GetDealCreationContextParams {
+  tenantScope?: string | null
+  businessLineCode?: string | null
+}
+
+/**
+ * Reads the HubSpot deal pipeline registry and resolves which pipeline / stage
+ * / owner should be used when creating a new deal. Tenant overrides win over
+ * business-line, which win over global; within a pipeline the default stage is
+ * the one flagged `is_default_for_create`, falling back to the first open
+ * selectable stage by display order.
+ */
+export const getDealCreationContext = async (
+  params: GetDealCreationContextParams = {}
+): Promise<DealCreationContext> => {
+  const tenantScope = params.tenantScope?.trim() || null
+  const businessLineCode = params.businessLineCode?.trim() || null
+
+  const structureRows = await query<PipelineStageRow>(
+    `SELECT pipeline_id,
+            pipeline_label,
+            pipeline_display_order,
+            pipeline_active,
+            stage_id,
+            stage_label,
+            stage_display_order,
+            is_open_selectable,
+            is_closed,
+            is_won,
+            is_default_for_create
+       FROM greenhouse_commercial.hubspot_deal_pipeline_config
+      ORDER BY
+        COALESCE(pipeline_display_order, 999999),
+        pipeline_id,
+        COALESCE(stage_display_order, 999999),
+        stage_id`
+  )
+
+  const defaultRows = await query<PipelineDefaultRow>(
+    `SELECT scope, scope_key, pipeline_id, stage_id, owner_hubspot_user_id
+       FROM greenhouse_commercial.hubspot_deal_pipeline_defaults
+      WHERE (scope = 'global' AND scope_key = $1)
+         OR (scope = 'tenant' AND scope_key = COALESCE($2, ''))
+         OR (scope = 'business_line' AND scope_key = COALESCE($3, ''))`,
+    [GLOBAL_DEFAULT_SCOPE_KEY, tenantScope ?? '', businessLineCode ?? '']
+  )
+
+  const pipelineMap = new Map<string, DealCreationContextPipeline>()
+
+  for (const row of structureRows) {
+    let pipeline = pipelineMap.get(row.pipeline_id)
+
+    if (!pipeline) {
+      pipeline = {
+        pipelineId: row.pipeline_id,
+        label: row.pipeline_label && row.pipeline_label.trim().length > 0
+          ? row.pipeline_label
+          : row.pipeline_id,
+        displayOrder: row.pipeline_display_order,
+        active: Boolean(row.pipeline_active),
+        isDefault: false,
+        stages: []
+      }
+      pipelineMap.set(row.pipeline_id, pipeline)
+    }
+
+    pipeline.stages.push({
+      stageId: row.stage_id,
+      label: row.stage_label,
+      displayOrder: row.stage_display_order,
+      isClosed: Boolean(row.is_closed),
+      isWon: Boolean(row.is_won),
+      isSelectableForCreate: Boolean(row.is_open_selectable) && !row.is_closed,
+      isDefault: Boolean(row.is_default_for_create)
+    })
+  }
+
+  const pipelines = Array.from(pipelineMap.values())
+  const activePipelines = pipelines.filter(p => p.active)
+
+  const policyByScope: Record<DealPipelineDefaultScope, PipelineDefaultRow | null> = {
+    tenant: null,
+    business_line: null,
+    global: null
+  }
+
+  for (const row of defaultRows) {
+    if (row.scope === 'tenant' && row.scope_key === tenantScope) policyByScope.tenant = row
+    else if (row.scope === 'business_line' && row.scope_key === businessLineCode) policyByScope.business_line = row
+    else if (row.scope === 'global' && row.scope_key === GLOBAL_DEFAULT_SCOPE_KEY) policyByScope.global = row
+  }
+
+  let defaultPipelineId: string | null = null
+  let defaultsSourcePipeline: DealCreationContextDefaultsSource['pipeline'] = 'none'
+  let defaultsSourceOwner: DealCreationContextDefaultsSource['owner'] = 'none'
+  let defaultOwnerHubspotUserId: string | null = null
+
+  const resolvePipelineFromPolicy = (
+    row: PipelineDefaultRow | null,
+    source: Exclude<DealCreationContextDefaultsSource['pipeline'], 'single_option' | 'first_active' | 'none'>
+  ) => {
+    if (!row) return false
+    const match = activePipelines.find(p => p.pipelineId === row.pipeline_id)
+
+    if (!match) return false
+    defaultPipelineId = match.pipelineId
+    defaultsSourcePipeline = source
+
+    if (row.owner_hubspot_user_id) {
+      defaultOwnerHubspotUserId = row.owner_hubspot_user_id
+      defaultsSourceOwner = source === 'tenant_policy'
+        ? 'tenant_policy'
+        : source === 'business_line_policy'
+          ? 'business_line_policy'
+          : 'global_policy'
+    }
+
+    return true
+  }
+
+  if (!resolvePipelineFromPolicy(policyByScope.tenant, 'tenant_policy')) {
+    if (!resolvePipelineFromPolicy(policyByScope.business_line, 'business_line_policy')) {
+      if (!resolvePipelineFromPolicy(policyByScope.global, 'global_policy')) {
+        if (activePipelines.length === 1) {
+          defaultPipelineId = activePipelines[0].pipelineId
+          defaultsSourcePipeline = 'single_option'
+        } else if (activePipelines.length > 1) {
+          defaultPipelineId = activePipelines[0].pipelineId
+          defaultsSourcePipeline = 'first_active'
+        }
+      }
+    }
+  }
+
+  let defaultStageId: string | null = null
+  let defaultsSourceStage: DealCreationContextDefaultsSource['stage'] = 'none'
+
+  if (defaultPipelineId) {
+    const chosenPipeline = pipelineMap.get(defaultPipelineId)!
+
+    chosenPipeline.isDefault = true
+
+    const selectableStages = chosenPipeline.stages.filter(s => s.isSelectableForCreate)
+
+    const policyStageId =
+      policyByScope.tenant?.pipeline_id === defaultPipelineId ? policyByScope.tenant?.stage_id
+      : policyByScope.business_line?.pipeline_id === defaultPipelineId ? policyByScope.business_line?.stage_id
+      : policyByScope.global?.pipeline_id === defaultPipelineId ? policyByScope.global?.stage_id
+      : null
+
+    const policyStageSource: DealCreationContextDefaultsSource['stage'] =
+      policyByScope.tenant?.pipeline_id === defaultPipelineId && policyByScope.tenant?.stage_id
+        ? 'tenant_policy'
+        : policyByScope.business_line?.pipeline_id === defaultPipelineId && policyByScope.business_line?.stage_id
+          ? 'business_line_policy'
+          : policyByScope.global?.pipeline_id === defaultPipelineId && policyByScope.global?.stage_id
+            ? 'global_policy'
+            : 'none'
+
+    if (policyStageId && selectableStages.some(s => s.stageId === policyStageId)) {
+      defaultStageId = policyStageId
+      defaultsSourceStage = policyStageSource
+    } else {
+      const pipelineDefaultStage = selectableStages.find(s => s.isDefault)
+
+      if (pipelineDefaultStage) {
+        defaultStageId = pipelineDefaultStage.stageId
+        defaultsSourceStage = 'pipeline_default'
+      } else if (selectableStages.length === 1) {
+        defaultStageId = selectableStages[0].stageId
+        defaultsSourceStage = 'single_option'
+      } else if (selectableStages.length > 1) {
+        defaultStageId = selectableStages[0].stageId
+        defaultsSourceStage = 'first_open_stage'
+      }
+    }
+
+    if (defaultStageId) {
+      const resolvedStage = chosenPipeline.stages.find(s => s.stageId === defaultStageId)
+
+      if (resolvedStage) resolvedStage.isDefault = true
+    }
+  }
+
+  return {
+    defaultPipelineId,
+    defaultStageId,
+    defaultOwnerHubspotUserId,
+    defaultsSource: {
+      pipeline: defaultsSourcePipeline,
+      stage: defaultsSourceStage,
+      owner: defaultsSourceOwner
+    },
+    pipelines
+  }
+}
+
+export interface DealSelectionValidationInput {
+  pipelineId: string
+  stageId: string
+  context?: DealCreationContext | null
+}
+
+export interface DealSelectionValidationResult {
+  valid: boolean
+  errorCode?:
+    | 'pipeline_unknown'
+    | 'pipeline_inactive'
+    | 'stage_unknown'
+    | 'stage_not_in_pipeline'
+    | 'stage_closed'
+    | 'stage_not_selectable'
+  pipelineLabel?: string | null
+  stageLabel?: string | null
+}
+
+/**
+ * Validates that a pipeline+stage pair is coherent for creating a new deal.
+ * Uses the context resolver so readers can reuse the same truth.
+ */
+export const validateDealCreationSelection = async (
+  input: DealSelectionValidationInput
+): Promise<DealSelectionValidationResult> => {
+  const context = input.context ?? await getDealCreationContext()
+  const pipeline = context.pipelines.find(p => p.pipelineId === input.pipelineId)
+
+  if (!pipeline) return { valid: false, errorCode: 'pipeline_unknown' }
+  if (!pipeline.active) return { valid: false, errorCode: 'pipeline_inactive', pipelineLabel: pipeline.label }
+
+  const stage = pipeline.stages.find(s => s.stageId === input.stageId)
+
+  if (!stage) {
+    const stillInConfig = context.pipelines
+      .flatMap(p => p.stages.map(s => ({ pipelineId: p.pipelineId, ...s })))
+      .find(s => s.stageId === input.stageId)
+
+    if (stillInConfig && stillInConfig.pipelineId !== pipeline.pipelineId) {
+      return { valid: false, errorCode: 'stage_not_in_pipeline', pipelineLabel: pipeline.label }
+    }
+
+    return { valid: false, errorCode: 'stage_unknown', pipelineLabel: pipeline.label }
+  }
+
+  if (stage.isClosed) {
+    return {
+      valid: false,
+      errorCode: 'stage_closed',
+      pipelineLabel: pipeline.label,
+      stageLabel: stage.label
+    }
+  }
+
+  if (!stage.isSelectableForCreate) {
+    return {
+      valid: false,
+      errorCode: 'stage_not_selectable',
+      pipelineLabel: pipeline.label,
+      stageLabel: stage.label
+    }
+  }
+
+  return { valid: true, pipelineLabel: pipeline.label, stageLabel: stage.label }
+}
+
 export const listQuotesForDeal = async (
   dealIdOrHubSpotDealId: string
 ): Promise<DealQuoteLinkEntry[]> => {

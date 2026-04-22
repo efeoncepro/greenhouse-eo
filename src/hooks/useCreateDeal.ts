@@ -36,6 +36,17 @@ export interface CreateDealResponse {
   requiresApproval: boolean
   approvalId: string | null
   message: string
+
+  /**
+   * Pipeline/stage/owner actually resolved by the backend governance layer.
+   * Populated on completed + pending_approval + endpoint_not_deployed; null
+   * on idempotent / fingerprint hits that skipped the resolver.
+   */
+  pipelineUsed: string | null
+  pipelineLabelUsed: string | null
+  stageUsed: string | null
+  stageLabelUsed: string | null
+  ownerUsed: string | null
 }
 
 export interface CreateDealError {

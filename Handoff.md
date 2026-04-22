@@ -1,5 +1,88 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — Cloud Build upload hygiene hardening para workers Cloud Run (Codex)
+
+- **Scope:** eliminar el lastre estructural del contexto de build compartido por `ops-worker`, `commercial-cost-worker` e `ico-batch-worker`, evitando que `gcloud builds submit .` siga subiendo artefactos locales gigantes del portal.
+- **Root cause real**
+  - el upload inicial a Cloud Build depende de la `.gcloudignore` raíz, no de los `.dockerignore` dentro de `services/*`
+  - la `.gcloudignore` existente no excluía artefactos locales críticos como `.next-local/`, `.next-build-dir`, `.next-build-meta.json`, `.claude/`, `.codex/`, `.auth/` y otras superficies no runtime
+  - además no existía `.dockerignore` en la raíz, por lo que el `docker build ... .` de los workers tampoco tenía un contrato de contexto explícito a nivel repo
+- **Implementacion shipped**
+  - `.gcloudignore`
+    - ahora incluye `#!include:.gitignore` para reducir drift con la higiene local del repo
+    - excluye explícitamente build outputs locales (`.next/`, `.next-local/`, `.next-build-*`, `coverage`, `playwright-report`, `blob-report`)
+    - excluye estado local/operativo (`.auth/`, `.claude/`, `.codex/`, `.vercel/`, `.vscode/`, `.idea/`)
+    - excluye árboles repo-no-runtime para workers actuales (`docs/`, `full-version/`, `public/`, `spec/`, `tests/`, `artifacts/`, `bigquery/`, `data/`, `demo-configs/`)
+  - `.dockerignore` nuevo en raíz
+    - formaliza el contrato del `docker build` root-context usado por los deploy scripts de Cloud Run
+    - se mantiene deliberadamente conservador: excluye generated/local clutter, pero no poda agresivamente subárboles de `src/` para no romper imports transitorios futuros
+- **Verificacion ejecutada**
+  - `gcloud meta list-files-for-upload .` ya no incluye `.next-local/`, `.next/`, `node_modules/`, `docs/`, `public/`, `artifacts/`, `.tmp/`, `.claude/`, `.codex/`, `.auth/` ni `full-version/`
+  - tamaño estimado del upload actual: `20.40 MiB` (`2695` files)
+  - baseline real observado antes del hardening en el deploy de `ops-worker`: `1.5 GiB`
+- **Notas operativas**
+  - el recorte grande vino de sacar build artifacts locales, no de excluir código runtime
+  - no reejecuté otro deploy solo para esta mejora porque el runtime ya estaba sano; el cambio queda aplicado a los próximos deploys de los 3 workers Cloud Run
+
+## Sesion 2026-04-22 — TASK-571 Deal Creation Context Registry + Pipeline/Stage Governance (Claude)
+
+- **Scope:** cerrar el gap estructural del create-deal inline que quedó abierto en TASK-539. Greenhouse ya aceptaba `pipelineId` / `stageId`, pero la UI no los exponía y tanto el comando como el optimistic update del Quote Builder hacían fallback a un `dealstage: 'appointmentscheduled'` hardcodeado. Con múltiples pipelines HubSpot activos, eso volvía frágil el flujo.
+- **Implementación shipped (6 slices)**
+  - Slice 1 — migración `20260422141406517_task-571-deal-creation-context-governance.sql`: extiende `greenhouse_commercial.hubspot_deal_pipeline_config` con `pipeline_label`, `pipeline_display_order`, `pipeline_active`, `stage_display_order`, `is_open_selectable`, `is_default_for_create` + unique index parcial sobre default stage per pipeline. Añade tabla `greenhouse_commercial.hubspot_deal_pipeline_defaults` (scope `global` | `tenant` | `business_line`). El observational bootstrap en `ensureHubSpotDealPipelineConfig` sigue siendo la primera línea de defensa: la gobernanza (labels, orden, selectable, default-for-create, policy overrides) se gestiona vía SQL / admin UI posterior.
+  - Slice 1 — nuevo reader canónico `getDealCreationContext(params)` + validador `validateDealCreationSelection({ pipelineId, stageId, context })` en `src/lib/commercial/deals-store.ts`. La resolución de defaults respeta precedencia `tenant_policy → business_line_policy → global_policy → single_option → first_active`; para stage `tenant/BU/global_policy → pipeline_default → single_option → first_open_stage`.
+  - Slice 2 — nuevo endpoint `GET /api/commercial/organizations/[id]/deal-creation-context` con `requireFinanceTenantContext` + capability `commercial.deal.create` + `resolveFinanceQuoteTenantOrganizationIds`. Lee exclusivamente Greenhouse local (no llama a HubSpot live).
+  - Slice 3 — `createDealFromQuoteContext` endurecido: `resolveSelection` corre antes del pending attempt y rechaza combos inválidos con `DealCreateSelectionInvalidError` (422) o `DealCreateContextEmptyError` (409). El insert del deal persiste `pipeline_name` + `dealstage_label` resueltos. El `CreateDealFromQuoteContextResult` gana los campos `pipelineUsed`, `pipelineLabelUsed`, `stageUsed`, `stageLabelUsed`, `ownerUsed` — expuestos también por `CreateDealResponse` en `useCreateDeal`.
+  - Slice 4 — `CreateDealDrawer` agrega selectores Pipeline + Etapa inicial alimentados por el nuevo hook `useDealCreationContext` (SWR-style con AbortController). Al cambiar pipeline se refiltran las stages y se re-arma la stage default. Si el registry está vacío, el submit queda bloqueado con Alert accionable.
+  - Slice 5 — el optimistic update en `QuoteBuilderShell.onSuccess` dejó de usar `dealstage: 'appointmentscheduled'`. Ahora toma `response.stageUsed`, `response.stageLabelUsed` y `response.pipelineLabelUsed` directos, y el `dealName` placeholder ahora mirrorea el del drawer (`"{Organization} — Nuevo deal"`).
+  - Slice 6 — doc funcional `docs/documentation/finance/crear-deal-desde-quote-builder.md` actualizada a v1.1 con la nueva precedencia de defaults, la ownership split HubSpot ↔ Greenhouse, y los nuevos paths técnicos.
+- **Tests**
+  - Actualicé los 7 tests existentes de `create-deal-from-quote-context.test.ts` para inyectar los 2 queries extra del context resolver en el orden correcto (antes del rate limit).
+  - Nuevo test `TASK-571 validation` que exige que un `stageId` fuera del pipeline produzca `DealCreateSelectionInvalidError`.
+  - Nuevo archivo `src/lib/commercial/__tests__/deal-creation-context.test.ts` con 6 tests cubriendo: single active pipeline + pipeline default → `single_option`/`pipeline_default`; tenant override ganando sobre global; first open stage fallback; `pipeline_unknown`; `stage_closed`; happy path de validación.
+- **Verificación**
+  - `pnpm exec tsc --noEmit` OK
+  - `pnpm lint` OK (autofix aplicado sobre padding-line-between-statements)
+  - `pnpm test` → 1845 tests passed / 2 skipped.
+  - Migración aplicada contra `greenhouse-pg-dev` vía `pnpm pg:connect:migrate`; tipos regenerados en `src/types/db.d.ts`.
+- **Follow-ups abiertos**
+  - Admin UI para gobernar overrides/defaults de pipeline por tenant/BU sin tener que escribir SQL directo — sigue siendo follow-up del backlog (TASK-571 lo deja como follow-up explícito en la spec).
+  - Surface operacional para refresh manual del catálogo HubSpot si se necesita (hoy el bootstrap observacional cubre el caso estable).
+  - Associación automática del contact seleccionado de la quote al deal HubSpot recién creado (follow-up del flow, fuera de scope aquí).
+
+## Sesion 2026-04-22 — Ops Worker deploy hardening por drift detect helper omitido (Codex)
+
+- **Scope:** corregir el pipeline roto de `Ops Worker Deploy` que venía fallando en `develop` desde `TASK-548` y estaba bloqueando los deploys automáticos de Cloud Run.
+- **Root cause real**
+  - `services/ops-worker/server.ts` importa `./product-catalog-drift-detect.ts` desde `TASK-548`.
+  - `services/ops-worker/Dockerfile` seguía copiando solo tres archivos sueltos (`server.ts`, `auth.ts`, `reactive-queue-depth.ts`) al stage builder.
+  - En Cloud Build, `esbuild` corría dentro de una imagen donde `product-catalog-drift-detect.ts` no existía, por eso el bundle caía con `Could not resolve "./product-catalog-drift-detect"`.
+- **Implementacion shipped**
+  - `services/ops-worker/Dockerfile`
+    - deja de depender de un `COPY` file-by-file frágil
+    - ahora copia `services/ops-worker/` completo al builder stage
+    - comentario explícito deja documentado que el objetivo es evitar regressions cuando el servicio agregue helpers locales nuevos
+- **Decision operativa**
+  - el hardening fue intencionalmente local a `ops-worker` para destrabar el deploy roto sin mezclar refactors laterales
+  - el patrón correcto para este servicio pasa a ser “copiar el directorio del worker”, no mantener una whitelist manual de siblings
+- **Verificacion ejecutada**
+  - reproducción fiel del fallo previo en un temp dir con el patrón viejo de `COPY`: `pnpm exec esbuild ...` falla con `Could not resolve "./product-catalog-drift-detect"`
+  - misma reproducción con el directorio completo copiado: `pnpm exec esbuild ...` OK (`dist/server.mjs 1.4mb`)
+  - `docker build` local no pudo correrse porque en esta máquina no había daemon disponible (`/var/run/docker.sock` ausente)
+- **Ejecucion operativa posterior**
+  - redeploy manual ejecutado con `ENV=staging bash services/ops-worker/deploy.sh`
+  - nueva revisión live: `ops-worker-00062-5rc`
+  - health check OK vía `gcloud run services proxy` + `GET /health`
+  - scheduler nuevo confirmado: `ops-product-catalog-drift-detect` (`0 3 * * *`, `America/Santiago`)
+  - catch-up manual ejecutado con `gcloud scheduler jobs run ops-product-catalog-drift-detect`
+  - evidencia:
+    - `greenhouse_sync.source_sync_runs`: corrida `product_catalog_drift_detect` `succeeded`
+    - `greenhouse_commercial.product_catalog`: `77/77` rows con `last_drift_check_at`
+    - `greenhouse_commercial.product_sync_conflicts`: `1` conflicto `pending`
+- **Follow-up abierto**
+  - drift detect encontró `1` conflicto real `field_drift` para `product_code=ECG-037` / `hubspot_product_id=44099985051`
+  - diferencia detectada: `description` en HubSpot `TASK-563 create live-smoke-20260422e` vs Greenhouse `TASK-563 update live-smoke-20260422e`
+  - `metadata.autoHealEligible=true`, pero no se auto-healó en esta corrida; quedó pendiente para resolución explícita y auditada
+
 ## Sesion 2026-04-22 — Quote Builder contact hydration for adopted HubSpot organizations (Codex)
 
 - **Scope:** cerrar el gap donde el Quote Builder ya podia adoptar companies HubSpot nuevas, pero el dropdown de `Contacto` quedaba vacío porque `GET /api/commercial/organizations/[id]/contacts` solo leia `person_memberships` locales sin materializar los contactos asociados desde HubSpot.

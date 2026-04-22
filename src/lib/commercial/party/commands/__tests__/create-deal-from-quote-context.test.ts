@@ -36,6 +36,7 @@ vi.mock('../promote-party', () => ({
 
 import {
   DealCreateRateLimitError,
+  DealCreateSelectionInvalidError,
   DealCreateValidationError,
   OrganizationHasNoCompanyError
 } from '../create-deal-types'
@@ -50,12 +51,41 @@ const ORG_WITH_HUBSPOT = {
   space_id: null
 }
 
+// TASK-571: the command now queries the pipeline registry + defaults policy
+// table (`getDealCreationContext`) between rate-limit enforcement and the
+// pending-attempt insert. Tests that run the happy path must feed those two
+// queries ahead of the INSERT mock, in that exact order.
+const stubPipelineStructureRows = () => [
+  {
+    pipeline_id: 'default',
+    pipeline_label: 'Default',
+    pipeline_display_order: 1,
+    pipeline_active: true,
+    stage_id: 'appointmentscheduled',
+    stage_label: 'Appointment scheduled',
+    stage_display_order: 1,
+    is_open_selectable: true,
+    is_closed: false,
+    is_won: false,
+    is_default_for_create: true
+  }
+]
+
+const stubPipelineDefaultRows = () => []
+
+const mockPipelineContextQueries = () => {
+  mockQuery.mockResolvedValueOnce(stubPipelineStructureRows())
+  mockQuery.mockResolvedValueOnce(stubPipelineDefaultRows())
+}
+
 const baseInput = {
   organizationId: 'org-1',
   dealName: 'Campaña Q3',
   amount: 5_000_000,
   amountClp: 5_000_000,
   currency: 'CLP',
+  pipelineId: 'default',
+  stageId: 'appointmentscheduled',
   actor: { userId: 'user-1', tenantScope: 'efeonce_internal:efeonce' }
 }
 
@@ -114,7 +144,9 @@ describe('createDealFromQuoteContext', () => {
     mockQuery
       .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
       .mockResolvedValueOnce([]) // no fingerprint
-      .mockResolvedValueOnce([{ count: '20' }]) // user rate limit hit
+
+    mockPipelineContextQueries()
+    mockQuery.mockResolvedValueOnce([{ count: '20' }]) // user rate limit hit
 
     await expect(
       createDealFromQuoteContext({ ...baseInput, idempotencyKey: null })
@@ -127,6 +159,9 @@ describe('createDealFromQuoteContext', () => {
     mockQuery
       .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
       .mockResolvedValueOnce([]) // fingerprint
+
+    mockPipelineContextQueries()
+    mockQuery
       .mockResolvedValueOnce([{ count: '0' }]) // user
       .mockResolvedValueOnce([{ count: '0' }]) // tenant
       .mockResolvedValueOnce([{ attempt_id: 'attempt-hi' }]) // insertPendingAttempt
@@ -150,6 +185,9 @@ describe('createDealFromQuoteContext', () => {
     mockQuery
       .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
       .mockResolvedValueOnce([])
+
+    mockPipelineContextQueries()
+    mockQuery
       .mockResolvedValueOnce([{ count: '0' }])
       .mockResolvedValueOnce([{ count: '0' }])
       .mockResolvedValueOnce([{ attempt_id: 'attempt-stub' }])
@@ -172,6 +210,9 @@ describe('createDealFromQuoteContext', () => {
     mockQuery
       .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
       .mockResolvedValueOnce([])
+
+    mockPipelineContextQueries()
+    mockQuery
       .mockResolvedValueOnce([{ count: '0' }])
       .mockResolvedValueOnce([{ count: '0' }])
       .mockResolvedValueOnce([{ attempt_id: 'attempt-fail' }])
@@ -193,6 +234,9 @@ describe('createDealFromQuoteContext', () => {
     mockQuery
       .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
       .mockResolvedValueOnce([])
+
+    mockPipelineContextQueries()
+    mockQuery
       .mockResolvedValueOnce([{ count: '0' }])
       .mockResolvedValueOnce([{ count: '0' }])
       .mockResolvedValueOnce([{ attempt_id: 'attempt-happy' }])
@@ -228,10 +272,31 @@ describe('createDealFromQuoteContext', () => {
     expect(mockPublishDealCreatedFromGreenhouse).toHaveBeenCalledTimes(1)
   })
 
+  it('rejects when stageId does not belong to pipelineId (TASK-571 validation)', async () => {
+    mockQuery
+      .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
+      .mockResolvedValueOnce([]) // fingerprint
+
+    mockPipelineContextQueries()
+
+    await expect(
+      createDealFromQuoteContext({
+        ...baseInput,
+        stageId: 'stage-that-does-not-exist',
+        idempotencyKey: null
+      })
+    ).rejects.toBeInstanceOf(DealCreateSelectionInvalidError)
+
+    expect(mockCreateHubSpotDeal).not.toHaveBeenCalled()
+  })
+
   it('does NOT promote when org is already in opportunity stage', async () => {
     mockQuery
       .mockResolvedValueOnce([{ ...ORG_WITH_HUBSPOT, lifecycle_stage: 'opportunity' }])
       .mockResolvedValueOnce([])
+
+    mockPipelineContextQueries()
+    mockQuery
       .mockResolvedValueOnce([{ count: '0' }])
       .mockResolvedValueOnce([{ count: '0' }])
       .mockResolvedValueOnce([{ attempt_id: 'attempt-noprom' }])

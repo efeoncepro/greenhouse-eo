@@ -2,6 +2,28 @@
 
 ## 2026-04-22
 
+### 2026-04-22 — Cloud Build de workers Cloud Run ya no sube artefactos locales del portal
+
+- `.gcloudignore` pasa a ser un contrato más sólido para `gcloud builds submit .`: reutiliza `.gitignore` y excluye explícitamente `.next-local/`, `.next-build-*`, `.auth/`, `.claude/`, `.codex/`, `artifacts/`, `spec/`, `tests/`, `public/`, `full-version/` y otros árboles no runtime para los workers actuales.
+- Se agrega `.dockerignore` en la raíz del repo para que el `docker build ... .` de `ops-worker`, `commercial-cost-worker` e `ico-batch-worker` use un contexto repo-root explícito y no dependa de `.dockerignore` anidados que Docker no lee en ese flujo.
+- Verificación operativa: `gcloud meta list-files-for-upload .` ahora estima un upload de `20.40 MiB`, versus el baseline real de `1.5 GiB` observado antes del hardening.
+
+### 2026-04-22 — TASK-571: governance de pipelines/stages HubSpot para la creación inline de deals
+
+- Migración `20260422141406517_task-571-deal-creation-context-governance.sql` extiende `greenhouse_commercial.hubspot_deal_pipeline_config` con `pipeline_label`, `pipeline_display_order`, `pipeline_active`, `stage_display_order`, `is_open_selectable`, `is_default_for_create`, y crea la tabla `greenhouse_commercial.hubspot_deal_pipeline_defaults` para overrides `global | tenant | business_line`.
+- Nuevo reader canónico `getDealCreationContext` y validador `validateDealCreationSelection` en `src/lib/commercial/deals-store.ts`; precedencia de defaults tenant → BU → global → single/first-active y stage: policy → pipeline default → first open selectable.
+- Nuevo endpoint `GET /api/commercial/organizations/[id]/deal-creation-context` (capability `commercial.deal.create` + tenant isolation) alimenta el drawer sin llamar a HubSpot live.
+- `createDealFromQuoteContext` ahora resuelve pipeline/stage/owner y rechaza combinaciones inválidas (`DealCreateSelectionInvalidError` 422) o registries vacíos (`DealCreateContextEmptyError` 409). El insert a `greenhouse_commercial.deals` persiste `pipeline_name` + `dealstage_label`. El `CreateDealFromQuoteContextResult` gana `pipelineUsed`/`pipelineLabelUsed`/`stageUsed`/`stageLabelUsed`/`ownerUsed`.
+- `CreateDealDrawer` suma selectores Pipeline + Etapa inicial con defaults precargados y helper de "sugerida por política". El optimistic update del Quote Builder deja de hardcodear `'appointmentscheduled'` y usa el pipeline/stage/label reales devueltos por el backend.
+- Tests: 4 nuevos (validación + happy path del resolver + 3 casos de defaults/validation), 7 existentes ajustados al nuevo orden de queries. Suite completa en verde (1845 tests).
+- Documentación funcional `docs/documentation/finance/crear-deal-desde-quote-builder.md` actualizada a v1.1 con la ownership split y la precedencia canónica de defaults.
+
+### 2026-04-22 — Ops Worker Deploy deja de romperse al agregar helpers locales nuevos
+
+- `services/ops-worker/Dockerfile` ya no copia una lista manual incompleta de archivos del worker al builder stage.
+- El build de Cloud Run ahora copia `services/ops-worker/` completo antes de correr `esbuild`, evitando que imports locales nuevos queden fuera de la imagen.
+- Se corrige así el root cause de los fallos repetidos de `Ops Worker Deploy` en GitHub Actions (`Could not resolve "./product-catalog-drift-detect"` durante Cloud Build).
+
 ### 2026-04-22 — Quote Builder ya hidrata contactos HubSpot al primer uso
 
 - `GET /api/commercial/organizations/[id]/contacts` sigue siendo el contrato canónico del selector de contacto, pero ahora hace read-through materialization cuando la organización ya tiene `hubspot_company_id` y todavía no existen `person_memberships` comerciales locales.

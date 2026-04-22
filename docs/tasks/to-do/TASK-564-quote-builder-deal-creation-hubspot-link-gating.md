@@ -1,5 +1,11 @@
 # TASK-564 — Quote Builder: Gate Deal Creation + Link-to-HubSpot-Company Fallback
 
+## Delta 2026-04-22
+
+- `CreateDealDrawer` y `useCreateDeal` ganaron pipeline/stage/owner vía TASK-571. El drawer ahora fetchea `GET /api/commercial/organizations/[id]/deal-creation-context` al abrirse y bloquea el submit si no hay pipelines.
+- La aserción "el comando `createDealFromQuoteContext` falla con 409 porque el guard de `src/lib/commercial/party/commands/create-deal-from-quote-context.ts:369-371` exige `hubspot_company_id`" sigue válida, pero ahora el command puede fallar también con `DealCreateSelectionInvalidError` (422) o `DealCreateContextEmptyError` (409) si el registry local no está gobernado. Considerar ambos errores al diseñar el gating.
+- El CTA "Crear deal nuevo" ya no está en un floating button: vive en el footer del popover del chip Deal (TASK-570). El gating de TASK-564 debe ocultar o deshabilitar ese footer cuando la org no tiene `hubspot_company_id`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

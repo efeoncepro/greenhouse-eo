@@ -1563,14 +1563,17 @@ const QuoteBuilderShell = ({
           if (response.hubspotDealId) {
             setHubspotDealId(response.hubspotDealId)
 
-            // Optimistic insert so the selector shows the new deal without a roundtrip.
+            // Optimistic insert so the selector shows the new deal without a
+            // roundtrip. TASK-571: pull pipeline/stage + labels from the
+            // resolved selection returned by the backend — no more
+            // hardcoded `appointmentscheduled`.
             setOrgDeals(current => {
               const next: QuoteOrganizationDeal = {
                 hubspotDealId: response.hubspotDealId as string,
-                dealName: 'Nuevo deal',
-                dealstage: 'appointmentscheduled',
-                dealstageLabel: null,
-                pipelineName: null,
+                dealName: selectedOrgName ? `${selectedOrgName} — Nuevo deal` : 'Nuevo deal',
+                dealstage: response.stageUsed ?? 'pending',
+                dealstageLabel: response.stageLabelUsed,
+                pipelineName: response.pipelineLabelUsed,
                 isClosed: false,
                 isWon: false
               }

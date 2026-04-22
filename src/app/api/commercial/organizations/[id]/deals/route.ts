@@ -3,9 +3,11 @@ import { NextResponse } from 'next/server'
 import { listCommercialDealsForOrganization } from '@/lib/commercial/deals-store'
 import {
   createDealFromQuoteContext,
+  DealCreateContextEmptyError,
   DealCreateError,
   DealCreateInsufficientPermissionsError,
   DealCreateRateLimitError,
+  DealCreateSelectionInvalidError,
   DealCreateValidationError,
   OrganizationHasNoCompanyError
 } from '@/lib/commercial/party'
@@ -173,7 +175,9 @@ export async function POST(
     if (
       error instanceof DealCreateValidationError ||
       error instanceof OrganizationHasNoCompanyError ||
-      error instanceof DealCreateInsufficientPermissionsError
+      error instanceof DealCreateInsufficientPermissionsError ||
+      error instanceof DealCreateSelectionInvalidError ||
+      error instanceof DealCreateContextEmptyError
     ) {
       return NextResponse.json(
         { error: error.message, code: error.code, details: error.details ?? null },

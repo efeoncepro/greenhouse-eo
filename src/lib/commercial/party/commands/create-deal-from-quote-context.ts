@@ -4,6 +4,11 @@ import { randomUUID } from 'node:crypto'
 
 import { query, withTransaction } from '@/lib/db'
 import {
+  getDealCreationContext,
+  validateDealCreationSelection,
+  type DealCreationContext
+} from '@/lib/commercial/deals-store'
+import {
   publishDealCreateApprovalRequested,
   publishDealCreateRequested,
   publishDealCreated,
@@ -22,13 +27,22 @@ import {
   DEAL_CREATE_RATE_LIMIT_TENANT_WINDOW_SECONDS,
   DEAL_CREATE_RATE_LIMIT_USER_MAX,
   DEAL_CREATE_RATE_LIMIT_USER_WINDOW_SECONDS,
+  DealCreateContextEmptyError,
   DealCreateRateLimitError,
+  DealCreateSelectionInvalidError,
   DealCreateValidationError,
   OrganizationHasNoCompanyError,
   type CreateDealFromQuoteContextInput,
   type CreateDealFromQuoteContextResult,
   type DealCreateAttemptStatus
 } from './create-deal-types'
+
+interface ResolvedSelection {
+  pipelineId: string
+  pipelineLabel: string
+  stageId: string
+  stageLabel: string
+}
 
 // TASK-539: canonical write path for deals originated inside Greenhouse.
 //
@@ -275,11 +289,26 @@ const finalizeAttempt = async (
 const insertOrUpdateDealRow = async (
   cloudRunResponse: HubSpotGreenhouseCreateDealResponse,
   organization: OrganizationRow,
-  input: CreateDealFromQuoteContextInput
+  input: CreateDealFromQuoteContextInput,
+  selection: ResolvedSelection,
+  ownerHubspotUserId: string | null
 ): Promise<string> => {
   if (!cloudRunResponse.hubspotDealId) {
     throw new Error('Cloud Run /deals returned success without hubspotDealId')
   }
+
+  // Resolved values are source of truth; Cloud Run echoes override them only
+  // when the external service reshaped the request.
+  const effectivePipelineId = cloudRunResponse.pipelineUsed ?? selection.pipelineId
+  const effectiveStageId = cloudRunResponse.stageUsed ?? selection.stageId
+
+  const pipelineLabel = cloudRunResponse.pipelineUsed && cloudRunResponse.pipelineUsed !== selection.pipelineId
+    ? cloudRunResponse.pipelineUsed
+    : selection.pipelineLabel
+
+  const stageLabel = cloudRunResponse.stageUsed && cloudRunResponse.stageUsed !== selection.stageId
+    ? cloudRunResponse.stageUsed
+    : selection.stageLabel
 
   const rows = await query<{ deal_id: string }>(
     `INSERT INTO greenhouse_commercial.deals (
@@ -290,6 +319,8 @@ const insertOrUpdateDealRow = async (
        space_id,
        deal_name,
        dealstage,
+       dealstage_label,
+       pipeline_name,
        amount,
        amount_clp,
        currency,
@@ -301,7 +332,7 @@ const insertOrUpdateDealRow = async (
        created_at,
        updated_at
      ) VALUES (
-       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::jsonb, NOW(), NOW(), NOW(), NOW()
+       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb, NOW(), NOW(), NOW(), NOW()
      )
      ON CONFLICT (hubspot_deal_id) DO UPDATE
        SET deal_name = EXCLUDED.deal_name,
@@ -310,27 +341,33 @@ const insertOrUpdateDealRow = async (
            currency = EXCLUDED.currency,
            hubspot_pipeline_id = COALESCE(EXCLUDED.hubspot_pipeline_id, deals.hubspot_pipeline_id),
            dealstage = COALESCE(EXCLUDED.dealstage, deals.dealstage),
+           dealstage_label = COALESCE(EXCLUDED.dealstage_label, deals.dealstage_label),
+           pipeline_name = COALESCE(EXCLUDED.pipeline_name, deals.pipeline_name),
            updated_at = NOW(),
            hubspot_last_synced_at = NOW()
      RETURNING deal_id`,
     [
       cloudRunResponse.hubspotDealId,
-      cloudRunResponse.pipelineUsed ?? input.pipelineId ?? null,
+      effectivePipelineId,
       organization.client_id,
       organization.organization_id,
       organization.space_id,
       input.dealName,
-      cloudRunResponse.stageUsed ?? input.stageId ?? 'appointmentscheduled',
+      effectiveStageId,
+      stageLabel,
+      pipelineLabel,
       input.amount ?? null,
       input.amountClp ?? null,
       normalizeCurrency(input.currency),
-      cloudRunResponse.ownerUsed ?? input.ownerHubspotUserId ?? null,
+      ownerHubspotUserId,
       input.actor.userId,
       JSON.stringify({
         origin: 'greenhouse_quote_builder',
         attempt_id: null,
         quotation_id: input.quotationId ?? null,
-        cloud_run_response: { status: cloudRunResponse.status }
+        cloud_run_response: { status: cloudRunResponse.status },
+        resolved_selection: selection,
+        resolved_owner_hubspot_user_id: ownerHubspotUserId
       })
     ]
   )
@@ -340,6 +377,51 @@ const insertOrUpdateDealRow = async (
   if (!row) throw new Error('Failed to upsert deals row after HubSpot create')
 
   return row.deal_id
+}
+
+const resolveSelection = async (
+  input: CreateDealFromQuoteContextInput,
+  context: DealCreationContext
+): Promise<ResolvedSelection> => {
+  if (context.pipelines.length === 0) {
+    throw new DealCreateContextEmptyError()
+  }
+
+  const pipelineId = input.pipelineId ?? context.defaultPipelineId
+  const stageId = input.stageId ?? context.defaultStageId
+
+  if (!pipelineId || !stageId) {
+    throw new DealCreateSelectionInvalidError(
+      !pipelineId ? 'pipeline_unknown' : 'stage_unknown',
+      {
+        pipelineProvided: pipelineId,
+        stageProvided: stageId,
+        defaultsSource: context.defaultsSource
+      }
+    )
+  }
+
+  const validation = await validateDealCreationSelection({
+    pipelineId,
+    stageId,
+    context
+  })
+
+  if (!validation.valid) {
+    throw new DealCreateSelectionInvalidError(validation.errorCode!, {
+      pipelineId,
+      stageId,
+      pipelineLabel: validation.pipelineLabel ?? null,
+      stageLabel: validation.stageLabel ?? null
+    })
+  }
+
+  return {
+    pipelineId,
+    pipelineLabel: validation.pipelineLabel ?? pipelineId,
+    stageId,
+    stageLabel: validation.stageLabel ?? stageId
+  }
 }
 
 /**
@@ -383,7 +465,12 @@ export const createDealFromQuoteContext = async (
         organizationPromoted: false,
         requiresApproval: existing.status === 'pending_approval',
         approvalId: existing.approval_id,
-        message: `Idempotent hit on existing attempt ${existing.attempt_id} (status=${existing.status})`
+        message: `Idempotent hit on existing attempt ${existing.attempt_id} (status=${existing.status})`,
+        pipelineUsed: null,
+        pipelineLabelUsed: null,
+        stageUsed: null,
+        stageLabelUsed: null,
+        ownerUsed: null
       }
     }
   } else {
@@ -403,10 +490,28 @@ export const createDealFromQuoteContext = async (
         organizationPromoted: false,
         requiresApproval: fingerprint.status === 'pending_approval',
         approvalId: fingerprint.approval_id,
-        message: `Fingerprint dedupe — reusing attempt ${fingerprint.attempt_id} from ${fingerprint.created_at}`
+        message: `Fingerprint dedupe — reusing attempt ${fingerprint.attempt_id} from ${fingerprint.created_at}`,
+        pipelineUsed: null,
+        pipelineLabelUsed: null,
+        stageUsed: null,
+        stageLabelUsed: null,
+        ownerUsed: null
       }
     }
   }
+
+  // 1.5 Resolve pipeline/stage selection from governance registry. Throws
+  // DealCreateSelectionInvalidError or DealCreateContextEmptyError — the
+  // route layer maps those to 422/409.
+  const creationContext = await getDealCreationContext({
+    tenantScope: input.actor.tenantScope,
+    businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null
+  })
+
+  const selection = await resolveSelection(input, creationContext)
+
+  const ownerHubspotUserId =
+    input.ownerHubspotUserId ?? creationContext.defaultOwnerHubspotUserId ?? null
 
   // 2. Rate limit. Throws DealCreateRateLimitError → 429 at the route layer.
   await enforceRateLimits(input.actor)
@@ -422,13 +527,15 @@ export const createDealFromQuoteContext = async (
     amount: input.amount ?? null,
     amountClp: input.amountClp ?? null,
     currency: normalizeCurrency(input.currency),
-    pipelineId: input.pipelineId ?? null,
-    stageId: input.stageId ?? null,
-    ownerHubspotUserId: input.ownerHubspotUserId ?? null,
+    pipelineId: selection.pipelineId,
+    stageId: selection.stageId,
+    ownerHubspotUserId,
     businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null,
     metadata: {
       origin: 'greenhouse_quote_builder',
-      quotation_id: input.quotationId ?? null
+      quotation_id: input.quotationId ?? null,
+      resolved_selection: selection,
+      defaults_source: creationContext.defaultsSource
     }
   })
 
@@ -472,7 +579,12 @@ export const createDealFromQuoteContext = async (
       organizationPromoted: false,
       requiresApproval: true,
       approvalId,
-      message: `Deal exceeds CLP ${DEAL_CREATE_APPROVAL_THRESHOLD_CLP.toLocaleString('es-CL')} threshold — approval pending.`
+      message: `Deal exceeds CLP ${DEAL_CREATE_APPROVAL_THRESHOLD_CLP.toLocaleString('es-CL')} threshold — approval pending.`,
+      pipelineUsed: selection.pipelineId,
+      pipelineLabelUsed: selection.pipelineLabel,
+      stageUsed: selection.stageId,
+      stageLabelUsed: selection.stageLabel,
+      ownerUsed: ownerHubspotUserId
     }
   }
 
@@ -486,9 +598,9 @@ export const createDealFromQuoteContext = async (
       dealName,
       amount: input.amount ?? null,
       currency: normalizeCurrency(input.currency),
-      pipelineId: input.pipelineId ?? null,
-      stageId: input.stageId ?? null,
-      ownerHubspotUserId: input.ownerHubspotUserId ?? null,
+      pipelineId: selection.pipelineId,
+      stageId: selection.stageId,
+      ownerHubspotUserId,
       closeDate: input.closeDateHint ?? null,
       businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null,
       origin: 'greenhouse_quote_builder',
@@ -522,13 +634,20 @@ export const createDealFromQuoteContext = async (
       requiresApproval: false,
       approvalId: null,
       message:
-        response.message ?? 'Cloud Run /deals endpoint not deployed yet — attempt persisted for replay.'
+        response.message ?? 'Cloud Run /deals endpoint not deployed yet — attempt persisted for replay.',
+      pipelineUsed: selection.pipelineId,
+      pipelineLabelUsed: selection.pipelineLabel,
+      stageUsed: selection.stageId,
+      stageLabelUsed: selection.stageLabel,
+      ownerUsed: ownerHubspotUserId
     }
   }
 
   // 6. Persist deal + promote party + emit events, all in one transaction.
+  const effectiveOwner = response.ownerUsed ?? ownerHubspotUserId
+
   const { dealId, organizationPromoted } = await withTransaction(async () => {
-    const newDealId = await insertOrUpdateDealRow(response, organization, input)
+    const newDealId = await insertOrUpdateDealRow(response, organization, input, selection, effectiveOwner)
 
     let promoted = false
 
@@ -546,8 +665,8 @@ export const createDealFromQuoteContext = async (
     await publishDealCreated({
       dealId: newDealId,
       hubspotDealId: response.hubspotDealId ?? '',
-      hubspotPipelineId: response.pipelineUsed ?? input.pipelineId ?? null,
-      dealstage: response.stageUsed ?? input.stageId ?? 'appointmentscheduled',
+      hubspotPipelineId: response.pipelineUsed ?? selection.pipelineId,
+      dealstage: response.stageUsed ?? selection.stageId,
       clientId: organization.client_id,
       organizationId: organization.organization_id,
       spaceId: organization.space_id,
@@ -565,9 +684,9 @@ export const createDealFromQuoteContext = async (
       amount: input.amount ?? null,
       amountClp: input.amountClp ?? null,
       currency: normalizeCurrency(input.currency),
-      pipelineId: response.pipelineUsed ?? input.pipelineId ?? null,
-      stageId: response.stageUsed ?? input.stageId ?? null,
-      ownerHubspotUserId: response.ownerUsed ?? input.ownerHubspotUserId ?? null,
+      pipelineId: response.pipelineUsed ?? selection.pipelineId,
+      stageId: response.stageUsed ?? selection.stageId,
+      ownerHubspotUserId: effectiveOwner,
       actorUserId: input.actor.userId,
       quotationId: input.quotationId ?? null,
       origin: 'greenhouse_quote_builder',
@@ -583,6 +702,19 @@ export const createDealFromQuoteContext = async (
     dealId
   })
 
+  const effectivePipelineId = response.pipelineUsed ?? selection.pipelineId
+  const effectiveStageId = response.stageUsed ?? selection.stageId
+
+  const effectivePipelineLabel =
+    response.pipelineUsed && response.pipelineUsed !== selection.pipelineId
+      ? response.pipelineUsed
+      : selection.pipelineLabel
+
+  const effectiveStageLabel =
+    response.stageUsed && response.stageUsed !== selection.stageId
+      ? response.stageUsed
+      : selection.stageLabel
+
   return {
     attemptId,
     status: 'completed',
@@ -593,6 +725,11 @@ export const createDealFromQuoteContext = async (
     approvalId: null,
     message: organizationPromoted
       ? 'Deal created in HubSpot; organization promoted prospect → opportunity.'
-      : 'Deal created in HubSpot.'
+      : 'Deal created in HubSpot.',
+    pipelineUsed: effectivePipelineId,
+    pipelineLabelUsed: effectivePipelineLabel,
+    stageUsed: effectiveStageId,
+    stageLabelUsed: effectiveStageLabel,
+    ownerUsed: effectiveOwner
   }
 }

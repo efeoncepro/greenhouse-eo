@@ -63,6 +63,18 @@ export interface CreateDealFromQuoteContextResult {
   requiresApproval: boolean
   approvalId: string | null
   message: string
+
+  /**
+   * Resolved pipeline / stage / owner from the governance layer. Populated
+   * once the command actually writes a deal (status='completed'); null for
+   * pending_approval, endpoint_not_deployed, failed, or idempotent hits that
+   * did not run the resolver.
+   */
+  pipelineUsed: string | null
+  pipelineLabelUsed: string | null
+  stageUsed: string | null
+  stageLabelUsed: string | null
+  ownerUsed: string | null
 }
 
 // ── Error classes ─────────────────────────────────────────────────────────
@@ -112,6 +124,39 @@ export class DealCreateRateLimitError extends DealCreateError {
     )
     this.name = 'DealCreateRateLimitError'
     this.retryAfterSeconds = retryAfterSeconds
+  }
+}
+
+export class DealCreateSelectionInvalidError extends DealCreateError {
+  constructor(
+    reason:
+      | 'pipeline_unknown'
+      | 'pipeline_inactive'
+      | 'stage_unknown'
+      | 'stage_not_in_pipeline'
+      | 'stage_closed'
+      | 'stage_not_selectable',
+    detail: Record<string, unknown>
+  ) {
+    super(
+      'DEAL_CREATE_SELECTION_INVALID',
+      `Pipeline/stage selection is invalid: ${reason}`,
+      422,
+      { reason, ...detail }
+    )
+    this.name = 'DealCreateSelectionInvalidError'
+  }
+}
+
+export class DealCreateContextEmptyError extends DealCreateError {
+  constructor() {
+    super(
+      'DEAL_CREATE_CONTEXT_EMPTY',
+      'No pipelines are configured for deal creation. Ask an administrator to seed greenhouse_commercial.hubspot_deal_pipeline_config.',
+      409,
+      { requiredRegistry: 'greenhouse_commercial.hubspot_deal_pipeline_config' }
+    )
+    this.name = 'DealCreateContextEmptyError'
   }
 }
 

@@ -50,9 +50,11 @@ export { createDealFromQuoteContext } from './commands/create-deal-from-quote-co
 export {
   DEAL_CREATE_APPROVAL_THRESHOLD_CLP,
   DEAL_CREATE_ATTEMPT_STATUSES,
+  DealCreateContextEmptyError,
   DealCreateError,
   DealCreateInsufficientPermissionsError,
   DealCreateRateLimitError,
+  DealCreateSelectionInvalidError,
   DealCreateValidationError,
   OrganizationHasNoCompanyError
 } from './commands/create-deal-types'

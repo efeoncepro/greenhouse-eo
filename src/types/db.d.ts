@@ -443,12 +443,29 @@ export interface GreenhouseCommercialFteHoursGuide {
 export interface GreenhouseCommercialHubspotDealPipelineConfig {
   created_at: Generated<Timestamp>;
   is_closed: Generated<boolean>;
+  is_default_for_create: Generated<boolean>;
+  is_open_selectable: Generated<boolean>;
   is_won: Generated<boolean>;
   notes: string | null;
+  pipeline_active: Generated<boolean>;
+  pipeline_display_order: number | null;
   pipeline_id: string;
+  pipeline_label: string | null;
   probability_pct: Numeric | null;
+  stage_display_order: number | null;
   stage_id: string;
   stage_label: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialHubspotDealPipelineDefaults {
+  created_at: Generated<Timestamp>;
+  notes: string | null;
+  owner_hubspot_user_id: string | null;
+  pipeline_id: string;
+  scope: string;
+  scope_key: string;
+  stage_id: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -6217,6 +6234,7 @@ export interface DB {
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
+  "greenhouse_commercial.hubspot_deal_pipeline_defaults": GreenhouseCommercialHubspotDealPipelineDefaults;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.master_agreement_clauses": GreenhouseCommercialMasterAgreementClauses;
   "greenhouse_commercial.master_agreements": GreenhouseCommercialMasterAgreements;
