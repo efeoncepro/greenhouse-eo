@@ -251,6 +251,16 @@ const HUBSPOT_CUSTOM_PROPERTY_TEMPLATES: Record<
       options: DEAL_ORIGIN_OPTIONS,
       formField: false,
       displayOrder: 1
+    },
+    {
+      name: 'gh_idempotency_key',
+      label: 'Llave de Idempotencia Greenhouse',
+      description:
+        'Clave tecnica usada por Greenhouse para deduplicar retries al crear deals desde flujos automatizados o interactivos.',
+      type: 'string',
+      fieldType: 'text',
+      formField: false,
+      displayOrder: 2
     }
   ],
   products: [

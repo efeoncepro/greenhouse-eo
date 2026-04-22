@@ -625,4 +625,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-569` | `to-do` | Typography Visual Regression + Figma Alignment + Skills/Docs Cleanup (EPIC-004 child 4/4) | `docs/tasks/to-do/TASK-569-typography-visual-regression-figma-docs.md` |
 | `TASK-570` | `complete` | Move "Crear deal nuevo" CTA into Deal Chip Popover Footer | `docs/tasks/complete/TASK-570-create-deal-cta-in-popover-footer.md` |
 | `TASK-571` | `complete` | Deal Creation Context Registry + Pipeline/Stage Governance | `docs/tasks/complete/TASK-571-deal-creation-context-pipeline-stage-governance.md` |
-| `TASK-572` | `to-do` | Deploy `POST /deals` en el Cloud Run `hubspot-greenhouse-integration` | `docs/tasks/to-do/TASK-572-hubspot-integration-post-deals-deploy.md` |
+| `TASK-572` | `complete` | Deploy `POST /deals` en el Cloud Run `hubspot-greenhouse-integration` | `docs/tasks/complete/TASK-572-hubspot-integration-post-deals-deploy.md` |

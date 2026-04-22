@@ -62,7 +62,7 @@ HUBSPOT_ACCESS_TOKEN=... pnpm hubspot:properties -- --object companies,deals,pro
 ## Objetos y suites actuales
 
 - `companies`: lifecycle/commercial party outbound (`gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_active_contracts_count`, `gh_last_write_at`, `gh_mrr_tier`)
-- `deals`: origin marker de Quote Builder (`gh_deal_origin`)
+- `deals`: origin marker + idempotencia de Quote Builder (`gh_deal_origin`, `gh_idempotency_key`)
 - `products`: product catalog sync (`gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`, `gh_business_line`)
 - `services`: service bridge (`ef_*`)
 - `contacts`: reservado, sin suite activa todavía

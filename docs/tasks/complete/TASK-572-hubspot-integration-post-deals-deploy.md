@@ -6,17 +6,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Diseño`
+- Status real: `Implementado y desplegado 2026-04-22`
 - Rank: `TBD`
 - Domain: `integrations / crm`
-- Blocked by: `none` (TASK-539 y TASK-571 ya cerrados)
-- Branch: `task/TASK-572-hubspot-integration-post-deals-deploy` (en el repo hermano `hubspot-greenhouse-integration`)
+- Blocked by: `none`
+- Branch: `task/TASK-572-hubspot-integration-post-deals-deploy` (en `cesargrowth11/hubspot-bigquery`; servicio `services/hubspot_greenhouse_integration/`)
 - Legacy ID: `—`
 - GitHub Issue: `—`
 
@@ -56,9 +56,10 @@ Reglas obligatorias:
 - El servicio Cloud Run sigue siendo owner de toda llamada outbound a HubSpot Deals API. Greenhouse NO debe adquirir un cliente directo a HubSpot como workaround.
 - El contrato `POST /deals` debe ser compatible con `HubSpotGreenhouseCreateDealRequest` / `HubSpotGreenhouseCreateDealResponse` — cambiar el contrato en el repo hermano obliga a cambiar el cliente en este repo y revalidar tipos.
 - El endpoint debe honrar `idempotencyKey` (header o body) para que retries con la misma key devuelvan el deal ya creado sin llamar a HubSpot dos veces.
-- Auth: header `x-greenhouse-integration-key` + Bearer token (patrón existente de `/invoices`, `/products/:id`).
+- Auth: header `x-greenhouse-integration-key` + Bearer token (patrón existente de `PATCH /companies/:id/lifecycle` y `POST/PATCH /products`).
 - Errores esperados del servicio → códigos propios, nunca exponer excepciones crudas del SDK HubSpot.
 - La capability `commercial.deal.create` sigue enforzándose en Greenhouse. El Cloud Run confía en que el caller ya validó.
+- `docs/architecture/schema-snapshot-baseline.sql` NO refleja todavía las tablas live de TASK-539/TASK-571; para esta task el DDL canónico está en migrations + código runtime.
 
 ## Normative Docs
 
@@ -70,7 +71,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Repo hermano `hubspot-greenhouse-integration` con acceso de deploy a Cloud Run (`us-east4` o lo que use hoy `hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app` [verificar]).
+- Repo hermano `cesargrowth11/hubspot-bigquery`, servicio `services/hubspot_greenhouse_integration/`, con acceso de deploy a Cloud Run (`us-central1` según `services/hubspot_greenhouse_integration/deploy.sh`).
 - HubSpot Private App / API key con permisos `crm.objects.deals.write` + `crm.objects.companies.read` + `crm.associations.write`.
 - `greenhouse_commercial.hubspot_deal_pipeline_config` y `hubspot_deal_pipeline_defaults` — ya live en Greenhouse, útiles para reconciliar luego del primer deploy.
 
@@ -85,11 +86,12 @@ Reglas obligatorias:
 
 (en el repo hermano, no en `greenhouse-eo`)
 
-- `src/routes/deals.ts` o equivalente idiomático del servicio [verificar]
-- `src/clients/hubspot.ts` (extensión del client existente) [verificar]
-- `src/schemas/deal.ts` (validación de request) [verificar]
+- `services/hubspot_greenhouse_integration/app.py`
+- `services/hubspot_greenhouse_integration/hubspot_client.py`
+- `services/hubspot_greenhouse_integration/contract.py`
+- `tests/test_hubspot_greenhouse_integration_app.py`
 - Tests correspondientes del servicio
-- Infra: `cloudbuild.yaml` / `deploy.sh` si hace falta tocarlos [verificar]
+- Infra: `services/hubspot_greenhouse_integration/deploy.sh` si hace falta tocar env/runtime/smoke
 
 En este repo (`greenhouse-eo`) la task NO modifica código, solo:
 
@@ -125,13 +127,14 @@ En este repo (`greenhouse-eo`) la task NO modifica código, solo:
 
 ### Slice 1 — Endpoint `POST /deals` en el repo hermano
 
-- Implementar route handler en `hubspot-greenhouse-integration` con validación de request contra `HubSpotGreenhouseCreateDealRequest`.
+- Implementar route handler Flask en `services/hubspot_greenhouse_integration/app.py` con validación de request contra `HubSpotGreenhouseCreateDealRequest`.
 - Auth: reutilizar middleware existente (`x-greenhouse-integration-key` + Bearer).
 - Mapear payload → HubSpot Deals API (`POST /crm/v3/objects/deals`):
   - `dealname`, `amount`, `currency`, `pipeline`, `dealstage`, `hubspot_owner_id`, `closedate`
-  - `business_line_code` y `gh_deal_origin` como custom properties (si ya existen; si no, crear gh_deal_origin en el portal como parte del deploy).
+  - `gh_deal_origin` como custom property obligatoria
+  - `businessLineCode` solo si existe una property live verificada para deals; no asumir un `gh_*` inexistente
 - Asociar el deal a la `hubspotCompanyId` recibido (Associations v4).
-- Si viene `hubspotContactId`, asociarlo también.
+- Si viene `hubspotContactId`, asociarlo también. Nota: el tipo ya existe en Greenhouse, pero el caller actual `createDealFromQuoteContext` todavía no lo envía.
 
 ### Slice 2 — Idempotencia + manejo de errores
 
@@ -221,6 +224,14 @@ interface HubSpotGreenhouseCreateDealResponse {
 - `gh_deal_origin` (string): valor `'greenhouse_quote_builder'` en cada deal creado. Si aún no existe en el portal, crearla como parte del deploy.
 - `gh_idempotency_key` (string, opcional): para detectar retries sin tabla externa [verificar viabilidad].
 
+## Discovery Corrections
+
+- El servicio `hubspot-greenhouse-integration` no vive en un repo standalone: vive dentro de `cesargrowth11/hubspot-bigquery` en `services/hubspot_greenhouse_integration/`.
+- El servicio actual ya expone `PATCH /companies/:id/lifecycle`, `POST/PATCH /products`, `POST /quotes`, `GET /products/reconcile`, etc.; `POST /deals` sigue faltando.
+- `/invoices` no existe en el servicio Flask actual; no debe usarse como referencia de auth/patrón live para esta task.
+- El manifest/script de `gh_deal_origin` ya existe en `greenhouse-eo` (`src/lib/hubspot/custom-properties.ts` + `pnpm hubspot:deal-properties`). Lo que debe verificarse en esta task es su aplicación live, no recrear el manifiesto.
+- `rate_limited` existe en el enum/documentación de `deal_create_attempts`, pero el flujo real actual hace short-circuit antes de `insertPendingAttempt()`. Un 429 hoy no deja row en esa tabla.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
@@ -263,5 +274,6 @@ interface HubSpotGreenhouseCreateDealResponse {
 ## Open Questions
 
 - ¿Idempotencia via custom property HubSpot (`gh_idempotency_key`) o via KV/tabla interna del servicio? Ambos sirven; la decisión pide weighting entre ops simplicity y cost/quota de HubSpot.
-- ¿El deploy incluye la creación de `gh_deal_origin` en production portal o eso ya fue cubierto por TASK-563 u otra task de props? [verificar]
+- ¿`business_line_code` mapea a una property HubSpot deals ya existente (`linea_de_servicio` u otra) o debe omitirse del primer deploy si no hay contrato live verificable?
+- ¿El deploy incluye solo la verificación/aplicación live de `gh_deal_origin`, dado que el manifiesto canónico ya existe en `greenhouse-eo`?
 - ¿Vamos a replayar los intentos históricos `endpoint_not_deployed` (pueden estar stale) o quedan como cementerio auditivo?

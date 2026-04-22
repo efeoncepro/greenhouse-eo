@@ -2,6 +2,14 @@
 
 ## 2026-04-22
 
+### 2026-04-22 — TASK-572 cierra el `POST /deals` live hacia HubSpot
+
+- El servicio Cloud Run hermano `hubspot-greenhouse-integration` ya expone `POST /deals` en producción; Greenhouse deja de caer en `endpoint_not_deployed` al intentar crear deals inline desde Quote Builder.
+- El endpoint nuevo acepta auth por `Authorization: Bearer` o `x-greenhouse-integration-key`, crea el deal en HubSpot, asocia company y contact opcional, y devuelve el shape que Greenhouse ya consumia (`status`, `hubspotDealId`, `pipelineUsed`, `stageUsed`, `ownerUsed`).
+- El manifest canónico de custom properties de deals gana `gh_idempotency_key`, la property se aplico live en HubSpot, y el servicio la usa para idempotencia durable.
+- El smoke real destapo una carrera de concurrencia: dos requests simultaneos con la misma key creaban dos deals. La revision final del servicio reconcilia por `gh_idempotency_key`, conserva el deal mas antiguo y archiva el duplicado en HubSpot.
+- Documentacion funcional actualizada a v1.2 en `docs/documentation/finance/crear-deal-desde-quote-builder.md`; el follow-up #1 heredado de TASK-539 queda formalmente cerrado.
+
 ### 2026-04-22 — Cloud Build de workers Cloud Run ya no sube artefactos locales del portal
 
 - `.gcloudignore` pasa a ser un contrato más sólido para `gcloud builds submit .`: reutiliza `.gitignore` y excluye explícitamente `.next-local/`, `.next-build-*`, `.auth/`, `.claude/`, `.codex/`, `artifacts/`, `spec/`, `tests/`, `public/`, `full-version/` y otros árboles no runtime para los workers actuales.

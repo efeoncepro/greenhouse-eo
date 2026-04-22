@@ -23,6 +23,10 @@ describe('hubspot custom properties manifest', () => {
         expect.objectContaining({
           name: 'gh_deal_origin',
           label: 'Origen del Deal en Greenhouse'
+        }),
+        expect.objectContaining({
+          name: 'gh_idempotency_key',
+          label: 'Llave de Idempotencia Greenhouse'
         })
       ])
     )
@@ -62,11 +66,17 @@ describe('hubspot custom properties manifest', () => {
       }
     ])
 
-    expect(diff).toEqual([
-      expect.objectContaining({
-        action: 'update',
-        definition: expect.objectContaining({ name: 'gh_deal_origin' })
-      })
-    ])
+    expect(diff).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          action: 'update',
+          definition: expect.objectContaining({ name: 'gh_deal_origin' })
+        }),
+        expect.objectContaining({
+          action: 'create',
+          definition: expect.objectContaining({ name: 'gh_idempotency_key' })
+        })
+      ])
+    )
   })
 })

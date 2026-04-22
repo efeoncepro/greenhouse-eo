@@ -1,5 +1,53 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — TASK-572 POST /deals live en HubSpot Cloud Run (Codex)
+
+- **Scope:** cerrar el follow-up operativo que quedo abierto desde `TASK-539`: el Quote Builder ya llamaba `POST /deals`, pero el servicio `hubspot-greenhouse-integration` devolvia `404` y todos los intentos quedaban como `endpoint_not_deployed`.
+- **Discovery / correccion de supuestos**
+  - la implementacion real no vive en un repo separado abstracto: el servicio esta en `cesargrowth11/hubspot-bigquery`, ruta `services/hubspot_greenhouse_integration/`
+  - la auth real del servicio no es OIDC; el patron live es `Authorization: Bearer` o `x-greenhouse-integration-key` con `GREENHOUSE_INTEGRATION_API_TOKEN`
+  - `docs/architecture/schema-snapshot-baseline.sql` no refleja aun las tablas live de `TASK-539` / `TASK-571`; el DDL canónico para este flujo sigue estando en migrations + runtime
+- **Implementacion shipped (repo hermano + Greenhouse docs)**
+  - `services/hubspot_greenhouse_integration/app.py`
+    - nuevo `POST /deals`
+    - valida `hubspotCompanyId`, `dealName`, `idempotencyKey`, `origin`
+    - crea el deal HubSpot y asocia company + contact opcional
+    - responde el shape esperado por Greenhouse (`status`, `hubspotDealId`, `pipelineUsed`, `stageUsed`, `ownerUsed`)
+    - mapea errores a `HUBSPOT_AUTH`, `HUBSPOT_RATE_LIMIT`, `HUBSPOT_VALIDATION`, `HUBSPOT_UPSTREAM`
+    - corrige la carrera real de idempotencia concurrente: si 2 requests con la misma key crean dos deals, el servicio conserva el mas antiguo y archiva el duplicado
+  - `services/hubspot_greenhouse_integration/hubspot_client.py`
+    - helpers para buscar, crear, hidratar, asociar y archivar deals
+  - `services/hubspot_greenhouse_integration/contract.py`
+    - `deal_create` ya figura en `/contract`
+  - `tests/test_hubspot_greenhouse_integration_app.py`
+    - coverage para auth, create, reuse por idempotencia, rate limit y dedupe concurrente
+  - `src/lib/hubspot/custom-properties.ts`
+    - el manifest canónico de deals gana `gh_idempotency_key`
+  - `scripts/__tests__/hubspot-custom-properties.test.ts`
+    - actualizado al manifest real
+  - `docs/documentation/finance/crear-deal-desde-quote-builder.md`
+    - follow-up #1 de TASK-539 ahora queda cerrado y la doc pasa a v1.2
+- **Deploy / verificacion live**
+  - `gcloud auth login --update-adc` relanzado y luego `gcloud auth application-default set-quota-project efeonce-group` para limpiar el warning de quota project
+  - Cloud Run desplegado en `us-central1` a revision `hubspot-greenhouse-integration-00017-hf8`
+  - custom property live aplicada en HubSpot:
+    - `gh_idempotency_key`
+  - smoke del servicio:
+    - `GET /health` OK
+    - `GET /contract` OK (`deal_create` visible)
+    - `POST /deals` autenticado contra company interna `Efeonce` (`40379321357`) OK
+  - aprendizaje importante:
+    - el primer smoke concurrente destapo que la idempotencia secuencial no bastaba; creo 2 deals (`59450091698`, `59453096289`)
+    - se shippeo fix de reconciliacion/archivo y se redeployo
+    - smoke posterior con la misma `idempotencyKey=smoke-task-572-20260422` devolvio el deal canonico `59453096289` y archivo el duplicado `59450091698`
+    - verificacion directa HubSpot: 1 deal activo con esa key + el duplicado `archived=true`
+- **Estado Greenhouse**
+  - `pnpm exec vitest run scripts/__tests__/hubspot-custom-properties.test.ts` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+- **Follow-up abierto**
+  - sigue pendiente una lane de replay/worker para los intentos historicos `deal_create_attempts.status='endpoint_not_deployed'`; TASK-572 cierra el deploy, no el replay historico
+
 ## Sesion 2026-04-22 — Cloud Build upload hygiene hardening para workers Cloud Run (Codex)
 
 - **Scope:** eliminar el lastre estructural del contexto de build compartido por `ops-worker`, `commercial-cost-worker` e `ico-batch-worker`, evitando que `gcloud builds submit .` siga subiendo artefactos locales gigantes del portal.

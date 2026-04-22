@@ -1,9 +1,9 @@
 # Crear Deal desde el Cotizador — Sin salir a HubSpot
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-21 por Claude (Opus 4.7) — TASK-539
-> **Ultima actualizacion:** 2026-04-22 por Claude — TASK-571 (governance de pipeline/stage)
+> **Ultima actualizacion:** 2026-04-22 por Codex — TASK-572 (`POST /deals` live + idempotencia concurrente)
 > **Documentacion tecnica:**
 > - Task: [TASK-539](../../tasks/complete/TASK-539-inline-deal-creation-quote-builder.md)
 > - Spec tecnica: [GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1 § Delta Fase E](../../architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md)
@@ -46,11 +46,11 @@ Ahora puedes crear el deal **desde el mismo cotizador**, en un drawer minimalist
 | Step | Que hace el sistema |
 |---|---|
 | Validacion | Rechaza si no hay organization o nombre de deal vacio. |
-| Idempotencia | Si el cliente reintenta con el mismo `idempotencyKey`, retorna el resultado anterior (no duplica). |
+| Idempotencia | Si el cliente reintenta con el mismo `idempotencyKey`, retorna el deal canonico. Si hubo 2 creates concurrentes, reutiliza el mas antiguo y archiva el duplicado en HubSpot. |
 | Fingerprint dedupe | Sin idempotency key explicita, el sistema detecta doble-click (mismo actor + misma company + mismo nombre, 5 min) y reutiliza el intento. |
 | Rate limit | Maximo 20 deals/minuto por usuario, 100 deals/hora por tenant. Exceso retorna HTTP 429 con `Retry-After`. |
 | Threshold de aprobacion | Si el monto supera $50M CLP, el deal **NO** se crea automaticamente. Se persiste como `pending_approval` y se emite un evento para que el Sales Lead lo revise. |
-| Cloud Run POST | Llama al service `hubspot-greenhouse-integration` con el payload. Timeout 4s, auth OIDC. |
+| Cloud Run POST | Llama al service `hubspot-greenhouse-integration` con el payload. Timeout 4s, auth por integration token (`Authorization: Bearer` o `x-greenhouse-integration-key`). |
 | Transaction atomica | Insert en `deals` + `promoteParty` + emit eventos → todo en una sola transaccion. Si algo falla, nada se persiste. |
 | Trazabilidad | Cada intento (exitoso o fallido) queda en `deal_create_attempts` con status, error, contador de reintentos. Soporte puede reconstruir exactamente que paso. |
 
@@ -63,7 +63,7 @@ Ahora puedes crear el deal **desde el mismo cotizador**, en un drawer minimalist
 | `pending_approval` | Monto > $50M CLP: aprobacion necesaria. No se llamo a HubSpot aun. |
 | `rate_limited` | Rechazado por rate limit; no se creo el deal. |
 | `failed` | Cloud Run respondio error (5xx, timeout). El intento queda registrado con el mensaje de error; el usuario puede reintentar. |
-| `endpoint_not_deployed` | La ruta `/deals` en Cloud Run aun no esta desplegada. El intento queda registrado para replay cuando el deploy aterrice. |
+| `endpoint_not_deployed` | Estado historico pre-go-live de TASK-572. Quedo registrado antes del deploy del `POST /deals` y sirve para replay/manual recovery. |
 
 ## Valores por defecto (TASK-571)
 
@@ -149,7 +149,7 @@ El sistema retorna el resultado del intento anterior sin crear un deal nuevo. Es
 
 **¿Que pasa si el Cloud Run `/deals` no esta desplegado?**
 
-El sistema persiste el intento como `endpoint_not_deployed` y muestra un toast de advertencia. Cuando el deploy aterrice, un worker de retry (follow-up) tomara estos intentos y los procesara. Mientras tanto el intento no se pierde.
+Ese era el gap original de TASK-539 y quedo cerrado el 2026-04-22 con TASK-572. Los intentos historicos previos al go-live pueden seguir existiendo como `endpoint_not_deployed`, pero ya no es el comportamiento esperado del sistema.
 
 **¿Que pasa si pido 2 veces el mismo deal por error (doble-click)?**
 
@@ -165,19 +165,17 @@ En la misma transaccion que persiste la attempt como `completed`. Si algo falla 
 
 ## Limitaciones conocidas
 
-1. **No se crea `contact` association** — los contactos de HubSpot quedan no asociados en esta fase. Follow-up: resolver `contact_identity_profile_id` desde la quote.
+1. **El caller actual no envia `hubspotContactId`** — el servicio Cloud Run ya soporta deal ↔ contact opcional, pero el flujo del Quote Builder aun no resuelve automaticamente el contacto seleccionado de la quote.
 2. **No se crean lineas del deal** — el deal se crea vacio. Las quotations siguen siendo el source de detalle.
-3. **No hay retry automatico de `failed` / `endpoint_not_deployed`** — el operador debe reintentar manualmente desde el cotizador. Follow-up: retry worker.
+3. **No hay retry automatico de `failed` ni replay del historico `endpoint_not_deployed`** — el operador debe reintentar manualmente desde el cotizador. Follow-up: retry worker / replay lane.
 4. **Approval workflow genérico no existe** — hoy el `pending_approval` queda registrado pero no hay UI para aprobar. Sales Lead recibe el evento pero tiene que actuar via otro canal. Follow-up: workflow generico de approvals.
 
 ## Follow-ups declarados
 
-1. Deploy de `POST /deals` en el Cloud Run `hubspot-greenhouse-integration`.
-2. Crear custom property `gh_deal_origin` en el HubSpot portal.
-3. Workflow genérico de approval (para deals, no solo quotations).
-4. Resolucion automatica de `ownerHubspotUserId` desde `identity_profile_source_links`.
-5. Admin Center surface para listar intentos en `failed` / `endpoint_not_deployed` con boton de retry manual.
-6. Bidirectional update (editar deal desde Greenhouse) — TASK-540+.
+1. Workflow genérico de approval (para deals, no solo quotations).
+2. Resolucion automatica de `ownerHubspotUserId` desde `identity_profile_source_links`.
+3. Admin Center surface para listar intentos en `failed` / historico `endpoint_not_deployed` con boton de retry manual.
+4. Bidirectional update (editar deal desde Greenhouse) — TASK-540+.
 
 > Detalle tecnico:
 > - Comando: [src/lib/commercial/party/commands/create-deal-from-quote-context.ts](../../../src/lib/commercial/party/commands/create-deal-from-quote-context.ts)
