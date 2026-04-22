@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 from typing import Any
 
@@ -162,6 +164,21 @@ def build_product_profile(product: dict[str, Any]) -> dict[str, Any]:
             "sourceObjectType": "product",
             "sourceObjectId": str(product.get("id")),
         },
+    }
+
+
+def build_product_reconcile_item(product: dict[str, Any]) -> dict[str, Any]:
+    props = product.get("properties") or {}
+    return {
+        "hubspotProductId": str(product.get("id")),
+        "gh_product_code": props.get("gh_product_code"),
+        "gh_source_kind": props.get("gh_source_kind"),
+        "gh_last_write_at": props.get("gh_last_write_at"),
+        "name": props.get("name") or props.get("hs_product_name"),
+        "sku": props.get("hs_sku"),
+        "price": _safe_number(props.get("price")),
+        "description": props.get("description") or props.get("hs_product_description"),
+        "isArchived": bool(product.get("archived")),
     }
 
 

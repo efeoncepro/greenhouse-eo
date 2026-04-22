@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 import requests
@@ -235,30 +237,68 @@ class HubSpotClient:
         "hs_recurring_billing_period", "hs_recurring_billing_frequency",
         "createdate", "hs_lastmodifieddate",
     ]
+    PRODUCT_CUSTOM_PROPERTIES = [
+        "gh_product_code",
+        "gh_source_kind",
+        "gh_last_write_at",
+        "gh_archived_by_greenhouse",
+        "gh_business_line",
+    ]
+    RECONCILE_PRODUCT_PROPERTIES = PRODUCT_PROPERTIES + PRODUCT_CUSTOM_PROPERTIES
+
+    @staticmethod
+    def _unique_properties(properties: list[str]) -> list[str]:
+        seen: set[str] = set()
+        deduped: list[str] = []
+        for prop in properties:
+            if prop in seen:
+                continue
+            seen.add(prop)
+            deduped.append(prop)
+        return deduped
+
+    def list_products_page(
+        self,
+        *,
+        limit: int = 100,
+        after: str | None = None,
+        archived: bool = False,
+        properties: list[str] | None = None,
+    ) -> dict[str, Any]:
+        props = self._unique_properties(properties or self.PRODUCT_PROPERTIES)
+        params: dict[str, str | int | bool] = {
+            "limit": limit,
+            "properties": ",".join(props),
+            "archived": str(bool(archived)).lower(),
+        }
+        if after:
+            params["after"] = after
+
+        response = self.session.get(
+            f"{HUBSPOT_API}/crm/v3/objects/products",
+            headers=self._headers(),
+            params=params,
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+
+        return response.json()
 
     def list_all_products(self, *, properties: list[str] | None = None) -> list[dict[str, Any]]:
-        props = properties or self.PRODUCT_PROPERTIES
+        props = self._unique_properties(properties or self.PRODUCT_PROPERTIES)
         results: list[dict[str, Any]] = []
         after: str | None = None
 
         while True:
-            params: dict[str, str | int] = {"limit": 100, "properties": ",".join(props)}
-            if after:
-                params["after"] = after
-
-            response = self.session.get(
-                f"{HUBSPOT_API}/crm/v3/objects/products",
-                headers=self._headers(),
-                params=params,
-                timeout=self.timeout_seconds,
+            payload = self.list_products_page(
+                limit=100,
+                after=after,
+                properties=props,
             )
-            if response.status_code >= 400:
-                raise HubSpotIntegrationError(
-                    _parse_error(response),
-                    status_code=response.status_code,
-                )
-
-            payload = response.json()
             results.extend(payload.get("results") or [])
 
             paging = payload.get("paging") or {}
@@ -270,7 +310,7 @@ class HubSpotClient:
         return results
 
     def get_product(self, product_id: str, *, properties: list[str] | None = None) -> dict[str, Any]:
-        props = properties or self.PRODUCT_PROPERTIES
+        props = self._unique_properties(properties or self.PRODUCT_PROPERTIES)
         response = self.session.get(
             f"{HUBSPOT_API}/crm/v3/objects/products/{product_id}",
             headers=self._headers(),
@@ -311,6 +351,18 @@ class HubSpotClient:
                 status_code=response.status_code,
             )
         return response.json()
+
+    def archive_product(self, product_id: str) -> None:
+        response = self.session.delete(
+            f"{HUBSPOT_API}/crm/v3/objects/products/{product_id}",
+            headers=self._headers(),
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
 
     # ------------------------------------------------------------------
     # Line Items (read for quotes/deals)

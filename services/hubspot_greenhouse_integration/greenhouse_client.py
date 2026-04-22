@@ -1,6 +1,7 @@
-from typing import Any
+from __future__ import annotations
 
 import requests
+from typing import Any
 
 
 class GreenhouseIntegrationError(RuntimeError):

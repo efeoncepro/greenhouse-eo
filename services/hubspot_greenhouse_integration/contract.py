@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 
@@ -39,10 +41,47 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "method": "GET",
                 "path": "/services/{hubspotServiceId}",
             },
+            "product_catalog": {
+                "method": "GET",
+                "path": "/products",
+            },
+            "product_detail": {
+                "method": "GET",
+                "path": "/products/{hubspotProductId}",
+            },
+            "product_create": {
+                "method": "POST",
+                "path": "/products",
+            },
+            "product_update": {
+                "method": "PATCH",
+                "path": "/products/{hubspotProductId}",
+            },
+            "product_archive": {
+                "method": "POST",
+                "path": "/products/{hubspotProductId}/archive",
+            },
+            "product_reconcile": {
+                "method": "GET",
+                "path": "/products/reconcile",
+            },
             "hubspot_webhook": {
                 "method": "POST",
                 "path": "/webhooks/hubspot",
             },
+        },
+        "writeAuth": {
+            "type": "integration_token",
+            "headers": [
+                "Authorization: Bearer <GREENHOUSE_INTEGRATION_API_TOKEN>",
+                "x-greenhouse-integration-key: <GREENHOUSE_INTEGRATION_API_TOKEN>",
+            ],
+            "appliesTo": [
+                "company_lifecycle_update",
+                "product_create",
+                "product_update",
+                "product_archive",
+            ],
         },
         "companyModel": {
             "identity": [
@@ -90,6 +129,31 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "hsLeadStatus",
             ],
         },
+        "productModel": {
+            "identity": [
+                "productId",
+                "hubspotProductId",
+                "name",
+                "sku",
+            ],
+            "pricing": [
+                "unitPrice",
+                "costOfGoodsSold",
+                "tax",
+            ],
+            "billing": [
+                "isRecurring",
+                "frequency",
+                "periodCount",
+            ],
+            "customProperties": [
+                "gh_product_code",
+                "gh_source_kind",
+                "gh_last_write_at",
+                "gh_archived_by_greenhouse",
+                "gh_business_line",
+            ],
+        },
         "sourceFields": {
             "companies": [
                 "name",
@@ -131,6 +195,25 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "hs_lead_status",
                 "company",
             ],
+            "products": [
+                "name",
+                "hs_sku",
+                "description",
+                "price",
+                "cost_of_goods_sold",
+                "hs_cost_price",
+                "tax",
+                "hs_recurring",
+                "hs_recurring_billing_period",
+                "hs_recurring_billing_frequency",
+                "createdate",
+                "hs_lastmodifieddate",
+                "gh_product_code",
+                "gh_source_kind",
+                "gh_last_write_at",
+                "gh_archived_by_greenhouse",
+                "gh_business_line",
+            ],
             "services": [
                 "ef_space_id",
                 "ef_organization_id",
@@ -156,6 +239,7 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
         "decisionRules": {
             "reuseStandardCompanyFields": True,
             "createCustomCompanyPropertyOnlyIfMissingAtCompanyLevel": True,
+            "restrictProductCustomPropertiesToGhPrefix": True,
         },
         "realtime": {
             "supported": bool(

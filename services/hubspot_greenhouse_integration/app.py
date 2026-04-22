@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from hmac import compare_digest
 from typing import Any
 
@@ -14,6 +16,7 @@ try:
         build_line_item_profile,
         build_owner_profile,
         build_product_profile,
+        build_product_reconcile_item,
         build_quote_profile,
         build_service_profile,
     )
@@ -30,7 +33,7 @@ except ImportError:
     from contract import build_contract
     from greenhouse_client import GreenhouseClient
     from hubspot_client import HubSpotClient, HubSpotIntegrationError
-    from models import build_company_profile, build_contact_profile, build_line_item_profile, build_owner_profile, build_product_profile, build_quote_profile, build_service_profile
+    from models import build_company_profile, build_contact_profile, build_line_item_profile, build_owner_profile, build_product_profile, build_product_reconcile_item, build_quote_profile, build_service_profile
     from webhooks import (
         extract_company_ids_from_webhook_events,
         parse_webhook_events,
@@ -73,6 +76,43 @@ def create_app() -> Flask:
         if not provided or not compare_digest(provided, expected):
             return jsonify({"error": "Unauthorized"}), 401
 
+        return None
+
+    def _normalize_hubspot_write_value(value: Any) -> Any:
+        if value is None:
+            return ""
+        return value
+
+    def _extract_greenhouse_custom_properties(body: dict[str, Any]) -> dict[str, Any]:
+        raw = body.get("customProperties")
+        if raw is None:
+            return {}
+        if not isinstance(raw, dict):
+            raise ValueError("customProperties must be an object")
+
+        props: dict[str, Any] = {}
+        for key, value in raw.items():
+            prop_name = str(key or "").strip()
+            if not prop_name.startswith("gh_"):
+                raise ValueError("customProperties only supports gh_* keys")
+            if isinstance(value, (dict, list, tuple, set)):
+                raise ValueError(f"customProperties[{prop_name}] must be a scalar value")
+            props[prop_name] = _normalize_hubspot_write_value(value)
+        return props
+
+    def _parse_reconcile_cursor(raw_cursor: str | None) -> tuple[str, str | None]:
+        cursor = (raw_cursor or "").strip()
+        if not cursor:
+            return "active", None
+
+        stage, _, after = cursor.partition(":")
+        if stage not in {"active", "archived"}:
+            raise ValueError("Invalid cursor")
+        return stage, after or None
+
+    def _next_reconcile_cursor(stage: str, after: str | None) -> str | None:
+        if after:
+            return f"{stage}:{after}"
         return None
 
     @app.get("/health")
@@ -269,7 +309,9 @@ def create_app() -> Flask:
     def product_catalog():
         try:
             client = _client()
-            products_raw = client.list_all_products()
+            products_raw = client.list_all_products(
+                properties=build_contract(app.config)["sourceFields"]["products"],
+            )
             products = [build_product_profile(p) for p in products_raw]
             return jsonify({"count": len(products), "products": products})
         except HubSpotIntegrationError as exc:
@@ -280,7 +322,10 @@ def create_app() -> Flask:
     @app.get("/products/<product_id>")
     def product_detail(product_id: str):
         try:
-            product = _client().get_product(product_id)
+            product = _client().get_product(
+                product_id,
+                properties=build_contract(app.config)["sourceFields"]["products"],
+            )
             return jsonify(build_product_profile(product))
         except HubSpotIntegrationError as exc:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (
@@ -289,6 +334,10 @@ def create_app() -> Flask:
 
     @app.post("/products")
     def create_product_endpoint():
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
         try:
             body = request.get_json(force=True) or {}
             name = body.get("name")
@@ -314,6 +363,7 @@ def create_app() -> Flask:
                 props["hs_recurring_billing_period"] = body["billingFrequency"]
             if body.get("billingPeriodCount") is not None:
                 props["hs_recurring_billing_frequency"] = body["billingPeriodCount"]
+            props.update(_extract_greenhouse_custom_properties(body))
 
             created = _client().create_product(props)
             created_props = created.get("properties") or {}
@@ -322,6 +372,8 @@ def create_app() -> Flask:
                 "name": created_props.get("name"),
                 "sku": created_props.get("hs_sku"),
             }), 201
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
         except HubSpotIntegrationError as exc:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (
                 exc.status_code or 502
@@ -329,25 +381,109 @@ def create_app() -> Flask:
 
     @app.patch("/products/<product_id>")
     def update_product_endpoint(product_id: str):
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
         try:
             body = request.get_json(force=True) or {}
             props: dict[str, Any] = {}
-            if body.get("name"):
-                props["name"] = body["name"]
-            if body.get("sku"):
-                props["hs_sku"] = body["sku"]
-            if body.get("description") is not None:
-                props["description"] = body["description"]
-            if body.get("unitPrice") is not None:
-                props["price"] = body["unitPrice"]
-            if body.get("costOfGoodsSold") is not None:
-                props["cost_of_goods_sold"] = body["costOfGoodsSold"]
+            if body.get("isArchived") is True:
+                return jsonify({"error": "Use POST /products/<id>/archive to archive a product"}), 400
+
+            if "name" in body:
+                props["name"] = _normalize_hubspot_write_value(body["name"])
+            if "sku" in body:
+                props["hs_sku"] = _normalize_hubspot_write_value(body["sku"])
+            if "description" in body:
+                props["description"] = _normalize_hubspot_write_value(body["description"])
+            if "unitPrice" in body:
+                props["price"] = _normalize_hubspot_write_value(body["unitPrice"])
+            if "costOfGoodsSold" in body:
+                props["cost_of_goods_sold"] = _normalize_hubspot_write_value(body["costOfGoodsSold"])
+            if "tax" in body:
+                props["tax"] = _normalize_hubspot_write_value(body["tax"])
+            if "isRecurring" in body:
+                props["hs_recurring"] = _normalize_hubspot_write_value(body["isRecurring"])
+            if "billingFrequency" in body:
+                props["hs_recurring_billing_period"] = _normalize_hubspot_write_value(body["billingFrequency"])
+            if "billingPeriodCount" in body:
+                props["hs_recurring_billing_frequency"] = _normalize_hubspot_write_value(body["billingPeriodCount"])
+            props.update(_extract_greenhouse_custom_properties(body))
 
             if not props:
                 return jsonify({"error": "No fields to update"}), 400
 
             updated = _client().update_product(product_id, props)
-            return jsonify(build_product_profile(updated))
+            return jsonify(
+                {
+                    "status": "updated",
+                    "hubspotProductId": str(updated.get("id") or product_id),
+                    "fieldsWritten": list(props.keys()),
+                }
+            )
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.post("/products/<product_id>/archive")
+    def archive_product_endpoint(product_id: str):
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
+        try:
+            _client().archive_product(product_id)
+            return jsonify(
+                {
+                    "status": "archived",
+                    "hubspotProductId": product_id,
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.get("/products/reconcile")
+    def reconcile_products():
+        try:
+            limit = request.args.get("limit", default=100, type=int) or 100
+            limit = max(1, min(limit, 100))
+            include_archived = (
+                request.args.get("includeArchived", "").strip().lower()
+                in {"1", "true", "yes"}
+            )
+            stage, after = _parse_reconcile_cursor(request.args.get("cursor"))
+            page = _client().list_products_page(
+                limit=limit,
+                after=after,
+                archived=(stage == "archived"),
+                properties=HubSpotClient.RECONCILE_PRODUCT_PROPERTIES,
+            )
+            items = [
+                build_product_reconcile_item(product)
+                for product in (page.get("results") or [])
+            ]
+
+            paging = page.get("paging") or {}
+            next_page = paging.get("next") or {}
+            next_cursor = _next_reconcile_cursor(stage, next_page.get("after"))
+            if not next_cursor and include_archived and stage == "active":
+                next_cursor = "archived:"
+
+            return jsonify(
+                {
+                    "status": "ok",
+                    "items": items,
+                    "nextCursor": next_cursor,
+                }
+            )
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
         except HubSpotIntegrationError as exc:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (
                 exc.status_code or 502
