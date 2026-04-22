@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
-import {
-  isPartyLifecycleSyncEnabled,
-  syncHubSpotCompanies
-} from '@/lib/hubspot/sync-hubspot-companies'
+import { syncHubSpotCompanies } from '@/lib/hubspot/sync-hubspot-companies'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,13 +14,6 @@ export async function GET(request: Request) {
 
   if (!authorized) {
     return errorResponse
-  }
-
-  if (!isPartyLifecycleSyncEnabled()) {
-    return NextResponse.json({
-      skipped: true,
-      reason: 'GREENHOUSE_PARTY_LIFECYCLE_SYNC is disabled'
-    })
   }
 
   try {

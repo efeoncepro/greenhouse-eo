@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — TASK-543 cleanup final del Commercial Party Lifecycle (Codex)
+
+- **Scope:** cerrar la Fase I del programa `TASK-534` removiendo el rollout legacy que sobrevivía en el selector unificado del Quote Builder y en el inbound HubSpot Companies sync.
+- **Implementacion shipped**
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx`
+    - el selector unificado queda como único carril para `mode === 'create'`
+    - se elimina la dependencia a `session.user.featureFlags`
+  - `src/lib/hubspot/sync-hubspot-companies.ts`
+    - se remueve el env guard `GREENHOUSE_PARTY_LIFECYCLE_SYNC`
+    - el summary queda siempre `enabled: true` en runtime
+  - `src/app/api/cron/hubspot-companies-sync/route.ts`
+    - se elimina el skip temprano por flag
+  - se eliminan `src/lib/commercial/party/feature-flags.ts` y su test
+- **Decision arquitectonica**
+  - `GET /api/commercial/organizations/[id]/contacts` y `GET/POST /api/commercial/organizations/[id]/deals` siguen siendo canónicos; la cleanup no toca esos contratos
+  - el único legacy real era el branch por flags, no el subárbol `organizations/[id]/*`
+- **Docs / trackers cerrados**
+  - arquitectura viva: `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - documentación funcional: `docs/documentation/finance/cotizador.md`, `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - trackers: `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`
+  - tasks movidas a `complete/`: `TASK-543`, umbrella `TASK-534`
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/app/api/cron/hubspot-companies-sync/route.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - `rg "new Pool\\(" src` → solo `src/lib/postgres/client.ts`
+
 ## Sesion 2026-04-22 — HubSpot custom properties declarative reconcile hardening (Codex)
 
 - **Scope:** unificar el provisioning de custom properties HubSpot en Greenhouse y cerrar el gap histórico entre properties de `companies`, `deals`, `products` y `services`, dejando `contacts` soportado por el engine sin inventar un contrato inexistente.

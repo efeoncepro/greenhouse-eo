@@ -587,7 +587,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-531` | `complete` | Income / Invoice Tax Convergence | `docs/tasks/complete/TASK-531-income-invoice-tax-convergence.md` |
 | `TASK-532` | `to-do` | Purchase VAT Recoverability | `docs/tasks/to-do/TASK-532-purchase-vat-recoverability.md` |
 | `TASK-533` | `complete` | Chile VAT Ledger & Monthly Position | `docs/tasks/complete/TASK-533-chile-vat-ledger-monthly-position.md` |
-| `TASK-534` | `to-do` | Commercial Party Lifecycle & Quote-to-Cash Program (umbrella) | `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md` |
+| `TASK-534` | `complete` | Commercial Party Lifecycle & Quote-to-Cash Program (umbrella) | `docs/tasks/complete/TASK-534-commercial-party-lifecycle-program.md` |
 | `TASK-535` | `complete` | Party Lifecycle Schema & Commands Foundation (Fase A) | `docs/tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md` |
 | `TASK-536` | `complete` | HubSpot Companies Inbound Prospect Sync (Fase B) | `docs/tasks/complete/TASK-536-hubspot-companies-inbound-prospect-sync.md` |
 | `TASK-537` | `complete` | Party Search & Adoption Endpoints (Fase C) | `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md` |
@@ -596,7 +596,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-540` | `complete` | HubSpot Lifecycle Outbound Sync (Fase F) | `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md` |
 | `TASK-541` | `complete` | Quote-to-Cash Atomic Choreography (Fase G) | `docs/tasks/complete/TASK-541-quote-to-cash-atomic-choreography.md` |
 | `TASK-542` | `complete` | Party Lifecycle Admin Dashboards (Fase H) | `docs/tasks/complete/TASK-542-party-lifecycle-admin-dashboards.md` |
-| `TASK-543` | `to-do` | Party Lifecycle Deprecation & Flag Cleanup (Fase I) | `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md` |
+| `TASK-543` | `complete` | Party Lifecycle Deprecation & Flag Cleanup (Fase I) | `docs/tasks/complete/TASK-543-party-lifecycle-deprecation-flag-cleanup.md` |
 | `TASK-544` | `to-do` | Commercial Product Catalog Sync Program (umbrella) | `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md` |
 | `TASK-545` | `to-do` | Product Catalog Schema & Materializer Foundation (Fase A) | `docs/tasks/to-do/TASK-545-product-catalog-schema-materializer-foundation.md` |
 | `TASK-546` | `to-do` | Product Catalog Source Handlers & Event Homogenization (Fase B) | `docs/tasks/to-do/TASK-546-product-catalog-source-handlers-events.md` |

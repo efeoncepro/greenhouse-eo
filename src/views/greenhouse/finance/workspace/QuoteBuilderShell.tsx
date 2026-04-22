@@ -4,8 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { useSession } from 'next-auth/react'
-
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
@@ -20,7 +18,6 @@ import { toast } from 'react-toastify'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
-import { isUnifiedPartySelectorEnabled } from '@/lib/commercial/party/feature-flags'
 import { requiresHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
 import type {
   PricingEngineInputV2,
@@ -326,7 +323,6 @@ const QuoteBuilderShell = ({
   onSubmit
 }: QuoteBuilderShellProps) => {
   const router = useRouter()
-  const { data: session } = useSession()
   const editorRef = useRef<QuoteLineItemsEditorHandle>(null)
 
   const initialBuilderState = useMemo<BuilderContextState>(
@@ -393,8 +389,7 @@ const QuoteBuilderShell = ({
     employmentTypes: []
   })
 
-  const unifiedPartySelectorEnabled =
-    mode === 'create' && isUnifiedPartySelectorEnabled(session?.user?.featureFlags)
+  const unifiedPartySelectorEnabled = mode === 'create'
 
   const {
     query: partySearchQuery,

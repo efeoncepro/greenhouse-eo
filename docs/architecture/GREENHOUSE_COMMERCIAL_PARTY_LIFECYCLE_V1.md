@@ -1,11 +1,23 @@
 # Greenhouse EO — Commercial Party Lifecycle Architecture V1
 
-> **Version:** 1.2
+> **Version:** 1.3
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
-> **Ultima actualizacion:** 2026-04-21 por Codex — Fase D shipped
+> **Ultima actualizacion:** 2026-04-22 por Codex — TASK-543 cleanup de flags post-rollout
 > **Audience:** Backend engineers, product owners, agentes que implementen features de pre-venta, quote builder, HubSpot sync o revenue pipeline
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`, `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## Delta 2026-04-22 — TASK-543 post-rollout cleanup
+
+El selector unificado del Quote Builder y el inbound HubSpot Companies sync dejan de depender de flags de rollout. `TASK-543` remueve `GREENHOUSE_PARTY_SELECTOR_UNIFIED` y `GREENHOUSE_PARTY_LIFECYCLE_SYNC` del runtime Greenhouse: el builder de creación usa el selector unificado como comportamiento default y el cron `GET /api/cron/hubspot-companies-sync` deja de saltarse por env guard.
+
+### Efecto operativo
+
+1. `organizationId` sigue siendo el handshake canónico hacia contactos, deals y quotations; no cambia el contrato downstream.
+2. El cleanup NO remueve `GET /api/commercial/organizations/[id]/contacts` ni `GET/POST /api/commercial/organizations/[id]/deals`; esos endpoints siguen siendo canónicos.
+3. La documentación histórica de PR-B / PR-D se interpreta como rollout inicial, no como estado runtime actual.
 
 ---
 
@@ -21,7 +33,7 @@ La primera surface visible del programa ya consume el carril unificado: el `Quot
 | Surface contextual | `src/components/greenhouse/pricing/QuoteContextStrip.tsx` |
 | Primitive extendido | `src/components/greenhouse/primitives/ContextChip.tsx` |
 | Hook cliente | `src/hooks/useParties.ts` |
-| Flag | `GREENHOUSE_PARTY_SELECTOR_UNIFIED` leída desde `session.user.featureFlags` |
+| Runtime final | selector unificado default-on en `QuoteBuilderShell` create mode; sin feature flag |
 
 ### Notas de diseño
 
@@ -44,7 +56,7 @@ HubSpot Companies ya no entra al lifecycle comercial solo por `closed-won` o boo
 | Writer de transición | `promoteParty()` |
 | Invariante `active_client` | `instantiateClientForParty()` si falta `client_id` |
 | Tracking | `greenhouse_sync.source_sync_runs` + `greenhouse_sync.source_sync_watermarks` |
-| Guard rail | flag `GREENHOUSE_PARTY_LIFECYCLE_SYNC` |
+| Runtime final | cron/sync inbound default-on; sin env guard de rollout |
 
 ### Notas de diseño
 
@@ -544,7 +556,7 @@ Rollback: si cualquier step falla, toda la transacción abortea; no hay estados 
 
 ### 7.1 Selector unificado del Quote Builder
 
-Hoy: no existe `GET /api/commercial/parties/search`; las surfaces relacionadas solo leen organizations ya materializadas (`GET /api/organizations` en admin/internal y `GET /api/commercial/organizations/[id]/contacts` para el Quote Builder).
+Hoy: `GET /api/commercial/parties/search` ya existe y es el carril canónico del selector unificado del Quote Builder. Las surfaces complementarias siguen consumiendo `GET /api/commercial/organizations/[id]/contacts` y `GET/POST /api/commercial/organizations/[id]/deals` una vez resuelto el `organizationId`.
 
 Target: **`GET /api/commercial/parties/search?q=&includeStages=`** unifica dos fuentes:
 
@@ -682,9 +694,9 @@ Toda invocación de los comandos escribe a `greenhouse_core.commercial_operation
 Orden recomendado para minimizar blast radius:
 
 1. **PR-A** (solo código, flag off): comandos canónicos, helpers, tipos, tests unitarios. Nada visible al usuario.
-2. **PR-B**: extensión del inbound sync de HubSpot companies — empieza a poblar prospects. Feature flag `GREENHOUSE_PARTY_LIFECYCLE_SYNC=true`.
+2. **PR-B**: extensión del inbound sync de HubSpot companies — empieza a poblar prospects. El rollout inicial usó `GREENHOUSE_PARTY_LIFECYCLE_SYNC`; `TASK-543` luego lo removió del runtime.
 3. **PR-C**: endpoints `/parties/search` + `/parties/adopt`. Todavía no expuestos en UI.
-4. **PR-D**: Quote Builder consume selector unificado. Flag UI `GREENHOUSE_PARTY_SELECTOR_UNIFIED=true`.
+4. **PR-D**: Quote Builder consume selector unificado. El rollout inicial usó `GREENHOUSE_PARTY_SELECTOR_UNIFIED`; `TASK-543` luego lo removió del runtime.
 5. **PR-E**: endpoint `/organizations/:id/deals` + drawer "Crear deal nuevo" en Quote Builder.
 6. **PR-F**: outbound sync HubSpot lifecycle property + projection.
 7. **PR-G**: comando `convertQuoteToCash` + wiring desde `contract.created` y `deal.won`.

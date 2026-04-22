@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `umbrella`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Programa cerrado end-to-end`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none`
@@ -28,6 +28,15 @@ Programa oficial para formalizar el lifecycle canonico de la parte comercial (pr
 
 - **Fase A cerrada.** `TASK-535` completada: schema DDL + comandos CQRS (`promoteParty`, `createPartyFromHubSpotCompany`, `instantiateClientForParty`) + backfill idempotente + 5 eventos outbox + 6 capabilities + HubSpot mapping con env override. Desbloquea Fase B. Ver `docs/tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md`.
 - Open question #1 (dual-role) queda diferida: `is_dual_role` expuesto en schema (default false); decisión final post-backfill en data real.
+
+## Delta 2026-04-22 — Programa cerrado por TASK-543
+
+- `TASK-543` removió el branch legacy del selector unificado y el env guard del inbound HubSpot Companies sync.
+- El runtime final queda convergido:
+  - Quote Builder create usa el selector unificado como carril default
+  - `GET /api/cron/hubspot-companies-sync` corre sin `GREENHOUSE_PARTY_LIFECYCLE_SYNC`
+  - endpoints `GET /api/commercial/organizations/[id]/contacts` y `GET/POST /api/commercial/organizations/[id]/deals` permanecen como contratos canónicos
+- La narrativa de rollout behind-flags queda solo como historia del programa; no como estado runtime vigente.
 
 ## Delta 2026-04-21 — Fase F aterriza localmente
 
@@ -130,7 +139,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md`
 - `docs/tasks/complete/TASK-541-quote-to-cash-atomic-choreography.md`
 - `docs/tasks/complete/TASK-542-party-lifecycle-admin-dashboards.md`
-- `docs/tasks/to-do/TASK-543-party-lifecycle-deprecation-flag-cleanup.md`
+- `docs/tasks/complete/TASK-543-party-lifecycle-deprecation-flag-cleanup.md`
 
 ## Current Repo State
 
@@ -171,7 +180,7 @@ Reglas obligatorias:
 
 ### Slice 2 — HubSpot inbound extension
 
-- `TASK-536` (Fase B) cerrada: inbound `greenhouse_crm.companies -> organizations` con cron incremental/full, tracking `source_sync_runs`/watermarks y flag `GREENHOUSE_PARTY_LIFECYCLE_SYNC`.
+- `TASK-536` (Fase B) cerrada: inbound `greenhouse_crm.companies -> organizations` con cron incremental/full y tracking `source_sync_runs`/watermarks. El env guard inicial se limpia en `TASK-543`.
 
 ### Slice 3 — Party search + adoption endpoints
 
@@ -179,7 +188,7 @@ Reglas obligatorias:
 
 ### Slice 4 — Quote Builder unified selector
 
-- `TASK-538` (Fase D) shipped: Quote Builder consume el selector unificado. Flag UI `GREENHOUSE_PARTY_SELECTOR_UNIFIED`. Candidates HubSpot se adoptan on-select y solo aparecen en V1 para `efeonce_internal`.
+- `TASK-538` (Fase D) shipped: Quote Builder consume el selector unificado. Candidates HubSpot se adoptan on-select y solo aparecen en V1 para `efeonce_internal`. El flag UI inicial se limpia en `TASK-543`.
 
 ### Slice 5 — Inline deal creation
 

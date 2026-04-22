@@ -2,6 +2,14 @@
 
 ## 2026-04-22
 
+### 2026-04-22 — TASK-543 cierra el rollout legacy del Commercial Party Lifecycle
+
+- El Quote Builder de creación usa el selector unificado de parties como comportamiento canónico por defecto; ya no depende de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`.
+- El inbound `greenhouse_crm.companies -> organizations` queda default-on: `sync-hubspot-companies.ts` y `GET /api/cron/hubspot-companies-sync` ya no se saltan por `GREENHOUSE_PARTY_LIFECYCLE_SYNC`.
+- Se elimina el helper legacy `src/lib/commercial/party/feature-flags.ts` y su test asociado.
+- Se corrige la documentación viva para dejar explícito que `GET /api/commercial/organizations/[id]/contacts` y `GET/POST /api/commercial/organizations/[id]/deals` siguen siendo endpoints canónicos; lo removido fue solo el rollout legacy por flags.
+- `TASK-543` y la umbrella `TASK-534` quedan movidas a `docs/tasks/complete/`.
+
 ### 2026-04-22 — TASK-563 cierra el outbound de Product Catalog hacia HubSpot
 
 - Greenhouse EO ya validó de punta a punta el carril `sellable_role -> product_catalog -> HubSpot Products` en staging contra HubSpot sandbox.

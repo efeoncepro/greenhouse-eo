@@ -13,7 +13,6 @@ import {
   type LifecycleStage
 } from '@/lib/commercial/party'
 
-const HUBSPOT_COMPANIES_SYNC_FLAG = 'GREENHOUSE_PARTY_LIFECYCLE_SYNC'
 const SOURCE_SYSTEM = 'hubspot'
 const SOURCE_OBJECT_TYPE = 'companies_party'
 const WATERMARK_KEY = 'last_source_updated_at'
@@ -79,12 +78,6 @@ export interface HubSpotCompaniesSyncSummary {
 }
 
 const actor = { system: true, reason: 'hubspot_companies_sync' } as const
-
-const normalizeBoolean = (value: string | undefined): boolean =>
-  typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
-
-export const isPartyLifecycleSyncEnabled = (): boolean =>
-  normalizeBoolean(process.env[HUBSPOT_COMPANIES_SYNC_FLAG])
 
 const toIso = (value: Date | string | null | undefined): string | null => {
   if (!value) return null
@@ -270,25 +263,6 @@ export const syncHubSpotCompanies = async (
 ): Promise<HubSpotCompaniesSyncSummary> => {
   const dryRun = options.dryRun ?? false
   const fullResync = options.fullResync ?? false
-  const enabled = isPartyLifecycleSyncEnabled()
-
-  if (!enabled) {
-    return {
-      enabled: false,
-      dryRun,
-      fullResync,
-      runId: null,
-      watermarkStart: null,
-      watermarkEnd: null,
-      processed: 0,
-      created: 0,
-      promoted: 0,
-      clientsInstantiated: 0,
-      skipped: 0,
-      errors: []
-    }
-  }
-
   const watermarkStart = fullResync ? null : await getWatermark()
   const runId = `hubspot-companies-${randomUUID()}`
 

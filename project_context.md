@@ -350,7 +350,7 @@
   - helper `src/lib/hubspot/sync-hubspot-companies.ts`
   - cron `GET /api/cron/hubspot-companies-sync`
   - schedule Vercel `*/10 * * * *` incremental + `0 3 * * *` full (`?full=true`)
-  - flag runtime `GREENHOUSE_PARTY_LIFECYCLE_SYNC` (default off)
+  - rollout inicial detrás de `GREENHOUSE_PARTY_LIFECYCLE_SYNC` (removido luego por `TASK-543`)
 - Contrato operativo:
   - el source-of-work local es `greenhouse_crm.companies`, no un full-list live read a Cloud Run
   - toda alta de party sigue pasando por `createPartyFromHubSpotCompany`
@@ -358,6 +358,13 @@
   - si HubSpot mapea a `active_client`, el pipeline instancia `client_id` con `instantiateClientForParty` para respetar el invariante del lifecycle
   - el tracking queda en `greenhouse_sync.source_sync_runs` + `greenhouse_sync.source_sync_watermarks`
   - `provider_only`, `disqualified` y `churned` quedan protegidos contra degradación inbound
+
+## Delta 2026-04-22 TASK-543 cierra el rollout legacy del Party Lifecycle
+
+- `QuoteBuilderShell` ya no lee `session.user.featureFlags` para el selector de organizations: create mode usa el selector unificado como carril default.
+- `src/lib/hubspot/sync-hubspot-companies.ts` y `GET /api/cron/hubspot-companies-sync` quedan default-on sin `GREENHOUSE_PARTY_LIFECYCLE_SYNC`.
+- Se elimina `src/lib/commercial/party/feature-flags.ts`; no queda helper runtime para `GREENHOUSE_PARTY_SELECTOR_UNIFIED`.
+- Regla importante para futuros cambios: no intentar “limpiar” `GET /api/commercial/organizations/[id]/contacts` ni `GET/POST /api/commercial/organizations/[id]/deals` como si fueran legacy; siguen siendo el contrato canónico downstream del `organizationId`.
 
 # project_context.md
 

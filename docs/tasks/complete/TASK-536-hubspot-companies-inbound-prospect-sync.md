@@ -65,7 +65,7 @@ Reglas obligatorias:
 
 - `project_context.md`
 - `Handoff.md`
-- `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md`
+- `docs/tasks/complete/TASK-534-commercial-party-lifecycle-program.md`
 - `docs/tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md`
 
 ## Dependencies & Impact

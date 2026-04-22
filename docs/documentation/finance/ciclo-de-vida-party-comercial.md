@@ -151,12 +151,12 @@ Todos los eventos incluyen `commercial_party_id` — un identificador **estable 
 |---|---|---|
 | B | TASK-536 | Shipped. HubSpot companies nuevas se materializan como `prospect` automaticamente |
 | C | TASK-537 | Shipped. `GET /parties/search` + `POST /parties/adopt` ya listos. V1 usa `greenhouse_crm.companies` y expone `hubspot_candidate` solo para carril interno |
-| D | TASK-538 | Shipped. Quote Builder ya consume el selector unificado detras de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`; adopta candidates HubSpot on-select y mantiene fallback legacy |
+| D | TASK-538 | Shipped. Quote Builder ya consume el selector unificado como carril default; adopta candidates HubSpot on-select y preserva `organizationId` como anchor canónico |
 | E | TASK-539 | Shipped. Crear deal desde Greenhouse sin saltar a HubSpot |
 | F | TASK-540 | Shipped. Greenhouse ya propaga lifecycle a HubSpot, valida anti-ping-pong y deja trazabilidad de conflictos |
 | G | TASK-541 | Shipped. Quote-to-cash atomico: firmar contrato + promover a cliente + crear income, todo en una transaccion |
 | H | TASK-542 | Shipped. Admin Center: dashboards de funnel, conflictos de sync, detalle por party, transiciones manuales y sweep de inactivos |
-| I | TASK-543 | Deprecar flags y codigo legacy |
+| I | TASK-543 | Cleanup post-rollout: remover flags y branches legacy del selector/sync inbound |
 
 ## Ejemplos practicos
 

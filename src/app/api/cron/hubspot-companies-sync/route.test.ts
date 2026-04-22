@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireCronAuth = vi.fn()
 const mockCheckIntegrationReadiness = vi.fn()
-const mockIsPartyLifecycleSyncEnabled = vi.fn()
 const mockSyncHubSpotCompanies = vi.fn()
 
 vi.mock('@/lib/cron/require-cron-auth', () => ({
@@ -14,7 +13,6 @@ vi.mock('@/lib/integrations/readiness', () => ({
 }))
 
 vi.mock('@/lib/hubspot/sync-hubspot-companies', () => ({
-  isPartyLifecycleSyncEnabled: (...args: unknown[]) => mockIsPartyLifecycleSyncEnabled(...args),
   syncHubSpotCompanies: (...args: unknown[]) => mockSyncHubSpotCompanies(...args)
 }))
 
@@ -25,7 +23,6 @@ describe('GET /api/cron/hubspot-companies-sync', () => {
     vi.clearAllMocks()
     mockRequireCronAuth.mockReturnValue({ authorized: true, errorResponse: null })
     mockCheckIntegrationReadiness.mockResolvedValue({ ready: true })
-    mockIsPartyLifecycleSyncEnabled.mockReturnValue(true)
     mockSyncHubSpotCompanies.mockResolvedValue({
       enabled: true,
       dryRun: true,
@@ -52,20 +49,6 @@ describe('GET /api/cron/hubspot-companies-sync', () => {
 
     expect(response.status).toBe(401)
     expect(mockSyncHubSpotCompanies).not.toHaveBeenCalled()
-  })
-
-  it('skips when the lifecycle sync flag is disabled', async () => {
-    mockIsPartyLifecycleSyncEnabled.mockReturnValue(false)
-
-    const response = await GET(new Request('http://localhost/api/cron/hubspot-companies-sync'))
-    const body = await response.json()
-
-    expect(response.status).toBe(200)
-    expect(body).toMatchObject({
-      skipped: true,
-      reason: 'GREENHOUSE_PARTY_LIFECYCLE_SYNC is disabled'
-    })
-    expect(mockCheckIntegrationReadiness).not.toHaveBeenCalled()
   })
 
   it('passes dry/full query params to the sync helper', async () => {

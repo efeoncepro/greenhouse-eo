@@ -44,7 +44,7 @@ HubSpot Companies raw/conformed snapshot
 ### Reglas
 
 1. El inbound nuevo usa `greenhouse_crm.companies` como source-of-work local; no depende de un list endpoint live del servicio `hubspot-greenhouse-integration`.
-2. La cadencia canónica queda en `*/10 * * * *` para incremental y `0 3 * * *` para full resync, ambos detrás de `GREENHOUSE_PARTY_LIFECYCLE_SYNC`.
+2. La cadencia canónica queda en `*/10 * * * *` para incremental y `0 3 * * *` para full resync. El rollout inicial usó `GREENHOUSE_PARTY_LIFECYCLE_SYNC`; `TASK-543` removió ese env guard y el pipeline queda default-on.
 3. Toda creación de organization pasa por `createPartyFromHubSpotCompany`; toda promoción posterior pasa por `promoteParty`.
 4. `provider_only`, `disqualified` y `churned` se tratan como stages protegidos: el inbound no los degrada.
 5. Si HubSpot resuelve a `active_client`, el pipeline respeta el invariante del modelo y materializa `client_id` vía `instantiateClientForParty`.
