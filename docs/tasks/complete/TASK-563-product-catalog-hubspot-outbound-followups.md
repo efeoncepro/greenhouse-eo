@@ -12,7 +12,7 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional — TASK-544 Commercial Product Catalog Sync umbrella]`
-- Status real: `Shipped`
+- Status real: `Shipped (enablement externo + smoke staging), con gap operativo legacy descubierto post-cierre`
 - Rank: `TBD`
 - Domain: `crm + platform`
 - Blocked by: `none`
@@ -22,7 +22,9 @@
 
 ## Summary
 
-Cerrar los follow-ups que TASK-547 dejó fuera del V1 y estaban partidos entre Greenhouse EO y el repo hermano `hubspot-bigquery`. El carril `sellable_role -> product_catalog -> HubSpot Products` ya quedó operativo de punta a punta en staging: el servicio externo de products está live con `POST` / `PATCH` / `archive` / `reconcile`, las 5 custom properties quedaron aplicadas con labels visibles en lenguaje natural, el bridge local recuperó la emisión real de eventos para writes admin de `sellable_roles`, el smoke E2E create/update/archive quedó validado contra HubSpot sandbox y los envs drifted de staging/production se sanearon para no repetir el `401`.
+Cerrar los follow-ups que TASK-547 dejó fuera del V1 y estaban partidos entre Greenhouse EO y el repo hermano `hubspot-bigquery`. El carril `sellable_role -> product_catalog -> HubSpot Products` quedó operativo de punta a punta en staging para writes Greenhouse-owned nuevos: el servicio externo de products está live con `POST` / `PATCH` / `archive` / `reconcile`, las 5 custom properties quedaron aplicadas con labels visibles en lenguaje natural, el bridge local recuperó la emisión real de eventos para writes admin de `sellable_roles`, el smoke E2E create/update/archive quedó validado contra HubSpot sandbox y los envs drifted de staging/production se sanearon para no repetir el `401`.
+
+Nota de realidad descubierta el `2026-04-22`: este task cerró el carril técnico/operativo de enablement, pero NO dejó resuelto el binding/backfill del catálogo legacy ya existente en HubSpot. El portal live sigue teniendo products legacy sin `gh_*`, por lo que el cierre operativo completo del programa requiere un cutover de identidad posterior.
 
 ## Delivery Outcome
 
@@ -31,6 +33,7 @@ Cerrar los follow-ups que TASK-547 dejó fuera del V1 y estaban partidos entre G
 - `GREENHOUSE_INTEGRATION_API_TOKEN` y `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` quedaron saneados en `staging`; el root cause del `401` era un valor contaminado en Vercel con comillas + `CRLF`.
 - `Production` quedó provisionado con el mismo token/base URL canónicos y con `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}=true` para el próximo deploy formal de `main`.
 - El smoke `scripts/e2e-product-hubspot-outbound.ts` ya respeta la ventana anti-ping-pong de 60s entre writes, y el reporte operativo quedó registrado en `docs/operations/product-hubspot-outbound-e2e-report.md`.
+- Gap descubierto post-cierre: el catálogo legacy de HubSpot no quedó binded/backfilled. Live se observa `0` products con `gh_product_code`/`gh_source_kind`/`gh_last_write_at`, aunque Greenhouse sí conserva rows `hubspot_imported` ligadas por `hubspot_product_id`. Ese trabajo queda fuera del scope original de follow-ups externos y pasa a la fase de cutover/policy enforcement.
 
 ## Why This Task Exists
 
@@ -122,6 +125,7 @@ Reglas obligatorias:
 - Repo externo real localizado via GitHub CLI: `cesargrowth11/hubspot-bigquery/services/hubspot_greenhouse_integration/`
 - El service externo YA expone `POST /products` y `PATCH /products/:id`
 - Infra staging/E2E reutilizable ya existe en este repo (`staging-request`, Playwright auth, APIs admin para roles)
+- El catálogo live de HubSpot sigue conteniendo products legacy sin markers `gh_*`; Greenhouse conserva adoption/backfill local (`hubspot_imported`) pero no hubo bind-first/backfill efectivo sobre esos registros remotos.
 
 ### Gap
 
@@ -132,6 +136,8 @@ Reglas obligatorias:
 - Batch API/coalescing multi-producto NO cabe hoy en la arquitectura reactiva actual sin cambio mayor del worker o explicit defer.
 - No hay E2E específica de product outbound contra HubSpot sandbox.
 - Feature flags `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}` están ON en staging desde TASK-546, pero sin los items arriba no se pueden activar en production sin perder eventos o corromper state en HubSpot.
+- No existe `bind-first` antes de `create`. `push-product-to-hubspot.ts` sigue `create-first`, el servicio externo no expone search/bind previo, y el catálogo legacy HubSpot todavía no está marcado con `gh_*`.
+- `hubspot_product_id` no es único en `greenhouse_commercial.product_catalog`, así que el schema aún no protege por sí solo contra doble binding Greenhouse ↔ HubSpot durante el cutover.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

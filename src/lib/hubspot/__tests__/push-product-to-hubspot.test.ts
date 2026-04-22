@@ -8,6 +8,7 @@ const mockWithTransaction = vi.fn()
 const mockCreateProduct = vi.fn()
 const mockUpdateProduct = vi.fn()
 const mockArchiveProduct = vi.fn()
+const mockFindExistingBinding = vi.fn()
 const mockPublishSynced = vi.fn()
 const mockPublishFailed = vi.fn()
 
@@ -20,6 +21,10 @@ vi.mock('@/lib/integrations/hubspot-greenhouse-service', () => ({
   createHubSpotGreenhouseProduct: (...args: unknown[]) => mockCreateProduct(...args),
   updateHubSpotGreenhouseProduct: (...args: unknown[]) => mockUpdateProduct(...args),
   archiveHubSpotGreenhouseProduct: (...args: unknown[]) => mockArchiveProduct(...args)
+}))
+
+vi.mock('../find-existing-hubspot-product-binding', () => ({
+  findExistingHubSpotProductBinding: (...args: unknown[]) => mockFindExistingBinding(...args)
 }))
 
 vi.mock('../product-hubspot-events', () => ({
@@ -73,8 +78,10 @@ beforeEach(() => {
   mockCreateProduct.mockReset()
   mockUpdateProduct.mockReset()
   mockArchiveProduct.mockReset()
+  mockFindExistingBinding.mockReset()
   mockPublishSynced.mockReset()
   mockPublishFailed.mockReset()
+  mockFindExistingBinding.mockResolvedValue({ status: 'not_found' })
 
   // Default transaction behavior: invoke the callback with a captured client.
   mockWithTransaction.mockImplementation(async (fn: (client: unknown) => Promise<unknown>) => {
@@ -103,6 +110,41 @@ describe('pushProductToHubSpot — happy paths', () => {
       expect.anything()
     )
     expect(mockPublishFailed).not.toHaveBeenCalled()
+  })
+
+  it('bind-first: row without hubspot_product_id but exact HubSpot survivor by sku → PATCH instead of POST', async () => {
+    mockReadRow(baseRow({ hubspot_product_id: null }))
+    mockFindExistingBinding.mockResolvedValueOnce({
+      status: 'matched',
+      matchType: 'sku',
+      item: {
+        hubspotProductId: 'hs-survivor',
+        gh_product_code: null,
+        gh_source_kind: null,
+        gh_last_write_at: null,
+        name: 'Senior Designer',
+        sku: 'ECG-001',
+        price: 120,
+        description: 'Senior designer role',
+        isArchived: false
+      }
+    })
+    mockUpdateProduct.mockResolvedValueOnce({ status: 'updated', hubspotProductId: 'hs-survivor' })
+
+    const result = await pushProductToHubSpot({ productId: 'prd-abc' })
+
+    expect(result).toEqual({
+      status: 'synced',
+      action: 'updated',
+      productId: 'prd-abc',
+      hubspotProductId: 'hs-survivor'
+    })
+    expect(mockCreateProduct).not.toHaveBeenCalled()
+    expect(mockUpdateProduct).toHaveBeenCalledTimes(1)
+    expect(mockQuery).toHaveBeenCalledWith(
+      expect.stringContaining('SET hubspot_product_id = $2'),
+      ['prd-abc', 'hs-survivor']
+    )
   })
 
   it('update: row with hubspot_product_id → calls PATCH + emits synced updated', async () => {

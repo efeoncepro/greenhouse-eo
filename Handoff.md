@@ -16680,3 +16680,61 @@ Fase 4 completada:
   - `docs/tasks/TASK_ID_REGISTRY.md`
   - `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md`
   - `changelog.md`
+
+## Sesion 2026-04-22 — Product Catalog Greenhouse-first identity cutover (Codex)
+
+- **Pedido del usuario:** resolver el gap real donde HubSpot tenía products legacy sin `gh_*`, evitar duplicados Greenhouse ↔ HubSpot y confirmar que products son Greenhouse-first (a diferencia de deals/companies).
+- **Corrección de política aplicada**
+  - `products` quedan explícitamente Greenhouse-first
+  - HubSpot-only products NO se adoptan a Greenhouse
+  - si un survivor HubSpot coincide exactamente con un `product_code` Greenhouse, se linkea; si no, queda como legacy para cleanup/archivo, no como nueva fuente
+- **Hallazgos operativos reales antes del fix**
+  - HubSpot live: `36` products activos y `0` con `gh_product_code` / `gh_source_kind` / `gh_last_write_at`
+  - local `product_catalog`: `39` rows, `38` con `hubspot_product_id`, `36` `hubspot_imported`, solo `3` rows Greenhouse-owned
+  - el problema no era solo outbound: faltaba rematerialización masiva desde Greenhouse sources y `push-product-to-hubspot.ts` seguía `create-first`
+- **Implementación shipped**
+  - migration `20260422111241268_task-549-hubspot-product-binding-guard.sql`
+    - nuevo unique partial index para `hubspot_product_id` no nulo en `greenhouse_commercial.product_catalog`
+  - `src/lib/commercial/product-catalog/upsert-product-catalog-from-source.ts`
+    - ahora promociona survivors legacy `hubspot_imported` en sitio cuando `legacy_sku = product_code` Greenhouse
+    - preserva `product_id` + `hubspot_product_id` y convierte la row a source-bound en vez de crear duplicado local
+  - `src/lib/hubspot/find-existing-hubspot-product-binding.ts`
+    - lookup exacto por `gh_product_code`, luego por `sku`
+    - sin fuzzy por nombre
+  - `src/lib/hubspot/push-product-to-hubspot.ts`
+    - ahora hace `bind-first` antes de `create`
+  - `scripts/materialize-and-sync-product-catalog.ts`
+    - rematerializa roles/tools/overheads/services desde Greenhouse
+    - luego sincroniza/bindea hacia HubSpot
+  - `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md`
+  - `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md`
+  - `docs/operations/product-catalog-sync-runbook.md`
+- **Ejecución real**
+  - migration aplicada con `pnpm pg:connect:migrate`
+  - cutover ejecutado con:
+    - `GREENHOUSE_INTEGRATION_API_TOKEN=$(gcloud secrets versions access latest --secret=greenhouse-integration-api-token)`
+    - `HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_MS=20000`
+    - `pnpm product-catalog:materialize-and-sync`
+  - resultado del lote:
+    - `materialized: 74`
+    - `synced: 73`
+    - `skipped: 1`
+    - `failed: 0`
+    - `leftoverHubSpotImported: 0`
+  - retry puntual adicional:
+    - `ECG-036` quedó pendiente por un `401` viejo del primer intento sin token y luego se empujó manualmente OK → `hubspotProductId=44110439542`
+- **Estado final verificado**
+  - HubSpot live: `74` products activos y `74` con markers `gh_*`
+  - local `product_catalog`: source-bound only (`sellable_role=35`, `tool=26`, `overhead_addon=9`, `service=7`)
+  - único `hubspot_product_id = null`: `EFO-008`, archived, no accionable
+  - `hubspot_imported = 0`
+- **Validación**
+  - `pnpm exec vitest run src/lib/commercial/product-catalog/__tests__/upsert-product-catalog-from-source.test.ts src/lib/hubspot/__tests__/push-product-to-hubspot.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm lint`
+  - `pnpm build`
+  - grep `new Pool(` → solo `src/lib/postgres/client.ts`
+- **Notas**
+  - `pnpm build` volvió a imprimir los warnings esperados de `Dynamic server usage` en rutas que usan `headers`; el build terminó exit code `0`
+  - `TASK-549` NO está cerrada todavía: falta cleanup final de flags/carriles legacy/documentación, pero el cutover de identidad ya quedó hecho

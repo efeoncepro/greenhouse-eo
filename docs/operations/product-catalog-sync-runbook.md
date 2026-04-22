@@ -34,11 +34,14 @@ Fuente técnica: `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V
    - priorizar `sku_collision` y `orphan_in_hubspot`
 4. Si el outbound no converge:
    - revisar `hubspot_sync_status`, `hubspot_sync_error`, `hubspot_sync_attempt_count`
+5. Si el catálogo local no refleja las fuentes Greenhouse:
+   - correr `pnpm product-catalog:materialize-and-sync`
+   - el comando rematerializa `sellable_roles`, `tool_catalog`, `overhead_addons` y `service_pricing`, promueve survivors legacy por `legacy_sku = product_code`, y luego empuja/bindea hacia HubSpot
 
 ## Respuesta recomendada por conflicto
 
 - `orphan_in_hubspot`
-  Decidir entre adopción manual o archivado remoto.
+  En products, NO adoptar a Greenhouse. Si no existe match exacto contra un `product_code` canónico Greenhouse, tratarlo como legacy a archivar/limpiar en HubSpot.
 - `orphan_in_greenhouse`
   Reintentar `Reenviar estado Greenhouse`.
 - `field_drift`
@@ -56,6 +59,9 @@ Fuente técnica: `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V
 ## Comandos útiles
 
 ```bash
+# Rematerializar el canon Greenhouse-first y sincronizarlo hacia HubSpot
+pnpm product-catalog:materialize-and-sync
+
 # TypeScript
 pnpm exec tsc --noEmit --pretty false
 
@@ -78,5 +84,6 @@ pnpm tsx scripts/e2e-product-hubspot-outbound.ts
 ## Escalación
 
 - si el servicio externo no expone `/products/reconcile`, escalar al repo `hubspot-greenhouse-integration`
+- si reaparece un `hubspot_imported` sin source Greenhouse, tratarlo como deuda legacy del cutover; no reactivar el carril de adopción automática
 - si aparecen colisiones de SKU repetidas, abrir issue de higiene del catálogo comercial
 - si una resolución admin no deja audit trail, tratarlo como incidente del lane de governance

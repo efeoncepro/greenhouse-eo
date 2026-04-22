@@ -7,6 +7,7 @@ import {
   updateHubSpotGreenhouseProduct
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { wasWrittenByHubSpotRecently } from '@/lib/sync/anti-ping-pong'
+import { findExistingHubSpotProductBinding } from '@/lib/hubspot/find-existing-hubspot-product-binding'
 
 import {
   adaptProductCatalogToHubSpotCreatePayload,
@@ -170,6 +171,19 @@ const hitsAntiPingPong = (row: ProductCatalogRow): boolean => {
   return wasWrittenByHubSpotRecently(row.hubspot_last_write_at)
 }
 
+const bindExistingHubSpotProductId = async (
+  productId: string,
+  hubspotProductId: string
+): Promise<void> => {
+  await query(
+    `UPDATE greenhouse_commercial.product_catalog
+        SET hubspot_product_id = $2,
+            updated_at = CURRENT_TIMESTAMP
+      WHERE product_id = $1`,
+    [productId, hubspotProductId]
+  )
+}
+
 export const pushProductToHubSpot = async (
   input: ProductHubSpotPushInput
 ): Promise<ProductHubSpotPushResult> => {
@@ -200,6 +214,15 @@ export const pushProductToHubSpot = async (
       productId,
       hubspotProductId: existing.hubspot_product_id,
       reason: 'anti_ping_pong_window'
+    }
+  }
+
+  if (!existing.hubspot_product_id && !existing.is_archived) {
+    const binding = await findExistingHubSpotProductBinding(existing.product_code)
+
+    if (binding.status === 'matched') {
+      await bindExistingHubSpotProductId(productId, binding.item.hubspotProductId)
+      existing.hubspot_product_id = binding.item.hubspotProductId
     }
   }
 

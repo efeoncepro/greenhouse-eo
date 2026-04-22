@@ -15,7 +15,7 @@
 - Status real: `Programa parcialmente implementado`
 - Rank: `TBD`
 - Domain: `crm`
-- Blocked by: `validacion final en production para TASK-549`
+- Blocked by: `identity cutover + bind/backfill legacy en TASK-549`
 - Branch: `task/TASK-544-commercial-product-catalog-sync-program`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
@@ -31,11 +31,12 @@ Programa oficial para convertir a Greenhouse en source of truth del catalogo que
 - **Fase C cerrada.** `TASK-547` completada 2026-04-21: bridge outbound `product_catalog -> HubSpot Products`, trace cols, payload adapter, push helper y proyección reactiva `productHubSpotOutbound`. Ver `complete/TASK-547-product-catalog-hubspot-outbound.md`.
 - **Fase D cerrada.** `TASK-548` completada 2026-04-21: drift reconciler, `ops-worker`, surface admin de conflictos y comandos auditables. Ver `complete/TASK-548-product-catalog-drift-detection-admin.md`.
 - **Gate externo resuelto.** `TASK-563` quedó cerrada el `2026-04-22`: servicio externo live, custom properties aplicadas, env drift saneado y smoke staging create/update/archive validado.
-- **Fase E pendiente.** `TASK-549` sigue abierta para cleanup/policy enforcement. Su cierre honesto depende ahora de la validación real en production del bridge ya activable.
+- **Gap operativo descubierto post-cierre.** El catálogo legacy de HubSpot sigue sin markers `gh_*` y el bridge todavía no hace `bind-first`; Greenhouse conserva adopción local (`hubspot_imported`) pero no hubo cutover de identidad sobre los products remotos existentes.
+- **Fase E pendiente.** `TASK-549` sigue abierta y ahora absorbe el cierre operativo real: bind/backfill legacy, dedupe, enforcement y cleanup/policy final.
 
 ## Why This Task Exists
 
-El programa ya cerró la foundation runtime A-D y también resolvió el gate externo/operativo de `TASK-563`. El trabajo real pendiente en este umbrella es Fase E (`TASK-549`): cleanup de flags/superficies legacy, normalización final de `sync_direction` y política Greenhouse-first coherente con el runtime actual ya validado en staging.
+El programa ya cerró la foundation runtime A-D y también resolvió el gate externo de `TASK-563`, pero apareció un hueco operativo real: el catálogo legacy existente en HubSpot no quedó binded/backfilled al canon Greenhouse. El trabajo pendiente en este umbrella es Fase E (`TASK-549`): cutover de identidad, binding/backfill, dedupe, cleanup de flags/superficies legacy, normalización final de `sync_direction` y política Greenhouse-first coherente con el runtime real.
 
 ## Goal
 
@@ -43,9 +44,10 @@ El programa ya cerró la foundation runtime A-D y también resolvió el gate ext
 - Conectar los 4 source catalogs con `product_catalog` via reactive materializer.
 - Habilitar outbound Greenhouse → HubSpot reactivo (create + update + archive).
 - Implementar drift detection + reconciliation con Admin Center surface.
-- Policy strict: productos nacen en Greenhouse; orphans HubSpot se adoptan o borran.
+- Policy strict: productos nacen en Greenhouse; HubSpot-only products NO se adoptan a Greenhouse. Si existe match exacto con un producto canónico Greenhouse, se linkea el survivor HubSpot; si no, queda para archivo/cleanup legacy.
+- Resolver el catálogo legacy existente sin duplicar: bind-first por identidad (`product_code`/SKU), backfill de markers `gh_*`, survivor selection y archivo de duplicados donde corresponda.
 - Cerrar el programa sin drift documental entre spec, código, tasks hijas y trackers.
-- Dejar explícito que la activación/cierre final depende de `TASK-549` + validación en production.
+- Dejar explícito que la activación/cierre final depende de `TASK-549` + identity cutover + validación en production.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -118,6 +120,7 @@ Reglas obligatorias:
 - `product_sync_conflicts` + reconciler nocturno + Admin Center ya existen
 - Siguen vivos dos carriles legacy: `src/lib/hubspot/sync-hubspot-products.ts` y `src/lib/hubspot/create-hubspot-product.ts`
 - `TASK-563` ya documenta el cierre de los follow-ups externos/operativos que destrabaron la activación real end-to-end
+- `TASK-563` NO resolvió el cutover del catálogo legacy HubSpot ya existente; esa deuda quedó visible al auditar el portal live post-cierre
 
 ### Gap
 
@@ -125,7 +128,8 @@ Reglas obligatorias:
 - El cron/flow legacy `sync-hubspot-products.ts` sigue manteniendo `greenhouse_finance.products` y todavía debe decidirse su deprecación final
 - `create-hubspot-product.ts` y `POST /api/finance/products/hubspot` siguen como surface legacy separada del bridge canónico
 - El contrato legacy de `sync_direction` aún requiere limpieza/migración histórica
-- La activación real en production ya no depende de `TASK-563`; el próximo gate es el soak/cleanup de `TASK-549` sobre runtime productivo
+- Falta un carril explícito de `bind-first`/backfill para productos legacy HubSpot ya existentes; sin eso el bridge reactivo puede duplicar o dejar el portal sin markers `gh_*`
+- La activación/cierre real ya no depende de `TASK-563`; el próximo gate es `TASK-549` con identity cutover + soak/cleanup sobre runtime productivo
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -177,7 +181,7 @@ Programa oficial con foundation A-D ya implementada, gate externo resuelto en `T
 3. `TASK-547` (Fase C) — Outbound + Cloud Run. Depende de A; puede paralelo a B si hay coordinacion.
 4. `TASK-548` (Fase D) — Drift detection + Admin. ✅ Cerrada 2026-04-21.
 5. `TASK-563` — Follow-ups externos/operativos para activación real del bridge. ✅ Cerrada 2026-04-22.
-6. `TASK-549` (Fase E) — Policy enforcement + cleanup. Depende de A-D + `TASK-563` cerrada + ≥4 semanas en production.
+6. `TASK-549` (Fase E) — Identity cutover + policy enforcement + cleanup. Depende de A-D + `TASK-563` cerrada + binding/backfill legacy validado + ≥4 semanas en production.
 
 ### Decisiones arquitectonicas cerradas por esta umbrella
 

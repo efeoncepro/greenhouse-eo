@@ -36,6 +36,7 @@
     "hubspot:deal-properties": "tsx scripts/create-hubspot-deal-custom-properties.ts",
     "hubspot:product-properties": "tsx scripts/create-hubspot-product-custom-properties.ts",
     "hubspot:service-properties": "tsx scripts/create-hubspot-service-custom-properties.ts",
+    "product-catalog:materialize-and-sync": "tsx scripts/materialize-and-sync-product-catalog.ts",
     "backfill:portal-home-contract": "tsx scripts/backfill-portal-home-contract.ts",
     "backfill:efeonce-microsoft-aliases": "tsx scripts/backfill-efeonce-microsoft-aliases.ts",
     "backfill:internal-identity-profiles": "tsx scripts/backfill-internal-identity-profiles.ts",

@@ -48,6 +48,27 @@ interface ExistingRow {
   source_variant_key: string | null
 }
 
+const findPromotableHubSpotImportedRow = async (
+  client: PoolClient,
+  productCode: string
+): Promise<ExistingRow | null> => {
+  const result = await client.query<ExistingRow>(
+    `
+      SELECT product_id, gh_owned_fields_checksum, is_archived, hubspot_product_id, source_variant_key
+      FROM greenhouse_commercial.product_catalog
+      WHERE source_kind = 'hubspot_imported'
+        AND source_id IS NULL
+        AND legacy_sku = $1
+      ORDER BY updated_at DESC, product_id ASC
+      LIMIT 1
+      FOR UPDATE
+    `,
+    [productCode]
+  )
+
+  return result.rows[0] ?? null
+}
+
 const diffSnapshotFields = (
   next: GhOwnedFieldsSnapshot,
   prevChecksum: string | null,
@@ -106,7 +127,10 @@ export const upsertProductCatalogFromSource = async (
     [input.sourceKind, input.sourceId, variantKey]
   )
 
-  const existing = existingResult.rows[0] ?? null
+  const existing =
+    existingResult.rows[0] ??
+    (await findPromotableHubSpotImportedRow(client, input.snapshot.product_code))
+
   const previousChecksum = existing?.gh_owned_fields_checksum ?? null
 
   if (
@@ -152,6 +176,7 @@ export const upsertProductCatalogFromSource = async (
           is_archived,
           archived_at,
           gh_owned_fields_checksum,
+          legacy_sku,
           source_system,
           sync_status,
           sync_direction,
@@ -160,7 +185,7 @@ export const upsertProductCatalogFromSource = async (
           updated_at
         ) VALUES (
           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
-          $14, $15, $16, $17, 'task-546-materializer', 'local_only', 'greenhouse_only',
+          $14, $15, $16, $17, $18, 'task-546-materializer', 'local_only', 'greenhouse_only',
           'task-546-materializer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
       `,
@@ -181,7 +206,8 @@ export const upsertProductCatalogFromSource = async (
         !nowArchived,
         nowArchived,
         nowArchived ? now : null,
-        nextChecksum
+        nextChecksum,
+        input.snapshot.product_code
       ]
     )
   } else {
@@ -189,28 +215,38 @@ export const upsertProductCatalogFromSource = async (
       `
         UPDATE greenhouse_commercial.product_catalog
         SET
-          product_code = $2,
-          product_name = $3,
-          product_type = $4,
-          pricing_model = $5,
-          business_line_code = $6,
-          default_currency = $7,
-          default_unit_price = $8,
-          default_unit = $9,
-          description = $10,
-          active = $11,
-          is_archived = $12,
+          source_kind = $2,
+          source_id = $3,
+          source_variant_key = $4,
+          legacy_sku = COALESCE(legacy_sku, $5),
+          product_code = $6,
+          product_name = $7,
+          product_type = $8,
+          pricing_model = $9,
+          business_line_code = $10,
+          default_currency = $11,
+          default_unit_price = $12,
+          default_unit = $13,
+          description = $14,
+          active = $15,
+          is_archived = $16,
           archived_at = CASE
-            WHEN $12::boolean AND NOT is_archived THEN CURRENT_TIMESTAMP
-            WHEN NOT $12::boolean THEN NULL
+            WHEN $16::boolean AND NOT is_archived THEN CURRENT_TIMESTAMP
+            WHEN NOT $16::boolean THEN NULL
             ELSE archived_at
           END,
-          gh_owned_fields_checksum = $13,
+          gh_owned_fields_checksum = $17,
+          source_system = 'task-546-materializer',
+          sync_direction = 'greenhouse_only',
           updated_at = CURRENT_TIMESTAMP
         WHERE product_id = $1
       `,
       [
         productId,
+        input.sourceKind,
+        input.sourceId,
+        variantKey,
+        input.snapshot.product_code,
         input.snapshot.product_code,
         input.snapshot.product_name,
         input.snapshot.product_type,
