@@ -15,7 +15,7 @@
 - Status real: `Programa parcialmente implementado`
 - Rank: `TBD`
 - Domain: `crm`
-- Blocked by: `TASK-563` + `validacion final en production para TASK-549`
+- Blocked by: `validacion final en production para TASK-549`
 - Branch: `task/TASK-544-commercial-product-catalog-sync-program`
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
@@ -30,11 +30,12 @@ Programa oficial para convertir a Greenhouse en source of truth del catalogo que
 - **Fase B cerrada.** `TASK-546` completada 2026-04-21: handlers por source, homogenización de eventos y rollout por sub-flags `GREENHOUSE_PRODUCT_SYNC_*`. Ver `complete/TASK-546-product-catalog-source-handlers-events.md`.
 - **Fase C cerrada.** `TASK-547` completada 2026-04-21: bridge outbound `product_catalog -> HubSpot Products`, trace cols, payload adapter, push helper y proyección reactiva `productHubSpotOutbound`. Ver `complete/TASK-547-product-catalog-hubspot-outbound.md`.
 - **Fase D cerrada.** `TASK-548` completada 2026-04-21: drift reconciler, `ops-worker`, surface admin de conflictos y comandos auditables. Ver `complete/TASK-548-product-catalog-drift-detection-admin.md`.
-- **Fase E pendiente.** `TASK-549` sigue abierta para cleanup/policy enforcement. Su cierre honesto depende además de `TASK-563` y de validación real en production.
+- **Gate externo resuelto.** `TASK-563` quedó cerrada el `2026-04-22`: servicio externo live, custom properties aplicadas, env drift saneado y smoke staging create/update/archive validado.
+- **Fase E pendiente.** `TASK-549` sigue abierta para cleanup/policy enforcement. Su cierre honesto depende ahora de la validación real en production del bridge ya activable.
 
 ## Why This Task Exists
 
-El programa ya cerró la foundation runtime A-D y ahora necesita converger su capa documental/operativa para no seguir describiendo como gaps cosas que ya existen. El trabajo real pendiente en este umbrella es Fase E (`TASK-549`): cleanup de flags/superficies legacy, normalización final de `sync_direction` y política Greenhouse-first coherente con el runtime actual y con los follow-ups externos de `TASK-563`.
+El programa ya cerró la foundation runtime A-D y también resolvió el gate externo/operativo de `TASK-563`. El trabajo real pendiente en este umbrella es Fase E (`TASK-549`): cleanup de flags/superficies legacy, normalización final de `sync_direction` y política Greenhouse-first coherente con el runtime actual ya validado en staging.
 
 ## Goal
 
@@ -44,7 +45,7 @@ El programa ya cerró la foundation runtime A-D y ahora necesita converger su ca
 - Implementar drift detection + reconciliation con Admin Center surface.
 - Policy strict: productos nacen en Greenhouse; orphans HubSpot se adoptan o borran.
 - Cerrar el programa sin drift documental entre spec, código, tasks hijas y trackers.
-- Dejar explícito que la activación/cierre final depende de `TASK-549` + `TASK-563` + validación en production.
+- Dejar explícito que la activación/cierre final depende de `TASK-549` + validación en production.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -94,7 +95,7 @@ Reglas obligatorias:
 - TASK-467 (Pricing Catalog Admin UI) — gana surface de conflict resolution
 - TASK-534 (Commercial Party Lifecycle) — complementario (juntos cierran quote-to-HubSpot end-to-end)
 - Reporting por product/role/tool — habilita revenue attribution consistente
-- `TASK-563` — gate operativo/external para la activación real del bridge
+- `TASK-563` — gate operativo/external ya resuelto para la activación real del bridge
 - Kortex platform — hereda un modelo unificado para clientes externos
 
 ### Files owned
@@ -104,7 +105,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-547-product-catalog-hubspot-outbound.md`
 - `docs/tasks/complete/TASK-548-product-catalog-drift-detection-admin.md`
 - `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md`
-- `docs/tasks/to-do/TASK-563-product-catalog-hubspot-outbound-followups.md`
+- `docs/tasks/complete/TASK-563-product-catalog-hubspot-outbound-followups.md`
 
 ## Current Repo State
 
@@ -116,7 +117,7 @@ Reglas obligatorias:
 - `productHubSpotOutbound` ya existe y empuja create/update/archive con trace y anti-ping-pong
 - `product_sync_conflicts` + reconciler nocturno + Admin Center ya existen
 - Siguen vivos dos carriles legacy: `src/lib/hubspot/sync-hubspot-products.ts` y `src/lib/hubspot/create-hubspot-product.ts`
-- `TASK-563` ya documenta los follow-ups externos/operativos que faltan para activación real end-to-end
+- `TASK-563` ya documenta el cierre de los follow-ups externos/operativos que destrabaron la activación real end-to-end
 
 ### Gap
 
@@ -124,7 +125,7 @@ Reglas obligatorias:
 - El cron/flow legacy `sync-hubspot-products.ts` sigue manteniendo `greenhouse_finance.products` y todavía debe decidirse su deprecación final
 - `create-hubspot-product.ts` y `POST /api/finance/products/hubspot` siguen como surface legacy separada del bridge canónico
 - El contrato legacy de `sync_direction` aún requiere limpieza/migración histórica
-- La activación real en production sigue bloqueada por `TASK-563` (deploy de endpoints externos, apply de custom properties, E2E real y follow-ups operativos)
+- La activación real en production ya no depende de `TASK-563`; el próximo gate es el soak/cleanup de `TASK-549` sobre runtime productivo
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -146,7 +147,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Outbound proyeccion + Cloud Run endpoints
 
-- `TASK-547` (Fase C) cerrada 2026-04-21: deja cliente/proyección outbound listos en este repo; los follow-ups externos y de activación real quedaron explícitamente derivados a `TASK-563`.
+- `TASK-547` (Fase C) cerrada 2026-04-21: dejó cliente/proyección outbound listos en este repo; los follow-ups externos y de activación real se cerraron luego en `TASK-563`.
 
 ### Slice 4 — Drift detection + Admin Center
 
@@ -155,7 +156,7 @@ Reglas obligatorias:
 ### Slice 5 — Policy enforcement + legacy cleanup
 
 - `TASK-549` (Fase E): cleanup documental/runtime final del programa dentro de este repo.
-- `TASK-563`: prerequisito operativo/external para poder cerrar honestamente la Fase E y activar production.
+- `TASK-563`: gate operativo/external ya resuelto; Fase E hereda ahora el soak y cleanup sobre runtime productivo.
 
 ## Out of Scope
 
@@ -167,7 +168,7 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-Programa oficial con foundation A-D ya implementada y una fase final E todavía pendiente. El gate operativo actual ya no es Fase A sino `TASK-563` + soak real en production.
+Programa oficial con foundation A-D ya implementada, gate externo resuelto en `TASK-563` y una fase final E todavía pendiente. El gate operativo actual ya no es Fase A sino el soak real en production antes de cerrar `TASK-549`.
 
 ### Orden de ejecucion
 
@@ -175,8 +176,8 @@ Programa oficial con foundation A-D ya implementada y una fase final E todavía 
 2. `TASK-546` (Fase B) — Source handlers. Depende de A.
 3. `TASK-547` (Fase C) — Outbound + Cloud Run. Depende de A; puede paralelo a B si hay coordinacion.
 4. `TASK-548` (Fase D) — Drift detection + Admin. ✅ Cerrada 2026-04-21.
-5. `TASK-563` — Follow-ups externos/operativos para activación real del bridge. Gate para production.
-6. `TASK-549` (Fase E) — Policy enforcement + cleanup. Depende de A-D + `TASK-563` + ≥4 semanas en production.
+5. `TASK-563` — Follow-ups externos/operativos para activación real del bridge. ✅ Cerrada 2026-04-22.
+6. `TASK-549` (Fase E) — Policy enforcement + cleanup. Depende de A-D + `TASK-563` cerrada + ≥4 semanas en production.
 
 ### Decisiones arquitectonicas cerradas por esta umbrella
 
@@ -208,7 +209,7 @@ Las 7 open questions del spec §15 quedan heredadas por este programa:
 - [x] Existen las tasks hijas `TASK-545` a `TASK-549` registradas en `TASK_ID_REGISTRY.md` y `README.md`.
 - [x] Cada task hija referencia `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` como spec normativo.
 - [x] La dependencia causal A → B/C → D → E quedó explícita en las tasks hijas y en el umbrella.
-- [ ] `TASK-563` queda cerrada y el bridge outbound puede operar end-to-end sin `endpoint_not_deployed`.
+- [x] `TASK-563` queda cerrada y el bridge outbound puede operar end-to-end sin `endpoint_not_deployed`.
 - [ ] `TASK-549` se ejecuta tras soak real en production y cierra flags/carriles legacy/documentación.
 - [ ] Al cerrar el programa, todas las hijas están en `complete` y las open questions pendientes quedan resueltas o derivadas.
 
@@ -234,7 +235,7 @@ Las 7 open questions del spec §15 quedan heredadas por este programa:
 - `TASK-546` Fase B — Source handlers + event homogenization
 - `TASK-547` Fase C — Outbound projection + Cloud Run endpoints
 - `TASK-548` Fase D — Drift detection + Admin Center ✅
-- `TASK-563` — Follow-ups externos/operativos para activación real
+- `TASK-563` — Follow-ups externos/operativos para activación real ✅
 - `TASK-549` Fase E — Policy enforcement + legacy cleanup
 
 ## Open Questions

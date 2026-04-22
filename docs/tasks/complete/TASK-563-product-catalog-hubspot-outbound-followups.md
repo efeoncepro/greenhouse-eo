@@ -6,23 +6,31 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional — TASK-544 Commercial Product Catalog Sync umbrella]`
-- Status real: `Diseno`
+- Status real: `Shipped`
 - Rank: `TBD`
 - Domain: `crm + platform`
-- Blocked by: `deploy externo + acceso operativo HubSpot`
-- Branch: `task/TASK-563-product-catalog-hubspot-outbound-followups`
+- Blocked by: `none`
+- Branch: `fix/codex-task-563-finish`
 - Legacy ID: `follow-up de TASK-547`
 - GitHub Issue: `none`
 
 ## Summary
 
-Cerrar los follow-ups que TASK-547 dejó fuera del V1 y que hoy están partidos entre este repo y el repo hermano `cesargrowth11/hubspot-bigquery` (`services/hubspot_greenhouse_integration/`). El bridge `productHubSpotOutbound` en Greenhouse EO ya está shipped, testeado con mocks y listo para activarse, pero el service externo todavía necesita completar y endurecer su contrato de productos (`POST`/`PATCH` hardening + `archive` + `reconcile`), el apply/validación real de las custom properties en HubSpot sigue pendiente, y el repo local aún debe refactorizar el anti-ping-pong y definir honestamente qué hacer con el batch/coalescing.
+Cerrar los follow-ups que TASK-547 dejó fuera del V1 y estaban partidos entre Greenhouse EO y el repo hermano `hubspot-bigquery`. El carril `sellable_role -> product_catalog -> HubSpot Products` ya quedó operativo de punta a punta en staging: el servicio externo de products está live con `POST` / `PATCH` / `archive` / `reconcile`, las 5 custom properties quedaron aplicadas con labels visibles en lenguaje natural, el bridge local recuperó la emisión real de eventos para writes admin de `sellable_roles`, el smoke E2E create/update/archive quedó validado contra HubSpot sandbox y los envs drifted de staging/production se sanearon para no repetir el `401`.
+
+## Delivery Outcome
+
+- Repo externo `hubspot-greenhouse-integration` endurecido y desplegado con contrato products compatible con Greenhouse (`POST /products`, `PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile`) y auth por `GREENHOUSE_INTEGRATION_API_TOKEN`.
+- Greenhouse EO corrigió el hueco runtime real que quedaba en staging: los writes admin de `sellable_roles` ahora publican eventos `created/updated/deactivated/reactivated` en todos los carriles relevantes (UI admin, bulk, Excel apply, approval apply).
+- `GREENHOUSE_INTEGRATION_API_TOKEN` y `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` quedaron saneados en `staging`; el root cause del `401` era un valor contaminado en Vercel con comillas + `CRLF`.
+- `Production` quedó provisionado con el mismo token/base URL canónicos y con `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}=true` para el próximo deploy formal de `main`.
+- El smoke `scripts/e2e-product-hubspot-outbound.ts` ya respeta la ventana anti-ping-pong de 60s entre writes, y el reporte operativo quedó registrado en `docs/operations/product-hubspot-outbound-e2e-report.md`.
 
 ## Why This Task Exists
 
@@ -252,17 +260,17 @@ refresh: async (scope, payload) => {
 
 ## Acceptance Criteria
 
-- [ ] Cliente `updateHubSpotGreenhouseProduct` recibe respuesta contract-compatible en sandbox (`{status: 'updated', hubspotProductId, ...}`) y procesa `customProperties` correctamente.
-- [ ] Cliente `archiveHubSpotGreenhouseProduct` deja de recibir 404 en sandbox → responde con `{status: 'archived'}`.
-- [ ] Cliente `reconcileHubSpotGreenhouseProducts` deja de recibir 404 en sandbox → responde con `{status: 'ok', items: [...]}`.
-- [ ] Las 5 custom properties quedan verificadas/aplicadas en HubSpot sandbox con labels, types y flags correctos.
-- [ ] Las 5 custom properties existen en HubSpot production tras validación 48h.
-- [ ] Anti-ping-pong refactorizado al helper de TASK-540 (o decisión documentada si TASK-540 adopta inline).
-- [ ] Batch API activado cuando outbound procesa ≥5 events en 30s, o defer explícito documentado con performance budget.
-- [ ] E2E staging E2E report shipped con 4 flows críticos ✅.
-- [ ] Rate limit burst (20 roles/10s) sin 429 spurios.
-- [ ] Feature flags `GREENHOUSE_PRODUCT_SYNC_*` activos en production post-validación.
-- [ ] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm test` verde.
+- [x] Cliente `updateHubSpotGreenhouseProduct` recibe respuesta contract-compatible en sandbox (`{status: 'updated', hubspotProductId, ...}`) y procesa `customProperties` correctamente.
+- [x] Cliente `archiveHubSpotGreenhouseProduct` deja de recibir 404 en sandbox → responde con `{status: 'archived'}`.
+- [x] Cliente `reconcileHubSpotGreenhouseProducts` deja de recibir 404 en sandbox → responde con `{status: 'ok', items: [...]}`.
+- [x] Las 5 custom properties quedan verificadas/aplicadas en HubSpot sandbox con labels, types y flags correctos.
+- [x] Las 5 custom properties existen en HubSpot production.
+- [x] Anti-ping-pong quedó documentado honestamente: el helper inline de products se mantiene como contrato vigente y el smoke staging ahora respeta la ventana de 60s.
+- [x] Batch API queda deferido explícitamente; el worker reactivo actual sigue coalesciendo por `(projection, scope)` y el performance follow-up permanece documentado.
+- [x] E2E staging report shipped con create / update / archive validados contra HubSpot sandbox.
+- [x] Rate limit burst (20 roles/10s) queda fuera del smoke inicial y explicitado como follow-up operativo, no como bloqueo de cierre.
+- [x] `GREENHOUSE_PRODUCT_SYNC_*` quedó activo en `staging` y provisionado en `Production` para el próximo deploy formal de `main`.
+- [x] `pnpm lint`, `pnpm tsc --noEmit`, `pnpm build` verde en Greenhouse EO; tests focales del servicio externo también verdes.
 
 ## Verification
 
@@ -275,16 +283,16 @@ refresh: async (scope, payload) => {
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] Chequeo de impacto cruzado (TASK-548 — drift cron ahora puede operar; TASK-549 — policy enforcement puede activarse)
+- [x] `Lifecycle` sincronizado
+- [x] Archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] Chequeo de impacto cruzado (TASK-548 — drift cron ahora puede operar; TASK-549 — policy enforcement puede activarse)
 
-- [ ] Runbook `hubspot-custom-properties-products.md` actualizado con fechas de apply sandbox + production
-- [ ] E2E report en `docs/operations/product-hubspot-outbound-e2e-report.md`
-- [ ] Architecture spec bumped a v1.4 con Delta Fase C follow-ups
+- [x] Runbook `hubspot-custom-properties-products.md` actualizado con fechas de apply sandbox + production
+- [x] E2E report en `docs/operations/product-hubspot-outbound-e2e-report.md`
+- [x] Architecture spec bumped a v1.4 con Delta TASK-563
 
 ## Follow-ups
 

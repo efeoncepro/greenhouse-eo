@@ -21,7 +21,7 @@ export interface UpdateHubSpotQuoteResult {
 
 // ── Config ──
 
-const DEFAULT_BASE_URL = 'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app'
+const DEFAULT_BASE_URL = 'https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app'
 const DEFAULT_TIMEOUT_MS = 4000
 
 const normalizeBaseUrl = (value: string | undefined) => {

@@ -16601,3 +16601,58 @@ Fase 4 completada:
   - follow-on arquitectónico/documental abierto:
     - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` y `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` ya quedaron ampliados con el `Integration Runtime Pattern`
     - nueva `TASK-399` creada para institucionalizar el hardening runtime de integraciones source-led como carril separado de `TASK-188`
+
+## Sesion 2026-04-22 — TASK-563 Product Catalog HubSpot Outbound Follow-ups (Codex)
+
+- **Scope:** cerrar `TASK-563` de punta a punta entre Greenhouse EO + repo externo `hubspot-bigquery`: auth drift staging, emisión real de eventos `sellable_roles`, smoke staging contra HubSpot sandbox, runbooks/documentación viva y preparación de Production env.
+- **Hallazgos reales**
+  - el runtime local del bridge ya estaba bien del lado payload/client, pero staging seguía respondiendo `401` porque `GREENHOUSE_INTEGRATION_API_TOKEN` en Vercel estaba contaminado con comillas envolventes + `CRLF`
+  - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` faltaba en `staging`, por lo que el cliente podía caer al `DEFAULT_BASE_URL` viejo
+  - los writes admin de `sellable_roles` seguían sin publicar eventos en varios carriles (`roles`, `[id]`, `pricing`, `cost-components`, bulk, Excel apply, approval apply), así que el materializer no alimentaba `product_catalog` consistentemente
+  - el primer smoke live falló por diseño del test: intentó `PATCH` dentro de la ventana anti-ping-pong de 60s; el bridge respondió con `noop` correctamente
+- **Implementacion shipped en Greenhouse EO**
+  - `src/app/api/admin/pricing-catalog/roles/**` ahora publica `created/updated/deactivated/reactivated` según transición real
+  - nuevo helper `src/lib/commercial/sellable-role-sync-events.ts` para publicar eventos desde carriles transaccionales compartidos
+  - `pricing-catalog-approvals.ts` + `pricing-catalog-excel-approval.ts` + `import-excel/apply` + bulk route quedaron alineados a la misma emisión
+  - `src/lib/sync/projections/source-to-product-catalog.ts` reconoce `commercial.sellable_role.updated`
+  - `src/lib/integrations/hubspot-greenhouse-service.ts` ahora falla explícitamente si falta `GREENHOUSE_INTEGRATION_API_TOKEN` en un write
+  - defaults de service URL actualizados al Cloud Run vigente `https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app`
+  - `scripts/e2e-product-hubspot-outbound.ts` ahora espera 65s entre create/update/archive para respetar anti-ping-pong
+- **Operación / envs**
+  - `staging`:
+    - `GREENHOUSE_INTEGRATION_API_TOKEN` regrabado saneado desde Secret Manager (`greenhouse-integration-api-token`)
+    - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` agregado al endpoint vigente
+    - `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}=true`
+    - deployment validado: `https://greenhouse-kg5boa48r-efeonce-7670142f.vercel.app` (`target=staging`)
+  - `Production`:
+    - token + base URL saneados y regrabados
+    - `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}=true` provisionado
+    - **nota:** estos envs tomarán efecto en el próximo deploy formal de `main`; no se forzó deploy opaco a Production desde esta rama/worktree
+- **HubSpot / repo externo**
+  - el repo `hubspot-bigquery-task-563` ya tenía el contrato products desplegado; además se empujó `ca92344` para alinear la property booleana `gh_archived_by_greenhouse` con opciones `Si/No`
+  - labels visibles confirmados:
+    - `gh_product_code` → `Codigo de Producto Greenhouse`
+    - `gh_source_kind` → `Origen del Producto en Greenhouse`
+    - `gh_last_write_at` → `Ultima Sincronizacion desde Greenhouse`
+    - `gh_archived_by_greenhouse` → `Archivado por Greenhouse`
+    - `gh_business_line` → `Linea de Negocio Greenhouse`
+- **Smoke E2E staging**
+  - intento `live-smoke-20260422e`: create OK (`12.5s`), update timeout por anti-ping-pong esperado
+  - intento `live-smoke-20260422f`: **OK**
+    - `roleId=sr-0a1018ce-77e1-481e-bd20-2bfccf78c425`
+    - `roleSku=ECG-038`
+    - `hubspotProductId=44106723437`
+    - create `8.995s`
+    - update `11.455s`
+    - archive `31.665s`
+- **Verificacion local**
+  - `pnpm exec eslint src/lib/integrations/hubspot-greenhouse-service.ts src/lib/hubspot/update-hubspot-quote.ts scripts/e2e-product-hubspot-outbound.ts scripts/backfill-hubspot-contact-names.ts scripts/backfill-hubspot-products.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+- **Docs actualizadas**
+  - `docs/operations/product-hubspot-outbound-e2e-report.md`
+  - `docs/operations/hubspot-custom-properties-products.md`
+  - `docs/tasks/complete/TASK-563-product-catalog-hubspot-outbound-followups.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md`
+  - `changelog.md`

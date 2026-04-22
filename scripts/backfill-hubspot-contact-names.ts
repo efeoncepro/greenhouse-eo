@@ -29,7 +29,7 @@ const bigQuery = new BigQuery({
   projectId: process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'efeonce-group'
 })
 
-const serviceBaseUrl = (process.env.HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL || 'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app').trim().replace(/\/+$/, '')
+const serviceBaseUrl = (process.env.HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL || 'https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app').trim().replace(/\/+$/, '')
 const dryRun = process.argv.includes('--dry-run')
 const clientIdArg = process.argv.find(argument => argument.startsWith('--client-id='))
 const scopedClientId = clientIdArg ? clientIdArg.slice('--client-id='.length).trim() : null

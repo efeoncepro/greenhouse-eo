@@ -1,13 +1,36 @@
 # Greenhouse EO — Commercial Product Catalog Sync Architecture V1
 
-> **Version:** 1.3
+> **Version:** 1.4
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
-> **Ultima actualizacion:** 2026-04-21 por Claude (Opus 4.7) — Fase C shipped (TASK-547)
+> **Ultima actualizacion:** 2026-04-22 por Codex — TASK-563 closed (service live + properties applied + staging E2E validated)
 > **Audience:** Backend engineers, product owners, agentes que implementen features de catalog management, pricing, quote builder o HubSpot sync
 > **Related:** `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
 
 ---
+
+## Delta 2026-04-22 — TASK-563 closed (service live + properties applied + staging E2E)
+
+El gate operativo/external que quedaba fuera de TASK-547 ya está resuelto.
+
+### Cerrado por TASK-563
+
+| Area | Estado 2026-04-22 |
+|---|---|
+| Service externo products | `hubspot-greenhouse-integration` ya expone y smokea `POST /products`, `PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile` |
+| Custom properties HubSpot | Las 5 properties `gh_*` quedaron aplicadas en sandbox + production con labels visibles en lenguaje natural |
+| E2E staging | `scripts/e2e-product-hubspot-outbound.ts` validó `create / update / archive` contra HubSpot sandbox (`8.995s / 11.455s / 31.665s`) |
+| Auth drift staging | Root cause resuelto: `GREENHOUSE_INTEGRATION_API_TOKEN` contaminado en Vercel con comillas + `CRLF`, más ausencia de `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` |
+| Production env prep | token + base URL canónicos y `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}=true` provisionados para el próximo deploy formal de `main` |
+
+### Correcciones a los supuestos de Fase C
+
+| Supuesto previo | Estado real 2026-04-22 |
+|---|---|
+| Los endpoints `PATCH/archive/reconcile` siguen como follow-up externo | Ya están live y consumidos por Greenhouse EO |
+| Las custom properties siguen pendientes de apply/verificación | Ya están creadas y alineadas en sandbox + production |
+| El smoke staging podía encadenar writes inmediatamente | No. Debe respetar la ventana anti-ping-pong de 60s entre writes Greenhouse-owned |
+| El gate principal seguía siendo infraestructura externa | El gate técnico quedó resuelto; el siguiente cierre del programa pasa por `TASK-549` + rollout formal a `main`/production |
 
 ## Delta 2026-04-21 — Fase C shipped (TASK-547)
 
@@ -34,17 +57,17 @@ Outbound bridge reactivo `product_catalog → HubSpot Products` cerrando el loop
 
 | Spec asume | Decisión pragmática |
 |---|---|
-| Cloud Run service `hubspot-greenhouse-integration` vive en `services/` de este repo | Vive en repo externo. Este repo implementa el **cliente** con graceful `endpoint_not_deployed` fallback en los 3 endpoints pendientes (PATCH/archive/reconcile). Deploy del service queda como follow-up del repo `hubspot-greenhouse-integration` |
+| Cloud Run service `hubspot-greenhouse-integration` vive en `services/` de este repo | Vive en repo externo. Este repo implementa el **cliente**; desde TASK-563 el service externo ya está deployado/live con `PATCH/archive/reconcile` |
 | Anti-ping-pong helper compartido de TASK-540 | TASK-540 ya aterrizó `src/lib/sync/anti-ping-pong.ts`. `push-product-to-hubspot.ts` sigue inline leyendo `hubspot_last_write_at` + ventana 60s; `TASK-563` debe refactorizarlo al helper canónico |
 | Columna nueva `gh_last_write_at` | No necesaria: `hubspot_last_write_at` (migration TASK-547) cumple esa función; `last_outbound_sync_at` (TASK-545) sigue como el ACK timestamp para UI display |
 | `sync_status` granular (5 estados) | Columna legacy `sync_status` es `local_only | pending_sync | synced`. NO se toca. En su lugar 4 cols nuevas específicas del bridge HubSpot (espejo del patrón TASK-524 income), con CHECK constraint enforced |
 | Batch API HubSpot para ≥5 events en 30s | Deferido. El reactive worker procesa events 1:1 hoy; introducir coalescing requiere cambios cross-projection. Follow-up explícito post-producción |
-| Tests E2E contra HubSpot sandbox | Deferido a post-deploy. Los 30 unit tests cubren todos los paths del push helper + adapter + projection con mocks; E2E contra HubSpot real queda para staging smoke test post-activación del flag |
+| Tests E2E contra HubSpot sandbox | Resueltos por TASK-563. El smoke staging real ahora vive en `scripts/e2e-product-hubspot-outbound.ts` y respeta la ventana anti-ping-pong de 60s entre writes |
 
 ### Runtime topology confirmada
 
 - **ops-worker** (Cloud Run) — corre `productHubSpotOutboundProjection` del outbox. Consume eventos `commercial.product_catalog.*` emitidos por la materialización de TASK-546. Mismo carril que `quotationHubSpotOutbound` (TASK-463) y `incomeHubSpotOutbound` (TASK-524).
-- **hubspot-greenhouse-integration** (Cloud Run, repo externo) — HTTP facade a HubSpot Products API. Expone `POST /products` (ya deployado), y **necesita deploy** de `PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile`. El cliente de este repo handle 404 como `endpoint_not_deployed` y el retry worker reprocessa cuando el service ship los endpoints.
+- **hubspot-greenhouse-integration** (Cloud Run, repo externo) — HTTP facade a HubSpot Products API. Desde TASK-563 expone `POST /products`, `PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile` y ya fue validado en staging.
 - **commercial-cost-worker** — NO participa. Reservado para cost basis materialization.
 
 ### Decisión multi-currency (open question #4 resuelta)
@@ -60,21 +83,20 @@ Cuando TASK-421 desbloquee multi-currency, el adapter + materializer extenderán
 
 ### Rollout plan
 
-1. **Deploy del service externo**: el repo `hubspot-greenhouse-integration` debe shipear `PATCH /products/:id`, `POST /products/:id/archive`, `GET /products/reconcile` antes de activar el bridge. Mientras tanto, el cliente handle 404 como `endpoint_not_deployed` y el retry worker reprocessa cuando shipa.
-2. **Custom properties**: correr runbook `docs/operations/hubspot-custom-properties-products.md` contra sandbox HubSpot, validar, replicar en production.
-3. **Staging activation**: con los flags `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}` ya ON de TASK-546, los eventos fluirán. Monitorear:
+1. **Service externo**: resuelto por TASK-563; `PATCH /products/:id`, `POST /products/:id/archive` y `GET /products/reconcile` ya están live.
+2. **Custom properties**: resuelto por TASK-563; runbook aplicado en sandbox + production.
+3. **Staging activation**: resuelto por TASK-563. Con los flags `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}` ON, el smoke create/update/archive ya quedó validado. Mantener monitoreo sobre:
    - `greenhouse_commercial.product_catalog.hubspot_sync_status` distribución
    - Outbox lag (eventos `commercial.product_catalog.*` con edad >5min)
    - `hubspot_sync_attempt_count` max per product (alerta si >3)
-4. **Production activation**: replicar tras 48h de staging sin errores.
+4. **Production activation**: env ya provisionado por TASK-563; el rollout runtime queda ligado al próximo deploy formal de `main`.
 
 ### Gaps reconocidos para fases siguientes
 
 1. **TASK-548 (Fase D)** — drift cron: consume `reconcileHubSpotGreenhouseProducts` para comparar `gh_owned_fields_checksum` con snapshot HubSpot; escribe `product_sync_conflicts`. Shipped 2026-04-21: cron `ops-product-catalog-drift-detect`, comandos admin, routes `/api/admin/commercial/product-sync-conflicts/**`, Admin Center surface y Slack alerting.
 2. **TASK-549 (Fase E)** — policy enforcement: deprecar inbound auto-adopt y drop `sync_direction='hubspot_only'`.
-3. **Follow-up outbound service**: deploy de `PATCH/archive/reconcile` endpoints en `hubspot-greenhouse-integration`.
-4. **Batch API coalescing** — si el volumen justifica, agregar window-based batching de eventos 30s en el reactive worker.
-5. **Multi-currency variants** — se desbloquea con TASK-421.
+3. **Batch API coalescing** — si el volumen justifica, agregar window-based batching de eventos 30s en el reactive worker.
+4. **Multi-currency variants** — se desbloquea con TASK-421.
 
 ---
 

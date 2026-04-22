@@ -13,11 +13,12 @@ const STAGING_REQUEST_SCRIPT = resolve(PROJECT_ROOT, 'scripts/staging-request.mj
 const ENV_LOCAL_PATH = resolve(PROJECT_ROOT, '.env.local')
 
 const DEFAULT_RECONCILE_BASE_URL =
-  'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app'
+  'https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app'
 
 const DEFAULT_TIMEOUT_MS = 180_000
 const DEFAULT_INTERVAL_MS = 10_000
 const DEFAULT_PAGE_LIMIT = 100
+const ANTI_PING_PONG_SETTLE_MS = 65_000
 
 interface SellableRoleResponse {
   roleId: string
@@ -52,7 +53,28 @@ interface ScriptOptions {
   suffix: string
 }
 
+interface OutboxPublishResponse {
+  runId: string
+  eventsRead: number
+  eventsPublished: number
+  eventsFailed: number
+  durationMs: number
+}
+
+interface ReactiveRunResponse {
+  runId: string
+  eventsProcessed: number
+  eventsFailed: number
+  projectionsTriggered: number
+  actions?: string[]
+}
+
 const sleep = (ms: number) => new Promise(resolvePromise => setTimeout(resolvePromise, ms))
+
+const waitForAntiPingPongWindow = async (label: string) => {
+  console.log(`[wait] respecting anti-ping-pong window before ${label} (${ANTI_PING_PONG_SETTLE_MS}ms)`)
+  await sleep(ANTI_PING_PONG_SETTLE_MS)
+}
 
 const parseEnvFile = (content: string) => {
   const vars: Record<string, string> = {}
@@ -163,6 +185,26 @@ const deleteRoleViaStaging = async (roleId: string) => {
   })
 }
 
+const drainProductSyncPipelines = async (cycles = 2) => {
+  for (let cycle = 0; cycle < cycles; cycle += 1) {
+    const publishResult = await runStagingRequest<OutboxPublishResponse>(
+      'POST',
+      '/api/admin/ops/outbox/publish',
+      {}
+    )
+
+    const reactiveResult = await runStagingRequest<ReactiveRunResponse>(
+      'POST',
+      '/api/admin/ops/reactive/run',
+      {}
+    )
+
+    console.log(
+      `[drain] cycle ${cycle + 1}/${cycles} publish=${publishResult.eventsPublished}/${publishResult.eventsRead} reactive=${reactiveResult.eventsProcessed} projections=${reactiveResult.projectionsTriggered}`
+    )
+  }
+}
+
 const fetchReconcilePage = async (
   baseUrl: string,
   cursor?: string | null
@@ -233,6 +275,7 @@ const waitForProductState = async (
   let lastSeen: ReconcileProductItem | null = null
 
   while (Date.now() - startedAt <= timeoutMs) {
+    await drainProductSyncPipelines()
     lastSeen = await findProductByCode(baseUrl, productCode)
 
     if (predicate(lastSeen)) {
@@ -307,6 +350,8 @@ const main = async () => {
       `[ok] create synced in ${formatDuration(created.elapsedMs)} -> hubspotProductId=${created.item?.hubspotProductId}`
     )
 
+    await waitForAntiPingPongWindow('update sync')
+
     console.log('\n[2/4] Updating sellable role notes in staging')
     await runStagingRequest<SellableRoleResponse>('PATCH', `/api/admin/pricing-catalog/roles/${role.roleId}`, {
       notes: updatedNotes
@@ -322,6 +367,8 @@ const main = async () => {
     )
 
     console.log(`[ok] update synced in ${formatDuration(updated.elapsedMs)}`)
+
+    await waitForAntiPingPongWindow('archive sync')
 
     console.log('\n[3/4] Deactivating sellable role in staging')
     await deleteRoleViaStaging(role.roleId)

@@ -2,6 +2,28 @@
 
 ## 2026-04-22
 
+### 2026-04-22 — TASK-563 cierra el outbound de Product Catalog hacia HubSpot
+
+- Greenhouse EO ya validó de punta a punta el carril `sellable_role -> product_catalog -> HubSpot Products` en staging contra HubSpot sandbox.
+- **Runtime Greenhouse EO**:
+  - se restauró la emisión real de eventos `commercial.sellable_role.{created,updated,deactivated,reactivated}` en todos los write paths admin relevantes (UI roles, bulk, Excel apply, approval apply)
+  - el cliente del servicio HubSpot ahora falla explícitamente si falta `GREENHOUSE_INTEGRATION_API_TOKEN` en writes y deja de caer al endpoint Cloud Run viejo cuando falta env
+  - scripts operativos (`e2e-product-hubspot-outbound`, backfills y quote helper) quedaron apuntando al service URL vigente
+- **Operación / env**:
+  - staging tenía el root cause real del `401`: `GREENHOUSE_INTEGRATION_API_TOKEN` contaminado con comillas + `CRLF` y ausencia de `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+  - `staging` quedó saneado y el smoke real create/update/archive pasó con latencias `8.995s / 11.455s / 31.665s`
+  - `Production` quedó provisionado con token/base URL canónicos y con `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}=true` para el próximo deploy formal de `main`
+- **HubSpot properties**:
+  - `gh_product_code` → `Codigo de Producto Greenhouse`
+  - `gh_source_kind` → `Origen del Producto en Greenhouse`
+  - `gh_last_write_at` → `Ultima Sincronizacion desde Greenhouse`
+  - `gh_archived_by_greenhouse` → `Archivado por Greenhouse`
+  - `gh_business_line` → `Linea de Negocio Greenhouse`
+  - `gh_archived_by_greenhouse` quedó como boolean con opciones `Si/No`
+- **E2E learnings**:
+  - el primer smoke falló por diseño porque intentó `PATCH` dentro de la ventana anti-ping-pong de 60s; el script ahora espera 65s entre writes
+  - batch multi-product y burst/rate-limit siguen documentados como follow-up explícito, no como bloqueo de cierre
+
 ### 2026-04-22 — TASK-550 cierra los follow-ups enterprise del Pricing Catalog
 
 - El Admin Pricing Catalog ya quedó convergido respecto de los gaps declarados al cerrar TASK-471.

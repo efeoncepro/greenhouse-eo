@@ -30,6 +30,19 @@ Todas (excepto `gh_business_line`) son **read-only** desde la UI de HubSpot — 
 - Una vez por portal (sandbox → production), en orden.
 - Idempotente: correr dos veces no crea duplicados, solo salta las que ya existan.
 
+## Estado aplicado
+
+- Sandbox HubSpot: aplicado y validado el `2026-04-22`.
+- Production HubSpot: aplicado y alineado el `2026-04-22`.
+- Definiciones visibles confirmadas:
+  - `gh_product_code` → `Codigo de Producto Greenhouse`
+  - `gh_source_kind` → `Origen del Producto en Greenhouse`
+  - `gh_last_write_at` → `Ultima Sincronizacion desde Greenhouse`
+  - `gh_archived_by_greenhouse` → `Archivado por Greenhouse`
+  - `gh_business_line` → `Linea de Negocio Greenhouse`
+- Nota de implementación:
+  - `gh_archived_by_greenhouse` quedó como boolean con opciones visibles `Si` / `No`.
+
 ## Prerequisitos
 
 - Credenciales admin del portal HubSpot correspondiente.
