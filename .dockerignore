@@ -1,0 +1,66 @@
+# Root Docker build context contract for Cloud Run workers.
+#
+# The worker deploy scripts run `docker build ... -f services/<worker>/Dockerfile .`
+# from the repo root, so Docker only reads ignore rules from THIS file. The
+# service-local `.dockerignore` files are useful as reference, but they do not
+# reduce the root build context by themselves.
+#
+# Keep this file conservative: exclude generated/local/operational clutter that
+# no current worker needs, but do not prune `src/` subtrees aggressively here
+# because worker transitive imports can evolve over time.
+
+# VCS / CI / local tooling
+.git/
+.github/
+.vscode/
+.idea/
+.auth/
+.claude/
+.codex/
+.vercel/
+*.swp
+
+# Local build outputs / caches
+.next/
+.next-local/
+.next-build-dir
+.next-build-meta.json
+out/
+dist/
+build/
+coverage/
+blob-report/
+playwright-report/
+test-results/
+artifacts/
+.tmp/
+*.tsbuildinfo
+
+# Dependencies are installed inside the image
+node_modules/
+
+# Local env / secrets
+.env*
+!.env.example
+!.env.local.example
+
+# Repo areas not needed by current Cloud Run worker images
+bigquery/
+data/
+demo-configs/
+docs/
+full-version/
+public/
+spec/
+tests/
+
+# Test sources
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+src/test/
+
+# Misc
+*.tmp
+*.log
+.DS_Store

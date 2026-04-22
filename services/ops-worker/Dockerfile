@@ -20,7 +20,10 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json ./
 COPY src/ ./src/
-COPY services/ops-worker/server.ts services/ops-worker/auth.ts services/ops-worker/reactive-queue-depth.ts ./services/ops-worker/
+# Copy the whole service directory so new sibling modules are automatically
+# available to esbuild. This avoids Cloud Build regressions whenever ops-worker
+# grows a new local helper/import.
+COPY services/ops-worker/ ./services/ops-worker/
 
 # Bundle: resolves @/ path aliases + TypeScript at build time.
 # server-only shimmed to empty module (Next.js convention).
