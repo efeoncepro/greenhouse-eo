@@ -340,15 +340,11 @@ const QuoteContextStrip = ({
     ? `${selectedContact.fullName ?? selectedContact.canonicalEmail ?? selectedContact.identityProfileId}${selectedContact.isPrimary ? ' · ' + GH_PRICING.contextChips.contact.primaryBadge : ''}`
     : null
 
-  const dealValue = selectedDeal
-    ? [
-        selectedDeal.dealName,
-        selectedDeal.dealstageLabel,
-        selectedDeal.isClosed ? (selectedDeal.isWon ? 'Cerrado ganado' : 'Cerrado') : null
-      ]
-        .filter(Boolean)
-        .join(' · ')
-    : null
+  // Chip value shows ONLY dealName — the stage / pipeline / closed-status live
+  // inside the popover's secondary line to keep the chip content-first.
+  // Enterprise pattern (Linear / Notion): chip shows the identity, popover
+  // shows context.
+  const dealValue = selectedDeal?.dealName ?? null
 
   const commercialModelValue = selectedCommercialModel
     ? `${selectedCommercialModel.label} · ${formatMultiplier(selectedCommercialModel.multiplierPct)}`
@@ -428,7 +424,7 @@ const QuoteContextStrip = ({
         position: 'sticky',
         top: stickyOffset,
         zIndex: theme.zIndex.appBar - 2,
-        py: 1.5,
+        py: 2,
         px: { xs: 2, md: 3 },
 
         // Solid subtle bg + crisp border-bottom — 2026 enterprise pattern
@@ -437,7 +433,7 @@ const QuoteContextStrip = ({
         borderBottom: `1px solid ${theme.palette.divider}`
       })}
     >
-      <Stack spacing={1.5} aria-label={GH_PRICING.contextChips.ariaLabel}>
+      <Stack spacing={2} aria-label={GH_PRICING.contextChips.ariaLabel}>
         {/* ────────────────────────────────────────────────────────────────
             Tier 1 — Party (prominence='primary'). Flex-distributed chips
             + right-anchored progress counter. Balances the strip so the
@@ -449,15 +445,15 @@ const QuoteContextStrip = ({
           </Typography>
           <Stack
             direction={{ xs: 'column', md: 'row' }}
-            spacing={{ xs: 1.5, md: 2 }}
+            spacing={{ xs: 2, md: 2.5 }}
             alignItems='stretch'
             justifyContent='space-between'
             useFlexGap
           >
             <Stack
               direction='row'
-              spacing={1.5}
-              rowGap={1.5}
+              spacing={2}
+              rowGap={2}
               flexWrap='wrap'
               useFlexGap
               alignItems='stretch'

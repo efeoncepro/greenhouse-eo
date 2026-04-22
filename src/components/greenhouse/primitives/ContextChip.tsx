@@ -293,8 +293,8 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             // balance 3 chips across the strip instead of leaving dead space.
             width: fullWidth ? '100%' : undefined,
             maxWidth: fullWidth ? 'none' : '40ch',
-            px: 1.75,
-            py: 1,
+            px: 2,
+            py: 1.25,
             borderRadius: `${theme.shape.customBorderRadius.md}px`,
 
             // Solid border on all states (2026 enterprise — Linear, Stripe).
@@ -377,11 +377,16 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
               aria-hidden='true'
               sx={{ fontSize: 16, flexShrink: 0 }}
             />
-            <Stack spacing={0} sx={{ minWidth: 0, flex: 1 }}>
+            <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 id={labelId}
-                variant='overline'
-                sx={{ lineHeight: 1.2, color: 'text.secondary' }}
+                variant='caption'
+                sx={{
+                  lineHeight: 1.2,
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                  letterSpacing: 0
+                }}
               >
                 {label}
                 {required ? (
@@ -391,7 +396,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 ) : null}
               </Typography>
               <Typography
-                variant={status === 'filled' ? 'subtitle2' : 'body2'}
+                variant={status === 'filled' ? 'subtitle1' : 'body1'}
                 sx={{
                   fontWeight: status === 'filled' ? 500 : 400,
                   color:
