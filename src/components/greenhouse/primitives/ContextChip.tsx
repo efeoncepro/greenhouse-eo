@@ -3,6 +3,7 @@
 import {
   forwardRef,
   useId,
+  useMemo,
   useRef,
   useState,
   type HTMLAttributes,
@@ -19,12 +20,14 @@ import ClickAwayListener from '@mui/material/ClickAwayListener'
 import InputAdornment from '@mui/material/InputAdornment'
 import InputBase from '@mui/material/InputBase'
 import Paper from '@mui/material/Paper'
+import type { PaperProps } from '@mui/material/Paper'
 import Popover from '@mui/material/Popover'
 import Popper from '@mui/material/Popper'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { alpha, styled } from '@mui/material/styles'
+import { alpha, styled, useTheme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles'
 
 export type ContextChipStatus = 'empty' | 'filled' | 'invalid' | 'locked' | 'blocking-empty'
 
@@ -125,6 +128,103 @@ const StyledSearchInput = styled(InputBase)(({ theme }) => ({
 }))
 
 /**
+ * Resolves the background tint color for the popover notice footer based on
+ * its semantic tone. Extracted to module scope for testability and to keep the
+ * render tree small.
+ */
+const resolveNoticeBackground = (
+  theme: Theme,
+  tone: ContextChipPopoverNotice['tone']
+): string => {
+  switch (tone) {
+    case 'error':
+      return alpha(theme.palette.error.main, 0.06)
+    case 'warning':
+      return alpha(theme.palette.warning.main, 0.08)
+    case 'info':
+      return alpha(theme.palette.info.main, 0.08)
+    default:
+      return alpha(theme.palette.text.primary, 0.03)
+  }
+}
+
+/**
+ * Props that the custom Autocomplete Paper accepts, in addition to the standard
+ * MUI `PaperProps`. `notice` is the data to render in the footer; `onAfterAction`
+ * is invoked after the footer's action fires, so the consumer (ContextChip) can
+ * close the popover.
+ */
+interface ContextChipPaperProps extends PaperProps {
+  notice?: ContextChipPopoverNotice
+  onAfterAction?: () => void
+}
+
+/**
+ * Custom Paper component for MUI Autocomplete that renders the popover listbox
+ * AND the optional notice footer inside the same absolutely-positioned Paper.
+ *
+ * This is necessary because MUI Autocomplete with `open disablePortal` renders
+ * its listbox Paper as absolutely positioned. A sibling element placed after
+ * the Autocomplete in static flow would be occluded by this absolute Paper.
+ * By injecting the notice inside the same Paper, both the listbox and notice
+ * share the same positioning context and stack correctly.
+ *
+ * `forwardRef` preserves MUI's ref-forwarding contract for focus management.
+ */
+const ContextChipAutocompletePaper = forwardRef<HTMLDivElement, ContextChipPaperProps>(
+  function ContextChipAutocompletePaper({ children, notice, onAfterAction, sx, ...paperRest }, ref) {
+    const theme = useTheme()
+
+    return (
+      <Paper
+        {...paperRest}
+        ref={ref}
+        sx={[
+          { boxShadow: 'none', borderRadius: 0, margin: 0, border: 'none' },
+          ...(Array.isArray(sx) ? sx : sx ? [sx] : [])
+        ]}
+      >
+        {children}
+        {notice ? (
+          <Stack
+            direction='row'
+            spacing={1}
+            alignItems='flex-start'
+            justifyContent='space-between'
+            sx={{
+              px: 1.5,
+              py: 1.25,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              backgroundColor: resolveNoticeBackground(theme, notice.tone)
+            }}
+          >
+            <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.4 }}>
+              {notice.message}
+            </Typography>
+            {notice.actionLabel && notice.onAction ? (
+              <Button
+                size='small'
+                variant='text'
+                color={notice.tone === 'error' ? 'error' : 'primary'}
+                onClick={event => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  notice.onAction?.()
+                  onAfterAction?.()
+                }}
+                sx={{ minWidth: 'auto', px: 0.75, alignSelf: 'center' }}
+              >
+                {notice.actionLabel}
+              </Button>
+            ) : null}
+          </Stack>
+        ) : null}
+      </Paper>
+    )
+  }
+)
+
+/**
  * Context chip — compact display + popover editor for one contextual field.
  *
  * Built on MUI's GitHub Picker pattern (Autocomplete with `open` forced true
@@ -188,6 +288,31 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
       : null
 
   const inputValue = !isCustomMode(props) ? (props.inputValue ?? internalInputValue) : ''
+
+  // Notice to render inside the Autocomplete Paper footer. Only defined for
+  // select mode — custom mode has no listbox to pair a notice with.
+  const popoverNoticeForPaper = !isCustomMode(props) ? props.popoverNotice : undefined
+
+  // Memoize the PaperComponent so MUI Autocomplete doesn't re-mount the Paper
+  // (and re-focus the input) on every parent render. The memo key bakes in the
+  // notice + close handler because those drive the render output.
+  const autocompletePaperComponent = useMemo(() => {
+    const MemoizedPaper = forwardRef<HTMLDivElement, PaperProps>(function MemoizedPaper(
+      paperProps,
+      paperRef
+    ) {
+      return (
+        <ContextChipAutocompletePaper
+          {...paperProps}
+          ref={paperRef}
+          notice={popoverNoticeForPaper}
+          onAfterAction={handleClose}
+        />
+      )
+    })
+
+    return MemoizedPaper
+  }, [popoverNoticeForPaper])
 
   return (
     <>
@@ -644,43 +769,13 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                     })
                   }
                 }}
+
+                // PaperComponent injects the popoverNotice footer INSIDE the
+                // Autocomplete's absolutely-positioned Paper so the notice sits
+                // below the listbox without being occluded by it in static flow.
+                // Memoized via `autocompletePaperComponent` above.
+                PaperComponent={autocompletePaperComponent}
               />
-              {props.popoverNotice ? (
-                <Stack
-                  direction='row'
-                  spacing={1}
-                  alignItems='flex-start'
-                  justifyContent='space-between'
-                  sx={theme => ({
-                    px: 1.5,
-                    py: 1.25,
-                    borderTop: `1px solid ${theme.palette.divider}`,
-                    backgroundColor:
-                      props.popoverNotice?.tone === 'error'
-                        ? alpha(theme.palette.error.main, 0.06)
-                        : props.popoverNotice?.tone === 'warning'
-                          ? alpha(theme.palette.warning.main, 0.08)
-                          : props.popoverNotice?.tone === 'info'
-                            ? alpha(theme.palette.info.main, 0.08)
-                            : alpha(theme.palette.text.primary, 0.03)
-                  })}
-                >
-                  <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.4 }}>
-                    {props.popoverNotice.message}
-                  </Typography>
-                  {props.popoverNotice.actionLabel && props.popoverNotice.onAction ? (
-                    <Button
-                      size='small'
-                      variant='text'
-                      color={props.popoverNotice.tone === 'error' ? 'error' : 'primary'}
-                      onClick={props.popoverNotice.onAction}
-                      sx={{ minWidth: 'auto', px: 0.5, alignSelf: 'center' }}
-                    >
-                      {props.popoverNotice.actionLabel}
-                    </Button>
-                  ) : null}
-                </Stack>
-              ) : null}
             </Paper>
           </ClickAwayListener>
         </Popper>
