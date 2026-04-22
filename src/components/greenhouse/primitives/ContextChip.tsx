@@ -26,7 +26,9 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha, styled } from '@mui/material/styles'
 
-export type ContextChipStatus = 'empty' | 'filled' | 'invalid' | 'locked'
+export type ContextChipStatus = 'empty' | 'filled' | 'invalid' | 'locked' | 'blocking-empty'
+
+export type ContextChipProminence = 'primary' | 'inline'
 
 export interface ContextChipOption {
   value: string
@@ -47,6 +49,17 @@ interface ContextChipCommonProps {
   errorMessage?: string | null
   testId?: string
   ariaLabel?: string
+
+  /**
+   * Visual prominence tier.
+   * - `primary` (default): full chip box, 44px touch target, for required/party-level context.
+   * - `inline`: no box, inline underline-on-hover, for secondary terms (business line, currency, duration, validity).
+   * Popover behavior is identical across tiers.
+   */
+  prominence?: ContextChipProminence
+
+  /** Micro-label shown below the chip when status='blocking-empty' (e.g. "Requerido"). */
+  requiredHint?: string
 }
 
 interface ContextChipPopoverNotice {
@@ -129,7 +142,9 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
     disabled = false,
     errorMessage,
     testId,
-    ariaLabel
+    ariaLabel,
+    prominence = 'primary',
+    requiredHint
   } = props
 
   const labelId = useId()
@@ -192,37 +207,86 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           const isFilled = status === 'filled'
           const isInvalid = status === 'invalid'
           const isLocked = status === 'locked'
+          const isBlocking = status === 'blocking-empty'
+          const isInline = prominence === 'inline'
 
           const borderColor = isInvalid
             ? theme.palette.error.main
-            : isFilled || isOpen
-              ? theme.palette.primary.main
-              : alpha(theme.palette.divider, 1)
+            : isBlocking
+              ? theme.palette.warning.main
+              : isFilled || isOpen
+                ? theme.palette.primary.main
+                : alpha(theme.palette.divider, 1)
 
           const bgColor = isLocked
             ? theme.palette.action.disabledBackground
-            : isFilled
-              ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.18 : 0.08)
-              : isInvalid
-                ? alpha(theme.palette.error.main, 0.06)
-                : 'transparent'
+            : isBlocking
+              ? alpha(theme.palette.warning.main, 0.08)
+              : isFilled
+                ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.18 : 0.08)
+                : isInvalid
+                  ? alpha(theme.palette.error.main, 0.06)
+                  : 'transparent'
 
           const textColor = isFilled
             ? theme.palette.primary.main
             : isInvalid
               ? theme.palette.error.main
-              : isLocked
-                ? theme.palette.text.disabled
-                : theme.palette.text.primary
+              : isBlocking
+                ? theme.palette.warning.dark
+                : isLocked
+                  ? theme.palette.text.disabled
+                  : theme.palette.text.primary
 
+          // Inline prominence: no box, inline text with hover underline, same popover behavior.
+          if (isInline) {
+            return {
+              minHeight: 28,
+              minWidth: 0,
+              px: 0.5,
+              py: 0.25,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+              border: '1px solid transparent',
+              backgroundColor: 'transparent',
+              color: textColor,
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 0.75,
+              textAlign: 'left',
+              transition: theme.transitions.create(['background-color', 'border-color'], {
+                duration: 200,
+                easing: 'cubic-bezier(0.2, 0, 0, 1)'
+              }),
+              '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+              '&:hover': isInteractive
+                ? {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    textDecoration: 'underline',
+                    textDecorationStyle: 'dotted',
+                    textDecorationColor: theme.palette.primary.main,
+                    textUnderlineOffset: 4
+                  }
+                : undefined,
+              '&.Mui-focusVisible': {
+                outline: `2px solid ${theme.palette.primary.main}`,
+                outlineOffset: 2
+              },
+              '&.Mui-disabled': { opacity: 1, pointerEvents: 'none' }
+            }
+          }
+
+          // Primary prominence: boxed chip (default).
           return {
-            minHeight: 40,
+            minHeight: 44,
             minWidth: 0,
-            maxWidth: 320,
+            maxWidth: '40ch',
             px: 1.75,
             py: 1,
-            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-            border: status === 'empty' ? `1px dashed ${borderColor}` : `1px solid ${borderColor}`,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            border:
+              status === 'empty'
+                ? `1px dashed ${borderColor}`
+                : `1px solid ${borderColor}`,
             backgroundColor: bgColor,
             color: textColor,
             display: 'inline-flex',
@@ -230,13 +294,16 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             gap: 1,
             textAlign: 'left',
             transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform'], {
-              duration: theme.transitions.duration.shortest
+              duration: 200,
+              easing: 'cubic-bezier(0.2, 0, 0, 1)'
             }),
             '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
             '&:hover': isInteractive
               ? {
-                  borderColor: theme.palette.primary.main,
-                  backgroundColor: alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.14 : 0.06)
+                  borderColor: isBlocking ? theme.palette.warning.main : theme.palette.primary.main,
+                  backgroundColor: isBlocking
+                    ? alpha(theme.palette.warning.main, 0.12)
+                    : alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.14 : 0.06)
                 }
               : undefined,
             '&:active': isInteractive ? { transform: 'scale(0.98)' } : undefined,
@@ -248,63 +315,123 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           }
         }}
       >
-        <Box
-          component='i'
-          className={status === 'invalid' ? 'tabler-alert-triangle' : status === 'locked' ? 'tabler-lock' : icon}
-          aria-hidden='true'
-          sx={{ fontSize: 16, flexShrink: 0 }}
-        />
-        <Stack spacing={0} sx={{ minWidth: 0, flex: 1 }}>
-          <Typography
-            id={labelId}
-            variant='caption'
-            sx={{
-              lineHeight: 1.1,
-              fontWeight: 500,
-              color: 'inherit',
-              opacity: 0.7,
-              textTransform: 'none',
-              letterSpacing: 0,
-              fontSize: '0.6875rem'
-            }}
-          >
-            {label}
-            {required ? (
-              <Box component='span' aria-hidden='true' sx={{ color: 'error.main', ml: 0.25 }}>
-                *
-              </Box>
+        {prominence === 'inline' ? (
+          <>
+            <Box
+              component='i'
+              className={
+                status === 'invalid'
+                  ? 'tabler-alert-triangle'
+                  : status === 'blocking-empty'
+                    ? 'tabler-alert-circle'
+                    : status === 'locked'
+                      ? 'tabler-lock'
+                      : icon
+              }
+              aria-hidden='true'
+              sx={{ fontSize: 14, flexShrink: 0 }}
+            />
+            <Typography
+              id={labelId}
+              component='span'
+              variant='body2'
+              sx={{
+                fontWeight: status === 'filled' ? 500 : 400,
+                color: 'inherit',
+                lineHeight: 1.3,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {displayText}
+            </Typography>
+          </>
+        ) : (
+          <>
+            <Box
+              component='i'
+              className={
+                status === 'invalid'
+                  ? 'tabler-alert-triangle'
+                  : status === 'blocking-empty'
+                    ? 'tabler-alert-circle'
+                    : status === 'locked'
+                      ? 'tabler-lock'
+                      : icon
+              }
+              aria-hidden='true'
+              sx={{ fontSize: 16, flexShrink: 0 }}
+            />
+            <Stack spacing={0} sx={{ minWidth: 0, flex: 1 }}>
+              <Typography
+                id={labelId}
+                variant='overline'
+                sx={{ lineHeight: 1.2, color: 'text.secondary' }}
+              >
+                {label}
+                {required ? (
+                  <Box component='span' aria-hidden='true' sx={{ color: 'error.main', ml: 0.25 }}>
+                    *
+                  </Box>
+                ) : null}
+              </Typography>
+              <Typography
+                variant={status === 'filled' ? 'subtitle2' : 'body2'}
+                sx={{
+                  fontWeight: status === 'filled' ? 500 : 400,
+                  color:
+                    status === 'empty' || status === 'blocking-empty' ? 'text.secondary' : 'inherit',
+                  lineHeight: 1.3,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  fontStyle: status === 'empty' ? 'italic' : 'normal'
+                }}
+              >
+                {status === 'blocking-empty' ? (
+                  <Box component='span' sx={{ color: 'warning.dark', fontWeight: 500 }}>
+                    {displayText}
+                  </Box>
+                ) : (
+                  displayText
+                )}
+              </Typography>
+            </Stack>
+            {status !== 'locked' ? (
+              <Box
+                component='i'
+                className='tabler-chevron-down'
+                aria-hidden='true'
+                sx={{
+                  fontSize: 16,
+                  flexShrink: 0,
+                  transition: 'transform 150ms ease-out',
+                  transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+                  '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+                }}
+              />
             ) : null}
-          </Typography>
-          <Typography
-            variant='body2'
-            sx={{
-              fontWeight: status === 'filled' ? 600 : 400,
-              color: status === 'empty' ? 'text.secondary' : 'inherit',
-              lineHeight: 1.2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontStyle: status === 'empty' ? 'italic' : 'normal'
-            }}
-          >
-            {displayText}
-          </Typography>
-        </Stack>
-        {status !== 'locked' ? (
-          <Box
-            component='i'
-            className='tabler-chevron-down'
-            aria-hidden='true'
-            sx={{
-              fontSize: 16,
-              flexShrink: 0,
-              transition: 'transform 150ms ease-out',
-              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-              '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
-            }}
-          />
-        ) : null}
+          </>
+        )}
       </ButtonBase>
+
+      {prominence === 'primary' && status === 'blocking-empty' && requiredHint ? (
+        <Typography
+          variant='caption'
+          component='span'
+          sx={{
+            display: 'block',
+            mt: 0.5,
+            color: 'warning.main',
+            fontWeight: 500,
+            lineHeight: 1.2
+          }}
+          aria-hidden='true'
+        >
+          {requiredHint}
+        </Typography>
+      ) : null}
 
       {errorMessage ? (
         <Tooltip
