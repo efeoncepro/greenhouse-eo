@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from typing import Any
+from urllib.parse import urlparse
 
 
 MULTI_VALUE_SPLIT_RE = re.compile(r"[;,\n|]+")
@@ -50,6 +51,35 @@ def _display_name(owner: dict[str, Any]) -> str | None:
     return full_name or None
 
 
+def _company_display_name(props: dict[str, Any], fallback_id: str) -> str:
+    for value in (
+        props.get("name"),
+        props.get("domain"),
+        props.get("website"),
+    ):
+        normalized = str(value or "").strip()
+        if normalized:
+            return normalized
+    return f"HubSpot Company {fallback_id}"
+
+
+def _normalize_domain(value: Any) -> str | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+
+    if "://" not in raw:
+        raw = f"https://{raw}"
+
+    try:
+        hostname = urlparse(raw).hostname or ""
+    except ValueError:
+        return None
+
+    normalized = hostname.lower().removeprefix("www.").strip()
+    return normalized or None
+
+
 def build_company_profile(
     company: dict[str, Any],
     *,
@@ -92,6 +122,22 @@ def build_company_profile(
             "sourceObjectType": "company",
             "sourceObjectId": str(company.get("id")),
         },
+    }
+
+
+def build_company_search_item(company: dict[str, Any]) -> dict[str, Any]:
+    props = company.get("properties") or {}
+    company_id = str(company.get("id"))
+    website = props.get("website")
+    domain = props.get("domain") or _normalize_domain(website)
+
+    return {
+        "hubspotCompanyId": company_id,
+        "displayName": _company_display_name(props, company_id),
+        "domain": domain,
+        "website": website,
+        "lifecyclestage": props.get("lifecyclestage"),
+        "lastModifiedAt": props.get("hs_lastmodifieddate") or company.get("updatedAt"),
     }
 
 

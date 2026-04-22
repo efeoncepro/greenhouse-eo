@@ -68,6 +68,35 @@ class HubSpotClient:
             )
         return response.json()
 
+    def search_companies(
+        self,
+        query: str,
+        *,
+        properties: list[str],
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        normalized_query = query.strip()
+        if not normalized_query:
+            return []
+
+        response = self.session.post(
+            f"{HUBSPOT_API}/crm/v3/objects/companies/search",
+            headers=self._headers(),
+            json={
+                "query": normalized_query,
+                "properties": self._unique_properties(properties),
+                "limit": max(1, min(limit, 50)),
+                "sorts": ["-hs_lastmodifieddate"],
+            },
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return (response.json() or {}).get("results") or []
+
     def update_company(self, company_id: str, properties: dict[str, Any]) -> dict[str, Any]:
         response = self.session.patch(
             f"{HUBSPOT_API}/crm/v3/objects/companies/{company_id}",

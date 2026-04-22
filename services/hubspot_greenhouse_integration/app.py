@@ -12,6 +12,7 @@ try:
     from .hubspot_client import HubSpotClient, HubSpotIntegrationError
     from .models import (
         build_company_profile,
+        build_company_search_item,
         build_contact_profile,
         build_line_item_profile,
         build_owner_profile,
@@ -33,7 +34,17 @@ except ImportError:
     from contract import build_contract
     from greenhouse_client import GreenhouseClient
     from hubspot_client import HubSpotClient, HubSpotIntegrationError
-    from models import build_company_profile, build_contact_profile, build_line_item_profile, build_owner_profile, build_product_profile, build_product_reconcile_item, build_quote_profile, build_service_profile
+    from models import (
+        build_company_profile,
+        build_company_search_item,
+        build_contact_profile,
+        build_line_item_profile,
+        build_owner_profile,
+        build_product_profile,
+        build_product_reconcile_item,
+        build_quote_profile,
+        build_service_profile,
+    )
     from webhooks import (
         extract_company_ids_from_webhook_events,
         parse_webhook_events,
@@ -148,6 +159,39 @@ def create_app() -> Flask:
                     business_line_prop=app.config["business_line_prop"],
                     service_module_prop=app.config["service_module_prop"],
                 )
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.get("/companies/search")
+    def company_search():
+        raw_query = request.args.get("q", "").strip()
+        raw_limit = request.args.get("limit", "").strip()
+
+        if len(raw_query) < 2:
+            return jsonify({"query": raw_query, "count": 0, "companies": []})
+
+        try:
+            limit = int(raw_limit) if raw_limit else 20
+        except ValueError:
+            return jsonify({"error": "limit must be an integer"}), 400
+
+        try:
+            companies = _client().search_companies(
+                raw_query,
+                properties=build_contract(app.config)["sourceFields"]["companies"],
+                limit=limit,
+            )
+            return jsonify(
+                {
+                    "query": raw_query,
+                    "count": len(companies),
+                    "companies": [
+                        build_company_search_item(company) for company in companies
+                    ],
+                }
             )
         except HubSpotIntegrationError as exc:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (

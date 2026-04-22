@@ -21,6 +21,10 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "method": "GET",
                 "path": "/companies/{hubspotCompanyId}",
             },
+            "company_search": {
+                "method": "GET",
+                "path": "/companies/search?q={query}&limit={limit}",
+            },
             "company_owner": {
                 "method": "GET",
                 "path": "/companies/{hubspotCompanyId}/owner",
