@@ -41,6 +41,10 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "method": "PATCH",
                 "path": "/companies/{hubspotCompanyId}/lifecycle",
             },
+            "deal_create": {
+                "method": "POST",
+                "path": "/deals",
+            },
             "service_profile": {
                 "method": "GET",
                 "path": "/services/{hubspotServiceId}",
@@ -82,6 +86,7 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
             ],
             "appliesTo": [
                 "company_lifecycle_update",
+                "deal_create",
                 "product_create",
                 "product_update",
                 "product_archive",
@@ -131,6 +136,46 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "jobTitle",
                 "lifecyclestage",
                 "hsLeadStatus",
+            ],
+        },
+        "dealCreateModel": {
+            "required": [
+                "idempotencyKey",
+                "hubspotCompanyId",
+                "dealName",
+                "origin",
+            ],
+            "optional": [
+                "amount",
+                "currency",
+                "pipelineId",
+                "stageId",
+                "ownerHubspotUserId",
+                "closeDate",
+                "businessLineCode",
+                "correlationId",
+                "hubspotContactId",
+            ],
+            "customProperties": [
+                "gh_deal_origin",
+                "gh_idempotency_key",
+            ],
+            "supportedOrigins": [
+                "greenhouse_quote_builder",
+            ],
+            "response": [
+                "status",
+                "hubspotDealId",
+                "pipelineUsed",
+                "stageUsed",
+                "ownerUsed",
+                "message",
+            ],
+            "errorCodes": [
+                "HUBSPOT_AUTH",
+                "HUBSPOT_RATE_LIMIT",
+                "HUBSPOT_VALIDATION",
+                "HUBSPOT_UPSTREAM",
             ],
         },
         "productModel": {
@@ -218,6 +263,19 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "gh_archived_by_greenhouse",
                 "gh_business_line",
             ],
+            "deals": [
+                "dealname",
+                "amount",
+                "deal_currency_code",
+                "dealstage",
+                "pipeline",
+                "hubspot_owner_id",
+                "closedate",
+                "createdate",
+                "hs_lastmodifieddate",
+                "gh_deal_origin",
+                "gh_idempotency_key",
+            ],
             "services": [
                 "ef_space_id",
                 "ef_organization_id",
@@ -244,6 +302,7 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
             "reuseStandardCompanyFields": True,
             "createCustomCompanyPropertyOnlyIfMissingAtCompanyLevel": True,
             "restrictProductCustomPropertiesToGhPrefix": True,
+            "dealIdempotencyUsesGhPropertyWhenPresent": True,
         },
         "realtime": {
             "supported": bool(

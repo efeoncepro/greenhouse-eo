@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from hmac import compare_digest
+import time
 from typing import Any
 
 from flask import Flask, jsonify, request
@@ -57,6 +58,8 @@ except ImportError:
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config.update(build_runtime_config())
+    deal_idempotency_property = "gh_idempotency_key"
+    supported_deal_origins = {"greenhouse_quote_builder"}
 
     def _client() -> HubSpotClient:
         return HubSpotClient(
@@ -125,6 +128,203 @@ def create_app() -> Flask:
         if after:
             return f"{stage}:{after}"
         return None
+
+    def _normalize_required_text(body: dict[str, Any], field: str) -> str:
+        value = str(body.get(field) or "").strip()
+        if not value:
+            raise ValueError(f"{field} is required")
+        return value
+
+    def _normalize_optional_text(body: dict[str, Any], field: str) -> str | None:
+        value = str(body.get(field) or "").strip()
+        return value or None
+
+    def _normalize_optional_number(body: dict[str, Any], field: str) -> int | float | None:
+        value = body.get(field)
+        if value is None or value == "":
+            return None
+        if isinstance(value, bool):
+            raise ValueError(f"{field} must be a number")
+        if isinstance(value, (int, float)):
+            return value
+        try:
+            parsed = float(str(value).strip())
+        except ValueError as exc:
+            raise ValueError(f"{field} must be a number") from exc
+        if parsed.is_integer():
+            return int(parsed)
+        return parsed
+
+    def _deal_properties_payload(
+        body: dict[str, Any],
+        *,
+        include_idempotency_property: bool,
+    ) -> dict[str, Any]:
+        props: dict[str, Any] = {
+            "dealname": _normalize_required_text(body, "dealName"),
+            "gh_deal_origin": _normalize_required_text(body, "origin"),
+        }
+        if include_idempotency_property:
+            props[deal_idempotency_property] = _normalize_required_text(
+                body, "idempotencyKey"
+            )
+
+        amount = _normalize_optional_number(body, "amount")
+        if amount is not None:
+            props["amount"] = amount
+
+        currency = _normalize_optional_text(body, "currency")
+        if currency:
+            props["deal_currency_code"] = currency
+
+        pipeline_id = _normalize_optional_text(body, "pipelineId")
+        if pipeline_id:
+            props["pipeline"] = pipeline_id
+
+        stage_id = _normalize_optional_text(body, "stageId")
+        if stage_id:
+            props["dealstage"] = stage_id
+
+        owner_id = _normalize_optional_text(body, "ownerHubspotUserId")
+        if owner_id:
+            props["hubspot_owner_id"] = owner_id
+
+        close_date = _normalize_optional_text(body, "closeDate")
+        if close_date:
+            props["closedate"] = close_date
+
+        business_line_code = _normalize_optional_text(body, "businessLineCode")
+        if business_line_code:
+            props[app.config["business_line_prop"]] = business_line_code
+
+        return props
+
+    def _build_deal_response(
+        deal: dict[str, Any],
+    ) -> tuple[dict[str, Any], str]:
+        deal_id = str(deal.get("id") or "")
+        if not deal_id:
+            raise ValueError("HubSpot deal payload is missing id")
+
+        props = deal.get("properties") or {}
+        payload = {
+            "status": "created",
+            "hubspotDealId": deal_id,
+            "pipelineUsed": props.get("pipeline"),
+            "stageUsed": props.get("dealstage"),
+            "ownerUsed": props.get("hubspot_owner_id"),
+        }
+        return payload, deal_id
+
+    def _associated_record_ids(record: dict[str, Any], key: str) -> set[str]:
+        associations = record.get("associations") or {}
+        results = (associations.get(key) or {}).get("results") or []
+        ids: set[str] = set()
+        for result in results:
+            assoc_id = result.get("id") or result.get("toObjectId")
+            if assoc_id is not None:
+                ids.add(str(assoc_id))
+        return ids
+
+    def _ensure_deal_associations(
+        client: HubSpotClient,
+        *,
+        deal: dict[str, Any],
+        company_id: str,
+        contact_id: str | None,
+    ) -> None:
+        deal_id = str(deal.get("id") or "")
+        if not deal_id:
+            raise ValueError("HubSpot deal payload is missing id")
+
+        company_ids = _associated_record_ids(deal, "companies")
+        if company_ids and company_id not in company_ids:
+            raise ValueError(
+                "idempotencyKey is already associated to a different hubspotCompanyId"
+            )
+        if company_id not in company_ids:
+            client.create_default_association("deals", deal_id, "companies", company_id)
+
+        if contact_id and contact_id not in _associated_record_ids(deal, "contacts"):
+            client.create_default_association("deals", deal_id, "contacts", contact_id)
+
+    def _deal_idempotency_sort_key(deal: dict[str, Any]) -> tuple[str, str]:
+        props = deal.get("properties") or {}
+        created_at = str(props.get("createdate") or "9999-12-31T23:59:59.999Z")
+        deal_id = str(deal.get("id") or "")
+        return created_at, deal_id
+
+    def _resolve_idempotent_deal(
+        client: HubSpotClient,
+        *,
+        idempotency_key: str,
+        deal_fields: list[str],
+        fallback_deal: dict[str, Any] | None = None,
+    ) -> tuple[dict[str, Any], bool]:
+        matches: list[dict[str, Any]] = []
+
+        for attempt, delay_seconds in enumerate((0.0, 0.2, 0.5, 1.0)):
+            if delay_seconds > 0:
+                time.sleep(delay_seconds)
+
+            matches = client.search_deals(
+                property_name=deal_idempotency_property,
+                property_value=idempotency_key,
+                properties=deal_fields,
+                limit=10,
+            )
+            if matches:
+                break
+
+        if not matches:
+            if fallback_deal is None:
+                raise ValueError("HubSpot idempotency search returned no deal")
+            return fallback_deal, False
+
+        ranked_matches = sorted(matches, key=_deal_idempotency_sort_key)
+        canonical = ranked_matches[0]
+        canonical_id = str(canonical.get("id") or "")
+        archived_duplicates = False
+
+        for duplicate in ranked_matches[1:]:
+            duplicate_id = str(duplicate.get("id") or "")
+            if not duplicate_id or duplicate_id == canonical_id:
+                continue
+            try:
+                client.archive_deal(duplicate_id)
+                archived_duplicates = True
+            except HubSpotIntegrationError as exc:
+                if exc.status_code != 404:
+                    raise
+
+        return canonical, archived_duplicates
+
+    def _hubspot_error_response(exc: HubSpotIntegrationError):
+        status = exc.status_code or 502
+        code = exc.error_code or "HUBSPOT_UPSTREAM"
+        response_status = 502
+        headers: dict[str, str] = {}
+
+        if code == "HUBSPOT_AUTH":
+            response_status = 401
+        elif code == "HUBSPOT_RATE_LIMIT":
+            response_status = 429
+            if exc.retry_after:
+                headers["Retry-After"] = str(exc.retry_after)
+        elif code == "HUBSPOT_VALIDATION":
+            response_status = 422
+
+        return (
+            jsonify(
+                {
+                    "error": str(exc),
+                    "code": code,
+                    "status_code": status,
+                }
+            ),
+            response_status,
+            headers,
+        )
 
     @app.get("/health")
     def health():
@@ -344,6 +544,106 @@ def create_app() -> Flask:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (
                 exc.status_code or 502
             )
+
+    @app.post("/deals")
+    def create_deal_endpoint():
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
+        try:
+            body = request.get_json(force=True) or {}
+            hubspot_company_id = _normalize_required_text(body, "hubspotCompanyId")
+            origin = _normalize_required_text(body, "origin")
+            if origin not in supported_deal_origins:
+                return jsonify({"error": "origin is not supported"}), 400
+
+            idempotency_key = _normalize_required_text(body, "idempotencyKey")
+            contact_id = _normalize_optional_text(body, "hubspotContactId")
+            client = _client()
+            deal_fields = build_contract(app.config)["sourceFields"]["deals"]
+            existing, idempotency_property_supported = (
+                client.find_deal_by_idempotency_key(
+                    idempotency_key,
+                    properties=deal_fields,
+                )
+            )
+            deal_properties = _deal_properties_payload(
+                body,
+                include_idempotency_property=idempotency_property_supported,
+            )
+
+            reused_existing = existing is not None
+            if existing:
+                canonical, archived_duplicates = _resolve_idempotent_deal(
+                    client,
+                    idempotency_key=idempotency_key,
+                    deal_fields=deal_fields,
+                    fallback_deal=existing,
+                )
+                deal_id = str(canonical.get("id") or "")
+                reused_existing = True
+                hydrated = client.get_deal(
+                    deal_id,
+                    properties=deal_fields,
+                    associations=["companies", "contacts"],
+                )
+            else:
+                created = client.create_deal(deal_properties)
+                created_id = str(created.get("id") or "")
+                if not created_id:
+                    raise ValueError("HubSpot create_deal returned no id")
+
+                archived_duplicates = False
+                deal_id = created_id
+                if idempotency_property_supported:
+                    canonical, archived_duplicates = _resolve_idempotent_deal(
+                        client,
+                        idempotency_key=idempotency_key,
+                        deal_fields=deal_fields,
+                        fallback_deal=created,
+                    )
+                    deal_id = str(canonical.get("id") or created_id)
+                    reused_existing = deal_id != created_id
+
+                hydrated = client.get_deal(
+                    deal_id,
+                    properties=deal_fields,
+                    associations=["companies", "contacts"],
+                )
+
+            _ensure_deal_associations(
+                client,
+                deal=hydrated,
+                company_id=hubspot_company_id,
+                contact_id=contact_id,
+            )
+
+            final_deal = client.get_deal(
+                deal_id,
+                properties=deal_fields,
+            )
+            payload, _ = _build_deal_response(final_deal)
+            if reused_existing:
+                payload["message"] = "Reused existing HubSpot deal for idempotencyKey"
+                if archived_duplicates:
+                    payload["message"] += " after archiving duplicate concurrent creates"
+                return jsonify(payload), 200
+            if not idempotency_property_supported:
+                payload["message"] = (
+                    "Created deal, but durable idempotency is inactive until "
+                    "gh_idempotency_key exists in HubSpot."
+                )
+            elif archived_duplicates:
+                payload["message"] = (
+                    "Created HubSpot deal and archived duplicate concurrent creates"
+                )
+
+            return jsonify(payload), 201
+        except ValueError as exc:
+            return jsonify({"error": str(exc), "code": "INVALID_REQUEST"}), 400
+        except HubSpotIntegrationError as exc:
+            return _hubspot_error_response(exc)
 
     # ------------------------------------------------------------------
     # Products (TASK-211)

@@ -12,9 +12,18 @@ except ImportError:
 
 
 class HubSpotIntegrationError(RuntimeError):
-    def __init__(self, message: str, *, status_code: int | None = None):
+    def __init__(
+        self,
+        message: str,
+        *,
+        status_code: int | None = None,
+        error_code: str | None = None,
+        retry_after: str | int | None = None,
+    ):
         super().__init__(message)
         self.status_code = status_code
+        self.error_code = error_code
+        self.retry_after = retry_after
 
 
 def _parse_error(response: requests.Response) -> str:
@@ -39,7 +48,40 @@ def _parse_error(response: requests.Response) -> str:
     return f"{message} | {'; '.join(details)}" if details else message
 
 
+def _classify_error_code(status_code: int) -> str:
+    if status_code in {401, 403}:
+        return "HUBSPOT_AUTH"
+    if status_code == 429:
+        return "HUBSPOT_RATE_LIMIT"
+    if 400 <= status_code < 500:
+        return "HUBSPOT_VALIDATION"
+    return "HUBSPOT_UPSTREAM"
+
+
+def _raise_hubspot_error(response: requests.Response) -> None:
+    raise HubSpotIntegrationError(
+        _parse_error(response),
+        status_code=response.status_code,
+        error_code=_classify_error_code(response.status_code),
+        retry_after=response.headers.get("Retry-After"),
+    )
+
+
 class HubSpotClient:
+    DEAL_PROPERTIES = [
+        "dealname",
+        "amount",
+        "deal_currency_code",
+        "dealstage",
+        "pipeline",
+        "hubspot_owner_id",
+        "closedate",
+        "createdate",
+        "hs_lastmodifieddate",
+        "gh_deal_origin",
+        "gh_idempotency_key",
+    ]
+
     def __init__(self, *, access_token: str, timeout_seconds: int):
         normalized_access_token = access_token.strip()
         if not normalized_access_token:
@@ -53,6 +95,17 @@ class HubSpotClient:
             "Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/json",
         }
+
+    @staticmethod
+    def _association_object_name(object_type: str) -> str:
+        return {
+            "companies": "company",
+            "company": "company",
+            "contacts": "contact",
+            "contact": "contact",
+            "deals": "deal",
+            "deal": "deal",
+        }.get(object_type, object_type)
 
     def get_company(self, company_id: str, *, properties: list[str]) -> dict[str, Any]:
         response = self.session.get(
@@ -110,6 +163,130 @@ class HubSpotClient:
                 status_code=response.status_code,
             )
         return response.json()
+
+    def search_deals(
+        self,
+        *,
+        property_name: str,
+        property_value: str,
+        properties: list[str] | None = None,
+        limit: int = 1,
+    ) -> list[dict[str, Any]]:
+        normalized_name = property_name.strip()
+        normalized_value = property_value.strip()
+        if not normalized_name or not normalized_value:
+            return []
+
+        response = self.session.post(
+            f"{HUBSPOT_API}/crm/v3/objects/deals/search",
+            headers=self._headers(),
+            json={
+                "filterGroups": [
+                    {
+                        "filters": [
+                            {
+                                "propertyName": normalized_name,
+                                "operator": "EQ",
+                                "value": normalized_value,
+                            }
+                        ]
+                    }
+                ],
+                "properties": self._unique_properties(properties or self.DEAL_PROPERTIES),
+                "limit": max(1, min(limit, 10)),
+            },
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return (response.json() or {}).get("results") or []
+
+    def create_deal(self, properties: dict[str, Any]) -> dict[str, Any]:
+        response = self.session.post(
+            f"{HUBSPOT_API}/crm/v3/objects/deals",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return response.json()
+
+    def get_deal(
+        self,
+        deal_id: str,
+        *,
+        properties: list[str] | None = None,
+        associations: list[str] | None = None,
+    ) -> dict[str, Any]:
+        params: dict[str, str] = {
+            "properties": ",".join(properties or self.DEAL_PROPERTIES)
+        }
+        if associations:
+            params["associations"] = ",".join(associations)
+
+        response = self.session.get(
+            f"{HUBSPOT_API}/crm/v3/objects/deals/{deal_id}",
+            headers=self._headers(),
+            params=params,
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return response.json()
+
+    def find_deal_by_idempotency_key(
+        self,
+        idempotency_key: str,
+        *,
+        properties: list[str] | None = None,
+    ) -> tuple[dict[str, Any] | None, bool]:
+        normalized_key = idempotency_key.strip()
+        if not normalized_key:
+            return None, False
+
+        try:
+            matches = self.search_deals(
+                property_name="gh_idempotency_key",
+                property_value=normalized_key,
+                properties=properties or self.DEAL_PROPERTIES,
+                limit=1,
+            )
+        except HubSpotIntegrationError as exc:
+            if exc.status_code == 400 and "gh_idempotency_key" in str(exc).lower():
+                return None, False
+            raise
+
+        return (matches[0] if matches else None), True
+
+    def create_default_association(
+        self,
+        from_type: str,
+        from_id: str,
+        to_type: str,
+        to_id: str,
+    ) -> dict[str, Any]:
+        response = self.session.put(
+            (
+                f"{HUBSPOT_API}/crm/v4/objects/"
+                f"{self._association_object_name(from_type)}/{from_id}"
+                f"/associations/default/{self._association_object_name(to_type)}/{to_id}"
+            ),
+            headers=self._headers(),
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return response.json() if response.content else {}
+
+    def archive_deal(self, deal_id: str) -> None:
+        response = self.session.delete(
+            f"{HUBSPOT_API}/crm/v3/objects/deals/{deal_id}",
+            headers=self._headers(),
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
 
     def get_owner(self, owner_id: str) -> dict[str, Any]:
         response = self.session.get(
@@ -619,6 +796,21 @@ class HubSpotClient:
             raise HubSpotIntegrationError(
                 _parse_error(response),
                 status_code=response.status_code,
+            )
+
+    def create_default_association(
+        self, from_type: str, from_id: str, to_type: str, to_id: str
+    ) -> None:
+        response = self.session.put(
+            f"{HUBSPOT_API}/crm/v4/objects/{from_type}/{from_id}/associations/default/{to_type}/{to_id}",
+            headers=self._headers(),
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+                retry_after=response.headers.get("Retry-After"),
             )
 
     def update_quote(self, quote_id: str, properties: dict[str, Any]) -> dict[str, Any]:
