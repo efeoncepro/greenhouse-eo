@@ -52,6 +52,21 @@ export interface HubSpotGreenhouseCompanyProfile {
   }
 }
 
+export interface HubSpotGreenhouseCompanySearchItem {
+  hubspotCompanyId: string
+  displayName: string
+  domain: string | null
+  website: string | null
+  lifecyclestage: string | null
+  lastModifiedAt: string | null
+}
+
+export interface HubSpotGreenhouseCompanySearchResponse {
+  query: string
+  count: number
+  companies: HubSpotGreenhouseCompanySearchItem[]
+}
+
 export interface HubSpotGreenhouseOwnerProfile {
   hubspotOwnerId: string
   ownerEmail: string | null
@@ -427,6 +442,27 @@ export const getHubSpotGreenhouseServiceContract = async () => fetchJson<HubSpot
 
 export const getHubSpotGreenhouseCompanyProfile = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyProfile>(`/companies/${hubspotCompanyId}`)
+
+export const searchHubSpotGreenhouseCompanies = async (
+  query: string,
+  options: { limit?: number } = {}
+) => {
+  const normalizedQuery = query.trim()
+
+  if (!normalizedQuery) {
+    return {
+      query: normalizedQuery,
+      count: 0,
+      companies: []
+    } satisfies HubSpotGreenhouseCompanySearchResponse
+  }
+
+  const limit = Math.max(1, Math.min(options.limit ?? 20, 50))
+
+  return fetchJson<HubSpotGreenhouseCompanySearchResponse>(
+    `/companies/search?q=${encodeURIComponent(normalizedQuery)}&limit=${limit}`
+  )
+}
 
 export const getHubSpotGreenhouseCompanyOwner = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`)

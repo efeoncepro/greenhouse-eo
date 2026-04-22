@@ -150,7 +150,7 @@ Todos los eventos incluyen `commercial_party_id` — un identificador **estable 
 | Fase | Task | Que trae |
 |---|---|---|
 | B | TASK-536 | Shipped. HubSpot companies nuevas se materializan como `prospect` automaticamente |
-| C | TASK-537 | Shipped. `GET /parties/search` + `POST /parties/adopt` ya listos. V1 usa `greenhouse_crm.companies` y expone `hubspot_candidate` solo para carril interno |
+| C | TASK-537 | Shipped. `GET /parties/search` + `POST /parties/adopt` ya listos. El search usa `greenhouse_crm.companies` como carril principal y, para actores internos, suplementa con search live de HubSpot cuando el mirror viene atrasado; `hubspot_candidate` sigue expuesto solo para carril interno |
 | D | TASK-538 | Shipped. Quote Builder ya consume el selector unificado como carril default; adopta candidates HubSpot on-select y preserva `organizationId` como anchor canónico |
 | E | TASK-539 | Shipped. Crear deal desde Greenhouse sin saltar a HubSpot |
 | F | TASK-540 | Shipped. Greenhouse ya propaga lifecycle a HubSpot, valida anti-ping-pong y deja trazabilidad de conflictos |

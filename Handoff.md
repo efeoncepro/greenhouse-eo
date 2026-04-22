@@ -1,5 +1,47 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — Commercial Party search mirror/live hardening (Codex)
+
+- **Scope:** corregir el gap donde el selector de organización del Quote Builder no encontraba companies HubSpot existentes como prospects (ej. Carozzi) porque `greenhouse_crm.companies` venía incompleto y `/api/commercial/parties/search` dependía ciegamente del mirror.
+- **Implementacion shipped**
+  - `src/lib/commercial/party/hubspot-candidate-reader.ts`
+    - el carril de candidates ya no depende solo del mirror local
+    - `listHubSpotCandidates()` ahora hace unión canónica `mirror + live` en paralelo
+    - dedupe por `hubspot_company_id`
+    - filtro de companies ya materializadas en `greenhouse_core.organizations`
+    - `getHubSpotCandidateByCompanyId()` ya puede resolver por read live si el mirror todavía no refleja la company
+  - `src/lib/integrations/hubspot-greenhouse-service.ts`
+    - nuevo contrato `searchHubSpotGreenhouseCompanies()`
+    - types `HubSpotGreenhouseCompanySearchItem/Response`
+  - `src/app/api/commercial/parties/adopt/route.ts`
+    - error 404 deja de afirmar falsamente que el candidate “no existe en el local mirror”
+  - `scripts/sync-source-runtime-projections.ts`
+    - el seed legacy deja de excluir/borrar `greenhouse_crm.companies` con `client_id IS NULL`
+    - el mirror local vuelve a poder contener prospects puros de HubSpot
+- **Repo hermano (`hubspot-bigquery-task-563`)**
+  - nuevo endpoint `GET /companies/search?q=&limit=`
+  - `HubSpotClient.search_companies(...)`
+  - mapper `build_company_search_item(...)`
+  - tests Python extendidos para contrato y route
+- **Decision arquitectonica**
+  - la solución final no queda como “parche UI”; el contrato real pasa a ser:
+    - mirror local completo como source-of-work primario
+    - search/adopt con suplemento live cuando el mirror viene atrasado
+  - no se creó un cache paralelo nuevo (`greenhouse_sync.hubspot_companies_cache` sigue fuera de scope)
+- **Docs alineadas**
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK
+  - `python3 -m py_compile services/hubspot_greenhouse_integration/app.py services/hubspot_greenhouse_integration/hubspot_client.py services/hubspot_greenhouse_integration/models.py` OK
+  - `pnpm exec vitest run src/app/api/commercial/parties/search/route.test.ts src/app/api/commercial/parties/adopt/route.test.ts src/lib/commercial/party/__tests__/party-search-reader.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+
 ## Sesion 2026-04-22 — TASK-543 cleanup final del Commercial Party Lifecycle (Codex)
 
 - **Scope:** cerrar la Fase I del programa `TASK-534` removiendo el rollout legacy que sobrevivía en el selector unificado del Quote Builder y en el inbound HubSpot Companies sync.

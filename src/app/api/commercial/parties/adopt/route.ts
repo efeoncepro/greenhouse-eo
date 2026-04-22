@@ -171,7 +171,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(
-      { error: 'HubSpot company candidate not found in the local mirror.' },
+      { error: 'HubSpot company candidate not found.' },
       { status: 404 }
     )
   }

@@ -44,14 +44,14 @@ La primera surface visible del programa ya consume el carril unificado: el `Quot
 
 ## Delta 2026-04-21 — Fase B shipped (TASK-536)
 
-HubSpot Companies ya no entra al lifecycle comercial solo por `closed-won` o bootstrap manual. El inbound `src/lib/hubspot/sync-hubspot-companies.ts` materializa `organizations` desde `greenhouse_crm.companies` cuando el `lifecyclestage` cae en el mapping canónico (`lead/mql/sql -> prospect`, `opportunity -> opportunity`, `customer/evangelist -> active_client`).
+HubSpot Companies ya no entra al lifecycle comercial solo por `closed-won` o bootstrap manual. El inbound `src/lib/hubspot/sync-hubspot-companies.ts` materializa `organizations` desde `greenhouse_crm.companies` cuando el `lifecyclestage` cae en el mapping canónico (`lead/mql/sql -> prospect`, `opportunity -> opportunity`, `customer/evangelist -> active_client`). Desde 2026-04-22, el seed legacy de `greenhouse_crm.companies` deja de filtrar companies sin `client_id`, de modo que el mirror local vuelve a representar también prospects puros de HubSpot.
 
 ### Implementado
 
 | Área | Artefacto |
 |---|---|
 | Trigger | `GET /api/cron/hubspot-companies-sync` incremental cada 10 min + `?full=true` nocturno |
-| Source-of-work | `greenhouse_crm.companies` |
+| Source-of-work | `greenhouse_crm.companies` como mirror local completo; `GET /api/commercial/parties/search` suplementa con search live HubSpot cuando detecta gaps del mirror |
 | Writer de creación | `createPartyFromHubSpotCompany()` |
 | Writer de transición | `promoteParty()` |
 | Invariante `active_client` | `instantiateClientForParty()` si falta `client_id` |
@@ -561,7 +561,7 @@ Hoy: `GET /api/commercial/parties/search` ya existe y es el carril canónico del
 Target: **`GET /api/commercial/parties/search?q=&includeStages=`** unifica dos fuentes:
 
 1. Organizations ya materializadas en PG (todos los stages excepto `churned`, `disqualified`, `provider_only` por default).
-2. HubSpot companies NO aún sincronizadas — query al mirror local `greenhouse_crm.companies` que ya hidrata TASK-536. V1 no agrega `greenhouse_sync.hubspot_companies_cache` ni fallback live a la API de HubSpot.
+2. HubSpot companies NO aún sincronizadas — query al mirror local `greenhouse_crm.companies` que ya hidrata TASK-536, suplementado con search live vía `hubspot-greenhouse-integration` cuando el mirror todavía no refleja una company existente. V1 sigue sin crear `greenhouse_sync.hubspot_companies_cache`; el fallback live se encapsula en `hubspot-candidate-reader.ts` y mantiene dedupe por `hubspot_company_id`.
 
 Response:
 

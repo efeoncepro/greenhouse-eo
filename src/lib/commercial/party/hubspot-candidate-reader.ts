@@ -3,6 +3,12 @@ import 'server-only'
 import { sql } from 'kysely'
 
 import { getDb } from '@/lib/db'
+import {
+  getHubSpotGreenhouseCompanyProfile,
+  searchHubSpotGreenhouseCompanies,
+  type HubSpotGreenhouseCompanyProfile,
+  type HubSpotGreenhouseCompanySearchItem
+} from '@/lib/integrations/hubspot-greenhouse-service'
 
 import { parseLifecycleStage } from './lifecycle-state-machine'
 import { resolveHubSpotStage } from './hubspot-lifecycle-mapping'
@@ -74,22 +80,120 @@ const mapCandidateRow = (row: HubSpotCandidateRow): HubSpotCandidateRecord => ({
     toIsoString(row.updated_at)
 })
 
-export const listHubSpotCandidates = async ({
+const buildCandidateRecord = ({
+  hubspotCompanyId,
+  displayName,
+  hubspotLifecycleStage,
+  domain,
+  lastActivityAt
+}: {
+  hubspotCompanyId: string
+  displayName: string
+  hubspotLifecycleStage: string | null
+  domain: string | null
+  lastActivityAt: string | null
+}): HubSpotCandidateRecord => ({
+  hubspotCompanyId,
+  displayName,
+  lifecycleStage: resolveHubSpotStage(hubspotLifecycleStage, { unknownFallback: 'prospect' }),
+  hubspotLifecycleStage,
+  domain,
+  lastActivityAt
+})
+
+const mapLiveSearchCompanyToCandidate = (
+  company: HubSpotGreenhouseCompanySearchItem
+): HubSpotCandidateRecord =>
+  buildCandidateRecord({
+    hubspotCompanyId: company.hubspotCompanyId,
+    displayName: company.displayName.trim() || company.domain || company.website || company.hubspotCompanyId,
+    hubspotLifecycleStage: company.lifecyclestage,
+    domain: normalizeCompanyDomain(company.domain) ?? normalizeCompanyDomain(company.website),
+    lastActivityAt: company.lastModifiedAt
+  })
+
+const mapLiveCompanyProfileToCandidate = (
+  company: HubSpotGreenhouseCompanyProfile
+): HubSpotCandidateRecord =>
+  buildCandidateRecord({
+    hubspotCompanyId: company.hubspotCompanyId,
+    displayName:
+      company.identity.name?.trim() ||
+      normalizeCompanyDomain(company.identity.domain) ||
+      normalizeCompanyDomain(company.identity.website) ||
+      company.hubspotCompanyId,
+    hubspotLifecycleStage: company.lifecycle.lifecyclestage,
+    domain:
+      normalizeCompanyDomain(company.identity.domain) ??
+      normalizeCompanyDomain(company.identity.website),
+    lastActivityAt: company.lifecycle.ghLastWriteAt ?? null
+  })
+
+const sortCandidates = (left: HubSpotCandidateRecord, right: HubSpotCandidateRecord) => {
+  const leftTime = left.lastActivityAt ? Date.parse(left.lastActivityAt) : 0
+  const rightTime = right.lastActivityAt ? Date.parse(right.lastActivityAt) : 0
+
+  if (leftTime !== rightTime) {
+    return rightTime - leftTime
+  }
+
+  return left.displayName.localeCompare(right.displayName, 'es', { sensitivity: 'base' })
+}
+
+const dedupeCandidates = (candidates: HubSpotCandidateRecord[]): HubSpotCandidateRecord[] => {
+  const deduped = new Map<string, HubSpotCandidateRecord>()
+
+  for (const candidate of candidates) {
+    const key = candidate.hubspotCompanyId.trim()
+
+    if (!key || deduped.has(key)) {
+      continue
+    }
+
+    deduped.set(key, candidate)
+  }
+
+  return Array.from(deduped.values()).sort(sortCandidates)
+}
+
+const listMaterializedHubSpotCompanyIds = async (hubspotCompanyIds: readonly string[]): Promise<Set<string>> => {
+  const normalizedIds = Array.from(
+    new Set(hubspotCompanyIds.map(value => value.trim()).filter(Boolean))
+  )
+
+  if (normalizedIds.length === 0) {
+    return new Set()
+  }
+
+  const db = await getDb()
+
+  const rows = await db
+    .selectFrom('greenhouse_core.organizations')
+    .select(['hubspot_company_id'])
+    .where('hubspot_company_id', 'in', normalizedIds)
+    .where('active', '=', true)
+    .execute()
+
+  return new Set(
+    rows
+      .map(row => row.hubspot_company_id)
+      .filter((value): value is string => Boolean(value))
+  )
+}
+
+const isNotFoundFromHubSpotService = (error: unknown): boolean =>
+  error instanceof Error && error.message.includes('returned 404')
+
+const listLocalHubSpotCandidates = async ({
   query,
   includeStages,
-  limit = 20
+  limit
 }: {
   query: string
   includeStages: readonly LifecycleStage[]
-  limit?: number
+  limit: number
 }): Promise<HubSpotCandidateRecord[]> => {
-  const normalizedQuery = query.trim()
-
-  if (!normalizedQuery) {
-    return []
-  }
-
-  const needle = `%${normalizedQuery}%`
+  const needle = `%${query.trim()}%`
 
   const db = await getDb()
 
@@ -126,7 +230,70 @@ export const listHubSpotCandidates = async ({
   return rows
     .map(mapCandidateRow)
     .filter(candidate => includeStages.includes(candidate.lifecycleStage))
-    .slice(0, limit)
+}
+
+const listLiveHubSpotCandidates = async ({
+  query,
+  includeStages,
+  limit
+}: {
+  query: string
+  includeStages: readonly LifecycleStage[]
+  limit: number
+}): Promise<HubSpotCandidateRecord[]> => {
+  const response = await searchHubSpotGreenhouseCompanies(query, {
+    limit: Math.max(limit * 3, 30)
+  })
+
+  const candidates = response.companies
+    .map(mapLiveSearchCompanyToCandidate)
+    .filter(candidate => includeStages.includes(candidate.lifecycleStage))
+
+  const materializedHubSpotCompanyIds = await listMaterializedHubSpotCompanyIds(
+    candidates.map(candidate => candidate.hubspotCompanyId)
+  )
+
+  return candidates.filter(
+    candidate => !materializedHubSpotCompanyIds.has(candidate.hubspotCompanyId)
+  )
+}
+
+export const listHubSpotCandidates = async ({
+  query,
+  includeStages,
+  limit = 20
+}: {
+  query: string
+  includeStages: readonly LifecycleStage[]
+  limit?: number
+}): Promise<HubSpotCandidateRecord[]> => {
+  const normalizedQuery = query.trim()
+
+  if (!normalizedQuery) {
+    return []
+  }
+
+  const [localCandidates, liveCandidates] = await Promise.all([
+    listLocalHubSpotCandidates({
+      query: normalizedQuery,
+      includeStages,
+      limit
+    }),
+    listLiveHubSpotCandidates({
+      query: normalizedQuery,
+      includeStages,
+      limit
+    }).catch(error => {
+      console.warn(
+        '[hubspot-candidate-reader] Live company search failed, falling back to local mirror only.',
+        error
+      )
+
+      return [] as HubSpotCandidateRecord[]
+    })
+  ])
+
+  return dedupeCandidates([...localCandidates, ...liveCandidates]).slice(0, limit)
 }
 
 export const getHubSpotCandidateByCompanyId = async (
@@ -157,7 +324,21 @@ export const getHubSpotCandidateByCompanyId = async (
     .where('is_deleted', '=', false)
     .executeTakeFirst()
 
-  return row ? mapCandidateRow(row) : null
+  if (row) {
+    return mapCandidateRow(row)
+  }
+
+  try {
+    const company = await getHubSpotGreenhouseCompanyProfile(normalizedId)
+
+    return mapLiveCompanyProfileToCandidate(company)
+  } catch (error) {
+    if (isNotFoundFromHubSpotService(error)) {
+      return null
+    }
+
+    throw error
+  }
 }
 
 export const findMaterializedPartyByHubSpotCompanyId = async (

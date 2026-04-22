@@ -62,7 +62,7 @@
   - tabla `greenhouse_commercial.party_endpoint_requests`
   - helpers `party-search-reader`, `hubspot-candidate-reader`, `party-endpoint-rate-limit`
 - Reglas operativas:
-  - V1 usa `greenhouse_crm.companies` como mirror local de HubSpot companies; no hay search live contra la API de HubSpot
+  - `greenhouse_crm.companies` sigue siendo el mirror local primario de HubSpot companies, pero `GET /api/commercial/parties/search` ahora suplementa con search live vía `hubspot-greenhouse-integration` cuando el mirror todavía no refleja una company existente
   - toda organization materializada se scopea por tenant usando `resolveFinanceQuoteTenantOrganizationIds()`
   - los `hubspot_candidate` no materializados solo se exponen a `efeonce_internal`, porque aun no existe anchor tenant-safe para mostrarlos a tenants externos
   - `/adopt` es idempotente por `hubspot_company_id` y, si el lifecycle mapea a `active_client`, completa tambien `instantiateClientForParty`
@@ -352,7 +352,8 @@
   - schedule Vercel `*/10 * * * *` incremental + `0 3 * * *` full (`?full=true`)
   - rollout inicial detrás de `GREENHOUSE_PARTY_LIFECYCLE_SYNC` (removido luego por `TASK-543`)
 - Contrato operativo:
-  - el source-of-work local es `greenhouse_crm.companies`, no un full-list live read a Cloud Run
+  - el source-of-work local es `greenhouse_crm.companies`, pero el selector unificado de parties puede suplementar con search live contra Cloud Run para cerrar gaps operativos del mirror
+  - `scripts/sync-source-runtime-projections.ts` ya no filtra HubSpot companies sin `client_id` al proyectar `greenhouse_crm.companies`; el mirror local vuelve a incluir prospects puros
   - toda alta de party sigue pasando por `createPartyFromHubSpotCompany`
   - toda promoción posterior sigue pasando por `promoteParty`
   - si HubSpot mapea a `active_client`, el pipeline instancia `client_id` con `instantiateClientForParty` para respetar el invariante del lifecycle

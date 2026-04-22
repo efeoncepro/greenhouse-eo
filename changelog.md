@@ -2,6 +2,13 @@
 
 ## 2026-04-22
 
+### 2026-04-22 — Commercial Party search deja de depender ciegamente del mirror local
+
+- `GET /api/commercial/parties/search` y `POST /api/commercial/parties/adopt` ya no quedan bloqueados cuando `greenhouse_crm.companies` viene atrasado respecto de HubSpot.
+- `hubspot-candidate-reader.ts` ahora hace unión canónica `mirror local + search live` vía `hubspot-greenhouse-integration`, dedupe por `hubspot_company_id` y filtro de companies ya materializadas en `organizations`.
+- El servicio hermano `hubspot-greenhouse-integration` expone `GET /companies/search?q=&limit=` para búsqueda live de companies reutilizable por Greenhouse.
+- `scripts/sync-source-runtime-projections.ts` deja de excluir companies sin `client_id` al escribir `greenhouse_crm.companies`, de modo que el mirror local puede volver a contener prospects antiguos/puros como source-of-work del lifecycle comercial.
+
 ### 2026-04-22 — TASK-543 cierra el rollout legacy del Commercial Party Lifecycle
 
 - El Quote Builder de creación usa el selector unificado de parties como comportamiento canónico por defecto; ya no depende de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`.

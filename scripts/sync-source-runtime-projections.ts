@@ -1857,6 +1857,9 @@ const syncHubspot = async (): Promise<SyncSummary> => {
       }
     })
 
+    // Keep the CRM company mirror complete, even when the company is still a
+    // pure prospect without a Greenhouse client binding. Deals/contacts remain
+    // client-scoped below until their own lanes are widened.
     const projectedCompanies = crmCompanies.filter(company => Boolean(company.client_id))
     const projectedCompanyIds = new Set(projectedCompanies.map(company => company.company_source_id).filter(Boolean))
 
@@ -2279,13 +2282,6 @@ const syncHubspot = async (): Promise<SyncSummary> => {
 
     await runGreenhousePostgresQuery(
       `
-        DELETE FROM greenhouse_crm.companies
-        WHERE client_id IS NULL
-      `
-    )
-
-    await runGreenhousePostgresQuery(
-      `
         DELETE FROM greenhouse_crm.contacts
         WHERE client_id IS NULL
       `
@@ -2293,7 +2289,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
 
     let projected = 0
 
-    for (const company of projectedCompanies) {
+    for (const company of crmCompanies) {
       await runGreenhousePostgresQuery(
         `
           INSERT INTO greenhouse_crm.companies (
