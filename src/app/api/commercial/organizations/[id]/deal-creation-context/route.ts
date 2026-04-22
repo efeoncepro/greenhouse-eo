@@ -63,8 +63,12 @@ export async function GET(
     return NextResponse.json({ error: 'Organization not visible to this tenant.' }, { status: 403 })
   }
 
-  const orgRows = await query<{ organization_id: string; hubspot_company_id: string | null; name: string | null }>(
-    `SELECT organization_id, hubspot_company_id, name
+  const orgRows = await query<{
+    organization_id: string
+    hubspot_company_id: string | null
+    organization_name: string | null
+  }>(
+    `SELECT organization_id, hubspot_company_id, organization_name
        FROM greenhouse_core.organizations
       WHERE organization_id = $1
       LIMIT 1`,
@@ -82,7 +86,7 @@ export async function GET(
 
   return NextResponse.json({
     organizationId: orgRows[0].organization_id,
-    organizationName: orgRows[0].name ?? null,
+    organizationName: orgRows[0].organization_name ?? null,
     hubspotCompanyId: orgRows[0].hubspot_company_id,
     ...context
   })
