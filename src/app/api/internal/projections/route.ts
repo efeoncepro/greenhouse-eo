@@ -5,8 +5,10 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { readReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
 import { readAllCircuitStates } from '@/lib/operations/reactive-circuit-breaker'
 import { getRegisteredProjections, getSupportedProjectionDomains } from '@/lib/sync/projection-registry'
+import { readProjectionRuntimeHealthMap } from '@/lib/sync/projection-runtime-health'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
 import { getQueueStats } from '@/lib/sync/refresh-queue'
+import { extractReactiveErrorCategory, stripReactiveErrorCategory } from '@/lib/sync/reactive-error-classification'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,6 +18,7 @@ interface RefreshStats extends Record<string, unknown> {
   successful: string | number
   dead_letters: string | number
   retrying: string | number
+  infrastructure_failures: string | number
   last_reacted_at: string | null
   oldest_pending: string | null
 }
@@ -40,6 +43,7 @@ export async function GET() {
          COUNT(*) FILTER (WHERE result != 'dead-letter' AND result != 'retry' AND last_error IS NULL) AS successful,
          COUNT(*) FILTER (WHERE result = 'dead-letter') AS dead_letters,
          COUNT(*) FILTER (WHERE result = 'retry') AS retrying,
+         COUNT(*) FILTER (WHERE result IN ('retry', 'dead-letter') AND is_infrastructure_fault) AS infrastructure_failures,
          MAX(reacted_at)::text AS last_reacted_at,
          MIN(CASE WHEN result = 'retry' THEN reacted_at END)::text AS oldest_pending
        FROM greenhouse_sync.outbox_reactive_log
@@ -51,10 +55,11 @@ export async function GET() {
     const statsMap = new Map(stats.map(s => [s.handler, s]))
 
     // Queue stats + reactive backlog overview + circuit breaker states, fetched in parallel
-    const [queue, reactiveBacklog, circuitStates] = await Promise.all([
+    const [queue, reactiveBacklog, circuitStates, runtimeHealthMap] = await Promise.all([
       getQueueStats().catch(() => ({ pending: 0, processing: 0, completed: 0, failed: 0 })),
       readReactiveBacklogOverview(),
-      readAllCircuitStates().catch(() => [])
+      readAllCircuitStates().catch(() => []),
+      readProjectionRuntimeHealthMap(projections).catch(() => new Map())
     ])
 
     const circuitMap = new Map(circuitStates.map(c => [c.projectionName, c]))
@@ -70,6 +75,15 @@ export async function GET() {
       const failures = deadLetters + retrying
       const errorRate = totalEvents > 0 ? failures / totalEvents : 0
 
+      const runtimeHealth = runtimeHealthMap.get(p.name) ?? {
+        projectionName: p.name,
+        status: 'not_declared' as const,
+        currentUser: null,
+        checks: []
+      }
+
+      const circuitLastError = circuit?.lastError ?? null
+
       return {
         name: p.name,
         description: p.description,
@@ -77,13 +91,17 @@ export async function GET() {
         triggerEvents: p.triggerEvents,
         maxRetries: p.maxRetries ?? 2,
         circuitState: circuit?.state ?? 'closed',
-        circuitLastError: circuit?.lastError ?? null,
+        circuitLastError,
+        circuitLastErrorCategory: extractReactiveErrorCategory(circuitLastError),
+        circuitLastErrorMessage: stripReactiveErrorCategory(circuitLastError),
         circuitOpenedAt: circuit?.openedAt ?? null,
+        runtimeHealth,
         last24h: {
           totalEvents,
           successful: Number(s?.successful ?? 0),
           deadLetters,
           retrying,
+          infrastructureFailures: Number(s?.infrastructure_failures ?? 0),
           errorRate,
           lastReactedAt,
           lagHours: ageHours,
@@ -94,7 +112,16 @@ export async function GET() {
 
     // Global health: no dead letters, no failed queue items
     const globalDeadLetters = projectionStatus.reduce((s, p) => s + p.last24h.deadLetters, 0)
-    const healthy = globalDeadLetters === 0 && queue.failed === 0 && reactiveBacklog.totalUnreacted === 0
+
+    const projectionsWithRuntimeIssues = projectionStatus.filter(
+      projection => projection.runtimeHealth.status === 'degraded'
+    ).map(projection => projection.name)
+
+    const healthy =
+      globalDeadLetters === 0 &&
+      queue.failed === 0 &&
+      reactiveBacklog.totalUnreacted === 0 &&
+      projectionsWithRuntimeIssues.length === 0
 
     return NextResponse.json({
       projections: projectionStatus,
@@ -103,6 +130,7 @@ export async function GET() {
       queue,
       totalRegistered: projections.length,
       globalDeadLetters,
+      projectionsWithRuntimeIssues,
       healthy,
       checkedAt: new Date().toISOString()
     })

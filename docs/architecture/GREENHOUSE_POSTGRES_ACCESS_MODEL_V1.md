@@ -1,5 +1,17 @@
 # Greenhouse PostgreSQL Access Model V1
 
+## Delta 2026-04-23 — Projection-owned serving writes now require an explicit runtime contract
+
+- `greenhouse_serving` sigue siendo read-only por defecto para `greenhouse_runtime`; los writes desde runtime/worker siguen siendo excepciones estrechas, no una regla general del schema.
+- Regla nueva:
+  - toda projection que materializa una tabla shared debe declarar explícitamente su contrato de privilegios requeridos en código (`ProjectionDefinition.requiredTablePrivileges`)
+  - el drift de esos privilegios debe poder leerse antes del dead-letter vía un health check de runtime, no solo vía error textual en producción
+- Implementación inicial:
+  - `service_attribution` declara sus write targets
+  - las migraciones `20260423190340145_service-attribution-runtime-writer-hardening.sql` y `20260423190546748_reactive-error-classification-observability.sql` formalizan el patrón
+- Regla operativa complementaria:
+  - los fallos reactivos de permisos, conectividad o credenciales ya no deben quedar solo en `error_message`; deben persistir clasificación tipada (`error_class`, `error_family`, `is_infrastructure_fault`) en `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue`
+
 ## Delta 2026-04-17 — Mutation guardrails vía trigger + session var (TASK-451)
 
 ### Patrón canónico

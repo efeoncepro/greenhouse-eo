@@ -637,3 +637,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-581` | `to-do` | Cutover de un tirón + sibling retirement + docs — EPIC-005 child 5/6 | `docs/tasks/to-do/TASK-581-notion-sync-cutover-and-sibling-retirement.md` |
 | `TASK-582` | `to-do` | Monthly Project Provisioning Admin Surface with Preview — EPIC-005 child 6/6 | `docs/tasks/to-do/TASK-582-monthly-project-provisioning-admin-surface.md` |
 | `TASK-583` | `to-do` | HubSpot Quote Native Publish & Tax Finalization | `docs/tasks/to-do/TASK-583-hubspot-quote-native-publish-tax-finalization.md` |
+| `TASK-584` | `in-progress` | PostgreSQL Migration Tooling Hardening | `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md` |

@@ -57,7 +57,7 @@ describe('refresh queue helpers', () => {
     )
     expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledWith(
       expect.stringContaining('retry_count = retry_count + 1'),
-      ['queue-2', 3, 'boom']
+      ['queue-2', 3, 'boom', null, null, false]
     )
   })
 

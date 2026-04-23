@@ -221,9 +221,28 @@ export interface HubSpotGreenhouseQuoteProfile {
     expirationDate: string | null
     lastModifiedDate: string | null
   }
+  links: {
+    quoteLink: string | null
+    pdfDownloadLink: string | null
+  }
   status: {
     approvalStatus: string | null
     signatureStatus: string | null
+    locked: boolean | null
+  }
+  sender: {
+    firstName: string | null
+    lastName: string | null
+    email: string | null
+    companyName: string | null
+  }
+  configuration: {
+    templateType: string | null
+    acceptanceMethod: string | null
+    terms: string | null
+    timezone: string | null
+    domain: string | null
+    slug: string | null
   }
   associations: {
     dealId: string | null
@@ -249,6 +268,15 @@ export interface HubSpotGreenhouseCreateQuoteRequest {
   expirationDate: string
   language?: string
   locale?: string
+  status?: string
+  acceptanceMethod?: string
+  templateType?: string
+  terms?: string
+  timezone?: string
+  domain?: string
+  slug?: string
+  quoteNumber?: string
+  currency?: string
   sender?: {
     firstName: string
     lastName: string
@@ -262,12 +290,25 @@ export interface HubSpotGreenhouseCreateQuoteRequest {
     quoteTemplateId?: string
   }
   lineItems?: Array<{
+    hubspotLineItemId?: string
+    hubspotProductId?: string
+    productId?: string
     name: string
     quantity: number
     unitPrice: number
     description?: string
     discount?: number
+    discountPercentage?: number
+    productCode?: string
+    legacySku?: string
+    billingFrequency?: string
+    billingPeriod?: number
+    billingStartDate?: string
+    billingEndDate?: string
+    taxRate?: number
+    taxRateGroupId?: string
     taxAmount?: number
+    currency?: string
   }>
 }
 
@@ -276,10 +317,45 @@ export interface HubSpotGreenhouseCreateQuoteResponse {
   quoteNumber: string | null
   status: string
   quoteLink: string | null
+  pdfDownloadLink: string | null
+  locked: boolean | null
   associations: {
     dealId: string | null
+    companyId: string | null
+    contactIds: string[]
     lineItemIds: string[]
   }
+}
+
+export interface HubSpotGreenhouseUpdateQuoteResponse {
+  status: 'updated' | 'endpoint_not_deployed'
+  hubspotQuoteId: string | null
+  quoteNumber?: string | null
+  quoteStatus?: string | null
+  quoteLink?: string | null
+  pdfDownloadLink?: string | null
+  locked?: boolean | null
+  associations?: {
+    dealId?: string | null
+    companyId?: string | null
+    contactIds?: string[]
+    lineItemIds?: string[]
+  }
+  message?: string
+}
+
+export interface HubSpotGreenhouseTaxRate {
+  id: string
+  name: string | null
+  rate: number | null
+  isActive: boolean
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export interface HubSpotGreenhouseTaxRatesResponse {
+  count: number
+  taxRates: HubSpotGreenhouseTaxRate[]
 }
 
 // ── Products (TASK-211) ──
@@ -871,6 +947,56 @@ export const createHubSpotGreenhouseQuote = async (payload: HubSpotGreenhouseCre
   }
 
   return (await response.json()) as HubSpotGreenhouseCreateQuoteResponse
+}
+
+export const updateHubSpotGreenhouseQuote = async (
+  hubspotQuoteId: string,
+  payload: Partial<HubSpotGreenhouseCreateQuoteRequest>
+): Promise<HubSpotGreenhouseUpdateQuoteResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/quotes/${encodeURIComponent(hubspotQuoteId)}`, {
+    method: 'PATCH',
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotQuoteId,
+      message:
+        'HubSpot integration service does not expose PATCH /quotes/:id yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for PATCH /quotes/${hubspotQuoteId}: ${body || response.statusText}`
+    )
+  }
+
+  const payloadJson = (await response.json()) as Omit<HubSpotGreenhouseUpdateQuoteResponse, 'status'>
+
+  return {
+    ...payloadJson,
+    status: 'updated'
+  }
+}
+
+export const getHubSpotGreenhouseTaxRates = async (
+  options: { active?: boolean } = {}
+) => {
+  const query = typeof options.active === 'boolean'
+    ? `?active=${options.active ? 'true' : 'false'}`
+    : ''
+
+  return fetchJson<HubSpotGreenhouseTaxRatesResponse>(`/tax-rates${query}`)
 }
 
 // ── Invoice client methods (TASK-524) ──

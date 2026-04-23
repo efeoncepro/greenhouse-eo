@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.37
+> **Version:** 2.38
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-23 — v2.38: **TASK-583 local convergence de HubSpot quote publish/tax native**. El outbound de quotes ya no arma create/update por carriles distintos: `src/lib/hubspot/hubspot-quote-sync.ts` pasa a ser el builder canónico de payload para HubSpot y resuelve `sender`, empresa emisora, binding catálogo-first, billing semantics y metadata tributaria desde el canon local. `src/lib/integrations/hubspot-greenhouse-service.ts` gana `updateHubSpotGreenhouseQuote()` + `getHubSpotGreenhouseTaxRates()`, eliminando la dependencia del cliente update degradado. `pushCanonicalQuoteToHubSpot()` persiste `hubspot_quote_status`, `hubspot_quote_link`, `hubspot_quote_pdf_download_link`, `hubspot_quote_locked` y `hubspot_last_synced_at` en `greenhouse_commercial.quotations`. El bridge sibling expone `GET /tax-rates` y la respuesta de quote devuelve también `pdfDownloadLink` + `locked`, dejando documentado el método canónico para resolver `hs_tax_rate_group_id` por ambiente sin hardcodear IDs.
 > **Updated:** 2026-04-22 — v2.37: **TASK-573 Deal birth contract completion**. El carril inline `Quote Builder -> POST /api/commercial/organizations/[id]/deals` ya no nace “desnudo”. `GET /deal-creation-context` expone `readyToCreate`, `blockingIssues`, `dealTypeOptions`, `priorityOptions` y defaults de `dealType/priority`; el drawer muestra contacto/owner esperados y bloquea create cuando falta `hubspot_company_id` o la governance está incompleta. `createDealFromQuoteContext` ahora resuelve owner desde el actor/policy, contacto desde `quotation.contact_identity_profile_id -> person_360.hubspot_contact_id`, y persiste `dealType`/`priority` en `deal_create_attempts` + `greenhouse_commercial.deals`. Se suma `greenhouse_commercial.hubspot_deal_property_config` para mirror local de property options y una lane admin-safe `GET/POST /api/admin/commercial/deal-governance` para summary + refresh de metadata HubSpot.
 > **Updated:** 2026-04-22 — v2.36: **Quote Builder contact hydration**. `GET /api/commercial/organizations/[id]/contacts` sigue siendo el read contract canónico del builder, pero ahora hace read-through materialization desde HubSpot cuando la organization recién adoptada todavía no tiene `person_memberships` comerciales locales. La lane admin `POST /api/organizations/[id]/hubspot-sync` reutiliza el mismo helper canónico, evitando dos implementaciones separadas del bridge `HubSpot company contacts -> identity_profiles/person_memberships`.
 > **Updated:** 2026-04-22 — v2.35: **TASK-543 post-rollout cleanup**. El selector unificado de parties ya no depende de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`: el builder de creación usa `GET /api/commercial/parties/search` como carril canónico por defecto y preserva `organizationId` como handshake downstream hacia contactos, deals y persistencia de quotations. `hubspot_candidate` sigue visible solo para `efeonce_internal`; edit mantiene `organizationLocked`.
@@ -520,6 +521,38 @@ Downstream lifecycle (sent/approved/rejected/version_created) disparan la misma 
 - Implementar el endpoint PATCH real en el Cloud Run service para que `updateHubSpotQuote` deje de ser stub
 - Dropear `greenhouse_finance.quotes` legacy completo cuando termine la ventana de coexistencia (hoy vive como compat view read-only via `syncCanonicalFinanceQuote`)
 - Webhook subscription HubSpot `quote.propertyChange` para sync casi-real-time inbound (hoy es polling 6h)
+
+---
+
+## Delta 2026-04-23 — TASK-583 HubSpot quote native publish/tax convergence (implementación local)
+
+- Nuevo source of truth outbound:
+  - `src/lib/hubspot/hubspot-quote-sync.ts`
+  - builda el payload HubSpot desde `greenhouse_commercial.quotations` + `quotation_line_items`
+  - resuelve `sender` desde `actorId -> issued_by -> created_by`
+  - resuelve empresa emisora desde `getOperatingEntityIdentity()`
+  - exige binding catálogo-first cuando una línea ya referencia `product_id`, `product_code` o `service_sku`
+- Convergencia create/update:
+  - `create-hubspot-quote.ts` y `update-hubspot-quote.ts` ya comparten el mismo contrato efectivo del integration service
+  - `update-hubspot-quote.ts` deja de ser un cliente degradado/stub y usa `updateHubSpotGreenhouseQuote()`
+  - status outbound HubSpot-native normalizado a `APPROVAL_NOT_NEEDED` o `DRAFT`
+- Native tax binding:
+  - el mapping de `hs_tax_rate_group_id` ya no debe hardcodearse
+  - método canónico: consultar `GET /tax-rates` del bridge sibling, filtrar `isActive`, normalizar el porcentaje y resolver por rate equivalente
+  - si existe tasa tributable en Greenhouse pero no hay group activo equivalente en HubSpot, el carril falla explícitamente con `tax_rate_group_missing:<rate>`
+- Observabilidad outbound nueva:
+  - `greenhouse_commercial.quotations` persiste:
+    - `hubspot_quote_status`
+    - `hubspot_quote_link`
+    - `hubspot_quote_pdf_download_link`
+    - `hubspot_quote_locked`
+    - `hubspot_last_synced_at`
+  - la respuesta del bridge sibling ya expone `quoteLink`, `pdfDownloadLink` y `locked`
+- Billing semantics:
+  - la fecha base de billing sigue saliendo del contrato canónico de quotation (`billing_start_date` / `issued_at` / `quote_date`)
+  - el outbound debe seguir escribiendo nombres nativos HubSpot:
+    - `recurringbillingfrequency`
+    - `hs_recurring_billing_start_date`
 
 ---
 

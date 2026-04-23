@@ -9,6 +9,7 @@ import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@
 import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
 import { publishQuoteCreated } from '@/lib/commercial/quotation-events'
+import type { HubSpotQuoteSender, HubSpotQuoteWriteLineItem } from '@/lib/hubspot/hubspot-quote-sync'
 
 // ── Types ──
 
@@ -18,14 +19,12 @@ export type CreateHubSpotQuoteInput = {
   title: string
   expirationDate: string
   description?: string
+  currency?: string
+  sender: HubSpotQuoteSender
+  status?: string
   contactIdentityProfileId?: string | null
   hubspotContactId?: string | null
-  lineItems: Array<{
-    name: string
-    quantity: number
-    unitPrice: number
-    description?: string
-  }>
+  lineItems: HubSpotQuoteWriteLineItem[]
   dealId?: string
   publishImmediately?: boolean
   persistFinanceMirror?: boolean
@@ -36,7 +35,10 @@ export type CreateHubSpotQuoteResult = {
   quoteId: string
   hubspotQuoteId: string | null
   hubspotQuoteNumber: string | null
+  hubspotQuoteStatus: string | null
   hubspotQuoteLink: string | null
+  hubspotPdfDownloadLink: string | null
+  hubspotQuoteLocked: boolean | null
   hubspotContactId: string | null
   error: string | null
 }
@@ -44,7 +46,7 @@ export type CreateHubSpotQuoteResult = {
 // ── Status mapping: Greenhouse outbound → HubSpot ──
 
 const resolveOutboundStatus = (publishImmediately: boolean): string =>
-  publishImmediately ? 'sent' : 'draft'
+  publishImmediately ? 'APPROVAL_NOT_NEEDED' : 'DRAFT'
 
 // ── Organization → HubSpot company resolution ──
 
@@ -114,6 +116,8 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
     organizationId,
     title,
     expirationDate,
+    currency = 'CLP',
+    sender,
     lineItems,
     dealId,
     publishImmediately = false,
@@ -129,7 +133,10 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
       quoteId,
       hubspotQuoteId: null,
       hubspotQuoteNumber: null,
+      hubspotQuoteStatus: null,
       hubspotQuoteLink: null,
+      hubspotPdfDownloadLink: null,
+      hubspotQuoteLocked: null,
       hubspotContactId: null,
       error: 'Organization not found'
     }
@@ -141,7 +148,10 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
       quoteId,
       hubspotQuoteId: null,
       hubspotQuoteNumber: null,
+      hubspotQuoteStatus: null,
       hubspotQuoteLink: null,
+      hubspotPdfDownloadLink: null,
+      hubspotQuoteLocked: null,
       hubspotContactId: null,
       error: 'Organization has no HubSpot company linked'
     }
@@ -160,7 +170,10 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
         quoteId,
         hubspotQuoteId: null,
         hubspotQuoteNumber: null,
+        hubspotQuoteStatus: null,
         hubspotQuoteLink: null,
+        hubspotPdfDownloadLink: null,
+        hubspotQuoteLocked: null,
         hubspotContactId: null,
         error: 'Contact has no HubSpot contact linked'
       }
@@ -179,37 +192,61 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
     expirationDate,
     language: 'es',
     locale: 'es-cl',
+    currency,
+    sender,
+    status: input.status || resolveOutboundStatus(publishImmediately),
     associations: {
       companyId: org.hubspot_company_id,
       dealId: dealId || undefined,
       contactIds: resolvedHubSpotContactId ? [resolvedHubSpotContactId] : undefined
     },
     lineItems: lineItems.map(li => ({
+      hubspotLineItemId: li.hubspotLineItemId,
+      hubspotProductId: li.hubspotProductId,
+      productId: li.productId,
       name: li.name,
       quantity: li.quantity,
       unitPrice: li.unitPrice,
-      description: li.description
+      description: li.description,
+      discount: li.discount ?? undefined,
+      productCode: li.productCode ?? undefined,
+      legacySku: li.legacySku ?? undefined,
+      billingFrequency: li.billingFrequency ?? undefined,
+      billingStartDate: li.billingStartDate ?? undefined,
+      taxRate: li.taxRate ?? undefined,
+      taxRateGroupId: li.taxRateGroupId ?? undefined,
+      taxAmount: li.taxAmount ?? undefined,
+      currency: li.currency ?? undefined
     }))
   }
 
   // 4. Call Cloud Run integration service
   let hubspotQuoteId: string | null = null
   let hubspotQuoteNumber: string | null = null
+  let hubspotQuoteStatus: string | null = null
   let hubspotQuoteLink: string | null = null
+  let hubspotPdfDownloadLink: string | null = null
+  let hubspotQuoteLocked: boolean | null = null
 
   try {
     const response = await createHubSpotGreenhouseQuote(payload)
 
     hubspotQuoteId = response.hubspotQuoteId
     hubspotQuoteNumber = response.quoteNumber
-    hubspotQuoteLink = response.quoteLink
+    hubspotQuoteStatus = response.status ?? null
+    hubspotQuoteLink = response.quoteLink ?? null
+    hubspotPdfDownloadLink = response.pdfDownloadLink ?? null
+    hubspotQuoteLocked = response.locked ?? null
   } catch (error) {
     return {
       success: false,
       quoteId,
       hubspotQuoteId: null,
       hubspotQuoteNumber: null,
+      hubspotQuoteStatus: null,
       hubspotQuoteLink: null,
+      hubspotPdfDownloadLink: null,
+      hubspotQuoteLocked: null,
       hubspotContactId: resolvedHubSpotContactId,
       error: error instanceof Error ? error.message : 'HubSpot quote creation failed'
     }
@@ -221,7 +258,10 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
       quoteId,
       hubspotQuoteId,
       hubspotQuoteNumber,
+      hubspotQuoteStatus,
       hubspotQuoteLink,
+      hubspotPdfDownloadLink,
+      hubspotQuoteLocked,
       hubspotContactId: resolvedHubSpotContactId,
       error: null
     }
@@ -233,7 +273,10 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
       quoteId,
       hubspotQuoteId,
       hubspotQuoteNumber,
+      hubspotQuoteStatus,
       hubspotQuoteLink,
+      hubspotPdfDownloadLink,
+      hubspotQuoteLocked,
       hubspotContactId: resolvedHubSpotContactId,
       error: null
     }
@@ -241,7 +284,7 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
 
   // 5. Persist locally + publish outbox event in a transaction
   const totalAmount = lineItems.reduce((sum, li) => sum + li.quantity * li.unitPrice, 0)
-  const status = resolveOutboundStatus(publishImmediately)
+  const status = input.status || resolveOutboundStatus(publishImmediately)
   const persistedQuoteId = hubspotQuoteId ? `QUO-HS-${hubspotQuoteId}` : quoteId
 
   await withGreenhousePostgresTransaction(async client => {
@@ -329,7 +372,10 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
     quoteId: persistedQuoteId,
     hubspotQuoteId,
     hubspotQuoteNumber,
+    hubspotQuoteStatus,
     hubspotQuoteLink,
+    hubspotPdfDownloadLink,
+    hubspotQuoteLocked,
     hubspotContactId: resolvedHubSpotContactId,
     error: null
   }

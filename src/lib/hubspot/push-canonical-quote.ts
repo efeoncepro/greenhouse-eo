@@ -5,11 +5,10 @@ import {
   publishQuotationPushedToHubSpot,
   publishQuotationHubSpotSyncFailed
 } from '@/lib/commercial/quotation-events'
+import { resolveHubSpotQuoteSyncPayload } from '@/lib/hubspot/hubspot-quote-sync'
 
 import { createHubSpotQuote } from './create-hubspot-quote'
 import { updateHubSpotQuote } from './update-hubspot-quote'
-
-// ── Types ──
 
 export interface PushCanonicalQuoteInput {
   quotationId: string
@@ -24,84 +23,57 @@ export interface PushCanonicalQuoteResult {
 
 interface CanonicalQuoteRow extends Record<string, unknown> {
   quotation_id: string
-  quotation_number: string
   organization_id: string | null
-  contact_identity_profile_id: string | null
   hubspot_deal_id: string | null
   hubspot_quote_id: string | null
-  description: string | null
-  valid_until: string | { value?: string } | null
-  currency: string | null
 }
 
-interface CanonicalLineItemRow extends Record<string, unknown> {
-  line_item_id: string
-  label: string
-  description: string | null
-  quantity: string | number | null
-  unit_price: string | number | null
+const persistHubSpotQuoteState = async ({
+  quotationId,
+  hubspotQuoteId,
+  hubspotQuoteStatus,
+  hubspotQuoteLink,
+  hubspotPdfDownloadLink,
+  hubspotQuoteLocked
+}: {
+  quotationId: string
+  hubspotQuoteId: string
+  hubspotQuoteStatus: string | null
+  hubspotQuoteLink: string | null
+  hubspotPdfDownloadLink: string | null
+  hubspotQuoteLocked: boolean | null
+}) => {
+  await runGreenhousePostgresQuery(
+    `UPDATE greenhouse_commercial.quotations
+        SET hubspot_quote_id = $1,
+            hubspot_quote_status = $2,
+            hubspot_quote_link = $3,
+            hubspot_quote_pdf_download_link = $4,
+            hubspot_quote_locked = $5,
+            hubspot_last_synced_at = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
+      WHERE quotation_id = $6`,
+    [
+      hubspotQuoteId,
+      hubspotQuoteStatus,
+      hubspotQuoteLink,
+      hubspotPdfDownloadLink,
+      hubspotQuoteLocked,
+      quotationId
+    ]
+  )
 }
 
-// ── Utilities ──
-
-const toNum = (value: unknown): number => {
-  if (typeof value === 'number') return Number.isFinite(value) ? value : 0
-
-  if (typeof value === 'string') {
-    const parsed = Number(value)
-
-    return Number.isFinite(parsed) ? parsed : 0
-  }
-
-  return 0
-}
-
-const toDateString = (value: string | { value?: string } | null | undefined): string | null => {
-  if (!value) return null
-  if (typeof value === 'string') return value.slice(0, 10)
-
-  return typeof value.value === 'string' ? value.value.slice(0, 10) : null
-}
-
-// Minimum viable expiration fallback when canonical has no valid_until.
-const computeFallbackExpirationDate = () => {
-  const d = new Date()
-
-  d.setUTCDate(d.getUTCDate() + 30)
-
-  return d.toISOString().slice(0, 10)
-}
-
-// ── Main adapter ──
-
-/**
- * Push a canonical `greenhouse_commercial.quotations` row to HubSpot.
- *
- * MVP behavior (TASK-463 phase A):
- * - If canonical has no `hubspot_deal_id`: skipped + event emitted.
- * - If canonical has no `hubspot_quote_id` yet: delegate to legacy `createHubSpotQuote()`,
- *   persist returned `hubspot_quote_id` onto canonical, emit `commercial.quotation.pushed_to_hubspot`.
- * - If canonical already has `hubspot_quote_id`: delegate to `updateHubSpotQuote()`.
- *   Downstream endpoint may not exist yet — stub returns `success=false, error='update_not_supported'`
- *   and we emit `pushed_to_hubspot` with result='updated' regardless so the projection records
- *   the attempt. We do NOT re-throw on update-unsupported.
- * - On unexpected error (throw from downstream): emit `hubspot_sync_failed` and re-throw so the
- *   ops-worker reactive projection marks the run failed and retries.
- */
 export const pushCanonicalQuoteToHubSpot = async (
   input: PushCanonicalQuoteInput
 ): Promise<PushCanonicalQuoteResult> => {
   const { quotationId, actorId = null } = input
 
-  // 1. Read canonical quotation
   const quoteRows = await runGreenhousePostgresQuery<CanonicalQuoteRow>(
-    `SELECT quotation_id, quotation_number, organization_id,
-            contact_identity_profile_id,
-            hubspot_deal_id, hubspot_quote_id, description,
-            valid_until, currency
+    `SELECT quotation_id, organization_id, hubspot_deal_id, hubspot_quote_id
        FROM greenhouse_commercial.quotations
-       WHERE quotation_id = $1
-       LIMIT 1`,
+      WHERE quotation_id = $1
+      LIMIT 1`,
     [quotationId]
   )
 
@@ -111,7 +83,6 @@ export const pushCanonicalQuoteToHubSpot = async (
     throw new Error(`Canonical quotation not found: ${quotationId}`)
   }
 
-  // 2. Skip if no HubSpot deal associated — we need it to anchor the quote.
   if (!quote.hubspot_deal_id) {
     await publishQuotationPushedToHubSpot({
       quotationId,
@@ -130,7 +101,6 @@ export const pushCanonicalQuoteToHubSpot = async (
     }
   }
 
-  // We also need an organization to resolve the HubSpot company — required by create path.
   if (!quote.organization_id) {
     await publishQuotationPushedToHubSpot({
       quotationId,
@@ -149,43 +119,25 @@ export const pushCanonicalQuoteToHubSpot = async (
     }
   }
 
-  // 3. Read canonical line items (latest version only — caller must ensure quotation_versions
-  //    snapshot is aligned with current_version before push; MVP reads all versions joined via
-  //    current_version filter on the quotation row).
-  const lineRows = await runGreenhousePostgresQuery<CanonicalLineItemRow>(
-    `SELECT qli.line_item_id, qli.label, qli.description, qli.quantity, qli.unit_price
-       FROM greenhouse_commercial.quotation_line_items qli
-       JOIN greenhouse_commercial.quotations q ON q.quotation_id = qli.quotation_id
-       WHERE qli.quotation_id = $1
-         AND qli.version_number = q.current_version
-       ORDER BY qli.sort_order ASC, qli.created_at ASC`,
-    [quotationId]
-  )
+  const syncPayload = await resolveHubSpotQuoteSyncPayload({
+    quotationId,
+    actorId
+  })
 
-  const lineItems = lineRows.map(row => ({
-    name: row.label || 'Line item',
-    quantity: toNum(row.quantity) || 1,
-    unitPrice: toNum(row.unit_price),
-    description: row.description || undefined
-  }))
-
-  const title = (quote.description && quote.description.trim()) || quote.quotation_number
-  const expirationDate = toDateString(quote.valid_until) || computeFallbackExpirationDate()
-
-  // 4. Branch on whether HubSpot quote already exists
   if (!quote.hubspot_quote_id) {
-    // Create path — delegate to legacy helper
     try {
       const createResult = await createHubSpotQuote({
         quoteId: quotationId,
-        organizationId: quote.organization_id,
-        title,
-        expirationDate,
-        description: quote.description || undefined,
-        contactIdentityProfileId: quote.contact_identity_profile_id,
-        lineItems,
-        dealId: quote.hubspot_deal_id,
-        publishImmediately: false,
+        organizationId: syncPayload.organizationId,
+        title: syncPayload.title,
+        expirationDate: syncPayload.expirationDate,
+        currency: syncPayload.currency,
+        sender: syncPayload.sender,
+        status: syncPayload.status,
+        contactIdentityProfileId: syncPayload.contactIdentityProfileId,
+        lineItems: syncPayload.lineItems,
+        dealId: syncPayload.dealId,
+        publishImmediately: true,
         persistFinanceMirror: false
       })
 
@@ -203,15 +155,14 @@ export const pushCanonicalQuoteToHubSpot = async (
         throw new Error(errMsg)
       }
 
-      // Persist hubspot_quote_id onto canonical so future pushes go through update path.
-      await runGreenhousePostgresQuery(
-        `UPDATE greenhouse_commercial.quotations
-            SET hubspot_quote_id = $1,
-                hubspot_last_synced_at = CURRENT_TIMESTAMP,
-                updated_at = CURRENT_TIMESTAMP
-          WHERE quotation_id = $2`,
-        [createResult.hubspotQuoteId, quotationId]
-      )
+      await persistHubSpotQuoteState({
+        quotationId,
+        hubspotQuoteId: createResult.hubspotQuoteId,
+        hubspotQuoteStatus: createResult.hubspotQuoteStatus,
+        hubspotQuoteLink: createResult.hubspotQuoteLink,
+        hubspotPdfDownloadLink: createResult.hubspotPdfDownloadLink,
+        hubspotQuoteLocked: createResult.hubspotQuoteLocked
+      })
 
       await publishQuotationPushedToHubSpot({
         quotationId,
@@ -241,47 +192,29 @@ export const pushCanonicalQuoteToHubSpot = async (
     }
   }
 
-  // 5. Update path — the downstream service may not support PATCH yet. The stub returns
-  //    `{ success: false, error: 'update_not_supported' }` in that case. We record the attempt
-  //    via the pushed_to_hubspot event but do NOT re-throw so the workflow keeps going.
   try {
     const updateResult = await updateHubSpotQuote({
       hubspotQuoteId: quote.hubspot_quote_id,
-      title,
-      expirationDate,
-      lineItems
+      title: syncPayload.title,
+      expirationDate: syncPayload.expirationDate,
+      currency: syncPayload.currency,
+      status: syncPayload.status,
+      sender: syncPayload.sender,
+      lineItems: syncPayload.lineItems
     })
 
     if (!updateResult.success) {
-      // Known MVP limitation — log + emit sync_failed but do not re-throw.
-      console.warn('[push-canonical-quote] update skipped', {
-        quotationId,
-        hubspotQuoteId: quote.hubspot_quote_id,
-        error: updateResult.error
-      })
-
-      await publishQuotationHubSpotSyncFailed({
-        quotationId,
-        hubspotDealId: quote.hubspot_deal_id,
-        errorMessage: updateResult.error || 'update_failed',
-        attemptedAction: 'update',
-        actorId
-      })
-
-      return {
-        result: 'updated',
-        hubspotQuoteId: quote.hubspot_quote_id,
-        reason: updateResult.error || 'update_failed'
-      }
+      throw new Error(updateResult.error || 'HubSpot quote update failed')
     }
 
-    await runGreenhousePostgresQuery(
-      `UPDATE greenhouse_commercial.quotations
-          SET hubspot_last_synced_at = CURRENT_TIMESTAMP,
-              updated_at = CURRENT_TIMESTAMP
-        WHERE quotation_id = $1`,
-      [quotationId]
-    )
+    await persistHubSpotQuoteState({
+      quotationId,
+      hubspotQuoteId: quote.hubspot_quote_id,
+      hubspotQuoteStatus: updateResult.quoteStatus ?? null,
+      hubspotQuoteLink: updateResult.quoteLink ?? null,
+      hubspotPdfDownloadLink: updateResult.pdfDownloadLink ?? null,
+      hubspotQuoteLocked: updateResult.locked ?? null
+    })
 
     await publishQuotationPushedToHubSpot({
       quotationId,

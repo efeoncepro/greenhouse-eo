@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import type { ReactiveErrorCategory, ReactiveErrorFamily } from './reactive-error-classification'
 
 /**
  * Persistent Refresh Queue — survives outbox event expiration.
@@ -55,14 +56,33 @@ export const enqueueRefresh = async (input: {
 
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_sync.projection_refresh_queue
-       (refresh_id, projection_name, entity_type, entity_id, priority, status, triggered_by_event_id, error_message, retry_count, max_retries, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, 'pending', $6, NULL, 0, $7, NOW(), NOW())
+       (
+         refresh_id,
+         projection_name,
+         entity_type,
+         entity_id,
+         priority,
+         status,
+         triggered_by_event_id,
+         error_message,
+         error_class,
+         error_family,
+         is_infrastructure_fault,
+         retry_count,
+         max_retries,
+         created_at,
+         updated_at
+       )
+     VALUES ($1, $2, $3, $4, $5, 'pending', $6, NULL, NULL, NULL, FALSE, 0, $7, NOW(), NOW())
      ON CONFLICT (projection_name, entity_type, entity_id)
      DO UPDATE SET
        priority = GREATEST(EXCLUDED.priority, projection_refresh_queue.priority),
        updated_at = NOW(),
        triggered_by_event_id = EXCLUDED.triggered_by_event_id,
        error_message = NULL,
+       error_class = NULL,
+       error_family = NULL,
+       is_infrastructure_fault = FALSE,
        max_retries = GREATEST(EXCLUDED.max_retries, projection_refresh_queue.max_retries),
        created_at = CASE
          WHEN projection_refresh_queue.status IN ('completed', 'failed') THEN NOW()
@@ -133,21 +153,45 @@ export const dequeueRefreshBatch = async (batchSize = 10): Promise<QueueItem[]> 
 export const markRefreshCompleted = async (queueId: string): Promise<void> => {
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_sync.projection_refresh_queue
-     SET status = 'completed', updated_at = NOW(), error_message = NULL
+     SET status = 'completed',
+         updated_at = NOW(),
+         error_message = NULL,
+         error_class = NULL,
+         error_family = NULL,
+         is_infrastructure_fault = FALSE
      WHERE refresh_id = $1`,
     [queueId]
   )
 }
 
-export const markRefreshFailed = async (queueId: string, error: string, maxAttempts = 3): Promise<void> => {
+export const markRefreshFailed = async (
+  queueId: string,
+  error: string,
+  maxAttempts = 3,
+  classification?: {
+    errorClass?: ReactiveErrorCategory | null
+    errorFamily?: ReactiveErrorFamily | null
+    isInfrastructureFault?: boolean
+  }
+): Promise<void> => {
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_sync.projection_refresh_queue
      SET retry_count = retry_count + 1,
          status = CASE WHEN retry_count + 1 >= $2 THEN 'failed' ELSE 'pending' END,
          error_message = $3,
+         error_class = $4,
+         error_family = $5,
+         is_infrastructure_fault = $6,
          updated_at = NOW()
      WHERE refresh_id = $1`,
-    [queueId, maxAttempts, error]
+    [
+      queueId,
+      maxAttempts,
+      error,
+      classification?.errorClass ?? null,
+      classification?.errorFamily ?? null,
+      classification?.isInfrastructureFault ?? false
+    ]
   )
 }
 

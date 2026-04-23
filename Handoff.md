@@ -1,5 +1,143 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — TASK-584 tomada: hardening del tooling de migraciones PostgreSQL (Codex)
+
+- **Scope**
+  - cerrar el split operativo entre runtime Connector-first y tooling proxy-first
+  - desbloquear la aplicación real de las migraciones pendientes del hardening `service_attribution`
+- **Task tomada**
+  - `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md`
+  - plan: `docs/tasks/plans/TASK-584-plan.md`
+- **Discovery resumida**
+  - `scripts/migrate.ts` y `scripts/generate-db-types.ts` siguen dependiendo de `DATABASE_URL` / `GREENHOUSE_POSTGRES_HOST`
+  - `scripts/pg-connect.sh` levanta un proxy global en `127.0.0.1:15432`, mata procesos previos y luego delega; el patrón es frágil ante `ECONNRESET`
+  - el entorno local tiene simultáneamente `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` y `GREENHOUSE_POSTGRES_HOST=127.0.0.1`
+  - `pnpm pg:doctor` y una prueba directa con Connector terminaron en timeout, así que además del código puede existir un problema de conectividad local a sanear
+- **Siguiente paso inmediato**
+  - refactorizar el tooling DB para carril autosuficiente
+  - reintentar migraciones y regeneración de tipos sobre ese carril nuevo
+
+## Sesion 2026-04-23 — hardening del dead-letter `service_attribution` y clasificación reactiva infra (Codex)
+
+- **Scope**
+  - cerrar de forma robusta el dead-letter heredado `permission denied for table service_attribution_facts`
+  - evitar que futuros fallos de permisos/shared serving queden como texto libre sin clasificación ni replay selectivo
+- **Implementación local**
+  - `src/lib/sync/projection-registry.ts`
+    - nuevo contrato opcional `requiredTablePrivileges`
+  - `src/lib/sync/projections/service-attribution.ts`
+    - declara write requirements sobre:
+      - `greenhouse_serving.service_attribution_facts`
+      - `greenhouse_serving.service_attribution_unresolved`
+  - `src/lib/sync/projection-runtime-health.ts`
+    - nuevo checker server-only que valida `has_table_privilege(current_user, ...)` por projection
+  - `src/lib/sync/reactive-error-classification.ts`
+    - clasifica fallos reactivos (`infra.db_privilege`, `infra.db_missing_object`, `infra.db_connectivity`, `infra.credential`, `application`)
+  - `src/lib/sync/reactive-consumer.ts`
+    - persiste clasificación tipada junto con `retry/dead-letter`
+  - `src/app/api/cron/projection-recovery/route.ts`
+  - `services/ops-worker/server.ts`
+    - recovery paths usan la misma clasificación tipada
+  - `src/app/api/internal/projections/route.ts`
+  - `src/lib/operations/get-reactive-projection-breakdown.ts`
+  - `src/lib/operations/get-operations-overview.ts`
+    - exponen infraestructura degradada y runtime health sin depender solo de `last_error`
+  - `src/app/api/admin/ops/projections/requeue-failed/route.ts`
+    - nuevo filtro opcional por `projectionName`, `errorClass`, `onlyInfrastructure`
+- **Migraciones creadas**
+  - `20260423190340145_service-attribution-runtime-writer-hardening.sql`
+    - `OWNER TO greenhouse_ops` + grants explícitos para runtime/app/migrator sobre `service_attribution_*`
+  - `20260423190546748_reactive-error-classification-observability.sql`
+    - agrega `error_class`, `error_family`, `is_infrastructure_fault` a:
+      - `greenhouse_sync.outbox_reactive_log`
+      - `greenhouse_sync.projection_refresh_queue`
+- **Verificación ejecutada**
+  - `pnpm exec vitest run src/lib/sync/reactive-error-classification.test.ts src/lib/sync/projection-runtime-health.test.ts src/lib/sync/refresh-queue.test.ts src/lib/sync/reactive-consumer.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+- **Bloqueo operativo**
+  - `pnpm pg:connect:migrate` falló dos veces antes de ejecutar SQL con:
+    - `FAIL:read ECONNRESET`
+  - `pnpm migrate:up` directo también falla porque el wrapper queda apuntando a `127.0.0.1:15432` sin proxy activo:
+    - `ECONNREFUSED 127.0.0.1:15432`
+  - por lo mismo:
+    - las migraciones quedaron **creadas pero no aplicadas**
+    - `src/types/db.d.ts` **no** se regeneró en esta sesión
+- **Siguiente paso recomendado**
+  - restablecer conectividad PostgreSQL (proxy / entorno local)
+  - correr `pnpm pg:connect:migrate`
+  - confirmar que `GET /api/internal/projections` muestra `service_attribution.runtimeHealth.status = ready`
+  - reencolar solo la lane afectada, idealmente:
+    - `POST /api/admin/ops/projections/requeue-failed` con `{ "projectionName": "service_attribution", "onlyInfrastructure": true }`
+
+## Sesion 2026-04-23 — TASK-583 implementación local del publish/tax native de HubSpot quotes (Codex)
+
+- **Estado real**
+  - `greenhouse-eo` quedó implementado y verificado localmente para el cierre técnico de `TASK-583`
+  - todavía falta `deploy/smoke` live final antes de mover la task a `complete/`
+- **Implementación shipped en Greenhouse**
+  - nuevo helper `src/lib/hubspot/hubspot-quote-sync.ts`
+    - unifica el payload outbound canónico para create/update
+    - resuelve `sender` desde `actorId | issued_by | created_by`
+    - resuelve empresa emisora desde `getOperatingEntityIdentity()`
+    - exige binding catálogo-first (`hubspot_product_id`) cuando la línea ya tiene `product_id` o `product_code/service_sku`
+    - deriva billing semantics y mapea impuestos hacia `hs_tax_rate_group_id`
+  - `src/lib/integrations/hubspot-greenhouse-service.ts`
+    - agrega `updateHubSpotGreenhouseQuote()`
+    - agrega `getHubSpotGreenhouseTaxRates({ active })`
+    - expande payload/respuesta de quotes con sender, billing, tax group, `pdfDownloadLink`, `locked`
+  - `src/lib/hubspot/create-hubspot-quote.ts`
+    - deja explícito `sender`
+    - usa status HubSpot-native (`APPROVAL_NOT_NEEDED`, `DRAFT`)
+    - devuelve `hubspotQuoteStatus`, `hubspotPdfDownloadLink`, `hubspotQuoteLocked`
+  - `src/lib/hubspot/update-hubspot-quote.ts`
+    - deja de usar el cliente degradado legacy y converge sobre el integration service autenticado
+  - `src/lib/hubspot/push-canonical-quote.ts`
+    - create/update usan el mismo payload canónico
+    - persiste observabilidad en `greenhouse_commercial.quotations`:
+      - `hubspot_quote_status`
+      - `hubspot_quote_link`
+      - `hubspot_quote_pdf_download_link`
+      - `hubspot_quote_locked`
+      - `hubspot_last_synced_at`
+- **Implementación shipped en el sibling**
+  - `services/hubspot_greenhouse_integration/app.py`
+  - `services/hubspot_greenhouse_integration/hubspot_client.py`
+  - `services/hubspot_greenhouse_integration/models.py`
+  - `services/hubspot_greenhouse_integration/contract.py`
+  - `tests/test_hubspot_greenhouse_integration_app.py`
+  - contrato nuevo/extendido:
+    - `GET /tax-rates`
+    - respuesta de quote incluye `pdfDownloadLink` y `locked`
+    - normalización defensiva de `taxRateGroupId`
+- **Migraciones / schema**
+  - se aplicó `migrations/20260423122137281_task-583-hubspot-quote-native-publish-observability-followup.sql`
+  - durante `pnpm pg:connect:migrate` apareció drift real: la base ya tenía aplicada `20260423110044569_task-576-quote-billing-start-date` y el repo no la tenía
+  - se reconstruyó y versionó `migrations/20260423110044569_task-576-quote-billing-start-date.sql` para recuperar una cadena reproducible de migraciones
+  - `src/types/db.d.ts` quedó regenerado contra la base real
+- **Verificación ejecutada**
+  - `pnpm exec vitest run src/lib/hubspot/__tests__/create-hubspot-quote.test.ts src/lib/hubspot/__tests__/push-canonical-quote.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - sibling: `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK (`44` tests, `29` skipped)
+  - `rg "new Pool\\(" src` → solo `src/lib/postgres/client.ts`
+- **Pendiente explícito**
+  - cierre completado el mismo día:
+    - preview validado: `greenhouse-ftfx1pm8j-efeonce-7670142f.vercel.app`
+    - Cloud Run bridge validado tras redeploy manual desde source limpio: revision `hubspot-greenhouse-integration-00027-bhp`
+    - `GET /tax-rates?active=true` respondió `IVA` `19.0` con `id=15837572`
+    - `POST /api/admin/ops/reactive/run` en preview ejecutó `quotation_hubspot_outbound` exitosamente para `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9`
+    - verificación HubSpot posterior:
+      - quote `39307909907` quedó `approvalStatus=APPROVAL_NOT_NEEDED`
+      - `locked=true`
+      - `quoteLink` materializado
+      - line item `54542714929` quedó con `taxRateGroupId=15837572`
+- **Nota operativa**
+  - el mismo run reactivo dejó un dead-letter heredado en `service_attribution` por `permission denied for table service_attribution_facts`
+  - no bloqueó `quotation_hubspot_outbound`, pero conviene triagearlo aparte si vuelve a aparecer
+
 ## Sesion 2026-04-23 — TASK-583 registrada para cerrar publish nativo + impuesto nativo de HubSpot quotes (Codex)
 
 - Se crea `TASK-583 — HubSpot Quote Native Publish & Tax Finalization` como follow-up explícita de `TASK-576`.

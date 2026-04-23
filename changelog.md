@@ -2,6 +2,14 @@
 
 ## 2026-04-22
 
+### 2026-04-23 — Reactive pipeline endurece dead-letters infra y service attribution deja de depender de grants implícitos
+
+- `service_attribution` ya declara explícitamente sus write requirements sobre `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`, en vez de depender de grants implícitos del schema shared.
+- Nuevo helper `src/lib/sync/projection-runtime-health.ts` permite leer readiness de privilegios por projection; `GET /api/internal/projections` ahora expone runtime health y resalta projections degradadas por drift de permisos.
+- Nuevo helper `src/lib/sync/reactive-error-classification.ts` tipifica fallos reactivos de infraestructura (`infra.db_privilege`, etc.) y persiste metadata estructurada en `outbox_reactive_log` / `projection_refresh_queue` mediante las migraciones `20260423190340145_service-attribution-runtime-writer-hardening.sql` y `20260423190546748_reactive-error-classification-observability.sql`.
+- `projection-recovery`, `ops-worker /reactive/recover` y el consumer reactivo ya no reencolan errores DB como texto libre solamente; ahora marcan `error_class`, `error_family` e `is_infrastructure_fault`.
+- `POST /api/admin/ops/projections/requeue-failed` deja de ser all-or-nothing y ahora acepta filtros por `projectionName`, `errorClass` y `onlyInfrastructure` para replays más seguros.
+
 ### 2026-04-23 — Quote Builder ya crea cotizaciones HubSpot desde el anchor `organization` y las asocia al deal real
 
 - El outbound canonico de cotizaciones deja de bloquearse por ausencia de `space`: `createHubSpotQuote()` ahora usa `organization -> hubspot_company_id` como anchor estructural y trata el mirror legacy de `greenhouse_finance.quotes` como opt-in (`persistFinanceMirror`), no como prerequisito.
@@ -10,6 +18,15 @@
 - `services/ops-worker/deploy.sh` publica explícitamente el token/base URL de la integración HubSpot para que el carril reactivo de quotes no dependa de drift de env en Cloud Run.
 - El servicio hermano `hubspot-greenhouse-integration` deja de hardcodear `associationTypeId` para `POST /quotes` y pasa a asociaciones `default` de HubSpot para `line_items`, `deals`, `companies` y `contacts`, eliminando el error live `400 One or more associations are invalid`.
 - Validación real: la quote canónica `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9` reprocesó OK, persistió `hubspot_quote_id=39307909907`, y la lectura live `GET /companies/29666506565/quotes` confirmó la asociación al deal `59465365539`, company `29666506565` y contacto seleccionado.
+
+### 2026-04-23 — TASK-583 converge localmente create/update de HubSpot quotes y materializa observabilidad native
+
+- Nuevo helper `src/lib/hubspot/hubspot-quote-sync.ts` unifica el payload outbound de create/update a partir del canon local de quotation: resuelve `sender`, empresa emisora, billing semantics, binding catálogo-first y metadata tributaria.
+- `src/lib/integrations/hubspot-greenhouse-service.ts` gana `updateHubSpotGreenhouseQuote()` y `getHubSpotGreenhouseTaxRates()`, dejando de depender del cliente update degradado y habilitando lookup runtime de tax groups HubSpot sin hardcodear IDs.
+- `pushCanonicalQuoteToHubSpot()` deja persistidos `hubspot_quote_status`, `hubspot_quote_link`, `hubspot_quote_pdf_download_link`, `hubspot_quote_locked` y `hubspot_last_synced_at` en `greenhouse_commercial.quotations`, cerrando el gap de observabilidad outbound.
+- El sibling `hubspot-greenhouse-integration` suma `GET /tax-rates`, y la respuesta de quotes ahora devuelve también `pdfDownloadLink` y `locked`, alineando el contrato con el publish nativo de HubSpot.
+- Se aplicó la migración `20260423122137281_task-583-hubspot-quote-native-publish-observability-followup.sql` y quedó reconstruida en repo la migración faltante `20260423110044569_task-576-quote-billing-start-date.sql` para recuperar una cadena reproducible de migraciones.
+- Smoke real de cierre: en el preview `greenhouse-ftfx1pm8j-efeonce-7670142f.vercel.app`, un `quotation.updated` sobre `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9` disparó `quotation_hubspot_outbound`; HubSpot dejó la quote `39307909907` en `APPROVAL_NOT_NEEDED`, `locked=true`, materializó `quoteLink`, y el line item `54542714929` cerró `taxRateGroupId=15837572` (`IVA 19%`).
 
 ### 2026-04-23 — Quote Builder ya lee todos los deals asociados a la company en HubSpot
 

@@ -911,6 +911,7 @@ export interface GreenhouseCommercialQuotations {
   approved_by: string | null;
   arr: Numeric | null;
   billing_frequency: Generated<string>;
+  billing_start_date: Timestamp | null;
   business_line_code: string | null;
   client_id: string | null;
   client_name_cache: string | null;
@@ -947,6 +948,22 @@ export interface GreenhouseCommercialQuotations {
   hubspot_deal_id: string | null;
   hubspot_last_synced_at: Timestamp | null;
   hubspot_quote_id: string | null;
+  /**
+   * Observed native HubSpot public quote link (`hs_quote_link`) from the last successful outbound write/read.
+   */
+  hubspot_quote_link: string | null;
+  /**
+   * Observed native HubSpot lock state (`hs_locked`) from the last successful outbound write/read.
+   */
+  hubspot_quote_locked: boolean | null;
+  /**
+   * Observed native HubSpot PDF download link (`hs_pdf_download_link`) from the last successful outbound write/read.
+   */
+  hubspot_quote_pdf_download_link: string | null;
+  /**
+   * Observed native HubSpot quote status (`hs_status`) from the last successful outbound write/read.
+   */
+  hubspot_quote_status: string | null;
   internal_notes: string | null;
   /**
    * Derived flag for fast filtering — true when tax_code IN (cl_vat_exempt, cl_vat_non_billable).
@@ -6025,8 +6042,11 @@ export interface GreenhouseSyncOutboxEvents {
 }
 
 export interface GreenhouseSyncOutboxReactiveLog {
+  error_class: string | null;
+  error_family: string | null;
   event_id: string;
   handler: string;
+  is_infrastructure_fault: Generated<boolean>;
   last_error: string | null;
   reacted_at: Generated<Timestamp>;
   result: string | null;
@@ -6061,7 +6081,10 @@ export interface GreenhouseSyncProjectionRefreshQueue {
   created_at: Generated<Timestamp>;
   entity_id: string;
   entity_type: string;
+  error_class: string | null;
+  error_family: string | null;
   error_message: string | null;
+  is_infrastructure_fault: Generated<boolean>;
   max_retries: Generated<number>;
   priority: Generated<number>;
   projection_name: string;

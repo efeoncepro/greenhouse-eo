@@ -1,3 +1,38 @@
+## Delta 2026-04-23 Reactive projections ahora declaran writer privileges y clasifican fallos infra tipados
+
+- Las projections que escriben tablas shared como excepción (`greenhouse_serving`) ya no deben depender solo de grants implícitos o del texto libre de un dead-letter.
+- Contrato nuevo:
+  - `ProjectionDefinition.requiredTablePrivileges`
+  - helper `src/lib/sync/projection-runtime-health.ts`
+  - helper `src/lib/sync/reactive-error-classification.ts`
+- Regla operativa nueva:
+  - toda projection que materializa tablas shared debe declarar explícitamente sus privilegios requeridos para que Ops Health pueda detectar drift antes de que llegue un evento real
+  - los fallos reactivos de infraestructura ya no deben persistirse solo como texto libre; se tipifican con `error_class`, `error_family` e `is_infrastructure_fault` en `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue`
+- Primer consumidor:
+  - `service_attribution` declara write privileges sobre `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`
+- Operación nueva:
+  - `POST /api/admin/ops/projections/requeue-failed` acepta filtros opcionales `projectionName`, `errorClass` y `onlyInfrastructure`
+
+## Delta 2026-04-23 TASK-583 converge el contrato local de HubSpot quotes hacia publish/tax native
+
+- El outbound de quotes ya no debe armar payloads create/update por carriles distintos.
+- Nuevo helper canónico:
+  - `src/lib/hubspot/hubspot-quote-sync.ts`
+  - source of truth para `sender`, `senderCompany`, binding catálogo-first, billing semantics y metadata tributaria outbound
+- Regla operativa nueva:
+  - si una línea ya referencia catálogo Greenhouse (`product_id`, `product_code`, `service_sku`), el outbound exige `hubspot_product_id`
+  - si falta ese binding, el carril falla explícitamente con `catalog_binding_missing:*` en vez de degradar silenciosamente a línea libre
+- Tax binding native:
+  - Greenhouse ya no debe hardcodear `hs_tax_rate_group_id`
+  - el resolver canónico consulta `GET /tax-rates` del bridge `hubspot-greenhouse-integration`, filtra tasas activas y mapea por rate normalizada
+- Observabilidad outbound nueva en `greenhouse_commercial.quotations`:
+  - `hubspot_quote_status`
+  - `hubspot_quote_link`
+  - `hubspot_quote_pdf_download_link`
+  - `hubspot_quote_locked`
+  - `hubspot_last_synced_at`
+- `create-hubspot-quote.ts` y `update-hubspot-quote.ts` ya convergen sobre el integration service autenticado; el cliente update degradado legacy no debe reintroducirse
+
 ## Delta 2026-04-23 Quote outbound HubSpot converge on canonical `organization`, not `space`
 
 - El carril reactivo `quotation_hubspot_outbound` ya no debe asumir `space` como anchor para crear cotizaciones HubSpot.

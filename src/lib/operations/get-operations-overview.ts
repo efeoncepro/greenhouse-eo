@@ -52,6 +52,8 @@ export interface OperationsFailedProjection {
   entityId: string
   failedAt: string
   errorMessage: string
+  errorClass: string | null
+  isInfrastructure: boolean
 }
 
 export interface OperationsFailedHandler {
@@ -60,6 +62,8 @@ export interface OperationsFailedHandler {
   retries: number
   reactedAt: string
   lastError: string
+  errorClass: string | null
+  isInfrastructure: boolean
 }
 
 export interface OperationsWebhookOverview {
@@ -566,6 +570,8 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     entity_id: string
     updated_at: string
     error_message: string | null
+    error_class: string | null
+    is_infrastructure_fault: boolean | null
   }
 
   interface SecretRefRow extends Record<string, unknown> {
@@ -599,7 +605,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
 
   try {
     const rows = await runGreenhousePostgresQuery<ProjectionRow>(
-      `SELECT projection_name, entity_type, entity_id, updated_at::text, error_message
+      `SELECT projection_name, entity_type, entity_id, updated_at::text, error_message, error_class, is_infrastructure_fault
        FROM greenhouse_sync.projection_refresh_queue
        WHERE status = 'failed'
        ORDER BY updated_at DESC
@@ -611,7 +617,9 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       entityType: row.entity_type,
       entityId: row.entity_id,
       failedAt: row.updated_at,
-      errorMessage: row.error_message || 'Unknown error'
+      errorMessage: row.error_message || 'Unknown error',
+      errorClass: row.error_class ?? null,
+      isInfrastructure: Boolean(row.is_infrastructure_fault ?? false)
     }))
   } catch {
     failedProjections = []
@@ -628,9 +636,11 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
           retries: number
           reacted_at: string
           last_error: string | null
+          error_class: string | null
+          is_infrastructure_fault: boolean | null
         } & Record<string, unknown>
       >(
-        `SELECT handler, result, retries, reacted_at::text, last_error
+        `SELECT handler, result, retries, reacted_at::text, last_error, error_class, is_infrastructure_fault
          FROM greenhouse_sync.outbox_reactive_log
          WHERE result IN ('retry', 'dead-letter')
          ORDER BY reacted_at DESC
@@ -642,7 +652,9 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
         result: row.result,
         retries: Number(row.retries ?? 0),
         reactedAt: row.reacted_at,
-        lastError: row.last_error || 'Unknown error'
+        lastError: row.last_error || 'Unknown error',
+        errorClass: row.error_class ?? null,
+        isInfrastructure: Boolean(row.is_infrastructure_fault ?? false)
       }))
     }
   } catch {
