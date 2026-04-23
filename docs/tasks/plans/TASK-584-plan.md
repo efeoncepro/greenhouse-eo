@@ -1,13 +1,16 @@
 # Plan — TASK-584 PostgreSQL Migration Tooling Hardening
 
+## Delta 2026-04-23
+
+- Scope reducido tras validar en sesión live que el tooling actual funciona fin-a-fin cuando la red no bloquea TLS en 3307. Las 2 migraciones pendientes (`20260423190340145_*`, `20260423190546748_*`) se aplicaron con `pnpm pg:connect:migrate` sin modificar ningún script.
+- Diagnóstico corregido: el `ECONNRESET` previo fue un PMTUD blackhole corporativo en puerto 3307 (reproducible con `ping -D -s 1200`), no un problema de tooling split. `pnpm pg:doctor` via Cloud SQL Connector nativo falló idéntico, lo que descarta que "Connector-first" hubiera prevenido el bloqueo.
+
 ## Discovery summary
 
-- El runtime canónico ya existe en `src/lib/postgres/client.ts` y usa Cloud SQL Connector con prioridad sobre `GREENHOUSE_POSTGRES_HOST`.
-- `scripts/migrate.ts` todavía shell-out a `node-pg-migrate` CLI con `DATABASE_URL`, por lo que depende de `GREENHOUSE_POSTGRES_HOST` aunque el runtime del repo no lo haga.
-- `scripts/generate-db-types.ts` también depende de `DATABASE_URL` y hoy asume un host/puerto listos; no autoprovisiona conectividad.
-- `scripts/pg-connect.sh` levanta un proxy global en `127.0.0.1:15432`, mata procesos previos y luego delega; ese patrón explica que después de `ECONNRESET` el siguiente comando caiga en `ECONNREFUSED`.
-- En este entorno coexistían `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` y `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, lo que parte el repo entre carril Connector-first y carril proxy-first.
-- `pnpm pg:doctor` y una prueba directa con Connector también expiraron por timeout; no basta con “volver a correr migraciones”, hay que sanear el tooling y luego revalidar la conectividad real.
+- `src/lib/postgres/client.ts` usa Cloud SQL Connector + Secret Manager como runtime canónico. **No se toca en esta task.**
+- `scripts/migrate.ts` construye `DATABASE_URL` desde `GREENHOUSE_POSTGRES_HOST` y hace shell-out a `node-pg-migrate`. Funciona vía proxy local. **Solo se agrega clasificación de errores.**
+- `scripts/generate-db-types.ts` depende de URL-based (upstream `kysely-codegen` lo exige). **Fuera de scope.**
+- `scripts/pg-connect.sh` es el único punto donde hay valor real de endurecer: `set -e` + proxy background sin `trap` + `sleep 3` fijo + mensajes de error indistinguibles. **Foco aquí.**
 
 ## Access model
 
@@ -17,55 +20,47 @@ No aplica capa de `views` o `entitlements`.
 - `views` / `authorizedViews`: no aplica
 - `entitlements`: no aplica
 - `startup policy`: no aplica
-- Decision de diseño: task puramente de plataforma/tooling PostgreSQL
+- Decisión de diseño: task puramente de plataforma/tooling PostgreSQL
 
 ## Skills
 
-- Task creation: `greenhouse-task-planner`
-- Implementación backend/tooling: `greenhouse-agent`
+- Implementación backend/tooling: `greenhouse-backend`
 
 ## Subagent strategy
 
-`fork`
+`main-thread`
 
-- Subagente exploró el carril actual de migraciones y confirmó el split entre runtime Connector-first y tooling proxy-first.
-- El hilo principal ejecuta los cambios porque el write-set está concentrado en `scripts/` y `docs/`.
+- Write-set pequeño y concentrado (2 scripts + 1 doc). No hay valor en dividir.
 
 ## Execution order
 
-1. Crear helper compartido de conectividad para tooling DB
-2. Refactorizar `scripts/migrate.ts` a carril autosuficiente sin proxy global residual
-3. Refactorizar `scripts/generate-db-types.ts` para codegen con conectividad efímera autocontenida
-4. Simplificar `scripts/pg-connect.sh` a carril interactivo coherente
-5. Actualizar docs y handoff
-6. Aplicar migraciones pendientes y regenerar `src/types/db.d.ts`
-7. Correr validaciones técnicas
+1. Agregar `trap EXIT` y poll de `ready for new connections` en `pg-connect.sh`
+2. Agregar preflight de red (ping DF-1200) con skip env var
+3. Agregar prefijos de error `[ADC|PROXY|NETWORK|SQL]` en `pg-connect.sh` y `scripts/migrate.ts`
+4. Documentar tabla de prefijos en `GREENHOUSE_DATABASE_TOOLING_V1.md`
+5. Verificación: happy path + fallo simulado con `GREENHOUSE_FORCE_PREFLIGHT_FAIL=true`
 
 ## Files to create
 
-- `scripts/lib/[verificar]-postgres-tooling-connection.ts`
+- ninguno
 
 ## Files to modify
 
-- `scripts/migrate.ts` — eliminar dependencia rígida de `DATABASE_URL` + proxy global
-- `scripts/generate-db-types.ts` — autoprovisionar conectividad efímera
-- `scripts/pg-connect.sh` — dejarlo como carril interactivo/manual coherente
-- `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` — actualizar contrato
-- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` — alinear postura operativa
-- `Handoff.md` — registrar hallazgos y validación
-- `changelog.md` / `project_context.md` — si el contrato operativo visible cambia
+- `scripts/pg-connect.sh` — `trap EXIT`, poll del ready message, preflight de red, prefijos de error
+- `scripts/migrate.ts` — prefijos de error consistentes con `pg-connect.sh`
+- `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` — tabla prefijos → triage
+- `Handoff.md` / `changelog.md` — si el contrato operativo visible cambia
 
 ## Files to delete
 
-- ninguno previsto
+- ninguno
 
 ## Risk flags
 
-- `node-pg-migrate` sigue siendo SQL-first y no se debe romper `migrate:create`
-- `kysely-codegen` todavía exige URL-based connection, así que el carril de codegen probablemente necesite un helper diferente al de migraciones
-- el entorno local también mostró fallos de conectividad reales; puede ser necesario corregir ADC/proxy/Connector además del código
+- `trap EXIT` en bash sobrescribe trap previos — asegurar que no hay otro trap registrado antes
+- Preflight con `ping -D` puede fallar en redes donde ICMP está bloqueado pero TCP 3307 funciona (poco común para Cloud SQL via proxy, pero posible) — por eso el `GREENHOUSE_SKIP_PREFLIGHT=true` escape hatch
+- Cambiar mensajes de error puede romper scripts/CI que parsean stdout — hoy no hay consumers conocidos; buscar con `grep` antes de shipping
 
 ## Open questions
 
-- si la API programática instalada de `node-pg-migrate@8.0.4` soporta el flujo exacto con `dbClient` y migrations SQL tal como el repo las usa
-- si conviene usar un socket local efímero vía Connector o un proxy TCP efímero para `kysely-codegen` en este entorno
+- ninguna — scope cerrado
