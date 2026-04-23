@@ -1,5 +1,60 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — TASK-583 implementación local del publish/tax native de HubSpot quotes (Codex)
+
+- **Estado real**
+  - `greenhouse-eo` quedó implementado y verificado localmente para el cierre técnico de `TASK-583`
+  - todavía falta `deploy/smoke` live final antes de mover la task a `complete/`
+- **Implementación shipped en Greenhouse**
+  - nuevo helper `src/lib/hubspot/hubspot-quote-sync.ts`
+    - unifica el payload outbound canónico para create/update
+    - resuelve `sender` desde `actorId | issued_by | created_by`
+    - resuelve empresa emisora desde `getOperatingEntityIdentity()`
+    - exige binding catálogo-first (`hubspot_product_id`) cuando la línea ya tiene `product_id` o `product_code/service_sku`
+    - deriva billing semantics y mapea impuestos hacia `hs_tax_rate_group_id`
+  - `src/lib/integrations/hubspot-greenhouse-service.ts`
+    - agrega `updateHubSpotGreenhouseQuote()`
+    - agrega `getHubSpotGreenhouseTaxRates({ active })`
+    - expande payload/respuesta de quotes con sender, billing, tax group, `pdfDownloadLink`, `locked`
+  - `src/lib/hubspot/create-hubspot-quote.ts`
+    - deja explícito `sender`
+    - usa status HubSpot-native (`APPROVAL_NOT_NEEDED`, `DRAFT`)
+    - devuelve `hubspotQuoteStatus`, `hubspotPdfDownloadLink`, `hubspotQuoteLocked`
+  - `src/lib/hubspot/update-hubspot-quote.ts`
+    - deja de usar el cliente degradado legacy y converge sobre el integration service autenticado
+  - `src/lib/hubspot/push-canonical-quote.ts`
+    - create/update usan el mismo payload canónico
+    - persiste observabilidad en `greenhouse_commercial.quotations`:
+      - `hubspot_quote_status`
+      - `hubspot_quote_link`
+      - `hubspot_quote_pdf_download_link`
+      - `hubspot_quote_locked`
+      - `hubspot_last_synced_at`
+- **Implementación shipped en el sibling**
+  - `services/hubspot_greenhouse_integration/app.py`
+  - `services/hubspot_greenhouse_integration/hubspot_client.py`
+  - `services/hubspot_greenhouse_integration/models.py`
+  - `services/hubspot_greenhouse_integration/contract.py`
+  - `tests/test_hubspot_greenhouse_integration_app.py`
+  - contrato nuevo/extendido:
+    - `GET /tax-rates`
+    - respuesta de quote incluye `pdfDownloadLink` y `locked`
+    - normalización defensiva de `taxRateGroupId`
+- **Migraciones / schema**
+  - se aplicó `migrations/20260423122137281_task-583-hubspot-quote-native-publish-observability-followup.sql`
+  - durante `pnpm pg:connect:migrate` apareció drift real: la base ya tenía aplicada `20260423110044569_task-576-quote-billing-start-date` y el repo no la tenía
+  - se reconstruyó y versionó `migrations/20260423110044569_task-576-quote-billing-start-date.sql` para recuperar una cadena reproducible de migraciones
+  - `src/types/db.d.ts` quedó regenerado contra la base real
+- **Verificación ejecutada**
+  - `pnpm exec vitest run src/lib/hubspot/__tests__/create-hubspot-quote.test.ts src/lib/hubspot/__tests__/push-canonical-quote.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - sibling: `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK (`44` tests, `29` skipped)
+  - `rg "new Pool\\(" src` → solo `src/lib/postgres/client.ts`
+- **Pendiente explícito**
+  - falta deploy del sibling + smoke live del carril completo para validar quote no-`DRAFT`, links públicos y `hs_tax_rate_group_id` visibles en HubSpot antes de cerrar definitivamente `TASK-583`
+
 ## Sesion 2026-04-23 — TASK-583 registrada para cerrar publish nativo + impuesto nativo de HubSpot quotes (Codex)
 
 - Se crea `TASK-583 — HubSpot Quote Native Publish & Tax Finalization` como follow-up explícita de `TASK-576`.

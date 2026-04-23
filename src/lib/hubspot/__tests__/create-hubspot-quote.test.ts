@@ -85,6 +85,12 @@ describe('createHubSpotQuote', () => {
       organizationId: 'org-1',
       title: 'Bata - TEST',
       expirationDate: '2026-04-27',
+      sender: {
+        firstName: 'Julio',
+        lastName: 'Reyes',
+        email: 'julio@example.com',
+        companyName: 'Efeonce Group SpA'
+      },
       contactIdentityProfileId: 'identity-contact-1',
       lineItems: [
         {
@@ -102,7 +108,10 @@ describe('createHubSpotQuote', () => {
       quoteId: 'qt-1',
       hubspotQuoteId: 'hs-quote-1',
       hubspotQuoteNumber: 'HQ-1',
+      hubspotQuoteStatus: null,
       hubspotQuoteLink: 'https://app.hubspot.com/quotes/hs-quote-1',
+      hubspotPdfDownloadLink: null,
+      hubspotQuoteLocked: null,
       hubspotContactId: '87929193780',
       error: null
     })
@@ -110,6 +119,13 @@ describe('createHubSpotQuote', () => {
     expect(createHubSpotGreenhouseQuoteMock).toHaveBeenCalledWith(
       expect.objectContaining({
         title: 'Bata - TEST',
+        status: 'DRAFT',
+        sender: {
+          firstName: 'Julio',
+          lastName: 'Reyes',
+          email: 'julio@example.com',
+          companyName: 'Efeonce Group SpA'
+        },
         associations: {
           companyId: '29666506565',
           dealId: '59465365539',
@@ -145,6 +161,12 @@ describe('createHubSpotQuote', () => {
       organizationId: 'org-1',
       title: 'Bata - TEST',
       expirationDate: '2026-04-27',
+      sender: {
+        firstName: 'Julio',
+        lastName: 'Reyes',
+        email: 'julio@example.com',
+        companyName: 'Efeonce Group SpA'
+      },
       contactIdentityProfileId: 'identity-contact-1',
       lineItems: [],
       persistFinanceMirror: false
@@ -155,7 +177,10 @@ describe('createHubSpotQuote', () => {
       quoteId: 'qt-1',
       hubspotQuoteId: null,
       hubspotQuoteNumber: null,
+      hubspotQuoteStatus: null,
       hubspotQuoteLink: null,
+      hubspotPdfDownloadLink: null,
+      hubspotQuoteLocked: null,
       hubspotContactId: null,
       error: 'Contact has no HubSpot contact linked'
     })

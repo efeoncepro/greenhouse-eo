@@ -11,6 +11,14 @@
 - El servicio hermano `hubspot-greenhouse-integration` deja de hardcodear `associationTypeId` para `POST /quotes` y pasa a asociaciones `default` de HubSpot para `line_items`, `deals`, `companies` y `contacts`, eliminando el error live `400 One or more associations are invalid`.
 - Validación real: la quote canónica `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9` reprocesó OK, persistió `hubspot_quote_id=39307909907`, y la lectura live `GET /companies/29666506565/quotes` confirmó la asociación al deal `59465365539`, company `29666506565` y contacto seleccionado.
 
+### 2026-04-23 — TASK-583 converge localmente create/update de HubSpot quotes y materializa observabilidad native
+
+- Nuevo helper `src/lib/hubspot/hubspot-quote-sync.ts` unifica el payload outbound de create/update a partir del canon local de quotation: resuelve `sender`, empresa emisora, billing semantics, binding catálogo-first y metadata tributaria.
+- `src/lib/integrations/hubspot-greenhouse-service.ts` gana `updateHubSpotGreenhouseQuote()` y `getHubSpotGreenhouseTaxRates()`, dejando de depender del cliente update degradado y habilitando lookup runtime de tax groups HubSpot sin hardcodear IDs.
+- `pushCanonicalQuoteToHubSpot()` deja persistidos `hubspot_quote_status`, `hubspot_quote_link`, `hubspot_quote_pdf_download_link`, `hubspot_quote_locked` y `hubspot_last_synced_at` en `greenhouse_commercial.quotations`, cerrando el gap de observabilidad outbound.
+- El sibling `hubspot-greenhouse-integration` suma `GET /tax-rates`, y la respuesta de quotes ahora devuelve también `pdfDownloadLink` y `locked`, alineando el contrato con el publish nativo de HubSpot.
+- Se aplicó la migración `20260423122137281_task-583-hubspot-quote-native-publish-observability-followup.sql` y quedó reconstruida en repo la migración faltante `20260423110044569_task-576-quote-billing-start-date.sql` para recuperar una cadena reproducible de migraciones.
+
 ### 2026-04-23 — Quote Builder ya lee todos los deals asociados a la company en HubSpot
 
 - `GET /api/commercial/organizations/[id]/deals` deja de depender solo del mirror local `greenhouse_commercial.deals` y ahora hace `read-through sync` live cuando la organizacion ya tiene `hubspot_company_id`.
