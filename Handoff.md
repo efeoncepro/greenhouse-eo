@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — TASK-583 registrada para cerrar publish nativo + impuesto nativo de HubSpot quotes (Codex)
+
+- Se crea `TASK-583 — HubSpot Quote Native Publish & Tax Finalization` como follow-up explícita de `TASK-576`.
+- Hallazgo consolidado que motiva la task:
+  - la quote real `39307909907` sigue en `hs_status = DRAFT`
+  - `hs_quote_link` y `hs_pdf_download_link` siguen `null`
+  - el line item real ya tiene `recurringbillingfrequency = monthly`, `hs_recurring_billing_start_date = 2026-04-23`, `tax = 555465` y `gh_tax_rate = 0.19`
+  - pero `hs_tax_rate_group_id = null`
+- La task deja explícita la separación entre:
+  - metadata custom útil (`gh_tax_rate`)
+  - contrato nativo HubSpot que todavía falta cerrar (`hs_status`, `hs_quote_link`, `hs_pdf_download_link`, `hs_tax_rate_group_id`)
+- También se documenta un descalce de nombres que no debe reintroducirse:
+  - `recurringbillingfrequency` es la frecuencia nativa correcta
+  - `hs_recurring_billing_start_date` es la fecha nativa correcta
+  - `hs_billing_start_date` no existe
+  - `hs_recurring_billing_period` no es el campo UI-canonical de frecuencia
+
 ## Sesion 2026-04-23 — TASK-576 registrada para completar el contrato publish-ready de HubSpot quotes (Codex)
 
 - Se crea `TASK-576 — HubSpot Quote Publish Contract Completion`.

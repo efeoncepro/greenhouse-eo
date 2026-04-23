@@ -636,3 +636,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-580` | `to-do` | Reverse Orchestrator: Delivery → Commercial (Notion → HubSpot) híbrido — EPIC-005 child 4/6 | `docs/tasks/to-do/TASK-580-reverse-orchestrator-hybrid-notion-to-commercial.md` |
 | `TASK-581` | `to-do` | Cutover de un tirón + sibling retirement + docs — EPIC-005 child 5/6 | `docs/tasks/to-do/TASK-581-notion-sync-cutover-and-sibling-retirement.md` |
 | `TASK-582` | `to-do` | Monthly Project Provisioning Admin Surface with Preview — EPIC-005 child 6/6 | `docs/tasks/to-do/TASK-582-monthly-project-provisioning-admin-surface.md` |
+| `TASK-583` | `to-do` | HubSpot Quote Native Publish & Tax Finalization | `docs/tasks/to-do/TASK-583-hubspot-quote-native-publish-tax-finalization.md` |
