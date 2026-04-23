@@ -73,6 +73,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-530-quote-tax-explicitness-chile-iva.md`
 - `docs/tasks/complete/TASK-563-product-catalog-hubspot-outbound.md`
 - `docs/tasks/to-do/TASK-574-absorb-hubspot-greenhouse-integration-service.md`
+- `docs/tasks/to-do/TASK-575-hubspot-developer-platform-2026-upgrade.md`
 
 ## Dependencies & Impact
 
@@ -97,6 +98,7 @@ Reglas obligatorias:
 - Impacta el contrato `POST /quotes` y probablemente `PATCH /quotes/{id}`
 - Impacta la calidad del catálogo comercial sincronizado con HubSpot y su reuso downstream
 - Desbloquea una publicación de cotizaciones HubSpot sin edición manual en el Quote Editor
+- Define un contrato que `TASK-574` y `TASK-575` deben preservar explícitamente: cualquier absorción del servicio o upgrade de plataforma que toque `/quotes` debe considerar este carril como regression baseline, no como follow-up implícito.
 
 ### Files owned
 
