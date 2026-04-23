@@ -13,6 +13,10 @@ const DEAL_PROPERTY_ALIASES = {
   priority: 'hs_priority'
 } as const
 
+const DEAL_METADATA_SYNC_TTL_MS = 15 * 60 * 1000
+
+let inFlightDealMetadataSync: Promise<DealMetadataSyncSummary | null> | null = null
+
 const parseBoolean = (value: unknown): boolean | null => {
   if (typeof value === 'boolean') return value
 
@@ -217,6 +221,89 @@ export interface DealMetadataSyncSummary {
   syncedAt: string
 }
 
+interface DealMetadataRegistryHealth {
+  shouldSync: boolean
+  reasons: string[]
+  latestPipelineUpdatedAt: string | null
+  latestPropertySyncedAt: string | null
+}
+
+const toMillis = (value: string | null) => {
+  if (!value) return null
+
+  const parsed = Date.parse(value)
+
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+export const getHubSpotDealMetadataRegistryHealth = async (): Promise<DealMetadataRegistryHealth> => {
+  const rows = await query<{
+    pipeline_count: string | number
+    property_count: string | number
+    missing_pipeline_label_count: string | number
+    missing_stage_order_count: string | number
+    latest_pipeline_updated_at: string | null
+    latest_property_synced_at: string | null
+  }>(
+    `WITH pipeline_summary AS (
+       SELECT COUNT(DISTINCT pipeline_id)::text AS pipeline_count,
+              COUNT(*) FILTER (
+                WHERE pipeline_label IS NULL
+                   OR btrim(pipeline_label) = ''
+                   OR pipeline_label = pipeline_id
+              )::text AS missing_pipeline_label_count,
+              COUNT(*) FILTER (WHERE stage_display_order IS NULL)::text AS missing_stage_order_count,
+              MAX(updated_at)::text AS latest_pipeline_updated_at
+         FROM greenhouse_commercial.hubspot_deal_pipeline_config
+     ),
+     property_summary AS (
+       SELECT COUNT(*)::text AS property_count,
+              MAX(synced_at)::text AS latest_property_synced_at
+         FROM greenhouse_commercial.hubspot_deal_property_config
+     )
+     SELECT pipeline_summary.pipeline_count,
+            property_summary.property_count,
+            pipeline_summary.missing_pipeline_label_count,
+            pipeline_summary.missing_stage_order_count,
+            pipeline_summary.latest_pipeline_updated_at,
+            property_summary.latest_property_synced_at
+       FROM pipeline_summary, property_summary`
+  )
+
+  const row = rows[0]
+  const pipelineCount = Number(row?.pipeline_count ?? 0)
+  const propertyCount = Number(row?.property_count ?? 0)
+  const missingPipelineLabelCount = Number(row?.missing_pipeline_label_count ?? 0)
+  const missingStageOrderCount = Number(row?.missing_stage_order_count ?? 0)
+  const latestPipelineUpdatedAt = row?.latest_pipeline_updated_at ?? null
+  const latestPropertySyncedAt = row?.latest_property_synced_at ?? null
+  const now = Date.now()
+  const reasons: string[] = []
+
+  if (pipelineCount === 0) reasons.push('no_pipelines_seeded')
+  if (propertyCount < 2) reasons.push('property_metadata_incomplete')
+  if (missingPipelineLabelCount > 0) reasons.push('pipeline_labels_unhydrated')
+  if (missingStageOrderCount > 0) reasons.push('stage_display_order_missing')
+
+  const latestPipelineMs = toMillis(latestPipelineUpdatedAt)
+  const latestPropertyMs = toMillis(latestPropertySyncedAt)
+
+  if (pipelineCount > 0 && latestPipelineMs !== null && now - latestPipelineMs > DEAL_METADATA_SYNC_TTL_MS) {
+    reasons.push('pipeline_registry_stale')
+  }
+
+  if (propertyCount > 0 && latestPropertyMs !== null && now - latestPropertyMs > DEAL_METADATA_SYNC_TTL_MS) {
+    reasons.push('property_registry_stale')
+  }
+
+  return {
+    shouldSync: reasons.length > 0,
+    reasons,
+    latestPipelineUpdatedAt,
+    latestPropertySyncedAt
+  }
+}
+
 export const syncHubSpotDealMetadata = async (): Promise<DealMetadataSyncSummary> => {
   const metadata = await getHubSpotGreenhouseDealMetadata()
   const seenKeys = new Set<string>()
@@ -243,4 +330,22 @@ export const syncHubSpotDealMetadata = async (): Promise<DealMetadataSyncSummary
       .map(([propertyName]) => propertyName),
     syncedAt: new Date().toISOString()
   }
+}
+
+export const ensureHubSpotDealMetadataFresh = async (
+  options: { force?: boolean } = {}
+): Promise<DealMetadataSyncSummary | null> => {
+  if (!options.force) {
+    const health = await getHubSpotDealMetadataRegistryHealth()
+
+    if (!health.shouldSync) return null
+  }
+
+  if (!inFlightDealMetadataSync) {
+    inFlightDealMetadataSync = syncHubSpotDealMetadata().finally(() => {
+      inFlightDealMetadataSync = null
+    })
+  }
+
+  return inFlightDealMetadataSync
 }

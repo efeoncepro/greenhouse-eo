@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
+import { resolveHubSpotBusinessLine } from '@/lib/business-line/hubspot'
 import { query, withTransaction } from '@/lib/db'
 import {
   getDealCreationContext,
@@ -16,6 +17,7 @@ import {
   publishDealCreated,
   publishDealCreatedFromGreenhouse
 } from '@/lib/commercial/deal-events'
+import { ensureHubSpotDealMetadataFresh } from '@/lib/commercial/deal-metadata-sync'
 import {
   createHubSpotGreenhouseDeal,
   type HubSpotGreenhouseCreateDealResponse
@@ -122,6 +124,12 @@ interface ResolvedContact {
 interface ResolvedDealProperties {
   dealType: string | null
   priority: string | null
+}
+
+interface ResolvedBusinessLine {
+  requestedCode: string | null
+  moduleCode: string | null
+  hubspotEnumValue: string | null
 }
 
 const assertNonEmpty = (value: string | null | undefined, field: string): string => {
@@ -410,6 +418,28 @@ const resolveDealProperties = (
     creationContext.priorityOptions
   )
 })
+
+const resolveBusinessLine = async (
+  input: CreateDealFromQuoteContextInput
+): Promise<ResolvedBusinessLine> => {
+  const requestedCode = input.businessLineCode?.trim() || input.actor.businessLineCode?.trim() || null
+
+  if (!requestedCode) {
+    return {
+      requestedCode: null,
+      moduleCode: null,
+      hubspotEnumValue: null
+    }
+  }
+
+  const resolved = await resolveHubSpotBusinessLine(requestedCode)
+
+  return {
+    requestedCode,
+    moduleCode: resolved?.moduleCode ?? null,
+    hubspotEnumValue: resolved?.hubspotEnumValue ?? null
+  }
+}
 
 const findExistingAttemptByKey = async (idempotencyKey: string): Promise<AttemptRow | null> => {
   const rows = await query<AttemptRow>(
@@ -849,12 +879,20 @@ export const createDealFromQuoteContext = async (
   // 1.5 Resolve pipeline/stage selection from governance registry. Throws
   // DealCreateSelectionInvalidError or DealCreateContextEmptyError — the
   // route layer maps those to 422/409.
+  try {
+    await ensureHubSpotDealMetadataFresh()
+  } catch (error) {
+    console.error('[createDealFromQuoteContext] metadata refresh failed', error)
+  }
+
+  const resolvedBusinessLine = await resolveBusinessLine(input)
+
   const creationContext = await getDealCreationContext({
     tenantScope: input.actor.tenantScope,
-    businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null
+    businessLineCode: resolvedBusinessLine.moduleCode
   })
 
-  if (!creationContext.readyToCreate) {
+  if (creationContext.blockingIssues.length > 0) {
     throw new DealCreateGovernanceIncompleteError('context_not_ready', {
       blockingIssues: creationContext.blockingIssues
     })
@@ -886,12 +924,15 @@ export const createDealFromQuoteContext = async (
     hubspotContactId: resolvedContact.hubspotContactId,
     dealType: resolvedProperties.dealType,
     priority: resolvedProperties.priority,
-    businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null,
+    businessLineCode: resolvedBusinessLine.moduleCode,
     metadata: {
       origin: 'greenhouse_quote_builder',
       quotation_id: input.quotationId ?? null,
       contact_identity_profile_id: resolvedContact.contactIdentityProfileId,
       hubspot_contact_id: resolvedContact.hubspotContactId,
+      requested_business_line_code: resolvedBusinessLine.requestedCode,
+      resolved_business_line_code: resolvedBusinessLine.moduleCode,
+      resolved_hubspot_business_line: resolvedBusinessLine.hubspotEnumValue,
       resolved_selection: selection,
       resolved_properties: resolvedProperties,
       defaults_source: creationContext.defaultsSource
@@ -968,7 +1009,7 @@ export const createDealFromQuoteContext = async (
       priority: resolvedProperties.priority,
       ownerHubspotUserId: resolvedOwner.hubspotOwnerUserId,
       closeDate: input.closeDateHint ?? null,
-      businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null,
+      businessLineCode: resolvedBusinessLine.hubspotEnumValue,
       origin: 'greenhouse_quote_builder',
       correlationId: attemptId,
       hubspotContactId: resolvedContact.hubspotContactId

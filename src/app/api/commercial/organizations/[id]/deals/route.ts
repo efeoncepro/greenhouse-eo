@@ -134,9 +134,7 @@ export async function POST(
       closeDateHint:
         typeof body.closeDateHint === 'string' ? body.closeDateHint : null,
       businessLineCode:
-        typeof body.businessLineCode === 'string'
-          ? body.businessLineCode
-          : tenant.businessLines[0] ?? null,
+        typeof body.businessLineCode === 'string' ? body.businessLineCode : null,
       quotationId: typeof body.quotationId === 'string' ? body.quotationId : null,
       idempotencyKey:
         typeof body.idempotencyKey === 'string' ? body.idempotencyKey : null,

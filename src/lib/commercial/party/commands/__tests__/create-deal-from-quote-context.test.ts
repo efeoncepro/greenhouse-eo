@@ -11,9 +11,19 @@ vi.mock('@/lib/db', () => ({
 }))
 
 const mockCreateHubSpotDeal = vi.fn()
+const mockEnsureHubSpotDealMetadataFresh = vi.fn()
+const mockResolveHubSpotBusinessLine = vi.fn()
 
 vi.mock('@/lib/integrations/hubspot-greenhouse-service', () => ({
   createHubSpotGreenhouseDeal: (...args: unknown[]) => mockCreateHubSpotDeal(...args)
+}))
+
+vi.mock('@/lib/business-line/hubspot', () => ({
+  resolveHubSpotBusinessLine: (...args: unknown[]) => mockResolveHubSpotBusinessLine(...args)
+}))
+
+vi.mock('@/lib/commercial/deal-metadata-sync', () => ({
+  ensureHubSpotDealMetadataFresh: (...args: unknown[]) => mockEnsureHubSpotDealMetadataFresh(...args)
 }))
 
 const mockPublishDealCreated = vi.fn()
@@ -80,6 +90,7 @@ const stubPipelineDefaultRows = () => [] as Array<{
   priority: string | null
   owner_hubspot_user_id: string | null
 }>
+
 const stubPropertyRows = () => []
 
 const mockPipelineContextQueries = () => {
@@ -103,6 +114,8 @@ const baseInput = {
 describe('createDealFromQuoteContext', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockEnsureHubSpotDealMetadataFresh.mockResolvedValue(null)
+    mockResolveHubSpotBusinessLine.mockResolvedValue(null)
   })
 
   it('rejects when organizationId or dealName is missing', async () => {
@@ -282,6 +295,83 @@ describe('createDealFromQuoteContext', () => {
 
     expect(mockPublishDealCreated).toHaveBeenCalledTimes(1)
     expect(mockPublishDealCreatedFromGreenhouse).toHaveBeenCalledTimes(1)
+  })
+
+  it('maps a canonical commercial business line into the HubSpot enum before POST /deals', async () => {
+    mockResolveHubSpotBusinessLine.mockResolvedValueOnce({
+      moduleCode: 'globe',
+      hubspotEnumValue: 'globe',
+      label: 'Globe'
+    })
+
+    mockQuery
+      .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
+      .mockResolvedValueOnce([])
+
+    mockPipelineContextQueries()
+    mockQuery
+      .mockResolvedValueOnce([{ count: '0' }])
+      .mockResolvedValueOnce([{ count: '0' }])
+      .mockResolvedValueOnce([{ attempt_id: 'attempt-business-line' }])
+      .mockResolvedValueOnce([{ deal_id: 'deal-business-line' }])
+      .mockResolvedValueOnce(undefined)
+
+    mockCreateHubSpotDeal.mockResolvedValueOnce({
+      status: 'created',
+      hubspotDealId: 'hs-deal-business-line',
+      pipelineUsed: 'default',
+      stageUsed: 'appointmentscheduled',
+      ownerUsed: 'hs-user-1'
+    })
+
+    await createDealFromQuoteContext({
+      ...baseInput,
+      businessLineCode: 'globe',
+      idempotencyKey: null
+    })
+
+    expect(mockCreateHubSpotDeal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        businessLineCode: 'globe'
+      })
+    )
+  })
+
+  it('omits non-commercial tenant business lines instead of forwarding invalid HubSpot values', async () => {
+    mockQuery
+      .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
+      .mockResolvedValueOnce([])
+
+    mockPipelineContextQueries()
+    mockQuery
+      .mockResolvedValueOnce([{ count: '0' }])
+      .mockResolvedValueOnce([{ count: '0' }])
+      .mockResolvedValueOnce([{ attempt_id: 'attempt-no-business-line' }])
+      .mockResolvedValueOnce([{ deal_id: 'deal-no-business-line' }])
+      .mockResolvedValueOnce(undefined)
+
+    mockCreateHubSpotDeal.mockResolvedValueOnce({
+      status: 'created',
+      hubspotDealId: 'hs-deal-no-business-line',
+      pipelineUsed: 'default',
+      stageUsed: 'appointmentscheduled',
+      ownerUsed: 'hs-user-1'
+    })
+
+    await createDealFromQuoteContext({
+      ...baseInput,
+      actor: {
+        ...baseInput.actor,
+        businessLineCode: 'growth'
+      },
+      idempotencyKey: null
+    })
+
+    expect(mockCreateHubSpotDeal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        businessLineCode: null
+      })
+    )
   })
 
   it('rejects when stageId does not belong to pipelineId (TASK-571 validation)', async () => {

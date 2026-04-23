@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { ensureHubSpotDealMetadataFresh } from '@/lib/commercial/deal-metadata-sync'
 import { query } from '@/lib/db'
 import { getDealCreationContext } from '@/lib/commercial/deals-store'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party'
@@ -66,8 +67,13 @@ export async function GET(
 
   const tenantScope = `${tenant.tenantType}:${tenant.clientId || 'system'}`
   const { searchParams } = new URL(request.url)
-  const requestedBusinessLineCode = searchParams.get('businessLineCode')?.trim() || null
-  const businessLineCode = requestedBusinessLineCode || tenant.businessLines[0] || null
+  const businessLineCode = searchParams.get('businessLineCode')?.trim() || null
+
+  try {
+    await ensureHubSpotDealMetadataFresh()
+  } catch (error) {
+    console.error('[api/commercial/organizations/deal-creation-context] metadata refresh failed', error)
+  }
 
   const context = await getDealCreationContext({ tenantScope, businessLineCode })
   const organizationHasHubSpotCompany = Boolean(orgRows[0].hubspot_company_id)

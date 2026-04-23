@@ -118,19 +118,9 @@ const sortOptions = (options: DealCreationContextOption[]): DealCreationContextO
 
 const formatBlockingIssue = (issue: string): string => {
   switch (issue) {
-    case 'multiple_active_pipelines_without_policy':
-      return 'Hay más de un pipeline activo y no existe una política que defina cuál usar para crear.'
-    case 'deal_type_default_missing':
-      return 'Falta definir el tipo de negocio por defecto para esta política comercial.'
-    case 'priority_default_missing':
-      return 'Falta definir la prioridad por defecto para esta política comercial.'
     case 'no_active_pipeline':
       return 'No hay pipelines activos habilitados para crear negocios.'
     default:
-      if (issue.startsWith('pipeline:') && issue.endsWith(':multiple_selectable_stages_without_default')) {
-        return 'El pipeline seleccionado tiene varias etapas válidas, pero ninguna está marcada como etapa inicial.'
-      }
-
       if (issue.startsWith('pipeline:') && issue.endsWith(':no_selectable_stage')) {
         return 'El pipeline seleccionado no tiene una etapa inicial disponible para crear el negocio.'
       }
@@ -269,6 +259,8 @@ const CreateDealDrawer = ({
   const governanceBlocked = !!context && !context.readyToCreate
   const missingHubSpotCompany = !!context && !context.hubspotCompanyId
   const missingSelection = !pipelineId || !stageId
+  const missingDealType = dealTypeOptions.length > 1 && !dealType
+  const missingPriority = priorityOptions.length > 1 && !priority
 
   const stageSuggestedByPolicy =
     !!context && !stageTouched && !!stageId && context.defaultsSource.stage !== 'none'
@@ -280,6 +272,8 @@ const CreateDealDrawer = ({
     || governanceBlocked
     || missingHubSpotCompany
     || missingSelection
+    || missingDealType
+    || missingPriority
     || dealName.trim().length === 0
     || !!contextError
 
@@ -520,17 +514,20 @@ const CreateDealDrawer = ({
                 </TextField>
 
                 {dealTypeOptions.length > 0 ? (
-                  <TextField
-                    select
-                    label='Tipo de negocio'
-                    value={dealType ?? ''}
-                    onChange={event => handleDealTypeChange(event.target.value)}
-                    fullWidth
-                    helperText={defaultSourceHelper(
+                <TextField
+                  select
+                  label='Tipo de negocio'
+                  value={dealType ?? ''}
+                  onChange={event => handleDealTypeChange(event.target.value)}
+                  required={dealTypeOptions.length > 1}
+                  fullWidth
+                  helperText={defaultSourceHelper(
                       context?.defaultsSource.dealType ?? 'none',
-                      'Opcional. Si existe una política, se aplicará al crear.'
+                      dealTypeOptions.length > 1
+                        ? 'Elige el tipo de negocio que tendrá el deal en HubSpot.'
+                        : 'Opcional. Si existe una política, se aplicará al crear.'
                     )}
-                  >
+                >
                     <MenuItem value=''>
                       <em>Sin definir</em>
                     </MenuItem>
@@ -543,17 +540,20 @@ const CreateDealDrawer = ({
                 ) : null}
 
                 {priorityOptions.length > 0 ? (
-                  <TextField
-                    select
-                    label='Prioridad'
-                    value={priority ?? ''}
-                    onChange={event => handlePriorityChange(event.target.value)}
-                    fullWidth
-                    helperText={defaultSourceHelper(
+                <TextField
+                  select
+                  label='Prioridad'
+                  value={priority ?? ''}
+                  onChange={event => handlePriorityChange(event.target.value)}
+                  required={priorityOptions.length > 1}
+                  fullWidth
+                  helperText={defaultSourceHelper(
                       context?.defaultsSource.priority ?? 'none',
-                      'Opcional. Si existe una política, se aplicará al crear.'
+                      priorityOptions.length > 1
+                        ? 'Elige la prioridad que tendrá el deal en HubSpot.'
+                        : 'Opcional. Si existe una política, se aplicará al crear.'
                     )}
-                  >
+                >
                     <MenuItem value=''>
                       <em>Sin definir</em>
                     </MenuItem>

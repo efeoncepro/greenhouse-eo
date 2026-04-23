@@ -865,8 +865,6 @@ export const getDealCreationContext = async (
         if (activePipelines.length === 1) {
           defaultPipelineId = activePipelines[0].pipelineId
           defaultsSourcePipeline = 'single_option'
-        } else if (activePipelines.length > 1) {
-          blockingIssues.push('multiple_active_pipelines_without_policy')
         }
       }
     }
@@ -909,9 +907,7 @@ export const getDealCreationContext = async (
       } else if (selectableStages.length === 1) {
         defaultStageId = selectableStages[0].stageId
         defaultsSourceStage = 'single_option'
-      } else if (selectableStages.length > 1) {
-        blockingIssues.push(`pipeline:${defaultPipelineId}:multiple_selectable_stages_without_default`)
-      } else {
+      } else if (selectableStages.length === 0) {
         blockingIssues.push(`pipeline:${defaultPipelineId}:no_selectable_stage`)
       }
     }
@@ -1003,14 +999,6 @@ return options[0].value
   defaultPriority = resolveScopedPropertyDefault('priority', priorityOptions, source => {
     defaultsSourcePriority = source
   })
-
-  if (dealTypeOptions.length > 1 && !defaultDealType) {
-    blockingIssues.push('deal_type_default_missing')
-  }
-
-  if (priorityOptions.length > 1 && !defaultPriority) {
-    blockingIssues.push('priority_default_missing')
-  }
 
   if (activePipelines.length === 0) {
     blockingIssues.push('no_active_pipeline')

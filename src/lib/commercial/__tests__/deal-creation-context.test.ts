@@ -99,7 +99,7 @@ describe('getDealCreationContext', () => {
     expect(context.defaultsSource.pipeline).toBe('tenant_policy')
   })
 
-  it('flags governance incomplete when multiple selectable stages lack an explicit default', async () => {
+  it('keeps the pipeline usable when multiple selectable stages exist but no default was configured', async () => {
     mockQuery
       .mockResolvedValueOnce([
         stageRow('p1', 'Sales', 's-closed', 'Lost', { isClosed: true, isOpenSelectable: false, stageDisplayOrder: 3 }),
@@ -112,8 +112,48 @@ describe('getDealCreationContext', () => {
     const context = await getDealCreationContext()
 
     expect(context.defaultStageId).toBeNull()
-    expect(context.readyToCreate).toBe(false)
-    expect(context.blockingIssues).toContain('pipeline:p1:multiple_selectable_stages_without_default')
+    expect(context.readyToCreate).toBe(true)
+    expect(context.blockingIssues).toEqual([])
+  })
+
+  it('does not block when multiple pipelines exist and the operator must pick one manually', async () => {
+    mockQuery
+      .mockResolvedValueOnce([
+        stageRow('p1', 'Sales', 's1', 'Appointment', { pipelineDisplayOrder: 1, stageDisplayOrder: 1 }),
+        stageRow('p2', 'Shared', 's2', 'Discovery', { pipelineDisplayOrder: 2, stageDisplayOrder: 1 })
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          property_name: 'dealType',
+          hubspot_property_name: 'dealtype',
+          label: 'Deal Type',
+          options_json: JSON.stringify([
+            { value: 'newbusiness', label: 'New Business', displayOrder: 0, hidden: false },
+            { value: 'existingbusiness', label: 'Existing Business', displayOrder: 1, hidden: false }
+          ]),
+          missing_in_hubspot: false
+        },
+        {
+          property_name: 'priority',
+          hubspot_property_name: 'hs_priority',
+          label: 'Priority',
+          options_json: JSON.stringify([
+            { value: 'low', label: 'Low', displayOrder: 0, hidden: false },
+            { value: 'high', label: 'High', displayOrder: 1, hidden: false }
+          ]),
+          missing_in_hubspot: false
+        }
+      ])
+
+    const context = await getDealCreationContext({ tenantScope: 'efeonce_internal:efeonce' })
+
+    expect(context.defaultPipelineId).toBeNull()
+    expect(context.defaultStageId).toBeNull()
+    expect(context.defaultDealType).toBeNull()
+    expect(context.defaultPriority).toBeNull()
+    expect(context.readyToCreate).toBe(true)
+    expect(context.blockingIssues).toEqual([])
   })
 })
 
