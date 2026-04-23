@@ -1095,6 +1095,10 @@ def create_app() -> Flask:
 
     @app.post("/quotes")
     def create_quote():
+        auth_error = _require_integration_write_auth()
+        if auth_error:
+            return auth_error
+
         try:
             body = request.get_json(force=True) or {}
             client = _client()
@@ -1143,23 +1147,27 @@ def create_app() -> Flask:
                 li_id = str(created_li.get("id"))
                 line_item_ids.append(li_id)
 
-                # Associate line item → quote (type 67)
-                client.create_association("line_items", li_id, "quotes", hs_quote_id, 67)
+                # Use HubSpot default unlabeled associations for standard objects.
+                client.create_default_association("line_items", li_id, "quotes", hs_quote_id)
 
             # 3. Associate to deal if provided
             associations = body.get("associations") or {}
             deal_id = associations.get("dealId")
             if deal_id:
-                client.create_association("quotes", hs_quote_id, "deals", deal_id, 64)
+                client.create_default_association("quotes", hs_quote_id, "deals", deal_id)
 
             # 4. Associate to company if provided
             company_id = associations.get("companyId")
             if company_id:
-                client.create_association("quotes", hs_quote_id, "companies", company_id, 69)
+                client.create_default_association(
+                    "quotes", hs_quote_id, "companies", company_id
+                )
 
             # 5. Associate to contacts if provided
             for contact_id in associations.get("contactIds") or []:
-                client.create_association("quotes", hs_quote_id, "contacts", contact_id, 70)
+                client.create_default_association(
+                    "quotes", hs_quote_id, "contacts", contact_id
+                )
 
             # 6. Read back to get computed fields
             final_quote = client.get_quote(hs_quote_id)
