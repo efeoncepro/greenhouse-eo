@@ -3,6 +3,8 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getRegisteredProjections } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
+import { readProjectionRuntimeHealthMap } from '@/lib/sync/projection-runtime-health'
+import { extractReactiveErrorCategory, stripReactiveErrorCategory } from '@/lib/sync/reactive-error-classification'
 
 import { readAllCircuitStates, type CircuitState } from './reactive-circuit-breaker'
 
@@ -25,9 +27,12 @@ export interface ReactiveProjectionBreakdownRow {
   eventsAcknowledgedLast24h: number
   successful: number
   failures: number
+  infrastructureFailures: number
   errorRate: number
   circuitState: CircuitState
   circuitLastError: string | null
+  circuitLastErrorCategory: string | null
+  runtimeHealthStatus: 'not_declared' | 'ready' | 'degraded'
   lastReactedAt: string | null
 }
 
@@ -47,6 +52,7 @@ interface RefreshStatsRow extends Record<string, unknown> {
   successful: string | number
   dead_letters: string | number
   retrying: string | number
+  infrastructure_failures: string | number
   coalesced_scopes: string | number
   last_reacted_at: string | null
 }
@@ -68,7 +74,7 @@ export const readReactiveProjectionBreakdown = async (): Promise<ReactiveProject
 
   const projections = getRegisteredProjections()
 
-  const [stats, circuitStates] = await Promise.all([
+  const [stats, circuitStates, runtimeHealthMap] = await Promise.all([
     runGreenhousePostgresQuery<RefreshStatsRow>(
       `SELECT
          SPLIT_PART(handler, ':', 1) AS handler,
@@ -77,12 +83,14 @@ export const readReactiveProjectionBreakdown = async (): Promise<ReactiveProject
          COUNT(*) FILTER (WHERE result LIKE 'coalesced:%' OR result LIKE 'no-op:%')::text AS successful,
          COUNT(*) FILTER (WHERE result = 'dead-letter')::text AS dead_letters,
          COUNT(*) FILTER (WHERE result = 'retry')::text AS retrying,
+         COUNT(*) FILTER (WHERE result IN ('retry', 'dead-letter') AND is_infrastructure_fault)::text AS infrastructure_failures,
          MAX(reacted_at)::text AS last_reacted_at
        FROM greenhouse_sync.outbox_reactive_log
        WHERE reacted_at > NOW() - INTERVAL '24 hours'
        GROUP BY SPLIT_PART(handler, ':', 1)`
     ).catch(() => [] as RefreshStatsRow[]),
-    readAllCircuitStates().catch(() => [])
+    readAllCircuitStates().catch(() => []),
+    readProjectionRuntimeHealthMap(projections).catch(() => new Map())
   ])
 
   const statsMap = new Map(stats.map(row => [row.handler, row]))
@@ -96,7 +104,10 @@ export const readReactiveProjectionBreakdown = async (): Promise<ReactiveProject
     const deadLetters = toCount(stat?.dead_letters)
     const retrying = toCount(stat?.retrying)
     const failures = deadLetters + retrying
+    const infrastructureFailures = toCount(stat?.infrastructure_failures)
     const errorRate = totalEvents > 0 ? failures / totalEvents : 0
+    const circuitLastError = circuit?.lastError ?? null
+    const runtimeHealth = runtimeHealthMap.get(projection.name)
 
     return {
       name: projection.name,
@@ -106,9 +117,12 @@ export const readReactiveProjectionBreakdown = async (): Promise<ReactiveProject
       eventsAcknowledgedLast24h: totalEvents,
       successful,
       failures,
+      infrastructureFailures,
       errorRate,
       circuitState: circuit?.state ?? 'closed',
-      circuitLastError: circuit?.lastError ?? null,
+      circuitLastError: stripReactiveErrorCategory(circuitLastError),
+      circuitLastErrorCategory: extractReactiveErrorCategory(circuitLastError),
+      runtimeHealthStatus: runtimeHealth?.status ?? 'not_declared',
       lastReactedAt: stat?.last_reacted_at ?? null
     }
   })
@@ -122,8 +136,8 @@ export const readReactiveProjectionBreakdown = async (): Promise<ReactiveProject
   return {
     projections: rows.sort((a, b) => {
       // Prioritize unhealthy projections at the top of the table.
-      const aUnhealthy = a.circuitState !== 'closed' || a.errorRate > 0 ? 0 : 1
-      const bUnhealthy = b.circuitState !== 'closed' || b.errorRate > 0 ? 0 : 1
+      const aUnhealthy = a.circuitState !== 'closed' || a.errorRate > 0 || a.runtimeHealthStatus === 'degraded' ? 0 : 1
+      const bUnhealthy = b.circuitState !== 'closed' || b.errorRate > 0 || b.runtimeHealthStatus === 'degraded' ? 0 : 1
 
       if (aUnhealthy !== bUnhealthy) return aUnhealthy - bUnhealthy
       if (b.errorRate !== a.errorRate) return b.errorRate - a.errorRate

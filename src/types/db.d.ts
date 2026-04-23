@@ -6042,8 +6042,11 @@ export interface GreenhouseSyncOutboxEvents {
 }
 
 export interface GreenhouseSyncOutboxReactiveLog {
+  error_class: string | null;
+  error_family: string | null;
   event_id: string;
   handler: string;
+  is_infrastructure_fault: Generated<boolean>;
   last_error: string | null;
   reacted_at: Generated<Timestamp>;
   result: string | null;
@@ -6078,7 +6081,10 @@ export interface GreenhouseSyncProjectionRefreshQueue {
   created_at: Generated<Timestamp>;
   entity_id: string;
   entity_type: string;
+  error_class: string | null;
+  error_family: string | null;
   error_message: string | null;
+  is_infrastructure_fault: Generated<boolean>;
   max_retries: Generated<number>;
   priority: Generated<number>;
   projection_name: string;

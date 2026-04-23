@@ -295,6 +295,45 @@ describe('processReactiveEvents (V2)', () => {
     expect(result.actions.some(a => a.includes('DEAD-LETTER'))).toBe(true)
   })
 
+  it('persists infra classification for permission-denied failures', async () => {
+    const projection = buildProjection({
+      refresh: vi.fn().mockRejectedValue(new Error('permission denied for table service_attribution_facts')),
+      maxRetries: 2
+    })
+
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
+
+    const events = [buildEventRow('perm-1', 'finance.expense.created')]
+
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValueOnce([{ retries: 1 }])
+    mockQuery.mockResolvedValue([])
+
+    await processReactiveEvents()
+
+    expect(mockMarkRefreshFailed).toHaveBeenCalledWith(
+      'test_projection:finance_period:2026-04',
+      '[infra.db_privilege] permission denied for table service_attribution_facts',
+      2,
+      {
+        errorClass: 'infra.db_privilege',
+        errorFamily: 'infrastructure',
+        isInfrastructureFault: true
+      }
+    )
+
+    const insertCalls = mockQuery.mock.calls.filter(call =>
+      typeof call[0] === 'string' && call[0].includes('INSERT INTO greenhouse_sync.outbox_reactive_log')
+    )
+
+    const allParams = insertCalls.flatMap(call => call[1] as unknown[])
+
+    expect(allParams).toContain('infra.db_privilege')
+    expect(allParams).toContain('infrastructure')
+    expect(allParams).toContain(true)
+  })
+
   it('reports per-projection stats with successes and acknowledged counts', async () => {
     const projectionA = buildProjection({ name: 'projection_a' })
 

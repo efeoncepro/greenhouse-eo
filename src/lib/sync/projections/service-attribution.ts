@@ -168,5 +168,17 @@ export const serviceAttributionProjection: ProjectionDefinition = {
 
     return `materialized service_attribution: ${result.factsWritten} facts and ${result.unresolvedWritten} unresolved for ${scope.entityId} via ${eventType}`
   },
-  maxRetries: 1
+  maxRetries: 1,
+  requiredTablePrivileges: [
+    {
+      tableName: 'greenhouse_serving.service_attribution_facts',
+      privileges: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
+      reason: 'Projection-owned serving fact table materialized by the reactive runtime.'
+    },
+    {
+      tableName: 'greenhouse_serving.service_attribution_unresolved',
+      privileges: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
+      reason: 'Projection-owned unresolved queue materialized by the reactive runtime.'
+    }
+  ]
 }

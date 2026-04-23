@@ -4,6 +4,7 @@ import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 import { alertCronFailure } from '@/lib/alerts/slack-notify'
 
 import { claimOrphanedRefreshItems, markRefreshCompleted, markRefreshFailed } from '@/lib/sync/refresh-queue'
+import { classifyReactiveError } from '@/lib/sync/reactive-error-classification'
 import { getRegisteredProjections } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
 
@@ -44,7 +45,13 @@ export async function GET(request: Request) {
       const projection = projections.find(p => p.name === orphan.projectionName)
 
       if (!projection) {
-        await markRefreshFailed(orphan.queueId, `Projection "${orphan.projectionName}" not found in registry`, 0)
+        const classified = classifyReactiveError(`Projection "${orphan.projectionName}" not found in registry`)
+
+        await markRefreshFailed(orphan.queueId, classified.formattedMessage, 0, {
+          errorClass: classified.category,
+          errorFamily: classified.family,
+          isInfrastructureFault: classified.isInfrastructure
+        })
         failed++
         details.push({ queueId: orphan.queueId, projectionName: orphan.projectionName, status: 'unknown_projection' })
         continue
@@ -58,9 +65,13 @@ export async function GET(request: Request) {
         recovered++
         details.push({ queueId: orphan.queueId, projectionName: orphan.projectionName, status: 'recovered' })
       } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : String(error)
+        const classified = classifyReactiveError(error)
 
-        await markRefreshFailed(orphan.queueId, errorMsg, projection.maxRetries ?? 2)
+        await markRefreshFailed(orphan.queueId, classified.formattedMessage, projection.maxRetries ?? 2, {
+          errorClass: classified.category,
+          errorFamily: classified.family,
+          isInfrastructureFault: classified.isInfrastructure
+        })
         failed++
         details.push({ queueId: orphan.queueId, projectionName: orphan.projectionName, status: 'failed' })
       }
