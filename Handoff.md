@@ -53,7 +53,19 @@
   - sibling: `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK (`44` tests, `29` skipped)
   - `rg "new Pool\\(" src` → solo `src/lib/postgres/client.ts`
 - **Pendiente explícito**
-  - falta deploy del sibling + smoke live del carril completo para validar quote no-`DRAFT`, links públicos y `hs_tax_rate_group_id` visibles en HubSpot antes de cerrar definitivamente `TASK-583`
+  - cierre completado el mismo día:
+    - preview validado: `greenhouse-ftfx1pm8j-efeonce-7670142f.vercel.app`
+    - Cloud Run bridge validado tras redeploy manual desde source limpio: revision `hubspot-greenhouse-integration-00027-bhp`
+    - `GET /tax-rates?active=true` respondió `IVA` `19.0` con `id=15837572`
+    - `POST /api/admin/ops/reactive/run` en preview ejecutó `quotation_hubspot_outbound` exitosamente para `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9`
+    - verificación HubSpot posterior:
+      - quote `39307909907` quedó `approvalStatus=APPROVAL_NOT_NEEDED`
+      - `locked=true`
+      - `quoteLink` materializado
+      - line item `54542714929` quedó con `taxRateGroupId=15837572`
+- **Nota operativa**
+  - el mismo run reactivo dejó un dead-letter heredado en `service_attribution` por `permission denied for table service_attribution_facts`
+  - no bloqueó `quotation_hubspot_outbound`, pero conviene triagearlo aparte si vuelve a aparecer
 
 ## Sesion 2026-04-23 — TASK-583 registrada para cerrar publish nativo + impuesto nativo de HubSpot quotes (Codex)
 

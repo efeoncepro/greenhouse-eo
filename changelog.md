@@ -18,6 +18,7 @@
 - `pushCanonicalQuoteToHubSpot()` deja persistidos `hubspot_quote_status`, `hubspot_quote_link`, `hubspot_quote_pdf_download_link`, `hubspot_quote_locked` y `hubspot_last_synced_at` en `greenhouse_commercial.quotations`, cerrando el gap de observabilidad outbound.
 - El sibling `hubspot-greenhouse-integration` suma `GET /tax-rates`, y la respuesta de quotes ahora devuelve también `pdfDownloadLink` y `locked`, alineando el contrato con el publish nativo de HubSpot.
 - Se aplicó la migración `20260423122137281_task-583-hubspot-quote-native-publish-observability-followup.sql` y quedó reconstruida en repo la migración faltante `20260423110044569_task-576-quote-billing-start-date.sql` para recuperar una cadena reproducible de migraciones.
+- Smoke real de cierre: en el preview `greenhouse-ftfx1pm8j-efeonce-7670142f.vercel.app`, un `quotation.updated` sobre `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9` disparó `quotation_hubspot_outbound`; HubSpot dejó la quote `39307909907` en `APPROVAL_NOT_NEEDED`, `locked=true`, materializó `quoteLink`, y el line item `54542714929` cerró `taxRateGroupId=15837572` (`IVA 19%`).
 
 ### 2026-04-23 — Quote Builder ya lee todos los deals asociados a la company en HubSpot
 

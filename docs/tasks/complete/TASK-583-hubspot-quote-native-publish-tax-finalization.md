@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Implementación local + verificación técnica completa; deploy/smoke live pendiente`
+- Status real: `Completada con smoke real en preview + HubSpot`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none`
@@ -241,8 +241,8 @@ La definición de done de esta task no es “la API responde 200”, sino:
 
 ## Acceptance Criteria
 
-- [ ] Una quote outbound creada desde Greenhouse deja de terminar en `DRAFT` y queda publicada en HubSpot usando el contrato nativo soportado por el carril actual.
-- [ ] Los line items publicados quedan con `hs_tax_rate_group_id` resuelto desde la tax library/config nativa de HubSpot, además del monto/tasa de auditoría ya enviados por Greenhouse.
+- [x] Una quote outbound creada desde Greenhouse deja de terminar en `DRAFT` y queda publicada en HubSpot usando el contrato nativo soportado por el carril actual.
+- [x] Los line items publicados quedan con `hs_tax_rate_group_id` resuelto desde la tax library/config nativa de HubSpot, además del monto/tasa de auditoría ya enviados por Greenhouse.
 - [x] `greenhouse-eo` deja de depender del cliente update degradado y converge create/update sobre el mismo contrato autenticado del integration service.
 - [x] Create, update y republish convergen sin edición manual posterior en HubSpot y sin pérdida de asociaciones ni duplicación de line items.
 - [x] La documentación del repo deja explícita la diferencia entre metadata custom (`gh_tax_rate`) y finalización nativa (`hs_tax_rate_group_id`, `hs_status`).
@@ -264,6 +264,23 @@ La definición de done de esta task no es “la API responde 200”, sino:
 - [x] `changelog.md` quedó actualizado si cambió el comportamiento runtime del quote outbound
 - [x] se ejecutó chequeo de impacto cruzado sobre `TASK-574`, `TASK-575` y `TASK-576`
 - [x] se documentó el método canónico para resolver tax groups HubSpot por ambiente sin hardcodear IDs
+
+## Closing Notes
+
+- Smoke real ejecutado el `2026-04-23` contra preview `greenhouse-ftfx1pm8j-efeonce-7670142f.vercel.app` + Cloud Run `hubspot-greenhouse-integration-00027-bhp`.
+- Quote validada:
+  - `quotation_id = qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9`
+  - `hubspot_quote_id = 39307909907`
+  - `hubspot_company_id = 29666506565`
+  - `hubspot_deal_id = 59465365539`
+- Resultado live observado en HubSpot:
+  - `approvalStatus = APPROVAL_NOT_NEEDED`
+  - `locked = true`
+  - `quoteLink` materializado
+  - line item `54542714929` con `taxRateGroupId = 15837572` y `taxRate = 19.0`
+- Incidente no bloqueante observado durante `POST /api/admin/ops/reactive/run`:
+  - `service_attribution` cayó en dead-letter por `permission denied for table service_attribution_facts`
+  - `quotation_hubspot_outbound` completó exitosamente en el mismo run
 
 ## Follow-ups
 
