@@ -630,3 +630,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-574` | `to-do` | Absorber el Cloud Run `hubspot-greenhouse-integration` en `services/` de `greenhouse-eo` | `docs/tasks/to-do/TASK-574-absorb-hubspot-greenhouse-integration-service.md` |
 | `TASK-575` | `to-do` | Upgrade HubSpot Developer Platform + API calls del bridge a versión 2026.03 | `docs/tasks/to-do/TASK-575-hubspot-developer-platform-2026-upgrade.md` |
 | `TASK-576` | `to-do` | HubSpot Quote Publish Contract Completion | `docs/tasks/to-do/TASK-576-hubspot-quote-publish-contract-completion.md` |
+| `TASK-577` | `to-do` | Notion Write Bridge (HTTP service) — EPIC-005 child 1/6 | `docs/tasks/to-do/TASK-577-notion-write-bridge.md` |
+| `TASK-578` | `to-do` | Canonical Mapping Registry + Identity Extension Notion — EPIC-005 child 2/6 | `docs/tasks/to-do/TASK-578-canonical-mapping-registry-notion.md` |
+| `TASK-579` | `to-do` | Forward Orchestrator: Commercial → Delivery (HubSpot → Notion) — EPIC-005 child 3/6 | `docs/tasks/to-do/TASK-579-forward-orchestrator-commercial-to-delivery.md` |
+| `TASK-580` | `to-do` | Reverse Orchestrator: Delivery → Commercial (Notion → HubSpot) híbrido — EPIC-005 child 4/6 | `docs/tasks/to-do/TASK-580-reverse-orchestrator-hybrid-notion-to-commercial.md` |
+| `TASK-581` | `to-do` | Cutover de un tirón + sibling retirement + docs — EPIC-005 child 5/6 | `docs/tasks/to-do/TASK-581-notion-sync-cutover-and-sibling-retirement.md` |
+| `TASK-582` | `to-do` | Monthly Project Provisioning Admin Surface with Preview — EPIC-005 child 6/6 | `docs/tasks/to-do/TASK-582-monthly-project-provisioning-admin-surface.md` |
