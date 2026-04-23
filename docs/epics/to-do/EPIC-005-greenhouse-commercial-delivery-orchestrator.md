@@ -15,7 +15,7 @@
 
 ## Summary
 
-Convertir a Greenhouse EO en el **orquestador canónico** del flujo bidireccional que hoy ocurre entre HubSpot y Notion vía el sibling `cesargrowth11/notion-hubspot-sync`. Ese sibling corre dos Cloud Functions en polling 15-minutal, con 2711 LOC de Python, mappings hardcoded (owner, status, deal stage, línea de servicio, servicios específicos, prioridad), y un historial documentado de race conditions padre/hijo + watermark drift + edits perdidos en ventanas concurrentes. En lugar de fix-in-place sobre un diseño que ya no escala, este epic promueve a Greenhouse de observador pasivo a source-of-truth activa: HubSpot writes → canonicalization en `greenhouse_commercial.*` → outbox events → reactive projection a Notion (y viceversa con inversa), usando infraestructura que Greenhouse ya tiene (canonical deals post TASK-571/573, outbox pattern en `ops-worker`, bridge HTTP absorbido post TASK-574). Objetivo operativo: un solo lugar que decide qué fluye entre sistemas, con conflict resolution policy explícita, sin polling ciego.
+Convertir a Greenhouse EO en el **orquestador canónico** del flujo bidireccional entre HubSpot y Notion, reemplazando el sibling `cesargrowth11/notion-hubspot-sync` (2 Cloud Functions, 2711 LOC, polling 15-min, mappings hardcoded, watermark drift, race conditions padre/hijo). La tesis: Greenhouse YA es source-of-truth tanto del lado commercial (`greenhouse_commercial.deals`, `organizations`, `party_lifecycle_events`) como del lado delivery (`greenhouse_delivery.projects`, `tasks`, `sprints`) — y ya tiene todo el contexto de negocio, governance, identity mapping y motor Notion (via `notion-bigquery`) que el sibling no tiene. El sibling es sync raw sin contexto; Greenhouse puede decidir con stage del deal, lifecycle de la org, capabilities y approvals. Alcance: **deals + tasks + companies + contacts**, con admin surface con preview para monthly project auto-provisioning, conflict resolution policy basada en state-machine del deal (+ LWW fallback para campos no-locked), integración Notion dedicada con write scope, y estrategia real-time híbrida (webhooks + reconciliation polling + full-sync on demand). Cutover de un tirón con 48h rollback window.
 
 ## Why This Epic Exists
 
@@ -32,14 +32,17 @@ El usuario reportó 2026-04-23 que la orquestación Notion↔HubSpot no anda fin
 
 ### Greenhouse ya tiene lo que necesita para orquestar
 
-Post TASK-571/572/573/574/575, el monorepo reúne todos los habilitantes:
+Post TASK-571/572/573/574/575, el monorepo reúne todos los habilitantes. Más importante aún: Greenhouse tiene **contexto de negocio completo** que el sibling no tiene — historia del cliente, motor Notion validado, decision layer canónico.
 
 - **Canonical commercial state**: `greenhouse_commercial.deals` con mirror de deals HubSpot + `hubspot_deal_pipeline_config` + `hubspot_deal_pipeline_defaults` + `hubspot_deal_property_config` para governance.
-- **Canonical delivery state**: `greenhouse_delivery.projects`, `greenhouse_delivery.tasks`, `greenhouse_delivery.sprints` alimentados hoy por `notion-bigquery` sync (read-only).
-- **Bridge HTTP absorbido** (post TASK-574): `services/hubspot_greenhouse_integration/` en el monorepo con 17 rutas — ya sabe cómo escribir a HubSpot con idempotencia + signature webhook validation.
-- **Outbox pattern**: `commercial_outbox` + eventos `commercial.deal.created/updated/stage_changed/lost/won` ya live post TASK-540.
+- **Canonical party state**: `greenhouse_core.organizations` con `lifecycle_stage` + history en `commercial.party_lifecycle_events` + `commercialParty*` events ya en catalog (`commercial.party.created/promoted/demoted/lifecycle_backfilled`). El orchestrator proyecta companies como consumer de estos events — no requiere declarar events nuevos.
+- **Canonical delivery state**: `greenhouse_delivery.projects`, `greenhouse_delivery.tasks`, `greenhouse_delivery.sprints` alimentados hoy por `notion-bigquery` sync (read-only). El motor Notion API (rich text, relations, rollups, multi-select) está validado y testeado — el orchestrator reusa esa capa en lugar de duplicar como hace el sibling (`forward_sync/clients/notion.py`, 250 LOC duplicados).
+- **Bridge HTTP absorbido** (post TASK-574): `services/hubspot_greenhouse_integration/` en el monorepo con 17 rutas — ya sabe cómo escribir a HubSpot con idempotencia + signature webhook validation. El epic agrega routes Notion-write en el mismo servicio.
+- **Outbox pattern**: `commercial_outbox` + eventos `commercial.deal.created/synced/stage_changed/won/lost/created_from_greenhouse/create_requested/create_approval_requested` ya live post TASK-540.
 - **Reactive workers**: `ops-worker` ya procesa outbox events en Cloud Run, con crons `ops-reactive-process` 5-min.
-- **Identity mapping foundation**: `identity_profile_source_links` existe para mapear HubSpot users ↔ Efeonce persons; extenderlo a Notion users es incremental.
+- **Identity mapping foundation**: `identity_profile_source_links` mapea HubSpot users ↔ Efeonce persons. Extenderlo a `source_system='notion'` es una fila por persona — canonical ya cubre el patrón para otros source systems.
+- **Decision layer real**: `promoteParty` + lifecycle state machine + capability gating + approval thresholds (TASK-539 pattern). Greenhouse puede hacer conflict resolution con contexto de negocio; el sibling solo puede comparar timestamps.
+- **Governance pattern**: TASK-571/573 introdujeron `hubspot_*_config` tables como registry admin-gobernable. El Mapping Registry de TASK-578 extiende ese mismo patrón, no crea infra nueva.
 
 ### Qué cambia la topología con este epic
 
@@ -65,14 +68,15 @@ Resultado: todo cambio pasa por Greenhouse. Ningún flujo directo HubSpot↔Noti
 
 ## Outcome
 
-- Greenhouse decide qué fluye entre HubSpot y Notion con policy explícita (no heurísticas ocultas en Python).
-- Cero polling paralelo — un solo worker Greenhouse hace canonicalization inbound de Notion (reemplaza reverse sync del sibling).
-- Webhooks HubSpot (ya absorbidos post TASK-574) disparan projection a Notion vía outbox + reactive worker.
-- Mappings (`NOTION_TO_HS_OWNER`, etc.) viven como tablas admin-gobernables en Postgres, no como diccionarios en código.
-- Monthly project auto-provisioning queda como surface admin con regla canónica editable.
-- Cutover retira las 2 Cloud Functions del sibling + sus 2 schedulers + 2 datasets BQ (watermarks quedan en canonical).
+- Greenhouse decide qué fluye entre HubSpot y Notion con policy state-machine explícita (no heurísticas ocultas en Python).
+- Scope 4 entidades: **deals + tasks + companies + contacts**. Companies via `commercial.party.*` events existentes. Contacts como subset de `commercial.deal.*` (no requieren events nuevos — proyectados via `primary_contact_identity_profile_id` resuelto a través de `identity_profile_source_links`).
+- Estrategia real-time **híbrida**: Notion webhooks como primary (0-5s lag), reconciliation polling cada 6h como safety net, full-sync admin command para disaster recovery.
+- Una sola integration Notion dedicada (`Greenhouse Commercial-Delivery Orchestrator`) con read+write scope, secretos separados staging/prod, grant per-DB (no workspace-wide). `notion-bigquery` integration queda intacta para daily ingestion.
+- Mappings (6 diccionarios hardcoded del sibling) viven como tablas admin-gobernables en `greenhouse_commercial.*_mapping`.
+- Monthly project auto-provisioning queda como **surface admin con preview + approve-to-commit** en Admin Center (nuevo), no auto-silent como hoy.
+- Cutover **de un tirón** con 48h rollback window: schedulers del sibling pausados, código vivo, listo para re-activar si hay regresión.
 - Documentación funcional nueva: `docs/documentation/delivery/orquestacion-commercial-delivery.md`.
-- El sibling `notion-hubspot-sync` archiva el código antiguo con stub README apuntando a Greenhouse.
+- El sibling `notion-hubspot-sync` archiva el código antiguo con stub README apuntando a Greenhouse tras los 48h sin regresión.
 
 ## Existing Related Work
 
@@ -82,87 +86,134 @@ Resultado: todo cambio pasa por Greenhouse. Ningún flujo directo HubSpot↔Noti
 - **TASK-571/572/573** (complete) — Deal creation context + `POST /deals` + deal birth contract. Garantizan que el canonical de `commercial.deals` está completo.
 - **`notion-bigquery`** (sibling vivo) — ingestion one-way de Notion a BQ. Sigue siendo útil como observability layer; este epic no lo toca.
 
-## Child Tasks (propuesta inicial, ajustable)
+## Child Tasks (6 tareas propuestas; scope y decisiones acordadas 2026-04-23)
 
 ### TASK-577 — Notion Write Bridge (HTTP service)
 
-Agregar capacidad de escritura a Notion al servicio absorbido en `services/hubspot_greenhouse_integration/` (o crear un módulo `notion_client.py` hermano) con endpoints:
+Agregar capacidad de escritura a Notion al servicio absorbido en `services/hubspot_greenhouse_integration/` (post TASK-574) con endpoints:
 
-- `POST /notion/tasks` — crear task
-- `PATCH /notion/tasks/<page_id>` — actualizar task (status, owner, props)
+- `POST /notion/tasks` — crear task (deal parent o subtask)
+- `PATCH /notion/tasks/<page_id>` — actualizar task (status, owner, props, contact field)
+- `POST /notion/companies` — crear/upsert company en Notion Companies DB
+- `PATCH /notion/companies/<page_id>` — actualizar company props
 - `POST /notion/projects` — crear proyecto mensual
 - `GET /notion/projects/current` — resolver proyecto mensual vigente
+- `POST /notion/full-sync` — admin-only, gatilla full-sync on demand (disaster recovery)
 
-Considerar: renombrar el servicio absorbido a algo más amplio (`commercial_delivery_bridge`) si el scope ya no es solo HubSpot. Decisión en Discovery de la task.
+Slice preliminar: **bootstrap de la integration Notion dedicada** (`Greenhouse Commercial-Delivery Orchestrator`, read+write scope, grant per-DB, secretos `notion-orchestrator-token-{staging,prod}` en Secret Manager, runbook en `scripts/bootstrap-notion-orchestrator-integration.md`).
 
-Effort: Medio.
-
-### TASK-578 — Canonical Mapping Registry
-
-Mover los 6 diccionarios hardcoded del sibling a tablas en `greenhouse_commercial` o `greenhouse_delivery`:
-
-- `hubspot_notion_owner_map` (HubSpot user id ↔ Notion user id, derivable de `identity_profile_source_links`)
-- `deal_stage_mapping` (Notion task status ↔ HubSpot dealstage, con dirección explícita)
-- `task_status_mapping` (Notion task status ↔ HubSpot task status)
-- `priority_mapping` (Notion priority ↔ HubSpot priority)
-- `business_line_mapping` (Notion "Línea de Servicio" ↔ `linea_de_servicio` HubSpot custom property)
-- `service_module_mapping` (Notion "Servicios Específicos" ↔ `servicios_especificos`)
-
-Seed inicial con los valores hardcoded actuales. Admin surface opcional (follow-up) o SQL-only.
+Decisión en Discovery: ¿renombrar el servicio a `commercial_delivery_bridge` dado que el scope ya no es solo HubSpot? Inclinación: **sí** — el nombre actual engaña. Sujeto a verificar que no rompa references.
 
 Effort: Medio.
 
-### TASK-579 — Forward Orchestrator: Commercial → Delivery (HubSpot → Notion)
+### TASK-578 — Canonical Mapping Registry (incluye identity extension Notion)
 
-Reactive worker en `ops-worker` suscrito a eventos de outbox:
+Mover los 6 diccionarios hardcoded del sibling a tablas en `greenhouse_commercial` + extender `identity_profile_source_links` con `source_system='notion'`. Siguiendo el patrón `hubspot_*_config` que introdujo TASK-571/573.
 
-- `commercial.deal.created` → crear parent task en Notion en el proyecto mensual correspondiente (resuelve via `resolveMonthlyProject` canónico)
-- `commercial.deal.updated` → update de props en el parent task existente
-- `commercial.deal.stage_changed` → map stage ↔ Notion status via mapping registry
-- `commercial.deal.lost` / `commercial.deal.won` → transición terminal en Notion
+Slices:
 
-Reemplaza el forward_sync del sibling. Usa el Notion Write Bridge (TASK-577) + Mapping Registry (TASK-578).
+1. **Identity extension**: `identity_profile_source_links` acepta `source_system='notion'` + seed inicial desde `NOTION_TO_HS_OWNER` actual resuelto via HubSpot user id ↔ Notion user id.
+2. Tablas de mapping canónicas (admin-gobernables):
+   - `commercial_deal_stage_mapping` (Notion task status ↔ HubSpot dealstage)
+   - `commercial_task_status_mapping`
+   - `commercial_priority_mapping`
+   - `commercial_business_line_mapping` (Notion "Línea de Servicio" ↔ `linea_de_servicio`)
+   - `commercial_service_module_mapping` (Notion "Servicios Específicos" ↔ `servicios_especificos`)
+   - `commercial_contact_role_mapping` (Notion contact role ↔ HubSpot contact property, para proyección de contacts)
+3. Seed inicial con valores hardcoded actuales, reader + validator en `src/lib/commercial/mappings-store.ts`.
+
+Admin UI declarada como **follow-up** (no entra en V1); V1 es SQL + admin API endpoint de refresh.
+
+Effort: Medio.
+
+### TASK-579 — Forward Orchestrator: Commercial → Delivery
+
+Reactive worker en `ops-worker` suscrito a outbox events, proyectando a Notion via Write Bridge (TASK-577) + Mapping Registry (TASK-578). Cubre **deals + tasks + companies + contacts**.
+
+**Deals → Notion Tareas DB** (parent tasks):
+
+- `commercial.deal.created` / `commercial.deal.created_from_greenhouse` → crear parent task en proyecto mensual resuelto
+- `commercial.deal.synced` / `commercial.deal.stage_changed` → update state en parent existente via mapping
+- `commercial.deal.won` / `commercial.deal.lost` → transición terminal
+
+**Companies → Notion Companies DB** (nueva, o existente si ya vive en workspace):
+
+- `commercial.party.created` → crear company
+- `commercial.party.promoted` / `commercial.party.demoted` → update lifecycle
+- `organization.updated` → update props
+- `crm.company.lifecyclestage_changed` → update lifecycle stage
+
+**Contacts** (subset de `commercial.deal.*`, sin events nuevos):
+
+- Al proyectar deal, leer `primary_contact_identity_profile_id` del deal → resolver via `identity_profile_source_links` → proyectar nombre/email/role al campo "Contact" del Notion task.
+- Follow-up post-MVP: contacts independientes sin deal asociado.
+
+Usa conflict resolution state-machine (ver Decisiones Arquitectónicas abajo).
 
 Effort: Alto.
 
-### TASK-580 — Reverse Orchestrator: Delivery → Commercial (Notion → HubSpot)
+### TASK-580 — Reverse Orchestrator: Delivery → Commercial (hybrid real-time)
 
-Polling worker (Notion no tiene webhooks robustos para las dbs que usamos, a verificar en Discovery) que:
+Canonicalization inbound de cambios Notion. **Estrategia híbrida**:
 
-- Pollea Notion cada 5 min (no 15) buscando cambios desde watermark canónico en `greenhouse_delivery.sync_watermarks`
-- Canonicaliza cambios en `greenhouse_delivery.tasks` / `greenhouse_delivery.projects`
-- Emite eventos `delivery.task.updated` / `delivery.project.updated`
-- Otro reactive worker suscrito proyecta a HubSpot via el bridge existente (`POST /deals`, custom props update) cuando la policy lo autoriza
+- **Primary: Notion webhooks** → webhook endpoint nuevo en `services/hubspot_greenhouse_integration/` (ex `commercial_delivery_bridge`), signature validation análoga al `/webhooks/hubspot` existente, canonicalization en `greenhouse_delivery.*` + emit de `delivery.task.updated/project.updated` eventos (nuevos — declarar en catalog)
+- **Safety net: reconciliation polling** — cron cada 6h que re-pollea Notion desde `greenhouse_delivery.sync_watermarks` en Postgres, reconcilia cualquier cambio que el webhook haya perdido. Volumen esperado: bajo (un solo worker canonical en lugar de 2 Cloud Functions).
+- **Recovery: full-sync on demand** — admin-triggered via `POST /notion/full-sync` del bridge, útil para bootstrap + disaster recovery.
 
-Reemplaza el reverse sync del sibling. Conflict resolution policy: **last-writer-wins por campo con timestamp canonical**. Declarado explícito.
+Cambios Notion → canonical → outbox event → reactive worker separado decide si proyecta a HubSpot (via Write Bridge HubSpot absorbido) según la policy de conflict resolution.
+
+Gate de Discovery: **verificar Notion webhooks availability** para DBs activas (Tareas, Proyectos, Companies, Contacts). Si NO existen para alguna DB, degrada graceful a polling-only para esa DB específica; el resto sigue híbrido.
 
 Effort: Alto.
 
-Open question crítica: verificar si Notion tiene webhook capability para las dbs activas. Si sí, TASK-580 cambia de "polling worker" a "webhook receiver" — mucho más barato y menos lag.
+### TASK-581 — Cutover de un tirón + sibling retirement + docs
 
-### TASK-581 — Cutover + sibling retirement + docs
+**Cutover atómico** (no hay ventana paralelo):
 
-- Deploy forward + reverse orchestrators en paralelo al sibling durante ventana de validación (mínimo 1 semana)
-- Comparar logs: todo cambio detectado por ambos sistemas debe converger al mismo estado en ambos lados
-- Post-validation: desactivar Cloud Scheduler jobs del sibling (`notion-hubspot-reverse-poll` + `hubspot-notion-deal-poll`)
-- Cloud Functions quedan desplegadas pero sin schedule durante 2 semanas más (rollback fácil)
-- Después de 2 semanas: eliminar Cloud Functions del sibling, stub README en el repo
-- Monthly project auto-provisioning surface admin si decidimos promoverlo desde canonical
-- Documentar en `docs/documentation/delivery/orquestacion-commercial-delivery.md`
-- Actualizar `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` sección 3 removiendo `notion-hubspot-sync` como source-of-truth del flow
-- Archive del sibling BQ datasets `notion_hubspot_reverse_sync` + `hubspot_notion_sync` (después del rollback window)
+- Staging validation profunda: ≥1 ciclo completo simulado, parity check vs sibling output.
+- Production cutover: deploy en Greenhouse orchestrators + pausar Cloud Scheduler jobs del sibling (`notion-hubspot-reverse-poll` + `hubspot-notion-deal-poll`) en la misma ventana.
+- **48h rollback window**: Cloud Functions del sibling quedan live pero sin schedule; re-activables con `gcloud scheduler jobs resume` si hay regresión grave.
+- Post-48h sin regresión: eliminar Cloud Functions + BQ datasets del sibling + stub README en el repo apuntando a Greenhouse.
+
+Docs:
+
+- `docs/documentation/delivery/orquestacion-commercial-delivery.md` (nueva)
+- `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` sección 3 re-scoped (sibling queda solo como referencia histórica)
+- `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md` agrega la integration Notion + cadencia de rotación
+- `AGENTS.md` + `CLAUDE.md` + `.codex/` actualizados
 
 Effort: Medio.
 
-## Open Questions (arquitectónicas, resolver antes de Discovery del primer hijo)
+### TASK-582 — Monthly Project Provisioning Admin Surface with Preview
 
-1. **Notion API webhooks**: ¿existen webhooks funcionales para las dbs que usamos hoy (`NOTION_TAREAS_DB`, `NOTION_PROYECTOS_DB`)? Si sí, TASK-580 deja de ser polling worker y se vuelve webhook receiver, mismo patrón que el `/webhooks/hubspot` existente. Ahorro concreto: elimina polling + elimina watermark drift. Si no, polling queda pero centralizado en un solo worker.
-2. **Conflict resolution policy**: ¿last-writer-wins por campo (con timestamp canonical), canonical-wins (Greenhouse decide siempre), o deal-state-machine controla (certain stages lock certain fields)? Decisión de negocio, no técnica.
-3. **Monthly project auto-provisioning**: `forward_sync/services/project_resolution.py` tiene lógica dura (first-business-day del mes, skip archived projects, auto-create on demand). ¿Esa regla vive en Greenhouse canonical con admin surface, o se hardcodea en TASK-579?
-4. **Identity mapping completeness**: `identity_profile_source_links` hoy mapea HubSpot ↔ Efeonce persons. ¿Incluye Notion user ids? Si no, ¿lo extendemos como parte de TASK-578 o como dependencia previa?
-5. **Watermark storage**: hoy en BQ `sync_watermark`. ¿Migrar a Postgres `greenhouse_delivery.sync_watermarks` (consistente con el resto del canonical) o dejar en BQ por volumetría? Costo diferencial muy bajo — me inclino por Postgres.
-6. **Orden de ejecución**: ¿TASK-574 (absorción) debe cerrar ANTES de empezar este epic? Recomendado sí — el write bridge Notion (TASK-577) es más limpio si se agrega al servicio ya en el monorepo. Alternativa: arrancar TASK-577 en paralelo si se mueve primero al sibling y se absorbe después, pero agrega un porting doble.
-7. **Mapping registry visibility**: ¿TASK-578 incluye admin UI o queda SQL-only con follow-up para UI? Me inclino por SQL-only + admin API endpoint para refresh, UI como follow-up separado.
+Nueva vista en Admin Center reemplazando el auto-silent del sibling (`forward_sync/services/project_resolution.py`):
+
+- **Preview** del próximo mes: qué deals van a generar qué proyectos Notion, qué subtareas, qué owners resueltos — todo derivable del canonical state.
+- **Override manual**: skip, merge con proyecto existente, forzar nombre.
+- **Approve-to-commit**: el orchestrator ejecuta solo tras aprobación; antes de eso no hay proyección.
+- **Log auditable**: cada provisioning queda registrado con quién aprobó + con qué override.
+- Capability gate: `commercial.project_provisioning.approve` (nueva, declarar en entitlements catalog).
+
+Effort: Medio.
+
+## Decisiones Arquitectónicas (resueltas 2026-04-23)
+
+| Decisión | Resolución |
+|---|---|
+| **Scope del epic** | 4 entidades: deals + tasks + companies + contacts. Companies via `commercial.party.*` events existentes. Contacts como subset de `commercial.deal.*` (vía `primary_contact_identity_profile_id` + `identity_profile_source_links`), no eventos nuevos. |
+| **Monthly project auto-provisioning** | Admin surface con preview + approve-to-commit (TASK-582). No auto-silent como hoy. |
+| **Cutover strategy** | De un tirón con 48h rollback window. Sin ventana paralelo de 2 semanas. |
+| **Real-time strategy** | Híbrida: Notion webhooks primary (0-5s lag) + reconciliation polling cada 6h (safety net) + full-sync admin command (recovery). Watermark en Postgres `greenhouse_delivery.sync_watermarks`. Feasibility de webhooks se verifica en Discovery de TASK-580 per-DB; si falta para alguna DB, degrada graceful a polling-only para esa. |
+| **Notion integration** | Una dedicada: `Greenhouse Commercial-Delivery Orchestrator`, read+write scope, grant per-DB (no workspace-wide), secretos separados staging/prod, rotación trimestral alineada con `ops-worker`. `notion-bigquery` integration queda intacta para daily ingestion. Runbook scriptado en `scripts/bootstrap-notion-orchestrator-integration.md`. |
+| **Conflict resolution policy** | **State-machine por deal stage + LWW fallback para campos no-locked**: la state-machine define qué campos son inmutables en cada stage (ej. deal `closedwon` → `amount` + `dealstage` locked desde Notion, pero descripción y owner siguen editables). Los no-locked usan last-writer-wins por campo con timestamp canonical. Reglas viven en el Mapping Registry (TASK-578). |
+| **Contact events** | No se declaran `commercial.contact.*`. Contacts proyectados como subset de `commercial.deal.*` events — cleaner scope, mismo outcome funcional. |
+| **Notion Companies/Contacts DBs** | Si no existen en workspace, TASK-580 incluye slice "Notion schema bootstrap" que las crea via write bridge. Verificación en Discovery. |
+
+## Open Questions remanentes (no bloqueantes)
+
+- **Notion webhooks per-DB availability**: verificar en Discovery de TASK-580 por cada DB (Tareas, Proyectos, Companies si existe, Contacts si existe). No bloquea el epic — la estrategia híbrida degrada graceful.
+- **Renaming del servicio absorbido** (`hubspot_greenhouse_integration` → `commercial_delivery_bridge`): decisión en Discovery de TASK-577. Inclinación: sí, pero sujeto a verificar impacto de references.
+- **Notion Companies + Contacts DBs existence**: verificar en Discovery de TASK-580 si existen en el workspace Efeonce. Si no, slice "Notion schema bootstrap" las crea via write bridge.
 
 ## Blocking Considerations
 
@@ -173,18 +224,23 @@ Effort: Medio.
 
 ## Validation / Definition of Done
 
-- Cloud Functions del sibling quedan sin tráfico en Cloud Scheduler por ≥ 2 semanas sin regresión.
-- Todo deal HubSpot creado en la ventana de validación refleja correctamente en Notion via Greenhouse orchestrator, sin pasar por el sibling.
-- Toda edit Notion en la ventana refleja en HubSpot via el reverse orchestrator.
+- Staging: ≥1 ciclo completo simulado con parity check vs sibling output antes del cutover production.
+- Cloud Scheduler jobs del sibling (`notion-hubspot-reverse-poll` + `hubspot-notion-deal-poll`) pausados en la ventana de cutover; sin tráfico en 48h de rollback window.
+- Post-48h sin regresión: Cloud Functions + BQ datasets del sibling retirados.
+- Todo deal HubSpot creado post-cutover refleja correctamente en Notion via Greenhouse orchestrator, incluyendo contact resuelto desde `identity_profile_source_links`.
+- Toda edit Notion post-cutover refleja en HubSpot via reverse orchestrator, respetando la state-machine policy (campos locked según stage del deal).
+- Companies (Notion Companies DB) reflejan correctamente los eventos `commercial.party.*`.
+- Monthly project provisioning corre via admin surface con preview, no auto-silent.
 - `docs/documentation/delivery/orquestacion-commercial-delivery.md` publicada.
-- `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` actualizada: `notion-hubspot-sync` removido como source-of-truth.
-- Todos los mappings hardcoded del sibling tienen equivalente en tablas canónicas consultables por SQL.
+- `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` actualizada: `notion-hubspot-sync` removido como source-of-truth del write flow.
+- `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md` documenta la integration Notion dedicada + rotación trimestral.
+- Todos los 6 diccionarios hardcoded del sibling tienen equivalente en tablas canónicas consultables por SQL.
+- `identity_profile_source_links` acepta `source_system='notion'` con seed inicial.
 - Tests integration en monorepo cubren al menos los escenarios que cubrían los 603 LOC del sibling.
-- BQ datasets del sibling archivados o apagados.
 
 ## Follow-ups declarados (post-EPIC)
 
-- Admin UI para mapping registry (CRUD sobre las 6 tablas).
-- Extender el patrón a otros syncs en el ecosistema (si aplica: `notion-teams`, `notion-frame-io` podrían orquestarse desde Greenhouse también — evaluar caso por caso).
-- Real-time Notion webhooks si la evaluación en Discovery concluye que existen.
-- Monthly project auto-provisioning como workflow admin con preview + manual approval (hoy es silent auto-create).
+- Admin UI para mapping registry (CRUD sobre las 6 tablas) — V1 es SQL-only + admin API endpoint de refresh.
+- Contacts independientes (Notion contact edits sin deal asociado que deban proyectarse a HubSpot) — MVP cubre solo contacts como subset de deals.
+- Extender el patrón orchestrator a otros syncs del ecosistema si aplica: `notion-teams`, `notion-frame-io` podrían orquestarse desde Greenhouse también — evaluar caso por caso.
+- Real-time full (eliminar reconciliation polling si los Notion webhooks demuestran reliability ≥99.9% sostenido por 90 días).
