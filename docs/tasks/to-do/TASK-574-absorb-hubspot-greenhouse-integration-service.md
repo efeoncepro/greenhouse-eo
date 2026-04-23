@@ -81,6 +81,7 @@ Reglas obligatorias:
 
 - `docs/tasks/complete/TASK-572-hubspot-integration-post-deals-deploy.md` (servicio vivo)
 - `docs/tasks/complete/TASK-573-quote-builder-deal-birth-contract-completion.md` (último delta del contrato)
+- `docs/tasks/to-do/TASK-576-hubspot-quote-publish-contract-completion.md` (contrato publish-ready de quotes que el servicio absorbido debe soportar sin regresión)
 - `services/ops-worker/README.md` (patrón de referencia para estructura `services/`)
 - `services/ops-worker/deploy.sh` (patrón de script de deploy)
 - `services/ops-worker/Dockerfile` (patrón de Dockerfile per-service)
@@ -100,6 +101,7 @@ Reglas obligatorias:
 - Impacta a agentes AI: `AGENTS.md` + `CLAUDE.md` + `.codex/` pasan a declarar el bridge como asset de `greenhouse-eo`.
 - Impacta a operaciones: un único punto de review para cambios del bridge (no más "revisó el PR en un repo pero el otro no").
 - Cierra el riesgo de drift silencioso entre contrato esperado (definido en `src/lib/integrations/hubspot-greenhouse-service.ts`) y contrato deployado (hoy en sibling).
+- Debe dejar considerado desde el diseño el carril que cerrará `TASK-576`: quote create/update publish-ready, binding catálogo-first de line items, sender/remitente y empresa emisora. La absorción no puede reubicar el servicio ignorando ese contrato.
 
 ### Files owned (monorepo destino)
 
@@ -426,6 +428,7 @@ bindings:
 
 ## Follow-ups
 
+- `TASK-576` debe poder ejecutarse sobre la topología resultante de `TASK-574` sin redescubrir el servicio; por eso esta task debe dejar inventariados y documentados los módulos, endpoints y tests que tocan `/quotes`, asociaciones, line items y cualquier future update path.
 - **Migrar el HubSpot Developer Platform app del sibling (`hsproject.json` + `src/app/`) de v2025.2 a 2026.03** — upgrade estratégico para acceder a Serverless Functions (reintroducidas en 2026.03), Webhooks Journal batched reads, MCP Auth Apps, App Pages y Code Sharing via npm workspaces. Sin deadline duro: v2025.2 no tiene EOL anunciado (solo v2025.1 expira 2026-08-01). La ventana natural para migrar es antes de fin de 2026 para mantenerse dentro del ciclo Supported. Task independiente; vive en sibling porque gobierna el BQ sync auth, no el Cloud Run absorbido.
 - Evaluar absorber también `notion-bigquery` y `notion-teams` bajo la misma lógica (cada uno con su task si el ROI justifica).
 - Integración lint end-to-end: al cambiar `src/lib/integrations/hubspot-greenhouse-service.ts`, el CI podría correr automáticamente contract tests contra `services/hubspot_greenhouse_integration/tests/` para detectar drift de contrato antes de staging.
@@ -445,6 +448,7 @@ Resueltas en el kick-off (2026-04-23):
 Resueltas durante la inspección del sibling (2026-04-23):
 
 - **`hsproject.json` + `src/app/`**: se QUEDAN en sibling — son config de la app HubSpot Developer Platform v2025.2 usada por el BQ sync (token estático del Developer App). v2025.2 NO está deprecada (solo v2025.1 expira 2026-08-01). Migrar a v2026.03 es un upgrade estratégico (acceso a Serverless Functions + Webhooks Journal v4 batched + MCP Auth Apps), NO un rescate por deadline. Follow-up independiente de TASK-574.
+- **Compatibilidad con `TASK-576`**: la absorción debe dejar claro dónde viven `POST /quotes`, `GET /quotes/{id}/line-items`, asociaciones y tests relacionados, para que el cierre de quote publish-ready ocurra sin ambigüedad después del cutover.
 - **Scripts ops**: se QUEDAN en sibling (`create_hubspot_properties.py`, `backfill_company_capabilities_from_deals.py`, `rotate_greenhouse_integration_secret.py`) — operan sobre el portal HubSpot / Secret Manager, no sobre el runtime del servicio.
 - **Skill `skills/efeonce-hubspot-greenhouse-ops/`**: migra al monorepo en Slice 7.
 - **Webhook handler `POST /webhooks/hubspot`**: migra junto con el resto del servicio. HubSpot app webhook URL apunta al Cloud Run URL (mismo URL post-cutover, sin cambio de config en el portal HubSpot).

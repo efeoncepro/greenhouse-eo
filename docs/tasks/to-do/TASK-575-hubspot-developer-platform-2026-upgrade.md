@@ -73,6 +73,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-574-absorb-hubspot-greenhouse-integration-service.md` (contexto de la absorción)
+- `docs/tasks/to-do/TASK-576-hubspot-quote-publish-contract-completion.md` (contrato quote publish-ready que el upgrade no debe romper y, si toca `/quotes`, debe dejar contemplado)
 - `docs/tasks/complete/TASK-572-hubspot-integration-post-deals-deploy.md` (contrato del bridge live)
 - `docs/tasks/complete/TASK-573-quote-builder-deal-birth-contract-completion.md` (governance del create deal)
 - HubSpot Developer Changelog entries:
@@ -89,6 +90,7 @@ Reglas obligatorias:
 - HubSpot CLI ≥ 8.3.0 instalado local y en CI.
 - Developer Test Account de HubSpot (si no existe, crear uno para smoke de la migración).
 - Acceso admin al portal HubSpot production para activar features 2026.03 que lo requieran (ej. Webhooks Journal v4 subscriptions).
+- Si `TASK-576` ya está en ejecución o ya definió contrato de `/quotes`, el upgrade debe incorporarlo como baseline de compatibilidad y smoke.
 
 ### Blocks / Impacts
 
@@ -97,6 +99,7 @@ Reglas obligatorias:
 - Desbloquea MCP Auth Apps → habilita integraciones AI nativas sin pasar por el bridge para ciertos read paths (follow-up separado si se adopta).
 - Extiende la ventana de soporte 18 meses hasta ~Q3 2027 (vs v2025.2 sin EOL pero eventualmente Supported).
 - **No rompe contrato con `greenhouse-eo` Vercel**: el bridge absorbe cualquier diferencia upstream en sus modelos internos; el contrato HTTP público queda estable.
+- Si el upgrade toca rutas, payloads o tests de `/quotes`, debe considerar desde el diseño el objetivo de `TASK-576`: quote create/update publish-ready, catálogo-first, con sender, empresa emisora, SKU/ref, billing frequency, billing start y tax contract completos.
 
 ### Files owned
 
@@ -318,6 +321,7 @@ for event in response.json()["events"]:
 
 ## Follow-ups
 
+- Si `TASK-576` termina antes o en paralelo, reusar su smoke de quotes como regression suite obligatoria para validar que 2026.03 no degradó el carril quote publish.
 - Migrar rutas adicionales del bridge a Serverless Functions caso por caso (cada una con su task si el ROI justifica).
 - Adoptar MCP Auth Apps si aparecen casos de uso para AI connectors sobre HubSpot (agentes Kortex, por ejemplo).
 - Evaluar App Pages cuando se quiera exponer surface de Greenhouse dentro del portal HubSpot (no hay demanda hoy).

@@ -1,5 +1,14 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — TASK-576 registrada para completar el contrato publish-ready de HubSpot quotes (Codex)
+
+- Se crea `TASK-576 — HubSpot Quote Publish Contract Completion`.
+- La task separa claramente el problema ya resuelto (create + asociaciones de quote) del gap que sigue abierto:
+  - `sender` / `sender company` faltantes
+  - line items HubSpot creados como líneas mínimas en vez de reusar catálogo sincronizado
+  - ausencia de `Ref/SKU`, billing frequency, billing start date e IVA publish-ready en HubSpot Quote Editor
+- La task queda explícitamente cross-repo mientras `TASK-574` no absorba `hubspot-greenhouse-integration` al monorepo.
+
 ## Sesion 2026-04-23 — Quote outbound HubSpot deja de depender de `space` y reancla en `organization` (Codex)
 
 - **Scope:** cerrar el incidente donde una cotizacion emitida en Greenhouse no aparecia creada ni asociada en HubSpot, aunque el deal inline ya existiera.
