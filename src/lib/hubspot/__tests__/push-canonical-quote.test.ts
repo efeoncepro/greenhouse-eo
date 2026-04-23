@@ -4,12 +4,14 @@ const {
   runGreenhousePostgresQueryMock,
   createHubSpotQuoteMock,
   updateHubSpotQuoteMock,
+  resolveHubSpotQuoteSenderMock,
   publishQuotationPushedToHubSpotMock,
   publishQuotationHubSpotSyncFailedMock
 } = vi.hoisted(() => ({
   runGreenhousePostgresQueryMock: vi.fn(),
   createHubSpotQuoteMock: vi.fn(),
   updateHubSpotQuoteMock: vi.fn(),
+  resolveHubSpotQuoteSenderMock: vi.fn(),
   publishQuotationPushedToHubSpotMock: vi.fn(),
   publishQuotationHubSpotSyncFailedMock: vi.fn()
 }))
@@ -28,6 +30,10 @@ vi.mock('@/lib/hubspot/update-hubspot-quote', () => ({
   updateHubSpotQuote: (...args: unknown[]) => updateHubSpotQuoteMock(...args)
 }))
 
+vi.mock('@/lib/hubspot/hubspot-quote-publish-contract', () => ({
+  resolveHubSpotQuoteSender: (...args: unknown[]) => resolveHubSpotQuoteSenderMock(...args)
+}))
+
 vi.mock('@/lib/commercial/quotation-events', () => ({
   publishQuotationPushedToHubSpot: (...args: unknown[]) => publishQuotationPushedToHubSpotMock(...args),
   publishQuotationHubSpotSyncFailed: (...args: unknown[]) => publishQuotationHubSpotSyncFailedMock(...args)
@@ -44,12 +50,23 @@ const buildQuoteRow = (overrides: Record<string, unknown> = {}) => ({
   description: 'Test quote',
   valid_until: '2026-06-30',
   currency: 'CLP',
+  billing_frequency: 'monthly',
+  billing_start_date: '2026-05-01',
+  tax_rate_snapshot: 19,
+  created_by: 'user-created',
+  issued_by: null,
   ...overrides
 })
 
 describe('pushCanonicalQuoteToHubSpot', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    resolveHubSpotQuoteSenderMock.mockResolvedValue({
+      firstName: 'Oscar',
+      lastName: 'Carrasco',
+      email: 'oscar@efeonce.org',
+      companyName: 'Efeonce Group SpA'
+    })
   })
 
   it('skips when canonical has no hubspot_deal_id and emits pushed event with result=skipped', async () => {
@@ -103,7 +120,14 @@ describe('pushCanonicalQuoteToHubSpot', () => {
           label: 'Consultoría',
           description: 'Horas',
           quantity: 10,
-          unit_price: 100
+          unit_price: 100,
+          product_id: 'prd-1',
+          hubspot_product_id: 'hs-prod-1',
+          product_code: 'ECG-SVC-001',
+          legacy_sku: 'LEG-001',
+          recurrence_type: 'recurring',
+          tax_rate_snapshot: 19,
+          tax_amount_snapshot: 190
         }
       ])
       .mockResolvedValueOnce([])
@@ -132,11 +156,23 @@ describe('pushCanonicalQuoteToHubSpot', () => {
         contactIdentityProfileId: 'identity-contact-1',
         dealId: 'hs-deal-1',
         persistFinanceMirror: false,
+        sender: {
+          firstName: 'Oscar',
+          lastName: 'Carrasco',
+          email: 'oscar@efeonce.org',
+          companyName: 'Efeonce Group SpA'
+        },
         lineItems: [
           expect.objectContaining({
             name: 'Consultoría',
             quantity: 10,
-            unitPrice: 100
+            unitPrice: 100,
+            hubspotProductId: 'hs-prod-1',
+            productCode: 'ECG-SVC-001',
+            billingFrequency: 'monthly',
+            billingStartDate: '2026-05-01',
+            taxRate: 19,
+            taxAmount: 190
           })
         ]
       })
@@ -181,7 +217,14 @@ describe('pushCanonicalQuoteToHubSpot', () => {
           label: 'Horas',
           description: null,
           quantity: 5,
-          unit_price: 50
+          unit_price: 50,
+          product_id: 'prd-1',
+          hubspot_product_id: 'hs-prod-1',
+          product_code: 'ECG-SVC-001',
+          legacy_sku: 'LEG-001',
+          recurrence_type: 'recurring',
+          tax_rate_snapshot: 19,
+          tax_amount_snapshot: 95
         }
       ])
       .mockResolvedValueOnce([])
@@ -199,11 +242,23 @@ describe('pushCanonicalQuoteToHubSpot', () => {
     expect(updateHubSpotQuoteMock).toHaveBeenCalledWith(
       expect.objectContaining({
         hubspotQuoteId: 'hs-quote-existing',
+        sender: {
+          firstName: 'Oscar',
+          lastName: 'Carrasco',
+          email: 'oscar@efeonce.org',
+          companyName: 'Efeonce Group SpA'
+        },
         lineItems: [
           expect.objectContaining({
             name: 'Horas',
             quantity: 5,
-            unitPrice: 50
+            unitPrice: 50,
+            hubspotProductId: 'hs-prod-1',
+            productCode: 'ECG-SVC-001',
+            billingFrequency: 'monthly',
+            billingStartDate: '2026-05-01',
+            taxRate: 19,
+            taxAmount: 95
           })
         ]
       })

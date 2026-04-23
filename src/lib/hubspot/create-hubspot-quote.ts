@@ -2,7 +2,9 @@ import 'server-only'
 
 import {
   createHubSpotGreenhouseQuote,
-  type HubSpotGreenhouseCreateQuoteRequest
+  type HubSpotGreenhouseCreateQuoteRequest,
+  type HubSpotGreenhouseQuoteLineItemPayload,
+  type HubSpotGreenhouseQuoteSender
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { resolveHubSpotContactByIdentityProfileId } from '@/lib/commercial/hubspot-contact-resolution'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
@@ -21,11 +23,21 @@ export type CreateHubSpotQuoteInput = {
   contactIdentityProfileId?: string | null
   hubspotContactId?: string | null
   lineItems: Array<{
-    name: string
-    quantity: number
-    unitPrice: number
-    description?: string
+    name: HubSpotGreenhouseQuoteLineItemPayload['name']
+    quantity: HubSpotGreenhouseQuoteLineItemPayload['quantity']
+    unitPrice: HubSpotGreenhouseQuoteLineItemPayload['unitPrice']
+    description?: HubSpotGreenhouseQuoteLineItemPayload['description']
+    discount?: HubSpotGreenhouseQuoteLineItemPayload['discount']
+    taxAmount?: HubSpotGreenhouseQuoteLineItemPayload['taxAmount']
+    productId?: HubSpotGreenhouseQuoteLineItemPayload['productId']
+    hubspotProductId?: HubSpotGreenhouseQuoteLineItemPayload['hubspotProductId']
+    productCode?: HubSpotGreenhouseQuoteLineItemPayload['productCode']
+    legacySku?: HubSpotGreenhouseQuoteLineItemPayload['legacySku']
+    billingFrequency?: HubSpotGreenhouseQuoteLineItemPayload['billingFrequency']
+    billingStartDate?: HubSpotGreenhouseQuoteLineItemPayload['billingStartDate']
+    taxRate?: HubSpotGreenhouseQuoteLineItemPayload['taxRate']
   }>
+  sender: HubSpotGreenhouseQuoteSender
   dealId?: string
   publishImmediately?: boolean
   persistFinanceMirror?: boolean
@@ -115,6 +127,7 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
     title,
     expirationDate,
     lineItems,
+    sender,
     dealId,
     publishImmediately = false,
     persistFinanceMirror = true
@@ -179,6 +192,7 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
     expirationDate,
     language: 'es',
     locale: 'es-cl',
+    sender,
     associations: {
       companyId: org.hubspot_company_id,
       dealId: dealId || undefined,
@@ -188,7 +202,16 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
       name: li.name,
       quantity: li.quantity,
       unitPrice: li.unitPrice,
-      description: li.description
+      description: li.description,
+      discount: li.discount,
+      taxAmount: li.taxAmount,
+      productId: li.productId,
+      hubspotProductId: li.hubspotProductId,
+      productCode: li.productCode,
+      legacySku: li.legacySku,
+      billingFrequency: li.billingFrequency,
+      billingStartDate: li.billingStartDate,
+      taxRate: li.taxRate
     }))
   }
 

@@ -8,7 +8,7 @@ import {
 
 describe('hubspot custom properties manifest', () => {
   it('keeps technical names and human-readable labels separate across supported objects', () => {
-    const objects = ['companies', 'deals', 'products', 'services'] as const
+    const objects = ['companies', 'deals', 'line_items', 'products', 'services'] as const
 
     for (const objectType of objects) {
       for (const definition of getHubSpotCustomPropertyDefinitions(objectType)) {
@@ -41,6 +41,23 @@ describe('hubspot custom properties manifest', () => {
         expect.objectContaining({ name: 'ef_linea_de_servicio' }),
         expect.objectContaining({ name: 'ef_servicio_especifico' }),
         expect.objectContaining({ name: 'ef_notion_project_id' })
+      ])
+    )
+  })
+
+  it('includes the line item publish-ready property suite', () => {
+    const definitions = getHubSpotCustomPropertyDefinitions('line_items')
+
+    expect(definitions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'gh_product_code',
+          label: 'Codigo de Producto Greenhouse'
+        }),
+        expect.objectContaining({
+          name: 'gh_tax_rate',
+          label: 'Tasa IVA Greenhouse'
+        })
       ])
     )
   })

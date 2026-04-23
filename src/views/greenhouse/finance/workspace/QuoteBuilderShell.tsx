@@ -75,6 +75,7 @@ export interface QuoteBuilderShellQuote {
   quotationId: string
   quotationNumber: string | null
   quoteDate?: string | null
+  billingStartDate?: string | null
   clientId: string | null
   organizationId: string | null
   contactIdentityProfileId?: string | null
@@ -107,6 +108,7 @@ export interface QuoteBuilderShellSubmitPayload {
   billingFrequency: QuoteBuilderBillingFrequency
   contractDurationMonths: number | null
   validUntil: string | null
+  billingStartDate: string | null
   businessLineCode: string | null
   commercialModel: CommercialModelCode
   countryFactorCode: string
@@ -289,6 +291,7 @@ interface BuilderContextState extends QuoteBuilderPricingContext {
   outputCurrency: PricingOutputCurrency
   contractDurationMonths: number | null
   validUntil: string | null
+  billingStartDate: string | null
   description: string
 }
 
@@ -334,6 +337,7 @@ const QuoteBuilderShell = ({
       outputCurrency: coerceCurrency(quote?.outputCurrency ?? quote?.currency ?? null),
       contractDurationMonths: quote?.contractDurationMonths ?? null,
       validUntil: quote?.validUntil ?? null,
+      billingStartDate: quote?.billingStartDate ?? quote?.quoteDate ?? new Date().toISOString().slice(0, 10),
       description: quote?.description ?? ''
     }),
     [quote]
@@ -1134,6 +1138,7 @@ const QuoteBuilderShell = ({
           billingFrequency,
           contractDurationMonths: builderState.contractDurationMonths,
           validUntil: builderState.validUntil,
+          billingStartDate: builderState.billingStartDate,
           businessLineCode: builderState.businessLineCode,
           commercialModel: builderState.commercialModel,
           countryFactorCode: builderState.countryFactorCode,
@@ -1164,6 +1169,7 @@ const QuoteBuilderShell = ({
             billingFrequency,
             contractDurationMonths: builderState.contractDurationMonths,
             validUntil: builderState.validUntil,
+            billingStartDate: builderState.billingStartDate,
             businessLineCode: builderState.businessLineCode,
             commercialModel: builderState.commercialModel,
             pricingEngineCommercialModel: builderState.commercialModel,
@@ -1203,6 +1209,7 @@ const QuoteBuilderShell = ({
             billingFrequency,
             contractDurationMonths: builderState.contractDurationMonths,
             validUntil: builderState.validUntil,
+            billingStartDate: builderState.billingStartDate,
             businessLineCode: builderState.businessLineCode,
             pricingModel,
             commercialModel: builderState.commercialModel,
@@ -1355,7 +1362,8 @@ const QuoteBuilderShell = ({
       countryFactorCode: builderState.countryFactorCode,
       outputCurrency: builderState.outputCurrency,
       contractDurationMonths: builderState.contractDurationMonths,
-      validUntil: builderState.validUntil
+      validUntil: builderState.validUntil,
+      billingStartDate: builderState.billingStartDate
     }),
     [
       organizationId,
@@ -1366,7 +1374,8 @@ const QuoteBuilderShell = ({
       builderState.countryFactorCode,
       builderState.outputCurrency,
       builderState.contractDurationMonths,
-      builderState.validUntil
+      builderState.validUntil,
+      builderState.billingStartDate
     ]
   )
 
@@ -1553,6 +1562,7 @@ const QuoteBuilderShell = ({
         onCurrencyChange={value => setBuilderState(prev => ({ ...prev, outputCurrency: value }))}
         onDurationChange={months => setBuilderState(prev => ({ ...prev, contractDurationMonths: months }))}
         onValidUntilChange={iso => setBuilderState(prev => ({ ...prev, validUntil: iso }))}
+        onBillingStartDateChange={iso => setBuilderState(prev => ({ ...prev, billingStartDate: iso }))}
         onCreateDeal={submitting ? undefined : () => setCreateDealDrawerOpen(true)}
       />
 

@@ -911,6 +911,7 @@ export interface GreenhouseCommercialQuotations {
   approved_by: string | null;
   arr: Numeric | null;
   billing_frequency: Generated<string>;
+  billing_start_date: Timestamp | null;
   business_line_code: string | null;
   client_id: string | null;
   client_name_cache: string | null;

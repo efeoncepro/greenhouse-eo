@@ -62,6 +62,9 @@ type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
   dte_type_code: string | null
   dte_folio: string | null
   notes: string | null
+  billing_frequency: string | null
+  contract_duration_months: number | null
+  billing_start_date: string | Date | null
   current_version: number | null
   created_at: string | Date | null
   updated_at: string | Date | null
@@ -360,6 +363,9 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        q.hubspot_quote_id,
        q.hubspot_deal_id,
        q.notes,
+       q.billing_frequency,
+       q.contract_duration_months,
+       q.billing_start_date,
        q.current_version,
        q.created_at,
        q.updated_at,
@@ -1202,6 +1208,14 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
     : row.valid_until
       ? new Date(String(row.valid_until)).toISOString().slice(0, 10)
       : null,
+  billingFrequency: row.billing_frequency ? String(row.billing_frequency) : null,
+  contractDurationMonths:
+    row.contract_duration_months !== null && row.contract_duration_months !== undefined
+      ? Number(row.contract_duration_months)
+      : null,
+  billingStartDate: row.billing_start_date
+    ? new Date(String(row.billing_start_date)).toISOString().slice(0, 10)
+    : null,
   description: row.description ? String(row.description) : null,
   currency: String(row.currency || 'CLP'),
   subtotal: row.subtotal !== null ? Number(row.subtotal) : null,

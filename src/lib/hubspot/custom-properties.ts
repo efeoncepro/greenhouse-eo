@@ -2,6 +2,7 @@ export const HUBSPOT_CUSTOM_PROPERTY_OBJECT_TYPES = [
   'companies',
   'contacts',
   'deals',
+  'line_items',
   'products',
   'services'
 ] as const
@@ -157,6 +158,11 @@ export const HUBSPOT_CUSTOM_PROPERTY_GROUP_CONFIG: Record<
     groupLabel: 'Deal Information',
     groupCandidates: ['dealinformation', 'greenhouse_sync']
   },
+  line_items: {
+    preferredGroupName: 'greenhouse_sync',
+    groupLabel: GREENHOUSE_SYNC_GROUP_LABEL,
+    groupCandidates: ['greenhouse_sync', 'line_item_information']
+  },
   products: {
     preferredGroupName: 'greenhouse_sync',
     groupLabel: GREENHOUSE_SYNC_GROUP_LABEL,
@@ -259,6 +265,28 @@ const HUBSPOT_CUSTOM_PROPERTY_TEMPLATES: Record<
         'Clave tecnica usada por Greenhouse para deduplicar retries al crear deals desde flujos automatizados o interactivos.',
       type: 'string',
       fieldType: 'text',
+      formField: false,
+      displayOrder: 2
+    }
+  ],
+  line_items: [
+    {
+      name: 'gh_product_code',
+      label: 'Codigo de Producto Greenhouse',
+      description:
+        'Codigo canonico del catalogo Greenhouse expuesto sobre line items HubSpot para joins, auditoria y lectura publish-ready de quotes.',
+      type: 'string',
+      fieldType: 'text',
+      formField: false,
+      displayOrder: 1
+    },
+    {
+      name: 'gh_tax_rate',
+      label: 'Tasa IVA Greenhouse',
+      description:
+        'Tasa impositiva canonica resuelta por Greenhouse para la linea cotizada. Se usa como lectura publish-ready y no reemplaza los grupos tributarios nativos de HubSpot.',
+      type: 'number',
+      fieldType: 'number',
       formField: false,
       displayOrder: 2
     }

@@ -262,6 +262,7 @@ export interface TermVariableContext {
   paymentTermsDays?: number | null
   contractDurationMonths?: number | null
   billingFrequency?: string | null
+  billingStartDate?: string | null
   validUntil?: string | null
   organizationName?: string | null
   escalationPct?: number | null
@@ -298,6 +299,7 @@ export const resolveTermVariables = (
     payment_terms_days: context.paymentTermsDays != null ? String(context.paymentTermsDays) : '',
     contract_duration: context.contractDurationMonths != null ? `${context.contractDurationMonths} meses` : '',
     billing_frequency: formatBillingFrequency(context.billingFrequency),
+    billing_start_date: formatDate(context.billingStartDate),
     valid_until: formatDate(context.validUntil),
     organization_name: context.organizationName ?? '',
     escalation_pct: context.escalationPct != null ? `${context.escalationPct}%` : ''

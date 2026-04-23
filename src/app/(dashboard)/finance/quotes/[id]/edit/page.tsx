@@ -227,6 +227,7 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
     outputCurrency: coerceCurrency(detail.currency),
     contractDurationMonths: null,
     validUntil: detail.expiryDate,
+    billingStartDate: detail.billingStartDate ?? detail.quoteDate,
     pricingModel: coercePricingModel(detail.pricingModel),
     billingFrequency: coerceBillingFrequency(null),
     businessLineCode: detail.businessLineCode ?? null,

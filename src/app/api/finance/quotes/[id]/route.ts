@@ -192,6 +192,7 @@ interface UpdateQuotationPayload {
   businessLineCode?: string | null
   currency?: string | null
   billingFrequency?: string | null
+  billingStartDate?: string | null
   contractDurationMonths?: number | null
   globalDiscountType?: 'percentage' | 'fixed_amount' | null
   globalDiscountValue?: number | null
@@ -297,6 +298,7 @@ export async function PUT(
   if (body.businessLineCode !== undefined) push('business_line_code', body.businessLineCode)
   if (body.currency !== undefined && body.currency) push('currency', body.currency)
   if (body.billingFrequency !== undefined && body.billingFrequency) push('billing_frequency', body.billingFrequency)
+  if (body.billingStartDate !== undefined) push('billing_start_date', body.billingStartDate, '::date')
 
   if (body.contractDurationMonths !== undefined) {
     push('contract_duration_months', body.contractDurationMonths)

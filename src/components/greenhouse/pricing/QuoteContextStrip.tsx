@@ -82,6 +82,7 @@ export interface QuoteContextStripValues {
   outputCurrency: PricingOutputCurrency
   contractDurationMonths: number | null
   validUntil: string | null
+  billingStartDate: string | null
 }
 
 export interface QuoteContextStripHandlers {
@@ -94,6 +95,7 @@ export interface QuoteContextStripHandlers {
   onCurrencyChange: (currency: PricingOutputCurrency) => void
   onDurationChange: (months: number | null) => void
   onValidUntilChange: (iso: string | null) => void
+  onBillingStartDateChange: (iso: string | null) => void
 
   /**
    * Opens the Create Deal drawer. When provided, the Deal HubSpot chip popover
@@ -215,6 +217,7 @@ const QuoteContextStrip = ({
   onCurrencyChange,
   onDurationChange,
   onValidUntilChange,
+  onBillingStartDateChange,
   onCreateDeal
 }: QuoteContextStripProps) => {
   const orgOptions = useMemo<ContextChipOption[]>(
@@ -367,6 +370,18 @@ const QuoteContextStrip = ({
       })()
     : null
 
+  const billingStartDateValue = values.billingStartDate
+    ? (() => {
+        try {
+          return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }).format(
+            new Date(values.billingStartDate)
+          )
+        } catch {
+          return values.billingStartDate
+        }
+      })()
+    : null
+
   // TASK-565: blocking-empty tension only when organization is set but required
   // downstream chip (Deal HubSpot) is still empty. Keeps the CTA silent for the
   // very first load (no organization → no tension yet).
@@ -377,11 +392,11 @@ const QuoteContextStrip = ({
         ? 'blocking-empty'
         : undefined
 
-  // TASK-565: completion counter. 6 fields the user must explicitly pick (the
+  // TASK-565: completion counter. 7 fields the user must explicitly pick (the
   // other 3 — commercial model / country / currency — ship with defaults so
   // they are always "filled" from the user's perspective). Keep this aligned
   // with the Tier 1/3 chips that actually require a decision.
-  const progressTotal = 6
+  const progressTotal = 7
 
   const progressFilled =
     (values.organizationId ? 1 : 0) +
@@ -389,7 +404,8 @@ const QuoteContextStrip = ({
     (values.hubspotDealId ? 1 : 0) +
     (values.businessLineCode ? 1 : 0) +
     (values.contractDurationMonths ? 1 : 0) +
-    (values.validUntil ? 1 : 0)
+    (values.validUntil ? 1 : 0) +
+    (values.billingStartDate ? 1 : 0)
 
   // TASK-565: fire a single "attention" pulse on the Deal chip the first time
   // the user picks an organization with no deal attached. Gated by reduced-motion.
@@ -797,6 +813,36 @@ const QuoteContextStrip = ({
                     helperText={GH_PRICING.contextChips.duration.hint}
                     disabled={disabled}
                     aria-label={GH_PRICING.contextChips.duration.label}
+                    autoFocus
+                  />
+                </Stack>
+              )}
+            />
+            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
+              ·
+            </Typography>
+            <ContextChip
+              prominence='inline'
+              mode='custom'
+              icon={GH_PRICING.contextChips.billingStartDate.icon}
+              label={GH_PRICING.contextChips.billingStartDate.label}
+              value={billingStartDateValue}
+              placeholder={GH_PRICING.contextChips.billingStartDate.placeholder}
+              disabled={disabled}
+              popoverWidth={280}
+              popoverContent={() => (
+                <Stack spacing={1.5}>
+                  <Typography variant='subtitle1'>{GH_PRICING.contextChips.billingStartDate.label}</Typography>
+                  <CustomTextField
+                    fullWidth
+                    size='small'
+                    type='date'
+                    value={values.billingStartDate ?? ''}
+                    onChange={event => onBillingStartDateChange(event.target.value || null)}
+                    helperText={GH_PRICING.contextChips.billingStartDate.hint}
+                    InputLabelProps={{ shrink: true }}
+                    disabled={disabled}
+                    aria-label={GH_PRICING.contextChips.billingStartDate.label}
                     autoFocus
                   />
                 </Stack>

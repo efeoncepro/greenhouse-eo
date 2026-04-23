@@ -249,26 +249,54 @@ export interface HubSpotGreenhouseCreateQuoteRequest {
   expirationDate: string
   language?: string
   locale?: string
-  sender?: {
-    firstName: string
-    lastName: string
-    email: string
-    companyName: string
-  }
+  sender?: HubSpotGreenhouseQuoteSender
   associations?: {
     dealId?: string
     companyId?: string
     contactIds?: string[]
     quoteTemplateId?: string
   }
-  lineItems?: Array<{
-    name: string
-    quantity: number
-    unitPrice: number
-    description?: string
-    discount?: number
-    taxAmount?: number
-  }>
+  lineItems?: HubSpotGreenhouseQuoteLineItemPayload[]
+}
+
+export interface HubSpotGreenhouseQuoteSender {
+  firstName: string
+  lastName: string
+  email: string
+  companyName: string
+}
+
+export interface HubSpotGreenhouseQuoteLineItemPayload {
+  hubspotLineItemId?: string
+  lineItemId?: string
+  name: string
+  quantity: number
+  unitPrice: number
+  description?: string
+  discount?: number
+  taxAmount?: number
+  productId?: string
+  hubspotProductId?: string
+  productCode?: string
+  legacySku?: string
+  billingFrequency?: string
+  billingStartDate?: string
+  taxRate?: number
+}
+
+export interface HubSpotGreenhouseUpdateQuoteRequest {
+  title?: string
+  expirationDate?: string
+  language?: string
+  locale?: string
+  sender?: HubSpotGreenhouseQuoteSender
+  associations?: {
+    dealId?: string
+    companyId?: string
+    contactIds?: string[]
+    quoteTemplateId?: string
+  }
+  lineItems?: HubSpotGreenhouseQuoteLineItemPayload[]
 }
 
 export interface HubSpotGreenhouseCreateQuoteResponse {
@@ -407,7 +435,11 @@ export interface HubSpotGreenhouseLiveContext {
 }
 
 const normalizeBaseUrl = (value: string | undefined) => {
-  const normalized = value?.trim().replace(/\/+$/, '')
+  const normalized = value
+    ?.trim()
+    .replace(/\\r|\\n/g, '')
+    .replace(/[\r\n]+/g, '')
+    .replace(/\/+$/, '')
 
   return normalized || DEFAULT_BASE_URL
 }
@@ -868,6 +900,32 @@ export const createHubSpotGreenhouseQuote = async (payload: HubSpotGreenhouseCre
     const body = await response.text()
 
     throw new Error(`HubSpot integration service returned ${response.status} for POST /quotes: ${body || response.statusText}`)
+  }
+
+  return (await response.json()) as HubSpotGreenhouseCreateQuoteResponse
+}
+
+export const updateHubSpotGreenhouseQuote = async (
+  hubspotQuoteId: string,
+  payload: HubSpotGreenhouseUpdateQuoteRequest
+) => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/quotes/${encodeURIComponent(hubspotQuoteId)}`, {
+    method: 'PATCH',
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for PATCH /quotes/${hubspotQuoteId}: ${body || response.statusText}`
+    )
   }
 
   return (await response.json()) as HubSpotGreenhouseCreateQuoteResponse

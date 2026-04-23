@@ -189,6 +189,7 @@ interface CreateQuotationPayload {
   validUntil?: string | null
   expiryDate?: string | null
   billingFrequency?: QuotationBillingFrequency
+  billingStartDate?: string | null
   contractDurationMonths?: number | null
   exchangeRates?: Record<string, number>
   exchangeSnapshotDate?: string | null
@@ -420,6 +421,7 @@ export async function POST(request: Request) {
            global_discount_value,
            revenue_type,
            billing_frequency,
+           billing_start_date,
            payment_terms_days,
            contract_duration_months,
            quote_date,
@@ -436,11 +438,11 @@ export async function POST(request: Request) {
            $1, $2, $3, $4, $5, $6, $7, $8, 'draft', 1,
            $9, NULL, $10::jsonb, $11::date,
            $12, $13, $14, $15,
-           'one_time', $16, 30, $17,
-           $18::date, $19::date, $20::date, $21::date,
-           $22, $23,
-           'manual', $1, $24,
-           $25
+           'one_time', $16, $17::date, 30, $18,
+           $19::date, $20::date, $21::date, $22::date,
+           $23, $24,
+           'manual', $1, $25,
+           $26
          )
          RETURNING quotation_id`,
         [
@@ -460,6 +462,7 @@ export async function POST(request: Request) {
           body.globalDiscountType ?? null,
           body.globalDiscountValue ?? null,
           billingFrequency,
+          body.billingStartDate ?? quoteDate,
           contractDurationMonths,
           quoteDate,
           body.dueDate ?? null,
@@ -583,6 +586,7 @@ export async function POST(request: Request) {
         paymentTermsDays: templateSnapshot.defaults.paymentTermsDays,
         contractDurationMonths,
         billingFrequency,
+        billingStartDate: body.billingStartDate ?? quoteDate,
         validUntil: body.validUntil ?? null,
         organizationName: null,
         escalationPct: null

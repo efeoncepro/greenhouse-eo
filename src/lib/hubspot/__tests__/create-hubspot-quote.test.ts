@@ -85,12 +85,25 @@ describe('createHubSpotQuote', () => {
       organizationId: 'org-1',
       title: 'Bata - TEST',
       expirationDate: '2026-04-27',
+      sender: {
+        firstName: 'Oscar',
+        lastName: 'Carrasco',
+        email: 'oscar@efeonce.org',
+        companyName: 'Efeonce Group SpA'
+      },
       contactIdentityProfileId: 'identity-contact-1',
       lineItems: [
         {
           name: 'Servicio',
           quantity: 1,
-          unitPrice: 2923500
+          unitPrice: 2923500,
+          productId: 'prd-1',
+          hubspotProductId: 'hs-prod-1',
+          productCode: 'ECG-SVC-001',
+          billingFrequency: 'monthly',
+          billingStartDate: '2026-05-01',
+          taxRate: 19,
+          taxAmount: 554465
         }
       ],
       dealId: '59465365539',
@@ -110,6 +123,12 @@ describe('createHubSpotQuote', () => {
     expect(createHubSpotGreenhouseQuoteMock).toHaveBeenCalledWith(
       expect.objectContaining({
         title: 'Bata - TEST',
+        sender: {
+          firstName: 'Oscar',
+          lastName: 'Carrasco',
+          email: 'oscar@efeonce.org',
+          companyName: 'Efeonce Group SpA'
+        },
         associations: {
           companyId: '29666506565',
           dealId: '59465365539',
@@ -145,6 +164,12 @@ describe('createHubSpotQuote', () => {
       organizationId: 'org-1',
       title: 'Bata - TEST',
       expirationDate: '2026-04-27',
+      sender: {
+        firstName: 'Oscar',
+        lastName: 'Carrasco',
+        email: 'oscar@efeonce.org',
+        companyName: 'Efeonce Group SpA'
+      },
       contactIdentityProfileId: 'identity-contact-1',
       lineItems: [],
       persistFinanceMirror: false

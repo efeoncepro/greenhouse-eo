@@ -4,6 +4,15 @@
 
 ### 2026-04-23 — Quote Builder ya crea cotizaciones HubSpot desde el anchor `organization` y las asocia al deal real
 
+### 2026-04-23 — TASK-576 deja las HubSpot quotes publish-ready sin edición manual
+
+- El contrato outbound de quotes ya no se limita a “crear algo en HubSpot”: ahora resuelve `sender` desde `person_360` (`issued_by -> created_by -> actorId`) y `sender company` desde la operating entity canónica de Greenhouse, por lo que la quote nace con remitente y empresa emisora completos.
+- `greenhouse_commercial.quotations` gana `billing_start_date` como source of truth explícita; el Quote Builder la captura en el rail contextual con default visible igual a `quoteDate`, pero editable antes de guardar.
+- `pushCanonicalQuoteToHubSpot()` deja de construir líneas mínimas y exige binding catálogo-first: `quotation_line_items.product_id -> product_catalog.product_id -> hubspot_product_id`, con `Ref` visible desde `product_code` y compatibilidad vía `legacy_sku`.
+- Create y update convergen al mismo DTO publish-ready hacia el bridge HubSpot: `hubspotLineItemId`, `hubspotProductId`, `productCode`, `legacySku`, `billingFrequency`, `billingStartDate`, `taxRate`, `taxAmount`, además de sender.
+- El bridge hermano `hubspot-greenhouse-integration` ya expone `PATCH /quotes/{hubspotQuoteId}` en live, y HubSpot `line_items` gana la custom property `gh_tax_rate` para reflejar IVA publish-ready.
+- Smoke real final sobre la quote `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9` / HubSpot quote `39307909907`: sender `Julio Reyes`, emisor `Efeonce Group SpA`, deal `59465365539`, company `29666506565`, contact `97482887171`, line item `54542714929` ligado a producto `34043995189`, `Ref=ECG-001`, `billingFrequency=monthly`, `billingStartDate=2026-04-23`, `taxRate=0.19`.
+
 - El outbound canonico de cotizaciones deja de bloquearse por ausencia de `space`: `createHubSpotQuote()` ahora usa `organization -> hubspot_company_id` como anchor estructural y trata el mirror legacy de `greenhouse_finance.quotes` como opt-in (`persistFinanceMirror`), no como prerequisito.
 - Nuevo helper `src/lib/commercial/hubspot-contact-resolution.ts` resuelve el contacto HubSpot desde el contrato canonico con precedencia `person_360 CRM facet -> greenhouse_crm.contacts -> identity_profiles` origen HubSpot.
 - `pushCanonicalQuoteToHubSpot()` ahora propaga `contact_identity_profile_id` y crea la quote HubSpot aunque la organización todavía no tenga `space` porque aún no es cliente.

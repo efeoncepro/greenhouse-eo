@@ -1986,6 +1986,12 @@ export const GH_PRICING = {
       placeholder: 'dd/mm/aaaa',
       icon: 'tabler-calendar-event'
     },
+    billingStartDate: {
+      label: 'Inicio de facturación',
+      placeholder: 'dd/mm/aaaa',
+      icon: 'tabler-calendar-up',
+      hint: 'Fecha desde la que parte la facturación del contrato en HubSpot.'
+    },
     progress: {
       suffix: (total: number) => `de ${total} campos`,
       ariaLive: (filled: number, total: number) => {

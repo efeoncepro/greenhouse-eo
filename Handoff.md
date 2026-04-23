@@ -1,5 +1,71 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — TASK-576 completada: HubSpot quote publish-ready sin edición manual (Codex)
+
+- **Scope:** cerrar el contrato final `quotation -> HubSpot quote` para que una cotización nacida en Greenhouse quede publish-ready en HubSpot sin completar sender, emisor, SKU/Ref, billing ni IVA a mano.
+- **Implementación shipped en `greenhouse-eo`**
+  - migración `20260423110044569_task-576-quote-billing-start-date.sql`
+    - `greenhouse_commercial.quotations` gana `billing_start_date`
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx`
+  - `src/components/greenhouse/pricing/QuoteContextStrip.tsx`
+  - `src/app/api/finance/quotes/route.ts`
+  - `src/app/api/finance/quotes/[id]/route.ts`
+    - el Quote Builder ya captura/persiste `billingStartDate` con default visible inicial `quoteDate`
+  - `src/lib/hubspot/hubspot-quote-publish-contract.ts`
+    - nuevo contrato canónico para `sender`/`sender company`
+    - `sender` se resuelve vía `issued_by -> created_by -> actorId` usando `person_360`
+    - `sender company` se resuelve vía `getOperatingEntityIdentity()`
+  - `src/lib/hubspot/push-canonical-quote.ts`
+  - `src/lib/hubspot/create-hubspot-quote.ts`
+  - `src/lib/hubspot/update-hubspot-quote.ts`
+  - `src/lib/integrations/hubspot-greenhouse-service.ts`
+    - create/update convergen al mismo DTO publish-ready
+    - line items outbound ya exigen binding canónico `quotation_line_items.product_id -> product_catalog.product_id -> hubspot_product_id`
+    - payload publish-ready ahora incluye `hubspotLineItemId`, `hubspotProductId`, `productCode`, `legacySku`, `billingFrequency`, `billingStartDate`, `taxRate`, `taxAmount`
+  - `src/lib/hubspot/custom-properties.ts`
+    - el manifest canónico ya soporta `line_items` con `gh_product_code` y `gh_tax_rate`
+  - `scripts/smoke-task-576-hubspot-quote-publish.ts`
+    - smoke operativo reusable que fuerza el binding canónico real, empuja la quote y verifica sender/emisor/producto/billing/tax directamente contra el bridge live
+- **Implementación shipped en repo hermano `hubspot-bigquery-task-563`**
+  - `services/hubspot_greenhouse_integration/app.py`
+  - `services/hubspot_greenhouse_integration/hubspot_client.py`
+  - `services/hubspot_greenhouse_integration/contract.py`
+  - `services/hubspot_greenhouse_integration/models.py`
+    - nuevo `PATCH /quotes/{hubspotQuoteId}`
+    - create/update comparten normalización de quote + line items
+    - el bridge ya escribe sender y line items product-backed (`hs_product_id`, `gh_product_code`, billing fields, tax fields)
+- **Hardening adicional detectado y corregido**
+  - `normalizeBaseUrl()` en `hubspot-greenhouse-service.ts` ahora limpia también secuencias literales `\\r\\n`; el smoke detectó drift local de env en `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+  - `push-canonical-quote.ts` ahora normaliza también `Date` en `toDateString()`; sin eso, `billing_start_date` podía persistirse bien y aun así leerse como `null` en el adapter
+  - HubSpot `line_items` ya tenía `gh_product_code`, pero faltaba `gh_tax_rate`; se creó live para cerrar el IVA publish-ready end-to-end
+- **Verificación ejecutada**
+  - `pnpm pg:doctor` OK
+  - `pnpm pg:connect:migrate` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test src/lib/hubspot/__tests__/create-hubspot-quote.test.ts src/lib/hubspot/__tests__/push-canonical-quote.test.ts` OK
+  - `pnpm test scripts/__tests__/hubspot-custom-properties.test.ts` OK
+  - `pnpm lint` OK
+  - `pnpm test` OK
+  - `pnpm build` OK
+  - sibling repo:
+    - `python3 -m py_compile services/hubspot_greenhouse_integration/app.py services/hubspot_greenhouse_integration/hubspot_client.py services/hubspot_greenhouse_integration/contract.py services/hubspot_greenhouse_integration/models.py` OK
+    - `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK
+    - `bash services/hubspot_greenhouse_integration/deploy.sh` OK
+    - Cloud Run revision live: `hubspot-greenhouse-integration-00023-zzq`
+- **Smoke real final**
+  - cotización Greenhouse: `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9`
+  - quote HubSpot: `39307909907`
+  - deal: `59465365539`
+  - company: `29666506565`
+  - contact: `97482887171`
+  - line item HubSpot: `54542714929`
+  - product binding live: `hubspot_product_id=34043995189`, `Ref=ECG-001`
+  - sender live: `Julio Reyes <jreyes@efeoncepro.com>`
+  - sender company live: `Efeonce Group SpA`
+  - billing live: `monthly`, `billingStartDate=2026-04-23`
+  - tax live: `gh_tax_rate = 0.19`
+  - resultado: publish-ready sin edición manual posterior en HubSpot
+
 ## Sesion 2026-04-23 — TASK-576 registrada para completar el contrato publish-ready de HubSpot quotes (Codex)
 
 - Se crea `TASK-576 — HubSpot Quote Publish Contract Completion`.

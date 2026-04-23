@@ -1,15 +1,23 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.10
+> **Version:** 3.11
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-22 por Codex (v3.10 — hidratacion canonica de contactos HubSpot al seleccionar una org adoptada), Codex (v3.9 — TASK-543 cleanup de flags legacy del selector unificado), Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
+> **Ultima actualizacion:** 2026-04-23 por Codex (v3.11 — contrato publish-ready de HubSpot quotes con remitente/emisor canónicos, `billing_start_date` y line items catálogo-first), 2026-04-22 por Codex (v3.10 — hidratacion canonica de contactos HubSpot al seleccionar una org adoptada), Codex (v3.9 — TASK-543 cleanup de flags legacy del selector unificado), Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.11 (2026-04-23 — TASK-576 · HubSpot quote publish-ready)
+
+- **Nuevo campo contextual visible: "Inicio de facturación"**. Vive en el rail de "Términos y plazos", al lado de duración y vigencia. Nace prellenado con la fecha de la cotización, pero el usuario puede ajustarlo antes de guardar.
+- **La fecha ya no es una heurística opaca del bridge**: Greenhouse la persiste como `billing_start_date` en la quote y la usa como source of truth cuando publica líneas recurrentes en HubSpot.
+- **Remitente y empresa emisora ahora salen de contratos canónicos**: el sender humano se resuelve desde la identidad interna (`person_360`) y la empresa emisora desde la entidad operativa de Greenhouse. Ya no depende de owner de HubSpot ni de `space`.
+- **Las líneas de HubSpot dejan de ser “mínimas”**: el outbound exige que cada línea llegue ligada al catálogo sincronizado. El `Ref` visible sale de `product_code` y, si aplica, `legacy_sku`; además viajan frecuencia de facturación, inicio de facturación e impuestos.
+- **Si falta un dato publishable, el sistema bloquea con una razón clara**. Ejemplos: falta de binding al catálogo o falta de inicio de facturación en líneas recurrentes. La meta ya no es “crear algo en HubSpot”, sino dejar la quote lista para publicar sin edición manual.
 
 ## Cambios v3.10 (2026-04-22 — Contactos HubSpot read-through)
 
