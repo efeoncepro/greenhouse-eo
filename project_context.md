@@ -1,3 +1,18 @@
+## Delta 2026-04-23 Reactive projections ahora declaran writer privileges y clasifican fallos infra tipados
+
+- Las projections que escriben tablas shared como excepción (`greenhouse_serving`) ya no deben depender solo de grants implícitos o del texto libre de un dead-letter.
+- Contrato nuevo:
+  - `ProjectionDefinition.requiredTablePrivileges`
+  - helper `src/lib/sync/projection-runtime-health.ts`
+  - helper `src/lib/sync/reactive-error-classification.ts`
+- Regla operativa nueva:
+  - toda projection que materializa tablas shared debe declarar explícitamente sus privilegios requeridos para que Ops Health pueda detectar drift antes de que llegue un evento real
+  - los fallos reactivos de infraestructura ya no deben persistirse solo como texto libre; se tipifican con `error_class`, `error_family` e `is_infrastructure_fault` en `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue`
+- Primer consumidor:
+  - `service_attribution` declara write privileges sobre `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`
+- Operación nueva:
+  - `POST /api/admin/ops/projections/requeue-failed` acepta filtros opcionales `projectionName`, `errorClass` y `onlyInfrastructure`
+
 ## Delta 2026-04-23 TASK-583 converge el contrato local de HubSpot quotes hacia publish/tax native
 
 - El outbound de quotes ya no debe armar payloads create/update por carriles distintos.

@@ -1,5 +1,76 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — TASK-584 tomada: hardening del tooling de migraciones PostgreSQL (Codex)
+
+- **Scope**
+  - cerrar el split operativo entre runtime Connector-first y tooling proxy-first
+  - desbloquear la aplicación real de las migraciones pendientes del hardening `service_attribution`
+- **Task tomada**
+  - `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md`
+  - plan: `docs/tasks/plans/TASK-584-plan.md`
+- **Discovery resumida**
+  - `scripts/migrate.ts` y `scripts/generate-db-types.ts` siguen dependiendo de `DATABASE_URL` / `GREENHOUSE_POSTGRES_HOST`
+  - `scripts/pg-connect.sh` levanta un proxy global en `127.0.0.1:15432`, mata procesos previos y luego delega; el patrón es frágil ante `ECONNRESET`
+  - el entorno local tiene simultáneamente `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` y `GREENHOUSE_POSTGRES_HOST=127.0.0.1`
+  - `pnpm pg:doctor` y una prueba directa con Connector terminaron en timeout, así que además del código puede existir un problema de conectividad local a sanear
+- **Siguiente paso inmediato**
+  - refactorizar el tooling DB para carril autosuficiente
+  - reintentar migraciones y regeneración de tipos sobre ese carril nuevo
+
+## Sesion 2026-04-23 — hardening del dead-letter `service_attribution` y clasificación reactiva infra (Codex)
+
+- **Scope**
+  - cerrar de forma robusta el dead-letter heredado `permission denied for table service_attribution_facts`
+  - evitar que futuros fallos de permisos/shared serving queden como texto libre sin clasificación ni replay selectivo
+- **Implementación local**
+  - `src/lib/sync/projection-registry.ts`
+    - nuevo contrato opcional `requiredTablePrivileges`
+  - `src/lib/sync/projections/service-attribution.ts`
+    - declara write requirements sobre:
+      - `greenhouse_serving.service_attribution_facts`
+      - `greenhouse_serving.service_attribution_unresolved`
+  - `src/lib/sync/projection-runtime-health.ts`
+    - nuevo checker server-only que valida `has_table_privilege(current_user, ...)` por projection
+  - `src/lib/sync/reactive-error-classification.ts`
+    - clasifica fallos reactivos (`infra.db_privilege`, `infra.db_missing_object`, `infra.db_connectivity`, `infra.credential`, `application`)
+  - `src/lib/sync/reactive-consumer.ts`
+    - persiste clasificación tipada junto con `retry/dead-letter`
+  - `src/app/api/cron/projection-recovery/route.ts`
+  - `services/ops-worker/server.ts`
+    - recovery paths usan la misma clasificación tipada
+  - `src/app/api/internal/projections/route.ts`
+  - `src/lib/operations/get-reactive-projection-breakdown.ts`
+  - `src/lib/operations/get-operations-overview.ts`
+    - exponen infraestructura degradada y runtime health sin depender solo de `last_error`
+  - `src/app/api/admin/ops/projections/requeue-failed/route.ts`
+    - nuevo filtro opcional por `projectionName`, `errorClass`, `onlyInfrastructure`
+- **Migraciones creadas**
+  - `20260423190340145_service-attribution-runtime-writer-hardening.sql`
+    - `OWNER TO greenhouse_ops` + grants explícitos para runtime/app/migrator sobre `service_attribution_*`
+  - `20260423190546748_reactive-error-classification-observability.sql`
+    - agrega `error_class`, `error_family`, `is_infrastructure_fault` a:
+      - `greenhouse_sync.outbox_reactive_log`
+      - `greenhouse_sync.projection_refresh_queue`
+- **Verificación ejecutada**
+  - `pnpm exec vitest run src/lib/sync/reactive-error-classification.test.ts src/lib/sync/projection-runtime-health.test.ts src/lib/sync/refresh-queue.test.ts src/lib/sync/reactive-consumer.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+- **Bloqueo operativo**
+  - `pnpm pg:connect:migrate` falló dos veces antes de ejecutar SQL con:
+    - `FAIL:read ECONNRESET`
+  - `pnpm migrate:up` directo también falla porque el wrapper queda apuntando a `127.0.0.1:15432` sin proxy activo:
+    - `ECONNREFUSED 127.0.0.1:15432`
+  - por lo mismo:
+    - las migraciones quedaron **creadas pero no aplicadas**
+    - `src/types/db.d.ts` **no** se regeneró en esta sesión
+- **Siguiente paso recomendado**
+  - restablecer conectividad PostgreSQL (proxy / entorno local)
+  - correr `pnpm pg:connect:migrate`
+  - confirmar que `GET /api/internal/projections` muestra `service_attribution.runtimeHealth.status = ready`
+  - reencolar solo la lane afectada, idealmente:
+    - `POST /api/admin/ops/projections/requeue-failed` con `{ "projectionName": "service_attribution", "onlyInfrastructure": true }`
+
 ## Sesion 2026-04-23 — TASK-583 implementación local del publish/tax native de HubSpot quotes (Codex)
 
 - **Estado real**

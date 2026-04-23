@@ -2,6 +2,14 @@
 
 ## 2026-04-22
 
+### 2026-04-23 — Reactive pipeline endurece dead-letters infra y service attribution deja de depender de grants implícitos
+
+- `service_attribution` ya declara explícitamente sus write requirements sobre `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`, en vez de depender de grants implícitos del schema shared.
+- Nuevo helper `src/lib/sync/projection-runtime-health.ts` permite leer readiness de privilegios por projection; `GET /api/internal/projections` ahora expone runtime health y resalta projections degradadas por drift de permisos.
+- Nuevo helper `src/lib/sync/reactive-error-classification.ts` tipifica fallos reactivos de infraestructura (`infra.db_privilege`, etc.) y persiste metadata estructurada en `outbox_reactive_log` / `projection_refresh_queue` mediante las migraciones `20260423190340145_service-attribution-runtime-writer-hardening.sql` y `20260423190546748_reactive-error-classification-observability.sql`.
+- `projection-recovery`, `ops-worker /reactive/recover` y el consumer reactivo ya no reencolan errores DB como texto libre solamente; ahora marcan `error_class`, `error_family` e `is_infrastructure_fault`.
+- `POST /api/admin/ops/projections/requeue-failed` deja de ser all-or-nothing y ahora acepta filtros por `projectionName`, `errorClass` y `onlyInfrastructure` para replays más seguros.
+
 ### 2026-04-23 — Quote Builder ya crea cotizaciones HubSpot desde el anchor `organization` y las asocia al deal real
 
 - El outbound canonico de cotizaciones deja de bloquearse por ausencia de `space`: `createHubSpotQuote()` ahora usa `organization -> hubspot_company_id` como anchor estructural y trata el mirror legacy de `greenhouse_finance.quotes` como opt-in (`persistFinanceMirror`), no como prerequisito.
