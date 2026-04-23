@@ -403,7 +403,7 @@ bindings:
 - [ ] `AGENTS.md`, `CLAUDE.md`, `project_context.md`, y `.codex/` equivalentes actualizados.
 - [ ] `docs/documentation/finance/crear-deal-desde-quote-builder.md` apunta al nuevo path.
 - [ ] `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm test`, `pnpm build` siguen verdes en `greenhouse-eo` (el Python service está excluido del Next.js build vía `.gcloudignore` y `.dockerignore`).
-- [ ] Follow-up TASK creada para migrar el `hsproject.json` del sibling de v2025.2 a v2026.03 antes del 2026-08-01 deadline.
+- [ ] Follow-up TASK creada para migrar el `hsproject.json` del sibling de v2025.2 a v2026.03 (upgrade estratégico, sin deadline duro; v2025.1 es la que expira 2026-08-01, v2025.2 sigue soportada).
 
 ## Verification
 
@@ -426,7 +426,7 @@ bindings:
 
 ## Follow-ups
 
-- **Migrar el HubSpot Developer Platform app del sibling (`hsproject.json` + `src/app/`) de v2025.2 a 2026.03 antes de 2026-08-01** (deprecation Spring 2026 Spotlight). Task independiente; vive en sibling porque gobierna el BQ sync auth, no el Cloud Run absorbido.
+- **Migrar el HubSpot Developer Platform app del sibling (`hsproject.json` + `src/app/`) de v2025.2 a 2026.03** — upgrade estratégico para acceder a Serverless Functions (reintroducidas en 2026.03), Webhooks Journal batched reads, MCP Auth Apps, App Pages y Code Sharing via npm workspaces. Sin deadline duro: v2025.2 no tiene EOL anunciado (solo v2025.1 expira 2026-08-01). La ventana natural para migrar es antes de fin de 2026 para mantenerse dentro del ciclo Supported. Task independiente; vive en sibling porque gobierna el BQ sync auth, no el Cloud Run absorbido.
 - Evaluar absorber también `notion-bigquery` y `notion-teams` bajo la misma lógica (cada uno con su task si el ROI justifica).
 - Integración lint end-to-end: al cambiar `src/lib/integrations/hubspot-greenhouse-service.ts`, el CI podría correr automáticamente contract tests contra `services/hubspot_greenhouse_integration/tests/` para detectar drift de contrato antes de staging.
 - Evaluar migrar el servicio de `flask + gunicorn` a `fastapi + uvicorn` (fuera de scope — el dolor es de ubicación, no de framework).
@@ -444,7 +444,7 @@ Resueltas en el kick-off (2026-04-23):
 
 Resueltas durante la inspección del sibling (2026-04-23):
 
-- **`hsproject.json` + `src/app/`**: se QUEDAN en sibling — son config de la app HubSpot Developer Platform v2025.2 usada por el BQ sync (token stático del Developer App). Migrarlas a v2026.03 antes del 2026-08-01 EOL es un follow-up obligatorio pero independiente de TASK-574.
+- **`hsproject.json` + `src/app/`**: se QUEDAN en sibling — son config de la app HubSpot Developer Platform v2025.2 usada por el BQ sync (token estático del Developer App). v2025.2 NO está deprecada (solo v2025.1 expira 2026-08-01). Migrar a v2026.03 es un upgrade estratégico (acceso a Serverless Functions + Webhooks Journal v4 batched + MCP Auth Apps), NO un rescate por deadline. Follow-up independiente de TASK-574.
 - **Scripts ops**: se QUEDAN en sibling (`create_hubspot_properties.py`, `backfill_company_capabilities_from_deals.py`, `rotate_greenhouse_integration_secret.py`) — operan sobre el portal HubSpot / Secret Manager, no sobre el runtime del servicio.
 - **Skill `skills/efeonce-hubspot-greenhouse-ops/`**: migra al monorepo en Slice 7.
 - **Webhook handler `POST /webhooks/hubspot`**: migra junto con el resto del servicio. HubSpot app webhook URL apunta al Cloud Run URL (mismo URL post-cutover, sin cambio de config en el portal HubSpot).
