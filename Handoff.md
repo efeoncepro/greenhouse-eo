@@ -1,5 +1,53 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — Quote outbound HubSpot deja de depender de `space` y reancla en `organization` (Codex)
+
+- **Scope:** cerrar el incidente donde una cotizacion emitida en Greenhouse no aparecia creada ni asociada en HubSpot, aunque el deal inline ya existiera.
+- **Root cause real**
+  - la projection `quotation_hubspot_outbound` si estaba corriendo, pero fallaba con `No space found for organization`
+  - el helper `createHubSpotQuote()` seguia tratando `space` como prerequisito estructural del outbound, cuando la ancla canonica del dominio comercial ya es `organization_id`
+  - ademas, el servicio hermano `POST /quotes` usaba `associationTypeId` hardcodeados para `quote -> company/contact`; en live HubSpot eso devolvia `400 One or more associations are invalid`
+- **Implementacion shipped**
+  - `src/lib/commercial/hubspot-contact-resolution.ts`
+    - nuevo resolver canonico de contacto HubSpot con precedencia:
+      - `greenhouse_serving.person_360.hubspot_contact_id`
+      - `greenhouse_crm.contacts.hubspot_contact_id`
+      - `greenhouse_core.identity_profiles.primary_source_object_id` solo si la identidad es `hubspot/contact`
+  - `src/lib/hubspot/create-hubspot-quote.ts`
+    - el create outbound ya no exige `space`
+    - la quote HubSpot se crea/ancla por `organization -> hubspot_company_id` + `hubspot_deal_id` + `contactIdentityProfileId`
+    - `persistFinanceMirror=false` permite el carril canonico comercial sin bloquear por el mirror legacy de `greenhouse_finance.quotes`
+  - `src/lib/hubspot/push-canonical-quote.ts`
+    - reusa el contacto canonico de la quotation (`contact_identity_profile_id`)
+    - fuerza `persistFinanceMirror: false` para el outbound canónico de `greenhouse_commercial.quotations`
+  - `services/ops-worker/deploy.sh`
+    - publica `GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF`
+    - publica `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+    - asegura acceso al secret `greenhouse-integration-api-token` para el worker reactivo
+  - repo hermano `hubspot-bigquery-task-563`
+    - `POST /quotes` deja de usar type IDs hardcodeados y pasa a `create_default_association(...)` para `line_items`, `deals`, `companies` y `contacts`
+    - esto elimina drift de IDs direccionales y usa el contrato default/unlabeled de HubSpot para objetos estándar
+- **Verificacion ejecutada**
+  - `greenhouse-eo`
+    - `pnpm exec vitest run src/lib/hubspot/__tests__/push-canonical-quote.test.ts src/lib/hubspot/__tests__/create-hubspot-quote.test.ts` OK
+    - `pnpm exec tsc --noEmit --pretty false` OK
+    - `pnpm lint` OK
+    - `pnpm build` OK
+  - `hubspot-bigquery-task-563`
+    - `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK
+    - Cloud Run revision live: `hubspot-greenhouse-integration-00022-x29`
+  - smoke real de replay:
+    - quote canonica: `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9`
+    - deal HubSpot anchor: `59465365539`
+    - company HubSpot anchor: `29666506565`
+    - queue item `quotation_hubspot_outbound:quotation:qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9` reprocesada via `ops-worker /reactive/recover`
+    - resultado: `completed`
+    - `greenhouse_commercial.quotations.hubspot_quote_id = 39307909907`
+    - lectura live `GET /companies/29666506565/quotes` confirma la quote `39307909907` asociada a:
+      - `dealId = 59465365539`
+      - `companyId = 29666506565`
+      - `contactIds = ["97482887171"]`
+
 ## Sesion 2026-04-23 — lectura live de todos los deals HubSpot por company en Quote Builder (Codex)
 
 - **Scope:** cerrar el gap operativo donde el cotizador mostraba "sin deals" aunque la company en HubSpot si tenia negocios historicos o ganados, porque `GET /api/commercial/organizations/[id]/deals` solo leia el mirror local `greenhouse_commercial.deals`.

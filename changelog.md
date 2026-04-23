@@ -2,6 +2,15 @@
 
 ## 2026-04-22
 
+### 2026-04-23 — Quote Builder ya crea cotizaciones HubSpot desde el anchor `organization` y las asocia al deal real
+
+- El outbound canonico de cotizaciones deja de bloquearse por ausencia de `space`: `createHubSpotQuote()` ahora usa `organization -> hubspot_company_id` como anchor estructural y trata el mirror legacy de `greenhouse_finance.quotes` como opt-in (`persistFinanceMirror`), no como prerequisito.
+- Nuevo helper `src/lib/commercial/hubspot-contact-resolution.ts` resuelve el contacto HubSpot desde el contrato canonico con precedencia `person_360 CRM facet -> greenhouse_crm.contacts -> identity_profiles` origen HubSpot.
+- `pushCanonicalQuoteToHubSpot()` ahora propaga `contact_identity_profile_id` y crea la quote HubSpot aunque la organización todavía no tenga `space` porque aún no es cliente.
+- `services/ops-worker/deploy.sh` publica explícitamente el token/base URL de la integración HubSpot para que el carril reactivo de quotes no dependa de drift de env en Cloud Run.
+- El servicio hermano `hubspot-greenhouse-integration` deja de hardcodear `associationTypeId` para `POST /quotes` y pasa a asociaciones `default` de HubSpot para `line_items`, `deals`, `companies` y `contacts`, eliminando el error live `400 One or more associations are invalid`.
+- Validación real: la quote canónica `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9` reprocesó OK, persistió `hubspot_quote_id=39307909907`, y la lectura live `GET /companies/29666506565/quotes` confirmó la asociación al deal `59465365539`, company `29666506565` y contacto seleccionado.
+
 ### 2026-04-23 — Quote Builder ya lee todos los deals asociados a la company en HubSpot
 
 - `GET /api/commercial/organizations/[id]/deals` deja de depender solo del mirror local `greenhouse_commercial.deals` y ahora hace `read-through sync` live cuando la organizacion ya tiene `hubspot_company_id`.

@@ -1,3 +1,19 @@
+## Delta 2026-04-23 Quote outbound HubSpot converge on canonical `organization`, not `space`
+
+- El carril reactivo `quotation_hubspot_outbound` ya no debe asumir `space` como anchor para crear cotizaciones HubSpot.
+- La ancla canonica del outbound comercial es:
+  - `organization_id` -> `greenhouse_core.organizations.hubspot_company_id`
+  - `hubspot_deal_id`
+  - `contact_identity_profile_id` -> HubSpot contact
+- `space` queda solo como bridge legacy para mirrors financieros locales cuando la organización ya es cliente; no puede bloquear la creación/sincronización de una quote HubSpot.
+- El resolver canónico de contacto HubSpot para este lane es:
+  - `greenhouse_serving.person_360.hubspot_contact_id`
+  - fallback `greenhouse_crm.contacts.hubspot_contact_id`
+  - fallback final `greenhouse_core.identity_profiles.primary_source_object_id` si el source es `hubspot/contact`
+- El `ops-worker` debe publicar ambos valores de integración para writes reactivos a HubSpot:
+  - `GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF`
+  - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+
 ## Delta 2026-04-23 Quote Builder hydratea deals HubSpot de la company via read-through
 
 - `GET /api/commercial/organizations/[id]/deals` sigue siendo el contrato canónico downstream del `organizationId`, pero ya no asume que `greenhouse_commercial.deals` contiene previamente todos los negocios de la company.

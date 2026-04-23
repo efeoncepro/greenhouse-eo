@@ -26,6 +26,7 @@ interface CanonicalQuoteRow extends Record<string, unknown> {
   quotation_id: string
   quotation_number: string
   organization_id: string | null
+  contact_identity_profile_id: string | null
   hubspot_deal_id: string | null
   hubspot_quote_id: string | null
   description: string | null
@@ -95,6 +96,7 @@ export const pushCanonicalQuoteToHubSpot = async (
   // 1. Read canonical quotation
   const quoteRows = await runGreenhousePostgresQuery<CanonicalQuoteRow>(
     `SELECT quotation_id, quotation_number, organization_id,
+            contact_identity_profile_id,
             hubspot_deal_id, hubspot_quote_id, description,
             valid_until, currency
        FROM greenhouse_commercial.quotations
@@ -180,9 +182,11 @@ export const pushCanonicalQuoteToHubSpot = async (
         title,
         expirationDate,
         description: quote.description || undefined,
+        contactIdentityProfileId: quote.contact_identity_profile_id,
         lineItems,
         dealId: quote.hubspot_deal_id,
-        publishImmediately: false
+        publishImmediately: false,
+        persistFinanceMirror: false
       })
 
       if (!createResult.success || !createResult.hubspotQuoteId) {

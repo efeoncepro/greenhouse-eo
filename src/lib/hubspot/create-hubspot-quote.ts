@@ -4,6 +4,7 @@ import {
   createHubSpotGreenhouseQuote,
   type HubSpotGreenhouseCreateQuoteRequest
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { resolveHubSpotContactByIdentityProfileId } from '@/lib/commercial/hubspot-contact-resolution'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
@@ -17,6 +18,8 @@ export type CreateHubSpotQuoteInput = {
   title: string
   expirationDate: string
   description?: string
+  contactIdentityProfileId?: string | null
+  hubspotContactId?: string | null
   lineItems: Array<{
     name: string
     quantity: number
@@ -25,6 +28,7 @@ export type CreateHubSpotQuoteInput = {
   }>
   dealId?: string
   publishImmediately?: boolean
+  persistFinanceMirror?: boolean
 }
 
 export type CreateHubSpotQuoteResult = {
@@ -33,6 +37,7 @@ export type CreateHubSpotQuoteResult = {
   hubspotQuoteId: string | null
   hubspotQuoteNumber: string | null
   hubspotQuoteLink: string | null
+  hubspotContactId: string | null
   error: string | null
 }
 
@@ -104,27 +109,69 @@ const resolveClientName = async (clientId: string): Promise<string | null> => {
 // ── Core creation logic ──
 
 export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promise<CreateHubSpotQuoteResult> => {
-  const { quoteId, organizationId, title, expirationDate, lineItems, dealId, publishImmediately = false } = input
+  const {
+    quoteId,
+    organizationId,
+    title,
+    expirationDate,
+    lineItems,
+    dealId,
+    publishImmediately = false,
+    persistFinanceMirror = true
+  } = input
 
   // 1. Resolve organization → hubspot_company_id
   const org = await resolveOrganization(organizationId)
 
   if (!org) {
-    return { success: false, quoteId, hubspotQuoteId: null, hubspotQuoteNumber: null, hubspotQuoteLink: null, error: 'Organization not found' }
+    return {
+      success: false,
+      quoteId,
+      hubspotQuoteId: null,
+      hubspotQuoteNumber: null,
+      hubspotQuoteLink: null,
+      hubspotContactId: null,
+      error: 'Organization not found'
+    }
   }
 
   if (!org.hubspot_company_id) {
-    return { success: false, quoteId, hubspotQuoteId: null, hubspotQuoteNumber: null, hubspotQuoteLink: null, error: 'Organization has no HubSpot company linked' }
+    return {
+      success: false,
+      quoteId,
+      hubspotQuoteId: null,
+      hubspotQuoteNumber: null,
+      hubspotQuoteLink: null,
+      hubspotContactId: null,
+      error: 'Organization has no HubSpot company linked'
+    }
   }
 
-  // 2. Resolve space + client for local persistence
-  const space = await resolveSpaceForOrg(organizationId)
+  const explicitHubSpotContactId = input.hubspotContactId?.trim() || null
+  const contactIdentityProfileId = input.contactIdentityProfileId?.trim() || null
+  let resolvedHubSpotContactId = explicitHubSpotContactId
 
-  if (!space) {
-    return { success: false, quoteId, hubspotQuoteId: null, hubspotQuoteNumber: null, hubspotQuoteLink: null, error: 'No space found for organization' }
+  if (!resolvedHubSpotContactId && contactIdentityProfileId) {
+    const contactResolution = await resolveHubSpotContactByIdentityProfileId(contactIdentityProfileId)
+
+    if (!contactResolution?.hubspotContactId) {
+      return {
+        success: false,
+        quoteId,
+        hubspotQuoteId: null,
+        hubspotQuoteNumber: null,
+        hubspotQuoteLink: null,
+        hubspotContactId: null,
+        error: 'Contact has no HubSpot contact linked'
+      }
+    }
+
+    resolvedHubSpotContactId = contactResolution.hubspotContactId
   }
 
-  const clientName = await resolveClientName(space.client_id)
+  // 2. Resolve optional finance quote mirror context.
+  const space = persistFinanceMirror ? await resolveSpaceForOrg(organizationId) : null
+  const clientName = space ? await resolveClientName(space.client_id) : null
 
   // 3. Build Cloud Run request
   const payload: HubSpotGreenhouseCreateQuoteRequest = {
@@ -134,7 +181,8 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
     locale: 'es-cl',
     associations: {
       companyId: org.hubspot_company_id,
-      dealId: dealId || undefined
+      dealId: dealId || undefined,
+      contactIds: resolvedHubSpotContactId ? [resolvedHubSpotContactId] : undefined
     },
     lineItems: lineItems.map(li => ({
       name: li.name,
@@ -162,7 +210,32 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
       hubspotQuoteId: null,
       hubspotQuoteNumber: null,
       hubspotQuoteLink: null,
+      hubspotContactId: resolvedHubSpotContactId,
       error: error instanceof Error ? error.message : 'HubSpot quote creation failed'
+    }
+  }
+
+  if (!persistFinanceMirror) {
+    return {
+      success: true,
+      quoteId,
+      hubspotQuoteId,
+      hubspotQuoteNumber,
+      hubspotQuoteLink,
+      hubspotContactId: resolvedHubSpotContactId,
+      error: null
+    }
+  }
+
+  if (!space) {
+    return {
+      success: true,
+      quoteId,
+      hubspotQuoteId,
+      hubspotQuoteNumber,
+      hubspotQuoteLink,
+      hubspotContactId: resolvedHubSpotContactId,
+      error: null
     }
   }
 
@@ -257,6 +330,7 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
     hubspotQuoteId,
     hubspotQuoteNumber,
     hubspotQuoteLink,
+    hubspotContactId: resolvedHubSpotContactId,
     error: null
   }
 }

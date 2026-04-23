@@ -38,6 +38,7 @@ const buildQuoteRow = (overrides: Record<string, unknown> = {}) => ({
   quotation_id: 'qt-1',
   quotation_number: 'QT-2026-0001',
   organization_id: 'org-1',
+  contact_identity_profile_id: 'identity-contact-1',
   hubspot_deal_id: 'hs-deal-1',
   hubspot_quote_id: null,
   description: 'Test quote',
@@ -128,7 +129,9 @@ describe('pushCanonicalQuoteToHubSpot', () => {
       expect.objectContaining({
         quoteId: 'qt-1',
         organizationId: 'org-1',
+        contactIdentityProfileId: 'identity-contact-1',
         dealId: 'hs-deal-1',
+        persistFinanceMirror: false,
         lineItems: [
           expect.objectContaining({
             name: 'Consultoría',
