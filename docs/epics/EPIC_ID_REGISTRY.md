@@ -18,7 +18,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-002` | `to-do` | `docs/epics/to-do/EPIC-002-commercial-domain-separation-from-finance.md` |
 | `EPIC-003` | `to-do` | `docs/epics/to-do/EPIC-003-ops-registry-federated-operational-framework.md` |
 | `EPIC-004` | `to-do` | `docs/epics/to-do/EPIC-004-typography-unification-poppins-geist.md` |
+| `EPIC-005` | `to-do` | `docs/epics/to-do/EPIC-005-greenhouse-commercial-delivery-orchestrator.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-005`
+- `EPIC-006`
