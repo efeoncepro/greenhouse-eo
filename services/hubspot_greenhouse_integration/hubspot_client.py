@@ -74,6 +74,8 @@ class HubSpotClient:
         "deal_currency_code",
         "dealstage",
         "pipeline",
+        "dealtype",
+        "hs_priority",
         "hubspot_owner_id",
         "closedate",
         "createdate",
@@ -206,6 +208,30 @@ class HubSpotClient:
             f"{HUBSPOT_API}/crm/v3/objects/deals",
             headers=self._headers(),
             json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return response.json()
+
+    def list_deal_pipelines(self) -> list[dict[str, Any]]:
+        response = self.session.get(
+            f"{HUBSPOT_API}/crm/v3/pipelines/deals",
+            headers=self._headers(),
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            _raise_hubspot_error(response)
+        return (response.json() or {}).get("results") or []
+
+    def get_deal_property(self, property_name: str) -> dict[str, Any]:
+        normalized_name = property_name.strip()
+        if not normalized_name:
+            raise ValueError("property_name is required")
+
+        response = self.session.get(
+            f"{HUBSPOT_API}/crm/v3/properties/deals/{normalized_name}",
+            headers=self._headers(),
             timeout=self.timeout_seconds,
         )
         if response.status_code >= 400:

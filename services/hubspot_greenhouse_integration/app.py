@@ -185,6 +185,14 @@ def create_app() -> Flask:
         if stage_id:
             props["dealstage"] = stage_id
 
+        deal_type = _normalize_optional_text(body, "dealType")
+        if deal_type:
+            props["dealtype"] = deal_type
+
+        priority = _normalize_optional_text(body, "priority")
+        if priority:
+            props["hs_priority"] = priority
+
         owner_id = _normalize_optional_text(body, "ownerHubspotUserId")
         if owner_id:
             props["hubspot_owner_id"] = owner_id
@@ -212,9 +220,66 @@ def create_app() -> Flask:
             "hubspotDealId": deal_id,
             "pipelineUsed": props.get("pipeline"),
             "stageUsed": props.get("dealstage"),
+            "dealTypeUsed": props.get("dealtype"),
+            "priorityUsed": props.get("hs_priority"),
             "ownerUsed": props.get("hubspot_owner_id"),
         }
         return payload, deal_id
+
+    def _build_deal_pipeline_metadata(pipelines: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        payload: list[dict[str, Any]] = []
+        for pipeline in pipelines:
+            stages_payload: list[dict[str, Any]] = []
+            for stage in pipeline.get("stages") or []:
+                metadata = stage.get("metadata")
+                stages_payload.append(
+                    {
+                        "stageId": str(stage.get("id") or ""),
+                        "label": stage.get("label"),
+                        "displayOrder": stage.get("displayOrder"),
+                        "archived": bool(stage.get("archived")),
+                        "metadata": metadata if isinstance(metadata, dict) else {},
+                    }
+                )
+
+            payload.append(
+                {
+                    "pipelineId": str(pipeline.get("id") or ""),
+                    "label": pipeline.get("label"),
+                    "displayOrder": pipeline.get("displayOrder"),
+                    "archived": bool(pipeline.get("archived")),
+                    "stages": stages_payload,
+                }
+            )
+        return payload
+
+    def _build_deal_property_metadata(
+        property_name: str,
+        prop: dict[str, Any] | None,
+    ) -> dict[str, Any] | None:
+        if prop is None:
+            return None
+
+        options_payload: list[dict[str, Any]] = []
+        for option in prop.get("options") or []:
+            options_payload.append(
+                {
+                    "value": option.get("value"),
+                    "label": option.get("label"),
+                    "description": option.get("description"),
+                    "displayOrder": option.get("displayOrder"),
+                    "hidden": bool(option.get("hidden")),
+                }
+            )
+
+        return {
+            "propertyName": property_name,
+            "label": prop.get("label"),
+            "type": prop.get("type"),
+            "fieldType": prop.get("fieldType"),
+            "hubspotDefined": bool(prop.get("hubspotDefined")),
+            "options": options_payload,
+        }
 
     def _associated_record_ids(record: dict[str, Any], key: str) -> set[str]:
         associations = record.get("associations") or {}
@@ -345,6 +410,42 @@ def create_app() -> Flask:
     @app.get("/contract")
     def contract():
         return jsonify(build_contract(app.config))
+
+    @app.get("/deals/metadata")
+    def deal_metadata():
+        try:
+            client = _client()
+            property_aliases = {
+                "dealType": "dealtype",
+                "priority": "hs_priority",
+            }
+            properties: dict[str, Any] = {}
+
+            for alias, property_name in property_aliases.items():
+                try:
+                    properties[alias] = _build_deal_property_metadata(
+                        property_name,
+                        client.get_deal_property(property_name),
+                    )
+                except HubSpotIntegrationError as exc:
+                    if exc.status_code == 404:
+                        properties[alias] = None
+                        continue
+                    raise
+
+            return jsonify(
+                {
+                    "objectType": "deals",
+                    "pipelines": _build_deal_pipeline_metadata(
+                        client.list_deal_pipelines()
+                    ),
+                    "properties": properties,
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
 
     @app.get("/companies/<company_id>")
     def company_profile(company_id: str):

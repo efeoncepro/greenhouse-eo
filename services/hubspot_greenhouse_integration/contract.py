@@ -45,6 +45,10 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "method": "POST",
                 "path": "/deals",
             },
+            "deal_metadata": {
+                "method": "GET",
+                "path": "/deals/metadata",
+            },
             "service_profile": {
                 "method": "GET",
                 "path": "/services/{hubspotServiceId}",
@@ -150,6 +154,8 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "currency",
                 "pipelineId",
                 "stageId",
+                "dealType",
+                "priority",
                 "ownerHubspotUserId",
                 "closeDate",
                 "businessLineCode",
@@ -168,6 +174,8 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "hubspotDealId",
                 "pipelineUsed",
                 "stageUsed",
+                "dealTypeUsed",
+                "priorityUsed",
                 "ownerUsed",
                 "message",
             ],
@@ -269,6 +277,8 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "deal_currency_code",
                 "dealstage",
                 "pipeline",
+                "dealtype",
+                "hs_priority",
                 "hubspot_owner_id",
                 "closedate",
                 "createdate",
@@ -303,6 +313,34 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
             "createCustomCompanyPropertyOnlyIfMissingAtCompanyLevel": True,
             "restrictProductCustomPropertiesToGhPrefix": True,
             "dealIdempotencyUsesGhPropertyWhenPresent": True,
+        },
+        "dealMetadataModel": {
+            "pipelines": [
+                "pipelineId",
+                "label",
+                "displayOrder",
+                "archived",
+                "stages",
+            ],
+            "stage": [
+                "stageId",
+                "label",
+                "displayOrder",
+                "archived",
+                "metadata",
+            ],
+            "properties": [
+                "propertyName",
+                "label",
+                "type",
+                "fieldType",
+                "hubspotDefined",
+                "options",
+            ],
+            "supportedPropertyLookups": [
+                "dealtype",
+                "hs_priority",
+            ],
         },
         "realtime": {
             "supported": bool(
