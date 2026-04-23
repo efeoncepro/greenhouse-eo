@@ -15,6 +15,7 @@ try:
         build_company_profile,
         build_company_search_item,
         build_contact_profile,
+        build_deal_profile,
         build_line_item_profile,
         build_owner_profile,
         build_product_profile,
@@ -39,6 +40,7 @@ except ImportError:
         build_company_profile,
         build_company_search_item,
         build_contact_profile,
+        build_deal_profile,
         build_line_item_profile,
         build_owner_profile,
         build_product_profile,
@@ -252,6 +254,24 @@ def create_app() -> Flask:
                 }
             )
         return payload
+
+    def _build_deal_pipeline_index(
+        pipelines: list[dict[str, Any]],
+    ) -> tuple[dict[str, str | None], dict[tuple[str, str], dict[str, Any]]]:
+        pipeline_labels_by_id: dict[str, str | None] = {}
+        stage_metadata_by_key: dict[tuple[str, str], dict[str, Any]] = {}
+
+        for pipeline in _build_deal_pipeline_metadata(pipelines):
+            pipeline_id = str(pipeline.get("pipelineId") or "")
+            pipeline_labels_by_id[pipeline_id] = pipeline.get("label")
+
+            for stage in pipeline.get("stages") or []:
+                stage_id = str(stage.get("stageId") or "")
+                if not stage_id:
+                    continue
+                stage_metadata_by_key[(pipeline_id, stage_id)] = stage
+
+        return pipeline_labels_by_id, stage_metadata_by_key
 
     def _build_deal_property_metadata(
         property_name: str,
@@ -528,6 +548,25 @@ def create_app() -> Flask:
                 exc.status_code or 502
             )
 
+    @app.get("/owners/resolve")
+    def owner_resolution():
+        email = request.args.get("email", "").strip()
+        if not email:
+            return jsonify({"error": "email is required"}), 400
+
+        try:
+            owner = _client().resolve_owner_by_email(email)
+            return jsonify(
+                {
+                    "email": email,
+                    "owner": build_owner_profile(str(owner.get("id")), owner) if owner else None,
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
     @app.get("/companies/<company_id>/contacts")
     def company_contacts(company_id: str):
         try:
@@ -552,6 +591,61 @@ def create_app() -> Flask:
                     "hubspotCompanyId": company_id,
                     "count": len(ordered_contacts),
                     "contacts": ordered_contacts,
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.get("/companies/<company_id>/deals")
+    def company_deals(company_id: str):
+        try:
+            contract = build_contract(app.config)
+            client = _client()
+            deal_ids = client.list_company_deal_ids(company_id)
+            if not deal_ids:
+                return jsonify(
+                    {
+                        "hubspotCompanyId": company_id,
+                        "count": 0,
+                        "deals": [],
+                    }
+                )
+
+            deals_raw = client.get_deals_by_ids(
+                deal_ids,
+                properties=contract["sourceFields"]["deals"],
+            )
+            pipeline_labels_by_id, stage_metadata_by_key = _build_deal_pipeline_index(
+                client.list_deal_pipelines()
+            )
+            deals_by_id = {
+                str(deal.get("id")): build_deal_profile(
+                    deal,
+                    pipeline_labels_by_id=pipeline_labels_by_id,
+                    stage_metadata_by_key=stage_metadata_by_key,
+                )
+                for deal in deals_raw
+            }
+            ordered_deals = [
+                deals_by_id[deal_id]
+                for deal_id in deal_ids
+                if deal_id in deals_by_id
+            ]
+            ordered_deals.sort(
+                key=lambda deal: (
+                    str(deal.get("lastModifiedAt") or ""),
+                    str(deal.get("hubspotDealId") or ""),
+                ),
+                reverse=True,
+            )
+
+            return jsonify(
+                {
+                    "hubspotCompanyId": company_id,
+                    "count": len(ordered_deals),
+                    "deals": ordered_deals,
                 }
             )
         except HubSpotIntegrationError as exc:

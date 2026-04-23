@@ -29,9 +29,17 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "method": "GET",
                 "path": "/companies/{hubspotCompanyId}/owner",
             },
+            "owner_resolution": {
+                "method": "GET",
+                "path": "/owners/resolve?email={email}",
+            },
             "company_contacts": {
                 "method": "GET",
                 "path": "/companies/{hubspotCompanyId}/contacts",
+            },
+            "company_deals": {
+                "method": "GET",
+                "path": "/companies/{hubspotCompanyId}/deals",
             },
             "company_services": {
                 "method": "GET",
@@ -142,6 +150,15 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "hsLeadStatus",
             ],
         },
+        "ownerResolutionModel": {
+            "required": [
+                "email",
+            ],
+            "response": [
+                "email",
+                "owner",
+            ],
+        },
         "dealCreateModel": {
             "required": [
                 "idempotencyKey",
@@ -184,6 +201,16 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "HUBSPOT_RATE_LIMIT",
                 "HUBSPOT_VALIDATION",
                 "HUBSPOT_UPSTREAM",
+            ],
+        },
+        "companyDealsModel": {
+            "required": [
+                "hubspotCompanyId",
+            ],
+            "response": [
+                "hubspotCompanyId",
+                "count",
+                "deals",
             ],
         },
         "productModel": {

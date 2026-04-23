@@ -178,6 +178,54 @@ def build_contact_profile(contact: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def build_deal_profile(
+    deal: dict[str, Any],
+    *,
+    pipeline_labels_by_id: dict[str, str | None] | None = None,
+    stage_metadata_by_key: dict[tuple[str, str], dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    props = deal.get("properties") or {}
+    hubspot_deal_id = str(deal.get("id"))
+    pipeline_id = str(props.get("pipeline") or "").strip() or None
+    stage_id = str(props.get("dealstage") or "").strip() or None
+    stage_meta = (stage_metadata_by_key or {}).get((pipeline_id or "", stage_id or ""), {})
+    stage_label = stage_meta.get("label")
+    stage_display_order = stage_meta.get("displayOrder")
+    metadata = stage_meta.get("metadata") if isinstance(stage_meta, dict) else {}
+    metadata = metadata if isinstance(metadata, dict) else {}
+    probability_raw = metadata.get("probability")
+    probability = _safe_number(probability_raw)
+    is_closed_raw = str(metadata.get("isClosed") or "").strip().lower()
+    is_closed = is_closed_raw == "true"
+    is_won = is_closed and probability is not None and probability >= 1
+
+    return {
+        "hubspotDealId": hubspot_deal_id,
+        "dealName": props.get("dealname"),
+        "amount": _safe_number(props.get("amount")),
+        "currency": props.get("deal_currency_code"),
+        "pipelineId": pipeline_id,
+        "pipelineLabel": (pipeline_labels_by_id or {}).get(pipeline_id or ""),
+        "stageId": stage_id,
+        "stageLabel": stage_label,
+        "stageDisplayOrder": stage_display_order,
+        "probabilityPct": probability * 100 if probability is not None and probability <= 1 else probability,
+        "isClosed": is_closed,
+        "isWon": is_won,
+        "dealType": props.get("dealtype"),
+        "priority": props.get("hs_priority"),
+        "ownerHubspotUserId": props.get("hubspot_owner_id"),
+        "closeDate": props.get("closedate"),
+        "createdAt": props.get("createdate"),
+        "lastModifiedAt": props.get("hs_lastmodifieddate") or deal.get("updatedAt"),
+        "source": {
+            "sourceSystem": "hubspot",
+            "sourceObjectType": "deal",
+            "sourceObjectId": hubspot_deal_id,
+        },
+    }
+
+
 def build_product_profile(product: dict[str, Any]) -> dict[str, Any]:
     props = product.get("properties") or {}
     is_recurring = str(props.get("hs_recurring") or "").lower() in ("true", "1", "yes")

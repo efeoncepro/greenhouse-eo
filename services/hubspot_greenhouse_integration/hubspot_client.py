@@ -327,6 +327,50 @@ class HubSpotClient:
             )
         return response.json()
 
+    def list_owners(
+        self,
+        *,
+        email: str | None = None,
+        archived: bool = False,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        params: dict[str, Any] = {
+            "archived": str(bool(archived)).lower(),
+            "limit": max(1, min(int(limit), 100)),
+        }
+        normalized_email = (email or "").strip()
+        if normalized_email:
+            params["email"] = normalized_email
+
+        response = self.session.get(
+            f"{HUBSPOT_API}/crm/v3/owners",
+            headers=self._headers(),
+            params=params,
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return (response.json() or {}).get("results") or []
+
+    def resolve_owner_by_email(self, email: str) -> dict[str, Any] | None:
+        normalized_email = (email or "").strip()
+        if not normalized_email:
+            return None
+
+        normalized_email_key = normalized_email.casefold()
+
+        for archived in (False, True):
+            owners = self.list_owners(email=normalized_email, archived=archived)
+            for owner in owners:
+                owner_email = str(owner.get("email") or "").strip()
+                if owner_email and owner_email.casefold() == normalized_email_key:
+                    return owner
+
+        return None
+
     def list_company_contact_ids(self, company_id: str, *, limit: int = 100) -> list[str]:
         contact_ids: list[str] = []
         after: str | None = None
@@ -369,6 +413,48 @@ class HubSpotClient:
             deduped_contact_ids.append(contact_id)
         return deduped_contact_ids
 
+    def list_company_deal_ids(self, company_id: str, *, limit: int = 100) -> list[str]:
+        deal_ids: list[str] = []
+        after: str | None = None
+
+        while True:
+            params: dict[str, str | int] = {"limit": limit}
+            if after:
+                params["after"] = after
+
+            response = self.session.get(
+                f"{HUBSPOT_API}/crm/v4/objects/companies/{company_id}/associations/deals",
+                headers=self._headers(),
+                params=params,
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+
+            payload = response.json()
+            for result in payload.get("results") or []:
+                deal_id = result.get("toObjectId")
+                if deal_id is not None:
+                    deal_ids.append(str(deal_id))
+
+            paging = payload.get("paging") or {}
+            next_page = paging.get("next") or {}
+            after = next_page.get("after")
+            if not after:
+                break
+
+        deduped_deal_ids: list[str] = []
+        seen = set()
+        for deal_id in deal_ids:
+            if deal_id in seen:
+                continue
+            seen.add(deal_id)
+            deduped_deal_ids.append(deal_id)
+        return deduped_deal_ids
+
     def get_contacts_by_ids(
         self,
         contact_ids: list[str],
@@ -387,6 +473,37 @@ class HubSpotClient:
                 json={
                     "properties": properties,
                     "inputs": [{"id": contact_id} for contact_id in batch_ids],
+                },
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+            payload = response.json()
+            results.extend(payload.get("results") or [])
+        return results
+
+    def get_deals_by_ids(
+        self,
+        deal_ids: list[str],
+        *,
+        properties: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        if not deal_ids:
+            return []
+
+        props = self._unique_properties(properties or self.DEAL_PROPERTIES)
+        results: list[dict[str, Any]] = []
+        for start in range(0, len(deal_ids), 100):
+            batch_ids = deal_ids[start : start + 100]
+            response = self.session.post(
+                f"{HUBSPOT_API}/crm/v3/objects/deals/batch/read",
+                headers=self._headers(),
+                json={
+                    "properties": props,
+                    "inputs": [{"id": deal_id} for deal_id in batch_ids],
                 },
                 timeout=self.timeout_seconds,
             )
