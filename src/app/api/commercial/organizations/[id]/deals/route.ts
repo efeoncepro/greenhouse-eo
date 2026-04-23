@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
+import { getOrganizationDetail } from '@/lib/account-360/organization-store'
 import { listCommercialDealsForOrganization } from '@/lib/commercial/deals-store'
+import { syncOrganizationHubSpotDeals } from '@/lib/commercial/sync-organization-hubspot-deals'
 import {
   buildTenantEntitlementSubject,
   createDealFromQuoteContext,
@@ -43,7 +45,21 @@ export async function GET(
     return NextResponse.json({ error: 'Organization not visible to this tenant.' }, { status: 403 })
   }
 
-  const items = await listCommercialDealsForOrganization(normalizedOrganizationId)
+  let items = await listCommercialDealsForOrganization(normalizedOrganizationId)
+
+  const organization = await getOrganizationDetail(normalizedOrganizationId)
+
+  if (organization?.hubspotCompanyId) {
+    try {
+      await syncOrganizationHubSpotDeals({ organizationId: normalizedOrganizationId })
+      items = await listCommercialDealsForOrganization(normalizedOrganizationId)
+    } catch (error) {
+      console.warn('[commercial organization deals] hubspot read-through sync failed', {
+        organizationId: normalizedOrganizationId,
+        error: error instanceof Error ? error.message : String(error)
+      })
+    }
+  }
 
   return NextResponse.json({ items, total: items.length })
 }

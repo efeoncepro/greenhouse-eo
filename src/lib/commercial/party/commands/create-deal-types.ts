@@ -184,9 +184,13 @@ export class DealCreateGovernanceIncompleteError extends DealCreateError {
 
 export class DealCreateMappingMissingError extends DealCreateError {
   constructor(reason: 'owner_mapping_missing' | 'contact_mapping_missing', details?: unknown) {
+    const message = reason === 'owner_mapping_missing'
+      ? 'No pudimos resolver el propietario de HubSpot para tu usuario actual.'
+      : 'No pudimos resolver el contacto de HubSpot asociado a esta cotización.'
+
     super(
       'DEAL_CREATE_MAPPING_MISSING',
-      `Deal creation mapping is missing: ${reason}`,
+      message,
       409,
       { reason, ...(details && typeof details === 'object' ? details as Record<string, unknown> : { details }) }
     )

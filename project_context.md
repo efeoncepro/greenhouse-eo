@@ -1,3 +1,10 @@
+## Delta 2026-04-23 Quote Builder hydratea deals HubSpot de la company via read-through
+
+- `GET /api/commercial/organizations/[id]/deals` sigue siendo el contrato canónico downstream del `organizationId`, pero ya no asume que `greenhouse_commercial.deals` contiene previamente todos los negocios de la company.
+- Si la organization tiene `hubspot_company_id`, el endpoint ejecuta una hidratación live desde HubSpot y luego responde desde Greenhouse con el mirror actualizado.
+- La lane canónica nueva vive en `src/lib/commercial/sync-organization-hubspot-deals.ts` y materializa todos los deals asociados a la company, incluyendo historicos, `closedwon` y `closedlost`; no filtra por etapa.
+- La dependencia upstream es `GET /companies/{hubspotCompanyId}/deals` del servicio `hubspot-greenhouse-integration`, que devuelve metadata live de pipeline y stage desde HubSpot Pipelines API.
+
 ## Delta 2026-04-22 Quote Builder contact hydration converge via canonical read-through
 
 - `GET /api/commercial/organizations/[id]/contacts` sigue siendo el contrato canónico downstream del `organizationId`, pero ya no asume que el mirror local de contactos está precargado.

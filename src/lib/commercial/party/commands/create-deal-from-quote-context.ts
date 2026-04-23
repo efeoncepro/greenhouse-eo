@@ -6,6 +6,7 @@ import type { PoolClient } from 'pg'
 
 import { resolveHubSpotBusinessLine } from '@/lib/business-line/hubspot'
 import { query, withTransaction } from '@/lib/db'
+import { loadActorHubSpotOwnerIdentity } from '@/lib/commercial/hubspot-owner-identity'
 import {
   getDealCreationContext,
   validateDealCreationSelection,
@@ -20,6 +21,7 @@ import {
 import { ensureHubSpotDealMetadataFresh } from '@/lib/commercial/deal-metadata-sync'
 import {
   createHubSpotGreenhouseDeal,
+  resolveHubSpotGreenhouseOwnerByEmail,
   type HubSpotGreenhouseCreateDealResponse
 } from '@/lib/integrations/hubspot-greenhouse-service'
 
@@ -92,10 +94,6 @@ interface AttemptRow extends Record<string, unknown> {
   approval_id: string | null
   created_at: string
   completed_at: string | null
-}
-
-interface ActorOwnerRow extends Record<string, unknown> {
-  hubspot_owner_id: string | null
 }
 
 interface QuoteContactRow extends Record<string, unknown> {
@@ -189,49 +187,18 @@ const loadOrganization = async (organizationId: string): Promise<OrganizationRow
   return rows[0] ?? null
 }
 
-const loadActorHubSpotOwnerId = async (
-  actor: CreateDealFromQuoteContextInput['actor']
-): Promise<string | null> => {
-  if (actor.memberId) {
-    const rows = await query<ActorOwnerRow>(
-      `SELECT hubspot_owner_id
-         FROM greenhouse_core.members
-        WHERE member_id = $1
-          AND hubspot_owner_id IS NOT NULL
-        LIMIT 1`,
-      [actor.memberId]
-    )
+const persistActorHubSpotOwnerId = async (memberId: string | null, hubspotOwnerId: string) => {
+  if (!memberId || !hubspotOwnerId.trim()) return
 
-    if (rows[0]?.hubspot_owner_id) return rows[0].hubspot_owner_id
-  }
-
-  if (actor.identityProfileId) {
-    const rows = await query<ActorOwnerRow>(
-      `SELECT m.hubspot_owner_id
-         FROM greenhouse_serving.person_360 AS p360
-         JOIN greenhouse_core.members AS m
-           ON m.member_id = p360.member_id
-        WHERE p360.identity_profile_id = $1
-          AND m.hubspot_owner_id IS NOT NULL
-        LIMIT 1`,
-      [actor.identityProfileId]
-    )
-
-    if (rows[0]?.hubspot_owner_id) return rows[0].hubspot_owner_id
-  }
-
-  const rows = await query<ActorOwnerRow>(
-    `SELECT m.hubspot_owner_id
-       FROM greenhouse_serving.person_360 AS p360
-       JOIN greenhouse_core.members AS m
-         ON m.member_id = p360.member_id
-      WHERE p360.user_id = $1
-        AND m.hubspot_owner_id IS NOT NULL
-      LIMIT 1`,
-    [actor.userId]
+  await query(
+    `UPDATE greenhouse_core.members
+        SET hubspot_owner_id = $2,
+            updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $1
+        AND active = TRUE
+        AND COALESCE(hubspot_owner_id, '') <> $2`,
+    [memberId, hubspotOwnerId]
   )
-
-  return rows[0]?.hubspot_owner_id ?? null
 }
 
 const loadQuoteContact = async (
@@ -241,9 +208,20 @@ const loadQuoteContact = async (
   const rows = await query<QuoteContactRow>(
     `SELECT q.quotation_id,
             q.contact_identity_profile_id,
-            COALESCE(p360.hubspot_contact_id, ct.hubspot_contact_id) AS hubspot_contact_id,
-            COALESCE(p360.resolved_display_name, ct.display_name) AS contact_display_name
+            COALESCE(
+              p360.hubspot_contact_id,
+              ct.hubspot_contact_id,
+              CASE
+                WHEN ip.primary_source_system = 'hubspot'
+                 AND ip.primary_source_object_type = 'contact'
+                THEN ip.primary_source_object_id
+                ELSE NULL
+              END
+            ) AS hubspot_contact_id,
+            COALESCE(p360.resolved_display_name, ct.display_name, ip.full_name) AS contact_display_name
        FROM greenhouse_commercial.quotations AS q
+       LEFT JOIN greenhouse_core.identity_profiles AS ip
+         ON ip.profile_id = q.contact_identity_profile_id
        LEFT JOIN greenhouse_serving.person_360 AS p360
          ON p360.identity_profile_id = q.contact_identity_profile_id
        LEFT JOIN greenhouse_crm.contacts AS ct
@@ -263,14 +241,25 @@ const loadContactResolution = async (
   identityProfileId: string
 ): Promise<ContactResolutionRow | null> => {
   const rows = await query<ContactResolutionRow>(
-    `SELECT p360.identity_profile_id,
-            COALESCE(p360.hubspot_contact_id, ct.hubspot_contact_id) AS hubspot_contact_id,
-            COALESCE(p360.resolved_display_name, ct.display_name) AS contact_display_name
-       FROM greenhouse_serving.person_360 AS p360
+    `SELECT ip.profile_id AS identity_profile_id,
+            COALESCE(
+              p360.hubspot_contact_id,
+              ct.hubspot_contact_id,
+              CASE
+                WHEN ip.primary_source_system = 'hubspot'
+                 AND ip.primary_source_object_type = 'contact'
+                THEN ip.primary_source_object_id
+                ELSE NULL
+              END
+            ) AS hubspot_contact_id,
+            COALESCE(p360.resolved_display_name, ct.display_name, ip.full_name) AS contact_display_name
+       FROM greenhouse_core.identity_profiles AS ip
+       LEFT JOIN greenhouse_serving.person_360 AS p360
+         ON p360.identity_profile_id = ip.profile_id
        LEFT JOIN greenhouse_crm.contacts AS ct
-         ON ct.linked_identity_profile_id = p360.identity_profile_id
+         ON ct.linked_identity_profile_id = ip.profile_id
         AND ct.is_deleted = FALSE
-       WHERE p360.identity_profile_id = $1
+       WHERE ip.profile_id = $1
        LIMIT 1`,
     [identityProfileId]
   )
@@ -288,10 +277,28 @@ const resolveOwner = async (
     return { hubspotOwnerUserId: explicitOwner }
   }
 
-  const actorOwner = await loadActorHubSpotOwnerId(input.actor)
+  const actorIdentity = await loadActorHubSpotOwnerIdentity(input.actor)
+  const actorOwner = actorIdentity.hubspotOwnerId?.trim() || null
 
   if (actorOwner) {
     return { hubspotOwnerUserId: actorOwner }
+  }
+
+  for (const email of actorIdentity.candidateEmails) {
+    const resolution = await resolveHubSpotGreenhouseOwnerByEmail(email)
+
+    if (resolution.status === 'resolved' && resolution.owner?.hubspotOwnerId) {
+      await persistActorHubSpotOwnerId(actorIdentity.memberId, resolution.owner.hubspotOwnerId)
+
+      return { hubspotOwnerUserId: resolution.owner.hubspotOwnerId }
+    }
+
+    if (resolution.status === 'endpoint_not_deployed') {
+      console.warn('[createDealFromQuoteContext] owner resolution endpoint not deployed yet', {
+        email
+      })
+      break
+    }
   }
 
   const defaultOwner = creationContext.defaultOwnerHubspotUserId?.trim() || null
@@ -302,8 +309,9 @@ const resolveOwner = async (
 
   throw new DealCreateMappingMissingError('owner_mapping_missing', {
     userId: input.actor.userId,
-    memberId: input.actor.memberId ?? null,
-    identityProfileId: input.actor.identityProfileId ?? null
+    memberId: actorIdentity.memberId || input.actor.memberId || null,
+    identityProfileId: input.actor.identityProfileId ?? null,
+    attemptedEmails: actorIdentity.candidateEmails
   })
 }
 

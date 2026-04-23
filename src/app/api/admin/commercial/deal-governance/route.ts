@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { syncHubSpotOwnerMappings } from '@/lib/commercial/hubspot-owner-sync'
 import { query } from '@/lib/db'
 import { syncHubSpotDealMetadata } from '@/lib/commercial/deal-metadata-sync'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
@@ -13,7 +14,7 @@ export async function GET() {
     return errorResponse ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [pipelineRows, defaultRows, propertyRows] = await Promise.all([
+  const [pipelineRows, defaultRows, propertyRows, ownerRows] = await Promise.all([
     query<{
       pipeline_count: string | number
       stage_count: string | number
@@ -53,6 +54,23 @@ export async function GET() {
               synced_at::text AS synced_at
          FROM greenhouse_commercial.hubspot_deal_property_config
         ORDER BY property_name ASC`
+    ),
+    query<{
+      active_member_count: string | number
+      mapped_member_count: string | number
+      unmapped_member_count: string | number
+    }>(
+      `SELECT COUNT(*)::text AS active_member_count,
+              COUNT(*) FILTER (
+                WHERE hubspot_owner_id IS NOT NULL
+                  AND btrim(hubspot_owner_id) <> ''
+              )::text AS mapped_member_count,
+              COUNT(*) FILTER (
+                WHERE hubspot_owner_id IS NULL
+                   OR btrim(hubspot_owner_id) = ''
+              )::text AS unmapped_member_count
+         FROM greenhouse_core.members
+        WHERE active = TRUE`
     )
   ])
 
@@ -63,6 +81,11 @@ export async function GET() {
       stageCount: Number(pipelineRows[0]?.stage_count ?? 0),
       activePipelineCount: Number(pipelineRows[0]?.active_pipeline_count ?? 0),
       defaultStageCount: Number(pipelineRows[0]?.default_stage_count ?? 0)
+    },
+    ownerMappings: {
+      activeMemberCount: Number(ownerRows[0]?.active_member_count ?? 0),
+      mappedMemberCount: Number(ownerRows[0]?.mapped_member_count ?? 0),
+      unmappedMemberCount: Number(ownerRows[0]?.unmapped_member_count ?? 0)
     },
     defaults: defaultRows,
     properties: propertyRows
@@ -77,12 +100,16 @@ export async function POST() {
   }
 
   try {
-    const summary = await syncHubSpotDealMetadata()
+    const [metadataSync, ownerMappingSync] = await Promise.all([
+      syncHubSpotDealMetadata(),
+      syncHubSpotOwnerMappings()
+    ])
 
     return NextResponse.json({
       ok: true,
       actorUserId: tenant.userId,
-      ...summary
+      metadataSync,
+      ownerMappingSync
     })
   } catch (error) {
     console.error('[api/admin/commercial/deal-governance] metadata sync failed', error)

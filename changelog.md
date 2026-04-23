@@ -2,6 +2,13 @@
 
 ## 2026-04-22
 
+### 2026-04-23 — Quote Builder ya lee todos los deals asociados a la company en HubSpot
+
+- `GET /api/commercial/organizations/[id]/deals` deja de depender solo del mirror local `greenhouse_commercial.deals` y ahora hace `read-through sync` live cuando la organizacion ya tiene `hubspot_company_id`.
+- Nuevo helper `src/lib/commercial/sync-organization-hubspot-deals.ts` materializa en Greenhouse todos los deals asociados a la company en HubSpot, incluyendo historicos, `closedwon` y `closedlost`; no filtra por etapa.
+- El cotizador sigue consumiendo la misma route canónica, por lo que el fix corrige la lectura de deals existentes sin introducir otra superficie paralela.
+- Validacion real en `staging`: `Aguas Andinas` (`org-b3e9e92b-518d-4924-b8c0-83cd1f9aa17f`) ahora devuelve `5` negocios, incluido `Aguas Andinas - Implementación` (`58295637620`) en `Cierre ganado`.
+
 ### 2026-04-22 — TASK-573 completa el contrato de nacimiento de deals del Quote Builder
 
 - El create inline desde `POST /api/commercial/organizations/[id]/deals` ya no nace “desnudo”: el backend resuelve `owner`, `contact`, `dealType` y `priority` antes de llamar a HubSpot, y persiste esos valores efectivos en `deal_create_attempts` + `greenhouse_commercial.deals`.

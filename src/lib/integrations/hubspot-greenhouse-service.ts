@@ -85,6 +85,13 @@ export interface HubSpotGreenhouseCompanyOwnerResponse {
   detail?: string
 }
 
+export interface HubSpotGreenhouseOwnerResolutionResponse {
+  email: string
+  owner: HubSpotGreenhouseOwnerProfile | null
+  detail?: string
+  status: 'resolved' | 'not_found' | 'endpoint_not_deployed'
+}
+
 export interface HubSpotGreenhouseContactProfile {
   hubspotContactId: string
   email: string | null
@@ -103,6 +110,38 @@ export interface HubSpotGreenhouseCompanyContactsResponse {
   hubspotCompanyId: string
   count: number
   contacts: HubSpotGreenhouseContactProfile[]
+}
+
+export interface HubSpotGreenhouseCompanyDealProfile {
+  hubspotDealId: string
+  dealName: string | null
+  amount: number | null
+  currency: string | null
+  pipelineId: string | null
+  pipelineLabel: string | null
+  stageId: string | null
+  stageLabel: string | null
+  stageDisplayOrder: number | null
+  probabilityPct: number | null
+  isClosed: boolean
+  isWon: boolean
+  dealType: string | null
+  priority: string | null
+  ownerHubspotUserId: string | null
+  closeDate: string | null
+  createdAt: string | null
+  lastModifiedAt: string | null
+  source: {
+    sourceSystem: string
+    sourceObjectType: string
+    sourceObjectId: string
+  }
+}
+
+export interface HubSpotGreenhouseCompanyDealsResponse {
+  hubspotCompanyId: string
+  count: number
+  deals: HubSpotGreenhouseCompanyDealProfile[]
 }
 
 export interface HubSpotGreenhouseServiceProfile {
@@ -483,6 +522,56 @@ export const searchHubSpotGreenhouseCompanies = async (
 export const getHubSpotGreenhouseCompanyOwner = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`)
 
+export const resolveHubSpotGreenhouseOwnerByEmail = async (
+  email: string
+): Promise<HubSpotGreenhouseOwnerResolutionResponse> => {
+  const normalizedEmail = email.trim()
+
+  if (!normalizedEmail) {
+    return {
+      email: normalizedEmail,
+      owner: null,
+      status: 'not_found'
+    }
+  }
+
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(
+    `${baseUrl}/owners/resolve?email=${encodeURIComponent(normalizedEmail)}`,
+    {
+      headers: buildServiceHeaders(),
+      cache: 'no-store',
+      next: { revalidate: 0 },
+      signal: AbortSignal.timeout(timeoutMs)
+    }
+  )
+
+  if (response.status === 404) {
+    return {
+      email: normalizedEmail,
+      owner: null,
+      status: 'endpoint_not_deployed',
+      detail: 'HubSpot integration service does not expose GET /owners/resolve yet.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for /owners/resolve: ${body || response.statusText}`
+    )
+  }
+
+  const payload = (await response.json()) as Omit<HubSpotGreenhouseOwnerResolutionResponse, 'status'>
+
+  return {
+    ...payload,
+    status: payload.owner ? 'resolved' : 'not_found'
+  }
+}
+
 export const getHubSpotGreenhouseCompanyServices = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyServicesResponse>(`/companies/${hubspotCompanyId}/services`)
 
@@ -501,6 +590,9 @@ export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: stri
       }))
     }
   }
+
+export const getHubSpotGreenhouseCompanyDeals = async (hubspotCompanyId: string) =>
+  fetchJson<HubSpotGreenhouseCompanyDealsResponse>(`/companies/${hubspotCompanyId}/deals`)
 
 export const updateHubSpotGreenhouseCompanyLifecycle = async (
   hubspotCompanyId: string,

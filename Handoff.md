@@ -1,5 +1,31 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — lectura live de todos los deals HubSpot por company en Quote Builder (Codex)
+
+- **Scope:** cerrar el gap operativo donde el cotizador mostraba "sin deals" aunque la company en HubSpot si tenia negocios historicos o ganados, porque `GET /api/commercial/organizations/[id]/deals` solo leia el mirror local `greenhouse_commercial.deals`.
+- **Implementacion shipped**
+  - `src/app/api/commercial/organizations/[id]/deals/route.ts`
+    - `GET` ahora hace `read-through sync` cuando la organizacion ya tiene `hubspot_company_id`: lee local, hidrata live desde HubSpot y relee local antes de responder
+  - `src/lib/commercial/sync-organization-hubspot-deals.ts`
+    - nuevo helper canonico para materializar deals asociados a una company HubSpot en `greenhouse_commercial.deals`
+    - no filtra por etapa; sincroniza abiertos, historicos, `closedwon` y `closedlost`
+    - reutiliza `person_360` + facet CRM para binding canonico de owner/contact y upsertea con los write paths existentes del dominio comercial
+  - `src/lib/commercial/hubspot-owner-identity.ts`
+    - helper canonico para resolver owners locales desde `hubspot_owner_id` sin parches ad-hoc
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx`
+    - sigue consumiendo la misma route canónica `/api/commercial/organizations/:id/deals`; el fix fue backend/mirror, no un hardcode en UI
+- **Dependencia cross-repo cerrada**
+  - repo hermano `hubspot-bigquery` ahora expone `GET /companies/{hubspotCompanyId}/deals`
+  - el endpoint devuelve todos los deals asociados a la company con metadata live de pipeline/stage desde HubSpot Pipelines API
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/lib/commercial/sync-organization-hubspot-deals.test.ts src/app/api/commercial/organizations/[id]/deals/route.test.ts src/lib/commercial/party/commands/__tests__/create-deal-from-quote-context.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - smoke real en `staging`:
+    - `GET /api/commercial/organizations/org-b3e9e92b-518d-4924-b8c0-83cd1f9aa17f/deals` → `total=5`
+    - incluye `58295637620` (`Aguas Andinas - Implementación`) en etapa `Cierre ganado`
+
 ## Sesion 2026-04-22 — TASK-573 cierre del contrato de nacimiento de deals (Codex)
 
 - **Scope:** cerrar el follow-on estructural de `TASK-539/571/572` para que los deals nacidos desde el Quote Builder ya no salgan con metadata incompleta ni caigan en fallbacks inseguros.

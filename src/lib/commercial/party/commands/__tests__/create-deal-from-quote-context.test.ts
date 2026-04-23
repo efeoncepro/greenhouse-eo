@@ -11,11 +11,13 @@ vi.mock('@/lib/db', () => ({
 }))
 
 const mockCreateHubSpotDeal = vi.fn()
+const mockResolveHubSpotOwnerByEmail = vi.fn()
 const mockEnsureHubSpotDealMetadataFresh = vi.fn()
 const mockResolveHubSpotBusinessLine = vi.fn()
 
 vi.mock('@/lib/integrations/hubspot-greenhouse-service', () => ({
-  createHubSpotGreenhouseDeal: (...args: unknown[]) => mockCreateHubSpotDeal(...args)
+  createHubSpotGreenhouseDeal: (...args: unknown[]) => mockCreateHubSpotDeal(...args),
+  resolveHubSpotGreenhouseOwnerByEmail: (...args: unknown[]) => mockResolveHubSpotOwnerByEmail(...args)
 }))
 
 vi.mock('@/lib/business-line/hubspot', () => ({
@@ -116,6 +118,11 @@ describe('createDealFromQuoteContext', () => {
     vi.clearAllMocks()
     mockEnsureHubSpotDealMetadataFresh.mockResolvedValue(null)
     mockResolveHubSpotBusinessLine.mockResolvedValue(null)
+    mockResolveHubSpotOwnerByEmail.mockResolvedValue({
+      email: 'user-1',
+      owner: null,
+      status: 'not_found'
+    })
   })
 
   it('rejects when organizationId or dealName is missing', async () => {
@@ -337,6 +344,89 @@ describe('createDealFromQuoteContext', () => {
     )
   })
 
+  it('resolves the actor owner live by email and persists the bridge when local mapping is missing', async () => {
+    mockQuery
+      .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
+      .mockResolvedValueOnce([])
+
+    mockPipelineContextQueries()
+    mockQuery
+      .mockResolvedValueOnce([
+        {
+          member_id: 'julio-reyes',
+          hubspot_owner_id: null,
+          email_aliases: null,
+          canonical_email: 'julio.reyes@efeonce.org',
+          resolved_email: 'jreyes@efeoncepro.com',
+          member_email: 'julio.reyes@efeonce.org',
+          user_email: 'jreyes@efeoncepro.com',
+          user_id: 'user-efeonce-admin-julio-reyes'
+        }
+      ])
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce([{ count: '0' }])
+      .mockResolvedValueOnce([{ count: '0' }])
+      .mockResolvedValueOnce([{ attempt_id: 'attempt-live-owner' }])
+      .mockResolvedValueOnce([{ deal_id: 'deal-live-owner' }])
+      .mockResolvedValueOnce(undefined)
+
+    mockResolveHubSpotOwnerByEmail
+      .mockResolvedValueOnce({
+        email: 'julio.reyes@efeonce.org',
+        owner: null,
+        status: 'not_found'
+      })
+      .mockResolvedValueOnce({
+        email: 'jreyes@efeoncepro.com',
+        owner: {
+          hubspotOwnerId: '75788512',
+          ownerEmail: 'jreyes@efeoncepro.com',
+          ownerFirstName: 'Julio',
+          ownerLastName: 'Reyes',
+          ownerDisplayName: 'Julio Reyes',
+          userId: 123,
+          archived: false
+        },
+        status: 'resolved'
+      })
+
+    mockCreateHubSpotDeal.mockResolvedValueOnce({
+      status: 'created',
+      hubspotDealId: 'hs-deal-live-owner',
+      pipelineUsed: 'default',
+      stageUsed: 'appointmentscheduled',
+      ownerUsed: '75788512'
+    })
+
+    const result = await createDealFromQuoteContext({
+      ...baseInput,
+      ownerHubspotUserId: null,
+      actor: {
+        ...baseInput.actor,
+        memberId: 'julio-reyes'
+      },
+      idempotencyKey: null
+    })
+
+    expect(result.ownerUsed).toBe('75788512')
+    expect(mockResolveHubSpotOwnerByEmail).toHaveBeenCalledWith('julio.reyes@efeonce.org')
+    expect(mockResolveHubSpotOwnerByEmail).toHaveBeenCalledWith('jreyes@efeoncepro.com')
+    expect(mockCreateHubSpotDeal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ownerHubspotUserId: '75788512'
+      })
+    )
+
+    expect(mockQuery.mock.calls).toEqual(
+      expect.arrayContaining([
+        [
+          expect.stringContaining('UPDATE greenhouse_core.members'),
+          ['julio-reyes', '75788512']
+        ]
+      ])
+    )
+  })
+
   it('omits non-commercial tenant business lines instead of forwarding invalid HubSpot values', async () => {
     mockQuery
       .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
@@ -370,6 +460,47 @@ describe('createDealFromQuoteContext', () => {
     expect(mockCreateHubSpotDeal).toHaveBeenCalledWith(
       expect.objectContaining({
         businessLineCode: null
+      })
+    )
+  })
+
+  it('resolves hubspot contact id from the canonical identity source when the crm facet is not materialized', async () => {
+    mockQuery
+      .mockResolvedValueOnce([ORG_WITH_HUBSPOT])
+      .mockResolvedValueOnce([])
+
+    mockPipelineContextQueries()
+    mockQuery
+      .mockResolvedValueOnce([
+        {
+          identity_profile_id: 'identity-hubspot-contact-87929193780',
+          hubspot_contact_id: '87929193780',
+          contact_display_name: 'Oscar Carrasco Sepulveda'
+        }
+      ])
+      .mockResolvedValueOnce([{ count: '0' }])
+      .mockResolvedValueOnce([{ count: '0' }])
+      .mockResolvedValueOnce([{ attempt_id: 'attempt-contact-fallback' }])
+      .mockResolvedValueOnce([{ deal_id: 'deal-contact-fallback' }])
+      .mockResolvedValueOnce(undefined)
+
+    mockCreateHubSpotDeal.mockResolvedValueOnce({
+      status: 'created',
+      hubspotDealId: 'hs-deal-contact-fallback',
+      pipelineUsed: 'default',
+      stageUsed: 'appointmentscheduled',
+      ownerUsed: 'hs-owner-request'
+    })
+
+    await createDealFromQuoteContext({
+      ...baseInput,
+      contactIdentityProfileId: 'identity-hubspot-contact-87929193780',
+      idempotencyKey: null
+    })
+
+    expect(mockCreateHubSpotDeal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hubspotContactId: '87929193780'
       })
     )
   })

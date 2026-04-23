@@ -435,7 +435,7 @@ const CreateDealDrawer = ({
                 <Typography variant='body2'>
                   {context?.defaultOwnerHubspotUserId
                     ? `Propietario: la política actual resuelve el owner ${context.defaultOwnerHubspotUserId}.`
-                    : 'Propietario: el backend intentará resolver al owner del usuario Greenhouse actual y, si no existe mapeo, aplicará la política comercial disponible.'}
+                    : 'Propietario: el backend intentará resolver el owner del usuario Greenhouse actual desde el bridge local y, si aún falta, buscará su usuario HubSpot por email antes de aplicar la política comercial disponible.'}
                 </Typography>
               </Stack>
             </Alert>
