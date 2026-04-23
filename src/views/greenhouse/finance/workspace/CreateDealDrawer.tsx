@@ -22,6 +22,7 @@ import { toast } from 'react-toastify'
 
 import useCreateDeal, { type CreateDealResponse } from '@/hooks/useCreateDeal'
 import useDealCreationContext, {
+  type DealCreationContextOption,
   type DealCreationContextPipeline,
   type DealCreationContextStage
 } from '@/hooks/useDealCreationContext'
@@ -41,9 +42,18 @@ export interface CreateDealDrawerProps {
   organizationId: string
   organizationName?: string | null
   quotationId?: string | null
+  contactIdentityProfileId?: string | null
   defaultCurrency?: 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN' | null
   defaultBusinessLineCode?: string | null
-  onSuccess: (response: CreateDealResponse) => void
+  selectedContact?: {
+    identityProfileId: string
+    fullName: string | null
+    canonicalEmail: string | null
+    jobTitle: string | null
+    roleLabel: string | null
+    isPrimary: boolean
+  } | null
+  onSuccess: (response: CreateDealResponse, meta: { dealName: string }) => void
 }
 
 const CURRENCY_OPTIONS = ['CLP', 'USD', 'CLF', 'COP', 'MXN', 'PEN'] as const
@@ -96,13 +106,68 @@ const selectableStages = (pipeline: DealCreationContextPipeline | undefined): De
     })
 }
 
+const sortOptions = (options: DealCreationContextOption[]): DealCreationContextOption[] =>
+  [...options]
+    .filter(option => !option.hidden)
+    .sort((a, b) => {
+      const orderA = a.displayOrder ?? Number.MAX_SAFE_INTEGER
+      const orderB = b.displayOrder ?? Number.MAX_SAFE_INTEGER
+
+      return orderA - orderB || a.label.localeCompare(b.label, 'es')
+    })
+
+const formatBlockingIssue = (issue: string): string => {
+  switch (issue) {
+    case 'multiple_active_pipelines_without_policy':
+      return 'Hay más de un pipeline activo y no existe una política que defina cuál usar para crear.'
+    case 'deal_type_default_missing':
+      return 'Falta definir el tipo de negocio por defecto para esta política comercial.'
+    case 'priority_default_missing':
+      return 'Falta definir la prioridad por defecto para esta política comercial.'
+    case 'no_active_pipeline':
+      return 'No hay pipelines activos habilitados para crear negocios.'
+    default:
+      if (issue.startsWith('pipeline:') && issue.endsWith(':multiple_selectable_stages_without_default')) {
+        return 'El pipeline seleccionado tiene varias etapas válidas, pero ninguna está marcada como etapa inicial.'
+      }
+
+      if (issue.startsWith('pipeline:') && issue.endsWith(':no_selectable_stage')) {
+        return 'El pipeline seleccionado no tiene una etapa inicial disponible para crear el negocio.'
+      }
+
+      return 'La gobernanza comercial aún no está completa para crear este negocio.'
+  }
+}
+
+const defaultSourceHelper = (
+  source: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'single_option' | 'none',
+  fallback: string
+): string => {
+  switch (source) {
+    case 'tenant_policy':
+      return 'Valor sugerido por política del tenant.'
+    case 'business_line_policy':
+      return 'Valor sugerido por política de la línea de negocio.'
+    case 'global_policy':
+      return 'Valor sugerido por política global.'
+    case 'single_option':
+      return 'Solo existe una opción disponible hoy.'
+    case 'none':
+    default:
+      return fallback
+  }
+}
+
 const CreateDealDrawer = ({
   open,
   onClose,
   organizationId,
   organizationName,
   quotationId,
+  contactIdentityProfileId,
   defaultCurrency,
+  defaultBusinessLineCode,
+  selectedContact,
   onSuccess
 }: CreateDealDrawerProps) => {
   const { create, loading: creating, error, reset } = useCreateDeal()
@@ -112,7 +177,11 @@ const CreateDealDrawer = ({
     loading: loadingContext,
     error: contextError,
     reload: reloadContext
-  } = useDealCreationContext({ organizationId: open ? organizationId : null, enabled: open })
+  } = useDealCreationContext({
+    organizationId: open ? organizationId : null,
+    businessLineCode: defaultBusinessLineCode,
+    enabled: open
+  })
 
   const [dealName, setDealName] = useState('')
   const [amount, setAmount] = useState('')
@@ -123,8 +192,12 @@ const CreateDealDrawer = ({
 
   const [pipelineId, setPipelineId] = useState<string | null>(null)
   const [stageId, setStageId] = useState<string | null>(null)
+  const [dealType, setDealType] = useState<string | null>(null)
+  const [priority, setPriority] = useState<string | null>(null)
   const [pipelineTouched, setPipelineTouched] = useState(false)
   const [stageTouched, setStageTouched] = useState(false)
+  const [dealTypeTouched, setDealTypeTouched] = useState(false)
+  const [priorityTouched, setPriorityTouched] = useState(false)
 
   // Rehydrate defaults when the drawer opens.
   useEffect(() => {
@@ -134,6 +207,10 @@ const CreateDealDrawer = ({
       setCurrency((defaultCurrency as CurrencyOption | undefined) ?? 'CLP')
       setPipelineTouched(false)
       setStageTouched(false)
+      setDealTypeTouched(false)
+      setPriorityTouched(false)
+      setDealType(null)
+      setPriority(null)
       reset()
     }
   }, [open, organizationName, defaultCurrency, reset])
@@ -149,7 +226,15 @@ const CreateDealDrawer = ({
     if (!stageTouched) {
       setStageId(context.defaultStageId)
     }
-  }, [context, pipelineTouched, stageTouched])
+
+    if (!dealTypeTouched) {
+      setDealType(context.defaultDealType)
+    }
+
+    if (!priorityTouched) {
+      setPriority(context.defaultPriority)
+    }
+  }, [context, dealTypeTouched, pipelineTouched, priorityTouched, stageTouched])
 
   const parsedAmount = useMemo(() => parseAmountInput(amount), [amount])
   const parsedAmountClp = useMemo(() => estimateAmountClp(parsedAmount, currency), [parsedAmount, currency])
@@ -157,6 +242,16 @@ const CreateDealDrawer = ({
 
   const sortedPipelines = useMemo(
     () => sortPipelines(context?.pipelines.filter(p => p.active) ?? []),
+    [context]
+  )
+
+  const dealTypeOptions = useMemo(
+    () => sortOptions(context?.dealTypeOptions ?? []),
+    [context]
+  )
+
+  const priorityOptions = useMemo(
+    () => sortOptions(context?.priorityOptions ?? []),
     [context]
   )
 
@@ -171,6 +266,8 @@ const CreateDealDrawer = ({
   )
 
   const contextEmpty = !loadingContext && sortedPipelines.length === 0
+  const governanceBlocked = !!context && !context.readyToCreate
+  const missingHubSpotCompany = !!context && !context.hubspotCompanyId
   const missingSelection = !pipelineId || !stageId
 
   const stageSuggestedByPolicy =
@@ -180,6 +277,8 @@ const CreateDealDrawer = ({
     creating
     || loadingContext
     || contextEmpty
+    || governanceBlocked
+    || missingHubSpotCompany
     || missingSelection
     || dealName.trim().length === 0
     || !!contextError
@@ -204,6 +303,16 @@ const CreateDealDrawer = ({
     setStageId(value)
   }
 
+  const handleDealTypeChange = (value: string) => {
+    setDealTypeTouched(true)
+    setDealType(value || null)
+  }
+
+  const handlePriorityChange = (value: string) => {
+    setPriorityTouched(true)
+    setPriority(value || null)
+  }
+
   const handleSubmit = async () => {
     if (disableSubmit) return
 
@@ -213,9 +322,13 @@ const CreateDealDrawer = ({
       amount: parsedAmount,
       amountClp: parsedAmountClp,
       currency,
+      businessLineCode: defaultBusinessLineCode ?? null,
       pipelineId,
       stageId,
-      quotationId: quotationId ?? null
+      dealType,
+      priority,
+      quotationId: quotationId ?? null,
+      contactIdentityProfileId: contactIdentityProfileId ?? selectedContact?.identityProfileId ?? null
     })
 
     if (!response) {
@@ -230,7 +343,7 @@ const CreateDealDrawer = ({
           ? 'Deal creado. Organización promovida a oportunidad.'
           : 'Deal creado en HubSpot.'
       )
-      onSuccess(response)
+      onSuccess(response, { dealName: dealName.trim() })
       onClose()
 
       return
@@ -238,7 +351,7 @@ const CreateDealDrawer = ({
 
     if (response.status === 'pending_approval') {
       toast.info('Deal sobre umbral: solicitud de aprobación creada.')
-      onSuccess(response)
+      onSuccess(response, { dealName: dealName.trim() })
       onClose()
 
       return
@@ -248,14 +361,14 @@ const CreateDealDrawer = ({
       toast.warning(
         'La integración HubSpot /deals aún no está disponible. El intento quedó registrado.'
       )
-      onSuccess(response)
+      onSuccess(response, { dealName: dealName.trim() })
       onClose()
 
       return
     }
 
     toast.info(`Intento registrado (${response.status}). Ver consola de soporte.`)
-    onSuccess(response)
+    onSuccess(response, { dealName: dealName.trim() })
   }
 
   return (
@@ -296,6 +409,42 @@ const CreateDealDrawer = ({
               autoFocus
               helperText='El nombre aparece en HubSpot y en el pipeline comercial.'
             />
+
+            {missingHubSpotCompany ? (
+              <Alert severity='warning'>
+                <AlertTitle>Esta organización aún no está vinculada a una empresa de HubSpot</AlertTitle>
+                Antes de crear el deal debes completar la vinculación comercial para poder asociarlo a la empresa correcta.
+              </Alert>
+            ) : null}
+
+            {governanceBlocked && context?.blockingIssues.length ? (
+              <Alert severity='warning'>
+                <AlertTitle>La gobernanza del deal todavía está incompleta</AlertTitle>
+                <Box component='ul' sx={{ pl: 4, mb: 0, mt: 1 }}>
+                  {context.blockingIssues.map(issue => (
+                    <li key={issue}>
+                      <Typography variant='body2'>{formatBlockingIssue(issue)}</Typography>
+                    </li>
+                  ))}
+                </Box>
+              </Alert>
+            ) : null}
+
+            <Alert severity='info' variant='outlined'>
+              <AlertTitle>Asociaciones esperadas al crear</AlertTitle>
+              <Stack spacing={1}>
+                <Typography variant='body2'>
+                  {selectedContact
+                    ? `Contacto: ${selectedContact.fullName ?? selectedContact.canonicalEmail ?? selectedContact.identityProfileId}${selectedContact.canonicalEmail ? ` · ${selectedContact.canonicalEmail}` : ''}`
+                    : 'Contacto: si esta cotización tiene un contacto canónico vinculado, el backend lo asociará automáticamente al negocio.'}
+                </Typography>
+                <Typography variant='body2'>
+                  {context?.defaultOwnerHubspotUserId
+                    ? `Propietario: la política actual resuelve el owner ${context.defaultOwnerHubspotUserId}.`
+                    : 'Propietario: el backend intentará resolver al owner del usuario Greenhouse actual y, si no existe mapeo, aplicará la política comercial disponible.'}
+                </Typography>
+              </Stack>
+            </Alert>
 
             {loadingContext ? (
               <Stack spacing={1.5}>
@@ -369,6 +518,52 @@ const CreateDealDrawer = ({
                     </MenuItem>
                   ))}
                 </TextField>
+
+                {dealTypeOptions.length > 0 ? (
+                  <TextField
+                    select
+                    label='Tipo de negocio'
+                    value={dealType ?? ''}
+                    onChange={event => handleDealTypeChange(event.target.value)}
+                    fullWidth
+                    helperText={defaultSourceHelper(
+                      context?.defaultsSource.dealType ?? 'none',
+                      'Opcional. Si existe una política, se aplicará al crear.'
+                    )}
+                  >
+                    <MenuItem value=''>
+                      <em>Sin definir</em>
+                    </MenuItem>
+                    {dealTypeOptions.map(option => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                ) : null}
+
+                {priorityOptions.length > 0 ? (
+                  <TextField
+                    select
+                    label='Prioridad'
+                    value={priority ?? ''}
+                    onChange={event => handlePriorityChange(event.target.value)}
+                    fullWidth
+                    helperText={defaultSourceHelper(
+                      context?.defaultsSource.priority ?? 'none',
+                      'Opcional. Si existe una política, se aplicará al crear.'
+                    )}
+                  >
+                    <MenuItem value=''>
+                      <em>Sin definir</em>
+                    </MenuItem>
+                    {priorityOptions.map(option => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                ) : null}
               </Stack>
             )}
 

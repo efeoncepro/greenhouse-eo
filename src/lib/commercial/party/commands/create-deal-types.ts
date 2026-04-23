@@ -36,6 +36,8 @@ export interface DealActor {
   userId: string
   tenantScope: string
   businessLineCode?: string | null
+  memberId?: string | null
+  identityProfileId?: string | null
 }
 
 export interface CreateDealFromQuoteContextInput {
@@ -46,7 +48,10 @@ export interface CreateDealFromQuoteContextInput {
   amountClp?: number | null
   pipelineId?: string | null
   stageId?: string | null
+  dealType?: string | null
+  priority?: string | null
   ownerHubspotUserId?: string | null
+  contactIdentityProfileId?: string | null
   closeDateHint?: string | null
   businessLineCode?: string | null
   quotationId?: string | null
@@ -59,6 +64,7 @@ export interface CreateDealFromQuoteContextResult {
   status: DealCreateAttemptStatus
   dealId: string | null
   hubspotDealId: string | null
+  dealNameUsed: string | null
   organizationPromoted: boolean
   requiresApproval: boolean
   approvalId: string | null
@@ -74,7 +80,11 @@ export interface CreateDealFromQuoteContextResult {
   pipelineLabelUsed: string | null
   stageUsed: string | null
   stageLabelUsed: string | null
+  dealTypeUsed: string | null
+  priorityUsed: string | null
   ownerUsed: string | null
+  contactIdentityProfileIdUsed: string | null
+  contactUsed: string | null
 }
 
 // ── Error classes ─────────────────────────────────────────────────────────
@@ -157,6 +167,30 @@ export class DealCreateContextEmptyError extends DealCreateError {
       { requiredRegistry: 'greenhouse_commercial.hubspot_deal_pipeline_config' }
     )
     this.name = 'DealCreateContextEmptyError'
+  }
+}
+
+export class DealCreateGovernanceIncompleteError extends DealCreateError {
+  constructor(reason: string, details?: unknown) {
+    super(
+      'DEAL_CREATE_GOVERNANCE_INCOMPLETE',
+      `Deal creation governance is incomplete: ${reason}`,
+      409,
+      { reason, ...(details && typeof details === 'object' ? details as Record<string, unknown> : { details }) }
+    )
+    this.name = 'DealCreateGovernanceIncompleteError'
+  }
+}
+
+export class DealCreateMappingMissingError extends DealCreateError {
+  constructor(reason: 'owner_mapping_missing' | 'contact_mapping_missing', details?: unknown) {
+    super(
+      'DEAL_CREATE_MAPPING_MISSING',
+      `Deal creation mapping is missing: ${reason}`,
+      409,
+      { reason, ...(details && typeof details === 'object' ? details as Record<string, unknown> : { details }) }
+    )
+    this.name = 'DealCreateMappingMissingError'
   }
 }
 

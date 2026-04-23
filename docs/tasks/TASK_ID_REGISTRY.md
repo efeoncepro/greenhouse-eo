@@ -626,3 +626,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-570` | `complete` | Move "Crear deal nuevo" CTA into Deal Chip Popover Footer | `docs/tasks/complete/TASK-570-create-deal-cta-in-popover-footer.md` |
 | `TASK-571` | `complete` | Deal Creation Context Registry + Pipeline/Stage Governance | `docs/tasks/complete/TASK-571-deal-creation-context-pipeline-stage-governance.md` |
 | `TASK-572` | `complete` | Deploy `POST /deals` en el Cloud Run `hubspot-greenhouse-integration` | `docs/tasks/complete/TASK-572-hubspot-integration-post-deals-deploy.md` |
+| `TASK-573` | `complete` | Quote Builder Deal Birth Contract Completion & HubSpot Governance Hardening | `docs/tasks/complete/TASK-573-quote-builder-deal-birth-contract-completion.md` |

@@ -118,7 +118,11 @@ export interface DealCreatedFromGreenhousePayload {
   currency: string
   pipelineId: string | null
   stageId: string | null
+  dealType?: string | null
+  priority?: string | null
   ownerHubspotUserId: string | null
+  contactIdentityProfileId?: string | null
+  hubspotContactId?: string | null
   actorUserId: string
   quotationId?: string | null
   origin: 'greenhouse_quote_builder'

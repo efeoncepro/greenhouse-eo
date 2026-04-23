@@ -13,11 +13,15 @@ export interface CreateDealRequest {
   amount?: number | null
   currency?: string | null
   amountClp?: number | null
+  businessLineCode?: string | null
   pipelineId?: string | null
   stageId?: string | null
+  dealType?: string | null
+  priority?: string | null
   ownerHubspotUserId?: string | null
   closeDateHint?: string | null
   quotationId?: string | null
+  contactIdentityProfileId?: string | null
   idempotencyKey?: string | null
 }
 
@@ -47,6 +51,10 @@ export interface CreateDealResponse {
   stageUsed: string | null
   stageLabelUsed: string | null
   ownerUsed: string | null
+  dealTypeUsed: string | null
+  priorityUsed: string | null
+  contactIdentityProfileIdUsed: string | null
+  contactUsed: string | null
 }
 
 export interface CreateDealError {
@@ -62,6 +70,41 @@ export interface UseCreateDealResult {
   error: CreateDealError | null
   reset: () => void
 }
+
+interface CreateDealResponseCompat extends Partial<CreateDealResponse> {
+  attemptId: string
+  status:
+    | 'pending'
+    | 'completed'
+    | 'pending_approval'
+    | 'rate_limited'
+    | 'failed'
+    | 'endpoint_not_deployed'
+  organizationPromoted: boolean
+  requiresApproval: boolean
+  approvalId: string | null
+  message: string
+}
+
+const normalizeCreateDealResponse = (input: CreateDealResponseCompat): CreateDealResponse => ({
+  attemptId: input.attemptId,
+  status: input.status,
+  dealId: input.dealId ?? null,
+  hubspotDealId: input.hubspotDealId ?? null,
+  organizationPromoted: input.organizationPromoted,
+  requiresApproval: input.requiresApproval,
+  approvalId: input.approvalId ?? null,
+  message: input.message,
+  pipelineUsed: input.pipelineUsed ?? null,
+  pipelineLabelUsed: input.pipelineLabelUsed ?? null,
+  stageUsed: input.stageUsed ?? null,
+  stageLabelUsed: input.stageLabelUsed ?? null,
+  ownerUsed: input.ownerUsed ?? null,
+  dealTypeUsed: input.dealTypeUsed ?? null,
+  priorityUsed: input.priorityUsed ?? null,
+  contactIdentityProfileIdUsed: input.contactIdentityProfileIdUsed ?? null,
+  contactUsed: input.contactUsed ?? null
+})
 
 const useCreateDeal = (): UseCreateDealResult => {
   const [loading, setLoading] = useState(false)
@@ -95,11 +138,15 @@ const useCreateDeal = (): UseCreateDealResult => {
             amount: input.amount ?? null,
             amountClp: input.amountClp ?? null,
             currency: input.currency ?? null,
+            businessLineCode: input.businessLineCode ?? null,
             pipelineId: input.pipelineId ?? null,
             stageId: input.stageId ?? null,
+            dealType: input.dealType ?? null,
+            priority: input.priority ?? null,
             ownerHubspotUserId: input.ownerHubspotUserId ?? null,
             closeDateHint: input.closeDateHint ?? null,
             quotationId: input.quotationId ?? null,
+            contactIdentityProfileId: input.contactIdentityProfileId ?? null,
             idempotencyKey: input.idempotencyKey ?? null
           }),
           signal: controller.signal
@@ -143,7 +190,7 @@ const useCreateDeal = (): UseCreateDealResult => {
         return null
       }
 
-      const data = (await response.json()) as CreateDealResponse
+      const data = normalizeCreateDealResponse((await response.json()) as CreateDealResponseCompat)
 
       return data
     } catch (caught) {

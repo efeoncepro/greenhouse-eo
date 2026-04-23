@@ -2,6 +2,8 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
+import type { PoolClient } from 'pg'
+
 import { query, withTransaction } from '@/lib/db'
 import {
   getDealCreationContext,
@@ -28,6 +30,8 @@ import {
   DEAL_CREATE_RATE_LIMIT_USER_MAX,
   DEAL_CREATE_RATE_LIMIT_USER_WINDOW_SECONDS,
   DealCreateContextEmptyError,
+  DealCreateGovernanceIncompleteError,
+  DealCreateMappingMissingError,
   DealCreateRateLimitError,
   DealCreateSelectionInvalidError,
   DealCreateValidationError,
@@ -42,6 +46,10 @@ interface ResolvedSelection {
   pipelineLabel: string
   stageId: string
   stageLabel: string
+}
+
+interface QueryResultLike<T> {
+  rows: T[]
 }
 
 // TASK-539: canonical write path for deals originated inside Greenhouse.
@@ -84,6 +92,38 @@ interface AttemptRow extends Record<string, unknown> {
   completed_at: string | null
 }
 
+interface ActorOwnerRow extends Record<string, unknown> {
+  hubspot_owner_id: string | null
+}
+
+interface QuoteContactRow extends Record<string, unknown> {
+  quotation_id: string
+  contact_identity_profile_id: string | null
+  hubspot_contact_id: string | null
+  contact_display_name: string | null
+}
+
+interface ContactResolutionRow extends Record<string, unknown> {
+  identity_profile_id: string
+  hubspot_contact_id: string | null
+  contact_display_name: string | null
+}
+
+interface ResolvedOwner {
+  hubspotOwnerUserId: string
+}
+
+interface ResolvedContact {
+  contactIdentityProfileId: string | null
+  hubspotContactId: string | null
+  displayName: string | null
+}
+
+interface ResolvedDealProperties {
+  dealType: string | null
+  priority: string | null
+}
+
 const assertNonEmpty = (value: string | null | undefined, field: string): string => {
   const trimmed = (value ?? '').trim()
 
@@ -100,18 +140,276 @@ const normalizeCurrency = (value: string | null | undefined): string => {
   return upper || 'CLP'
 }
 
+const runQuery = async <T extends Record<string, unknown>>(
+  text: string,
+  values: unknown[] = [],
+  client?: PoolClient
+): Promise<T[]> => {
+  if (client) {
+    const result = await client.query<T>(text, values) as QueryResultLike<T>
+
+    return result.rows
+  }
+
+  return query<T>(text, values)
+}
+
 const loadOrganization = async (organizationId: string): Promise<OrganizationRow | null> => {
   const rows = await query<OrganizationRow>(
-    `SELECT organization_id, organization_name, hubspot_company_id,
-            lifecycle_stage, NULL::text AS client_id, NULL::text AS space_id
-       FROM greenhouse_core.organizations
-       WHERE organization_id = $1
-       LIMIT 1`,
+    `WITH primary_space AS (
+       SELECT s.space_id, s.client_id
+       FROM greenhouse_core.spaces AS s
+       WHERE s.organization_id = $1
+         AND s.active = TRUE
+       ORDER BY s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
+       LIMIT 1
+     )
+     SELECT o.organization_id,
+            o.organization_name,
+            o.hubspot_company_id,
+            o.lifecycle_stage,
+            ps.client_id,
+            ps.space_id
+       FROM greenhouse_core.organizations AS o
+       LEFT JOIN primary_space AS ps ON TRUE
+      WHERE o.organization_id = $1
+        AND o.active = TRUE
+      LIMIT 1`,
     [organizationId]
   )
 
   return rows[0] ?? null
 }
+
+const loadActorHubSpotOwnerId = async (
+  actor: CreateDealFromQuoteContextInput['actor']
+): Promise<string | null> => {
+  if (actor.memberId) {
+    const rows = await query<ActorOwnerRow>(
+      `SELECT hubspot_owner_id
+         FROM greenhouse_core.members
+        WHERE member_id = $1
+          AND hubspot_owner_id IS NOT NULL
+        LIMIT 1`,
+      [actor.memberId]
+    )
+
+    if (rows[0]?.hubspot_owner_id) return rows[0].hubspot_owner_id
+  }
+
+  if (actor.identityProfileId) {
+    const rows = await query<ActorOwnerRow>(
+      `SELECT m.hubspot_owner_id
+         FROM greenhouse_serving.person_360 AS p360
+         JOIN greenhouse_core.members AS m
+           ON m.member_id = p360.member_id
+        WHERE p360.identity_profile_id = $1
+          AND m.hubspot_owner_id IS NOT NULL
+        LIMIT 1`,
+      [actor.identityProfileId]
+    )
+
+    if (rows[0]?.hubspot_owner_id) return rows[0].hubspot_owner_id
+  }
+
+  const rows = await query<ActorOwnerRow>(
+    `SELECT m.hubspot_owner_id
+       FROM greenhouse_serving.person_360 AS p360
+       JOIN greenhouse_core.members AS m
+         ON m.member_id = p360.member_id
+      WHERE p360.user_id = $1
+        AND m.hubspot_owner_id IS NOT NULL
+      LIMIT 1`,
+    [actor.userId]
+  )
+
+  return rows[0]?.hubspot_owner_id ?? null
+}
+
+const loadQuoteContact = async (
+  quotationId: string,
+  organizationId: string
+): Promise<QuoteContactRow | null> => {
+  const rows = await query<QuoteContactRow>(
+    `SELECT q.quotation_id,
+            q.contact_identity_profile_id,
+            COALESCE(p360.hubspot_contact_id, ct.hubspot_contact_id) AS hubspot_contact_id,
+            COALESCE(p360.resolved_display_name, ct.display_name) AS contact_display_name
+       FROM greenhouse_commercial.quotations AS q
+       LEFT JOIN greenhouse_serving.person_360 AS p360
+         ON p360.identity_profile_id = q.contact_identity_profile_id
+       LEFT JOIN greenhouse_crm.contacts AS ct
+         ON ct.linked_identity_profile_id = q.contact_identity_profile_id
+        AND ct.is_deleted = FALSE
+       WHERE (q.quotation_id = $1 OR q.finance_quote_id = $1)
+         AND q.organization_id = $2
+       ORDER BY q.updated_at DESC NULLS LAST, q.created_at DESC NULLS LAST
+       LIMIT 1`,
+    [quotationId, organizationId]
+  )
+
+  return rows[0] ?? null
+}
+
+const loadContactResolution = async (
+  identityProfileId: string
+): Promise<ContactResolutionRow | null> => {
+  const rows = await query<ContactResolutionRow>(
+    `SELECT p360.identity_profile_id,
+            COALESCE(p360.hubspot_contact_id, ct.hubspot_contact_id) AS hubspot_contact_id,
+            COALESCE(p360.resolved_display_name, ct.display_name) AS contact_display_name
+       FROM greenhouse_serving.person_360 AS p360
+       LEFT JOIN greenhouse_crm.contacts AS ct
+         ON ct.linked_identity_profile_id = p360.identity_profile_id
+        AND ct.is_deleted = FALSE
+       WHERE p360.identity_profile_id = $1
+       LIMIT 1`,
+    [identityProfileId]
+  )
+
+  return rows[0] ?? null
+}
+
+const resolveOwner = async (
+  input: CreateDealFromQuoteContextInput,
+  creationContext: DealCreationContext
+): Promise<ResolvedOwner> => {
+  const explicitOwner = input.ownerHubspotUserId?.trim() || null
+
+  if (explicitOwner) {
+    return { hubspotOwnerUserId: explicitOwner }
+  }
+
+  const actorOwner = await loadActorHubSpotOwnerId(input.actor)
+
+  if (actorOwner) {
+    return { hubspotOwnerUserId: actorOwner }
+  }
+
+  const defaultOwner = creationContext.defaultOwnerHubspotUserId?.trim() || null
+
+  if (defaultOwner) {
+    return { hubspotOwnerUserId: defaultOwner }
+  }
+
+  throw new DealCreateMappingMissingError('owner_mapping_missing', {
+    userId: input.actor.userId,
+    memberId: input.actor.memberId ?? null,
+    identityProfileId: input.actor.identityProfileId ?? null
+  })
+}
+
+const resolveContact = async (
+  input: CreateDealFromQuoteContextInput
+): Promise<ResolvedContact> => {
+  const explicitContactIdentityProfileId = input.contactIdentityProfileId?.trim() || null
+
+  if (explicitContactIdentityProfileId) {
+    const resolution = await loadContactResolution(explicitContactIdentityProfileId)
+
+    if (!resolution?.hubspot_contact_id) {
+      throw new DealCreateMappingMissingError('contact_mapping_missing', {
+        contactIdentityProfileId: explicitContactIdentityProfileId
+      })
+    }
+
+    return {
+      contactIdentityProfileId: explicitContactIdentityProfileId,
+      hubspotContactId: resolution.hubspot_contact_id,
+      displayName: resolution.contact_display_name ?? null
+    }
+  }
+
+  const quotationId = input.quotationId?.trim() || null
+
+  if (!quotationId) {
+    return {
+      contactIdentityProfileId: null,
+      hubspotContactId: null,
+      displayName: null
+    }
+  }
+
+  const quoteContact = await loadQuoteContact(quotationId, input.organizationId)
+
+  if (!quoteContact?.contact_identity_profile_id) {
+    return {
+      contactIdentityProfileId: null,
+      hubspotContactId: null,
+      displayName: null
+    }
+  }
+
+  if (!quoteContact.hubspot_contact_id) {
+    throw new DealCreateMappingMissingError('contact_mapping_missing', {
+      quotationId,
+      contactIdentityProfileId: quoteContact.contact_identity_profile_id
+    })
+  }
+
+  return {
+    contactIdentityProfileId: quoteContact.contact_identity_profile_id,
+    hubspotContactId: quoteContact.hubspot_contact_id,
+    displayName: quoteContact.contact_display_name ?? null
+  }
+}
+
+const resolveGovernedOption = (
+  propertyName: 'dealType' | 'priority',
+  explicitValue: string | null | undefined,
+  defaultValue: string | null,
+  options: DealCreationContext['dealTypeOptions']
+): string | null => {
+  const normalizedExplicit = explicitValue?.trim() || null
+
+  if (options.length === 0) {
+    if (normalizedExplicit) {
+      throw new DealCreateGovernanceIncompleteError(`${propertyName}_metadata_missing`, {
+        propertyName,
+        requestedValue: normalizedExplicit
+      })
+    }
+
+    return null
+  }
+
+  const selectedValue = normalizedExplicit ?? defaultValue
+
+  if (!selectedValue) {
+    throw new DealCreateGovernanceIncompleteError(`${propertyName}_default_missing`, {
+      propertyName,
+      availableValues: options.map(option => option.value)
+    })
+  }
+
+  if (!options.some(option => option.value === selectedValue)) {
+    throw new DealCreateValidationError(`${propertyName} is not a valid HubSpot option`, {
+      propertyName,
+      requestedValue: selectedValue,
+      availableValues: options.map(option => option.value)
+    })
+  }
+
+  return selectedValue
+}
+
+const resolveDealProperties = (
+  input: CreateDealFromQuoteContextInput,
+  creationContext: DealCreationContext
+): ResolvedDealProperties => ({
+  dealType: resolveGovernedOption(
+    'dealType',
+    input.dealType,
+    creationContext.defaultDealType,
+    creationContext.dealTypeOptions
+  ),
+  priority: resolveGovernedOption(
+    'priority',
+    input.priority,
+    creationContext.defaultPriority,
+    creationContext.priorityOptions
+  )
+})
 
 const findExistingAttemptByKey = async (idempotencyKey: string): Promise<AttemptRow | null> => {
   const rows = await query<AttemptRow>(
@@ -207,6 +505,10 @@ const insertPendingAttempt = async (input: {
   pipelineId: string | null
   stageId: string | null
   ownerHubspotUserId: string | null
+  contactIdentityProfileId: string | null
+  hubspotContactId: string | null
+  dealType: string | null
+  priority: string | null
   businessLineCode: string | null
   metadata: Record<string, unknown>
 }): Promise<string> => {
@@ -224,9 +526,13 @@ const insertPendingAttempt = async (input: {
        pipeline_id,
        stage_id,
        owner_hubspot_user_id,
+       contact_identity_profile_id,
+       hubspot_contact_id,
+       deal_type,
+       priority,
        business_line_code,
        metadata
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb)
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18::jsonb)
      RETURNING attempt_id`,
     [
       input.idempotencyKey,
@@ -241,6 +547,10 @@ const insertPendingAttempt = async (input: {
       input.pipelineId,
       input.stageId,
       input.ownerHubspotUserId,
+      input.contactIdentityProfileId,
+      input.hubspotContactId,
+      input.dealType,
+      input.priority,
       input.businessLineCode,
       JSON.stringify(input.metadata)
     ]
@@ -290,8 +600,12 @@ const insertOrUpdateDealRow = async (
   cloudRunResponse: HubSpotGreenhouseCreateDealResponse,
   organization: OrganizationRow,
   input: CreateDealFromQuoteContextInput,
+  attemptId: string,
   selection: ResolvedSelection,
-  ownerHubspotUserId: string | null
+  ownerHubspotUserId: string,
+  resolvedContact: ResolvedContact,
+  resolvedProperties: ResolvedDealProperties,
+  client?: PoolClient
 ): Promise<string> => {
   if (!cloudRunResponse.hubspotDealId) {
     throw new Error('Cloud Run /deals returned success without hubspotDealId')
@@ -310,7 +624,7 @@ const insertOrUpdateDealRow = async (
     ? cloudRunResponse.stageUsed
     : selection.stageLabel
 
-  const rows = await query<{ deal_id: string }>(
+  const rows = await runQuery<{ deal_id: string }>(
     `INSERT INTO greenhouse_commercial.deals (
        hubspot_deal_id,
        hubspot_pipeline_id,
@@ -321,21 +635,27 @@ const insertOrUpdateDealRow = async (
        dealstage,
        dealstage_label,
        pipeline_name,
+       deal_type,
+       priority,
        amount,
        amount_clp,
        currency,
        deal_owner_hubspot_user_id,
        deal_owner_user_id,
+       contact_identity_profile_id,
+       hubspot_contact_id,
        source_payload,
        created_in_hubspot_at,
        hubspot_last_synced_at,
        created_at,
        updated_at
-     ) VALUES (
-       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb, NOW(), NOW(), NOW(), NOW()
-     )
+      ) VALUES (
+       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19::jsonb, NOW(), NOW(), NOW(), NOW()
+      )
      ON CONFLICT (hubspot_deal_id) DO UPDATE
        SET deal_name = EXCLUDED.deal_name,
+           deal_type = COALESCE(EXCLUDED.deal_type, deals.deal_type),
+           priority = COALESCE(EXCLUDED.priority, deals.priority),
            amount = COALESCE(EXCLUDED.amount, deals.amount),
            amount_clp = COALESCE(EXCLUDED.amount_clp, deals.amount_clp),
            currency = EXCLUDED.currency,
@@ -343,6 +663,11 @@ const insertOrUpdateDealRow = async (
            dealstage = COALESCE(EXCLUDED.dealstage, deals.dealstage),
            dealstage_label = COALESCE(EXCLUDED.dealstage_label, deals.dealstage_label),
            pipeline_name = COALESCE(EXCLUDED.pipeline_name, deals.pipeline_name),
+           deal_owner_hubspot_user_id = COALESCE(EXCLUDED.deal_owner_hubspot_user_id, deals.deal_owner_hubspot_user_id),
+           deal_owner_user_id = COALESCE(EXCLUDED.deal_owner_user_id, deals.deal_owner_user_id),
+           contact_identity_profile_id = COALESCE(EXCLUDED.contact_identity_profile_id, deals.contact_identity_profile_id),
+           hubspot_contact_id = COALESCE(EXCLUDED.hubspot_contact_id, deals.hubspot_contact_id),
+           source_payload = EXCLUDED.source_payload,
            updated_at = NOW(),
            hubspot_last_synced_at = NOW()
      RETURNING deal_id`,
@@ -356,20 +681,31 @@ const insertOrUpdateDealRow = async (
       effectiveStageId,
       stageLabel,
       pipelineLabel,
+      cloudRunResponse.dealTypeUsed ?? resolvedProperties.dealType,
+      cloudRunResponse.priorityUsed ?? resolvedProperties.priority,
       input.amount ?? null,
       input.amountClp ?? null,
       normalizeCurrency(input.currency),
       ownerHubspotUserId,
       input.actor.userId,
+      resolvedContact.contactIdentityProfileId,
+      resolvedContact.hubspotContactId,
       JSON.stringify({
         origin: 'greenhouse_quote_builder',
-        attempt_id: null,
+        attempt_id: attemptId,
         quotation_id: input.quotationId ?? null,
+        contact_identity_profile_id: resolvedContact.contactIdentityProfileId,
+        hubspot_contact_id: resolvedContact.hubspotContactId,
         cloud_run_response: { status: cloudRunResponse.status },
         resolved_selection: selection,
-        resolved_owner_hubspot_user_id: ownerHubspotUserId
+        resolved_owner_hubspot_user_id: ownerHubspotUserId,
+        resolved_properties: {
+          dealType: cloudRunResponse.dealTypeUsed ?? resolvedProperties.dealType,
+          priority: cloudRunResponse.priorityUsed ?? resolvedProperties.priority
+        }
       })
-    ]
+    ],
+    client
   )
 
   const row = rows[0]
@@ -462,6 +798,7 @@ export const createDealFromQuoteContext = async (
         status: existing.status,
         dealId: existing.deal_id,
         hubspotDealId: existing.hubspot_deal_id,
+        dealNameUsed: null,
         organizationPromoted: false,
         requiresApproval: existing.status === 'pending_approval',
         approvalId: existing.approval_id,
@@ -470,7 +807,11 @@ export const createDealFromQuoteContext = async (
         pipelineLabelUsed: null,
         stageUsed: null,
         stageLabelUsed: null,
-        ownerUsed: null
+        dealTypeUsed: null,
+        priorityUsed: null,
+        ownerUsed: null,
+        contactIdentityProfileIdUsed: null,
+        contactUsed: null
       }
     }
   } else {
@@ -487,6 +828,7 @@ export const createDealFromQuoteContext = async (
         status: fingerprint.status,
         dealId: fingerprint.deal_id,
         hubspotDealId: fingerprint.hubspot_deal_id,
+        dealNameUsed: null,
         organizationPromoted: false,
         requiresApproval: fingerprint.status === 'pending_approval',
         approvalId: fingerprint.approval_id,
@@ -495,7 +837,11 @@ export const createDealFromQuoteContext = async (
         pipelineLabelUsed: null,
         stageUsed: null,
         stageLabelUsed: null,
-        ownerUsed: null
+        dealTypeUsed: null,
+        priorityUsed: null,
+        ownerUsed: null,
+        contactIdentityProfileIdUsed: null,
+        contactUsed: null
       }
     }
   }
@@ -508,10 +854,16 @@ export const createDealFromQuoteContext = async (
     businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null
   })
 
-  const selection = await resolveSelection(input, creationContext)
+  if (!creationContext.readyToCreate) {
+    throw new DealCreateGovernanceIncompleteError('context_not_ready', {
+      blockingIssues: creationContext.blockingIssues
+    })
+  }
 
-  const ownerHubspotUserId =
-    input.ownerHubspotUserId ?? creationContext.defaultOwnerHubspotUserId ?? null
+  const selection = await resolveSelection(input, creationContext)
+  const resolvedOwner = await resolveOwner(input, creationContext)
+  const resolvedContact = await resolveContact(input)
+  const resolvedProperties = resolveDealProperties(input, creationContext)
 
   // 2. Rate limit. Throws DealCreateRateLimitError → 429 at the route layer.
   await enforceRateLimits(input.actor)
@@ -529,12 +881,19 @@ export const createDealFromQuoteContext = async (
     currency: normalizeCurrency(input.currency),
     pipelineId: selection.pipelineId,
     stageId: selection.stageId,
-    ownerHubspotUserId,
+    ownerHubspotUserId: resolvedOwner.hubspotOwnerUserId,
+    contactIdentityProfileId: resolvedContact.contactIdentityProfileId,
+    hubspotContactId: resolvedContact.hubspotContactId,
+    dealType: resolvedProperties.dealType,
+    priority: resolvedProperties.priority,
     businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null,
     metadata: {
       origin: 'greenhouse_quote_builder',
       quotation_id: input.quotationId ?? null,
+      contact_identity_profile_id: resolvedContact.contactIdentityProfileId,
+      hubspot_contact_id: resolvedContact.hubspotContactId,
       resolved_selection: selection,
+      resolved_properties: resolvedProperties,
       defaults_source: creationContext.defaultsSource
     }
   })
@@ -576,6 +935,7 @@ export const createDealFromQuoteContext = async (
       status: 'pending_approval',
       dealId: null,
       hubspotDealId: null,
+      dealNameUsed: dealName,
       organizationPromoted: false,
       requiresApproval: true,
       approvalId,
@@ -584,7 +944,11 @@ export const createDealFromQuoteContext = async (
       pipelineLabelUsed: selection.pipelineLabel,
       stageUsed: selection.stageId,
       stageLabelUsed: selection.stageLabel,
-      ownerUsed: ownerHubspotUserId
+      dealTypeUsed: resolvedProperties.dealType,
+      priorityUsed: resolvedProperties.priority,
+      ownerUsed: resolvedOwner.hubspotOwnerUserId,
+      contactIdentityProfileIdUsed: resolvedContact.contactIdentityProfileId,
+      contactUsed: resolvedContact.hubspotContactId
     }
   }
 
@@ -600,11 +964,14 @@ export const createDealFromQuoteContext = async (
       currency: normalizeCurrency(input.currency),
       pipelineId: selection.pipelineId,
       stageId: selection.stageId,
-      ownerHubspotUserId,
+      dealType: resolvedProperties.dealType,
+      priority: resolvedProperties.priority,
+      ownerHubspotUserId: resolvedOwner.hubspotOwnerUserId,
       closeDate: input.closeDateHint ?? null,
       businessLineCode: input.businessLineCode ?? input.actor.businessLineCode ?? null,
       origin: 'greenhouse_quote_builder',
-      correlationId: attemptId
+      correlationId: attemptId,
+      hubspotContactId: resolvedContact.hubspotContactId
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
@@ -630,6 +997,7 @@ export const createDealFromQuoteContext = async (
       status: 'endpoint_not_deployed',
       dealId: null,
       hubspotDealId: null,
+      dealNameUsed: dealName,
       organizationPromoted: false,
       requiresApproval: false,
       approvalId: null,
@@ -639,15 +1007,29 @@ export const createDealFromQuoteContext = async (
       pipelineLabelUsed: selection.pipelineLabel,
       stageUsed: selection.stageId,
       stageLabelUsed: selection.stageLabel,
-      ownerUsed: ownerHubspotUserId
+      dealTypeUsed: resolvedProperties.dealType,
+      priorityUsed: resolvedProperties.priority,
+      ownerUsed: resolvedOwner.hubspotOwnerUserId,
+      contactIdentityProfileIdUsed: resolvedContact.contactIdentityProfileId,
+      contactUsed: resolvedContact.hubspotContactId
     }
   }
 
   // 6. Persist deal + promote party + emit events, all in one transaction.
-  const effectiveOwner = response.ownerUsed ?? ownerHubspotUserId
+  const effectiveOwner = response.ownerUsed ?? resolvedOwner.hubspotOwnerUserId
 
-  const { dealId, organizationPromoted } = await withTransaction(async () => {
-    const newDealId = await insertOrUpdateDealRow(response, organization, input, selection, effectiveOwner)
+  const { dealId, organizationPromoted } = await withTransaction(async client => {
+    const newDealId = await insertOrUpdateDealRow(
+      response,
+      organization,
+      input,
+      attemptId,
+      selection,
+      effectiveOwner,
+      resolvedContact,
+      resolvedProperties,
+      client
+    )
 
     let promoted = false
 
@@ -658,7 +1040,7 @@ export const createDealFromQuoteContext = async (
         source: 'deal_won',
         actor: { userId: input.actor.userId, reason: 'First deal created from Quote Builder' },
         triggerEntity: { type: 'deal', id: newDealId }
-      })
+      }, client)
       promoted = true
     }
 
@@ -673,7 +1055,7 @@ export const createDealFromQuoteContext = async (
       amountClp: input.amountClp ?? null,
       currency: normalizeCurrency(input.currency),
       closeDate: input.closeDateHint ?? null
-    })
+    }, client)
 
     await publishDealCreatedFromGreenhouse({
       dealId: newDealId,
@@ -686,12 +1068,16 @@ export const createDealFromQuoteContext = async (
       currency: normalizeCurrency(input.currency),
       pipelineId: response.pipelineUsed ?? selection.pipelineId,
       stageId: response.stageUsed ?? selection.stageId,
+      dealType: response.dealTypeUsed ?? resolvedProperties.dealType,
+      priority: response.priorityUsed ?? resolvedProperties.priority,
       ownerHubspotUserId: effectiveOwner,
+      contactIdentityProfileId: resolvedContact.contactIdentityProfileId,
+      hubspotContactId: resolvedContact.hubspotContactId,
       actorUserId: input.actor.userId,
       quotationId: input.quotationId ?? null,
       origin: 'greenhouse_quote_builder',
       attemptId
-    })
+    }, client)
 
     return { dealId: newDealId, organizationPromoted: promoted }
   })
@@ -720,6 +1106,7 @@ export const createDealFromQuoteContext = async (
     status: 'completed',
     dealId,
     hubspotDealId: response.hubspotDealId,
+    dealNameUsed: dealName,
     organizationPromoted,
     requiresApproval: false,
     approvalId: null,
@@ -730,6 +1117,10 @@ export const createDealFromQuoteContext = async (
     pipelineLabelUsed: effectivePipelineLabel,
     stageUsed: effectiveStageId,
     stageLabelUsed: effectiveStageLabel,
-    ownerUsed: effectiveOwner
+    dealTypeUsed: response.dealTypeUsed ?? resolvedProperties.dealType,
+    priorityUsed: response.priorityUsed ?? resolvedProperties.priority,
+    ownerUsed: effectiveOwner,
+    contactIdentityProfileIdUsed: resolvedContact.contactIdentityProfileId,
+    contactUsed: resolvedContact.hubspotContactId
   }
 }

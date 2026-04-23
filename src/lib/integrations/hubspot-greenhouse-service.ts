@@ -890,6 +890,8 @@ export interface HubSpotGreenhouseCreateDealRequest {
   currency?: string | null
   pipelineId?: string | null
   stageId?: string | null
+  dealType?: string | null
+  priority?: string | null
   ownerHubspotUserId?: string | null
   closeDate?: string | null
   businessLineCode?: string | null
@@ -909,8 +911,52 @@ export interface HubSpotGreenhouseCreateDealResponse {
   hubspotDealId: string | null
   pipelineUsed?: string | null
   stageUsed?: string | null
+  dealTypeUsed?: string | null
+  priorityUsed?: string | null
   ownerUsed?: string | null
   message?: string
+}
+
+export interface HubSpotGreenhouseDealMetadataStage {
+  stageId: string
+  label: string | null
+  displayOrder: number | null
+  archived: boolean
+  metadata: Record<string, unknown>
+}
+
+export interface HubSpotGreenhouseDealMetadataPipeline {
+  pipelineId: string
+  label: string | null
+  displayOrder: number | null
+  archived: boolean
+  stages: HubSpotGreenhouseDealMetadataStage[]
+}
+
+export interface HubSpotGreenhouseDealMetadataPropertyOption {
+  value: string | null
+  label: string | null
+  description?: string | null
+  displayOrder: number | null
+  hidden: boolean
+}
+
+export interface HubSpotGreenhouseDealMetadataProperty {
+  propertyName: string
+  label: string | null
+  type: string | null
+  fieldType: string | null
+  hubspotDefined: boolean
+  options: HubSpotGreenhouseDealMetadataPropertyOption[]
+}
+
+export interface HubSpotGreenhouseDealMetadataResponse {
+  objectType: 'deals'
+  pipelines: HubSpotGreenhouseDealMetadataPipeline[]
+  properties: {
+    dealType: HubSpotGreenhouseDealMetadataProperty | null
+    priority: HubSpotGreenhouseDealMetadataProperty | null
+  }
 }
 
 export const createHubSpotGreenhouseDeal = async (
@@ -946,6 +992,9 @@ export const createHubSpotGreenhouseDeal = async (
 
   return (await response.json()) as HubSpotGreenhouseCreateDealResponse
 }
+
+export const getHubSpotGreenhouseDealMetadata = async (): Promise<HubSpotGreenhouseDealMetadataResponse> =>
+  fetchJson<HubSpotGreenhouseDealMetadataResponse>('/deals/metadata')
 
 export const getHubSpotGreenhouseLiveContext = async (
   hubspotCompanyId: string | null

@@ -63,6 +63,7 @@ describe('getDealCreationContext', () => {
         stageRow('p1', 'Default', 's2', 'Qualified', { stageDisplayOrder: 2, isDefaultForCreate: true })
       ])
       .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
 
     const context = await getDealCreationContext({ tenantScope: 'efeonce_internal:efeonce' })
 
@@ -72,6 +73,8 @@ describe('getDealCreationContext', () => {
     expect(context.defaultsSource).toEqual({
       pipeline: 'single_option',
       stage: 'pipeline_default',
+      dealType: 'none',
+      priority: 'none',
       owner: 'none'
     })
   })
@@ -83,9 +86,10 @@ describe('getDealCreationContext', () => {
         stageRow('p2', 'Ops', 's3', 'Intake', { pipelineDisplayOrder: 2 })
       ])
       .mockResolvedValueOnce([
-        { scope: 'global', scope_key: '__global__', pipeline_id: 'p1', stage_id: 's1', owner_hubspot_user_id: 'owner-global' },
-        { scope: 'tenant', scope_key: 'efeonce_internal:efeonce', pipeline_id: 'p2', stage_id: 's3', owner_hubspot_user_id: 'owner-tenant' }
+        { scope: 'global', scope_key: '__global__', pipeline_id: 'p1', stage_id: 's1', deal_type: null, priority: null, owner_hubspot_user_id: 'owner-global' },
+        { scope: 'tenant', scope_key: 'efeonce_internal:efeonce', pipeline_id: 'p2', stage_id: 's3', deal_type: null, priority: null, owner_hubspot_user_id: 'owner-tenant' }
       ])
+      .mockResolvedValueOnce([])
 
     const context = await getDealCreationContext({ tenantScope: 'efeonce_internal:efeonce' })
 
@@ -95,7 +99,7 @@ describe('getDealCreationContext', () => {
     expect(context.defaultsSource.pipeline).toBe('tenant_policy')
   })
 
-  it('falls back to first open selectable stage when no pipeline default exists', async () => {
+  it('flags governance incomplete when multiple selectable stages lack an explicit default', async () => {
     mockQuery
       .mockResolvedValueOnce([
         stageRow('p1', 'Sales', 's-closed', 'Lost', { isClosed: true, isOpenSelectable: false, stageDisplayOrder: 3 }),
@@ -103,11 +107,13 @@ describe('getDealCreationContext', () => {
         stageRow('p1', 'Sales', 's-mid', 'Proposal', { stageDisplayOrder: 2 })
       ])
       .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
 
     const context = await getDealCreationContext()
 
-    expect(context.defaultStageId).toBe('s-open')
-    expect(context.defaultsSource.stage).toBe('first_open_stage')
+    expect(context.defaultStageId).toBeNull()
+    expect(context.readyToCreate).toBe(false)
+    expect(context.blockingIssues).toContain('pipeline:p1:multiple_selectable_stages_without_default')
   })
 })
 
@@ -123,8 +129,14 @@ describe('validateDealCreationSelection', () => {
       context: {
         defaultPipelineId: null,
         defaultStageId: null,
+        defaultDealType: null,
+        defaultPriority: null,
         defaultOwnerHubspotUserId: null,
-        defaultsSource: { pipeline: 'none', stage: 'none', owner: 'none' },
+        defaultsSource: { pipeline: 'none', stage: 'none', dealType: 'none', priority: 'none', owner: 'none' },
+        readyToCreate: false,
+        blockingIssues: [],
+        dealTypeOptions: [],
+        priorityOptions: [],
         pipelines: []
       }
     })
@@ -139,8 +151,14 @@ describe('validateDealCreationSelection', () => {
       context: {
         defaultPipelineId: 'p1',
         defaultStageId: null,
+        defaultDealType: null,
+        defaultPriority: null,
         defaultOwnerHubspotUserId: null,
-        defaultsSource: { pipeline: 'single_option', stage: 'none', owner: 'none' },
+        defaultsSource: { pipeline: 'single_option', stage: 'none', dealType: 'none', priority: 'none', owner: 'none' },
+        readyToCreate: false,
+        blockingIssues: [],
+        dealTypeOptions: [],
+        priorityOptions: [],
         pipelines: [
           {
             pipelineId: 'p1',
@@ -174,8 +192,14 @@ describe('validateDealCreationSelection', () => {
       context: {
         defaultPipelineId: 'p1',
         defaultStageId: 's-open',
+        defaultDealType: null,
+        defaultPriority: null,
         defaultOwnerHubspotUserId: null,
-        defaultsSource: { pipeline: 'single_option', stage: 'pipeline_default', owner: 'none' },
+        defaultsSource: { pipeline: 'single_option', stage: 'pipeline_default', dealType: 'none', priority: 'none', owner: 'none' },
+        readyToCreate: true,
+        blockingIssues: [],
+        dealTypeOptions: [],
+        priorityOptions: [],
         pipelines: [
           {
             pipelineId: 'p1',

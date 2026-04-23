@@ -1330,6 +1330,11 @@ const QuoteBuilderShell = ({
     [localOrganizations, organizationId, pendingOrganizationLabel]
   )
 
+  const selectedContact = useMemo(
+    () => orgContacts.find(contact => contact.identityProfileId === contactIdentityProfileId) ?? null,
+    [contactIdentityProfileId, orgContacts]
+  )
+
   const baseTitle = mode === 'edit' && quote?.quotationNumber
     ? `Editar ${quote.quotationNumber}`
     : GH_PRICING.builderTitleNew
@@ -1557,8 +1562,11 @@ const QuoteBuilderShell = ({
         organizationId={organizationId ?? ''}
         organizationName={selectedOrgName}
         quotationId={quote?.quotationId ?? null}
+        contactIdentityProfileId={contactIdentityProfileId}
         defaultCurrency={currency as 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN'}
-        onSuccess={response => {
+        defaultBusinessLineCode={builderState.businessLineCode}
+        selectedContact={selectedContact}
+        onSuccess={(response, meta) => {
           // Immediately bind the new hubspot deal so the quote ties to it.
           if (response.hubspotDealId) {
             setHubspotDealId(response.hubspotDealId)
@@ -1570,10 +1578,10 @@ const QuoteBuilderShell = ({
             setOrgDeals(current => {
               const next: QuoteOrganizationDeal = {
                 hubspotDealId: response.hubspotDealId as string,
-                dealName: selectedOrgName ? `${selectedOrgName} — Nuevo deal` : 'Nuevo deal',
+                dealName: meta.dealName,
                 dealstage: response.stageUsed ?? 'pending',
-                dealstageLabel: response.stageLabelUsed,
-                pipelineName: response.pipelineLabelUsed,
+                dealstageLabel: response.stageLabelUsed ?? response.stageUsed,
+                pipelineName: response.pipelineLabelUsed ?? response.pipelineUsed,
                 isClosed: false,
                 isWon: false
               }

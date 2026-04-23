@@ -2,34 +2,21 @@ import { NextResponse } from 'next/server'
 
 import { listCommercialDealsForOrganization } from '@/lib/commercial/deals-store'
 import {
+  buildTenantEntitlementSubject,
   createDealFromQuoteContext,
   DealCreateContextEmptyError,
   DealCreateError,
+  DealCreateGovernanceIncompleteError,
   DealCreateInsufficientPermissionsError,
+  DealCreateMappingMissingError,
   DealCreateRateLimitError,
   DealCreateSelectionInvalidError,
   DealCreateValidationError,
   OrganizationHasNoCompanyError
 } from '@/lib/commercial/party'
 import { hasEntitlement } from '@/lib/entitlements/runtime'
-import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { resolveFinanceQuoteTenantOrganizationIds } from '@/lib/finance/quotation-canonical-store'
-import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-
-const buildEntitlementSubjectFromTenant = (tenant: TenantContext): TenantEntitlementSubject => ({
-  userId: tenant.userId,
-  tenantType: tenant.tenantType,
-  roleCodes: tenant.roleCodes,
-  primaryRoleCode: tenant.primaryRoleCode,
-  routeGroups: tenant.routeGroups,
-  authorizedViews: [],
-  projectScopes: tenant.projectScopes,
-  campaignScopes: tenant.campaignScopes,
-  businessLines: tenant.businessLines,
-  serviceModules: tenant.serviceModules,
-  portalHomePath: tenant.portalHomePath
-})
 
 export const dynamic = 'force-dynamic'
 
@@ -87,7 +74,7 @@ export async function POST(
   }
 
   // Capability gate.
-  const subject = buildEntitlementSubjectFromTenant(tenant)
+  const subject = buildTenantEntitlementSubject(tenant)
   const canCreateDeal = hasEntitlement(subject, 'commercial.deal.create', 'create')
 
   if (!canCreateDeal) {
@@ -136,8 +123,14 @@ export async function POST(
       currency: typeof body.currency === 'string' ? body.currency : null,
       pipelineId: typeof body.pipelineId === 'string' ? body.pipelineId : null,
       stageId: typeof body.stageId === 'string' ? body.stageId : null,
+      dealType: typeof body.dealType === 'string' ? body.dealType : null,
+      priority: typeof body.priority === 'string' ? body.priority : null,
       ownerHubspotUserId:
         typeof body.ownerHubspotUserId === 'string' ? body.ownerHubspotUserId : null,
+      contactIdentityProfileId:
+        typeof body.contactIdentityProfileId === 'string'
+          ? body.contactIdentityProfileId
+          : null,
       closeDateHint:
         typeof body.closeDateHint === 'string' ? body.closeDateHint : null,
       businessLineCode:
@@ -150,7 +143,9 @@ export async function POST(
       actor: {
         userId: tenant.userId,
         tenantScope,
-        businessLineCode: tenant.businessLines[0] ?? null
+        businessLineCode: tenant.businessLines[0] ?? null,
+        memberId: tenant.memberId ?? null,
+        identityProfileId: tenant.identityProfileId ?? null
       }
     })
 
@@ -177,7 +172,9 @@ export async function POST(
       error instanceof OrganizationHasNoCompanyError ||
       error instanceof DealCreateInsufficientPermissionsError ||
       error instanceof DealCreateSelectionInvalidError ||
-      error instanceof DealCreateContextEmptyError
+      error instanceof DealCreateContextEmptyError ||
+      error instanceof DealCreateGovernanceIncompleteError ||
+      error instanceof DealCreateMappingMissingError
     ) {
       return NextResponse.json(
         { error: error.message, code: error.code, details: error.details ?? null },

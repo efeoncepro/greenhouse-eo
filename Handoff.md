@@ -1,5 +1,64 @@
 # Handoff.md
 
+## Sesion 2026-04-22 — TASK-573 cierre del contrato de nacimiento de deals (Codex)
+
+- **Scope:** cerrar el follow-on estructural de `TASK-539/571/572` para que los deals nacidos desde el Quote Builder ya no salgan con metadata incompleta ni caigan en fallbacks inseguros.
+- **Implementacion shipped**
+  - migración `20260423010123303_task-573-deal-birth-contract-completion.sql`
+    - `deal_create_attempts`: gana `contact_identity_profile_id`, `hubspot_contact_id`, `deal_type`, `priority`
+    - `greenhouse_commercial.deals`: gana `contact_identity_profile_id`, `hubspot_contact_id`, `priority`
+    - `hubspot_deal_pipeline_defaults`: gana `deal_type`, `priority`
+    - nueva tabla `greenhouse_commercial.hubspot_deal_property_config`
+  - `src/lib/commercial/deal-metadata-sync.ts`
+    - nuevo helper server-only para refrescar pipelines/stages/property options desde `GET /deals/metadata` del servicio HubSpot
+    - upsert de `hubspot_deal_pipeline_config` + `hubspot_deal_property_config`
+  - `src/lib/commercial/deals-store.ts`
+    - `getDealCreationContext` ahora devuelve `readyToCreate`, `blockingIssues`, `defaultDealType`, `defaultPriority`, `dealTypeOptions`, `priorityOptions`
+    - se elimina el fallback inseguro cuando hay múltiples pipelines o múltiples stages válidas sin policy/default explícita
+  - `src/lib/commercial/party/commands/create-deal-from-quote-context.ts`
+    - resuelve owner por cascada `explicit -> actor/member.hubspot_owner_id -> policy`
+    - resuelve contacto `quotation/contactIdentityProfileId -> person_360 -> hubspotContactId`
+    - resuelve `dealType` + `priority` por governance
+    - persiste todos los valores efectivos y bloquea con errores explícitos de governance/mapping faltante
+  - `src/app/api/commercial/organizations/[id]/deals/route.ts`
+    - acepta `dealType`, `priority`, `contactIdentityProfileId`
+    - traduce errores nuevos `DealCreateGovernanceIncompleteError` y `DealCreateMappingMissingError`
+  - `src/app/api/commercial/organizations/[id]/deal-creation-context/route.ts`
+    - acepta `businessLineCode`
+    - marca `organization_missing_hubspot_company` como blocker explícito
+  - `src/app/api/admin/commercial/deal-governance/route.ts`
+    - `GET`: summary operativo del registry
+    - `POST`: refresh manual admin-safe de metadata HubSpot
+  - `CreateDealDrawer` / `useCreateDeal` / `useDealCreationContext` / `QuoteBuilderShell`
+    - UI muestra owner/contact esperados, dropdowns `Tipo de negocio` + `Prioridad`, blockers explícitos y optimistic update con nombre real del deal
+- **Decision documental / backlog**
+  - `TASK-573` se mueve a `complete/`
+  - `TASK-564` **no** se cerró como absorbida al 100%
+  - el gating duro del create ya vive en `TASK-573`; `TASK-564` queda re-scopeada solo al flujo inline de link para orgs legacy sin `hubspot_company_id`
+- **Verificacion ejecutada**
+  - `pnpm pg:connect:migrate` OK (aplica migration + regenera `src/types/db.d.ts`)
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm exec vitest run src/lib/commercial/__tests__/deal-creation-context.test.ts src/lib/commercial/party/commands/__tests__/create-deal-from-quote-context.test.ts` OK (`16` tests)
+  - `pnpm build` OK
+  - `rg "new Pool\\(" src` → solo `src/lib/postgres/client.ts`
+
+## Sesion 2026-04-22 — TASK-573 registrada para completar el contrato de nacimiento de deals (Codex)
+
+- **Scope:** se registró `TASK-573 — Quote Builder Deal Birth Contract Completion & HubSpot Governance Hardening` como follow-on integral de `TASK-539`, `TASK-571` y `TASK-572`.
+- **Motivación operativa consolidada**
+  - el create de deals ya funciona, pero todavía nace con gaps reales de contrato: stage avanzada por fallback inseguro, owner no resuelto desde el actor actual, contacto de la quote no asociado, y ausencia de `dealType` / `priority` en el create path inline
+  - el registry local de pipeline/stage sigue mezclando mirror observacional y governance, lo que no escala bien a múltiples pipelines ni a drift de HubSpot
+- **Decisión documental**
+  - `TASK-573` absorbe funcionalmente el scope narrow de `TASK-564`; no conviene implementar ambas en paralelo sin re-scope explícito
+  - el nuevo task deja explicitado que el problema correcto no es solo “gatear el botón”, sino cerrar el contrato completo `pipeline + stage + owner + contact + dealType + priority`
+- **Archivos actualizados**
+  - `docs/tasks/to-do/TASK-573-quote-builder-deal-birth-contract-completion.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+- **Siguiente ID disponible**
+  - `TASK-574`
+
 ## Sesion 2026-04-22 — TASK-572 POST /deals live en HubSpot Cloud Run (Codex)
 
 - **Scope:** cerrar el follow-up operativo que quedo abierto desde `TASK-539`: el Quote Builder ya llamaba `POST /deals`, pero el servicio `hubspot-greenhouse-integration` devolvia `404` y todos los intentos quedaban como `endpoint_not_deployed`.

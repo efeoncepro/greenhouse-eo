@@ -2,6 +2,15 @@
 
 ## 2026-04-22
 
+### 2026-04-22 — TASK-573 completa el contrato de nacimiento de deals del Quote Builder
+
+- El create inline desde `POST /api/commercial/organizations/[id]/deals` ya no nace “desnudo”: el backend resuelve `owner`, `contact`, `dealType` y `priority` antes de llamar a HubSpot, y persiste esos valores efectivos en `deal_create_attempts` + `greenhouse_commercial.deals`.
+- `createDealFromQuoteContext` deja de caer en fallbacks inseguros cuando la governance está incompleta: múltiples pipelines activos sin policy, múltiples stages válidas sin default, falta de `hubspot_company_id`, o mappings obligatorios ausentes ahora bloquean el create con errores explícitos.
+- Nueva tabla `greenhouse_commercial.hubspot_deal_property_config` espeja options de propiedades HubSpot relevantes para create (`deal type`, `priority`), complementando `hubspot_deal_pipeline_config` y `hubspot_deal_pipeline_defaults`.
+- Nuevo helper `src/lib/commercial/deal-metadata-sync.ts` y nueva route admin-safe `GET/POST /api/admin/commercial/deal-governance` permiten ver el estado operativo y refrescar metadata HubSpot sin SQL manual.
+- `CreateDealDrawer` y sus hooks asociados ahora muestran contacto/owner esperados, dropdowns de `Tipo de negocio` y `Prioridad`, blockers explícitos, y el optimistic update deja de usar placeholders de nombre al insertar el deal recién creado.
+- `TASK-564` queda re-scopeada: el gating duro ya quedó cerrado aquí; lo único pendiente en esa task es un eventual flujo inline para vincular orgs legacy a una Company HubSpot.
+
 ### 2026-04-22 — TASK-572 cierra el `POST /deals` live hacia HubSpot
 
 - El servicio Cloud Run hermano `hubspot-greenhouse-integration` ya expone `POST /deals` en producción; Greenhouse deja de caer en `endpoint_not_deployed` al intentar crear deals inline desde Quote Builder.

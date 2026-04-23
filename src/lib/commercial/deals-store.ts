@@ -660,17 +660,33 @@ export interface DealCreationContextPipeline {
   stages: DealCreationContextStage[]
 }
 
+export interface DealCreationContextOption {
+  value: string
+  label: string
+  description: string | null
+  displayOrder: number | null
+  hidden: boolean
+}
+
 export interface DealCreationContextDefaultsSource {
-  pipeline: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'single_option' | 'first_active' | 'none'
-  stage: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'pipeline_default' | 'first_open_stage' | 'single_option' | 'none'
+  pipeline: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'single_option' | 'none'
+  stage: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'pipeline_default' | 'single_option' | 'none'
+  dealType: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'single_option' | 'none'
+  priority: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'single_option' | 'none'
   owner: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'none'
 }
 
 export interface DealCreationContext {
   defaultPipelineId: string | null
   defaultStageId: string | null
+  defaultDealType: string | null
+  defaultPriority: string | null
   defaultOwnerHubspotUserId: string | null
   defaultsSource: DealCreationContextDefaultsSource
+  readyToCreate: boolean
+  blockingIssues: string[]
+  dealTypeOptions: DealCreationContextOption[]
+  priorityOptions: DealCreationContextOption[]
   pipelines: DealCreationContextPipeline[]
 }
 
@@ -693,7 +709,17 @@ interface PipelineDefaultRow extends Record<string, unknown> {
   scope_key: string
   pipeline_id: string
   stage_id: string | null
+  deal_type: string | null
+  priority: string | null
   owner_hubspot_user_id: string | null
+}
+
+interface DealPropertyConfigRow extends Record<string, unknown> {
+  property_name: string
+  hubspot_property_name: string
+  label: string | null
+  options_json: unknown
+  missing_in_hubspot: boolean
 }
 
 const GLOBAL_DEFAULT_SCOPE_KEY = '__global__'
@@ -737,12 +763,22 @@ export const getDealCreationContext = async (
   )
 
   const defaultRows = await query<PipelineDefaultRow>(
-    `SELECT scope, scope_key, pipeline_id, stage_id, owner_hubspot_user_id
+    `SELECT scope, scope_key, pipeline_id, stage_id, deal_type, priority, owner_hubspot_user_id
        FROM greenhouse_commercial.hubspot_deal_pipeline_defaults
       WHERE (scope = 'global' AND scope_key = $1)
          OR (scope = 'tenant' AND scope_key = COALESCE($2, ''))
          OR (scope = 'business_line' AND scope_key = COALESCE($3, ''))`,
     [GLOBAL_DEFAULT_SCOPE_KEY, tenantScope ?? '', businessLineCode ?? '']
+  )
+
+  const propertyRows = await query<DealPropertyConfigRow>(
+    `SELECT property_name,
+            hubspot_property_name,
+            label,
+            options_json,
+            missing_in_hubspot
+       FROM greenhouse_commercial.hubspot_deal_property_config
+      WHERE property_name IN ('dealType', 'priority')`
   )
 
   const pipelineMap = new Map<string, DealCreationContextPipeline>()
@@ -792,8 +828,13 @@ export const getDealCreationContext = async (
 
   let defaultPipelineId: string | null = null
   let defaultsSourcePipeline: DealCreationContextDefaultsSource['pipeline'] = 'none'
+  let defaultsSourceDealType: DealCreationContextDefaultsSource['dealType'] = 'none'
+  let defaultsSourcePriority: DealCreationContextDefaultsSource['priority'] = 'none'
   let defaultsSourceOwner: DealCreationContextDefaultsSource['owner'] = 'none'
   let defaultOwnerHubspotUserId: string | null = null
+  let defaultDealType: string | null = null
+  let defaultPriority: string | null = null
+  const blockingIssues: string[] = []
 
   const resolvePipelineFromPolicy = (
     row: PipelineDefaultRow | null,
@@ -825,8 +866,7 @@ export const getDealCreationContext = async (
           defaultPipelineId = activePipelines[0].pipelineId
           defaultsSourcePipeline = 'single_option'
         } else if (activePipelines.length > 1) {
-          defaultPipelineId = activePipelines[0].pipelineId
-          defaultsSourcePipeline = 'first_active'
+          blockingIssues.push('multiple_active_pipelines_without_policy')
         }
       }
     }
@@ -870,8 +910,9 @@ export const getDealCreationContext = async (
         defaultStageId = selectableStages[0].stageId
         defaultsSourceStage = 'single_option'
       } else if (selectableStages.length > 1) {
-        defaultStageId = selectableStages[0].stageId
-        defaultsSourceStage = 'first_open_stage'
+        blockingIssues.push(`pipeline:${defaultPipelineId}:multiple_selectable_stages_without_default`)
+      } else {
+        blockingIssues.push(`pipeline:${defaultPipelineId}:no_selectable_stage`)
       }
     }
 
@@ -882,15 +923,116 @@ export const getDealCreationContext = async (
     }
   }
 
+  const propertyMap = new Map(propertyRows.map(row => [row.property_name, row]))
+
+  const parseOptions = (propertyName: 'dealType' | 'priority'): DealCreationContextOption[] => {
+    const row = propertyMap.get(propertyName)
+
+    if (!row || row.missing_in_hubspot) return []
+
+    const payload = Array.isArray(row.options_json)
+      ? row.options_json
+      : typeof row.options_json === 'string'
+        ? (() => {
+            try {
+              const parsed = JSON.parse(row.options_json)
+
+              
+return Array.isArray(parsed) ? parsed : []
+            } catch {
+              return []
+            }
+          })()
+        : []
+
+    return payload
+      .filter(option => option && typeof option === 'object' && typeof option.value === 'string' && typeof option.label === 'string')
+      .map(option => ({
+        value: String(option.value),
+        label: String(option.label),
+        description: typeof option.description === 'string' ? option.description : null,
+        displayOrder: typeof option.displayOrder === 'number' ? option.displayOrder : null,
+        hidden: Boolean(option.hidden)
+      }))
+      .filter(option => !option.hidden)
+      .sort((left, right) => {
+        const leftOrder = left.displayOrder ?? Number.MAX_SAFE_INTEGER
+        const rightOrder = right.displayOrder ?? Number.MAX_SAFE_INTEGER
+
+        return leftOrder - rightOrder || left.label.localeCompare(right.label, 'es')
+      })
+  }
+
+  const dealTypeOptions = parseOptions('dealType')
+  const priorityOptions = parseOptions('priority')
+
+  const resolveScopedPropertyDefault = (
+    key: 'deal_type' | 'priority',
+    options: DealCreationContextOption[],
+    sourceSetter: (source: DealCreationContextDefaultsSource['dealType']) => void
+  ) => {
+    const candidates: Array<{
+      value: string | null
+      source: DealCreationContextDefaultsSource['dealType']
+    }> = [
+      { value: policyByScope.tenant?.[key] ?? null, source: 'tenant_policy' },
+      { value: policyByScope.business_line?.[key] ?? null, source: 'business_line_policy' },
+      { value: policyByScope.global?.[key] ?? null, source: 'global_policy' }
+    ]
+
+    for (const candidate of candidates) {
+      if (candidate.value && options.some(option => option.value === candidate.value)) {
+        sourceSetter(candidate.source)
+        
+return candidate.value
+      }
+    }
+
+    if (options.length === 1) {
+      sourceSetter('single_option')
+      
+return options[0].value
+    }
+
+    return null
+  }
+
+  defaultDealType = resolveScopedPropertyDefault('deal_type', dealTypeOptions, source => {
+    defaultsSourceDealType = source
+  })
+  defaultPriority = resolveScopedPropertyDefault('priority', priorityOptions, source => {
+    defaultsSourcePriority = source
+  })
+
+  if (dealTypeOptions.length > 1 && !defaultDealType) {
+    blockingIssues.push('deal_type_default_missing')
+  }
+
+  if (priorityOptions.length > 1 && !defaultPriority) {
+    blockingIssues.push('priority_default_missing')
+  }
+
+  if (activePipelines.length === 0) {
+    blockingIssues.push('no_active_pipeline')
+  }
+
   return {
     defaultPipelineId,
     defaultStageId,
+    defaultDealType,
+    defaultPriority,
     defaultOwnerHubspotUserId,
     defaultsSource: {
       pipeline: defaultsSourcePipeline,
       stage: defaultsSourceStage,
+      dealType: defaultsSourceDealType,
+      priority: defaultsSourcePriority,
       owner: defaultsSourceOwner
     },
+    readyToCreate: blockingIssues.length === 0,
+    blockingIssues,
+    dealTypeOptions,
+    priorityOptions,
     pipelines
   }
 }

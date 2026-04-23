@@ -2,10 +2,28 @@
 
 > **Version:** 1.4
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
-> **Ultima actualizacion:** 2026-04-22 por Codex — read-through contact hydration para Quote Builder; 2026-04-22 por Codex — TASK-543 cleanup de flags post-rollout
+> **Ultima actualizacion:** 2026-04-22 por Codex — TASK-573 hardening del nacimiento de deals; 2026-04-22 por Codex — read-through contact hydration para Quote Builder; 2026-04-22 por Codex — TASK-543 cleanup de flags post-rollout
 > **Audience:** Backend engineers, product owners, agentes que implementen features de pre-venta, quote builder, HubSpot sync o revenue pipeline
 > **Related:** `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`, `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## Delta 2026-04-22 — TASK-573 deal birth contract completion
+
+El comando `createDealFromQuoteContext` deja de depender de heurísticas frágiles y pasa a resolver el nacimiento del deal con un contrato más completo:
+
+1. `owner`: override explícito -> actor Greenhouse (`members.hubspot_owner_id`) -> policy tenant/business line/global -> error explícito si el mapping requerido no existe.
+2. `contact`: `quotation.contact_identity_profile_id` o input explícito -> `person_360` / `greenhouse_crm.contacts` -> `hubspotContactId` -> error explícito si la quote exige contacto HubSpot y no existe mapping.
+3. `dealType` y `priority`: mirror local de property options HubSpot + policy Greenhouse, persistidos en `deal_create_attempts` y `greenhouse_commercial.deals`.
+4. `pipeline/stage`: si la governance está incompleta o hay ambigüedad real, el create se bloquea; ya no cae en un fallback silencioso a stage avanzada.
+
+### Efecto operativo
+
+- `GET /api/commercial/organizations/[id]/deal-creation-context` expone `readyToCreate`, `blockingIssues`, `dealTypeOptions`, `priorityOptions` y bloquea create desde UI cuando falta `hubspot_company_id`.
+- Nace `greenhouse_commercial.hubspot_deal_property_config` como mirror local de options relevantes (`deal type`, `priority`).
+- Existe una lane admin-safe `GET/POST /api/admin/commercial/deal-governance` para ver summary y refrescar metadata HubSpot sin tocar SQL manual.
+- `TASK-564` ya no debe reabrir el gating duro del create; su scope residual queda solo en la remediación inline para orgs legacy sin `hubspot_company_id`, si esa UX todavía se desea.
 
 ---
 

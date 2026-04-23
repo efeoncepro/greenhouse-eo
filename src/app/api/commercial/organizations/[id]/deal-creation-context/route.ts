@@ -2,25 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { query } from '@/lib/db'
 import { getDealCreationContext } from '@/lib/commercial/deals-store'
+import { buildTenantEntitlementSubject } from '@/lib/commercial/party'
 import { hasEntitlement } from '@/lib/entitlements/runtime'
-import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { resolveFinanceQuoteTenantOrganizationIds } from '@/lib/finance/quotation-canonical-store'
-import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-
-const buildEntitlementSubjectFromTenant = (tenant: TenantContext): TenantEntitlementSubject => ({
-  userId: tenant.userId,
-  tenantType: tenant.tenantType,
-  roleCodes: tenant.roleCodes,
-  primaryRoleCode: tenant.primaryRoleCode,
-  routeGroups: tenant.routeGroups,
-  authorizedViews: [],
-  projectScopes: tenant.projectScopes,
-  campaignScopes: tenant.campaignScopes,
-  businessLines: tenant.businessLines,
-  serviceModules: tenant.serviceModules,
-  portalHomePath: tenant.portalHomePath
-})
 
 export const dynamic = 'force-dynamic'
 
@@ -32,7 +17,7 @@ export const dynamic = 'force-dynamic'
 // `hubspot_deal_pipeline_defaults`) so the drawer never has to query HubSpot
 // live.
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -48,7 +33,7 @@ export async function GET(
     return NextResponse.json({ error: 'organization id is required' }, { status: 400 })
   }
 
-  const subject = buildEntitlementSubjectFromTenant(tenant)
+  const subject = buildTenantEntitlementSubject(tenant)
 
   if (!hasEntitlement(subject, 'commercial.deal.create', 'create')) {
     return NextResponse.json(
@@ -80,14 +65,23 @@ export async function GET(
   }
 
   const tenantScope = `${tenant.tenantType}:${tenant.clientId || 'system'}`
-  const businessLineCode = tenant.businessLines[0] ?? null
+  const { searchParams } = new URL(request.url)
+  const requestedBusinessLineCode = searchParams.get('businessLineCode')?.trim() || null
+  const businessLineCode = requestedBusinessLineCode || tenant.businessLines[0] || null
 
   const context = await getDealCreationContext({ tenantScope, businessLineCode })
+  const organizationHasHubSpotCompany = Boolean(orgRows[0].hubspot_company_id)
+
+  const blockingIssues = organizationHasHubSpotCompany
+    ? context.blockingIssues
+    : [...context.blockingIssues, 'organization_missing_hubspot_company']
 
   return NextResponse.json({
     organizationId: orgRows[0].organization_id,
     organizationName: orgRows[0].organization_name ?? null,
     hubspotCompanyId: orgRows[0].hubspot_company_id,
-    ...context
+    ...context,
+    readyToCreate: context.readyToCreate && organizationHasHubSpotCompany,
+    blockingIssues
   })
 }

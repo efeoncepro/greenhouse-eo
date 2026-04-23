@@ -341,13 +341,16 @@ export interface GreenhouseCommercialDealCreateAttempts {
   attempt_id: Generated<string>;
   business_line_code: string | null;
   completed_at: Timestamp | null;
+  contact_identity_profile_id: string | null;
   created_at: Generated<Timestamp>;
   currency: string | null;
   deal_id: string | null;
   deal_name: string;
+  deal_type: string | null;
   error_code: string | null;
   error_message: string | null;
   hubspot_company_id: string | null;
+  hubspot_contact_id: string | null;
   hubspot_deal_id: string | null;
   /**
    * Caller-supplied key; UNIQUE partial index dedupes retries within the default window.
@@ -357,6 +360,7 @@ export interface GreenhouseCommercialDealCreateAttempts {
   organization_id: string;
   owner_hubspot_user_id: string | null;
   pipeline_id: string | null;
+  priority: string | null;
   stage_id: string | null;
   /**
    * pending (in-flight) · completed (deal created + persisted) · pending_approval (>threshold, awaiting approval) · rate_limited (refused) · failed (Cloud Run error) · endpoint_not_deployed (graceful fallback while /deals ships)
@@ -373,6 +377,7 @@ export interface GreenhouseCommercialDeals {
   amount_clp: Numeric | null;
   client_id: string | null;
   close_date: Timestamp | null;
+  contact_identity_profile_id: string | null;
   created_at: Generated<Timestamp>;
   created_in_hubspot_at: Timestamp | null;
   currency: Generated<string>;
@@ -385,6 +390,7 @@ export interface GreenhouseCommercialDeals {
   dealstage: string;
   dealstage_label: string | null;
   exchange_rate_to_clp: Numeric | null;
+  hubspot_contact_id: string | null;
   hubspot_deal_id: string;
   hubspot_last_synced_at: Generated<Timestamp>;
   hubspot_pipeline_id: string | null;
@@ -393,6 +399,7 @@ export interface GreenhouseCommercialDeals {
   is_won: Generated<boolean>;
   organization_id: string | null;
   pipeline_name: string | null;
+  priority: string | null;
   probability_pct: Numeric | null;
   source_payload: Generated<Json>;
   space_id: string | null;
@@ -460,13 +467,37 @@ export interface GreenhouseCommercialHubspotDealPipelineConfig {
 
 export interface GreenhouseCommercialHubspotDealPipelineDefaults {
   created_at: Generated<Timestamp>;
+  deal_type: string | null;
   notes: string | null;
   owner_hubspot_user_id: string | null;
   pipeline_id: string;
+  priority: string | null;
   scope: string;
   scope_key: string;
   stage_id: string | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialHubspotDealPropertyConfig {
+  description: string | null;
+  field_type: string | null;
+  /**
+   * HubSpot internal property name, e.g. dealtype or hs_priority.
+   */
+  hubspot_property_name: string;
+  label: string | null;
+  metadata: Generated<Json>;
+  missing_in_hubspot: Generated<boolean>;
+  /**
+   * HubSpot options snapshot as JSON array; empty array when the property has no enumerated options.
+   */
+  options_json: Generated<Json>;
+  /**
+   * Greenhouse-facing semantic property key, e.g. dealType or priority.
+   */
+  property_name: string;
+  property_type: string | null;
+  synced_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseCommercialMarginTargets {
@@ -6235,6 +6266,7 @@ export interface DB {
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
   "greenhouse_commercial.hubspot_deal_pipeline_defaults": GreenhouseCommercialHubspotDealPipelineDefaults;
+  "greenhouse_commercial.hubspot_deal_property_config": GreenhouseCommercialHubspotDealPropertyConfig;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.master_agreement_clauses": GreenhouseCommercialMasterAgreementClauses;
   "greenhouse_commercial.master_agreements": GreenhouseCommercialMasterAgreements;

@@ -71,11 +71,21 @@ const stubPipelineStructureRows = () => [
   }
 ]
 
-const stubPipelineDefaultRows = () => []
+const stubPipelineDefaultRows = () => [] as Array<{
+  scope: string
+  scope_key: string
+  pipeline_id: string
+  stage_id: string | null
+  deal_type: string | null
+  priority: string | null
+  owner_hubspot_user_id: string | null
+}>
+const stubPropertyRows = () => []
 
 const mockPipelineContextQueries = () => {
   mockQuery.mockResolvedValueOnce(stubPipelineStructureRows())
   mockQuery.mockResolvedValueOnce(stubPipelineDefaultRows())
+  mockQuery.mockResolvedValueOnce(stubPropertyRows())
 }
 
 const baseInput = {
@@ -86,6 +96,7 @@ const baseInput = {
   currency: 'CLP',
   pipelineId: 'default',
   stageId: 'appointmentscheduled',
+  ownerHubspotUserId: 'hs-owner-request',
   actor: { userId: 'user-1', tenantScope: 'efeonce_internal:efeonce' }
 }
 
@@ -265,7 +276,8 @@ describe('createDealFromQuoteContext', () => {
         organizationId: 'org-1',
         toStage: 'opportunity',
         triggerEntity: { type: 'deal', id: 'deal-new' }
-      })
+      }),
+      undefined
     )
 
     expect(mockPublishDealCreated).toHaveBeenCalledTimes(1)

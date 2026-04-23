@@ -6,6 +6,12 @@
 - La aserción "el comando `createDealFromQuoteContext` falla con 409 porque el guard de `src/lib/commercial/party/commands/create-deal-from-quote-context.ts:369-371` exige `hubspot_company_id`" sigue válida, pero ahora el command puede fallar también con `DealCreateSelectionInvalidError` (422) o `DealCreateContextEmptyError` (409) si el registry local no está gobernado. Considerar ambos errores al diseñar el gating.
 - El CTA "Crear deal nuevo" ya no está en un floating button: vive en el footer del popover del chip Deal (TASK-570). El gating de TASK-564 debe ocultar o deshabilitar ese footer cuando la org no tiene `hubspot_company_id`.
 
+## Delta 2026-04-22 — Re-scope post TASK-573
+
+- `TASK-573` ya cerró el gating duro del create: `GET /deal-creation-context` devuelve `readyToCreate=false` + `blockingIssues`, `CreateDealDrawer` muestra blocker explícito cuando falta `hubspot_company_id`, y el backend mantiene la defensa en profundidad.
+- Esta task **ya no debe reimplementar** ese gating ni tocar de nuevo el contrato `createDealFromQuoteContext`.
+- El scope residual, si todavía vale la pena, es solo la **remediación inline** para orgs legacy: un flujo dentro del Quote Builder para vincular una organization existente a una Company HubSpot sin salir del builder.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -28,17 +34,16 @@
 
 ## Summary
 
-El CTA "Crear deal nuevo" en Quote Builder se renderiza aunque la organization no tenga `hubspot_company_id`; el operador llena el drawer y recién al submit recibe 409 `ORGANIZATION_HAS_NO_HUBSPOT_COMPANY`. Esta task cierra el gap: grisa/oculta el CTA cuando falta el vínculo, muestra motivo explícito, y agrega una acción inline "Vincular a Company HubSpot" que reutiliza el search de TASK-537 para setear `hubspot_company_id` sobre la organization existente sin salir del builder.
+Follow-up residual post `TASK-573`: el Quote Builder ya bloquea correctamente la creación de deals cuando falta `hubspot_company_id`, pero todavía no existe una remediación inline para vincular una organization legacy a una Company HubSpot desde la misma surface. Esta task queda enfocada solo en ese flujo de link guiado.
 
 ## Why This Task Exists
 
-TASK-539 entregó la creación inline de deals con la premisa implícita de que la organization ya estaba sincronizada con HubSpot (vía TASK-538 selector que adopta `hubspot_candidate`). Orgs creadas por el path legacy de Finance (Clients → Organizations) **no tienen `hubspot_company_id`** y no pasaron por el selector unificado. El gap se manifiesta en producción: el operador elige "Santander – Chile" (legacy), ve "Sin deals disponibles", clickea "+ Crear deal nuevo", llena el drawer, y el comando `createDealFromQuoteContext` falla con 409 porque el guard de `src/lib/commercial/party/commands/create-deal-from-quote-context.ts:369-371` exige `hubspot_company_id`. La promesa de TASK-539 (eliminar context-switch a HubSpot) queda rota para este subconjunto de orgs.
+`TASK-573` resolvió el problema más riesgoso: ya no se llega al submit para descubrir recién ahí que falta el vínculo a HubSpot. Sin embargo, las orgs legacy creadas por paths anteriores de Finance siguen necesitando una remediación manual fuera del builder para completar `hubspot_company_id`. Si queremos cerrar la experiencia end-to-end para ese subconjunto, falta un flujo inline de linkeo retroactivo sobre la organization ya local.
 
 ## Goal
 
-- Gate visual del CTA "Crear deal nuevo" cuando `organization.hubspot_company_id IS NULL` — botón disabled con tooltip explicativo, no silent no-op.
-- Pre-check en `CreateDealDrawer` que comunica el motivo antes de dejar submitear.
-- Acción inline "Vincular a Company HubSpot existente" que reutiliza `/api/commercial/parties/search` (TASK-537) filtrando `kind='hubspot_candidate'` y dispara comando `linkOrganizationToHubSpotCompany` que setea `hubspot_company_id` + emite evento outbox.
+- Mantener como invariant que el gating del create vive en `TASK-573`; esta task no lo duplica.
+- Agregar una acción inline "Vincular a Company HubSpot existente" que reutiliza `/api/commercial/parties/search` (TASK-537) filtrando `kind='hubspot_candidate'` y dispara comando `linkOrganizationToHubSpotCompany` que setea `hubspot_company_id` + emite evento outbox.
 - Una vez linkeada, el CTA "Crear deal nuevo" se desbloquea sin refresh de página.
 
 <!-- ═══════════════════════════════════════════════════════════

@@ -16,6 +16,14 @@ export interface DealCreationContextStage {
   isDefault: boolean
 }
 
+export interface DealCreationContextOption {
+  value: string
+  label: string
+  description: string | null
+  displayOrder: number | null
+  hidden: boolean
+}
+
 export interface DealCreationContextPipeline {
   pipelineId: string
   label: string
@@ -31,6 +39,8 @@ export interface DealCreationContextResponse {
   hubspotCompanyId: string | null
   defaultPipelineId: string | null
   defaultStageId: string | null
+  defaultDealType: string | null
+  defaultPriority: string | null
   defaultOwnerHubspotUserId: string | null
   defaultsSource: {
     pipeline:
@@ -48,8 +58,14 @@ export interface DealCreationContextResponse {
       | 'first_open_stage'
       | 'single_option'
       | 'none'
+    dealType: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'single_option' | 'none'
+    priority: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'single_option' | 'none'
     owner: 'tenant_policy' | 'business_line_policy' | 'global_policy' | 'none'
   }
+  readyToCreate: boolean
+  blockingIssues: string[]
+  dealTypeOptions: DealCreationContextOption[]
+  priorityOptions: DealCreationContextOption[]
   pipelines: DealCreationContextPipeline[]
 }
 
@@ -62,11 +78,63 @@ export interface UseDealCreationContextResult {
 
 interface UseDealCreationContextOptions {
   organizationId: string | null
+  businessLineCode?: string | null
   enabled?: boolean
 }
 
+interface DealCreationContextResponseCompat
+  extends Partial<Omit<DealCreationContextResponse, 'defaultsSource' | 'pipelines'>> {
+  organizationId: string
+  organizationName?: string | null
+  hubspotCompanyId?: string | null
+  defaultPipelineId?: string | null
+  defaultStageId?: string | null
+  defaultDealType?: string | null
+  defaultPriority?: string | null
+  defaultOwnerHubspotUserId?: string | null
+  defaultsSource?: Partial<DealCreationContextResponse['defaultsSource']>
+  blockingIssues?: string[]
+  dealTypeOptions?: DealCreationContextOption[]
+  priorityOptions?: DealCreationContextOption[]
+  pipelines?: DealCreationContextPipeline[]
+}
+
+const normalizeDefaultsSource = (
+  source?: DealCreationContextResponseCompat['defaultsSource']
+): DealCreationContextResponse['defaultsSource'] => ({
+  pipeline: source?.pipeline ?? 'none',
+  stage: source?.stage ?? 'none',
+  dealType: source?.dealType ?? 'none',
+  priority: source?.priority ?? 'none',
+  owner: source?.owner ?? 'none'
+})
+
+const normalizeContextPayload = (
+  body: DealCreationContextResponseCompat
+): DealCreationContextResponse => {
+  const pipelines = body.pipelines ?? []
+  const blockingIssues = Array.isArray(body.blockingIssues) ? body.blockingIssues : []
+
+  return {
+    organizationId: body.organizationId,
+    organizationName: body.organizationName ?? null,
+    hubspotCompanyId: body.hubspotCompanyId ?? null,
+    defaultPipelineId: body.defaultPipelineId ?? null,
+    defaultStageId: body.defaultStageId ?? null,
+    defaultDealType: body.defaultDealType ?? null,
+    defaultPriority: body.defaultPriority ?? null,
+    defaultOwnerHubspotUserId: body.defaultOwnerHubspotUserId ?? null,
+    defaultsSource: normalizeDefaultsSource(body.defaultsSource),
+    readyToCreate: body.readyToCreate ?? (blockingIssues.length === 0 && pipelines.length > 0),
+    blockingIssues,
+    dealTypeOptions: body.dealTypeOptions ?? [],
+    priorityOptions: body.priorityOptions ?? [],
+    pipelines
+  }
+}
+
 const useDealCreationContext = (
-  { organizationId, enabled = true }: UseDealCreationContextOptions
+  { organizationId, businessLineCode, enabled = true }: UseDealCreationContextOptions
 ): UseDealCreationContextResult => {
   const [data, setData] = useState<DealCreationContextResponse | null>(null)
   const [loading, setLoading] = useState(false)
@@ -90,8 +158,16 @@ const useDealCreationContext = (
     setError(null)
 
     try {
+      const searchParams = new URLSearchParams()
+
+      if (businessLineCode?.trim()) {
+        searchParams.set('businessLineCode', businessLineCode.trim())
+      }
+
+      const query = searchParams.toString()
+
       const response = await fetch(
-        `/api/commercial/organizations/${encodeURIComponent(organizationId)}/deal-creation-context`,
+        `/api/commercial/organizations/${encodeURIComponent(organizationId)}/deal-creation-context${query ? `?${query}` : ''}`,
         { signal: controller.signal, cache: 'no-store' }
       )
 
@@ -112,9 +188,9 @@ const useDealCreationContext = (
         return
       }
 
-      const body = (await response.json()) as DealCreationContextResponse
+      const body = (await response.json()) as DealCreationContextResponseCompat
 
-      setData(body)
+      setData(normalizeContextPayload(body))
     } catch (caught) {
       if (caught instanceof DOMException && caught.name === 'AbortError') return
 
@@ -124,7 +200,7 @@ const useDealCreationContext = (
       setLoading(false)
       abortRef.current = null
     }
-  }, [organizationId])
+  }, [businessLineCode, organizationId])
 
   useEffect(() => {
     if (!enabled) return
