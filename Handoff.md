@@ -1,10 +1,63 @@
 # Handoff.md
 
-## Sesion 2026-04-24 — TASK-598 cerrada: ICO Narrative Presentation Layer (Claude)
+## Sesion 2026-04-24 — EPIC-007 + TASK-600: Reliability Control Plane foundation (Codex)
 
-- **Task:** `TASK-598` → `complete` (código shippeado; deploy ops-worker operacional pendiente pre-lunes).
+- **Nuevo programa creado**
+  - `EPIC-007 — Reliability Control Plane`
+  - `TASK-600 — Reliability Registry & Signal Correlation Foundation`
+- **Motivación**
+  - Greenhouse ya tiene `Ops Health`, `Cloud & Integrations`, `Sentry`, Playwright smoke y varios readers de salud, pero todavía no existe una capa canónica de confiabilidad por módulo que los una
+- **Decisión de framing**
+  - el epic no parte por un “agente LLM” ni por una UI nueva grande
+  - la primera task fundacional parte por:
+    - registry canónico por módulo crítico
+    - modelo unificado de señales
+    - reader consolidado reusable
+    - primer surfacing ligero en `Admin Center`
+- **Relación con backlog ya existente**
+  - `TASK-586` pasa a entenderse como slice visible de observabilidad cloud + Notion dentro de este programa, sin cambiar su scope
+  - `TASK-599` pasa a entenderse como el primer bloque de confianza preventiva por tests dentro de este programa, sin cambiar su scope
+
+## Sesion 2026-04-24 — TASK-598 cerrada + deploy verificado end-to-end (Claude)
+
+- **Task:** `TASK-598` → `complete`. Código en develop (commit `b5e2431f`), deploy ejecutado vía GitHub Actions, email de prueba recibido OK, dry-run + cron path verificados. Cerrada end-to-end.
 - **Branch:** `task/TASK-598-ico-narrative-presentation-layer` → squash merge a `develop`.
-- **Deadline duro:** lunes 2026-04-27 07:00 Chile (cron `ops-nexa-weekly-digest`).
+- **Deadline duro:** lunes 2026-04-27 07:00 Chile (cron `ops-nexa-weekly-digest`). Llegamos antes.
+
+### Deploy operacional ejecutado (2026-04-24 T12:14 UTC)
+
+- GitHub Actions `Ops Worker Deploy` (run 24888600504) auto-disparado por el commit de merge a develop. Completed success.
+- Nueva revisión Cloud Run: **`ops-worker-00070-bj4`** con 100% del tráfico.
+- Rollback target si algo se rompe: `ops-worker-00069-lxb` (revisión previa).
+- Health check `GET /health` → HTTP 200 `{"status":"ok","service":"ops-worker"}`.
+- Smoke `POST /reactive/process` (batchSize=1) → HTTP 200, 142ms, no regresión del runtime reactivo.
+- Dry-run `POST /nexa/weekly-digest` con `{"dryRun":true,"limit":8}` → HTTP 200, payload con 4 critical insights (3 Efeonce + 1 Sky Airline). `grep -i` por sentinels en el JSON completo: 0 matches.
+- Envío real `POST /nexa/weekly-digest` con `recipients_override=[{"email":"jreyes@efeoncepro.com"}]` → HTTP 200, `status=sent`, `deliveryId=48454c0d-c005-4722-ac03-5e13a3529747`, `resendId=85c865df-2fc7-45f1-a893-736b5af9c48d`.
+- **Email confirmado OK por el recipient en cliente real** (Julio Reyes, 2026-04-24).
+- Cloud Logging capturó `[ops-worker] /nexa/weekly-digest done — status=sent recipients=1 insights=4 override=true`.
+- Cloud Logging capturó también el structured log `narrative_presentation`: `{source: "weekly_digest", total_mentions: 16, resolved: 16, fallback_rate: 0, fallback_count_by_reason: {none: 16, sentinel: 0, missing_entity: 0, null_canonical: 0, technical_id: 0}}`. **100% de mentions resuelven contra canonical vigente en producción.**
+
+### Acceptance criteria de TASK-598 — estado
+
+Todos los buckets cubiertos al momento del cierre:
+
+- **Correctitud de contenido:** `narrative-presentation.ts` + tests (21) + `build-weekly-digest.ts` refactorizado + tests (5) + fixture regression. ✅
+- **Empty-digest risk (Slice 3.5):** threshold preview ejecutado contra dataset real, defaults validados, fallback_rate 0/16 confirmado. ✅
+- **Deploy + end-to-end render (Slice 6 + 6.5):** nueva revisión activa, dry-run limpio, envío real a jreyes@efeoncepro.com confirmado OK. ✅
+- **Post-deploy monitoring + rollback (Slice 7):** runbook publicado en `docs/runbooks/ico-weekly-digest-rollback.md`, comandos gcloud scheduler pause + revert revision documentados, template de comunicación pre-escrito. ✅
+- **Smoke test del primer cron real (lunes):** sigue pendiente (el cron dispara el lunes 07:00 Chile). Comando de verificación post-cron documentado abajo. ⏳
+
+### Monitoreo previsto lunes 2026-04-27 07:00-08:00 Chile
+
+```bash
+gcloud logging read 'resource.type="cloud_run_revision"
+  AND resource.labels.service_name="ops-worker"
+  AND textPayload =~ "POST /nexa/weekly-digest"' \
+  --project efeonce-group --limit 5 --freshness=1h \
+  --format="value(timestamp, textPayload)"
+```
+
+Esperado: línea `done — status=sent recipients=N insights=M override=false` con N > 0 dentro de la ventana 07:00-07:10 Chile (10:00-10:10 UTC). Si falta o falla → aplicar runbook (`docs/runbooks/ico-weekly-digest-rollback.md`).
 
 - **Qué quedó shippeado en develop:**
   - Capa compartida `src/lib/ico-engine/ai/narrative-presentation.ts`: `resolveMentions`, `loadMentionContext`, `selectPresentableEnrichments`, `resolveAllNarrativeFields`, `summarizePresentationReports`, `emitPresentationLog`. 4 fallback reasons tipados (sentinel, missing_entity, null_canonical, technical_id).
@@ -21,54 +74,6 @@
   - `fallback_rate: 0.0` en TODOS los runs (18 combos de threshold matrix).
   - 16/16 mentions resuelven 100% contra canonical vigente. Cero sentinels, cero huérfanos propagados.
   - Defaults validados sin cambios: minQualityScore=0, severityFloor=warning, maxPerSpace=3, maxTotal=8.
-
-- **Pendiente PRE-LUNES 07:00 Chile (operación productiva):**
-
-  **Paso 1 — Deploy ops-worker con el fix.**
-
-  ```bash
-  bash services/ops-worker/deploy.sh
-  ```
-
-  Re-deploya el Cloud Run con el bundle nuevo que incluye narrative-presentation + build-weekly-digest refactor + handler con dryRun/recipients_override.
-
-  **Paso 2 — Dry-run staging (valida sin enviar email):**
-
-  ```bash
-  export OPS_WORKER_URL=$(gcloud run services describe ops-worker \
-    --project efeonce-group --region us-east4 --format="value(status.url)")
-  export ID_TOKEN=$(gcloud auth print-identity-token)
-
-  curl -X POST "${OPS_WORKER_URL}/nexa/weekly-digest" \
-    -H "Authorization: Bearer ${ID_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -d '{"dryRun": true, "limit": 8}' \
-    | jq '.digest | {totalInsights, criticalCount, spacesAffected, spaces: [.spaces[] | {name, insights: [.insights[] | .headline]}]}'
-  ```
-
-  Esperado: `totalInsights: 4`, `spacesAffected: 2`, sin strings "Sin nombre" en output.
-
-  **Paso 3 — Envío real a recipient de test:**
-
-  ```bash
-  curl -X POST "${OPS_WORKER_URL}/nexa/weekly-digest" \
-    -H "Authorization: Bearer ${ID_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -d '{"recipients_override": ["tu-email@efeonce.org"], "limit": 8}'
-  ```
-
-  Abrir email en Gmail desktop + mobile. Verificar: cero sentinels, links `@[...]` funcionan, layout OK con labels largos.
-
-  **Paso 4 — Monitoreo post-cron (lunes 07:00-08:00):**
-
-  ```bash
-  gcloud logging read 'resource.type="cloud_run_revision"
-    AND resource.labels.service_name="ops-worker"
-    AND textPayload =~ "POST /nexa/weekly-digest"' \
-    --project efeonce-group --limit 10 --format="value(timestamp, textPayload)"
-  ```
-
-  Esperado: `done — status=sent` con `recipients > 0`. Si falta o falla → aplicar runbook rollback (`docs/runbooks/ico-weekly-digest-rollback.md`).
 
 - **Sinergia con EPIC-006:** la capa `narrative-presentation.ts` es reusable por TASK-595 (UI inbox), TASK-596 (webhooks + Nexa), y compatible con el schema v2 futuro de TASK-590 (solo cambia el JOIN target cuando se deprecate v1).
 

@@ -18,6 +18,83 @@
 
 Exponer la capa de signals al exterior vía webhooks HMAC-signed al configurar subscripciones por tenant, y permitir que el agente Nexa lea signals y ejecute transiciones via la API en nombre del user con audit trail correcto. Habilita integración Slack, PagerDuty, tickets, y cualquier endpoint HTTP custom por tenant. El agente AI entra como actor first-class del sistema.
 
+## Delta 2026-04-24 — TASK-598 shipped: resolver narrativas ANTES de firmar el payload
+
+`TASK-598` instaló `src/lib/ico-engine/ai/narrative-presentation.ts` y dejó el weekly digest live con narrativas resueltas contra canonical vigente. Los webhooks y Nexa DEBEN consumir la misma capa para evitar que clientes externos reciban payloads con labels frozen o sentinels.
+
+**Qué significa para esta task (Webhooks + Nexa):**
+
+### Webhooks outbound HMAC-signed
+
+Antes de firmar el payload y enviarlo al endpoint del cliente, pasar las narrativas por `resolveMentions` con contexto canonical. Ejemplo:
+
+```ts
+// En el webhook dispatcher
+const mentionContext = await loadMentionContext({ enrichments: [signalPayload.enrichment] })
+const resolvedEnrichment = resolveAllNarrativeFields(signalPayload.enrichment, mentionContext)
+
+const webhookPayload = {
+  event: 'signal.critical',
+  signal_id: signal.signal_id,
+  enrichment: {
+    explanation_summary: resolvedEnrichment.explanation_summary,
+    root_cause_narrative: resolvedEnrichment.root_cause_narrative,
+    recommended_action: resolvedEnrichment.recommended_action
+  }
+}
+
+// Emitir log structured para SLI
+emitPresentationLog(summarizePresentationReports(resolvedEnrichment.presentation_reports, {
+  source: 'webhook_outbound',
+  windowStart: ..., windowEnd: ...
+}))
+
+const signature = hmacSign(JSON.stringify(webhookPayload), subscription.signing_secret)
+await httpPost(subscription.endpoint_url, { payload: webhookPayload, 'X-Greenhouse-Signature': signature })
+```
+
+### Nexa agent tools
+
+Los tools que el agente invoca (listIcoSignals, acknowledgeSignal, resolveSignal) deben devolver narrativa resuelta. Esto significa:
+
+- `listIcoSignals` usa `selectPresentableEnrichments` + `resolveMentions` idéntico a la UI.
+- `acknowledgeSignal(signal_key, reason)` escribe el transition event — no necesita resolver nada, pero el `reason` debería ir tal cual (no procesar con `resolveMentions` porque no tiene mentions).
+- Al devolver el signal detail al agente para que lo resuma, la narrativa ya debe venir resuelta.
+
+### Source en el log estructurado
+
+- Webhooks: `source: 'webhook_outbound'`
+- Nexa agent: `source: 'nexa_agent'`
+
+Esto permite a TASK-594 medir SLIs por superficie.
+
+### Label policy en el payload HMAC
+
+Decidir: ¿el payload lleva los `@[label](type:id)` tokens o texto plano hidratado?
+
+- Plain text (recomendado): clientes externos reciben narrativa human-readable sin procesar. Ej. "El proyecto TEASER TS cayó a 67.6%".
+- Tokens (alternativa): `@[TEASER TS](project:abc)` — cliente externo decide cómo renderizar. Complica el webhook.
+
+Recomendado: plain text, usando `resolveMentions` (que ya colapsa a texto plano cuando el canonical existe).
+
+**Contrato que NO se debe romper:**
+
+- Firmas públicas de la capa TASK-598.
+- No enviar labels frozen en webhooks — el cliente externo puede confiar en que el payload es vigente.
+- No enviar signals huérfanos — `selectPresentableEnrichments` con `requireSignalExists: true`.
+
+**Sinergia:**
+
+- Clientes de Slack/PagerDuty/etc. ven siempre labels actuales.
+- Nexa agent tiene la misma vista que humanos en la UI inbox (TASK-595).
+- Si un signal se resuelve entre la detección y el webhook send (ventana de minutos), el handler puede consultar `status` via TASK-592 y skippear el envío — el webhook queda consistente con la UI.
+
+**Referencias:**
+
+- Spec TASK-598: `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md`
+- Utilities: `src/lib/ico-engine/ai/narrative-presentation.ts`
+- Helper `resolveAllNarrativeFields`: aplica a los 3 campos de narrativa en una pasada + retorna reports.
+
 ## Why This Task Exists
 
 Un sistema de alertas enterprise-grade tiene que integrarse con los canales donde el equipo ya opera: Slack para notificación rápida, PagerDuty para SLAs duros, tickets para trazabilidad. Hoy los signals viven solo en la UI interna. Además, Nexa (el agente AI) tiene que poder actuar como representante del user dentro del sistema con audit trail explícito (`actor_type='agent'` + `agent_id`).

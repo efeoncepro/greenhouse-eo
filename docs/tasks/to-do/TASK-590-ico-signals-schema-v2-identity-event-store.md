@@ -20,6 +20,50 @@
 
 Crear el schema fundacional de la nueva capa de signals sin breaking changes al v1 actual: tabla de eventos append-only (`signal_events`), tabla consolidada con identidad determinista (`signals_v2`), enrichments versionados (`signal_enrichments_v2`), observabilidad del pipeline (`materialize_runs`), y helper canónico de `signal_key` hash con tests de determinismo + colision-safety. Conviven con `ai_signals` actual hasta que TASK-597 complete el cutover.
 
+## Delta 2026-04-24 — TASK-598 shipped: no romper la capa de presentación
+
+`TASK-598` (complete, commit `b5e2431f` en develop, deploy live en Cloud Run `ops-worker` revisión `00070-bj4`) instaló `src/lib/ico-engine/ai/narrative-presentation.ts` con tres utilities que el weekly digest ya consume en prod: `resolveMentions`, `loadMentionContext`, `selectPresentableEnrichments`. También está activo el handler `POST /nexa/weekly-digest` con params `dryRun` + `recipients_override` + `limit`, y el log estructurado `narrative_presentation` en Cloud Logging.
+
+**Qué significa para esta task (Schema v2):**
+
+El schema `ico_engine.signal_enrichments_v2` que crea esta task DEBE mantener compatibilidad con los campos que lee `selectPresentableEnrichments`, para que el switch de read path en TASK-597 no rompa el digest ni downstream consumers. Campos mínimos esperados:
+
+| Campo | Fuente actual (v1) | Obligatorio en v2 |
+|---|---|---|
+| `enrichment_id` | `ico_ai_signal_enrichment_history.enrichment_id` | sí |
+| `signal_id` | `ico_ai_signal_enrichment_history.signal_id` | sí (o equivalente stable para el JOIN) |
+| `space_id` | `ico_ai_signal_enrichment_history.space_id` | sí |
+| `signal_type` | idem | sí |
+| `metric_name` | idem | sí |
+| `severity` | idem | sí |
+| `quality_score` | idem | sí |
+| `confidence` | idem | sí |
+| `explanation_summary` | idem | sí |
+| `root_cause_narrative` | idem | sí |
+| `recommended_action` | idem | sí |
+| `processed_at` | idem | sí |
+| `member_id` | idem | sí |
+| `project_id` | idem | sí |
+
+**Contrato que NO se debe romper:**
+
+- Firma pública de `resolveMentions(narrative, context): ResolvedNarrative`, `loadMentionContext({enrichments, fallbacks}): Promise<MentionResolutionContext>`, `selectPresentableEnrichments(windowStart, windowEnd, filters): Promise<PresentableEnrichment[]>`.
+- Shape de `WeeklyDigestBuildResult` (consumido por `WeeklyExecutiveDigestEmail.tsx` y por el handler `/nexa/weekly-digest`).
+- Comportamiento del handler ops-worker `POST /nexa/weekly-digest` (params `dryRun`, `recipients_override`, `limit`).
+- Shape del log estructurado `narrative_presentation` (Cloud Logging consumer futuro: TASK-594).
+
+**Sinergia con TASK-598:**
+
+- Cuando signals_v2 aterrice, el `signal_key` determinista permite que `selectPresentableEnrichments` elimine el INNER JOIN de filtro de huérfanos (ya no existirán) — pero **no elimines el JOIN todavía**; espera al cutover completo en TASK-597.
+- Si el enrichments_v2 guarda mentions por ID puro (sin label frozen), `resolveMentions` sigue funcionando sin cambios — pero el lookup se vuelve redundante, útil como fallback.
+
+**Referencias:**
+
+- Spec TASK-598: `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md`
+- Runbook: `docs/runbooks/ico-weekly-digest-rollback.md`
+- Arquitectura: `docs/architecture/Greenhouse_ICO_Engine_v1.md` (delta 2026-04-24)
+- Código: `src/lib/ico-engine/ai/narrative-presentation.ts` + tests
+
 ## Why This Task Exists
 
 La identidad actual de los signals (`signal_id = EO-AIS-{random}`) rompe idempotencia: cada `reconcileSignalsForPeriod` tendría que generar el mismo ID para la misma condición, lo que es imposible con hash aleatorio. Sin identidad determinista no hay UPSERT correcto ni reconcile matemáticamente idempotente. Este task instala el contrato de datos que el resto del epic asume como foundation.

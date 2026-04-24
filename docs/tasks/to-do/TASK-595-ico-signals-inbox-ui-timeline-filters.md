@@ -18,6 +18,68 @@
 
 Reemplazar las cards stateless de signals en dashboards por un inbox operativo con status badges, acciones (acknowledge/assign/resolve/snooze), timeline del signal (eventos completos), filtros por status/severity/dimension/período/tenant, y panel de métricas agregadas (MTTA, MTTR, volumen por severity). Es la superficie humana del sistema.
 
+## Delta 2026-04-24 — TASK-598 shipped: CONSUMER de la capa, NO reimplementes
+
+`TASK-598` instaló `src/lib/ico-engine/ai/narrative-presentation.ts` con utilities compartidas. El weekly digest ya las consume exitosamente en prod (email real enviado OK 2026-04-24). **TASK-595 debe ser CONSUMER, no reimplementador** — cero duplicación de lógica.
+
+**Qué significa para esta task (UI inbox):**
+
+### Para list view del inbox
+
+Usar `selectPresentableEnrichments(windowStart, windowEnd, filters)` con params ajustados al caso UI:
+
+```ts
+// En la API route que alimenta el inbox, ej. /api/ico-signals
+const enrichments = await selectPresentableEnrichments(from, to, {
+  requireSignalExists: true,
+  maxTotal: pageSize,
+  maxPerSpace: 50,        // más que el digest; UI puede mostrar muchos del mismo space
+  severityFloor: 'info',  // UI muestra info también (no solo warning+ como el digest)
+  minQualityScore: 0,
+  excludeStatuses: filter.status === 'all' ? [] : ['resolved', 'auto_resolved']  // post-TASK-592
+})
+```
+
+### Para detail view + narrativa
+
+Usar `loadMentionContext({enrichments})` + `resolveMentions(narrative, context)` para hidratar las narrativas antes de enviar al frontend. El frontend recibe texto limpio con mentions resueltos contra canonical vigente — NO debe parsear ni sanitizar por su cuenta.
+
+### Para timeline view (eventos del signal)
+
+Los `signal_events` de TASK-590 pueden tener narrativas con mentions también. Pasar cada event.payload_json.narrative (si existe) por `resolveMentions` con el mismo context.
+
+### NO duplicar el parser
+
+`parseNarrativeToParts` en `src/lib/nexa/digest/build-weekly-digest.ts` convierte texto con `@[label](type:id)` a estructura `WeeklyDigestNarrativePart[]` para el email. Si el frontend necesita estructura similar (para renderizar como links React), **exportar esa función** en la capa compartida en vez de reimplementarla. Coordinar con TASK-598 para promoverla a `narrative-presentation.ts`.
+
+**Emisión de logs desde UI:**
+
+Al invocar `resolveMentions` desde la API del inbox, emitir el log con `source: 'ui_inbox'`:
+
+```ts
+emitPresentationLog(summarizePresentationReports(reports, { source: 'ui_inbox', windowStart, windowEnd }))
+```
+
+TASK-594 ya va a consumir estos logs para SLIs.
+
+**Contrato que NO se debe romper:**
+
+- Firmas públicas de la capa TASK-598.
+- Shape del log estructurado — usar el source correcto.
+
+**Sinergia prevista:**
+
+- UI inbox hereda automáticamente el fix de sentinels + orphans + diversity.
+- El email del lunes y la UI muestran literalmente lo mismo — cero drift entre superficies.
+- Al cambiar thresholds globalmente (ej. severityFloor), ambas superficies reflejan el cambio sin redeploy de 2 componentes.
+
+**Referencias:**
+
+- Spec TASK-598: `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md`
+- Utilities: `src/lib/ico-engine/ai/narrative-presentation.ts`
+- Consumer ejemplo: `src/lib/nexa/digest/build-weekly-digest.ts`
+- Types: `PresentableEnrichment`, `MentionResolutionContext`, `ResolvedNarrative`
+
 ## Why This Task Exists
 
 Las cards actuales tipo "Nexa insight" muestran narrativa pero no permiten acción — no se puede marcar un signal como visto, cerrarlo, ni ver su historia. Tampoco hay filtros ni ordenamiento. Un inbox operativo eleva la capa a producto alertable con governance de acción.

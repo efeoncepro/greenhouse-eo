@@ -18,6 +18,67 @@
 
 Refactorizar el LLM enrichment worker para que sea idempotente por `signal_key + prompt_hash`, versione narrativas históricas, respete budgets por tenant, aplique quality gate y circuit breaker. Hoy regenera en cada corrida aunque nada material haya cambiado, genera huérfanos cuando el signal parent se borra, y no tiene governance de costo ni calidad.
 
+## Delta 2026-04-24 — TASK-598 shipped: ALTA CRITICIDAD de compatibilidad
+
+Este es el child task del EPIC-006 con más impacto en TASK-598. Leer con atención antes de empezar.
+
+`TASK-598` (complete, commit `b5e2431f`, deploy live) instaló `src/lib/ico-engine/ai/narrative-presentation.ts` que consume `ico_ai_signal_enrichment_history.{explanation_summary, root_cause_narrative, recommended_action}` y resuelve los tokens `@[label](type:id)` contra canonical vigente. El weekly digest en producción depende de esta capa.
+
+**Qué significa para esta task (Enrichment versioning v2):**
+
+### 1. El prompt del LLM actual emite mentions con el formato `@[label](type:id)`
+
+La capa de TASK-598 parsea ese formato con el regex `MENTION_PATTERN` exportado en `narrative-presentation.ts`. Si el nuevo enrichment worker de esta task cambia el formato a refs por ID puro (ej. `{{project:abc}}` o JSON estructurado), `resolveMentions` se rompe.
+
+Opciones seguras:
+
+- (A) Mantener `@[label](type:id)` como output del LLM + agregar `prompt_hash` + `is_current`.
+- (B) Emitir nuevo formato pero **además** reconstruir el formato legacy al persistir (dual-output) para que `resolveMentions` siga funcionando.
+- (C) Cambiar formato + actualizar `MENTION_PATTERN` en narrative-presentation.ts **en el mismo commit** + nuevo test.
+
+Recomendado: **(A)** — el label frozen es redundante tras TASK-598 (la capa lo reresuelve al render), pero la sintaxis `@[label](type:id)` es la lingua franca. No romperla sin beneficio claro.
+
+### 2. El enrichments_v2 debe mantener los mismos campos leídos por selectPresentableEnrichments
+
+Ver tabla de campos mínimos en el Delta de TASK-590. No eliminar ni renombrar sin coordinar con TASK-598 sync.
+
+### 3. is_current + prompt_hash: TASK-598 los aprovecha
+
+Cuando el versioning esté live, `selectPresentableEnrichments` debe filtrar por `is_current=true` automáticamente cuando el dataset sea v2. Agregar el filter inline en TASK-597 durante el cutover:
+
+```sql
+-- Post-TASK-593 en el INNER JOIN:
+INNER JOIN greenhouse_serving.ico_ai_signal_enrichments_v2 e
+  ON e.signal_id = sig.signal_id
+  AND e.is_current = TRUE
+```
+
+### 4. Budget cap + quality gate NO tocan a TASK-598
+
+Son filtros en el write path. La capa de presentación lee lo que se persistió — si el budget bloqueó el enrichment, el signal no aparece en `enrichment_history` y `selectPresentableEnrichments` naturalmente no lo incluye. Cero cambios necesarios en TASK-598.
+
+### 5. Fallback templated cuando quality < threshold
+
+Si el quality gate rechaza un enrichment y el worker escribe un templated narrative en su lugar, **ese narrative NO debe contener tokens `@[label](type:id)` con labels frozen viejos**. Usar IDs reales + dejar que `resolveMentions` resuelva al render.
+
+**Contrato que NO se debe romper:**
+
+- Firmas de `resolveMentions`, `loadMentionContext`, `selectPresentableEnrichments`.
+- Regex `MENTION_PATTERN` exportado — si se cambia, actualizar tests + readers + weekly-digest.ts en el mismo commit.
+- Shape de `PresentableEnrichment` type.
+- Log estructurado `narrative_presentation`.
+
+**Sinergia prevista:**
+
+- Con TASK-593 live, `fallback_rate` del log `narrative_presentation` debería mantenerse ≤ 5% (hoy es 0%). Si sube, es regresión.
+- El backward-compat del formato @[...] permite deploy gradual sin dual-read code paths en la capa de presentación.
+
+**Referencias:**
+
+- Spec TASK-598: `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md`
+- Regex + pattern: `src/lib/ico-engine/ai/narrative-presentation.ts:MENTION_PATTERN`
+- Tests a verificar verdes tras cambios: `src/lib/ico-engine/ai/narrative-presentation.test.ts`, `src/lib/nexa/digest/build-weekly-digest.test.ts`
+
 ## Why This Task Exists
 
 El enrichment actual es caro y ruidoso: regenera narrativa en cada materialize, gasta tokens aunque la data sea idéntica, propaga narrativas low-confidence a UI, y deja huérfanos en PG cuando el signal parent se borra. Enterprise-grade requiere: versionar cada narrativa con el contexto que la produjo, regenerar solo cuando algo cambió material mente, respetar un budget cap por tenant, y descartar outputs de baja calidad.

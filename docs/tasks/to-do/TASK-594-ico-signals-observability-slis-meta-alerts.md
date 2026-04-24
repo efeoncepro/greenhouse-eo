@@ -18,6 +18,73 @@
 
 Instrumentar la capa de signals como un sistema alertable por sí mismo. Panel en Admin Ops Health con SLIs (freshness, materialize latency, enrichment latency, MTTA, MTTR, auto-resolve rate, detection stability). Meta-alertas cuando un SLI viola umbral (ej. volumen de signals ±3σ, p95 latencia > 5 min). Reusa infra de `source_sync_runs` y TASK-586 cuando aplique.
 
+## Delta 2026-04-24 — TASK-598 shipped: log estructurado ya disponible
+
+`TASK-598` (complete, deploy live) instaló el log estructurado `narrative_presentation` en Cloud Logging que emite en cada corrida del weekly digest:
+
+```json
+{
+  "event": "narrative_presentation",
+  "source": "weekly_digest",
+  "window_start": "ISO-8601",
+  "window_end": "ISO-8601",
+  "total_mentions": 16,
+  "resolved": 16,
+  "fallback_count_by_reason": {
+    "none": 16,
+    "sentinel": 0,
+    "missing_entity": 0,
+    "null_canonical": 0,
+    "technical_id": 0
+  },
+  "fallback_rate": 0.0
+}
+```
+
+**Qué significa para esta task (Observability + SLIs):**
+
+### Nuevo SLI sugerido: digest_mention_resolution_rate
+
+Incluir como SLI del pipeline ICO:
+
+| SLI | Umbrales |
+|---|---|
+| `digest_mention_resolution_rate` | green: `fallback_rate ≤ 0.05`, warning: `0.05 < fallback_rate ≤ 0.20`, critical: `> 0.20` |
+| `digest_sentinel_count` | green: `sentinel = 0`, warning: `≥ 1` (indica upstream regression) |
+| `digest_orphan_rate` | green: `missing_entity ≤ 0.05`, warning: `> 0.05` (indica drift canonical vs signals) |
+
+### Consumer recomendado
+
+Cloud Logging → Cloud Monitoring metric filter → Cloud Monitoring alert. Ejemplo de log-based metric:
+
+```
+resource.type="cloud_run_revision"
+AND resource.labels.service_name="ops-worker"
+AND jsonPayload.event="narrative_presentation"
+AND jsonPayload.source="weekly_digest"
+```
+
+Alerta sobre `fallback_rate > 0.20` por 3 runs consecutivos.
+
+### Extender source cuando TASK-595/596 usen la capa
+
+TASK-595 (UI inbox) y TASK-596 (webhooks) usarán también `resolveMentions` + `selectPresentableEnrichments`. Cada uno emitirá su propio log con `source: 'ui_inbox'`, `source: 'webhook_outbound'`, etc. El dashboard de TASK-594 puede filtrar por source para SLI por superficie.
+
+**Contrato que NO se debe romper:**
+
+- Shape del log estructurado — clave `event: 'narrative_presentation'` y campos `source`, `total_mentions`, `resolved`, `fallback_count_by_reason`, `fallback_rate`.
+- Firmas de la capa TASK-598.
+
+**Sinergia:**
+
+Este task formaliza la observabilidad que TASK-598 ya dejó instrumentada. No hay overlap — complementos.
+
+**Referencias:**
+
+- Log schema: `src/lib/ico-engine/ai/narrative-presentation.ts:NarrativePresentationLog`
+- Cloud Logging consumer: `emitPresentationLog` (misma file)
+- Ejemplo real en prod (2026-04-24): `gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="ops-worker" AND jsonPayload.event="narrative_presentation"' --project efeonce-group --limit 5`
+
 ## Why This Task Exists
 
 Hoy nadie sabe si la capa de signals está sana. Si el detector deja de fire por un bug, el sistema queda silencioso y el equipo no se entera hasta que un humano nota falta de alertas. Enterprise-grade exige observabilidad self-service del propio pipeline, con SLIs y meta-alertas escalables.

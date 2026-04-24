@@ -18,6 +18,74 @@
 
 Ejecutar la migración del sistema v1 al v2 sin downtime: dual-write durante ~14 días, validación de paridad diaria, cutover de read primero, cutover de write después, grace period de 30 días, DROP de tablas legacy. Incluye backfill opcional de historia (regenerar `detected_at` sintético sobre periodos pasados con `algorithm_version='legacy-backfill'`) y limpieza de huérfanos existentes en PG serving.
 
+## Delta 2026-04-24 — TASK-598 shipped: cambiar el JOIN target de la capa, no la firma
+
+`TASK-598` instaló `src/lib/ico-engine/ai/narrative-presentation.ts` con `selectPresentableEnrichments` que hace `INNER JOIN greenhouse_serving.ico_ai_signals sig ON sig.signal_id = e.signal_id` contra v1. El cutover de TASK-597 debe preservar la firma pública de la función, solo cambiar el JOIN target.
+
+**Qué significa para esta task (Cutover):**
+
+### Fase de cutover de read
+
+Cuando las lecturas pasen a v2, actualizar el SQL dentro de `selectPresentableEnrichments` a:
+
+```sql
+INNER JOIN greenhouse_serving.ico_signals_v2 sig
+  ON sig.signal_id = e.signal_id  -- o sig.signal_key = e.signal_key si el schema lo justifica
+```
+
+Y si el enrichment también aterrizó en v2 (TASK-593):
+
+```sql
+FROM greenhouse_serving.ico_ai_signal_enrichments_v2 e
+  -- en vez de enrichment_history
+```
+
+Agregar filtro por `e.is_current = TRUE` para excluir versiones anteriores.
+
+### Fase de dual-read con shadow
+
+Durante la ventana de validación, `selectPresentableEnrichments` puede aceptar un param `source: 'v1' | 'v2'` (default `'v1'` durante dual-read). Esto permite diff v1 vs v2 sin romper la función pública. Al final del cutover, hacer `source = 'v2'` default y eliminar el param cuando v1 se dropee.
+
+### Cleanup de huérfanos legacy
+
+El cleanup de huérfanos en PG serving que menciona esta task **se vuelve no-op** una vez que `selectPresentableEnrichments.requireSignalExists=true` + la semántica de reconcile de TASK-591 estén live. Pero el cleanup de la data histórica sigue siendo útil para analytics honest.
+
+### DROP de v1
+
+Al hacer DROP de `greenhouse_serving.ico_ai_signals` v1 + `ico_ai_signal_enrichment_history`, asegurar que:
+
+- TODAS las referencias en código a esas tablas estén migradas a v2 (grep canónico incluye `narrative-presentation.ts:selectPresentableEnrichments`).
+- El regression test `build-weekly-digest.test.ts:"sanitiza sentinels"` sigue verde con mocks del schema v2.
+- El parity check diario no ha encontrado diffs > 1% en los últimos 14 días.
+
+### Consumer downstream que heredan el cutover
+
+- Weekly digest (TASK-598 original consumer) — cambia automáticamente al actualizar `selectPresentableEnrichments`.
+- UI inbox (TASK-595) — idem.
+- Webhooks outbound (TASK-596) — idem.
+- Nexa agent tools (TASK-596) — idem.
+
+**Contrato que NO se debe romper:**
+
+- Firma pública de `selectPresentableEnrichments(windowStart, windowEnd, filters)`.
+- Shape de `PresentableEnrichment` que retorna.
+- Shape de `WeeklyDigestBuildResult`.
+- Handler `POST /nexa/weekly-digest`.
+
+**Sinergia:**
+
+Post-cutover, TASK-598 queda automáticamente mejorado:
+
+- Cero huérfanos por diseño (reconcile preserva signal_ids estables).
+- Narrativas vigentes por contrato (enrichment v2 con ID refs).
+- Observabilidad completa via `signal_events` + `materialize_runs` + log `narrative_presentation`.
+
+**Referencias:**
+
+- Spec TASK-598: `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md`
+- Query a migrar: `src/lib/ico-engine/ai/narrative-presentation.ts:selectPresentableEnrichments` (buscar `greenhouse_serving.ico_ai_signal_enrichment_history` y `greenhouse_serving.ico_ai_signals`)
+- Tests que deben seguir verdes tras swap: `narrative-presentation.test.ts`, `build-weekly-digest.test.ts`
+
 ## Why This Task Exists
 
 Refactorizar la capa de signals sin downtime exige un strangler fig disciplinado: no se puede apagar v1 hasta que v2 haya sido validada con tráfico real por ≥ 14 días, comparando números lado a lado. Este task es el plan de migración operacional — el que decide cuándo y cómo dejar de usar lo viejo.

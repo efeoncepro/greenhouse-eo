@@ -18,6 +18,39 @@
 
 Reemplazar `replaceBigQuerySignalsForPeriod` (patrón DELETE+INSERT destructivo) por `reconcileSignalsForPeriod` (UPSERT idempotente + mark auto_resolved). Cada transición genera `signal_event` append-only con `run_id`. Dual-write durante ~14 días a v1 (compatibilidad) y v2 (nuevo contrato) para habilitar la validación antes del cutover (TASK-597).
 
+## Delta 2026-04-24 — TASK-598 shipped: no romper la capa de presentación
+
+`TASK-598` (complete, commit `b5e2431f` en develop, deploy live) instaló la capa de presentación `src/lib/ico-engine/ai/narrative-presentation.ts` que el weekly digest consume en prod. El email semanal del liderazgo depende de que `selectPresentableEnrichments` pueda filtrar huérfanos via INNER JOIN con `ico_ai_signals` por `signal_id`.
+
+**Qué significa para esta task (Reconcile materialize):**
+
+El refactor de `replaceBigQuerySignalsForPeriod` → `reconcileSignalsForPeriod` NO debe cambiar la estabilidad del campo `signal_id` en `ico_ai_signals`. El INNER JOIN de `selectPresentableEnrichments` depende de que enrichments históricos en `ico_ai_signal_enrichment_history.signal_id` matcheen con `ico_ai_signals.signal_id` vivo.
+
+Opciones seguras:
+
+- (A) Mantener `signal_id` estable entre corridas (reconcile UPSERT por `signal_key` determinista, pero no regenerar `signal_id` si ya existe).
+- (B) Agregar columna `signal_key` separada del `signal_id` legacy, y que la proyección a PG preserve `signal_id` original.
+
+**Qué SÍ mejora para TASK-598 cuando este task esté live:**
+
+El reconcile elimina huérfanos en la raíz. Una vez deployed, `selectPresentableEnrichments.requireSignalExists` se vuelve redundante (el INNER JOIN ya no filtra nada porque no habrá huérfanos). **No elimines el INNER JOIN en TASK-591** — espera al cutover completo de TASK-597, que retira v1.
+
+**Contrato que NO se debe romper:**
+
+- Firma pública de `selectPresentableEnrichments(windowStart, windowEnd, filters)` y tipos exportados (`PresentableEnrichment`, `PresentationFilters`).
+- Shape de `WeeklyDigestBuildResult` (template email y handler ops-worker).
+- Log estructurado `narrative_presentation` en Cloud Logging (consumer futuro: TASK-594 SLIs).
+
+**Sinergia:**
+
+Al emitir `signal_events` con lifecycle, TASK-598 podría extender `selectPresentableEnrichments` con filtro `excludeStatuses?: ['auto_resolved']` para el digest semanal sin cambiar el default. Coordinar con TASK-592 para agregar el param opcional.
+
+**Referencias:**
+
+- Spec TASK-598: `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md`
+- Código afectado: `src/lib/ico-engine/ai/narrative-presentation.ts:selectPresentableEnrichments`
+- Log consumer futuro: `docs/architecture/Greenhouse_ICO_Engine_v1.md` (delta 2026-04-24)
+
 ## Why This Task Exists
 
 El materialize actual borra signals del período cada corrida y reescribe. Esto destruye la memoria operativa: el signal "Daniela FTR crítico el 23 Abr" se borra el 24 cuando el algoritmo ya no la detecta como outlier. Un sistema de alertas enterprise-grade no puede funcionar así. El reconcile preserva historia, marca `auto_resolved` cuando una condición deja de detectarse, y es matemáticamente idempotente.

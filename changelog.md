@@ -13,7 +13,7 @@
 - Doc de arquitectura `Greenhouse_ICO_Engine_v1.md` actualizada con delta completo del contrato nuevo. Doc funcional `docs/documentation/delivery/nexa-insights-digest-semanal.md` reescrita (v1.1) en lenguaje simple para lectores no técnicos del liderazgo.
 - Tests: 21 cases de narrative-presentation + 5 de digest builder (incluye fixture regression con 20 "Sin nombre" + 60 huérfanos → output 100% limpio). 1914 tests totales verdes.
 - Infra reusable por TASK-595 (UI inbox, EPIC-006 child 6/8) y TASK-596 (webhooks + Nexa, EPIC-006 child 7/8) sin duplicación. Compatible con enrichment v2 de TASK-593 (solo cambia JOIN target).
-- Pendiente pre-lunes 07:00 Chile: deploy `bash services/ops-worker/deploy.sh` + dry-run staging + envío a recipient de test. Instrucciones en `Handoff.md`.
+- **Deploy operacional ejecutado el mismo día 2026-04-24 12:14 UTC:** GitHub Actions `Ops Worker Deploy` auto-disparado por el merge a develop → nueva revisión `ops-worker-00070-bj4` con 100% traffic. Health OK, smoke `POST /reactive/process` OK, dry-run `POST /nexa/weekly-digest` OK (4 insights, 0 sentinels en payload), envío real a `jreyes@efeoncepro.com` → `status=sent, resendId=85c865df-2fc7-45f1-a893-736b5af9c48d`. Email recibido y validado OK por el recipient. Cloud Logging captura el structured log `narrative_presentation` con `fallback_rate=0, total_mentions=16, resolved=16 (100%)`. El cron `ops-nexa-weekly-digest` del lunes 2026-04-27 07:00 Chile usará exactamente el mismo path validado. Rollback target: `ops-worker-00069-lxb`.
 
 ### 2026-04-24 — Finance `expenses/meta` deja de depender de BigQuery como precondición global
 

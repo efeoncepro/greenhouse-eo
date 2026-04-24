@@ -18,6 +18,49 @@
 
 Implementar state machine explícita de lifecycle de signals (`open → acknowledged → acting → resolved | suppressed | auto_resolved`) con CRUD de transiciones expuesto vía API, RBAC por capability, y audit trail append-only en `signal_events`. Es la superficie para que humanos, agentes AI, y webhooks externos modifiquen el estado de un signal sin bypasear la governance.
 
+## Delta 2026-04-24 — TASK-598 shipped: extender PresentationFilters con status
+
+`TASK-598` instaló la capa `src/lib/ico-engine/ai/narrative-presentation.ts` con `selectPresentableEnrichments(windowStart, windowEnd, filters)` que acepta un objeto `PresentationFilters`. Este task agrega `status` como columna de signals.
+
+**Qué significa para esta task:**
+
+Cuando el state machine esté live, extender el tipo `PresentationFilters` de TASK-598 con un campo opcional `excludeStatuses?: SignalStatus[]` (default para weekly digest: `['resolved', 'auto_resolved']`) para que el email del lunes excluya alertas ya cerradas. **Agregar como optional** — no breaking para consumers existentes.
+
+**Patch conceptual:**
+
+```ts
+// src/lib/ico-engine/ai/narrative-presentation.ts
+export interface PresentationFilters {
+  requireSignalExists?: boolean
+  minQualityScore?: number
+  maxPerSpace?: number
+  maxTotal?: number
+  severityFloor?: SeverityFloor
+  excludeStatuses?: SignalStatus[]  // ← nuevo, agregado por TASK-592
+}
+```
+
+Y actualizar el SQL WHERE clause dentro de `selectPresentableEnrichments` para incluir `AND sig.status NOT IN (...)` cuando el filtro venga.
+
+**UI inbox (TASK-595) lo usa diferente:**
+
+La UI inbox de TASK-595 probablemente querrá filtrar `status='open'` primariamente, `acknowledged` en otra view. Diseñar `excludeStatuses` tolerante a ambos patrones de consumo.
+
+**Contrato que NO se debe romper:**
+
+- Todas las firmas públicas de TASK-598 siguen compatibles (el nuevo campo es optional).
+- Shape del `WeeklyDigestBuildResult`.
+- Handler `POST /nexa/weekly-digest`.
+
+**Sinergia:**
+
+Cada transition API (`acknowledge/resolve/suppress/reopen`) emite `signal_events` append-only. TASK-594 puede construir SLIs de MTTA / MTTR leyendo esa tabla. La capa de presentación de TASK-598 se beneficia automáticamente — signals resueltos no aparecen en el email cuando el filter se active.
+
+**Referencias:**
+
+- Spec TASK-598: `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md`
+- Código afectado: `src/lib/ico-engine/ai/narrative-presentation.ts` (PresentationFilters type + SQL)
+
 ## Why This Task Exists
 
 Hoy un signal no tiene estado gestionable — existe o no existe. No se puede marcar como "visto", "en acción", "falso positivo". Sin state machine no hay inbox operativo, no hay MTTA/MTTR medible, no hay audit trail. Este task instala la capa de acciones sobre los signals.
