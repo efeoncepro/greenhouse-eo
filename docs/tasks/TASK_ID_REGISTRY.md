@@ -653,3 +653,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-597` | `to-do` | Migración strangler fig + backfill + deprecate v1 (EPIC-006 child 8/8) | `docs/tasks/to-do/TASK-597-ico-signals-migration-cutover-deprecate-v1.md` |
 | `TASK-598` | `complete` | ICO Narrative Presentation Layer (resolve mentions + relevance filter + sanitization) | `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md` |
 | `TASK-599` | `to-do` | Finance Preventive Test Lane (Playwright + Component + Route Resilience) | `docs/tasks/to-do/TASK-599-finance-preventive-test-lane.md` |
+| `TASK-600` | `to-do` | Reliability Registry & Signal Correlation Foundation | `docs/tasks/to-do/TASK-600-reliability-registry-signal-foundation.md` |

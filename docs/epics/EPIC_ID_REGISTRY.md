@@ -20,7 +20,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-004` | `to-do` | `docs/epics/to-do/EPIC-004-typography-unification-poppins-geist.md` |
 | `EPIC-005` | `to-do` | `docs/epics/to-do/EPIC-005-greenhouse-commercial-delivery-orchestrator.md` |
 | `EPIC-006` | `to-do` | `docs/epics/to-do/EPIC-006-ico-signals-operational-memory-platform.md` |
+| `EPIC-007` | `to-do` | `docs/epics/to-do/EPIC-007-reliability-control-plane.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-007`
+- `EPIC-008`

@@ -1,0 +1,267 @@
+# TASK-600 — Reliability Registry & Signal Correlation Foundation
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P1`
+- Impact: `Alto`
+- Effort: `Medio`
+- Type: `implementation`
+- Epic: `EPIC-007`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `platform`
+- Blocked by: `none`
+- Branch: `task/TASK-600-reliability-registry-signal-foundation`
+- Legacy ID: `[optional]`
+- GitHub Issue: `[optional]`
+
+## Summary
+
+Crear la foundation del `Reliability Control Plane` de Greenhouse: un registro canónico por módulo y un modelo unificado de señales para que `Admin Center`, `Ops Health` y `Cloud & Integrations` puedan razonar sobre salud, regresiones y confianza con un lenguaje común.
+
+## Why This Task Exists
+
+Hoy Greenhouse ya tiene señales útiles, pero aisladas:
+
+- `getOperationsOverview()` expone subsistemas, backlog reactivo, webhooks, cloud posture, observabilidad y data quality Notion
+- `GET /api/internal/health` expone postura cloud y checks runtime
+- `AdminOpsHealthView` y `AdminCloudIntegrationsView` ya renderizan parte de esa lectura
+- `TASK-586` y `TASK-599` van a sumar más señal visible
+
+El gap real es estructural: no existe todavía una capa canónica que diga qué módulos críticos existen, qué rutas/tests/señales les pertenecen y cómo se normaliza su estado. Sin esa base, cada nueva surface o monitor agrega más cards, pero no un verdadero sistema de confiabilidad.
+
+## Goal
+
+- Definir un `Reliability Registry` canónico por módulo crítico.
+- Normalizar señales existentes de runtime, freshness, tests y cloud a un contrato compartido.
+- Exponer una primera lectura consolidada reusable para `Admin Center`, `Ops Health` y futuros consumers.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     "Que necesito entender antes de planificar?"
+     El agente lee cada doc referenciado aqui. Si un doc no
+     existe en el repo, reporta antes de continuar.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+
+Reglas obligatorias:
+
+- la primera iteración vive en el plano de `views` administrativas existentes (`Admin Center`, `Cloud & Integrations`, `Ops Health`); no redefine `entitlements` nuevos salvo que Discovery demuestre una brecha real
+- el registry no reemplaza las fuentes actuales (`Sentry`, `source_sync_runs`, Playwright, Billing Export); las normaliza
+- no crear un “agente” LLM-first antes de tener registro, señales y evidence model
+- si una señal no puede confirmarse todavía, debe quedar explícita como `not_configured`, `awaiting_data` o `[verificar]`, no asumirse sana
+
+## Normative Docs
+
+- `project_context.md`
+- `Handoff.md`
+- `docs/tasks/to-do/TASK-586-notion-sync-billing-observability.md`
+- `docs/tasks/to-do/TASK-599-finance-preventive-test-lane.md`
+- `docs/tasks/in-progress/TASK-103-gcp-budget-alerts-bigquery-guards.md`
+- `docs/tasks/complete/TASK-208-delivery-data-quality-monitoring-auditor.md`
+- `docs/operations/PLAYWRIGHT_E2E.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- `src/lib/operations/get-operations-overview.ts`
+- `src/app/api/internal/health/route.ts`
+- `src/lib/cloud/observability.ts`
+- `src/views/greenhouse/admin/AdminCenterView.tsx`
+- `src/views/greenhouse/admin/AdminCloudIntegrationsView.tsx`
+- `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+- `tests/e2e/smoke/`
+- `docs/tasks/to-do/TASK-586-notion-sync-billing-observability.md`
+- `docs/tasks/to-do/TASK-599-finance-preventive-test-lane.md`
+
+### Blocks / Impacts
+
+- `EPIC-007`
+- surfaces futuras de confiabilidad dentro de `Admin Center`
+- change-based verification para módulos críticos
+- follow-ups de observabilidad visible y synthetic monitoring
+
+### Files owned
+
+- `[verificar] src/lib/reliability/*`
+- `[verificar] src/types/reliability.ts`
+- `src/lib/operations/get-operations-overview.ts`
+- `src/views/greenhouse/admin/AdminCenterView.tsx`
+- `src/views/greenhouse/admin/AdminCloudIntegrationsView.tsx`
+- `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+- `[verificar] src/app/api/admin/reliability/route.ts`
+- `[verificar] docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
+
+## Current Repo State
+
+### Already exists
+
+- `Admin Center`, `Cloud & Integrations` y `Ops Health` ya existen como surfaces administrativas visibles
+- `getOperationsOverview()` ya agrega salud operacional, cloud posture, webhooks, backlog reactivo y data quality Notion
+- `GET /api/internal/health` ya expone checks runtime y posture cloud
+- `Sentry` ya es visible desde helpers cloud y se usa como señal incidente
+- existe Playwright smoke base autenticado y lane preventiva explícita para Finance en `TASK-599`
+- existe lane explícita para llevar `Billing Export` y Notion sync al portal en `TASK-586`
+
+### Gap
+
+- no hay un registro canónico de módulos críticos con sus rutas, señales y pruebas asociadas
+- no hay un contrato unificado de `signal -> severity -> evidence -> affected module`
+- `Admin Center` consume observabilidad parcial, pero todavía no puede razonar con “confidence” ni correlación por módulo
+- la plataforma sigue dependiendo de lectura manual para conectar deploys, señales de error y pruebas preventivas
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     "Que construyo exactamente, slice por slice?"
+     El agente solo lee esta zona DESPUES de que el plan este
+     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — Reliability Registry base
+
+- definir el contrato canónico del registry por módulo crítico
+- incluir al menos:
+  - `module_key`
+  - label visible
+  - rutas críticas
+  - APIs críticas
+  - dependencias operativas
+  - smoke/tests asociados
+  - señales esperadas
+- sembrar un set inicial con dominios de alto valor:
+  - `finance`
+  - `integrations.notion`
+  - `cloud`
+  - `[verificar] delivery`
+
+### Slice 2 — Modelo unificado de señales
+
+- crear un tipo común para señales de confiabilidad
+- normalizar, como mínimo:
+  - estado runtime
+  - incidente Sentry
+  - freshness/data quality
+  - smoke/test signal
+  - costo cloud / billing anomaly placeholder
+- exponer severidad, source, evidence, timestamp y módulo afectado
+
+### Slice 3 — Reader consolidado reusable
+
+- crear o formalizar un reader server-side que produzca una vista consolidada de confiabilidad por módulo
+- reutilizar `getOperationsOverview()` y `GET /api/internal/health` como fuentes, sin duplicar su lógica
+- dejar preparado el boundary para que `TASK-586` y `TASK-599` enchufen sus nuevas señales sin rediseñar la estructura
+
+### Slice 4 — Primer surfacing en Admin Center
+
+- agregar una lectura mínima de `confidence / health by module` en alguna surface administrativa existente
+- la UI debe ser ligera y explicativa, no una nueva consola gigante
+- dejar explícito qué consumers seguirán siendo `Ops Health`, cuáles `Cloud & Integrations` y cuáles `Admin Center` general
+
+## Out of Scope
+
+- automatizar remediaciones mutantes en producción
+- construir el synthetic monitoring completo de todos los módulos
+- reemplazar `TASK-586` o `TASK-599`
+- implementar FinOps avanzado o Playwright orchestration completa dentro de esta task
+
+## Detailed Spec
+
+La task debe producir la base para una capa de confiabilidad real, no otra colección de cards aisladas.
+
+Principios de diseño:
+
+1. **Registry-first**
+   - no empezar por UI ni por LLM
+   - primero declarar qué módulos existen y qué señales les pertenecen
+
+2. **Evidence-first**
+   - cada señal normalizada debe poder enlazarse a evidencia real:
+     - endpoint
+     - helper
+     - incident id
+     - test name
+     - run timestamp
+
+3. **Module-oriented**
+   - la lectura final debe responder:
+     - qué módulo está afectado
+     - cuán confiable está hoy
+     - por qué
+
+4. **Integración incremental**
+   - `TASK-586` debe poder agregar costo cloud global y spotlight de `notion-bq-sync` como señales nuevas
+   - `TASK-599` debe poder agregar smoke/component/route health como señales nuevas
+
+5. **No duplicar contracts existentes**
+   - `getOperationsOverview()` sigue siendo el agregador operativo amplio
+   - `GET /api/internal/health` sigue siendo la vista técnica del posture runtime
+   - el Reliability layer debe sentarse encima, no reemplazarlos
+
+La primera iteración puede ser deterministic/rule-based. Un agente explicativo o correlador más sofisticado es follow-up, no prerequisito para esta task.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     "Como compruebo que termine y que actualizo?"
+     El agente ejecuta estos checks al cerrar cada slice y
+     al cerrar la task completa.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] existe un registry canónico inicial de módulos críticos con rutas, dependencias y señales asociadas
+- [ ] existe un tipo/modelo unificado de señal de confiabilidad reusable por múltiples consumers
+- [ ] `Admin Center` puede consumir al menos una lectura consolidada de salud/confianza por módulo
+- [ ] la estructura deja explícito cómo se integran después `TASK-586` y `TASK-599`
+
+## Verification
+
+- `pnpm lint`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm test`
+- validación manual sobre `Admin Center` / `Ops Health` / `Cloud & Integrations`
+
+## Closing Protocol
+
+- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [ ] quedó explícito qué parte vive en registry, qué parte vive en señales y qué parte sigue siendo consumer UI
+
+## Follow-ups
+
+- derivar task específica para synthetic monitoring periódico si el registry deja claro el set de rutas críticas
+- derivar task específica para change-based verification matrix una vez que el mapa módulo→tests esté sembrado
+- evaluar un correlador explicativo más rico después de que el modelo de señales esté estable
+
+## Open Questions
+
+- si la primera surface de `confidence` debe vivir primero en `Admin Center` general o directamente en `Ops Health`
+- si el registry inicial debe persistirse en código estático, DB o un híbrido derivado
