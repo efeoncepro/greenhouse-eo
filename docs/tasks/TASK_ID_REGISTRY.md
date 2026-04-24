@@ -627,7 +627,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-571` | `complete` | Deal Creation Context Registry + Pipeline/Stage Governance | `docs/tasks/complete/TASK-571-deal-creation-context-pipeline-stage-governance.md` |
 | `TASK-572` | `complete` | Deploy `POST /deals` en el Cloud Run `hubspot-greenhouse-integration` | `docs/tasks/complete/TASK-572-hubspot-integration-post-deals-deploy.md` |
 | `TASK-573` | `complete` | Quote Builder Deal Birth Contract Completion & HubSpot Governance Hardening | `docs/tasks/complete/TASK-573-quote-builder-deal-birth-contract-completion.md` |
-| `TASK-574` | `in-progress` | Absorber el Cloud Run `hubspot-greenhouse-integration` en `services/` de `greenhouse-eo` | `docs/tasks/in-progress/TASK-574-absorb-hubspot-greenhouse-integration-service.md` |
+| `TASK-574` | `complete` | Absorber el Cloud Run `hubspot-greenhouse-integration` en `services/` de `greenhouse-eo` | `docs/tasks/complete/TASK-574-absorb-hubspot-greenhouse-integration-service.md` |
 | `TASK-575` | `to-do` | Upgrade HubSpot Developer Platform + API calls del bridge a versión 2026.03 | `docs/tasks/to-do/TASK-575-hubspot-developer-platform-2026-upgrade.md` |
 | `TASK-576` | `to-do` | HubSpot Quote Publish Contract Completion | `docs/tasks/to-do/TASK-576-hubspot-quote-publish-contract-completion.md` |
 | `TASK-577` | `to-do` | Notion Write Bridge (HTTP service) — EPIC-005 child 1/6 | `docs/tasks/to-do/TASK-577-notion-write-bridge.md` |

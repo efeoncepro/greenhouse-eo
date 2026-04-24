@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Avanzada`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `infra / integrations`
 - Blocked by: `none`

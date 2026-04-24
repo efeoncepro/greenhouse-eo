@@ -17,7 +17,7 @@ Los servicios nacen en **HubSpot** (objeto Services, `objectTypeId: 0-162`) como
 **Arquitectura de datos de Greenhouse (decisión transversal):**
 - **PostgreSQL (Cloud SQL):** Capa OLTP y fuente de verdad operativa. Toda la data transaccional: `services`, `clients`, `fin_*`, `payroll_*`, `compensation_*`, **y capabilities** (las tablas `service_modules` y `client_service_modules` ya existen en `greenhouse_core`; `identity-store.ts` ya lee de PostgreSQL para la sesión). Con la tabla `services`, las capabilities se derivan automáticamente de los servicios activos asignados a un Space/Client, eliminando la escritura manual en `client_service_modules`.
 - **BigQuery:** Capa OLAP. Analytics, reporting, cross-analysis. Se alimenta de syncs directos (Notion, HubSpot CRM via Cloud Function `hubspot-bq-sync`). Las tablas `greenhouse.client_service_modules` y `greenhouse.service_modules` en BigQuery son **legacy fallback** y serán deprecadas. El ETL PG→BQ es **nueva infraestructura a crear** (no existe actualmente).
-- **HubSpot:** Origen comercial. Products, Deals, Services, Companies. Sync bidireccional: inbound vía Cloud Run service `hubspot-greenhouse-integration` (repo `cesargrowth11/hubspot-bigquery`), outbound async vía write-back queue en PostgreSQL procesada por el mismo servicio.
+- **HubSpot:** Origen comercial. Products, Deals, Services, Companies. Sync bidireccional: inbound vía Cloud Run service `hubspot-greenhouse-integration` (desde 2026-04-24 vive en este monorepo `services/hubspot_greenhouse_integration/` — **TASK-574**; antes estaba en sibling `cesargrowth11/hubspot-bigquery`), outbound async vía write-back queue en PostgreSQL procesada por el mismo servicio.
 
 **Cambio respecto a Capabilities Architecture v1:** En la v1, las capabilities se resolvían desde dos propiedades string en el objeto Company (`linea_de_servicio` + `servicios_especificos`) y se almacenaban manualmente en `client_service_modules` (que ya existe en PostgreSQL `greenhouse_core`). En esta v2, las capabilities se **derivan automáticamente** de registros individuales de Services activos en PostgreSQL, asociados al Space (tenant) del cliente. La tabla `services` se convierte en la fuente de verdad para capabilities: una vista `v_client_active_modules` deriva los módulos activos desde los servicios, y `loadServiceModules()` en `identity-store.ts` lee de esta vista para construir el TenantContext. `resolveCapabilityModules()` sigue recibiendo `{ businessLines, serviceModules }` y matcheando contra el registry estático — zero breaking changes en sidebar/guards. Lo que cambia es **de dónde vienen** esos arrays: ya no de una tabla manual, sino derivados de servicios activos.
 
@@ -522,7 +522,7 @@ HubSpot Service Records (objeto 0-162)
   │ Properties nativas + custom ef_*
   ↓
 Inbound sync (webhook o polling)
-  │ Cloud Run service: hubspot-greenhouse-integration (repo cesargrowth11/hubspot-bigquery)
+  │ Cloud Run service: hubspot-greenhouse-integration (monorepo services/hubspot_greenhouse_integration/ — TASK-574)
   │ GET /companies/{id}/services → HubSpot API (intermediado)
   │ UPSERT en PostgreSQL tabla `greenhouse_core.services`
   ↓
@@ -544,7 +544,7 @@ PostgreSQL (Cloud SQL) — FUENTE DE VERDAD OPERATIVA
 
 ### 6.2 Sync HubSpot → PostgreSQL (inbound)
 
-**IMPORTANTE:** Toda la integración HubSpot pasa por el servicio Cloud Run intermediario `hubspot-greenhouse-integration` (repo `cesargrowth11/hubspot-bigquery`, servicio `hubspot-greenhouse-integration-*.us-central1.run.app`). Greenhouse Next.js app NO llama a HubSpot directamente — usa el client en `src/lib/integrations/hubspot-greenhouse-service.ts` con `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`.
+**IMPORTANTE:** Toda la integración HubSpot pasa por el servicio Cloud Run intermediario `hubspot-greenhouse-integration` (desde 2026-04-24 vive en el monorepo `services/hubspot_greenhouse_integration/` vía **TASK-574**; antes en sibling `cesargrowth11/hubspot-bigquery`; URL Cloud Run `hubspot-greenhouse-integration-*.us-central1.run.app` inalterada). Greenhouse Next.js app NO llama a HubSpot directamente — usa el client en `src/lib/integrations/hubspot-greenhouse-service.ts` con `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`.
 
 | Trigger | Mecanismo | Frecuencia | Acción |
 |---|---|---|---|
@@ -979,7 +979,7 @@ Misma estrategia que Capabilities v1:
     └── setup-postgres-services.sql     # NUEVO: DDL de §5.1 (tabla + vista + triggers)
 ```
 
-**Archivos en repo `hubspot-bigquery` (Cloud Run service):**
+**Archivos en monorepo `greenhouse-eo` bajo `services/hubspot_greenhouse_integration/` (TASK-574; antes vivían en sibling `cesargrowth11/hubspot-bigquery`):**
 ```
 services/hubspot_greenhouse_integration/
 ├── app.py                # EXTENDER: +GET /services/<id>, +GET /companies/<id>/services
