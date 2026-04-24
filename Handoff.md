@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-574 en PR: HubSpot Greenhouse Integration Service absorbido (código listo; cutover pendiente de ventana operativa)
+
+- **Qué entrega el PR**
+  - Servicio Cloud Run `hubspot-greenhouse-integration` extraído del sibling `cesargrowth11/hubspot-bigquery` con historia git preservada (`git filter-repo --path services/hubspot_greenhouse_integration/`; 16 commits originales visibles via `git log --follow services/hubspot_greenhouse_integration/app.py`).
+  - 11 archivos Python runtime migrados (3410 LOC) + 1660 LOC de tests (`services/hubspot_greenhouse_integration/tests/test_app.py`, ajustados los 2 paths que asumían layout sibling).
+  - **Primera CI/CD** que este código tiene: `.github/workflows/hubspot-greenhouse-integration-deploy.yml` (pytest → Cloud Build → Cloud Run deploy → smoke `/health` + `/contract`), usando WIF + SA `github-actions-deployer@` (reusado de ops-worker).
+  - Dockerfile Python 3.12-slim (primer Python image del monorepo), `.dockerignore` service-local, `deploy.sh` adaptado al monorepo, README.md operativo con inventario de las 23 rutas.
+  - `.vercelignore` actualizado para excluir el servicio del build Next.js de Vercel.
+  - Skill migrada a `.claude/skills/hubspot-greenhouse-bridge/` y `.codex/skills/hubspot-greenhouse-bridge/` — reemplaza la skill del sibling con paths Windows-specific.
+  - `AGENTS.md`, `CLAUDE.md`, `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` (§3 y §3.1 + tabla quick-ref) actualizados para reflejar ownership post-cutover.
+  - `docs/documentation/finance/crear-deal-desde-quote-builder.md` linkea el nuevo path.
+  - **Runbook de cutover** (`docs/operations/TASK-574-cutover-runbook.md`) con 9 secciones paso-a-paso cubriendo pre-flight, IAM grants, workflow_dispatch manual, smoke, PR al sibling con stub README, rollback procedure en <60s, y cleanup a los 7 días.
+- **Qué NO ejecuta el PR (requiere intervención operador)**
+  - `gcloud run services add-iam-policy-binding` con `roles/run.admin` para el deployer SA (runbook §2).
+  - `workflow_dispatch` manual del primer deploy production (runbook §3).
+  - PR paralelo al sibling con stub README + workflow disable (runbook §4).
+  - Cleanup físico del código viejo del sibling (runbook §7, +7 días).
+- **Tests migrados**: pytest local en venv fresh → 37/40 passing. Los 3 failures (rate limit mapping, missing optional property tolerance, RECONCILE_PRODUCT_PROPERTIES MagicMock spec) son pre-existentes del sibling (confirmed) — follow-up task para hardening.
+- **Riesgos conocidos + mitigaciones**
+  - Region locked a `us-central1` (URL pública contiene `-uc.`) — documentado en deploy.sh header y workflow env vars. NO migrar a `us-east4`.
+  - El Cloud Run actual permite `allUsers` invoker (auth en app layer) — preservado; endurecer es follow-up separado (no parte de TASK-574).
+  - `requirements.txt` con versiones floating (`flask>=2.0`, etc.) — documentado como follow-up para pinear.
+- **Branch**: `task/TASK-574-absorb-hubspot-greenhouse-integration-service` → PR a develop pendiente.
+
 ## Sesion 2026-04-24 — TASK-606 rescata la intención útil del PR #62 (Codex)
 
 - **Contexto**

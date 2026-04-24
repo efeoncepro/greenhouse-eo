@@ -426,6 +426,18 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
 - Documentación funcional: `docs/documentation/operations/ops-worker-reactive-crons.md`
 
+### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
+
+- Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).
+- URL: `https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app`. Ubicación código: `services/hubspot_greenhouse_integration/` (absorbido 2026-04-24 desde el sibling `cesargrowth11/hubspot-bigquery` con `git filter-repo` — blame y autoría preservados).
+- 23 rutas HTTP: lectura (16 GET no-auth) + escritura (6 endpoints Bearer auth) + webhook inbound HMAC (`POST /webhooks/hubspot`). Lista completa en `services/hubspot_greenhouse_integration/README.md`.
+- Consumer en Vercel: `src/lib/integrations/hubspot-greenhouse-service.ts` (no cambia pre/post cutover — contrato HTTP idéntico).
+- **Si el cambio toca rutas del bridge, secretos (`hubspot-access-token`, `greenhouse-integration-api-token`, `hubspot-app-client-secret`), webhook handler, `Dockerfile` o `deploy.sh`**: invocar la skill `hubspot-greenhouse-bridge` en `.claude/skills/` o `.codex/skills/`. La skill tiene el árbol de decisión para property lifecycle, rotación de secretos, smoke end-to-end.
+- Deploy automático: `.github/workflows/hubspot-greenhouse-integration-deploy.yml` (push a `develop`/`main` con cambios a `services/hubspot_greenhouse_integration/**` → pytest → Cloud Build → Cloud Run deploy → smoke `/health` + `/contract`). Auth via Workload Identity Federation.
+- Deploy manual emergencia: `ENV=production bash services/hubspot_greenhouse_integration/deploy.sh`.
+- Tests pytest locales: `python -m pytest services/hubspot_greenhouse_integration/tests/ -v` (37/40 passing — 3 known failures pre-cutover documentados en README).
+- **Sibling `cesargrowth11/hubspot-bigquery` ya no es owner del bridge**: conserva solo ingestion Cloud Function `main.py` + app HubSpot Developer Platform. Ver `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` §3 y §3.1.
+
 ### Conectividad PostgreSQL (leer ANTES de cualquier operación DB)
 
 - **Paso 1 — Usar `pg-connect.sh`** (recomendado para cualquier operación manual o interactiva):

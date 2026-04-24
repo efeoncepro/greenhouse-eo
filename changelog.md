@@ -2,6 +2,21 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-574 (implementación completa en PR): HubSpot Greenhouse Integration Service absorbido al monorepo
+
+- Servicio Cloud Run `hubspot-greenhouse-integration` ahora vive en `services/hubspot_greenhouse_integration/` del monorepo (antes en sibling `cesargrowth11/hubspot-bigquery`).
+- Extracción via `git filter-repo --path services/hubspot_greenhouse_integration/` preserva autoría y blame de 16 commits originales (verificable con `git log --follow services/hubspot_greenhouse_integration/app.py`).
+- 3410 LOC Python runtime + 1660 LOC tests migrados. 23 rutas HTTP + webhook handler HMAC-validated.
+- **Primera CI/CD** para este código: `.github/workflows/hubspot-greenhouse-integration-deploy.yml` corre pytest → Cloud Build → Cloud Run deploy → smoke (`/health` + `/contract`). Triggers: push a `develop`/`main` en paths del servicio + `workflow_dispatch` manual. Auth via Workload Identity Federation (cero SA-key JSON).
+- Dockerfile Python 3.12-slim (primer Python image del monorepo): gunicorn entrypoint matcheando Procfile original, non-root user, 2 workers × 4 threads.
+- `deploy.sh` monorepo-native: region LOCKED a `us-central1` para preservar la URL pública (contiene `-uc.`), reutiliza SA `greenhouse-portal@` runtime y `github-actions-deployer@` para deploy.
+- `.vercelignore` actualizado para excluir el servicio del build Next.js.
+- Skill migrada de sibling a `.claude/skills/hubspot-greenhouse-bridge/` + `.codex/skills/hubspot-greenhouse-bridge/`. Helper script `ensure_hubspot_company_properties.py` + references + agents migrados.
+- Docs actualizados: `AGENTS.md`, `CLAUDE.md`, `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` (§3 re-scoped + nueva §3.1 para el write bridge + tabla quick-ref), `docs/documentation/finance/crear-deal-desde-quote-builder.md`.
+- **Cutover runbook** (`docs/operations/TASK-574-cutover-runbook.md`): 9 secciones con pre-flight, IAM grants, `workflow_dispatch` manual, smoke end-to-end, PR paralelo al sibling (stub README + workflow disable), rollback procedure (<60s), cleanup a los 7 días.
+- Tests locales: 37/40 pytest passing. 3 failures pre-existentes del sibling (no causados por migración) documentados como follow-up de hardening.
+- **Cutover real pendiente** de ventana operativa + aprobación humana — el PR deja todo listo pero NO ejecuta el deploy production.
+
 ### 2026-04-24 — TASK-598 cerrada: ICO Narrative Presentation Layer (fix weekly digest pre-lunes)
 
 - Nueva capa compartida `src/lib/ico-engine/ai/narrative-presentation.ts` que re-hidrata narrativas del ICO Engine contra canonical vigente al momento de renderizar, en vez de mostrar labels frozen del momento de generación. Principio: Slack-style mention resolution (`@[id|old_label]` → current username al render).

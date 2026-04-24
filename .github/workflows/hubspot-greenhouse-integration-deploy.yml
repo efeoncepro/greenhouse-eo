@@ -1,0 +1,192 @@
+name: HubSpot Greenhouse Integration Deploy
+
+# TASK-574 — first CI/CD that this service has ever had.
+# Absorbed 2026-04-24 from cesargrowth11/hubspot-bigquery. The service is
+# the write bridge HubSpot ↔ Greenhouse (23 HTTP routes + webhook handler).
+# Region is us-central1 — preserving the existing public URL
+# https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app so the
+# Vercel consumer does not need any config change.
+#
+# Auth: Workload Identity Federation. No SA-key JSON in GitHub Secrets.
+# Deploy SA: github-actions-deployer@ (reused from ops-worker / commercial-cost-worker).
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - '.github/workflows/hubspot-greenhouse-integration-deploy.yml'
+      - 'services/hubspot_greenhouse_integration/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip pytest (emergency deploys only)'
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: hubspot-greenhouse-integration-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test:
+    # Primer gate de CI que este servicio tiene. Corre pytest sobre los
+    # 40 test functions migrados desde el sibling. No bloquea si el operador
+    # usa `workflow_dispatch` con `skip_tests=true` (solo emergencias).
+    name: pytest services/hubspot_greenhouse_integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >-
+      ${{
+        github.event_name != 'workflow_dispatch'
+          || github.event.inputs.skip_tests != 'true'
+      }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: services/hubspot_greenhouse_integration/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r services/hubspot_greenhouse_integration/requirements.txt
+          pip install pytest
+
+      - name: Run pytest
+        run: |
+          python -m pytest services/hubspot_greenhouse_integration/tests/ -v --tb=short
+
+  deploy:
+    name: Deploy hubspot-greenhouse-integration to Cloud Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: [test]
+    if: >-
+      ${{ always() && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+
+    environment: >-
+      ${{
+        github.event_name == 'workflow_dispatch'
+          && github.event.inputs.environment
+          || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+      }}
+
+    env:
+      ENV: >-
+        ${{
+          github.event_name == 'workflow_dispatch'
+            && github.event.inputs.environment
+            || (github.ref == 'refs/heads/main' && 'production' || 'staging')
+        }}
+      GCP_PROJECT_ID: efeonce-group
+      # Region LOCKED to us-central1 to preserve the public URL used by
+      # the Vercel consumer. See services/hubspot_greenhouse_integration/deploy.sh
+      # header comment for the full rationale.
+      GCP_REGION: us-central1
+      SERVICE_NAME: hubspot-greenhouse-integration
+      DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+      RUNTIME_SERVICE_ACCOUNT: greenhouse-portal@efeonce-group.iam.gserviceaccount.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Verify gcloud account
+        run: |
+          gcloud config list --format='value(core.project,core.account)'
+          gcloud auth list
+
+      - name: Deploy hubspot-greenhouse-integration
+        run: |
+          bash services/hubspot_greenhouse_integration/deploy.sh
+        env:
+          ENV: ${{ env.ENV }}
+
+      - name: Verify deployment + smoke
+        run: |
+          REVISION="$(gcloud run services describe ${SERVICE_NAME} \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.latestReadyRevisionName)')"
+          READY="$(gcloud run services describe ${SERVICE_NAME} \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.conditions[0].status)')"
+          SERVICE_URL="$(gcloud run services describe ${SERVICE_NAME} \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.url)')"
+
+          echo "Latest revision: ${REVISION}"
+          echo "Service ready:   ${READY}"
+          echo "Service URL:     ${SERVICE_URL}"
+
+          if [ "${READY}" != "True" ]; then
+            echo "::error::Service reports not-ready after deploy."
+            exit 1
+          fi
+
+          # Smoke: GET /health + GET /contract. 5 attempts (~15s total) for
+          # cold-start warmup. Both must return 200 to declare success.
+          SMOKE_OK="false"
+          for i in 1 2 3 4 5; do
+            sleep 3
+            HEALTH_CODE=$(curl -s -o /dev/null -w '%{http_code}' "${SERVICE_URL}/health" || echo "000")
+            CONTRACT_CODE=$(curl -s -o /dev/null -w '%{http_code}' "${SERVICE_URL}/contract" || echo "000")
+            if [ "${HEALTH_CODE}" = "200" ] && [ "${CONTRACT_CODE}" = "200" ]; then
+              SMOKE_OK="true"
+              echo "Smoke OK (attempt ${i}): /health=${HEALTH_CODE} /contract=${CONTRACT_CODE}"
+              break
+            fi
+            echo "  attempt ${i}/5: /health=${HEALTH_CODE} /contract=${CONTRACT_CODE} — retry..."
+          done
+
+          if [ "${SMOKE_OK}" != "true" ]; then
+            echo "::error::Smoke failed after 5 attempts — the service is not responding to /health and /contract."
+            exit 1
+          fi
+
+          echo "✓ hubspot-greenhouse-integration deploy verified (revision ${REVISION})"
+
+      - name: Record deployment summary
+        run: |
+          echo "## HubSpot Greenhouse Integration — Deploy Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Environment:** ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Commit:** ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Triggered by:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Region:** ${{ env.GCP_REGION }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Service:** [${{ env.SERVICE_NAME }}](https://console.cloud.google.com/run/detail/${{ env.GCP_REGION }}/${{ env.SERVICE_NAME }}/metrics?project=${{ env.GCP_PROJECT_ID }})" >> "$GITHUB_STEP_SUMMARY"
