@@ -2,6 +2,17 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-574 CUTOVER EJECUTADO ✅: HubSpot Greenhouse Integration Service ahora deploya desde el monorepo
+
+- **Cloud Run revisión `hubspot-greenhouse-integration-00029-ng2`** live desde 2026-04-24 15:01 UTC, desplegada vía GitHub Actions workflow (`hubspot-greenhouse-integration-deploy.yml`) con Workload Identity Federation auth.
+- **Runtime SA migrado** de default Compute SA (`183008134038-compute@`) a la SA canónica del monorepo `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`.
+- **URL pública inalterada** (`https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app`); post-deploy smoke `/health` y `/contract` = 200.
+- **Region preservada**: `us-central1` (no migrado a `us-east4`).
+- **PRs**: #94 (monorepo develop, servicio + infra + docs + runbook), #95 (monorepo main, workflow-to-main, MERGEADO commit `d791c91c`), sibling PR #1 (stub README + backup del código viejo por 7 días).
+- **IAM grants ejecutados** al SA deployer `github-actions-deployer@`: `roles/run.admin` + `roles/iam.serviceAccountUser` (sobre runtime SA) + `roles/secretmanager.secretAccessor` (sobre los 3 secretos `hubspot-access-token`, `greenhouse-integration-api-token`, `hubspot-app-client-secret`).
+- **Test fixes** post-migración en `tests/test_app.py`: agregado import `HubSpotIntegrationError` (fixea 2 tests con NameError); 2 tests pre-existentes con drift test-vs-app marcados `@unittest.expectedFailure` como deuda documentada. CI final: 38 passed + 2 xfailed + 0 failed.
+- **Rollback target activo** (7-day window hasta 2026-05-01): revisión `hubspot-greenhouse-integration-00028-xwr` + backup físico en sibling `services/hubspot_greenhouse_integration.PRE-TASK-574.DELETE-AFTER-7-DAYS/`.
+
 ### 2026-04-24 — TASK-574 (implementación completa en PR): HubSpot Greenhouse Integration Service absorbido al monorepo
 
 - Servicio Cloud Run `hubspot-greenhouse-integration` ahora vive en `services/hubspot_greenhouse_integration/` del monorepo (antes en sibling `cesargrowth11/hubspot-bigquery`).
