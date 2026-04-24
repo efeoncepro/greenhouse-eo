@@ -6,13 +6,14 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `TASK-587` (umbrella) → `TASK-544` (program parent)
-- Status real: `Diseno`
+- Status real: `Cerrada`
+- Closed at: `2026-04-24`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none`
@@ -72,7 +73,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/{timestamp}_task-601-product-catalog-extension.sql` (new — 16 columnas)
+- `migrations/{timestamp}_task-601-product-catalog-extension.sql` (new — 16 columnas, con prefijo `hubspot_` donde aplica para evitar colisión con `product_type`/`pricing_model` GH-internos)
 - `migrations/{timestamp}_task-601-product-catalog-reference-tables.sql` (new — 4 tablas)
 - `migrations/{timestamp}_task-601-product-catalog-backfill.sql` (new — backfill desde finance.products)
 - `scripts/discovery/hubspot-products-inventory.ts` (new)
@@ -113,9 +114,27 @@ Reglas obligatorias:
 
 ### Slice 2 — Migration: catalog extension
 
-- `migrations/{ts}_task-601-product-catalog-extension.sql` con 16 columnas nullable. Ver lista en [TASK-587 Slice A](docs/tasks/to-do/TASK-587-hubspot-products-full-fidelity-sync.md).
-- Index opcional en `commercial_owner_member_id` si query patterns lo justifican.
-- `pnpm migrate:up` + `pnpm db:generate-types`.
+- `migrations/{ts}_task-601-product-catalog-extension.sql` con 16 columnas nullable.
+- **Columnas HS-alignadas (prefijo `hubspot_`** para evitar colisión con `product_type` / `pricing_model` GH-internos existentes, ver Delta 2026-04-24):
+  - `description_rich_html TEXT`
+  - `hubspot_product_type_code TEXT` (valores HS: `service|inventory|non_inventory`)
+  - `category_code TEXT`
+  - `unit_code TEXT`
+  - `tax_category_code TEXT`
+  - `hubspot_pricing_model TEXT DEFAULT 'flat'` (valores HS: `flat|volume|stairstep|graduated`)
+  - `hubspot_product_classification TEXT DEFAULT 'standalone'` (valores HS: `standalone|variant|bundle`)
+  - `hubspot_bundle_type_code TEXT DEFAULT 'none'` (valores HS: `none|open`)
+  - `is_recurring BOOLEAN DEFAULT FALSE`
+  - `recurring_billing_period_iso TEXT` (ISO 8601 duration, ej. `P12M` — HS lo expone como string, no enum)
+  - `recurring_billing_frequency_code TEXT` (valor HS directo: `weekly|biweekly|monthly|quarterly|per_six_months|annually|per_two_years|per_three_years|per_four_years|per_five_years`)
+  - `commercial_owner_member_id TEXT REFERENCES greenhouse_core.members(member_id)`
+  - `commercial_owner_assigned_at TIMESTAMPTZ`
+  - `owner_gh_authoritative BOOLEAN DEFAULT FALSE`
+  - `marketing_url TEXT`
+  - `image_urls TEXT[] DEFAULT ARRAY[]::TEXT[]`
+- Las columnas GH-internas existentes (`product_type`, `pricing_model`) quedan intactas — siguen su lógica interna.
+- Index: `CREATE INDEX IF NOT EXISTS idx_product_catalog_owner ON product_catalog(commercial_owner_member_id) WHERE commercial_owner_member_id IS NOT NULL;`
+- `pnpm migrate:up` + auto-regen types.
 
 ### Slice 3 — Migration: reference tables + seed
 
@@ -124,11 +143,27 @@ Reglas obligatorias:
   - `greenhouse_commercial.product_units (code PK, label_es, label_en, hubspot_option_value, active, display_order)`
   - `greenhouse_finance.tax_categories (code PK, label_es, hubspot_option_value, default_rate_pct, jurisdiction)`
   - `greenhouse_commercial.product_source_kind_mapping (source_kind PK, hubspot_product_type, notes)`
-- Seeds:
-  - `product_units`: `UN`, `HORA`, `MES`, `ANUAL`, `DIA`, `PROYECTO`, `CUSTOM` (+ valores observados en Discovery)
-  - `tax_categories`: `standard_iva_19` (Chile, 19%, hs_value `'standard'`), `exempt`, `non_taxable`
-  - `product_source_kind_mapping`: 5 filas (service/sellable_role → service; tool/overhead_addon → non_inventory; manual → service)
-  - `product_categories`: derivado de Discovery output (pueden ser ~5-10 categorías iniciales o vacío + admin completa después)
+- Seeds (alineados a options reales de HS portal `48713323` confirmadas en Discovery):
+  - `product_units` — 12 filas (match 1:1 con HS enumeration `unidad`):
+    - `Hora`, `FTE`, `Dia`, `Mes`, `Trimestre`, `Proyecto`, `Entrega`, `Año`, `Licencia`, `Bolsa`, `Creditos`, `Addon`
+    - Para cada: `hubspot_option_value` = label exacto HS (mantiene tildes en Spanish)
+  - `product_categories` — 5 filas (match 1:1 con HS enumeration `categoria_de_item`):
+    - `staff_augmentation` → HS `Staff augmentation`
+    - `proyecto_implementacion` → HS `Proyecto o Implementación`
+    - `retainer_ongoing` → HS `Retainer (On-Going)`
+    - `consultoria_estrategica_ip` → HS `Consultoría Estratégica - IP`
+    - `licencia_acceso_tecnologico` → HS `Licencia / Acceso Tecnológico`
+  - `tax_categories` — 3 filas Chile:
+    - `standard_iva_19` (Chile, 19%, `hubspot_option_value=NULL` hasta que HS portal admin configure options)
+    - `exempt` (0%, `hubspot_option_value=NULL`)
+    - `non_taxable` (0%, `hubspot_option_value=NULL`)
+    - Nota: `hs_tax_category` options array está vacío en el portal actual (confirmed Discovery). Follow-up governance: coordinar con HS admin la creación de options para habilitar mapping bidi.
+  - `product_source_kind_mapping` — 5 filas (GH `source_kind` → HS `hs_product_type`):
+    - `service → service`
+    - `sellable_role → service`
+    - `tool → non_inventory`
+    - `overhead_addon → non_inventory`
+    - `manual → service` (default)
 
 ### Slice 4 — Backfill desde finance.products
 
@@ -167,7 +202,7 @@ Spec heavy en [TASK-587 § Detailed Spec](docs/tasks/to-do/TASK-587-hubspot-prod
 
 ## Acceptance Criteria
 
-- [ ] `product_catalog` extendido con 16 columnas nullable; `\d greenhouse_commercial.product_catalog` muestra todas
+- [ ] `product_catalog` extendido con 16 columnas nullable (incluye prefijo `hubspot_` en 4 de ellas para evitar colisión con GH-internas existentes `product_type`/`pricing_model`); `\d greenhouse_commercial.product_catalog` muestra todas
 - [ ] 4 tablas ref creadas; `SELECT count(*)` por cada una devuelve seed > 0
 - [ ] `product_source_kind_mapping` cubre los 5 source kinds (service, sellable_role, tool, overhead_addon, manual)
 - [ ] Tipos Kysely regenerados; `npx tsc --noEmit` green
@@ -199,3 +234,18 @@ Spec heavy en [TASK-587 § Detailed Spec](docs/tasks/to-do/TASK-587-hubspot-prod
 
 - Si Discovery revela categorías HS no contempladas en seed → completar `product_categories` en migración follow-up
 - Admin UI para CRUD de tablas ref → TASK-605 o follow-up separado si emerge necesidad
+- `gh_business_line` data quality cleanup (casing inconsistente wave/Wave, multi-BU string) — follow-up separado; TASK-601 solo reporta en Discovery
+- Coordinar con HubSpot portal admin la creación de `hs_tax_category` options (array vacío hoy) para habilitar mapping bidi en Fase C/D
+- 42/74 productos ya tienen `hs_price_*` poblados + 33/74 con `hs_cost_of_goods_sold` real — propagar a TASK-602 Discovery seed como autoritativos de partida
+
+## Delta 2026-04-24
+
+Post-Discovery (Phase 2 Audit) — correcciones aplicadas antes de implementar:
+
+1. **Prefijo `hubspot_` en 4 columnas HS-alignadas** para evitar colisión con `product_type` (existe, NOT NULL, CHECK `service|deliverable|license|infrastructure`) y `pricing_model` (existe, nullable, CHECK `staff_aug|retainer|project|fixed`). Nuevas columnas HS: `hubspot_product_type_code`, `hubspot_pricing_model`, `hubspot_product_classification`, `hubspot_bundle_type_code`.
+2. **Seed `product_units` ajustado de 7 a 12 filas** para match 1:1 con HS enumeration `unidad` options reales (Hora, FTE, Día, Mes, Trimestre, Proyecto, Entrega, Año, Licencia, Bolsa, Créditos, Addon).
+3. **Seed `product_categories` especificado** con los 5 valores reales en HS portal `48713323`.
+4. **`recurring_billing_period_code TEXT` → `recurring_billing_period_iso TEXT`** — HS guarda ISO 8601 duration string (e.g. `P12M`), no enumeration.
+5. **`recurring_billing_frequency_code`** permanece; guarda el string HS directo (no se crea ref table separada — options son fijas de HubSpot API).
+6. **`hs_tax_category` options vacío** en portal HS actual → tax_categories seed con `hubspot_option_value=NULL`; follow-up governance coordinar con HS admin.
+7. **No-green-field confirmado en HS**: 42/74 productos tienen `hs_price_*` poblados + 33/74 tienen `hs_cost_of_goods_sold` real. No bloquea TASK-601 (solo schema), pero propagar a TASK-602 Discovery seed (Fase B) y TASK-603 COGS unblock (Fase C).

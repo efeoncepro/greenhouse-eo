@@ -28,6 +28,25 @@
 - Tests locales: 37/40 pytest passing. 3 failures pre-existentes del sibling (no causados por migración) documentados como follow-up de hardening.
 - **Cutover real pendiente** de ventana operativa + aprobación humana — el PR deja todo listo pero NO ejecuta el deploy production.
 
+### 2026-04-24 — TASK-601 cerrada: Product Catalog Schema Extension + 4 Reference Tables (Fase A de TASK-587)
+
+- `greenhouse_commercial.product_catalog` extendido con 16 columnas nullable:
+  - `description_rich_html`, `category_code` (FK), `unit_code` (FK), `tax_category_code` (FK)
+  - `hubspot_product_type_code`, `hubspot_pricing_model`, `hubspot_product_classification`, `hubspot_bundle_type_code` (prefijo `hubspot_` para evitar colisión con `product_type`/`pricing_model` GH-internos existentes con semántica distinta)
+  - `is_recurring`, `recurring_billing_period_iso`, `recurring_billing_frequency_code`
+  - `commercial_owner_member_id` (FK a `greenhouse_core.members`), `commercial_owner_assigned_at`, `owner_gh_authoritative`
+  - `marketing_url`, `image_urls` (TEXT[])
+- 4 nuevas tablas de referencia con seed alineado 1:1 al portal HubSpot 48713323:
+  - `greenhouse_commercial.product_categories` (5 filas: staff_augmentation, proyecto_implementacion, retainer_ongoing, consultoria_estrategica_ip, licencia_acceso_tecnologico)
+  - `greenhouse_commercial.product_units` (12 filas: Hora, FTE, Día, Mes, Trimestre, Proyecto, Entrega, Año, Licencia, Bolsa, Créditos, Addon)
+  - `greenhouse_finance.tax_categories` (3 filas Chile: standard_iva_19, exempt, non_taxable; hubspot_option_value=NULL hasta que HS admin configure options)
+  - `greenhouse_commercial.product_source_kind_mapping` (7 filas, mapping GH source_kind → hs_product_type)
+- Module nuevo `src/lib/commercial/product-catalog-references.ts` con readers Kysely tipados (Selectable<DB[table]>), cache TTL 60s, y helper `resolveHubSpotProductType(sourceKind)` para outbound.
+- 17 tests unitarios passing cubriendo list (con/sin inactive), lookup directo por code, reverse lookup por hubspot_option_value, cache hit/miss, filter por jurisdiction en tax categories.
+- Script reproducible `scripts/discovery/hubspot-products-inventory.ts` + reporte operativo one-time en `docs/operations/discovery-hubspot-products-inventory-20260424.md` con distribuciones reales: 42/74 con precios HS, 33/74 con COGS, 0/74 con owner/url/images.
+- Backfill idempotente desde `greenhouse_finance.products` legacy para `is_recurring`, `recurring_billing_frequency_code`, `category_code` (reverse-lookup `category` / `legacy_category` → `product_categories.label_es`).
+- Tipos Kysely regenerados (`src/types/db.d.ts` — 283 tablas introspeccionadas).
+
 ### 2026-04-24 — TASK-598 cerrada: ICO Narrative Presentation Layer (fix weekly digest pre-lunes)
 
 - Nueva capa compartida `src/lib/ico-engine/ai/narrative-presentation.ts` que re-hidrata narrativas del ICO Engine contra canonical vigente al momento de renderizar, en vez de mostrar labels frozen del momento de generación. Principio: Slack-style mention resolution (`@[id|old_label]` → current username al render).
