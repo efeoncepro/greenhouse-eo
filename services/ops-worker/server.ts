@@ -48,6 +48,7 @@ import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
+import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -511,6 +512,32 @@ const handleProductCatalogDriftDetect = async (_req: IncomingMessage, res: Serve
 }
 
 /**
+ * POST /product-catalog/reconcile-v2
+ * TASK-605 Slice 6: weekly reconcile against HubSpot catalog with v2
+ * drift classifier (pending_overwrite / manual_drift / error) + Slack
+ * alert when (manual_drift + error) > threshold. Scheduled via Cloud
+ * Scheduler (weekly Monday 06:00 America/Santiago).
+ */
+const handleProductCatalogReconcileV2 = async (_req: IncomingMessage, res: ServerResponse) => {
+  console.log('[ops-worker] POST /product-catalog/reconcile-v2')
+
+  try {
+    const summary = await runProductCatalogReconcileV2Job()
+
+    console.log(
+      `[ops-worker] /product-catalog/reconcile-v2 done — matched=${summary.matched} withDrift=${summary.productsWithDrift} pending=${summary.pendingOverwriteTotal} manual=${summary.manualDriftTotal} error=${summary.errorTotal} alert=${summary.alertFired} ${summary.durationMs}ms`
+    )
+
+    json(res, 200, summary)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /product-catalog/reconcile-v2 failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
  * POST /quotation-lifecycle/sweep
  * TASK-351: Daily quotation lifecycle sweep.
  * - Flips quotations past `expiry_date` to `status='expired'` + emits `commercial.quotation.expired`.
@@ -807,6 +834,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/product-catalog/drift-detect') {
       await handleProductCatalogDriftDetect(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/product-catalog/reconcile-v2') {
+      await handleProductCatalogReconcileV2(req, res)
 
       return
     }

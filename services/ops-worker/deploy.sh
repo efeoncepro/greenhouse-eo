@@ -439,6 +439,13 @@ upsert_scheduler_job \
 echo "  -> ops-product-catalog-drift-detect: 0 3 * * * (nightly HubSpot product drift detect, TASK-548)"
 
 upsert_scheduler_job \
+  "ops-product-catalog-reconcile-v2" \
+  "0 6 * * 1" \
+  "/product-catalog/reconcile-v2" \
+  '{}'
+echo "  -> ops-product-catalog-reconcile-v2: 0 6 * * 1 (weekly Mon 06:00 Santiago, v2 drift classifier + Slack alert, TASK-605)"
+
+upsert_scheduler_job \
   "ops-quotation-lifecycle" \
   "0 7 * * *" \
   "/quotation-lifecycle/sweep" \
