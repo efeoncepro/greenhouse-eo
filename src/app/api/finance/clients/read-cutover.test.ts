@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
 const mockEnsureFinanceInfrastructure = vi.fn()
+const mockAssertFinanceBigQueryReadiness = vi.fn()
 const mockRunFinanceQuery = vi.fn()
 const mockGetFinanceProjectId = vi.fn()
 const mockGetHubspotTableColumns = vi.fn()
@@ -17,7 +18,8 @@ vi.mock('@/lib/tenant/authorization', () => ({
 }))
 
 vi.mock('@/lib/finance/schema', () => ({
-  ensureFinanceInfrastructure: (...args: unknown[]) => mockEnsureFinanceInfrastructure(...args)
+  ensureFinanceInfrastructure: (...args: unknown[]) => mockEnsureFinanceInfrastructure(...args),
+  assertFinanceBigQueryReadiness: (...args: unknown[]) => mockAssertFinanceBigQueryReadiness(...args)
 }))
 
 vi.mock('@/lib/finance/hubspot', () => ({
@@ -77,6 +79,7 @@ describe('Finance clients read-path cutover', () => {
     })
 
     mockEnsureFinanceInfrastructure.mockResolvedValue(undefined)
+    mockAssertFinanceBigQueryReadiness.mockResolvedValue(undefined)
     mockGetFinanceProjectId.mockReturnValue('test-project')
     mockGetHubspotTableColumns.mockResolvedValue(['dummy_column'])
     mockGetHubspotCompaniesExpressions.mockReturnValue({
@@ -173,6 +176,9 @@ describe('Finance clients read-path cutover', () => {
       requiresHes: false,
       totalReceivable: 1234,
       activeInvoicesCount: 1
+    })
+    expect(mockAssertFinanceBigQueryReadiness).toHaveBeenCalledWith({
+      tables: ['fin_client_profiles', 'fin_income']
     })
   })
 
@@ -281,6 +287,9 @@ describe('Finance clients read-path cutover', () => {
       amountPending: 4000
     })
     expect(body.deals).toEqual([])
+    expect(mockAssertFinanceBigQueryReadiness).toHaveBeenCalledWith({
+      tables: ['fin_client_profiles', 'fin_income']
+    })
   })
 
   it('uses canonical client_id aggregation for receivables in the Postgres read path', async () => {
@@ -321,6 +330,7 @@ describe('Finance clients read-path cutover', () => {
     expect(countQuery).toContain('LEFT JOIN greenhouse_finance.client_profiles cp_income')
     expect(countQuery).toContain('COALESCE(i.client_id, cp_income.client_id) AS client_id')
     expect(countQuery).not.toContain('COALESCE(client_id, client_profile_id, hubspot_company_id) AS income_key')
+    expect(mockAssertFinanceBigQueryReadiness).not.toHaveBeenCalled()
   })
 
   it('prefers organization memberships over legacy finance_contacts in the Postgres detail path', async () => {
@@ -397,6 +407,7 @@ describe('Finance clients read-path cutover', () => {
         role: 'billing'
       }
     ])
+    expect(mockAssertFinanceBigQueryReadiness).not.toHaveBeenCalled()
   })
 
   it.skip('prefers a Postgres-first read path for finance clients once the list/detail cutover is wired', () => {})

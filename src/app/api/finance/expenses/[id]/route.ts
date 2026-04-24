@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { EXPENSE_SOURCE_TYPES, PAYMENT_PROVIDERS, PAYMENT_RAILS } from '@/lib/finance/expense-taxonomy'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   getFinanceExpenseFromPostgres,
   updateFinanceExpenseInPostgres
@@ -208,7 +208,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   // ── BigQuery fallback ──
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_expenses'] })
   const projectId = getFinanceProjectId()
 
   const rows = await runFinanceQuery<ExpenseDetailRow>(`

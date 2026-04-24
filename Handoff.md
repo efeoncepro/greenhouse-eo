@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-589 en verificación: Finance read paths sin provisioning runtime (Codex)
+
+- **Task:** `TASK-589` → `in-progress` (`Verification`)
+- **Objetivo ya implementado**
+  - sacar `ensureFinanceInfrastructure()` de los `GET /api/finance/**` interactivos y reemplazarlo por un boundary read-only de schema readiness
+  - endurecer `suppliers` sobre Postgres para eliminar el patrón frágil `ARRAY_AGG(...)[1]`
+- **Cambio estructural aplicado**
+  - nuevo helper `assertFinanceBigQueryReadiness()` en `src/lib/finance/schema.ts`
+  - `GET` afectados migrados al patrón `Postgres-first -> assertFinanceBigQueryReadiness -> BigQuery fallback`:
+    - `clients`, `clients/[id]`
+    - `suppliers`, `suppliers/[id]`
+    - `accounts`
+    - `income`, `income/[id]`, `income/summary`
+    - `expenses`, `expenses/[id]`, `expenses/summary`, `expenses/meta`
+    - `exchange-rates`
+    - dashboards `aging`, `summary`, `cashflow`, `by-service-line`
+  - `src/lib/finance/postgres-store.ts` reemplaza `ARRAY_AGG(...)[1]` en suppliers por laterals explícitos para conteo y contacto principal
+- **Payroll dependency**
+  - `expenses/meta` sigue leyendo `compensation_versions` para enriquecer instituciones, pero ahora lo hace con `assertPayrollBigQueryReadiness()` read-only y degradación opcional: si Payroll no está listo, el endpoint no cae completo
+- **Validación corrida**
+  - `pnpm exec vitest run src/app/api/finance/clients/read-cutover.test.ts 'src/app/api/finance/suppliers/[id]/route.test.ts' src/app/api/finance/suppliers/route.test.ts src/app/api/finance/expenses/meta/route.test.ts` → `11 passed, 1 skipped`
+  - `pnpm exec tsc --noEmit` → OK
+  - `pnpm build` → OK
+  - `pnpm lint` quedó fallando una vez por `newline-before-return` en `src/lib/payroll/schema.ts`; fix ya aplicado y falta rerun final para cerrar la checklist
+- **Nota de hygiene**
+  - `next build` volvió a mutar `tsconfig.json` con includes timestamped de `.next-local`; se revirtió y no debe commitearse
+- **Pendiente inmediato**
+  - rerun final de `pnpm lint`
+  - revisar `git status` para no mezclar untracked ajenos (`.agents/`, `scripts/verify-ftr-discrepancy.mts`)
+  - commit + push cuando cierre verificación
+
 ## Sesion 2026-04-24 — TASK-588 cerrada: project title resolution hardening (Claude)
 
 - **Task:** `TASK-588` → `complete`

@@ -18,7 +18,7 @@ import {
   shouldFallbackFromFinancePostgres,
   upsertFinanceExchangeRateInPostgres
 } from '@/lib/finance/postgres-store'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
   }
 
   // ── BigQuery fallback ──
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_exchange_rates'] })
 
   const projectId = getFinanceProjectId()
 

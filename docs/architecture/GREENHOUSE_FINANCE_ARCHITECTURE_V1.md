@@ -1118,6 +1118,10 @@ Estado operativo post `TASK-166`:
 - `clients` list/detail ya operan org-first sobre `greenhouse_core.organizations WHERE organization_type IN ('client', 'both')`, con `client_profiles.organization_id` como FK fuerte.
 - `client_id` se preserva como bridge operativo para modules, `purchase_orders`, `hes`, `income`, `client_economics` y `v_client_active_modules`; el cutover actual no elimina esa clave legacy.
 - El residual de `Finance Clients` queda reducido a fallback transicional, no a dependencia estructural del request path.
+- Delta `TASK-589`:
+  - ningun `GET /api/finance/**` interactivo debe invocar `ensureFinanceInfrastructure()` como side effect de lectura; el contrato correcto es `Postgres-first` y, si cae al carril legacy, usar una verificacion read-only (`assertFinanceBigQueryReadiness`) antes de consultar BigQuery.
+  - esto aplica a `clients`, `suppliers`, `accounts`, `income`, `expenses`, `exchange_rates`, dashboards y summaries Finance; el runtime ya no debe intentar `CREATE TABLE` / `ALTER TABLE` dentro de requests interactivos.
+  - `expenses/meta` puede enriquecer instituciones desde Payroll, pero ese enrichment no debe provisionar Payroll en un `GET`; la lectura se considera opcional y no puede tumbar toda la metadata de Finance.
 
 ### Delta 2026-04-08 — Ledger-first reconciliation & settlement foundation
 

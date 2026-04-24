@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { aggregateMonthlyEntries, buildCurrentMonthMetrics, getMonthKey, getRecentMonthKeys } from '@/lib/finance/reporting'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toDateString, toNumber } from '@/lib/finance/shared'
 import { isFinanceSlice2PostgresEnabled } from '@/lib/finance/postgres-store-slice2'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -94,7 +94,7 @@ async function getBigQueryFallbackSummary() {
   const monthKeys = getRecentMonthKeys(6)
   const projectId = getFinanceProjectId()
 
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_expenses'] })
 
   const rows = await runFinanceQuery<ExpenseSummaryRow>(`
     SELECT document_date, payment_date, total_amount_clp, payment_status

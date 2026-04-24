@@ -5,7 +5,7 @@ import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
 import { resolveCanonicalProviderId } from '@/lib/providers/postgres'
 import { getLatestProviderToolingSnapshot } from '@/lib/providers/provider-tooling-snapshots'
 import { listPreferredToolProviderCostBasisByProvider } from '@/lib/commercial-cost-basis/tool-provider-cost-basis-reader'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import { ensureOrganizationContactMembership, getOrganizationMemberships } from '@/lib/account-360/organization-store'
 import {
@@ -164,7 +164,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   // ── BigQuery fallback ──
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_suppliers', 'fin_expenses'] })
 
   const projectId = getFinanceProjectId()
 

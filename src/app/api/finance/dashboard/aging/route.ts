@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness } from '@/lib/finance/schema'
 import { getFinanceProjectId, runFinanceQuery, toNumber } from '@/lib/finance/shared'
 
 export const dynamic = 'force-dynamic'
@@ -19,7 +19,7 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_income'] })
 
   const projectId = getFinanceProjectId()
 

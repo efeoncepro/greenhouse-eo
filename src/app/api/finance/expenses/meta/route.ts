@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
+import { assertFinanceBigQueryReadiness } from '@/lib/finance/schema'
+import { assertPayrollBigQueryReadiness } from '@/lib/payroll/schema'
 import {
   EXPENSE_DRAWER_CATEGORIES,
   EXPENSE_DRAWER_TAB_LABELS,
@@ -71,9 +71,7 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-  await ensurePayrollInfrastructure()
-
+  await assertFinanceBigQueryReadiness({ tables: ['fin_suppliers', 'fin_accounts', 'fin_expenses'] })
   const projectId = getFinanceProjectId()
 
   // ── Postgres-first for accounts ──
@@ -149,23 +147,27 @@ export async function GET() {
       WHERE social_security_institution IS NOT NULL
         AND TRIM(social_security_institution) != ''
     `),
-    runFinanceQuery<{ institution: string | null }>(`
-      SELECT DISTINCT institution
-      FROM (
-        SELECT afp_name AS institution
-        FROM \`${projectId}.greenhouse.compensation_versions\`
-        WHERE afp_name IS NOT NULL AND TRIM(afp_name) != ''
-        UNION ALL
-        SELECT
-          CASE
-            WHEN LOWER(TRIM(health_system)) = 'fonasa' THEN 'Fonasa'
-            WHEN LOWER(TRIM(health_system)) = 'isapre' THEN 'Isapre'
-            ELSE NULL
-          END AS institution
-        FROM \`${projectId}.greenhouse.compensation_versions\`
+    assertPayrollBigQueryReadiness({ tables: ['compensation_versions'] })
+      .then(() =>
+        runFinanceQuery<{ institution: string | null }>(`
+          SELECT DISTINCT institution
+          FROM (
+            SELECT afp_name AS institution
+            FROM \`${projectId}.greenhouse.compensation_versions\`
+            WHERE afp_name IS NOT NULL AND TRIM(afp_name) != ''
+            UNION ALL
+            SELECT
+              CASE
+                WHEN LOWER(TRIM(health_system)) = 'fonasa' THEN 'Fonasa'
+                WHEN LOWER(TRIM(health_system)) = 'isapre' THEN 'Isapre'
+                ELSE NULL
+              END AS institution
+            FROM \`${projectId}.greenhouse.compensation_versions\`
+          )
+          WHERE institution IS NOT NULL
+        `)
       )
-      WHERE institution IS NOT NULL
-    `),
+      .catch(() => []),
     runGreenhousePostgresQuery<FinanceMemberOption>(
       `
         SELECT member_id, display_name

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
-const mockEnsureFinanceInfrastructure = vi.fn()
-const mockEnsurePayrollInfrastructure = vi.fn()
+const mockAssertFinanceBigQueryReadiness = vi.fn()
+const mockAssertPayrollBigQueryReadiness = vi.fn()
 const mockRunFinanceQuery = vi.fn()
 const mockListFinanceSuppliersFromPostgres = vi.fn()
 const mockListFinanceAccountsFromPostgres = vi.fn()
@@ -13,11 +13,11 @@ vi.mock('@/lib/tenant/authorization', () => ({
 }))
 
 vi.mock('@/lib/finance/schema', () => ({
-  ensureFinanceInfrastructure: () => mockEnsureFinanceInfrastructure()
+  assertFinanceBigQueryReadiness: (...args: unknown[]) => mockAssertFinanceBigQueryReadiness(...args)
 }))
 
 vi.mock('@/lib/payroll/schema', () => ({
-  ensurePayrollInfrastructure: () => mockEnsurePayrollInfrastructure()
+  assertPayrollBigQueryReadiness: (...args: unknown[]) => mockAssertPayrollBigQueryReadiness(...args)
 }))
 
 vi.mock('@/lib/finance/shared', async () => {
@@ -47,6 +47,8 @@ describe('GET /api/finance/expenses/meta', () => {
       errorResponse: null
     })
 
+    mockAssertFinanceBigQueryReadiness.mockResolvedValue(undefined)
+    mockAssertPayrollBigQueryReadiness.mockResolvedValue(undefined)
     mockShouldFallbackFromFinancePostgres.mockReturnValue(true)
     mockListFinanceSuppliersFromPostgres.mockResolvedValue({
       items: [
@@ -126,6 +128,24 @@ describe('GET /api/finance/expenses/meta', () => {
     expect(
       mockRunFinanceQuery.mock.calls.some(([query]) =>
         typeof query === 'string' && query.includes('FROM `test-project.greenhouse.fin_suppliers`')
+      )
+    ).toBe(false)
+    expect(mockAssertFinanceBigQueryReadiness).toHaveBeenCalledWith({
+      tables: ['fin_suppliers', 'fin_accounts', 'fin_expenses']
+    })
+  })
+
+  it('degrades payroll institution enrichment without failing the full payload when payroll readiness is missing', async () => {
+    mockAssertPayrollBigQueryReadiness.mockRejectedValueOnce(new Error('payroll not ready'))
+
+    const response = await GET()
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body.socialSecurityInstitutions).toContain('Fonasa')
+    expect(
+      mockRunFinanceQuery.mock.calls.some(([query]) =>
+        typeof query === 'string' && query.includes('FROM `test-project.greenhouse.compensation_versions`')
       )
     ).toBe(false)
   })

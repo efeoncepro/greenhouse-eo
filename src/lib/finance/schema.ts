@@ -1,8 +1,12 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { FinanceValidationError } from '@/lib/finance/shared'
 
 let ensureFinanceInfrastructurePromise: Promise<void> | null = null
+const financeBigQueryReadinessPromises = new Map<string, Promise<void>>()
+const financeBigQueryReadinessCache = new Map<string, number>()
+const FINANCE_BIGQUERY_READINESS_TTL_MS = 60_000
 
 const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
   fin_accounts: `
@@ -329,6 +333,79 @@ const getExistingFinanceColumns = async (projectId: string) => {
   })
 
   return new Set((rows as Array<{ table_name: string; column_name: string }>).map(row => `${row.table_name}.${row.column_name}`))
+}
+
+type FinanceBigQueryTableName = keyof typeof FINANCE_TABLE_DEFINITIONS
+
+type AssertFinanceBigQueryReadinessOptions = {
+  tables: FinanceBigQueryTableName[]
+  includeRequiredColumns?: boolean
+}
+
+const getFinanceReadinessKey = (tables: FinanceBigQueryTableName[], includeRequiredColumns: boolean) =>
+  `${includeRequiredColumns ? 'with-columns' : 'tables-only'}:${[...new Set(tables)].sort().join(',')}`
+
+export const assertFinanceBigQueryReadiness = async ({
+  tables,
+  includeRequiredColumns = true
+}: AssertFinanceBigQueryReadinessOptions) => {
+  const normalizedTables = [...new Set(tables)].sort() as FinanceBigQueryTableName[]
+
+  if (normalizedTables.length === 0) {
+    return
+  }
+
+  const cacheKey = getFinanceReadinessKey(normalizedTables, includeRequiredColumns)
+  const cachedAt = financeBigQueryReadinessCache.get(cacheKey) ?? 0
+
+  if (Date.now() - cachedAt < FINANCE_BIGQUERY_READINESS_TTL_MS) {
+    return
+  }
+
+  const existingPromise = financeBigQueryReadinessPromises.get(cacheKey)
+
+  if (existingPromise) {
+    return existingPromise
+  }
+
+  const readinessPromise = (async () => {
+    const projectId = getBigQueryProjectId()
+    const existingTables = await getExistingFinanceTables(projectId)
+
+    const missingTables = normalizedTables.filter(tableName => !existingTables.has(tableName))
+
+    let missingColumns: string[] = []
+
+    if (includeRequiredColumns && missingTables.length === 0) {
+      const existingColumns = await getExistingFinanceColumns(projectId)
+
+      missingColumns = normalizedTables.flatMap(tableName =>
+        Object.keys(FINANCE_COLUMN_REQUIREMENTS[tableName] ?? {}).filter(
+          columnName => !existingColumns.has(`${tableName}.${columnName}`)
+        ).map(columnName => `${tableName}.${columnName}`)
+      )
+    }
+
+    if (missingTables.length > 0 || missingColumns.length > 0) {
+      throw new FinanceValidationError(
+        'Finance BigQuery legacy schema is not ready for runtime reads. Run the explicit Finance provisioning lane before using the BigQuery fallback.',
+        503,
+        { missingTables, missingColumns },
+        'FINANCE_BIGQUERY_SCHEMA_NOT_READY'
+      )
+    }
+
+    financeBigQueryReadinessCache.set(cacheKey, Date.now())
+  })().catch(error => {
+    financeBigQueryReadinessCache.delete(cacheKey)
+    throw error
+  }).finally(() => {
+    financeBigQueryReadinessPromises.delete(cacheKey)
+  })
+
+  financeBigQueryReadinessPromises.set(cacheKey, readinessPromise)
+
+  return readinessPromise
 }
 
 const ensureFinanceManagerRole = async (projectId: string) => {

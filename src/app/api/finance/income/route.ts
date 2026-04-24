@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -173,7 +173,7 @@ export async function GET(request: Request) {
   }
 
   // ── BigQuery fallback ──
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_income'] })
   const projectId = getFinanceProjectId()
 
   let filters = ''

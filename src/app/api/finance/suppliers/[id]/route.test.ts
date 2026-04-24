@@ -7,6 +7,7 @@ const mockShouldFallbackFromFinancePostgres = vi.fn()
 const mockListFinanceExpensesFromPostgres = vi.fn()
 const mockGetLatestProviderToolingSnapshot = vi.fn()
 const mockEnsureFinanceInfrastructure = vi.fn()
+const mockAssertFinanceBigQueryReadiness = vi.fn()
 const mockRunFinanceQuery = vi.fn()
 const mockGetFinanceProjectId = vi.fn()
 const mockSyncProviderFromFinanceSupplier = vi.fn()
@@ -35,7 +36,8 @@ vi.mock('@/lib/account-360/organization-store', () => ({
 }))
 
 vi.mock('@/lib/finance/schema', () => ({
-  ensureFinanceInfrastructure: () => mockEnsureFinanceInfrastructure()
+  ensureFinanceInfrastructure: () => mockEnsureFinanceInfrastructure(),
+  assertFinanceBigQueryReadiness: (...args: unknown[]) => mockAssertFinanceBigQueryReadiness(...args)
 }))
 
 vi.mock('@/lib/finance/postgres-store', () => ({
@@ -86,6 +88,7 @@ describe('GET /api/finance/suppliers/[id]', () => {
     mockGetOrganizationMemberships.mockResolvedValue([])
     mockRunFinanceQuery.mockResolvedValue([])
     mockEnsureFinanceInfrastructure.mockResolvedValue(undefined)
+    mockAssertFinanceBigQueryReadiness.mockResolvedValue(undefined)
     mockSyncProviderFromFinanceSupplier.mockResolvedValue(null)
     mockResolveCanonicalProviderId.mockReturnValue('local-studio')
   })
@@ -228,6 +231,7 @@ describe('GET /api/finance/suppliers/[id]', () => {
         }
       ]
     })
+    expect(mockAssertFinanceBigQueryReadiness).not.toHaveBeenCalled()
 
     expect(mockGetOrganizationMemberships).toHaveBeenCalledWith('org-anthropic')
   })
@@ -275,6 +279,7 @@ describe('GET /api/finance/suppliers/[id]', () => {
 
     expect(body.providerTooling).toBeNull()
     expect(body.organizationContacts).toEqual([])
+    expect(mockAssertFinanceBigQueryReadiness).not.toHaveBeenCalled()
   })
 
   it('auto-links a supplier to a derived canonical provider id through PUT', async () => {

@@ -2,8 +2,24 @@ import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
+import { PayrollValidationError, getTableColumns, runPayrollQuery } from '@/lib/payroll/shared'
 
 let ensurePayrollInfrastructurePromise: Promise<void> | null = null
+const payrollBigQueryReadinessPromises = new Map<string, Promise<void>>()
+const payrollBigQueryReadinessCache = new Map<string, number>()
+const PAYROLL_BIGQUERY_READINESS_TTL_MS = 60_000
+
+const PAYROLL_TABLE_REQUIREMENTS = {
+  compensation_versions: ['afp_name', 'health_system'],
+  payroll_entries: ['entry_id', 'period_id', 'member_id']
+} as const
+
+type PayrollBigQueryTableName = keyof typeof PAYROLL_TABLE_REQUIREMENTS
+
+type AssertPayrollBigQueryReadinessOptions = {
+  tables: PayrollBigQueryTableName[]
+  includeRequiredColumns?: boolean
+}
 
 const buildStatements = (projectId: string) => [
   `
@@ -357,4 +373,102 @@ export const ensurePayrollInfrastructure = async () => {
   })
 
   return ensurePayrollInfrastructurePromise
+}
+
+export const assertPayrollBigQueryReadiness = async ({
+  tables,
+  includeRequiredColumns = true
+}: AssertPayrollBigQueryReadinessOptions) => {
+  if (isPayrollPostgresEnabled()) {
+    return
+  }
+
+  const uniqueTables = Array.from(new Set(tables))
+
+  if (uniqueTables.length === 0) {
+    return
+  }
+
+  const signature = `${includeRequiredColumns ? 'cols' : 'tables'}:${uniqueTables.sort().join(',')}`
+  const now = Date.now()
+  const cachedAt = payrollBigQueryReadinessCache.get(signature)
+
+  if (cachedAt && now - cachedAt < PAYROLL_BIGQUERY_READINESS_TTL_MS) {
+    return
+  }
+
+  const existingPromise = payrollBigQueryReadinessPromises.get(signature)
+
+  if (existingPromise) {
+    return existingPromise
+  }
+
+  const projectId = getBigQueryProjectId()
+
+  const readinessPromise = (async () => {
+    const tableRows = await runPayrollQuery<{ table_name: string }>(
+      `
+        SELECT table_name
+        FROM \`${projectId}.greenhouse.INFORMATION_SCHEMA.TABLES\`
+        WHERE table_name IN UNNEST(@tableNames)
+      `,
+      { tableNames: uniqueTables }
+    )
+
+    const existingTables = new Set(tableRows.map(row => row.table_name))
+    const missingTables = uniqueTables.filter(tableName => !existingTables.has(tableName))
+
+    if (missingTables.length > 0) {
+      throw new PayrollValidationError(
+        `Payroll BigQuery schema is not ready. Missing tables: ${missingTables.join(', ')}.`,
+        503,
+        { code: 'PAYROLL_BIGQUERY_SCHEMA_NOT_READY', missingTables }
+      )
+    }
+
+    if (!includeRequiredColumns) {
+      payrollBigQueryReadinessCache.set(signature, Date.now())
+
+      return
+    }
+
+    const missingColumnsByTable = new Map<string, string[]>()
+
+    for (const tableName of uniqueTables) {
+      const requiredColumns = PAYROLL_TABLE_REQUIREMENTS[tableName]
+
+      const existingColumns = await getTableColumns('greenhouse', tableName)
+      const missingColumns = requiredColumns.filter(columnName => !existingColumns.has(columnName))
+
+      if (missingColumns.length > 0) {
+        missingColumnsByTable.set(tableName, missingColumns)
+      }
+    }
+
+    if (missingColumnsByTable.size > 0) {
+      throw new PayrollValidationError(
+        `Payroll BigQuery schema is not ready. Missing columns: ${Array.from(missingColumnsByTable.entries())
+          .map(([tableName, columns]) => `${tableName}(${columns.join(', ')})`)
+          .join('; ')}.`,
+        503,
+        {
+          code: 'PAYROLL_BIGQUERY_SCHEMA_NOT_READY',
+          missingColumnsByTable: Object.fromEntries(missingColumnsByTable.entries())
+        }
+      )
+    }
+
+    payrollBigQueryReadinessCache.set(signature, Date.now())
+  })()
+    .catch(error => {
+      payrollBigQueryReadinessCache.delete(signature)
+      throw error
+    })
+    .finally(() => {
+      payrollBigQueryReadinessPromises.delete(signature)
+    })
+
+  payrollBigQueryReadinessPromises.set(signature, readinessPromise)
+
+  return readinessPromise
 }

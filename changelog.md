@@ -2,6 +2,13 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-589 desacopla provisioning de los read paths interactivos de Finance
+
+- Los `GET /api/finance/**` interactivos dejan de usar `ensureFinanceInfrastructure()` como side effect de lectura. El patrón nuevo es `Postgres-first` y, solo si hay fallback legacy, validar schema BigQuery en modo read-only con `assertFinanceBigQueryReadiness()` antes de consultar `fin_*`.
+- El cambio se aplicó de forma transversal a `clients`, `suppliers`, `accounts`, `income`, `expenses`, `exchange-rates`, dashboards y summaries Finance, cerrando la clase de errores donde un request de UI intentaba hacer `CREATE TABLE` / `ALTER TABLE` en BigQuery y chocaba con cuotas de `table update operations`.
+- `GET /api/finance/suppliers` y `GET /api/finance/suppliers/[id]` también quedan endurecidos por el lado Postgres: la selección de contacto principal deja de depender de `ARRAY_AGG(...)[1]` y pasa a un lateral explícito con `ORDER BY ... LIMIT 1`, más legible y estable.
+- `GET /api/finance/expenses/meta` sigue pudiendo enriquecer instituciones desde Payroll, pero ya no puede provisionar Payroll en runtime; si Payroll no está listo, Finance devuelve la metadata base y degrada solo ese enrichment opcional.
+
 ### 2026-04-24 — TASK-588 cerrada: resolución de título Notion tolerante a multi-tenant
 
 - El sync canónico deja de asumir que la property title de Notion se llama `nombre_del_proyecto`. Efeonce y Sky Airline tenían el título en columnas distintas (`nombre_del_proyecto` vs `project_name`) → 78 proyectos + 3590 tareas Sky terminaban como `'Sin nombre'` en el canónico y en signals ICO. Fix: cascada COALESCE data-driven sobre las columnas que existen en `INFORMATION_SCHEMA.COLUMNS` por corrida; set conservador de candidatos (solo columnas semánticamente equivalentes).

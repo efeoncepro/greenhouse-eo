@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   getFinanceIncomeFromPostgres,
   updateFinanceIncomeInPostgres
@@ -153,7 +153,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   }
 
   // ── BigQuery fallback ──
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_income'] })
   const projectId = getFinanceProjectId()
 
   const rows = await runFinanceQuery<IncomeDetailRow>(`

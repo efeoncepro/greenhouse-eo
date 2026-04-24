@@ -212,6 +212,31 @@ let financePostgresReadyAt = 0
 
 const FINANCE_POSTGRES_READY_TTL_MS = 60_000
 
+const SUPPLIER_CONTACT_MEMBERSHIP_TYPES_SQL = `ARRAY['contact', 'billing', 'client_contact']::text[]`
+
+const SUPPLIER_ORGANIZATION_CONTACTS_LATERAL_SQL = `
+  LEFT JOIN LATERAL (
+    SELECT COUNT(*)::int AS organization_contacts_count
+    FROM greenhouse_core.person_memberships pm
+    WHERE pm.organization_id = greenhouse_finance.suppliers.organization_id
+      AND pm.active = TRUE
+      AND pm.membership_type = ANY(${SUPPLIER_CONTACT_MEMBERSHIP_TYPES_SQL})
+  ) organization_contact_counts ON TRUE
+  LEFT JOIN LATERAL (
+    SELECT
+      ip.full_name AS organization_contact_name,
+      ip.canonical_email AS organization_contact_email,
+      pm.role_label AS organization_contact_role
+    FROM greenhouse_core.person_memberships pm
+    JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
+    WHERE pm.organization_id = greenhouse_finance.suppliers.organization_id
+      AND pm.active = TRUE
+      AND pm.membership_type = ANY(${SUPPLIER_CONTACT_MEMBERSHIP_TYPES_SQL})
+    ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST, pm.membership_id ASC
+    LIMIT 1
+  ) organization_contact_summary ON TRUE
+`
+
 const getCurrentSantiagoPeriod = () => {
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
   const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
@@ -916,26 +941,15 @@ export const listFinanceSuppliersFromPostgres = async ({
         requires_po,
         is_active,
         notes,
-        organization_contacts.organization_contacts_count,
-        organization_contacts.organization_contact_name,
-        organization_contacts.organization_contact_email,
-        organization_contacts.organization_contact_role,
+        organization_contact_counts.organization_contacts_count,
+        organization_contact_summary.organization_contact_name,
+        organization_contact_summary.organization_contact_email,
+        organization_contact_summary.organization_contact_role,
         created_by_user_id,
         created_at,
         updated_at
       FROM greenhouse_finance.suppliers
-      LEFT JOIN LATERAL (
-        SELECT
-          COUNT(*)::int AS organization_contacts_count,
-          ARRAY_AGG(ip.full_name ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_name,
-          ARRAY_AGG(ip.canonical_email ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_email,
-          ARRAY_AGG(pm.role_label ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_role
-        FROM greenhouse_core.person_memberships pm
-        JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
-        WHERE pm.organization_id = greenhouse_finance.suppliers.organization_id
-          AND pm.active = TRUE
-          AND pm.membership_type = ANY(ARRAY['contact', 'billing', 'client_contact']::text[])
-      ) organization_contacts ON TRUE
+      ${SUPPLIER_ORGANIZATION_CONTACTS_LATERAL_SQL}
       ${filterClause}
       ORDER BY COALESCE(trade_name, legal_name) ASC
       LIMIT $5 OFFSET $6
@@ -977,26 +991,15 @@ export const getFinanceSupplierFromPostgres = async (supplierId: string) => {
         requires_po,
         is_active,
         notes,
-        organization_contacts.organization_contacts_count,
-        organization_contacts.organization_contact_name,
-        organization_contacts.organization_contact_email,
-        organization_contacts.organization_contact_role,
+        organization_contact_counts.organization_contacts_count,
+        organization_contact_summary.organization_contact_name,
+        organization_contact_summary.organization_contact_email,
+        organization_contact_summary.organization_contact_role,
         created_by_user_id,
         created_at,
         updated_at
       FROM greenhouse_finance.suppliers
-      LEFT JOIN LATERAL (
-        SELECT
-          COUNT(*)::int AS organization_contacts_count,
-          ARRAY_AGG(ip.full_name ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_name,
-          ARRAY_AGG(ip.canonical_email ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_email,
-          ARRAY_AGG(pm.role_label ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_role
-        FROM greenhouse_core.person_memberships pm
-        JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
-        WHERE pm.organization_id = greenhouse_finance.suppliers.organization_id
-          AND pm.active = TRUE
-          AND pm.membership_type = ANY(ARRAY['contact', 'billing', 'client_contact']::text[])
-      ) organization_contacts ON TRUE
+      ${SUPPLIER_ORGANIZATION_CONTACTS_LATERAL_SQL}
       WHERE supplier_id = $1
       LIMIT 1
     `,
