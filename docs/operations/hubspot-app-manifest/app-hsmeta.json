@@ -31,8 +31,6 @@
         "crm.objects.custom.write",
         "crm.objects.feedback_submissions.read",
         "crm.objects.goals.read",
-        "crm.objects.marketing_events.read",
-        "crm.objects.marketing_events.write",
         "crm.objects.subscriptions.read",
         "crm.objects.carts.read",
         "crm.objects.carts.write",
@@ -40,16 +38,6 @@
         "crm.objects.orders.write",
         "crm.objects.invoices.read",
         "crm.objects.commercepayments.read",
-        "crm.objects.appointments.read",
-        "crm.objects.appointments.write",
-        "crm.objects.courses.read",
-        "crm.objects.courses.write",
-        "crm.objects.listings.read",
-        "crm.objects.listings.write",
-        "crm.objects.partner-clients.read",
-        "crm.objects.partner-clients.write",
-        "crm.objects.partner-services.read",
-        "crm.objects.partner-services.write",
         "crm.objects.users.read",
         "crm.objects.users.write",
 
@@ -74,20 +62,10 @@
         "crm.schemas.invoices.read",
         "crm.schemas.invoices.write",
         "crm.schemas.commercepayments.read",
-        "crm.schemas.appointments.read",
-        "crm.schemas.appointments.write",
-        "crm.schemas.courses.read",
-        "crm.schemas.courses.write",
-        "crm.schemas.listings.read",
-        "crm.schemas.listings.write",
 
         "crm.lists.read",
         "crm.lists.write",
 
-        "crm.pipelines.orders.read",
-        "crm.pipelines.orders.write",
-
-        "crm.dealsplits.read_write",
         "crm.export",
         "crm.import",
 
@@ -96,6 +74,7 @@
         "files",
         "forms",
         "content",
+        "timeline",
 
         "conversations.read",
         "conversations.write",
@@ -108,38 +87,18 @@
         "communication_preferences.statuses.batch.read",
         "communication_preferences.statuses.batch.write",
 
-        "automation",
-        "automation.sequences.read",
-        "automation.sequences.enrollments.write",
-
-        "business-intelligence",
-
         "settings.currencies.read",
         "settings.users.read",
         "settings.users.teams.read",
 
-        "analytics.behavioral_events.send",
-        "behavioral_events.event_definitions.read_write",
-
-        "collector.graphql_query.execute",
-        "collector.graphql_schema.read",
-
         "e-commerce",
-        "hubdb",
-        "transactional-email",
-        "timeline",
 
-        "accounting",
+        "automation",
+        "automation.sequences.read",
+        "automation.sequences.enrollments.write",
 
-        "actions",
-        "ctas.read",
-        "external_integrations.forms.access",
-
-        "cms.domains.read",
-        "cms.functions.read",
-        "cms.knowledge_base.articles.read",
-        "cms.knowledge_base.settings.read",
-        "cms.membership.access_groups.read"
+        "crm.objects.marketing_events.read",
+        "crm.objects.marketing_events.write"
       ],
       "optionalScopes": [],
       "conditionallyRequiredScopes": []
