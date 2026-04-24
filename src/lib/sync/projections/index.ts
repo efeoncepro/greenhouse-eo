@@ -44,6 +44,7 @@ import { partyHubSpotOutboundProjection } from './party-hubspot-outbound'
 import { partyLifecycleSnapshotProjection } from './party-lifecycle-snapshot'
 import { pricingCatalogApprovalNotifierProjection } from './pricing-catalog-approval-notifier'
 import { productCatalogPricesRecomputeProjection } from './product-catalog-prices-recompute'
+import { productCatalogPricesSyncProjection } from './product-catalog-prices-sync'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -92,6 +93,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(sourceToProductCatalogProjection)
   registerProjection(productHubSpotOutboundProjection)
   registerProjection(productCatalogPricesRecomputeProjection)
+  registerProjection(productCatalogPricesSyncProjection)
   registerProjection(pricingCatalogApprovalNotifierProjection)
   registerProjection(incomeHubSpotOutboundProjection)
   registerProjection(partyHubSpotOutboundProjection)

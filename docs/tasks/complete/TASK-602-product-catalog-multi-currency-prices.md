@@ -196,6 +196,21 @@ Ver [TASK-587 § Slice B](docs/tasks/to-do/TASK-587-hubspot-products-full-fideli
 
 ## Follow-ups
 
-- Drop `default_unit_price` y `default_currency` de `product_catalog` cuando todos los callers migren al VIEW o a `getPricesByCurrency` → TASK-549 cleanup
-- Price history con `effective_at` si se requieren prices time-travel → follow-up TASK
+- Price history con `effective_at` si se requieren prices time-travel → **TASK-608** (creada 2026-04-24)
 - UI admin para grid de prices → TASK-605 (Fase E)
+
+## Addendum 2026-04-24 — Bridge legacy → normalized
+
+El scope original de TASK-602 dejó la tabla `product_catalog_prices` poblada sólo por backfill one-shot, mientras los 5 sync handlers seguían escribiendo sólo `product_catalog.default_unit_price`. Eso hacía que la tabla nueva quedara stale al primer upsert post-migración.
+
+**Fix**: proyección reactiva `product_catalog_prices_sync` (en `src/lib/sync/projections/product-catalog-prices-sync.ts`) suscrita a `commercial.product_catalog.created` + `commercial.product_catalog.updated`. Lee `defaultUnitPrice` + `defaultCurrency` del payload y llama `setAuthoritativePrice` con `source='backfill_legacy'`, lo cual además computa las 5 derivadas FX en la misma transacción.
+
+Garantías:
+
+- **Idempotente**: múltiples eventos para el mismo producto convergen al mismo estado via `ON CONFLICT DO UPDATE` en el upsert
+- **Preserva decisiones operativas**: `setAuthoritativePrice` NO pisa filas autoritativas en otras monedas (si un operador fijó USD explícitamente, un update de `default_currency=CLP` no borra la USD)
+- **Tolerante a currencies fuera de matriz**: CLP/USD/CLF/COP/MXN/PEN only; monedas exóticas (EUR, BRL) se loguean como skipped sin fallar
+
+Con esto, dropear `default_unit_price` + `default_currency` deja de ser follow-up — la coexistencia de ambas representaciones es estable mientras los sync handlers sigan escribiendo la columna legacy (que seguirá pasando hasta que TASK-549 o una task futura decida migrarlos, si es que la decisión se justifica).
+
+Tests: 12/12 passing en `product-catalog-prices-sync.test.ts`. Registrado en `src/lib/sync/projections/index.ts`.

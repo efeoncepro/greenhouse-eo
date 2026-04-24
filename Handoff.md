@@ -57,7 +57,23 @@ Fase B del programa TASK-587 (HubSpot Products Full-Fidelity Sync). Instala el m
 ### Seguimiento recomendado
 
 - Ejecutar seed `--apply` contra HS portal 48713323 en una ventana planificada (actualmente `hs_price_*` vacíos → no-op esperado, pero validar antes de Fase C)
-- Considerar drop de `default_unit_price` + `default_currency` en `product_catalog` cuando todos los callers migren al VIEW o a `getPricesByCurrency` (follow-up TASK-549 cleanup)
+- **Price history (`effective_at`) → [TASK-608](docs/tasks/to-do/TASK-608-product-catalog-price-history.md)** creada 2026-04-24
+
+### Addendum 2026-04-24 — Cierre follow-ups de TASK-602
+
+El follow-up "drop `default_unit_price` + `default_currency`" se **canceló** tras reevaluación: las columnas legacy siguen vivas como cache denormalized, y el consumidor real (TASK-603 outbound v2) leerá de la tabla nueva, no de las columnas viejas. El costo de dropearlas (refactor cross-cutting en 26 archivos: finance, hubspot, governance, sync handlers, UI) no se justifica — las columnas pueden coexistir indefinidamente sin bug.
+
+**Lo que sí se arregló** (gap real descubierto): los 5 sync handlers (service/tool/overhead/sellable-role/source-to-product-catalog) seguían escribiendo solo `default_unit_price`, dejando la tabla nueva `product_catalog_prices` congelada en el backfill one-shot. Fix entregado:
+
+- **Nueva proyección reactiva** `productCatalogPricesSyncProjection` en [src/lib/sync/projections/product-catalog-prices-sync.ts](src/lib/sync/projections/product-catalog-prices-sync.ts)
+- Suscrita a `commercial.product_catalog.created` + `commercial.product_catalog.updated`
+- Lee `defaultUnitPrice` + `defaultCurrency` del payload, llama `setAuthoritativePrice` con `source='backfill_legacy'`, que además computa las 5 derivadas FX en la misma transacción
+- Tolerante a currencies fuera de matriz (EUR, BRL → skipped sin fallar), negative prices (skipped), y missing fields
+- Preserva decisiones operativas: NO pisa autoritativas en otras monedas
+- Registrada en [src/lib/sync/projections/index.ts](src/lib/sync/projections/index.ts)
+- 12/12 tests passing; 401/401 en dir commercial + projections (up from 389)
+
+Con esto TASK-602 queda **operativa end-to-end**: cualquier upsert del catálogo vía sync handlers propaga automáticamente a la tabla normalizada, manteniéndola live sin tocar los writers legacy.
 
 ---
 

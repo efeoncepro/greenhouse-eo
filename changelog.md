@@ -2,6 +2,14 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-602 FOLLOW-UP ✅: Reactive bridge legacy → normalized + TASK-608 creada
+
+- **Nueva proyección reactiva `productCatalogPricesSyncProjection`** (`src/lib/sync/projections/product-catalog-prices-sync.ts`) suscrita a `commercial.product_catalog.created` + `commercial.product_catalog.updated`. Lee `defaultUnitPrice` + `defaultCurrency` del payload y llama `setAuthoritativePrice` con `source='backfill_legacy'` — cierra el gap de que los 5 sync handlers legacy escribían solo `default_unit_price`, dejando la tabla normalizada `product_catalog_prices` congelada en el backfill one-shot. Con esto TASK-602 queda operativa end-to-end.
+- **Tolerancias**: currencies fuera de matriz (EUR, BRL) → skipped sin fallar; negative prices → skipped; missing fields → skipped. Preserva decisiones operativas (no pisa filas autoritativas en otras monedas).
+- **Tests**: 12/12 passing en `product-catalog-prices-sync.test.ts`; 401/401 en dir commercial + projections (up from 389).
+- **TASK-608 creada** (`to-do/TASK-608-product-catalog-price-history.md`): follow-up aditivo para time-travel de precios via `effective_at` + `effective_until`. P3, no urgente.
+- **Follow-up "drop columnas legacy" cancelado**: reevaluación concluyó que `default_unit_price` + `default_currency` pueden coexistir indefinidamente como cache denormalized sin bug. Refactor cross-cutting de 26 archivos no justificado.
+
 ### 2026-04-24 — TASK-602 CERRADA ✅: Product Catalog Multi-Currency Price Normalization (TASK-587 Fase B)
 
 - **Nueva tabla `greenhouse_commercial.product_catalog_prices`** con PK `(product_id, currency_code)`, FK CASCADE a `product_catalog`, CHECKs sobre matriz canónica CLP/USD/CLF/COP/MXN/PEN + enum `source` ∈ {gh_admin, hs_seed, fx_derived, backfill_legacy} + consistency de columnas derivadas, 2 partial indexes. Migración `20260424174148326`.
