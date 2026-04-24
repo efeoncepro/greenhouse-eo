@@ -1,11 +1,35 @@
 # Greenhouse EO — Commercial Product Catalog Sync Architecture V1
 
-> **Version:** 1.4
+> **Version:** 1.5
 > **Created:** 2026-04-20 por Claude (Opus 4.7)
-> **Ultima actualizacion:** 2026-04-22 por Codex — delta de realidad post-TASK-563 (enablement cerrado, cutover legacy pendiente)
+> **Ultima actualizacion:** 2026-04-24 por Claude — programa TASK-587 cerrado (5 fases A-E); contract v2 full-fidelity live en prod
 > **Audience:** Backend engineers, product owners, agentes que implementen features de catalog management, pricing, quote builder o HubSpot sync
-> **Related:** `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
+> **Related:** `GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md` (especialización post TASK-587), `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`, `GREENHOUSE_EVENT_CATALOG_V1.md`
 > **Supersedes:** ninguno (spec nuevo)
+
+---
+
+## Delta 2026-04-24 — Programa TASK-587 CERRADO (5 fases A-E completas)
+
+El documento V1 sigue siendo el tronco canónico del modelo dos capas (`greenhouse_finance.products` legacy + `greenhouse_commercial.product_catalog` canónico). Las 5 fases del umbrella **TASK-587** cierran el loop **full-fidelity GH↔HS** en producción:
+
+| Fase | Task | Entrega |
+|---|---|---|
+| A | [TASK-601](../tasks/complete/TASK-601-product-catalog-schema-extension-ref-tables.md) | Schema v2 + 4 ref tables (categories, units, tax_categories, product_source_kind_mapping). 16 columnas nuevas en `product_catalog` con prefijo `hubspot_` donde aplica. |
+| B | [TASK-602](../tasks/complete/TASK-602-product-catalog-multi-currency-prices.md) | `product_catalog_prices` (producto × moneda, 6 currencies CLP/USD/CLF/COP/MXN/PEN), store con `setAuthoritativePrice` + FX derivation + projection reactiva `product_catalog_prices_sync` bridge legacy→normalized. |
+| C | [TASK-603](../tasks/complete/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md) | Outbound contract v2 en middleware Cloud Run (16 HS fields + COGS); TASK-347 cost guard narrowed (margin/cost_breakdown siguen blocked; COGS allowed). HTML sanitizer con whitelist. Prod rev `00037-4r5` → `00038-hs9`. |
+| D | [TASK-604](../tasks/complete/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md) | Inbound v2 rehydration con owner bridge (soft-SoT → GH-SoT post-UI), drift detector 3-nivel (`pending_overwrite`/`manual_drift`/`error`) persistido a `source_sync_runs`. |
+| E | [TASK-605](../tasks/complete/TASK-605-product-catalog-admin-ui-backfill-governance.md) | Admin UI `/admin/commercial/product-catalog` (list + detail + 5 secciones editables + manual sync), 5 API routes, backfill script idempotente (`scripts/backfill/product-catalog-hs-v2.ts`), ops-worker reconcile weekly scheduler con Slack alert, HubSpot field permissions runbook. |
+
+**El detalle técnico del contrato final de 16 fields catalog + COGS + multi-currency + owner bridge + drift classification vive en la spec especializada**: [GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md](GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md). Este doc V1 retiene el tronco del modelo dos capas + el contexto histórico del programa; el full-fidelity consolida los fields finales + SoT direction table + governance COGS + admin surface.
+
+### Hallazgos operativos del cierre
+
+- **Hotfix del middleware Python**: 3 HubSpot fields (`hs_recurring`, `hs_product_classification`, `hs_bundle_type`) son `readOnlyValue:true` (los 2 últimos) o no existen en el portal 48713323 (el primero). El middleware los excluye del outbound v1 y v2. Confirmado via `GET /crm/v3/properties/products/{name}`: son inmutables por diseño de HubSpot, ningún scope de app los abre. Greenhouse retiene los valores en `product_catalog` como SoT interno.
+- **Scope expansion del HubSpot app**: manifest del `efeonce-data-platform` (ID 33235280) ampliado via `hs project upload` en HubSpot Developer Platform 2025.2 — `requiredScopes` = core CRM estable + `optionalScopes` = gated-by-tier (commerce, CMS, appointments, courses, industry-specific). Snapshot versionado en `docs/operations/hubspot-app-manifest/app-hsmeta.json`. Build 21 deployed.
+- **Token rotation procedure**: el token del app se rotó en la UI de HubSpot y se refrescó en Secret Manager (`hubspot-access-token:v3`) + nueva revisión Cloud Run `hubspot-greenhouse-integration-00038-hs9` con rolling deploy.
+- **Multi-app pattern descubierto**: el portal 48713323 tiene **3 Private Apps** activas con tokens independientes. Solo `efeonce-data-platform` se rotó; los otros 5 Cloud Functions (BQ sync + Notion bridge) usan apps distintas y no fueron afectados. Mapeo completo en [docs/operations/hubspot-apps-inventory.md](../operations/hubspot-apps-inventory.md).
+- **Deploy topology confirmada**: Cloud Run `hubspot-greenhouse-integration` en `us-central1` (region lock por URL pública preservada en TASK-574). ops-worker en `us-east4` gestiona crons + reconcile weekly. Portal Vercel llama middleware via `GREENHOUSE_INTEGRATION_API_TOKEN` (shared secret, no el HS token directo).
 
 ---
 
