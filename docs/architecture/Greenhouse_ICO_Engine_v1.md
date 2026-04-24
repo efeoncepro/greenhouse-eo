@@ -1,5 +1,58 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-24 — TASK-598 introduce Narrative Presentation Layer (read-time canonical resolution)
+
+Contexto: las narrativas LLM se persisten en `greenhouse_serving.ico_ai_signal_enrichment_history` con mentions `@[label](type:id)` donde el `label` queda **congelado al momento de generación**. Si un proyecto se llamaba `Sin nombre` el lunes pasado y hoy se llama `TEASER TS - Chile (S)` (escenario real post-TASK-588), el enrichment sigue diciendo `Sin nombre` para siempre. Además el materialize ICO hace `DELETE+INSERT` diario sobre `ico_ai_signals` mientras la proyección a PG hace UPSERT por `signal_id` sin limpiar → enrichments quedan huérfanos en `_history`.
+
+Diagnóstico ejecutado 2026-04-24: los últimos 7d de `enrichment_history` tenían 20 filas con `Sin nombre` literal y 42% de enrichments huérfanos. El cron `ops-nexa-weekly-digest` (lunes 07:00 Chile) iba a entregar al liderazgo un email con contenido visiblemente roto.
+
+### Capa nueva: `src/lib/ico-engine/ai/narrative-presentation.ts`
+
+Principio: **las narrativas son templates con referencias canónicas; los consumers resuelven contra la verdad vigente al renderizar, no contra labels frozen al persistir**. Patrón Slack-style: `<@U123|old_username>` → el cliente muestra el username actual.
+
+Tres utilities públicas:
+
+- `loadMentionContext({enrichments, fallbacks})` — batch load canonical labels para los IDs referenciados en los narratives + los FKs estructurales. 3 queries paralelas (una por tabla): `greenhouse_delivery.projects`, `greenhouse_core.members`, `greenhouse_core.spaces`. Para projects busca por `project_record_id OR notion_project_id` para cubrir ambos aliases.
+
+- `resolveMentions(narrative, context)` — parsea tokens `@[label](type:id)`, busca canonical vigente en el context, y replace el label. Cuatro fallback reasons tipados: `sentinel` (canonical label es placeholder tipo `Sin nombre`), `missing_entity` (ID no existe en canonical), `null_canonical` (canonical.label es null post-TASK-588), `technical_id` (canonical es UUID/hex32/prefijo `project-`/etc). Todos los casos caen al fallback canónico (`este proyecto | este responsable | este espacio`). Además sanitiza sentinels plain-text fuera de mentions (ej. `proyecto 'Sin nombre'` → `este proyecto`).
+
+- `selectPresentableEnrichments(windowStart, windowEnd, filters)` — query consolidada con:
+  - `INNER JOIN ico_ai_signals` para excluir huérfanos.
+  - `DISTINCT ON (signal_id)` para dedup del materialize diario.
+  - Quality gate (`minQualityScore`, default 0, configurable).
+  - Severity floor (`severityFloor`, default `warning`).
+  - `ROW_NUMBER OVER PARTITION BY space_id <= maxPerSpace` (default 3) como diversity cap — evita que un tenant con mucha actividad domine el top-N.
+  - `LIMIT maxTotal` (default 8).
+
+Helper `resolveAllNarrativeFields(enrichment, context)` aplica `resolveMentions` a `explanation_summary`, `root_cause_narrative`, `recommended_action` en una pasada y agrega reports.
+
+Observability: `emitPresentationLog` escribe JSON estructurado a Cloud Logging `{event: 'narrative_presentation', source, total_mentions, resolved, fallback_count_by_reason, fallback_rate}`. Consumer futuro: TASK-594 (SLIs del pipeline ICO).
+
+### Consumer inmediato: `src/lib/nexa/digest/build-weekly-digest.ts`
+
+Refactorizado. Antes: 300+ líneas con query inline + `parseNarrativeText` que no sanitizaba nada. Ahora: menos de 200 líneas, delgadas, que invocan `selectPresentableEnrichments` → `loadMentionContext` → `resolveAllNarrativeFields` → `emitPresentationLog`. Shape de output `WeeklyDigestBuildResult` sin cambios — template `WeeklyExecutiveDigestEmail.tsx` y handler `ops-worker/server.ts` no requieren modificaciones.
+
+### Consumers futuros que heredan automático
+
+- **TASK-595** (UI inbox operativo, EPIC-006 child 6/8) — consumirá las mismas utilities desde día 1. Cero duplicación de lógica.
+- **TASK-596** (webhooks + Nexa agent, EPIC-006 child 7/8) — el payload HMAC-signed del webhook llevará narrativa ya resuelta. Nexa agent via API del mismo flujo.
+- **TASK-593** (LLM enrichment versioning v2, EPIC-006 child 4/8) — cuando el contrato v2 aterrice con refs por ID puro sin label frozen, la capa sigue funcionando; solo cambia el JOIN target.
+
+### Hardening operacional agregado (TASK-598 Slices 3.5 + 6.5 + 7)
+
+- `scripts/ico-digest-threshold-preview.ts` — matriz de thresholds contra dataset real para elegir defaults informadamente.
+- Handler `POST /nexa/weekly-digest` acepta `dryRun: true` (construye digest sin enviar) y `recipients_override: string[]` (envía a recipient de test). Usado para validación visual pre-deploy.
+- `docs/runbooks/ico-weekly-digest-rollback.md` — procedimiento pause-cron + revert-revision + template de comunicación.
+
+### Archivos clave
+
+- `src/lib/ico-engine/ai/narrative-presentation.ts` + `narrative-presentation.test.ts` (21 tests).
+- `src/lib/nexa/digest/build-weekly-digest.ts` refactorizado + test fixture con sentinels + huérfanos.
+- `scripts/ico-digest-threshold-preview.ts`.
+- `services/ops-worker/server.ts` handler `/nexa/weekly-digest`.
+- `docs/documentation/delivery/nexa-insights-digest-semanal.md` (doc funcional actualizada).
+- `docs/runbooks/ico-weekly-digest-rollback.md`.
+
 ## Delta 2026-04-17 — Nexa Insights preserva historial advisory con archive append-only
 
 - Nuevo archivo `greenhouse_serving.ico_ai_signal_enrichment_history` para conservar cada corrida LLM sin sobrescribirla

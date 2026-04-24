@@ -631,12 +631,50 @@ const handleBatchEmailSend = async (req: IncomingMessage, res: ServerResponse) =
  * POST /nexa/weekly-digest
  * Builds and sends the ICO-first Nexa executive digest to internal leadership.
  */
+/**
+ * Parse opcional de recipients_override desde body. Acepta:
+ *   - Array de strings: ["a@b.com", "c@d.com"]
+ *   - Array de objetos: [{email, name?, userId?}]
+ * Devuelve EmailRecipient[] válido o null si no hay override.
+ */
+const parseRecipientsOverride = (raw: unknown): Array<{ email: string; name?: string; userId?: string }> | null => {
+  if (!Array.isArray(raw) || raw.length === 0) return null
+
+  const out: Array<{ email: string; name?: string; userId?: string }> = []
+
+  for (const entry of raw) {
+    if (typeof entry === 'string' && entry.trim()) {
+      out.push({ email: entry.trim() })
+    } else if (entry && typeof entry === 'object' && 'email' in entry) {
+      const email = typeof entry.email === 'string' ? entry.email.trim() : ''
+
+      if (!email) continue
+
+      const name = 'name' in entry && typeof entry.name === 'string' ? entry.name : undefined
+      const userId = 'userId' in entry && typeof entry.userId === 'string' ? entry.userId : undefined
+
+      out.push({ email, ...(name ? { name } : {}), ...(userId ? { userId } : {}) })
+    }
+  }
+
+  return out.length > 0 ? out : null
+}
+
 const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const limitCandidate = Number(body.limit)
   const limit = Number.isFinite(limitCandidate) ? limitCandidate : WEEKLY_DIGEST_DEFAULT_LIMIT
 
-  console.log(`[ops-worker] POST /nexa/weekly-digest — limit=${limit}`)
+  // TASK-598 Slice 6.5: dry-run y recipients_override para testing seguro
+  // antes del envío real. `dryRun=true` construye el digest pero no envía
+  // email — útil para validar output en staging. `recipients_override`
+  // permite dirigir el envío a un recipient de test específico.
+  const dryRun = body.dryRun === true
+  const recipientsOverride = parseRecipientsOverride(body.recipients_override ?? body.recipientsOverride)
+
+  console.log(
+    `[ops-worker] POST /nexa/weekly-digest — limit=${limit} dryRun=${dryRun} override=${recipientsOverride ? recipientsOverride.length : 'none'}`
+  )
 
   try {
     const digest = await buildWeeklyDigest({ limit })
@@ -652,7 +690,20 @@ const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse)
       return
     }
 
-    const recipients = await resolveWeeklyDigestRecipients()
+    if (dryRun) {
+      // No envía, devuelve el digest completo para inspección.
+      json(res, 200, {
+        ok: true,
+        dryRun: true,
+        digest,
+        skipped: true,
+        reason: 'dry_run_no_send'
+      })
+
+      return
+    }
+
+    const recipients = recipientsOverride ?? (await resolveWeeklyDigestRecipients())
 
     if (recipients.length === 0) {
       json(res, 200, {
@@ -670,12 +721,12 @@ const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse)
       domain: 'delivery',
       recipients,
       context: digest,
-      sourceEventId: `nexa-weekly-digest:${digest.window.startAt}:${digest.window.endAt}`,
+      sourceEventId: `nexa-weekly-digest:${digest.window.startAt}:${digest.window.endAt}${recipientsOverride ? ':override' : ''}`,
       sourceEntity: 'nexa.weekly_digest'
     })
 
     console.log(
-      `[ops-worker] /nexa/weekly-digest done — status=${result.status} recipients=${recipients.length} insights=${digest.totalInsights}`
+      `[ops-worker] /nexa/weekly-digest done — status=${result.status} recipients=${recipients.length} insights=${digest.totalInsights} override=${recipientsOverride ? 'true' : 'false'}`
     )
 
     json(res, 200, {

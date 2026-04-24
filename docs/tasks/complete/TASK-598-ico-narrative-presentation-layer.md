@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none` (infra compartida que EPIC-006 reusa; no es child del epic)
-- Status real: `Diseño`
+- Status real: `Shipped — deploy ops-worker pendiente pre-lunes`
 - Rank: `TBD` (deadline duro lunes 2026-04-27 07:00 Chile)
 - Domain: `platform`
 - Blocked by: `none`

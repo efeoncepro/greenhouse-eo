@@ -2,6 +2,19 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-598 cerrada: ICO Narrative Presentation Layer (fix weekly digest pre-lunes)
+
+- Nueva capa compartida `src/lib/ico-engine/ai/narrative-presentation.ts` que re-hidrata narrativas del ICO Engine contra canonical vigente al momento de renderizar, en vez de mostrar labels frozen del momento de generación. Principio: Slack-style mention resolution (`@[id|old_label]` → current username al render).
+- Tres utilities públicas: `resolveMentions` (parsea `@[label](type:id)` + sanitiza sentinels/technical IDs con 4 fallback reasons tipados), `loadMentionContext` (batch load de las 3 canonical tables: projects + members + spaces), `selectPresentableEnrichments` (INNER JOIN con `ico_ai_signals` para filtrar huérfanos, DISTINCT ON signal_id para dedup, quality gate + severity floor + diversity cap por space).
+- Weekly digest (`src/lib/nexa/digest/build-weekly-digest.ts`) refactorizado como consumer delgado de la capa: 300→200 líneas, shape `WeeklyDigestBuildResult` inalterado (template y handler sin cambios).
+- Handler `POST /nexa/weekly-digest` en `services/ops-worker/server.ts` acepta `dryRun: true` y `recipients_override: string[]` para validación segura pre-envío.
+- Script `scripts/ico-digest-threshold-preview.ts` ejecutado contra dataset real: `fallback_rate = 0/16 (100%)` de mentions resuelven contra canonical vigente; 4 critical insights en ventana de 7d, 2 spaces (Efeonce + Sky Airline); defaults confirmados (minQualityScore=0, severityFloor=warning, maxPerSpace=3, maxTotal=8).
+- Runbook operacional `docs/runbooks/ico-weekly-digest-rollback.md` con comandos de pause del Cloud Scheduler, revert de Cloud Run revision, y template de comunicación a stakeholders si el email sale roto.
+- Doc de arquitectura `Greenhouse_ICO_Engine_v1.md` actualizada con delta completo del contrato nuevo. Doc funcional `docs/documentation/delivery/nexa-insights-digest-semanal.md` reescrita (v1.1) en lenguaje simple para lectores no técnicos del liderazgo.
+- Tests: 21 cases de narrative-presentation + 5 de digest builder (incluye fixture regression con 20 "Sin nombre" + 60 huérfanos → output 100% limpio). 1914 tests totales verdes.
+- Infra reusable por TASK-595 (UI inbox, EPIC-006 child 6/8) y TASK-596 (webhooks + Nexa, EPIC-006 child 7/8) sin duplicación. Compatible con enrichment v2 de TASK-593 (solo cambia JOIN target).
+- Pendiente pre-lunes 07:00 Chile: deploy `bash services/ops-worker/deploy.sh` + dry-run staging + envío a recipient de test. Instrucciones en `Handoff.md`.
+
 ### 2026-04-24 — Finance `expenses/meta` deja de depender de BigQuery como precondición global
 
 - `GET /api/finance/expenses/meta` deja de bloquear toda la metadata del drawer si el schema legacy de BigQuery no está listo. El endpoint ahora separa providers por slice: `suppliers`, `accounts` e instituciones históricas de gastos salen primero de PostgreSQL; BigQuery queda solo como compatibilidad explícita por fuente cuando todavía aporta resiliencia.

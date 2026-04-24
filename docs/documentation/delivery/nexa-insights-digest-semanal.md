@@ -1,10 +1,54 @@
 # Nexa Insights — Digest Semanal para Liderazgo
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-16 por Codex
-> **Ultima actualizacion:** 2026-04-17 por Codex
-> **Documentacion tecnica:** [GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md](../../architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md), [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md), [GREENHOUSE_EMAIL_CATALOG_V1.md](../../architecture/GREENHOUSE_EMAIL_CATALOG_V1.md)
+> **Ultima actualizacion:** 2026-04-24 por Claude (TASK-598 — narrativas al día con canonical vigente)
+> **Documentacion tecnica:** [Greenhouse_ICO_Engine_v1.md](../../architecture/Greenhouse_ICO_Engine_v1.md), [GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md](../../architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md), [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md), [GREENHOUSE_EMAIL_CATALOG_V1.md](../../architecture/GREENHOUSE_EMAIL_CATALOG_V1.md)
+
+## Actualizacion 2026-04-24 — Narrativas siempre al dia con la verdad actual
+
+El digest ya no muestra nombres viejos ni referencias rotas cuando la realidad operativa cambio entre el momento en que se detecto la alerta y el momento en que el email se envia.
+
+**Que cambio y por que**
+
+Cada insight que llega al digest tiene adentro menciones a proyectos, responsables y spaces. Antes, esas menciones guardaban el nombre que tenian en el momento en que el sistema genero el texto. Eso producia tres problemas visibles al liderazgo:
+
+- Un proyecto que se llamaba "Sin nombre" cuando se detecto la alerta seguia apareciendo como "Sin nombre" aunque despues alguien le hubiera puesto el nombre real.
+- Alertas que ya fueron resueltas aparecian mezcladas con las actuales porque el email leia solamente el historial sin validar que la senal siguiera vigente.
+- Un solo space con mucha actividad podia ocupar los 8 lugares del top y ocultar alertas de otros clientes.
+
+**Como funciona ahora**
+
+El email resuelve cada mencion en el momento de enviarse:
+
+- Si el proyecto existe hoy en la base canonica, usa el nombre actual (aunque hace una semana se llamaba distinto).
+- Si el proyecto ya no tiene nombre canonico (casos raros donde la fuente upstream lo perdio), usa la expresion neutra "este proyecto" — nunca muestra el placeholder crudo al ejecutivo.
+- Si una alerta vieja ya no existe en la capa de signals (fue reemplazada o resuelta), se excluye del email automaticamente.
+- El conteo de "insights incluidos" desduplica por senal — si la misma condicion genero alertas repetidas durante la semana, cuenta solamente la ultima version.
+- Se limita a 3 insights por space para diversificar — si un tenant tiene 10 criticos, el email muestra los 3 mas importantes y deja espacio para los hallazgos de otros spaces.
+
+**Que significa para el lector del email**
+
+- Lo que ves en el email es lo vigente hoy, no una foto congelada de hace dias.
+- Si un insight menciona un proyecto, el nombre del link es el canonico de hoy.
+- El count de insights es representativo — no inflado por re-generaciones diarias.
+- La distribucion por space es equilibrada.
+
+**Que NO cambio**
+
+- La forma del email (header, secciones por Space, cards por insight, footer) es la misma.
+- Los destinatarios (liderazgo Efeonce) son los mismos.
+- El schedule (lunes 7am hora Chile) es el mismo.
+- El contenido de las narrativas LLM (explicacion, causa probable, accion sugerida) sigue siendo el que genera Nexa.
+
+**Que sigue pendiente (EPIC-006)**
+
+Esta correccion es una capa de presentacion sobre la arquitectura actual. El refactor estructural del sistema de signals — que preservara historial completo de alertas (detectadas, reconocidas, resueltas), habilitara inbox operativo, y expondra webhooks a integraciones externas — vive en EPIC-006 y llega en semanas siguientes. Cuando ese epic aterriza, el email hereda automaticamente el fix de narrativas sin cambios adicionales.
+
+> Detalle tecnico: [`src/lib/ico-engine/ai/narrative-presentation.ts`](../../../src/lib/ico-engine/ai/narrative-presentation.ts), [`src/lib/nexa/digest/build-weekly-digest.ts`](../../../src/lib/nexa/digest/build-weekly-digest.ts), runbook de rollback en [`docs/runbooks/ico-weekly-digest-rollback.md`](../../runbooks/ico-weekly-digest-rollback.md).
+
+---
 
 # Nexa Insights — Digest Semanal para Liderazgo
 
