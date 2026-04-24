@@ -2,6 +2,12 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — Finance `expenses/meta` deja de depender de BigQuery como precondición global
+
+- `GET /api/finance/expenses/meta` deja de bloquear toda la metadata del drawer si el schema legacy de BigQuery no está listo. El endpoint ahora separa providers por slice: `suppliers`, `accounts` e instituciones históricas de gastos salen primero de PostgreSQL; BigQuery queda solo como compatibilidad explícita por fuente cuando todavía aporta resiliencia.
+- `greenhouse_finance.expenses` gana un reader canónico de instituciones históricas (`listFinanceExpenseSocialSecurityInstitutionsFromPostgres`) y `greenhouse_payroll.compensation_versions` gana un reader read-only de instituciones previsionales/salud (`listPayrollSocialSecurityInstitutionsFromPostgres`) filtrado a `pay_regime='chile'`.
+- El enrichment de Payroll sigue siendo opcional: si PostgreSQL y el fallback legacy no están disponibles, `expenses/meta` responde `200` con defaults y metadata crítica intacta, en vez de tumbar el drawer por un `FINANCE_BIGQUERY_SCHEMA_NOT_READY`.
+
 ### 2026-04-24 — TASK-589 desacopla provisioning de los read paths interactivos de Finance
 
 - Los `GET /api/finance/**` interactivos dejan de usar `ensureFinanceInfrastructure()` como side effect de lectura. El patrón nuevo es `Postgres-first` y, solo si hay fallback legacy, validar schema BigQuery en modo read-only con `assertFinanceBigQueryReadiness()` antes de consultar `fin_*`.

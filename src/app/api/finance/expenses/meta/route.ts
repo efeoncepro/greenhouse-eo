@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { assertFinanceBigQueryReadiness } from '@/lib/finance/schema'
 import { assertPayrollBigQueryReadiness } from '@/lib/payroll/schema'
+import { listPayrollSocialSecurityInstitutionsFromPostgres } from '@/lib/payroll/postgres-store'
 import {
   EXPENSE_DRAWER_CATEGORIES,
   EXPENSE_DRAWER_TAB_LABELS,
@@ -27,6 +28,7 @@ import {
   listFinanceAccountsFromPostgres,
   shouldFallbackFromFinancePostgres
 } from '@/lib/finance/postgres-store'
+import { listFinanceExpenseSocialSecurityInstitutionsFromPostgres } from '@/lib/finance/postgres-store-slice2'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -64,22 +66,15 @@ const DEFAULT_SOCIAL_SECURITY_INSTITUTIONS = [
   'Mutual de Seguridad'
 ]
 
-export async function GET() {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+type FinanceInstitutionRow = {
+  institution: string | null
+}
 
-  if (!tenant) {
-    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+const logExpenseMetaOptionalFailure = (source: string, error: unknown) => {
+  console.error(`[finance][expenses-meta] optional ${source} unavailable`, error)
+}
 
-  await assertFinanceBigQueryReadiness({ tables: ['fin_suppliers', 'fin_accounts', 'fin_expenses'] })
-  const projectId = getFinanceProjectId()
-
-  // ── Postgres-first for accounts ──
-  let suppliersList:
-    | { supplierId: string; legalName: string; tradeName: string | null; paymentCurrency: string | null }[]
-    | null = null
-  let accountsList: { accountId: string; accountName: string; currency: string; accountType: string }[] | null = null
-
+const getSuppliersForExpenseMeta = async (projectId: string) => {
   try {
     const pgSuppliers = await listFinanceSuppliersFromPostgres({
       active: true,
@@ -87,7 +82,7 @@ export async function GET() {
       pageSize: 1000
     })
 
-    suppliersList = pgSuppliers.items.map(s => ({
+    return pgSuppliers.items.map(s => ({
       supplierId: s.supplierId,
       legalName: s.legalName,
       tradeName: s.tradeName,
@@ -99,10 +94,33 @@ export async function GET() {
     }
   }
 
+  await assertFinanceBigQueryReadiness({ tables: ['fin_suppliers'] })
+
+  const suppliers = await runFinanceQuery<{
+    supplier_id: string
+    legal_name: string
+    trade_name: string | null
+    payment_currency: string | null
+  }>(`
+    SELECT supplier_id, legal_name, trade_name, payment_currency
+    FROM \`${projectId}.greenhouse.fin_suppliers\`
+    WHERE is_active = TRUE
+    ORDER BY COALESCE(trade_name, legal_name) ASC
+  `)
+
+  return suppliers.map(row => ({
+    supplierId: normalizeString(row.supplier_id),
+    legalName: normalizeString(row.legal_name),
+    tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
+    paymentCurrency: row.payment_currency ? normalizeString(row.payment_currency) : null
+  }))
+}
+
+const getAccountsForExpenseMeta = async (projectId: string) => {
   try {
     const pgAccounts = await listFinanceAccountsFromPostgres()
 
-    accountsList = pgAccounts.map(a => ({
+    return pgAccounts.map(a => ({
       accountId: a.accountId,
       accountName: a.accountName,
       currency: a.currency,
@@ -116,58 +134,119 @@ export async function GET() {
     }
   }
 
-  const [suppliers, bqAccounts, priorInstitutions, payrollInstitutions, members, spaces, supplierToolLinks] = await Promise.all([
-    suppliersList
-      ? Promise.resolve(null)
-      : runFinanceQuery<{
-          supplier_id: string
-          legal_name: string
-          trade_name: string | null
-          payment_currency: string | null
-        }>(`
-          SELECT supplier_id, legal_name, trade_name, payment_currency
-          FROM \`${projectId}.greenhouse.fin_suppliers\`
-          WHERE is_active = TRUE
-          ORDER BY COALESCE(trade_name, legal_name) ASC
-        `),
-    accountsList ? Promise.resolve(null) : runFinanceQuery<{
-      account_id: string
-      account_name: string
-      currency: string
-      account_type: string
-    }>(`
-      SELECT account_id, account_name, currency, account_type
-      FROM \`${projectId}.greenhouse.fin_accounts\`
-      WHERE is_active = TRUE
-      ORDER BY account_name ASC
-    `),
-    runFinanceQuery<{ institution: string | null }>(`
+  await assertFinanceBigQueryReadiness({ tables: ['fin_accounts'] })
+
+  const accounts = await runFinanceQuery<{
+    account_id: string
+    account_name: string
+    currency: string
+    account_type: string
+  }>(`
+    SELECT account_id, account_name, currency, account_type
+    FROM \`${projectId}.greenhouse.fin_accounts\`
+    WHERE is_active = TRUE
+    ORDER BY account_name ASC
+  `)
+
+  return accounts.map(row => ({
+    accountId: normalizeString(row.account_id),
+    accountName: normalizeString(row.account_name),
+    currency: normalizeString(row.currency),
+    accountType: ACCOUNT_TYPES.includes(normalizeString(row.account_type) as (typeof ACCOUNT_TYPES)[number])
+      ? normalizeString(row.account_type)
+      : 'other'
+  }))
+}
+
+const getHistoricalInstitutionsForExpenseMeta = async (projectId: string) => {
+  let postgresError: unknown = null
+
+  try {
+    return await listFinanceExpenseSocialSecurityInstitutionsFromPostgres()
+  } catch (error) {
+    postgresError = error
+  }
+
+  try {
+    await assertFinanceBigQueryReadiness({ tables: ['fin_expenses'] })
+
+    const rows = await runFinanceQuery<FinanceInstitutionRow>(`
       SELECT DISTINCT social_security_institution AS institution
       FROM \`${projectId}.greenhouse.fin_expenses\`
       WHERE social_security_institution IS NOT NULL
         AND TRIM(social_security_institution) != ''
-    `),
-    assertPayrollBigQueryReadiness({ tables: ['compensation_versions'] })
-      .then(() =>
-        runFinanceQuery<{ institution: string | null }>(`
-          SELECT DISTINCT institution
-          FROM (
-            SELECT afp_name AS institution
-            FROM \`${projectId}.greenhouse.compensation_versions\`
-            WHERE afp_name IS NOT NULL AND TRIM(afp_name) != ''
-            UNION ALL
-            SELECT
-              CASE
-                WHEN LOWER(TRIM(health_system)) = 'fonasa' THEN 'Fonasa'
-                WHEN LOWER(TRIM(health_system)) = 'isapre' THEN 'Isapre'
-                ELSE NULL
-              END AS institution
-            FROM \`${projectId}.greenhouse.compensation_versions\`
-          )
-          WHERE institution IS NOT NULL
-        `)
+    `)
+
+    return rows
+      .map(row => normalizeString(row.institution))
+      .filter(Boolean)
+  } catch (error) {
+    logExpenseMetaOptionalFailure('finance historical institutions', {
+      postgresError,
+      fallbackError: error
+    })
+
+    return []
+  }
+}
+
+const getPayrollInstitutionsForExpenseMeta = async (projectId: string) => {
+  let postgresError: unknown = null
+
+  try {
+    return await listPayrollSocialSecurityInstitutionsFromPostgres()
+  } catch (error) {
+    postgresError = error
+  }
+
+  try {
+    await assertPayrollBigQueryReadiness({ tables: ['compensation_versions'] })
+
+    const rows = await runFinanceQuery<FinanceInstitutionRow>(`
+      SELECT DISTINCT institution
+      FROM (
+        SELECT afp_name AS institution
+        FROM \`${projectId}.greenhouse.compensation_versions\`
+        WHERE afp_name IS NOT NULL AND TRIM(afp_name) != ''
+        UNION ALL
+        SELECT
+          CASE
+            WHEN LOWER(TRIM(health_system)) = 'fonasa' THEN 'Fonasa'
+            WHEN LOWER(TRIM(health_system)) = 'isapre' THEN 'Isapre'
+            ELSE NULL
+          END AS institution
+        FROM \`${projectId}.greenhouse.compensation_versions\`
       )
-      .catch(() => []),
+      WHERE institution IS NOT NULL
+    `)
+
+    return rows
+      .map(row => normalizeString(row.institution))
+      .filter(Boolean)
+  } catch (error) {
+    logExpenseMetaOptionalFailure('payroll institutions', {
+      postgresError,
+      fallbackError: error
+    })
+
+    return []
+  }
+}
+
+export async function GET() {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const projectId = getFinanceProjectId()
+
+  const [suppliers, accounts, priorInstitutions, payrollInstitutions, members, spaces, supplierToolLinks] = await Promise.all([
+    getSuppliersForExpenseMeta(projectId),
+    getAccountsForExpenseMeta(projectId),
+    getHistoricalInstitutionsForExpenseMeta(projectId),
+    getPayrollInstitutionsForExpenseMeta(projectId),
     runGreenhousePostgresQuery<FinanceMemberOption>(
       `
         SELECT member_id, display_name
@@ -203,28 +282,13 @@ export async function GET() {
 
   const institutionSet = new Set(
     [...DEFAULT_SOCIAL_SECURITY_INSTITUTIONS, ...priorInstitutions, ...payrollInstitutions]
-      .map(row => (typeof row === 'string' ? row : row.institution))
       .map(value => normalizeString(value))
       .filter(Boolean)
   )
 
   return NextResponse.json({
-    suppliers:
-      suppliersList ??
-      (suppliers ?? []).map(row => ({
-        supplierId: normalizeString(row.supplier_id),
-        legalName: normalizeString(row.legal_name),
-        tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
-        paymentCurrency: row.payment_currency ? normalizeString(row.payment_currency) : null
-      })),
-    accounts: accountsList ?? (bqAccounts ?? []).map(row => ({
-      accountId: normalizeString(row.account_id),
-      accountName: normalizeString(row.account_name),
-      currency: normalizeString(row.currency),
-      accountType: ACCOUNT_TYPES.includes(normalizeString(row.account_type) as (typeof ACCOUNT_TYPES)[number])
-        ? normalizeString(row.account_type)
-        : 'other'
-    })),
+    suppliers,
+    accounts,
     paymentMethods: PAYMENT_METHODS,
     paymentProviders: PAYMENT_PROVIDERS,
     paymentRails: PAYMENT_RAILS,

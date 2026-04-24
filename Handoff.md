@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — Finance `expenses/meta` hardening post-TASK-589 (Codex)
+
+- **Contexto**
+  - staging quedó verde para `clients`, `clients/[id]`, `suppliers`, `suppliers/[id]` y `dashboard/summary`, pero Sentry detectó que `GET /api/finance/expenses/meta` seguía devolviendo `500`
+  - root cause: el route todavía hacía `assertFinanceBigQueryReadiness({ tables: ['fin_suppliers','fin_accounts','fin_expenses'] })` como precondición global, aunque `suppliers` y `accounts` ya son Postgres-first y Payroll en ese payload es solo enrichment
+- **Corrección aplicada**
+  - `src/app/api/finance/expenses/meta/route.ts`
+    - se elimina la precondición global de BigQuery
+    - se divide el payload por providers:
+      - `suppliers` → Postgres-first + fallback BigQuery por slice
+      - `accounts` → Postgres-first + fallback BigQuery por slice
+      - instituciones históricas → Postgres-first (`greenhouse_finance.expenses`) + fallback BigQuery opcional
+      - instituciones Payroll → Postgres-first (`greenhouse_payroll.compensation_versions`, `pay_regime='chile'`) + fallback BigQuery opcional
+    - los enrichments opcionales ya no tumban el endpoint; si fallan ambas fuentes se loguea el problema y el route sigue con defaults
+  - nuevo helper `listFinanceExpenseSocialSecurityInstitutionsFromPostgres()` en `src/lib/finance/postgres-store-slice2.ts`
+  - nuevo helper `listPayrollSocialSecurityInstitutionsFromPostgres()` en `src/lib/payroll/postgres-store.ts`
+  - tests ajustados en `src/app/api/finance/expenses/meta/route.test.ts`
+- **Validación local**
+  - `pnpm exec vitest run src/app/api/finance/expenses/meta/route.test.ts src/app/api/finance/clients/read-cutover.test.ts src/app/api/finance/suppliers/route.test.ts 'src/app/api/finance/suppliers/[id]/route.test.ts'` → `13 passed, 1 skipped`
+  - `pnpm exec tsc --noEmit --pretty false` → OK
+  - `pnpm lint` → OK
+  - `pnpm build` → OK
+- **Pendiente inmediato**
+  - commit + push del hardening
+  - repetir smoke en staging para:
+    - `GET /api/finance/expenses/meta`
+    - `/finance/expenses`
+
 ## Sesion 2026-04-24 — TASK-589 en verificación: Finance read paths sin provisioning runtime (Codex)
 
 - **Task:** `TASK-589` → `in-progress` (`Verification`)

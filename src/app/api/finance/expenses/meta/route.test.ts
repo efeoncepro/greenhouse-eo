@@ -6,6 +6,8 @@ const mockAssertPayrollBigQueryReadiness = vi.fn()
 const mockRunFinanceQuery = vi.fn()
 const mockListFinanceSuppliersFromPostgres = vi.fn()
 const mockListFinanceAccountsFromPostgres = vi.fn()
+const mockListFinanceExpenseSocialSecurityInstitutionsFromPostgres = vi.fn()
+const mockListPayrollSocialSecurityInstitutionsFromPostgres = vi.fn()
 const mockShouldFallbackFromFinancePostgres = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
@@ -18,6 +20,11 @@ vi.mock('@/lib/finance/schema', () => ({
 
 vi.mock('@/lib/payroll/schema', () => ({
   assertPayrollBigQueryReadiness: (...args: unknown[]) => mockAssertPayrollBigQueryReadiness(...args)
+}))
+
+vi.mock('@/lib/payroll/postgres-store', () => ({
+  listPayrollSocialSecurityInstitutionsFromPostgres: (...args: unknown[]) =>
+    mockListPayrollSocialSecurityInstitutionsFromPostgres(...args)
 }))
 
 vi.mock('@/lib/finance/shared', async () => {
@@ -34,6 +41,11 @@ vi.mock('@/lib/finance/postgres-store', () => ({
   listFinanceSuppliersFromPostgres: (...args: unknown[]) => mockListFinanceSuppliersFromPostgres(...args),
   listFinanceAccountsFromPostgres: (...args: unknown[]) => mockListFinanceAccountsFromPostgres(...args),
   shouldFallbackFromFinancePostgres: (...args: unknown[]) => mockShouldFallbackFromFinancePostgres(...args)
+}))
+
+vi.mock('@/lib/finance/postgres-store-slice2', () => ({
+  listFinanceExpenseSocialSecurityInstitutionsFromPostgres: (...args: unknown[]) =>
+    mockListFinanceExpenseSocialSecurityInstitutionsFromPostgres(...args)
 }))
 
 import { GET } from './route'
@@ -74,6 +86,8 @@ describe('GET /api/finance/expenses/meta', () => {
         accountType: 'bank'
       }
     ])
+    mockListFinanceExpenseSocialSecurityInstitutionsFromPostgres.mockResolvedValue(['Fonasa'])
+    mockListPayrollSocialSecurityInstitutionsFromPostgres.mockResolvedValue(['AFP Habitat'])
     mockRunFinanceQuery.mockImplementation(async (query: string) => {
       if (query.includes('FROM `test-project.greenhouse.fin_suppliers`')) {
         return [
@@ -130,12 +144,11 @@ describe('GET /api/finance/expenses/meta', () => {
         typeof query === 'string' && query.includes('FROM `test-project.greenhouse.fin_suppliers`')
       )
     ).toBe(false)
-    expect(mockAssertFinanceBigQueryReadiness).toHaveBeenCalledWith({
-      tables: ['fin_suppliers', 'fin_accounts', 'fin_expenses']
-    })
+    expect(mockAssertFinanceBigQueryReadiness).not.toHaveBeenCalled()
   })
 
   it('degrades payroll institution enrichment without failing the full payload when payroll readiness is missing', async () => {
+    mockListPayrollSocialSecurityInstitutionsFromPostgres.mockRejectedValueOnce(new Error('payroll postgres unavailable'))
     mockAssertPayrollBigQueryReadiness.mockRejectedValueOnce(new Error('payroll not ready'))
 
     const response = await GET()
@@ -148,5 +161,37 @@ describe('GET /api/finance/expenses/meta', () => {
         typeof query === 'string' && query.includes('FROM `test-project.greenhouse.compensation_versions`')
       )
     ).toBe(false)
+  })
+
+  it('degrades finance historical institutions without failing the full payload when both Postgres and BigQuery legacy are unavailable', async () => {
+    mockListFinanceExpenseSocialSecurityInstitutionsFromPostgres.mockRejectedValueOnce(new Error('finance postgres unavailable'))
+    mockAssertFinanceBigQueryReadiness.mockRejectedValueOnce(new Error('finance bq not ready'))
+
+    const response = await GET()
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body.socialSecurityInstitutions).toContain('AFP Habitat')
+    expect(body.socialSecurityInstitutions).toContain('Fonasa')
+    expect(body.suppliers).toHaveLength(2)
+    expect(body.accounts).toHaveLength(1)
+  })
+
+  it('falls back to BigQuery per slice when suppliers Postgres is unavailable', async () => {
+    mockListFinanceSuppliersFromPostgres.mockRejectedValueOnce(new Error('finance postgres schema is not ready'))
+
+    const response = await GET()
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(mockAssertFinanceBigQueryReadiness).toHaveBeenCalledWith({ tables: ['fin_suppliers'] })
+    expect(body.suppliers).toEqual([
+      {
+        supplierId: 'legacy-only',
+        legalName: 'Legacy Supplier',
+        tradeName: null,
+        paymentCurrency: 'USD'
+      }
+    ])
   })
 })

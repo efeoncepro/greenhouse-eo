@@ -1984,6 +1984,22 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
   return rows[0] ? mapExpense(rows[0]) : null
 }
 
+export const listFinanceExpenseSocialSecurityInstitutionsFromPostgres = async () => {
+  await assertFinanceSlice2PostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<{ institution: string }>(
+    `
+      SELECT DISTINCT BTRIM(social_security_institution) AS institution
+      FROM greenhouse_finance.expenses
+      WHERE social_security_institution IS NOT NULL
+        AND BTRIM(social_security_institution) <> ''
+      ORDER BY institution ASC
+    `
+  )
+
+  return rows.map(row => normalizeString(row.institution)).filter(Boolean)
+}
+
 // ─── Expenses: create ───────────────────────────────────────────────
 
 export const createFinanceExpenseInPostgres = async ({

@@ -2,7 +2,18 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-04-21
+> **Last updated:** 2026-04-24
+
+## Delta 2026-04-24 — `expenses/meta` Postgres-first metadata providers
+
+El endpoint `GET /api/finance/expenses/meta` deja de tratar el schema legacy de BigQuery como precondición global. La metadata del drawer ahora se compone por providers con ownership explícito:
+
+- `suppliers` → `greenhouse_finance.suppliers` / reader Postgres canónico
+- `accounts` → `greenhouse_finance.accounts` / reader Postgres canónico
+- instituciones históricas de gastos → `greenhouse_finance.expenses` / reader Postgres `listFinanceExpenseSocialSecurityInstitutionsFromPostgres`
+- instituciones previsionales/salud de Payroll → `greenhouse_payroll.compensation_versions` / reader Postgres `listPayrollSocialSecurityInstitutionsFromPostgres`
+
+BigQuery queda solo como carril legacy de compatibilidad por slice, no como guard global del endpoint. Si los enrichments opcionales no están disponibles, el drawer mantiene `200` con defaults y payload crítico intacto.
 
 ## Delta 2026-04-21 — Chile VAT Ledger & Monthly Position (TASK-533)
 
