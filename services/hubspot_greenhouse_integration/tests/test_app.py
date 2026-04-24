@@ -980,14 +980,6 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
             "deals", "hs-deal-existing", "companies", "30825221458"
         )
 
-    @unittest.expectedFailure
-    # Pre-existing sibling test issue inherited by TASK-574 migration.
-    # The app evolved post-this-test-write: when the HubSpotClient mock raises
-    # HubSpotIntegrationError(status_code=429) from find_deal_by_idempotency_key,
-    # the current handler returns 502 (Bad Gateway) instead of propagating 429.
-    # Whether the app behavior or the test expectation is correct is TBD — both
-    # plausible. Tracked as a follow-up to TASK-574 once the service stabilizes
-    # post-cutover.
     def test_deal_create_maps_hubspot_rate_limit_to_retryable_response(self):
         try:
             from services.hubspot_greenhouse_integration.app import create_app
@@ -1004,10 +996,16 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
         )
         client = app.test_client()
 
+        # The real HubSpotClient._classify_error_code() sets error_code
+        # = "HUBSPOT_RATE_LIMIT" on any 429, and the app's
+        # _hubspot_error_response keys on that error_code (not status_code
+        # alone) to map to the 429 response with Retry-After. The fake
+        # exception must mirror that contract.
         fake_hubspot = MagicMock()
         fake_hubspot.find_deal_by_idempotency_key.side_effect = HubSpotIntegrationError(
             "rate limited",
             status_code=429,
+            error_code="HUBSPOT_RATE_LIMIT",
             retry_after="7",
         )
 
@@ -1558,15 +1556,6 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
         self.assertEqual(payload["hubspotProductId"], "hs-42")
         fake_hubspot.archive_product.assert_called_once_with("hs-42")
 
-    @unittest.expectedFailure
-    # Pre-existing sibling test issue inherited by TASK-574 migration.
-    # The `patch("services.hubspot_greenhouse_integration.app.HubSpotClient", return_value=fake_hubspot)`
-    # replaces the HubSpotClient class with a MagicMock, so when app code reads
-    # `HubSpotClient.RECONCILE_PRODUCT_PROPERTIES` it gets an auto-MagicMock
-    # instead of the real class attribute. The assertion then fails because the
-    # recorded call has `properties=<MagicMock>` instead of the expected list.
-    # Proper fix: patch the class attribute separately or use autospec. Tracked
-    # as a follow-up to TASK-574 once the service stabilizes post-cutover.
     def test_product_reconcile_returns_page_and_next_cursor(self):
         try:
             from services.hubspot_greenhouse_integration.app import create_app
@@ -1602,10 +1591,14 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
             "paging": {"next": {"after": "cursor-2"}},
         }
 
+        # Preserve HubSpotClient.RECONCILE_PRODUCT_PROPERTIES on the patched
+        # class: without this, app code reads it as an auto-MagicMock and
+        # the call assertion below fails with properties=<MagicMock>.
         with patch(
             "services.hubspot_greenhouse_integration.app.HubSpotClient",
             return_value=fake_hubspot,
-        ):
+        ) as mock_class:
+            mock_class.RECONCILE_PRODUCT_PROPERTIES = HubSpotClient.RECONCILE_PRODUCT_PROPERTIES
             response = client.get("/products/reconcile?limit=250")
 
         self.assertEqual(response.status_code, 200)
