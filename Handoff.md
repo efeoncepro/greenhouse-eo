@@ -1,5 +1,58 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-603 CERRADA: HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C)
+
+### Qué cambió
+
+Outbound GH→HS ahora usa **contract v2 full-fidelity**: 16 nuevos campos fluyen en cada create/update de producto. Cierra el gap reportado por la UI HS (productos con `Price USD` + `Price CLF` visibles pero invisibles al seed de TASK-602 porque el middleware v1 no los exponía). Post-TASK-603 el middleware acepta v2 via header `X-Contract-Version: v2`, fan-out a 16 HS properties, y v1 sigue funcionando sin header para rollback rápido.
+
+### Componentes entregados (TS)
+
+- **Guard acotado** (`src/lib/commercial/hubspot-outbound-guard.ts`): FORBIDDEN set reducido de 16 → 10 strings. COGS removido (`costOfGoodsSold` + `cost_of_goods_sold` + variantes `unitCost`/`loadedCost`). Margin (4 variantes × 2 casing) + cost_breakdown siguen BLOCKED permanentemente. JSDoc actualizada con decisión TASK-347/TASK-603.
+- **Types v2** (`src/lib/integrations/hubspot-greenhouse-service.ts`): `HubSpotGreenhouseCreateProductRequest` + `HubSpotGreenhouseUpdateProductRequest` extendidos con 16 fields (`pricesByCurrency`, `descriptionRichHtml`, `productType`, `pricingModel`, `productClassification`, `bundleType`, `categoryCode`, `unitCode`, `taxCategoryCode`, `isRecurring`, `recurringBillingFrequency`, `recurringBillingPeriodCode`, `commercialOwnerEmail`, `hubspotOwnerId`, `marketingUrl`, `imageUrls`) + COGS. Nuevo `HubSpotCanonicalCurrency` + `HubSpotProductPricesByCurrency` + `HubSpotProductType` exports. Header `X-Contract-Version: v2` emitido por default en `createHubSpotGreenhouseProduct` + `updateHubSpotGreenhouseProduct`.
+- **HTML sanitizer** (`src/lib/commercial/description-sanitizer.ts`): 2 exports — `sanitizeProductDescriptionHtml` con whitelist estricta (`p`, `strong`, `em`, `ul`, `ol`, `li`, `a[href]`, `br`); `derivePlainDescription` (strip + collapse whitespace). Backed by `isomorphic-dompurify`. Hardening: rechaza `javascript:` + `data:` URIs en `href`.
+- **Adapter v2** (`src/lib/hubspot/hubspot-product-payload-adapter.ts`): reescrito async. `buildV2Payload` consume 4 helpers existentes en paralelo (`getPricesByCurrency`, `resolveHubSpotProductType`, `loadActorHubSpotOwnerIdentity`, `getProductCategoryByCode/Unit/Tax`) + sanitiza descripciones in-band. Resuelve owner dual (email + direct `hubspotOwnerId`). Defense-in-depth: corre guard aún con COGS permitido para bloquear margin leaks.
+- **Snapshot extendido** (`src/lib/hubspot/push-product-to-hubspot.ts`): `ProductCatalogSyncSnapshot` crece con 14 fields v2; `readProductCatalogRow` select extendido leyendo las columnas añadidas por TASK-601; `buildSnapshot` mapea row → snapshot; sitios de uso del adapter ahora hacen `await`.
+
+### Componentes entregados (Python middleware)
+
+- **`services/hubspot_greenhouse_integration/app.py`**: 9 helpers módulo-level (`_is_v2_request`, `_reject_v2_forbidden_fields`, `_extract_v2_prices`, `_extract_v2_classification`, `_extract_v2_references`, `_extract_v2_recurring`, `_extract_v2_owner`, `_extract_v2_marketing`, `_build_v2_product_properties`). Endpoints `POST /products` y `PATCH /products/<id>` branchean por header: v2 → fan-out completo a 16 HS properties; v1 → lógica existente preservada verbatim.
+- **Fan-out v2**: prices → `hs_price_{clp,usd,clf,cop,mxn,pen}` (null → `""` explícito clear); rich → `hs_rich_text_description`; productType → `hs_product_type` (valida `service|inventory|non_inventory`); classification → `hs_pricing_model`, `hs_product_classification`, `hs_bundle_type`; refs → `categoria_de_item`, `unidad`, `hs_tax_category` (hubspot_option_value raw); recurring → `hs_recurring`, `recurringbillingfrequency`, `hs_recurring_billing_period`; COGS → `cost_of_goods_sold` (unblocked); owner → `hubspot_owner_id` (prefer direct id; fallback via `resolve_owner_by_email`); marketing → `hs_url`, `hs_images` (semicolon-joined).
+- **Defense-in-depth mirror del guard**: v2 rechaza con 400 cualquier `marginPct`/`margin_pct`/`targetMarginPct`/`target_margin_pct`/`floorMarginPct`/`floor_margin_pct`/`effectiveMarginPct`/`effective_margin_pct`/`costBreakdown`/`cost_breakdown` llegando al middleware.
+- **Graceful owner fallback**: `commercialOwnerEmail` sin match en HubSpot → log warning + omite el campo del payload (no falla la creación/actualización).
+
+### Decisiones de diseño
+
+- **TS emite v2 por default** (header siempre presente). Rollback al v1 = edit del header en 2 sitios + redeploy; no requiere tabla de feature flags ni toggle remoto.
+- **Middleware dual-write v1+v2**: sin `X-Contract-Version` header → path v1 intacto (compat legacy + rollback desde el portal sin tocar middleware).
+- **COGS unblock es irreversible por gobierno** (decisión TASK-587/TASK-603 explícita). Margin/cost_breakdown mantienen block permanente — cualquier futuro intento requiere nueva task de gobierno.
+- **Owner resolution dual**: adapter envía `hubspotOwnerId` directo cuando el member ya tiene binding en PG (skip HS API call); envía `commercialOwnerEmail` como fallback. Middleware prefiere el id directo para ahorrar latencia.
+- **`isomorphic-dompurify` > `sanitize-html`**: elegido porque (a) ESM-first, (b) single dependency (jsdom como transitiva), (c) mejor soporte Next.js 16 server runtime, (d) API más clara (`ALLOWED_TAGS` + `ALLOWED_URI_REGEXP`).
+- **Shared `buildV2Payload`** (create + update): evita duplicación; create/update difieren solo en whether `name/sku` son required vs optional, manejado a nivel de tipos sin branching runtime.
+
+### Verificación
+
+- `pnpm lint` — clean (2 warnings cosméticos DOMPurify, sin errores)
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/commercial/__tests__/hubspot-outbound-guard.test.ts` — 8/8
+- `pnpm test src/lib/commercial/__tests__/description-sanitizer.test.ts` — 15/15
+- `pnpm test src/lib/hubspot/__tests__/hubspot-product-payload-adapter.test.ts` — 18/18
+- `pytest services/hubspot_greenhouse_integration/tests/test_app.py` — 50/50 (40 preexistentes + 10 nuevos v2)
+- `pnpm test src/lib` — 1689/1689 passing
+
+### Desbloquea
+
+- **TASK-604** (Inbound Rehydration Fase D): contract v2 ya live en middleware; TASK-604 sólo agrega el retorno del shape en `GET /products`
+- **TASK-605** (Admin UI + Backfill Fase E): backfill masivo de 74 productos consume `adaptProductCatalogToHubSpotUpdatePayload` en loop
+
+### Seguimiento recomendado
+
+- **Production deploy del middleware v2** (workflow `hubspot-greenhouse-integration-deploy.yml` lo cubre; trigger manual o merge a `main`)
+- **Test E2E staging con 1 producto**: queda cubierto naturalmente cuando TASK-605 corra el backfill masivo (74 productos × v2 payload); alternativa inmediata via script one-shot
+- **MCP HS verification** post-deploy: `get_crm_objects products [id] [16 properties]` para sanity check
+
+---
+
 ## Sesion 2026-04-24 — TASK-602 CERRADA: Product Catalog Multi-Currency Price Normalization
 
 ### Qué cambió

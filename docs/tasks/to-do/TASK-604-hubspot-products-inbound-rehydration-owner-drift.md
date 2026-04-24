@@ -15,7 +15,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `crm`
-- Blocked by: `TASK-603`, `TASK-574` (TASK-601 + TASK-602 cerradas 2026-04-24)
+- Blocked by: `none` (TASK-601 + TASK-602 + TASK-603 + TASK-574 cerradas 2026-04-24)
 - Branch: `task/TASK-604-hubspot-products-inbound-rehydration`
 
 ## Summary

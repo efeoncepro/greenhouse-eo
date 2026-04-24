@@ -4,6 +4,43 @@ Runbook operativo del loop Greenhouse ↔ HubSpot Products.
 
 Fuente técnica: `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md`
 
+## Contract v2 (TASK-603, 2026-04-24)
+
+El outbound GH→HS usa ahora **contract v2** (header `X-Contract-Version: v2`). El middleware acepta v1 sin header para rollback rápido. Fields full-fidelity emitidos en cada push:
+
+| Campo Greenhouse | Campo HubSpot | SoT | Notas |
+|---|---|---|---|
+| `pricesByCurrency.{CLP,USD,CLF,COP,MXN,PEN}` | `hs_price_*` | GH | 6 monedas siempre presentes; NULL = borra en HS |
+| `descriptionRichHtml` | `hs_rich_text_description` | GH | Whitelist `<p>,<strong>,<em>,<ul>,<ol>,<li>,<a href>,<br>`; JS stripped |
+| `description` (plain, derivado) | `description` | GH | Si operador no provee, se deriva de rich HTML |
+| `productType` | `hs_product_type` | GH | `service`/`inventory`/`non_inventory` — desde `source_kind` o operador override |
+| `pricingModel` | `hs_pricing_model` | GH | Siempre `flat` en Fase 1 |
+| `productClassification` | `hs_product_classification` | GH | Siempre `standalone` en Fase 1 |
+| `bundleType` | `hs_bundle_type` | GH | Siempre `none` en Fase 1 |
+| `categoryCode` (HS option value) | `categoria_de_item` | GH | Resuelto via ref table |
+| `unitCode` (HS option value) | `unidad` | GH | Resuelto via ref table |
+| `taxCategoryCode` (HS option value) | `hs_tax_category` | GH | Resuelto via ref table |
+| `isRecurring` | `hs_recurring` | GH | — |
+| `recurringBillingFrequency` | `recurringbillingfrequency` | GH | — |
+| `recurringBillingPeriodCode` | `hs_recurring_billing_period` | GH | ISO 8601 duration |
+| `commercialOwnerEmail` (fallback) + `hubspotOwnerId` (directo) | `hubspot_owner_id` | GH (soft) | TASK-604 flipea a HS-wins inicial |
+| `marketingUrl` | `hs_url` | GH | — |
+| `imageUrls` (array) | `hs_images` | GH | Semicolon-joined en middleware |
+| `costOfGoodsSold` | `hs_cost_of_goods_sold` | GH | **Desbloqueado por TASK-603** |
+| `gh_*` (5 custom) | `gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`, `gh_business_line` | GH | Read-only en HS (TASK-563) |
+
+### Governance de costos
+
+- **COGS (TASK-603)**: ALLOWED outbound. `hs_cost_of_goods_sold` se emite siempre que GH lo tenga. Decisión explícita para reporting HS.
+- **Margin (permanente)**: BLOCKED. El guard `hubspot-outbound-guard.ts` rechaza con `HubSpotCostFieldLeakError` si alguien intenta enviar `marginPct`, `targetMarginPct`, `floorMarginPct`, `effectiveMarginPct`.
+- **Cost breakdown (permanente)**: BLOCKED. Mismo guard rechaza `costBreakdown` / `cost_breakdown`.
+
+### Rollback
+
+Si v2 rompe staging/prod, revertir el middleware a la revisión previa (`gcloud run services update-traffic hubspot-greenhouse-integration ... --to-revisions=PREVIOUS=100`). El TS del portal seguirá enviando header v2, pero el middleware sin logic v2 rechaza con 400 → eventos `commercial.product.hubspot_sync_failed` quedan loggeados sin corromper HS.
+
+Para desactivar v2 desde el TS sin redeploy, editar `src/lib/integrations/hubspot-greenhouse-service.ts` y remover `'X-Contract-Version': 'v2'` del `buildWriteServiceHeaders` call en `create/updateHubSpotGreenhouseProduct`. Middleware cae en path v1.
+
 ## Componentes
 
 - materializer local: `source-to-product-catalog`

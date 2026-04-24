@@ -1502,6 +1502,339 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("gh_*", response.get_json()["error"])
 
+    # ------------------------------------------------------------------
+    # TASK-587 / TASK-603 — HubSpot Products Outbound Contract v2 tests.
+    # The middleware branches on the `X-Contract-Version: v2` header and
+    # maps 16 new fields + COGS to native HubSpot properties.
+    # ------------------------------------------------------------------
+
+    def _build_v2_app_and_client(self):
+        try:
+            from services.hubspot_greenhouse_integration.app import create_app
+        except ImportError as exc:
+            self.skipTest(f"Flask runtime not installed in local test environment: {exc}")
+
+        app = create_app()
+        app.config.update(
+            {
+                "hubspot_access_token": "hubspot-token",
+                "timeout_seconds": 30,
+                "greenhouse_integration_api_token": "ghi-token",
+            }
+        )
+        return app, app.test_client()
+
+    def test_create_product_v2_accepts_prices_by_currency(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_product.return_value = {
+            "id": "hs-42",
+            "properties": {"name": "Starter Plan", "hs_sku": "PRD-001"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "pricesByCurrency": {"CLP": 1000, "USD": 1},
+                },
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 201)
+        fake_hubspot.create_product.assert_called_once()
+        props = fake_hubspot.create_product.call_args.args[0]
+        self.assertEqual(props["hs_price_clp"], 1000)
+        self.assertEqual(props["hs_price_usd"], 1)
+        self.assertNotIn("hs_price_clf", props)
+
+    def test_create_product_v2_accepts_cogs(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_product.return_value = {
+            "id": "hs-42",
+            "properties": {"name": "Starter Plan", "hs_sku": "PRD-001"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "costOfGoodsSold": 500,
+                },
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 201)
+        props = fake_hubspot.create_product.call_args.args[0]
+        self.assertEqual(props["cost_of_goods_sold"], 500)
+
+    def test_create_product_v2_rejects_margin_fields(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "marginPct": 0.2,
+                },
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("marginPct", response.get_json()["error"])
+        fake_hubspot.create_product.assert_not_called()
+
+    def test_create_product_v2_rejects_invalid_product_type(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "productType": "weird",
+                },
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Invalid productType", response.get_json()["error"])
+        fake_hubspot.create_product.assert_not_called()
+
+    def test_create_product_v2_accepts_all_classification_fields(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_product.return_value = {
+            "id": "hs-42",
+            "properties": {"name": "Starter Plan", "hs_sku": "PRD-001"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "productType": "service",
+                    "pricingModel": "flat",
+                    "productClassification": "standalone",
+                    "bundleType": "none",
+                },
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 201)
+        props = fake_hubspot.create_product.call_args.args[0]
+        self.assertEqual(props["hs_product_type"], "service")
+        self.assertEqual(props["hs_pricing_model"], "flat")
+        self.assertEqual(props["hs_product_classification"], "standalone")
+        self.assertEqual(props["hs_bundle_type"], "none")
+
+    def test_create_product_v2_resolves_owner_by_email(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.resolve_owner_by_email.return_value = {
+            "id": "123",
+            "email": "foo@bar.com",
+        }
+        fake_hubspot.create_product.return_value = {
+            "id": "hs-42",
+            "properties": {"name": "Starter Plan", "hs_sku": "PRD-001"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "commercialOwnerEmail": "foo@bar.com",
+                },
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 201)
+        fake_hubspot.resolve_owner_by_email.assert_called_once_with("foo@bar.com")
+        props = fake_hubspot.create_product.call_args.args[0]
+        self.assertEqual(props["hubspot_owner_id"], "123")
+
+    def test_create_product_v2_handles_missing_owner_gracefully(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.resolve_owner_by_email.return_value = None
+        fake_hubspot.create_product.return_value = {
+            "id": "hs-42",
+            "properties": {"name": "Starter Plan", "hs_sku": "PRD-001"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "commercialOwnerEmail": "ghost@nowhere.com",
+                },
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 201)
+        fake_hubspot.resolve_owner_by_email.assert_called_once_with("ghost@nowhere.com")
+        props = fake_hubspot.create_product.call_args.args[0]
+        self.assertNotIn("hubspot_owner_id", props)
+
+    def test_create_product_v2_maps_image_urls_to_semicolon_joined(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_product.return_value = {
+            "id": "hs-42",
+            "properties": {"name": "Starter Plan", "hs_sku": "PRD-001"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "imageUrls": ["a.jpg", "b.jpg"],
+                },
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 201)
+        props = fake_hubspot.create_product.call_args.args[0]
+        self.assertEqual(props["hs_images"], "a.jpg;b.jpg")
+
+    def test_update_product_v2_accepts_partial_v2_fields(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.update_product.return_value = {"id": "hs-42", "properties": {}}
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.patch(
+                "/products/hs-42",
+                json={"pricesByCurrency": {"USD": 9.99}},
+                headers={
+                    "Authorization": "Bearer ghi-token",
+                    "X-Contract-Version": "v2",
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        fake_hubspot.update_product.assert_called_once()
+        call_args = fake_hubspot.update_product.call_args
+        self.assertEqual(call_args.args[0], "hs-42")
+        self.assertEqual(call_args.args[1], {"hs_price_usd": 9.99})
+
+    def test_create_product_v1_still_works_without_header(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.create_product.return_value = {
+            "id": "hs-42",
+            "properties": {"name": "Starter Plan", "hs_sku": "PRD-001"},
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.post(
+                "/products",
+                json={
+                    "name": "Starter Plan",
+                    "sku": "PRD-001",
+                    "unitPrice": 99,
+                    "billingFrequency": "monthly",
+                    "billingPeriodCount": 1,
+                },
+                headers={"Authorization": "Bearer ghi-token"},
+            )
+
+        self.assertEqual(response.status_code, 201)
+        # v1 legacy behavior: billingFrequency/billingPeriodCount map to the
+        # older HS property names; no v2 fan-out fields appear.
+        fake_hubspot.create_product.assert_called_once_with(
+            {
+                "name": "Starter Plan",
+                "hs_sku": "PRD-001",
+                "price": 99,
+                "hs_recurring_billing_period": "monthly",
+                "hs_recurring_billing_frequency": 1,
+            }
+        )
+
     def test_product_archive_requires_integration_token(self):
         try:
             from services.hubspot_greenhouse_integration.app import create_app

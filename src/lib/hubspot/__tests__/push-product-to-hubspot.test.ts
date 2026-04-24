@@ -32,6 +32,23 @@ vi.mock('../product-hubspot-events', () => ({
   publishProductHubSpotSyncFailed: (...args: unknown[]) => mockPublishFailed(...args)
 }))
 
+// TASK-603: adapter now pulls from product-catalog-prices + owner bridge +
+// ref tables. Mock it at the adapter boundary so push tests stay focused
+// on the orchestration logic; adapter behavior is covered separately in
+// hubspot-product-payload-adapter.test.ts.
+vi.mock('../hubspot-product-payload-adapter', () => ({
+  adaptProductCatalogToHubSpotCreatePayload: async (snapshot: { productCode: string; productName: string }) => ({
+    name: snapshot.productName,
+    sku: snapshot.productCode,
+    customProperties: { gh_product_code: snapshot.productCode }
+  }),
+  adaptProductCatalogToHubSpotUpdatePayload: async (snapshot: { productCode: string; productName: string }) => ({
+    name: snapshot.productName,
+    sku: snapshot.productCode,
+    customProperties: { gh_product_code: snapshot.productCode }
+  })
+}))
+
 import { pushProductToHubSpot } from '../push-product-to-hubspot'
 import { ProductNotFoundError } from '../product-hubspot-types'
 

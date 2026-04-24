@@ -1,5 +1,13 @@
 # TASK-347 — Quotation Catalog & HubSpot Canonical Bridge
 
+> **Delta 2026-04-24 — Parcialmente supersedido por TASK-603**
+>
+> La cláusula de gobierno "no COGS outbound" originaria de este task fue **acotada** por [TASK-603](TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md) Fase C. Decisión:
+> - **COGS (`cost_of_goods_sold`)**: ahora ALLOWED outbound (GH→HS). HubSpot lo surfacea como `hs_cost_of_goods_sold` para reporting a nivel de producto; el SoT sigue siendo Greenhouse.
+> - **Margin + cost_breakdown (permanente)**: siguen BLOCKED. El guard `hubspot-outbound-guard.ts` mantiene los 10 strings forbidden (margin_pct × 4 variantes + effective_margin × 2 + cost_breakdown × 2).
+>
+> El rationale sigue válido: HubSpot es CRM, Greenhouse es pricing intelligence. COGS es **atributo de producto** (aceptable en HS); margin es **estructura de costos** (leaks loaded labor).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

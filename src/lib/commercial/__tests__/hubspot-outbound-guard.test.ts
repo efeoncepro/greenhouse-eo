@@ -7,7 +7,7 @@ import {
 } from '../hubspot-outbound-guard'
 
 describe('sanitizeHubSpotProductPayload', () => {
-  it('strips costOfGoodsSold (camelCase)', () => {
+  it('PRESERVES costOfGoodsSold (TASK-603 unblocked COGS outbound)', () => {
     const result = sanitizeHubSpotProductPayload({
       name: 'Creative retainer',
       sku: 'CR-001',
@@ -15,32 +15,40 @@ describe('sanitizeHubSpotProductPayload', () => {
       costOfGoodsSold: 5_000_000
     })
 
-    expect(result).not.toHaveProperty('costOfGoodsSold')
-    expect(result).toMatchObject({ name: 'Creative retainer', unitPrice: 9_600_000 })
+    expect(result).toMatchObject({
+      name: 'Creative retainer',
+      unitPrice: 9_600_000,
+      costOfGoodsSold: 5_000_000
+    })
   })
 
-  it('strips snake_case variants as well', () => {
+  it('PRESERVES snake_case cost_of_goods_sold (TASK-603)', () => {
     const result = sanitizeHubSpotProductPayload({
       name: 'Creative retainer',
       sku: 'CR-001',
-      cost_of_goods_sold: 5_000_000,
-      unit_cost: 4_800_000
+      cost_of_goods_sold: 5_000_000
     })
 
-    expect(result).not.toHaveProperty('cost_of_goods_sold')
-    expect(result).not.toHaveProperty('unit_cost')
-    expect(result).toMatchObject({ name: 'Creative retainer' })
+    expect(result).toMatchObject({
+      name: 'Creative retainer',
+      cost_of_goods_sold: 5_000_000
+    })
   })
 
-  it('strips margin fields', () => {
+  it('strips margin fields (both camelCase and snake_case)', () => {
     const result = sanitizeHubSpotProductPayload({
       name: 'Creative retainer',
       sku: 'CR-001',
       marginPct: 40,
+      margin_pct: 40,
       targetMarginPct: 35,
+      target_margin_pct: 35,
       floorMarginPct: 20,
+      floor_margin_pct: 20,
       effectiveMarginPct: 38,
-      costBreakdown: { salary: 1_200_000 }
+      effective_margin_pct: 38,
+      costBreakdown: { salary: 1_200_000 },
+      cost_breakdown: { salary: 1_200_000 }
     })
 
     expect(result).toEqual({ name: 'Creative retainer', sku: 'CR-001' })
@@ -72,14 +80,25 @@ describe('sanitizeHubSpotProductPayload', () => {
 })
 
 describe('assertNoCostFieldsInHubSpotPayload', () => {
-  it('throws with leaked fields list when cost fields present', () => {
+  it('throws with leaked fields list when margin fields present', () => {
     expect(() =>
       assertNoCostFieldsInHubSpotPayload({
         name: 'Creative retainer',
-        costOfGoodsSold: 5_000_000,
-        marginPct: 40
+        marginPct: 40,
+        targetMarginPct: 35
       })
     ).toThrow(HubSpotCostFieldLeakError)
+  })
+
+  it('does NOT throw when costOfGoodsSold is present (TASK-603 unblocked)', () => {
+    expect(() =>
+      assertNoCostFieldsInHubSpotPayload({
+        name: 'Creative retainer',
+        sku: 'CR-001',
+        unitPrice: 9_600_000,
+        costOfGoodsSold: 5_000_000
+      })
+    ).not.toThrow()
   })
 
   it('does not throw when only safe fields are present', () => {
@@ -92,18 +111,19 @@ describe('assertNoCostFieldsInHubSpotPayload', () => {
     ).not.toThrow()
   })
 
-  it('reports every leaked field in the error', () => {
+  it('reports every leaked margin/cost_breakdown field in the error', () => {
     try {
       assertNoCostFieldsInHubSpotPayload({
-        costOfGoodsSold: 1,
+        marginPct: 1,
         margin_pct: 2,
-        costBreakdown: {}
+        costBreakdown: {},
+        cost_breakdown: {}
       })
       throw new Error('expected to throw')
     } catch (err) {
       expect(err).toBeInstanceOf(HubSpotCostFieldLeakError)
       expect((err as HubSpotCostFieldLeakError).leakedFields).toEqual(
-        expect.arrayContaining(['costOfGoodsSold', 'margin_pct', 'costBreakdown'])
+        expect.arrayContaining(['marginPct', 'margin_pct', 'costBreakdown', 'cost_breakdown'])
       )
     }
   })

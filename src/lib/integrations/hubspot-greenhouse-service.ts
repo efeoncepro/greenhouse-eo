@@ -396,17 +396,55 @@ export interface HubSpotGreenhouseProductCatalogResponse {
   products: HubSpotGreenhouseProductProfile[]
 }
 
+// ── Contract v2 supporting types (TASK-603) ──
+//
+// Currency matrix is the canonical set declared in
+// `@/lib/commercial/product-catalog-prices`. Re-declared here as a local
+// union to keep the write-service types self-contained (no circular import
+// between integrations layer and commercial layer).
+
+export type HubSpotCanonicalCurrency = 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN'
+
+export type HubSpotProductPricesByCurrency = Partial<
+  Record<HubSpotCanonicalCurrency, number | null>
+>
+
+export type HubSpotProductType = 'service' | 'inventory' | 'non_inventory'
+
 export interface HubSpotGreenhouseCreateProductRequest {
   name: string
   sku: string
   description?: string
   unitPrice?: number
 
+  // ── TASK-603 v2 fields ─────────────────────────────────────────────
+  // The middleware accepts these when the caller sends
+  // `X-Contract-Version: v2`. Greenhouse always emits v2 since TASK-603.
+
+  /** Plain-text description; middleware forwards as HubSpot `description`. */
+  descriptionRichHtml?: string
+
+  /** Sanitized rich HTML (whitelist tags only); middleware forwards as `hs_rich_text_description`. */
+  pricesByCurrency?: HubSpotProductPricesByCurrency
+  productType?: HubSpotProductType
+  pricingModel?: string
+  productClassification?: string
+  bundleType?: string
+  categoryCode?: string | null
+  unitCode?: string | null
+  taxCategoryCode?: string | null
+  recurringBillingFrequency?: string | null
+  recurringBillingPeriodCode?: string | null
+  commercialOwnerEmail?: string | null
+  hubspotOwnerId?: string | null
+  marketingUrl?: string | null
+  imageUrls?: string[]
+
   /**
-   * @deprecated TASK-347: cost must never be forwarded to HubSpot. Keep in the type
-   * only to support the legacy inbound sync where HubSpot sends it back to Greenhouse.
-   * Callers creating outbound products must NOT set this field; the outbound guard
-   * (`src/lib/commercial/hubspot-outbound-guard.ts`) strips it defensively.
+   * TASK-347 governance, narrowed by TASK-603: COGS is now ALLOWED outbound.
+   * The outbound guard (`src/lib/commercial/hubspot-outbound-guard.ts`)
+   * blocks only margin + cost_breakdown fields; COGS is a product attribute,
+   * not a cost structure leak.
    */
   costOfGoodsSold?: number
   tax?: number
@@ -717,16 +755,17 @@ export const getHubSpotGreenhouseProduct = async (productId: string) =>
 export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseCreateProductRequest) => {
   const { baseUrl, timeoutMs } = getServiceConfig()
 
-  // TASK-347 defense-in-depth: strip cost_of_goods_sold if a caller forgot the guard.
-  // The authoritative sanitizer lives in src/lib/commercial/hubspot-outbound-guard.ts.
-  const safePayload: Record<string, unknown> = { ...payload }
-
-  delete safePayload.costOfGoodsSold
-
+  // TASK-603: payload already passes through `sanitizeHubSpotProductPayload`
+  // upstream (blocks margin + cost_breakdown). COGS is allowed now; no wire-
+  // level strip. The middleware also applies defense-in-depth mirror of the
+  // guard when it sees `X-Contract-Version: v2`.
   const response = await fetch(`${baseUrl}/products`, {
     method: 'POST',
-    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify(safePayload),
+    headers: await buildWriteServiceHeaders({
+      'Content-Type': 'application/json',
+      'X-Contract-Version': 'v2'
+    }),
+    body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
     signal: AbortSignal.timeout(timeoutMs)
@@ -762,6 +801,28 @@ export interface HubSpotGreenhouseUpdateProductRequest {
   unitPrice?: number | null
   sku?: string | null
   isArchived?: boolean | null
+
+  // ── TASK-603 v2 fields (all optional on PATCH) ─────────────────────
+  descriptionRichHtml?: string | null
+  pricesByCurrency?: HubSpotProductPricesByCurrency
+  productType?: HubSpotProductType | null
+  pricingModel?: string | null
+  productClassification?: string | null
+  bundleType?: string | null
+  categoryCode?: string | null
+  unitCode?: string | null
+  taxCategoryCode?: string | null
+  isRecurring?: boolean | null
+  recurringBillingFrequency?: string | null
+  recurringBillingPeriodCode?: string | null
+  commercialOwnerEmail?: string | null
+  hubspotOwnerId?: string | null
+  marketingUrl?: string | null
+  imageUrls?: string[]
+
+  /** TASK-603: COGS unblocked outbound. See guard JSDoc for rationale. */
+  costOfGoodsSold?: number | null
+
   customProperties?: Partial<HubSpotGreenhouseProductCustomProperties>
 }
 
@@ -777,16 +838,15 @@ export const updateHubSpotGreenhouseProduct = async (
 ): Promise<HubSpotGreenhouseUpdateProductResponse> => {
   const { baseUrl, timeoutMs } = getServiceConfig()
 
-  // TASK-347 defense-in-depth: the sanitizer guarantees cost fields never leave
-  // Greenhouse. Strip any leakage at the wire boundary as well.
-  const safePayload: Record<string, unknown> = { ...payload }
-
-  delete safePayload.costOfGoodsSold
-
+  // TASK-603: payload already passes through the guard upstream. COGS is
+  // allowed in contract v2 (hs_cost_of_goods_sold). No wire-level strip.
   const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}`, {
     method: 'PATCH',
-    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify(safePayload),
+    headers: await buildWriteServiceHeaders({
+      'Content-Type': 'application/json',
+      'X-Contract-Version': 'v2'
+    }),
+    body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
     signal: AbortSignal.timeout(timeoutMs)

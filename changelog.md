@@ -2,6 +2,18 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-603 CERRADA ✅: HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C)
+
+- **Guard acotado** (`src/lib/commercial/hubspot-outbound-guard.ts`): `HUBSPOT_FORBIDDEN_PRODUCT_FIELDS` reducido de 16 → 10 strings. **COGS unblocked** outbound por decisión explícita de gobierno (supersedea parcialmente TASK-347); margin + cost_breakdown siguen permanentemente BLOCKED.
+- **Contract v2 types** (`src/lib/integrations/hubspot-greenhouse-service.ts`): `HubSpotGreenhouseCreateProductRequest` + `UpdateProductRequest` extendidos con 16 fields v2 (`pricesByCurrency`, `descriptionRichHtml`, `productType`, `pricingModel`, `productClassification`, `bundleType`, `categoryCode`, `unitCode`, `taxCategoryCode`, `isRecurring`, `recurringBillingFrequency`, `recurringBillingPeriodCode`, `commercialOwnerEmail`, `hubspotOwnerId`, `marketingUrl`, `imageUrls`) + `costOfGoodsSold`. Header `X-Contract-Version: v2` emitido por default.
+- **HTML sanitizer** (`src/lib/commercial/description-sanitizer.ts`): whitelist `<p>,<strong>,<em>,<ul>,<ol>,<li>,<a href>,<br>`; strip `<script>`, `onclick`, `<iframe>`, `javascript:` URIs. Plain text derivation via strip-tags + collapse whitespace. Dep nueva: `isomorphic-dompurify`.
+- **Adapter v2** (`src/lib/hubspot/hubspot-product-payload-adapter.ts`): reescrito async con `buildV2Payload` shared. Consume 4 helpers existentes en paralelo (`getPricesByCurrency`, `resolveHubSpotProductType`, `loadActorHubSpotOwnerIdentity`, `getProductCategoryByCode/Unit/Tax`) + sanitiza HTML. Owner resolution dual (email + direct id).
+- **Snapshot extendido** (`src/lib/hubspot/push-product-to-hubspot.ts`): `ProductCatalogSyncSnapshot` crece con 14 fields v2; DB reader lee columnas añadidas por TASK-601.
+- **Middleware Python v2** (`services/hubspot_greenhouse_integration/app.py`): 9 helpers módulo-level para extraer fields v2 + validación + defense-in-depth. `POST /products` y `PATCH /products/<id>` branchean por header: v2 fan-out completo a 16 HS properties; v1 preservado verbatim (dual-write para rollback). Graceful fallback cuando `commercialOwnerEmail` no resuelve (warning log + omite campo, no falla request).
+- **Mappings**: prices → `hs_price_{clp,usd,clf,cop,mxn,pen}`; rich → `hs_rich_text_description`; productType → `hs_product_type`; classification → `hs_pricing_model`/`hs_product_classification`/`hs_bundle_type`; refs → `categoria_de_item`/`unidad`/`hs_tax_category`; recurring → `hs_recurring`/`recurringbillingfrequency`/`hs_recurring_billing_period`; COGS → `cost_of_goods_sold`; owner → `hubspot_owner_id`; marketing → `hs_url`/`hs_images` (semicolon-joined).
+- **Tests**: 8/8 guard + 15/15 sanitizer + 18/18 adapter + 50/50 pytest middleware (40 preexistentes + 10 nuevos v2). 1689/1689 en dir src/lib.
+- **Docs**: `docs/operations/product-catalog-sync-runbook.md` actualizado con contract v2 SoT table + governance COGS + rollback procedure. `TASK-347` marcado parcialmente supersedido. `TASK-587` Fase C ✅ cerrada. TASK-604 desbloqueada.
+
 ### 2026-04-24 — TASK-602 FOLLOW-UP ✅: Reactive bridge legacy → normalized + TASK-608 creada
 
 - **Nueva proyección reactiva `productCatalogPricesSyncProjection`** (`src/lib/sync/projections/product-catalog-prices-sync.ts`) suscrita a `commercial.product_catalog.created` + `commercial.product_catalog.updated`. Lee `defaultUnitPrice` + `defaultCurrency` del payload y llama `setAuthoritativePrice` con `source='backfill_legacy'` — cierra el gap de que los 5 sync handlers legacy escribían solo `default_unit_price`, dejando la tabla normalizada `product_catalog_prices` congelada en el backfill one-shot. Con esto TASK-602 queda operativa end-to-end.

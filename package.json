@@ -155,6 +155,7 @@
     "framer-motion": "^12.38.0",
     "google-auth-library": "^10.6.1",
     "input-otp": "1.4.2",
+    "isomorphic-dompurify": "^3.10.0",
     "jsonwebtoken": "^9.0.3",
     "keen-slider": "6.8.6",
     "kysely": "^0.28.15",

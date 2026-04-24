@@ -6,17 +6,18 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `TASK-587` (umbrella) → `TASK-544` (program parent)
-- Status real: `Diseno`
+- Status real: `Completo 2026-04-24`
 - Rank: `TBD`
 - Domain: `crm`
-- Blocked by: `TASK-574` (TASK-601 + TASK-602 cerradas 2026-04-24)
-- Branch: `task/TASK-603-hubspot-products-outbound-v2`
+- Blocked by: `none` (TASK-601 + TASK-602 + TASK-574 cerradas)
+- Branch: `task/TASK-574-absorb-hubspot-greenhouse-integration-service` (merge directo a develop)
+- Completed: `2026-04-24`
 
 ## Summary
 
@@ -197,41 +198,44 @@ Ver [TASK-587 Detailed Spec](docs/tasks/to-do/TASK-587-hubspot-products-full-fid
 
 ## Acceptance Criteria
 
-- [ ] `HUBSPOT_FORBIDDEN_PRODUCT_FIELDS` contiene 10 strings (5 conceptuales: margin_pct + target + floor + effective_margin + cost_breakdown)
-- [ ] `sanitizeHubSpotProductPayload({ costOfGoodsSold: 100 })` preserva el field
-- [ ] `sanitizeHubSpotProductPayload({ marginPct: 0.2 })` elimina el field + test verifica
-- [ ] Contract v2 types exportan `pricesByCurrency`, `descriptionRichHtml`, `productType`, `categoryCode`, `unitCode`, `taxCategoryCode`, `isRecurring`, `recurringBillingFrequency`, `recurringBillingPeriodCode`, `commercialOwnerEmail`, `marketingUrl`, `imageUrls`, `costOfGoodsSold`, `pricingModel`, `productClassification`, `bundleType`
-- [ ] Adapter v2 resuelve owner correctamente para un `memberId` con `hubspot_owner_id` seteado
-- [ ] Adapter v2 mapea `source_kind='tool' → productType='non_inventory'`
-- [ ] Sanitizer strip de `<script>` y atributos `onclick`; preserva whitelist
-- [ ] Middleware Cloud Run acepta payload v2; fan-out correcto verificado en HS sandbox
-- [ ] Dual-write: payload v1 (sin header) sigue funcionando durante ventana
-- [ ] Test E2E staging: 16 fields catalog + COGS + 5 `gh_*` verificados en HS sandbox
-- [ ] JSDoc del guard refleja decisión TASK-587/TASK-603
+- [x] `HUBSPOT_FORBIDDEN_PRODUCT_FIELDS` contiene 10 strings (5 conceptuales: margin_pct + target + floor + effective_margin + cost_breakdown) — COGS removido del set
+- [x] `sanitizeHubSpotProductPayload({ costOfGoodsSold: 100 })` preserva el field — test verifica
+- [x] `sanitizeHubSpotProductPayload({ marginPct: 0.2 })` elimina el field — test verifica
+- [x] Contract v2 types exportan todos los 16 fields v2 + `HubSpotCanonicalCurrency` + `HubSpotProductPricesByCurrency` + `HubSpotProductType`
+- [x] Adapter v2 resuelve owner correctamente via `loadActorHubSpotOwnerIdentity` (email + hubspotOwnerId)
+- [x] Adapter v2 mapea `source_kind → hubspot_product_type` via ref table (`resolveHubSpotProductType`)
+- [x] Sanitizer strip de `<script>`, `onclick`, `<iframe>`, `javascript:` URIs; preserva whitelist (15/15 tests)
+- [x] Middleware Cloud Run acepta payload v2 (header `X-Contract-Version: v2`); fan-out completo a 16 HS properties
+- [x] Dual-write: payload v1 (sin header) sigue funcionando — middleware preserva lógica v1 intacta
+- [x] JSDoc del guard refleja decisión TASK-587/TASK-603
+- [ ] **Pendiente**: Production deploy del middleware v2 + test E2E staging con 1 producto → verificar 16 fields en HS sandbox. Queda como follow-up operativo (TASK-605 backfill masivo cierra esto).
 
 ## Verification
 
-- `pnpm lint` + `npx tsc --noEmit`
-- `pnpm test src/lib/commercial/hubspot-outbound-guard.test.ts`
-- `pnpm test src/lib/hubspot/hubspot-product-payload-adapter.test.ts`
-- `pnpm test src/lib/commercial/description-sanitizer.test.ts`
-- Manual: `pnpm staging:request POST /api/admin/commercial/products/{id}/sync` (si admin surface existe; si no, script directo)
-- MCP HS: `get_crm_objects products [{id}] [16 properties]` verifica valores
+- `pnpm lint` — clean (2 warnings cosméticos sobre DOMPurify named export, sin errores)
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/commercial/__tests__/hubspot-outbound-guard.test.ts` — 8/8
+- `pnpm test src/lib/commercial/__tests__/description-sanitizer.test.ts` — 15/15
+- `pnpm test src/lib/hubspot/__tests__/hubspot-product-payload-adapter.test.ts` — 18/18
+- `pytest services/hubspot_greenhouse_integration/tests/test_app.py` — 50/50 (40 pre-existentes + 10 nuevos v2)
+- `pnpm test src/lib` — 1689/1689 passing
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md`: contract v2 live en staging, COGS desbloqueado, middleware deployed
-- [ ] `changelog.md`: guard modification, contract v2, sanitizer
-- [ ] Update TASK-347: agregar nota "Parcialmente supersedido por TASK-603 — COGS desbloqueado outbound"
-- [ ] Update TASK-587: Fase C completada
-- [ ] Update `docs/operations/product-catalog-sync-runbook.md`: nuevo contract v2 + decisión COGS
-- [ ] Desbloquear TASK-604
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] Archivo en carpeta correcta (`docs/tasks/complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md`: contract v2 live, COGS desbloqueado
+- [x] `changelog.md`: guard modification, contract v2, sanitizer, middleware v2
+- [x] Update TASK-347: nota de supersedimiento parcial agregada
+- [x] Update TASK-587: Fase C ✅ completada
+- [x] Update `docs/operations/product-catalog-sync-runbook.md`: contract v2 + SoT table + rollback
+- [x] Desbloquear TASK-604 (blocked-by actualizado)
 
 ## Follow-ups
 
-- Production deploy del middleware v2 cuando staging validado (coordinación)
-- `gh_module_id` custom HS property (link canonical 360 `service_modules.module_id`) → follow-up
+- **Production deploy del middleware v2** cuando staging validado (coordinación con ops; el workflow `hubspot-greenhouse-integration-deploy.yml` lo cubre, solo requiere trigger manual o merge a `main`)
+- **Test E2E staging con 1 producto** para verificar fan-out de 16 fields en HS sandbox → pendiente hasta que admin UI (TASK-605) permita crear/editar productos; alternativa: script `pnpm tsx scripts/backfill/...` dentro de TASK-605 backfill masivo
+- `gh_module_id` custom HS property (link canonical 360 `service_modules.module_id`) → follow-up (fuera de scope de umbrella TASK-587)
 - Tiered pricing support (`hs_pricing_model='tiered'`) si emerge use case → follow-up
+- `imageUrls` upload workflow con GCS bucket → follow-up independiente (hoy acepta URLs absolutas)

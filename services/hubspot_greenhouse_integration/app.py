@@ -116,6 +116,231 @@ def create_app() -> Flask:
             props[prop_name] = _normalize_hubspot_write_value(value)
         return props
 
+    # -------------------------------------------------------------------------
+    # TASK-587 / TASK-603 — HubSpot Products Outbound Contract v2 helpers.
+    #
+    # Requests opt into the v2 payload shape by sending the header
+    # ``X-Contract-Version: v2``. Older callers (no header or ``v1``) keep the
+    # legacy behavior intact so the middleware can dual-write during the
+    # validation window.
+    # -------------------------------------------------------------------------
+
+    V2_CONTRACT_VERSION_HEADER = "X-Contract-Version"
+    V2_CONTRACT_VERSION_VALUE = "v2"
+
+    V2_ALLOWED_PRODUCT_TYPES = {"service", "inventory", "non_inventory"}
+
+    V2_FORBIDDEN_PRODUCT_FIELDS = (
+        "marginPct",
+        "margin_pct",
+        "targetMarginPct",
+        "target_margin_pct",
+        "floorMarginPct",
+        "floor_margin_pct",
+        "effectiveMarginPct",
+        "effective_margin_pct",
+        "costBreakdown",
+        "cost_breakdown",
+    )
+
+    V2_PRICE_CURRENCY_TO_PROPERTY = (
+        ("CLP", "hs_price_clp"),
+        ("USD", "hs_price_usd"),
+        ("CLF", "hs_price_clf"),
+        ("COP", "hs_price_cop"),
+        ("MXN", "hs_price_mxn"),
+        ("PEN", "hs_price_pen"),
+    )
+
+    def _is_v2_request(flask_request) -> bool:
+        header_value = (flask_request.headers.get(V2_CONTRACT_VERSION_HEADER) or "").strip().lower()
+        return header_value == V2_CONTRACT_VERSION_VALUE
+
+    def _reject_v2_forbidden_fields(body: dict[str, Any]) -> None:
+        for field in V2_FORBIDDEN_PRODUCT_FIELDS:
+            if field in body:
+                raise ValueError(
+                    f"HubSpot v2 contract rejects {field}: Greenhouse governance (TASK-347/TASK-603)"
+                )
+
+    def _extract_v2_prices(body: dict[str, Any]) -> dict[str, Any]:
+        raw = body.get("pricesByCurrency")
+        if raw is None:
+            return {}
+        if not isinstance(raw, dict):
+            raise ValueError("pricesByCurrency must be an object")
+
+        props: dict[str, Any] = {}
+        for currency, prop_name in V2_PRICE_CURRENCY_TO_PROPERTY:
+            if currency not in raw:
+                continue
+            value = raw[currency]
+            if value is None:
+                props[prop_name] = ""
+            elif isinstance(value, bool):
+                raise ValueError(f"pricesByCurrency[{currency}] must be a number")
+            elif isinstance(value, (int, float)):
+                props[prop_name] = value
+            else:
+                raise ValueError(f"pricesByCurrency[{currency}] must be a number")
+        return props
+
+    def _extract_v2_classification(body: dict[str, Any]) -> dict[str, Any]:
+        props: dict[str, Any] = {}
+
+        if "productType" in body:
+            product_type = body["productType"]
+            if product_type is None or product_type == "":
+                props["hs_product_type"] = ""
+            else:
+                normalized = str(product_type).strip()
+                if normalized not in V2_ALLOWED_PRODUCT_TYPES:
+                    raise ValueError(
+                        "Invalid productType: must be service|inventory|non_inventory"
+                    )
+                props["hs_product_type"] = normalized
+
+        if "pricingModel" in body:
+            props["hs_pricing_model"] = _normalize_hubspot_write_value(body["pricingModel"])
+        if "productClassification" in body:
+            props["hs_product_classification"] = _normalize_hubspot_write_value(
+                body["productClassification"]
+            )
+        if "bundleType" in body:
+            props["hs_bundle_type"] = _normalize_hubspot_write_value(body["bundleType"])
+
+        return props
+
+    def _extract_v2_references(body: dict[str, Any]) -> dict[str, Any]:
+        props: dict[str, Any] = {}
+        if "categoryCode" in body:
+            props["categoria_de_item"] = _normalize_hubspot_write_value(body["categoryCode"])
+        if "unitCode" in body:
+            props["unidad"] = _normalize_hubspot_write_value(body["unitCode"])
+        if "taxCategoryCode" in body:
+            props["hs_tax_category"] = _normalize_hubspot_write_value(body["taxCategoryCode"])
+        return props
+
+    def _extract_v2_recurring(body: dict[str, Any]) -> dict[str, Any]:
+        props: dict[str, Any] = {}
+        if "isRecurring" in body:
+            props["hs_recurring"] = _normalize_hubspot_write_value(body["isRecurring"])
+        if "recurringBillingFrequency" in body:
+            props["recurringbillingfrequency"] = _normalize_hubspot_write_value(
+                body["recurringBillingFrequency"]
+            )
+        if "recurringBillingPeriodCode" in body:
+            props["hs_recurring_billing_period"] = _normalize_hubspot_write_value(
+                body["recurringBillingPeriodCode"]
+            )
+        return props
+
+    def _extract_v2_owner(client: HubSpotClient, body: dict[str, Any]) -> dict[str, Any]:
+        # Direct owner id wins over email resolution to allow callers that
+        # already resolved the owner upstream (e.g. cached binding) to skip the
+        # HubSpot round-trip.
+        if "hubspotOwnerId" in body and body["hubspotOwnerId"] not in (None, ""):
+            return {"hubspot_owner_id": _normalize_hubspot_write_value(body["hubspotOwnerId"])}
+
+        if "commercialOwnerEmail" in body:
+            email = body["commercialOwnerEmail"]
+            if email is None or str(email).strip() == "":
+                # Explicit null/empty clears the owner on HubSpot.
+                return {"hubspot_owner_id": ""}
+
+            try:
+                owner = client.resolve_owner_by_email(str(email).strip())
+            except HubSpotIntegrationError:
+                # Re-raise so the endpoint can map to a 5xx response.
+                raise
+            if owner is None:
+                app.logger.warning(
+                    "HubSpot v2 product write: commercialOwnerEmail did not resolve to an owner; omitting hubspot_owner_id"
+                )
+                return {}
+            owner_id = owner.get("id")
+            if owner_id in (None, ""):
+                app.logger.warning(
+                    "HubSpot v2 product write: resolved owner is missing id; omitting hubspot_owner_id"
+                )
+                return {}
+            return {"hubspot_owner_id": str(owner_id)}
+
+        return {}
+
+    def _extract_v2_marketing(body: dict[str, Any]) -> dict[str, Any]:
+        props: dict[str, Any] = {}
+        if "marketingUrl" in body:
+            props["hs_url"] = _normalize_hubspot_write_value(body["marketingUrl"])
+
+        if "imageUrls" in body:
+            raw_images = body["imageUrls"]
+            if raw_images is None:
+                props["hs_images"] = ""
+            elif isinstance(raw_images, (list, tuple)):
+                cleaned = []
+                for item in raw_images:
+                    if item is None:
+                        continue
+                    text = str(item).strip()
+                    if text:
+                        cleaned.append(text)
+                props["hs_images"] = ";".join(cleaned) if cleaned else ""
+            else:
+                raise ValueError("imageUrls must be an array of strings")
+        return props
+
+    def _build_v2_product_properties(
+        client: HubSpotClient,
+        body: dict[str, Any],
+        *,
+        require_create_fields: bool,
+    ) -> dict[str, Any]:
+        _reject_v2_forbidden_fields(body)
+
+        props: dict[str, Any] = {}
+
+        # Core identity — name/sku/description mirror v1 behavior so v2 callers
+        # can still rely on the canonical HubSpot property names.
+        if require_create_fields:
+            name = body.get("name")
+            sku = body.get("sku")
+            if not name or not sku:
+                raise ValueError("name and sku are required")
+            props["name"] = name
+            props["hs_sku"] = sku
+        else:
+            if "name" in body:
+                props["name"] = _normalize_hubspot_write_value(body["name"])
+            if "sku" in body:
+                props["hs_sku"] = _normalize_hubspot_write_value(body["sku"])
+
+        if "description" in body:
+            props["description"] = _normalize_hubspot_write_value(body["description"])
+        if "descriptionRichHtml" in body:
+            props["hs_rich_text_description"] = _normalize_hubspot_write_value(
+                body["descriptionRichHtml"]
+            )
+
+        if "unitPrice" in body:
+            props["price"] = _normalize_hubspot_write_value(body["unitPrice"])
+        if "costOfGoodsSold" in body:
+            # TASK-603: COGS is unblocked outbound. Governance decision
+            # supersedes the TASK-347 ban for this field only.
+            props["cost_of_goods_sold"] = _normalize_hubspot_write_value(body["costOfGoodsSold"])
+        if "tax" in body:
+            props["tax"] = _normalize_hubspot_write_value(body["tax"])
+
+        props.update(_extract_v2_prices(body))
+        props.update(_extract_v2_classification(body))
+        props.update(_extract_v2_references(body))
+        props.update(_extract_v2_recurring(body))
+        props.update(_extract_v2_owner(client, body))
+        props.update(_extract_v2_marketing(body))
+        props.update(_extract_greenhouse_custom_properties(body))
+
+        return props
+
     def _parse_reconcile_cursor(raw_cursor: str | None) -> tuple[str, str | None]:
         cursor = (raw_cursor or "").strip()
         if not cursor:
@@ -879,32 +1104,45 @@ def create_app() -> Flask:
 
         try:
             body = request.get_json(force=True) or {}
-            name = body.get("name")
-            sku = body.get("sku")
-            if not name or not sku:
-                return jsonify({"error": "name and sku are required"}), 400
 
-            props: dict[str, Any] = {
-                "name": name,
-                "hs_sku": sku,
-            }
-            if body.get("description"):
-                props["description"] = body["description"]
-            if body.get("unitPrice") is not None:
-                props["price"] = body["unitPrice"]
-            if body.get("costOfGoodsSold") is not None:
-                props["cost_of_goods_sold"] = body["costOfGoodsSold"]
-            if body.get("tax") is not None:
-                props["tax"] = body["tax"]
-            if body.get("isRecurring") is not None:
-                props["hs_recurring"] = body["isRecurring"]
-            if body.get("billingFrequency"):
-                props["hs_recurring_billing_period"] = body["billingFrequency"]
-            if body.get("billingPeriodCount") is not None:
-                props["hs_recurring_billing_frequency"] = body["billingPeriodCount"]
-            props.update(_extract_greenhouse_custom_properties(body))
+            if _is_v2_request(request):
+                # TASK-587 / TASK-603 — v2 contract: 16 new fields + COGS
+                # unblocked + owner resolution + fan-out to native HS props.
+                client = _client()
+                props = _build_v2_product_properties(
+                    client, body, require_create_fields=True
+                )
+                created = client.create_product(props)
+            else:
+                # Legacy v1 contract — preserved verbatim during the dual-write
+                # window so in-flight callers keep working.
+                name = body.get("name")
+                sku = body.get("sku")
+                if not name or not sku:
+                    return jsonify({"error": "name and sku are required"}), 400
 
-            created = _client().create_product(props)
+                props = {
+                    "name": name,
+                    "hs_sku": sku,
+                }
+                if body.get("description"):
+                    props["description"] = body["description"]
+                if body.get("unitPrice") is not None:
+                    props["price"] = body["unitPrice"]
+                if body.get("costOfGoodsSold") is not None:
+                    props["cost_of_goods_sold"] = body["costOfGoodsSold"]
+                if body.get("tax") is not None:
+                    props["tax"] = body["tax"]
+                if body.get("isRecurring") is not None:
+                    props["hs_recurring"] = body["isRecurring"]
+                if body.get("billingFrequency"):
+                    props["hs_recurring_billing_period"] = body["billingFrequency"]
+                if body.get("billingPeriodCount") is not None:
+                    props["hs_recurring_billing_frequency"] = body["billingPeriodCount"]
+                props.update(_extract_greenhouse_custom_properties(body))
+
+                created = _client().create_product(props)
+
             created_props = created.get("properties") or {}
             return jsonify({
                 "hubspotProductId": str(created.get("id")),
@@ -926,34 +1164,42 @@ def create_app() -> Flask:
 
         try:
             body = request.get_json(force=True) or {}
-            props: dict[str, Any] = {}
             if body.get("isArchived") is True:
                 return jsonify({"error": "Use POST /products/<id>/archive to archive a product"}), 400
 
-            if "name" in body:
-                props["name"] = _normalize_hubspot_write_value(body["name"])
-            if "sku" in body:
-                props["hs_sku"] = _normalize_hubspot_write_value(body["sku"])
-            if "description" in body:
-                props["description"] = _normalize_hubspot_write_value(body["description"])
-            if "unitPrice" in body:
-                props["price"] = _normalize_hubspot_write_value(body["unitPrice"])
-            if "costOfGoodsSold" in body:
-                props["cost_of_goods_sold"] = _normalize_hubspot_write_value(body["costOfGoodsSold"])
-            if "tax" in body:
-                props["tax"] = _normalize_hubspot_write_value(body["tax"])
-            if "isRecurring" in body:
-                props["hs_recurring"] = _normalize_hubspot_write_value(body["isRecurring"])
-            if "billingFrequency" in body:
-                props["hs_recurring_billing_period"] = _normalize_hubspot_write_value(body["billingFrequency"])
-            if "billingPeriodCount" in body:
-                props["hs_recurring_billing_frequency"] = _normalize_hubspot_write_value(body["billingPeriodCount"])
-            props.update(_extract_greenhouse_custom_properties(body))
+            if _is_v2_request(request):
+                # TASK-587 / TASK-603 — v2 contract applied as a partial update.
+                client = _client()
+                props = _build_v2_product_properties(
+                    client, body, require_create_fields=False
+                )
+            else:
+                client = _client()
+                props = {}
+                if "name" in body:
+                    props["name"] = _normalize_hubspot_write_value(body["name"])
+                if "sku" in body:
+                    props["hs_sku"] = _normalize_hubspot_write_value(body["sku"])
+                if "description" in body:
+                    props["description"] = _normalize_hubspot_write_value(body["description"])
+                if "unitPrice" in body:
+                    props["price"] = _normalize_hubspot_write_value(body["unitPrice"])
+                if "costOfGoodsSold" in body:
+                    props["cost_of_goods_sold"] = _normalize_hubspot_write_value(body["costOfGoodsSold"])
+                if "tax" in body:
+                    props["tax"] = _normalize_hubspot_write_value(body["tax"])
+                if "isRecurring" in body:
+                    props["hs_recurring"] = _normalize_hubspot_write_value(body["isRecurring"])
+                if "billingFrequency" in body:
+                    props["hs_recurring_billing_period"] = _normalize_hubspot_write_value(body["billingFrequency"])
+                if "billingPeriodCount" in body:
+                    props["hs_recurring_billing_frequency"] = _normalize_hubspot_write_value(body["billingPeriodCount"])
+                props.update(_extract_greenhouse_custom_properties(body))
 
             if not props:
                 return jsonify({"error": "No fields to update"}), 400
 
-            updated = _client().update_product(product_id, props)
+            updated = client.update_product(product_id, props)
             return jsonify(
                 {
                     "status": "updated",

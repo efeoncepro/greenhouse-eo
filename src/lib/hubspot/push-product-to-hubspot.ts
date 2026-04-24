@@ -58,6 +58,22 @@ interface ProductCatalogRow extends Record<string, unknown> {
   gh_owned_fields_checksum: string | null
   hubspot_sync_attempt_count: number | string | null
   hubspot_last_write_at: string | Date | null
+
+  // ── TASK-603 v2 columns (nullable until operator fills) ───────────────
+  description_rich_html: string | null
+  hubspot_product_type_code: string | null
+  category_code: string | null
+  unit_code: string | null
+  tax_category_code: string | null
+  hubspot_pricing_model: string | null
+  hubspot_product_classification: string | null
+  hubspot_bundle_type_code: string | null
+  is_recurring: boolean | null
+  recurring_billing_frequency_code: string | null
+  recurring_billing_period_iso: string | null
+  commercial_owner_member_id: string | null
+  marketing_url: string | null
+  image_urls: string[] | null
 }
 
 const toNumberOrNull = (value: unknown): number | null => {
@@ -86,7 +102,13 @@ const readProductCatalogRow = async (productId: string): Promise<ProductCatalogR
             default_unit_price, default_currency, default_unit,
             hubspot_product_id, source_kind, source_id, business_line_code,
             is_archived, gh_owned_fields_checksum,
-            hubspot_sync_attempt_count, hubspot_last_write_at
+            hubspot_sync_attempt_count, hubspot_last_write_at,
+            description_rich_html, hubspot_product_type_code, category_code,
+            unit_code, tax_category_code, hubspot_pricing_model,
+            hubspot_product_classification, hubspot_bundle_type_code,
+            is_recurring, recurring_billing_frequency_code,
+            recurring_billing_period_iso, commercial_owner_member_id,
+            marketing_url, image_urls
        FROM greenhouse_commercial.product_catalog
        WHERE product_id = $1
        LIMIT 1`,
@@ -108,7 +130,23 @@ const buildSnapshot = (row: ProductCatalogRow, ghLastWriteAt: string): ProductCa
   sourceKind: row.source_kind ?? 'manual',
   sourceId: row.source_id,
   businessLineCode: row.business_line_code,
-  ghLastWriteAt
+  ghLastWriteAt,
+
+  // TASK-603 v2 fields — all nullable until operator fills via admin UI.
+  descriptionRichHtml: row.description_rich_html,
+  hubspotProductTypeCode: row.hubspot_product_type_code,
+  categoryCode: row.category_code,
+  unitCode: row.unit_code,
+  taxCategoryCode: row.tax_category_code,
+  hubspotPricingModel: row.hubspot_pricing_model,
+  hubspotProductClassification: row.hubspot_product_classification,
+  hubspotBundleTypeCode: row.hubspot_bundle_type_code,
+  isRecurring: Boolean(row.is_recurring),
+  recurringBillingFrequencyCode: row.recurring_billing_frequency_code,
+  recurringBillingPeriodIso: row.recurring_billing_period_iso,
+  commercialOwnerMemberId: row.commercial_owner_member_id,
+  marketingUrl: row.marketing_url,
+  imageUrls: Array.isArray(row.image_urls) ? row.image_urls : []
 })
 
 const persistTrace = async (
@@ -255,7 +293,7 @@ export const pushProductToHubSpot = async (
 
   try {
     if (action === 'created') {
-      const createPayload = adaptProductCatalogToHubSpotCreatePayload(snapshot)
+      const createPayload = await adaptProductCatalogToHubSpotCreatePayload(snapshot)
       const createResponse = await createHubSpotGreenhouseProduct(createPayload)
       const hubspotProductId = createResponse.hubspotProductId
 
@@ -352,7 +390,7 @@ export const pushProductToHubSpot = async (
     }
 
     // update OR unarchive → PATCH /products/:id
-    const updatePayload = adaptProductCatalogToHubSpotUpdatePayload(snapshot)
+    const updatePayload = await adaptProductCatalogToHubSpotUpdatePayload(snapshot)
     const updateResponse = await updateHubSpotGreenhouseProduct(existing.hubspot_product_id!, updatePayload)
 
     if (updateResponse.status === 'endpoint_not_deployed') {
