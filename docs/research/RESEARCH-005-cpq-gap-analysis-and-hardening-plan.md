@@ -1,16 +1,22 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-24 por Julio + Claude
-> **Actualizado:** 2026-04-24 — Delta 1.1 incorpora business context confirmado (renewal via service catalog, SaaS bundles, footprint LATAM) + hallazgo del service catalog como proto-bundle engine
 > **Status:** Active
 > **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync
-> **Documentacion tecnica relacionada:**
-> - [GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md](../architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md)
-> - [GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md](../architecture/GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md)
-> - [catalogo-productos-fullsync.md](../documentation/admin-center/catalogo-productos-fullsync.md)
-> - [cotizaciones-gobernanza.md](../documentation/finance/cotizaciones-gobernanza.md)
+
+**Actualizaciones:**
+
+- v1.1 (2026-04-24): incorpora business context confirmado (renewal via service catalog, SaaS bundles, footprint LATAM) + hallazgo del service catalog como proto-bundle engine
+- v1.2 (2026-04-24): incorpora PDF enterprise spec + product descriptions rich HTML + DocuSign integration + renewal periodicity variable confirmada + conceptos explicados (constraint rules DSL, nesting, co-term, amendment)
+
+**Documentacion tecnica relacionada:**
+
+- [GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md](../architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md)
+- [GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md](../architecture/GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md)
+- [catalogo-productos-fullsync.md](../documentation/admin-center/catalogo-productos-fullsync.md)
+- [cotizaciones-gobernanza.md](../documentation/finance/cotizaciones-gobernanza.md)
 
 ## Proposito
 
@@ -70,6 +76,218 @@ Revision de `src/lib/commercial/service-catalog-{store,expand,constraints}.ts`:
 | eSignature | **DocuSign only en Fase 1** | Mayor cobertura LATAM; Adobe Sign si cliente enterprise lo pide |
 
 Con estas decisiones cerradas, el plan pasa de "hipotetico" a "accionable" — las tasks P0/P1 arrancan sin blockers.
+
+## Delta 2026-04-24 (v1.2) — PDF enterprise + product descriptions + DocuSign + conceptos
+
+### a) Renewal periodicity confirmada
+
+El campo `service_modules.default_duration_months` hoy persiste un integer. Se confirma que el rango operacional es **variable, con mínimo mensual**: mensual, bimensual, trimestral, semestral, anual. El engine debe soportar cualquier entero de meses (no solo los 5 tipicos — algunos retainers pueden ser de 4 o 9 meses).
+
+**Modelado:** el campo actual ya soporta cualquier entero. No requiere cambio de schema. Lo que falta es:
+
+- Una tabla de **periodicidades canonicas** con labels humanos (`mensual`, `bimensual`, `trimestral`, `semestral`, `anual`) que se muestre en UI como preset, con opcion "Personalizado" para valores arbitrarios.
+- El renewal engine (TASK-624) usa directamente `default_duration_months` para calcular `next_renewal_date = start_date + INTERVAL N MONTH` sin asumir que la periodicidad es una de las 5 tipicas.
+
+### b) Product descriptions rich HTML — estado actual vs gap
+
+HubSpot ya soporta 2 fields nativos: `description` (text plain) + `hs_rich_text_description` (HTML). Mapping del estado real:
+
+| Layer | `description` plain | `description_rich_html` | Status |
+|---|---|---|---|
+| HubSpot portal 48713323 | ✅ field existe | ✅ field existe | — |
+| Greenhouse `product_catalog` schema | ✅ columna `description TEXT` | ✅ columna `description_rich_html TEXT` (TASK-603) | — |
+| Adapter outbound GH→HS | ✅ emite `description` | ✅ emite sanitized HTML via `sanitizeProductDescriptionHtml` | — |
+| Adapter inbound HS→GH (v2 rehydration) | ✅ | ✅ first-sync only | TASK-604 |
+| Backfill 2026-04-24 | ✅ presente en los 74 products que tengan valor | ⚠️ presente pero la mayoria no tiene rich HTML cargado (operator no lo editó aún) | Populacion progresiva via admin UI |
+| **Quote PDF rendering** | ⚠️ Linea del quote tiene su propio `description` operator-set, **no lee el del product_catalog** | ❌ **NO se renderiza en PDF** | **Gap del PDF, no de los datos** |
+| Admin UI editor rich text | ⚠️ A validar — existe el campo pero hay que confirmar si el detail view usa un editor WYSIWYG (TipTap/Slate) o solo textarea | ⚠️ Mismo | Gap menor |
+
+**Conclusion:** el contrato end-to-end funciona. El gap es que el **PDF no linkea line_item → product_id → product.description_rich_html** para enriquecer la linea con la descripcion canonica del catalogo. Fix trivial en `render-quotation-pdf.ts`.
+
+### c) PDF enterprise — spec de rediseno
+
+El PDF actual ([src/lib/finance/pdf/quotation-pdf-document.tsx](../../src/lib/finance/pdf/quotation-pdf-document.tsx)) es funcional pero no-enterprise. Principales problemas:
+
+1. "Efeonce" es texto plano en Helvetica, no el logo real
+2. Color primary `#0375DB` no es el canon (canon Efeonce: `#023c70` azul marino, con `#0375db` como accent)
+3. Direccion del cliente aparece siempre `—`
+4. No hay datos del emisor (RUT 77.357.182-1, direccion legal)
+5. Sin pagina de portada ni sub-brand identification (Globe/Wave/Reach)
+6. Footer minimal sin paginacion (N/M)
+7. Sin signature block ni QR de verificacion online
+8. Sin executive summary ni investment timeline
+9. `product_catalog.description_rich_html` no se renderiza en el PDF
+10. Bundles no visualmente agrupados (todas las lineas mezcladas)
+
+**Spec PDF enterprise propuesta:**
+
+```text
+Pagina 1 — Cover
+├─ Logo real (public/branding/logo-full.png, ~150x40px via <Image>)
+├─ Sub-brand badge (isotipo globe/wave/reach segun business_line_code)
+├─ Titulo: "Propuesta Comercial"
+├─ Quote ID + version + fecha emision
+├─ "Preparada para:" [Client name + organization]
+├─ "Preparada por:" [sales rep name + email + phone]
+├─ "Valida hasta:" [fecha]
+└─ Footer cover: datos legales emisor
+
+Pagina 2 — Executive Summary
+├─ TL;DR: "Inversion total [TOTAL] [MONEDA]"
+├─ "Duracion estimada: [duration_months] meses"
+├─ "Modelo: [commercial_model label]"
+├─ "Equipo asignado: [N roles seniors, N analysts]"
+└─ Descripcion ejecutiva (< 400 palabras — desde quote.description)
+
+Pagina 3+ — Scope of Work
+├─ Para cada line item / bundle:
+│   ├─ Nombre del producto/servicio
+│   ├─ Rich HTML description del product_catalog (NEW — hoy no se renderiza)
+│   ├─ Quantity + unit + recurrencia
+│   └─ Componentes si es bundle (roles/tools listados con indent)
+└─ Bundles visualmente agrupados con linea lateral accent color
+
+Pagina N-2 — Commercial Proposal (tabla detalle)
+├─ Tabla pricing idéntica a hoy + mejoras:
+│   ├─ Agrupacion visual por bundle (subtotales)
+│   ├─ Line-level IVA si aplica (hoy solo total)
+│   └─ Alternate row background con surface color
+└─ Pricing summary sidebar: Neto / IVA / Total
+
+Pagina N-1 — Investment Timeline + Payment Terms
+├─ Milestones visualizados en timeline horizontal
+├─ "Mes 1: [amount]"
+├─ "Mes 2-12: [amount recurrente]"
+└─ Metodos de pago aceptados
+
+Pagina N — Terms & Conditions + Signatures
+├─ Terms block (existente, mejor formato)
+├─ Signature block:
+│   ├─ "Firma cliente" + area + "Nombre, cargo, fecha"
+│   ├─ "Firma Efeonce Group" + area + "Nombre, cargo, fecha"
+│   └─ QR code → link a version online verificable
+└─ FX footer (existente)
+
+Footer fijo todas las paginas
+├─ "Efeonce Group SpA · RUT 77.357.182-1 · Santiago, Chile"
+├─ "Propuesta [QUOTE-NUMBER] v[N] · Pagina N de M"
+└─ "Confidencial · No distribuir sin autorizacion"
+```
+
+**Brand assets ya disponibles en el repo** (inventario via Explore agent):
+
+- `public/branding/logo-full.png` — logo completo para PDF via `<Image>`
+- `public/branding/SVG/isotipo-efeonce-negativo.svg` — isotipo
+- Sub-brand variants: `globe-full.svg`, `wave-full.svg`, `reach-full.svg` (+ negativo variants)
+- Colores canonicos: `#023c70` (Efeonce Digital navy), `#0375db` (accent), `#bb1954` (Globe), `#00BAD1` (Wave), `#ff6500` (Reach)
+- Fuentes: DM Sans (body) + Poppins (headings) — via `Font.register()` en `@react-pdf/renderer`, requiere `.ttf` en `src/assets/fonts/`
+- Emisor legal: **Efeonce Group SpA, RUT 77.357.182-1, Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile**
+
+**Decisiones tecnicas a resolver:**
+
+| Tema | Decision recomendada |
+|---|---|
+| Logo SVG vs PNG en PDF | PNG via `<Image>` (SVG en `@react-pdf/renderer` soporta limitado) |
+| Rich HTML renderer | Whitelist `<p>`, `<strong>`, `<em>`, `<ul>`, `<li>`, `<br>` via parser custom → React-PDF `<Text>` jerarquicos |
+| QR code | Libreria `qrcode` → PNG data URL → `<Image>` |
+| Executive summary auto | Fallback al campo `description`; enriquecer con AI cuando TASK-609 este live |
+| Sales rep info | De session `tenant.userId` → lookup `team_members` (name, email, phone) |
+
+**Gap clasificado:** Este PDF redesign es un item **funcional-visibilidad**, no robustez. Alto impacto percibido (cada cliente ve el PDF) con esfuerzo medio (2 sprints). Encaja en **P2 Fase 1** junto con eSignature (ambos tocan el "momento de cierre").
+
+### d) DocuSign integration — contexto
+
+DocuSign es el lider enterprise con ~70% market share. Para LATAM:
+
+- **Integracion tecnica:** API REST + webhooks (`envelope.sent`, `envelope.signed`, `envelope.declined`, `envelope.voided`).
+- **Flujo operacional:** quote emitida → POST a DocuSign → envelope con PDF + campos de firma → email al cliente → cliente firma → webhook → GH actualiza `quotation.signed_at` + `signed_by`.
+- **Validez legal LATAM:** Chile (Ley 19.799), Colombia (Ley 527), Mexico (NOM-151), Peru (Ley 27269). Todas validas con eSignature no-certificada para contratos comerciales.
+- **Costo:** ~$10-25 USD/envelope segun plan (Business Pro = $40 USD/user/mes + envelopes incluidos).
+- **Alternativas:** Adobe Sign (enterprise mas caro), HelloSign (barato, menos trust), Signaturit (LATAM-nativo, mas barato).
+
+**Recomendacion Fase 1:** DocuSign only con capa de abstraccion `eSignatureProvider` (interface) para permitir swap a Adobe Sign sin rework cuando un cliente enterprise lo pida.
+
+**Fields nuevos en `quotations`:**
+
+- `esignature_provider VARCHAR` (docusign, adobe_sign)
+- `esignature_envelope_id VARCHAR`
+- `esignature_status ENUM(pending, sent, viewed, signed, declined, voided, expired)`
+- `esignature_sent_at TIMESTAMP`
+- `esignature_signed_at TIMESTAMP`
+- `esignature_signed_by VARCHAR` (nombre del firmante)
+- `esignature_signed_ip VARCHAR` (audit trail)
+
+### e) Conceptos explicados (pedido explicito del owner)
+
+#### Constraint rules DSL: DB vs TS declarativo
+
+**Problema:** al construir bundles necesitas reglas de compatibilidad entre componentes:
+
+- "Si agregas `senior-data-scientist` **debes** incluir `bigquery-license`"
+- "`retainer-premium` **no puede** combinarse con `retainer-basic`"
+- "Si `quantity > 10 horas/mes` de `strategy-director`, obligatorio agregar `project-manager`"
+
+**Opcion A — DSL en DB:** tabla `bundle_constraints` con operadores (`AND`/`OR`/`REQUIRES`/`EXCLUDES`) que persiste. Admins editan sin deploy. Mas flexible, mas complejo de testear.
+
+**Opcion B — TS declarativo:** reglas viven en TypeScript como funciones tipadas. Maximo type safety, cada cambio requiere deploy.
+
+**Recomendacion Greenhouse:** TS declarativo en Fase 1 (mas robusto, menos bugs). Migrar a DB solo si los product managers piden autonomia real sin PR.
+
+#### Nesting recursivo vs 1 nivel
+
+**1 nivel:** Service A contiene roles + tools. Service B tambien. **No** puedes meter Service A dentro de Service B.
+
+**Recursivo (N niveles):** "Retainer Premium" = "Retainer Base" + "Analytics Add-on", cada uno podria contener otros bundles.
+
+**Riesgos del recursivo:**
+
+1. Ciclos infinitos (A → B → A) requieren deteccion
+2. Pricing engine se vuelve arbol profundo (mas CPU)
+3. UX confuso al editar quote
+
+**Recomendacion:** 1 nivel + campo `service.add_ons[]` para un paso extra sin recursividad. Cubre el caso "Retainer Premium = Base + Analytics" sin complejidad de arbol.
+
+#### Co-term estricto vs paralelo-agrupable
+
+Cliente con 3 servicios recurrentes:
+
+- Service A: vence Mar 2027
+- Service B: vence Jun 2027
+- Service C: vence Sep 2027
+
+**Co-term estricto:** al renovar uno, forzas alinear los 3 a la misma fecha (ej. todos a Mar 2028). Una sola fecha de renewal, un solo quote, un solo pago anual.
+
+**Paralelo-agrupable:** cada servicio mantiene su fecha. Opcional: boton "Renovar todos juntos" genera quote combinado con prorrateo (adelantar B y C a Mar).
+
+**Recomendacion:** paralelo-agrupable. Estricto genera friccion (clientes no quieren pagar 6 meses antes solo por alineacion).
+
+#### Amendment vs re-quote
+
+Cliente con retainer vigente pide cambios (ej. subir de 40 a 60 horas/mes):
+
+**Amendment:** modifica contrato existente. Anexo "cambio nro 1" con fecha efectiva, delta, firma adicional. Contrato original sigue siendo unidad legal. Contabilidad: ajuste de revenue.
+
+**Re-quote:** cotizacion nueva que **supersede** la anterior. Cancela contrato vigente + crea uno nuevo. Contabilidad: baja original + alta nuevo.
+
+**Diferencia practica:** amendment mantiene continuidad legal (serial, auditoria, terminos heredados). Re-quote es mas simple operacionalmente pero pierde trazabilidad del cambio.
+
+**Recomendacion LATAM:** soportar ambos. Amendment es lo estandar en contratos corporativos LATAM; re-quote como fallback cuando el cambio es tan grande que amerita renegociar todo.
+
+### f) Impacto en priorizacion (update a la tabla P2)
+
+Agregar 2 items al plan:
+
+| ID | Spec candidato | Gap | Fase | Esfuerzo |
+|---|---|---|---|---|
+| **TASK-629** | PDF enterprise redesign (7 paginas + logo + sub-brand + signature block + QR verificacion + paginacion + datos emisor dinamicos + rich HTML descriptions rendering) | PDF generico | P2 Fase 1 (junto con eSignature) | 2 sprints |
+| **TASK-630** | Rich text editor (TipTap) en admin UI product-catalog para poblar `description_rich_html` | Datos product | P2 Fase 1 | 1 sprint |
+
+Y refinar el alcance de tasks ya planeadas:
+
+- **TASK-620** (Service catalog como bundle CPQ) incluye explicitamente **constraint rules en TS declarativo** (Opcion B elegida) + **1 nivel de nesting** con `service.add_ons[]`.
+- **TASK-624** (Renewal engine) incluye **paralelo-agrupable** (no co-term estricto) + soporta cualquier `default_duration_months` entero (no solo los 5 presets tipicos).
+- **TASK-628** (Amendment) queda **NO diferible**: sube de Fase 5 a Fase 2 porque LATAM corporate lo espera.
+- **TASK-619** (eSignature DocuSign) incluye capa `eSignatureProvider` interface para permitir Adobe Sign como segundo provider cuando lo pidan.
 
 ## Hallazgos principales
 
@@ -240,15 +458,24 @@ Oportunistico — ir resolviendo mientras se ejecutan los bloques 1-3.
 
 ## Decisiones abiertas
 
-Las 5 decisiones fundacionales se cerraron en la Delta v1.1 (ver tabla arriba). Quedan las siguientes decisiones de segundo orden:
+Las 5 decisiones fundacionales se cerraron en la Delta v1.1 (ver tabla arriba). Las 4 conceptuales se cerraron en la Delta v1.2 despues de explicarlas al owner:
 
-1. **Nesting de bundles (service → service)**: ¿recursivo (N niveles) o limitado a 1 nivel? Limitacion 1 nivel simplifica pricing engine y previene ciclos infinitos; recursivo habilita super-bundles complejos pero agrega complejidad exponencial.
-2. **Renewal notification lead time**: ¿30 / 60 / 90 dias antes del vencimiento emitir el event `commercial.service.renewal_due`? Depende de velocidad de aprobacion del cliente.
-3. **Co-term policy**: ¿alinear todos los renewals a fecha comun por cliente (co-term estricto), o permitir varios vencimientos paralelos con opcion de agrupar manualmente? Salesforce soporta ambos; preferencia operativa.
-4. **Bundle-level discount vs line-level**: ¿un bundle aplica descuento como unidad (ej. 15% off total del bundle) o los descuentos siguen siendo line-level agregados? Line-level es mas simple; bundle-level es mas intuitivo para upsell.
-5. **Amendment vs re-quote**: ¿extender el quote vigente con un amendment (mantiene contrato original) o emitir un nuevo quote que supersede al anterior? Implicancias legales + contables.
-6. **Tax engine LATAM per-pais**: ¿un sub-motor por pais (Colombia IVA, Mexico IVA, Peru IGV) o un motor generico parametrico? El generico escala mejor pero pierde matices locales (ej. retencion en Colombia).
-7. **Constraint rules para bundles**: ¿DSL propio en DB (tabla `bundle_constraints` con operators AND/OR/NOT) o codigo TS declarativo? DB es mas flexible para admins; TS es mas testable.
+| Decision | Estado | Resolucion |
+|---|---|---|
+| Constraint rules DSL | ✅ Cerrada | TS declarativo (Opcion B) en Fase 1; migrar a DB solo si hace falta |
+| Nesting recursivo vs 1 nivel | ✅ Cerrada | 1 nivel + `service.add_ons[]` |
+| Co-term estricto vs paralelo | ✅ Cerrada | Paralelo-agrupable (flexible, respeta decision original del cliente) |
+| Amendment vs re-quote | ✅ Cerrada | Soportar ambos (amendment como default LATAM, re-quote como fallback) |
+
+**Decisiones abiertas que quedan:**
+
+1. **Renewal notification lead time**: ¿30 / 60 / 90 dias antes del vencimiento emitir `commercial.service.renewal_due`? Multi-valor (ej. 90 dias primera alerta + 30 dias recordatorio + 7 dias final) es estandar enterprise.
+2. **Bundle-level discount vs line-level**: ¿un bundle aplica descuento como unidad (15% off total del bundle) o los descuentos siguen siendo line-level agregados? Line-level es mas simple; bundle-level es mas intuitivo para upsell.
+3. **Tax engine LATAM per-pais vs generico**: sub-motor por pais (Colombia IVA, Mexico IVA, Peru IGV) preserva matices locales (ej. retencion en fuente en Colombia, IEPS en Mexico) pero multiplica mantenimiento. Motor generico parametrico escala mejor si los IVAs de LATAM son esencialmente "tasa X sobre base Y".
+4. **Rich text editor admin UI**: ¿TipTap, Slate, Lexical? TipTap tiene mejor comunidad React + ProseMirror underneath; Lexical (Meta) es mas nuevo y mas rapido pero menos plugins.
+5. **QR en PDF — destino del link**: ¿pagina publica de la cotizacion en el portal (requires `/public/quote/[quotationId]/[versionNumber]/[signedToken]`) o pagina privada con autenticacion? Publica es mejor UX para verificacion; privada es mas seguro.
+6. **Sub-brand detection en PDF**: ¿por `business_line_code` del quote header, o por mayoria de las lineas (cada line item puede venir de un business_line distinto)? Header es mas simple; lineas mezcladas son raras pero posibles.
+7. **Legal entity dinamica**: ¿hardcodear "Efeonce Group SpA" en el PDF o leerlo dinamicamente desde `greenhouse_core.organizations` where `is_operating_entity=TRUE`? Dinamico permite que si cambia la razon social mañana, los quotes nuevos reflejan sin rebuild. Hardcoded es mas simple.
 
 ## Criterio "ready for task"
 
