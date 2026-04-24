@@ -1,8 +1,9 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-24 por Julio + Claude
+> **Actualizado:** 2026-04-24 — Delta 1.1 incorpora business context confirmado (renewal via service catalog, SaaS bundles, footprint LATAM) + hallazgo del service catalog como proto-bundle engine
 > **Status:** Active
 > **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync
 > **Documentacion tecnica relacionada:**
@@ -23,6 +24,52 @@ Esta investigacion surge del cierre del programa TASK-587 (Product Catalog Full-
 2. **Muestreo live** contra portal HubSpot (48713323): `GET /crm/v3/properties/products/*` para validar opciones reales y `GET /crm/v3/objects/products?limit=100` para agregados post-backfill.
 3. **Mapeo contra CPQ canonico** — 7 dimensiones (Product Catalog, Quote Config, Pricing, Document, CRM, Quote-to-Cash, Analytics).
 4. **Clasificacion de hallazgos** en 3 categorias: **robustez** (data consistency), **funcional** (features vs mercado), **cosmeticos** (deuda tecnica sin impacto de negocio).
+
+## Delta 2026-04-24 (v1.1) — Business Context Confirmado
+
+Post-revision del service catalog con el owner del producto, se confirman 4 inputs que **cambian la priorizacion del plan**:
+
+1. **Service Catalog es el vehiculo para bundles** — no se va a replicar Salesforce CPQ ni construir un motor de bundle desde cero. La tabla `greenhouse_commercial.service_modules` + `service_role_recipe` + `service_tool_recipe` ya es un **proto-bundle engine** (composite products: un service SKU contiene roles + tools con quantity + optional flag + pass-through flag). `expandServiceIntoQuoteLines()` ya expande servicios a multiples quote lines via `pricing-engine-v2`.
+2. **Renewal es un must-have** con base actual ya funcional: `service_modules.default_duration_months` + `commercial_model='on_going'` ya persisten el concepto. Falta el schedule engine + co-term + amendment.
+3. **SaaS bundles entran en roadmap** — requiere motor `pricingModel=volume|graduated` (hoy engine es `flat` only) + licencias con periodos recurrentes formales.
+4. **LATAM multi-pais confirmado** — FX ya multi-moneda (6 codigos: CLP, USD, CLF, COP, MXN, PEN). Tax engine multi-pais sube en prioridad (hoy solo IVA Chile).
+
+### Hallazgo — Service Catalog como proto-bundle
+
+Revision de `src/lib/commercial/service-catalog-{store,expand,constraints}.ts`:
+
+| Capability bundle CPQ | Estado service catalog | Gap |
+|---|---|---|
+| Parent container (bundle SKU) | ✅ `service_modules.service_sku` | — |
+| Child components | ✅ `service_role_recipe` + `service_tool_recipe` | — |
+| Quantity per component | ✅ `hours_per_period` + `quantity` | — |
+| Optional flag | ✅ `is_optional` | — |
+| Override at quote time | ✅ `ServiceLineOverride` en `expandServiceIntoQuoteLines()` (excluded, qty, hours) | — |
+| Commercial model recurring | ✅ `commercial_model: on_going \| on_demand \| hybrid \| license_consulting` | — |
+| Tier (1-4) | ✅ `tier` column | — |
+| Duration | ✅ `default_duration_months` | — |
+| Pass-through (reventa) | ✅ `pass_through` en tool recipe | — |
+| Business line | ✅ `business_line_code` | — |
+| **Nesting (bundle dentro de bundle)** | ❌ | Gap — service no referencia otro service |
+| **Constraint rules entre components** | ❌ | Gap — no hay "si rol X, tool Y requerido" |
+| **Bundle-level discount** | ⚠️ Hoy se aplica via `globalDiscount`, no por-bundle | Gap menor |
+| **Sync a HubSpot como bundle** | ❌ `hubspot_bundle_type='none'` hardcoded | Gap — HS si soporta bundles |
+| **Renewal schedule engine** | ❌ | Gap — `default_duration_months` persiste pero no hay cron/event que genere renewal quote |
+| **Amendment / co-term** | ❌ | Gap |
+
+**Conclusion:** no se construye "bundles desde cero"; se **extiende service_catalog** con: nesting, constraint rules, HubSpot bundle sync, renewal engine, amendment. Reduce esfuerzo 60-70% vs disenar desde cero y aprovecha tests existentes (`service-catalog-constraints.test.ts`, `service-catalog-expand.test.ts`).
+
+### Confirmacion de decisiones abiertas
+
+| Decision | Resolucion | Racional |
+|---|---|---|
+| Bundle model | **Extender service_catalog** (NO replicar Salesforce) | Proto-bundle ya existe; 70% del camino hecho |
+| Renewal trigger | **Event-based + cliente-driven combinado** | Cron por `default_duration_months` expira + boton opcional en portal para adelantar |
+| Tax engine | **Extender Chile IVA incrementalmente** a otros paises LATAM (Colombia IVA, Mexico IVA, Peru IGV) antes de Avalara | Cada pais LATAM tiene su enum tributario; Avalara solo cuando escales fuera de LATAM |
+| Analytics stack | **In-portal Next.js + BQ** | Dashboards nativos aprovechan permisos del portal; sin overhead Metabase |
+| eSignature | **DocuSign only en Fase 1** | Mayor cobertura LATAM; Adobe Sign si cliente enterprise lo pide |
+
+Con estas decisiones cerradas, el plan pasa de "hipotetico" a "accionable" — las tasks P0/P1 arrancan sin blockers.
 
 ## Hallazgos principales
 
@@ -135,18 +182,21 @@ Impacto: previene clase de bugs con volumen. Sin urgencia hoy pero acumula debt.
 
 ### P2 — Funcionales priorizadas por impacto agency
 
-Ordenadas por ROI para modelo agency-LATAM actual:
+Re-priorizadas post-Delta v1.1 con business context confirmado (renewal must-have, SaaS bundles, LATAM multi-pais). Ordenadas por ROI estrategico:
 
-| ID | Spec candidato | Gap | Esfuerzo | Por que primero |
+| ID | Spec candidato | Gap | Esfuerzo | Por que en este orden |
 |---|---|---|---|---|
-| **P2.1** | TASK-619 — eSignature integration (DocuSign primero) | F3 | 2 sprints | Cierra loop quote-to-signed, elimina "lost in email" |
-| **P2.2** | TASK-620 — Bundles + config rules engine (MVP) | F1 | 3 sprints | Permite vender "paquetes retainer + tools" sin hacks. Encaja en modelo agency (upsells). |
-| **P2.3** | TASK-621 — Analytics dashboards (win/loss + velocity + discount) | F13 | 2 sprints | Usa BQ ya existente; multiplica visibilidad comercial |
-| **P2.4** | TASK-622 — Multi-level approval con escalation matrix | F4 | 2 sprints | Prep para cuando equipo comercial crezca |
-| **P2.5** | TASK-609 — AI quote draft (ya registrada, apunta a F5/F7) | F5 + F7 | 2-3 sprints | Reduce onboarding SDR; diferenciador premium |
-| **P2.6** | TASK-623 — Tier/volume pricing en engine | F2 | 2 sprints | Necesario para retainers con descuento por commitment |
-| **P2.7** | TASK-624 — Renewal management + co-term | F6 | 3 sprints | Critico cuando retainers >30% del libro |
-| **P2.8** | TASK-625 — Multi-language doc (ES/EN primero) | F12 | 1 sprint | Habilita cuentas Globe internacionales |
+| **P2.1** | TASK-619 — eSignature DocuSign integration | F3 | 2 sprints | Cierra loop quote-to-signed, mejora cobranza. DocuSign cubre LATAM; Adobe queda opcional cuando un cliente enterprise lo requiera. |
+| **P2.2** | TASK-623 — Tier/volume/graduated pricing en engine | F2 | 2 sprints | **Prerequisite para SaaS bundles + renewals maduros.** Hoy engine es flat-only, bloquea vender licencias con commitment discounts. |
+| **P2.3** | TASK-620 — Service catalog como bundle CPQ (extension) | F1 | 2 sprints | **NO construir desde cero**: extender `service_modules` con (a) sync a HubSpot como bundle real (desbloquea `hubspot_bundle_type='open'`), (b) bundle-level discount, (c) constraint rules entre role+tool recipes. Aprovecha 70% del modelo ya implementado. |
+| **P2.4** | TASK-624 — Renewal engine + co-term | F6 | 3 sprints | **Must-have confirmado.** Base ya existe (`default_duration_months` + `on_going` model). Requiere: cron que detecta expiracion, emite `commercial.service.renewal_due` event, genera renewal quote automatica con opcion de override. Co-term para agrupar renewals en un solo quote date. |
+| **P2.5** | TASK-626 — Tax engine LATAM extendido (Colombia IVA + Mexico IVA + Peru IGV) | F10 | 2 sprints | **LATAM confirmado.** Extender buckets tributarios actuales (Chile IVA 19%) a los 4 paises de la matriz FX (CLP/COP/MXN/PEN). Mantener el motor propio; Avalara solo si escalas fuera de LATAM. |
+| **P2.6** | TASK-625 — Multi-language doc (ES/EN) | F12 | 1 sprint | LATAM empuja ingles para accounts cross-border (Mexico + Colombia frecuentemente bilingues). |
+| **P2.7** | TASK-609 — AI quote draft (ya registrada) | F5 + F7 | 2-3 sprints | Aprovecha bundles (P2.3) + renewal history (P2.4) como input al modelo — si se hace antes de P2.3/P2.4 el AI no tiene features ricas que aprender. |
+| **P2.8** | TASK-621 — Analytics dashboards (win/loss + velocity + discount + renewal rate + MRR) | F13 | 2 sprints | Despues de P2.4 hay metricas de MRR/renewal rate que hoy no existen; vale mas hacerlo con data completa. |
+| **P2.9** | TASK-622 — Multi-level approval con escalation | F4 | 2 sprints | Postergable: governance actual basta hasta que equipo comercial crezca 3x. |
+| **P2.10** | TASK-627 — Service bundle nesting (service → service reference) | F1 ext | 1 sprint | Feature avanzada: permite super-bundles como "Retainer Premium = Retainer Base + Add-on Analytics". Despues de P2.3 estable. |
+| **P2.11** | TASK-628 — Amendment / co-term quotes | F11 | 2 sprints | Co-term incluido en P2.4; amendment pura (modificar contrato vigente) puede esperar. |
 
 ### P3 — Polish / deuda tecnica
 
@@ -176,24 +226,29 @@ TASK-611, TASK-612, TASK-613 juntas — cierran los 3 gaps criticos de data cons
 
 TASK-614..618 en paralelo donde posible. Habilita escalamiento seguro de volumen.
 
-### Bloque 3 — P2 por fases
+### Bloque 3 — P2 por fases (actualizado v1.1)
 
-- **Fase 1 (quote-to-cash completo):** TASK-619 (eSignature) + TASK-623 (tier pricing) + TASK-621 (analytics).
-- **Fase 2 (bundles + config):** TASK-620 (bundles MVP) + TASK-609 (AI draft).
-- **Fase 3 (subscription maturity):** TASK-624 (renewals) + TASK-622 (multi-approval).
-- **Fase 4 (internacionalizacion):** TASK-625 (i18n).
+- **Fase 1 — Ciclo comercial completo:** TASK-619 (eSignature) + TASK-623 (tier pricing engine).
+- **Fase 2 — Bundles + Renewals (el corazon SaaS):** TASK-620 (service catalog como bundle CPQ) + TASK-624 (renewal engine + co-term). **Orden:** bundles primero, renewals despues, porque renewals necesitan bundles estables como unidad de renovacion.
+- **Fase 3 — LATAM expansion:** TASK-626 (tax engine Colombia/Mexico/Peru) + TASK-625 (multi-language ES/EN).
+- **Fase 4 — Intelligence + Analytics:** TASK-609 (AI quote draft con bundles + renewals como features) + TASK-621 (dashboards con MRR + renewal rate).
+- **Fase 5 — Scale (diferibles):** TASK-622 (multi-level approval) + TASK-627 (bundle nesting) + TASK-628 (amendment).
 
 ### Bloque 4 — P3 + OP
 
 Oportunistico — ir resolviendo mientras se ejecutan los bloques 1-3.
 
-## Decisiones abiertas para validar
+## Decisiones abiertas
 
-1. **Alcance eSignature**: DocuSign only o DocuSign + Adobe Sign? Costo vs coverage de clientes.
-2. **Bundle model**: ¿replicar pattern Salesforce (productOptions + constraintRules) o modelo propio mas simple para agency (templates + line presets)?
-3. **Renewal trigger**: ¿event-based (cron vs fecha_fin_contrato) o cliente-driven (boton en portal)?
-4. **Tax engine**: construir motor propio extendiendo el de Chile IVA, o integrar Avalara cuando pasemos 3+ paises?
-5. **Analytics stack**: dashboards dentro del portal (Next.js + BQ) o Metabase/Looker dedicado?
+Las 5 decisiones fundacionales se cerraron en la Delta v1.1 (ver tabla arriba). Quedan las siguientes decisiones de segundo orden:
+
+1. **Nesting de bundles (service → service)**: ¿recursivo (N niveles) o limitado a 1 nivel? Limitacion 1 nivel simplifica pricing engine y previene ciclos infinitos; recursivo habilita super-bundles complejos pero agrega complejidad exponencial.
+2. **Renewal notification lead time**: ¿30 / 60 / 90 dias antes del vencimiento emitir el event `commercial.service.renewal_due`? Depende de velocidad de aprobacion del cliente.
+3. **Co-term policy**: ¿alinear todos los renewals a fecha comun por cliente (co-term estricto), o permitir varios vencimientos paralelos con opcion de agrupar manualmente? Salesforce soporta ambos; preferencia operativa.
+4. **Bundle-level discount vs line-level**: ¿un bundle aplica descuento como unidad (ej. 15% off total del bundle) o los descuentos siguen siendo line-level agregados? Line-level es mas simple; bundle-level es mas intuitivo para upsell.
+5. **Amendment vs re-quote**: ¿extender el quote vigente con un amendment (mantiene contrato original) o emitir un nuevo quote que supersede al anterior? Implicancias legales + contables.
+6. **Tax engine LATAM per-pais**: ¿un sub-motor por pais (Colombia IVA, Mexico IVA, Peru IGV) o un motor generico parametrico? El generico escala mejor pero pierde matices locales (ej. retencion en Colombia).
+7. **Constraint rules para bundles**: ¿DSL propio en DB (tabla `bundle_constraints` con operators AND/OR/NOT) o codigo TS declarativo? DB es mas flexible para admins; TS es mas testable.
 
 ## Criterio "ready for task"
 
