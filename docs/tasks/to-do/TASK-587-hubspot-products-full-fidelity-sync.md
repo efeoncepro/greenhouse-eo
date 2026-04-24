@@ -92,10 +92,34 @@ Reglas obligatorias:
 - `ref.currencies` (o equivalente registrado en FX platform) [verificar exacto schema]
 - `TASK-347` ✅ — Cost Field Leak Guard (este task lo modifica parcialmente para COGS, ver Detailed Spec § Governance)
 
+### Sequencing + dependencias externas
+
+**TASK-574 es prerequisito para Fases C, D, E** (cualquier cambio al middleware `hubspot-greenhouse-integration`). Sin TASK-574 cerrada, esas fases requieren PRs cross-repo al sibling `cesargrowth11/hubspot-bigquery` que tiene 0 CI/CD y deploy 100% manual — alta fricción operativa.
+
+Orden recomendado:
+
+```
+[TASK-574 absorb middleware]          ────┐
+                                          │
+[TASK-601 Fase A schema] ─ [TASK-602 Fase B prices] ──┤ (pueden correr en paralelo)
+                                          │           │
+                                          └───────────┤
+                                                      ▼
+                             [TASK-603 Fase C outbound v2]
+                                          │
+                                          ▼
+                             [TASK-604 Fase D inbound v2]
+                                          │
+                                          ▼
+                             [TASK-605 Fase E UI + governance]
+```
+
+Fases A y B (TASK-601, TASK-602) son 100% PostgreSQL + TS interno — se pueden arrancar en paralelo con TASK-574 sin esperar.
+
 ### Coordina con
 
-- `TASK-574` — Absorber Cloud Run `hubspot-greenhouse-integration` en `services/`. Si TASK-574 cierra antes que Fase C de este task, el contrato v2 vive en monorepo. Si no, requiere PR cross-repo al sibling [verificar status TASK-574 al iniciar Discovery].
-- `TASK-575` — Upgrade HubSpot Developer Platform 2026.03 (ortogonal pero suma surface)
+- `TASK-574` — Absorber Cloud Run `hubspot-greenhouse-integration` en `services/` (prerequisito de C/D/E)
+- `TASK-575` — Upgrade HubSpot Developer Platform 2026.03 (ortogonal, no bloquea)
 
 ### Blocks / Impacts
 
@@ -164,7 +188,15 @@ Reglas obligatorias:
 
 ## Scope
 
-> **Naturaleza umbrella**: cada slice debe convertirse en child task `TASK-###` durante Discovery, siguiendo el patrón de TASK-534 (Party Lifecycle) y TASK-544 (Product Catalog Program). Los IDs de los hijos se asignan al iniciar Discovery.
+> **Naturaleza umbrella**: 5 child tasks ya reservadas, siguiendo el patrón de TASK-534 (Party Lifecycle) y TASK-544 (Product Catalog Program).
+>
+> | Fase | Child task | Effort |
+> |---|---|---|
+> | A — Canonical Model Extension + Ref Tables | [TASK-601](docs/tasks/to-do/TASK-601-product-catalog-schema-extension-ref-tables.md) | Medio |
+> | B — Multi-Currency Price Normalization | [TASK-602](docs/tasks/to-do/TASK-602-product-catalog-multi-currency-prices.md) | Medio |
+> | C — Outbound Contract v2 + COGS Unblock | [TASK-603](docs/tasks/to-do/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md) | Alto |
+> | D — Inbound Rehydration + Owner + Drift | [TASK-604](docs/tasks/to-do/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md) | Medio |
+> | E — Admin UI + Backfill + Reconcile + Governance | [TASK-605](docs/tasks/to-do/TASK-605-product-catalog-admin-ui-backfill-governance.md) | Alto |
 
 ### Slice A — Canonical Model Extension
 
