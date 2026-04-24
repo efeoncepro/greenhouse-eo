@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — documentación cloud alineada a auditoría live (Codex)
+
+- **Scope**
+  - alinear la documentación viva con la auditoría live de GCP / PostgreSQL del `2026-04-23`
+  - dejar un documento funcional corto en `docs/documentation/`
+- **Documentos actualizados**
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+  - `docs/documentation/README.md`
+  - nuevo: `docs/documentation/operations/postura-cloud-gcp.md`
+- **Cambios documentales clave**
+  - Cloud SQL ya no se documenta como `0.0.0.0/0` + SSL opcional; queda reflejado el baseline live:
+    - `authorizedNetworks` vacía
+    - `sslMode=ENCRYPTED_ONLY`
+    - hardening pendiente en `connectorEnforcement`, `deletionProtection` e IP pública
+  - el inventario cloud se rebaselinea a:
+    - `13` servicios serverless
+    - `16` jobs Scheduler
+    - `29` secretos
+    - `13` datasets BigQuery
+    - PostgreSQL live con `261` tablas base, `18` views, `148 MB`
+  - queda explícito el riesgo mixto actual:
+    - servicios legacy con default compute SA
+    - servicios públicamente invocables (`allUsers`)
+    - secretos sensibles aún en env plano
+    - drift real de grants runtime en PostgreSQL
+    - topología compartida staging/production
+- **Validación**
+  - sin cambios de infraestructura
+  - sin rotación de secretos
+  - documentación actualizada contra hallazgos live ya auditados en GCP / DB
+
 ## Sesion 2026-04-23 — TASK-584 cerrada: resiliencia de `pg-connect.sh` + preflight de red + taxonomía de errores (Claude)
 
 - **Diagnóstico corregido vs el abierto inicial por Codex**

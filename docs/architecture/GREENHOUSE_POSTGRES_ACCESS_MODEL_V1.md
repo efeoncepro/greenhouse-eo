@@ -1,5 +1,18 @@
 # Greenhouse PostgreSQL Access Model V1
 
+## Delta 2026-04-23 — Auditoria live confirma drift de DDL en runtime
+
+- La auditoría live del `2026-04-23` confirmó que `greenhouse_app` todavía reporta `can_create=true` en:
+  - `greenhouse_serving`
+  - `greenhouse_payroll`
+- Ese estado contradice el modelo canónico de este documento y la reconciliación versionada de grants.
+- Regla explícita:
+  - no documentar ni usar ese acceso como si fuera comportamiento aprobado
+  - tratarlo como drift operativo hasta que los grants reales vuelvan a alinearse con el contrato
+- Consecuencia:
+  - cualquier excepción de write/DDL desde runtime debe seguir siendo estrecha, per-table y documentada
+  - `greenhouse_serving` no pasa a ser writable por defecto solo porque hoy el grant efectivo haya derivado a eso
+
 ## Delta 2026-04-23 — Projection-owned serving writes now require an explicit runtime contract
 
 - `greenhouse_serving` sigue siendo read-only por defecto para `greenhouse_runtime`; los writes desde runtime/worker siguen siendo excepciones estrechas, no una regla general del schema.
@@ -108,9 +121,15 @@ await withTransaction(async client => {
   - preview `version=7638f85` respondió `Cloud SQL reachable` vía `instanceConnectionName=efeonce-group:us-east4:greenhouse-pg-dev`
   - el path usó WIF y no SA key
 - Estado transicional todavía vigente:
-  - el entorno compartido `dev-greenhouse.efeoncepro.com` sigue observándose con host directo en lugar de connector
-  - Cloud SQL externo aún no fue endurecido (`0.0.0.0/0`, SSL opcional)
-  - no retirar el fallback ni cerrar el host path hasta validar ese entorno compartido
+  - el runtime canonical sigue siendo Connector-first
+  - Cloud SQL ya quedó endurecido a nivel de red/SSL:
+    - `authorizedNetworks` vacía
+    - `sslMode=ENCRYPTED_ONLY`
+  - el remanente ya no es “cerrar `0.0.0.0/0`”, sino:
+    - `connectorEnforcement=NOT_REQUIRED`
+    - topología shared entre staging y production
+    - tooling legacy que aún conserva carriles host/proxy
+  - no asumir que el hardening de red resuelve por sí solo el drift de grants o la separación de ambientes
 
 ## Purpose
 

@@ -2,9 +2,42 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-28
+> **Last updated:** 2026-04-23
 > **Audience:** Platform engineers, security reviewers, on-call operators
 > **Companion doc:** `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (resource inventory)
 > **Task track:** TASK-096, TASK-098 through TASK-103 (Cloud Posture Hardening 1–7)
+
+---
+
+## Delta 2026-04-23 — Auditoria live actualiza la postura real y baja el optimismo documental
+
+La postura cloud ya no puede describirse como “WIF + Secret Manager + Cloud SQL endurecido” sin matices. La auditoria live del `2026-04-23` confirmó una realidad mixta.
+
+Lo que sí está mejor:
+
+- Cloud SQL ya no expone `authorizedNetworks=0.0.0.0/0`
+- `sslMode=ENCRYPTED_ONLY` ya está activo
+- `ops-worker` y `commercial-cost-worker` ya corren con:
+  - SA dedicada `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+  - invocación OIDC desde Cloud Scheduler
+  - secretos resueltos desde Secret Manager
+
+Lo que sigue siendo riesgo vivo:
+
+- parte del runtime legacy sigue en la default compute service account
+- al menos `hubspot-greenhouse-integration` y `notion-bq-sync` siguen públicamente invocables (`allUsers`)
+- `ico-batch-worker` mantiene `GREENHOUSE_POSTGRES_PASSWORD` en env plano
+- varias Functions legacy mantienen tokens sensibles en env plano
+- staging y production siguen compartiendo la misma Cloud SQL y parte de los mismos workers
+- el runtime PostgreSQL aún presenta drift de privilegios (`greenhouse_app` puede `CREATE` en `greenhouse_serving` y `greenhouse_payroll`)
+
+Regla documental nueva:
+
+- este documento debe describir la postura **mixta** actual
+- no debe dar por “cerrado” el hardening solo porque una parte del stack moderno ya quedó bien aterrizada
+- cuando se hable de Greenhouse cloud posture, diferenciar explícitamente:
+  - capa moderna
+  - capa legacy
 
 ---
 
@@ -187,7 +220,10 @@ Regla vigente:
 - La postura externa todavía sigue transicional:
   - el repo ya soporta WIF/OIDC
   - el rollout externo WIF ya existe en GCP/Vercel y quedó validado en un preview real (`version=7638f85`) con BigQuery + Cloud SQL Connector OK y sin SA key
-  - pero `greenhouse-pg-dev` sigue con `0.0.0.0/0`, `ALLOW_UNENCRYPTED_AND_ENCRYPTED` y `requireSsl=false`
+  - la parte de Cloud SQL que antes seguía abierta ya quedó endurecida:
+    - `authorizedNetworks` vacía
+    - `sslMode=ENCRYPTED_ONLY`
+    - `requireSsl=false`
   - además sigue habiendo drift de ambientación:
     - el drift de `\n` en las variables activas del rollout WIF/conector ya fue corregido
     - el mapping del entorno compartido ya quedó aclarado: `dev-greenhouse.efeoncepro.com` sí es `staging`
@@ -235,47 +271,46 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 
 ---
 
-## 2. Current State Assessment (March 2026)
+## 2. Current State Assessment (April 2026 live audit)
 
 ### 2.1 Platform Profile
 
-| Dimension           | Value                                                             |
-| ------------------- | ----------------------------------------------------------------- |
-| GCP Project         | `efeonce-group`                                                   |
-| Vercel Team         | Efeonce Group                                                     |
-| API Routes          | 238                                                               |
-| Cron Jobs           | 18 (Vercel) + 4 (Cloud Scheduler)                                 |
-| Cloud Run/Functions | 10 services                                                       |
-| PostgreSQL schemas  | 9                                                                 |
-| BigQuery datasets   | 13 (200+ tables)                                                  |
-| Secrets             | 18 total (6 critical)                                             |
-| Active developers   | 1                                                                 |
-| Data sensitivity    | High — payroll, compensation, identity, tax documents (SII/Nubox) |
+| Dimension | Value |
+| --- | --- |
+| GCP Project | `efeonce-group` |
+| Vercel Team | Efeonce Group |
+| Cloud Run / Functions | `13` servicios (`5` Cloud Run custom + `8` legacy/Functions Gen 2) |
+| Cloud Scheduler | `16` jobs activos |
+| Cloud SQL | `1` instancia compartida (`greenhouse-pg-dev`) |
+| PostgreSQL live | `261` tablas base, `18` views, `148 MB` |
+| BigQuery | `13` datasets |
+| Secrets | `29` secretos en Secret Manager |
+| Data sensitivity | High — payroll, compensation, identity, tax documents, third-party tokens |
 
-### 2.2 Security Scorecard (Pre-Hardening)
+### 2.2 Security Scorecard (Live posture)
 
-| Dimension            | Score | Key Gap                                                                                                                                                           |
-| -------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Secret Management    | 5/10  | El rollout WIF ya existe y quedó validado en preview real, pero la SA key sigue como fallback transicional y falta alinear el entorno compartido + retirar la key |
-| Network Security     | 1/10  | Cloud SQL open to `0.0.0.0/0`, optional SSL                                                                                                                       |
-| Security Headers     | 1/10  | No middleware.ts, no CSP/HSTS/X-Frame                                                                                                                             |
-| Observability        | 1/10  | `console.error()` only, zero external alerting                                                                                                                    |
-| CI/CD Validation     | 3/10  | Lint + build only, 86 test files not in CI                                                                                                                        |
-| API Auth Consistency | 4/10  | 2 inconsistent cron auth patterns, no timing-safe                                                                                                                 |
-| Database Resilience  | 8/10  | PITR, WAL retention, slow query logging, pool `15` y restore test manual ya quedaron verificados                                                                  |
-| Cost Visibility      | 0/10  | No budget alerts, no BigQuery cost guards                                                                                                                         |
+| Dimension | Score | Key Gap |
+| --- | --- | --- |
+| Secret Management | 6/10 | existe Secret Manager y varios consumers modernos ya usan refs, pero la capa legacy todavía mantiene tokens/passwords sensibles en env plano |
+| Network Security | 6/10 | Cloud SQL ya no está abierto por red y SSL ya es obligatorio, pero sigue con IP pública, sin connector enforcement y sin deletion protection |
+| Runtime Identity Isolation | 3/10 | varias integraciones legacy siguen en la default compute SA con permisos demasiado amplios |
+| Service Exposure | 4/10 | persisten servicios con `allUsers` como invoker |
+| Database Governance | 4/10 | el runtime PostgreSQL todavía tiene drift real de grants frente al modelo canónico |
+| Database Resilience | 8/10 | PITR, WAL retention, slow query logging y restore test siguen siendo puntos fuertes |
+| Cost / Data Footprint | 6/10 | BigQuery está contenido, pero la gobernanza de datasets legacy y retención aún es dispareja |
 
 ### 2.3 Threat Model
 
-| Threat                             | Current Exposure                                                                     | Impact                                           |
-| ---------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| SA key leak (env var exfiltration) | **High** — la SA key sigue existiendo como fallback aunque el repo ya soporte WIF    | Full GCP compromise                              |
-| Cloud SQL brute force              | **High** — `0.0.0.0/0` + optional SSL + password runtime en env var                  | Database compromise (payroll, identity, finance) |
-| XSS / Clickjacking                 | **Medium** — no CSP, no X-Frame-Options                                              | Session hijacking, data exfiltration             |
-| Cron route spoofing                | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret)             | Unauthorized data mutation                       |
-| BigQuery cost bomb                 | **Medium** — no `maximumBytesBilled`                                                 | $5-50 per accidental full-scan                   |
-| Silent production failure          | **High** — zero alerting on cron/webhook/projection failures                         | Data inconsistency, delayed detection            |
-| Backup unusable                    | **Low** — PITR ya existe y el restore test manual quedó verificado con clone efímero | Unable to recover from corruption                |
+| Threat | Current Exposure | Impact |
+| --- | --- | --- |
+| Default compute SA compromise | **High** — varios servicios legacy dependen de una identidad demasiado amplia | lateral movement sobre secretos/datasets/servicios |
+| Public service invocation | **High** — existen servicios Cloud Run con `allUsers` | ejecución no deseada, abuso de endpoints internos |
+| Plaintext secret leakage | **High** — parte del runtime legacy y `ico-batch-worker` aún cargan secretos en env plano | compromiso de integraciones, DB o tokens operativos |
+| PostgreSQL privilege drift | **High** — `greenhouse_app` conserva permisos más amplios de los documentados | writes o DDL fuera del contrato esperado |
+| Shared env blast radius | **High** — staging y production siguen compartiendo Cloud SQL y parte del runtime | errores operativos cross-ambiente |
+| XSS / Clickjacking | **Medium** — no CSP, no X-Frame-Options | session hijacking, data exfiltration |
+| BigQuery cost / retention drift | **Medium** — datasets legacy concentran volumen sin una postura fuerte de lifecycle | costos y gobierno de datos degradados |
+| Backup unusable | **Low** — PITR y restore test siguen verificados | unable to recover from corruption |
 
 ---
 
@@ -285,7 +320,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 
 #### Principle: Eliminate static credentials, not centralize them
 
-The goal is **not** to move all 18 env vars to Secret Manager — that's overhead without proportional security gain. The strategy is:
+The goal is **not** to move every config value to Secret Manager. The strategy is:
 
 1. **Eliminate the highest-risk credential** (SA key) via Workload Identity Federation
 2. **Protect the 6 critical secrets** via Secret Manager with audit logging
@@ -332,13 +367,13 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 
 #### Secret Classification
 
-| Tier                   | Criteria                                     | Storage                     | Rotation          | Audit            | Count                       |
-| ---------------------- | -------------------------------------------- | --------------------------- | ----------------- | ---------------- | --------------------------- |
-| **Critical**           | Compromise = financial/legal/identity damage | GCP Secret Manager          | Future: automated | Cloud Audit Logs | 6                           |
-| **Standard**           | Compromise = limited blast radius            | Vercel env vars (encrypted) | Manual            | Vercel audit log | 10                          |
-| **Target elimination** | Replaced by keyless auth after rollout       | N/A                         | N/A               | N/A              | 2 (SA key + base64 variant) |
+| Tier | Criteria | Storage | Rotation | Audit |
+| --- | --- | --- | --- | --- |
+| **Critical** | compromise = financial/legal/identity damage | GCP Secret Manager | future: automated | Cloud Audit Logs |
+| **Standard** | compromise = limited blast radius | env vars cifrados solo cuando el consumer no puede resolver Secret Manager todavía | manual | Vercel / service audit logs |
+| **Target elimination** | credencial reemplazable por identidad keyless | N/A | N/A | N/A |
 
-**Critical secrets (Secret Manager):**
+**Critical secrets (Secret Manager preferred):**
 
 1. `GREENHOUSE_POSTGRES_PASSWORD` (runtime)
 2. `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD`
@@ -347,7 +382,7 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 5. `AZURE_AD_CLIENT_SECRET`
 6. `NUBOX_BEARER_TOKEN`
 
-**Standard secrets (Vercel env vars):**
+**Standard / transicionales (mientras no se migren todos los consumers):**
 
 - `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `GREENHOUSE_INTEGRATION_API_TOKEN`, `CRON_SECRET`, `HR_CORE_TEAMS_WEBHOOK_SECRET`, `NUBOX_X_API_KEY`, `SLACK_ALERTS_WEBHOOK_URL`, `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`
 
@@ -390,16 +425,22 @@ Error occurs
 
 #### Cloud SQL Network Hardening
 
-```
-Before:  0.0.0.0/0 → Cloud SQL (any IP, optional SSL)
-After:   Vercel IPs + Cloud Run NAT + Dev VPN → Cloud SQL (restricted, SSL enforced)
-```
+La auditoría live cambia la foto:
 
-| Control             | Before                            | After                                            |
-| ------------------- | --------------------------------- | ------------------------------------------------ |
-| Authorized networks | `0.0.0.0/0`                       | Vercel egress CIDRs + Cloud Run NAT IP + dev VPN |
-| SSL mode            | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` | `ENCRYPTED_ONLY`                                 |
-| Cloud SQL Connector | Available, not mandatory          | Preferred for all runtime connections            |
+- `authorizedNetworks` ya está vacía
+- `sslMode` ya es `ENCRYPTED_ONLY`
+- el hardening pendiente ya no es “cerrar \`0.0.0.0/0\`”, sino:
+  - evaluar si la IP pública sigue siendo necesaria
+  - mover `connectorEnforcement` a una postura más estricta
+  - activar `deletionProtection`
+
+| Control | Current state | Target |
+| --- | --- | --- |
+| Authorized networks | vacía | mantener vacía |
+| SSL mode | `ENCRYPTED_ONLY` | mantener |
+| Cloud SQL Connector | disponible, preferido | exigirlo para runtime y tooling moderno cuando sea viable |
+| Public IP | habilitada | evaluar retiro si no aporta un carril operativo real |
+| Deletion protection | `false` | activar |
 
 #### Security Headers
 
