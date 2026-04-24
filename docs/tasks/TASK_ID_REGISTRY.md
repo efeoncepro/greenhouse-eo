@@ -662,3 +662,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-606` | `to-do` | Space 360 Motion Consistency & Empty State Follow-up | `docs/tasks/to-do/TASK-606-space-360-motion-consistency-empty-state-followup.md` |
 | `TASK-607` | `to-do` | GitHub Actions Node.js 24 Migration (5 workflows restantes) | `docs/tasks/to-do/TASK-607-github-actions-nodejs-24-migration.md` |
 | `TASK-608` | `to-do` | Product Catalog Price History (effective_at) — follow-up aditivo de TASK-602 | `docs/tasks/to-do/TASK-608-product-catalog-price-history.md` |
+| `TASK-609` | `to-do` | AI Quote Draft Assistant (intent -> canonical draft + QA guardrails) | `docs/tasks/to-do/TASK-609-ai-quote-draft-assistant.md` |

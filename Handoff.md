@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-609 registrada: AI Quote Draft Assistant
+
+### Que cambio
+
+Se registro una task nueva de backlog:
+
+- `TASK-609` — `docs/tasks/to-do/TASK-609-ai-quote-draft-assistant.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Intencion de la task
+
+Formaliza una primera lane de IA para el cotizador con patron CPQ hibrido:
+
+- brief libre -> `quote_intent` estructurado
+- resolucion canonica server-side
+- `resolution_report` con blockers, ambiguedades y readiness
+- integracion revisable en Quote Builder
+
+### Regla arquitectonica explicitada en la task
+
+La IA no reemplaza:
+
+- `pricing-engine-v2`
+- `persistQuotationPricing()`
+- write paths de quotations
+- sync/outbound HubSpot
+
+La IA propone y explica; el core deterministico sigue siendo la fuente de verdad.
+
 ## Sesion 2026-04-24 — TASK-605 CERRADA (MVP): Product Catalog Admin UI + Backfill + Governance → TASK-587 umbrella CERRADA
 
 ### Qué cambió
