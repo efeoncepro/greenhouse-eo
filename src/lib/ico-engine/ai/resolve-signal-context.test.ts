@@ -94,4 +94,66 @@ describe('resolveSignalContext', () => {
 
     expect(getResolvedProjectLabel(context, 'space-2', 'notion-project-1')).toBeNull()
   })
+
+  it('returns null when project_name is null (post-TASK-588 canonical may hold null)', async () => {
+    mockGetDb.mockResolvedValue({
+      selectFrom: (table: string) => {
+        if (table === 'greenhouse_core.spaces') {
+          return createBuilder([{ space_id: 'space-1', space_name: 'Sky Airlines' }])
+        }
+
+        if (table === 'greenhouse_core.members') {
+          return createBuilder([{ member_id: 'member-1', display_name: 'Andres Carlosama' }])
+        }
+
+        if (table === 'greenhouse_delivery.projects') {
+          return createBuilder([
+            {
+              project_record_id: 'project-notion-project-1',
+              notion_project_id: 'notion-project-1',
+              project_name: null,
+              space_id: 'space-1'
+            }
+          ])
+        }
+
+        throw new Error(`Unexpected table ${table}`)
+      }
+    })
+
+    const context = await resolveSignalContext([baseSignal])
+
+    expect(getResolvedProjectLabel(context, 'space-1', 'notion-project-1')).toBeNull()
+  })
+
+  it('rejects sentinel project_name values even if stored (defensive against legacy BQ data)', async () => {
+    mockGetDb.mockResolvedValue({
+      selectFrom: (table: string) => {
+        if (table === 'greenhouse_core.spaces') {
+          return createBuilder([{ space_id: 'space-1', space_name: 'Sky Airlines' }])
+        }
+
+        if (table === 'greenhouse_core.members') {
+          return createBuilder([])
+        }
+
+        if (table === 'greenhouse_delivery.projects') {
+          return createBuilder([
+            {
+              project_record_id: 'project-notion-project-1',
+              notion_project_id: 'notion-project-1',
+              project_name: 'Sin nombre',
+              space_id: 'space-1'
+            }
+          ])
+        }
+
+        throw new Error(`Unexpected table ${table}`)
+      }
+    })
+
+    const context = await resolveSignalContext([baseSignal])
+
+    expect(getResolvedProjectLabel(context, 'space-1', 'notion-project-1')).toBeNull()
+  })
 })

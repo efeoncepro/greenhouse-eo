@@ -2,6 +2,14 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-588 cerrada: resolución de título Notion tolerante a multi-tenant
+
+- El sync canónico deja de asumir que la property title de Notion se llama `nombre_del_proyecto`. Efeonce y Sky Airline tenían el título en columnas distintas (`nombre_del_proyecto` vs `project_name`) → 78 proyectos + 3590 tareas Sky terminaban como `'Sin nombre'` en el canónico y en signals ICO. Fix: cascada COALESCE data-driven sobre las columnas que existen en `INFORMATION_SCHEMA.COLUMNS` por corrida; set conservador de candidatos (solo columnas semánticamente equivalentes).
+- Schema PG: `greenhouse_delivery.projects.project_name` (+ `tasks.task_name` y `sprints.sprint_name`) pasan a nullable. Cleanup batch-safe (`DO $$ LOOP LIMIT 2000 + pg_sleep`) barre `'Sin nombre'` histórico. CHECK constraints `*_name_no_sentinel_chk` prohíben 7 placeholders (es/pt/en, case-insensitive) para que ningún writer futuro pueda reintroducirlos.
+- Observabilidad: el writer canónico emite warnings estructurados a `greenhouse_sync.source_sync_failures` (`error_code='sync_warning_missing_title'`, `retryable=false`) cuando una corrida deja filas con título no resuelto, con `{space_id, count, sample_notion_page_ids}` en `payload_json`. TASK-586 (observabilidad Admin Center) puede consumirlo sin mapping adicional.
+- Resolver ICO (`entity-display-resolution.ts`) como defensa en profundidad: `sanitizeProjectDisplayLabel` rechaza sentinels; `isTechnicalProjectIdentifier` reconoce prefijos `project-/proj-/notion-/task-/sprint-`, 32-hex, UUID y numéricos ≥12 dígitos; `enrichSignalPayload` y `buildRecommendationSignals` filtran `payloadJson.dimensionLabel` histórico en BQ antes de propagarlo a la UI, aunque signals materializados en períodos anteriores aún lo contengan.
+- No toca el Cloud Run externo `notion-bq-sync` ni requiere config por space. No se agregan feature flags — la cascada es determinística (COALESCE de columnas semánticamente equivalentes); si algo se rompe, rollback es `git revert` + `pnpm migrate:down`.
+
 ### 2026-04-23 — TASK-584 cerrada: `pg-connect.sh` resiliente + preflight de red + taxonomía de errores
 
 - `scripts/pg-connect.sh` ahora tiene `trap cleanup EXIT INT TERM` que mata el proxy spawn cuando el script muere a medias en modos one-shot (`--migrate`, `--status`, `--shell`), pero preserva el proxy (disown + `KEEP_PROXY=true`) en modo default `connect` para que el usuario pueda seguir usándolo manualmente — elimina la cadena de fallos `ECONNRESET seguido de ECONNREFUSED 127.0.0.1:15432` que bloqueó a Codex.

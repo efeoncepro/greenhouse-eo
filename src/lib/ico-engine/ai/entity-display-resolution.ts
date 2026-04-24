@@ -21,7 +21,22 @@ export interface ResolvedProjectDisplay {
 
 const PROJECT_SCOPED_KEY_SEPARATOR = '::'
 const PROJECT_ID_MENTION_PATTERN = /@\[((?:[^\]\\]|\\.)+)\]\((member|space|project):([^)]+)\)/g
-const PROJECT_RECORD_ID_PREFIX = 'project-'
+const TECHNICAL_ID_PREFIXES = ['project-', 'proj-', 'notion-', 'task-', 'sprint-'] as const
+
+// Lista canónica de placeholders que NO deben aparecer como nombre humano.
+// Sincronizada con el CHECK constraint de greenhouse_delivery.{projects,tasks,
+// sprints} (migration 20260424082917533_project-title-nullable-sentinel-cleanup).
+// Sentinels históricos en BQ ai_signals pueden contener estos strings — el
+// sanitizer los rechaza para que la UI no los muestre aunque estén persistidos.
+export const PROJECT_DISPLAY_SENTINELS = new Set<string>([
+  'sin nombre',
+  'sin título',
+  'sin titulo',
+  'untitled',
+  'no title',
+  'sem nome',
+  'n/a'
+])
 
 const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -37,7 +52,9 @@ export const isTechnicalProjectIdentifier = (value: string | null | undefined) =
 
   if (!normalized) return false
 
-  if (normalized.startsWith(PROJECT_RECORD_ID_PREFIX)) {
+  const normalizedLower = normalized.toLowerCase()
+
+  if (TECHNICAL_ID_PREFIXES.some(prefix => normalizedLower.startsWith(prefix))) {
     return true
   }
 
@@ -49,13 +66,30 @@ export const isTechnicalProjectIdentifier = (value: string | null | undefined) =
     return true
   }
 
+  // Numéricos largos (IDs HubSpot, IDs de integraciones legacy).
+  if (/^\d{12,}$/.test(normalized)) {
+    return true
+  }
+
   return false
+}
+
+export const isProjectDisplaySentinel = (value: string | null | undefined) => {
+  const normalized = normalizeText(value)
+
+  if (!normalized) return false
+
+  return PROJECT_DISPLAY_SENTINELS.has(normalized.toLowerCase())
 }
 
 const sanitizeProjectDisplayLabel = (value: string | null | undefined) => {
   const normalized = normalizeText(value)
 
-  return normalized && !isTechnicalProjectIdentifier(normalized) ? normalized : null
+  if (!normalized) return null
+  if (isTechnicalProjectIdentifier(normalized)) return null
+  if (isProjectDisplaySentinel(normalized)) return null
+
+  return normalized
 }
 
 export const resolveProjectDisplayBatch = async (

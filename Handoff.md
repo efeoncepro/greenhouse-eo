@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-588 cerrada: project title resolution hardening (Claude)
+
+- **Task:** `TASK-588` → `complete`
+- **Branch:** `task/TASK-588-project-title-resolution-conformed-sync-hardening` → squash merge a `develop`
+- **Root cause cerrado:** el sync canónico hardcodeaba `nombre_del_proyecto` como única fuente del título. Sky Airline (78/78 proyectos + 3590 tareas) usa `project_name` / `nombre_de_la_tarea` en Notion, no `nombre_del_proyecto` / `nombre_de_tarea` como Efeonce. El fix elimina el hardcoding con una cascada COALESCE data-driven vía `INFORMATION_SCHEMA.COLUMNS` — sin requerir config por space, sin tocar el Cloud Run externo `notion-bq-sync`.
+- **Qué quedó shippeado:**
+  - Migración `20260424082917533_project-title-nullable-sentinel-cleanup.sql`: nullable en `greenhouse_delivery.{projects,tasks,sprints}.*_name` + cleanup batch-safe (DO LOOP + pg_sleep, seguro bajo syncs concurrentes) + CHECK constraints anti-sentinel.
+  - Cascada data-driven en `src/lib/sync/sync-notion-conformed.ts` y `scripts/sync-source-runtime-projections.ts`. Set conservador de candidatos (solo columnas semánticamente equivalentes): projects=[`nombre_del_proyecto`,`project_name`]; tasks=[`nombre_de_tarea`,`nombre_de_la_tarea`]; sprints=[`nombre_del_sprint`,`sprint_name`].
+  - Resolver ICO (`entity-display-resolution.ts`) rechaza 7 sentinels (es/pt/en) + amplía detección de IDs técnicos (prefijos `project-/proj-/notion-/task-/sprint-`, numéricos ≥12, 32-hex, UUID). Defensa en profundidad activa sobre signals históricos en BQ sin rematerializar.
+  - Observability: helper `emitMissingTitleWarning` + `countMissingTitles` emiten a `greenhouse_sync.source_sync_failures` con `error_code='sync_warning_missing_title'`, `retryable=false`, payload `{space_id, count, sample_notion_page_ids}`. TASK-586 puede consumirlo sin mapping adicional.
+  - Tests: 3 archivos (nuevos + extendidos). 1885/1885 tests verdes en la suite completa.
+- **Decisión de simplificación tomada en Discovery:** se removió la feature flag `GREENHOUSE_DELIVERY_TITLE_CASCADE_ENABLED` y el shadow run planeados en la spec original. La cascada es determinística (COALESCE entre columnas semánticamente iguales) y la CHECK constraint protege mejor que una env var. Rollback es `git revert` + `pnpm migrate:down` si algo explota.
+- **Estado PG verificado post-migración:**
+  - projects: 0 sentinels, 74 nulls (antes eran 'Sin nombre'), 137 total
+  - tasks: 0 sentinels, 3041 nulls, 4266 total
+  - sprints: 0 sentinels, 0 nulls, 27 total
+  - Sky: 72/72 proyectos activos con `project_name=NULL` esperando rehidratación por el próximo tick del cron notion-sync
+  - Efeonce: 63/63 con título real (no-regression)
+- **Path del Slice 5 (freeze window):** descartado — `replaceBigQuerySignalsForPeriod` hace DELETE+INSERT sin consultar `period_closure_status`, así que el próximo tick de `ico-materialize` (cron con `monthsBack=3` cubre 2026-02) reescribe los 4 signals afectados con `dimensionLabel` correcto una vez que el sync Notion hidrate los títulos. Los guards del resolver ya protegen la UI de signals materializados antes del re-run.
+- **Siguiente tick operativo:** deploy en develop → cron notion-sync rehidrata Sky proyectos → cron ico-materialize reescribe signals. Sin intervención manual adicional.
+
+## Sesion 2026-04-24 — TASK-588 iniciada: project title resolution hardening (Claude)
+
+- **Task tomada:** `TASK-588` → `in-progress`
+- **Branch:** `task/TASK-588-project-title-resolution-conformed-sync-hardening`
+- **Objetivo:** cerrar root cause de signals ICO mostrando `"Sin nombre"` (Sky Airline tiene el title de proyectos en columna `project_name` en Notion; Efeonce lo tiene en `nombre_del_proyecto`. El sync canónico hardcodea una sola columna → 78/78 proyectos Sky quedan con placeholder)
+- **Evidencia diagnóstico (triple capa, 2026-04-24):**
+  - Notion MCP: Sky DB `23039c2fefe7817a8272ffe6be1a696a` usa title property `"Project name"`; Efeonce DB `15288d9b145940529acc75439bbd5470` usa `"Nombre del proyecto"`
+  - BQ `notion_ops.proyectos`: Sky 78/78 con `nombre_del_proyecto=NULL` y `project_name` poblada; Efeonce 65/65 inverso
+  - BQ `ico_engine.ai_signals`: 4 signals `dimension='project'` período 2026-02 con `payloadJson.dimensionLabel='Sin nombre'`, TODOS de Sky
+- **Scope declarado:** 7 slices — kill-switch + shadow run + cascada data-driven via INFORMATION_SCHEMA + migración batch-safe + CHECK constraint anti-sentinel + guards ICO + rematerialize con decisión explícita sobre freeze window
+- **Fase actual:** Discovery
+- **Cierre:** merge directo a develop (squash) al terminar verificación — instrucción explícita del usuario
+
 ## Sesion 2026-04-24 — TASK-585 cost-first: `notion-bq-sync` baja `minScale` a `0` (Codex)
 
 - **Prioridad ejecutada**

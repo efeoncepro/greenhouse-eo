@@ -2689,7 +2689,7 @@ export interface GreenhouseDeliveryProjects {
   page_url: string | null;
   payload_hash: string | null;
   project_database_source_id: string | null;
-  project_name: string;
+  project_name: string | null;
   project_phase: string | null;
   project_record_id: string;
   project_status: string | null;
@@ -2733,7 +2733,7 @@ export interface GreenhouseDeliverySprints {
   project_record_id: string | null;
   source_updated_at: Timestamp | null;
   space_id: string | null;
-  sprint_name: string;
+  sprint_name: string | null;
   sprint_record_id: string;
   sprint_status: string | null;
   start_date: Timestamp | null;
@@ -2861,7 +2861,7 @@ export interface GreenhouseDeliveryTasks {
   sync_run_id: string | null;
   synced_at: Generated<Timestamp>;
   tarea_principal_ids: Generated<string[]>;
-  task_name: string;
+  task_name: string | null;
   task_phase: string | null;
   task_priority: string | null;
   task_record_id: string;

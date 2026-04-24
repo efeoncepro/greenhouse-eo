@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Shipped`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -138,6 +138,60 @@ Reglas obligatorias:
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-04-24 — Discovery + Decisión de simplificación
+
+Supuestos corregidos y decisión de eliminar la feature flag tras auditar el
+código real (no cambian el alcance ni criterios de aceptación materiales, sí
+la implementación):
+
+**Decisión de simplificación: SE REMUEVE la feature flag `GREENHOUSE_DELIVERY_TITLE_CASCADE_ENABLED`
+y el shadow run del Slice 0.**
+
+Razones:
+- La cascada es determinística: `COALESCE(nombre_del_proyecto, project_name)`
+  solo puede elegir entre dos columnas semánticamente equivalentes (ambas
+  son el Notion title property normalizado), no hay escenario "pick incorrecto".
+- El CHECK constraint activo post-migración rechaza sentinels por construcción;
+  protege mejor que una flag porque actúa a nivel base de datos y no depende de env.
+- El canónico `sync-notion-conformed.ts` escribe solo a BQ (sin CHECK); el
+  legacy `sync-source-runtime-projections.ts` escribe a PG pero es CLI-only
+  (invocado manualmente vía `pnpm sync:source-runtime-projections`, sin cron).
+  El CHECK no bloquea operaciones agendadas.
+- Rollback = `git revert` + `pnpm migrate:down` si algo se rompe. Protocol
+  estándar.
+- Shadow mode era para validar "new_value vs legacy_value" pero el cambio ES
+  la corrección: para Sky, new_value es el título real, legacy_value es el
+  placeholder roto. La divergencia ES lo que queremos.
+
+Otros supuestos ajustados:
+
+1. **Observabilidad**: no existe `source_sync_runs.warnings`. Los warnings se
+   emiten a `greenhouse_sync.source_sync_failures` con `retryable=false` y
+   `error_code='sync_warning_missing_title'`, usando `writeFailure` (helper
+   existente en `scripts/sync-source-runtime-projections.ts:744` y variantes
+   en `src/lib/sync/outbox-consumer.ts:88` y `src/lib/nubox/sync-nubox-raw.ts:103`).
+   El `payload_json jsonb` lleva `{space_id, count, sample_notion_page_ids}`.
+2. **Helper de cascada**: NO crear `src/lib/sync/helpers/title-cascade.ts`.
+   El patrón ya existe inline en `sync-notion-conformed.ts:261-286`:
+   `readTableColumns` + `buildRawTaskNameExpression`. Extender con
+   `buildRawProjectNameExpression` y `buildRawSprintNameExpression` en
+   el mismo archivo y replicar el patrón en el script legacy.
+3. **Scope asimétrico entre writers**: el canónico `sync-notion-conformed.ts`
+   YA resuelve tareas correctamente via `COALESCE(nombre_de_tarea, nombre_de_la_tarea)`.
+   Sky usa `nombre_de_la_tarea` y el canónico ya lo captura. Falta cascade
+   para projects (columnas reales: `nombre_del_proyecto`, `project_name`) y
+   sprints (solo `nombre_del_sprint` confirmada, cascade defensivo).
+   El legacy `scripts/sync-source-runtime-projections.ts` NO tiene cascade
+   para ninguno → agregar en los tres.
+
+4. **Volumen confirmado para Slice 1 (batch cleanup)**: Sky tiene 3618 tareas
+   (3590 con `task_name='Sin nombre'` en PG, escritas por el legacy writer),
+   78 proyectos afectados, 0 sprints afectados. El batch cleanup de `tasks`
+   es obligatorio.
+5. **Freeze window no aplica a signals ICO**: `replaceBigQuerySignalsForPeriod`
+   hace DELETE+INSERT sin consultar `period_closure_status`. Slice 5 camino
+   único = Path A (invocar `materializeAiSignals` para 2026-02 sin override).
 
 ## Scope
 

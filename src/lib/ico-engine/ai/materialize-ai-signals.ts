@@ -13,6 +13,7 @@ import { buildAiPredictions } from './predictor'
 import { analyzeAiRootCauses } from './root-cause-analyzer'
 import {
   getResolvedProjectDisplay,
+  isProjectDisplaySentinel,
   isTechnicalProjectIdentifier,
   resolveProjectDisplayBatch
 } from './entity-display-resolution'
@@ -224,15 +225,19 @@ export const buildRecommendationSignals = ({
       continue
     }
 
-    const targetLabel =
+    const rawLabel =
       typeof primaryCause.payloadJson.dimensionLabel === 'string' && primaryCause.payloadJson.dimensionLabel.trim()
         ? primaryCause.payloadJson.dimensionLabel.trim()
         : primaryCause.dimensionId
 
-    const safeProjectLabel =
-      targetLabel && !isTechnicalProjectIdentifier(targetLabel)
-        ? targetLabel
-        : 'este proyecto'
+    // Un label es usable si no es ID técnico y no es sentinel placeholder
+    // (p. ej. "Sin nombre" histórico en BQ antes de TASK-588).
+    const labelIsHuman =
+      Boolean(rawLabel) && !isTechnicalProjectIdentifier(rawLabel) && !isProjectDisplaySentinel(rawLabel)
+
+    const targetLabel = labelIsHuman ? rawLabel : primaryCause.dimensionId
+
+    const safeProjectLabel = labelIsHuman ? rawLabel : 'este proyecto'
 
     const actionSummary =
       primaryCause.dimension === 'member'

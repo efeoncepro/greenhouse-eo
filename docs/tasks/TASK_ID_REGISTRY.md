@@ -641,4 +641,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-585` | `in-progress` | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
 | `TASK-586` | `to-do` | Notion Sync & Billing Export Observability in Admin Center | `docs/tasks/to-do/TASK-586-notion-sync-billing-observability.md` |
 | `TASK-587` | `to-do` | HubSpot Products Full-Fidelity Bidirectional Sync Expansion | `docs/tasks/to-do/TASK-587-hubspot-products-full-fidelity-sync.md` |
-| `TASK-588` | `to-do` | Project Title Resolution Hardening en Conformed Sync (fix ICO "Sin nombre") | `docs/tasks/to-do/TASK-588-project-title-resolution-conformed-sync-hardening.md` |
+| `TASK-588` | `complete` | Project Title Resolution Hardening en Conformed Sync (fix ICO "Sin nombre") | `docs/tasks/complete/TASK-588-project-title-resolution-conformed-sync-hardening.md` |
+| `TASK-589` | `to-do` | Finance Runtime Read Path Decoupling for Clients & Suppliers | `docs/tasks/to-do/TASK-589-finance-runtime-read-path-decoupling-clients-suppliers.md` |

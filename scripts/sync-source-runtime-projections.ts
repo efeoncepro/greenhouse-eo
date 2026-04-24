@@ -780,6 +780,32 @@ const writeFailure = async ({
   )
 }
 
+// Cascade helpers — resolve Notion title tolerando nombres distintos de la
+// property title por database (Efeonce: `Nombre del proyecto`; Sky: `Project
+// name`). Mantener sincronizado con src/lib/sync/sync-notion-conformed.ts.
+const readBigQueryColumns = async (dataset: string, table: string) => {
+  const rows = await runBigQuery<{ column_name: string | null }>(`
+    SELECT column_name
+    FROM \`${projectId}.${dataset}.INFORMATION_SCHEMA.COLUMNS\`
+    WHERE table_name = '${table}'
+  `)
+
+  return new Set(rows.map(row => row.column_name || '').filter(Boolean))
+}
+
+const buildCoalescingTitleExpression = (columns: Set<string>, candidates: readonly string[]) => {
+  const applicable = candidates.filter(column => columns.has(column))
+
+  if (applicable.length === 0) return 'CAST(NULL AS STRING)'
+  if (applicable.length === 1) return `NULLIF(TRIM(\`${applicable[0]}\`), '')`
+
+  return `COALESCE(${applicable.map(column => `NULLIF(TRIM(\`${column}\`), '')`).join(', ')})`
+}
+
+const NOTION_PROJECT_TITLE_CANDIDATES = ['nombre_del_proyecto', 'project_name'] as const
+const NOTION_TASK_TITLE_CANDIDATES = ['nombre_de_tarea', 'nombre_de_la_tarea'] as const
+const NOTION_SPRINT_TITLE_CANDIDATES = ['nombre_del_sprint', 'sprint_name'] as const
+
 const syncNotion = async (): Promise<SyncSummary> => {
   const syncRunId = `sync-notion-${randomUUID()}`
 
@@ -792,6 +818,16 @@ const syncNotion = async (): Promise<SyncSummary> => {
   })
 
   try {
+    const [projectColumns, taskColumns, sprintColumns] = await Promise.all([
+      readBigQueryColumns('notion_ops', 'proyectos'),
+      readBigQueryColumns('notion_ops', 'tareas'),
+      readBigQueryColumns('notion_ops', 'sprints')
+    ])
+
+    const projectTitleExpression = buildCoalescingTitleExpression(projectColumns, NOTION_PROJECT_TITLE_CANDIDATES)
+    const taskTitleExpression = buildCoalescingTitleExpression(taskColumns, NOTION_TASK_TITLE_CANDIDATES)
+    const sprintTitleExpression = buildCoalescingTitleExpression(sprintColumns, NOTION_SPRINT_TITLE_CANDIDATES)
+
     const [projects, tasks, sprints] = await Promise.all([
       runBigQuery<NotionProjectRow>(
         `
@@ -800,7 +836,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             _source_database_id,
             created_time,
             last_edited_time,
-            nombre_del_proyecto,
+            ${projectTitleExpression} AS nombre_del_proyecto,
             resumen,
             estado,
             \`finalización\`,
@@ -823,7 +859,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             space_id,
             created_time,
             last_edited_time,
-            nombre_de_tarea,
+            ${taskTitleExpression} AS nombre_de_tarea,
             estado,
             prioridad,
             \`priorización\`,
@@ -871,7 +907,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             _source_database_id,
             created_time,
             last_edited_time,
-            nombre_del_sprint,
+            ${sprintTitleExpression} AS nombre_del_sprint,
             estado_del_sprint,
             fechas,
             fechas_end,
@@ -1010,7 +1046,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         client_id: clientId,
         module_code: null,
         module_id: null,
-        project_name: toNullableString(row.nombre_del_proyecto) || 'Sin nombre',
+        project_name: toNullableString(row.nombre_del_proyecto),
         project_status: toNullableString(row.estado),
         project_summary: toNullableString(row.resumen),
         completion_label: toNullableString(row['finalización']),
@@ -1117,7 +1153,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         client_id: clientId,
         module_code: null as string | null,
         module_id: null as string | null,
-        task_name: toNullableString(row.nombre_de_tarea) || 'Sin nombre',
+        task_name: toNullableString(row.nombre_de_tarea),
         task_status: toNullableString(row.estado),
         task_phase: toNullableString(row.priorización),
         task_priority: toNullableString(row.prioridad),
@@ -1208,7 +1244,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         project_source_id: sprintSourceId ? sprintProjectMap.get(sprintSourceId) || null : null,
         project_database_source_id: projectDatabaseSourceId,
         space_id: sprintSourceId ? sprintSpaceMap.get(sprintSourceId) || null : null,
-        sprint_name: toNullableString(row.nombre_del_sprint) || 'Sin nombre',
+        sprint_name: toNullableString(row.nombre_del_sprint),
         sprint_status: toNullableString(row.estado_del_sprint),
         start_date: toDateValue(row.fechas),
         end_date: toDateValue(row.fechas_end),
