@@ -81,7 +81,7 @@ Reglas obligatorias:
 - `Handoff.md`
 - `docs/tasks/in-progress/TASK-103-gcp-budget-alerts-bigquery-guards.md`
 - `docs/tasks/complete/TASK-208-delivery-data-quality-monitoring-auditor.md`
-- `docs/tasks/to-do/TASK-585-notion-bq-sync-cost-efficiency-hardening.md`
+- `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md`
 
 ## Dependencies & Impact
 

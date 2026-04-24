@@ -49,6 +49,19 @@ El problema actual no es falta de infraestructura. Es convivencia entre un estan
 - Staging y production todavia comparten la misma Cloud SQL y parte del runtime batch/reactivo.
 - El runtime PostgreSQL todavia tiene drift de permisos: `greenhouse_app` puede crear en schemas donde no deberia por contrato.
 
+## Delta 2026-04-24
+
+Se aplico la primera optimizacion de costo de bajo riesgo sobre `notion-bq-sync`:
+
+- `minScale` quedo en `0`
+- la revision live posterior fue `notion-bq-sync-00015-4b4`
+- el servicio sigue publico y con la default compute service account, asi que el ahorro ya se capturo pero el hardening sigue pendiente
+
+En otras palabras:
+
+- el costo idle artificial ya bajo
+- la postura de seguridad / identidad del servicio todavia no esta cerrada
+
 ## Que Significa Operativamente
 
 Greenhouse ya tiene una base moderna sobre la cual crecer, pero todavia no tiene una postura cloud homogenea.

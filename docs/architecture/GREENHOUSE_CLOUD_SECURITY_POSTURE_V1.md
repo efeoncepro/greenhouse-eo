@@ -31,6 +31,11 @@ Lo que sigue siendo riesgo vivo:
 - staging y production siguen compartiendo la misma Cloud SQL y parte de los mismos workers
 - el runtime PostgreSQL aún presenta drift de privilegios (`greenhouse_app` puede `CREATE` en `greenhouse_serving` y `greenhouse_payroll`)
 
+Delta `2026-04-24`:
+
+- `notion-bq-sync` ya redujo costo idle con `minScale=0`
+- el hallazgo de seguridad sigue abierto porque el servicio permanece público y en la default compute SA
+
 Regla documental nueva:
 
 - este documento debe describir la postura **mixta** actual

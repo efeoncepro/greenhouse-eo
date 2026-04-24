@@ -643,7 +643,7 @@ La auditoría live confirmó `13` servicios serverless:
 | `commercial-cost-worker` | `us-east4` | `greenhouse-portal@...` | IAM only | Secret Manager | worker moderno dedicado |
 | `ico-batch-worker` | `us-east4` | `greenhouse-portal@...` | IAM only | **mixto** | mantiene `GREENHOUSE_POSTGRES_PASSWORD` en env plano |
 | `hubspot-greenhouse-integration` | `us-central1` | default compute SA | **public** (`allUsers`) | parcial | revisar si el exposure público es realmente el deseado |
-| `notion-bq-sync` | `us-central1` | default compute SA | **public** (`allUsers`) | Secret Manager | exposición pública innecesaria para un sync interno |
+| `notion-bq-sync` | `us-central1` | default compute SA | **public** (`allUsers`) | Secret Manager | exposición pública innecesaria para un sync interno; `minScale=0` desde `2026-04-24` |
 
 ### Cloud Functions Gen 2 / legacy services
 

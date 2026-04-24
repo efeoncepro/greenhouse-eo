@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementacion`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -93,7 +93,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-585-notion-bq-sync-cost-efficiency-hardening.md`
+- `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md`
 - `src/app/api/integrations/notion/discover/route.ts`
 - `src/app/api/integrations/notion/register/route.ts`
 - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
@@ -115,6 +115,32 @@ Reglas obligatorias:
 - el costo live del servicio no está todavía cuantificado con queries sobre billing export
 - la postura target está decidida, pero no existe una task canónica que secuencie costo, auth y cutover sin romper portal
 
+### Delta 2026-04-24 — ejecución cost-first
+
+- prioridad operativa actual: capturar el ahorro inmediato de costo antes que el hardening secundario
+- los datasets `billing_export` y `billing_cud_export` ya existen, pero al tomar esta task todavía no materializan tablas; eso bloquea el baseline FinOps completo, pero **no** bloquea el cambio de menor riesgo `minScale=0`
+- el runtime canónico de `notion-bq-sync` sigue viviendo fuera de este repo; `greenhouse-eo` puede documentar, validar y adaptar el portal, pero el cambio live de escala mínima vive en GCP
+- esta ejecución se interpreta así:
+  1. validar estado live y dejar evidencia
+  2. aplicar `minScale=0`
+  3. validar no-regresión inmediata
+  4. dejar identidad / `OIDC` / retiro de `allUsers` como follow-up secundario dentro de la misma task
+
+### Delta 2026-04-24 — ejecución live aplicada
+
+- se aplicó `gcloud run services update notion-bq-sync --project efeonce-group --region us-central1 --min-instances=0`
+- resultado live:
+  - revisión nueva `notion-bq-sync-00015-4b4`
+  - `minScale` removido del spec live, equivalente a `0`
+  - service account sin cambios: `183008134038-compute@developer.gserviceaccount.com`
+  - exposición pública sin cambios: `allUsers` sigue siendo invoker
+  - Scheduler sin cambios: sigue sin `OIDC`
+- validación inmediata post-deploy:
+  - `GET /discover` del servicio respondió `200`
+  - no se observó regresión inmediata en el contrato HTTP actual del pipeline
+- rollback rápido:
+  - `gcloud run services update notion-bq-sync --project efeonce-group --region us-central1 --min-instances=1`
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
      El agente que toma esta task ejecuta Discovery y produce
@@ -132,9 +158,9 @@ Reglas obligatorias:
 
 ### Slice 1 — Baseline FinOps y evidencia operacional
 
-- crear queries base sobre `billing_export` para costo diario y tendencia de `notion-bq-sync`
-- documentar baseline de uso, cold starts, duración de sync y costo asociado antes de cambiar configuración
-- dejar evidencia explícita de por qué `minScale=1` es costo fijo y no crecimiento natural del portal
+- crear queries base sobre `billing_export` para costo diario y tendencia de `notion-bq-sync` **cuando las tablas materialicen**
+- si el export todavía no tiene tablas, documentar explícitamente esa ausencia como estado `awaiting_data` y seguir con Slice 2
+- dejar evidencia explícita de por qué `minScale=1` es costo fijo y no crecimiento natural del portal con métricas live ya disponibles (`minScale`, segundos facturables, request volume)
 
 ### Slice 2 — Optimización de bajo riesgo
 
@@ -177,6 +203,8 @@ Decisiones ya ratificadas por la auditoría:
 - `minScale=0` es el primer cambio recomendado porque reduce costo idle sin alterar contrato funcional
 - el histórico de `OOM` con `512Mi` hace que la memoria actual (`2Gi`) no deba tocarse al inicio
 - `allUsers` es deuda real, pero cerrarlo antes de adaptar portal + Scheduler rompería runtime
+- el baseline sobre `billing_export` queda como best-effort hasta que BigQuery materialice tablas; su ausencia no debe impedir ejecutar el cambio de ahorro inmediato
+- el runtime del servicio sigue siendo un concern cross-repo / GCP live; esta task puede ejecutarse parcialmente desde `greenhouse-eo`, pero debe documentar qué cambios no viven en este workspace
 - la secuencia correcta es:
   1. medir
   2. bajar `minScale`
@@ -200,7 +228,7 @@ Se espera que el agente valide esta secuencia contra documentación oficial de G
 
 ## Acceptance Criteria
 
-- [ ] existe un baseline verificable de costo y uso de `notion-bq-sync` usando `billing_export`
+- [ ] existe un baseline verificable de costo y uso de `notion-bq-sync` usando `billing_export`, o queda documentado como `awaiting_data` si las tablas aún no materializan
 - [ ] `notion-bq-sync` opera con `minScale=0` sin regresión del sync diario ni de discovery/sample
 - [ ] el runtime deja de usar la `default compute service account`
 - [ ] `Cloud Scheduler` invoca el servicio con `OIDC`
@@ -213,7 +241,7 @@ Se espera que el agente valide esta secuencia contra documentación oficial de G
 - `gcloud run services describe notion-bq-sync --region us-central1 --format export`
 - `gcloud scheduler jobs describe notion-bq-daily-sync --location us-central1`
 - `bq ls efeonce-group:billing_export`
-- `bq query --use_legacy_sql=false '<query de costo diario por servicio/SKU>'`
+- `bq query --use_legacy_sql=false '<query de costo diario por servicio/SKU>'` si y solo si las tablas de export ya materializaron
 - validación manual de:
   - `GET /api/integrations/notion/discover`
   - `POST /api/integrations/notion/register`

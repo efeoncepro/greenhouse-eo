@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-585 cost-first: `notion-bq-sync` baja `minScale` a `0` (Codex)
+
+- **Prioridad ejecutada**
+  - capturar el ahorro inmediato de costo de `TASK-585` antes del hardening secundario
+- **Corrección de task**
+  - `TASK-585` pasó a `in-progress`
+  - se corrigió el scope para tratar `billing_export` como `awaiting_data` mientras no materialice tablas
+  - la task queda explícitamente en modo `cost-first`
+- **Cambio live aplicado**
+  - comando ejecutado:
+    - `gcloud run services update notion-bq-sync --project efeonce-group --region us-central1 --min-instances=0`
+  - resultado:
+    - revisión nueva `notion-bq-sync-00015-4b4`
+    - `minScale` ya no aparece en el spec live, equivalente a `0`
+- **Validación inmediata**
+  - `gcloud run services describe notion-bq-sync --region us-central1` confirma:
+    - `maxScale=3`
+    - `startup-cpu-boost=true`
+    - service account sigue siendo `183008134038-compute@developer.gserviceaccount.com`
+  - `curl https://notion-bq-sync-y6egnifl6a-uc.a.run.app/discover` respondió `200` post-deploy
+  - el servicio sigue público (`allUsers`) y el Scheduler sigue sin `OIDC`; ese hardening queda pendiente en la misma task
+- **Estado de Billing Export**
+  - datasets `billing_export` y `billing_cud_export` existen en `efeonce-group`
+  - al momento de tomar la task todavía no había tablas materializadas visibles, así que el baseline SQL de costo sigue pendiente
+- **Rollback rápido**
+  - `gcloud run services update notion-bq-sync --project efeonce-group --region us-central1 --min-instances=1`
+
 ## Sesion 2026-04-24 — decisión arquitectónica: `notion-bigquery` sigue como repo hermano (Codex)
 
 - **Pregunta resuelta**

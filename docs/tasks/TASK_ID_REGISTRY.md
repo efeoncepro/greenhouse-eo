@@ -638,6 +638,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-582` | `to-do` | Monthly Project Provisioning Admin Surface with Preview — EPIC-005 child 6/6 | `docs/tasks/to-do/TASK-582-monthly-project-provisioning-admin-surface.md` |
 | `TASK-583` | `to-do` | HubSpot Quote Native Publish & Tax Finalization | `docs/tasks/to-do/TASK-583-hubspot-quote-native-publish-tax-finalization.md` |
 | `TASK-584` | `in-progress` | PostgreSQL Migration Tooling Hardening | `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md` |
-| `TASK-585` | `to-do` | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/to-do/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
+| `TASK-585` | `in-progress` | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
 | `TASK-586` | `to-do` | Notion Sync & Billing Export Observability in Admin Center | `docs/tasks/to-do/TASK-586-notion-sync-billing-observability.md` |
 | `TASK-587` | `to-do` | HubSpot Products Full-Fidelity Bidirectional Sync Expansion | `docs/tasks/to-do/TASK-587-hubspot-products-full-fidelity-sync.md` |

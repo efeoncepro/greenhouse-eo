@@ -6,7 +6,7 @@
 - Fecha: `2026-04-24`
 - Owner: `Codex / Greenhouse architecture`
 - Relacionado con:
-  - `docs/tasks/to-do/TASK-585-notion-bq-sync-cost-efficiency-hardening.md`
+  - `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md`
   - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
   - `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
 
