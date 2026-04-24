@@ -29,17 +29,6 @@
         "crm.objects.services.write",
         "crm.objects.custom.read",
         "crm.objects.custom.write",
-        "crm.objects.feedback_submissions.read",
-        "crm.objects.goals.read",
-        "crm.objects.subscriptions.read",
-        "crm.objects.carts.read",
-        "crm.objects.carts.write",
-        "crm.objects.orders.read",
-        "crm.objects.orders.write",
-        "crm.objects.invoices.read",
-        "crm.objects.commercepayments.read",
-        "crm.objects.users.read",
-        "crm.objects.users.write",
 
         "crm.schemas.contacts.read",
         "crm.schemas.contacts.write",
@@ -48,59 +37,38 @@
         "crm.schemas.deals.read",
         "crm.schemas.deals.write",
         "crm.schemas.quotes.read",
+        "crm.schemas.quotes.write",
         "crm.schemas.line_items.read",
         "crm.schemas.custom.read",
         "crm.schemas.custom.write",
-        "crm.schemas.services.read",
-        "crm.schemas.services.write",
-        "crm.schemas.subscriptions.read",
-        "crm.schemas.subscriptions.write",
-        "crm.schemas.carts.read",
-        "crm.schemas.carts.write",
-        "crm.schemas.orders.read",
-        "crm.schemas.orders.write",
-        "crm.schemas.invoices.read",
-        "crm.schemas.invoices.write",
-        "crm.schemas.commercepayments.read",
 
         "crm.lists.read",
         "crm.lists.write",
-
-        "crm.export",
-        "crm.import",
 
         "tickets",
         "sales-email-read",
         "files",
         "forms",
         "content",
-        "timeline",
-
         "conversations.read",
-        "conversations.write",
-        "conversations.visitor_identification.tokens.create",
-        "conversations.custom_channels.read",
-        "conversations.custom_channels.write",
-
         "communication_preferences.read",
-        "communication_preferences.read_write",
-        "communication_preferences.statuses.batch.read",
-        "communication_preferences.statuses.batch.write",
-
+        "communication_preferences.read_write"
+      ],
+      "optionalScopes": [
+        "crm.objects.feedback_submissions.read",
+        "crm.objects.goals.read",
+        "crm.objects.marketing_events.read",
+        "crm.objects.marketing_events.write",
+        "automation",
+        "business-intelligence",
         "settings.currencies.read",
         "settings.users.read",
         "settings.users.teams.read",
-
-        "e-commerce",
-
-        "automation",
-        "automation.sequences.read",
-        "automation.sequences.enrollments.write",
-
-        "crm.objects.marketing_events.read",
-        "crm.objects.marketing_events.write"
+        "analytics.behavioral_events.send",
+        "behavioral_events.event_definitions.read_write",
+        "collector.graphql_query.execute",
+        "collector.graphql_schema.read"
       ],
-      "optionalScopes": [],
       "conditionallyRequiredScopes": []
     },
     "permittedUrls": {
