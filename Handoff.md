@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-606 rescata la intención útil del PR #62 (Codex)
+
+- **Contexto**
+  - `PR #62` seguía abierto desde un estado viejo del backlog y proponía una pseudo-`TASK-415` para `Space 360`
+  - el PR ya no era mergeable ni documentalmente sano porque `TASK-415` quedó ocupada/cerrada por otro dominio (`HR Leave Balance Visibility, Admin Backfill & Manual Adjustments`)
+- **Corrección documental aplicada**
+  - nueva task: `TASK-606 — Space 360 Motion Consistency & Empty State Follow-up`
+  - objetivo: rescatar la intención válida del PR (microinteracciones + empty states + a11y shell en `Space 360`) sin reciclar IDs ni volver el backlog inconsistente
+- **Relación con trabajo vigente**
+  - queda como follow-up acotado de `TASK-321`
+  - no reabre el rediseño completo de `Space 360`
+  - el `PR #62` debe cerrarse como superseded por `TASK-606`
+
 ## Sesion 2026-04-24 — EPIC-007 + TASK-600: Reliability Control Plane foundation (Codex)
 
 - **Nuevo programa creado**

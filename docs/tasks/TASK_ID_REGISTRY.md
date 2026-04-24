@@ -659,3 +659,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-603` | `to-do` | HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C) | `docs/tasks/to-do/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md` |
 | `TASK-604` | `to-do` | HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D) | `docs/tasks/to-do/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md` |
 | `TASK-605` | `to-do` | Product Catalog Admin UI + Backfill + Reconcile + Governance (TASK-587 Fase E) | `docs/tasks/to-do/TASK-605-product-catalog-admin-ui-backfill-governance.md` |
+| `TASK-606` | `to-do` | Space 360 Motion Consistency & Empty State Follow-up | `docs/tasks/to-do/TASK-606-space-360-motion-consistency-empty-state-followup.md` |
