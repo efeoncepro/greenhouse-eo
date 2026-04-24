@@ -640,7 +640,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-584` | `in-progress` | PostgreSQL Migration Tooling Hardening | `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md` |
 | `TASK-585` | `in-progress` | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
 | `TASK-586` | `to-do` | Notion Sync & Billing Export Observability in Admin Center | `docs/tasks/to-do/TASK-586-notion-sync-billing-observability.md` |
-| `TASK-587` | `to-do` | HubSpot Products Full-Fidelity Bidirectional Sync Expansion | `docs/tasks/to-do/TASK-587-hubspot-products-full-fidelity-sync.md` |
+| `TASK-587` | `complete` | HubSpot Products Full-Fidelity Bidirectional Sync Expansion (umbrella — 5 fases A-E cerradas) | `docs/tasks/complete/TASK-587-hubspot-products-full-fidelity-sync.md` |
 | `TASK-588` | `complete` | Project Title Resolution Hardening en Conformed Sync (fix ICO "Sin nombre") | `docs/tasks/complete/TASK-588-project-title-resolution-conformed-sync-hardening.md` |
 | `TASK-589` | `complete` | Finance Read Path Provisioning Decoupling & Directory Hardening | `docs/tasks/complete/TASK-589-finance-runtime-read-path-decoupling-clients-suppliers.md` |
 | `TASK-590` | `to-do` | ICO Signals Schema v2: identidad determinista + event store (EPIC-006 child 1/8) | `docs/tasks/to-do/TASK-590-ico-signals-schema-v2-identity-event-store.md` |
@@ -658,7 +658,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-602` | `complete` | Product Catalog Multi-Currency Price Normalization (TASK-587 Fase B) | `docs/tasks/complete/TASK-602-product-catalog-multi-currency-prices.md` |
 | `TASK-603` | `complete` | HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C) | `docs/tasks/complete/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md` |
 | `TASK-604` | `complete` | HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D) | `docs/tasks/complete/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md` |
-| `TASK-605` | `to-do` | Product Catalog Admin UI + Backfill + Reconcile + Governance (TASK-587 Fase E) | `docs/tasks/to-do/TASK-605-product-catalog-admin-ui-backfill-governance.md` |
+| `TASK-605` | `complete` | Product Catalog Admin UI + Backfill + Reconcile + Governance (TASK-587 Fase E) | `docs/tasks/complete/TASK-605-product-catalog-admin-ui-backfill-governance.md` |
 | `TASK-606` | `to-do` | Space 360 Motion Consistency & Empty State Follow-up | `docs/tasks/to-do/TASK-606-space-360-motion-consistency-empty-state-followup.md` |
 | `TASK-607` | `to-do` | GitHub Actions Node.js 24 Migration (5 workflows restantes) | `docs/tasks/to-do/TASK-607-github-actions-nodejs-24-migration.md` |
 | `TASK-608` | `to-do` | Product Catalog Price History (effective_at) — follow-up aditivo de TASK-602 | `docs/tasks/to-do/TASK-608-product-catalog-price-history.md` |

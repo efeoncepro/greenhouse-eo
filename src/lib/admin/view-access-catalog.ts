@@ -344,6 +344,15 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.product_catalog',
+    section: 'administracion',
+    label: 'Catálogo de productos',
+    description:
+      'Edita productos, precios multi-moneda, clasificación y owner; dispara sync manual a HubSpot. TASK-587 Fase E.',
+    routePath: '/admin/commercial/product-catalog',
+    routeGroup: 'admin'
+  },
+  {
     viewCode: 'administracion.instrumentos_pago',
     section: 'administracion',
     label: 'Instrumentos de pago',

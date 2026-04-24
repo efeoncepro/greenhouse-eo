@@ -1,5 +1,82 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-605 CERRADA (MVP): Product Catalog Admin UI + Backfill + Governance → TASK-587 umbrella CERRADA
+
+### Qué cambió
+
+**El programa TASK-587 queda completo end-to-end**. Todas las 5 fases A-E cerradas en un solo día (2026-04-24). El portal ahora tiene admin UI operativa para el catálogo de productos y los 16 fields catalog + COGS fluyen closed-loop GH↔HS en prod (middleware rev `00035-tfb`).
+
+### Componentes entregados (Fase E — MVP)
+
+**Capability + access**:
+- `administracion.product_catalog` registrada en [src/lib/admin/view-access-catalog.ts](src/lib/admin/view-access-catalog.ts) con `routeGroup: 'admin'`.
+- [src/app/(dashboard)/admin/commercial/layout.tsx](src/app/(dashboard)/admin/commercial/layout.tsx) extendido para aceptar el nuevo viewCode + fallback a `routeGroups.includes('admin')`.
+
+**Admin surface** `/admin/commercial/product-catalog`:
+- **List view** ([ProductCatalogListView.tsx](src/views/greenhouse/admin/product-catalog/ProductCatalogListView.tsx)): MUI Table con 74 productos, search global SKU/name, filtros sourceKind + archived + drift, chip drift con count + fecha de último scan.
+- **Detail view** ([ProductCatalogDetailView.tsx](src/views/greenhouse/admin/product-catalog/ProductCatalogDetailView.tsx)): secciones Identidad (name, description plain + rich HTML, marketing URL, image URLs) + Clasificación (product type + category/unit/tax desde ref tables) + Precios (grid 6 monedas con input → auto-recompute derivadas FX) + Recurrencia (toggle + freq + period) + Metadatos (owner + `owner_gh_authoritative` toggle + archivado + timestamps). Manual sync button + drift alert inline cuando hay `driftedFields`.
+
+**API routes**:
+- `GET /api/admin/commercial/products` — list con filtros + drift count join sobre `source_sync_runs`.
+- `GET /api/admin/commercial/products/[id]` — detail (product + prices + owner + last drift + refOptions).
+- `PATCH /api/admin/commercial/products/[id]` — update con validación de enums (productType, pricingModel).
+- `PUT /api/admin/commercial/products/[id]/prices` — bulk set authoritative + recompute derivadas 1-request (207 si parcial).
+- `POST /api/admin/commercial/products/[id]/sync` — trigger manual outbound síncrono via `pushProductToHubSpot` (adapter v2 ya live).
+
+**Backfill script**:
+- [scripts/backfill/product-catalog-hs-v2.ts](scripts/backfill/product-catalog-hs-v2.ts) idempotente: dry-run default + `--apply` flag + reporte MD en `docs/operations/backfill-product-catalog-hs-v2-YYYYMMDD.md`. Iterates los 74 productos vía `listCommercialProductCatalog` + invoca `pushProductToHubSpot` + captura outcomes per-product (created/updated/skipped/failed). Anti-ping-pong heredado.
+
+**Docs**:
+- **Nueva spec arquitectura** [GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md](docs/architecture/GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md) consolidando el contrato final del programa: tabla de 16 fields catalog + COGS, multi-currency model, owner bridge semantics (soft-SoT → GH-SoT post-UI), drift classification 3-nivel, admin surface, governance COGS.
+- [Runbook operativo](docs/operations/product-catalog-sync-runbook.md) actualizado con: Admin UI operativa, Backfill masivo procedure, Governance de COGS (TASK-603), HubSpot field permissions checklist, Reconcile scheduler manual flow, Manual sync flow.
+
+### Decisiones de diseño (MVP)
+
+- **Capability naming**: `administracion.X` viewCode (convención del repo) en vez de `commercial.product_catalog.manage` estilo RBAC de la spec. Se mantiene el mismo gate via `hasAnyAuthorizedViewCode`.
+- **No 5 tabs formales** — single-page con 5 secciones organizadas en Grid (Identidad / Clasificación / Precios / Recurrencia / Metadatos). Operativamente equivalente; tabs real queda como polish follow-up.
+- **No TipTap** — textarea plano para `description_rich_html`. El sanitizer server-side ya filtra HTML peligroso. TipTap queda como follow-up.
+- **No member autocomplete** — input directo de `member_id` en tab Metadatos con helper text mostrando el owner resuelto actual. Autocomplete + endpoint `/api/admin/members/search` queda como follow-up.
+- **Reconcile scheduler NO en código** — cron via Cloud Scheduler queda como follow-up ops (gcloud provisioning). El reconcile reactivo via `detectProductDriftV2` corre ya en cada inbound sync (TASK-604 wire).
+- **HubSpot field permissions manual ops** — documentadas en runbook como checklist, no hay código para ellas.
+- **Owner flip**: `owner_gh_authoritative` es editable via PATCH. Productos nuevos no se crean desde admin UI en Fase 1 (out-of-scope — los productos siguen naciendo del sync pipeline).
+
+### Verificación
+
+- `pnpm lint` — 0 errors (2 warnings DOMPurify cosméticos pre-existentes)
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib` — 1716/1716 passing (baseline preservado)
+- Backfill script: tsc + lint verificados por subagente
+
+### Programa TASK-587 — umbrella CERRADA
+
+| Fase | Task | Estado |
+|---|---|---|
+| A | [TASK-601](docs/tasks/complete/TASK-601-product-catalog-schema-extension-ref-tables.md) Schema + Ref Tables | ✅ 2026-04-24 |
+| B | [TASK-602](docs/tasks/complete/TASK-602-product-catalog-multi-currency-prices.md) Multi-Currency Prices | ✅ 2026-04-24 |
+| C | [TASK-603](docs/tasks/complete/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md) Outbound v2 + COGS Unblock | ✅ 2026-04-24 + prod deploy |
+| D | [TASK-604](docs/tasks/complete/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md) Inbound v2 + Drift | ✅ 2026-04-24 + prod deploy |
+| E | [TASK-605](docs/tasks/complete/TASK-605-product-catalog-admin-ui-backfill-governance.md) Admin UI + Backfill | ✅ 2026-04-24 |
+
+**Middleware Cloud Run prod rev actual**: `hubspot-greenhouse-integration-00035-tfb` con contract v2 completo (outbound + inbound) + owner caching per-request + fan-out a 16 HS properties.
+
+### Follow-ups operativos (manual, no código)
+
+- **Backfill masivo en prod**: ejecutar `pnpm tsx scripts/backfill/product-catalog-hs-v2.ts --apply` contra production después del merge del commit final.
+- **HS field permissions**: configurar en portal HubSpot (admin manual) siguiendo checklist del runbook.
+- **Cloud Scheduler weekly cron**: provisionar via gcloud siguiendo pattern de ops-worker (TASK follow-up dedicada).
+- **Notificar equipo HubSpot**: los 16 fields catalog quedan como read-only para roles operadores.
+
+### Follow-ups de código (candidatos a tasks)
+
+- Rich editor TipTap para `description_rich_html` (MVP usa textarea)
+- Member autocomplete component + `/api/admin/members/search` (MVP usa input por member_id)
+- 5 tabs formales vs secciones (MVP funcional)
+- GCS image uploader con drag-drop + signed URLs (MVP acepta URLs HTTPS)
+- `gh_module_id` custom HS property (bridge a canonical 360)
+- Tiered pricing / variants (YAGNI)
+
+---
+
 ## Sesion 2026-04-24 — TASK-604 CERRADA: HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D)
 
 ### Qué cambió

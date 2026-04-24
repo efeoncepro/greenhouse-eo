@@ -2,6 +2,18 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-605 CERRADA ✅ (MVP) + TASK-587 umbrella CERRADA: programa full-fidelity GH↔HS closed-loop
+
+- **Capability `administracion.product_catalog`** registrada en `src/lib/admin/view-access-catalog.ts`. Commercial layout guard extendido con el nuevo viewCode + fallback `routeGroups.includes('admin')`.
+- **Admin surface `/admin/commercial/product-catalog`**: list view (MUI Table + search + filtros sourceKind/archived/drift + drift count por fila) + detail view (secciones Identidad / Clasificación / Precios / Recurrencia / Metadatos + manual sync button + drift alert inline).
+- **5 API routes** bajo `/api/admin/commercial/products/...`: GET list con drift join, GET detail full (product + prices + owner + last drift + refOptions), PATCH update con enum validation, PUT prices bulk (recompute derivadas FX 1-request), POST sync (manual outbound síncrono via `pushProductToHubSpot`).
+- **Backfill script** `scripts/backfill/product-catalog-hs-v2.ts`: idempotente, dry-run default + `--apply` flag, reporte MD per-product. Itera los 74 productos + pushProductToHubSpot + captura outcomes.
+- **Nueva spec arquitectura** `docs/architecture/GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md` consolidando el contrato final: 16 fields catalog + COGS, multi-currency model, owner bridge semantics, drift classification 3-nivel, admin surface, governance COGS.
+- **Runbook actualizado** con Admin UI operativa + backfill procedure + governance COGS + HubSpot field permissions checklist + reconcile manual flow + manual sync flow.
+- **TASK-587 umbrella marcada complete** con las 5 fases A-E cerradas en 2026-04-24: TASK-601 (schema) + TASK-602 (prices) + TASK-603 (outbound v2 + COGS unblock) + TASK-604 (inbound v2 + drift) + TASK-605 (admin UI + backfill + governance). Middleware Cloud Run prod rev `00035-tfb` atendiendo contract v2 completo.
+- **Scope MVP**: tabs formales, rich editor TipTap, member autocomplete, Cloud Scheduler cron semanal, HubSpot field permissions config → documentados como follow-ups (no código en Fase 1).
+- **Tests**: 1716/1716 en dir src/lib passing (baseline preservado). Lint + tsc + build clean.
+
 ### 2026-04-24 — TASK-604 CERRADA ✅: HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D)
 
 - **Profile v2 inbound** (`src/lib/integrations/hubspot-greenhouse-service.ts`): `HubSpotGreenhouseProductProfile` extendido con 9 campos opcionales (`owner`, `pricesByCurrency`, `descriptionRichHtml`, `categoryHubspotValue`/`unitHubspotValue`/`taxCategoryHubspotValue`, `productType`/`pricingModel`/`productClassification`/`bundleType`, `imageUrls`, `marketingUrl`, `hubspotOwnerAssignedAt`). `fetchJson` acepta extraHeaders; `getHubSpotGreenhouseProductCatalog` + `getHubSpotGreenhouseProduct` envían `X-Contract-Version: v2`.

@@ -6,17 +6,18 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `umbrella`
 - Epic: `TASK-544` (Commercial Product Catalog Sync Program — extiende como Fase F)
-- Status real: `Diseno`
+- Status real: `Completo 2026-04-24 — todas las 5 Fases A-E cerradas`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none`
-- Branch: `task/TASK-587-hubspot-products-full-fidelity-sync`
+- Branch: `develop` (merge directo via las 5 child tasks)
+- Completed: `2026-04-24`
 
 ## Summary
 
@@ -196,7 +197,7 @@ Fases A y B (TASK-601, TASK-602) son 100% PostgreSQL + TS interno — se pueden 
 > | B — Multi-Currency Price Normalization | [TASK-602](docs/tasks/complete/TASK-602-product-catalog-multi-currency-prices.md) ✅ cerrada 2026-04-24 | Medio |
 > | C — Outbound Contract v2 + COGS Unblock | [TASK-603](docs/tasks/complete/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md) ✅ cerrada 2026-04-24 | Alto |
 > | D — Inbound Rehydration + Owner + Drift | [TASK-604](docs/tasks/complete/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md) ✅ cerrada 2026-04-24 | Medio |
-> | E — Admin UI + Backfill + Reconcile + Governance | [TASK-605](docs/tasks/to-do/TASK-605-product-catalog-admin-ui-backfill-governance.md) | Alto |
+> | E — Admin UI + Backfill + Reconcile + Governance | [TASK-605](docs/tasks/complete/TASK-605-product-catalog-admin-ui-backfill-governance.md) ✅ cerrada 2026-04-24 | Alto |
 
 ### Slice A — Canonical Model Extension
 

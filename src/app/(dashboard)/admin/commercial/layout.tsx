@@ -17,7 +17,8 @@ export default async function AdminCommercialLayout({ children }: { children: Re
     viewCodes: [
       'administracion.admin_center',
       'administracion.commercial_parties',
-      'administracion.product_sync_conflicts'
+      'administracion.product_sync_conflicts',
+      'administracion.product_catalog'
     ],
     fallback: tenant.routeGroups.includes('admin')
   })

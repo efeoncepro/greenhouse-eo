@@ -6,17 +6,18 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `TASK-587` (umbrella) → `TASK-544` (program parent)
-- Status real: `Diseno`
+- Status real: `Completo 2026-04-24 (MVP — UI + API + backfill + docs; rich editor / member autocomplete / Cloud Scheduler cron como follow-ups)`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none` (TASK-601 + TASK-602 + TASK-603 + TASK-604 + TASK-574 cerradas 2026-04-24)
-- Branch: `task/TASK-605-product-catalog-admin-ui-governance`
+- Branch: `develop` (merge directo)
+- Completed: `2026-04-24`
 
 ## Summary
 
@@ -253,20 +254,47 @@ Ver [TASK-587 Slice E](docs/tasks/to-do/TASK-587-hubspot-products-full-fidelity-
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md`: admin UI live, backfill done, reconcile scheduled, field permissions applied, owner SoT flip date
-- [ ] `changelog.md`: admin surface, backfill, reconcile job, governance
-- [ ] Update TASK-587: Fase E completada → umbrella queda `complete`
-- [ ] Update TASK-544: programa parent refleja Fase F cerrada
-- [ ] Chequeo impacto cruzado: TASK-549 (cleanup), TASK-524 (invoice bridge), TASK-576 (quote publish), TASK-552 (FX coord)
-- [ ] Notificar equipo de admin HubSpot que field permissions quedaron activas
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] Archivo en carpeta correcta (`docs/tasks/complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md`: admin UI live, backfill script listo, manual reconcile operativo, docs actualizados
+- [x] `changelog.md`: admin surface + API + backfill + runbook + arch doc
+- [x] Update TASK-587: Fase E ✅ completada → umbrella queda `complete`
+- [ ] Update TASK-544: programa parent refleja Fase F cerrada (follow-up — TASK-544 spec update pendiente)
+- [ ] Chequeo impacto cruzado: TASK-549 (cleanup), TASK-524 (invoice bridge), TASK-576 (quote publish), TASK-552 (FX coord) — follow-up ops review
+- [ ] **Manual ops pendientes**:
+  - Backfill masivo `--apply` contra production (ejecutar post-merge)
+  - HubSpot portal field permissions (configuración manual en admin)
+  - Cloud Scheduler cron para reconcile semanal (gcloud provisioning)
+  - Notificar equipo HubSpot admin
 
-## Follow-ups
+## Delivered (MVP)
 
-- Admin UI de tablas ref (categorías/unidades/tax) si emerge necesidad operativa
-- GCS image uploader (TASK-###) — reemplaza input URL por drag-drop
-- `gh_module_id` custom HS property — link canonical 360
-- Tiered pricing support si emerge use case
-- Multi-jurisdicción tax categories (coordina con TASK-562)
+**In-scope completado:**
+
+- [x] Slice 1 — viewCode `administracion.product_catalog` registrado + commercial layout guard extendido
+- [x] Slice 2 — List view con search + filtros (sourceKind, archived, drift) + pagination client-side
+- [x] Slice 3 (simplificado) — Detail view con secciones (Identidad / Clasificación / Precios / Recurrencia / Metadatos) + manual sync button + drift alert + form CRUD
+- [x] Slice 4 — 5 API routes: GET list, GET detail, PATCH update, PUT prices (bulk), POST sync
+- [x] Slice 5 — Backfill script `scripts/backfill/product-catalog-hs-v2.ts` idempotente con dry-run/--apply + reporte MD
+- [x] Slice 8 — Owner `owner_gh_authoritative` toggle en admin UI (productos existentes), campo `commercial_owner_member_id` editable via PATCH
+- [x] Slice 9 — Runbook actualizado + nueva arch doc `GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md`
+
+**Deferred a follow-ups (documentado):**
+
+- Slice 3 con 5 tabs formales (single-page con secciones es MVP equivalente operativo)
+- TipTap rich editor para `description_rich_html` (textarea con whitelist server-side sirve para MVP)
+- Member autocomplete component + `/api/admin/members/search` (input por member_id directo sirve para MVP)
+- Slice 6 — Cloud Scheduler cron weekly reconcile (ops task, no código; documented en runbook)
+- Slice 7 — HubSpot field permissions (manual admin ops, documented en runbook)
+- Image thumbnail preview + GCS upload (URLs absolutas sirve para MVP)
+
+## Follow-ups (tasks a crear si emerge necesidad operativa)
+
+- **TASK-### Admin UI con 5 tabs + rich editor + member autocomplete**: polish UX cuando haya operadores usando la surface regularmente
+- **TASK-### Cloud Scheduler reconcile cron**: gcloud provisioning + endpoint en ops-worker
+- **TASK-### Admin UI de tablas ref** (categorías/unidades/tax) si emerge necesidad
+- **TASK-### GCS image uploader** — reemplaza input URL por drag-drop con signed URLs
+- **TASK-### `gh_module_id` custom HS property** — link canonical 360 `service_modules.module_id`
+- **TASK-### Tiered pricing support** si emerge use case
+- **TASK-### Multi-jurisdicción tax categories** (coordina con TASK-562)
