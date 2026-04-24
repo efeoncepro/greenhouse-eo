@@ -204,12 +204,17 @@ def create_app() -> Flask:
 
         if "pricingModel" in body:
             props["hs_pricing_model"] = _normalize_hubspot_write_value(body["pricingModel"])
-        if "productClassification" in body:
-            props["hs_product_classification"] = _normalize_hubspot_write_value(
-                body["productClassification"]
-            )
-        if "bundleType" in body:
-            props["hs_bundle_type"] = _normalize_hubspot_write_value(body["bundleType"])
+
+        # TASK-605 hotfix 2026-04-24: HubSpot rejects writes to these as
+        # READ_ONLY_VALUE (HS manages them internally, not settable via
+        # public API). Accept in payload for forward-compat (e.g. if
+        # HubSpot opens them later) but skip emission to HS.
+        #
+        # - productClassification → hs_product_classification (READ_ONLY)
+        # - bundleType → hs_bundle_type (READ_ONLY)
+        #
+        # GH retains the values in product_catalog as SoT; drift detector
+        # will not flag them since HS returns its own defaults.
 
         return props
 
@@ -225,8 +230,16 @@ def create_app() -> Flask:
 
     def _extract_v2_recurring(body: dict[str, Any]) -> dict[str, Any]:
         props: dict[str, Any] = {}
-        if "isRecurring" in body:
-            props["hs_recurring"] = _normalize_hubspot_write_value(body["isRecurring"])
+
+        # TASK-605 hotfix 2026-04-24: `hs_recurring` does not exist as a
+        # property in portal 48713323 (PROPERTY_DOESNT_EXIST). Recurrence
+        # is captured implicitly via hs_recurring_billing_period +
+        # recurringbillingfrequency. Skip emission of the boolean flag.
+        #
+        # If operators ever need a boolean indicator, a custom property
+        # `gh_is_recurring` can be added in the portal — but current
+        # billing_period = null is the canonical "not recurring" signal.
+
         if "recurringBillingFrequency" in body:
             props["recurringbillingfrequency"] = _normalize_hubspot_write_value(
                 body["recurringBillingFrequency"]
@@ -1172,8 +1185,8 @@ def create_app() -> Flask:
                     props["cost_of_goods_sold"] = body["costOfGoodsSold"]
                 if body.get("tax") is not None:
                     props["tax"] = body["tax"]
-                if body.get("isRecurring") is not None:
-                    props["hs_recurring"] = body["isRecurring"]
+                # TASK-605 hotfix: skip hs_recurring (PROPERTY_DOESNT_EXIST in
+                # portal 48713323). Recurrence captured via billing_period.
                 if body.get("billingFrequency"):
                     props["hs_recurring_billing_period"] = body["billingFrequency"]
                 if body.get("billingPeriodCount") is not None:
@@ -1227,8 +1240,7 @@ def create_app() -> Flask:
                     props["cost_of_goods_sold"] = _normalize_hubspot_write_value(body["costOfGoodsSold"])
                 if "tax" in body:
                     props["tax"] = _normalize_hubspot_write_value(body["tax"])
-                if "isRecurring" in body:
-                    props["hs_recurring"] = _normalize_hubspot_write_value(body["isRecurring"])
+                # TASK-605 hotfix: skip hs_recurring (PROPERTY_DOESNT_EXIST).
                 if "billingFrequency" in body:
                     props["hs_recurring_billing_period"] = _normalize_hubspot_write_value(body["billingFrequency"])
                 if "billingPeriodCount" in body:

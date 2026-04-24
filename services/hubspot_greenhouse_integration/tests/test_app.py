@@ -1672,8 +1672,10 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
         props = fake_hubspot.create_product.call_args.args[0]
         self.assertEqual(props["hs_product_type"], "service")
         self.assertEqual(props["hs_pricing_model"], "flat")
-        self.assertEqual(props["hs_product_classification"], "standalone")
-        self.assertEqual(props["hs_bundle_type"], "none")
+        # TASK-605 hotfix 2026-04-24: hs_product_classification + hs_bundle_type
+        # are READ_ONLY in HubSpot; the middleware must NOT emit them.
+        self.assertNotIn("hs_product_classification", props)
+        self.assertNotIn("hs_bundle_type", props)
 
     def test_create_product_v2_resolves_owner_by_email(self):
         app, client = self._build_v2_app_and_client()
