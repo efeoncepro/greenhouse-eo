@@ -779,6 +779,28 @@ export interface GreenhouseCommercialProductCatalog {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialProductCatalogAuthoritativePrice {
+  created_at: Timestamp | null;
+  currency_code: string | null;
+  product_id: string | null;
+  source: string | null;
+  unit_price: Numeric | null;
+  updated_at: Timestamp | null;
+}
+
+export interface GreenhouseCommercialProductCatalogPrices {
+  created_at: Generated<Timestamp>;
+  currency_code: string;
+  derived_from_currency: string | null;
+  derived_from_fx_at: Timestamp | null;
+  derived_fx_rate: Numeric | null;
+  is_authoritative: Generated<boolean>;
+  product_id: string;
+  source: string;
+  unit_price: Numeric;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCommercialProductCategories {
   active: Generated<boolean>;
   code: string;
@@ -6359,6 +6381,8 @@ export interface DB {
   "greenhouse_commercial.pricing_catalog_approval_queue": GreenhouseCommercialPricingCatalogApprovalQueue;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
+  "greenhouse_commercial.product_catalog_authoritative_price": GreenhouseCommercialProductCatalogAuthoritativePrice;
+  "greenhouse_commercial.product_catalog_prices": GreenhouseCommercialProductCatalogPrices;
   "greenhouse_commercial.product_categories": GreenhouseCommercialProductCategories;
   "greenhouse_commercial.product_source_kind_mapping": GreenhouseCommercialProductSourceKindMapping;
   "greenhouse_commercial.product_sync_conflicts": GreenhouseCommercialProductSyncConflicts;

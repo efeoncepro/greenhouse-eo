@@ -1,5 +1,66 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-602 CERRADA: Product Catalog Multi-Currency Price Normalization
+
+### Qué cambió
+
+Fase B del programa TASK-587 (HubSpot Products Full-Fidelity Sync). Instala el modelo de precios producto × moneda que Fase C (TASK-603) necesita para emitir los 6 fields HS (`hs_price_clp/usd/clf/cop/mxn/pen`). Completa el pivote del catálogo desde un scalar `default_unit_price + default_currency` a una tabla normalizada con autoridad explícita + derivación FX + hook reactivo.
+
+### Componentes entregados
+
+- **3 migraciones aplicadas** en `greenhouse-pg-dev`:
+  - `20260424174148326_task-602-product-catalog-prices-table.sql` — tabla `greenhouse_commercial.product_catalog_prices` con PK `(product_id, currency_code)`, FK CASCADE a `product_catalog`, CHECKs sobre matriz canónica + enum source + derived-consistency, 2 partial indexes
+  - `20260424174148937_task-602-product-catalog-authoritative-price-view.sql` — VIEW `product_catalog_authoritative_price` con `DISTINCT ON (product_id)` y precedencia canónica `CLP → USD → CLF → COP → MXN → PEN`
+  - `20260424174149550_task-602-product-catalog-prices-backfill.sql` — backfill idempotente de `default_unit_price/default_currency` con `source='backfill_legacy'` y `ON CONFLICT DO NOTHING`
+- **Store canónico** [src/lib/commercial/product-catalog-prices.ts](src/lib/commercial/product-catalog-prices.ts):
+  - `CURRENCY_CODES` / `CURRENCY_PRECEDENCE` exportadas como constantes canónicas
+  - `setAuthoritativePrice({productId, currencyCode, unitPrice, source})` — upsert autoritativa + recompute de 5 derivadas en **misma transacción** via `withTransaction`; reporta `missingRates` sin fallar; NO pisa filas autoritativas en otras monedas (respeta decisiones del operador)
+  - `getPricesByCurrency(productId)` — devuelve siempre las 6 monedas con `null` fallback (útil para outbound HS que necesita mandar `null` explícito)
+  - `getAuthoritativePrice(productId)` — lee desde la VIEW, resuelve desempate por precedencia
+  - `recomputeDerivedForCurrencyPair({fromCurrency, toCurrency, rateDate})` — regenera derivadas afectadas con ventana **anti-ping-pong de 60s** (derived_from_fx_at < cutoff)
+- **Projection reactiva** [src/lib/sync/projections/product-catalog-prices-recompute.ts](src/lib/sync/projections/product-catalog-prices-recompute.ts):
+  - Domain `cost_intelligence` (alineado con commercial-cost-attribution)
+  - Trigger `finance.exchange_rate.upserted` (evento canónico de la FX platform)
+  - `entityId` = `${first}_${second}` alfabético (coalescing del outbox dedupea automáticamente forward + reverse)
+  - Llama `recomputeDerivedForCurrencyPair` dos veces (forward + reverse); el anti-ping-pong hace la segunda invocación barata
+  - `maxRetries: 2`
+  - Registrado en [src/lib/sync/projections/index.ts](src/lib/sync/projections/index.ts)
+- **Discovery seed one-time** [scripts/discovery/hubspot-products-prices-seed.ts](scripts/discovery/hubspot-products-prices-seed.ts):
+  - Barre productos HS, matchea via `hubspot_product_id` al catálogo local
+  - Para cada `hs_price_{code}` poblado, hace upsert con `source='hs_seed'`, `is_authoritative=true`
+  - **Dry-run por default**, `--apply` explícito para escrituras reales
+  - **Idempotente**: filas autoritativas existentes se preservan (reportadas como `conflict`)
+  - Output Markdown: `docs/operations/discovery-hubspot-products-prices-seed-YYYYMMDD.md`
+
+### Decisiones de diseño
+
+- **Rounding a 2 decimales** en `setAuthoritativePrice` vía `round2()` (no a más por ahora — si CLF u otras monedas requieren más precisión, se escala en follow-up post Fase E)
+- **VIEW renombrada** de `product_catalog_default_price` a `product_catalog_authoritative_price`: ningún caller legacy consume el shape old, y el nombre nuevo describe mejor la semántica (resolución de autoridad, no "default")
+- **`setAuthoritativePrice` NO publica evento**: el outbound de TASK-603 leerá la tabla on-demand vía `getPricesByCurrency`. Evita doble hop y race en outbox.
+- **Anti-ping-pong 60s**: evita tight-loop si el publisher de `finance.exchange_rate.upserted` y el consumer de la projection están desincronizados; un rate que suba 2x en <60s solo gatilla 1 recompute
+- **Matriz de rates FX**: cuando no hay rate disponible para una moneda objetivo, la fila derivada NO se crea ni se updatea (decisión conservadora — prefer stale sobre ausencia)
+
+### Verificación
+
+- `pnpm lint` — clean sobre archivos TASK-602
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/commercial/product-catalog-prices.test.ts` — 11/11
+- `pnpm test src/lib/sync/projections/product-catalog-prices-recompute.test.ts` — 9/9
+- `pnpm test src/lib/commercial src/lib/sync/projections` — 389/389 passing
+- Migraciones aplicadas via `pnpm pg:connect:migrate`; tipos Kysely regenerados (285 tablas totales)
+
+### Desbloquea
+
+- **TASK-603** (Outbound Contract v2): ahora tiene `getPricesByCurrency` para construir el payload `pricesByCurrency` v2
+- **TASK-605** (Admin UI): grid de precios lee de la tabla normalizada
+
+### Seguimiento recomendado
+
+- Ejecutar seed `--apply` contra HS portal 48713323 en una ventana planificada (actualmente `hs_price_*` vacíos → no-op esperado, pero validar antes de Fase C)
+- Considerar drop de `default_unit_price` + `default_currency` en `product_catalog` cuando todos los callers migren al VIEW o a `getPricesByCurrency` (follow-up TASK-549 cleanup)
+
+---
+
 ## Sesion 2026-04-24 — TASK-574 CUTOVER EJECUTADO: HubSpot Greenhouse Integration Service ahora deploya desde el monorepo
 
 ### Evidencia del cutover

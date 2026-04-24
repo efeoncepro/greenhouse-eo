@@ -192,8 +192,8 @@ Fases A y B (TASK-601, TASK-602) son 100% PostgreSQL + TS interno — se pueden 
 >
 > | Fase | Child task | Effort |
 > |---|---|---|
-> | A — Canonical Model Extension + Ref Tables | [TASK-601](docs/tasks/to-do/TASK-601-product-catalog-schema-extension-ref-tables.md) | Medio |
-> | B — Multi-Currency Price Normalization | [TASK-602](docs/tasks/to-do/TASK-602-product-catalog-multi-currency-prices.md) | Medio |
+> | A — Canonical Model Extension + Ref Tables | [TASK-601](docs/tasks/complete/TASK-601-product-catalog-schema-extension-ref-tables.md) ✅ cerrada 2026-04-24 | Medio |
+> | B — Multi-Currency Price Normalization | [TASK-602](docs/tasks/complete/TASK-602-product-catalog-multi-currency-prices.md) ✅ cerrada 2026-04-24 | Medio |
 > | C — Outbound Contract v2 + COGS Unblock | [TASK-603](docs/tasks/to-do/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md) | Alto |
 > | D — Inbound Rehydration + Owner + Drift | [TASK-604](docs/tasks/to-do/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md) | Medio |
 > | E — Admin UI + Backfill + Reconcile + Governance | [TASK-605](docs/tasks/to-do/TASK-605-product-catalog-admin-ui-backfill-governance.md) | Alto |

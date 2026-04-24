@@ -2,6 +2,18 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-602 CERRADA ✅: Product Catalog Multi-Currency Price Normalization (TASK-587 Fase B)
+
+- **Nueva tabla `greenhouse_commercial.product_catalog_prices`** con PK `(product_id, currency_code)`, FK CASCADE a `product_catalog`, CHECKs sobre matriz canónica CLP/USD/CLF/COP/MXN/PEN + enum `source` ∈ {gh_admin, hs_seed, fx_derived, backfill_legacy} + consistency de columnas derivadas, 2 partial indexes. Migración `20260424174148326`.
+- **VIEW `product_catalog_authoritative_price`** resuelve primary authoritative con precedencia CLP → USD → CLF → COP → MXN → PEN via `DISTINCT ON (product_id)`. Migración `20260424174148937`.
+- **Backfill idempotente** desde `default_unit_price + default_currency` del catálogo como filas `source='backfill_legacy', is_authoritative=true`. Migración `20260424174149550`.
+- **Store `src/lib/commercial/product-catalog-prices.ts`**: `setAuthoritativePrice` (upsert autoritativa + recompute 5 derivadas en misma transacción, reporta `missingRates` sin fallar, preserva autoritativas en otras monedas), `getPricesByCurrency` (6 monedas con NULL fallback), `getAuthoritativePrice` (lee VIEW), `recomputeDerivedForCurrencyPair` (anti-ping-pong 60s via `derived_from_fx_at`).
+- **Projection reactiva `product-catalog-prices-recompute`** (domain `cost_intelligence`) suscrita a `finance.exchange_rate.upserted`. `extractScope` normaliza entityId alfabético (`CLP_USD` canónico); `refresh` llama `recomputeDerivedForCurrencyPair` dos veces (forward + reverse) — anti-ping-pong hace la segunda invocación barata. Registrada en `src/lib/sync/projections/index.ts`. maxRetries=2.
+- **Discovery seed one-time** `scripts/discovery/hubspot-products-prices-seed.ts`: barre HS portal, matchea via `hubspot_product_id`, upsert `source='hs_seed'` para cada `hs_price_{code}` poblado. Dry-run default, `--apply` explícito, idempotente (preserva autoritativas existentes como conflict), reporte Markdown.
+- **Tests**: 20/20 específicos passing (`product-catalog-prices.test.ts` 11/11 + `product-catalog-prices-recompute.test.ts` 9/9); 389/389 en dir commercial + projections.
+- **Tipos Kysely regenerados**: 2 nuevas interfaces `GreenhouseCommercialProductCatalogPrices` + `GreenhouseCommercialProductCatalogAuthoritativePrice` (285 tablas totales).
+- **Desbloquea TASK-603** (Outbound v2 construye `pricesByCurrency` payload via `getPricesByCurrency`) y **TASK-605** (Admin UI grid lee la tabla normalizada).
+
 ### 2026-04-24 — TASK-574 CUTOVER EJECUTADO ✅: HubSpot Greenhouse Integration Service ahora deploya desde el monorepo
 
 - **Cloud Run revisión `hubspot-greenhouse-integration-00029-ng2`** live desde 2026-04-24 15:01 UTC, desplegada vía GitHub Actions workflow (`hubspot-greenhouse-integration-deploy.yml`) con Workload Identity Federation auth.

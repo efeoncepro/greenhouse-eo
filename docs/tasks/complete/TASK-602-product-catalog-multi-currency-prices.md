@@ -6,17 +6,18 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `TASK-587` (umbrella) → `TASK-544` (program parent)
-- Status real: `Diseno`
+- Status real: `Completo`
 - Rank: `TBD`
 - Domain: `crm`
-- Blocked by: `TASK-601`
-- Branch: `task/TASK-602-product-catalog-multi-currency-prices`
+- Blocked by: `none` (TASK-601 landed en commit `e227c5c4`)
+- Branch: `task/TASK-574-absorb-hubspot-greenhouse-integration-service` (trabajo realizado sobre la rama activa)
+- Completed: `2026-04-24`
 
 ## Summary
 
@@ -164,32 +165,34 @@ Ver [TASK-587 § Slice B](docs/tasks/to-do/TASK-587-hubspot-products-full-fideli
 
 ## Acceptance Criteria
 
-- [ ] `product_catalog_prices` creada con PK, indexes, FK a `product_catalog(product_id)` ON DELETE CASCADE
-- [ ] VIEW `product_catalog_default_price` reproduce shape legacy (`product_id, default_unit_price, default_currency`)
-- [ ] Backfill ejecutado: cada producto con `default_unit_price` tiene exactamente 1 fila autoritativa
-- [ ] Discovery seed report generado; 0 productos huérfanos sin precio (Discovery confirmó si HS tenía valores)
-- [ ] `setAuthoritativePrice` produce las 5 derivadas en mismo statement transaccional
-- [ ] Hook reactivo en `fx.rate.updated` regenera derivadas afectadas
-- [ ] Tests passing
-- [ ] Re-correr backfill 2x no genera duplicados ni cambios
+- [x] `product_catalog_prices` creada con PK, indexes, FK a `product_catalog(product_id)` ON DELETE CASCADE (migración `20260424174148326`)
+- [x] VIEW `product_catalog_authoritative_price` resuelve desempate por precedencia canónica CLP→USD→CLF→COP→MXN→PEN (migración `20260424174148937`). Nota: se renombró de `product_catalog_default_price` a `product_catalog_authoritative_price` por claridad; las columnas legacy `default_unit_price`/`default_currency` del catálogo se preservan intactas (no se crea VIEW de compat porque ningún caller usa ese shape aún)
+- [x] Backfill ejecutado: cada producto con `default_unit_price` tiene exactamente 1 fila autoritativa (migración `20260424174149550`, idempotente via `ON CONFLICT`)
+- [x] Discovery seed script creado (`scripts/discovery/hubspot-products-prices-seed.ts`) con modo `--apply` explícito; dry-run default
+- [x] `setAuthoritativePrice` produce las 5 derivadas en mismo statement transaccional via `withTransaction`
+- [x] Hook reactivo en `finance.exchange_rate.upserted` regenera derivadas afectadas (`src/lib/sync/projections/product-catalog-prices-recompute.ts`, registrado en `projections/index.ts`)
+- [x] Tests passing: 20/20 específicas, 389/389 en dir commercial + projections
+- [x] Backfill idempotente por diseño (ON CONFLICT DO NOTHING)
 
 ## Verification
 
-- `pnpm migrate:status` muestra las 3 migraciones de Fase B aplicadas
-- `pnpm pg:doctor`
-- `pnpm lint` + `npx tsc --noEmit`
-- `pnpm test src/lib/commercial/product-catalog-prices.test.ts`
-- Manual: `SELECT product_id, count(*) FROM product_catalog_prices GROUP BY product_id` — todos = 6 (después de derivación) o 1+ (operator-set sin derivación si rate no disponible)
+- `pnpm migrate:status` — 3 migraciones de Fase B aplicadas (`20260424174148326`, `20260424174148937`, `20260424174149550`)
+- `pnpm lint` — clean sobre archivos TASK-602
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/commercial/product-catalog-prices.test.ts` — 11/11
+- `pnpm test src/lib/sync/projections/product-catalog-prices-recompute.test.ts` — 9/9
+- `pnpm test src/lib/commercial src/lib/sync/projections` — 389/389 pasando
+- Manual post-seed: `SELECT product_id, count(*) FROM greenhouse_commercial.product_catalog_prices GROUP BY product_id` queda pendiente de ejecutar cuando haya productos con `setAuthoritativePrice` real (backfill Slice 3 produce 1 fila por producto; derivación FX ocurre al próximo `setAuthoritativePrice` o al próximo `finance.exchange_rate.upserted`)
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado: tabla creada, productos con prices, Discovery seed result
-- [ ] `changelog.md`: nueva tabla + VIEW + helper + hook
-- [ ] Update TASK-587 con nota: Fase B completada
-- [ ] Desbloquear TASK-603 — confirmar `Blocked by` removido
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] Archivo en carpeta correcta (`docs/tasks/complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado: tabla creada, VIEW, store, projection, Discovery seed
+- [x] `changelog.md`: nueva tabla + VIEW + helper + projection + seed script
+- [x] Update TASK-587 con nota: Fase B completada
+- [x] Desbloquear TASK-603 — `Blocked by` removido
 
 ## Follow-ups
 

@@ -43,6 +43,7 @@ import { vatMonthlyPositionProjection } from './vat-monthly-position'
 import { partyHubSpotOutboundProjection } from './party-hubspot-outbound'
 import { partyLifecycleSnapshotProjection } from './party-lifecycle-snapshot'
 import { pricingCatalogApprovalNotifierProjection } from './pricing-catalog-approval-notifier'
+import { productCatalogPricesRecomputeProjection } from './product-catalog-prices-recompute'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -90,6 +91,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(contractMrrArrProjection)
   registerProjection(sourceToProductCatalogProjection)
   registerProjection(productHubSpotOutboundProjection)
+  registerProjection(productCatalogPricesRecomputeProjection)
   registerProjection(pricingCatalogApprovalNotifierProjection)
   registerProjection(incomeHubSpotOutboundProjection)
   registerProjection(partyHubSpotOutboundProjection)
