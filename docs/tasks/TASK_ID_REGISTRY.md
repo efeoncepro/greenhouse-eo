@@ -654,7 +654,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-598` | `complete` | ICO Narrative Presentation Layer (resolve mentions + relevance filter + sanitization) | `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md` |
 | `TASK-599` | `to-do` | Finance Preventive Test Lane (Playwright + Component + Route Resilience) | `docs/tasks/to-do/TASK-599-finance-preventive-test-lane.md` |
 | `TASK-600` | `to-do` | Reliability Registry & Signal Correlation Foundation | `docs/tasks/to-do/TASK-600-reliability-registry-signal-foundation.md` |
-| `TASK-601` | `to-do` | Product Catalog Schema Extension + 4 Reference Tables (TASK-587 Fase A) | `docs/tasks/to-do/TASK-601-product-catalog-schema-extension-ref-tables.md` |
+| `TASK-601` | `complete` | Product Catalog Schema Extension + 4 Reference Tables (TASK-587 Fase A) | `docs/tasks/complete/TASK-601-product-catalog-schema-extension-ref-tables.md` |
 | `TASK-602` | `to-do` | Product Catalog Multi-Currency Price Normalization (TASK-587 Fase B) | `docs/tasks/to-do/TASK-602-product-catalog-multi-currency-prices.md` |
 | `TASK-603` | `to-do` | HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C) | `docs/tasks/to-do/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md` |
 | `TASK-604` | `to-do` | HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D) | `docs/tasks/to-do/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md` |

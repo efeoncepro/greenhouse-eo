@@ -695,22 +695,30 @@ export interface GreenhouseCommercialProductCatalog {
   archived_at: Timestamp | null;
   archived_by: string | null;
   business_line_code: string | null;
+  category_code: string | null;
+  commercial_owner_assigned_at: Timestamp | null;
+  commercial_owner_member_id: string | null;
   created_at: Generated<Timestamp>;
   created_by: Generated<string>;
   default_currency: Generated<string>;
   default_unit: Generated<string>;
   default_unit_price: Numeric | null;
   description: string | null;
+  description_rich_html: string | null;
   finance_product_id: string | null;
   /**
    * SHA-256 of the Greenhouse-owned fields joined with | — used by drift detection to compare against HubSpot snapshot. Recomputed on every commit. NULL until first materialize.
    */
   gh_owned_fields_checksum: string | null;
+  hubspot_bundle_type_code: Generated<string | null>;
   /**
    * TASK-547: timestamp of the last successful outbound write to HubSpot. Inbound sync (TASK-548) consults this to skip pushes received within 60s (anti-ping-pong guard).
    */
   hubspot_last_write_at: Timestamp | null;
+  hubspot_pricing_model: Generated<string | null>;
+  hubspot_product_classification: Generated<string | null>;
   hubspot_product_id: string | null;
+  hubspot_product_type_code: string | null;
   /**
    * TASK-547: monotonic counter of outbound attempts since last success. Reset to 0 on synced.
    */
@@ -723,10 +731,12 @@ export interface GreenhouseCommercialProductCatalog {
    * TASK-547: last outbound attempt status (pending | synced | failed | endpoint_not_deployed | skipped_no_anchors). NULL == never attempted.
    */
   hubspot_sync_status: string | null;
+  image_urls: Generated<string[] | null>;
   /**
    * Soft-archive flag. Archived products are hidden from selectors but preserved for historical quotations/contracts.
    */
   is_archived: Generated<boolean>;
+  is_recurring: Generated<boolean | null>;
   /**
    * Timestamp of the most recent drift detection pass (TASK-548). NULL until first cron run.
    */
@@ -738,11 +748,15 @@ export interface GreenhouseCommercialProductCatalog {
   last_synced_at: Timestamp | null;
   legacy_category: string | null;
   legacy_sku: string | null;
+  marketing_url: string | null;
+  owner_gh_authoritative: Generated<boolean | null>;
   pricing_model: string | null;
   product_code: string;
   product_id: Generated<string>;
   product_name: string;
   product_type: Generated<string>;
+  recurring_billing_frequency_code: string | null;
+  recurring_billing_period_iso: string | null;
   /**
    * PK of the source row in the owning catalog (role_id / tool_id / addon_id / module_id). NULL for source_kind in (manual, hubspot_imported).
    */
@@ -760,6 +774,27 @@ export interface GreenhouseCommercialProductCatalog {
   suggested_role_code: string | null;
   sync_direction: Generated<string>;
   sync_status: Generated<string>;
+  tax_category_code: string | null;
+  unit_code: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProductCategories {
+  active: Generated<boolean>;
+  code: string;
+  created_at: Generated<Timestamp>;
+  display_order: number | null;
+  hubspot_option_value: string | null;
+  label_en: string | null;
+  label_es: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProductSourceKindMapping {
+  created_at: Generated<Timestamp>;
+  hubspot_product_type: string;
+  notes: string | null;
+  source_kind: string;
   updated_at: Generated<Timestamp>;
 }
 
@@ -774,6 +809,17 @@ export interface GreenhouseCommercialProductSyncConflicts {
   resolution_applied_at: Timestamp | null;
   resolution_status: Generated<string>;
   resolved_by: string | null;
+}
+
+export interface GreenhouseCommercialProductUnits {
+  active: Generated<boolean>;
+  code: string;
+  created_at: Generated<Timestamp>;
+  display_order: number | null;
+  hubspot_option_value: string | null;
+  label_en: string | null;
+  label_es: string;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseCommercialQuotationAuditLog {
@@ -3747,6 +3793,19 @@ export interface GreenhouseFinanceSuppliers {
   website_url: string | null;
 }
 
+export interface GreenhouseFinanceTaxCategories {
+  active: Generated<boolean>;
+  code: string;
+  created_at: Generated<Timestamp>;
+  default_rate_pct: Numeric | null;
+  display_order: number | null;
+  hubspot_option_value: string | null;
+  jurisdiction: Generated<string>;
+  label_en: string | null;
+  label_es: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceTaxCodes {
   created_at: Generated<Timestamp>;
   description: string | null;
@@ -6300,7 +6359,10 @@ export interface DB {
   "greenhouse_commercial.pricing_catalog_approval_queue": GreenhouseCommercialPricingCatalogApprovalQueue;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
+  "greenhouse_commercial.product_categories": GreenhouseCommercialProductCategories;
+  "greenhouse_commercial.product_source_kind_mapping": GreenhouseCommercialProductSourceKindMapping;
   "greenhouse_commercial.product_sync_conflicts": GreenhouseCommercialProductSyncConflicts;
+  "greenhouse_commercial.product_units": GreenhouseCommercialProductUnits;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
   "greenhouse_commercial.quotation_line_cost_override_history": GreenhouseCommercialQuotationLineCostOverrideHistory;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;
@@ -6428,6 +6490,7 @@ export interface DB {
   "greenhouse_finance.shareholder_account_movements": GreenhouseFinanceShareholderAccountMovements;
   "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
+  "greenhouse_finance.tax_categories": GreenhouseFinanceTaxCategories;
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;

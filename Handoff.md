@@ -120,6 +120,30 @@ Runbook completo: `docs/operations/TASK-574-cutover-runbook.md`.
   - `requirements.txt` con versiones floating (`flask>=2.0`, etc.) — documentado como follow-up para pinear.
 - **Branch**: `task/TASK-574-absorb-hubspot-greenhouse-integration-service` → PR a develop pendiente.
 
+## Sesion 2026-04-24 — TASK-601 cerrada: Product Catalog Schema Extension + Ref Tables (Fase A de TASK-587 umbrella)
+
+- **Entregado**
+  - 3 migraciones aplicadas (`20260424133202485` catalog extension, `20260424133208734` reference tables, `20260424133209349` backfill)
+  - `greenhouse_commercial.product_catalog` +16 columnas nullable (4 con prefijo `hubspot_` para evitar colisión con `product_type`/`pricing_model` GH-internos existentes con semántica distinta)
+  - 4 tablas ref sembradas 1:1 con HubSpot portal 48713323 options:
+    - `greenhouse_commercial.product_categories` (5 filas)
+    - `greenhouse_commercial.product_units` (12 filas)
+    - `greenhouse_finance.tax_categories` (3 filas Chile, hubspot_option_value=NULL hoy — HS portal tiene options array vacío; governance follow-up)
+    - `greenhouse_commercial.product_source_kind_mapping` (7 filas, incluye `sellable_role_variant` + `hubspot_imported` observados en TASK-545 CHECK)
+  - FKs: `category_code`, `unit_code`, `tax_category_code`, `commercial_owner_member_id` → `greenhouse_core.members(member_id)` (ON DELETE SET NULL)
+  - CHECKs HS-alignados para `hubspot_product_type_code|pricing_model|product_classification|bundle_type_code|recurring_billing_frequency_code`
+  - Readers TS con cache TTL 60s en `src/lib/commercial/product-catalog-references.ts` + 17 tests passing
+  - Discovery script reproducible `scripts/discovery/hubspot-products-inventory.ts`
+  - Reporte operativo de Discovery: `docs/operations/discovery-hubspot-products-inventory-20260424.md`
+- **Hallazgos del Discovery (propagar a TASK-602/603)**
+  - 42/74 productos ya tienen `hs_price_*` poblados → TASK-602 seed debe capturar como `source='hs_seed'` autoritativos
+  - 33/74 productos con `hs_cost_of_goods_sold` real → TASK-603 COGS outbound unblock entrega valor inmediato
+  - 0/74 con `hubspot_owner_id`, `hs_url`, `hs_images` → green-field para Fase D owner bridge
+  - `gh_business_line` data quality (casing `wave`/`Wave` + multi-BU `"Efeonce / Globe / Wave / Reach"`) — follow-up candidate
+- **Desbloquea**: TASK-602 (Fase B multi-currency prices) ya puede iniciar
+- **No desbloquea aún**: TASK-603/604/605 siguen bloqueadas por TASK-574 (absorción middleware Cloud Run) — decisión de sequencing del umbrella TASK-587
+- **Branch**: `task/TASK-601-product-catalog-schema-extension` → PR pending a develop
+
 ## Sesion 2026-04-24 — TASK-606 rescata la intención útil del PR #62 (Codex)
 
 - **Contexto**
