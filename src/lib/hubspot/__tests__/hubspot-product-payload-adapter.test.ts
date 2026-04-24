@@ -207,13 +207,24 @@ describe('adaptProductCatalogToHubSpotCreatePayload', () => {
     expect(payload.taxCategoryCode).toBe('Chile - IVA 19%')
   })
 
-  it('omits category/unit/tax when codes are null (no lookup happens)', async () => {
+  it('falls back to SOURCE_KIND_DEFAULTS when category/unit codes are null', async () => {
+    // When the product_catalog row has no ref codes (materializer gap —
+    // TASK-546 Fase B not yet projecting them), the adapter emits the
+    // canonical default for the source_kind fetched from portal 48713323
+    // (2026-04-24). Ref-table lookups are still skipped for null inputs.
     const payload = await adaptProductCatalogToHubSpotCreatePayload(
-      baseSnapshot({ categoryCode: null, unitCode: null, taxCategoryCode: null })
+      baseSnapshot({
+        sourceKind: 'sellable_role',
+        categoryCode: null,
+        unitCode: null,
+        taxCategoryCode: null
+      })
     )
 
-    expect(payload.categoryCode).toBeNull()
-    expect(payload.unitCode).toBeNull()
+    expect(payload.categoryCode).toBe('Staff augmentation')
+    expect(payload.unitCode).toBe('Hora')
+    // tax still null: hs_tax_category uses externalOptions (Taxation add-on
+    // not enabled on portal 48713323), so no fallback available.
     expect(payload.taxCategoryCode).toBeNull()
     expect(mockGetCategoryByCode).not.toHaveBeenCalled()
     expect(mockGetUnitByCode).not.toHaveBeenCalled()

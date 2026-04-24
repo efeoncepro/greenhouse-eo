@@ -12,11 +12,17 @@ import {
   type CurrencyCode
 } from '@/lib/commercial/product-catalog-prices'
 import {
+  SOURCE_KIND_DEFAULTS,
+  normalizeBusinessLineCode
+} from '@/lib/commercial/product-catalog/source-kind-defaults'
+import type { ProductSourceKind } from '@/lib/commercial/product-catalog/types'
+import {
   getProductCategoryByCode,
   getProductUnitByCode,
   getTaxCategoryByCode,
   resolveHubSpotProductType
 } from '@/lib/commercial/product-catalog-references'
+import { convertCurrencyAmount } from '@/lib/finance/pricing/currency-converter'
 
 import type {
   HubSpotGreenhouseCreateProductRequest,
@@ -82,6 +88,19 @@ export interface ProductCatalogSyncSnapshot {
   imageUrls: string[]
 }
 
+const resolveBusinessLineWithFallback = (
+  snapshot: ProductCatalogSyncSnapshot
+): string | null => {
+  const normalized = normalizeBusinessLineCode(snapshot.businessLineCode)
+
+  if (normalized) return normalized
+
+  const defaults = SOURCE_KIND_DEFAULTS[snapshot.sourceKind as ProductSourceKind]
+
+  
+return defaults?.businessLineCode ?? null
+}
+
 const buildCustomProperties = (
   snapshot: ProductCatalogSyncSnapshot
 ): HubSpotGreenhouseProductCustomProperties => ({
@@ -89,7 +108,7 @@ const buildCustomProperties = (
   gh_source_kind: snapshot.sourceKind,
   gh_last_write_at: snapshot.ghLastWriteAt,
   gh_archived_by_greenhouse: snapshot.isArchived,
-  gh_business_line: snapshot.businessLineCode
+  gh_business_line: resolveBusinessLineWithFallback(snapshot)
 })
 
 // ── v2 field builders (extracted for testability + clarity) ─────────────
@@ -110,6 +129,28 @@ const buildPricesByCurrency = async (
   for (const code of CURRENCY_CODES) {
     // null propagates as null → middleware writes ""
     result[code as CurrencyCode] = prices[code as CurrencyCode]
+  }
+
+  // FX-derive CLP from USD when authoritative price is USD and CLP is
+  // missing. Applies only to products whose canonical currency is USD
+  // (most sellable_role rows). Uses latest exchange rate from
+  // `fin_exchange_rates` — non-blocking: if FX resolution fails we leave
+  // CLP null and the middleware blanks it in HubSpot (consistent with
+  // Greenhouse-SoT semantics).
+  if (result.USD != null && result.CLP == null) {
+    try {
+      const clpDerived = await convertCurrencyAmount({
+        amount: result.USD,
+        fromCurrency: 'USD',
+        toCurrency: 'CLP'
+      })
+
+      if (clpDerived != null && Number.isFinite(clpDerived) && clpDerived > 0) {
+        result.CLP = clpDerived
+      }
+    } catch {
+      // Intentional swallow — FX lookup is best-effort on outbound.
+    }
   }
 
   return result
@@ -183,7 +224,12 @@ const resolveProductType = async (
 
   const mapped = await resolveHubSpotProductType(snapshot.sourceKind)
 
-  return mapped as HubSpotProductType
+  if (mapped) return mapped as HubSpotProductType
+
+  const defaults = SOURCE_KIND_DEFAULTS[snapshot.sourceKind as ProductSourceKind]
+
+  
+return (defaults?.hubspotProductType ?? 'service') as HubSpotProductType
 }
 
 /**
@@ -205,6 +251,15 @@ const buildV2Payload = async (snapshot: ProductCatalogSyncSnapshot) => {
       resolveProductType(snapshot)
     ])
 
+  // Source-kind fallbacks: if the snapshot doesn't have an explicit ref
+  // code set in PG, apply the canonical default matched to the actual
+  // HubSpot option values fetched from portal 48713323 (2026-04-24).
+  // Keeps outbound populated while TASK-546 materializer catches up on
+  // projecting these fields from the source catalogs.
+  const defaults = SOURCE_KIND_DEFAULTS[snapshot.sourceKind as ProductSourceKind]
+  const finalCategory = categoryOption ?? defaults?.categoryCode ?? null
+  const finalUnit = unitOption ?? defaults?.unitCode ?? null
+
   // Plain description: prefer the operator-set plain field; fall back to
   // derived from rich HTML so both stay consistent. Empty string is
   // treated as "operator explicitly cleared" — we send "" to HubSpot.
@@ -218,8 +273,8 @@ const buildV2Payload = async (snapshot: ProductCatalogSyncSnapshot) => {
     pricingModel: snapshot.hubspotPricingModel ?? 'flat',
     productClassification: snapshot.hubspotProductClassification ?? 'standalone',
     bundleType: snapshot.hubspotBundleTypeCode ?? 'none',
-    categoryCode: categoryOption,
-    unitCode: unitOption,
+    categoryCode: finalCategory,
+    unitCode: finalUnit,
     taxCategoryCode: taxOption,
     isRecurring: snapshot.isRecurring,
     recurringBillingFrequency: snapshot.recurringBillingFrequencyCode,
