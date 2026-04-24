@@ -38,20 +38,18 @@ const buildDatabaseUrl = () => {
   // No authorized networks are configured. Connecting to the public IP
   // will hang for 30+ seconds before ETIMEDOUT. Detect and abort early.
   if (host && !isLocalProxy && !host.endsWith('.internal')) {
-    console.error(`
-┌─────────────────────────────────────────────────────────────────┐
-│  GREENHOUSE_POSTGRES_HOST="${host}" is not reachable   │
-│  via direct TCP. Cloud SQL has no authorized networks.          │
-│                                                                 │
-│  Start the Cloud SQL Auth Proxy first:                          │
-│    cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev"   │
-│      --port 15432                                               │
-│                                                                 │
-│  Then set in .env.local:                                        │
-│    GREENHOUSE_POSTGRES_HOST="127.0.0.1"                         │
-│    GREENHOUSE_POSTGRES_PORT="15432"                              │
-│    GREENHOUSE_POSTGRES_SSL="false"                               │
-└─────────────────────────────────────────────────────────────────┘
+    console.error(`[CONFIG] GREENHOUSE_POSTGRES_HOST="${host}" is not reachable via direct TCP.
+Cloud SQL has no authorized networks configured.
+
+Start the Cloud SQL Auth Proxy first:
+  cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
+
+Then set in .env.local:
+  GREENHOUSE_POSTGRES_HOST="127.0.0.1"
+  GREENHOUSE_POSTGRES_PORT="15432"
+  GREENHOUSE_POSTGRES_SSL="false"
+
+Or use the automated wrapper: pnpm pg:connect:migrate
 `)
     process.exit(1)
   }
@@ -72,7 +70,7 @@ const buildDatabaseUrl = () => {
       !password && 'GREENHOUSE_POSTGRES_PASSWORD (resolved from profile)'
     ].filter(Boolean)
 
-    throw new Error(`Cannot build DATABASE_URL. Missing: ${missing.join(', ')}`)
+    throw new Error(`[CONFIG] Cannot build DATABASE_URL. Missing: ${missing.join(', ')}`)
   }
 
   const encodedPassword = encodeURIComponent(password)
@@ -152,6 +150,14 @@ const main = () => {
   try {
     execSync(fullCommand, { stdio: 'inherit', env: envWithUrl })
   } catch {
+    console.error(`
+[SQL] node-pg-migrate ${command} failed — ver salida completa arriba para el error específico.
+Triage rápido según el mensaje:
+  - "ECONNREFUSED 127.0.0.1:15432"  → el Cloud SQL Proxy no está corriendo. Usa: pnpm pg:connect:migrate
+  - "handshake failed" / se colgó    → [NETWORK] red bloquea TLS al 3307. Usa: pnpm pg:connect:status para diagnóstico
+  - "password authentication failed" → revisa GREENHOUSE_POSTGRES_*_PASSWORD en .env.local
+  - error SQL específico             → revisa la migración que falló
+`)
     process.exit(1)
   }
 
@@ -172,7 +178,7 @@ const main = () => {
 
         console.log('[migrate] Types updated in src/types/db.d.ts')
       } catch {
-        console.warn('[migrate] Type generation failed — run pnpm db:generate-types manually')
+        console.warn('[SQL] Type generation failed — run pnpm db:generate-types manually')
       }
     }
   }

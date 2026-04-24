@@ -8,19 +8,37 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Cerrada 2026-04-23`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-584-postgres-migration-tooling-hardening`
+- Branch: `develop` (commit directo, docs + tooling)
 - Legacy ID: `[optional]`
 - GitHub Issue: `[optional]`
+
+## Outcome 2026-04-23
+
+- `scripts/pg-connect.sh` ahora:
+  - Registra `trap cleanup EXIT INT TERM` — en `--migrate`/`--status`/`--shell` el proxy se mata al salir; en modo default `connect` persiste (disown) como antes
+  - Ejecuta `network_preflight` (ping -D -s 1200 a `34.86.135.144`) antes del proxy. Si DF grande falla y DF chico pasa → `[NETWORK]` con acciones concretas en <1s
+  - Reemplazó `sleep 3` fijo por poll del mensaje `ready for new connections` (hasta 10s). En happy path arranca en 1-2s
+  - Imprime `tail -20` del log del proxy cuando `[PROXY]` o `[SQL]` fallan
+  - Clasifica errores con prefijos `[ADC]` `[PROXY]` `[NETWORK]` `[SQL]` `[CONFIG]` (se agregó `[CONFIG]` para env vars ausentes)
+  - Escape hatches: `GREENHOUSE_SKIP_PREFLIGHT=true`, `GREENHOUSE_FORCE_PREFLIGHT_FAIL=true` (testing)
+- `scripts/migrate.ts` etiqueta sus errores owned con `[CONFIG]` (fail-fast por IP pública no accesible + missing env) y `[SQL]` (fallo de `node-pg-migrate` o `kysely-codegen`). Incluye guía de triage rápido en el mensaje de `[SQL]`
+- `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` tiene nueva sección "Error Prefix Taxonomy" con tabla prefijo → primera acción, sección "Preflight de red" con escape hatch, y tabla de Troubleshooting ampliada con los nuevos prefijos
+
+Verificación live:
+- `GREENHOUSE_FORCE_PREFLIGHT_FAIL=true bash scripts/pg-connect.sh` → `[NETWORK]` en <1s ✅
+- `pnpm pg:connect:status` happy path → arranca en 2s, corre dry-run, "No migrations to run!", proxy killed por trap al salir ✅
+- `pnpm pg:connect` (no-arg) → proxy persiste tras exit del script ✅
+- `npx tsc --noEmit` limpio, `pnpm lint` limpio ✅
 
 ## Delta 2026-04-23
 

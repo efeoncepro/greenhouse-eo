@@ -2,6 +2,15 @@
 
 ## 2026-04-22
 
+### 2026-04-23 — TASK-584 cerrada: `pg-connect.sh` resiliente + preflight de red + taxonomía de errores
+
+- `scripts/pg-connect.sh` ahora tiene `trap cleanup EXIT INT TERM` que mata el proxy spawn cuando el script muere a medias en modos one-shot (`--migrate`, `--status`, `--shell`), pero preserva el proxy (disown + `KEEP_PROXY=true`) en modo default `connect` para que el usuario pueda seguir usándolo manualmente — elimina la cadena de fallos `ECONNRESET seguido de ECONNREFUSED 127.0.0.1:15432` que bloqueó a Codex.
+- Nuevo `network_preflight` con `ping -D -s 1200 34.86.135.144`: si DF grande falla y DF chico pasa, el script reporta `[NETWORK]` con acciones concretas (hotspot, MSS clamp, Cloud Shell) en <1s, en vez de colgarse 30s esperando el TLS handshake. Escape hatches: `GREENHOUSE_SKIP_PREFLIGHT=true` (ICMP bloqueado pero TCP OK) y `GREENHOUSE_FORCE_PREFLIGHT_FAIL=true` (testing).
+- `sleep 3` fijo del arranque del proxy reemplazado por poll del mensaje `ready for new connections` (hasta 10s). Happy path ahora arranca en 1-2s; redes lentas tienen márgen real.
+- Taxonomía de prefijos de error mutuamente excluyentes en `pg-connect.sh` y `scripts/migrate.ts`: `[ADC]` (credenciales GCP), `[PROXY]` (binary / proceso), `[NETWORK]` (MTU / middlebox / handshake TLS), `[SQL]` (auth/query Postgres), `[CONFIG]` (env vars / `.env.local`). Cuando falla `[PROXY]` o `[SQL]`, el script imprime `tail -20` del log del proxy.
+- `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` tiene nueva sección "Error Prefix Taxonomy" con tabla prefijo → primera acción, sección "Preflight de red" con el escape hatch, y tabla de Troubleshooting expandida con los nuevos prefijos.
+- Diagnóstico original de Codex (tooling split Connector-first vs proxy-first) quedó descartado tras verificar que `pnpm pg:doctor` (Cloud SQL Connector nativo, otro camino) fallaba idéntico → la raíz era PMTUD blackhole de red corporativa en puerto 3307, no un defecto del tooling. Descartado del scope: refactor Connector-first de `migrate.ts` y `generate-db-types.ts` (kysely-codegen upstream exige URL).
+
 ### 2026-04-23 — Reactive pipeline endurece dead-letters infra y service attribution deja de depender de grants implícitos
 
 - `service_attribution` ya declara explícitamente sus write requirements sobre `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`, en vez de depender de grants implícitos del schema shared.

@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-23 — TASK-584 cerrada: resiliencia de `pg-connect.sh` + preflight de red + taxonomía de errores (Claude)
+
+- **Diagnóstico corregido vs el abierto inicial por Codex**
+  - El `ECONNRESET`/`ECONNREFUSED` que bloqueó la sesión previa NO fue el split Connector-first vs proxy-first. Fue un **PMTUD blackhole** de la red corporativa en puerto 3307: paquetes DF > ~1000B se droppean silenciosamente, ICMP "Frag Needed" está suprimido, y el handshake TLS de Cloud SQL muere en timeout
+  - Prueba concluyente: `pnpm pg:doctor` (Cloud SQL Connector nativo, camino totalmente distinto al proxy standalone) falló idéntico. Ningún refactor Connector-first lo hubiera evitado
+  - Confirmación cruzada: puerto 443 (HTTPS a Google) funciona porque el firewall hace MSS clamping solo en 80/443. Ping DF -s 1200 a 8.8.8.8 también se dropea → no es GCP-specific
+  - Cambio de red (hotspot) destapó el path y `pnpm pg:connect:migrate` con el tooling original aplicó las 2 migraciones de `service_attribution` limpias
+- **Scope reducido y ejecutado**
+  - `scripts/pg-connect.sh`: `trap cleanup EXIT/INT/TERM` (mata proxy spawn si muere a medias salvo en modo default `connect` donde disown + KEEP_PROXY), `network_preflight` con `ping -D -s 1200 34.86.135.144`, poll del mensaje `ready for new connections` (reemplaza `sleep 3` fijo), tail del log del proxy en fallos, clasificación `[ADC] [PROXY] [NETWORK] [SQL] [CONFIG]`, escape hatches `GREENHOUSE_SKIP_PREFLIGHT=true` y `GREENHOUSE_FORCE_PREFLIGHT_FAIL=true`
+  - `scripts/migrate.ts`: prefijos `[CONFIG]` (fail-fast por IP pública + env vars missing) y `[SQL]` (fallos de `node-pg-migrate` / `kysely-codegen`) con guía de triage rápido
+  - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`: nueva sección "Error Prefix Taxonomy", sección "Preflight de red" con escape hatch, tabla de Troubleshooting expandida
+  - Scope explícitamente descartado: refactor Connector-first de `migrate.ts` y `generate-db-types.ts` (kysely-codegen upstream exige URL; poco valor por el mantenimiento que agrega)
+- **Verificaciones live ejecutadas**
+  - `GREENHOUSE_FORCE_PREFLIGHT_FAIL=true bash scripts/pg-connect.sh` → `[NETWORK]` en <1s ✅
+  - `pnpm pg:connect:status` happy path → proxy ready en 2s, dry-run limpio, trap mata el proxy al salir (no zombie) ✅
+  - `pnpm pg:connect` no-arg → proxy persiste tras exit del script ✅
+  - `npx tsc --noEmit` y `pnpm lint` limpios ✅
+- **No-deja deuda**: la task queda cerrada con acceptance criteria verificados. Follow-up ideas en la spec (considerar los mismos prefijos en `scripts/pg-doctor.ts`) quedan como nice-to-have, no blocker
+
 ## Sesion 2026-04-23 — TASK-584 tomada: hardening del tooling de migraciones PostgreSQL (Codex)
 
 - **Scope**
@@ -14,8 +33,7 @@
   - el entorno local tiene simultáneamente `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` y `GREENHOUSE_POSTGRES_HOST=127.0.0.1`
   - `pnpm pg:doctor` y una prueba directa con Connector terminaron en timeout, así que además del código puede existir un problema de conectividad local a sanear
 - **Siguiente paso inmediato**
-  - refactorizar el tooling DB para carril autosuficiente
-  - reintentar migraciones y regeneración de tipos sobre ese carril nuevo
+  - (resuelto arriba) diagnóstico era PMTUD, no tooling split; task cerrada con scope reducido
 
 ## Sesion 2026-04-23 — hardening del dead-letter `service_attribution` y clasificación reactiva infra (Codex)
 
