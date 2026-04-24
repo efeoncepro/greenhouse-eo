@@ -643,3 +643,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-587` | `to-do` | HubSpot Products Full-Fidelity Bidirectional Sync Expansion | `docs/tasks/to-do/TASK-587-hubspot-products-full-fidelity-sync.md` |
 | `TASK-588` | `complete` | Project Title Resolution Hardening en Conformed Sync (fix ICO "Sin nombre") | `docs/tasks/complete/TASK-588-project-title-resolution-conformed-sync-hardening.md` |
 | `TASK-589` | `complete` | Finance Read Path Provisioning Decoupling & Directory Hardening | `docs/tasks/complete/TASK-589-finance-runtime-read-path-decoupling-clients-suppliers.md` |
+| `TASK-590` | `to-do` | ICO Signals Schema v2: identidad determinista + event store (EPIC-006 child 1/8) | `docs/tasks/to-do/TASK-590-ico-signals-schema-v2-identity-event-store.md` |
+| `TASK-591` | `to-do` | Reconcile-based materialize refactor + idempotencia (EPIC-006 child 2/8) | `docs/tasks/to-do/TASK-591-ico-signals-reconcile-materialize-refactor.md` |
+| `TASK-592` | `to-do` | Signal state machine + transitions API (EPIC-006 child 3/8) | `docs/tasks/to-do/TASK-592-ico-signals-state-machine-transitions-api.md` |
+| `TASK-593` | `to-do` | LLM enrichment con versioning + budget + quality gate (EPIC-006 child 4/8) | `docs/tasks/to-do/TASK-593-ico-signals-llm-enrichment-versioning-budget.md` |
+| `TASK-594` | `to-do` | Pipeline observability + SLIs + meta-alertas (EPIC-006 child 5/8) | `docs/tasks/to-do/TASK-594-ico-signals-observability-slis-meta-alerts.md` |
+| `TASK-595` | `to-do` | UI inbox operativo + timeline + filtros (EPIC-006 child 6/8) | `docs/tasks/to-do/TASK-595-ico-signals-inbox-ui-timeline-filters.md` |
+| `TASK-596` | `to-do` | Webhooks outbound + Nexa agent integration (EPIC-006 child 7/8) | `docs/tasks/to-do/TASK-596-ico-signals-webhooks-nexa-integration.md` |
+| `TASK-597` | `to-do` | Migración strangler fig + backfill + deprecate v1 (EPIC-006 child 8/8) | `docs/tasks/to-do/TASK-597-ico-signals-migration-cutover-deprecate-v1.md` |
