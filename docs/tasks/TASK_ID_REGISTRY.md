@@ -651,3 +651,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-595` | `to-do` | UI inbox operativo + timeline + filtros (EPIC-006 child 6/8) | `docs/tasks/to-do/TASK-595-ico-signals-inbox-ui-timeline-filters.md` |
 | `TASK-596` | `to-do` | Webhooks outbound + Nexa agent integration (EPIC-006 child 7/8) | `docs/tasks/to-do/TASK-596-ico-signals-webhooks-nexa-integration.md` |
 | `TASK-597` | `to-do` | Migración strangler fig + backfill + deprecate v1 (EPIC-006 child 8/8) | `docs/tasks/to-do/TASK-597-ico-signals-migration-cutover-deprecate-v1.md` |
+| `TASK-598` | `to-do` | ICO Narrative Presentation Layer (resolve mentions + relevance filter + sanitization) | `docs/tasks/to-do/TASK-598-ico-narrative-presentation-layer.md` |
