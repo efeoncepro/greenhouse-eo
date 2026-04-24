@@ -1,7 +1,7 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-24 por Julio + Claude
 > **Status:** Active
 > **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync
@@ -11,6 +11,7 @@
 - v1.1 (2026-04-24): incorpora business context confirmado (renewal via service catalog, SaaS bundles, footprint LATAM) + hallazgo del service catalog como proto-bundle engine
 - v1.2 (2026-04-24): incorpora PDF enterprise spec + product descriptions rich HTML + DocuSign integration + renewal periodicity variable confirmada + conceptos explicados (constraint rules DSL, nesting, co-term, amendment)
 - v1.3 (2026-04-24): cierra las 7 decisiones operativas pendientes con racional robustez + escalabilidad documentado; refina alcance de TASK-619/620/624/626/629/630 con los acuerdos cerrados
+- v1.4 (2026-04-24): decision PDF — single template con secciones condicionales (no multi-template explicito); refina TASK-629 con el contrato de secciones (always vs conditional) + reglas de activacion
 
 **Documentacion tecnica relacionada:**
 
@@ -403,6 +404,91 @@ Los acuerdos cerrados absorben scope a tasks ya planeadas:
 
 Estimado total P2 Fase 1-2: **+1 sprint neto**.
 
+## Delta 2026-04-24 (v1.4) — PDF: single template con secciones condicionales
+
+### Decision: NO multi-template explicito
+
+Se descarta el approach de tener 3 templates (`compact` / `standard` / `enterprise`) seleccionables manualmente o por reglas. En su lugar, **un solo template con secciones condicionales** que se activan basandose en si los datos existen.
+
+**Racional:**
+
+- **Una sola codebase a mantener** — no hay 3 layouts paralelos que pueden divergir.
+- **Sin decision operativa** — el sales rep no elige template, el sistema decide segun la data.
+- **Look-and-feel consistente** — el cover, branding, fonts, colores son siempre identicos. Solo varia cuantas secciones aparecen.
+- **Validacion empirica primero** — empezamos con 1 template; si en 5-10 quotes reales se valida la necesidad de templates explicitos (ej. "para SaaS bundles necesito un layout diferente al de retainers"), se evoluciona a multi-template en una segunda iteracion. No se sobre-ingenieriza antes de validar.
+
+### Contrato de secciones — always vs conditional
+
+| Seccion | Renderizado | Trigger de activacion |
+|---|---|---|
+| **Cover** | ✅ Siempre | — |
+| **Executive Summary** | ⚠️ Condicional | `quotation.description` tiene >= 200 caracteres O `total > $50M CLP equivalente` O tag `enterprise` |
+| **About Efeonce / Sub-brand** | ⚠️ Condicional | `total > $50M CLP equivalente` O tag `enterprise` O cliente en su 1er quote |
+| **Scope of Work** | ✅ Siempre | — |
+| **Commercial Proposal (tabla)** | ✅ Siempre | — |
+| **Investment Timeline** | ⚠️ Condicional | Existe alguna linea con `is_recurring=true` O hay milestones de pago definidos |
+| **Terms & Conditions** | ✅ Siempre | — |
+| **Signatures + QR** | ✅ Siempre | — |
+| **Footer fijo** | ✅ Siempre (todas las paginas) | — |
+
+**Comportamiento esperado:**
+
+- Quote chica (1-3 lineas, < $5M, sin recurring, sin description): **2-3 paginas** (Cover + Scope + Commercial + Terms + Signatures, sin Executive Summary, sin About, sin Timeline).
+- Quote estandar (3-10 lineas, retainer o bundle, $5-50M): **4-5 paginas** (agrega Investment Timeline si hay recurring; sin Executive Summary ni About).
+- Quote enterprise (> 10 lineas, > $50M o tag enterprise): **6-7 paginas** (todas las secciones activas).
+
+### Triggers detallados de activacion
+
+```ts
+interface QuotationPdfFlags {
+  showExecutiveSummary: boolean
+  showAboutEfeonce: boolean
+  showInvestmentTimeline: boolean
+}
+
+const computePdfFlags = (quote: Quotation): QuotationPdfFlags => {
+  const totalInClp = quote.totalCLP // pre-calculado en outbound
+  const isEnterpriseTagged = quote.tags?.includes('enterprise') ?? false
+  const isFirstQuoteForClient = quote.clientQuoteCount === 1
+  const hasLongDescription = (quote.description?.length ?? 0) >= 200
+  const hasRecurringLines = quote.lineItems.some(li => li.isRecurring)
+  const hasPaymentMilestones = quote.paymentMilestones?.length > 0
+
+  return {
+    showExecutiveSummary: hasLongDescription || totalInClp > 50_000_000 || isEnterpriseTagged,
+    showAboutEfeonce: totalInClp > 50_000_000 || isEnterpriseTagged || isFirstQuoteForClient,
+    showInvestmentTimeline: hasRecurringLines || hasPaymentMilestones
+  }
+}
+```
+
+**Threshold $50M CLP** es ajustable via env var `GREENHOUSE_PDF_ENTERPRISE_THRESHOLD_CLP`. Permite calibrar segun feedback operativo sin deploy.
+
+### Refinamiento TASK-629
+
+Alcance final del rediseno PDF:
+
+1. **Componentes React-PDF reutilizables**: cada seccion (Cover, ExecutiveSummary, ScopeOfWork, CommercialProposal, InvestmentTimeline, Terms, Signatures) es un componente independiente con su propia data shape.
+2. **Orquestador**: `<QuotationPdfDocument>` lee los flags via `computePdfFlags()` y compone las secciones aplicables.
+3. **Brand assets**: logo PNG via `<Image>`, fonts DM Sans + Poppins via `Font.register()`.
+4. **Sub-brand resolver**: persistir `quotation.resolved_business_line_code` al issue (Decision 6 v1.3).
+5. **Legal entity**: query dinamico a `greenhouse_core.organizations` con cache 1h (Decision 7 v1.3).
+6. **QR**: signed HMAC token publico (Decision 5 v1.3).
+7. **Rich HTML descriptions**: line items leen `product_catalog.description_rich_html` y lo renderizan via parser whitelist (`<p>`, `<strong>`, `<em>`, `<ul>`, `<li>`, `<br>`).
+8. **Threshold configurable** via env var.
+
+**Estimado mantenido:** 2 sprints (no cambia vs v1.3 — el modelo single-template con conditionals es comparable en esfuerzo a multi-template explicit, y no agrega ceremonia operativa).
+
+### Migration path si en el futuro se necesita multi-template explicito
+
+Si despues de validar con 5-10 quotes reales se descubre que SaaS bundles requieren un layout estructuralmente distinto (ej. "comparison table vs feature list" o "cover diferente"):
+
+1. Agregar campo `quotation.pdf_template VARCHAR DEFAULT 'universal'`.
+2. Crear archivo `quotation-pdf-template-saas.tsx` que reusa los mismos componentes pero los compone diferente.
+3. El orquestador switch on `quote.pdf_template`.
+
+Sin breaking change al template universal. La inversion en componentes reutilizables paga el rework futuro.
+
 ## Hallazgos principales
 
 ### A. Score Greenhouse vs CPQ canon (benchmark mercado)
@@ -592,8 +678,9 @@ Oportunistico — ir resolviendo mientras se ejecutan los bloques 1-3.
 | Operativa | 14 | QR destino | Publico con signed token HMAC | Delta v1.3 |
 | Operativa | 15 | Sub-brand detection | Mayoria lineas + override header | Delta v1.3 |
 | Operativa | 16 | Legal entity | Dinamico desde organizations | Delta v1.3 |
+| PDF | 17 | Multi-template vs single-template | Single template con secciones condicionales | Delta v1.4 |
 
-**Total:** 16 decisiones cerradas, 0 abiertas. El brief esta listo para generar las TASK-### especificas cuando el owner lo apruebe.
+**Total:** 17 decisiones cerradas, 0 abiertas. El brief esta listo para generar las TASK-### especificas cuando el owner lo apruebe.
 
 Cualquier nueva decision que surja en la implementacion se documenta como Delta vN+1 a este mismo brief, no como ad-hoc en cada task.
 
