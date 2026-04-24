@@ -6,13 +6,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Diseño`
+- Status real: `Avanzada`
 - Rank: `TBD`
 - Domain: `infra / integrations`
 - Blocked by: `none`
@@ -24,12 +24,16 @@
 
 Mover el servicio Cloud Run `hubspot-greenhouse-integration` desde el repo hermano `cesargrowth11/hubspot-bigquery` (carpeta `services/hubspot_greenhouse_integration/`) al monorepo `greenhouse-eo` bajo `services/hubspot_greenhouse_integration/`, siguiendo el mismo patrón que `services/ops-worker/` y `services/commercial-cost-worker/`. El pipeline HubSpot → BigQuery (`main.py` Cloud Function + `greenhouse_bridge.py` top-level) permanece en el sibling; solo el write-bridge HTTP se muda. Objetivo: todo cambio de contrato HubSpot↔Greenhouse (deals, companies, products, quotes, services, webhooks HubSpot inbound) se despacha en un solo PR + un solo deploy + sin context-switch de repo. Ganancia adicional: el servicio recibe CI propia por primera vez (hoy deploya manual sin pipeline).
 
-### Alcance real confirmado por inspección del sibling (2026-04-23)
+### Alcance real confirmado por inspección del sibling (2026-04-23) + Delta 2026-04-24 (Discovery re-ejecutada en ejecución)
 
-- **17 rutas HTTP activas** (no solo `POST /deals`): `/health`, `/contract`, `/deals/metadata`, `/companies/<id>`, `/companies/search`, `/companies/<id>/owner`, `/companies/<id>/contacts`, `/services/<id>`, `/companies/<id>/services`, `POST /deals`, `/products`, `/products/<id>`, `POST /products`, `/products/<id>/archive`, `/products/reconcile`, `/quotes/<id>/line-items`, `/companies/<id>/quotes`, `POST /quotes`, **`POST /webhooks/hubspot`**.
-- **3116 LOC Python** repartidas en 8 archivos: `app.py` (1165), `hubspot_client.py` (884), `contract.py` (364), `models.py` (363), `webhooks.py` (218), `greenhouse_client.py` (80), `config.py` (41), `__init__.py` (1).
-- **1341 LOC de tests** en `tests/test_hubspot_greenhouse_integration_app.py` (más `test_greenhouse_bridge.py` 302 LOC que corresponde al bridge del BQ sync, NO al servicio).
-- **Dependencias runtime**: flask + requests + gunicorn (Procfile: `web: gunicorn --bind :${PORT:-8080} app:app`).
+- **23 rutas HTTP activas** (spec original decía 17 — el servicio creció entre planificación y ejecución):
+  - Lectura (no-auth): `GET /health`, `GET /contract`, `GET /deals/metadata`, `GET /companies/<id>`, `GET /companies/search`, `GET /companies/<id>/owner`, **`GET /owners/resolve`** _(nueva)_, `GET /companies/<id>/contacts`, **`GET /companies/<id>/deals`** _(nueva)_, `GET /services/<id>`, `GET /companies/<id>/services`, `GET /products`, `GET /products/<id>`, `GET /products/reconcile`, `GET /quotes/<id>/line-items`, `GET /companies/<id>/quotes`
+  - Escritura (Bearer auth): **`PATCH /companies/<id>/lifecycle`** _(nueva)_, `POST /deals`, `POST /products`, **`PATCH /products/<id>`** _(nueva)_, `POST /products/<id>/archive`, `POST /quotes`
+  - Webhook (HMAC signature): `POST /webhooks/hubspot`
+- **3410 LOC Python runtime** (spec decía 3116; +294 LOC). 8 módulos: `app.py` (1267), `hubspot_client.py` (1001), `models.py` (411), `contract.py` (391), `webhooks.py` (218), `greenhouse_client.py` (80), `config.py` (41), `__init__.py` (1).
+- **1660 LOC de tests** (spec decía 1341) en `tests/test_hubspot_greenhouse_integration_app.py`; framework `unittest` stdlib con 40 test functions. `test_greenhouse_bridge.py` (302 LOC) corresponde al bridge del BQ sync, NO al servicio — se queda en sibling.
+- **Dependencias runtime**: `flask>=2.0`, `requests>=2.28`, `gunicorn>=22.0` (floating — follow-up post-cutover: pinear para builds reproducibles). Procfile: `web: gunicorn --bind :${PORT:-8080} app:app`.
+- **Acoplamiento cross-service con otros módulos del sibling = NINGUNO** (grep confirmado Discovery 2026-04-24). Todo import interno del servicio es relativo (`from .config import ...`); no depende de `main.py`, `greenhouse_bridge.py`, etc.
 - **El servicio llama back a `greenhouse-eo`** vía `GreenhouseClient` (POST `sync_capabilities` desde webhooks HubSpot inbound). Coupling es puramente HTTP, no import; sobrevive a la mudanza sin cambio.
 - **Tres secretos**: `HUBSPOT_ACCESS_TOKEN`, `GREENHOUSE_INTEGRATION_API_TOKEN`, `HUBSPOT_APP_CLIENT_SECRET` (este último para validación de firma de webhook HubSpot).
 - **Cero CI en el sibling** — deploys 100% manual via `bash deploy.sh`.

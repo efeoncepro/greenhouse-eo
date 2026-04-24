@@ -1,0 +1,31 @@
+# Never ship test or development artefacts in the Cloud Run image.
+tests/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# VCS metadata (the image has no use for git history).
+.git/
+.gitignore
+
+# Editor / IDE state.
+.vscode/
+.idea/
+*.swp
+
+# macOS / Linux cruft.
+.DS_Store
+Thumbs.db
+
+# Legacy artefacts from the sibling that should never reach the image.
+.env.yaml
+.env.example.yaml
+.env.local
+.env.*.local

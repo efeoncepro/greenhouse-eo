@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "greenhouse_customer_tier",
+      "label": "Greenhouse Customer Tier",
+      "description": "Customer tier requested by Greenhouse for tenant segmentation.",
+      "type": "enumeration",
+      "fieldType": "select",
+      "groupName": "companyinformation",
+      "options": [
+        {
+          "label": "Strategic",
+          "value": "strategic",
+          "displayOrder": 1
+        },
+        {
+          "label": "Growth",
+          "value": "growth",
+          "displayOrder": 2
+        },
+        {
+          "label": "SMB",
+          "value": "smb",
+          "displayOrder": 3
+        }
+      ]
+    }
+  ]
+}

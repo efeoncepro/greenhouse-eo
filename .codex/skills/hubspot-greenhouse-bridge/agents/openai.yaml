@@ -1,0 +1,4 @@
+interface:
+  display_name: "Efeonce HubSpot Greenhouse Ops"
+  short_description: "Operate the Efeonce HubSpot/Greenhouse bridge"
+  default_prompt: "Use $efeonce-hubspot-greenhouse-ops to inspect, deploy, validate, or repair the HubSpot BigQuery and Greenhouse bridge integration."
