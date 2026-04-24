@@ -1,7 +1,7 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-24 por Julio + Claude
 > **Status:** Active
 > **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync
@@ -10,6 +10,7 @@
 
 - v1.1 (2026-04-24): incorpora business context confirmado (renewal via service catalog, SaaS bundles, footprint LATAM) + hallazgo del service catalog como proto-bundle engine
 - v1.2 (2026-04-24): incorpora PDF enterprise spec + product descriptions rich HTML + DocuSign integration + renewal periodicity variable confirmada + conceptos explicados (constraint rules DSL, nesting, co-term, amendment)
+- v1.3 (2026-04-24): cierra las 7 decisiones operativas pendientes con racional robustez + escalabilidad documentado; refina alcance de TASK-619/620/624/626/629/630 con los acuerdos cerrados
 
 **Documentacion tecnica relacionada:**
 
@@ -289,6 +290,119 @@ Y refinar el alcance de tasks ya planeadas:
 - **TASK-628** (Amendment) queda **NO diferible**: sube de Fase 5 a Fase 2 porque LATAM corporate lo espera.
 - **TASK-619** (eSignature DocuSign) incluye capa `eSignatureProvider` interface para permitir Adobe Sign como segundo provider cuando lo pidan.
 
+## Delta 2026-04-24 (v1.3) — 7 decisiones operativas cerradas con racional robustez+escalabilidad
+
+Las 7 decisiones operativas que quedaban abiertas en v1.2 se cierran. Cada una tiene su racional documentado para que cualquier futuro cambio de criterio entienda el trade-off.
+
+### Decision 1 — Renewal lead time → multi-valor cascada estandar (90 / 30 / 7 dias)
+
+Emitir 3 events en cascada antes del vencimiento:
+
+- **90 dias antes**: `commercial.service.renewal_due_advance` → CSM tiene tiempo para revisar valor entregado y negociar
+- **30 dias antes**: `commercial.service.renewal_due_imminent` → genera renewal quote draft automatica
+- **7 dias antes**: `commercial.service.renewal_due_critical` → escala a manager si no hay aceptacion
+
+**Racional:** enterprise estandar (Salesforce/Zuora/Chargebee). Single-event te deja sin segunda oportunidad si el cliente no responde. Multi-tier permite procesos diferenciados (revision → quote → escalacion) sin construirlos despues.
+
+**Modelado:** tabla `service_renewal_alerts` con `(service_module_id, alert_offset_days, event_type)`. **Configurable por tenant** para que algunos clientes premium tengan 120/60/14 si se justifica.
+
+### Decision 2 — Discount levels → soportar los tres jerarquicamente
+
+Soportar **line + bundle + global** con orden de aplicacion claro:
+
+```text
+precio_linea
+  → -line_discount
+  → subtotal_linea
+  → suma_subtotales_bundle
+  → -bundle_discount
+  → subtotal_bundle
+  → suma_bundles
+  → -global_discount
+  → total
+```
+
+**Racional:** bundle-level es lo que el operador comercial intuitivamente quiere ofrecer ("15% off al paquete completo"). Line-level es necesario para casos puntuales (descontar solo una herramienta cara). Negar uno de los dos corta UX: operador termina haciendo calculos mentales para "fingir" el descuento que no tiene.
+
+**Robustez:** agregar tabla `bundle_discount_audit` registrando que descuento se aplico a que nivel + por quien. Sin esto el margin engine no puede explicar por que la cotizacion quedo debajo del floor.
+
+### Decision 3 — Tax engine LATAM → generico parametrico con override per-pais
+
+Motor base generico con interface `TaxRule(country, rate, scope, exemptions)` + sub-modulos por pais que sobreescriben **solo los matices**:
+
+- Chile: usa el generico (IVA 19% directo)
+- Colombia: extiende con retencion en la fuente
+- Mexico: extiende con IEPS para ciertos productos
+- Peru: usa el generico (IGV 18% directo)
+
+**Racional:** sub-motor por pais desde dia 1 duplica logica que es 80% igual. Solo generico choca en 6 meses con el primer caso colombiano de retencion y refactorizas todo. **Plugin extensible** te da la base generica + extension points donde realmente importa.
+
+**Escalabilidad:** el dia que llegues a Brasil (ICMS+PIS+COFINS+IPI, el mas complejo de LATAM), agregas un sub-modulo Brasil sin tocar los otros 4 paises.
+
+### Decision 4 — Rich text editor → TipTap
+
+**Racional vs alternativas:**
+
+- **TipTap vs Lexical:** TipTap tiene 4 anios de madurez, comunidad React grande, ecosistema de extensions (mentions, slash commands, tables). Lexical es de Meta pero el ecosistema es chico, breaking changes frecuentes.
+- **TipTap vs Slate:** Slate es low-level (te da las primitivas, construyes todo encima). TipTap viene con extensions production-ready out-of-the-box.
+- **TipTap vs Quill:** Quill es legacy (Delta format propio, no extensible). TipTap output es HTML estandar — clave porque tu sanitizer ya espera HTML.
+
+**Robustez extra:** TipTap output → tu `sanitizeProductDescriptionHtml` (TASK-603) → DB. La cadena ya esta armada, no hay que cambiar el sanitizer.
+
+### Decision 5 — QR del PDF → publico con signed token
+
+Ruta publica `/public/quote/[quotationId]/[versionNumber]/[signedToken]`. El token es HMAC del `quotationId+version+pdfHash+secret`.
+
+**Racional:**
+
+- **UX:** el cliente abre el QR desde su celular sin login. Autenticado requiere que el cliente sea usuario del portal — friction enorme.
+- **Seguridad:** el signed token previene URL guessing. Solo quien tiene el PDF (con el QR) puede acceder.
+- **Trazabilidad:** registras hits a esa URL → analytics de "el cliente abrio el quote N veces" → senial comercial valiosa.
+- **Audit:** el token incluye el hash del PDF. Si el PDF fue alterado offline, el QR muestra "documento invalido" al validar.
+
+**Escalabilidad:** el endpoint publico sirve para verificacion legal en disputa ("este quote es autentico, este no"). Salesforce/HubSpot CPQ lo hacen asi.
+
+### Decision 6 — Sub-brand detection → mayoria de lineas con override en header
+
+Logica en cascada al renderizar el PDF:
+
+1. Si `quotation.business_line_code_override` esta set → usa ese (admin lo seteo manualmente)
+2. Si no, mayoria de los `line_items.product.business_line_code` → usa esa BL
+3. Si hay empate o todas null → usa `efeonce` (matriz)
+
+**Racional:**
+
+- **Header solo:** no captura quotes mixtas (cada vez mas comunes — "te vendo Globe + Wave en el mismo retainer").
+- **Por linea solo:** confuso visualmente — que logo poner en el cover si hay 60% Globe y 40% Wave.
+- **Mayoria con override:** respeta la realidad de las quotes mixtas pero da escape hatch al admin para forzar cuando el negocio dice "esta es Globe aunque tenga 1 linea Wave".
+
+**Robustez:** persistir el resultado en `quotation.resolved_business_line_code` al issue para que el PDF siempre renderice consistente (no recalcule cada vez).
+
+### Decision 7 — Legal entity → dinamico desde greenhouse_core.organizations
+
+Query dinamico al render del PDF, con cache de 1 hora.
+
+**Racional:**
+
+- **Hardcoded** parece simple hoy pero es deuda futura: el dia que cambies de "Efeonce Group SpA" a "Efeonce Holding SpA" (M&A, restructuring), todos los quotes nuevos siguen mostrando el viejo nombre hasta que un dev haga deploy. Pesimo legalmente.
+- **Dinamico** se autocorrige solo. Y permite multi-entity (operating_entity por pais: Efeonce Chile SpA, Efeonce Colombia SAS, Efeonce Mexico SAPI) cuando expandas LATAM.
+
+**Robustez:** funcion `getOperatingEntityForCountry(country_code)` resuelve la entidad correcta basandose en el pais del cliente. Esto te prepara para que clientes mexicanos reciban factura desde Efeonce Mexico SAPI sin codigo nuevo.
+
+### Resumen de impacto en estimados
+
+Los acuerdos cerrados absorben scope a tasks ya planeadas:
+
+| Task | Cambio de estimado | Motivo |
+|---|---|---|
+| TASK-624 (renewals) | +1 sprint | Multi-tier 90/30/7 + tabla `service_renewal_alerts` configurable |
+| TASK-620 (bundles) | +0.5 sprint | `bundle_discount` + tabla `bundle_discount_audit` |
+| TASK-626 (tax) | -1 sprint | Re-formateada como "engine generico + Chile plugin Fase 1"; otros paises entran on-demand |
+| TASK-629 (PDF) | +0.5 sprint | Sub-brand resolver + legal entity dinamico + QR signed token |
+| TASK-630 (rich text editor) | sin cambio | Especificamente TipTap |
+
+Estimado total P2 Fase 1-2: **+1 sprint neto**.
+
 ## Hallazgos principales
 
 ### A. Score Greenhouse vs CPQ canon (benchmark mercado)
@@ -458,24 +572,30 @@ Oportunistico — ir resolviendo mientras se ejecutan los bloques 1-3.
 
 ## Decisiones abiertas
 
-Las 5 decisiones fundacionales se cerraron en la Delta v1.1 (ver tabla arriba). Las 4 conceptuales se cerraron en la Delta v1.2 despues de explicarlas al owner:
+**Todas las decisiones del brief estan cerradas a partir de v1.3.** Los 3 bloques de decisiones se documentaron con racional para que cualquier futura iteracion entienda el trade-off:
 
-| Decision | Estado | Resolucion |
-|---|---|---|
-| Constraint rules DSL | ✅ Cerrada | TS declarativo (Opcion B) en Fase 1; migrar a DB solo si hace falta |
-| Nesting recursivo vs 1 nivel | ✅ Cerrada | 1 nivel + `service.add_ons[]` |
-| Co-term estricto vs paralelo | ✅ Cerrada | Paralelo-agrupable (flexible, respeta decision original del cliente) |
-| Amendment vs re-quote | ✅ Cerrada | Soportar ambos (amendment como default LATAM, re-quote como fallback) |
+| Bloque | # | Decision | Resolucion | Doc |
+|---|---|---|---|---|
+| Fundacional | 1 | Bundle model | Extender service_catalog (no replicar Salesforce) | Delta v1.1 |
+| Fundacional | 2 | Renewal trigger | Event-based + cliente-driven combinado | Delta v1.1 |
+| Fundacional | 3 | Tax engine | Extender Chile IVA a LATAM incrementalmente | Delta v1.1 |
+| Fundacional | 4 | Analytics stack | In-portal Next.js + BQ | Delta v1.1 |
+| Fundacional | 5 | eSignature | DocuSign only Fase 1 | Delta v1.1 |
+| Conceptual | 6 | Constraint rules DSL | TS declarativo Fase 1 | Delta v1.2 |
+| Conceptual | 7 | Nesting | 1 nivel + `service.add_ons[]` | Delta v1.2 |
+| Conceptual | 8 | Co-term | Paralelo-agrupable | Delta v1.2 |
+| Conceptual | 9 | Amendment vs re-quote | Soportar ambos | Delta v1.2 |
+| Operativa | 10 | Renewal lead time | Multi-valor 90/30/7 cascada | Delta v1.3 |
+| Operativa | 11 | Discount levels | Line + bundle + global jerarquicos | Delta v1.3 |
+| Operativa | 12 | Tax engine arquitectura | Generico + plugins per-pais | Delta v1.3 |
+| Operativa | 13 | Rich text editor | TipTap | Delta v1.3 |
+| Operativa | 14 | QR destino | Publico con signed token HMAC | Delta v1.3 |
+| Operativa | 15 | Sub-brand detection | Mayoria lineas + override header | Delta v1.3 |
+| Operativa | 16 | Legal entity | Dinamico desde organizations | Delta v1.3 |
 
-**Decisiones abiertas que quedan:**
+**Total:** 16 decisiones cerradas, 0 abiertas. El brief esta listo para generar las TASK-### especificas cuando el owner lo apruebe.
 
-1. **Renewal notification lead time**: ¿30 / 60 / 90 dias antes del vencimiento emitir `commercial.service.renewal_due`? Multi-valor (ej. 90 dias primera alerta + 30 dias recordatorio + 7 dias final) es estandar enterprise.
-2. **Bundle-level discount vs line-level**: ¿un bundle aplica descuento como unidad (15% off total del bundle) o los descuentos siguen siendo line-level agregados? Line-level es mas simple; bundle-level es mas intuitivo para upsell.
-3. **Tax engine LATAM per-pais vs generico**: sub-motor por pais (Colombia IVA, Mexico IVA, Peru IGV) preserva matices locales (ej. retencion en fuente en Colombia, IEPS en Mexico) pero multiplica mantenimiento. Motor generico parametrico escala mejor si los IVAs de LATAM son esencialmente "tasa X sobre base Y".
-4. **Rich text editor admin UI**: ¿TipTap, Slate, Lexical? TipTap tiene mejor comunidad React + ProseMirror underneath; Lexical (Meta) es mas nuevo y mas rapido pero menos plugins.
-5. **QR en PDF — destino del link**: ¿pagina publica de la cotizacion en el portal (requires `/public/quote/[quotationId]/[versionNumber]/[signedToken]`) o pagina privada con autenticacion? Publica es mejor UX para verificacion; privada es mas seguro.
-6. **Sub-brand detection en PDF**: ¿por `business_line_code` del quote header, o por mayoria de las lineas (cada line item puede venir de un business_line distinto)? Header es mas simple; lineas mezcladas son raras pero posibles.
-7. **Legal entity dinamica**: ¿hardcodear "Efeonce Group SpA" en el PDF o leerlo dinamicamente desde `greenhouse_core.organizations` where `is_operating_entity=TRUE`? Dinamico permite que si cambia la razon social mañana, los quotes nuevos reflejan sin rebuild. Hardcoded es mas simple.
+Cualquier nueva decision que surja en la implementacion se documenta como Delta vN+1 a este mismo brief, no como ad-hoc en cada task.
 
 ## Criterio "ready for task"
 
