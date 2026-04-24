@@ -37,22 +37,21 @@ vi.mock('@/lib/commercial/hubspot-owner-identity', () => ({
     mockLoadActorIdentity(...(args as Parameters<typeof mockLoadActorIdentity>))
 }))
 
-const mockResolveHsProductType = vi.fn(async () => 'service')
+const mockResolveHsProductType = vi.fn<(...args: unknown[]) => Promise<string>>(
+  async () => 'service'
+)
 
-const mockGetCategoryByCode = vi.fn(async () => ({
-  code: 'staff_augmentation',
-  hubspotOptionValue: 'Staff augmentation'
-}))
+const mockGetCategoryByCode = vi.fn<(...args: unknown[]) => Promise<{ code: string; hubspotOptionValue: string }>>(
+  async () => ({ code: 'staff_augmentation', hubspotOptionValue: 'Staff augmentation' })
+)
 
-const mockGetUnitByCode = vi.fn(async () => ({
-  code: 'hour',
-  hubspotOptionValue: 'Hour'
-}))
+const mockGetUnitByCode = vi.fn<(...args: unknown[]) => Promise<{ code: string; hubspotOptionValue: string }>>(
+  async () => ({ code: 'hour', hubspotOptionValue: 'Hour' })
+)
 
-const mockGetTaxByCode = vi.fn(async () => ({
-  code: 'cl_iva_19',
-  hubspotOptionValue: 'Chile - IVA 19%'
-}))
+const mockGetTaxByCode = vi.fn<(...args: unknown[]) => Promise<{ code: string; hubspotOptionValue: string }>>(
+  async () => ({ code: 'cl_iva_19', hubspotOptionValue: 'Chile - IVA 19%' })
+)
 
 vi.mock('@/lib/commercial/product-catalog-references', () => ({
   resolveHubSpotProductType: (...args: unknown[]) => mockResolveHsProductType(...args),

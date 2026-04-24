@@ -1835,6 +1835,196 @@ class HubSpotGreenhouseIntegrationAppTests(unittest.TestCase):
             }
         )
 
+    # ------------------------------------------------------------------
+    # TASK-604 — HubSpot Products Inbound Rehydration v2 tests.
+    # GET /products and GET /products/<id> branch on
+    # `X-Contract-Version: v2` to return the v2 shape (prices by currency,
+    # resolved owner, classification fields, parsed image URLs).
+    # ------------------------------------------------------------------
+
+    def test_get_products_v1_default_without_header(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.list_all_products.return_value = [
+            {
+                "id": "hs-1",
+                "properties": {
+                    "name": "Plan A",
+                    "hs_sku": "PRD-A",
+                    "price": "10",
+                    "hs_price_usd": "1",
+                    "hubspot_owner_id": "999",
+                    "hs_images": "a.jpg;b.jpg",
+                },
+            }
+        ]
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.get("/products")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertEqual(payload["count"], 1)
+        product = payload["products"][0]
+        # v1 shape has no v2-only keys.
+        self.assertNotIn("pricesByCurrency", product)
+        self.assertNotIn("owner", product)
+        self.assertNotIn("imageUrls", product)
+        self.assertNotIn("productType", product)
+        # Owner resolver must NOT be called in v1 mode.
+        fake_hubspot.get_owner.assert_not_called()
+
+    def test_get_products_v2_with_header_returns_prices_by_currency(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.list_all_products.return_value = [
+            {
+                "id": "hs-1",
+                "properties": {
+                    "name": "Plan A",
+                    "hs_sku": "PRD-A",
+                    "hs_price_clp": "1000",
+                    "hs_price_usd": "1.25",
+                    "hs_price_clf": None,
+                },
+            }
+        ]
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.get(
+                "/products",
+                headers={"X-Contract-Version": "v2"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        product = payload["products"][0]
+        self.assertIn("pricesByCurrency", product)
+        prices = product["pricesByCurrency"]
+        # Six currency keys must always be present in v2 shape.
+        self.assertEqual(
+            set(prices.keys()),
+            {"CLP", "USD", "CLF", "COP", "MXN", "PEN"},
+        )
+        self.assertEqual(prices["CLP"], 1000.0)
+        self.assertEqual(prices["USD"], 1.25)
+        self.assertIsNone(prices["CLF"])
+        self.assertIsNone(prices["COP"])
+
+    def test_get_products_v2_resolves_owner(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.list_all_products.return_value = [
+            {
+                "id": "hs-1",
+                "properties": {
+                    "name": "Plan A",
+                    "hs_sku": "PRD-A",
+                    "hubspot_owner_id": "999",
+                },
+            }
+        ]
+        fake_hubspot.get_owner.return_value = {
+            "id": "999",
+            "email": "owner@example.com",
+            "firstName": "Grace",
+            "lastName": "Hopper",
+            "userId": "42",
+            "archived": False,
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.get(
+                "/products",
+                headers={"X-Contract-Version": "v2"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        product = response.get_json()["products"][0]
+        self.assertIsNotNone(product["owner"])
+        self.assertEqual(product["owner"]["hubspotOwnerId"], "999")
+        self.assertEqual(product["owner"]["ownerEmail"], "owner@example.com")
+        self.assertEqual(product["owner"]["ownerFirstName"], "Grace")
+        self.assertEqual(product["owner"]["ownerLastName"], "Hopper")
+        self.assertEqual(product["owner"]["ownerDisplayName"], "Grace Hopper")
+        fake_hubspot.get_owner.assert_called_once_with("999")
+
+    def test_get_products_v2_caches_owner_across_products(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.list_all_products.return_value = [
+            {
+                "id": f"hs-{i}",
+                "properties": {
+                    "name": f"Plan {i}",
+                    "hs_sku": f"PRD-{i}",
+                    "hubspot_owner_id": "999",
+                },
+            }
+            for i in range(3)
+        ]
+        fake_hubspot.get_owner.return_value = {
+            "id": "999",
+            "email": "owner@example.com",
+            "firstName": "Grace",
+            "lastName": "Hopper",
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.get(
+                "/products",
+                headers={"X-Contract-Version": "v2"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.get_json()["products"]), 3)
+        # All 3 products share owner_id=999 — resolver should be called once.
+        fake_hubspot.get_owner.assert_called_once_with("999")
+
+    def test_get_product_detail_v2_parses_image_urls(self):
+        app, client = self._build_v2_app_and_client()
+
+        fake_hubspot = MagicMock()
+        fake_hubspot.get_product.return_value = {
+            "id": "hs-42",
+            "properties": {
+                "name": "Plan X",
+                "hs_sku": "PRD-X",
+                "hs_images": "a.jpg;b.jpg",
+            },
+        }
+
+        with patch(
+            "services.hubspot_greenhouse_integration.app.HubSpotClient",
+            return_value=fake_hubspot,
+        ):
+            response = client.get(
+                "/products/hs-42",
+                headers={"X-Contract-Version": "v2"},
+            )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.get_json()
+        self.assertEqual(payload["imageUrls"], ["a.jpg", "b.jpg"])
+        # Owner id not present → no owner lookup attempted.
+        fake_hubspot.get_owner.assert_not_called()
+
     def test_product_archive_requires_integration_token(self):
         try:
             from services.hubspot_greenhouse_integration.app import create_app

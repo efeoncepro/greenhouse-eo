@@ -389,6 +389,42 @@ export interface HubSpotGreenhouseProductProfile {
     sourceObjectType: 'product'
     sourceObjectId: string
   }
+
+  // ── TASK-604 v2 fields ─────────────────────────────────────────────
+  // Middleware returns these when caller sends `X-Contract-Version: v2`.
+  // They are optional so consumers that haven't migrated to v2 still
+  // compile; inbound rehydration logic tolerates missing fields.
+
+  /** HubSpot owner record resolved by the middleware (via owner cache). */
+  owner?: HubSpotGreenhouseOwnerProfile | null
+
+  /** 6-currency map; middleware returns null for unpopulated currencies. */
+  pricesByCurrency?: HubSpotProductPricesByCurrency
+
+  /** Sanitized rich HTML from HubSpot (`hs_rich_text_description`). */
+  descriptionRichHtml?: string | null
+
+  /** Raw `hubspot_option_value` for categoria_de_item (reverse-mapped in GH). */
+  categoryHubspotValue?: string | null
+  unitHubspotValue?: string | null
+  taxCategoryHubspotValue?: string | null
+
+  /** Full classification tuple — GH-SoT, used only for drift detection. */
+  productType?: HubSpotProductType | null
+  pricingModel?: string | null
+  productClassification?: string | null
+  bundleType?: string | null
+
+  /** Parsed from HubSpot's semicolon-joined `hs_images`. */
+  imageUrls?: string[]
+
+  marketingUrl?: string | null
+
+  /**
+   * HubSpot audit timestamp for owner assignment (`hubspot_owner_assigneddate`).
+   * Read-only — GH never writes this back outbound.
+   */
+  hubspotOwnerAssignedAt?: string | null
 }
 
 export interface HubSpotGreenhouseProductCatalogResponse {
@@ -580,11 +616,14 @@ const buildWriteServiceHeaders = async (extraHeaders?: Record<string, string>) =
   return headers
 }
 
-const fetchJson = async <T>(path: string): Promise<T> => {
+const fetchJson = async <T>(
+  path: string,
+  extraHeaders?: Record<string, string>
+): Promise<T> => {
   const { baseUrl, timeoutMs } = getServiceConfig()
 
   const response = await fetch(`${baseUrl}${path}`, {
-    headers: buildServiceHeaders(),
+    headers: buildServiceHeaders(extraHeaders),
     cache: 'no-store',
     next: { revalidate: 0 },
     signal: AbortSignal.timeout(timeoutMs)
@@ -746,11 +785,19 @@ export const updateHubSpotGreenhouseCompanyLifecycle = async (
 
 // ── Products client methods (TASK-211) ──
 
+// TASK-604: request v2 shape so the middleware returns the 9 extra fields
+// (owner, pricesByCurrency, descriptionRichHtml, category/unit/tax HS values,
+// imageUrls, marketingUrl, hubspotOwnerAssignedAt). The middleware falls back
+// to v1 when the header is absent, so legacy callers stay unaffected.
 export const getHubSpotGreenhouseProductCatalog = async () =>
-  fetchJson<HubSpotGreenhouseProductCatalogResponse>('/products')
+  fetchJson<HubSpotGreenhouseProductCatalogResponse>('/products', {
+    'X-Contract-Version': 'v2'
+  })
 
 export const getHubSpotGreenhouseProduct = async (productId: string) =>
-  fetchJson<HubSpotGreenhouseProductProfile>(`/products/${productId}`)
+  fetchJson<HubSpotGreenhouseProductProfile>(`/products/${productId}`, {
+    'X-Contract-Version': 'v2'
+  })
 
 export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseCreateProductRequest) => {
   const { baseUrl, timeoutMs } = getServiceConfig()

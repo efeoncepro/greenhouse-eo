@@ -657,7 +657,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-601` | `complete` | Product Catalog Schema Extension + 4 Reference Tables (TASK-587 Fase A) | `docs/tasks/complete/TASK-601-product-catalog-schema-extension-ref-tables.md` |
 | `TASK-602` | `complete` | Product Catalog Multi-Currency Price Normalization (TASK-587 Fase B) | `docs/tasks/complete/TASK-602-product-catalog-multi-currency-prices.md` |
 | `TASK-603` | `complete` | HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C) | `docs/tasks/complete/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md` |
-| `TASK-604` | `to-do` | HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D) | `docs/tasks/to-do/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md` |
+| `TASK-604` | `complete` | HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D) | `docs/tasks/complete/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md` |
 | `TASK-605` | `to-do` | Product Catalog Admin UI + Backfill + Reconcile + Governance (TASK-587 Fase E) | `docs/tasks/to-do/TASK-605-product-catalog-admin-ui-backfill-governance.md` |
 | `TASK-606` | `to-do` | Space 360 Motion Consistency & Empty State Follow-up | `docs/tasks/to-do/TASK-606-space-360-motion-consistency-empty-state-followup.md` |
 | `TASK-607` | `to-do` | GitHub Actions Node.js 24 Migration (5 workflows restantes) | `docs/tasks/to-do/TASK-607-github-actions-nodejs-24-migration.md` |

@@ -6,8 +6,16 @@ import {
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { syncCanonicalFinanceProduct } from '@/lib/finance/quotation-canonical-store'
 import { getCommercialProduct } from '@/lib/commercial/product-catalog-store'
+import {
+  detectProductDriftV2,
+  persistDriftReport,
+  type ProductCatalogDriftSnapshot
+} from '@/lib/commercial/product-catalog/drift-detector-v2'
 import { publishProductSynced } from '@/lib/commercial/quotation-events'
+import { query } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+
+import { hydrateProductCatalogFromHubSpotV2 } from './inbound-product-catalog-hydration'
 
 // ── Upsert single product ──
 
@@ -74,6 +82,44 @@ const upsertProductFromHubSpot = async (
   return action
 }
 
+// ── TASK-604 drift detection wiring ──
+//
+// Loads the product_catalog snapshot needed by the drift detector and
+// persists the resulting report to source_sync_runs. The detector itself
+// lives in src/lib/commercial/product-catalog/drift-detector-v2.ts.
+
+const loadDriftSnapshot = async (
+  productId: string
+): Promise<ProductCatalogDriftSnapshot | null> => {
+  const rows = await query<ProductCatalogDriftSnapshot>(
+    `SELECT product_id, hubspot_product_id, product_name, description,
+            description_rich_html, hubspot_product_type_code,
+            hubspot_pricing_model, hubspot_product_classification,
+            hubspot_bundle_type_code, category_code, unit_code,
+            tax_category_code, marketing_url, image_urls,
+            commercial_owner_member_id, is_archived
+       FROM greenhouse_commercial.product_catalog
+      WHERE product_id = $1
+      LIMIT 1`,
+    [productId]
+  )
+
+  return rows[0] ?? null
+}
+
+const runDriftDetectionV2 = async (
+  productId: string,
+  profile: HubSpotGreenhouseProductProfile
+): Promise<void> => {
+  const snapshot = await loadDriftSnapshot(productId)
+
+  if (!snapshot) return
+
+  const report = await detectProductDriftV2(productId, profile, snapshot)
+
+  await persistDriftReport(report, { triggeredBy: 'sync-hubspot-products' })
+}
+
 // ── Public API ──
 
 export interface ProductSyncResult {
@@ -113,6 +159,24 @@ export const syncHubSpotProductCatalog = async (): Promise<ProductSyncResult> =>
         await syncCanonicalFinanceProduct({ productId: financeProductId })
 
         const canonical = await getCommercialProduct(financeProductId).catch(() => null)
+
+        // TASK-604 Fase D — rehydrate v2 inbound-writable fields +
+        // record drift report. Both run best-effort: a failure in either
+        // path does NOT break the sync loop (logged via source_sync_runs
+        // or swallowed into the per-product errors array).
+        if (canonical?.productId) {
+          await hydrateProductCatalogFromHubSpotV2(canonical.productId, product).catch(err => {
+            result.errors.push(
+              `Product ${product.identity.productId} hydration v2 failed: ${err instanceof Error ? err.message : String(err)}`
+            )
+          })
+
+          await runDriftDetectionV2(canonical.productId, product).catch(err => {
+            result.errors.push(
+              `Product ${product.identity.productId} drift detection v2 failed: ${err instanceof Error ? err.message : String(err)}`
+            )
+          })
+        }
 
         await publishProductSynced({
           productId: financeProductId,

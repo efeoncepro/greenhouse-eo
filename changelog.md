@@ -2,6 +2,19 @@
 
 ## 2026-04-22
 
+### 2026-04-24 — TASK-604 CERRADA ✅: HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D)
+
+- **Profile v2 inbound** (`src/lib/integrations/hubspot-greenhouse-service.ts`): `HubSpotGreenhouseProductProfile` extendido con 9 campos opcionales (`owner`, `pricesByCurrency`, `descriptionRichHtml`, `categoryHubspotValue`/`unitHubspotValue`/`taxCategoryHubspotValue`, `productType`/`pricingModel`/`productClassification`/`bundleType`, `imageUrls`, `marketingUrl`, `hubspotOwnerAssignedAt`). `fetchJson` acepta extraHeaders; `getHubSpotGreenhouseProductCatalog` + `getHubSpotGreenhouseProduct` envían `X-Contract-Version: v2`.
+- **Hidratador** (`src/lib/hubspot/inbound-product-catalog-hydration.ts`): `hydrateProductCatalogFromHubSpotV2` escribe SOLO 5 fields v2-inbound-writable al `product_catalog`. Always-write: `commercial_owner_assigned_at`. Conflict resolution: `commercial_owner_member_id` via `owner_gh_authoritative` + tiebreaker `hs_lastmodifieddate > gh_last_write_at`. First-sync only: `marketing_url`, `image_urls`, `description_rich_html` (preserva si GH tiene valor). NUNCA escribe a `product_catalog_prices` ni a campos GH-SoT.
+- **Drift detector v2** (`src/lib/commercial/product-catalog/drift-detector-v2.ts`): `detectProductDriftV2` clasifica drift en 3 niveles — `pending_overwrite` (prices / classification / marketing / description / category conocida distinta), `manual_drift` (hubspot_option_value desconocido en ref table), `error` (owner sin binding). `persistDriftReport` escribe a `source_sync_runs` con `source_system='product_drift_v2'` y `notes` JSON.
+- **Sync loop wiring** (`src/lib/hubspot/sync-hubspot-products.ts`): después de `syncCanonicalFinanceProduct` corre hidratación + drift best-effort. Errores se agregan a `result.errors[]` sin romper el loop.
+- **Middleware Python v2 inbound**:
+  - `contract.py`: 18 HS properties v2 agregadas a `sourceFields.products` (siempre solicitadas; shape branchea en header).
+  - `models.py`: nueva `build_product_profile_v2(product, owner_resolver)` — spread de v1 + 10 keys extra, owner resolver defensivo.
+  - `app.py`: GET /products + /products/<id> branchean por `_is_v2_request`; `/products` (batch) usa owner cache per-request (N productos mismo owner = 1 HS API call).
+- **Tests**: 11/11 hydration + 16/16 drift v2 + 55/55 pytest middleware (50 pre + 5 nuevos v2 GET). 1716/1716 en dir src/lib (up from 1689 = +27 tests).
+- **Desbloquea TASK-605** (último bloqueante del programa TASK-587): admin UI consume drift reports + backfill masivo usa el adapter outbound v2.
+
 ### 2026-04-24 — TASK-603 CERRADA ✅: HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C)
 
 - **Guard acotado** (`src/lib/commercial/hubspot-outbound-guard.ts`): `HUBSPOT_FORBIDDEN_PRODUCT_FIELDS` reducido de 16 → 10 strings. **COGS unblocked** outbound por decisión explícita de gobierno (supersedea parcialmente TASK-347); margin + cost_breakdown siguen permanentemente BLOCKED.

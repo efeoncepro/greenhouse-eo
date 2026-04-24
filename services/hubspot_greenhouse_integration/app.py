@@ -19,6 +19,7 @@ try:
         build_line_item_profile,
         build_owner_profile,
         build_product_profile,
+        build_product_profile_v2,
         build_product_reconcile_item,
         build_quote_profile,
         build_service_profile,
@@ -44,6 +45,7 @@ except ImportError:
         build_line_item_profile,
         build_owner_profile,
         build_product_profile,
+        build_product_profile_v2,
         build_product_reconcile_item,
         build_quote_profile,
         build_service_profile,
@@ -1076,7 +1078,30 @@ def create_app() -> Flask:
             products_raw = client.list_all_products(
                 properties=build_contract(app.config)["sourceFields"]["products"],
             )
-            products = [build_product_profile(p) for p in products_raw]
+
+            if _is_v2_request(request):
+                # TASK-604 — v2 inbound rehydration. Cache owner lookups
+                # across products in a single GET /products call so we
+                # issue 1 HubSpot owners request per unique owner, not per
+                # product.
+                owner_cache: dict[str, dict[str, Any] | None] = {}
+
+                def cached_owner_resolver(owner_id: str) -> dict[str, Any] | None:
+                    if owner_id in owner_cache:
+                        return owner_cache[owner_id]
+                    try:
+                        owner_cache[owner_id] = client.get_owner(owner_id)
+                    except HubSpotIntegrationError:
+                        owner_cache[owner_id] = None
+                    return owner_cache[owner_id]
+
+                products = [
+                    build_product_profile_v2(p, owner_resolver=cached_owner_resolver)
+                    for p in products_raw
+                ]
+            else:
+                products = [build_product_profile(p) for p in products_raw]
+
             return jsonify({"count": len(products), "products": products})
         except HubSpotIntegrationError as exc:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (
@@ -1086,10 +1111,24 @@ def create_app() -> Flask:
     @app.get("/products/<product_id>")
     def product_detail(product_id: str):
         try:
-            product = _client().get_product(
+            client = _client()
+            product = client.get_product(
                 product_id,
                 properties=build_contract(app.config)["sourceFields"]["products"],
             )
+
+            if _is_v2_request(request):
+                # TASK-604 — single-product GET resolves owner once at most.
+                def owner_resolver(owner_id: str) -> dict[str, Any] | None:
+                    try:
+                        return client.get_owner(owner_id)
+                    except HubSpotIntegrationError:
+                        return None
+
+                return jsonify(
+                    build_product_profile_v2(product, owner_resolver=owner_resolver)
+                )
+
             return jsonify(build_product_profile(product))
         except HubSpotIntegrationError as exc:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (

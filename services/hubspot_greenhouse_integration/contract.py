@@ -297,6 +297,28 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "gh_last_write_at",
                 "gh_archived_by_greenhouse",
                 "gh_business_line",
+                # TASK-604 — v2 inbound rehydration. These properties are
+                # always requested from HubSpot; the middleware branches on
+                # `X-Contract-Version: v2` to decide whether to expose them
+                # in the response payload. They return NULL when unset.
+                "hs_price_clp",
+                "hs_price_usd",
+                "hs_price_clf",
+                "hs_price_cop",
+                "hs_price_mxn",
+                "hs_price_pen",
+                "hs_rich_text_description",
+                "hs_product_type",
+                "hs_pricing_model",
+                "hs_product_classification",
+                "hs_bundle_type",
+                "categoria_de_item",
+                "unidad",
+                "hs_tax_category",
+                "hs_url",
+                "hs_images",
+                "hubspot_owner_id",
+                "hubspot_owner_assigneddate",
             ],
             "deals": [
                 "dealname",

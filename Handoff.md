@@ -1,5 +1,69 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-604 CERRADA: HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D)
+
+### Qué cambió
+
+Con TASK-603 closed-loop en outbound, ahora **inbound también habla contract v2**. El portal GET /products envía `X-Contract-Version: v2` → middleware devuelve shape v2 (9 campos extra incluyendo owner resuelto + prices por moneda + clasificación + ref hubspot_option_values + marketing + image_urls + owner assigned timestamp). El TS ingresa estos fields a `product_catalog` (solo 5 de ellos escribibles desde HS) y a `source_sync_runs` como drift report clasificado.
+
+### Componentes entregados (TS)
+
+- **Profile v2 extendido** (`src/lib/integrations/hubspot-greenhouse-service.ts`): 9 campos opcionales agregados a `HubSpotGreenhouseProductProfile` (backward-compat: consumers v1 siguen compilando). `fetchJson` ahora acepta extraHeaders.
+- **Header `X-Contract-Version: v2`** en `getHubSpotGreenhouseProductCatalog` y `getHubSpotGreenhouseProduct` — middleware responde shape v2 en GET.
+- **Nuevo módulo** [src/lib/hubspot/inbound-product-catalog-hydration.ts](src/lib/hubspot/inbound-product-catalog-hydration.ts):
+  - `hydrateProductCatalogFromHubSpotV2(productId, profile)` escribe SOLO 5 fields v2-inbound-writable al `product_catalog`:
+    - `commercial_owner_assigned_at` — always-write (HS audit trail, nunca outbound)
+    - `commercial_owner_member_id` — con conflict resolution:
+      - si `owner_gh_authoritative=true` → GH wins, preserve
+      - si `hs_lastmodifieddate > gh_last_write_at` → HS wins, upsert binding
+      - sino → GH wins, preserve
+    - `marketing_url`, `image_urls`, `description_rich_html` — first-sync only (preserve si GH ya tiene valor)
+  - Retorna `HydrationOutcome` con kind `updated | no_changes | skipped_no_row | owner_unmapped`
+  - NUNCA escribe a `product_catalog_prices` ni a campos GH-SoT (tests verifican)
+- **Nuevo módulo** [src/lib/commercial/product-catalog/drift-detector-v2.ts](src/lib/commercial/product-catalog/drift-detector-v2.ts):
+  - `detectProductDriftV2(productId, profile, ghRow)` compara 16 v2 fields y clasifica en 3 niveles:
+    - **`pending_overwrite`** — HS distinto de GH-SoT, próximo outbound lo resuelve automáticamente. Informacional, no alerta. Cubre: prices (6 monedas), productType/pricingModel/productClassification/bundleType, category/unit/tax con hubspot_option_value conocido pero distinto, description plain + rich, marketing_url, image_urls.
+    - **`manual_drift`** — HS tiene hubspot_option_value no registrado en ref table (GH debe decidir: agregar al ref o override HS). Cubre category/unit/tax desconocido.
+    - **`error`** — drift estructuralmente inválido (owner sin binding en members). Alert-worthy.
+  - `persistDriftReport(report)` escribe a `greenhouse_sync.source_sync_runs` con `source_system='product_drift_v2'` y `notes` JSON con el shape completo (TASK-605 admin UI consumerá).
+- **Wire-eado en `syncHubSpotProductCatalog`** (`src/lib/hubspot/sync-hubspot-products.ts`): después de `syncCanonicalFinanceProduct` + bridge canonical, corre hidratación + drift best-effort. Errores se agregan a `result.errors[]` sin romper el loop del sync masivo.
+
+### Componentes entregados (Python middleware)
+
+- **`contract.py`**: 18 HS properties v2 agregadas a `sourceFields.products` (6 prices por moneda, hs_rich_text_description, hs_product_type, hs_pricing_model, hs_product_classification, hs_bundle_type, categoria_de_item, unidad, hs_tax_category, hs_url, hs_images, hubspot_owner_id, hubspot_owner_assigneddate). Siempre se solicitan a HS — la respuesta shape branchea en header.
+- **`models.py`**: nueva función `build_product_profile_v2(product, owner_resolver)` — preserva v1 intacto, spread del v1 + 10 keys extra. Owner resolver defensivo (catch exceptions, fallback a shape nested o flat).
+- **`app.py`**: GET /products + GET /products/<id> handlers extendidos con `_is_v2_request(request)` branching. `/products` (batch) usa owner cache per-request (N productos con mismo owner = 1 HS API call).
+
+### Decisiones de diseño
+
+- **Inbound NUNCA sobrescribe GH-SoT**: hydration y drift están estrictamente separados. El hidratador **solo** toca 5 columnas; el detector **solo** lee y escribe a `source_sync_runs`. Esa partición permite a TASK-605 wire-ear un reconcile scheduler sin miedo a double-writes.
+- **First-sync semantics para marketing_url/image_urls/description_rich_html**: estos campos nacen NULL/empty en `product_catalog` (TASK-601 no los backfilleó). La idea es que HS, que ya tiene algunos valores, "sembre" GH. Una vez GH tiene valor, TASK-603 outbound es quien lo mantiene — inbound se vuelve read-only para ese campo.
+- **Owner soft-SoT temporal**: hasta que TASK-605 land el admin UI con selector de owner, `owner_gh_authoritative` default es `false` → HS wins por tiebreaker. Cuando TASK-605 permita editar owner en GH, el flag se flipea a `true` para esos productos y GH gana.
+- **Drift persisted como JSON en `notes`**: evita migration nueva. Admin UI (TASK-605) parsea JSON. Reconcile scheduler (TASK-605) agrega rows con misma shape.
+- **Shared v2 profile type**: los 9 campos nuevos son opcionales para no romper callers v1 (ej. tests que no setean `pricesByCurrency`). Consumers que necesiten v2 hacen narrowing local.
+
+### Verificación
+
+- `pnpm lint` — clean (2 warnings cosméticos DOMPurify legacy de TASK-603)
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/hubspot/__tests__/inbound-product-catalog-hydration.test.ts` — 11/11
+- `pnpm test src/lib/commercial/product-catalog/__tests__/drift-detector-v2.test.ts` — 16/16
+- `pytest services/hubspot_greenhouse_integration/tests/test_app.py` — 55/55 (50 pre + 5 nuevos v2 GET)
+- `pnpm test src/lib` — 1716/1716 (up from 1689 baseline pre-TASK-604 = +27)
+- `pnpm build` — compila OK
+
+### Desbloquea
+
+- **TASK-605** (Admin UI + Backfill + Reconcile + Governance): última fase del programa TASK-587. Consumidor directo del drift report persisted en `source_sync_runs`.
+
+### Seguimiento recomendado
+
+- **Deploy del middleware v2 inbound a producción** — el TS del portal ya emite header v2 en GET, pero hasta que la Cloud Run revisión tenga el código de `build_product_profile_v2`, el middleware devolverá v1 shape (todos los 9 v2 fields llegan undefined → hydration y drift se vuelven no-op, no rompen). Una vez deployed, inbound v2 está live.
+- **Flip `owner_gh_authoritative=true`** cuando TASK-605 lande admin UI con selector de owner. Un follow-up sin scope de código — solo migration + política.
+- **Drift auto-fix trigger** (outbound automático cuando drift `pending_overwrite` detectado) → follow-up post-TASK-605.
+
+---
+
 ## Sesion 2026-04-24 — TASK-603 CERRADA: HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C)
 
 ### Qué cambió

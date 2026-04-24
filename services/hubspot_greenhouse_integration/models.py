@@ -261,6 +261,89 @@ def build_product_profile(product: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def build_product_profile_v2(
+    product: dict[str, Any],
+    owner_resolver: Any = None,
+) -> dict[str, Any]:
+    """
+    Build the v2 product profile for TASK-604 inbound rehydration.
+
+    Extends the v1 shape (``build_product_profile``) with:
+    - ``owner`` — resolved HubSpot owner record (via ``owner_resolver``).
+    - ``pricesByCurrency`` — dict keyed by CLP/USD/CLF/COP/MXN/PEN.
+    - ``descriptionRichHtml`` — HubSpot rich-text description.
+    - classification fields (productType, pricingModel, productClassification,
+      bundleType) + categorization (categoryHubspotValue, unitHubspotValue,
+      taxCategoryHubspotValue).
+    - ``imageUrls`` — list parsed from semicolon-joined ``hs_images``.
+    - ``marketingUrl`` + ``hubspotOwnerAssignedAt`` — raw HS values.
+
+    ``owner_resolver`` is an optional callable ``(owner_id: str) -> dict | None``
+    that returns the HubSpot owner record (or ``None`` when unresolvable).
+    The middleware passes a cached bound ``client.get_owner`` to avoid N+1
+    calls when many products share the same owner.
+    """
+    props = product.get("properties") or {}
+
+    base = build_product_profile(product)
+
+    prices_by_currency: dict[str, float | None] = {}
+    for code in ("CLP", "USD", "CLF", "COP", "MXN", "PEN"):
+        prices_by_currency[code] = _safe_number(props.get(f"hs_price_{code.lower()}"))
+
+    owner: dict[str, Any] | None = None
+    owner_id = props.get("hubspot_owner_id")
+    if owner_id and owner_resolver is not None:
+        try:
+            owner_record = owner_resolver(str(owner_id))
+        except Exception:
+            # Resolver failed — graceful fallback, no owner in response.
+            owner_record = None
+
+        if owner_record:
+            # HubSpot v3 owners API returns top-level fields (email,
+            # firstName, lastName, userId), not nested under "properties".
+            # Accept both shapes defensively.
+            owner_props = owner_record.get("properties") or owner_record
+            first_name = owner_props.get("firstName")
+            last_name = owner_props.get("lastName")
+            display_name = " ".join(
+                part for part in (str(first_name or "").strip(), str(last_name or "").strip()) if part
+            ).strip() or None
+            owner = {
+                "hubspotOwnerId": str(owner_record.get("id") or owner_id),
+                "ownerEmail": owner_props.get("email"),
+                "ownerFirstName": first_name,
+                "ownerLastName": last_name,
+                "ownerDisplayName": display_name,
+                "userId": _safe_number(owner_props.get("userId")),
+                "archived": bool(owner_record.get("archived")),
+            }
+
+    image_urls_raw = props.get("hs_images") or ""
+    if image_urls_raw:
+        image_urls = [u.strip() for u in str(image_urls_raw).split(";") if u.strip()]
+    else:
+        image_urls = []
+
+    return {
+        **base,
+        "owner": owner,
+        "pricesByCurrency": prices_by_currency,
+        "descriptionRichHtml": props.get("hs_rich_text_description"),
+        "categoryHubspotValue": props.get("categoria_de_item"),
+        "unitHubspotValue": props.get("unidad"),
+        "taxCategoryHubspotValue": props.get("hs_tax_category"),
+        "productType": props.get("hs_product_type"),
+        "pricingModel": props.get("hs_pricing_model"),
+        "productClassification": props.get("hs_product_classification"),
+        "bundleType": props.get("hs_bundle_type"),
+        "imageUrls": image_urls,
+        "marketingUrl": props.get("hs_url"),
+        "hubspotOwnerAssignedAt": props.get("hubspot_owner_assigneddate"),
+    }
+
+
 def build_product_reconcile_item(product: dict[str, Any]) -> dict[str, Any]:
     props = product.get("properties") or {}
     return {

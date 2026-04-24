@@ -6,17 +6,18 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `TASK-587` (umbrella) → `TASK-544` (program parent)
-- Status real: `Diseno`
+- Status real: `Completo 2026-04-24`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `none` (TASK-601 + TASK-602 + TASK-603 + TASK-574 cerradas 2026-04-24)
-- Branch: `task/TASK-604-hubspot-products-inbound-rehydration`
+- Branch: `develop` (merge directo)
+- Completed: `2026-04-24`
 
 ## Summary
 
@@ -205,31 +206,34 @@ Ver [TASK-587 § Owner resolution flow (inbound)](docs/tasks/to-do/TASK-587-hubs
 
 ## Acceptance Criteria
 
-- [ ] `HubSpotGreenhouseProductProfile` v2 exporta 9 nuevos campos; tipos Kysely compatibles
-- [ ] Middleware devuelve profile v2 cuando `X-Contract-Version: v2`
-- [ ] Upsert inbound rehidrata: `commercial_owner_assigned_at`, `image_urls`, `marketing_url`, `description_rich_html` (si GH NULL), owner con conflict resolution correcto
-- [ ] Upsert NUNCA escribe a `product_catalog_prices` (verifica test)
-- [ ] Upsert NUNCA updatea description/category/unit/type/classification desde HS (verifica test)
-- [ ] Drift detector clasifica correctamente 3 categorías (pending_overwrite, manual_drift, error)
-- [ ] `source_sync_runs` contiene drift reports con shape esperado
-- [ ] Tests owner HS-wins / GH-wins / no-binding passing
+- [x] `HubSpotGreenhouseProductProfile` v2 exporta 9 nuevos campos opcionales (owner, pricesByCurrency, descriptionRichHtml, categoryHubspotValue, unitHubspotValue, taxCategoryHubspotValue, productType/pricingModel/productClassification/bundleType, imageUrls, marketingUrl, hubspotOwnerAssignedAt)
+- [x] Middleware devuelve profile v2 cuando `X-Contract-Version: v2` (models.py `build_product_profile_v2` + app.py branching con owner caching)
+- [x] Hidratador `hydrateProductCatalogFromHubSpotV2` rehidrata: `commercial_owner_assigned_at` (always-write), `image_urls` + `marketing_url` + `description_rich_html` (first-sync only — preserva si GH tiene valor), `commercial_owner_member_id` con conflict resolution (owner_gh_authoritative + tiebreaker timestamp)
+- [x] Hidratador NUNCA escribe a `product_catalog_prices` (test verifica SQL)
+- [x] Hidratador NUNCA updatea description plain / category_code / unit_code / tax_category_code / hubspot_product_type_code / hubspot_pricing_model / hubspot_product_classification / hubspot_bundle_type_code — solo los 5 fields inbound-writable (test verifica)
+- [x] `detectProductDriftV2` clasifica correctamente los 3 niveles: `pending_overwrite` (prices / classification / marketing / description / category-conocida-diferente), `manual_drift` (category/unit/tax con hubspot_option_value no registrado en ref table), `error` (owner sin binding en greenhouse_core.members)
+- [x] `source_sync_runs` recibe drift reports con source_system='product_drift_v2' y notes JSON con `{productId, hubspotProductId, scannedAt, driftedFields[]}`
+- [x] Tests owner HS-wins / GH-wins / no-binding passing (11/11 hydration + 16/16 drift v2)
 
 ## Verification
 
-- `pnpm lint` + `npx tsc --noEmit`
-- `pnpm test src/lib/hubspot/sync-hubspot-products.test.ts`
-- `pnpm test src/lib/hubspot/drift-detector.test.ts`
-- Staging: `pnpm staging:request GET /api/admin/commercial/product-sync-conflicts` muestra shape nuevo
+- `pnpm lint` — clean (2 warnings cosméticos DOMPurify, sin errores)
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/hubspot/__tests__/inbound-product-catalog-hydration.test.ts` — 11/11
+- `pnpm test src/lib/commercial/product-catalog/__tests__/drift-detector-v2.test.ts` — 16/16
+- `pytest services/hubspot_greenhouse_integration/tests/test_app.py` — 55/55 (50 pre + 5 nuevos v2 GET)
+- `pnpm test src/lib` — 1716/1716 passing (up from 1689 baseline pre-TASK-604)
+- `pnpm build` — compiles successfully
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] Archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md`: inbound v2 live, drift classifier deployed, owner bridge activo para productos
-- [ ] `changelog.md`: profile v2, drift classification, owner rehydration
-- [ ] Update TASK-587: Fase D completada
-- [ ] Desbloquear TASK-605
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] Archivo en carpeta correcta (`docs/tasks/complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md`: inbound v2 live, drift classifier operativo, owner bridge activo para productos
+- [x] `changelog.md`: profile v2, hydration, drift classification
+- [x] Update TASK-587: Fase D ✅ completada
+- [x] Desbloquear TASK-605 (último bloqueante, queda libre)
 
 ## Follow-ups
 
