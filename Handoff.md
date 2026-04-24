@@ -1,5 +1,55 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-574 IAM grants ejecutados; deploy production pendiente de trigger humano
+
+### IAM bindings aplicados al SA del deployer (`github-actions-deployer@efeonce-group.iam.gserviceaccount.com`)
+
+Ejecutados desde `julio.reyes@efeonce.org` para habilitar el workflow `hubspot-greenhouse-integration-deploy.yml`:
+
+1. `roles/run.admin` sobre el Cloud Run service `hubspot-greenhouse-integration` (región `us-central1`). Verificable: `gcloud run services get-iam-policy hubspot-greenhouse-integration --region us-central1`.
+2. `roles/iam.serviceAccountUser` sobre la SA runtime `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Permite que el deployer impersone la runtime SA durante el deploy.
+3. `roles/secretmanager.secretAccessor` sobre los 3 secretos canónicos: `hubspot-access-token`, `greenhouse-integration-api-token`, `hubspot-app-client-secret`.
+
+Con esto el workflow de GitHub Actions puede ejecutarse end-to-end sin intervención GCP adicional.
+
+### Rollback target del Cloud Run pre-cutover
+
+- Revisión vigente: `hubspot-greenhouse-integration-00028-xwr`
+- URL estable: `https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app`
+- Runtime SA pre-cutover: `183008134038-compute@developer.gserviceaccount.com` (default Compute SA). Post-cutover la revisión nueva usará `greenhouse-portal@` (convención monorepo).
+- Baseline smoke: `/health` → 200, `/contract` → 200.
+
+Rollback en <60s si algo rompe:
+```bash
+gcloud run services update-traffic hubspot-greenhouse-integration \
+  --region us-central1 --project efeonce-group \
+  --to-revisions=hubspot-greenhouse-integration-00028-xwr=100
+```
+
+### Acción pendiente para cerrar el cutover
+
+El harness de esta sesión no permite disparar el deploy production desde Claude. Lo tiene que hacer el operador:
+
+**Opción recomendada** — workflow_dispatch manual vía GitHub UI (más auditable):
+
+```
+https://github.com/efeoncepro/greenhouse-eo/actions/workflows/hubspot-greenhouse-integration-deploy.yml
+→ Run workflow
+  - Branch: task/TASK-574-absorb-hubspot-greenhouse-integration-service
+  - Environment: production
+  - Skip tests: false
+```
+
+El workflow corre pytest (37/40 esperado passing) → Cloud Build → Cloud Run deploy → smoke `/health` + `/contract`. Si el smoke falla, `deploy` job falla y la revisión nueva no queda Ready (traffic se queda en la revisión vieja — fail closed).
+
+**Después del deploy validado**, Claude puede cerrar en la próxima sesión:
+
+- PR al sibling `cesargrowth11/hubspot-bigquery` con stub README + backup del código (branch ya preparado localmente en `/tmp/hbi-sibling-pr-1777041339/`, listo para push + PR)
+- Validación post-cutover 24h según runbook §6
+- Slice 8 (cleanup físico del sibling) programado para 2026-05-01
+
+Runbook completo: `docs/operations/TASK-574-cutover-runbook.md`.
+
 ## Sesion 2026-04-24 — TASK-574 en PR: HubSpot Greenhouse Integration Service absorbido (código listo; cutover pendiente de ventana operativa)
 
 - **Qué entrega el PR**
