@@ -130,7 +130,10 @@ Reglas obligatorias:
 - `src/lib/nexa/digest/build-weekly-digest.ts` (refactor)
 - `src/lib/nexa/digest/build-weekly-digest.test.ts` (extender con fixtures de sentinels y orphans)
 - `src/lib/ico-engine/ai/entity-display-resolution.ts` (minor: export adicional si se necesita)
+- `scripts/ico-digest-threshold-preview.ts` (nuevo, one-shot — Slice 3.5)
+- `services/ops-worker/server.ts` (minor: soporte `recipients_override` para Slice 6.5 si no existe)
 - `services/ops-worker/` redeploy (cambio de código, no de archivos)
+- `docs/runbooks/ico-weekly-digest-rollback.md` (nuevo — Slice 7)
 - `docs/architecture/GREENHOUSE_ICO_ENGINE_V2.md` (sección nueva sobre presentation layer)
 
 ## Current Repo State
@@ -163,6 +166,17 @@ Reglas obligatorias:
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-04-24 — Hardening post-revisión: 4 gaps cerrados
+
+Revisión con el owner del task expuso que el scope original resolvía los **4 bugs de contenido** (sentinels, huérfanos, dedup, diversidad) pero **no garantizaba end-to-end** que el email llegue a los ejecutivos el lunes. Se agregaron 3 slices + 9 acceptance criteria nuevos:
+
+1. **Slice 3.5 — Defaults validados contra dataset real**: script `scripts/ico-digest-threshold-preview.ts` que corre la matriz de filtros contra datos actuales antes de commitear los defaults. Previene el failure mode "filtros aggressive → 0 insights → ops-worker salta envío (línea 644 de server.ts) → nadie recibe email".
+2. **Slice 6.5 — Email render end-to-end**: envío real a recipient de staging + sign-off visual (Gmail desktop + mobile). Previene bugs de layout, labels truncados, links 404 que no detectan los tests.
+3. **Slice 7 — Post-deploy monitoring + rollback runbook**: alerta proactiva si falta log `done — status=sent` entre 07:00-08:00 Chile + runbook documentado con comandos `gcloud scheduler pause` y template de comunicación a stakeholders.
+4. **Smoke test del primer cron real**: nuevo AC que exige evidencia de ejecución exitosa el lunes en producción.
+
+La garantía pasa de ~80% a ~99%.
 
 ## Scope
 
@@ -278,6 +292,19 @@ const presentable = enrichments.map(e => ({
 
 Esto elimina ~150 líneas de lógica en el digest y las mueve a utilities testeadas.
 
+### Slice 3.5 — Defaults de filtros validados contra dataset real
+
+Los defaults (`minQualityScore=0.6`, `severityFloor='warning'`, `maxPerSpace=3`, `maxTotal=8`) son hipótesis razonables pero podrían dejar el digest en 0 si el dataset actual no los soporta. Esto haría que el email del lunes **no se envíe** (ops-worker `server.ts:644` salta envío cuando `totalInsights===0`).
+
+Script `scripts/ico-digest-threshold-preview.ts` (nuevo, uso one-shot):
+
+- Invoca `selectPresentableEnrichments` con una matriz de combinaciones: `minQualityScore ∈ {0.3, 0.4, 0.5, 0.6}`, `severityFloor ∈ {'info', 'warning', 'critical'}`.
+- Reporta por combinación: count total, count per severity, distribución por space, 5 sample narratives hidratadas.
+- Permite al owner elegir los thresholds con evidencia del dataset real.
+- Si ningún combo produce ≥ 3 insights → escalate: la task debe rethinking del floor o enfrentar UX de "no insights this week".
+
+El default que quede en el código debe ser justificado en el commit message con el preview output.
+
 ### Slice 4 — Tests
 
 En `narrative-presentation.test.ts`:
@@ -310,6 +337,56 @@ Contar per-invocation fallback rates:
 - Ejecutar dry-run manual: `curl -X POST https://ops-worker-.../nexa/weekly-digest?dry_run=true` (si el endpoint soporta dry_run; si no, invocar la función directamente).
 - Verificar output del email con 0 sentinels + 0 huérfanos.
 - Confirmación al owner antes del lunes 07:00 Chile.
+
+### Slice 6.5 — Email render end-to-end en staging (sign-off visual)
+
+Un payload limpio de `buildWeeklyDigest` no garantiza que el email renderizado visualmente esté OK. El template `WeeklyExecutiveDigestEmail.tsx` puede tener bugs de layout, truncar narrativas largas (post-hidratación los labels pueden ser más largos que el original `"Sin nombre"`), o generar links rotos.
+
+Proceso obligatorio antes del lunes:
+
+- Enviar email real desde staging a un recipient interno de test (ej. `agent@greenhouse.efeonce.org` o alias Efeonce staging). Usar el `POST /nexa/weekly-digest` del ops-worker con `?recipients_override=...` si el endpoint lo soporta, o agregar ese param como sub-slice.
+- Abrir el email en cliente real (Gmail desktop + mobile).
+- Verificar:
+  - Cero ocurrencias de literal `"Sin nombre"`, `"Sin título"`, `"Untitled"`, `"N/A"` standalone.
+  - Todos los links de mentions (`@[label](project:id)`) resuelven a páginas existentes (no 404).
+  - Layout no se rompe con labels largos (p.ej. `"TEASER TS - Chile (S)"` más largo que `"Sin nombre"`).
+  - Subject + preview text coherentes.
+  - Renderiza OK en light mode + dark mode del cliente (Gmail respeta parcialmente).
+- Guardar el HTML del email como evidencia en `Handoff.md` (copiar el source rendered) o screenshot.
+- **Sign-off explícito del owner** documentado en el commit message o Handoff antes de promover a prod.
+
+### Slice 7 — Post-deploy monitoring + rollback runbook
+
+Aun con Slice 6 + 6.5 verde, la primera corrida del cron el lunes 07:00 Chile puede fallar por razones ortogonales (token Secret Manager inválido, IAM drift, race con otro deploy, cold start, rate limit sendgrid). Sin observabilidad proactiva, el problema aparece al día siguiente cuando alguien pregunta por qué no llegó el email.
+
+Componentes:
+
+**Alerta proactiva:**
+
+- Monitoring rule en Cloud Run o Cloud Logging: si NO aparece log `[ops-worker] /nexa/weekly-digest done — status=sent` entre lunes 07:00-08:00 Chile, trigger alert a Slack/Ops (reusar canal de TASK-586 o crear `#ops-alerts`).
+- Complemento: log `[ops-worker] /nexa/weekly-digest failed` genera alert inmediato con el error message.
+
+**Rollback runbook** documentado en la sección `Closing Protocol` de la task y en `docs/runbooks/ico-weekly-digest-rollback.md` (nuevo):
+
+```bash
+# 1. Pausar el cron inmediatamente
+gcloud scheduler jobs pause ops-nexa-weekly-digest --location=us-central1 --project=efeonce-group
+
+# 2. Revertir el deploy del ops-worker al revision anterior
+gcloud run services update-traffic ops-worker \
+  --project efeonce-group --region us-east4 \
+  --to-revisions=<PREVIOUS_REVISION>=100
+
+# 3. Verificar
+gcloud run services describe ops-worker --region us-east4 \
+  --format="value(status.traffic)"
+
+# 4. Si el email ya salió roto: comunicación a stakeholders con template pre-escrito
+```
+
+Template de comunicación pre-escrito (incluir en el runbook):
+
+> "El resumen semanal Nexa del DD/MM tiene un problema de renderizado. Ya estamos corrigiendo. No es necesario que actúen sobre las alertas mostradas — son eventos que ya fueron resueltos automáticamente."
 
 ## Out of Scope
 
@@ -405,6 +482,8 @@ email template render + sendgrid send
 
 ## Acceptance Criteria
 
+### Correctitud de contenido (Slice 1-5)
+
 - [ ] `src/lib/ico-engine/ai/narrative-presentation.ts` existe con `resolveMentions`, `loadMentionContext`, `selectPresentableEnrichments` exportados.
 - [ ] Test suite `narrative-presentation.test.ts` cubre: sentinel, fresh, orphan, technical ID inline, multi-mention, dedup, diversity, quality gate, plain-text sentinel. Todos verdes.
 - [ ] `build-weekly-digest.ts` refactorizado: usa las utilities y su código se reduce en ≥40%.
@@ -412,8 +491,32 @@ email template render + sendgrid send
 - [ ] Dry-run manual en staging: el email NO contiene literal `"Sin nombre"`, `"Sin título"`, `"untitled"`, ni `"N/A"` standalone.
 - [ ] Dry-run manual: el email NO contiene narrativas cuyo `signal_id` no existe en `ico_ai_signals`.
 - [ ] `pnpm lint`, `pnpm test`, `npx tsc --noEmit`, `pnpm build` clean.
-- [ ] Ops-worker Cloud Run redeployed con el código nuevo antes del lunes 27-04 07:00 Chile.
 - [ ] Logs estructurados de `narrative_presentation` emitidos por invocación del digest.
+
+### Empty-digest risk (Slice 3.5)
+
+- [ ] Script `scripts/ico-digest-threshold-preview.ts` ejecutado contra dataset real (últimos 7d); output adjuntado en el commit message o Handoff.
+- [ ] Con los defaults que queden commiteados, el dataset real produce `totalInsights ≥ 3` (no vacío).
+- [ ] Si los defaults originales propuestos (`minQualityScore=0.6`, `severityFloor='warning'`) no soportan el criterio anterior, están afinados con justificación visible en el commit.
+
+### Deploy + end-to-end email render (Slice 6 + 6.5)
+
+- [ ] Ops-worker Cloud Run redeployed con el código nuevo antes del lunes 27-04 07:00 Chile.
+- [ ] Email real enviado desde staging a recipient interno de test; HTML rendered guardado como evidencia en `Handoff.md` (source o screenshot).
+- [ ] Sign-off visual del owner documentado: layout correcto, links `@[mention]` no 404, labels largos no rompen el layout.
+- [ ] Verificación en Gmail desktop + Gmail mobile como mínimo.
+
+### Post-deploy monitoring + rollback (Slice 7)
+
+- [ ] Alerta Cloud Logging/Run configurada: si falta log `done — status=sent` entre lunes 07:00-08:00 Chile → alert a Slack/Ops.
+- [ ] Alerta configurada para log `failed` en el endpoint.
+- [ ] `docs/runbooks/ico-weekly-digest-rollback.md` existe con comandos concretos + template de comunicación.
+- [ ] Sección `Closing Protocol` de esta task incluye link al runbook.
+
+### Smoke test del primer cron real (lunes)
+
+- [ ] Logs de Cloud Run muestran el cron del lunes 27-04 07:00 Chile ejecutando `done — status=sent` con `recipients > 0`.
+- [ ] Confirmación manual de al menos 1 recipient que recibió el email OK (ej. screenshot Slack o forward a owner).
 
 ## Verification
 
