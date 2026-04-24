@@ -1,5 +1,21 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — decisión arquitectónica: `notion-bigquery` sigue como repo hermano (Codex)
+
+- **Pregunta resuelta**
+  - si vale la pena absorber `cesargrowth11/notion-bigquery` a `greenhouse-eo`
+- **Decisión**
+  - no absorber por ahora
+  - `greenhouse-eo` sí depende operativamente de `notion-bq-sync`, pero la deuda principal actual es de postura runtime (`minScale`, `allUsers`, default compute SA, Scheduler sin `OIDC`), no de ubicación del código
+- **Documentación nueva**
+  - `docs/architecture/GREENHOUSE_NOTION_BIGQUERY_ABSORPTION_DECISION_V1.md`
+- **Alineación documental**
+  - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+  - `docs/README.md`
+- **Criterio operativo vigente**
+  - primero endurecer `notion-bq-sync` y bajar costo según `TASK-585`
+  - reevaluar absorción solo si la fricción cross-repo pasa a ser el costo dominante
+
 ## Sesion 2026-04-23 — documentación cloud alineada a auditoría live (Codex)
 
 - **Scope**

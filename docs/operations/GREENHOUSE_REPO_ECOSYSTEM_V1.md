@@ -1,5 +1,14 @@
 # GREENHOUSE_REPO_ECOSYSTEM_V1.md
 
+## Delta 2026-04-24 — `notion-bigquery` queda como repo hermano; dependencia sí, absorción no todavía
+
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_NOTION_BIGQUERY_ABSORPTION_DECISION_V1.md`
+- Decisión vigente:
+  - `greenhouse-eo` sí depende operativamente de `notion-bq-sync`
+  - esa dependencia no obliga todavía a absorber `cesargrowth11/notion-bigquery` al monorepo
+  - primero se debe endurecer costo/auth/identidad del servicio actual y recién después reevaluar ownership
+
 ## Delta 2026-04-11 — Sister platforms contract now governs cross-repo integration posture
 
 - La relación entre `greenhouse-eo` y plataformas hermanas del ecosistema ya no debe inferirse solo desde esta lista operativa.
