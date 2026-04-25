@@ -8,6 +8,10 @@ import { getInternalDashboardOverview } from '@/lib/internal/get-internal-dashbo
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
 import { buildReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
+import {
+  getLatestSweepRun,
+  getLatestSyntheticSnapshotsByRoute
+} from '@/lib/reliability/synthetic/reader'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 
@@ -30,18 +34,30 @@ export default async function Page() {
     redirect(tenant.portalHomePath)
   }
 
-  const [access, tenants, controlTower, operations, billing, notionOperational] = await Promise.all([
+  const [
+    access,
+    tenants,
+    controlTower,
+    operations,
+    billing,
+    notionOperational,
+    syntheticSnapshots,
+    syntheticSweep
+  ] = await Promise.all([
     getAdminAccessOverview(),
     getAdminTenantsOverview(),
     getInternalDashboardOverview(),
     getOperationsOverview(),
     getGcpBillingOverview().catch(() => null),
-    getNotionSyncOperationalOverview().catch(() => null)
+    getNotionSyncOperationalOverview().catch(() => null),
+    getLatestSyntheticSnapshotsByRoute().catch(() => []),
+    getLatestSweepRun().catch(() => null)
   ])
 
   const reliability = buildReliabilityOverview(operations, {
     billing,
-    notionOperational
+    notionOperational,
+    syntheticSnapshots
   })
 
   return (
@@ -51,6 +67,8 @@ export default async function Page() {
       controlTower={controlTower}
       operations={operations}
       reliability={reliability}
+      syntheticSnapshots={syntheticSnapshots}
+      syntheticSweep={syntheticSweep}
     />
   )
 }

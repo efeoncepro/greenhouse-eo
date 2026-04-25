@@ -60,11 +60,20 @@ vi.mock('@/components/greenhouse', () => ({
   }) => <div>{items.map(item => renderItem(item))}</div>,
   ReliabilityModuleCard: ({ module }: { module: { moduleKey: string; label: string } }) => (
     <article data-testid={`reliability-module-${module.moduleKey}`}>{module.label}</article>
+  ),
+  GreenhouseRouteLink: ({ children, href }: { children: ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
   )
 }))
 
 vi.mock('@components/greenhouse/SectionErrorBoundary', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>
+}))
+
+vi.mock('@/components/greenhouse/admin/ReliabilitySyntheticCard', () => ({
+  default: ({ snapshots }: { snapshots: { routePath: string }[] }) => (
+    <article data-testid='reliability-synthetic-card'>{snapshots.length} probes</article>
+  )
 }))
 
 const buildClient = (overrides: Partial<InternalDashboardClientRow>): InternalDashboardClientRow => ({
@@ -309,6 +318,8 @@ describe('AdminCenterView', () => {
         controlTower={controlTower}
         operations={operations}
         reliability={reliability}
+        syntheticSnapshots={[]}
+        syntheticSweep={null}
       />
     )
 
@@ -338,6 +349,8 @@ describe('AdminCenterView', () => {
         controlTower={controlTower}
         operations={operations}
         reliability={reliability}
+        syntheticSnapshots={[]}
+        syntheticSweep={null}
       />
     )
 
@@ -398,6 +411,8 @@ describe('AdminCenterView', () => {
           }
         }}
         reliability={reliability}
+        syntheticSnapshots={[]}
+        syntheticSweep={null}
       />
     )
 

@@ -6237,6 +6237,21 @@ export interface GreenhouseSyncProjectionRefreshQueue {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseSyncReliabilitySyntheticRuns {
+  created_at: Generated<Timestamp>;
+  error_message: string | null;
+  finished_at: Timestamp;
+  http_status: number;
+  latency_ms: number;
+  module_key: string;
+  ok: boolean;
+  probe_id: string;
+  route_path: string;
+  started_at: Timestamp;
+  sweep_run_id: string;
+  triggered_by: string;
+}
+
 export interface GreenhouseSyncReportingHierarchyDriftProposals {
   created_at: Generated<Timestamp>;
   current_reporting_line_id: string | null;
@@ -6684,6 +6699,7 @@ export interface DB {
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_circuit_state": GreenhouseSyncProjectionCircuitState;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
+  "greenhouse_sync.reliability_synthetic_runs": GreenhouseSyncReliabilitySyntheticRuns;
   "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;
   "greenhouse_sync.service_sync_queue": GreenhouseSyncServiceSyncQueue;

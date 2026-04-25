@@ -2,6 +2,22 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Reliability Synthetic Monitoring (TASK-632) — cron periódico de rutas críticas
+
+- **Nueva tabla canónica**: `greenhouse_sync.reliability_synthetic_runs` (probe_id PK, sweep_run_id FK→source_sync_runs, module_key, route_path, http_status, ok, latency_ms, error_message, triggered_by, started/finished_at). 3 índices.
+- **Cron Vercel `*/30 * * * *`**: `/api/cron/reliability-synthetic` ejecuta GET autenticado vía Agent Auth contra cada `route.path` declarada en `RELIABILITY_REGISTRY` (10 rutas en 4 módulos), persiste cada probe y emite señal `kind=runtime` por ruta + agregada `kind=test_lane` por módulo.
+- **Decisión Vercel cron sobre Cloud Run**: setup 1/10, mismo deployment, paralelización en olas de 6 cabe holgado en cap 60s. ops-worker queda como follow-up si sweep crece >20 rutas.
+- **Kill switch opt-in**: `RELIABILITY_SYNTHETIC_ENABLED=false` apaga el cron sin redeploy. Default true. Convención del repo (`bigquery-write-flag.ts`).
+- **Detección de SSO redirect**: 3xx con location `/login` o `/auth/access-denied` se marca falla — evita ocultar regresiones de auth como "todo bien".
+- **Reliability boundaries movidos a `ready`**: 4 entries (1 por módulo) con `expectedSignalKind=runtime` y `expectedSource=runReliabilitySyntheticSweep` en `RELIABILITY_INTEGRATION_BOUNDARIES`.
+- **Nueva surface visible**: card "Synthetic monitor de rutas críticas" en Admin Center muestra resumen de última corrida + lista compacta de rutas en error.
+- **Habilita TASK-633** (Change-Based Verification Matrix): puede consumir `reliability_synthetic_runs` para verificar última corrida OK antes de aprobar PR.
+
+### 2026-04-25 — Cloud & Integrations vuelve a abrir la surface Cloud real
+
+- `/admin/cloud-integrations` dejó de redirigir a `/admin/integrations` y vuelve a renderizar `AdminCloudIntegrationsView` con postura cloud, runtime checks, cost guard, webhooks y secret refs.
+- Los entrypoints `Cloud & Integrations` del menú, Admin Center y Ops Health apuntan a `/admin/cloud-integrations`; `/admin/integrations` queda reservado para `Integration Governance`.
+
 ### 2026-04-25 — Navegación interna resiliente para Admin Center
 
 - Se agregó `GreenhouseRouteLink`, un wrapper de `next/link` con fallback controlado a navegación completa cuando App Router recibe la respuesta RSC pero no comitea el cambio de URL.

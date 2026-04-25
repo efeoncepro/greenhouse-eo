@@ -7,6 +7,7 @@ import {
   getOperationsOverview,
   type OperationsOverview
 } from '@/lib/operations/get-operations-overview'
+import { getLatestSyntheticSnapshotsByRoute } from '@/lib/reliability/synthetic/reader'
 import type { GcpBillingOverview } from '@/types/billing-export'
 import type {
   ReliabilityIntegrationBoundary,
@@ -16,6 +17,7 @@ import type {
   ReliabilitySignal,
   ReliabilitySignalKind
 } from '@/types/reliability'
+import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import { RELIABILITY_REGISTRY } from './registry'
 import {
@@ -30,7 +32,9 @@ import {
   buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
   buildSentryIncidentSignals,
-  buildSubsystemSignals
+  buildSubsystemSignals,
+  buildSyntheticModuleSignals,
+  buildSyntheticRouteSignals
 } from './signals'
 
 const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
@@ -57,6 +61,38 @@ const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
     expectedSource: 'getFinanceSmokeLaneStatus',
     status: 'pending',
     note: 'TASK-599 entregará smoke E2E de /finance/{expenses,clients,suppliers}. Enchufa como signal kind=test_lane.'
+  },
+  {
+    taskId: 'TASK-632',
+    moduleKey: 'finance',
+    expectedSignalKind: 'runtime',
+    expectedSource: 'runReliabilitySyntheticSweep',
+    status: 'ready',
+    note: 'TASK-632 entregó cron de synthetic monitoring. Adapter: buildSyntheticRouteSignals.'
+  },
+  {
+    taskId: 'TASK-632',
+    moduleKey: 'integrations.notion',
+    expectedSignalKind: 'runtime',
+    expectedSource: 'runReliabilitySyntheticSweep',
+    status: 'ready',
+    note: 'TASK-632 entregó cron de synthetic monitoring. Adapter: buildSyntheticRouteSignals.'
+  },
+  {
+    taskId: 'TASK-632',
+    moduleKey: 'cloud',
+    expectedSignalKind: 'runtime',
+    expectedSource: 'runReliabilitySyntheticSweep',
+    status: 'ready',
+    note: 'TASK-632 entregó cron de synthetic monitoring. Adapter: buildSyntheticRouteSignals.'
+  },
+  {
+    taskId: 'TASK-632',
+    moduleKey: 'delivery',
+    expectedSignalKind: 'runtime',
+    expectedSource: 'runReliabilitySyntheticSweep',
+    status: 'ready',
+    note: 'TASK-632 entregó cron de synthetic monitoring. Adapter: buildSyntheticRouteSignals.'
   },
   {
     taskId: 'TASK-103',
@@ -132,12 +168,15 @@ const sortSignalsForDisplay = (signals: ReliabilitySignal[]): ReliabilitySignal[
 interface ReliabilityOverviewSources {
   billing?: GcpBillingOverview | null
   notionOperational?: NotionSyncOperationalOverview | null
+  syntheticSnapshots?: SyntheticRouteSnapshot[] | null
 }
 
 export const buildReliabilityOverview = (
   operations: OperationsOverview,
   sources: ReliabilityOverviewSources = {}
 ): ReliabilityOverview => {
+  const syntheticSnapshots = sources.syntheticSnapshots ?? []
+
   const allSignals: ReliabilitySignal[] = [
     ...buildSubsystemSignals(operations.subsystems),
     ...buildCloudSignals(operations.cloud),
@@ -145,7 +184,9 @@ export const buildReliabilityOverview = (
     buildObservabilityPostureSignal(operations.cloud.observability.posture),
     ...buildNotionDataQualitySignals(operations.notionDeliveryDataQuality ?? null),
     ...(sources.billing ? buildGcpBillingSignals(sources.billing) : []),
-    ...(sources.notionOperational ? [buildNotionFreshnessSignal(sources.notionOperational)] : [])
+    ...(sources.notionOperational ? [buildNotionFreshnessSignal(sources.notionOperational)] : []),
+    ...buildSyntheticRouteSignals(syntheticSnapshots),
+    ...buildSyntheticModuleSignals(syntheticSnapshots)
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -253,5 +294,10 @@ export const getReliabilityOverview = async (
       ? preloadedSources.notionOperational
       : await getNotionSyncOperationalOverview().catch(() => null)
 
-  return buildReliabilityOverview(operations, { billing, notionOperational })
+  const syntheticSnapshots =
+    preloadedSources.syntheticSnapshots !== undefined
+      ? preloadedSources.syntheticSnapshots
+      : await getLatestSyntheticSnapshotsByRoute().catch(() => [])
+
+  return buildReliabilityOverview(operations, { billing, notionOperational, syntheticSnapshots })
 }

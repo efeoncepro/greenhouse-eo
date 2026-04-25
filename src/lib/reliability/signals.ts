@@ -18,6 +18,7 @@ import type {
   ReliabilitySignal,
   ReliabilitySignalKind
 } from '@/types/reliability'
+import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import {
   fromCloudHealthStatus,
@@ -517,6 +518,144 @@ export const buildNotionFreshnessSignal = (
       }
     ]
   }
+}
+
+/**
+ * TASK-632 — Synthetic monitoring adapters.
+ *
+ * Cada `SyntheticRouteSnapshot` (última probe por módulo+ruta) emite una señal
+ * `kind=runtime` específica para esa ruta. Adicionalmente, un agregado por
+ * módulo `kind=test_lane` resume "qué tan saludable está el set de rutas
+ * críticas del módulo" — útil para boundary del Reliability Control Plane.
+ */
+const synthSeverityFromProbe = (probe: SyntheticRouteSnapshot['lastProbe']): ReliabilitySeverity => {
+  if (probe.ok) return 'ok'
+
+  if (probe.httpStatus === 0) return 'error'
+  if (probe.httpStatus >= 500) return 'error'
+  if (probe.httpStatus >= 400) return 'warning'
+
+  return 'warning'
+}
+
+const slugForRoute = (path: string) =>
+  path.replace(/^\//, '').replace(/[^a-z0-9]+/gi, '_').toLowerCase() || 'root'
+
+export const buildSyntheticRouteSignals = (
+  snapshots: SyntheticRouteSnapshot[]
+): ReliabilitySignal[] => {
+  if (snapshots.length === 0) return []
+
+  return snapshots.map<ReliabilitySignal>(snapshot => {
+    const probe = snapshot.lastProbe
+    const severity = synthSeverityFromProbe(probe)
+
+    const summaryParts = [
+      probe.ok ? 'GET ok' : `GET ${probe.httpStatus || 'failed'}`,
+      `${probe.latencyMs} ms`,
+      probe.errorMessage ? probe.errorMessage.slice(0, 100) : null
+    ].filter(Boolean) as string[]
+
+    return {
+      signalId: `${snapshot.moduleKey}.runtime.synthetic.${slugForRoute(snapshot.routePath)}`,
+      moduleKey: snapshot.moduleKey,
+      kind: 'runtime',
+      source: 'runReliabilitySyntheticSweep',
+      label: `Synthetic: ${snapshot.routePath}`,
+      severity,
+      summary: summaryParts.join(' · '),
+      observedAt: probe.finishedAt,
+      evidence: [
+        {
+          kind: 'helper',
+          label: 'Synthetic runner',
+          value: 'src/lib/reliability/synthetic/runner.ts'
+        },
+        {
+          kind: 'sql',
+          label: 'Probe table',
+          value: 'greenhouse_sync.reliability_synthetic_runs'
+        },
+        {
+          kind: 'metric',
+          label: 'http_status',
+          value: String(probe.httpStatus)
+        }
+      ]
+    }
+  })
+}
+
+const SEVERITY_RANK_FOR_AGGREGATE: Record<ReliabilitySeverity, number> = {
+  ok: 0,
+  awaiting_data: 1,
+  unknown: 2,
+  not_configured: 3,
+  warning: 4,
+  error: 5
+}
+
+export const buildSyntheticModuleSignals = (
+  snapshots: SyntheticRouteSnapshot[]
+): ReliabilitySignal[] => {
+  if (snapshots.length === 0) return []
+
+  const grouped = new Map<ReliabilityModuleKey, SyntheticRouteSnapshot[]>()
+
+  for (const snapshot of snapshots) {
+    const list = grouped.get(snapshot.moduleKey) ?? []
+
+    list.push(snapshot)
+    grouped.set(snapshot.moduleKey, list)
+  }
+
+  return Array.from(grouped.entries()).map<ReliabilitySignal>(([moduleKey, items]) => {
+    let worstRank = 0
+
+    for (const item of items) {
+      const rank = SEVERITY_RANK_FOR_AGGREGATE[synthSeverityFromProbe(item.lastProbe)]
+
+      if (rank > worstRank) worstRank = rank
+    }
+
+    const severity =
+      (Object.entries(SEVERITY_RANK_FOR_AGGREGATE).find(([, rank]) => rank === worstRank)?.[0] as ReliabilitySeverity) ??
+      'ok'
+
+    const okCount = items.filter(item => item.lastProbe.ok).length
+    const failCount = items.length - okCount
+
+    const lastObservedAt = items
+      .map(item => item.lastProbe.finishedAt)
+      .sort()
+      .at(-1) ?? null
+
+    return {
+      signalId: `${moduleKey}.test_lane.synthetic`,
+      moduleKey,
+      kind: 'test_lane',
+      source: 'runReliabilitySyntheticSweep',
+      label: 'Synthetic route lane',
+      severity,
+      summary:
+        failCount === 0
+          ? `${okCount} ruta${okCount === 1 ? '' : 's'} sana${okCount === 1 ? '' : 's'} en última corrida.`
+          : `${failCount} ruta${failCount === 1 ? '' : 's'} en error de ${items.length}.`,
+      observedAt: lastObservedAt,
+      evidence: [
+        {
+          kind: 'helper',
+          label: 'Synthetic runner',
+          value: 'src/lib/reliability/synthetic/runner.ts'
+        },
+        {
+          kind: 'metric',
+          label: 'routes',
+          value: `${okCount}/${items.length} ok`
+        }
+      ]
+    }
+  })
 }
 
 export const SIGNAL_KIND_LABELS: Record<ReliabilitySignalKind, string> = {

@@ -9,6 +9,10 @@
       "schedule": "*/5 * * * *"
     },
     {
+      "path": "/api/cron/reliability-synthetic",
+      "schedule": "*/30 * * * *"
+    },
+    {
       "path": "/api/cron/sync-conformed",
       "schedule": "20 7 * * *"
     },

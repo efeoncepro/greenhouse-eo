@@ -23,12 +23,14 @@ import {
   GreenhouseDragList,
   ReliabilityModuleCard
 } from '@/components/greenhouse'
+import ReliabilitySyntheticCard from '@/components/greenhouse/admin/ReliabilitySyntheticCard'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 import type { OperationsOverview } from '@/lib/operations/get-operations-overview'
 import type { ReliabilityOverview } from '@/types/reliability'
+import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import {
   buildControlTowerSummary,
@@ -48,6 +50,14 @@ type Props = {
   controlTower: InternalDashboardOverview
   operations: OperationsOverview
   reliability: ReliabilityOverview
+  syntheticSnapshots: SyntheticRouteSnapshot[]
+  syntheticSweep: {
+    sweepRunId: string
+    startedAt: string
+    finishedAt: string | null
+    status: string
+    notes: string | null
+  } | null
 }
 
 type DomainCard = {
@@ -239,9 +249,9 @@ const buildDomainCards = ({
       label: cloudStatusLabel(operations),
       color: cloudStatusColor(operations)
     },
-    href: '/admin/integrations',
+    href: '/admin/cloud-integrations',
     primaryAction: 'Abrir cloud & integrations',
-    routes: ['/admin/integrations', '/admin/cloud-integrations'],
+    routes: ['/admin/cloud-integrations', '/admin/integrations'],
     points: [
       `${operations.kpis.activeSyncs} fuentes activas de sincronizacion`,
       operations.cloud.cron.secretConfigured ? 'Cron control plane autenticado' : 'CRON_SECRET pendiente',
@@ -390,7 +400,15 @@ const buildDomainCards = ({
 const validFilters: StatusFilter[] = ['all', 'active', 'onboarding', 'attention', 'inactive']
 const ADMIN_CENTER_CARD_ORDER_KEY = 'greenhouse:admin-center:domain-card-order'
 
-const AdminCenterView = ({ access, tenants, controlTower, operations, reliability }: Props) => {
+const AdminCenterView = ({
+  access,
+  tenants,
+  controlTower,
+  operations,
+  reliability,
+  syntheticSnapshots,
+  syntheticSweep
+}: Props) => {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const navRouter = useNavRouter()
@@ -549,7 +567,7 @@ const AdminCenterView = ({ access, tenants, controlTower, operations, reliabilit
               <Button component={Link} href='/admin/tenants' variant='contained'>
                 Abrir Spaces
               </Button>
-              <Button component={GreenhouseRouteLink} href='/admin/integrations' variant='outlined'>
+              <Button component={GreenhouseRouteLink} href='/admin/cloud-integrations' variant='outlined'>
                 Ver Cloud & Integrations
               </Button>
             </Stack>
@@ -782,6 +800,9 @@ const AdminCenterView = ({ access, tenants, controlTower, operations, reliabilit
           )}
         </Stack>
       </ExecutiveCardShell>
+
+      {/* ── Synthetic Monitor (TASK-632) ── */}
+      <ReliabilitySyntheticCard snapshots={syntheticSnapshots} sweep={syntheticSweep} />
 
       {/* ── Torre de control (Spaces health table) ── */}
       <SectionErrorBoundary
