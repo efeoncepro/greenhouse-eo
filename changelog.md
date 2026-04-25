@@ -2,6 +2,23 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — API Platform y MCP ya tienen cierre de decisiones arquitectónicas pendientes
+
+- `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` ahora deja explícitos el `event control plane`, el resource canon V1.1, la policy de writes/status codes, la deprecación y la disciplina de frescura.
+- `GREENHOUSE_MCP_ARCHITECTURE_V1.md` ahora deja explícitas la taxonomy de surfaces, las trust boundaries, las clases de write, cuotas, audit trail y la strategy base de skills.
+
+### 2026-04-25 — MCP y skills ya tienen boundary arquitectónico explícito
+
+- `GREENHOUSE_MCP_ARCHITECTURE_V1.md` ahora deja explícito que el `MCP server` y los `skills` de agentes no son lo mismo.
+- Se formaliza la separación:
+  - `MCP` = capability layer (`tools`, `resources`, `prompts`)
+  - `skills` = behavior layer (workflow, guardrails, nomenclatura y uso correcto)
+
+### 2026-04-25 — MCP ya tiene arquitectura propia como server downstream
+
+- **Nueva spec canónica**: `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md` formaliza el MCP de Greenhouse como un server oficial para agentes, montado downstream de `api/platform/*`.
+- **Boundary aclarado**: la arquitectura de API platform sigue definiendo la secuencia y la dependencia; la nueva spec de MCP define el server, sus surfaces (`tools`, `resources`, `prompts`), su scope inicial read-only y la política de writes seguros.
+
 ### 2026-04-25 — Documentación funcional nueva: API Platform Ecosystem
 
 - **Nueva guía funcional**: `docs/documentation/plataforma/api-platform-ecosystem.md` explica en lenguaje simple cómo funciona hoy la lane `api/platform/ecosystem/*`, qué recursos expone, cómo resuelve seguridad/tenancy y cómo convive con `/api/integrations/v1/*`.

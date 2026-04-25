@@ -1,5 +1,75 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — API Platform y MCP cierran sus decisiones arquitectónicas pendientes
+
+### Que cambio
+
+Se ampliaron las specs para dejar resueltas las decisiones que seguían implícitas o abiertas:
+
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+
+### Decisiones canónicas explicitadas
+
+En `API Platform` quedaron cerrados:
+
+- el `event control plane` como parte oficial de `api/platform/*`
+- el resource canon base de plataforma
+- la política canónica de `POST` / `PATCH` / `PUT` / `DELETE`
+- la matrix uniforme de status codes
+- la disciplina de deprecation y frescura
+
+En `MCP` quedaron cerrados:
+
+- taxonomy de `tools` / `resources` / `prompts`
+- trust boundaries y prompt-injection posture
+- clases de write y confirmación humana
+- cuotas/rate limits
+- audit trail mínimo
+- strategy base de skills
+
+## Sesion 2026-04-25 — MCP y skills quedan separados como capability layer vs behavior layer
+
+### Que cambio
+
+Se amplió la arquitectura de MCP para dejar explícito que Greenhouse debe diseñar:
+
+- `MCP server` como capa de capacidades ejecutables
+- `skills` como capa de comportamiento y uso correcto
+
+Documento actualizado:
+
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+
+### Decisión canónica explicitada
+
+La regla nueva es:
+
+- MCP responde qué puede hacer un agente
+- skills responden cómo debería hacerlo
+- Greenhouse necesita ambos, pero como capas separadas
+
+## Sesion 2026-04-25 — Arquitectura propia para MCP server
+
+### Que cambio
+
+Se creó una spec separada para MCP, en vez de dejarlo solo como un apéndice de la API platform:
+
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+
+También quedó sincronizada la referencia desde:
+
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+
+### Decisión canónica explicitada
+
+MCP en Greenhouse se modela como:
+
+- un **server** oficial
+- downstream de `api/platform/*`
+- read-only por defecto
+- con writes solo vía commands auditables e idempotentes
+
 ## Sesion 2026-04-25 — Documentacion funcional nueva para API Platform Ecosystem
 
 ### Que cambio

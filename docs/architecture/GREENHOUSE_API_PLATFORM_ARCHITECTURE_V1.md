@@ -5,7 +5,7 @@
 > **Creado:** 2026-04-25
 > **Ultima actualizacion:** 2026-04-25
 > **Scope:** API platform interna, ecosystem-facing y futura external-facing de Greenhouse
-> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`, `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`, `TASK-040`
+> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_MCP_ARCHITECTURE_V1.md`, `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`, `TASK-040`
 
 ---
 
@@ -262,9 +262,227 @@ Solo debe existir cuando haya:
 
 ---
 
-## 8. Política de versionado
+## 8. Objetivo RESTful
 
-### 8.1 Regla canónica
+### 8.1 Posición canónica
+
+La `API platform` de Greenhouse debe evolucionar hacia una API **RESTful**.
+
+Eso significa, en términos prácticos:
+
+- recursos identificables por URL
+- métodos HTTP con semántica consistente
+- contratos uniformes de request/response
+- stateless auth por request
+- uso correcto de status codes, headers y paginación
+- writes seguros, idempotentes y auditables
+
+Greenhouse no necesita perseguir una REST “académicamente pura” si eso complica la operación.
+
+Sí necesita una API:
+
+- resource-oriented
+- predecible
+- tenant-safe
+- auditable
+- evolutiva sin romper consumers
+
+### 8.2 Estado actual
+
+Hoy la lane `api/platform/ecosystem/*` ya es **REST-like** pero todavía no es una REST API madura completa.
+
+Lo que ya cumple:
+
+- recursos legibles por URL
+- lane stateless y machine-to-machine
+- `GET` read-only consistente
+- versionado por header
+- envelope uniforme
+- auth/context por request
+- request IDs y headers operativos
+
+Lo que todavía falta para llamarla RESTful de forma fuerte:
+
+- métodos mutativos (`POST`, `PUT`, `PATCH`, `DELETE`) con semántica estable
+- política uniforme de status codes para create/update/delete
+- paginación consistente en todas las colecciones
+- headers/contratos de rate limiting más completos
+- soporte explícito para conditional requests y caching donde tenga sentido
+- deprecación/versionado operado end-to-end
+
+### 8.3 Regla de diseño
+
+Greenhouse debe modelar primero recursos y después comandos.
+
+Eso implica:
+
+- evitar rutas RPC disfrazadas como si fueran resources
+- no usar `POST` genérico para todo
+- usar `PATCH` para cambios parciales cuando la semántica sea clara
+- reservar `DELETE` para delete real o deprecación claramente documentada
+
+Cuando una operación sea más comando que recurso, debe quedar explícita como command endpoint auditable y no fingirse como un CRUD trivial.
+
+### 8.4 Métodos HTTP objetivo
+
+La `API platform` debe soportar esta semántica objetivo:
+
+- `GET`
+  - lectura de resources o colecciones
+- `POST`
+  - create o command explícito con idempotencia
+- `PUT`
+  - replace completo cuando el recurso realmente lo soporte
+- `PATCH`
+  - actualización parcial
+- `DELETE`
+  - eliminación lógica o física solo cuando el contrato sea inequívoco
+- `HEAD`
+  - opcional cuando aporte valor a consumers o tooling
+- `OPTIONS`
+  - soporte técnico/CORS cuando aplique
+
+### 8.5 Brechas actuales para llegar a RESTful
+
+Las brechas concretas hoy son:
+
+1. **Read-only solamente**
+   - la lane nueva solo expone `GET`
+   - todavía no existen command endpoints ecosystem-facing
+
+2. **Colecciones sin contrato uniforme completo**
+   - aunque ya hay shape estable, no todas las colecciones exponen cursores/links/metadata de navegación con la misma madurez
+
+3. **Caching y conditional requests ausentes**
+   - faltan `ETag`, `Last-Modified`, `If-None-Match` o `If-Modified-Since` donde tenga sentido
+
+4. **Rate limit headers incompletos**
+   - la política existe, pero todavía debe converger a un contrato más consistente y más útil para consumers
+
+5. **Semántica mutativa no definida**
+   - faltan reglas canónicas de:
+     - `201 Created`
+     - `202 Accepted`
+     - `204 No Content`
+     - `409 Conflict`
+     - `422 Unprocessable Entity`
+
+6. **Relación legacy vs REST nueva aún transicional**
+   - `/api/integrations/v1/*` sigue viva y no toda su semántica está alineada todavía con el carril nuevo
+
+### 8.6 Secuencia correcta para cerrar la brecha
+
+Greenhouse no debe intentar “volverse RESTful” de golpe.
+
+La secuencia correcta es:
+
+1. consolidar read resources y paginación
+2. cerrar error/status code policy
+3. abrir `POST` idempotentes y auditables
+4. abrir `PATCH` donde el dominio ya sea estable
+5. agregar conditional requests y caching selectivo
+6. recién después evaluar `DELETE`, public API amplia o MCP downstream más rico
+
+### 8.7 Criterio de salida
+
+Greenhouse podrá decir que su `API platform` es RESTful de forma sólida cuando:
+
+- la lane nueva ya no sea solo read-only
+- los resources principales tengan semántica uniforme de colección y detalle
+- los writes sean idempotentes y auditables
+- la paginación y status code policy sean consistentes
+- el carril nuevo sea la referencia principal para consumers ecosystem-facing
+
+### 8.8 Objetivo completo de plataforma API
+
+El objetivo canónico de Greenhouse no es solo una REST API de lectura/escritura.
+
+El objetivo completo es una **API platform convergida** con tres piezas:
+
+1. `RESTful resource API`
+   - resources y command endpoints HTTP claros
+2. `Event delivery / webhooks`
+   - delivery outbound y recepción inbound gobernados como capability de plataforma
+3. `MCP downstream`
+   - adapters montados sobre contratos ya estabilizados
+
+En otras palabras:
+
+- REST es una parte del objetivo
+- webhooks/event delivery son otra parte del objetivo
+- MCP viene después, no antes
+
+### 8.9 Estado actual del objetivo completo
+
+Hoy Greenhouse ya tiene partes importantes de ese objetivo, pero todavía distribuidas en capas distintas.
+
+#### Ya existe
+
+- lane nueva `api/platform/ecosystem/*` read-only y REST-like
+- outbox canónico en `greenhouse_sync.outbox_events`
+- inbound webhooks con endpoint genérico
+- outbound webhook delivery con subscriptions, deliveries, attempts y dead-letter semantics
+- observabilidad interna básica de inbox/deliveries
+
+#### Todavía falta converger
+
+- que webhooks/event delivery queden modelados explícitamente como parte de la `API platform`
+- que exista un contrato canónico ecosystem-facing para subscriptions, deliveries y firmas
+- que REST y event delivery compartan de forma explícita:
+  - versionado
+  - error taxonomy
+  - observabilidad
+  - reglas de seguridad
+  - lifecycle/deprecación
+
+### 8.10 Brechas concretas para alcanzar el objetivo completo
+
+Además de las brechas REST descritas arriba, faltan estas:
+
+1. **Webhooks todavía no viven bajo `api/platform/*`**
+   - existen como capability operativa del repo
+   - todavía no son una lane convergida de platform API
+
+2. **Subscriptions y deliveries no están expuestos como resources canónicos de plataforma**
+   - el runtime existe
+   - el contrato ecosystem-facing todavía no
+
+3. **Event contract no está gobernado junto a la lane nueva**
+   - faltan reglas más explícitas para:
+     - envelope versioning
+     - firma y auth outbound
+     - retry policy declarada como contrato
+     - dead-letter semantics canónicas
+
+4. **REST y webhooks aún no comparten un control plane unificado**
+   - hoy se apoyan en foundations sanas pero separadas
+   - todavía falta una historia única de platform API para consumers externos
+
+### 8.11 Secuencia correcta para cerrar el objetivo completo
+
+La secuencia canónica debería ser:
+
+1. cerrar la madurez REST del lane `api/platform/ecosystem/*`
+2. formalizar webhooks/event delivery como parte de `api-platform`
+3. converger observabilidad, seguridad, errores y versionado entre ambas capas
+4. recién después expandir commands amplios, public API o MCP más rico
+
+### 8.12 Regla operativa
+
+Greenhouse no debe tratar “REST” y “webhooks” como programas separados y competidores.
+
+Debe tratarlos como dos caras de la misma `API platform`:
+
+- REST para consultar y comandar
+- webhooks/event delivery para reaccionar a cambios
+
+El objetivo no se considera completo mientras una de esas dos capas siga viviendo como capability útil pero todavía no convergida bajo la disciplina de plataforma nueva.
+
+---
+
+## 9. Política de versionado
+
+### 9.1 Regla canónica
 
 Greenhouse debe preferir versionado explícito por header para la API platform, con una default version documentada.
 
@@ -272,7 +490,7 @@ Header recomendado:
 
 - `X-Greenhouse-Api-Version: 2026-04-25`
 
-### 8.2 Por qué no solo `/v1`
+### 9.2 Por qué no solo `/v1`
 
 El repo todavía está convergiendo múltiples lanes y backends. Un header versionado por fecha permite:
 
@@ -280,7 +498,7 @@ El repo todavía está convergiendo múltiples lanes y backends. Un header versi
 - mantener additive changes sin forks innecesarios
 - alinear SDK/types/tests por versión
 
-### 8.3 Reglas de cambio
+### 9.3 Reglas de cambio
 
 Se consideran `breaking changes`:
 
@@ -297,7 +515,7 @@ Se consideran `additive changes`:
 - agregar headers opcionales
 - agregar enum values no disruptivos
 
-### 8.4 Soporte
+### 9.4 Soporte
 
 Cada nueva versión breaking de la API platform debe declarar explícitamente:
 
@@ -307,11 +525,11 @@ Cada nueva versión breaking de la API platform debe declarar explícitamente:
 
 ---
 
-## 9. Modelo de autenticación
+## 10. Modelo de autenticación
 
 La platform API no debe mezclar auth humana del portal con auth machine-to-machine.
 
-### 9.1 Internal auth
+### 10.1 Internal auth
 
 Usa:
 
@@ -319,7 +537,7 @@ Usa:
 - tenant context
 - role codes / route groups / views / entitlements según corresponda
 
-### 9.2 Ecosystem auth
+### 10.2 Ecosystem auth
 
 Debe generalizar el patrón ya implementado en `sister-platforms`:
 
@@ -330,7 +548,7 @@ Debe generalizar el patrón ya implementado en `sister-platforms`:
 - allowlist de scope types
 - rate limits por consumer
 
-### 9.3 Binding-aware auth
+### 10.3 Binding-aware auth
 
 Para requests ecosystem-facing que necesiten resolver tenancy externa:
 
@@ -343,7 +561,7 @@ La request solo puede servirse si:
 - el binding resuelve un scope activo
 - ese scope está permitido para el consumer
 
-### 9.4 Public auth
+### 10.4 Public auth
 
 No aprobada por defecto en V1.
 
@@ -351,11 +569,11 @@ Si aparece, debe usar credenciales, scopes y observabilidad propias, no reciclar
 
 ---
 
-## 10. Response contract
+## 11. Response contract
 
 La platform API debe usar un envelope uniforme.
 
-### 10.1 Response envelope
+### 11.1 Response envelope
 
 Shape recomendada:
 
@@ -371,7 +589,7 @@ Shape recomendada:
 }
 ```
 
-### 10.2 Headers mínimos
+### 11.2 Headers mínimos
 
 - `x-greenhouse-request-id`
 - `cache-control`
@@ -381,7 +599,7 @@ Shape recomendada:
   - `X-RateLimit-Remaining`
   - `X-RateLimit-Reset`
 
-### 10.3 Error contract
+### 11.3 Error contract
 
 Los errores deben ser machine-readable.
 
@@ -407,19 +625,19 @@ Shape recomendada:
 
 ---
 
-## 11. Idempotencia
+## 12. Idempotencia
 
 Para que los writes sean robustos y seguros, la platform API debe tratar la idempotencia como contrato nativo.
 
-### 11.1 Header
+### 12.1 Header
 
 - `Idempotency-Key`
 
-### 11.2 Regla
+### 12.2 Regla
 
 Todos los `POST`, `PUT` o `PATCH` mutativos de la API platform deben poder aceptar idempotency key.
 
-### 11.3 Semántica
+### 12.3 Semántica
 
 La plataforma debe:
 
@@ -428,7 +646,7 @@ La plataforma debe:
 - rechazar el reuse de una key con payload distinto
 - expirar las keys según política documentada
 
-### 11.4 Alcance V1
+### 12.4 Alcance V1
 
 No es obligatorio retrofitear todas las rutas históricas del repo.
 
@@ -436,20 +654,20 @@ Sí es obligatorio en nuevos command endpoints de `api/platform/*`.
 
 ---
 
-## 12. Paginación y cursores
+## 13. Paginación y cursores
 
 Los endpoints de colección deben evitar dumps sin control.
 
-### 12.1 Regla
+### 13.1 Regla
 
 Toda colección ecosystem-facing debe soportar paginación explícita.
 
-### 12.2 Contratos aceptados
+### 13.2 Contratos aceptados
 
 - cursor-based preferido
 - page/per_page permitido como compat temporal donde ya exista ese patrón
 
-### 12.3 Respuesta
+### 13.3 Respuesta
 
 El contrato debe incluir:
 
@@ -457,17 +675,17 @@ El contrato debe incluir:
 - page info / next cursor
 - link headers cuando aplique
 
-### 12.4 No-goal
+### 13.4 No-goal
 
 Los consumers no deben inferir o construir manualmente URLs futuras; deben consumir cursores o links devueltos por la plataforma.
 
 ---
 
-## 13. Observabilidad
+## 14. Observabilidad
 
 La API platform debe ser observable desde el día 1.
 
-### 13.1 Mínimos por request
+### 14.1 Mínimos por request
 
 - request ID
 - consumer principal o tenant actor
@@ -479,7 +697,7 @@ La API platform debe ser observable desde el día 1.
 - degraded flag
 - backend provenance
 
-### 13.2 Provenance
+### 14.2 Provenance
 
 Toda response debería poder declarar, si aporta valor operativo:
 
@@ -489,7 +707,7 @@ Toda response debería poder declarar, si aporta valor operativo:
 - `external_facade`
 - `derived_cache`
 
-### 13.3 Error taxonomy
+### 14.3 Error taxonomy
 
 Los errores deben tipificarse de forma estable, por ejemplo:
 
@@ -508,20 +726,20 @@ Los errores deben tipificarse de forma estable, por ejemplo:
 
 ---
 
-## 14. Resiliencia y degraded modes
+## 15. Resiliencia y degraded modes
 
-### 14.1 Regla
+### 15.1 Regla
 
 La platform API no debe fingir consistencia cuando una dependencia no está lista, pero tampoco debe colapsar innecesariamente en `500`.
 
-### 14.2 Patrones admitidos
+### 15.2 Patrones admitidos
 
 - fallback de serving materializado a truth reader cuando sea seguro
 - respuesta parcial/degradada con metadata explícita
 - timeouts conservadores hacia providers externos
 - no bloquear un resource completo por metadata secundaria no crítica
 
-### 14.3 Patrones no admitidos
+### 15.3 Patrones no admitidos
 
 - silent fallback que cambie semántica sin avisar
 - mezclar en una misma response datos frescos y stale sin metadata
@@ -529,35 +747,35 @@ La platform API no debe fingir consistencia cuando una dependencia no está list
 
 ---
 
-## 15. Política de backend
+## 16. Política de backend
 
 La platform API debe desacoplar el contrato externo del backend real.
 
-### 15.1 Prioridad de lectura
+### 16.1 Prioridad de lectura
 
 1. `PostgreSQL / greenhouse_serving` cuando exista serving canónico
 2. `PostgreSQL truth layer` cuando el aggregate aún no tenga serving derivado
 3. `BigQuery` solo como carril legacy o transición explícita
 4. facades externas dedicadas cuando el dato deba leerse live desde un sistema hermano o integración dedicada
 
-### 15.2 Regla dura
+### 16.2 Regla dura
 
 Un consumer de plataforma no debe tener que saber si un resource vino de `BigQuery` o `Postgres` para usar el contrato.
 
-### 15.3 Consecuencia
+### 16.3 Consecuencia
 
 La platform API debe montarse sobre resource adapters propios, no sobre SQL inline en cada route ni sobre proxies de rutas legacy.
 
 ---
 
-## 16. Resource adapters canónicos
+## 17. Resource adapters canónicos
 
 La capa técnica objetivo es:
 
 - `src/lib/api-platform/core/**`
 - `src/lib/api-platform/resources/**`
 
-### 16.1 `core`
+### 17.1 `core`
 
 Debe incluir al menos:
 
@@ -571,7 +789,7 @@ Debe incluir al menos:
 - observability
 - rate limit helpers
 
-### 16.2 `resources`
+### 17.2 `resources`
 
 Debe incluir adapters por aggregate, por ejemplo:
 
@@ -591,17 +809,17 @@ Cada adapter decide:
 
 ---
 
-## 17. Lanes vigentes y migración
+## 18. Lanes vigentes y migración
 
-### 17.1 Lane legacy vigente
+### 18.1 Lane legacy vigente
 
 `/api/integrations/v1/*` sigue siendo un carril válido y operativo.
 
-### 17.2 Nueva regla
+### 18.2 Nueva regla
 
 No debe seguir creciendo como namespace catch-all de la plataforma.
 
-### 17.3 Camino correcto
+### 18.3 Camino correcto
 
 1. mantener `integrations/v1` estable mientras tenga consumers
 2. crear `api/platform/ecosystem/*` como lane nueva y aditiva
@@ -610,11 +828,11 @@ No debe seguir creciendo como namespace catch-all de la plataforma.
 
 ---
 
-## 18. Primer slice recomendado
+## 19. Primer slice recomendado
 
 La primera iteración de la platform API debe ser deliberadamente chica.
 
-### 18.1 Foundation
+### 19.1 Foundation
 
 - request context shared
 - version header
@@ -623,7 +841,7 @@ La primera iteración de la platform API debe ser deliberadamente chica.
 - observability/rate limit headers
 - idempotency foundation para futuros writes
 
-### 18.2 Endpoints iniciales
+### 19.2 Endpoints iniciales
 
 - `GET /api/platform/ecosystem/context`
 - `GET /api/platform/ecosystem/organizations`
@@ -631,7 +849,7 @@ La primera iteración de la platform API debe ser deliberadamente chica.
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
 
-### 18.3 No-goals del primer slice
+### 19.3 No-goals del primer slice
 
 - abrir una API pública genérica
 - retrofitear todas las rutas históricas del repo
@@ -640,7 +858,7 @@ La primera iteración de la platform API debe ser deliberadamente chica.
 
 ---
 
-## 19. Relación con sister platforms y Kortex
+## 20. Relación con sister platforms y Kortex
 
 Esta arquitectura no reemplaza:
 
@@ -661,9 +879,9 @@ Distribución correcta:
 
 ---
 
-## 20. Relación con Data Node y Ops Registry
+## 21. Relación con Data Node y Ops Registry
 
-### 20.1 Data Node
+### 21.1 Data Node
 
 `TASK-040` sigue vigente en su regla clave:
 
@@ -671,7 +889,7 @@ Distribución correcta:
 
 Esta arquitectura la reafirma.
 
-### 20.2 Ops Registry
+### 21.2 Ops Registry
 
 `EPIC-003` y `GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md` quedan alineados así:
 
@@ -679,9 +897,209 @@ Esta arquitectura la reafirma.
 - su surface humana vive en el portal
 - su surface agente/API/MCP debe montarse sobre esta disciplina de platform API
 
+### 21.3 MCP
+
+La arquitectura específica del server MCP vive en:
+
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+
+Regla canónica:
+
+- esta spec define la dependencia y la secuencia
+- la spec de MCP define el server, sus surfaces y su write policy
+
 ---
 
-## 21. Reglas canónicas nuevas
+## 22. Plano de eventos canónico
+
+La convergencia de webhooks y event delivery dentro de la `API platform` no debe rehacer el transport layer que ya existe.
+
+Debe agregar un control plane canónico ecosystem-facing encima del runtime descrito en `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`.
+
+### 22.1 Distinción obligatoria
+
+Greenhouse debe separar explícitamente:
+
+- `transport boundary`
+  - recepción y entrega HTTP real de webhooks
+- `event control plane`
+  - resources y commands para administrar subscriptions, deliveries, retries y observabilidad
+
+Regla:
+
+- el transport inbound puede seguir viviendo en `/api/webhooks/*`
+- el control plane nuevo debe vivir en `/api/platform/*`
+
+### 22.2 Resources canónicos de event plane
+
+La `API platform` debe tratar como resources oficiales, al menos:
+
+- `event-types`
+- `webhook-subscriptions`
+- `webhook-deliveries`
+- `webhook-delivery-attempts`
+- `webhook-endpoints` cuando la recepción inbound deba administrarse como asset del consumer
+
+Los nombres finales pueden refinarse, pero el modelo debe mantenerse resource-oriented.
+
+### 22.3 Surface ecosystem recomendada
+
+El carril `ecosystem` debería converger a algo como:
+
+- `GET /api/platform/ecosystem/event-types`
+- `GET /api/platform/ecosystem/webhook-subscriptions`
+- `GET /api/platform/ecosystem/webhook-subscriptions/:id`
+- `POST /api/platform/ecosystem/webhook-subscriptions`
+- `PATCH /api/platform/ecosystem/webhook-subscriptions/:id`
+- `GET /api/platform/ecosystem/webhook-deliveries`
+- `GET /api/platform/ecosystem/webhook-deliveries/:id`
+- `POST /api/platform/ecosystem/webhook-deliveries/:id/retry`
+
+Regla:
+
+- `POST` y `PATCH` viven en el control plane
+- el POST real del webhook transport no reemplaza a esos resources
+
+### 22.4 Envelope de evento
+
+El contract de evento debe seguir una disciplina uniforme con la platform API.
+
+Campos mínimos esperados:
+
+- `eventId`
+- `eventType`
+- `eventVersion`
+- `occurredAt`
+- `publishedAt`
+- `scope`
+- `data`
+- `meta`
+
+`eventVersion` y `apiVersion` pueden evolucionar por separado si hace falta, pero ambos deben ser explícitos.
+
+### 22.5 Seguridad y retries
+
+La convergencia del event plane debe preservar estas reglas:
+
+- firma outbound obligatoria cuando exista secreto configurado
+- retries declarados como contrato operativo documentado
+- dead-letter visible y reintenable desde control plane
+- ningún consumer externo debe leer tablas `greenhouse_sync.*` como integración oficial
+
+### 22.6 Regla canónica nueva
+
+Webhooks y event delivery sí son parte de la `API platform`, pero solo a través de su control plane convergido; no a través del transport raw ni de acceso directo a tablas.
+
+---
+
+## 23. Cierre de diseño pendiente ya resuelto
+
+Para evitar que la `API platform` siga creciendo con ambigüedad, desde esta spec quedan resueltas estas decisiones arquitectónicas.
+
+### 23.1 Resource canon V1.1
+
+Los resources canónicos base de la plataforma son:
+
+- `context`
+- `organization`
+- `organization-workspace`
+- `person`
+- `capability-surface`
+- `integration-readiness`
+- `event-type`
+- `webhook-subscription`
+- `webhook-delivery`
+
+Eso significa:
+
+- `capabilities` expresa catálogo/asignación de capability surface, no UI payload arbitrario
+- `integration-readiness` expresa estado operativo de integraciones y bindings, no KPIs analíticos inline
+- el event plane también entra al canon de plataforma, no queda como subsistema aparte
+
+### 23.2 Write model V1.1
+
+La política canónica de mutaciones queda así:
+
+- `POST`
+  - create o command explícito
+- `PATCH`
+  - cambios parciales de estado o metadata
+- `PUT`
+  - excepcional; solo para replace completo de recursos verdaderamente reemplazables
+- `DELETE`
+  - desaconsejado por defecto; preferir `archive`, `suspend`, `deprecate` o `disable` cuando esa sea la semántica real
+
+Greenhouse no debe perseguir CRUD completo como objetivo; debe perseguir commands y resources semánticamente correctos.
+
+### 23.3 Status code policy V1.1
+
+La política uniforme objetivo queda así:
+
+- `200 OK`
+  - lectura exitosa o mutación que devuelve representación inmediata
+- `201 Created`
+  - create exitoso de recurso nuevo
+- `202 Accepted`
+  - command aceptado pero todavía asíncrono
+- `204 No Content`
+  - mutación exitosa sin body
+- `304 Not Modified`
+  - conditional request sin cambios
+- `400 Bad Request`
+  - request mal formada
+- `401 Unauthorized`
+  - credencial inválida o ausente
+- `403 Forbidden`
+  - actor autenticado pero sin permiso/scope
+- `404 Not Found`
+  - recurso no visible o inexistente dentro del scope
+- `409 Conflict`
+  - conflicto de estado o idempotencia
+- `422 Unprocessable Entity`
+  - payload válido sintácticamente pero rechazado por reglas de dominio
+- `429 Too Many Requests`
+  - rate limit
+- `503 Service Unavailable`
+  - dependencia o backend no disponible
+
+### 23.4 Deprecation policy V1.1
+
+La convivencia con lanes legacy debe seguir esta disciplina:
+
+- todo contrato nuevo nace en `api/platform/*`
+- `integrations/v1` solo crece por compatibilidad o transición explícita
+- un endpoint legacy no se considera deprecado hasta que:
+  - exista surface equivalente o superior en `api/platform/*`
+  - el consumer haya sido identificado
+  - exista ventana de migración documentada
+
+### 23.5 SLO y frescura
+
+La `API platform` debe documentar por resource cuál es su expectativa de frescura:
+
+- `live`
+- `near-real-time`
+- `periodic-materialized`
+- `derived-cache`
+
+Regla:
+
+- Greenhouse no debe prometer frescura implícita
+- si un resource puede degradarse o venir materializado, eso debe declararse en metadata y documentación
+
+### 23.6 Regla canónica nueva
+
+La `API platform` de Greenhouse queda definida no solo por sus routes, sino por cinco contratos obligatorios:
+
+- resource canon
+- write model
+- status code policy
+- event control plane
+- deprecation y freshness discipline
+
+---
+
+## 24. Reglas canónicas nuevas
 
 Desde 2026-04-25 Greenhouse debe operar con estas reglas:
 
@@ -694,7 +1112,7 @@ Desde 2026-04-25 Greenhouse debe operar con estas reglas:
 
 ---
 
-## 22. Delta 2026-04-25 — Nace la arquitectura canónica de API platform
+## 25. Delta 2026-04-25 — Nace la arquitectura canónica de API platform
 
 Se crea `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` como source of truth para la plataforma de APIs de Greenhouse.
 
@@ -706,7 +1124,7 @@ Decisiones explícitas:
 - `integrations/v1` sigue vivo como lane legacy/transicional
 - `MCP` queda reafirmado como adapter downstream de una API estable y no como punto de partida
 
-## 23. Delta 2026-04-25 — TASK-616 implementa el primer slice runtime
+## 26. Delta 2026-04-25 — TASK-616 implementa el primer slice runtime
 
 Ya existe una primera implementación runtime aditiva de la arquitectura:
 
