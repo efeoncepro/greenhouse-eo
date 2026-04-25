@@ -3,9 +3,10 @@
 // React Imports
 import { forwardRef } from 'react'
 
-// Next Imports
-import Link from 'next/link'
 import type { LinkProps } from 'next/link'
+
+// Component Imports
+import GreenhouseRouteLink from '@/components/greenhouse/GreenhouseRouteLink'
 
 // Type Imports
 import type { ChildrenType } from '../types'
@@ -20,8 +21,8 @@ export const RouterLink = forwardRef((props: RouterLinkProps, ref: any) => {
   const { href, className, ...other } = props
 
   return (
-    <Link ref={ref} href={href} className={className} {...other}>
+    <GreenhouseRouteLink ref={ref} href={href} className={className} {...other}>
       {props.children}
-    </Link>
+    </GreenhouseRouteLink>
   )
 })

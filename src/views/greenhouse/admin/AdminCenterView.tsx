@@ -19,6 +19,7 @@ import SectionErrorBoundary from '@components/greenhouse/SectionErrorBoundary'
 import {
   ExecutiveCardShell,
   ExecutiveMiniStatCard,
+  GreenhouseRouteLink,
   GreenhouseDragList,
   ReliabilityModuleCard
 } from '@/components/greenhouse'
@@ -548,7 +549,7 @@ const AdminCenterView = ({ access, tenants, controlTower, operations, reliabilit
               <Button component={Link} href='/admin/tenants' variant='contained'>
                 Abrir Spaces
               </Button>
-              <Button component={Link} href='/admin/integrations' variant='outlined'>
+              <Button component={GreenhouseRouteLink} href='/admin/integrations' variant='outlined'>
                 Ver Cloud & Integrations
               </Button>
             </Stack>
@@ -862,7 +863,7 @@ const AdminCenterView = ({ access, tenants, controlTower, operations, reliabilit
                         />
                       ))}
                     </Stack>
-                    <Button component={Link} href={card.href} variant='outlined'>
+                    <Button component={GreenhouseRouteLink} href={card.href} variant='outlined'>
                       {card.primaryAction}
                     </Button>
                   </Box>

@@ -2,6 +2,11 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Navegación interna resiliente para Admin Center
+
+- Se agregó `GreenhouseRouteLink`, un wrapper de `next/link` con fallback controlado a navegación completa cuando App Router recibe la respuesta RSC pero no comitea el cambio de URL.
+- El menú vertical hereda el comportamiento desde `RouterLink` y los CTAs/card links del Admin Center usan el wrapper para evitar que entrypoints como `Cloud & Integrations` queden aparentemente colgados.
+
 ### 2026-04-25 — Notion Sync & Billing Export Observability (TASK-586) — primer plomado de señales contra el Reliability Control Plane
 
 - **Nueva spec canónica**: `docs/architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` formaliza el reader Billing Export, los thresholds iniciales y el split de ownership con TASK-103/208/585.

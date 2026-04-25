@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Navegación resiliente Admin Center
+
+### Que cambio
+
+Se reprodujo en staging que los CTAs de `/admin` disparaban el fetch RSC hacia `/admin/integrations` con HTTP 200, pero App Router no comiteaba el cambio de URL y dejaba al operador en `/admin`.
+
+Se agregó una solución reutilizable:
+
+- `src/components/greenhouse/GreenhouseRouteLink.tsx` — wrapper de `next/link` con watchdog; si la URL no cambia después de la navegación SPA, hace fallback a `window.location.assign()`.
+- `src/@menu/components/RouterLink.tsx` — el menú vertical usa el wrapper, así el fix cubre navegación del shell.
+- `src/views/greenhouse/admin/AdminCenterView.tsx` — los CTAs/cards del Admin Center usan el wrapper.
+- `src/components/greenhouse/GreenhouseRouteLink.test.tsx` — cobertura del fallback y del caso donde la navegación SPA sí cambia URL.
+- `changelog.md` — delta visible del fix.
+
+### Validaciones
+
+- `pnpm staging:request /admin/integrations --grep "Integration Governance"` ✅ confirma que staging sirve la surface real con HTTP 200.
+- Reproducción Playwright contra staging ✅ confirma que el click actual dispara RSC 200 pero queda en `/admin`.
+- `pnpm exec vitest run src/components/greenhouse/GreenhouseRouteLink.test.tsx` ✅
+- `pnpm exec eslint src/components/greenhouse/GreenhouseRouteLink.tsx src/components/greenhouse/GreenhouseRouteLink.test.tsx src/components/greenhouse/index.ts src/@menu/components/RouterLink.tsx src/views/greenhouse/admin/AdminCenterView.tsx` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+
 ## Sesion 2026-04-25 — Notion Sync & Billing Export Observability (TASK-586)
 
 ### Que cambio
