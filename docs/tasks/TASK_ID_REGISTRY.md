@@ -712,3 +712,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-634` | `to-do` | Reliability Sentry Incident → Module Correlator (rules-first path/title → module, LLM como tiebreaker opcional) | `docs/tasks/to-do/TASK-634-reliability-sentry-incident-module-correlator.md` |
 | `TASK-635` | `to-do` | Reliability Registry DB Persistence + Tenant Overrides (híbrido: seed estático mantiene defaults, DB guarda overrides per-tenant + SLOs) | `docs/tasks/to-do/TASK-635-reliability-registry-db-persistence-tenant-overrides.md` |
 | `TASK-636` | `to-do` | Vercel Billing FOCUS Cost Observability in Admin Center | `docs/tasks/to-do/TASK-636-vercel-billing-focus-observability.md` |
+| `TASK-637` | `to-do` | GitHub Billing & Actions Cost Observability in Admin Center | `docs/tasks/to-do/TASK-637-github-billing-actions-cost-observability.md` |
