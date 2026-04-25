@@ -98,6 +98,14 @@ interface RunAiObserverArgs {
 
   /** override para tests: snapshot precargado, evita doble fetch */
   preloadedOverview?: ReliabilityOverview
+
+  /**
+   * Bypassa el dedup de fingerprint y siempre persiste. Útil para validar
+   * cambios al prompt o al schema de respuesta sin esperar que cambie el
+   * estado RCP. Solo se debe usar en triggers manuales — Cloud Scheduler
+   * NUNCA debe pasar force=true (defeats the dedup purpose).
+   */
+  force?: boolean
 }
 
 const stripJsonFence = (raw: string): string => {
@@ -152,7 +160,8 @@ const buildSummary = (
 export const runReliabilityAiObserver = async ({
   triggeredBy = 'cron',
   env = process.env,
-  preloadedOverview
+  preloadedOverview,
+  force = false
 }: RunAiObserverArgs = {}): Promise<AiSweepResult> => {
   const startedAt = new Date()
   const sweepRunId = generateAiSweepRunId()
@@ -222,7 +231,7 @@ export const runReliabilityAiObserver = async ({
   const overviewFingerprint = fingerprintOverview(overview)
   const lastOverviewFingerprint = await getLatestFingerprint('overview', 'overview')
 
-  if (lastOverviewFingerprint !== overviewFingerprint) {
+  if (force || lastOverviewFingerprint !== overviewFingerprint) {
     const observation: AiObservationInput = {
       observationId: generateAiObservationId(),
       sweepRunId,
@@ -258,7 +267,7 @@ export const runReliabilityAiObserver = async ({
     const moduleFp = fingerprintModule(moduleSnapshot)
     const lastFp = await getLatestFingerprint('module', moduleEntry.moduleKey)
 
-    if (lastFp === moduleFp) {
+    if (!force && lastFp === moduleFp) {
       skipped += 1
       continue
     }

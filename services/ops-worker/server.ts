@@ -800,7 +800,9 @@ const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerRespons
     | 'manual'
     | 'cloud_scheduler'
 
-  console.log(`[ops-worker] POST /reliability-ai-watch — triggeredBy=${triggeredBy}`)
+  const force = body.force === true
+
+  console.log(`[ops-worker] POST /reliability-ai-watch — triggeredBy=${triggeredBy} force=${force}`)
 
   try {
     /**
@@ -810,7 +812,7 @@ const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerRespons
      * romper el boot del worker. Importarlo aqui aisla el costo al request.
      */
     const { runReliabilityAiObserver } = await import('@/lib/reliability/ai/runner')
-    const result = await runReliabilityAiObserver({ triggeredBy })
+    const result = await runReliabilityAiObserver({ triggeredBy, force })
 
     if (result.summary.skippedReason) {
       console.log(
