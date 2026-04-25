@@ -75,6 +75,18 @@ type Props = {
    * null cuando el runner aún no ha corrido o el kill-switch está OFF.
    */
   aiObservation: AiObservationView | null
+
+  /**
+   * TASK-638: Observaciones scope='module' frescas (ventana 24h) del AI
+   * Observer. Se renderizan dentro de la tarjeta AI Observer para dar
+   * contexto granular del overview sin abrir cada module card.
+   */
+  aiModuleObservations: Array<{
+    moduleKey: string
+    severity: ReliabilityOverview['modules'][number]['status']
+    summary: string
+    recommendedAction: string | null
+  }>
 }
 
 type DomainCard = {
@@ -425,7 +437,8 @@ const AdminCenterView = ({
   reliability,
   syntheticSnapshots,
   syntheticSweep,
-  aiObservation
+  aiObservation,
+  aiModuleObservations
 }: Props) => {
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -820,7 +833,7 @@ const AdminCenterView = ({
       </ExecutiveCardShell>
 
       {/* ── AI Observer (TASK-638) ── */}
-      <ReliabilityAiWatcherCard observation={aiObservation} />
+      <ReliabilityAiWatcherCard observation={aiObservation} moduleObservations={aiModuleObservations} />
 
       {/* ── Synthetic Monitor (TASK-632) ── */}
       <ReliabilitySyntheticCard snapshots={syntheticSnapshots} sweep={syntheticSweep} />

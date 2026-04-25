@@ -1,7 +1,9 @@
 'use client'
 
 import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -18,6 +20,13 @@ interface AiObservationView {
   observedAt: string
 }
 
+interface AiModuleObservationView {
+  moduleKey: string
+  severity: ReliabilitySeverity
+  summary: string
+  recommendedAction: string | null
+}
+
 interface Props {
 
   /**
@@ -25,6 +34,20 @@ interface Props {
    * null el AI Observer no ha corrido aún o el kill-switch está OFF.
    */
   observation: AiObservationView | null
+
+  /**
+   * Observaciones per-módulo (scope='module') frescas (ventana 24h). Se
+   * renderizan debajo del overview para dar contexto del *por qué* sin
+   * tener que abrir cada `ReliabilityModuleCard` por separado.
+   */
+  moduleObservations?: AiModuleObservationView[]
+}
+
+const MODULE_LABELS: Record<string, string> = {
+  finance: 'Finance',
+  'integrations.notion': 'Notion sync',
+  cloud: 'Cloud',
+  delivery: 'Delivery'
 }
 
 const severityChipColor = (
@@ -67,8 +90,22 @@ const formatAge = (iso: string): string => {
   return `hace ${days} día${days === 1 ? '' : 's'}`
 }
 
-const ReliabilityAiWatcherCard = ({ observation }: Props) => {
-  return (
+const SEVERITY_RANK: Record<ReliabilitySeverity, number> = {
+  error: 0,
+  warning: 1,
+  not_configured: 2,
+  unknown: 3,
+  awaiting_data: 4,
+  ok: 5
+}
+
+const ReliabilityAiWatcherCard = ({ observation, moduleObservations = [] }: Props) => {
+  const sortedModules = [...moduleObservations].sort(
+    (a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]
+  )
+
+  
+return (
     <ExecutiveCardShell
       title='AI Observer'
       subtitle='Resumen ejecutivo generado por Gemini Flash a partir del snapshot del Reliability Control Plane. No reemplaza señales determinísticas — agrega contexto narrativo.'
@@ -115,6 +152,43 @@ const ReliabilityAiWatcherCard = ({ observation }: Props) => {
                 <strong>Acción sugerida:</strong> {observation.recommendedAction}
               </Typography>
             </Alert>
+          )}
+
+          {sortedModules.length > 0 && (
+            <>
+              <Divider />
+              <Stack spacing={1.5}>
+                <Typography
+                  variant='caption'
+                  sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: 'text.secondary' }}
+                >
+                  Observaciones por módulo
+                </Typography>
+                {sortedModules.map(mod => (
+                  <Box key={mod.moduleKey} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                      <Chip
+                        size='small'
+                        color={severityChipColor(mod.severity)}
+                        variant='tonal'
+                        label={severityLabel(mod.severity)}
+                      />
+                      <Typography variant='subtitle2'>
+                        {MODULE_LABELS[mod.moduleKey] ?? mod.moduleKey}
+                      </Typography>
+                    </Stack>
+                    <Typography variant='body2' sx={{ lineHeight: 1.5 }}>
+                      {mod.summary}
+                    </Typography>
+                    {mod.recommendedAction && (
+                      <Typography variant='caption' color='text.secondary'>
+                        <strong>Sugerencia:</strong> {mod.recommendedAction}
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Stack>
+            </>
           )}
 
           <Typography variant='caption' color='text.secondary'>

@@ -321,6 +321,7 @@ describe('AdminCenterView', () => {
         syntheticSnapshots={[]}
         syntheticSweep={null}
         aiObservation={null}
+        aiModuleObservations={[]}
       />
     )
 
@@ -353,6 +354,7 @@ describe('AdminCenterView', () => {
         syntheticSnapshots={[]}
         syntheticSweep={null}
         aiObservation={null}
+        aiModuleObservations={[]}
       />
     )
 
@@ -416,6 +418,7 @@ describe('AdminCenterView', () => {
         syntheticSnapshots={[]}
         syntheticSweep={null}
         aiObservation={null}
+        aiModuleObservations={[]}
       />
     )
 

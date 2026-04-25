@@ -86,6 +86,16 @@ export default async function Page() {
       syntheticSnapshots={syntheticSnapshots}
       syntheticSweep={syntheticSweep}
       aiObservation={aiObservations?.overview ?? null}
+      aiModuleObservations={
+        aiObservations
+          ? Object.entries(aiObservations.byModule).map(([moduleKey, obs]) => ({
+              moduleKey,
+              severity: obs.severity,
+              summary: obs.summary,
+              recommendedAction: obs.recommendedAction
+            }))
+          : []
+      }
     />
   )
 }
