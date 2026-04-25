@@ -2246,6 +2246,33 @@ export interface GreenhouseCoreProviders {
   website_url: string | null;
 }
 
+export interface GreenhouseCoreReliabilityModuleOverrides {
+  created_at: Generated<Timestamp>;
+  extra_signal_kinds: Generated<Json>;
+  hidden: Generated<boolean>;
+  module_key: string;
+  override_id: string;
+  slo_overrides: Generated<Json>;
+  space_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreReliabilityModuleRegistry {
+  apis: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  dependencies: Generated<Json>;
+  description: string;
+  domain: string;
+  expected_signal_kinds: Generated<Json>;
+  files_owned: Generated<Json>;
+  label: string;
+  module_key: string;
+  routes: Generated<Json>;
+  slo_thresholds: Generated<Json>;
+  smoke_tests: Generated<Json>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreReportingLines {
   change_reason: Generated<string>;
   changed_by_user_id: string | null;
@@ -6525,6 +6552,8 @@ export interface DB {
   "greenhouse_core.person_legal_entity_relationships": GreenhouseCorePersonLegalEntityRelationships;
   "greenhouse_core.person_memberships": GreenhouseCorePersonMemberships;
   "greenhouse_core.providers": GreenhouseCoreProviders;
+  "greenhouse_core.reliability_module_overrides": GreenhouseCoreReliabilityModuleOverrides;
+  "greenhouse_core.reliability_module_registry": GreenhouseCoreReliabilityModuleRegistry;
   "greenhouse_core.reporting_lines": GreenhouseCoreReportingLines;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
   "greenhouse_core.roles": GreenhouseCoreRoles;

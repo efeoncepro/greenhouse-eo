@@ -13,6 +13,7 @@ import type { GcpBillingOverview } from '@/types/billing-export'
 import type { FinanceSmokeLaneStatus } from '@/types/finance-smoke-lane'
 import type {
   ReliabilityIntegrationBoundary,
+  ReliabilityModuleDefinition,
   ReliabilityModuleSnapshot,
   ReliabilityOverview,
   ReliabilitySeverity,
@@ -22,6 +23,7 @@ import type {
 import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import { RELIABILITY_REGISTRY } from './registry'
+import { getReliabilityRegistry } from './registry-store'
 import {
   aggregateModuleStatus,
   computeConfidence,
@@ -173,6 +175,14 @@ interface ReliabilityOverviewSources {
   notionOperational?: NotionSyncOperationalOverview | null
   syntheticSnapshots?: SyntheticRouteSnapshot[] | null
   financeSmokeLane?: FinanceSmokeLaneStatus | null
+
+  /**
+   * TASK-635: módulos efectivos resueltos para el tenant. Cuando se pasa,
+   * el composer itera sobre este array (DB defaults + overlay overrides);
+   * cuando es null/undefined, cae al `STATIC_RELIABILITY_REGISTRY` para
+   * mantener compatibilidad pre-635.
+   */
+  modules?: ReliabilityModuleDefinition[] | null
 }
 
 export const buildReliabilityOverview = (
@@ -180,6 +190,10 @@ export const buildReliabilityOverview = (
   sources: ReliabilityOverviewSources = {}
 ): ReliabilityOverview => {
   const syntheticSnapshots = sources.syntheticSnapshots ?? []
+
+  const effectiveModules = sources.modules && sources.modules.length > 0
+    ? sources.modules
+    : RELIABILITY_REGISTRY
 
   const allSignals: ReliabilitySignal[] = [
     ...buildSubsystemSignals(operations.subsystems),
@@ -203,7 +217,7 @@ export const buildReliabilityOverview = (
     signalsByModule.set(signal.moduleKey, list)
   }
 
-  const modules: ReliabilityModuleSnapshot[] = RELIABILITY_REGISTRY.map(definition => {
+  const modules: ReliabilityModuleSnapshot[] = effectiveModules.map(definition => {
     const signals = sortSignalsForDisplay(signalsByModule.get(definition.moduleKey) ?? [])
 
     const observedKinds = new Set(signals.map(signal => signal.kind))
@@ -285,7 +299,8 @@ export const buildReliabilityOverview = (
  */
 export const getReliabilityOverview = async (
   preloadedOperations?: OperationsOverview,
-  preloadedSources: ReliabilityOverviewSources = {}
+  preloadedSources: ReliabilityOverviewSources = {},
+  options: { spaceId?: string | null } = {}
 ): Promise<ReliabilityOverview> => {
   const operations = preloadedOperations ?? (await getOperationsOverview())
 
@@ -309,10 +324,19 @@ export const getReliabilityOverview = async (
       ? preloadedSources.financeSmokeLane
       : await getFinanceSmokeLaneStatus().catch(() => null)
 
+  // TASK-635: módulos efectivos resueltos por el store DB-aware. Si no se
+  // pasa preloaded.modules, el store consulta DB defaults + overlay overrides
+  // para `options.spaceId`. Fallback a STATIC_RELIABILITY_REGISTRY si DB falla.
+  const modules: ReliabilityModuleDefinition[] | null =
+    preloadedSources.modules !== undefined
+      ? preloadedSources.modules
+      : await getReliabilityRegistry(options.spaceId ?? null)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
     syntheticSnapshots,
-    financeSmokeLane
+    financeSmokeLane,
+    modules
   })
 }

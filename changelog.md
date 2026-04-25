@@ -2,6 +2,19 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Reliability Registry DB Persistence + Tenant Overrides (TASK-635) — V1.1 persiste el registry
+
+- **Migración nueva**: `migrations/20260425204554656_task-635-reliability-registry-tables.sql` crea `greenhouse_core.reliability_module_registry` (defaults) + `greenhouse_core.reliability_module_overrides` (diffs per-tenant con FK a `spaces` y `UNIQUE(space_id, module_key)`). 1 índice + ALTER OWNER greenhouse_ops + grants runtime/migrator.
+- **Registry refactor**: `RELIABILITY_REGISTRY` renombrado a `STATIC_RELIABILITY_REGISTRY` en `src/lib/reliability/registry.ts`; alias compat preserva imports existentes (TASK-633 CLI, TASK-634 correlator).
+- **Nuevo store DB-aware**: `src/lib/reliability/registry-store.ts` con `ensureReliabilityRegistrySeed()` idempotente (`INSERT ... ON CONFLICT DO UPDATE`), `getReliabilityRegistry(spaceId?)` con cache TTL 60s, helpers de upsert/delete de overrides.
+- **`ReliabilityModuleDefinition.sloThresholds?`** opcional agregado para forward-compat con SLO breach detector futuro (persistido pero no evaluado en V1.1).
+- **`buildReliabilityOverview`** acepta `sources.modules`. **`getReliabilityOverview`** acepta `options.spaceId`. `/admin/page.tsx` y `/api/admin/reliability` cablados para pasar `tenant.spaceId`.
+- **Fallback honesto**: si DB falla en cualquier paso (seed, defaults select, overrides select), retorna `STATIC_RELIABILITY_REGISTRY`. Admin Center nunca se rompe por la layer de overrides.
+- **11 unit tests** cubren: defaults sin override, cache TTL, hidden module dropped, extra signals merged sin dup, sloOverrides overlay, fallback en 3 escenarios, idempotencia seed concurrente, upsert override.
+- **Spec V1 actualizado**: §9 marca registry como persistido en V1.1 (era TODO en V1). §10 referencia `registry-store.ts` y la migración como archivos canónicos.
+- **`filesOwned` (TASK-633) y reglas incident (TASK-634)** NO migran a DB — son globales por diseño. Solo `expectedSignalKinds` y `sloThresholds` admiten overrides per-space.
+- **Slice 4 Admin CRUD UI** queda follow-up — los helpers `setReliabilityModuleOverride` / `clearReliabilityModuleOverride` ya quedan listos para consumir.
+
 ### 2026-04-25 — Reliability Sentry Incident → Module Correlator (TASK-634) — incidentes ya no caen masivamente a `cloud`
 
 - **Nuevo helper `correlateIncident()`** en `src/lib/reliability/incident-mapping.ts` rules-first determinista. Mapea cada incidente Sentry a su módulo real (`finance`, `integrations.notion`, `delivery`) usando heurísticas sobre `incident.location` (file path) + `incident.title`.

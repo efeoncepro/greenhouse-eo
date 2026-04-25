@@ -1,5 +1,84 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Reliability Registry DB Persistence + Tenant Overrides (TASK-635)
+
+### Que cambio
+
+User pidió execution explícita end-to-end de TASK-635 a pesar de que la spec original la marcaba como "no ejecutar hasta que aparezca caso de uso real". Se entregó V1.1 que sienta la base de persistencia DB sin Slice 4 (Admin CRUD UI), que sigue follow-up.
+
+Archivos creados:
+
+- `migrations/20260425204554656_task-635-reliability-registry-tables.sql` — `greenhouse_core.reliability_module_registry` (module_key PK + jsonb fields) + `greenhouse_core.reliability_module_overrides` (override_id EO-RMO + space_id FK + UNIQUE(space_id, module_key)). 1 índice. ALTER OWNER greenhouse_ops + grants runtime/migrator. 292 tablas en types regenerados.
+- `src/lib/reliability/registry-store.ts` — `ensureReliabilityRegistrySeed()` idempotente con single-promise pattern, `getReliabilityRegistry(spaceId?)` con cache TTL 60s, `setReliabilityModuleOverride()` / `clearReliabilityModuleOverride()` con cache invalidation. Fallback honesto a `STATIC_RELIABILITY_REGISTRY` si DB falla en cualquier paso.
+- `src/lib/reliability/registry-store.test.ts` — 11 unit tests (defaults sin override, cache TTL, hidden module dropped, extra signals merged sin dup, sloOverrides overlay, fallback en 3 escenarios, idempotencia seed concurrente, upsert override).
+
+Archivos modificados:
+
+- `src/types/reliability.ts` — `sloThresholds?: Record<string, unknown>` opcional agregado para forward-compat (SLO breach detector futuro lo lee sin migración nueva).
+- `src/lib/reliability/registry.ts` — `RELIABILITY_REGISTRY` renombrado a `STATIC_RELIABILITY_REGISTRY`; alias compat exportado para no romper TASK-633 (CLI affected-modules) y TASK-634 (incident correlator) que importan `RELIABILITY_REGISTRY`.
+- `src/lib/reliability/get-reliability-overview.ts` — `ReliabilityOverviewSources.modules?` slot agregado. `buildReliabilityOverview` itera `effectiveModules`. `getReliabilityOverview` acepta `options.spaceId` y resuelve registry per-tenant via `getReliabilityRegistry`.
+- `src/app/(dashboard)/admin/page.tsx` — fetch paralelo de `getReliabilityRegistry(tenant.spaceId)` agregado, pasa `modules` al builder.
+- `src/app/api/admin/reliability/route.ts` — `getReliabilityOverview(undefined, {}, { spaceId: tenant.spaceId ?? null })`.
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §9 + §10 actualizados — V1 ya no aplica, V1.1 sí persiste registry.
+
+### Decisión canónica explicitada
+
+1. **Registry sigue versionado en código**, DB es proyección + diff overrides. `INSERT ... ON CONFLICT DO UPDATE` evita drift cuando alguien edita DB y olvida actualizar código. Source of truth: `STATIC_RELIABILITY_REGISTRY`.
+2. **`filesOwned` (TASK-633) y reglas de incident (TASK-634) NO migran a DB**. Son globales por diseño: el matrix CI es global, los incidentes Sentry no son tenant-scoped. Solo `expectedSignalKinds` y `sloThresholds` admiten overrides per-space.
+3. **`sloThresholds` persistido pero NO evaluado en runtime V1.1** — forward-compat para "SLO breach detector" cron futuro.
+4. **Cache TTL 60s in-process** — mejora warm function reuse, no caché global.
+5. **`spaceId?: string | null` opcional** — el reader funciona sin tenant context. Defaults sin overlay = comportamiento idéntico pre-635.
+6. **Fallback honesto a STATIC** — si DB falla, retorna `STATIC_RELIABILITY_REGISTRY`. Nunca rompe Admin Center.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (411 files / 2127 passed — 11 nuevos tests del store)
+- `pnpm migrate:up` ✅ (292 tablas en types)
+- `pnpm build` ✅
+
+### Estado del EPIC-007 ahora
+
+Todas las child tasks del Reliability Control Plane cerradas: TASK-600 ✅, TASK-586 ✅, TASK-632 ✅, TASK-633 ✅, TASK-599 ✅, TASK-634 ✅, TASK-635 ✅. Solo TASK-103 budget thresholds GCP queda en `partial` (depende setup manual GCP Console).
+
+### Siguiente
+
+- Slice 4 (Admin Center CRUD UI para overrides) sigue follow-up — helpers `setReliabilityModuleOverride` / `clearReliabilityModuleOverride` ya listos para consumir.
+- SLO breach detector como cron que compare señales reales contra `slo_thresholds` y emita señal `kind=metric`.
+- Audit log de cambios al registry (event outbox `reliability.module.override.{set,cleared}`).
+
+## Sesion 2026-04-25 — Workforce architecture mother spec
+
+### Que cambio
+
+Se formalizo la arquitectura madre del dominio `Workforce` en:
+
+- `docs/architecture/GREENHOUSE_WORKFORCE_ARCHITECTURE_V1.md`
+
+Tambien se actualizo:
+
+- `docs/README.md`
+- `project_context.md`
+
+### Decisiones canónicas explicitadas
+
+1. **`Workforce` no es copia de `People` ni alias de `HR`**: es el dominio madre de lifecycle laboral-operativo, drift y orchestration.
+2. **`Person360.workforce` queda como target canónico por persona**: el facet resuelve estado laboral-operativo persona-first.
+3. **`Workforce Workspace` queda como shell operativa objetivo**: roster, queues, drift, lifecycle y profile operativo multi-persona.
+4. **`Offboarding` queda subordinado a `Workforce`**: la spec de offboarding sigue vigente, pero ahora cuelga explícitamente del dominio madre.
+5. **Diseño obligatorio en ambos planos**: toda capacidad workforce futura debe explicitar `views` y `entitlements`, además del write owner especializado (`HR`, `Payroll`, `Identity`).
+
+### Validaciones
+
+- No se corrieron tests: cambio documental/arquitectonico solamente.
+
+### Siguiente
+
+- Crear el epic del programa `Workforce`.
+- Bajar `Person360.workforce`, lifecycle state model y drift registry a tasks ejecutables.
+- Definir si V1 del workspace vive primero dentro de `People/HR` o nace ya bajo `/workforce`.
+
 ## Sesion 2026-04-25 — Workforce Offboarding architecture foundation
 
 ### Que cambio

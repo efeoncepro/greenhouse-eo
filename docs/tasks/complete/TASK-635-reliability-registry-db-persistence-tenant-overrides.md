@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Alto`
@@ -184,38 +184,53 @@ Esto evita drift: si alguien edita el registry en DB y olvida actualizar código
 
 ## Acceptance Criteria
 
-- [ ] migración crea ambas tablas; seed boot las popula desde código.
-- [ ] `getReliabilityRegistryForTenant(spaceId)` retorna mismos datos que el registry estático cuando no hay overrides.
-- [ ] `getReliabilityRegistryForTenant(spaceId)` aplica overrides cuando existen.
-- [ ] `/api/admin/reliability` consulta el registry DB-aware sin regresión visible.
-- [ ] fallback al seed estático funciona si DB queda inaccesible.
+- [x] migración crea ambas tablas (`greenhouse_core.reliability_module_registry` + `reliability_module_overrides`) con grants + ALTER OWNER `greenhouse_ops`. Aplicada (292 tablas en types).
+- [x] `ensureReliabilityRegistrySeed()` idempotente con `INSERT ... ON CONFLICT DO UPDATE` para mantener defaults sincronizados desde código.
+- [x] `getReliabilityRegistry(spaceId?)` retorna defaults DB cuando no hay overrides (= comportamiento idéntico a STATIC).
+- [x] `getReliabilityRegistry(spaceId)` aplica overrides: `hidden` esconde módulo, `extraSignalKinds` se mergean en `expectedSignalKinds` sin dup, `sloOverrides` overlays sobre `sloThresholds`.
+- [x] `/api/admin/reliability` y `/admin/page.tsx` ahora pasan `tenant.spaceId` al reader DB-aware sin regresión visible (página servidor + endpoint).
+- [x] Fallback honesto: si la DB falla en cualquier paso, retorna `STATIC_RELIABILITY_REGISTRY`. Tests cubren los 3 escenarios (seed insert throws, defaults select throws, overrides select throws).
+- [x] 11 unit tests verdes en `src/lib/reliability/registry-store.test.ts`.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm test src/lib/reliability/registry-store.test.ts`
-- `pnpm migrate:up` (auto-regenera tipos).
-- `pnpm pg:doctor`.
-- inspección manual con override sintético para un space de testing.
+- `pnpm lint` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm test src/lib/reliability/registry-store.test.ts` ✅ (411 files / 2127 passed — 11 nuevos tests)
+- `pnpm migrate:up` ✅ (292 tablas en types)
+- `pnpm build` ✅
+- Inspección manual con override sintético: queda como validación post-deploy.
+
+## Resolution
+
+V1.1 entregada. Decisiones tomadas durante Discovery:
+
+1. **Pull-trigger explícita por user request** — el spec original dejaba la task como "no ejecutar hasta que aparezca caso de uso". El user pidió implementarla ahora. V1 sienta la base sin Slice 4 (Admin Center CRUD UI), que sigue follow-up cuando aparezca el primer caso real.
+2. **`module_key` como PK natural** del registry — no necesita ID separado. Los overrides sí llevan `EO-RMO-{uuid8}` (PK natural sería `(space_id, module_key)` pero `override_id` facilita auditoría).
+3. **`sloThresholds: jsonb DEFAULT '{}'`** — persistido pero NO evaluado en runtime V1.1. Forward-compat para el "SLO breach detector" futuro: cuando ese cron exista, no necesitará migración nueva.
+4. **Cache TTL 60s in-process** — mejora warm function reuse en serverless. NO es caché global (Vercel es stateless por invocación).
+5. **`spaceId?: string | null` opcional** — cuando es null/undefined, retorna defaults sin overlay. Permite seguir llamando desde lugares sin tenant context (CLI scripts, jobs ops-worker).
+6. **Fallback honesto a STATIC** — si DB falla, el portal sigue rindiendo el Reliability Control Plane con defaults del código. Nunca rompe Admin Center por un problema en la layer de overrides.
+7. **`filesOwned` (TASK-633) y reglas de incident (TASK-634) NO migran a DB** — siguen en código por diseño. Son globales, no per-tenant: el matrix CI es global, los incidentes Sentry no son tenant-scoped. Solo `expectedSignalKinds` y `sloThresholds` admiten overrides per-space.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` actualizado
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] chequeo cruzado: TASK-632 (synthetic), TASK-633 (filesOwned), TASK-634 (incident rules)
-- [ ] actualizar `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §9 (cosas que NO hace V1) — mover el bullet de "no persiste el registry" a "v1 no persistía; v1.1 sí".
-- [ ] documentar en `Handoff.md` la pull-trigger que disparó esta task.
+- [x] `Lifecycle` sincronizado con estado real (`complete`)
+- [x] archivo en la carpeta `complete/`
+- [x] `docs/tasks/README.md` sincronizado con el cierre
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] chequeo cruzado: TASK-632 (synthetic — sin acoplamiento), TASK-633 (filesOwned — sigue en código), TASK-634 (incident rules — sigue en código).
+- [x] `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §9 actualizado: bullet "no persiste el registry" tachado y enlazado a TASK-635 V1.1. §10 ahora referencia `registry-store.ts` y la migración.
+- [x] documentado en `Handoff.md` que el user solicitó execution explícita end-to-end.
 
 ## Follow-ups
 
-- Surface admin completa para CRUD de overrides (Slice 4 si se difiere).
+- Surface admin completa para CRUD de overrides (Slice 4 deferred): API `/api/admin/reliability/registry/overrides` + sub-surface en Admin Center > Cloud & Integrations.
 - SLO breach detector como cron que compare señales reales contra `slo_thresholds` y emita señal `kind=metric`.
-- Audit log de cambios al registry (event outbox).
+- Audit log de cambios al registry (event outbox `reliability.module.override.{set,cleared}`).
+- Migrar `filesOwned` (TASK-633) y reglas incident (TASK-634) a DB SOLO si aparece caso de uso per-tenant para esos planos (hoy no tiene sentido).
 
-## Open Questions
+## Open Questions (resueltas)
 
-- ¿`filesOwned` (TASK-633) y reglas de incident (TASK-634) también migran a DB aquí, o cada una mantiene su propia tabla?
-- ¿El registry sigue versionado en código y la DB es solo proyección, o la DB se vuelve la fuente de verdad y el código solo siembra el bootstrap?
+- ✅ `filesOwned` y incident rules quedan en código (son globales, no per-tenant).
+- ✅ Registry versionado en código (source of truth de defaults). DB es proyección + diff overrides. `INSERT ... ON CONFLICT DO UPDATE` evita drift cuando alguien edita DB y olvida actualizar código.

@@ -18,8 +18,14 @@ import type { ReliabilityModuleDefinition, ReliabilityModuleKey } from '@/types/
  * Adding a `ReliabilitySignalKind` here is a contract: a signal of that kind
  * is expected to exist now or to be plumbed in soon (registered as an
  * integration boundary in `RELIABILITY_INTEGRATION_BOUNDARIES`).
+ *
+ * TASK-635 nota: este array es la fuente canónica de DEFAULTS. La DB
+ * (`greenhouse_core.reliability_module_registry`) almacena el seed para que
+ * los overrides per-tenant (`reliability_module_overrides`) tengan algo
+ * sobre qué proyectarse, pero el código sigue siendo source of truth — el
+ * seed boot script reescribe los defaults con `ON CONFLICT DO UPDATE`.
  */
-export const RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
+export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
   {
     moduleKey: 'finance',
     label: 'Finance',
@@ -168,8 +174,17 @@ export const RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
   }
 ]
 
+/**
+ * Backwards-compatible alias. Pre-TASK-635 callers (CLI affected-modules,
+ * incident correlator, ad-hoc imports) leen `RELIABILITY_REGISTRY`. La
+ * referencia mutable apunta al mismo array estático (defaults) — la
+ * resolución per-tenant pasa por `getReliabilityRegistry(spaceId)` en
+ * `registry-store.ts`.
+ */
+export const RELIABILITY_REGISTRY = STATIC_RELIABILITY_REGISTRY
+
 const REGISTRY_BY_KEY: Map<ReliabilityModuleKey, ReliabilityModuleDefinition> = new Map(
-  RELIABILITY_REGISTRY.map(definition => [definition.moduleKey, definition])
+  STATIC_RELIABILITY_REGISTRY.map(definition => [definition.moduleKey, definition])
 )
 
 export const getReliabilityModuleDefinition = (
@@ -177,4 +192,4 @@ export const getReliabilityModuleDefinition = (
 ): ReliabilityModuleDefinition | null => REGISTRY_BY_KEY.get(moduleKey) ?? null
 
 export const listReliabilityModuleKeys = (): ReliabilityModuleKey[] =>
-  RELIABILITY_REGISTRY.map(definition => definition.moduleKey)
+  STATIC_RELIABILITY_REGISTRY.map(definition => definition.moduleKey)

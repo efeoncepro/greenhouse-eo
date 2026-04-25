@@ -173,17 +173,23 @@ No requiere cambios al contrato ni al UI: las nuevas señales aparecen automáti
 
 - No define entitlements nuevos. Reusa `requireAdminTenantContext()`.
 - No persiste señales históricas. Cada lectura es snapshot.
+- ~~No persiste el registry~~ → **TASK-635 (V1.1)**: registry persistido en `greenhouse_core.reliability_module_registry` + overrides per-tenant en `greenhouse_core.reliability_module_overrides`. Seed estático sigue siendo source of truth para defaults (idempotente al boot vía `INSERT ... ON CONFLICT DO UPDATE`).
 - No automatiza remediaciones.
-- No implementa synthetic monitoring real.
+- No implementa synthetic monitoring real (TASK-632 lo implementa con cron Vercel + Agent Auth).
 - No reemplaza Sentry, `source_sync_runs`, Playwright ni Billing Export.
+- No implementa Admin Center CRUD UI para overrides per-tenant (queda follow-up de TASK-635 cuando aparezca primer caso de uso real).
+- No implementa SLO breach detector (solo persiste `sloThresholds` para forward-compat).
 
 ## 10. Archivos canónicos
 
 - Tipos: [`src/types/reliability.ts`](../../src/types/reliability.ts)
-- Registry: [`src/lib/reliability/registry.ts`](../../src/lib/reliability/registry.ts)
+- Registry estático (defaults): [`src/lib/reliability/registry.ts`](../../src/lib/reliability/registry.ts) — exporta `STATIC_RELIABILITY_REGISTRY` y alias compat `RELIABILITY_REGISTRY`.
+- **Registry store DB-backed (TASK-635)**: [`src/lib/reliability/registry-store.ts`](../../src/lib/reliability/registry-store.ts) — `ensureReliabilityRegistrySeed()`, `getReliabilityRegistry(spaceId?)`, `setReliabilityModuleOverride()`, `clearReliabilityModuleOverride()`. Cache TTL 60s + fallback a `STATIC_RELIABILITY_REGISTRY` cuando DB falla.
+- **Migration TASK-635**: [`migrations/20260425204554656_task-635-reliability-registry-tables.sql`](../../migrations/20260425204554656_task-635-reliability-registry-tables.sql)
 - Severity helpers: [`src/lib/reliability/severity.ts`](../../src/lib/reliability/severity.ts)
 - Signal adapters: [`src/lib/reliability/signals.ts`](../../src/lib/reliability/signals.ts)
-- Reader: [`src/lib/reliability/get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts)
+- Incident correlator: [`src/lib/reliability/incident-mapping.ts`](../../src/lib/reliability/incident-mapping.ts)
+- Reader: [`src/lib/reliability/get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) — acepta `options.spaceId` y resuelve registry per-tenant via `registry-store.ts`.
 - API: [`src/app/api/admin/reliability/route.ts`](../../src/app/api/admin/reliability/route.ts)
 - UI primitive: [`src/components/greenhouse/ReliabilityModuleCard.tsx`](../../src/components/greenhouse/ReliabilityModuleCard.tsx)
 - Surface entrypoint: sección en [`src/views/greenhouse/admin/AdminCenterView.tsx`](../../src/views/greenhouse/admin/AdminCenterView.tsx)

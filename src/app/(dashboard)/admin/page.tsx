@@ -8,6 +8,7 @@ import { getInternalDashboardOverview } from '@/lib/internal/get-internal-dashbo
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
 import { buildReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
+import { getReliabilityRegistry } from '@/lib/reliability/registry-store'
 import {
   getLatestSweepRun,
   getLatestSyntheticSnapshotsByRoute
@@ -42,7 +43,8 @@ export default async function Page() {
     billing,
     notionOperational,
     syntheticSnapshots,
-    syntheticSweep
+    syntheticSweep,
+    reliabilityModules
   ] = await Promise.all([
     getAdminAccessOverview(),
     getAdminTenantsOverview(),
@@ -51,13 +53,19 @@ export default async function Page() {
     getGcpBillingOverview().catch(() => null),
     getNotionSyncOperationalOverview().catch(() => null),
     getLatestSyntheticSnapshotsByRoute().catch(() => []),
-    getLatestSweepRun().catch(() => null)
+    getLatestSweepRun().catch(() => null),
+
+    // TASK-635: módulos resueltos por el store DB-aware (defaults DB +
+    // overlay overrides para `tenant.spaceId` cuando existe). Fallback al
+    // STATIC_RELIABILITY_REGISTRY si DB falla.
+    getReliabilityRegistry(tenant.spaceId ?? null).catch(() => null)
   ])
 
   const reliability = buildReliabilityOverview(operations, {
     billing,
     notionOperational,
-    syntheticSnapshots
+    syntheticSnapshots,
+    modules: reliabilityModules
   })
 
   return (

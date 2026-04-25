@@ -89,6 +89,15 @@ export interface ReliabilityModuleDefinition {
    */
   filesOwned: string[]
   expectedSignalKinds: ReliabilitySignalKind[]
+
+  /**
+   * SLO thresholds opcionales por módulo. Forward-compat para TASK-635 V1.1
+   * "SLO breach detector". Hoy no se evalúan en runtime — solo se persisten
+   * para que el detector futuro los lea sin migración nueva.
+   *
+   * Ejemplos: `{ freshness_max_lag_hours: 6, error_rate_max_percent: 1.5 }`.
+   */
+  sloThresholds?: Record<string, unknown>
 }
 
 export interface ReliabilitySignal {
