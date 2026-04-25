@@ -2,6 +2,14 @@
 
 ## 2026-04-22
 
+### 2026-04-25 — TASK-610 CERRADA ✅: Content Sanitization Runtime Isolation + Shared Policy Layer
+
+- **Nueva capability shared** `src/lib/content/sanitization/` con policy registry reusable y primer policy id `hubspot_product_description_v1`.
+- **Crash SSR/productivo eliminado** del carril `description-sanitizer -> hubspot-product-payload-adapter`: se retiró `isomorphic-dompurify` y con ello la cadena `jsdom -> html-encoding-sniffer -> @exodus/bytes` que estaba rompiendo bajo Turbopack/Vercel SSR.
+- **Compatibilidad preservada**: `src/lib/commercial/description-sanitizer.ts` sigue exportando `sanitizeProductDescriptionHtml()` y `derivePlainDescription()`, pero ahora delega a la capability shared Node-safe.
+- **Cobertura de validación**: tests nuevos de la capa shared + suites existentes del sanitizer y del adapter HubSpot siguen verdes; `pnpm lint` y `pnpm build` clean.
+- **Arquitectura formalizada**: `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` y `GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md` ya explicitan la regla institucional de no usar emulación DOM en sanitización HTML operativa server-side.
+
 ### 2026-04-24 — TASK-605 CERRADA ✅ (MVP) + TASK-587 umbrella CERRADA: programa full-fidelity GH↔HS closed-loop
 
 - **Capability `administracion.product_catalog`** registrada en `src/lib/admin/view-access-catalog.ts`. Commercial layout guard extendido con el nuevo viewCode + fallback `routeGroups.includes('admin')`.

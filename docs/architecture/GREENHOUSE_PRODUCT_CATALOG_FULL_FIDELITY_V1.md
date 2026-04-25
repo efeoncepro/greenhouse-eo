@@ -20,7 +20,7 @@ Los 16 campos + COGS son GH-SoT inviolable. HubSpot los refleja; edits manuales 
 | Product name | `product_catalog.product_name` | `name` | GH | Editable en admin UI |
 | SKU | `product_catalog.product_code` | `hs_sku` | GH | Immutable post-creación |
 | Description plain | `product_catalog.description` | `description` | GH | Derivado de rich si null |
-| Description rich HTML | `product_catalog.description_rich_html` | `hs_rich_text_description` | GH | Whitelist `<p>,<strong>,<em>,<ul>,<ol>,<li>,<a href>,<br>` |
+| Description rich HTML | `product_catalog.description_rich_html` | `hs_rich_text_description` | GH | Sanitizado server-side por capability shared Node-safe (`src/lib/content/sanitization/*`, policy `hubspot_product_description_v1`) con whitelist `<p>,<strong>,<em>,<ul>,<ol>,<li>,<a href>,<br>` |
 | Prices por moneda (6) | `product_catalog_prices.{CLP,USD,CLF,COP,MXN,PEN}` | `hs_price_clp/usd/clf/cop/mxn/pen` | GH | 1 authoritative + 5 derivadas FX |
 | Product type | `product_catalog.hubspot_product_type_code` | `hs_product_type` | GH | `service` / `inventory` / `non_inventory` |
 | Pricing model | `product_catalog.hubspot_pricing_model` | `hs_pricing_model` | GH | Fijo `flat` en Fase 1 |

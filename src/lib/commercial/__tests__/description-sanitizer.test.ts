@@ -22,7 +22,7 @@ describe('sanitizeProductDescriptionHtml', () => {
     expect(result).toContain('<ul><li>Bullet</li></ul>')
     expect(result).toContain('<ol><li>Number</li></ol>')
     expect(result).toContain('href="https://example.com"')
-    expect(result).toContain('<br>')
+    expect(result).toContain('<br')
   })
 
   it('strips <script> tags completely', () => {

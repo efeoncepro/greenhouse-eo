@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `—`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -41,8 +41,8 @@ La solucion correcta debe:
 
 1. aislar la sanitizacion de runtime del portal respecto de `jsdom` o equivalentes
 2. formalizar politicas de sanitizacion reutilizables por dominio
-3. permitir persistir y consumir contenido safe/derivado sin recalcular en cada read critico
-4. dejar rollout sin downtime y con backfill/audit claros
+3. permitir persistir y consumir contenido safe/derivado sin recalcular con dependencias DOM en cada read critico
+4. dejar rollout sin downtime y con backfill/audit claros cuando el dominio realmente lo requiera
 
 ## Goal
 
@@ -106,8 +106,9 @@ Reglas obligatorias:
 - `src/lib/commercial/description-sanitizer.ts`
 - `src/lib/hubspot/hubspot-product-payload-adapter.ts`
 - `src/lib/commercial/product-catalog/drift-detector-v2.ts`
-- `src/lib/content/[nuevo modulo shared]`
-- `docs/architecture/[nuevo o delta especializado]`
+- `src/lib/content/sanitization/`
+- `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md`
+- `docs/architecture/GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md`
 - `docs/documentation/[si aplica]`
 - `package.json`
 
@@ -219,11 +220,11 @@ Regla: elegir la variante con mejor balance entre no-downtime, claridad futura y
 
 ## Acceptance Criteria
 
-- [ ] Los paths productivos actuales de sanitizacion HTML ya no dependen de `isomorphic-dompurify` ni de `jsdom`.
-- [ ] Existe un modulo shared de sanitizacion rich HTML con policies versionadas y API reusable.
-- [ ] El caso de descripciones de producto HubSpot consume ese contrato shared sin regression funcional visible.
-- [ ] Existe estrategia documentada y ejecutable de backfill/migracion para contenido ya persistido si aplica.
-- [ ] Queda formalizada en arquitectura la regla de no usar emulacion DOM en sanitizacion operativa server-side.
+- [x] Los paths productivos actuales de sanitizacion HTML ya no dependen de `isomorphic-dompurify` ni de `jsdom`.
+- [x] Existe un modulo shared de sanitizacion rich HTML con policies versionadas y API reusable.
+- [x] El caso de descripciones de producto HubSpot consume ese contrato shared sin regression funcional visible.
+- [x] Existe estrategia documentada y ejecutable de backfill/migracion para contenido ya persistido si aplica.
+- [x] Queda formalizada en arquitectura la regla de no usar emulacion DOM en sanitizacion operativa server-side.
 
 ## Verification
 
@@ -235,14 +236,14 @@ Regla: elegir la variante con mejor balance entre no-downtime, claridad futura y
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado con fix, validaciones y riesgo residual
-- [ ] `changelog.md` quedo actualizado si cambio el contrato visible/operativo
-- [ ] se ejecuto chequeo de impacto cruzado sobre `TASK-603`, `TASK-604` y `TASK-605`
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado con fix, validaciones y riesgo residual
+- [x] `changelog.md` quedo actualizado si cambio el contrato visible/operativo
+- [x] se ejecuto chequeo de impacto cruzado sobre `TASK-603`, `TASK-604` y `TASK-605`
 
-- [ ] la documentacion de arquitectura deja explicitado el pattern shared de sanitizacion reusable
+- [x] la documentacion de arquitectura deja explicitado el pattern shared de sanitizacion reusable
 
 ## Follow-ups
 

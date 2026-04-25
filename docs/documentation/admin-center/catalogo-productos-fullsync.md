@@ -79,7 +79,7 @@ Capability requerida: `administracion.product_catalog`. Tambien accede cualquier
 
 Click en una fila → `/admin/commercial/product-catalog/[productId]` con 5 secciones editables:
 
-- **Identidad**: nombre, descripcion simple, descripcion HTML rica (con whitelist server-side), URL marketing, lista de URLs de imagenes (una por linea)
+- **Identidad**: nombre, descripcion simple, descripcion HTML rica (sanitizada server-side por la capability shared de contenido; no depende de `jsdom` ni emulación DOM), URL marketing, lista de URLs de imagenes (una por linea)
 - **Clasificacion**: tipo de producto, categoria, unidad, categoria tributaria — todos dropdowns poblados desde las ref tables
 - **Precios**: grid con las 6 monedas. Escribir un precio en una moneda lo marca como autoritativo (`source=gh_admin`) y automaticamente recalcula las 5 derivadas via FX platform. Si no hay rate disponible para alguna moneda, esa derivada queda null y se reporta en la respuesta.
 - **Recurrencia**: toggle activar/desactivar, frecuencia (monthly, yearly, etc.) y periodo ISO 8601 (P1M, P1Y)

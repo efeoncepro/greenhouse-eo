@@ -1,6 +1,10 @@
 import 'server-only'
 
-import DOMPurify from 'isomorphic-dompurify'
+import {
+  derivePlainTextFromRichHtml,
+  sanitizeRichHtml
+} from '@/lib/content/sanitization'
+import { HUBSPOT_PRODUCT_DESCRIPTION_POLICY_ID } from '@/lib/content/sanitization/policies'
 
 // ─────────────────────────────────────────────────────────────
 // TASK-603 — HTML sanitizer for HubSpot product descriptions.
@@ -23,31 +27,13 @@ import DOMPurify from 'isomorphic-dompurify'
 // fields consistent without requiring operator to write plain twice.
 // ─────────────────────────────────────────────────────────────
 
-const ALLOWED_TAGS = ['p', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'br'] as const
-
-const ALLOWED_ATTR = ['href'] as const
-
 /**
  * Sanitizes product description HTML for outbound delivery to HubSpot.
  * Returns a safe HTML string with only the whitelisted tags/attributes.
  * Null/undefined input returns empty string.
  */
 export const sanitizeProductDescriptionHtml = (html: string | null | undefined): string => {
-  if (html === null || html === undefined) return ''
-  const trimmed = String(html).trim()
-
-  if (!trimmed) return ''
-
-  return DOMPurify.sanitize(trimmed, {
-    ALLOWED_TAGS: [...ALLOWED_TAGS],
-    ALLOWED_ATTR: [...ALLOWED_ATTR],
-
-    // Additional hardening: reject <a href="javascript:..."> and data: URIs
-    // by forbidding the URI schemes that HubSpot's renderer would otherwise
-    // trust.
-    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-    KEEP_CONTENT: true
-  })
+  return sanitizeRichHtml(html, HUBSPOT_PRODUCT_DESCRIPTION_POLICY_ID)
 }
 
 /**
@@ -59,15 +45,5 @@ export const sanitizeProductDescriptionHtml = (html: string | null | undefined):
  * Null/undefined/empty input returns empty string.
  */
 export const derivePlainDescription = (html: string | null | undefined): string => {
-  if (html === null || html === undefined) return ''
-  const trimmed = String(html).trim()
-
-  if (!trimmed) return ''
-
-  // Strip ALL tags (not just unsafe ones) — for plain derivation we want text.
-  const stripped = DOMPurify.sanitize(trimmed, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
-
-  // DOMPurify leaves raw text; collapse whitespace runs (including
-  // newlines inserted by block-level tags) into single spaces.
-  return stripped.replace(/\s+/g, ' ').trim()
+  return derivePlainTextFromRichHtml(html, HUBSPOT_PRODUCT_DESCRIPTION_POLICY_ID)
 }

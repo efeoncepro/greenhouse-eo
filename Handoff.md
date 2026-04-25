@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — TASK-610 CERRADA: Sanitización shared Node-safe sin `jsdom`
+
+### Que cambio
+
+Se cerró el crash productivo reportado por Sentry en el carril de descripciones ricas de Product Catalog / HubSpot.
+
+- Nueva capability shared: `src/lib/content/sanitization/`
+  - `policies.ts`
+  - `index.ts`
+  - policy inicial `hubspot_product_description_v1`
+- `src/lib/commercial/description-sanitizer.ts` quedó como wrapper de compatibilidad sobre la capa shared.
+- `isomorphic-dompurify` salió de dependencies; entra `sanitize-html` + `@types/sanitize-html`.
+- Documentación actualizada en:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md`
+  - `docs/architecture/GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md`
+  - `docs/documentation/admin-center/catalogo-productos-fullsync.md`
+
+### Validacion
+
+- `pnpm test src/lib/content/sanitization/__tests__/rich-html.test.ts`
+- `pnpm test src/lib/commercial/__tests__/description-sanitizer.test.ts`
+- `pnpm test src/lib/hubspot/__tests__/hubspot-product-payload-adapter.test.ts`
+- `pnpm why isomorphic-dompurify` → sin resultados
+- `pnpm lint` → clean
+- `pnpm build` → clean
+
+### Riesgo residual / follow-up
+
+- No hubo migración de schema: este corte resuelve runtime isolation sin introducir metadata persistida de policy/version. Si otro dominio necesita persistir `raw/safe/derived`, abrir follow-up aditivo en vez de reusar helpers ad hoc.
+- `pnpm build` volvió a imprimir warnings conocidos de `Dynamic server usage` en rutas autenticadas; no bloqueó el build y no es parte de este cambio.
+
 ## Sesion 2026-04-24 — TASK-629 IMPLEMENTADA: PDF Cotizacion Enterprise
 
 ### Que cambio
