@@ -4,6 +4,10 @@ import { sql } from 'kysely'
 import { getDb } from '@/lib/db'
 import type { DB } from '@/types/db'
 
+import {
+  publishSellableRoleDeactivated,
+  publishSellableRoleReactivated
+} from './sellable-role-events'
 import type {
   EmploymentTypeSeedRow,
   SellableRolePricingCurrency,
@@ -737,6 +741,71 @@ export const insertPricingRowsIfChanged = async (
   }
 
   return results
+}
+
+// TASK-546 Fase B — lifecycle transitions for sellable roles. The seed-based
+// `upsertSellableRole` always marks active=true, which is intentional for the
+// bulk loader. Manual deactivation flows (Admin Center, migrations, ops)
+// should go through these helpers so the materializer sees the canonical
+// `.deactivated` / `.reactivated` events.
+export const deactivateSellableRole = async (
+  roleId: string,
+  dbOrTx?: DbLike
+): Promise<{ changed: boolean }> => {
+  const db = await getDbOrTx(dbOrTx)
+
+  const existing = await db
+    .selectFrom('greenhouse_commercial.sellable_roles')
+    .select(['role_id', 'role_sku', 'active'])
+    .where('role_id', '=', roleId)
+    .executeTakeFirst()
+
+  if (!existing) return { changed: false }
+  if (!existing.active) return { changed: false }
+
+  await db
+    .updateTable('greenhouse_commercial.sellable_roles')
+    .set({ active: false, updated_at: sql`CURRENT_TIMESTAMP` })
+    .where('role_id', '=', roleId)
+    .execute()
+
+  await publishSellableRoleDeactivated({
+    roleId: existing.role_id,
+    roleSku: existing.role_sku,
+    deactivatedAt: new Date().toISOString()
+  })
+
+  return { changed: true }
+}
+
+export const reactivateSellableRole = async (
+  roleId: string,
+  dbOrTx?: DbLike
+): Promise<{ changed: boolean }> => {
+  const db = await getDbOrTx(dbOrTx)
+
+  const existing = await db
+    .selectFrom('greenhouse_commercial.sellable_roles')
+    .select(['role_id', 'role_sku', 'active'])
+    .where('role_id', '=', roleId)
+    .executeTakeFirst()
+
+  if (!existing) return { changed: false }
+  if (existing.active) return { changed: false }
+
+  await db
+    .updateTable('greenhouse_commercial.sellable_roles')
+    .set({ active: true, updated_at: sql`CURRENT_TIMESTAMP` })
+    .where('role_id', '=', roleId)
+    .execute()
+
+  await publishSellableRoleReactivated({
+    roleId: existing.role_id,
+    roleSku: existing.role_sku,
+    reactivatedAt: new Date().toISOString()
+  })
+
+  return { changed: true }
 }
 
 export const syncSellableRoleSkuSequence = async (dbOrTx?: DbLike): Promise<void> => {

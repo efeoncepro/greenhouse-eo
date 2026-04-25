@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 
 import { withTransaction } from '@/lib/db'
 import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
+import {
+  buildExpenseTaxWriteFields,
+  serializeExpenseTaxSnapshot
+} from '@/lib/finance/expense-tax-snapshot'
 import { createFinanceExpenseInPostgres } from '@/lib/finance/postgres-store-slice2'
 import {
   EXPENSE_PAYMENT_STATUSES,
@@ -110,11 +114,25 @@ export async function POST(request: Request) {
         payrollEntryId: item.payrollEntryId
       })
 
-      const taxRate = toNumber(item.taxRate ?? 0)
-      const taxAmount = toNumber(item.taxAmount) || subtotal * taxRate
-      const totalAmount = toNumber(item.totalAmount) || subtotal + taxAmount
       const exchangeRateToClp = await resolveExchangeRateToClp({ currency, requestedRate: item.exchangeRateToClp })
-      const totalAmountClp = toNumber(item.totalAmountClp) || totalAmount * exchangeRateToClp
+
+      const taxWriteFields = await buildExpenseTaxWriteFields({
+        subtotal,
+        exchangeRateToClp,
+        taxCode: item.taxCode,
+        taxRate: item.taxRate,
+        taxAmount: item.taxAmount,
+        totalAmount: item.totalAmount,
+        dteTypeCode: item.dteTypeCode,
+        exemptAmount: item.exemptAmount,
+        vatUnrecoverableAmount: item.vatUnrecoverableAmount,
+        vatCommonUseAmount: item.vatCommonUseAmount,
+        vatFixedAssetsAmount: item.vatFixedAssetsAmount,
+        spaceId: resolvedScope.spaceId,
+        issuedAt: item.documentDate || item.paymentDate || undefined
+      })
+
+      const totalAmountClp = toNumber(item.totalAmountClp) || taxWriteFields.totalAmount * exchangeRateToClp
 
       const expenseType = item.expenseType && EXPENSE_TYPES.includes(item.expenseType)
         ? (item.expenseType as ExpenseType)
@@ -153,9 +171,22 @@ export async function POST(request: Request) {
           description,
           currency,
           subtotal,
-          taxRate,
-          taxAmount,
-          totalAmount,
+          taxRate: taxWriteFields.taxRate,
+          taxAmount: taxWriteFields.taxAmount,
+          taxCode: taxWriteFields.taxCode,
+          taxRecoverability: taxWriteFields.taxRecoverability,
+          taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+          taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+          taxSnapshotJson: serializeExpenseTaxSnapshot(taxWriteFields.taxSnapshot),
+          isTaxExempt: taxWriteFields.isTaxExempt,
+          taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
+          recoverableTaxAmount: taxWriteFields.recoverableTaxAmount,
+          recoverableTaxAmountClp: taxWriteFields.recoverableTaxAmountClp,
+          nonRecoverableTaxAmount: taxWriteFields.nonRecoverableTaxAmount,
+          nonRecoverableTaxAmountClp: taxWriteFields.nonRecoverableTaxAmountClp,
+          effectiveCostAmount: taxWriteFields.effectiveCostAmount,
+          effectiveCostAmountClp: taxWriteFields.effectiveCostAmountClp,
+          totalAmount: taxWriteFields.totalAmount,
           exchangeRateToClp,
           totalAmountClp,
           paymentDate: item.paymentDate ? normalizeString(item.paymentDate) : null,
@@ -191,6 +222,16 @@ export async function POST(request: Request) {
           directOverheadScope: null,
           directOverheadKind: null,
           directOverheadMemberId: null,
+          receiptDate: item.receiptDate ? normalizeString(item.receiptDate) : null,
+          purchaseType: item.purchaseType ? normalizeString(item.purchaseType) : null,
+          vatUnrecoverableAmount: item.vatUnrecoverableAmount != null ? toNumber(item.vatUnrecoverableAmount) : null,
+          vatFixedAssetsAmount: item.vatFixedAssetsAmount != null ? toNumber(item.vatFixedAssetsAmount) : null,
+          vatCommonUseAmount: item.vatCommonUseAmount != null ? toNumber(item.vatCommonUseAmount) : null,
+          dteTypeCode: item.dteTypeCode ? normalizeString(item.dteTypeCode) : null,
+          dteFolio: item.dteFolio ? normalizeString(item.dteFolio) : null,
+          exemptAmount: item.exemptAmount != null ? toNumber(item.exemptAmount) : null,
+          otherTaxesAmount: item.otherTaxesAmount != null ? toNumber(item.otherTaxesAmount) : null,
+          withholdingAmount: item.withholdingAmount != null ? toNumber(item.withholdingAmount) : null,
           notes: item.notes ? normalizeString(item.notes) : null,
           actorUserId: tenant.userId || null
         }

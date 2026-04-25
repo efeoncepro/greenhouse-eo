@@ -20,7 +20,13 @@ const resendApiKeyResolution = await resolveSecret({
   envVarName: 'RESEND_API_KEY'
 })
 
+const resendWebhookSigningSecretResolution = await resolveSecret({
+  envVarName: 'RESEND_WEBHOOK_SIGNING_SECRET'
+})
+
 export const getResendApiKey = () => resendApiKeyResolution.value?.trim() || null
+
+export const getResendWebhookSigningSecret = () => resendWebhookSigningSecretResolution.value?.trim() || null
 
 export const isResendConfigured = () => Boolean(getResendApiKey())
 

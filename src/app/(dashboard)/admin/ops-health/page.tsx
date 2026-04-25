@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 
+import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
 import { readReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
 import AdminOpsHealthView from '@/views/greenhouse/admin/AdminOpsHealthView'
@@ -29,10 +31,19 @@ export default async function Page() {
     redirect(tenant.portalHomePath)
   }
 
-  const [data, reactiveBreakdown] = await Promise.all([
+  const [data, reactiveBreakdown, gcpBilling, notionOperationalOverview] = await Promise.all([
     getOperationsOverview(),
-    readReactiveProjectionBreakdown().catch(() => null)
+    readReactiveProjectionBreakdown().catch(() => null),
+    getGcpBillingOverview().catch(() => null),
+    getNotionSyncOperationalOverview().catch(() => null)
   ])
 
-  return <AdminOpsHealthView data={data} reactiveBreakdown={reactiveBreakdown} />
+  return (
+    <AdminOpsHealthView
+      data={data}
+      reactiveBreakdown={reactiveBreakdown}
+      gcpBilling={gcpBilling}
+      notionOperationalOverview={notionOperationalOverview}
+    />
+  )
 }

@@ -328,6 +328,31 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.commercial_parties',
+    section: 'administracion',
+    label: 'Commercial Parties',
+    description: 'Embudo, adopción HubSpot, conflictos de sync y drill-down del party lifecycle.',
+    routePath: '/admin/commercial/parties',
+    routeGroup: 'admin'
+  },
+  {
+    viewCode: 'administracion.product_sync_conflicts',
+    section: 'administracion',
+    label: 'Product Sync Conflicts',
+    description: 'Drift del catálogo comercial, auto-heal y resolución operativa de conflictos con HubSpot Products.',
+    routePath: '/admin/commercial/product-sync-conflicts',
+    routeGroup: 'admin'
+  },
+  {
+    viewCode: 'administracion.product_catalog',
+    section: 'administracion',
+    label: 'Catálogo de productos',
+    description:
+      'Edita productos, precios multi-moneda, clasificación y owner; dispara sync manual a HubSpot. TASK-587 Fase E.',
+    routePath: '/admin/commercial/product-catalog',
+    routeGroup: 'admin'
+  },
+  {
     viewCode: 'administracion.instrumentos_pago',
     section: 'administracion',
     label: 'Instrumentos de pago',

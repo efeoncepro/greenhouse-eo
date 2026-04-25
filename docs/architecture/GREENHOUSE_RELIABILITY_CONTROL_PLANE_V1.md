@@ -1,0 +1,257 @@
+# Greenhouse Reliability Control Plane V1
+
+> Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
+>
+> Versión: `1.2`
+> Estado: `vigente`
+> Creada: `2026-04-25` por TASK-600
+> Última actualización: `2026-04-25` por TASK-638 (AI Observer enrichment via Gemini Flash + ops-worker host)
+
+---
+
+## 1. Por qué existe
+
+Greenhouse ya tenía señales útiles, pero aisladas:
+
+- `getOperationsOverview()` agregaba subsistemas, backlog reactivo, webhooks, cloud posture, observabilidad y data quality Notion.
+- `GET /api/internal/health` exponía postura cloud y checks runtime.
+- Sentry, `source_sync_runs`, Playwright smoke y Billing Export viven en planos distintos.
+
+Faltaba una capa estructural que dijera **qué módulos son críticos**, **qué señales les pertenecen** y **cómo se normaliza su estado**. Sin esa base, cada nueva feature de observabilidad agrega más cards, no un sistema de confianza.
+
+El Reliability Control Plane se sienta **encima** de las fuentes existentes — no las reemplaza, las normaliza.
+
+## 2. Principios de diseño
+
+1. **Registry-first.** Empezar declarando qué módulos críticos existen y qué señales les pertenecen, antes de cualquier UI o LLM.
+2. **Evidence-first.** Cada señal normalizada apunta a evidencia real: endpoint, helper, incidente, test, run, doc, SQL, métrica.
+3. **Module-oriented.** La lectura final responde tres preguntas por módulo: ¿qué está afectado? ¿cuán confiable está hoy? ¿por qué?
+4. **Integración incremental.** TASK-586 agrega cost cloud y notion-bq-sync sin redefinir contratos. TASK-599 agrega smoke/component/route sin tocar el modelo.
+5. **No duplicar contracts existentes.** `getOperationsOverview()` y `GET /api/internal/health` siguen siendo dueños de su lectura técnica; el control plane consume de ellos.
+
+## 3. Contracts canónicos
+
+Todos los tipos viven en [`src/types/reliability.ts`](../../src/types/reliability.ts).
+
+### 3.1 `ReliabilityModuleDefinition` (registry estático)
+
+Cada entrada del registry declara:
+
+| Campo | Descripción |
+|---|---|
+| `moduleKey` | Identificador estable del módulo (`finance`, `integrations.notion`, `cloud`, `delivery`). |
+| `label` | Nombre visible. |
+| `description` | Una línea explicando el alcance operativo. |
+| `domain` | Dominio macro (`platform`, `integrations`, `finance`, `delivery`). |
+| `routes` | Rutas críticas que operadores esperan navegables. |
+| `apis` | APIs críticas. |
+| `dependencies` | Dependencias operativas que, si fallan, propagan al módulo. |
+| `smokeTests` | Specs de Playwright que protegen el módulo hoy. |
+| `filesOwned` | Glob patterns (minimatch) que declaran qué archivos pertenecen al módulo. Consumido por TASK-633 (change-based verification matrix). |
+| `expectedSignalKinds` | Tipos de señal que se esperan vivos para este módulo. |
+
+El seed inicial vive en [`src/lib/reliability/registry.ts`](../../src/lib/reliability/registry.ts) y persiste como código estático. Persistencia DB se evaluará si Discovery posterior demuestra necesidad.
+
+### 3.2 `ReliabilitySignal` (modelo unificado)
+
+| Campo | Descripción |
+|---|---|
+| `signalId` | Identificador estable (`cloud.runtime.postgres`, `integrations.notion.data_quality`). |
+| `moduleKey` | Módulo al que pertenece. |
+| `kind` | `runtime` \| `posture` \| `incident` \| `freshness` \| `data_quality` \| `cost_guard` \| `subsystem` \| `test_lane` \| `billing`. |
+| `source` | Helper origen (`getCloudHealthSnapshot`, `getCloudSentryIncidents`, etc). |
+| `label` | Etiqueta visible. |
+| `severity` | `ok` \| `warning` \| `error` \| `unknown` \| `not_configured` \| `awaiting_data`. |
+| `summary` | Resumen humano de lo observado. |
+| `evidence[]` | Array de pointers a evidencia real (kind + label + value). |
+| `observedAt` | Timestamp de la observación. |
+
+`severity` separa explícitamente `not_configured` y `awaiting_data` de `unknown` para que la señal nunca se asuma sana cuando no está plomada.
+
+### 3.3 `ReliabilityModuleSnapshot` (vista por módulo)
+
+Combina la definición + las señales agregadas + el estado computado:
+
+- `status`: peor severidad agregada de las señales del módulo.
+- `confidence`: `high` \| `medium` \| `low` \| `unknown` según ratio de señales esperadas que tienen evidencia concreta.
+- `summary`: lectura humana en una línea.
+- `signalCounts`: histograma por severidad.
+- `missingSignalKinds`: tipos esperados sin plomar (boundary explícito para tasks futuras).
+
+### 3.4 `ReliabilityIntegrationBoundary`
+
+Declara qué task futura va a plomar qué señal:
+
+| Campo | Descripción |
+|---|---|
+| `taskId` | TASK-586, TASK-599, TASK-103. |
+| `moduleKey` | Módulo destino. |
+| `expectedSignalKind` | Tipo de señal que se espera. |
+| `expectedSource` | Helper que se espera implementar. |
+| `status` | `pending` \| `partial` \| `ready`. |
+| `note` | Cómo se enchufa al runtime. |
+
+## 4. Reader consolidado
+
+[`src/lib/reliability/get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) compone:
+
+1. Subsistemas de `OperationsOverview.subsystems` → señales `kind=subsystem` (mapeadas por nombre a su módulo).
+2. `OperationsOverview.cloud.health.runtimeChecks` → señales `kind=runtime` (módulo `cloud`).
+3. `OperationsOverview.cloud.health.postureChecks` → señales `kind=posture` (módulo `cloud`).
+4. `OperationsOverview.cloud.observability.incidents` → señales `kind=incident` (módulo `cloud`, top 3 abiertos).
+5. `OperationsOverview.cloud.observability.posture` → señal posture observabilidad.
+6. `OperationsOverview.cloud.bigquery.blockedQueries` → señal `kind=cost_guard` (módulo `cloud`).
+7. `OperationsOverview.notionDeliveryDataQuality` → señales `kind=data_quality` para `integrations.notion` y `delivery`.
+
+El reader **no hace fetches propios**: consume el `OperationsOverview` que el caller ya construyó. Si el caller no lo trae, el reader hace un fallback a `getOperationsOverview()`.
+
+## 5. Surfaces consumidoras
+
+| Surface | Rol |
+|---|---|
+| `Admin Center` (`/admin`) | Lectura ligera "Confiabilidad por módulo" — 1 card por módulo + chips de totales + boundaries pendientes. Foundation visible. |
+| `Ops Health` (`/admin/ops-health`) | Detalle técnico de subsystems, reactive backlog, webhooks. **Sigue siendo dueño** de la lectura técnica. |
+| `Cloud & Integrations` (`/admin/integrations`) | Detalle de syncs, posture cloud, secret refs. **Sigue siendo dueño** de la lectura cloud. |
+| `GET /api/admin/reliability` | Endpoint protegido `requireAdminTenantContext()`. Reusable por agentes, synthetic monitors y change-based verification. |
+| GitHub Action `reliability-verify` (TASK-633) | Job de CI que en cada PR lee el diff, deriva módulos afectados via `filesOwned` y corre solo los smoke specs relevantes. Ver `docs/operations/PLAYWRIGHT_E2E.md` §"Change-Based Verification Matrix". |
+
+La spec impone separación explícita: la nueva surface **no reemplaza** a las especialistas. Es complemento.
+
+## 6. Severidad y aggregation
+
+Mapeos canónicos (`src/lib/reliability/severity.ts`):
+
+| Source | Source value | ReliabilitySeverity |
+|---|---|---|
+| `CloudHealthStatus` | `ok`/`degraded`/`error`/`not_configured` | `ok`/`warning`/`error`/`not_configured` |
+| `CloudPostureStatus` | `ok`/`warning`/`unconfigured` | `ok`/`warning`/`not_configured` |
+| `OperationsHealthStatus` | `healthy`/`degraded`/`down`/`not_configured`/`idle` | `ok`/`warning`/`error`/`not_configured`/`awaiting_data` |
+| `IntegrationDataQualityStatus` | `healthy`/`degraded`/`broken`/`unknown` | `ok`/`warning`/`error`/`unknown` |
+| `CloudSentryIncidentLevel` | `fatal`/`error`/`warning`/`info`/`unknown` | `error`/`error`/`warning`/`ok`/`unknown` |
+
+Aggregation por módulo: peor severidad concreta. Estados pendientes (`not_configured`, `awaiting_data`, `unknown`) **nunca** ocultan un `warning` o `error` real.
+
+Confidence:
+
+- `high` ≥ 80% de señales esperadas tienen evidencia concreta (`ok`/`warning`/`error`).
+- `medium` ≥ 50%.
+- `low` < 50%.
+- `unknown` 0 señales presentes.
+
+### Sentry incident → module attribution (TASK-634)
+
+A partir de TASK-634, los incidentes Sentry NO se atribuyen masivamente al módulo `cloud`. El correlador determinista `correlateIncident()` en [`src/lib/reliability/incident-mapping.ts`](../../src/lib/reliability/incident-mapping.ts) decide:
+
+1. **Path matching**: `incident.location` se evalúa contra los globs `filesOwned` declarados en `RELIABILITY_REGISTRY` (TASK-633). Single source of truth — cuando `filesOwned` cambia, el correlador lo recoge automáticamente.
+2. **Title matching**: si no hay match por path, busca substrings (lowercase) en `incident.title` por módulo: `finance` (quote, expense, payroll, nubox, …), `integrations.notion` (notion, notion-bq-sync, delivery_tasks), `delivery` (ico-engine, sprint, reactive worker), `cloud` (cloud sql, bigquery, sentry, vercel cron).
+3. **Tie-break por priority**: `finance` > `integrations.notion` > `delivery` > `cloud`. Especializado siempre gana al fallback.
+4. **Fallback honesto**: incidentes que no matchean ningún módulo se etiquetan `cloud` con `signalId` con sufijo `.uncorrelated.<id>` para auditarlos como huérfanos.
+
+`buildSentryIncidentSignals` (en `signals.ts`) cap-ea a `MAX_SENTRY_INCIDENTS_PER_MODULE=3` por módulo (no global), de modo que finance siempre ve sus 3 top incidentes incluso cuando cloud tiene muchos uncorrelated.
+
+LLM-assisted enrichment para huérfanos queda como follow-up (Slice 4 del spec). V1 es solo rules-first determinista — input → output reproducible sin estado externo.
+
+## 7. Cómo enchufar TASK-586 y TASK-599
+
+Cada upstream debe:
+
+1. Implementar su helper de fetch (ej. `getGcpBillingOverview`, `getFinanceSmokeLaneStatus`).
+2. Agregar un adapter en [`src/lib/reliability/signals.ts`](../../src/lib/reliability/signals.ts) que normalice su output a `ReliabilitySignal[]`.
+3. Componer el adapter en `buildReliabilityOverview()`.
+4. Mover el `ReliabilityIntegrationBoundary` correspondiente de `pending` → `ready`.
+
+No requiere cambios al contrato ni al UI: las nuevas señales aparecen automáticamente en el módulo correspondiente y el conteo `missingSignalKinds` se reduce.
+
+## 7.1 AI Observer (TASK-638, V1.2)
+
+**Qué es.** Capa narrativa opcional sobre el Reliability Control Plane. Toma el snapshot canónico (`getReliabilityOverview()`), lo sanitiza (PII redaction), y llama a Gemini Flash via Vertex AI con un prompt determinista que produce JSON estricto:
+
+```json
+{
+  "overviewSummary": "...",
+  "overviewSeverity": "ok|warning|error|...",
+  "modules": [
+    { "moduleKey": "finance", "severity": "warning", "summary": "...", "recommendedAction": "..." }
+  ]
+}
+```
+
+**Por qué existe.** El RCP determinístico ya cubre health, signals, y boundaries. El AI Observer agrega:
+
+- Resumen ejecutivo en lenguaje neutro (un párrafo) para el Admin Center.
+- Recomendaciones contextuales por módulo cuando hay error/warning.
+- Detección de patrones cross-módulo que no caben en una regla simple.
+
+**No reemplaza** señales determinísticas. Cada `kind='ai_summary'` queda visible junto al resto de signals — el operador puede contrastar la lectura IA con la evidencia bruta.
+
+**Host: ops-worker (NO Vercel cron).** Decisión 2026-04-25:
+
+| Criterio                              | Vercel cron     | Cloud Function | ops-worker (Cloud Run)        |
+| ------------------------------------- | --------------- | -------------- | ----------------------------- |
+| Timeout safety (Gemini + DB writes)   | 60s cap         | OK             | 540s cap                      |
+| WIF nativo para Vertex AI             | ❌ (rotar ADC)  | ✅             | ✅                            |
+| Cloud Logging audit (prompt+respuesta)| logs Vercel     | ✅             | ✅                            |
+| Setup overhead                        | bajo            | medio          | mínimo (servicio ya existe)   |
+| Cloud Scheduler retries               | manual          | ✅             | ✅                            |
+
+ops-worker gana por: ya corre 7+ jobs Scheduler, WIF nativo evita rotar Vertex AI ADC en Vercel, y captura prompt + respuesta en Cloud Logging para audit.
+
+**Kill-switch.** Default OFF (opt-in). Activación explícita: `RELIABILITY_AI_OBSERVER_ENABLED=true` en el Cloud Run service. Sin esto, cada llamada al endpoint `POST /reliability-ai-watch` retorna `skippedReason` con costo cero. Convención **opuesta** a synthetic (default ON) porque cada llamada gasta tokens, dedup-skipped o no.
+
+**Dedup por fingerprint.** Cada observation lleva un fingerprint sha256 truncado del estado relevante (`status`, `confidence`, `signalCounts`, `missingSignalKinds` ordenados). Si el último fingerprint persistido coincide, la observation se descarta — esto evita inflar la tabla cuando el portal está estable durante días.
+
+**Anti-feedback loop.** El runner llama `getReliabilityOverview()` SIN incluir `aiObservations` (default OFF). El consumer de Admin Center lo llama explícitamente con `includeAiObservations=true`. Así el snapshot que entra al prompt nunca contiene resúmenes IA previos.
+
+**Schema.** `greenhouse_ai.reliability_ai_observations` (TASK-638 migration `20260425211608760`):
+
+- PK `observation_id` (`EO-RAI-{uuid8}`)
+- `sweep_run_id` (`EO-RAS-{uuid8}`)
+- `(scope, module_key, observed_at)` para reads ordenados
+- `fingerprint` para dedup lookup
+- `summary`, `recommended_action`, `model`, token counts
+
+**Cloud Scheduler.** Job `ops-reliability-ai-watch` cada 1h (`0 */1 * * *`, timezone `America/Santiago`), `triggeredBy=cloud_scheduler`. Frecuencia conservadora porque cada llamada cuesta tokens regardless of dedup.
+
+## 8. Roadmap de follow-ups
+
+- Synthetic monitoring periódico que ejecute las rutas críticas declaradas en el registry.
+- Change-based verification matrix: cuando un PR toca un archivo `owned` por un módulo, correr el smoke + signal correspondiente.
+- Correlador explicativo (LLM o reglas) que correlacione incidentes Sentry con módulos por path/title.
+- Persistencia DB del registry si aparece necesidad de overrides por tenant o de SLOs configurables.
+
+## 9. Cosas que NO hace V1
+
+- No define entitlements nuevos. Reusa `requireAdminTenantContext()`.
+- No persiste señales históricas. Cada lectura es snapshot.
+- ~~No persiste el registry~~ → **TASK-635 (V1.1)**: registry persistido en `greenhouse_core.reliability_module_registry` + overrides per-tenant en `greenhouse_core.reliability_module_overrides`. Seed estático sigue siendo source of truth para defaults (idempotente al boot vía `INSERT ... ON CONFLICT DO UPDATE`).
+- No automatiza remediaciones.
+- No implementa synthetic monitoring real (TASK-632 lo implementa con cron Vercel + Agent Auth).
+- No reemplaza Sentry, `source_sync_runs`, Playwright ni Billing Export.
+- No implementa Admin Center CRUD UI para overrides per-tenant (queda follow-up de TASK-635 cuando aparezca primer caso de uso real).
+- No implementa SLO breach detector (solo persiste `sloThresholds` para forward-compat).
+
+## 10. Archivos canónicos
+
+- Tipos: [`src/types/reliability.ts`](../../src/types/reliability.ts)
+- Registry estático (defaults): [`src/lib/reliability/registry.ts`](../../src/lib/reliability/registry.ts) — exporta `STATIC_RELIABILITY_REGISTRY` y alias compat `RELIABILITY_REGISTRY`.
+- **Registry store DB-backed (TASK-635)**: [`src/lib/reliability/registry-store.ts`](../../src/lib/reliability/registry-store.ts) — `ensureReliabilityRegistrySeed()`, `getReliabilityRegistry(spaceId?)`, `setReliabilityModuleOverride()`, `clearReliabilityModuleOverride()`. Cache TTL 60s + fallback a `STATIC_RELIABILITY_REGISTRY` cuando DB falla.
+- **Migration TASK-635**: [`migrations/20260425204554656_task-635-reliability-registry-tables.sql`](../../migrations/20260425204554656_task-635-reliability-registry-tables.sql)
+- Severity helpers: [`src/lib/reliability/severity.ts`](../../src/lib/reliability/severity.ts)
+- Signal adapters: [`src/lib/reliability/signals.ts`](../../src/lib/reliability/signals.ts)
+- Incident correlator: [`src/lib/reliability/incident-mapping.ts`](../../src/lib/reliability/incident-mapping.ts)
+- Reader: [`src/lib/reliability/get-reliability-overview.ts`](../../src/lib/reliability/get-reliability-overview.ts) — acepta `options.spaceId` y resuelve registry per-tenant via `registry-store.ts`.
+- API: [`src/app/api/admin/reliability/route.ts`](../../src/app/api/admin/reliability/route.ts)
+- UI primitive: [`src/components/greenhouse/ReliabilityModuleCard.tsx`](../../src/components/greenhouse/ReliabilityModuleCard.tsx)
+- Surface entrypoint: sección en [`src/views/greenhouse/admin/AdminCenterView.tsx`](../../src/views/greenhouse/admin/AdminCenterView.tsx)
+- **AI Observer (TASK-638)**:
+  - Sanitizer: [`src/lib/reliability/ai/sanitize.ts`](../../src/lib/reliability/ai/sanitize.ts)
+  - Prompt builder: [`src/lib/reliability/ai/build-prompt.ts`](../../src/lib/reliability/ai/build-prompt.ts)
+  - Kill-switch: [`src/lib/reliability/ai/kill-switch.ts`](../../src/lib/reliability/ai/kill-switch.ts)
+  - Persist: [`src/lib/reliability/ai/persist.ts`](../../src/lib/reliability/ai/persist.ts)
+  - Reader: [`src/lib/reliability/ai/reader.ts`](../../src/lib/reliability/ai/reader.ts)
+  - Runner: [`src/lib/reliability/ai/runner.ts`](../../src/lib/reliability/ai/runner.ts) — host-agnostic
+  - Adapter (signals): [`src/lib/reliability/ai/build-ai-summary-signals.ts`](../../src/lib/reliability/ai/build-ai-summary-signals.ts)
+  - ops-worker endpoint: `POST /reliability-ai-watch` en [`services/ops-worker/server.ts`](../../services/ops-worker/server.ts)
+  - Cloud Scheduler job: `ops-reliability-ai-watch` en [`services/ops-worker/deploy.sh`](../../services/ops-worker/deploy.sh)
+  - UI: [`src/components/greenhouse/admin/ReliabilityAiWatcherCard.tsx`](../../src/components/greenhouse/admin/ReliabilityAiWatcherCard.tsx)
+  - Migration: [`migrations/20260425211608760_task-638-reliability-ai-observations.sql`](../../migrations/20260425211608760_task-638-reliability-ai-observations.sql)

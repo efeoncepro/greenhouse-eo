@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { parsePersistedIncomeTaxSnapshot } from '@/lib/finance/income-tax-snapshot'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { toNumber } from '@/lib/finance/shared'
 
@@ -16,6 +17,11 @@ interface LineItemRow extends Record<string, unknown> {
   total_amount: string | number
   discount_percent: string | number | null
   is_exempt: boolean
+  tax_code: string | null
+  tax_rate_snapshot: string | number | null
+  tax_amount_snapshot: string | number | null
+  tax_snapshot_json: unknown | null
+  is_tax_exempt: boolean
 }
 
 export async function GET(
@@ -33,7 +39,8 @@ export async function GET(
   try {
     const rows = await runGreenhousePostgresQuery<LineItemRow>(
       `SELECT line_item_id, income_id, line_number, description,
-              quantity, unit_price, total_amount, discount_percent, is_exempt
+              quantity, unit_price, total_amount, discount_percent, is_exempt,
+              tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt
        FROM greenhouse_finance.income_line_items
        WHERE income_id = $1
        ORDER BY line_number ASC`,
@@ -49,7 +56,11 @@ export async function GET(
       unitPrice: toNumber(r.unit_price),
       totalAmount: toNumber(r.total_amount),
       discountPercent: r.discount_percent != null ? toNumber(r.discount_percent) : null,
-      isExempt: Boolean(r.is_exempt)
+      isExempt: Boolean(r.is_tax_exempt ?? r.is_exempt),
+      taxCode: r.tax_code ? String(r.tax_code) : null,
+      taxRateSnapshot: r.tax_rate_snapshot != null ? toNumber(r.tax_rate_snapshot) : null,
+      taxAmountSnapshot: r.tax_amount_snapshot != null ? toNumber(r.tax_amount_snapshot) : null,
+      taxSnapshot: parsePersistedIncomeTaxSnapshot(r.tax_snapshot_json)
     }))
 
     return NextResponse.json({ items })

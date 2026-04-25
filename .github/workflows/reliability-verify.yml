@@ -1,0 +1,155 @@
+name: Reliability change-based verification
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: 'Base ref para diff (default origin/develop)'
+        required: false
+        default: 'origin/develop'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reliability-verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect:
+    name: Detect affected modules
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      modules: ${{ steps.affected.outputs.modules }}
+      modules_count: ${{ steps.affected.outputs.modules_count }}
+      specs: ${{ steps.affected.outputs.specs }}
+      specs_count: ${{ steps.affected.outputs.specs_count }}
+    steps:
+      - name: Checkout PR branch (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve diff base
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_REF="origin/${{ github.event.pull_request.base.ref }}"
+          else
+            BASE_REF="${{ github.event.inputs.base_ref || 'origin/develop' }}"
+          fi
+          echo "Resolved base ref: $BASE_REF"
+          echo "base_ref=$BASE_REF" >> "$GITHUB_OUTPUT"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Compute affected modules + specs
+        id: affected
+        run: pnpm exec tsx scripts/reliability/affected-modules.ts --from-git --base "${{ steps.base.outputs.base_ref }}"
+
+      - name: Summary
+        run: |
+          echo "Modules: ${{ steps.affected.outputs.modules || '<none>' }}"
+          echo "Specs:   ${{ steps.affected.outputs.specs || '<none>' }}"
+
+  smoke:
+    name: Run affected smoke specs
+    needs: detect
+    if: ${{ needs.detect.outputs.specs != '' && needs.detect.outputs.specs_count != '0' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: true
+      NEXT_TELEMETRY_DISABLED: 1
+      PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL }}
+      AGENT_AUTH_SECRET: ${{ secrets.AGENT_AUTH_SECRET }}
+      AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.org' }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      - name: Guard — require base URL + agent secret
+        run: |
+          if [ -z "$PLAYWRIGHT_BASE_URL" ]; then
+            echo "::warning::PLAYWRIGHT_BASE_URL is empty. Skipping smoke run."
+            echo "skip_run=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          if [ -z "$AGENT_AUTH_SECRET" ]; then
+            echo "::warning::AGENT_AUTH_SECRET secret missing. Skipping smoke run."
+            echo "skip_run=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+      - name: Checkout
+        if: env.skip_run != 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        if: env.skip_run != 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        if: env.skip_run != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        if: env.skip_run != 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        if: env.skip_run != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run affected smoke specs
+        if: env.skip_run != 'true'
+        run: pnpm test:e2e ${{ needs.detect.outputs.specs }}
+
+      - name: Upload HTML report
+        if: always() && env.skip_run != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: reliability-verify-report-${{ github.run_id }}
+          if-no-files-found: warn
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload results JSON + traces
+        if: always() && env.skip_run != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: reliability-verify-artifacts-${{ github.run_id }}
+          if-no-files-found: warn
+          path: |
+            artifacts/playwright/**
+            test-results/**
+          retention-days: 14
+
+  no-affected:
+    name: No reliability modules affected
+    needs: detect
+    if: ${{ needs.detect.outputs.specs == '' || needs.detect.outputs.specs_count == '0' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip — no reliability modules touched
+        run: echo "PR no toca archivos owned por módulos del Reliability Registry. Smoke matrix skipped."

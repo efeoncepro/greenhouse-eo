@@ -1,9 +1,11 @@
 import 'server-only'
 
 import { resolveContactDisplayName } from '@/lib/contacts/contact-display'
+import { resolveSecret } from '@/lib/secrets/secret-manager'
 
-const DEFAULT_BASE_URL = 'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app'
+const DEFAULT_BASE_URL = 'https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app'
 const DEFAULT_TIMEOUT_MS = 4000
+const DEFAULT_INTEGRATION_TOKEN_SECRET_REF = 'greenhouse-integration-api-token'
 
 export interface HubSpotGreenhouseServiceContract {
   service: string
@@ -31,6 +33,12 @@ export interface HubSpotGreenhouseCompanyProfile {
     lifecyclestage: string | null
     hs_current_customer: string | null
     hubspotTeamId: string | null
+    ghCommercialPartyId: string | null
+    ghLastQuoteAt: string | null
+    ghLastContractAt: string | null
+    ghActiveContractsCount: number | null
+    ghLastWriteAt: string | null
+    ghMrrTier: string | null
   }
   capabilities: {
     businessLines: string[]
@@ -44,6 +52,21 @@ export interface HubSpotGreenhouseCompanyProfile {
     sourceObjectType: string
     sourceObjectId: string
   }
+}
+
+export interface HubSpotGreenhouseCompanySearchItem {
+  hubspotCompanyId: string
+  displayName: string
+  domain: string | null
+  website: string | null
+  lifecyclestage: string | null
+  lastModifiedAt: string | null
+}
+
+export interface HubSpotGreenhouseCompanySearchResponse {
+  query: string
+  count: number
+  companies: HubSpotGreenhouseCompanySearchItem[]
 }
 
 export interface HubSpotGreenhouseOwnerProfile {
@@ -60,6 +83,13 @@ export interface HubSpotGreenhouseCompanyOwnerResponse {
   hubspotCompanyId: string
   owner: HubSpotGreenhouseOwnerProfile | null
   detail?: string
+}
+
+export interface HubSpotGreenhouseOwnerResolutionResponse {
+  email: string
+  owner: HubSpotGreenhouseOwnerProfile | null
+  detail?: string
+  status: 'resolved' | 'not_found' | 'endpoint_not_deployed'
 }
 
 export interface HubSpotGreenhouseContactProfile {
@@ -80,6 +110,38 @@ export interface HubSpotGreenhouseCompanyContactsResponse {
   hubspotCompanyId: string
   count: number
   contacts: HubSpotGreenhouseContactProfile[]
+}
+
+export interface HubSpotGreenhouseCompanyDealProfile {
+  hubspotDealId: string
+  dealName: string | null
+  amount: number | null
+  currency: string | null
+  pipelineId: string | null
+  pipelineLabel: string | null
+  stageId: string | null
+  stageLabel: string | null
+  stageDisplayOrder: number | null
+  probabilityPct: number | null
+  isClosed: boolean
+  isWon: boolean
+  dealType: string | null
+  priority: string | null
+  ownerHubspotUserId: string | null
+  closeDate: string | null
+  createdAt: string | null
+  lastModifiedAt: string | null
+  source: {
+    sourceSystem: string
+    sourceObjectType: string
+    sourceObjectId: string
+  }
+}
+
+export interface HubSpotGreenhouseCompanyDealsResponse {
+  hubspotCompanyId: string
+  count: number
+  deals: HubSpotGreenhouseCompanyDealProfile[]
 }
 
 export interface HubSpotGreenhouseServiceProfile {
@@ -122,6 +184,24 @@ export interface HubSpotGreenhouseCompanyServicesResponse {
   count: number
 }
 
+export interface HubSpotGreenhouseUpdateCompanyLifecycleRequest {
+  organizationId?: string
+  commercialPartyId?: string | null
+  lifecycleStage?: string | null
+  activeContractsCount?: number | null
+  lastQuoteAt?: string | null
+  lastContractAt?: string | null
+  ghLastWriteAt: string
+  mrrTier?: string | null
+}
+
+export interface HubSpotGreenhouseUpdateCompanyLifecycleResponse {
+  status: 'updated' | 'endpoint_not_deployed'
+  hubspotCompanyId: string | null
+  fieldsWritten: string[]
+  message?: string
+}
+
 // ── Quotes (TASK-210) ──
 
 export interface HubSpotGreenhouseQuoteProfile {
@@ -141,9 +221,28 @@ export interface HubSpotGreenhouseQuoteProfile {
     expirationDate: string | null
     lastModifiedDate: string | null
   }
+  links: {
+    quoteLink: string | null
+    pdfDownloadLink: string | null
+  }
   status: {
     approvalStatus: string | null
     signatureStatus: string | null
+    locked: boolean | null
+  }
+  sender: {
+    firstName: string | null
+    lastName: string | null
+    email: string | null
+    companyName: string | null
+  }
+  configuration: {
+    templateType: string | null
+    acceptanceMethod: string | null
+    terms: string | null
+    timezone: string | null
+    domain: string | null
+    slug: string | null
   }
   associations: {
     dealId: string | null
@@ -169,6 +268,15 @@ export interface HubSpotGreenhouseCreateQuoteRequest {
   expirationDate: string
   language?: string
   locale?: string
+  status?: string
+  acceptanceMethod?: string
+  templateType?: string
+  terms?: string
+  timezone?: string
+  domain?: string
+  slug?: string
+  quoteNumber?: string
+  currency?: string
   sender?: {
     firstName: string
     lastName: string
@@ -182,12 +290,25 @@ export interface HubSpotGreenhouseCreateQuoteRequest {
     quoteTemplateId?: string
   }
   lineItems?: Array<{
+    hubspotLineItemId?: string
+    hubspotProductId?: string
+    productId?: string
     name: string
     quantity: number
     unitPrice: number
     description?: string
     discount?: number
+    discountPercentage?: number
+    productCode?: string
+    legacySku?: string
+    billingFrequency?: string
+    billingPeriod?: number
+    billingStartDate?: string
+    billingEndDate?: string
+    taxRate?: number
+    taxRateGroupId?: string
     taxAmount?: number
+    currency?: string
   }>
 }
 
@@ -196,10 +317,45 @@ export interface HubSpotGreenhouseCreateQuoteResponse {
   quoteNumber: string | null
   status: string
   quoteLink: string | null
+  pdfDownloadLink: string | null
+  locked: boolean | null
   associations: {
     dealId: string | null
+    companyId: string | null
+    contactIds: string[]
     lineItemIds: string[]
   }
+}
+
+export interface HubSpotGreenhouseUpdateQuoteResponse {
+  status: 'updated' | 'endpoint_not_deployed'
+  hubspotQuoteId: string | null
+  quoteNumber?: string | null
+  quoteStatus?: string | null
+  quoteLink?: string | null
+  pdfDownloadLink?: string | null
+  locked?: boolean | null
+  associations?: {
+    dealId?: string | null
+    companyId?: string | null
+    contactIds?: string[]
+    lineItemIds?: string[]
+  }
+  message?: string
+}
+
+export interface HubSpotGreenhouseTaxRate {
+  id: string
+  name: string | null
+  rate: number | null
+  isActive: boolean
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export interface HubSpotGreenhouseTaxRatesResponse {
+  count: number
+  taxRates: HubSpotGreenhouseTaxRate[]
 }
 
 // ── Products (TASK-211) ──
@@ -233,6 +389,42 @@ export interface HubSpotGreenhouseProductProfile {
     sourceObjectType: 'product'
     sourceObjectId: string
   }
+
+  // ── TASK-604 v2 fields ─────────────────────────────────────────────
+  // Middleware returns these when caller sends `X-Contract-Version: v2`.
+  // They are optional so consumers that haven't migrated to v2 still
+  // compile; inbound rehydration logic tolerates missing fields.
+
+  /** HubSpot owner record resolved by the middleware (via owner cache). */
+  owner?: HubSpotGreenhouseOwnerProfile | null
+
+  /** 6-currency map; middleware returns null for unpopulated currencies. */
+  pricesByCurrency?: HubSpotProductPricesByCurrency
+
+  /** Sanitized rich HTML from HubSpot (`hs_rich_text_description`). */
+  descriptionRichHtml?: string | null
+
+  /** Raw `hubspot_option_value` for categoria_de_item (reverse-mapped in GH). */
+  categoryHubspotValue?: string | null
+  unitHubspotValue?: string | null
+  taxCategoryHubspotValue?: string | null
+
+  /** Full classification tuple — GH-SoT, used only for drift detection. */
+  productType?: HubSpotProductType | null
+  pricingModel?: string | null
+  productClassification?: string | null
+  bundleType?: string | null
+
+  /** Parsed from HubSpot's semicolon-joined `hs_images`. */
+  imageUrls?: string[]
+
+  marketingUrl?: string | null
+
+  /**
+   * HubSpot audit timestamp for owner assignment (`hubspot_owner_assigneddate`).
+   * Read-only — GH never writes this back outbound.
+   */
+  hubspotOwnerAssignedAt?: string | null
 }
 
 export interface HubSpotGreenhouseProductCatalogResponse {
@@ -240,23 +432,75 @@ export interface HubSpotGreenhouseProductCatalogResponse {
   products: HubSpotGreenhouseProductProfile[]
 }
 
+// ── Contract v2 supporting types (TASK-603) ──
+//
+// Currency matrix is the canonical set declared in
+// `@/lib/commercial/product-catalog-prices`. Re-declared here as a local
+// union to keep the write-service types self-contained (no circular import
+// between integrations layer and commercial layer).
+
+export type HubSpotCanonicalCurrency = 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN'
+
+export type HubSpotProductPricesByCurrency = Partial<
+  Record<HubSpotCanonicalCurrency, number | null>
+>
+
+export type HubSpotProductType = 'service' | 'inventory' | 'non_inventory'
+
 export interface HubSpotGreenhouseCreateProductRequest {
   name: string
   sku: string
   description?: string
   unitPrice?: number
 
+  // ── TASK-603 v2 fields ─────────────────────────────────────────────
+  // The middleware accepts these when the caller sends
+  // `X-Contract-Version: v2`. Greenhouse always emits v2 since TASK-603.
+
+  /** Plain-text description; middleware forwards as HubSpot `description`. */
+  descriptionRichHtml?: string
+
+  /** Sanitized rich HTML (whitelist tags only); middleware forwards as `hs_rich_text_description`. */
+  pricesByCurrency?: HubSpotProductPricesByCurrency
+  productType?: HubSpotProductType
+  pricingModel?: string
+  productClassification?: string
+  bundleType?: string
+  categoryCode?: string | null
+  unitCode?: string | null
+  taxCategoryCode?: string | null
+  recurringBillingFrequency?: string | null
+  recurringBillingPeriodCode?: string | null
+  commercialOwnerEmail?: string | null
+  hubspotOwnerId?: string | null
+  marketingUrl?: string | null
+  imageUrls?: string[]
+
   /**
-   * @deprecated TASK-347: cost must never be forwarded to HubSpot. Keep in the type
-   * only to support the legacy inbound sync where HubSpot sends it back to Greenhouse.
-   * Callers creating outbound products must NOT set this field; the outbound guard
-   * (`src/lib/commercial/hubspot-outbound-guard.ts`) strips it defensively.
+   * TASK-347 governance, narrowed by TASK-603: COGS is now ALLOWED outbound.
+   * The outbound guard (`src/lib/commercial/hubspot-outbound-guard.ts`)
+   * blocks only margin + cost_breakdown fields; COGS is a product attribute,
+   * not a cost structure leak.
    */
   costOfGoodsSold?: number
   tax?: number
   isRecurring?: boolean
   billingFrequency?: string
   billingPeriodCount?: number
+
+  // TASK-547 Fase C — outbound bridge annotations. The Cloud Run service
+  // forwards these as HubSpot custom properties (`gh_product_code`,
+  // `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`,
+  // `gh_business_line`). `createdBy` is an audit tag persisted into HubSpot's
+  // default audit trail.
+  createdBy?: string
+  customProperties?: Partial<{
+    gh_product_code: string
+    gh_source_kind: string
+    gh_last_write_at: string
+    gh_archived_by_greenhouse: boolean
+    gh_business_line: string | null
+  }>
 }
 
 export interface HubSpotGreenhouseCreateProductResponse {
@@ -333,10 +577,53 @@ const getServiceConfig = () => ({
   timeoutMs: parseTimeoutMs(process.env.HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_MS)
 })
 
-const fetchJson = async <T>(path: string): Promise<T> => {
+const buildServiceHeaders = (extraHeaders?: Record<string, string>) => {
+  const headers: Record<string, string> = {
+    ...(extraHeaders ?? {})
+  }
+
+  return headers
+}
+
+const resolveIntegrationToken = async () => {
+  const { value } = await resolveSecret({
+    envVarName: 'GREENHOUSE_INTEGRATION_API_TOKEN',
+    env: {
+      ...process.env,
+      GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF:
+        process.env.GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF?.trim()
+        || DEFAULT_INTEGRATION_TOKEN_SECRET_REF
+    }
+  })
+
+  return value?.trim() || null
+}
+
+const buildWriteServiceHeaders = async (extraHeaders?: Record<string, string>) => {
+  const integrationToken = await resolveIntegrationToken()
+
+  if (!integrationToken) {
+    throw new Error(
+      'Missing GREENHOUSE_INTEGRATION_API_TOKEN for HubSpot integration service write request.'
+    )
+  }
+
+  const headers = buildServiceHeaders(extraHeaders)
+
+  headers.Authorization = `Bearer ${integrationToken}`
+  headers['x-greenhouse-integration-key'] = integrationToken
+
+  return headers
+}
+
+const fetchJson = async <T>(
+  path: string,
+  extraHeaders?: Record<string, string>
+): Promise<T> => {
   const { baseUrl, timeoutMs } = getServiceConfig()
 
   const response = await fetch(`${baseUrl}${path}`, {
+    headers: buildServiceHeaders(extraHeaders),
     cache: 'no-store',
     next: { revalidate: 0 },
     signal: AbortSignal.timeout(timeoutMs)
@@ -364,8 +651,79 @@ export const getHubSpotGreenhouseServiceContract = async () => fetchJson<HubSpot
 export const getHubSpotGreenhouseCompanyProfile = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyProfile>(`/companies/${hubspotCompanyId}`)
 
+export const searchHubSpotGreenhouseCompanies = async (
+  query: string,
+  options: { limit?: number } = {}
+) => {
+  const normalizedQuery = query.trim()
+
+  if (!normalizedQuery) {
+    return {
+      query: normalizedQuery,
+      count: 0,
+      companies: []
+    } satisfies HubSpotGreenhouseCompanySearchResponse
+  }
+
+  const limit = Math.max(1, Math.min(options.limit ?? 20, 50))
+
+  return fetchJson<HubSpotGreenhouseCompanySearchResponse>(
+    `/companies/search?q=${encodeURIComponent(normalizedQuery)}&limit=${limit}`
+  )
+}
+
 export const getHubSpotGreenhouseCompanyOwner = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`)
+
+export const resolveHubSpotGreenhouseOwnerByEmail = async (
+  email: string
+): Promise<HubSpotGreenhouseOwnerResolutionResponse> => {
+  const normalizedEmail = email.trim()
+
+  if (!normalizedEmail) {
+    return {
+      email: normalizedEmail,
+      owner: null,
+      status: 'not_found'
+    }
+  }
+
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(
+    `${baseUrl}/owners/resolve?email=${encodeURIComponent(normalizedEmail)}`,
+    {
+      headers: buildServiceHeaders(),
+      cache: 'no-store',
+      next: { revalidate: 0 },
+      signal: AbortSignal.timeout(timeoutMs)
+    }
+  )
+
+  if (response.status === 404) {
+    return {
+      email: normalizedEmail,
+      owner: null,
+      status: 'endpoint_not_deployed',
+      detail: 'HubSpot integration service does not expose GET /owners/resolve yet.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for /owners/resolve: ${body || response.statusText}`
+    )
+  }
+
+  const payload = (await response.json()) as Omit<HubSpotGreenhouseOwnerResolutionResponse, 'status'>
+
+  return {
+    ...payload,
+    status: payload.owner ? 'resolved' : 'not_found'
+  }
+}
 
 export const getHubSpotGreenhouseCompanyServices = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyServicesResponse>(`/companies/${hubspotCompanyId}/services`)
@@ -386,27 +744,75 @@ export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: stri
     }
   }
 
+export const getHubSpotGreenhouseCompanyDeals = async (hubspotCompanyId: string) =>
+  fetchJson<HubSpotGreenhouseCompanyDealsResponse>(`/companies/${hubspotCompanyId}/deals`)
+
+export const updateHubSpotGreenhouseCompanyLifecycle = async (
+  hubspotCompanyId: string,
+  payload: HubSpotGreenhouseUpdateCompanyLifecycleRequest
+): Promise<HubSpotGreenhouseUpdateCompanyLifecycleResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/companies/${encodeURIComponent(hubspotCompanyId)}/lifecycle`, {
+    method: 'PATCH',
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotCompanyId,
+      fieldsWritten: [],
+      message:
+        'HubSpot integration service does not expose PATCH /companies/:id/lifecycle yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for PATCH /companies/${hubspotCompanyId}/lifecycle: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseUpdateCompanyLifecycleResponse
+}
+
 // ── Products client methods (TASK-211) ──
 
+// TASK-604: request v2 shape so the middleware returns the 9 extra fields
+// (owner, pricesByCurrency, descriptionRichHtml, category/unit/tax HS values,
+// imageUrls, marketingUrl, hubspotOwnerAssignedAt). The middleware falls back
+// to v1 when the header is absent, so legacy callers stay unaffected.
 export const getHubSpotGreenhouseProductCatalog = async () =>
-  fetchJson<HubSpotGreenhouseProductCatalogResponse>('/products')
+  fetchJson<HubSpotGreenhouseProductCatalogResponse>('/products', {
+    'X-Contract-Version': 'v2'
+  })
 
 export const getHubSpotGreenhouseProduct = async (productId: string) =>
-  fetchJson<HubSpotGreenhouseProductProfile>(`/products/${productId}`)
+  fetchJson<HubSpotGreenhouseProductProfile>(`/products/${productId}`, {
+    'X-Contract-Version': 'v2'
+  })
 
 export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseCreateProductRequest) => {
   const { baseUrl, timeoutMs } = getServiceConfig()
 
-  // TASK-347 defense-in-depth: strip cost_of_goods_sold if a caller forgot the guard.
-  // The authoritative sanitizer lives in src/lib/commercial/hubspot-outbound-guard.ts.
-  const safePayload: Record<string, unknown> = { ...payload }
-
-  delete safePayload.costOfGoodsSold
-
+  // TASK-603: payload already passes through `sanitizeHubSpotProductPayload`
+  // upstream (blocks margin + cost_breakdown). COGS is allowed now; no wire-
+  // level strip. The middleware also applies defense-in-depth mirror of the
+  // guard when it sees `X-Contract-Version: v2`.
   const response = await fetch(`${baseUrl}/products`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(safePayload),
+    headers: await buildWriteServiceHeaders({
+      'Content-Type': 'application/json',
+      'X-Contract-Version': 'v2'
+    }),
+    body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
     signal: AbortSignal.timeout(timeoutMs)
@@ -419,6 +825,204 @@ export const createHubSpotGreenhouseProduct = async (payload: HubSpotGreenhouseC
   }
 
   return (await response.json()) as HubSpotGreenhouseCreateProductResponse
+}
+
+// ── Product outbound extensions (TASK-547) ──
+//
+// PATCH / archive / reconcile may still hit older deployments while rollout is
+// in flight. Follow the TASK-524 invoice and TASK-539 deal patterns: return a
+// structured `endpoint_not_deployed` result on 404 so the reactive outbound
+// bridge records the trace without throwing.
+
+export interface HubSpotGreenhouseProductCustomProperties {
+  gh_product_code: string
+  gh_source_kind: string
+  gh_last_write_at: string
+  gh_archived_by_greenhouse: boolean
+  gh_business_line?: string | null
+}
+
+export interface HubSpotGreenhouseUpdateProductRequest {
+  name?: string | null
+  description?: string | null
+  unitPrice?: number | null
+  sku?: string | null
+  isArchived?: boolean | null
+
+  // ── TASK-603 v2 fields (all optional on PATCH) ─────────────────────
+  descriptionRichHtml?: string | null
+  pricesByCurrency?: HubSpotProductPricesByCurrency
+  productType?: HubSpotProductType | null
+  pricingModel?: string | null
+  productClassification?: string | null
+  bundleType?: string | null
+  categoryCode?: string | null
+  unitCode?: string | null
+  taxCategoryCode?: string | null
+  isRecurring?: boolean | null
+  recurringBillingFrequency?: string | null
+  recurringBillingPeriodCode?: string | null
+  commercialOwnerEmail?: string | null
+  hubspotOwnerId?: string | null
+  marketingUrl?: string | null
+  imageUrls?: string[]
+
+  /** TASK-603: COGS unblocked outbound. See guard JSDoc for rationale. */
+  costOfGoodsSold?: number | null
+
+  customProperties?: Partial<HubSpotGreenhouseProductCustomProperties>
+}
+
+export interface HubSpotGreenhouseUpdateProductResponse {
+  status: 'updated' | 'endpoint_not_deployed'
+  hubspotProductId: string | null
+  message?: string
+}
+
+export const updateHubSpotGreenhouseProduct = async (
+  hubspotProductId: string,
+  payload: HubSpotGreenhouseUpdateProductRequest
+): Promise<HubSpotGreenhouseUpdateProductResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  // TASK-603: payload already passes through the guard upstream. COGS is
+  // allowed in contract v2 (hs_cost_of_goods_sold). No wire-level strip.
+  const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}`, {
+    method: 'PATCH',
+    headers: await buildWriteServiceHeaders({
+      'Content-Type': 'application/json',
+      'X-Contract-Version': 'v2'
+    }),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotProductId,
+      message:
+        'HubSpot integration service does not expose PATCH /products/:id yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for PATCH /products/${hubspotProductId}: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseUpdateProductResponse
+}
+
+export interface HubSpotGreenhouseArchiveProductResponse {
+  status: 'archived' | 'endpoint_not_deployed'
+  hubspotProductId: string | null
+  message?: string
+}
+
+export const archiveHubSpotGreenhouseProduct = async (
+  hubspotProductId: string,
+  reason?: string
+): Promise<HubSpotGreenhouseArchiveProductResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/products/${encodeURIComponent(hubspotProductId)}/archive`, {
+    method: 'POST',
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ reason: reason ?? 'source_deactivated_in_greenhouse' }),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotProductId,
+      message:
+        'HubSpot integration service does not expose POST /products/:id/archive yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for POST /products/${hubspotProductId}/archive: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseArchiveProductResponse
+}
+
+export interface HubSpotGreenhouseReconcileProductsRequest {
+  cursor?: string | null
+  limit?: number
+  includeArchived?: boolean
+}
+
+export interface HubSpotGreenhouseReconcileProductItem {
+  hubspotProductId: string
+  gh_product_code: string | null
+  gh_source_kind: string | null
+  gh_last_write_at: string | null
+  name: string | null
+  sku: string | null
+  price: number | null
+  description: string | null
+  isArchived: boolean
+}
+
+export interface HubSpotGreenhouseReconcileProductsResponse {
+  status: 'ok' | 'endpoint_not_deployed'
+  items: HubSpotGreenhouseReconcileProductItem[]
+  nextCursor?: string | null
+  message?: string
+}
+
+export const reconcileHubSpotGreenhouseProducts = async (
+  input: HubSpotGreenhouseReconcileProductsRequest = {}
+): Promise<HubSpotGreenhouseReconcileProductsResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const params = new URLSearchParams()
+
+  if (input.cursor) params.set('cursor', input.cursor)
+  if (typeof input.limit === 'number' && input.limit > 0) params.set('limit', String(input.limit))
+  if (input.includeArchived) params.set('includeArchived', 'true')
+
+  const query = params.toString() ? `?${params.toString()}` : ''
+
+  const response = await fetch(`${baseUrl}/products/reconcile${query}`, {
+    method: 'GET',
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      items: [],
+      message:
+        'HubSpot integration service does not expose GET /products/reconcile yet. TASK-548 drift detector should treat this as an empty batch.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for GET /products/reconcile: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseReconcileProductsResponse
 }
 
 // ── Line Items client methods (TASK-211) ──
@@ -436,7 +1040,7 @@ export const createHubSpotGreenhouseQuote = async (payload: HubSpotGreenhouseCre
 
   const response = await fetch(`${baseUrl}/quotes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload),
     cache: 'no-store',
     next: { revalidate: 0 },
@@ -451,6 +1055,271 @@ export const createHubSpotGreenhouseQuote = async (payload: HubSpotGreenhouseCre
 
   return (await response.json()) as HubSpotGreenhouseCreateQuoteResponse
 }
+
+export const updateHubSpotGreenhouseQuote = async (
+  hubspotQuoteId: string,
+  payload: Partial<HubSpotGreenhouseCreateQuoteRequest>
+): Promise<HubSpotGreenhouseUpdateQuoteResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/quotes/${encodeURIComponent(hubspotQuoteId)}`, {
+    method: 'PATCH',
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotQuoteId,
+      message:
+        'HubSpot integration service does not expose PATCH /quotes/:id yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for PATCH /quotes/${hubspotQuoteId}: ${body || response.statusText}`
+    )
+  }
+
+  const payloadJson = (await response.json()) as Omit<HubSpotGreenhouseUpdateQuoteResponse, 'status'>
+
+  return {
+    ...payloadJson,
+    status: 'updated'
+  }
+}
+
+export const getHubSpotGreenhouseTaxRates = async (
+  options: { active?: boolean } = {}
+) => {
+  const query = typeof options.active === 'boolean'
+    ? `?active=${options.active ? 'true' : 'false'}`
+    : ''
+
+  return fetchJson<HubSpotGreenhouseTaxRatesResponse>(`/tax-rates${query}`)
+}
+
+// ── Invoice client methods (TASK-524) ──
+//
+// Mirror of `greenhouse_finance.income` into HubSpot's native `invoice`
+// object as a **non-billable** reflection. The endpoint is not live in the
+// Cloud Run service yet; `upsertHubSpotGreenhouseInvoice` returns a
+// structured `endpoint_not_deployed` result on 404 so the reactive bridge
+// records the trace without throwing.
+
+export interface HubSpotGreenhouseInvoiceLineItemPayload {
+  description: string
+  quantity: number
+  unitPrice: number
+  discountPercent?: number | null
+  isExempt?: boolean | null
+}
+
+export interface HubSpotGreenhouseInvoiceAssociations {
+  hubspotCompanyId: string | null
+  hubspotDealId: string | null
+  hubspotContactId?: string | null
+}
+
+export interface HubSpotGreenhouseUpsertInvoiceRequest {
+
+  /** Greenhouse-side id; the Cloud Run service uses it as idempotency key. */
+  incomeId: string
+
+  /** Present on UPDATE; absent on CREATE. */
+  hubspotInvoiceId: string | null
+  invoiceNumber: string | null
+  invoiceDate: string
+  dueDate: string | null
+  currency: string
+  subtotal: number
+  taxAmount: number | null
+  totalAmount: number
+  totalAmountClp: number | null
+  exchangeRateToClp: number | null
+  description: string | null
+  isBillable: false
+  associations: HubSpotGreenhouseInvoiceAssociations
+  lineItems: HubSpotGreenhouseInvoiceLineItemPayload[]
+}
+
+export interface HubSpotGreenhouseUpsertInvoiceResponse {
+  status: 'created' | 'updated' | 'endpoint_not_deployed'
+  hubspotInvoiceId: string | null
+  invoiceNumber?: string | null
+  associations?: {
+    hubspotCompanyId?: string | null
+    hubspotDealId?: string | null
+    hubspotContactId?: string | null
+  }
+  message?: string
+}
+
+export const upsertHubSpotGreenhouseInvoice = async (
+  payload: HubSpotGreenhouseUpsertInvoiceRequest
+): Promise<HubSpotGreenhouseUpsertInvoiceResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/invoices`, {
+    method: 'POST',
+    headers: buildServiceHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  // Graceful degradation: while the Cloud Run service ships the /invoices
+  // route in a later deploy, the bridge records `endpoint_not_deployed` so
+  // ops can detect the backlog without Sentry noise.
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotInvoiceId: payload.hubspotInvoiceId,
+      message: 'HubSpot integration service does not expose /invoices yet. Trace persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for POST /invoices: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseUpsertInvoiceResponse
+}
+
+// ── Deals client methods (TASK-539) ──
+//
+// Creates a deal in HubSpot against an existing company. Same graceful-404
+// semantics as the invoice bridge — while the Cloud Run service ships the
+// `/deals` POST route, clients record the attempt as `endpoint_not_deployed`
+// and retry on the next deploy.
+
+export interface HubSpotGreenhouseCreateDealRequest {
+
+  /** Greenhouse-side idempotency key; the Cloud Run service dedupes on this. */
+  idempotencyKey: string
+  hubspotCompanyId: string
+  dealName: string
+  amount?: number | null
+  currency?: string | null
+  pipelineId?: string | null
+  stageId?: string | null
+  dealType?: string | null
+  priority?: string | null
+  ownerHubspotUserId?: string | null
+  closeDate?: string | null
+  businessLineCode?: string | null
+
+  /** Origin marker written as a HubSpot custom property (`gh_deal_origin`). */
+  origin: 'greenhouse_quote_builder'
+
+  /** Optional correlation id for cross-service tracing. */
+  correlationId?: string
+
+  /** Optional contact id to associate at creation. */
+  hubspotContactId?: string | null
+}
+
+export interface HubSpotGreenhouseCreateDealResponse {
+  status: 'created' | 'endpoint_not_deployed'
+  hubspotDealId: string | null
+  pipelineUsed?: string | null
+  stageUsed?: string | null
+  dealTypeUsed?: string | null
+  priorityUsed?: string | null
+  ownerUsed?: string | null
+  message?: string
+}
+
+export interface HubSpotGreenhouseDealMetadataStage {
+  stageId: string
+  label: string | null
+  displayOrder: number | null
+  archived: boolean
+  metadata: Record<string, unknown>
+}
+
+export interface HubSpotGreenhouseDealMetadataPipeline {
+  pipelineId: string
+  label: string | null
+  displayOrder: number | null
+  archived: boolean
+  stages: HubSpotGreenhouseDealMetadataStage[]
+}
+
+export interface HubSpotGreenhouseDealMetadataPropertyOption {
+  value: string | null
+  label: string | null
+  description?: string | null
+  displayOrder: number | null
+  hidden: boolean
+}
+
+export interface HubSpotGreenhouseDealMetadataProperty {
+  propertyName: string
+  label: string | null
+  type: string | null
+  fieldType: string | null
+  hubspotDefined: boolean
+  options: HubSpotGreenhouseDealMetadataPropertyOption[]
+}
+
+export interface HubSpotGreenhouseDealMetadataResponse {
+  objectType: 'deals'
+  pipelines: HubSpotGreenhouseDealMetadataPipeline[]
+  properties: {
+    dealType: HubSpotGreenhouseDealMetadataProperty | null
+    priority: HubSpotGreenhouseDealMetadataProperty | null
+  }
+}
+
+export const createHubSpotGreenhouseDeal = async (
+  payload: HubSpotGreenhouseCreateDealRequest
+): Promise<HubSpotGreenhouseCreateDealResponse> => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/deals`, {
+    method: 'POST',
+    headers: await buildWriteServiceHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (response.status === 404) {
+    return {
+      status: 'endpoint_not_deployed',
+      hubspotDealId: null,
+      message:
+        'HubSpot integration service does not expose POST /deals yet. Attempt persisted; retry on next deploy.'
+    }
+  }
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(
+      `HubSpot integration service returned ${response.status} for POST /deals: ${body || response.statusText}`
+    )
+  }
+
+  return (await response.json()) as HubSpotGreenhouseCreateDealResponse
+}
+
+export const getHubSpotGreenhouseDealMetadata = async (): Promise<HubSpotGreenhouseDealMetadataResponse> =>
+  fetchJson<HubSpotGreenhouseDealMetadataResponse>('/deals/metadata')
 
 export const getHubSpotGreenhouseLiveContext = async (
   hubspotCompanyId: string | null

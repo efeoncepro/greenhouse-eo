@@ -93,6 +93,39 @@ export const canAdministerPricingCatalog = (tenant: TenantContext) =>
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
   hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN)
 
+/**
+ * Gates revert de cambios del pricing catalog desde el audit timeline (TASK-471 slice 2).
+ * Más restrictivo que `canAdministerPricingCatalog` (que permite PATCH directo): un revert
+ * deshace la decisión de otro admin, así que se limita a `efeonce_admin` puros.
+ * Finance admin puede editar/crear catálogo pero NO revertir cambios históricos del audit log.
+ *
+ * Follow-up V2 (TASK-471 slice 5 maker-checker): considerar maker≠reverter cuando haya
+ * approval queue en producción.
+ */
+export const canRevertPricingCatalogChange = (tenant: TenantContext) =>
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
+/**
+ * Gates el workflow de aprobaciones de cambios críticos del pricing catalog (TASK-471 slice 5).
+ * Solo efeonce_admin puede aprobar/rechazar; el proposer NO puede ser el mismo actor que
+ * el reviewer (enforced server-side en el endpoint de decide).
+ */
+export const canReviewPricingCatalogApproval = (tenant: TenantContext) =>
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+
+/**
+ * Gates override manual de costo sugerido por línea en el Quote Builder (TASK-481).
+ * Más restrictivo que canViewCostStack: finance_analyst puede leer el cost stack
+ * para investigar márgenes pero NO puede mutar con overrides — eso queda en
+ * efeonce_admin + finance_admin. Alineado con el patrón de pricing catalog admin
+ * (TASK-467/TASK-470).
+ *
+ * Follow-up V2: threshold-based dual approval para deltas > umbral.
+ */
+export const canOverrideQuoteCost = (tenant: TenantContext) =>
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN)
+
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||

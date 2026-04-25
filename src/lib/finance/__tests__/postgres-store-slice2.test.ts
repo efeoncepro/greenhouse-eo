@@ -21,6 +21,14 @@ vi.mock('@/lib/account-360/organization-identity', () => ({
 }))
 
 import {
+  buildExpenseTaxWriteFields,
+  serializeExpenseTaxSnapshot
+} from '@/lib/finance/expense-tax-snapshot'
+import {
+  buildIncomeTaxWriteFields,
+  serializeIncomeTaxSnapshot
+} from '@/lib/finance/income-tax-snapshot'
+import {
   assertFinanceSlice2PostgresReady,
   buildMonthlySequenceIdFromPostgres,
   createFinanceExpenseInPostgres,
@@ -30,6 +38,9 @@ import {
   listFinanceIncomeFromPostgres,
   updateFinanceIncomeInPostgres
 } from '@/lib/finance/postgres-store-slice2'
+
+type CreateFinanceIncomeParams = Parameters<typeof createFinanceIncomeInPostgres>[0]
+type CreateFinanceExpenseParams = Parameters<typeof createFinanceExpenseInPostgres>[0]
 
 // ─── Fixtures ────────────────────────────────────────────────────────
 
@@ -160,6 +171,150 @@ const mockExpenseRow = {
   balance_nubox: null
 }
 
+const buildCreateFinanceIncomeParams = async (
+  overrides: Partial<CreateFinanceIncomeParams> = {}
+): Promise<CreateFinanceIncomeParams> => {
+  const subtotal = overrides.subtotal ?? 1000000
+
+  const taxWriteFields = await buildIncomeTaxWriteFields({
+    subtotal,
+    taxCode: overrides.taxCode ?? 'cl_vat_19'
+  })
+
+  return {
+    incomeId: 'INC-202603-001',
+    clientId: 'client-1',
+    organizationId: 'org-1',
+    clientProfileId: 'profile-1',
+    hubspotCompanyId: null,
+    hubspotDealId: null,
+    clientName: 'Acme Corp',
+    invoiceNumber: 'F-001',
+    invoiceDate: '2026-03-01',
+    dueDate: '2026-03-31',
+    description: 'Dev services',
+    currency: 'CLP',
+    subtotal,
+    taxRate: taxWriteFields.taxRate,
+    taxAmount: taxWriteFields.taxAmount,
+    taxCode: taxWriteFields.taxCode,
+    taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+    taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+    taxSnapshotJson: serializeIncomeTaxSnapshot(taxWriteFields.taxSnapshot),
+    isTaxExempt: taxWriteFields.isTaxExempt,
+    taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
+    totalAmount: taxWriteFields.totalAmount,
+    exchangeRateToClp: 1,
+    totalAmountClp: taxWriteFields.totalAmount,
+    paymentStatus: 'pending',
+    quotationId: null,
+    contractId: null,
+    sourceHesId: null,
+    purchaseOrderId: null,
+    hesId: null,
+    poNumber: null,
+    hesNumber: null,
+    serviceLine: 'globe',
+    incomeType: 'invoice',
+    partnerId: null,
+    partnerName: null,
+    partnerSharePercent: null,
+    partnerShareAmount: null,
+    netAfterPartner: null,
+    notes: null,
+    actorUserId: 'user-1',
+    ...overrides
+  }
+}
+
+const buildCreateFinanceExpenseParams = async (
+  overrides: Partial<CreateFinanceExpenseParams> = {}
+): Promise<CreateFinanceExpenseParams> => {
+  const subtotal = overrides.subtotal ?? 50000
+  const exchangeRateToClp = overrides.exchangeRateToClp ?? 1
+
+  const taxWriteFields = await buildExpenseTaxWriteFields({
+    subtotal,
+    exchangeRateToClp,
+    taxCode: overrides.taxCode ?? 'cl_vat_non_billable'
+  })
+
+  return {
+    expenseId: 'EXP-202603-001',
+    clientId: 'client-1',
+    spaceId: 'space-1',
+    expenseType: 'supplier',
+    sourceType: 'manual',
+    description: 'Software license',
+    currency: 'CLP',
+    subtotal,
+    taxRate: taxWriteFields.taxRate,
+    taxAmount: taxWriteFields.taxAmount,
+    taxCode: taxWriteFields.taxCode,
+    taxRecoverability: taxWriteFields.taxRecoverability,
+    taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+    taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+    taxSnapshotJson: serializeExpenseTaxSnapshot(taxWriteFields.taxSnapshot),
+    isTaxExempt: taxWriteFields.isTaxExempt,
+    taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
+    recoverableTaxAmount: taxWriteFields.recoverableTaxAmount,
+    recoverableTaxAmountClp: taxWriteFields.recoverableTaxAmountClp,
+    nonRecoverableTaxAmount: taxWriteFields.nonRecoverableTaxAmount,
+    nonRecoverableTaxAmountClp: taxWriteFields.nonRecoverableTaxAmountClp,
+    effectiveCostAmount: taxWriteFields.effectiveCostAmount,
+    effectiveCostAmountClp: taxWriteFields.effectiveCostAmountClp,
+    totalAmount: taxWriteFields.totalAmount,
+    exchangeRateToClp,
+    totalAmountClp: taxWriteFields.totalAmount,
+    paymentDate: '2026-03-15',
+    paymentStatus: 'paid',
+    paymentMethod: 'transfer',
+    paymentProvider: null,
+    paymentRail: null,
+    paymentAccountId: null,
+    paymentReference: null,
+    documentNumber: null,
+    documentDate: null,
+    dueDate: null,
+    supplierId: null,
+    supplierName: 'Proveedor SA',
+    supplierInvoiceNumber: null,
+    payrollPeriodId: null,
+    payrollEntryId: null,
+    memberId: null,
+    memberName: null,
+    socialSecurityType: null,
+    socialSecurityInstitution: null,
+    socialSecurityPeriod: null,
+    taxType: null,
+    taxPeriod: null,
+    taxFormNumber: null,
+    miscellaneousCategory: null,
+    serviceLine: null,
+    isRecurring: false,
+    recurrenceFrequency: null,
+    costCategory: null,
+    costIsDirect: true,
+    allocatedClientId: null,
+    directOverheadScope: null,
+    directOverheadKind: null,
+    directOverheadMemberId: null,
+    receiptDate: null,
+    purchaseType: null,
+    vatUnrecoverableAmount: 0,
+    vatFixedAssetsAmount: 0,
+    vatCommonUseAmount: 0,
+    dteTypeCode: null,
+    dteFolio: null,
+    exemptAmount: 0,
+    otherTaxesAmount: 0,
+    withholdingAmount: 0,
+    notes: null,
+    actorUserId: 'user-1',
+    ...overrides
+  }
+}
+
 // ─── Prime the TTL cache ──────────────────────────────────────────────
 
 beforeAll(async () => {
@@ -270,38 +425,7 @@ describe('createFinanceIncomeInPostgres', () => {
       async (fn: (client: typeof mockClient) => Promise<unknown>) => fn(mockClient)
     )
 
-    const result = await createFinanceIncomeInPostgres({
-      incomeId: 'INC-202603-001',
-      clientId: 'client-1',
-      organizationId: 'org-1',
-      clientProfileId: 'profile-1',
-      hubspotCompanyId: null,
-      hubspotDealId: null,
-      clientName: 'Acme Corp',
-      invoiceNumber: 'F-001',
-      invoiceDate: '2026-03-01',
-      dueDate: '2026-03-31',
-      description: 'Dev services',
-      currency: 'CLP',
-      subtotal: 1000000,
-      taxRate: 0.19,
-      taxAmount: 190000,
-      totalAmount: 1190000,
-      exchangeRateToClp: 1,
-      totalAmountClp: 1190000,
-      paymentStatus: 'pending',
-      poNumber: null,
-      hesNumber: null,
-      serviceLine: 'globe',
-      incomeType: 'invoice',
-      partnerId: null,
-      partnerName: null,
-      partnerSharePercent: null,
-      partnerShareAmount: null,
-      netAfterPartner: null,
-      notes: null,
-      actorUserId: 'user-1'
-    })
+    const result = await createFinanceIncomeInPostgres(await buildCreateFinanceIncomeParams())
 
     expect(mockWithGreenhousePostgresTransaction).toHaveBeenCalledTimes(1)
     expect(result.incomeId).toBe('INC-202603-001')
@@ -351,57 +475,6 @@ describe('updateFinanceIncomeInPostgres', () => {
 // ─── createFinanceExpenseInPostgres ──────────────────────────────────
 
 describe('createFinanceExpenseInPostgres', () => {
-  const baseExpenseParams = {
-    expenseId: 'EXP-202603-001',
-    clientId: 'client-1',
-    spaceId: 'space-1',
-    expenseType: 'supplier' as const,
-    sourceType: 'manual' as const,
-    description: 'Software license',
-    currency: 'CLP',
-    subtotal: 50000,
-    taxRate: 0,
-    taxAmount: 0,
-    totalAmount: 50000,
-    exchangeRateToClp: 1,
-    totalAmountClp: 50000,
-    paymentDate: '2026-03-15',
-    paymentStatus: 'paid',
-    paymentMethod: 'transfer' as const,
-    paymentProvider: null,
-    paymentRail: null,
-    paymentAccountId: null,
-    paymentReference: null,
-    documentNumber: null,
-    documentDate: null,
-    dueDate: null,
-    supplierId: null,
-    supplierName: 'Proveedor SA',
-    supplierInvoiceNumber: null,
-    payrollPeriodId: null,
-    payrollEntryId: null,
-    memberId: null,
-    memberName: null,
-    socialSecurityType: null,
-    socialSecurityInstitution: null,
-    socialSecurityPeriod: null,
-    taxType: null,
-    taxPeriod: null,
-    taxFormNumber: null,
-    miscellaneousCategory: null,
-    serviceLine: null,
-    isRecurring: false,
-    recurrenceFrequency: null,
-    costCategory: null,
-    costIsDirect: true,
-    allocatedClientId: null,
-    directOverheadScope: null,
-    directOverheadKind: null,
-    directOverheadMemberId: null,
-    notes: null,
-    actorUserId: 'user-1'
-  }
-
   it('uses withGreenhousePostgresTransaction when no external client is provided', async () => {
     const mockClientQuery = vi.fn().mockResolvedValue({ rows: [mockExpenseRow] })
     const mockClient = { query: mockClientQuery }
@@ -410,7 +483,7 @@ describe('createFinanceExpenseInPostgres', () => {
       async (fn: (client: typeof mockClient) => Promise<unknown>) => fn(mockClient)
     )
 
-    const result = await createFinanceExpenseInPostgres(baseExpenseParams)
+    const result = await createFinanceExpenseInPostgres(await buildCreateFinanceExpenseParams())
 
     expect(mockWithGreenhousePostgresTransaction).toHaveBeenCalledTimes(1)
     expect(result.expenseId).toBe('EXP-202603-001')
@@ -424,7 +497,7 @@ describe('createFinanceExpenseInPostgres', () => {
     const externalClient = { query: mockClientQuery }
 
     const result = await createFinanceExpenseInPostgres(
-      baseExpenseParams,
+      await buildCreateFinanceExpenseParams(),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       { client: externalClient as any }
     )

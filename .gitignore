@@ -9,6 +9,10 @@
 /coverage
 /artifacts/
 /.auth/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
 
 # next.js
 /.next/
@@ -67,3 +71,11 @@ src/assets/iconify-icons/generated-icons.css
 # Legacy AI skill artifacts (not the src/lib/ai/ module which is tracked)
 
 .vercel
+
+# Python bytecode caches (Cloud Run services with Python)
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Local PDF render scratch (test artifacts, not committed)
+/tmp/

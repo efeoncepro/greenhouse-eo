@@ -9,7 +9,11 @@ import type {
   CommercialProviderType,
   ToolCatalogSeedRow
 } from './tool-catalog-seed'
-import { publishToolCatalogSeedEvents } from './tool-catalog-events'
+import {
+  publishAiToolDeactivated,
+  publishAiToolReactivated,
+  publishToolCatalogSeedEvents
+} from './tool-catalog-events'
 
 type ToolRow = Selectable<DB['greenhouse_ai.tool_catalog']>
 
@@ -424,6 +428,76 @@ export const upsertToolCatalogEntry = async (row: ToolCatalogSeedRow): Promise<U
       changed: true,
       costImpactChanged
     }
+  })
+
+// TASK-546 Fase B — lifecycle transitions for AI tools. `upsertToolCatalogEntry`
+// preserves the existing `is_active` on update, so active → inactive
+// transitions only happen through explicit admin paths. These helpers make
+// the event emission canonical and idempotent.
+export const deactivateToolCatalogEntry = async (toolId: string): Promise<{ changed: boolean }> =>
+  withTransaction(async client => {
+    const existing = await client.query<{
+      tool_id: string
+      provider_id: string
+      is_active: boolean
+    }>(
+      `SELECT tool_id, provider_id, is_active FROM greenhouse_ai.tool_catalog WHERE tool_id = $1`,
+      [toolId]
+    )
+
+    const row = existing.rows[0]
+
+    if (!row) return { changed: false }
+    if (!row.is_active) return { changed: false }
+
+    await client.query(
+      `UPDATE greenhouse_ai.tool_catalog SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP WHERE tool_id = $1`,
+      [toolId]
+    )
+
+    await publishAiToolDeactivated(
+      {
+        toolId: row.tool_id,
+        providerId: row.provider_id,
+        deactivatedAt: new Date().toISOString()
+      },
+      client
+    )
+
+    return { changed: true }
+  })
+
+export const reactivateToolCatalogEntry = async (toolId: string): Promise<{ changed: boolean }> =>
+  withTransaction(async client => {
+    const existing = await client.query<{
+      tool_id: string
+      provider_id: string
+      is_active: boolean
+    }>(
+      `SELECT tool_id, provider_id, is_active FROM greenhouse_ai.tool_catalog WHERE tool_id = $1`,
+      [toolId]
+    )
+
+    const row = existing.rows[0]
+
+    if (!row) return { changed: false }
+    if (row.is_active) return { changed: false }
+
+    await client.query(
+      `UPDATE greenhouse_ai.tool_catalog SET is_active = TRUE, updated_at = CURRENT_TIMESTAMP WHERE tool_id = $1`,
+      [toolId]
+    )
+
+    await publishAiToolReactivated(
+      {
+        toolId: row.tool_id,
+        providerId: row.provider_id,
+        reactivatedAt: new Date().toISOString()
+      },
+      client
+    )
+
+    return { changed: true }
   })
 
 export const syncToolCatalogSkuSequence = async () => {

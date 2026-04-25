@@ -10,6 +10,8 @@ import {
 } from './resolve-signal-context'
 import {
   getResolvedProjectDisplay,
+  isProjectDisplaySentinel,
+  isTechnicalProjectIdentifier,
   sanitizeProjectNarrative
 } from './entity-display-resolution'
 import {
@@ -69,12 +71,21 @@ export const enrichSignalPayload = (signal: AiSignalRecord, context?: ResolvedSi
 
   const projectName = getResolvedProjectLabel(context, signal.spaceId, signal.projectId)
 
+  // Para dimensiones non-project, el dimensionLabel histórico puede venir con
+  // sentinels (p. ej. "Sin nombre" persistido en BQ antes de TASK-588) o con
+  // IDs técnicos sin resolver. Los descartamos para no propagarlos a la UI.
+  const rawHistoricLabel =
+    typeof signal.payloadJson.dimensionLabel === 'string' ? signal.payloadJson.dimensionLabel : null
+
+  const historicLabel =
+    rawHistoricLabel && !isProjectDisplaySentinel(rawHistoricLabel) && !isTechnicalProjectIdentifier(rawHistoricLabel)
+      ? rawHistoricLabel
+      : null
+
   const dimensionLabel =
     signal.dimension === 'project'
       ? projectName ?? 'este proyecto'
-      : typeof signal.payloadJson.dimensionLabel === 'string'
-        ? signal.payloadJson.dimensionLabel
-        : null
+      : historicLabel
 
   return {
     ...signal,

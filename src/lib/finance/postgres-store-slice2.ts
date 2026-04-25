@@ -19,8 +19,11 @@ import {
   toNullableNumber,
   toTimestampString
 } from '@/lib/finance/shared'
+import { parsePersistedIncomeTaxSnapshot } from '@/lib/finance/income-tax-snapshot'
+import { parsePersistedExpenseTaxSnapshot } from '@/lib/finance/expense-tax-snapshot'
 import { resolveAutoAllocation, type AutoAllocationInput } from '@/lib/finance/auto-allocation-rules'
 import { ensureOrganizationForClient } from '@/lib/account-360/organization-identity'
+import type { ChileTaxSnapshot } from '@/lib/tax/chile'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -64,6 +67,12 @@ type PostgresIncomeRow = {
   subtotal: unknown
   tax_rate: unknown
   tax_amount: unknown
+  tax_code: string | null
+  tax_rate_snapshot: unknown
+  tax_amount_snapshot: unknown
+  tax_snapshot_json: unknown | null
+  is_tax_exempt: boolean
+  tax_snapshot_frozen_at: string | Date | null
   total_amount: unknown
   exchange_rate_to_clp: unknown
   total_amount_clp: unknown
@@ -115,6 +124,19 @@ type PostgresExpenseRow = {
   subtotal: unknown
   tax_rate: unknown
   tax_amount: unknown
+  tax_code: string | null
+  tax_recoverability: string | null
+  tax_rate_snapshot: unknown
+  tax_amount_snapshot: unknown
+  tax_snapshot_json: unknown | null
+  is_tax_exempt: boolean | null
+  tax_snapshot_frozen_at: string | Date | null
+  recoverable_tax_amount: unknown
+  recoverable_tax_amount_clp: unknown
+  non_recoverable_tax_amount: unknown
+  non_recoverable_tax_amount_clp: unknown
+  effective_cost_amount: unknown
+  effective_cost_amount_clp: unknown
   total_amount: unknown
   exchange_rate_to_clp: unknown
   total_amount_clp: unknown
@@ -170,8 +192,18 @@ type PostgresExpenseRow = {
   // Enrichment fields (TASK-165)
   is_annulled: boolean
   sii_document_status: string | null
+  receipt_date: string | Date | null
+  purchase_type: string | null
+  vat_unrecoverable_amount: unknown
+  vat_fixed_assets_amount: unknown
+  vat_common_use_amount: unknown
   nubox_pdf_url: string | null
   balance_nubox: unknown
+  dte_type_code: string | null
+  dte_folio: string | null
+  exempt_amount: unknown
+  other_taxes_amount: unknown
+  withholding_amount: unknown
 }
 
 type PostgresIncomePaymentRow = {
@@ -233,6 +265,12 @@ export type FinanceIncomeRecord = {
   subtotal: number
   taxRate: number
   taxAmount: number
+  taxCode: string | null
+  taxRateSnapshot: number | null
+  taxAmountSnapshot: number | null
+  taxSnapshot: ChileTaxSnapshot | null
+  isTaxExempt: boolean
+  taxSnapshotFrozenAt: string | null
   totalAmount: number
   exchangeRateToClp: number
   totalAmountClp: number
@@ -289,6 +327,19 @@ export type FinanceExpenseRecord = {
   subtotal: number
   taxRate: number
   taxAmount: number
+  taxCode: string | null
+  taxRecoverability: string | null
+  taxRateSnapshot: number | null
+  taxAmountSnapshot: number | null
+  taxSnapshot: ChileTaxSnapshot | null
+  isTaxExempt: boolean
+  taxSnapshotFrozenAt: string | null
+  recoverableTaxAmount: number | null
+  recoverableTaxAmountClp: number | null
+  nonRecoverableTaxAmount: number | null
+  nonRecoverableTaxAmountClp: number | null
+  effectiveCostAmount: number | null
+  effectiveCostAmountClp: number | null
   totalAmount: number
   exchangeRateToClp: number
   totalAmountClp: number
@@ -344,8 +395,18 @@ export type FinanceExpenseRecord = {
   // Enrichment fields (TASK-165)
   isAnnulled: boolean
   siiDocumentStatus: string | null
+  receiptDate: string | null
+  purchaseType: string | null
+  vatUnrecoverableAmount: number | null
+  vatFixedAssetsAmount: number | null
+  vatCommonUseAmount: number | null
   nuboxPdfUrl: string | null
   balanceNubox: number | null
+  dteTypeCode: string | null
+  dteFolio: string | null
+  exemptAmount: number | null
+  otherTaxesAmount: number | null
+  withholdingAmount: number | null
 }
 
 export type CostAllocationRecord = {
@@ -462,6 +523,12 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
     subtotal: toNumber(row.subtotal),
     taxRate: toNumber(row.tax_rate),
     taxAmount: toNumber(row.tax_amount),
+    taxCode: str(row.tax_code),
+    taxRateSnapshot: toNullableNumber(row.tax_rate_snapshot),
+    taxAmountSnapshot: toNullableNumber(row.tax_amount_snapshot),
+    taxSnapshot: parsePersistedIncomeTaxSnapshot(row.tax_snapshot_json),
+    isTaxExempt: normalizeBoolean(row.is_tax_exempt),
+    taxSnapshotFrozenAt: toTimestampString(row.tax_snapshot_frozen_at as string | { value?: string } | null),
     totalAmount,
     exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
     totalAmountClp: toNumber(row.total_amount_clp),
@@ -511,6 +578,19 @@ const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   subtotal: toNumber(row.subtotal),
   taxRate: toNumber(row.tax_rate),
   taxAmount: toNumber(row.tax_amount),
+  taxCode: str(row.tax_code),
+  taxRecoverability: str(row.tax_recoverability),
+  taxRateSnapshot: toNullableNumber(row.tax_rate_snapshot),
+  taxAmountSnapshot: toNullableNumber(row.tax_amount_snapshot),
+  taxSnapshot: parsePersistedExpenseTaxSnapshot(row.tax_snapshot_json),
+  isTaxExempt: normalizeBoolean(row.is_tax_exempt),
+  taxSnapshotFrozenAt: toTimestampString(row.tax_snapshot_frozen_at as string | { value?: string } | null),
+  recoverableTaxAmount: toNullableNumber(row.recoverable_tax_amount),
+  recoverableTaxAmountClp: toNullableNumber(row.recoverable_tax_amount_clp),
+  nonRecoverableTaxAmount: toNullableNumber(row.non_recoverable_tax_amount),
+  nonRecoverableTaxAmountClp: toNullableNumber(row.non_recoverable_tax_amount_clp),
+  effectiveCostAmount: toNullableNumber(row.effective_cost_amount),
+  effectiveCostAmountClp: toNullableNumber(row.effective_cost_amount_clp),
   totalAmount: toNumber(row.total_amount),
   exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
   totalAmountClp: toNumber(row.total_amount_clp),
@@ -562,8 +642,18 @@ const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null),
   isAnnulled: normalizeBoolean(row.is_annulled),
   siiDocumentStatus: str(row.sii_document_status),
+  receiptDate: toDateString(row.receipt_date as string | { value?: string } | null),
+  purchaseType: str(row.purchase_type),
+  vatUnrecoverableAmount: toNullableNumber(row.vat_unrecoverable_amount),
+  vatFixedAssetsAmount: toNullableNumber(row.vat_fixed_assets_amount),
+  vatCommonUseAmount: toNullableNumber(row.vat_common_use_amount),
   nuboxPdfUrl: str(row.nubox_pdf_url),
-  balanceNubox: toNullableNumber(row.balance_nubox)
+  balanceNubox: toNullableNumber(row.balance_nubox),
+  dteTypeCode: str(row.dte_type_code),
+  dteFolio: str(row.dte_folio),
+  exemptAmount: toNullableNumber(row.exempt_amount),
+  otherTaxesAmount: toNullableNumber(row.other_taxes_amount),
+  withholdingAmount: toNullableNumber(row.withholding_amount)
 })
 
 const mapIncomePayment =(row: PostgresIncomePaymentRow): FinanceIncomePaymentRecord => ({
@@ -830,7 +920,9 @@ export const listFinanceIncomeFromPostgres = async ({
       SELECT
         income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date, description,
-        currency, subtotal, tax_rate, tax_amount, total_amount,
+        currency, subtotal, tax_rate, tax_amount,
+        tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        total_amount,
         exchange_rate_to_clp, total_amount_clp, payment_status, amount_paid,
         collection_method, po_number, hes_number, service_line, income_type,
         is_reconciled, reconciliation_id,
@@ -1188,7 +1280,9 @@ export const getFinanceIncomeFromPostgres = async (incomeId: string) => {
       SELECT
         income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date, description,
-        currency, subtotal, tax_rate, tax_amount, total_amount,
+        currency, subtotal, tax_rate, tax_amount,
+        tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        total_amount,
         exchange_rate_to_clp, total_amount_clp, payment_status, amount_paid,
         collection_method, po_number, hes_number, service_line, income_type,
         is_reconciled, reconciliation_id,
@@ -1249,10 +1343,21 @@ export const createFinanceIncomeInPostgres = async ({
   subtotal,
   taxRate,
   taxAmount,
+  taxCode,
+  taxRateSnapshot,
+  taxAmountSnapshot,
+  taxSnapshotJson,
+  isTaxExempt,
+  taxSnapshotFrozenAt,
   totalAmount,
   exchangeRateToClp,
   totalAmountClp,
   paymentStatus,
+  quotationId,
+  contractId,
+  sourceHesId,
+  purchaseOrderId,
+  hesId,
   poNumber,
   hesNumber,
   serviceLine,
@@ -1280,10 +1385,21 @@ export const createFinanceIncomeInPostgres = async ({
   subtotal: number
   taxRate: number
   taxAmount: number
+  taxCode: string | null
+  taxRateSnapshot: number | null
+  taxAmountSnapshot: number | null
+  taxSnapshotJson: string | null
+  isTaxExempt: boolean
+  taxSnapshotFrozenAt: string
   totalAmount: number
   exchangeRateToClp: number
   totalAmountClp: number
   paymentStatus: string
+  quotationId?: string | null
+  contractId?: string | null
+  sourceHesId?: string | null
+  purchaseOrderId?: string | null
+  hesId?: string | null
   poNumber: string | null
   hesNumber: string | null
   serviceLine: string | null
@@ -1295,18 +1411,21 @@ export const createFinanceIncomeInPostgres = async ({
   netAfterPartner: number | null
   notes: string | null
   actorUserId: string | null
-}) => {
+}, opts?: { client?: PoolClient }) => {
   await assertFinanceSlice2PostgresReady()
 
-  return withGreenhousePostgresTransaction(async client => {
+  const run = async (client: PoolClient) => {
     const rows = await queryRows<PostgresIncomeRow>(
       `
         INSERT INTO greenhouse_finance.income (
           income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
           client_name, invoice_number, invoice_date, due_date, description,
-          currency, subtotal, tax_rate, tax_amount, total_amount,
+          currency, subtotal, tax_rate, tax_amount,
+          tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+          total_amount,
           exchange_rate_to_clp, total_amount_clp,
           payment_status, amount_paid,
+          quotation_id, contract_id, source_hes_id, purchase_order_id, hes_id,
           po_number, hes_number, service_line, income_type,
           is_reconciled,
           partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
@@ -1316,13 +1435,16 @@ export const createFinanceIncomeInPostgres = async ({
         VALUES (
           $1, $2, $3, $4, $5, $6,
           $7, $8, $9::date, $10::date, $11,
-          $12, $13, $14, $15, $16,
-          $17, $18,
-          $19, 0,
-          $20, $21, $22, $23,
+          $12, $13, $14,
+          $15, $16, $17, $18::jsonb, $19, $20::timestamptz,
+          $21,
+          $22, $23,
+          $24, 0,
+          $25, $26, $27, $28, $29,
+          $30, $31, $32, $33,
           FALSE,
-          $24, $25, $26, $27, $28,
-          $29, $30,
+          $34, $35, $36, $37, $38,
+          $39, $40,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -1330,9 +1452,12 @@ export const createFinanceIncomeInPostgres = async ({
       [
         incomeId, clientId, organizationId, clientProfileId, hubspotCompanyId, hubspotDealId,
         clientName, invoiceNumber, invoiceDate, dueDate, description,
-        currency, subtotal, taxRate, taxAmount, totalAmount,
+        currency, subtotal, taxRate, taxAmount,
+        taxCode, taxRateSnapshot, taxAmountSnapshot, taxSnapshotJson, isTaxExempt, taxSnapshotFrozenAt,
+        totalAmount,
         exchangeRateToClp, totalAmountClp,
         paymentStatus,
+        quotationId, contractId, sourceHesId, purchaseOrderId, hesId,
         poNumber, hesNumber, serviceLine, incomeType,
         partnerId, partnerName, partnerSharePercent, partnerShareAmount, netAfterPartner,
         notes, actorUserId
@@ -1351,7 +1476,13 @@ export const createFinanceIncomeInPostgres = async ({
     })
 
     return created
-  })
+  }
+
+  if (opts?.client) {
+    return run(opts.client)
+  }
+
+  return withGreenhousePostgresTransaction(run)
 }
 
 // ─── Income: update ─────────────────────────────────────────────────
@@ -1378,6 +1509,12 @@ export const updateFinanceIncomeInPostgres = async (
     subtotal: 'subtotal',
     taxRate: 'tax_rate',
     taxAmount: 'tax_amount',
+    taxCode: 'tax_code',
+    taxRateSnapshot: 'tax_rate_snapshot',
+    taxAmountSnapshot: 'tax_amount_snapshot',
+    taxSnapshotJson: 'tax_snapshot_json',
+    isTaxExempt: 'is_tax_exempt',
+    taxSnapshotFrozenAt: 'tax_snapshot_frozen_at',
     totalAmount: 'total_amount',
     exchangeRateToClp: 'exchange_rate_to_clp',
     totalAmountClp: 'total_amount_clp',
@@ -1461,6 +1598,19 @@ export const updateFinanceExpenseInPostgres = async (
     subtotal: 'subtotal',
     taxRate: 'tax_rate',
     taxAmount: 'tax_amount',
+    taxCode: 'tax_code',
+    taxRecoverability: 'tax_recoverability',
+    taxRateSnapshot: 'tax_rate_snapshot',
+    taxAmountSnapshot: 'tax_amount_snapshot',
+    taxSnapshotJson: 'tax_snapshot_json',
+    isTaxExempt: 'is_tax_exempt',
+    taxSnapshotFrozenAt: 'tax_snapshot_frozen_at',
+    recoverableTaxAmount: 'recoverable_tax_amount',
+    recoverableTaxAmountClp: 'recoverable_tax_amount_clp',
+    nonRecoverableTaxAmount: 'non_recoverable_tax_amount',
+    nonRecoverableTaxAmountClp: 'non_recoverable_tax_amount_clp',
+    effectiveCostAmount: 'effective_cost_amount',
+    effectiveCostAmountClp: 'effective_cost_amount_clp',
     totalAmount: 'total_amount',
     exchangeRateToClp: 'exchange_rate_to_clp',
     totalAmountClp: 'total_amount_clp',
@@ -1497,10 +1647,20 @@ export const updateFinanceExpenseInPostgres = async (
     directOverheadScope: 'direct_overhead_scope',
     directOverheadKind: 'direct_overhead_kind',
     directOverheadMemberId: 'direct_overhead_member_id',
+    receiptDate: 'receipt_date',
+    purchaseType: 'purchase_type',
+    vatUnrecoverableAmount: 'vat_unrecoverable_amount',
+    vatFixedAssetsAmount: 'vat_fixed_assets_amount',
+    vatCommonUseAmount: 'vat_common_use_amount',
+    dteTypeCode: 'dte_type_code',
+    dteFolio: 'dte_folio',
+    exemptAmount: 'exempt_amount',
+    otherTaxesAmount: 'other_taxes_amount',
+    withholdingAmount: 'withholding_amount',
     notes: 'notes'
   }
 
-  const dateColumns = new Set(['payment_date', 'document_date', 'due_date'])
+  const dateColumns = new Set(['payment_date', 'document_date', 'due_date', 'receipt_date'])
   const setClauses: string[] = []
   const values: unknown[] = []
   let paramIdx = 1
@@ -1748,7 +1908,10 @@ export const listFinanceExpensesFromPostgres = async ({
     `
       SELECT
         expense_id, client_id, space_id, expense_type, source_type, description, currency,
-        subtotal, tax_rate, tax_amount, total_amount,
+        subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
+        tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
+        effective_cost_amount, effective_cost_amount_clp, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
         document_number, document_date, due_date,
@@ -1764,7 +1927,10 @@ export const listFinanceExpensesFromPostgres = async ({
         created_at, updated_at,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
         nubox_supplier_name, nubox_origin, nubox_last_synced_at,
-        is_annulled, sii_document_status, nubox_pdf_url, balance_nubox
+        is_annulled, sii_document_status, receipt_date, purchase_type,
+        vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
+        nubox_pdf_url, balance_nubox, dte_type_code, dte_folio,
+        exempt_amount, other_taxes_amount, withholding_amount
       FROM greenhouse_finance.expenses
       ${whereClause}
       ORDER BY COALESCE(document_date, payment_date, created_at::date) DESC
@@ -1785,7 +1951,10 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
     `
       SELECT
         expense_id, client_id, space_id, expense_type, source_type, description, currency,
-        subtotal, tax_rate, tax_amount, total_amount,
+        subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
+        tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
+        effective_cost_amount, effective_cost_amount_clp, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
         document_number, document_date, due_date,
@@ -1801,7 +1970,10 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
         created_at, updated_at,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
         nubox_supplier_name, nubox_origin, nubox_last_synced_at,
-        is_annulled, sii_document_status, nubox_pdf_url, balance_nubox
+        is_annulled, sii_document_status, receipt_date, purchase_type,
+        vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
+        nubox_pdf_url, balance_nubox, dte_type_code, dte_folio,
+        exempt_amount, other_taxes_amount, withholding_amount
       FROM greenhouse_finance.expenses
       WHERE expense_id = $1
       LIMIT 1
@@ -1810,6 +1982,22 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
   )
 
   return rows[0] ? mapExpense(rows[0]) : null
+}
+
+export const listFinanceExpenseSocialSecurityInstitutionsFromPostgres = async () => {
+  await assertFinanceSlice2PostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<{ institution: string }>(
+    `
+      SELECT DISTINCT BTRIM(social_security_institution) AS institution
+      FROM greenhouse_finance.expenses
+      WHERE social_security_institution IS NOT NULL
+        AND BTRIM(social_security_institution) <> ''
+      ORDER BY institution ASC
+    `
+  )
+
+  return rows.map(row => normalizeString(row.institution)).filter(Boolean)
 }
 
 // ─── Expenses: create ───────────────────────────────────────────────
@@ -1825,6 +2013,19 @@ export const createFinanceExpenseInPostgres = async ({
   subtotal,
   taxRate,
   taxAmount,
+  taxCode,
+  taxRecoverability,
+  taxRateSnapshot,
+  taxAmountSnapshot,
+  taxSnapshotJson,
+  isTaxExempt,
+  taxSnapshotFrozenAt,
+  recoverableTaxAmount,
+  recoverableTaxAmountClp,
+  nonRecoverableTaxAmount,
+  nonRecoverableTaxAmountClp,
+  effectiveCostAmount,
+  effectiveCostAmountClp,
   totalAmount,
   exchangeRateToClp,
   totalAmountClp,
@@ -1861,6 +2062,16 @@ export const createFinanceExpenseInPostgres = async ({
   directOverheadScope,
   directOverheadKind,
   directOverheadMemberId,
+  receiptDate,
+  purchaseType,
+  vatUnrecoverableAmount,
+  vatFixedAssetsAmount,
+  vatCommonUseAmount,
+  dteTypeCode,
+  dteFolio,
+  exemptAmount,
+  otherTaxesAmount,
+  withholdingAmount,
   notes,
   actorUserId
 }: {
@@ -1874,6 +2085,19 @@ export const createFinanceExpenseInPostgres = async ({
   subtotal: number
   taxRate: number
   taxAmount: number
+  taxCode: string | null
+  taxRecoverability: string | null
+  taxRateSnapshot: number | null
+  taxAmountSnapshot: number
+  taxSnapshotJson: string
+  isTaxExempt: boolean
+  taxSnapshotFrozenAt: string
+  recoverableTaxAmount: number
+  recoverableTaxAmountClp: number
+  nonRecoverableTaxAmount: number
+  nonRecoverableTaxAmountClp: number
+  effectiveCostAmount: number
+  effectiveCostAmountClp: number
   totalAmount: number
   exchangeRateToClp: number
   totalAmountClp: number
@@ -1910,6 +2134,16 @@ export const createFinanceExpenseInPostgres = async ({
   directOverheadScope: string | null
   directOverheadKind: string | null
   directOverheadMemberId: string | null
+  receiptDate: string | null
+  purchaseType: string | null
+  vatUnrecoverableAmount: number | null
+  vatFixedAssetsAmount: number | null
+  vatCommonUseAmount: number | null
+  dteTypeCode: string | null
+  dteFolio: string | null
+  exemptAmount: number | null
+  otherTaxesAmount: number | null
+  withholdingAmount: number | null
   notes: string | null
   actorUserId: string | null
 }, opts?: { client?: PoolClient }) => {
@@ -1920,7 +2154,10 @@ export const createFinanceExpenseInPostgres = async ({
       `
         INSERT INTO greenhouse_finance.expenses (
           expense_id, client_id, space_id, expense_type, source_type, description, currency,
-          subtotal, tax_rate, tax_amount, total_amount,
+          subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
+          tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+          recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
+          effective_cost_amount, effective_cost_amount_clp, total_amount,
           exchange_rate_to_clp, total_amount_clp,
           payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
           document_number, document_date, due_date,
@@ -1932,30 +2169,37 @@ export const createFinanceExpenseInPostgres = async ({
           is_reconciled,
           cost_category, cost_is_direct, allocated_client_id,
           direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
+          receipt_date, purchase_type, vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
+          dte_type_code, dte_folio, exempt_amount, other_taxes_amount, withholding_amount,
           notes, created_by_user_id,
           created_at, updated_at
         )
         VALUES (
           $1, $2, $3, $4, $5, $6, $7,
-          $8, $9, $10, $11,
-          $12, $13,
-          $14::date, $15, $16, $17, $18, $19, $20,
-          $21, $22::date, $23::date,
-          $24, $25, $26,
-          $27, $28, $29, $30,
-          $31, $32, $33,
-          $34, $35, $36, $37, $38, $39, $40,
+          $8, $9, $10, $11, $12, $13, $14,
+          $15::jsonb, $16, $17::timestamptz,
+          $18, $19, $20, $21,
+          $22, $23, $24,
+          $25, $26,
+          $27::date, $28, $29, $30, $31, $32, $33,
+          $34, $35::date, $36::date,
+          $37, $38, $39,
+          $40, $41, $42, $43,
           FALSE,
-          $41, $42, $43,
           $44, $45, $46,
-          $47, $48,
+          $47::date, $48, $49, $50, $51,
+          $52, $53, $54, $55, $56,
+          $57, $58,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
       `,
       [
         expenseId, clientId, spaceId, expenseType, sourceType, description, currency,
-        subtotal, taxRate, taxAmount, totalAmount,
+        subtotal, taxRate, taxAmount, taxCode, taxRecoverability, taxRateSnapshot, taxAmountSnapshot,
+        taxSnapshotJson, isTaxExempt, taxSnapshotFrozenAt,
+        recoverableTaxAmount, recoverableTaxAmountClp, nonRecoverableTaxAmount, nonRecoverableTaxAmountClp,
+        effectiveCostAmount, effectiveCostAmountClp, totalAmount,
         exchangeRateToClp, totalAmountClp,
         paymentDate, paymentStatus, paymentMethod, paymentProvider, paymentRail, paymentAccountId, paymentReference,
         documentNumber, documentDate, dueDate,
@@ -1966,6 +2210,8 @@ export const createFinanceExpenseInPostgres = async ({
         miscellaneousCategory, serviceLine, isRecurring, recurrenceFrequency,
         costCategory, costIsDirect, allocatedClientId,
         directOverheadScope, directOverheadKind, directOverheadMemberId,
+        receiptDate, purchaseType, vatUnrecoverableAmount, vatFixedAssetsAmount, vatCommonUseAmount,
+        dteTypeCode, dteFolio, exemptAmount, otherTaxesAmount, withholdingAmount,
         notes, actorUserId
       ],
       client
@@ -1988,7 +2234,7 @@ export const createFinanceExpenseInPostgres = async ({
       memberId: memberId ?? null,
       clientId: clientId ?? null,
       costCategory: costCategory ?? null,
-      totalAmountClp
+      totalAmountClp: effectiveCostAmountClp
     }).catch(err => console.error('[auto-allocation] Failed:', err))
 
     return created

@@ -22,6 +22,9 @@ interface EmailDeliveryRow extends Record<string, unknown> {
   actor_email: string | null
   error_message: string | null
   attempt_number: number
+  delivered_at: string | null
+  bounced_at: string | null
+  complained_at: string | null
   created_at: string
   updated_at: string
   total_count: string
@@ -89,6 +92,7 @@ export async function GET(request: Request) {
           subject, resend_id, status, has_attachments,
           source_event_id, source_entity, actor_email,
           error_message, attempt_number,
+          delivered_at::text, bounced_at::text, complained_at::text,
           created_at::text, updated_at::text,
           COUNT(*) OVER() AS total_count
         FROM greenhouse_notifications.email_deliveries
@@ -101,11 +105,11 @@ export async function GET(request: Request) {
     runGreenhousePostgresQuery<KpiRow>(
       `
         SELECT
-          COUNT(*) FILTER (WHERE status = 'sent' AND created_at > NOW() - INTERVAL '24 hours') AS sent_today,
+          COUNT(*) FILTER (WHERE status IN ('sent', 'delivered') AND created_at > NOW() - INTERVAL '24 hours') AS sent_today,
           COUNT(*) FILTER (WHERE status = 'failed' AND created_at > NOW() - INTERVAL '24 hours') AS failed_today,
           COUNT(*) FILTER (WHERE status = 'failed' AND attempt_number < 3 AND created_at > NOW() - INTERVAL '1 hour') AS pending_retry,
-          COUNT(*) FILTER (WHERE status = 'sent' AND created_at > NOW() - INTERVAL '7 days') AS sent_7d,
-          COUNT(*) FILTER (WHERE status IN ('sent', 'failed') AND created_at > NOW() - INTERVAL '7 days') AS processed_7d
+          COUNT(*) FILTER (WHERE status IN ('sent', 'delivered') AND created_at > NOW() - INTERVAL '7 days') AS sent_7d,
+          COUNT(*) FILTER (WHERE status IN ('sent', 'delivered', 'failed') AND created_at > NOW() - INTERVAL '7 days') AS processed_7d
         FROM greenhouse_notifications.email_deliveries
       `,
       []
@@ -119,6 +123,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     data: rows.map(row => ({
+      effectiveStatus: row.complained_at ? 'complained' : row.bounced_at ? 'bounced' : row.delivered_at ? 'delivered' : row.status,
       deliveryId: row.delivery_id,
       batchId: row.batch_id,
       emailType: row.email_type,
@@ -135,6 +140,9 @@ export async function GET(request: Request) {
       actorEmail: row.actor_email,
       errorMessage: row.error_message,
       attemptNumber: row.attempt_number,
+      deliveredAt: row.delivered_at,
+      bouncedAt: row.bounced_at,
+      complainedAt: row.complained_at,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     })),

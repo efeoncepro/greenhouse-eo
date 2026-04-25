@@ -21,6 +21,7 @@ import type { ProjectionDefinition } from '../projection-registry'
  */
 export const QUOTATION_HUBSPOT_OUTBOUND_TRIGGER_EVENTS = [
   EVENT_TYPES.quotationCreated,
+  EVENT_TYPES.quotationUpdated,
   EVENT_TYPES.quotationIssued,
   EVENT_TYPES.quotationSent,
   EVENT_TYPES.quotationApproved,

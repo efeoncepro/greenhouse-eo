@@ -11,10 +11,8 @@
  *   POST /cost-basis/materialize/roles
  *   POST /cost-basis/materialize/tools
  *   POST /cost-basis/materialize/bundle
- *
- * Reserved endpoints:
  *   POST /quotes/reprice-bulk
- *   POST /margin-feedback/materialize
+ *   POST /margin-feedback/materialize           (TASK-482)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle
@@ -23,10 +21,16 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
 import {
+  normalizeQuoteRepriceBulkRequest,
   normalizeCommercialCostBasisRequest,
-  runCommercialCostBasisMaterialization,
   type CommercialCostBasisScope
-} from '@/lib/commercial-cost-worker/materialize'
+} from '@/lib/commercial-cost-worker/contracts'
+import {
+  normalizeMarginFeedbackRequest,
+  runMarginFeedback
+} from '@/lib/commercial-cost-worker/margin-feedback'
+import { runCommercialCostBasisMaterialization } from '@/lib/commercial-cost-worker/materialize'
+import { runQuoteRepriceBulk } from '@/lib/commercial-cost-worker/quote-reprice-bulk'
 
 import { checkAuthorization } from './auth'
 
@@ -76,14 +80,6 @@ const notFound = (res: ServerResponse, pathname: string) => {
   })
 }
 
-const notImplemented = (res: ServerResponse, pathname: string, reason: string) => {
-  json(res, 501, {
-    error: 'NOT_IMPLEMENTED',
-    path: pathname,
-    reason
-  })
-}
-
 const withScopeOverride = (body: JsonObject, scope: CommercialCostBasisScope | null): JsonObject =>
   scope ? { ...body, scope } : body
 
@@ -124,6 +120,54 @@ const handleMaterialize = async (
     json(res, 502, {
       error: message,
       scope: resolvedScope,
+      timestamp: now()
+    })
+  }
+}
+
+const handleQuoteRepriceBulk = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  try {
+    const normalizedRequest = normalizeQuoteRepriceBulkRequest(body)
+    const result = await runQuoteRepriceBulk(normalizedRequest)
+
+    json(res, 200, {
+      service: 'commercial-cost-worker',
+      timestamp: now(),
+      result
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[commercial-cost-worker] quote repricing failed:', message)
+
+    json(res, 502, {
+      error: message,
+      timestamp: now()
+    })
+  }
+}
+
+const handleMarginFeedback = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  try {
+    const normalizedRequest = normalizeMarginFeedbackRequest(body)
+    const result = await runMarginFeedback(normalizedRequest)
+
+    json(res, 200, {
+      service: 'commercial-cost-worker',
+      timestamp: now(),
+      result
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[commercial-cost-worker] margin feedback failed:', message)
+
+    json(res, 502, {
+      error: message,
       timestamp: now()
     })
   }
@@ -179,21 +223,13 @@ const server = createServer(async (req, res) => {
   if (pathname === '/quotes/reprice-bulk') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
 
-    return notImplemented(
-      res,
-      pathname,
-      'Reserved for quote repricing orchestration over the commercial cost basis engine.'
-    )
+    return handleQuoteRepriceBulk(req, res)
   }
 
   if (pathname === '/margin-feedback/materialize') {
     if (method !== 'POST') return methodNotAllowed(res, req.method)
 
-    return notImplemented(
-      res,
-      pathname,
-      'Reserved for downstream margin feedback materialization after cost basis stabilization.'
-    )
+    return handleMarginFeedback(req, res)
   }
 
   return notFound(res, pathname)

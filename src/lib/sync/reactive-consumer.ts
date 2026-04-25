@@ -26,6 +26,7 @@ import {
   markRefreshCompleted,
   markRefreshFailed
 } from './refresh-queue'
+import { classifyReactiveError } from './reactive-error-classification'
 
 /**
  * V2 reactive consumer (TASK-379).
@@ -200,12 +201,15 @@ const bulkAcknowledgeEvents = async (
     result: string
     lastError: string | null
     retries: number
+    errorClass?: string | null
+    errorFamily?: string | null
+    isInfrastructureFault?: boolean
   }>
 ): Promise<void> => {
   if (entries.length === 0) return
 
   // Build a multi-row VALUES clause. Postgres has a 65535-parameter limit,
-  // and each row uses 5 parameters, so we cap chunks at ~10000 rows for
+  // and each row uses 8 parameters, so we cap chunks at ~10000 rows for
   // safety. In practice the consumer batches at <1000 events.
   const CHUNK_SIZE = 10_000
 
@@ -215,22 +219,44 @@ const bulkAcknowledgeEvents = async (
     const params: unknown[] = []
 
     chunk.forEach((entry, index) => {
-      const base = index * 5
+      const base = index * 8
 
-      values.push(`($${base + 1}, CURRENT_TIMESTAMP, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5})`)
-      params.push(entry.eventId, entry.handler, entry.result, entry.retries, entry.lastError)
+      values.push(
+        `($${base + 1}, CURRENT_TIMESTAMP, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6}, $${base + 7}, $${base + 8})`
+      )
+      params.push(
+        entry.eventId,
+        entry.handler,
+        entry.result,
+        entry.retries,
+        entry.lastError,
+        entry.errorClass ?? null,
+        entry.errorFamily ?? null,
+        entry.isInfrastructureFault ?? false
+      )
     })
 
     await runGreenhousePostgresQuery(
       `INSERT INTO greenhouse_sync.outbox_reactive_log (
-         event_id, reacted_at, handler, result, retries, last_error
+         event_id,
+         reacted_at,
+         handler,
+         result,
+         retries,
+         last_error,
+         error_class,
+         error_family,
+         is_infrastructure_fault
        )
        VALUES ${values.join(', ')}
        ON CONFLICT (event_id, handler) DO UPDATE SET
          reacted_at = CURRENT_TIMESTAMP,
          result = EXCLUDED.result,
          retries = EXCLUDED.retries,
-         last_error = EXCLUDED.last_error`,
+         last_error = EXCLUDED.last_error,
+         error_class = EXCLUDED.error_class,
+         error_family = EXCLUDED.error_family,
+         is_infrastructure_fault = EXCLUDED.is_infrastructure_fault`,
       params
     )
   }
@@ -643,7 +669,8 @@ export const processReactiveEvents = async (options?: {
         actions.push(`[${group.projection.name}] ${actionDescription} (coalesced ${group.events.length} events)`)
       }
     } catch (error) {
-      const errMsg = errorMessage(error)
+      const err = classifyReactiveError(error)
+      const errMsg = err.formattedMessage
 
       console.error(
         `[reactive-consumer] ${group.projection.name} failed for scope ${group.scope.entityId}:`,
@@ -655,7 +682,11 @@ export const processReactiveEvents = async (options?: {
       scopeGroupsFailed += 1
 
       try {
-        await markRefreshFailed(queueId, errMsg, group.projection.maxRetries ?? 2)
+        await markRefreshFailed(queueId, errMsg, group.projection.maxRetries ?? 2, {
+          errorClass: err.category,
+          errorFamily: err.family,
+          isInfrastructureFault: err.isInfrastructure
+        })
       } catch (failureError) {
         console.error('[reactive-consumer] markRefreshFailed orphan:', failureError)
       }
@@ -669,6 +700,9 @@ export const processReactiveEvents = async (options?: {
         result: string
         lastError: string | null
         retries: number
+        errorClass?: string | null
+        errorFamily?: string | null
+        isInfrastructureFault?: boolean
       }> = []
 
       for (const event of group.events) {
@@ -692,7 +726,10 @@ export const processReactiveEvents = async (options?: {
           handler: handlerKey,
           result: isDeadLetter ? 'dead-letter' : 'retry',
           lastError: errMsg,
-          retries: nextRetries
+          retries: nextRetries,
+          errorClass: err.category,
+          errorFamily: err.family,
+          isInfrastructureFault: err.isInfrastructure
         })
 
         if (isDeadLetter) {

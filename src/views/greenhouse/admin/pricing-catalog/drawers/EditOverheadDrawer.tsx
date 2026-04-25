@@ -18,6 +18,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 type AddonType = 'overhead_fixed' | 'fee_percentage' | 'fee_fixed' | 'resource_month' | 'adjustment_pct'
@@ -72,6 +74,7 @@ const EditOverheadDrawer = ({ open, overheadId, onClose, onSuccess }: Props) => 
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [impactBlocking, setImpactBlocking] = useState(false)
 
   const [category, setCategory] = useState('')
   const [addonName, setAddonName] = useState('')
@@ -476,6 +479,15 @@ const EditOverheadDrawer = ({ open, overheadId, onClose, onSuccess }: Props) => 
       </Stack>
 
       <Divider />
+      {overheadId ? (
+        <Box sx={{ px: 4, py: 2 }}>
+          <ImpactPreviewPanel
+            entityType='overhead_addon'
+            entityId={overheadId}
+            onBlockingStateChange={setImpactBlocking}
+          />
+        </Box>
+      ) : null}
       <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
         <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth disabled={saving}>
           Cancelar
@@ -484,11 +496,11 @@ const EditOverheadDrawer = ({ open, overheadId, onClose, onSuccess }: Props) => 
           variant='contained'
           color='primary'
           onClick={handleSubmit}
-          disabled={saving || loading}
+          disabled={saving || loading || impactBlocking}
           fullWidth
           startIcon={saving ? <CircularProgress size={16} color='inherit' /> : undefined}
         >
-          {saving ? 'Guardando...' : 'Guardar cambios'}
+          {saving ? 'Guardando...' : impactBlocking ? 'Confirmar impacto alto' : 'Guardar cambios'}
         </Button>
       </Box>
     </Drawer>

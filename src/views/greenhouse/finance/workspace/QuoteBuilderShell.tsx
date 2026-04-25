@@ -18,6 +18,7 @@ import { toast } from 'react-toastify'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
+import { requiresHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
 import type {
   PricingEngineInputV2,
   PricingLineOutputV2,
@@ -27,11 +28,15 @@ import type {
 } from '@/lib/finance/pricing/contracts'
 import { UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
+import useParties, { type PartySearchError, type PartySearchItem } from '@/hooks/useParties'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
+import { previewChileTaxAmounts } from '@/lib/finance/pricing/quotation-tax-constants'
 
 import AddLineSplitButton from '@/components/greenhouse/pricing/AddLineSplitButton'
-import QuoteContextStrip from '@/components/greenhouse/pricing/QuoteContextStrip'
+import QuoteContextStrip, {
+  type QuoteContextPartySelectorOption
+} from '@/components/greenhouse/pricing/QuoteContextStrip'
 import QuoteIdentityStrip, {
   type QuoteStatus
 } from '@/components/greenhouse/pricing/QuoteIdentityStrip'
@@ -43,6 +48,7 @@ import SellableItemPickerDrawer, {
 } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
 
 import AddonSuggestionsPanel from './AddonSuggestionsPanel'
+import CreateDealDrawer from './CreateDealDrawer'
 import QuoteLineItemsEditor, {
   mapSelectionToLine,
   makeBlankManualLine,
@@ -72,9 +78,12 @@ export interface QuoteBuilderShellQuote {
   clientId: string | null
   organizationId: string | null
   contactIdentityProfileId?: string | null
+  hubspotDealId?: string | null
+  hubspotQuoteId?: string | null
   description: string | null
   currency: string
   status: string
+  source?: string | null
   businessLineCode?: string | null
   commercialModel?: CommercialModelCode | null
   countryFactorCode?: string | null
@@ -91,6 +100,7 @@ export interface QuoteBuilderShellSubmitPayload {
   templateId: string | null
   organizationId: string | null
   contactIdentityProfileId: string | null
+  hubspotDealId: string | null
   description: string
   pricingModel: QuoteBuilderPricingModel
   currency: PricingOutputCurrency
@@ -112,6 +122,16 @@ interface QuoteOrganizationContact {
   roleLabel: string | null
   membershipType: string
   isPrimary: boolean
+}
+
+interface QuoteOrganizationDeal {
+  hubspotDealId: string
+  dealName: string
+  dealstage: string
+  dealstageLabel: string | null
+  pipelineName: string | null
+  isClosed: boolean
+  isWon: boolean
 }
 
 export interface QuoteBuilderShellProps {
@@ -170,6 +190,31 @@ const coercePricingModel = (value: string | null | undefined): QuoteBuilderPrici
   if (value === 'staff_aug' || value === 'retainer') return value
 
   return 'project'
+}
+
+const upsertOrganization = (
+  organizations: QuoteCreateOrganization[],
+  nextOrganization: QuoteCreateOrganization
+): QuoteCreateOrganization[] => {
+  const existingIndex = organizations.findIndex(org => org.organizationId === nextOrganization.organizationId)
+
+  if (existingIndex === -1) {
+    return [nextOrganization, ...organizations]
+  }
+
+  const next = [...organizations]
+
+  next[existingIndex] = nextOrganization
+
+  return next
+}
+
+const formatPartySelectorError = (error: PartySearchError): string => {
+  if (error.retryAfterSeconds && error.retryAfterSeconds > 0) {
+    return `${error.message} Intenta de nuevo en ${error.retryAfterSeconds}s.`
+  }
+
+  return error.message
 }
 
 const mapLineTypeFromV2 = (lineType: PricingV2LineType): QuoteLineItem['lineType'] => {
@@ -295,14 +340,23 @@ const QuoteBuilderShell = ({
   )
 
   const [builderState, setBuilderState] = useState<BuilderContextState>(initialBuilderState)
+  const [localOrganizations, setLocalOrganizations] = useState<QuoteCreateOrganization[]>(() => organizations)
   const [organizationId, setOrganizationId] = useState<string | null>(quote?.organizationId ?? null)
+  const [pendingOrganizationLabel, setPendingOrganizationLabel] = useState<string | null>(null)
 
   const [contactIdentityProfileId, setContactIdentityProfileId] = useState<string | null>(
     quote?.contactIdentityProfileId ?? null
   )
 
+  const [hubspotDealId, setHubspotDealId] = useState<string | null>(quote?.hubspotDealId ?? null)
+
   const [orgContacts, setOrgContacts] = useState<QuoteOrganizationContact[]>([])
   const [contactsLoading, setContactsLoading] = useState(false)
+  const [orgDeals, setOrgDeals] = useState<QuoteOrganizationDeal[]>([])
+  const [dealsLoading, setDealsLoading] = useState(false)
+
+  // TASK-539: inline deal creation from the Quote Builder
+  const [createDealDrawerOpen, setCreateDealDrawerOpen] = useState(false)
 
   const [pricingModel, setPricingModel] = useState<QuoteBuilderPricingModel>(
     coercePricingModel(quote?.pricingModel ?? null)
@@ -334,6 +388,149 @@ const QuoteBuilderShell = ({
     countryFactors: DEFAULT_COUNTRY_FACTORS,
     employmentTypes: []
   })
+
+  const unifiedPartySelectorEnabled = mode === 'create'
+
+  const {
+    query: partySearchQuery,
+    setQuery: setPartySearchQuery,
+    parties: partySearchResults,
+    hasMore: partySearchHasMore,
+    loading: partySearchLoading,
+    searchError: partySearchError,
+    adoptingCompanyId,
+    retrySearch: retryPartySearch,
+    clearSearch: clearPartySearch,
+    adoptParty
+  } = useParties({ enabled: unifiedPartySelectorEnabled })
+
+  const setOrganizationContext = useCallback((nextOrganizationId: string | null) => {
+    setOrganizationId(nextOrganizationId)
+    setContactIdentityProfileId(null)
+    setHubspotDealId(null)
+  }, [])
+
+  const partySelectorOptions = useMemo<QuoteContextPartySelectorOption[]>(
+    () =>
+      partySearchResults.map(result => ({
+        kind: result.kind,
+        organizationId: result.organizationId,
+        commercialPartyId: result.commercialPartyId,
+        hubspotCompanyId: result.hubspotCompanyId,
+        displayName: result.displayName,
+        lifecycleStage: result.lifecycleStage,
+        domain: result.domain ?? null,
+        canAdopt: result.canAdopt
+      })),
+    [partySearchResults]
+  )
+
+  const partySelectorLiveMessage = useMemo(() => {
+    if (!unifiedPartySelectorEnabled) return undefined
+
+    if (adoptingCompanyId) {
+      return GH_PRICING.contextChips.organization.unifiedAdopting
+    }
+
+    if (partySearchLoading) {
+      return 'Buscando organizaciones…'
+    }
+
+    if (partySearchError) {
+      return formatPartySelectorError(partySearchError)
+    }
+
+    const trimmedQuery = partySearchQuery.trim()
+
+    if (trimmedQuery.length < 2) {
+      return GH_PRICING.contextChips.organization.unifiedMinQuery
+    }
+
+    if (partySearchResults.length === 0) {
+      return GH_PRICING.contextChips.organization.unifiedEmpty
+    }
+
+    return partySearchHasMore
+      ? `${partySearchResults.length} resultados parciales disponibles.`
+      : `${partySearchResults.length} resultados disponibles.`
+  }, [
+    adoptingCompanyId,
+    partySearchError,
+    partySearchHasMore,
+    partySearchLoading,
+    partySearchQuery,
+    partySearchResults.length,
+    unifiedPartySelectorEnabled
+  ])
+
+  const handleOrganizationChange = useCallback(
+    (nextOrganizationId: string | null) => {
+      setPendingOrganizationLabel(null)
+      setOrganizationContext(nextOrganizationId)
+    },
+    [setOrganizationContext]
+  )
+
+  const handlePartySelection = useCallback(async (party: QuoteContextPartySelectorOption | null) => {
+    if (!party) {
+      setPendingOrganizationLabel(null)
+      setOrganizationContext(null)
+
+      return
+    }
+
+    if (party.kind === 'party' && party.organizationId) {
+      setPendingOrganizationLabel(null)
+      setLocalOrganizations(current =>
+        upsertOrganization(current, {
+          organizationId: party.organizationId as string,
+          organizationName: party.displayName
+        })
+      )
+      setOrganizationContext(party.organizationId)
+      clearPartySearch()
+
+      return
+    }
+
+    if (party.kind !== 'hubspot_candidate') {
+      return
+    }
+
+    setPendingOrganizationLabel(party.displayName)
+
+    try {
+      const adopted = await adoptParty(party as PartySearchItem)
+
+      if (!adopted) return
+
+      setLocalOrganizations(current =>
+        upsertOrganization(current, {
+          organizationId: adopted.organizationId,
+          organizationName: party.displayName
+        })
+      )
+      setOrganizationContext(adopted.organizationId)
+      clearPartySearch()
+      toast.success(GH_PRICING.contextChips.organization.unifiedAdopted, {
+        autoClose: 2400,
+        position: 'bottom-right'
+      })
+    } catch (caught) {
+      const nextError =
+        caught && typeof caught === 'object' && 'message' in caught
+          ? formatPartySelectorError(caught as PartySearchError)
+          : GH_PRICING.contextChips.organization.unifiedError
+
+      setError(nextError)
+      toast.error(nextError, {
+        autoClose: 4200,
+        position: 'bottom-right'
+      })
+    } finally {
+      setPendingOrganizationLabel(null)
+    }
+  }, [adoptParty, clearPartySearch, setOrganizationContext])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -422,6 +619,50 @@ const QuoteBuilderShell = ({
         setOrgContacts([])
       } finally {
         setContactsLoading(false)
+      }
+    })()
+
+    return () => controller.abort()
+  }, [organizationId])
+
+  useEffect(() => {
+    if (!organizationId) {
+      setOrgDeals([])
+      setDealsLoading(false)
+
+      return
+    }
+
+    const controller = new AbortController()
+
+    setDealsLoading(true)
+
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/commercial/organizations/${organizationId}/deals`, {
+          signal: controller.signal
+        })
+
+        if (!res.ok) {
+          console.warn(`[QuoteBuilderShell] deals fetch failed: ${res.status}`)
+          setOrgDeals([])
+
+          return
+        }
+
+        const payload = (await res.json()) as { items?: QuoteOrganizationDeal[] }
+        const items = payload.items ?? []
+
+        setOrgDeals(items)
+        setHubspotDealId(current =>
+          current && items.some(item => item.hubspotDealId === current) ? current : null
+        )
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return
+        console.warn('[QuoteBuilderShell] deals fetch error', err)
+        setOrgDeals([])
+      } finally {
+        setDealsLoading(false)
       }
     })()
 
@@ -726,8 +967,54 @@ const QuoteBuilderShell = ({
       return GH_PRICING.builderValidationLines
     }
 
+    const requiresHubSpotContext = requiresHubSpotQuoteCommercialContext({
+      hubspotDealId,
+      hubspotQuoteId: quote?.hubspotQuoteId ?? null,
+      sourceSystem: quote?.source ?? null
+    })
+
+    if (requiresHubSpotContext && !contactIdentityProfileId) {
+      return GH_PRICING.builderValidationHubspotContact
+    }
+
+    if (requiresHubSpotContext && !hubspotDealId) {
+      return GH_PRICING.builderValidationHubspotDeal
+    }
+
     return null
-  }, [builderState.description, organizationId, selectedTemplateId, linesSnapshot])
+  }, [
+    builderState.description,
+    contactIdentityProfileId,
+    hubspotDealId,
+    linesSnapshot,
+    organizationId,
+    quote?.hubspotQuoteId,
+    quote?.source,
+    selectedTemplateId
+  ])
+
+  const invalidFields = useMemo(() => {
+    const requiresHubSpotContext = requiresHubSpotQuoteCommercialContext({
+      hubspotDealId,
+      hubspotQuoteId: quote?.hubspotQuoteId ?? null,
+      sourceSystem: quote?.source ?? null
+    })
+
+    return {
+      organizationId: !organizationId && !selectedTemplateId ? GH_PRICING.builderValidationOrganization : undefined,
+      contactIdentityProfileId:
+        requiresHubSpotContext && !contactIdentityProfileId ? GH_PRICING.builderValidationHubspotContact : undefined,
+      hubspotDealId:
+        requiresHubSpotContext && !hubspotDealId ? GH_PRICING.builderValidationHubspotDeal : undefined
+    }
+  }, [
+    contactIdentityProfileId,
+    hubspotDealId,
+    organizationId,
+    quote?.hubspotQuoteId,
+    quote?.source,
+    selectedTemplateId
+  ])
 
   const handleSubmit = useCallback(async ({ closeAfter = true, issueAfterSave = false }: QuoteBuilderSubmitOptions = {}) => {
     const validation = validate()
@@ -840,6 +1127,7 @@ const QuoteBuilderShell = ({
           templateId: selectedTemplateId,
           organizationId,
           contactIdentityProfileId,
+          hubspotDealId,
           description: builderState.description.trim(),
           pricingModel,
           currency,
@@ -878,7 +1166,10 @@ const QuoteBuilderShell = ({
             validUntil: builderState.validUntil,
             businessLineCode: builderState.businessLineCode,
             commercialModel: builderState.commercialModel,
+            pricingEngineCommercialModel: builderState.commercialModel,
+            countryFactorCode: builderState.countryFactorCode,
             contactIdentityProfileId,
+            hubspotDealId,
             lineItems: persistedLineItems
           })
         })
@@ -915,7 +1206,8 @@ const QuoteBuilderShell = ({
             businessLineCode: builderState.businessLineCode,
             pricingModel,
             commercialModel: builderState.commercialModel,
-            contactIdentityProfileId
+            contactIdentityProfileId,
+            hubspotDealId
           })
         })
 
@@ -929,7 +1221,12 @@ const QuoteBuilderShell = ({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            lineItems: persistedLineItems
+            lineItems: persistedLineItems,
+            pricingContext: {
+              commercialModelCode: builderState.commercialModel,
+              countryFactorCode: builderState.countryFactorCode,
+              autoResolveAddons: 'internal_only'
+            }
           })
         })
 
@@ -958,6 +1255,7 @@ const QuoteBuilderShell = ({
     selectedTemplateId,
     organizationId,
     contactIdentityProfileId,
+    hubspotDealId,
     builderState,
     pricingModel,
     currency,
@@ -1028,8 +1326,13 @@ const QuoteBuilderShell = ({
   }, [handleSubmit, openCatalogPicker])
 
   const selectedOrgName = useMemo(
-    () => organizations.find(o => o.organizationId === organizationId)?.organizationName ?? null,
-    [organizations, organizationId]
+    () => localOrganizations.find(o => o.organizationId === organizationId)?.organizationName ?? pendingOrganizationLabel ?? null,
+    [localOrganizations, organizationId, pendingOrganizationLabel]
+  )
+
+  const selectedContact = useMemo(
+    () => orgContacts.find(contact => contact.identityProfileId === contactIdentityProfileId) ?? null,
+    [contactIdentityProfileId, orgContacts]
   )
 
   const baseTitle = mode === 'edit' && quote?.quotationNumber
@@ -1046,6 +1349,7 @@ const QuoteBuilderShell = ({
     () => ({
       organizationId,
       contactIdentityProfileId,
+      hubspotDealId,
       businessLineCode: builderState.businessLineCode,
       commercialModel: builderState.commercialModel,
       countryFactorCode: builderState.countryFactorCode,
@@ -1056,6 +1360,7 @@ const QuoteBuilderShell = ({
     [
       organizationId,
       contactIdentityProfileId,
+      hubspotDealId,
       builderState.businessLineCode,
       builderState.commercialModel,
       builderState.countryFactorCode,
@@ -1067,6 +1372,19 @@ const QuoteBuilderShell = ({
 
   const totalOutputCurrency = simulation?.totals.totalOutputCurrency ?? null
   const subtotalOutputCurrency = simulation?.totals.totalOutputCurrency ?? null // same for now — engine returns consolidated totalOutputCurrency
+
+  // TASK-530: preview IVA amount + total-con-IVA client-side so the summary
+  // dock shows Neto / IVA / Total. Uses the default Chile 19% rate; the
+  // server re-resolves the canonical rate from the catalogue at issue time.
+  // Engine output is NET (no IVA) — subtotal prop stays net; total prop
+  // becomes net + IVA so the dock headline matches the invoice.
+  const taxPreview = subtotalOutputCurrency !== null
+    ? previewChileTaxAmounts(subtotalOutputCurrency, 'cl_vat_19')
+    : null
+
+  const ivaAmountPreview = taxPreview?.taxAmount ?? null
+  const totalWithIvaPreview = taxPreview?.totalAmount ?? totalOutputCurrency
+
   const factorApplied = simulation?.totals.countryFactorApplied ?? null
   const marginPct = simulation?.aggregateMargin.marginPct ?? null
   const marginClass = simulation?.aggregateMargin.classification ?? null
@@ -1089,16 +1407,6 @@ const QuoteBuilderShell = ({
       tierLabel: tc.tier ? `Tier ${tc.tier}` : undefined
     }
   }, [simulation?.lines])
-
-  // Delta preview del chip del dock: suma de los addons visibles SUGERIDOS
-  // (no incluidos aún como línea). Representa cuánto más podría cobrarse al
-  // cliente si el comercial decide tildarlos todos. Los ya tildados ya están
-  // reflejados en el subtotal/total de la cotización.
-  const addonTotalDelta = useMemo(() => {
-    if (addonSuggestions.length === 0) return null
-
-    return addonSuggestions.reduce((sum, a) => sum + (a.amountOutputCurrency ?? 0), 0)
-  }, [addonSuggestions])
 
   // Suma de los addons ya aplicados como línea overhead_addon. El chip del
   // dock muestra este monto para dar contexto cuantitativo: "1 addon ·
@@ -1197,26 +1505,93 @@ const QuoteBuilderShell = ({
       <QuoteContextStrip
         values={contextValues}
         options={{
-          organizations,
+          organizations: localOrganizations,
           contacts: orgContacts,
           contactsLoading,
+          deals: orgDeals,
+          dealsLoading,
           businessLines: builderOptions.businessLines,
           commercialModels: builderOptions.commercialModels,
           countryFactors: builderOptions.countryFactors
         }}
+        organizationSelector={
+          unifiedPartySelectorEnabled
+            ? {
+                enabled: true,
+                searchValue: partySearchQuery,
+                selectedLabel: pendingOrganizationLabel,
+                options: partySelectorOptions,
+                loading: partySearchLoading || Boolean(adoptingCompanyId),
+                liveMessage: partySelectorLiveMessage,
+                errorMessage: partySearchError ? formatPartySelectorError(partySearchError) : null,
+                retryActionLabel: GH_PRICING.contextChips.organization.unifiedRetry,
+                minQueryMessage: GH_PRICING.contextChips.organization.unifiedMinQuery,
+                emptyMessage: partySearchHasMore
+                  ? `${GH_PRICING.contextChips.organization.unifiedEmpty} Hay más resultados disponibles.`
+                  : GH_PRICING.contextChips.organization.unifiedEmpty,
+                loadingText: adoptingCompanyId
+                  ? GH_PRICING.contextChips.organization.unifiedAdopting
+                  : 'Buscando organizaciones…',
+                searchPlaceholder: GH_PRICING.contextChips.organization.unifiedSearchPlaceholder,
+                onSearchChange: setPartySearchQuery,
+                onSelectParty: party => {
+                  void handlePartySelection(party)
+                },
+                onRetry: retryPartySearch
+              }
+            : undefined
+        }
+        invalidFields={invalidFields}
         disabled={submitting}
         organizationLocked={mode === 'edit'}
-        onOrganizationChange={nextId => {
-          setOrganizationId(nextId)
-          setContactIdentityProfileId(null)
-        }}
+        onOrganizationChange={handleOrganizationChange}
         onContactChange={setContactIdentityProfileId}
+        onDealChange={setHubspotDealId}
         onBusinessLineChange={code => setBuilderState(prev => ({ ...prev, businessLineCode: code }))}
         onCommercialModelChange={code => setBuilderState(prev => ({ ...prev, commercialModel: code }))}
         onCountryFactorChange={code => setBuilderState(prev => ({ ...prev, countryFactorCode: code }))}
         onCurrencyChange={value => setBuilderState(prev => ({ ...prev, outputCurrency: value }))}
         onDurationChange={months => setBuilderState(prev => ({ ...prev, contractDurationMonths: months }))}
         onValidUntilChange={iso => setBuilderState(prev => ({ ...prev, validUntil: iso }))}
+        onCreateDeal={submitting ? undefined : () => setCreateDealDrawerOpen(true)}
+      />
+
+      <CreateDealDrawer
+        open={createDealDrawerOpen}
+        onClose={() => setCreateDealDrawerOpen(false)}
+        organizationId={organizationId ?? ''}
+        organizationName={selectedOrgName}
+        quotationId={quote?.quotationId ?? null}
+        contactIdentityProfileId={contactIdentityProfileId}
+        defaultCurrency={currency as 'CLP' | 'USD' | 'CLF' | 'COP' | 'MXN' | 'PEN'}
+        defaultBusinessLineCode={builderState.businessLineCode}
+        selectedContact={selectedContact}
+        onSuccess={(response, meta) => {
+          // Immediately bind the new hubspot deal so the quote ties to it.
+          if (response.hubspotDealId) {
+            setHubspotDealId(response.hubspotDealId)
+
+            // Optimistic insert so the selector shows the new deal without a
+            // roundtrip. TASK-571: pull pipeline/stage + labels from the
+            // resolved selection returned by the backend — no more
+            // hardcoded `appointmentscheduled`.
+            setOrgDeals(current => {
+              const next: QuoteOrganizationDeal = {
+                hubspotDealId: response.hubspotDealId as string,
+                dealName: meta.dealName,
+                dealstage: response.stageUsed ?? 'pending',
+                dealstageLabel: response.stageLabelUsed ?? response.stageUsed,
+                pipelineName: response.pipelineLabelUsed ?? response.pipelineUsed,
+                isClosed: false,
+                isWon: false
+              }
+
+              return current.some(d => d.hubspotDealId === next.hubspotDealId)
+                ? current
+                : [next, ...current]
+            })
+          }
+        }}
       />
 
       <Box sx={{ px: { xs: 2, md: 3 }, py: { xs: 2, md: 3 } }}>
@@ -1242,6 +1617,13 @@ const QuoteBuilderShell = ({
             saving={submitting || serviceExpanding}
             businessLineCode={builderState.businessLineCode}
             canViewCostStack={canSeeCostStack}
+            canOverrideCost={canSeeCostStack}
+            onCostOverrideApplied={() => {
+              // TASK-481: refresh pricing después del override; re-seteamos
+              // el snapshot para que el hook de simulación recompute cost
+              // breakdown + margen con la metadata nueva persistida.
+              setLinesSnapshot(current => current.map(line => ({ ...line })))
+            }}
             simulationLines={simulation?.lines ?? null}
             outputCurrency={currency}
             structuredWarnings={mergedStructuredWarnings.length > 0 ? mergedStructuredWarnings : null}
@@ -1307,7 +1689,8 @@ const QuoteBuilderShell = ({
         <QuoteSummaryDock
           subtotal={subtotalOutputCurrency}
           factor={factorApplied}
-          total={totalOutputCurrency}
+          ivaAmount={ivaAmountPreview}
+          total={totalWithIvaPreview}
           currency={currency}
           loading={simulating}
           addonCount={addonPanelEntries.length}
@@ -1328,7 +1711,6 @@ const QuoteBuilderShell = ({
           marginClassification={marginClass}
           marginPct={marginPct}
           marginTierRange={marginTierRange}
-          addonTotalDelta={addonTotalDelta}
           appliedAddonsTotal={appliedAddonsTotal}
           saveState={saveState}
           simulationError={dockSimulationError}

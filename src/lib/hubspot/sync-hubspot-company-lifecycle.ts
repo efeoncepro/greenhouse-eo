@@ -13,6 +13,7 @@ import {
   type ClientLifecycleStageSource
 } from './company-lifecycle-store'
 import { publishCompanyLifecycleStageChanged } from './company-lifecycle-events'
+import { wasWrittenByGreenhouseRecently } from '@/lib/sync/anti-ping-pong'
 
 interface OrganizationLifecycleTarget extends Record<string, unknown> {
   organization_id: string
@@ -33,6 +34,7 @@ export interface HubSpotCompanyLifecycleSyncResult {
   updated: number
   changed: number
   skippedManualOverrides: number
+  skippedRecentGreenhouseWrites: number
   errors: string[]
 }
 
@@ -114,6 +116,7 @@ export const syncHubSpotCompanyLifecycles = async (): Promise<HubSpotCompanyLife
     updated: 0,
     changed: 0,
     skippedManualOverrides: 0,
+    skippedRecentGreenhouseWrites: 0,
     errors: []
   }
 
@@ -134,6 +137,7 @@ export const syncHubSpotCompanyLifecycles = async (): Promise<HubSpotCompanyLife
     const nextStage = resolveLifecycleStage(company)
     const nextSource = resolveLifecycleSource()
     const clientIds = target.client_ids ?? []
+    const recentGreenhouseWrite = wasWrittenByGreenhouseRecently(company.lifecycle.ghLastWriteAt, 60)
 
     let clientRows: ClientLifecycleRow[]
 
@@ -147,6 +151,11 @@ export const syncHubSpotCompanyLifecycles = async (): Promise<HubSpotCompanyLife
     }
 
     if (clientRows.length === 0) continue
+
+    if (recentGreenhouseWrite) {
+      result.skippedRecentGreenhouseWrites += clientRows.length
+      continue
+    }
 
     try {
       await withTransaction(async client => {

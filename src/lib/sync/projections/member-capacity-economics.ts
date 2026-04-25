@@ -671,7 +671,7 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
     `
       SELECT
         COUNT(*)::int AS expense_count,
-        COALESCE(SUM(total_amount_clp), 0) AS total_shared_overhead_target,
+        COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_shared_overhead_target,
         (
           SELECT COUNT(DISTINCT a2.member_id)::int
           FROM greenhouse_core.client_team_assignments a2

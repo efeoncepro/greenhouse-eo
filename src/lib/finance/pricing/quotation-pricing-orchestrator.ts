@@ -8,10 +8,14 @@ import type {
   DiscountHealthResult,
   LineCostResolutionResult,
   LineRecurrenceType,
+  PricingLineInputV2,
+  PricingLineOutputV2,
+  PricingOutputCurrency,
   QuotationBillingFrequency,
   QuotationDiscountType,
   QuotationLineType,
   QuotationPricingCurrency,
+  QuotationPricingReplayContext,
   QuotationPricingTotals,
   QuotationRevenueMetrics,
   RevenueMetricConfig,
@@ -21,17 +25,147 @@ import { resolveLineItemCost } from './costing-engine'
 import { convertCurrencyAmount, getExchangeRateOnOrBefore } from './currency-converter'
 import { aggregateQuotationTotals, computeLineItemTotals } from './line-item-totals'
 import { checkDiscountHealth } from './margin-health'
+import { buildPricingEngineOutputV2 } from './pricing-engine-v2'
 import { ensureQuotationLineInputsArePriced } from './quotation-line-input-validation'
 import {
   resolveMarginTarget,
   resolveRevenueMetricConfig
 } from './pricing-config-store'
 import { computeRevenueMetrics } from './revenue-metrics'
+import { buildQuotationTaxSnapshot } from './quotation-tax-snapshot'
+import { computeChileTaxSnapshot } from '@/lib/tax/chile'
 
 const round2 = (value: number): number => {
   if (!Number.isFinite(value)) return 0
 
   return Math.round(value * 100) / 100
+}
+
+const AUTO_REPRICE_LINE_TYPES = new Set<PricingLineInputV2['lineType']>([
+  'role',
+  'person',
+  'tool',
+  'overhead_addon'
+])
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const isPricingLineInputV2 = (value: unknown): value is PricingLineInputV2 => {
+  if (!isRecord(value) || typeof value.lineType !== 'string') return false
+
+  switch (value.lineType) {
+    case 'role':
+      return typeof value.roleSku === 'string'
+    case 'person':
+      return typeof value.memberId === 'string'
+    case 'tool':
+      return typeof value.toolSku === 'string'
+    case 'overhead_addon':
+      return typeof value.addonSku === 'string'
+    case 'direct_cost':
+      return typeof value.label === 'string' && Number.isFinite(Number(value.amount))
+    default:
+      return false
+  }
+}
+
+const isReplayContext = (value: unknown): value is QuotationPricingReplayContext => {
+  if (!isRecord(value)) return false
+
+  const commercialModelCode = value.commercialModelCode
+  const countryFactorCode = value.countryFactorCode
+  const autoResolveAddons = value.autoResolveAddons
+
+  return (
+    (commercialModelCode == null || typeof commercialModelCode === 'string') &&
+    (countryFactorCode == null || typeof countryFactorCode === 'string') &&
+    (autoResolveAddons == null ||
+      typeof autoResolveAddons === 'boolean' ||
+      autoResolveAddons === 'internal_only')
+  )
+}
+
+const buildResolvedCostBreakdownFromReplay = (
+  simulationLine: PricingLineOutputV2,
+  outputCurrency: PricingOutputCurrency
+): CostComponentBreakdown => ({
+  salaryComponent: null,
+  employerCosts: null,
+  directOverhead: null,
+  structuralOverhead: null,
+  loadedTotal: simulationLine.costStack.unitCostOutputCurrency,
+  costPerHour:
+    simulationLine.suggestedBillRate.pricingBasis === 'hour'
+      ? simulationLine.costStack.unitCostOutputCurrency
+      : null,
+  sourcePeriod: null,
+  sourceCompensationVersionId: null,
+  sourcePayrollPeriodId: null,
+  fxRateApplied: null,
+  fxRateDate: null,
+  sourceCurrency: outputCurrency,
+  targetCurrency: outputCurrency,
+  snapshotSource: 'pricing_engine_v2',
+  notes: simulationLine.resolutionNotes.join(' | '),
+  pricingV2CostBasisKind: simulationLine.costStack.costBasisKind ?? null,
+  pricingV2CostBasisSourceRef: simulationLine.costStack.costBasisSourceRef ?? null,
+  pricingV2CostBasisSnapshotDate: simulationLine.costStack.costBasisSnapshotDate ?? null,
+  pricingV2CostBasisConfidenceScore: simulationLine.costStack.costBasisConfidenceScore ?? null,
+  pricingV2CostBasisConfidenceLabel: simulationLine.costStack.costBasisConfidenceLabel ?? null,
+  pricingV2UnitCostUsd: simulationLine.costStack.unitCostUsd,
+  pricingV2UnitCostOutputCurrency: simulationLine.costStack.unitCostOutputCurrency,
+  pricingV2TotalCostUsd: simulationLine.costStack.totalCostUsd,
+  pricingV2TotalCostOutputCurrency: simulationLine.costStack.totalCostOutputCurrency
+})
+
+const buildMetadataFromPricingInput = (
+  pricingInput: PricingLineInputV2 | null | undefined
+): QuotationLineInput['metadata'] => {
+  if (!pricingInput) return null
+
+  switch (pricingInput.lineType) {
+    case 'role':
+      return {
+        pricingV2LineType: 'role',
+        sku: pricingInput.roleSku,
+        fteFraction: pricingInput.fteFraction ?? null,
+        periods: pricingInput.periods ?? null,
+        employmentTypeCode: pricingInput.employmentTypeCode ?? null
+      }
+    case 'person':
+      return {
+        pricingV2LineType: 'person',
+        sku: pricingInput.memberId,
+        fteFraction: pricingInput.fteFraction ?? null,
+        periods: pricingInput.periods ?? null
+      }
+    case 'tool':
+      return {
+        pricingV2LineType: 'tool',
+        sku: pricingInput.toolSku,
+        periods: pricingInput.periods ?? null
+      }
+    case 'overhead_addon':
+      return {
+        pricingV2LineType: 'overhead_addon',
+        sku: pricingInput.addonSku
+      }
+    case 'direct_cost':
+      return {
+        pricingV2LineType: 'direct_cost',
+        sku: null
+      }
+    default:
+      return null
+  }
+}
+
+export class UnsupportedQuotationReplayError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'UnsupportedQuotationReplayError'
+  }
 }
 
 export interface QuotationLineInput {
@@ -64,7 +198,15 @@ export interface QuotationLineInput {
   metadata?: {
     pricingV2LineType?: 'role' | 'person' | 'tool' | 'overhead_addon' | 'direct_cost'
     sku?: string | null
+    fteFraction?: number | null
+    periods?: number | null
+    employmentTypeCode?: string | null
+    moduleId?: string | null
+    serviceSku?: string | null
+    serviceLineOrder?: number | null
+    templateItemId?: string | null
   } | null
+  pricingInput?: PricingLineInputV2 | null
   resolvedCostBreakdown?: CostComponentBreakdown | null
   resolvedCostNotes?: string[] | null
 }
@@ -85,8 +227,18 @@ export interface QuotationPricingInput {
   globalDiscountValue?: number | null
   marginTargetPct?: number | null
   marginFloorPct?: number | null
+  pricingContext?: QuotationPricingReplayContext | null
   lineItems: QuotationLineInput[]
   createdBy: string
+
+  /**
+   * TASK-530: canonical Chile tax code for the header (defaults to
+   * `cl_vat_19`). Passed through to the tax snapshot builder.
+   */
+  taxCode?: string | null
+
+  /** TASK-530: optional space override for tenant-scoped tax catalogue. */
+  spaceId?: string | null
 }
 
 export interface PricedLineItem extends Omit<QuotationLineInput, 'recurrenceType'> {
@@ -267,6 +419,7 @@ const buildLineSnapshotJson = (snapshot: QuotationPricingSnapshot) =>
     memberId: line.memberId ?? null,
     roleCode: line.roleCode ?? null,
     productId: line.productId ?? null,
+    pricingInput: line.pricingInput ?? null,
     costBreakdown: line.costBreakdown,
     resolutionNotes: line.resolutionNotes
   }))
@@ -304,6 +457,16 @@ export const persistQuotationPricing = async (
           rateDate: input.quoteDate
         })
 
+  // TASK-530: compute the Chile tax snapshot from the net subtotal so the
+  // quote header persists `Neto / IVA / Total` explicitly and consistently
+  // across builder / detail / PDF / email.
+  const taxResolution = await buildQuotationTaxSnapshot({
+    netAmount: snapshot.totals.totalPrice,
+    taxCode: input.taxCode ?? null,
+    spaceId: input.spaceId ?? null,
+    issuedAt: input.quoteDate
+  })
+
   await withTransaction(async client => {
     await client.query(
       `UPDATE greenhouse_commercial.quotations
@@ -332,6 +495,13 @@ export const persistQuotationPricing = async (
              total_amount = $24,
              total_amount_clp = $25,
              exchange_rate_to_clp = $26,
+             pricing_context = $27::jsonb,
+             tax_code = $28,
+             tax_rate_snapshot = $29,
+             tax_amount_snapshot = $30,
+             tax_snapshot_json = $31::jsonb,
+             is_tax_exempt = $32,
+             tax_snapshot_frozen_at = NOW(),
              updated_at = CURRENT_TIMESTAMP
          WHERE quotation_id = $1`,
       [
@@ -360,7 +530,13 @@ export const persistQuotationPricing = async (
         snapshot.totals.totalPriceBeforeDiscount,
         snapshot.totals.totalPrice,
         totalAmountClp,
-        exchangeRateToClp
+        exchangeRateToClp,
+        JSON.stringify(input.pricingContext ?? {}),
+        taxResolution.taxCode,
+        taxResolution.rateSnapshot,
+        taxResolution.taxAmountSnapshot,
+        JSON.stringify(taxResolution.snapshot),
+        taxResolution.isTaxExempt
       ]
     )
 
@@ -375,6 +551,18 @@ export const persistQuotationPricing = async (
 
     for (const line of snapshot.lineItems) {
       sortCounter += 1
+
+      // TASK-530: every line inherits the header tax code. Per-line override
+      // is a follow-up; today the UI only edits the header. We still compute
+      // a per-line snapshot so PDF/detail can render IVA line-by-line if
+      // needed, and the header total remains the sum of the lines.
+      const lineNetAmount = Math.max(0, round2(line.subtotalAfterDiscount ?? line.subtotalPrice ?? 0))
+
+      const lineTaxSnapshot = computeChileTaxSnapshot({
+        code: taxResolution.record,
+        netAmount: lineNetAmount,
+        issuedAt: input.quoteDate
+      })
 
       await client.query(
         `INSERT INTO greenhouse_commercial.quotation_line_items (
@@ -400,6 +588,7 @@ export const persistQuotationPricing = async (
            unit,
            quantity,
            unit_cost,
+           pricing_input,
            cost_breakdown,
            subtotal_cost,
            unit_price,
@@ -411,13 +600,19 @@ export const persistQuotationPricing = async (
            effective_margin_pct,
            recurrence_type,
            currency,
-           notes
+           notes,
+           tax_code,
+           tax_rate_snapshot,
+           tax_amount_snapshot,
+           tax_snapshot_json,
+           is_tax_exempt
          ) VALUES (
            COALESCE($1, 'qli-' || gen_random_uuid()::text),
            $2, $3,
            (SELECT finance_quote_id FROM greenhouse_commercial.quotations WHERE quotation_id = $4),
            $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
-           $15, $16, $17, $18, $19, $20, $21, $22::jsonb, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33
+           $15, $16, $17, $18, $19, $20, $21, $22::jsonb, $23::jsonb, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34,
+           $35, $36, $37, $38::jsonb, $39
          )`,
         [
           line.lineItemId ?? null,
@@ -441,6 +636,7 @@ export const persistQuotationPricing = async (
           line.unit ?? 'unit',
           line.quantity,
           line.unitCost,
+          JSON.stringify(line.pricingInput ?? null),
           JSON.stringify(line.costBreakdown),
           line.subtotalCost,
           line.unitPrice,
@@ -452,7 +648,12 @@ export const persistQuotationPricing = async (
           line.effectiveMarginPct,
           line.recurrenceType,
           line.currencyResolved,
-          line.notes ?? null
+          line.notes ?? null,
+          taxResolution.taxCode,
+          taxResolution.rateSnapshot,
+          lineTaxSnapshot.taxAmount,
+          JSON.stringify(lineTaxSnapshot),
+          taxResolution.isTaxExempt
         ]
       )
     }
@@ -531,6 +732,7 @@ export interface RecalculateQuotationInput {
   quotationId: string
   createdBy: string
   createVersion?: boolean
+  strictReplay?: boolean
 }
 
 export const recalculateQuotationPricing = async (
@@ -549,13 +751,14 @@ export const recalculateQuotationPricing = async (
     global_discount_value: string | number | null
     target_margin_pct: string | number | null
     margin_floor_pct: string | number | null
+    pricing_context: unknown
     current_version: number
   }>(
     `SELECT quotation_id, business_line_code, currency, quote_date,
             billing_frequency, contract_duration_months,
             exchange_rates, exchange_snapshot_date,
             global_discount_type, global_discount_value,
-            target_margin_pct, margin_floor_pct, current_version
+            target_margin_pct, margin_floor_pct, pricing_context, current_version
      FROM greenhouse_commercial.quotations
      WHERE quotation_id = $1`,
     [input.quotationId]
@@ -601,51 +804,155 @@ export const recalculateQuotationPricing = async (
     hours_estimated: string | number | null
     unit: string
     quantity: string | number
+    unit_cost: string | number | null
     unit_price: string | number | null
     discount_type: string | null
     discount_value: string | number | null
     recurrence_type: string
     currency: string | null
     notes: string | null
+    cost_breakdown: unknown
+    pricing_input: unknown
   }>(
     `SELECT line_item_id, finance_line_item_id, finance_product_id, product_id,
             hubspot_line_item_id, hubspot_product_id, source_system, line_type,
             sort_order, line_number, label, description, member_id, role_code,
-            fte_allocation, hours_estimated, unit, quantity, unit_price,
-            discount_type, discount_value, recurrence_type, currency, notes
+            fte_allocation, hours_estimated, unit, quantity, unit_cost, unit_price,
+            discount_type, discount_value, recurrence_type, currency, notes,
+            cost_breakdown, pricing_input
      FROM greenhouse_commercial.quotation_line_items
      WHERE quotation_id = $1 AND version_number = $2
      ORDER BY sort_order ASC, created_at ASC`,
     [input.quotationId, quote.current_version]
   )
 
-  const lineItems: QuotationLineInput[] = linesRows.map(row => ({
-    lineItemId: row.line_item_id,
-    financeLineItemId: row.finance_line_item_id,
-    financeProductId: row.finance_product_id,
-    productId: row.product_id,
-    hubspotLineItemId: row.hubspot_line_item_id,
-    hubspotProductId: row.hubspot_product_id,
-    sourceSystem: row.source_system,
-    lineType: row.line_type as QuotationLineType,
-    sortOrder: row.sort_order,
-    lineNumber: row.line_number,
-    label: row.label,
-    description: row.description,
-    memberId: row.member_id,
-    roleCode: row.role_code,
-    seniorityLevel: null,
-    fteAllocation: row.fte_allocation != null ? Number(row.fte_allocation) : null,
-    hoursEstimated: row.hours_estimated != null ? Number(row.hours_estimated) : null,
-    unit: (row.unit as 'hour' | 'month' | 'unit' | 'project') || 'unit',
-    quantity: Number(row.quantity) || 0,
-    unitPrice: Number(row.unit_price) || 0,
-    discountType: (row.discount_type as QuotationDiscountType | null) ?? null,
-    discountValue: row.discount_value != null ? Number(row.discount_value) : null,
-    recurrenceType: (row.recurrence_type as LineRecurrenceType) ?? 'inherit',
-    currency: (row.currency as QuotationPricingCurrency | null) ?? null,
-    notes: row.notes
-  }))
+  const pricingContext = isReplayContext(quote.pricing_context) ? quote.pricing_context : null
+
+  const replayableRows = linesRows
+    .map(row => ({
+      row,
+      pricingInput: isPricingLineInputV2(row.pricing_input) ? row.pricing_input : null
+    }))
+    .filter(
+      (
+        candidate
+      ): candidate is {
+        row: (typeof linesRows)[number]
+        pricingInput: PricingLineInputV2
+      } =>
+        candidate.pricingInput != null &&
+        AUTO_REPRICE_LINE_TYPES.has(candidate.pricingInput.lineType)
+    )
+
+  const hasReplayableLines = replayableRows.length > 0
+
+  const canReplay =
+    hasReplayableLines &&
+    pricingContext?.commercialModelCode &&
+    pricingContext.countryFactorCode &&
+    ['CLP', 'USD', 'CLF'].includes(String(quote.currency || 'CLP'))
+
+  if (input.strictReplay && hasReplayableLines && !canReplay) {
+    throw new UnsupportedQuotationReplayError(
+      `Quotation ${input.quotationId} is missing pricing replay context.`
+    )
+  }
+
+  const replayOutputsByLineId = new Map<string, PricingLineOutputV2>()
+
+  if (canReplay) {
+    const replayResult = await buildPricingEngineOutputV2({
+      businessLineCode: quote.business_line_code,
+      commercialModel: pricingContext.commercialModelCode!,
+      countryFactorCode: pricingContext.countryFactorCode!,
+      outputCurrency: quote.currency as PricingOutputCurrency,
+      quoteDate,
+      lines: replayableRows.map(candidate => candidate.pricingInput),
+      autoResolveAddons: pricingContext.autoResolveAddons ?? 'internal_only'
+    })
+
+    replayableRows.forEach((candidate, index) => {
+      const replayLine = replayResult.lines[index]
+
+      if (replayLine) {
+        replayOutputsByLineId.set(candidate.row.line_item_id, replayLine)
+      }
+    })
+  }
+
+  if (input.strictReplay) {
+    const missingReplayLine = replayableRows.find(
+      candidate => !replayOutputsByLineId.has(candidate.row.line_item_id)
+    )
+
+    if (missingReplayLine) {
+      throw new UnsupportedQuotationReplayError(
+        `Quotation ${input.quotationId} has replayable lines without engine output.`
+      )
+    }
+  }
+
+  const lineItems: QuotationLineInput[] = linesRows.map(row => {
+    const pricingInput = isPricingLineInputV2(row.pricing_input) ? row.pricing_input : null
+    const replayOutput = replayOutputsByLineId.get(row.line_item_id)
+
+    const isAutoReplayLine =
+      pricingInput != null && AUTO_REPRICE_LINE_TYPES.has(pricingInput.lineType)
+
+    const persistedBreakdown = isRecord(row.cost_breakdown)
+      ? (row.cost_breakdown as unknown as CostComponentBreakdown)
+      : null
+
+    return {
+      lineItemId: row.line_item_id,
+      financeLineItemId: row.finance_line_item_id,
+      financeProductId: row.finance_product_id,
+      productId: row.product_id,
+      hubspotLineItemId: row.hubspot_line_item_id,
+      hubspotProductId: row.hubspot_product_id,
+      sourceSystem: row.source_system,
+      lineType: row.line_type as QuotationLineType,
+      sortOrder: row.sort_order,
+      lineNumber: row.line_number,
+      label: row.label,
+      description: row.description,
+      memberId: row.member_id,
+      roleCode: row.role_code,
+      seniorityLevel: null,
+      fteAllocation: row.fte_allocation != null ? Number(row.fte_allocation) : null,
+      hoursEstimated: row.hours_estimated != null ? Number(row.hours_estimated) : null,
+      unit: (row.unit as 'hour' | 'month' | 'unit' | 'project') || 'unit',
+      quantity: Number(row.quantity) || 0,
+      unitPrice: replayOutput
+        ? replayOutput.suggestedBillRate.unitPriceOutputCurrency
+        : Number(row.unit_price) || 0,
+      manualUnitCost: replayOutput
+        ? replayOutput.costStack.unitCostOutputCurrency
+        : !isAutoReplayLine && row.unit_cost != null
+          ? Number(row.unit_cost)
+          : null,
+      discountType: (row.discount_type as QuotationDiscountType | null) ?? null,
+      discountValue: row.discount_value != null ? Number(row.discount_value) : null,
+      recurrenceType: (row.recurrence_type as LineRecurrenceType) ?? 'inherit',
+      currency: (row.currency as QuotationPricingCurrency | null) ?? null,
+      notes: row.notes,
+      metadata: buildMetadataFromPricingInput(pricingInput),
+      pricingInput,
+      resolvedCostBreakdown: replayOutput
+        ? buildResolvedCostBreakdownFromReplay(
+            replayOutput,
+            quote.currency as PricingOutputCurrency
+          )
+        : !isAutoReplayLine
+          ? persistedBreakdown
+          : null,
+      resolvedCostNotes: replayOutput
+        ? replayOutput.resolutionNotes
+        : persistedBreakdown?.notes
+          ? [persistedBreakdown.notes]
+          : []
+    }
+  })
 
   return persistQuotationPricing(
     {
@@ -666,6 +973,7 @@ export const recalculateQuotationPricing = async (
         quote.global_discount_value != null ? Number(quote.global_discount_value) : null,
       marginTargetPct: quote.target_margin_pct != null ? Number(quote.target_margin_pct) : null,
       marginFloorPct: quote.margin_floor_pct != null ? Number(quote.margin_floor_pct) : null,
+      pricingContext,
       lineItems,
       createdBy: input.createdBy
     },

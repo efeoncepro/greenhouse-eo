@@ -524,18 +524,18 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-468` | `to-do`       | Payroll ↔ Commercial Employment Types Unification | `docs/tasks/to-do/TASK-468-payroll-commercial-employment-types-unification.md` |
 | `TASK-469` | `complete`    | Commercial Pricing Program — UI Interface Plan & Vuexy Component Inventory | `docs/tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md` |
 | `TASK-470` | `complete`    | Pricing Catalog Enterprise Hardening (Concurrency + Validation + Impact + Overcommit) | `docs/tasks/complete/TASK-470-pricing-catalog-enterprise-hardening.md` |
-| `TASK-471` | `to-do`       | Pricing Catalog Phase-4 UI Polish (Diff + Revert + Bulk + Impact + Maker-Checker + Excel) | `docs/tasks/to-do/TASK-471-pricing-catalog-phase-4-ui-polish.md` |
+| `TASK-471` | `complete`    | Pricing Catalog Phase-4 UI Polish (Diff + Revert + Bulk + Impact + Maker-Checker + Excel) | `docs/tasks/complete/TASK-471-pricing-catalog-phase-4-ui-polish.md` |
 | `TASK-472` | `to-do`       | Fix `/my/profile` SSR 500 in staging (resuelve ISSUE-054) | `docs/tasks/to-do/TASK-472-my-profile-ssr-500-fix.md` |
 | `TASK-473` | `to-do`       | Quote Builder Full-Page Surface Migration & Flow Recomposition | `docs/tasks/to-do/TASK-473-quote-builder-full-page-surface-migration.md` |
 | `TASK-474` | `to-do`       | Quote Builder Catalog / Service Reconnection Pass | `docs/tasks/to-do/TASK-474-quote-builder-catalog-reconnection-pass.md` |
 | `TASK-475` | `complete` | Greenhouse FX & Currency Platform Foundation | `docs/tasks/complete/TASK-475-greenhouse-fx-currency-platform-foundation.md` |
-| `TASK-476` | `to-do`       | Commercial Cost Basis Program | `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md` |
+| `TASK-476` | `complete`    | Commercial Cost Basis Program | `docs/tasks/complete/TASK-476-commercial-cost-basis-program.md` |
 | `TASK-477` | `to-do`       | Role Cost Assumptions Catalog & Effective-Dated Modeling | `docs/tasks/to-do/TASK-477-role-cost-assumptions-catalog.md` |
 | `TASK-478` | `complete`    | Tool & Provider Cost Basis Snapshots | `docs/tasks/complete/TASK-478-tool-provider-cost-basis-snapshots.md` |
 | `TASK-479` | `to-do`       | People Actual Cost + Blended Role Cost Snapshots | `docs/tasks/to-do/TASK-479-people-actual-cost-blended-role-snapshots.md` |
-| `TASK-480` | `to-do`       | Pricing Engine Cost Resolver, Provenance & Confidence | `docs/tasks/to-do/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md` |
-| `TASK-481` | `to-do`       | Quote Builder Suggested Cost UX & Override Governance | `docs/tasks/to-do/TASK-481-quote-builder-suggested-cost-override-governance.md` |
-| `TASK-482` | `to-do`       | Quoted vs Actual Margin Feedback Loop | `docs/tasks/to-do/TASK-482-quoted-vs-actual-margin-feedback-loop.md` |
+| `TASK-480` | `complete`    | Pricing Engine Cost Resolver, Provenance & Confidence | `docs/tasks/complete/TASK-480-pricing-engine-cost-resolver-provenance-confidence.md` |
+| `TASK-481` | `complete`    | Quote Builder Suggested Cost UX & Override Governance | `docs/tasks/complete/TASK-481-quote-builder-suggested-cost-override-governance.md` |
+| `TASK-482` | `in-progress` | Quoted vs Actual Margin Feedback Loop | `docs/tasks/in-progress/TASK-482-quoted-vs-actual-margin-feedback-loop.md` |
 | `TASK-483` | `complete` | Commercial Cost Basis Engine Runtime Topology & Worker Foundation | `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md` |
 | `TASK-484` | `complete`    | FX Provider Adapter Platform | `docs/tasks/complete/TASK-484-fx-provider-adapter-platform.md` |
 | `TASK-485` | `to-do`       | FX Coverage Rollout (manual_only → auto_synced) | `docs/tasks/to-do/TASK-485-fx-coverage-rollout.md` |
@@ -560,3 +560,157 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-504` | `complete` | Commercial Quotation Issuance Lifecycle & Approval-by-Exception | `docs/tasks/complete/TASK-504-commercial-quotation-issued-lifecycle-approval-by-exception.md` |
 | `TASK-505` | `complete` | Quote Summary Dock v2 — Enterprise Hierarchy + Primitives | `docs/tasks/complete/TASK-505-quote-summary-dock-v2-hierarchy.md` |
 | `TASK-506` | `complete` | Quote Builder Dock: CTA simplification + addons chip amount | `docs/tasks/complete/TASK-506-dock-cta-simplification.md` |
+| `TASK-507` | `complete` | Addons inline en la TotalsLadder (zone 3 = CTA-only) | `docs/tasks/complete/TASK-507-addons-inline-ladder.md` |
+| `TASK-508` | `complete` | Line row polish: chip consolidation + warning inline + density | `docs/tasks/complete/TASK-508-line-row-polish.md` |
+| `TASK-509` | `complete` | Floating UI en TotalsLadder (addons primitive self-contained) | `docs/tasks/complete/TASK-509-floating-ui-addons-primitive.md` |
+| `TASK-510` | `to-do` | Platform-wide Floating UI migration | `docs/tasks/to-do/TASK-510-floating-ui-platform-migration.md` |
+| `TASK-511` | `to-do` | Stack Modernization Roadmap (Linear/Stripe/Vercel 2026 bar) | `docs/tasks/to-do/TASK-511-stack-modernization-roadmap.md` |
+| `TASK-512` | `to-do` | react-toastify → sonner | `docs/tasks/to-do/TASK-512-toastify-to-sonner.md` |
+| `TASK-513` | `to-do` | @tanstack/react-query adoption (server state) | `docs/tasks/to-do/TASK-513-tanstack-react-query-adoption.md` |
+| `TASK-514` | `to-do` | ESLint 8 → 9 flat config migration | `docs/tasks/to-do/TASK-514-eslint-9-flat-config.md` |
+| `TASK-515` | `to-do` | jsonwebtoken → jose | `docs/tasks/to-do/TASK-515-jsonwebtoken-to-jose.md` |
+| `TASK-516` | `to-do` | NextAuth v4 → Auth.js v5 migration | `docs/tasks/to-do/TASK-516-nextauth-v4-to-authjs-v5.md` |
+| `TASK-517` | `to-do` | Playwright E2E smoke suite | `docs/tasks/to-do/TASK-517-playwright-e2e-smoke-suite.md` |
+| `TASK-518` | `to-do` | ApexCharts deprecation; consolidate on Recharts | `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md` |
+| `TASK-519` | `to-do` | react-datepicker → MUI X DatePicker | `docs/tasks/to-do/TASK-519-datepicker-to-mui-x.md` |
+| `TASK-520` | `to-do` | mapbox-gl → maplibre-gl | `docs/tasks/to-do/TASK-520-mapbox-to-maplibre.md` |
+| `TASK-521` | `to-do` | classnames → clsx + tailwind-merge | `docs/tasks/to-do/TASK-521-classnames-to-clsx-tailwind-merge.md` |
+| `TASK-522` | `to-do` | Install MSW (Mock Service Worker) for tests | `docs/tasks/to-do/TASK-522-msw-mock-layer.md` |
+| `TASK-523` | `to-do` | bcryptjs → @node-rs/argon2 (with re-hash policy) | `docs/tasks/to-do/TASK-523-bcryptjs-to-argon2.md` |
+| `TASK-524` | `to-do` | Income → HubSpot Invoice Bridge | `docs/tasks/to-do/TASK-524-income-hubspot-invoice-bridge.md` |
+| `TASK-525` | `to-do` | View Transitions API rollout (navegación animada nativa) | `docs/tasks/to-do/TASK-525-view-transitions-api-rollout.md` |
+| `TASK-526` | `to-do` | @formkit/auto-animate para list motion zero-config | `docs/tasks/to-do/TASK-526-auto-animate-list-motion.md` |
+| `TASK-527` | `to-do` | Rive interactive illustrations (next-gen Lottie) | `docs/tasks/to-do/TASK-527-rive-interactive-illustrations.md` |
+| `TASK-528` | `to-do` | Chile Tax / IVA Program | `docs/tasks/to-do/TASK-528-chile-tax-iva-program.md` |
+| `TASK-529` | `to-do` | Chile Tax Code Foundation | `docs/tasks/to-do/TASK-529-chile-tax-code-foundation.md` |
+| `TASK-530` | `to-do` | Quote Tax Explicitness (Chile IVA) | `docs/tasks/to-do/TASK-530-quote-tax-explicitness-chile-iva.md` |
+| `TASK-531` | `complete` | Income / Invoice Tax Convergence | `docs/tasks/complete/TASK-531-income-invoice-tax-convergence.md` |
+| `TASK-532` | `to-do` | Purchase VAT Recoverability | `docs/tasks/to-do/TASK-532-purchase-vat-recoverability.md` |
+| `TASK-533` | `complete` | Chile VAT Ledger & Monthly Position | `docs/tasks/complete/TASK-533-chile-vat-ledger-monthly-position.md` |
+| `TASK-534` | `complete` | Commercial Party Lifecycle & Quote-to-Cash Program (umbrella) | `docs/tasks/complete/TASK-534-commercial-party-lifecycle-program.md` |
+| `TASK-535` | `complete` | Party Lifecycle Schema & Commands Foundation (Fase A) | `docs/tasks/complete/TASK-535-party-lifecycle-schema-commands-foundation.md` |
+| `TASK-536` | `complete` | HubSpot Companies Inbound Prospect Sync (Fase B) | `docs/tasks/complete/TASK-536-hubspot-companies-inbound-prospect-sync.md` |
+| `TASK-537` | `complete` | Party Search & Adoption Endpoints (Fase C) | `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md` |
+| `TASK-538` | `complete` | Quote Builder Unified Party Selector (Fase D) | `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md` |
+| `TASK-539` | `complete` | Inline Deal Creation from Quote Builder (Fase E) | `docs/tasks/complete/TASK-539-inline-deal-creation-quote-builder.md` |
+| `TASK-540` | `complete` | HubSpot Lifecycle Outbound Sync (Fase F) | `docs/tasks/complete/TASK-540-hubspot-lifecycle-outbound-sync.md` |
+| `TASK-541` | `complete` | Quote-to-Cash Atomic Choreography (Fase G) | `docs/tasks/complete/TASK-541-quote-to-cash-atomic-choreography.md` |
+| `TASK-542` | `complete` | Party Lifecycle Admin Dashboards (Fase H) | `docs/tasks/complete/TASK-542-party-lifecycle-admin-dashboards.md` |
+| `TASK-543` | `complete` | Party Lifecycle Deprecation & Flag Cleanup (Fase I) | `docs/tasks/complete/TASK-543-party-lifecycle-deprecation-flag-cleanup.md` |
+| `TASK-544` | `to-do` | Commercial Product Catalog Sync Program (umbrella) | `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md` |
+| `TASK-545` | `to-do` | Product Catalog Schema & Materializer Foundation (Fase A) | `docs/tasks/to-do/TASK-545-product-catalog-schema-materializer-foundation.md` |
+| `TASK-546` | `to-do` | Product Catalog Source Handlers & Event Homogenization (Fase B) | `docs/tasks/to-do/TASK-546-product-catalog-source-handlers-events.md` |
+| `TASK-547` | `complete` | Product Catalog HubSpot Outbound Projection (Fase C) | `docs/tasks/complete/TASK-547-product-catalog-hubspot-outbound.md` |
+| `TASK-548` | `complete` | Product Catalog Drift Detection & Admin Center (Fase D) | `docs/tasks/complete/TASK-548-product-catalog-drift-detection-admin.md` |
+| `TASK-549` | `to-do` | Product Catalog Policy Enforcement & Legacy Cleanup (Fase E) | `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md` |
+| `TASK-550` | `complete` | Pricing Catalog Phase-5 Follow-ups (governance revert + tab gating + notifications + excel create/delete) | `docs/tasks/complete/TASK-550-pricing-catalog-phase-5-followups.md` |
+| `TASK-551` | `to-do` | Outbox Reactive Decoupling from Analytics Publish | `docs/tasks/to-do/TASK-551-outbox-reactive-decoupling.md` |
+| `TASK-552` | `to-do` | Multi-Currency Quote Output Follow-ups (email + bidirectional FX + locked rates + line history + drift alerts + client portal) | `docs/tasks/to-do/TASK-552-multi-currency-quote-output-followups.md` |
+| `TASK-553` | `to-do` | Quick Access Shortcuts Platform | `docs/tasks/to-do/TASK-553-quick-access-shortcuts-platform.md` |
+| `TASK-554` | `to-do` | Commercial Domain Navigation Separation | `docs/tasks/to-do/TASK-554-commercial-domain-navigation-separation.md` |
+| `TASK-555` | `to-do` | Commercial Access Model Foundation | `docs/tasks/to-do/TASK-555-commercial-access-model-foundation.md` |
+| `TASK-556` | `to-do` | Commercial Surface Adoption over Legacy Finance Paths | `docs/tasks/to-do/TASK-556-commercial-surface-adoption-over-legacy-finance-paths.md` |
+| `TASK-557` | `to-do` | Commercial Pipeline Lane Extraction | `docs/tasks/to-do/TASK-557-commercial-pipeline-lane-extraction.md` |
+| `TASK-558` | `to-do` | Ops Registry Schema, Parser & Repo Config Foundation | `docs/tasks/to-do/TASK-558-ops-registry-schema-parser-repo-config-foundation.md` |
+| `TASK-559` | `to-do` | Ops Registry Validation, Query CLI & Generated Outputs | `docs/tasks/to-do/TASK-559-ops-registry-validation-query-cli-generated-outputs.md` |
+| `TASK-560` | `to-do` | Ops Registry Human + Agent Surfaces | `docs/tasks/to-do/TASK-560-ops-registry-human-agent-surfaces.md` |
+| `TASK-561` | `to-do` | Ops Registry Federation Contract for Sister Repos | `docs/tasks/to-do/TASK-561-ops-registry-federation-contract-sister-repos.md` |
+| `TASK-562` | `to-do` | Quote Tax Explicitness Follow-ups (UI Selector + Per-Line Override + Email Integration + Multi-Jurisdiction) | `docs/tasks/to-do/TASK-562-quote-tax-explicitness-followups.md` |
+| `TASK-563` | `complete` | Product Catalog HubSpot Outbound Follow-ups (External Service Deploy + Custom Properties Apply + Anti-Ping-Pong Refactor + Batch Coalescing + E2E Staging) | `docs/tasks/complete/TASK-563-product-catalog-hubspot-outbound-followups.md` |
+| `TASK-564` | `to-do` | Quote Builder: Gate Deal Creation + Link-to-HubSpot-Company Fallback | `docs/tasks/to-do/TASK-564-quote-builder-deal-creation-hubspot-link-gating.md` |
+| `TASK-565` | `to-do` | Quote Builder Context Strip Modernization (Prominence Tiers + Blocking-Empty Semantics + Progress Counter) | `docs/tasks/to-do/TASK-565-quote-builder-context-strip-modernization.md` |
+| `TASK-566` | `to-do` | Typography Foundation: Geist + Poppins Theme Swap (EPIC-004 child 1/4) | `docs/tasks/to-do/TASK-566-typography-foundation-geist-poppins-theme.md` |
+| `TASK-567` | `to-do` | Typography Code Sweep + ESLint Governance Rule (EPIC-004 child 2/4) | `docs/tasks/to-do/TASK-567-typography-code-sweep-eslint-rule.md` |
+| `TASK-568` | `to-do` | Typography in Delivery Surfaces: Email Stack + PDF Font Registration (EPIC-004 child 3/4) | `docs/tasks/to-do/TASK-568-typography-email-pdf-font-registration.md` |
+| `TASK-569` | `to-do` | Typography Visual Regression + Figma Alignment + Skills/Docs Cleanup (EPIC-004 child 4/4) | `docs/tasks/to-do/TASK-569-typography-visual-regression-figma-docs.md` |
+| `TASK-570` | `complete` | Move "Crear deal nuevo" CTA into Deal Chip Popover Footer | `docs/tasks/complete/TASK-570-create-deal-cta-in-popover-footer.md` |
+| `TASK-571` | `complete` | Deal Creation Context Registry + Pipeline/Stage Governance | `docs/tasks/complete/TASK-571-deal-creation-context-pipeline-stage-governance.md` |
+| `TASK-572` | `complete` | Deploy `POST /deals` en el Cloud Run `hubspot-greenhouse-integration` | `docs/tasks/complete/TASK-572-hubspot-integration-post-deals-deploy.md` |
+| `TASK-573` | `complete` | Quote Builder Deal Birth Contract Completion & HubSpot Governance Hardening | `docs/tasks/complete/TASK-573-quote-builder-deal-birth-contract-completion.md` |
+| `TASK-574` | `complete` | Absorber el Cloud Run `hubspot-greenhouse-integration` en `services/` de `greenhouse-eo` | `docs/tasks/complete/TASK-574-absorb-hubspot-greenhouse-integration-service.md` |
+| `TASK-575` | `to-do` | Upgrade HubSpot Developer Platform + API calls del bridge a versión 2026.03 | `docs/tasks/to-do/TASK-575-hubspot-developer-platform-2026-upgrade.md` |
+| `TASK-576` | `to-do` | HubSpot Quote Publish Contract Completion | `docs/tasks/to-do/TASK-576-hubspot-quote-publish-contract-completion.md` |
+| `TASK-577` | `to-do` | Notion Write Bridge (HTTP service) — EPIC-005 child 1/6 | `docs/tasks/to-do/TASK-577-notion-write-bridge.md` |
+| `TASK-578` | `to-do` | Canonical Mapping Registry + Identity Extension Notion — EPIC-005 child 2/6 | `docs/tasks/to-do/TASK-578-canonical-mapping-registry-notion.md` |
+| `TASK-579` | `to-do` | Forward Orchestrator: Commercial → Delivery (HubSpot → Notion) — EPIC-005 child 3/6 | `docs/tasks/to-do/TASK-579-forward-orchestrator-commercial-to-delivery.md` |
+| `TASK-580` | `to-do` | Reverse Orchestrator: Delivery → Commercial (Notion → HubSpot) híbrido — EPIC-005 child 4/6 | `docs/tasks/to-do/TASK-580-reverse-orchestrator-hybrid-notion-to-commercial.md` |
+| `TASK-581` | `to-do` | Cutover de un tirón + sibling retirement + docs — EPIC-005 child 5/6 | `docs/tasks/to-do/TASK-581-notion-sync-cutover-and-sibling-retirement.md` |
+| `TASK-582` | `to-do` | Monthly Project Provisioning Admin Surface with Preview — EPIC-005 child 6/6 | `docs/tasks/to-do/TASK-582-monthly-project-provisioning-admin-surface.md` |
+| `TASK-583` | `to-do` | HubSpot Quote Native Publish & Tax Finalization | `docs/tasks/to-do/TASK-583-hubspot-quote-native-publish-tax-finalization.md` |
+| `TASK-584` | `in-progress` | PostgreSQL Migration Tooling Hardening | `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md` |
+| `TASK-585` | `in-progress` | Notion BQ Sync Cost Efficiency & Invocation Hardening | `docs/tasks/in-progress/TASK-585-notion-bq-sync-cost-efficiency-hardening.md` |
+| `TASK-586` | `to-do` | Notion Sync & Billing Export Observability in Admin Center | `docs/tasks/to-do/TASK-586-notion-sync-billing-observability.md` |
+| `TASK-587` | `complete` | HubSpot Products Full-Fidelity Bidirectional Sync Expansion (umbrella — 5 fases A-E cerradas) | `docs/tasks/complete/TASK-587-hubspot-products-full-fidelity-sync.md` |
+| `TASK-588` | `complete` | Project Title Resolution Hardening en Conformed Sync (fix ICO "Sin nombre") | `docs/tasks/complete/TASK-588-project-title-resolution-conformed-sync-hardening.md` |
+| `TASK-589` | `complete` | Finance Read Path Provisioning Decoupling & Directory Hardening | `docs/tasks/complete/TASK-589-finance-runtime-read-path-decoupling-clients-suppliers.md` |
+| `TASK-590` | `to-do` | ICO Signals Schema v2: identidad determinista + event store (EPIC-006 child 1/8) | `docs/tasks/to-do/TASK-590-ico-signals-schema-v2-identity-event-store.md` |
+| `TASK-591` | `to-do` | Reconcile-based materialize refactor + idempotencia (EPIC-006 child 2/8) | `docs/tasks/to-do/TASK-591-ico-signals-reconcile-materialize-refactor.md` |
+| `TASK-592` | `to-do` | Signal state machine + transitions API (EPIC-006 child 3/8) | `docs/tasks/to-do/TASK-592-ico-signals-state-machine-transitions-api.md` |
+| `TASK-593` | `to-do` | LLM enrichment con versioning + budget + quality gate (EPIC-006 child 4/8) | `docs/tasks/to-do/TASK-593-ico-signals-llm-enrichment-versioning-budget.md` |
+| `TASK-594` | `to-do` | Pipeline observability + SLIs + meta-alertas (EPIC-006 child 5/8) | `docs/tasks/to-do/TASK-594-ico-signals-observability-slis-meta-alerts.md` |
+| `TASK-595` | `to-do` | UI inbox operativo + timeline + filtros (EPIC-006 child 6/8) | `docs/tasks/to-do/TASK-595-ico-signals-inbox-ui-timeline-filters.md` |
+| `TASK-596` | `to-do` | Webhooks outbound + Nexa agent integration (EPIC-006 child 7/8) | `docs/tasks/to-do/TASK-596-ico-signals-webhooks-nexa-integration.md` |
+| `TASK-597` | `to-do` | Migración strangler fig + backfill + deprecate v1 (EPIC-006 child 8/8) | `docs/tasks/to-do/TASK-597-ico-signals-migration-cutover-deprecate-v1.md` |
+| `TASK-598` | `complete` | ICO Narrative Presentation Layer (resolve mentions + relevance filter + sanitization) | `docs/tasks/complete/TASK-598-ico-narrative-presentation-layer.md` |
+| `TASK-599` | `to-do` | Finance Preventive Test Lane (Playwright + Component + Route Resilience) | `docs/tasks/to-do/TASK-599-finance-preventive-test-lane.md` |
+| `TASK-600` | `to-do` | Reliability Registry & Signal Correlation Foundation | `docs/tasks/to-do/TASK-600-reliability-registry-signal-foundation.md` |
+| `TASK-601` | `complete` | Product Catalog Schema Extension + 4 Reference Tables (TASK-587 Fase A) | `docs/tasks/complete/TASK-601-product-catalog-schema-extension-ref-tables.md` |
+| `TASK-602` | `complete` | Product Catalog Multi-Currency Price Normalization (TASK-587 Fase B) | `docs/tasks/complete/TASK-602-product-catalog-multi-currency-prices.md` |
+| `TASK-603` | `complete` | HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C) | `docs/tasks/complete/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md` |
+| `TASK-604` | `complete` | HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D) | `docs/tasks/complete/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md` |
+| `TASK-605` | `complete` | Product Catalog Admin UI + Backfill + Reconcile + Governance (TASK-587 Fase E) | `docs/tasks/complete/TASK-605-product-catalog-admin-ui-backfill-governance.md` |
+| `TASK-606` | `to-do` | Space 360 Motion Consistency & Empty State Follow-up | `docs/tasks/to-do/TASK-606-space-360-motion-consistency-empty-state-followup.md` |
+| `TASK-607` | `to-do` | GitHub Actions Node.js 24 Migration (5 workflows restantes) | `docs/tasks/to-do/TASK-607-github-actions-nodejs-24-migration.md` |
+| `TASK-608` | `to-do` | Product Catalog Price History (effective_at) — follow-up aditivo de TASK-602 | `docs/tasks/to-do/TASK-608-product-catalog-price-history.md` |
+| `TASK-609` | `to-do` | AI Quote Draft Assistant (intent -> canonical draft + QA guardrails) | `docs/tasks/to-do/TASK-609-ai-quote-draft-assistant.md` |
+| `TASK-610` | `complete` | Content Sanitization Runtime Isolation + Shared Policy Layer | `docs/tasks/complete/TASK-610-content-sanitization-runtime-isolation-shared-policy-layer.md` |
+| `TASK-611` | `to-do` | Organization Workspace Facet Projection & Fine-Grained Entitlements Foundation | `docs/tasks/to-do/TASK-611-organization-workspace-facet-projection-entitlements-foundation.md` |
+| `TASK-612` | `to-do` | Shared Organization Workspace Shell Convergence | `docs/tasks/to-do/TASK-612-shared-organization-workspace-shell-convergence.md` |
+| `TASK-613` | `to-do` | Finance Clients Detail -> Organization Workspace Convergence | `docs/tasks/to-do/TASK-613-finance-clients-organization-workspace-convergence.md` |
+| `TASK-614` | `to-do` | People / Payroll Economy Facet & Entitlements Hardening | `docs/tasks/to-do/TASK-614-people-payroll-economy-facet-entitlements-hardening.md` |
+| `TASK-615` | `to-do` | Quote Builder Flow Orchestration & UX Hardening | `docs/tasks/to-do/TASK-615-quote-builder-flow-orchestration-ux-hardening.md` |
+| `TASK-616` | `complete` | API Platform Foundation & Ecosystem Read Surface V1 | `docs/tasks/complete/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md` |
+| `TASK-617` | `to-do` | API Platform V1.1 Convergence Program | `docs/tasks/to-do/TASK-617-api-platform-v1-1-convergence-program.md` |
+| `TASK-617.1` | `to-do` | API Platform REST Hardening | `docs/tasks/to-do/TASK-617.1-api-platform-rest-hardening.md` |
+| `TASK-617.2` | `to-do` | API Platform First-Party App Surface Foundation | `docs/tasks/to-do/TASK-617.2-api-platform-first-party-app-surface-foundation.md` |
+| `TASK-617.3` | `to-do` | API Platform Event Control Plane | `docs/tasks/to-do/TASK-617.3-api-platform-event-control-plane.md` |
+| `TASK-617.4` | `to-do` | Developer API Documentation Portal | `docs/tasks/to-do/TASK-617.4-developer-api-documentation-portal.md` |
+| `TASK-619` | `to-do` | Quote eSignature (consumer del foundation neutro de firma) | `docs/tasks/to-do/TASK-619-quote-esignature-zapsign.md` |
+| `TASK-619.1` | `to-do` | Signed PDF Storage Hardening (bucket separado + retention 10 anos + multi-region) | `docs/tasks/to-do/TASK-619.1-signed-pdf-storage-hardening.md` |
+| `TASK-619.2` | `to-do` | Signature Operational Worker (reconciliation + expiry alerting + DLQ) | `docs/tasks/to-do/TASK-619.2-signature-operational-worker.md` |
+| `TASK-619.3` | `to-do` | Quote Signature Notifications (email + in-app + Slack reactors) | `docs/tasks/to-do/TASK-619.3-quote-signature-notifications.md` |
+| `TASK-620` | `to-do` | Sellable Catalog Unification (sellable_tools + sellable_artifacts + service_module_children schema desde dia 1) | `docs/tasks/to-do/TASK-620-sellable-catalog-unification.md` |
+| `TASK-620.1` | `to-do` | Tools as Sellable Standalone (refactor service_tool_recipe -> sellable_tools FK + canonical pricing) | `docs/tasks/to-do/TASK-620.1-tools-as-sellable-standalone.md` |
+| `TASK-620.1.1` | `to-do` | Tool Partner Program (Adobe / Microsoft / HubSpot reseller tracking + commission accounting) | `docs/tasks/to-do/TASK-620.1.1-tool-partner-program.md` |
+| `TASK-620.2` | `to-do` | Artifacts Catalog (sellable_artifacts hibrido: priced standalone o absorbido en horas) | `docs/tasks/to-do/TASK-620.2-artifacts-catalog.md` |
+| `TASK-620.3` | `to-do` | Service Module Composer with Native Nesting (composer recursivo depth 3 + cycle detection + constraints UI nesting-aware) | `docs/tasks/to-do/TASK-620.3-service-module-composer-native-nesting.md` |
+| `TASK-620.4` | `to-do` | Quote Builder Direct Picker (autocomplete a 4 catalogos: roles + tools + artifacts + services) | `docs/tasks/to-do/TASK-620.4-quote-builder-direct-picker.md` |
+| `TASK-620.5` | `to-do` | Ad-hoc Bundle Composer in Quote (modal inline + flag is_ad_hoc + promote-to-catalog) | `docs/tasks/to-do/TASK-620.5-adhoc-bundle-composer.md` |
+| `TASK-627` | `cancelled` | Service Bundle Nesting (ABSORBIDA en TASK-620.3 v1.8 — nesting in-baked desde dia 1) | `docs/tasks/cancelled/TASK-627-service-bundle-nesting.md` |
+| `TASK-630` | `to-do` | Rich Text Editor TipTap en admin product-catalog (componente reusable GreenhouseRichTextEditor) | `docs/tasks/to-do/TASK-630-rich-text-editor-tiptap.md` |
+| `TASK-630.1` | `to-do` | Backfill productos legacy con descripcion plana envuelta en `<p>` (74 productos) | `docs/tasks/to-do/TASK-630.1-backfill-products-rich-html.md` |
+| `TASK-630.2` | `to-do` | AI-assisted Description Generator (boton Generar con AI usando @google/genai) | `docs/tasks/to-do/TASK-630.2-ai-description-generator.md` |
+| `TASK-557.1` | `to-do` | Legacy Quotes Cleanup & Limbo State Audit (legacy_status normalization + legacy_excluded flag) | `docs/tasks/to-do/TASK-557.1-legacy-quotes-cleanup-audit.md` |
+| `TASK-619.4` | `to-do` | HubSpot Bidirectional Signature Sync (deal stage Signed - Awaiting Invoice + anti-ping-pong + conflict resolution) | `docs/tasks/to-do/TASK-619.4-hubspot-bidirectional-signature-sync.md` |
+| `TASK-619.5` | `to-do` | Cost Guardrails + GDPR Signer Anonymization (tenant_quotas + envelope/AI rate limits + anonymize endpoint) | `docs/tasks/to-do/TASK-619.5-cost-guardrails-gdpr-anonymization.md` |
+| `TASK-620.6` | `to-do` | HubSpot Field Mapping Detallado (sellable_tools + sellable_artifacts + nested service_modules outbound contract v3) | `docs/tasks/to-do/TASK-620.6-hubspot-field-mapping-extended.md` |
+| `TASK-620.7` | `to-do` | Catalog Lifecycle & Sunset (service_module_lifecycle states + soft-delete unified + sunset notifications) | `docs/tasks/to-do/TASK-620.7-catalog-lifecycle-sunset.md` |
+| `TASK-621` | `to-do` | Commercial Analytics Dashboards (win/loss + velocity + discount + renewal rate + MRR + program adoption metrics) | `docs/tasks/to-do/TASK-621-commercial-analytics-dashboards.md` |
+| `TASK-622` | `to-do` | Multi-level Approval + Permission Hierarchy (sales_rep / account_lead / sales_lead / finance_admin scopes + escalation) | `docs/tasks/to-do/TASK-622-multi-level-approval-permission-hierarchy.md` |
+| `TASK-623` | `to-do` | Tier/Volume/Graduated Pricing Engine (pricingModel: flat \| volume \| graduated, commitment discounts) | `docs/tasks/to-do/TASK-623-tier-volume-graduated-pricing-engine.md` |
+| `TASK-624` | `to-do` | Renewal Engine + Co-term + Alerting Cascade (cron 90/30/7 + auto-renewal quote + service_renewal_alerts) | `docs/tasks/to-do/TASK-624-renewal-engine-coterm-alerting.md` |
+| `TASK-625` | `to-do` | Multi-language i18n del Programa CPQ (PDF + composer UI + notifications + ZapSign templates ES/EN) | `docs/tasks/to-do/TASK-625-multi-language-cpq-i18n.md` |
+| `TASK-626` | `to-do` | Tax Engine LATAM Extendido (Colombia IVA + Mexico IVA + Peru IGV + Brazil ICMS futuro, plugin per-pais) | `docs/tasks/to-do/TASK-626-tax-engine-latam-extended.md` |
+| `TASK-627.1` | `to-do` | Quote Cloning + Templating from Prior Quote (POST /clone, override cliente/version/pricing) | `docs/tasks/to-do/TASK-627.1-quote-cloning-templating.md` |
+| `TASK-628` | `to-do` | Quote Amendment Engine (amendment vs re-quote, signed quotes mantienen continuidad legal) | `docs/tasks/to-do/TASK-628-quote-amendment-engine.md` |
+| `TASK-628.1` | `to-do` | Audit Timeline UI (visibility en QuoteDetailView de audit_log + outbox events + diff viewer entre versiones) | `docs/tasks/to-do/TASK-628.1-audit-timeline-ui.md` |
+| `TASK-631.1` | `to-do` | Quote Share Pipeline Hardening Test Suite (PDF cache + email + short-link + redirect blast-radius coverage) | `docs/tasks/to-do/TASK-631.1-quote-share-pipeline-hardening-tests.md` |
+| `TASK-631.2` | `to-do` | Contract Version Enforcement (frozen contracts + auto-bump QUOTE_PDF_TEMPLATE_VERSION + Zod schemas) | `docs/tasks/to-do/TASK-631.2-contract-version-enforcement.md` |
+| `TASK-629` | `complete` | PDF Cotización Enterprise Redesign (single template + secciones condicionales + brand assets + QR signed) | `docs/tasks/complete/TASK-629-pdf-cotizacion-enterprise-redesign.md` |
+| `TASK-632` | `to-do` | Reliability Synthetic Monitoring (rutas críticas del registry — cron periódico de GET autenticado + adapter kind=runtime) | `docs/tasks/to-do/TASK-632-reliability-synthetic-monitoring-routes.md` |
+| `TASK-633` | `to-do` | Reliability Change-Based Verification Matrix (PR diff → módulos afectados → smoke + signal verify, status check obligatorio) | `docs/tasks/to-do/TASK-633-reliability-change-based-verification-matrix.md` |
+| `TASK-634` | `to-do` | Reliability Sentry Incident → Module Correlator (rules-first path/title → module, LLM como tiebreaker opcional) | `docs/tasks/to-do/TASK-634-reliability-sentry-incident-module-correlator.md` |
+| `TASK-635` | `to-do` | Reliability Registry DB Persistence + Tenant Overrides (híbrido: seed estático mantiene defaults, DB guarda overrides per-tenant + SLOs) | `docs/tasks/to-do/TASK-635-reliability-registry-db-persistence-tenant-overrides.md` |
+| `TASK-636` | `to-do` | Vercel Billing FOCUS Cost Observability in Admin Center | `docs/tasks/to-do/TASK-636-vercel-billing-focus-observability.md` |
+| `TASK-637` | `to-do` | GitHub Billing & Actions Cost Observability in Admin Center | `docs/tasks/to-do/TASK-637-github-billing-actions-cost-observability.md` |
+| `TASK-638` | `complete` | Reliability AI Observer (Gemini watcher hosted en ops-worker + Cloud Scheduler) | `docs/tasks/complete/TASK-638-reliability-ai-observer.md` |

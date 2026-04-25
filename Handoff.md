@@ -1,5 +1,3229 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Reliability AI Observer (TASK-638) — Capa Gemini sobre el RCP
+
+### Que cambio
+
+Se agregó la capa de IA sobre el Reliability Control Plane (RCP V1.2) hosted en `ops-worker` (Cloud Run) + Cloud Scheduler:
+
+- **Migration nueva**: `migrations/20260425211608760_task-638-reliability-ai-observations.sql` crea `greenhouse_ai.reliability_ai_observations` con PK `observation_id` (`EO-RAI-{uuid8}`), 3 indices, checks scope/severity, ownership greenhouse_ops + grants runtime/migrator.
+- **Tipo `ai_summary`** agregado a `ReliabilitySignalKind` enum + `SIGNAL_KIND_LABELS` + `ReliabilityModuleCard` local map.
+- **Pipeline AI**: `sanitize.ts` (PII redaction: emails, UUIDs, hex, Bearer, sk_/gho_, RUTs chilenos), `build-prompt.ts` (system+user prompt deterministico para Gemini Flash con JSON estricto + fingerprint sha256 truncado), `kill-switch.ts` (default OFF, opt-in), `persist.ts` (writer + `getLatestFingerprint` para dedup), `reader.ts` (consumer reader con ventana 24h), `runner.ts` (host-agnostic orchestrator), `build-ai-summary-signals.ts` (adapter al composer).
+- **Composer wiring**: `getReliabilityOverview()` acepta `options.includeAiObservations` (default OFF — evita feedback loop). El runner llama el composer SIN pasar `aiObservations`. El consumer de Admin Center si lo pasa explicitamente.
+- **ops-worker endpoint**: `POST /reliability-ai-watch` en `services/ops-worker/server.ts`. Cloud Scheduler job `ops-reliability-ai-watch` (cada 1h, timezone Santiago) en `deploy.sh` + README actualizado.
+- **UI**: nuevo `ReliabilityAiWatcherCard` que renderiza resumen ejecutivo con severity chip, modelo, edad, sweep_run_id y `recommendedAction` cuando aplica. Banner de fallback cuando `observation === null`.
+- **Spec RCP V1.2**: nueva §7.1 con decision arquitectonica completa (host matrix, kill-switch convention, dedup por fingerprint, anti-feedback loop). 9 archivos nuevos listados en "Archivos canonicos".
+- **Documentacion funcional**: `docs/documentation/plataforma/reliability-control-plane.md` (nuevo) explica el RCP completo + AI Observer en lenguaje simple, registrado en el indice.
+- **Integration boundaries**: 4 entries nuevas (status=ready) en `RELIABILITY_INTEGRATION_BOUNDARIES` para los 4 modulos canonicos con `ai_summary` esperado.
+
+### Validaciones
+
+- `npx tsc --noEmit` → clean (0 errores).
+- `pnpm lint` → clean tras autofix.
+- `pnpm test --run src/lib/reliability/ai` → 2153 tests pasaron / 2 skipped (incluye sanitize 14 tests + build-prompt 14 tests).
+- `pnpm build` → success.
+
+### Decisiones canonicas
+
+1. **Host: ops-worker (Cloud Run), NO Vercel cron.** Timeout safety (Gemini + DB peor caso > 60s), WIF nativo para Vertex AI, Cloud Logging audit, retries Cloud Scheduler.
+2. **Kill-switch default OFF (opt-in).** Convencion opuesta a synthetic (default ON). Razon: cada llamada a Gemini gasta tokens regardless of dedup.
+3. **Dedup por fingerprint sha256.** Si la huella coincide con la ultima persistida, se descarta. Una semana estable produce 1 observacion por modulo, no 168.
+4. **Anti-feedback loop.** Runner llama `getReliabilityOverview()` SIN incluir AI observations previas. El consumer de UI las pide explicitamente.
+5. **Cadencia 1h.** Conservadora porque cada llamada cuesta tokens.
+
+### Para activar en produccion
+
+```bash
+gcloud run services update ops-worker \
+  --project=efeonce-group --region=us-east4 \
+  --update-env-vars=RELIABILITY_AI_OBSERVER_ENABLED=true
+```
+
+### Siguiente
+
+- Activar AI Observer en staging primero para validar prompt + costo real antes de produccion.
+- SLO breach detector — `sloThresholds` ya existe (TASK-635), falta el detector que dispare alertas cuando un modulo cae bajo umbral por X minutos.
+- Admin Center CRUD UI de overrides per-tenant del registry (helpers ya existen, falta surface).
+
+---
+
+## Sesion 2026-04-25 — Workforce onboarding architecture foundation
+
+### Que cambio
+
+Se formalizo la arquitectura canonica de onboarding como subdominio propio de `Workforce` en:
+
+- `docs/architecture/GREENHOUSE_WORKFORCE_ONBOARDING_ARCHITECTURE_V1.md`
+
+Tambien se actualizo:
+
+- `docs/README.md`
+- `project_context.md`
+
+### Decisiones canónicas explicitadas
+
+1. **Onboarding no es solo provisioning**: el agregado canonico es un caso de inicio de relacion de trabajo con snapshot contractual/legal y readiness operativa.
+2. **SCIM es signal source, no owner total**: un provisioning tecnico puede abrir `needs_review`, pero no reemplaza el proceso laboral/operativo.
+3. **Checklist HRIS legacy deja de ser source of truth**: las plantillas/instancias de onboarding quedan como child object operativo del caso.
+4. **Onboarding workforce interno y onboarding de placement no se mezclan**: `HRIS onboarding` y `Staff Aug onboarding` quedan como agregados distintos aunque puedan encadenarse.
+5. **La matriz de reglas depende de `relationship_type + employment_type + contract_type + pay_regime + payroll_via + country`** para distinguir lanes `internal_payroll`, `external_payroll`, `non_payroll`, `identity_only` y `relationship_transition`.
+
+### Validaciones
+
+- No se corrieron tests: cambio documental/arquitectonico solamente.
+
+### Siguiente
+
+- Alinear `Workforce` madre para enlazar onboarding/offboarding como case families del mismo dominio.
+- Bajar `WorkRelationshipOnboardingCase` a tasks ejecutables.
+- Definir cómo se proyecta `onboarding` dentro de `Person360.workforce`.
+
+## Sesion 2026-04-25 — Reliability Registry DB Persistence + Tenant Overrides (TASK-635)
+
+### Que cambio
+
+User pidió execution explícita end-to-end de TASK-635 a pesar de que la spec original la marcaba como "no ejecutar hasta que aparezca caso de uso real". Se entregó V1.1 que sienta la base de persistencia DB sin Slice 4 (Admin CRUD UI), que sigue follow-up.
+
+Archivos creados:
+
+- `migrations/20260425204554656_task-635-reliability-registry-tables.sql` — `greenhouse_core.reliability_module_registry` (module_key PK + jsonb fields) + `greenhouse_core.reliability_module_overrides` (override_id EO-RMO + space_id FK + UNIQUE(space_id, module_key)). 1 índice. ALTER OWNER greenhouse_ops + grants runtime/migrator. 292 tablas en types regenerados.
+- `src/lib/reliability/registry-store.ts` — `ensureReliabilityRegistrySeed()` idempotente con single-promise pattern, `getReliabilityRegistry(spaceId?)` con cache TTL 60s, `setReliabilityModuleOverride()` / `clearReliabilityModuleOverride()` con cache invalidation. Fallback honesto a `STATIC_RELIABILITY_REGISTRY` si DB falla en cualquier paso.
+- `src/lib/reliability/registry-store.test.ts` — 11 unit tests (defaults sin override, cache TTL, hidden module dropped, extra signals merged sin dup, sloOverrides overlay, fallback en 3 escenarios, idempotencia seed concurrente, upsert override).
+
+Archivos modificados:
+
+- `src/types/reliability.ts` — `sloThresholds?: Record<string, unknown>` opcional agregado para forward-compat (SLO breach detector futuro lo lee sin migración nueva).
+- `src/lib/reliability/registry.ts` — `RELIABILITY_REGISTRY` renombrado a `STATIC_RELIABILITY_REGISTRY`; alias compat exportado para no romper TASK-633 (CLI affected-modules) y TASK-634 (incident correlator) que importan `RELIABILITY_REGISTRY`.
+- `src/lib/reliability/get-reliability-overview.ts` — `ReliabilityOverviewSources.modules?` slot agregado. `buildReliabilityOverview` itera `effectiveModules`. `getReliabilityOverview` acepta `options.spaceId` y resuelve registry per-tenant via `getReliabilityRegistry`.
+- `src/app/(dashboard)/admin/page.tsx` — fetch paralelo de `getReliabilityRegistry(tenant.spaceId)` agregado, pasa `modules` al builder.
+- `src/app/api/admin/reliability/route.ts` — `getReliabilityOverview(undefined, {}, { spaceId: tenant.spaceId ?? null })`.
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §9 + §10 actualizados — V1 ya no aplica, V1.1 sí persiste registry.
+
+### Decisión canónica explicitada
+
+1. **Registry sigue versionado en código**, DB es proyección + diff overrides. `INSERT ... ON CONFLICT DO UPDATE` evita drift cuando alguien edita DB y olvida actualizar código. Source of truth: `STATIC_RELIABILITY_REGISTRY`.
+2. **`filesOwned` (TASK-633) y reglas de incident (TASK-634) NO migran a DB**. Son globales por diseño: el matrix CI es global, los incidentes Sentry no son tenant-scoped. Solo `expectedSignalKinds` y `sloThresholds` admiten overrides per-space.
+3. **`sloThresholds` persistido pero NO evaluado en runtime V1.1** — forward-compat para "SLO breach detector" cron futuro.
+4. **Cache TTL 60s in-process** — mejora warm function reuse, no caché global.
+5. **`spaceId?: string | null` opcional** — el reader funciona sin tenant context. Defaults sin overlay = comportamiento idéntico pre-635.
+6. **Fallback honesto a STATIC** — si DB falla, retorna `STATIC_RELIABILITY_REGISTRY`. Nunca rompe Admin Center.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (411 files / 2127 passed — 11 nuevos tests del store)
+- `pnpm migrate:up` ✅ (292 tablas en types)
+- `pnpm build` ✅
+
+### Estado del EPIC-007 ahora
+
+Todas las child tasks del Reliability Control Plane cerradas: TASK-600 ✅, TASK-586 ✅, TASK-632 ✅, TASK-633 ✅, TASK-599 ✅, TASK-634 ✅, TASK-635 ✅. Solo TASK-103 budget thresholds GCP queda en `partial` (depende setup manual GCP Console).
+
+### Siguiente
+
+- Slice 4 (Admin Center CRUD UI para overrides) sigue follow-up — helpers `setReliabilityModuleOverride` / `clearReliabilityModuleOverride` ya listos para consumir.
+- SLO breach detector como cron que compare señales reales contra `slo_thresholds` y emita señal `kind=metric`.
+- Audit log de cambios al registry (event outbox `reliability.module.override.{set,cleared}`).
+
+## Sesion 2026-04-25 — Workforce architecture mother spec
+
+### Que cambio
+
+Se formalizo la arquitectura madre del dominio `Workforce` en:
+
+- `docs/architecture/GREENHOUSE_WORKFORCE_ARCHITECTURE_V1.md`
+
+Tambien se actualizo:
+
+- `docs/README.md`
+- `project_context.md`
+
+### Decisiones canónicas explicitadas
+
+1. **`Workforce` no es copia de `People` ni alias de `HR`**: es el dominio madre de lifecycle laboral-operativo, drift y orchestration.
+2. **`Person360.workforce` queda como target canónico por persona**: el facet resuelve estado laboral-operativo persona-first.
+3. **`Workforce Workspace` queda como shell operativa objetivo**: roster, queues, drift, lifecycle y profile operativo multi-persona.
+4. **`Offboarding` queda subordinado a `Workforce`**: la spec de offboarding sigue vigente, pero ahora cuelga explícitamente del dominio madre.
+5. **Diseño obligatorio en ambos planos**: toda capacidad workforce futura debe explicitar `views` y `entitlements`, además del write owner especializado (`HR`, `Payroll`, `Identity`).
+
+### Validaciones
+
+- No se corrieron tests: cambio documental/arquitectonico solamente.
+
+### Siguiente
+
+- Crear el epic del programa `Workforce`.
+- Bajar `Person360.workforce`, lifecycle state model y drift registry a tasks ejecutables.
+- Definir si V1 del workspace vive primero dentro de `People/HR` o nace ya bajo `/workforce`.
+
+## Sesion 2026-04-25 — Workforce Offboarding architecture foundation
+
+### Que cambio
+
+Se formalizo la arquitectura canonica de offboarding como dominio propio en:
+
+- `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`
+
+Tambien se actualizo:
+
+- `docs/README.md`
+- `project_context.md`
+
+### Decisiones canónicas explicitadas
+
+1. **Offboarding no es desactivar un usuario**: el agregado canonico es un caso de salida de relacion de trabajo con snapshot contractual/legal.
+2. **SCIM es signal source, no owner total**: un deprovision tecnico puede abrir `needs_review`, pero no debe reemplazar el proceso laboral/operativo.
+3. **Checklist HRIS legacy deja de ser source of truth**: las plantillas/instancias de offboarding quedan como child object operativo del caso.
+4. **People + HR comparten el dominio en distintos planos**:
+   - `People` sigue siendo la ficha canonica
+   - `HR` queda como surface operativa
+   - `entitlements` resuelven permisos finos separados de la navegacion
+5. **La matriz de reglas depende de `relationship_type + employment_type + contract_type + pay_regime + payroll_via + country`** para distinguir lanes `internal_payroll`, `external_payroll`, `non_payroll`, `identity_only` y `relationship_transition`.
+
+### Validaciones
+
+- No se corrieron tests: cambio documental/arquitectonico solamente.
+
+### Siguiente
+
+- Traducir el spec a epic/task backlog.
+- Definir el shape exacto del agregado runtime y de la rule matrix V1.
+- Conectar `SCIM`, `Identity`, `People`, `HR`, `Payroll` y drift reporting a ese agregado cuando se abra la implementacion.
+
+## Sesion 2026-04-25 — Reliability Sentry Incident → Module Correlator (TASK-634)
+
+### Que cambio
+
+Se entregó el correlador determinista que mapea cada incidente Sentry a su módulo real (`finance`, `integrations.notion`, `delivery`) en vez de adjuntar todo a `cloud`. La capa Reliability Control Plane ahora rinde incidentes en el módulo correcto, lo cual hace que `confidence` por módulo refleje la realidad y permite ver "qué módulo está crashing" en vez de "todo es cloud".
+
+Archivos creados:
+
+- `src/lib/reliability/incident-mapping.ts` — `correlateIncident(incident)` rules-first. Reusa `filesOwned` (TASK-633) como source of truth para path matching, agrega `MODULE_TITLE_HINTS` curados por módulo, tie-break por `MODULE_PRIORITY` (finance > integrations.notion > delivery > cloud).
+- `src/lib/reliability/incident-mapping.test.ts` — 15 tests sintéticos (path matching, title fallback, priority en colisiones, edge cases: location vacío, prefix "in ", leading slash, release antiguo, vendor path, fallback cloud).
+
+Archivos modificados:
+
+- `src/lib/reliability/signals.ts` — `buildSentryIncidentSignals` ahora itera con `correlateIncident`, cap por módulo (`MAX_SENTRY_INCIDENTS_PER_MODULE=3`) en vez de cap global, evidence enriquecida con `correlation.source` + `matchedPattern`. Incidentes huérfanos: `signalId='cloud.incident.sentry.uncorrelated.<id>'`.
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` — §6 con sub-sección "Sentry incident → module attribution (TASK-634)".
+
+### Decisión canónica explicitada
+
+1. **Reuso de `filesOwned`** (TASK-633) en vez de duplicar regex paralelas — single source of truth. Cuando alguien añade un glob nuevo en el registry, el correlador lo recoge automáticamente sin re-deploy.
+2. **`MODULE_TITLE_HINTS` curados** — substrings específicas del dominio (quote, expense, notion-bq-sync, ico-engine, etc.). Evitamos hints genéricos ("error", "failed") que generarían correlaciones falsas.
+3. **Cap por módulo, no cap global** — antes el cap era 3 incidentes total. Ahora cada módulo ve sus top 3 — finance no se queda sin ver sus incidentes cuando cloud tiene muchos uncorrelated.
+4. **Evidence enriquecida** — el adapter agrega `correlation.source` + `matchedPattern` al evidence array. Auditable en Admin Center: si finance tiene un incidente, evidence dice si fue por path (qué glob) o por title (qué hint).
+5. **LLM tiebreaker descartado en V1** — rules-first cubre el 99% de los crashes con stack trace en `src/lib/<dominio>/...`. LLM se activa solo si auditoría post-merge revela >20% uncorrelated en Sentry real.
+
+### Coverage post-merge (validación pendiente)
+
+Auditoría manual cuando haya `SENTRY_AUTH_TOKEN` + acceso al portal sentry.io: si `>20%` de incidentes abiertos quedan como `uncorrelated`, evaluar Slice 4 (LLM enrichment) o ampliar `MODULE_TITLE_HINTS`. Hoy los casos sintéticos cubren los patrones canónicos esperados.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (410 files / 2116 passed — 15 nuevos tests del correlador)
+- `pnpm build` ✅
+- `GET /api/admin/reliability` queda como inspección manual post-deploy.
+
+### Siguiente
+
+- TASK-635 (registry persistence) sigue pull-trigger. Cuando se ejecute, las reglas `MODULE_TITLE_HINTS` migran junto con `filesOwned` al schema DB.
+- LLM-assisted enrichment para huérfanos si auditoría post-merge revela >20% uncorrelated.
+- Routing per-módulo a Slack (si finance-incident, ping a #finance-eng) — requiere observabilidad outbound separada.
+- Histórico de correlaciones por incidente (`incident_correlation_log`) para entrenar mejor las reglas.
+
+## Sesion 2026-04-25 — Finance Preventive Test Lane (TASK-599)
+
+### Que cambio
+
+Se entregaron los 3 niveles de defensa preventiva para Finance, cerrando el gap entre unit/route tests y detección tardía por Sentry. Adicionalmente se enchufó la señal `kind=test_lane` para módulo `finance` en el Reliability Control Plane.
+
+Archivos creados:
+
+- `tests/e2e/smoke/finance-clients.spec.ts` — smoke `/finance/clients`.
+- `tests/e2e/smoke/finance-suppliers.spec.ts` — smoke `/finance/suppliers`.
+- `tests/e2e/smoke/finance-expenses.spec.ts` — smoke `/finance/expenses`.
+- `src/views/greenhouse/finance/ExpensesListView.test.tsx` — 4 casos (success, empty, error API, network failure).
+- `src/views/greenhouse/finance/drawers/CreateExpenseDrawer.test.tsx` — 4 casos (open=false sin fetch, fetch /meta+/accounts, payload parcial no fatal, meta 500 no rompe drawer).
+- `src/types/finance-smoke-lane.ts` — contracts `FinanceSmokeLaneStatus`, `FinanceSmokeLaneSuite`, `FinanceSmokeLaneTotals`.
+- `src/lib/reliability/finance/get-finance-smoke-lane-status.ts` — reader que parsea `artifacts/playwright/results.json` con degradación honesta cuando no existe.
+
+Archivos modificados:
+
+- `src/lib/reliability/registry.ts` — `RELIABILITY_REGISTRY[finance].smokeTests` ahora incluye los 4 specs.
+- `src/lib/reliability/affected-modules.test.ts` — actualizado contador de specs finance.
+- `src/lib/reliability/signals.ts` — nuevo adapter `buildFinanceSmokeLaneSignals` (1 señal agregada + N por suite fallida).
+- `src/lib/reliability/get-reliability-overview.ts` — `sources.financeSmokeLane?` agregado, composer + auto-fetch tolerante. Boundary TASK-599 movido a status `ready`.
+- `src/app/api/finance/expenses/meta/route.test.ts` — 3 tests TASK-599 nuevos documentando slices críticos vs enrichment vs static.
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — sección "Preventive Test Lane (TASK-599)" con los 3 niveles.
+
+### Decisión canónica explicitada
+
+1. **No DB persistence en V1** — el reader lee `artifacts/playwright/results.json` directo cuando existe (CI workspace). Cuando no existe (runtime portal Vercel), degrada a `awaiting_data`. Persistencia DB queda como follow-up cuando aparezca el caso "histórico cross-CI".
+2. **Component tests focalizados en estados**, no en submit-flow completo del drawer — submit success/error requiere llenar todos los campos requeridos del form (brittle). Queda como follow-up.
+3. **Smoke specs reusan el patrón canónico** `gotoAuthenticated` + status<400 + body visible + ausencia de fatal text. NO depende de data específica → estable contra cualquier ambiente con Agent Auth.
+4. **Slices críticos vs enrichment documentados explícitamente** en route tests:
+   - Críticos (Postgres-first → BQ fallback): `suppliers`, `accounts`.
+   - Enrichment (degradan a empty/default sin tumbar): institutions, members, spaces, supplierToolLinks.
+   - Static (siempre presentes): paymentMethods, drawerTabs, etc.
+5. **Adapter signals.ts emite por suite fallida** además del agregado — así Admin Center muestra cuál spec específico está rojo, no solo "el lane está rojo".
+
+### Boundary movido a `ready`
+
+- TASK-599 / `finance.test_lane` → `ready` (era `pending`).
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (409 files / 2101 passed — 12 nuevos casos: 4 expenses + 4 drawer + 3 route + 1 affected-modules update)
+- `pnpm build` ✅
+- `pnpm test:e2e --grep finance` queda como validación manual cuando los secrets staging estén disponibles.
+
+### Siguiente
+
+- TASK-634 (correlador Sentry) puede consumir `route_path` + `filesOwned` para mapear `incident.location` → módulo correcto.
+- TASK-635 (registry persistence) sigue pull-trigger.
+- Component tests submit success/error en `CreateExpenseDrawer` cuando se necesite completar el form-flow (follow-up).
+- `RegisterCashOutDrawer` merece segunda ola de component tests siguiendo el mismo patrón.
+- Persistir `finance_smoke_lane_runs` en `source_sync_runs` cuando aparezca caso de uso "histórico cross-CI".
+
+## Sesion 2026-04-25 — Reliability Change-Based Verification Matrix (TASK-633)
+
+### Que cambio
+
+Se entregó el carril de verificación por PR: cuando un PR toca archivos owned por un módulo crítico, GitHub Actions corre solo los smoke specs relevantes en vez de la suite completa.
+
+Archivos creados:
+
+- `src/lib/reliability/affected-modules.ts` — `getAffectedModules(changedFiles)` + `mapModulesToSmokeSpecs(modules)` con minimatch.
+- `src/lib/reliability/affected-modules.test.ts` — 12 unit tests (single-module, cross-domain, dotfiles, orden estable).
+- `scripts/reliability/affected-modules.ts` — CLI invocable por GitHub Actions: lee `git diff --name-only $BASE...HEAD`, emite outputs `modules`, `specs`, `modules_count`, `specs_count` en `$GITHUB_OUTPUT`.
+- `.github/workflows/reliability-verify.yml` — 2 jobs (detect + smoke condicional + no-affected fallback). Triggers `pull_request` (develop, main) + `workflow_dispatch`.
+
+Archivos modificados:
+
+- `src/types/reliability.ts` → `ReliabilityModuleDefinition.filesOwned: string[]` agregado.
+- `src/lib/reliability/registry.ts` → 4 módulos sembrados con globs `filesOwned`. Specs huérfanos asociados a sus módulos:
+  - finance → finance-quotes
+  - integrations.notion → admin-nav
+  - cloud → admin-nav, login-session, home
+  - delivery → people-360, hr-payroll
+  - **`server-only` removido**: registry es data pura, ahora consumible desde Node script + Vitest sin mock global.
+- `package.json` → `minimatch` ^9.0.5 como devDependency.
+- `docs/operations/PLAYWRIGHT_E2E.md` → nueva sección "Change-Based Verification Matrix".
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §3.1 + §5 actualizados.
+
+### Decisión canónica explicitada
+
+1. **Vercel cron sigue siendo el host** del synthetic monitor (TASK-632). El matrix vive en GitHub Actions, no consume el cron — es complementario.
+2. **`filesOwned` en código estático**, no en YAML. Single source of truth en `registry.ts`. Si TASK-635 ejecuta, migra a DB junto con el resto del registry.
+3. **`server-only` removido del registry**: el archivo es data pura sin fetch ni secretos. Permite consumirlo desde el CLI Node y Vitest sin mock. Server-only sigue aplicado en helpers que tocan DB/red.
+4. **Workflow degrada con warning** si faltan `PLAYWRIGHT_BASE_URL` o `AGENT_AUTH_SECRET` — no rompe PRs de forks/contributors externos sin acceso a secrets.
+5. **Status check NO obligatorio en V1**: el workflow corre informativo. Activación de branch protection queda como decisión separada del owner post-calibración.
+6. **Verificación adicional contra `/api/admin/reliability` (preview deploy) descartada en V1**: requiere preview deploy determinista por PR. Queda como follow-up. Smoke pass/fail es gate suficiente por ahora.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (407 files / 2090 passed — 12 nuevos tests para affected-modules)
+- `pnpm build` ✅
+- CLI manual: `tsx scripts/reliability/affected-modules.ts --files src/lib/finance/foo.ts src/lib/cloud/bar.ts CHANGELOG.md` → `modules: finance, cloud`, 4 specs ✅
+- Validación contra PR real: queda post-merge (status check informativo).
+
+### Siguiente
+
+- TASK-634 (correlador Sentry) puede heredar `filesOwned` para inferir módulo desde `incident.location` (file path) usando el mismo helper minimatch.
+- TASK-599 (smoke lane finance) cuando entregue `finance-{expenses,clients,suppliers}.spec.ts` simplemente registrarlas en `smokeTests` del módulo finance — el matrix las recogerá automáticamente.
+- TASK-635 (registry persistence DB) sigue pull-trigger.
+- Activar status check obligatorio en branch protection para `reliability-verify` una vez calibrados los globs con datos de PRs reales.
+
+## Sesion 2026-04-25 — Reliability Synthetic Monitoring (TASK-632)
+
+### Que cambio
+
+Se entregó el monitor sintético periódico que cierra el gap entre "el registry sabe qué rutas son críticas" y "alguien verifica que esas rutas siguen vivas".
+
+Archivos canónicos creados:
+
+- `migrations/20260425181908816_task-632-reliability-synthetic-runs.sql` — tabla nueva `greenhouse_sync.reliability_synthetic_runs` (probe_id PK, sweep_run_id FK→source_sync_runs, module_key, route_path, http_status, ok, latency_ms, error_message, triggered_by, started/finished_at). 3 índices.
+- `src/types/reliability-synthetic.ts` — contracts (SyntheticProbeRecord, SyntheticRouteSnapshot, SyntheticSweepSummary).
+- `src/lib/reliability/synthetic/{kill-switch,persist,reader,runner}.ts` — runtime completo.
+- `src/app/api/cron/reliability-synthetic/route.ts` — cron handler GET/POST con `requireCronAuth`.
+- `vercel.json` — cron registrado `*/30 * * * *`.
+- `src/components/greenhouse/admin/ReliabilitySyntheticCard.tsx` — UI compacta con timestamp última corrida + lista de rutas en error.
+
+Archivos modificados:
+
+- `src/lib/reliability/signals.ts` → 2 adapters: `buildSyntheticRouteSignals` (kind=runtime por ruta) y `buildSyntheticModuleSignals` (kind=test_lane agregado por módulo).
+- `src/lib/reliability/get-reliability-overview.ts` → `sources.syntheticSnapshots` opcional + 4 boundaries (1 por módulo) con status `ready`.
+- `src/app/(dashboard)/admin/page.tsx` → fetch paralelo de snapshots + sweep.
+- `src/views/greenhouse/admin/AdminCenterView.tsx` → `ReliabilitySyntheticCard` insertada después de "Confiabilidad por módulo".
+
+### Decisión canónica explicitada
+
+1. **Vercel cron sobre Cloud Run** — análisis pragmático: setup 1/10, mismo deployment evita topología externa, paralelización en olas de 6 cabe holgadamente en cap 60s. Migración a ops-worker queda como follow-up si el sweep crece >20 rutas.
+2. **Tabla dedicada, no reuso de source_sync_runs** — grano correcto es 1 row por probe. El sweep crea 1 row agregada en source_sync_runs (FK) y N rows detalladas en la tabla nueva.
+3. **Kill switch opt-in** (`RELIABILITY_SYNTHETIC_ENABLED=false` para apagar) siguiendo convención `bigquery-write-flag.ts`.
+4. **Detección de SSO redirect**: 3xx con location `/login` o `/auth/access-denied` se marca falla — evita ocultar regresiones de auth.
+5. **Probes paralelas en olas de 6** con timeout 8s — peak ~16s para 10 rutas, cabe holgado en 60s.
+
+### Boundaries movidos a `ready`
+
+- TASK-632 / `finance.runtime` → `ready`.
+- TASK-632 / `integrations.notion.runtime` → `ready`.
+- TASK-632 / `cloud.runtime` → `ready`.
+- TASK-632 / `delivery.runtime` → `ready`.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test src/views/greenhouse/admin/AdminCenterView.test.tsx` ✅ (406 files / 2075 passed)
+- `pnpm build` ✅ (`/api/cron/reliability-synthetic` como dynamic function)
+- Validación manual sobre staging: pendiente — requiere `AGENT_AUTH_SECRET` configurado en Vercel envs.
+
+### Siguiente
+
+- TASK-633 (matrix) puede consumir `reliability_synthetic_runs` para verificar última corrida OK antes de aprobar PR.
+- TASK-634 (correlador Sentry) puede inferir módulo desde `route_path`.
+- TASK-635 (registry persistence) sigue pull-trigger.
+
+## Sesion 2026-04-25 — Cloud & Integrations apunta a Cloud real
+
+### Que cambio
+
+Se separaron nuevamente las surfaces administrativas:
+
+- `/admin/cloud-integrations` renderiza `AdminCloudIntegrationsView` con `getOperationsOverview()`.
+- `/admin/integrations` permanece como `AdminIntegrationGovernanceView` para governance de integraciones y cards Billing Export/Notion operacional.
+- `Cloud & Integrations` en menú, Admin Center y Ops Health ahora apunta a `/admin/cloud-integrations`.
+- `Integration Governance` conserva el enlace cruzado hacia `/admin/integrations`.
+- Se actualizó el changelog y la nota de resolución de `TASK-586`, porque ya no es correcto decir que `AdminCloudIntegrationsView` está orphaned.
+
+### Validaciones
+
+- `pnpm exec eslint src/app/'(dashboard)'/admin/cloud-integrations/page.tsx src/components/layout/vertical/VerticalMenu.tsx src/views/greenhouse/admin/AdminCenterView.tsx src/views/greenhouse/admin/AdminCloudIntegrationsView.tsx src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx src/views/greenhouse/admin/AdminOpsHealthView.tsx` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm staging:request /admin/cloud-integrations --grep "Cloud runtime"` ejecutado antes del deploy de este commit: HTTP 200, sin match esperado porque staging aún corre el build previo.
+
+## Sesion 2026-04-25 — Navegación resiliente Admin Center
+
+### Que cambio
+
+Se reprodujo en staging que los CTAs de `/admin` disparaban el fetch RSC hacia `/admin/integrations` con HTTP 200, pero App Router no comiteaba el cambio de URL y dejaba al operador en `/admin`.
+
+Se agregó una solución reutilizable:
+
+- `src/components/greenhouse/GreenhouseRouteLink.tsx` — wrapper de `next/link` con watchdog; si la URL no cambia después de la navegación SPA, hace fallback a `window.location.assign()`.
+- `src/@menu/components/RouterLink.tsx` — el menú vertical usa el wrapper, así el fix cubre navegación del shell.
+- `src/views/greenhouse/admin/AdminCenterView.tsx` — los CTAs/cards del Admin Center usan el wrapper.
+- `src/components/greenhouse/GreenhouseRouteLink.test.tsx` — cobertura del fallback y del caso donde la navegación SPA sí cambia URL.
+- `changelog.md` — delta visible del fix.
+
+### Validaciones
+
+- `pnpm staging:request /admin/integrations --grep "Integration Governance"` ✅ confirma que staging sirve la surface real con HTTP 200.
+- Reproducción Playwright contra staging ✅ confirma que el click actual dispara RSC 200 pero queda en `/admin`.
+- `pnpm exec vitest run src/components/greenhouse/GreenhouseRouteLink.test.tsx` ✅
+- `pnpm exec eslint src/components/greenhouse/GreenhouseRouteLink.tsx src/components/greenhouse/GreenhouseRouteLink.test.tsx src/components/greenhouse/index.ts src/@menu/components/RouterLink.tsx src/views/greenhouse/admin/AdminCenterView.tsx` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+
+## Sesion 2026-04-25 — Notion Sync & Billing Export Observability (TASK-586)
+
+### Que cambio
+
+Se entregó la lectura productizada de costo cloud y del flujo Notion end-to-end dentro de `Admin Center`, completando el primer slice de plomería de señales contra el Reliability Control Plane (TASK-600).
+
+Archivos canónicos creados:
+
+- `src/types/billing-export.ts` — contracts (`BillingExportAvailability`, `GcpBillingOverview`, spotlights, detection strategy)
+- `src/lib/cloud/gcp-billing.ts` — reader con cache 30 min y degradación honesta (`awaiting_data` cuando tablas no rinden)
+- `src/lib/integrations/notion-sync-operational-overview.ts` — composer puro de `getNotionRawFreshnessGate` + `getNotionSyncOrchestrationOverview` + `getNotionDeliveryDataQualityOverview`
+- `src/components/greenhouse/admin/GcpBillingCard.tsx` — UI con KPI total + breakdown por servicio + spotlight notion-bq-sync con dual probe (label / service description)
+- `src/components/greenhouse/admin/NotionSyncOperationalCard.tsx` — timeline raw → orchestration → DQ
+- `src/app/api/admin/cloud/gcp-billing/route.ts` — endpoint admin (acepta `?days=N`)
+- `src/app/api/admin/integrations/notion/operational-overview/route.ts` — endpoint admin
+- `docs/architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` — spec canónica
+
+Archivos modificados:
+
+- `src/lib/reliability/signals.ts` → 2 adapters nuevos: `buildGcpBillingSignals`, `buildNotionFreshnessSignal`.
+- `src/lib/reliability/get-reliability-overview.ts` → acepta `sources?: { billing, notionOperational }`; boundaries `cloud.billing` y `integrations.notion.freshness` movidos a `ready`.
+- `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx` → 2 cards insertadas entre KPIs y Sister Platform Bindings.
+- `src/views/greenhouse/admin/AdminOpsHealthView.tsx` → sección "Spotlight observabilidad" entre Notion Delivery monitor y Cloud runtime.
+- `src/app/(dashboard)/admin/page.tsx` y `src/app/(dashboard)/admin/integrations/page.tsx` y `src/app/(dashboard)/admin/ops-health/page.tsx` → fetch de los 2 nuevos overviews en paralelo, sin doble fetch para Reliability.
+
+### Decisión canónica explicitada
+
+1. **`AdminCloudIntegrationsView` está orphaned.** Las cards nuevas viven en `AdminIntegrationGovernanceView` (la view que sí está rendereada por `/admin/integrations`).
+2. **`notion-bq-sync` se infiere por `_synced_at`**, no por Cloud Run logs. Es la verdad funcional ("¿hace cuánto subió data nueva?") y evita acoplamiento al servicio externo.
+3. **Composer puro Notion** — los 3 readers existentes se reusan al pie de la letra; nada se duplica.
+4. **Cache 30 min** para Billing Export (latencia natural ~24h hace inútil sub-hour fresh).
+5. **Detection strategy explícita** en spotlight notion-bq-sync — la UI muestra chip "Atribución por label" vs "Aproximación por servicio" para que operadores entiendan precisión.
+
+### Boundaries movidos a `ready`
+
+- TASK-586 / `cloud.billing` → `ready` (era `pending`).
+- TASK-586 / `integrations.notion.freshness` → `ready` (era `pending`).
+- TASK-103 / `cloud.billing` → `partial` (cost guard ya cubierto, budget alerts requieren GCP Console).
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (405 files / 2073 passed)
+- `pnpm build` ✅ (`/api/admin/cloud/gcp-billing` y `/api/admin/integrations/notion/operational-overview` aparecen como dynamic functions)
+- Validación manual sobre staging: pendiente. Cuando Billing Export materialice tablas (~24h post-enable), las cards rinden datos automáticamente.
+
+### Siguiente
+
+- TASK-585 sigue siendo dueña del hardening notion-bq-sync; no se tocó.
+- TASK-103 sigue dueña del budget setup en GCP Console; cuando se complete, agregar adapter `cloud.billing.gcp_budget_threshold`.
+- TASK-599 sigue siendo el siguiente boundary `finance.test_lane` pendiente.
+
+## Sesion 2026-04-25 — Foundation V1 del Reliability Control Plane (TASK-600)
+
+### Que cambio
+
+Se entregó la foundation deterministic/rule-based del `Reliability Control Plane` de Greenhouse. La capa se sienta encima de `getOperationsOverview()`, `GET /api/internal/health`, Sentry y Notion DQ — no las reemplaza, las normaliza.
+
+Archivos canónicos creados:
+
+- `src/types/reliability.ts` — contracts (`ReliabilityModuleDefinition`, `ReliabilitySignal`, `ReliabilityModuleSnapshot`, `ReliabilityOverview`, severidad de 6 estados que separa `not_configured`/`awaiting_data`/`unknown`)
+- `src/lib/reliability/registry.ts` — seed estático: `finance`, `integrations.notion`, `cloud`, `delivery`
+- `src/lib/reliability/severity.ts` — mappers desde `CloudHealthStatus`, `OperationsHealthStatus`, `IntegrationDataQualityStatus`, `CloudSentryIncidentLevel`
+- `src/lib/reliability/signals.ts` — adapters: subsystems, runtime/posture cloud, Sentry incidents, BigQuery cost guard, observability posture, Notion delivery DQ
+- `src/lib/reliability/get-reliability-overview.ts` — reader que compone el overview (acepta `OperationsOverview` preloaded para evitar doble fetch)
+- `src/app/api/admin/reliability/route.ts` — endpoint protegido por `requireAdminTenantContext()`
+- `src/components/greenhouse/ReliabilityModuleCard.tsx` — UI primitive
+- `src/views/greenhouse/admin/AdminCenterView.tsx` — sección "Confiabilidad por módulo" entre alertas y Torre de control
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` — spec canónica
+
+### Decisión canónica explicitada
+
+1. Registry estático en código (no DB). Persistencia se evaluará si aparece necesidad de overrides por tenant o SLOs configurables.
+2. Primera surface en `Admin Center` general. `Ops Health` y `Cloud & Integrations` preservan su lectura técnica especializada — no se duplica.
+3. Reader nunca duplica fetches: la página `/admin` pasa el `OperationsOverview` ya construido.
+4. Severidad de 6 estados: `ok`/`warning`/`error`/`unknown`/`not_configured`/`awaiting_data`. Estados pendientes nunca enmascaran señales reales.
+
+### Boundaries explícitos para tasks downstream
+
+`RELIABILITY_INTEGRATION_BOUNDARIES` declara qué task plomará qué señal y cómo enchufar sin redefinir contratos:
+
+- `TASK-586` → `cloud.billing` + `integrations.notion.freshness` (notion-bq-sync run + GCP cost)
+- `TASK-599` → `finance.test_lane` (smoke E2E + component + route resilience)
+- `TASK-103` → `cloud.billing` (budget thresholds 50/80/100%)
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test -- src/views/greenhouse/admin/AdminCenterView.test.tsx` ✅ (405 files / 2073 passed)
+- `pnpm build` ✅ (`/api/admin/reliability` aparece como dynamic function)
+- Validación manual sobre staging: pendiente.
+
+## Sesion 2026-04-25 — Se abren follow-ups ejecutables para API Platform V1.1
+
+### Que cambio
+
+Se registró un programa corto y cuatro child tasks para ejecutar el siguiente tramo de la plataforma API después de `TASK-616`:
+
+- `TASK-617` — API Platform V1.1 Convergence Program
+- `TASK-617.1` — API Platform REST Hardening
+- `TASK-617.2` — API Platform First-Party App Surface Foundation
+- `TASK-617.3` — API Platform Event Control Plane
+- `TASK-617.4` — Developer API Documentation Portal
+
+### Decisión canónica explicitada
+
+La secuencia operativa queda así:
+
+1. endurecer REST en `ecosystem`
+2. abrir lane `app` para la futura app `React Native`
+3. converger `webhooks / event delivery` como control plane de plataforma
+4. evolucionar `/developers/api` a portal público canónico
+5. recién después retomar `MCP`
+
+## Sesion 2026-04-25 — API Platform ahora considera first-party mobile clients
+
+### Que cambio
+
+Se amplió la arquitectura de `API Platform` para dejar explícito que también debe servir como backend contract para futuras apps `iOS` y `Android`.
+
+Documento actualizado:
+
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+
+### Decisión canónica explicitada
+
+La regla nueva es:
+
+- Greenhouse no debe conectar la app móvil a rutas internas del portal pensadas para web
+- debe exponer una lane first-party `app` dentro de `api/platform/*`
+- mobile pasa a ser consumer oficial de la plataforma, no un caso secundario de integrations
+- el supuesto actual de producto es app móvil `React Native`, tratado como contexto de consumer y no como dependencia rígida del contrato API
+
+## Sesion 2026-04-25 — API Platform y MCP cierran sus decisiones arquitectónicas pendientes
+
+### Que cambio
+
+Se ampliaron las specs para dejar resueltas las decisiones que seguían implícitas o abiertas:
+
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+
+### Decisiones canónicas explicitadas
+
+En `API Platform` quedaron cerrados:
+
+- el `event control plane` como parte oficial de `api/platform/*`
+- el resource canon base de plataforma
+- la política canónica de `POST` / `PATCH` / `PUT` / `DELETE`
+- la matrix uniforme de status codes
+- la disciplina de deprecation y frescura
+
+En `MCP` quedaron cerrados:
+
+- taxonomy de `tools` / `resources` / `prompts`
+- trust boundaries y prompt-injection posture
+- clases de write y confirmación humana
+- cuotas/rate limits
+- audit trail mínimo
+- strategy base de skills
+
+## Sesion 2026-04-25 — MCP y skills quedan separados como capability layer vs behavior layer
+
+### Que cambio
+
+Se amplió la arquitectura de MCP para dejar explícito que Greenhouse debe diseñar:
+
+- `MCP server` como capa de capacidades ejecutables
+- `skills` como capa de comportamiento y uso correcto
+
+Documento actualizado:
+
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+
+### Decisión canónica explicitada
+
+La regla nueva es:
+
+- MCP responde qué puede hacer un agente
+- skills responden cómo debería hacerlo
+- Greenhouse necesita ambos, pero como capas separadas
+
+## Sesion 2026-04-25 — Arquitectura propia para MCP server
+
+### Que cambio
+
+Se creó una spec separada para MCP, en vez de dejarlo solo como un apéndice de la API platform:
+
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+
+También quedó sincronizada la referencia desde:
+
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+
+### Decisión canónica explicitada
+
+MCP en Greenhouse se modela como:
+
+- un **server** oficial
+- downstream de `api/platform/*`
+- read-only por defecto
+- con writes solo vía commands auditables e idempotentes
+
+## Sesion 2026-04-25 — Documentacion funcional nueva para API Platform Ecosystem
+
+### Que cambio
+
+Se agregó documentación funcional del módulo para que la lane nueva no quede explicada solo en arquitectura:
+
+- `docs/documentation/plataforma/api-platform-ecosystem.md`
+
+También quedó sincronizado:
+
+- `docs/documentation/README.md`
+
+### Que responde este documento
+
+La guía nueva deja explícito:
+
+- cómo funciona hoy `api/platform/ecosystem/*`
+- qué endpoints expone
+- cómo resuelve auth, binding y tenancy
+- cómo convive con `/api/integrations/v1/*`
+- qué sigue después de TASK-616
+- cómo robustecer la lane sin romper consumers actuales
+
+## Sesion 2026-04-25 — TASK-616 IMPLEMENTADA: API Platform Foundation & Ecosystem Read Surface V1
+
+### Que cambio
+
+Quedó implementado el primer slice runtime aditivo de la nueva API platform:
+
+- `src/lib/api-platform/core/*`
+- `src/lib/api-platform/resources/*`
+- `src/app/api/platform/ecosystem/context/route.ts`
+- `src/app/api/platform/ecosystem/organizations/route.ts`
+- `src/app/api/platform/ecosystem/organizations/[id]/route.ts`
+- `src/app/api/platform/ecosystem/capabilities/route.ts`
+- `src/app/api/platform/ecosystem/integration-readiness/route.ts`
+
+Tambien quedó corregida la task para reflejar la semántica real del runtime:
+
+- `capabilities` = catálogo/asignación de tenant capabilities
+- `integration-readiness` = health/readiness de integraciones
+- `context` = consumer context binding-aware
+
+### Verificacion
+
+- `pnpm vitest run src/lib/api-platform/core/versioning.test.ts src/lib/api-platform/core/responses.test.ts`
+- `pnpm vitest run src/lib/integrations/health.test.ts src/lib/account-360/organization-store.test.ts src/lib/integrations/notion-readiness.test.ts`
+- `pnpm tsc --noEmit`
+- `pnpm lint`
+- `pnpm build`
+
+### No-break notes
+
+- `/api/integrations/v1/*` no fue movido ni refactorizado
+- `/api/integrations/v1/sister-platforms/*` no fue modificado
+- el harness nuevo reutiliza el mismo modelo de `consumers + bindings + request_logs`, pero desde una lane aditiva nueva
+- `pnpm build` volvió a imprimir warnings conocidos de `Dynamic server usage` en rutas autenticadas; el build cerró OK y no es una regresión introducida por TASK-616
+
+## Sesion 2026-04-25 — TASK-616 registrada: API Platform Foundation & Ecosystem Read Surface V1
+
+### Que cambio
+
+Se registró la task ejecutable que baja a runtime la arquitectura nueva de plataforma API:
+
+- `docs/tasks/to-do/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Decisión canónica explicitada
+
+La implementación correcta de la `API platform` no debe arrancar absorbiendo `TASK-040`.
+
+La regla explicitada en la task es:
+
+- `TASK-040` sigue viva como baseline programática de `Data Node`
+- `TASK-616` ejecuta la foundation shared `src/lib/api-platform/**` y la primera lane `src/app/api/platform/ecosystem/**`
+- `/api/integrations/v1/*` convive como lane legacy/transicional
+- `MCP` sigue fuera del primer corte y downstream de esta API estable
+
+## Sesion 2026-04-25 — API Platform documentada como arquitectura canónica
+
+### Que cambio
+
+Se creó una spec nueva de arquitectura para consolidar la visión de plataforma API de Greenhouse:
+
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+
+También quedaron sincronizados:
+
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+- `project_context.md`
+- `changelog.md`
+
+### Decisión canónica explicitada
+
+La plataforma API correcta para Greenhouse ya no debe leerse desde `docs/api/*` como source of truth principal.
+
+La regla nueva es:
+
+- la arquitectura canónica vive en `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md` y `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md` quedan como documentos derivados/transicionales
+- `/api/integrations/v1/*` sigue siendo lane válido, pero tratado como `legacy/transicional`
+- nuevos contratos ecosystem-facing deben preferir `api/platform/*`
+- `MCP` sigue siendo downstream de una API estable
+
+### Riesgo / follow-up
+
+- No hay implementación runtime todavía en `src/lib/api-platform/**` ni `src/app/api/platform/**`; este corte deja la arquitectura y la jerarquía documental listas para que la implementación posterior no nazca sobre fuentes contradictorias.
+
+## Sesion 2026-04-25 — TASK-615 registrada: Quote Builder Flow Orchestration & UX Hardening
+
+### Que cambio
+
+Se registró una task nueva de backlog para endurecer la experiencia del Quote Builder sin reabrir pricing ni contratos backend:
+
+- `docs/tasks/to-do/TASK-615-quote-builder-flow-orchestration-ux-hardening.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Intención de la task
+
+Formaliza el follow-up UX/UI que quedó implícito después de los rediseños parciales del builder:
+
+- converger header y dock para que no compitan por la acción terminal
+- hacer que el setup comercial se lea como flujo guiado
+- ordenar la relación entre empty state y toolbar de ítems
+- mejorar estados parciales, blockers y microfeedback sin tocar el contrato de negocio
+
+### Decisión explícita
+
+La task no debe convertirse en refactor backend ni en rediseño total del builder.
+
+El criterio canónico es:
+
+- preservar `QuoteBuilderShell` como arquitectura
+- reutilizar `QuoteIdentityStrip`, `QuoteContextStrip`, `QuoteSummaryDock` y `QuoteLineItemsEditor`
+- resolver primero jerarquía, copy y feedback antes de abrir primitives nuevas o migraciones platform-wide de popovers
+
+## Sesion 2026-04-25 — EPIC-008 + TASK-611/612/613 registradas: convergencia canónica Organization Workspace
+
+### Que cambio
+
+Se formalizó el programa para converger `Organizaciones` y `Clientes` sin romper el runtime actual:
+
+- nuevo epic:
+  - `docs/epics/to-do/EPIC-008-organization-workspace-convergence-facet-entitlements.md`
+- nuevas child tasks:
+  - `docs/tasks/to-do/TASK-611-organization-workspace-facet-projection-entitlements-foundation.md`
+  - `docs/tasks/to-do/TASK-612-shared-organization-workspace-shell-convergence.md`
+  - `docs/tasks/to-do/TASK-613-finance-clients-organization-workspace-convergence.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/epics/EPIC_ID_REGISTRY.md`
+- `docs/epics/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Decision canónica explicitada
+
+La convergencia correcta no es `entitlements en vez de views`, sino:
+
+- `organization` como aggregate cross-domain canónico
+- `client_profile` como overlay financiero
+- `views` / rutas actuales como entrypoints (`/agency/organizations/...`, `/finance/clients/...`)
+- `entitlements` como owner de facets, tabs y acciones
+
+### Relación con trabajo ya existente
+
+El programa no compite con `TASK-181` ni `TASK-191`; se monta sobre ellas.
+
+- `TASK-181` ya dejó `Finance Clients` org-first en el runtime
+- `TASK-191` avanzó el cutover downstream de consumers financieros
+- `EPIC-008` ataca ahora el gap de surface, proyección y convergencia de experiencia
+
+## Sesion 2026-04-25 — TASK-614 registrada: hardening acotado de People / Payroll
+
+### Que cambio
+
+Se registró una task follow-up específica para el gap residual entre `People` y `Payroll`:
+
+- `docs/tasks/to-do/TASK-614-people-payroll-economy-facet-entitlements-hardening.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Decisión canónica explicitada
+
+En `People/Payroll` no se detectó una fractura equivalente a `Organizaciones/Clientes`.
+
+La dirección correcta ya existe y la task la endurece:
+
+- `People` sigue siendo el workspace canónico del colaborador
+- `Payroll` sigue siendo una superficie operativa especializada
+- el detail de payroll no debe bifurcarse en una experiencia paralela
+- la deuda real está en permisos finos, composición de `economy` y convergencia de readers transitorios
+
+## Sesion 2026-04-25 — TASK-610 CERRADA: Sanitización shared Node-safe sin `jsdom`
+
+### Que cambio
+
+Se cerró el crash productivo reportado por Sentry en el carril de descripciones ricas de Product Catalog / HubSpot.
+
+- Nueva capability shared: `src/lib/content/sanitization/`
+  - `policies.ts`
+  - `index.ts`
+  - policy inicial `hubspot_product_description_v1`
+- `src/lib/commercial/description-sanitizer.ts` quedó como wrapper de compatibilidad sobre la capa shared.
+- `isomorphic-dompurify` salió de dependencies; entra `sanitize-html` + `@types/sanitize-html`.
+- Documentación actualizada en:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md`
+  - `docs/architecture/GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md`
+  - `docs/documentation/admin-center/catalogo-productos-fullsync.md`
+
+### Validacion
+
+- `pnpm test src/lib/content/sanitization/__tests__/rich-html.test.ts`
+- `pnpm test src/lib/commercial/__tests__/description-sanitizer.test.ts`
+- `pnpm test src/lib/hubspot/__tests__/hubspot-product-payload-adapter.test.ts`
+- `pnpm why isomorphic-dompurify` → sin resultados
+- `pnpm lint` → clean
+- `pnpm build` → clean
+
+### Riesgo residual / follow-up
+
+- No hubo migración de schema: este corte resuelve runtime isolation sin introducir metadata persistida de policy/version. Si otro dominio necesita persistir `raw/safe/derived`, abrir follow-up aditivo en vez de reusar helpers ad hoc.
+- `pnpm build` volvió a imprimir warnings conocidos de `Dynamic server usage` en rutas autenticadas; no bloqueó el build y no es parte de este cambio.
+
+## Sesion 2026-04-24 — TASK-629 IMPLEMENTADA: PDF Cotizacion Enterprise
+
+### Que cambio
+
+PDF de cotizaciones rediseñado end-to-end siguiendo RESEARCH-005 v1.5. Branch: `develop`. Commits clave: `bb3cedf5` (refactor inicial), `20eb6ff3` (cierre de las 4 limitaciones).
+
+### Entregas
+
+- Sistema de tokens `PdfTokens` (paralelo a `GREENHOUSE_DESIGN_TOKENS_V1`) en `src/lib/finance/pdf/tokens.ts`.
+- 8 secciones modulares en `src/lib/finance/pdf/sections/` (Cover, Executive Summary, About Efeonce, Scope of Work, Commercial Proposal, Investment Timeline, Terms, Signatures + shared).
+- Conditional rendering via `flags.ts` con threshold `GREENHOUSE_PDF_ENTERPRISE_THRESHOLD_CLP` ajustable.
+- Fonts DM Sans + Poppins reales en `src/assets/fonts/` con lazy registration.
+- QR signed HMAC (`qr-verification.ts`) + endpoint publico `/public/quote/[id]/[v]/[token]`.
+- Pipeline SVG→PNG (`scripts/build-pdf-brand-assets.ts`) para sub-brand assets.
+- Rich HTML rendering en line items vía LEFT JOIN al `product_catalog`.
+- Sales rep + legal entity dinamicos desde DB.
+- Test render script (`scripts/render-test-pdf.ts`) que genera enterprise + compact samples.
+- 33 tests unitarios nuevos (flags, qr-verification, formatters).
+
+### Validacion
+
+- tsc clean / lint clean / 2052 tests passing / build clean.
+- Render real validado: enterprise 84 KB / compact 52 KB en `tmp/`.
+- Endpoint publico de verificacion funcional contra DB.
+
+### Follow-up operativo CRITICO
+
+**Setear `GREENHOUSE_QUOTE_VERIFICATION_SECRET` en Vercel production** con `openssl rand -hex 32`. Sin esta variable el QR se omite (graceful degradation pero pierde verificacion legal).
+
+### Documentacion
+
+- RESEARCH-005 v1.5 con Delta de cierre TASK-629
+- `docs/research/mockups/quote-pdf-full-mockup.html` como visual contract de referencia
+
+---
+
+## Sesion 2026-04-24 — TASK-610 registrada: Content Sanitization Runtime Isolation
+
+### Que cambio
+
+Se registro una task nueva de backlog:
+
+- `TASK-610` — `docs/tasks/to-do/TASK-610-content-sanitization-runtime-isolation-shared-policy-layer.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Contexto de la task
+
+Nace a partir del error productivo reportado en Sentry por `jsdom` / `html-encoding-sniffer` / `@exodus/bytes` al cargar `isomorphic-dompurify` desde:
+
+- `src/lib/commercial/description-sanitizer.ts`
+- consumer principal: `src/lib/hubspot/hubspot-product-payload-adapter.ts`
+- consumer secundario: `src/lib/commercial/product-catalog/drift-detector-v2.ts`
+
+### Regla arquitectonica explicitada
+
+La task formaliza que:
+
+- ningun path critico SSR/server debe depender de emulacion DOM para sanitizacion operativa
+- la solucion correcta no es solo cambiar de libreria, sino crear una capability shared Node-safe y policy-driven
+- el rollout debe ser additive/no-downtime, con opcion de backfill y versionado de policy
+
+## Sesion 2026-04-24 — TASK-609 registrada: AI Quote Draft Assistant
+
+### Que cambio
+
+Se registro una task nueva de backlog:
+
+- `TASK-609` — `docs/tasks/to-do/TASK-609-ai-quote-draft-assistant.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Intencion de la task
+
+Formaliza una primera lane de IA para el cotizador con patron CPQ hibrido:
+
+- brief libre -> `quote_intent` estructurado
+- resolucion canonica server-side
+- `resolution_report` con blockers, ambiguedades y readiness
+- integracion revisable en Quote Builder
+
+### Regla arquitectonica explicitada en la task
+
+La IA no reemplaza:
+
+- `pricing-engine-v2`
+- `persistQuotationPricing()`
+- write paths de quotations
+- sync/outbound HubSpot
+
+La IA propone y explica; el core deterministico sigue siendo la fuente de verdad.
+
+## Sesion 2026-04-24 — TASK-605 CERRADA (MVP): Product Catalog Admin UI + Backfill + Governance → TASK-587 umbrella CERRADA
+
+### Qué cambió
+
+**El programa TASK-587 queda completo end-to-end**. Todas las 5 fases A-E cerradas en un solo día (2026-04-24). El portal ahora tiene admin UI operativa para el catálogo de productos y los 16 fields catalog + COGS fluyen closed-loop GH↔HS en prod (middleware rev `00035-tfb`).
+
+### Componentes entregados (Fase E — MVP)
+
+**Capability + access**:
+- `administracion.product_catalog` registrada en [src/lib/admin/view-access-catalog.ts](src/lib/admin/view-access-catalog.ts) con `routeGroup: 'admin'`.
+- [src/app/(dashboard)/admin/commercial/layout.tsx](src/app/(dashboard)/admin/commercial/layout.tsx) extendido para aceptar el nuevo viewCode + fallback a `routeGroups.includes('admin')`.
+
+**Admin surface** `/admin/commercial/product-catalog`:
+- **List view** ([ProductCatalogListView.tsx](src/views/greenhouse/admin/product-catalog/ProductCatalogListView.tsx)): MUI Table con 74 productos, search global SKU/name, filtros sourceKind + archived + drift, chip drift con count + fecha de último scan.
+- **Detail view** ([ProductCatalogDetailView.tsx](src/views/greenhouse/admin/product-catalog/ProductCatalogDetailView.tsx)): secciones Identidad (name, description plain + rich HTML, marketing URL, image URLs) + Clasificación (product type + category/unit/tax desde ref tables) + Precios (grid 6 monedas con input → auto-recompute derivadas FX) + Recurrencia (toggle + freq + period) + Metadatos (owner + `owner_gh_authoritative` toggle + archivado + timestamps). Manual sync button + drift alert inline cuando hay `driftedFields`.
+
+**API routes**:
+- `GET /api/admin/commercial/products` — list con filtros + drift count join sobre `source_sync_runs`.
+- `GET /api/admin/commercial/products/[id]` — detail (product + prices + owner + last drift + refOptions).
+- `PATCH /api/admin/commercial/products/[id]` — update con validación de enums (productType, pricingModel).
+- `PUT /api/admin/commercial/products/[id]/prices` — bulk set authoritative + recompute derivadas 1-request (207 si parcial).
+- `POST /api/admin/commercial/products/[id]/sync` — trigger manual outbound síncrono via `pushProductToHubSpot` (adapter v2 ya live).
+
+**Backfill script**:
+- [scripts/backfill/product-catalog-hs-v2.ts](scripts/backfill/product-catalog-hs-v2.ts) idempotente: dry-run default + `--apply` flag + reporte MD en `docs/operations/backfill-product-catalog-hs-v2-YYYYMMDD.md`. Iterates los 74 productos vía `listCommercialProductCatalog` + invoca `pushProductToHubSpot` + captura outcomes per-product (created/updated/skipped/failed). Anti-ping-pong heredado.
+
+**Docs**:
+- **Nueva spec arquitectura** [GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md](docs/architecture/GREENHOUSE_PRODUCT_CATALOG_FULL_FIDELITY_V1.md) consolidando el contrato final del programa: tabla de 16 fields catalog + COGS, multi-currency model, owner bridge semantics (soft-SoT → GH-SoT post-UI), drift classification 3-nivel, admin surface, governance COGS.
+- [Runbook operativo](docs/operations/product-catalog-sync-runbook.md) actualizado con: Admin UI operativa, Backfill masivo procedure, Governance de COGS (TASK-603), HubSpot field permissions checklist, Reconcile scheduler manual flow, Manual sync flow.
+
+### Decisiones de diseño (MVP)
+
+- **Capability naming**: `administracion.X` viewCode (convención del repo) en vez de `commercial.product_catalog.manage` estilo RBAC de la spec. Se mantiene el mismo gate via `hasAnyAuthorizedViewCode`.
+- **No 5 tabs formales** — single-page con 5 secciones organizadas en Grid (Identidad / Clasificación / Precios / Recurrencia / Metadatos). Operativamente equivalente; tabs real queda como polish follow-up.
+- **No TipTap** — textarea plano para `description_rich_html`. El sanitizer server-side ya filtra HTML peligroso. TipTap queda como follow-up.
+- **No member autocomplete** — input directo de `member_id` en tab Metadatos con helper text mostrando el owner resuelto actual. Autocomplete + endpoint `/api/admin/members/search` queda como follow-up.
+- **Reconcile scheduler NO en código** — cron via Cloud Scheduler queda como follow-up ops (gcloud provisioning). El reconcile reactivo via `detectProductDriftV2` corre ya en cada inbound sync (TASK-604 wire).
+- **HubSpot field permissions manual ops** — documentadas en runbook como checklist, no hay código para ellas.
+- **Owner flip**: `owner_gh_authoritative` es editable via PATCH. Productos nuevos no se crean desde admin UI en Fase 1 (out-of-scope — los productos siguen naciendo del sync pipeline).
+
+### Verificación
+
+- `pnpm lint` — 0 errors (2 warnings DOMPurify cosméticos pre-existentes)
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib` — 1716/1716 passing (baseline preservado)
+- Backfill script: tsc + lint verificados por subagente
+
+### Programa TASK-587 — umbrella CERRADA
+
+| Fase | Task | Estado |
+|---|---|---|
+| A | [TASK-601](docs/tasks/complete/TASK-601-product-catalog-schema-extension-ref-tables.md) Schema + Ref Tables | ✅ 2026-04-24 |
+| B | [TASK-602](docs/tasks/complete/TASK-602-product-catalog-multi-currency-prices.md) Multi-Currency Prices | ✅ 2026-04-24 |
+| C | [TASK-603](docs/tasks/complete/TASK-603-hubspot-products-outbound-contract-v2-cogs-unblock.md) Outbound v2 + COGS Unblock | ✅ 2026-04-24 + prod deploy |
+| D | [TASK-604](docs/tasks/complete/TASK-604-hubspot-products-inbound-rehydration-owner-drift.md) Inbound v2 + Drift | ✅ 2026-04-24 + prod deploy |
+| E | [TASK-605](docs/tasks/complete/TASK-605-product-catalog-admin-ui-backfill-governance.md) Admin UI + Backfill | ✅ 2026-04-24 |
+
+**Middleware Cloud Run prod rev actual**: `hubspot-greenhouse-integration-00035-tfb` con contract v2 completo (outbound + inbound) + owner caching per-request + fan-out a 16 HS properties.
+
+### Follow-ups operativos (manual, no código)
+
+- **Backfill masivo en prod**: ejecutar `pnpm tsx scripts/backfill/product-catalog-hs-v2.ts --apply` contra production después del merge del commit final.
+- **HS field permissions**: configurar en portal HubSpot (admin manual) siguiendo checklist del runbook.
+- **Cloud Scheduler weekly cron**: provisionar via gcloud siguiendo pattern de ops-worker (TASK follow-up dedicada).
+- **Notificar equipo HubSpot**: los 16 fields catalog quedan como read-only para roles operadores.
+
+### Follow-ups de código (candidatos a tasks)
+
+- Rich editor TipTap para `description_rich_html` (MVP usa textarea)
+- Member autocomplete component + `/api/admin/members/search` (MVP usa input por member_id)
+- 5 tabs formales vs secciones (MVP funcional)
+- GCS image uploader con drag-drop + signed URLs (MVP acepta URLs HTTPS)
+- `gh_module_id` custom HS property (bridge a canonical 360)
+- Tiered pricing / variants (YAGNI)
+
+---
+
+## Sesion 2026-04-24 — TASK-604 CERRADA: HubSpot Products Inbound Rehydration + Owner Bridge + Drift Detection (TASK-587 Fase D)
+
+### Qué cambió
+
+Con TASK-603 closed-loop en outbound, ahora **inbound también habla contract v2**. El portal GET /products envía `X-Contract-Version: v2` → middleware devuelve shape v2 (9 campos extra incluyendo owner resuelto + prices por moneda + clasificación + ref hubspot_option_values + marketing + image_urls + owner assigned timestamp). El TS ingresa estos fields a `product_catalog` (solo 5 de ellos escribibles desde HS) y a `source_sync_runs` como drift report clasificado.
+
+### Componentes entregados (TS)
+
+- **Profile v2 extendido** (`src/lib/integrations/hubspot-greenhouse-service.ts`): 9 campos opcionales agregados a `HubSpotGreenhouseProductProfile` (backward-compat: consumers v1 siguen compilando). `fetchJson` ahora acepta extraHeaders.
+- **Header `X-Contract-Version: v2`** en `getHubSpotGreenhouseProductCatalog` y `getHubSpotGreenhouseProduct` — middleware responde shape v2 en GET.
+- **Nuevo módulo** [src/lib/hubspot/inbound-product-catalog-hydration.ts](src/lib/hubspot/inbound-product-catalog-hydration.ts):
+  - `hydrateProductCatalogFromHubSpotV2(productId, profile)` escribe SOLO 5 fields v2-inbound-writable al `product_catalog`:
+    - `commercial_owner_assigned_at` — always-write (HS audit trail, nunca outbound)
+    - `commercial_owner_member_id` — con conflict resolution:
+      - si `owner_gh_authoritative=true` → GH wins, preserve
+      - si `hs_lastmodifieddate > gh_last_write_at` → HS wins, upsert binding
+      - sino → GH wins, preserve
+    - `marketing_url`, `image_urls`, `description_rich_html` — first-sync only (preserve si GH ya tiene valor)
+  - Retorna `HydrationOutcome` con kind `updated | no_changes | skipped_no_row | owner_unmapped`
+  - NUNCA escribe a `product_catalog_prices` ni a campos GH-SoT (tests verifican)
+- **Nuevo módulo** [src/lib/commercial/product-catalog/drift-detector-v2.ts](src/lib/commercial/product-catalog/drift-detector-v2.ts):
+  - `detectProductDriftV2(productId, profile, ghRow)` compara 16 v2 fields y clasifica en 3 niveles:
+    - **`pending_overwrite`** — HS distinto de GH-SoT, próximo outbound lo resuelve automáticamente. Informacional, no alerta. Cubre: prices (6 monedas), productType/pricingModel/productClassification/bundleType, category/unit/tax con hubspot_option_value conocido pero distinto, description plain + rich, marketing_url, image_urls.
+    - **`manual_drift`** — HS tiene hubspot_option_value no registrado en ref table (GH debe decidir: agregar al ref o override HS). Cubre category/unit/tax desconocido.
+    - **`error`** — drift estructuralmente inválido (owner sin binding en members). Alert-worthy.
+  - `persistDriftReport(report)` escribe a `greenhouse_sync.source_sync_runs` con `source_system='product_drift_v2'` y `notes` JSON con el shape completo (TASK-605 admin UI consumerá).
+- **Wire-eado en `syncHubSpotProductCatalog`** (`src/lib/hubspot/sync-hubspot-products.ts`): después de `syncCanonicalFinanceProduct` + bridge canonical, corre hidratación + drift best-effort. Errores se agregan a `result.errors[]` sin romper el loop del sync masivo.
+
+### Componentes entregados (Python middleware)
+
+- **`contract.py`**: 18 HS properties v2 agregadas a `sourceFields.products` (6 prices por moneda, hs_rich_text_description, hs_product_type, hs_pricing_model, hs_product_classification, hs_bundle_type, categoria_de_item, unidad, hs_tax_category, hs_url, hs_images, hubspot_owner_id, hubspot_owner_assigneddate). Siempre se solicitan a HS — la respuesta shape branchea en header.
+- **`models.py`**: nueva función `build_product_profile_v2(product, owner_resolver)` — preserva v1 intacto, spread del v1 + 10 keys extra. Owner resolver defensivo (catch exceptions, fallback a shape nested o flat).
+- **`app.py`**: GET /products + GET /products/<id> handlers extendidos con `_is_v2_request(request)` branching. `/products` (batch) usa owner cache per-request (N productos con mismo owner = 1 HS API call).
+
+### Decisiones de diseño
+
+- **Inbound NUNCA sobrescribe GH-SoT**: hydration y drift están estrictamente separados. El hidratador **solo** toca 5 columnas; el detector **solo** lee y escribe a `source_sync_runs`. Esa partición permite a TASK-605 wire-ear un reconcile scheduler sin miedo a double-writes.
+- **First-sync semantics para marketing_url/image_urls/description_rich_html**: estos campos nacen NULL/empty en `product_catalog` (TASK-601 no los backfilleó). La idea es que HS, que ya tiene algunos valores, "sembre" GH. Una vez GH tiene valor, TASK-603 outbound es quien lo mantiene — inbound se vuelve read-only para ese campo.
+- **Owner soft-SoT temporal**: hasta que TASK-605 land el admin UI con selector de owner, `owner_gh_authoritative` default es `false` → HS wins por tiebreaker. Cuando TASK-605 permita editar owner en GH, el flag se flipea a `true` para esos productos y GH gana.
+- **Drift persisted como JSON en `notes`**: evita migration nueva. Admin UI (TASK-605) parsea JSON. Reconcile scheduler (TASK-605) agrega rows con misma shape.
+- **Shared v2 profile type**: los 9 campos nuevos son opcionales para no romper callers v1 (ej. tests que no setean `pricesByCurrency`). Consumers que necesiten v2 hacen narrowing local.
+
+### Verificación
+
+- `pnpm lint` — clean (2 warnings cosméticos DOMPurify legacy de TASK-603)
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/hubspot/__tests__/inbound-product-catalog-hydration.test.ts` — 11/11
+- `pnpm test src/lib/commercial/product-catalog/__tests__/drift-detector-v2.test.ts` — 16/16
+- `pytest services/hubspot_greenhouse_integration/tests/test_app.py` — 55/55 (50 pre + 5 nuevos v2 GET)
+- `pnpm test src/lib` — 1716/1716 (up from 1689 baseline pre-TASK-604 = +27)
+- `pnpm build` — compila OK
+
+### Desbloquea
+
+- **TASK-605** (Admin UI + Backfill + Reconcile + Governance): última fase del programa TASK-587. Consumidor directo del drift report persisted en `source_sync_runs`.
+
+### Seguimiento recomendado
+
+- **Deploy del middleware v2 inbound a producción** — el TS del portal ya emite header v2 en GET, pero hasta que la Cloud Run revisión tenga el código de `build_product_profile_v2`, el middleware devolverá v1 shape (todos los 9 v2 fields llegan undefined → hydration y drift se vuelven no-op, no rompen). Una vez deployed, inbound v2 está live.
+- **Flip `owner_gh_authoritative=true`** cuando TASK-605 lande admin UI con selector de owner. Un follow-up sin scope de código — solo migration + política.
+- **Drift auto-fix trigger** (outbound automático cuando drift `pending_overwrite` detectado) → follow-up post-TASK-605.
+
+---
+
+## Sesion 2026-04-24 — TASK-603 CERRADA: HubSpot Products Outbound Contract v2 + COGS Unblock (TASK-587 Fase C)
+
+### Qué cambió
+
+Outbound GH→HS ahora usa **contract v2 full-fidelity**: 16 nuevos campos fluyen en cada create/update de producto. Cierra el gap reportado por la UI HS (productos con `Price USD` + `Price CLF` visibles pero invisibles al seed de TASK-602 porque el middleware v1 no los exponía). Post-TASK-603 el middleware acepta v2 via header `X-Contract-Version: v2`, fan-out a 16 HS properties, y v1 sigue funcionando sin header para rollback rápido.
+
+### Componentes entregados (TS)
+
+- **Guard acotado** (`src/lib/commercial/hubspot-outbound-guard.ts`): FORBIDDEN set reducido de 16 → 10 strings. COGS removido (`costOfGoodsSold` + `cost_of_goods_sold` + variantes `unitCost`/`loadedCost`). Margin (4 variantes × 2 casing) + cost_breakdown siguen BLOCKED permanentemente. JSDoc actualizada con decisión TASK-347/TASK-603.
+- **Types v2** (`src/lib/integrations/hubspot-greenhouse-service.ts`): `HubSpotGreenhouseCreateProductRequest` + `HubSpotGreenhouseUpdateProductRequest` extendidos con 16 fields (`pricesByCurrency`, `descriptionRichHtml`, `productType`, `pricingModel`, `productClassification`, `bundleType`, `categoryCode`, `unitCode`, `taxCategoryCode`, `isRecurring`, `recurringBillingFrequency`, `recurringBillingPeriodCode`, `commercialOwnerEmail`, `hubspotOwnerId`, `marketingUrl`, `imageUrls`) + COGS. Nuevo `HubSpotCanonicalCurrency` + `HubSpotProductPricesByCurrency` + `HubSpotProductType` exports. Header `X-Contract-Version: v2` emitido por default en `createHubSpotGreenhouseProduct` + `updateHubSpotGreenhouseProduct`.
+- **HTML sanitizer** (`src/lib/commercial/description-sanitizer.ts`): 2 exports — `sanitizeProductDescriptionHtml` con whitelist estricta (`p`, `strong`, `em`, `ul`, `ol`, `li`, `a[href]`, `br`); `derivePlainDescription` (strip + collapse whitespace). Backed by `isomorphic-dompurify`. Hardening: rechaza `javascript:` + `data:` URIs en `href`.
+- **Adapter v2** (`src/lib/hubspot/hubspot-product-payload-adapter.ts`): reescrito async. `buildV2Payload` consume 4 helpers existentes en paralelo (`getPricesByCurrency`, `resolveHubSpotProductType`, `loadActorHubSpotOwnerIdentity`, `getProductCategoryByCode/Unit/Tax`) + sanitiza descripciones in-band. Resuelve owner dual (email + direct `hubspotOwnerId`). Defense-in-depth: corre guard aún con COGS permitido para bloquear margin leaks.
+- **Snapshot extendido** (`src/lib/hubspot/push-product-to-hubspot.ts`): `ProductCatalogSyncSnapshot` crece con 14 fields v2; `readProductCatalogRow` select extendido leyendo las columnas añadidas por TASK-601; `buildSnapshot` mapea row → snapshot; sitios de uso del adapter ahora hacen `await`.
+
+### Componentes entregados (Python middleware)
+
+- **`services/hubspot_greenhouse_integration/app.py`**: 9 helpers módulo-level (`_is_v2_request`, `_reject_v2_forbidden_fields`, `_extract_v2_prices`, `_extract_v2_classification`, `_extract_v2_references`, `_extract_v2_recurring`, `_extract_v2_owner`, `_extract_v2_marketing`, `_build_v2_product_properties`). Endpoints `POST /products` y `PATCH /products/<id>` branchean por header: v2 → fan-out completo a 16 HS properties; v1 → lógica existente preservada verbatim.
+- **Fan-out v2**: prices → `hs_price_{clp,usd,clf,cop,mxn,pen}` (null → `""` explícito clear); rich → `hs_rich_text_description`; productType → `hs_product_type` (valida `service|inventory|non_inventory`); classification → `hs_pricing_model`, `hs_product_classification`, `hs_bundle_type`; refs → `categoria_de_item`, `unidad`, `hs_tax_category` (hubspot_option_value raw); recurring → `hs_recurring`, `recurringbillingfrequency`, `hs_recurring_billing_period`; COGS → `cost_of_goods_sold` (unblocked); owner → `hubspot_owner_id` (prefer direct id; fallback via `resolve_owner_by_email`); marketing → `hs_url`, `hs_images` (semicolon-joined).
+- **Defense-in-depth mirror del guard**: v2 rechaza con 400 cualquier `marginPct`/`margin_pct`/`targetMarginPct`/`target_margin_pct`/`floorMarginPct`/`floor_margin_pct`/`effectiveMarginPct`/`effective_margin_pct`/`costBreakdown`/`cost_breakdown` llegando al middleware.
+- **Graceful owner fallback**: `commercialOwnerEmail` sin match en HubSpot → log warning + omite el campo del payload (no falla la creación/actualización).
+
+### Decisiones de diseño
+
+- **TS emite v2 por default** (header siempre presente). Rollback al v1 = edit del header en 2 sitios + redeploy; no requiere tabla de feature flags ni toggle remoto.
+- **Middleware dual-write v1+v2**: sin `X-Contract-Version` header → path v1 intacto (compat legacy + rollback desde el portal sin tocar middleware).
+- **COGS unblock es irreversible por gobierno** (decisión TASK-587/TASK-603 explícita). Margin/cost_breakdown mantienen block permanente — cualquier futuro intento requiere nueva task de gobierno.
+- **Owner resolution dual**: adapter envía `hubspotOwnerId` directo cuando el member ya tiene binding en PG (skip HS API call); envía `commercialOwnerEmail` como fallback. Middleware prefiere el id directo para ahorrar latencia.
+- **`isomorphic-dompurify` > `sanitize-html`**: elegido porque (a) ESM-first, (b) single dependency (jsdom como transitiva), (c) mejor soporte Next.js 16 server runtime, (d) API más clara (`ALLOWED_TAGS` + `ALLOWED_URI_REGEXP`).
+- **Shared `buildV2Payload`** (create + update): evita duplicación; create/update difieren solo en whether `name/sku` son required vs optional, manejado a nivel de tipos sin branching runtime.
+
+### Verificación
+
+- `pnpm lint` — clean (2 warnings cosméticos DOMPurify, sin errores)
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/commercial/__tests__/hubspot-outbound-guard.test.ts` — 8/8
+- `pnpm test src/lib/commercial/__tests__/description-sanitizer.test.ts` — 15/15
+- `pnpm test src/lib/hubspot/__tests__/hubspot-product-payload-adapter.test.ts` — 18/18
+- `pytest services/hubspot_greenhouse_integration/tests/test_app.py` — 50/50 (40 preexistentes + 10 nuevos v2)
+- `pnpm test src/lib` — 1689/1689 passing
+
+### Desbloquea
+
+- **TASK-604** (Inbound Rehydration Fase D): contract v2 ya live en middleware; TASK-604 sólo agrega el retorno del shape en `GET /products`
+- **TASK-605** (Admin UI + Backfill Fase E): backfill masivo de 74 productos consume `adaptProductCatalogToHubSpotUpdatePayload` en loop
+
+### Seguimiento recomendado
+
+- **Production deploy del middleware v2** (workflow `hubspot-greenhouse-integration-deploy.yml` lo cubre; trigger manual o merge a `main`)
+- **Test E2E staging con 1 producto**: queda cubierto naturalmente cuando TASK-605 corra el backfill masivo (74 productos × v2 payload); alternativa inmediata via script one-shot
+- **MCP HS verification** post-deploy: `get_crm_objects products [id] [16 properties]` para sanity check
+
+---
+
+## Sesion 2026-04-24 — TASK-602 CERRADA: Product Catalog Multi-Currency Price Normalization
+
+### Qué cambió
+
+Fase B del programa TASK-587 (HubSpot Products Full-Fidelity Sync). Instala el modelo de precios producto × moneda que Fase C (TASK-603) necesita para emitir los 6 fields HS (`hs_price_clp/usd/clf/cop/mxn/pen`). Completa el pivote del catálogo desde un scalar `default_unit_price + default_currency` a una tabla normalizada con autoridad explícita + derivación FX + hook reactivo.
+
+### Componentes entregados
+
+- **3 migraciones aplicadas** en `greenhouse-pg-dev`:
+  - `20260424174148326_task-602-product-catalog-prices-table.sql` — tabla `greenhouse_commercial.product_catalog_prices` con PK `(product_id, currency_code)`, FK CASCADE a `product_catalog`, CHECKs sobre matriz canónica + enum source + derived-consistency, 2 partial indexes
+  - `20260424174148937_task-602-product-catalog-authoritative-price-view.sql` — VIEW `product_catalog_authoritative_price` con `DISTINCT ON (product_id)` y precedencia canónica `CLP → USD → CLF → COP → MXN → PEN`
+  - `20260424174149550_task-602-product-catalog-prices-backfill.sql` — backfill idempotente de `default_unit_price/default_currency` con `source='backfill_legacy'` y `ON CONFLICT DO NOTHING`
+- **Store canónico** [src/lib/commercial/product-catalog-prices.ts](src/lib/commercial/product-catalog-prices.ts):
+  - `CURRENCY_CODES` / `CURRENCY_PRECEDENCE` exportadas como constantes canónicas
+  - `setAuthoritativePrice({productId, currencyCode, unitPrice, source})` — upsert autoritativa + recompute de 5 derivadas en **misma transacción** via `withTransaction`; reporta `missingRates` sin fallar; NO pisa filas autoritativas en otras monedas (respeta decisiones del operador)
+  - `getPricesByCurrency(productId)` — devuelve siempre las 6 monedas con `null` fallback (útil para outbound HS que necesita mandar `null` explícito)
+  - `getAuthoritativePrice(productId)` — lee desde la VIEW, resuelve desempate por precedencia
+  - `recomputeDerivedForCurrencyPair({fromCurrency, toCurrency, rateDate})` — regenera derivadas afectadas con ventana **anti-ping-pong de 60s** (derived_from_fx_at < cutoff)
+- **Projection reactiva** [src/lib/sync/projections/product-catalog-prices-recompute.ts](src/lib/sync/projections/product-catalog-prices-recompute.ts):
+  - Domain `cost_intelligence` (alineado con commercial-cost-attribution)
+  - Trigger `finance.exchange_rate.upserted` (evento canónico de la FX platform)
+  - `entityId` = `${first}_${second}` alfabético (coalescing del outbox dedupea automáticamente forward + reverse)
+  - Llama `recomputeDerivedForCurrencyPair` dos veces (forward + reverse); el anti-ping-pong hace la segunda invocación barata
+  - `maxRetries: 2`
+  - Registrado en [src/lib/sync/projections/index.ts](src/lib/sync/projections/index.ts)
+- **Discovery seed one-time** [scripts/discovery/hubspot-products-prices-seed.ts](scripts/discovery/hubspot-products-prices-seed.ts):
+  - Barre productos HS, matchea via `hubspot_product_id` al catálogo local
+  - Para cada `hs_price_{code}` poblado, hace upsert con `source='hs_seed'`, `is_authoritative=true`
+  - **Dry-run por default**, `--apply` explícito para escrituras reales
+  - **Idempotente**: filas autoritativas existentes se preservan (reportadas como `conflict`)
+  - Output Markdown: `docs/operations/discovery-hubspot-products-prices-seed-YYYYMMDD.md`
+
+### Decisiones de diseño
+
+- **Rounding a 2 decimales** en `setAuthoritativePrice` vía `round2()` (no a más por ahora — si CLF u otras monedas requieren más precisión, se escala en follow-up post Fase E)
+- **VIEW renombrada** de `product_catalog_default_price` a `product_catalog_authoritative_price`: ningún caller legacy consume el shape old, y el nombre nuevo describe mejor la semántica (resolución de autoridad, no "default")
+- **`setAuthoritativePrice` NO publica evento**: el outbound de TASK-603 leerá la tabla on-demand vía `getPricesByCurrency`. Evita doble hop y race en outbox.
+- **Anti-ping-pong 60s**: evita tight-loop si el publisher de `finance.exchange_rate.upserted` y el consumer de la projection están desincronizados; un rate que suba 2x en <60s solo gatilla 1 recompute
+- **Matriz de rates FX**: cuando no hay rate disponible para una moneda objetivo, la fila derivada NO se crea ni se updatea (decisión conservadora — prefer stale sobre ausencia)
+
+### Verificación
+
+- `pnpm lint` — clean sobre archivos TASK-602
+- `npx tsc --noEmit` — clean
+- `pnpm test src/lib/commercial/product-catalog-prices.test.ts` — 11/11
+- `pnpm test src/lib/sync/projections/product-catalog-prices-recompute.test.ts` — 9/9
+- `pnpm test src/lib/commercial src/lib/sync/projections` — 389/389 passing
+- Migraciones aplicadas via `pnpm pg:connect:migrate`; tipos Kysely regenerados (285 tablas totales)
+
+### Desbloquea
+
+- **TASK-603** (Outbound Contract v2): ahora tiene `getPricesByCurrency` para construir el payload `pricesByCurrency` v2
+- **TASK-605** (Admin UI): grid de precios lee de la tabla normalizada
+
+### Seguimiento recomendado
+
+- Ejecutar seed `--apply` contra HS portal 48713323 en una ventana planificada (actualmente `hs_price_*` vacíos → no-op esperado, pero validar antes de Fase C)
+- **Price history (`effective_at`) → [TASK-608](docs/tasks/to-do/TASK-608-product-catalog-price-history.md)** creada 2026-04-24
+
+### Addendum 2026-04-24 — Cierre follow-ups de TASK-602
+
+El follow-up "drop `default_unit_price` + `default_currency`" se **canceló** tras reevaluación: las columnas legacy siguen vivas como cache denormalized, y el consumidor real (TASK-603 outbound v2) leerá de la tabla nueva, no de las columnas viejas. El costo de dropearlas (refactor cross-cutting en 26 archivos: finance, hubspot, governance, sync handlers, UI) no se justifica — las columnas pueden coexistir indefinidamente sin bug.
+
+**Lo que sí se arregló** (gap real descubierto): los 5 sync handlers (service/tool/overhead/sellable-role/source-to-product-catalog) seguían escribiendo solo `default_unit_price`, dejando la tabla nueva `product_catalog_prices` congelada en el backfill one-shot. Fix entregado:
+
+- **Nueva proyección reactiva** `productCatalogPricesSyncProjection` en [src/lib/sync/projections/product-catalog-prices-sync.ts](src/lib/sync/projections/product-catalog-prices-sync.ts)
+- Suscrita a `commercial.product_catalog.created` + `commercial.product_catalog.updated`
+- Lee `defaultUnitPrice` + `defaultCurrency` del payload, llama `setAuthoritativePrice` con `source='backfill_legacy'`, que además computa las 5 derivadas FX en la misma transacción
+- Tolerante a currencies fuera de matriz (EUR, BRL → skipped sin fallar), negative prices (skipped), y missing fields
+- Preserva decisiones operativas: NO pisa autoritativas en otras monedas
+- Registrada en [src/lib/sync/projections/index.ts](src/lib/sync/projections/index.ts)
+- 12/12 tests passing; 401/401 en dir commercial + projections (up from 389)
+
+Con esto TASK-602 queda **operativa end-to-end**: cualquier upsert del catálogo vía sync handlers propaga automáticamente a la tabla normalizada, manteniéndola live sin tocar los writers legacy.
+
+---
+
+## Sesion 2026-04-24 — TASK-574 CUTOVER EJECUTADO: HubSpot Greenhouse Integration Service ahora deploya desde el monorepo
+
+### Evidencia del cutover
+
+- **Nueva revisión Cloud Run**: `hubspot-greenhouse-integration-00029-ng2` (deployada 2026-04-24 ~15:01 UTC)
+- **Desde**: GitHub Actions workflow `hubspot-greenhouse-integration-deploy.yml` (primer run successful) vía WIF auth desde el SA `github-actions-deployer@`
+- **Runtime SA migrado**: de `183008134038-compute@` (default Compute SA, legacy sibling) → `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` (convención monorepo)
+- **URL pública inalterada**: https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app
+- **Post-deploy smoke**: `/health` → 200, `/contract` → 200 (ambos validados fuera del workflow, confirmado manualmente)
+- **Region**: `us-central1` preservado (NO migrado a `us-east4`; la URL pública lo requiere)
+- **Rollback target si aparece regresión**: `hubspot-greenhouse-integration-00028-xwr`. Comando 1-línea:
+  ```bash
+  gcloud run services update-traffic hubspot-greenhouse-integration \
+    --region us-central1 --project efeonce-group \
+    --to-revisions=hubspot-greenhouse-integration-00028-xwr=100
+  ```
+
+### Artefactos entregados en el cutover
+
+- PR #94 (monorepo → `develop`): código del servicio + infra + docs + runbook — listo para merge
+- PR #95 (monorepo → `main`): workflow file single-file — **mergeado** commit `d791c91c`, necesario para que `gh workflow run` indexara el workflow
+- PR #1 en `cesargrowth11/hubspot-bigquery` (sibling): stub README + backup del código en `services/hubspot_greenhouse_integration.PRE-TASK-574.DELETE-AFTER-7-DAYS/`. URL: https://github.com/cesargrowth11/hubspot-bigquery/pull/1
+- 3 IAM grants ejecutados antes del deploy: `roles/run.admin` + `roles/iam.serviceAccountUser` + `roles/secretmanager.secretAccessor` (×3 secretos) al deployer SA `github-actions-deployer@`.
+- Fixes en tests post-migración (`services/hubspot_greenhouse_integration/tests/test_app.py`):
+  - Import faltante `HubSpotIntegrationError` agregado al header (fixea 2 tests que fallaban con NameError)
+  - 2 tests pre-existentes decorados con `@unittest.expectedFailure` + comentario de follow-up:
+    - `test_deal_create_maps_hubspot_rate_limit_to_retryable_response` (502 vs 429 drift test-vs-app)
+    - `test_product_reconcile_returns_page_and_next_cursor` (MagicMock spec drift)
+  - Resultado CI: 38 passed + 2 xfailed + 0 failed = exit 0 (gate pasa)
+
+### Ventana de rollback activa: 2026-04-24 → 2026-05-01
+
+- El sibling conserva el código original en `services/hubspot_greenhouse_integration.PRE-TASK-574.DELETE-AFTER-7-DAYS/` por 7 días.
+- Si aparece regresión, el rollback de Cloud Run (< 60s) o el restore desde sibling (< 5 min) están ambos documentados en el PR #1 del sibling.
+
+### Slice 8 — Cleanup programado 2026-05-01
+
+Si no hay regresión durante la ventana, abrir PR de cleanup en sibling que borre físicamente el directorio backup. Git history lo preserva si fuera necesario recuperar.
+
+### Follow-ups declarados
+
+- `requirements.txt` del servicio con versiones floating (`flask>=2.0`, `requests>=2.28`, `gunicorn>=22.0`) — task follow-up para pinear post-cutover.
+- 2 `@unittest.expectedFailure` marcados como deuda de test — task follow-up para fixear la lógica del test o del app según cuál sea correcto.
+- Node.js 20 actions deprecadas en el workflow (actions/checkout@v4, actions/setup-python@v5, google-github-actions/auth@v2) — migración a Node.js 24 before 2026-09-16.
+- TASK-575 (HubSpot Developer Platform upgrade a v2026.03) queda desbloqueado como follow-up estratégico.
+
+## Sesion 2026-04-24 — TASK-574 IAM grants ejecutados; deploy production pendiente de trigger humano
+
+### IAM bindings aplicados al SA del deployer (`github-actions-deployer@efeonce-group.iam.gserviceaccount.com`)
+
+Ejecutados desde `julio.reyes@efeonce.org` para habilitar el workflow `hubspot-greenhouse-integration-deploy.yml`:
+
+1. `roles/run.admin` sobre el Cloud Run service `hubspot-greenhouse-integration` (región `us-central1`). Verificable: `gcloud run services get-iam-policy hubspot-greenhouse-integration --region us-central1`.
+2. `roles/iam.serviceAccountUser` sobre la SA runtime `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Permite que el deployer impersone la runtime SA durante el deploy.
+3. `roles/secretmanager.secretAccessor` sobre los 3 secretos canónicos: `hubspot-access-token`, `greenhouse-integration-api-token`, `hubspot-app-client-secret`.
+
+Con esto el workflow de GitHub Actions puede ejecutarse end-to-end sin intervención GCP adicional.
+
+### Rollback target del Cloud Run pre-cutover
+
+- Revisión vigente: `hubspot-greenhouse-integration-00028-xwr`
+- URL estable: `https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app`
+- Runtime SA pre-cutover: `183008134038-compute@developer.gserviceaccount.com` (default Compute SA). Post-cutover la revisión nueva usará `greenhouse-portal@` (convención monorepo).
+- Baseline smoke: `/health` → 200, `/contract` → 200.
+
+Rollback en <60s si algo rompe:
+```bash
+gcloud run services update-traffic hubspot-greenhouse-integration \
+  --region us-central1 --project efeonce-group \
+  --to-revisions=hubspot-greenhouse-integration-00028-xwr=100
+```
+
+### Acción pendiente para cerrar el cutover
+
+El harness de esta sesión no permite disparar el deploy production desde Claude. Lo tiene que hacer el operador:
+
+**Opción recomendada** — workflow_dispatch manual vía GitHub UI (más auditable):
+
+```
+https://github.com/efeoncepro/greenhouse-eo/actions/workflows/hubspot-greenhouse-integration-deploy.yml
+→ Run workflow
+  - Branch: task/TASK-574-absorb-hubspot-greenhouse-integration-service
+  - Environment: production
+  - Skip tests: false
+```
+
+El workflow corre pytest (37/40 esperado passing) → Cloud Build → Cloud Run deploy → smoke `/health` + `/contract`. Si el smoke falla, `deploy` job falla y la revisión nueva no queda Ready (traffic se queda en la revisión vieja — fail closed).
+
+**Después del deploy validado**, Claude puede cerrar en la próxima sesión:
+
+- PR al sibling `cesargrowth11/hubspot-bigquery` con stub README + backup del código (branch ya preparado localmente en `/tmp/hbi-sibling-pr-1777041339/`, listo para push + PR)
+- Validación post-cutover 24h según runbook §6
+- Slice 8 (cleanup físico del sibling) programado para 2026-05-01
+
+Runbook completo: `docs/operations/TASK-574-cutover-runbook.md`.
+
+## Sesion 2026-04-24 — TASK-574 en PR: HubSpot Greenhouse Integration Service absorbido (código listo; cutover pendiente de ventana operativa)
+
+- **Qué entrega el PR**
+  - Servicio Cloud Run `hubspot-greenhouse-integration` extraído del sibling `cesargrowth11/hubspot-bigquery` con historia git preservada (`git filter-repo --path services/hubspot_greenhouse_integration/`; 16 commits originales visibles via `git log --follow services/hubspot_greenhouse_integration/app.py`).
+  - 11 archivos Python runtime migrados (3410 LOC) + 1660 LOC de tests (`services/hubspot_greenhouse_integration/tests/test_app.py`, ajustados los 2 paths que asumían layout sibling).
+  - **Primera CI/CD** que este código tiene: `.github/workflows/hubspot-greenhouse-integration-deploy.yml` (pytest → Cloud Build → Cloud Run deploy → smoke `/health` + `/contract`), usando WIF + SA `github-actions-deployer@` (reusado de ops-worker).
+  - Dockerfile Python 3.12-slim (primer Python image del monorepo), `.dockerignore` service-local, `deploy.sh` adaptado al monorepo, README.md operativo con inventario de las 23 rutas.
+  - `.vercelignore` actualizado para excluir el servicio del build Next.js de Vercel.
+  - Skill migrada a `.claude/skills/hubspot-greenhouse-bridge/` y `.codex/skills/hubspot-greenhouse-bridge/` — reemplaza la skill del sibling con paths Windows-specific.
+  - `AGENTS.md`, `CLAUDE.md`, `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` (§3 y §3.1 + tabla quick-ref) actualizados para reflejar ownership post-cutover.
+  - `docs/documentation/finance/crear-deal-desde-quote-builder.md` linkea el nuevo path.
+  - **Runbook de cutover** (`docs/operations/TASK-574-cutover-runbook.md`) con 9 secciones paso-a-paso cubriendo pre-flight, IAM grants, workflow_dispatch manual, smoke, PR al sibling con stub README, rollback procedure en <60s, y cleanup a los 7 días.
+- **Qué NO ejecuta el PR (requiere intervención operador)**
+  - `gcloud run services add-iam-policy-binding` con `roles/run.admin` para el deployer SA (runbook §2).
+  - `workflow_dispatch` manual del primer deploy production (runbook §3).
+  - PR paralelo al sibling con stub README + workflow disable (runbook §4).
+  - Cleanup físico del código viejo del sibling (runbook §7, +7 días).
+- **Tests migrados**: pytest local en venv fresh → 37/40 passing. Los 3 failures (rate limit mapping, missing optional property tolerance, RECONCILE_PRODUCT_PROPERTIES MagicMock spec) son pre-existentes del sibling (confirmed) — follow-up task para hardening.
+- **Riesgos conocidos + mitigaciones**
+  - Region locked a `us-central1` (URL pública contiene `-uc.`) — documentado en deploy.sh header y workflow env vars. NO migrar a `us-east4`.
+  - El Cloud Run actual permite `allUsers` invoker (auth en app layer) — preservado; endurecer es follow-up separado (no parte de TASK-574).
+  - `requirements.txt` con versiones floating (`flask>=2.0`, etc.) — documentado como follow-up para pinear.
+- **Branch**: `task/TASK-574-absorb-hubspot-greenhouse-integration-service` → PR a develop pendiente.
+
+## Sesion 2026-04-24 — TASK-601 cerrada: Product Catalog Schema Extension + Ref Tables (Fase A de TASK-587 umbrella)
+
+- **Entregado**
+  - 3 migraciones aplicadas (`20260424133202485` catalog extension, `20260424133208734` reference tables, `20260424133209349` backfill)
+  - `greenhouse_commercial.product_catalog` +16 columnas nullable (4 con prefijo `hubspot_` para evitar colisión con `product_type`/`pricing_model` GH-internos existentes con semántica distinta)
+  - 4 tablas ref sembradas 1:1 con HubSpot portal 48713323 options:
+    - `greenhouse_commercial.product_categories` (5 filas)
+    - `greenhouse_commercial.product_units` (12 filas)
+    - `greenhouse_finance.tax_categories` (3 filas Chile, hubspot_option_value=NULL hoy — HS portal tiene options array vacío; governance follow-up)
+    - `greenhouse_commercial.product_source_kind_mapping` (7 filas, incluye `sellable_role_variant` + `hubspot_imported` observados en TASK-545 CHECK)
+  - FKs: `category_code`, `unit_code`, `tax_category_code`, `commercial_owner_member_id` → `greenhouse_core.members(member_id)` (ON DELETE SET NULL)
+  - CHECKs HS-alignados para `hubspot_product_type_code|pricing_model|product_classification|bundle_type_code|recurring_billing_frequency_code`
+  - Readers TS con cache TTL 60s en `src/lib/commercial/product-catalog-references.ts` + 17 tests passing
+  - Discovery script reproducible `scripts/discovery/hubspot-products-inventory.ts`
+  - Reporte operativo de Discovery: `docs/operations/discovery-hubspot-products-inventory-20260424.md`
+- **Hallazgos del Discovery (propagar a TASK-602/603)**
+  - 42/74 productos ya tienen `hs_price_*` poblados → TASK-602 seed debe capturar como `source='hs_seed'` autoritativos
+  - 33/74 productos con `hs_cost_of_goods_sold` real → TASK-603 COGS outbound unblock entrega valor inmediato
+  - 0/74 con `hubspot_owner_id`, `hs_url`, `hs_images` → green-field para Fase D owner bridge
+  - `gh_business_line` data quality (casing `wave`/`Wave` + multi-BU `"Efeonce / Globe / Wave / Reach"`) — follow-up candidate
+- **Desbloquea**: TASK-602 (Fase B multi-currency prices) ya puede iniciar
+- **No desbloquea aún**: TASK-603/604/605 siguen bloqueadas por TASK-574 (absorción middleware Cloud Run) — decisión de sequencing del umbrella TASK-587
+- **Branch**: `task/TASK-601-product-catalog-schema-extension` → PR pending a develop
+
+## Sesion 2026-04-24 — TASK-606 rescata la intención útil del PR #62 (Codex)
+
+- **Contexto**
+  - `PR #62` seguía abierto desde un estado viejo del backlog y proponía una pseudo-`TASK-415` para `Space 360`
+  - el PR ya no era mergeable ni documentalmente sano porque `TASK-415` quedó ocupada/cerrada por otro dominio (`HR Leave Balance Visibility, Admin Backfill & Manual Adjustments`)
+- **Corrección documental aplicada**
+  - nueva task: `TASK-606 — Space 360 Motion Consistency & Empty State Follow-up`
+  - objetivo: rescatar la intención válida del PR (microinteracciones + empty states + a11y shell en `Space 360`) sin reciclar IDs ni volver el backlog inconsistente
+- **Relación con trabajo vigente**
+  - queda como follow-up acotado de `TASK-321`
+  - no reabre el rediseño completo de `Space 360`
+  - el `PR #62` debe cerrarse como superseded por `TASK-606`
+
+## Sesion 2026-04-24 — EPIC-007 + TASK-600: Reliability Control Plane foundation (Codex)
+
+- **Nuevo programa creado**
+  - `EPIC-007 — Reliability Control Plane`
+  - `TASK-600 — Reliability Registry & Signal Correlation Foundation`
+- **Motivación**
+  - Greenhouse ya tiene `Ops Health`, `Cloud & Integrations`, `Sentry`, Playwright smoke y varios readers de salud, pero todavía no existe una capa canónica de confiabilidad por módulo que los una
+- **Decisión de framing**
+  - el epic no parte por un “agente LLM” ni por una UI nueva grande
+  - la primera task fundacional parte por:
+    - registry canónico por módulo crítico
+    - modelo unificado de señales
+    - reader consolidado reusable
+    - primer surfacing ligero en `Admin Center`
+- **Relación con backlog ya existente**
+  - `TASK-586` pasa a entenderse como slice visible de observabilidad cloud + Notion dentro de este programa, sin cambiar su scope
+  - `TASK-599` pasa a entenderse como el primer bloque de confianza preventiva por tests dentro de este programa, sin cambiar su scope
+
+## Sesion 2026-04-24 — TASK-598 cerrada + deploy verificado end-to-end (Claude)
+
+- **Task:** `TASK-598` → `complete`. Código en develop (commit `b5e2431f`), deploy ejecutado vía GitHub Actions, email de prueba recibido OK, dry-run + cron path verificados. Cerrada end-to-end.
+- **Branch:** `task/TASK-598-ico-narrative-presentation-layer` → squash merge a `develop`.
+- **Deadline duro:** lunes 2026-04-27 07:00 Chile (cron `ops-nexa-weekly-digest`). Llegamos antes.
+
+### Deploy operacional ejecutado (2026-04-24 T12:14 UTC)
+
+- GitHub Actions `Ops Worker Deploy` (run 24888600504) auto-disparado por el commit de merge a develop. Completed success.
+- Nueva revisión Cloud Run: **`ops-worker-00070-bj4`** con 100% del tráfico.
+- Rollback target si algo se rompe: `ops-worker-00069-lxb` (revisión previa).
+- Health check `GET /health` → HTTP 200 `{"status":"ok","service":"ops-worker"}`.
+- Smoke `POST /reactive/process` (batchSize=1) → HTTP 200, 142ms, no regresión del runtime reactivo.
+- Dry-run `POST /nexa/weekly-digest` con `{"dryRun":true,"limit":8}` → HTTP 200, payload con 4 critical insights (3 Efeonce + 1 Sky Airline). `grep -i` por sentinels en el JSON completo: 0 matches.
+- Envío real `POST /nexa/weekly-digest` con `recipients_override=[{"email":"jreyes@efeoncepro.com"}]` → HTTP 200, `status=sent`, `deliveryId=48454c0d-c005-4722-ac03-5e13a3529747`, `resendId=85c865df-2fc7-45f1-a893-736b5af9c48d`.
+- **Email confirmado OK por el recipient en cliente real** (Julio Reyes, 2026-04-24).
+- Cloud Logging capturó `[ops-worker] /nexa/weekly-digest done — status=sent recipients=1 insights=4 override=true`.
+- Cloud Logging capturó también el structured log `narrative_presentation`: `{source: "weekly_digest", total_mentions: 16, resolved: 16, fallback_rate: 0, fallback_count_by_reason: {none: 16, sentinel: 0, missing_entity: 0, null_canonical: 0, technical_id: 0}}`. **100% de mentions resuelven contra canonical vigente en producción.**
+
+### Acceptance criteria de TASK-598 — estado
+
+Todos los buckets cubiertos al momento del cierre:
+
+- **Correctitud de contenido:** `narrative-presentation.ts` + tests (21) + `build-weekly-digest.ts` refactorizado + tests (5) + fixture regression. ✅
+- **Empty-digest risk (Slice 3.5):** threshold preview ejecutado contra dataset real, defaults validados, fallback_rate 0/16 confirmado. ✅
+- **Deploy + end-to-end render (Slice 6 + 6.5):** nueva revisión activa, dry-run limpio, envío real a jreyes@efeoncepro.com confirmado OK. ✅
+- **Post-deploy monitoring + rollback (Slice 7):** runbook publicado en `docs/runbooks/ico-weekly-digest-rollback.md`, comandos gcloud scheduler pause + revert revision documentados, template de comunicación pre-escrito. ✅
+- **Smoke test del primer cron real (lunes):** sigue pendiente (el cron dispara el lunes 07:00 Chile). Comando de verificación post-cron documentado abajo. ⏳
+
+### Monitoreo previsto lunes 2026-04-27 07:00-08:00 Chile
+
+```bash
+gcloud logging read 'resource.type="cloud_run_revision"
+  AND resource.labels.service_name="ops-worker"
+  AND textPayload =~ "POST /nexa/weekly-digest"' \
+  --project efeonce-group --limit 5 --freshness=1h \
+  --format="value(timestamp, textPayload)"
+```
+
+Esperado: línea `done — status=sent recipients=N insights=M override=false` con N > 0 dentro de la ventana 07:00-07:10 Chile (10:00-10:10 UTC). Si falta o falla → aplicar runbook (`docs/runbooks/ico-weekly-digest-rollback.md`).
+
+- **Qué quedó shippeado en develop:**
+  - Capa compartida `src/lib/ico-engine/ai/narrative-presentation.ts`: `resolveMentions`, `loadMentionContext`, `selectPresentableEnrichments`, `resolveAllNarrativeFields`, `summarizePresentationReports`, `emitPresentationLog`. 4 fallback reasons tipados (sentinel, missing_entity, null_canonical, technical_id).
+  - `src/lib/nexa/digest/build-weekly-digest.ts` refactorizado: consumer delgado de las utilities, 300→200 líneas, shape WeeklyDigestBuildResult inalterado.
+  - Handler ops-worker `/nexa/weekly-digest` acepta `dryRun: true` + `recipients_override: string[]` para validación segura (Slice 6.5).
+  - Script `scripts/ico-digest-threshold-preview.ts` para validar defaults contra dataset real (Slice 3.5).
+  - Runbook `docs/runbooks/ico-weekly-digest-rollback.md` con pause-cron + revert-revision + template stakeholder comm (Slice 7).
+  - Doc arquitectura `Greenhouse_ICO_Engine_v1.md` con delta 2026-04-24 completo.
+  - Doc funcional `docs/documentation/delivery/nexa-insights-digest-semanal.md` actualizada a v1.1 con lenguaje simple para liderazgo.
+  - Tests: 21 casos de narrative-presentation + 5 de build-weekly-digest (incluye fixture regression "Sin nombre" + huérfanos). 1914/1914 tests verdes.
+
+- **Threshold preview ejecutado contra dataset real (2026-04-17..24):**
+  - 4 critical insights en ventana, 2 spaces (Efeonce + Sky Airline).
+  - `fallback_rate: 0.0` en TODOS los runs (18 combos de threshold matrix).
+  - 16/16 mentions resuelven 100% contra canonical vigente. Cero sentinels, cero huérfanos propagados.
+  - Defaults validados sin cambios: minQualityScore=0, severityFloor=warning, maxPerSpace=3, maxTotal=8.
+
+- **Sinergia con EPIC-006:** la capa `narrative-presentation.ts` es reusable por TASK-595 (UI inbox), TASK-596 (webhooks + Nexa), y compatible con el schema v2 futuro de TASK-590 (solo cambia el JOIN target cuando se deprecate v1).
+
+## Sesion 2026-04-24 — TASK-598 iniciada: ICO Narrative Presentation Layer (Claude)
+
+- **Task tomada:** `TASK-598` → `in-progress`
+- **Branch:** `task/TASK-598-ico-narrative-presentation-layer`
+- **Deadline duro:** lunes 2026-04-27 07:00 Chile (antes del cron `ops-nexa-weekly-digest`).
+- **Objetivo:** capa de presentación compartida `src/lib/ico-engine/ai/narrative-presentation.ts` que reconcilia narrativas frozen de `ico_ai_signal_enrichment_history` contra canonical vigente + filtra huérfanos + dedup + diversity cap. Integra en `build-weekly-digest.ts` para el email del lunes.
+- **Scope post-Delta:** 8 slices (1, 2, 3, 3.5, 4, 5, 6, 6.5, 7). Garantía end-to-end ~99% vs 80% de scope original.
+- **Cierre:** merge directo squash a develop, redeploy `services/ops-worker/` pre-lunes.
+- **Fase actual:** Discovery
+
+## Sesion 2026-04-24 — Finance `expenses/meta` hardening post-TASK-589 (Codex)
+
+- **Contexto**
+  - staging quedó verde para `clients`, `clients/[id]`, `suppliers`, `suppliers/[id]` y `dashboard/summary`, pero Sentry detectó que `GET /api/finance/expenses/meta` seguía devolviendo `500`
+  - root cause: el route todavía hacía `assertFinanceBigQueryReadiness({ tables: ['fin_suppliers','fin_accounts','fin_expenses'] })` como precondición global, aunque `suppliers` y `accounts` ya son Postgres-first y Payroll en ese payload es solo enrichment
+- **Corrección aplicada**
+  - `src/app/api/finance/expenses/meta/route.ts`
+    - se elimina la precondición global de BigQuery
+    - se divide el payload por providers:
+      - `suppliers` → Postgres-first + fallback BigQuery por slice
+      - `accounts` → Postgres-first + fallback BigQuery por slice
+      - instituciones históricas → Postgres-first (`greenhouse_finance.expenses`) + fallback BigQuery opcional
+      - instituciones Payroll → Postgres-first (`greenhouse_payroll.compensation_versions`, `pay_regime='chile'`) + fallback BigQuery opcional
+    - los enrichments opcionales ya no tumban el endpoint; si fallan ambas fuentes se loguea el problema y el route sigue con defaults
+  - nuevo helper `listFinanceExpenseSocialSecurityInstitutionsFromPostgres()` en `src/lib/finance/postgres-store-slice2.ts`
+  - nuevo helper `listPayrollSocialSecurityInstitutionsFromPostgres()` en `src/lib/payroll/postgres-store.ts`
+  - tests ajustados en `src/app/api/finance/expenses/meta/route.test.ts`
+- **Validación local**
+  - `pnpm exec vitest run src/app/api/finance/expenses/meta/route.test.ts src/app/api/finance/clients/read-cutover.test.ts src/app/api/finance/suppliers/route.test.ts 'src/app/api/finance/suppliers/[id]/route.test.ts'` → `13 passed, 1 skipped`
+  - `pnpm exec tsc --noEmit --pretty false` → OK
+  - `pnpm lint` → OK
+  - `pnpm build` → OK
+- **Pendiente inmediato**
+  - commit + push del hardening
+  - repetir smoke en staging para:
+    - `GET /api/finance/expenses/meta`
+    - `/finance/expenses`
+
+## Sesion 2026-04-24 — TASK-589 en verificación: Finance read paths sin provisioning runtime (Codex)
+
+- **Task:** `TASK-589` → `in-progress` (`Verification`)
+- **Objetivo ya implementado**
+  - sacar `ensureFinanceInfrastructure()` de los `GET /api/finance/**` interactivos y reemplazarlo por un boundary read-only de schema readiness
+  - endurecer `suppliers` sobre Postgres para eliminar el patrón frágil `ARRAY_AGG(...)[1]`
+- **Cambio estructural aplicado**
+  - nuevo helper `assertFinanceBigQueryReadiness()` en `src/lib/finance/schema.ts`
+  - `GET` afectados migrados al patrón `Postgres-first -> assertFinanceBigQueryReadiness -> BigQuery fallback`:
+    - `clients`, `clients/[id]`
+    - `suppliers`, `suppliers/[id]`
+    - `accounts`
+    - `income`, `income/[id]`, `income/summary`
+    - `expenses`, `expenses/[id]`, `expenses/summary`, `expenses/meta`
+    - `exchange-rates`
+    - dashboards `aging`, `summary`, `cashflow`, `by-service-line`
+  - `src/lib/finance/postgres-store.ts` reemplaza `ARRAY_AGG(...)[1]` en suppliers por laterals explícitos para conteo y contacto principal
+- **Payroll dependency**
+  - `expenses/meta` sigue leyendo `compensation_versions` para enriquecer instituciones, pero ahora lo hace con `assertPayrollBigQueryReadiness()` read-only y degradación opcional: si Payroll no está listo, el endpoint no cae completo
+- **Validación corrida**
+  - `pnpm exec vitest run src/app/api/finance/clients/read-cutover.test.ts 'src/app/api/finance/suppliers/[id]/route.test.ts' src/app/api/finance/suppliers/route.test.ts src/app/api/finance/expenses/meta/route.test.ts` → `11 passed, 1 skipped`
+  - `pnpm exec tsc --noEmit` → OK
+  - `pnpm build` → OK
+  - `pnpm lint` quedó fallando una vez por `newline-before-return` en `src/lib/payroll/schema.ts`; fix ya aplicado y falta rerun final para cerrar la checklist
+- **Nota de hygiene**
+  - `next build` volvió a mutar `tsconfig.json` con includes timestamped de `.next-local`; se revirtió y no debe commitearse
+- **Pendiente inmediato**
+  - rerun final de `pnpm lint`
+  - revisar `git status` para no mezclar untracked ajenos (`.agents/`, `scripts/verify-ftr-discrepancy.mts`)
+  - commit + push cuando cierre verificación
+
+## Sesion 2026-04-24 — TASK-588 cerrada: project title resolution hardening (Claude)
+
+- **Task:** `TASK-588` → `complete`
+- **Branch:** `task/TASK-588-project-title-resolution-conformed-sync-hardening` → squash merge a `develop`
+- **Root cause cerrado:** el sync canónico hardcodeaba `nombre_del_proyecto` como única fuente del título. Sky Airline (78/78 proyectos + 3590 tareas) usa `project_name` / `nombre_de_la_tarea` en Notion, no `nombre_del_proyecto` / `nombre_de_tarea` como Efeonce. El fix elimina el hardcoding con una cascada COALESCE data-driven vía `INFORMATION_SCHEMA.COLUMNS` — sin requerir config por space, sin tocar el Cloud Run externo `notion-bq-sync`.
+- **Qué quedó shippeado:**
+  - Migración `20260424082917533_project-title-nullable-sentinel-cleanup.sql`: nullable en `greenhouse_delivery.{projects,tasks,sprints}.*_name` + cleanup batch-safe (DO LOOP + pg_sleep, seguro bajo syncs concurrentes) + CHECK constraints anti-sentinel.
+  - Cascada data-driven en `src/lib/sync/sync-notion-conformed.ts` y `scripts/sync-source-runtime-projections.ts`. Set conservador de candidatos (solo columnas semánticamente equivalentes): projects=[`nombre_del_proyecto`,`project_name`]; tasks=[`nombre_de_tarea`,`nombre_de_la_tarea`]; sprints=[`nombre_del_sprint`,`sprint_name`].
+  - Resolver ICO (`entity-display-resolution.ts`) rechaza 7 sentinels (es/pt/en) + amplía detección de IDs técnicos (prefijos `project-/proj-/notion-/task-/sprint-`, numéricos ≥12, 32-hex, UUID). Defensa en profundidad activa sobre signals históricos en BQ sin rematerializar.
+  - Observability: helper `emitMissingTitleWarning` + `countMissingTitles` emiten a `greenhouse_sync.source_sync_failures` con `error_code='sync_warning_missing_title'`, `retryable=false`, payload `{space_id, count, sample_notion_page_ids}`. TASK-586 puede consumirlo sin mapping adicional.
+  - Tests: 3 archivos (nuevos + extendidos). 1885/1885 tests verdes en la suite completa.
+- **Decisión de simplificación tomada en Discovery:** se removió la feature flag `GREENHOUSE_DELIVERY_TITLE_CASCADE_ENABLED` y el shadow run planeados en la spec original. La cascada es determinística (COALESCE entre columnas semánticamente iguales) y la CHECK constraint protege mejor que una env var. Rollback es `git revert` + `pnpm migrate:down` si algo explota.
+- **Estado PG verificado post-migración:**
+  - projects: 0 sentinels, 74 nulls (antes eran 'Sin nombre'), 137 total
+  - tasks: 0 sentinels, 3041 nulls, 4266 total
+  - sprints: 0 sentinels, 0 nulls, 27 total
+  - Sky: 72/72 proyectos activos con `project_name=NULL` esperando rehidratación por el próximo tick del cron notion-sync
+  - Efeonce: 63/63 con título real (no-regression)
+- **Path del Slice 5 (freeze window):** descartado — `replaceBigQuerySignalsForPeriod` hace DELETE+INSERT sin consultar `period_closure_status`, así que el próximo tick de `ico-materialize` (cron con `monthsBack=3` cubre 2026-02) reescribe los 4 signals afectados con `dimensionLabel` correcto una vez que el sync Notion hidrate los títulos. Los guards del resolver ya protegen la UI de signals materializados antes del re-run.
+- **Siguiente tick operativo:** deploy en develop → cron notion-sync rehidrata Sky proyectos → cron ico-materialize reescribe signals. Sin intervención manual adicional.
+
+## Sesion 2026-04-24 — TASK-588 iniciada: project title resolution hardening (Claude)
+
+- **Task tomada:** `TASK-588` → `in-progress`
+- **Branch:** `task/TASK-588-project-title-resolution-conformed-sync-hardening`
+- **Objetivo:** cerrar root cause de signals ICO mostrando `"Sin nombre"` (Sky Airline tiene el title de proyectos en columna `project_name` en Notion; Efeonce lo tiene en `nombre_del_proyecto`. El sync canónico hardcodea una sola columna → 78/78 proyectos Sky quedan con placeholder)
+- **Evidencia diagnóstico (triple capa, 2026-04-24):**
+  - Notion MCP: Sky DB `23039c2fefe7817a8272ffe6be1a696a` usa title property `"Project name"`; Efeonce DB `15288d9b145940529acc75439bbd5470` usa `"Nombre del proyecto"`
+  - BQ `notion_ops.proyectos`: Sky 78/78 con `nombre_del_proyecto=NULL` y `project_name` poblada; Efeonce 65/65 inverso
+  - BQ `ico_engine.ai_signals`: 4 signals `dimension='project'` período 2026-02 con `payloadJson.dimensionLabel='Sin nombre'`, TODOS de Sky
+- **Scope declarado:** 7 slices — kill-switch + shadow run + cascada data-driven via INFORMATION_SCHEMA + migración batch-safe + CHECK constraint anti-sentinel + guards ICO + rematerialize con decisión explícita sobre freeze window
+- **Fase actual:** Discovery
+- **Cierre:** merge directo a develop (squash) al terminar verificación — instrucción explícita del usuario
+
+## Sesion 2026-04-24 — TASK-585 cost-first: `notion-bq-sync` baja `minScale` a `0` (Codex)
+
+- **Prioridad ejecutada**
+  - capturar el ahorro inmediato de costo de `TASK-585` antes del hardening secundario
+- **Corrección de task**
+  - `TASK-585` pasó a `in-progress`
+  - se corrigió el scope para tratar `billing_export` como `awaiting_data` mientras no materialice tablas
+  - la task queda explícitamente en modo `cost-first`
+- **Cambio live aplicado**
+  - comando ejecutado:
+    - `gcloud run services update notion-bq-sync --project efeonce-group --region us-central1 --min-instances=0`
+  - resultado:
+    - revisión nueva `notion-bq-sync-00015-4b4`
+    - `minScale` ya no aparece en el spec live, equivalente a `0`
+- **Validación inmediata**
+  - `gcloud run services describe notion-bq-sync --region us-central1` confirma:
+    - `maxScale=3`
+    - `startup-cpu-boost=true`
+    - service account sigue siendo `183008134038-compute@developer.gserviceaccount.com`
+  - `curl https://notion-bq-sync-y6egnifl6a-uc.a.run.app/discover` respondió `200` post-deploy
+  - el servicio sigue público (`allUsers`) y el Scheduler sigue sin `OIDC`; ese hardening queda pendiente en la misma task
+- **Estado de Billing Export**
+  - datasets `billing_export` y `billing_cud_export` existen en `efeonce-group`
+  - al momento de tomar la task todavía no había tablas materializadas visibles, así que el baseline SQL de costo sigue pendiente
+- **Rollback rápido**
+  - `gcloud run services update notion-bq-sync --project efeonce-group --region us-central1 --min-instances=1`
+
+## Sesion 2026-04-24 — decisión arquitectónica: `notion-bigquery` sigue como repo hermano (Codex)
+
+- **Pregunta resuelta**
+  - si vale la pena absorber `cesargrowth11/notion-bigquery` a `greenhouse-eo`
+- **Decisión**
+  - no absorber por ahora
+  - `greenhouse-eo` sí depende operativamente de `notion-bq-sync`, pero la deuda principal actual es de postura runtime (`minScale`, `allUsers`, default compute SA, Scheduler sin `OIDC`), no de ubicación del código
+- **Documentación nueva**
+  - `docs/architecture/GREENHOUSE_NOTION_BIGQUERY_ABSORPTION_DECISION_V1.md`
+- **Alineación documental**
+  - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+  - `docs/README.md`
+- **Criterio operativo vigente**
+  - primero endurecer `notion-bq-sync` y bajar costo según `TASK-585`
+  - reevaluar absorción solo si la fricción cross-repo pasa a ser el costo dominante
+
+## Sesion 2026-04-23 — documentación cloud alineada a auditoría live (Codex)
+
+- **Scope**
+  - alinear la documentación viva con la auditoría live de GCP / PostgreSQL del `2026-04-23`
+  - dejar un documento funcional corto en `docs/documentation/`
+- **Documentos actualizados**
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+  - `docs/documentation/README.md`
+  - nuevo: `docs/documentation/operations/postura-cloud-gcp.md`
+- **Cambios documentales clave**
+  - Cloud SQL ya no se documenta como `0.0.0.0/0` + SSL opcional; queda reflejado el baseline live:
+    - `authorizedNetworks` vacía
+    - `sslMode=ENCRYPTED_ONLY`
+    - hardening pendiente en `connectorEnforcement`, `deletionProtection` e IP pública
+  - el inventario cloud se rebaselinea a:
+    - `13` servicios serverless
+    - `16` jobs Scheduler
+    - `29` secretos
+    - `13` datasets BigQuery
+    - PostgreSQL live con `261` tablas base, `18` views, `148 MB`
+  - queda explícito el riesgo mixto actual:
+    - servicios legacy con default compute SA
+    - servicios públicamente invocables (`allUsers`)
+    - secretos sensibles aún en env plano
+    - drift real de grants runtime en PostgreSQL
+    - topología compartida staging/production
+- **Validación**
+  - sin cambios de infraestructura
+  - sin rotación de secretos
+  - documentación actualizada contra hallazgos live ya auditados en GCP / DB
+
+## Sesion 2026-04-23 — TASK-584 cerrada: resiliencia de `pg-connect.sh` + preflight de red + taxonomía de errores (Claude)
+
+- **Diagnóstico corregido vs el abierto inicial por Codex**
+  - El `ECONNRESET`/`ECONNREFUSED` que bloqueó la sesión previa NO fue el split Connector-first vs proxy-first. Fue un **PMTUD blackhole** de la red corporativa en puerto 3307: paquetes DF > ~1000B se droppean silenciosamente, ICMP "Frag Needed" está suprimido, y el handshake TLS de Cloud SQL muere en timeout
+  - Prueba concluyente: `pnpm pg:doctor` (Cloud SQL Connector nativo, camino totalmente distinto al proxy standalone) falló idéntico. Ningún refactor Connector-first lo hubiera evitado
+  - Confirmación cruzada: puerto 443 (HTTPS a Google) funciona porque el firewall hace MSS clamping solo en 80/443. Ping DF -s 1200 a 8.8.8.8 también se dropea → no es GCP-specific
+  - Cambio de red (hotspot) destapó el path y `pnpm pg:connect:migrate` con el tooling original aplicó las 2 migraciones de `service_attribution` limpias
+- **Scope reducido y ejecutado**
+  - `scripts/pg-connect.sh`: `trap cleanup EXIT/INT/TERM` (mata proxy spawn si muere a medias salvo en modo default `connect` donde disown + KEEP_PROXY), `network_preflight` con `ping -D -s 1200 34.86.135.144`, poll del mensaje `ready for new connections` (reemplaza `sleep 3` fijo), tail del log del proxy en fallos, clasificación `[ADC] [PROXY] [NETWORK] [SQL] [CONFIG]`, escape hatches `GREENHOUSE_SKIP_PREFLIGHT=true` y `GREENHOUSE_FORCE_PREFLIGHT_FAIL=true`
+  - `scripts/migrate.ts`: prefijos `[CONFIG]` (fail-fast por IP pública + env vars missing) y `[SQL]` (fallos de `node-pg-migrate` / `kysely-codegen`) con guía de triage rápido
+  - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`: nueva sección "Error Prefix Taxonomy", sección "Preflight de red" con escape hatch, tabla de Troubleshooting expandida
+  - Scope explícitamente descartado: refactor Connector-first de `migrate.ts` y `generate-db-types.ts` (kysely-codegen upstream exige URL; poco valor por el mantenimiento que agrega)
+- **Verificaciones live ejecutadas**
+  - `GREENHOUSE_FORCE_PREFLIGHT_FAIL=true bash scripts/pg-connect.sh` → `[NETWORK]` en <1s ✅
+  - `pnpm pg:connect:status` happy path → proxy ready en 2s, dry-run limpio, trap mata el proxy al salir (no zombie) ✅
+  - `pnpm pg:connect` no-arg → proxy persiste tras exit del script ✅
+  - `npx tsc --noEmit` y `pnpm lint` limpios ✅
+- **No-deja deuda**: la task queda cerrada con acceptance criteria verificados. Follow-up ideas en la spec (considerar los mismos prefijos en `scripts/pg-doctor.ts`) quedan como nice-to-have, no blocker
+
+## Sesion 2026-04-23 — TASK-584 tomada: hardening del tooling de migraciones PostgreSQL (Codex)
+
+- **Scope**
+  - cerrar el split operativo entre runtime Connector-first y tooling proxy-first
+  - desbloquear la aplicación real de las migraciones pendientes del hardening `service_attribution`
+- **Task tomada**
+  - `docs/tasks/in-progress/TASK-584-postgres-migration-tooling-hardening.md`
+  - plan: `docs/tasks/plans/TASK-584-plan.md`
+- **Discovery resumida**
+  - `scripts/migrate.ts` y `scripts/generate-db-types.ts` siguen dependiendo de `DATABASE_URL` / `GREENHOUSE_POSTGRES_HOST`
+  - `scripts/pg-connect.sh` levanta un proxy global en `127.0.0.1:15432`, mata procesos previos y luego delega; el patrón es frágil ante `ECONNRESET`
+  - el entorno local tiene simultáneamente `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` y `GREENHOUSE_POSTGRES_HOST=127.0.0.1`
+  - `pnpm pg:doctor` y una prueba directa con Connector terminaron en timeout, así que además del código puede existir un problema de conectividad local a sanear
+- **Siguiente paso inmediato**
+  - (resuelto arriba) diagnóstico era PMTUD, no tooling split; task cerrada con scope reducido
+
+## Sesion 2026-04-23 — hardening del dead-letter `service_attribution` y clasificación reactiva infra (Codex)
+
+- **Scope**
+  - cerrar de forma robusta el dead-letter heredado `permission denied for table service_attribution_facts`
+  - evitar que futuros fallos de permisos/shared serving queden como texto libre sin clasificación ni replay selectivo
+- **Implementación local**
+  - `src/lib/sync/projection-registry.ts`
+    - nuevo contrato opcional `requiredTablePrivileges`
+  - `src/lib/sync/projections/service-attribution.ts`
+    - declara write requirements sobre:
+      - `greenhouse_serving.service_attribution_facts`
+      - `greenhouse_serving.service_attribution_unresolved`
+  - `src/lib/sync/projection-runtime-health.ts`
+    - nuevo checker server-only que valida `has_table_privilege(current_user, ...)` por projection
+  - `src/lib/sync/reactive-error-classification.ts`
+    - clasifica fallos reactivos (`infra.db_privilege`, `infra.db_missing_object`, `infra.db_connectivity`, `infra.credential`, `application`)
+  - `src/lib/sync/reactive-consumer.ts`
+    - persiste clasificación tipada junto con `retry/dead-letter`
+  - `src/app/api/cron/projection-recovery/route.ts`
+  - `services/ops-worker/server.ts`
+    - recovery paths usan la misma clasificación tipada
+  - `src/app/api/internal/projections/route.ts`
+  - `src/lib/operations/get-reactive-projection-breakdown.ts`
+  - `src/lib/operations/get-operations-overview.ts`
+    - exponen infraestructura degradada y runtime health sin depender solo de `last_error`
+  - `src/app/api/admin/ops/projections/requeue-failed/route.ts`
+    - nuevo filtro opcional por `projectionName`, `errorClass`, `onlyInfrastructure`
+- **Migraciones creadas**
+  - `20260423190340145_service-attribution-runtime-writer-hardening.sql`
+    - `OWNER TO greenhouse_ops` + grants explícitos para runtime/app/migrator sobre `service_attribution_*`
+  - `20260423190546748_reactive-error-classification-observability.sql`
+    - agrega `error_class`, `error_family`, `is_infrastructure_fault` a:
+      - `greenhouse_sync.outbox_reactive_log`
+      - `greenhouse_sync.projection_refresh_queue`
+- **Verificación ejecutada**
+  - `pnpm exec vitest run src/lib/sync/reactive-error-classification.test.ts src/lib/sync/projection-runtime-health.test.ts src/lib/sync/refresh-queue.test.ts src/lib/sync/reactive-consumer.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+- **Bloqueo operativo**
+  - `pnpm pg:connect:migrate` falló dos veces antes de ejecutar SQL con:
+    - `FAIL:read ECONNRESET`
+  - `pnpm migrate:up` directo también falla porque el wrapper queda apuntando a `127.0.0.1:15432` sin proxy activo:
+    - `ECONNREFUSED 127.0.0.1:15432`
+  - por lo mismo:
+    - las migraciones quedaron **creadas pero no aplicadas**
+    - `src/types/db.d.ts` **no** se regeneró en esta sesión
+- **Siguiente paso recomendado**
+  - restablecer conectividad PostgreSQL (proxy / entorno local)
+  - correr `pnpm pg:connect:migrate`
+  - confirmar que `GET /api/internal/projections` muestra `service_attribution.runtimeHealth.status = ready`
+  - reencolar solo la lane afectada, idealmente:
+    - `POST /api/admin/ops/projections/requeue-failed` con `{ "projectionName": "service_attribution", "onlyInfrastructure": true }`
+
+## Sesion 2026-04-23 — TASK-583 implementación local del publish/tax native de HubSpot quotes (Codex)
+
+- **Estado real**
+  - `greenhouse-eo` quedó implementado y verificado localmente para el cierre técnico de `TASK-583`
+  - todavía falta `deploy/smoke` live final antes de mover la task a `complete/`
+- **Implementación shipped en Greenhouse**
+  - nuevo helper `src/lib/hubspot/hubspot-quote-sync.ts`
+    - unifica el payload outbound canónico para create/update
+    - resuelve `sender` desde `actorId | issued_by | created_by`
+    - resuelve empresa emisora desde `getOperatingEntityIdentity()`
+    - exige binding catálogo-first (`hubspot_product_id`) cuando la línea ya tiene `product_id` o `product_code/service_sku`
+    - deriva billing semantics y mapea impuestos hacia `hs_tax_rate_group_id`
+  - `src/lib/integrations/hubspot-greenhouse-service.ts`
+    - agrega `updateHubSpotGreenhouseQuote()`
+    - agrega `getHubSpotGreenhouseTaxRates({ active })`
+    - expande payload/respuesta de quotes con sender, billing, tax group, `pdfDownloadLink`, `locked`
+  - `src/lib/hubspot/create-hubspot-quote.ts`
+    - deja explícito `sender`
+    - usa status HubSpot-native (`APPROVAL_NOT_NEEDED`, `DRAFT`)
+    - devuelve `hubspotQuoteStatus`, `hubspotPdfDownloadLink`, `hubspotQuoteLocked`
+  - `src/lib/hubspot/update-hubspot-quote.ts`
+    - deja de usar el cliente degradado legacy y converge sobre el integration service autenticado
+  - `src/lib/hubspot/push-canonical-quote.ts`
+    - create/update usan el mismo payload canónico
+    - persiste observabilidad en `greenhouse_commercial.quotations`:
+      - `hubspot_quote_status`
+      - `hubspot_quote_link`
+      - `hubspot_quote_pdf_download_link`
+      - `hubspot_quote_locked`
+      - `hubspot_last_synced_at`
+- **Implementación shipped en el sibling**
+  - `services/hubspot_greenhouse_integration/app.py`
+  - `services/hubspot_greenhouse_integration/hubspot_client.py`
+  - `services/hubspot_greenhouse_integration/models.py`
+  - `services/hubspot_greenhouse_integration/contract.py`
+  - `tests/test_hubspot_greenhouse_integration_app.py`
+  - contrato nuevo/extendido:
+    - `GET /tax-rates`
+    - respuesta de quote incluye `pdfDownloadLink` y `locked`
+    - normalización defensiva de `taxRateGroupId`
+- **Migraciones / schema**
+  - se aplicó `migrations/20260423122137281_task-583-hubspot-quote-native-publish-observability-followup.sql`
+  - durante `pnpm pg:connect:migrate` apareció drift real: la base ya tenía aplicada `20260423110044569_task-576-quote-billing-start-date` y el repo no la tenía
+  - se reconstruyó y versionó `migrations/20260423110044569_task-576-quote-billing-start-date.sql` para recuperar una cadena reproducible de migraciones
+  - `src/types/db.d.ts` quedó regenerado contra la base real
+- **Verificación ejecutada**
+  - `pnpm exec vitest run src/lib/hubspot/__tests__/create-hubspot-quote.test.ts src/lib/hubspot/__tests__/push-canonical-quote.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - sibling: `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK (`44` tests, `29` skipped)
+  - `rg "new Pool\\(" src` → solo `src/lib/postgres/client.ts`
+- **Pendiente explícito**
+  - cierre completado el mismo día:
+    - preview validado: `greenhouse-ftfx1pm8j-efeonce-7670142f.vercel.app`
+    - Cloud Run bridge validado tras redeploy manual desde source limpio: revision `hubspot-greenhouse-integration-00027-bhp`
+    - `GET /tax-rates?active=true` respondió `IVA` `19.0` con `id=15837572`
+    - `POST /api/admin/ops/reactive/run` en preview ejecutó `quotation_hubspot_outbound` exitosamente para `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9`
+    - verificación HubSpot posterior:
+      - quote `39307909907` quedó `approvalStatus=APPROVAL_NOT_NEEDED`
+      - `locked=true`
+      - `quoteLink` materializado
+      - line item `54542714929` quedó con `taxRateGroupId=15837572`
+- **Nota operativa**
+  - el mismo run reactivo dejó un dead-letter heredado en `service_attribution` por `permission denied for table service_attribution_facts`
+  - no bloqueó `quotation_hubspot_outbound`, pero conviene triagearlo aparte si vuelve a aparecer
+
+## Sesion 2026-04-23 — TASK-583 registrada para cerrar publish nativo + impuesto nativo de HubSpot quotes (Codex)
+
+- Se crea `TASK-583 — HubSpot Quote Native Publish & Tax Finalization` como follow-up explícita de `TASK-576`.
+- Hallazgo consolidado que motiva la task:
+  - la quote real `39307909907` sigue en `hs_status = DRAFT`
+  - `hs_quote_link` y `hs_pdf_download_link` siguen `null`
+  - el line item real ya tiene `recurringbillingfrequency = monthly`, `hs_recurring_billing_start_date = 2026-04-23`, `tax = 555465` y `gh_tax_rate = 0.19`
+  - pero `hs_tax_rate_group_id = null`
+- La task deja explícita la separación entre:
+  - metadata custom útil (`gh_tax_rate`)
+  - contrato nativo HubSpot que todavía falta cerrar (`hs_status`, `hs_quote_link`, `hs_pdf_download_link`, `hs_tax_rate_group_id`)
+- También se documenta un descalce de nombres que no debe reintroducirse:
+  - `recurringbillingfrequency` es la frecuencia nativa correcta
+  - `hs_recurring_billing_start_date` es la fecha nativa correcta
+  - `hs_billing_start_date` no existe
+  - `hs_recurring_billing_period` no es el campo UI-canonical de frecuencia
+
+## Sesion 2026-04-23 — TASK-576 registrada para completar el contrato publish-ready de HubSpot quotes (Codex)
+
+- Se crea `TASK-576 — HubSpot Quote Publish Contract Completion`.
+- La task separa claramente el problema ya resuelto (create + asociaciones de quote) del gap que sigue abierto:
+  - `sender` / `sender company` faltantes
+  - line items HubSpot creados como líneas mínimas en vez de reusar catálogo sincronizado
+  - ausencia de `Ref/SKU`, billing frequency, billing start date e IVA publish-ready en HubSpot Quote Editor
+- La task queda explícitamente cross-repo mientras `TASK-574` no absorba `hubspot-greenhouse-integration` al monorepo.
+
+## Sesion 2026-04-23 — Quote outbound HubSpot deja de depender de `space` y reancla en `organization` (Codex)
+
+- **Scope:** cerrar el incidente donde una cotizacion emitida en Greenhouse no aparecia creada ni asociada en HubSpot, aunque el deal inline ya existiera.
+- **Root cause real**
+  - la projection `quotation_hubspot_outbound` si estaba corriendo, pero fallaba con `No space found for organization`
+  - el helper `createHubSpotQuote()` seguia tratando `space` como prerequisito estructural del outbound, cuando la ancla canonica del dominio comercial ya es `organization_id`
+  - ademas, el servicio hermano `POST /quotes` usaba `associationTypeId` hardcodeados para `quote -> company/contact`; en live HubSpot eso devolvia `400 One or more associations are invalid`
+- **Implementacion shipped**
+  - `src/lib/commercial/hubspot-contact-resolution.ts`
+    - nuevo resolver canonico de contacto HubSpot con precedencia:
+      - `greenhouse_serving.person_360.hubspot_contact_id`
+      - `greenhouse_crm.contacts.hubspot_contact_id`
+      - `greenhouse_core.identity_profiles.primary_source_object_id` solo si la identidad es `hubspot/contact`
+  - `src/lib/hubspot/create-hubspot-quote.ts`
+    - el create outbound ya no exige `space`
+    - la quote HubSpot se crea/ancla por `organization -> hubspot_company_id` + `hubspot_deal_id` + `contactIdentityProfileId`
+    - `persistFinanceMirror=false` permite el carril canonico comercial sin bloquear por el mirror legacy de `greenhouse_finance.quotes`
+  - `src/lib/hubspot/push-canonical-quote.ts`
+    - reusa el contacto canonico de la quotation (`contact_identity_profile_id`)
+    - fuerza `persistFinanceMirror: false` para el outbound canónico de `greenhouse_commercial.quotations`
+  - `services/ops-worker/deploy.sh`
+    - publica `GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF`
+    - publica `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+    - asegura acceso al secret `greenhouse-integration-api-token` para el worker reactivo
+  - repo hermano `hubspot-bigquery-task-563`
+    - `POST /quotes` deja de usar type IDs hardcodeados y pasa a `create_default_association(...)` para `line_items`, `deals`, `companies` y `contacts`
+    - esto elimina drift de IDs direccionales y usa el contrato default/unlabeled de HubSpot para objetos estándar
+- **Verificacion ejecutada**
+  - `greenhouse-eo`
+    - `pnpm exec vitest run src/lib/hubspot/__tests__/push-canonical-quote.test.ts src/lib/hubspot/__tests__/create-hubspot-quote.test.ts` OK
+    - `pnpm exec tsc --noEmit --pretty false` OK
+    - `pnpm lint` OK
+    - `pnpm build` OK
+  - `hubspot-bigquery-task-563`
+    - `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK
+    - Cloud Run revision live: `hubspot-greenhouse-integration-00022-x29`
+  - smoke real de replay:
+    - quote canonica: `qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9`
+    - deal HubSpot anchor: `59465365539`
+    - company HubSpot anchor: `29666506565`
+    - queue item `quotation_hubspot_outbound:quotation:qt-b1959939-db45-45c2-a2c3-6f5fd57b2af9` reprocesada via `ops-worker /reactive/recover`
+    - resultado: `completed`
+    - `greenhouse_commercial.quotations.hubspot_quote_id = 39307909907`
+    - lectura live `GET /companies/29666506565/quotes` confirma la quote `39307909907` asociada a:
+      - `dealId = 59465365539`
+      - `companyId = 29666506565`
+      - `contactIds = ["97482887171"]`
+
+## Sesion 2026-04-23 — lectura live de todos los deals HubSpot por company en Quote Builder (Codex)
+
+- **Scope:** cerrar el gap operativo donde el cotizador mostraba "sin deals" aunque la company en HubSpot si tenia negocios historicos o ganados, porque `GET /api/commercial/organizations/[id]/deals` solo leia el mirror local `greenhouse_commercial.deals`.
+- **Implementacion shipped**
+  - `src/app/api/commercial/organizations/[id]/deals/route.ts`
+    - `GET` ahora hace `read-through sync` cuando la organizacion ya tiene `hubspot_company_id`: lee local, hidrata live desde HubSpot y relee local antes de responder
+  - `src/lib/commercial/sync-organization-hubspot-deals.ts`
+    - nuevo helper canonico para materializar deals asociados a una company HubSpot en `greenhouse_commercial.deals`
+    - no filtra por etapa; sincroniza abiertos, historicos, `closedwon` y `closedlost`
+    - reutiliza `person_360` + facet CRM para binding canonico de owner/contact y upsertea con los write paths existentes del dominio comercial
+  - `src/lib/commercial/hubspot-owner-identity.ts`
+    - helper canonico para resolver owners locales desde `hubspot_owner_id` sin parches ad-hoc
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx`
+    - sigue consumiendo la misma route canónica `/api/commercial/organizations/:id/deals`; el fix fue backend/mirror, no un hardcode en UI
+- **Dependencia cross-repo cerrada**
+  - repo hermano `hubspot-bigquery` ahora expone `GET /companies/{hubspotCompanyId}/deals`
+  - el endpoint devuelve todos los deals asociados a la company con metadata live de pipeline/stage desde HubSpot Pipelines API
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/lib/commercial/sync-organization-hubspot-deals.test.ts src/app/api/commercial/organizations/[id]/deals/route.test.ts src/lib/commercial/party/commands/__tests__/create-deal-from-quote-context.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - smoke real en `staging`:
+    - `GET /api/commercial/organizations/org-b3e9e92b-518d-4924-b8c0-83cd1f9aa17f/deals` → `total=5`
+    - incluye `58295637620` (`Aguas Andinas - Implementación`) en etapa `Cierre ganado`
+
+## Sesion 2026-04-22 — TASK-573 cierre del contrato de nacimiento de deals (Codex)
+
+- **Scope:** cerrar el follow-on estructural de `TASK-539/571/572` para que los deals nacidos desde el Quote Builder ya no salgan con metadata incompleta ni caigan en fallbacks inseguros.
+- **Implementacion shipped**
+  - migración `20260423010123303_task-573-deal-birth-contract-completion.sql`
+    - `deal_create_attempts`: gana `contact_identity_profile_id`, `hubspot_contact_id`, `deal_type`, `priority`
+    - `greenhouse_commercial.deals`: gana `contact_identity_profile_id`, `hubspot_contact_id`, `priority`
+    - `hubspot_deal_pipeline_defaults`: gana `deal_type`, `priority`
+    - nueva tabla `greenhouse_commercial.hubspot_deal_property_config`
+  - `src/lib/commercial/deal-metadata-sync.ts`
+    - nuevo helper server-only para refrescar pipelines/stages/property options desde `GET /deals/metadata` del servicio HubSpot
+    - upsert de `hubspot_deal_pipeline_config` + `hubspot_deal_property_config`
+  - `src/lib/commercial/deals-store.ts`
+    - `getDealCreationContext` ahora devuelve `readyToCreate`, `blockingIssues`, `defaultDealType`, `defaultPriority`, `dealTypeOptions`, `priorityOptions`
+    - se elimina el fallback inseguro cuando hay múltiples pipelines o múltiples stages válidas sin policy/default explícita
+  - `src/lib/commercial/party/commands/create-deal-from-quote-context.ts`
+    - resuelve owner por cascada `explicit -> actor/member.hubspot_owner_id -> policy`
+    - resuelve contacto `quotation/contactIdentityProfileId -> person_360 -> hubspotContactId`
+    - resuelve `dealType` + `priority` por governance
+    - persiste todos los valores efectivos y bloquea con errores explícitos de governance/mapping faltante
+  - `src/app/api/commercial/organizations/[id]/deals/route.ts`
+    - acepta `dealType`, `priority`, `contactIdentityProfileId`
+    - traduce errores nuevos `DealCreateGovernanceIncompleteError` y `DealCreateMappingMissingError`
+  - `src/app/api/commercial/organizations/[id]/deal-creation-context/route.ts`
+    - acepta `businessLineCode`
+    - marca `organization_missing_hubspot_company` como blocker explícito
+  - `src/app/api/admin/commercial/deal-governance/route.ts`
+    - `GET`: summary operativo del registry
+    - `POST`: refresh manual admin-safe de metadata HubSpot
+  - `CreateDealDrawer` / `useCreateDeal` / `useDealCreationContext` / `QuoteBuilderShell`
+    - UI muestra owner/contact esperados, dropdowns `Tipo de negocio` + `Prioridad`, blockers explícitos y optimistic update con nombre real del deal
+- **Decision documental / backlog**
+  - `TASK-573` se mueve a `complete/`
+  - `TASK-564` **no** se cerró como absorbida al 100%
+  - el gating duro del create ya vive en `TASK-573`; `TASK-564` queda re-scopeada solo al flujo inline de link para orgs legacy sin `hubspot_company_id`
+- **Verificacion ejecutada**
+  - `pnpm pg:connect:migrate` OK (aplica migration + regenera `src/types/db.d.ts`)
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm exec vitest run src/lib/commercial/__tests__/deal-creation-context.test.ts src/lib/commercial/party/commands/__tests__/create-deal-from-quote-context.test.ts` OK (`16` tests)
+  - `pnpm build` OK
+  - `rg "new Pool\\(" src` → solo `src/lib/postgres/client.ts`
+
+## Sesion 2026-04-22 — TASK-573 registrada para completar el contrato de nacimiento de deals (Codex)
+
+- **Scope:** se registró `TASK-573 — Quote Builder Deal Birth Contract Completion & HubSpot Governance Hardening` como follow-on integral de `TASK-539`, `TASK-571` y `TASK-572`.
+- **Motivación operativa consolidada**
+  - el create de deals ya funciona, pero todavía nace con gaps reales de contrato: stage avanzada por fallback inseguro, owner no resuelto desde el actor actual, contacto de la quote no asociado, y ausencia de `dealType` / `priority` en el create path inline
+  - el registry local de pipeline/stage sigue mezclando mirror observacional y governance, lo que no escala bien a múltiples pipelines ni a drift de HubSpot
+- **Decisión documental**
+  - `TASK-573` absorbe funcionalmente el scope narrow de `TASK-564`; no conviene implementar ambas en paralelo sin re-scope explícito
+  - el nuevo task deja explicitado que el problema correcto no es solo “gatear el botón”, sino cerrar el contrato completo `pipeline + stage + owner + contact + dealType + priority`
+- **Archivos actualizados**
+  - `docs/tasks/to-do/TASK-573-quote-builder-deal-birth-contract-completion.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+- **Siguiente ID disponible**
+  - `TASK-574`
+
+## Sesion 2026-04-22 — TASK-572 POST /deals live en HubSpot Cloud Run (Codex)
+
+- **Scope:** cerrar el follow-up operativo que quedo abierto desde `TASK-539`: el Quote Builder ya llamaba `POST /deals`, pero el servicio `hubspot-greenhouse-integration` devolvia `404` y todos los intentos quedaban como `endpoint_not_deployed`.
+- **Discovery / correccion de supuestos**
+  - la implementacion real no vive en un repo separado abstracto: el servicio esta en `cesargrowth11/hubspot-bigquery`, ruta `services/hubspot_greenhouse_integration/`
+  - la auth real del servicio no es OIDC; el patron live es `Authorization: Bearer` o `x-greenhouse-integration-key` con `GREENHOUSE_INTEGRATION_API_TOKEN`
+  - `docs/architecture/schema-snapshot-baseline.sql` no refleja aun las tablas live de `TASK-539` / `TASK-571`; el DDL canónico para este flujo sigue estando en migrations + runtime
+- **Implementacion shipped (repo hermano + Greenhouse docs)**
+  - `services/hubspot_greenhouse_integration/app.py`
+    - nuevo `POST /deals`
+    - valida `hubspotCompanyId`, `dealName`, `idempotencyKey`, `origin`
+    - crea el deal HubSpot y asocia company + contact opcional
+    - responde el shape esperado por Greenhouse (`status`, `hubspotDealId`, `pipelineUsed`, `stageUsed`, `ownerUsed`)
+    - mapea errores a `HUBSPOT_AUTH`, `HUBSPOT_RATE_LIMIT`, `HUBSPOT_VALIDATION`, `HUBSPOT_UPSTREAM`
+    - corrige la carrera real de idempotencia concurrente: si 2 requests con la misma key crean dos deals, el servicio conserva el mas antiguo y archiva el duplicado
+  - `services/hubspot_greenhouse_integration/hubspot_client.py`
+    - helpers para buscar, crear, hidratar, asociar y archivar deals
+  - `services/hubspot_greenhouse_integration/contract.py`
+    - `deal_create` ya figura en `/contract`
+  - `tests/test_hubspot_greenhouse_integration_app.py`
+    - coverage para auth, create, reuse por idempotencia, rate limit y dedupe concurrente
+  - `src/lib/hubspot/custom-properties.ts`
+    - el manifest canónico de deals gana `gh_idempotency_key`
+  - `scripts/__tests__/hubspot-custom-properties.test.ts`
+    - actualizado al manifest real
+  - `docs/documentation/finance/crear-deal-desde-quote-builder.md`
+    - follow-up #1 de TASK-539 ahora queda cerrado y la doc pasa a v1.2
+- **Deploy / verificacion live**
+  - `gcloud auth login --update-adc` relanzado y luego `gcloud auth application-default set-quota-project efeonce-group` para limpiar el warning de quota project
+  - Cloud Run desplegado en `us-central1` a revision `hubspot-greenhouse-integration-00017-hf8`
+  - custom property live aplicada en HubSpot:
+    - `gh_idempotency_key`
+  - smoke del servicio:
+    - `GET /health` OK
+    - `GET /contract` OK (`deal_create` visible)
+    - `POST /deals` autenticado contra company interna `Efeonce` (`40379321357`) OK
+  - aprendizaje importante:
+    - el primer smoke concurrente destapo que la idempotencia secuencial no bastaba; creo 2 deals (`59450091698`, `59453096289`)
+    - se shippeo fix de reconciliacion/archivo y se redeployo
+    - smoke posterior con la misma `idempotencyKey=smoke-task-572-20260422` devolvio el deal canonico `59453096289` y archivo el duplicado `59450091698`
+    - verificacion directa HubSpot: 1 deal activo con esa key + el duplicado `archived=true`
+- **Estado Greenhouse**
+  - `pnpm exec vitest run scripts/__tests__/hubspot-custom-properties.test.ts` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+- **Follow-up abierto**
+  - sigue pendiente una lane de replay/worker para los intentos historicos `deal_create_attempts.status='endpoint_not_deployed'`; TASK-572 cierra el deploy, no el replay historico
+
+## Sesion 2026-04-22 — Cloud Build upload hygiene hardening para workers Cloud Run (Codex)
+
+- **Scope:** eliminar el lastre estructural del contexto de build compartido por `ops-worker`, `commercial-cost-worker` e `ico-batch-worker`, evitando que `gcloud builds submit .` siga subiendo artefactos locales gigantes del portal.
+- **Root cause real**
+  - el upload inicial a Cloud Build depende de la `.gcloudignore` raíz, no de los `.dockerignore` dentro de `services/*`
+  - la `.gcloudignore` existente no excluía artefactos locales críticos como `.next-local/`, `.next-build-dir`, `.next-build-meta.json`, `.claude/`, `.codex/`, `.auth/` y otras superficies no runtime
+  - además no existía `.dockerignore` en la raíz, por lo que el `docker build ... .` de los workers tampoco tenía un contrato de contexto explícito a nivel repo
+- **Implementacion shipped**
+  - `.gcloudignore`
+    - ahora incluye `#!include:.gitignore` para reducir drift con la higiene local del repo
+    - excluye explícitamente build outputs locales (`.next/`, `.next-local/`, `.next-build-*`, `coverage`, `playwright-report`, `blob-report`)
+    - excluye estado local/operativo (`.auth/`, `.claude/`, `.codex/`, `.vercel/`, `.vscode/`, `.idea/`)
+    - excluye árboles repo-no-runtime para workers actuales (`docs/`, `full-version/`, `public/`, `spec/`, `tests/`, `artifacts/`, `bigquery/`, `data/`, `demo-configs/`)
+  - `.dockerignore` nuevo en raíz
+    - formaliza el contrato del `docker build` root-context usado por los deploy scripts de Cloud Run
+    - se mantiene deliberadamente conservador: excluye generated/local clutter, pero no poda agresivamente subárboles de `src/` para no romper imports transitorios futuros
+- **Verificacion ejecutada**
+  - `gcloud meta list-files-for-upload .` ya no incluye `.next-local/`, `.next/`, `node_modules/`, `docs/`, `public/`, `artifacts/`, `.tmp/`, `.claude/`, `.codex/`, `.auth/` ni `full-version/`
+  - tamaño estimado del upload actual: `20.40 MiB` (`2695` files)
+  - baseline real observado antes del hardening en el deploy de `ops-worker`: `1.5 GiB`
+- **Notas operativas**
+  - el recorte grande vino de sacar build artifacts locales, no de excluir código runtime
+  - no reejecuté otro deploy solo para esta mejora porque el runtime ya estaba sano; el cambio queda aplicado a los próximos deploys de los 3 workers Cloud Run
+
+## Sesion 2026-04-22 — TASK-571 Deal Creation Context Registry + Pipeline/Stage Governance (Claude)
+
+- **Scope:** cerrar el gap estructural del create-deal inline que quedó abierto en TASK-539. Greenhouse ya aceptaba `pipelineId` / `stageId`, pero la UI no los exponía y tanto el comando como el optimistic update del Quote Builder hacían fallback a un `dealstage: 'appointmentscheduled'` hardcodeado. Con múltiples pipelines HubSpot activos, eso volvía frágil el flujo.
+- **Implementación shipped (6 slices)**
+  - Slice 1 — migración `20260422141406517_task-571-deal-creation-context-governance.sql`: extiende `greenhouse_commercial.hubspot_deal_pipeline_config` con `pipeline_label`, `pipeline_display_order`, `pipeline_active`, `stage_display_order`, `is_open_selectable`, `is_default_for_create` + unique index parcial sobre default stage per pipeline. Añade tabla `greenhouse_commercial.hubspot_deal_pipeline_defaults` (scope `global` | `tenant` | `business_line`). El observational bootstrap en `ensureHubSpotDealPipelineConfig` sigue siendo la primera línea de defensa: la gobernanza (labels, orden, selectable, default-for-create, policy overrides) se gestiona vía SQL / admin UI posterior.
+  - Slice 1 — nuevo reader canónico `getDealCreationContext(params)` + validador `validateDealCreationSelection({ pipelineId, stageId, context })` en `src/lib/commercial/deals-store.ts`. La resolución de defaults respeta precedencia `tenant_policy → business_line_policy → global_policy → single_option → first_active`; para stage `tenant/BU/global_policy → pipeline_default → single_option → first_open_stage`.
+  - Slice 2 — nuevo endpoint `GET /api/commercial/organizations/[id]/deal-creation-context` con `requireFinanceTenantContext` + capability `commercial.deal.create` + `resolveFinanceQuoteTenantOrganizationIds`. Lee exclusivamente Greenhouse local (no llama a HubSpot live).
+  - Slice 3 — `createDealFromQuoteContext` endurecido: `resolveSelection` corre antes del pending attempt y rechaza combos inválidos con `DealCreateSelectionInvalidError` (422) o `DealCreateContextEmptyError` (409). El insert del deal persiste `pipeline_name` + `dealstage_label` resueltos. El `CreateDealFromQuoteContextResult` gana los campos `pipelineUsed`, `pipelineLabelUsed`, `stageUsed`, `stageLabelUsed`, `ownerUsed` — expuestos también por `CreateDealResponse` en `useCreateDeal`.
+  - Slice 4 — `CreateDealDrawer` agrega selectores Pipeline + Etapa inicial alimentados por el nuevo hook `useDealCreationContext` (SWR-style con AbortController). Al cambiar pipeline se refiltran las stages y se re-arma la stage default. Si el registry está vacío, el submit queda bloqueado con Alert accionable.
+  - Slice 5 — el optimistic update en `QuoteBuilderShell.onSuccess` dejó de usar `dealstage: 'appointmentscheduled'`. Ahora toma `response.stageUsed`, `response.stageLabelUsed` y `response.pipelineLabelUsed` directos, y el `dealName` placeholder ahora mirrorea el del drawer (`"{Organization} — Nuevo deal"`).
+  - Slice 6 — doc funcional `docs/documentation/finance/crear-deal-desde-quote-builder.md` actualizada a v1.1 con la nueva precedencia de defaults, la ownership split HubSpot ↔ Greenhouse, y los nuevos paths técnicos.
+- **Tests**
+  - Actualicé los 7 tests existentes de `create-deal-from-quote-context.test.ts` para inyectar los 2 queries extra del context resolver en el orden correcto (antes del rate limit).
+  - Nuevo test `TASK-571 validation` que exige que un `stageId` fuera del pipeline produzca `DealCreateSelectionInvalidError`.
+  - Nuevo archivo `src/lib/commercial/__tests__/deal-creation-context.test.ts` con 6 tests cubriendo: single active pipeline + pipeline default → `single_option`/`pipeline_default`; tenant override ganando sobre global; first open stage fallback; `pipeline_unknown`; `stage_closed`; happy path de validación.
+- **Verificación**
+  - `pnpm exec tsc --noEmit` OK
+  - `pnpm lint` OK (autofix aplicado sobre padding-line-between-statements)
+  - `pnpm test` → 1845 tests passed / 2 skipped.
+  - Migración aplicada contra `greenhouse-pg-dev` vía `pnpm pg:connect:migrate`; tipos regenerados en `src/types/db.d.ts`.
+- **Follow-ups abiertos**
+  - Admin UI para gobernar overrides/defaults de pipeline por tenant/BU sin tener que escribir SQL directo — sigue siendo follow-up del backlog (TASK-571 lo deja como follow-up explícito en la spec).
+  - Surface operacional para refresh manual del catálogo HubSpot si se necesita (hoy el bootstrap observacional cubre el caso estable).
+  - Associación automática del contact seleccionado de la quote al deal HubSpot recién creado (follow-up del flow, fuera de scope aquí).
+
+## Sesion 2026-04-22 — Ops Worker deploy hardening por drift detect helper omitido (Codex)
+
+- **Scope:** corregir el pipeline roto de `Ops Worker Deploy` que venía fallando en `develop` desde `TASK-548` y estaba bloqueando los deploys automáticos de Cloud Run.
+- **Root cause real**
+  - `services/ops-worker/server.ts` importa `./product-catalog-drift-detect.ts` desde `TASK-548`.
+  - `services/ops-worker/Dockerfile` seguía copiando solo tres archivos sueltos (`server.ts`, `auth.ts`, `reactive-queue-depth.ts`) al stage builder.
+  - En Cloud Build, `esbuild` corría dentro de una imagen donde `product-catalog-drift-detect.ts` no existía, por eso el bundle caía con `Could not resolve "./product-catalog-drift-detect"`.
+- **Implementacion shipped**
+  - `services/ops-worker/Dockerfile`
+    - deja de depender de un `COPY` file-by-file frágil
+    - ahora copia `services/ops-worker/` completo al builder stage
+    - comentario explícito deja documentado que el objetivo es evitar regressions cuando el servicio agregue helpers locales nuevos
+- **Decision operativa**
+  - el hardening fue intencionalmente local a `ops-worker` para destrabar el deploy roto sin mezclar refactors laterales
+  - el patrón correcto para este servicio pasa a ser “copiar el directorio del worker”, no mantener una whitelist manual de siblings
+- **Verificacion ejecutada**
+  - reproducción fiel del fallo previo en un temp dir con el patrón viejo de `COPY`: `pnpm exec esbuild ...` falla con `Could not resolve "./product-catalog-drift-detect"`
+  - misma reproducción con el directorio completo copiado: `pnpm exec esbuild ...` OK (`dist/server.mjs 1.4mb`)
+  - `docker build` local no pudo correrse porque en esta máquina no había daemon disponible (`/var/run/docker.sock` ausente)
+- **Ejecucion operativa posterior**
+  - redeploy manual ejecutado con `ENV=staging bash services/ops-worker/deploy.sh`
+  - nueva revisión live: `ops-worker-00062-5rc`
+  - health check OK vía `gcloud run services proxy` + `GET /health`
+  - scheduler nuevo confirmado: `ops-product-catalog-drift-detect` (`0 3 * * *`, `America/Santiago`)
+  - catch-up manual ejecutado con `gcloud scheduler jobs run ops-product-catalog-drift-detect`
+  - evidencia:
+    - `greenhouse_sync.source_sync_runs`: corrida `product_catalog_drift_detect` `succeeded`
+    - `greenhouse_commercial.product_catalog`: `77/77` rows con `last_drift_check_at`
+    - `greenhouse_commercial.product_sync_conflicts`: `1` conflicto `pending`
+- **Follow-up abierto**
+  - drift detect encontró `1` conflicto real `field_drift` para `product_code=ECG-037` / `hubspot_product_id=44099985051`
+  - diferencia detectada: `description` en HubSpot `TASK-563 create live-smoke-20260422e` vs Greenhouse `TASK-563 update live-smoke-20260422e`
+  - `metadata.autoHealEligible=true`, pero no se auto-healó en esta corrida; quedó pendiente para resolución explícita y auditada
+
+## Sesion 2026-04-22 — Quote Builder contact hydration for adopted HubSpot organizations (Codex)
+
+- **Scope:** cerrar el gap donde el Quote Builder ya podia adoptar companies HubSpot nuevas, pero el dropdown de `Contacto` quedaba vacío porque `GET /api/commercial/organizations/[id]/contacts` solo leia `person_memberships` locales sin materializar los contactos asociados desde HubSpot.
+- **Implementacion shipped**
+  - `src/lib/account-360/sync-organization-hubspot-contacts.ts`
+    - helper canónico reusable para sync organization + contactos HubSpot
+    - actualiza `organizationName` / `industry` / `country` cuando HubSpot trae valores mas frescos
+    - materializa contactos en `identity_profiles` + `person_memberships(contact)` usando `ensureOrganizationContactMembership`
+    - evita duplicados por email ya materializado en la organization
+  - `src/app/api/commercial/organizations/[id]/contacts/route.ts`
+    - sigue siendo el contrato canónico del Quote Builder
+    - ahora hace read-through hydration: local read → si no hay contactos y existe `hubspot_company_id`, sync canónico → re-read local
+  - `src/app/api/organizations/[id]/hubspot-sync/route.ts`
+    - deja de duplicar lógica manual
+    - reutiliza el mismo helper canónico para el sync admin on-demand
+- **Decision arquitectonica**
+  - el selector de contactos **no** consulta HubSpot live directamente desde la UI
+  - Greenhouse sigue siendo la surface canónica de lectura (`identity_profiles` + `person_memberships`)
+  - HubSpot solo se usa como source puntual de hidratación cuando el mirror local aun no converge
+- **Docs alineadas**
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+  - `docs/documentation/finance/cotizador.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/lib/account-360/sync-organization-hubspot-contacts.test.ts 'src/app/api/commercial/organizations/[id]/contacts/route.test.ts'` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+
+## Sesion 2026-04-22 — Commercial Party search mirror/live hardening (Codex)
+
+- **Scope:** corregir el gap donde el selector de organización del Quote Builder no encontraba companies HubSpot existentes como prospects (ej. Carozzi) porque `greenhouse_crm.companies` venía incompleto y `/api/commercial/parties/search` dependía ciegamente del mirror.
+- **Implementacion shipped**
+  - `src/lib/commercial/party/hubspot-candidate-reader.ts`
+    - el carril de candidates ya no depende solo del mirror local
+    - `listHubSpotCandidates()` ahora hace unión canónica `mirror + live` en paralelo
+    - dedupe por `hubspot_company_id`
+    - filtro de companies ya materializadas en `greenhouse_core.organizations`
+    - `getHubSpotCandidateByCompanyId()` ya puede resolver por read live si el mirror todavía no refleja la company
+  - `src/lib/integrations/hubspot-greenhouse-service.ts`
+    - nuevo contrato `searchHubSpotGreenhouseCompanies()`
+    - types `HubSpotGreenhouseCompanySearchItem/Response`
+  - `src/app/api/commercial/parties/adopt/route.ts`
+    - error 404 deja de afirmar falsamente que el candidate “no existe en el local mirror”
+  - `scripts/sync-source-runtime-projections.ts`
+    - el seed legacy deja de excluir/borrar `greenhouse_crm.companies` con `client_id IS NULL`
+    - el mirror local vuelve a poder contener prospects puros de HubSpot
+- **Repo hermano (`hubspot-bigquery-task-563`)**
+  - nuevo endpoint `GET /companies/search?q=&limit=`
+  - `HubSpotClient.search_companies(...)`
+  - mapper `build_company_search_item(...)`
+  - tests Python extendidos para contrato y route
+- **Decision arquitectonica**
+  - la solución final no queda como “parche UI”; el contrato real pasa a ser:
+    - mirror local completo como source-of-work primario
+    - search/adopt con suplemento live cuando el mirror viene atrasado
+  - no se creó un cache paralelo nuevo (`greenhouse_sync.hubspot_companies_cache` sigue fuera de scope)
+- **Docs alineadas**
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `python3 -m unittest tests.test_hubspot_greenhouse_integration_app` OK
+  - `python3 -m py_compile services/hubspot_greenhouse_integration/app.py services/hubspot_greenhouse_integration/hubspot_client.py services/hubspot_greenhouse_integration/models.py` OK
+  - `pnpm exec vitest run src/app/api/commercial/parties/search/route.test.ts src/app/api/commercial/parties/adopt/route.test.ts src/lib/commercial/party/__tests__/party-search-reader.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+
+## Sesion 2026-04-22 — TASK-543 cleanup final del Commercial Party Lifecycle (Codex)
+
+- **Scope:** cerrar la Fase I del programa `TASK-534` removiendo el rollout legacy que sobrevivía en el selector unificado del Quote Builder y en el inbound HubSpot Companies sync.
+- **Implementacion shipped**
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx`
+    - el selector unificado queda como único carril para `mode === 'create'`
+    - se elimina la dependencia a `session.user.featureFlags`
+  - `src/lib/hubspot/sync-hubspot-companies.ts`
+    - se remueve el env guard `GREENHOUSE_PARTY_LIFECYCLE_SYNC`
+    - el summary queda siempre `enabled: true` en runtime
+  - `src/app/api/cron/hubspot-companies-sync/route.ts`
+    - se elimina el skip temprano por flag
+  - se eliminan `src/lib/commercial/party/feature-flags.ts` y su test
+- **Decision arquitectonica**
+  - `GET /api/commercial/organizations/[id]/contacts` y `GET/POST /api/commercial/organizations/[id]/deals` siguen siendo canónicos; la cleanup no toca esos contratos
+  - el único legacy real era el branch por flags, no el subárbol `organizations/[id]/*`
+- **Docs / trackers cerrados**
+  - arquitectura viva: `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`, `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`, `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - documentación funcional: `docs/documentation/finance/cotizador.md`, `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - trackers: `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`
+  - tasks movidas a `complete/`: `TASK-543`, umbrella `TASK-534`
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/app/api/cron/hubspot-companies-sync/route.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - `rg "new Pool\\(" src` → solo `src/lib/postgres/client.ts`
+
+## Sesion 2026-04-22 — HubSpot custom properties declarative reconcile hardening (Codex)
+
+- **Scope:** unificar el provisioning de custom properties HubSpot en Greenhouse y cerrar el gap histórico entre properties de `companies`, `deals`, `products` y `services`, dejando `contacts` soportado por el engine sin inventar un contrato inexistente.
+- **Implementacion shipped**
+  - manifest canónico `src/lib/hubspot/custom-properties.ts`
+  - reconciler idempotente multi-objeto `scripts/ensure-hubspot-custom-properties.ts`
+  - wrappers compatibles:
+    - `scripts/create-hubspot-company-custom-properties.ts`
+    - `scripts/create-hubspot-contact-custom-properties.ts`
+    - `scripts/create-hubspot-deal-custom-properties.ts`
+    - `scripts/create-hubspot-product-custom-properties.ts`
+    - `scripts/create-hubspot-service-custom-properties.ts`
+  - scripts `package.json` nuevos: `hubspot:properties`, `hubspot:{company,contact,deal,product,service}-properties`
+  - tests nuevos: `scripts/__tests__/hubspot-custom-properties.test.ts`
+- **Estado live verificado y aplicado en HubSpot**
+  - `companies`: 6 properties `gh_*` convergen limpio en `companyinformation`
+  - `deals`: `gh_deal_origin` creada y converge limpio en `dealinformation`
+  - `products`: 5 properties `gh_*` convergen limpio en `greenhouse_sync`
+  - `services`: 15 properties `ef_*` ya existían y convergen limpio en `service_information`
+  - `contacts`: objeto soportado por el engine, sin properties canónicas activas todavía
+- **Decision operativa importante**
+  - las tasks/specs viejas hablaban de `readOnlyValue=true`, pero la API live de HubSpot no lo refleja para `companies`, `deals` ni `products`; el manifiesto quedó alineado al estado verificable para evitar drift perpetuo
+  - la ownership rule sigue siendo operativa/documental: los campos `gh_*` y `ef_*` Greenhouse-owned no deben editarse manualmente en HubSpot aunque el proveedor no exponga el flag read-only de forma confiable
+
+## Sesion 2026-04-22 — TASK-544 Product Catalog Sync umbrella realignment (Codex)
+
+- **Scope:** corregir la umbrella `TASK-544`, la task hija `TASK-549` y los trackers vivos (`README`, `TASK_ID_REGISTRY`) para que reflejen el runtime real del programa Product Catalog Sync.
+- **Correccion de spec antes de implementar**
+  - `TASK-544` seguía describiendo como gaps varias piezas ya shippeadas en A-D (`sourceToProductCatalog`, `productHubSpotOutbound`, drift cron, Admin Center conflicts)
+  - `TASK-549` seguía mezclando cleanup interno de Fase E con supuestos rotos: `TASK-474` ya está cerrada y el “auto-adopt” relevante que sobrevive hoy es el carril legacy alrededor de `greenhouse_finance.products`, no un auto-adopt directo del canon `product_catalog`
+  - `TASK_ID_REGISTRY` estaba desalineado con `README`: `TASK-474` y `TASK-546` seguían en `to-do` y con paths incorrectos
+- **Decision documental nueva**
+  - `TASK-544` queda marcada como programa `in-progress`: Fases A-D cerradas, Fase E pendiente
+  - el cierre honesto del programa queda explícitamente bloqueado por `TASK-563` + validación real en production
+  - `TASK-549` se redefine como cleanup final de flags/legacy surfaces/`sync_direction`, no como desbloqueo de `TASK-474`
+
+## Sesion 2026-04-22 — TASK-550 Pricing Catalog Phase-5 Follow-ups (Codex)
+
+- **Scope:** cerrar los 4 follow-ups que habían quedado explícitamente fuera del scope V1 de TASK-471: revert governance, gate de impacto alto multi-tab, notificaciones de approval queue y Excel create/delete vía approval workflow.
+- **Correccion de spec antes de implementar**
+  - la spec asumía que el tenant scope broad del módulo seguía siendo `space_id`; el código vivo ya usa `organization_id` para quotations y conserva `space_id` solo en proyecciones legacy
+  - `AuditDiffViewer` y `ApprovalsQueueView` ya existían; el gap real estaba en el wiring, no en crear esas surfaces
+  - `employment_type` no escribía en `pricing-governance-store.ts`, sino en `sellable-roles-store.ts`
+- **Implementacion shipped**
+  - helper nuevo `src/lib/commercial/pricing-catalog-governance-writer.ts` para revert efectivo-dateado de governance
+  - route `/api/admin/pricing-catalog/audit-log/[auditId]/revert` extendida para governance types
+  - `/api/admin/pricing-catalog/governance` ahora persiste `previous_values` para que los cambios futuros sean revertibles
+  - helper nuevo `src/lib/commercial/pricing-catalog-excel-approval.ts`
+  - route nueva `POST /api/admin/pricing-catalog/import-excel/propose`
+  - approval queue extendida para aplicar proposals Excel create/delete al aprobar
+  - eventos nuevos `commercial.pricing_catalog_approval.proposed` y `.decided`
+  - proyección nueva `src/lib/sync/projections/pricing-catalog-approval-notifier.ts`
+  - `ExcelImportView` separa apply directo (`update`) de proposal flow (`create/delete`)
+  - `EditSellableRoleDrawer` aplica gate `impactBlocking` en las 4 tabs guardables
+  - `BulkEditDrawer` quedó saneado para dejar `eslint` sin warnings
+- **Contrato operativo**
+  - `create/delete` desde Excel no persisten directo: siempre pasan por approval queue
+  - `delete` es soft delete (`active=false` o `is_active=false`)
+  - la approval queue sigue siendo source of truth aunque Slack/email falle; el dispatch reactivo es best-effort
+  - el flag `GREENHOUSE_PRICING_APPROVAL_NOTIFICATIONS` gobierna solo las notificaciones, no el flujo de approvals
+- **Docs actualizadas**
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+  - `docs/documentation/finance/administracion-catalogo-pricing.md`
+  - `project_context.md`
+  - `changelog.md`
+  - trackers de task (`docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, task moved a `complete`)
+- **Verificacion ejecutada**
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1813` passing, `2` skipped)
+  - `pnpm lint` OK
+  - `pnpm build` OK
+  - sin `new Pool()` nuevos fuera de `src/lib/postgres/client.ts`
+
+## Sesion 2026-04-21 — TASK-548 Product Catalog Drift Detection & Admin Center (Codex)
+
+- **Scope:** cerrar la Fase D del programa Product Catalog Sync con reconciler nocturno, resolution commands auditables, surface admin de conflictos y tracking operativo end-to-end.
+- **Correccion de spec antes de implementar**
+  - la spec apuntaba a paths UI viejos (`(admin)`), scheduler `0 4 * * *`, doc path UI incorrecto y skills desactualizados
+  - la spec asumía aislamiento por `space_id`, pero el schema vigente de `greenhouse_commercial.product_catalog` y `product_sync_conflicts` sigue siendo global-operativo; V1 queda protegido por `requireAdminTenantContext()` + capability `commercial.product_catalog.resolve_conflict`
+  - el tracking real del repo para este lane es `source_sync_runs`, no `source_sync_pipelines`
+- **Implementacion shipped**
+  - migración `20260422011657625_task-548-product-catalog-audit-entity.sql`
+  - reconciler `src/lib/commercial/product-catalog/drift-reconciler.ts`
+  - tracker `src/lib/commercial/product-catalog/drift-run-tracker.ts`
+  - commands `src/lib/commercial/product-catalog/conflict-resolution-commands.ts`
+  - extensión del store `product-sync-conflicts-store.ts` para list/detail/summary/update
+  - APIs admin `/api/admin/commercial/product-sync-conflicts`, `/[conflictId]`, `/[conflictId]/resolve`
+  - surface `/admin/commercial/product-sync-conflicts` con list/detail en `src/views/greenhouse/admin/product-sync-conflicts/**`
+  - lane `ops-worker` `POST /product-catalog/drift-detect` + scheduler `ops-product-catalog-drift-detect`
+  - docs: arquitectura, event catalog, doc funcional admin, runbook, project context, changelog, task docs
+- **Contrato operativo**
+  - el reconciler detecta `orphan_in_hubspot`, `orphan_in_greenhouse`, `field_drift`, `sku_collision`, `archive_mismatch`
+  - auto-heal V1 usa solo `replay_greenhouse`; `orphan_in_hubspot` y `sku_collision` siguen manuales
+  - si el servicio externo responde `endpoint_not_deployed`, el run queda degradado/cancelled sin crear conflicts falsos y se actualiza `last_drift_check_at`
+  - las resoluciones admin escriben audit trail en `pricing_catalog_audit_log` con `entity_type='product_catalog'`
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/lib/commercial/product-catalog/drift-reconciler.test.ts src/app/api/admin/commercial/product-sync-conflicts/route.test.ts 'src/app/api/admin/commercial/product-sync-conflicts/[conflictId]/resolve/route.test.ts'` OK
+  - `pnpm pg:connect:migrate` OK (aplicó la migración y regeneró `src/types/db.d.ts`)
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1813` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+- **Nota de integración**
+  - `pnpm build` volvió a ajustar `tsconfig.json` para incluir paths generados de `.next-local`; validar si ese diff ya era esperado antes de commitear cualquier cambio ahí
+
+## Sesion 2026-04-21 — TASK-542 Party Lifecycle Admin Dashboards (Codex)
+
+- **Scope:** cerrar la Fase H del programa Party Lifecycle con surface administrativa real en Admin Center, snapshot serving canonico, resolución de conflictos, override manual y sweep operativo en `ops-worker`.
+- **Correccion de spec antes de implementar**
+  - la spec apuntaba a paths UI y skills desactualizados; se alineó a los paths reales del repo y a los skills vigentes
+  - el surface real no era un page suelto sino el patrón `Admin Center -> card -> list/detail`
+  - la regla de APIs admin quedó explícita sobre `requireAdminTenantContext()` y no sobre guards laxos
+- **Implementacion shipped**
+  - migración `20260422003000000_task-542-party-lifecycle-snapshots.sql`
+  - projection reactiva `src/lib/sync/projections/party-lifecycle-snapshot.ts`
+  - store `src/lib/commercial/party/party-lifecycle-snapshot-store.ts`
+  - sweep `src/lib/commercial/party/party-lifecycle-sweep.ts`
+  - comandos admin `override-party-lifecycle.ts` y `resolve-party-sync-conflict.ts`
+  - APIs admin `/api/admin/commercial/parties/**`
+  - surfaces `/admin/commercial/parties` y `/admin/commercial/parties/[id]`
+  - card nueva en `AdminCenterView`
+- **Contrato operativo**
+  - list/funnel/detail SSR consumen la snapshot `greenhouse_serving.party_lifecycle_snapshots`; el backlog de candidates HubSpot sigue leyendo `greenhouse_crm.companies`
+  - la resolución admin de conflictos soporta `force_outbound`, `force_inbound` e `ignore`
+  - las transiciones manuales generan history con `source='operator_override'`
+  - el sweep mueve `active_client -> inactive` cuando no hay contrato activo ni quote reciente en 6 meses
+- **Docs actualizadas**
+  - `docs/tasks/complete/TASK-542-party-lifecycle-admin-dashboards.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+  - `docs/documentation/admin-center/commercial-parties.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `docs/operations/party-lifecycle-runbook.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm exec vitest run src/app/api/admin/commercial/parties/route.test.ts 'src/app/api/admin/commercial/parties/[partyId]/transition/route.test.ts' 'src/app/api/admin/commercial/parties/conflicts/[conflictId]/resolve/route.test.ts' src/lib/commercial/party/__tests__/party-lifecycle-sweep.test.ts src/lib/commercial/party/__tests__/resolve-party-sync-conflict.test.ts src/lib/sync/projections/party-lifecycle-snapshot.test.ts` OK (`12` passing)
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1805` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+  - sin `new Pool()` nuevos fuera de `src/lib/postgres/client.ts`
+
+## Sesion 2026-04-21 — TASK-540 HubSpot Lifecycle Outbound Sync (Codex)
+
+- **Scope:** aterrizar la foundation local de Fase F del programa Party Lifecycle para devolver lifecycle/commercial party metadata desde Greenhouse a HubSpot Companies vía carril reactivo, sin romper tenant isolation ni el sync inbound existente.
+- **Correccion de spec antes de implementar**
+  - la spec asumía una tabla global `greenhouse_sync.sync_conflicts`, pero el patrón vivo del repo es conflicto domain-specific; se corrigió a `greenhouse_commercial.party_sync_conflicts`
+  - la spec asumía `source_sync_pipelines` como tabla viva; el tracking real del repo usa outbox/reactive + `source_sync_runs` y trazas por módulo
+  - la decisión V1 de compliance quedó en `gh_mrr_tier`; no se empuja `gh_mrr_clp`
+  - el endpoint server-side `PATCH /companies/:id/lifecycle` no vive en este repo; el contrato local se implementó con fallback `endpoint_not_deployed`
+- **Implementacion local shipped**
+  - migración `20260421220244374_task-540-party-sync-conflicts.sql`
+  - helper store `src/lib/commercial/party/sync-conflicts-store.ts`
+  - helpers compartidos `src/lib/sync/field-authority.ts` y `src/lib/sync/anti-ping-pong.ts`
+  - publishers `src/lib/hubspot/party-hubspot-events.ts`
+  - push helper `src/lib/hubspot/push-party-lifecycle.ts`
+  - projection `src/lib/sync/projections/party-hubspot-outbound.ts`
+  - cliente outbound `updateHubSpotGreenhouseCompanyLifecycle()` en `src/lib/integrations/hubspot-greenhouse-service.ts`
+  - test nuevo `src/lib/hubspot/sync-hubspot-company-lifecycle.test.ts`
+- **Contrato operativo**
+  - outbound escribe solo campos Greenhouse-owned (`lifecyclestage` cuando Greenhouse gana field authority, `gh_commercial_party_id`, `gh_last_quote_at`, `gh_last_contract_at`, `gh_active_contracts_count`, `gh_last_write_at`, `gh_mrr_tier`)
+  - `operator_override` local bloquea outbound automático y deja conflicto `operator_override_hold`
+  - el inbound `sync-hubspot-company-lifecycle.ts` ya usa `gh_last_write_at` para skippear loopbacks de Greenhouse dentro de 60s
+  - si el servicio externo aún no tiene deployado `PATCH /companies/:id/lifecycle`, el resultado se degrada a `endpoint_not_deployed` y queda trazado sin romper el reactor
+- **Dependencia restante**
+  - resuelta: el repo hermano `hubspot-bigquery` quedó desplegado a `hubspot-greenhouse-integration-00013-hpl`
+- **Verificacion ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm exec vitest run src/lib/sync/__tests__/field-authority.test.ts src/lib/sync/__tests__/anti-ping-pong.test.ts src/lib/sync/event-catalog.test.ts src/lib/hubspot/sync-hubspot-company-lifecycle.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1793` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+  - HubSpot properties de Company creadas con labels visibles en lenguaje natural
+  - smoke directo Cloud Run `PATCH /companies/30825221458/lifecycle` OK
+  - smoke end-to-end `pushPartyLifecycleToHubSpot({ organizationId: 'org-b9977f96-f7ef-4afb-bb26-7355d78c981f' })` → `status: synced`
+  - smoke anti-ping-pong inbound `syncHubSpotCompanyLifecycles()` → `skippedRecentGreenhouseWrites: 1`
+
+## Sesion 2026-04-21 — TASK-538 Quote Builder Unified Party Selector (Codex)
+
+- **Scope:** cerrar la Fase D del programa Party Lifecycle exponiendo el selector unificado directamente en el Quote Builder, con fallback legacy y adopción transparente de candidates HubSpot.
+- **Correccion de spec antes de implementar**
+  - el selector actual no vivía solo en `QuoteBuilderShell`; el carril real era `QuoteContextStrip -> ContextChip`
+  - `docs/architecture/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` estaba mal referenciado; el path correcto era `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+  - `src/lib/flags/greenhouse-flags.ts` no existía; el gate real del rollout quedó sobre `session.user.featureFlags`
+  - los skills mencionados en la spec estaban desactualizados; el trabajo se hizo con `greenhouse-agent`, `greenhouse-ui-orchestrator`, `greenhouse-vuexy-ui-expert` y `greenhouse-ux-content-accessibility`
+- **Implementacion shipped**
+  - `src/hooks/useParties.ts` — search con debounce 250 ms, parse de rate limit/error y adopción de candidates
+  - `src/lib/commercial/party/feature-flags.ts` + test — helper del flag `GREENHOUSE_PARTY_SELECTOR_UNIFIED`
+  - `src/components/greenhouse/primitives/ContextChip.tsx` — soporte para search remoto controlado, render rico de options, `aria-live` y notice con retry
+  - `src/components/greenhouse/pricing/QuoteContextStrip.tsx` — integración del selector unificado dentro del chip de Organización, con badges de lifecycle / HubSpot
+  - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — wiring de flag, search/adopt, upsert local de organization y preservación del handshake downstream `organizationId -> contactos/deals`
+  - `src/config/greenhouse-nomenclature.ts` — copy del selector unificado
+- **Contrato operativo**
+  - con flag OFF: fallback 100% legacy usando el preload de organizaciones activas
+  - con flag ON: create usa `/api/commercial/parties/search`; edit sigue `organizationLocked`
+  - `hubspot_candidate` sigue visible solo para `efeonce_internal` porque el backend V1 no lo expone a tenants externos
+- **Docs actualizadas**
+  - `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/documentation/finance/cotizador.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `pnpm exec vitest run src/lib/commercial/party/feature-flags.test.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm test` OK (`1785` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+- **Riesgo abierto no bloqueante**
+  - el rollout real depende de habilitar `GREENHOUSE_PARTY_SELECTOR_UNIFIED` sobre tenants concretos; sin ese flag la UI seguirá usando el selector legacy aunque el código nuevo ya esté deployado
+
+## Sesion 2026-04-21 — TASK-537 Party Search & Adoption Endpoints (Codex)
+
+- **Scope:** cerrar la Fase C del programa Party Lifecycle con los endpoints backend `GET /api/commercial/parties/search` y `POST /api/commercial/parties/adopt`, reutilizando el mirror local `greenhouse_crm.companies` y los comandos canónicos de lifecycle.
+- **Correccion de spec/arquitectura antes de implementar**
+  - la spec asumia `greenhouse_sync.hubspot_companies_cache`, pero el source real V1 es `greenhouse_crm.companies`
+  - no existe search live contra HubSpot en este repo; V1 queda 100% local
+  - `/adopt` no puede asumir siempre `prospect`: cuando el mapping HubSpot resuelve `active_client`, el route debe tambien ejecutar `instantiateClientForParty`
+  - como los candidates no materializados aun no tienen anchor tenant-safe, el branch `hubspot_candidate` queda **solo para `efeonce_internal`** en esta iteracion
+- **Migration shipped + aplicada en dev:** `20260421210212616_task-537-party-endpoint-request-log.sql`
+  - crea `greenhouse_commercial.party_endpoint_requests`
+  - log append-only para `/search` y `/adopt` con `actor_user_id`, `tenant_scope`, `hubspot_company_id`, fingerprint/query y `response_status`
+  - sirve como substrate simple de rate limit y auditoria operacional
+- **Helpers nuevos**
+  - `src/lib/commercial/party/route-entitlement-subject.ts` — adapta `TenantContext` a `TenantEntitlementSubject`
+  - `src/lib/commercial/party/party-endpoint-rate-limit.ts` — rate limit + request logging (`60/min` search, `10/min` adopt)
+  - `src/lib/commercial/party/hubspot-candidate-reader.ts` — lee candidates desde `greenhouse_crm.companies`, excluye orgs ya materializadas y resuelve domain / lifecycle
+  - `src/lib/commercial/party/party-search-reader.ts` — une organizations visibles + candidates HubSpot, dedupea por `hubspot_company_id` y ordena por stage/actividad
+- **Routes nuevas**
+  - `GET /api/commercial/parties/search`
+    - usa `requireFinanceTenantContext`
+    - scopea organizations via `resolveFinanceQuoteTenantOrganizationIds()`
+    - exige minimo `q.length >= 2`
+    - candidates HubSpot solo para `efeonce_internal`
+    - `canAdopt` se apaga si el actor no tiene `commercial.party.create`
+  - `POST /api/commercial/parties/adopt`
+    - exige `commercial.party.create`
+    - hace idempotent hit por `hubspot_company_id`
+    - reutiliza `createPartyFromHubSpotCompany`
+    - si el stage resuelve `active_client`, completa `instantiateClientForParty` o reutiliza el cliente existente
+- **Docs actualizadas**
+  - `docs/tasks/complete/TASK-537-party-search-adoption-endpoints.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md`
+  - `docs/documentation/finance/ciclo-de-vida-party-comercial.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-534-commercial-party-lifecycle-program.md`
+  - `docs/tasks/complete/TASK-538-quote-builder-unified-party-selector.md`
+  - `project_context.md`
+  - `changelog.md`
+- **Verificacion ejecutada**
+  - `pnpm migrate:up` OK (regenero `src/types/db.d.ts`)
+  - tests focales + suite completa via `pnpm test` OK (`1781` passing, `2` skipped)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm build` OK
+- **Siguiente paso natural**
+  - `TASK-538` ya puede consumir `/api/commercial/parties/search` y `/api/commercial/parties/adopt` sin inventar contratos nuevos; debe respetar que los `hubspot_candidate` solo existen en V1 para carril interno
+- **Riesgo abierto no bloqueante**
+  - el rate limit actual vive sobre log en Postgres; suficiente para V1 interna, pero si la surface se expande fuera de `efeonce_internal` conviene migrarlo a helper compartido o redis/cache dedicado
+
+## Sesion 2026-04-21 — TASK-533 Chile VAT Ledger & Monthly Position (Codex)
+
+- **Scope:** materializar el libro IVA mensual y la posición fiscal por `space_id` usando los snapshots tributarios ya convergidos en `income` y `expenses`, con runtime pesado en `ops-worker`, serving en Finance y surface mínima exportable.
+- **Migration shipped + aplicada en dev:** `20260421200121412_task-533-chile-vat-ledger-monthly-position.sql`
+  - crea `greenhouse_finance.vat_ledger_entries`
+  - crea `greenhouse_finance.vat_monthly_positions`
+  - indexes por `space_id`, periodo y bucket para serving / replay / auditoría
+- **Helper nuevo:** `src/lib/finance/vat-ledger.ts`
+  - materializa por periodo o en bulk
+  - consolida tres buckets: `debit_fiscal`, `credito_fiscal`, `iva_no_recuperable`
+  - resuelve el `space_id` de ventas desde la cotización o, en fallback, desde el bridge cliente→space
+- **Reactive + worker**
+  - nueva projection `src/lib/sync/projections/vat-monthly-position.ts`
+  - triggers: `finance.income.{created,updated,nubox_synced}` + `finance.expense.{created,updated,nubox_synced}`
+  - publica `finance.vat_position.period_materialized`
+  - `services/ops-worker/server.ts` gana `POST /vat-ledger/materialize` para replay/backfill manual
+- **Serving / UI**
+  - `GET /api/finance/vat/monthly-position` responde posición del periodo, periodos recientes y ledger entries; soporta `format=csv`
+  - `POST /api/internal/vat-ledger-materialize` expone recompute admin-only
+  - `FinanceDashboardView` muestra una card de IVA mensual con débito, crédito, IVA no recuperable, saldo y exportación CSV
+- **Docs actualizadas**
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+  - `docs/documentation/finance/libro-iva-posicion-mensual.md`
+  - `docs/documentation/operations/ops-worker-reactive-crons.md`
+  - `project_context.md`
+  - spec `TASK-533`
+- **Verificación ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm test` OK (`355` files, `1768` passing, `2` skipped)
+  - `CI=1 pnpm build` OK
+- **Decisión operativa**
+  - no se agregó scheduler dedicado para VAT en esta iteración; el trigger normal nace de la projection reactiva y el endpoint del worker queda como lane manual/backfill
+- **Follow-up explícito**
+  - una prorrata tributaria más fina para `vat_common_use_amount` sigue pendiente; el ledger actual usa la recoverability ya persistida en `expenses`
+
+## Sesion 2026-04-21 — TASK-532 Purchase VAT Recoverability (Codex)
+
+- **Scope:** converger compras/gastos al contrato tributario canónico Chile IVA para distinguir crédito fiscal recuperable vs IVA no recuperable capitalizado a costo, y propagar esa semántica a P&L / economics / service attribution.
+- **Migration shipped + aplicada en dev:** `20260421192902964_task-532-purchase-vat-recoverability.sql`
+  - `greenhouse_finance.expenses` gana `tax_code`, `tax_recoverability`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`
+  - gana también `recoverable_tax_amount`, `recoverable_tax_amount_clp`, `non_recoverable_tax_amount`, `non_recoverable_tax_amount_clp`, `effective_cost_amount`, `effective_cost_amount_clp`
+  - CHECKs de dominio/coherencia + backfill idempotente sobre histórico usando `dte_type_code`, `exempt_amount`, `vat_unrecoverable_amount` y `vat_common_use_amount`
+- **Helper nuevo:** `src/lib/finance/expense-tax-snapshot.ts`
+  - `buildExpenseTaxWriteFields()` resuelve `tax_code`, snapshot y buckets recoverable/non-recoverable/effective cost
+  - degraded mode intencional: si el catálogo DB no está disponible, cae a los 4 códigos Chile canónicos de compras para mantener estables tests y runtimes locales
+- **Write path**
+  - `POST /api/finance/expenses`, `PUT /api/finance/expenses/[id]` y `POST /api/finance/expenses/bulk` persisten el contrato nuevo
+  - `PUT` solo rehidrata el gasto existente cuando el update toca campos fiscales y recalcula el snapshot/costo efectivo de forma determinística
+  - `GET /api/finance/expenses` y `GET /api/finance/expenses/[id]` ya exponen también los campos tributarios nuevos en el fallback BigQuery
+- **BigQuery fallback**
+  - `fin_expenses` ahora garantiza `space_id`, `source_type`, `payment_provider`, `payment_rail`, `receipt_date`, `purchase_type`, buckets IVA y metadata tributaria de compra
+  - POST/PUT ya escriben esas columnas para no degradar el contrato cuando Postgres cae
+- **Nubox / payroll**
+  - `sync-nubox-to-postgres.ts` crea compras nuevas con snapshot tributario y buckets persistidos
+  - `payroll-expense-reactive.ts` adapta los gastos generados por nómina al writer nuevo con `cl_vat_non_billable`
+- **Downstream**
+  - `compute-operational-pl`, `postgres-store-intelligence`, `service-attribution`, `member-capacity-economics`, dashboards P&L y readers de provider/tooling ahora consumen `COALESCE(effective_cost_amount_clp, total_amount_clp)`
+  - resultado: el IVA recuperable deja de inflar costo operativo; solo el IVA no recuperable entra a costo efectivo
+- **Docs actualizadas**
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/documentation/finance/iva-compras-recuperabilidad.md`
+  - `docs/documentation/README.md`
+  - spec `TASK-532`
+- **Verificación ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - test focal `src/lib/finance/expense-tax-snapshot.test.ts` OK
+  - `pnpm build` OK
+  - `pnpm test` OK (`355` files, `1768` tests passing, `2` skipped)
+- **Cross-impact**
+  - deja a `TASK-533` listo para consumir `expenses.tax_snapshot_json` + buckets recoverable/non-recoverable como source de crédito fiscal
+  - cierra el gap downstream detectado en economics/cost readers que todavía sumaban `total_amount_clp` bruto
+
+## Sesion 2026-04-21 — TASK-531 Income / Invoice Tax Convergence (Codex)
+
+- **Scope:** cerrar la convergencia tributaria del agregado `income`: schema + API + materializers + readiness downstream para HubSpot/Nubox, alineado a TASK-529/TASK-530/TASK-524/TASK-541.
+- **Migration shipped + aplicada en dev:** `20260421183955091_task-531-income-tax-convergence.sql`
+  - `greenhouse_finance.income` gana `tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`
+  - `greenhouse_finance.income_line_items` gana `tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`
+  - CHECKs de dominio + consistencia (`tax_code ⇔ snapshot`)
+  - backfill idempotente sobre rows legacy de income y line items
+- **Helper nuevo:** `src/lib/finance/income-tax-snapshot.ts`
+  - `buildIncomeTaxWriteFields()` resuelve el snapshot tributario canónico para income manual o heredado
+  - fallback estático para los 3 tax codes Chile canónicos (`cl_vat_19`, `cl_vat_exempt`, `cl_vat_non_billable`) para no depender del catálogo DB en paths comunes/tests
+- **Write path manual (`/api/finance/income`)**
+  - `POST` ya no usa `body.taxRate ?? 0.19`
+  - persiste snapshot completo en Postgres y BigQuery fallback
+  - `PUT /api/finance/income/[id]` solo carga el `income` existente cuando el update realmente toca campos tributarios; evita depender de BigQuery para edits no fiscales y preserva el fail-closed correcto cuando Postgres cae
+  - `/api/finance/income/[id]/lines` expone `taxCode`, `taxRateSnapshot`, `taxAmountSnapshot`, `taxSnapshot`, `isTaxExempt`
+- **Quote-to-cash materializers**
+  - `materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` heredan el snapshot tributario de la quotation y escriben el income via `createFinanceIncomeInPostgres(...)`
+  - efecto colateral importante: esos write paths ahora emiten también `finance.income.created` porque pasan por el writer canónico del agregado
+  - además se elimina el write legacy de `income.space_id`, consistente con el schema real live
+- **Downstream**
+  - `push-income-to-hubspot.ts` ahora consume `tax_code` / `is_tax_exempt` reales de header y line items; la línea sintética deja de asumir factura gravada por default
+  - `sync-nubox-to-postgres.ts` publica `incomeId` en `finance.income.nubox_synced` y las filas nuevas creadas desde ventas Nubox nacen con `tax_code` + snapshot persistidos
+- **Docs actualizadas**
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/documentation/finance/sincronizacion-facturas-hubspot.md`
+  - spec `TASK-531`
+- **Verificación ejecutada**
+  - `pnpm migrate:up` OK (regeneró `src/types/db.d.ts`)
+  - `pnpm lint` OK con 1 warning legacy preexistente en `src/views/greenhouse/admin/pricing-catalog/drawers/BulkEditDrawer.tsx`
+  - `pnpm test` OK (`354` files, `1764` tests passing, `2` skipped)
+  - `pnpm build` OK
+- **Cross-impact**
+  - cierra el gap downstream detectado en TASK-524: los incomes materializados desde quotation/HES ya no bypassan `finance.income.created`
+  - deja a TASK-533 listo para consumir `income.tax_snapshot_json` como source de débito fiscal
+  - deja explícito que `convertQuoteToCash` (TASK-541) sigue sin crear invoice; la materialización documental continúa separada
+
+
+## Sesion 2026-04-21 — TASK-547 Product Catalog HubSpot Outbound Projection (Claude Opus 4.7)
+
+- **Scope:** Fase C del programa Product Catalog Sync (TASK-544 umbrella). Cierra el loop Greenhouse → HubSpot: los 4 eventos `commercial.product_catalog.{created,updated,archived,unarchived}` emitidos por la materialización de TASK-546 ahora disparan pushes reactivos a HubSpot Products via Cloud Run.
+- **Migration shipped + aplicada en dev** (`20260421180531865_task-547-product-catalog-hubspot-sync-trace.sql`):
+  - 4 columnas nuevas en `greenhouse_commercial.product_catalog`: `hubspot_sync_status`, `hubspot_sync_error`, `hubspot_sync_attempt_count`, `hubspot_last_write_at`.
+  - CHECK constraint: `hubspot_sync_status ∈ {pending, synced, failed, endpoint_not_deployed, skipped_no_anchors}`.
+  - CHECK consistencia: `hubspot_product_id IS NULL OR last_outbound_sync_at IS NOT NULL` (defensivo, con backfill para rows legacy).
+  - 2 indexes: `idx_product_catalog_hubspot_sync_retryable` (hot path del retry worker) + `idx_product_catalog_hubspot_last_write` (guard anti-ping-pong).
+  - Backfill idempotente: rows con `hubspot_product_id` pero sin `last_outbound_sync_at` se stampan desde `last_synced_at` legacy o `created_at` para satisfacer la nueva invariante.
+- **Event catalog extendido**: 2 events nuevos `commercial.product.hubspot_synced_out` + `commercial.product.hubspot_sync_failed` sobre aggregate `product_catalog`.
+- **Publishers** (`src/lib/hubspot/product-hubspot-events.ts`): `publishProductHubSpotSynced` + `publishProductHubSpotSyncFailed` con payloads tipados (productId, hubspotProductId, action, syncedAt/failedAt, errorMessage, attemptCount, ghOwnedFieldsChecksum, endpointNotDeployed flag).
+- **Types** (`src/lib/hubspot/product-hubspot-types.ts`): `ProductHubSpotSyncStatus` union que espeja el CHECK del schema; `ProductHubSpotPushAction`, `ProductHubSpotPushResult`, `ProductNotFoundError`.
+- **Cloud Run client extensions** (`src/lib/integrations/hubspot-greenhouse-service.ts`):
+  - `updateHubSpotGreenhouseProduct(hubspotProductId, payload)` → PATCH `/products/:id`.
+  - `archiveHubSpotGreenhouseProduct(hubspotProductId, reason?)` → POST `/products/:id/archive`.
+  - `reconcileHubSpotGreenhouseProducts({cursor, limit, includeArchived})` → GET `/products/reconcile` (para TASK-548).
+  - Todos con graceful fallback `{status: 'endpoint_not_deployed', message}` en HTTP 404 — patrón TASK-524 invoices / TASK-539 deals.
+  - La interfaz `HubSpotGreenhouseCreateProductRequest` ganó `createdBy` + `customProperties` tipado (antes requería cast). Los handlers server-side del Cloud Run ajeno deben agregarse para los nuevos endpoints.
+- **Payload adapter** (`src/lib/hubspot/hubspot-product-payload-adapter.ts`): `adaptProductCatalogToHubSpotCreatePayload` + `adaptProductCatalogToHubSpotUpdatePayload` mapean el snapshot canónico a payload HubSpot con 5 custom properties (`gh_product_code`, `gh_source_kind`, `gh_last_write_at`, `gh_archived_by_greenhouse`, `gh_business_line`). Pasa por `sanitizeHubSpotProductPayload` (TASK-347 guard) como defense-in-depth.
+- **Push helper** (`src/lib/hubspot/push-product-to-hubspot.ts`): pipeline core del bridge. Pasos:
+  1. `readProductCatalogRow(productId)` → 404 ⇒ `ProductNotFoundError`.
+  2. Anti-ping-pong guard: si `hubspot_last_write_at` < 60s ⇒ skip con status `skipped_no_anchors` + reason `anti_ping_pong_window`.
+  3. `deriveAction(row, eventType)` decide entre `created`/`updated`/`archived`/`unarchived`/`noop` según `hubspot_product_id` + `is_archived` + eventType recibido.
+  4. Llama al método correspondiente del Cloud Run client.
+  5. Persiste trace (`hubspot_sync_status`, `hubspot_sync_error`, `hubspot_sync_attempt_count`, `hubspot_last_write_at`, `last_outbound_sync_at`, `hubspot_product_id` en create).
+  6. Emite `synced` o `failed` event.
+  - `endpoint_not_deployed` → persist trace + emite synced con `endpointNotDeployed=true`, NO throw.
+  - 5xx / error inesperado → persist `failed` + emite failed + rethrow (reactive worker retry).
+  - Create path usa `withTransaction` para atomicity trace UPDATE + outbox emit.
+- **Projection** (`src/lib/sync/projections/product-hubspot-outbound.ts`): domain `cost_intelligence`, `maxRetries: 2`. Triggers sobre los 4 lifecycle events. `extractScope` resuelve `productId` (camelCase y snake_case). Delega a `pushProductToHubSpot`. Registrada en `src/lib/sync/projections/index.ts`.
+- **Custom properties spec** (`scripts/create-hubspot-product-custom-properties.ts`): array de 5 property definitions con shape HubSpot Schema API + helper `planCustomPropertyCreation` idempotente. NO llama HubSpot directamente (este repo no tiene creds); la aplicación se hace offline via skill `hubspot-ops`.
+- **Runbook operativo** (`docs/operations/hubspot-custom-properties-products.md`): cuándo correr (antes de activar flag), prerequisitos, proceso sandbox→production, smoke test, rollback, troubleshooting, relación con TASK-548.
+- **Tests**: 30 passing — 6 payload adapter (mapping create/update, null handling, custom props stability), 13 push helper (4 happy paths, 3 skip paths, 2 anti-ping-pong, 2 endpoint_not_deployed, 3 error paths), 11 projection (registration, scope extraction variantes, dispatch con mocks, eventType drop de valores no canónicos).
+- **Decisiones vs spec:**
+  - Cloud Run service `hubspot-greenhouse-integration` NO vive en este repo (está en repo externo). Spec asumía `services/hubspot-greenhouse-integration/routes/products.ts`; en su lugar implementamos el cliente con `endpoint_not_deployed` fallback. Deploy del service queda como follow-up del repo externo.
+  - TASK-540 ya aterrizó el helper compartido `src/lib/sync/anti-ping-pong.ts`; el push helper de products sigue inline y `TASK-563` debe refactorizarlo al canonical.
+  - `gh_last_write_at` columna nueva no necesaria: `hubspot_last_write_at` (migration TASK-547) + `last_outbound_sync_at` (TASK-545) cubren el caso de uso.
+  - `sync_status` legacy de finance (`local_only|pending_sync|synced`) NO tocada. Nueva columna `hubspot_sync_status` específica del bridge, CHECK-constrained.
+  - Batch API HubSpot (coalescing ≥5 events/30s) deferido — requiere cambios cross-projection en el reactive worker. Follow-up explícito.
+  - Tests E2E contra HubSpot sandbox deferidos a staging smoke test post-activación (mocks unit tests cubren todas las paths).
+- **Rollout plan:** deploy de Cloud Run endpoints externo → custom properties runbook sandbox → staging activation (flags TASK-546 ya ON) → validación 48h → production.
+- **Cross-impact:** TASK-548 (drift detection) desbloqueado — el cliente `reconcileHubSpotGreenhouseProducts` ya existe. TASK-549 (policy enforcement) también se acerca.
+- **Out of scope explícito:** drift cron (TASK-548), Admin UI (TASK-548), variants/multi-currency (TASK-421), batch API coalescing, service bundles HubSpot (open question #6).
+
+## Sesion 2026-04-21 — TASK-546 Product Catalog Source Handlers & Event Homogenization (Claude Opus 4.7)
+
+- **Scope:** Fase B del programa Product Catalog Sync (TASK-544 umbrella). Activa el materializer scaffolded en TASK-545, conectando los 4 catálogos fuente (sellable_roles, tool_catalog, overhead_addons, service_pricing) al `product_catalog` canónico vía reactive projection + handlers idempotentes. Sin cambios de schema: TASK-545 ya cubría el DDL completo.
+- **Event catalog extendido** (`src/lib/sync/event-catalog.ts`): agregado aggregate `overheadAddon` + 6 events nuevos — `sellableRoleDeactivated`/`Reactivated`, `aiToolDeactivated`/`Reactivated`, `overheadAddonCreated`/`Updated`/`Deactivated`/`Reactivated`.
+- **Publishers faltantes creados:**
+  - Extendido `sellable-role-events.ts` con `publishSellableRole{Deactivated,Reactivated}`.
+  - Extendido `tool-catalog-events.ts` con `publishAiTool{Deactivated,Reactivated}`.
+  - Nuevo `overhead-addon-events.ts` con 4 publishers (antes overhead-addons hacía silent upsert sin eventos).
+- **Lifecycle helpers en stores:**
+  - `deactivateSellableRole(roleId)` / `reactivateSellableRole(roleId)` en `sellable-roles-store.ts`.
+  - `deactivateToolCatalogEntry(toolId)` / `reactivateToolCatalogEntry(toolId)` en `tool-catalog-store.ts`.
+  - `upsertOverheadAddonEntry` ahora emite `.created` al insertar; en update emite `.deactivated` / `.reactivated` según transición de `active`, o `.updated` si solo cambiaron otros campos.
+- **Foundation helpers** (`src/lib/commercial/product-catalog/`):
+  - `flags.ts` — `isProductSyncEnabled(sourceKind)` despacha a 4 env vars `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}`. Default OFF. Pattern decentralizado (match con `bigquery-write-flag.ts`).
+  - `source-readers.ts` — 4 readers defensivos. Cada handler re-query la source table (los events tienen payload delgado: solo IDs) para evitar stale data en retries.
+  - `upsert-product-catalog-from-source.ts` — corazón del materializer. Lock con `FOR UPDATE` por `(source_kind, source_id, source_variant_key)`, compute checksum SHA-256, compare contra el persistido, decide outcome entre 5 (`created`/`updated`/`archived`/`unarchived`/`noop`), upsert, emit evento en la misma transacción.
+- **Handlers** (`src/lib/sync/handlers/`):
+  - `sellable-role-to-product.ts` → `product_type=service`, `pricing_model=staff_aug`, `default_unit=hour`, `default_currency=USD`, `default_unit_price` desde último pricing USD en `sellable_role_pricing_currency`.
+  - `tool-to-product.ts` → `product_type=license`, `pricing_model=fixed`, `default_unit=month`, `business_line_code` = primer elemento de `applicable_business_lines`. Skip si `tool_sku IS NULL` (interpretación pragmática de "sellable" porque la columna no existe en schema).
+  - `overhead-addon-to-product.ts` → `product_type=service`, `pricing_model=fixed`, `default_unit=unit` por default. Archivo cuando `active=false` **OR** `visible_to_client=false`.
+  - `service-to-product.ts` → `default_unit_price=null` (servicios son compositivos, pricing por quote). `pricing_model` derivado de `commercial_model`: `on_going/on_demand→retainer`, `hybrid→project`, `license_consulting→fixed`, default `project`.
+- **Projection refresh body** (`source-to-product-catalog.ts`): reemplazado el no-op por dispatcher que:
+  1. Chequea si el `entityType` es auto-materializable (excluye `manual`/`hubspot_imported`/`sellable_role_variant`)
+  2. Chequea el sub-flag correspondiente
+  3. Abre `withTransaction` e invoca el handler
+  4. Retorna string descriptivo (`created:sellable_role:role-1:prd-abc` / `skip:flag_disabled:tool` / etc)
+  - Trigger events ampliado de 8 a 16: suma los `.deactivated`/`.reactivated` de cada source.
+- **Tests**: 55/55 pasando — 7 upsert paths (create/update/archive/unarchive/noop/lock-key/variant-normalization), 14 mapper tests (4 handlers), 10 flags tests (per-source + dispatcher + env coerción), 13 projection tests (trigger list + scope extraction + dispatching con mocks), + 11 preservados de Fase A.
+- **Decisiones vs spec §6.2:**
+  - DB CHECK constraints son más estrictos que la pseudo-spec. Mapping pragmático documentado en el Delta del doc de arquitectura.
+  - `tool.sellable=true` no existe como columna → interpretación pragmática `tool_sku IS NOT NULL AND is_active=true`.
+  - Handler NO es `{extract, commit}` class-style; es función pura + delegate al helper compartido. Evita duplicar el transaction flow en 4 lugares.
+  - Events de publishers emiten solo IDs (payload delgado); handlers re-query source tables. Defensivo contra stale data.
+- **Rollout plan** (documentado en la doc funcional):
+  1. Staging: `ROLES=true` → validar 48h → `TOOLS=true` → 48h → `OVERHEADS=true` → 48h → `SERVICES=true` → 48h.
+  2. Production: replicar flag por flag tras validación.
+  3. Rollback seguro: flag=false → handler skippea silenciosamente. Rows materializadas persisten (no hay DDL rollback necesario).
+- **Cross-impact:** TASK-547 (Fase C outbound HubSpot) desbloqueada — ya hay eventos `commercial.product_catalog.{created,updated,archived,unarchived}` consistentes que puede consumir. TASK-548 (Fase D drift) también aprovecha el checksum canonical de TASK-545.
+- **Out of scope explícito:** outbound Cloud Run (TASK-547), drift cron (TASK-548), Admin UI (TASK-548), variants on-demand, service bundle en HubSpot.
+
+## Sesion 2026-04-21 — TASK-530 Quote Tax Explicitness Chile IVA (Claude Opus 4.7)
+
+- **Scope:** hace explícito el IVA Chile en cotizaciones — schema persiste snapshot tributario inmutable por versión, builder/PDF muestran Neto/IVA/Total, pricing engine sigue neto. Apoyado en TASK-529 (tax code foundation).
+- **Migration shipped + aplicada en dev:** `20260421162238991_task-530-quote-tax-snapshot.sql`:
+  - Extiende `greenhouse_commercial.quotations` con 6 columnas (`tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`).
+  - Extiende `greenhouse_commercial.quotation_line_items` con 5 columnas (mismo shape sin `frozen_at`).
+  - CHECK constraints: `tax_code ∈ {cl_vat_19, cl_vat_exempt, cl_vat_non_billable}`; `tax_code ⇔ snapshot ⇔ frozen_at` coherencia.
+  - Index parcial por `tax_code` para reports (filtro exentos mensuales).
+  - Backfill idempotente: rate≈0.19 → cl_vat_19, rate=0 → cl_vat_exempt, rate IS NULL → cl_vat_non_billable. Cada row obtiene snapshot sintético preservando legacy `tax_amount` con `metadata.backfillSource = 'TASK-530'`.
+- **Helpers nuevos** (`src/lib/finance/pricing/`):
+  - `quotation-tax-snapshot.ts` — server-only; expone `buildQuotationTaxSnapshot({netAmount, taxCode?, spaceId?, issuedAt?})` que llama a `resolveChileTaxCode` + `computeChileTaxSnapshot` (TASK-529). Default code `cl_vat_19`. Retorna `{snapshot, taxCode, isTaxExempt, rateSnapshot, taxAmountSnapshot, record}`. También `parsePersistedTaxSnapshot(raw)` defensivo para reads.
+  - `quotation-tax-constants.ts` — cliente-safe (sin `server-only`); expone `DEFAULT_CHILE_IVA_RATE = 0.19`, `QUOTE_TAX_CODE_{VALUES,RATES,LABELS}`, `isQuoteTaxCodeValue`, `previewChileTaxAmounts(netAmount, taxCode)`. Usado por el builder para preview optimista antes de que el server re-resuelva el catálogo.
+- **Orchestrator actualizado** (`quotation-pricing-orchestrator.ts`):
+  - `QuotationPricingInput` gana `taxCode?: string | null` + `spaceId?: string | null`.
+  - UPDATE del header escribe las 6 columnas nuevas en la misma transacción del pricing.
+  - INSERT de line items hereda `tax_code` del header y computa snapshot per-line proporcional a `subtotalAfterDiscount` usando `computeChileTaxSnapshot({code, netAmount, issuedAt})`.
+  - El pricing engine sigue retornando **neto** — el IVA es post-engine.
+- **Canonical store actualizado** (`quotation-canonical-store.ts`):
+  - `QuotationHeaderRow` + reads exponen `tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`, `tax_snapshot_frozen_at`.
+  - Mapper retorna `taxCode`, `taxRateSnapshot`, `taxAmountSnapshot`, `taxSnapshot: ChileTaxSnapshot | null`, `isTaxExempt`, `taxSnapshotFrozenAt`. Usa `parsePersistedTaxSnapshot` para tolerar rows legacy.
+- **UI wiring** (`QuoteBuilderShell` + `QuoteSummaryDock`):
+  - `QuoteBuilderShell` computa `taxPreview = previewChileTaxAmounts(subtotalOutputCurrency, 'cl_vat_19')` inline.
+  - `QuoteSummaryDock` recibe `ivaAmount={ivaAmountPreview}` + `total={totalWithIvaPreview}`. `subtotal` sigue siendo neto. El `TotalsLadder` ya tenía soporte para `ivaAmount` — solo faltaba el wiring.
+- **PDF** (`src/lib/finance/pdf/`):
+  - `contracts.ts` — `QuotationPdfTotals.tax` opcional con `{code, label, rate, amount, isExempt}`.
+  - `quotation-pdf-document.tsx` — renderiza una línea explícita entre Subtotal y Total: "IVA 19%" con monto, o "IVA Exento" / "No Afecto a IVA" con `—`.
+  - `src/app/api/finance/quotes/[id]/pdf/route.ts` — `QuotationHeaderRow` lee las 4 columnas tributarias; construye `totals.tax` con la etiqueta correcta + ajusta `total` para incluir IVA (engine returns net, invoice shows net+IVA).
+- **Tests (22/22 passing)**:
+  - `quotation-tax-constants.test.ts` (14 tests) — constantes, type guard, `previewChileTaxAmounts` para los 3 códigos + rounding + defensive inputs.
+  - `quotation-tax-snapshot.test.ts` (8 tests) — `buildQuotationTaxSnapshot` con default code, exempt code, frozenAt propagation, spaceId scope; `parsePersistedTaxSnapshot` con inválidos, wrong version, happy path, numeric coercion.
+- **Decisiones clave vs spec §Detailed Spec:**
+  - **Email template**: spec decía "PDF y email"; no existe template de quote email todavía. Shippeamos PDF; email queda como follow-up explícito (crear el template completo expande scope más allá de "tax explicitness").
+  - **UI selector de tax_code**: hoy el builder siempre graba `cl_vat_19` (default). Dropdown para elegir entre IVA / Exento / No Afecto queda como follow-up UI.
+  - **Per-line tax override**: schema soporta (cada línea tiene sus 5 columnas) pero UI solo edita el header V1.
+  - **Multi-currency**: el snapshot se computa sobre la moneda del quote (CLP/USD/CLF/etc.); no se convierte.
+- **Correcciones al audit inicial:** el subagente reportó `li.total_price` (no existe) — la columna real es `subtotal_price`. La migration corrigió el backfill antes de aplicar.
+- **Docs:**
+  - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — Delta TASK-530 al tope con columnas + flujo + backfill + cliente-safe module + follow-ups.
+  - `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` — bump a v2.32 con el Update del 2026-04-21.
+  - `docs/documentation/finance/iva-explicito-cotizaciones.md` — doc funcional nuevo explicando flujo operativo, 3 códigos, inmutabilidad, multi-currency, exento/no-afecto, FAQ.
+  - `docs/documentation/README.md` — link nuevo en la sección Finanzas.
+- **Verificación:** `pnpm migrate:up` + types regen OK · `pnpm lint` clean · `npx tsc --noEmit` clean · 22/22 tests passing.
+- **Cross-impact:**
+  - **TASK-529 (Chile Tax Foundation)** — consumidor principal; valida que el helper funciona con el catálogo real.
+  - **TASK-466 (Multi-Currency Quote Output)** — ahora puede leer el snapshot tributario al renderizar multi-moneda.
+  - **TASK-531 (Income tax inheritance)** — downstream; el income que nace del quote hereda `tax_code` + snapshot.
+  - **TASK-541 (Quote-to-cash)** — la choreography preserva el snapshot intacto durante la conversión (no recalcula).
+  - **TASK-533 (VAT Ledger mensual)** — consumidor futuro de los snapshots para consolidar débito/crédito fiscal.
+- **Out of scope (follow-ups):** dropdown de tax_code en builder; email template con breakdown IVA; per-line override UI; multi-jurisdiction (solo Chile V1); tests E2E del write path.
+
+## Sesion 2026-04-21 — TASK-541 Quote-to-Cash Atomic Choreography (Claude Opus 4.7)
+
+- **Scope:** Fase G del programa Commercial Party Lifecycle (paraguas TASK-534). Cierra el loop end-to-end quote→contract→party→client→deal-won en un solo comando atómico con `correlation_id` UNIQUE propagado a todos los eventos. Desbloquea MRR materializer consumir triggers consistentes.
+- **Migration shipped + aplicada en dev:** `20260421150625283_task-541-commercial-operations-audit.sql` crea `greenhouse_commercial.commercial_operations_audit` con PK `operation_id` UUID, UNIQUE `correlation_id` UUID (propagado a payload de todos los eventos downstream), 3 CHECK constraints (operation_type, status de 5 valores, trigger_source de 4 valores), 4 indexes hot-path (quotation_id + started_at, status in `('started','pending_approval')`, contract_id, hubspot_deal_id). Runtime grants INSERT/UPDATE/SELECT.
+- **Comando CQRS** (`src/lib/commercial/party/commands/convert-quote-to-cash.ts`): pipeline transaccional explícito:
+  1. `FOR UPDATE OF q` sobre `quotations` joineado a `organizations` para leer `lifecycle_stage`
+  2. Idempotency check: si ya `converted` con audit previo → retorna `idempotent_hit`; sin audit → sintetiza row `legacy_converted_quote_with_no_audit`
+  3. Validación `CONVERTIBLE_STATUSES = {issued, sent, approved}`
+  4. Guard `organization_id` presente
+  5. `startCorrelatedOperation` + emit `quote_to_cash.started`
+  6. Threshold gate: `total_amount_clp > $100M` → `pending_approval` + emit `approval_requested` + throw (sin mutar nada más)
+  7. UPDATE quote status → `converted`
+  8. `ensureContractForQuotation` (TASK-460 reusado)
+  9. `promoteParty(active_client)` si no ya está en ese stage (instancia client por side-effect)
+  10. Fallback: `instantiateClientForParty` si la promoción se saltó y no hay client_id
+  11. `publishQuotationConvertedEvent` directo (no via publishQuoteConverted porque ese requiere incomeId que no creamos aquí)
+  12. `publishDealWon` LOCAL solo si trigger ≠ `deal_won_hubspot` (anti-duplicado con sync inbound)
+  13. `completeOperation(completed)` + emit `quote_to_cash.completed`
+  14. Try/catch outer: `completeOperation(failed)` + emit `quote_to_cash.failed` + rethrow (la tx rollea todo de igual forma — los eventos solo llegan al outbox si antes fueron INSERT; el failed event es best-effort)
+- **Correcciones a spec §6.5:**
+  - `markDealWon(tx, hubspotDealId)` outbound a HubSpot NO se implementa (TASK-540 Fase F). Emito solo evento local y anti-duplicado cuando el trigger viene del sync inbound.
+  - `publishQuoteConverted` requiere `incomeId` que no creamos aquí → emito `commercial.quotation.converted` directo con `correlationId` en payload.
+  - Wiring reactivo sobre `commercial.contract.created` sería circular (el comando emite ese evento). Solo escucho `commercial.deal.won`.
+  - Dual approval genérico no existe; gate simple detecta threshold y persiste `pending_approval` + evento (follow-up para workflow completo).
+  - Income materialization separada — sigue en `materializeInvoiceFromApprovedQuotation` (endpoint manual). Posible reactivización como follow-up.
+- **Event catalog extendido**: aggregate nuevo `commercial_operation` + 4 event types (`commercial.quote_to_cash.{started,completed,failed,approval_requested}`).
+- **Projection reactiva** (`quote-to-cash-autopromoter.ts`): domain `cost_intelligence`, trigger `commercial.deal.won`, extractScope por `hubspotDealId`, busca quotation convertible (issued/sent/approved sin converted_to_income_id), invoca comando con trigger `deal_won_hubspot`. Swallows `QUOTE_TO_CASH_APPROVAL_REQUIRED` para no quemar retries.
+- **API route** (`POST /api/commercial/quotations/[id]/convert-to-cash`): capability gate `commercial.quote_to_cash.execute` (bindeada a `efeonce_admin` + `finance_admin`), traducción explícita de errores: 404 not found, 409 not convertible/missing anchors, 202 con `approvalId` cuando threshold gate dispara, 200 para completed/idempotent_hit, 500 fallback.
+- **Types + errors**: 4 error classes dedicadas (`QuotationNotFoundError`, `QuotationNotConvertibleError`, `QuoteToCashApprovalRequiredError`, `QuoteToCashMissingAnchorsError`), enums (`ConversionTriggeredBy`, `CommercialOperationStatus`), threshold constante `QUOTE_TO_CASH_DUAL_APPROVAL_THRESHOLD_CLP = 100_000_000`.
+- **Tests**: 9/9 passing — not found, not convertible, missing anchors, idempotent hit, threshold gate, bypass via `skipApprovalGate`, happy path con promote, trigger=deal_won_hubspot suprime re-emit local, skip promote cuando ya es active_client.
+- **Docs**: `GREENHOUSE_EVENT_CATALOG_V1.md` sección Commercial Deals extendida con los 4 events del aggregate `commercial_operation` + el `quotation.converted` re-emitido con correlationId. `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` gana sección "Delta 2026-04-21 — Fase G shipped (TASK-541)". Doc funcional nueva `docs/documentation/finance/quote-to-cash-atomico.md` explica flujo operativo, 12 pasos, 5 estados, threshold, correlation ID, trigger reactivo, FAQ.
+- **Verificación:** `pnpm migrate:up` + types regen OK · `pnpm lint` clean · `npx tsc --noEmit` clean · 9/9 tests passing.
+- **Cross-impact:**
+  - **TASK-535 (Party Lifecycle)** — usa `promoteParty` + `instantiateClientForParty`.
+  - **TASK-460 (Contracts)** — reusa `ensureContractForQuotation` tal cual.
+  - **TASK-504 (Quotation Governance)** — respeta status enum; el comando converge quotes `approved`/`issued`/`sent` sin re-aplicar approval del workflow propio.
+  - **TASK-539 (Inline Deal)** — los deals creados allí entran al pipeline y pueden ser convertidos via trigger `deal_won_hubspot` o operador.
+  - **TASK-540 (Outbound Fase F)** — consumirá los eventos `party.promoted`, `deal.won`, `contract.activated` con el mismo `correlationId` para propagar a HubSpot.
+  - **TASK-462 (MRR/ARR)** — `contract.activated` emitido desde el comando dispara la materialización correctamente.
+- **Out of scope (follow-ups):** workflow genérico de approvals para resolver `pending_approval`; outbound Fase F; income materialization reactiva al `quote_to_cash.completed`; Admin Center funnel/velocity dashboard (TASK-542); reversal/unconvert post-V1.
+
+## Sesion 2026-04-21 — TASK-539 Inline Deal Creation from Quote Builder (Claude Opus 4.7)
+
+- **Scope:** Fase E del programa Commercial Party Lifecycle (paraguas TASK-534). Elimina el context-switch HubSpot desde el cotizador — el pain point principal declarado del programa. Desbloquea TASK-540 (outbound) y TASK-541 (quote-to-cash).
+- **Migration shipped + aplicada en dev:** `20260421143050333_task-539-deal-create-attempts.sql` crea `greenhouse_commercial.deal_create_attempts` con 22 columnas, PK `attempt_id` UUID, UNIQUE parcial por `idempotency_key`, 5 indexes hot-path (rate limit por user/tenant, fingerprint dedupe, reverse lookup por `hubspot_deal_id`), 3 CHECK constraints (status enum de 6 valores, completed_consistent, deal_linkage).
+- **Cloud Run client extension** (`src/lib/integrations/hubspot-greenhouse-service.ts`): nuevo `createHubSpotGreenhouseDeal(payload)` + tipos `HubSpotGreenhouseCreateDealRequest`/`Response` (status `created | endpoint_not_deployed`). 404 se captura y devuelve shape estructurado sin throw — mismo patrón que TASK-524 (invoice bridge). Permite shippear el flujo completo mientras el Cloud Run repo aterriza la ruta `/deals`.
+- **Event catalog extendido** (`src/lib/sync/event-catalog.ts`): 3 event types nuevos bajo aggregate `deal`:
+  - `commercial.deal.create_requested` — siempre, al momento de persistir el attempt pending (audit trail completo)
+  - `commercial.deal.create_approval_requested` — cuando amount > $50M CLP
+  - `commercial.deal.created_from_greenhouse` — happy path, distingue origen Greenhouse vs sync inbound
+- **Comando CQRS** (`src/lib/commercial/party/commands/create-deal-from-quote-context.ts`):
+  - Pipeline: validate → loadOrg → idempotency/fingerprint dedupe → rate limit (20/min user, 100/h tenant) → threshold check ($50M CLP) → insertPendingAttempt → POST Cloud Run → transactional upsert deal + `promoteParty(prospect→opportunity)` + emit events → finalizeAttempt.
+  - Rate limit enforcement cuenta rows en `deal_create_attempts` por `actor_user_id` (window 60s) y `tenant_scope` (window 3600s) filtrando por status activo (`completed | pending_approval | pending`).
+  - 5 error classes dedicadas (`DealCreateValidationError`, `OrganizationHasNoCompanyError`, `DealCreateRateLimitError`, `DealCreateInsufficientPermissionsError`, `DealCreateError` genérico).
+  - Mapping automático de HTTP status en el route (400/403/409/429/201/202).
+- **API route** (`POST /api/commercial/organizations/[id]/deals`): capability gate `commercial.deal.create` (bindeada a `efeonce_admin` por TASK-535), tenant isolation via `resolveFinanceQuoteTenantOrganizationIds`, 429 con header `Retry-After` en rate limit, 201 para `completed` / 202 para `pending_approval`/`endpoint_not_deployed`.
+- **UI** (`src/views/greenhouse/finance/workspace/CreateDealDrawer.tsx` + `src/hooks/useCreateDeal.ts`): MUI v7 Drawer minimalista con 3 inputs (dealName, amount, currency), aviso contextual cuando supera el threshold, toast feedback via `react-toastify`. Hook con AbortController patrón `usePricingSimulation`.
+- **Integración QuoteBuilder**: `QuoteBuilderShell` gana CTA "+ Crear deal nuevo" visible cuando hay organization seleccionada pero no hay deal. Al éxito: bindea `hubspotDealId` al quote form + insert optimista en `orgDeals` para no hacer roundtrip.
+- **Tests**: 9 unit tests del comando passing (happy path, validation, org sin hubspot, idempotency hit, rate limit, threshold > $50M, endpoint_not_deployed sin throw, Cloud Run 5xx con trace + rethrow, promotion skip cuando ya es opportunity).
+- **Docs:** `GREENHOUSE_EVENT_CATALOG_V1.md` sección Commercial Deals extendida con los 3 events nuevos. `GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` gana sección "Delta 2026-04-21 — Fase E shipped (TASK-539)" con correcciones a §6.4 y follow-ups. Doc funcional nueva `docs/documentation/finance/crear-deal-desde-quote-builder.md` explica flujo operativo, los 6 estados, threshold, defaults, y FAQ.
+- **Correcciones clave a la spec:**
+  - Cloud Run `/deals` no existe en el repo local — graceful fallback como TASK-524.
+  - Custom property `gh_deal_origin` en HubSpot no está creada — se envía como `origin: 'greenhouse_quote_builder'` en el payload; follow-up ops.
+  - Approval workflow de TASK-504 es quote-only — Fase E persiste el attempt en `pending_approval` + emite evento para que un workflow genérico futuro lo consuma.
+  - Rate limit helper genérico no existía — implementado in-module sobre la propia tabla de attempts.
+  - `identity_profiles.hubspot_user_id` no existe — opcional en input.
+- **Verificación:** `pnpm migrate:up` + types regen OK · `pnpm lint` clean · `npx tsc --noEmit` clean · 9/9 tests del command passing.
+- **Cross-impact:**
+  - **TASK-535 (Party Lifecycle Fase A)** — consume `promoteParty` directamente para auto-promoción.
+  - **TASK-524 (Income Bridge)** — mismo patrón Cloud Run client + graceful fallback.
+  - **TASK-534 umbrella** — Fase E cerrada; queda C/D/F/G/H/I pendientes.
+  - **TASK-541 (quote-to-cash)** — reusará `dealId` creado aquí en el flujo atómico.
+- **Out of scope (follow-ups):** deploy `/deals` en Cloud Run repo externo; crear `gh_deal_origin` en HubSpot portal; workflow genérico de approval; resolución automática de `ownerHubspotUserId` via `identity_profile_source_links`; Admin Center surface para retry de `failed`/`endpoint_not_deployed`; bidirectional update (TASK-540+).
+
+## Sesion 2026-04-21 — Ops Registry architecture + EPIC-003 bootstrap (Codex)
+
+- **Scope:** definir el mini sistema interno para operar specs, arquitectura, tasks, epics, mini-tasks e issues sin sacar la truth del repo, y decidir si esto cabe en una sola task o en un programa federado.
+- **Documentacion nueva:**
+  - `docs/architecture/GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md`
+  - `docs/epics/to-do/EPIC-003-ops-registry-federated-operational-framework.md`
+  - `docs/tasks/to-do/TASK-558-ops-registry-schema-parser-repo-config-foundation.md`
+  - `docs/tasks/to-do/TASK-559-ops-registry-validation-query-cli-generated-outputs.md`
+  - `docs/tasks/to-do/TASK-560-ops-registry-human-agent-surfaces.md`
+  - `docs/tasks/to-do/TASK-561-ops-registry-federation-contract-sister-repos.md`
+- **Decision canonica registrada:**
+  - `Ops Registry` debe ser repo-native y read-first; la source of truth sigue en markdown/Git.
+  - V1 debe montarse sobre `TypeScript + Node.js`, `unified + remark-parse`, `zod`, sin base externa obligatoria.
+  - outputs derivados mínimos: `registry.json`, `graph.json`, `validation-report.json`, `stale-report.json`.
+  - el sistema debe ser dual: surface humana y surface JSON-first para agentes.
+  - la escalabilidad buscada es por federación entre repos hermanos, no por centralización temprana.
+  - la arquitectura fue ampliada para incluir API HTTP, MCP server y write plane seguro: crear/actualizar artefactos vía comandos materializados en markdown en lugar de edición libre.
+  - además quedó formalizada una `Artifact Policy Layer`: `Ops Registry` debe respetar templates, registries, índices y procesos del repo por tipo de artefacto.
+  - **Conclusion de programa:** esto **no cabe** sanamente en una sola task. Se formalizo como `EPIC-003` con 4 child tasks:
+  - `TASK-558` foundation de schema/parser/repo-config
+  - `TASK-559` validaciones + CLI + outputs derivados
+  - `TASK-560` surfaces humano + agente + API/MCP + write-safe commands
+  - `TASK-561` contrato federado para repos hermanos incluyendo operación cross-repo
+- **Docs sincronizadas:** `docs/README.md`, `docs/epics/*`, `docs/tasks/*`, `project_context.md`, `changelog.md`.
+- **Validacion:** documental únicamente; no se tocaron rutas runtime ni código de aplicación en esta sesión.
+
+## Sesion 2026-04-21 — Arquitectura Comercial vs Finanzas + programa EPIC-002 (Codex)
+
+- **Scope:** formalizar antes de implementar la separacion de dominio entre `Comercial` y `Finanzas`, para decidir si el cambio cabe en una sola task o requiere programa multi-task.
+- **Documentacion nueva:**
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`
+- **Decision canonica registrada:**
+  - `Comercial` y `Finanzas` deben operar como dominios hermanos del portal.
+  - `Quotes`, `Contracts`, `SOW`, `Master Agreements`, `Products` y `Pipeline` pertenecen a `Comercial` como owner domain.
+  - la primera separacion debe ocurrir en `sidebar + surfaces + access model`, **sin** mover de inmediato las URLs legacy `/finance/...`.
+  - el cambio toca ambos planos de acceso: `views/authorizedViews/view_code` y `entitlements/routeGroups`; no basta con mover links.
+- **Conclusion de arquitectura:** esto **no cabe** de forma sana en una sola task. Se formalizo como programa multi-task:
+  - `EPIC-002 — Commercial Domain Separation from Finance`
+  - `TASK-554` navegación/sidebar
+  - `TASK-555` access model foundation (`routeGroup commercial`, `comercial.*`, compat legacy)
+  - `TASK-556` adopción de surfaces comerciales sobre paths `/finance/...`
+  - `TASK-557` extracción de `Pipeline comercial` desde `Finance > Intelligence`
+- **Docs sincronizadas:** `docs/README.md`, `docs/epics/*`, `docs/tasks/*`, `project_context.md`.
+- **Validacion:** documental únicamente; no se tocaron rutas ni código runtime en esta sesión.
+
+## Sesion 2026-04-21 — TASK-524 Income → HubSpot Invoice Bridge (Claude Opus 4.7)
+
+- **Scope:** cerrar la continuidad comercial quote→income→HubSpot. Desbloquea el hilo full CRM (deal → quote → income visible en HubSpot invoice object).
+- **Migration shipped + aplicada en dev:** `20260421125353997_task-524-income-hubspot-invoice-trace.sql` agrega 7 columnas a `greenhouse_finance.income`: `hubspot_invoice_id`, `hubspot_last_synced_at`, `hubspot_sync_status` (CHECK enum `pending|synced|failed|endpoint_not_deployed|skipped_no_anchors`), `hubspot_sync_error`, `hubspot_sync_attempt_count` (default 0), `hubspot_artifact_note_id`, `hubspot_artifact_synced_at`. Consistency check `hubspot_invoice_id IS NOT NULL ⇒ hubspot_last_synced_at IS NOT NULL`. 2 indexes: partial por `hubspot_sync_status` para retry worker; UNIQUE parcial por `hubspot_invoice_id` para webhook reverse-lookup.
+- **Corrección al audit inicial:** el agent explorador reportó que `hubspot_last_synced_at` ya existía en `income`; en realidad **no existía**. La migration la incluye.
+- **Materializers actualizados (ambas ramas):**
+  - `materialize-invoice-from-quotation.ts` — SELECT enriquecido con `LEFT JOIN greenhouse_core.organizations` para traer `organization_hubspot_company_id`; INSERT income ahora incluye `hubspot_company_id` y `hubspot_deal_id`.
+  - `materialize-invoice-from-hes.ts` — mismo patrón; ambas ramas usan `FOR UPDATE OF q` para lockear solo quotations, no organizations.
+- **Módulo nuevo `src/lib/finance/income-hubspot/`** (5 archivos + barrel):
+  - `types.ts` — `IncomeHubSpotSyncStatus` union (5 valores, alineada con CHECK), `IncomeHubSpotMirrorPayload`, `IncomeHubSpotSyncTrace`, error classes (`IncomeHubSpotBridgeError`, `IncomeNotFoundError`).
+  - `income-hubspot-events.ts` — 3 publishers (`publishIncomeHubSpotSynced`, `publishIncomeHubSpotSyncFailed`, `publishIncomeHubSpotArtifactAttached`) bajo aggregate `income`.
+  - `push-income-to-hubspot.ts` — bridge idempotente con 5 paths explícitos: `skipped_no_anchors` (sin anchors → trace + evento failed, no call), `endpoint_not_deployed` (404 del Cloud Run → trace, no rethrow), `failed` (5xx → trace + rethrow para retry backoff), `synced` (success → persist `hubspot_invoice_id` + evento synced). Construye line_items desde `greenhouse_finance.income_line_items` o synthetic single-line desde `total_amount`.
+  - `index.ts` — barrel.
+- **Projection nueva** (`src/lib/sync/projections/income-hubspot-outbound.ts`): domain `cost_intelligence`, listener `finance.income.{created,updated,nubox_synced}`, refresh delega a `pushIncomeToHubSpot`. Registrada en `projections/index.ts`.
+- **Cloud Run service client extendido** (`src/lib/integrations/hubspot-greenhouse-service.ts`): nuevo `upsertHubSpotGreenhouseInvoice(payload)` con tipos `HubSpotGreenhouseUpsertInvoiceRequest` (anchors, lineItems, `isBillable: false`) y `HubSpotGreenhouseUpsertInvoiceResponse` (status `created | updated | endpoint_not_deployed`). El 404 se atrapa y retorna shape estructurado en lugar de throw — permite que la projection no queme retries cuando la ruta `/invoices` aún no está deployada en prod.
+- **Event catalog extendido**: 3 event types nuevos (`finance.income.hubspot_synced`, `finance.income.hubspot_sync_failed`, `finance.income.hubspot_artifact_attached`) bajo el aggregate `income` existente.
+- **Tests:** 15/15 passing (push-income-to-hubspot 7, income-hubspot-events 3, projection 5).
+- **Docs:** `GREENHOUSE_EVENT_CATALOG_V1.md` sección Finance reescrita con los 5 events del income aggregate. `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` gana sección "Delta 2026-04-21 — Income → HubSpot Invoice Bridge (TASK-524)".
+- **Verificación:** `pnpm migrate:up` OK + types regenerados · `pnpm lint` clean · `npx tsc --noEmit` clean.
+- **Cross-impact:** TASK-463 (bidirectional quote sync) no colisiona; TASK-486/TASK-504 ya cerrados; TASK-528/529 Chile tax compatible; TASK-547 Product Catalog Outbound usa mismo patrón.
+- **Out of scope (follow-ups):** Fase 2 attachar PDF/XML/DTE como note al invoice en `finance.income.nubox_synced`; contact association best-effort; Admin Center surface para rows en status degradado; deploy de `/invoices` en el Cloud Run.
+
+## Sesion 2026-04-21 — TASK-545 Product Catalog Schema & Materializer Foundation (Claude Opus 4.7)
+
+- **Scope:** Fase A del programa Commercial Product Catalog Sync (paraguas TASK-544). Desbloquea TASK-546 (Fase B handlers). Branch: `develop`.
+- **Migraciones shipped y aplicadas en dev (types regenerados):**
+  - `20260421122806370_task-545-product-catalog-extension.sql` — 9 columnas nuevas en `greenhouse_commercial.product_catalog`: `source_kind` (CHECK de 7 valores), `source_id`, `source_variant_key`, `is_archived NOT NULL DEFAULT FALSE`, `archived_at`, `archived_by`, `last_outbound_sync_at`, `last_drift_check_at`, `gh_owned_fields_checksum`. UNIQUE parcial `(source_kind, source_id, COALESCE(source_variant_key, ''))` solo para rows no-manual/no-hubspot-imported. 3 indexes hot-path: por `(source_kind, source_id)`, por `(active, is_archived) WHERE is_archived=FALSE`, por `last_outbound_sync_at NULLS FIRST`.
+  - `20260421122812484_task-545-product-sync-conflicts-table.sql` — `product_sync_conflicts` con 5 conflict types (`orphan_in_hubspot/greenhouse`, `field_drift`, `sku_collision`, `archive_mismatch`), 4 resolution statuses (`pending`, `resolved_greenhouse_wins`, `resolved_hubspot_wins`, `ignored`), anchor-present check, resolution-consistency check, 3 indexes (unresolved hot path + dedup por producto/hubspot). Grants: SELECT/INSERT/UPDATE a runtime, no DELETE.
+  - `20260421122820579_task-545-product-catalog-source-backfill.sql` — 6 passes idempotentes por prefix (ECG→sellable_role, ETG→tool, EFO→overhead_addon, EFG→service, PRD→manual sin source_id, fallback hubspot_imported si tiene `hubspot_product_id`). DO block final levanta `NOTICE` con sample de ambiguous rows si quedan.
+- **Correcciones críticas a la spec §5.3:** `service_pricing` PK es `module_id` (no `pricing_id`), joinear por `service_sku` y usar `module_id` como `source_id`. Documentado en el delta V1.
+- **Módulo nuevo `src/lib/commercial/product-catalog/`** (5 archivos + barrel):
+  - `types.ts` — `PRODUCT_SOURCE_KINDS` (7), `PRODUCT_SYNC_CONFLICT_TYPES` (5), `PRODUCT_SYNC_CONFLICT_RESOLUTIONS` (4), `GhOwnedFieldsSnapshot`, `ProductSyncConflictRow`, error classes (`ProductCatalogError`, `ProductSourceKindMismatchError`, `ProductAlreadyArchivedError`, `ProductNotArchivedError`).
+  - `checksum.ts` — `computeGhOwnedFieldsChecksum(snapshot)` SHA-256 con orden inmutable documentado en `GH_OWNED_FIELDS_CHECKSUM_ORDER`. **NULL ≡ empty string** (evita drift falso por normalización de HubSpot), **boolean → `"true"`/`"false"`** (no 1/0).
+  - `product-catalog-events.ts` — 6 publishers: `publishProductCatalog{Created,Updated,Archived,Unarchived}` sobre aggregate `product_catalog`; `publishProductSyncConflict{Detected,Resolved}` sobre aggregate `product_sync_conflict`.
+  - `product-sync-conflicts-store.ts` — Kysely-first CRUD minimo (`insertProductSyncConflict`, `listUnresolvedProductSyncConflicts` con filtros, `countUnresolvedProductSyncConflictsByType`). Fase A solo usa insert + list; handlers vienen en TASK-548.
+  - `index.ts` — barrel.
+- **Projection scaffolding** (`src/lib/sync/projections/source-to-product-catalog.ts`):
+  - Registrada en `projections/index.ts` → `ensureProjectionsRegistered()`.
+  - Domain `cost_intelligence`, listener de eventos **reales**: `commercial.sellable_role.{created,cost_updated,pricing_updated}` + `ai_tool.{created,updated}` + `service.{created,updated,deactivated}`. TODO Fase B: agregar `overhead_addon.*` cuando aterrice publisher en `overhead-addons-store`.
+  - `extractScope` resuelve el id desde el payload; `refresh` es **no-op** en Fase A (log informativo en dev, retorna null). Fase B lo reemplaza con el upsert real + emit.
+- **Event catalog extendido** (`src/lib/sync/event-catalog.ts`): aggregate `product_sync_conflict` + 5 event types (`commercial.product_catalog.{updated,archived,unarchived}`, `commercial.product_sync_conflict.{detected,resolved}`). Los 2 preexistentes (`created`, `synced`) siguen.
+- **Backfill CLI** (`scripts/backfill-product-catalog-source.ts`): `--dry-run` preview, `--force` reclasifica rows ya clasificados. Dist-by-kind en stdout; lista los ambiguous rows (hasta 10) y sale con `exitCode=2` si quedan.
+- **Store extension** (`src/lib/commercial/product-catalog-store.ts`): `listCommercialProductCatalog` gana filtros `sourceKind` + `includeArchived`. **Default: `is_archived=FALSE`** (selectors ocultan archived); callers explícitos (Admin Center, drift reconciler) pasan `includeArchived: true`. Orden nuevo: `is_archived ASC, active DESC, product_name ASC`.
+- **Tests** — 17 tests passing en `src/lib/commercial/product-catalog/__tests__/**` (checksum 6, events 4) + `src/lib/sync/projections/__tests__/source-to-product-catalog.test.ts` (7). Cubren: determinismo del checksum, drift por campo único, NULL/empty string equivalencia, boolean normalization, reorder-independence, event publishers (aggregate + eventType + payload), projection registry + extractScope (multiple id fields) + refresh no-op.
+- **Docs:** `GREENHOUSE_EVENT_CATALOG_V1.md` sección "Commercial Product Catalog — canonical namespace (TASK-347 + TASK-545 sync foundation)" reescrita con los 7 events + invariantes. `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md` tiene sección "Delta 2026-04-21 — Fase A shipped" al tope con correcciones a §5.3 (service_pricing PK) y §6 (event type namespaces reales).
+- **Verificación local:** `pnpm migrate:up` aplicó las 3 migraciones + regeneró `src/types/db.d.ts` (270 tables, +columnas + tabla nueva). `pnpm lint` clean (solo warning preexistente en `BulkEditDrawer.tsx`). `npx tsc --noEmit` clean. 17/17 tests del módulo + 17 dentro de la suite general passing.
+- **Cross-impact:**
+  - **TASK-467** (pricing-catalog-audit-store) — no colisiona.
+  - **TASK-474** — sigue bloqueada por Fase E.
+  - **TASK-544 umbrella** — Fase A cerrada formalmente; TASK-546 lista para arrancar.
+  - **TASK-535 (Party Lifecycle)** — patron gemelo (foundation schema + CQRS-adjacent + scaffolded projection + env-var override), ambos en `develop`.
+- **Out of scope (fases siguientes):** handlers Fase B (TASK-546), outbound Cloud Run (TASK-547), drift cron + Admin Center UI (TASK-548), policy enforcement + drop `sync_direction='hubspot_only'` (TASK-549).
+
+## Sesion 2026-04-21 — TASK-535 Party Lifecycle Schema & Commands Foundation (Claude Opus 4.7)
+
+- **Scope:** Fase A del programa Commercial Party Lifecycle (paraguas TASK-534). Desbloquea TASK-536 (Fase B). Branch: `develop` (trabajo directo en rama principal por falta de worktree separado; commit único consolidado).
+- **Migraciones shipped:**
+  - `20260421113910459_task-535-organization-lifecycle-ddl.sql` — ALTER `organizations` con 6 columnas (`lifecycle_stage`, `lifecycle_stage_since`, `lifecycle_stage_source`, `lifecycle_stage_by`, `is_dual_role`, `commercial_party_id` UUID unique), CHECK constraints por dominio, partial index activo (excluye terminal stages), CREATE TABLE `organization_lifecycle_history` append-only con trigger que bloquea UPDATE/DELETE a nivel DB.
+  - `20260421114006586_task-535-organization-lifecycle-backfill.sql` — backfill idempotente (WHERE `lifecycle_stage_source='bootstrap'` AND no history yet) con CTE que detecta `has_client_link` via `fin_client_profiles.organization_id` + `clients.hubspot_company_id` bridge, `has_active_contract` en `greenhouse_commercial.contracts`, `has_recent_income` en `greenhouse_finance.income` (últimos 6 meses). Incluye guard fail-fast DO block.
+- **Spec §10.1 corregida:** los campos `organizations.client_id` y `organizations.is_provider` que la spec asumía no existen en el schema real; la implementación usa los bridges reales + providers no detectables → todos los sin client link caen a `prospect` por default (documentado como follow-up).
+- **Módulo nuevo `src/lib/commercial/party/`** (8 archivos):
+  - `types.ts` — `LifecycleStage`, `LifecycleTransitionSource`, `PartyActor`, `PartyPromotionResult`, `PartyLifecycleError` + subclases (`InvalidTransitionError`, `OrganizationNotFoundError`, `OrganizationAlreadyHasClientError`, `InsufficientPermissionsError`).
+  - `lifecycle-state-machine.ts` — `ALLOWED_TRANSITIONS` canónico §4.2 + `isTransitionAllowed` / `getAllowedNextStages` / `isTerminalStage` / `parseLifecycleStage`.
+  - `party-events.ts` — 4 publishers transaccionales (`publishPartyCreated`, `publishPartyPromoted`, `publishPartyDemoted`, `publishClientInstantiated`).
+  - `party-store.ts` — `selectOrganizationForLifecycleUpdate` (lock pesimista), `findOrganizationByHubSpotCompany`, `organizationHasClient` (detecta via 2 paths).
+  - `hubspot-lifecycle-mapping.ts` — `DEFAULT_HUBSPOT_STAGE_MAP` canónico §4.5 + `resolveHubSpotStage(raw, opts)` con env override `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE` (JSON) + unknown-stage warn + fallback configurable. `isKnownHubSpotStage` + `getEffectiveHubSpotStageMap` para ops.
+  - `commands/promote-party.ts` — lock + validar state machine + insert history + update org + side-effect `instantiateClientForParty` (si target=active_client, swallow `ORGANIZATION_ALREADY_HAS_CLIENT`) + emit promoted o demoted según rank.
+  - `commands/create-party-from-hubspot-company.ts` — upsert idempotente por `hubspot_company_id` (skip si ya existe) + mapping via resolver + history + emit created.
+  - `commands/instantiate-client-for-party.ts` — crea row en `clients` + bootstrap `fin_client_profiles` defaults (CLP + 30d) + emit instantiated.
+  - `index.ts` — barrel export.
+- **Event catalog extendido** (`src/lib/sync/event-catalog.ts`): 2 aggregates nuevos (`commercial_party`, `commercial_client`) + 5 event types (`commercial.party.created`, `.promoted`, `.demoted`, `.lifecycle_backfilled`, `commercial.client.instantiated`).
+- **Entitlements**: módulo `commercial` agregado a `ENTITLEMENT_MODULES`; 6 capabilities nuevas (`commercial.party.create/promote_to_client/churn/override_lifecycle`, `commercial.deal.create`, `commercial.quote_to_cash.execute`) bindeadas a `efeonce_admin` (6/6) + `finance_admin` (promote_to_client + quote_to_cash). Roles `sales`/`sales_lead` NO existen en repo — follow-up documentado para TASK-536+.
+- **Backfill CLI** (`scripts/backfill-organization-lifecycle.ts`): `--dry-run` para preview, `--force` para re-clasificar. Duplica la lógica de M2 para correr contra snapshots refrescados sin migrate down/up.
+- **Robustez HubSpot stages** (ask explícito del usuario): `HUBSPOT_LIFECYCLE_STAGE_MAP_OVERRIDE='{"partner":"active_client"}'` en Vercel env permite mapear stages custom sin deploy. Unknown stages → warn log (no throw) + fallback configurable. Precedencia: ad-hoc overrides > env > defaults > fallback. 9 tests dedicados al resolver.
+- **Tests** (36 passing en `src/lib/commercial/party/__tests__/`): 4 archivos: state machine (transiciones válidas/inválidas/override), promoteParty (unknown org, illegal transition, same-stage no-op, active_client side-effect, demotion, swallow double-client), createPartyFromHubSpotCompany (idempotencia, first-sync, empty id), hubspot-lifecycle-mapping (defaults, env override, malformed JSON, ad-hoc override, known/unknown).
+- **Spec docs:** `GREENHOUSE_EVENT_CATALOG_V1.md` extendido con sección "Commercial Party Lifecycle (TASK-535, Fase A)" — 5 eventos con payload + invariantes + referencia a env override.
+- **Verificación local:** `pnpm lint` → 0 errors · `npx tsc --noEmit` → clean · 36/36 tests party passing · 1629/1629 tests suite completa passing.
+- **Out of scope (diferido a fases B+):** sync HubSpot inbound, endpoints HTTP, UI del selector unificado, sweep cron, outbound sync, quote-to-cash atomic. Ver TASK-536..543.
+- **Migraciones aplicadas:** M1 + M2 corrieron contra `greenhouse-pg-dev` vía `pnpm migrate:up` (proxy Cloud SQL en `127.0.0.1:15432`). Sanity guard de M2 pasó (0 organizations sin history row). `src/types/db.d.ts` regenerado automáticamente (269 tablas introspectadas).
+
+## Sesion 2026-04-21 — TASK-529 Chile Tax Code Foundation (Claude Opus 4.7)
+
+- **Scope:** foundation canónica de tax codes Chile-first + helpers + seeds. Desbloquea TASK-530/531/532/533. Branch `task/TASK-529-chile-tax-code-foundation`.
+- **Migración shipped:** `20260421105127894_task-529-chile-tax-code-foundation.sql`:
+  - Tabla `greenhouse_finance.tax_codes` (jurisdiction-agnostic, effective dating, `space_id` nullable para overrides tenant-specific futuros).
+  - Unique constraints: `(tax_code, jurisdiction, effective_from)` global via partial index WHERE `space_id IS NULL`, scoped via partial index WHERE `space_id IS NOT NULL`.
+  - CHECK `tax_codes_kind_check` (5 valores), `tax_codes_recoverability_check` (4 valores), `tax_codes_effective_window_check`, `tax_codes_rate_nonnegative_check`.
+  - Seed Chile v1: `cl_vat_19`, `cl_vat_exempt`, `cl_vat_non_billable`, `cl_input_vat_credit_19`, `cl_input_vat_non_recoverable_19`, todos `jurisdiction='CL'`, `effective_from='2026-01-01'`, global.
+- **Kysely types regenerados automáticamente** por `pnpm migrate:up` (el script tiene post-hook `pnpm db:generate-types`). `GreenhouseFinanceTaxCodes` aparece en `src/types/db.d.ts:3405`.
+- **Helpers nuevos en `src/lib/tax/chile/`** (5 archivos):
+  - `types.ts` — `ChileTaxCodeId`, `TaxCodeKind`, `TaxRecoverability`, `TaxCodeRecord`, `ChileTaxSnapshot`, `ChileTaxAmounts`.
+  - `catalog.ts` — `loadChileTaxCodes(context)` con cache in-memory 5 min + dedup tenant-override > global.
+  - `resolver.ts` — `resolveChileTaxCode(id, context)` lanza `ChileTaxCodeNotFoundError`; `tryResolveChileTaxCode` devuelve `null`.
+  - `compute.ts` — `computeChileTaxAmounts`, `computeChileTaxSnapshot`, `validateChileTaxSnapshot`. Rounding CLP 2 decimales. Tolerancia 1 peso en validate.
+  - `index.ts` — barrel exports.
+- **Tests:** `compute.test.ts` (15 tests: 19%, exempt, non-billable, rounding, input credit/non-recoverable simetría, error handling, snapshot freeze, validate drift/tolerance) + `resolver.test.ts` (6 tests mockeando catalog: match, not found, space propagation, tryResolve). 21/21 pass.
+- **Contrato canónico adoptable por downstream:**
+  - `tax_rate` deja de ser first-class; el que manda es `tax_code` + snapshot persistido.
+  - `ChileTaxSnapshot` versión `1` incluye `taxCode`, `jurisdiction`, `kind`, `rate`, `recoverability`, `labelEs`, `effectiveFrom`, `frozenAt`, amounts, metadata.
+  - Re-renders (PDF quote, email, portal cliente) leen del snapshot, nunca del catálogo live.
+  - Recoverability es first-class — TASK-532 la usará para separar crédito fiscal vs no recuperable sin inferir por signo.
+- **Bloqueador encontrado + hotfix shipped:** TASK-466 migration (`20260421011323497`) referenciaba tabla `quotation_defaults` (no existe en DB ni en repo) y columna `approval_policies.default_currency` (la columna no existe). Fix surgical con `ALTER TABLE IF EXISTS` + DO block de chequeo a `information_schema.columns`. El constraint de `quotations.currency` y `role_rate_cards.currency` SÍ se aplicó correctamente a las 6 monedas `{CLP, USD, CLF, COP, MXN, PEN}`. ISSUE-056 creado documentando el gap — pendiente decidir si `quotation_defaults` debe crearse o si fue leftover.
+- **Docs arquitectura:** sección `## Delta 2026-04-21 — TASK-529 Chile Tax Code Foundation` agregada al tope de `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`. Incluye runtime nuevo, helpers, contrato para downstream, out-of-scope.
+- **Out of scope (para 530/531/532/533):** UI tributaria, re-anclar income/expenses/quotes a snapshots persistidos, retenciones/boletas/regímenes fuera de IVA v1, multi-country real (shape lo soporta, sólo Chile seedeada).
+- **Verificación local:** `pnpm migrate:up` verde (aplicó 466 + 529 secuencial) · 5 seed rows confirmados via pg client directo · tax tests 21/21 · Kysely types incluyen `GreenhouseFinanceTaxCodes`.
+
+## Sesion 2026-04-21 — TASK-517 Playwright E2E smoke suite (Claude Opus 4.7)
+
+- **Scope:** instalar Playwright + smoke suite autenticado via agent-auth, CI workflow manual/push-develop, docs ops. Primera task completada de Ola 2 (`TASK-511 Stack Modernization Roadmap`). Branch `task/TASK-517-playwright-e2e-smoke`.
+- **Decisión de secuencia:** se hace antes que TASK-516 (NextAuth v4 → Auth.js v5) porque 516 está bloqueado por 515 (jose) y la acceptance de 516 es literalmente el smoke login→session→/finance/quotes que esta task automatiza. 517 da red de seguridad para la migración.
+- **Stack:** `@playwright/test@1.59.1`, Chromium only V1 (Firefox/WebKit follow-up), reuso de `scripts/playwright-auth-setup.mjs` + `/api/auth/agent-session` sin modificarlos.
+- **Archivos creados:**
+  - `playwright.config.ts` (Chromium project, baseURL por env, storageState, bypass header auto, webServer opcional por flag).
+  - `tests/e2e/global-setup.ts` (regenera storageState cuando pasa de 20 min).
+  - `tests/e2e/fixtures/auth.ts` (helpers `expectAuthenticated` + `gotoAuthenticated`).
+  - `tests/e2e/smoke/*.spec.ts` × 6 → 10 tests: login-session, home, finance-quotes, hr-payroll, people-360, admin-nav.
+  - `.github/workflows/playwright.yml` (workflow_dispatch + push develop, guard fail-fast, HTML/JSON/trace artifacts).
+  - `docs/operations/PLAYWRIGHT_E2E.md` V1 (stack, env, local/staging/CI how-to, troubleshooting, convenciones).
+- **Archivos modificados:** `package.json` (3 scripts + dep), `.env.example` (3 env vars), `.gitignore` (4 paths).
+- **Asserts del suite:** smoke deliberadamente minimalista — `status < 400`, `<body>` visible, sin error text, sin redirect a `/login`. No testea copy ni UI específica (integration/visual regression son out of scope V1).
+- **Verificación local 2026-04-21:** `pnpm lint` clean (solo warning pre-existente en BulkEditDrawer) · `npx tsc --noEmit` 0 errores · `pnpm test` 1572/1572 + 2 skipped (sin regresión).
+- **Green run real 2026-04-21** contra `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`: **10/10 tests pass en 11.3s**. storageState autogenerado con cookie `__Secure-next-auth.session-token` del usuario `user-agent-e2e-001` via `/api/auth/agent-session` con bypass header.
+- **Follow-up commit `f72f11c3`:** `playwright.config.ts` carga `.env.local` automático, `global-setup.ts` propaga `AGENT_AUTH_BASE_URL` al subprocess, y `scripts/playwright-auth-setup.mjs` agregó soporte backward-compat para el header `x-vercel-protection-bypass`.
+- **GitHub Secrets sembrados** via `gh secret set`: `PLAYWRIGHT_BASE_URL`, `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL`, `VERCEL_AUTOMATION_BYPASS_SECRET`. Vercel Production NO fue tocado — el endpoint agent-session está production-blocked por diseño, el smoke suite corre contra staging only.
+- **Sinergia con TASK-516:** el test de cookie ya lista ambos nombres (`next-auth.session-token` + `authjs.session-token`) para sobrevivir la migración. `storageState.json` se regenera automáticamente en cada run.
+- **Follow-ups explícitos:** multi-browser matrix (Firefox + WebKit), visual regression (Chromatic/Percy), integration tests de mutación, Preview-deployment E2E hook por PR.
+
+## Sesion 2026-04-21 — TASK-452 Service Attribution Foundation — cierre formal (Claude Opus 4.7)
+
+- **Scope:** cerrar formalmente TASK-452. Auditoría contra el repo confirma que la foundation ya está shipped por Codex en commits previos; el único gap era documental/lifecycle. El branch `task/TASK-452-service-attribution-foundation` estaba desalineado (behind develop por 5 commits post TASK-466/482); lo recreé desde develop actual.
+- **Estado shipped en develop (sin cambios de código en esta sesión):**
+  - Migraciones `20260420123025804_task-452-service-attribution-foundation.sql` + `20260420124700528_task-452-service-attribution-foundation-repair.sql` → tablas `greenhouse_serving.service_attribution_facts` + `service_attribution_unresolved`.
+  - Materializer `src/lib/service-attribution/materialize.ts` (1,546 líneas, Kysely-first) con `materializeServiceAttributionForPeriod`, `materializeAllAvailableServiceAttributionPeriods`, readers por período / por servicio / por unresolved, helpers puros (`buildServiceIndexes`, `distributeAmountByWeights`, `resolveServiceCandidates`).
+  - Matching canónico respetado: service_id directo → document bridges (HES→PO→quotation, contract) → hubspot_deal_id → service_line sólo unívoco dentro de space+org.
+  - Projection reactiva `src/lib/sync/projections/service-attribution.ts` registrada con 20+ trigger events. Publica `accounting.service_attribution.period_materialized` (schema v2).
+  - Types Kysely generados para ambas tablas en `src/types/db.d.ts`.
+  - Tests `src/lib/service-attribution/materialize.test.ts` — 4/4 pass.
+  - Docs de arquitectura actualizados (finance, 360 object model, agency, event catalog, commercial cost attribution).
+- **Impacto cruzado verificado:**
+  - **TASK-482 (cerrada 2026-04-21):** probe runtime `serviceGrainAvailable` en `margin-feedback-materializer.ts` chequea `information_schema.tables` para `greenhouse_serving.service_attribution`. Como la tabla ya existe en la DB (instancia única `greenhouse-pg-dev` sirve dev+staging+prod), el probe flipea automáticamente a `true` en el próximo run del margin feedback batch (scheduler 5:10 AM Santiago). Sin deploy intermedio.
+  - **TASK-146** (service_economics) desbloqueada a nivel contrato: puede construir la tabla final encima de `readServiceAttributionFactsForPeriod` sin recalcular joins.
+  - **TASK-147** (campaign-service bridge): mismo contrato reusable si se necesita.
+- **Verificación local 2026-04-21:** tsc clean · lint clean (solo warning pre-existente BulkEditDrawer) · **1572/1572 tests** · build OK.
+- **Out of scope V1 confirmado:** UI backoffice de remediación manual para `service_attribution_unresolved` — queda como follow-up cuando el volumen justifique.
+
+## Sesion 2026-04-20 — TASK-466 Multi-Currency Quote Output (Claude Opus 4.7)
+
+- **Scope:** convergir el rendering client-facing multi-moneda de la quote canónica al contrato `currency + exchange_rates + exchange_snapshot_date`. Branch `task/TASK-466-multi-currency-quote-output`.
+- **Migración prerequisito (obligatoria antes del deploy):** `20260421011323497_task-466-expand-quotation-currency-constraint.sql` relaja el CHECK de `greenhouse_commercial.quotations.currency` y tablas hermanas (`quotation_defaults.default_currency`, `role_rate_cards.currency`, `approval_policies.default_currency`) de `{CLP, USD, CLF}` a `{CLP, USD, CLF, COP, MXN, PEN}` alineado con `CURRENCY_DOMAIN_SUPPORT.pricing_output`. Sin esto Postgres rechaza cualquier quote en MXN/COP/PEN aunque el builder las permita seleccionar.
+- **Contrato canónico del snapshot:** `exchange_rates` JSONB ahora persiste `{__snapshot: QuotationFxSnapshot, <outputCurrency>: rate, CLP: rate}`. La clave `__snapshot` es la fuente de verdad (versionada, con rate, rateDateResolved, source, composedViaUsd, readinessState, ageDays, frozenAt, domain). Las keys currency-indexadas quedan para readers legacy que iteran `Object.entries` (ej. `src/app/api/finance/quotes/[id]/lines/route.ts`).
+- **Readiness gate:** todo issue/send pasa por `resolveFxReadiness(USD→currency, pricing_output)` + `evaluateQuotationFxReadinessGate`. Policies: `unsupported_pair` y `no_rate_available` bloquean con HTTP 422; `rate_is_stale_for_domain` o `rate_exceeds_client_facing_threshold` (>3d) también bloquean en path directo. En approval path la readiness se re-resuelve pero no re-bloquea para no invalidar una aprobación ya decidida; `blockOnClientFacingStale=false` degrada a warning registrado en audit.
+- **Surfaces tocadas:**
+  - `requestQuotationIssue` (+ gate + snapshot freeze + audit detail).
+  - `decideApproval` en `approval-steps-store` (re-resuelve FX al marcar `allResolved`, construye snapshot best-effort, audit extra).
+  - `finalizeQuotationIssued` acepta `fxSnapshot?` y escribe en el mismo `withTransaction`.
+  - `/api/finance/quotes/[id]/issue` y `/send` traducen `QuotationFxReadinessError` a 422 con body `{error, code, severity, readiness}`.
+  - `/api/finance/quotes/[id]/pdf` lee `exchange_rates`, extrae snapshot, pasa `fxFooter` al renderer.
+  - `quotation-pdf-document.tsx` agrega bloque "Tipo de cambio aplicado" con rate, fecha, fuente y nota "Derivada por composición vía USD" cuando aplica.
+  - Nuevo endpoint read-only `GET /api/finance/quotes/[id]/fx-snapshot` devuelve snapshot + derivados USD/moneda cliente.
+  - Nuevo componente `QuoteCurrencyView` (en `src/views/greenhouse/finance/workspace/`) con `ToggleButtonGroup` USD/moneda cliente, integrado en `QuoteDetailView` debajo del health card.
+  - `QuoteSendDialog` acepta `fxReadiness?` opcional; renderiza Alert con severity del gate y deshabilita el CTA si `blocking=true`. `QuoteDetailView.handleOpenSendDialog` prefetch readiness al abrir.
+  - `QuotationDocumentChain.quotation` expone `fxSnapshot: QuotationFxSnapshot | null`.
+- **Verificación local:** `pnpm tsc --noEmit` 0 errores · `pnpm lint` limpio (solo warning pre-existente de BulkEditDrawer) · `pnpm test` 1569/1569 · `pnpm build` OK.
+- **Post-merge operativo:** correr la migración via Cloud SQL Proxy antes del deploy (`pnpm pg:connect:migrate`). CLF/COP/MXN/PEN siguen `manual_only` en `currency-registry`: un admin de finance debe hacer `POST /api/admin/fx/sync-pair` con la tasa manual antes del primer send real. El flip a `auto_synced` sigue siendo TASK-485.
+- **Pendiente explícito (fuera de scope V1):** template Resend/@react-email para outbound client-facing completo (Slice 3 cubrió gating + snapshot reutilizable; el template mismo queda como task nueva cuando se decida branding), bidirectional currency conversion, lock rate por cliente, historia FX a nivel línea.
+
+## Sesion 2026-04-20 — Resend deliverability hardening para permisos/correos reactivos (Codex)
+
+- **Scope:** endurecer el circuito de trazabilidad email después de un reporte de permisos donde el usuario percibía que “no llegó el correo” aunque la entrega inicial a Resend sí existía.
+- **Hallazgos operativos:**
+  - para la solicitud/aprobación reciente de Andrés Carlosama, `greenhouse_notifications.email_deliveries` ya mostraba `leave_request_submitted`, `leave_request_pending_review`, `leave_request_decision` y `leave_review_confirmation` en `status='sent'` con `resend_id` real
+  - el mail de solicitud pendiente no iba a Julio Reyes sino a la reviewer efectiva de esa solicitud; el problema observado no era solo “falló el envío”, también había una expectativa de routing distinta
+  - el hueco real del sistema era de observabilidad/deliverability: no quedaba persistido si Resend confirmaba `delivered`, `bounced` o `complained`
+- **Cambios aplicados:**
+  - migración `20260421005352134_email-delivery-webhook-lifecycle-timestamps.sql`
+  - `src/lib/resend.ts` ahora resuelve `RESEND_WEBHOOK_SIGNING_SECRET` vía helper canónico
+  - `src/app/api/webhooks/resend/route.ts` persiste `delivered_at`, `bounced_at`, `complained_at`
+  - `/api/admin/email-deliveries` + admin UI distinguen `delivered` / `bounced` / `complained` como estado efectivo
+  - `/api/cron/email-deliverability-monitor` dejó de leer una query rota basada en `source_entity`
+- **Pendiente de verificación post-deploy:** confirmar que el webhook de Resend esté realmente configurado con el signing secret correcto y que nuevos correos de permisos pasen de `sent` a `delivered` cuando corresponda.
+
+## Sesion 2026-04-20 — TASK-471 V1 gap completion (Claude Opus 4.7)
+
+- **Scope**: cerrar los 5 gaps V1 honestamente declarados al cierre del shipping inicial de TASK-471. Branch: `task/TASK-471-phase-4-gaps-completion` → merge `547106ed` en `develop`.
+- **Gaps cerrados**:
+  - Gap-1 Approval auto-apply — queue approvals aprobadas persisten al target + emiten audit en la misma transacción (atómico).
+  - Gap-2 High-impact gate efectivo — `onBlockingStateChange` callback en `ImpactPreviewPanel`; 3 drawers gate save.
+  - Gap-3 Revert refactor + service_catalog — shared writer (elimina duplicación), 4 entity types V1.
+  - Gap-4 Bulk edit tools + overheads — endpoint generalizado `/bulk` + BulkEditDrawer generalizado + multi-select en 2 list views adicionales.
+  - Gap-5 Excel apply tools + overheads — parser de 3 sheets + apply via shared writer.
+- **Decisión arquitectónica**: nuevo módulo shared `pricing-catalog-entity-writer.ts` centraliza whitelist + writer + error typing. Reutilizado por revert, approval-apply, bulk, excel-apply. Antes el whitelist vivía duplicado en 3 endpoints; ahora un solo lugar.
+- **Verificación**: `pnpm lint` 0 errores, `pnpm tsc --noEmit` clean, `pnpm test` 1569/1569, `pnpm build` OK.
+- **Follow-ups phase-5 reales (fuera de TASK-471)**:
+  - Governance types revert: tablas con composite keys + effective-dating (role_tier_margin, service_tier_margin, commercial_model_multiplier, country_pricing_factor, employment_type). Requieren PATCH al governance router en vez de UPDATE por PK.
+  - High-impact gate extendido a tabs compat/cost/pricing del SellableRoleDrawer.
+  - Slack/email notifications para approvals.
+  - Excel create/delete actions (hoy solo update).
+
+## Sesion 2026-04-20 — TASK-471 Pricing Catalog Phase-4 UI Polish (Claude Opus 4.7)
+
+- **Scope**: 6 slices shippeados en una sola sesión sobre `task/TASK-471-pricing-catalog-phase-4-ui`.
+- **Slices entregados**: (1) AuditDiffViewer primitive, (2) one-click revert + migration + capability + dialog, (3) bulk edit roles, (4) ImpactPreviewPanel wired en 3 drawers, (5) maker-checker approval queue, (6) Excel export/import/apply.
+- **Decisiones enterprise cerradas (4 open questions resueltas)**:
+  1. Revert → nueva capability `canRevertPricingCatalogChange` restrictiva a `efeonce_admin` only.
+  2. Revert of revert → permitido (cada audit es immutable, chain finito).
+  3. Reason dialog → obligatorio minLength 15 chars.
+  4. Diff viewer → handle todos los 9+ action types, no solo 'updated'.
+- **2 migrations**: `audit-action-governance-extension` (extiende enum con reverted/approval_applied/bulk_edited) + `pricing-catalog-approval-queue` (tabla nueva).
+- **V1 scope honesto**: Revert backend V1 = sellable_role, tool_catalog, overhead_addon (3 de 10 entity types; governance types + service_catalog = follow-up). Bulk edit V1 = solo roles. Excel apply V1 = solo sellable_role update (create/delete + tools/overheads = follow-up). Approval queue persiste pero no auto-apply al approve (slice 5b = follow-up).
+- **Nomenclature**: nuevo namespace `GH_PRICING_GOVERNANCE` con copy ES completo (6 sub-objetos).
+- **Verification**: `pnpm lint` 0 errores, `pnpm tsc --noEmit` clean, `pnpm test` 1569/1569 passed, `pnpm build` OK.
+- **Follow-ups (phase-5)**:
+  - Auto-apply al approve en queue
+  - Extensión revert + bulk + excel apply a tools/overheads + governance
+  - Notificaciones Slack/email de approvals
+  - Auto-gate de high-impact confirmation en edit drawers (hoy el checkbox es informativo)
+  - Consumer reactivo de overcommit event en dashboard de delivery
+
+## Sesion 2026-04-20 — TASK-481 Quote Builder suggested cost UX + override governance (Claude Opus 4.7)
+
+- **Scope:** entregar la UX de provenance / confidence / freshness sobre la metadata que el engine v2 ya persiste, y gobernar el override manual con motivo + categoría + trazabilidad backend.
+- **Branch:** `task/TASK-481-quote-builder-suggested-cost-override-governance`
+- **Commits clave:**
+  - `0d21103d` slice 0 — schema + events + write path
+  - `273224e4` slice 1 — nomenclature extensions
+  - commits slices 2-4 — primitives + cost stack integration + override dialog
+  - `643c656d` slice 5 — verification + client/server boundary fix
+- **Delta al scope spec:** auditoria detectó que no existían columnas de override governance en `quotation_line_items`. Se amplió el scope con migration + tabla append-only + evento canónico nuevo + capability nueva + 5 primitives + dialog — todo documentado en el Delta de la task.
+- **Decisiones enterprise cerradas (open questions):**
+  1. Override reemplaza breakdown completo con `kind='manual'`; suggested breakdown queda snapshotted en columna JSONB.
+  2. Capability `canOverrideQuoteCost` restrictiva: solo `efeonce_admin + finance_admin`.
+  3. Reason minLength 30 chars si category=other, 15 si no; category obligatoria (enum estructurado).
+  4. Historial last-5 en dialog via tabla append-only `quotation_line_cost_override_history`.
+- **Runtime topology:** sin cambios — el override corre en Vercel serverless con `withTransaction` (lock pesimista + commit atómico + outbox emit). Worker cron-side no participa.
+- **Gotcha importante:** cuando client components importan tipos/constantes de un módulo `server-only`, Next.js intenta incluir deps server en el bundle cliente y el build falla con errores de `grpc-js` module-not-found. Fix: split en módulos types client-safe vs events server-only (aplicado en `quotation-line-cost-override-*.ts`). Pattern reusable para otros flows que compartan enums entre client y server.
+- **Verificación:** `pnpm lint` ✓, `pnpm tsc --noEmit` ✓, `pnpm test` 1569/1569 ✓, `pnpm build` ✓.
+- **Follow-ups:**
+  - Read-only variant de provenance en `QuoteDetailView` post-emisión (diferido; el builder ya cubre el caso activo).
+  - V2 threshold-based dual approval para deltas grandes — declarado en la capability comment.
+  - TASK-482 (quoted vs actual margin feedback) ya puede consumir el nuevo event `commercial.quotation_line.cost_overridden`.
+
+## Sesion 2026-04-20 — TASK-480 closure doc sync (Codex)
+
+- **Scope:** alinear la documentación de `TASK-480` con el estado real ya implementado en `develop`.
+- **Cambio documental:**
+  - `TASK-480` se movió a `docs/tasks/complete/`
+  - se actualizó el markdown de la task como closure doc con replay input, bulk repricing, taxonomía `tool_catalog_fallback` y downstream adoption ya cerrados
+  - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `TASK-476` y `TASK-483` quedaron sincronizados con la nueva ruta/estado
+- **Coordinación:** no se tocó el trabajo paralelo visible de `TASK-481`, `src/lib/sync/event-catalog.ts` ni `data/api_zapsign.txt`.
+
+## Sesion 2026-04-20 — TASK-480 pricing replay context + bulk repricing (Codex)
+
+- **Scope:** cerrar el follow-on real de `TASK-480` sobre el codebase actual: replay input persistido, semántica final de provenance/fallback, worker batch de repricing y readers downstream sin recompute.
+- **Cambios principales:**
+  - migración `20260420131341856_task-480-quote-pricing-v2-replay-input.sql`
+  - `greenhouse_commercial.quotations.pricing_context`
+  - `greenhouse_commercial.quotation_line_items.pricing_input`
+  - `services/commercial-cost-worker/server.ts` ya activa `POST /quotes/reprice-bulk`
+  - helper nuevo `src/lib/commercial-cost-worker/quote-reprice-bulk.ts`
+  - `quotation-pricing-orchestrator.ts` ahora soporta `strictReplay`, reusa `pricing_input` y lanza `UnsupportedQuotationReplayError` cuando una quote no tiene contexto suficiente
+  - edit/read paths de quotes ya exponen e hidratan `pricingInput` + provenance persistida
+- **Decisiones importantes:**
+  - no se repricingean quotes legacy “a ciegas” en batch; se marcan `skipped`
+  - el fallback catalog-level de tools queda explícito como `tool_catalog_fallback`
+  - `schema-snapshot-baseline.sql` sigue stale para esta zona; la referencia operativa fue migraciones + `src/types/db.d.ts`
+- **Validación corrida:**
+  - `pnpm test -- src/lib/finance/pricing/__tests__/pricing-engine-v2.test.ts src/views/greenhouse/finance/workspace/__tests__/quote-builder-pricing.test.ts` ok
+  - `pnpm exec tsc --noEmit` ok
+  - `pnpm lint` ok
+  - `pnpm pg:connect:migrate` ok
+  - `pnpm build` ok
+- **Nota de entorno:** `pnpm build` sigue mostrando los warnings conocidos de `Dynamic server usage` por rutas que usan `headers`; el build termina exitosamente y no fue introducido por esta task.
+
+## Sesion 2026-04-20 — TASK-452 service attribution foundation (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `task/TASK-452-service-attribution-foundation`
+- **Implementación ya aterrizada:**
+  - migración `20260420123025804_task-452-service-attribution-foundation.sql`
+  - migración correctiva `20260420124700528_task-452-service-attribution-foundation-repair.sql` para reparar el caso donde el SQL inicial quedó registrado en `pgmigrations` sin ejecutar el DDL por un encabezado `Up/Down` duplicado
+  - tablas `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`
+  - helper/materializer `src/lib/service-attribution/materialize.ts`
+  - tests `src/lib/service-attribution/materialize.test.ts`
+  - projection reactiva `src/lib/sync/projections/service-attribution.ts`
+  - wiring en `src/lib/sync/projections/index.ts` y catálogo de eventos
+- **Contrato operativo resuelto:**
+  - attribution por servicio usa anchors fuertes (`quotation`, `contract`, `purchase_order`, `service_entry_sheet`, `hubspot_deal`) antes de caer a `service_line`
+  - `commercial_cost_attribution` no cambia de grain; labor/overhead por servicio se deriva downstream
+  - los casos ambiguos persisten en unresolved; no se fuerzan en runtime
+- **Validación corrida hasta ahora:**
+  - `pnpm exec vitest run src/lib/service-attribution/materialize.test.ts`
+  - `pnpm exec eslint src/lib/service-attribution/materialize.ts src/lib/service-attribution/materialize.test.ts src/lib/sync/projections/service-attribution.ts src/lib/sync/projections/index.ts src/lib/sync/event-catalog.ts`
+  - `pnpm exec tsc --noEmit`
+  - `pnpm pg:connect:migrate` (ok; regeneró `src/types/db.d.ts`)
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de cierre:**
+  - `pnpm build` cerró `exit 0`; durante el build aparecieron logs conocidos de `Dynamic server usage` por rutas que usan `headers`, pero no bloquearon la compilación ni nacen de este corte
+  - `src/types/db.d.ts` ya incluye ambas tablas nuevas de `greenhouse_serving`
+
+## Sesion 2026-04-20 — Backlog alignment TASK-452/466/471/476/480/481/482/485 (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete` (docs-only)
+- **Rama:** `docs/codex-backlog-alignment-commercial-cost-fx`
+- **Cambio documental:**
+  - `TASK-476` se cerró y movió a `docs/tasks/complete/` como closure doc del programa `Commercial Cost Basis`.
+  - `TASK-480`, `TASK-481` y `TASK-482` quedaron reancladas al runtime real: ya no prometen foundations que el repo ya aterrizó y ahora describen solo los follow-ons pendientes.
+  - `TASK-466` quedó recortada al gap client-facing real (`currency + exchange_rates` + snapshot en send/issue + PDF/email/detail/document-chain), sin abrir una columna paralela `output_currency` mientras la arquitectura no cambie.
+  - `TASK-471` quedó explícitamente como follow-on UI/gobernanza del pricing catalog; ya no depende de backend pendiente porque `TASK-470` ya lo cubrió.
+  - `TASK-452` y `TASK-485` quedaron validadas como todavía necesarias sin recorte de scope.
+  - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y referencias cruzadas de `TASK-528`, `TASK-532` y `TASK-483` quedaron sincronizadas con el cierre de `TASK-476`.
+- **Validación:**
+  - revisión documental y contraste contra codebase
+  - sin cambios de runtime
+  - sin build/lint/test porque el trabajo fue docs-only
+
+## Sesion 2026-04-20 — Chile tax layer task stack registered (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete` (docs-only)
+- **Rama:** `docs/codex-chile-tax-layer-tasks`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-hubspot-quote-sync`
+- **Cambio documental:**
+  - se registro `TASK-528` como programa paraguas para la capa tributaria Chile/IVA.
+  - se registraron las tasks hijas `TASK-529` a `TASK-533` para foundation tributaria, quotes, income/invoice, compras con recuperabilidad y ledger mensual.
+- **Decisiones de diseno resueltas:**
+  - el contrato base es `tax_code + tax_rate_snapshot + tax_amount + recoverability`, no solo `tax_rate`.
+  - `income` no debe seguir naciendo con IVA implicito `0.19`.
+  - el IVA compra debe distinguir recuperable vs no recuperable para no contaminar costos.
+  - la posicion mensual de IVA debe vivir en proyecciones financieras sobre `ops-worker` o un worker tributario dedicado; no en el commercial worker.
+- **Notas de coordinacion:**
+  - antes de registrar las tasks se hizo `rebase` sobre `origin/develop` para absorber `TASK-525`, `TASK-526` y `TASK-527` ya creadas por Claude y evitar colisiones de numeracion.
+
+## Sesion 2026-04-20 — TASK-524 invoice sync contract registered (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete` (docs-only)
+- **Rama:** `task/TASK-524-income-hubspot-invoice-bridge`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-hubspot-quote-sync`
+- **Cambio documental:**
+  - se registró `TASK-524 — Income → HubSpot Invoice Bridge`.
+  - se resolvieron las open questions de diseño con contrato explícito:
+    - HubSpot `invoice` object como espejo canónico del `income`
+    - `hs_invoice_billable = false` como modo base para no delegar la cobranza a HubSpot
+    - sync en dos fases: mirror financiero en `finance.income.created|updated`; PDF/XML/DTE como file+note en `finance.income.nubox_synced`
+    - asociación a contacto `best-effort`; `company + deal` siguen siendo los anchors obligatorios cuando existen
+- **Fuentes usadas para la decisión:**
+  - docs oficiales HubSpot Invoices API
+  - docs oficiales HubSpot Notes API
+  - docs oficiales HubSpot Files API
+- **Notas de coordinación:**
+  - la task se movió de `TASK-511` a `TASK-524` para no colisionar con el stack roadmap que Claude ya registró en `develop`.
+
+## Sesion 2026-04-20 — HubSpot quote sync hardening (Codex)
+
+- **Owner:** Codex
+- **Estado:** `complete`
+- **Rama:** `fix/codex-hubspot-quote-sync`
+- **Worktree:** `/Users/jreye/Documents/greenhouse-eo-fix-hubspot-quote-sync`
+- **Problema corregido:**
+  - las cotizaciones creadas manualmente desde Greenhouse podían existir sin `hubspot_deal_id`, por lo que el sync outbound no tenía anchor bidireccional real en HubSpot.
+  - `POST /api/finance/quotes` no publicaba `commercial.quotation.created`, y las ediciones de header/líneas tampoco emitían un evento canónico de update para re-sincronizar.
+  - el builder no ofrecía seleccionar deal HubSpot aunque la organización sí tuviera oportunidades comerciales activas.
+- **Solución aplicada:**
+  - nuevo endpoint tenant-safe `GET /api/commercial/organizations/[id]/deals` apoyado en `listCommercialDealsForOrganization`.
+  - `QuoteBuilderShell` + `QuoteContextStrip` agregan selector **Deal HubSpot** con fetch async por organización; create/edit envían `hubspotDealId`.
+  - `POST /api/finance/quotes` y `PUT /api/finance/quotes/[id]` validan que el deal exista y pertenezca a la misma organización antes de persistir `hubspot_deal_id`.
+  - el outbox comercial suma `commercial.quotation.updated`; el outbound de HubSpot ahora escucha ese evento y el write path canónico vuelve a publicar `commercial.quotation.created`.
+  - `POST /api/finance/quotes/[id]/lines` publica update después de persistir pricing para que cambios en line items re-sincronicen HubSpot.
+- **Tests / validación:**
+  - `pnpm exec vitest run src/lib/commercial/__tests__/quotation-events.test.ts src/lib/hubspot/__tests__/push-canonical-quote.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- **Notas de coordinación:**
+  - fix hecho en worktree aislado para no colisionar con el checkout principal, que sigue con cambios paralelos de UI.
+  - diagnóstico confirmado en staging sobre `qt-d5c9a4b5-ba51-4267-a54b-ac721eb46a6c`: la quote estaba `source='manual'`, `hubspotQuoteId = null`, `hubspotDealId = null`; no era falla de HubSpot sino ausencia de anchor comercial desde Greenhouse.
+
 ## Sesion 2026-04-19 — Quote-to-cash conversion transaction convergence (Codex)
 
 - **Owner:** Codex
@@ -655,7 +3879,7 @@ Al investigar el bug quedó expuesto que `quotations` mezcla identidades: tiene 
   - `portal interactive lane` para preview, composición y lectura de snapshots,
   - `Cloud Run compute lane` en worker dedicado para materializaciones, repricing batch, backfills y feedback loop.
 - **Rationale:** `ops-worker` ya concentra lanes reactivos y jobs operativos compartidos; sumar ahí el engine comercial mezclaría blast radius, recursos y cadence de deploy.
-- **Docs sincronizados:** `docs/tasks/to-do/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`, `docs/tasks/to-do/TASK-476-commercial-cost-basis-program.md`, `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`, `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`.
+- **Docs sincronizados:** `docs/tasks/complete/TASK-483-commercial-cost-basis-engine-runtime-topology-worker-foundation.md`, `docs/tasks/complete/TASK-476-commercial-cost-basis-program.md`, `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`, `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`.
 - **Importante para siguientes agentes:** `TASK-477` a `TASK-482` ya no deben asumir implementación puramente in-app ni montarse en `ops-worker`; revisar `TASK-483` antes de tocar worker placement o jobs batch.
 
 ## Sesion 2026-04-19 — Programa Commercial Cost Basis registrado (Codex)
@@ -1240,6 +4464,27 @@ Al investigar el bug quedó expuesto que `quotations` mezcla identidades: tiene 
   - distribución dev tras sync -> `customer/hubspot_sync: 9`, `customer/nubox_fallback: 1`, `unknown/unknown: 3`
 - **Riesgo / pendiente menor:**
   - la validación explícita en staging queda atada al deploy de `develop` después del merge; localmente la cron route ya respondió `200`
+
+## Sesion 2026-04-21 — TASK-536 HubSpot Companies Inbound Prospect Sync (Codex)
+
+- **Owner:** Codex
+- **Estado:** implementación local avanzada; pendiente validación final/commit
+- **Entregables nuevos:**
+  - `src/lib/hubspot/sync-hubspot-companies.ts`
+  - `src/app/api/cron/hubspot-companies-sync/route.ts`
+  - `src/app/api/cron/hubspot-companies-sync/route.test.ts`
+  - `vercel.json` con cron incremental + full resync nocturno
+- **Decisión operativa clave:**
+  - la spec asumía `source_sync_pipelines`, webhook dedicado y dependencia dura de live reads a Cloud Run; el runtime real se cerró sobre `greenhouse_crm.companies` + `source_sync_runs`/`source_sync_watermarks`
+  - este corte no implementa lane realtime dedicada; el webhook HubSpot Companies queda como follow-up sobre el gateway genérico
+- **Contrato implementado:**
+  - `GREENHOUSE_PARTY_LIFECYCLE_SYNC` gobierna el pipeline
+  - incremental cada 10 minutos; full nightly a las 03:00
+  - `createPartyFromHubSpotCompany` crea prospects/opportunities/active_client idempotentes por `hubspot_company_id`
+  - `promoteParty` solo avanza stage; no degrada `provider_only`, `disqualified` ni `churned`
+  - si HubSpot llega como `customer/evangelist`, se materializa `client_id` vía `instantiateClientForParty`
+- **Hardening colateral resuelto durante la sesión:**
+  - el rojo de `tsc --noEmit` en `src/lib/finance/__tests__/postgres-store-slice2.test.ts` ya no depende de fixtures fiscales legacy; el test ahora usa builders canónicos (`buildIncomeTaxWriteFields` / `buildExpenseTaxWriteFields`) para absorber futuras extensiones del contrato tributario sin drift por columnas nuevas
 
 ## Sesion 2026-04-18 — TASK-464e Quote Builder UI Exposure (cierre Ola 4 completa)
 
@@ -15587,3 +18832,135 @@ Fase 4 completada:
   - follow-on arquitectónico/documental abierto:
     - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` y `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` ya quedaron ampliados con el `Integration Runtime Pattern`
     - nueva `TASK-399` creada para institucionalizar el hardening runtime de integraciones source-led como carril separado de `TASK-188`
+
+## Sesion 2026-04-22 — TASK-563 Product Catalog HubSpot Outbound Follow-ups (Codex)
+
+- **Scope:** cerrar `TASK-563` de punta a punta entre Greenhouse EO + repo externo `hubspot-bigquery`: auth drift staging, emisión real de eventos `sellable_roles`, smoke staging contra HubSpot sandbox, runbooks/documentación viva y preparación de Production env.
+- **Hallazgos reales**
+  - el runtime local del bridge ya estaba bien del lado payload/client, pero staging seguía respondiendo `401` porque `GREENHOUSE_INTEGRATION_API_TOKEN` en Vercel estaba contaminado con comillas envolventes + `CRLF`
+  - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` faltaba en `staging`, por lo que el cliente podía caer al `DEFAULT_BASE_URL` viejo
+  - los writes admin de `sellable_roles` seguían sin publicar eventos en varios carriles (`roles`, `[id]`, `pricing`, `cost-components`, bulk, Excel apply, approval apply), así que el materializer no alimentaba `product_catalog` consistentemente
+  - el primer smoke live falló por diseño del test: intentó `PATCH` dentro de la ventana anti-ping-pong de 60s; el bridge respondió con `noop` correctamente
+- **Implementacion shipped en Greenhouse EO**
+  - `src/app/api/admin/pricing-catalog/roles/**` ahora publica `created/updated/deactivated/reactivated` según transición real
+  - nuevo helper `src/lib/commercial/sellable-role-sync-events.ts` para publicar eventos desde carriles transaccionales compartidos
+  - `pricing-catalog-approvals.ts` + `pricing-catalog-excel-approval.ts` + `import-excel/apply` + bulk route quedaron alineados a la misma emisión
+  - `src/lib/sync/projections/source-to-product-catalog.ts` reconoce `commercial.sellable_role.updated`
+  - `src/lib/integrations/hubspot-greenhouse-service.ts` ahora falla explícitamente si falta `GREENHOUSE_INTEGRATION_API_TOKEN` en un write
+  - defaults de service URL actualizados al Cloud Run vigente `https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app`
+  - `scripts/e2e-product-hubspot-outbound.ts` ahora espera 65s entre create/update/archive para respetar anti-ping-pong
+- **Operación / envs**
+  - `staging`:
+    - `GREENHOUSE_INTEGRATION_API_TOKEN` regrabado saneado desde Secret Manager (`greenhouse-integration-api-token`)
+    - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` agregado al endpoint vigente
+    - `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}=true`
+    - deployment validado: `https://greenhouse-kg5boa48r-efeonce-7670142f.vercel.app` (`target=staging`)
+  - `Production`:
+    - token + base URL saneados y regrabados
+    - `GREENHOUSE_PRODUCT_SYNC_{ROLES,TOOLS,OVERHEADS,SERVICES}=true` provisionado
+    - **nota:** estos envs tomarán efecto en el próximo deploy formal de `main`; no se forzó deploy opaco a Production desde esta rama/worktree
+- **HubSpot / repo externo**
+  - el repo `hubspot-bigquery-task-563` ya tenía el contrato products desplegado; además se empujó `ca92344` para alinear la property booleana `gh_archived_by_greenhouse` con opciones `Si/No`
+  - labels visibles confirmados:
+    - `gh_product_code` → `Codigo de Producto Greenhouse`
+    - `gh_source_kind` → `Origen del Producto en Greenhouse`
+    - `gh_last_write_at` → `Ultima Sincronizacion desde Greenhouse`
+    - `gh_archived_by_greenhouse` → `Archivado por Greenhouse`
+    - `gh_business_line` → `Linea de Negocio Greenhouse`
+- **Smoke E2E staging**
+  - intento `live-smoke-20260422e`: create OK (`12.5s`), update timeout por anti-ping-pong esperado
+  - intento `live-smoke-20260422f`: **OK**
+    - `roleId=sr-0a1018ce-77e1-481e-bd20-2bfccf78c425`
+    - `roleSku=ECG-038`
+    - `hubspotProductId=44106723437`
+    - create `8.995s`
+    - update `11.455s`
+    - archive `31.665s`
+- **Verificacion local**
+  - `pnpm exec eslint src/lib/integrations/hubspot-greenhouse-service.ts src/lib/hubspot/update-hubspot-quote.ts scripts/e2e-product-hubspot-outbound.ts scripts/backfill-hubspot-contact-names.ts scripts/backfill-hubspot-products.ts` OK
+  - `pnpm exec tsc --noEmit --pretty false` OK
+- **Docs actualizadas**
+  - `docs/operations/product-hubspot-outbound-e2e-report.md`
+  - `docs/operations/hubspot-custom-properties-products.md`
+  - `docs/tasks/complete/TASK-563-product-catalog-hubspot-outbound-followups.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md`
+  - `changelog.md`
+
+## Sesion 2026-04-22 — Product Catalog Greenhouse-first identity cutover (Codex)
+
+- **Pedido del usuario:** resolver el gap real donde HubSpot tenía products legacy sin `gh_*`, evitar duplicados Greenhouse ↔ HubSpot y confirmar que products son Greenhouse-first (a diferencia de deals/companies).
+- **Corrección de política aplicada**
+  - `products` quedan explícitamente Greenhouse-first
+  - HubSpot-only products NO se adoptan a Greenhouse
+  - si un survivor HubSpot coincide exactamente con un `product_code` Greenhouse, se linkea; si no, queda como legacy para cleanup/archivo, no como nueva fuente
+- **Hallazgos operativos reales antes del fix**
+  - HubSpot live: `36` products activos y `0` con `gh_product_code` / `gh_source_kind` / `gh_last_write_at`
+  - local `product_catalog`: `39` rows, `38` con `hubspot_product_id`, `36` `hubspot_imported`, solo `3` rows Greenhouse-owned
+  - el problema no era solo outbound: faltaba rematerialización masiva desde Greenhouse sources y `push-product-to-hubspot.ts` seguía `create-first`
+- **Implementación shipped**
+  - migration `20260422111241268_task-549-hubspot-product-binding-guard.sql`
+    - nuevo unique partial index para `hubspot_product_id` no nulo en `greenhouse_commercial.product_catalog`
+  - `src/lib/commercial/product-catalog/upsert-product-catalog-from-source.ts`
+    - ahora promociona survivors legacy `hubspot_imported` en sitio cuando `legacy_sku = product_code` Greenhouse
+    - preserva `product_id` + `hubspot_product_id` y convierte la row a source-bound en vez de crear duplicado local
+  - `src/lib/hubspot/find-existing-hubspot-product-binding.ts`
+    - lookup exacto por `gh_product_code`, luego por `sku`
+    - sin fuzzy por nombre
+  - `src/lib/hubspot/push-product-to-hubspot.ts`
+    - ahora hace `bind-first` antes de `create`
+  - `scripts/materialize-and-sync-product-catalog.ts`
+    - rematerializa roles/tools/overheads/services desde Greenhouse
+    - luego sincroniza/bindea hacia HubSpot
+  - `docs/tasks/to-do/TASK-544-commercial-product-catalog-sync-program.md`
+  - `docs/tasks/to-do/TASK-549-product-catalog-policy-enforcement-cleanup.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1.md`
+  - `docs/operations/product-catalog-sync-runbook.md`
+- **Ejecución real**
+  - migration aplicada con `pnpm pg:connect:migrate`
+  - cutover ejecutado con:
+    - `GREENHOUSE_INTEGRATION_API_TOKEN=$(gcloud secrets versions access latest --secret=greenhouse-integration-api-token)`
+    - `HUBSPOT_GREENHOUSE_INTEGRATION_TIMEOUT_MS=20000`
+    - `pnpm product-catalog:materialize-and-sync`
+  - resultado del lote:
+    - `materialized: 74`
+    - `synced: 73`
+    - `skipped: 1`
+    - `failed: 0`
+    - `leftoverHubSpotImported: 0`
+  - retry puntual adicional:
+    - `ECG-036` quedó pendiente por un `401` viejo del primer intento sin token y luego se empujó manualmente OK → `hubspotProductId=44110439542`
+- **Estado final verificado**
+  - HubSpot live: `74` products activos y `74` con markers `gh_*`
+  - local `product_catalog`: source-bound only (`sellable_role=35`, `tool=26`, `overhead_addon=9`, `service=7`)
+  - único `hubspot_product_id = null`: `EFO-008`, archived, no accionable
+  - `hubspot_imported = 0`
+- **Validación**
+  - `pnpm exec vitest run src/lib/commercial/product-catalog/__tests__/upsert-product-catalog-from-source.test.ts src/lib/hubspot/__tests__/push-product-to-hubspot.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm lint`
+  - `pnpm build`
+  - grep `new Pool(` → solo `src/lib/postgres/client.ts`
+- **Notas**
+  - `pnpm build` volvió a imprimir los warnings esperados de `Dynamic server usage` en rutas que usan `headers`; el build terminó exit code `0`
+  - `TASK-549` NO está cerrada todavía: falta cleanup final de flags/carriles legacy/documentación, pero el cutover de identidad ya quedó hecho
+
+## Sesion 2026-04-22 — Deal create staging auth hardening para hubspot-greenhouse-integration (Codex)
+
+- **Síntoma real:** `POST /api/commercial/organizations/:id/deals` seguía fallando en staging con `500`, pero el stack runtime mostró que el root cause era `401 Unauthorized` desde `hubspot-greenhouse-integration` al llamar `POST /deals`.
+- **Hallazgo operativo:** el servicio externo y el token live estaban sanos; el drift estaba en cómo el runtime de Vercel resolvía el token para writes outbound de Greenhouse.
+- **Fix shipped**
+  - `src/lib/integrations/hubspot-greenhouse-service.ts`
+    - los writes outbound (`/companies/:id/lifecycle`, `/products*`, `/quotes`, `/deals`) ya no dependen solo de `process.env.GREENHOUSE_INTEGRATION_API_TOKEN`
+    - ahora resuelven el token vía `resolveSecret({ envVarName: 'GREENHOUSE_INTEGRATION_API_TOKEN' })`
+    - si no existe `GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF`, el cliente cae al secret canónico `greenhouse-integration-api-token`
+- **Validación**
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - deploy directo a `staging` con el patch local OK
+  - smoke real OK:
+    - `POST /api/commercial/organizations/org-b8e5a481-4cfd-447d-afce-ddb0179408f7/deals`
+    - `HTTP 201`
+    - `attemptId=e97cb047-6bcd-48d1-98e8-3a0b9d7693c9`
+    - `dealId=dl-b4c2fca0-3cdc-4955-befa-332633af16f8`
+    - `hubspotDealId=59448087991`

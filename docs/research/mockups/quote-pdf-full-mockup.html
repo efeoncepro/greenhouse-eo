@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF cotización end-to-end · Mockup v1 · TASK-629</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pdf-color-primary: #023c70;
+      --pdf-color-accent: #0375db;
+      --pdf-color-text: #2F2B3D;
+      --pdf-color-text-muted: #6E6B7B;
+      --pdf-color-text-subtle: #A5A3AE;
+      --pdf-color-surface: #F8F7FA;
+      --pdf-color-surface-strong: #ECECEF;
+      --pdf-color-divider: #E4E5EB;
+      --pdf-color-paper: #FFFFFF;
+      --pdf-color-success: #6ec207;
+      --pdf-color-warning: #ff6500;
+
+      --pdf-color-sub-globe: #bb1954;
+      --pdf-color-sub-wave: #00BAD1;
+      --pdf-color-sub-reach: #ff6500;
+      --pdf-color-sub-efeonce: #023c70;
+
+      --pdf-font-heading: 'Poppins', sans-serif;
+      --pdf-font-body: 'DM Sans', sans-serif;
+
+      --pdf-space-1: 4pt;
+      --pdf-space-2: 8pt;
+      --pdf-space-3: 12pt;
+      --pdf-space-4: 16pt;
+      --pdf-space-5: 20pt;
+      --pdf-space-6: 24pt;
+      --pdf-space-8: 32pt;
+      --pdf-space-10: 40pt;
+      --pdf-space-12: 48pt;
+
+      --pdf-radius-sm: 4pt;
+      --pdf-radius-md: 6pt;
+      --pdf-radius-lg: 8pt;
+
+      --pdf-page-width: 595pt;
+      --pdf-page-height: 842pt;
+      --pdf-page-padding-x: 48pt;
+      --pdf-page-padding-y: 56pt;
+      --pdf-page-padding-bottom: 72pt;  /* deja espacio para footer fijo */
+    }
+
+    body {
+      margin: 0;
+      padding: 32px;
+      background: var(--pdf-color-surface-strong);
+      font-family: var(--pdf-font-body);
+      color: var(--pdf-color-text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .mockup-banner {
+      max-width: 595pt;
+      width: 100%;
+      padding: 16px 24px;
+      background: #fff;
+      border-radius: 8px;
+      border-left: 4px solid var(--pdf-color-accent);
+    }
+    .mockup-banner h1 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--pdf-color-primary);
+    }
+    .mockup-banner p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--pdf-color-text-muted);
+    }
+    .mockup-section-divider {
+      max-width: 595pt;
+      width: 100%;
+      padding: 8px 16px;
+      background: var(--pdf-color-primary);
+      color: #fff;
+      font-family: var(--pdf-font-body);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+      border-radius: 4px;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * Página A4
+     * ───────────────────────────────────────────────────────────── */
+    .pdf-page {
+      width: var(--pdf-page-width);
+      height: var(--pdf-page-height);
+      background: var(--pdf-color-paper);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+      page-break-after: always;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * Page footer (común a todas las páginas non-cover)
+     * ───────────────────────────────────────────────────────────── */
+    .page-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--pdf-space-3) var(--pdf-page-padding-x);
+      border-top: 1pt solid var(--pdf-color-divider);
+      background: var(--pdf-color-paper);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      color: var(--pdf-color-text-muted);
+    }
+    .page-footer__legal {
+      flex: 1;
+      max-width: 60%;
+    }
+    .page-footer__legal-name {
+      font-weight: 700;
+      color: var(--pdf-color-primary);
+    }
+    .page-footer__pagination {
+      letter-spacing: 0.5pt;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+    .page-footer__pagination strong {
+      font-weight: 700;
+      color: var(--pdf-color-primary);
+    }
+    .page-footer__id {
+      letter-spacing: 0.5pt;
+      font-variant-numeric: tabular-nums;
+      margin-right: var(--pdf-space-3);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * Page header (común a todas las páginas non-cover)
+     * ───────────────────────────────────────────────────────────── */
+    .page-header {
+      padding: var(--pdf-space-5) var(--pdf-page-padding-x) var(--pdf-space-3);
+      border-bottom: 1pt solid var(--pdf-color-divider);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .page-header__brand img {
+      height: 24pt;
+      width: auto;
+    }
+    .page-header__meta {
+      font-family: var(--pdf-font-body);
+      font-size: 8pt;
+      color: var(--pdf-color-text-muted);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .page-header__meta strong {
+      color: var(--pdf-color-primary);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * Section heading (común)
+     * ───────────────────────────────────────────────────────────── */
+    .section-heading {
+      padding: var(--pdf-space-8) var(--pdf-page-padding-x) var(--pdf-space-4);
+    }
+    .section-heading__eyebrow {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      font-weight: 500;
+      letter-spacing: 2pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-accent);
+      margin: 0 0 var(--pdf-space-2) 0;
+    }
+    .section-heading__title {
+      font-family: var(--pdf-font-heading);
+      font-size: 22pt;
+      font-weight: 600;
+      color: var(--pdf-color-primary);
+      margin: 0;
+      letter-spacing: -0.3pt;
+      line-height: 1.15;
+    }
+    .section-heading__subtitle {
+      font-family: var(--pdf-font-body);
+      font-size: 10pt;
+      color: var(--pdf-color-text-muted);
+      margin: var(--pdf-space-2) 0 0 0;
+      line-height: 1.5;
+      max-width: 430pt;
+    }
+
+    .section-body {
+      padding: 0 var(--pdf-page-padding-x) var(--pdf-space-6);
+    }
+
+    /* ═════════════════════════════════════════════════════════════
+     * PÁGINA 1 — COVER
+     * ═════════════════════════════════════════════════════════════ */
+    .cover-header {
+      padding: var(--pdf-page-padding-y) var(--pdf-page-padding-x) var(--pdf-space-6);
+      border-bottom: 1pt solid var(--pdf-color-divider);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cover-header__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--pdf-space-3);
+    }
+    .cover-header__logo {
+      height: 40pt;
+      width: auto;
+    }
+    .cover-header__sub-divider {
+      width: 1pt;
+      height: 32pt;
+      background: var(--pdf-color-divider);
+    }
+    .cover-header__sub-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--pdf-space-2);
+    }
+    .cover-header__sub-isotipo {
+      height: 28pt;
+      width: auto;
+    }
+    .cover-header__sub-label {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      font-weight: 500;
+      letter-spacing: 1.2pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+    }
+    .cover-header__meta {
+      text-align: right;
+      font-family: var(--pdf-font-body);
+    }
+    .cover-header__meta-eyebrow {
+      font-size: 7pt;
+      font-weight: 500;
+      letter-spacing: 1.2pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+      margin: 0 0 2pt 0;
+    }
+    .cover-header__meta-id {
+      font-family: var(--pdf-font-body);
+      font-size: 11pt;
+      font-weight: 500;
+      color: var(--pdf-color-primary);
+      letter-spacing: 0.5pt;
+      font-variant-numeric: tabular-nums;
+      margin: 0;
+    }
+    .cover-hero {
+      padding: var(--pdf-space-12) var(--pdf-page-padding-x) var(--pdf-space-10);
+    }
+    .cover-hero__eyebrow {
+      font-family: var(--pdf-font-body);
+      font-size: 8pt;
+      font-weight: 500;
+      letter-spacing: 2pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-accent);
+      margin: 0 0 var(--pdf-space-2) 0;
+    }
+    .cover-hero__title {
+      font-family: var(--pdf-font-heading);
+      font-size: 36pt;
+      font-weight: 600;
+      line-height: 1.05;
+      color: var(--pdf-color-primary);
+      margin: 0 0 var(--pdf-space-3) 0;
+      letter-spacing: -0.5pt;
+    }
+    .cover-hero__subtitle {
+      font-family: var(--pdf-font-body);
+      font-size: 11pt;
+      line-height: 1.5;
+      color: var(--pdf-color-text);
+      max-width: 380pt;
+      margin: 0;
+    }
+    .cover-parties {
+      padding: var(--pdf-space-6) var(--pdf-page-padding-x) var(--pdf-space-8);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--pdf-space-8);
+    }
+    .cover-party { border-top: 2pt solid var(--pdf-color-primary); padding-top: var(--pdf-space-3); }
+    .cover-party__eyebrow {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt; font-weight: 500; letter-spacing: 1.5pt;
+      text-transform: uppercase; color: var(--pdf-color-text-muted);
+      margin: 0 0 var(--pdf-space-2) 0;
+    }
+    .cover-party__name {
+      font-family: var(--pdf-font-heading); font-size: 14pt; font-weight: 600;
+      color: var(--pdf-color-primary); margin: 0 0 var(--pdf-space-1) 0; line-height: 1.2;
+    }
+    .cover-party__detail {
+      font-family: var(--pdf-font-body); font-size: 9pt;
+      color: var(--pdf-color-text); margin: 0; line-height: 1.5;
+    }
+    .cover-party__detail--muted { color: var(--pdf-color-text-muted); }
+    .cover-party__contact {
+      margin-top: var(--pdf-space-2); padding-top: var(--pdf-space-2);
+      border-top: 1pt solid var(--pdf-color-divider);
+      display: grid; grid-template-columns: auto 1fr;
+      column-gap: var(--pdf-space-3); row-gap: 2pt;
+    }
+    .cover-party__contact-label {
+      font-family: var(--pdf-font-body); font-size: 7pt; letter-spacing: 1pt;
+      text-transform: uppercase; color: var(--pdf-color-text-muted);
+    }
+    .cover-party__contact-value {
+      font-family: var(--pdf-font-body); font-size: 9pt;
+      color: var(--pdf-color-text); font-variant-numeric: tabular-nums;
+    }
+    .cover-highlights {
+      margin: 0 var(--pdf-page-padding-x) var(--pdf-space-6);
+      padding: var(--pdf-space-4) var(--pdf-space-5);
+      background: var(--pdf-color-surface);
+      border-radius: var(--pdf-radius-md);
+      border-left: 3pt solid var(--pdf-color-accent);
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--pdf-space-5);
+    }
+    .cover-highlight__label {
+      font-family: var(--pdf-font-body); font-size: 7pt; font-weight: 500;
+      letter-spacing: 1.2pt; text-transform: uppercase; color: var(--pdf-color-text-muted);
+      margin: 0 0 var(--pdf-space-1) 0;
+    }
+    .cover-highlight__value {
+      font-family: var(--pdf-font-heading); font-size: 16pt; font-weight: 600;
+      color: var(--pdf-color-primary); margin: 0; line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+    .cover-highlight__hint {
+      font-family: var(--pdf-font-body); font-size: 8pt;
+      color: var(--pdf-color-text-muted); margin: 2pt 0 0 0;
+    }
+    .cover-validity {
+      margin: 0 var(--pdf-page-padding-x);
+      padding: var(--pdf-space-3) var(--pdf-space-4);
+      border: 1pt solid var(--pdf-color-divider);
+      border-radius: var(--pdf-radius-md);
+      display: flex; justify-content: space-between; align-items: center;
+      gap: var(--pdf-space-4);
+    }
+    .cover-validity__text { font-family: var(--pdf-font-body); font-size: 9pt; color: var(--pdf-color-text); margin: 0; }
+    .cover-validity__date { font-weight: 700; color: var(--pdf-color-primary); font-variant-numeric: tabular-nums; }
+    .cover-validity__chip {
+      font-family: var(--pdf-font-body); font-size: 7pt; font-weight: 500;
+      letter-spacing: 1pt; text-transform: uppercase;
+      color: var(--pdf-color-paper); background: var(--pdf-color-accent);
+      padding: 4pt 8pt; border-radius: 999pt;
+    }
+    .cover-footer {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: var(--pdf-space-4) var(--pdf-page-padding-x);
+      border-top: 1pt solid var(--pdf-color-divider);
+      background: var(--pdf-color-paper);
+      display: flex; justify-content: space-between; align-items: flex-end;
+      gap: var(--pdf-space-4);
+    }
+    .cover-footer__legal {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      color: var(--pdf-color-text-muted); line-height: 1.4; max-width: 60%;
+    }
+    .cover-footer__legal-name { font-weight: 700; color: var(--pdf-color-primary); }
+    .cover-footer__page {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      color: var(--pdf-color-text-muted); letter-spacing: 0.5pt;
+      font-variant-numeric: tabular-nums; text-align: right;
+    }
+    .cover-footer__page strong { font-weight: 700; color: var(--pdf-color-primary); }
+
+    /* ═════════════════════════════════════════════════════════════
+     * PÁGINA 2 — EXECUTIVE SUMMARY
+     * ═════════════════════════════════════════════════════════════ */
+    .exec-grid {
+      display: grid;
+      grid-template-columns: 1fr 220pt;
+      gap: var(--pdf-space-6);
+      margin-bottom: var(--pdf-space-6);
+    }
+    .exec-summary-prose {
+      font-family: var(--pdf-font-body);
+      font-size: 10pt;
+      line-height: 1.65;
+      color: var(--pdf-color-text);
+    }
+    .exec-summary-prose p { margin: 0 0 var(--pdf-space-3) 0; }
+    .exec-summary-prose strong { color: var(--pdf-color-primary); font-weight: 600; }
+    .exec-pillars-card {
+      background: var(--pdf-color-surface);
+      border-radius: var(--pdf-radius-md);
+      padding: var(--pdf-space-4);
+      border-top: 3pt solid var(--pdf-color-accent);
+    }
+    .exec-pillars-card h4 {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      font-weight: 500; letter-spacing: 1.5pt;
+      text-transform: uppercase; color: var(--pdf-color-text-muted);
+      margin: 0 0 var(--pdf-space-3) 0;
+    }
+    .exec-pillar {
+      display: flex; gap: var(--pdf-space-3); margin-bottom: var(--pdf-space-3);
+    }
+    .exec-pillar:last-child { margin-bottom: 0; }
+    .exec-pillar__num {
+      flex-shrink: 0; width: 18pt; height: 18pt;
+      background: var(--pdf-color-primary); color: #fff;
+      border-radius: 999pt; display: flex;
+      align-items: center; justify-content: center;
+      font-family: var(--pdf-font-heading); font-size: 9pt; font-weight: 600;
+    }
+    .exec-pillar__body { flex: 1; }
+    .exec-pillar__title {
+      font-family: var(--pdf-font-heading); font-size: 10pt; font-weight: 500;
+      color: var(--pdf-color-primary); margin: 0 0 1pt 0;
+    }
+    .exec-pillar__detail {
+      font-family: var(--pdf-font-body); font-size: 8pt;
+      color: var(--pdf-color-text-muted); margin: 0; line-height: 1.4;
+    }
+    .exec-kpis {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: var(--pdf-space-3);
+      padding: var(--pdf-space-4);
+      background: var(--pdf-color-paper);
+      border: 1pt solid var(--pdf-color-divider);
+      border-radius: var(--pdf-radius-md);
+    }
+    .exec-kpi__label {
+      font-family: var(--pdf-font-body); font-size: 7pt; font-weight: 500;
+      letter-spacing: 1.2pt; text-transform: uppercase;
+      color: var(--pdf-color-text-muted); margin: 0 0 var(--pdf-space-1) 0;
+    }
+    .exec-kpi__value {
+      font-family: var(--pdf-font-heading); font-size: 14pt; font-weight: 600;
+      color: var(--pdf-color-primary); margin: 0;
+      font-variant-numeric: tabular-nums; line-height: 1.1;
+    }
+    .exec-kpi__sub {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      color: var(--pdf-color-text-muted); margin: 2pt 0 0 0;
+    }
+
+    /* ═════════════════════════════════════════════════════════════
+     * PÁGINA 3 — ABOUT EFEONCE / SUB-BRAND
+     * ═════════════════════════════════════════════════════════════ */
+    .about-intro {
+      font-family: var(--pdf-font-body); font-size: 11pt; line-height: 1.6;
+      color: var(--pdf-color-text); margin: 0 0 var(--pdf-space-5) 0;
+    }
+    .about-brands {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: var(--pdf-space-4);
+    }
+    .about-brand-card {
+      background: var(--pdf-color-paper);
+      border: 1pt solid var(--pdf-color-divider);
+      border-radius: var(--pdf-radius-md);
+      padding: var(--pdf-space-4);
+    }
+    .about-brand-card--current { border: 2pt solid var(--pdf-color-accent); }
+    .about-brand-card__head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--pdf-space-3);
+    }
+    .about-brand-card__logo { height: 28pt; width: auto; }
+    .about-brand-card__chip {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      font-weight: 500; letter-spacing: 1pt; text-transform: uppercase;
+      padding: 3pt 7pt; border-radius: 999pt;
+      background: var(--pdf-color-accent); color: #fff;
+    }
+    .about-brand-card__pitch {
+      font-family: var(--pdf-font-body); font-size: 9pt;
+      color: var(--pdf-color-text-muted); line-height: 1.5; margin: 0;
+    }
+    .about-stats {
+      margin-top: var(--pdf-space-6);
+      padding: var(--pdf-space-5);
+      background: var(--pdf-color-primary);
+      border-radius: var(--pdf-radius-md);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: var(--pdf-space-4);
+    }
+    .about-stat__value {
+      font-family: var(--pdf-font-heading); font-size: 22pt; font-weight: 700;
+      color: var(--pdf-color-paper); margin: 0; line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
+    .about-stat__label {
+      font-family: var(--pdf-font-body); font-size: 8pt;
+      color: rgba(255,255,255,0.7); margin: var(--pdf-space-1) 0 0 0;
+      letter-spacing: 0.5pt;
+    }
+
+    /* ═════════════════════════════════════════════════════════════
+     * PÁGINA 4 — SCOPE OF WORK
+     * ═════════════════════════════════════════════════════════════ */
+    .scope-bundle {
+      margin-bottom: var(--pdf-space-5);
+      border: 1pt solid var(--pdf-color-divider);
+      border-radius: var(--pdf-radius-md);
+      overflow: hidden;
+    }
+    .scope-bundle__header {
+      padding: var(--pdf-space-3) var(--pdf-space-4);
+      background: var(--pdf-color-surface);
+      border-bottom: 1pt solid var(--pdf-color-divider);
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: var(--pdf-space-3);
+    }
+    .scope-bundle__title {
+      font-family: var(--pdf-font-heading); font-size: 12pt; font-weight: 600;
+      color: var(--pdf-color-primary); margin: 0 0 2pt 0;
+    }
+    .scope-bundle__sku {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      letter-spacing: 1pt; text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .scope-bundle__chip {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      letter-spacing: 1pt; text-transform: uppercase; font-weight: 500;
+      padding: 3pt 7pt; border-radius: 999pt;
+      background: var(--pdf-color-paper);
+      color: var(--pdf-color-primary);
+      border: 1pt solid var(--pdf-color-primary);
+      white-space: nowrap;
+    }
+    .scope-bundle__body { padding: var(--pdf-space-4); }
+    .scope-bundle__description {
+      font-family: var(--pdf-font-body); font-size: 9pt;
+      line-height: 1.55; color: var(--pdf-color-text);
+      margin: 0 0 var(--pdf-space-4) 0;
+    }
+    .scope-bundle__description p { margin: 0 0 var(--pdf-space-2) 0; }
+    .scope-bundle__description strong { color: var(--pdf-color-primary); }
+    .scope-bundle__description ul { margin: var(--pdf-space-2) 0; padding-left: var(--pdf-space-4); }
+    .scope-bundle__description li { margin-bottom: 2pt; }
+    .scope-components {
+      border-top: 1pt dashed var(--pdf-color-divider);
+      padding-top: var(--pdf-space-3);
+    }
+    .scope-components__title {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      font-weight: 500; letter-spacing: 1.5pt;
+      text-transform: uppercase; color: var(--pdf-color-text-muted);
+      margin: 0 0 var(--pdf-space-2) 0;
+    }
+    .scope-component {
+      display: grid; grid-template-columns: 18pt 1fr auto;
+      gap: var(--pdf-space-2); padding: 4pt 0;
+      border-bottom: 1pt dotted var(--pdf-color-divider);
+      align-items: center;
+    }
+    .scope-component:last-child { border-bottom: none; }
+    .scope-component__type {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      font-weight: 500; letter-spacing: 0.5pt;
+      color: var(--pdf-color-accent); text-align: center;
+    }
+    .scope-component__name {
+      font-family: var(--pdf-font-body); font-size: 9pt;
+      color: var(--pdf-color-text);
+    }
+    .scope-component__qty {
+      font-family: var(--pdf-font-body); font-size: 8pt;
+      color: var(--pdf-color-text-muted);
+      font-variant-numeric: tabular-nums; text-align: right;
+    }
+
+    /* ═════════════════════════════════════════════════════════════
+     * PÁGINA 5 — COMMERCIAL PROPOSAL
+     * ═════════════════════════════════════════════════════════════ */
+    .commercial-table {
+      width: 100%; border-collapse: collapse; margin-bottom: var(--pdf-space-4);
+    }
+    .commercial-table thead th {
+      background: var(--pdf-color-primary); color: #fff;
+      padding: var(--pdf-space-2) var(--pdf-space-3);
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      letter-spacing: 1pt; text-transform: uppercase; font-weight: 500;
+      text-align: left;
+    }
+    .commercial-table thead th.num { text-align: right; }
+    .commercial-table thead th.center { text-align: center; }
+    .commercial-bundle-row td {
+      background: var(--pdf-color-surface);
+      padding: var(--pdf-space-2) var(--pdf-space-3);
+      font-family: var(--pdf-font-heading); font-size: 9pt; font-weight: 600;
+      color: var(--pdf-color-primary);
+      border-top: 2pt solid var(--pdf-color-primary);
+    }
+    .commercial-bundle-row td.num {
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .commercial-line-row td {
+      padding: 6pt var(--pdf-space-3);
+      font-family: var(--pdf-font-body); font-size: 8.5pt;
+      color: var(--pdf-color-text);
+      border-bottom: 1pt solid var(--pdf-color-divider);
+      vertical-align: top;
+    }
+    .commercial-line-row td.num {
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .commercial-line-row td.center { text-align: center; }
+    .commercial-line-row__label { font-weight: 500; color: var(--pdf-color-text); }
+    .commercial-line-row__hint {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      color: var(--pdf-color-text-muted); margin-top: 1pt;
+    }
+    .commercial-summary {
+      margin-left: auto; width: 280pt;
+      border: 1pt solid var(--pdf-color-divider);
+      border-radius: var(--pdf-radius-md);
+      overflow: hidden;
+      margin-top: var(--pdf-space-5);
+    }
+    .commercial-summary__row {
+      padding: var(--pdf-space-2) var(--pdf-space-4);
+      display: flex; justify-content: space-between;
+      font-family: var(--pdf-font-body); font-size: 9pt;
+      border-bottom: 1pt solid var(--pdf-color-divider);
+    }
+    .commercial-summary__row:last-child { border-bottom: none; }
+    .commercial-summary__label { color: var(--pdf-color-text-muted); }
+    .commercial-summary__value {
+      color: var(--pdf-color-text);
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+    .commercial-summary__row--total {
+      background: var(--pdf-color-primary);
+    }
+    .commercial-summary__row--total .commercial-summary__label {
+      color: rgba(255,255,255,0.7);
+      font-family: var(--pdf-font-heading);
+      font-size: 9pt; font-weight: 500;
+      letter-spacing: 1pt; text-transform: uppercase;
+    }
+    .commercial-summary__row--total .commercial-summary__value {
+      color: #fff; font-family: var(--pdf-font-heading);
+      font-size: 14pt; font-weight: 600;
+    }
+    .fx-note {
+      margin-top: var(--pdf-space-4);
+      padding: var(--pdf-space-3) var(--pdf-space-4);
+      border: 1pt solid var(--pdf-color-divider);
+      border-radius: var(--pdf-radius-sm);
+      font-family: var(--pdf-font-body); font-size: 8pt;
+      color: var(--pdf-color-text-muted); line-height: 1.5;
+    }
+    .fx-note__title {
+      font-weight: 700; color: var(--pdf-color-text); margin-bottom: 2pt;
+    }
+
+    /* ═════════════════════════════════════════════════════════════
+     * PÁGINA 6 — INVESTMENT TIMELINE
+     * ═════════════════════════════════════════════════════════════ */
+    .timeline-intro {
+      font-family: var(--pdf-font-body); font-size: 9.5pt;
+      color: var(--pdf-color-text); line-height: 1.55;
+      margin: 0 0 var(--pdf-space-5) 0;
+    }
+    .timeline {
+      position: relative; padding-left: var(--pdf-space-5);
+      margin-bottom: var(--pdf-space-6);
+    }
+    .timeline::before {
+      content: ''; position: absolute; left: 6pt; top: 6pt; bottom: 6pt;
+      width: 2pt; background: var(--pdf-color-divider);
+    }
+    .timeline-item {
+      position: relative; margin-bottom: var(--pdf-space-4);
+      display: grid; grid-template-columns: 1fr auto;
+      gap: var(--pdf-space-3); align-items: flex-start;
+    }
+    .timeline-item:last-child { margin-bottom: 0; }
+    .timeline-item::before {
+      content: ''; position: absolute;
+      left: -22pt; top: 4pt;
+      width: 12pt; height: 12pt;
+      background: var(--pdf-color-accent);
+      border-radius: 999pt;
+      border: 2pt solid var(--pdf-color-paper);
+    }
+    .timeline-item__milestone {
+      font-family: var(--pdf-font-heading); font-size: 11pt; font-weight: 500;
+      color: var(--pdf-color-primary); margin: 0 0 1pt 0;
+    }
+    .timeline-item__date {
+      font-family: var(--pdf-font-body); font-size: 8pt;
+      letter-spacing: 1pt; text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .timeline-item__detail {
+      font-family: var(--pdf-font-body); font-size: 8.5pt;
+      color: var(--pdf-color-text-muted); margin: 2pt 0 0 0;
+      line-height: 1.45;
+    }
+    .timeline-item__amount {
+      font-family: var(--pdf-font-heading); font-size: 12pt; font-weight: 600;
+      color: var(--pdf-color-primary);
+      font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    .payment-methods {
+      padding: var(--pdf-space-4);
+      background: var(--pdf-color-surface);
+      border-radius: var(--pdf-radius-md);
+      border-left: 3pt solid var(--pdf-color-accent);
+    }
+    .payment-methods h4 {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      font-weight: 500; letter-spacing: 1.5pt;
+      text-transform: uppercase; color: var(--pdf-color-text-muted);
+      margin: 0 0 var(--pdf-space-2) 0;
+    }
+    .payment-methods p {
+      font-family: var(--pdf-font-body); font-size: 9pt;
+      color: var(--pdf-color-text); margin: 0; line-height: 1.5;
+    }
+
+    /* ═════════════════════════════════════════════════════════════
+     * PÁGINA 7 — TERMS & CONDITIONS
+     * ═════════════════════════════════════════════════════════════ */
+    .term {
+      margin-bottom: var(--pdf-space-4);
+      padding-bottom: var(--pdf-space-3);
+      border-bottom: 1pt solid var(--pdf-color-divider);
+    }
+    .term:last-child { border-bottom: none; margin-bottom: 0; }
+    .term__title {
+      font-family: var(--pdf-font-heading); font-size: 10pt; font-weight: 500;
+      color: var(--pdf-color-primary); margin: 0 0 var(--pdf-space-2) 0;
+    }
+    .term__body {
+      font-family: var(--pdf-font-body); font-size: 8.5pt;
+      color: var(--pdf-color-text); line-height: 1.55; margin: 0;
+    }
+
+    /* ═════════════════════════════════════════════════════════════
+     * PÁGINA 8 — SIGNATURES + QR
+     * ═════════════════════════════════════════════════════════════ */
+    .signatures-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--pdf-space-6);
+      margin-top: var(--pdf-space-5);
+    }
+    .signature-block {
+      border-top: 2pt solid var(--pdf-color-primary);
+      padding-top: var(--pdf-space-4);
+    }
+    .signature-block__eyebrow {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      font-weight: 500; letter-spacing: 1.5pt;
+      text-transform: uppercase; color: var(--pdf-color-text-muted);
+      margin: 0 0 var(--pdf-space-2) 0;
+    }
+    .signature-block__line {
+      height: 60pt;
+      border-bottom: 1pt solid var(--pdf-color-text-subtle);
+      margin-bottom: var(--pdf-space-2);
+    }
+    .signature-block__field {
+      display: grid; grid-template-columns: 60pt 1fr;
+      gap: var(--pdf-space-2); padding: 2pt 0;
+      border-bottom: 1pt dotted var(--pdf-color-divider);
+    }
+    .signature-block__field:last-child { border-bottom: none; }
+    .signature-block__label {
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      letter-spacing: 1pt; text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+    }
+    .signature-block__value {
+      font-family: var(--pdf-font-body); font-size: 9pt;
+      color: var(--pdf-color-text-subtle); font-style: italic;
+    }
+    .verify-block {
+      margin-top: var(--pdf-space-8);
+      padding: var(--pdf-space-4);
+      background: var(--pdf-color-surface);
+      border-radius: var(--pdf-radius-md);
+      display: grid; grid-template-columns: 80pt 1fr;
+      gap: var(--pdf-space-4); align-items: center;
+    }
+    .verify-block__qr {
+      width: 80pt; height: 80pt;
+      background:
+        repeating-linear-gradient(0deg, #000 0 4pt, #fff 4pt 8pt),
+        repeating-linear-gradient(90deg, #000 0 4pt, #fff 4pt 8pt);
+      background-blend-mode: multiply;
+      border-radius: 4pt;
+      border: 1pt solid var(--pdf-color-text);
+    }
+    .verify-block__copy { font-family: var(--pdf-font-body); }
+    .verify-block__copy h4 {
+      font-family: var(--pdf-font-heading); font-size: 11pt; font-weight: 500;
+      color: var(--pdf-color-primary); margin: 0 0 var(--pdf-space-1) 0;
+    }
+    .verify-block__copy p {
+      font-size: 8pt; color: var(--pdf-color-text-muted);
+      line-height: 1.5; margin: 0;
+    }
+    .verify-block__copy code {
+      display: inline-block; margin-top: 4pt;
+      font-family: var(--pdf-font-body); font-size: 7pt;
+      letter-spacing: 0.5pt; color: var(--pdf-color-accent);
+      font-variant-numeric: tabular-nums;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mockup-banner">
+    <h1>PDF cotización end-to-end · Mockup v1 · TASK-629</h1>
+    <p>
+      Las 8 secciones del template universal renderizadas a tamaño real A4.
+      Datos demo: cliente Banco Industrial Latinoamericano · sub-brand Globe · USD 184,500 ·
+      retainer 12 meses. Ejemplo enterprise (todas las secciones condicionales activadas).
+      Iteramos sobre este HTML antes de migrar a <code>@react-pdf/renderer</code>.
+    </p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PÁGINA 1 — COVER
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Página 1 · Cover</div>
+  <article class="pdf-page">
+    <header class="cover-header">
+      <div class="cover-header__brand">
+        <img class="cover-header__logo" src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+        <div class="cover-header__sub-divider"></div>
+        <div class="cover-header__sub-brand">
+          <img class="cover-header__sub-isotipo" src="../../../public/branding/SVG/globe-full.svg" alt="Globe">
+          <span class="cover-header__sub-label">Business Line</span>
+        </div>
+      </div>
+      <div class="cover-header__meta">
+        <p class="cover-header__meta-eyebrow">Propuesta</p>
+        <p class="cover-header__meta-id">EFG-2026-00184 · v2</p>
+      </div>
+    </header>
+    <section class="cover-hero">
+      <p class="cover-hero__eyebrow">Propuesta Comercial</p>
+      <h1 class="cover-hero__title">Programa de crecimiento orgánico<br>Globe LATAM 2026</h1>
+      <p class="cover-hero__subtitle">
+        Estrategia de adquisición + retención multicanal con foco en Chile,
+        Colombia y México. Modelo retainer mensual con KPIs compartidos y
+        reportería ejecutiva trimestral.
+      </p>
+    </section>
+    <section class="cover-parties">
+      <div class="cover-party">
+        <p class="cover-party__eyebrow">Preparada para</p>
+        <p class="cover-party__name">Banco Industrial Latinoamericano</p>
+        <p class="cover-party__detail cover-party__detail--muted">División Marketing &amp; Growth</p>
+        <div class="cover-party__contact">
+          <span class="cover-party__contact-label">Contacto</span>
+          <span class="cover-party__contact-value">María Elena Vargas, CMO</span>
+          <span class="cover-party__contact-label">Email</span>
+          <span class="cover-party__contact-value">mvargas@bil.lat</span>
+        </div>
+      </div>
+      <div class="cover-party">
+        <p class="cover-party__eyebrow">Preparada por</p>
+        <p class="cover-party__name">Julio Reyes</p>
+        <p class="cover-party__detail cover-party__detail--muted">Account Lead · Efeonce Globe</p>
+        <div class="cover-party__contact">
+          <span class="cover-party__contact-label">Email</span>
+          <span class="cover-party__contact-value">jreyes@efeoncepro.com</span>
+          <span class="cover-party__contact-label">Teléfono</span>
+          <span class="cover-party__contact-value">+56 9 5847 2310</span>
+        </div>
+      </div>
+    </section>
+    <section class="cover-highlights">
+      <div>
+        <p class="cover-highlight__label">Inversión total</p>
+        <p class="cover-highlight__value">USD 184,500</p>
+        <p class="cover-highlight__hint">12 meses · facturación mensual</p>
+      </div>
+      <div>
+        <p class="cover-highlight__label">Inicio estimado</p>
+        <p class="cover-highlight__value">Mayo 2026</p>
+        <p class="cover-highlight__hint">Onboarding 14 días hábiles</p>
+      </div>
+      <div>
+        <p class="cover-highlight__label">Equipo asignado</p>
+        <p class="cover-highlight__value">8 expertos</p>
+        <p class="cover-highlight__hint">2 leads · 4 specialists · 2 analysts</p>
+      </div>
+    </section>
+    <div class="cover-validity">
+      <p class="cover-validity__text">
+        Esta propuesta es válida hasta el
+        <span class="cover-validity__date">30/05/2026</span>
+        — sujeta a los términos y condiciones detallados al final del documento.
+      </p>
+      <span class="cover-validity__chip">Confidencial</span>
+    </div>
+    <footer class="cover-footer">
+      <p class="cover-footer__legal">
+        <span class="cover-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Dr. Manuel Barros Borgoño 71 of. 05, Providencia, Santiago, Chile
+        · efeoncepro.com
+      </p>
+      <p class="cover-footer__page">
+        Propuesta EFG-2026-00184 v2<br>
+        Página <strong>1</strong> de <strong>8</strong>
+      </p>
+    </footer>
+  </article>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PÁGINA 2 — EXECUTIVE SUMMARY
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Página 2 · Executive Summary (conditional)</div>
+  <article class="pdf-page">
+    <header class="page-header">
+      <div class="page-header__brand">
+        <img src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+      </div>
+      <div class="page-header__meta">
+        Propuesta <strong>EFG-2026-00184 v2</strong>
+      </div>
+    </header>
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">01 · Síntesis ejecutiva</p>
+      <h2 class="section-heading__title">Lo que entregamos en una página</h2>
+      <p class="section-heading__subtitle">
+        Resumen para sponsor y comité de aprobación. Si solo lees una sección,
+        que sea esta — explica el objetivo, la inversión y el equipo en menos
+        de tres minutos.
+      </p>
+    </div>
+    <div class="section-body">
+      <div class="exec-grid">
+        <div class="exec-summary-prose">
+          <p>
+            Diseñamos un programa <strong>full-funnel</strong> para impulsar la captación de
+            clientes corporativos del Banco Industrial Latinoamericano en
+            Chile, Colombia y México durante los próximos 12 meses, con foco
+            en categorías de alto valor (cuentas empresa, comercio exterior,
+            financiamiento estructurado).
+          </p>
+          <p>
+            La propuesta se ejecuta con un <strong>retainer mensual fijo</strong> que
+            consolida estrategia, contenidos, performance multicanal y
+            reportería operativa, evitando la fragmentación habitual en
+            agencias múltiples. El equipo asignado opera como extensión del
+            departamento de Marketing &amp; Growth, con governance trimestral y
+            KPIs compartidos.
+          </p>
+          <p>
+            En el horizonte de 12 meses estimamos <strong>+38% en leads
+            calificados</strong>, reducción del 22% en costo por adquisición y un
+            uplift de marca trackeable vía estudios de awareness contratados
+            por separado.
+          </p>
+        </div>
+        <aside class="exec-pillars-card">
+          <h4>Pilares estratégicos</h4>
+          <div class="exec-pillar">
+            <div class="exec-pillar__num">1</div>
+            <div class="exec-pillar__body">
+              <p class="exec-pillar__title">Adquisición orgánica</p>
+              <p class="exec-pillar__detail">SEO técnico + content engine multi-país</p>
+            </div>
+          </div>
+          <div class="exec-pillar">
+            <div class="exec-pillar__num">2</div>
+            <div class="exec-pillar__body">
+              <p class="exec-pillar__title">Performance integrado</p>
+              <p class="exec-pillar__detail">Paid media gobernado bajo KPIs únicos</p>
+            </div>
+          </div>
+          <div class="exec-pillar">
+            <div class="exec-pillar__num">3</div>
+            <div class="exec-pillar__body">
+              <p class="exec-pillar__title">Retención &amp; lifecycle</p>
+              <p class="exec-pillar__detail">CRM + automation + reportería ejecutiva</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+      <div class="exec-kpis">
+        <div>
+          <p class="exec-kpi__label">Inversión</p>
+          <p class="exec-kpi__value">USD 184,500</p>
+          <p class="exec-kpi__sub">+ IVA aplicable por país</p>
+        </div>
+        <div>
+          <p class="exec-kpi__label">Duración</p>
+          <p class="exec-kpi__value">12 meses</p>
+          <p class="exec-kpi__sub">Renovable mensualmente</p>
+        </div>
+        <div>
+          <p class="exec-kpi__label">Equipo</p>
+          <p class="exec-kpi__value">8 expertos</p>
+          <p class="exec-kpi__sub">2 lead · 4 spec · 2 analyst</p>
+        </div>
+        <div>
+          <p class="exec-kpi__label">Países cubiertos</p>
+          <p class="exec-kpi__value">3</p>
+          <p class="exec-kpi__sub">CL · CO · MX</p>
+        </div>
+      </div>
+    </div>
+    <footer class="page-footer">
+      <span class="page-footer__legal">
+        <span class="page-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Confidencial · No distribuir sin autorización
+      </span>
+      <span class="page-footer__pagination">
+        <span class="page-footer__id">EFG-2026-00184 v2</span>
+        Página <strong>2</strong> de <strong>8</strong>
+      </span>
+    </footer>
+  </article>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PÁGINA 3 — ABOUT EFEONCE
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Página 3 · About Efeonce / Sub-brand (conditional)</div>
+  <article class="pdf-page">
+    <header class="page-header">
+      <div class="page-header__brand">
+        <img src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+      </div>
+      <div class="page-header__meta">
+        Propuesta <strong>EFG-2026-00184 v2</strong>
+      </div>
+    </header>
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">02 · Quiénes somos</p>
+      <h2 class="section-heading__title">Una agencia, cuatro especializaciones</h2>
+      <p class="section-heading__subtitle">
+        Efeonce opera bajo cuatro líneas de negocio que comparten plataforma
+        operativa, governance y reportería. Esta propuesta se entrega desde
+        la línea Globe.
+      </p>
+    </div>
+    <div class="section-body">
+      <p class="about-intro">
+        Somos un grupo agencia con sede en Santiago de Chile, footprint en
+        LATAM y +12 años entregando programas de crecimiento para clientes
+        enterprise. Nuestro modelo se construye sobre cuatro líneas de
+        negocio especializadas, conectadas por un único stack operacional.
+      </p>
+      <div class="about-brands">
+        <div class="about-brand-card about-brand-card--current">
+          <div class="about-brand-card__head">
+            <img class="about-brand-card__logo" src="../../../public/branding/SVG/globe-full.svg" alt="Globe">
+            <span class="about-brand-card__chip">Esta propuesta</span>
+          </div>
+          <p class="about-brand-card__pitch">
+            Marketing performance + media multicanal para marcas enterprise
+            en mercados regulados (banca, salud, retail).
+          </p>
+        </div>
+        <div class="about-brand-card">
+          <div class="about-brand-card__head">
+            <img class="about-brand-card__logo" src="../../../public/branding/SVG/wave-full.svg" alt="Wave">
+          </div>
+          <p class="about-brand-card__pitch">
+            Producto digital y data: dashboards, telemetría, analítica
+            avanzada para equipos de negocio.
+          </p>
+        </div>
+        <div class="about-brand-card">
+          <div class="about-brand-card__head">
+            <img class="about-brand-card__logo" src="../../../public/branding/SVG/reach-full.svg" alt="Reach">
+          </div>
+          <p class="about-brand-card__pitch">
+            Branding, contenido y storytelling para construir marcas con
+            atributos diferenciadores.
+          </p>
+        </div>
+        <div class="about-brand-card">
+          <div class="about-brand-card__head">
+            <img class="about-brand-card__logo" src="../../../public/branding/SVG/isotipo-full-efeonce.svg" alt="Efeonce">
+          </div>
+          <p class="about-brand-card__pitch">
+            Operación, finanzas, governance corporativo y plataforma
+            tecnológica compartida que sostiene a las tres marcas.
+          </p>
+        </div>
+      </div>
+      <div class="about-stats">
+        <div>
+          <p class="about-stat__value">+120</p>
+          <p class="about-stat__label">Profesionales</p>
+        </div>
+        <div>
+          <p class="about-stat__value">12</p>
+          <p class="about-stat__label">Años en mercado</p>
+        </div>
+        <div>
+          <p class="about-stat__value">5</p>
+          <p class="about-stat__label">Países LATAM</p>
+        </div>
+        <div>
+          <p class="about-stat__value">+80</p>
+          <p class="about-stat__label">Marcas enterprise activas</p>
+        </div>
+      </div>
+    </div>
+    <footer class="page-footer">
+      <span class="page-footer__legal">
+        <span class="page-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Confidencial · No distribuir sin autorización
+      </span>
+      <span class="page-footer__pagination">
+        <span class="page-footer__id">EFG-2026-00184 v2</span>
+        Página <strong>3</strong> de <strong>8</strong>
+      </span>
+    </footer>
+  </article>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PÁGINA 4 — SCOPE OF WORK
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Página 4 · Scope of Work</div>
+  <article class="pdf-page">
+    <header class="page-header">
+      <div class="page-header__brand">
+        <img src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+      </div>
+      <div class="page-header__meta">
+        Propuesta <strong>EFG-2026-00184 v2</strong>
+      </div>
+    </header>
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">03 · Alcance del trabajo</p>
+      <h2 class="section-heading__title">Servicios y componentes incluidos</h2>
+      <p class="section-heading__subtitle">
+        Cada bundle agrupa los componentes (roles dedicados + herramientas)
+        que se activan al iniciar el retainer. Los componentes opcionales se
+        marcan como tales y pueden activarse a demanda durante la ejecución.
+      </p>
+    </div>
+    <div class="section-body">
+      <article class="scope-bundle">
+        <div class="scope-bundle__header">
+          <div>
+            <h3 class="scope-bundle__title">Retainer Globe Performance Premium</h3>
+            <p class="scope-bundle__sku">SKU GLO-RTR-PREM-12</p>
+          </div>
+          <span class="scope-bundle__chip">Retainer mensual</span>
+        </div>
+        <div class="scope-bundle__body">
+          <div class="scope-bundle__description">
+            <p>
+              Programa <strong>full-funnel</strong> que integra estrategia, paid media,
+              contenido y reportería ejecutiva. Diseñado para marcas con
+              presencia regional que requieren coordinación cross-país y
+              governance unificado.
+            </p>
+            <ul>
+              <li>Reuniones de leadership trimestrales</li>
+              <li>Reportería ejecutiva mensual + dashboard live</li>
+              <li>Capacidad ajustable hasta ±20% sin renegociar contrato</li>
+            </ul>
+          </div>
+          <div class="scope-components">
+            <p class="scope-components__title">Componentes incluidos (8)</p>
+            <div class="scope-component">
+              <span class="scope-component__type">ROL</span>
+              <span class="scope-component__name">Performance Lead Senior</span>
+              <span class="scope-component__qty">160 hrs/mes</span>
+            </div>
+            <div class="scope-component">
+              <span class="scope-component__type">ROL</span>
+              <span class="scope-component__name">Strategy Director</span>
+              <span class="scope-component__qty">40 hrs/mes</span>
+            </div>
+            <div class="scope-component">
+              <span class="scope-component__type">ROL</span>
+              <span class="scope-component__name">Content Manager (×2)</span>
+              <span class="scope-component__qty">320 hrs/mes</span>
+            </div>
+            <div class="scope-component">
+              <span class="scope-component__type">ROL</span>
+              <span class="scope-component__name">Data Analyst</span>
+              <span class="scope-component__qty">80 hrs/mes</span>
+            </div>
+            <div class="scope-component">
+              <span class="scope-component__type">TLS</span>
+              <span class="scope-component__name">Adobe Creative Cloud · Team license</span>
+              <span class="scope-component__qty">4 seats</span>
+            </div>
+            <div class="scope-component">
+              <span class="scope-component__type">TLS</span>
+              <span class="scope-component__name">Looker Studio Pro</span>
+              <span class="scope-component__qty">incluido</span>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="scope-bundle">
+        <div class="scope-bundle__header">
+          <div>
+            <h3 class="scope-bundle__title">Add-on Analytics Avanzado</h3>
+            <p class="scope-bundle__sku">SKU GLO-ADD-ANALYT</p>
+          </div>
+          <span class="scope-bundle__chip">Add-on opcional</span>
+        </div>
+        <div class="scope-bundle__body">
+          <div class="scope-bundle__description">
+            <p>
+              Capa adicional de <strong>experimentación A/B</strong> + modelado
+              predictivo de churn. Se factura separadamente cuando se
+              activa.
+            </p>
+          </div>
+        </div>
+      </article>
+    </div>
+    <footer class="page-footer">
+      <span class="page-footer__legal">
+        <span class="page-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Confidencial · No distribuir sin autorización
+      </span>
+      <span class="page-footer__pagination">
+        <span class="page-footer__id">EFG-2026-00184 v2</span>
+        Página <strong>4</strong> de <strong>8</strong>
+      </span>
+    </footer>
+  </article>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PÁGINA 5 — COMMERCIAL PROPOSAL
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Página 5 · Commercial Proposal (tabla detallada)</div>
+  <article class="pdf-page">
+    <header class="page-header">
+      <div class="page-header__brand">
+        <img src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+      </div>
+      <div class="page-header__meta">
+        Propuesta <strong>EFG-2026-00184 v2</strong>
+      </div>
+    </header>
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">04 · Detalle comercial</p>
+      <h2 class="section-heading__title">Pricing por bundle y línea</h2>
+      <p class="section-heading__subtitle">
+        Subtotales por bundle + total general. Todos los precios en USD,
+        IVA aplicable según país de facturación (Chile 19%, Colombia 19%,
+        México 16%).
+      </p>
+    </div>
+    <div class="section-body">
+      <table class="commercial-table">
+        <thead>
+          <tr>
+            <th>Descripción</th>
+            <th class="num">Cant.</th>
+            <th class="center">Unidad</th>
+            <th class="num">Precio unit.</th>
+            <th class="num">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="commercial-bundle-row">
+            <td colspan="4">Retainer Globe Performance Premium</td>
+            <td class="num">USD 14,200 / mes</td>
+          </tr>
+          <tr class="commercial-line-row">
+            <td>
+              <div class="commercial-line-row__label">Performance Lead Senior</div>
+              <div class="commercial-line-row__hint">160 hrs/mes · ROL-PERFLD-SR</div>
+            </td>
+            <td class="num">160</td>
+            <td class="center">Hora</td>
+            <td class="num">USD 38</td>
+            <td class="num">USD 6,080</td>
+          </tr>
+          <tr class="commercial-line-row">
+            <td>
+              <div class="commercial-line-row__label">Strategy Director</div>
+              <div class="commercial-line-row__hint">40 hrs/mes · ROL-STRAT-DIR</div>
+            </td>
+            <td class="num">40</td>
+            <td class="center">Hora</td>
+            <td class="num">USD 65</td>
+            <td class="num">USD 2,600</td>
+          </tr>
+          <tr class="commercial-line-row">
+            <td>
+              <div class="commercial-line-row__label">Content Manager (×2)</div>
+              <div class="commercial-line-row__hint">320 hrs/mes · ROL-CONT-MGR</div>
+            </td>
+            <td class="num">320</td>
+            <td class="center">Hora</td>
+            <td class="num">USD 14</td>
+            <td class="num">USD 4,480</td>
+          </tr>
+          <tr class="commercial-line-row">
+            <td>
+              <div class="commercial-line-row__label">Data Analyst</div>
+              <div class="commercial-line-row__hint">80 hrs/mes · ROL-DATA-ANL</div>
+            </td>
+            <td class="num">80</td>
+            <td class="center">Hora</td>
+            <td class="num">USD 12</td>
+            <td class="num">USD 960</td>
+          </tr>
+          <tr class="commercial-line-row">
+            <td>
+              <div class="commercial-line-row__label">Adobe Creative Cloud (4 seats)</div>
+              <div class="commercial-line-row__hint">Pass-through · TLS-ADOBE-CC</div>
+            </td>
+            <td class="num">4</td>
+            <td class="center">Licencia</td>
+            <td class="num">USD 20</td>
+            <td class="num">USD 80</td>
+          </tr>
+          <tr class="commercial-bundle-row">
+            <td colspan="4">Mensualidad bundle base</td>
+            <td class="num">USD 14,200</td>
+          </tr>
+          <tr class="commercial-bundle-row">
+            <td colspan="4">Compromiso 12 meses</td>
+            <td class="num">USD 170,400</td>
+          </tr>
+          <tr class="commercial-bundle-row">
+            <td colspan="4">Setup &amp; onboarding (one-time)</td>
+            <td class="num">USD 14,100</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="commercial-summary">
+        <div class="commercial-summary__row">
+          <span class="commercial-summary__label">Subtotal neto</span>
+          <span class="commercial-summary__value">USD 184,500</span>
+        </div>
+        <div class="commercial-summary__row">
+          <span class="commercial-summary__label">Descuento aplicado</span>
+          <span class="commercial-summary__value">— USD 0</span>
+        </div>
+        <div class="commercial-summary__row">
+          <span class="commercial-summary__label">IVA (aplicable por país)</span>
+          <span class="commercial-summary__value">A determinar</span>
+        </div>
+        <div class="commercial-summary__row commercial-summary__row--total">
+          <span class="commercial-summary__label">Total</span>
+          <span class="commercial-summary__value">USD 184,500</span>
+        </div>
+      </div>
+      <div class="fx-note">
+        <div class="fx-note__title">Tipo de cambio aplicado</div>
+        USD 1 = CLP 950.40 · fecha 24/04/2026 · fuente Banco Central de Chile.
+        El monto en CLP queda fijado a esta tasa durante la vigencia de la cotización.
+      </div>
+    </div>
+    <footer class="page-footer">
+      <span class="page-footer__legal">
+        <span class="page-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Confidencial · No distribuir sin autorización
+      </span>
+      <span class="page-footer__pagination">
+        <span class="page-footer__id">EFG-2026-00184 v2</span>
+        Página <strong>5</strong> de <strong>8</strong>
+      </span>
+    </footer>
+  </article>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PÁGINA 6 — INVESTMENT TIMELINE
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Página 6 · Investment Timeline (conditional · solo si recurring/milestones)</div>
+  <article class="pdf-page">
+    <header class="page-header">
+      <div class="page-header__brand">
+        <img src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+      </div>
+      <div class="page-header__meta">
+        Propuesta <strong>EFG-2026-00184 v2</strong>
+      </div>
+    </header>
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">05 · Cronograma de inversión</p>
+      <h2 class="section-heading__title">Calendario de pagos y entregables</h2>
+      <p class="section-heading__subtitle">
+        Pagos mensuales contra factura emitida los primeros 5 días hábiles
+        de cada mes. Setup &amp; onboarding se facturan al inicio del contrato.
+      </p>
+    </div>
+    <div class="section-body">
+      <p class="timeline-intro">
+        El compromiso es de <strong>12 meses</strong> con renovación tácita mensual.
+        Cualquiera de las partes puede notificar la no-renovación con 60 días
+        de antelación al cumplimiento del periodo.
+      </p>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div>
+            <p class="timeline-item__date">Mayo 2026 · M0</p>
+            <p class="timeline-item__milestone">Kick-off &amp; onboarding</p>
+            <p class="timeline-item__detail">
+              Setup técnico, integraciones, governance, training del equipo
+              de marketing del cliente. Factura emitida al firmar.
+            </p>
+          </div>
+          <div class="timeline-item__amount">USD 14,100</div>
+        </div>
+        <div class="timeline-item">
+          <div>
+            <p class="timeline-item__date">Junio 2026 · M1</p>
+            <p class="timeline-item__milestone">Operación mensual #1</p>
+            <p class="timeline-item__detail">
+              Inicio de operación del retainer. Facturación recurrente.
+            </p>
+          </div>
+          <div class="timeline-item__amount">USD 14,200</div>
+        </div>
+        <div class="timeline-item">
+          <div>
+            <p class="timeline-item__date">Julio 2026 — Abril 2027 · M2-M11</p>
+            <p class="timeline-item__milestone">Operación mensual #2-#11</p>
+            <p class="timeline-item__detail">
+              10 ciclos mensuales. Cada uno incluye reportería ejecutiva,
+              QBR trimestral en M3 y M9, y refresh de plan en M6.
+            </p>
+          </div>
+          <div class="timeline-item__amount">10 × USD 14,200</div>
+        </div>
+        <div class="timeline-item">
+          <div>
+            <p class="timeline-item__date">Mayo 2027 · M12</p>
+            <p class="timeline-item__milestone">Cierre de ciclo + renewal review</p>
+            <p class="timeline-item__detail">
+              Última factura del ciclo + revisión de renovación 60 días antes.
+            </p>
+          </div>
+          <div class="timeline-item__amount">USD 14,200</div>
+        </div>
+      </div>
+      <div class="payment-methods">
+        <h4>Métodos de pago aceptados</h4>
+        <p>
+          Transferencia bancaria local (Chile · Banco BCI · Cta corriente
+          74-0000-187), transferencia internacional (USD), tarjeta corporativa
+          (Visa/Mastercard) vía link Stripe seguro.
+        </p>
+      </div>
+    </div>
+    <footer class="page-footer">
+      <span class="page-footer__legal">
+        <span class="page-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Confidencial · No distribuir sin autorización
+      </span>
+      <span class="page-footer__pagination">
+        <span class="page-footer__id">EFG-2026-00184 v2</span>
+        Página <strong>6</strong> de <strong>8</strong>
+      </span>
+    </footer>
+  </article>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PÁGINA 7 — TERMS & CONDITIONS
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Página 7 · Terms &amp; Conditions</div>
+  <article class="pdf-page">
+    <header class="page-header">
+      <div class="page-header__brand">
+        <img src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+      </div>
+      <div class="page-header__meta">
+        Propuesta <strong>EFG-2026-00184 v2</strong>
+      </div>
+    </header>
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">06 · Términos y condiciones</p>
+      <h2 class="section-heading__title">Marco contractual</h2>
+      <p class="section-heading__subtitle">
+        Condiciones generales aplicables a esta propuesta. La aceptación de
+        esta cotización implica conformidad con cada punto. El contrato
+        formal se firma por separado.
+      </p>
+    </div>
+    <div class="section-body">
+      <div class="term">
+        <h3 class="term__title">1. Vigencia y aceptación</h3>
+        <p class="term__body">
+          Esta propuesta es válida hasta el 30/05/2026. Pasada esa fecha
+          requiere re-validación por parte de Efeonce, ya que tarifas, FX
+          y disponibilidad de equipo pueden variar.
+        </p>
+      </div>
+      <div class="term">
+        <h3 class="term__title">2. Facturación y pagos</h3>
+        <p class="term__body">
+          Facturación los primeros 5 días hábiles del mes correspondiente
+          al periodo de servicio. Plazo de pago: 15 días corridos desde
+          emisión. Mora: interés simple del 1% mensual sobre saldo.
+        </p>
+      </div>
+      <div class="term">
+        <h3 class="term__title">3. Confidencialidad</h3>
+        <p class="term__body">
+          Toda información intercambiada entre las partes durante el ciclo
+          de venta y ejecución es confidencial y permanece como tal por
+          5 años desde la finalización del contrato. Aplica a estrategias,
+          resultados, métricas y cualquier dato no público de la operación.
+        </p>
+      </div>
+      <div class="term">
+        <h3 class="term__title">4. Propiedad intelectual</h3>
+        <p class="term__body">
+          Los entregables creados específicamente para este programa
+          (campañas, contenidos, dashboards, código custom) son propiedad
+          del cliente al pago efectivo de cada periodo. El stack
+          tecnológico, frameworks, plantillas y know-how preexistente
+          permanecen como propiedad de Efeonce.
+        </p>
+      </div>
+      <div class="term">
+        <h3 class="term__title">5. Renovación y término anticipado</h3>
+        <p class="term__body">
+          El contrato se renueva tácitamente al vencimiento mensual.
+          Cualquier parte puede notificar la no-renovación con 60 días de
+          antelación. Término anticipado por causa imputable se rige por
+          la cláusula 11 del contrato marco.
+        </p>
+      </div>
+      <div class="term">
+        <h3 class="term__title">6. Jurisdicción</h3>
+        <p class="term__body">
+          Las partes se someten a la jurisdicción de los tribunales
+          ordinarios de Santiago de Chile. Para clientes facturados desde
+          entidades operativas locales (Colombia, México) aplican los
+          tribunales del país de facturación correspondiente.
+        </p>
+      </div>
+    </div>
+    <footer class="page-footer">
+      <span class="page-footer__legal">
+        <span class="page-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Confidencial · No distribuir sin autorización
+      </span>
+      <span class="page-footer__pagination">
+        <span class="page-footer__id">EFG-2026-00184 v2</span>
+        Página <strong>7</strong> de <strong>8</strong>
+      </span>
+    </footer>
+  </article>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PÁGINA 8 — SIGNATURES + QR
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Página 8 · Signatures + QR verificación</div>
+  <article class="pdf-page">
+    <header class="page-header">
+      <div class="page-header__brand">
+        <img src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+      </div>
+      <div class="page-header__meta">
+        Propuesta <strong>EFG-2026-00184 v2</strong>
+      </div>
+    </header>
+    <div class="section-heading">
+      <p class="section-heading__eyebrow">07 · Aceptación</p>
+      <h2 class="section-heading__title">Firmas autorizadas</h2>
+      <p class="section-heading__subtitle">
+        La firma de esta cotización por ambas partes formaliza la aceptación
+        comercial de la propuesta. El contrato formal con cláusulas
+        completas se firma por separado en plazo no mayor a 10 días hábiles.
+      </p>
+    </div>
+    <div class="section-body">
+      <div class="signatures-grid">
+        <div class="signature-block">
+          <p class="signature-block__eyebrow">Por el cliente</p>
+          <div class="signature-block__line"></div>
+          <div class="signature-block__field">
+            <span class="signature-block__label">Nombre</span>
+            <span class="signature-block__value">_____________________</span>
+          </div>
+          <div class="signature-block__field">
+            <span class="signature-block__label">Cargo</span>
+            <span class="signature-block__value">_____________________</span>
+          </div>
+          <div class="signature-block__field">
+            <span class="signature-block__label">RUT</span>
+            <span class="signature-block__value">_____________________</span>
+          </div>
+          <div class="signature-block__field">
+            <span class="signature-block__label">Fecha</span>
+            <span class="signature-block__value">__ / __ / ____</span>
+          </div>
+        </div>
+        <div class="signature-block">
+          <p class="signature-block__eyebrow">Por Efeonce Group SpA</p>
+          <div class="signature-block__line"></div>
+          <div class="signature-block__field">
+            <span class="signature-block__label">Nombre</span>
+            <span class="signature-block__value">Julio Reyes</span>
+          </div>
+          <div class="signature-block__field">
+            <span class="signature-block__label">Cargo</span>
+            <span class="signature-block__value">Account Lead · Globe</span>
+          </div>
+          <div class="signature-block__field">
+            <span class="signature-block__label">RUT</span>
+            <span class="signature-block__value">77.357.182-1</span>
+          </div>
+          <div class="signature-block__field">
+            <span class="signature-block__label">Fecha</span>
+            <span class="signature-block__value">24 / 04 / 2026</span>
+          </div>
+        </div>
+      </div>
+      <div class="verify-block">
+        <div class="verify-block__qr"></div>
+        <div class="verify-block__copy">
+          <h4>Verifica la autenticidad</h4>
+          <p>
+            Escanea el código QR para validar esta cotización en línea.
+            El sistema confirma número, versión, totales y vigencia contra
+            nuestros registros, y registra cada apertura como audit trail.
+          </p>
+          <code>greenhouse.efeoncepro.com/public/quote/EFG-2026-00184/v2/{signed-token}</code>
+        </div>
+      </div>
+    </div>
+    <footer class="page-footer">
+      <span class="page-footer__legal">
+        <span class="page-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Confidencial · No distribuir sin autorización
+      </span>
+      <span class="page-footer__pagination">
+        <span class="page-footer__id">EFG-2026-00184 v2</span>
+        Página <strong>8</strong> de <strong>8</strong>
+      </span>
+    </footer>
+  </article>
+
+</body>
+</html>

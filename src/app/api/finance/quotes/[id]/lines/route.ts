@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { publishQuotationUpdated } from '@/lib/commercial/quotation-events'
 import { query } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
@@ -22,6 +23,7 @@ import {
 import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
+import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 
 export const dynamic = 'force-dynamic'
 
@@ -126,8 +128,19 @@ export async function GET(
 
 interface ReplaceLinesPayload {
   lineItems: QuotationLineInput[]
+  pricingContext?: {
+    commercialModelCode?: string | null
+    countryFactorCode?: string | null
+    autoResolveAddons?: boolean | 'internal_only' | null
+  } | null
   createVersion?: boolean
 }
+
+const isPricingEngineCommercialModel = (value: unknown): value is CommercialModelCode =>
+  value === 'on_going' ||
+  value === 'on_demand' ||
+  value === 'hybrid' ||
+  value === 'license_consulting'
 
 export async function POST(
   request: Request,
@@ -223,6 +236,17 @@ export async function POST(
           row.global_discount_value != null ? Number(row.global_discount_value) : null,
         marginTargetPct: row.target_margin_pct != null ? Number(row.target_margin_pct) : null,
         marginFloorPct: row.margin_floor_pct != null ? Number(row.margin_floor_pct) : null,
+        pricingContext: body.pricingContext
+          ? {
+              commercialModelCode: isPricingEngineCommercialModel(
+                body.pricingContext.commercialModelCode
+              )
+                ? body.pricingContext.commercialModelCode
+                : null,
+              countryFactorCode: body.pricingContext.countryFactorCode ?? null,
+              autoResolveAddons: body.pricingContext.autoResolveAddons ?? 'internal_only'
+            }
+          : null,
         lineItems: body.lineItems,
         createdBy: tenant.userId
       },
@@ -231,6 +255,45 @@ export async function POST(
         versionNotes: body.createVersion ? 'Line items replaced via API.' : null
       }
     )
+
+    const quotationRows = await query<{
+      hubspot_quote_id: string | null
+      hubspot_deal_id: string | null
+      source_system: string | null
+      organization_id: string | null
+      pricing_model: string | null
+      commercial_model: string | null
+      staffing_model: string | null
+    }>(
+      `SELECT hubspot_quote_id,
+              hubspot_deal_id,
+              source_system,
+              organization_id,
+              pricing_model,
+              commercial_model,
+              staffing_model
+         FROM greenhouse_commercial.quotations
+        WHERE quotation_id = $1
+        LIMIT 1`,
+      [identity.quotationId]
+    )
+
+    const quotation = quotationRows[0]
+
+    await publishQuotationUpdated({
+      quotationId: identity.quotationId,
+      quoteId: identity.financeQuoteId ?? identity.quotationId,
+      hubspotQuoteId: quotation?.hubspot_quote_id ?? null,
+      hubspotDealId: quotation?.hubspot_deal_id ?? null,
+      sourceSystem: quotation?.source_system ?? null,
+      organizationId: quotation?.organization_id ?? null,
+      spaceId: null,
+      updatedBy: tenant.userId,
+      changedFields: ['line_items'],
+      pricingModel: quotation?.pricing_model ?? null,
+      commercialModel: quotation?.commercial_model ?? null,
+      staffingModel: quotation?.staffing_model ?? null
+    })
 
     return NextResponse.json({
       quotationId: identity.quotationId,

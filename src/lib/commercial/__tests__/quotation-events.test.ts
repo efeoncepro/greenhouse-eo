@@ -11,6 +11,7 @@ import {
   publishProductCreated,
   publishProductSynced,
   publishQuoteCreated,
+  publishQuotationUpdated,
   publishQuoteLineItemsSynced,
   publishQuoteSynced
 } from '../quotation-events'
@@ -87,6 +88,48 @@ describe('publishQuoteSynced', () => {
     expect(legacyCall[0]).toMatchObject({ eventType: 'finance.quote.synced' })
     expect(canonicalCall[0]).toMatchObject({ eventType: 'commercial.quotation.synced' })
     expect(canonicalCall[0].payload).toMatchObject({ action: 'updated', quotationId: 'qt-abc' })
+  })
+})
+
+describe('publishQuotationUpdated', () => {
+  it('emits canonical commercial.quotation.updated with changed fields and HubSpot anchors', async () => {
+    await publishQuotationUpdated({
+      quotationId: 'qt-abc',
+      quoteId: 'qt-abc',
+      hubspotQuoteId: 'hs-123',
+      hubspotDealId: 'deal-456',
+      sourceSystem: 'manual',
+      organizationId: 'org-1',
+      spaceId: null,
+      updatedBy: 'user-1',
+      changedFields: ['hubspot_deal_id', 'line_items'],
+      pricingModel: 'hybrid',
+      commercialModel: 'project',
+      staffingModel: 'outcome_based'
+    })
+
+    expect(mockPublishOutboxEvent).toHaveBeenCalledTimes(1)
+    expect(mockPublishOutboxEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        aggregateType: 'quotation',
+        aggregateId: 'qt-abc',
+        eventType: 'commercial.quotation.updated',
+        payload: expect.objectContaining({
+          quotationId: 'qt-abc',
+          quoteId: 'qt-abc',
+          hubspotQuoteId: 'hs-123',
+          hubspotDealId: 'deal-456',
+          sourceSystem: 'manual',
+          organizationId: 'org-1',
+          updatedBy: 'user-1',
+          changedFields: ['hubspot_deal_id', 'line_items'],
+          pricingModel: 'hybrid',
+          commercialModel: 'project',
+          staffingModel: 'outcome_based'
+        })
+      }),
+      undefined
+    )
   })
 })
 

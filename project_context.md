@@ -1,3 +1,265 @@
+## Delta 2026-04-25 Onboarding ya tiene arquitectura canónica propia
+
+- Greenhouse ya no debe tratar onboarding como una suma implícita de provisioning SCIM + checklist HRIS + activación manual dispersa.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_WORKFORCE_ONBOARDING_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - el agregado canonico es un caso de inicio de relacion de trabajo con snapshot contractual y legal
+  - `SCIM` es signal source de identidad, no owner total del onboarding
+  - el checklist legacy de onboarding en HRIS pasa a ser child object operativo del caso, no su source of truth
+  - el onboarding de placement (`Staff Aug`) sigue siendo un agregado separado del onboarding workforce interno
+
+## Delta 2026-04-25 Workforce ya tiene arquitectura canónica propia
+
+- Greenhouse ya no debe tratar `Workforce` como una suma implícita de `People + HR + Payroll + SCIM`.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_WORKFORCE_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - `Workforce` es el dominio madre de lifecycle laboral-operativo, drift y orchestration sobre personas de trabajo
+  - `Person360.workforce` es el target canónico de lectura por persona
+  - `Workforce Workspace` es la shell operativa objetivo por encima de `People`, `HR` y `Payroll`
+  - `Offboarding` queda como subdominio especializado bajo `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`
+
+## Delta 2026-04-25 Offboarding ya tiene arquitectura canónica propia
+
+- Greenhouse ya no debe tratar offboarding como una suma implícita de SCIM deactivation + checklist HRIS + cleanup manual en Payroll/People.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - el agregado canonico es un caso de salida de relacion de trabajo con snapshot contractual y legal
+  - `SCIM` es signal source de identidad, no owner total del offboarding
+  - el checklist legacy de offboarding en HRIS pasa a ser child object operativo del caso, no su source of truth
+  - el dominio debe pensarse en ambos planos:
+    - `views` (`People` como ficha canonica, `HR` como surface operativa)
+    - `entitlements/capabilities` para create/review/approve/execute/cancel
+
+## Delta 2026-04-25 API Platform ahora tiene arquitectura canónica propia
+
+- Greenhouse ya no debe operar su capa API solo desde docs sueltos en `docs/api/*`.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - la arquitectura API se define como capability shared de plataforma
+  - `docs/api/GREENHOUSE_API_REFERENCE_V1.md` y `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md` quedan como documentos derivados/transicionales
+  - nuevos contratos ecosystem-facing deben preferir `api/platform/*` como namespace objetivo
+  - `MCP` sigue siendo downstream de contratos API estables
+
+## Delta 2026-04-23 Reactive projections ahora declaran writer privileges y clasifican fallos infra tipados
+
+- Las projections que escriben tablas shared como excepción (`greenhouse_serving`) ya no deben depender solo de grants implícitos o del texto libre de un dead-letter.
+- Contrato nuevo:
+  - `ProjectionDefinition.requiredTablePrivileges`
+  - helper `src/lib/sync/projection-runtime-health.ts`
+  - helper `src/lib/sync/reactive-error-classification.ts`
+- Regla operativa nueva:
+  - toda projection que materializa tablas shared debe declarar explícitamente sus privilegios requeridos para que Ops Health pueda detectar drift antes de que llegue un evento real
+  - los fallos reactivos de infraestructura ya no deben persistirse solo como texto libre; se tipifican con `error_class`, `error_family` e `is_infrastructure_fault` en `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue`
+- Primer consumidor:
+  - `service_attribution` declara write privileges sobre `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`
+- Operación nueva:
+  - `POST /api/admin/ops/projections/requeue-failed` acepta filtros opcionales `projectionName`, `errorClass` y `onlyInfrastructure`
+
+## Delta 2026-04-23 TASK-583 converge el contrato local de HubSpot quotes hacia publish/tax native
+
+- El outbound de quotes ya no debe armar payloads create/update por carriles distintos.
+- Nuevo helper canónico:
+  - `src/lib/hubspot/hubspot-quote-sync.ts`
+  - source of truth para `sender`, `senderCompany`, binding catálogo-first, billing semantics y metadata tributaria outbound
+- Regla operativa nueva:
+  - si una línea ya referencia catálogo Greenhouse (`product_id`, `product_code`, `service_sku`), el outbound exige `hubspot_product_id`
+  - si falta ese binding, el carril falla explícitamente con `catalog_binding_missing:*` en vez de degradar silenciosamente a línea libre
+- Tax binding native:
+  - Greenhouse ya no debe hardcodear `hs_tax_rate_group_id`
+  - el resolver canónico consulta `GET /tax-rates` del bridge `hubspot-greenhouse-integration`, filtra tasas activas y mapea por rate normalizada
+- Observabilidad outbound nueva en `greenhouse_commercial.quotations`:
+  - `hubspot_quote_status`
+  - `hubspot_quote_link`
+  - `hubspot_quote_pdf_download_link`
+  - `hubspot_quote_locked`
+  - `hubspot_last_synced_at`
+- `create-hubspot-quote.ts` y `update-hubspot-quote.ts` ya convergen sobre el integration service autenticado; el cliente update degradado legacy no debe reintroducirse
+
+## Delta 2026-04-23 Quote outbound HubSpot converge on canonical `organization`, not `space`
+
+- El carril reactivo `quotation_hubspot_outbound` ya no debe asumir `space` como anchor para crear cotizaciones HubSpot.
+- La ancla canonica del outbound comercial es:
+  - `organization_id` -> `greenhouse_core.organizations.hubspot_company_id`
+  - `hubspot_deal_id`
+  - `contact_identity_profile_id` -> HubSpot contact
+- `space` queda solo como bridge legacy para mirrors financieros locales cuando la organización ya es cliente; no puede bloquear la creación/sincronización de una quote HubSpot.
+- El resolver canónico de contacto HubSpot para este lane es:
+  - `greenhouse_serving.person_360.hubspot_contact_id`
+  - fallback `greenhouse_crm.contacts.hubspot_contact_id`
+  - fallback final `greenhouse_core.identity_profiles.primary_source_object_id` si el source es `hubspot/contact`
+- El `ops-worker` debe publicar ambos valores de integración para writes reactivos a HubSpot:
+  - `GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF`
+  - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+
+## Delta 2026-04-23 Quote Builder hydratea deals HubSpot de la company via read-through
+
+- `GET /api/commercial/organizations/[id]/deals` sigue siendo el contrato canónico downstream del `organizationId`, pero ya no asume que `greenhouse_commercial.deals` contiene previamente todos los negocios de la company.
+- Si la organization tiene `hubspot_company_id`, el endpoint ejecuta una hidratación live desde HubSpot y luego responde desde Greenhouse con el mirror actualizado.
+- La lane canónica nueva vive en `src/lib/commercial/sync-organization-hubspot-deals.ts` y materializa todos los deals asociados a la company, incluyendo historicos, `closedwon` y `closedlost`; no filtra por etapa.
+- La dependencia upstream es `GET /companies/{hubspotCompanyId}/deals` del servicio `hubspot-greenhouse-integration`, que devuelve metadata live de pipeline y stage desde HubSpot Pipelines API.
+
+## Delta 2026-04-22 Quote Builder contact hydration converge via canonical read-through
+
+- `GET /api/commercial/organizations/[id]/contacts` sigue siendo el contrato canónico downstream del `organizationId`, pero ya no asume que el mirror local de contactos está precargado.
+- Si la organization tiene `hubspot_company_id` y todavía no existen `person_memberships` comerciales locales, el endpoint ejecuta una primera hidratación canónica desde HubSpot y luego responde desde Greenhouse.
+- La lane admin `POST /api/organizations/[id]/hubspot-sync` quedó convergida sobre el mismo helper `src/lib/account-360/sync-organization-hubspot-contacts.ts`.
+
+## Delta 2026-04-22 TASK-550 cierra los follow-ups enterprise del pricing catalog
+
+- El Admin Pricing Catalog ya no tiene gaps abiertos respecto del cierre de TASK-471:
+  - revert one-click para governance types (`role_tier_margin`, `service_tier_margin`, `commercial_model_multiplier`, `country_pricing_factor`, `employment_type`)
+  - gate de impacto alto en los 4 tabs guardables del `EditSellableRoleDrawer`
+  - notificaciones reactivas para la approval queue del catálogo
+  - Excel import con proposal/apply split: `update` directo, `create/delete` vía approval workflow
+- Contrato runtime nuevo:
+  - route `POST /api/admin/pricing-catalog/import-excel/propose`
+  - helper `src/lib/commercial/pricing-catalog-excel-approval.ts`
+  - projection `src/lib/sync/projections/pricing-catalog-approval-notifier.ts`
+  - eventos `commercial.pricing_catalog_approval.proposed` y `commercial.pricing_catalog_approval.decided`
+- Flag nuevo:
+  - `GREENHOUSE_PRICING_APPROVAL_NOTIFICATIONS`
+  - default recomendado: `false` hasta validar entrega en el ambiente objetivo
+  - cuando está apagado, la approval queue sigue operando normalmente; solo se omite el dispatch reactivo de email/Slack/in-app
+- Aclaración arquitectónica vigente:
+  - el tenant scope del pricing impact analysis ya no debe describirse como broad `space_id`
+  - el scope canónico para quotations/commercial readers actuales es `organization_id`
+  - `space_id` se conserva solo donde una proyección legacy aún lo exige (`deal_pipeline_snapshots`)
+
+## Delta 2026-04-21 TASK-542 cierra la surface administrativa de Party Lifecycle
+
+- Greenhouse ya tiene surface administrativa canonica para lifecycle comercial en Admin Center.
+- Contrato nuevo:
+  - navegación `Commercial Parties` en `/admin/commercial/parties`
+  - detail `/admin/commercial/parties/:id`
+  - projection `src/lib/sync/projections/party-lifecycle-snapshot.ts`
+  - tabla `greenhouse_serving.party_lifecycle_snapshots`
+  - store `src/lib/commercial/party/party-lifecycle-snapshot-store.ts`
+  - comandos admin `override-party-lifecycle.ts` y `resolve-party-sync-conflict.ts`
+  - endpoint `POST /party-lifecycle/sweep` en `services/ops-worker/server.ts`
+- Reglas operativas:
+  - la lectura de funnel/velocity debe consumir la snapshot, no queries ad-hoc
+  - las transiciones manuales solo pasan por `promoteParty` con `source='operator_override'` y razón obligatoria
+  - la resolución de conflictos vive sobre `greenhouse_commercial.party_sync_conflicts`
+  - el sweep de inactividad corre en `ops-worker`, no en Vercel serverless
+
+## Delta 2026-04-21 TASK-540 aterriza la foundation outbound de Party Lifecycle
+
+- Greenhouse ya tiene carril reactivo local para devolver lifecycle comercial hacia HubSpot Companies.
+- Contrato nuevo:
+  - projection `src/lib/sync/projections/party-hubspot-outbound.ts`
+  - helper `src/lib/hubspot/push-party-lifecycle.ts`
+  - tabla `greenhouse_commercial.party_sync_conflicts`
+  - helpers `src/lib/sync/field-authority.ts` y `src/lib/sync/anti-ping-pong.ts`
+  - eventos `commercial.party.hubspot_synced_out` y `commercial.party.sync_conflict`
+  - script `scripts/create-hubspot-company-custom-properties.ts`
+- Reglas operativas:
+  - el outbound solo escribe campos Greenhouse-owned; HubSpot sigue siendo owner de `name`, `domain`, `industry`, address y phone
+  - `gh_last_write_at` es el anchor canónico del anti-ping-pong; el inbound `sync-hubspot-company-lifecycle.ts` ya lo consume para skippear loopbacks
+  - el write HTTP usa `GREENHOUSE_INTEGRATION_API_TOKEN` contra el servicio externo `hubspot-greenhouse-integration`
+  - el servicio externo `hubspot-greenhouse-integration` ya expone `PATCH /companies/:id/lifecycle`; `endpoint_not_deployed` queda como degraded path defensivo
+  - la decisión V1 de compliance es exportar `gh_mrr_tier`; no se empuja monto bruto `gh_mrr_clp`
+
+## Delta 2026-04-21 TASK-537 cierra la Fase C de party lifecycle con search/adopt backend-only
+
+- Greenhouse ya tiene carril backend para buscar y adoptar parties comerciales antes de la UI unificada del Quote Builder.
+- Contrato nuevo:
+  - `GET /api/commercial/parties/search`
+  - `POST /api/commercial/parties/adopt`
+  - tabla `greenhouse_commercial.party_endpoint_requests`
+  - helpers `party-search-reader`, `hubspot-candidate-reader`, `party-endpoint-rate-limit`
+- Reglas operativas:
+  - `greenhouse_crm.companies` sigue siendo el mirror local primario de HubSpot companies, pero `GET /api/commercial/parties/search` ahora suplementa con search live vía `hubspot-greenhouse-integration` cuando el mirror todavía no refleja una company existente
+  - toda organization materializada se scopea por tenant usando `resolveFinanceQuoteTenantOrganizationIds()`
+  - los `hubspot_candidate` no materializados solo se exponen a `efeonce_internal`, porque aun no existe anchor tenant-safe para mostrarlos a tenants externos
+  - `/adopt` es idempotente por `hubspot_company_id` y, si el lifecycle mapea a `active_client`, completa tambien `instantiateClientForParty`
+  - `TASK-538` debe consumir estos endpoints tal cual y no reimplementar merge/search inline
+
+## Delta 2026-04-21 TASK-533 materializa libro IVA mensual y posicion fiscal por tenant
+
+- Greenhouse ya puede consolidar IVA mensual por `space_id` sin calcular inline en UI.
+- Contrato nuevo:
+  - tablas `greenhouse_finance.vat_ledger_entries` y `greenhouse_finance.vat_monthly_positions`
+  - helper `src/lib/finance/vat-ledger.ts`
+  - projection reactiva `vat_monthly_position`
+  - evento coarse-grained `finance.vat_position.period_materialized`
+  - endpoint Cloud Run `POST /vat-ledger/materialize` en `ops-worker`
+  - serving route `GET /api/finance/vat/monthly-position` con export CSV
+- Reglas operativas:
+  - el débito fiscal nace desde `income.tax_snapshot_json`
+  - el crédito fiscal nace solo desde `expenses.recoverable_tax_amount`
+  - `non_recoverable_tax_amount` queda separado y no incrementa crédito
+  - toda lectura mensual debe filtrar por `space_id`
+
+## Delta 2026-04-21 TASK-532 formaliza IVA de compras como contrato explícito de costo
+
+- `greenhouse_finance.expenses` ya no debe leerse solo como `subtotal + tax_amount + total_amount`.
+- Contrato nuevo:
+  - `tax_code` + `tax_snapshot_json` + `tax_snapshot_frozen_at`
+  - `tax_recoverability`
+  - buckets `recoverable_tax_amount`, `non_recoverable_tax_amount`, `effective_cost_amount`
+- Regla operativa:
+  - IVA recuperable NO entra a costo operativo
+  - IVA no recuperable SÍ entra a costo/gasto
+  - consumers downstream de P&L/economics deben preferir `COALESCE(effective_cost_amount_clp, total_amount_clp)` sobre `total_amount_clp` bruto
+- Nubox purchases y payroll-generated expenses ya escriben el mismo contrato.
+- `TASK-533` debe consumir estos buckets como base del ledger mensual de IVA.
+
+## Delta 2026-04-21 EPIC-003 formaliza Ops Registry como framework operativo repo-native y federable
+
+- Greenhouse ya no debe pensar la operacion del framework documental solo como una colección de markdowns navegados manualmente.
+- Decision canonica nueva:
+  - nace `Ops Registry` como capa derivada para indexar, validar, relacionar y consultar `architecture`, `tasks`, `epics`, `mini-tasks`, `issues`, `project_context`, `Handoff` y `changelog`
+  - la source of truth sigue en Git y en markdown local a cada repo
+  - el sistema debe servir tanto a humanos como a agentes
+  - el diseño base debe escalar a repos hermanos por federacion, no por centralizacion
+  - el sistema debe exponer API HTTP y MCP para LLMs/agents
+  - el sistema no solo lee: debe poder crear y actualizar artefactos mediante comandos write-safe materializados en markdown
+  - el sistema debe ser template-aware y process-aware: respetar `TASK_TEMPLATE`, `TASK_PROCESS`, `EPIC_TEMPLATE`, `MINI_TASK_TEMPLATE` y el modelo de issues
+- Mounting técnico objetivo:
+  - `src/lib/ops-registry/**`
+  - `scripts/ops-registry-*.mjs`
+  - `.generated/ops-registry/**`
+  - `src/app/api/internal/ops-registry/**`
+  - `src/app/(dashboard)/admin/ops-registry/**`
+  - `src/mcp/ops-registry/**`
+- Stack recomendado:
+  - `TypeScript + Node.js`
+  - `unified + remark-parse`
+  - `zod`
+  - JSON derivados como contrato V1; base externa opcional solo como cache futura, nunca como truth primaria
+- Artefactos derivados mínimos:
+  - `registry.json`
+  - `graph.json`
+  - `validation-report.json`
+  - `stale-report.json`
+- Programa operativo:
+  - `EPIC-003 — Ops Registry Federated Operational Framework`
+  - child tasks iniciales: `TASK-558` a `TASK-561`
+
+## Delta 2026-04-21 EPIC-002 formaliza la separacion canonica Comercial vs Finanzas
+
+- Greenhouse ya no debe tratar `Finance` como owner primario de quotes, contracts, SOW, master agreements, products y pipeline comercial solo porque varias rutas legacy sigan bajo `/finance/...`.
+- Decision canonica nueva:
+  - `Comercial` y `Finanzas` pasan a ser dominios hermanos del portal
+  - la primera separacion ocurre en `navegacion + surfaces + autorizacion`
+  - la primera separacion **no** obliga a migrar paths legacy `/finance/...`
+- Fuente especializada:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`
+- Contrato operativo:
+  - `Comercial` es owner de `pipeline`, `deals`, `cotizaciones`, `contratos`, `SOW`, `acuerdos marco` y `productos`
+  - `Finanzas` conserva ownership de `ingresos`, `egresos`, `cobros`, `pagos`, `banco`, `posicion de caja`, `conciliacion`, `asignaciones` y `economia`
+  - el access model objetivo requiere los dos planos:
+    - `views` / `authorizedViews` / `view_code` con namespace `comercial.*`
+    - `entitlements` / `routeGroup: commercial` con compat temporal a `finanzas.*`
+- Implicacion de ejecucion:
+  - este corte no cabe sanamente en una sola task
+  - nace `EPIC-002 — Commercial Domain Separation from Finance`
+  - child tasks iniciales: `TASK-554` a `TASK-557`
+
 ## Delta 2026-04-19 EPIC-001 introduce taxonomía canónica de epics y el programa documental transversal
 
 - El repo ya no usa solo `umbrella task` para coordinar programas grandes: nace `docs/epics/` con `EPIC-###`, `EPIC_TEMPLATE.md` y `EPIC_ID_REGISTRY.md`.
@@ -191,7 +453,46 @@
   - el sync respeta `manual_override`, puede dejar `unknown` cuando HubSpot no informa stage y usa `nubox_fallback` solo para rows legacy con evidencia económica runtime
   - el evento `crm.company.lifecyclestage_changed` existe para follow-ons del pipeline comercial, pero este corte no agrega consumer reactivo
 
+## Delta 2026-04-21 TASK-536 extiende HubSpot Companies inbound al Party Lifecycle
+
+- Greenhouse ya no debe esperar `closed-won` para conocer una contraparte comercial de HubSpot.
+- Runtime nuevo:
+  - helper `src/lib/hubspot/sync-hubspot-companies.ts`
+  - cron `GET /api/cron/hubspot-companies-sync`
+  - schedule Vercel `*/10 * * * *` incremental + `0 3 * * *` full (`?full=true`)
+  - rollout inicial detrás de `GREENHOUSE_PARTY_LIFECYCLE_SYNC` (removido luego por `TASK-543`)
+- Contrato operativo:
+  - el source-of-work local es `greenhouse_crm.companies`, pero el selector unificado de parties puede suplementar con search live contra Cloud Run para cerrar gaps operativos del mirror
+  - `scripts/sync-source-runtime-projections.ts` ya no filtra HubSpot companies sin `client_id` al proyectar `greenhouse_crm.companies`; el mirror local vuelve a incluir prospects puros
+  - toda alta de party sigue pasando por `createPartyFromHubSpotCompany`
+  - toda promoción posterior sigue pasando por `promoteParty`
+  - si HubSpot mapea a `active_client`, el pipeline instancia `client_id` con `instantiateClientForParty` para respetar el invariante del lifecycle
+  - el tracking queda en `greenhouse_sync.source_sync_runs` + `greenhouse_sync.source_sync_watermarks`
+  - `provider_only`, `disqualified` y `churned` quedan protegidos contra degradación inbound
+
+## Delta 2026-04-22 TASK-543 cierra el rollout legacy del Party Lifecycle
+
+- `QuoteBuilderShell` ya no lee `session.user.featureFlags` para el selector de organizations: create mode usa el selector unificado como carril default.
+- `src/lib/hubspot/sync-hubspot-companies.ts` y `GET /api/cron/hubspot-companies-sync` quedan default-on sin `GREENHOUSE_PARTY_LIFECYCLE_SYNC`.
+- Se elimina `src/lib/commercial/party/feature-flags.ts`; no queda helper runtime para `GREENHOUSE_PARTY_SELECTOR_UNIFIED`.
+- Regla importante para futuros cambios: no intentar “limpiar” `GET /api/commercial/organizations/[id]/contacts` ni `GET/POST /api/commercial/organizations/[id]/deals` como si fueran legacy; siguen siendo el contrato canónico downstream del `organizationId`.
+
 # project_context.md
+
+## Delta 2026-04-20 TASK-452 formaliza la foundation canónica de service attribution
+
+- Greenhouse ya no debe tratar el P&L por servicio como inferencia oportunista desde readers de Space, quotes o commercial cost.
+- Runtime nuevo:
+  - migración `20260420123025804_task-452-service-attribution-foundation.sql`
+  - tablas `greenhouse_serving.service_attribution_facts` y `greenhouse_serving.service_attribution_unresolved`
+  - helper `src/lib/service-attribution/materialize.ts`
+  - projection reactiva `src/lib/sync/projections/service-attribution.ts`
+  - evento `accounting.service_attribution.period_materialized`
+- Contrato operativo:
+  - revenue/direct cost/labor-overhead por servicio se resuelven `evidence-first` desde quotation / contract / PO / HES / deal cuando existe anchor suficiente
+  - `commercial_cost_attribution` sigue siendo truth layer `member + client + period`; el split a `service_id` ocurre downstream y deja `method`, `confidence` y `evidence_json`
+  - los casos ambiguos no se fuerzan; quedan en `service_attribution_unresolved`
+  - `TASK-146`, `TASK-147` y profitability per service ya tienen foundation factual, pero la UI client-facing aún no debe fabricar `service_economics` mientras no exista el read model derivado
 
 ## Delta 2026-04-19 TASK-483 crea runtime dedicado para commercial cost basis
 
@@ -526,6 +827,29 @@
   - el código y la migración existen en repo
   - la migración quedó aplicada el 2026-04-11 vía `pnpm pg:connect:migrate`
   - `src/types/db.d.ts` quedó regenerado en el mismo lote
+
+## Delta 2026-04-25 API Platform Foundation runtime ya existe
+
+- Greenhouse ya no está solo en fase documental para `API platform`.
+- Runtime nuevo:
+  - `src/lib/api-platform/core/*`
+  - `src/lib/api-platform/resources/*`
+  - `src/app/api/platform/ecosystem/context/route.ts`
+  - `src/app/api/platform/ecosystem/organizations/route.ts`
+  - `src/app/api/platform/ecosystem/organizations/[id]/route.ts`
+  - `src/app/api/platform/ecosystem/capabilities/route.ts`
+  - `src/app/api/platform/ecosystem/integration-readiness/route.ts`
+- Contrato operativo:
+  - el lane nuevo es aditivo y read-only
+  - el auth ecosystem sigue siendo binding-aware y consumer-scoped
+  - el envelope ahora es uniforme (`requestId`, `servedAt`, `version`, `data`, `meta` / `errors`)
+  - header de version vigente: `x-greenhouse-api-version`
+  - version default inicial: `2026-04-25`
+  - el scope canónico para isolation ya no se describe como “siempre `space_id`”; la lane ecosystem resuelve `organization`, `client`, `space` o `internal` según binding
+- Convivencia explícita:
+  - `/api/integrations/v1/*` y `/api/integrations/v1/sister-platforms/*` siguen vivos como lanes legacy/transicionales
+  - `capabilities` en `api/platform/ecosystem` significa catálogo/asignación de tenant capabilities, no runtime data de módulos UI
+  - `integration-readiness` significa health/readiness de integraciones; no readiness transversal genérica de toda la plataforma
 
 ## Delta 2026-04-11 Seed operativo para consumer piloto Kortex
 
@@ -4886,8 +5210,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `RESEND_API_KEY`
 - `RESEND_API_KEY_SECRET_REF`
+- `RESEND_WEBHOOK_SIGNING_SECRET`
+- `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF`
 - `EMAIL_FROM`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+- `GREENHOUSE_INTEGRATION_API_TOKEN` — token compartido para autenticar writes Greenhouse → servicio externo `hubspot-greenhouse-integration` (`PATCH /companies/:id/lifecycle`, `/deals`, y futuros endpoints outbound).
 - `AGENT_AUTH_SECRET` — shared secret para autenticación headless de agentes y E2E (generar con `openssl rand -hex 32`). Sin esta variable el endpoint `/api/auth/agent-session` responde 404.
 - `AGENT_AUTH_EMAIL` — email del usuario a autenticar en modo headless. Debe existir en la tabla de acceso de tenants.
 - `AGENT_AUTH_ALLOW_PRODUCTION` — `true` para permitir agent auth en production (no recomendado). Por defecto bloqueado cuando `VERCEL_ENV === 'production'`.
@@ -4911,7 +5238,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` habilitan Google SSO en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `RESEND_API_KEY` y `EMAIL_FROM` quedan reservadas para el sistema de emails transaccionales; no deben commitearse con valores reales y deben existir al menos en `Development`, `Preview`, `Staging` y `Production` si ese flujo se habilita.
 - `RESEND_API_KEY_SECRET_REF` es el contrato canónico recomendado cuando el mismo flujo de email puede correr en más de un runtime (por ejemplo Vercel + Cloud Run); el valor directo `RESEND_API_KEY` queda como fallback legacy.
+- `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF` es el contrato canónico recomendado para el webhook de Resend; el valor directo `RESEND_WEBHOOK_SIGNING_SECRET` queda como fallback legacy.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
+- `GREENHOUSE_INTEGRATION_API_TOKEN` debe existir al menos en `Development`, `Preview`, `Staging` y `Production`; autentica los writes outbound de Greenhouse hacia el servicio externo HubSpot y no debe quedar solo en overrides por branch.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.
 
@@ -4976,3 +5305,43 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.
 - `Handoff.md` es la fuente de continuidad entre turnos.
 - `AGENTS.md` define las reglas del repositorio y prevalece como guia operativa local.
+## Delta 2026-04-21 TASK-548 cierra el loop operativo de Product Catalog Sync
+
+- Greenhouse ya tiene detección nocturna de drift para `product_catalog` frente a HubSpot Products.
+- Runtime nuevo:
+  - `src/lib/commercial/product-catalog/drift-reconciler.ts`
+  - `src/lib/commercial/product-catalog/drift-run-tracker.ts`
+  - `src/lib/commercial/product-catalog/conflict-resolution-commands.ts`
+  - `services/ops-worker/product-catalog-drift-detect.ts`
+  - APIs admin `/api/admin/commercial/product-sync-conflicts/**`
+  - surface `/admin/commercial/product-sync-conflicts`
+- Contrato operativo:
+  - el scheduler canónico es `ops-product-catalog-drift-detect` a las `03:00` `America/Santiago`
+  - los runs se registran en `greenhouse_sync.source_sync_runs` con `source_system='product_catalog_drift_detect'`
+  - si el servicio externo aún no expone `GET /products/reconcile`, el lane degrada a `endpoint_not_deployed`/`cancelled` sin crear conflicts falsos
+  - las resoluciones admin (`adopt_hubspot_product`, `archive_hubspot_product`, `replay_greenhouse`, `accept_hubspot_field`, `ignore`) dejan audit trail en `pricing_catalog_audit_log`
+  - `accept_hubspot_field` solo aplica a productos `manual` o `hubspot_imported`
+- Restricción explícita:
+  - `greenhouse_commercial.product_catalog` y `greenhouse_commercial.product_sync_conflicts` siguen sin `space_id` en el schema vigente; este slice se aísla por access surface admin + capability `commercial.product_catalog.resolve_conflict`, no por FK tenant-aware a nivel tabla
+## Delta 2026-04-22 — HubSpot custom properties now use a canonical declarative reconcile layer
+
+- Greenhouse ya no debe manejar custom properties HubSpot con scripts aislados por task.
+- Contrato nuevo:
+  - manifest canónico: `src/lib/hubspot/custom-properties.ts`
+  - reconcile live/idempotente: `scripts/ensure-hubspot-custom-properties.ts`
+  - wrappers por objeto:
+    - `pnpm hubspot:company-properties`
+    - `pnpm hubspot:contact-properties`
+    - `pnpm hubspot:deal-properties`
+    - `pnpm hubspot:product-properties`
+    - `pnpm hubspot:service-properties`
+    - `pnpm hubspot:properties` para multi-objeto
+- Objetos soportados hoy:
+  - `companies` (`gh_*` party lifecycle)
+  - `deals` (`gh_deal_origin`)
+  - `products` (`gh_*` product catalog)
+  - `services` (`ef_*`)
+  - `contacts` soportado por el engine pero sin suite activa todavía
+- Regla operativa:
+  - si una property HubSpot nueva pertenece al contrato Greenhouse, debe declararse primero en el manifest canónico y no en un script ad-hoc
+  - cuando HubSpot no refleje un atributo de metadata de forma confiable (ej. `readOnlyValue`), el manifiesto debe converger contra el estado verificable live y la restricción queda documentada como policy operativa

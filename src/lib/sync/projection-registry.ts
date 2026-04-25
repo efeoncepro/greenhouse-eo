@@ -22,6 +22,24 @@ export const PROJECTION_DOMAINS = [
 
 export type ProjectionDomain = (typeof PROJECTION_DOMAINS)[number]
 
+export const TABLE_PRIVILEGES = [
+  'SELECT',
+  'INSERT',
+  'UPDATE',
+  'DELETE',
+  'TRUNCATE',
+  'REFERENCES',
+  'TRIGGER'
+] as const
+
+export type TablePrivilege = (typeof TABLE_PRIVILEGES)[number]
+
+export interface ProjectionTablePrivilegeRequirement {
+  tableName: string
+  privileges: TablePrivilege[]
+  reason?: string
+}
+
 export interface ProjectionDefinition {
 
   /** Unique name for logging and observability */
@@ -44,6 +62,13 @@ export interface ProjectionDefinition {
 
   /** Max retries before marking as dead-letter (default: 2) */
   maxRetries?: number
+
+  /**
+   * Optional runtime-table contract for projection-owned exceptions in shared
+   * schemas such as greenhouse_serving. Used for health checks and drift
+   * detection; it does not grant privileges by itself.
+   */
+  requiredTablePrivileges?: ProjectionTablePrivilegeRequirement[]
 }
 
 // ── Registry ──

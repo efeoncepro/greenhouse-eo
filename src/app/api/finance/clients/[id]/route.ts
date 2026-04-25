@@ -17,7 +17,7 @@ import {
   upsertFinanceClientProfileInPostgres
 } from '@/lib/finance/postgres-store-slice2'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -497,8 +497,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { id } = await params
 
   try {
@@ -516,6 +514,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     console.warn('[finance/clients/[id]] Postgres-first read path unavailable, falling back to BigQuery.', error)
   }
+
+  await assertFinanceBigQueryReadiness({ tables: ['fin_client_profiles', 'fin_income'] })
 
   const projectId = getFinanceProjectId()
   const companyColumns = await getHubspotTableColumns('companies')

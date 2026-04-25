@@ -5,12 +5,17 @@ import {
   type CommercialModel,
   type StaffingModel
 } from '@/lib/commercial/delivery-model'
+import { getCommercialDealByHubSpotId } from '@/lib/commercial/deals-store'
+import { validateHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
 import { query, withTransaction } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { seedQuotationDefaultTerms } from '@/lib/commercial/governance/terms-store'
 import { recordTemplateUsage } from '@/lib/commercial/governance/templates-store'
-import { publishTemplateUsed } from '@/lib/commercial/quotation-events'
+import {
+  publishQuoteCreated,
+  publishTemplateUsed
+} from '@/lib/commercial/quotation-events'
 import {
   listFinanceQuotesFromCanonical,
   mapCanonicalQuoteListRow
@@ -30,6 +35,7 @@ import {
 import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
+import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 
 export const dynamic = 'force-dynamic'
 
@@ -174,6 +180,7 @@ interface CreateQuotationPayload {
   clientId?: string | null
   organizationId?: string | null
   contactIdentityProfileId?: string | null
+  hubspotDealId?: string | null
   spaceId?: string | null // TASK-486: aceptado por backwards compat; ignorado al inserta (queda NULL).
   businessLineCode?: string | null
   currency?: QuotationPricingCurrency
@@ -195,8 +202,16 @@ interface CreateQuotationPayload {
   pricingModel?: 'staff_aug' | 'retainer' | 'project'
   commercialModel?: CommercialModel
   staffingModel?: StaffingModel
+  pricingEngineCommercialModel?: string | null
+  countryFactorCode?: string | null
   templateId?: string | null
 }
+
+const isPricingEngineCommercialModel = (value: unknown): value is CommercialModelCode =>
+  value === 'on_going' ||
+  value === 'on_demand' ||
+  value === 'hybrid' ||
+  value === 'license_consulting'
 
 const generateQuotationNumber = () => {
   const now = new Date()
@@ -233,8 +248,8 @@ export async function POST(request: Request) {
     )
   }
 
-  const orgExists = await query<{ organization_id: string }>(
-    `SELECT organization_id
+  const orgExists = await query<{ organization_id: string; hubspot_company_id: string | null }>(
+    `SELECT organization_id, hubspot_company_id
      FROM greenhouse_core.organizations
      WHERE organization_id = $1
        AND active = TRUE
@@ -253,6 +268,26 @@ export async function POST(request: Request) {
     typeof body.contactIdentityProfileId === 'string' && body.contactIdentityProfileId.trim()
       ? body.contactIdentityProfileId.trim()
       : null
+
+  const hubspotDealId =
+    typeof body.hubspotDealId === 'string' && body.hubspotDealId.trim()
+      ? body.hubspotDealId.trim()
+      : null
+
+  const hubspotCompanyId = orgExists[0]?.hubspot_company_id ?? null
+
+  const hubspotContextError = validateHubSpotQuoteCommercialContext({
+    organizationId,
+    hubspotCompanyId,
+    contactIdentityProfileId,
+    hubspotDealId,
+    sourceSystem: null,
+    hubspotQuoteId: null
+  })
+
+  if (hubspotContextError) {
+    return NextResponse.json({ error: hubspotContextError }, { status: 400 })
+  }
 
   if (contactIdentityProfileId) {
     const membershipRows = await query<{ membership_id: string; membership_type: string }>(
@@ -282,6 +317,24 @@ export async function POST(request: Request) {
         {
           error: `membership_type='${membershipType}' no aplica como contacto comercial (admitidos: ${QUOTE_CONTACT_MEMBERSHIP_TYPES.join(', ')}).`
         },
+        { status: 400 }
+      )
+    }
+  }
+
+  if (hubspotDealId) {
+    const deal = await getCommercialDealByHubSpotId(hubspotDealId)
+
+    if (!deal) {
+      return NextResponse.json(
+        { error: `HubSpot deal ${hubspotDealId} no existe en el runtime comercial sincronizado.` },
+        { status: 404 }
+      )
+    }
+
+    if (deal.organizationId !== organizationId) {
+      return NextResponse.json(
+        { error: 'El HubSpot deal seleccionado no pertenece a la organización de esta cotización.' },
         { status: 400 }
       )
     }
@@ -377,6 +430,7 @@ export async function POST(request: Request) {
            internal_notes,
            source_system,
            source_quote_id,
+           hubspot_deal_id,
            created_by
          ) VALUES (
            $1, $2, $3, $4, $5, $6, $7, $8, 'draft', 1,
@@ -385,8 +439,8 @@ export async function POST(request: Request) {
            'one_time', $16, 30, $17,
            $18::date, $19::date, $20::date, $21::date,
            $22, $23,
-           'manual', $1,
-           $24
+           'manual', $1, $24,
+           $25
          )
          RETURNING quotation_id`,
         [
@@ -413,6 +467,7 @@ export async function POST(request: Request) {
           resolvedExpiryDate,
           body.description ?? null,
           body.internalNotes ?? null,
+          hubspotDealId,
           createdBy
         ]
       )
@@ -476,6 +531,13 @@ export async function POST(request: Request) {
         globalDiscountValue: body.globalDiscountValue ?? null,
         marginTargetPct: body.targetMarginPct ?? null,
         marginFloorPct: body.marginFloorPct ?? null,
+        pricingContext: {
+          commercialModelCode: isPricingEngineCommercialModel(body.pricingEngineCommercialModel)
+            ? body.pricingEngineCommercialModel
+            : null,
+          countryFactorCode: body.countryFactorCode ?? null,
+          autoResolveAddons: 'internal_only'
+        },
         lineItems,
         createdBy
       },
@@ -550,6 +612,23 @@ export async function POST(request: Request) {
       }
     })
   }
+
+  await publishQuoteCreated({
+    quoteId: quotationId,
+    quotationId,
+    hubspotQuoteId: null,
+    hubspotDealId,
+    sourceSystem: 'manual',
+    direction: 'outbound',
+    organizationId,
+    spaceId: null,
+    amount: snapshot.totals.totalPrice,
+    currency,
+    lineItemCount: snapshot.lineItems.length,
+    pricingModel: resolvedDeliveryModel.pricingModel,
+    commercialModel: resolvedDeliveryModel.commercialModel,
+    staffingModel: resolvedDeliveryModel.staffingModel
+  })
 
   return NextResponse.json(
     {

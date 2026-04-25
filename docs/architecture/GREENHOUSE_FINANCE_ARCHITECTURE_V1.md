@@ -2,10 +2,389 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-04-19
+> **Last updated:** 2026-04-24
+
+## Delta 2026-04-24 — `expenses/meta` Postgres-first metadata providers
+
+El endpoint `GET /api/finance/expenses/meta` deja de tratar el schema legacy de BigQuery como precondición global. La metadata del drawer ahora se compone por providers con ownership explícito:
+
+- `suppliers` → `greenhouse_finance.suppliers` / reader Postgres canónico
+- `accounts` → `greenhouse_finance.accounts` / reader Postgres canónico
+- instituciones históricas de gastos → `greenhouse_finance.expenses` / reader Postgres `listFinanceExpenseSocialSecurityInstitutionsFromPostgres`
+- instituciones previsionales/salud de Payroll → `greenhouse_payroll.compensation_versions` / reader Postgres `listPayrollSocialSecurityInstitutionsFromPostgres`
+
+BigQuery queda solo como carril legacy de compatibilidad por slice, no como guard global del endpoint. Si los enrichments opcionales no están disponibles, el drawer mantiene `200` con defaults y payload crítico intacto.
+
+## Delta 2026-04-21 — Chile VAT Ledger & Monthly Position (TASK-533)
+
+Greenhouse ya puede materializar una posicion mensual de IVA Chile por `space_id` sin recalcular inline en UI ni depender de planillas manuales.
+
+### Nuevas tablas
+
+| Tabla | Uso |
+|---|---|
+| `greenhouse_finance.vat_ledger_entries` | Ledger tributario por documento y bucket (`debit_fiscal`, `credito_fiscal`, `iva_no_recuperable`). |
+| `greenhouse_finance.vat_monthly_positions` | Snapshot mensual consolidado por `space_id` + periodo (`year`, `month`). |
+
+El ledger usa como source canonica:
+
+- `greenhouse_finance.income.tax_snapshot_json` para débito fiscal de ventas.
+- `greenhouse_finance.expenses.tax_snapshot_json` + `recoverable_tax_amount` + `non_recoverable_tax_amount` para crédito fiscal y IVA no recuperable de compras.
+
+### Runtime nuevo
+
+- Helper central: `src/lib/finance/vat-ledger.ts`
+  - `materializeVatLedgerForPeriod(year, month, reason)`
+  - `materializeAllAvailableVatPeriods(reason)`
+  - readers `getVatMonthlyPosition`, `listVatMonthlyPositions`, `listVatLedgerEntries`
+- Projection reactiva: `src/lib/sync/projections/vat-monthly-position.ts`
+  - escucha `finance.income.{created,updated,nubox_synced}`
+  - escucha `finance.expense.{created,updated,nubox_synced}`
+  - publica `finance.vat_position.period_materialized`
+- `ops-worker` gana `POST /vat-ledger/materialize` como lane canónica de recomputo/backfill pesado fuera de Vercel serverless.
+
+### Serving y surface mínima
+
+- `GET /api/finance/vat/monthly-position`
+  - scope tenant-safe vía `requireFinanceTenantContext()`
+  - responde snapshot del periodo, periodos recientes y ledger entries
+  - soporta `format=csv` para export operativo
+- `POST /api/internal/vat-ledger-materialize`
+  - requiere contexto admin
+  - permite recomputo de un periodo o backfill bulk
+- `FinanceDashboardView` incorpora una card de posición mensual con:
+  - débito fiscal
+  - crédito fiscal
+  - IVA no recuperable
+  - saldo fiscal del periodo
+  - export CSV
+
+### Reglas operativas
+
+- El ledger se consolida por `space_id`; ningún reader mensual debe mezclar tenants.
+- El débito fiscal nace solo desde ventas con snapshot tributario explícito.
+- El crédito fiscal nace solo desde `recoverable_tax_amount`; el IVA no recuperable queda separado y no incrementa crédito.
+- `vat_common_use_amount` sigue entrando hoy como recoverability parcial ya resuelta en `expenses`; una política tributaria más fina de prorrata futura queda como follow-up y no altera el contrato actual del ledger.
+
+### Archivos clave
+
+- `src/lib/finance/vat-ledger.ts`
+- `src/lib/sync/projections/vat-monthly-position.ts`
+- `src/app/api/finance/vat/monthly-position/route.ts`
+- `src/app/api/internal/vat-ledger-materialize/route.ts`
+- `src/views/greenhouse/finance/components/VatMonthlyPositionCard.tsx`
+- `services/ops-worker/server.ts`
+- Migration: `20260421200121412_task-533-chile-vat-ledger-monthly-position.sql`
+
+## Delta 2026-04-21 — Purchase VAT Recoverability (TASK-532)
+
+`greenhouse_finance.expenses` deja de tratar el IVA de compras como un `tax_rate` suelto y persiste una semántica contable explícita: crédito fiscal recuperable vs IVA no recuperable que debe capitalizarse en costo.
+
+### Nuevas columnas
+
+En `greenhouse_finance.expenses`:
+
+| Columna | Uso |
+|---|---|
+| `tax_code` | Código canónico de compra (`cl_input_vat_credit_19` / `cl_input_vat_non_recoverable_19` / `cl_vat_exempt` / `cl_vat_non_billable`). |
+| `tax_recoverability` | Recoverability persistida en la fila (`full` / `partial` / `none` / `not_applicable`). |
+| `tax_rate_snapshot` | Tasa congelada (19% o `null`). |
+| `tax_amount_snapshot` | Monto tributario congelado en moneda del documento. |
+| `tax_snapshot_json` | Snapshot `ChileTaxSnapshot` v1 del documento de compra. |
+| `is_tax_exempt` | Derivado rápido para filtros y bridges. |
+| `tax_snapshot_frozen_at` | Timestamp de congelamiento del snapshot. |
+| `recoverable_tax_amount` | Parte del IVA que permanece como crédito fiscal. |
+| `non_recoverable_tax_amount` | Parte del IVA que se capitaliza a costo/gasto. |
+| `effective_cost_amount` | Costo operativo canónico: `subtotal + non_recoverable_tax_amount`. |
+| `*_clp` | Espejo CLP de recoverable / non-recoverable / effective cost para consumers downstream. |
+
+### Runtime nuevo
+
+- `POST /api/finance/expenses`, `PUT /api/finance/expenses/[id]` y `POST /api/finance/expenses/bulk` pasan por `buildExpenseTaxWriteFields()`.
+- El helper resuelve `tax_code`, congela el snapshot y deriva tres buckets:
+  - `recoverableTaxAmount`
+  - `nonRecoverableTaxAmount`
+  - `effectiveCostAmount`
+- `payroll-expense-reactive` y las compras nuevas creadas desde Nubox también escriben el contrato nuevo; los gastos de nómina nacen como `cl_vat_non_billable`.
+- El fallback BigQuery de `expenses` ahora persiste y rehidrata el mismo contrato tributario y la metadata relevante (`space_id`, `source_type`, payment provider/rail y purchase metadata).
+
+### Regla operativa
+
+- IVA recuperable NO infla costo operativo.
+- IVA no recuperable SÍ entra al costo efectivo.
+- `tax_recoverability = 'partial'` conserva la parte recuperable fuera del costo y solo capitaliza `vat_unrecoverable_amount`.
+- `vat_common_use_amount` marca recoverability parcial, pero no se capitaliza a costo hasta que el ledger mensual (TASK-533) materialice el tratamiento completo.
+
+### Downstream
+
+- `compute-operational-pl`, `postgres-store-intelligence`, `service-attribution`, `member-capacity-economics`, dashboards P&L y readers de provider/tooling dejan de sumar `expenses.total_amount_clp` bruto y pasan a leer `COALESCE(effective_cost_amount_clp, total_amount_clp)`.
+- El contrato nuevo desacopla:
+  - **ledger tributario**: `recoverable_tax_amount*`
+  - **costo operativo**: `effective_cost_amount*`
+- `TASK-533` debe consumir `expenses.tax_snapshot_json` + buckets recoverable/non-recoverable como source canónica de crédito fiscal de compras.
+
+### Backfill
+
+La migración `20260421192902964_task-532-purchase-vat-recoverability.sql` backfillea el histórico usando `tax_amount`, `dte_type_code`, `exempt_amount`, `vat_unrecoverable_amount` y `vat_common_use_amount`, y deja `effective_cost_amount` listo para consumers existentes sin recalcular inline.
+
+### Archivos clave
+
+- `src/lib/finance/expense-tax-snapshot.ts`
+- `src/app/api/finance/expenses/{route,[id]/route,bulk/route}.ts`
+- `src/lib/finance/postgres-store-slice2.ts`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
+- `src/lib/finance/payroll-expense-reactive.ts`
+- `src/lib/cost-intelligence/compute-operational-pl.ts`
+- `src/lib/service-attribution/materialize.ts`
+- Migration: `20260421192902964_task-532-purchase-vat-recoverability.sql`
+
+### Follow-ups
+
+1. `TASK-533` debe materializar el ledger mensual de IVA sobre los buckets persistidos y resolver explícitamente el tratamiento de `vat_common_use_amount`.
+2. Las surfaces UI de compras pueden exponer más adelante `effectiveCostAmount` y `taxRecoverability` como campos visibles si Finance lo necesita operativamente.
+
+## Delta 2026-04-21 — Quote Tax Explicitness Chile IVA (TASK-530)
+
+`greenhouse_commercial.quotations` y `quotation_line_items` ahora persisten un snapshot tributario inmutable por versión. El pricing engine sigue trabajando en **neto**; el IVA se añade como contrato documental en builder / detail / PDF.
+
+### Nuevas columnas
+
+En `greenhouse_commercial.quotations` y `quotation_line_items`:
+
+| Columna | Uso |
+|---|---|
+| `tax_code` | Canonical code (`cl_vat_19` / `cl_vat_exempt` / `cl_vat_non_billable`). |
+| `tax_rate_snapshot` | Tasa congelada (null para exento / no-facturable). |
+| `tax_amount_snapshot` | Monto de IVA en moneda del quote. |
+| `tax_snapshot_json` | Snapshot completo `ChileTaxSnapshot` v1 con `frozenAt`. |
+| `is_tax_exempt` | Derivado — true para `vat_exempt`/`vat_non_billable`. |
+| `tax_snapshot_frozen_at` (solo header) | Timestamp del congelamiento. |
+
+CHECK constraints aseguran: `tax_code ∈ {cl_vat_19, cl_vat_exempt, cl_vat_non_billable}` y coherencia `tax_code ⇔ tax_snapshot_json ⇔ tax_snapshot_frozen_at`.
+
+### Flujo de persistencia
+
+`persistQuotationPricing` llama a `buildQuotationTaxSnapshot({ netAmount, taxCode?, spaceId?, issuedAt })` (default `cl_vat_19`) y graba las 5 columnas del header. Cada line item hereda el `tax_code` y graba su propio snapshot proporcional a `subtotalAfterDiscount`. El pricing engine sigue retornando **neto**; el IVA se computa post-engine.
+
+### UI / PDF
+
+- **Builder**: el `QuoteSummaryDock` recibe `ivaAmount` (preview cliente-side con `previewChileTaxAmounts` — 19% Chile default). `subtotal` neto, `total` con IVA. `TotalsLadder` renderiza `Subtotal · IVA · Total` cuando hay IVA.
+- **PDF**: `RenderQuotationPdfInput.totals.tax` (opcional) con `{ code, label, rate, amount, isExempt }`. El documento muestra una línea explícita "IVA 19%" / "IVA Exento" / "No Afecto a IVA" entre Subtotal y Total.
+- **Detail**: el canonical store expone `taxCode`, `taxRate`, `taxAmount`, `taxSnapshot`, `isTaxExempt` vía `getFinanceQuoteDetailFromCanonical`.
+
+### Backfill
+
+Migración backfilla rows existentes: `tax_rate ≈ 0.19` → `cl_vat_19`; `tax_rate = 0` → `cl_vat_exempt`; `tax_rate IS NULL` → `cl_vat_non_billable`. Cada row obtiene un snapshot sintético que preserva el legacy `tax_amount`.
+
+### Cliente-safe module
+
+`src/lib/finance/pricing/quotation-tax-constants.ts` expone `DEFAULT_CHILE_IVA_RATE`, `QUOTE_TAX_CODE_LABELS`, `QUOTE_TAX_CODE_RATES`, `previewChileTaxAmounts()` sin `server-only` para que builder / dock / detail / PDF renderer hagan preview optimista antes de persistir. El server siempre re-resuelve el rate real desde el catálogo (`resolveChileTaxCode`) al issue time.
+
+### Archivos clave
+
+- `src/lib/finance/pricing/quotation-tax-snapshot.ts` — server helper + serializer.
+- `src/lib/finance/pricing/quotation-tax-constants.ts` — client preview constants.
+- `src/lib/finance/pricing/quotation-pricing-orchestrator.ts` — writes persisten snapshot.
+- `src/lib/finance/quotation-canonical-store.ts` — reads exponen snapshot.
+- `src/lib/finance/pdf/{contracts,quotation-pdf-document}.tsx` — PDF renderiza IVA.
+- `src/components/greenhouse/pricing/QuoteSummaryDock.tsx` — dock wiring.
+- Migration: `20260421162238991_task-530-quote-tax-snapshot.sql`.
+
+### Follow-ups
+
+1. Selector explícito de `tax_code` en el builder (dropdown con IVA 19% / Exento / No Afecto). Hoy el default es `cl_vat_19`; el operador no lo puede cambiar sin edit post-issue.
+2. Email template que incluya el breakdown de IVA (`src/emails/` no tiene template de quote aún).
+3. Per-line override de tax_code cuando haya casos mixtos (schema ya soporta; UI pendiente).
+4. Integración con income bridge (TASK-524 / TASK-531): el income hereda `tax_code` del quote al materializarse.
+
+## Delta 2026-04-21 — Income / Invoice Tax Convergence (TASK-531)
+
+`greenhouse_finance.income` y `income_line_items` convergen al mismo contrato tributario canonico que quotations. El write path manual, la materialización quote→invoice y los bridges downstream dejan de depender de `tax_rate = 0.19` como semántica implícita.
+
+### Nuevas columnas
+
+En `greenhouse_finance.income`:
+
+| Columna | Uso |
+|---|---|
+| `tax_code` | Canonical code (`cl_vat_19` / `cl_vat_exempt` / `cl_vat_non_billable`). |
+| `tax_rate_snapshot` | Tasa congelada (null para exento / no facturable). |
+| `tax_amount_snapshot` | Monto tributario congelado. |
+| `tax_snapshot_json` | Snapshot completo `ChileTaxSnapshot` v1 persistido en el agregado. |
+| `is_tax_exempt` | Derivado para filtros / bridges downstream. |
+| `tax_snapshot_frozen_at` | Timestamp de congelamiento del snapshot. |
+
+En `greenhouse_finance.income_line_items`:
+
+| Columna | Uso |
+|---|---|
+| `tax_code` | Carrier tributario por línea. |
+| `tax_rate_snapshot` | Tasa congelada por línea. |
+| `tax_amount_snapshot` | Monto tributario por línea. |
+| `tax_snapshot_json` | Snapshot degradado o explícito por línea. |
+| `is_tax_exempt` | Reemplaza el rol exclusivo de `is_exempt`. |
+
+### Runtime nuevo
+
+- `POST /api/finance/income` y `PUT /api/finance/income/[id]` pasan por `buildIncomeTaxWriteFields()`: ya no aceptan el default implícito `0.19`; resuelven `tax_code` y congelan snapshot al momento del write.
+- `materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` heredan el snapshot tributario de la quotation y lo persisten congelado en `income`.
+- `createFinanceIncomeInPostgres()` se vuelve el writer común del agregado para que los materializers publiquen también `finance.income.created`.
+- `income_hubspot_outbound` consume `tax_code` / `is_tax_exempt` de header y líneas; el synthetic line item deja de asumir gravado por default.
+- `sync-nubox-to-postgres` publica `incomeId` en `finance.income.nubox_synced` y las filas nuevas creadas desde ventas Nubox nacen con `tax_code` + snapshot persistidos.
+
+### Backfill
+
+La migración `20260421183955091_task-531-income-tax-convergence.sql` backfillea:
+
+- header `income`: heurísticas sobre `tax_amount`, `tax_rate`, `dte_type_code`, `exempt_amount`
+- `income_line_items`: asignación degradada desde el header y `is_exempt`
+
+El contrato resultante es: `tax_code ⇔ tax_snapshot_json ⇔ tax_snapshot_frozen_at` en header, y `tax_code ⇔ tax_snapshot_json` en line items.
+
+### Archivos clave
+
+- `src/lib/finance/income-tax-snapshot.ts`
+- `src/app/api/finance/income/{route,[id]/route,[id]/lines/route}.ts`
+- `src/lib/finance/quote-to-cash/materialize-invoice-from-{quotation,hes}.ts`
+- `src/lib/finance/income-hubspot/push-income-to-hubspot.ts`
+- `src/lib/nubox/sync-nubox-to-postgres.ts`
+- Migration: `20260421183955091_task-531-income-tax-convergence.sql`
+
+### Follow-ups
+
+1. Exponer selector explícito de `tax_code` en la UI de income cuando el flujo manual lo necesite.
+2. Endurecer line items nuevos de `income` para que nazcan con snapshot detallado, no solo degradado por backfill.
+3. VAT ledger mensual (TASK-533) debe consumir `income.tax_snapshot_json` como source canónica de débito fiscal.
+
+## Delta 2026-04-21 — Income → HubSpot Invoice Bridge (TASK-524)
+
+`greenhouse_finance.income` es espejado reactivamente a HubSpot como objeto nativo `invoice` (**non-billable mirror**, `hs_invoice_billable=false`). Nubox sigue siendo el emisor tributario; HubSpot es una proyección read-only para continuidad CRM.
+
+### Nuevas columnas en `greenhouse_finance.income`
+
+| Columna | Uso |
+|---|---|
+| `hubspot_invoice_id` | Id del objeto `invoice` en HubSpot (UNIQUE parcial). |
+| `hubspot_last_synced_at` | Timestamp del último attempt (success o failure). |
+| `hubspot_sync_status` | `pending` · `synced` · `failed` · `endpoint_not_deployed` · `skipped_no_anchors` |
+| `hubspot_sync_error` | Último mensaje de error (limpiado al siguiente success). |
+| `hubspot_sync_attempt_count` | Counter monotónico para backoff del retry worker. |
+| `hubspot_artifact_note_id` | Id del engagement/note que attacha el DTE (Fase 2 del contrato). |
+| `hubspot_artifact_synced_at` | Timestamp del artifact attach. |
+
+### Inheritance de anchors desde quote-to-cash
+
+`materializeInvoiceFromApprovedQuotation` y `materializeInvoiceFromApprovedHes` ahora **heredan** `hubspot_deal_id` (directo de la quote) + `hubspot_company_id` (via `organizations.hubspot_company_id` join). El income nace anclado al mismo hilo comercial que la quote.
+
+### Projection reactiva
+
+`src/lib/sync/projections/income-hubspot-outbound.ts` (domain `cost_intelligence`) escucha `finance.income.created`, `finance.income.updated` y `finance.income.nubox_synced`. Delega a `pushIncomeToHubSpot(incomeId)` que:
+
+1. Guard: sin `hubspot_company_id` ni `hubspot_deal_id` → `skipped_no_anchors` (trace + evento, sin call).
+2. Construye payload con `line_items` reales (si hay en `greenhouse_finance.income_line_items`) o synthetic single-line desde `total_amount`.
+3. Llama a `upsertHubSpotGreenhouseInvoice()` del Cloud Run service.
+4. Si 404 → `endpoint_not_deployed` (sin rethrow, retry worker lo toma cuando aterrice la ruta).
+5. Si 5xx/network → `failed` (trace + evento + rethrow para retry backoff).
+6. Success → `synced` + persist `hubspot_invoice_id` + emit `finance.income.hubspot_synced`.
+
+### Eventos nuevos emitidos
+
+- `finance.income.hubspot_synced`
+- `finance.income.hubspot_sync_failed` (con campo `status` distinguiendo failed / endpoint_not_deployed / skipped_no_anchors)
+- `finance.income.hubspot_artifact_attached` (reservado Fase 2)
+
+### Archivos clave
+
+- `src/lib/finance/income-hubspot/` — types, events, bridge
+- `src/lib/sync/projections/income-hubspot-outbound.ts` — projection
+- `src/lib/integrations/hubspot-greenhouse-service.ts` — `upsertHubSpotGreenhouseInvoice()` con fallback stateless de endpoint_not_deployed
+- Migration: `20260421125353997_task-524-income-hubspot-invoice-trace.sql`
+
+### Follow-ups
+
+- Fase 2 del contrato: al `finance.income.nubox_synced` adjuntar PDF/XML/DTE como engagement/note al invoice + deal + company.
+- Contact association best-effort via `contact_identity_profile_id` en la quote cuando exista el campo.
+- Admin Center surface para listar rows con `hubspot_sync_status ∈ (failed, endpoint_not_deployed, skipped_no_anchors)`.
+- Deploy de la ruta `/invoices` en `hubspot-greenhouse-integration` Cloud Run service.
 > **Audience:** Backend engineers, finance product owners, agents implementing finance features
 
 ---
+
+## Delta 2026-04-21 — TASK-529 Chile Tax Code Foundation
+
+- `TASK-529` crea la capa canónica de tax codes Chile-first sobre la que `TASK-530/531/532/533` van a persistir snapshots de IVA.
+- Hasta ahora `tax_rate` (19% hardcoded) era el contrato primario en `income`, `expenses`, `quotes` y `quotations`. A partir de esta task pasa a ser un snapshot derivado de un `tax_code` canónico — la tasa suelta deja de ser first-class semantics.
+
+**Runtime nuevo en `greenhouse_finance`:**
+
+- Tabla `greenhouse_finance.tax_codes` — catálogo jurisdiction-agnostic con effective dating:
+  - `tax_code` (ID humano, ej. `cl_vat_19`), `jurisdiction` (`CL`), `kind` (`vat_output` | `vat_input_credit` | `vat_input_non_recoverable` | `vat_exempt` | `vat_non_billable`)
+  - `rate` NUMERIC(6,4) nullable (NULL para exempt/non-billable)
+  - `recoverability` (`full` | `partial` | `none` | `not_applicable`) — first-class, no inferida
+  - `effective_from` / `effective_to` para versionado regulatorio
+  - `space_id` nullable: `NULL` = catálogo global; populado = override tenant-specific
+  - Unique constraints por `(tax_code, jurisdiction, effective_from)` global + `(tax_code, jurisdiction, effective_from, space_id)` scoped
+- Seed Chile v1 (effective_from `2026-01-01`, global):
+  - `cl_vat_19` — IVA output 19%
+  - `cl_vat_exempt` — IVA exento (DL 825 art.12)
+  - `cl_vat_non_billable` — operación no afecta
+  - `cl_input_vat_credit_19` — IVA crédito fiscal 19%
+  - `cl_input_vat_non_recoverable_19` — IVA sin derecho a crédito
+
+**Helpers canónicos en `src/lib/tax/chile/`:**
+
+- `loadChileTaxCodes(context)` — lee el catálogo aplicando overrides por `spaceId` y filtro `effective_from/to`; cache in-memory 5 min.
+- `resolveChileTaxCode(taxCode, context)` — lookup por ID con precedence tenant-scoped > global; lanza `ChileTaxCodeNotFoundError` (dura).
+- `computeChileTaxAmounts({ code, netAmount })` → `{ taxableAmount, taxAmount, totalAmount }` — aplica la tasa, redondea a 2 decimales (CLP).
+- `computeChileTaxSnapshot({ code, netAmount, issuedAt })` → `ChileTaxSnapshot` — congela la tasa + etiqueta + metadata al momento del issue. Los aggregates downstream persisten este shape verbatim para que re-renders/audits reproduzcan la foto original.
+- `validateChileTaxSnapshot(snapshot)` — re-compute vs persisted; tolerancia 1 peso; úsalo en audit pipelines (TASK-533).
+- `ChileTaxSnapshot` versión `1`: `{ version, taxCode, jurisdiction, kind, rate, recoverability, labelEs, effectiveFrom, frozenAt, taxableAmount, taxAmount, totalAmount, metadata }`.
+
+**Contrato para aggregates downstream (TASK-530/531/532/533):**
+
+1. Todo documento financiero que soporte impuestos debe persistir `tax_code` explícito más el `ChileTaxSnapshot` (JSONB, junto al registro) en lugar de una columna `tax_rate` suelta.
+2. Re-renders (PDF de quote, email, portal cliente) leen del snapshot, no del catálogo live. Un cambio regulatorio posterior no muta documentos ya emitidos.
+3. Recoverability se lee del snapshot (`recoverability`), no se infiere por signo ni por tipo de documento. Esto es lo que TASK-532 va a usar para separar IVA crédito fiscal vs. no recuperable en expenses.
+4. Sin `tax_code` el documento no se puede emitir — el resolver lanza `ChileTaxCodeNotFoundError` y la aprobación debe fallar antes de persistir.
+
+**Out of scope de TASK-529 (queda para 530–533):**
+
+- UI tributaria del builder / detail / PDF.
+- Re-anclar `income.tax_rate` / `expenses.tax_rate` a snapshots persistidos.
+- Retenciones (honorarios), boletas, regímenes especiales fuera de IVA v1.
+- Multi-country — el shape soporta múltiples jurisdicciones pero sólo Chile está seedeada.
+
+**Referencia:** `src/lib/tax/chile/index.ts` · migración `20260421105127894_task-529-chile-tax-code-foundation.sql` · tests `src/lib/tax/chile/*.test.ts`.
+
+---
+
+## Delta 2026-04-20 — TASK-480 cierra replay input + bulk repricing seguro
+
+- `TASK-480` deja explícito que provenance/confidence no basta por sí sola para repricing fiel: el canon ahora persiste también el contrato mínimo de replay del pricing engine v2.
+- Runtime nuevo en `greenhouse_commercial`:
+  - `quotations.pricing_context` guarda `commercialModelCode`, `countryFactorCode` y flags de replay del engine
+  - `quotation_line_items.pricing_input` guarda el `PricingLineInputV2` persistido por línea
+- Regla operativa:
+  - `commercial-cost-worker` ya no deja `POST /quotes/reprice-bulk` reservado; ahora ejecuta repricing batch tenant-scoped usando `strictReplay`
+  - quotes sin `pricing_context` o sin `pricing_input` suficiente no se repricingean a ciegas: quedan `skipped`
+  - el fallback catalog-level de tools deja de quedar implícito; el engine emite `tool_catalog_fallback` como `costBasisKind` explícito
+- Read-side:
+  - el edit path de quotations rehidrata `pricingInput`/metadata real en vez de deducirla solo desde columnas degradadas
+  - document chain y APIs de líneas ya exponen provenance persistida sin recomputar costo inline
+
+## Delta 2026-04-20 — TASK-452 agrega la foundation reusable de attribution por servicio
+
+- Finance/commercial ya no debe intentar derivar P&L por servicio leyendo `income`, `expenses` y `commercial_cost_attribution` directamente desde cada consumer.
+- Runtime nuevo:
+  - `greenhouse_serving.service_attribution_facts`
+  - `greenhouse_serving.service_attribution_unresolved`
+  - helper/materializer `src/lib/service-attribution/materialize.ts`
+  - projection reactiva `service_attribution`
+  - evento `accounting.service_attribution.period_materialized`
+- Regla operativa:
+  - revenue y direct cost se atribuyen con anchors documentales/comerciales fuertes cuando existen
+  - labor/overhead comercial sigue naciendo en `commercial_cost_attribution`; el split a `service_id` ocurre downstream usando share de revenue y fallback conservador
+  - Agency y surfaces client-facing siguen sin fabricar `service_economics` hasta que exista el read model derivado (`TASK-146`)
 
 ## Delta 2026-04-19 — TASK-479 People Actual Cost + Blended Role Snapshots
 
@@ -730,10 +1109,12 @@ Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 arc
 | `bank_statement_rows`         | Postgres                                | `fin_bank_statement_rows` (fallback)    | Migrado                                                                     |
 | `dte_emission_queue`          | Postgres only                           | No                                      | TASK-139                                                                    |
 | `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No                                      | Canónico materializado; persiste `organization_id` + `client_id` compat     |
+| `service_attribution_facts`   | Serving Postgres (`greenhouse_serving`) | No                                      | Foundation factual por `service_id + period + source`; desbloquea `service_economics` |
 
 Nota operativa:
 
 - `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema, pero su DDL base sigue asegurado por runtime/store code además de las migraciones incrementales; todavía no vive como create-table canónico separado dentro de `scripts/` o una migración histórica dedicada.
+- `service_attribution_unresolved` acompaña a `service_attribution_facts` como cola auditable de casos ambiguos o sin evidencia suficiente; no debe tratarse como error silencioso ni como fallback inventado en UI.
 
 ### BigQuery Cutover Plan
 
@@ -748,6 +1129,10 @@ Estado operativo post `TASK-166`:
 - `clients` list/detail ya operan org-first sobre `greenhouse_core.organizations WHERE organization_type IN ('client', 'both')`, con `client_profiles.organization_id` como FK fuerte.
 - `client_id` se preserva como bridge operativo para modules, `purchase_orders`, `hes`, `income`, `client_economics` y `v_client_active_modules`; el cutover actual no elimina esa clave legacy.
 - El residual de `Finance Clients` queda reducido a fallback transicional, no a dependencia estructural del request path.
+- Delta `TASK-589`:
+  - ningun `GET /api/finance/**` interactivo debe invocar `ensureFinanceInfrastructure()` como side effect de lectura; el contrato correcto es `Postgres-first` y, si cae al carril legacy, usar una verificacion read-only (`assertFinanceBigQueryReadiness`) antes de consultar BigQuery.
+  - esto aplica a `clients`, `suppliers`, `accounts`, `income`, `expenses`, `exchange_rates`, dashboards y summaries Finance; el runtime ya no debe intentar `CREATE TABLE` / `ALTER TABLE` dentro de requests interactivos.
+  - `expenses/meta` puede enriquecer instituciones desde Payroll, pero ese enrichment no debe provisionar Payroll en un `GET`; la lectura se considera opcional y no puede tumbar toda la metadata de Finance.
 
 ### Delta 2026-04-08 — Ledger-first reconciliation & settlement foundation
 
@@ -1102,3 +1487,54 @@ Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality".
 | `src/app/api/finance/dashboard/pnl/route.ts`     | P&L endpoint (motor central)                  |
 | `src/app/api/finance/dashboard/summary/route.ts` | Working capital metrics                       |
 | `src/app/api/finance/data-quality/route.ts`      | Data quality checks                           |
+
+## Preventive Test Lane (TASK-599)
+
+A partir de 2026-04-25, Finance tiene una lane preventiva de tests con 3 niveles de defensa que cubre el gap entre unit/route tests y detección tardía por Sentry. La lane es complementaria a la suite Playwright completa que corre post-merge a `develop`.
+
+### Nivel 1 — Playwright smoke
+
+Specs canónicos en `tests/e2e/smoke/`:
+
+| Spec | Cubre |
+|------|-------|
+| `finance-quotes.spec.ts` | `/finance/quotes` + `/finance/quotes/new` |
+| `finance-clients.spec.ts` | `/finance/clients` |
+| `finance-suppliers.spec.ts` | `/finance/suppliers` |
+| `finance-expenses.spec.ts` | `/finance/expenses` |
+
+Cada spec usa `gotoAuthenticated` y verifica `status<400` + body visible + ausencia de fatal text. Reusa el setup de Agent Auth.
+
+Las 4 specs están registradas en `RELIABILITY_REGISTRY[finance].smokeTests` (`src/lib/reliability/registry.ts`). El **Change-Based Verification Matrix** (TASK-633) las recoge automáticamente cuando un PR toca archivos owned por el módulo finance.
+
+### Nivel 2 — Component tests (Vitest + jsdom)
+
+| Test | Cubre |
+|------|-------|
+| `src/views/greenhouse/finance/ExpensesListView.test.tsx` | render éxito, empty state, error API, network failure |
+| `src/views/greenhouse/finance/drawers/CreateExpenseDrawer.test.tsx` | open=false sin fetch, fetch /meta + /accounts al abrir, payload meta parcial no fatal, meta endpoint 500 no rompe drawer |
+
+Patrón canónico: `vi.stubGlobal('fetch', mockFn)` + `renderWithTheme`. Sin MSW (instalado pero no usado en componentes).
+
+### Nivel 3 — Route degradation hardening
+
+`src/app/api/finance/expenses/meta/route.test.ts` documenta el contrato de degradación parcial del meta provider:
+
+- **Slices críticos** (Postgres-first → BigQuery fallback): `suppliers`, `accounts`. Si falla Postgres, BQ rescata.
+- **Slices enrichment** (degradan a empty/default sin tumbar el endpoint): `socialSecurityInstitutions` (finance + payroll), `members`, `spaces`, `supplierToolLinks`.
+- **Static enrichment**: `paymentMethods`, `paymentProviders`, `paymentRails`, `recurrenceFrequencies`, `drawerTabs` — siempre presentes (vienen del módulo, no de DB).
+
+Tests TASK-599 explícitos:
+
+- `keeps payload alive when ALL enrichment slices fail`
+- `falls back to BigQuery for accounts when Postgres accounts is unavailable`
+- `response shape includes static enrichment defaults regardless of dynamic providers`
+
+### Reliability Control Plane integration
+
+`src/lib/reliability/finance/get-finance-smoke-lane-status.ts` parsea `artifacts/playwright/results.json` (Playwright JSON reporter) y filtra suites `tests/e2e/smoke/finance-*.spec.ts`. El adapter `buildFinanceSmokeLaneSignals` emite señales `kind=test_lane` para el módulo `finance` en el Reliability Control Plane:
+
+- 1 señal agregada por lane completo (`finance.test_lane.smoke`).
+- N señales adicionales por suite fallida cuando hay errores.
+
+El boundary TASK-599 en `RELIABILITY_INTEGRATION_BOUNDARIES` quedó en status `ready`. Cuando no hay reporte local (runtime portal sin acceso a artifacts CI), degrada a `awaiting_data` con notas explícitas — nunca enmascara regresiones como "todo bien".

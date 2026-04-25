@@ -1,5 +1,11 @@
 # TASK-103 — GCP Budget Alerts & BigQuery Cost Guards
 
+## Delta 2026-04-25 — Reliability Control Plane V1 reserva boundary cloud.billing
+
+- TASK-600 entregó la foundation `Reliability Control Plane V1`. La señal `cloud.cost_guard.bigquery` ya consume `getBlockedQueries()` desde el adapter `buildCloudSignals()` en `src/lib/reliability/signals.ts` — la parte ya implementada de esta task aparece automáticamente en la lectura "Confiabilidad por módulo" del Admin Center.
+- El boundary pendiente (budget thresholds 50/80/100% que requieren GCP Console) tiene reserva en `RELIABILITY_INTEGRATION_BOUNDARIES`: `cloud.billing` ← `getGcpBudgetThresholdState`. Cuando se complete el setup en GCP, agregar adapter `kind=billing` y mover el boundary a `ready`.
+- Spec del contrato a respetar: `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §3 y §7.
+
 ## Delta 2026-03-29 — Slice 2 y 4 implementados en código
 
 - `getBigQueryClient()` ahora wrappea `.query()` para inyectar `maximumBytesBilled` automáticamente en todas las 50+ query sites sin cambios por archivo.

@@ -9,6 +9,10 @@
       "schedule": "*/5 * * * *"
     },
     {
+      "path": "/api/cron/reliability-synthetic",
+      "schedule": "*/30 * * * *"
+    },
+    {
       "path": "/api/cron/sync-conformed",
       "schedule": "20 7 * * *"
     },
@@ -71,6 +75,14 @@
     {
       "path": "/api/cron/hubspot-company-lifecycle-sync",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/hubspot-companies-sync",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/hubspot-companies-sync?full=true",
+      "schedule": "0 3 * * *"
     },
     {
       "path": "/api/cron/hubspot-deals-sync",

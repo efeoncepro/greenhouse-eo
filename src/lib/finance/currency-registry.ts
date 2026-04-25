@@ -71,10 +71,22 @@ export interface CurrencyRegistryEntry {
 
   /** Permissible fallback strategies when the direct rate is missing:
    *   - `inverse`: try `to → from` and invert.
-   *   - `usd_composition`: compose via USD (`from → USD → to`).
+   *   - `usd_composition`: compose via the declared `compositionHub` (USD by
+   *     default for LATAM pairs, CLP for CLF — the flag stays historically
+   *     named for backward-compat but the hub is read from `compositionHub`).
    *   - `none`: no fallback — return readiness `temporarily_unavailable`.
    */
   fallbackStrategies: readonly ('inverse' | 'usd_composition' | 'none')[]
+
+  /** Currency to use as the pivot hub when `from → to` has no direct row and
+   *  `usd_composition` is in `fallbackStrategies`. The resolver composes
+   *  `from → hub` + `hub → to`. Defaults:
+   *   - `USD` for market currencies (COP, MXN, PEN) — interbank rates vs USD.
+   *   - `CLP` for CLF (UF is a CLP-indexed accounting unit published by BCR;
+   *     there is never a direct USD↔CLF rate).
+   *   - `null` for currencies that are themselves hubs (CLP, USD) or that
+   *     don't support composition. */
+  compositionHub: PlatformCurrency | null
 
   /** Expected cadence of the automatic sync. Null for non-auto classes. */
   syncCadence: 'daily' | 'weekly' | 'on_demand' | null
@@ -103,6 +115,7 @@ export const CURRENCY_REGISTRY: Record<PlatformCurrency, CurrencyRegistryEntry> 
     provider: 'mindicador',
     providers: { primary: 'mindicador', fallbacks: ['open_er_api'] },
     fallbackStrategies: ['inverse', 'usd_composition'],
+    compositionHub: null,
     syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_event',
     coverage: 'auto_synced',
@@ -116,6 +129,7 @@ export const CURRENCY_REGISTRY: Record<PlatformCurrency, CurrencyRegistryEntry> 
     provider: 'mindicador',
     providers: { primary: 'mindicador', fallbacks: ['open_er_api'] },
     fallbackStrategies: ['inverse', 'usd_composition'],
+    compositionHub: null,
     syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_event',
     coverage: 'auto_synced',
@@ -129,11 +143,12 @@ export const CURRENCY_REGISTRY: Record<PlatformCurrency, CurrencyRegistryEntry> 
     provider: 'clf_from_indicators',
     providers: { primary: 'clf_from_indicators', fallbacks: ['fawaz_ahmed'] },
     fallbackStrategies: ['inverse', 'usd_composition'],
+    compositionHub: 'CLP',
     syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_send',
-    coverage: 'manual_only',
+    coverage: 'auto_synced',
     domains: ['pricing_output'],
-    notes: 'UF is a Chilean accounting unit. Synced from greenhouse_finance.economic_indicators (UF indicator) — TASK-484 wires this as an FX pair without fetching. Coverage stays manual_only until post-deploy 24-48h dry-run verification (TASK-484 Slice 5).'
+    notes: 'UF is a Chilean accounting unit indexed to CLP (published daily by Banco Central). The clf_from_indicators adapter materializes CLP↔CLF from greenhouse_finance.economic_indicators. USD↔CLF resolves via CLP hub (USD→CLP + CLP→CLF) — there is no direct USD↔CLF market rate. Coverage=auto_synced because the UF ingestion is self-hosted and deterministic.'
   },
   COP: {
     code: 'COP',
@@ -142,6 +157,7 @@ export const CURRENCY_REGISTRY: Record<PlatformCurrency, CurrencyRegistryEntry> 
     provider: 'datos_gov_co_trm',
     providers: { primary: 'datos_gov_co_trm', fallbacks: ['fawaz_ahmed'] },
     fallbackStrategies: ['usd_composition'],
+    compositionHub: 'USD',
     syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_send',
     coverage: 'manual_only',
@@ -155,6 +171,7 @@ export const CURRENCY_REGISTRY: Record<PlatformCurrency, CurrencyRegistryEntry> 
     provider: 'banxico_sie',
     providers: { primary: 'banxico_sie', fallbacks: ['frankfurter', 'fawaz_ahmed'] },
     fallbackStrategies: ['usd_composition'],
+    compositionHub: 'USD',
     syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_send',
     coverage: 'manual_only',
@@ -168,6 +185,7 @@ export const CURRENCY_REGISTRY: Record<PlatformCurrency, CurrencyRegistryEntry> 
     provider: 'apis_net_pe_sunat',
     providers: { primary: 'apis_net_pe_sunat', fallbacks: ['fawaz_ahmed'], historical: 'bcrp' },
     fallbackStrategies: ['usd_composition'],
+    compositionHub: 'USD',
     syncCadence: 'daily',
     fxPolicyDefault: 'rate_at_send',
     coverage: 'manual_only',
@@ -193,4 +211,37 @@ export const allowsUsdComposition = (currency: string): boolean => {
   if (!entry) return false
 
   return entry.fallbackStrategies.includes('usd_composition')
+}
+
+/** Returns the composition hub for a currency, or null if it is itself a hub
+ *  (USD, CLP) or the registry has no entry. The resolver uses this to pick
+ *  the right pivot currency when composing `from → hub → to`. CLF returns
+ *  'CLP' (UF is a CLP-indexed unit); market currencies return 'USD'. */
+export const getCompositionHub = (currency: string): PlatformCurrency | null => {
+  const entry = getCurrencyRegistryEntry(currency)
+
+  if (!entry) return null
+
+  return entry.compositionHub
+}
+
+/** Picks a pivot hub to compose `from → hub → to`. Priority:
+ *   1. If one side is a hub itself (USD/CLP = no hub declared), the other
+ *      side's hub is used.
+ *   2. If both sides declare a hub and they match, that's the hub.
+ *   3. If both sides declare a hub and they differ, the DESTINATION's hub
+ *      wins (the client-facing currency drives the accounting unit).
+ *   4. Returns null if neither side has a hub (identity / both are hubs).
+ *
+ *  Does NOT decide triple-hop composition (CLF→MXN needs CLF→CLP→USD→MXN)
+ *  — callers that need multi-hop must do additional resolution. */
+export const pickCompositionHub = (from: string, to: string): PlatformCurrency | null => {
+  const fromHub = getCompositionHub(from)
+  const toHub = getCompositionHub(to)
+
+  // Destination hub wins when both sides declare one.
+  if (toHub) return toHub
+  if (fromHub) return fromHub
+
+  return null
 }

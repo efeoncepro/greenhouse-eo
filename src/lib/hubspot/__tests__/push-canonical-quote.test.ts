@@ -4,12 +4,14 @@ const {
   runGreenhousePostgresQueryMock,
   createHubSpotQuoteMock,
   updateHubSpotQuoteMock,
+  resolveHubSpotQuoteSyncPayloadMock,
   publishQuotationPushedToHubSpotMock,
   publishQuotationHubSpotSyncFailedMock
 } = vi.hoisted(() => ({
   runGreenhousePostgresQueryMock: vi.fn(),
   createHubSpotQuoteMock: vi.fn(),
   updateHubSpotQuoteMock: vi.fn(),
+  resolveHubSpotQuoteSyncPayloadMock: vi.fn(),
   publishQuotationPushedToHubSpotMock: vi.fn(),
   publishQuotationHubSpotSyncFailedMock: vi.fn()
 }))
@@ -28,6 +30,10 @@ vi.mock('@/lib/hubspot/update-hubspot-quote', () => ({
   updateHubSpotQuote: (...args: unknown[]) => updateHubSpotQuoteMock(...args)
 }))
 
+vi.mock('@/lib/hubspot/hubspot-quote-sync', () => ({
+  resolveHubSpotQuoteSyncPayload: (...args: unknown[]) => resolveHubSpotQuoteSyncPayloadMock(...args)
+}))
+
 vi.mock('@/lib/commercial/quotation-events', () => ({
   publishQuotationPushedToHubSpot: (...args: unknown[]) => publishQuotationPushedToHubSpotMock(...args),
   publishQuotationHubSpotSyncFailed: (...args: unknown[]) => publishQuotationHubSpotSyncFailedMock(...args)
@@ -36,13 +42,42 @@ vi.mock('@/lib/commercial/quotation-events', () => ({
 // Helper — build a canonical quote row shape. Only the fields the SUT reads matter.
 const buildQuoteRow = (overrides: Record<string, unknown> = {}) => ({
   quotation_id: 'qt-1',
-  quotation_number: 'QT-2026-0001',
   organization_id: 'org-1',
   hubspot_deal_id: 'hs-deal-1',
   hubspot_quote_id: null,
-  description: 'Test quote',
-  valid_until: '2026-06-30',
+  ...overrides
+})
+
+const buildSyncPayload = (overrides: Record<string, unknown> = {}) => ({
+  quotationId: 'qt-1',
+  organizationId: 'org-1',
+  contactIdentityProfileId: 'identity-contact-1',
+  dealId: 'hs-deal-1',
+  title: 'Test quote',
+  expirationDate: '2026-06-30',
   currency: 'CLP',
+  status: 'APPROVAL_NOT_NEEDED',
+  sender: {
+    firstName: 'Julio',
+    lastName: 'Reyes',
+    email: 'julio@example.com',
+    companyName: 'Efeonce Group SpA'
+  },
+  lineItems: [
+    {
+      hubspotProductId: 'prod-77',
+      name: 'Consultoría',
+      quantity: 10,
+      unitPrice: 100,
+      productCode: 'GH-PRO-001',
+      legacySku: 'LEG-001',
+      billingFrequency: 'monthly',
+      billingStartDate: '2026-05-01',
+      taxRate: 19,
+      taxRateGroupId: 'tax-group-1',
+      taxAmount: 190
+    }
+  ],
   ...overrides
 })
 
@@ -90,29 +125,21 @@ describe('pushCanonicalQuoteToHubSpot', () => {
   })
 
   it('creates the HubSpot quote, persists hubspot_quote_id, and emits result=created', async () => {
-    // Mock sequence of SQL calls:
-    //   1. SELECT canonical quote
-    //   2. SELECT line items
-    //   3. UPDATE quotations SET hubspot_quote_id
     runGreenhousePostgresQueryMock
       .mockResolvedValueOnce([buildQuoteRow({ hubspot_quote_id: null })])
-      .mockResolvedValueOnce([
-        {
-          line_item_id: 'li-1',
-          label: 'Consultoría',
-          description: 'Horas',
-          quantity: 10,
-          unit_price: 100
-        }
-      ])
       .mockResolvedValueOnce([])
+
+    resolveHubSpotQuoteSyncPayloadMock.mockResolvedValueOnce(buildSyncPayload())
 
     createHubSpotQuoteMock.mockResolvedValueOnce({
       success: true,
       quoteId: 'qt-1',
       hubspotQuoteId: 'hs-quote-99',
       hubspotQuoteNumber: 'HS-99',
+      hubspotQuoteStatus: 'APPROVAL_NOT_NEEDED',
       hubspotQuoteLink: 'https://example.com/hs-quote-99',
+      hubspotPdfDownloadLink: 'https://example.com/hs-quote-99.pdf',
+      hubspotQuoteLocked: true,
       error: null
     })
 
@@ -128,14 +155,21 @@ describe('pushCanonicalQuoteToHubSpot', () => {
       expect.objectContaining({
         quoteId: 'qt-1',
         organizationId: 'org-1',
+        contactIdentityProfileId: 'identity-contact-1',
         dealId: 'hs-deal-1',
-        lineItems: [
+        sender: expect.objectContaining({
+          email: 'julio@example.com'
+        }),
+        status: 'APPROVAL_NOT_NEEDED',
+        persistFinanceMirror: false,
+        lineItems: expect.arrayContaining([
           expect.objectContaining({
             name: 'Consultoría',
             quantity: 10,
-            unitPrice: 100
+            unitPrice: 100,
+            taxRateGroupId: 'tax-group-1'
           })
-        ]
+        ])
       })
     )
 
@@ -158,32 +192,46 @@ describe('pushCanonicalQuoteToHubSpot', () => {
     // No failure event on success
     expect(publishQuotationHubSpotSyncFailedMock).not.toHaveBeenCalled()
 
-    // Persist call — the 3rd postgres call should UPDATE quotations with the new hubspot_quote_id
-    const persistCall = runGreenhousePostgresQueryMock.mock.calls[2]
+    const persistCall = runGreenhousePostgresQueryMock.mock.calls[1]
 
     expect(persistCall[0]).toContain('UPDATE greenhouse_commercial.quotations')
-    expect(persistCall[1]).toEqual(['hs-quote-99', 'qt-1'])
+    expect(persistCall[1]).toEqual([
+      'hs-quote-99',
+      'APPROVAL_NOT_NEEDED',
+      'https://example.com/hs-quote-99',
+      'https://example.com/hs-quote-99.pdf',
+      true,
+      'qt-1'
+    ])
   })
 
   it('updates the HubSpot quote when hubspot_quote_id already exists and emits result=updated', async () => {
-    // Mock sequence:
-    //   1. SELECT canonical quote (with existing hubspot_quote_id)
-    //   2. SELECT line items
-    //   3. UPDATE quotations SET hubspot_last_synced_at
     runGreenhousePostgresQueryMock
       .mockResolvedValueOnce([buildQuoteRow({ hubspot_quote_id: 'hs-quote-existing' })])
-      .mockResolvedValueOnce([
-        {
-          line_item_id: 'li-1',
-          label: 'Horas',
-          description: null,
-          quantity: 5,
-          unit_price: 50
-        }
-      ])
       .mockResolvedValueOnce([])
 
-    updateHubSpotQuoteMock.mockResolvedValueOnce({ success: true })
+    resolveHubSpotQuoteSyncPayloadMock.mockResolvedValueOnce(
+      buildSyncPayload({
+        lineItems: [
+          {
+            hubspotLineItemId: 'li-9',
+            hubspotProductId: 'prod-77',
+            name: 'Horas',
+            quantity: 5,
+            unitPrice: 50,
+            taxRateGroupId: 'tax-group-1'
+          }
+        ]
+      })
+    )
+
+    updateHubSpotQuoteMock.mockResolvedValueOnce({
+      success: true,
+      quoteStatus: 'APPROVAL_NOT_NEEDED',
+      quoteLink: 'https://example.com/hs-quote-existing',
+      pdfDownloadLink: 'https://example.com/hs-quote-existing.pdf',
+      locked: true
+    })
 
     const { pushCanonicalQuoteToHubSpot } = await import('../push-canonical-quote')
 
@@ -196,13 +244,19 @@ describe('pushCanonicalQuoteToHubSpot', () => {
     expect(updateHubSpotQuoteMock).toHaveBeenCalledWith(
       expect.objectContaining({
         hubspotQuoteId: 'hs-quote-existing',
-        lineItems: [
+        status: 'APPROVAL_NOT_NEEDED',
+        sender: expect.objectContaining({
+          email: 'julio@example.com'
+        }),
+        lineItems: expect.arrayContaining([
           expect.objectContaining({
+            hubspotLineItemId: 'li-9',
             name: 'Horas',
             quantity: 5,
-            unitPrice: 50
+            unitPrice: 50,
+            taxRateGroupId: 'tax-group-1'
           })
-        ]
+        ])
       })
     )
     expect(createHubSpotQuoteMock).not.toHaveBeenCalled()
@@ -222,5 +276,17 @@ describe('pushCanonicalQuoteToHubSpot', () => {
 
     // No failure event on success
     expect(publishQuotationHubSpotSyncFailedMock).not.toHaveBeenCalled()
+
+    const persistCall = runGreenhousePostgresQueryMock.mock.calls[1]
+
+    expect(persistCall[0]).toContain('UPDATE greenhouse_commercial.quotations')
+    expect(persistCall[1]).toEqual([
+      'hs-quote-existing',
+      'APPROVAL_NOT_NEEDED',
+      'https://example.com/hs-quote-existing',
+      'https://example.com/hs-quote-existing.pdf',
+      true,
+      'qt-1'
+    ])
   })
 })

@@ -72,7 +72,8 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   certification_draft: 'hr_certification',
   certification: 'hr_certification',
   evidence_draft: 'hr_evidence',
-  evidence: 'hr_evidence'
+  evidence: 'hr_evidence',
+  quote_pdf: 'document_vault'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -88,7 +89,8 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   certification_draft: 'certifications',
   certification: 'certifications',
   evidence_draft: 'evidence',
-  evidence: 'evidence'
+  evidence: 'evidence',
+  quote_pdf: 'quotation-pdfs'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -563,7 +565,7 @@ export const upsertSystemGeneratedAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'quote_pdf'
   >
   ownerAggregateId: string
   ownerClientId?: string | null
@@ -676,7 +678,7 @@ export const storeSystemGeneratedPrivateAsset = async ({
   assetId?: string | null
   ownerAggregateType: Extract<
     GreenhouseAssetContext,
-    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv'
+    'master_agreement' | 'payroll_receipt' | 'payroll_export_pdf' | 'payroll_export_csv' | 'quote_pdf'
   >
   ownerAggregateId: string
   ownerClientId?: string | null

@@ -269,15 +269,42 @@ Use Cloud SQL Connector automatically when `GREENHOUSE_POSTGRES_INSTANCE_CONNECT
 | `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` | For DDL | Secret Manager: `greenhouse-pg-dev-migrator-password` |
 | `GREENHOUSE_POSTGRES_SSL` | Yes | `false` (proxy handles encryption) |
 
+### Error Prefix Taxonomy
+
+`scripts/pg-connect.sh` y `scripts/migrate.ts` etiquetan sus errores con prefijos mutuamente excluyentes para acelerar triage:
+
+| Prefijo | Qué significa | Primera acción |
+|---------|---------------|----------------|
+| `[ADC]` | Credenciales GCP expiradas o ausentes | `gcloud auth application-default login` |
+| `[PROXY]` | `cloud-sql-proxy` binary missing, no arrancó, o murió durante el handshake | Revisa `which cloud-sql-proxy` y el tail del log impreso; `gcloud components install cloud-sql-proxy` si falta |
+| `[NETWORK]` | TCP llega al proxy pero el handshake TLS con Cloud SQL no completa (típico PMTUD blackhole en puerto 3307 sin MSS clamping) | Cambiar red / hotspot / Cloud Shell / `sudo route add -host 34.86.135.144 -mtu 900`. Si ICMP está bloqueado pero TCP funciona, usar `GREENHOUSE_SKIP_PREFLIGHT=true` |
+| `[SQL]` | Conexión + TLS OK pero falla auth, query, DDL, o codegen | Leer el mensaje SQL específico; verificar perfil/credenciales/permisos |
+| `[CONFIG]` | `.env.local` ausente o variables requeridas no resueltas | Revisar `.env.local` vs perfiles en `scripts/lib/load-greenhouse-tool-env.ts` |
+
+### Preflight de red
+
+`pg-connect.sh` ejecuta un `ping -D -s 1200` a `34.86.135.144` antes de arrancar el proxy. Si los paquetes DF > 1000B se droppean pero los pequeños llegan, clasifica como `[NETWORK]` en <5s y sugiere acciones concretas — en vez de colgar 30s esperando el TLS handshake.
+
+Saltar el preflight (útil si tu red bloquea ICMP pero TCP 3307 funciona):
+
+```bash
+GREENHOUSE_SKIP_PREFLIGHT=true pnpm pg:connect:migrate
+```
+
 ### Troubleshooting
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `ETIMEDOUT` on `34.86.135.144:5432` | Direct IP not accessible | Start Cloud SQL Proxy, use `127.0.0.1:15432` |
-| `connection refused` on `127.0.0.1:15432` | Proxy not running | `cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432` |
-| `password authentication failed` | Wrong credentials | Check profile in `.env.local`, verify with Secret Manager |
-| `permission denied for table X` | Object owned by different user | Use `greenhouse_ops` profile (inherits all roles) |
-| `SSL SYSCALL error` | SSL mismatch | Set `GREENHOUSE_POSTGRES_SSL=false` when using proxy |
+| `[CONFIG] GREENHOUSE_POSTGRES_HOST=... is not reachable` | Fail-fast de `migrate.ts` vs IP pública directa | Usar `pnpm pg:connect:migrate` o arrancar el proxy antes |
+| `[NETWORK] red local bloquea paquetes DF > 1000B` | PMTUD blackhole en puerto 3307 | Hotspot / Cloud Shell / MSS clamp / `GREENHOUSE_SKIP_PREFLIGHT=true` |
+| `[NETWORK] TCP al proxy llega pero Cloud SQL no completa TLS` | Handshake congelado (PMTUD o middlebox) | Mismo que arriba |
+| `[PROXY] cloud-sql-proxy no encontrado` | Binary faltante | `gcloud components install cloud-sql-proxy` |
+| `[PROXY] no reportó 'ready for new connections' en 10s` | Proxy arranca pero no completa handshake inicial | Revisar ADC, conectividad a `cloudsql.googleapis.com`, tail del log impreso |
+| `[ADC] no se pudo renovar ADC` | Browser flow falló o sin acceso a GCP | `gcloud auth application-default login` manual |
+| `[SQL] password authentication failed` | Credenciales mal o perfil equivocado | Verificar perfil en `.env.local` vs Secret Manager |
+| `[SQL] permission denied for table X` | Object owned by different user | Usar perfil `greenhouse_ops` (canonical owner) |
+| `ECONNREFUSED 127.0.0.1:15432` (sin prefijo) | Proxy no está corriendo y se invocó `pnpm migrate:up` directo | Usar `pnpm pg:connect:migrate` |
+| `SSL SYSCALL error` | SSL encima del túnel del proxy | `GREENHOUSE_POSTGRES_SSL=false` (el proxy ya cifra) |
 
 ---
 

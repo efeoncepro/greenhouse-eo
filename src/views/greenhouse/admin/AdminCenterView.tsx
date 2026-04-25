@@ -16,12 +16,22 @@ import Typography from '@mui/material/Typography'
 
 import SectionErrorBoundary from '@components/greenhouse/SectionErrorBoundary'
 
-import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseDragList } from '@/components/greenhouse'
+import {
+  ExecutiveCardShell,
+  ExecutiveMiniStatCard,
+  GreenhouseRouteLink,
+  GreenhouseDragList,
+  ReliabilityModuleCard
+} from '@/components/greenhouse'
+import ReliabilityAiWatcherCard from '@/components/greenhouse/admin/ReliabilityAiWatcherCard'
+import ReliabilitySyntheticCard from '@/components/greenhouse/admin/ReliabilitySyntheticCard'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 import type { OperationsOverview } from '@/lib/operations/get-operations-overview'
+import type { ReliabilityOverview } from '@/types/reliability'
+import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
 import {
   buildControlTowerSummary,
@@ -35,11 +45,48 @@ import AdminCenterSpacesTable from './AdminCenterSpacesTable'
 
 type StatusFilter = 'all' | 'active' | 'onboarding' | 'attention' | 'inactive'
 
+type AiObservationView = {
+  observationId: string
+  sweepRunId: string
+  severity: ReliabilityOverview['modules'][number]['status']
+  summary: string
+  recommendedAction: string | null
+  model: string
+  observedAt: string
+}
+
 type Props = {
   access: AdminAccessOverview
   tenants: AdminTenantsOverview
   controlTower: InternalDashboardOverview
   operations: OperationsOverview
+  reliability: ReliabilityOverview
+  syntheticSnapshots: SyntheticRouteSnapshot[]
+  syntheticSweep: {
+    sweepRunId: string
+    startedAt: string
+    finishedAt: string | null
+    status: string
+    notes: string | null
+  } | null
+
+  /**
+   * TASK-638: Última observación scope='overview' del AI Observer.
+   * null cuando el runner aún no ha corrido o el kill-switch está OFF.
+   */
+  aiObservation: AiObservationView | null
+
+  /**
+   * TASK-638: Observaciones scope='module' frescas (ventana 24h) del AI
+   * Observer. Se renderizan dentro de la tarjeta AI Observer para dar
+   * contexto granular del overview sin abrir cada module card.
+   */
+  aiModuleObservations: Array<{
+    moduleKey: string
+    severity: ReliabilityOverview['modules'][number]['status']
+    summary: string
+    recommendedAction: string | null
+  }>
 }
 
 type DomainCard = {
@@ -231,9 +278,9 @@ const buildDomainCards = ({
       label: cloudStatusLabel(operations),
       color: cloudStatusColor(operations)
     },
-    href: '/admin/integrations',
+    href: '/admin/cloud-integrations',
     primaryAction: 'Abrir cloud & integrations',
-    routes: ['/admin/integrations', '/admin/cloud-integrations'],
+    routes: ['/admin/cloud-integrations', '/admin/integrations'],
     points: [
       `${operations.kpis.activeSyncs} fuentes activas de sincronizacion`,
       operations.cloud.cron.secretConfigured ? 'Cron control plane autenticado' : 'CRON_SECRET pendiente',
@@ -257,6 +304,44 @@ const buildDomainCards = ({
       'Taxonomia y ownership de integraciones nativas',
       'Readiness downstream por integracion',
       'Health y freshness unificados'
+    ]
+  },
+  {
+    id: 'commercial-parties',
+    title: GH_INTERNAL_NAV.adminCommercialParties.label,
+    subtitle: GH_INTERNAL_NAV.adminCommercialParties.subtitle,
+    icon: 'tabler-building-community',
+    avatarColor: 'warning',
+    status: {
+      label: 'Lifecycle',
+      color: 'info'
+    },
+    href: '/admin/commercial/parties',
+    primaryAction: 'Abrir commercial parties',
+    routes: ['/admin/commercial/parties'],
+    points: [
+      'Embudo prospect → opportunity → active_client sobre organizations materializadas',
+      'Conflictos de sync HubSpot y señales anti ping-pong visibles desde Admin',
+      'Detalle por party con timeline, anclas comerciales y bridge financiero'
+    ]
+  },
+  {
+    id: 'product-sync-conflicts',
+    title: GH_INTERNAL_NAV.adminProductSyncConflicts.label,
+    subtitle: GH_INTERNAL_NAV.adminProductSyncConflicts.subtitle,
+    icon: 'tabler-arrows-shuffle',
+    avatarColor: 'warning',
+    status: {
+      label: 'Catálogo',
+      color: 'info'
+    },
+    href: '/admin/commercial/product-sync-conflicts',
+    primaryAction: 'Abrir conflictos de producto',
+    routes: ['/admin/commercial/product-sync-conflicts'],
+    points: [
+      'Drift nightly entre product_catalog y HubSpot Products',
+      'Auto-heal seguro para orphans en Greenhouse, field drift y archive mismatch',
+      'Resolución manual auditable cuando HubSpot o el operador deben ganar'
     ]
   },
   {
@@ -344,7 +429,17 @@ const buildDomainCards = ({
 const validFilters: StatusFilter[] = ['all', 'active', 'onboarding', 'attention', 'inactive']
 const ADMIN_CENTER_CARD_ORDER_KEY = 'greenhouse:admin-center:domain-card-order'
 
-const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) => {
+const AdminCenterView = ({
+  access,
+  tenants,
+  controlTower,
+  operations,
+  reliability,
+  syntheticSnapshots,
+  syntheticSweep,
+  aiObservation,
+  aiModuleObservations
+}: Props) => {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const navRouter = useNavRouter()
@@ -503,7 +598,7 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
               <Button component={Link} href='/admin/tenants' variant='contained'>
                 Abrir Spaces
               </Button>
-              <Button component={Link} href='/admin/integrations' variant='outlined'>
+              <Button component={GreenhouseRouteLink} href='/admin/cloud-integrations' variant='outlined'>
                 Ver Cloud & Integrations
               </Button>
             </Stack>
@@ -664,6 +759,85 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
         )
       })()}
 
+      {/* ── Confiabilidad por módulo (Reliability Control Plane) ── */}
+      <ExecutiveCardShell
+        title='Confiabilidad por módulo'
+        subtitle='Lectura consolidada de salud, señales activas y evidencia por módulo crítico. Surface técnica vive en Ops Health y Cloud & Integrations.'
+      >
+        <Stack spacing={3}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            justifyContent='space-between'
+            alignItems={{ xs: 'flex-start', md: 'center' }}
+          >
+            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+              <Chip
+                size='small'
+                color='success'
+                variant='tonal'
+                label={`${reliability.totals.healthy} sano${reliability.totals.healthy === 1 ? '' : 's'}`}
+              />
+              <Chip
+                size='small'
+                color='warning'
+                variant='tonal'
+                label={`${reliability.totals.warning} en atención`}
+              />
+              <Chip
+                size='small'
+                color='error'
+                variant='tonal'
+                label={`${reliability.totals.error} crítico${reliability.totals.error === 1 ? '' : 's'}`}
+              />
+              <Chip
+                size='small'
+                variant='outlined'
+                label={`${reliability.totals.unknownOrPending} sin señal aún`}
+              />
+            </Stack>
+            <Typography variant='caption' color='text.secondary'>
+              {reliability.totals.totalModules} módulo{reliability.totals.totalModules === 1 ? '' : 's'} en
+              registry · {reliability.integrationBoundaries.length} boundary
+              {reliability.integrationBoundaries.length === 1 ? '' : 'ies'} pendiente
+              {reliability.integrationBoundaries.length === 1 ? '' : 's'} (TASK-586/599)
+            </Typography>
+          </Stack>
+
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 3,
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(2, minmax(0, 1fr))',
+                xl: 'repeat(2, minmax(0, 1fr))'
+              }
+            }}
+          >
+            {reliability.modules.map(module => (
+              <ReliabilityModuleCard key={module.moduleKey} module={module} />
+            ))}
+          </Box>
+
+          {reliability.notes.length > 0 && (
+            <Stack spacing={0.5}>
+              {reliability.notes.map(note => (
+                <Typography key={note} variant='caption' color='text.secondary'>
+                  · {note}
+                </Typography>
+              ))}
+            </Stack>
+          )}
+        </Stack>
+      </ExecutiveCardShell>
+
+      {/* ── AI Observer (TASK-638) ── */}
+      <ReliabilityAiWatcherCard observation={aiObservation} moduleObservations={aiModuleObservations} />
+
+      {/* ── Synthetic Monitor (TASK-632) ── */}
+      <ReliabilitySyntheticCard snapshots={syntheticSnapshots} sweep={syntheticSweep} />
+
       {/* ── Torre de control (Spaces health table) ── */}
       <SectionErrorBoundary
         sectionName='admin-center-control-tower'
@@ -744,7 +918,7 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
                         />
                       ))}
                     </Stack>
-                    <Button component={Link} href={card.href} variant='outlined'>
+                    <Button component={GreenhouseRouteLink} href={card.href} variant='outlined'>
                       {card.primaryAction}
                     </Button>
                   </Box>

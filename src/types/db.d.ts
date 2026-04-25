@@ -123,6 +123,22 @@ export interface GreenhouseAiNexaThreads {
   user_id: string;
 }
 
+export interface GreenhouseAiReliabilityAiObservations {
+  created_at: Generated<Timestamp>;
+  fingerprint: string;
+  model: string;
+  module_key: string;
+  observation_id: string;
+  observed_at: Timestamp;
+  output_tokens: number | null;
+  prompt_tokens: number | null;
+  recommended_action: string | null;
+  scope: string;
+  severity: string;
+  summary: string;
+  sweep_run_id: string;
+}
+
 export interface GreenhouseAiToolCatalog {
   applicability_tags: Generated<string[]>;
   applicable_business_lines: Generated<string[]>;
@@ -245,6 +261,34 @@ export interface GreenhouseCommercialCommercialModelMultipliers {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialCommercialOperationsAudit {
+  actor_user_id: string;
+  approval_id: string | null;
+  client_id: string | null;
+  completed_at: Timestamp | null;
+  contract_id: string | null;
+  /**
+   * UNIQUE uuid emitted in every outbox event payload produced during this operation — ties party/client/contract/deal events into a single narrative for support + replay.
+   */
+  correlation_id: string;
+  error_code: string | null;
+  error_message: string | null;
+  hubspot_deal_id: string | null;
+  metadata: Generated<Json>;
+  operation_id: Generated<string>;
+  operation_type: string;
+  organization_id: string | null;
+  quotation_id: string | null;
+  started_at: Generated<Timestamp>;
+  status: Generated<string>;
+  tenant_scope: string;
+  total_amount_clp: Numeric | null;
+  /**
+   * operator (explicit API) · contract_signed (reserved for reactive future) · deal_won_hubspot (inbound deal sync triggered auto-promoter) · reactive_auto (other projections).
+   */
+  trigger_source: string;
+}
+
 export interface GreenhouseCommercialContractQuotes {
   contract_id: string;
   created_at: Generated<Timestamp>;
@@ -305,11 +349,51 @@ export interface GreenhouseCommercialCountryPricingFactors {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCommercialDealCreateAttempts {
+  actor_user_id: string;
+  amount: Numeric | null;
+  amount_clp: Numeric | null;
+  approval_id: string | null;
+  attempt_id: Generated<string>;
+  business_line_code: string | null;
+  completed_at: Timestamp | null;
+  contact_identity_profile_id: string | null;
+  created_at: Generated<Timestamp>;
+  currency: string | null;
+  deal_id: string | null;
+  deal_name: string;
+  deal_type: string | null;
+  error_code: string | null;
+  error_message: string | null;
+  hubspot_company_id: string | null;
+  hubspot_contact_id: string | null;
+  hubspot_deal_id: string | null;
+  /**
+   * Caller-supplied key; UNIQUE partial index dedupes retries within the default window.
+   */
+  idempotency_key: string | null;
+  metadata: Generated<Json>;
+  organization_id: string;
+  owner_hubspot_user_id: string | null;
+  pipeline_id: string | null;
+  priority: string | null;
+  stage_id: string | null;
+  /**
+   * pending (in-flight) · completed (deal created + persisted) · pending_approval (>threshold, awaiting approval) · rate_limited (refused) · failed (Cloud Run error) · endpoint_not_deployed (graceful fallback while /deals ships)
+   */
+  status: Generated<string>;
+  /**
+   * Canonical tenant bucket for rate limiting — tenantType + clientId joined. Kept as text to avoid cross-schema FK.
+   */
+  tenant_scope: string;
+}
+
 export interface GreenhouseCommercialDeals {
   amount: Numeric | null;
   amount_clp: Numeric | null;
   client_id: string | null;
   close_date: Timestamp | null;
+  contact_identity_profile_id: string | null;
   created_at: Generated<Timestamp>;
   created_in_hubspot_at: Timestamp | null;
   currency: Generated<string>;
@@ -322,6 +406,7 @@ export interface GreenhouseCommercialDeals {
   dealstage: string;
   dealstage_label: string | null;
   exchange_rate_to_clp: Numeric | null;
+  hubspot_contact_id: string | null;
   hubspot_deal_id: string;
   hubspot_last_synced_at: Generated<Timestamp>;
   hubspot_pipeline_id: string | null;
@@ -330,6 +415,7 @@ export interface GreenhouseCommercialDeals {
   is_won: Generated<boolean>;
   organization_id: string | null;
   pipeline_name: string | null;
+  priority: string | null;
   probability_pct: Numeric | null;
   source_payload: Generated<Json>;
   space_id: string | null;
@@ -380,13 +466,54 @@ export interface GreenhouseCommercialFteHoursGuide {
 export interface GreenhouseCommercialHubspotDealPipelineConfig {
   created_at: Generated<Timestamp>;
   is_closed: Generated<boolean>;
+  is_default_for_create: Generated<boolean>;
+  is_open_selectable: Generated<boolean>;
   is_won: Generated<boolean>;
   notes: string | null;
+  pipeline_active: Generated<boolean>;
+  pipeline_display_order: number | null;
   pipeline_id: string;
+  pipeline_label: string | null;
   probability_pct: Numeric | null;
+  stage_display_order: number | null;
   stage_id: string;
   stage_label: string;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialHubspotDealPipelineDefaults {
+  created_at: Generated<Timestamp>;
+  deal_type: string | null;
+  notes: string | null;
+  owner_hubspot_user_id: string | null;
+  pipeline_id: string;
+  priority: string | null;
+  scope: string;
+  scope_key: string;
+  stage_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialHubspotDealPropertyConfig {
+  description: string | null;
+  field_type: string | null;
+  /**
+   * HubSpot internal property name, e.g. dealtype or hs_priority.
+   */
+  hubspot_property_name: string;
+  label: string | null;
+  metadata: Generated<Json>;
+  missing_in_hubspot: Generated<boolean>;
+  /**
+   * HubSpot options snapshot as JSON array; empty array when the property has no enumerated options.
+   */
+  options_json: Generated<Json>;
+  /**
+   * Greenhouse-facing semantic property key, e.g. dealType or priority.
+   */
+  property_name: string;
+  property_type: string | null;
+  synced_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseCommercialMarginTargets {
@@ -514,7 +641,58 @@ export interface GreenhouseCommercialOverheadAddons {
   visible_to_client: Generated<boolean>;
 }
 
+export interface GreenhouseCommercialPartyEndpointRequests {
+  actor_user_id: string;
+  created_at: Generated<Timestamp>;
+  endpoint_key: string;
+  hubspot_company_id: string | null;
+  metadata: Generated<Json>;
+  party_endpoint_request_id: Generated<string>;
+  /**
+   * Normalized lowercase search term used only for audit/debug. Not unique.
+   */
+  query_fingerprint: string | null;
+  query_text: string | null;
+  response_status: number;
+  tenant_scope: string;
+}
+
+export interface GreenhouseCommercialPartySyncConflicts {
+  commercial_party_id: string | null;
+  conflict_id: Generated<string>;
+  conflict_type: string;
+  conflicting_fields: Json | null;
+  detected_at: Generated<Timestamp>;
+  hubspot_company_id: string | null;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  resolution_applied_at: Timestamp | null;
+  resolution_status: Generated<string>;
+  resolved_by: string | null;
+}
+
+export interface GreenhouseCommercialPricingCatalogApprovalQueue {
+  approval_id: Generated<string>;
+  criticality: string;
+  entity_id: string;
+  entity_sku: string | null;
+  entity_type: string;
+  justification: string | null;
+  proposed_at: Generated<Timestamp>;
+  proposed_by_name: string;
+  proposed_by_user_id: string;
+  proposed_changes: Json;
+  review_comment: string | null;
+  reviewed_at: Timestamp | null;
+  reviewed_by_name: string | null;
+  reviewed_by_user_id: string | null;
+  status: Generated<string>;
+}
+
 export interface GreenhouseCommercialPricingCatalogAuditLog {
+  /**
+   * Acción auditada. 12 valores: 9 operacionales (created, updated, deactivated, reactivated, cost_updated, pricing_updated, bulk_imported, recipe_updated, deleted) + 3 governance (reverted, approval_applied, bulk_edited) agregados en TASK-471.
+   */
   action: string;
   actor_name: string;
   actor_user_id: string;
@@ -530,28 +708,155 @@ export interface GreenhouseCommercialPricingCatalogAuditLog {
 
 export interface GreenhouseCommercialProductCatalog {
   active: Generated<boolean>;
+  archived_at: Timestamp | null;
+  archived_by: string | null;
   business_line_code: string | null;
+  category_code: string | null;
+  commercial_owner_assigned_at: Timestamp | null;
+  commercial_owner_member_id: string | null;
   created_at: Generated<Timestamp>;
   created_by: Generated<string>;
   default_currency: Generated<string>;
   default_unit: Generated<string>;
   default_unit_price: Numeric | null;
   description: string | null;
+  description_rich_html: string | null;
   finance_product_id: string | null;
+  /**
+   * SHA-256 of the Greenhouse-owned fields joined with | — used by drift detection to compare against HubSpot snapshot. Recomputed on every commit. NULL until first materialize.
+   */
+  gh_owned_fields_checksum: string | null;
+  hubspot_bundle_type_code: Generated<string | null>;
+  /**
+   * TASK-547: timestamp of the last successful outbound write to HubSpot. Inbound sync (TASK-548) consults this to skip pushes received within 60s (anti-ping-pong guard).
+   */
+  hubspot_last_write_at: Timestamp | null;
+  hubspot_pricing_model: Generated<string | null>;
+  hubspot_product_classification: Generated<string | null>;
   hubspot_product_id: string | null;
+  hubspot_product_type_code: string | null;
+  /**
+   * TASK-547: monotonic counter of outbound attempts since last success. Reset to 0 on synced.
+   */
+  hubspot_sync_attempt_count: Generated<number>;
+  /**
+   * TASK-547: short error message from the last failed outbound attempt. Cleared on the next successful sync.
+   */
+  hubspot_sync_error: string | null;
+  /**
+   * TASK-547: last outbound attempt status (pending | synced | failed | endpoint_not_deployed | skipped_no_anchors). NULL == never attempted.
+   */
+  hubspot_sync_status: string | null;
+  image_urls: Generated<string[] | null>;
+  /**
+   * Soft-archive flag. Archived products are hidden from selectors but preserved for historical quotations/contracts.
+   */
+  is_archived: Generated<boolean>;
+  is_recurring: Generated<boolean | null>;
+  /**
+   * Timestamp of the most recent drift detection pass (TASK-548). NULL until first cron run.
+   */
+  last_drift_check_at: Timestamp | null;
+  /**
+   * Timestamp of the most recent successful HubSpot outbound push (TASK-547). NULL until first sync.
+   */
+  last_outbound_sync_at: Timestamp | null;
   last_synced_at: Timestamp | null;
   legacy_category: string | null;
   legacy_sku: string | null;
+  marketing_url: string | null;
+  owner_gh_authoritative: Generated<boolean | null>;
   pricing_model: string | null;
   product_code: string;
   product_id: Generated<string>;
   product_name: string;
   product_type: Generated<string>;
+  recurring_billing_frequency_code: string | null;
+  recurring_billing_period_iso: string | null;
+  /**
+   * PK of the source row in the owning catalog (role_id / tool_id / addon_id / module_id). NULL for source_kind in (manual, hubspot_imported).
+   */
+  source_id: string | null;
+  /**
+   * Which source catalog owns this row. One of sellable_role, sellable_role_variant, tool, overhead_addon, service, manual, hubspot_imported. See GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1 §5.
+   */
+  source_kind: string | null;
   source_system: Generated<string>;
+  /**
+   * Reserved for sellable_role_variant — deterministic key differentiating variants of the same role. Always NULL in Fase A.
+   */
+  source_variant_key: string | null;
   suggested_hours: Numeric | null;
   suggested_role_code: string | null;
   sync_direction: Generated<string>;
   sync_status: Generated<string>;
+  tax_category_code: string | null;
+  unit_code: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProductCatalogAuthoritativePrice {
+  created_at: Timestamp | null;
+  currency_code: string | null;
+  product_id: string | null;
+  source: string | null;
+  unit_price: Numeric | null;
+  updated_at: Timestamp | null;
+}
+
+export interface GreenhouseCommercialProductCatalogPrices {
+  created_at: Generated<Timestamp>;
+  currency_code: string;
+  derived_from_currency: string | null;
+  derived_from_fx_at: Timestamp | null;
+  derived_fx_rate: Numeric | null;
+  is_authoritative: Generated<boolean>;
+  product_id: string;
+  source: string;
+  unit_price: Numeric;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProductCategories {
+  active: Generated<boolean>;
+  code: string;
+  created_at: Generated<Timestamp>;
+  display_order: number | null;
+  hubspot_option_value: string | null;
+  label_en: string | null;
+  label_es: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProductSourceKindMapping {
+  created_at: Generated<Timestamp>;
+  hubspot_product_type: string;
+  notes: string | null;
+  source_kind: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialProductSyncConflicts {
+  conflict_id: Generated<string>;
+  conflict_type: string;
+  conflicting_fields: Json | null;
+  detected_at: Generated<Timestamp>;
+  hubspot_product_id: string | null;
+  metadata: Generated<Json>;
+  product_id: string | null;
+  resolution_applied_at: Timestamp | null;
+  resolution_status: Generated<string>;
+  resolved_by: string | null;
+}
+
+export interface GreenhouseCommercialProductUnits {
+  active: Generated<boolean>;
+  code: string;
+  created_at: Generated<Timestamp>;
+  display_order: number | null;
+  hubspot_option_value: string | null;
+  label_en: string | null;
+  label_es: string;
   updated_at: Generated<Timestamp>;
 }
 
@@ -566,9 +871,53 @@ export interface GreenhouseCommercialQuotationAuditLog {
   version_number: number | null;
 }
 
+export interface GreenhouseCommercialQuotationLineCostOverrideHistory {
+  category: string;
+  delta_pct: Numeric | null;
+  history_id: Generated<string>;
+  line_item_id: string;
+  metadata: Generated<Json>;
+  overridden_at: Generated<Timestamp>;
+  overridden_by_user_id: string | null;
+  override_breakdown: Json | null;
+  override_unit_cost_usd: Numeric;
+  quotation_id: string;
+  reason: string;
+  suggested_breakdown: Json | null;
+  suggested_unit_cost_usd: Numeric | null;
+}
+
 export interface GreenhouseCommercialQuotationLineItems {
   addon_id: string | null;
   cost_breakdown: Generated<Json>;
+  /**
+   * Timestamp of the override action. Null when the line has never been overridden.
+   */
+  cost_override_at: Timestamp | null;
+  /**
+   * User profile id of the actor who performed the override. Soft FK to greenhouse_core.identity_profiles.
+   */
+  cost_override_by_user_id: string | null;
+  /**
+   * Structured category for the override (competitive_pressure | strategic_investment | roi_correction | error_correction | client_negotiation | other) to enable analytics on override patterns.
+   */
+  cost_override_category: string | null;
+  /**
+   * Signed delta percentage between override_unit_cost and suggested_unit_cost at the moment of override. Positive = override above suggested.
+   */
+  cost_override_delta_pct: Numeric | null;
+  /**
+   * Required free-text justification for a manual cost override on this line. 15-500 chars (shorter if category is not other).
+   */
+  cost_override_reason: string | null;
+  /**
+   * Full snapshot of the suggested cost_breakdown JSONB (provenance, confidence, freshness) at the moment of override. Immutable for audit integrity.
+   */
+  cost_override_suggested_breakdown: Json | null;
+  /**
+   * Snapshot of the system-suggested unit cost (USD) at the moment of override. Immutable for audit integrity even if the source catalog changes.
+   */
+  cost_override_suggested_unit_cost_usd: Numeric | null;
   created_at: Generated<Timestamp>;
   currency: string | null;
   description: string | null;
@@ -583,6 +932,7 @@ export interface GreenhouseCommercialQuotationLineItems {
   hours_estimated: Numeric | null;
   hubspot_line_item_id: string | null;
   hubspot_product_id: string | null;
+  is_tax_exempt: Generated<boolean>;
   label: string;
   legacy_tax_amount: Numeric | null;
   legacy_total_amount: Numeric | null;
@@ -593,6 +943,10 @@ export interface GreenhouseCommercialQuotationLineItems {
   member_id: string | null;
   module_id: string | null;
   notes: string | null;
+  /**
+   * Persisted pricing-engine-v2 line input for faithful repricing/replay outside the interactive builder.
+   */
+  pricing_input: Json | null;
   product_id: string | null;
   quantity: Generated<Numeric>;
   quotation_id: string;
@@ -605,6 +959,10 @@ export interface GreenhouseCommercialQuotationLineItems {
   subtotal_after_discount: Numeric | null;
   subtotal_cost: Numeric | null;
   subtotal_price: Numeric | null;
+  tax_amount_snapshot: Numeric | null;
+  tax_code: string | null;
+  tax_rate_snapshot: Numeric | null;
+  tax_snapshot_json: Json | null;
   tool_id: string | null;
   unit: Generated<string>;
   unit_cost: Numeric | null;
@@ -624,6 +982,11 @@ export interface GreenhouseCommercialQuotationRenewalReminders {
 }
 
 export interface GreenhouseCommercialQuotations {
+  accepted_at: Timestamp | null;
+  accepted_by_name: string | null;
+  accepted_by_role: string | null;
+  accepted_ip: string | null;
+  accepted_via_short_code: string | null;
   acv: Numeric | null;
   /**
    * Timestamp del rechazo por aprobación de excepción para la versión vigente.
@@ -637,6 +1000,7 @@ export interface GreenhouseCommercialQuotations {
   approved_by: string | null;
   arr: Numeric | null;
   billing_frequency: Generated<string>;
+  billing_start_date: Timestamp | null;
   business_line_code: string | null;
   client_id: string | null;
   client_name_cache: string | null;
@@ -673,7 +1037,27 @@ export interface GreenhouseCommercialQuotations {
   hubspot_deal_id: string | null;
   hubspot_last_synced_at: Timestamp | null;
   hubspot_quote_id: string | null;
+  /**
+   * Observed native HubSpot public quote link (`hs_quote_link`) from the last successful outbound write/read.
+   */
+  hubspot_quote_link: string | null;
+  /**
+   * Observed native HubSpot lock state (`hs_locked`) from the last successful outbound write/read.
+   */
+  hubspot_quote_locked: boolean | null;
+  /**
+   * Observed native HubSpot PDF download link (`hs_pdf_download_link`) from the last successful outbound write/read.
+   */
+  hubspot_quote_pdf_download_link: string | null;
+  /**
+   * Observed native HubSpot quote status (`hs_status`) from the last successful outbound write/read.
+   */
+  hubspot_quote_status: string | null;
   internal_notes: string | null;
+  /**
+   * Derived flag for fast filtering — true when tax_code IN (cl_vat_exempt, cl_vat_non_billable).
+   */
+  is_tax_exempt: Generated<boolean>;
   /**
    * Timestamp canónico de emisión documental. `sent_at` queda como columna legacy de compatibilidad mientras los consumers migran.
    */
@@ -696,6 +1080,10 @@ export interface GreenhouseCommercialQuotations {
    */
   organization_id: string | null;
   payment_terms_days: Generated<number>;
+  /**
+   * Replay context for pricing-engine-v2 (commercial model code, country factor and related controls).
+   */
+  pricing_context: Generated<Json>;
   pricing_model: Generated<string>;
   quotation_id: Generated<string>;
   quotation_number: string;
@@ -721,7 +1109,18 @@ export interface GreenhouseCommercialQuotations {
   subtotal: Numeric | null;
   target_margin_pct: Numeric | null;
   tax_amount: Numeric | null;
+  tax_amount_snapshot: Numeric | null;
+  /**
+   * Canonical Chile tax code applied to the quote (cl_vat_19 / cl_vat_exempt / cl_vat_non_billable). See GREENHOUSE_FINANCE_ARCHITECTURE_V1 Delta 2026-04-21 (Chile tax foundation).
+   */
+  tax_code: string | null;
   tax_rate: Numeric | null;
+  tax_rate_snapshot: Numeric | null;
+  tax_snapshot_frozen_at: Timestamp | null;
+  /**
+   * Frozen ChileTaxSnapshot (version=1) with the rate, label, recoverability and amounts captured at issuance. Immutable — never recalculated retroactively.
+   */
+  tax_snapshot_json: Json | null;
   tcv: Numeric | null;
   total_amount: Numeric | null;
   total_amount_clp: Numeric | null;
@@ -757,6 +1156,45 @@ export interface GreenhouseCommercialQuotationVersions {
   total_discount: Numeric | null;
   total_price: Numeric | null;
   version_id: Generated<string>;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialQuotePdfAssets {
+  asset_id: string;
+  file_name: string;
+  file_size_bytes: number;
+  generated_at: Generated<Timestamp>;
+  generated_by: string | null;
+  quotation_id: string;
+  storage_bucket: string;
+  storage_path: string;
+  template_version: string;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialQuoteShareViews {
+  ip_address: string | null;
+  quotation_id: string;
+  referer: string | null;
+  short_code: string;
+  user_agent: string | null;
+  version_number: number;
+  view_id: Generated<string>;
+  viewed_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCommercialQuoteShortLinks {
+  access_count: Generated<number>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  expires_at: Timestamp | null;
+  full_token: string;
+  last_accessed_at: Timestamp | null;
+  quotation_id: string;
+  revocation_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  short_code: string;
   version_number: number;
 }
 
@@ -1699,15 +2137,47 @@ export interface GreenhouseCoreOperationalResponsibilities {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreOrganizationLifecycleHistory {
+  commercial_party_id: string;
+  from_stage: string | null;
+  history_id: Generated<string>;
+  metadata: Generated<Json>;
+  organization_id: string;
+  to_stage: string;
+  transition_source: string;
+  transitioned_at: Generated<Timestamp>;
+  transitioned_by: string | null;
+  trigger_entity_id: string | null;
+  trigger_entity_type: string | null;
+}
+
 export interface GreenhouseCoreOrganizations {
   active: Generated<boolean>;
+  /**
+   * Stable surfaceable identifier for the party — used in outbox events and cross-module projections.
+   */
+  commercial_party_id: Generated<string>;
   country: Generated<string | null>;
   created_at: Generated<Timestamp>;
   hubspot_company_id: string | null;
   industry: string | null;
+  /**
+   * Marks the rare organization that is simultaneously a commercial target and a provider (§4.2 invariant 7).
+   */
+  is_dual_role: Generated<boolean>;
   is_operating_entity: Generated<boolean>;
   legal_address: string | null;
   legal_name: string | null;
+  /**
+   * Canonical party lifecycle stage — source of truth for commercial state. See GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1 §4.
+   */
+  lifecycle_stage: Generated<string>;
+  lifecycle_stage_by: string | null;
+  lifecycle_stage_since: Generated<Timestamp>;
+  /**
+   * Which command/pipeline drove the most recent transition (bootstrap, hubspot_sync, manual, …).
+   */
+  lifecycle_stage_source: Generated<string>;
   notes: string | null;
   organization_id: string;
   organization_name: string;
@@ -1790,6 +2260,33 @@ export interface GreenhouseCoreProviders {
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
   website_url: string | null;
+}
+
+export interface GreenhouseCoreReliabilityModuleOverrides {
+  created_at: Generated<Timestamp>;
+  extra_signal_kinds: Generated<Json>;
+  hidden: Generated<boolean>;
+  module_key: string;
+  override_id: string;
+  slo_overrides: Generated<Json>;
+  space_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreReliabilityModuleRegistry {
+  apis: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  dependencies: Generated<Json>;
+  description: string;
+  domain: string;
+  expected_signal_kinds: Generated<Json>;
+  files_owned: Generated<Json>;
+  label: string;
+  module_key: string;
+  routes: Generated<Json>;
+  slo_thresholds: Generated<Json>;
+  smoke_tests: Generated<Json>;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseCoreReportingLines {
@@ -2347,7 +2844,7 @@ export interface GreenhouseDeliveryProjects {
   page_url: string | null;
   payload_hash: string | null;
   project_database_source_id: string | null;
-  project_name: string;
+  project_name: string | null;
   project_phase: string | null;
   project_record_id: string;
   project_status: string | null;
@@ -2391,7 +2888,7 @@ export interface GreenhouseDeliverySprints {
   project_record_id: string | null;
   source_updated_at: Timestamp | null;
   space_id: string | null;
-  sprint_name: string;
+  sprint_name: string | null;
   sprint_record_id: string;
   sprint_status: string | null;
   start_date: Timestamp | null;
@@ -2519,7 +3016,7 @@ export interface GreenhouseDeliveryTasks {
   sync_run_id: string | null;
   synced_at: Generated<Timestamp>;
   tarea_principal_ids: Generated<string[]>;
-  task_name: string;
+  task_name: string | null;
   task_phase: string | null;
   task_priority: string | null;
   task_record_id: string;
@@ -2768,6 +3265,11 @@ export interface GreenhouseFinanceExpenses {
   dte_folio: string | null;
   dte_type_code: string | null;
   due_date: Timestamp | null;
+  /**
+   * Canonical operational cost in document currency: subtotal + non_recoverable_tax_amount.
+   */
+  effective_cost_amount: Numeric | null;
+  effective_cost_amount_clp: Numeric | null;
   exchange_rate_to_clp: Numeric | null;
   exempt_amount: Numeric | null;
   expense_id: string;
@@ -2775,10 +3277,16 @@ export interface GreenhouseFinanceExpenses {
   is_annulled: Generated<boolean | null>;
   is_reconciled: Generated<boolean>;
   is_recurring: Generated<boolean>;
+  is_tax_exempt: boolean | null;
   linked_income_id: string | null;
   member_id: string | null;
   member_name: string | null;
   miscellaneous_category: string | null;
+  /**
+   * Portion of expense tax amount capitalized into cost/gasto.
+   */
+  non_recoverable_tax_amount: Numeric | null;
+  non_recoverable_tax_amount_clp: Numeric | null;
   notes: string | null;
   nubox_document_status: string | null;
   nubox_last_synced_at: Timestamp | null;
@@ -2808,6 +3316,11 @@ export interface GreenhouseFinanceExpenses {
   purchase_type: string | null;
   receipt_date: Timestamp | null;
   reconciliation_id: string | null;
+  /**
+   * Portion of expense tax amount that remains fiscal credit and must not inflate operational cost.
+   */
+  recoverable_tax_amount: Numeric | null;
+  recoverable_tax_amount_clp: Numeric | null;
   recurrence_frequency: string | null;
   /**
    * FK to greenhouse_payroll.payroll_period_reopen_audit for expense rows that represent a reliquidación delta (TASK-411). NULL for every other expense.
@@ -2831,9 +3344,24 @@ export interface GreenhouseFinanceExpenses {
   supplier_invoice_number: string | null;
   supplier_name: string | null;
   tax_amount: Numeric | null;
+  tax_amount_snapshot: Numeric | null;
+  /**
+   * Canonical purchase tax code. Mirrors greenhouse_finance.tax_codes and replaces tax_rate as first-class semantics for expenses.
+   */
+  tax_code: string | null;
   tax_form_number: string | null;
   tax_period: string | null;
   tax_rate: Numeric | null;
+  tax_rate_snapshot: Numeric | null;
+  /**
+   * Resolved recoverability persisted on the expense row for fast filters and downstream cost consumers.
+   */
+  tax_recoverability: string | null;
+  tax_snapshot_frozen_at: Timestamp | null;
+  /**
+   * Frozen ChileTaxSnapshot (version=1) for purchases. Never re-derived from live catalog at read time.
+   */
+  tax_snapshot_json: Json | null;
   tax_type: string | null;
   total_amount: Numeric;
   total_amount_clp: Numeric;
@@ -2912,14 +3440,43 @@ export interface GreenhouseFinanceIncome {
   exempt_amount: Numeric | null;
   hes_id: string | null;
   hes_number: string | null;
+  /**
+   * Id of the HubSpot engagement/note that attached the Nubox-emitted PDF/XML/DTE to the invoice + deal + company. Populated in the second sync phase (on finance.income.nubox_synced).
+   */
+  hubspot_artifact_note_id: string | null;
+  /**
+   * Timestamp of the artifact attach run. NULL until the Nubox document is linked into HubSpot.
+   */
+  hubspot_artifact_synced_at: Timestamp | null;
   hubspot_company_id: string | null;
   hubspot_deal_id: string | null;
+  /**
+   * Id of the mirror invoice object in HubSpot (non-billable). Populated by the reactive outbound bridge in src/lib/finance/income-hubspot/.
+   */
+  hubspot_invoice_id: string | null;
+  hubspot_last_synced_at: Timestamp | null;
+  /**
+   * Monotonic counter of outbound attempts (success or failure). Used by retry worker to apply backoff.
+   */
+  hubspot_sync_attempt_count: Generated<number>;
+  /**
+   * Short error message from the last failed outbound attempt. Cleared on the next successful sync.
+   */
+  hubspot_sync_error: string | null;
+  /**
+   * Last outbound attempt status: pending | synced | failed | endpoint_not_deployed | skipped_no_anchors. NULL == never attempted.
+   */
+  hubspot_sync_status: string | null;
   income_id: string;
   income_type: Generated<string | null>;
   invoice_date: Timestamp;
   invoice_number: string | null;
   is_annulled: Generated<boolean | null>;
   is_reconciled: Generated<boolean>;
+  /**
+   * Derived flag for quick filters. True when the applied tax code is exempt or non-billable.
+   */
+  is_tax_exempt: Generated<boolean>;
   /**
    * total_amount minus partner_share_amount
    */
@@ -2967,7 +3524,18 @@ export interface GreenhouseFinanceIncome {
   source_hes_id: string | null;
   subtotal: Numeric;
   tax_amount: Generated<Numeric>;
+  tax_amount_snapshot: Numeric | null;
+  /**
+   * Canonical Chile tax code applied to the invoice/income (cl_vat_19 / cl_vat_exempt / cl_vat_non_billable). Downstream integrations consume this instead of inferring taxes from raw tax_rate.
+   */
+  tax_code: string | null;
   tax_rate: Numeric | null;
+  tax_rate_snapshot: Numeric | null;
+  tax_snapshot_frozen_at: Timestamp | null;
+  /**
+   * Frozen ChileTaxSnapshot (version=1) persisted on the financial aggregate. Immutable after issuance/materialization.
+   */
+  tax_snapshot_json: Json | null;
   total_amount: Numeric;
   total_amount_clp: Numeric;
   updated_at: Generated<Timestamp>;
@@ -2980,9 +3548,14 @@ export interface GreenhouseFinanceIncomeLineItems {
   discount_percent: Numeric | null;
   income_id: string;
   is_exempt: Generated<boolean | null>;
+  is_tax_exempt: Generated<boolean>;
   line_item_id: string;
   line_number: number;
   quantity: Numeric | null;
+  tax_amount_snapshot: Numeric | null;
+  tax_code: string | null;
+  tax_rate_snapshot: Numeric | null;
+  tax_snapshot_json: Json | null;
   total_amount: Numeric | null;
   unit_price: Numeric | null;
 }
@@ -3329,6 +3902,118 @@ export interface GreenhouseFinanceSuppliers {
   website_url: string | null;
 }
 
+export interface GreenhouseFinanceTaxCategories {
+  active: Generated<boolean>;
+  code: string;
+  created_at: Generated<Timestamp>;
+  default_rate_pct: Numeric | null;
+  display_order: number | null;
+  hubspot_option_value: string | null;
+  jurisdiction: Generated<string>;
+  label_en: string | null;
+  label_es: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceTaxCodes {
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  /**
+   * First day the code is applicable. Snapshots frozen at issuance time reference this window.
+   */
+  effective_from: Timestamp;
+  /**
+   * Exclusive upper bound. NULL means currently active.
+   */
+  effective_to: Timestamp | null;
+  id: Generated<string>;
+  /**
+   * ISO 3166-1 alpha-2 country code (uppercase). Chile = CL.
+   */
+  jurisdiction: string;
+  /**
+   * Semantic classification: vat_output (charged on sales), vat_input_credit (recoverable on purchases), vat_input_non_recoverable, vat_exempt, vat_non_billable.
+   */
+  kind: string;
+  label_en: string | null;
+  label_es: string;
+  metadata: Generated<Json>;
+  /**
+   * Decimal rate (0.19 = 19%). NULL for exempt / non-billable codes.
+   */
+  rate: Numeric | null;
+  /**
+   * full | partial | none | not_applicable. not_applicable applies to output taxes and exempt/non-billable.
+   */
+  recoverability: string;
+  /**
+   * NULL = global default (Chile seed). Populated = tenant-specific override for the same (tax_code, jurisdiction, effective_from).
+   */
+  space_id: string | null;
+  /**
+   * Stable human identifier, e.g. cl_vat_19, cl_input_vat_credit_19. Consumers reference by this string.
+   */
+  tax_code: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceVatLedgerEntries {
+  amount_clp: Generated<Numeric>;
+  amount_document: Generated<Numeric>;
+  client_id: string | null;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  exchange_rate_to_clp: Numeric | null;
+  ledger_entry_id: string;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  source_date: Timestamp;
+  source_id: string;
+  source_kind: string;
+  source_public_ref: string | null;
+  space_id: string;
+  /**
+   * How tenant isolation was resolved for the source row: quotation, client_bridge, or expense.
+   */
+  space_resolution_source: string;
+  tax_code: string;
+  tax_recoverability: string | null;
+  tax_snapshot_json: Json;
+  taxable_amount: Generated<Numeric>;
+  updated_at: Generated<Timestamp>;
+  /**
+   * Fiscal bucket for the entry: debit_fiscal, credito_fiscal, or iva_no_recuperable.
+   */
+  vat_bucket: string;
+}
+
+export interface GreenhouseFinanceVatMonthlyPositions {
+  client_id: string | null;
+  credit_document_count: Generated<number>;
+  credit_fiscal_amount_clp: Generated<Numeric>;
+  debit_document_count: Generated<number>;
+  debit_fiscal_amount_clp: Generated<Numeric>;
+  ledger_entry_count: Generated<number>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  metadata: Generated<Json>;
+  /**
+   * Monthly VAT payable position in CLP: debit_fiscal_amount_clp - credit_fiscal_amount_clp.
+   */
+  net_vat_position_clp: Generated<Numeric>;
+  non_recoverable_document_count: Generated<number>;
+  non_recoverable_vat_amount_clp: Generated<Numeric>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  space_id: string;
+  vat_position_id: string;
+}
+
 export interface GreenhouseHrEvalAssignments {
   assignment_id: string;
   created_at: Generated<Timestamp>;
@@ -3580,13 +4265,26 @@ export interface GreenhouseHrWorkflowApprovalSnapshots {
 
 export interface GreenhouseNotificationsEmailDeliveries {
   actor_email: string | null;
+  attachment_size_bytes: number | null;
   attempt_number: Generated<number>;
   batch_id: string;
+  /**
+   * Timestamp confirmed by Resend webhook email.bounced.
+   */
+  bounced_at: Timestamp | null;
+  /**
+   * Timestamp confirmed by Resend webhook email.complained.
+   */
+  complained_at: Timestamp | null;
   created_at: Generated<Timestamp>;
   /**
    * Set when delivery_payload and PII fields are anonymized for GDPR/data retention
    */
   data_redacted_at: Timestamp | null;
+  /**
+   * Timestamp confirmed by Resend webhook email.delivered.
+   */
+  delivered_at: Timestamp | null;
   delivery_id: Generated<string>;
   delivery_payload: Generated<Json>;
   domain: string;
@@ -3597,14 +4295,19 @@ export interface GreenhouseNotificationsEmailDeliveries {
   error_class: string | null;
   error_message: string | null;
   has_attachments: Generated<boolean>;
+  organization_id: string | null;
+  parent_delivery_id: string | null;
   /**
    * critical | transactional | broadcast — critical/transactional bypass rate limits
    */
   priority: Generated<string>;
+  recipient_contact_id: string | null;
   recipient_email: string;
+  recipient_kind: string | null;
   recipient_name: string | null;
   recipient_user_id: string | null;
   resend_id: string | null;
+  resend_reason: string | null;
   source_entity: string | null;
   source_event_id: string | null;
   status: Generated<string>;
@@ -3618,6 +4321,7 @@ export interface GreenhouseNotificationsEmailEngagement {
   engagement_id: Generated<string>;
   event_type: string;
   link_url: string | null;
+  resend_event_id: string | null;
   resend_id: string;
 }
 
@@ -3638,6 +4342,16 @@ export interface GreenhouseNotificationsEmailTypeConfig {
   paused_by: string | null;
   paused_reason: string | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseNotificationsIdempotencyKeys {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  endpoint: string;
+  expires_at: Timestamp;
+  idempotency_key: string;
+  response_body: Json;
+  response_status: number;
 }
 
 export interface GreenhouseNotificationsNotificationLog {
@@ -4668,6 +5382,39 @@ export interface GreenhouseServingOrganizationOperationalMetrics {
   throughput_count: number | null;
 }
 
+export interface GreenhouseServingPartyLifecycleSnapshots {
+  active_client_at: Timestamp | null;
+  active_contracts_count: Generated<number>;
+  active_quotes_count: Generated<number>;
+  churned_at: Timestamp | null;
+  commercial_party_id: string;
+  disqualified_at: Timestamp | null;
+  first_seen_at: Timestamp;
+  hubspot_company_id: string | null;
+  inactive_at: Timestamp | null;
+  last_conflict_at: Timestamp | null;
+  last_conflict_type: string | null;
+  last_contract_at: Timestamp | null;
+  last_quote_at: Timestamp | null;
+  latest_history_id: string | null;
+  latest_reason: string | null;
+  latest_transition_at: Timestamp;
+  latest_transition_by: string | null;
+  latest_transition_source: string | null;
+  lifecycle_stage: string;
+  lifecycle_stage_by: string | null;
+  lifecycle_stage_since: Timestamp;
+  lifecycle_stage_source: string;
+  materialized_at: Generated<Timestamp>;
+  opportunity_at: Timestamp | null;
+  organization_id: string;
+  organization_name: string;
+  prospect_at: Timestamp | null;
+  provider_only_at: Timestamp | null;
+  total_transitions: Generated<number>;
+  unresolved_conflicts_count: Generated<number>;
+}
+
 export interface GreenhouseServingPeriodClosureStatus {
   closure_status: string;
   expenses_closed: Generated<boolean>;
@@ -5053,6 +5800,54 @@ export interface GreenhouseServingQuotationProfitabilitySnapshots {
   staffing_model: string | null;
 }
 
+export interface GreenhouseServingServiceAttributionFacts {
+  amount_clp: Numeric;
+  amount_kind: string;
+  attribution_id: string;
+  attribution_method: string;
+  client_id: string | null;
+  confidence_label: string;
+  confidence_score: Generated<Numeric>;
+  evidence_json: Generated<Json>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  service_id: string;
+  source_amount: Numeric | null;
+  source_currency: string | null;
+  source_domain: string;
+  source_id: string;
+  source_type: string;
+  space_id: string;
+}
+
+export interface GreenhouseServingServiceAttributionUnresolved {
+  amount_clp: Numeric;
+  amount_kind: string;
+  attempted_method: string | null;
+  candidate_service_ids: Generated<string[]>;
+  candidate_space_ids: Generated<string[]>;
+  client_id: string | null;
+  confidence_label: Generated<string>;
+  confidence_score: Generated<Numeric>;
+  evidence_json: Generated<Json>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  reason_code: string;
+  source_amount: Numeric | null;
+  source_currency: string | null;
+  source_domain: string;
+  source_id: string;
+  source_type: string;
+  space_id: string | null;
+  unresolved_id: string;
+}
+
 export interface GreenhouseServingServiceSlaComplianceSnapshots {
   actual_value: Numeric | null;
   breach_threshold: Numeric | null;
@@ -5432,8 +6227,11 @@ export interface GreenhouseSyncOutboxEvents {
 }
 
 export interface GreenhouseSyncOutboxReactiveLog {
+  error_class: string | null;
+  error_family: string | null;
   event_id: string;
   handler: string;
+  is_infrastructure_fault: Generated<boolean>;
   last_error: string | null;
   reacted_at: Generated<Timestamp>;
   result: string | null;
@@ -5468,7 +6266,10 @@ export interface GreenhouseSyncProjectionRefreshQueue {
   created_at: Generated<Timestamp>;
   entity_id: string;
   entity_type: string;
+  error_class: string | null;
+  error_family: string | null;
   error_message: string | null;
+  is_infrastructure_fault: Generated<boolean>;
   max_retries: Generated<number>;
   priority: Generated<number>;
   projection_name: string;
@@ -5477,6 +6278,21 @@ export interface GreenhouseSyncProjectionRefreshQueue {
   status: Generated<string>;
   triggered_by_event_id: string | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseSyncReliabilitySyntheticRuns {
+  created_at: Generated<Timestamp>;
+  error_message: string | null;
+  finished_at: Timestamp;
+  http_status: number;
+  latency_ms: number;
+  module_key: string;
+  ok: boolean;
+  probe_id: string;
+  route_path: string;
+  started_at: Timestamp;
+  sweep_run_id: string;
+  triggered_by: string;
 }
 
 export interface GreenhouseSyncReportingHierarchyDriftProposals {
@@ -5655,34 +6471,52 @@ export interface DB {
   "greenhouse_ai.nexa_feedback": GreenhouseAiNexaFeedback;
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
+  "greenhouse_ai.reliability_ai_observations": GreenhouseAiReliabilityAiObservations;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;
   "greenhouse_commercial.clause_library": GreenhouseCommercialClauseLibrary;
   "greenhouse_commercial.commercial_cost_basis_snapshots": GreenhouseCommercialCommercialCostBasisSnapshots;
   "greenhouse_commercial.commercial_model_multipliers": GreenhouseCommercialCommercialModelMultipliers;
+  "greenhouse_commercial.commercial_operations_audit": GreenhouseCommercialCommercialOperationsAudit;
   "greenhouse_commercial.contract_quotes": GreenhouseCommercialContractQuotes;
   "greenhouse_commercial.contract_renewal_reminders": GreenhouseCommercialContractRenewalReminders;
   "greenhouse_commercial.contracts": GreenhouseCommercialContracts;
   "greenhouse_commercial.country_pricing_factors": GreenhouseCommercialCountryPricingFactors;
+  "greenhouse_commercial.deal_create_attempts": GreenhouseCommercialDealCreateAttempts;
   "greenhouse_commercial.deals": GreenhouseCommercialDeals;
   "greenhouse_commercial.employment_type_aliases": GreenhouseCommercialEmploymentTypeAliases;
   "greenhouse_commercial.employment_types": GreenhouseCommercialEmploymentTypes;
   "greenhouse_commercial.fte_hours_guide": GreenhouseCommercialFteHoursGuide;
   "greenhouse_commercial.hubspot_deal_pipeline_config": GreenhouseCommercialHubspotDealPipelineConfig;
+  "greenhouse_commercial.hubspot_deal_pipeline_defaults": GreenhouseCommercialHubspotDealPipelineDefaults;
+  "greenhouse_commercial.hubspot_deal_property_config": GreenhouseCommercialHubspotDealPropertyConfig;
   "greenhouse_commercial.margin_targets": GreenhouseCommercialMarginTargets;
   "greenhouse_commercial.master_agreement_clauses": GreenhouseCommercialMasterAgreementClauses;
   "greenhouse_commercial.master_agreements": GreenhouseCommercialMasterAgreements;
   "greenhouse_commercial.member_role_cost_basis_snapshots": GreenhouseCommercialMemberRoleCostBasisSnapshots;
   "greenhouse_commercial.overhead_addons": GreenhouseCommercialOverheadAddons;
+  "greenhouse_commercial.party_endpoint_requests": GreenhouseCommercialPartyEndpointRequests;
+  "greenhouse_commercial.party_sync_conflicts": GreenhouseCommercialPartySyncConflicts;
+  "greenhouse_commercial.pricing_catalog_approval_queue": GreenhouseCommercialPricingCatalogApprovalQueue;
   "greenhouse_commercial.pricing_catalog_audit_log": GreenhouseCommercialPricingCatalogAuditLog;
   "greenhouse_commercial.product_catalog": GreenhouseCommercialProductCatalog;
+  "greenhouse_commercial.product_catalog_authoritative_price": GreenhouseCommercialProductCatalogAuthoritativePrice;
+  "greenhouse_commercial.product_catalog_prices": GreenhouseCommercialProductCatalogPrices;
+  "greenhouse_commercial.product_categories": GreenhouseCommercialProductCategories;
+  "greenhouse_commercial.product_source_kind_mapping": GreenhouseCommercialProductSourceKindMapping;
+  "greenhouse_commercial.product_sync_conflicts": GreenhouseCommercialProductSyncConflicts;
+  "greenhouse_commercial.product_units": GreenhouseCommercialProductUnits;
   "greenhouse_commercial.quotation_audit_log": GreenhouseCommercialQuotationAuditLog;
+  "greenhouse_commercial.quotation_line_cost_override_history": GreenhouseCommercialQuotationLineCostOverrideHistory;
   "greenhouse_commercial.quotation_line_items": GreenhouseCommercialQuotationLineItems;
   "greenhouse_commercial.quotation_renewal_reminders": GreenhouseCommercialQuotationRenewalReminders;
   "greenhouse_commercial.quotation_terms": GreenhouseCommercialQuotationTerms;
   "greenhouse_commercial.quotation_versions": GreenhouseCommercialQuotationVersions;
   "greenhouse_commercial.quotations": GreenhouseCommercialQuotations;
+  "greenhouse_commercial.quote_pdf_assets": GreenhouseCommercialQuotePdfAssets;
+  "greenhouse_commercial.quote_share_views": GreenhouseCommercialQuoteShareViews;
+  "greenhouse_commercial.quote_short_links": GreenhouseCommercialQuoteShortLinks;
   "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
   "greenhouse_commercial.quote_templates": GreenhouseCommercialQuoteTemplates;
   "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
@@ -5729,11 +6563,14 @@ export interface DB {
   "greenhouse_core.notion_workspace_source_bindings": GreenhouseCoreNotionWorkspaceSourceBindings;
   "greenhouse_core.notion_workspaces": GreenhouseCoreNotionWorkspaces;
   "greenhouse_core.operational_responsibilities": GreenhouseCoreOperationalResponsibilities;
+  "greenhouse_core.organization_lifecycle_history": GreenhouseCoreOrganizationLifecycleHistory;
   "greenhouse_core.organizations": GreenhouseCoreOrganizations;
   "greenhouse_core.permission_sets": GreenhouseCorePermissionSets;
   "greenhouse_core.person_legal_entity_relationships": GreenhouseCorePersonLegalEntityRelationships;
   "greenhouse_core.person_memberships": GreenhouseCorePersonMemberships;
   "greenhouse_core.providers": GreenhouseCoreProviders;
+  "greenhouse_core.reliability_module_overrides": GreenhouseCoreReliabilityModuleOverrides;
+  "greenhouse_core.reliability_module_registry": GreenhouseCoreReliabilityModuleRegistry;
   "greenhouse_core.reporting_lines": GreenhouseCoreReportingLines;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
   "greenhouse_core.roles": GreenhouseCoreRoles;
@@ -5802,6 +6639,10 @@ export interface DB {
   "greenhouse_finance.shareholder_account_movements": GreenhouseFinanceShareholderAccountMovements;
   "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
+  "greenhouse_finance.tax_categories": GreenhouseFinanceTaxCategories;
+  "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
+  "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
+  "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
   "greenhouse_hr.eval_assignments": GreenhouseHrEvalAssignments;
   "greenhouse_hr.eval_competencies": GreenhouseHrEvalCompetencies;
   "greenhouse_hr.eval_cycles": GreenhouseHrEvalCycles;
@@ -5822,6 +6663,7 @@ export interface DB {
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;
   "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;
   "greenhouse_notifications.email_type_config": GreenhouseNotificationsEmailTypeConfig;
+  "greenhouse_notifications.idempotency_keys": GreenhouseNotificationsIdempotencyKeys;
   "greenhouse_notifications.notification_log": GreenhouseNotificationsNotificationLog;
   "greenhouse_notifications.notification_preferences": GreenhouseNotificationsNotificationPreferences;
   "greenhouse_notifications.notifications": GreenhouseNotificationsNotifications;
@@ -5866,6 +6708,7 @@ export interface DB {
   "greenhouse_serving.operational_pl_snapshots": GreenhouseServingOperationalPlSnapshots;
   "greenhouse_serving.organization_360": GreenhouseServingOrganization360;
   "greenhouse_serving.organization_operational_metrics": GreenhouseServingOrganizationOperationalMetrics;
+  "greenhouse_serving.party_lifecycle_snapshots": GreenhouseServingPartyLifecycleSnapshots;
   "greenhouse_serving.period_closure_status": GreenhouseServingPeriodClosureStatus;
   "greenhouse_serving.person_360": GreenhouseServingPerson360;
   "greenhouse_serving.person_delivery_360": GreenhouseServingPersonDelivery360;
@@ -5879,6 +6722,8 @@ export interface DB {
   "greenhouse_serving.provider_tooling_snapshots": GreenhouseServingProviderToolingSnapshots;
   "greenhouse_serving.quotation_pipeline_snapshots": GreenhouseServingQuotationPipelineSnapshots;
   "greenhouse_serving.quotation_profitability_snapshots": GreenhouseServingQuotationProfitabilitySnapshots;
+  "greenhouse_serving.service_attribution_facts": GreenhouseServingServiceAttributionFacts;
+  "greenhouse_serving.service_attribution_unresolved": GreenhouseServingServiceAttributionUnresolved;
   "greenhouse_serving.service_sla_compliance_snapshots": GreenhouseServingServiceSlaComplianceSnapshots;
   "greenhouse_serving.session_360": GreenhouseServingSession360;
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
@@ -5900,6 +6745,7 @@ export interface DB {
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_circuit_state": GreenhouseSyncProjectionCircuitState;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
+  "greenhouse_sync.reliability_synthetic_runs": GreenhouseSyncReliabilitySyntheticRuns;
   "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;
   "greenhouse_sync.service_sync_queue": GreenhouseSyncServiceSyncQueue;

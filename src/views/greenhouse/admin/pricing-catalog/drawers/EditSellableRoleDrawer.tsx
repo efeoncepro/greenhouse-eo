@@ -23,7 +23,11 @@ import Switch from '@mui/material/Switch'
 import Tab from '@mui/material/Tab'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+
 import { TabContext, TabList, TabPanel } from '@mui/lab'
+
+import ImpactPreviewPanel from '@/components/greenhouse/pricing/ImpactPreviewPanel'
+import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -268,6 +272,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
   const [notes, setNotes] = useState('')
   const [savingInfo, setSavingInfo] = useState(false)
   const [infoError, setInfoError] = useState<string | null>(null)
+  const [impactBlocking, setImpactBlocking] = useState(false)
 
   // Employment tab
   const [employmentTypes, setEmploymentTypes] = useState<EmploymentTypeOption[]>([])
@@ -505,10 +510,19 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
     if (open && roleId && tab === 'pricing') void loadPricing()
   }, [open, roleId, tab, loadPricing])
 
+  const guardImpactBlocking = () => {
+    if (!impactBlocking) return false
+
+    toast.error(GH_PRICING_GOVERNANCE.impactPreview.blockingSaveToast)
+
+    return true
+  }
+
   // ── Info tab submit ──────────────────────────────────────────────────
 
   const handleSaveInfo = async () => {
     if (!roleId || !role) return
+    if (guardImpactBlocking()) return
 
     if (!roleLabelEs.trim()) {
       setInfoError('Ingresa un nombre para el rol en español.')
@@ -583,6 +597,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
 
   const handleSubmitCost = async () => {
     if (!roleId) return
+    if (guardImpactBlocking()) return
 
     if (!costForm.employmentTypeCode) {
       toast.error('Selecciona una modalidad de contrato.')
@@ -673,6 +688,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
 
   const handleSubmitPricing = async () => {
     if (!roleId) return
+    if (guardImpactBlocking()) return
 
     const completedRows = pricingRows.filter(
       row => row.marginPct !== '' && row.hourlyPrice !== '' && row.fteMonthlyPrice !== ''
@@ -848,6 +864,7 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
 
   const handleSaveCompatibility = async () => {
     if (!roleId) return
+    if (guardImpactBlocking()) return
 
     // Client-side validation: at least 1 default if list is non-empty
     if (compatibility.length > 0) {
@@ -1175,10 +1192,14 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                   variant='contained'
                   color='primary'
                   onClick={handleSaveInfo}
-                  disabled={savingInfo}
+                  disabled={savingInfo || impactBlocking}
                   startIcon={savingInfo ? <CircularProgress size={16} color='inherit' /> : undefined}
                 >
-                  {savingInfo ? 'Guardando...' : 'Guardar cambios'}
+                  {savingInfo
+                    ? 'Guardando...'
+                    : impactBlocking
+                      ? GH_PRICING_GOVERNANCE.impactPreview.blockingSaveCta
+                      : 'Guardar cambios'}
                 </Button>
               </Box>
             </Stack>
@@ -1391,12 +1412,16 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                   variant='contained'
                   color='primary'
                   onClick={handleSaveCompatibility}
-                  disabled={savingCompatibility || loadingCompatibility}
+                  disabled={savingCompatibility || loadingCompatibility || impactBlocking}
                   startIcon={
                     savingCompatibility ? <CircularProgress size={16} color='inherit' /> : undefined
                   }
                 >
-                  {savingCompatibility ? 'Guardando...' : 'Guardar modalidades'}
+                  {savingCompatibility
+                    ? 'Guardando...'
+                    : impactBlocking
+                      ? GH_PRICING_GOVERNANCE.impactPreview.blockingSaveCta
+                      : 'Guardar modalidades'}
                 </Button>
               </Box>
             </Stack>
@@ -1652,12 +1677,16 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                         variant='contained'
                         size='small'
                         onClick={handleSubmitCost}
-                        disabled={savingCost}
+                        disabled={savingCost || impactBlocking}
                         startIcon={
                           savingCost ? <CircularProgress size={16} color='inherit' /> : undefined
                         }
                       >
-                        {savingCost ? 'Guardando...' : 'Guardar versión'}
+                        {savingCost
+                          ? 'Guardando...'
+                          : impactBlocking
+                            ? GH_PRICING_GOVERNANCE.impactPreview.blockingSaveCta
+                            : 'Guardar versión'}
                       </Button>
                     </Box>
                   </Stack>
@@ -2115,12 +2144,16 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
                         variant='contained'
                         size='small'
                         onClick={handleSubmitPricing}
-                        disabled={savingPricing}
+                        disabled={savingPricing || impactBlocking}
                         startIcon={
                           savingPricing ? <CircularProgress size={16} color='inherit' /> : undefined
                         }
                       >
-                        {savingPricing ? 'Guardando...' : 'Guardar versión'}
+                        {savingPricing
+                          ? 'Guardando...'
+                          : impactBlocking
+                            ? GH_PRICING_GOVERNANCE.impactPreview.blockingSaveCta
+                            : 'Guardar versión'}
                       </Button>
                     </Box>
                   </Stack>
@@ -2241,6 +2274,15 @@ const EditSellableRoleDrawer = ({ open, roleId, onClose, onSuccess }: EditSellab
       ) : null}
 
       <Divider />
+      {roleId ? (
+        <Box sx={{ px: 4, py: 2 }}>
+          <ImpactPreviewPanel
+            entityType='sellable_role'
+            entityId={roleId}
+            onBlockingStateChange={setImpactBlocking}
+          />
+        </Box>
+      ) : null}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 4 }}>
         <Button variant='outlined' color='secondary' onClick={handleClose}>
           Cerrar

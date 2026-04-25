@@ -24,6 +24,28 @@ export const publishSellableRoleCreated = async (
     client
   )
 
+export const publishSellableRoleUpdated = async (
+  params: {
+    roleId: string
+    roleSku: string
+    roleCode: string
+    roleLabelEs: string
+    category: string
+    tier: string
+    active: boolean
+  },
+  client?: PublishClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.sellableRole,
+      aggregateId: params.roleId,
+      eventType: EVENT_TYPES.sellableRoleUpdated,
+      payload: params
+    },
+    client
+  )
+
 export const publishSellableRoleCostUpdated = async (
   params: {
     roleId: string
@@ -62,6 +84,44 @@ export const publishSellableRolePricingUpdated = async (
       aggregateType: AGGREGATE_TYPES.sellableRole,
       aggregateId: params.roleId,
       eventType: EVENT_TYPES.sellableRolePricingUpdated,
+      payload: params
+    },
+    client
+  )
+
+// TASK-546 Fase B: lifecycle transitions so source-to-product-catalog can
+// archive/unarchive the materialized product when a role toggles active.
+export const publishSellableRoleDeactivated = async (
+  params: {
+    roleId: string
+    roleSku: string
+    deactivatedAt: string
+  },
+  client?: PublishClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.sellableRole,
+      aggregateId: params.roleId,
+      eventType: EVENT_TYPES.sellableRoleDeactivated,
+      payload: params
+    },
+    client
+  )
+
+export const publishSellableRoleReactivated = async (
+  params: {
+    roleId: string
+    roleSku: string
+    reactivatedAt: string
+  },
+  client?: PublishClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.sellableRole,
+      aggregateId: params.roleId,
+      eventType: EVENT_TYPES.sellableRoleReactivated,
       payload: params
     },
     client

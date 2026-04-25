@@ -145,6 +145,12 @@ const UserDropdown = () => {
                     </>
                   ) : null}
                   {isAdminUser ? (
+                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/commercial/parties')}>
+                      <i className='tabler-building-community' />
+                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminCommercialParties.label}</Typography>
+                    </MenuItem>
+                  ) : null}
+                  {isAdminUser ? (
                     <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/tenants')}>
                       <i className='tabler-building-community' />
                       <Typography color='text.primary'>{GH_INTERNAL_NAV.adminTenants.label}</Typography>

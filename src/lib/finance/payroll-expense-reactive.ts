@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { buildMonthlySequenceIdFromPostgres, createFinanceExpenseInPostgres } from '@/lib/finance/postgres-store-slice2'
+import { buildExpenseTaxWriteFields, serializeExpenseTaxSnapshot } from '@/lib/finance/expense-tax-snapshot'
 import { resolveExchangeRateToClp } from '@/lib/finance/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -135,6 +136,15 @@ export const materializePayrollExpensesForExportedPeriod = async ({
       requestedRate: null
     })
 
+    const taxWriteFields = await buildExpenseTaxWriteFields({
+      subtotal: amount,
+      exchangeRateToClp,
+      taxCode: 'cl_vat_non_billable',
+      taxAmount: 0,
+      totalAmount: amount,
+      issuedAt: periodDate
+    })
+
     const expenseId = await buildMonthlySequenceIdFromPostgres({
       tableName: 'expenses',
       idColumn: 'expense_id',
@@ -151,9 +161,22 @@ export const materializePayrollExpensesForExportedPeriod = async ({
       description: `Nomina neta — ${row.display_name || row.member_id}`,
       currency: row.currency,
       subtotal: amount,
-      taxRate: 0,
-      taxAmount: 0,
-      totalAmount: amount,
+      taxRate: taxWriteFields.taxRate,
+      taxAmount: taxWriteFields.taxAmount,
+      taxCode: taxWriteFields.taxCode,
+      taxRecoverability: taxWriteFields.taxRecoverability,
+      taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+      taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+      taxSnapshotJson: serializeExpenseTaxSnapshot(taxWriteFields.taxSnapshot),
+      isTaxExempt: taxWriteFields.isTaxExempt,
+      taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
+      recoverableTaxAmount: taxWriteFields.recoverableTaxAmount,
+      recoverableTaxAmountClp: taxWriteFields.recoverableTaxAmountClp,
+      nonRecoverableTaxAmount: taxWriteFields.nonRecoverableTaxAmount,
+      nonRecoverableTaxAmountClp: taxWriteFields.nonRecoverableTaxAmountClp,
+      effectiveCostAmount: taxWriteFields.effectiveCostAmount,
+      effectiveCostAmountClp: taxWriteFields.effectiveCostAmountClp,
+      totalAmount: taxWriteFields.totalAmount,
       exchangeRateToClp,
       totalAmountClp: amount * exchangeRateToClp,
       paymentDate: periodDate,
@@ -189,6 +212,16 @@ export const materializePayrollExpensesForExportedPeriod = async ({
       directOverheadScope: 'none',
       directOverheadKind: null,
       directOverheadMemberId: null,
+      receiptDate: null,
+      purchaseType: null,
+      vatUnrecoverableAmount: null,
+      vatFixedAssetsAmount: null,
+      vatCommonUseAmount: null,
+      dteTypeCode: null,
+      dteFolio: null,
+      exemptAmount: null,
+      otherTaxesAmount: null,
+      withholdingAmount: null,
       notes: 'System-generated from payroll_period.exported',
       actorUserId: null
     })
@@ -236,6 +269,15 @@ export const materializePayrollExpensesForExportedPeriod = async ({
     period: sequencePeriod
   })
 
+  const socialSecurityTaxWriteFields = await buildExpenseTaxWriteFields({
+    subtotal: previredTotal,
+    exchangeRateToClp: 1,
+    taxCode: 'cl_vat_non_billable',
+    taxAmount: 0,
+    totalAmount: previredTotal,
+    issuedAt: periodDate
+  })
+
   await createFinanceExpenseInPostgres({
     expenseId: socialSecurityExpenseId,
     clientId: null,
@@ -245,9 +287,22 @@ export const materializePayrollExpensesForExportedPeriod = async ({
     description: `Previred consolidado — ${periodId}`,
     currency: 'CLP',
     subtotal: previredTotal,
-    taxRate: 0,
-    taxAmount: 0,
-    totalAmount: previredTotal,
+    taxRate: socialSecurityTaxWriteFields.taxRate,
+    taxAmount: socialSecurityTaxWriteFields.taxAmount,
+    taxCode: socialSecurityTaxWriteFields.taxCode,
+    taxRecoverability: socialSecurityTaxWriteFields.taxRecoverability,
+    taxRateSnapshot: socialSecurityTaxWriteFields.taxRateSnapshot,
+    taxAmountSnapshot: socialSecurityTaxWriteFields.taxAmountSnapshot,
+    taxSnapshotJson: serializeExpenseTaxSnapshot(socialSecurityTaxWriteFields.taxSnapshot),
+    isTaxExempt: socialSecurityTaxWriteFields.isTaxExempt,
+    taxSnapshotFrozenAt: socialSecurityTaxWriteFields.taxSnapshotFrozenAt,
+    recoverableTaxAmount: socialSecurityTaxWriteFields.recoverableTaxAmount,
+    recoverableTaxAmountClp: socialSecurityTaxWriteFields.recoverableTaxAmountClp,
+    nonRecoverableTaxAmount: socialSecurityTaxWriteFields.nonRecoverableTaxAmount,
+    nonRecoverableTaxAmountClp: socialSecurityTaxWriteFields.nonRecoverableTaxAmountClp,
+    effectiveCostAmount: socialSecurityTaxWriteFields.effectiveCostAmount,
+    effectiveCostAmountClp: socialSecurityTaxWriteFields.effectiveCostAmountClp,
+    totalAmount: socialSecurityTaxWriteFields.totalAmount,
     exchangeRateToClp: 1,
     totalAmountClp: previredTotal,
     paymentDate: periodDate,
@@ -283,6 +338,16 @@ export const materializePayrollExpensesForExportedPeriod = async ({
     directOverheadScope: 'none',
     directOverheadKind: null,
     directOverheadMemberId: null,
+    receiptDate: null,
+    purchaseType: null,
+    vatUnrecoverableAmount: null,
+    vatFixedAssetsAmount: null,
+    vatCommonUseAmount: null,
+    dteTypeCode: null,
+    dteFolio: null,
+    exemptAmount: null,
+    otherTaxesAmount: null,
+    withholdingAmount: null,
     notes: 'System-generated from payroll_period.exported',
     actorUserId: null
   })

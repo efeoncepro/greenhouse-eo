@@ -189,7 +189,8 @@ describe('Finance identity drift payload propagation', () => {
         body: JSON.stringify({
           invoiceDate: '2026-03-30',
           currency: 'USD',
-          subtotal: 1000
+          subtotal: 1000,
+          taxCode: 'cl_vat_non_billable'
         })
       })
     )

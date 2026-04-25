@@ -6,6 +6,7 @@ import {
   validateCostComponents
 } from '@/lib/commercial/pricing-catalog-constraints'
 import { recordPricingCatalogAudit } from '@/lib/commercial/pricing-catalog-audit-store'
+import { publishSellableRoleCostUpdated } from '@/lib/commercial/sellable-role-events'
 import type { SellableRoleSeedRow } from '@/lib/commercial/sellable-roles-seed'
 import { insertCostComponentsIfChanged } from '@/lib/commercial/sellable-roles-store'
 import { query } from '@/lib/db'
@@ -416,6 +417,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     },
     effectiveFrom
   })
+
+  if (result.changed) {
+    await publishSellableRoleCostUpdated({
+      roleId: id,
+      roleSku,
+      employmentTypeCode,
+      effectiveFrom,
+      totalMonthlyCostUsd: result.entry.totalMonthlyCostUsd ?? 0,
+      hourlyCostUsd: result.entry.hourlyCostUsd ?? 0
+    })
+  }
 
   const updatedAt = await touchRoleUpdatedAt(id)
 

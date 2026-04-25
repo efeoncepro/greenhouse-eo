@@ -95,3 +95,43 @@ export const publishToolCatalogSeedEvents = async (input: PublishToolCatalogEven
     )
   }
 }
+
+// TASK-546 Fase B: lifecycle transitions so source-to-product-catalog can
+// archive/unarchive the materialized product when a tool toggles active.
+type LifecycleClient = Parameters<typeof publishOutboxEvent>[1]
+
+export const publishAiToolDeactivated = async (
+  params: {
+    toolId: string
+    providerId: string
+    deactivatedAt: string
+  },
+  client?: LifecycleClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.aiTool,
+      aggregateId: params.toolId,
+      eventType: EVENT_TYPES.aiToolDeactivated,
+      payload: params
+    },
+    client
+  )
+
+export const publishAiToolReactivated = async (
+  params: {
+    toolId: string
+    providerId: string
+    reactivatedAt: string
+  },
+  client?: LifecycleClient
+) =>
+  publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.aiTool,
+      aggregateId: params.toolId,
+      eventType: EVENT_TYPES.aiToolReactivated,
+      payload: params
+    },
+    client
+  )

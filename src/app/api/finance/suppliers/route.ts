@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import { ensureOrganizationContactMembership } from '@/lib/account-360/organization-store'
 import {
@@ -134,7 +134,7 @@ export async function GET(request: Request) {
   }
 
   // ── BigQuery fallback ──
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_suppliers'] })
   const projectId = getFinanceProjectId()
 
   let filters = ''

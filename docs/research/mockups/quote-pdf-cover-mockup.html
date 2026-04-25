@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cover PDF cotización · Mockup v1 · TASK-629</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── PDF Token System (paralelo a GREENHOUSE_DESIGN_TOKENS_V1.md) ─── */
+    :root {
+      /* Color tokens */
+      --pdf-color-primary: #023c70;        /* Efeonce navy — backbone */
+      --pdf-color-accent: #0375db;         /* Efeonce blue — accent + links */
+      --pdf-color-text: #2F2B3D;           /* Body text */
+      --pdf-color-text-muted: #6E6B7B;     /* Metadata, helpers */
+      --pdf-color-text-subtle: #A5A3AE;    /* Tertiary */
+      --pdf-color-surface: #F8F7FA;        /* Backgrounds */
+      --pdf-color-divider: #E4E5EB;        /* Borders */
+      --pdf-color-paper: #FFFFFF;
+
+      /* Sub-brand accents (paired with isotipo, never standalone color) */
+      --pdf-color-sub-globe: #bb1954;
+      --pdf-color-sub-wave: #00BAD1;
+      --pdf-color-sub-reach: #ff6500;
+      --pdf-color-sub-efeonce: #023c70;
+
+      /* Typography */
+      --pdf-font-heading: 'Poppins', sans-serif;
+      --pdf-font-body: 'DM Sans', sans-serif;
+      --pdf-font-mono: 'DM Sans', sans-serif;     /* DM Sans con tabular-nums */
+
+      /* Spacing scale — pt-equivalents (4n) */
+      --pdf-space-1: 4pt;
+      --pdf-space-2: 8pt;
+      --pdf-space-3: 12pt;
+      --pdf-space-4: 16pt;
+      --pdf-space-5: 20pt;
+      --pdf-space-6: 24pt;
+      --pdf-space-8: 32pt;
+      --pdf-space-10: 40pt;
+      --pdf-space-12: 48pt;
+
+      /* Radii */
+      --pdf-radius-sm: 4pt;
+      --pdf-radius-md: 6pt;
+      --pdf-radius-lg: 8pt;
+
+      /* Page dimensions A4 */
+      --pdf-page-width: 595pt;     /* A4 width = 595.28 */
+      --pdf-page-height: 842pt;    /* A4 height = 841.89 */
+      --pdf-page-padding-x: 48pt;
+      --pdf-page-padding-y: 56pt;
+    }
+
+    /* ─── Mockup chrome (preview only — no parte del PDF real) ─── */
+    body {
+      margin: 0;
+      padding: 32px;
+      background: #ECECEF;
+      font-family: var(--pdf-font-body);
+      color: var(--pdf-color-text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .mockup-banner {
+      max-width: 595pt;
+      width: 100%;
+      padding: 16px 24px;
+      background: #fff;
+      border-radius: 8px;
+      border-left: 4px solid var(--pdf-color-accent);
+      font-family: var(--pdf-font-body);
+    }
+    .mockup-banner h1 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--pdf-color-primary);
+    }
+    .mockup-banner p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--pdf-color-text-muted);
+    }
+
+    /* ─── A4 Page (preview real del PDF) ─── */
+    .pdf-page {
+      width: var(--pdf-page-width);
+      height: var(--pdf-page-height);
+      background: var(--pdf-color-paper);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* ─── Header band con logo + sub-brand ─── */
+    .cover-header {
+      padding: var(--pdf-page-padding-y) var(--pdf-page-padding-x) var(--pdf-space-6);
+      border-bottom: 1pt solid var(--pdf-color-divider);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cover-header__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--pdf-space-3);
+    }
+    .cover-header__logo {
+      height: 40pt;
+      width: auto;
+      display: block;
+    }
+    .cover-header__sub-divider {
+      width: 1pt;
+      height: 32pt;
+      background: var(--pdf-color-divider);
+    }
+    .cover-header__sub-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--pdf-space-2);
+    }
+    .cover-header__sub-isotipo {
+      height: 28pt;
+      width: auto;
+    }
+    .cover-header__sub-label {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      font-weight: 500;
+      letter-spacing: 1.2pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+    }
+    .cover-header__meta {
+      text-align: right;
+      font-family: var(--pdf-font-body);
+    }
+    .cover-header__meta-eyebrow {
+      font-size: 7pt;
+      font-weight: 500;
+      letter-spacing: 1.2pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+      margin-bottom: 2pt;
+    }
+    .cover-header__meta-id {
+      font-family: var(--pdf-font-mono);
+      font-size: 11pt;
+      font-weight: 500;
+      color: var(--pdf-color-primary);
+      letter-spacing: 0.5pt;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ─── Title hero ─── */
+    .cover-hero {
+      padding: var(--pdf-space-12) var(--pdf-page-padding-x) var(--pdf-space-10);
+    }
+    .cover-hero__eyebrow {
+      font-family: var(--pdf-font-body);
+      font-size: 8pt;
+      font-weight: 500;
+      letter-spacing: 2pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-accent);
+      margin-bottom: var(--pdf-space-2);
+    }
+    .cover-hero__title {
+      font-family: var(--pdf-font-heading);
+      font-size: 36pt;
+      font-weight: 600;
+      line-height: 1.05;
+      color: var(--pdf-color-primary);
+      margin: 0 0 var(--pdf-space-3) 0;
+      letter-spacing: -0.5pt;
+    }
+    .cover-hero__subtitle {
+      font-family: var(--pdf-font-body);
+      font-size: 11pt;
+      line-height: 1.5;
+      color: var(--pdf-color-text);
+      max-width: 380pt;
+      margin: 0;
+    }
+
+    /* ─── Parties block (Preparada para / por) ─── */
+    .cover-parties {
+      padding: var(--pdf-space-6) var(--pdf-page-padding-x) var(--pdf-space-8);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--pdf-space-8);
+    }
+    .cover-party {
+      border-top: 2pt solid var(--pdf-color-primary);
+      padding-top: var(--pdf-space-3);
+    }
+    .cover-party__eyebrow {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      font-weight: 500;
+      letter-spacing: 1.5pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+      margin-bottom: var(--pdf-space-2);
+    }
+    .cover-party__name {
+      font-family: var(--pdf-font-heading);
+      font-size: 14pt;
+      font-weight: 600;
+      color: var(--pdf-color-primary);
+      margin: 0 0 var(--pdf-space-1) 0;
+      line-height: 1.2;
+    }
+    .cover-party__detail {
+      font-family: var(--pdf-font-body);
+      font-size: 9pt;
+      color: var(--pdf-color-text);
+      margin: 0;
+      line-height: 1.5;
+    }
+    .cover-party__detail--muted {
+      color: var(--pdf-color-text-muted);
+    }
+    .cover-party__contact {
+      margin-top: var(--pdf-space-2);
+      padding-top: var(--pdf-space-2);
+      border-top: 1pt solid var(--pdf-color-divider);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: var(--pdf-space-3);
+      row-gap: 2pt;
+    }
+    .cover-party__contact-label {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      letter-spacing: 1pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+    }
+    .cover-party__contact-value {
+      font-family: var(--pdf-font-body);
+      font-size: 9pt;
+      color: var(--pdf-color-text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ─── Highlights stripe (snapshot rápido) ─── */
+    .cover-highlights {
+      margin: 0 var(--pdf-page-padding-x) var(--pdf-space-6);
+      padding: var(--pdf-space-4) var(--pdf-space-5);
+      background: var(--pdf-color-surface);
+      border-radius: var(--pdf-radius-md);
+      border-left: 3pt solid var(--pdf-color-accent);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--pdf-space-5);
+    }
+    .cover-highlight__label {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      font-weight: 500;
+      letter-spacing: 1.2pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-text-muted);
+      margin: 0 0 var(--pdf-space-1) 0;
+    }
+    .cover-highlight__value {
+      font-family: var(--pdf-font-heading);
+      font-size: 16pt;
+      font-weight: 600;
+      color: var(--pdf-color-primary);
+      margin: 0;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+    .cover-highlight__hint {
+      font-family: var(--pdf-font-body);
+      font-size: 8pt;
+      color: var(--pdf-color-text-muted);
+      margin: 2pt 0 0 0;
+    }
+
+    /* ─── Validity callout ─── */
+    .cover-validity {
+      margin: 0 var(--pdf-page-padding-x);
+      padding: var(--pdf-space-3) var(--pdf-space-4);
+      border: 1pt solid var(--pdf-color-divider);
+      border-radius: var(--pdf-radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--pdf-space-4);
+    }
+    .cover-validity__text {
+      font-family: var(--pdf-font-body);
+      font-size: 9pt;
+      color: var(--pdf-color-text);
+      margin: 0;
+    }
+    .cover-validity__date {
+      font-weight: 700;
+      color: var(--pdf-color-primary);
+      font-variant-numeric: tabular-nums;
+    }
+    .cover-validity__chip {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      font-weight: 500;
+      letter-spacing: 1pt;
+      text-transform: uppercase;
+      color: var(--pdf-color-paper);
+      background: var(--pdf-color-accent);
+      padding: 4pt 8pt;
+      border-radius: 999pt;
+    }
+
+    /* ─── Footer cover (datos legales emisor) ─── */
+    .cover-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--pdf-space-4) var(--pdf-page-padding-x);
+      border-top: 1pt solid var(--pdf-color-divider);
+      background: var(--pdf-color-paper);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--pdf-space-4);
+    }
+    .cover-footer__legal {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      color: var(--pdf-color-text-muted);
+      line-height: 1.4;
+      max-width: 60%;
+    }
+    .cover-footer__legal-name {
+      font-weight: 700;
+      color: var(--pdf-color-primary);
+    }
+    .cover-footer__page {
+      font-family: var(--pdf-font-body);
+      font-size: 7pt;
+      color: var(--pdf-color-text-muted);
+      letter-spacing: 0.5pt;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+    .cover-footer__page-number {
+      font-weight: 700;
+      color: var(--pdf-color-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mockup-banner">
+    <h1>Mockup Cover · TASK-629 PDF redesign · iteración 1</h1>
+    <p>
+      Preview a tamaño real A4 (595×842 pt). Tipografías + colores + spacing reflejan
+      el sistema de tokens propuesto para <code>PdfTokens.ts</code>. Iteramos sobre este HTML
+      antes de codear en <code>@react-pdf/renderer</code>.
+    </p>
+  </div>
+
+  <article class="pdf-page" aria-label="Cover de cotización">
+    <!-- Header band: logo Efeonce + sub-brand badge + quote ID -->
+    <header class="cover-header">
+      <div class="cover-header__brand">
+        <img
+          class="cover-header__logo"
+          src="../../../public/branding/logo-full.svg"
+          alt="Efeonce Group"
+        >
+        <div class="cover-header__sub-divider" aria-hidden="true"></div>
+        <div class="cover-header__sub-brand">
+          <img
+            class="cover-header__sub-isotipo"
+            src="../../../public/branding/SVG/globe-full.svg"
+            alt="Globe"
+          >
+          <span class="cover-header__sub-label">Business Line</span>
+        </div>
+      </div>
+      <div class="cover-header__meta">
+        <p class="cover-header__meta-eyebrow">Propuesta</p>
+        <p class="cover-header__meta-id">EFG-2026-00184 · v2</p>
+      </div>
+    </header>
+
+    <!-- Hero: título grande + subtitle -->
+    <section class="cover-hero">
+      <p class="cover-hero__eyebrow">Propuesta Comercial</p>
+      <h1 class="cover-hero__title">
+        Programa de crecimiento orgánico
+        <br>
+        Globe LATAM 2026
+      </h1>
+      <p class="cover-hero__subtitle">
+        Estrategia de adquisición + retención multicanal con foco en
+        Chile, Colombia y México. Modelo retainer mensual con KPIs
+        compartidos y reportería ejecutiva trimestral.
+      </p>
+    </section>
+
+    <!-- Parties: cliente + sales rep -->
+    <section class="cover-parties">
+      <div class="cover-party">
+        <p class="cover-party__eyebrow">Preparada para</p>
+        <p class="cover-party__name">Banco Industrial Latinoamericano</p>
+        <p class="cover-party__detail cover-party__detail--muted">
+          División Marketing &amp; Growth
+        </p>
+        <div class="cover-party__contact">
+          <span class="cover-party__contact-label">Contacto</span>
+          <span class="cover-party__contact-value">María Elena Vargas, CMO</span>
+          <span class="cover-party__contact-label">Email</span>
+          <span class="cover-party__contact-value">mvargas@bil.lat</span>
+        </div>
+      </div>
+      <div class="cover-party">
+        <p class="cover-party__eyebrow">Preparada por</p>
+        <p class="cover-party__name">Julio Reyes</p>
+        <p class="cover-party__detail cover-party__detail--muted">
+          Account Lead · Efeonce Globe
+        </p>
+        <div class="cover-party__contact">
+          <span class="cover-party__contact-label">Email</span>
+          <span class="cover-party__contact-value">jreyes@efeoncepro.com</span>
+          <span class="cover-party__contact-label">Teléfono</span>
+          <span class="cover-party__contact-value">+56 9 5847 2310</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Highlights stripe -->
+    <section class="cover-highlights" aria-label="Resumen de la inversión">
+      <div>
+        <p class="cover-highlight__label">Inversión total</p>
+        <p class="cover-highlight__value">USD 184,500</p>
+        <p class="cover-highlight__hint">12 meses · facturación mensual</p>
+      </div>
+      <div>
+        <p class="cover-highlight__label">Inicio estimado</p>
+        <p class="cover-highlight__value">Mayo 2026</p>
+        <p class="cover-highlight__hint">Onboarding 14 días hábiles</p>
+      </div>
+      <div>
+        <p class="cover-highlight__label">Equipo asignado</p>
+        <p class="cover-highlight__value">8 expertos</p>
+        <p class="cover-highlight__hint">2 leads · 4 specialists · 2 analysts</p>
+      </div>
+    </section>
+
+    <!-- Validity callout -->
+    <div class="cover-validity">
+      <p class="cover-validity__text">
+        Esta propuesta es válida hasta el
+        <span class="cover-validity__date">30/05/2026</span>
+        — sujeta a los términos y condiciones detallados al final del documento.
+      </p>
+      <span class="cover-validity__chip">Confidencial</span>
+    </div>
+
+    <!-- Footer fijo del cover -->
+    <footer class="cover-footer">
+      <p class="cover-footer__legal">
+        <span class="cover-footer__legal-name">Efeonce Group SpA</span>
+        · RUT 77.357.182-1 · Dr. Manuel Barros Borgoño 71 of. 05, Providencia, Santiago, Chile
+        · efeoncepro.com
+      </p>
+      <p class="cover-footer__page">
+        Propuesta EFG-2026-00184 v2
+        <br>
+        Página <span class="cover-footer__page-number">1</span> de
+        <span class="cover-footer__page-number">7</span>
+      </p>
+    </footer>
+  </article>
+
+</body>
+</html>

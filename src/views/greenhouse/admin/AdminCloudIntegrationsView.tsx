@@ -18,7 +18,7 @@ import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
+import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseRouteLink } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { OperationsHealthStatus, OperationsOverview, OperationsSubsystem } from '@/lib/operations/get-operations-overview'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
@@ -192,10 +192,10 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
               <Button component={Link} href='/agency/operations' variant='contained'>
                 Abrir operaciones extendidas
               </Button>
-              <Button component={Link} href='/admin/integrations' variant='outlined'>
+              <Button component={GreenhouseRouteLink} href='/admin/integrations' variant='outlined'>
                 Integration Governance
               </Button>
-              <Button component={Link} href='/admin' variant='outlined'>
+              <Button component={GreenhouseRouteLink} href='/admin' variant='outlined'>
                 Volver a Admin Center
               </Button>
             </Stack>

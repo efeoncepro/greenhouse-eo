@@ -350,7 +350,7 @@ export const computeOperationalPl = async (
             COALESCE(es.organization_id, cb.organization_id) AS organization_id,
             MAX(o.organization_name) AS organization_name,
             MAX(c.client_name) AS client_name,
-            COALESCE(SUM(e.total_amount_clp), 0) AS total_direct_expense_clp
+            COALESCE(SUM(COALESCE(e.effective_cost_amount_clp, e.total_amount_clp)), 0) AS total_direct_expense_clp
           FROM greenhouse_finance.expenses e
           LEFT JOIN greenhouse_core.clients c ON c.client_id = e.allocated_client_id
           LEFT JOIN greenhouse_core.spaces es ON es.space_id = e.space_id

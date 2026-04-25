@@ -1,0 +1,162 @@
+/**
+ * Reliability Control Plane — canonical types
+ *
+ * Foundation contract that lets Admin Center, Ops Health and Cloud & Integrations
+ * reason about module health, regressions and confidence with a shared language.
+ *
+ * NOTE: This layer SITS ON TOP of existing observability sources (operations
+ * overview, cloud health snapshot, sentry incidents, integration data quality,
+ * source sync runs). It NEVER duplicates their logic — only normalizes them
+ * into a module-oriented, evidence-first model.
+ *
+ * Spec: docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md
+ */
+
+export type ReliabilityModuleKey =
+  | 'finance'
+  | 'integrations.notion'
+  | 'cloud'
+  | 'delivery'
+
+export type ReliabilityModuleDomain =
+  | 'platform'
+  | 'integrations'
+  | 'finance'
+  | 'delivery'
+
+export type ReliabilitySignalKind =
+  | 'runtime'
+  | 'posture'
+  | 'incident'
+  | 'freshness'
+  | 'data_quality'
+  | 'cost_guard'
+  | 'subsystem'
+  | 'test_lane'
+  | 'billing'
+
+  /**
+   * TASK-638 — AI Observer enriquece el Reliability Control Plane con
+   * resumen ejecutivo + observaciones por módulo. La IA NO reemplaza reglas
+   * determinísticas; solo agrega contexto narrativo basado en el snapshot
+   * normalizado.
+   */
+  | 'ai_summary'
+
+export type ReliabilitySeverity =
+  | 'ok'
+  | 'warning'
+  | 'error'
+  | 'unknown'
+  | 'not_configured'
+  | 'awaiting_data'
+
+export type ReliabilityConfidence = 'high' | 'medium' | 'low' | 'unknown'
+
+export type ReliabilityEvidenceKind =
+  | 'endpoint'
+  | 'helper'
+  | 'incident'
+  | 'test'
+  | 'run'
+  | 'doc'
+  | 'sql'
+  | 'metric'
+
+export interface ReliabilityEvidence {
+  kind: ReliabilityEvidenceKind
+  label: string
+  value: string
+}
+
+export interface ReliabilityRouteRef {
+  path: string
+  label: string
+}
+
+export interface ReliabilityApiRef {
+  path: string
+  label: string
+}
+
+export interface ReliabilityModuleDefinition {
+  moduleKey: ReliabilityModuleKey
+  label: string
+  description: string
+  domain: ReliabilityModuleDomain
+  routes: ReliabilityRouteRef[]
+  apis: ReliabilityApiRef[]
+  dependencies: string[]
+  smokeTests: string[]
+
+  /**
+   * Glob patterns (minimatch syntax) que declaran qué archivos del repo
+   * pertenecen a este módulo. Consumido por TASK-633 (change-based
+   * verification matrix) para derivar módulos afectados desde el diff
+   * de un PR y disparar solo los smoke specs relevantes.
+   */
+  filesOwned: string[]
+  expectedSignalKinds: ReliabilitySignalKind[]
+
+  /**
+   * SLO thresholds opcionales por módulo. Forward-compat para TASK-635 V1.1
+   * "SLO breach detector". Hoy no se evalúan en runtime — solo se persisten
+   * para que el detector futuro los lea sin migración nueva.
+   *
+   * Ejemplos: `{ freshness_max_lag_hours: 6, error_rate_max_percent: 1.5 }`.
+   */
+  sloThresholds?: Record<string, unknown>
+}
+
+export interface ReliabilitySignal {
+  signalId: string
+  moduleKey: ReliabilityModuleKey
+  kind: ReliabilitySignalKind
+  source: string
+  label: string
+  severity: ReliabilitySeverity
+  summary: string
+  evidence: ReliabilityEvidence[]
+  observedAt: string | null
+}
+
+export interface ReliabilityModuleSnapshot {
+  moduleKey: ReliabilityModuleKey
+  label: string
+  description: string
+  domain: ReliabilityModuleDomain
+  status: ReliabilitySeverity
+  confidence: ReliabilityConfidence
+  summary: string
+  routes: ReliabilityRouteRef[]
+  apis: ReliabilityApiRef[]
+  dependencies: string[]
+  smokeTests: string[]
+  signals: ReliabilitySignal[]
+  signalCounts: Record<ReliabilitySeverity, number>
+  expectedSignalKinds: ReliabilitySignalKind[]
+  missingSignalKinds: ReliabilitySignalKind[]
+}
+
+export interface ReliabilityIntegrationBoundary {
+  taskId: string
+  moduleKey: ReliabilityModuleKey
+  expectedSignalKind: ReliabilitySignalKind
+  expectedSource: string
+  status: 'pending' | 'partial' | 'ready'
+  note: string
+}
+
+export interface ReliabilityOverview {
+  generatedAt: string
+  modules: ReliabilityModuleSnapshot[]
+  totals: {
+    totalModules: number
+    healthy: number
+    warning: number
+    error: number
+    unknownOrPending: number
+  }
+  integrationBoundaries: ReliabilityIntegrationBoundary[]
+  notes: string[]
+}

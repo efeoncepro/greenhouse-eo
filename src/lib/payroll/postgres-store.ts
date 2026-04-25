@@ -2401,6 +2401,37 @@ export const pgListPayrollCompensationMembers = async (): Promise<PayrollCompens
   return rows.map(mapCompensationMember)
 }
 
+export const listPayrollSocialSecurityInstitutionsFromPostgres = async (): Promise<string[]> => {
+  await assertPayrollPostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<{ institution: string }>(
+    `
+      SELECT DISTINCT institution
+      FROM (
+        SELECT NULLIF(BTRIM(afp_name), '') AS institution
+        FROM greenhouse_payroll.compensation_versions
+        WHERE pay_regime = 'chile'
+          AND afp_name IS NOT NULL
+
+        UNION ALL
+
+        SELECT
+          CASE
+            WHEN LOWER(BTRIM(health_system)) = 'fonasa' THEN 'Fonasa'
+            WHEN LOWER(BTRIM(health_system)) = 'isapre' THEN 'Isapre'
+            ELSE NULL
+          END AS institution
+        FROM greenhouse_payroll.compensation_versions
+        WHERE pay_regime = 'chile'
+      ) AS payroll_institutions
+      WHERE institution IS NOT NULL
+      ORDER BY institution ASC
+    `
+  )
+
+  return rows.map(row => row.institution)
+}
+
 // ---------------------------------------------------------------------------
 // Bonus config
 // ---------------------------------------------------------------------------

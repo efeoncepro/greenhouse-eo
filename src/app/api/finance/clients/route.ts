@@ -9,7 +9,7 @@ import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { upsertFinanceClientProfileInPostgres } from '@/lib/finance/postgres-store-slice2'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -342,8 +342,6 @@ export async function GET(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { searchParams } = new URL(request.url)
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
@@ -368,6 +366,8 @@ export async function GET(request: Request) {
 
     console.warn('[finance/clients] Postgres-first read path unavailable, falling back to BigQuery.', error)
   }
+
+  await assertFinanceBigQueryReadiness({ tables: ['fin_client_profiles', 'fin_income'] })
 
   const projectId = getFinanceProjectId()
   let companyExpressions = DEFAULT_COMPANY_EXPRESSIONS

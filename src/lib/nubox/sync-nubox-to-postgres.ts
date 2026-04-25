@@ -3,11 +3,20 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  buildIncomeTaxWriteFields,
+  serializeIncomeTaxSnapshot
+} from '@/lib/finance/income-tax-snapshot'
+import {
+  buildExpenseTaxWriteFields,
+  serializeExpenseTaxSnapshot
+} from '@/lib/finance/expense-tax-snapshot'
 import { syncCanonicalFinanceQuote } from '@/lib/finance/quotation-canonical-store'
 import { recordPayment } from '@/lib/finance/payment-ledger'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
+import type { ChileTaxSnapshot } from '@/lib/tax/chile'
 
 type NuboxProjectionSale = NuboxConformedSale & {
   source_last_ingested_at: string | null
@@ -29,6 +38,37 @@ const safeNum = (v: unknown): number | null => {
   const n = Number(s)
 
   return Number.isFinite(n) ? n : null
+}
+
+const resolveNuboxIncomeTaxCode = (sale: NuboxProjectionSale): 'cl_vat_19' | 'cl_vat_exempt' | 'cl_vat_non_billable' => {
+  const netAmount = Math.abs(safeNum(sale.net_amount) ?? 0)
+  const vatAmount = Math.abs(safeNum(sale.tax_vat_amount) ?? 0)
+  const totalAmount = Math.abs(safeNum(sale.total_amount) ?? 0)
+  const exemptAmount = Math.abs(safeNum(sale.exempt_amount) ?? 0)
+
+  if (sale.dte_type_code === '34' || exemptAmount > 0) return 'cl_vat_exempt'
+  if (vatAmount > 0 || totalAmount > netAmount) return 'cl_vat_19'
+
+  return 'cl_vat_non_billable'
+}
+
+const applySignToIncomeTaxSnapshot = (
+  snapshot: ChileTaxSnapshot,
+  signMultiplier: 1 | -1
+): ChileTaxSnapshot => {
+  if (signMultiplier === 1) return snapshot
+
+  return {
+    ...snapshot,
+    taxableAmount: snapshot.taxableAmount * signMultiplier,
+    taxAmount: snapshot.taxAmount * signMultiplier,
+    totalAmount: snapshot.totalAmount * signMultiplier,
+    metadata: {
+      ...snapshot.metadata,
+      signedForIncome: true,
+      signMultiplier
+    }
+  }
 }
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -179,7 +219,12 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
       'finance.income',
       existing[0].income_id,
       'finance.income.nubox_synced',
-      { nubox_sale_id: sale.nubox_sale_id, emission_status: sale.emission_status_name }
+      {
+        incomeId: existing[0].income_id,
+        income_id: existing[0].income_id,
+        nubox_sale_id: sale.nubox_sale_id,
+        emission_status: sale.emission_status_name
+      }
     )
 
     return 'updated'
@@ -193,13 +238,30 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
 
   // Credit notes (DTE 61) are stored with negative amounts
   const isCreditNote = sale.dte_type_code === '61'
-  const signMultiplier = isCreditNote ? -1 : 1
+  const signMultiplier: 1 | -1 = isCreditNote ? -1 : 1
+  const subtotalAbs = Math.abs(safeNum(sale.net_amount) ?? 0)
+
+  const taxWriteFields = await buildIncomeTaxWriteFields({
+    subtotal: subtotalAbs,
+    taxCode: resolveNuboxIncomeTaxCode(sale),
+    taxAmount: Math.abs(safeNum(sale.tax_vat_amount) ?? 0),
+    totalAmount: Math.abs(safeNum(sale.total_amount) ?? 0),
+    dteTypeCode: sale.dte_type_code,
+    exemptAmount: Math.abs(safeNum(sale.exempt_amount) ?? 0),
+    issuedAt: sale.emission_date ?? undefined
+  })
+
+  const signedTaxSnapshot = applySignToIncomeTaxSnapshot(taxWriteFields.taxSnapshot, signMultiplier)
+  const signedSubtotal = subtotalAbs * signMultiplier
+  const signedTaxAmount = taxWriteFields.taxAmount * signMultiplier
+  const signedTaxAmountSnapshot = taxWriteFields.taxAmountSnapshot * signMultiplier
+  const signedTotalAmount = taxWriteFields.totalAmount * signMultiplier
 
   await withGreenhousePostgresTransaction(async client => {
     await client.query(
       `INSERT INTO greenhouse_finance.income (
         income_id, client_id, organization_id, client_name, invoice_number, invoice_date, due_date,
-        currency, subtotal, tax_rate, tax_amount, total_amount,
+        currency, subtotal, tax_rate, tax_amount, tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_status, amount_paid, income_type, is_annulled, service_line,
         nubox_document_id, nubox_sii_track_id, nubox_emission_status,
@@ -213,17 +275,17 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
         created_by_user_id, created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7,
-        'CLP', $8, 0.19, $9, $10,
-        1, $10,
-        $11, 0, $12, $19, NULL,
-        $13, $14, $15,
-        $16, $17, $18, $36::timestamptz,
-        $20, $21,
-        $22, $23, $24,
-        $25, $26, $27,
-        $28, $29, $30,
-        $31, $32, $33, $34,
-        $35,
+        'CLP', $8, $9, $10, $11, $12, $13, $14::jsonb, $15, $16::timestamptz, $17,
+        1, $17,
+        $18, 0, $19, $26, NULL,
+        $20, $21, $22,
+        $23, $24, $25, $43::timestamptz,
+        $27, $28,
+        $29, $30, $31,
+        $32, $33, $34,
+        $35, $36, $37,
+        $38, $39, $40, $41,
+        $42,
         NULL, NOW(), NOW()
       )
       ON CONFLICT (income_id) DO UPDATE SET
@@ -234,11 +296,17 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
         dte_folio = COALESCE(EXCLUDED.dte_folio, greenhouse_finance.income.dte_folio),
         nubox_emitted_at = COALESCE(EXCLUDED.nubox_emitted_at, greenhouse_finance.income.nubox_emitted_at),
         organization_id = COALESCE(greenhouse_finance.income.organization_id, EXCLUDED.organization_id),
+        tax_code = COALESCE(greenhouse_finance.income.tax_code, EXCLUDED.tax_code),
+        tax_rate_snapshot = COALESCE(greenhouse_finance.income.tax_rate_snapshot, EXCLUDED.tax_rate_snapshot),
+        tax_amount_snapshot = COALESCE(greenhouse_finance.income.tax_amount_snapshot, EXCLUDED.tax_amount_snapshot),
+        tax_snapshot_json = COALESCE(greenhouse_finance.income.tax_snapshot_json, EXCLUDED.tax_snapshot_json),
+        tax_snapshot_frozen_at = COALESCE(greenhouse_finance.income.tax_snapshot_frozen_at, EXCLUDED.tax_snapshot_frozen_at),
         is_annulled = EXCLUDED.is_annulled,
+        is_tax_exempt = COALESCE(greenhouse_finance.income.is_tax_exempt, EXCLUDED.is_tax_exempt),
         balance_nubox = EXCLUDED.balance_nubox,
         nubox_pdf_url = COALESCE(EXCLUDED.nubox_pdf_url, greenhouse_finance.income.nubox_pdf_url),
         nubox_xml_url = COALESCE(EXCLUDED.nubox_xml_url, greenhouse_finance.income.nubox_xml_url),
-        nubox_last_synced_at = COALESCE($36::timestamptz, greenhouse_finance.income.nubox_last_synced_at, NOW()),
+        nubox_last_synced_at = COALESCE($43::timestamptz, greenhouse_finance.income.nubox_last_synced_at, NOW()),
         updated_at = NOW()`,
       [
         incomeId,
@@ -248,9 +316,16 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
         sale.folio,
         sale.emission_date,
         sale.due_date,
-        (safeNum(sale.net_amount) ?? 0) * signMultiplier,
-        (safeNum(sale.tax_vat_amount) ?? 0) * signMultiplier,
-        (safeNum(sale.total_amount) ?? 0) * signMultiplier,
+        signedSubtotal,
+        taxWriteFields.taxRate,
+        signedTaxAmount,
+        taxWriteFields.taxCode,
+        taxWriteFields.taxRateSnapshot,
+        signedTaxAmountSnapshot,
+        serializeIncomeTaxSnapshot(signedTaxSnapshot),
+        taxWriteFields.isTaxExempt,
+        signedTaxSnapshot.frozenAt,
+        signedTotalAmount,
         isCreditNote ? 'paid' : (isAnnulled ? 'written_off' : 'pending'),
         mapDteTypeToIncomeType(sale.dte_type_code),
         Number(sale.nubox_sale_id),
@@ -289,6 +364,7 @@ const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'created
         `evt-${randomUUID()}`,
         incomeId,
         JSON.stringify({
+          incomeId,
           income_id: incomeId,
           source: 'nubox_sync',
           nubox_sale_id: sale.nubox_sale_id,
@@ -403,12 +479,29 @@ const upsertExpenseFromPurchase = async (
   const expenseId = `EXP-NB-${purchase.nubox_purchase_id}`
 
   const isExpenseAnnulled = purchase.is_annulled === true
+  const exchangeRateToClp = 1
+
+  const taxWriteFields = await buildExpenseTaxWriteFields({
+    subtotal: safeNum(purchase.net_amount) ?? 0,
+    exchangeRateToClp,
+    taxAmount: safeNum(purchase.tax_vat_amount) ?? 0,
+    totalAmount: safeNum(purchase.total_amount) ?? 0,
+    dteTypeCode: purchase.dte_type_code,
+    exemptAmount: safeNum(purchase.exempt_amount),
+    vatUnrecoverableAmount: safeNum(purchase.vat_unrecoverable_amount),
+    vatCommonUseAmount: safeNum(purchase.vat_common_use_amount),
+    vatFixedAssetsAmount: safeNum(purchase.vat_fixed_assets_amount),
+    issuedAt: purchase.emission_date ?? undefined
+  })
 
   await withGreenhousePostgresTransaction(async client => {
     await client.query(
       `INSERT INTO greenhouse_finance.expenses (
         expense_id, expense_type, description,
-        currency, subtotal, tax_rate, tax_amount, total_amount,
+        currency, subtotal, tax_rate, tax_amount, tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot,
+        tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
+        effective_cost_amount, effective_cost_amount_clp, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_status, document_number, document_date, due_date,
         supplier_id, supplier_name,
@@ -422,17 +515,20 @@ const upsertExpenseFromPurchase = async (
         created_by_user_id, created_at, updated_at
       ) VALUES (
         $1, 'supplier', $2,
-        'CLP', $3, 0.19, $4, $5,
-        1, $5,
-        $6, $7, $8, $9,
-        $10, $11,
-        $12, $13, $14,
-        $15, $16, $33::timestamptz,
-        $17, $18, $19::date, $20,
-        $21, $22, $23, $24,
-        $25, $26, $27,
-        $28, $29, $30,
-        $31, $32,
+        'CLP', $3, $4, $5, $6, $7, $8, $9,
+        $10::jsonb, $11, $12::timestamptz,
+        $13, $14, $15, $16,
+        $17, $18, $19,
+        1, $19,
+        $20, $21, $22, $23,
+        $24, $25,
+        $26, $27, $28,
+        $29, $30, $31::timestamptz,
+        $32, $33, $34::date, $35,
+        $36, $37, $38, $39,
+        $40, $41, $42,
+        $43, $44, $45,
+        $46, $47,
         NULL, NOW(), NOW()
       )
       ON CONFLICT (expense_id) DO NOTHING`,
@@ -440,8 +536,22 @@ const upsertExpenseFromPurchase = async (
         expenseId,
         `${purchase.dte_type_name || 'Factura'} — ${purchase.supplier_trade_name || 'Unknown'}`,
         safeNum(purchase.net_amount) ?? 0,
-        safeNum(purchase.tax_vat_amount) ?? 0,
-        safeNum(purchase.total_amount) ?? 0,
+        taxWriteFields.taxRate,
+        taxWriteFields.taxAmount,
+        taxWriteFields.taxCode,
+        taxWriteFields.taxRecoverability,
+        taxWriteFields.taxRateSnapshot,
+        taxWriteFields.taxAmountSnapshot,
+        serializeExpenseTaxSnapshot(taxWriteFields.taxSnapshot),
+        taxWriteFields.isTaxExempt,
+        taxWriteFields.taxSnapshotFrozenAt,
+        taxWriteFields.recoverableTaxAmount,
+        taxWriteFields.recoverableTaxAmountClp,
+        taxWriteFields.nonRecoverableTaxAmount,
+        taxWriteFields.nonRecoverableTaxAmountClp,
+        taxWriteFields.effectiveCostAmount,
+        taxWriteFields.effectiveCostAmountClp,
+        taxWriteFields.totalAmount,
         isExpenseAnnulled ? 'written_off' : ((safeNum(purchase.balance) ?? -1) === 0 ? 'paid' : 'pending'),
         purchase.folio,
         purchase.emission_date,
@@ -453,6 +563,7 @@ const upsertExpenseFromPurchase = async (
         purchase.supplier_rut,
         purchase.supplier_trade_name,
         purchase.origin_name,
+        purchase.source_last_ingested_at,
         isExpenseAnnulled,
         purchase.document_status_name,
         purchase.receipt_date,
@@ -468,8 +579,7 @@ const upsertExpenseFromPurchase = async (
         safeNum(purchase.total_other_taxes_amount),
         safeNum(purchase.total_withholding_amount),
         purchase.period_year,
-        purchase.period_month,
-        purchase.source_last_ingested_at
+        purchase.period_month
       ]
     )
 

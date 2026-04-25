@@ -1,44 +1,64 @@
-# Cloud Build ignore file — separate from .gitignore
-# gcloud uses this instead of .gitignore when present.
+# Cloud Build upload contract.
+#
+# `gcloud builds submit` uses `.gcloudignore` for the initial upload to GCP.
+# This is separate from any service-level `.dockerignore`, which only applies
+# later inside the Docker build step. Keep this file aligned with the current
+# Cloud Run workers (`ops-worker`, `commercial-cost-worker`, `ico-batch`):
+# they build from `services/**` plus backend/runtime code under `src/**`, and
+# do not need local Next.js output, docs, Vercel state, or agent scratch data.
+#
+# Reuse the repo's existing local/generated ignore rules first so Cloud Build
+# hygiene doesn't drift from day-to-day developer hygiene.
+#!include:.gitignore
 
-# Build artifacts
+# Build outputs generated locally
 .next/
+.next-local/
+.next-build-dir
+.next-build-meta.json
 out/
 dist/
+build/
+coverage/
+blob-report/
+playwright-report/
 
-# Dependencies (installed in Docker)
+# Dependencies are installed inside the image
 node_modules/
 
-# Vuexy reference (not needed for Cloud Run services)
-full-version/
-
-# IDE / editor
-.vscode/
-.idea/
-*.swp
-
-# Git
+# Git / CI metadata
 .git/
 .github/
 
-# Env files (secrets injected via Cloud Run env vars)
+# Local IDE / agent / preview / auth state
+.auth/
+.claude/
+.codex/
+.vscode/
+.idea/
+.vercel/
+*.swp
+
+# Environment files — runtime secrets are injected by Cloud Run / Secret Manager
 .env*
 !.env.example
+!.env.local.example
 
-# Documentation (not needed at build time)
+# Repo areas not needed by current Cloud Run worker images
+artifacts/
+bigquery/
+data/
+demo-configs/
 docs/
+full-version/
+public/
+spec/
+tests/
 
-# Tests
+# Test sources and generated TS metadata
 **/*.test.ts
 **/*.test.tsx
 **/*.spec.ts
 src/test/
-
-# Vercel
-.vercel/
-
-# Public assets
-public/
-
-# Temp files
 *.tmp
+*.tsbuildinfo

@@ -12,9 +12,12 @@
  *   POST /reactive/recover          → Recover orphaned projection queue items (replaces projection-recovery cron)
  *   GET  /reactive/queue-depth      → Queue depth + oldest-event lag, optionally filtered by ?domain=<x>
  *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
+ *   POST /vat-ledger/materialize       → Materialize Chile VAT ledger + monthly position
+ *   POST /party-lifecycle/sweep        → Daily sweep: active_client → inactive on stale parties (TASK-542)
  *   POST /quotation-lifecycle/sweep    → Daily sweep: expire overdue quotes + emit renewal_due events (TASK-351)
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
+ *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -24,6 +27,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 
 import { processReactiveEvents, ensureReactiveSchema, sweepAuditOnlyEvents } from '@/lib/sync/reactive-consumer'
 import { claimOrphanedRefreshItems, markRefreshCompleted, markRefreshFailed } from '@/lib/sync/refresh-queue'
+import { classifyReactiveError } from '@/lib/sync/reactive-error-classification'
 import { getRegisteredProjections } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
 import {
@@ -36,12 +40,16 @@ import {
   materializeCommercialCostAttributionForPeriod,
   materializeAllAvailablePeriods
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
+import { runPartyLifecycleInactivitySweep } from '@/lib/commercial/party'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
+import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
+import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
+import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -268,7 +276,13 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
       const projection = projections.find(p => p.name === orphan.projectionName)
 
       if (!projection) {
-        await markRefreshFailed(orphan.queueId, `Projection "${orphan.projectionName}" not found in registry`, 0)
+        const classified = classifyReactiveError(`Projection "${orphan.projectionName}" not found in registry`)
+
+        await markRefreshFailed(orphan.queueId, classified.formattedMessage, 0, {
+          errorClass: classified.category,
+          errorFamily: classified.family,
+          isInfrastructureFault: classified.isInfrastructure
+        })
         failed++
         details.push({ queueId: orphan.queueId, projectionName: orphan.projectionName, status: 'unknown_projection' })
         continue
@@ -282,9 +296,13 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
         recovered++
         details.push({ queueId: orphan.queueId, projectionName: orphan.projectionName, status: 'recovered' })
       } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : String(error)
+        const classified = classifyReactiveError(error)
 
-        await markRefreshFailed(orphan.queueId, errorMsg, projection.maxRetries ?? 2)
+        await markRefreshFailed(orphan.queueId, classified.formattedMessage, projection.maxRetries ?? 2, {
+          errorClass: classified.category,
+          errorFamily: classified.family,
+          isInfrastructureFault: classified.isInfrastructure
+        })
         failed++
         details.push({ queueId: orphan.queueId, projectionName: orphan.projectionName, status: 'failed' })
       }
@@ -389,6 +407,133 @@ const handleCostAttributionMaterialize = async (req: IncomingMessage, res: Serve
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('[ops-worker] /cost-attribution/materialize failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
+ * POST /vat-ledger/materialize
+ * Materializes Chile VAT ledger entries + monthly VAT position.
+ *
+ * Body:
+ *   { year?: number, month?: number }
+ *   - If year+month provided: single period
+ *   - If omitted: all periods with source fiscal data
+ */
+const handleVatLedgerMaterialize = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const year = typeof body.year === 'number' ? body.year : undefined
+  const month = typeof body.month === 'number' ? body.month : undefined
+  const startMs = Date.now()
+
+  console.log(`[ops-worker] POST /vat-ledger/materialize — year=${year ?? 'all'} month=${month ?? 'all'}`)
+
+  try {
+    if (year && month) {
+      const summary = await materializeVatLedgerForPeriod(year, month, 'ops-worker-trigger')
+
+      json(res, 200, {
+        periods: 1,
+        summaries: [summary],
+        durationMs: Date.now() - startMs
+      })
+
+      return
+    }
+
+    const result = await materializeAllAvailableVatPeriods('ops-worker-trigger-all')
+
+    json(res, 200, {
+      ...result,
+      durationMs: Date.now() - startMs
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /vat-ledger/materialize failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
+ * POST /party-lifecycle/sweep
+ * TASK-542: daily inactivity sweep for commercial parties.
+ */
+const handlePartyLifecycleSweep = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const dryRun = body.dryRun !== false
+  const limit = typeof body.limit === 'number' ? body.limit : undefined
+  const inactivityMonths = typeof body.inactivityMonths === 'number' ? body.inactivityMonths : undefined
+  const startMs = Date.now()
+
+  console.log(
+    `[ops-worker] POST /party-lifecycle/sweep — dryRun=${dryRun} limit=${limit ?? 'default'} inactivityMonths=${inactivityMonths ?? 6}`
+  )
+
+  try {
+    const result = await runPartyLifecycleInactivitySweep({
+      dryRun,
+      limit,
+      inactivityMonths
+    })
+
+    json(res, 200, {
+      ...result,
+      durationMs: Date.now() - startMs
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /party-lifecycle/sweep failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
+ * POST /product-catalog/drift-detect
+ * TASK-548: nightly product catalog drift detect against HubSpot Products.
+ */
+const handleProductCatalogDriftDetect = async (_req: IncomingMessage, res: ServerResponse) => {
+  console.log('[ops-worker] POST /product-catalog/drift-detect')
+
+  try {
+    const result = await runProductCatalogDriftDetectJob()
+
+    console.log(
+      `[ops-worker] /product-catalog/drift-detect done — status=${result.status} conflicts=${result.conflictsDetected} autoHealed=${result.autoHealed} ${result.durationMs}ms`
+    )
+
+    json(res, 200, result)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /product-catalog/drift-detect failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
+ * POST /product-catalog/reconcile-v2
+ * TASK-605 Slice 6: weekly reconcile against HubSpot catalog with v2
+ * drift classifier (pending_overwrite / manual_drift / error) + Slack
+ * alert when (manual_drift + error) > threshold. Scheduled via Cloud
+ * Scheduler (weekly Monday 06:00 America/Santiago).
+ */
+const handleProductCatalogReconcileV2 = async (_req: IncomingMessage, res: ServerResponse) => {
+  console.log('[ops-worker] POST /product-catalog/reconcile-v2')
+
+  try {
+    const summary = await runProductCatalogReconcileV2Job()
+
+    console.log(
+      `[ops-worker] /product-catalog/reconcile-v2 done — matched=${summary.matched} withDrift=${summary.productsWithDrift} pending=${summary.pendingOverwriteTotal} manual=${summary.manualDriftTotal} error=${summary.errorTotal} alert=${summary.alertFired} ${summary.durationMs}ms`
+    )
+
+    json(res, 200, summary)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /product-catalog/reconcile-v2 failed:', message)
     json(res, 500, { error: message })
   }
 }
@@ -514,12 +659,50 @@ const handleBatchEmailSend = async (req: IncomingMessage, res: ServerResponse) =
  * POST /nexa/weekly-digest
  * Builds and sends the ICO-first Nexa executive digest to internal leadership.
  */
+/**
+ * Parse opcional de recipients_override desde body. Acepta:
+ *   - Array de strings: ["a@b.com", "c@d.com"]
+ *   - Array de objetos: [{email, name?, userId?}]
+ * Devuelve EmailRecipient[] válido o null si no hay override.
+ */
+const parseRecipientsOverride = (raw: unknown): Array<{ email: string; name?: string; userId?: string }> | null => {
+  if (!Array.isArray(raw) || raw.length === 0) return null
+
+  const out: Array<{ email: string; name?: string; userId?: string }> = []
+
+  for (const entry of raw) {
+    if (typeof entry === 'string' && entry.trim()) {
+      out.push({ email: entry.trim() })
+    } else if (entry && typeof entry === 'object' && 'email' in entry) {
+      const email = typeof entry.email === 'string' ? entry.email.trim() : ''
+
+      if (!email) continue
+
+      const name = 'name' in entry && typeof entry.name === 'string' ? entry.name : undefined
+      const userId = 'userId' in entry && typeof entry.userId === 'string' ? entry.userId : undefined
+
+      out.push({ email, ...(name ? { name } : {}), ...(userId ? { userId } : {}) })
+    }
+  }
+
+  return out.length > 0 ? out : null
+}
+
 const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const limitCandidate = Number(body.limit)
   const limit = Number.isFinite(limitCandidate) ? limitCandidate : WEEKLY_DIGEST_DEFAULT_LIMIT
 
-  console.log(`[ops-worker] POST /nexa/weekly-digest — limit=${limit}`)
+  // TASK-598 Slice 6.5: dry-run y recipients_override para testing seguro
+  // antes del envío real. `dryRun=true` construye el digest pero no envía
+  // email — útil para validar output en staging. `recipients_override`
+  // permite dirigir el envío a un recipient de test específico.
+  const dryRun = body.dryRun === true
+  const recipientsOverride = parseRecipientsOverride(body.recipients_override ?? body.recipientsOverride)
+
+  console.log(
+    `[ops-worker] POST /nexa/weekly-digest — limit=${limit} dryRun=${dryRun} override=${recipientsOverride ? recipientsOverride.length : 'none'}`
+  )
 
   try {
     const digest = await buildWeeklyDigest({ limit })
@@ -535,7 +718,20 @@ const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse)
       return
     }
 
-    const recipients = await resolveWeeklyDigestRecipients()
+    if (dryRun) {
+      // No envía, devuelve el digest completo para inspección.
+      json(res, 200, {
+        ok: true,
+        dryRun: true,
+        digest,
+        skipped: true,
+        reason: 'dry_run_no_send'
+      })
+
+      return
+    }
+
+    const recipients = recipientsOverride ?? (await resolveWeeklyDigestRecipients())
 
     if (recipients.length === 0) {
       json(res, 200, {
@@ -553,12 +749,12 @@ const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse)
       domain: 'delivery',
       recipients,
       context: digest,
-      sourceEventId: `nexa-weekly-digest:${digest.window.startAt}:${digest.window.endAt}`,
+      sourceEventId: `nexa-weekly-digest:${digest.window.startAt}:${digest.window.endAt}${recipientsOverride ? ':override' : ''}`,
       sourceEntity: 'nexa.weekly_digest'
     })
 
     console.log(
-      `[ops-worker] /nexa/weekly-digest done — status=${result.status} recipients=${recipients.length} insights=${digest.totalInsights}`
+      `[ops-worker] /nexa/weekly-digest done — status=${result.status} recipients=${recipients.length} insights=${digest.totalInsights} override=${recipientsOverride ? 'true' : 'false'}`
     )
 
     json(res, 200, {
@@ -571,6 +767,68 @@ const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse)
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('[ops-worker] /nexa/weekly-digest failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
+/**
+ * POST /reliability-ai-watch
+ * TASK-638 — AI Observer del Reliability Control Plane.
+ *
+ * Lee `getReliabilityOverview()` (snapshot canónico), llama Gemini Flash via
+ * Vertex AI con prompt determinista, persiste observations dedupeadas por
+ * fingerprint en `greenhouse_ai.reliability_ai_observations`.
+ *
+ * Hosted aquí (NO en Vercel cron) porque:
+ *  - Gemini + DB writes pueden exceder 60s en corner cases
+ *  - WIF nativo en Cloud Run (no rotar ADC en Vercel)
+ *  - Cloud Logging captura prompt + respuesta para audit
+ *  - Cloud Scheduler retries automáticos con backoff
+ *
+ * Kill-switch: `RELIABILITY_AI_OBSERVER_ENABLED=true`. Default OFF (costo cero
+ * hasta activación explícita).
+ *
+ * Cloud Scheduler job recomendado: cada 1h (`0 *\/1 * * *`) timezone
+ * `America/Santiago`. Frecuencia conservadora porque dedup por fingerprint
+ * descarta repetidos — pero cada llamada cuesta tokens, sin importar dedup.
+ */
+const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const triggeredBy = (typeof body.triggeredBy === 'string' ? body.triggeredBy : 'cloud_scheduler') as
+    | 'cron'
+    | 'manual'
+    | 'cloud_scheduler'
+
+  const force = body.force === true
+
+  console.log(`[ops-worker] POST /reliability-ai-watch — triggeredBy=${triggeredBy} force=${force}`)
+
+  try {
+    /**
+     * Lazy import: el runner pulls a heavy tree (`getReliabilityOverview` →
+     * cloud/observability/billing/notion/sentry helpers). Si lo importamos
+     * top-level, cualquier evaluacion side-effect en esa cadena puede
+     * romper el boot del worker. Importarlo aqui aisla el costo al request.
+     */
+    const { runReliabilityAiObserver } = await import('@/lib/reliability/ai/runner')
+    const result = await runReliabilityAiObserver({ triggeredBy, force })
+
+    if (result.summary.skippedReason) {
+      console.log(
+        `[ops-worker] /reliability-ai-watch skipped — sweepRunId=${result.summary.sweepRunId} reason="${result.summary.skippedReason}"`
+      )
+    } else {
+      console.log(
+        `[ops-worker] /reliability-ai-watch done — sweepRunId=${result.summary.sweepRunId} evaluated=${result.summary.observationsEvaluated} persisted=${result.summary.observationsPersisted} skipped=${result.summary.observationsSkipped} ${result.summary.durationMs}ms model=${result.summary.model}`
+      )
+    }
+
+    json(res, 200, result.summary)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /reliability-ai-watch failed:', message)
     json(res, 502, { error: message })
   }
 }
@@ -625,6 +883,30 @@ const server = createServer(async (req, res) => {
       return
     }
 
+    if (method === 'POST' && path === '/vat-ledger/materialize') {
+      await handleVatLedgerMaterialize(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/party-lifecycle/sweep') {
+      await handlePartyLifecycleSweep(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/product-catalog/drift-detect') {
+      await handleProductCatalogDriftDetect(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/product-catalog/reconcile-v2') {
+      await handleProductCatalogReconcileV2(req, res)
+
+      return
+    }
+
     if (method === 'POST' && path === '/quotation-lifecycle/sweep') {
       await handleQuotationLifecycleSweep(req, res)
 
@@ -639,6 +921,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/nexa/weekly-digest') {
       await handleNexaWeeklyDigest(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/reliability-ai-watch') {
+      await handleReliabilityAiWatch(req, res)
 
       return
     }

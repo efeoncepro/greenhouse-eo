@@ -18,14 +18,16 @@ import TimelineSeparator from '@mui/lab/TimelineSeparator'
 import { styled } from '@mui/material/styles'
 import type { TimelineProps } from '@mui/lab/Timeline'
 
-import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
+import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseRouteLink } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type {
   OperationsHealthStatus,
   OperationsOverview,
   OperationsSubsystem
 } from '@/lib/operations/get-operations-overview'
 import type { ReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
+import type { GcpBillingOverview } from '@/types/billing-export'
 import type { IntegrationDataQualityRunResult, IntegrationDataQualityStatus } from '@/types/integration-data-quality'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
@@ -34,6 +36,8 @@ import AdminReactiveProjectionBreakdown from './AdminReactiveProjectionBreakdown
 type Props = {
   data: OperationsOverview
   reactiveBreakdown?: ReactiveProjectionBreakdown | null
+  gcpBilling?: GcpBillingOverview | null
+  notionOperationalOverview?: NotionSyncOperationalOverview | null
 }
 
 type AdminHealth = 'ok' | 'warning' | 'failed' | 'stale'
@@ -237,7 +241,12 @@ const buildAuditEvents = (data: OperationsOverview): AuditEvent[] => {
     .slice(0, 10)
 }
 
-const AdminOpsHealthView = ({ data, reactiveBreakdown = null }: Props) => {
+const AdminOpsHealthView = ({
+  data,
+  reactiveBreakdown = null,
+  gcpBilling = null,
+  notionOperationalOverview = null
+}: Props) => {
   const subsystems = healthSubsystems(data.subsystems)
   const uniqueRecentEventTypes = Array.from(new Set(data.recentEvents.map(event => event.eventType))).slice(0, 8)
   const auditEvents = buildAuditEvents(data)
@@ -273,7 +282,7 @@ const AdminOpsHealthView = ({ data, reactiveBreakdown = null }: Props) => {
               <Button component={Link} href='/agency/operations' variant='contained'>
                 Abrir operaciones extendidas
               </Button>
-              <Button component={Link} href='/admin/integrations' variant='outlined'>
+              <Button component={GreenhouseRouteLink} href='/admin/cloud-integrations' variant='outlined'>
                 Ver Cloud & Integrations
               </Button>
             </Stack>
@@ -520,6 +529,111 @@ const AdminOpsHealthView = ({ data, reactiveBreakdown = null }: Props) => {
           </Stack>
         )}
       </ExecutiveCardShell>
+
+      {/* Spotlight observabilidad TASK-586: incidentes de costo cloud + sync Notion stale */}
+      {(gcpBilling || notionOperationalOverview) && (
+        <ExecutiveCardShell
+          title='Spotlight observabilidad'
+          subtitle='Anomalías relevantes del Billing Export y del flujo Notion. La lectura completa vive en Cloud & Integrations.'
+        >
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 3,
+              gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }
+            }}
+          >
+            {gcpBilling && (
+              <Card variant='outlined'>
+                <CardContent sx={{ p: 3 }}>
+                  <Stack spacing={1.5}>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                      <Typography variant='subtitle2'>GCP cost (Billing Export)</Typography>
+                      <Chip
+                        size='small'
+                        color={
+                          gcpBilling.availability === 'configured'
+                            ? 'success'
+                            : gcpBilling.availability === 'awaiting_data'
+                              ? 'info'
+                              : gcpBilling.availability === 'not_configured'
+                                ? 'warning'
+                                : 'error'
+                        }
+                        label={
+                          gcpBilling.availability === 'configured'
+                            ? 'Activo'
+                            : gcpBilling.availability === 'awaiting_data'
+                              ? 'Esperando datos'
+                              : gcpBilling.availability === 'not_configured'
+                                ? 'Sin configurar'
+                                : 'Error'
+                        }
+                      />
+                    </Stack>
+                    <Typography variant='body2'>
+                      {gcpBilling.availability === 'configured'
+                        ? `Total ${gcpBilling.currency} ${Math.round(gcpBilling.totalCost).toLocaleString('en-US')} en ${gcpBilling.period.days} días.`
+                        : (gcpBilling.error ?? gcpBilling.notes[0] ?? 'Billing Export aún no rinde datos.')}
+                    </Typography>
+                    {gcpBilling.availability === 'configured' &&
+                      gcpBilling.spotlights.notionBqSync &&
+                      gcpBilling.spotlights.notionBqSync.cost > 0 && (
+                        <Typography variant='caption' color='text.secondary'>
+                          notion-bq-sync: {gcpBilling.currency}{' '}
+                          {Math.round(gcpBilling.spotlights.notionBqSync.cost).toLocaleString('en-US')} ·{' '}
+                          {gcpBilling.spotlights.notionBqSync.share}% del total cloud.
+                        </Typography>
+                      )}
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
+
+            {notionOperationalOverview && (
+              <Card variant='outlined'>
+                <CardContent sx={{ p: 3 }}>
+                  <Stack spacing={1.5}>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                      <Typography variant='subtitle2'>Flujo Notion end-to-end</Typography>
+                      <Chip
+                        size='small'
+                        color={
+                          notionOperationalOverview.flowStatus === 'healthy'
+                            ? 'success'
+                            : notionOperationalOverview.flowStatus === 'degraded'
+                              ? 'warning'
+                              : notionOperationalOverview.flowStatus === 'broken'
+                                ? 'error'
+                                : 'info'
+                        }
+                        label={
+                          notionOperationalOverview.flowStatus === 'healthy'
+                            ? 'Sano'
+                            : notionOperationalOverview.flowStatus === 'degraded'
+                              ? 'Atención'
+                              : notionOperationalOverview.flowStatus === 'broken'
+                                ? 'Crítico'
+                                : 'Esperando datos'
+                        }
+                      />
+                    </Stack>
+                    <Typography variant='body2'>{notionOperationalOverview.summary}</Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      Última corrida raw:{' '}
+                      {notionOperationalOverview.upstream.freshestRawSyncedAt
+                        ? `${notionOperationalOverview.upstream.freshestRawSyncedAt.slice(0, 16).replace('T', ' ')}`
+                        : 'sin dato'}{' '}
+                      · {notionOperationalOverview.orchestration.failedSpaces} en sync_failed ·{' '}
+                      {notionOperationalOverview.dataQuality.totals.brokenSpaces} con DQ broken.
+                    </Typography>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
+          </Box>
+        </ExecutiveCardShell>
+      )}
 
       <ExecutiveCardShell
         title='Cloud runtime'

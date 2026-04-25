@@ -65,6 +65,8 @@ TIMEOUT="540"
 CONCURRENCY="4"
 REACTIVE_BATCH_SIZE="500"
 DEFAULT_EMAIL_FROM="Efeonce Greenhouse <greenhouse@efeoncepro.com>"
+HUBSPOT_SERVICE_NAME="hubspot-greenhouse-integration"
+HUBSPOT_SERVICE_REGION="us-central1"
 
 # Cloud Scheduler timezone
 SCHEDULER_TZ="America/Santiago"
@@ -78,12 +80,14 @@ if [ "${ENV}" = "production" ]; then
   DEFAULT_PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
   DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
   DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-production"
+  DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
   echo "=== PRODUCTION deployment ==="
 else
   DEFAULT_NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-staging:latest"
   DEFAULT_PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
   DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
   DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-staging"
+  DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="greenhouse-integration-api-token"
   echo "=== STAGING deployment ==="
 fi
 
@@ -91,7 +95,9 @@ NEXTAUTH_SECRET_REF="${NEXTAUTH_SECRET_REF:-${DEFAULT_NEXTAUTH_SECRET_REF}}"
 PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
 PG_INSTANCE="${PG_INSTANCE:-${DEFAULT_PG_INSTANCE}}"
 RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-${DEFAULT_RESEND_API_KEY_SECRET_REF}}"
+GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF="${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF:-${DEFAULT_GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}}"
 EMAIL_FROM="${EMAIL_FROM:-${DEFAULT_EMAIL_FROM}}"
+HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL="${HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL:-$(gcloud run services describe "${HUBSPOT_SERVICE_NAME}" --project="${PROJECT_ID}" --region="${HUBSPOT_SERVICE_REGION}" --format='value(status.url)')}"
 
 # ─── Secret access helpers ───────────────────────────────────────────────────
 
@@ -212,6 +218,15 @@ ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
 ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
+ENV_VARS="${ENV_VARS},GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF=${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
+ENV_VARS="${ENV_VARS},HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL=${HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL}"
+
+# TASK-638 — Reliability AI Observer kill-switch.
+# Declarativo en deploy.sh para que `--set-env-vars` (destructivo) NO lo
+# borre en cada redeploy. Default true en staging, configurable via env.
+# Para apagar: `RELIABILITY_AI_OBSERVER_ENABLED=false bash deploy.sh`.
+RELIABILITY_AI_OBSERVER_ENABLED="${RELIABILITY_AI_OBSERVER_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},RELIABILITY_AI_OBSERVER_ENABLED=${RELIABILITY_AI_OBSERVER_ENABLED}"
 
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
@@ -233,6 +248,8 @@ ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF}"
 fi
+
+ensure_secret_accessor_binding "${GREENHOUSE_INTEGRATION_API_TOKEN_SECRET_REF}"
 
 gcloud run deploy "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
@@ -422,11 +439,36 @@ upsert_scheduler_job \
 echo "  -> ops-nexa-weekly-digest: 0 7 * * 1 (weekly Nexa executive digest)"
 
 upsert_scheduler_job \
+  "ops-product-catalog-drift-detect" \
+  "0 3 * * *" \
+  "/product-catalog/drift-detect" \
+  '{}'
+echo "  -> ops-product-catalog-drift-detect: 0 3 * * * (nightly HubSpot product drift detect, TASK-548)"
+
+upsert_scheduler_job \
+  "ops-product-catalog-reconcile-v2" \
+  "0 6 * * 1" \
+  "/product-catalog/reconcile-v2" \
+  '{}'
+echo "  -> ops-product-catalog-reconcile-v2: 0 6 * * 1 (weekly Mon 06:00 Santiago, v2 drift classifier + Slack alert, TASK-605)"
+
+upsert_scheduler_job \
   "ops-quotation-lifecycle" \
   "0 7 * * *" \
   "/quotation-lifecycle/sweep" \
   '{}'
 echo "  -> ops-quotation-lifecycle: 0 7 * * * (daily quote expiration + renewal_due sweep, TASK-351)"
+
+# TASK-638 — Reliability AI Observer.
+# Hourly Gemini watcher over RCP overview. Conservative cadence (1h) because
+# every call costs Vertex AI tokens regardless of fingerprint dedup. Activate
+# only after RELIABILITY_AI_OBSERVER_ENABLED=true is set on the service.
+upsert_scheduler_job \
+  "ops-reliability-ai-watch" \
+  "0 */1 * * *" \
+  "/reliability-ai-watch" \
+  '{"triggeredBy":"cloud_scheduler"}'
+echo "  -> ops-reliability-ai-watch: 0 */1 * * * (Reliability AI Observer, TASK-638 — gated by RELIABILITY_AI_OBSERVER_ENABLED)"
 
 echo ""
 echo "=== Deployment complete ==="

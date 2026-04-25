@@ -56,12 +56,19 @@ async function authViaApi() {
   }
 
   const url = `${BASE_URL}/api/auth/agent-session`
+  const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
 
-  console.log(`→ POST ${url}  (email: ${EMAIL})`)
+  console.log(`→ POST ${url}  (email: ${EMAIL})${bypassSecret ? '  [vercel bypass on]' : ''}`)
+
+  const headers = { 'Content-Type': 'application/json' }
+
+  if (bypassSecret) {
+    headers['x-vercel-protection-bypass'] = bypassSecret
+  }
 
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ secret, email: EMAIL })
   })
 

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -31,6 +31,11 @@ import {
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import { withIdempotency } from '@/lib/finance/idempotency'
+import {
+  buildIncomeTaxWriteFields,
+  parsePersistedIncomeTaxSnapshot,
+  serializeIncomeTaxSnapshot
+} from '@/lib/finance/income-tax-snapshot'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,6 +52,12 @@ interface IncomeRow {
   subtotal: unknown
   tax_rate: unknown
   tax_amount: unknown
+  tax_code?: string | null
+  tax_rate_snapshot?: unknown
+  tax_amount_snapshot?: unknown
+  tax_snapshot_json?: unknown | null
+  is_tax_exempt?: boolean
+  tax_snapshot_frozen_at?: unknown
   total_amount: unknown
   exchange_rate_to_clp: unknown
   total_amount_clp: unknown
@@ -77,6 +88,12 @@ const normalizeIncome = (row: IncomeRow) => ({
   subtotal: toNumber(row.subtotal),
   taxRate: toNumber(row.tax_rate),
   taxAmount: toNumber(row.tax_amount),
+  taxCode: row.tax_code ? normalizeString(row.tax_code) : null,
+  taxRateSnapshot: row.tax_rate_snapshot != null ? toNumber(row.tax_rate_snapshot) : null,
+  taxAmountSnapshot: row.tax_amount_snapshot != null ? toNumber(row.tax_amount_snapshot) : null,
+  taxSnapshot: parsePersistedIncomeTaxSnapshot(row.tax_snapshot_json),
+  isTaxExempt: normalizeBoolean(row.is_tax_exempt),
+  taxSnapshotFrozenAt: toTimestampString(row.tax_snapshot_frozen_at as string | { value?: string } | null),
   totalAmount: toNumber(row.total_amount),
   exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
   totalAmountClp: toNumber(row.total_amount_clp),
@@ -156,7 +173,7 @@ export async function GET(request: Request) {
   }
 
   // ── BigQuery fallback ──
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_income'] })
   const projectId = getFinanceProjectId()
 
   let filters = ''
@@ -273,9 +290,20 @@ export async function POST(request: Request) {
     const currency = assertValidCurrency(body.currency)
     const subtotal = assertPositiveAmount(toNumber(body.subtotal), 'subtotal')
 
-    const taxRate = toNumber(body.taxRate ?? 0.19)
-    const taxAmount = toNumber(body.taxAmount) || subtotal * taxRate
-    const totalAmount = toNumber(body.totalAmount) || subtotal + taxAmount
+    const taxWriteFields = await buildIncomeTaxWriteFields({
+      subtotal,
+      taxCode: body.taxCode ?? null,
+      taxRate: body.taxRate != null ? toNumber(body.taxRate) : null,
+      taxAmount: body.taxAmount != null ? toNumber(body.taxAmount) : null,
+      totalAmount: body.totalAmount != null ? toNumber(body.totalAmount) : null,
+      dteTypeCode: body.dteTypeCode ? normalizeString(body.dteTypeCode) : null,
+      exemptAmount: body.exemptAmount != null ? toNumber(body.exemptAmount) : null,
+      issuedAt: invoiceDate
+    })
+
+    const taxRate = taxWriteFields.taxRate
+    const taxAmount = taxWriteFields.taxAmount
+    const totalAmount = taxWriteFields.totalAmount
     const exchangeRateToClp = await resolveExchangeRateToClp({ currency, requestedRate: body.exchangeRateToClp })
     const totalAmountClp = toNumber(body.totalAmountClp) || totalAmount * exchangeRateToClp
 
@@ -320,6 +348,12 @@ export async function POST(request: Request) {
         subtotal,
         taxRate,
         taxAmount,
+        taxCode: taxWriteFields.taxCode,
+        taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+        taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+        taxSnapshotJson: serializeIncomeTaxSnapshot(taxWriteFields.taxSnapshot),
+        isTaxExempt: taxWriteFields.isTaxExempt,
+        taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
         totalAmount,
         exchangeRateToClp,
         totalAmountClp,
@@ -373,7 +407,9 @@ export async function POST(request: Request) {
       INSERT INTO \`${projectId}.greenhouse.fin_income\` (
         income_id, client_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date,
-        currency, subtotal, tax_rate, tax_amount, total_amount,
+        currency, subtotal, tax_rate, tax_amount,
+        tax_code, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_status, amount_paid,
         po_number, hes_number, service_line, income_type, description,
@@ -382,7 +418,9 @@ export async function POST(request: Request) {
       ) VALUES (
         @incomeId, NULLIF(@clientId, ''), NULLIF(@clientProfileId, ''), NULLIF(@hubspotCompanyId, ''), NULLIF(@hubspotDealId, ''),
         @clientName, NULLIF(@invoiceNumber, ''), CAST(@invoiceDate AS DATE), IF(@dueDate = '', NULL, CAST(@dueDate AS DATE)),
-        @currency, CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
+        @currency, CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC),
+        @taxCode, CAST(@taxRateSnapshot AS NUMERIC), CAST(@taxAmountSnapshot AS NUMERIC), PARSE_JSON(@taxSnapshotJson), @isTaxExempt, TIMESTAMP(@taxSnapshotFrozenAt),
+        CAST(@totalAmount AS NUMERIC),
         CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
         @paymentStatus, 0,
         NULLIF(@poNumber, ''), NULLIF(@hesNumber, ''), NULLIF(@serviceLine, ''), @incomeType, NULLIF(@description, ''),
@@ -404,6 +442,12 @@ export async function POST(request: Request) {
         subtotal,
         taxRate,
         taxAmount,
+        taxCode: taxWriteFields.taxCode,
+        taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+        taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+        taxSnapshotJson: serializeIncomeTaxSnapshot(taxWriteFields.taxSnapshot),
+        isTaxExempt: taxWriteFields.isTaxExempt,
+        taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
         totalAmount,
         exchangeRateToClp,
         totalAmountClp,

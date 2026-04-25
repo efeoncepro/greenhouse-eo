@@ -7,7 +7,8 @@ export const ENTITLEMENT_MODULES = [
   'admin',
   'client_portal',
   'my_workspace',
-  'ai_tooling'
+  'ai_tooling',
+  'commercial'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -133,6 +134,53 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'ai_tooling',
     actions: ['read', 'launch'] as const,
     defaultScope: 'tenant'
+  },
+
+  // Commercial Party Lifecycle (TASK-535 §9.1).
+  // Roles `sales` and `sales_lead` are not yet defined in role-codes.ts; the
+  // runtime binding starts with `efeonce_admin` + `finance_admin`. When the
+  // sales role family lands, extend `getTenantEntitlements()` accordingly.
+  {
+    key: 'commercial.party.create',
+    module: 'commercial',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.party.promote_to_client',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.party.churn',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.party.override_lifecycle',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.deal.create',
+    module: 'commercial',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.quote_to_cash.execute',
+    module: 'commercial',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.product_catalog.resolve_conflict',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'all'
   }
 ] as const
 

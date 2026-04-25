@@ -1,5 +1,14 @@
 # GREENHOUSE_REPO_ECOSYSTEM_V1.md
 
+## Delta 2026-04-24 — `notion-bigquery` queda como repo hermano; dependencia sí, absorción no todavía
+
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_NOTION_BIGQUERY_ABSORPTION_DECISION_V1.md`
+- Decisión vigente:
+  - `greenhouse-eo` sí depende operativamente de `notion-bq-sync`
+  - esa dependencia no obliga todavía a absorber `cesargrowth11/notion-bigquery` al monorepo
+  - primero se debe endurecer costo/auth/identidad del servicio actual y recién después reevaluar ownership
+
 ## Delta 2026-04-11 — Sister platforms contract now governs cross-repo integration posture
 
 - La relación entre `greenhouse-eo` y plataformas hermanas del ecosistema ya no debe inferirse solo desde esta lista operativa.
@@ -64,18 +73,36 @@ Nota:
   - materializacion/sync de delivery desde Notion a BigQuery
 - No asumir que `greenhouse-eo` puede corregir por si solo un gap del pipeline si la columna o la logica nace en esta Cloud Function.
 
-### 3. HubSpot -> BigQuery CRM pipeline
+### 3. HubSpot -> BigQuery CRM pipeline (SIBLING)
 
 - Repo: `cesargrowth11/hubspot-bigquery`
-- Rol: Cloud Function que sincroniza HubSpot hacia BigQuery (`hubspot_crm`) y opera el bridge con Greenhouse para catalogo/capabilities y lecturas salientes
+- Rol (tras **TASK-574**, 2026-04-24): Cloud Function `hubspot-bq-sync` que sincroniza HubSpot hacia BigQuery (`hubspot_crm`) + app HubSpot Developer Platform (`hsproject.json`, `src/app/`) + scripts ops contra el portal HubSpot y Secret Manager.
 - Source of truth para:
-  - ingestion CRM desde HubSpot
+  - ingestion CRM desde HubSpot (Cloud Function `main.py`)
   - shape de `hubspot_crm.*`
-  - bridge operativo entre HubSpot y Greenhouse
+  - app scopes HubSpot + configuracion de webhooks
+  - `greenhouse_bridge.py` (bridge de capabilities batch dentro del BQ sync — no confundir con el write bridge HTTP)
 - Tomar desde aqui cuando el cambio afecte:
   - contacts, companies, deals, tickets, services u otros objetos CRM en BigQuery
-  - custom properties o asociaciones de HubSpot
-  - bridges de capabilities / tenant pulls entre HubSpot y Greenhouse
+  - scopes de la app HubSpot o propiedades que impactan la ingestion
+  - jobs ops contra el portal HubSpot (creacion de properties, backfill de capabilities)
+- **YA NO vive aqui** (post TASK-574): el write bridge HTTP + webhook handler — ver 3.1.
+
+### 3.1. HubSpot write bridge + webhooks (MONOREPO, post TASK-574)
+
+- Repo: **`efeoncepro/greenhouse-eo`** — `services/hubspot_greenhouse_integration/`
+- Rol: Cloud Run Python/Flask que expone 23 rutas HTTP de lectura/escritura contra HubSpot CRM + recibe webhooks HubSpot inbound (HMAC-validated) y los propaga al runtime Next.js via `GreenhouseClient`.
+- URL publica (inalterada por el cutover): `https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app` (region `us-central1`)
+- Source of truth para:
+  - contrato HTTP `/deals`, `/companies/*`, `/products/*`, `/quotes/*`, `/services/*`, `/owners/*`, `/webhooks/hubspot`
+  - deploy via `.github/workflows/hubspot-greenhouse-integration-deploy.yml` (WIF, primer CI que este codigo tiene)
+  - tests pytest `services/hubspot_greenhouse_integration/tests/test_app.py`
+  - skill operativa `.claude/skills/hubspot-greenhouse-bridge/` + `.codex/skills/hubspot-greenhouse-bridge/`
+- Tomar desde aqui cuando el cambio afecte:
+  - cualquier route HTTP del bridge (request shape, response shape, auth, idempotency)
+  - validacion del webhook signature (`HUBSPOT_APP_CLIENT_SECRET`)
+  - deploy pipeline, Dockerfile, dependencies Python
+  - rotacion del token `GREENHOUSE_INTEGRATION_API_TOKEN` (coordinada con Vercel)
 
 ### 4. Notion -> Teams notifier
 
@@ -139,13 +166,14 @@ Nota:
 
 | Si el cambio toca...                        | Consultar primero             |
 | ------------------------------------------- | ----------------------------- |
-| UX, rutas, permisos, modulos del portal     | `greenhouse-eo`               |
-| Layout base, shell o tema Vuexy             | `vuexy-nextjs-admin-template` |
-| Notion -> BigQuery operativo (`notion_ops`) | `notion-bigquery`             |
-| HubSpot -> BigQuery / bridge CRM            | `hubspot-bigquery`            |
-| Notificaciones Notion -> Teams              | `notion-teams`                |
-| Sync de revision Notion <-> Frame.io        | `notion-frame-io`             |
-| Agentes/Kortex/MCP fuera del portal         | `kortex`                      |
+| UX, rutas, permisos, modulos del portal                                   | `greenhouse-eo`               |
+| Layout base, shell o tema Vuexy                                           | `vuexy-nextjs-admin-template` |
+| Notion -> BigQuery operativo (`notion_ops`)                               | `notion-bigquery`             |
+| **HubSpot write bridge + webhooks** (rutas Cloud Run, 23 endpoints)       | **`greenhouse-eo`** (`services/hubspot_greenhouse_integration/`, post TASK-574) |
+| HubSpot -> BigQuery ingestion CRM + app config HubSpot Developer Platform | `hubspot-bigquery`            |
+| Notificaciones Notion -> Teams                                            | `notion-teams`                |
+| Sync de revision Notion <-> Frame.io                                      | `notion-frame-io`             |
+| Agentes/Kortex/MCP fuera del portal                                       | `kortex`                      |
 
 ## Guardrails para agentes
 

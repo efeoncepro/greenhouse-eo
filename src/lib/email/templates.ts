@@ -10,6 +10,7 @@ import PasswordResetEmail from '@/emails/PasswordResetEmail'
 import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
 import PayrollLiquidacionV2Email from '@/emails/PayrollLiquidacionV2Email'
 import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
+import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import VerifyEmail from '@/emails/VerifyEmail'
 import type { WeeklyDigestEmailContext } from '@/lib/nexa/digest'
@@ -1067,4 +1068,76 @@ registerPreviewMeta('weekly_executive_digest', {
     { key: 'portalUrl', label: 'URL del portal', type: 'text' },
     { key: 'closingNote', label: 'Nota de cierre', type: 'text' }
   ]
+})
+
+// ── TASK-631 Fase 3+4 — quote_share template (with PDF + org context) ─────
+interface QuoteShareContext extends Record<string, unknown> {
+  shareUrl: string
+  quotationNumber: string
+  versionNumber: number
+  clientName: string
+  recipientName?: string
+  totalLabel: string
+  validUntilLabel?: string | null
+  senderName: string
+  senderRole?: string | null
+  senderEmail?: string | null
+  customMessage?: string | null
+  hasPdfAttached?: boolean
+  pdfFileName?: string | null
+  pdfSizeBytes?: number | null
+  subject?: string
+}
+
+registerTemplate<QuoteShareContext>('quote_share', context => {
+  const greetingName = context.recipientName?.split(' ')[0] ?? null
+  const greeting = greetingName ? `Hola ${greetingName},` : 'Hola,'
+
+  return {
+    subject:
+      context.subject
+      ?? `Propuesta ${context.quotationNumber} v${context.versionNumber} para ${context.clientName}`,
+    react: QuoteSharePromptEmail({
+      shareUrl: context.shareUrl,
+      quotationNumber: context.quotationNumber,
+      versionNumber: context.versionNumber,
+      clientName: context.clientName,
+      recipientName: context.recipientName ?? null,
+      totalLabel: context.totalLabel,
+      validUntilLabel: context.validUntilLabel ?? null,
+      senderName: context.senderName,
+      senderRole: context.senderRole ?? null,
+      senderEmail: context.senderEmail ?? null,
+      customMessage: context.customMessage ?? null,
+      hasPdfAttached: context.hasPdfAttached ?? false,
+      pdfFileName: context.pdfFileName ?? null
+    }),
+    text: [
+      `PROPUESTA ${context.quotationNumber} v${context.versionNumber}`,
+      `PARA: ${context.clientName}`,
+      '═══════════════════════════════════',
+      '',
+      greeting,
+      '',
+      context.customMessage ?? '',
+      context.customMessage ? '' : null,
+      `Te comparto la propuesta comercial que preparamos para tu equipo en ${context.clientName}.`,
+      '',
+      context.hasPdfAttached && context.pdfFileName
+        ? `📎 ADJUNTO: ${context.pdfFileName}`
+        : null,
+      context.hasPdfAttached ? '' : null,
+      `Inversión total: ${context.totalLabel}`,
+      context.validUntilLabel ? `Válida hasta: ${context.validUntilLabel}` : null,
+      '',
+      `→ Ver propuesta online (con opción de aceptar):`,
+      `  ${context.shareUrl}`,
+      '',
+      `— ${context.senderName}`,
+      context.senderRole ? `   ${context.senderRole}` : null,
+      context.senderEmail ? `   ${context.senderEmail}` : null
+    ]
+      .filter(line => line !== null)
+      .join('\n')
+  }
 })

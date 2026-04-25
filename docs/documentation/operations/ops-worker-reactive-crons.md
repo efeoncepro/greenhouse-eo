@@ -1,9 +1,9 @@
 # Ops Worker — Crons Reactivos, Materializacion y Jobs Operativos en Cloud Run
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-06-17 por agente (TASK-254)
-> **Ultima actualizacion:** 2026-04-16 por Codex (TASK-246)
+> **Ultima actualizacion:** 2026-04-21 por Codex (TASK-533)
 > **Documentacion tecnica:** [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md) (§4.9, §5)
 
 ---
@@ -20,6 +20,7 @@ El servicio procesa cinco tipos de trabajo:
 | **Reactive Process Delivery** | Procesa solo los eventos reactivos del dominio `delivery` | Cada 5 minutos (desplazado 2 min) |
 | **Reactive Recover** | Recupera proyecciones huerfanas que quedaron pendientes en la cola de refresh | Cada 15 minutos |
 | **Cost Attribution Materialize** | Materializa la atribucion de costos laborales comerciales por periodo y recomputa snapshots de economics de clientes | Bajo demanda (manual o via reactive projection) |
+| **VAT Ledger Materialize** | Recalcula el libro IVA mensual y la posicion debito/credito fiscal por tenant y periodo | Bajo demanda (manual o via reactive projection) |
 | **Nexa Weekly Digest** | Construye y entrega el digest ejecutivo semanal de Nexa al liderazgo interno | Cada lunes, 7:00 AM Chile |
 
 ---
@@ -51,6 +52,7 @@ En **Admin Center > Ops Health**, el subsistema **Reactive Worker** muestra:
 | POST | `/reactive/process-domain` | Procesa backlog de un dominio especifico |
 | POST | `/reactive/recover` | Recupera proyecciones huerfanas |
 | POST | `/cost-attribution/materialize` | Materializa cost attribution + client economics |
+| POST | `/vat-ledger/materialize` | Recalcula el ledger IVA mensual y la posicion fiscal por periodo |
 | POST | `/nexa/weekly-digest` | Construye y envia el digest semanal de Nexa |
 
 Los endpoints reactivos aceptan un body JSON con `batchSize` (tamaño del lote).
@@ -59,6 +61,10 @@ El endpoint `/cost-attribution/materialize` acepta:
 - `{ year, month }` — materializa un periodo especifico
 - `{}` (sin parametros) — materializa todos los periodos con datos
 - `{ recomputeEconomics: false }` — omite la recomputacion de `client_economics` despues de materializar
+
+El endpoint `/vat-ledger/materialize` acepta:
+- `{ year, month }` — recalcula un periodo especifico
+- `{}` (sin parametros) — recalcula todos los periodos disponibles
 
 El endpoint `/nexa/weekly-digest` acepta:
 - `{ limit }` — cantidad maxima de insights a incluir en el correo
@@ -93,6 +99,14 @@ Cuando un evento financiero (factura, gasto, asignacion, nomina) dispara la proy
 3. Opcionalmente recomputa los snapshots de `client_economics` con los nuevos costos
 
 > Detalle tecnico: [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md) — commercial cost attribution pipeline
+
+## Por que el libro IVA mensual corre aqui
+
+La posicion mensual de IVA depende de recomputar ventas y compras canónicas por `space_id`, consolidar buckets de débito fiscal, crédito fiscal e IVA no recuperable, y dejar el resultado exportable y auditable. Ese trabajo ya no debe vivir en UI ni en rutas serverless livianas.
+
+Cuando llega un evento de `income` o `expense`, la projection reactiva `vat_monthly_position` puede pedir al ops-worker que materialice el periodo afectado. El mismo endpoint también sirve para replay manual o backfill histórico.
+
+La lectura final vive en tablas materializadas, no en agregaciones inline al abrir Finance.
 
 ---
 

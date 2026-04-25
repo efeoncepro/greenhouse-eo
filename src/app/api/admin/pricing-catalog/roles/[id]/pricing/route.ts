@@ -11,6 +11,7 @@ import {
   type SellableRolePricingCurrency,
   type SellableRoleSeedPricingRow
 } from '@/lib/commercial/sellable-roles-seed'
+import { publishSellableRolePricingUpdated } from '@/lib/commercial/sellable-role-events'
 import { insertPricingRowsIfChanged } from '@/lib/commercial/sellable-roles-store'
 import { query } from '@/lib/db'
 import { canAdministerPricingCatalog, requireFinanceTenantContext } from '@/lib/tenant/authorization'
@@ -284,6 +285,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     },
     effectiveFrom
   })
+
+  for (const result of results) {
+    if (!result.changed) continue
+
+    await publishSellableRolePricingUpdated({
+      roleId: id,
+      roleSku,
+      currencyCode: result.entry.currencyCode,
+      effectiveFrom,
+      hourlyPrice: result.entry.hourlyPrice,
+      fteMonthlyPrice: result.entry.fteMonthlyPrice,
+      marginPct: result.entry.marginPct
+    })
+  }
 
   const updatedAt = await touchRoleUpdatedAt(id)
 

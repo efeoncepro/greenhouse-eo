@@ -58,6 +58,44 @@ export type CommercialCostBasisRunResult = {
   eventsPublished: number
 }
 
+export const QUOTE_REPRICE_REPLAY_CRITERIA = [
+  'quote_ids',
+  'period_scope',
+  'current_open_quotes'
+] as const
+
+export type QuoteRepriceReplayCriteria = (typeof QUOTE_REPRICE_REPLAY_CRITERIA)[number]
+
+export type QuoteRepriceBulkRequest = {
+  quoteIds: string[]
+  period: { year: number; month: number } | null
+  replayCriteria: QuoteRepriceReplayCriteria
+  createVersion: boolean
+  triggerSource: string
+  triggeredBy: string
+  notes: string | null
+  tenantScope: CommercialCostBasisTenantScope
+}
+
+export type QuoteRepriceBulkQuoteResult = {
+  quotationId: string
+  status: 'succeeded' | 'failed' | 'skipped'
+  reason: string | null
+  versionNumber: number | null
+  lineItemsRepriced: number
+}
+
+export type QuoteRepriceBulkRunResult = {
+  runId: string
+  status: 'succeeded' | 'failed' | 'partial'
+  durationMs: number
+  quotesProcessed: number
+  quotesSucceeded: number
+  quotesSkipped: number
+  quotesFailed: number
+  results: QuoteRepriceBulkQuoteResult[]
+}
+
 const toInt = (value: unknown): number | null => {
   if (typeof value === 'number' && Number.isInteger(value)) return value
 
@@ -93,6 +131,17 @@ const toNullableString = (value: unknown): string | null => {
 
 const isScope = (value: unknown): value is CommercialCostBasisScope =>
   typeof value === 'string' && COMMERCIAL_COST_BASIS_SCOPES.includes(value as CommercialCostBasisScope)
+
+const isReplayCriteria = (value: unknown): value is QuoteRepriceReplayCriteria =>
+  typeof value === 'string' &&
+  QUOTE_REPRICE_REPLAY_CRITERIA.includes(value as QuoteRepriceReplayCriteria)
+
+const toStringArray = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value
+        .map(entry => (typeof entry === 'string' ? entry.trim() : ''))
+        .filter((entry): entry is string => entry.length > 0)
+    : []
 
 export const getCommercialCostBasisPeriodId = (year: number, month: number) =>
   `${year}-${String(month).padStart(2, '0')}`
@@ -139,6 +188,49 @@ export const normalizeCommercialCostBasisRequest = (
     month,
     monthsBack,
     recomputeEconomics: overrides.recomputeEconomics ?? toBoolean(raw.recomputeEconomics, true),
+    triggerSource: overrides.triggerSource ?? toNullableString(raw.triggerSource) ?? 'manual',
+    triggeredBy: overrides.triggeredBy ?? toNullableString(raw.triggeredBy) ?? 'commercial_cost_worker',
+    notes: overrides.notes ?? toNullableString(raw.notes),
+    tenantScope: {
+      organizationId: overrides.tenantScope?.organizationId ?? toNullableString(raw.organizationId),
+      clientId: overrides.tenantScope?.clientId ?? toNullableString(raw.clientId),
+      spaceId: overrides.tenantScope?.spaceId ?? toNullableString(raw.spaceId)
+    }
+  }
+}
+
+export const normalizeQuoteRepriceBulkRequest = (
+  raw: Record<string, unknown>,
+  overrides: Partial<QuoteRepriceBulkRequest> = {}
+): QuoteRepriceBulkRequest => {
+  const currentPeriod = getFinanceCurrentPeriod()
+  const quoteIds = overrides.quoteIds ?? toStringArray(raw.quoteIds)
+
+  const replayCriteria =
+    overrides.replayCriteria ??
+    (isReplayCriteria(raw.replayCriteria)
+      ? raw.replayCriteria
+      : quoteIds.length > 0
+        ? 'quote_ids'
+        : 'current_open_quotes')
+
+  const periodYear = toInt(raw.year) ?? toInt((raw.period as Record<string, unknown> | null)?.year) ?? currentPeriod.year
+  const periodMonth = toInt(raw.month) ?? toInt((raw.period as Record<string, unknown> | null)?.month) ?? currentPeriod.month
+
+  if (periodMonth < 1 || periodMonth > 12) {
+    throw new Error('month must be between 1 and 12')
+  }
+
+  return {
+    quoteIds,
+    period:
+      overrides.period === undefined
+        ? replayCriteria === 'period_scope'
+          ? { year: periodYear, month: periodMonth }
+          : null
+        : overrides.period,
+    replayCriteria,
+    createVersion: overrides.createVersion ?? toBoolean(raw.createVersion, false),
     triggerSource: overrides.triggerSource ?? toNullableString(raw.triggerSource) ?? 'manual',
     triggeredBy: overrides.triggeredBy ?? toNullableString(raw.triggeredBy) ?? 'commercial_cost_worker',
     notes: overrides.notes ?? toNullableString(raw.notes),

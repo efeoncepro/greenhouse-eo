@@ -1,7 +1,17 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 2.29
+> **Version:** 2.38
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-23 — v2.38: **TASK-583 local convergence de HubSpot quote publish/tax native**. El outbound de quotes ya no arma create/update por carriles distintos: `src/lib/hubspot/hubspot-quote-sync.ts` pasa a ser el builder canónico de payload para HubSpot y resuelve `sender`, empresa emisora, binding catálogo-first, billing semantics y metadata tributaria desde el canon local. `src/lib/integrations/hubspot-greenhouse-service.ts` gana `updateHubSpotGreenhouseQuote()` + `getHubSpotGreenhouseTaxRates()`, eliminando la dependencia del cliente update degradado. `pushCanonicalQuoteToHubSpot()` persiste `hubspot_quote_status`, `hubspot_quote_link`, `hubspot_quote_pdf_download_link`, `hubspot_quote_locked` y `hubspot_last_synced_at` en `greenhouse_commercial.quotations`. El bridge sibling expone `GET /tax-rates` y la respuesta de quote devuelve también `pdfDownloadLink` + `locked`, dejando documentado el método canónico para resolver `hs_tax_rate_group_id` por ambiente sin hardcodear IDs.
+> **Updated:** 2026-04-22 — v2.37: **TASK-573 Deal birth contract completion**. El carril inline `Quote Builder -> POST /api/commercial/organizations/[id]/deals` ya no nace “desnudo”. `GET /deal-creation-context` expone `readyToCreate`, `blockingIssues`, `dealTypeOptions`, `priorityOptions` y defaults de `dealType/priority`; el drawer muestra contacto/owner esperados y bloquea create cuando falta `hubspot_company_id` o la governance está incompleta. `createDealFromQuoteContext` ahora resuelve owner desde el actor/policy, contacto desde `quotation.contact_identity_profile_id -> person_360.hubspot_contact_id`, y persiste `dealType`/`priority` en `deal_create_attempts` + `greenhouse_commercial.deals`. Se suma `greenhouse_commercial.hubspot_deal_property_config` para mirror local de property options y una lane admin-safe `GET/POST /api/admin/commercial/deal-governance` para summary + refresh de metadata HubSpot.
+> **Updated:** 2026-04-22 — v2.36: **Quote Builder contact hydration**. `GET /api/commercial/organizations/[id]/contacts` sigue siendo el read contract canónico del builder, pero ahora hace read-through materialization desde HubSpot cuando la organization recién adoptada todavía no tiene `person_memberships` comerciales locales. La lane admin `POST /api/organizations/[id]/hubspot-sync` reutiliza el mismo helper canónico, evitando dos implementaciones separadas del bridge `HubSpot company contacts -> identity_profiles/person_memberships`.
+> **Updated:** 2026-04-22 — v2.35: **TASK-543 post-rollout cleanup**. El selector unificado de parties ya no depende de `GREENHOUSE_PARTY_SELECTOR_UNIFIED`: el builder de creación usa `GET /api/commercial/parties/search` como carril canónico por defecto y preserva `organizationId` como handshake downstream hacia contactos, deals y persistencia de quotations. `hubspot_candidate` sigue visible solo para `efeonce_internal`; edit mantiene `organizationLocked`.
+> **Updated:** 2026-04-22 — v2.34: **TASK-550 Pricing Catalog follow-ups cerrados**. El Admin Pricing Catalog completa 4 gaps que habían quedado explícitamente fuera de scope al cerrar TASK-471. El audit timeline ya soporta revert one-click para governance types (`role_tier_margin`, `service_tier_margin`, `commercial_model_multiplier`, `country_pricing_factor`, `employment_type`) usando los write paths canónicos de governance/effective-dating; `fte_hours_guide` permanece read-only. El `SellableRoleDrawer` aplica el high-impact gate en sus 4 tabs guardables (Info, Modalidades, Costos, Pricing), evitando bypass por navegación interna. La approval queue del catálogo emite ahora eventos `commercial.pricing_catalog_approval.{proposed,decided}` consumidos por una proyección reactiva de notificaciones (in-app + email + Slack) detrás del flag `GREENHOUSE_PRICING_APPROVAL_NOTIFICATIONS`. El carril Excel deja de ser update-only: `update` sigue aplicándose directo y `create/delete` pasan por proposal → approval → apply con audit por fila y soft delete para bajas. Corrección arquitectónica adicional: el impacto del pricing catalog ya no se describe como tenant-scoped broad por `space_id`; quotations y readers comerciales actuales resuelven scope principal por `organization_id`, dejando `space_id` solo para proyecciones legacy que todavía lo requieren.
+> **Updated:** 2026-04-23 — v2.35: HubSpot quote outbound re-anchored on canonical `organization`. La proyección `quotation_hubspot_outbound` ya no puede fallar por ausencia de `space`: `createHubSpotQuote()` usa `organization_id -> hubspot_company_id` + `hubspot_deal_id` + `contact_identity_profile_id` como anchors canónicos, y el mirror legacy de `greenhouse_finance.quotes` queda opt-in (`persistFinanceMirror`) solo para compatibilidad. Resolución de contacto endurecida con precedencia `greenhouse_serving.person_360.hubspot_contact_id -> greenhouse_crm.contacts.hubspot_contact_id -> identity_profiles` origen HubSpot. Dependencia cross-repo endurecida: `hubspot-greenhouse-integration POST /quotes` migra a asociaciones `default` de HubSpot para `quote -> deal/company/contact` y `line_item -> quote`, eliminando drift por `associationTypeId` hardcodeados en objetos estándar.
+> **Updated:** 2026-04-21 — v2.32: **TASK-530 Quote Tax Explicitness (Chile IVA)**. `greenhouse_commercial.quotations` y `quotation_line_items` ganan 5 columnas nuevas (`tax_code`, `tax_rate_snapshot`, `tax_amount_snapshot`, `tax_snapshot_json`, `is_tax_exempt`) + `tax_snapshot_frozen_at` al header. CHECK constraints limitan `tax_code` a `{cl_vat_19, cl_vat_exempt, cl_vat_non_billable}` y fuerzan coherencia snapshot↔code↔frozen_at. `persistQuotationPricing` computa un `ChileTaxSnapshot` v1 post-engine (via `buildQuotationTaxSnapshot` que llama a `resolveChileTaxCode` + `computeChileTaxSnapshot` de TASK-529) y lo congela en el header + por línea proporcional a `subtotalAfterDiscount`. El pricing engine sigue operando sobre **neto**; el IVA es capa documental. `QuoteSummaryDock` recibe `ivaAmount` desde un preview cliente-safe (`previewChileTaxAmounts` en `quotation-tax-constants.ts`, sin `server-only`) y `TotalsLadder` renderiza `Subtotal · IVA · Total`. `RenderQuotationPdfInput.totals.tax` (opcional) lleva `{ code, label, rate, amount, isExempt }` y el PDF muestra una línea explícita "IVA 19%" / "IVA Exento" / "No Afecto a IVA" entre Subtotal y Total. Canonical store (`getFinanceQuoteDetailFromCanonical`) expone `taxCode`, `taxSnapshot`, `isTaxExempt`, `taxRateSnapshot`, `taxAmountSnapshot`, `taxSnapshotFrozenAt` para consumers downstream (detail view, income materializer, quote-to-cash audit). Backfill idempotente de rows legacy: `tax_rate ≈ 0.19` → `cl_vat_19`; `tax_rate = 0` → `cl_vat_exempt`; `tax_rate IS NULL` → `cl_vat_non_billable`. Follow-ups: dropdown de `tax_code` en el builder (hoy default `cl_vat_19`), email template con breakdown, per-line override UI.
+> **Updated:** 2026-04-20 — v2.31: TASK-509 encapsula el popover de addons dentro del primitive `TotalsLadder` usando Floating UI (`@floating-ui/react` 0.27) — el stack moderno de positioning que reemplaza popper.js v2 (MUI Popper). Motivación: el anchor cruzaba boundaries entre `QuoteSummaryDock` (state) y `TotalsLadder` (button DOM), y el re-render del button al cambiar `count`/`amount` dejaba el cached anchor stale → MUI Popper fallback a viewport `0,0` (popover en top-left). Con Floating UI el primitive es self-contained: `useFloating({ open, onOpenChange, placement: 'top-start', whileElementsMounted: autoUpdate, middleware: [offset(8), flip(), shift({ padding: 16 })] })` + `useInteractions([useClick(context), useDismiss(context, { outsidePress: true, escapeKey: true }), useRole(context, { role: 'dialog' })])` + `<FloatingPortal><FloatingFocusManager modal={false} returnFocus><Paper ref={refs.setFloating} style={floatingStyles}>{content}</Paper></FloatingFocusManager></FloatingPortal>`. `autoUpdate` mantiene el positioning vivo ante resize/scroll/mutation del anchor; `flip` + `shift` evitan overflow del viewport; `FloatingFocusManager returnFocus` devuelve el foco al segmento al cerrar. API contractual del primitive: `addonsSegment?: { count, amount, content: ReactNode } | null` (removida prop `onClick` + `ariaExpanded` — el primitive los gestiona). `QuoteSummaryDock` pierde state `addonAnchor` / `addonsOpen` / `handleAddonsToggle` / `handleAddonsClose` + imports Popper/Paper/ClickAwayListener/useState/ReactMouseEvent. Pasa solo el contenido. TASK-510 pendiente (backlog) para migrar el resto de popovers del portal (ContextChip, Ajustes, Warning) al mismo stack.
+> **Updated:** 2026-04-20 — v2.30: TASK-507 mueve el chip de addons de la zona 3 del dock a un segmento inline dentro del `TotalsLadder` primitive (zona 2). Razón: los addons son ajustes al total, no acciones independientes — patrón enterprise (Stripe Billing / Notion / Linear). `TotalsLadder` gana prop opcional `addonsSegment?: { count, amount, onClick, ariaExpanded } | null`. Render inline entre Subtotal y Factor con affordance de botón (hover primary color + underline, focus-visible, aria-expanded). `QuoteSummaryDock` elimina el chip redondo + Badge de zone 3; el popper queda como sibling del Grid y el anchor se captura desde el inline button. Zone 3 queda 100% ocupada por la CTA primary — cero wrap vertical posible. Props obsoletas removidas: `addonTotalDelta` (del dock + shell); cleanup de imports `Badge`, `formatMoney`, `CURRENCY_LOCALE`. TASK-508 cierra 3 polish items en `QuoteLineItemsEditor`: (a) columna "Tipo" reduce de 3 chips apilados (Tipo/Source/Tier) a 2 chips horizontales (Tipo + Tier); el source se degrada a ícono prefijo en la celda Ítem con tooltip. (b) warnings inline: antes renderizaban como `<TableRow colSpan=8>` con Alert full-width debajo de la row afectada, rompiendo la grid; ahora son un `IconButton` en la celda de acciones con color semantic según severity (critical=error, warning=warning, info=info), click abre un `Popover` con el `QuoteLineWarning` completo. Nuevo state `warningAnchor` + `warningIndex` sigue el mismo pattern que el popover de Ajustes (event.currentTarget, no ref). (c) density reducida: `.MuiTableBody-root .MuiTableCell-root { py: 0.75 }` + header `py: 1`, rows pasan de ~60-70px a ~48-52px, alineado con enterprise table density (Linear / Notion / GitHub Issues).
+> **Updated:** 2026-04-20 — v2.30: HubSpot quote sync hardening. `POST /api/finance/quotes` y `PUT /api/finance/quotes/[id]` aceptan/persisten `hubspotDealId` validado contra `greenhouse_commercial.deals` de la misma `organization_id`; el builder agrega selector async `Deal HubSpot` via `GET /api/commercial/organizations/[id]/deals` (tenant-safe, open deals first). Create outbound vuelve a publicar `commercial.quotation.created` incluso cuando la quote nace desde el write path canónico de Finance, y cambios posteriores de header / deal / líneas emiten `commercial.quotation.updated`. La proyección outbound de HubSpot escucha ahora `commercial.quotation.updated` además de `created/sent/approved/rejected/version_created`, eliminando el hueco donde una quote manual existía pero no tenía ancla `hubspot_deal_id` ni evento de actualización para re-sync. Regla operativa: `hubspot_company_id` resuelve organización; `hubspot_deal_id` resuelve la sync bidireccional de la cotización.
 > **Updated:** 2026-04-19 — v2.29: TASK-506 simplifica CTAs del Quote Summary Dock. El dock pasa de 2 CTAs (`Guardar y cerrar` tonal + `Guardar y emitir` contained) a 1 sola CTA terminal (`Guardar y emitir`). "Guardar y cerrar" se elimina del dock — el "Guardar borrador" del header absorbe el rol de save sin cerrar (2 saves en la página en vez de 3). Grid zones ajustadas de 3/5/4 a 3/6/3: zone 2 (total ladder) gana ancho, zone 3 (acciones) queda compacta con el addons chip + 1 CTA horizontal sin wrap vertical. `QuoteSummaryDockProps` gana prop nuevo `appliedAddonsTotal?: number | null` — cuando > 0 el chip de addons muestra `N addons · $applied` como contexto cuantitativo; si también hay `addonTotalDelta > 0` (sugerencias no aplicadas), añade `+$delta` muted al final. Shell computa `appliedAddonsTotal` sumando `simulation.lines[i].suggestedBillRate.totalBillOutputCurrency` para líneas con `metadata.pricingV2LineType === 'overhead_addon'`. `changeCount` del `SaveStateIndicator` ahora se deriva del delta entre `initialLines.length` y `linesSnapshot.length`, mostrando "Sin guardar · N cambios" cuando la cantidad de líneas cambió. El wrapper preserva `secondaryCtaLabel`/`onSecondaryClick`/`secondaryCtaDisabled` para consumers futuros (invoice/PO docks); el quote shell simplemente no los pasa.
 > **Updated:** 2026-04-19 — v2.28: TASK-505 Summary Dock v2. El `QuoteSummaryDock` sticky-bottom pasa de Stack flat a layout Grid de 3 zonas (`xs=12 / md=3+5+4`): Estado (save indicator + margin chip) / Totals ladder / Acciones (addons + Cancelar + Guardar). Tres primitives nuevos en `src/components/greenhouse/primitives/` (`SaveStateIndicator`, `MarginHealthChip`, `TotalsLadder`) reusables platform-wide para invoice / PO / contract docks. Total visible migra de `color=primary.main` a `text.primary` — el azul de marca queda reservado a la CTA primaria. `TotalsLadder` oculta subtotal/factor/IVA cuando no aportan información (`total === subtotal && factor === 1 && !ivaAmount`); cuando sí aportan, renderiza caption muted one-liner debajo del Total. `MarginHealthChip` pasa de `49.4%` + ícono a `Margen · 49,4% · Óptimo/Atención/Crítico` + ícono + tooltip de tier range (cierra color-only-state warning). `SaveStateIndicator` gana segunda línea con `changeCount` o `formatRelativeTime(lastSavedAt)`; dot pulsing en saving respeta `prefers-reduced-motion`. CTA primaria deja de hacer copy-swap (`"Guardar y cerrar"` → `"Calculando pricing…"` → `"Guardando…"`) y pasa a loading pattern enterprise: copy invariante + `disabled` + `<CircularProgress size={16} />` en startIcon. Shell actualizado: `primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}` constante, `primaryCtaLoading={submitting}`. `AnimatedCounter` del total baja de `duration=0.4` a `0.25` (emphasized decelerate `cubic-bezier(0.2, 0, 0, 1)`). Alinea con la estrategia de platform primitives de TASK-498.
 > **Updated:** 2026-04-19 — v2.27: TASK-500 / TASK-501 / TASK-502 / TASK-503 cierran el ciclo de UX y contratos del Quote Builder post-TASK-488. `PricingEngineInputV2.autoResolveAddons` pasa de `boolean` a `boolean | 'internal_only'` (aditivo, backwards-compatible). En modo `'internal_only'` el engine auto-resuelve solo addons `visibleToClient: false` (overhead, fee EOR estructural) y expone los addons `visibleToClient: true` aplicables en un campo nuevo de output `PricingEngineOutputV2.suggestedVisibleAddons: PricingAddonOutputV2[]`. El Quote Builder los ofrece como propuestas en el panel "Addons para el cliente" y al tildar se promueven a líneas `overhead_addon` explícitas en `lineItems`. Regla del modelo: lo que el cliente paga es lo que ve en la tabla — cero markup oculto. Para role/person, la UI del shell fija `quantity: 1` en el input al engine; el multiplicador real es `metadata.periods`, bindeado a la columna "Cantidad" visible (meses facturables). Elimina el doble conteo que dejó TASK-500 cuando se sincronizó quantity↔periods sin ajustar el engine. Para líneas catalog-backed (`role | person | tool | overhead_addon`) la UI renderiza el precio unitario como Typography read-only (no input, no override chip); override sigue disponible solo para líneas manuales (`direct_cost` sin `pricingV2LineType`). El shell fuerza una simulación fresca contra `/api/finance/quotes/pricing/simulate` antes de persistir y gate el botón Guardar mientras `simulating=true` — elimina la race condition que hacía fallar el save con "no hay precio" cuando el debounce del hook `usePricingSimulation` no había validado la snapshot actual. Endpoint `/api/finance/quotes/pricing/config` expone `catalog.employmentTypes` (ya existía) que ahora alimenta el dropdown "Tipo de contratación" del popover Ajustes; `periodsLabel` removido de `GH_PRICING.adjustPopover` (quedaba huérfano). Copy del chip de addons en el dock simplificado de "N addons sugeridos" → "N addons" porque el count engloba aplicados + propuestos. Popper del panel de addons migrado de `anchorEl={ref.current}` (caía al top-left cuando el ref era null en el primer render) a anchor capturado desde `event.currentTarget` + `useState<HTMLElement | null>`; dedupe client-side por sku en las entries del panel + guard idempotente en `handleAddonToggle` protegen contra double-clicks y race conditions del debounce.
@@ -61,6 +71,132 @@
   - ninguna de esas acciones redefine por sí sola el lifecycle documental de la cotización
 
 ---
+
+## Delta 2026-04-20 — TASK-509 Floating UI en `TotalsLadder` (addons primitive self-contained)
+
+Post-TASK-507 el segmento inline de addons tenía su state de popover repartido entre el dock (anchor + open) y el primitive (button). Al cambiar `count`/`amount` del segmento (ej. tildar un addon), el re-render del botón dejaba el anchor cacheado stale → MUI Popper fallaba a viewport `0,0` (popover en top-left).
+
+### Cambio de stack
+
+Se introduce `@floating-ui/react` (v0.27.16) como nueva dependencia — stack de positioning moderno, sucesor de popper.js v2 que usa MUI Popper. Es el primer consumer; TASK-510 (backlog) migra el resto de popovers del portal.
+
+### API del primitive
+
+```ts
+export interface TotalsLadderAddonsSegment {
+  count: number
+  amount: number
+  content: ReactNode   // ← self-contained: primitive maneja anchor/state/a11y
+}
+```
+
+Props `onClick` + `ariaExpanded` removidas — el primitive las maneja internamente. Consumers pasan el contenido del popover (típicamente `<AddonSuggestionsPanel>`) y listo.
+
+### Implementación interna (`AddonsSegmentButton`)
+
+```tsx
+const [open, setOpen] = useState(false)
+const { refs, floatingStyles, context, isPositioned } = useFloating<HTMLButtonElement>({
+  open,
+  onOpenChange: setOpen,
+  placement: 'top-start',
+  whileElementsMounted: autoUpdate,
+  middleware: [offset(8), flip({ fallbackAxisSideDirection: 'end' }), shift({ padding: 16 })]
+})
+
+const { getReferenceProps, getFloatingProps } = useInteractions([
+  useClick(context),
+  useDismiss(context, { outsidePress: true, escapeKey: true }),
+  useRole(context, { role: 'dialog' })
+])
+
+return (
+  <>
+    <Box component='button' ref={refs.setReference} {...getReferenceProps()} sx={{ ... }}>
+      <i className='tabler-sparkles' />
+      {count} addon{count === 1 ? '' : 's'}{amount > 0 ? ` ${formatMoney(amount)}` : ''}
+    </Box>
+    {open && (
+      <FloatingPortal>
+        <FloatingFocusManager context={context} modal={false} returnFocus>
+          <Paper ref={refs.setFloating} style={floatingStyles} {...getFloatingProps()}>
+            {content}
+          </Paper>
+        </FloatingFocusManager>
+      </FloatingPortal>
+    )}
+  </>
+)
+```
+
+### Qué gana el portal con Floating UI
+
+- **Stale-anchor recovery**: `autoUpdate` detecta cambios del reference element (resize, scroll, mutation) y recomputa positioning — bug que MUI Popper no recupera.
+- **Auto-flip + shift**: si el popover no cabe en el viewport, flip automático al lado opuesto o shift constrained dentro del viewport con padding de 16px.
+- **A11y integral**: `useRole({ role: 'dialog' })` + `useDismiss` + `useClick` + `FloatingFocusManager returnFocus` — reemplaza el boilerplate manual de aria-haspopup, escape handling, outside-click, y focus return.
+- **Portal-based rendering**: `FloatingPortal` renderiza al document.body evitando conflictos de z-index / stacking context.
+
+### Cambios en `QuoteSummaryDock`
+
+Removidos:
+- State: `addonAnchor`, `addonsOpen`, `handleAddonsToggle`, `handleAddonsClose`.
+- Imports: `Popper`, `Paper`, `ClickAwayListener`, `useState`, `MouseEvent as ReactMouseEvent`.
+- JSX del `<Popper>` sibling del Grid.
+
+Dock pasa a `addonsSegment={{ count, amount, content: <AddonSuggestionsPanel ... /> }}` — 3 props en vez de 4 (sin `onClick`, sin `ariaExpanded`). El primitive se encarga del resto.
+
+### Regla canónica de primitives
+
+A partir de TASK-509, un primitive con popover interno **es dueño** del state del popover (anchor + open + dismiss + focus). Consumers pasan solo el contenido. TASK-510 formaliza esto en `GREENHOUSE_UI_PLATFORM_V1.md` como pattern estándar.
+
+## Delta 2026-04-20 — TASK-507 + TASK-508 Dock Addons Inline + Line Row Polish
+
+### TASK-507 — Addons inline en la TotalsLadder
+
+Post-TASK-506 el dock quedó con 1 CTA + chip de addons en zona 3, pero la zona (md=3) no acomodaba ambos horizontalmente → wrap → chip sentado sobre el botón. Root cause: el chip estaba en la zona equivocada semánticamente.
+
+**Cambios**:
+
+- `TotalsLadder` (`src/components/greenhouse/primitives/TotalsLadder.tsx`) acepta prop nueva:
+  ```ts
+  addonsSegment?: {
+    count: number
+    amount: number
+    onClick: (event: ReactMouseEvent<HTMLElement>) => void
+    ariaExpanded?: boolean
+  } | null
+  ```
+- Cuando `count > 0`, renderiza un segmento inline en la ladder entre Subtotal y Factor con el mismo peso visual (caption muted, tabular-nums) pero con affordance de botón: hover → primary color + `textDecoration: underline`, focus-visible outline primary, aria-expanded. Copy: `N addon{s} $amount` si `amount > 0`; `N addon{s}` si `amount === 0`.
+- Ícono `tabler-sparkles` (14px) prefija el texto.
+- `QuoteSummaryDock` elimina el `<Box component='button'>` chip con Badge + el branch condicional de zone 3. El `<Popper>` queda como sibling del `<Grid>` (no dentro de zone 3). Anchor consumido desde el segmento inline de la ladder vía `handleAddonsToggle`.
+- Prop `addonTotalDelta` removida del dock + del shell (dead code tras TASK-506).
+- Imports cleanup: `Badge`, `formatMoney` local, `CURRENCY_LOCALE` local (ya no necesarios en el dock — `TotalsLadder` tiene su propio format).
+
+### TASK-508 — Line item row polish
+
+Audit módulo identificó 3 mejoras modern-bar en la tabla de items.
+
+**Chip consolidation**:
+- Columna "Tipo" antes: `<Stack spacing=0.5>` con 3 `<CustomChip>` verticales (Tipo tonal / Source outlined / Tier tonal). ~60px vertical por row de solo chips.
+- Ahora: `<Stack direction='row' spacing={0.5}>` con 2 chips (Tipo + Tier). Source pasa a ícono prefijo en la celda Ítem: `<Tooltip><Box><i className={SOURCE_META[source].icon} /></Box></Tooltip>` al lado del `SKU XXX` caption.
+- Columna "Tipo" `minWidth: 140` → `160` (acomoda el stack horizontal).
+
+**Warning inline**:
+- Antes: `<TableRow><TableCell colSpan={8}><QuoteLineWarning ... /></TableCell></TableRow>` debajo de la row afectada. Rompía grid + aumentaba altura de la tabla.
+- Ahora: `<IconButton>` al inicio de la celda de acciones (antes del Ajustes button). Color semantic derivado de la severity más alta de los warnings de la row (`critical → error`, `warning → warning`, `info → info`). Ícono: `tabler-alert-triangle` / `tabler-alert-circle` / `tabler-info-circle`. Click dispara `handleWarningOpen(event, index)` capturando `event.currentTarget` como anchor.
+- Nuevo `<Popover>` al final del editor (sibling del Ajustes Popover) abre con el `<QuoteLineWarning>` completo. aria-haspopup='dialog', aria-expanded.
+- Warnings globales (sin `lineIndex`) siguen como `<Alert>` arriba del dock, sin cambio.
+- State: `warningAnchor: HTMLElement | null`, `warningIndex: number | null`, `currentWarnings = warningIndex !== null ? warningsByLine.get(warningIndex) ?? [] : []`.
+
+**Row density**:
+- `<Box sx={{ overflowX: 'auto', '& .MuiTableBody-root .MuiTableCell-root': { py: 0.75 }, '& .MuiTableHead-root .MuiTableCell-root': { py: 1 } }}>`.
+- Default MUI `Table size='small'` da `py: 1.5` (~12px). Ahora `py: 0.75` (~6px) en body, `py: 1` (~8px) en header.
+- Target: ~48-52px row height (Linear / Notion / GitHub Issues convention).
+- Columna acciones `minWidth: 80` → `100` (acomoda el nuevo warning IconButton).
+
+### Regla canónica del dock (refinada post-TASK-507)
+
+"Estado (izq) → Total + ajustes inline (centro) → Acción terminal (der)". El Total es el anchor visual; los ajustes (subtotal, factor, IVA, addons) son caption muted inline **solo cuando aportan información**. Los addons son el único segmento interactivo de la ladder — click abre el popover de detalle. La zona de acciones contiene solo la CTA terminal de la cotización.
 
 ## Delta 2026-04-19 — TASK-506 Dock CTA Simplification + Addons Chip Amount
 
@@ -385,6 +521,38 @@ Downstream lifecycle (sent/approved/rejected/version_created) disparan la misma 
 - Implementar el endpoint PATCH real en el Cloud Run service para que `updateHubSpotQuote` deje de ser stub
 - Dropear `greenhouse_finance.quotes` legacy completo cuando termine la ventana de coexistencia (hoy vive como compat view read-only via `syncCanonicalFinanceQuote`)
 - Webhook subscription HubSpot `quote.propertyChange` para sync casi-real-time inbound (hoy es polling 6h)
+
+---
+
+## Delta 2026-04-23 — TASK-583 HubSpot quote native publish/tax convergence (implementación local)
+
+- Nuevo source of truth outbound:
+  - `src/lib/hubspot/hubspot-quote-sync.ts`
+  - builda el payload HubSpot desde `greenhouse_commercial.quotations` + `quotation_line_items`
+  - resuelve `sender` desde `actorId -> issued_by -> created_by`
+  - resuelve empresa emisora desde `getOperatingEntityIdentity()`
+  - exige binding catálogo-first cuando una línea ya referencia `product_id`, `product_code` o `service_sku`
+- Convergencia create/update:
+  - `create-hubspot-quote.ts` y `update-hubspot-quote.ts` ya comparten el mismo contrato efectivo del integration service
+  - `update-hubspot-quote.ts` deja de ser un cliente degradado/stub y usa `updateHubSpotGreenhouseQuote()`
+  - status outbound HubSpot-native normalizado a `APPROVAL_NOT_NEEDED` o `DRAFT`
+- Native tax binding:
+  - el mapping de `hs_tax_rate_group_id` ya no debe hardcodearse
+  - método canónico: consultar `GET /tax-rates` del bridge sibling, filtrar `isActive`, normalizar el porcentaje y resolver por rate equivalente
+  - si existe tasa tributable en Greenhouse pero no hay group activo equivalente en HubSpot, el carril falla explícitamente con `tax_rate_group_missing:<rate>`
+- Observabilidad outbound nueva:
+  - `greenhouse_commercial.quotations` persiste:
+    - `hubspot_quote_status`
+    - `hubspot_quote_link`
+    - `hubspot_quote_pdf_download_link`
+    - `hubspot_quote_locked`
+    - `hubspot_last_synced_at`
+  - la respuesta del bridge sibling ya expone `quoteLink`, `pdfDownloadLink` y `locked`
+- Billing semantics:
+  - la fecha base de billing sigue saliendo del contrato canónico de quotation (`billing_start_date` / `issued_at` / `quote_date`)
+  - el outbound debe seguir escribiendo nombres nativos HubSpot:
+    - `recurringbillingfrequency`
+    - `hs_recurring_billing_start_date`
 
 ---
 
@@ -1439,11 +1607,19 @@ interface VersionDiff {
 
 | Campo | Direccion | Detalle |
 |-------|-----------|---------|
-| Deal amount | GH → HS | `total_price` de la cotizacion |
+| Deal amount | GH → HS | `total_price` de la cotizacion vigente vinculada por `hubspot_deal_id` |
 | Deal stage | Bidireccional | Mapping: draft→proposal, sent→proposal_sent, approved→closed_won, rejected→closed_lost |
 | Deal line items | GH ↔ HS | Linked a `product_catalog` via `hubspot_product_id` |
 | Deal contacts | HS → GH | El deal ya tiene contactos; se leen para contexto |
 | Notes/attachments | GH → HS | PDF se adjunta como engagement note |
+
+**Ancla operativa del quote sync:**
+
+- `hubspot_company_id` resuelve la organización comercial candidata.
+- `hubspot_deal_id` resuelve el destino bidireccional de la cotización.
+- Una quote manual sin `hubspot_deal_id` puede existir como documento interno o standalone, pero el outbound guard la tratará como `skip_no_hubspot_deal` hasta que el deal quede vinculado.
+- `POST /api/finance/quotes` y `PUT /api/finance/quotes/[id]` validan que el deal pertenezca a la misma `organization_id` antes de persistirlo.
+- `POST /api/finance/quotes/[id]/lines` vuelve a disparar sync outbound vía `commercial.quotation.updated` tras persistir pricing.
 
 **Sync bidireccional de productos:**
 
@@ -2228,6 +2404,7 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | Evento | Trigger | Consumers |
 |--------|---------|-----------|
 | `commercial.quotation.created` | Crear draft | Notifications → Account Lead, audit log |
+| `commercial.quotation.updated` | Editar header / deal / líneas | HubSpot sync outbound, audit log |
 | `commercial.quotation.sent` | Enviar al cliente | HubSpot sync (deal stage), Notifications, readers históricos del quote detail |
 | `commercial.quotation.approved` | Aprobada (post-approval) | HubSpot sync, crear service module, crear assignments |
 | `commercial.quotation.rejected` | Rechazada | HubSpot sync, Notifications |

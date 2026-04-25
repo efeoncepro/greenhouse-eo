@@ -1,15 +1,92 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.4
+> **Version:** 3.10
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-04-19 por Claude (v3.4 — TASK-506 dock CTA simplification: una sola CTA terminal + addons chip cuantitativo)
+> **Ultima actualizacion:** 2026-04-22 por Codex (v3.10 — hidratacion canonica de contactos HubSpot al seleccionar una org adoptada), Codex (v3.9 — TASK-543 cleanup de flags legacy del selector unificado), Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.10 (2026-04-22 — Contactos HubSpot read-through)
+
+- **El selector de contacto ya no depende de que el mirror venga pre-sembrado**: si eliges una organización recién adoptada desde HubSpot y todavía no existen contactos locales, el backend hace una primera hidratación canónica y luego responde desde Greenhouse.
+- **El contrato no cambió**: el builder sigue leyendo `/api/commercial/organizations/[id]/contacts`; no hay consultas live directas desde el dropdown ni un segundo carril paralelo.
+- **La convergencia queda reutilizable**: los contactos materializados viven como `identity_profiles` + `person_memberships`, así que después sirven para futuras cotizaciones y otras vistas del portal.
+
+## Cambios v3.8 (2026-04-21 — TASK-538 · Selector unificado de parties)
+
+- **La organización ya no depende solo del preload local**: el chip contextual "Organización" del Quote Builder puede buscar por nombre o dominio usando `/api/commercial/parties/search`.
+- **Adopción transparente de candidates HubSpot**: si el resultado todavía no existe como `organization` materializada, seleccionar el item dispara `/api/commercial/parties/adopt` y deja el `organizationId` listo para seguir cotizando sin salir a HubSpot.
+- **Selector unificado por defecto**: el carril nuevo ya no depende de feature flags. El builder de creación usa este buscador como comportamiento canónico y reemplaza el selector legacy de organizaciones activas.
+- **Regla V1 importante**: los `hubspot_candidate` solo aparecen en tenants `efeonce_internal`. Tenants externos siguen viendo únicamente organizations ya visibles en su scope.
+- **Sin romper el resto del flujo**: contactos y deals siguen dependiendo del mismo `organizationId`; el builder no cambia su handshake downstream.
+- **Nuevo detalle de convergencia**: cuando una org llega recién desde HubSpot, el dropdown de contactos hace una primera materialización local antes de mostrar resultados. Después el read path vuelve a ser 100% local.
+
+## Cambios v3.7 (2026-04-20 — TASK-509 · Floating UI)
+
+Fix de un bug donde el popover de addons aparecía en el top-left del viewport en vez de anclado al segmento inline. Causa raíz: state del anchor cruzaba boundaries entre dock y primitive, y el re-render del button al cambiar `count`/`amount` dejaba el DOM node cacheado stale → MUI Popper fallback a `0,0`.
+
+### Fix robusto + upgrade de stack
+
+Instalamos **Floating UI** (`@floating-ui/react`) — el stack moderno de positioning que usan Linear, Stripe, Radix, shadcn, Notion. Sustituye MUI Popper (basado en popper.js v2, legacy 2019) en el primitive `TotalsLadder`.
+
+Beneficios para el usuario:
+- Popover anclado correctamente al segmento **siempre** — `autoUpdate` de Floating UI monitorea el reference element con ResizeObserver + IntersectionObserver y recupera si el anchor se mueve o re-renderiza.
+- **Auto-flip** cuando el popover no cabe en el viewport (ej. scroll cerca del borde → flip automático al lado opuesto).
+- **Escape + click afuera** cierran el popover sin boilerplate (antes lo cosíamos con `ClickAwayListener` a mano).
+- **Focus management** integral — al abrir, focus va al primer elemento del panel; al cerrar con escape, focus vuelve al segmento.
+
+### Arquitectura
+
+El primitive `TotalsLadder` ahora **encapsula el popover internamente**:
+- El dock le pasa `addonsSegment.content: ReactNode` (el `AddonSuggestionsPanel`).
+- El primitive gestiona anchor, state, positioning, focus, dismiss.
+- Zero state leak entre componentes.
+- Consumers futuros (invoice dock, PO footer, contract summary) heredan el comportamiento sin reimplementar.
+
+TASK-510 (backlog) migrará el resto de popovers del portal al mismo stack (ContextChip, Ajustes popover, warnings, etc.) para consistencia platform-wide.
+
+## Cambios v3.6 (2026-04-20 — HubSpot quote sync hardening — Codex)
+
+- **Nuevo contexto comercial "Deal HubSpot"**: el rail derecho del builder ahora deja elegir la oportunidad comercial vinculada a la organización seleccionada. La lista se carga on-demand desde `/api/commercial/organizations/[id]/deals`, ordenada para privilegiar deals abiertos y respetando tenant isolation.
+- **El anchor de sync deja de ser implícito**: antes una quote manual podía nacer sin `hubspot_deal_id`, lo que dejaba la sincronización outbound sin destino real. Ahora create/edit persisten `hubspotDealId` cuando existe y validan que el deal pertenezca a la misma organización.
+- **Contacto obligatorio cuando la quote vive en HubSpot**: si una cotización ya está vinculada a HubSpot, o si el usuario la vincula a un deal, el builder y las APIs exigen también un contacto activo de esa organización. Company + contacto + deal quedan alineados como contexto comercial mínimo para una sync robusta.
+- **Las actualizaciones ya no dependen solo de emisión**: cambios en header y líneas publican `commercial.quotation.updated`, así que HubSpot puede re-sincronizar total, metadata y attachment cuando la quote ya existe.
+
+## Cambios v3.5 (2026-04-20 — TASK-507 + TASK-508)
+
+Cierre del polish enterprise del dock y la tabla de ítems. Dos cambios conectados:
+
+### TASK-507 — Addons inline en la Total ladder
+
+Problema post-v3.4: el chip de addons vivía en la zona 3 (acciones) y con un solo CTA ya no había lugar horizontal para ambos — el chip wrapeaba visualmente encima del botón "Guardar y emitir". Mala experiencia.
+
+Root cause conceptual: los addons **son ajustes al total**, no acciones independientes. Patrón enterprise (Stripe Billing / Notion / Linear): acciones contextuales viven con sus datos, no como chips flotantes.
+
+Solución: el addon pasa a ser un **segmento inline interactivo dentro de la Total ladder** (zona 2). Render:
+
+```
+TOTAL CLP
+$2.132.384
+Subtotal $1.936.250  ·  ✨ 1 addon $196.134  ·  Factor ×1,15
+                         ↑ hover: primary color + underline, click: popover
+```
+
+El segmento tiene el mismo peso visual que "Subtotal" o "Factor" (caption muted) pero con affordance de botón (hover, focus-visible, aria-expanded). La zona 3 queda **100% ocupada por la CTA primary** — cero wrap vertical posible.
+
+### TASK-508 — Polish de line item rows
+
+Tres mejoras modern-bar en la tabla de ítems:
+
+1. **Consolidación de chips**: la columna "Tipo" antes mostraba 3 chips apilados (Tipo / Source / Tier). Ahora son 2 chips horizontales (Tipo + Tier), y el origen (Catálogo/Servicio/Template/Manual) pasa a ser un **ícono prefijo en la celda Ítem** con tooltip. Menos ruido visual, misma información.
+
+2. **Warnings inline**: los avisos del engine antes rompían la grid de la tabla con una fila extra `<Alert>` full-width debajo de la row afectada. Ahora el warning aparece como **icon-button en la celda de acciones** (color semantic: error/warning/info según severity más alta); click abre un Popover con el detalle. La grid queda intacta, la tabla no se fragmenta.
+
+3. **Row density reducida**: padding vertical de body cells de default (~16px) a `py: 0.75` (~6px), alineando con la densidad enterprise de Linear / Notion / GitHub Issues. Rows pasan de ~60-70px a ~48-52px — más ítems visibles por scroll.
 
 ## Cambios v3.4 (2026-04-19 — TASK-506 · Dock CTA simplification)
 
@@ -122,6 +199,7 @@ Bundle enfocado en cerrar las últimas fricciones del Quote Builder post-TASK-48
 - **Validación en el POST**: si no mandas `organizationId` al guardar, el endpoint devuelve 400 con "organizationId es obligatorio". Si mandas un `contactIdentityProfileId` que no tiene membership activa en esa organización, 400 con "El contacto no tiene membership activa en esa organización". Con esto el modelo canónico se respeta siempre, no por convención.
 - **`space_id` queda legacy**: columnas `space_id` y `space_resolution_source` se preservan en la base de datos para no romper lectores downstream de quote-to-cash (purchase orders, service entries, income materialization), pero el builder y el sync de HubSpot ya no las escriben. Se planifica una v2 que haga drop físico cuando todos los consumers migren.
 - **HubSpot sync más simple**: antes pedía que la company de HubSpot tuviera un Space mapeado para poder sincronizar. Ahora sólo pide que la company esté mapeada a una Organización. Si la org existe, la quote se sincroniza aunque no haya space.
+- **Deal HubSpot como ancla de sincronización**: además de la organización y el contacto, el builder puede guardar `hubspotDealId` sobre la quote. Eso resuelve el caso real en que la company existe pero la quote no sabe a qué oportunidad empujar updates, stages o attachments en HubSpot.
 - **Response del detail**: `GET /api/finance/quotes/[id]` ahora devuelve dos objetos nuevos en la respuesta — `organization` (con id, nombre y tipo: cliente/prospecto) y `contact` (con id, nombre, email, cargo). Consumers como el PDF, el email de envío y el approval workflow los pueden usar sin resolver la identidad por separado.
 
 ## Cambios v3.1 (2026-04-19 — hardening de persistencia y rehidratación)

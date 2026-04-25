@@ -1,5 +1,139 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-24 — TASK-588 resolución de título Notion tolerante a multi-tenant
+
+El contrato del título canónico (`project_name`, `task_name`, `sprint_name` en
+`greenhouse_delivery.*` y `greenhouse_conformed.delivery_*`) pasa a ser
+**"real o NULL, jamás placeholder"**. Se elimina el fallback hardcoded a
+`'Sin nombre'` en los dos writers.
+
+### Por qué
+
+El Cloud Run externo `notion-bq-sync` serializa cada property Notion con
+`force_string=True` en una columna cuyo nombre deriva del property name
+normalizado a snake_case. La property title tiene nombre **decidido por el
+cliente** en la UI de Notion — Efeonce usa `Nombre del proyecto` →
+`nombre_del_proyecto`, Sky Airline usa `Project name` → `project_name`. El
+sync canónico leía solo `nombre_del_proyecto` y cualquier tenant con otra
+convención terminaba con todos sus títulos en NULL → placeholder `'Sin nombre'`
+→ propagación a `greenhouse_delivery.projects` → visible en signals ICO
+(`dimensionLabel: "Sin nombre"`).
+
+### Contrato nuevo
+
+- El sync construye una cascada COALESCE **data-driven** por corrida: consulta
+  `INFORMATION_SCHEMA.COLUMNS` de cada tabla raw (`notion_ops.proyectos`,
+  `notion_ops.tareas`, `notion_ops.sprints`) y arma un `COALESCE(NULLIF(TRIM(col)), ...)`
+  solo con las columnas que existen. Set canónico conservador (solo columnas
+  semánticamente equivalentes al título):
+  - projects: `['nombre_del_proyecto', 'project_name']`
+  - tasks: `['nombre_de_tarea', 'nombre_de_la_tarea']`
+  - sprints: `['nombre_del_sprint', 'sprint_name']`
+- Si el cascade no resuelve ninguna columna poblada para una fila, el writer
+  persiste `NULL` y emite un warning estructurado a
+  `greenhouse_sync.source_sync_failures` con `error_code='sync_warning_missing_title'`
+  y `retryable=false` (observabilidad, no fallo).
+- La tabla PG `greenhouse_delivery.*` tiene CHECK constraint
+  (`*_name_no_sentinel_chk`) que prohíbe strings placeholder
+  (`'sin nombre'`, `'sin título'`, `'untitled'`, `'no title'`, `'sem nome'`,
+  `'n/a'`) case-insensitive. Cualquier writer futuro que intente escribirlos
+  falla al INSERT.
+- El resolver del ICO (`entity-display-resolution.ts`) tiene defensa en
+  profundidad: rechaza los mismos sentinels y más shapes de IDs técnicos
+  (numéricos largos, prefijos extendidos) para no propagar placeholder
+  ni IDs crudos a la narrativa del LLM o la UI, aunque signals históricos
+  en BQ aún los tengan en `payloadJson.dimensionLabel`.
+
+### Topología
+
+```text
+Notion (property title con nombre variable por cliente)
+  ↓ Cloud Run notion-bq-sync (force_string=True)
+BQ notion_ops.{proyectos,tareas,sprints}  ← tabla multi-tenant, columnas
+                                             variables por space
+  ↓ sync canónico (sync-notion-conformed.ts)
+  ↓   + readTableColumns() + buildCoalescingTitleExpression()
+  ↓   = SELECT ... COALESCE(NULLIF(TRIM(c1),''), NULLIF(TRIM(c2),'')) AS nombre_del_proyecto
+  ↓
+BQ greenhouse_conformed.delivery_*  (title real o NULL)
+  ↓ legacy writer (scripts/sync-source-runtime-projections.ts, CLI-only)
+  ↓   = mismo patrón de cascade
+PG greenhouse_delivery.*  (CHECK constraint activa)
+  ↓ ICO materialize (materialize-ai-signals.ts)
+  ↓   + resolver con doble filtro: !isTechnicalProjectIdentifier && !isProjectDisplaySentinel
+BQ ico_engine.ai_signals.payload_json.dimensionLabel  (human-readable o fallback "este proyecto")
+  ↓
+PG greenhouse_serving.ico_ai_signals  ← UI reads
+```
+
+### Extensión futura
+
+Si aparece un tenant nuevo con property title fuera del set canónico (p. ej.
+una space con `Título`, `Name`, `Campaign name`), el warning
+`sync_warning_missing_title` lo expone inmediatamente en la siguiente corrida.
+La remediación es extender los `NOTION_*_TITLE_CANDIDATES` en
+`src/lib/sync/sync-notion-conformed.ts`. No se requiere config por space ni
+tabla de mappings — el sistema sigue siendo stateless para esto.
+
+### Archivos clave
+
+- `src/lib/sync/sync-notion-conformed.ts` — cascade helpers, emitMissingTitleWarning,
+  countMissingTitles
+- `scripts/sync-source-runtime-projections.ts` — cascade local replicado (CLI-only)
+- `src/lib/ico-engine/ai/entity-display-resolution.ts` — sanitizer + sentinels
+- `migrations/20260424082917533_project-title-nullable-sentinel-cleanup.sql` — nullable + cleanup batch-safe + CHECK
+- `docs/tasks/in-progress/TASK-588-project-title-resolution-conformed-sync-hardening.md`
+
+## Delta 2026-04-21 — TASK-540 agrega Party Lifecycle outbound a HubSpot
+
+Nuevo lane outbound: `greenhouse_core.organizations / commercial_party -> HubSpot Companies`.
+
+### Topologia
+
+```text
+greenhouse_sync.outbox_events
+  -> partyHubSpotOutbound
+    -> push-party-lifecycle.ts
+      -> PATCH /companies/:id/lifecycle (hubspot-greenhouse-integration)
+        -> HubSpot company properties
+          -> gh_last_write_at
+            -> sync-hubspot-company-lifecycle.ts (inbound guard anti-ping-pong)
+```
+
+### Reglas
+
+1. El outbound solo escribe campos Greenhouse-owned; `name`, `domain`, `industry`, address y phone siguen owned por HubSpot.
+2. `gh_last_write_at` es el anchor canónico del anti-ping-pong entre outbound Greenhouse e inbound lifecycle sync.
+3. Si el servicio externo responde `404`, Greenhouse trata el resultado como `endpoint_not_deployed`; no se considera hard fail de todo el reactor.
+4. Los conflictos operativos se persisten en `greenhouse_commercial.party_sync_conflicts`; no existe una tabla viva `source_sync_pipelines` para este lane.
+5. La decisión V1 de compliance es exportar `gh_mrr_tier` y no monto bruto `gh_mrr_clp`.
+
+## Delta 2026-04-21 — TASK-536 extiende HubSpot Companies inbound a Party Lifecycle
+
+Nuevo pipeline inbound: `greenhouse_crm.companies -> greenhouse_core.organizations` para materializar prospects y oportunidades comerciales antes del closed-won.
+
+### Topologia
+
+```text
+HubSpot Companies raw/conformed snapshot
+  -> greenhouse_crm.companies
+    -> sync-hubspot-companies.ts
+      -> greenhouse_core.organizations
+      -> greenhouse_core.organization_lifecycle_history
+      -> greenhouse_core.clients (solo si el stage resuelve a active_client)
+      -> greenhouse_sync.outbox_events (commercial.party.created/promoted, commercial.client.instantiated)
+      -> greenhouse_sync.source_sync_runs + source_sync_watermarks
+```
+
+### Reglas
+
+1. El inbound nuevo usa `greenhouse_crm.companies` como source-of-work local; no depende de un list endpoint live del servicio `hubspot-greenhouse-integration`.
+2. La cadencia canónica queda en `*/10 * * * *` para incremental y `0 3 * * *` para full resync. El rollout inicial usó `GREENHOUSE_PARTY_LIFECYCLE_SYNC`; `TASK-543` removió ese env guard y el pipeline queda default-on.
+3. Toda creación de organization pasa por `createPartyFromHubSpotCompany`; toda promoción posterior pasa por `promoteParty`.
+4. `provider_only`, `disqualified` y `churned` se tratan como stages protegidos: el inbound no los degrada.
+5. Si HubSpot resuelve a `active_client`, el pipeline respeta el invariante del modelo y materializa `client_id` vía `instantiateClientForParty`.
+6. El tracking operativo vive en `greenhouse_sync.source_sync_runs` y `greenhouse_sync.source_sync_watermarks`; no existe una tabla viva `source_sync_pipelines` que haya que sembrar para este corte.
+
 ## Delta 2026-04-18 — TASK-454 adds a lightweight HubSpot lifecycle bridge sync
 
 Nuevo pipeline inbound liviano: `HubSpot company lifecycle -> greenhouse_core.clients`.

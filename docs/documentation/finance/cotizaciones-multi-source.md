@@ -1,9 +1,9 @@
 # Cotizaciones multi-source — Nubox y HubSpot
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-07 por Claude (TASK-210)
-> **Ultima actualizacion:** 2026-04-19 por Codex (TASK-504)
+> **Ultima actualizacion:** 2026-04-20 por Codex (HubSpot quote sync hardening)
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 ## Que es
@@ -73,11 +73,12 @@ Las cotizaciones de HubSpot usan un sistema de estados distinto. Greenhouse los 
 
 ## Crear cotizacion en HubSpot
 
-Desde la vista de cotizaciones, el boton "Nueva cotizacion HubSpot" abre un formulario lateral con:
+Desde la vista de cotizaciones o el builder full-page, Greenhouse puede originar una quote outbound hacia HubSpot siempre que exista el contexto comercial mínimo:
 
 | Campo | Requerido | Descripcion |
 |-------|-----------|-------------|
 | ID de organizacion | Si | Organizacion de Greenhouse (debe tener HubSpot company vinculada) |
+| Deal HubSpot | Si para sync bidireccional | Oportunidad comercial canonica que recibira amount, stage y attachment |
 | Titulo | Si | Nombre descriptivo de la cotizacion |
 | Fecha de vencimiento | Si | Hasta cuando es valida la cotizacion |
 | Items | Si (min 1) | Nombre, cantidad y precio unitario por item |
@@ -86,20 +87,25 @@ Desde la vista de cotizaciones, el boton "Nueva cotizacion HubSpot" abre un form
 Al crear:
 1. Greenhouse llama al servicio Cloud Run que crea la quote en HubSpot
 2. HubSpot genera el numero de cotizacion automaticamente
-3. Greenhouse guarda la cotizacion localmente con `source_system = 'hubspot'`
-4. La cotizacion aparece inmediatamente en la tabla
+3. Greenhouse guarda la cotizacion localmente con `source_system = 'hubspot'` y el anchor `hubspot_deal_id`
+4. El outbox publica `finance.quote.created` + `commercial.quotation.created`
+5. La cotizacion aparece inmediatamente en la tabla
 
 ## Identity resolution
 
-La vinculacion entre HubSpot y Greenhouse se hace via `hubspot_company_id`:
+La resolucion ocurre en dos niveles:
 
 ```
 Organization (greenhouse_core.organizations)
   └── hubspot_company_id → HubSpot Company
-        └── Quotes asociadas a esa company
+        └── Deal (greenhouse_commercial.deals / hubspot_deal_id)
+              └── Quote outbound / inbound
 ```
 
-Solo las organizaciones con `hubspot_company_id` configurado pueden sincronizar o crear cotizaciones de HubSpot.
+- `hubspot_company_id` sigue resolviendo **qué organización** comercial corresponde.
+- `hubspot_deal_id` pasa a ser el anchor operativo para la **sync bidireccional** de la cotización.
+
+Sin `hubspot_deal_id`, una quote manual puede existir en Greenhouse, pero no tiene a dónde empujar updates en HubSpot.
 
 ## Sincronizacion automatica
 
@@ -117,6 +123,8 @@ El cron tiene un **readiness gate**: si la integracion HubSpot esta marcada como
 | Evento | Cuando se emite | Payload clave |
 |--------|----------------|---------------|
 | `finance.quote.synced` | Al sincronizar una quote desde HubSpot | `quoteId`, `hubspotQuoteId`, `sourceSystem`, `action` |
-| `finance.quote.created` | Al crear una quote outbound hacia HubSpot | `quoteId`, `hubspotQuoteId`, `direction: 'outbound'` |
+| `finance.quote.created` | Al crear una quote outbound hacia HubSpot | `quoteId`, `hubspotQuoteId`, `hubspotDealId`, `direction: 'outbound'` |
+| `commercial.quotation.created` | Al crear la quote canónica local | `quotationId`, `hubspotQuoteId`, `hubspotDealId` |
+| `commercial.quotation.updated` | Al editar header, deal o líneas de una quote canónica | `quotationId`, `changedFields[]`, `hubspotDealId` |
 
 > Detalle tecnico: ver [GREENHOUSE_EVENT_CATALOG_V1.md](../../architecture/GREENHOUSE_EVENT_CATALOG_V1.md) y [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)

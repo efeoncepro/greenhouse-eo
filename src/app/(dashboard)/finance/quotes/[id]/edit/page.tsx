@@ -121,17 +121,35 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
   const initialLines: QuoteLineItem[] = linesRows
     .map(row => mapCanonicalQuoteLineRow(row))
     .map(row => {
+      const pricingInput =
+        row.pricingInput && typeof row.pricingInput === 'object' && !Array.isArray(row.pricingInput)
+          ? (row.pricingInput as Record<string, unknown>)
+          : null
+
       const pricingV2LineType =
-        row.lineType === 'role' ||
-        row.lineType === 'person' ||
-        row.lineType === 'tool' ||
-        row.lineType === 'overhead_addon' ||
-        row.lineType === 'direct_cost'
-          ? row.lineType
-          : undefined
+        pricingInput &&
+        (pricingInput['lineType'] === 'role' ||
+          pricingInput['lineType'] === 'person' ||
+          pricingInput['lineType'] === 'tool' ||
+          pricingInput['lineType'] === 'overhead_addon' ||
+          pricingInput['lineType'] === 'direct_cost')
+          ? pricingInput['lineType']
+          : row.lineType === 'role' ||
+              row.lineType === 'person' ||
+              row.lineType === 'tool' ||
+              row.lineType === 'overhead_addon' ||
+              row.lineType === 'direct_cost'
+            ? row.lineType
+            : undefined
 
       const resolvedSku =
-        row.roleCode ?? row.memberId ?? row.serviceSku ?? row.toolId ?? row.addonId ?? null
+        pricingInput && pricingV2LineType === 'role' && typeof pricingInput['roleSku'] === 'string'
+          ? pricingInput['roleSku']
+          : pricingInput && pricingV2LineType === 'tool' && typeof pricingInput['toolSku'] === 'string'
+            ? pricingInput['toolSku']
+            : pricingInput && pricingV2LineType === 'overhead_addon' && typeof pricingInput['addonSku'] === 'string'
+              ? pricingInput['addonSku']
+              : row.roleCode ?? row.memberId ?? row.serviceSku ?? row.toolId ?? row.addonId ?? null
 
       return {
         lineItemId: row.lineItemId,
@@ -156,8 +174,18 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
               sku: resolvedSku ?? undefined,
               moduleId: row.moduleId,
               serviceSku: row.serviceSku,
-              fteFraction: row.fteAllocation,
-              periods: 1
+              fteFraction:
+                pricingInput && typeof pricingInput['fteFraction'] === 'number'
+                  ? pricingInput['fteFraction']
+                  : row.fteAllocation,
+              periods:
+                pricingInput && typeof pricingInput['periods'] === 'number'
+                  ? pricingInput['periods']
+                  : 1,
+              employmentTypeCode:
+                pricingInput && typeof pricingInput['employmentTypeCode'] === 'string'
+                  ? pricingInput['employmentTypeCode']
+                  : null
             }
           : null
       }
@@ -190,17 +218,23 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
     clientId: detail.clientId,
     organizationId: detail.organizationId,
     contactIdentityProfileId: detail.contact?.identityProfileId ?? null,
+    hubspotDealId: detail.hubspotDealId ?? null,
+    hubspotQuoteId: detail.hubspotQuoteId ?? null,
     description: detail.description,
     currency: detail.currency,
     status: detail.status,
+    source: detail.source,
     outputCurrency: coerceCurrency(detail.currency),
     contractDurationMonths: null,
     validUntil: detail.expiryDate,
     pricingModel: coercePricingModel(detail.pricingModel),
     billingFrequency: coerceBillingFrequency(null),
     businessLineCode: detail.businessLineCode ?? null,
-    commercialModel: (detail.commercialModel as CommercialModelCode | null) ?? null,
-    countryFactorCode: null
+    commercialModel:
+      (detail.pricingEngineCommercialModel as CommercialModelCode | null) ??
+      (detail.commercialModel as CommercialModelCode | null) ??
+      null,
+    countryFactorCode: detail.countryFactorCode ?? null
   }
 
   return (

@@ -14,6 +14,7 @@ import type {
   InternalDashboardOverview
 } from '@/lib/internal/get-internal-dashboard-overview'
 import type { OperationsOverview } from '@/lib/operations/get-operations-overview'
+import type { ReliabilityOverview } from '@/types/reliability'
 
 import AdminCenterView from './AdminCenterView'
 
@@ -56,11 +57,23 @@ vi.mock('@/components/greenhouse', () => ({
   }: {
     items: T[]
     renderItem: (item: T) => ReactNode
-  }) => <div>{items.map(item => renderItem(item))}</div>
+  }) => <div>{items.map(item => renderItem(item))}</div>,
+  ReliabilityModuleCard: ({ module }: { module: { moduleKey: string; label: string } }) => (
+    <article data-testid={`reliability-module-${module.moduleKey}`}>{module.label}</article>
+  ),
+  GreenhouseRouteLink: ({ children, href }: { children: ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  )
 }))
 
 vi.mock('@components/greenhouse/SectionErrorBoundary', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>
+}))
+
+vi.mock('@/components/greenhouse/admin/ReliabilitySyntheticCard', () => ({
+  default: ({ snapshots }: { snapshots: { routePath: string }[] }) => (
+    <article data-testid='reliability-synthetic-card'>{snapshots.length} probes</article>
+  )
 }))
 
 const buildClient = (overrides: Partial<InternalDashboardClientRow>): InternalDashboardClientRow => ({
@@ -257,6 +270,32 @@ const operations: OperationsOverview = {
   }
 }
 
+const reliability: ReliabilityOverview = {
+  generatedAt: '2026-03-30T10:00:00.000Z',
+  modules: [
+    {
+      moduleKey: 'finance',
+      label: 'Finance',
+      description: 'Test fixture',
+      domain: 'finance',
+      status: 'ok',
+      confidence: 'medium',
+      summary: '0 señales sanas.',
+      routes: [],
+      apis: [],
+      dependencies: [],
+      smokeTests: [],
+      signals: [],
+      signalCounts: { ok: 0, warning: 0, error: 0, unknown: 0, not_configured: 0, awaiting_data: 0 },
+      expectedSignalKinds: ['subsystem'],
+      missingSignalKinds: ['subsystem']
+    }
+  ],
+  totals: { totalModules: 1, healthy: 1, warning: 0, error: 0, unknownOrPending: 0 },
+  integrationBoundaries: [],
+  notes: []
+}
+
 describe('AdminCenterView', () => {
   beforeEach(() => {
     replaceMock.mockReset()
@@ -273,7 +312,17 @@ describe('AdminCenterView', () => {
     currentSearchParams = new URLSearchParams('filter=attention&q=acme')
 
     renderWithTheme(
-      <AdminCenterView access={access} tenants={tenants} controlTower={controlTower} operations={operations} />
+      <AdminCenterView
+        access={access}
+        tenants={tenants}
+        controlTower={controlTower}
+        operations={operations}
+        reliability={reliability}
+        syntheticSnapshots={[]}
+        syntheticSweep={null}
+        aiObservation={null}
+        aiModuleObservations={[]}
+      />
     )
 
     expect(screen.getByDisplayValue('acme')).toBeInTheDocument()
@@ -296,9 +345,24 @@ describe('AdminCenterView', () => {
 
   it('renders the consolidated alert block only when there are active signals', () => {
     renderWithTheme(
-      <AdminCenterView access={access} tenants={tenants} controlTower={controlTower} operations={operations} />
+      <AdminCenterView
+        access={access}
+        tenants={tenants}
+        controlTower={controlTower}
+        operations={operations}
+        reliability={reliability}
+        syntheticSnapshots={[]}
+        syntheticSweep={null}
+        aiObservation={null}
+        aiModuleObservations={[]}
+      />
     )
 
+    expect(screen.getByRole('link', { name: /abrir commercial parties/i })).toHaveAttribute(
+      'href',
+      '/admin/commercial/parties'
+    )
+    expect(screen.getAllByText('Commercial Parties').length).toBeGreaterThan(0)
     expect(screen.getByRole('heading', { level: 2, name: 'Requiere atencion' })).toBeInTheDocument()
     expect(screen.getByText('2 handlers degradados')).toBeInTheDocument()
     expect(screen.getByText('128 backlog reactivo oculto')).toBeInTheDocument()
@@ -350,6 +414,11 @@ describe('AdminCenterView', () => {
             deliveriesDeadLetter: 0
           }
         }}
+        reliability={reliability}
+        syntheticSnapshots={[]}
+        syntheticSweep={null}
+        aiObservation={null}
+        aiModuleObservations={[]}
       />
     )
 

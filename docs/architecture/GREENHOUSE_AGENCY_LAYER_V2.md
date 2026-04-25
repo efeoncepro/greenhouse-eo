@@ -8,6 +8,18 @@
 
 ---
 
+## Delta 2026-04-20 — TASK-452 aterriza la foundation económica por servicio sin cerrar aún Service P&L
+
+- Agency ya no está completamente a ciegas respecto al bridge económico `Finance/Commercial -> service_id`.
+- Runtime nuevo upstream:
+  - `greenhouse_serving.service_attribution_facts`
+  - `greenhouse_serving.service_attribution_unresolved`
+  - projection/evento `service_attribution`
+- Regla de producto:
+  - el drill-down client-facing sigue sin poder fabricar `service_economics` completos hasta `TASK-146`
+  - pero cualquier futura surface de `Service P&L`, Campaigns ↔ Services o profitability por servicio debe apoyarse en esta foundation y no repartir revenue/costo inline desde la UI
+  - los casos ambiguos deben mostrarse como pendientes/insuficientes, no como margen inventado
+
 ## 1. Visión
 
 La capa de Agencia es el **sistema nervioso operativo** de Efeonce. No es un dashboard que muestra datos — es un Operator Layer que interpreta la realidad operativa, anticipa problemas, y recomienda acciones.

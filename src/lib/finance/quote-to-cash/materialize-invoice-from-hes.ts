@@ -9,8 +9,12 @@ import { recordAudit } from '@/lib/commercial/governance/audit-log'
 import { publishQuotationInvoiceEmitted } from '@/lib/commercial/quotation-events'
 import { ensureContractForQuotation } from '@/lib/commercial/contract-lifecycle'
 import { materializeContractProfitabilitySnapshots } from '@/lib/commercial-intelligence/contract-profitability-materializer'
-
-type QueryableClient = Pick<PoolClient, 'query'>
+import {
+  buildIncomeTaxWriteFields,
+  parsePersistedIncomeTaxSnapshot,
+  serializeIncomeTaxSnapshot
+} from '@/lib/finance/income-tax-snapshot'
+import { createFinanceIncomeInPostgres } from '@/lib/finance/postgres-store-slice2'
 
 export interface MaterializeInvoiceFromHesActor {
   userId: string
@@ -57,6 +61,15 @@ interface QuotationRow extends Record<string, unknown> {
   status: string
   converted_to_income_id: string | null
   current_version: number | null
+  hubspot_deal_id: string | null
+  organization_hubspot_company_id: string | null
+  tax_rate: string | number | null
+  tax_amount: string | number | null
+  tax_code: string | null
+  tax_rate_snapshot: string | number | null
+  tax_amount_snapshot: string | number | null
+  tax_snapshot_json: unknown | null
+  tax_snapshot_frozen_at: string | null
 }
 
 interface ClientNameRow extends Record<string, unknown> {
@@ -72,7 +85,7 @@ const addDaysToIsoDate = (isoDate: string, days: number): string => {
 }
 
 const resolveClientName = async (
-  client: QueryableClient,
+  client: PoolClient,
   clientId: string | null,
   fallbackCache: string | null
 ): Promise<string> => {
@@ -109,7 +122,7 @@ export const materializeInvoiceFromApprovedHes = async (
 ): Promise<MaterializeInvoiceFromHesResult> => {
   const { hesId, actor } = params
 
-  const result = await withTransaction(async (client: QueryableClient) => {
+  const result = await withTransaction(async client => {
     const hesResult = (await client.query(
       `SELECT hes_id, hes_number, purchase_order_id, client_id, organization_id, space_id,
               service_description, amount, currency, amount_clp, amount_authorized_clp,
@@ -142,12 +155,20 @@ export const materializeInvoiceFromApprovedHes = async (
 
     const quotationId = hes.quotation_id
 
+    // TASK-524: resolve HubSpot anchors from the quotation + its organization
+    // so the materialized income inherits the commercial thread.
     const quotationResult = (await client.query(
-      `SELECT quotation_id, client_id, organization_id, space_id, client_name_cache,
-              status, converted_to_income_id, current_version
-         FROM greenhouse_commercial.quotations
-         WHERE quotation_id = $1
-         FOR UPDATE`,
+      `SELECT q.quotation_id, q.client_id, q.organization_id, q.space_id, q.client_name_cache,
+              q.status, q.converted_to_income_id, q.current_version,
+              q.tax_rate, q.tax_amount, q.tax_code, q.tax_rate_snapshot, q.tax_amount_snapshot,
+              q.tax_snapshot_json, q.tax_snapshot_frozen_at,
+              q.hubspot_deal_id,
+              o.hubspot_company_id AS organization_hubspot_company_id
+         FROM greenhouse_commercial.quotations q
+         LEFT JOIN greenhouse_core.organizations o
+           ON o.organization_id = q.organization_id
+         WHERE q.quotation_id = $1
+         FOR UPDATE OF q`,
       [quotationId]
     )) as { rows: QuotationRow[] }
 
@@ -159,14 +180,42 @@ export const materializeInvoiceFromApprovedHes = async (
 
     const incomeId = `INC-${randomUUID().slice(0, 8)}`
 
-    const totalAmountClp = hes.amount_authorized_clp !== null && hes.amount_authorized_clp !== undefined
+    const totalAmountClpRaw = hes.amount_authorized_clp !== null && hes.amount_authorized_clp !== undefined
       ? Number(hes.amount_authorized_clp)
       : Number(hes.amount_clp ?? 0)
 
-    const subtotal = Number(hes.amount ?? hes.amount_clp ?? totalAmountClp)
+    const subtotal = Number(hes.amount ?? hes.amount_clp ?? totalAmountClpRaw)
     const currency = hes.currency || 'CLP'
     const invoiceDate = new Date().toISOString().slice(0, 10)
     const dueDate = params.dueDate || addDaysToIsoDate(invoiceDate, 30)
+    const sourceTaxSnapshot = parsePersistedIncomeTaxSnapshot(quotation.tax_snapshot_json)
+
+    const taxWriteFields = await buildIncomeTaxWriteFields({
+      subtotal,
+      taxCode: quotation.tax_code,
+      taxRate: quotation.tax_rate_snapshot != null
+        ? Number(quotation.tax_rate_snapshot)
+        : quotation.tax_rate != null
+          ? Number(quotation.tax_rate)
+          : null,
+      taxAmount: quotation.tax_amount_snapshot != null
+        ? Number(quotation.tax_amount_snapshot)
+        : quotation.tax_amount != null
+          ? Number(quotation.tax_amount)
+          : null,
+      sourceSnapshot: sourceTaxSnapshot,
+      issuedAt: quotation.tax_snapshot_frozen_at ?? invoiceDate
+    })
+
+    const totalAmount = taxWriteFields.totalAmount
+
+    const totalAmountClp = currency === 'CLP'
+      ? totalAmount
+      : totalAmountClpRaw
+
+    const exchangeRateToClp = totalAmount > 0
+      ? totalAmountClp / totalAmount
+      : 1
 
     const clientName = await resolveClientName(
       client,
@@ -180,49 +229,49 @@ export const materializeInvoiceFromApprovedHes = async (
       client
     })
 
-    await client.query(
-      `INSERT INTO greenhouse_finance.income (
-         income_id, client_id, organization_id, space_id,
-         client_name, invoice_number, invoice_date, due_date, description,
-         currency, subtotal, total_amount, total_amount_clp,
-         payment_status, amount_paid,
-         hes_id, hes_number, purchase_order_id,
-         quotation_id, contract_id, source_hes_id,
-         created_by_user_id,
-         created_at, updated_at
-       ) VALUES (
-         $1, $2, $3, $4,
-         $5, $6, $7::date, $8::date, $9,
-         $10, $11, $12, $13,
-         'pending', 0,
-         $14, $15, $16,
-         $17, $18, $19,
-         $20,
-         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-       )`,
-      [
-        incomeId,
-        hes.client_id,
-        hes.organization_id,
-        hes.space_id,
-        clientName,
-        hes.hes_number,
-        invoiceDate,
-        dueDate,
-        hes.service_description,
-        currency,
-        subtotal,
-        totalAmountClp,
-        totalAmountClp,
-        hes.hes_id,
-        hes.hes_number,
-        hes.purchase_order_id,
-        quotationId,
-        contract.contractId,
-        hes.hes_id,
-        actor.userId
-      ]
-    )
+    await createFinanceIncomeInPostgres({
+      incomeId,
+      clientId: hes.client_id,
+      organizationId: hes.organization_id,
+      clientProfileId: null,
+      hubspotCompanyId: quotation.organization_hubspot_company_id,
+      hubspotDealId: quotation.hubspot_deal_id,
+      clientName,
+      invoiceNumber: hes.hes_number,
+      invoiceDate,
+      dueDate,
+      description: hes.service_description,
+      currency,
+      subtotal,
+      taxRate: taxWriteFields.taxRate,
+      taxAmount: taxWriteFields.taxAmount,
+      taxCode: taxWriteFields.taxCode,
+      taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+      taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+      taxSnapshotJson: serializeIncomeTaxSnapshot(taxWriteFields.taxSnapshot),
+      isTaxExempt: taxWriteFields.isTaxExempt,
+      taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
+      totalAmount,
+      exchangeRateToClp,
+      totalAmountClp,
+      paymentStatus: 'pending',
+      quotationId,
+      contractId: contract.contractId,
+      sourceHesId: hes.hes_id,
+      purchaseOrderId: hes.purchase_order_id,
+      hesId: hes.hes_id,
+      poNumber: null,
+      hesNumber: hes.hes_number,
+      serviceLine: null,
+      incomeType: 'service_fee',
+      partnerId: null,
+      partnerName: null,
+      partnerSharePercent: null,
+      partnerShareAmount: null,
+      netAfterPartner: null,
+      notes: null,
+      actorUserId: actor.userId
+    }, { client })
 
     await client.query(
       `UPDATE greenhouse_finance.service_entry_sheets

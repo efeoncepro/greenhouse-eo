@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { EXPENSE_SOURCE_TYPES, PAYMENT_PROVIDERS, PAYMENT_RAILS } from '@/lib/finance/expense-taxonomy'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -13,6 +13,7 @@ import {
   normalizeString,
   normalizeBoolean,
   toNumber,
+  toNullableNumber,
   toDateString,
   toTimestampString,
   FinanceValidationError,
@@ -36,6 +37,11 @@ import {
   createFinanceExpenseInPostgres,
   buildMonthlySequenceIdFromPostgres
 } from '@/lib/finance/postgres-store-slice2'
+import {
+  buildExpenseTaxWriteFields,
+  parsePersistedExpenseTaxSnapshot,
+  serializeExpenseTaxSnapshot
+} from '@/lib/finance/expense-tax-snapshot'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import { withIdempotency } from '@/lib/finance/idempotency'
@@ -53,6 +59,19 @@ interface ExpenseRow {
   subtotal: unknown
   tax_rate: unknown
   tax_amount: unknown
+  tax_code: string | null
+  tax_recoverability: string | null
+  tax_rate_snapshot: unknown
+  tax_amount_snapshot: unknown
+  tax_snapshot_json: unknown | null
+  is_tax_exempt: boolean | null
+  tax_snapshot_frozen_at: unknown
+  recoverable_tax_amount: unknown
+  recoverable_tax_amount_clp: unknown
+  non_recoverable_tax_amount: unknown
+  non_recoverable_tax_amount_clp: unknown
+  effective_cost_amount: unknown
+  effective_cost_amount_clp: unknown
   total_amount: unknown
   exchange_rate_to_clp: unknown
   total_amount_clp: unknown
@@ -73,6 +92,16 @@ interface ExpenseRow {
   payroll_entry_id: string | null
   member_id: string | null
   member_name: string | null
+  receipt_date: unknown
+  purchase_type: string | null
+  vat_unrecoverable_amount: unknown
+  vat_fixed_assets_amount: unknown
+  vat_common_use_amount: unknown
+  dte_type_code: string | null
+  dte_folio: string | null
+  exempt_amount: unknown
+  other_taxes_amount: unknown
+  withholding_amount: unknown
   social_security_type: string | null
   social_security_institution: string | null
   social_security_period: string | null
@@ -101,6 +130,19 @@ const normalizeExpense = (row: ExpenseRow) => ({
   subtotal: toNumber(row.subtotal),
   taxRate: toNumber(row.tax_rate),
   taxAmount: toNumber(row.tax_amount),
+  taxCode: row.tax_code ? normalizeString(row.tax_code) : null,
+  taxRecoverability: row.tax_recoverability ? normalizeString(row.tax_recoverability) : null,
+  taxRateSnapshot: toNullableNumber(row.tax_rate_snapshot),
+  taxAmountSnapshot: toNullableNumber(row.tax_amount_snapshot),
+  taxSnapshot: parsePersistedExpenseTaxSnapshot(row.tax_snapshot_json),
+  isTaxExempt: normalizeBoolean(row.is_tax_exempt),
+  taxSnapshotFrozenAt: toTimestampString(row.tax_snapshot_frozen_at as string | { value?: string } | null),
+  recoverableTaxAmount: toNullableNumber(row.recoverable_tax_amount),
+  recoverableTaxAmountClp: toNullableNumber(row.recoverable_tax_amount_clp),
+  nonRecoverableTaxAmount: toNullableNumber(row.non_recoverable_tax_amount),
+  nonRecoverableTaxAmountClp: toNullableNumber(row.non_recoverable_tax_amount_clp),
+  effectiveCostAmount: toNullableNumber(row.effective_cost_amount),
+  effectiveCostAmountClp: toNullableNumber(row.effective_cost_amount_clp),
   totalAmount: toNumber(row.total_amount),
   exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
   totalAmountClp: toNumber(row.total_amount_clp),
@@ -121,6 +163,16 @@ const normalizeExpense = (row: ExpenseRow) => ({
   payrollEntryId: row.payroll_entry_id ? normalizeString(row.payroll_entry_id) : null,
   memberId: row.member_id ? normalizeString(row.member_id) : null,
   memberName: row.member_name ? normalizeString(row.member_name) : null,
+  receiptDate: toDateString(row.receipt_date as string | { value?: string } | null),
+  purchaseType: row.purchase_type ? normalizeString(row.purchase_type) : null,
+  vatUnrecoverableAmount: toNullableNumber(row.vat_unrecoverable_amount),
+  vatFixedAssetsAmount: toNullableNumber(row.vat_fixed_assets_amount),
+  vatCommonUseAmount: toNullableNumber(row.vat_common_use_amount),
+  dteTypeCode: row.dte_type_code ? normalizeString(row.dte_type_code) : null,
+  dteFolio: row.dte_folio ? normalizeString(row.dte_folio) : null,
+  exemptAmount: toNullableNumber(row.exempt_amount),
+  otherTaxesAmount: toNullableNumber(row.other_taxes_amount),
+  withholdingAmount: toNullableNumber(row.withholding_amount),
   socialSecurityType: row.social_security_type ? normalizeString(row.social_security_type) : null,
   socialSecurityInstitution: row.social_security_institution ? normalizeString(row.social_security_institution) : null,
   socialSecurityPeriod: row.social_security_period ? normalizeString(row.social_security_period) : null,
@@ -196,7 +248,7 @@ export async function GET(request: Request) {
   }
 
   // ── BigQuery fallback ──
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_expenses'] })
 
   try {
     const projectId = getFinanceProjectId()
@@ -327,11 +379,25 @@ export async function POST(request: Request) {
     const sourceType =
       body.sourceType && EXPENSE_SOURCE_TYPES.includes(body.sourceType) ? normalizeString(body.sourceType) : 'manual'
 
-    const taxRate = toNumber(body.taxRate ?? 0)
-    const taxAmount = toNumber(body.taxAmount) || subtotal * taxRate
-    const totalAmount = toNumber(body.totalAmount) || subtotal + taxAmount
     const exchangeRateToClp = await resolveExchangeRateToClp({ currency, requestedRate: body.exchangeRateToClp })
-    const totalAmountClp = toNumber(body.totalAmountClp) || totalAmount * exchangeRateToClp
+
+    const taxWriteFields = await buildExpenseTaxWriteFields({
+      subtotal,
+      exchangeRateToClp,
+      taxCode: body.taxCode,
+      taxRate: body.taxRate,
+      taxAmount: body.taxAmount,
+      totalAmount: body.totalAmount,
+      dteTypeCode: body.dteTypeCode,
+      exemptAmount: body.exemptAmount,
+      vatUnrecoverableAmount: body.vatUnrecoverableAmount,
+      vatCommonUseAmount: body.vatCommonUseAmount,
+      vatFixedAssetsAmount: body.vatFixedAssetsAmount,
+      spaceId: resolvedScope.spaceId,
+      issuedAt: body.documentDate || body.paymentDate || undefined
+    })
+
+    const totalAmountClp = toNumber(body.totalAmountClp) || taxWriteFields.totalAmount * exchangeRateToClp
 
     const periodSource = normalizeString(body.documentDate || body.paymentDate) || new Date().toISOString().slice(0, 10)
     const period = periodSource.slice(0, 7).replace('-', '')
@@ -385,9 +451,22 @@ export async function POST(request: Request) {
         description,
         currency,
         subtotal,
-        taxRate,
-        taxAmount,
-        totalAmount,
+        taxRate: taxWriteFields.taxRate,
+        taxAmount: taxWriteFields.taxAmount,
+        taxCode: taxWriteFields.taxCode,
+        taxRecoverability: taxWriteFields.taxRecoverability,
+        taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+        taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+        taxSnapshotJson: serializeExpenseTaxSnapshot(taxWriteFields.taxSnapshot),
+        isTaxExempt: taxWriteFields.isTaxExempt,
+        taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
+        recoverableTaxAmount: taxWriteFields.recoverableTaxAmount,
+        recoverableTaxAmountClp: taxWriteFields.recoverableTaxAmountClp,
+        nonRecoverableTaxAmount: taxWriteFields.nonRecoverableTaxAmount,
+        nonRecoverableTaxAmountClp: taxWriteFields.nonRecoverableTaxAmountClp,
+        effectiveCostAmount: taxWriteFields.effectiveCostAmount,
+        effectiveCostAmountClp: taxWriteFields.effectiveCostAmountClp,
+        totalAmount: taxWriteFields.totalAmount,
         exchangeRateToClp,
         totalAmountClp,
         paymentDate: body.paymentDate ? normalizeString(body.paymentDate) : null,
@@ -431,6 +510,16 @@ export async function POST(request: Request) {
             ? normalizeString(body.directOverheadKind)
             : null,
         directOverheadMemberId: body.directOverheadMemberId ? normalizeString(body.directOverheadMemberId) : null,
+        receiptDate: body.receiptDate ? normalizeString(body.receiptDate) : null,
+        purchaseType: body.purchaseType ? normalizeString(body.purchaseType) : null,
+        vatUnrecoverableAmount: body.vatUnrecoverableAmount != null ? toNumber(body.vatUnrecoverableAmount) : null,
+        vatFixedAssetsAmount: body.vatFixedAssetsAmount != null ? toNumber(body.vatFixedAssetsAmount) : null,
+        vatCommonUseAmount: body.vatCommonUseAmount != null ? toNumber(body.vatCommonUseAmount) : null,
+        dteTypeCode: body.dteTypeCode ? normalizeString(body.dteTypeCode) : null,
+        dteFolio: body.dteFolio ? normalizeString(body.dteFolio) : null,
+        exemptAmount: body.exemptAmount != null ? toNumber(body.exemptAmount) : null,
+        otherTaxesAmount: body.otherTaxesAmount != null ? toNumber(body.otherTaxesAmount) : null,
+        withholdingAmount: body.withholdingAmount != null ? toNumber(body.withholdingAmount) : null,
         notes: body.notes ? normalizeString(body.notes) : null,
         actorUserId: tenant.userId || null
       })
@@ -469,28 +558,40 @@ export async function POST(request: Request) {
     await runFinanceQuery(
       `
       INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
-        expense_id, client_id, space_id, expense_type, description, currency,
-        subtotal, tax_rate, tax_amount, total_amount,
+        expense_id, client_id, space_id, expense_type, source_type, description, currency,
+        subtotal, tax_rate, tax_amount,
+        tax_code, tax_recoverability, tax_rate_snapshot, tax_amount_snapshot, tax_snapshot_json, is_tax_exempt, tax_snapshot_frozen_at,
+        recoverable_tax_amount, recoverable_tax_amount_clp, non_recoverable_tax_amount, non_recoverable_tax_amount_clp,
+        effective_cost_amount, effective_cost_amount_clp, total_amount,
         exchange_rate_to_clp, total_amount_clp,
-        payment_date, payment_status, payment_method,
+        payment_date, payment_status, payment_method, payment_provider, payment_rail,
         payment_account_id, payment_reference,
         document_number, document_date, due_date,
         supplier_id, supplier_name, supplier_invoice_number,
         payroll_period_id, payroll_entry_id, member_id, member_name,
+        receipt_date, purchase_type, vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
+        dte_type_code, dte_folio, exempt_amount, other_taxes_amount, withholding_amount,
         social_security_type, social_security_institution, social_security_period,
         tax_type, tax_period, tax_form_number,
         miscellaneous_category, service_line, is_recurring, recurrence_frequency,
         is_reconciled, notes, created_by,
         created_at, updated_at
       ) VALUES (
-        @expenseId, @clientId, @spaceId, @expenseType, @description, @currency,
-        CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
+        @expenseId, @clientId, @spaceId, @expenseType, @sourceType, @description, @currency,
+        CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC),
+        @taxCode, @taxRecoverability, CAST(@taxRateSnapshot AS NUMERIC), CAST(@taxAmountSnapshot AS NUMERIC), PARSE_JSON(@taxSnapshotJson), @isTaxExempt, TIMESTAMP(@taxSnapshotFrozenAt),
+        CAST(@recoverableTaxAmount AS NUMERIC), CAST(@recoverableTaxAmountClp AS NUMERIC), CAST(@nonRecoverableTaxAmount AS NUMERIC), CAST(@nonRecoverableTaxAmountClp AS NUMERIC),
+        CAST(@effectiveCostAmount AS NUMERIC), CAST(@effectiveCostAmountClp AS NUMERIC), CAST(@totalAmount AS NUMERIC),
         CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
-        IF(@paymentDate = '', NULL, CAST(@paymentDate AS DATE)), @paymentStatus, @paymentMethod,
+        IF(@paymentDate = '', NULL, CAST(@paymentDate AS DATE)), @paymentStatus, @paymentMethod, @paymentProvider, @paymentRail,
         @paymentAccountId, @paymentReference,
         @documentNumber, IF(@documentDate = '', NULL, CAST(@documentDate AS DATE)), IF(@dueDate = '', NULL, CAST(@dueDate AS DATE)),
         @supplierId, @supplierName, @supplierInvoiceNumber,
         @payrollPeriodId, @payrollEntryId, @memberId, @memberName,
+        IF(@receiptDate = '', NULL, CAST(@receiptDate AS DATE)), @purchaseType,
+        CAST(@vatUnrecoverableAmount AS NUMERIC), CAST(@vatFixedAssetsAmount AS NUMERIC), CAST(@vatCommonUseAmount AS NUMERIC),
+        @dteTypeCode, @dteFolio,
+        CAST(@exemptAmount AS NUMERIC), CAST(@otherTaxesAmount AS NUMERIC), CAST(@withholdingAmount AS NUMERIC),
         @socialSecurityType, @socialSecurityInstitution, @socialSecurityPeriod,
         @taxType, @taxPeriod, @taxFormNumber,
         @miscellaneousCategory, @serviceLine, @isRecurring, @recurrenceFrequency,
@@ -503,17 +604,33 @@ export async function POST(request: Request) {
         clientId: resolvedScope.clientId,
         spaceId: resolvedScope.spaceId,
         expenseType,
+        sourceType,
         description,
         currency,
         subtotal,
-        taxRate,
-        taxAmount,
-        totalAmount,
+        taxRate: taxWriteFields.taxRate,
+        taxAmount: taxWriteFields.taxAmount,
+        taxCode: taxWriteFields.taxCode,
+        taxRecoverability: taxWriteFields.taxRecoverability,
+        taxRateSnapshot: taxWriteFields.taxRateSnapshot,
+        taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
+        taxSnapshotJson: serializeExpenseTaxSnapshot(taxWriteFields.taxSnapshot),
+        isTaxExempt: taxWriteFields.isTaxExempt,
+        taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
+        recoverableTaxAmount: taxWriteFields.recoverableTaxAmount,
+        recoverableTaxAmountClp: taxWriteFields.recoverableTaxAmountClp,
+        nonRecoverableTaxAmount: taxWriteFields.nonRecoverableTaxAmount,
+        nonRecoverableTaxAmountClp: taxWriteFields.nonRecoverableTaxAmountClp,
+        effectiveCostAmount: taxWriteFields.effectiveCostAmount,
+        effectiveCostAmountClp: taxWriteFields.effectiveCostAmountClp,
+        totalAmount: taxWriteFields.totalAmount,
         exchangeRateToClp,
         totalAmountClp,
         paymentDate: body.paymentDate ? normalizeString(body.paymentDate) : null,
         paymentStatus,
         paymentMethod,
+        paymentProvider,
+        paymentRail,
         paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
         paymentReference: body.paymentReference ? normalizeString(body.paymentReference) : null,
         documentNumber: body.documentNumber ? normalizeString(body.documentNumber) : null,
@@ -526,6 +643,16 @@ export async function POST(request: Request) {
         payrollEntryId: resolvedMember.payrollEntryId,
         memberId: resolvedMember.memberId,
         memberName: normalizeString(body.memberName) || resolvedMember.memberName,
+        receiptDate: body.receiptDate ? normalizeString(body.receiptDate) : null,
+        purchaseType: body.purchaseType ? normalizeString(body.purchaseType) : null,
+        vatUnrecoverableAmount: body.vatUnrecoverableAmount != null ? toNumber(body.vatUnrecoverableAmount) : null,
+        vatFixedAssetsAmount: body.vatFixedAssetsAmount != null ? toNumber(body.vatFixedAssetsAmount) : null,
+        vatCommonUseAmount: body.vatCommonUseAmount != null ? toNumber(body.vatCommonUseAmount) : null,
+        dteTypeCode: body.dteTypeCode ? normalizeString(body.dteTypeCode) : null,
+        dteFolio: body.dteFolio ? normalizeString(body.dteFolio) : null,
+        exemptAmount: body.exemptAmount != null ? toNumber(body.exemptAmount) : null,
+        otherTaxesAmount: body.otherTaxesAmount != null ? toNumber(body.otherTaxesAmount) : null,
+        withholdingAmount: body.withholdingAmount != null ? toNumber(body.withholdingAmount) : null,
         socialSecurityType,
         socialSecurityInstitution: body.socialSecurityInstitution
           ? normalizeString(body.socialSecurityInstitution)

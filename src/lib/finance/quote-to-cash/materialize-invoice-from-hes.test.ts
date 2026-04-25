@@ -22,6 +22,10 @@ vi.mock('@/lib/commercial-intelligence/contract-profitability-materializer', () 
   materializeContractProfitabilitySnapshots: vi.fn()
 }))
 
+vi.mock('@/lib/finance/postgres-store-slice2', () => ({
+  createFinanceIncomeInPostgres: vi.fn()
+}))
+
 import { withTransaction } from '@/lib/db'
 import { ensureContractForQuotation } from '@/lib/commercial/contract-lifecycle'
 import { materializeContractProfitabilitySnapshots } from '@/lib/commercial-intelligence/contract-profitability-materializer'
@@ -72,7 +76,8 @@ describe('materializeInvoiceFromApprovedHes', () => {
               client_name_cache: 'Cliente Test',
               status: 'issued',
               converted_to_income_id: null,
-              current_version: 1
+              current_version: 1,
+              tax_code: 'cl_vat_non_billable'
             }
           ]
         })

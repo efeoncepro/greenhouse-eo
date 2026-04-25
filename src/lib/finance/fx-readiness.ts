@@ -8,7 +8,11 @@ import {
   FX_STALENESS_THRESHOLD_DAYS,
   isSupportedCurrencyForDomain
 } from './currency-domain'
-import { allowsUsdComposition, getCurrencyRegistryEntry } from './currency-registry'
+import {
+  allowsUsdComposition,
+  getCurrencyRegistryEntry,
+  pickCompositionHub
+} from './currency-registry'
 
 // Canonical FX readiness resolver. Every consumer (pricing engine, quote
 // simulator, future TASK-466 UI, admin diagnostics) goes through THIS
@@ -87,7 +91,7 @@ const buildMessage = (
   state: FxReadiness['state'],
   ageDays: number | null,
   threshold: number,
-  composedViaUsd: boolean
+  compositionHub: string | null
 ): string => {
   if (state === 'unsupported') {
     return `El par ${from}→${to} no está habilitado para este dominio.`
@@ -101,7 +105,7 @@ const buildMessage = (
     return `La tasa ${from}→${to} es de hace ${ageDays} días (umbral ${threshold}). Actualiza antes de snapshot client-facing.`
   }
 
-  const composedNote = composedViaUsd ? ' Derivada por composición vía USD.' : ''
+  const composedNote = compositionHub ? ` Derivada por composición vía ${compositionHub}.` : ''
 
   return `Tasa ${from}→${to} disponible (hace ${ageDays ?? 0} días).${composedNote}`
 }
@@ -131,6 +135,7 @@ export const resolveFxReadiness = async ({
       ageDays: 0,
       stalenessThresholdDays: threshold,
       composedViaUsd: false,
+      compositionHub: null,
       message: `${from}→${to} es identidad (1.00).`
     }
   }
@@ -154,6 +159,7 @@ export const resolveFxReadiness = async ({
       ageDays: null,
       stalenessThresholdDays: threshold,
       composedViaUsd: false,
+      compositionHub: null,
       message: `Dominio "${domain}" solo admite ${supported}. Par solicitado: ${from}→${to}.`
     }
   }
@@ -162,7 +168,7 @@ export const resolveFxReadiness = async ({
   let rateValue: number | null = null
   let rateDateResolved: string | null = null
   let source: string | null = null
-  let composedViaUsd = false
+  let compositionHub: string | null = null
 
   const direct = await fetchDirectRow(from, to, refDate)
 
@@ -192,29 +198,71 @@ export const resolveFxReadiness = async ({
     }
   }
 
-  // 5. USD composition (only if both registry entries allow it)
-  if (rateValue === null && from !== 'USD' && to !== 'USD') {
-    const fromAllows = allowsUsdComposition(from)
+  // 5. Hub composition (single pivot). The pivot hub comes from the registry
+  // (destination first, origin fallback) so CLF pairs compose via CLP even
+  // though CLF is declared as `usd_composition` allowed — the flag name
+  // stays historical while the real hub is data-driven.
+  //
+  // Order of attempts when first hub fails:
+  //   a) pivot = destination hub (if present)
+  //   b) pivot = origin hub (if different and present)
+  //
+  // This covers the canonical cases:
+  //   - USD→CLF: toHub=CLP → USD→CLP + CLP→CLF ✅
+  //   - CLF→USD: fromHub=CLP (toHub=null) → CLF→CLP + CLP→USD ✅
+  //   - USD→MXN: toHub=USD, but origin IS the hub → direct only, no composition
+  //   - COP→MXN: toHub=USD → COP→USD + USD→MXN ✅
+  //
+  // Dual-hub pairs (CLF↔MXN: fromHub=CLP, toHub=USD) that cannot resolve in
+  // a single pivot stay `temporarily_unavailable` in V1 — multi-hop would
+  // need an explicit design decision about accumulated staleness + rounding.
+  if (rateValue === null) {
+    const fromAllows = allowsUsdComposition(from) // flag remains "usd_composition" for backward-compat
     const toAllows = allowsUsdComposition(to)
 
     if (fromAllows && toAllows) {
-      const [fromToUsd, usdToTo] = await Promise.all([
-        fetchDirectRow(from, 'USD', refDate),
-        fetchDirectRow('USD', to, refDate)
-      ])
+      const hubCandidates: string[] = []
+      const preferredHub = pickCompositionHub(from, to)
 
-      if (fromToUsd && usdToTo) {
-        const leg1 = toNumber(fromToUsd.rate)
-        const leg2 = toNumber(usdToTo.rate)
+      if (preferredHub && preferredHub !== from && preferredHub !== to) {
+        hubCandidates.push(preferredHub)
+      }
 
-        if (leg1 !== null && leg2 !== null) {
-          rateValue = leg1 * leg2
-          const d1 = toIsoDate(fromToUsd.rate_date) ?? refDate
-          const d2 = toIsoDate(usdToTo.rate_date) ?? refDate
+      // Fallback to the other side's hub if it differs (dual-hub edge case).
+      const fromHub = getCurrencyRegistryEntry(from)?.compositionHub ?? null
+      const toHub = getCurrencyRegistryEntry(to)?.compositionHub ?? null
+      const secondary = preferredHub === toHub ? fromHub : toHub
 
-          rateDateResolved = d1 < d2 ? d1 : d2
-          source = `composed_via_usd(${fromToUsd.source ?? 'unknown'},${usdToTo.source ?? 'unknown'})`
-          composedViaUsd = true
+      if (secondary && secondary !== preferredHub && secondary !== from && secondary !== to) {
+        hubCandidates.push(secondary)
+      }
+
+      for (const hub of hubCandidates) {
+        const [fromToHub, hubToTo] = await Promise.all([
+          fetchDirectRow(from, hub, refDate),
+          fetchDirectRow(hub, to, refDate)
+        ])
+
+        if (fromToHub && hubToTo) {
+          const leg1 = toNumber(fromToHub.rate)
+          const leg2 = toNumber(hubToTo.rate)
+
+          if (leg1 !== null && leg2 !== null) {
+            rateValue = leg1 * leg2
+            const d1 = toIsoDate(fromToHub.rate_date) ?? refDate
+            const d2 = toIsoDate(hubToTo.rate_date) ?? refDate
+
+            rateDateResolved = d1 < d2 ? d1 : d2
+
+            // Preserve the historical `composed_via_usd(...)` prefix when the
+            // hub happens to be USD so consumers that string-match on that
+            // token keep working. Other hubs get `composed_via_{hub}(...)`.
+            const hubTag = hub === 'USD' ? 'composed_via_usd' : `composed_via_${hub.toLowerCase()}`
+
+            source = `${hubTag}(${fromToHub.source ?? 'unknown'},${hubToTo.source ?? 'unknown'})`
+            compositionHub = hub
+            break
+          }
         }
       }
     }
@@ -234,13 +282,15 @@ export const resolveFxReadiness = async ({
       ageDays: null,
       stalenessThresholdDays: threshold,
       composedViaUsd: false,
-      message: buildMessage(from, to, 'temporarily_unavailable', null, threshold, false)
+      compositionHub: null,
+      message: buildMessage(from, to, 'temporarily_unavailable', null, threshold, null)
     }
   }
 
   const age = ageInDays(rateDateResolved, refDate)
   const isStale = age > threshold
   const state = isStale ? 'supported_but_stale' : 'supported'
+  const composedViaUsd = compositionHub === 'USD'
 
   return {
     fromCurrency: from,
@@ -254,6 +304,7 @@ export const resolveFxReadiness = async ({
     ageDays: age,
     stalenessThresholdDays: threshold,
     composedViaUsd,
-    message: buildMessage(from, to, state, age, threshold, composedViaUsd)
+    compositionHub,
+    message: buildMessage(from, to, state, age, threshold, compositionHub)
   }
 }

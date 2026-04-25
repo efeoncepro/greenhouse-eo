@@ -1,6 +1,10 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import {
+  extractQuotationFxSnapshot,
+  type QuotationFxSnapshot
+} from '@/lib/finance/quotation-fx-snapshot'
 
 export interface QuotationDocumentChainPurchaseOrder {
   poId: string
@@ -58,6 +62,19 @@ export interface QuotationDocumentChain {
     number: string | null
     status: string
     currency: string
+
+    /**
+     * TASK-466 — Canonical FX snapshot frozen at issue time. Null for quotes
+     * emitted before TASK-466 landed or for quotes still in `draft`. Downstream
+     * UIs can surface the rate/source/composedViaUsd without re-resolving FX.
+     */
+    fxSnapshot: QuotationFxSnapshot | null
+    pricingProvenance: {
+      lineCount: number
+      replayableLineCount: number
+      costBasisKinds: string[]
+      confidenceLabels: string[]
+    } | null
   } | null
   purchaseOrders: QuotationDocumentChainPurchaseOrder[]
   serviceEntries: QuotationDocumentChainServiceEntry[]
@@ -105,6 +122,7 @@ interface QuotationRow extends Record<string, unknown> {
   total_price: string | number | null
   total_amount: string | number | null
   total_amount_clp: string | number | null
+  exchange_rates: unknown
 }
 
 interface PoRow extends Record<string, unknown> {
@@ -155,6 +173,13 @@ interface IncomeRow extends Record<string, unknown> {
   dte_folio: string | null
   dte_type_code: string | null
   created_at: string | Date | null
+}
+
+interface PricingProvenanceSummaryRow extends Record<string, unknown> {
+  line_count: string | number | null
+  replayable_line_count: string | number | null
+  cost_basis_kinds: string[] | null
+  confidence_labels: string[] | null
 }
 
 interface ContractRow extends Record<string, unknown> {
@@ -215,7 +240,7 @@ export const readQuotationDocumentChain = async ({
 }): Promise<QuotationDocumentChain> => {
   const quotationRows = await query<QuotationRow>(
     `SELECT quotation_id, quotation_number, status, currency,
-            total_price, total_amount, total_amount_clp
+            total_price, total_amount, total_amount_clp, exchange_rates
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1
        LIMIT 1`,
@@ -223,6 +248,24 @@ export const readQuotationDocumentChain = async ({
   )
 
   const quotation = quotationRows[0] ?? null
+
+  const pricingProvenanceRows = await query<PricingProvenanceSummaryRow>(
+    `SELECT
+       COUNT(*) AS line_count,
+       COUNT(*) FILTER (WHERE pricing_input IS NOT NULL) AS replayable_line_count,
+       ARRAY_REMOVE(ARRAY_AGG(DISTINCT cost_breakdown ->> 'pricingV2CostBasisKind'), NULL) AS cost_basis_kinds,
+       ARRAY_REMOVE(ARRAY_AGG(DISTINCT cost_breakdown ->> 'pricingV2CostBasisConfidenceLabel'), NULL) AS confidence_labels
+     FROM greenhouse_commercial.quotation_line_items
+     WHERE quotation_id = $1
+       AND version_number = (
+         SELECT current_version
+         FROM greenhouse_commercial.quotations
+         WHERE quotation_id = $1
+       )`,
+    [quotationId]
+  )
+
+  const pricingProvenance = pricingProvenanceRows[0]
 
   const poRows = await query<PoRow>(
     `SELECT po_id, po_number, status,
@@ -327,7 +370,14 @@ export const readQuotationDocumentChain = async ({
           id: String(quotation.quotation_id),
           number: quotation.quotation_number ? String(quotation.quotation_number) : null,
           status: String(quotation.status),
-          currency: String(quotation.currency || 'CLP')
+          currency: String(quotation.currency || 'CLP'),
+          fxSnapshot: extractQuotationFxSnapshot(quotation.exchange_rates),
+          pricingProvenance: {
+            lineCount: num(pricingProvenance?.line_count),
+            replayableLineCount: num(pricingProvenance?.replayable_line_count),
+            costBasisKinds: pricingProvenance?.cost_basis_kinds ?? [],
+            confidenceLabels: pricingProvenance?.confidence_labels ?? []
+          }
         }
       : null,
     purchaseOrders,

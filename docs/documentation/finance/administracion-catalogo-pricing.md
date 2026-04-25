@@ -1,12 +1,13 @@
 # Administración del Catálogo de Pricing
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-19 por Claude (TASK-467)
-> **Ultima actualizacion:** 2026-04-19 por Claude (TASK-467 phase-2)
+> **Ultima actualizacion:** 2026-04-22 por Codex (TASK-550)
 > **Documentacion tecnica:**
 > - Spec: [TASK-467](../../tasks/complete/TASK-467-pricing-catalog-admin-ui.md)
 > - Catálogos base: [TASK-464a](../../tasks/complete/TASK-464a-sellable-roles-catalog-canonical.md), [TASK-464b](../../tasks/complete/TASK-464b-pricing-governance-tables.md), [TASK-464c](../../tasks/complete/TASK-464c-tool-catalog-extension-overhead-addons.md)
+> - Follow-up: [TASK-550](../../tasks/complete/TASK-550-pricing-catalog-phase-5-followups.md)
 
 ## Para qué sirve
 
@@ -92,10 +93,54 @@ Toda creación, actualización, activación y desactivación se registra en `gre
 
 La UI de consulta del log está disponible via `GET /api/admin/pricing-catalog/audit-log` (API funcional, vista UI con filtros queda para follow-up).
 
+## Novedades phase-5 (2026-04-22)
+
+TASK-550 cerró los follow-ups que habían quedado abiertos al terminar TASK-471:
+
+### Revert para governance
+
+- El timeline del audit log ahora permite revertir también cambios de:
+  - `role_tier_margin`
+  - `service_tier_margin`
+  - `commercial_model_multiplier`
+  - `country_pricing_factor`
+  - `employment_type`
+- El revert recrea el estado anterior usando los write paths canónicos del módulo.
+- `fte_hours_guide` sigue visible en el timeline, pero queda **read-only**: no tiene revert one-click en esta versión.
+
+### Gate de impacto alto en los 4 tabs del drawer de roles
+
+- El bloqueo por impacto alto ya no se puede esquivar cambiando de tab.
+- Si una edición de rol afecta cotizaciones activas o el blast radius estimado es alto, el operador debe confirmar explícitamente antes de guardar en:
+  - Info general
+  - Modalidades
+  - Componentes de costo
+  - Pricing por moneda
+
+### Cola de aprobaciones con notificaciones
+
+- La cola `/admin/pricing-catalog/approvals` sigue siendo la fuente de verdad del maker-checker.
+- Ahora, cuando alguien propone o decide una aprobación del pricing catalog:
+  - se registra evento reactivo en outbox
+  - se notifica a otros `efeonce_admin` por in-app + email + Slack en el caso de propuestas
+  - se notifica al proponente cuando la aprobación queda aprobada, rechazada o cancelada
+- El envío se puede activar o apagar con el flag `GREENHOUSE_PRICING_APPROVAL_NOTIFICATIONS`.
+
+### Excel import con create/delete gobernado
+
+- El import Excel ya no es solo “preview + updates”.
+- `update` seleccionado se puede aplicar directamente desde la vista.
+- `create` y `delete` ahora generan diffs marcados como **requiere aprobación**:
+  - el operador puede seleccionarlos
+  - click en **Proponer aprobación**
+  - se crean entries en la approval queue
+  - al aprobarse, el sistema aplica el alta o la desactivación soft-delete y deja audit trail por fila
+- El objetivo es permitir onboarding y cleanup masivo sin saltarse el control maker-checker.
+
 ## Qué NO hace (MVP)
 
-- **No importa Excel bulk**: el re-seed CSV sigue siendo el path para bulk updates masivas. Follow-up si Efeonce lo pide.
-- **No tiene approval workflow**: V1 confía que admins saben lo que hacen. El audit garantiza traceability.
+- **No hace hard delete** desde Excel: las bajas siguen siendo soft delete (`active=false` o `is_active=false`).
+- **No tiene multi-aprobador**: el approval workflow actual sigue siendo 1 reviewer por propuesta.
 - **Cost components tiene dos campos con limitación de backend actual**: `hours_per_fte_month` y `fee_eor_usd` se muestran editables en el drawer pero el store `insertCostComponentsIfChanged` los hardcodea a 180 / 0. Helper text en el form aclara esto. Queda como phase-3 cuando se extienda el store.
 
 ## Novedades phase-2 (2026-04-19)
@@ -155,11 +200,9 @@ La UI **NUNCA escribe** en `greenhouse_payroll.*`. Los campos de rates de payrol
 
 > **Detalle técnico:** API routes en [src/app/api/admin/pricing-catalog/](../../../src/app/api/admin/pricing-catalog/). Views en [src/views/greenhouse/admin/pricing-catalog/](../../../src/views/greenhouse/admin/pricing-catalog/). Audit store en [src/lib/commercial/pricing-catalog-audit-store.ts](../../../src/lib/commercial/pricing-catalog-audit-store.ts). Permission helper `canAdministerPricingCatalog` en [src/lib/tenant/authorization.ts](../../../src/lib/tenant/authorization.ts).
 
-## Próximos pasos (follow-ups phase-5+)
+## Próximos pasos (follow-ups posteriores)
 
 - **Role employment compatibility**: endpoint + UI para gestión full (hoy solo read-only en tab "Modalidades")
-- **Excel import con diff preview** si Efeonce lo pide (CSV re-seed sigue como fallback)
-- **Approval workflow** para cambios críticos (ej. bajar `margin_min` requiere aprobación de efeonce_admin)
 - **Bulk edit** (seleccionar 10 roles + ajustar salary +5% todos)
 - **Preview de impacto**: "¿cuántas cotizaciones activas se verían afectadas si subo este rate?"
-- **Diff viewer mejorado** en el audit timeline (hoy muestra JSON raw; próximo: diff visual side-by-side)
+- **Diff viewer mejorado** en el audit timeline (hoy ya muestra diff estructurado; próximo paso sería side-by-side más rico)

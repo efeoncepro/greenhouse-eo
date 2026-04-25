@@ -5,6 +5,7 @@ import type { PoolClient, QueryResult } from 'pg'
 import { resolveQuoteDeliveryModel } from '@/lib/commercial/delivery-model'
 import { query } from '@/lib/db'
 import { normalizeQuoteSalesContext } from '@/lib/commercial/sales-context'
+import { parsePersistedTaxSnapshot } from '@/lib/finance/pricing/quotation-tax-snapshot'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 type QueryableClient = Pick<PoolClient, 'query'>
@@ -49,6 +50,12 @@ type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
   subtotal: string | number | null
   tax_rate: string | number | null
   tax_amount: string | number | null
+  tax_code: string | null
+  tax_rate_snapshot: string | number | null
+  tax_amount_snapshot: string | number | null
+  tax_snapshot_json: unknown | null
+  is_tax_exempt: boolean | null
+  tax_snapshot_frozen_at: string | Date | null
   exchange_rate_to_clp: string | number | null
   nubox_sii_track_id: string | null
   nubox_emission_status: string | null
@@ -59,6 +66,7 @@ type CanonicalQuoteDetailRow = CanonicalQuoteListRow & {
   created_at: string | Date | null
   updated_at: string | Date | null
   sales_context_at_sent: unknown | null
+  pricing_context: unknown | null
 }
 
 type CanonicalQuoteLineRow = {
@@ -90,6 +98,8 @@ type CanonicalQuoteLineRow = {
   tool_id: string | null
   addon_id: string | null
   fte_allocation: string | number | null
+  cost_breakdown: unknown
+  pricing_input: unknown
 }
 
 type TenantSpaceRow = { space_id: string }
@@ -330,6 +340,12 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        q.subtotal,
        q.tax_rate,
        q.tax_amount,
+       q.tax_code,
+       q.tax_rate_snapshot,
+       q.tax_amount_snapshot,
+       q.tax_snapshot_json,
+       q.is_tax_exempt,
+       q.tax_snapshot_frozen_at,
        COALESCE(NULLIF(q.total_amount, 0), q.total_price, q.total_amount) AS total_amount,
        COALESCE(q.total_amount_clp, q.total_amount, q.total_price) AS total_amount_clp,
        q.exchange_rate_to_clp,
@@ -348,6 +364,7 @@ export const getFinanceQuoteDetailFromCanonical = async ({
        q.created_at,
        q.updated_at,
        q.sales_context_at_sent,
+       q.pricing_context,
        q.pricing_model,
        q.commercial_model,
        q.staffing_model,
@@ -421,7 +438,9 @@ export const listFinanceQuoteLinesFromCanonical = async ({
        qli.module_id,
        qli.tool_id,
        qli.addon_id,
-       qli.fte_allocation
+       qli.fte_allocation,
+       qli.cost_breakdown,
+       qli.pricing_input
      FROM greenhouse_commercial.quotation_line_items qli
      JOIN greenhouse_commercial.quotations q
        ON q.quotation_id = qli.quotation_id
@@ -1188,6 +1207,18 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
   subtotal: row.subtotal !== null ? Number(row.subtotal) : null,
   taxRate: row.tax_rate !== null ? Number(row.tax_rate) : null,
   taxAmount: row.tax_amount !== null ? Number(row.tax_amount) : null,
+  taxCode: row.tax_code ?? null,
+  taxRateSnapshot: row.tax_rate_snapshot !== null && row.tax_rate_snapshot !== undefined
+    ? Number(row.tax_rate_snapshot)
+    : null,
+  taxAmountSnapshot: row.tax_amount_snapshot !== null && row.tax_amount_snapshot !== undefined
+    ? Number(row.tax_amount_snapshot)
+    : null,
+  taxSnapshot: parsePersistedTaxSnapshot(row.tax_snapshot_json),
+  isTaxExempt: Boolean(row.is_tax_exempt),
+  taxSnapshotFrozenAt: row.tax_snapshot_frozen_at
+    ? new Date(String(row.tax_snapshot_frozen_at)).toISOString()
+    : null,
   totalAmount: Number(row.total_amount ?? 0),
   totalAmountClp: Number(row.total_amount_clp ?? row.total_amount ?? 0),
   exchangeRateToClp: row.exchange_rate_to_clp !== null ? Number(row.exchange_rate_to_clp) : null,
@@ -1208,7 +1239,29 @@ export const mapCanonicalQuoteDetailRow = (row: CanonicalQuoteDetailRow & { lega
   pricingModel: row.pricing_model ? String(row.pricing_model) : null,
   commercialModel: row.commercial_model ? String(row.commercial_model) : null,
   staffingModel: row.staffing_model ? String(row.staffing_model) : null,
-  salesContextAtSent: normalizeQuoteSalesContext(row.sales_context_at_sent)
+  salesContextAtSent: normalizeQuoteSalesContext(row.sales_context_at_sent),
+  pricingContext:
+    row.pricing_context && typeof row.pricing_context === 'object' && !Array.isArray(row.pricing_context)
+      ? row.pricing_context
+      : null,
+  pricingEngineCommercialModel:
+    row.pricing_context &&
+    typeof row.pricing_context === 'object' &&
+    !Array.isArray(row.pricing_context) &&
+    'commercialModelCode' in row.pricing_context
+      ? row.pricing_context.commercialModelCode
+        ? String(row.pricing_context.commercialModelCode)
+        : null
+      : null,
+  countryFactorCode:
+    row.pricing_context &&
+    typeof row.pricing_context === 'object' &&
+    !Array.isArray(row.pricing_context) &&
+    'countryFactorCode' in row.pricing_context
+      ? row.pricing_context.countryFactorCode
+        ? String(row.pricing_context.countryFactorCode)
+        : null
+      : null
 })
 
 export const mapCanonicalQuoteLineRow = (row: CanonicalQuoteLineRow) => ({
@@ -1236,5 +1289,37 @@ export const mapCanonicalQuoteLineRow = (row: CanonicalQuoteLineRow) => ({
   moduleId: row.module_id ? String(row.module_id) : null,
   toolId: row.tool_id ? String(row.tool_id) : null,
   addonId: row.addon_id ? String(row.addon_id) : null,
-  fteAllocation: row.fte_allocation !== null && row.fte_allocation !== undefined ? Number(row.fte_allocation) : null
+  fteAllocation: row.fte_allocation !== null && row.fte_allocation !== undefined ? Number(row.fte_allocation) : null,
+  pricingInput:
+    row.pricing_input && typeof row.pricing_input === 'object' && !Array.isArray(row.pricing_input)
+      ? row.pricing_input
+      : null,
+  costProvenance:
+    row.cost_breakdown && typeof row.cost_breakdown === 'object' && !Array.isArray(row.cost_breakdown)
+      ? {
+          snapshotSource:
+            'snapshotSource' in row.cost_breakdown ? row.cost_breakdown.snapshotSource : null,
+          pricingV2CostBasisKind:
+            'pricingV2CostBasisKind' in row.cost_breakdown
+              ? row.cost_breakdown.pricingV2CostBasisKind
+              : null,
+          pricingV2CostBasisSourceRef:
+            'pricingV2CostBasisSourceRef' in row.cost_breakdown
+              ? row.cost_breakdown.pricingV2CostBasisSourceRef
+              : null,
+          pricingV2CostBasisSnapshotDate:
+            'pricingV2CostBasisSnapshotDate' in row.cost_breakdown
+              ? row.cost_breakdown.pricingV2CostBasisSnapshotDate
+              : null,
+          pricingV2CostBasisConfidenceScore:
+            'pricingV2CostBasisConfidenceScore' in row.cost_breakdown
+              ? row.cost_breakdown.pricingV2CostBasisConfidenceScore
+              : null,
+          pricingV2CostBasisConfidenceLabel:
+            'pricingV2CostBasisConfidenceLabel' in row.cost_breakdown
+              ? row.cost_breakdown.pricingV2CostBasisConfidenceLabel
+              : null,
+          notes: 'notes' in row.cost_breakdown ? row.cost_breakdown.notes : null
+        }
+      : null
 })

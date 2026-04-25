@@ -1,16 +1,12 @@
 'use client'
 
-import { type MouseEvent as ReactMouseEvent, type ReactNode, useState } from 'react'
+import { type ReactNode, useEffect, useRef } from 'react'
 
 import Alert from '@mui/material/Alert'
-import Badge from '@mui/material/Badge'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Grid from '@mui/material/Grid'
-import Paper from '@mui/material/Paper'
-import Popper from '@mui/material/Popper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
@@ -49,12 +45,8 @@ export interface QuoteSummaryDockProps {
   /** Target tier range, usado para tooltip del margen. */
   marginTierRange?: MarginTierRange | null
 
-  /** Delta de los addons sugeridos (aún no aplicados) al total. Preview para
-   *  decir "si los tildas todos, el total sube en +$X". */
-  addonTotalDelta?: number | null
-
   /** Suma de los addons ya aplicados como línea overhead_addon. Se muestra en
-   *  el chip como contexto cuantitativo cuando > 0. */
+   *  el segmento inline de la ladder como contexto cuantitativo cuando > 0. */
   appliedAddonsTotal?: number | null
 
   /** Save state indicator en la parte izquierda del dock. */
@@ -70,46 +62,21 @@ export interface QuoteSummaryDockProps {
   emptyStateMessage?: string | null
 }
 
-const CURRENCY_LOCALE: Record<PricingOutputCurrency, string> = {
-  CLP: 'es-CL',
-  USD: 'en-US',
-  CLF: 'es-CL',
-  COP: 'es-CO',
-  MXN: 'es-MX',
-  PEN: 'es-PE'
-}
-
-const formatMoney = (amount: number | null, currency: PricingOutputCurrency): string => {
-  if (amount === null || Number.isNaN(amount)) return '—'
-
-  const locale = CURRENCY_LOCALE[currency] ?? 'es-CL'
-
-  try {
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(amount)
-  } catch {
-    return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(amount)} ${currency}`
-  }
-}
-
 /**
  * QuoteSummaryDock v2 — sticky-bottom cockpit para el Quote Builder.
  *
- * Jerarquía 3-zonas (Grid 3/5/4 en md+):
- *   [Estado]        [Totals ladder]                 [Acciones]
- *   Save state      Total CLP                       Addons · Cancelar · Guardar
- *   Margen chip     $X — subtotal · factor · IVA
+ * Jerarquía 3-zonas (Grid 3/6/3 en md+):
+ *   [Estado]        [Totals ladder + addons inline]       [Acción terminal]
+ *   Save state      Total CLP                              Guardar y emitir
+ *   Margen chip     $X — subtotal · addon · factor · IVA
  *
  * Principios:
- * - Total en text.primary (no primary.main). El azul de marca se reserva para
- *   la CTA primaria — así el ojo distingue "valor destacado" de "acción".
- * - Subtotal/Factor/IVA colapsan en caption muted debajo del Total solo cuando
- *   aportan info (factor≠1 o IVA>0 o delta real con subtotal). Si no, oculto.
- * - Margen chip con label completo "Margen · N,N% · Óptimo" (no color-only).
- * - CTA copy invariante; el estado de loading se comunica con disabled+spinner.
+ * - Total en text.primary. El azul de marca queda exclusivo para la CTA.
+ * - Subtotal/Factor/IVA/addons colapsan en caption muted debajo del Total
+ *   solo cuando aportan info. El segmento de addons es interactivo y abre
+ *   un popover con el detalle — self-contained en el primitive (TASK-509,
+ *   via Floating UI).
+ * - CTA copy invariante; loading state = disabled + spinner.
  * - Live region a11y consolidada en el root aside.
  */
 const QuoteSummaryDock = ({
@@ -132,23 +99,17 @@ const QuoteSummaryDock = ({
   marginClassification,
   marginPct,
   marginTierRange,
-  addonTotalDelta,
   appliedAddonsTotal,
   saveState,
   simulationError,
   emptyStateMessage
 }: QuoteSummaryDockProps) => {
-  // Anchor capturado desde el evento click, no via ref. El Popper queda atado
-  // al elemento DOM real y sobrevive re-renders. Si usáramos ref.current, en
-  // el primer click ref puede ser null (orden de ejecución) y el Popper caería
-  // al top-left del viewport.
-  const [addonAnchor, setAddonAnchor] = useState<HTMLElement | null>(null)
-  const addonsOpen = addonAnchor !== null
+  // Guarda la diferencia clave del "before/after" para re-animar counter sólo cuando el valor cambia material
+  const lastTotalRef = useRef<number | null>(null)
 
-  const handleAddonsToggle = (event: ReactMouseEvent<HTMLElement>) =>
-    setAddonAnchor(prev => (prev ? null : event.currentTarget))
-
-  const handleAddonsClose = () => setAddonAnchor(null)
+  useEffect(() => {
+    if (total !== null) lastTotalRef.current = total
+  }, [total])
 
   return (
     <Box
@@ -225,6 +186,15 @@ const QuoteSummaryDock = ({
               total={total}
               currency={currency}
               loading={loading}
+              addonsSegment={
+                addonContent && addonCount > 0
+                  ? {
+                      count: addonCount,
+                      amount: appliedAddonsTotal ?? 0,
+                      content: addonContent
+                    }
+                  : null
+              }
             />
           )}
         </Grid>
@@ -239,105 +209,6 @@ const QuoteSummaryDock = ({
             flexWrap='wrap'
             useFlexGap
           >
-            {addonContent && addonCount > 0 ? (
-              <>
-                <Box
-                  component='button'
-                  type='button'
-                  onClick={handleAddonsToggle}
-                  aria-expanded={addonsOpen}
-                  aria-haspopup='dialog'
-                  aria-label={GH_PRICING.summaryDock.addonsChip(addonCount)}
-                  sx={theme => ({
-                    appearance: 'none',
-                    border: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: alpha(theme.palette.primary.main, 0.06),
-                    color: theme.palette.primary.main,
-                    borderRadius: 999,
-                    px: 1.5,
-                    py: 0.75,
-                    minHeight: 36,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.75,
-                    cursor: 'pointer',
-                    transition: theme.transitions.create(['background-color', 'border-color'], {
-                      duration: 150,
-                      easing: 'cubic-bezier(0.2, 0, 0, 1)'
-                    }),
-                    '&:hover': {
-                      borderColor: theme.palette.primary.main,
-                      backgroundColor: alpha(theme.palette.primary.main, 0.1)
-                    },
-                    '&:focus-visible': {
-                      outline: `2px solid ${theme.palette.primary.main}`,
-                      outlineOffset: 2
-                    },
-                    '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
-                  })}
-                >
-                  <Badge
-                    badgeContent={addonCount}
-                    color='primary'
-                    invisible={addonCount === 0}
-                    sx={{ '& .MuiBadge-badge': { fontSize: 10, height: 16, minWidth: 16 } }}
-                  >
-                    <i className='tabler-sparkles' aria-hidden='true' style={{ fontSize: 16 }} />
-                  </Badge>
-                  <Typography variant='caption' sx={{ fontWeight: 500 }}>
-                    {GH_PRICING.summaryDock.addonsChip(addonCount)}
-                  </Typography>
-                  {/* Monto aplicado: cuando hay addons ya tildados, se muestra
-                      su contribución al total como contexto cuantitativo. */}
-                  {appliedAddonsTotal !== null && appliedAddonsTotal !== undefined && appliedAddonsTotal > 0 ? (
-                    <Typography
-                      variant='caption'
-                      sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums', ml: 0.5 }}
-                    >
-                      · {formatMoney(appliedAddonsTotal, currency)}
-                    </Typography>
-                  ) : null}
-                  {/* Delta de sugerencias no aplicadas: preview de cuánto
-                      subiría el total si el comercial tildara las pendientes. */}
-                  {addonTotalDelta !== null && addonTotalDelta !== undefined && addonTotalDelta > 0 ? (
-                    <Typography
-                      variant='caption'
-                      sx={{
-                        fontWeight: 500,
-                        fontVariantNumeric: 'tabular-nums',
-                        ml: 0.5,
-                        color: 'text.secondary'
-                      }}
-                    >
-                      +{formatMoney(addonTotalDelta, currency)}
-                    </Typography>
-                  ) : null}
-                </Box>
-                <Popper
-                  open={addonsOpen}
-                  anchorEl={addonAnchor}
-                  placement='top-end'
-                  sx={{ zIndex: theme => theme.zIndex.modal + 1 }}
-                >
-                  <ClickAwayListener onClickAway={handleAddonsClose}>
-                    <Paper
-                      elevation={6}
-                      sx={theme => ({
-                        mb: 1,
-                        p: 2,
-                        width: 380,
-                        maxWidth: 'calc(100vw - 32px)',
-                        borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                        border: `1px solid ${theme.palette.divider}`
-                      })}
-                    >
-                      {addonContent}
-                    </Paper>
-                  </ClickAwayListener>
-                </Popper>
-              </>
-            ) : null}
-
             {secondaryCtaLabel && onSecondaryClick ? (
               <Button
                 variant='tonal'

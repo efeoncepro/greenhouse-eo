@@ -35,6 +35,10 @@ import type { TimelineProps } from '@mui/lab/Timeline'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import AuditDiffViewer from '@/components/greenhouse/pricing/AuditDiffViewer'
+import AuditRevertConfirmDialog from '@/components/greenhouse/pricing/AuditRevertConfirmDialog'
+import { GH_PRICING_GOVERNANCE } from '@/config/greenhouse-nomenclature'
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 type EntityType =
@@ -47,6 +51,7 @@ type EntityType =
   | 'country_pricing_factor'
   | 'fte_hours_guide'
   | 'employment_type'
+  | 'service_catalog'
 
 type ActionType =
   | 'created'
@@ -56,6 +61,11 @@ type ActionType =
   | 'cost_updated'
   | 'pricing_updated'
   | 'bulk_imported'
+  | 'recipe_updated'
+  | 'deleted'
+  | 'reverted'
+  | 'approval_applied'
+  | 'bulk_edited'
 
 interface AuditEntry {
   auditId: string
@@ -86,7 +96,8 @@ const ENTITY_LABELS: Record<EntityType, string> = {
   commercial_model_multiplier: 'Modelo comercial',
   country_pricing_factor: 'Factor país',
   fte_hours_guide: 'Guía FTE',
-  employment_type: 'Modalidad de contrato'
+  employment_type: 'Modalidad de contrato',
+  service_catalog: 'Servicio empaquetado'
 }
 
 const ACTION_LABELS: Record<ActionType, string> = {
@@ -96,7 +107,12 @@ const ACTION_LABELS: Record<ActionType, string> = {
   reactivated: 'Reactivado',
   cost_updated: 'Costos actualizados',
   pricing_updated: 'Pricing actualizado',
-  bulk_imported: 'Importación masiva'
+  bulk_imported: 'Importación masiva',
+  recipe_updated: 'Receta actualizada',
+  deleted: 'Eliminado',
+  reverted: 'Revertido',
+  approval_applied: 'Aprobación aplicada',
+  bulk_edited: 'Edición masiva'
 }
 
 type TimelineDotColor =
@@ -116,7 +132,12 @@ const ACTION_COLORS: Record<ActionType, TimelineDotColor> = {
   reactivated: 'success',
   cost_updated: 'info',
   pricing_updated: 'info',
-  bulk_imported: 'primary'
+  bulk_imported: 'primary',
+  recipe_updated: 'info',
+  deleted: 'error',
+  reverted: 'warning',
+  approval_applied: 'success',
+  bulk_edited: 'primary'
 }
 
 const ACTION_ICONS: Record<ActionType, string> = {
@@ -126,8 +147,36 @@ const ACTION_ICONS: Record<ActionType, string> = {
   reactivated: 'tabler-rotate',
   cost_updated: 'tabler-coin',
   pricing_updated: 'tabler-tag',
-  bulk_imported: 'tabler-database-import'
+  bulk_imported: 'tabler-database-import',
+  recipe_updated: 'tabler-recipe',
+  deleted: 'tabler-trash',
+  reverted: 'tabler-arrow-back-up',
+  approval_applied: 'tabler-shield-check',
+  bulk_edited: 'tabler-table-options'
 }
+
+const REVERTIBLE_ACTIONS: ActionType[] = [
+  'updated',
+  'deactivated',
+  'reactivated',
+  'cost_updated',
+  'pricing_updated',
+  'recipe_updated'
+]
+
+const REVERTIBLE_ENTITIES: EntityType[] = [
+  'sellable_role',
+  'tool_catalog',
+  'overhead_addon',
+  'service_catalog',
+  'role_tier_margin',
+  'service_tier_margin',
+  'commercial_model_multiplier',
+  'country_pricing_factor',
+  'employment_type'
+]
+
+const READ_ONLY_REVERT_ENTITIES: EntityType[] = ['fte_hours_guide']
 
 // ── Styled ─────────────────────────────────────────────────────────────
 
@@ -167,10 +216,17 @@ const hasDetails = (summary: Record<string, unknown>): boolean => {
 
 // ── Component ──────────────────────────────────────────────────────────
 
-const AuditLogTimelineView = () => {
+interface AuditLogTimelineViewProps {
+  canRevert?: boolean
+}
+
+const AuditLogTimelineView = ({ canRevert = false }: AuditLogTimelineViewProps) => {
   const [items, setItems] = useState<AuditEntry[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const [revertTarget, setRevertTarget] = useState<AuditEntry | null>(null)
+  const [revertedIds, setRevertedIds] = useState<Set<string>>(new Set())
 
   const [entityType, setEntityType] = useState<'all' | EntityType>('all')
   const [entityIdInput, setEntityIdInput] = useState('')
@@ -481,24 +537,52 @@ const AuditLogTimelineView = () => {
                               </Typography>
                             </AccordionSummary>
                             <AccordionDetails sx={{ pt: 0 }}>
-                              <Box
-                                component='pre'
-                                sx={{
-                                  m: 0,
-                                  p: 2,
-                                  fontSize: '0.75rem',
-                                  fontFamily: 'monospace',
-                                  bgcolor: t =>
-                                    t.palette.mode === 'dark'
-                                      ? 'rgba(255,255,255,0.04)'
-                                      : 'rgba(0,0,0,0.03)',
-                                  borderRadius: 1,
-                                  overflow: 'auto',
-                                  maxHeight: 240
-                                }}
-                              >
-                                {JSON.stringify(entry.changeSummary, null, 2)}
-                              </Box>
+                              <AuditDiffViewer
+                                action={entry.action}
+                                changeSummary={entry.changeSummary}
+                              />
+                              {(() => {
+                                const actionOk = REVERTIBLE_ACTIONS.includes(entry.action)
+
+                                const entityOk =
+                                  REVERTIBLE_ENTITIES.includes(entry.entityType) ||
+                                  READ_ONLY_REVERT_ENTITIES.includes(entry.entityType)
+
+                                const alreadyReverted = revertedIds.has(entry.auditId)
+
+                                const isReadOnlyEntity = READ_ONLY_REVERT_ENTITIES.includes(
+                                  entry.entityType
+                                )
+
+                                const canShowButton = actionOk && entityOk && !alreadyReverted
+
+                                if (!canShowButton) return null
+
+                                const tooltipTitle = isReadOnlyEntity
+                                  ? GH_PRICING_GOVERNANCE.auditRevert.triggerDisabledFteGuideReadOnly
+                                  : !canRevert
+                                    ? GH_PRICING_GOVERNANCE.auditRevert.triggerDisabledNoPermission
+                                    : GH_PRICING_GOVERNANCE.auditRevert.triggerLabel
+
+                                return (
+                                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                                    <Tooltip title={tooltipTitle} disableInteractive>
+                                      <span>
+                                        <Button
+                                          size='small'
+                                          variant='outlined'
+                                          color='warning'
+                                          startIcon={<i className='tabler-arrow-back-up' />}
+                                          onClick={() => setRevertTarget(entry)}
+                                          disabled={isReadOnlyEntity || !canRevert}
+                                        >
+                                          {GH_PRICING_GOVERNANCE.auditRevert.triggerLabel}
+                                        </Button>
+                                      </span>
+                                    </Tooltip>
+                                  </Box>
+                                )
+                              })()}
                             </AccordionDetails>
                           </Accordion>
                         )}
@@ -511,6 +595,32 @@ const AuditLogTimelineView = () => {
           )}
         </Card>
       </Grid>
+      {revertTarget ? (
+        <AuditRevertConfirmDialog
+          open
+          auditId={revertTarget.auditId}
+          action={revertTarget.action}
+          entityType={ENTITY_LABELS[revertTarget.entityType] ?? revertTarget.entityType}
+          entityLabel={revertTarget.entitySku ?? revertTarget.entityId}
+          changeSummary={revertTarget.changeSummary}
+          onClose={() => setRevertTarget(null)}
+          onSuccess={({ newAuditId }) => {
+            setRevertedIds(prev => {
+              const next = new Set(prev)
+
+              next.add(revertTarget.auditId)
+              
+return next
+            })
+
+            // Remove unused var hint
+            void newAuditId
+
+            // Refresh timeline to pick up the new revert entry on top.
+            setAppliedFilters(current => ({ ...current }))
+          }}
+        />
+      ) : null}
     </Grid>
   )
 }

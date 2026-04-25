@@ -32,6 +32,18 @@ interface QuoteCreatedParams extends BaseQuoteContext, DeliveryModelContext {
   lineItemCount?: number | null
 }
 
+interface QuotationUpdatedParams extends DeliveryModelContext {
+  quotationId: string
+  quoteId?: string | null
+  hubspotQuoteId?: string | null
+  hubspotDealId?: string | null
+  sourceSystem?: string | null
+  organizationId?: string | null
+  spaceId?: string | null
+  updatedBy?: string | null
+  changedFields?: string[]
+}
+
 interface QuoteSyncedParams extends BaseQuoteContext, DeliveryModelContext {
   action: 'created' | 'updated' | 'skipped'
 }
@@ -122,6 +134,34 @@ export const publishQuoteCreated = async (
       client
     )
   }
+}
+
+export const publishQuotationUpdated = async (
+  params: QuotationUpdatedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.quotation,
+      aggregateId: params.quotationId,
+      eventType: EVENT_TYPES.quotationUpdated,
+      payload: {
+        quotationId: params.quotationId,
+        quoteId: params.quoteId ?? params.quotationId,
+        hubspotQuoteId: params.hubspotQuoteId ?? null,
+        hubspotDealId: params.hubspotDealId ?? null,
+        sourceSystem: params.sourceSystem ?? null,
+        organizationId: params.organizationId ?? null,
+        spaceId: params.spaceId ?? null,
+        updatedBy: params.updatedBy ?? null,
+        changedFields: params.changedFields ?? [],
+        pricingModel: params.pricingModel ?? null,
+        commercialModel: params.commercialModel ?? null,
+        staffingModel: params.staffingModel ?? null
+      }
+    },
+    client
+  )
 }
 
 export const publishQuoteSynced = async (
@@ -843,6 +883,97 @@ export const publishQuotationProfitabilityMaterialized = async (
         quotedMarginPct: params.quotedMarginPct,
         marginDriftPct: params.marginDriftPct,
         driftSeverity: params.driftSeverity
+      }
+    },
+    client
+  )
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// TASK-482 — Margin Feedback Loop batch publisher
+// ═══════════════════════════════════════════════════════════════
+//
+// Emitted by `commercial-cost-worker` after `POST /margin-feedback/materialize`
+// completes a batch run. Aggregates the results of the underlying quotation
+// and contract profitability materializers plus the calibration signals so
+// downstream consumers (TASK-476 recalibration, analytics dashboards) do not
+// need to re-aggregate the snapshots themselves.
+
+interface MarginFeedbackBatchCompletedParams {
+  runId: string
+  periods: Array<{ year: number; month: number }>
+  quotationCount: number
+  contractCount: number
+  calibrationSignals: MarginFeedbackCalibrationSignals
+  serviceGrainAvailable: boolean
+}
+
+export interface MarginFeedbackCalibrationSignals {
+
+  /** Distribution of margin drift across quotation snapshots touched in this
+   *  run (p50/p90/count). Null fields when no snapshot had enough data to
+   *  compute drift. */
+  quotationDriftDistribution: {
+    p50Pct: number | null
+    p90Pct: number | null
+    maxAbsPct: number | null
+    sampleSize: number
+  }
+
+
+  /** Counts by `driftSeverity` for quotations in this run. */
+  quotationDriftBucketCounts: {
+    aligned: number
+    warning: number
+    critical: number
+  }
+
+
+  /** Same distribution for contract snapshots. */
+  contractDriftDistribution: {
+    p50Pct: number | null
+    p90Pct: number | null
+    maxAbsPct: number | null
+    sampleSize: number
+  }
+
+
+  /** Counts by severity for contracts. */
+  contractDriftBucketCounts: {
+    aligned: number
+    warning: number
+    critical: number
+  }
+
+
+  /** Top pricing models by absolute drift — useful to flag which commercial
+   *  templates consistently underestimate cost. Empty when drift cannot be
+   *  computed (no cost attribution for the period). */
+  topDriftByPricingModel: Array<{
+    pricingModel: string | null
+    commercialModel: string | null
+    meanDriftPct: number
+    sampleSize: number
+  }>
+}
+
+export const publishMarginFeedbackBatchCompleted = async (
+  params: MarginFeedbackBatchCompletedParams,
+  client?: QueryableClient
+) => {
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.marginFeedback,
+      aggregateId: params.runId,
+      eventType: EVENT_TYPES.marginFeedbackBatchCompleted,
+      payload: {
+        runId: params.runId,
+        periods: params.periods,
+        quotationCount: params.quotationCount,
+        contractCount: params.contractCount,
+        calibrationSignals: params.calibrationSignals,
+        serviceGrainAvailable: params.serviceGrainAvailable
       }
     },
     client

@@ -13,3 +13,8 @@ full-version
 demo-configs
 CODEX_TASK_*.md
 Greenhouse_Capabilities_Architecture_v1.md
+
+# TASK-574: Python Cloud Run services live in the monorepo but are not part
+# of the Vercel Next.js bundle. They deploy separately via
+# `.github/workflows/hubspot-greenhouse-integration-deploy.yml`.
+services/hubspot_greenhouse_integration/

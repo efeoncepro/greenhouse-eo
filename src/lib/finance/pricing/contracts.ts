@@ -1,3 +1,4 @@
+import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { FinanceCurrency } from '@/lib/finance/contracts'
 
 export const MARGIN_METRIC_KEYS = ['mrr', 'arr', 'tcv', 'acv'] as const
@@ -102,7 +103,7 @@ export interface CostComponentBreakdown {
   roleCode?: string | null
   seniorityLevel?: RoleRateSeniorityLevel | null
   notes?: string | null
-  pricingV2CostBasisKind?: 'member_actual' | 'role_blended' | 'role_modeled' | 'tool_snapshot' | 'manual' | null
+  pricingV2CostBasisKind?: PricingCostBasisKind | null
   pricingV2CostBasisSourceRef?: string | null
   pricingV2CostBasisSnapshotDate?: string | null
   pricingV2CostBasisConfidenceScore?: number | null
@@ -210,6 +211,22 @@ export const PRICING_V2_LINE_TYPES = [
 ] as const
 export type PricingV2LineType = (typeof PRICING_V2_LINE_TYPES)[number]
 
+export const PRICING_COST_BASIS_KINDS = [
+  'member_actual',
+  'role_blended',
+  'role_modeled',
+  'tool_snapshot',
+  'tool_catalog_fallback',
+  'manual'
+] as const
+export type PricingCostBasisKind = (typeof PRICING_COST_BASIS_KINDS)[number]
+
+export interface QuotationPricingReplayContext {
+  commercialModelCode?: CommercialModelCode | null
+  countryFactorCode?: string | null
+  autoResolveAddons?: boolean | 'internal_only' | null
+}
+
 export interface RolePricingLineInputV2 {
   lineType: 'role'
   roleSku: string
@@ -293,7 +310,7 @@ export interface PricingCostStackV2 {
   breakdown: Record<string, number>
   employmentTypeCode?: string | null
   employmentTypeSource?: 'explicit_input' | 'role_default' | 'payroll_compensation_version'
-  costBasisKind?: 'member_actual' | 'role_blended' | 'role_modeled' | 'tool_snapshot' | 'manual'
+  costBasisKind?: PricingCostBasisKind
   costBasisSourceRef?: string | null
   costBasisSnapshotDate?: string | null
   costBasisConfidenceScore?: number | null

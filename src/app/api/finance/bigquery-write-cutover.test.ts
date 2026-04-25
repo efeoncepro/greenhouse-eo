@@ -51,6 +51,7 @@ vi.mock('@/lib/finance/postgres-reconciliation', () => ({
 
 // Allow withTransaction to call its callback in test env (no real Postgres needed)
 vi.mock('@/lib/db', () => ({
+  getDb: vi.fn(),
   withTransaction: async (fn: (client: unknown) => Promise<unknown>) => fn({ query: vi.fn() })
 }))
 

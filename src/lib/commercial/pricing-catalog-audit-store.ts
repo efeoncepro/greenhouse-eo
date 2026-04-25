@@ -13,6 +13,7 @@ export type PricingCatalogEntityType =
   | 'fte_hours_guide'
   | 'employment_type'
   | 'service_catalog'
+  | 'product_catalog'
 
 export type PricingCatalogAction =
   | 'created'
@@ -24,6 +25,9 @@ export type PricingCatalogAction =
   | 'bulk_imported'
   | 'recipe_updated'
   | 'deleted'
+  | 'reverted'
+  | 'approval_applied'
+  | 'bulk_edited'
 
 export interface PricingCatalogAuditEntry {
   auditId: string
@@ -63,7 +67,8 @@ const PRICING_CATALOG_ENTITY_TYPES: readonly PricingCatalogEntityType[] = [
   'country_pricing_factor',
   'fte_hours_guide',
   'employment_type',
-  'service_catalog'
+  'service_catalog',
+  'product_catalog'
 ]
 
 const PRICING_CATALOG_ACTIONS: readonly PricingCatalogAction[] = [
@@ -75,7 +80,10 @@ const PRICING_CATALOG_ACTIONS: readonly PricingCatalogAction[] = [
   'pricing_updated',
   'bulk_imported',
   'recipe_updated',
-  'deleted'
+  'deleted',
+  'reverted',
+  'approval_applied',
+  'bulk_edited'
 ]
 
 const toChangeSummary = (value: unknown): Record<string, unknown> => {
@@ -224,4 +232,43 @@ export const listPricingCatalogAudit = async (
   )
 
   return rows.map(mapRow)
+}
+
+/**
+ * Read a single audit entry by id. Used by the revert endpoint (TASK-471 slice 2)
+ * to reconstruct the inverse payload from `change_summary.previous_values`.
+ */
+export const getPricingCatalogAuditEntry = async (
+  auditId: string
+): Promise<PricingCatalogAuditEntry | null> => {
+  const rows = await query<AuditRow>(
+    `SELECT audit_id, entity_type, entity_id, entity_sku, action,
+            actor_user_id, actor_name, change_summary, effective_from, notes, created_at
+       FROM greenhouse_commercial.pricing_catalog_audit_log
+      WHERE audit_id = $1
+      LIMIT 1`,
+    [auditId]
+  )
+
+  if (rows.length === 0) return null
+
+  return mapRow(rows[0])
+}
+
+/**
+ * Check if an audit entry has already been reverted by a subsequent audit row.
+ * Used to disable "Revertir" button on already-reverted entries (TASK-471 slice 2).
+ * Detects reverts by reading `change_summary.reverts_audit_id` metadata.
+ */
+export const isPricingCatalogAuditReverted = async (auditId: string): Promise<boolean> => {
+  const rows = await query<{ audit_id: string }>(
+    `SELECT audit_id
+       FROM greenhouse_commercial.pricing_catalog_audit_log
+      WHERE action = 'reverted'
+        AND change_summary ->> 'reverts_audit_id' = $1
+      LIMIT 1`,
+    [auditId]
+  )
+
+  return rows.length > 0
 }

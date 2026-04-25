@@ -1,8 +1,12 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { FinanceValidationError } from '@/lib/finance/shared'
 
 let ensureFinanceInfrastructurePromise: Promise<void> | null = null
+const financeBigQueryReadinessPromises = new Map<string, Promise<void>>()
+const financeBigQueryReadinessCache = new Map<string, number>()
+const FINANCE_BIGQUERY_READINESS_TTL_MS = 60_000
 
 const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
   fin_accounts: `
@@ -92,6 +96,12 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
       subtotal NUMERIC NOT NULL,
       tax_rate NUMERIC,
       tax_amount NUMERIC NOT NULL,
+      tax_code STRING,
+      tax_rate_snapshot NUMERIC,
+      tax_amount_snapshot NUMERIC,
+      tax_snapshot_json JSON,
+      is_tax_exempt BOOL,
+      tax_snapshot_frozen_at TIMESTAMP,
       total_amount NUMERIC NOT NULL,
       exchange_rate_to_clp NUMERIC,
       total_amount_clp NUMERIC NOT NULL,
@@ -115,18 +125,35 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
     CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_expenses\` (
       expense_id STRING NOT NULL,
       client_id STRING,
+      space_id STRING,
       expense_type STRING NOT NULL,
+      source_type STRING,
       description STRING NOT NULL,
       currency STRING NOT NULL,
       subtotal NUMERIC NOT NULL,
       tax_rate NUMERIC,
       tax_amount NUMERIC,
+      tax_code STRING,
+      tax_recoverability STRING,
+      tax_rate_snapshot NUMERIC,
+      tax_amount_snapshot NUMERIC,
+      tax_snapshot_json JSON,
+      is_tax_exempt BOOL,
+      tax_snapshot_frozen_at TIMESTAMP,
+      recoverable_tax_amount NUMERIC,
+      recoverable_tax_amount_clp NUMERIC,
+      non_recoverable_tax_amount NUMERIC,
+      non_recoverable_tax_amount_clp NUMERIC,
+      effective_cost_amount NUMERIC,
+      effective_cost_amount_clp NUMERIC,
       total_amount NUMERIC NOT NULL,
       exchange_rate_to_clp NUMERIC,
       total_amount_clp NUMERIC NOT NULL,
       payment_date DATE,
       payment_status STRING NOT NULL,
       payment_method STRING,
+      payment_provider STRING,
+      payment_rail STRING,
       payment_account_id STRING,
       payment_reference STRING,
       document_number STRING,
@@ -139,6 +166,16 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
       payroll_entry_id STRING,
       member_id STRING,
       member_name STRING,
+      receipt_date DATE,
+      purchase_type STRING,
+      vat_unrecoverable_amount NUMERIC,
+      vat_fixed_assets_amount NUMERIC,
+      vat_common_use_amount NUMERIC,
+      dte_type_code STRING,
+      dte_folio STRING,
+      exempt_amount NUMERIC,
+      other_taxes_amount NUMERIC,
+      withholding_amount NUMERIC,
       social_security_type STRING,
       social_security_institution STRING,
       social_security_period STRING,
@@ -198,10 +235,43 @@ const FINANCE_COLUMN_REQUIREMENTS: Record<string, Record<string, string>> = {
     dte_type_code: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS dte_type_code STRING',
     dte_folio: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS dte_folio STRING',
     nubox_emitted_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_emitted_at TIMESTAMP',
-    nubox_last_synced_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_last_synced_at TIMESTAMP'
+    nubox_last_synced_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_last_synced_at TIMESTAMP',
+    tax_code: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_code STRING',
+    tax_rate_snapshot: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_rate_snapshot NUMERIC',
+    tax_amount_snapshot: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_amount_snapshot NUMERIC',
+    tax_snapshot_json: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_snapshot_json JSON',
+    is_tax_exempt: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS is_tax_exempt BOOL',
+    tax_snapshot_frozen_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS tax_snapshot_frozen_at TIMESTAMP'
   },
   fin_expenses: {
     client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS client_id STRING',
+    space_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS space_id STRING',
+    source_type: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS source_type STRING',
+    tax_code: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS tax_code STRING',
+    tax_recoverability: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS tax_recoverability STRING',
+    tax_rate_snapshot: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS tax_rate_snapshot NUMERIC',
+    tax_amount_snapshot: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS tax_amount_snapshot NUMERIC',
+    tax_snapshot_json: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS tax_snapshot_json JSON',
+    is_tax_exempt: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS is_tax_exempt BOOL',
+    tax_snapshot_frozen_at: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS tax_snapshot_frozen_at TIMESTAMP',
+    recoverable_tax_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS recoverable_tax_amount NUMERIC',
+    recoverable_tax_amount_clp: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS recoverable_tax_amount_clp NUMERIC',
+    non_recoverable_tax_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS non_recoverable_tax_amount NUMERIC',
+    non_recoverable_tax_amount_clp: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS non_recoverable_tax_amount_clp NUMERIC',
+    effective_cost_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS effective_cost_amount NUMERIC',
+    effective_cost_amount_clp: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS effective_cost_amount_clp NUMERIC',
+    payment_provider: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS payment_provider STRING',
+    payment_rail: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS payment_rail STRING',
+    receipt_date: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS receipt_date DATE',
+    purchase_type: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS purchase_type STRING',
+    vat_unrecoverable_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS vat_unrecoverable_amount NUMERIC',
+    vat_fixed_assets_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS vat_fixed_assets_amount NUMERIC',
+    vat_common_use_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS vat_common_use_amount NUMERIC',
+    dte_type_code: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS dte_type_code STRING',
+    dte_folio: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS dte_folio STRING',
+    exempt_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS exempt_amount NUMERIC',
+    other_taxes_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS other_taxes_amount NUMERIC',
+    withholding_amount: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS withholding_amount NUMERIC',
     nubox_purchase_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_purchase_id STRING',
     nubox_document_status: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_document_status STRING',
     nubox_supplier_rut: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_supplier_rut STRING',
@@ -263,6 +333,79 @@ const getExistingFinanceColumns = async (projectId: string) => {
   })
 
   return new Set((rows as Array<{ table_name: string; column_name: string }>).map(row => `${row.table_name}.${row.column_name}`))
+}
+
+type FinanceBigQueryTableName = keyof typeof FINANCE_TABLE_DEFINITIONS
+
+type AssertFinanceBigQueryReadinessOptions = {
+  tables: FinanceBigQueryTableName[]
+  includeRequiredColumns?: boolean
+}
+
+const getFinanceReadinessKey = (tables: FinanceBigQueryTableName[], includeRequiredColumns: boolean) =>
+  `${includeRequiredColumns ? 'with-columns' : 'tables-only'}:${[...new Set(tables)].sort().join(',')}`
+
+export const assertFinanceBigQueryReadiness = async ({
+  tables,
+  includeRequiredColumns = true
+}: AssertFinanceBigQueryReadinessOptions) => {
+  const normalizedTables = [...new Set(tables)].sort() as FinanceBigQueryTableName[]
+
+  if (normalizedTables.length === 0) {
+    return
+  }
+
+  const cacheKey = getFinanceReadinessKey(normalizedTables, includeRequiredColumns)
+  const cachedAt = financeBigQueryReadinessCache.get(cacheKey) ?? 0
+
+  if (Date.now() - cachedAt < FINANCE_BIGQUERY_READINESS_TTL_MS) {
+    return
+  }
+
+  const existingPromise = financeBigQueryReadinessPromises.get(cacheKey)
+
+  if (existingPromise) {
+    return existingPromise
+  }
+
+  const readinessPromise = (async () => {
+    const projectId = getBigQueryProjectId()
+    const existingTables = await getExistingFinanceTables(projectId)
+
+    const missingTables = normalizedTables.filter(tableName => !existingTables.has(tableName))
+
+    let missingColumns: string[] = []
+
+    if (includeRequiredColumns && missingTables.length === 0) {
+      const existingColumns = await getExistingFinanceColumns(projectId)
+
+      missingColumns = normalizedTables.flatMap(tableName =>
+        Object.keys(FINANCE_COLUMN_REQUIREMENTS[tableName] ?? {}).filter(
+          columnName => !existingColumns.has(`${tableName}.${columnName}`)
+        ).map(columnName => `${tableName}.${columnName}`)
+      )
+    }
+
+    if (missingTables.length > 0 || missingColumns.length > 0) {
+      throw new FinanceValidationError(
+        'Finance BigQuery legacy schema is not ready for runtime reads. Run the explicit Finance provisioning lane before using the BigQuery fallback.',
+        503,
+        { missingTables, missingColumns },
+        'FINANCE_BIGQUERY_SCHEMA_NOT_READY'
+      )
+    }
+
+    financeBigQueryReadinessCache.set(cacheKey, Date.now())
+  })().catch(error => {
+    financeBigQueryReadinessCache.delete(cacheKey)
+    throw error
+  }).finally(() => {
+    financeBigQueryReadinessPromises.delete(cacheKey)
+  })
+
+  financeBigQueryReadinessPromises.set(cacheKey, readinessPromise)
+
+  return readinessPromise
 }
 
 const ensureFinanceManagerRole = async (projectId: string) => {

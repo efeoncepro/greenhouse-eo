@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -42,6 +42,12 @@ interface AccountRow {
   current_balance: unknown
   balance_as_of: unknown
   balance_source: string
+}
+
+type CurrentBalanceSnapshot = {
+  currentBalance: number
+  balanceAsOf: string | null
+  balanceSource: string
 }
 
 const normalizeAccount = (row: AccountRow) => ({
@@ -144,11 +150,28 @@ const getCurrentBalanceMap = async () => {
     console.warn('[finance/accounts] current balance enrichment failed, falling back to opening balances:', error instanceof Error ? error.message : error)
 
     return {
-      statementMap: new Map<string, { currentBalance: number; balanceAsOf: string | null; balanceSource: string }>(),
-      periodMap: new Map<string, { currentBalance: number; balanceAsOf: string | null; balanceSource: string }>()
+      statementMap: new Map<string, CurrentBalanceSnapshot>(),
+      periodMap: new Map<string, CurrentBalanceSnapshot>()
     }
   }
 }
+
+const applyCurrentBalanceEnrichment = <T extends { accountId: string; openingBalance: number; openingBalanceDate: string | null }>(
+  accounts: T[],
+  statementMap: Map<string, CurrentBalanceSnapshot>,
+  periodMap: Map<string, CurrentBalanceSnapshot>
+) =>
+  accounts.map(account => {
+    const statementBalance = statementMap.get(account.accountId)
+    const periodBalance = periodMap.get(account.accountId)
+
+    return {
+      ...account,
+      currentBalance: statementBalance?.currentBalance ?? periodBalance?.currentBalance ?? account.openingBalance,
+      balanceAsOf: statementBalance?.balanceAsOf ?? periodBalance?.balanceAsOf ?? account.openingBalanceDate,
+      balanceSource: statementBalance ? 'statement' : periodBalance ? 'period_close' : 'opening_balance'
+    }
+  })
 
 export async function GET() {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -164,17 +187,7 @@ export async function GET() {
     // Enrich with current balance from BigQuery reconciliation data
     const { statementMap, periodMap } = await getCurrentBalanceMap()
 
-    const enriched = accounts.map(account => {
-      const statementBalance = statementMap.get(account.accountId)
-      const periodBalance = periodMap.get(account.accountId)
-
-      return {
-        ...account,
-        currentBalance: statementBalance?.currentBalance ?? periodBalance?.currentBalance ?? account.openingBalance,
-        balanceAsOf: statementBalance?.balanceAsOf ?? periodBalance?.balanceAsOf ?? account.openingBalanceDate,
-        balanceSource: statementBalance ? 'statement' : periodBalance ? 'period_close' : 'opening_balance'
-      }
-    })
+    const enriched = applyCurrentBalanceEnrichment(accounts, statementMap, periodMap)
 
     return NextResponse.json({
       items: enriched,
@@ -188,63 +201,30 @@ export async function GET() {
 
   // ── BigQuery fallback ──
   {
-    await ensureFinanceInfrastructure()
+    await assertFinanceBigQueryReadiness({ tables: ['fin_accounts'] })
 
     const projectId = getFinanceProjectId()
 
     const rows = await runFinanceQuery<AccountRow>(`
-      WITH latest_statement_balance AS (
-        SELECT
-          period.account_id,
-          statement_row.balance AS current_balance,
-          COALESCE(statement_row.value_date, statement_row.transaction_date) AS balance_as_of,
-          ROW_NUMBER() OVER (
-            PARTITION BY period.account_id
-            ORDER BY COALESCE(statement_row.value_date, statement_row.transaction_date) DESC, statement_row.created_at DESC, statement_row.row_id DESC
-          ) AS row_number
-        FROM \`${projectId}.greenhouse.fin_bank_statement_rows\` AS statement_row
-        INNER JOIN \`${projectId}.greenhouse.fin_reconciliation_periods\` period
-          ON period.period_id = statement_row.period_id
-        WHERE statement_row.balance IS NOT NULL
-      ),
-      latest_period_close AS (
-        SELECT
-          account_id,
-          closing_balance_bank AS current_balance,
-          DATE_SUB(DATE_ADD(DATE(year, month, 1), INTERVAL 1 MONTH), INTERVAL 1 DAY) AS balance_as_of,
-          ROW_NUMBER() OVER (
-            PARTITION BY account_id
-            ORDER BY year DESC, month DESC, updated_at DESC, period_id DESC
-          ) AS row_number
-        FROM \`${projectId}.greenhouse.fin_reconciliation_periods\`
-        WHERE closing_balance_bank IS NOT NULL
-      )
       SELECT
-        account.account_id, account.account_name, account.bank_name, account.account_number,
-        account.currency, account.account_type, account.country, account.is_active,
-        account.opening_balance, account.opening_balance_date, account.notes,
-        account.created_at, account.updated_at,
-        COALESCE(statement_balance.current_balance, period_close.current_balance, account.opening_balance) AS current_balance,
-        COALESCE(statement_balance.balance_as_of, period_close.balance_as_of, account.opening_balance_date) AS balance_as_of,
-        CASE
-          WHEN statement_balance.current_balance IS NOT NULL THEN 'statement'
-          WHEN period_close.current_balance IS NOT NULL THEN 'period_close'
-          ELSE 'opening_balance'
-        END AS balance_source
-      FROM \`${projectId}.greenhouse.fin_accounts\` AS account
-      LEFT JOIN latest_statement_balance AS statement_balance
-        ON statement_balance.account_id = account.account_id
-        AND statement_balance.row_number = 1
-      LEFT JOIN latest_period_close AS period_close
-        ON period_close.account_id = account.account_id
-        AND period_close.row_number = 1
-      WHERE account.is_active = TRUE
-      ORDER BY account.account_name ASC
+        account_id, account_name, bank_name, account_number,
+        currency, account_type, country, is_active,
+        opening_balance, opening_balance_date, notes,
+        created_at, updated_at,
+        opening_balance AS current_balance,
+        opening_balance_date AS balance_as_of,
+        'opening_balance' AS balance_source
+      FROM \`${projectId}.greenhouse.fin_accounts\`
+      WHERE is_active = TRUE
+      ORDER BY account_name ASC
     `)
 
+    const { statementMap, periodMap } = await getCurrentBalanceMap()
+    const enriched = applyCurrentBalanceEnrichment(rows.map(normalizeAccount), statementMap, periodMap)
+
     return NextResponse.json({
-      items: rows.map(normalizeAccount),
-      total: rows.length
+      items: enriched,
+      total: enriched.length
     })
   }
 }

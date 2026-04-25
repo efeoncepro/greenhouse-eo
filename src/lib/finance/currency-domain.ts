@@ -164,9 +164,18 @@ export interface FxReadiness {
   /** Staleness threshold applied by this domain (days). */
   stalenessThresholdDays: number
 
-  /** When true, the rate was derived by composing `from→USD→to` because no
-   *  direct row existed. UI should surface this as a transparency note. */
+  /** When true, the rate was derived by composing via USD as the pivot hub
+   *  (`from → USD → to`). Kept for backwards-compatibility with consumers
+   *  that only know the USD-hub case (PDF footer, quotation snapshot). For
+   *  non-USD hubs (e.g. CLF composed via CLP) this is `false` and the real
+   *  hub is exposed in `compositionHub`. */
   composedViaUsd: boolean
+
+  /** The pivot currency used to compose the rate when direct lookup missed.
+   *  Null when the rate was direct, inverse, or identity. Non-null examples:
+   *   - `'USD'` for COP/MXN/PEN cross pairs (and where `composedViaUsd = true`)
+   *   - `'CLP'` for CLF pairs (UF is CLP-indexed; there is no direct USD↔CLF) */
+  compositionHub: string | null
 
   /** Human-readable message in Spanish for UI consumption. */
   message: string

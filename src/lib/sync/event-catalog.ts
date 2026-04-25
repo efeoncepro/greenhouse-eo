@@ -12,6 +12,7 @@ export const AGGREGATE_TYPES = {
   financeSettlementLeg: 'finance_settlement_leg',
   financeReconciliationPeriod: 'finance_reconciliation_period',
   economicIndicator: 'economic_indicator',
+  vatPosition: 'vat_position',
   provider: 'provider',
   providerToolingSnapshot: 'provider_tooling_snapshot',
 
@@ -54,6 +55,11 @@ export const AGGREGATE_TYPES = {
   membership: 'membership',
   crmCompany: 'crm_company',
   personLegalEntityRelationship: 'person_legal_entity_relationship',
+
+  // Commercial Party Lifecycle (TASK-535)
+  commercialParty: 'commercial_party',
+  commercialClient: 'commercial_client',
+  commercialOperation: 'commercial_operation',
 
   // HR Core / People
   member: 'member',
@@ -99,13 +105,17 @@ export const AGGREGATE_TYPES = {
   // Commercial Quotation (canonical, TASK-347 cutover)
   quotation: 'quotation',
   quotationLineItem: 'quotation_line_item',
+  quotationLineCostOverride: 'quotation_line_cost_override',
   commercialCapacity: 'commercial_capacity',
   contract: 'contract',
   contractQuote: 'contract_quote',
   masterAgreement: 'master_agreement',
   deal: 'deal',
+  pricingCatalogApproval: 'pricing_catalog_approval',
   productCatalog: 'product_catalog',
+  productSyncConflict: 'product_sync_conflict',
   sellableRole: 'sellable_role',
+  overheadAddon: 'overhead_addon',
   employmentType: 'employment_type',
 
   // Products (legacy finance namespace)
@@ -124,8 +134,10 @@ export const AGGREGATE_TYPES = {
   // Cost Intelligence
   periodClosure: 'period_closure',
   commercialCostAttribution: 'commercial_cost_attribution',
+  serviceAttribution: 'service_attribution',
   operationalPl: 'operational_pl',
   marginAlert: 'margin_alert',
+  marginFeedback: 'margin_feedback',
   commercialCostBasis: 'commercial_cost_basis',
   staffAugPlacement: 'staff_aug_placement',
   staffAugOnboardingItem: 'staff_aug_onboarding_item',
@@ -165,6 +177,15 @@ export const EVENT_TYPES = {
   // Account 360
   organizationCreated: 'organization.created',
   organizationUpdated: 'organization.updated',
+
+  // Commercial Party Lifecycle (TASK-535)
+  commercialPartyCreated: 'commercial.party.created',
+  commercialPartyPromoted: 'commercial.party.promoted',
+  commercialPartyDemoted: 'commercial.party.demoted',
+  commercialPartyLifecycleBackfilled: 'commercial.party.lifecycle_backfilled',
+  commercialClientInstantiated: 'commercial.client.instantiated',
+  commercialPartyHubSpotSyncedOut: 'commercial.party.hubspot_synced_out',
+  commercialPartySyncConflict: 'commercial.party.sync_conflict',
   membershipCreated: 'membership.created',
   membershipUpdated: 'membership.updated',
   membershipDeactivated: 'membership.deactivated',
@@ -216,8 +237,14 @@ export const EVENT_TYPES = {
   // Finance
   financeIncomeCreated: 'finance.income.created',
   financeIncomeUpdated: 'finance.income.updated',
+  financeIncomeNuboxSynced: 'finance.income.nubox_synced',
+  financeIncomeHubspotSynced: 'finance.income.hubspot_synced',
+  financeIncomeHubspotSyncFailed: 'finance.income.hubspot_sync_failed',
+  financeIncomeHubspotArtifactAttached: 'finance.income.hubspot_artifact_attached',
   financeExpenseCreated: 'finance.expense.created',
   financeExpenseUpdated: 'finance.expense.updated',
+  financeExpenseNuboxSynced: 'finance.expense.nubox_synced',
+  financeVatPositionPeriodMaterialized: 'finance.vat_position.period_materialized',
   financeShareholderAccountCreated: 'finance.shareholder_account.created',
   financeShareholderAccountMovementRecorded: 'finance.shareholder_account_movement.recorded',
   financeSupplierCreated: 'finance.supplier.created',
@@ -338,6 +365,7 @@ export const EVENT_TYPES = {
   // Commercial Quotation (canonical, TASK-347)
   // Emitted alongside finance.quote.* during cutover so consumers can migrate gradually.
   quotationCreated: 'commercial.quotation.created',
+  quotationUpdated: 'commercial.quotation.updated',
   quotationSynced: 'commercial.quotation.synced',
   quotationConverted: 'commercial.quotation.converted',
   quotationLineItemsSynced: 'commercial.quotation.line_items_synced',
@@ -346,9 +374,18 @@ export const EVENT_TYPES = {
   // Commercial Deals (TASK-453)
   dealSynced: 'commercial.deal.synced',
   dealCreated: 'commercial.deal.created',
+  dealCreatedFromGreenhouse: 'commercial.deal.created_from_greenhouse',
+  dealCreateRequested: 'commercial.deal.create_requested',
+  dealCreateApprovalRequested: 'commercial.deal.create_approval_requested',
   dealStageChanged: 'commercial.deal.stage_changed',
   dealWon: 'commercial.deal.won',
   dealLost: 'commercial.deal.lost',
+
+  // Commercial Quote-to-Cash choreography (TASK-541, Fase G)
+  quoteToCashStarted: 'commercial.quote_to_cash.started',
+  quoteToCashCompleted: 'commercial.quote_to_cash.completed',
+  quoteToCashFailed: 'commercial.quote_to_cash.failed',
+  quoteToCashApprovalRequested: 'commercial.quote_to_cash.approval_requested',
 
   // Commercial Quotation Governance (TASK-348)
   quotationVersionCreated: 'commercial.quotation.version_created',
@@ -382,6 +419,11 @@ export const EVENT_TYPES = {
   contractCompleted: 'commercial.contract.completed',
   contractRenewalDue: 'commercial.contract.renewal_due',
   contractProfitabilityMaterialized: 'commercial.contract.profitability_materialized',
+
+  // Margin Feedback Loop (TASK-482) — batch-level convergence of the
+  // quotation + contract profitability snapshots plus calibration signals
+  // for downstream cost basis recalibration.
+  marginFeedbackBatchCompleted: 'commercial.margin_feedback.batch_completed',
   masterAgreementCreated: 'commercial.master_agreement.created',
   masterAgreementUpdated: 'commercial.master_agreement.updated',
   masterAgreementClausesChanged: 'commercial.master_agreement.clauses_changed',
@@ -391,16 +433,45 @@ export const EVENT_TYPES = {
   quotationPushedToHubSpot: 'commercial.quotation.pushed_to_hubspot',
   quotationHubSpotSyncFailed: 'commercial.quotation.hubspot_sync_failed',
 
+  // Quote Builder Suggested Cost Override Governance (TASK-481)
+  quotationLineCostOverridden: 'commercial.quotation_line.cost_overridden',
+
+  // Pricing Catalog Approvals (TASK-550)
+  pricingCatalogApprovalProposed: 'commercial.pricing_catalog_approval.proposed',
+  pricingCatalogApprovalDecided: 'commercial.pricing_catalog_approval.decided',
+
   // Products (legacy finance namespace)
   productSynced: 'finance.product.synced',
   productCreated: 'finance.product.created',
 
-  // Commercial Product Catalog (canonical, TASK-347)
+  // Commercial Product Catalog (canonical, TASK-347 + TASK-545 sync foundation)
   productCatalogSynced: 'commercial.product_catalog.synced',
   productCatalogCreated: 'commercial.product_catalog.created',
+  productCatalogUpdated: 'commercial.product_catalog.updated',
+  productCatalogArchived: 'commercial.product_catalog.archived',
+  productCatalogUnarchived: 'commercial.product_catalog.unarchived',
+
+  // Product Catalog HubSpot Outbound (TASK-547)
+  productHubSpotSynced: 'commercial.product.hubspot_synced_out',
+  productHubSpotSyncFailed: 'commercial.product.hubspot_sync_failed',
+  productSyncConflictDetected: 'commercial.product_sync_conflict.detected',
+  productSyncConflictResolved: 'commercial.product_sync_conflict.resolved',
   sellableRoleCreated: 'commercial.sellable_role.created',
+  sellableRoleUpdated: 'commercial.sellable_role.updated',
   sellableRoleCostUpdated: 'commercial.sellable_role.cost_updated',
   sellableRolePricingUpdated: 'commercial.sellable_role.pricing_updated',
+  sellableRoleDeactivated: 'commercial.sellable_role.deactivated',
+  sellableRoleReactivated: 'commercial.sellable_role.reactivated',
+
+  // AI Tool lifecycle (deactivation added in TASK-546 Fase B)
+  aiToolDeactivated: 'ai_tool.deactivated',
+  aiToolReactivated: 'ai_tool.reactivated',
+
+  // Overhead Addon lifecycle (publishers added in TASK-546 Fase B)
+  overheadAddonCreated: 'commercial.overhead_addon.created',
+  overheadAddonUpdated: 'commercial.overhead_addon.updated',
+  overheadAddonDeactivated: 'commercial.overhead_addon.deactivated',
+  overheadAddonReactivated: 'commercial.overhead_addon.reactivated',
 
   // Purchase Orders & HES
   purchaseOrderCreated: 'finance.purchase_order.created',
@@ -440,6 +511,7 @@ export const EVENT_TYPES = {
   accountingPeriodReopened: 'accounting.period_reopened',
   accountingCommercialCostAttributionMaterialized: 'accounting.commercial_cost_attribution.materialized',
   accountingCommercialCostAttributionPeriodMaterialized: 'accounting.commercial_cost_attribution.period_materialized',
+  accountingServiceAttributionPeriodMaterialized: 'accounting.service_attribution.period_materialized',
   accountingPlSnapshotMaterialized: 'accounting.pl_snapshot.materialized',
   accountingPlSnapshotPeriodMaterialized: 'accounting.pl_snapshot.period_materialized',
   accountingMarginAlertTriggered: 'accounting.margin_alert.triggered',

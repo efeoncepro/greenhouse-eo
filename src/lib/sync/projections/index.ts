@@ -19,6 +19,7 @@ import { payrollReceiptsProjection } from './payroll-receipts'
 import { payrollExportReadyProjection } from './payroll-export-ready'
 import { periodClosureStatusProjection } from './period-closure-status'
 import { commercialCostAttributionProjection } from './commercial-cost-attribution'
+import { serviceAttributionProjection } from './service-attribution'
 import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
@@ -34,6 +35,16 @@ import { quotationProfitabilityProjection } from './quotation-profitability'
 import { quotationHubSpotOutboundProjection } from './quotation-hubspot-outbound'
 import { dealPipelineProjection } from './deal-pipeline'
 import { contractMrrArrProjection } from './contract-mrr-arr'
+import { sourceToProductCatalogProjection } from './source-to-product-catalog'
+import { productHubSpotOutboundProjection } from './product-hubspot-outbound'
+import { incomeHubSpotOutboundProjection } from './income-hubspot-outbound'
+import { quoteToCashAutopromoterProjection } from './quote-to-cash-autopromoter'
+import { vatMonthlyPositionProjection } from './vat-monthly-position'
+import { partyHubSpotOutboundProjection } from './party-hubspot-outbound'
+import { partyLifecycleSnapshotProjection } from './party-lifecycle-snapshot'
+import { pricingCatalogApprovalNotifierProjection } from './pricing-catalog-approval-notifier'
+import { productCatalogPricesRecomputeProjection } from './product-catalog-prices-recompute'
+import { productCatalogPricesSyncProjection } from './product-catalog-prices-sync'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -68,6 +79,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(accountBalancesProjection)
   registerProjection(staffAugPlacementProjection)
   registerProjection(commercialCostAttributionProjection)
+  registerProjection(serviceAttributionProjection)
   registerProjection(operationalPlProjection)
   registerProjection(agencyPerformanceReportProjection)
   registerProjection(icoAiSignalsProjection)
@@ -78,4 +90,14 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(quotationHubSpotOutboundProjection)
   registerProjection(dealPipelineProjection)
   registerProjection(contractMrrArrProjection)
+  registerProjection(sourceToProductCatalogProjection)
+  registerProjection(productHubSpotOutboundProjection)
+  registerProjection(productCatalogPricesRecomputeProjection)
+  registerProjection(productCatalogPricesSyncProjection)
+  registerProjection(pricingCatalogApprovalNotifierProjection)
+  registerProjection(incomeHubSpotOutboundProjection)
+  registerProjection(partyHubSpotOutboundProjection)
+  registerProjection(partyLifecycleSnapshotProjection)
+  registerProjection(quoteToCashAutopromoterProjection)
+  registerProjection(vatMonthlyPositionProjection)
 }

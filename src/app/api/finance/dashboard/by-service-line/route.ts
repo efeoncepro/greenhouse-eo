@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { buildBusinessLineMap } from '@/lib/business-line/metadata'
 import { toIncomePaymentCashEntries } from '@/lib/finance/income-payments'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { assertFinanceBigQueryReadiness } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber } from '@/lib/finance/shared'
 import { isFinanceSlice2PostgresEnabled } from '@/lib/finance/postgres-store-slice2'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -48,7 +48,7 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
+  await assertFinanceBigQueryReadiness({ tables: ['fin_income', 'fin_expenses'] })
 
   const projectId = getFinanceProjectId()
 
@@ -72,7 +72,7 @@ export async function GET() {
         `SELECT
            service_line,
            cost_category,
-           COALESCE(SUM(total_amount_clp), 0) AS total_clp
+           COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_clp
          FROM greenhouse_finance.expenses
          WHERE cost_category IS NOT NULL
          GROUP BY service_line, cost_category`

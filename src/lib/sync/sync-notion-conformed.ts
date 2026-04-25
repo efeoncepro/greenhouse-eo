@@ -258,16 +258,36 @@ const buildRawStatusExpression = (columns: Set<string>) => {
   return 'CAST(NULL AS STRING)'
 }
 
-const buildRawTaskNameExpression = (columns: Set<string>) => {
-  const hasNombreDeTarea = columns.has('nombre_de_tarea')
-  const hasNombreDeLaTarea = columns.has('nombre_de_la_tarea')
+// Construye una expresión SQL que resuelve el título de una fila Notion
+// tolerando que la property title tenga distintos nombres por database
+// (p. ej. Efeonce usa "Nombre del proyecto" → `nombre_del_proyecto`; Sky
+// Airline usa "Project name" → `project_name`). La cascada selecciona la
+// primera columna NO-vacía entre los candidatos que realmente existan en
+// la tabla raw de BQ. NULLIF(TRIM(...),'') descarta strings en blanco.
+export const buildCoalescingTitleExpression = (
+  columns: Set<string>,
+  candidates: readonly string[]
+) => {
+  const applicable = candidates.filter(column => columns.has(column))
 
-  if (hasNombreDeTarea && hasNombreDeLaTarea) return 'COALESCE(nombre_de_tarea, nombre_de_la_tarea)'
-  if (hasNombreDeTarea) return 'nombre_de_tarea'
-  if (hasNombreDeLaTarea) return 'nombre_de_la_tarea'
+  if (applicable.length === 0) return 'CAST(NULL AS STRING)'
+  if (applicable.length === 1) return `NULLIF(TRIM(\`${applicable[0]}\`), '')`
 
-  return 'CAST(NULL AS STRING)'
+  return `COALESCE(${applicable.map(column => `NULLIF(TRIM(\`${column}\`), '')`).join(', ')})`
 }
+
+export const NOTION_PROJECT_TITLE_CANDIDATES = ['nombre_del_proyecto', 'project_name'] as const
+export const NOTION_TASK_TITLE_CANDIDATES = ['nombre_de_tarea', 'nombre_de_la_tarea'] as const
+export const NOTION_SPRINT_TITLE_CANDIDATES = ['nombre_del_sprint', 'sprint_name'] as const
+
+const buildRawProjectNameExpression = (columns: Set<string>) =>
+  buildCoalescingTitleExpression(columns, NOTION_PROJECT_TITLE_CANDIDATES)
+
+const buildRawTaskNameExpression = (columns: Set<string>) =>
+  buildCoalescingTitleExpression(columns, NOTION_TASK_TITLE_CANDIDATES)
+
+const buildRawSprintNameExpression = (columns: Set<string>) =>
+  buildCoalescingTitleExpression(columns, NOTION_SPRINT_TITLE_CANDIDATES)
 
 const readTableColumns = async (dataset: string, table: string) => {
   const projectId = getBigQueryProjectId()
@@ -671,6 +691,83 @@ export const writeSyncConformedRunRecord = async ({
   }
 }
 
+// Emite un warning informativo (retryable=false) a source_sync_failures
+// cuando una fracción de filas no logró resolver el título después de
+// aplicar la cascada COALESCE sobre las columnas candidatas de Notion.
+// No es un fallo — es visibilidad: si aparece, significa que el tenant
+// tiene una property title con nombre que aún no está en la cascada, o
+// que hay pages realmente sin título en Notion.
+export const emitMissingTitleWarning = async ({
+  syncRunId,
+  surface,
+  spaceId,
+  count,
+  samplePageIds
+}: {
+  syncRunId: string
+  surface: 'delivery_projects' | 'delivery_tasks' | 'delivery_sprints'
+  spaceId: string | null
+  count: number
+  samplePageIds: string[]
+}) => {
+  if (count <= 0) return
+
+  try {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_sync.source_sync_failures
+         (sync_failure_id, sync_run_id, source_system, source_object_type,
+          source_object_id, error_code, error_message, payload_json, retryable)
+       VALUES ($1, $2, 'notion', $3, $4, 'sync_warning_missing_title', $5, $6::jsonb, FALSE)`,
+      [
+        randomUUID(),
+        syncRunId,
+        surface,
+        spaceId,
+        `[${surface}] ${count} rows sin título resoluble tras cascada en space ${spaceId ?? 'null'}`,
+        JSON.stringify({
+          space_id: spaceId,
+          count,
+          sample_notion_page_ids: samplePageIds.slice(0, 5),
+          note: 'Cascada de título no resolvió ninguna columna candidata poblada. Revisar property title del space o agregar columna nueva a la cascada.'
+        })
+      ]
+    )
+  } catch {
+    // Non-critical observability write; do not fail the sync because of it.
+  }
+}
+
+const countMissingTitles = <T extends { project_name?: string | null; task_name?: string | null; sprint_name?: string | null; project_source_id?: string | null; task_source_id?: string | null; sprint_source_id?: string | null; space_id?: string | null }>(
+  rows: T[],
+  titleKey: 'project_name' | 'task_name' | 'sprint_name',
+  sourceIdKey: 'project_source_id' | 'task_source_id' | 'sprint_source_id'
+) => {
+  const perSpace = new Map<string | null, { count: number; sample: string[] }>()
+
+  for (const row of rows) {
+    const title = row[titleKey]
+
+    if (title !== null && title !== undefined && typeof title === 'string' && title.trim() !== '') continue
+
+    const key = row.space_id ?? null
+    const bucket = perSpace.get(key) ?? { count: 0, sample: [] }
+
+    bucket.count += 1
+
+    if (bucket.sample.length < 5) {
+      const sourceId = row[sourceIdKey]
+
+      if (typeof sourceId === 'string' && sourceId) {
+        bucket.sample.push(sourceId)
+      }
+    }
+
+    perSpace.set(key, bucket)
+  }
+
+  return perSpace
+}
+
 const uniqueSpaceIds = (spaceIds: Array<string | null | undefined>) =>
   Array.from(new Set(spaceIds.filter((spaceId): spaceId is string => Boolean(spaceId))))
 
@@ -948,8 +1045,15 @@ export const syncNotionToConformed = async (input?: {
       spaceIds: targetSpaceIds
     })
 
-    const taskColumns = await readTableColumns('notion_ops', 'tareas')
+    const [projectColumns, taskColumns, sprintColumns] = await Promise.all([
+      readTableColumns('notion_ops', 'proyectos'),
+      readTableColumns('notion_ops', 'tareas'),
+      readTableColumns('notion_ops', 'sprints')
+    ])
+
+    const rawProjectNameExpression = buildRawProjectNameExpression(projectColumns)
     const rawTaskNameExpression = buildRawTaskNameExpression(taskColumns)
+    const rawSprintNameExpression = buildRawSprintNameExpression(sprintColumns)
     const rawTaskStatusExpression = buildRawStatusExpression(taskColumns)
     const rawAssigneeIdsExpression = buildRawAssigneeIdsExpression(taskColumns)
 
@@ -965,7 +1069,8 @@ export const syncNotionToConformed = async (input?: {
     const [projects, tasks, sprints] = await Promise.all([
     runBigQuery<NotionProjectRow>(`
       SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
-             nombre_del_proyecto, resumen, estado, \`finalización\`, pct_on_time,
+             ${rawProjectNameExpression} AS nombre_del_proyecto,
+             resumen, estado, \`finalización\`, pct_on_time,
              prioridad, rpa_promedio, fechas, fechas_end, page_url, propietario_ids,
              business_unit
       FROM \`${projectId}.notion_ops.proyectos\`
@@ -996,7 +1101,8 @@ export const syncNotionToConformed = async (input?: {
     `),
     runBigQuery<NotionSprintRow>(`
       SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
-             nombre_del_sprint, estado_del_sprint, fechas, fechas_end,
+             ${rawSprintNameExpression} AS nombre_del_sprint,
+             estado_del_sprint, fechas, fechas_end,
              tareas_completadas, total_de_tareas, page_url
       FROM \`${projectId}.notion_ops.sprints\`
       WHERE notion_page_id IS NOT NULL${rawSourceSpaceFilterSql}
@@ -1059,7 +1165,7 @@ export const syncNotionToConformed = async (input?: {
       client_id: clientId,
       module_code: null as string | null,
       module_id: null as string | null,
-      project_name: toNullableString(row.nombre_del_proyecto) || 'Sin nombre',
+      project_name: toNullableString(row.nombre_del_proyecto),
       project_status: toNullableString(row.estado),
       project_summary: toNullableString(row.resumen),
       completion_label: toNullableString(row['finalización']),
@@ -1127,7 +1233,7 @@ export const syncNotionToConformed = async (input?: {
       client_id: clientId,
       module_code: null as string | null,
       module_id: null as string | null,
-      task_name: toNullableString(row.nombre_de_tarea) || 'Sin nombre',
+      task_name: toNullableString(row.nombre_de_tarea),
       task_status: toNullableString(row.estado),
       task_phase: toNullableString(row['priorización']),
       task_priority: toNullableString(row.prioridad),
@@ -1242,7 +1348,7 @@ export const syncNotionToConformed = async (input?: {
       project_source_id: sprintSourceId ? (sprintProjectMap.get(sprintSourceId) || null) : null,
       project_database_source_id: null as string | null,
       space_id: spaceId,
-      sprint_name: toNullableString(row.nombre_del_sprint) || 'Sin nombre',
+      sprint_name: toNullableString(row.nombre_del_sprint),
       sprint_status: toNullableString(row.estado_del_sprint),
       start_date: toDateValue(row.fechas),
       end_date: toDateValue(row.fechas_end),
@@ -1257,6 +1363,44 @@ export const syncNotionToConformed = async (input?: {
       synced_at: nowIso
     }
   })
+
+  // 5b. Emit observability warnings for rows where the title cascade did not
+  // resolve. This surfaces tenants with a title property named outside our
+  // cascade, or pages truly untitled in Notion. Writes to source_sync_failures
+  // with retryable=false (informational, not a real failure).
+  const projectMissingBySpace = countMissingTitles(deliveryProjects, 'project_name', 'project_source_id')
+  const taskMissingBySpace = countMissingTitles(deliveryTasks, 'task_name', 'task_source_id')
+  const sprintMissingBySpace = countMissingTitles(deliverySprints, 'sprint_name', 'sprint_source_id')
+
+  await Promise.all([
+    ...[...projectMissingBySpace.entries()].map(([spaceId, bucket]) =>
+      emitMissingTitleWarning({
+        syncRunId,
+        surface: 'delivery_projects',
+        spaceId,
+        count: bucket.count,
+        samplePageIds: bucket.sample
+      })
+    ),
+    ...[...taskMissingBySpace.entries()].map(([spaceId, bucket]) =>
+      emitMissingTitleWarning({
+        syncRunId,
+        surface: 'delivery_tasks',
+        spaceId,
+        count: bucket.count,
+        samplePageIds: bucket.sample
+      })
+    ),
+    ...[...sprintMissingBySpace.entries()].map(([spaceId, bucket]) =>
+      emitMissingTitleWarning({
+        syncRunId,
+        surface: 'delivery_sprints',
+        spaceId,
+        count: bucket.count,
+        samplePageIds: bucket.sample
+      })
+    )
+  ])
 
   // 6. Write to conformed layer (safe DELETE pattern)
   if (deliveryTasks.length === 0) {

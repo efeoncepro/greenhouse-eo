@@ -3,6 +3,7 @@
 import {
   forwardRef,
   useId,
+  useMemo,
   useRef,
   useState,
   type HTMLAttributes,
@@ -13,25 +14,32 @@ import {
 import Autocomplete from '@mui/material/Autocomplete'
 import type { AutocompleteCloseReason } from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import ButtonBase from '@mui/material/ButtonBase'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import InputAdornment from '@mui/material/InputAdornment'
 import InputBase from '@mui/material/InputBase'
 import Paper from '@mui/material/Paper'
+import type { PaperProps } from '@mui/material/Paper'
 import Popover from '@mui/material/Popover'
 import Popper from '@mui/material/Popper'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { alpha, styled } from '@mui/material/styles'
+import { alpha, styled, useTheme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles'
+import { visuallyHidden } from '@mui/utils'
 
-export type ContextChipStatus = 'empty' | 'filled' | 'invalid' | 'locked'
+export type ContextChipStatus = 'empty' | 'filled' | 'invalid' | 'locked' | 'blocking-empty'
+
+export type ContextChipProminence = 'primary' | 'inline'
 
 export interface ContextChipOption {
   value: string
   label: string
   secondary?: string
   disabled?: boolean
+  meta?: Record<string, unknown>
 }
 
 interface ContextChipCommonProps {
@@ -45,6 +53,31 @@ interface ContextChipCommonProps {
   errorMessage?: string | null
   testId?: string
   ariaLabel?: string
+
+  /**
+   * Visual prominence tier.
+   * - `primary` (default): full chip box, 44px touch target, for required/party-level context.
+   * - `inline`: no box, inline underline-on-hover, for secondary terms (business line, currency, duration, validity).
+   * Popover behavior is identical across tiers.
+   */
+  prominence?: ContextChipProminence
+
+  /** Micro-label shown below the chip when status='blocking-empty' (e.g. "Requerido"). */
+  requiredHint?: string
+
+  /**
+   * When true, the chip fills 100% of its parent width and drops the 40ch cap.
+   * Use only when wrapping the chip in a sized flex/grid cell that controls width.
+   * Only applies to `prominence='primary'`; ignored for `inline`.
+   */
+  fullWidth?: boolean
+}
+
+interface ContextChipPopoverNotice {
+  tone?: 'default' | 'info' | 'warning' | 'error'
+  message: string
+  actionLabel?: string
+  onAction?: () => void
 }
 
 interface ContextChipSelectProps extends ContextChipCommonProps {
@@ -52,10 +85,17 @@ interface ContextChipSelectProps extends ContextChipCommonProps {
   options: ContextChipOption[]
   selectedValue?: string | null
   onSelectChange: (value: string | null) => void
+  onOptionSelect?: (option: ContextChipOption | null) => void
   noOptionsText?: string
   loading?: boolean
   loadingText?: string
   searchPlaceholder?: string
+  inputValue?: string
+  onInputValueChange?: (value: string) => void
+  filterOptions?: (options: ContextChipOption[], inputValue: string) => ContextChipOption[]
+  renderOption?: (option: ContextChipOption) => ReactNode
+  popoverNotice?: ContextChipPopoverNotice
+  liveMessage?: string
 
   /** Popper width. Default 360. */
   popoverWidth?: number
@@ -89,6 +129,103 @@ const StyledSearchInput = styled(InputBase)(({ theme }) => ({
 }))
 
 /**
+ * Resolves the background tint color for the popover notice footer based on
+ * its semantic tone. Extracted to module scope for testability and to keep the
+ * render tree small.
+ */
+const resolveNoticeBackground = (
+  theme: Theme,
+  tone: ContextChipPopoverNotice['tone']
+): string => {
+  switch (tone) {
+    case 'error':
+      return alpha(theme.palette.error.main, 0.06)
+    case 'warning':
+      return alpha(theme.palette.warning.main, 0.08)
+    case 'info':
+      return alpha(theme.palette.info.main, 0.08)
+    default:
+      return alpha(theme.palette.text.primary, 0.03)
+  }
+}
+
+/**
+ * Props that the custom Autocomplete Paper accepts, in addition to the standard
+ * MUI `PaperProps`. `notice` is the data to render in the footer; `onAfterAction`
+ * is invoked after the footer's action fires, so the consumer (ContextChip) can
+ * close the popover.
+ */
+interface ContextChipPaperProps extends PaperProps {
+  notice?: ContextChipPopoverNotice
+  onAfterAction?: () => void
+}
+
+/**
+ * Custom Paper component for MUI Autocomplete that renders the popover listbox
+ * AND the optional notice footer inside the same absolutely-positioned Paper.
+ *
+ * This is necessary because MUI Autocomplete with `open disablePortal` renders
+ * its listbox Paper as absolutely positioned. A sibling element placed after
+ * the Autocomplete in static flow would be occluded by this absolute Paper.
+ * By injecting the notice inside the same Paper, both the listbox and notice
+ * share the same positioning context and stack correctly.
+ *
+ * `forwardRef` preserves MUI's ref-forwarding contract for focus management.
+ */
+const ContextChipAutocompletePaper = forwardRef<HTMLDivElement, ContextChipPaperProps>(
+  function ContextChipAutocompletePaper({ children, notice, onAfterAction, sx, ...paperRest }, ref) {
+    const theme = useTheme()
+
+    return (
+      <Paper
+        {...paperRest}
+        ref={ref}
+        sx={[
+          { boxShadow: 'none', borderRadius: 0, margin: 0, border: 'none' },
+          ...(Array.isArray(sx) ? sx : sx ? [sx] : [])
+        ]}
+      >
+        {children}
+        {notice ? (
+          <Stack
+            direction='row'
+            spacing={1}
+            alignItems='flex-start'
+            justifyContent='space-between'
+            sx={{
+              px: 1.5,
+              py: 1.25,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              backgroundColor: resolveNoticeBackground(theme, notice.tone)
+            }}
+          >
+            <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.4 }}>
+              {notice.message}
+            </Typography>
+            {notice.actionLabel && notice.onAction ? (
+              <Button
+                size='small'
+                variant='text'
+                color={notice.tone === 'error' ? 'error' : 'primary'}
+                onClick={event => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  notice.onAction?.()
+                  onAfterAction?.()
+                }}
+                sx={{ minWidth: 'auto', px: 0.75, alignSelf: 'center' }}
+              >
+                {notice.actionLabel}
+              </Button>
+            ) : null}
+          </Stack>
+        ) : null}
+      </Paper>
+    )
+  }
+)
+
+/**
  * Context chip — compact display + popover editor for one contextual field.
  *
  * Built on MUI's GitHub Picker pattern (Autocomplete with `open` forced true
@@ -113,14 +250,19 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
     disabled = false,
     errorMessage,
     testId,
-    ariaLabel
+    ariaLabel,
+    prominence = 'primary',
+    requiredHint,
+    fullWidth = false
   } = props
 
   const labelId = useId()
   const errorId = useId()
+  const liveRegionId = useId()
 
   const anchorRef = useRef<HTMLButtonElement | null>(null)
   const [open, setOpen] = useState(false)
+  const [internalInputValue, setInternalInputValue] = useState('')
 
   const status: ContextChipStatus = statusProp ?? (value ? 'filled' : 'empty')
   const isInteractive = status !== 'locked' && !disabled
@@ -146,6 +288,33 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
       ? props.options.find(o => o.value === props.selectedValue) ?? null
       : null
 
+  const inputValue = !isCustomMode(props) ? (props.inputValue ?? internalInputValue) : ''
+
+  // Notice to render inside the Autocomplete Paper footer. Only defined for
+  // select mode — custom mode has no listbox to pair a notice with.
+  const popoverNoticeForPaper = !isCustomMode(props) ? props.popoverNotice : undefined
+
+  // Memoize the PaperComponent so MUI Autocomplete doesn't re-mount the Paper
+  // (and re-focus the input) on every parent render. The memo key bakes in the
+  // notice + close handler because those drive the render output.
+  const autocompletePaperComponent = useMemo(() => {
+    const MemoizedPaper = forwardRef<HTMLDivElement, PaperProps>(function MemoizedPaper(
+      paperProps,
+      paperRef
+    ) {
+      return (
+        <ContextChipAutocompletePaper
+          {...paperProps}
+          ref={paperRef}
+          notice={popoverNoticeForPaper}
+          onAfterAction={handleClose}
+        />
+      )
+    })
+
+    return MemoizedPaper
+  }, [popoverNoticeForPaper])
+
   return (
     <>
       <ButtonBase
@@ -159,7 +328,9 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
         aria-haspopup={isCustomMode(props) ? 'dialog' : 'listbox'}
         aria-expanded={open}
         aria-label={ariaLabel ?? `${label}${value ? `: ${value}` : ''}`}
-        aria-describedby={errorMessage ? errorId : undefined}
+        aria-describedby={[errorMessage ? errorId : null, !isCustomMode(props) && props.liveMessage ? liveRegionId : null]
+          .filter(Boolean)
+          .join(' ') || undefined}
         aria-invalid={status === 'invalid'}
         aria-labelledby={labelId}
         aria-required={required}
@@ -170,37 +341,92 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           const isFilled = status === 'filled'
           const isInvalid = status === 'invalid'
           const isLocked = status === 'locked'
+          const isBlocking = status === 'blocking-empty'
+          const isInline = prominence === 'inline'
 
           const borderColor = isInvalid
             ? theme.palette.error.main
-            : isFilled || isOpen
-              ? theme.palette.primary.main
-              : alpha(theme.palette.divider, 1)
+            : isBlocking
+              ? theme.palette.warning.main
+              : isFilled || isOpen
+                ? theme.palette.primary.main
+                : alpha(theme.palette.divider, 1)
 
           const bgColor = isLocked
             ? theme.palette.action.disabledBackground
-            : isFilled
-              ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.18 : 0.08)
-              : isInvalid
-                ? alpha(theme.palette.error.main, 0.06)
-                : 'transparent'
+            : isBlocking
+              ? alpha(theme.palette.warning.main, 0.08)
+              : isFilled
+                ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.18 : 0.08)
+                : isInvalid
+                  ? alpha(theme.palette.error.main, 0.06)
+                  : 'transparent'
 
           const textColor = isFilled
             ? theme.palette.primary.main
             : isInvalid
               ? theme.palette.error.main
-              : isLocked
-                ? theme.palette.text.disabled
-                : theme.palette.text.primary
+              : isBlocking
+                ? theme.palette.warning.dark
+                : isLocked
+                  ? theme.palette.text.disabled
+                  : theme.palette.text.primary
 
+          // Inline prominence: no box, inline text with hover underline, same popover behavior.
+          if (isInline) {
+            return {
+              minHeight: 28,
+              minWidth: 0,
+              px: 0.5,
+              py: 0.25,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+              border: '1px solid transparent',
+              backgroundColor: 'transparent',
+              color: textColor,
+              display: 'inline-flex',
+              alignItems: 'baseline',
+              gap: 0.75,
+              textAlign: 'left',
+              transition: theme.transitions.create(['background-color', 'border-color'], {
+                duration: 200,
+                easing: 'cubic-bezier(0.2, 0, 0, 1)'
+              }),
+              '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+              '&:hover': isInteractive
+                ? {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    textDecoration: 'underline',
+                    textDecorationStyle: 'dotted',
+                    textDecorationColor: theme.palette.primary.main,
+                    textUnderlineOffset: 4
+                  }
+                : undefined,
+              '&.Mui-focusVisible': {
+                outline: `2px solid ${theme.palette.primary.main}`,
+                outlineOffset: 2
+              },
+              '&.Mui-disabled': { opacity: 1, pointerEvents: 'none' }
+            }
+          }
+
+          // Primary prominence: boxed chip (default).
           return {
-            minHeight: 40,
+            minHeight: 44,
             minWidth: 0,
-            maxWidth: 320,
-            px: 1.75,
-            py: 1,
-            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-            border: status === 'empty' ? `1px dashed ${borderColor}` : `1px solid ${borderColor}`,
+
+            // fullWidth makes the chip claim 100% of its parent flex/grid cell and
+            // drops the natural 40ch content-cap so a distributed-row layout can
+            // balance 3 chips across the strip instead of leaving dead space.
+            width: fullWidth ? '100%' : undefined,
+            maxWidth: fullWidth ? 'none' : '40ch',
+            px: 2,
+            py: 1.25,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+
+            // Solid border on all states (2026 enterprise — Linear, Stripe).
+            // Dashed empty borders read as "broken field"; solid + subtle
+            // divider alpha reads as "unpopulated field ready for input".
+            border: `1px solid ${borderColor}`,
             backgroundColor: bgColor,
             color: textColor,
             display: 'inline-flex',
@@ -208,13 +434,16 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             gap: 1,
             textAlign: 'left',
             transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform'], {
-              duration: theme.transitions.duration.shortest
+              duration: 200,
+              easing: 'cubic-bezier(0.2, 0, 0, 1)'
             }),
             '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
             '&:hover': isInteractive
               ? {
-                  borderColor: theme.palette.primary.main,
-                  backgroundColor: alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.14 : 0.06)
+                  borderColor: isBlocking ? theme.palette.warning.main : theme.palette.primary.main,
+                  backgroundColor: isBlocking
+                    ? alpha(theme.palette.warning.main, 0.12)
+                    : alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.14 : 0.06)
                 }
               : undefined,
             '&:active': isInteractive ? { transform: 'scale(0.98)' } : undefined,
@@ -226,63 +455,128 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           }
         }}
       >
-        <Box
-          component='i'
-          className={status === 'invalid' ? 'tabler-alert-triangle' : status === 'locked' ? 'tabler-lock' : icon}
-          aria-hidden='true'
-          sx={{ fontSize: 16, flexShrink: 0 }}
-        />
-        <Stack spacing={0} sx={{ minWidth: 0, flex: 1 }}>
-          <Typography
-            id={labelId}
-            variant='caption'
-            sx={{
-              lineHeight: 1.1,
-              fontWeight: 500,
-              color: 'inherit',
-              opacity: 0.7,
-              textTransform: 'none',
-              letterSpacing: 0,
-              fontSize: '0.6875rem'
-            }}
-          >
-            {label}
-            {required ? (
-              <Box component='span' aria-hidden='true' sx={{ color: 'error.main', ml: 0.25 }}>
-                *
-              </Box>
+        {prominence === 'inline' ? (
+          <>
+            <Box
+              component='i'
+              className={
+                status === 'invalid'
+                  ? 'tabler-alert-triangle'
+                  : status === 'blocking-empty'
+                    ? 'tabler-alert-circle'
+                    : status === 'locked'
+                      ? 'tabler-lock'
+                      : icon
+              }
+              aria-hidden='true'
+              sx={{ fontSize: 14, flexShrink: 0 }}
+            />
+            <Typography
+              id={labelId}
+              component='span'
+              variant='body2'
+              sx={{
+                fontWeight: status === 'filled' ? 500 : 400,
+                color: 'inherit',
+                lineHeight: 1.3,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+            >
+              {displayText}
+            </Typography>
+          </>
+        ) : (
+          <>
+            <Box
+              component='i'
+              className={
+                status === 'invalid'
+                  ? 'tabler-alert-triangle'
+                  : status === 'blocking-empty'
+                    ? 'tabler-alert-circle'
+                    : status === 'locked'
+                      ? 'tabler-lock'
+                      : icon
+              }
+              aria-hidden='true'
+              sx={{ fontSize: 16, flexShrink: 0 }}
+            />
+            <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
+              <Typography
+                id={labelId}
+                variant='caption'
+                sx={{
+                  lineHeight: 1.2,
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                  letterSpacing: 0
+                }}
+              >
+                {label}
+                {required ? (
+                  <Box component='span' aria-hidden='true' sx={{ color: 'error.main', ml: 0.25 }}>
+                    *
+                  </Box>
+                ) : null}
+              </Typography>
+              <Typography
+                variant={status === 'filled' ? 'subtitle1' : 'body1'}
+                sx={{
+                  fontWeight: status === 'filled' ? 500 : 400,
+                  color:
+                    status === 'empty' || status === 'blocking-empty' ? 'text.secondary' : 'inherit',
+                  lineHeight: 1.3,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  fontStyle: status === 'empty' ? 'italic' : 'normal'
+                }}
+              >
+                {status === 'blocking-empty' ? (
+                  <Box component='span' sx={{ color: 'warning.dark', fontWeight: 500 }}>
+                    {displayText}
+                  </Box>
+                ) : (
+                  displayText
+                )}
+              </Typography>
+            </Stack>
+            {status !== 'locked' ? (
+              <Box
+                component='i'
+                className='tabler-chevron-down'
+                aria-hidden='true'
+                sx={{
+                  fontSize: 16,
+                  flexShrink: 0,
+                  transition: 'transform 150ms ease-out',
+                  transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+                  '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+                }}
+              />
             ) : null}
-          </Typography>
-          <Typography
-            variant='body2'
-            sx={{
-              fontWeight: status === 'filled' ? 600 : 400,
-              color: status === 'empty' ? 'text.secondary' : 'inherit',
-              lineHeight: 1.2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontStyle: status === 'empty' ? 'italic' : 'normal'
-            }}
-          >
-            {displayText}
-          </Typography>
-        </Stack>
-        {status !== 'locked' ? (
-          <Box
-            component='i'
-            className='tabler-chevron-down'
-            aria-hidden='true'
-            sx={{
-              fontSize: 16,
-              flexShrink: 0,
-              transition: 'transform 150ms ease-out',
-              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-              '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
-            }}
-          />
-        ) : null}
+          </>
+        )}
       </ButtonBase>
+
+      {prominence === 'primary' && status === 'blocking-empty' && requiredHint ? (
+        <Typography
+          variant='caption'
+          component='span'
+          sx={{
+            display: 'block',
+            mt: 0.5,
+            color: 'warning.main',
+            fontWeight: 500,
+            lineHeight: 1.2
+          }}
+          aria-hidden='true'
+        >
+          {requiredHint}
+        </Typography>
+      ) : null}
 
       {errorMessage ? (
         <Tooltip
@@ -292,13 +586,16 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           placement='bottom-start'
           disableInteractive
         >
-          <span
-            id={errorId}
-            style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}
-          >
+          <Box component='span' id={errorId} sx={visuallyHidden}>
             {errorMessage}
-          </span>
+          </Box>
         </Tooltip>
+      ) : null}
+
+      {!isCustomMode(props) && props.liveMessage ? (
+        <Box id={liveRegionId} component='span' aria-live='polite' sx={visuallyHidden}>
+          {props.liveMessage}
+        </Box>
       ) : null}
 
       {isCustomMode(props) ? (
@@ -359,8 +656,17 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 disableCloseOnSelect={false}
                 autoHighlight
                 value={selectedOption ?? undefined}
+                inputValue={inputValue}
+                onInputChange={(_event, nextInputValue) => {
+                  if (props.onInputValueChange) {
+                    props.onInputValueChange(nextInputValue)
+                  } else {
+                    setInternalInputValue(nextInputValue)
+                  }
+                }}
                 onChange={(_event, newValue) => {
                   props.onSelectChange(newValue?.value ?? null)
+                  props.onOptionSelect?.(newValue ?? null)
                   handleClose()
                 }}
                 options={props.options}
@@ -371,6 +677,10 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 loadingText={props.loadingText ?? 'Cargando…'}
                 noOptionsText={props.noOptionsText ?? 'Sin resultados'}
                 filterOptions={(options, { inputValue }) => {
+                  if (props.filterOptions) {
+                    return props.filterOptions(options, inputValue)
+                  }
+
                   const query = inputValue.trim().toLowerCase()
 
                   if (!query) return options
@@ -395,27 +705,37 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                     }
                   />
                 )}
-                renderOption={(optionProps: HTMLAttributes<HTMLLIElement>, option) => (
-                  <li
-                    {...optionProps}
-                    key={option.value}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      gap: 2
-                    }}
-                  >
-                    <Typography variant='body2' sx={{ fontWeight: 500, lineHeight: 1.3, width: '100%' }}>
-                      {option.label}
-                    </Typography>
-                    {option.secondary ? (
-                      <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2, width: '100%' }}>
-                        {option.secondary}
+                renderOption={(optionProps: HTMLAttributes<HTMLLIElement>, option) => {
+                  const optionContent = props.renderOption ? (
+                    props.renderOption(option)
+                  ) : (
+                    <>
+                      <Typography variant='body2' sx={{ fontWeight: 500, lineHeight: 1.3, width: '100%' }}>
+                        {option.label}
                       </Typography>
-                    ) : null}
-                  </li>
-                )}
+                      {option.secondary ? (
+                        <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.2, width: '100%' }}>
+                          {option.secondary}
+                        </Typography>
+                      ) : null}
+                    </>
+                  )
+
+                  return (
+                    <li
+                      {...optionProps}
+                      key={option.value}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        gap: 2
+                      }}
+                    >
+                      {optionContent}
+                    </li>
+                  )
+                }}
                 slotProps={{
                   paper: {
                     sx: {
@@ -442,6 +762,12 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                     })
                   }
                 }}
+
+                // PaperComponent injects the popoverNotice footer INSIDE the
+                // Autocomplete's absolutely-positioned Paper so the notice sits
+                // below the listbox without being occluded by it in static flow.
+                // Memoized via `autocompletePaperComponent` above.
+                PaperComponent={autocompletePaperComponent}
               />
             </Paper>
           </ClickAwayListener>

@@ -3,7 +3,7 @@
  *
  * Usage:
  *   pnpm pg:connect                       # Start proxy
- *   HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL=https://hubspot-greenhouse-integration-183008134038.us-central1.run.app \
+ *   HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL=https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app \
  *     npx tsx --env-file=.env.local scripts/backfill-hubspot-products.ts
  *
  * Safe to run multiple times (idempotent via ON CONFLICT).

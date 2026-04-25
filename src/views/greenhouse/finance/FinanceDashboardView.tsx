@@ -57,6 +57,8 @@ import OptionMenu from '@core/components/option-menu'
 
 import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
+import VatMonthlyPositionCard from '@views/greenhouse/finance/components/VatMonthlyPositionCard'
+import type { VatMonthlyPositionPayload } from '@views/greenhouse/finance/components/vat-monthly-position-types'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
@@ -374,6 +376,7 @@ const FinanceDashboardView = () => {
   const [cashflow, setCashflow] = useState<CashflowData | null>(null)
   const [syncing, setSyncing] = useState(false)
   const [workingCapital, setWorkingCapital] = useState<{ dso: number | null; dpo: number | null; payrollToRevenueRatio: number | null }>({ dso: null, dpo: null, payrollToRevenueRatio: null })
+  const [vatPosition, setVatPosition] = useState<VatMonthlyPositionPayload | null>(null)
 
   const [nexaInsights, setNexaInsights] = useState<{
     insights: NexaInsightItem[]
@@ -390,7 +393,7 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes, nexaRes] = await Promise.all([
+      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes, nexaRes, vatPositionRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
         fetch('/api/finance/economic-indicators/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
@@ -401,7 +404,8 @@ const FinanceDashboardView = () => {
         fetch('/api/finance/nubox/sync-status', { cache: 'no-store' }),
         fetch('/api/finance/dashboard/cashflow', { cache: 'no-store' }),
         fetch('/api/finance/dashboard/summary', { cache: 'no-store' }),
-        fetch('/api/finance/intelligence/nexa-insights', { cache: 'no-store' })
+        fetch('/api/finance/intelligence/nexa-insights', { cache: 'no-store' }),
+        fetch('/api/finance/vat/monthly-position', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -518,6 +522,14 @@ const FinanceDashboardView = () => {
           lastAnalysis: typeof nexaData.lastAnalysis === 'string' ? nexaData.lastAnalysis : null,
           runStatus: nexaData.runStatus ?? null
         })
+      }
+
+      if (vatPositionRes.ok) {
+        setVatPosition(await vatPositionRes.json())
+      } else {
+        const d = await vatPositionRes.json().catch(() => ({}))
+
+        errors.push(`IVA mensual: ${d.error || vatPositionRes.status}`)
       }
     } catch (e) {
       errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
@@ -819,6 +831,13 @@ const FinanceDashboardView = () => {
           })()}
         </Grid>
       </Grid>
+
+      <VatMonthlyPositionCard
+        loading={loading}
+        position={vatPosition?.position ?? null}
+        recentPositions={vatPosition?.recentPositions ?? []}
+        entries={vatPosition?.entries ?? []}
+      />
 
       {/* Charts row */}
       <Grid container spacing={6}>
