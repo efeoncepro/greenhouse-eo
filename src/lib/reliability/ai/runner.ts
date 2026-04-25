@@ -128,7 +128,29 @@ const safeParseJson = (raw: string): AiOverviewResponse | null => {
     if (!VALID_SEVERITIES.has(parsed.overviewSeverity)) return null
     if (!Array.isArray(parsed.modules)) return null
 
-    return parsed as AiOverviewResponse
+    /**
+     * Normalizar cada modulo: si la IA omite `recommendedAction` o lo deja
+     * como string vacio, lo coercemos a null. Si falta `summary` pero el
+     * modulo tiene `severity` valida, descartamos el modulo individual sin
+     * tirar toda la respuesta.
+     */
+    const validModules = parsed.modules
+      .filter(
+        (m: { moduleKey?: unknown; severity?: unknown; summary?: unknown }) =>
+          typeof m.moduleKey === 'string' &&
+          typeof m.severity === 'string' &&
+          typeof m.summary === 'string' &&
+          m.summary.trim().length > 0
+      )
+      .map((m: { recommendedAction?: unknown; [k: string]: unknown }) => ({
+        ...m,
+        recommendedAction:
+          typeof m.recommendedAction === 'string' && m.recommendedAction.trim().length > 0
+            ? m.recommendedAction.trim()
+            : null
+      }))
+
+    return { ...parsed, modules: validModules } as AiOverviewResponse
   } catch {
     return null
   }
@@ -189,7 +211,8 @@ export const runReliabilityAiObserver = async ({
     config: {
       systemInstruction: systemPrompt,
       temperature: 0.1,
-      responseMimeType: 'application/json'
+      responseMimeType: 'application/json',
+      maxOutputTokens: 4096
     }
   })
 
@@ -208,6 +231,16 @@ export const runReliabilityAiObserver = async ({
   const parsed = safeParseJson(rawText)
 
   if (!parsed) {
+    /**
+     * Loguear el raw response truncado para auditar fallos de parser.
+     * Esto va a Cloud Logging — el sanitizer ya corrió antes de mandarlo
+     * al modelo, asi que el output deberia ser PII-safe (modulo lo que
+     * Gemini invente). Limitamos a 800 chars para no inflar logs.
+     */
+    console.error(
+      `[ai-observer] JSON parse failed — raw response (truncated 800 chars): ${rawText.slice(0, 800)}`
+    )
+
     return {
       summary: buildSummary(
         { sweepRunId, startedAt, triggeredBy, model },
