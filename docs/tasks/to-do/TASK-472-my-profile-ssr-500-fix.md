@@ -23,7 +23,7 @@
 
 Resolver el HTTP 500 que devuelve `/my/profile` en staging cuando se accede con agent headless (y probablemente con sesión humana normal también). El resto de páginas `/my/*` funcionan (payroll, performance, delivery, assignments, goals, leave, organization, evaluations) — el crash está aislado a `/my/profile`.
 
-Detectado 2026-04-19 durante smoke test E2E post-TASK-462. Documentado en `docs/issues/open/ISSUE-054-my-profile-500-staging.md`.
+Detectado 2026-04-19 durante smoke test E2E post-TASK-462. Documentado en `docs/issues/resolved/ISSUE-054-my-profile-500-staging.md`.
 
 ## Why This Task Exists
 
@@ -112,7 +112,7 @@ Agregar a la suite E2E:
 - [ ] Archivo a `complete/`
 - [ ] `docs/tasks/README.md` sincronizado
 - [ ] `Handoff.md` actualizado con el fix
-- [ ] `docs/issues/open/ISSUE-054-my-profile-500-staging.md` → mover a `docs/issues/resolved/` y actualizar issues README
+- [x] `docs/issues/resolved/ISSUE-054-my-profile-500-staging.md` documenta el cierre y el tracker quedó actualizado
 - [ ] Nota en ISSUE-054 del commit que lo resolvió
 
 ## Ownership sugerido

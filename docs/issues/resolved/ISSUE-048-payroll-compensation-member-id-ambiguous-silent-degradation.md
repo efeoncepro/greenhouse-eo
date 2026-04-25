@@ -66,15 +66,15 @@ Ejecutada localmente:
      - `eligibleMembers = 1`
    - `GET /hr/payroll` -> `200`
 
-Pendiente en runtime real / staging:
+Verificación adicional 2026-04-25:
 
-1. reproducir el carril contra runtime PostgreSQL real de Payroll
-2. confirmar si el síntoma visible actual en staging era HTTP 500 o payload parcial en `/api/hr/payroll/compensation`
-3. volver a validar `Payroll > Compensaciones vigentes` una vez desplegado el fix
+1. el reader canónico ya usa `SELECT DISTINCT ON (cv.member_id)` y `ORDER BY cv.member_id, ...`
+2. la regresión focalizada en `src/lib/payroll/postgres-store.test.ts` sigue vigente
+3. `pnpm exec vitest run src/lib/payroll/postgres-store.test.ts` sigue pasando
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

@@ -77,7 +77,7 @@ open
 
 ## Relacionado
 
-- `docs/issues/open/ISSUE-049-leave-review-modal-stale-actions-and-brittle-approval-policy.md`
+- `docs/issues/resolved/ISSUE-049-leave-review-modal-stale-actions-and-brittle-approval-policy.md`
 - `src/lib/sync/projections/notifications.ts`
 - `src/lib/email/delivery.ts`
 - `src/lib/resend.ts`

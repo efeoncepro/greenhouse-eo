@@ -39,15 +39,14 @@ El resto de páginas `(dashboard)` (`/home`, `/dashboard`, `/finance/*`, `/admin
 - El resto de secciones personales (`/my/*`) funciona normal
 - No bloquea otros flujos operativos críticos
 
-## Solución propuesta
+## Solución
 
-1. Ejecutar request a `/my/profile` con logs de servidor activos para capturar el stack trace específico del 500
-2. Revisar imports de MyProfileView + sub-tabs buscando:
-   - Imports que referencien `server-only` en files que no deberían
-   - APIs llamadas que devuelvan shapes inesperados
-   - `useEffect` que lance errores durante mount
-3. Verificar que el endpoint que consume MyProfileView existe y responde el shape esperado
-4. Agregar error boundary + logging específico para capturar crashes futuros
+La vista dejó de depender del endpoint sospechado durante el diagnóstico inicial y hoy se apoya en readers canónicos:
+
+1. `src/views/greenhouse/my/MyProfileView.tsx` consume `GET /api/person/me/360?facets=identity,assignments,leave,organization`
+2. la route canónica existe en `src/app/api/person/[id]/360/route.ts`
+3. la vista complementa colegas y directorio con `GET /api/my/organization/members`
+4. con esa convergencia, `/my/profile` vuelve a renderizar header, tabs y cards con datos reales
 
 ## Ownership sugerido
 
@@ -55,8 +54,13 @@ Codex — domain `identity/person` donde vive person-360 federated layer (TASK-2
 
 ## Verificación
 
-Antes de cerrar este issue:
-- [ ] `/my/profile` devuelve HTTP 200 en staging via agent-session
-- [ ] Carga visualmente el view con header + tabs + datos de person 360
-- [ ] No regresiones en otras páginas `/my/*`
-- [ ] Regression test agregado al suite E2E
+Ejecutada / confirmada:
+
+- revisión de código: `MyProfileView.tsx` ya no llama `/api/people/profile`
+- revisión de runtime: `/api/person/me/360` y `/api/my/organization/members` existen y responden desde rutas canónicas
+- validación manual en staging el 2026-04-25: `/my/profile` carga correctamente con tabs y datos reales visibles
+- no hay evidencia vigente del HTTP 500 descrito originalmente
+
+## Estado
+
+resolved

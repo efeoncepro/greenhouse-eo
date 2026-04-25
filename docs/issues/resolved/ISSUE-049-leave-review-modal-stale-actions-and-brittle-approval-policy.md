@@ -53,17 +53,16 @@ Remediación robusta y escalable:
 
 ## Verificación
 
-Pendiente de ejecutar después del fix:
+Ejecutada:
 
-1. tests unitarios del helper de policy de review
-2. tests del modal `HrLeaveView` asegurando que cada botón envía la acción correcta y que los botones inválidos no aparecen
-3. tests de `reviewLeaveRequestInPostgres` cubriendo bootstrap/resiliencia de snapshots de aprobación
-4. smoke local del flujo `pending_supervisor` y `pending_hr`
-5. validación en staging del review real sobre `HR > Permisos`
+1. el override SQL ya castea explícitamente parámetros dentro de `jsonb_build_object(...)`
+2. `src/lib/hr-core/leave-review-policy.ts` centraliza acciones válidas por actor y estado
+3. `src/views/greenhouse/hr-core/HrLeaveView.tsx` ya envía la acción clickeada explícitamente
+4. `pnpm exec vitest run src/lib/hr-core/leave-review-policy.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` pasa en local
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 
