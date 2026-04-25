@@ -36,6 +36,7 @@ RUN echo "" > /app/server-only-shim.js && \
     echo "export class NextResponse { static json(d,o){return{body:d,...o}} }" > /app/next-server-shim.js && \
     echo "export default function(){return{}} export function getServerSession(){return null}" > /app/next-auth-shim.js && \
     echo "export default function(){throw new Error('bcryptjs not available in ops-worker')} export function compare(){throw new Error('bcryptjs.compare not available in ops-worker')}" > /app/bcryptjs-shim.js && \
+    echo "export function getVercelOidcToken(){throw new Error('Vercel OIDC not available in ops-worker — use WIF')} export function getVercelOidcTokenSync(){throw new Error('Vercel OIDC not available in ops-worker — use WIF')}" > /app/vercel-oidc-shim.js && \
     esbuild services/ops-worker/server.ts \
       --bundle \
       --platform=node \
@@ -51,6 +52,7 @@ RUN echo "" > /app/server-only-shim.js && \
       --alias:next-auth/providers/google=./next-auth-shim.js \
       --alias:next-auth/next=./next-auth-shim.js \
       --alias:bcryptjs=./bcryptjs-shim.js \
+      --alias:@vercel/oidc=./vercel-oidc-shim.js \
       --alias:@=./src \
       --resolve-extensions=.ts,.tsx,.js,.json \
       --packages=external \
