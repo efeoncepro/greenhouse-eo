@@ -37,6 +37,30 @@ El programa no compite con `TASK-181` ni `TASK-191`; se monta sobre ellas.
 - `TASK-191` avanzó el cutover downstream de consumers financieros
 - `EPIC-008` ataca ahora el gap de surface, proyección y convergencia de experiencia
 
+## Sesion 2026-04-25 — TASK-614 registrada: hardening acotado de People / Payroll
+
+### Que cambio
+
+Se registró una task follow-up específica para el gap residual entre `People` y `Payroll`:
+
+- `docs/tasks/to-do/TASK-614-people-payroll-economy-facet-entitlements-hardening.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Decisión canónica explicitada
+
+En `People/Payroll` no se detectó una fractura equivalente a `Organizaciones/Clientes`.
+
+La dirección correcta ya existe y la task la endurece:
+
+- `People` sigue siendo el workspace canónico del colaborador
+- `Payroll` sigue siendo una superficie operativa especializada
+- el detail de payroll no debe bifurcarse en una experiencia paralela
+- la deuda real está en permisos finos, composición de `economy` y convergencia de readers transitorios
+
 ## Sesion 2026-04-25 — TASK-610 CERRADA: Sanitización shared Node-safe sin `jsdom`
 
 ### Que cambio
