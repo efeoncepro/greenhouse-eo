@@ -46,7 +46,6 @@ import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
-import { runReliabilityAiObserver } from '@/lib/reliability/ai/runner'
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
@@ -804,6 +803,13 @@ const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerRespons
   console.log(`[ops-worker] POST /reliability-ai-watch — triggeredBy=${triggeredBy}`)
 
   try {
+    /**
+     * Lazy import: el runner pulls a heavy tree (`getReliabilityOverview` →
+     * cloud/observability/billing/notion/sentry helpers). Si lo importamos
+     * top-level, cualquier evaluacion side-effect en esa cadena puede
+     * romper el boot del worker. Importarlo aqui aisla el costo al request.
+     */
+    const { runReliabilityAiObserver } = await import('@/lib/reliability/ai/runner')
     const result = await runReliabilityAiObserver({ triggeredBy })
 
     if (result.summary.skippedReason) {
