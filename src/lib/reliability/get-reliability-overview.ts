@@ -7,8 +7,10 @@ import {
   getOperationsOverview,
   type OperationsOverview
 } from '@/lib/operations/get-operations-overview'
+import { getFinanceSmokeLaneStatus } from '@/lib/reliability/finance/get-finance-smoke-lane-status'
 import { getLatestSyntheticSnapshotsByRoute } from '@/lib/reliability/synthetic/reader'
 import type { GcpBillingOverview } from '@/types/billing-export'
+import type { FinanceSmokeLaneStatus } from '@/types/finance-smoke-lane'
 import type {
   ReliabilityIntegrationBoundary,
   ReliabilityModuleSnapshot,
@@ -27,6 +29,7 @@ import {
 } from './severity'
 import {
   buildCloudSignals,
+  buildFinanceSmokeLaneSignals,
   buildGcpBillingSignals,
   buildNotionDataQualitySignals,
   buildNotionFreshnessSignal,
@@ -59,8 +62,8 @@ const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
     moduleKey: 'finance',
     expectedSignalKind: 'test_lane',
     expectedSource: 'getFinanceSmokeLaneStatus',
-    status: 'pending',
-    note: 'TASK-599 entregará smoke E2E de /finance/{expenses,clients,suppliers}. Enchufa como signal kind=test_lane.'
+    status: 'ready',
+    note: 'TASK-599 entregó 3 smoke specs Playwright (clients, suppliers, expenses) + reader que parsea artifacts/playwright/results.json + adapter buildFinanceSmokeLaneSignals.'
   },
   {
     taskId: 'TASK-632',
@@ -169,6 +172,7 @@ interface ReliabilityOverviewSources {
   billing?: GcpBillingOverview | null
   notionOperational?: NotionSyncOperationalOverview | null
   syntheticSnapshots?: SyntheticRouteSnapshot[] | null
+  financeSmokeLane?: FinanceSmokeLaneStatus | null
 }
 
 export const buildReliabilityOverview = (
@@ -186,7 +190,8 @@ export const buildReliabilityOverview = (
     ...(sources.billing ? buildGcpBillingSignals(sources.billing) : []),
     ...(sources.notionOperational ? [buildNotionFreshnessSignal(sources.notionOperational)] : []),
     ...buildSyntheticRouteSignals(syntheticSnapshots),
-    ...buildSyntheticModuleSignals(syntheticSnapshots)
+    ...buildSyntheticModuleSignals(syntheticSnapshots),
+    ...(sources.financeSmokeLane ? buildFinanceSmokeLaneSignals(sources.financeSmokeLane) : [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -299,5 +304,15 @@ export const getReliabilityOverview = async (
       ? preloadedSources.syntheticSnapshots
       : await getLatestSyntheticSnapshotsByRoute().catch(() => [])
 
-  return buildReliabilityOverview(operations, { billing, notionOperational, syntheticSnapshots })
+  const financeSmokeLane =
+    preloadedSources.financeSmokeLane !== undefined
+      ? preloadedSources.financeSmokeLane
+      : await getFinanceSmokeLaneStatus().catch(() => null)
+
+  return buildReliabilityOverview(operations, {
+    billing,
+    notionOperational,
+    syntheticSnapshots,
+    financeSmokeLane
+  })
 }

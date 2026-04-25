@@ -1,5 +1,61 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Finance Preventive Test Lane (TASK-599)
+
+### Que cambio
+
+Se entregaron los 3 niveles de defensa preventiva para Finance, cerrando el gap entre unit/route tests y detección tardía por Sentry. Adicionalmente se enchufó la señal `kind=test_lane` para módulo `finance` en el Reliability Control Plane.
+
+Archivos creados:
+
+- `tests/e2e/smoke/finance-clients.spec.ts` — smoke `/finance/clients`.
+- `tests/e2e/smoke/finance-suppliers.spec.ts` — smoke `/finance/suppliers`.
+- `tests/e2e/smoke/finance-expenses.spec.ts` — smoke `/finance/expenses`.
+- `src/views/greenhouse/finance/ExpensesListView.test.tsx` — 4 casos (success, empty, error API, network failure).
+- `src/views/greenhouse/finance/drawers/CreateExpenseDrawer.test.tsx` — 4 casos (open=false sin fetch, fetch /meta+/accounts, payload parcial no fatal, meta 500 no rompe drawer).
+- `src/types/finance-smoke-lane.ts` — contracts `FinanceSmokeLaneStatus`, `FinanceSmokeLaneSuite`, `FinanceSmokeLaneTotals`.
+- `src/lib/reliability/finance/get-finance-smoke-lane-status.ts` — reader que parsea `artifacts/playwright/results.json` con degradación honesta cuando no existe.
+
+Archivos modificados:
+
+- `src/lib/reliability/registry.ts` — `RELIABILITY_REGISTRY[finance].smokeTests` ahora incluye los 4 specs.
+- `src/lib/reliability/affected-modules.test.ts` — actualizado contador de specs finance.
+- `src/lib/reliability/signals.ts` — nuevo adapter `buildFinanceSmokeLaneSignals` (1 señal agregada + N por suite fallida).
+- `src/lib/reliability/get-reliability-overview.ts` — `sources.financeSmokeLane?` agregado, composer + auto-fetch tolerante. Boundary TASK-599 movido a status `ready`.
+- `src/app/api/finance/expenses/meta/route.test.ts` — 3 tests TASK-599 nuevos documentando slices críticos vs enrichment vs static.
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — sección "Preventive Test Lane (TASK-599)" con los 3 niveles.
+
+### Decisión canónica explicitada
+
+1. **No DB persistence en V1** — el reader lee `artifacts/playwright/results.json` directo cuando existe (CI workspace). Cuando no existe (runtime portal Vercel), degrada a `awaiting_data`. Persistencia DB queda como follow-up cuando aparezca el caso "histórico cross-CI".
+2. **Component tests focalizados en estados**, no en submit-flow completo del drawer — submit success/error requiere llenar todos los campos requeridos del form (brittle). Queda como follow-up.
+3. **Smoke specs reusan el patrón canónico** `gotoAuthenticated` + status<400 + body visible + ausencia de fatal text. NO depende de data específica → estable contra cualquier ambiente con Agent Auth.
+4. **Slices críticos vs enrichment documentados explícitamente** en route tests:
+   - Críticos (Postgres-first → BQ fallback): `suppliers`, `accounts`.
+   - Enrichment (degradan a empty/default sin tumbar): institutions, members, spaces, supplierToolLinks.
+   - Static (siempre presentes): paymentMethods, drawerTabs, etc.
+5. **Adapter signals.ts emite por suite fallida** además del agregado — así Admin Center muestra cuál spec específico está rojo, no solo "el lane está rojo".
+
+### Boundary movido a `ready`
+
+- TASK-599 / `finance.test_lane` → `ready` (era `pending`).
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (409 files / 2101 passed — 12 nuevos casos: 4 expenses + 4 drawer + 3 route + 1 affected-modules update)
+- `pnpm build` ✅
+- `pnpm test:e2e --grep finance` queda como validación manual cuando los secrets staging estén disponibles.
+
+### Siguiente
+
+- TASK-634 (correlador Sentry) puede consumir `route_path` + `filesOwned` para mapear `incident.location` → módulo correcto.
+- TASK-635 (registry persistence) sigue pull-trigger.
+- Component tests submit success/error en `CreateExpenseDrawer` cuando se necesite completar el form-flow (follow-up).
+- `RegisterCashOutDrawer` merece segunda ola de component tests siguiendo el mismo patrón.
+- Persistir `finance_smoke_lane_runs` en `source_sync_runs` cuando aparezca caso de uso "histórico cross-CI".
+
 ## Sesion 2026-04-25 — Reliability Change-Based Verification Matrix (TASK-633)
 
 ### Que cambio

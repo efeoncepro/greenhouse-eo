@@ -75,7 +75,10 @@ describe('mapModulesToSmokeSpecs', () => {
 
   it('returns smoke specs for finance', () => {
     expect(mapModulesToSmokeSpecs(['finance'])).toEqual([
-      'tests/e2e/smoke/finance-quotes.spec.ts'
+      'tests/e2e/smoke/finance-quotes.spec.ts',
+      'tests/e2e/smoke/finance-clients.spec.ts',
+      'tests/e2e/smoke/finance-suppliers.spec.ts',
+      'tests/e2e/smoke/finance-expenses.spec.ts'
     ])
   })
 

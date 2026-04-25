@@ -2,6 +2,17 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Finance Preventive Test Lane (TASK-599) — 3 niveles de defensa + señal `kind=test_lane` en Reliability
+
+- **Smoke Playwright nuevos**: `tests/e2e/smoke/finance-{clients,suppliers,expenses}.spec.ts` siguiendo el template canónico (`gotoAuthenticated` + status<400 + body visible + ausencia de fatal text). Registrados en `RELIABILITY_REGISTRY[finance].smokeTests`.
+- **Component tests con `vi.stubGlobal('fetch')`**: `ExpensesListView.test.tsx` (success, empty, API error, network failure) + `CreateExpenseDrawer.test.tsx` (open=false sin fetch, fetch /meta+/accounts al abrir, payload meta parcial no fatal, meta 500 no rompe drawer).
+- **Route hardening**: 3 tests TASK-599 en `expenses/meta/route.test.ts` documentando explícitamente el contrato de degradación parcial: slices críticos (`suppliers`, `accounts` con Postgres-first/BQ-fallback) vs enrichment (`institutions`, `members`, `spaces`, `supplierToolLinks` degradan a empty sin tumbar) vs static (`paymentMethods`, `drawerTabs`, etc. siempre presentes).
+- **Reader `getFinanceSmokeLaneStatus`**: `src/lib/reliability/finance/get-finance-smoke-lane-status.ts` parsea `artifacts/playwright/results.json` y filtra suites finance. Degrada a `awaiting_data` cuando no hay reporte (runtime portal sin acceso a artifacts CI).
+- **Adapter `buildFinanceSmokeLaneSignals`**: emite 1 señal agregada `finance.test_lane.smoke` + N señales por suite fallida — Admin Center muestra qué spec está rojo, no solo "el lane está rojo".
+- **`buildReliabilityOverview`** ahora acepta `sources.financeSmokeLane`; `getReliabilityOverview` lo auto-fetchea con tolerancia a fallos.
+- **Reliability boundary movido a `ready`**: TASK-599 / `finance.test_lane` (era `pending`).
+- **Documentación**: `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` ahora tiene sección "Preventive Test Lane (TASK-599)" con los 3 niveles + integración con Reliability Control Plane.
+
 ### 2026-04-25 — Reliability Change-Based Verification Matrix (TASK-633) — gate por PR via filesOwned
 
 - **`ReliabilityModuleDefinition.filesOwned`**: nuevo campo (globs minimatch) en `src/types/reliability.ts`. Sembrado para los 4 módulos en `src/lib/reliability/registry.ts`.

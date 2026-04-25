@@ -1487,3 +1487,54 @@ Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality".
 | `src/app/api/finance/dashboard/pnl/route.ts`     | P&L endpoint (motor central)                  |
 | `src/app/api/finance/dashboard/summary/route.ts` | Working capital metrics                       |
 | `src/app/api/finance/data-quality/route.ts`      | Data quality checks                           |
+
+## Preventive Test Lane (TASK-599)
+
+A partir de 2026-04-25, Finance tiene una lane preventiva de tests con 3 niveles de defensa que cubre el gap entre unit/route tests y detección tardía por Sentry. La lane es complementaria a la suite Playwright completa que corre post-merge a `develop`.
+
+### Nivel 1 — Playwright smoke
+
+Specs canónicos en `tests/e2e/smoke/`:
+
+| Spec | Cubre |
+|------|-------|
+| `finance-quotes.spec.ts` | `/finance/quotes` + `/finance/quotes/new` |
+| `finance-clients.spec.ts` | `/finance/clients` |
+| `finance-suppliers.spec.ts` | `/finance/suppliers` |
+| `finance-expenses.spec.ts` | `/finance/expenses` |
+
+Cada spec usa `gotoAuthenticated` y verifica `status<400` + body visible + ausencia de fatal text. Reusa el setup de Agent Auth.
+
+Las 4 specs están registradas en `RELIABILITY_REGISTRY[finance].smokeTests` (`src/lib/reliability/registry.ts`). El **Change-Based Verification Matrix** (TASK-633) las recoge automáticamente cuando un PR toca archivos owned por el módulo finance.
+
+### Nivel 2 — Component tests (Vitest + jsdom)
+
+| Test | Cubre |
+|------|-------|
+| `src/views/greenhouse/finance/ExpensesListView.test.tsx` | render éxito, empty state, error API, network failure |
+| `src/views/greenhouse/finance/drawers/CreateExpenseDrawer.test.tsx` | open=false sin fetch, fetch /meta + /accounts al abrir, payload meta parcial no fatal, meta endpoint 500 no rompe drawer |
+
+Patrón canónico: `vi.stubGlobal('fetch', mockFn)` + `renderWithTheme`. Sin MSW (instalado pero no usado en componentes).
+
+### Nivel 3 — Route degradation hardening
+
+`src/app/api/finance/expenses/meta/route.test.ts` documenta el contrato de degradación parcial del meta provider:
+
+- **Slices críticos** (Postgres-first → BigQuery fallback): `suppliers`, `accounts`. Si falla Postgres, BQ rescata.
+- **Slices enrichment** (degradan a empty/default sin tumbar el endpoint): `socialSecurityInstitutions` (finance + payroll), `members`, `spaces`, `supplierToolLinks`.
+- **Static enrichment**: `paymentMethods`, `paymentProviders`, `paymentRails`, `recurrenceFrequencies`, `drawerTabs` — siempre presentes (vienen del módulo, no de DB).
+
+Tests TASK-599 explícitos:
+
+- `keeps payload alive when ALL enrichment slices fail`
+- `falls back to BigQuery for accounts when Postgres accounts is unavailable`
+- `response shape includes static enrichment defaults regardless of dynamic providers`
+
+### Reliability Control Plane integration
+
+`src/lib/reliability/finance/get-finance-smoke-lane-status.ts` parsea `artifacts/playwright/results.json` (Playwright JSON reporter) y filtra suites `tests/e2e/smoke/finance-*.spec.ts`. El adapter `buildFinanceSmokeLaneSignals` emite señales `kind=test_lane` para el módulo `finance` en el Reliability Control Plane:
+
+- 1 señal agregada por lane completo (`finance.test_lane.smoke`).
+- N señales adicionales por suite fallida cuando hay errores.
+
+El boundary TASK-599 en `RELIABILITY_INTEGRATION_BOUNDARIES` quedó en status `ready`. Cuando no hay reporte local (runtime portal sin acceso a artifacts CI), degrada a `awaiting_data` con notas explícitas — nunca enmascara regresiones como "todo bien".

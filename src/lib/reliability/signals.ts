@@ -11,6 +11,7 @@ import type {
   OperationsSubsystem
 } from '@/lib/operations/get-operations-overview'
 import type { GcpBillingOverview } from '@/types/billing-export'
+import type { FinanceSmokeLaneStatus } from '@/types/finance-smoke-lane'
 import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
 import type {
   ReliabilityModuleKey,
@@ -656,6 +657,105 @@ export const buildSyntheticModuleSignals = (
       ]
     }
   })
+}
+
+/**
+ * TASK-599 — Finance preventive test lane adapter.
+ *
+ * Convierte el último resultado del smoke lane Finance en señales
+ * `kind=test_lane` para el módulo `finance`. Emite:
+ *  - 1 señal agregada `finance.test_lane.smoke` (estado del lane).
+ *  - 0..N señales por suite individual cuando hay fallas, para que el
+ *    Admin Center muestre cuál spec está en error sin perder detalle.
+ *
+ * Si `availability !== 'configured'`, emite solo la señal agregada con
+ * severidad `awaiting_data` o `error` según corresponda — la UI degrada
+ * con honestidad sin enmascarar regresiones.
+ */
+export const buildFinanceSmokeLaneSignals = (status: FinanceSmokeLaneStatus): ReliabilitySignal[] => {
+  if (status.availability !== 'configured') {
+    const severity: ReliabilitySeverity = status.availability === 'error' ? 'error' : 'awaiting_data'
+
+    return [
+      {
+        signalId: 'finance.test_lane.smoke',
+        moduleKey: 'finance',
+        kind: 'test_lane',
+        source: 'getFinanceSmokeLaneStatus',
+        label: 'Finance smoke lane',
+        severity,
+        summary: status.error ?? status.notes[0] ?? 'Smoke lane Finance sin datos todavía.',
+        observedAt: status.generatedAt,
+        evidence: [
+          {
+            kind: 'helper',
+            label: 'Smoke lane reader',
+            value: 'src/lib/reliability/finance/get-finance-smoke-lane-status.ts'
+          },
+          {
+            kind: 'doc',
+            label: 'Lane spec',
+            value: 'docs/operations/PLAYWRIGHT_E2E.md'
+          }
+        ]
+      }
+    ]
+  }
+
+  const aggregateSeverity: ReliabilitySeverity = status.totals.failed > 0 ? 'error' : 'ok'
+
+  const aggregateSummary =
+    status.totals.failed === 0
+      ? `${status.totals.passed} de ${status.totals.total} specs Finance pasaron.`
+      : `${status.totals.failed} spec${status.totals.failed === 1 ? '' : 's'} Finance en falla.`
+
+  const baseEvidence = [
+    {
+      kind: 'helper' as const,
+      label: 'Smoke lane reader',
+      value: 'src/lib/reliability/finance/get-finance-smoke-lane-status.ts'
+    },
+    {
+      kind: 'run' as const,
+      label: 'Última corrida',
+      value: status.reportFinishedAt ?? status.generatedAt
+    }
+  ]
+
+  const aggregate: ReliabilitySignal = {
+    signalId: 'finance.test_lane.smoke',
+    moduleKey: 'finance',
+    kind: 'test_lane',
+    source: 'getFinanceSmokeLaneStatus',
+    label: 'Finance smoke lane',
+    severity: aggregateSeverity,
+    summary: aggregateSummary,
+    observedAt: status.reportFinishedAt ?? status.generatedAt,
+    evidence: baseEvidence
+  }
+
+  const failingSuiteSignals: ReliabilitySignal[] = status.suites
+    .filter(suite => suite.status === 'failed')
+    .map(suite => ({
+      signalId: `finance.test_lane.smoke.${suite.spec.replace(/[^a-zA-Z0-9]+/g, '_')}`,
+      moduleKey: 'finance',
+      kind: 'test_lane',
+      source: 'getFinanceSmokeLaneStatus',
+      label: `Smoke fallido: ${suite.title}`,
+      severity: 'error',
+      summary: suite.errorMessage ?? `Spec ${suite.spec} en falla.`,
+      observedAt: status.reportFinishedAt ?? status.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'test',
+          label: 'Spec',
+          value: suite.spec
+        }
+      ]
+    }))
+
+  return [aggregate, ...failingSuiteSignals]
 }
 
 export const SIGNAL_KIND_LABELS: Record<ReliabilitySignalKind, string> = {

@@ -38,7 +38,12 @@ export const RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       { path: '/api/finance/quotations', label: 'Cotizaciones' }
     ],
     dependencies: ['greenhouse_finance schema', 'cloud.postgres', 'pricing-engine-v2', 'HubSpot deals bridge'],
-    smokeTests: ['tests/e2e/smoke/finance-quotes.spec.ts'],
+    smokeTests: [
+      'tests/e2e/smoke/finance-quotes.spec.ts',
+      'tests/e2e/smoke/finance-clients.spec.ts',
+      'tests/e2e/smoke/finance-suppliers.spec.ts',
+      'tests/e2e/smoke/finance-expenses.spec.ts'
+    ],
     filesOwned: [
       'src/lib/finance/**',
       'src/views/greenhouse/finance/**',
