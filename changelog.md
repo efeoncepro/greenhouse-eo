@@ -2,6 +2,11 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Documentación funcional nueva: API Platform Ecosystem
+
+- **Nueva guía funcional**: `docs/documentation/plataforma/api-platform-ecosystem.md` explica en lenguaje simple cómo funciona hoy la lane `api/platform/ecosystem/*`, qué recursos expone, cómo resuelve seguridad/tenancy y cómo convive con `/api/integrations/v1/*`.
+- **Ruta de evolución más clara**: el documento también deja explícito qué sigue después de TASK-616 y cuál es la forma correcta de robustecer la plataforma sin mezclar de golpe reads, writes y MCP.
+
 ### 2026-04-25 — TASK-616 CERRADA ✅: API Platform Foundation & Ecosystem Read Surface V1
 
 - **Nueva foundation runtime**: nace `src/lib/api-platform/**` con version negotiation, error taxonomy, response envelope uniforme, auth/context ecosystem binding-aware y request logging/rate limit comparables al carril endurecido de sister platforms.

@@ -18,6 +18,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Plataforma interna y calidad
 
+- [API Platform Ecosystem](plataforma/api-platform-ecosystem.md) — nueva lane ecosystem-facing de APIs machine-to-machine: cómo funciona hoy, qué expone, cómo convive con `/api/integrations/v1/*` y cuál es el camino correcto de hardening sin romper consumers actuales
 - [Capa de Contexto Estructurado](plataforma/capa-contexto-estructurado.md) — memoria estructurada sidecar para payloads normalizados, auditoría, replay operativo y trabajo asistido por agentes sin reemplazar la verdad relacional
 - [Mi Perfil](plataforma/mi-perfil.md) — vista personal del colaborador: datos de identidad, equipos, proyectos, colegas y actividad reciente
 - [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse
@@ -88,6 +89,7 @@ Para detalle tecnico, schemas, contratos y decisiones de diseno, ver `docs/archi
 | [GREENHOUSE_ARCHITECTURE_V1.md](../architecture/GREENHOUSE_ARCHITECTURE_V1.md)                             | Global             | Arquitectura maestra del portal                                   |
 | [GREENHOUSE_IDENTITY_ACCESS_V2.md](../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md)                       | Identidad          | Auth, sesion, RBAC, route groups, scopes, audit                   |
 | [GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md](../architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md) | Plataforma / Ecosistema | Runtime canonico de bindings entre sister platforms y scopes Greenhouse |
+| [GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md](../architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md) | Plataforma / Ecosistema | Arquitectura canonica de la API platform y lane `api/platform/ecosystem/*` |
 | [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md) | Identidad          | 4 planos de roles y jerarquias, taxonomia de roles                |
 | [GREENHOUSE_EVENT_CATALOG_V1.md](../architecture/GREENHOUSE_EVENT_CATALOG_V1.md)                           | Plataforma         | Catalogo de eventos outbox, publishers, consumers                 |
 | [GREENHOUSE_360_OBJECT_MODEL_V1.md](../architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md)                     | Global             | Modelo canonico 360: Cliente, Colaborador, Persona, Space         |

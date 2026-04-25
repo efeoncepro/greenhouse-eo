@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Documentacion funcional nueva para API Platform Ecosystem
+
+### Que cambio
+
+Se agregó documentación funcional del módulo para que la lane nueva no quede explicada solo en arquitectura:
+
+- `docs/documentation/plataforma/api-platform-ecosystem.md`
+
+También quedó sincronizado:
+
+- `docs/documentation/README.md`
+
+### Que responde este documento
+
+La guía nueva deja explícito:
+
+- cómo funciona hoy `api/platform/ecosystem/*`
+- qué endpoints expone
+- cómo resuelve auth, binding y tenancy
+- cómo convive con `/api/integrations/v1/*`
+- qué sigue después de TASK-616
+- cómo robustecer la lane sin romper consumers actuales
+
 ## Sesion 2026-04-25 — TASK-616 IMPLEMENTADA: API Platform Foundation & Ecosystem Read Surface V1
 
 ### Que cambio
