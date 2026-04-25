@@ -1,9 +1,9 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-04-24 por Julio + Claude
-> **Status:** Active
+> **Status:** Active (TASK-629 implementada y deployada)
 > **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync
 
 **Actualizaciones:**
@@ -12,6 +12,7 @@
 - v1.2 (2026-04-24): incorpora PDF enterprise spec + product descriptions rich HTML + DocuSign integration + renewal periodicity variable confirmada + conceptos explicados (constraint rules DSL, nesting, co-term, amendment)
 - v1.3 (2026-04-24): cierra las 7 decisiones operativas pendientes con racional robustez + escalabilidad documentado; refina alcance de TASK-619/620/624/626/629/630 con los acuerdos cerrados
 - v1.4 (2026-04-24): decision PDF — single template con secciones condicionales (no multi-template explicito); refina TASK-629 con el contrato de secciones (always vs conditional) + reglas de activacion
+- v1.5 (2026-04-24): **TASK-629 IMPLEMENTADA** — PDF enterprise rediseño live en develop. 8 secciones modulares + tokens DM Sans+Poppins + QR signed HMAC + sub-brand PNG pipeline + product_catalog JOIN + endpoint público de verificación + 33 tests unitarios. Render validado end-to-end (enterprise 84KB / compact 52KB). Único follow-up: setear `GREENHOUSE_QUOTE_VERIFICATION_SECRET` en Vercel prod (sin esto el QR se omite gracefully).
 
 **Documentacion tecnica relacionada:**
 
@@ -655,6 +656,57 @@ TASK-614..618 en paralelo donde posible. Habilita escalamiento seguro de volumen
 ### Bloque 4 — P3 + OP
 
 Oportunistico — ir resolviendo mientras se ejecutan los bloques 1-3.
+
+## Delta 2026-04-24 (v1.5) — TASK-629 PDF enterprise IMPLEMENTADA + deployada
+
+TASK-629 (PDF redesign) fue implementada end-to-end y commiteada a develop en una sola sesion de iteracion intensiva. Es la primera task del backlog P2 que se cierra fuera del orden secuencial planeado, motivada por la urgencia operativa de tener un PDF enterprise para nuevas propuestas en curso.
+
+### Entregas
+
+| Categoria | Entrega |
+|---|---|
+| Mockup HTML (visual contract) | `docs/research/mockups/quote-pdf-cover-mockup.html` (cover) + `quote-pdf-full-mockup.html` (8 secciones a tamaño A4 real) |
+| Sistema de tokens | `src/lib/finance/pdf/tokens.ts` (PdfColors + PdfFonts + PdfSpacing + PdfRadii + PdfPage + SUB_BRAND_ASSETS + DEFAULT_LEGAL_ENTITY) |
+| Orquestador | `quotation-pdf-document.tsx` refactorizado de 510 líneas monolíticas a 194 líneas como composer |
+| 8 secciones modulares | `sections/cover.tsx`, `executive-summary.tsx`, `about-efeonce.tsx`, `scope-of-work.tsx`, `commercial-proposal.tsx`, `investment-timeline.tsx`, `terms.tsx`, `signatures.tsx`, `shared.tsx` |
+| Conditional rendering | `flags.ts` (computePdfFlags + computeSectionPageMap + computeTotalPages) — threshold ajustable via `GREENHOUSE_PDF_ENTERPRISE_THRESHOLD_CLP` |
+| Fonts reales | DM Sans 400/500/700 + Poppins 500/600/700 (.ttf en `src/assets/fonts/`) + `register-fonts.ts` con lazy registration + cache singleton + tryRegister fallback |
+| QR verificacion | `qr-verification.ts` con HMAC-SHA256 signed token + content-hash binding + falla cerrado sin secret + qrcode lib generando PNG real |
+| Endpoint publico | `/public/quote/[quotationId]/[versionNumber]/[token]/page.tsx` valida el token recomputando hash desde DB; muestra "documento autentico" o "documento invalido" |
+| Sub-brand assets | `scripts/build-pdf-brand-assets.ts` (sharp SVG→PNG pipeline) + 7 PNGs en `public/branding/pdf/` |
+| Rich HTML rendering | `rich-html-renderer.tsx` parser whitelist (`<p>`, `<strong>`, `<em>`, `<ul>`, `<ol>`, `<li>`, `<br>`) → React-PDF Text/View jerarquicos |
+| Product catalog JOIN | `route.ts` LEFT JOIN al `product_catalog` para `product_code` + `description_rich_html` por linea |
+| Sales rep + legal entity dinamicos | Lookups best-effort en route.ts contra `team_members` y `greenhouse_core.organizations` |
+| Validation script | `scripts/render-test-pdf.ts` renderiza enterprise (8 paginas, 84KB) + compact (5 paginas, 52KB) → `tmp/` |
+| Tests | 33 specs nuevos: `flags.test.ts` (12) + `qr-verification.test.ts` (12) + `formatters.test.ts` (9) — 100% verde |
+
+### Decisiones implementadas (de v1.1-v1.4)
+
+- ✅ **D6 v1.3 sub-brand detection**: implementada via `subBrand` prop con default `efeonce` cuando no se proporciona
+- ✅ **D7 v1.3 legal entity dinamica**: `route.ts` query a `greenhouse_core.organizations` con fallback a `DEFAULT_LEGAL_ENTITY`
+- ✅ **D5 v1.3 QR signed token publico**: HMAC-SHA256 + endpoint publico que recomputa hash desde DB
+- ✅ **D17 v1.4 single template**: implementado con conditional sections + 3 flags (Executive Summary, About Efeonce, Investment Timeline)
+- ✅ **D2 v1.3 product descriptions rich HTML**: pipeline end-to-end (DB → adapter → PDF)
+- ✅ **D4 v1.3 TipTap**: NO implementada (es admin UI editor — fuera del scope PDF; queda como TASK-630 separado)
+
+### Validacion
+
+- `npx tsc --noEmit` clean
+- `pnpm lint` clean (2 warnings pre-existentes ajenos)
+- `pnpm test` 2052/2054 passing (33 nuevos + 2019 pre-existentes; 2 skipped)
+- `pnpm build` clean
+- Render real validado: enterprise mode (Globe, USD 184,500) + compact mode (Wave, $4.76M CLP)
+- Endpoint publico funciona: token valido → "documento autentico" / token alterado → "documento invalido"
+
+### Follow-ups operativos (no codigo)
+
+1. **Setear `GREENHOUSE_QUOTE_VERIFICATION_SECRET` en Vercel production** — generar con `openssl rand -hex 32`. Sin esta variable el PDF se renderiza identico pero sin QR (graceful degradation).
+2. **Re-ejecutar `pnpm tsx scripts/build-pdf-brand-assets.ts`** cada vez que cambien los SVGs canonicos en `public/branding/SVG/`.
+3. **Comunicar a sales reps** que la nueva propuesta usa el PDF enterprise (cambio visible para clientes — onboarding de 5 min).
+
+### Tasks restantes del programa (sin tocar)
+
+Las demas tasks de RESEARCH-005 (P0 race conditions, P1 robustez, resto de P2) siguen pendientes y mantienen su priorizacion original. TASK-629 se adelanto por urgencia operativa pero no cambia el orden recomendado del resto.
 
 ## Decisiones abiertas
 

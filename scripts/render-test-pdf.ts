@@ -1,10 +1,12 @@
 // TASK-629 — Test PDF render script.
 //
-// Generates a sample enterprise quotation PDF using the new modular
-// architecture (tokens + sections + flags + QR + fonts) WITHOUT touching
-// the database. Sample data simulates a Globe LATAM enterprise retainer.
+// Generates 2 sample quotation PDFs to validate both rendering modes:
+// - quote-pdf-sample-enterprise-*.pdf — full 8 sections (Globe LATAM
+//   retainer USD 184,500 / 12 meses) with all conditional sections active.
+// - quote-pdf-sample-compact-*.pdf — minimal 5 sections (small Wave
+//   project < $5M CLP) testing the conditional-omit path.
 //
-// Output: tmp/quote-pdf-sample-<timestamp>.pdf  (gitignored)
+// Output: tmp/  (gitignored)
 //
 // Run: pnpm tsx scripts/render-test-pdf.ts
 //
@@ -18,7 +20,7 @@ import { renderQuotationPdf } from '@/lib/finance/pdf/render-quotation-pdf'
 
 import type { RenderQuotationPdfInput } from '@/lib/finance/pdf/contracts'
 
-const sampleInput: RenderQuotationPdfInput = {
+const enterpriseInput: RenderQuotationPdfInput = {
   quotationId: 'quo-sample-001',
   quotationNumber: 'EFG-2026-00184',
   versionNumber: 2,
@@ -179,11 +181,87 @@ const sampleInput: RenderQuotationPdfInput = {
   totalInClp: 175000000
 }
 
-const main = async () => {
-  console.log('[test-pdf] Rendering sample quotation PDF...')
+const compactInput: RenderQuotationPdfInput = {
+  quotationId: 'quo-sample-002',
+  quotationNumber: 'EFW-2026-00057',
+  versionNumber: 1,
+  currency: 'CLP',
+  quoteDate: '2026-04-24',
+  validUntil: '2026-05-15',
+  clientName: 'Café Latino SpA',
+  organizationName: null,
+  description: 'Audit técnico AEO + roadmap de optimización SEO.',
+  lineItems: [
+    {
+      label: 'Auditoría técnica AEO',
+      description: 'Diagnóstico completo + roadmap',
+      descriptionRichHtml: null,
+      productCode: 'SVC-AEO-AUDIT',
+      bundleId: null,
+      bundleLabel: null,
+      quantity: 1,
+      unit: 'Proyecto',
+      unitPrice: 2_500_000,
+      subtotalAfterDiscount: 2_500_000
+    },
+    {
+      label: 'Roadmap implementación',
+      description: '90 días',
+      descriptionRichHtml: null,
+      productCode: 'SVC-AEO-ROAD',
+      bundleId: null,
+      bundleLabel: null,
+      quantity: 1,
+      unit: 'Proyecto',
+      unitPrice: 1_500_000,
+      subtotalAfterDiscount: 1_500_000
+    }
+  ],
+  totals: {
+    subtotal: 4_000_000,
+    totalDiscount: 0,
+    total: 4_760_000,
+    tax: {
+      code: 'cl_vat_19',
+      label: 'IVA 19%',
+      rate: 0.19,
+      amount: 760_000,
+      isExempt: false
+    }
+  },
+  terms: [
+    {
+      title: 'Vigencia',
+      bodyResolved: 'Esta propuesta es válida hasta el 15/05/2026.',
+      sortOrder: 1
+    },
+    {
+      title: 'Pago',
+      bodyResolved: '50% al iniciar + 50% contra entrega del roadmap.',
+      sortOrder: 2
+    }
+  ],
+  fxFooter: null,
+  subBrand: 'wave',
+  salesRep: {
+    name: 'Julio Reyes',
+    role: 'Account Lead',
+    email: 'jreyes@efeoncepro.com',
+    phone: null
+  },
+  legalEntity: null,
+  forceEnterpriseTemplate: false,
+  totalInClp: 4_760_000  // Below the 50M threshold
+}
+
+const renderOne = async (
+  label: string,
+  input: RenderQuotationPdfInput
+): Promise<void> => {
+  console.log(`[test-pdf] Rendering ${label} sample...`)
 
   const startedAt = Date.now()
-  const buffer = await renderQuotationPdf(sampleInput)
+  const buffer = await renderQuotationPdf(input)
   const elapsed = Date.now() - startedAt
 
   const outputDir = resolve(process.cwd(), 'tmp')
@@ -191,14 +269,18 @@ const main = async () => {
   mkdirSync(outputDir, { recursive: true })
 
   const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-  const outputPath = resolve(outputDir, `quote-pdf-sample-${stamp}.pdf`)
+  const outputPath = resolve(outputDir, `quote-pdf-sample-${label}-${stamp}.pdf`)
 
   writeFileSync(outputPath, buffer)
 
   console.log(
-    `[test-pdf] ✓ Rendered ${(buffer.length / 1024).toFixed(1)} KB in ${elapsed}ms`
+    `[test-pdf] ✓ ${label}: ${(buffer.length / 1024).toFixed(1)} KB in ${elapsed}ms → ${outputPath}`
   )
-  console.log(`[test-pdf] Output: ${outputPath}`)
+}
+
+const main = async () => {
+  await renderOne('enterprise', enterpriseInput)
+  await renderOne('compact', compactInput)
 }
 
 main().catch(error => {

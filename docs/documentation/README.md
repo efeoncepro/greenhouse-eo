@@ -41,6 +41,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Cotizador — Builder full-page de cotizaciones](finance/cotizador.md) — pantalla canónica `/finance/quotes/new` y `/edit` con source selector (catálogo / servicio / template / manual), provenance chips, avisos del pricing engine, FX readiness y override de precio unitario
 - [Monedas y Tipos de Cambio — Foundation Plataforma](finance/monedas-y-tipos-de-cambio.md) — matriz canónica de monedas por dominio, política FX por dominio, readiness contract (supported/stale/unsupported/unavailable), registro declarativo de monedas y runbook operativo
 - [HES — Recepción y validación de servicio](finance/hes-recepcion-y-validacion.md) — hoja de entrada de servicio como respaldo recibido del cliente, estados visibles y herencia documental desde la OC
+- [PDF de Cotización — Documento Enterprise](finance/pdf-cotizacion-enterprise.md) — PDF rediseñado nivel enterprise con 8 secciones modulares (5 always + 3 conditional), branding Efeonce + sub-brand identification, fonts DM Sans + Poppins, QR signed para verificación de autenticidad y endpoint público que valida contra DB. Adaptativo: 2-3 páginas para quotes chicas / 6-7 páginas para enterprise. Shipped en TASK-629.
 - [Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), tesoreria por instrumento, cuenta corriente accionista y diferencia devengado vs caja
 
 ### HR y Nomina

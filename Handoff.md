@@ -1,5 +1,70 @@
 # Handoff.md
 
+## Sesion 2026-04-24 — TASK-629 IMPLEMENTADA: PDF Cotizacion Enterprise
+
+### Que cambio
+
+PDF de cotizaciones rediseñado end-to-end siguiendo RESEARCH-005 v1.5. Branch: `develop`. Commits clave: `bb3cedf5` (refactor inicial), `20eb6ff3` (cierre de las 4 limitaciones).
+
+### Entregas
+
+- Sistema de tokens `PdfTokens` (paralelo a `GREENHOUSE_DESIGN_TOKENS_V1`) en `src/lib/finance/pdf/tokens.ts`.
+- 8 secciones modulares en `src/lib/finance/pdf/sections/` (Cover, Executive Summary, About Efeonce, Scope of Work, Commercial Proposal, Investment Timeline, Terms, Signatures + shared).
+- Conditional rendering via `flags.ts` con threshold `GREENHOUSE_PDF_ENTERPRISE_THRESHOLD_CLP` ajustable.
+- Fonts DM Sans + Poppins reales en `src/assets/fonts/` con lazy registration.
+- QR signed HMAC (`qr-verification.ts`) + endpoint publico `/public/quote/[id]/[v]/[token]`.
+- Pipeline SVG→PNG (`scripts/build-pdf-brand-assets.ts`) para sub-brand assets.
+- Rich HTML rendering en line items vía LEFT JOIN al `product_catalog`.
+- Sales rep + legal entity dinamicos desde DB.
+- Test render script (`scripts/render-test-pdf.ts`) que genera enterprise + compact samples.
+- 33 tests unitarios nuevos (flags, qr-verification, formatters).
+
+### Validacion
+
+- tsc clean / lint clean / 2052 tests passing / build clean.
+- Render real validado: enterprise 84 KB / compact 52 KB en `tmp/`.
+- Endpoint publico de verificacion funcional contra DB.
+
+### Follow-up operativo CRITICO
+
+**Setear `GREENHOUSE_QUOTE_VERIFICATION_SECRET` en Vercel production** con `openssl rand -hex 32`. Sin esta variable el QR se omite (graceful degradation pero pierde verificacion legal).
+
+### Documentacion
+
+- RESEARCH-005 v1.5 con Delta de cierre TASK-629
+- `docs/research/mockups/quote-pdf-full-mockup.html` como visual contract de referencia
+
+---
+
+## Sesion 2026-04-24 — TASK-610 registrada: Content Sanitization Runtime Isolation
+
+### Que cambio
+
+Se registro una task nueva de backlog:
+
+- `TASK-610` — `docs/tasks/to-do/TASK-610-content-sanitization-runtime-isolation-shared-policy-layer.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Contexto de la task
+
+Nace a partir del error productivo reportado en Sentry por `jsdom` / `html-encoding-sniffer` / `@exodus/bytes` al cargar `isomorphic-dompurify` desde:
+
+- `src/lib/commercial/description-sanitizer.ts`
+- consumer principal: `src/lib/hubspot/hubspot-product-payload-adapter.ts`
+- consumer secundario: `src/lib/commercial/product-catalog/drift-detector-v2.ts`
+
+### Regla arquitectonica explicitada
+
+La task formaliza que:
+
+- ningun path critico SSR/server debe depender de emulacion DOM para sanitizacion operativa
+- la solucion correcta no es solo cambiar de libreria, sino crear una capability shared Node-safe y policy-driven
+- el rollout debe ser additive/no-downtime, con opcion de backfill y versionado de policy
+
 ## Sesion 2026-04-24 — TASK-609 registrada: AI Quote Draft Assistant
 
 ### Que cambio
