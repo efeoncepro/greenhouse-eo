@@ -11,6 +11,7 @@ import {
   getActiveShortLinksForQuote
 } from '@/lib/finance/quote-share/short-link'
 import { buildShortQuoteUrl } from '@/lib/finance/quote-share/url-builder'
+import { getShareViewAggregate } from '@/lib/finance/quote-share/view-tracker'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -67,7 +68,10 @@ export async function GET(
 
   const versionNumber = Number(headerRows[0]?.current_version ?? 1)
 
-  const links = await getActiveShortLinksForQuote(identity.quotationId, versionNumber)
+  const [links, aggregate] = await Promise.all([
+    getActiveShortLinksForQuote(identity.quotationId, versionNumber),
+    getShareViewAggregate(identity.quotationId, versionNumber)
+  ])
 
   return NextResponse.json({
     links: links.map(link => ({
@@ -78,7 +82,12 @@ export async function GET(
       expiresAt: link.expiresAt,
       lastAccessedAt: link.lastAccessedAt,
       accessCount: link.accessCount
-    }))
+    })),
+    aggregate: {
+      totalViews: aggregate.viewCount,
+      uniqueIps: aggregate.uniqueIps,
+      lastView: aggregate.lastView
+    }
   })
 }
 

@@ -28,6 +28,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
+import { QuoteShareDrawer } from './QuoteShareDrawer'
 import QuoteApprovalsPanel, { type ApprovalStep } from './governance/QuoteApprovalsPanel'
 import QuoteAuditTrail, { type AuditEntry } from './governance/QuoteAuditTrail'
 import QuoteTermsSection, { type QuotationTerm } from './governance/QuoteTermsSection'
@@ -255,6 +256,7 @@ const QuoteDetailView = () => {
   const [chainError, setChainError] = useState<string | null>(null)
   const [convertingInvoice, setConvertingInvoice] = useState(false)
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
   const [savingTemplate, setSavingTemplate] = useState(false)
   const [saveTemplateError, setSaveTemplateError] = useState<string | null>(null)
   const [actionMessage, setActionMessage] = useState<string | null>(null)
@@ -809,6 +811,15 @@ const QuoteDetailView = () => {
             >
               PDF
             </Button>
+            <Button
+              variant='outlined'
+              size='small'
+              color='primary'
+              startIcon={<i className='tabler-share' />}
+              onClick={() => setShareOpen(true)}
+            >
+              Compartir
+            </Button>
             {canManageCurrentQuote && (
               <Button
                 variant='outlined'
@@ -1280,6 +1291,12 @@ const QuoteDetailView = () => {
         error={saveTemplateError}
         onClose={() => setSaveTemplateOpen(false)}
         onConfirm={handleSaveAsTemplate}
+      />
+      <QuoteShareDrawer
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        quoteId={quoteId}
+        quotationNumber={quote.quoteNumber || quote.quoteId}
       />
     </Stack>
   )

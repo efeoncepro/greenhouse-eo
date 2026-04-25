@@ -1,4 +1,7 @@
+import { headers } from 'next/headers'
+
 import { loadPublicQuoteView } from '@/lib/finance/quote-share/load-quote-for-public-view'
+import { recordShareView } from '@/lib/finance/quote-share/view-tracker'
 import { DEFAULT_LEGAL_ENTITY } from '@/lib/finance/pdf/tokens'
 import { PublicQuoteView } from '@/views/greenhouse/finance/public-quote/PublicQuoteView'
 
@@ -6,6 +9,7 @@ export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ quotationId: string; versionNumber: string; token: string }>
+  searchParams?: Promise<{ via?: string }>
 }
 
 /**
@@ -21,9 +25,10 @@ interface PageProps {
  * - Short alias: /q/[code] → 301 → here
  * - QR scan from PDF: same canonical URL embedded in the QR
  */
-export default async function PublicQuotePage({ params }: PageProps) {
+export default async function PublicQuotePage({ params, searchParams }: PageProps) {
   const { quotationId, versionNumber: versionStr, token } = await params
   const versionNumber = Number(versionStr)
+  const search = (await searchParams) ?? {}
 
   if (!Number.isFinite(versionNumber) || versionNumber < 1) {
     return renderInvalidTokenPage()
@@ -39,10 +44,33 @@ export default async function PublicQuotePage({ params }: PageProps) {
     return renderNoSecretPage()
   }
 
+  // Best-effort view tracking (don't block render on failure)
+  const headerList = await headers()
+
+  recordShareView({
+    quotationId,
+    versionNumber,
+    shortCode: search.via ?? null,
+    ipAddress:
+      headerList.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || headerList.get('x-real-ip')
+      || null,
+    userAgent: headerList.get('user-agent'),
+    referer: headerList.get('referer')
+  }).catch(() => {})
+
   // result.kind === 'ok' — render full view
   const pdfDownloadUrl = `/api/finance/quotes/${quotationId}/pdf?download=1`
+  const acceptUrl = `/api/public/quote/${quotationId}/${versionNumber}/${token}/accept`
 
-  return <PublicQuoteView view={result.view} pdfDownloadUrl={pdfDownloadUrl} />
+  return (
+    <PublicQuoteView
+      view={result.view}
+      pdfDownloadUrl={pdfDownloadUrl}
+      acceptUrl={acceptUrl}
+      shortCode={search.via ?? null}
+    />
+  )
 }
 
 const renderInvalidTokenPage = () => (

@@ -37,6 +37,9 @@ interface QuotationHeaderRow extends Record<string, unknown> {
   tax_amount_snapshot: string | number | null
   is_tax_exempt: boolean | null
   status: string | null
+  accepted_at: string | Date | null
+  accepted_by_name: string | null
+  accepted_by_role: string | null
 }
 
 interface QuotationOrgRow extends Record<string, unknown> {
@@ -105,6 +108,15 @@ export interface PublicQuoteViewModel {
 
   /** Whether the validUntil has passed today (computed server-side) */
   isExpired: boolean
+
+  /** Whether the requested version is still the current_version of the quote */
+  isLatestVersion: boolean
+  currentVersion: number
+
+  /** Acceptance state — populated when accepted_at is set on the quotation */
+  acceptedAt: string | null
+  acceptedByName: string | null
+  acceptedByRole: string | null
 }
 
 export type PublicQuoteAuthOutcome =
@@ -138,7 +150,8 @@ export const loadPublicQuoteView = async (input: {
             total_price_before_discount, total_discount, total_price,
             exchange_rates,
             tax_code, tax_rate_snapshot, tax_amount_snapshot, is_tax_exempt,
-            status
+            status,
+            accepted_at, accepted_by_name, accepted_by_role
        FROM greenhouse_commercial.quotations
        WHERE quotation_id = $1`,
     [identity.quotationId]
@@ -148,7 +161,12 @@ export const loadPublicQuoteView = async (input: {
 
   if (!header) return { kind: 'not-found' }
 
-  const versionNumber = Number(header.current_version ?? input.versionNumber)
+  // Use the version requested by the URL (the token was signed against
+  // its content). Track current_version separately to surface "newer
+  // version available" to the client when they look at an old link.
+  const versionNumber = input.versionNumber
+  const currentVersion = Number(header.current_version ?? input.versionNumber)
+  const isLatestVersion = currentVersion === versionNumber
   const currency = String(header.currency || 'CLP').toUpperCase()
 
   const lineRows = await query<QuotationLineRow>(
@@ -327,7 +345,15 @@ export const loadPublicQuoteView = async (input: {
     fxFooter,
     subBrand: 'efeonce',
     legalEntity,
-    isExpired
+    isExpired,
+    isLatestVersion,
+    currentVersion,
+    acceptedAt:
+      header.accepted_at instanceof Date
+        ? header.accepted_at.toISOString()
+        : (header.accepted_at as string | null),
+    acceptedByName: header.accepted_by_name,
+    acceptedByRole: header.accepted_by_role
   }
 
   return { kind: 'ok', view }

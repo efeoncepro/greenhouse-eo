@@ -6,6 +6,7 @@ import {
 } from '@/lib/finance/pdf/formatters'
 import { SUB_BRAND_ASSETS } from '@/lib/finance/pdf/tokens'
 
+import { PublicQuoteAcceptForm } from './PublicQuoteAcceptForm'
 import { PublicQuoteInteractions } from './PublicQuoteInteractions'
 import styles from './styles.module.css'
 
@@ -28,6 +29,8 @@ import type { PublicQuoteViewModel } from '@/lib/finance/quote-share/load-quote-
 interface Props {
   view: PublicQuoteViewModel
   pdfDownloadUrl: string
+  acceptUrl: string
+  shortCode: string | null
 }
 
 const renderHtmlAsString = (html: string | null): string => {
@@ -38,7 +41,7 @@ const renderHtmlAsString = (html: string | null): string => {
   return html
 }
 
-export const PublicQuoteView = ({ view, pdfDownloadUrl }: Props) => {
+export const PublicQuoteView = ({ view, pdfDownloadUrl, acceptUrl, shortCode }: Props) => {
   const subBrandAssets = SUB_BRAND_ASSETS[view.subBrand]
   const heroSubtitle = view.description?.slice(0, 320) ?? null
 
@@ -84,8 +87,16 @@ export const PublicQuoteView = ({ view, pdfDownloadUrl }: Props) => {
             <span className={styles.quoteId}>
               Propuesta <strong>{view.quotationNumber} v{view.versionNumber}</strong>
             </span>
-            <span className={`${styles.statusBadge} ${view.isExpired ? styles.statusBadgeExpired : styles.statusBadgeActive}`}>
-              {view.isExpired ? '⚠ Vencida' : '✓ Vigente'}
+            <span
+              className={`${styles.statusBadge} ${
+                view.acceptedAt
+                  ? styles.statusBadgeAccepted
+                  : view.isExpired
+                    ? styles.statusBadgeExpired
+                    : styles.statusBadgeActive
+              }`}
+            >
+              {view.acceptedAt ? '✓ Aceptada' : view.isExpired ? '⚠ Vencida' : '✓ Vigente'}
             </span>
           </div>
         </header>
@@ -119,6 +130,17 @@ export const PublicQuoteView = ({ view, pdfDownloadUrl }: Props) => {
             </div>
           </div>
         </section>
+
+        {/* ── Version warning ── */}
+        {!view.isLatestVersion ? (
+          <div className={styles.versionWarning}>
+            <span aria-hidden='true' style={{ fontSize: 18 }}>ℹ</span>
+            <span>
+              Estás viendo la <strong>versión v{view.versionNumber}</strong> de esta cotización.
+              Hay una versión más reciente (<strong>v{view.currentVersion}</strong>) — solicita el link actualizado a tu account lead.
+            </span>
+          </div>
+        ) : null}
 
         {/* ── Validity callout ── */}
         {view.validUntil ? (
@@ -363,14 +385,21 @@ export const PublicQuoteView = ({ view, pdfDownloadUrl }: Props) => {
           <a className={`${styles.btn} ${styles.btnOutlined}`} href={pdfDownloadUrl} download>
             📥 Descargar PDF
           </a>
-          <button
-            type='button'
-            className={`${styles.btn} ${styles.btnDisabled}`}
-            disabled
-            title='Próximamente'
-          >
-            ✓ Aceptar (próximamente)
-          </button>
+          {view.isLatestVersion && !view.isExpired ? (
+            <PublicQuoteAcceptForm
+              acceptUrl={acceptUrl}
+              shortCode={shortCode}
+              initialAcceptedAt={view.acceptedAt}
+              initialAcceptedByName={view.acceptedByName}
+            />
+          ) : view.acceptedAt && view.acceptedByName ? (
+            <PublicQuoteAcceptForm
+              acceptUrl={acceptUrl}
+              shortCode={shortCode}
+              initialAcceptedAt={view.acceptedAt}
+              initialAcceptedByName={view.acceptedByName}
+            />
+          ) : null}
         </section>
 
         {/* ── Footer ── */}

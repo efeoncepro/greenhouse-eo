@@ -966,6 +966,11 @@ export interface GreenhouseCommercialQuotationRenewalReminders {
 }
 
 export interface GreenhouseCommercialQuotations {
+  accepted_at: Timestamp | null;
+  accepted_by_name: string | null;
+  accepted_by_role: string | null;
+  accepted_ip: string | null;
+  accepted_via_short_code: string | null;
   acv: Numeric | null;
   /**
    * Timestamp del rechazo por aprobación de excepción para la versión vigente.
@@ -1136,6 +1141,17 @@ export interface GreenhouseCommercialQuotationVersions {
   total_price: Numeric | null;
   version_id: Generated<string>;
   version_number: number;
+}
+
+export interface GreenhouseCommercialQuoteShareViews {
+  ip_address: string | null;
+  quotation_id: string;
+  referer: string | null;
+  short_code: string;
+  user_agent: string | null;
+  version_number: number;
+  view_id: Generated<string>;
+  viewed_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseCommercialQuoteShortLinks {
@@ -6409,6 +6425,7 @@ export interface DB {
   "greenhouse_commercial.quotation_terms": GreenhouseCommercialQuotationTerms;
   "greenhouse_commercial.quotation_versions": GreenhouseCommercialQuotationVersions;
   "greenhouse_commercial.quotations": GreenhouseCommercialQuotations;
+  "greenhouse_commercial.quote_share_views": GreenhouseCommercialQuoteShareViews;
   "greenhouse_commercial.quote_short_links": GreenhouseCommercialQuoteShortLinks;
   "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
   "greenhouse_commercial.quote_templates": GreenhouseCommercialQuoteTemplates;
