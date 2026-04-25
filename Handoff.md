@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — EPIC-008 + TASK-611/612/613 registradas: convergencia canónica Organization Workspace
+
+### Que cambio
+
+Se formalizó el programa para converger `Organizaciones` y `Clientes` sin romper el runtime actual:
+
+- nuevo epic:
+  - `docs/epics/to-do/EPIC-008-organization-workspace-convergence-facet-entitlements.md`
+- nuevas child tasks:
+  - `docs/tasks/to-do/TASK-611-organization-workspace-facet-projection-entitlements-foundation.md`
+  - `docs/tasks/to-do/TASK-612-shared-organization-workspace-shell-convergence.md`
+  - `docs/tasks/to-do/TASK-613-finance-clients-organization-workspace-convergence.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/epics/EPIC_ID_REGISTRY.md`
+- `docs/epics/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Decision canónica explicitada
+
+La convergencia correcta no es `entitlements en vez de views`, sino:
+
+- `organization` como aggregate cross-domain canónico
+- `client_profile` como overlay financiero
+- `views` / rutas actuales como entrypoints (`/agency/organizations/...`, `/finance/clients/...`)
+- `entitlements` como owner de facets, tabs y acciones
+
+### Relación con trabajo ya existente
+
+El programa no compite con `TASK-181` ni `TASK-191`; se monta sobre ellas.
+
+- `TASK-181` ya dejó `Finance Clients` org-first en el runtime
+- `TASK-191` avanzó el cutover downstream de consumers financieros
+- `EPIC-008` ataca ahora el gap de surface, proyección y convergencia de experiencia
+
 ## Sesion 2026-04-25 — TASK-610 CERRADA: Sanitización shared Node-safe sin `jsdom`
 
 ### Que cambio

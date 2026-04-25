@@ -664,4 +664,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-608` | `to-do` | Product Catalog Price History (effective_at) — follow-up aditivo de TASK-602 | `docs/tasks/to-do/TASK-608-product-catalog-price-history.md` |
 | `TASK-609` | `to-do` | AI Quote Draft Assistant (intent -> canonical draft + QA guardrails) | `docs/tasks/to-do/TASK-609-ai-quote-draft-assistant.md` |
 | `TASK-610` | `complete` | Content Sanitization Runtime Isolation + Shared Policy Layer | `docs/tasks/complete/TASK-610-content-sanitization-runtime-isolation-shared-policy-layer.md` |
+| `TASK-611` | `to-do` | Organization Workspace Facet Projection & Fine-Grained Entitlements Foundation | `docs/tasks/to-do/TASK-611-organization-workspace-facet-projection-entitlements-foundation.md` |
+| `TASK-612` | `to-do` | Shared Organization Workspace Shell Convergence | `docs/tasks/to-do/TASK-612-shared-organization-workspace-shell-convergence.md` |
+| `TASK-613` | `to-do` | Finance Clients Detail -> Organization Workspace Convergence | `docs/tasks/to-do/TASK-613-finance-clients-organization-workspace-convergence.md` |
 | `TASK-629` | `complete` | PDF Cotización Enterprise Redesign (single template + secciones condicionales + brand assets + QR signed) | `docs/tasks/complete/TASK-629-pdf-cotizacion-enterprise-redesign.md` |
