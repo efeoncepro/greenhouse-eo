@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — TASK-616 registrada: API Platform Foundation & Ecosystem Read Surface V1
+
+### Que cambio
+
+Se registró la task ejecutable que baja a runtime la arquitectura nueva de plataforma API:
+
+- `docs/tasks/to-do/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Decisión canónica explicitada
+
+La implementación correcta de la `API platform` no debe arrancar absorbiendo `TASK-040`.
+
+La regla explicitada en la task es:
+
+- `TASK-040` sigue viva como baseline programática de `Data Node`
+- `TASK-616` ejecuta la foundation shared `src/lib/api-platform/**` y la primera lane `src/app/api/platform/ecosystem/**`
+- `/api/integrations/v1/*` convive como lane legacy/transicional
+- `MCP` sigue fuera del primer corte y downstream de esta API estable
+
 ## Sesion 2026-04-25 — API Platform documentada como arquitectura canónica
 
 ### Que cambio
