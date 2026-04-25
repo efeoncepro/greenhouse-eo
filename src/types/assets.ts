@@ -29,6 +29,7 @@ export type GreenhouseAssetContext =
   | 'certification'
   | 'evidence_draft'
   | 'evidence'
+  | 'quote_pdf'
 
 export interface GreenhouseAssetRecord {
   assetId: string

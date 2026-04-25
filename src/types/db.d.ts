@@ -1143,6 +1143,19 @@ export interface GreenhouseCommercialQuotationVersions {
   version_number: number;
 }
 
+export interface GreenhouseCommercialQuotePdfAssets {
+  asset_id: string;
+  file_name: string;
+  file_size_bytes: number;
+  generated_at: Generated<Timestamp>;
+  generated_by: string | null;
+  quotation_id: string;
+  storage_bucket: string;
+  storage_path: string;
+  template_version: string;
+  version_number: number;
+}
+
 export interface GreenhouseCommercialQuoteShareViews {
   ip_address: string | null;
   quotation_id: string;
@@ -4209,6 +4222,7 @@ export interface GreenhouseHrWorkflowApprovalSnapshots {
 
 export interface GreenhouseNotificationsEmailDeliveries {
   actor_email: string | null;
+  attachment_size_bytes: number | null;
   attempt_number: Generated<number>;
   batch_id: string;
   /**
@@ -4238,14 +4252,19 @@ export interface GreenhouseNotificationsEmailDeliveries {
   error_class: string | null;
   error_message: string | null;
   has_attachments: Generated<boolean>;
+  organization_id: string | null;
+  parent_delivery_id: string | null;
   /**
    * critical | transactional | broadcast — critical/transactional bypass rate limits
    */
   priority: Generated<string>;
+  recipient_contact_id: string | null;
   recipient_email: string;
+  recipient_kind: string | null;
   recipient_name: string | null;
   recipient_user_id: string | null;
   resend_id: string | null;
+  resend_reason: string | null;
   source_entity: string | null;
   source_event_id: string | null;
   status: Generated<string>;
@@ -4259,6 +4278,7 @@ export interface GreenhouseNotificationsEmailEngagement {
   engagement_id: Generated<string>;
   event_type: string;
   link_url: string | null;
+  resend_event_id: string | null;
   resend_id: string;
 }
 
@@ -4279,6 +4299,16 @@ export interface GreenhouseNotificationsEmailTypeConfig {
   paused_by: string | null;
   paused_reason: string | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseNotificationsIdempotencyKeys {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  endpoint: string;
+  expires_at: Timestamp;
+  idempotency_key: string;
+  response_body: Json;
+  response_status: number;
 }
 
 export interface GreenhouseNotificationsNotificationLog {
@@ -6425,6 +6455,7 @@ export interface DB {
   "greenhouse_commercial.quotation_terms": GreenhouseCommercialQuotationTerms;
   "greenhouse_commercial.quotation_versions": GreenhouseCommercialQuotationVersions;
   "greenhouse_commercial.quotations": GreenhouseCommercialQuotations;
+  "greenhouse_commercial.quote_pdf_assets": GreenhouseCommercialQuotePdfAssets;
   "greenhouse_commercial.quote_share_views": GreenhouseCommercialQuoteShareViews;
   "greenhouse_commercial.quote_short_links": GreenhouseCommercialQuoteShortLinks;
   "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
@@ -6571,6 +6602,7 @@ export interface DB {
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;
   "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;
   "greenhouse_notifications.email_type_config": GreenhouseNotificationsEmailTypeConfig;
+  "greenhouse_notifications.idempotency_keys": GreenhouseNotificationsIdempotencyKeys;
   "greenhouse_notifications.notification_log": GreenhouseNotificationsNotificationLog;
   "greenhouse_notifications.notification_preferences": GreenhouseNotificationsNotificationPreferences;
   "greenhouse_notifications.notifications": GreenhouseNotificationsNotifications;

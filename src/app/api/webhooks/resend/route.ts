@@ -127,6 +127,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ processed: false, reason: 'No recipient email.' })
   }
 
+  // TASK-631 Fase 4 — Resend webhook deduplication. Resend retries on failure
+  // and may send the same event multiple times. We dedupe via the svix-id
+  // header (unique per event delivery attempt) by INSERT ON CONFLICT DO NOTHING
+  // into a sentinel marker. If dedup hit, return 200 without re-processing.
+  if (svixId) {
+    try {
+      const dedupRows = await runGreenhousePostgresQuery<{ resend_event_id: string } & Record<string, unknown>>(
+        `INSERT INTO greenhouse_notifications.email_engagement (resend_event_id, event_type, resend_id)
+         VALUES ($1, 'webhook_dedup', $2)
+         ON CONFLICT (resend_event_id) WHERE resend_event_id IS NOT NULL
+         DO NOTHING
+         RETURNING resend_event_id`,
+        [svixId, resendId ?? null]
+      )
+
+      if (dedupRows.length === 0) {
+        return NextResponse.json({ deduplicated: true, eventId: svixId })
+      }
+    } catch (error) {
+      // If dedup fails (constraint not yet deployed?), log and continue
+      console.warn('[webhooks/resend] Dedup check failed, proceeding:', error instanceof Error ? error.message : error)
+    }
+  }
+
   try {
     switch (event.type) {
       case 'email.bounced': {

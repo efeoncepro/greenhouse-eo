@@ -1,17 +1,21 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   Alert,
   Box,
   Button,
+  Checkbox,
+  Chip,
   CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   IconButton,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography
@@ -29,12 +33,28 @@ interface ShareLinkSummary {
   accessCount: number
 }
 
+interface OrgContact {
+  contactId: string
+  email: string
+  name: string | null
+  role: string | null
+  isPrimary: boolean
+}
+
+interface PdfSizeInfo {
+  sizeBytes: number | null
+  isEstimate: boolean
+  estimatedRangeBytes?: { min: number; max: number }
+}
+
 interface Props {
   open: boolean
   onClose: () => void
   quoteId: string
   quotationNumber: string
 }
+
+type SendState = 'idle' | 'generating-pdf' | 'sending' | 'success' | 'error'
 
 const formatRelative = (iso: string | null): string => {
   if (!iso) return '—'
@@ -65,10 +85,15 @@ const formatDate = (iso: string | null): string => {
   })
 }
 
+const formatBytes = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
+
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
 /**
- * TASK-631 Fase 2 — Drawer that surfaces the public share link to the
- * sales rep. Lets them generate (or reuse) a short link, copy it,
- * see analytics (views + last open), and revoke it.
+ * TASK-631 Fase 4 — Drawer with contact picker + PDF toggle + multi-fase loading.
  */
 export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Props) => {
   const [loading, setLoading] = useState(false)
@@ -77,11 +102,22 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
   const [error, setError] = useState<string | null>(null)
   const [links, setLinks] = useState<ShareLinkSummary[]>([])
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
+
+  // Email send state
   const [emailModeFor, setEmailModeFor] = useState<string | null>(null)
-  const [emailRecipient, setEmailRecipient] = useState('')
-  const [emailMessage, setEmailMessage] = useState('')
-  const [sendingEmail, setSendingEmail] = useState(false)
-  const [emailSentFor, setEmailSentFor] = useState<string | null>(null)
+
+  const [contactsState, setContactsState] = useState<{
+    organizationName: string | null
+    contacts: OrgContact[]
+  } | null>(null)
+
+  const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set())
+  const [adHocEmail, setAdHocEmail] = useState('')
+  const [customMessage, setCustomMessage] = useState('')
+  const [includePdf, setIncludePdf] = useState(true)
+  const [pdfSize, setPdfSize] = useState<PdfSizeInfo | null>(null)
+  const [sendState, setSendState] = useState<SendState>('idle')
+  const [emailSentSummary, setEmailSentSummary] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -107,6 +143,41 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
     }
   }, [open, refresh])
 
+  const loadContactsAndPdfSize = useCallback(
+    async (shortCode: string) => {
+      try {
+        const [contactsRes, sizeRes] = await Promise.all([
+          fetch(`/api/finance/quotes/${quoteId}/share/contacts`, { cache: 'no-store' }),
+          fetch(`/api/finance/quotes/${quoteId}/share/${shortCode}/pdf-size`, { cache: 'no-store' })
+        ])
+
+        if (contactsRes.ok) {
+          const data = (await contactsRes.json()) as {
+            organization: { name: string } | null
+            contacts: OrgContact[]
+          }
+
+          setContactsState({
+            organizationName: data.organization?.name ?? null,
+            contacts: data.contacts
+          })
+
+          // Default-select the primary contact
+          const primary = data.contacts.find(c => c.isPrimary)
+
+          if (primary) setSelectedContactIds(new Set([primary.contactId]))
+        }
+
+        if (sizeRes.ok) {
+          setPdfSize(await sizeRes.json())
+        }
+      } catch (err) {
+        console.warn('Failed to load contacts/pdf-size', err)
+      }
+    },
+    [quoteId]
+  )
+
   const createLink = async () => {
     setCreating(true)
     setError(null)
@@ -121,7 +192,7 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
 
-        throw new Error(body.error || `HTTP ${res.status}`)
+        throw new Error(body.error?.message || body.error || `HTTP ${res.status}`)
       }
 
       await refresh()
@@ -133,7 +204,11 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
   }
 
   const revoke = async (shortCode: string) => {
-    if (!window.confirm('¿Seguro que quieres revocar este link? El cliente verá "Documento inválido" si lo abre.')) {
+    if (
+      !window.confirm(
+        '¿Seguro que quieres revocar este link? El cliente verá "Documento inválido" si lo abre.'
+      )
+    ) {
       return
     }
 
@@ -157,40 +232,93 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
   }
 
   const sendEmail = async (shortCode: string) => {
-    if (!emailRecipient.includes('@')) {
-      setError('Email del destinatario requerido')
+    if (selectedContactIds.size === 0 && !adHocEmail.trim()) {
+      setError('Selecciona al menos un contacto o agrega un email externo')
       
 return
     }
 
-    setSendingEmail(true)
+    if (selectedContactIds.size === 0 && adHocEmail.trim()) {
+      setError(
+        'Para enviar a un email externo, debes incluir también al menos un contacto de la organización.'
+      )
+      
+return
+    }
+
+    setSendState(includePdf ? 'generating-pdf' : 'sending')
     setError(null)
 
+    // After 250ms, transition the loading text from 'generating-pdf' to 'sending'
+    // (PDF generation is server-side; we approximate the visual feedback)
+    let transitionTimer: ReturnType<typeof setTimeout> | null = null
+
+    if (includePdf) {
+      transitionTimer = setTimeout(() => {
+        setSendState(prev => (prev === 'generating-pdf' ? 'sending' : prev))
+      }, 250)
+    }
+
     try {
+      const recipients = Array.from(selectedContactIds).map(contactId => ({ contactId }))
+
+      const adHocRecipients =
+        adHocEmail.trim() && adHocEmail.includes('@')
+          ? [{ email: adHocEmail.trim() }]
+          : []
+
       const res = await fetch(`/api/finance/quotes/${quoteId}/share/${shortCode}/send-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': crypto.randomUUID()
+        },
         body: JSON.stringify({
-          recipientEmail: emailRecipient.trim(),
-          customMessage: emailMessage.trim() || undefined
+          recipients,
+          adHocRecipients,
+          customMessage: customMessage.trim() || undefined,
+          includePdf
         })
       })
+
+      if (transitionTimer) clearTimeout(transitionTimer)
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
 
-        throw new Error(body.error || `HTTP ${res.status}`)
+        throw new Error(body.error?.message || body.error || `HTTP ${res.status}`)
       }
 
-      setEmailSentFor(shortCode)
-      setEmailModeFor(null)
-      setEmailRecipient('')
-      setEmailMessage('')
-      setTimeout(() => setEmailSentFor(null), 4000)
+      const result = (await res.json()) as {
+        sent: number
+        pdfStatus: string
+      }
+
+      setSendState('success')
+
+      const pdfNote =
+        result.pdfStatus === 'failed_graceful'
+          ? ' (sin PDF — error al generar)'
+          : result.pdfStatus.startsWith('attached')
+            ? ' + PDF'
+            : ''
+
+      setEmailSentSummary(`Email enviado a ${result.sent} ${result.sent === 1 ? 'destinatario' : 'destinatarios'}${pdfNote}`)
+
+      // Reset form after 4s and refresh links
+      setTimeout(() => {
+        setSendState('idle')
+        setEmailSentSummary(null)
+        setEmailModeFor(null)
+        setSelectedContactIds(new Set())
+        setAdHocEmail('')
+        setCustomMessage('')
+        void refresh()
+      }, 4000)
     } catch (err) {
+      if (transitionTimer) clearTimeout(transitionTimer)
+      setSendState('error')
       setError(err instanceof Error ? err.message : 'No pudimos enviar el email')
-    } finally {
-      setSendingEmail(false)
     }
   }
 
@@ -200,10 +328,55 @@ return
       setCopiedCode(code)
       setTimeout(() => setCopiedCode(null), 2000)
     } catch {
-      // Fallback: prompt user to copy manually
       window.prompt('Copia el link:', url)
     }
   }
+
+  const openEmailMode = (shortCode: string) => {
+    setEmailModeFor(shortCode)
+    setError(null)
+    setEmailSentSummary(null)
+    setSendState('idle')
+    void loadContactsAndPdfSize(shortCode)
+  }
+
+  const closeEmailMode = () => {
+    setEmailModeFor(null)
+    setSelectedContactIds(new Set())
+    setAdHocEmail('')
+    setCustomMessage('')
+    setError(null)
+  }
+
+  const buttonText = useMemo(() => {
+    switch (sendState) {
+      case 'generating-pdf':
+        return 'Generando PDF...'
+      case 'sending':
+        return 'Enviando email...'
+      case 'success':
+        return '✓ Enviado'
+      case 'error':
+        return 'Reintentar'
+
+      default: {
+        const count = selectedContactIds.size + (adHocEmail.includes('@') ? 1 : 0)
+
+        return count > 0
+          ? `Enviar a ${count} ${count === 1 ? 'destinatario' : 'destinatarios'}`
+          : 'Enviar email'
+      }
+    }
+  }, [sendState, selectedContactIds.size, adHocEmail])
+
+  const pdfSizeLabel = useMemo(() => {
+    if (!pdfSize) return '~80–150 KB'
+    if (pdfSize.sizeBytes !== null) return formatBytes(pdfSize.sizeBytes)
+
+    const range = pdfSize.estimatedRangeBytes
+
+    return range ? `~${formatBytes(range.min)}–${formatBytes(range.max)}` : '~80–150 KB'
+  }, [pdfSize])
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
@@ -229,6 +402,12 @@ return
           </Alert>
         ) : null}
 
+        {emailSentSummary ? (
+          <Alert severity='success' sx={{ mb: 2 }}>
+            {emailSentSummary}
+          </Alert>
+        ) : null}
+
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress size={28} />
@@ -242,7 +421,9 @@ return
               variant='contained'
               onClick={createLink}
               disabled={creating}
-              startIcon={creating ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-link' />}
+              startIcon={
+                creating ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-link' />
+              }
             >
               {creating ? 'Generando...' : 'Generar link compartible'}
             </Button>
@@ -277,7 +458,11 @@ return
                     {link.shortUrl}
                   </Box>
                   <Tooltip title={copiedCode === link.shortCode ? '¡Copiado!' : 'Copiar link'}>
-                    <IconButton onClick={() => copy(link.shortUrl, link.shortCode)} size='small' color='primary'>
+                    <IconButton
+                      onClick={() => copy(link.shortUrl, link.shortCode)}
+                      size='small'
+                      color='primary'
+                    >
                       <i className={copiedCode === link.shortCode ? 'tabler-check' : 'tabler-copy'} />
                     </IconButton>
                   </Tooltip>
@@ -285,7 +470,11 @@ return
 
                 <Stack direction='row' spacing={2} sx={{ mb: 2 }}>
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                    <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{ textTransform: 'uppercase', letterSpacing: 0.8 }}
+                    >
                       Aperturas
                     </Typography>
                     <Typography variant='h6' sx={{ fontWeight: 600 }}>
@@ -293,7 +482,11 @@ return
                     </Typography>
                   </Box>
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                    <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{ textTransform: 'uppercase', letterSpacing: 0.8 }}
+                    >
                       Última apertura
                     </Typography>
                     <Typography variant='body2' sx={{ fontWeight: 500 }}>
@@ -301,7 +494,11 @@ return
                     </Typography>
                   </Box>
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                    <Typography
+                      variant='caption'
+                      color='text.secondary'
+                      sx={{ textTransform: 'uppercase', letterSpacing: 0.8 }}
+                    >
                       Vence
                     </Typography>
                     <Typography variant='body2' sx={{ fontWeight: 500 }}>
@@ -316,10 +513,9 @@ return
                     color='primary'
                     size='small'
                     startIcon={<i className='tabler-mail' />}
-                    onClick={() => {
-                      setEmailModeFor(emailModeFor === link.shortCode ? null : link.shortCode)
-                      setError(null)
-                    }}
+                    onClick={() =>
+                      emailModeFor === link.shortCode ? closeEmailMode() : openEmailMode(link.shortCode)
+                    }
                   >
                     {emailModeFor === link.shortCode ? 'Cancelar' : 'Enviar por email'}
                   </Button>
@@ -329,7 +525,13 @@ return
                     size='small'
                     onClick={() => revoke(link.shortCode)}
                     disabled={revokingCode === link.shortCode}
-                    startIcon={revokingCode === link.shortCode ? <CircularProgress size={14} color='inherit' /> : <i className='tabler-ban' />}
+                    startIcon={
+                      revokingCode === link.shortCode ? (
+                        <CircularProgress size={14} color='inherit' />
+                      ) : (
+                        <i className='tabler-ban' />
+                      )
+                    }
                   >
                     {revokingCode === link.shortCode ? 'Revocando...' : 'Revocar'}
                   </Button>
@@ -338,49 +540,145 @@ return
                 {emailModeFor === link.shortCode ? (
                   <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
                     <Stack spacing={1.5}>
+                      <Box>
+                        <Typography
+                          variant='caption'
+                          color='text.secondary'
+                          sx={{ textTransform: 'uppercase', letterSpacing: 0.8, fontWeight: 600 }}
+                        >
+                          Para
+                          {contactsState?.organizationName ? ` (contactos de ${contactsState.organizationName})` : null}
+                        </Typography>
+
+                        {!contactsState ? (
+                          <CircularProgress size={16} sx={{ mt: 1 }} />
+                        ) : contactsState.contacts.length === 0 ? (
+                          <Alert severity='info' sx={{ mt: 1 }}>
+                            No hay contactos registrados para esta organización. Agrega un email externo
+                            abajo.
+                          </Alert>
+                        ) : (
+                          <Stack sx={{ mt: 1, maxHeight: 200, overflowY: 'auto' }}>
+                            {contactsState.contacts.map(contact => (
+                              <FormControlLabel
+                                key={contact.contactId}
+                                control={
+                                  <Checkbox
+                                    size='small'
+                                    checked={selectedContactIds.has(contact.contactId)}
+                                    onChange={e => {
+                                      const next = new Set(selectedContactIds)
+
+                                      if (e.target.checked) next.add(contact.contactId)
+                                      else next.delete(contact.contactId)
+                                      setSelectedContactIds(next)
+                                    }}
+                                  />
+                                }
+                                label={
+                                  <Box>
+                                    <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                                      {contact.name || contact.email}
+                                      {contact.isPrimary ? (
+                                        <Chip
+                                          label='primary'
+                                          size='small'
+                                          sx={{ ml: 1, height: 18, fontSize: 10 }}
+                                          color='primary'
+                                        />
+                                      ) : null}
+                                    </Typography>
+                                    <Typography variant='caption' color='text.secondary'>
+                                      {contact.email}
+                                      {contact.role ? ` · ${contact.role}` : ''}
+                                    </Typography>
+                                  </Box>
+                                }
+                              />
+                            ))}
+                          </Stack>
+                        )}
+                      </Box>
+
                       <TextField
-                        label='Email del destinatario'
+                        label='+ Agregar email externo (no en CRM)'
                         type='email'
                         size='small'
                         fullWidth
-                        required
-                        value={emailRecipient}
-                        onChange={e => setEmailRecipient(e.target.value)}
-                        placeholder='cliente@empresa.com'
-                        disabled={sendingEmail}
+                        value={adHocEmail}
+                        onChange={e => setAdHocEmail(e.target.value)}
+                        placeholder='consultor@externo.com'
+                        disabled={sendState === 'generating-pdf' || sendState === 'sending'}
+                        helperText='Requiere al menos 1 contacto de la organización seleccionado arriba'
                       />
+
                       <TextField
                         label='Mensaje adicional (opcional)'
                         size='small'
                         fullWidth
                         multiline
                         rows={3}
-                        value={emailMessage}
-                        onChange={e => setEmailMessage(e.target.value)}
-                        placeholder='Hola María, te dejo la propuesta para que la revisemos en la próxima reunión...'
-                        disabled={sendingEmail}
+                        value={customMessage}
+                        onChange={e => setCustomMessage(e.target.value)}
+                        placeholder='Hola María, te dejo la propuesta para que la revisemos...'
+                        disabled={sendState === 'generating-pdf' || sendState === 'sending'}
                       />
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={includePdf}
+                              onChange={e => setIncludePdf(e.target.checked)}
+                              disabled={sendState === 'generating-pdf' || sendState === 'sending'}
+                            />
+                          }
+                          label={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Typography variant='body2'>
+                                Incluir PDF como adjunto
+                              </Typography>
+                              <Typography variant='caption' color='text.secondary'>
+                                {pdfSizeLabel}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                        <Tooltip title='El PDF se genera en nuestros servidores (~200ms primera vez, luego cached) y se adjunta al email. Sin él, solo se envía el link.'>
+                          <IconButton size='small' disableFocusRipple>
+                            <i className='tabler-info-circle' style={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+
                       <Button
                         variant='contained'
-                        size='small'
+                        size='medium'
                         onClick={() => sendEmail(link.shortCode)}
-                        disabled={sendingEmail || !emailRecipient.includes('@')}
-                        startIcon={sendingEmail ? <CircularProgress size={14} color='inherit' /> : <i className='tabler-send' />}
+                        disabled={sendState === 'generating-pdf' || sendState === 'sending'}
+                        startIcon={
+                          sendState === 'generating-pdf' || sendState === 'sending' ? (
+                            <CircularProgress size={14} color='inherit' />
+                          ) : (
+                            <i className='tabler-send' />
+                          )
+                        }
+                        aria-live='polite'
                       >
-                        {sendingEmail ? 'Enviando...' : 'Enviar email'}
+                        {buttonText}
                       </Button>
                     </Stack>
                   </Box>
                 ) : null}
 
-                {emailSentFor === link.shortCode ? (
-                  <Alert severity='success' sx={{ mt: 2 }}>
-                    Email enviado correctamente al cliente.
-                  </Alert>
-                ) : null}
-
                 <Box sx={{ mt: 1.5, display: 'flex', gap: 1 }}>
-                  <CustomChip round='true' size='small' variant='tonal' color='info' label={`Creado ${formatRelative(link.createdAt)}`} />
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color='info'
+                    label={`Creado ${formatRelative(link.createdAt)}`}
+                  />
                 </Box>
               </Box>
             ))}
