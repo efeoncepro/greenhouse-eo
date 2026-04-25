@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Se abren follow-ups ejecutables para API Platform V1.1
+
+### Que cambio
+
+Se registró un programa corto y cuatro child tasks para ejecutar el siguiente tramo de la plataforma API después de `TASK-616`:
+
+- `TASK-617` — API Platform V1.1 Convergence Program
+- `TASK-617.1` — API Platform REST Hardening
+- `TASK-617.2` — API Platform First-Party App Surface Foundation
+- `TASK-617.3` — API Platform Event Control Plane
+- `TASK-617.4` — Developer API Documentation Portal
+
+### Decisión canónica explicitada
+
+La secuencia operativa queda así:
+
+1. endurecer REST en `ecosystem`
+2. abrir lane `app` para la futura app `React Native`
+3. converger `webhooks / event delivery` como control plane de plataforma
+4. evolucionar `/developers/api` a portal público canónico
+5. recién después retomar `MCP`
+
+## Sesion 2026-04-25 — API Platform ahora considera first-party mobile clients
+
+### Que cambio
+
+Se amplió la arquitectura de `API Platform` para dejar explícito que también debe servir como backend contract para futuras apps `iOS` y `Android`.
+
+Documento actualizado:
+
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+
+### Decisión canónica explicitada
+
+La regla nueva es:
+
+- Greenhouse no debe conectar la app móvil a rutas internas del portal pensadas para web
+- debe exponer una lane first-party `app` dentro de `api/platform/*`
+- mobile pasa a ser consumer oficial de la plataforma, no un caso secundario de integrations
+- el supuesto actual de producto es app móvil `React Native`, tratado como contexto de consumer y no como dependencia rígida del contrato API
+
 ## Sesion 2026-04-25 — API Platform y MCP cierran sus decisiones arquitectónicas pendientes
 
 ### Que cambio

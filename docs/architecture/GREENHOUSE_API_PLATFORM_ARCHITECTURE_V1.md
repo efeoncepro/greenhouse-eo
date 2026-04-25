@@ -14,6 +14,7 @@
 Formalizar la arquitectura canónica de la `API platform` de Greenhouse para que el portal deje de crecer como una suma de rutas aisladas y pase a operar una capa de contratos consistente, robusta, resiliente, segura y escalable para:
 
 - surfaces internas del propio portal
+- first-party clients como futuras apps `iOS` y `Android`
 - consumers ecosystem/server-to-server
 - sister platforms como `Kortex`
 - futuros adapters `MCP`
@@ -50,8 +51,10 @@ Hoy el repo ya tiene piezas reales de una API platform, pero aún no una capa un
 - una taxonomía única de errores y degraded modes
 - una policy uniforme de versionado
 - una capability shared de idempotencia para writes
+- una lane first-party clara para clients móviles
 - una separación explícita entre:
   - rutas de producto/UI
+  - consumers first-party app
   - contratos ecosystem-facing
   - futuros adapters MCP downstream
 
@@ -248,7 +251,33 @@ Auth:
 - scope explícito
 - bindings explícitos cuando aplique
 
-### 7.3 Public
+### 7.3 App
+
+`/api/platform/app/*`
+
+Uso:
+
+- apps first-party `iOS`
+- apps first-party `Android`
+- futuros clients first-party no web que necesiten un contrato estable y desacoplado del portal
+
+Contexto actual:
+
+- la app móvil prevista hoy para Greenhouse es `React Native`
+- esta spec lo trata como supuesto vigente de consumer, no como dependencia rígida del contrato API
+
+Auth:
+
+- auth de usuario first-party
+- sesión o tokens móviles gobernados por Identity Access
+- tenancy y permisos resueltos por usuario autenticado, no por consumer token ecosystem
+
+Regla:
+
+- la app móvil no debe depender de rutas internas pensadas para server components o UI web del portal
+- debe depender de contratos estables de `api/platform/*`
+
+### 7.4 Public
 
 `/api/platform/public/*`
 
@@ -397,20 +426,43 @@ Greenhouse podrá decir que su `API platform` es RESTful de forma sólida cuando
 
 El objetivo canónico de Greenhouse no es solo una REST API de lectura/escritura.
 
-El objetivo completo es una **API platform convergida** con tres piezas:
+El objetivo completo es una **API platform convergida** con cuatro piezas:
 
 1. `RESTful resource API`
    - resources y command endpoints HTTP claros
-2. `Event delivery / webhooks`
+2. `First-party client surface`
+   - contrato estable para mobile app y futuros clients propios
+3. `Event delivery / webhooks`
    - delivery outbound y recepción inbound gobernados como capability de plataforma
-3. `MCP downstream`
+4. `MCP downstream`
    - adapters montados sobre contratos ya estabilizados
 
 En otras palabras:
 
 - REST es una parte del objetivo
+- first-party app support es otra parte del objetivo
 - webhooks/event delivery son otra parte del objetivo
 - MCP viene después, no antes
+
+### 8.8.1 First-party mobile rule
+
+Si Greenhouse lanza app `iOS` o `Android`, esa app debe tratarse como consumer oficial de la `API platform`.
+
+Eso implica:
+
+- no acoplarla a rutas internas del portal diseñadas para la web
+- no usar payloads accidentales de UI como contrato móvil
+- diseñar resources y commands explícitos para mobile workflows
+- garantizar auth, caching, paginación y performance compatibles con redes móviles
+
+El hecho de que la app prevista hoy sea `React Native` refuerza además:
+
+- la conveniencia de contratos HTTP predecibles
+- OpenAPI usable
+- generación o compartición de types TypeScript
+- payloads compactos y ergonómicos para clientes JS/TS móviles
+
+La `API platform` existe también para servir de backend contract de first-party clients, no solo de integraciones externas.
 
 ### 8.9 Estado actual del objetivo completo
 
@@ -426,6 +478,8 @@ Hoy Greenhouse ya tiene partes importantes de ese objetivo, pero todavía distri
 
 #### Todavía falta converger
 
+- que exista una lane first-party clara para mobile app
+- que la estrategia de auth móvil quede separada del lane ecosystem server-to-server
 - que webhooks/event delivery queden modelados explícitamente como parte de la `API platform`
 - que exista un contrato canónico ecosystem-facing para subscriptions, deliveries y firmas
 - que REST y event delivery compartan de forma explícita:
@@ -439,22 +493,30 @@ Hoy Greenhouse ya tiene partes importantes de ese objetivo, pero todavía distri
 
 Además de las brechas REST descritas arriba, faltan estas:
 
-1. **Webhooks todavía no viven bajo `api/platform/*`**
+1. **First-party mobile lane todavía no existe**
+   - la arquitectura ya la necesita
+   - el runtime todavía no la implementa
+
+2. **Auth móvil first-party todavía no está formalizada dentro de la platform**
+   - falta definir estrategia de sesión/tokens para mobile
+   - falta cerrar cómo se resuelven refresh, revocación y device posture cuando aplique
+
+3. **Webhooks todavía no viven bajo `api/platform/*`**
    - existen como capability operativa del repo
    - todavía no son una lane convergida de platform API
 
-2. **Subscriptions y deliveries no están expuestos como resources canónicos de plataforma**
+4. **Subscriptions y deliveries no están expuestos como resources canónicos de plataforma**
    - el runtime existe
    - el contrato ecosystem-facing todavía no
 
-3. **Event contract no está gobernado junto a la lane nueva**
+5. **Event contract no está gobernado junto a la lane nueva**
    - faltan reglas más explícitas para:
      - envelope versioning
      - firma y auth outbound
      - retry policy declarada como contrato
      - dead-letter semantics canónicas
 
-4. **REST y webhooks aún no comparten un control plane unificado**
+6. **REST y webhooks aún no comparten un control plane unificado**
    - hoy se apoyan en foundations sanas pero separadas
    - todavía falta una historia única de platform API para consumers externos
 
@@ -463,20 +525,22 @@ Además de las brechas REST descritas arriba, faltan estas:
 La secuencia canónica debería ser:
 
 1. cerrar la madurez REST del lane `api/platform/ecosystem/*`
-2. formalizar webhooks/event delivery como parte de `api-platform`
-3. converger observabilidad, seguridad, errores y versionado entre ambas capas
-4. recién después expandir commands amplios, public API o MCP más rico
+2. definir la lane `app` y la estrategia first-party mobile
+3. formalizar webhooks/event delivery como parte de `api-platform`
+4. converger observabilidad, seguridad, errores y versionado entre esas capas
+5. recién después expandir commands amplios, public API o MCP más rico
 
 ### 8.12 Regla operativa
 
 Greenhouse no debe tratar “REST” y “webhooks” como programas separados y competidores.
 
-Debe tratarlos como dos caras de la misma `API platform`:
+Debe tratar la `API platform` como una capability que sirve tres clases de consumers:
 
+- first-party apps para experiencias propias como mobile
 - REST para consultar y comandar
 - webhooks/event delivery para reaccionar a cambios
 
-El objetivo no se considera completo mientras una de esas dos capas siga viviendo como capability útil pero todavía no convergida bajo la disciplina de plataforma nueva.
+El objetivo no se considera completo mientras una de esas capas siga viviendo como capability útil pero todavía no convergida bajo la disciplina de plataforma nueva.
 
 ---
 

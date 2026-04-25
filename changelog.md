@@ -2,6 +2,11 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — API Platform ya considera mobile app como consumer first-party oficial
+
+- `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` ahora deja explícito que la plataforma API también debe servir a futuras apps `iOS` y `Android`.
+- Se formaliza una lane `app` dentro de `api/platform/*` y la regla de no acoplar mobile a rutas internas del portal pensadas para web.
+
 ### 2026-04-25 — API Platform y MCP ya tienen cierre de decisiones arquitectónicas pendientes
 
 - `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` ahora deja explícitos el `event control plane`, el resource canon V1.1, la policy de writes/status codes, la deprecación y la disciplina de frescura.
