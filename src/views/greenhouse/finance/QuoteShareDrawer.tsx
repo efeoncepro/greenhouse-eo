@@ -12,6 +12,7 @@ import {
   DialogTitle,
   IconButton,
   Stack,
+  TextField,
   Tooltip,
   Typography
 } from '@mui/material'
@@ -76,6 +77,11 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
   const [error, setError] = useState<string | null>(null)
   const [links, setLinks] = useState<ShareLinkSummary[]>([])
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
+  const [emailModeFor, setEmailModeFor] = useState<string | null>(null)
+  const [emailRecipient, setEmailRecipient] = useState('')
+  const [emailMessage, setEmailMessage] = useState('')
+  const [sendingEmail, setSendingEmail] = useState(false)
+  const [emailSentFor, setEmailSentFor] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -147,6 +153,44 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
       setError(err instanceof Error ? err.message : 'No pudimos revocar el link')
     } finally {
       setRevokingCode(null)
+    }
+  }
+
+  const sendEmail = async (shortCode: string) => {
+    if (!emailRecipient.includes('@')) {
+      setError('Email del destinatario requerido')
+      
+return
+    }
+
+    setSendingEmail(true)
+    setError(null)
+
+    try {
+      const res = await fetch(`/api/finance/quotes/${quoteId}/share/${shortCode}/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientEmail: emailRecipient.trim(),
+          customMessage: emailMessage.trim() || undefined
+        })
+      })
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+
+        throw new Error(body.error || `HTTP ${res.status}`)
+      }
+
+      setEmailSentFor(shortCode)
+      setEmailModeFor(null)
+      setEmailRecipient('')
+      setEmailMessage('')
+      setTimeout(() => setEmailSentFor(null), 4000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No pudimos enviar el email')
+    } finally {
+      setSendingEmail(false)
     }
   }
 
@@ -268,12 +312,16 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
 
                 <Stack direction='row' spacing={1}>
                   <Button
-                    variant='outlined'
+                    variant={emailModeFor === link.shortCode ? 'contained' : 'outlined'}
+                    color='primary'
                     size='small'
                     startIcon={<i className='tabler-mail' />}
-                    href={`mailto:?subject=${encodeURIComponent(`Propuesta ${quotationNumber}`)}&body=${encodeURIComponent(`Hola,\n\nAdjunto el link a tu propuesta:\n\n${link.shortUrl}\n\nSaludos,\nEfeonce Group`)}`}
+                    onClick={() => {
+                      setEmailModeFor(emailModeFor === link.shortCode ? null : link.shortCode)
+                      setError(null)
+                    }}
                   >
-                    Enviar por email
+                    {emailModeFor === link.shortCode ? 'Cancelar' : 'Enviar por email'}
                   </Button>
                   <Button
                     variant='outlined'
@@ -286,6 +334,50 @@ export const QuoteShareDrawer = ({ open, onClose, quoteId, quotationNumber }: Pr
                     {revokingCode === link.shortCode ? 'Revocando...' : 'Revocar'}
                   </Button>
                 </Stack>
+
+                {emailModeFor === link.shortCode ? (
+                  <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+                    <Stack spacing={1.5}>
+                      <TextField
+                        label='Email del destinatario'
+                        type='email'
+                        size='small'
+                        fullWidth
+                        required
+                        value={emailRecipient}
+                        onChange={e => setEmailRecipient(e.target.value)}
+                        placeholder='cliente@empresa.com'
+                        disabled={sendingEmail}
+                      />
+                      <TextField
+                        label='Mensaje adicional (opcional)'
+                        size='small'
+                        fullWidth
+                        multiline
+                        rows={3}
+                        value={emailMessage}
+                        onChange={e => setEmailMessage(e.target.value)}
+                        placeholder='Hola María, te dejo la propuesta para que la revisemos en la próxima reunión...'
+                        disabled={sendingEmail}
+                      />
+                      <Button
+                        variant='contained'
+                        size='small'
+                        onClick={() => sendEmail(link.shortCode)}
+                        disabled={sendingEmail || !emailRecipient.includes('@')}
+                        startIcon={sendingEmail ? <CircularProgress size={14} color='inherit' /> : <i className='tabler-send' />}
+                      >
+                        {sendingEmail ? 'Enviando...' : 'Enviar email'}
+                      </Button>
+                    </Stack>
+                  </Box>
+                ) : null}
+
+                {emailSentFor === link.shortCode ? (
+                  <Alert severity='success' sx={{ mt: 2 }}>
+                    Email enviado correctamente al cliente.
+                  </Alert>
+                ) : null}
 
                 <Box sx={{ mt: 1.5, display: 'flex', gap: 1 }}>
                   <CustomChip round='true' size='small' variant='tonal' color='info' label={`Creado ${formatRelative(link.createdAt)}`} />

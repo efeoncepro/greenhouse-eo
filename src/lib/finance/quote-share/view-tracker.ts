@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { sendSlackAlert } from '@/lib/alerts/slack-notify'
 import { query } from '@/lib/db'
 
 /**
@@ -25,6 +26,15 @@ interface RecordShareViewInput {
 
 export const recordShareView = async (input: RecordShareViewInput): Promise<void> => {
   try {
+    // Detect first view for this quote+version (across all short codes)
+    // BEFORE inserting — if no rows exist yet, this view is the first.
+    const { viewCount } = await getShareViewAggregate(
+      input.quotationId,
+      input.versionNumber
+    )
+
+    const isFirstView = viewCount === 0
+
     await query(
       `INSERT INTO greenhouse_commercial.quote_share_views
          (short_code, quotation_id, version_number, ip_address, user_agent, referer)
@@ -38,6 +48,17 @@ export const recordShareView = async (input: RecordShareViewInput): Promise<void
         input.referer ?? null
       ]
     )
+
+    // Best-effort Slack notification on FIRST view of this quote version
+    // — anti-spam: only one notification per quote+version, regardless of
+    // how many short links exist or how many times the client refreshes.
+    if (isFirstView) {
+      sendSlackAlert(
+        `:eyes: *Cotización ${input.quotationId} v${input.versionNumber} fue abierta por primera vez*\n` +
+          `Origen: ${input.shortCode ? `link corto /q/${input.shortCode}` : 'link canónico (PDF QR o directo)'}\n` +
+          `IP: ${input.ipAddress ?? 'desconocida'} · UA: ${(input.userAgent ?? 'desconocido').slice(0, 80)}`
+      ).catch(() => {})
+    }
   } catch (error) {
     console.warn(
       '[quote-share] Failed to record share view:',

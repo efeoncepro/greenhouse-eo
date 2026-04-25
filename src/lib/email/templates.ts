@@ -10,6 +10,7 @@ import PasswordResetEmail from '@/emails/PasswordResetEmail'
 import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
 import PayrollLiquidacionV2Email from '@/emails/PayrollLiquidacionV2Email'
 import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
+import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import VerifyEmail from '@/emails/VerifyEmail'
 import type { WeeklyDigestEmailContext } from '@/lib/nexa/digest'
@@ -1068,3 +1069,46 @@ registerPreviewMeta('weekly_executive_digest', {
     { key: 'closingNote', label: 'Nota de cierre', type: 'text' }
   ]
 })
+
+// ── TASK-631 Fase 3 — quote_share template ─────────────────────────────────
+registerTemplate('quote_share', (context: {
+  shareUrl: string
+  quotationNumber: string
+  versionNumber: number
+  clientName: string
+  totalLabel: string
+  validUntilLabel?: string | null
+  senderName: string
+  senderRole?: string | null
+  senderEmail?: string | null
+  customMessage?: string | null
+}) => ({
+  subject: `Propuesta ${context.quotationNumber} v${context.versionNumber} — Efeonce`,
+  react: QuoteSharePromptEmail({
+    shareUrl: context.shareUrl,
+    quotationNumber: context.quotationNumber,
+    versionNumber: context.versionNumber,
+    clientName: context.clientName,
+    totalLabel: context.totalLabel,
+    validUntilLabel: context.validUntilLabel ?? null,
+    senderName: context.senderName,
+    senderRole: context.senderRole ?? null,
+    senderEmail: context.senderEmail ?? null,
+    customMessage: context.customMessage ?? null
+  }),
+  text: [
+    `Hola ${context.clientName},`,
+    '',
+    context.customMessage ?? `Te comparto la propuesta comercial ${context.quotationNumber} v${context.versionNumber}.`,
+    '',
+    `Inversión total: ${context.totalLabel}`,
+    context.validUntilLabel ? `Válida hasta: ${context.validUntilLabel}` : '',
+    '',
+    `Ver propuesta: ${context.shareUrl}`,
+    '',
+    `Saludos,`,
+    context.senderName,
+    context.senderRole ?? '',
+    context.senderEmail ?? ''
+  ].filter(Boolean).join('\n')
+}))
