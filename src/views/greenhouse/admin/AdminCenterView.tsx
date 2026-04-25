@@ -23,6 +23,7 @@ import {
   GreenhouseDragList,
   ReliabilityModuleCard
 } from '@/components/greenhouse'
+import ReliabilityAiWatcherCard from '@/components/greenhouse/admin/ReliabilityAiWatcherCard'
 import ReliabilitySyntheticCard from '@/components/greenhouse/admin/ReliabilitySyntheticCard'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
@@ -44,6 +45,16 @@ import AdminCenterSpacesTable from './AdminCenterSpacesTable'
 
 type StatusFilter = 'all' | 'active' | 'onboarding' | 'attention' | 'inactive'
 
+type AiObservationView = {
+  observationId: string
+  sweepRunId: string
+  severity: ReliabilityOverview['modules'][number]['status']
+  summary: string
+  recommendedAction: string | null
+  model: string
+  observedAt: string
+}
+
 type Props = {
   access: AdminAccessOverview
   tenants: AdminTenantsOverview
@@ -58,6 +69,12 @@ type Props = {
     status: string
     notes: string | null
   } | null
+
+  /**
+   * TASK-638: Última observación scope='overview' del AI Observer.
+   * null cuando el runner aún no ha corrido o el kill-switch está OFF.
+   */
+  aiObservation: AiObservationView | null
 }
 
 type DomainCard = {
@@ -407,7 +424,8 @@ const AdminCenterView = ({
   operations,
   reliability,
   syntheticSnapshots,
-  syntheticSweep
+  syntheticSweep,
+  aiObservation
 }: Props) => {
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -800,6 +818,9 @@ const AdminCenterView = ({
           )}
         </Stack>
       </ExecutiveCardShell>
+
+      {/* ── AI Observer (TASK-638) ── */}
+      <ReliabilityAiWatcherCard observation={aiObservation} />
 
       {/* ── Synthetic Monitor (TASK-632) ── */}
       <ReliabilitySyntheticCard snapshots={syntheticSnapshots} sweep={syntheticSweep} />

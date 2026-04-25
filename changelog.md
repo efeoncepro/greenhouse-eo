@@ -2,6 +2,27 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Reliability AI Observer (TASK-638) — V1.2 capa Gemini Flash sobre el RCP
+
+- **Migration nueva**: `migrations/20260425211608760_task-638-reliability-ai-observations.sql` crea `greenhouse_ai.reliability_ai_observations` (PK `observation_id` formato `EO-RAI-{uuid8}`, FK `sweep_run_id` formato `EO-RAS-{uuid8}`, checks de scope `overview|module` y severity, 3 indices: `(scope,module_key,observed_at DESC)`, `(sweep_run_id)`, `(fingerprint)`). Ownership greenhouse_ops + grants runtime/migrator.
+- **`ai_summary` agregado a `ReliabilitySignalKind`** + `SIGNAL_KIND_LABELS` (signals.ts) + `SIGNAL_KIND_LABEL` (ReliabilityModuleCard.tsx local map).
+- **Pipeline AI nuevo en `src/lib/reliability/ai/`**:
+  - `sanitize.ts` + tests (14 cases): redacta emails, UUIDs canonicos, long hex, Bearer tokens, API keys (sk_/pk_/gho_/ghp_/ghu_/ghs_), Chilean RUTs. Idempotente, deterministico, recursivo via `sanitizePiiPayload`.
+  - `build-prompt.ts` + tests (14 cases): `buildPromptContext` (sanitiza + cap top 4 signals/modulo), `fingerprintModule` (sha256 truncado 16 chars sobre status+confidence+counts+missing ordenados, order-insensitive), `fingerprintOverview`, `buildPrompts` (system + user con JSON schema estricto: overviewSummary, overviewSeverity, modules[]).
+  - `kill-switch.ts`: `isReliabilityAiObserverEnabled()` lee `RELIABILITY_AI_OBSERVER_ENABLED`. Default OFF (opt-in) — convencion **opuesta** a synthetic. Costo cero hasta activacion explicita.
+  - `persist.ts`: `recordAiObservation()` con `INSERT ... ON CONFLICT DO NOTHING`, `getLatestFingerprint()` para dedup lookup, generadores de IDs.
+  - `reader.ts`: `getLatestAiObservation(scope, moduleKey)` y `getLatestAiObservationsByScope()` (ventana 24h via `ROW_NUMBER() OVER (PARTITION BY scope, module_key)`).
+  - `runner.ts`: `runReliabilityAiObserver()` host-agnostic orchestrator. Verifica kill-switch → carga overview → buildPrompts → Gemini Flash via `@google/genai` con `responseMimeType=application/json` + `temperature=0.1` → parsea + valida → fingerprint dedup → persiste solo lo que cambio. Retorna `AiSweepSummary` con counts.
+  - `build-ai-summary-signals.ts`: adapter `AiObservation[]` → `ReliabilitySignal[]` con `kind='ai_summary'`. Defensa en profundidad descarta moduleKeys no canonicos.
+- **Composer wiring**: `getReliabilityOverview()` acepta `options.includeAiObservations` (default OFF). Anti-feedback loop: runner llama composer SIN pasar AI source; consumer de UI la pide explicito.
+- **ops-worker endpoint**: `POST /reliability-ai-watch` en `services/ops-worker/server.ts`.
+- **Cloud Scheduler job**: `ops-reliability-ai-watch` (`0 */1 * * *`, timezone `America/Santiago`) en `deploy.sh`. README actualizado con tabla de endpoints + seccion "Reliability AI Observer (TASK-638)" con instrucciones gcloud para activar/desactivar.
+- **UI**: `ReliabilityAiWatcherCard` nuevo en Admin Center. Severity chip + modelo + edad relativa + sweep_run_id + summary + Alert con `recommendedAction`. Banner info cuando observation === null.
+- **API**: `GET /api/admin/reliability` pasa `includeAiObservations: true`. `/admin/page.tsx` resuelve `getLatestAiObservationsByScope()` en paralelo.
+- **Spec RCP V1.2**: nueva §7.1 con (a) que es y por que, (b) host decision matrix, (c) kill-switch convention, (d) dedup, (e) anti-feedback loop, (f) schema, (g) Cloud Scheduler job. 4 integration boundaries nuevas (status=ready) por modulo canonico.
+- **Documentacion funcional**: `docs/documentation/plataforma/reliability-control-plane.md` (nuevo) explica RCP + AI Observer en lenguaje simple — modulos canonicos, signal kinds, severidades, confidence, AI Observer completo, activacion gcloud, reglas de oro. Registrado en indice.
+- **Validaciones**: `tsc --noEmit` clean, `pnpm lint` clean tras autofix + manual fix (`module` → `snapshot`), `pnpm test --run src/lib/reliability/ai` → 2153 passed / 2 skipped, `pnpm build` success. Fix incidental al regex API_KEY (`[A-Za-z0-9]` → `[A-Za-z0-9_-]` para soportar `sk_live_*`).
+
 ### 2026-04-25 — Reliability Registry DB Persistence + Tenant Overrides (TASK-635) — V1.1 persiste el registry
 
 - **Migración nueva**: `migrations/20260425204554656_task-635-reliability-registry-tables.sql` crea `greenhouse_core.reliability_module_registry` (defaults) + `greenhouse_core.reliability_module_overrides` (diffs per-tenant con FK a `spaces` y `UNIQUE(space_id, module_key)`). 1 índice + ALTER OWNER greenhouse_ops + grants runtime/migrator.

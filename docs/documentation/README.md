@@ -24,6 +24,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 - [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse
 - [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
 - [Sistema de Email Templates](plataforma/sistema-email-templates.md) — inventario de templates (react-email + Resend), design tokens, assets de marca, workflow Figma ↔ codigo
+- [Reliability Control Plane y AI Observer](plataforma/reliability-control-plane.md) — lectura unificada de salud por modulo, capa narrativa Gemini Flash hosted en ops-worker + Cloud Scheduler, kill-switch opt-in, dedup por fingerprint, anti-feedback loop
 
 ### Finanzas
 

@@ -10,6 +10,7 @@ Standalone HTTP service that runs reactive projection consumers and projection-r
 | POST   | `/reactive/process`        | Process all reactive events (all domains)        | `api/cron/outbox-react`          |
 | POST   | `/reactive/process-domain` | Process domain-scoped events (default: delivery) | `api/cron/outbox-react-delivery` |
 | POST   | `/reactive/recover`        | Recover orphaned projection queue items          | `api/cron/projection-recovery`   |
+| POST   | `/reliability-ai-watch`    | Reliability AI Observer (TASK-638, Gemini)       | — (no Vercel equivalent)         |
 
 ## Request Bodies
 
@@ -24,6 +25,45 @@ All endpoints accept optional JSON body:
 
 // /reactive/recover
 { "batchSize": 10, "staleMinutes": 30 }
+
+// /reliability-ai-watch
+{ "triggeredBy": "cloud_scheduler" }   // optional: cron | manual | cloud_scheduler
+```
+
+### Reliability AI Observer (TASK-638)
+
+`POST /reliability-ai-watch` runs the Reliability Control Plane AI Observer:
+
+1. Verifies kill-switch — if `RELIABILITY_AI_OBSERVER_ENABLED=true` is not set
+   on the Cloud Run service, the endpoint returns immediately with
+   `skippedReason` and zero token cost (default OFF, opt-in).
+2. Loads `getReliabilityOverview()` (canonical reliability snapshot).
+3. Builds sanitized prompts (PII redaction: emails, UUIDs, hex tokens,
+   Bearer/sk_/gho_ keys, Chilean RUTs).
+4. Calls Gemini Flash via Vertex AI with `responseMimeType=application/json`
+   and `temperature=0.1` (deterministic enough for fingerprint dedup).
+5. Computes fingerprint per (overview, module) and persists to
+   `greenhouse_ai.reliability_ai_observations` only when fingerprint differs
+   from the latest stored value (dedup against repeated identical states).
+
+Response body shape: `AiSweepSummary` with `sweepRunId`, `observationsEvaluated`,
+`observationsPersisted`, `observationsSkipped`, `promptTokens`, `outputTokens`,
+`skippedReason`, `model`.
+
+To activate in production:
+
+```bash
+gcloud run services update ops-worker \
+  --project=efeonce-group --region=us-east4 \
+  --update-env-vars=RELIABILITY_AI_OBSERVER_ENABLED=true
+```
+
+To disable (kill-switch):
+
+```bash
+gcloud run services update ops-worker \
+  --project=efeonce-group --region=us-east4 \
+  --remove-env-vars=RELIABILITY_AI_OBSERVER_ENABLED
 ```
 
 ## Cloud Scheduler Jobs
@@ -33,6 +73,7 @@ All endpoints accept optional JSON body:
 | `ops-reactive-process`          | `*/5 * * * *`    | `/reactive/process`        |
 | `ops-reactive-process-delivery` | `2-59/5 * * * *` | `/reactive/process-domain` |
 | `ops-reactive-recover`          | `*/15 * * * *`   | `/reactive/recover`        |
+| `ops-reliability-ai-watch`      | `0 */1 * * *`    | `/reliability-ai-watch`    |
 
 ## Run Tracking
 

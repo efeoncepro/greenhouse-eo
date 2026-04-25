@@ -713,3 +713,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-635` | `to-do` | Reliability Registry DB Persistence + Tenant Overrides (híbrido: seed estático mantiene defaults, DB guarda overrides per-tenant + SLOs) | `docs/tasks/to-do/TASK-635-reliability-registry-db-persistence-tenant-overrides.md` |
 | `TASK-636` | `to-do` | Vercel Billing FOCUS Cost Observability in Admin Center | `docs/tasks/to-do/TASK-636-vercel-billing-focus-observability.md` |
 | `TASK-637` | `to-do` | GitHub Billing & Actions Cost Observability in Admin Center | `docs/tasks/to-do/TASK-637-github-billing-actions-cost-observability.md` |
+| `TASK-638` | `complete` | Reliability AI Observer (Gemini watcher hosted en ops-worker + Cloud Scheduler) | `docs/tasks/complete/TASK-638-reliability-ai-observer.md` |

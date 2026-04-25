@@ -12,7 +12,10 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const overview = await getReliabilityOverview(undefined, {}, { spaceId: tenant.spaceId ?? null })
+  const overview = await getReliabilityOverview(undefined, {}, {
+    spaceId: tenant.spaceId ?? null,
+    includeAiObservations: true
+  })
 
   return NextResponse.json(overview)
 }

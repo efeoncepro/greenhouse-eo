@@ -803,5 +803,6 @@ export const SIGNAL_KIND_LABELS: Record<ReliabilitySignalKind, string> = {
   cost_guard: 'Cost guard',
   subsystem: 'Subsistema',
   test_lane: 'Test lane',
-  billing: 'Billing'
+  billing: 'Billing',
+  ai_summary: 'AI summary'
 }

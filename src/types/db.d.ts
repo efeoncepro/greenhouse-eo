@@ -123,6 +123,22 @@ export interface GreenhouseAiNexaThreads {
   user_id: string;
 }
 
+export interface GreenhouseAiReliabilityAiObservations {
+  created_at: Generated<Timestamp>;
+  fingerprint: string;
+  model: string;
+  module_key: string;
+  observation_id: string;
+  observed_at: Timestamp;
+  output_tokens: number | null;
+  prompt_tokens: number | null;
+  recommended_action: string | null;
+  scope: string;
+  severity: string;
+  summary: string;
+  sweep_run_id: string;
+}
+
 export interface GreenhouseAiToolCatalog {
   applicability_tags: Generated<string[]>;
   applicable_business_lines: Generated<string[]>;
@@ -6455,6 +6471,7 @@ export interface DB {
   "greenhouse_ai.nexa_feedback": GreenhouseAiNexaFeedback;
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
+  "greenhouse_ai.reliability_ai_observations": GreenhouseAiReliabilityAiObservations;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_commercial.approval_policies": GreenhouseCommercialApprovalPolicies;
   "greenhouse_commercial.approval_steps": GreenhouseCommercialApprovalSteps;

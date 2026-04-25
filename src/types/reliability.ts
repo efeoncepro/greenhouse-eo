@@ -35,6 +35,14 @@ export type ReliabilitySignalKind =
   | 'test_lane'
   | 'billing'
 
+  /**
+   * TASK-638 — AI Observer enriquece el Reliability Control Plane con
+   * resumen ejecutivo + observaciones por módulo. La IA NO reemplaza reglas
+   * determinísticas; solo agrega contexto narrativo basado en el snapshot
+   * normalizado.
+   */
+  | 'ai_summary'
+
 export type ReliabilitySeverity =
   | 'ok'
   | 'warning'

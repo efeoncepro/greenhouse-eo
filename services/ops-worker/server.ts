@@ -17,6 +17,7 @@
  *   POST /quotation-lifecycle/sweep    → Daily sweep: expire overdue quotes + emit renewal_due events (TASK-351)
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
+ *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -45,6 +46,7 @@ import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
+import { runReliabilityAiObserver } from '@/lib/reliability/ai/runner'
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
@@ -770,6 +772,59 @@ const handleNexaWeeklyDigest = async (req: IncomingMessage, res: ServerResponse)
   }
 }
 
+/**
+ * POST /reliability-ai-watch
+ * TASK-638 — AI Observer del Reliability Control Plane.
+ *
+ * Lee `getReliabilityOverview()` (snapshot canónico), llama Gemini Flash via
+ * Vertex AI con prompt determinista, persiste observations dedupeadas por
+ * fingerprint en `greenhouse_ai.reliability_ai_observations`.
+ *
+ * Hosted aquí (NO en Vercel cron) porque:
+ *  - Gemini + DB writes pueden exceder 60s en corner cases
+ *  - WIF nativo en Cloud Run (no rotar ADC en Vercel)
+ *  - Cloud Logging captura prompt + respuesta para audit
+ *  - Cloud Scheduler retries automáticos con backoff
+ *
+ * Kill-switch: `RELIABILITY_AI_OBSERVER_ENABLED=true`. Default OFF (costo cero
+ * hasta activación explícita).
+ *
+ * Cloud Scheduler job recomendado: cada 1h (`0 *\/1 * * *`) timezone
+ * `America/Santiago`. Frecuencia conservadora porque dedup por fingerprint
+ * descarta repetidos — pero cada llamada cuesta tokens, sin importar dedup.
+ */
+const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const triggeredBy = (typeof body.triggeredBy === 'string' ? body.triggeredBy : 'cloud_scheduler') as
+    | 'cron'
+    | 'manual'
+    | 'cloud_scheduler'
+
+  console.log(`[ops-worker] POST /reliability-ai-watch — triggeredBy=${triggeredBy}`)
+
+  try {
+    const result = await runReliabilityAiObserver({ triggeredBy })
+
+    if (result.summary.skippedReason) {
+      console.log(
+        `[ops-worker] /reliability-ai-watch skipped — sweepRunId=${result.summary.sweepRunId} reason="${result.summary.skippedReason}"`
+      )
+    } else {
+      console.log(
+        `[ops-worker] /reliability-ai-watch done — sweepRunId=${result.summary.sweepRunId} evaluated=${result.summary.observationsEvaluated} persisted=${result.summary.observationsPersisted} skipped=${result.summary.observationsSkipped} ${result.summary.durationMs}ms model=${result.summary.model}`
+      )
+    }
+
+    json(res, 200, result.summary)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /reliability-ai-watch failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -858,6 +913,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/nexa/weekly-digest') {
       await handleNexaWeeklyDigest(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/reliability-ai-watch') {
+      await handleReliabilityAiWatch(req, res)
 
       return
     }

@@ -22,6 +22,8 @@ import type {
 } from '@/types/reliability'
 import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
+import { buildAiSummarySignals } from './ai/build-ai-summary-signals'
+import { getLatestAiObservationsByScope, type AiObservation } from './ai/reader'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
 import {
@@ -106,6 +108,38 @@ const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
     expectedSource: 'getGcpBudgetThresholdState',
     status: 'partial',
     note: 'TASK-103 todavía cubre solo cost guard runtime (kind=cost_guard). Budget thresholds 50/80/100% requieren GCP Console manual. La señal billing principal ya la cubre TASK-586.'
+  },
+  {
+    taskId: 'TASK-638',
+    moduleKey: 'finance',
+    expectedSignalKind: 'ai_summary',
+    expectedSource: 'reliability_ai_observer',
+    status: 'ready',
+    note: 'TASK-638 entregó AI Observer (Gemini Flash via Vertex AI) hosted en ops-worker + Cloud Scheduler. Adapter: buildAiSummarySignals. Default OFF (kill-switch RELIABILITY_AI_OBSERVER_ENABLED).'
+  },
+  {
+    taskId: 'TASK-638',
+    moduleKey: 'integrations.notion',
+    expectedSignalKind: 'ai_summary',
+    expectedSource: 'reliability_ai_observer',
+    status: 'ready',
+    note: 'TASK-638 entregó AI Observer (Gemini Flash via Vertex AI) hosted en ops-worker + Cloud Scheduler. Adapter: buildAiSummarySignals. Default OFF (kill-switch RELIABILITY_AI_OBSERVER_ENABLED).'
+  },
+  {
+    taskId: 'TASK-638',
+    moduleKey: 'cloud',
+    expectedSignalKind: 'ai_summary',
+    expectedSource: 'reliability_ai_observer',
+    status: 'ready',
+    note: 'TASK-638 entregó AI Observer (Gemini Flash via Vertex AI) hosted en ops-worker + Cloud Scheduler. Adapter: buildAiSummarySignals. Default OFF (kill-switch RELIABILITY_AI_OBSERVER_ENABLED).'
+  },
+  {
+    taskId: 'TASK-638',
+    moduleKey: 'delivery',
+    expectedSignalKind: 'ai_summary',
+    expectedSource: 'reliability_ai_observer',
+    status: 'ready',
+    note: 'TASK-638 entregó AI Observer (Gemini Flash via Vertex AI) hosted en ops-worker + Cloud Scheduler. Adapter: buildAiSummarySignals. Default OFF (kill-switch RELIABILITY_AI_OBSERVER_ENABLED).'
   }
 ]
 
@@ -183,6 +217,18 @@ interface ReliabilityOverviewSources {
    * mantener compatibilidad pre-635.
    */
   modules?: ReliabilityModuleDefinition[] | null
+
+  /**
+   * TASK-638: AI Observer observations. Opt-in para evitar feedback loop
+   * con el runner — cuando este source es undefined, NO se inyectan signals
+   * `ai_summary`. El runner pasa `aiObservations: null` explícitamente para
+   * pedir al composer "no inyectes" (signal de intención clara). El consumer
+   * de UI (Admin Center) pasa las observations leídas desde la DB.
+   */
+  aiObservations?: {
+    overview: AiObservation | null
+    byModule: Record<string, AiObservation>
+  } | null
 }
 
 export const buildReliabilityOverview = (
@@ -205,7 +251,8 @@ export const buildReliabilityOverview = (
     ...(sources.notionOperational ? [buildNotionFreshnessSignal(sources.notionOperational)] : []),
     ...buildSyntheticRouteSignals(syntheticSnapshots),
     ...buildSyntheticModuleSignals(syntheticSnapshots),
-    ...(sources.financeSmokeLane ? buildFinanceSmokeLaneSignals(sources.financeSmokeLane) : [])
+    ...(sources.financeSmokeLane ? buildFinanceSmokeLaneSignals(sources.financeSmokeLane) : []),
+    ...(sources.aiObservations ? buildAiSummarySignals(sources.aiObservations.byModule) : [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -300,7 +347,7 @@ export const buildReliabilityOverview = (
 export const getReliabilityOverview = async (
   preloadedOperations?: OperationsOverview,
   preloadedSources: ReliabilityOverviewSources = {},
-  options: { spaceId?: string | null } = {}
+  options: { spaceId?: string | null; includeAiObservations?: boolean } = {}
 ): Promise<ReliabilityOverview> => {
   const operations = preloadedOperations ?? (await getOperationsOverview())
 
@@ -332,11 +379,25 @@ export const getReliabilityOverview = async (
       ? preloadedSources.modules
       : await getReliabilityRegistry(options.spaceId ?? null)
 
+  /**
+   * TASK-638: AI observations son opt-in. Default OFF — el runner del AI
+   * Observer NO debe ver señales `ai_summary` previas (evita feedback loop).
+   * El consumer de UI (Admin Center page) pasa `includeAiObservations=true`.
+   * Si el caller ya pasó `aiObservations` en preloadedSources, se respeta.
+   */
+  const aiObservations =
+    preloadedSources.aiObservations !== undefined
+      ? preloadedSources.aiObservations
+      : options.includeAiObservations
+        ? await getLatestAiObservationsByScope().catch(() => null)
+        : null
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
     syntheticSnapshots,
     financeSmokeLane,
-    modules
+    modules,
+    aiObservations
   })
 }

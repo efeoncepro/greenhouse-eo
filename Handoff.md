@@ -1,5 +1,52 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Reliability AI Observer (TASK-638) — Capa Gemini sobre el RCP
+
+### Que cambio
+
+Se agregó la capa de IA sobre el Reliability Control Plane (RCP V1.2) hosted en `ops-worker` (Cloud Run) + Cloud Scheduler:
+
+- **Migration nueva**: `migrations/20260425211608760_task-638-reliability-ai-observations.sql` crea `greenhouse_ai.reliability_ai_observations` con PK `observation_id` (`EO-RAI-{uuid8}`), 3 indices, checks scope/severity, ownership greenhouse_ops + grants runtime/migrator.
+- **Tipo `ai_summary`** agregado a `ReliabilitySignalKind` enum + `SIGNAL_KIND_LABELS` + `ReliabilityModuleCard` local map.
+- **Pipeline AI**: `sanitize.ts` (PII redaction: emails, UUIDs, hex, Bearer, sk_/gho_, RUTs chilenos), `build-prompt.ts` (system+user prompt deterministico para Gemini Flash con JSON estricto + fingerprint sha256 truncado), `kill-switch.ts` (default OFF, opt-in), `persist.ts` (writer + `getLatestFingerprint` para dedup), `reader.ts` (consumer reader con ventana 24h), `runner.ts` (host-agnostic orchestrator), `build-ai-summary-signals.ts` (adapter al composer).
+- **Composer wiring**: `getReliabilityOverview()` acepta `options.includeAiObservations` (default OFF — evita feedback loop). El runner llama el composer SIN pasar `aiObservations`. El consumer de Admin Center si lo pasa explicitamente.
+- **ops-worker endpoint**: `POST /reliability-ai-watch` en `services/ops-worker/server.ts`. Cloud Scheduler job `ops-reliability-ai-watch` (cada 1h, timezone Santiago) en `deploy.sh` + README actualizado.
+- **UI**: nuevo `ReliabilityAiWatcherCard` que renderiza resumen ejecutivo con severity chip, modelo, edad, sweep_run_id y `recommendedAction` cuando aplica. Banner de fallback cuando `observation === null`.
+- **Spec RCP V1.2**: nueva §7.1 con decision arquitectonica completa (host matrix, kill-switch convention, dedup por fingerprint, anti-feedback loop). 9 archivos nuevos listados en "Archivos canonicos".
+- **Documentacion funcional**: `docs/documentation/plataforma/reliability-control-plane.md` (nuevo) explica el RCP completo + AI Observer en lenguaje simple, registrado en el indice.
+- **Integration boundaries**: 4 entries nuevas (status=ready) en `RELIABILITY_INTEGRATION_BOUNDARIES` para los 4 modulos canonicos con `ai_summary` esperado.
+
+### Validaciones
+
+- `npx tsc --noEmit` → clean (0 errores).
+- `pnpm lint` → clean tras autofix.
+- `pnpm test --run src/lib/reliability/ai` → 2153 tests pasaron / 2 skipped (incluye sanitize 14 tests + build-prompt 14 tests).
+- `pnpm build` → success.
+
+### Decisiones canonicas
+
+1. **Host: ops-worker (Cloud Run), NO Vercel cron.** Timeout safety (Gemini + DB peor caso > 60s), WIF nativo para Vertex AI, Cloud Logging audit, retries Cloud Scheduler.
+2. **Kill-switch default OFF (opt-in).** Convencion opuesta a synthetic (default ON). Razon: cada llamada a Gemini gasta tokens regardless of dedup.
+3. **Dedup por fingerprint sha256.** Si la huella coincide con la ultima persistida, se descarta. Una semana estable produce 1 observacion por modulo, no 168.
+4. **Anti-feedback loop.** Runner llama `getReliabilityOverview()` SIN incluir AI observations previas. El consumer de UI las pide explicitamente.
+5. **Cadencia 1h.** Conservadora porque cada llamada cuesta tokens.
+
+### Para activar en produccion
+
+```bash
+gcloud run services update ops-worker \
+  --project=efeonce-group --region=us-east4 \
+  --update-env-vars=RELIABILITY_AI_OBSERVER_ENABLED=true
+```
+
+### Siguiente
+
+- Activar AI Observer en staging primero para validar prompt + costo real antes de produccion.
+- SLO breach detector — `sloThresholds` ya existe (TASK-635), falta el detector que dispare alertas cuando un modulo cae bajo umbral por X minutos.
+- Admin Center CRUD UI de overrides per-tenant del registry (helpers ya existen, falta surface).
+
+---
+
 ## Sesion 2026-04-25 — Workforce onboarding architecture foundation
 
 ### Que cambio

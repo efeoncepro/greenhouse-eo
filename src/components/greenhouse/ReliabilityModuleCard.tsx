@@ -70,7 +70,8 @@ const SIGNAL_KIND_LABEL: Record<ReliabilitySignalKind, string> = {
   cost_guard: 'Cost guard',
   subsystem: 'Subsistema',
   test_lane: 'Test lane',
-  billing: 'Billing'
+  billing: 'Billing',
+  ai_summary: 'AI summary'
 }
 
 const VISIBLE_SIGNALS = 3

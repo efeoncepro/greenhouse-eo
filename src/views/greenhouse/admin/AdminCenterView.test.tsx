@@ -320,6 +320,7 @@ describe('AdminCenterView', () => {
         reliability={reliability}
         syntheticSnapshots={[]}
         syntheticSweep={null}
+        aiObservation={null}
       />
     )
 
@@ -351,6 +352,7 @@ describe('AdminCenterView', () => {
         reliability={reliability}
         syntheticSnapshots={[]}
         syntheticSweep={null}
+        aiObservation={null}
       />
     )
 
@@ -413,6 +415,7 @@ describe('AdminCenterView', () => {
         reliability={reliability}
         syntheticSnapshots={[]}
         syntheticSweep={null}
+        aiObservation={null}
       />
     )
 

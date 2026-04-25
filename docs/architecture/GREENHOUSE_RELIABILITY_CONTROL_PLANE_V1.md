@@ -2,10 +2,10 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.0`
+> Versión: `1.2`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-04-25`
+> Última actualización: `2026-04-25` por TASK-638 (AI Observer enrichment via Gemini Flash + ops-worker host)
 
 ---
 
@@ -162,6 +162,56 @@ Cada upstream debe:
 
 No requiere cambios al contrato ni al UI: las nuevas señales aparecen automáticamente en el módulo correspondiente y el conteo `missingSignalKinds` se reduce.
 
+## 7.1 AI Observer (TASK-638, V1.2)
+
+**Qué es.** Capa narrativa opcional sobre el Reliability Control Plane. Toma el snapshot canónico (`getReliabilityOverview()`), lo sanitiza (PII redaction), y llama a Gemini Flash via Vertex AI con un prompt determinista que produce JSON estricto:
+
+```json
+{
+  "overviewSummary": "...",
+  "overviewSeverity": "ok|warning|error|...",
+  "modules": [
+    { "moduleKey": "finance", "severity": "warning", "summary": "...", "recommendedAction": "..." }
+  ]
+}
+```
+
+**Por qué existe.** El RCP determinístico ya cubre health, signals, y boundaries. El AI Observer agrega:
+
+- Resumen ejecutivo en lenguaje neutro (un párrafo) para el Admin Center.
+- Recomendaciones contextuales por módulo cuando hay error/warning.
+- Detección de patrones cross-módulo que no caben en una regla simple.
+
+**No reemplaza** señales determinísticas. Cada `kind='ai_summary'` queda visible junto al resto de signals — el operador puede contrastar la lectura IA con la evidencia bruta.
+
+**Host: ops-worker (NO Vercel cron).** Decisión 2026-04-25:
+
+| Criterio                              | Vercel cron     | Cloud Function | ops-worker (Cloud Run)        |
+| ------------------------------------- | --------------- | -------------- | ----------------------------- |
+| Timeout safety (Gemini + DB writes)   | 60s cap         | OK             | 540s cap                      |
+| WIF nativo para Vertex AI             | ❌ (rotar ADC)  | ✅             | ✅                            |
+| Cloud Logging audit (prompt+respuesta)| logs Vercel     | ✅             | ✅                            |
+| Setup overhead                        | bajo            | medio          | mínimo (servicio ya existe)   |
+| Cloud Scheduler retries               | manual          | ✅             | ✅                            |
+
+ops-worker gana por: ya corre 7+ jobs Scheduler, WIF nativo evita rotar Vertex AI ADC en Vercel, y captura prompt + respuesta en Cloud Logging para audit.
+
+**Kill-switch.** Default OFF (opt-in). Activación explícita: `RELIABILITY_AI_OBSERVER_ENABLED=true` en el Cloud Run service. Sin esto, cada llamada al endpoint `POST /reliability-ai-watch` retorna `skippedReason` con costo cero. Convención **opuesta** a synthetic (default ON) porque cada llamada gasta tokens, dedup-skipped o no.
+
+**Dedup por fingerprint.** Cada observation lleva un fingerprint sha256 truncado del estado relevante (`status`, `confidence`, `signalCounts`, `missingSignalKinds` ordenados). Si el último fingerprint persistido coincide, la observation se descarta — esto evita inflar la tabla cuando el portal está estable durante días.
+
+**Anti-feedback loop.** El runner llama `getReliabilityOverview()` SIN incluir `aiObservations` (default OFF). El consumer de Admin Center lo llama explícitamente con `includeAiObservations=true`. Así el snapshot que entra al prompt nunca contiene resúmenes IA previos.
+
+**Schema.** `greenhouse_ai.reliability_ai_observations` (TASK-638 migration `20260425211608760`):
+
+- PK `observation_id` (`EO-RAI-{uuid8}`)
+- `sweep_run_id` (`EO-RAS-{uuid8}`)
+- `(scope, module_key, observed_at)` para reads ordenados
+- `fingerprint` para dedup lookup
+- `summary`, `recommended_action`, `model`, token counts
+
+**Cloud Scheduler.** Job `ops-reliability-ai-watch` cada 1h (`0 */1 * * *`, timezone `America/Santiago`), `triggeredBy=cloud_scheduler`. Frecuencia conservadora porque cada llamada cuesta tokens regardless of dedup.
+
 ## 8. Roadmap de follow-ups
 
 - Synthetic monitoring periódico que ejecute las rutas críticas declaradas en el registry.
@@ -193,3 +243,15 @@ No requiere cambios al contrato ni al UI: las nuevas señales aparecen automáti
 - API: [`src/app/api/admin/reliability/route.ts`](../../src/app/api/admin/reliability/route.ts)
 - UI primitive: [`src/components/greenhouse/ReliabilityModuleCard.tsx`](../../src/components/greenhouse/ReliabilityModuleCard.tsx)
 - Surface entrypoint: sección en [`src/views/greenhouse/admin/AdminCenterView.tsx`](../../src/views/greenhouse/admin/AdminCenterView.tsx)
+- **AI Observer (TASK-638)**:
+  - Sanitizer: [`src/lib/reliability/ai/sanitize.ts`](../../src/lib/reliability/ai/sanitize.ts)
+  - Prompt builder: [`src/lib/reliability/ai/build-prompt.ts`](../../src/lib/reliability/ai/build-prompt.ts)
+  - Kill-switch: [`src/lib/reliability/ai/kill-switch.ts`](../../src/lib/reliability/ai/kill-switch.ts)
+  - Persist: [`src/lib/reliability/ai/persist.ts`](../../src/lib/reliability/ai/persist.ts)
+  - Reader: [`src/lib/reliability/ai/reader.ts`](../../src/lib/reliability/ai/reader.ts)
+  - Runner: [`src/lib/reliability/ai/runner.ts`](../../src/lib/reliability/ai/runner.ts) — host-agnostic
+  - Adapter (signals): [`src/lib/reliability/ai/build-ai-summary-signals.ts`](../../src/lib/reliability/ai/build-ai-summary-signals.ts)
+  - ops-worker endpoint: `POST /reliability-ai-watch` en [`services/ops-worker/server.ts`](../../services/ops-worker/server.ts)
+  - Cloud Scheduler job: `ops-reliability-ai-watch` en [`services/ops-worker/deploy.sh`](../../services/ops-worker/deploy.sh)
+  - UI: [`src/components/greenhouse/admin/ReliabilityAiWatcherCard.tsx`](../../src/components/greenhouse/admin/ReliabilityAiWatcherCard.tsx)
+  - Migration: [`migrations/20260425211608760_task-638-reliability-ai-observations.sql`](../../migrations/20260425211608760_task-638-reliability-ai-observations.sql)

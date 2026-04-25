@@ -452,6 +452,17 @@ upsert_scheduler_job \
   '{}'
 echo "  -> ops-quotation-lifecycle: 0 7 * * * (daily quote expiration + renewal_due sweep, TASK-351)"
 
+# TASK-638 — Reliability AI Observer.
+# Hourly Gemini watcher over RCP overview. Conservative cadence (1h) because
+# every call costs Vertex AI tokens regardless of fingerprint dedup. Activate
+# only after RELIABILITY_AI_OBSERVER_ENABLED=true is set on the service.
+upsert_scheduler_job \
+  "ops-reliability-ai-watch" \
+  "0 */1 * * *" \
+  "/reliability-ai-watch" \
+  '{"triggeredBy":"cloud_scheduler"}'
+echo "  -> ops-reliability-ai-watch: 0 */1 * * * (Reliability AI Observer, TASK-638 — gated by RELIABILITY_AI_OBSERVER_ENABLED)"
+
 echo ""
 echo "=== Deployment complete ==="
 echo ""
