@@ -1,5 +1,18 @@
 # changelog.md
 
+## 2026-04-25
+
+### 2026-04-25 — TASK-616 CERRADA ✅: API Platform Foundation & Ecosystem Read Surface V1
+
+- **Nueva foundation runtime**: nace `src/lib/api-platform/**` con version negotiation, error taxonomy, response envelope uniforme, auth/context ecosystem binding-aware y request logging/rate limit comparables al carril endurecido de sister platforms.
+- **Nueva lane aditiva**: Greenhouse ya expone `GET /api/platform/ecosystem/context`, `/organizations`, `/organizations/[id]`, `/capabilities` e `/integration-readiness`.
+- **Semántica aclarada en runtime**:
+  - `context` = consumer/binding context autenticado
+  - `capabilities` = catálogo/asignación de tenant capabilities
+  - `integration-readiness` = health/readiness de integraciones y bindings
+- **Convivencia preservada**: `/api/integrations/v1/*` y `/api/integrations/v1/sister-platforms/*` no fueron movidos ni refactorizados; el corte es completamente aditivo.
+- **Validación fuerte**: tests nuevos de foundation, tests heredados de los readers reutilizados, `pnpm tsc --noEmit`, `pnpm lint` y `pnpm build` verdes.
+
 ## 2026-04-22
 
 ### 2026-04-25 — API Platform V1 documentada como arquitectura canónica

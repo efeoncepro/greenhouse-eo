@@ -1,5 +1,40 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — TASK-616 IMPLEMENTADA: API Platform Foundation & Ecosystem Read Surface V1
+
+### Que cambio
+
+Quedó implementado el primer slice runtime aditivo de la nueva API platform:
+
+- `src/lib/api-platform/core/*`
+- `src/lib/api-platform/resources/*`
+- `src/app/api/platform/ecosystem/context/route.ts`
+- `src/app/api/platform/ecosystem/organizations/route.ts`
+- `src/app/api/platform/ecosystem/organizations/[id]/route.ts`
+- `src/app/api/platform/ecosystem/capabilities/route.ts`
+- `src/app/api/platform/ecosystem/integration-readiness/route.ts`
+
+Tambien quedó corregida la task para reflejar la semántica real del runtime:
+
+- `capabilities` = catálogo/asignación de tenant capabilities
+- `integration-readiness` = health/readiness de integraciones
+- `context` = consumer context binding-aware
+
+### Verificacion
+
+- `pnpm vitest run src/lib/api-platform/core/versioning.test.ts src/lib/api-platform/core/responses.test.ts`
+- `pnpm vitest run src/lib/integrations/health.test.ts src/lib/account-360/organization-store.test.ts src/lib/integrations/notion-readiness.test.ts`
+- `pnpm tsc --noEmit`
+- `pnpm lint`
+- `pnpm build`
+
+### No-break notes
+
+- `/api/integrations/v1/*` no fue movido ni refactorizado
+- `/api/integrations/v1/sister-platforms/*` no fue modificado
+- el harness nuevo reutiliza el mismo modelo de `consumers + bindings + request_logs`, pero desde una lane aditiva nueva
+- `pnpm build` volvió a imprimir warnings conocidos de `Dynamic server usage` en rutas autenticadas; el build cerró OK y no es una regresión introducida por TASK-616
+
 ## Sesion 2026-04-25 — TASK-616 registrada: API Platform Foundation & Ecosystem Read Surface V1
 
 ### Que cambio

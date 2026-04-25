@@ -629,7 +629,7 @@ La primera iteración de la platform API debe ser deliberadamente chica.
 - `GET /api/platform/ecosystem/organizations`
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
-- `GET /api/platform/ecosystem/readiness`
+- `GET /api/platform/ecosystem/integration-readiness`
 
 ### 18.3 No-goals del primer slice
 
@@ -705,3 +705,26 @@ Decisiones explícitas:
 - la plataforma API correcta para Greenhouse debe nacer como capability shared nueva (`src/lib/api-platform/**` + `src/app/api/platform/**`)
 - `integrations/v1` sigue vivo como lane legacy/transicional
 - `MCP` queda reafirmado como adapter downstream de una API estable y no como punto de partida
+
+## 23. Delta 2026-04-25 — TASK-616 implementa el primer slice runtime
+
+Ya existe una primera implementación runtime aditiva de la arquitectura:
+
+- foundation nueva en `src/lib/api-platform/**`
+- lane nueva read-only en `src/app/api/platform/ecosystem/**`
+
+Endpoints implementados:
+
+- `GET /api/platform/ecosystem/context`
+- `GET /api/platform/ecosystem/organizations`
+- `GET /api/platform/ecosystem/organizations/:id`
+- `GET /api/platform/ecosystem/capabilities`
+- `GET /api/platform/ecosystem/integration-readiness`
+
+Decisiones explícitas de este slice:
+
+- `context` queda definido como contexto ecosystem binding-aware del consumer autenticado
+- `capabilities` en esta V1 significa catálogo/asignación de tenant capabilities, no runtime data de módulos UI
+- `integration-readiness` expresa health/readiness de integraciones y bindings; no pretende ser readiness transversal de toda la plataforma
+- el auth/context nuevo reutiliza el modelo seguro de `sister_platform_consumers` + `sister_platform_bindings` + `sister_platform_request_logs` sin romper `/api/integrations/v1/*`
+- `integrations/v1` y `integrations/v1/sister-platforms/*` siguen intactos y verificados como lanes legacy/transicionales

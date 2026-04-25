@@ -793,6 +793,29 @@
   - la migración quedó aplicada el 2026-04-11 vía `pnpm pg:connect:migrate`
   - `src/types/db.d.ts` quedó regenerado en el mismo lote
 
+## Delta 2026-04-25 API Platform Foundation runtime ya existe
+
+- Greenhouse ya no está solo en fase documental para `API platform`.
+- Runtime nuevo:
+  - `src/lib/api-platform/core/*`
+  - `src/lib/api-platform/resources/*`
+  - `src/app/api/platform/ecosystem/context/route.ts`
+  - `src/app/api/platform/ecosystem/organizations/route.ts`
+  - `src/app/api/platform/ecosystem/organizations/[id]/route.ts`
+  - `src/app/api/platform/ecosystem/capabilities/route.ts`
+  - `src/app/api/platform/ecosystem/integration-readiness/route.ts`
+- Contrato operativo:
+  - el lane nuevo es aditivo y read-only
+  - el auth ecosystem sigue siendo binding-aware y consumer-scoped
+  - el envelope ahora es uniforme (`requestId`, `servedAt`, `version`, `data`, `meta` / `errors`)
+  - header de version vigente: `x-greenhouse-api-version`
+  - version default inicial: `2026-04-25`
+  - el scope canónico para isolation ya no se describe como “siempre `space_id`”; la lane ecosystem resuelve `organization`, `client`, `space` o `internal` según binding
+- Convivencia explícita:
+  - `/api/integrations/v1/*` y `/api/integrations/v1/sister-platforms/*` siguen vivos como lanes legacy/transicionales
+  - `capabilities` en `api/platform/ecosystem` significa catálogo/asignación de tenant capabilities, no runtime data de módulos UI
+  - `integration-readiness` significa health/readiness de integraciones; no readiness transversal genérica de toda la plataforma
+
 ## Delta 2026-04-11 Seed operativo para consumer piloto Kortex
 
 - Greenhouse ya tiene una utilidad operativa para provisionar el primer consumer Kortex y su binding piloto sin SQL manual.

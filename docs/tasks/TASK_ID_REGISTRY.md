@@ -669,7 +669,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-613` | `to-do` | Finance Clients Detail -> Organization Workspace Convergence | `docs/tasks/to-do/TASK-613-finance-clients-organization-workspace-convergence.md` |
 | `TASK-614` | `to-do` | People / Payroll Economy Facet & Entitlements Hardening | `docs/tasks/to-do/TASK-614-people-payroll-economy-facet-entitlements-hardening.md` |
 | `TASK-615` | `to-do` | Quote Builder Flow Orchestration & UX Hardening | `docs/tasks/to-do/TASK-615-quote-builder-flow-orchestration-ux-hardening.md` |
-| `TASK-616` | `to-do` | API Platform Foundation & Ecosystem Read Surface V1 | `docs/tasks/to-do/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md` |
+| `TASK-616` | `complete` | API Platform Foundation & Ecosystem Read Surface V1 | `docs/tasks/complete/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md` |
 | `TASK-619` | `to-do` | Quote eSignature (consumer del foundation neutro de firma) | `docs/tasks/to-do/TASK-619-quote-esignature-zapsign.md` |
 | `TASK-619.1` | `to-do` | Signed PDF Storage Hardening (bucket separado + retention 10 anos + multi-region) | `docs/tasks/to-do/TASK-619.1-signed-pdf-storage-hardening.md` |
 | `TASK-619.2` | `to-do` | Signature Operational Worker (reconciliation + expiry alerting + DLQ) | `docs/tasks/to-do/TASK-619.2-signature-operational-worker.md` |

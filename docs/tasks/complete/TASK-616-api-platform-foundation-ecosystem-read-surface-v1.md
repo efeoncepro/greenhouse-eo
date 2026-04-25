@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseño listo para implementación`
+- Status real: `Implementado y verificado en develop`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -165,7 +165,7 @@ Reglas obligatorias:
 - Extraer/adaptar lo reutilizable del carril `sister-platforms` hacia la foundation nueva sin romper el runtime actual.
 - Definir el auth/context canónico de `ecosystem` para platform API:
   - consumer token
-  - scope explícito
+  - scope explícito resuelto (`organization`, `client`, `space` o `internal`)
   - binding-aware resolution cuando aplique
   - request logging consistente
 
@@ -173,19 +173,20 @@ Reglas obligatorias:
 
 - Crear adapters por aggregate en `src/lib/api-platform/resources/**` para:
   - `organizations`
-  - `capabilities`
-  - `readiness`
+  - `capabilities` como catálogo y asignación de tenant capabilities, no como runtime data de módulos UI
+  - `integration-readiness` como health/readiness de integraciones y bindings
 - Priorizar `PostgreSQL / greenhouse_serving` o readers canónicos existentes donde sea posible.
 - Evitar proxies a rutas legacy.
+- Si un aggregate sigue dependiendo de un reader legacy `BigQuery` para paridad inicial, documentar explícitamente esa dependencia como transicional en el adapter nuevo.
 
 ### Slice 4 — First platform routes
 
 - Exponer la primera lane en `src/app/api/platform/ecosystem/**` con endpoints iniciales como:
-  - `GET /api/platform/ecosystem/context`
+  - `GET /api/platform/ecosystem/context` como contexto ecosystem binding-aware del consumer autenticado
   - `GET /api/platform/ecosystem/organizations`
   - `GET /api/platform/ecosystem/organizations/[id]`
   - `GET /api/platform/ecosystem/capabilities`
-  - `GET /api/platform/ecosystem/readiness`
+  - `GET /api/platform/ecosystem/integration-readiness`
 - Incluir response envelope, request IDs y headers operativos uniformes.
 
 ### Slice 5 — Documentation & coexistence contract
@@ -199,7 +200,7 @@ Reglas obligatorias:
 ### Slice 6 — No-break rollout controls
 
 - Verificar explícitamente que los consumers actuales de `/api/integrations/v1/*` y `/api/integrations/v1/sister-platforms/*` siguen respondiendo igual que antes.
-- Mantener la primera implementación limitada a aggregates maduros (`context`, `capabilities`, `readiness`, `organizations`) y evitar abrir readers más ambiguos en el mismo corte.
+- Mantener la primera implementación limitada a aggregates maduros (`context`, `capabilities`, `integration-readiness`, `organizations`) y evitar abrir readers más ambiguos en el mismo corte.
 - Si aparece una necesidad de refactor transversal en auth/logging/shared helpers, extraerla como follow-up en vez de mezclarla dentro de la primera entrega runtime.
 
 ## Out of Scope
@@ -237,6 +238,7 @@ Decisiones esperadas:
 2. **Backend policy**
    - usar readers canónicos/adapters por aggregate
    - no exponer `BigQuery` como shape contractual hacia consumers
+   - si un adapter inicial depende de `BigQuery`, el contrato externo debe seguir siendo platform-native y la provenance debe quedar documentada como transicional
 
 3. **Observabilidad**
    - el request logging del lane ecosystem nuevo debe ser comparable al del carril `sister-platforms`
@@ -245,6 +247,10 @@ Decisiones esperadas:
 4. **Convergencia**
    - no introducir duplicación semántica innecesaria entre `integrations/v1` y `platform/ecosystem`
    - si un endpoint nuevo sustituye semánticamente a uno viejo, documentar la relación de convivencia
+
+5. **Tenant isolation**
+   - el aislamiento debe seguir el scope resuelto del consumer y binding (`organization`, `client`, `space` o `internal`)
+   - no asumir que toda query ecosystem-facing se reduce siempre a `space_id`
 
 ## Risk Controls
 
@@ -280,7 +286,7 @@ La task debe ejecutarse con política explícita de no-break rollout.
 ## Acceptance Criteria
 
 - [ ] Existe una capability shared nueva `src/lib/api-platform/**` con foundation reusable de platform API.
-- [ ] Existe una primera lane `src/app/api/platform/ecosystem/**` de solo lectura con al menos contexto, organizaciones, capabilities y readiness.
+- [ ] Existe una primera lane `src/app/api/platform/ecosystem/**` de solo lectura con al menos contexto, organizaciones, capabilities e `integration-readiness`.
 - [ ] Los endpoints nuevos usan envelope uniforme, request ID y auth/context ecosystem consistente.
 - [ ] La task deja explícita la convivencia con `/api/integrations/v1/*` sin romper consumers existentes.
 - [ ] `TASK-040` sigue vigente como baseline programática y no queda absorbida ni contradictoria tras este corte.
@@ -295,6 +301,23 @@ La task debe ejecutarse con política explícita de no-break rollout.
 - smoke/regression checks de `GET /api/integrations/v1/catalog/capabilities`
 - smoke/regression checks de `GET /api/integrations/v1/tenants`
 - smoke/regression checks de `GET /api/integrations/v1/sister-platforms/context`
+- smoke/regression checks de `GET /api/integrations/v1/readiness` y `GET /api/integrations/v1/sister-platforms/readiness`
+
+## Execution Notes
+
+- Implementado en `src/lib/api-platform/**` y `src/app/api/platform/ecosystem/**`
+- Endpoints V1 materializados:
+  - `GET /api/platform/ecosystem/context`
+  - `GET /api/platform/ecosystem/organizations`
+  - `GET /api/platform/ecosystem/organizations/[id]`
+  - `GET /api/platform/ecosystem/capabilities`
+  - `GET /api/platform/ecosystem/integration-readiness`
+- Validación ejecutada:
+  - `pnpm vitest run src/lib/api-platform/core/versioning.test.ts src/lib/api-platform/core/responses.test.ts`
+  - `pnpm vitest run src/lib/integrations/health.test.ts src/lib/account-360/organization-store.test.ts src/lib/integrations/notion-readiness.test.ts`
+  - `pnpm tsc --noEmit`
+  - `pnpm lint`
+  - `pnpm build`
 
 ## Closing Protocol
 
