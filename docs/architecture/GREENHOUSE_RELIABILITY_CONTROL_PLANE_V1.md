@@ -138,6 +138,19 @@ Confidence:
 - `low` < 50%.
 - `unknown` 0 señales presentes.
 
+### Sentry incident → module attribution (TASK-634)
+
+A partir de TASK-634, los incidentes Sentry NO se atribuyen masivamente al módulo `cloud`. El correlador determinista `correlateIncident()` en [`src/lib/reliability/incident-mapping.ts`](../../src/lib/reliability/incident-mapping.ts) decide:
+
+1. **Path matching**: `incident.location` se evalúa contra los globs `filesOwned` declarados en `RELIABILITY_REGISTRY` (TASK-633). Single source of truth — cuando `filesOwned` cambia, el correlador lo recoge automáticamente.
+2. **Title matching**: si no hay match por path, busca substrings (lowercase) en `incident.title` por módulo: `finance` (quote, expense, payroll, nubox, …), `integrations.notion` (notion, notion-bq-sync, delivery_tasks), `delivery` (ico-engine, sprint, reactive worker), `cloud` (cloud sql, bigquery, sentry, vercel cron).
+3. **Tie-break por priority**: `finance` > `integrations.notion` > `delivery` > `cloud`. Especializado siempre gana al fallback.
+4. **Fallback honesto**: incidentes que no matchean ningún módulo se etiquetan `cloud` con `signalId` con sufijo `.uncorrelated.<id>` para auditarlos como huérfanos.
+
+`buildSentryIncidentSignals` (en `signals.ts`) cap-ea a `MAX_SENTRY_INCIDENTS_PER_MODULE=3` por módulo (no global), de modo que finance siempre ve sus 3 top incidentes incluso cuando cloud tiene muchos uncorrelated.
+
+LLM-assisted enrichment para huérfanos queda como follow-up (Slice 4 del spec). V1 es solo rules-first determinista — input → output reproducible sin estado externo.
+
 ## 7. Cómo enchufar TASK-586 y TASK-599
 
 Cada upstream debe:

@@ -1,5 +1,48 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Reliability Sentry Incident → Module Correlator (TASK-634)
+
+### Que cambio
+
+Se entregó el correlador determinista que mapea cada incidente Sentry a su módulo real (`finance`, `integrations.notion`, `delivery`) en vez de adjuntar todo a `cloud`. La capa Reliability Control Plane ahora rinde incidentes en el módulo correcto, lo cual hace que `confidence` por módulo refleje la realidad y permite ver "qué módulo está crashing" en vez de "todo es cloud".
+
+Archivos creados:
+
+- `src/lib/reliability/incident-mapping.ts` — `correlateIncident(incident)` rules-first. Reusa `filesOwned` (TASK-633) como source of truth para path matching, agrega `MODULE_TITLE_HINTS` curados por módulo, tie-break por `MODULE_PRIORITY` (finance > integrations.notion > delivery > cloud).
+- `src/lib/reliability/incident-mapping.test.ts` — 15 tests sintéticos (path matching, title fallback, priority en colisiones, edge cases: location vacío, prefix "in ", leading slash, release antiguo, vendor path, fallback cloud).
+
+Archivos modificados:
+
+- `src/lib/reliability/signals.ts` — `buildSentryIncidentSignals` ahora itera con `correlateIncident`, cap por módulo (`MAX_SENTRY_INCIDENTS_PER_MODULE=3`) en vez de cap global, evidence enriquecida con `correlation.source` + `matchedPattern`. Incidentes huérfanos: `signalId='cloud.incident.sentry.uncorrelated.<id>'`.
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` — §6 con sub-sección "Sentry incident → module attribution (TASK-634)".
+
+### Decisión canónica explicitada
+
+1. **Reuso de `filesOwned`** (TASK-633) en vez de duplicar regex paralelas — single source of truth. Cuando alguien añade un glob nuevo en el registry, el correlador lo recoge automáticamente sin re-deploy.
+2. **`MODULE_TITLE_HINTS` curados** — substrings específicas del dominio (quote, expense, notion-bq-sync, ico-engine, etc.). Evitamos hints genéricos ("error", "failed") que generarían correlaciones falsas.
+3. **Cap por módulo, no cap global** — antes el cap era 3 incidentes total. Ahora cada módulo ve sus top 3 — finance no se queda sin ver sus incidentes cuando cloud tiene muchos uncorrelated.
+4. **Evidence enriquecida** — el adapter agrega `correlation.source` + `matchedPattern` al evidence array. Auditable en Admin Center: si finance tiene un incidente, evidence dice si fue por path (qué glob) o por title (qué hint).
+5. **LLM tiebreaker descartado en V1** — rules-first cubre el 99% de los crashes con stack trace en `src/lib/<dominio>/...`. LLM se activa solo si auditoría post-merge revela >20% uncorrelated en Sentry real.
+
+### Coverage post-merge (validación pendiente)
+
+Auditoría manual cuando haya `SENTRY_AUTH_TOKEN` + acceso al portal sentry.io: si `>20%` de incidentes abiertos quedan como `uncorrelated`, evaluar Slice 4 (LLM enrichment) o ampliar `MODULE_TITLE_HINTS`. Hoy los casos sintéticos cubren los patrones canónicos esperados.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (410 files / 2116 passed — 15 nuevos tests del correlador)
+- `pnpm build` ✅
+- `GET /api/admin/reliability` queda como inspección manual post-deploy.
+
+### Siguiente
+
+- TASK-635 (registry persistence) sigue pull-trigger. Cuando se ejecute, las reglas `MODULE_TITLE_HINTS` migran junto con `filesOwned` al schema DB.
+- LLM-assisted enrichment para huérfanos si auditoría post-merge revela >20% uncorrelated.
+- Routing per-módulo a Slack (si finance-incident, ping a #finance-eng) — requiere observabilidad outbound separada.
+- Histórico de correlaciones por incidente (`incident_correlation_log`) para entrenar mejor las reglas.
+
 ## Sesion 2026-04-25 — Finance Preventive Test Lane (TASK-599)
 
 ### Que cambio

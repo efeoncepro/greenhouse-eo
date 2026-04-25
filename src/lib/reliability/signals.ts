@@ -21,6 +21,7 @@ import type {
 } from '@/types/reliability'
 import type { SyntheticRouteSnapshot } from '@/types/reliability-synthetic'
 
+import { correlateIncident } from './incident-mapping'
 import {
   fromCloudHealthStatus,
   fromCloudPostureStatus,
@@ -29,7 +30,7 @@ import {
   fromSentryLevel
 } from './severity'
 
-const MAX_SENTRY_INCIDENTS_PER_SIGNAL = 3
+const MAX_SENTRY_INCIDENTS_PER_MODULE = 3
 
 /**
  * Maps an `OperationsSubsystem.name` to the reliability module that owns it.
@@ -246,21 +247,56 @@ export const buildSentryIncidentSignals = (snapshot: CloudSentryIncidentsSnapsho
     ]
   }
 
-  const top = snapshot.incidents.slice(0, MAX_SENTRY_INCIDENTS_PER_SIGNAL)
+  // TASK-634: each incident is correlated to its real module (finance,
+  // delivery, integrations.notion). Incidents that don't match any rule
+  // fall back to `cloud` with `signalId` suffix `.uncorrelated.<id>`.
+  // We cap incidents PER MODULE so finance always sees its own top N
+  // even when cloud has many uncorrelated entries.
+  const seenByModule = new Map<ReliabilityModuleKey, number>()
+  const signals: ReliabilitySignal[] = []
 
-  return top.map(incident => ({
-    signalId: `cloud.incident.sentry.${incident.shortId ?? incident.id}`,
-    moduleKey: 'cloud',
-    kind: 'incident',
-    source: 'getCloudSentryIncidents',
-    label: incident.shortId ? `Sentry ${incident.shortId}` : 'Sentry incident',
-    severity: fromSentryLevel(incident.level),
-    summary: `${incident.title} · ${incident.count} eventos · ${incident.userCount} usuarios`,
-    observedAt: incident.lastSeen,
-    evidence: incident.permalink
+  for (const incident of snapshot.incidents) {
+    const correlation = correlateIncident(incident)
+    const moduleKey = correlation.moduleKey
+    const seen = seenByModule.get(moduleKey) ?? 0
+
+    if (seen >= MAX_SENTRY_INCIDENTS_PER_MODULE) continue
+
+    seenByModule.set(moduleKey, seen + 1)
+
+    const isUncorrelated = correlation.source === 'fallback'
+    const incidentRef = incident.shortId ?? incident.id
+
+    const signalId = isUncorrelated
+      ? `cloud.incident.sentry.uncorrelated.${incidentRef}`
+      : `${moduleKey}.incident.sentry.${incidentRef}`
+
+    const evidence: ReliabilitySignal['evidence'] = incident.permalink
       ? [{ kind: 'incident', label: 'Sentry link', value: incident.permalink }]
       : [{ kind: 'incident', label: 'Sentry id', value: incident.id }]
-  }))
+
+    if (correlation.matchedPattern) {
+      evidence.push({
+        kind: 'metric',
+        label: `Correlation (${correlation.source})`,
+        value: correlation.matchedPattern
+      })
+    }
+
+    signals.push({
+      signalId,
+      moduleKey,
+      kind: 'incident',
+      source: 'getCloudSentryIncidents',
+      label: incident.shortId ? `Sentry ${incident.shortId}` : 'Sentry incident',
+      severity: fromSentryLevel(incident.level),
+      summary: `${incident.title} · ${incident.count} eventos · ${incident.userCount} usuarios`,
+      observedAt: incident.lastSeen,
+      evidence
+    })
+  }
+
+  return signals
 }
 
 export const buildObservabilityPostureSignal = (

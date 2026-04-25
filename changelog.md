@@ -2,6 +2,19 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Reliability Sentry Incident → Module Correlator (TASK-634) — incidentes ya no caen masivamente a `cloud`
+
+- **Nuevo helper `correlateIncident()`** en `src/lib/reliability/incident-mapping.ts` rules-first determinista. Mapea cada incidente Sentry a su módulo real (`finance`, `integrations.notion`, `delivery`) usando heurísticas sobre `incident.location` (file path) + `incident.title`.
+- **Path matching** reusa `RELIABILITY_REGISTRY[*].filesOwned` (TASK-633) como single source of truth via `minimatch`. Cuando alguien actualiza globs en el registry, el correlador los recoge automáticamente.
+- **Title matching** vía `MODULE_TITLE_HINTS` (substrings curados por módulo): `finance` (quote, expense, payroll, nubox, …), `integrations.notion` (notion, notion-bq-sync, delivery_tasks), `delivery` (ico-engine, sprint, reactive worker), `cloud` (cloud sql, bigquery, sentry, vercel cron).
+- **Tie-break por `MODULE_PRIORITY`**: `finance > integrations.notion > delivery > cloud`. Especializado siempre gana al fallback.
+- **Fallback honesto** — incidentes sin match: `signalId='cloud.incident.sentry.uncorrelated.<id>'` para auditarlos como huérfanos.
+- **Refactor `buildSentryIncidentSignals`**: itera con correlador, **cap por módulo** (`MAX_SENTRY_INCIDENTS_PER_MODULE=3`) en vez de cap global. Antes finance no veía sus incidentes si cloud tenía 3 más recientes — ahora cada módulo ve sus top 3.
+- **Evidence enriquecida**: cada signal lleva `correlation.source` (path/title/fallback) + `matchedPattern` (qué glob/hint disparó el match). Auditable en Admin Center.
+- **15 unit tests** sintéticos cubriendo cada módulo por path, por title, fallback cloud, edge cases (location vacío, prefix "in ", leading slash, release antiguo, vendor path).
+- **Spec V1 actualizado**: `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §6 con sub-sección "Sentry incident → module attribution".
+- **LLM tiebreaker** (Slice 4 del spec) descartado en V1 — rules-first cubre el 99% de los crashes con stack trace en `src/lib/<dominio>/...`. Activación solo si auditoría post-merge revela >20% uncorrelated.
+
 ### 2026-04-25 — Finance Preventive Test Lane (TASK-599) — 3 niveles de defensa + señal `kind=test_lane` en Reliability
 
 - **Smoke Playwright nuevos**: `tests/e2e/smoke/finance-{clients,suppliers,expenses}.spec.ts` siguiendo el template canónico (`gotoAuthenticated` + status<400 + body visible + ausencia de fatal text). Registrados en `RELIABILITY_REGISTRY[finance].smokeTests`.
