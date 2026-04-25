@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Cloud & Integrations apunta a Cloud real
+
+### Que cambio
+
+Se separaron nuevamente las surfaces administrativas:
+
+- `/admin/cloud-integrations` renderiza `AdminCloudIntegrationsView` con `getOperationsOverview()`.
+- `/admin/integrations` permanece como `AdminIntegrationGovernanceView` para governance de integraciones y cards Billing Export/Notion operacional.
+- `Cloud & Integrations` en menú, Admin Center y Ops Health ahora apunta a `/admin/cloud-integrations`.
+- `Integration Governance` conserva el enlace cruzado hacia `/admin/integrations`.
+- Se actualizó el changelog y la nota de resolución de `TASK-586`, porque ya no es correcto decir que `AdminCloudIntegrationsView` está orphaned.
+
+### Validaciones
+
+- `pnpm exec eslint src/app/'(dashboard)'/admin/cloud-integrations/page.tsx src/components/layout/vertical/VerticalMenu.tsx src/views/greenhouse/admin/AdminCenterView.tsx src/views/greenhouse/admin/AdminCloudIntegrationsView.tsx src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx src/views/greenhouse/admin/AdminOpsHealthView.tsx` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm staging:request /admin/cloud-integrations --grep "Cloud runtime"` ejecutado antes del deploy de este commit: HTTP 200, sin match esperado porque staging aún corre el build previo.
+
 ## Sesion 2026-04-25 — Navegación resiliente Admin Center
 
 ### Que cambio

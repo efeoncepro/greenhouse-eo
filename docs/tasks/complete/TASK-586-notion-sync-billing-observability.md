@@ -280,7 +280,7 @@ El diseño debe priorizar:
 
 V1 entregada con degradación honesta cuando Billing Export aún no materializa tablas. Decisiones tomadas durante Discovery:
 
-1. **`AdminCloudIntegrationsView` está orphaned** — el wrapper `/admin/cloud-integrations/page.tsx` redirige a `/admin/integrations` que renderiza `AdminIntegrationGovernanceView`. Las cards nuevas se enchufan en la view que sí está rendereada.
+1. **Actualización 2026-04-25**: `AdminCloudIntegrationsView` volvió a ser la surface canónica de `/admin/cloud-integrations`; `/admin/integrations` queda como `AdminIntegrationGovernanceView` para governance de integraciones. Las cards de Billing Export/Notion operacional siguen enchufadas en Integration Governance.
 2. **Nunca tocar Cloud Run logs de notion-bq-sync** — no expone reader API. Inferimos upstream desde `_synced_at` en `notion_ops.{tareas,proyectos,sprints}` (verdad funcional).
 3. **Composer puro** — `getNotionSyncOperationalOverview()` reusa los 3 readers existentes sin duplicar.
 4. **Reliability boundaries movidos a `ready`** — `cloud.billing` y `integrations.notion.freshness` ahora rinden señales reales en `/api/admin/reliability` y la sección "Confiabilidad por módulo" en Admin Center.

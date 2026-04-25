@@ -18,7 +18,7 @@ import TimelineSeparator from '@mui/lab/TimelineSeparator'
 import { styled } from '@mui/material/styles'
 import type { TimelineProps } from '@mui/lab/Timeline'
 
-import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
+import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseRouteLink } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type {
@@ -282,7 +282,7 @@ const AdminOpsHealthView = ({
               <Button component={Link} href='/agency/operations' variant='contained'>
                 Abrir operaciones extendidas
               </Button>
-              <Button component={Link} href='/admin/integrations' variant='outlined'>
+              <Button component={GreenhouseRouteLink} href='/admin/cloud-integrations' variant='outlined'>
                 Ver Cloud & Integrations
               </Button>
             </Stack>

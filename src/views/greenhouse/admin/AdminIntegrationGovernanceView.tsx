@@ -19,7 +19,7 @@ import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
+import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseRouteLink } from '@/components/greenhouse'
 import GcpBillingCard from '@/components/greenhouse/admin/GcpBillingCard'
 import NotionSyncOperationalCard from '@/components/greenhouse/admin/NotionSyncOperationalCard'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
@@ -241,7 +241,7 @@ const AdminIntegrationGovernanceView = ({
               La fuente canonica es <code>greenhouse_sync.integration_registry</code>.
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button component={Link} href='/admin/integrations' variant='contained'>
+              <Button component={GreenhouseRouteLink} href='/admin/cloud-integrations' variant='contained'>
                 Cloud & Integrations
               </Button>
               <Button component={Link} href='/admin' variant='outlined'>
