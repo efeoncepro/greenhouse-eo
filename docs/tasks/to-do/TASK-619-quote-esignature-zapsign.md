@@ -1,39 +1,49 @@
-# TASK-619 — Quote eSignature ZapSign (firmante / refrendario opcional per-version)
+# TASK-619 — Quote eSignature (consumer del foundation neutro de firma)
 
 ## Status
 
 - Lifecycle: `to-do`
 - Priority: `P2`
 - Impact: `Alto`
-- Effort: `Medio` (~6.5 dias)
+- Effort: `Medio` (~4 dias post-foundation)
 - Type: `implementation`
-- Epic: `none` (RESEARCH-005 P2.1)
-- Status real: `Diseno cerrado, listo para arrancar`
+- Epic: `EPIC-001` (Document Vault & Signature Orchestration Platform)
+- Status real: `Diseno cerrado v3 (defense-in-depth) — bloqueada por foundation`
 - Rank: `TBD`
 - Domain: `finance`
-- Blocked by: `none` (TASK-490/491 NO requeridas — short path)
+- Blocked by: `TASK-489, TASK-490, TASK-491`
 - Branch: `task/TASK-619-quote-esignature-zapsign`
 - Legacy ID: `RESEARCH-005 P2.1`
 - GitHub Issue: `none`
 
 ## Summary
 
-Habilitar firma electronica bilateral (firmantes lado cliente + refrendarios lado Efeonce) para cotizaciones, usando la integracion ZapSign que ya existe en produccion para Master Service Agreements. La firma es 100% opcional, configurable per-version desde la creacion de la quote v1.
+Habilitar firma electronica bilateral (firmantes lado cliente + refrendarios lado Efeonce) para cotizaciones, **consumiendo el agregado neutro `signature_requests`** que provee TASK-490 + el adapter ZapSign que provee TASK-491. La firma es 100% opcional, configurable per-version desde la creacion de la quote v1, con state machine formal y compliance LATAM defendible.
+
+Esta task es el **primer consumer de produccion del foundation documental + firma neutral**, no la integracion en si — la integracion vive en TASK-491.
 
 ## Why This Task Exists
 
 Hoy una quote pasa de `sent` a `approved` sin trail criptografico de firma. El cliente puede aceptar verbalmente, por email, o por silencio — pero no hay artifact firmado que cierre el ciclo legalmente. Esto bloquea cobranza enterprise y rompe auditoria contable LATAM (Chile/Colombia/Mexico/Peru/Brasil exigen firma electronica simple para contratos B2B con monto significativo).
 
-ZapSign ya esta integrado en repo para MSAs (cliente + webhook + secrets configurados); falta cablear el mismo plumbing al flujo de cotizaciones con un modelo bilateral firmante/refrendario.
+Tras analisis 2026-04-25 con owner, se decidio el camino largo (foundation primero) en vez del camino corto (replicar patron MSA) porque:
+
+1. HR contracts (TASK-027) reutilizara la misma foundation — ahorra ~5 dias futuros
+2. Refactoring MSA al agregado neutro (TASK-491) ya estaba planeado — esta task lo absorbe naturalmente
+3. Compliance LATAM defendible legalmente (vs deuda tecnica si vamos cortos)
+4. Multi-provider real desde dia 1: DocuSign/Adobe Sign en cliente enterprise = ~2 dias de adapter, no ~2 sprints
 
 ## Goal
 
 - Capacidad opcional de firma activable per-version desde v1
 - Modelo bilateral: firmantes (lado cliente, `order_group=1`) + refrendarios (lado Efeonce, `order_group=2`)
-- Reuso 100% del cliente ZapSign + webhook handler existentes
-- Estado runtime visible en QuoteDetailView con chip por estado de firma
-- Artifact firmado persistido en GCS via `storeSystemGeneratedPrivateAsset`
-- Eventos outbox emitidos para reactivar dashboard / Slack / AI features
+- Consumir `signature_requests` agregado neutro provisto por TASK-490
+- State machine formal con XState (no transiciones ad-hoc)
+- Compliance LATAM: hash SHA-256 + SHA-512 inmutable, retention 10 anos, audit log dedicado, sanitizacion PII
+- Provider-agnostic via interface `eSignatureProvider` (ZapSign primary, DocuSign/Adobe on-demand)
+- Webhook processing async (outbox + reactive worker, NO escritura sincrona en handler)
+- Notificaciones multi-canal: email + in-app + Slack via 3 reactores independientes
+- Quote firmada bloquea edicion + bloquea convert-to-income salvo override Finance Admin
 
 ## Architecture Alignment
 
@@ -43,75 +53,89 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md`
 - `docs/research/RESEARCH-005-cpq-gap-analysis-and-hardening-plan.md` Delta v1.6
+- `docs/epics/to-do/EPIC-001-document-vault-signature-orchestration-platform.md`
 
 Reglas obligatorias:
 
-- la firma no debe acoplarse a un provider unico (capa `eSignatureProvider` interface aunque sea minima)
-- el orden de firma debe ser legalmente correcto: cliente firma primero, Efeonce refrenda
+- consumir `signature_requests` y `signature_request_signers` del foundation (no inventar tablas paralelas en `greenhouse_commercial`)
+- el orden de firma es legalmente vinculante: cliente firma primero, Efeonce refrenda
 - la quote firmada (`status=signed`) es inmutable — cualquier cambio requiere amendment (TASK-628)
-- artifact firmado vuelve a Greenhouse como asset privado en GCS
-- webhook idempotente — replay del mismo evento no duplica state
+- artifact firmado vuelve a Greenhouse via `signed-documents` bucket (TASK-619.1) con retention 10 anos + multi-region
+- webhook handler NO escribe a DB sincronicamente — solo valida + persiste en `webhook_event_log` + emite outbox event procesado por reactive worker
+- toda transicion de estado debe pasar por XState machine + persistir audit event
+- PII sanitizada en logs (emails, IPs, nombres mascarados con hash SHA-256[:8])
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `src/lib/integrations/zapsign/client.ts` (ya productivo)
-- `src/app/api/webhooks/zapsign/route.ts` (ya productivo, requiere refactor para multi-aggregate)
-- `src/lib/storage/greenhouse-assets.ts` (ya productivo)
-- TASK-631 Fase 4 (PDF cache layer — ya cerrado en develop, dependencia satisfecha)
+- **`TASK-489`** (Document Registry & Versioning Foundation) — provee asset registry canonico
+- **`TASK-490`** (Signature Orchestration Foundation) — provee agregado neutro `signature_requests`
+- **`TASK-491`** (ZapSign Adapter + Webhook Convergence) — provee adapter + circuit breaker + dedup
+- **`TASK-619.1`** (Signed PDF Storage Hardening) — provee bucket separado + multi-region + retention
+- **`TASK-619.2`** (Signature Operational Worker) — provee reconciliation + expiry alerting
+- **`TASK-619.3`** (Quote Signature Notifications) — provee 3 reactors notificacion
+- TASK-631 Fase 4 (PDF cache) — ya cerrado en develop
 
 ### Blocks / Impacts
 
-- `TASK-628` (Amendment): un quote firmado solo puede modificarse via amendment, esta task define la frontera de inmutabilidad
-- `TASK-624` (Renewal engine): renewals heredan la politica de firma de la quote original
-- `TASK-621` (Analytics dashboards): nuevos eventos `quote.signed_*` alimentan dashboards de conversion
+- `TASK-628` (Amendment): consumer de quotes firmadas
+- `TASK-624` (Renewal engine): renewals heredan politica de firma
+- `TASK-621` (Analytics dashboards): nuevos eventos `quote.signed_*` alimentan funnel
+- `TASK-027` (HRIS Document Vault): consumer hermano del foundation, valida que el modelo es generalizable
 
 ### Files owned
 
-- `migrations/YYYYMMDD_task-619-quote-esignature.sql` (nueva)
-- `src/lib/finance/quotations/signature-store.ts` (nuevo)
-- `src/lib/finance/quotations/signature-policy.ts` (nuevo — defaults + validation)
-- `src/app/api/finance/quotes/[id]/signature-requests/route.ts` (nuevo)
-- `src/app/api/finance/quotes/[id]/signature-requests/cancel/route.ts` (nuevo)
-- `src/app/api/webhooks/zapsign/route.ts` (refactor: dispatcher por aggregate type)
-- `src/app/api/finance/quotes/route.ts` (extender body POST con `signaturePolicy`)
-- `src/app/api/finance/quotes/[id]/versions/route.ts` (extender body POST con override de politica)
-- `src/views/greenhouse/finance/QuoteShareDrawer.tsx` (seccion firma colapsable)
-- `src/views/greenhouse/finance/QuoteCreationForm.tsx` (toggle `signature_enabled` desde v1)
-- `src/views/greenhouse/finance/QuoteDetailView.tsx` (chip estado + link PDF firmado)
-- `src/types/db.d.ts` (regenerado por kysely-codegen)
+- `migrations/YYYYMMDD_task-619-quote-signature-link.sql` (link table + politica en quotations)
+- `src/lib/finance/quotations/signature-policy.ts`
+- `src/lib/finance/quotations/signature-state-machine.ts` (XState definition)
+- `src/lib/finance/quotations/signature-store.ts` (consumer de signature_requests)
+- `src/app/api/finance/quotes/[id]/signature-requests/route.ts`
+- `src/app/api/finance/quotes/[id]/signature-requests/cancel/route.ts`
+- `src/app/api/finance/quotes/[id]/signature-requests/void/route.ts`
+- `src/app/api/finance/quotes/[id]/signature-requests/signers/[signerId]/route.ts` (PATCH + resend)
+- `src/app/api/finance/quotes/route.ts` (extender body POST con signaturePolicy)
+- `src/app/api/finance/quotes/[id]/versions/route.ts` (extender body con override)
+- `src/views/greenhouse/finance/QuoteShareDrawer.tsx`
+- `src/views/greenhouse/finance/QuoteCreationForm.tsx`
+- `src/views/greenhouse/finance/QuoteDetailView.tsx`
+- `src/views/greenhouse/finance/QuoteSignaturePanel.tsx` (nuevo componente)
+- `src/types/db.d.ts` (regenerado)
 
 ## Current Repo State
 
 ### Already exists
 
-- Cliente ZapSign productivo: `createZapSignDocument`, `getZapSignDocument`, `isZapSignConfigured`
-- Webhook handler `/api/webhooks/zapsign` (hard-coded a MSA, requiere refactor a dispatcher)
-- Patron de uso: `/api/finance/master-agreements/[id]/signature-requests`
-- Asset storage para PDFs firmados: `storeSystemGeneratedPrivateAsset`
-- Secret Manager config: `ZAPSIGN_API_TOKEN`, `ZAPSIGN_WEBHOOK_SHARED_SECRET`, `ZAPSIGN_API_BASE_URL`
-- PDF cache de cotizaciones: `getOrCreateQuotePdfBuffer` (TASK-631 Fase 4)
-- Schema `quotations` + `quotation_versions` (modelo header + snapshots)
+- Asset registry: `greenhouse_core.assets` + `storeSystemGeneratedPrivateAsset`
+- Outbox publisher: `publishOutboxEvent` (`src/lib/sync/publish-event.ts`)
+- Circuit breaker: `src/lib/operations/reactive-circuit-breaker.ts`
+- Idempotency wrapper: `src/lib/idempotency/idempotency-key.ts`
+- Audit log: `src/lib/commercial/governance/audit-log.ts` (sera reusado pero NO modificado)
+- PDF cache: `getOrCreateQuotePdfBuffer` (TASK-631 Fase 4)
+- Schema `quotations` + `quotation_versions`
+- Reactive worker infra: Cloud Run `ops-worker` con scheduler
 
 ### Gap
 
-- No existe modelo de signers bilaterales para quotes (firmante/refrendario)
-- Webhook handler asume aggregate=MSA, no rutea por tipo
-- No hay columnas `signature_*` en `quotations` (politica) ni tabla `quotation_signature_signers` (signers materializados)
-- No hay UI para toggle + configuracion de signers en form de creacion ni en drawer
-- No hay eventos outbox `commercial.quote.signature_*` registrados
+- `signature_requests` agregado neutro NO existe (lo crea TASK-490)
+- `eSignatureProvider` interface NO existe (lo crea TASK-490, lo implementa TASK-491)
+- `webhook_event_log` para dedup NO existe (lo crea TASK-491)
+- Bucket `signed-documents` con retention 10 anos NO existe (lo crea TASK-619.1)
+- Workers de reconciliation + expiry alerting NO existen (lo crea TASK-619.2)
+- 3 reactors de notificacion NO existen (lo crea TASK-619.3)
+- Schema quotations NO tiene columnas de politica + link a signature_request
 
 ## Scope
 
-### Slice 1 — Schema (0.5 dia)
-
-Migracion node-pg-migrate:
+### Slice 1 — Schema link + politica per-version (0.5 dia)
 
 ```sql
+-- migrations/YYYYMMDD_task-619-quote-signature-link.sql
+
 ALTER TABLE greenhouse_commercial.quotations
-  -- Politica (editable per-version)
+  -- Politica (editable per-version, persistida en snapshot)
   ADD COLUMN signature_enabled boolean NOT NULL DEFAULT false,
   ADD COLUMN signature_requires_client_signers boolean NOT NULL DEFAULT true,
   ADD COLUMN signature_requires_efeonce_countersigners boolean NOT NULL DEFAULT true,
@@ -121,225 +145,310 @@ ALTER TABLE greenhouse_commercial.quotations
     CHECK (signature_min_efeonce_countersigners >= 0),
   ADD COLUMN signature_order_active boolean NOT NULL DEFAULT true,
 
-  -- Estado runtime
-  ADD COLUMN esignature_provider text
-    CHECK (esignature_provider IS NULL OR esignature_provider IN ('zapsign','docusign','adobe_sign')),
-  ADD COLUMN esignature_document_token text,
+  -- Link al agregado neutro (provisto por TASK-490)
+  ADD COLUMN active_signature_request_id uuid
+    REFERENCES greenhouse_signatures.signature_requests(signature_request_id),
+
+  -- Estado denormalizado para queries rapidas (la fuente de verdad esta en signature_requests.status)
   ADD COLUMN esignature_status text
     CHECK (esignature_status IS NULL OR esignature_status IN
-      ('not_required','draft','pending_client','pending_countersign','signed','declined','voided','expired','cancelled')),
-  ADD COLUMN esignature_sent_at timestamptz,
-  ADD COLUMN esignature_completed_at timestamptz,
-  ADD COLUMN esignature_signed_asset_id uuid REFERENCES greenhouse_core.assets(asset_id);
+      ('not_required','draft','pending_client','pending_countersign','signed',
+       'declined','voided','voided_after_signature','expired','cancelled','partial_signed_expired')),
 
-CREATE UNIQUE INDEX quotations_esignature_token_uniq
-  ON greenhouse_commercial.quotations (esignature_document_token)
-  WHERE esignature_document_token IS NOT NULL;
+  -- Override compliance gate
+  ADD COLUMN force_invoice_without_signature boolean NOT NULL DEFAULT false,
+  ADD COLUMN force_invoice_reason text,
+  ADD COLUMN force_invoice_authorized_by text,
+  ADD COLUMN force_invoice_authorized_at timestamptz;
 
-CREATE TABLE greenhouse_commercial.quotation_signature_signers (
-  signer_id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  quotation_id        text NOT NULL REFERENCES greenhouse_commercial.quotations(quotation_id) ON DELETE CASCADE,
-  version_number      int  NOT NULL,
-  signer_role         text NOT NULL
-    CHECK (signer_role IN ('client_signer','efeonce_countersigner','observer')),
-  order_group         int  NOT NULL,
-  full_name           text NOT NULL,
-  email               text NOT NULL,
-  phone_country       text,
-  phone_number        text,
-  qualification       text,
-  contact_id          text,
-  member_id           text,
-  zapsign_signer_token text,
-  status              text NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','viewed','signed','declined','expired')),
-  signed_at           timestamptz,
-  signed_ip           text,
-  decline_reason      text,
-  created_at          timestamptz NOT NULL DEFAULT now(),
-  updated_at          timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX quotation_signature_signers_quote_idx
-  ON greenhouse_commercial.quotation_signature_signers (quotation_id, version_number);
-CREATE INDEX quotation_signature_signers_token_idx
-  ON greenhouse_commercial.quotation_signature_signers (zapsign_signer_token);
+CREATE INDEX quotations_active_signature_request_idx
+  ON greenhouse_commercial.quotations (active_signature_request_id)
+  WHERE active_signature_request_id IS NOT NULL;
 ```
 
-Regenerar `src/types/db.d.ts` con `pnpm db:generate-types`.
+**Tabla `business_line_signature_policy` (opcional pero recomendada):**
 
-### Slice 2 — Backend store + endpoint creacion (1.5 dias)
+```sql
+CREATE TABLE greenhouse_commercial.business_line_signature_policy (
+  policy_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  business_line_code text NOT NULL,
+  required_countersigner_member_id text REFERENCES greenhouse.team_members(member_id),
+  requires_dual_countersign boolean NOT NULL DEFAULT false,
+  min_amount_for_dual_clp numeric(14,2),
+  min_auth_mode_above_amount_clp numeric(14,2),
+  min_auth_mode text CHECK (min_auth_mode IN ('assinaturaTela','token-email','sms','whatsapp','facial-biometrics')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (business_line_code)
+);
+```
 
-`src/lib/finance/quotations/signature-store.ts`:
+### Slice 2 — State machine formal (XState) (0.75 dia)
 
-- `getQuoteSignaturePolicy(quotationId, versionNumber)` — lee politica vigente
-- `getQuoteBySignatureDocumentToken(token)` — lookup para webhook
-- `createQuoteSignatureRequest({...})` — INSERT signers + UPDATE quote a `pending_client`
-- `syncQuoteSignatureFromZapsign({quotationId, payload})` — actualiza estado de signers + deriva estado agregado de la quote
-- `cancelQuoteSignatureRequest(quotationId, actorUserId)` — pasa a `cancelled`, libera la quote para edicion
+`src/lib/finance/quotations/signature-state-machine.ts`:
 
-`src/lib/finance/quotations/signature-policy.ts`:
+```typescript
+import { createMachine } from 'xstate'
 
-- `derivePolicyDefaults({organizationId, businessLineCode})` — pre-poblar firmantes + refrendarios
-- `validateSigners({clientSigners, efeonceCountersigners, policy})` — valida cantidad minima + roles
-- `deriveSignatureStatus(signers[])` — `pending_client` / `pending_countersign` / `signed` / `declined`
+export const quoteSignatureMachine = createMachine({
+  id: 'quoteSignature',
+  initial: 'not_required',
+  states: {
+    not_required: {
+      on: { ENABLE: 'draft' }
+    },
+    draft: {
+      on: {
+        DISABLE: 'not_required',
+        SEND_TO_PROVIDER: { target: 'pending_client', cond: 'hasValidSigners' }
+      }
+    },
+    pending_client: {
+      on: {
+        CLIENT_SIGNED_ALL: 'pending_countersign',
+        DECLINED: 'declined',
+        EXPIRED: 'expired',
+        CANCELLED: 'cancelled'
+      }
+    },
+    pending_countersign: {
+      on: {
+        EFEONCE_SIGNED_ALL: 'signed',
+        DECLINED: 'declined',
+        EXPIRED: 'partial_signed_expired',
+        CANCELLED: 'cancelled'
+      }
+    },
+    signed: {
+      type: 'final',
+      on: { VOID_AFTER_SIGNATURE: 'voided_after_signature' }
+    },
+    declined: { type: 'final' },
+    expired: { type: 'final' },
+    voided: { type: 'final' },
+    voided_after_signature: { type: 'final' },
+    cancelled: { on: { ENABLE: 'draft' } },
+    partial_signed_expired: { type: 'final' }
+  }
+}, {
+  guards: {
+    hasValidSigners: ({ context }) => /* ... */
+  }
+})
+```
 
-`src/app/api/finance/quotes/[id]/signature-requests/route.ts`:
+Ventaja: transiciones invalidas son rechazadas en compile-time por XState. Cero estado inconsistente.
 
-- `GET` — devuelve estado actual + signers
-- `POST` — body con signers, valida politica, llama `createZapSignDocument`, persiste signers + token, emite evento `commercial.quote.signature_requested`
+### Slice 3 — Backend store + endpoints (1 dia)
 
-`src/app/api/finance/quotes/[id]/signature-requests/cancel/route.ts`:
+**`signature-policy.ts`:**
 
-- `POST` — solo si estado en `pending_*`, llama `cancelZapSignDocument` (futuro), pasa a `cancelled`, emite evento
+- `derivePolicyDefaults({organizationId, businessLineCode, totalClp})` — pre-poblar firmantes desde HubSpot CRM con role legal_signatory, refrendarios desde sales rep + business_line policy, auth_mode minimo basado en monto
+- `validateSigners({clientSigners, efeonceCountersigners, policy, totalClp})` — valida cantidad minima + roles + auth_mode minimo
 
-### Slice 3 — Webhook refactor a dispatcher (0.5 dia)
+**`signature-store.ts`:**
 
-`src/app/api/webhooks/zapsign/route.ts`:
+- `linkQuoteToSignatureRequest(quotationId, versionNumber, signatureRequestId)` — set `active_signature_request_id`
+- `derivedQuoteSignatureStatus(signatureRequest)` — computa `esignature_status` denormalizado
+- `applyStateTransition(quotationId, event)` — usa XState machine + persiste audit
+- `cancelSignatureRequest`, `voidAfterSignature` — wrappers
 
-- Detectar tipo de aggregate via `metadata.aggregate_type` o `external_id` prefix (`msa:` vs `quote:`)
-- Rutear a MSA store o quote store
-- Backwards compatible — MSAs sin `metadata.aggregate_type` siguen funcionando
+**Endpoints:**
 
-### Slice 4 — Endpoints de quote create / version (0.5 dia)
+- `POST /api/finance/quotes/[id]/signature-requests` — body con signers + politica; valida estado vigente (debe estar `approved` para enviar a firma); llama `createSignatureRequest` del provider via TASK-491 adapter
+- `GET /api/finance/quotes/[id]/signature-requests` — devuelve estado + signers + audit log
+- `POST /api/finance/quotes/[id]/signature-requests/cancel` — solo si en `pending_*`
+- `POST /api/finance/quotes/[id]/signature-requests/void` — solo si en `signed`, requiere razon + Finance Admin
+- `PATCH /api/finance/quotes/[id]/signature-requests/signers/[signerId]` — editar email mientras `status != signed`
+- `POST /api/finance/quotes/[id]/signature-requests/signers/[signerId]/resend` — re-enviar email a un signer especifico
 
-`src/app/api/finance/quotes/route.ts` (POST):
+**Idempotency:** todos los POST usan `withIdempotency` con `Idempotency-Key` header.
 
-- Aceptar `signaturePolicy?: { enabled, requiresClientSigners, requiresEfeonceCountersigners, minClientSigners, minEfeonceCountersigners, orderActive }`
-- Default si omitido: `{ enabled: false }`
+### Slice 4 — Cross-flow gates (0.5 dia)
 
-`src/app/api/finance/quotes/[id]/versions/route.ts` (POST):
+**Gate A: enviar a firma requiere `quotation.status='approved'`:**
 
-- Bloquear si vigente esta en `pending_client | pending_countersign | signed`
-- Heredar politica de version anterior por default
-- Override via body opcional
+```typescript
+if (quote.status !== 'approved') {
+  throw new ValidationError('Quote debe estar approved antes de enviar a firma. Status actual: ' + quote.status)
+}
+```
 
-### Slice 5 — UI (1.5 dias)
+**Gate B: convert-to-income bloqueado si `signature_enabled=true` y no firmada:**
 
-> **Nota arquitectonica importante:** Greenhouse NO captura la firma del usuario. ZapSign provee la UI hosted donde el firmante elige metodo (dibujar con mouse/touch, escribir nombre con estilos cursive preset, subir imagen escaneada, OTP, selfie). El sales rep solo configura el envelope desde Greenhouse (quien firma, con que nivel de auth). Por eso **no se necesitan librerias de captura de firma** (`react-signature-canvas`, `signature_pad`, etc.). Reuso 100% de la UI hosted de ZapSign.
+```typescript
+// En src/lib/finance/income-conversion.ts (o equivalente)
+if (quote.signature_enabled && quote.esignature_status !== 'signed' && !quote.force_invoice_without_signature) {
+  throw new ValidationError('Quote requiere firma. Use override Finance Admin con razon.')
+}
+```
 
-Stack UI (todo ya en el repo):
+**Gate C: edicion bloqueada si `esignature_status IN (pending_*, signed)`:**
 
-- `react-hook-form` para validacion de forms del modal de signer
-- `react-datepicker` (envuelto en `GreenhouseDatePicker`) para `dateLimitToSign`
-- MUI Drawer + Dialog
-- `CustomTextField`, `CustomChip`, `CustomAvatar` (Vuexy wrappers)
+```typescript
+const EDITABLE_SIGNATURE_STATES = new Set([null, 'not_required', 'draft', 'cancelled', 'declined', 'expired', 'voided', 'partial_signed_expired'])
+if (!EDITABLE_SIGNATURE_STATES.has(quote.esignature_status)) {
+  throw new ValidationError('Quote bloqueada por firma en proceso. Cancela firma o crea amendment.')
+}
+```
 
-Selector de metodo de firma per-signer (mapea a `ZapSignSignerInput.authMode`):
+**Gate D: validar `valid_until` al enviar a firma:**
 
-| Opcion UI | Valor ZapSign | Uso tipico |
-| --- | --- | --- |
-| "Estandar (firma manuscrita o escrita)" | `assinaturaTela` (default) | B2B normal, monto bajo-medio |
-| "Reforzada con OTP email" | `token-email` | Monto medio-alto, sin telefono |
-| "Reforzada con OTP SMS" | `sms` | Monto alto, telefono confirmado |
-| "Reforzada con OTP WhatsApp" | `whatsapp` | Monto alto, contacto WhatsApp confirmado |
-| "Maxima (selfie + biometria facial)" | `facial-biometrics` | Solo si cliente lo exige (premium ZapSign, costo extra) |
+```typescript
+const minRequiredValidity = addDays(today, dateLimitToSignDays)
+if (quote.valid_until < minRequiredValidity) {
+  throw new ValidationError(`Extiende validity hasta al menos ${minRequiredValidity}`)
+}
+```
 
-Toggle adicional per-signer: "Enviar tambien por WhatsApp" (`sendAutomaticWhatsapp`) — diferenciador LATAM.
+### Slice 5 — Form de creacion + drawer (1 dia)
 
-`QuoteCreationForm.tsx`:
+**`QuoteCreationForm.tsx`:**
 
-- Seccion "Firma electronica (opcional)" colapsable
+- Seccion "Firma electronica (opcional)" colapsable al final del form
 - Toggle `signature_enabled` (off por default)
 - Si on: 2 checkboxes (`requires_client_signers`, `requires_efeonce_countersigners`) + sliders de minimo + checkbox de orden secuencial
 - Texto helper: "Los firmantes y refrendarios concretos se agregan al enviar a firma"
 
-`QuoteShareDrawer.tsx`:
+**`QuoteSignaturePanel.tsx` (nuevo, embebido en QuoteShareDrawer):**
 
-- Seccion nueva "Firma electronica" debajo del envio email
+> **Nota arquitectonica:** Greenhouse NO captura la firma del usuario. ZapSign hostea la UI completa donde el firmante elige metodo (dibujar, escribir nombre con cursive, subir imagen, OTP, biometria). Cero librerias de captura de firma necesarias.
+
 - Si `signature_enabled=false`: link "Activar firma para esta version" (solo si quote no esta locked)
 - Si `signature_enabled=true` y estado = `not_required | draft`:
-  - 2 listas editables (firmantes + refrendarios) con defaults pre-poblados
-  - Boton "Enviar a firma ZapSign"
-- Si estado en `pending_*`: read-only con lista de signers + estado individual + boton "Cancelar firma"
-- Si estado = `signed`: link a PDF firmado + lista de signers con timestamps
+  - Lista editable de firmantes (lado cliente) con defaults pre-poblados de HubSpot CRM
+  - Lista editable de refrendarios (lado Efeonce) con sales rep pre-poblado
+  - Selector per-signer de auth_mode (5 opciones)
+  - Toggle WhatsApp per-signer
+  - Plazo de firma (default 30 dias)
+  - Boton "Enviar a firma" — disabled si quote.status != 'approved'
+- Si estado en `pending_*`:
+  - Read-only con lista de signers + estado individual + timestamps
+  - Boton "Cancelar firma" + "Re-enviar a [signer]"
+- Si estado = `signed`:
+  - Link a PDF firmado + lista de signers con timestamps + IPs sanitizadas
+  - Boton "Void" (solo Finance Admin)
 
-`QuoteDetailView.tsx`:
+**`QuoteDetailView.tsx`:**
 
-- Chip de estado de firma en header de la quote (colores segun tabla del Delta v1.6)
-- Link a PDF firmado cuando exista
+- Chip de estado de firma en header (colores segun tabla)
+- Timeline event prominente "Firmada por X el Y" cuando estado = signed
+- Link a PDF firmado descargable
 
-### Slice 6 — Eventos outbox (0.5 dia)
+### Slice 6 — Outbox events del consumer (0.25 dia)
 
-Registrar 4 eventos nuevos en `commercial_outbox`:
+Emitir desde quote signature flow:
 
-- `commercial.quote.signature_requested`
-- `commercial.quote.signed_by_client` (todos los `client_signer` firmaron)
-- `commercial.quote.countersigned_by_efeonce` (todos los `efeonce_countersigner` firmaron — contrato cerrado)
-- `commercial.quote.signature_declined`
+| Evento | Cuando | Payload (sin PII) |
+| --- | --- | --- |
+| `commercial.quote.signature_requested` | POST signature-requests OK | `{quotationId, versionNumber, signatureRequestId, signersCount, estimatedCostUsd}` |
+| `commercial.quote.signed_by_client` | XState transition `pending_client → pending_countersign` | `{quotationId, versionNumber, clientSignerHashes[]}` |
+| `commercial.quote.countersigned_by_efeonce` | XState transition `pending_countersign → signed` | `{quotationId, versionNumber, signedAssetId, sha256, sha512}` |
+| `commercial.quote.signature_declined` | XState transition `* → declined` | `{quotationId, versionNumber, declinedByRole, declineReasonHash}` |
+| `commercial.quote.signature_voided_after_signature` | `signed → voided_after_signature` | `{quotationId, versionNumber, voidedBy, voidReasonHash}` |
 
 Documentar en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`.
 
-### Slice 7 — Tests + smoke E2E (1 dia)
+### Slice 7 — Tests + smoke E2E (0.75 dia)
 
 Tests unitarios:
 
-- `signature-policy.test.ts` — validacion de signers + derivacion de status
-- `signature-store.test.ts` — state transitions + idempotency del webhook
-- `webhook-dispatcher.test.ts` — routing por aggregate_type
+- `signature-state-machine.test.ts` — todas las transiciones validas + rechazo de invalidas
+- `signature-policy.test.ts` — validacion de signers + auth_mode minimo por monto
+- `signature-store.test.ts` — gates A/B/C/D + linkage al agregado neutro
+- `quote-signature-endpoints.test.ts` — POST/GET/PATCH/cancel/void
+- `cross-flow-gates.test.ts` — convert-to-income con override + edicion bloqueada
 
 Smoke E2E con cuenta ZapSign de staging:
 
-- Crear quote v1 con firma activada
-- Enviar a ZapSign → recibir email → firmar como cliente
-- Verificar que estado pasa a `pending_countersign`
-- Refrendar como Efeonce → estado pasa a `signed`
-- Verificar PDF firmado descargable + chip verde + evento outbox
+1. Crear quote v1 con `signature_enabled=true`
+2. Aprobar quote (gate de governance)
+3. Enviar a firma con 1 client_signer + 1 efeonce_countersigner
+4. Verificar evento outbox `signature_requested` + estado `pending_client`
+5. Firmar como cliente en UI ZapSign
+6. Verificar webhook procesa async + estado pasa a `pending_countersign` + evento `signed_by_client`
+7. Refrendar como Efeonce
+8. Verificar estado pasa a `signed` + PDF firmado en bucket `signed-documents` + evento `countersigned_by_efeonce`
+9. Verificar SHA-256 + SHA-512 persistidos
+10. Intentar editar quote → rechazado
+11. Intentar convert-to-income sin override → rechazado; con override → aceptado + audit log
 
 ## Out of Scope
 
-- Provider DocuSign / Adobe Sign (interface preparada, no implementada)
-- TASK-490 signature orchestration foundation (agregado neutro per-domain) — se hace cuando aparezca el 3er dominio
-- Amendment de quote firmada (TASK-628)
-- Multi-language email templates de ZapSign (usa default ZapSign por ahora)
-- Tabla `business_line_signature_policy` para mandatorios automaticos por BU (futuro)
-- WhatsApp + SMS auth modes (solo `assinaturaTela` + email en Fase 1; otros modes vienen on-demand)
+- Provider DocuSign / Adobe Sign concretos (interface preparada por TASK-490, implementacion on-demand)
+- WhatsApp templates personalizados (usa default ZapSign)
+- HR contracts signature flow (TASK-027 lo consume del mismo foundation)
+- Multi-language email templates (Fase 2)
+- Bulk send a firma de N quotes simultaneas (Fase 2)
 
 ## Acceptance Criteria
 
 - [ ] migracion aplicada en dev/staging/prod sin downtime
 - [ ] toggle `signature_enabled` visible en form de creacion de quote v1
-- [ ] toggle editable en versiones siguientes mientras estado runtime no este `pending_*` o `signed`
-- [ ] enviar a ZapSign con firmantes + refrendarios resulta en envelope creado con `order_group=1` para cliente y `order_group=2` para Efeonce
-- [ ] webhook recibe `signed` evento del cliente → estado pasa a `pending_countersign`
-- [ ] webhook recibe `signed` evento del refrendario → estado pasa a `signed` + PDF firmado persiste en GCS
-- [ ] quote firmada bloquea edicion (UI + backend retorna 409)
-- [ ] cancelar firma libera la quote para edicion + emite evento
-- [ ] webhook es idempotente — replay del mismo payload no duplica state
-- [ ] eventos outbox emitidos en cada transicion (4 eventos del catalogo)
-- [ ] chip de estado visible en QuoteDetailView con color correcto
-- [ ] PDF firmado descargable con permisos correctos (Finance Admin + Sales Rep dueno de la quote)
+- [ ] toggle editable en versiones siguientes mientras estado != `pending_*` y != `signed`
+- [ ] enviar a ZapSign requiere quote.status='approved' (Gate A)
+- [ ] convert-to-income bloqueado sin firma cuando enabled (Gate B); override audita razon + autor
+- [ ] edicion bloqueada cuando estado en pending_* o signed (Gate C)
+- [ ] valid_until validado al enviar a firma (Gate D)
+- [ ] envelope ZapSign con `order_group=1` cliente, `order_group=2` Efeonce
+- [ ] state machine XState rechaza transiciones invalidas en compile-time
+- [ ] webhook procesa async via outbox + reactive worker (no escritura sincrona en handler)
+- [ ] webhook idempotente — replay del mismo `event_id` no duplica state (dedup en `webhook_event_log`)
+- [ ] eventos outbox emitidos en cada transicion (5 eventos del catalogo)
+- [ ] PDF firmado persistido en bucket `signed-documents` con SHA-256 + SHA-512 inmutables
+- [ ] chip de estado en QuoteDetailView con color correcto
+- [ ] PDF firmado descargable solo por Finance Admin + sales rep owner
+- [ ] PII sanitizada en logs (emails/IPs/nombres mascarados)
+- [ ] re-envio a signer + edit signer email funcionales
+- [ ] void post-firma requiere Finance Admin + razon + audit log
+- [ ] notificaciones email + in-app + Slack disparadas (TASK-619.3)
+- [ ] reconciliation worker detecta drift cada 6h (TASK-619.2)
 
 ## Verification
 
-- `pnpm migrate:status` → migracion aplicada sin pendientes
-- `pnpm db:generate-types` → tipos regenerados
+- `pnpm migrate:status` clean
+- `pnpm db:generate-types` ejecutado
 - `pnpm tsc --noEmit` clean
 - `pnpm lint` clean
-- `pnpm test` → tests nuevos passing + suite full passing
+- `pnpm test` clean (incluye tests nuevos)
 - `pnpm build` clean
-- Smoke E2E con cuenta ZapSign de staging documentado en `Handoff.md`
+- Smoke E2E completo documentado en `Handoff.md`
 
 ## Decisions Cerradas (segun conversacion 2026-04-25)
 
 | # | Decision | Resolucion |
 | --- | --- | --- |
-| 1 | Camino corto (sin TASK-490) o largo (con agregado neutro) | **Corto** — replicar patron MSA, TASK-490 cuando aparezca 3er dominio |
-| 2 | Firmante obligatorio del lado Efeonce | Sales rep que creo la quote (default), editable |
-| 3 | SMS/WhatsApp ademas de email | No en Fase 1, solo `assinaturaTela` + email |
-| 4 | PDF firmado convive o reemplaza original | **Convive** — original = oferta, signed = ejecutado |
-| 5 | Quote firmada bloquea edicion | **Si**, requiere amendment (TASK-628) |
-| 6 | Modelo bilateral firmante/refrendario | **Si** — `client_signer` (`order_group=1`) + `efeonce_countersigner` (`order_group=2`) |
-| 7 | Firma 100% opcional | **Si** — `signature_enabled=false` por default |
-| 8 | Capacidad disponible desde v1 | **Si** — toggle en form de creacion |
-| 9 | Politica heredada per-version con override | **Si** |
-| 10 | Lock al pasar a `pending_client` | **Pendiente confirmacion final del owner** (recomendado: si) |
+| 1 | Camino corto vs largo | **Largo** — TASK-489 → TASK-490 → TASK-491 → TASK-619 (defense-in-depth + multi-domain reuse) |
+| 2 | State machine | **XState formal** — transiciones invalidas rechazadas en compile-time |
+| 3 | Webhook processing | **Async via outbox + reactive worker** — handler solo valida + dedup + emite |
+| 4 | Provider abstraction | **`eSignatureProvider` interface real desde dia 1** — ZapSign primary, DocuSign/Adobe on-demand |
+| 5 | Storage del PDF firmado | **Bucket separado `signed-documents` + retention 10 anos + replicacion multi-region** (TASK-619.1) |
+| 6 | Hash integridad | **SHA-256 + SHA-512 inmutables persistidos en outbox event** |
+| 7 | State machine cruzado approved/signed | **`approved → sent → pending_client → ... → signed`** — firma requiere approve previo |
+| 8 | Convert-to-income con firma activa | **Bloqueado salvo override Finance Admin con razon auditada** |
+| 9 | Auth mode minimo por monto | **Tabla `business_line_signature_policy.min_auth_mode_above_amount`** |
+| 10 | PII en logs | **Logger custom sanitiza emails/IPs/nombres antes de escribir** |
+| 11 | Notificaciones | **Email + in-app + Slack via 3 reactores independientes** (TASK-619.3) |
+| 12 | Re-envio + edit signer | **Incluido en MVP** |
+| 13 | Partial signed + expired | **Estado dedicado `partial_signed_expired` + alerting 24h antes de expiry** (TASK-619.2) |
+| 14 | Void post-firma | **Estado `voided_after_signature` + integracion explicita con TASK-628** |
+| 15 | Validacion valid_until | **Gate D al enviar + flag al recibir webhook** |
+| 16 | Audit log de firma | **Reusa `quotation_audit_log` existente con event_type prefix `signature.*`** |
+| 17 | Costo tracking envelopes | **Outbox event con `estimated_cost_usd` + dashboard Admin Center** |
+| 18 | Multi-tenancy ZapSign | **Folder `/{tenant_id}/quotes/` para aislamiento operacional** |
+| 19 | Reconciliation periodica | **Worker cada 6h via Cloud Run ops-worker** (TASK-619.2) |
+| 20 | Backup off-GCS | **Replicacion cross-region GCS** (us-east4 → us-central1); revisar S3 cross-cloud en 12 meses |
+| 21 | Retencion legal | **10 anos cubre todos los paises LATAM** |
+| 22 | HubSpot sync | **`signed → 'Signed - Awaiting Invoice'` (stage nuevo, separado de Closed Won)** |
+| 23 | Lock al pasar a `pending_client` | **Si — XState bloquea transitions de edit en estado pending_*** |
+| 24 | Identidad firmante real | **Para monto > umbral en `business_line_signature_policy` se exige `auth_mode='facial-biometrics'` o `'sms'` validado** |
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` y carpeta sincronizados (`to-do/` -> `in-progress/` -> `complete/`)
+- [ ] `Lifecycle` y carpeta sincronizados
 - [ ] `docs/tasks/README.md` actualizado
-- [ ] `Handoff.md` actualizado con smoke E2E + screenshots
+- [ ] `Handoff.md` actualizado con smoke E2E
 - [ ] `docs/research/RESEARCH-005-cpq-gap-analysis-and-hardening-plan.md` actualizado con Delta cerrando P2.1
 - [ ] `docs/documentation/finance/cotizaciones-gobernanza.md` actualizado con flujo de firma
-- [ ] `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` actualizado con 4 eventos nuevos
+- [ ] `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` actualizado con 5 eventos nuevos
+- [ ] `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` actualizado con state machine cruzado approved/signed/income

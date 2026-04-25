@@ -1,9 +1,9 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-04-24 por Julio + Claude
-> **Status:** Active (TASK-629 implementada y deployada; TASK-619 re-scoped a ZapSign)
+> **Status:** Active (TASK-629 implementada y deployada; TASK-619 expandida a EPIC-001 con foundation neutro)
 > **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync
 
 **Actualizaciones:**
@@ -14,6 +14,7 @@
 - v1.4 (2026-04-24): decision PDF — single template con secciones condicionales (no multi-template explicito); refina TASK-629 con el contrato de secciones (always vs conditional) + reglas de activacion
 - v1.5 (2026-04-24): **TASK-629 IMPLEMENTADA** — PDF enterprise rediseño live en develop. 8 secciones modulares + tokens DM Sans+Poppins + QR signed HMAC + sub-brand PNG pipeline + product_catalog JOIN + endpoint público de verificación + 33 tests unitarios. Render validado end-to-end (enterprise 84KB / compact 52KB). Único follow-up: setear `GREENHOUSE_QUOTE_VERIFICATION_SECRET` en Vercel prod (sin esto el QR se omite gracefully).
 - v1.6 (2026-04-25): **TASK-619 re-scoped a ZapSign** — DocuSign descartado tras descubrir que ZapSign ya está integrado en prod (Master Agreements). ZapSign es LATAM-native (Brasilera), 5–10x más barato/envelope que DocuSign, soporta WhatsApp + email automático nativo, y ya tiene cliente API + webhook handler funcionando en repo. Capa `eSignatureProvider` interface se mantiene para permitir DocuSign/Adobe Sign como secundarios si un cliente enterprise lo exige. Estimación TASK-619 baja de 2 sprints → ~5 días (solo orquestación + fields nuevos en `quotations` + UI; reusa [src/lib/integrations/zapsign/client.ts](../../src/lib/integrations/zapsign/client.ts) y [src/app/api/webhooks/zapsign/route.ts](../../src/app/api/webhooks/zapsign/route.ts)).
+- v1.7 (2026-04-25): **TASK-619 expandida al camino largo (defense-in-depth + multi-domain reuse)** — Tras audit de gaps con owner se decide ir por la opcion mas resiliente, robusta y escalable. Se renuncia al short path (~6.5 dias) en favor de la cadena completa: TASK-489 (foundation documental) → TASK-490 (signature aggregate neutro con XState formal + provider interface real) → TASK-491 (ZapSign adapter con circuit breaker + dedup + DLQ) → TASK-619 (consumer del foundation, mucho mas liviano) + 3 tasks derivadas: TASK-619.1 (storage hardening: bucket separado + retention 10 anos + multi-region replica), TASK-619.2 (worker operacional: reconciliation 6h + expiry alerting + DLQ replay), TASK-619.3 (notificaciones: 3 reactores email/in-app/Slack independientes). Ganancia: HR contracts (TASK-027) reusa foundation gratis + compliance LATAM defendible legalmente + multi-provider real. Costo: estimacion total ~20 dias (~4 semanas) en vez de 6.5 dias short path.
 
 **Documentacion tecnica relacionada:**
 
@@ -915,6 +916,75 @@ Cada item pasa a `docs/tasks/to-do/TASK-###-...md` cuando:
 - Spec tiene **rollback plan** si el fix sale mal.
 - Spec declara **archivos owned** para detectar impacto cruzado.
 - Decisiones abiertas estan resueltas.
+
+## Delta 2026-04-25 (v1.7) — TASK-619 expandida al camino largo (defense-in-depth + multi-domain reuse)
+
+Tras audit profunda con owner, se identificaron 14 gaps no cubiertos por el spec v2 (modelo bilateral) en 5 dimensiones criticas: compliance & auditoria LATAM, integracion con flujos existentes (HubSpot/approval/income), casos limite operacionales, seguridad, y costos & UX delivery. Se decide ir por la opcion mas resiliente, robusta y escalable.
+
+### Cambios estructurales vs v1.6
+
+| Decision | v1.6 (short path) | v1.7 (long path) |
+| --- | --- | --- |
+| Camino | Replicar patron MSA en quotes directamente | TASK-489 → TASK-490 → TASK-491 → TASK-619 (foundation neutro primero) |
+| State machine | Transiciones ad-hoc en TS | XState formal — invalidas rechazadas en compile-time |
+| Webhook processing | Sincrono en handler | Async via outbox + reactive worker (DLQ + retry) |
+| Provider abstraction | Interface minima | `eSignatureProvider` real desde dia 1, ZapSign como primera implementacion |
+| Storage PDF firmado | Mismo bucket private-assets (DELETE 730d) | Bucket dedicado `signed-documents` + retention 10 anos + replicacion us-east4 → us-central1 |
+| Hash integridad | No mencionado | SHA-256 + SHA-512 inmutables persistidos en evento outbox |
+| Cross-flow gates | Solo Gate C (edicion bloqueada) | Gates A/B/C/D (approve previo + convert-income bloqueado + edicion + valid_until) |
+| Auth mode por monto | No | Tabla `business_line_signature_policy.min_auth_mode_above_amount` |
+| PII en logs | Risk no abordado | Logger custom sanitiza emails/IPs/nombres (hash SHA-256[:8]) |
+| Notificaciones | "Eventos outbox emitidos" sin reactores | 3 reactores independientes (email + in-app + Slack) — failures aislados |
+| Re-envio + edit signer | No | Endpoints PATCH + resend en MVP |
+| Partial signed + expired | No | Estado `partial_signed_expired` + alerting 24h antes (TASK-619.2) |
+| Void post-firma | Mencionado, sin detalle | Estado `voided_after_signature` + integracion con TASK-628 |
+| Reconciliation | No | Worker cada 6h compara estado provider vs Greenhouse (TASK-619.2) |
+| HubSpot sync | "signed → Closed Won" | Stage nuevo `Signed - Awaiting Invoice` (separa firma de facturacion) |
+| Backup off-region | No | Replicacion cross-region GCS hourly (TASK-619.1) |
+
+### Nueva cadena de tasks
+
+| Task | Estado | Esfuerzo | Rol |
+| --- | --- | --- | --- |
+| **TASK-489** Document Registry & Versioning Foundation | to-do | ~3 dias | Foundation documental canonica |
+| **TASK-490** Signature Orchestration Foundation | to-do | ~5 dias | Agregado neutro `signature_requests` + XState + provider interface |
+| **TASK-491** ZapSign Adapter + Webhook Convergence | to-do | ~3 dias | Implementacion ZapSign del provider interface + circuit breaker + dedup + DLQ; refactor MSA al agregado neutro |
+| **TASK-619** Quote eSignature (consumer) | to-do | ~4 dias | Consumer del foundation para quotes (politica per-version + UI + gates cross-flow) |
+| **TASK-619.1** Signed PDF Storage Hardening | to-do | ~1.5 dias | Bucket dedicado `signed-documents` + retention 10 anos + multi-region |
+| **TASK-619.2** Signature Operational Worker | to-do | ~2 dias | Reconciliation 6h + expiry alerting + DLQ replay sobre Cloud Run ops-worker |
+| **TASK-619.3** Quote Signature Notifications | to-do | ~1.5 dias | 3 reactores independientes (email + in-app + Slack) |
+| **TASK-027** HRIS Document Vault | to-do | (existente) | Consumer hermano del foundation — valida que el modelo es generalizable |
+| **TASK-628** Quote Amendment Engine | to-do | (existente) | Consumer de quotes firmadas |
+
+### Estimacion total
+
+- **v1.6 short path:** ~6.5 dias (1 task TASK-619)
+- **v1.7 long path:** ~20 dias (~4 semanas con 1 dev) — incluye foundation reutilizable
+
+### ROI del long path
+
+| Beneficio | Valor |
+| --- | --- |
+| HR contracts (TASK-027) reusa foundation | Ahorra ~5 dias futuros |
+| Refactor MSA al agregado neutro (TASK-491) | Ya estaba planeado, esto lo absorbe |
+| Compliance LATAM defendible legalmente | Evita riesgo en auditorias SII + disputas |
+| Multi-provider real desde dia 1 | DocuSign/Adobe Sign en cliente enterprise = ~2 dias adapter, no ~2 sprints |
+| Defense-in-depth storage | Evita perdida catastrofica de evidencia legal |
+| State machine formal XState | Imposible introducir transiciones invalidas accidentalmente |
+| Async webhook processing | Webhook handler responde < 100ms; processing pesado en worker con retry |
+| Reconciliation periodica | Drift provider/Greenhouse detectado y auto-corregido sin intervencion humana |
+
+### Tasks afectadas por refinamiento P2 ordering
+
+La secuenciacion P2 Fase 1 cambia: ahora TASK-619 deja de ser standalone (~5-6.5 dias) y se vuelve la cuarta task de una cadena (~20 dias total). Eso modifica la priorizacion:
+
+- Bloque preparatorio (TASK-489 + TASK-490 + TASK-491) puede ejecutarse en paralelo con otras tasks P0/P1
+- TASK-619 no puede arrancar hasta que TASK-491 este complete (gate critico)
+- TASK-619.1 / TASK-619.2 / TASK-619.3 pueden desarrollarse en paralelo a TASK-619 mismo (dependencias laterales, no secuenciales)
+
+### Decisiones cerradas (24 total — extiende las 17 cerradas en v1.3)
+
+Ver tabla completa en `docs/tasks/to-do/TASK-619-quote-esignature-zapsign.md` seccion "Decisions Cerradas".
 
 ## Referencias
 
