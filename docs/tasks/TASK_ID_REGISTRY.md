@@ -685,4 +685,18 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-630` | `to-do` | Rich Text Editor TipTap en admin product-catalog (componente reusable GreenhouseRichTextEditor) | `docs/tasks/to-do/TASK-630-rich-text-editor-tiptap.md` |
 | `TASK-630.1` | `to-do` | Backfill productos legacy con descripcion plana envuelta en `<p>` (74 productos) | `docs/tasks/to-do/TASK-630.1-backfill-products-rich-html.md` |
 | `TASK-630.2` | `to-do` | AI-assisted Description Generator (boton Generar con AI usando @google/genai) | `docs/tasks/to-do/TASK-630.2-ai-description-generator.md` |
+| `TASK-557.1` | `to-do` | Legacy Quotes Cleanup & Limbo State Audit (legacy_status normalization + legacy_excluded flag) | `docs/tasks/to-do/TASK-557.1-legacy-quotes-cleanup-audit.md` |
+| `TASK-619.4` | `to-do` | HubSpot Bidirectional Signature Sync (deal stage Signed - Awaiting Invoice + anti-ping-pong + conflict resolution) | `docs/tasks/to-do/TASK-619.4-hubspot-bidirectional-signature-sync.md` |
+| `TASK-619.5` | `to-do` | Cost Guardrails + GDPR Signer Anonymization (tenant_quotas + envelope/AI rate limits + anonymize endpoint) | `docs/tasks/to-do/TASK-619.5-cost-guardrails-gdpr-anonymization.md` |
+| `TASK-620.6` | `to-do` | HubSpot Field Mapping Detallado (sellable_tools + sellable_artifacts + nested service_modules outbound contract v3) | `docs/tasks/to-do/TASK-620.6-hubspot-field-mapping-extended.md` |
+| `TASK-620.7` | `to-do` | Catalog Lifecycle & Sunset (service_module_lifecycle states + soft-delete unified + sunset notifications) | `docs/tasks/to-do/TASK-620.7-catalog-lifecycle-sunset.md` |
+| `TASK-621` | `to-do` | Commercial Analytics Dashboards (win/loss + velocity + discount + renewal rate + MRR + program adoption metrics) | `docs/tasks/to-do/TASK-621-commercial-analytics-dashboards.md` |
+| `TASK-622` | `to-do` | Multi-level Approval + Permission Hierarchy (sales_rep / account_lead / sales_lead / finance_admin scopes + escalation) | `docs/tasks/to-do/TASK-622-multi-level-approval-permission-hierarchy.md` |
+| `TASK-623` | `to-do` | Tier/Volume/Graduated Pricing Engine (pricingModel: flat \| volume \| graduated, commitment discounts) | `docs/tasks/to-do/TASK-623-tier-volume-graduated-pricing-engine.md` |
+| `TASK-624` | `to-do` | Renewal Engine + Co-term + Alerting Cascade (cron 90/30/7 + auto-renewal quote + service_renewal_alerts) | `docs/tasks/to-do/TASK-624-renewal-engine-coterm-alerting.md` |
+| `TASK-625` | `to-do` | Multi-language i18n del Programa CPQ (PDF + composer UI + notifications + ZapSign templates ES/EN) | `docs/tasks/to-do/TASK-625-multi-language-cpq-i18n.md` |
+| `TASK-626` | `to-do` | Tax Engine LATAM Extendido (Colombia IVA + Mexico IVA + Peru IGV + Brazil ICMS futuro, plugin per-pais) | `docs/tasks/to-do/TASK-626-tax-engine-latam-extended.md` |
+| `TASK-627.1` | `to-do` | Quote Cloning + Templating from Prior Quote (POST /clone, override cliente/version/pricing) | `docs/tasks/to-do/TASK-627.1-quote-cloning-templating.md` |
+| `TASK-628` | `to-do` | Quote Amendment Engine (amendment vs re-quote, signed quotes mantienen continuidad legal) | `docs/tasks/to-do/TASK-628-quote-amendment-engine.md` |
+| `TASK-628.1` | `to-do` | Audit Timeline UI (visibility en QuoteDetailView de audit_log + outbox events + diff viewer entre versiones) | `docs/tasks/to-do/TASK-628.1-audit-timeline-ui.md` |
 | `TASK-629` | `complete` | PDF Cotización Enterprise Redesign (single template + secciones condicionales + brand assets + QR signed) | `docs/tasks/complete/TASK-629-pdf-cotizacion-enterprise-redesign.md` |

@@ -1,10 +1,10 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-04-24 por Julio + Claude
-> **Status:** Active (3 programas live: A=eSignature long path, B=Rich text editor, C+D=Sellable catalog unification + composer with native nesting)
-> **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync + Sellable Catalog Unification
+> **Status:** Active (programa CPQ completo: Bloque 0 Domain Separation + A eSignature + B Rich Text + C Catalog + D Composer + E Cross-cutting; 6 capas no-ruptura + feature flag matrix + runway deprecacion documentado)
+> **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync + Sellable Catalog Unification + Commercial Domain Separation
 
 **Actualizaciones:**
 
@@ -16,6 +16,7 @@
 - v1.6 (2026-04-25): **TASK-619 re-scoped a ZapSign** — DocuSign descartado tras descubrir que ZapSign ya está integrado en prod (Master Agreements). ZapSign es LATAM-native (Brasilera), 5–10x más barato/envelope que DocuSign, soporta WhatsApp + email automático nativo, y ya tiene cliente API + webhook handler funcionando en repo. Capa `eSignatureProvider` interface se mantiene para permitir DocuSign/Adobe Sign como secundarios si un cliente enterprise lo exige. Estimación TASK-619 baja de 2 sprints → ~5 días (solo orquestación + fields nuevos en `quotations` + UI; reusa [src/lib/integrations/zapsign/client.ts](../../src/lib/integrations/zapsign/client.ts) y [src/app/api/webhooks/zapsign/route.ts](../../src/app/api/webhooks/zapsign/route.ts)).
 - v1.7 (2026-04-25): **TASK-619 expandida al camino largo (defense-in-depth + multi-domain reuse)** — Tras audit de gaps con owner se decide ir por la opcion mas resiliente, robusta y escalable. Se renuncia al short path (~6.5 dias) en favor de la cadena completa: TASK-489 (foundation documental) → TASK-490 (signature aggregate neutro con XState formal + provider interface real) → TASK-491 (ZapSign adapter con circuit breaker + dedup + DLQ) → TASK-619 (consumer del foundation, mucho mas liviano) + 3 tasks derivadas: TASK-619.1 (storage hardening: bucket separado + retention 10 anos + multi-region replica), TASK-619.2 (worker operacional: reconciliation 6h + expiry alerting + DLQ replay), TASK-619.3 (notificaciones: 3 reactores email/in-app/Slack independientes). Ganancia: HR contracts (TASK-027) reusa foundation gratis + compliance LATAM defendible legalmente + multi-provider real. Costo: estimacion total ~20 dias (~4 semanas) en vez de 6.5 dias short path.
 - v1.8 (2026-04-25): **Bloques B + C + D agregados (rich text editor + sellable catalog unification + composer with native nesting + tool partner program). TASK-627 cancelada (absorbida en TASK-620.3).** Tras conversacion con owner sobre 2 temas pendientes (productos sin descripcion + composer de bundles), se decide: (B) TipTap editor reusable como `<GreenhouseRichTextEditor>` + backfill productos legacy + AI-assisted generator. (C) Sellable Catalog Unification: 4 dimensiones canonicas (sellable_roles ya existente + sellable_tools NUEVO + sellable_artifacts NUEVO con pricing hibrido + service_modules existente extendido con nesting). (D) Composer visual con nesting nativo desde dia 1 (depth max 3, cycle detection en trigger DB + UI), constraint rules tipadas con suggested fixes, picker unificado a 4 catalogos en quote builder, modal ad-hoc bundles persistentes con promote-to-catalog. Adicional: tool partner program (Adobe / Microsoft / HubSpot reseller tracking + commission accounting + HubSpot sync con product_type='tool_license'). Estimacion programa total: ~44 dias (~9 semanas con 1 dev). 11 tasks creadas/canceladas (TASK-620 + 620.1 + 620.1.1 + 620.2 + 620.3 + 620.4 + 620.5 + TASK-630 + 630.1 + 630.2; TASK-627 cancelada).
+- v1.9 (2026-04-25): **Programa CPQ completo: Bloque 0 (Commercial Domain Separation EPIC-002 integrado) + Bloque E (cross-cutting hardening) + 14 gaps criticos cerrados + estrategia no-ruptura formalizada.** Tras pregunta del owner "como lo hacemos para que no rompa lo existente", se documenta: (1) Strangler Fig Pattern + 6 capas no-ruptura (schema aditivo, dual-namespace endpoints, sidebar feature-flagged, components con error boundary fallback, expand engine flat preservado, eventos outbox aditivos). (2) Feature Flag Matrix con 13 flags productivos (infra ya existe en `client_feature_flags`). (3) Runway de deprecacion 30-90 dias por elemento legacy. (4) Plan de rollback < 5 min por bloque. (5) Quote regression suite bloqueante en CI. (6) Bloque 0 (EPIC-002 TASK-554-557) integrado como prerequisite UX/access del programa CPQ con coordinacion de merge ordering documentada. (7) 14 gaps criticos resueltos: lifecycle/sunset catalog (TASK-620.7), soft delete unificado, HubSpot bidirectional signature sync (TASK-619.4), expand cache (TASK-620.3 amplificado), legacy quotes cleanup (TASK-557.1), cost guardrails per tenant (TASK-619.5), GDPR signer anonymization (TASK-619.5), audit timeline UI (TASK-628.1), i18n del programa (TASK-625 expandido), analytics CPQ (TASK-621 expandido), quote cloning (TASK-627.1 reusa ID liberado), HubSpot field mapping detallado (TASK-620.6), DR runbooks per provider, permission granularity hierarchy (TASK-622 expandido). (8) 7 tasks faltantes creadas (621/622/623/624/625/626/628). (9) 9 deseables Fase 2 documentados explicitamente. (10) 7 fuera-de-scope cross-referenced a sus programas correspondientes. **Estimacion programa total: ~90-92 dias (~18-19 semanas con 1 dev, ~9-10 semanas con 2 devs en paralelo).** 23 tasks nuevas reservadas en TASK_ID_REGISTRY.
 
 **Documentacion tecnica relacionada:**
 
@@ -1097,6 +1098,198 @@ Bloques B+C+D y A son **independientes** — pueden ejecutarse en paralelo si ha
 - **TASK-629** ya implementada en v1.5 — sin cambios; solo se beneficia indirectamente del rich html populate post Bloque B
 - **TASK-628** (Amendment) — sigue pendiente, ahora gana dependencia explicita en `signed` quotes (TASK-619) + posibilidad de amendar service module composition (TASK-620.3)
 - **TASK-624** (Renewal engine) — sigue pendiente, ahora consume composition de service modules con nesting
+
+## Delta 2026-04-25 (v1.9) — Programa CPQ completo: Bloque 0 + Bloque E + 14 gaps + estrategia no-ruptura
+
+Tras pregunta del owner "como lo hacemos para que no rompa lo existente" + audit de gaps faltantes (TASK-554-557 EPIC-002 + 14 gaps no cubiertos en v1.8), se cierra el programa CPQ end-to-end con criterio robusto/escalable + garantia de cero ruptura productiva.
+
+### Estrategia de cero ruptura — 6 capas
+
+| # | Capa | Regla |
+| --- | --- | --- |
+| 1 | **Schema (DB)** | Migraciones aditivas only en F1 (ADD COLUMN NULL, CREATE TABLE, CREATE INDEX CONCURRENTLY). Nunca renombrar columnas — agregar nueva, dual-write, deprecar vieja. NOT NULL constraints + DROP COLUMN solo en migracion separada post-runway 30+ dias |
+| 2 | **Endpoints API** | Nunca borrar ni renombrar endpoints existentes. Nuevos endpoints `/api/commercial/*` se agregan en paralelo a `/api/finance/*`. Auth check OR durante runway: `userHasRouteGroup('commercial') OR userHasRouteGroup('finance')` |
+| 3 | **UI Sidebar** | TASK-554 mueve items a seccion "Comercial" pero **paths `/finance/...` exactos**. Cero URL change. Bookmarks intactos. Feature flag `commercial_section_in_sidebar` con fallback al sidebar actual si flag falla |
+| 4 | **Componentes UI** | Componentes nuevos (TipTap editor, picker, modal) son **aditivos**: botones nuevos al lado del flow actual. Error boundary que cae al componente legacy si el nuevo crashea. Feature flags por componente |
+| 5 | **Engines / logica** | Expand engine reescrito para soportar nesting **pero caso flat preservado byte-perfect** (test exhaustivo). Pricing engine: snapshot inmutable en quote_line_items, cambios canonicos no afectan quotes historicas |
+| 6 | **Eventos outbox** | Nunca cambiar shape de evento existente. Solo agregar campos opcionales o emitir eventos nuevos en paralelo. Reactores existentes siguen funcionando idénticos |
+
+### Feature Flag Matrix (13 flags productivos — infra ya existe en `client_feature_flags`)
+
+| Flag | Default prod | Activacion gradual | Owner task |
+| --- | --- | --- | --- |
+| `commercial_section_in_sidebar` | off → on dia 7 | 0% → 25% → 50% → 100% en 1 semana | TASK-554 |
+| `commercial_routegroup_dual_namespace` | on inmediato | 100% (no destructivo) | TASK-555 |
+| `commercial_framing_breadcrumbs` | off → on dia 14 | 100% post-validacion visual | TASK-556 |
+| `pipeline_lane_commercial` | off → on dia 14 | 100% post-validacion | TASK-557 |
+| `product_rich_text_editor_tiptap` | off → on dia 7 | 50% admin users → 100% | TASK-630 |
+| `product_description_ai_generator` | off → on dia 7 | Internal users only → 100% | TASK-630.2 |
+| `sellable_tools_standalone` | off → on dia 14 | 100% (read-only) → write enabled | TASK-620.1 |
+| `tool_partner_attribution` | on inmediato | 100% (cero impacto user-facing) | TASK-620.1.1 |
+| `service_composer_v2_with_nesting` | off → on dia 21 | 100% post-regression suite | TASK-620.3 |
+| `quote_catalog_picker` | off → on dia 21 | 100% post-validacion | TASK-620.4 |
+| `quote_adhoc_bundle_modal` | off → on dia 28 | 100% post-validacion | TASK-620.5 |
+| `quote_signature_enabled` | off | Per-tenant opt-in inicial | TASK-619 |
+| `quote_amendments_enabled` | off → on dia 35 | 100% post-firma adoption | TASK-628 |
+
+**Rollback < 5 min** por bloque via feature flag toggle. Cero deploy requerido.
+
+### Runway de deprecacion
+
+| Cosa a deprecar | Cuando es seguro | Quien verifica |
+| --- | --- | --- |
+| Textarea actual del rich html | 0 errors en 30 dias + 100% productos editados con TipTap | Logs + Sentry |
+| Endpoint `/api/finance/quotes/...` con solo `routeGroup: finance` | 0 requests via `finance` route group para esos paths en 90 dias | Cloud Logging |
+| `ai.tool_catalog` referencia legacy | 0 reads en 90 dias | Logs |
+| `tool_id` column en `service_tool_recipe` | 0 reads y `sellable_tool_id` NOT NULL en 30 dias | Logs + DB introspection |
+
+### Quote Regression Suite (bloqueante en CI)
+
+Suite nueva (creada en TASK-620 baseline) que re-calcula totales de 100 quotes historicas reales y compara byte-perfect pre vs post deploy. Si hay drift, merge bloqueado. Suite re-ejecuta antes de cada deploy del programa.
+
+### Bloque 0 — Commercial Domain Separation (EPIC-002 integrado)
+
+| Task | Alcance | Esfuerzo | Coordinacion |
+| --- | --- | --- | --- |
+| **TASK-554** Sidebar separation | Crea seccion "Comercial" en sidebar moviendo Quotes/Contracts/MSA/Productos. Paths `/finance/...` intactos. Feature flag `commercial_section_in_sidebar` | ~2 dias | Debe completar **antes** de Bloques B/C/D (sales reps encuentran las nuevas features bajo "Comercial" no "Finanzas") |
+| **TASK-555** Access foundation | `routeGroup: commercial` + namespace `comercial.*` + compat `finanzas.*` legacy. Seed automatico que da `commercial` a todos los users con `finance` role (cero perdida de acceso) | ~3 dias | Debe completar **antes** de TASK-619/620.4/620.5 (nuevos endpoints usan `comercial.*` desde dia 1) |
+| **TASK-556** Framing adoption | Breadcrumbs, guards, CTAs tratan quotes/contracts/MSA/products como Comercial. Paths legacy intactos | ~3 dias | **Riesgo merge conflict con TASK-619/620.4/620.5** — 556 va antes; specs CPQ rebase sobre la base ya migrada |
+| **TASK-557** Pipeline lane extraction | Pipeline comercial deja de ser sub-tab de Finance Intelligence, gana entrypoint propio | ~2 dias | Independent (puede paralelizarse) |
+| **TASK-557.1** Legacy quotes cleanup | Audit + flag `legacy_excluded` para quotes en estado limbo (legacy_status set, sin canonical record) que romperian las nuevas surfaces | ~1 dia | Bloquea TASK-556/557 (data clean prerequisito) |
+
+**Bloque 0 total: ~11 dias.**
+
+### Bloque E — Cross-cutting Hardening (NUEVO en v1.9)
+
+Tasks que cierran los gaps cross-program detectados:
+
+| Task | Alcance | Esfuerzo |
+| --- | --- | --- |
+| **TASK-619.4** HubSpot bidirectional signature sync | Stage `Signed - Awaiting Invoice` + outbound on signed event + inbound webhook con anti-ping-pong + conflict resolution | ~2 dias |
+| **TASK-619.5** Cost guardrails + GDPR anonymization | Tabla `tenant_quotas` con limits envelopes/AI + reset cron + endpoint anonymize signers (right-to-be-forgotten) preservando PDF firmado | ~2 dias |
+| **TASK-620.6** HubSpot field mapping extended | 15 custom properties HubSpot para sellable_tools/artifacts/nested service_modules + outbound v3 + inbound rehydration v2 | ~2 dias |
+| **TASK-620.7** Catalog lifecycle + sunset | States `draft / active / sunset / archived` unificado en 4 catalogos + soft-delete + sunset notifications a sales reps con quotes vigentes impactadas | ~2 dias |
+| **TASK-621** Commercial analytics dashboards | Sales metrics (win/loss + velocity + MRR + renewal rate) + Program adoption metrics (% rich html, composer adoption, quotes con firma, conversion, costo envelope) | ~3 dias |
+| **TASK-622** Multi-level approval + permission hierarchy | 4 roles (sales_rep / account_lead / sales_lead / commercial_admin) + thresholds per business_line + workflow approval con escalation 48h SLA | ~3 dias |
+| **TASK-623** Tier/volume/graduated pricing engine | `pricingModel: flat \| volume \| graduated` para sellable_tools + sellable_artifacts. Habilita commitment discounts SaaS reseller | ~3 dias |
+| **TASK-624** Renewal engine + co-term + alerting | Cron 90/30/7 dias antes expiracion + auto-generate renewal draft + co-term grouping de multiples quotes mismo cliente | ~4 dias |
+| **TASK-625** Multi-language i18n del programa CPQ | next-intl + ES/EN translations para PDF + composer + notifications + ZapSign envelope language per signer | ~3 dias |
+| **TASK-626** Tax engine LATAM extendido | Engine generico + plugins CL (existing) + CO + MX + PE + BR spec-ready | ~3 dias |
+| **TASK-627.1** Quote cloning + templating | Endpoint clone quote con override cliente/version/pricing + lineage tracking | ~1 dia |
+| **TASK-628** Quote amendment engine | Amendments para quotes firmadas (anexo legal vs re-quote). Composition diff + delta visualization + opcional re-firma | ~3 dias |
+| **TASK-628.1** Audit timeline UI | Timeline visible en QuoteDetailView con audit_log + outbox events + diff viewer entre versiones | ~1.5 dias |
+
+**Bloque E total: ~32.5 dias.**
+
+### Plan unificado v1.9 final
+
+| Bloque | Tasks | Esfuerzo |
+| --- | --- | --- |
+| **0. Commercial Domain Separation** (NUEVO en v1.9) | 554 + 555 + 556 + 557 + 557.1 | ~11 dias |
+| **A. eSignature long path** | 489 → 490 → 491 → 619 + 619.1/2/3 | ~20 dias |
+| **B. Rich text editor** | 630 + 630.1 + 630.2 | ~4 dias |
+| **C. Sellable catalog unification** | 620 + 620.1 + 620.1.1 + 620.2 | ~8.5 dias |
+| **D. Composer with native nesting** | 620.3 + 620.4 + 620.5 | ~9 dias |
+| **E. Cross-cutting hardening** (NUEVO en v1.9) | 619.4 + 619.5 + 620.6 + 620.7 + 621 + 622 + 623 + 624 + 625 + 626 + 627.1 + 628 + 628.1 | ~32.5 dias |
+
+**Total programa CPQ v1.9: ~85 dias = ~17 semanas con 1 dev = ~9 semanas con 2 devs en paralelo.**
+
+(Bloque 0 + A son paralelos independientes; B + C + D dependen de Bloque 0 access foundation pero independientes entre si; E mayoritariamente sequential despues de A/B/C/D)
+
+### Plan de Rollback per Bloque
+
+| Bloque | Rollback time | Como |
+| --- | --- | --- |
+| 0. Commercial Domain Separation | < 1 min | Toggle 4 feature flags (sidebar, framing, pipeline lane, dual namespace permanece) |
+| A. eSignature | < 5 min | Flag `quote_signature_enabled=false` → quotes vuelven a state pre-firma; envelopes ZapSign existentes continuan via ZapSign UI directa |
+| B. Rich text editor | < 1 min | Flag `product_rich_text_editor_tiptap=false` → vuelve textarea |
+| C. Sellable catalog unification | Reversible si zero data | Drop tabla manteniendo `service_tool_recipe.tool_id` legacy intacto |
+| D. Composer with native nesting | < 5 min | Flag `service_composer_v2_with_nesting=false` → vuelve admin UI legacy |
+| E. Cross-cutting hardening | Por flag individual | Cada feature flag independientemente toggleable |
+
+### 14 Gaps Criticos Cerrados en v1.9
+
+1. **Lifecycle / sunset catalog** → TASK-620.7
+2. **Soft delete unificado** → TASK-620.7 (parte del lifecycle)
+3. **HubSpot bidirectional signature sync** → TASK-619.4
+4. **Performance expand engine recursivo** → TASK-620.3 amplificado con cache (Slice extra)
+5. **Migracion quotes legacy en limbo** → TASK-557.1
+6. **Cost guardrails per tenant** → TASK-619.5
+7. **GDPR signer anonymization** → TASK-619.5
+8. **Audit trail visibility en UI** → TASK-628.1
+9. **i18n del programa completo** → TASK-625
+10. **Analytics CPQ + program adoption metrics** → TASK-621
+11. **Quote cloning** → TASK-627.1
+12. **HubSpot field mapping detallado** → TASK-620.6
+13. **DR runbooks per provider** → TASK-619.2 amplificado
+14. **Permission granularity hierarchy** → TASK-622
+
+### Fase 2 (deseables, no bloqueantes — documentados explicitamente)
+
+| # | Gap | Por que Fase 2 |
+| --- | --- | --- |
+| 1 | Negociacion in-quote (chat por linea) | Feature avanzada que no bloquea produccion |
+| 2 | Cross-quote comparison ("este cliente vs aquel") | Análisis avanzado, util cuando >100 quotes/mes |
+| 3 | Search inside PDF (text layer) | Solo si auditoria legal lo exige explicitamente |
+| 4 | Multi-attachment en envelope | Util cuando ventas enterprise piden propuesta + slide deck + case studies |
+| 5 | Batch send a multiples prospects | Util para outbound sales scale |
+| 6 | A/B testing de PDF/email subject | Marketing optimization, no operacional |
+| 7 | Bulk operations (duplicate, bulk update pricing, bulk import) | Util cuando catalogo > 200 items |
+| 8 | Preview cliente pre-firma (sin signature request formal) | Feature comfort |
+| 9 | Service composition templates por business_line | Util despues de validar el composer en uso real |
+
+### Fuera de Scope CPQ (cross-references a otros programas)
+
+| # | Gap | Programa correspondiente |
+| --- | --- | --- |
+| 1 | Mobile/responsive del composer | UX program general del portal |
+| 2 | Cliente portal externo (cliente firma + ve PDF + comenta) | Programa "Client Portal" separado |
+| 3 | SOX / segregation of duties / dual approval | Programa "Financial Controls" — relevante post-IPO |
+| 4 | Print/export Excel/CSV del quote | Programa "Reporting & Exports" |
+| 5 | SEO publico del catalogo (pagina marketing) | Programa "Marketing Site" |
+| 6 | AI Quote Draft Assistant | TASK-609 ya existe spec separado |
+| 7 | Webhooks outbound publicos a clientes | Programa "Public API" futuro |
+
+### Decisiones cerradas en v1.9 (38 total — extiende las 29 cerradas en v1.8)
+
+Las nuevas 9 decisiones (con criterio robusto/escalable):
+
+| # | Decision | Resolucion |
+| --- | --- | --- |
+| 30 | Strangler Fig vs Big Bang migration | **Strangler Fig** — todo aditivo, deprecate gradual con runway 30-90 dias |
+| 31 | Feature flag matrix vs deploy gates | **Feature flags por feature** — rollback < 5 min sin deploy |
+| 32 | Quote regression suite enforcement | **Bloqueante en CI** — drift en pricing rechaza merge |
+| 33 | EPIC-002 integration con CPQ | **Bloque 0 prerequisite** — TASK-554/555 antes de B/C/D |
+| 34 | HubSpot stage post-firma | **`Signed - Awaiting Invoice` separado de Closed Won** — separa firma de facturacion |
+| 35 | Cost guardrails per tenant | **Hard limit + soft warning 80%** + monthly/daily reset |
+| 36 | GDPR scope | **Solo signers externos** (employees Efeonce no GDPR scope) + PDF firmado preserved |
+| 37 | i18n scope | **Programa completo** (PDF + UI + notifications + ZapSign) no solo PDF |
+| 38 | Catalog lifecycle | **Soft-delete unificado** + state machine `draft → active → sunset → archived`; never hard-delete |
+
+### Recomendacion de orden de ejecucion v1.9
+
+```text
+Semana 1-2:  Bloque 0 (TASK-554 + 555 + 557.1)
+             en paralelo: TASK-489 (foundation documental, no bloquea)
+
+Semana 3-4:  Bloque 0 finishing (TASK-556 + 557)
+             Bloque B (rich text editor: 630 + 630.1 + 630.2)
+             en paralelo: TASK-490 (signature foundation)
+
+Semana 5-6:  Bloque C (sellable catalog: 620 + 620.1 + 620.1.1 + 620.2)
+             en paralelo: TASK-491 (ZapSign adapter)
+
+Semana 7-9:  Bloque D (composer + picker + ad-hoc: 620.3 + 620.4 + 620.5)
+             en paralelo: TASK-619 + 619.1 + 619.2 + 619.3 (eSignature consumer + workers + notifications)
+
+Semana 10-13: Bloque E primer batch (619.4 + 619.5 + 620.6 + 620.7 + 627.1 + 628.1)
+
+Semana 14-17: Bloque E segundo batch (621 + 622 + 623 + 624 + 625 + 626 + 628)
+
+Semana 18:   Buffer + smoke tests E2E + documentation + training operadores
+```
+
+Con 2 devs en paralelo: ~9 semanas. Con 1 dev sequencial: ~17-18 semanas.
 
 ## Referencias
 
