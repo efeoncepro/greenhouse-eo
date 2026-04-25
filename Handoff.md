@@ -1,5 +1,69 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — API Platform documentada como arquitectura canónica
+
+### Que cambio
+
+Se creó una spec nueva de arquitectura para consolidar la visión de plataforma API de Greenhouse:
+
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+
+También quedaron sincronizados:
+
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+- `project_context.md`
+- `changelog.md`
+
+### Decisión canónica explicitada
+
+La plataforma API correcta para Greenhouse ya no debe leerse desde `docs/api/*` como source of truth principal.
+
+La regla nueva es:
+
+- la arquitectura canónica vive en `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md` y `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md` quedan como documentos derivados/transicionales
+- `/api/integrations/v1/*` sigue siendo lane válido, pero tratado como `legacy/transicional`
+- nuevos contratos ecosystem-facing deben preferir `api/platform/*`
+- `MCP` sigue siendo downstream de una API estable
+
+### Riesgo / follow-up
+
+- No hay implementación runtime todavía en `src/lib/api-platform/**` ni `src/app/api/platform/**`; este corte deja la arquitectura y la jerarquía documental listas para que la implementación posterior no nazca sobre fuentes contradictorias.
+
+## Sesion 2026-04-25 — TASK-615 registrada: Quote Builder Flow Orchestration & UX Hardening
+
+### Que cambio
+
+Se registró una task nueva de backlog para endurecer la experiencia del Quote Builder sin reabrir pricing ni contratos backend:
+
+- `docs/tasks/to-do/TASK-615-quote-builder-flow-orchestration-ux-hardening.md`
+
+Tambien quedaron sincronizados:
+
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Intención de la task
+
+Formaliza el follow-up UX/UI que quedó implícito después de los rediseños parciales del builder:
+
+- converger header y dock para que no compitan por la acción terminal
+- hacer que el setup comercial se lea como flujo guiado
+- ordenar la relación entre empty state y toolbar de ítems
+- mejorar estados parciales, blockers y microfeedback sin tocar el contrato de negocio
+
+### Decisión explícita
+
+La task no debe convertirse en refactor backend ni en rediseño total del builder.
+
+El criterio canónico es:
+
+- preservar `QuoteBuilderShell` como arquitectura
+- reutilizar `QuoteIdentityStrip`, `QuoteContextStrip`, `QuoteSummaryDock` y `QuoteLineItemsEditor`
+- resolver primero jerarquía, copy y feedback antes de abrir primitives nuevas o migraciones platform-wide de popovers
+
 ## Sesion 2026-04-25 — EPIC-008 + TASK-611/612/613 registradas: convergencia canónica Organization Workspace
 
 ### Que cambio

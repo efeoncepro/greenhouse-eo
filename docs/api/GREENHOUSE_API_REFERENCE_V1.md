@@ -1,5 +1,12 @@
 # Greenhouse API Reference V1
 
+> Estado 2026-04-25: documento derivado/transicional.
+> La arquitectura canónica de la API platform ahora vive en:
+> `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+>
+> Este archivo se conserva como quick reference operativa de surfaces ya vivas,
+> pero ya no debe tratarse como source of truth arquitectónica principal.
+
 Use this file as the first read for any agent or connector that needs to integrate with Greenhouse APIs.
 
 ## Environments
@@ -8,6 +15,9 @@ Use this file as the first read for any agent or connector that needs to integra
 - Staging base URL: `https://dev-greenhouse.efeoncepro.com`
 
 ## API Families
+
+La taxonomía general de lanes, versionado, auth, resiliencia, idempotencia y rollout
+ya no se define aquí. Este archivo solo resume surfaces existentes.
 
 ### 1. Integrations API
 
@@ -32,6 +42,7 @@ Routes:
 - `GET /api/integrations/v1/sister-platforms/readiness`
 
 Read next:
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
 
@@ -69,10 +80,11 @@ Key rules:
 ## Recommended Read Order For Another Codex
 
 1. `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
-2. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
-3. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
-4. `project_context.md`
-5. `Handoff.md`
+2. `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+3. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+4. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
+5. `project_context.md`
+6. `Handoff.md`
 
 ## Production-Ready Endpoints
 

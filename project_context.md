@@ -1,3 +1,14 @@
+## Delta 2026-04-25 API Platform ahora tiene arquitectura canónica propia
+
+- Greenhouse ya no debe operar su capa API solo desde docs sueltos en `docs/api/*`.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - la arquitectura API se define como capability shared de plataforma
+  - `docs/api/GREENHOUSE_API_REFERENCE_V1.md` y `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md` quedan como documentos derivados/transicionales
+  - nuevos contratos ecosystem-facing deben preferir `api/platform/*` como namespace objetivo
+  - `MCP` sigue siendo downstream de contratos API estables
+
 ## Delta 2026-04-23 Reactive projections ahora declaran writer privileges y clasifican fallos infra tipados
 
 - Las projections que escriben tablas shared como excepción (`greenhouse_serving`) ya no deben depender solo de grants implícitos o del texto libre de un dead-letter.

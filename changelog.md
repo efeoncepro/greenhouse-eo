@@ -2,6 +2,12 @@
 
 ## 2026-04-22
 
+### 2026-04-25 — API Platform V1 documentada como arquitectura canónica
+
+- **Nueva spec canónica**: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` consolida la visión de `API platform` para Greenhouse como capability shared y fija principios de robustez, resiliencia, seguridad, escalabilidad, versionado, idempotencia, pagination, observabilidad y degraded modes.
+- **Absorción documental explícita**: `docs/api/GREENHOUSE_API_REFERENCE_V1.md` y `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md` dejan de ser source of truth arquitectónica y pasan a quedar documentados como artefactos derivados/transicionales del carril actual.
+- **Arquitectura madre sincronizada**: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `project_context.md` ya registran la nueva regla canónica de que la plataforma API vive en `docs/architecture/` y que `/api/integrations/v1/*` sigue siendo válido, pero tratado como lane legacy/transicional.
+
 ### 2026-04-25 — TASK-610 CERRADA ✅: Content Sanitization Runtime Isolation + Shared Policy Layer
 
 - **Nueva capability shared** `src/lib/content/sanitization/` con policy registry reusable y primer policy id `hubspot_product_description_v1`.

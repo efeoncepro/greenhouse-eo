@@ -1,5 +1,21 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-25 — API Platform ahora tiene arquitectura canónica propia
+
+- Greenhouse ya no debe tratar sus contratos API como una suma de rutas sueltas o como documentación repartida solo en `docs/api/*`.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- Regla arquitectónica nueva:
+  - la `API platform` de Greenhouse se diseña como capability shared con:
+    - namespaces `internal / ecosystem / future public`
+    - auth y observabilidad uniformes
+    - versionado explícito
+    - idempotencia para writes nuevos
+    - adapters por aggregate
+    - `MCP` downstream de contratos API estables
+  - `docs/api/GREENHOUSE_API_REFERENCE_V1.md` y `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md` quedan absorbidos por esta arquitectura a nivel de source of truth y pasan a ser documentos derivados/transicionales
+  - `/api/integrations/v1/*` sigue siendo un lane runtime válido, pero ya no debe crecer como catch-all de plataforma por defecto
+
 ## Delta 2026-04-20 — TASK-452 formaliza la foundation canónica de service attribution
 
 - Greenhouse ya no debe tratar el P&L por servicio como un problema que se resuelve on-read desde `income`, `expenses` o `commercial_cost_attribution`.

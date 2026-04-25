@@ -1,5 +1,12 @@
 # Greenhouse Integrations API V1
 
+> Estado 2026-04-25: documento derivado del carril vigente `/api/integrations/v1/*`.
+> La arquitectura canónica de la API platform ahora vive en:
+> `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+>
+> Este archivo se conserva porque describe un lane runtime real y su OpenAPI asociado,
+> pero ya no debe leerse como la definición arquitectónica superior de toda la plataforma de APIs.
+
 ## Goal
 
 Expose a system-agnostic integration API so external connectors can exchange tenant commercial context with Greenhouse without coupling the product to a single provider.
@@ -21,6 +28,10 @@ Machine-readable handoff:
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
 
 ## Authentication
+
+La política general de auth, versionado, idempotencia, degraded modes y rollout
+ya queda gobernada por `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`.
+Aquí se documenta el comportamiento específico del lane actual.
 
 ### Generic integrations lane
 
@@ -253,6 +264,20 @@ Not implemented yet:
 - write flows for sister-platform consumers
 
 Those can be layered later without replacing the contract above.
+
+## Position in the new API platform
+
+Desde 2026-04-25 este carril debe tratarse como:
+
+- lane legacy/transicional vigente
+- surface ecosystem-facing ya productiva
+- foundation parcial reutilizable para la futura `api/platform/ecosystem/*`
+
+Regla nueva:
+
+- nuevos contratos ecosystem-facing no deberían nacer aquí por default
+- el crecimiento nuevo de platform API debe preferir `api/platform/*`
+- este lane se mantiene por compatibilidad y consumers existentes hasta convergencia real
 
 ## Latency Model
 
