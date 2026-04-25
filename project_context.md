@@ -1,3 +1,16 @@
+## Delta 2026-04-25 Offboarding ya tiene arquitectura canónica propia
+
+- Greenhouse ya no debe tratar offboarding como una suma implícita de SCIM deactivation + checklist HRIS + cleanup manual en Payroll/People.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - el agregado canonico es un caso de salida de relacion de trabajo con snapshot contractual y legal
+  - `SCIM` es signal source de identidad, no owner total del offboarding
+  - el checklist legacy de offboarding en HRIS pasa a ser child object operativo del caso, no su source of truth
+  - el dominio debe pensarse en ambos planos:
+    - `views` (`People` como ficha canonica, `HR` como surface operativa)
+    - `entitlements/capabilities` para create/review/approve/execute/cancel
+
 ## Delta 2026-04-25 API Platform ahora tiene arquitectura canónica propia
 
 - Greenhouse ya no debe operar su capa API solo desde docs sueltos en `docs/api/*`.

@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Workforce Offboarding architecture foundation
+
+### Que cambio
+
+Se formalizo la arquitectura canonica de offboarding como dominio propio en:
+
+- `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`
+
+Tambien se actualizo:
+
+- `docs/README.md`
+- `project_context.md`
+
+### Decisiones canónicas explicitadas
+
+1. **Offboarding no es desactivar un usuario**: el agregado canonico es un caso de salida de relacion de trabajo con snapshot contractual/legal.
+2. **SCIM es signal source, no owner total**: un deprovision tecnico puede abrir `needs_review`, pero no debe reemplazar el proceso laboral/operativo.
+3. **Checklist HRIS legacy deja de ser source of truth**: las plantillas/instancias de offboarding quedan como child object operativo del caso.
+4. **People + HR comparten el dominio en distintos planos**:
+   - `People` sigue siendo la ficha canonica
+   - `HR` queda como surface operativa
+   - `entitlements` resuelven permisos finos separados de la navegacion
+5. **La matriz de reglas depende de `relationship_type + employment_type + contract_type + pay_regime + payroll_via + country`** para distinguir lanes `internal_payroll`, `external_payroll`, `non_payroll`, `identity_only` y `relationship_transition`.
+
+### Validaciones
+
+- No se corrieron tests: cambio documental/arquitectonico solamente.
+
+### Siguiente
+
+- Traducir el spec a epic/task backlog.
+- Definir el shape exacto del agregado runtime y de la rule matrix V1.
+- Conectar `SCIM`, `Identity`, `People`, `HR`, `Payroll` y drift reporting a ese agregado cuando se abra la implementacion.
+
 ## Sesion 2026-04-25 — Reliability Sentry Incident → Module Correlator (TASK-634)
 
 ### Que cambio
