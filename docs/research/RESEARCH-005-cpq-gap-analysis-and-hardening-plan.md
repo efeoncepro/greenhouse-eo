@@ -1,9 +1,9 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-04-24 por Julio + Claude
-> **Status:** Active (TASK-629 implementada y deployada)
+> **Status:** Active (TASK-629 implementada y deployada; TASK-619 re-scoped a ZapSign)
 > **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync
 
 **Actualizaciones:**
@@ -13,6 +13,7 @@
 - v1.3 (2026-04-24): cierra las 7 decisiones operativas pendientes con racional robustez + escalabilidad documentado; refina alcance de TASK-619/620/624/626/629/630 con los acuerdos cerrados
 - v1.4 (2026-04-24): decision PDF — single template con secciones condicionales (no multi-template explicito); refina TASK-629 con el contrato de secciones (always vs conditional) + reglas de activacion
 - v1.5 (2026-04-24): **TASK-629 IMPLEMENTADA** — PDF enterprise rediseño live en develop. 8 secciones modulares + tokens DM Sans+Poppins + QR signed HMAC + sub-brand PNG pipeline + product_catalog JOIN + endpoint público de verificación + 33 tests unitarios. Render validado end-to-end (enterprise 84KB / compact 52KB). Único follow-up: setear `GREENHOUSE_QUOTE_VERIFICATION_SECRET` en Vercel prod (sin esto el QR se omite gracefully).
+- v1.6 (2026-04-25): **TASK-619 re-scoped a ZapSign** — DocuSign descartado tras descubrir que ZapSign ya está integrado en prod (Master Agreements). ZapSign es LATAM-native (Brasilera), 5–10x más barato/envelope que DocuSign, soporta WhatsApp + email automático nativo, y ya tiene cliente API + webhook handler funcionando en repo. Capa `eSignatureProvider` interface se mantiene para permitir DocuSign/Adobe Sign como secundarios si un cliente enterprise lo exige. Estimación TASK-619 baja de 2 sprints → ~5 días (solo orquestación + fields nuevos en `quotations` + UI; reusa [src/lib/integrations/zapsign/client.ts](../../src/lib/integrations/zapsign/client.ts) y [src/app/api/webhooks/zapsign/route.ts](../../src/app/api/webhooks/zapsign/route.ts)).
 
 **Documentacion tecnica relacionada:**
 
@@ -76,7 +77,7 @@ Revision de `src/lib/commercial/service-catalog-{store,expand,constraints}.ts`:
 | Renewal trigger | **Event-based + cliente-driven combinado** | Cron por `default_duration_months` expira + boton opcional en portal para adelantar |
 | Tax engine | **Extender Chile IVA incrementalmente** a otros paises LATAM (Colombia IVA, Mexico IVA, Peru IGV) antes de Avalara | Cada pais LATAM tiene su enum tributario; Avalara solo cuando escales fuera de LATAM |
 | Analytics stack | **In-portal Next.js + BQ** | Dashboards nativos aprovechan permisos del portal; sin overhead Metabase |
-| eSignature | **DocuSign only en Fase 1** | Mayor cobertura LATAM; Adobe Sign si cliente enterprise lo pide |
+| eSignature | **ZapSign primary** (LATAM-native, ya integrado en prod) | DocuSign/Adobe Sign disponibles via `eSignatureProvider` interface si cliente enterprise lo exige. Ver Delta v1.6. |
 
 Con estas decisiones cerradas, el plan pasa de "hipotetico" a "accionable" — las tasks P0/P1 arrancan sin blockers.
 
@@ -200,20 +201,23 @@ Footer fijo todas las paginas
 
 ### d) DocuSign integration — contexto
 
+> **Superado por Delta v1.6 (2026-04-25):** DocuSign descartado en favor de ZapSign (LATAM-native, ya integrado en prod para Master Agreements). Esta sección se mantiene como referencia histórica del análisis original. Ver Delta v1.6 para el contexto actual.
+
 DocuSign es el lider enterprise con ~70% market share. Para LATAM:
 
 - **Integracion tecnica:** API REST + webhooks (`envelope.sent`, `envelope.signed`, `envelope.declined`, `envelope.voided`).
 - **Flujo operacional:** quote emitida → POST a DocuSign → envelope con PDF + campos de firma → email al cliente → cliente firma → webhook → GH actualiza `quotation.signed_at` + `signed_by`.
 - **Validez legal LATAM:** Chile (Ley 19.799), Colombia (Ley 527), Mexico (NOM-151), Peru (Ley 27269). Todas validas con eSignature no-certificada para contratos comerciales.
 - **Costo:** ~$10-25 USD/envelope segun plan (Business Pro = $40 USD/user/mes + envelopes incluidos).
-- **Alternativas:** Adobe Sign (enterprise mas caro), HelloSign (barato, menos trust), Signaturit (LATAM-nativo, mas barato).
+- **Alternativas:** Adobe Sign (enterprise mas caro), HelloSign (barato, menos trust), Signaturit (LATAM-nativo, mas barato), **ZapSign (LATAM-native, ya integrado — adoptado en v1.6)**.
 
-**Recomendacion Fase 1:** DocuSign only con capa de abstraccion `eSignatureProvider` (interface) para permitir swap a Adobe Sign sin rework cuando un cliente enterprise lo pida.
+**Recomendacion v1.2 (superada):** DocuSign only con capa de abstraccion `eSignatureProvider` (interface) para permitir swap a Adobe Sign sin rework cuando un cliente enterprise lo pida.
+**Recomendacion vigente (v1.6):** ZapSign primary (ya integrado), capa `eSignatureProvider` se mantiene para DocuSign/Adobe Sign como secundarios on-demand.
 
 **Fields nuevos en `quotations`:**
 
-- `esignature_provider VARCHAR` (docusign, adobe_sign)
-- `esignature_envelope_id VARCHAR`
+- `esignature_provider VARCHAR` (zapsign, docusign, adobe_sign)
+- `esignature_envelope_id VARCHAR` (en ZapSign: `document_token`)
 - `esignature_status ENUM(pending, sent, viewed, signed, declined, voided, expired)`
 - `esignature_sent_at TIMESTAMP`
 - `esignature_signed_at TIMESTAMP`
@@ -290,7 +294,7 @@ Y refinar el alcance de tasks ya planeadas:
 - **TASK-620** (Service catalog como bundle CPQ) incluye explicitamente **constraint rules en TS declarativo** (Opcion B elegida) + **1 nivel de nesting** con `service.add_ons[]`.
 - **TASK-624** (Renewal engine) incluye **paralelo-agrupable** (no co-term estricto) + soporta cualquier `default_duration_months` entero (no solo los 5 presets tipicos).
 - **TASK-628** (Amendment) queda **NO diferible**: sube de Fase 5 a Fase 2 porque LATAM corporate lo espera.
-- **TASK-619** (eSignature DocuSign) incluye capa `eSignatureProvider` interface para permitir Adobe Sign como segundo provider cuando lo pidan.
+- **TASK-619** (eSignature) — **re-scoped en v1.6 a ZapSign primary** (DocuSign descartado). Reusa cliente API + webhook handler ya productivos en repo. Capa `eSignatureProvider` interface se mantiene para DocuSign/Adobe Sign on-demand.
 
 ## Delta 2026-04-24 (v1.3) — 7 decisiones operativas cerradas con racional robustez+escalabilidad
 
@@ -534,7 +538,7 @@ Estos son **anteriores** a cualquier gap funcional. El mercado CPQ los resolvio 
 |---|---|---|---|---|
 | F1 | Bundles + configuration rules | ❌ (`bundleType='none'` hardcoded) | ✅ Salesforce CPQ core | Alto si vendes paquetes componibles (ej. "retainer + herramientas") |
 | F2 | Tier/volume/graduated pricing | ❌ (engine flat-only) | ✅ Todos | Medio — relevante para retainers con descuento por volumen |
-| F3 | eSignature (DocuSign/Adobe) | ❌ | ✅ Tabla de apuestas | Medio — hoy "sent" no rastrea firma |
+| F3 | eSignature (ZapSign/DocuSign/Adobe) | ⚠️ ZapSign integrado en MSA, pendiente cableo a quotes (TASK-619) | ✅ Tabla de apuestas | Medio — hoy "sent" no rastrea firma; ZapSign primary post v1.6 |
 | F4 | Multi-level approval con escalation | ❌ (single gate por monto) | ✅ Todos | Bajo a medio — por ahora governance basta |
 | F5 | Guided selling wizard | ❌ | ✅ Salesforce/DealHub signature | Medio — reduce onboarding de SDRs nuevos |
 | F6 | Renewal management (co-term, auto-renew) | ❌ | ✅ Salesforce Subscription | Alto si creces en retainers/SaaS recurrente |
@@ -605,7 +609,7 @@ Re-priorizadas post-Delta v1.1 con business context confirmado (renewal must-hav
 
 | ID | Spec candidato | Gap | Esfuerzo | Por que en este orden |
 |---|---|---|---|---|
-| **P2.1** | TASK-619 — eSignature DocuSign integration | F3 | 2 sprints | Cierra loop quote-to-signed, mejora cobranza. DocuSign cubre LATAM; Adobe queda opcional cuando un cliente enterprise lo requiera. |
+| **P2.1** | TASK-619 — eSignature ZapSign integration | F3 | **~5 días (revised v1.6)** | Cierra loop quote-to-signed, mejora cobranza. **ZapSign primary** (LATAM-native, ya integrado en prod para Master Agreements — reusa cliente API + webhook). DocuSign/Adobe Sign opcionales via `eSignatureProvider` interface si cliente enterprise lo exige. Estimación reducida de 2 sprints → ~5 días por reuso de integración existente. |
 | **P2.2** | TASK-623 — Tier/volume/graduated pricing en engine | F2 | 2 sprints | **Prerequisite para SaaS bundles + renewals maduros.** Hoy engine es flat-only, bloquea vender licencias con commitment discounts. |
 | **P2.3** | TASK-620 — Service catalog como bundle CPQ (extension) | F1 | 2 sprints | **NO construir desde cero**: extender `service_modules` con (a) sync a HubSpot como bundle real (desbloquea `hubspot_bundle_type='open'`), (b) bundle-level discount, (c) constraint rules entre role+tool recipes. Aprovecha 70% del modelo ya implementado. |
 | **P2.4** | TASK-624 — Renewal engine + co-term | F6 | 3 sprints | **Must-have confirmado.** Base ya existe (`default_duration_months` + `on_going` model). Requiere: cron que detecta expiracion, emite `commercial.service.renewal_due` event, genera renewal quote automatica con opcion de override. Co-term para agrupar renewals en un solo quote date. |
@@ -647,7 +651,7 @@ TASK-614..618 en paralelo donde posible. Habilita escalamiento seguro de volumen
 
 ### Bloque 3 — P2 por fases (actualizado v1.1)
 
-- **Fase 1 — Ciclo comercial completo:** TASK-619 (eSignature) + TASK-623 (tier pricing engine).
+- **Fase 1 — Ciclo comercial completo:** TASK-619 (eSignature **ZapSign**, ~5 días por reuso) + TASK-623 (tier pricing engine).
 - **Fase 2 — Bundles + Renewals (el corazon SaaS):** TASK-620 (service catalog como bundle CPQ) + TASK-624 (renewal engine + co-term). **Orden:** bundles primero, renewals despues, porque renewals necesitan bundles estables como unidad de renovacion.
 - **Fase 3 — LATAM expansion:** TASK-626 (tax engine Colombia/Mexico/Peru) + TASK-625 (multi-language ES/EN).
 - **Fase 4 — Intelligence + Analytics:** TASK-609 (AI quote draft con bundles + renewals como features) + TASK-621 (dashboards con MRR + renewal rate).
@@ -708,6 +712,74 @@ TASK-629 (PDF redesign) fue implementada end-to-end y commiteada a develop en un
 
 Las demas tasks de RESEARCH-005 (P0 race conditions, P1 robustez, resto de P2) siguen pendientes y mantienen su priorizacion original. TASK-629 se adelanto por urgencia operativa pero no cambia el orden recomendado del resto.
 
+## Delta 2026-04-25 (v1.6) — TASK-619 re-scoped: ZapSign primary (DocuSign descartado)
+
+### Hallazgo
+
+Durante el cierre de TASK-631 Fase 4 (PDF email attachment + GCS asset cache), revision del repo descubrio que **ZapSign ya esta integrado en producion** para el flujo de Master Service Agreements (MSA). La integracion incluye:
+
+| Pieza | Ubicacion | Estado |
+|---|---|---|
+| Cliente API (`createZapSignDocument`, `getZapSignDocument`, `isZapSignConfigured`) | [src/lib/integrations/zapsign/client.ts](../../src/lib/integrations/zapsign/client.ts) | ✅ Productivo |
+| Webhook handler inbound (signed/refused/expired events) | [src/app/api/webhooks/zapsign/route.ts](../../src/app/api/webhooks/zapsign/route.ts) | ✅ Productivo |
+| Uso en MSA signing | [src/app/api/finance/master-agreements/[id]/signature-requests/route.ts](../../src/app/api/finance/master-agreements/%5Bid%5D/signature-requests/route.ts) | ✅ Productivo |
+| Env vars en Vercel (`ZAPSIGN_API_TOKEN_SECRET_REF`, `ZAPSIGN_WEBHOOK_SHARED_SECRET_SECRET_REF`, `ZAPSIGN_API_BASE_URL`) | Secret Manager + project config | ✅ Configurado |
+| Tasks alineadas: TASK-490 (signature orchestration foundation), TASK-491 (zapsign-adapter convergence) | [docs/tasks/to-do/](../tasks/to-do/) | 📋 To-do |
+
+### Decision
+
+**TASK-619 (eSignature) cambia de DocuSign a ZapSign primary** por las siguientes razones:
+
+1. **LATAM-native:** ZapSign es Brasilera, fuerte en CL/MX/CO/BR. Validez legal cubre las mismas leyes que DocuSign (Ley 19.799 CL, Ley 527 CO, NOM-151 MX, MP 2.200-2 BR).
+2. **Costo:** Plan Business arranca ~$50 USD/mes con envelopes incluidos. DocuSign Business Pro = ~$40/user/mes + ~$10-25/envelope adicional. ZapSign es 5–10x mas barato por envelope a volumen agency.
+3. **WhatsApp + email automatico nativo:** El cliente `ZapSignSignerInput` soporta `sendAutomaticWhatsapp` y `sendAutomaticWhatsappSignedFile` — diferenciador real en LATAM (DocuSign requiere integracion separada).
+4. **Reuso 100%:** Cero trabajo de integracion para client + webhook + auth. DocuSign requeriria implementar todo desde cero (~2 sprints solo en plumbing).
+5. **Capa `eSignatureProvider` se mantiene:** TASK-490 ya define la interface. ZapSign queda como primary, dejando puerta abierta a DocuSign/Adobe Sign cuando un cliente enterprise lo exija.
+
+### Impacto en TASK-619
+
+**Scope reducido:**
+
+- ✅ Reusar [src/lib/integrations/zapsign/client.ts](../../src/lib/integrations/zapsign/client.ts) (no implementar nada nuevo)
+- ✅ Extender [src/app/api/webhooks/zapsign/route.ts](../../src/app/api/webhooks/zapsign/route.ts) para emitir eventos `commercial.quote.signed` ademas de los eventos MSA actuales
+- ✅ Agregar campos `esignature_*` a `quotations` (migracion node-pg-migrate)
+- ✅ Endpoint nuevo `POST /api/finance/quotes/[id]/signature-requests` analogo al de master-agreements
+- ✅ UI: boton "Enviar para firma" en `QuoteShareDrawer` + estados de firma en detail view
+
+**Estimacion revisada:** 2 sprints → **~5 dias** (gracias al reuso de la integracion existente).
+
+### Validez legal verificada
+
+ZapSign cumple los mismos marcos legales que DocuSign para eSignature no-certificada:
+
+| Pais | Marco legal | Cobertura ZapSign |
+|---|---|---|
+| Chile | Ley 19.799 (firma electronica simple) | ✅ |
+| Colombia | Ley 527 / Decreto 2364 | ✅ |
+| Mexico | Codigo de Comercio Art. 89-114 (NOM-151 para certificada, no requerida en B2B no-financiero) | ✅ |
+| Peru | Ley 27269 + Reglamento DS 052-2008 | ✅ |
+| Brasil | MP 2.200-2 (firma electronica simples) | ✅ nativo |
+
+Para contratos comerciales B2B (caso 95% de Greenhouse) la firma simple ZapSign es legalmente vinculante en los 5 paises de la matriz LATAM.
+
+### Tasks impactadas
+
+- **TASK-619** (eSignature integration): scope re-orientado a ZapSign + reuso. Nueva estimacion ~5 dias.
+- **TASK-490** (signature orchestration foundation): sin cambios — la interface `eSignatureProvider` sigue siendo el contrato.
+- **TASK-491** (zapsign-adapter webhook convergence): adelanta su valor — ahora es prerequisite explicito de TASK-619 (asegura que el webhook handler emita eventos consumibles por el quote flow).
+
+### Validacion
+
+- ✅ Cliente ZapSign verificado en [src/lib/integrations/zapsign/client.ts](../../src/lib/integrations/zapsign/client.ts)
+- ✅ Webhook handler verificado en [src/app/api/webhooks/zapsign/route.ts](../../src/app/api/webhooks/zapsign/route.ts)
+- ✅ Patron de uso productivo verificado en [src/app/api/finance/master-agreements/[id]/signature-requests/route.ts](../../src/app/api/finance/master-agreements/%5Bid%5D/signature-requests/route.ts)
+- ✅ Env vars confirmadas en Secret Manager via project config
+
+### Follow-ups operativos (no codigo)
+
+1. **Actualizar TASK-619 spec en `docs/tasks/`** cuando se cree (hoy aun no existe como `TASK-619-*.md` standalone — al crearla, reflejar este scope reducido).
+2. **No requiere setup de cuenta nueva** — la cuenta ZapSign de produccion ya esta provisionada y funcionando para MSA.
+
 ## Decisiones abiertas
 
 **Todas las decisiones del brief estan cerradas a partir de v1.3.** Los 3 bloques de decisiones se documentaron con racional para que cualquier futura iteracion entienda el trade-off:
@@ -718,7 +790,7 @@ Las demas tasks de RESEARCH-005 (P0 race conditions, P1 robustez, resto de P2) s
 | Fundacional | 2 | Renewal trigger | Event-based + cliente-driven combinado | Delta v1.1 |
 | Fundacional | 3 | Tax engine | Extender Chile IVA a LATAM incrementalmente | Delta v1.1 |
 | Fundacional | 4 | Analytics stack | In-portal Next.js + BQ | Delta v1.1 |
-| Fundacional | 5 | eSignature | DocuSign only Fase 1 | Delta v1.1 |
+| Fundacional | 5 | eSignature | **ZapSign primary** (LATAM-native, ya integrado); DocuSign/Adobe Sign on-demand via `eSignatureProvider` interface | Delta v1.6 (super-seded v1.1) |
 | Conceptual | 6 | Constraint rules DSL | TS declarativo Fase 1 | Delta v1.2 |
 | Conceptual | 7 | Nesting | 1 nivel + `service.add_ons[]` | Delta v1.2 |
 | Conceptual | 8 | Co-term | Paralelo-agrupable | Delta v1.2 |
