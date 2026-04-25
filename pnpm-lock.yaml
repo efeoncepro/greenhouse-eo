@@ -380,6 +380,9 @@ importers:
       kysely-codegen:
         specifier: ^0.20.0
         version: 0.20.0(kysely@0.28.15)(pg@8.20.0)(typescript@5.9.3)
+      minimatch:
+        specifier: ^9.0.5
+        version: 9.0.5
       msw:
         specifier: ^2.13.4
         version: 2.13.4(@types/node@24.10.1)(typescript@5.9.3)

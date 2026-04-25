@@ -47,6 +47,7 @@ Cada entrada del registry declara:
 | `apis` | APIs críticas. |
 | `dependencies` | Dependencias operativas que, si fallan, propagan al módulo. |
 | `smokeTests` | Specs de Playwright que protegen el módulo hoy. |
+| `filesOwned` | Glob patterns (minimatch) que declaran qué archivos pertenecen al módulo. Consumido por TASK-633 (change-based verification matrix). |
 | `expectedSignalKinds` | Tipos de señal que se esperan vivos para este módulo. |
 
 El seed inicial vive en [`src/lib/reliability/registry.ts`](../../src/lib/reliability/registry.ts) y persiste como código estático. Persistencia DB se evaluará si Discovery posterior demuestra necesidad.
@@ -112,6 +113,7 @@ El reader **no hace fetches propios**: consume el `OperationsOverview` que el ca
 | `Ops Health` (`/admin/ops-health`) | Detalle técnico de subsystems, reactive backlog, webhooks. **Sigue siendo dueño** de la lectura técnica. |
 | `Cloud & Integrations` (`/admin/integrations`) | Detalle de syncs, posture cloud, secret refs. **Sigue siendo dueño** de la lectura cloud. |
 | `GET /api/admin/reliability` | Endpoint protegido `requireAdminTenantContext()`. Reusable por agentes, synthetic monitors y change-based verification. |
+| GitHub Action `reliability-verify` (TASK-633) | Job de CI que en cada PR lee el diff, deriva módulos afectados via `filesOwned` y corre solo los smoke specs relevantes. Ver `docs/operations/PLAYWRIGHT_E2E.md` §"Change-Based Verification Matrix". |
 
 La spec impone separación explícita: la nueva surface **no reemplaza** a las especialistas. Es complemento.
 

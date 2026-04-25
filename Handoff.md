@@ -1,5 +1,107 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Reliability Change-Based Verification Matrix (TASK-633)
+
+### Que cambio
+
+Se entregó el carril de verificación por PR: cuando un PR toca archivos owned por un módulo crítico, GitHub Actions corre solo los smoke specs relevantes en vez de la suite completa.
+
+Archivos creados:
+
+- `src/lib/reliability/affected-modules.ts` — `getAffectedModules(changedFiles)` + `mapModulesToSmokeSpecs(modules)` con minimatch.
+- `src/lib/reliability/affected-modules.test.ts` — 12 unit tests (single-module, cross-domain, dotfiles, orden estable).
+- `scripts/reliability/affected-modules.ts` — CLI invocable por GitHub Actions: lee `git diff --name-only $BASE...HEAD`, emite outputs `modules`, `specs`, `modules_count`, `specs_count` en `$GITHUB_OUTPUT`.
+- `.github/workflows/reliability-verify.yml` — 2 jobs (detect + smoke condicional + no-affected fallback). Triggers `pull_request` (develop, main) + `workflow_dispatch`.
+
+Archivos modificados:
+
+- `src/types/reliability.ts` → `ReliabilityModuleDefinition.filesOwned: string[]` agregado.
+- `src/lib/reliability/registry.ts` → 4 módulos sembrados con globs `filesOwned`. Specs huérfanos asociados a sus módulos:
+  - finance → finance-quotes
+  - integrations.notion → admin-nav
+  - cloud → admin-nav, login-session, home
+  - delivery → people-360, hr-payroll
+  - **`server-only` removido**: registry es data pura, ahora consumible desde Node script + Vitest sin mock global.
+- `package.json` → `minimatch` ^9.0.5 como devDependency.
+- `docs/operations/PLAYWRIGHT_E2E.md` → nueva sección "Change-Based Verification Matrix".
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §3.1 + §5 actualizados.
+
+### Decisión canónica explicitada
+
+1. **Vercel cron sigue siendo el host** del synthetic monitor (TASK-632). El matrix vive en GitHub Actions, no consume el cron — es complementario.
+2. **`filesOwned` en código estático**, no en YAML. Single source of truth en `registry.ts`. Si TASK-635 ejecuta, migra a DB junto con el resto del registry.
+3. **`server-only` removido del registry**: el archivo es data pura sin fetch ni secretos. Permite consumirlo desde el CLI Node y Vitest sin mock. Server-only sigue aplicado en helpers que tocan DB/red.
+4. **Workflow degrada con warning** si faltan `PLAYWRIGHT_BASE_URL` o `AGENT_AUTH_SECRET` — no rompe PRs de forks/contributors externos sin acceso a secrets.
+5. **Status check NO obligatorio en V1**: el workflow corre informativo. Activación de branch protection queda como decisión separada del owner post-calibración.
+6. **Verificación adicional contra `/api/admin/reliability` (preview deploy) descartada en V1**: requiere preview deploy determinista por PR. Queda como follow-up. Smoke pass/fail es gate suficiente por ahora.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (407 files / 2090 passed — 12 nuevos tests para affected-modules)
+- `pnpm build` ✅
+- CLI manual: `tsx scripts/reliability/affected-modules.ts --files src/lib/finance/foo.ts src/lib/cloud/bar.ts CHANGELOG.md` → `modules: finance, cloud`, 4 specs ✅
+- Validación contra PR real: queda post-merge (status check informativo).
+
+### Siguiente
+
+- TASK-634 (correlador Sentry) puede heredar `filesOwned` para inferir módulo desde `incident.location` (file path) usando el mismo helper minimatch.
+- TASK-599 (smoke lane finance) cuando entregue `finance-{expenses,clients,suppliers}.spec.ts` simplemente registrarlas en `smokeTests` del módulo finance — el matrix las recogerá automáticamente.
+- TASK-635 (registry persistence DB) sigue pull-trigger.
+- Activar status check obligatorio en branch protection para `reliability-verify` una vez calibrados los globs con datos de PRs reales.
+
+## Sesion 2026-04-25 — Reliability Synthetic Monitoring (TASK-632)
+
+### Que cambio
+
+Se entregó el monitor sintético periódico que cierra el gap entre "el registry sabe qué rutas son críticas" y "alguien verifica que esas rutas siguen vivas".
+
+Archivos canónicos creados:
+
+- `migrations/20260425181908816_task-632-reliability-synthetic-runs.sql` — tabla nueva `greenhouse_sync.reliability_synthetic_runs` (probe_id PK, sweep_run_id FK→source_sync_runs, module_key, route_path, http_status, ok, latency_ms, error_message, triggered_by, started/finished_at). 3 índices.
+- `src/types/reliability-synthetic.ts` — contracts (SyntheticProbeRecord, SyntheticRouteSnapshot, SyntheticSweepSummary).
+- `src/lib/reliability/synthetic/{kill-switch,persist,reader,runner}.ts` — runtime completo.
+- `src/app/api/cron/reliability-synthetic/route.ts` — cron handler GET/POST con `requireCronAuth`.
+- `vercel.json` — cron registrado `*/30 * * * *`.
+- `src/components/greenhouse/admin/ReliabilitySyntheticCard.tsx` — UI compacta con timestamp última corrida + lista de rutas en error.
+
+Archivos modificados:
+
+- `src/lib/reliability/signals.ts` → 2 adapters: `buildSyntheticRouteSignals` (kind=runtime por ruta) y `buildSyntheticModuleSignals` (kind=test_lane agregado por módulo).
+- `src/lib/reliability/get-reliability-overview.ts` → `sources.syntheticSnapshots` opcional + 4 boundaries (1 por módulo) con status `ready`.
+- `src/app/(dashboard)/admin/page.tsx` → fetch paralelo de snapshots + sweep.
+- `src/views/greenhouse/admin/AdminCenterView.tsx` → `ReliabilitySyntheticCard` insertada después de "Confiabilidad por módulo".
+
+### Decisión canónica explicitada
+
+1. **Vercel cron sobre Cloud Run** — análisis pragmático: setup 1/10, mismo deployment evita topología externa, paralelización en olas de 6 cabe holgadamente en cap 60s. Migración a ops-worker queda como follow-up si el sweep crece >20 rutas.
+2. **Tabla dedicada, no reuso de source_sync_runs** — grano correcto es 1 row por probe. El sweep crea 1 row agregada en source_sync_runs (FK) y N rows detalladas en la tabla nueva.
+3. **Kill switch opt-in** (`RELIABILITY_SYNTHETIC_ENABLED=false` para apagar) siguiendo convención `bigquery-write-flag.ts`.
+4. **Detección de SSO redirect**: 3xx con location `/login` o `/auth/access-denied` se marca falla — evita ocultar regresiones de auth.
+5. **Probes paralelas en olas de 6** con timeout 8s — peak ~16s para 10 rutas, cabe holgado en 60s.
+
+### Boundaries movidos a `ready`
+
+- TASK-632 / `finance.runtime` → `ready`.
+- TASK-632 / `integrations.notion.runtime` → `ready`.
+- TASK-632 / `cloud.runtime` → `ready`.
+- TASK-632 / `delivery.runtime` → `ready`.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test src/views/greenhouse/admin/AdminCenterView.test.tsx` ✅ (406 files / 2075 passed)
+- `pnpm build` ✅ (`/api/cron/reliability-synthetic` como dynamic function)
+- Validación manual sobre staging: pendiente — requiere `AGENT_AUTH_SECRET` configurado en Vercel envs.
+
+### Siguiente
+
+- TASK-633 (matrix) puede consumir `reliability_synthetic_runs` para verificar última corrida OK antes de aprobar PR.
+- TASK-634 (correlador Sentry) puede inferir módulo desde `route_path`.
+- TASK-635 (registry persistence) sigue pull-trigger.
+
 ## Sesion 2026-04-25 — Cloud & Integrations apunta a Cloud real
 
 ### Que cambio

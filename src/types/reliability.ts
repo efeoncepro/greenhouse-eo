@@ -80,6 +80,14 @@ export interface ReliabilityModuleDefinition {
   apis: ReliabilityApiRef[]
   dependencies: string[]
   smokeTests: string[]
+
+  /**
+   * Glob patterns (minimatch syntax) que declaran qué archivos del repo
+   * pertenecen a este módulo. Consumido por TASK-633 (change-based
+   * verification matrix) para derivar módulos afectados desde el diff
+   * de un PR y disparar solo los smoke specs relevantes.
+   */
+  filesOwned: string[]
   expectedSignalKinds: ReliabilitySignalKind[]
 }
 

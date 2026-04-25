@@ -219,6 +219,7 @@
     "eslint-plugin-import": "2.31.0",
     "jsdom": "^29.0.0",
     "kysely-codegen": "^0.20.0",
+    "minimatch": "^9.0.5",
     "msw": "^2.13.4",
     "node-pg-migrate": "^8.0.4",
     "postcss": "8.5.6",

@@ -116,6 +116,21 @@ Si falta `PLAYWRIGHT_BASE_URL` o `AGENT_AUTH_SECRET`, el workflow falla en el gu
 - `playwright-report` — HTML report navegable.
 - `playwright-artifacts` — JSON de resultados + traces + screenshots + videos de fallos.
 
+## Change-Based Verification Matrix (TASK-633)
+
+A partir de TASK-633, además de la suite completa que corre post-merge a `develop`, hay un carril paralelo:
+
+- **Workflow**: `.github/workflows/reliability-verify.yml`
+- **Trigger**: `pull_request` contra `develop` o `main` (también `workflow_dispatch`).
+- **Topología**: 2 jobs encadenados.
+  - `detect`: corre `pnpm exec tsx scripts/reliability/affected-modules.ts --from-git --base origin/<base>`. Lee el diff del PR, mapea archivos cambiados → módulos del `Reliability Registry` via `filesOwned`, emite `modules` y `specs` como outputs.
+  - `smoke`: si hay specs afectadas, corre `pnpm test:e2e <specs>` solo para esos archivos. Reusa el mismo setup canónico de `playwright.yml`.
+  - `no-affected`: job decorativo que reporta "skipped" cuando el PR no toca archivos owned por ningún módulo (cambios en docs, README, etc.).
+- **Convivencia**: NO reemplaza la suite completa de `playwright.yml`. La suite completa sigue corriendo post-merge a `develop`. El matrix añade una capa de detección temprana por PR, más rápida y más enfocada.
+- **Fuente de truth**: `src/lib/reliability/registry.ts` declara `filesOwned` (globs minimatch) y `smokeTests` por módulo. El mapping vive en código, no duplicado en YAML.
+- **Status check obligatorio**: queda como decisión del owner activar branch protection sobre `reliability-verify`. Mientras no se active, el workflow es informativo.
+- **Comportamiento sin secrets**: si `PLAYWRIGHT_BASE_URL` o `AGENT_AUTH_SECRET` no están configurados en el repo, el job `smoke` no falla — emite warning y termina exitoso. Esto evita romper PRs en forks o entornos donde los secrets no están disponibles.
+
 ## Estructura del suite
 
 ```

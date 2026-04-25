@@ -2,6 +2,18 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Reliability Change-Based Verification Matrix (TASK-633) — gate por PR via filesOwned
+
+- **`ReliabilityModuleDefinition.filesOwned`**: nuevo campo (globs minimatch) en `src/types/reliability.ts`. Sembrado para los 4 módulos en `src/lib/reliability/registry.ts`.
+- **Helper `getAffectedModules` + `mapModulesToSmokeSpecs`** en `src/lib/reliability/affected-modules.ts` — 12 unit tests (single-module, cross-domain, dotfiles, orden estable, files no owned).
+- **CLI `scripts/reliability/affected-modules.ts`**: lee `git diff --name-only $BASE...HEAD` o `--files <list>`, emite outputs `modules`, `specs`, `modules_count`, `specs_count` en `$GITHUB_OUTPUT` para que el workflow los consuma.
+- **GitHub Action `.github/workflows/reliability-verify.yml`**: triggers `pull_request` (develop, main) + `workflow_dispatch`. 2 jobs: `detect` (computa afectación) + `smoke` (condicional, corre solo specs relevantes) + `no-affected` (informativo). Reusa setup canónico de `playwright.yml`.
+- **`server-only` removido del registry**: archivo es data pura. Permite consumirlo desde Node script + Vitest sin mock. Server-only sigue aplicado en helpers que tocan DB/red.
+- **Specs huérfanos asociados al registry**: aprovechando la migración, `admin-nav` quedó en cloud + integrations.notion; `login-session` y `home` en cloud; `hr-payroll` y `people-360` en delivery.
+- **Workflow degrada con warning** sin secrets — no rompe PRs de forks.
+- **Status check informativo en V1**; activación obligatoria queda follow-up post-calibración.
+- **Habilita TASK-634** (correlador Sentry puede heredar `filesOwned` para inferir módulo desde `incident.location`).
+
 ### 2026-04-25 — Reliability Synthetic Monitoring (TASK-632) — cron periódico de rutas críticas
 
 - **Nueva tabla canónica**: `greenhouse_sync.reliability_synthetic_runs` (probe_id PK, sweep_run_id FK→source_sync_runs, module_key, route_path, http_status, ok, latency_ms, error_message, triggered_by, started/finished_at). 3 índices.

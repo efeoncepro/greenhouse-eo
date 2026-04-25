@@ -1,5 +1,8 @@
-import 'server-only'
-
+/**
+ * Static seed of the reliability registry — pure data, safe to import from
+ * server, client, scripts and Vitest. Helpers that wrap the registry with
+ * server-only side effects live in `get-reliability-overview.ts`.
+ */
 import type { ReliabilityModuleDefinition, ReliabilityModuleKey } from '@/types/reliability'
 
 /**
@@ -36,6 +39,14 @@ export const RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     dependencies: ['greenhouse_finance schema', 'cloud.postgres', 'pricing-engine-v2', 'HubSpot deals bridge'],
     smokeTests: ['tests/e2e/smoke/finance-quotes.spec.ts'],
+    filesOwned: [
+      'src/lib/finance/**',
+      'src/views/greenhouse/finance/**',
+      'src/app/api/finance/**',
+      'src/app/(dashboard)/finance/**',
+      'src/components/greenhouse/pricing/**',
+      'src/components/greenhouse/quote-builder/**'
+    ],
     expectedSignalKinds: ['subsystem', 'incident', 'test_lane']
   },
   {
@@ -57,7 +68,15 @@ export const RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'greenhouse_sync.integration_data_quality_runs',
       'notion-bq-sync Cloud Run service'
     ],
-    smokeTests: [],
+    smokeTests: ['tests/e2e/smoke/admin-nav.spec.ts'],
+    filesOwned: [
+      'src/lib/integrations/notion-*.ts',
+      'src/lib/integrations/notion/**',
+      'src/app/api/admin/integrations/**',
+      'src/app/api/admin/tenants/*/notion-data-quality/**',
+      'src/app/api/cron/notion-*/**',
+      'src/app/api/integrations/v1/notion/**'
+    ],
     expectedSignalKinds: ['subsystem', 'data_quality', 'freshness']
   },
   {
@@ -79,7 +98,29 @@ export const RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'Sentry incident reader',
       'BigQuery cost guard'
     ],
-    smokeTests: [],
+    smokeTests: [
+      'tests/e2e/smoke/admin-nav.spec.ts',
+      'tests/e2e/smoke/login-session.spec.ts',
+      'tests/e2e/smoke/home.spec.ts'
+    ],
+    filesOwned: [
+      'src/lib/cloud/**',
+      'src/lib/postgres/**',
+      'src/lib/bigquery.ts',
+      'src/lib/operations/**',
+      'src/lib/reliability/**',
+      'src/lib/auth.ts',
+      'src/lib/sync/**',
+      'src/middleware.ts',
+      'src/app/api/internal/health/**',
+      'src/app/api/admin/cloud/**',
+      'src/app/api/admin/reliability/**',
+      'src/app/api/admin/ops/**',
+      'src/app/api/cron/**',
+      'src/app/api/auth/**',
+      'src/app/(dashboard)/admin/**',
+      'src/views/greenhouse/admin/**'
+    ],
     expectedSignalKinds: ['runtime', 'posture', 'incident', 'cost_guard']
   },
   {
@@ -100,7 +141,24 @@ export const RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'greenhouse_serving.ico_member_metrics',
       'reactive worker (ops-worker)'
     ],
-    smokeTests: [],
+    smokeTests: ['tests/e2e/smoke/people-360.spec.ts', 'tests/e2e/smoke/hr-payroll.spec.ts'],
+    filesOwned: [
+      'src/lib/delivery/**',
+      'src/lib/ico-engine/**',
+      'src/lib/agency/**',
+      'src/lib/payroll/**',
+      'src/lib/people/**',
+      'src/views/greenhouse/agency/**',
+      'src/views/greenhouse/hr/**',
+      'src/views/greenhouse/people/**',
+      'src/app/api/agency/**',
+      'src/app/api/hr/**',
+      'src/app/api/people/**',
+      'src/app/(dashboard)/agency/**',
+      'src/app/(dashboard)/hr/**',
+      'src/app/(dashboard)/people/**',
+      'services/ops-worker/**'
+    ],
     expectedSignalKinds: ['subsystem', 'data_quality', 'freshness']
   }
 ]
