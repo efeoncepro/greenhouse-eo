@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Workforce onboarding architecture foundation
+
+### Que cambio
+
+Se formalizo la arquitectura canonica de onboarding como subdominio propio de `Workforce` en:
+
+- `docs/architecture/GREENHOUSE_WORKFORCE_ONBOARDING_ARCHITECTURE_V1.md`
+
+Tambien se actualizo:
+
+- `docs/README.md`
+- `project_context.md`
+
+### Decisiones canónicas explicitadas
+
+1. **Onboarding no es solo provisioning**: el agregado canonico es un caso de inicio de relacion de trabajo con snapshot contractual/legal y readiness operativa.
+2. **SCIM es signal source, no owner total**: un provisioning tecnico puede abrir `needs_review`, pero no reemplaza el proceso laboral/operativo.
+3. **Checklist HRIS legacy deja de ser source of truth**: las plantillas/instancias de onboarding quedan como child object operativo del caso.
+4. **Onboarding workforce interno y onboarding de placement no se mezclan**: `HRIS onboarding` y `Staff Aug onboarding` quedan como agregados distintos aunque puedan encadenarse.
+5. **La matriz de reglas depende de `relationship_type + employment_type + contract_type + pay_regime + payroll_via + country`** para distinguir lanes `internal_payroll`, `external_payroll`, `non_payroll`, `identity_only` y `relationship_transition`.
+
+### Validaciones
+
+- No se corrieron tests: cambio documental/arquitectonico solamente.
+
+### Siguiente
+
+- Alinear `Workforce` madre para enlazar onboarding/offboarding como case families del mismo dominio.
+- Bajar `WorkRelationshipOnboardingCase` a tasks ejecutables.
+- Definir cómo se proyecta `onboarding` dentro de `Person360.workforce`.
+
 ## Sesion 2026-04-25 — Reliability Registry DB Persistence + Tenant Overrides (TASK-635)
 
 ### Que cambio

@@ -1,3 +1,25 @@
+## Delta 2026-04-25 Onboarding ya tiene arquitectura canónica propia
+
+- Greenhouse ya no debe tratar onboarding como una suma implícita de provisioning SCIM + checklist HRIS + activación manual dispersa.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_WORKFORCE_ONBOARDING_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - el agregado canonico es un caso de inicio de relacion de trabajo con snapshot contractual y legal
+  - `SCIM` es signal source de identidad, no owner total del onboarding
+  - el checklist legacy de onboarding en HRIS pasa a ser child object operativo del caso, no su source of truth
+  - el onboarding de placement (`Staff Aug`) sigue siendo un agregado separado del onboarding workforce interno
+
+## Delta 2026-04-25 Workforce ya tiene arquitectura canónica propia
+
+- Greenhouse ya no debe tratar `Workforce` como una suma implícita de `People + HR + Payroll + SCIM`.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_WORKFORCE_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - `Workforce` es el dominio madre de lifecycle laboral-operativo, drift y orchestration sobre personas de trabajo
+  - `Person360.workforce` es el target canónico de lectura por persona
+  - `Workforce Workspace` es la shell operativa objetivo por encima de `People`, `HR` y `Payroll`
+  - `Offboarding` queda como subdominio especializado bajo `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`
+
 ## Delta 2026-04-25 Offboarding ya tiene arquitectura canónica propia
 
 - Greenhouse ya no debe tratar offboarding como una suma implícita de SCIM deactivation + checklist HRIS + cleanup manual en Payroll/People.
