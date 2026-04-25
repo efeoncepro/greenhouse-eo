@@ -1138,6 +1138,21 @@ export interface GreenhouseCommercialQuotationVersions {
   version_number: number;
 }
 
+export interface GreenhouseCommercialQuoteShortLinks {
+  access_count: Generated<number>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  expires_at: Timestamp | null;
+  full_token: string;
+  last_accessed_at: Timestamp | null;
+  quotation_id: string;
+  revocation_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  short_code: string;
+  version_number: number;
+}
+
 export interface GreenhouseCommercialQuoteTemplateItems {
   created_at: Generated<Timestamp>;
   default_margin_pct: Numeric | null;
@@ -6394,6 +6409,7 @@ export interface DB {
   "greenhouse_commercial.quotation_terms": GreenhouseCommercialQuotationTerms;
   "greenhouse_commercial.quotation_versions": GreenhouseCommercialQuotationVersions;
   "greenhouse_commercial.quotations": GreenhouseCommercialQuotations;
+  "greenhouse_commercial.quote_short_links": GreenhouseCommercialQuoteShortLinks;
   "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
   "greenhouse_commercial.quote_templates": GreenhouseCommercialQuoteTemplates;
   "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;

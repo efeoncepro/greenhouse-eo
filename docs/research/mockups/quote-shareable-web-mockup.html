@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cotización compartible web · Mockup v1 · TASK-631</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Token system (paralelo a PdfTokens.ts pero con CSS vars + dark mode) ─── */
+    :root {
+      --color-primary: #023c70;
+      --color-accent: #0375db;
+      --color-text: #2F2B3D;
+      --color-text-muted: #6E6B7B;
+      --color-text-subtle: #A5A3AE;
+      --color-paper: #FFFFFF;
+      --color-surface: #F8F7FA;
+      --color-surface-strong: #ECECEF;
+      --color-divider: #E4E5EB;
+      --color-success: #6ec207;
+      --color-warning: #ff6500;
+      --color-error: #bb1954;
+
+      --color-sub-globe: #bb1954;
+      --color-sub-wave: #00BAD1;
+      --color-sub-reach: #ff6500;
+      --color-sub-efeonce: #023c70;
+
+      --font-heading: 'Poppins', system-ui, sans-serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --space-16: 64px;
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+      --header-height: 72px;
+      --header-height-mobile: 60px;
+
+      --max-content-width: 920px;
+
+      --scroll-y: 0;  /* set via JS in real impl */
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-primary: #4a8ed1;       /* Lighter navy for dark contrast */
+        --color-accent: #5fa8e3;
+        --color-text: #E6E5EB;
+        --color-text-muted: #A5A3AE;
+        --color-text-subtle: #75737E;
+        --color-paper: #1A1B23;
+        --color-surface: #25262E;
+        --color-surface-strong: #2F3038;
+        --color-divider: #3A3B43;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--color-surface-strong);
+      font-family: var(--font-body);
+      color: var(--color-text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Mockup chrome (preview only) ─── */
+    .mockup-banner {
+      background: var(--color-paper);
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--color-divider);
+      border-left: 4px solid var(--color-accent);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .mockup-banner h1 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+    .mockup-banner p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+    .mockup-section-divider {
+      max-width: var(--max-content-width);
+      margin: var(--space-12) auto var(--space-6);
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ─── PUBLIC QUOTE PAGE ─── */
+    .quote-page {
+      background: var(--color-paper);
+      max-width: var(--max-content-width);
+      margin: 0 auto;
+      box-shadow: var(--shadow-lg);
+      min-height: 100vh;
+    }
+
+    /* ─── Sticky Header ─── */
+    .quote-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--color-paper);
+      border-bottom: 1px solid var(--color-divider);
+      padding: var(--space-3) var(--space-6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      transition: box-shadow 200ms ease-out;
+      backdrop-filter: blur(8px);
+      background: color-mix(in srgb, var(--color-paper) 92%, transparent);
+    }
+    .quote-header.scrolled {
+      box-shadow: var(--shadow-md);
+    }
+    .quote-header__brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .quote-header__logo {
+      height: 28px;
+      width: auto;
+    }
+    .quote-header__divider {
+      width: 1px;
+      height: 24px;
+      background: var(--color-divider);
+    }
+    .quote-header__sub-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .quote-header__sub-isotipo {
+      height: 20px;
+      width: auto;
+    }
+    .quote-header__sub-label {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      letter-spacing: 0.5px;
+    }
+    .quote-header__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .quote-header__id {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .quote-header__id strong {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    @media (max-width: 640px) {
+      .quote-header { padding: var(--space-2) var(--space-4); }
+      .quote-header__id { display: none; }
+      .quote-header__divider { display: none; }
+      .quote-header__sub-label { display: none; }
+    }
+
+    /* ─── Status badge ─── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+    .status-badge--active {
+      background: color-mix(in srgb, var(--color-success) 15%, transparent);
+      color: var(--color-success);
+    }
+    .status-badge--accepted {
+      background: color-mix(in srgb, var(--color-success) 18%, transparent);
+      color: var(--color-success);
+    }
+    .status-badge--expired {
+      background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+      color: var(--color-warning);
+    }
+    .status-badge--revoked {
+      background: color-mix(in srgb, var(--color-error) 15%, transparent);
+      color: var(--color-error);
+    }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: background-color 150ms ease-out, transform 100ms ease-out;
+      min-height: 44px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn--primary {
+      background: var(--color-primary);
+      color: white;
+    }
+    .btn--primary:hover { background: color-mix(in srgb, var(--color-primary) 88%, white); }
+    .btn--accent {
+      background: var(--color-accent);
+      color: white;
+    }
+    .btn--accent:hover { background: color-mix(in srgb, var(--color-accent) 88%, white); }
+    .btn--outlined {
+      background: transparent;
+      color: var(--color-primary);
+      border: 1px solid var(--color-divider);
+    }
+    .btn--outlined:hover {
+      background: var(--color-surface);
+      border-color: var(--color-primary);
+    }
+    .btn--small { padding: 6px 12px; font-size: 12px; min-height: 36px; }
+
+    /* ─── Hero ─── */
+    .quote-hero {
+      padding: var(--space-12) var(--space-6) var(--space-10);
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .quote-hero__eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin: 0 0 var(--space-3) 0;
+    }
+    .quote-hero__title {
+      font-family: var(--font-heading);
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      color: var(--color-primary);
+      margin: 0 0 var(--space-4) 0;
+      text-wrap: balance;
+    }
+    .quote-hero__subtitle {
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--color-text);
+      max-width: 640px;
+      margin: 0;
+      text-wrap: pretty;
+    }
+    .quote-hero__parties {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-6);
+      margin-top: var(--space-8);
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--color-divider);
+    }
+    .party {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+    .party__label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-2) 0;
+    }
+    .party__name {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0;
+    }
+    .party__detail {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+    .party__contact {
+      font-size: 13px;
+      color: var(--color-text);
+      margin: var(--space-1) 0 0 0;
+    }
+
+    /* ─── Validity callout ─── */
+    .validity-callout {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-6);
+      margin: var(--space-6) var(--space-6) 0;
+      background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+      border-left: 3px solid var(--color-accent);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+    }
+    .validity-callout strong {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    /* ─── Section base ─── */
+    .quote-section {
+      padding: var(--space-10) var(--space-6);
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .quote-section:last-of-type { border-bottom: none; }
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin: 0 0 var(--space-2) 0;
+    }
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0 0 var(--space-2) 0;
+      text-wrap: balance;
+    }
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-6) 0;
+      max-width: 600px;
+    }
+
+    /* ─── Summary cards ─── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-4);
+    }
+    .summary-card {
+      padding: var(--space-5);
+      background: var(--color-paper);
+      border: 1px solid var(--color-divider);
+      border-radius: var(--radius-md);
+      transition: border-color 150ms ease-out, transform 150ms ease-out;
+    }
+    .summary-card:hover {
+      border-color: var(--color-accent);
+      transform: translateY(-2px);
+    }
+    .summary-card__label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin: 0 0 var(--space-2) 0;
+    }
+    .summary-card__value {
+      font-family: var(--font-heading);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--color-primary);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      margin: 0 0 var(--space-1) 0;
+    }
+    .summary-card__hint {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+
+    /* ─── Bundle card ─── */
+    .bundle {
+      border: 1px solid var(--color-divider);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-4);
+      overflow: hidden;
+    }
+    .bundle__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface);
+      cursor: pointer;
+      gap: var(--space-3);
+      user-select: none;
+    }
+    .bundle__header:hover { background: color-mix(in srgb, var(--color-surface) 70%, var(--color-divider)); }
+    .bundle__title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0 0 2px 0;
+    }
+    .bundle__sku {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .bundle__chip {
+      padding: 4px 10px;
+      background: var(--color-paper);
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .bundle__chevron {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      color: var(--color-text-muted);
+      transition: transform 250ms ease-in-out;
+    }
+    .bundle.open .bundle__chevron { transform: rotate(180deg); }
+    .bundle__body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 250ms ease-in-out;
+    }
+    .bundle.open .bundle__body { max-height: 800px; }
+    .bundle__body-inner { padding: var(--space-5); }
+    .bundle__description {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-text);
+      margin: 0 0 var(--space-4) 0;
+    }
+    .bundle__description p { margin: 0 0 var(--space-2) 0; }
+    .bundle__description strong { color: var(--color-primary); font-weight: 600; }
+    .bundle__description ul { margin: var(--space-2) 0; padding-left: var(--space-5); }
+    .bundle__description li { margin-bottom: 4px; }
+    .components-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: var(--space-3);
+    }
+    .components-table th {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      text-align: left;
+      padding: var(--space-2);
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .components-table td {
+      padding: var(--space-2);
+      font-size: 13px;
+      color: var(--color-text);
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .components-table tr:last-child td { border-bottom: none; }
+    .components-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .components-type-chip {
+      display: inline-block;
+      padding: 2px 6px;
+      background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+      color: var(--color-accent);
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* ─── Pricing table ─── */
+    .pricing-table-wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--color-divider);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-6);
+    }
+    .pricing-table {
+      width: 100%;
+      min-width: 600px;
+      border-collapse: collapse;
+    }
+    .pricing-table thead {
+      position: sticky;
+      top: var(--header-height);
+      z-index: 10;
+    }
+    .pricing-table thead th {
+      background: var(--color-primary);
+      color: white;
+      padding: var(--space-3) var(--space-4);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: left;
+    }
+    .pricing-table thead th.num { text-align: right; }
+    .pricing-table thead th.center { text-align: center; }
+    .pricing-table tbody tr {
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .pricing-table tbody tr:nth-child(even) {
+      background: var(--color-surface);
+    }
+    .pricing-table tbody td {
+      padding: var(--space-3) var(--space-4);
+      font-size: 13px;
+      color: var(--color-text);
+      vertical-align: top;
+    }
+    .pricing-table tbody td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .pricing-table tbody td.center { text-align: center; }
+    .pricing-row__label { font-weight: 500; }
+    .pricing-row__hint {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+    .summary-block {
+      max-width: 360px;
+      margin-left: auto;
+      border: 1px solid var(--color-divider);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .summary-block__row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-divider);
+      font-size: 14px;
+    }
+    .summary-block__row:last-child { border-bottom: none; }
+    .summary-block__label { color: var(--color-text-muted); }
+    .summary-block__value {
+      color: var(--color-text);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .summary-block__row--total {
+      background: var(--color-primary);
+      padding: var(--space-4) var(--space-5);
+    }
+    .summary-block__row--total .summary-block__label {
+      color: rgba(255,255,255,0.75);
+      font-family: var(--font-heading);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .summary-block__row--total .summary-block__value {
+      color: white;
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    /* ─── Investment Timeline (MUI Timeline pattern) ─── */
+    .timeline {
+      position: relative;
+      padding-left: var(--space-8);
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--color-divider);
+    }
+    .timeline-item {
+      position: relative;
+      padding-bottom: var(--space-6);
+    }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 6px;
+      width: 14px;
+      height: 14px;
+      background: var(--color-accent);
+      border-radius: 999px;
+      border: 3px solid var(--color-paper);
+      box-shadow: 0 0 0 1px var(--color-accent);
+    }
+    .timeline-item__content {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-3);
+      align-items: flex-start;
+    }
+    .timeline-item__date {
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      font-variant-numeric: tabular-nums;
+      margin: 0 0 4px 0;
+    }
+    .timeline-item__title {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-primary);
+      margin: 0 0 4px 0;
+    }
+    .timeline-item__detail {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .timeline-item__amount {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-primary);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* ─── Terms acordeón ─── */
+    .terms-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .term {
+      border: 1px solid var(--color-divider);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      scroll-margin-top: calc(var(--header-height) + var(--space-4));
+    }
+    .term.highlight {
+      animation: pulse-highlight 1500ms ease-in-out;
+    }
+    @keyframes pulse-highlight {
+      0%, 100% { background: var(--color-paper); }
+      50% { background: color-mix(in srgb, var(--color-accent) 15%, transparent); }
+    }
+    .term__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      cursor: pointer;
+      user-select: none;
+      gap: var(--space-3);
+    }
+    .term__header:hover { background: var(--color-surface); }
+    .term__title {
+      font-family: var(--font-heading);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-primary);
+      margin: 0;
+    }
+    .term__chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-muted);
+      transition: transform 200ms ease-in-out;
+    }
+    .term.open .term__chevron { transform: rotate(180deg); }
+    .term__body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 250ms ease-in-out;
+    }
+    .term.open .term__body { max-height: 400px; }
+    .term__body-inner {
+      padding: 0 var(--space-4) var(--space-4);
+      font-size: 13px;
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
+    /* ─── Actions section ─── */
+    .quote-actions {
+      padding: var(--space-8) var(--space-6);
+      background: var(--color-surface);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      justify-content: center;
+      align-items: center;
+    }
+    @media (max-width: 640px) {
+      .quote-actions {
+        position: sticky;
+        bottom: 0;
+        background: color-mix(in srgb, var(--color-paper) 96%, transparent);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid var(--color-divider);
+        padding: var(--space-3) var(--space-4);
+        z-index: 30;
+      }
+      .quote-actions .btn { flex: 1; min-width: 0; }
+    }
+
+    /* ─── Footer ─── */
+    .quote-footer {
+      padding: var(--space-6);
+      background: var(--color-primary);
+      color: white;
+      font-size: 12px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .quote-footer__legal { margin: 0 0 var(--space-2) 0; }
+    .quote-footer__legal strong { font-weight: 600; }
+    .quote-footer__verify {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    /* ─── Error states ─── */
+    .error-state {
+      max-width: 480px;
+      margin: var(--space-16) auto;
+      padding: var(--space-10) var(--space-8);
+      background: var(--color-paper);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      text-align: center;
+      border-top: 4px solid var(--color-error);
+    }
+    .error-state--expired { border-top-color: var(--color-warning); }
+    .error-state__icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto var(--space-4);
+      color: var(--color-error);
+    }
+    .error-state--expired .error-state__icon { color: var(--color-warning); }
+    .error-state__title {
+      font-family: var(--font-heading);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0 0 var(--space-3) 0;
+    }
+    .error-state__body {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin: 0 0 var(--space-6) 0;
+    }
+    .error-state__legal {
+      font-size: 11px;
+      color: var(--color-text-subtle);
+      margin: var(--space-6) 0 0 0;
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-divider);
+    }
+
+    /* ─── Sales Rep Share Drawer (mockup) ─── */
+    .share-drawer {
+      max-width: 480px;
+      margin: var(--space-12) auto var(--space-16);
+      background: var(--color-paper);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .share-drawer__header {
+      padding: var(--space-5);
+      background: var(--color-primary);
+      color: white;
+    }
+    .share-drawer__header h3 {
+      margin: 0 0 var(--space-1) 0;
+      font-family: var(--font-heading);
+      font-size: 18px;
+    }
+    .share-drawer__header p {
+      margin: 0;
+      font-size: 12px;
+      color: rgba(255,255,255,0.75);
+    }
+    .share-drawer__body { padding: var(--space-5); }
+    .share-url-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-divider);
+      margin-bottom: var(--space-4);
+    }
+    .share-url-row__url {
+      flex: 1;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 13px;
+      color: var(--color-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .share-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-4);
+    }
+    .share-stat__label {
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin: 0 0 4px 0;
+    }
+    .share-stat__value {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-primary);
+      font-variant-numeric: tabular-nums;
+      margin: 0;
+    }
+    .share-drawer__actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+    .share-drawer__actions .btn { flex: 1; }
+
+    /* ─── Print stylesheet (degradación a versión imprimible) ─── */
+    @media print {
+      body { background: white; color: black; }
+      .mockup-banner, .mockup-section-divider { display: none; }
+      .quote-page { box-shadow: none; max-width: none; margin: 0; }
+      .quote-header { position: static; backdrop-filter: none; }
+      .quote-actions { display: none; }
+      .quote-footer { background: white; color: black; border-top: 2px solid black; }
+      .bundle__body, .term__body { max-height: none !important; }
+      .bundle__chevron, .term__chevron { display: none; }
+      .summary-card:hover { transform: none; border-color: var(--color-divider); }
+      .pricing-table thead { position: static; }
+      .pricing-table-wrapper { overflow: visible; }
+      .pricing-table { min-width: 0; }
+      a { color: black; text-decoration: underline; }
+    }
+
+    /* ─── Reduced motion ─── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ─── Smooth scroll para anchors ─── */
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body>
+
+  <div class="mockup-banner">
+    <h1>Cotización compartible web · Mockup v1 · TASK-631</h1>
+    <p>
+      Vista web pública en <code>/public/quote/[id]/[v]/[token]</code> — accesible desde QR del PDF o link corto
+      <code>/q/[code]</code>. Mockup incluye: estado activo, error states (token inválido / vencida), y panel
+      de share del sales rep. Soporta light/dark mode (system preference) + responsive + print stylesheet.
+    </p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ESTADO 1 — VISTA ACTIVA (token válido, quote vigente)
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Estado 1 · Vista activa (token válido, quote vigente)</div>
+  <article class="quote-page">
+
+    <!-- Sticky Header -->
+    <header class="quote-header">
+      <div class="quote-header__brand">
+        <img class="quote-header__logo" src="../../../public/branding/logo-full.svg" alt="Efeonce Group">
+        <div class="quote-header__divider"></div>
+        <div class="quote-header__sub-brand">
+          <img class="quote-header__sub-isotipo" src="../../../public/branding/SVG/globe-full.svg" alt="Globe">
+          <span class="quote-header__sub-label">Globe</span>
+        </div>
+      </div>
+      <div class="quote-header__actions">
+        <span class="quote-header__id">Propuesta <strong>EFG-2026-00184 v2</strong></span>
+        <span class="status-badge status-badge--active">✓ Vigente</span>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="quote-hero">
+      <p class="quote-hero__eyebrow">Propuesta Comercial</p>
+      <h1 class="quote-hero__title">Programa de crecimiento orgánico Globe LATAM 2026</h1>
+      <p class="quote-hero__subtitle">
+        Estrategia de adquisición + retención multicanal con foco en Chile, Colombia y México.
+        Modelo retainer mensual con KPIs compartidos y reportería ejecutiva trimestral.
+      </p>
+      <div class="quote-hero__parties">
+        <div class="party">
+          <p class="party__label">Preparada para</p>
+          <p class="party__name">Banco Industrial Latinoamericano</p>
+          <p class="party__detail">División Marketing &amp; Growth</p>
+          <p class="party__contact">María Elena Vargas · CMO</p>
+        </div>
+        <div class="party">
+          <p class="party__label">Preparada por</p>
+          <p class="party__name">Julio Reyes</p>
+          <p class="party__detail">Account Lead · Efeonce Globe</p>
+          <p class="party__contact">jreyes@efeoncepro.com · +56 9 5847 2310</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Validity callout -->
+    <div class="validity-callout">
+      <span style="font-size: 18px;">⏱</span>
+      <span>Esta propuesta es válida hasta el <strong>30/05/2026</strong>. Después de esa fecha requiere re-validación.</span>
+    </div>
+
+    <!-- Summary cards -->
+    <section class="quote-section" id="summary">
+      <p class="section-eyebrow">01 · Resumen</p>
+      <h2 class="section-title">Lo importante de un vistazo</h2>
+      <p class="section-subtitle">Inversión, duración y equipo asignado en este programa.</p>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <p class="summary-card__label">Inversión total</p>
+          <p class="summary-card__value">USD 184,500</p>
+          <p class="summary-card__hint">12 meses · facturación mensual</p>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Inicio estimado</p>
+          <p class="summary-card__value">Mayo 2026</p>
+          <p class="summary-card__hint">Onboarding 14 días hábiles</p>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Equipo asignado</p>
+          <p class="summary-card__value">8 expertos</p>
+          <p class="summary-card__hint">2 leads · 4 spec · 2 analyst</p>
+        </div>
+        <div class="summary-card">
+          <p class="summary-card__label">Países cubiertos</p>
+          <p class="summary-card__value">3</p>
+          <p class="summary-card__hint">Chile · Colombia · México</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scope of Work (bundles colapsables) -->
+    <section class="quote-section" id="scope">
+      <p class="section-eyebrow">02 · Alcance del trabajo</p>
+      <h2 class="section-title">Servicios y componentes incluidos</h2>
+      <p class="section-subtitle">Cada bundle agrupa los componentes que se activan al iniciar el servicio. Click para expandir detalle.</p>
+
+      <article class="bundle open" id="bundle-retainer">
+        <header class="bundle__header">
+          <div>
+            <h3 class="bundle__title">Retainer Globe Performance Premium</h3>
+            <p class="bundle__sku">SKU GLO-RTR-PREM-12</p>
+          </div>
+          <span class="bundle__chip">Retainer mensual</span>
+          <svg class="bundle__chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5"/></svg>
+        </header>
+        <div class="bundle__body">
+          <div class="bundle__body-inner">
+            <div class="bundle__description">
+              <p>Programa <strong>full-funnel</strong> que integra estrategia, paid media, contenido y reportería ejecutiva. Diseñado para marcas con presencia regional que requieren coordinación cross-país y governance unificado.</p>
+              <ul>
+                <li>Reuniones de leadership trimestrales</li>
+                <li>Reportería ejecutiva mensual + dashboard live</li>
+                <li>Capacidad ajustable hasta ±20% sin renegociar contrato</li>
+              </ul>
+            </div>
+            <table class="components-table">
+              <thead>
+                <tr><th>Tipo</th><th>Componente</th><th class="num">Cantidad</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="components-type-chip">ROL</span></td><td>Performance Lead Senior</td><td class="num">160 hrs/mes</td></tr>
+                <tr><td><span class="components-type-chip">ROL</span></td><td>Strategy Director</td><td class="num">40 hrs/mes</td></tr>
+                <tr><td><span class="components-type-chip">ROL</span></td><td>Content Manager (×2)</td><td class="num">320 hrs/mes</td></tr>
+                <tr><td><span class="components-type-chip">ROL</span></td><td>Data Analyst</td><td class="num">80 hrs/mes</td></tr>
+                <tr><td><span class="components-type-chip">TLS</span></td><td>Adobe Creative Cloud · Team license</td><td class="num">4 seats</td></tr>
+                <tr><td><span class="components-type-chip">TLS</span></td><td>Looker Studio Pro</td><td class="num">incluido</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+
+      <article class="bundle">
+        <header class="bundle__header">
+          <div>
+            <h3 class="bundle__title">Add-on Analytics Avanzado</h3>
+            <p class="bundle__sku">SKU GLO-ADD-ANALYT</p>
+          </div>
+          <span class="bundle__chip">Add-on opcional</span>
+          <svg class="bundle__chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5"/></svg>
+        </header>
+        <div class="bundle__body">
+          <div class="bundle__body-inner">
+            <p style="font-size: 14px; color: var(--color-text-muted); margin: 0;">Capa adicional de experimentación A/B + modelado predictivo de churn. Se factura separadamente cuando se activa.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Commercial Proposal (pricing table) -->
+    <section class="quote-section" id="proposal">
+      <p class="section-eyebrow">03 · Detalle comercial</p>
+      <h2 class="section-title">Pricing por línea</h2>
+      <p class="section-subtitle">Precios en USD. IVA aplicable según país de facturación (Chile 19%, Colombia 19%, México 16%).</p>
+      <div class="pricing-table-wrapper">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>Descripción</th>
+              <th class="num">Cant.</th>
+              <th class="center">Unidad</th>
+              <th class="num">Precio unit.</th>
+              <th class="num">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="pricing-row__label">Performance Lead Senior</div>
+                <div class="pricing-row__hint">160 hrs/mes · ROL-PERFLD-SR</div>
+              </td>
+              <td class="num">160</td>
+              <td class="center">Hora</td>
+              <td class="num">USD 38</td>
+              <td class="num">USD 6,080</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pricing-row__label">Strategy Director</div>
+                <div class="pricing-row__hint">40 hrs/mes · ROL-STRAT-DIR</div>
+              </td>
+              <td class="num">40</td>
+              <td class="center">Hora</td>
+              <td class="num">USD 65</td>
+              <td class="num">USD 2,600</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pricing-row__label">Content Manager (×2)</div>
+                <div class="pricing-row__hint">320 hrs/mes · ROL-CONT-MGR</div>
+              </td>
+              <td class="num">320</td>
+              <td class="center">Hora</td>
+              <td class="num">USD 14</td>
+              <td class="num">USD 4,480</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pricing-row__label">Data Analyst</div>
+                <div class="pricing-row__hint">80 hrs/mes · ROL-DATA-ANL</div>
+              </td>
+              <td class="num">80</td>
+              <td class="center">Hora</td>
+              <td class="num">USD 12</td>
+              <td class="num">USD 960</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pricing-row__label">Adobe Creative Cloud (4 seats)</div>
+                <div class="pricing-row__hint">Pass-through · TLS-ADOBE-CC</div>
+              </td>
+              <td class="num">4</td>
+              <td class="center">Licencia</td>
+              <td class="num">USD 20</td>
+              <td class="num">USD 80</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="pricing-row__label">Setup &amp; Onboarding (one-time)</div>
+                <div class="pricing-row__hint">Setup técnico, integraciones, training</div>
+              </td>
+              <td class="num">1</td>
+              <td class="center">Proyecto</td>
+              <td class="num">USD 14,100</td>
+              <td class="num">USD 14,100</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="summary-block">
+        <div class="summary-block__row">
+          <span class="summary-block__label">Subtotal neto</span>
+          <span class="summary-block__value">USD 184,500</span>
+        </div>
+        <div class="summary-block__row">
+          <span class="summary-block__label">IVA (aplicable por país)</span>
+          <span class="summary-block__value">A determinar</span>
+        </div>
+        <div class="summary-block__row summary-block__row--total">
+          <span class="summary-block__label">Total</span>
+          <span class="summary-block__value">USD 184,500</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Investment Timeline -->
+    <section class="quote-section" id="timeline">
+      <p class="section-eyebrow">04 · Cronograma</p>
+      <h2 class="section-title">Calendario de pagos y entregables</h2>
+      <p class="section-subtitle">Pagos los primeros 5 días hábiles del mes correspondiente. Setup &amp; onboarding al firmar.</p>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-item__content">
+            <div>
+              <p class="timeline-item__date">Mayo 2026 · M0</p>
+              <p class="timeline-item__title">Kick-off &amp; onboarding</p>
+              <p class="timeline-item__detail">Setup técnico, integraciones, training del equipo de marketing del cliente.</p>
+            </div>
+            <span class="timeline-item__amount">USD 14,100</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-item__content">
+            <div>
+              <p class="timeline-item__date">Junio 2026 · M1</p>
+              <p class="timeline-item__title">Operación mensual #1</p>
+              <p class="timeline-item__detail">Inicio del retainer. Primera reportería ejecutiva.</p>
+            </div>
+            <span class="timeline-item__amount">USD 14,200</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-item__content">
+            <div>
+              <p class="timeline-item__date">Jul 2026 — Abr 2027</p>
+              <p class="timeline-item__title">Operación mensual #2-#11</p>
+              <p class="timeline-item__detail">10 ciclos mensuales. Cada uno incluye reportería ejecutiva, QBR trimestral en M3 y M9.</p>
+            </div>
+            <span class="timeline-item__amount">10 × USD 14,200</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-item__content">
+            <div>
+              <p class="timeline-item__date">Mayo 2027 · M12</p>
+              <p class="timeline-item__title">Cierre de ciclo + renewal review</p>
+              <p class="timeline-item__detail">Última factura del ciclo + revisión de renovación 60 días antes.</p>
+            </div>
+            <span class="timeline-item__amount">USD 14,200</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Terms & Conditions (acordeón) -->
+    <section class="quote-section" id="terms">
+      <p class="section-eyebrow">05 · Términos y condiciones</p>
+      <h2 class="section-title">Marco contractual</h2>
+      <p class="section-subtitle">Click cada término para expandir. El contrato formal se firma por separado.</p>
+      <div class="terms-list">
+        <article class="term open" id="vigencia">
+          <header class="term__header">
+            <h3 class="term__title">1. Vigencia y aceptación</h3>
+            <svg class="term__chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5"/></svg>
+          </header>
+          <div class="term__body">
+            <div class="term__body-inner">
+              Esta propuesta es válida hasta el 30/05/2026. Pasada esa fecha requiere re-validación por parte de Efeonce, ya que tarifas, FX y disponibilidad de equipo pueden variar.
+            </div>
+          </div>
+        </article>
+        <article class="term" id="facturacion">
+          <header class="term__header">
+            <h3 class="term__title">2. Facturación y pagos</h3>
+            <svg class="term__chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5"/></svg>
+          </header>
+          <div class="term__body">
+            <div class="term__body-inner">
+              Facturación los primeros 5 días hábiles del mes correspondiente al periodo de servicio. Plazo de pago: 15 días corridos desde emisión.
+            </div>
+          </div>
+        </article>
+        <article class="term" id="confidencialidad">
+          <header class="term__header">
+            <h3 class="term__title">3. Confidencialidad</h3>
+            <svg class="term__chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5"/></svg>
+          </header>
+          <div class="term__body">
+            <div class="term__body-inner">
+              Toda información intercambiada entre las partes durante el ciclo de venta y ejecución es confidencial y permanece como tal por 5 años desde la finalización del contrato.
+            </div>
+          </div>
+        </article>
+        <article class="term" id="propiedad-intelectual">
+          <header class="term__header">
+            <h3 class="term__title">4. Propiedad intelectual</h3>
+            <svg class="term__chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8l5 5 5-5"/></svg>
+          </header>
+          <div class="term__body">
+            <div class="term__body-inner">
+              Los entregables creados específicamente para este programa son propiedad del cliente al pago efectivo de cada periodo. El stack tecnológico y know-how preexistente permanecen como propiedad de Efeonce.
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="quote-actions">
+      <button class="btn btn--outlined" type="button">📥 Descargar PDF</button>
+      <button class="btn btn--outlined" type="button">💬 Pedir cambios</button>
+      <button class="btn btn--primary" type="button" disabled style="opacity:0.6;cursor:not-allowed">✓ Aceptar (Fase 2)</button>
+    </section>
+
+    <!-- Footer -->
+    <footer class="quote-footer">
+      <p class="quote-footer__legal">
+        <strong>Efeonce Group SpA</strong> · RUT 77.357.182-1
+        <br>Dr. Manuel Barros Borgoño 71 of. 05, Providencia, Santiago, Chile · efeoncepro.com
+      </p>
+      <p class="quote-footer__legal" style="margin-top: 12px; opacity: 0.7;">
+        Confidencial · No distribuir sin autorización
+      </p>
+      <span class="quote-footer__verify">🔒 Documento auténtico · Verificado en línea</span>
+    </footer>
+
+  </article>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ESTADO 2 — ERROR: Token inválido
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Estado 2 · Error — Token inválido</div>
+  <div class="error-state">
+    <svg class="error-state__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M9 9l6 6M15 9l-6 6"/>
+    </svg>
+    <h1 class="error-state__title">No pudimos verificar este enlace</h1>
+    <p class="error-state__body">
+      El link que estás abriendo es inválido, fue revocado, o el documento fue alterado.
+      Si recibiste este link de Efeonce, contacta a tu account lead para que te emita una nueva cotización.
+    </p>
+    <button class="btn btn--accent" type="button">📧 Contactar a Efeonce</button>
+    <p class="error-state__legal">
+      <strong>Efeonce Group SpA</strong> · RUT 77.357.182-1<br>
+      Si tienes dudas sobre la autenticidad de este link, escríbenos a <code>contacto@efeoncepro.com</code>.
+    </p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ESTADO 3 — ERROR: Cotización vencida
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Estado 3 · Cotización vencida</div>
+  <div class="error-state error-state--expired">
+    <svg class="error-state__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 6v6l4 2"/>
+    </svg>
+    <h1 class="error-state__title">Esta cotización venció</h1>
+    <p class="error-state__body">
+      La propuesta <strong>EFG-2026-00184 v2</strong> tenía vigencia hasta el 30/05/2026 (hace 12 días).
+      Después de la fecha de vencimiento, las tarifas, tipo de cambio y disponibilidad pueden cambiar.
+      Solicita a tu account lead una versión actualizada.
+    </p>
+    <button class="btn btn--accent" type="button">📧 Solicitar nueva cotización</button>
+    <p class="error-state__legal">
+      <strong>Efeonce Group SpA</strong> · RUT 77.357.182-1
+    </p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       ESTADO 4 — Sales Rep Share Drawer (admin UI)
+       ════════════════════════════════════════════════════════════ -->
+  <div class="mockup-section-divider">Estado 4 · Sales Rep — Share Drawer (admin UI desde quote detail)</div>
+  <div class="share-drawer">
+    <header class="share-drawer__header">
+      <h3>Compartir cotización</h3>
+      <p>EFG-2026-00184 v2 · Banco Industrial Latinoamericano</p>
+    </header>
+    <div class="share-drawer__body">
+      <p style="margin: 0 0 var(--space-2) 0; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--color-text-muted); font-weight: 500;">Link compartible</p>
+      <div class="share-url-row">
+        <span class="share-url-row__url">greenhouse.efeoncepro.com/q/A3kF9pX</span>
+        <button class="btn btn--small btn--outlined" type="button">📋 Copiar</button>
+      </div>
+
+      <p style="margin: var(--space-4) 0 var(--space-2) 0; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--color-text-muted); font-weight: 500;">Estadísticas</p>
+      <div class="share-stats">
+        <div>
+          <p class="share-stat__label">Aperturas</p>
+          <p class="share-stat__value">7</p>
+        </div>
+        <div>
+          <p class="share-stat__label">Última</p>
+          <p class="share-stat__value">2h</p>
+        </div>
+        <div>
+          <p class="share-stat__label">Vence</p>
+          <p class="share-stat__value">29d</p>
+        </div>
+      </div>
+
+      <div class="share-drawer__actions">
+        <button class="btn btn--accent" type="button">📧 Enviar por email</button>
+        <button class="btn btn--outlined" type="button" style="color: var(--color-error); border-color: var(--color-error);">🚫 Revocar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sticky shadow progresivo
+    const header = document.querySelectorAll('.quote-header');
+    window.addEventListener('scroll', () => {
+      header.forEach(h => {
+        h.classList.toggle('scrolled', window.scrollY > 20);
+      });
+    }, { passive: true });
+
+    // Bundles colapsables
+    document.querySelectorAll('.bundle__header').forEach(h => {
+      h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+    });
+
+    // Terms colapsables
+    document.querySelectorAll('.term__header').forEach(h => {
+      h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+    });
+
+    // Deep-link highlight
+    if (window.location.hash) {
+      const target = document.querySelector(window.location.hash);
+      if (target && target.classList.contains('term')) {
+        target.classList.add('open', 'highlight');
+        setTimeout(() => target.classList.remove('highlight'), 1500);
+      }
+    }
+  </script>
+
+</body>
+</html>
