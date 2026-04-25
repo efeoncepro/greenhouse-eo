@@ -764,9 +764,107 @@ Para contratos comerciales B2B (caso 95% de Greenhouse) la firma simple ZapSign 
 
 ### Tasks impactadas
 
-- **TASK-619** (eSignature integration): scope re-orientado a ZapSign + reuso. Nueva estimacion ~5 dias.
+- **TASK-619** (eSignature integration): scope re-orientado a ZapSign + reuso. Nueva estimacion **~6.5 dias** (subio de 5 a 6.5 al incluir modelo bilateral firmante/refrendario).
 - **TASK-490** (signature orchestration foundation): sin cambios — la interface `eSignatureProvider` sigue siendo el contrato.
 - **TASK-491** (zapsign-adapter webhook convergence): adelanta su valor — ahora es prerequisite explicito de TASK-619 (asegura que el webhook handler emita eventos consumibles por el quote flow).
+
+### Modelo bilateral firmante / refrendario (refinamiento 2026-04-25)
+
+Tras conversacion con owner, se refina el modelo de signers para reflejar la naturaleza bilateral de los contratos comerciales:
+
+**Roles diferenciados:**
+
+| Rol | Lado | Orden ZapSign | Cantidad | Naturaleza |
+|---|---|---|---|---|
+| `client_signer` | Cliente (Space) | `order_group=1` | 1–N (default: 1) | Compromete legalmente al cliente |
+| `efeonce_countersigner` | Efeonce (Greenhouse) | `order_group=2` | 1–N (default: 1) | Refrenda y cierra el ciclo bilateral |
+| `observer` | Cualquiera | (sin orden) | 0–N | Solo recibe copia, sin valor legal |
+
+**Por que el orden importa legalmente:** primero firma cliente (acepta los terminos), despues refrenda Efeonce (confirma compromiso). Si Efeonce firmara primero, quedaria una propuesta unilateral abierta. ZapSign maneja esto con `signature_order_active=true` + `order_group` distintos.
+
+**Politica de firma — 100% opcional + configurable per-version:**
+
+Sales rep decide en cada version si esa version requiere firma. Casos contemplados:
+
+| `signature_enabled` | `requires_client_signers` | `requires_efeonce_countersigners` | Caso de uso |
+|---|---|---|---|
+| `false` (default) | (ignorado) | (ignorado) | Iteracion exploratoria, draft, propuesta sin commitment |
+| `true` | `true` | `true` | **Default cuando enabled** — version final, firma bilateral completa |
+| `true` | `true` | `false` | Carta de aceptacion cliente (Efeonce solo recibe copia) |
+| `true` | `false` | `true` | SLA addendum unilateral Efeonce |
+| `true` | `false` | `false` | **Invalido** — bloqueado en validacion |
+
+**Disponibilidad desde v1:**
+
+El toggle `signature_enabled` esta disponible **desde la creacion de la quote v1**, no aparece "cuando llega la version final". Sales rep puede:
+
+- Crear v1 con `signature_enabled=false` (exploratoria) y activar firma en v3 cuando la propuesta este lista.
+- Crear v1 con `signature_enabled=true` (esperando aceptacion rapida) y desactivar en v2 si el cliente pide cambios mayores.
+
+La politica se hereda al crear nueva version pero puede override-arse via body del endpoint.
+
+**Schema final — politica vive en `quotations` (header de version vigente), snapshots en `quotation_versions.snapshot_json`:**
+
+```sql
+ALTER TABLE greenhouse_commercial.quotations
+  -- Politica de firma (editable per-version)
+  ADD COLUMN signature_enabled boolean NOT NULL DEFAULT false,
+  ADD COLUMN signature_requires_client_signers boolean NOT NULL DEFAULT true,
+  ADD COLUMN signature_requires_efeonce_countersigners boolean NOT NULL DEFAULT true,
+  ADD COLUMN signature_min_client_signers int NOT NULL DEFAULT 1,
+  ADD COLUMN signature_min_efeonce_countersigners int NOT NULL DEFAULT 1,
+  ADD COLUMN signature_order_active boolean NOT NULL DEFAULT true,
+
+  -- Estado runtime (provider-agnostic)
+  ADD COLUMN esignature_provider text,
+  ADD COLUMN esignature_document_token text,
+  ADD COLUMN esignature_status text,    -- not_required, draft, pending_client, pending_countersign, signed, declined, voided, expired, cancelled
+  ADD COLUMN esignature_sent_at timestamptz,
+  ADD COLUMN esignature_completed_at timestamptz,
+  ADD COLUMN esignature_signed_asset_id uuid;
+
+CREATE TABLE greenhouse_commercial.quotation_signature_signers (
+  signer_id uuid PRIMARY KEY,
+  quotation_id text NOT NULL,
+  version_number int NOT NULL,
+  signer_role text NOT NULL,    -- client_signer, efeonce_countersigner, observer
+  order_group int NOT NULL,
+  full_name, email, phone_country, phone_number, qualification text,
+  contact_id text,    -- bridge a HubSpot CRM (lado cliente)
+  member_id text,     -- bridge a team_members (lado Efeonce)
+  zapsign_signer_token text,
+  status, signed_at, signed_ip, decline_reason
+);
+```
+
+**State machine de firma:**
+
+```text
+not_required        (signature_enabled=false — estado por defecto)
+draft               (signature_enabled=true, configurando signers en UI)
+  → pending_client          (enviado a ZapSign, esperando firmantes cliente)
+  → pending_countersign     (cliente firmo, esperando refrendarios Efeonce)
+  → signed                  (todos firmaron, contrato perfecto)
+  → declined / expired / voided / cancelled
+```
+
+**Eventos outbox emitidos:**
+
+- `commercial.quote.signature_requested` (al enviar a ZapSign)
+- `commercial.quote.signed_by_client` (todos los `client_signer` firmaron)
+- `commercial.quote.countersigned_by_efeonce` (todos los `efeonce_countersigner` firmaron — contrato cerrado)
+- `commercial.quote.signature_declined` (cualquier signer rechaza)
+
+**Defaults inteligentes en UI:**
+
+Al togglear "esta version requiere firma":
+
+- **Pre-poblar firmantes cliente:** contactos HubSpot del `organization_id` con role `legal_signatory` o `decision_maker`. Empty list si no hay.
+- **Pre-poblar refrendarios Efeonce:** sales rep que creo la quote (siempre). Mas mandatorios definidos en `business_line_signature_policy` si se crea esa tabla opcional.
+- **Plazo default:** 30 dias desde envio.
+- **Orden secuencial:** ON.
+
+**Detalle completo de implementacion:** ver `docs/tasks/to-do/TASK-619-quote-esignature-zapsign.md`.
 
 ### Validacion
 
