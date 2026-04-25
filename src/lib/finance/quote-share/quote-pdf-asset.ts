@@ -194,7 +194,10 @@ const generateAndPersist = async (
   input: GetOrCreateInput,
   existing: QuotePdfAssetRecord | null
 ): Promise<QuotePdfBufferResult> => {
-  const pdfInput = await loadInternalPdfInputForQuote(input.quotationId, input.versionNumber)
+  const pdfInput = await loadInternalPdfInputForQuote(input.quotationId, input.versionNumber, {
+    actorUserId: input.generatedBy ?? null
+  })
+
   const buffer = await renderQuotationPdf(pdfInput)
   const fileName = `${pdfInput.quotationNumber}-v${pdfInput.versionNumber}.pdf`
 

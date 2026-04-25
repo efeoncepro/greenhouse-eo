@@ -6,8 +6,16 @@ import { resolveQuotationIdentity } from '@/lib/finance/pricing'
 import type {
   QuotationPdfFxFooter,
   QuotationPdfLegalEntity,
+  QuotationPdfSalesRep,
+  QuotationPdfVerification,
   RenderQuotationPdfInput
 } from '@/lib/finance/pdf/contracts'
+import {
+  buildShortVerificationLabel,
+  buildVerificationUrl,
+  computePdfContentHash,
+  generateVerificationQrDataUrl
+} from '@/lib/finance/pdf/qr-verification'
 import { DEFAULT_LEGAL_ENTITY } from '@/lib/finance/pdf/tokens'
 import { extractQuotationFxSnapshot } from '@/lib/finance/quotation-fx-snapshot'
 
@@ -64,6 +72,13 @@ interface OperatingEntityRow extends Record<string, unknown> {
   website: string | null
 }
 
+interface SalesRepRow extends Record<string, unknown> {
+  full_name: string | null
+  job_title: string | null
+  work_email: string | null
+  phone: string | null
+}
+
 const toNumberSafe = (value: unknown): number => {
   if (value === null || value === undefined) return 0
   const parsed = typeof value === 'number' ? value : Number(value)
@@ -87,7 +102,8 @@ const toIsoDateNullable = (value: string | Date | null): string | null => {
 
 export const loadInternalPdfInputForQuote = async (
   quotationId: string,
-  versionNumber: number
+  versionNumber: number,
+  options: { actorUserId?: string | null } = {}
 ): Promise<RenderQuotationPdfInput> => {
   const identity = await resolveQuotationIdentity(quotationId)
 
@@ -196,6 +212,63 @@ export const loadInternalPdfInputForQuote = async (
 
   const totalNet = toNumberSafe(header.total_price)
   const taxAmount = toNumberSafe(header.tax_amount_snapshot)
+  const total = totalNet + taxAmount
+
+  // Sales rep (best-effort, only if actorUserId provided)
+  let salesRep: QuotationPdfSalesRep | null = null
+
+  if (options.actorUserId) {
+    try {
+      const memberRows = await query<SalesRepRow>(
+        `SELECT tm.full_name, tm.job_title, tm.work_email, tm.phone
+           FROM greenhouse.team_members tm
+           INNER JOIN greenhouse.client_users cu ON cu.member_id = tm.member_id
+           WHERE cu.user_id = $1 LIMIT 1`,
+        [options.actorUserId]
+      )
+
+      const member = memberRows[0]
+
+      if (member?.full_name) {
+        salesRep = {
+          name: member.full_name,
+          role: member.job_title ?? 'Account Lead',
+          email: member.work_email ?? null,
+          phone: member.phone ?? null
+        }
+      }
+    } catch {
+      // best-effort
+    }
+  }
+
+  // QR verification block (signed token + PNG data URL)
+  let verification: QuotationPdfVerification | null = null
+
+  try {
+    const pdfHash = computePdfContentHash({
+      quotationId: identity.quotationId,
+      versionNumber,
+      total,
+      currency,
+      lineCount: lineRows.length
+    })
+
+    const tokenInput = { quotationId: identity.quotationId, versionNumber, pdfHash }
+    const publicUrl = buildVerificationUrl(tokenInput)
+
+    if (publicUrl) {
+      const qrDataUrl = await generateVerificationQrDataUrl(tokenInput)
+
+      verification = {
+        publicUrl,
+        shortLabel: buildShortVerificationLabel(tokenInput),
+        qrDataUrl
+      }
+    }
+  } catch {
+    // best-effort
+  }
 
   return {
     quotationId: identity.quotationId,
@@ -222,7 +295,7 @@ export const loadInternalPdfInputForQuote = async (
     totals: {
       subtotal: toNumberSafe(header.total_price_before_discount),
       totalDiscount: toNumberSafe(header.total_discount),
-      total: totalNet + taxAmount,
+      total,
       tax: header.tax_code
         ? {
             code: header.tax_code,
@@ -244,6 +317,8 @@ export const loadInternalPdfInputForQuote = async (
     terms,
     fxFooter,
     legalEntity,
-    subBrand: 'efeonce'
+    subBrand: 'efeonce',
+    salesRep,
+    verification
   }
 }
