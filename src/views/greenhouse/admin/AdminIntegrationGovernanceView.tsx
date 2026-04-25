@@ -20,8 +20,12 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
+import GcpBillingCard from '@/components/greenhouse/admin/GcpBillingCard'
+import NotionSyncOperationalCard from '@/components/greenhouse/admin/NotionSyncOperationalCard'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type { SisterPlatformBindingRecord } from '@/lib/sister-platforms/types'
+import type { GcpBillingOverview } from '@/types/billing-export'
 import type {
   IntegrationDataQualityOverview,
   IntegrationDataQualityRunResult,
@@ -39,6 +43,8 @@ type Props = {
   notionDataQualityOverview: IntegrationDataQualityOverview | null
   notionOrchestrationOverview: NotionSyncOrchestrationOverview | null
   sisterPlatformBindings: SisterPlatformBindingRecord[]
+  gcpBilling: GcpBillingOverview | null
+  notionOperationalOverview: NotionSyncOperationalOverview | null
 }
 
 const typeLabel: Record<IntegrationType, string> = {
@@ -189,7 +195,9 @@ const AdminIntegrationGovernanceView = ({
   integrations,
   notionDataQualityOverview,
   notionOrchestrationOverview,
-  sisterPlatformBindings
+  sisterPlatformBindings,
+  gcpBilling,
+  notionOperationalOverview
 }: Props) => {
   const activeCount = integrations.filter(i => i.active).length
   const readyCount = integrations.filter(i => i.readinessStatus === 'ready' && !i.pausedAt).length
@@ -292,6 +300,14 @@ const AdminIntegrationGovernanceView = ({
           icon='tabler-topology-ring-3'
         />
       </Box>}
+
+      {/* Notion sync operational overview (TASK-586) */}
+      {notionOperationalOverview && (
+        <NotionSyncOperationalCard overview={notionOperationalOverview} />
+      )}
+
+      {/* GCP cost spotlight desde Billing Export (TASK-586) */}
+      {gcpBilling && <GcpBillingCard overview={gcpBilling} />}
 
       <ExecutiveCardShell
         title='Sister Platform Bindings'

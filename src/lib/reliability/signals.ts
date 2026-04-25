@@ -4,14 +4,17 @@ import type {
   CloudSentryIncidentsSnapshot,
   CloudObservabilityPosture
 } from '@/lib/cloud/contracts'
+import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type {
   BlockedQueryEntry,
   CloudPlatformOverview,
   OperationsSubsystem
 } from '@/lib/operations/get-operations-overview'
+import type { GcpBillingOverview } from '@/types/billing-export'
 import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
 import type {
   ReliabilityModuleKey,
+  ReliabilitySeverity,
   ReliabilitySignal,
   ReliabilitySignalKind
 } from '@/types/reliability'
@@ -380,6 +383,140 @@ export const buildNotionDataQualitySignals = (
       evidence
     }
   ]
+}
+
+const formatCurrency = (cost: number, currency: string): string => {
+  if (!Number.isFinite(cost)) return `${currency} —`
+
+  const rounded = cost >= 100 ? Math.round(cost) : Math.round(cost * 100) / 100
+
+  return `${currency} ${rounded.toLocaleString('en-US')}`
+}
+
+export const buildGcpBillingSignals = (overview: GcpBillingOverview): ReliabilitySignal[] => {
+  const signals: ReliabilitySignal[] = []
+
+  const baseEvidence = [
+    {
+      kind: 'sql' as const,
+      label: 'Billing dataset',
+      value: `${overview.source.dataset}${overview.source.table ? `.${overview.source.table}` : ''}`
+    },
+    {
+      kind: 'helper' as const,
+      label: 'Reader',
+      value: 'src/lib/cloud/gcp-billing.ts:getGcpBillingOverview'
+    }
+  ]
+
+  if (overview.availability !== 'configured') {
+    const severity: ReliabilitySeverity =
+      overview.availability === 'awaiting_data'
+        ? 'awaiting_data'
+        : overview.availability === 'not_configured'
+          ? 'not_configured'
+          : 'error'
+
+    signals.push({
+      signalId: 'cloud.billing.gcp_export',
+      moduleKey: 'cloud',
+      kind: 'billing',
+      source: 'getGcpBillingOverview',
+      label: 'GCP cost (Billing Export)',
+      severity,
+      summary:
+        overview.error ??
+        (overview.notes[0] ?? 'Billing Export no rinde datos todavía.'),
+      observedAt: overview.generatedAt,
+      evidence: baseEvidence
+    })
+
+    return signals
+  }
+
+  signals.push({
+    signalId: 'cloud.billing.gcp_export',
+    moduleKey: 'cloud',
+    kind: 'billing',
+    source: 'getGcpBillingOverview',
+    label: `GCP cost (${overview.period.days} días)`,
+    severity: 'ok',
+    summary: `Total ${formatCurrency(overview.totalCost, overview.currency)} · top servicio: ${
+      overview.costByService[0]?.serviceDescription ?? 'n/d'
+    }.`,
+    observedAt: overview.generatedAt,
+    evidence: baseEvidence
+  })
+
+  const notion = overview.spotlights.notionBqSync
+
+  if (notion && notion.detectionStrategy !== 'unavailable') {
+    signals.push({
+      signalId: 'integrations.notion.billing.notion_bq_sync',
+      moduleKey: 'integrations.notion',
+      kind: 'billing',
+      source: 'getGcpBillingOverview',
+      label: 'Costo notion-bq-sync',
+      severity: notion.detected ? 'ok' : 'awaiting_data',
+      summary: notion.detected
+        ? `${formatCurrency(notion.cost, overview.currency)} (${notion.share}% del total cloud).`
+        : `Aproximación vía Cloud Run/Logging/Monitoring · ${formatCurrency(notion.cost, overview.currency)}.`,
+      observedAt: overview.generatedAt,
+      evidence: [
+        ...baseEvidence,
+        {
+          kind: 'metric',
+          label: 'detectionStrategy',
+          value: notion.detectionStrategy
+        }
+      ]
+    })
+  }
+
+  return signals
+}
+
+export const buildNotionFreshnessSignal = (
+  overview: NotionSyncOperationalOverview
+): ReliabilitySignal => {
+  const severity: ReliabilitySeverity =
+    overview.flowStatus === 'healthy'
+      ? 'ok'
+      : overview.flowStatus === 'degraded'
+        ? 'warning'
+        : overview.flowStatus === 'broken'
+          ? 'error'
+          : overview.flowStatus === 'awaiting_data'
+            ? 'awaiting_data'
+            : 'unknown'
+
+  return {
+    signalId: 'integrations.notion.freshness.upstream',
+    moduleKey: 'integrations.notion',
+    kind: 'freshness',
+    source: 'getNotionSyncOperationalOverview',
+    label: 'Notion upstream freshness',
+    severity,
+    summary: overview.summary,
+    observedAt: overview.upstream.freshestRawSyncedAt ?? overview.generatedAt,
+    evidence: [
+      {
+        kind: 'helper',
+        label: 'Composer',
+        value: 'src/lib/integrations/notion-sync-operational-overview.ts'
+      },
+      {
+        kind: 'sql',
+        label: 'Source',
+        value: 'notion_ops.{tareas,proyectos,sprints}._synced_at'
+      },
+      {
+        kind: 'metric',
+        label: 'ageHours',
+        value: overview.upstream.ageHours === null ? 'n/d' : String(overview.upstream.ageHours)
+      }
+    ]
+  }
 }
 
 export const SIGNAL_KIND_LABELS: Record<ReliabilitySignalKind, string> = {

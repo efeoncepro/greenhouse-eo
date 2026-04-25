@@ -2,6 +2,16 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Notion Sync & Billing Export Observability (TASK-586) — primer plomado de señales contra el Reliability Control Plane
+
+- **Nueva spec canónica**: `docs/architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` formaliza el reader Billing Export, los thresholds iniciales y el split de ownership con TASK-103/208/585.
+- **Reader Billing Export**: `src/lib/cloud/gcp-billing.ts:getGcpBillingOverview()` con cache 30 min, detección dinámica de tabla (`gcp_billing_export_v1*`), graceful degradation cuando tablas no materializan (`availability='awaiting_data'`), spotlight notion-bq-sync con dual probe (label `cloud-run-resource-name` → service description fallback).
+- **Composer Notion sync**: `src/lib/integrations/notion-sync-operational-overview.ts` une `getNotionRawFreshnessGate` + `getNotionSyncOrchestrationOverview` + `getNotionDeliveryDataQualityOverview` en una sola lectura `flowStatus: healthy|degraded|broken|awaiting_data|unknown`.
+- **Cards nuevas**: `GcpBillingCard` y `NotionSyncOperationalCard` insertadas en `AdminIntegrationGovernanceView`. Sección "Spotlight observabilidad" agregada en `AdminOpsHealthView` entre Notion Delivery monitor y Cloud runtime.
+- **Endpoints nuevos**: `GET /api/admin/cloud/gcp-billing` (acepta `?days=N`) y `GET /api/admin/integrations/notion/operational-overview`. Ambos protegidos por `requireAdminTenantContext()`.
+- **Reliability boundaries movidos a `ready`**: `cloud.billing` ← `getGcpBillingOverview` y `integrations.notion.freshness` ← `getNotionSyncOperationalOverview` ahora rinden señales reales en `/api/admin/reliability` y la sección "Confiabilidad por módulo" del Admin Center.
+- **TASK-103 boundary actualizado a `partial`**: cost guard runtime cubierto, budget thresholds GCP Console siguen pendientes.
+
 ### 2026-04-25 — Reliability Control Plane V1 (TASK-600) — foundation visible en Admin Center
 
 - **Nueva spec canónica**: `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` formaliza el registry por módulo, el modelo unificado de señales y el contrato de evidencia.

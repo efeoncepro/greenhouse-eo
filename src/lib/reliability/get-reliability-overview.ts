@@ -1,9 +1,13 @@
 import 'server-only'
 
+import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
+import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import {
   getOperationsOverview,
   type OperationsOverview
 } from '@/lib/operations/get-operations-overview'
+import type { GcpBillingOverview } from '@/types/billing-export'
 import type {
   ReliabilityIntegrationBoundary,
   ReliabilityModuleSnapshot,
@@ -21,7 +25,9 @@ import {
 } from './severity'
 import {
   buildCloudSignals,
+  buildGcpBillingSignals,
   buildNotionDataQualitySignals,
+  buildNotionFreshnessSignal,
   buildObservabilityPostureSignal,
   buildSentryIncidentSignals,
   buildSubsystemSignals
@@ -33,16 +39,16 @@ const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
     moduleKey: 'cloud',
     expectedSignalKind: 'billing',
     expectedSource: 'getGcpBillingOverview',
-    status: 'pending',
-    note: 'TASK-586 expondrá GCP cost total + spotlight notion-bq-sync. Enchufa como signal kind=billing.'
+    status: 'ready',
+    note: 'TASK-586 entregó el reader Billing Export con degradación honesta (awaiting_data cuando tablas no rinden). Adapter: buildGcpBillingSignals.'
   },
   {
     taskId: 'TASK-586',
     moduleKey: 'integrations.notion',
     expectedSignalKind: 'freshness',
-    expectedSource: 'getNotionBqSyncRunStatus',
-    status: 'pending',
-    note: 'TASK-586 traerá la última corrida de notion-bq-sync (Cloud Run). Enchufa como signal kind=freshness.'
+    expectedSource: 'getNotionSyncOperationalOverview',
+    status: 'ready',
+    note: 'TASK-586 entregó composer Notion sync end-to-end (raw + orchestration + DQ). Adapter: buildNotionFreshnessSignal.'
   },
   {
     taskId: 'TASK-599',
@@ -57,8 +63,8 @@ const RELIABILITY_INTEGRATION_BOUNDARIES: ReliabilityIntegrationBoundary[] = [
     moduleKey: 'cloud',
     expectedSignalKind: 'billing',
     expectedSource: 'getGcpBudgetThresholdState',
-    status: 'pending',
-    note: 'TASK-103 cubrirá thresholds 50/80/100% del budget GCP. Refuerza la señal billing del módulo cloud.'
+    status: 'partial',
+    note: 'TASK-103 todavía cubre solo cost guard runtime (kind=cost_guard). Budget thresholds 50/80/100% requieren GCP Console manual. La señal billing principal ya la cubre TASK-586.'
   }
 ]
 
@@ -123,15 +129,23 @@ const SIGNAL_SEVERITY_RANK: Record<ReliabilitySeverity, number> = {
 const sortSignalsForDisplay = (signals: ReliabilitySignal[]): ReliabilitySignal[] =>
   [...signals].sort((a, b) => SIGNAL_SEVERITY_RANK[a.severity] - SIGNAL_SEVERITY_RANK[b.severity])
 
+interface ReliabilityOverviewSources {
+  billing?: GcpBillingOverview | null
+  notionOperational?: NotionSyncOperationalOverview | null
+}
+
 export const buildReliabilityOverview = (
-  operations: OperationsOverview
+  operations: OperationsOverview,
+  sources: ReliabilityOverviewSources = {}
 ): ReliabilityOverview => {
   const allSignals: ReliabilitySignal[] = [
     ...buildSubsystemSignals(operations.subsystems),
     ...buildCloudSignals(operations.cloud),
     ...buildSentryIncidentSignals(operations.cloud.observability.incidents),
     buildObservabilityPostureSignal(operations.cloud.observability.posture),
-    ...buildNotionDataQualitySignals(operations.notionDeliveryDataQuality ?? null)
+    ...buildNotionDataQualitySignals(operations.notionDeliveryDataQuality ?? null),
+    ...(sources.billing ? buildGcpBillingSignals(sources.billing) : []),
+    ...(sources.notionOperational ? [buildNotionFreshnessSignal(sources.notionOperational)] : [])
   ]
 
   const signalsByModule = new Map<string, ReliabilitySignal[]>()
@@ -218,11 +232,26 @@ export const buildReliabilityOverview = (
  * Reader consolidado de confiabilidad. Reusa `getOperationsOverview()` como
  * agregador operativo. Si el caller ya tiene el overview (ej: la página de
  * Admin Center), debe pasarlo para evitar el doble fetch.
+ *
+ * Las fuentes adicionales (`billing`, `notionOperational`) son opcionales:
+ * cuando no se pasan, se hace fetch adicional con tolerancia a fallos
+ * (ningún error individual rompe la lectura consolidada).
  */
 export const getReliabilityOverview = async (
-  preloadedOperations?: OperationsOverview
+  preloadedOperations?: OperationsOverview,
+  preloadedSources: ReliabilityOverviewSources = {}
 ): Promise<ReliabilityOverview> => {
   const operations = preloadedOperations ?? (await getOperationsOverview())
 
-  return buildReliabilityOverview(operations)
+  const billing =
+    preloadedSources.billing !== undefined
+      ? preloadedSources.billing
+      : await getGcpBillingOverview().catch(() => null)
+
+  const notionOperational =
+    preloadedSources.notionOperational !== undefined
+      ? preloadedSources.notionOperational
+      : await getNotionSyncOperationalOverview().catch(() => null)
+
+  return buildReliabilityOverview(operations, { billing, notionOperational })
 }

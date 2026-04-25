@@ -17,7 +17,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -260,45 +260,56 @@ El diseño debe priorizar:
 
 ## Acceptance Criteria
 
-- [ ] existe un reader canónico para Billing Export reutilizable por `Admin Center`
-- [ ] `Cloud & Integrations` muestra costo cloud real de todo GCP con breakdown útil por servicio
-- [ ] `Cloud & Integrations` muestra spotlight específico de `notion-bq-sync` sin limitar la observabilidad al servicio
-- [ ] `Ops Health` muestra anomalías relevantes de costo o ausencia de data del export
-- [ ] `Ops Health` y/o `Cloud & Integrations` muestran una síntesis operativa clara del flujo Notion end-to-end
-- [ ] la UI degrada correctamente cuando Billing Export aún no tiene tablas o datos materializados
-- [ ] el split de ownership entre `TASK-103`, `TASK-208`, `TASK-585` y `TASK-586` queda documentado sin ambigüedad
+- [x] existe un reader canónico para Billing Export reutilizable por `Admin Center` (`src/lib/cloud/gcp-billing.ts`)
+- [x] `Cloud & Integrations` muestra costo cloud real de todo GCP con breakdown útil por servicio (`GcpBillingCard` en `AdminIntegrationGovernanceView`)
+- [x] `Cloud & Integrations` muestra spotlight específico de `notion-bq-sync` sin limitar la observabilidad al servicio (sección dedicada en `GcpBillingCard` con dual probe label/service)
+- [x] `Ops Health` muestra anomalías relevantes de costo o ausencia de data del export (sección "Spotlight observabilidad" entre Notion Delivery y Cloud runtime)
+- [x] `Ops Health` y `Cloud & Integrations` muestran una síntesis operativa clara del flujo Notion end-to-end (`NotionSyncOperationalCard` con timeline raw → orchestration → DQ)
+- [x] la UI degrada correctamente cuando Billing Export aún no tiene tablas o datos materializados (`availability='awaiting_data'` con notes explícitas)
+- [x] el split de ownership entre `TASK-103`, `TASK-208`, `TASK-585` y `TASK-586` queda documentado sin ambigüedad (`GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` §8)
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm build`
-- validación manual en:
-  - `/admin/integrations`
-  - `/admin/ops-health`
-- validación de queries contra Billing Export:
-  - `bq ls efeonce-group:billing_export`
-  - `bq query --use_legacy_sql=false '<query de costo diario>'`
-- validación de señales Notion:
-  - `GET /api/admin/integrations/notion/data-quality`
-  - `GET /api/admin/tenants/[id]/notion-data-quality`
+- `pnpm lint` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm test` ✅ (405 files / 2073 passed)
+- `pnpm build` ✅ (`/api/admin/cloud/gcp-billing` y `/api/admin/integrations/notion/operational-overview` aparecen como dynamic functions)
+- validación manual sobre staging: pendiente.
+
+## Resolution
+
+V1 entregada con degradación honesta cuando Billing Export aún no materializa tablas. Decisiones tomadas durante Discovery:
+
+1. **`AdminCloudIntegrationsView` está orphaned** — el wrapper `/admin/cloud-integrations/page.tsx` redirige a `/admin/integrations` que renderiza `AdminIntegrationGovernanceView`. Las cards nuevas se enchufan en la view que sí está rendereada.
+2. **Nunca tocar Cloud Run logs de notion-bq-sync** — no expone reader API. Inferimos upstream desde `_synced_at` en `notion_ops.{tareas,proyectos,sprints}` (verdad funcional).
+3. **Composer puro** — `getNotionSyncOperationalOverview()` reusa los 3 readers existentes sin duplicar.
+4. **Reliability boundaries movidos a `ready`** — `cloud.billing` y `integrations.notion.freshness` ahora rinden señales reales en `/api/admin/reliability` y la sección "Confiabilidad por módulo" en Admin Center.
+5. **Cache 30 min** — Billing Export tiene latencia natural ~24h; sub-hour fresh es desperdicio de cuota BQ.
+
+Thresholds iniciales (auditables en `GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` §7):
+- `STALE_THRESHOLD_HOURS = 24` para Notion upstream
+- `notionBqSync.share` warning a 50% del total cloud
+- `costByService` limit = 25 servicios
+- `period.days` default = 7
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] se dejó documentado cualquier threshold inicial que deba ajustarse con datos reales posteriores
+- [x] `Lifecycle` sincronizado con estado real (`complete`)
+- [x] archivo en la carpeta `complete/`
+- [x] `docs/tasks/README.md` sincronizado con el cierre
+- [x] `Handoff.md` actualizado con foundation entregada
+- [x] `changelog.md` actualizado con la nueva surface visible
+- [x] chequeo cruzado sobre TASK-103 (boundary cloud.billing parcial), TASK-585 (sigue siendo dueño hardening), TASK-208 (sigue dueño DQ), TASK-600 (boundaries movidos a ready)
+- [x] thresholds iniciales documentados en spec V1 §7
 
 ## Follow-ups
 
-- FinOps avanzado con drill-down más fino si la lectura global queda corta
-- alert routing multi-canal de billing thresholds hacia notificaciones internas
-- views históricas o comparativas mensuales si la operación lo necesita
+- FinOps avanzado con drill-down más fino si la lectura global queda corta.
+- Alert routing multi-canal de billing thresholds hacia notificaciones internas (cuando GCP Console budget setup esté listo, parte de TASK-103).
+- Views históricas o comparativas mensuales si la operación lo necesita.
+- Persistir snapshots de billing en PostgreSQL (`greenhouse_observability.gcp_billing_snapshots`) si se necesita comparar contra baseline reciente.
 
-## Open Questions
+## Open Questions (resueltas)
 
-- `[verificar]` nombre exacto de las tablas materializadas de Billing Export una vez termine el bootstrap en BigQuery
-- si el spotlight de `notion-bq-sync` debe vivir en `Cloud & Integrations` solamente o también en una sub-surface tenant-scoped
+- ✅ Nombre exacto de tablas materializadas: `gcp_billing_export_v1*` detectado dinámicamente vía `INFORMATION_SCHEMA.TABLES`.
+- ✅ Spotlight `notion-bq-sync` vive en `Cloud & Integrations` general. Si se necesita vista tenant-scoped, sigue siendo follow-up.

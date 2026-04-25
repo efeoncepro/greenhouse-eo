@@ -1,5 +1,58 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Notion Sync & Billing Export Observability (TASK-586)
+
+### Que cambio
+
+Se entregó la lectura productizada de costo cloud y del flujo Notion end-to-end dentro de `Admin Center`, completando el primer slice de plomería de señales contra el Reliability Control Plane (TASK-600).
+
+Archivos canónicos creados:
+
+- `src/types/billing-export.ts` — contracts (`BillingExportAvailability`, `GcpBillingOverview`, spotlights, detection strategy)
+- `src/lib/cloud/gcp-billing.ts` — reader con cache 30 min y degradación honesta (`awaiting_data` cuando tablas no rinden)
+- `src/lib/integrations/notion-sync-operational-overview.ts` — composer puro de `getNotionRawFreshnessGate` + `getNotionSyncOrchestrationOverview` + `getNotionDeliveryDataQualityOverview`
+- `src/components/greenhouse/admin/GcpBillingCard.tsx` — UI con KPI total + breakdown por servicio + spotlight notion-bq-sync con dual probe (label / service description)
+- `src/components/greenhouse/admin/NotionSyncOperationalCard.tsx` — timeline raw → orchestration → DQ
+- `src/app/api/admin/cloud/gcp-billing/route.ts` — endpoint admin (acepta `?days=N`)
+- `src/app/api/admin/integrations/notion/operational-overview/route.ts` — endpoint admin
+- `docs/architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md` — spec canónica
+
+Archivos modificados:
+
+- `src/lib/reliability/signals.ts` → 2 adapters nuevos: `buildGcpBillingSignals`, `buildNotionFreshnessSignal`.
+- `src/lib/reliability/get-reliability-overview.ts` → acepta `sources?: { billing, notionOperational }`; boundaries `cloud.billing` y `integrations.notion.freshness` movidos a `ready`.
+- `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx` → 2 cards insertadas entre KPIs y Sister Platform Bindings.
+- `src/views/greenhouse/admin/AdminOpsHealthView.tsx` → sección "Spotlight observabilidad" entre Notion Delivery monitor y Cloud runtime.
+- `src/app/(dashboard)/admin/page.tsx` y `src/app/(dashboard)/admin/integrations/page.tsx` y `src/app/(dashboard)/admin/ops-health/page.tsx` → fetch de los 2 nuevos overviews en paralelo, sin doble fetch para Reliability.
+
+### Decisión canónica explicitada
+
+1. **`AdminCloudIntegrationsView` está orphaned.** Las cards nuevas viven en `AdminIntegrationGovernanceView` (la view que sí está rendereada por `/admin/integrations`).
+2. **`notion-bq-sync` se infiere por `_synced_at`**, no por Cloud Run logs. Es la verdad funcional ("¿hace cuánto subió data nueva?") y evita acoplamiento al servicio externo.
+3. **Composer puro Notion** — los 3 readers existentes se reusan al pie de la letra; nada se duplica.
+4. **Cache 30 min** para Billing Export (latencia natural ~24h hace inútil sub-hour fresh).
+5. **Detection strategy explícita** en spotlight notion-bq-sync — la UI muestra chip "Atribución por label" vs "Aproximación por servicio" para que operadores entiendan precisión.
+
+### Boundaries movidos a `ready`
+
+- TASK-586 / `cloud.billing` → `ready` (era `pending`).
+- TASK-586 / `integrations.notion.freshness` → `ready` (era `pending`).
+- TASK-103 / `cloud.billing` → `partial` (cost guard ya cubierto, budget alerts requieren GCP Console).
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ (405 files / 2073 passed)
+- `pnpm build` ✅ (`/api/admin/cloud/gcp-billing` y `/api/admin/integrations/notion/operational-overview` aparecen como dynamic functions)
+- Validación manual sobre staging: pendiente. Cuando Billing Export materialice tablas (~24h post-enable), las cards rinden datos automáticamente.
+
+### Siguiente
+
+- TASK-585 sigue siendo dueña del hardening notion-bq-sync; no se tocó.
+- TASK-103 sigue dueña del budget setup en GCP Console; cuando se complete, agregar adapter `cloud.billing.gcp_budget_threshold`.
+- TASK-599 sigue siendo el siguiente boundary `finance.test_lane` pendiente.
+
 ## Sesion 2026-04-25 — Foundation V1 del Reliability Control Plane (TASK-600)
 
 ### Que cambio
