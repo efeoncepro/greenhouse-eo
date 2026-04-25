@@ -223,6 +223,7 @@ describe('adaptProductCatalogToHubSpotCreatePayload', () => {
 
     expect(payload.categoryCode).toBe('Staff augmentation')
     expect(payload.unitCode).toBe('Hora')
+
     // tax still null: hs_tax_category uses externalOptions (Taxation add-on
     // not enabled on portal 48713323), so no fallback available.
     expect(payload.taxCategoryCode).toBeNull()

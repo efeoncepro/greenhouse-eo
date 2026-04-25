@@ -8,8 +8,11 @@ import { getFinanceQuoteDetailFromCanonical } from '@/lib/finance/quotation-cano
 import { renderQuotationPdf } from '@/lib/finance/pdf/render-quotation-pdf'
 import type {
   QuotationPdfFxFooter,
+  QuotationPdfLegalEntity,
+  QuotationPdfSalesRep,
   RenderQuotationPdfInput
 } from '@/lib/finance/pdf/contracts'
+import { DEFAULT_LEGAL_ENTITY } from '@/lib/finance/pdf/tokens'
 import { extractQuotationFxSnapshot } from '@/lib/finance/quotation-fx-snapshot'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
@@ -48,6 +51,26 @@ interface QuotationLineRow extends Record<string, unknown> {
   subtotal_after_discount: string | number | null
   sort_order: number | null
   created_at: string | Date | null
+
+  // Optional enrichment fields populated when canonical line has a product ref
+  product_code: string | null
+  product_description_rich_html: string | null
+  bundle_id: string | null
+  bundle_label: string | null
+}
+
+interface TeamMemberRow extends Record<string, unknown> {
+  full_name: string | null
+  job_title: string | null
+  work_email: string | null
+  phone: string | null
+}
+
+interface OperatingEntityRow extends Record<string, unknown> {
+  legal_name: string | null
+  tax_id: string | null
+  registered_address: string | null
+  website: string | null
 }
 
 const toNumberSafe = (value: unknown): number => {
@@ -154,6 +177,60 @@ export async function GET(
   const versionNumber = Number(header.current_version ?? 1)
   const currency = String(header.currency || 'CLP').toUpperCase()
 
+  // TASK-629 — Sales rep lookup (best-effort, falls back to null)
+  let salesRep: QuotationPdfSalesRep | null = null
+
+  try {
+    const memberRows = await query<TeamMemberRow>(
+      `SELECT tm.full_name, tm.job_title, tm.work_email, tm.phone
+         FROM greenhouse.team_members tm
+         INNER JOIN greenhouse.client_users cu
+           ON cu.member_id = tm.member_id
+         WHERE cu.user_id = $1
+         LIMIT 1`,
+      [tenant.userId]
+    )
+
+    const member = memberRows[0]
+
+    if (member?.full_name) {
+      salesRep = {
+        name: member.full_name,
+        role: member.job_title ?? 'Account Lead',
+        email: member.work_email ?? null,
+        phone: member.phone ?? null
+      }
+    }
+  } catch {
+    // best-effort — sales rep query shouldn't block PDF generation
+  }
+
+  // TASK-629 — Operating legal entity lookup (dynamic, Decision 7 v1.3)
+  let legalEntity: QuotationPdfLegalEntity = DEFAULT_LEGAL_ENTITY
+
+  try {
+    const entityRows = await query<OperatingEntityRow>(
+      `SELECT legal_name, tax_id, registered_address, website
+         FROM greenhouse_core.organizations
+         WHERE is_operating_entity = TRUE
+         ORDER BY created_at ASC
+         LIMIT 1`
+    )
+
+    const entity = entityRows[0]
+
+    if (entity?.legal_name && entity.tax_id && entity.registered_address) {
+      legalEntity = {
+        legalName: entity.legal_name,
+        taxId: entity.tax_id,
+        address: entity.registered_address,
+        website: entity.website ?? null
+      }
+    }
+  } catch {
+    // best-effort — fall back to DEFAULT_LEGAL_ENTITY
+  }
+
   // TASK-466 — Build FX footer from the snapshot frozen at issue time. The
   // footer is only shown when the output currency required conversion
   // (non-USD output OR composed via USD). For USD-direct or CLP quotes with
@@ -190,6 +267,10 @@ export async function GET(
     lineItems: lineRows.map(row => ({
       label: row.label,
       description: row.description,
+      descriptionRichHtml: row.product_description_rich_html ?? null,
+      productCode: row.product_code ?? null,
+      bundleId: row.bundle_id ?? null,
+      bundleLabel: row.bundle_label ?? null,
       quantity: toNumberSafe(row.quantity),
       unit: row.unit || 'unit',
       unitPrice: toNumberSafe(row.unit_price),
@@ -221,7 +302,9 @@ export async function GET(
         : null
     },
     terms: includedTerms,
-    fxFooter
+    fxFooter,
+    salesRep,
+    legalEntity
   }
 
   const pdfBuffer = await renderQuotationPdf(pdfInput)
