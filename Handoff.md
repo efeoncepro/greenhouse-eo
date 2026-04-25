@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Foundation V1 del Reliability Control Plane (TASK-600)
+
+### Que cambio
+
+Se entregó la foundation deterministic/rule-based del `Reliability Control Plane` de Greenhouse. La capa se sienta encima de `getOperationsOverview()`, `GET /api/internal/health`, Sentry y Notion DQ — no las reemplaza, las normaliza.
+
+Archivos canónicos creados:
+
+- `src/types/reliability.ts` — contracts (`ReliabilityModuleDefinition`, `ReliabilitySignal`, `ReliabilityModuleSnapshot`, `ReliabilityOverview`, severidad de 6 estados que separa `not_configured`/`awaiting_data`/`unknown`)
+- `src/lib/reliability/registry.ts` — seed estático: `finance`, `integrations.notion`, `cloud`, `delivery`
+- `src/lib/reliability/severity.ts` — mappers desde `CloudHealthStatus`, `OperationsHealthStatus`, `IntegrationDataQualityStatus`, `CloudSentryIncidentLevel`
+- `src/lib/reliability/signals.ts` — adapters: subsystems, runtime/posture cloud, Sentry incidents, BigQuery cost guard, observability posture, Notion delivery DQ
+- `src/lib/reliability/get-reliability-overview.ts` — reader que compone el overview (acepta `OperationsOverview` preloaded para evitar doble fetch)
+- `src/app/api/admin/reliability/route.ts` — endpoint protegido por `requireAdminTenantContext()`
+- `src/components/greenhouse/ReliabilityModuleCard.tsx` — UI primitive
+- `src/views/greenhouse/admin/AdminCenterView.tsx` — sección "Confiabilidad por módulo" entre alertas y Torre de control
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` — spec canónica
+
+### Decisión canónica explicitada
+
+1. Registry estático en código (no DB). Persistencia se evaluará si aparece necesidad de overrides por tenant o SLOs configurables.
+2. Primera surface en `Admin Center` general. `Ops Health` y `Cloud & Integrations` preservan su lectura técnica especializada — no se duplica.
+3. Reader nunca duplica fetches: la página `/admin` pasa el `OperationsOverview` ya construido.
+4. Severidad de 6 estados: `ok`/`warning`/`error`/`unknown`/`not_configured`/`awaiting_data`. Estados pendientes nunca enmascaran señales reales.
+
+### Boundaries explícitos para tasks downstream
+
+`RELIABILITY_INTEGRATION_BOUNDARIES` declara qué task plomará qué señal y cómo enchufar sin redefinir contratos:
+
+- `TASK-586` → `cloud.billing` + `integrations.notion.freshness` (notion-bq-sync run + GCP cost)
+- `TASK-599` → `finance.test_lane` (smoke E2E + component + route resilience)
+- `TASK-103` → `cloud.billing` (budget thresholds 50/80/100%)
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test -- src/views/greenhouse/admin/AdminCenterView.test.tsx` ✅ (405 files / 2073 passed)
+- `pnpm build` ✅ (`/api/admin/reliability` aparece como dynamic function)
+- Validación manual sobre staging: pendiente.
+
 ## Sesion 2026-04-25 — Se abren follow-ups ejecutables para API Platform V1.1
 
 ### Que cambio

@@ -5,6 +5,7 @@ import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { getAdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import { getInternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
+import { buildReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 
@@ -34,12 +35,15 @@ export default async function Page() {
     getOperationsOverview()
   ])
 
+  const reliability = buildReliabilityOverview(operations)
+
   return (
     <AdminCenterView
       access={access}
       tenants={tenants}
       controlTower={controlTower}
       operations={operations}
+      reliability={reliability}
     />
   )
 }

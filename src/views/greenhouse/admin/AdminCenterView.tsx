@@ -16,12 +16,18 @@ import Typography from '@mui/material/Typography'
 
 import SectionErrorBoundary from '@components/greenhouse/SectionErrorBoundary'
 
-import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseDragList } from '@/components/greenhouse'
+import {
+  ExecutiveCardShell,
+  ExecutiveMiniStatCard,
+  GreenhouseDragList,
+  ReliabilityModuleCard
+} from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 import type { OperationsOverview } from '@/lib/operations/get-operations-overview'
+import type { ReliabilityOverview } from '@/types/reliability'
 
 import {
   buildControlTowerSummary,
@@ -40,6 +46,7 @@ type Props = {
   tenants: AdminTenantsOverview
   controlTower: InternalDashboardOverview
   operations: OperationsOverview
+  reliability: ReliabilityOverview
 }
 
 type DomainCard = {
@@ -382,7 +389,7 @@ const buildDomainCards = ({
 const validFilters: StatusFilter[] = ['all', 'active', 'onboarding', 'attention', 'inactive']
 const ADMIN_CENTER_CARD_ORDER_KEY = 'greenhouse:admin-center:domain-card-order'
 
-const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) => {
+const AdminCenterView = ({ access, tenants, controlTower, operations, reliability }: Props) => {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const navRouter = useNavRouter()
@@ -701,6 +708,79 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
           </ExecutiveCardShell>
         )
       })()}
+
+      {/* ── Confiabilidad por módulo (Reliability Control Plane) ── */}
+      <ExecutiveCardShell
+        title='Confiabilidad por módulo'
+        subtitle='Lectura consolidada de salud, señales activas y evidencia por módulo crítico. Surface técnica vive en Ops Health y Cloud & Integrations.'
+      >
+        <Stack spacing={3}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            justifyContent='space-between'
+            alignItems={{ xs: 'flex-start', md: 'center' }}
+          >
+            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+              <Chip
+                size='small'
+                color='success'
+                variant='tonal'
+                label={`${reliability.totals.healthy} sano${reliability.totals.healthy === 1 ? '' : 's'}`}
+              />
+              <Chip
+                size='small'
+                color='warning'
+                variant='tonal'
+                label={`${reliability.totals.warning} en atención`}
+              />
+              <Chip
+                size='small'
+                color='error'
+                variant='tonal'
+                label={`${reliability.totals.error} crítico${reliability.totals.error === 1 ? '' : 's'}`}
+              />
+              <Chip
+                size='small'
+                variant='outlined'
+                label={`${reliability.totals.unknownOrPending} sin señal aún`}
+              />
+            </Stack>
+            <Typography variant='caption' color='text.secondary'>
+              {reliability.totals.totalModules} módulo{reliability.totals.totalModules === 1 ? '' : 's'} en
+              registry · {reliability.integrationBoundaries.length} boundary
+              {reliability.integrationBoundaries.length === 1 ? '' : 'ies'} pendiente
+              {reliability.integrationBoundaries.length === 1 ? '' : 's'} (TASK-586/599)
+            </Typography>
+          </Stack>
+
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 3,
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(2, minmax(0, 1fr))',
+                xl: 'repeat(2, minmax(0, 1fr))'
+              }
+            }}
+          >
+            {reliability.modules.map(module => (
+              <ReliabilityModuleCard key={module.moduleKey} module={module} />
+            ))}
+          </Box>
+
+          {reliability.notes.length > 0 && (
+            <Stack spacing={0.5}>
+              {reliability.notes.map(note => (
+                <Typography key={note} variant='caption' color='text.secondary'>
+                  · {note}
+                </Typography>
+              ))}
+            </Stack>
+          )}
+        </Stack>
+      </ExecutiveCardShell>
 
       {/* ── Torre de control (Spaces health table) ── */}
       <SectionErrorBoundary

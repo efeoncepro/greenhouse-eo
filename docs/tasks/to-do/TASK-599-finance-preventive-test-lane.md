@@ -1,5 +1,13 @@
 # TASK-599 — Finance Preventive Test Lane (Playwright + Component + Route Resilience)
 
+## Delta 2026-04-25
+
+- TASK-600 entregó la foundation `Reliability Control Plane V1`. Esta task ya tiene un `ReliabilityIntegrationBoundary` reservado en `src/lib/reliability/get-reliability-overview.ts`:
+  - `finance.test_lane` ← `getFinanceSmokeLaneStatus` (smoke E2E `/finance/{expenses,clients,suppliers}` + component tests + route resilience)
+- Para enchufar: implementar el helper de fetch + agregar adapter en `src/lib/reliability/signals.ts` que normalice el resultado del lane a `ReliabilitySignal[]` con `kind=test_lane` y mover el boundary a `ready`.
+- El módulo `finance` ya declara los smoke specs esperados en `src/lib/reliability/registry.ts`. El registry queda listo para que el conteo `missingSignalKinds` se reduzca automáticamente cuando esta task entre en producción.
+- Spec del contrato a respetar: `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §3 y §7.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

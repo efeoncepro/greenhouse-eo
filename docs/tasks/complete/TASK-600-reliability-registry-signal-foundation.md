@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -233,35 +233,48 @@ La primera iteración puede ser deterministic/rule-based. Un agente explicativo 
 
 ## Acceptance Criteria
 
-- [ ] existe un registry canónico inicial de módulos críticos con rutas, dependencias y señales asociadas
-- [ ] existe un tipo/modelo unificado de señal de confiabilidad reusable por múltiples consumers
-- [ ] `Admin Center` puede consumir al menos una lectura consolidada de salud/confianza por módulo
-- [ ] la estructura deja explícito cómo se integran después `TASK-586` y `TASK-599`
+- [x] existe un registry canónico inicial de módulos críticos con rutas, dependencias y señales asociadas (`src/lib/reliability/registry.ts`)
+- [x] existe un tipo/modelo unificado de señal de confiabilidad reusable por múltiples consumers (`src/types/reliability.ts` + `src/lib/reliability/signals.ts`)
+- [x] `Admin Center` puede consumir al menos una lectura consolidada de salud/confianza por módulo (sección "Confiabilidad por módulo" en `AdminCenterView` + `GET /api/admin/reliability`)
+- [x] la estructura deja explícito cómo se integran después `TASK-586` y `TASK-599` (`RELIABILITY_INTEGRATION_BOUNDARIES` en `get-reliability-overview.ts` + spec V1 §7)
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm test`
-- validación manual sobre `Admin Center` / `Ops Health` / `Cloud & Integrations`
+- `pnpm lint` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm test -- src/views/greenhouse/admin/AdminCenterView.test.tsx` ✅ (405 files / 2073 passed)
+- `pnpm build` ✅ (incluye `/api/admin/reliability` como dynamic function)
+- Validación manual pendiente sobre staging — `Admin Center` debe mostrar la sección "Confiabilidad por módulo" entre alertas y Torre de control.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] quedó explícito qué parte vive en registry, qué parte vive en señales y qué parte sigue siendo consumer UI
+- [x] `Lifecycle` del markdown sincronizado con el estado real (`complete`)
+- [x] el archivo vive en la carpeta `complete/`
+- [x] `docs/tasks/README.md` sincronizado con el cierre
+- [x] `Handoff.md` actualizado con foundation entregada y boundaries pendientes
+- [x] `changelog.md` actualizado con la lectura `Confiabilidad por módulo`
+- [x] chequeo de impacto cruzado sobre TASK-586 y TASK-599 (deltas registrados con el contrato a respetar)
+- [x] explícito qué parte vive en registry (`src/lib/reliability/registry.ts`), señales (`src/lib/reliability/signals.ts` + `severity.ts`) y consumer UI (`AdminCenterView` sección + `ReliabilityModuleCard`)
+
+## Resolution
+
+V1 entregada como foundation deterministic/rule-based. Decisiones tomadas durante Discovery:
+
+1. **Registry estático en código** (no DB). Es meta-código que ata módulos a señales existentes; persistencia DB se evaluará si aparece necesidad de overrides por tenant o SLOs configurables.
+2. **Primera surface en Admin Center** (no Ops Health). UI ligera: 1 card por módulo + chips de totales + boundaries pendientes. Ops Health y Cloud & Integrations preservan su lectura técnica especializada.
+3. **Reader compone OperationsOverview**: no duplica fetches. La página Admin pasa el overview ya construido para evitar doble fetch.
+4. **Severity con 6 estados**: `not_configured` y `awaiting_data` separados de `unknown` — nunca asumen sano cuando no hay plomería.
+
+Archivos canónicos en `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §10.
 
 ## Follow-ups
 
-- derivar task específica para synthetic monitoring periódico si el registry deja claro el set de rutas críticas
-- derivar task específica para change-based verification matrix una vez que el mapa módulo→tests esté sembrado
-- evaluar un correlador explicativo más rico después de que el modelo de señales esté estable
+- Synthetic monitoring periódico que ejecute las rutas críticas declaradas en el registry.
+- Change-based verification matrix: cuando un PR toca un archivo `owned` por un módulo, correr el smoke + signal correspondiente.
+- Correlador explicativo (LLM o reglas) que asocie incidentes Sentry con módulos por path/title.
+- Persistencia DB del registry si aparece necesidad de overrides por tenant.
 
-## Open Questions
+## Open Questions (resueltas)
 
-- si la primera surface de `confidence` debe vivir primero en `Admin Center` general o directamente en `Ops Health`
-- si el registry inicial debe persistirse en código estático, DB o un híbrido derivado
+- ✅ Primera surface en `Admin Center` general (no Ops Health). Ver Resolution §2.
+- ✅ Registry inicial estático en código. Ver Resolution §1.

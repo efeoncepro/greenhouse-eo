@@ -1,5 +1,14 @@
 # TASK-586 — Notion Sync & Billing Export Observability in Admin Center
 
+## Delta 2026-04-25
+
+- TASK-600 entregó la foundation `Reliability Control Plane V1`. Esta task ya tiene un `ReliabilityIntegrationBoundary` reservado en `src/lib/reliability/get-reliability-overview.ts`:
+  - `cloud.billing` ← `getGcpBillingOverview` (cost total + spotlight notion-bq-sync)
+  - `integrations.notion.freshness` ← `getNotionBqSyncRunStatus` (última corrida del Cloud Run)
+- Para enchufar: implementar el helper de fetch + agregar adapter en `src/lib/reliability/signals.ts` que normalice el output a `ReliabilitySignal[]` con `kind=billing` / `kind=freshness` y mover el boundary a `ready`.
+- No requiere redefinir contracts ni tocar UI: las señales aparecen automáticamente en los módulos `cloud` e `integrations.notion`, y el conteo `missingSignalKinds` se reduce.
+- Spec del contrato a respetar: `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §3 y §7.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

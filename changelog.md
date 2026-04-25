@@ -2,6 +2,17 @@
 
 ## 2026-04-25
 
+### 2026-04-25 — Reliability Control Plane V1 (TASK-600) — foundation visible en Admin Center
+
+- **Nueva spec canónica**: `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` formaliza el registry por módulo, el modelo unificado de señales y el contrato de evidencia.
+- **Nuevo registry**: `src/lib/reliability/registry.ts` declara los módulos críticos `finance`, `integrations.notion`, `cloud`, `delivery` con sus rutas, dependencias, smoke tests y señales esperadas.
+- **Nuevo modelo de señales**: `src/types/reliability.ts` + `src/lib/reliability/signals.ts` adaptan subsystems del operations overview, runtime/posture cloud, Sentry incidents, BigQuery cost guard, observability posture y Notion delivery DQ a un contrato compartido.
+- **Severidad de 6 estados**: `ok`/`warning`/`error`/`unknown`/`not_configured`/`awaiting_data`. Estados pendientes nunca enmascaran señales reales.
+- **Reader consolidado**: `src/lib/reliability/get-reliability-overview.ts` compone el overview reusando `getOperationsOverview()` sin duplicar fetches.
+- **Nuevo endpoint admin**: `GET /api/admin/reliability` protegido por `requireAdminTenantContext()` — reusable por agentes, synthetic monitors y change-based verification.
+- **Nueva sección visible**: `Admin Center` ahora expone "Confiabilidad por módulo" entre alertas y Torre de control. `Ops Health` y `Cloud & Integrations` preservan su lectura técnica especializada.
+- **Boundaries explícitos**: `TASK-586` (billing/notion-bq-sync), `TASK-599` (finance smoke lane) y `TASK-103` (budget alerts) tienen un `ReliabilityIntegrationBoundary` declarado para enchufar sus señales sin redefinir contratos.
+
 ### 2026-04-25 — API Platform ya considera mobile app como consumer first-party oficial
 
 - `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` ahora deja explícito que la plataforma API también debe servir a futuras apps `iOS` y `Android`.
