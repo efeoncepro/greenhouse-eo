@@ -1,10 +1,10 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.9
+> **Version:** 1.9.1
 > **Creado:** 2026-04-24 por Julio + Claude
-> **Status:** Active (programa CPQ completo: Bloque 0 Domain Separation + A eSignature + B Rich Text + C Catalog + D Composer + E Cross-cutting; 6 capas no-ruptura + feature flag matrix + runway deprecacion documentado)
-> **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync + Sellable Catalog Unification + Commercial Domain Separation
+> **Status:** Active (programa CPQ completo + blindaje TASK-631 Fase 4 productivo: TASK-631.1 + 631.2 prerequisite del programa)
+> **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync + Sellable Catalog Unification + Commercial Domain Separation + Quote Share Pipeline Hardening
 
 **Actualizaciones:**
 
@@ -16,6 +16,7 @@
 - v1.6 (2026-04-25): **TASK-619 re-scoped a ZapSign** — DocuSign descartado tras descubrir que ZapSign ya está integrado en prod (Master Agreements). ZapSign es LATAM-native (Brasilera), 5–10x más barato/envelope que DocuSign, soporta WhatsApp + email automático nativo, y ya tiene cliente API + webhook handler funcionando en repo. Capa `eSignatureProvider` interface se mantiene para permitir DocuSign/Adobe Sign como secundarios si un cliente enterprise lo exige. Estimación TASK-619 baja de 2 sprints → ~5 días (solo orquestación + fields nuevos en `quotations` + UI; reusa [src/lib/integrations/zapsign/client.ts](../../src/lib/integrations/zapsign/client.ts) y [src/app/api/webhooks/zapsign/route.ts](../../src/app/api/webhooks/zapsign/route.ts)).
 - v1.7 (2026-04-25): **TASK-619 expandida al camino largo (defense-in-depth + multi-domain reuse)** — Tras audit de gaps con owner se decide ir por la opcion mas resiliente, robusta y escalable. Se renuncia al short path (~6.5 dias) en favor de la cadena completa: TASK-489 (foundation documental) → TASK-490 (signature aggregate neutro con XState formal + provider interface real) → TASK-491 (ZapSign adapter con circuit breaker + dedup + DLQ) → TASK-619 (consumer del foundation, mucho mas liviano) + 3 tasks derivadas: TASK-619.1 (storage hardening: bucket separado + retention 10 anos + multi-region replica), TASK-619.2 (worker operacional: reconciliation 6h + expiry alerting + DLQ replay), TASK-619.3 (notificaciones: 3 reactores email/in-app/Slack independientes). Ganancia: HR contracts (TASK-027) reusa foundation gratis + compliance LATAM defendible legalmente + multi-provider real. Costo: estimacion total ~20 dias (~4 semanas) en vez de 6.5 dias short path.
 - v1.8 (2026-04-25): **Bloques B + C + D agregados (rich text editor + sellable catalog unification + composer with native nesting + tool partner program). TASK-627 cancelada (absorbida en TASK-620.3).** Tras conversacion con owner sobre 2 temas pendientes (productos sin descripcion + composer de bundles), se decide: (B) TipTap editor reusable como `<GreenhouseRichTextEditor>` + backfill productos legacy + AI-assisted generator. (C) Sellable Catalog Unification: 4 dimensiones canonicas (sellable_roles ya existente + sellable_tools NUEVO + sellable_artifacts NUEVO con pricing hibrido + service_modules existente extendido con nesting). (D) Composer visual con nesting nativo desde dia 1 (depth max 3, cycle detection en trigger DB + UI), constraint rules tipadas con suggested fixes, picker unificado a 4 catalogos en quote builder, modal ad-hoc bundles persistentes con promote-to-catalog. Adicional: tool partner program (Adobe / Microsoft / HubSpot reseller tracking + commission accounting + HubSpot sync con product_type='tool_license'). Estimacion programa total: ~44 dias (~9 semanas con 1 dev). 11 tasks creadas/canceladas (TASK-620 + 620.1 + 620.1.1 + 620.2 + 620.3 + 620.4 + 620.5 + TASK-630 + 630.1 + 630.2; TASK-627 cancelada).
+- v1.9.1 (2026-04-25): **Blindaje del quote-share pipeline productivo (TASK-631 Fase 4) antes de iniciar el programa CPQ v1.9.** Tras pregunta del owner "como aseguramos lo que hicimos de la generacion de PDF, de mail, y el link compartido no se rompa", se documentan 3 dimensiones de proteccion (tests defensivos + contracts versionados + compat checks per task) + se crean 2 tasks prerequisite obligatorias antes de TASK-554 / 619 / 620.x / 625 / 626 / 628: TASK-631.1 (Quote Share Pipeline Hardening Test Suite, ~2 dias) + TASK-631.2 (Contract Version Enforcement, ~1 dia). Se mapea el blast radius: 9 tasks del programa CPQ tocan directa o indirectamente el quote-share pipeline. Cada spec afectado debe agregar seccion "Quote Share Compat Check". Total: +3 dias agregados al programa CPQ (~88 dias = ~18 semanas con 1 dev = ~9-10 semanas con 2 devs paralelos). 2 nuevas tasks reservadas en TASK_ID_REGISTRY (TASK-631.1, TASK-631.2).
 - v1.9 (2026-04-25): **Programa CPQ completo: Bloque 0 (Commercial Domain Separation EPIC-002 integrado) + Bloque E (cross-cutting hardening) + 14 gaps criticos cerrados + estrategia no-ruptura formalizada.** Tras pregunta del owner "como lo hacemos para que no rompa lo existente", se documenta: (1) Strangler Fig Pattern + 6 capas no-ruptura (schema aditivo, dual-namespace endpoints, sidebar feature-flagged, components con error boundary fallback, expand engine flat preservado, eventos outbox aditivos). (2) Feature Flag Matrix con 13 flags productivos (infra ya existe en `client_feature_flags`). (3) Runway de deprecacion 30-90 dias por elemento legacy. (4) Plan de rollback < 5 min por bloque. (5) Quote regression suite bloqueante en CI. (6) Bloque 0 (EPIC-002 TASK-554-557) integrado como prerequisite UX/access del programa CPQ con coordinacion de merge ordering documentada. (7) 14 gaps criticos resueltos: lifecycle/sunset catalog (TASK-620.7), soft delete unificado, HubSpot bidirectional signature sync (TASK-619.4), expand cache (TASK-620.3 amplificado), legacy quotes cleanup (TASK-557.1), cost guardrails per tenant (TASK-619.5), GDPR signer anonymization (TASK-619.5), audit timeline UI (TASK-628.1), i18n del programa (TASK-625 expandido), analytics CPQ (TASK-621 expandido), quote cloning (TASK-627.1 reusa ID liberado), HubSpot field mapping detallado (TASK-620.6), DR runbooks per provider, permission granularity hierarchy (TASK-622 expandido). (8) 7 tasks faltantes creadas (621/622/623/624/625/626/628). (9) 9 deseables Fase 2 documentados explicitamente. (10) 7 fuera-de-scope cross-referenced a sus programas correspondientes. **Estimacion programa total: ~90-92 dias (~18-19 semanas con 1 dev, ~9-10 semanas con 2 devs en paralelo).** 23 tasks nuevas reservadas en TASK_ID_REGISTRY.
 
 **Documentacion tecnica relacionada:**
@@ -1290,6 +1291,158 @@ Semana 18:   Buffer + smoke tests E2E + documentation + training operadores
 ```
 
 Con 2 devs en paralelo: ~9 semanas. Con 1 dev sequencial: ~17-18 semanas.
+
+## Delta 2026-04-25 (v1.9.1) — Blindaje TASK-631 Fase 4 quote-share pipeline antes del programa CPQ
+
+Tras pregunta del owner "como aseguramos lo que hicimos de la generacion de PDF, de mail, y el link compartido no se rompa", se documentan las 3 dimensiones de proteccion del quote-share pipeline productivo (TASK-631 Fase 4) + se crean 2 tasks defensivas obligatorias **antes** de iniciar TASK-554 / 619 / 620.x / 625 / 626 / 628.
+
+### Superficie a proteger (blast radius)
+
+**4 archivos productivos criticos:**
+
+- `src/lib/finance/quote-share/quote-pdf-asset.ts` — cache GCS + regeneration (`getOrCreateQuotePdfBuffer`)
+- `src/lib/finance/quote-share/load-quote-for-pdf-internal.ts` — internal loader (consumido por cache)
+- `src/lib/finance/quote-share/short-link.ts` — short codes + HMAC
+- `src/lib/finance/quote-share/view-tracker.ts` — analytics de hits
+
+**8 endpoints productivos criticos:**
+
+- `GET /api/finance/quotes/[id]/pdf` (autenticado, refactored a usar cache)
+- `POST /api/finance/quotes/[id]/share` (genera short code)
+- `GET /api/finance/quotes/[id]/share/[shortCode]` (info del share)
+- `GET /api/finance/quotes/[id]/share/[shortCode]/pdf-size` (lightweight)
+- `POST /api/finance/quotes/[id]/share/[shortCode]/send-email` (email + PDF cached)
+- `POST /api/finance/quotes/[id]/share/[shortCode]/resend-email` (resend)
+- `GET /q/[shortCode]` (redirect publico al PDF)
+- `GET /public/quote/[quotationId]/[versionNumber]/[token]` (verificacion QR)
+
+**Tests existentes (insuficientes para el blast radius futuro):**
+
+- `accept-quote-validation.test.ts`, `short-link.test.ts`, `url-builder.test.ts`, `qr-verification.test.ts`
+
+**Tests faltantes hoy (riesgo invisible):** sin coverage del cache layer, sin coverage GCS upload/download, sin coverage E2E del email send, sin regression byte-perfect del PDF rendering, sin tests del short-link + redirect + view-tracker combinados.
+
+### 3 Dimensiones de proteccion
+
+#### Dimension 1 — Tests defensivos exhaustivos (TASK-631.1)
+
+**Quote Share Pipeline Hardening Test Suite** — 7 archivos de test cubriendo todo el pipeline:
+
+| Suite | Cobertura | Bloqueante en CI |
+| --- | --- | --- |
+| `quote-pdf-asset.test.ts` | cache hit / cache miss / regeneration / GCS download fallback / template_version mismatch | si |
+| `load-quote-for-pdf-internal.test.ts` | Loader contract: snapshot inputs producen output deterministico | si |
+| `pdf-rendering-snapshot.test.ts` | 5 quotes representativas (enterprise + compact + mixed FX + with QR + with sub-brand) -> PDF buffer SHA-256 identico pre/post deploy | si (quote regression suite del Bloque 0) |
+| `share-flow-e2e.test.ts` | Crear share -> enviar email mock -> resend con idempotency-key -> verificar 1 sola entrega | si |
+| `short-link-redirect.test.ts` | `/q/[shortCode]` -> resolve -> redirect -> view-tracker registra hit | si |
+| `public-verification.test.ts` | Token HMAC valido -> "documento autentico"; alterado -> "documento invalido" | si |
+| `gcs-lifecycle-fallback.test.ts` | Mock GCS object 404 -> cache layer regenera + reuploads sin perder request del usuario | si |
+
+**Estrategia golden file:** 5 quote inputs JSON snapshots versionados en git + 5 SHA-256 buffers golden. Cualquier cambio futuro al PDF rendering cambia el SHA → test rechaza merge unless dev regenera explicitamente con `pnpm test:quote-share:update-golden`.
+
+**Esfuerzo:** ~2 dias.
+
+#### Dimension 2 — Contracts versionados (TASK-631.2)
+
+**Contract Version Enforcement** — formaliza 4 frozen contracts del quote-share pipeline:
+
+| Contract | Hoy | Despues de TASK-631.2 |
+| --- | --- | --- |
+| `RenderQuotationPdfInput` interface | mutable, edits silenciosos | versionada (`v1`, `v2`...) con `as const` + `readonly` everywhere; backward-compat tests obligatorios |
+| `QUOTE_PDF_TEMPLATE_VERSION` constante | manual bump | bump automatico via CI gate que detecta diff del contract y exige bump |
+| Short link `shortCode` format | implicito | locked en `SHORT_LINK_FORMAT` constante + test de uniqueness collision |
+| Email template variable shape (`context`) | mutable sin validation | versionada con Zod schemas; runtime validation en endpoints (fail-fast en payload invalido) |
+| GCS object path `quotation-pdfs/{id}/v{N}/...` | implicito | constantes exportadas en `gcs-paths.ts` + test de path stability |
+
+**Mecanismo:** snapshot tests con structure serialization sorted alphabetically. Breaking change al contract = rechazo en CI. Para cambio legitimo: regenerar snapshot + bump version + actualizar consumers.
+
+**Esfuerzo:** ~1 dia.
+
+#### Dimension 3 — Backwards-compat checks per task del programa CPQ
+
+Cada task que toca el quote-share pipeline debe declarar en su spec una seccion **"Quote Share Compat Check"** con 4 preguntas:
+
+1. ¿Modifica el contract `RenderQuotationPdfInput`? -> Si si, bump `QUOTE_PDF_TEMPLATE_VERSION` + regenerar golden files
+2. ¿Modifica `loadInternalPdfInputForQuote` output? -> Si si, asegurar que cache layer re-renderiza correctamente al primer hit post-deploy
+3. ¿Modifica el flow de email send? -> Si si, validar idempotency-key cache no se invalida
+4. ¿Modifica el short-link table? -> Si si, migracion aditiva + dual-read durante runway
+
+### Mapping de blast radius — qué tasks del programa CPQ tocan quote-share
+
+| Task | Toca quote-share? | Vector de riesgo | Mitigacion |
+| --- | --- | --- | --- |
+| **TASK-619** signature | si — agrega signature panel al drawer + bloqueo send-email cuando `pending_*` | Email send podria fallar si quote pasa a `pending_client` mientras user esta en send drawer | Cache layer NO afectado; agregar gate al endpoint send-email + test de regresion |
+| **TASK-619.4** HubSpot bidirectional | no (solo deal stage sync) | cero | n/a |
+| **TASK-619.5** cost guardrails | si — quota check en send-email endpoint | Quota exceeded podria romper resend que antes funcionaba | Default tenant_quotas alto inicial (1000/mes) + soft warning antes de hard block |
+| **TASK-620** sellable catalog | indirecto — `loadInternalPdfInputForQuote` lee composition que ahora puede tener tools/artifacts | PDF rendering podria faltar nuevos campos | Loader extiende output **aditivamente**; PDF template renderea condicionalmente (no breaking) |
+| **TASK-620.3** composer + nesting | si — composition en quote_line_items puede ser nested ahora | PDF flat no entiende nesting | Loader `expand` produce flat lines (caso flat preservado); PDF v1 sigue funcionando |
+| **TASK-620.4** picker + 620.5 ad-hoc | si — line items pueden ahora venir de catalog_search (no module_id) | Loader debe leer ambos paths | Snapshot pricing en `quotation_line_items` ya inmutable; loader no rompe |
+| **TASK-620.6** HubSpot field mapping | no directo | cero | n/a |
+| **TASK-620.7** catalog lifecycle | indirecto — quote vigente con item archived | Loader podria fallar si item archived = NULL en JOIN | LEFT JOIN + COALESCE preserva snapshot ya guardado |
+| **TASK-625** i18n | si — PDF + email + ZapSign en idioma del cliente | Strings ES hardcoded romperian cliente EN | Translation files + fallback a `'es'` si key falta |
+| **TASK-626** tax engine | si — PDF tax breakdown section | Plugin nuevo CO/MX/PE no debe romper render CL | Default plugin `cl-iva` sigue activo si country no especificado |
+| **TASK-627.1** quote cloning | si — clone genera nueva quote que va a tener nuevo PDF | cero (es create new, no modify existing) | n/a |
+| **TASK-628** amendment | si — amendment doc tiene su propio PDF | PDF amendment NO debe usar mismo cache key que quote original | Nuevo bucket prefix `amendment-pdfs/` separado |
+| **TASK-628.1** audit timeline | no | cero | n/a |
+| **TASK-554-557** EPIC-002 | si — sidebar + paths + breadcrumbs | URLs `/finance/quotes/.../share/...` deben seguir funcionando | EPIC-002 declara explicitamente "paths legacy intactos" |
+
+### Plan unificado v1.9.1 (actualizado vs v1.9)
+
+| Bloque | Tasks | Esfuerzo | Status |
+| --- | --- | --- | --- |
+| **Prerequisite: Quote Share Hardening** (NUEVO) | 631.1 + 631.2 | ~3 dias | Diseno cerrado v1.9.1, **bloquea Bloques 0 / A / B / C / D / E** |
+| **0. Commercial Domain Separation** | 554 + 555 + 556 + 557 + 557.1 | ~11 dias | v1.9 |
+| **A. eSignature long path** | 489 → 490 → 491 → 619 + 619.1/2/3 | ~20 dias | v1.7 |
+| **B. Rich text editor** | 630 + 630.1 + 630.2 | ~4 dias | v1.8 |
+| **C. Sellable catalog unification** | 620 + 620.1 + 620.1.1 + 620.2 | ~8.5 dias | v1.8 |
+| **D. Composer with native nesting** | 620.3 + 620.4 + 620.5 | ~9 dias | v1.8 |
+| **E. Cross-cutting hardening** | 619.4 + 619.5 + 620.6 + 620.7 + 621 + 622 + 623 + 624 + 625 + 626 + 627.1 + 628 + 628.1 | ~32.5 dias | v1.9 |
+
+**Total programa CPQ v1.9.1: ~88 dias = ~18 semanas con 1 dev = ~9-10 semanas con 2 devs paralelos.** (vs ~85 dias v1.9, +3 dias por hardening prerequisite)
+
+### Recomendacion de orden de ejecucion v1.9.1
+
+```text
+Semana 0:    Prerequisite Hardening (TASK-631.1 + 631.2) — 3 dias antes de cualquier task del programa CPQ
+
+Semana 1-2:  Bloque 0 (TASK-554 + 555 + 557.1)
+             en paralelo: TASK-489 (foundation documental, no bloquea)
+
+Semana 3-4:  Bloque 0 finishing (TASK-556 + 557)
+             Bloque B (rich text editor: 630 + 630.1 + 630.2)
+             en paralelo: TASK-490 (signature foundation)
+
+Semana 5-6:  Bloque C (sellable catalog: 620 + 620.1 + 620.1.1 + 620.2)
+             en paralelo: TASK-491 (ZapSign adapter)
+
+Semana 7-9:  Bloque D (composer + picker + ad-hoc: 620.3 + 620.4 + 620.5)
+             en paralelo: TASK-619 + 619.1 + 619.2 + 619.3
+
+Semana 10-13: Bloque E primer batch (619.4 + 619.5 + 620.6 + 620.7 + 627.1 + 628.1)
+
+Semana 14-17: Bloque E segundo batch (621 + 622 + 623 + 624 + 625 + 626 + 628)
+
+Semana 18:   Buffer + smoke tests E2E + documentation + training operadores
+```
+
+### Decision cerrada en v1.9.1 (39 total — extiende las 38 cerradas en v1.9)
+
+| # | Decision | Resolucion |
+| --- | --- | --- |
+| 39 | Como blindar TASK-631 Fase 4 productivo antes del programa CPQ | **Suite de tests defensivos (TASK-631.1) + frozen contracts (TASK-631.2) como prerequisite obligatorio** + seccion "Quote Share Compat Check" en cada spec del programa CPQ que toca el pipeline. Bloqueante en CI. |
+
+### ROI del prerequisite
+
+| Metrica | Antes (sin TASK-631.1/.2) | Despues |
+| --- | --- | --- |
+| Tiempo deteccion regresion en quote-share | 2-24h (post-deploy, reportado por cliente) | < 30s (CI bloqueado pre-merge) |
+| QA manual por deploy del programa CPQ | ~2h (verificar PDF + email + short-link manualmente) | < 5min (suite automatica) |
+| Bugs introducidos al modificar contracts | promedio 1-2 por task (12-24 bugs en programa completo) | 0 (CI rechaza el merge) |
+| Costo total programa CPQ con bugs reactivos (estimado) | +5-10 dias de hotfixes diluidos | +0 (todo capturado en pre-merge) |
+
+Inversion: 3 dias.
+Ahorro estimado: 5-10 dias.
+**ROI: ~2-3x positivo + reduccion de riesgo reputacional con clientes.**
 
 ## Referencias
 

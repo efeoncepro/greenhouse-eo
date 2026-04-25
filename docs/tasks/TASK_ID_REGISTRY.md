@@ -699,4 +699,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-627.1` | `to-do` | Quote Cloning + Templating from Prior Quote (POST /clone, override cliente/version/pricing) | `docs/tasks/to-do/TASK-627.1-quote-cloning-templating.md` |
 | `TASK-628` | `to-do` | Quote Amendment Engine (amendment vs re-quote, signed quotes mantienen continuidad legal) | `docs/tasks/to-do/TASK-628-quote-amendment-engine.md` |
 | `TASK-628.1` | `to-do` | Audit Timeline UI (visibility en QuoteDetailView de audit_log + outbox events + diff viewer entre versiones) | `docs/tasks/to-do/TASK-628.1-audit-timeline-ui.md` |
+| `TASK-631.1` | `to-do` | Quote Share Pipeline Hardening Test Suite (PDF cache + email + short-link + redirect blast-radius coverage) | `docs/tasks/to-do/TASK-631.1-quote-share-pipeline-hardening-tests.md` |
+| `TASK-631.2` | `to-do` | Contract Version Enforcement (frozen contracts + auto-bump QUOTE_PDF_TEMPLATE_VERSION + Zod schemas) | `docs/tasks/to-do/TASK-631.2-contract-version-enforcement.md` |
 | `TASK-629` | `complete` | PDF Cotización Enterprise Redesign (single template + secciones condicionales + brand assets + QR signed) | `docs/tasks/complete/TASK-629-pdf-cotizacion-enterprise-redesign.md` |
