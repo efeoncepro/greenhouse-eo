@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import { Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 
 import type { QuotationPdfLegalEntity, QuotationPdfVerification } from '../contracts'
 import { PdfColors, PdfFonts, PdfRadii, PdfSpacing } from '../tokens'
@@ -78,7 +78,12 @@ const styles = StyleSheet.create({
   verifyQr: {
     width: 80,
     height: 80,
-    backgroundColor: '#000',
+    borderRadius: 4
+  },
+  verifyQrPlaceholder: {
+    width: 80,
+    height: 80,
+    backgroundColor: PdfColors.divider,
     borderRadius: 4
   },
   verifyCopy: { flex: 1 },
@@ -174,7 +179,11 @@ export const SignaturesPage = (props: SignaturesPageProps) => {
         </View>
         {props.verification ? (
           <View style={styles.verifyBlock}>
-            <View style={styles.verifyQr} />
+            {props.verification.qrDataUrl ? (
+              <Image src={props.verification.qrDataUrl} style={styles.verifyQr} />
+            ) : (
+              <View style={styles.verifyQrPlaceholder} />
+            )}
             <View style={styles.verifyCopy}>
               <Text style={styles.verifyTitle}>Verifica la autenticidad</Text>
               <Text style={styles.verifyBody}>

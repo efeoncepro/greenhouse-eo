@@ -10,8 +10,15 @@ import type {
   QuotationPdfFxFooter,
   QuotationPdfLegalEntity,
   QuotationPdfSalesRep,
+  QuotationPdfVerification,
   RenderQuotationPdfInput
 } from '@/lib/finance/pdf/contracts'
+import {
+  buildShortVerificationLabel,
+  buildVerificationUrl,
+  computePdfContentHash,
+  generateVerificationQrDataUrl
+} from '@/lib/finance/pdf/qr-verification'
 import { DEFAULT_LEGAL_ENTITY } from '@/lib/finance/pdf/tokens'
 import { extractQuotationFxSnapshot } from '@/lib/finance/quotation-fx-snapshot'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
@@ -153,12 +160,28 @@ export async function GET(
     organizationName = org?.organization_name || org?.legal_name || null
   }
 
+  // TASK-629 — JOIN product_catalog for productCode + descriptionRichHtml.
+  // LEFT JOIN: lines without product_id (manual lines) still render fine.
+  // Bundle grouping (bundleId/bundleLabel) deferred to TASK-620 when the
+  // schema gets a service_module reference column.
   const lineRows = await query<QuotationLineRow>(
-    `SELECT label, description, quantity, unit, unit_price, subtotal_after_discount,
-            sort_order, created_at
-       FROM greenhouse_commercial.quotation_line_items
-       WHERE quotation_id = $1 AND version_number = $2
-       ORDER BY sort_order ASC NULLS LAST, created_at ASC NULLS LAST`,
+    `SELECT li.label,
+            li.description,
+            li.quantity,
+            li.unit,
+            li.unit_price,
+            li.subtotal_after_discount,
+            li.sort_order,
+            li.created_at,
+            pc.product_code,
+            pc.description_rich_html AS product_description_rich_html,
+            NULL::text AS bundle_id,
+            NULL::text AS bundle_label
+       FROM greenhouse_commercial.quotation_line_items li
+       LEFT JOIN greenhouse_commercial.product_catalog pc
+         ON pc.product_id = li.product_id
+       WHERE li.quotation_id = $1 AND li.version_number = $2
+       ORDER BY li.sort_order ASC NULLS LAST, li.created_at ASC NULLS LAST`,
     [identity.quotationId, header.current_version]
   )
 
@@ -304,7 +327,40 @@ export async function GET(
     terms: includedTerms,
     fxFooter,
     salesRep,
-    legalEntity
+    legalEntity,
+    verification: null as QuotationPdfVerification | null
+  }
+
+  // TASK-629 — QR verification (Decision 5 v1.3): signed token + PNG data URL.
+  // Falla cerrado: si no hay GREENHOUSE_QUOTE_VERIFICATION_SECRET, omitimos QR.
+  try {
+    const pdfHash = computePdfContentHash({
+      quotationId: identity.quotationId,
+      versionNumber,
+      total: pdfInput.totals.total,
+      currency,
+      lineCount: lineRows.length
+    })
+
+    const tokenInput = {
+      quotationId: identity.quotationId,
+      versionNumber,
+      pdfHash
+    }
+
+    const publicUrl = buildVerificationUrl(tokenInput)
+
+    if (publicUrl) {
+      const qrDataUrl = await generateVerificationQrDataUrl(tokenInput)
+
+      pdfInput.verification = {
+        publicUrl,
+        shortLabel: buildShortVerificationLabel(tokenInput),
+        qrDataUrl
+      }
+    }
+  } catch {
+    // Best-effort — verification block is optional in the PDF.
   }
 
   const pdfBuffer = await renderQuotationPdf(pdfInput)

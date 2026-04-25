@@ -140,6 +140,7 @@ export interface QuotationPdfPaymentMethods {
 export interface QuotationPdfVerification {
   publicUrl: string         // Full URL with signed token
   shortLabel: string        // For displaying inside the QR's caption
+  qrDataUrl: string | null  // PNG data URL ready for <Image src={...}>; null when secret not configured
 }
 
 /**

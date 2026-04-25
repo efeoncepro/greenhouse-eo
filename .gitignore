@@ -76,3 +76,6 @@ src/assets/iconify-icons/generated-icons.css
 **/__pycache__/
 *.pyc
 *.pyo
+
+# Local PDF render scratch (test artifacts, not committed)
+/tmp/

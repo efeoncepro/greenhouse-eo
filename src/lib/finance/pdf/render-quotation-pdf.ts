@@ -5,6 +5,7 @@ import { createElement } from 'react'
 import { renderToBuffer } from '@react-pdf/renderer'
 
 import { QuotationPdfDocument } from './quotation-pdf-document'
+import { ensurePdfFontsRegistered } from './register-fonts'
 
 import type { RenderQuotationPdfInput } from './contracts'
 
@@ -29,6 +30,9 @@ export type {
 export const renderQuotationPdf = async (
   input: RenderQuotationPdfInput
 ): Promise<Buffer> => {
+  // Idempotente + cache-once: garantiza fonts disponibles antes de render.
+  await ensurePdfFontsRegistered()
+
   const element = createElement(QuotationPdfDocument, { input })
 
   // `renderToBuffer` types the argument as ReactElement<DocumentProps> (a
