@@ -672,4 +672,15 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-619.1` | `to-do` | Signed PDF Storage Hardening (bucket separado + retention 10 anos + multi-region) | `docs/tasks/to-do/TASK-619.1-signed-pdf-storage-hardening.md` |
 | `TASK-619.2` | `to-do` | Signature Operational Worker (reconciliation + expiry alerting + DLQ) | `docs/tasks/to-do/TASK-619.2-signature-operational-worker.md` |
 | `TASK-619.3` | `to-do` | Quote Signature Notifications (email + in-app + Slack reactors) | `docs/tasks/to-do/TASK-619.3-quote-signature-notifications.md` |
+| `TASK-620` | `to-do` | Sellable Catalog Unification (sellable_tools + sellable_artifacts + service_module_children schema desde dia 1) | `docs/tasks/to-do/TASK-620-sellable-catalog-unification.md` |
+| `TASK-620.1` | `to-do` | Tools as Sellable Standalone (refactor service_tool_recipe -> sellable_tools FK + canonical pricing) | `docs/tasks/to-do/TASK-620.1-tools-as-sellable-standalone.md` |
+| `TASK-620.1.1` | `to-do` | Tool Partner Program (Adobe / Microsoft / HubSpot reseller tracking + commission accounting) | `docs/tasks/to-do/TASK-620.1.1-tool-partner-program.md` |
+| `TASK-620.2` | `to-do` | Artifacts Catalog (sellable_artifacts hibrido: priced standalone o absorbido en horas) | `docs/tasks/to-do/TASK-620.2-artifacts-catalog.md` |
+| `TASK-620.3` | `to-do` | Service Module Composer with Native Nesting (composer recursivo depth 3 + cycle detection + constraints UI nesting-aware) | `docs/tasks/to-do/TASK-620.3-service-module-composer-native-nesting.md` |
+| `TASK-620.4` | `to-do` | Quote Builder Direct Picker (autocomplete a 4 catalogos: roles + tools + artifacts + services) | `docs/tasks/to-do/TASK-620.4-quote-builder-direct-picker.md` |
+| `TASK-620.5` | `to-do` | Ad-hoc Bundle Composer in Quote (modal inline + flag is_ad_hoc + promote-to-catalog) | `docs/tasks/to-do/TASK-620.5-adhoc-bundle-composer.md` |
+| `TASK-627` | `cancelled` | Service Bundle Nesting (ABSORBIDA en TASK-620.3 v1.8 — nesting in-baked desde dia 1) | `docs/tasks/cancelled/TASK-627-service-bundle-nesting.md` |
+| `TASK-630` | `to-do` | Rich Text Editor TipTap en admin product-catalog (componente reusable GreenhouseRichTextEditor) | `docs/tasks/to-do/TASK-630-rich-text-editor-tiptap.md` |
+| `TASK-630.1` | `to-do` | Backfill productos legacy con descripcion plana envuelta en `<p>` (74 productos) | `docs/tasks/to-do/TASK-630.1-backfill-products-rich-html.md` |
+| `TASK-630.2` | `to-do` | AI-assisted Description Generator (boton Generar con AI usando @google/genai) | `docs/tasks/to-do/TASK-630.2-ai-description-generator.md` |
 | `TASK-629` | `complete` | PDF Cotización Enterprise Redesign (single template + secciones condicionales + brand assets + QR signed) | `docs/tasks/complete/TASK-629-pdf-cotizacion-enterprise-redesign.md` |

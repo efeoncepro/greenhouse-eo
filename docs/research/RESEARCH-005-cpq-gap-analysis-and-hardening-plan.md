@@ -1,10 +1,10 @@
 # RESEARCH-005 — CPQ Gap Analysis & Hardening Plan
 
 > **Tipo de documento:** Research brief (auditoria + roadmap)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-04-24 por Julio + Claude
-> **Status:** Active (TASK-629 implementada y deployada; TASK-619 expandida a EPIC-001 con foundation neutro)
-> **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync
+> **Status:** Active (3 programas live: A=eSignature long path, B=Rich text editor, C+D=Sellable catalog unification + composer with native nesting)
+> **Alcance:** Modulo Cotizaciones + Product Catalog + HubSpot Sync + Sellable Catalog Unification
 
 **Actualizaciones:**
 
@@ -15,6 +15,7 @@
 - v1.5 (2026-04-24): **TASK-629 IMPLEMENTADA** — PDF enterprise rediseño live en develop. 8 secciones modulares + tokens DM Sans+Poppins + QR signed HMAC + sub-brand PNG pipeline + product_catalog JOIN + endpoint público de verificación + 33 tests unitarios. Render validado end-to-end (enterprise 84KB / compact 52KB). Único follow-up: setear `GREENHOUSE_QUOTE_VERIFICATION_SECRET` en Vercel prod (sin esto el QR se omite gracefully).
 - v1.6 (2026-04-25): **TASK-619 re-scoped a ZapSign** — DocuSign descartado tras descubrir que ZapSign ya está integrado en prod (Master Agreements). ZapSign es LATAM-native (Brasilera), 5–10x más barato/envelope que DocuSign, soporta WhatsApp + email automático nativo, y ya tiene cliente API + webhook handler funcionando en repo. Capa `eSignatureProvider` interface se mantiene para permitir DocuSign/Adobe Sign como secundarios si un cliente enterprise lo exige. Estimación TASK-619 baja de 2 sprints → ~5 días (solo orquestación + fields nuevos en `quotations` + UI; reusa [src/lib/integrations/zapsign/client.ts](../../src/lib/integrations/zapsign/client.ts) y [src/app/api/webhooks/zapsign/route.ts](../../src/app/api/webhooks/zapsign/route.ts)).
 - v1.7 (2026-04-25): **TASK-619 expandida al camino largo (defense-in-depth + multi-domain reuse)** — Tras audit de gaps con owner se decide ir por la opcion mas resiliente, robusta y escalable. Se renuncia al short path (~6.5 dias) en favor de la cadena completa: TASK-489 (foundation documental) → TASK-490 (signature aggregate neutro con XState formal + provider interface real) → TASK-491 (ZapSign adapter con circuit breaker + dedup + DLQ) → TASK-619 (consumer del foundation, mucho mas liviano) + 3 tasks derivadas: TASK-619.1 (storage hardening: bucket separado + retention 10 anos + multi-region replica), TASK-619.2 (worker operacional: reconciliation 6h + expiry alerting + DLQ replay), TASK-619.3 (notificaciones: 3 reactores email/in-app/Slack independientes). Ganancia: HR contracts (TASK-027) reusa foundation gratis + compliance LATAM defendible legalmente + multi-provider real. Costo: estimacion total ~20 dias (~4 semanas) en vez de 6.5 dias short path.
+- v1.8 (2026-04-25): **Bloques B + C + D agregados (rich text editor + sellable catalog unification + composer with native nesting + tool partner program). TASK-627 cancelada (absorbida en TASK-620.3).** Tras conversacion con owner sobre 2 temas pendientes (productos sin descripcion + composer de bundles), se decide: (B) TipTap editor reusable como `<GreenhouseRichTextEditor>` + backfill productos legacy + AI-assisted generator. (C) Sellable Catalog Unification: 4 dimensiones canonicas (sellable_roles ya existente + sellable_tools NUEVO + sellable_artifacts NUEVO con pricing hibrido + service_modules existente extendido con nesting). (D) Composer visual con nesting nativo desde dia 1 (depth max 3, cycle detection en trigger DB + UI), constraint rules tipadas con suggested fixes, picker unificado a 4 catalogos en quote builder, modal ad-hoc bundles persistentes con promote-to-catalog. Adicional: tool partner program (Adobe / Microsoft / HubSpot reseller tracking + commission accounting + HubSpot sync con product_type='tool_license'). Estimacion programa total: ~44 dias (~9 semanas con 1 dev). 11 tasks creadas/canceladas (TASK-620 + 620.1 + 620.1.1 + 620.2 + 620.3 + 620.4 + 620.5 + TASK-630 + 630.1 + 630.2; TASK-627 cancelada).
 
 **Documentacion tecnica relacionada:**
 
@@ -985,6 +986,117 @@ La secuenciacion P2 Fase 1 cambia: ahora TASK-619 deja de ser standalone (~5-6.5
 ### Decisiones cerradas (24 total — extiende las 17 cerradas en v1.3)
 
 Ver tabla completa en `docs/tasks/to-do/TASK-619-quote-esignature-zapsign.md` seccion "Decisions Cerradas".
+
+## Delta 2026-04-25 (v1.8) — Bloques B + C + D + tool partner program (44 dias programa total)
+
+Tras conversacion con owner sobre 2 temas pendientes que el plan actual no atacaba completamente:
+
+1. **Productos sin descripcion + librerias para HubSpot sync** — gap real es que `descriptionRichHtml` es textarea pelado, nadie escribe HTML manual. TipTap esta instalado pero no se usa. 74 productos vacios.
+2. **Composer de service bundles** — necesidad de soportar 4 patrones de venta (persona sola / herramienta sola / persona+herramienta / servicio empaquetado con artefactos + sub-servicios anidados). Modelo actual solo cubre el ultimo.
+
+Y 6 decisiones tomadas con criterio robusto/escalable + 1 confirmacion explicita del owner sobre nesting.
+
+### Bloque B — Rich text editor + descriptions
+
+3 tasks creadas:
+
+| Task | Alcance | Esfuerzo |
+| --- | --- | --- |
+| **TASK-630** | Componente `<GreenhouseRichTextEditor>` reusable con TipTap (instalado v3.14.0), 3 variantes toolbar (minimal/standard/extended), integrado en ProductCatalogDetailView reemplazando textarea | ~2 dias |
+| **TASK-630.1** | Backfill operativo: para los 74 productos legacy, envolver `description` plano como `<p>{escaped}</p>` en `description_rich_html` para que PDF renderice algo | ~0.25 dia |
+| **TASK-630.2** | AI-assisted generator: boton "Generar con AI" en toolbar extended que usa @google/genai (ya en repo), prompt template per-tipo (product/service/role/tool/artifact), credit tracking + rate limit | ~1.5 dias |
+
+Total Bloque B: **~4 dias**.
+
+### Bloque C — Sellable Catalog Unification
+
+Modelo del catalogo extendido a **4 dimensiones canonicas**:
+
+```text
+Catalogo de "vendibles" canonico:
+  ┌─────────────────────────────────────────────────────────┐
+  │ 1. sellable_roles      → Senior Designer, Strategy Lead  │
+  │ 2. sellable_tools      → Figma seat, Adobe CC seat       │
+  │ 3. sellable_artifacts  → Brand book, Video manifesto     │
+  │ 4. service_modules     → Bundle de los 3 anteriores      │
+  └─────────────────────────────────────────────────────────┘
+                                ↓
+                    Quote line items materializados
+```
+
+4 tasks creadas:
+
+| Task | Alcance | Esfuerzo |
+| --- | --- | --- |
+| **TASK-620** | Migracion atomica: tool_partners + sellable_tools + sellable_tool_pricing_currency + sellable_tool_pricing_tier + sellable_artifacts + sellable_artifact_pricing_currency + service_module_children + has_cycle function + trigger BEFORE INSERT/UPDATE + depth check 3. Seed 3 partners (Adobe/Microsoft/HubSpot). | ~2 dias |
+| **TASK-620.1** | Refactor `service_tool_recipe.tool_id` -> FK a `sellable_tools` (en vez de `ai.tool_catalog` legacy). Backfill desde `ai.tool_catalog`. Pricing canonico + override opcional en recipe. Endpoints CRUD `/api/commercial/sellable-tools`. | ~2 dias |
+| **TASK-620.1.1** | Tool Partner Program: snapshot attribution per quote line + reportes de comision per partner per periodo + reconciliation flow (gross vs neto) + HubSpot sync con `product_type='tool_license'` + dashboard PartnerRevenueDashboard. | ~1.5 dias |
+| **TASK-620.2** | Artifacts Catalog: hibrido `is_priced_directly=true` (precio fijo standalone) o `false` (absorbido en horas). Service_artifact_recipe + endpoints CRUD + seed 8 artifacts canonicos. | ~1.5 dias |
+
+Total Bloque C: **~7 dias** (sin tool partner) + 1.5 dias = **~8.5 dias** con partner program.
+
+### Bloque D — Composer with Native Nesting
+
+3 tasks creadas (TASK-627 absorbida en TASK-620.3):
+
+| Task | Alcance | Esfuerzo |
+| --- | --- | --- |
+| **TASK-620.3** | `<ServiceModuleComposer>` visual con drag-and-drop tipo arbol, nesting nativo depth 3 + cycle detection UI/DB, constraint rules tipadas con `ConstraintScope` (within_service / within_subservice / cross_subservice / whole_tree / business_line), suggested fixes auto-applicables, override pricing pct per child sub-service, optional flag, override pricing per tool/artifact in recipe. Reusa `<GreenhouseRichTextEditor>` para descripcion. **ABSORBE TASK-627.** | ~4 dias |
+| **TASK-620.4** | Quote Builder Direct Picker: autocomplete unificado en `QuoteLineItemsEditor` que busca en los 4 catalogos. Resultados agrupados por tipo. Selection -> snapshot pricing + partner attribution snapshot. Empty state con link a ad-hoc bundle. | ~2 dias |
+| **TASK-620.5** | Ad-hoc Bundle Composer in Quote: modal inline reusa `<ServiceModuleComposer>` con `mode='ad-hoc'`. Persiste como service_modules con `is_ad_hoc=true, is_catalog_visible=false, originated_from_quotation_id, originated_by_user_id`. Promote-to-catalog flow valida metadata + cambia flags. Panel "Mis bundles ad-hoc". | ~3 dias |
+
+Total Bloque D: **~9 dias**.
+
+### Decisiones cerradas en v1.8 (29 total — extiende las 24 cerradas en v1.7)
+
+Las nuevas 5 decisiones (con criterio robusto/escalable):
+
+| # | Decision | Resolucion |
+| --- | --- | --- |
+| 25 | Servicios anidados (TASK-627) | **Absorbida en TASK-620.3** — composer construido nesting-ready desde dia 1 (depth max 3, cycle detection) en vez de feature posterior. Confirmacion explicita owner. |
+| 26 | Pricing de tools: canonico vs embebido | **Canonico en sellable_tools + override opcional en recipe**. Cambio de precio Microsoft propaga a 30 services en 1 lugar. |
+| 27 | Artifacts pricing model | **Hibrido confirmado por owner** — `is_priced_directly=true` (precio fijo: brand book $5K USD) o `false` (absorbido: 12 social posts en 32h del designer). Check constraint enforce. |
+| 28 | Ad-hoc bundles | **Persisten + promovibles** (Trade-off A confirmado por owner). Tabla service_modules con flags is_ad_hoc / is_catalog_visible / originated_* / promoted_*. Picker excluye ad-hocs publicos pero muestra propios. |
+| 29 | Tools partner program | **Adobe / Microsoft / HubSpot reseller tracking** confirmado por owner. Snapshot attribution per quote line + comision reports + HubSpot sync con `product_type='tool_license'`. Tabla `tool_partners` con commission_pct seed (Adobe 15%, MSFT 10%, HubSpot 20%). |
+
+### Plan unificado v1.8
+
+| Bloque | Tasks | Esfuerzo | Status |
+| --- | --- | --- | --- |
+| **A** eSignature long path | 489 → 490 → 491 → 619 + 619.1/2/3 | ~20 dias | Diseno cerrado v1.7 |
+| **B** Rich text editor | 630 + 630.1 + 630.2 | ~4 dias | Diseno cerrado v1.8 |
+| **C** Sellable catalog unification | 620 + 620.1 + 620.1.1 + 620.2 | ~8.5 dias | Diseno cerrado v1.8 |
+| **D** Composer with native nesting | 620.3 + 620.4 + 620.5 | ~9 dias | Diseno cerrado v1.8 |
+| ~~E Service nesting (cancelado)~~ | ~~TASK-627~~ | ~~0 dias~~ | **Absorbida en TASK-620.3** |
+
+**Total programa: ~44 dias** (~9 semanas con 1 dev) — antes 46 dias planeados (con E separada), ahora 44 (con nesting in-baked).
+
+### Recomendacion de orden de ejecucion
+
+```text
+Semana 1-2:  Bloque B (rich text editor) — desbloquea population de descriptions
+             en paralelo: TASK-489 (foundation documental, no bloquea)
+
+Semana 3-4:  Bloque C (sellable catalog unification + tools/artifacts/partners)
+             en paralelo: TASK-490 (signature foundation)
+
+Semana 5-6:  Bloque D (composer + ad-hoc + picker)
+             en paralelo: TASK-491 (ZapSign adapter)
+
+Semana 7-8:  Bloque A finishing (TASK-619 + 619.1/2/3)
+
+Semana 9-10: Buffer + smoke E2E + documentation + training operadores
+```
+
+Bloques B+C+D y A son **independientes** — pueden ejecutarse en paralelo si hay 2 devs disponibles. Sinergia: Bloque B desbloquea TipTap usado en Bloque C+D (composer reusa GreenhouseRichTextEditor para descripciones).
+
+### Tasks afectadas por re-priorizacion
+
+- **TASK-620** (v1.6: "Service catalog como bundle CPQ", esfuerzo "2 sprints") — Reformateada completamente como **Sellable Catalog Unification + nesting schema**, esfuerzo ~2 dias para la migracion atomica (los otros componentes son tasks separadas)
+- **TASK-627** (v1.1: "Service nesting" P2 fase 5 diferible) — **CANCELADA**, absorbida en TASK-620.3 nesting nativo dia 1
+- **TASK-629** ya implementada en v1.5 — sin cambios; solo se beneficia indirectamente del rich html populate post Bloque B
+- **TASK-628** (Amendment) — sigue pendiente, ahora gana dependencia explicita en `signed` quotes (TASK-619) + posibilidad de amendar service module composition (TASK-620.3)
+- **TASK-624** (Renewal engine) — sigue pendiente, ahora consume composition de service modules con nesting
 
 ## Referencias
 
