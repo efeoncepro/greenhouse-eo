@@ -747,7 +747,7 @@ const countMissingTitles = <T extends { project_name?: string | null; task_name?
   for (const row of rows) {
     const title = row[titleKey]
 
-    if (title !== null && title !== undefined && typeof title === 'string' && title.trim() !== '') continue
+    if (!isEffectivelyMissingTitle(title)) continue
 
     const key = row.space_id ?? null
     const bucket = perSpace.get(key) ?? { count: 0, sample: [] }
@@ -767,6 +767,42 @@ const countMissingTitles = <T extends { project_name?: string | null; task_name?
 
   return perSpace
 }
+
+/**
+ * Title coercion for the BigQuery `greenhouse_conformed.{delivery_projects,
+ * delivery_tasks, delivery_sprints}` writers.
+ *
+ * BigQuery rejects `task_name`/`project_name`/`sprint_name` as REQUIRED fields,
+ * so a single null-title row from Notion would crash the *entire* daily sync
+ * with `Required field task_name cannot be null at [...]` and leave every
+ * conformed table stale until a human intervened.
+ *
+ * Resilience strategy:
+ *   1. Coerce null/empty titles to a placeholder we can spot in the UI.
+ *      The placeholder is intentionally Spanish + emoji so it stands out and
+ *      is easy to grep for.
+ *   2. Keep `emitMissingTitleWarning()` writing to `source_sync_failures` so
+ *      operators can surface the affected pages in the dashboard.
+ *   3. The placeholder marker (`MISSING_TITLE_PLACEHOLDER`) can be re-detected
+ *      downstream (e.g., DQ checks) without re-traversing raw — anything ===
+ *      this string was coerced.
+ *
+ * Do NOT switch the BigQuery columns to NULLABLE — REQUIRED forces explicit
+ * handling here, which is the safer contract for downstream readers.
+ */
+export const MISSING_TITLE_PLACEHOLDER = '⚠️ Sin título'
+
+const isEffectivelyMissingTitle = (value: unknown): boolean => {
+  if (value === null || value === undefined) return true
+  if (typeof value !== 'string') return true
+  if (value.trim() === '') return true
+  if (value === MISSING_TITLE_PLACEHOLDER) return true
+
+  return false
+}
+
+const coerceTitle = (value: string | null | undefined): string =>
+  isEffectivelyMissingTitle(value) ? MISSING_TITLE_PLACEHOLDER : (value as string)
 
 const uniqueSpaceIds = (spaceIds: Array<string | null | undefined>) =>
   Array.from(new Set(spaceIds.filter((spaceId): spaceId is string => Boolean(spaceId))))
@@ -1165,7 +1201,7 @@ export const syncNotionToConformed = async (input?: {
       client_id: clientId,
       module_code: null as string | null,
       module_id: null as string | null,
-      project_name: toNullableString(row.nombre_del_proyecto),
+      project_name: coerceTitle(toNullableString(row.nombre_del_proyecto)),
       project_status: toNullableString(row.estado),
       project_summary: toNullableString(row.resumen),
       completion_label: toNullableString(row['finalización']),
@@ -1233,7 +1269,7 @@ export const syncNotionToConformed = async (input?: {
       client_id: clientId,
       module_code: null as string | null,
       module_id: null as string | null,
-      task_name: toNullableString(row.nombre_de_tarea),
+      task_name: coerceTitle(toNullableString(row.nombre_de_tarea)),
       task_status: toNullableString(row.estado),
       task_phase: toNullableString(row['priorización']),
       task_priority: toNullableString(row.prioridad),
@@ -1348,7 +1384,7 @@ export const syncNotionToConformed = async (input?: {
       project_source_id: sprintSourceId ? (sprintProjectMap.get(sprintSourceId) || null) : null,
       project_database_source_id: null as string | null,
       space_id: spaceId,
-      sprint_name: toNullableString(row.nombre_del_sprint),
+      sprint_name: coerceTitle(toNullableString(row.nombre_del_sprint)),
       sprint_status: toNullableString(row.estado_del_sprint),
       start_date: toDateValue(row.fechas),
       end_date: toDateValue(row.fechas_end),
