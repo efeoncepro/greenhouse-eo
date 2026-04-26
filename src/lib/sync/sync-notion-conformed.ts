@@ -1603,6 +1603,147 @@ export const syncNotionToConformed = async (input?: {
     recordsWrittenConformed: conformedRowsWritten
   })
 
+  // PostgreSQL projection — non-blocking tail step
+  //
+  // After the canonical BQ-conformed write succeeds, project the same rows
+  // into Postgres `greenhouse_delivery.{projects,tasks,sprints}` using the
+  // canonical `projectNotionDeliveryToPostgres` helper.
+  //
+  // Before this step existed, PG was only updated by the manual ad-hoc script
+  // `pnpm sync:source-runtime-projections`, which had no schedule — leaving PG
+  // 24+ days behind BQ for both spaces. The Reliability Control Plane's
+  // "untitled pages" queue surfaced 3,041 PG-stale rows even though BQ
+  // conformed had the resolved titles.
+  //
+  // **Defensively wrapped**:
+  //   - Wrapped in try/catch — PG-side failures NEVER fail the BQ-conformed
+  //     write (which was the user-visible canonical step before).
+  //   - Gated by env `GREENHOUSE_NOTION_PG_PROJECTION_ENABLED` (default `true`).
+  //     Set to `false` to revert to the previous behavior without a deploy.
+  //   - Idempotent UPSERT by `notion_*_id` — re-running on the same data is a
+  //     no-op. Other writers (reactive event handlers) can interleave safely
+  //     because each entity uses per-row UPSERT, not table-level locks.
+  //   - `replaceMissingForSpaces=true` mirrors the BQ staged-swap semantics:
+  //     anything that disappeared from the cycle's input is marked deleted in
+  //     PG too.
+  if (process.env.GREENHOUSE_NOTION_PG_PROJECTION_ENABLED?.trim().toLowerCase() !== 'false') {
+    try {
+      const { projectNotionDeliveryToPostgres } = await import('@/lib/sync/project-notion-delivery-to-postgres')
+
+      const pgResult = await projectNotionDeliveryToPostgres({
+        syncRunId,
+        projects: deliveryProjects.map(p => ({
+          project_source_id: p.project_source_id,
+          space_id: p.space_id,
+          client_id: p.client_id,
+          module_id: p.module_id ?? null,
+          project_database_source_id: p.project_database_source_id,
+          project_name: p.project_name,
+          project_status: p.project_status,
+          project_summary: p.project_summary,
+          completion_label: p.completion_label,
+          on_time_pct_source: p.on_time_pct_source,
+          avg_rpa_source: p.avg_rpa_source,
+          project_phase: p.project_phase,
+          owner_member_id: p.owner_member_id,
+          start_date: p.start_date,
+          end_date: p.end_date,
+          page_url: p.page_url,
+          is_deleted: p.is_deleted,
+          last_edited_time: typeof p.last_edited_time === 'string' ? p.last_edited_time : null,
+          synced_at: p.synced_at,
+          sync_run_id: syncRunId,
+          payload_hash: p.payload_hash
+        })),
+        sprints: deliverySprints.map(s => ({
+          sprint_source_id: s.sprint_source_id,
+          project_source_id: s.project_source_id,
+          space_id: s.space_id,
+          project_database_source_id: s.project_database_source_id,
+          sprint_name: s.sprint_name,
+          sprint_status: s.sprint_status,
+          start_date: s.start_date,
+          end_date: s.end_date,
+          completed_tasks_count: s.completed_tasks_count,
+          total_tasks_count: s.total_tasks_count,
+          completion_pct_source: s.completion_pct_source,
+          page_url: s.page_url,
+          is_deleted: s.is_deleted,
+          last_edited_time: typeof s.last_edited_time === 'string' ? s.last_edited_time : null,
+          synced_at: s.synced_at,
+          sync_run_id: syncRunId,
+          payload_hash: s.payload_hash
+        })),
+        tasks: deliveryTasks.map(t => ({
+          task_source_id: t.task_source_id,
+          project_source_id: t.project_source_id,
+          project_source_ids: t.project_source_ids,
+          sprint_source_id: t.sprint_source_id,
+          space_id: t.space_id,
+          client_id: t.client_id,
+          module_id: t.module_id,
+          module_code: t.module_code,
+          assignee_member_id: t.assignee_member_id,
+          assignee_source_id: t.assignee_source_id,
+          assignee_member_ids: t.assignee_member_ids,
+          project_database_source_id: t.project_database_source_id,
+          task_name: t.task_name,
+          task_status: t.task_status,
+          task_phase: t.task_phase,
+          task_priority: t.task_priority,
+          completion_label: t.completion_label,
+          delivery_compliance: t.delivery_compliance,
+          days_late: t.days_late,
+          rescheduled_days: t.rescheduled_days,
+          is_rescheduled: t.is_rescheduled,
+          performance_indicator_label: t.performance_indicator_label,
+          performance_indicator_code: t.performance_indicator_code,
+          client_change_round_label: t.client_change_round_label,
+          client_change_round_final: t.client_change_round_final,
+          rpa_semaphore_source: t.rpa_semaphore_source,
+          rpa_value: t.rpa_value,
+          frame_versions: t.frame_versions,
+          frame_comments: t.frame_comments,
+          open_frame_comments: t.open_frame_comments,
+          client_review_open: t.client_review_open,
+          workflow_review_open: t.workflow_review_open,
+          blocker_count: t.blocker_count,
+          last_frame_comment: t.last_frame_comment,
+          tarea_principal_ids: t.tarea_principal_ids,
+          subtareas_ids: t.subtareas_ids,
+          original_due_date: t.original_due_date,
+          execution_time_label: t.execution_time_label,
+          changes_time_label: t.changes_time_label,
+          review_time_label: t.review_time_label,
+          workflow_change_round: t.workflow_change_round,
+          due_date: t.due_date,
+          completed_at: typeof t.completed_at === 'string' ? t.completed_at : null,
+          page_url: t.page_url,
+          is_deleted: t.is_deleted,
+          last_edited_time: typeof t.last_edited_time === 'string' ? t.last_edited_time : null,
+          synced_at: t.synced_at,
+          sync_run_id: syncRunId,
+          payload_hash: t.payload_hash,
+          created_at: typeof t.created_at === 'string' ? t.created_at : null
+        })),
+        targetSpaceIds,
+        replaceMissingForSpaces: !isPartialSync
+      })
+
+      console.log(
+        `[sync-conformed] PG projection: projects=${pgResult.projectsWritten}/+${pgResult.projectsMarkedDeleted}d, ` +
+        `sprints=${pgResult.sprintsWritten}/+${pgResult.sprintsMarkedDeleted}d, ` +
+        `tasks=${pgResult.tasksWritten}/+${pgResult.tasksMarkedDeleted}d, ${pgResult.durationMs}ms`
+      )
+    } catch (err) {
+      // Non-blocking — BQ-conformed already succeeded which is the user-visible
+      // contract for this cycle. PG can be back-filled by re-running the cron
+      // (idempotent) or by toggling the kill-switch off and using the legacy
+      // manual script.
+      console.warn('[sync-conformed] PG projection failed (non-blocking, BQ conformed unaffected):', err)
+    }
+  }
+
   // Identity reconciliation — non-blocking tail step
   try {
     const { runIdentityReconciliation } = await import('@/lib/identity/reconciliation/reconciliation-service')

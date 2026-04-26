@@ -18,6 +18,7 @@
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
+ *   POST /notion-conformed/sync        → Notion BQ raw → conformed → PG cycle (replaces Vercel /api/cron/sync-conformed)
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -41,6 +42,7 @@ import {
   materializeAllAvailablePeriods
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { runPartyLifecycleInactivitySweep } from '@/lib/commercial/party'
+import { runNotionSyncOrchestration } from '@/lib/integrations/notion-sync-orchestration'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
@@ -833,6 +835,56 @@ const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerRespons
   }
 }
 
+/**
+ * POST /notion-conformed/sync
+ *
+ * Canonical Cloud Run path for the daily Notion BQ-raw → BQ-conformed →
+ * PostgreSQL projection cycle. Triggered by Cloud Scheduler at 07:20 UTC
+ * (matching the Vercel cron schedule that this replaces). The Vercel cron
+ * `/api/cron/sync-conformed` stays available as a manual-trigger fallback.
+ *
+ * Why ops-worker over Vercel cron for this:
+ *   - 60-min Cloud Run timeout vs Vercel's 800s (and historical flakiness
+ *     on long Vercel cron jobs).
+ *   - Cloud Scheduler has built-in retry with exponential backoff
+ *     (`maxRetryAttempts`, `minBackoffDuration`, `maxBackoffDuration`).
+ *   - OIDC-authed invocation, no shared CRON_SECRET to rotate.
+ *   - Co-located in `us-east4` with the Cloud SQL instance — sub-millisecond
+ *     latency on the PG projection step.
+ *   - Cloud Logging native, observable in `Cloud Run > ops-worker > Logs`.
+ *
+ * Body (optional): `{ "executionSource": "scheduled_primary" | "scheduled_retry" | "manual_admin" }`
+ *   - default `scheduled_primary` (full daily run)
+ */
+const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
+
+  const executionSource = (
+    rawSource === 'scheduled_retry' || rawSource === 'manual_admin'
+      ? rawSource
+      : 'scheduled_primary'
+  ) as 'scheduled_primary' | 'scheduled_retry' | 'manual_admin'
+
+  console.log(`[ops-worker] POST /notion-conformed/sync — executionSource=${executionSource}`)
+
+  try {
+    const result = await runNotionSyncOrchestration({ executionSource })
+
+    json(res, 200, {
+      ok: true,
+      orchestrator: 'cloud_run',
+      executionSource,
+      result
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown sync orchestration error'
+
+    console.error('[ops-worker] /notion-conformed/sync failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -921,6 +973,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/nexa/weekly-digest') {
       await handleNexaWeeklyDigest(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/notion-conformed/sync') {
+      await handleNotionConformedSync(req, res)
 
       return
     }
