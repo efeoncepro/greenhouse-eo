@@ -716,3 +716,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-638` | `complete` | Reliability AI Observer (Gemini watcher hosted en ops-worker + Cloud Scheduler) | `docs/tasks/complete/TASK-638-reliability-ai-observer.md` |
 | `TASK-639` | `complete` | Finance VAT Reactive Lane & Data Quality Semantics Hardening | `docs/tasks/complete/TASK-639-finance-vat-reactive-data-quality-hardening.md` |
 | `TASK-640` | `to-do` | Nubox V2 Enterprise Enrichment Program | `docs/tasks/to-do/TASK-640-nubox-v2-enterprise-enrichment.md` |
+| `TASK-641` | `to-do` | Adopt Apache ECharts as canonical chart stack for high-impact dashboards | `docs/tasks/to-do/TASK-641-echarts-stack-adoption.md` |
