@@ -1,5 +1,48 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Reliability Control Plane hardening (Cloud / Delivery / Finance / Notion)
+
+### Trigger
+
+Admin Center mostraba 4 dominios con señales activas: Cloud Platform (warning, "1 con falla" en Proyecciones + GCP Billing "sin filas"), Delivery + Notion Integration (crítico, "2 spaces, 0 sanos, 2 rotos"), Finance (warning, drift de ledger + 28 AR vencidas). El reliability control plane mezclaba 3 tipos de señales (plataforma, pipelines, KPIs operativos) en un solo carril visual, lo que convertía cualquier ruido de negocio o latencia natural en "incidente crítico".
+
+### Que cambio
+
+- **Bug raíz de Proyecciones VAT corregido**: `src/lib/finance/vat-ledger.ts` ahora usa `${param}::int` / `${param}::text` postfix casts en todas las interpolaciones de `kysely.sql` template literals — antes el patrón mixto `CAST(... AS text)` dejaba a postgres sin poder inferir el tipo del parámetro `$6` cuando el SELECT llegaba vacío y abortaba con `could not determine data type of parameter $6`. Validado con script de reproducción contra Cloud SQL: los 3 bloques INSERT ($6 reason en income/expense, $9 reason en vat_monthly_positions) corren limpio.
+- **DLQ pattern para `projection_refresh_queue`**: nueva migración `20260426130806659_add-dead-status-projection-queue.sql` añade columna `dead_at TIMESTAMPTZ` + índice parcial `idx_projection_refresh_queue_dead`. `markRefreshFailed` ahora rutea: `is_infrastructure_fault=true` → status `failed` (recovery cron sigue reintentando), `is_infrastructure_fault=false` AND retries exhausted → status `dead` (poison pill — necesita intervención humana). Helper nuevo `requeueRefreshItem(queueId)` para reabrir manualmente. Backfill aplicado: 45 filas legacy (44 `product_hubspot_outbound` + 1 `member_capacity_economics`) reclasificadas a `dead` porque su clasificación apuntaba a application fault y >24h sin recovery.
+- **Operations overview Proyecciones honesto**: la query del subsystem ahora cuenta `status = 'dead'` OR `status = 'failed' AND retry_count >= max_retries AND updated_at < NOW() - INTERVAL '24 hours'`. Resultado: failures transitorios del último día NO disparan warning (recovery cron está trabajando), pero failures verdaderamente estancados (>24h sin progreso, infra o app) sí se surface. Summary del subsystem nombra "dead-letter" cuando hay failures activos.
+- **Notion DQ surface por check específico + auto-recovery classifier**: `IntegrationDataQualitySpaceSnapshot` ahora trae `failedChecks: IntegrationDataQualityFailedCheckSummary[]` (con `checkKey`, severity, observed/expected) + `recoveryClass: 'auto_recoverable' | 'manual' | 'healthy'`. Nuevo `IntegrationDataQualityOverview.totals.autoRecoverableSpaces`. Spaces cuyo único error es `fresh_raw_after_conformed_sync` (lag eventual de conformed sync vs raw, NO corrupción) se clasifican `auto_recoverable` y bajan a severity `degraded` en el reliability signal en lugar de `broken`. El summary del signal ahora muestra "checks: fresh_raw_after_conformed_sync (851)" en lugar de "2 con falla", on-call ve qué rompe sin drilear.
+- **Finance Data Quality split en plataforma vs hygiene operativa**: `payment_ledger_integrity` y `direct_cost_without_client` se mantienen como warning (integridad de datos real). `overdue_receivables` baja a `info` (es KPI de cobranzas, no incidente de plataforma). `shared_overhead_unallocated` ya estaba en `info`. La function `buildFinanceDataQualitySubsystem` solo escala a `degraded` cuando hay platform integrity issues; el summary lee "Plataforma sana · pendientes operativos: ..." cuando solo hay AR vencidas u overhead sin asignar.
+- **Credential classifier expandido**: `reactive-error-classification.ts` ahora reconoce patrones tipo `Missing GREENHOUSE_INTEGRATION_API_TOKEN`, `Missing API_KEY`, `Missing credentials` como `infra.credential` (antes caían en `application` y se trataban como bug de código).
+- **Live incidents**: requeued `vat_monthly_position:finance_period:2026-04` (status `pending`, retry_count=0) — la siguiente corrida del reactive worker ejecutará la query con el bug fix. Documentado `INC-NB-27971848` (drift `amount_paid` 6,902,000 vs sum payments 6,776,453 = 125,547) — requiere decisión de negocio (¿amount_paid de Nubox o sum payments es source of truth?), no se auto-fixa.
+
+### Validaciones
+
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → 0 errores
+- `pnpm test` → 425 files / 2202 passed / 2 skipped (suite completa, incluye 4 tests nuevos: dead-letter routing, requeueRefreshItem path, finance DQ healthy con KPIs operativos, credential classifier con 7 cases)
+- Migración aplicada en dev local (Cloud SQL Proxy) y tipos Kysely regenerados
+- VAT projection SQL fix validado en vivo con script reproductor contra Cloud SQL (los 3 bloques con $6/$9 corren limpios)
+
+### Estado post-cambio en el dashboard
+
+Una vez deployed a staging y la siguiente corrida del cron de Notion DQ refresca los runs:
+
+- Cloud Platform → Proyecciones: 1 dead (`vat_monthly_position` se va a verde después del próximo reactive sweep). Las 45 filas backfilled (`product_hubspot_outbound`+`member_capacity_economics`) se ven como dead — son issues reales pre-existentes que requieren provision del `GREENHOUSE_INTEGRATION_API_TOKEN` para autorecuperarse.
+- Cloud Platform → GCP Billing: sigue en `awaiting_data` (info, no warning) hasta que la tabla rinda datos.
+- Delivery + Notion Integration: bajará de `crítico/broken` a `warning/degraded` con label "X con lag auto-recuperable" + summary "checks: fresh_raw_after_conformed_sync (851)". La clasificación es honesta: el conformed sync (notion-bq-sync, repo sibling) está atrasado vs el raw, pero no hay corrupción.
+- Finance Data Quality: queda en `degraded` solo por el 1 drift de ledger (INC-NB-27971848). Las 28 AR vencidas + 137 overheads sin asignar se ven como informativos, no escalan a warning.
+
+### Pendientes follow-up (opcional, no bloquean)
+
+- **Watcher cron auto-recovery Notion**: re-disparar `notion-bq-sync` Cloud Run cuando un space queda `auto_recoverable` por >2h. Hoy el classifier baja la severidad pero la recuperación sigue dependiendo del schedule fijo del sync upstream.
+- **Provision `GREENHOUSE_INTEGRATION_API_TOKEN`** en staging/prod Vercel + Cloud Run para que las 44 filas dead de `product_hubspot_outbound` recuperen automáticamente vía `requeueRefreshItem` + sweep cron.
+- **UI surface del recoveryClass**: `AdminOpsHealthView` y `AdminIntegrationGovernanceView` siguen leyendo `brokenSpaces` raw (no `manualBrokenSpaces`). Una mejora futura es renderizar chip "auto" para los `auto_recoverable` en lugar de "rotos".
+
+### Notas
+
+- El backfill de 45 rows a `dead` se aplicó manualmente con autorización explícita del usuario porque el migration framework ya había marcado la migración como aplicada antes de añadir el statement de backfill al SQL. La sentencia es idempotente (`status='failed' AND COALESCE(is_infrastructure_fault, FALSE) = FALSE AND retry_count >= max_retries AND updated_at < NOW() - INTERVAL '24 hours'`) — re-correrla no hace daño.
+
 ## Sesion 2026-04-26 — TASK-669 Teams Workflow Notifications Channel (Slices 1-3)
 
 ### Que cambio

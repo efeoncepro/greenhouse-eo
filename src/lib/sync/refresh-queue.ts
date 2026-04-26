@@ -164,6 +164,24 @@ export const markRefreshCompleted = async (queueId: string): Promise<void> => {
   )
 }
 
+/**
+ * Mark a refresh as failed.
+ *
+ * Terminal classification (after retries are exhausted):
+ *
+ *   - `is_infrastructure_fault = true`  → status `failed`
+ *     Transient/infra problem (timeout, deadlock, rate limit, network). The
+ *     projection-recovery cron will keep claiming and retrying these.
+ *
+ *   - `is_infrastructure_fault = false` → status `dead`
+ *     Application/data fault (SQL bug, missing schema, contract violation). It
+ *     will NOT recover by itself — surfaces in the reliability control plane as
+ *     `Proyecciones` warning. Requires a code fix or manual requeue via the
+ *     admin endpoint after the underlying cause is addressed.
+ *
+ * `dead_at` is stamped when the row enters the dead state so the dashboard can
+ * age-out and escalate alerts honestly.
+ */
 export const markRefreshFailed = async (
   queueId: string,
   error: string,
@@ -177,11 +195,19 @@ export const markRefreshFailed = async (
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_sync.projection_refresh_queue
      SET retry_count = retry_count + 1,
-         status = CASE WHEN retry_count + 1 >= $2 THEN 'failed' ELSE 'pending' END,
+         status = CASE
+           WHEN retry_count + 1 >= $2 THEN
+             CASE WHEN $6 = TRUE THEN 'failed' ELSE 'dead' END
+           ELSE 'pending'
+         END,
          error_message = $3,
          error_class = $4,
          error_family = $5,
          is_infrastructure_fault = $6,
+         dead_at = CASE
+           WHEN retry_count + 1 >= $2 AND $6 = FALSE THEN NOW()
+           ELSE dead_at
+         END,
          updated_at = NOW()
      WHERE refresh_id = $1`,
     [
@@ -195,11 +221,37 @@ export const markRefreshFailed = async (
   )
 }
 
+/**
+ * Requeue a `dead` or `failed` projection refresh manually. Resets retry
+ * counters and clears classification so the next reactive sweep claims it
+ * fresh. Used after fixing the underlying application fault.
+ */
+export const requeueRefreshItem = async (queueId: string): Promise<boolean> => {
+  const rows = await runGreenhousePostgresQuery<{ refresh_id: string } & Record<string, unknown>>(
+    `UPDATE greenhouse_sync.projection_refresh_queue
+     SET status = 'pending',
+         retry_count = 0,
+         error_message = NULL,
+         error_class = NULL,
+         error_family = NULL,
+         is_infrastructure_fault = FALSE,
+         dead_at = NULL,
+         updated_at = NOW()
+     WHERE refresh_id = $1
+       AND status IN ('failed', 'dead')
+     RETURNING refresh_id`,
+    [queueId]
+  )
+
+  return rows.length > 0
+}
+
 export const getQueueStats = async (): Promise<{
   pending: number
   processing: number
   completed: number
   failed: number
+  dead: number
 }> => {
   await ensureRefreshQueue()
 
@@ -207,6 +259,7 @@ export const getQueueStats = async (): Promise<{
     `SELECT status, COUNT(*)::text AS count
      FROM greenhouse_sync.projection_refresh_queue
      WHERE created_at > NOW() - INTERVAL '24 hours'
+        OR status = 'dead'
      GROUP BY status`
   )
 
@@ -216,7 +269,8 @@ export const getQueueStats = async (): Promise<{
     pending: map.get('pending') ?? 0,
     processing: map.get('processing') ?? 0,
     completed: map.get('completed') ?? 0,
-    failed: map.get('failed') ?? 0
+    failed: map.get('failed') ?? 0,
+    dead: map.get('dead') ?? 0
   }
 }
 

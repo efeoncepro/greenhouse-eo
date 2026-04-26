@@ -373,21 +373,39 @@ export const buildNotionDataQualitySignals = (
     ]
   }
 
-  const aggregateStatus = overview.totals.brokenSpaces > 0
+  // Spaces whose only failure is auto-recoverable lag (`fresh_raw_after_conformed_sync`)
+  // are downgraded from `broken` to `degraded`. The conformed sync watcher will
+  // re-trigger a sync, so it's not an incident — it's expected eventual consistency.
+  const manualBrokenSpaces = overview.latestBySpace.filter(
+    space => space.qualityStatus === 'broken' && space.recoveryClass === 'manual'
+  ).length
+
+  const autoRecoverableSpaces = overview.totals.autoRecoverableSpaces ?? 0
+
+  const aggregateStatus: 'healthy' | 'degraded' | 'broken' = manualBrokenSpaces > 0
     ? 'broken'
-    : overview.totals.degradedSpaces > 0 || overview.totals.unknownSpaces > 0
+    : (overview.totals.degradedSpaces > 0 || autoRecoverableSpaces > 0 || overview.totals.unknownSpaces > 0)
       ? 'degraded'
       : 'healthy'
 
-  const summary = [
+  // Surface the *actual* failing checks in the summary so on-call sees what
+  // broke, not just "2 con falla".
+  const failedCheckBreakdown = aggregateFailedCheckCounts(overview.latestBySpace)
+
+  const baseSummary = [
     `${overview.totals.totalSpaces} spaces`,
     `${overview.totals.healthySpaces} sanos`,
     overview.totals.degradedSpaces > 0 ? `${overview.totals.degradedSpaces} degradados` : null,
-    overview.totals.brokenSpaces > 0 ? `${overview.totals.brokenSpaces} rotos` : null,
+    manualBrokenSpaces > 0 ? `${manualBrokenSpaces} rotos (intervención)` : null,
+    autoRecoverableSpaces > 0 ? `${autoRecoverableSpaces} con lag auto-recuperable` : null,
     overview.totals.unknownSpaces > 0 ? `${overview.totals.unknownSpaces} sin estado` : null
   ]
     .filter(Boolean)
     .join(' · ')
+
+  const summary = failedCheckBreakdown
+    ? `${baseSummary} — checks: ${failedCheckBreakdown}`
+    : baseSummary
 
   const evidence = [
     {
@@ -426,6 +444,26 @@ export const buildNotionDataQualitySignals = (
       evidence
     }
   ]
+}
+
+const aggregateFailedCheckCounts = (
+  spaces: IntegrationDataQualityOverview['latestBySpace']
+): string => {
+  const counts = new Map<string, number>()
+
+  for (const space of spaces) {
+    for (const check of space.failedChecks) {
+      counts.set(check.checkKey, (counts.get(check.checkKey) ?? 0) + check.count)
+    }
+  }
+
+  if (counts.size === 0) return ''
+
+  return Array.from(counts.entries())
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([key, count]) => `${key} (${count})`)
+    .join(', ')
 }
 
 const formatCurrency = (cost: number, currency: string): string => {

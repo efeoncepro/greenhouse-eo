@@ -88,18 +88,22 @@ describe('materializeVatLedgerForPeriod', () => {
       query.includes('INSERT INTO greenhouse_finance.vat_monthly_positions')
     )
 
-    expect(incomeInsert).toContain("'materializationReason', CAST($")
-    expect(incomeInsert).toContain('AS text)')
-    expect(incomeInsert?.match(/CAST\(\$\d+ AS text\)/g)).toHaveLength(2)
+    // After the explicit-cast refactor, all params use postfix `::text` / `::int`
+    // form (PG canonical) instead of `CAST(... AS text)`. This unblocks the
+    // "could not determine data type of parameter $N" error from PG's parser
+    // when a parameter sits inside a deeply nested SELECT projection.
+    expect(incomeInsert).toContain("'materializationReason', $")
+    expect(incomeInsert).toMatch(/\$\d+::text/)
+    expect(incomeInsert?.match(/\$\d+::int/g)?.length).toBeGreaterThanOrEqual(4)
 
-    expect(expenseInsert).toContain("'materializationReason', CAST($")
-    expect(expenseInsert).toContain('AS text)')
-    expect(expenseInsert?.match(/CAST\(\$\d+ AS text\)/g)).toHaveLength(2)
+    expect(expenseInsert).toContain("'materializationReason', $")
+    expect(expenseInsert).toMatch(/\$\d+::text/)
+    expect(expenseInsert?.match(/\$\d+::int/g)?.length).toBeGreaterThanOrEqual(4)
 
-    expect(monthlyPositionInsert).toMatch(/concat_ws\(':', space_id, CAST\(\$\d+ AS text\)\)/)
-    expect(monthlyPositionInsert).toMatch(/'periodId', CAST\(\$\d+ AS text\)/)
-    expect(monthlyPositionInsert).toMatch(/'materializationReason', CAST\(\$\d+ AS text\)/)
-    expect(monthlyPositionInsert?.match(/CAST\(\$\d+ AS text\)/g)).toHaveLength(5)
+    expect(monthlyPositionInsert).toMatch(/concat_ws\(':', space_id, \$\d+::text\)/)
+    expect(monthlyPositionInsert).toMatch(/'periodId', \$\d+::text/)
+    expect(monthlyPositionInsert).toMatch(/'materializationReason', \$\d+::text/)
+    expect(monthlyPositionInsert?.match(/\$\d+::text/g)?.length).toBeGreaterThanOrEqual(5)
 
     expect(summary).toEqual({
       periodId: '2026-04',

@@ -82,18 +82,22 @@ describe('buildFinanceDataQualitySubsystem', () => {
     })
   })
 
-  it('returns semantic metrics and summary instead of mixing processed and failed counters', async () => {
+  it('escalates only on platform integrity issues; AR + overhead surfaced as info', async () => {
     const subsystem = await buildFinanceDataQualitySubsystem()
 
+    // processed = number of platform integrity metrics (drift + direct_without_client = 2)
+    // failed = platform integrity metrics in warning/error (drift + direct_without_client = 2)
+    // status = degraded (because 2 platform integrity metrics are in warning state)
     expect(subsystem).toMatchObject({
       name: 'Finance Data Quality',
       status: 'degraded',
-      processed: 4,
-      failed: 3
+      processed: 2,
+      failed: 2
     })
 
-    expect(subsystem.summary).toContain('buckets con issue activo')
-    expect(subsystem.summary).toContain('overheads compartidos')
+    expect(subsystem.summary).toContain('integridades rotas')
+    expect(subsystem.summary).toContain('drift de ledger')
+    expect(subsystem.summary).toContain('Pendientes operativos paralelos')
     expect(subsystem.metrics).toEqual([
       {
         key: 'payment_ledger_integrity',
@@ -111,7 +115,11 @@ describe('buildFinanceDataQualitySubsystem', () => {
         key: 'overdue_receivables',
         label: 'Cartera vencida',
         value: 7,
-        status: 'error'
+
+        // AR vencidas no longer escalates — it's a collections KPI, not a
+        // platform health signal. The `info` tone keeps the count visible
+        // without firing yellow chips on the reliability dashboard.
+        status: 'info'
       },
       {
         key: 'shared_overhead_unallocated',
@@ -120,5 +128,23 @@ describe('buildFinanceDataQualitySubsystem', () => {
         status: 'info'
       }
     ])
+  })
+
+  it('keeps platform integrity green when only operational hygiene metrics have value', async () => {
+    mockRunGreenhousePostgresQuery.mockReset()
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
+      if (sql.includes('information_schema.tables')) return [{ exists: true }]
+      if (sql.includes('ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01')) return [{ cnt: '0' }]
+      if (sql.includes('payment_status IN (\'pending\', \'partial\', \'overdue\')')) return [{ cnt: '12' }]
+      if (sql.includes('AS direct_without_client')) return [{ direct_without_client: '0', shared_unallocated: '5' }]
+      throw new Error(`Unexpected SQL in test:\n${sql}`)
+    })
+
+    const subsystem = await buildFinanceDataQualitySubsystem()
+
+    expect(subsystem.status).toBe('healthy')
+    expect(subsystem.failed).toBe(0)
+    expect(subsystem.summary).toContain('Plataforma sana')
+    expect(subsystem.summary).toContain('cartera vencida')
   })
 })

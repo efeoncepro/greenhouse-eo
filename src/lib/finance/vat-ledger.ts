@@ -195,12 +195,12 @@ export async function materializeVatLedgerForPeriod(
   await db.transaction().execute(async trx => {
     await sql`
       DELETE FROM greenhouse_finance.vat_monthly_positions
-      WHERE period_year = ${year} AND period_month = ${month}
+      WHERE period_year = ${year}::int AND period_month = ${month}::int
     `.execute(trx)
 
     await sql`
       DELETE FROM greenhouse_finance.vat_ledger_entries
-      WHERE period_year = ${year} AND period_month = ${month}
+      WHERE period_year = ${year}::int AND period_month = ${month}::int
     `.execute(trx)
 
     await sql`
@@ -239,8 +239,8 @@ export async function materializeVatLedgerForPeriod(
           ON q.quotation_id = i.quotation_id
         LEFT JOIN client_bridge cb
           ON cb.client_id = COALESCE(i.client_id, cp.client_id)
-        WHERE i.period_year = ${year}
-          AND i.period_month = ${month}
+        WHERE i.period_year = ${year}::int
+          AND i.period_month = ${month}::int
           AND COALESCE(i.tax_snapshot_json ->> 'kind', '') = 'vat_output'
           AND COALESCE(i.tax_amount_snapshot, i.tax_amount, 0) > 0
           AND COALESCE(q.space_id, cb.space_id) IS NOT NULL
@@ -271,9 +271,9 @@ export async function materializeVatLedgerForPeriod(
       )
       SELECT
         'EO-VLE-' || upper(substr(md5(concat_ws(':', 'income', income_id, 'debit_fiscal')), 1, 8)),
-        ${year},
-        ${month},
-        CAST(${periodId} AS text),
+        ${year}::int,
+        ${month}::int,
+        ${periodId}::text,
         space_id,
         organization_id,
         client_id,
@@ -298,7 +298,7 @@ export async function materializeVatLedgerForPeriod(
         ),
         space_resolution_source,
         jsonb_build_object(
-          'materializationReason', CAST(${reason} AS text),
+          'materializationReason', ${reason}::text,
           'sourceTaxKind', COALESCE(tax_snapshot_json ->> 'kind', 'vat_output')
         )
       FROM scoped_income
@@ -353,8 +353,8 @@ export async function materializeVatLedgerForPeriod(
           ON sp.space_id = e.space_id
         LEFT JOIN client_bridge cb
           ON cb.client_id = COALESCE(e.allocated_client_id, e.client_id)
-        WHERE e.period_year = ${year}
-          AND e.period_month = ${month}
+        WHERE e.period_year = ${year}::int
+          AND e.period_month = ${month}::int
           AND e.space_id IS NOT NULL
           AND (
             COALESCE(e.recoverable_tax_amount, 0) > 0
@@ -387,9 +387,9 @@ export async function materializeVatLedgerForPeriod(
       )
       SELECT
         'EO-VLE-' || upper(substr(md5(concat_ws(':', 'expense', expense_id, vat_bucket)), 1, 8)),
-        ${year},
-        ${month},
-        CAST(${periodId} AS text),
+        ${year}::int,
+        ${month}::int,
+        ${periodId}::text,
         space_id,
         organization_id,
         client_id,
@@ -408,7 +408,7 @@ export async function materializeVatLedgerForPeriod(
         ROUND(amount_clp, 2),
         'expense',
         jsonb_build_object(
-          'materializationReason', CAST(${reason} AS text),
+          'materializationReason', ${reason}::text,
           'sourceTaxKind', COALESCE(tax_snapshot_json ->> 'kind', 'vat_input_credit')
         )
       FROM (
@@ -468,8 +468,8 @@ export async function materializeVatLedgerForPeriod(
           COUNT(DISTINCT CASE WHEN e.vat_bucket = 'iva_no_recuperable' THEN e.source_id END) AS non_recoverable_document_count,
           COUNT(*) AS ledger_entry_count
         FROM greenhouse_finance.vat_ledger_entries e
-        WHERE e.period_year = ${year}
-          AND e.period_month = ${month}
+        WHERE e.period_year = ${year}::int
+          AND e.period_month = ${month}::int
         GROUP BY e.space_id
       )
       INSERT INTO greenhouse_finance.vat_monthly_positions (
@@ -493,10 +493,10 @@ export async function materializeVatLedgerForPeriod(
         metadata
       )
       SELECT
-        'EO-VMP-' || upper(substr(md5(concat_ws(':', space_id, CAST(${periodId} AS text))), 1, 8)),
-        ${year},
-        ${month},
-        CAST(${periodId} AS text),
+        'EO-VMP-' || upper(substr(md5(concat_ws(':', space_id, ${periodId}::text)), 1, 8)),
+        ${year}::int,
+        ${month}::int,
+        ${periodId}::text,
         space_id,
         organization_id,
         client_id,
@@ -509,10 +509,10 @@ export async function materializeVatLedgerForPeriod(
         non_recoverable_document_count,
         ledger_entry_count,
         CURRENT_TIMESTAMP,
-        CAST(${reason} AS text),
+        ${reason}::text,
         jsonb_build_object(
-          'periodId', CAST(${periodId} AS text),
-          'materializationReason', CAST(${reason} AS text)
+          'periodId', ${periodId}::text,
+          'materializationReason', ${reason}::text
         )
       FROM aggregated
     `.execute(trx)
@@ -532,8 +532,8 @@ export async function materializeVatLedgerForPeriod(
       COALESCE(SUM(p.credit_fiscal_amount_clp), 0) AS credit_fiscal_amount_clp,
       COALESCE(SUM(p.non_recoverable_vat_amount_clp), 0) AS non_recoverable_vat_amount_clp
     FROM greenhouse_finance.vat_monthly_positions p
-    WHERE p.period_year = ${year}
-      AND p.period_month = ${month}
+    WHERE p.period_year = ${year}::int
+      AND p.period_month = ${month}::int
   `.execute(db)
 
   const summary = summaryResult.rows[0]

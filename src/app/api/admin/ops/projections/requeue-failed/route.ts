@@ -46,6 +46,8 @@ export async function POST(request: NextRequest) {
     onlyInfrastructure = false
   }
 
+  // Requeue covers BOTH `failed` (transient infra fault, awaiting recovery cron)
+  // AND `dead` (application fault — user requeues after fixing the underlying bug).
   const rows = await runGreenhousePostgresQuery<{ count: string } & Record<string, unknown>>(
     `WITH updated AS (
        UPDATE greenhouse_sync.projection_refresh_queue
@@ -55,8 +57,9 @@ export async function POST(request: NextRequest) {
            error_class = NULL,
            error_family = NULL,
            is_infrastructure_fault = FALSE,
+           dead_at = NULL,
            updated_at = NOW()
-       WHERE status = 'failed'
+       WHERE status IN ('failed', 'dead')
          AND ($1::text IS NULL OR projection_name = $1)
          AND ($2::text IS NULL OR error_class = $2)
          AND ($3::boolean = FALSE OR is_infrastructure_fault = TRUE)

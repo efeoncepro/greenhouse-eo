@@ -224,27 +224,54 @@ const describeFinanceMetric = (metric: OperationsSubsystemMetric) => {
   }
 }
 
+/**
+ * Build the Finance Data Quality summary, separating *platform integrity*
+ * issues (signal that the data layer itself is wrong) from *operational
+ * hygiene* metrics (counters that track human work — overdue receivables,
+ * unallocated overheads). Only platform integrity escalates the subsystem to
+ * `degraded`; operational hygiene is shown as informational context.
+ */
 const buildFinanceDataQualitySummary = (metrics: OperationsSubsystemMetric[]) => {
-  const issueMetrics = metrics.filter(metric => metric.status === 'warning' || metric.status === 'error')
-  const sharedOverheadMetric = metrics.find(metric => metric.key === 'shared_overhead_unallocated')
+  const platformIssueMetrics = metrics.filter(
+    metric => (metric.status === 'warning' || metric.status === 'error') && isPlatformIntegrityMetric(metric.key)
+  )
 
-  if (issueMetrics.length === 0) {
-    if (!sharedOverheadMetric || sharedOverheadMetric.value === 0) {
-      return 'Sin issues activos en ledger, asignación directa ni cartera vencida.'
+  const operationalMetrics = metrics.filter(metric => !isPlatformIntegrityMetric(metric.key))
+
+  const operationalSummaryParts = operationalMetrics
+    .filter(metric => metric.value > 0)
+    .map(metric => `${metric.value} ${metric.label.toLowerCase()}`)
+
+  if (platformIssueMetrics.length === 0) {
+    if (operationalSummaryParts.length === 0) {
+      return 'Plataforma sana · sin pendientes operativos.'
     }
 
-    return `${pluralize(sharedOverheadMetric.value, 'overhead compartido', 'overheads compartidos')} siguen sin asignación explícita; estado permitido.`
+    return `Plataforma sana · pendientes operativos: ${operationalSummaryParts.join(', ')}.`
   }
 
-  const issueParts = issueMetrics.map(describeFinanceMetric)
+  const issueParts = platformIssueMetrics.map(describeFinanceMetric)
 
-  const allowedOverheadSummary =
-    sharedOverheadMetric && sharedOverheadMetric.value > 0
-      ? ` Además, ${pluralize(sharedOverheadMetric.value, 'overhead compartido', 'overheads compartidos')} siguen sin asignación explícita; estado permitido.`
-      : ''
+  const operationalSuffix = operationalSummaryParts.length > 0
+    ? ` Pendientes operativos paralelos: ${operationalSummaryParts.join(', ')}.`
+    : ''
 
-  return `${pluralize(issueMetrics.length, 'bucket con issue activo', 'buckets con issue activo')}: ${issueParts.join(', ')}.${allowedOverheadSummary}`
+  return `${pluralize(platformIssueMetrics.length, 'integridad rota', 'integridades rotas')}: ${issueParts.join(', ')}.${operationalSuffix}`
 }
+
+/**
+ * Platform integrity metrics — these signal that the data layer itself is
+ * inconsistent and require a code, sync, or migration fix. Anything else
+ * (overdue invoices, unallocated overheads) is operational hygiene that the
+ * business team owns, not an incident the on-call should react to.
+ */
+const PLATFORM_INTEGRITY_METRIC_KEYS = new Set<string>([
+  'payment_ledger_integrity',
+  'direct_cost_without_client'
+])
+
+const isPlatformIntegrityMetric = (key: string): boolean =>
+  PLATFORM_INTEGRITY_METRIC_KEYS.has(key)
 
 export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
   try {
@@ -310,7 +337,12 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
         key: 'overdue_receivables',
         label: 'Cartera vencida',
         value: overdueCount,
-        status: overdueCount === 0 ? 'ok' : overdueCount > 5 ? 'error' : 'warning'
+
+        // Operational KPI — the existence of overdue invoices is a business
+        // workflow signal (collections), not a platform integrity issue. We
+        // surface the count for visibility but never escalate the subsystem
+        // because of it. See `isPlatformIntegrityMetric`.
+        status: 'info'
       },
       {
         key: 'shared_overhead_unallocated',
@@ -320,14 +352,19 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
       }
     ]
 
-    const issueMetrics = metrics.filter(metric => metric.status === 'warning' || metric.status === 'error')
-    const status: OperationsHealthStatus = issueMetrics.length > 0 ? 'degraded' : 'healthy'
+    const platformIssueMetrics = metrics.filter(
+      metric => (metric.status === 'warning' || metric.status === 'error') && isPlatformIntegrityMetric(metric.key)
+    )
+
+    const status: OperationsHealthStatus = platformIssueMetrics.length > 0 ? 'degraded' : 'healthy'
+
+    const platformMetricsCount = metrics.filter(metric => isPlatformIntegrityMetric(metric.key)).length
 
     return {
       name: 'Finance Data Quality',
       status,
-      processed: metrics.length,
-      failed: issueMetrics.length,
+      processed: platformMetricsCount,
+      failed: platformIssueMetrics.length,
       lastRun: new Date().toISOString(),
       summary: buildFinanceDataQualitySummary(metrics),
       metrics
@@ -470,8 +507,21 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       .catch(() => null),
 
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`),
+    // DLQ-aware Proyecciones warning surface. Counts:
+    //   1) status='dead' — application/data fault, recovery cron will not help.
+    //   2) status='failed' that the recovery cron has been retrying for >24h
+    //      without success — infra/credential fault that never auto-resolved.
+    // Transient `failed` rows from the last 24h are hidden because the recovery
+    // cron is actively working on them and a yellow chip every time a single
+    // projection blips would be noise.
     safeCount(
-      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '48 hours'`
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue
+        WHERE status = 'dead'
+           OR (
+             status = 'failed'
+             AND retry_count >= max_retries
+             AND updated_at < NOW() - INTERVAL '24 hours'
+           )`
     ),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
       `SELECT MAX(updated_at)::text AS last_run FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`
@@ -611,7 +661,10 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       status: deriveHealth(projCompleted, projFailed, projLastRun, hasProjections),
       processed: projCompleted,
       failed: projFailed,
-      lastRun: projLastRun
+      lastRun: projLastRun,
+      summary: projFailed > 0
+        ? `${projCompleted} completadas · ${projFailed} en dead-letter (requieren intervención manual)`
+        : null
     },
     {
       name: 'Reactive backlog',

@@ -220,7 +220,8 @@ export const getNotionSyncOperationalOverview = async (): Promise<NotionSyncOper
         healthySpaces: 0,
         degradedSpaces: 0,
         brokenSpaces: 0,
-        unknownSpaces: 0
+        unknownSpaces: 0,
+        autoRecoverableSpaces: 0
       },
       latestRunCheckedAt: dataQuality?.recentRuns[0]?.checkedAt ?? null
     },

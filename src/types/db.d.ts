@@ -6328,6 +6328,7 @@ export interface GreenhouseSyncProjectionCircuitState {
 
 export interface GreenhouseSyncProjectionRefreshQueue {
   created_at: Generated<Timestamp>;
+  dead_at: Timestamp | null;
   entity_id: string;
   entity_type: string;
   error_class: string | null;
