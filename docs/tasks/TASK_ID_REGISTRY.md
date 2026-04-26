@@ -717,3 +717,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-639` | `complete` | Finance VAT Reactive Lane & Data Quality Semantics Hardening | `docs/tasks/complete/TASK-639-finance-vat-reactive-data-quality-hardening.md` |
 | `TASK-640` | `to-do` | Nubox V2 Enterprise Enrichment Program | `docs/tasks/to-do/TASK-640-nubox-v2-enterprise-enrichment.md` |
 | `TASK-641` | `to-do` | Adopt Apache ECharts as canonical chart stack for high-impact dashboards | `docs/tasks/to-do/TASK-641-echarts-stack-adoption.md` |
+| `TASK-642` | `to-do` | Greenhouse Motion Polish Program 2026 (umbrella) | `docs/tasks/to-do/TASK-642-motion-polish-program-2026.md` |
+| `TASK-643` | `to-do` | Microinteractions polish + tokens canónicos de motion | `docs/tasks/to-do/TASK-643-microinteractions-polish.md` |
+| `TASK-644` | `to-do` | Page entrance + skeleton crossfade | `docs/tasks/to-do/TASK-644-page-entrance-skeleton-crossfade.md` |
+| `TASK-645` | `to-do` | KPI counter animations (rolling numbers) | `docs/tasks/to-do/TASK-645-kpi-counter-animations.md` |
+| `TASK-646` | `to-do` | Scroll-triggered chart entrance + list stagger | `docs/tasks/to-do/TASK-646-scroll-triggered-chart-entrance-stagger.md` |

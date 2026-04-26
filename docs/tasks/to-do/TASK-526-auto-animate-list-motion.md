@@ -1,9 +1,22 @@
 # TASK-526 — `@formkit/auto-animate` para list motion zero-config
 
+## Delta 2026-04-26
+
+Esta task ahora es **Slice 2 del programa TASK-642 "Greenhouse Motion Polish Program 2026"**. Se mantiene como spec independiente (ejecutable sola), pero su valor pleno se materializa cuando se ejecuta dentro del programa coordinado:
+
+- Slice 1: TASK-643 (microinteractions polish + tokens canónicos) — define los tokens de duration/easing que TASK-526 debe consumir en lugar de hardcodear `duration: 200, easing: 'ease-out'`.
+- Slice 3: TASK-644 (page entrance + skeleton crossfade).
+- Slice 4: TASK-645 (KPI counter animations).
+- Slice 5: TASK-646 (scroll-triggered + stagger).
+
+Si se ejecuta TASK-526 antes que TASK-643, los timings inline deben ser temporales y refactorizar a tokens cuando TASK-643 cierre.
+
+Priority degradada a `P2` (era P3) — sube por estar dentro del programa coordinado de motion polish.
+
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P3`
+- Priority: `P2`
 - Impact: `Bajo-Medio` (micro-polish visible en cada lista mutable)
 - Effort: `Bajo`
 - Type: `dependency` + `ux`
