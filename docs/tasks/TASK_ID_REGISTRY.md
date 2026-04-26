@@ -673,7 +673,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-617` | `to-do` | API Platform V1.1 Convergence Program | `docs/tasks/to-do/TASK-617-api-platform-v1-1-convergence-program.md` |
 | `TASK-617.1` | `complete` | API Platform REST Hardening | `docs/tasks/complete/TASK-617.1-api-platform-rest-hardening.md` |
 | `TASK-617.2` | `complete` | API Platform First-Party App Surface Foundation | `docs/tasks/complete/TASK-617.2-api-platform-first-party-app-surface-foundation.md` |
-| `TASK-617.3` | `to-do` | API Platform Event Control Plane | `docs/tasks/to-do/TASK-617.3-api-platform-event-control-plane.md` |
+| `TASK-617.3` | `complete` | API Platform Event Control Plane | `docs/tasks/complete/TASK-617.3-api-platform-event-control-plane.md` |
 | `TASK-617.4` | `to-do` | Developer API Documentation Portal | `docs/tasks/to-do/TASK-617.4-developer-api-documentation-portal.md` |
 | `TASK-619` | `to-do` | Quote eSignature (consumer del foundation neutro de firma) | `docs/tasks/to-do/TASK-619-quote-esignature-zapsign.md` |
 | `TASK-619.1` | `to-do` | Signed PDF Storage Hardening (bucket separado + retention 10 anos + multi-region) | `docs/tasks/to-do/TASK-619.1-signed-pdf-storage-hardening.md` |
