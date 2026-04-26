@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-057`
+`ISSUE-058`
 
 ## Open
 
@@ -81,6 +81,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                                            | Ambiente                       | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ISSUE-057` | [Build noise: `[DashboardLayout] getServerAuthSession failed: Dynamic server usage`](resolved/ISSUE-057-build-noise-getserverauthsession-dynamic-server-usage.md) | dev + preview (build only — runtime intacto) | 2026-04-26 | 2026-04-26 | Antipatrón en 4 server components que tragaba el `DYNAMIC_SERVER_USAGE` del framework como error de auth. Resuelto con helpers canónicos `requireServerSession` + `getOptionalServerSession` en `src/lib/auth/require-server-session.ts` que detectan el error por `digest` y lo re-lanzan; `force-dynamic` en cada page/layout que consume sesión; convención obligatoria en CLAUDE.md + `GREENHOUSE_AUTH_SERVER_SESSION_V1.md`. |
 | `ISSUE-056` | [TASK-466 migration referenced phantom schema (`quotation_defaults` + `approval_policies.default_currency`)](resolved/ISSUE-056-missing-quotation-defaults-ddl-task-466.md) | dev + staging + production | 2026-04-21 | 2026-04-21 | Hotfix idempotente en migración 466 (`ALTER TABLE IF EXISTS` + `DO` block con chequeo a `information_schema`). Auditoría empírica confirmó cero consumers en `src/`, entonces no se crea DDL especulativo. |
 | `ISSUE-054` | [`/my/profile` returns HTTP 500 in staging (sólo esa página, resto `/my/*` OK)](resolved/ISSUE-054-my-profile-500-staging.md) | staging | 2026-04-19 | 2026-04-25 | La vista migró al reader canónico `GET /api/person/me/360` y quedó validada manualmente en staging con datos reales visibles. |
 | `ISSUE-049` | [Leave review puede fallar con acción stale y policy frágil de aprobación](resolved/ISSUE-049-leave-review-modal-stale-actions-and-brittle-approval-policy.md) | staging + runtime general | 2026-04-15 | 2026-04-25 | Se corrigió el override SQL con casts explícitos, se centralizó la policy de review y la UI ya envía la acción clickeada explícitamente. |
