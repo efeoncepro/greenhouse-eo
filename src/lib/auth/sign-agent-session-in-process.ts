@@ -62,6 +62,7 @@ export const signAgentSessionInProcess = async (
   const normalizedEmail = email.trim().toLowerCase()
 
   let tenant
+
   try {
     tenant = await getTenantAccessRecordForAgent(normalizedEmail)
   } catch (error) {

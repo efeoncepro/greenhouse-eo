@@ -41,7 +41,8 @@ const AdminHandlerAcknowledgeButton = ({ handler }: Props) => {
   const submit = () => {
     if (!resolutionNote.trim()) {
       setFeedback({ tone: 'error', message: 'Resolution note required to acknowledge.' })
-      return
+      
+return
     }
 
     setFeedback(null)

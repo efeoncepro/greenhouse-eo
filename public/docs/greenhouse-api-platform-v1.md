@@ -56,6 +56,26 @@ Endpoints:
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
+- `GET /api/platform/ecosystem/health`
+
+### Platform Health (preflight contract)
+
+Versioned read-only contract for agent / MCP / Teams-bot preflight. Composes
+Reliability Control Plane, Operations Overview, internal runtime checks,
+integration readiness, synthetic monitoring and webhook delivery into a
+single `PlatformHealthV1` payload with safe-mode booleans.
+
+- `GET /api/platform/ecosystem/health` — ecosystem audience (redacted summary, safe modes, no evidence detail until TASK-658 lands the `platform.health.detail` capability).
+- `GET /api/admin/platform-health` — admin audience (full payload with evidence refs and degraded-source error details). Requires `requireAdminTenantContext`.
+
+The contract is `platform-health.v1`. Shape is documented in the OpenAPI
+artifact under `components.schemas.PlatformHealthV1` and in the functional
+guide at `docs/documentation/plataforma/platform-health-api.md`.
+
+Failure modes:
+
+- A single source timeout/error degrades the response (lower confidence, populated `degradedSources[]`) instead of returning 5xx.
+- Stack traces, secrets, tokens and PII are stripped before serialization (see `src/lib/observability/redact.ts`).
 
 ### First-party App API
 

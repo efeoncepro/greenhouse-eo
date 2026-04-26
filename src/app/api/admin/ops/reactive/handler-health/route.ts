@@ -43,6 +43,7 @@ export async function POST(request: Request) {
   }
 
   let body: AckRequestBody
+
   try {
     body = (await request.json()) as AckRequestBody
   } catch {

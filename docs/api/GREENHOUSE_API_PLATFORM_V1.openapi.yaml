@@ -120,6 +120,128 @@ components:
       properties:
         refreshToken:
           type: string
+    PlatformHealthV1:
+      type: object
+      required:
+        - contractVersion
+        - generatedAt
+        - environment
+        - overallStatus
+        - confidence
+        - safeModes
+        - modules
+        - blockingIssues
+        - warnings
+        - recommendedChecks
+        - degradedSources
+      properties:
+        contractVersion:
+          type: string
+          enum: [platform-health.v1]
+        generatedAt:
+          type: string
+          format: date-time
+        environment:
+          type: string
+          enum: [development, preview, staging, production, unknown]
+        overallStatus:
+          type: string
+          enum: [healthy, degraded, blocked, unknown]
+        confidence:
+          type: string
+          enum: [high, medium, low, unknown]
+        safeModes:
+          type: object
+          required:
+            - readSafe
+            - writeSafe
+            - deploySafe
+            - backfillSafe
+            - notifySafe
+            - agentAutomationSafe
+          properties:
+            readSafe: { type: boolean }
+            writeSafe: { type: boolean }
+            deploySafe: { type: boolean }
+            backfillSafe: { type: boolean }
+            notifySafe: { type: boolean }
+            agentAutomationSafe: { type: boolean }
+        modules:
+          type: array
+          items:
+            type: object
+            required: [moduleKey, label, domain, status, confidence, summary, topIssues, sourceFreshness]
+            properties:
+              moduleKey: { type: string }
+              label: { type: string }
+              domain: { type: string }
+              status:
+                type: string
+                enum: [healthy, degraded, blocked, unknown]
+              confidence:
+                type: string
+                enum: [high, medium, low, unknown]
+              summary: { type: string }
+              topIssues:
+                type: array
+                items: { $ref: '#/components/schemas/PlatformHealthIssue' }
+              sourceFreshness:
+                type: object
+                additionalProperties:
+                  type: string
+                  format: date-time
+                  nullable: true
+        blockingIssues:
+          type: array
+          items: { $ref: '#/components/schemas/PlatformHealthIssue' }
+        warnings:
+          type: array
+          items: { $ref: '#/components/schemas/PlatformHealthIssue' }
+        recommendedChecks:
+          type: array
+          items:
+            type: object
+            required: [id, label, appliesWhen]
+            properties:
+              id: { type: string }
+              label: { type: string }
+              command: { type: string }
+              docs: { type: string }
+              appliesWhen:
+                type: array
+                items: { type: string }
+        degradedSources:
+          type: array
+          items:
+            type: object
+            required: [source, status, observedAt, summary]
+            properties:
+              source: { type: string }
+              status:
+                type: string
+                enum: [timeout, error, unavailable, not_configured]
+              observedAt:
+                type: string
+                format: date-time
+              summary: { type: string }
+    PlatformHealthIssue:
+      type: object
+      required: [moduleKey, severity, source, summary, evidenceRefs, ownerDomain, observedAt]
+      properties:
+        moduleKey: { type: string }
+        severity:
+          type: string
+          enum: [ok, warning, error, unknown]
+        source: { type: string }
+        summary: { type: string }
+        evidenceRefs:
+          type: array
+          items: { type: string }
+        ownerDomain: { type: string }
+        observedAt:
+          type: string
+          format: date-time
+          nullable: true
     WebhookSubscriptionRequest:
       type: object
       required: [targetUrl, eventFilters]
@@ -247,6 +369,43 @@ paths:
       responses:
         '200':
           description: Integration readiness
+  /api/platform/ecosystem/health:
+    get:
+      summary: Platform Health V1 — preflight contract for agents and MCP
+      description: |
+        Versioned read-only contract that composes Reliability Control Plane,
+        Operations Overview, internal runtime checks, integration readiness,
+        synthetic monitoring and webhook delivery into a single payload with
+        deterministic safe-mode booleans.
+
+        Audience: ecosystem (redacted summary; no evidence detail until
+        TASK-658 lands the `platform.health.detail` capability bridge).
+        Admins consume `/api/admin/platform-health` for the full payload.
+
+        A single source timeout/error degrades the response (lower confidence,
+        populated `degradedSources[]`) instead of returning 5xx. Stack traces,
+        secrets, tokens and PII are stripped before serialization.
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+      responses:
+        '200':
+          description: Platform health snapshot
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PlatformEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PlatformHealthV1'
+        '304':
+          description: Not modified
   /api/platform/ecosystem/event-types:
     get:
       summary: List known event types
