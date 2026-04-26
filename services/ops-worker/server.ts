@@ -43,6 +43,7 @@ import {
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { runPartyLifecycleInactivitySweep } from '@/lib/commercial/party'
 import { runNotionSyncOrchestration } from '@/lib/integrations/notion-sync-orchestration'
+import { syncBqConformedToPostgres } from '@/lib/sync/sync-bq-conformed-to-postgres'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
@@ -869,13 +870,43 @@ const handleNotionConformedSync = async (req: IncomingMessage, res: ServerRespon
   console.log(`[ops-worker] POST /notion-conformed/sync — executionSource=${executionSource}`)
 
   try {
-    const result = await runNotionSyncOrchestration({ executionSource })
+    // Step 1: BQ-side cycle (raw → conformed). May skip if BQ conformed is
+    // already current — that's fine, Step 2 still runs unconditionally.
+    const orchestrationResult = await runNotionSyncOrchestration({ executionSource })
+
+    // Step 2: PG-side projection (BQ conformed → Postgres). UNCONDITIONAL —
+    // closes the historical gap where the orchestrator skipped on
+    // "BQ already current" but PG was 24+ days stale because no scheduled
+    // process drained BQ-conformed → PG independently. This step always runs
+    // so PG stays in sync regardless of what happened upstream.
+    let pgProjectionResult: Awaited<ReturnType<typeof syncBqConformedToPostgres>> | null = null
+    let pgProjectionError: string | null = null
+
+    try {
+      pgProjectionResult = await syncBqConformedToPostgres({
+        syncRunId: orchestrationResult.syncRunId ?? `pg-drain-${Date.now()}`,
+        targetSpaceIds: null, // null = all active spaces
+        replaceMissingForSpaces: true
+      })
+
+      console.log(
+        `[ops-worker] PG drain from BQ: read=${pgProjectionResult.bqProjectsRead}p/${pgProjectionResult.bqSprintsRead}s/${pgProjectionResult.bqTasksRead}t, ` +
+        `written=${pgProjectionResult.pgProjectsWritten}p/${pgProjectionResult.pgSprintsWritten}s/${pgProjectionResult.pgTasksWritten}t, ` +
+        `deleted=${pgProjectionResult.pgProjectsMarkedDeleted}p/${pgProjectionResult.pgSprintsMarkedDeleted}s/${pgProjectionResult.pgTasksMarkedDeleted}t, ` +
+        `${pgProjectionResult.durationMs}ms`
+      )
+    } catch (err) {
+      pgProjectionError = err instanceof Error ? err.message : String(err)
+      console.error('[ops-worker] PG drain failed (non-blocking):', pgProjectionError)
+    }
 
     json(res, 200, {
       ok: true,
       orchestrator: 'cloud_run',
       executionSource,
-      result
+      orchestration: orchestrationResult,
+      pgProjection: pgProjectionResult,
+      pgProjectionError
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown sync orchestration error'

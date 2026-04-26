@@ -28,14 +28,34 @@ export async function POST() {
   }
 
   try {
-    const result = await runNotionSyncOrchestration({
+    // Step 1: BQ-side cycle (raw → conformed). May skip if BQ conformed is
+    // already current. PG drain runs unconditionally below.
+    const orchestrationResult = await runNotionSyncOrchestration({
       executionSource: 'manual_admin'
     })
+
+    // Step 2: PG drain (BQ conformed → PG). Always runs regardless of step 1.
+    // Closes the gap where BQ is fresh but PG is stale.
+    const { syncBqConformedToPostgres } = await import('@/lib/sync/sync-bq-conformed-to-postgres')
+    let pgProjection: Awaited<ReturnType<typeof syncBqConformedToPostgres>> | null = null
+    let pgProjectionError: string | null = null
+
+    try {
+      pgProjection = await syncBqConformedToPostgres({
+        syncRunId: orchestrationResult.syncRunId ?? `pg-drain-manual-${Date.now()}`,
+        targetSpaceIds: null,
+        replaceMissingForSpaces: true
+      })
+    } catch (err) {
+      pgProjectionError = err instanceof Error ? err.message : String(err)
+    }
 
     return NextResponse.json({
       triggered: true,
       orchestrator: 'manual_admin',
-      result
+      orchestration: orchestrationResult,
+      pgProjection,
+      pgProjectionError
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown sync orchestration error'
