@@ -2654,6 +2654,31 @@ export interface GreenhouseCoreSpaces {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreTeamsBotConversationReferences {
+  azure_tenant_id: string;
+  bot_app_id: string;
+  conversation_id: string | null;
+  created_at: Generated<Timestamp>;
+  failure_count: Generated<number>;
+  last_failure_at: Timestamp | null;
+  /**
+   * Redacted summary of the last failure (no tokens, no stacks). For ops dashboards only.
+   */
+  last_failure_reason: string | null;
+  last_success_at: Timestamp | null;
+  last_used_at: Generated<Timestamp>;
+  reference_id: Generated<string>;
+  /**
+   * Stable lookup key. 'channel:<teamId>:<channelId>' | 'user:<aadObjectId>' | 'chat:<chatId>'. Unique per bot_app_id.
+   */
+  reference_key: string;
+  /**
+   * Bot Framework serviceUrl that has worked at least once for this target. Region drift is rare; on persistent failure we mark failure_count high and the dispatcher re-discovers via the candidate list.
+   */
+  service_url: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreTeamsBotInboundActions {
   action_data_json: Json | null;
   action_id: string;
@@ -6839,6 +6864,7 @@ export interface DB {
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;
   "greenhouse_core.spaces": GreenhouseCoreSpaces;
+  "greenhouse_core.teams_bot_conversation_references": GreenhouseCoreTeamsBotConversationReferences;
   "greenhouse_core.teams_bot_inbound_actions": GreenhouseCoreTeamsBotInboundActions;
   "greenhouse_core.teams_notification_channels": GreenhouseCoreTeamsNotificationChannels;
   "greenhouse_core.tool_catalog": GreenhouseCoreToolCatalog;

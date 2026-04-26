@@ -1,10 +1,55 @@
 # GREENHOUSE_TEAMS_BOT_INTERACTION_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-04-26 por TASK-671 (Claude)
+> **Última actualización:** 2026-04-26 por TASK-671 (Claude) — bump a v1.1 con path correcto Bot Framework Connector + lessons learned del deploy
 > **Estado:** vigente
 > **Spec relacionada:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.1
+
+## Delta v1.1 (2026-04-26 — verificado en producción)
+
+Durante el deploy a `efeoncepro.com` aprendimos que la propuesta original
+(Microsoft Graph `POST /v1.0/teams/{}/channels/{}/messages` con app token + RSC)
+**NO funciona para bots proactivos**. Microsoft Graph reserva la application
+permission `Teamwork.Migrate.All` para escenarios de migración únicamente; las
+RSC `ChannelMessage.Send.Group` declaradas en el manifest son consentidas pero
+Graph aún rechaza con `Forbidden — API requires Teamwork.Migrate.All`.
+
+### Path correcto verificado por smoke
+
+Greenhouse Teams Bot envía via **Bot Framework Connector API**, no Microsoft Graph:
+
+| Aspecto | Valor verificado |
+| --- | --- |
+| Token audience | `https://api.botframework.com/.default` |
+| Token endpoint | `https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token` (NO `botframework.com` para SingleTenant bots) |
+| Service URL | `https://smba.trafficmanager.net/teams` (primary), `/amer`, `/emea`, `/apac` (fallbacks regionales) |
+| Endpoint canal | `POST {serviceUrl}/v3/conversations` con body `{ isGroup: true, channelData: { channel, tenant, team? }, activity }` |
+| Endpoint chat existente | `POST {serviceUrl}/v3/conversations/{chatId}/activities` |
+| Endpoint crear DM | `POST {serviceUrl}/v3/conversations` con `members: [{ id: "29:<aadObjectId>" }]` |
+
+Microsoft Graph **sí** se usa para 2 lookups ancilares (token aud
+`https://graph.microsoft.com/.default`):
+
+- `GET /v1.0/users?$filter=mail eq '<email>'` — recipient resolver fallback
+- `POST /v1.0/users/{userId}/teamwork/installedApps` — auto-install para DM
+
+### Robustness baked in
+
+- **Region failover:** lista de candidatos (`/teams → /amer → /emea → /apac`); 404 "Unknown cloud" no se cuenta como error, salta al siguiente.
+- **Conversation reference cache:** tabla `greenhouse_core.teams_bot_conversation_references` (migración `20260426220857590`) cachea per-target el `serviceUrl` + `conversationId` que funcionó. Cache de 2 niveles: in-process Map (TTL 5 min) + Postgres. Hot path evita la región-loop.
+- **Circuit breaker:** `failure_count >= 3` en la cache row → `resolveConversationReference` retorna null y el dispatcher re-descubre. Self-healing en el próximo success.
+- **Backoff con jitter:** 250ms × 4^(n-1) + jitter aleatorio ≤ 250ms en 429/5xx, máx 3 intentos. Respeta `Retry-After` con cap de 30s.
+- **Token cache:** in-process Map por `(tenantId, clientId, scope)` con margen de seguridad de 60s antes de expiry. Soporta dos audiences (BF Connector + Graph) sin colisión.
+
+### Manifest learnings
+
+- `manifestVersion: "1.16"` es el más estable con RSC. `1.17` también funciona pero dispara warning "supportsChannelFeatures tier1" sin necesidad.
+- `webApplicationInfo` con `id` + `resource: api://botid-<appId>` es **REQUERIDO** cuando el manifest declara `authorization.permissions.resourceSpecific[]`. Sin esto, el upload al Admin Center falla con error genérico "No podemos cargar la aplicación" (el detalle solo lo muestra `@microsoft/teamsapp-cli teamsapp validate --debug`).
+- Scopes RSC inválidos rompen el upload entero. **`ChatMessage.Send.Chat` NO existe** — usar `Chat.Manage.Chat` para sends a chats con app token.
+- RSC application scopes se conceden **per-team al instalar el bot**. Después de actualizar el manifest, los installs existentes NO heredan los nuevos scopes — hay que **uninstall + reinstall** desde Teams Desktop (no via Graph CLI con token delegado, que no tiene autoridad para consentir RSC en nombre del team).
+- App registration debe ser `signInAudience=AzureADMyOrg` (single-tenant) para nuestro caso. NO multi-tenant a menos que el cliente Globe lo requiera explícitamente.
 
 ## 1. Propósito
 

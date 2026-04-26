@@ -5,25 +5,46 @@ import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 /**
  * TASK-671 — OAuth2 client_credentials token cache for the Greenhouse Teams Bot.
  *
- * The bot mints an app-only token against `login.microsoftonline.com/{tenant}`
- * with scope `https://graph.microsoft.com/.default` and uses it to:
- *  - POST to /teams/{teamId}/channels/{channelId}/messages
- *  - POST to /chats/{chatId}/messages
- *  - POST to /chats (create 1:1)
- *  - POST to /users/{userId}/teamwork/installedApps
+ * The bot mints app-only tokens against `login.microsoftonline.com/{tenantId}`
+ * for two distinct audiences:
  *
- * Tokens are cached in-process per (tenantId, clientId) tuple with a 60s safety margin
- * before expiry. The cache is intentionally NOT shared across function invocations on
- * Vercel (each cold start mints a fresh token; warm starts reuse it).
+ *  1. `https://api.botframework.com/.default` (DEFAULT for proactive sends).
+ *     Used by the Bot Framework Connector path:
+ *       - POST {serviceUrl}/v3/conversations              (create channel/chat conv)
+ *       - POST {serviceUrl}/v3/conversations/{id}/activities (post in existing conv)
+ *
+ *  2. `https://graph.microsoft.com/.default`. Used ONLY for ancillary lookups:
+ *       - GET /v1.0/users?$filter=mail eq … (recipient resolver email fallback)
+ *       - POST /v1.0/users/{userId}/teamwork/installedApps (auto-install for DM target)
+ *     (Channel/chat sends via Graph DO NOT WORK — see connector-client.ts.)
+ *
+ * Tokens are cached in-process per (tenantId, clientId, audience) tuple with a
+ * 60 s safety margin before expiry. The cache is intentionally NOT shared
+ * across Vercel function invocations (each cold start mints a fresh pair;
+ * warm starts reuse it). On Cloud Run the cache lives for the container
+ * lifetime which is long enough to amortize.
+ *
+ * We deliberately persist NOTHING to disk and never log the token value. The
+ * BotFrameworkTokenError class carries response status + a 500-byte truncated
+ * body for the redaction layer (see `redactSensitive` in observability/).
  */
 
+const DEFAULT_BOT_AUDIENCE = 'https://api.botframework.com/.default'
+const DEFAULT_GRAPH_AUDIENCE = 'https://graph.microsoft.com/.default'
 const SAFETY_MARGIN_MS = 60_000
+const TOKEN_REQUEST_TIMEOUT_MS = 8_000
+
 const cache = new Map<string, { token: string; expiresAt: number }>()
 
-const cacheKey = (tenantId: string, clientId: string) => `${tenantId}::${clientId}`
+const cacheKey = (tenantId: string, clientId: string, scope: string) =>
+  `${tenantId}::${clientId}::${scope}`
 
 export class BotFrameworkTokenError extends Error {
-  constructor(message: string, public readonly status?: number, public readonly responseBody?: string) {
+  constructor(
+    message: string,
+    public readonly status?: number,
+    public readonly responseBody?: string
+  ) {
     super(message)
     this.name = 'BotFrameworkTokenError'
   }
@@ -37,9 +58,17 @@ export interface BotFrameworkSecretBlob {
 
 /**
  * Reads the secret stored in `secret_ref` and parses it as a JSON blob with
- * `{ clientId, clientSecret, tenantId }`. The blob shape lets us rotate clientSecret
- * without touching the channel row, and lets us federate (e.g. swap clientSecret for
- * a federatedAssertion) later without an API change.
+ * `{ clientId, clientSecret, tenantId }`. The blob shape lets us rotate
+ * clientSecret without touching the channel row, and lets us swap to a
+ * federated assertion later without an API change.
+ *
+ * Returns null if:
+ *   - The secret is missing or empty in GCP Secret Manager.
+ *   - The blob is not valid JSON.
+ *   - Any of the 3 required keys is missing.
+ *
+ * NEVER returns the secret value to a logger or to the caller — it goes
+ * straight to acquireBotFrameworkToken which uses it once.
  */
 export const readBotFrameworkSecret = async (
   secretRef: string
@@ -69,22 +98,18 @@ interface MintParams {
   tenantId: string
   clientId: string
   clientSecret: string
+  /** Audience scope. Defaults to Bot Framework. */
   scope?: string
   fetchImpl?: typeof fetch
   now?: () => number
 }
 
-/**
- * Acquires (or returns cached) bot framework token. Resolves to a JWT string suitable
- * for the `Authorization: Bearer …` header on Microsoft Graph requests.
- */
-export const acquireBotFrameworkToken = async (params: MintParams): Promise<string> => {
+const mintToken = async (params: MintParams, scope: string): Promise<string> => {
   const { tenantId, clientId, clientSecret } = params
-  const scope = params.scope || 'https://graph.microsoft.com/.default'
   const fetchImpl = params.fetchImpl || fetch
   const now = params.now || Date.now
 
-  const key = cacheKey(tenantId, clientId)
+  const key = cacheKey(tenantId, clientId, scope)
   const cached = cache.get(key)
 
   if (cached && cached.expiresAt - SAFETY_MARGIN_MS > now()) {
@@ -107,7 +132,7 @@ export const acquireBotFrameworkToken = async (params: MintParams): Promise<stri
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: body.toString(),
-      signal: AbortSignal.timeout(8_000)
+      signal: AbortSignal.timeout(TOKEN_REQUEST_TIMEOUT_MS)
     })
   } catch (error) {
     throw new BotFrameworkTokenError(
@@ -119,7 +144,7 @@ export const acquireBotFrameworkToken = async (params: MintParams): Promise<stri
     const text = await response.text().catch(() => '')
 
     throw new BotFrameworkTokenError(
-      `Token endpoint returned ${response.status}`,
+      `Token endpoint returned ${response.status} for scope=${scope}`,
       response.status,
       text.slice(0, 500)
     )
@@ -137,6 +162,26 @@ export const acquireBotFrameworkToken = async (params: MintParams): Promise<stri
 
   return json.access_token
 }
+
+/**
+ * Acquires (or returns cached) Bot Framework Connector token. Use this for
+ * all proactive sends to channels and chats via smba.trafficmanager.net.
+ *
+ * Default scope is `https://api.botframework.com/.default` — callers should
+ * NOT override unless they really know what they're doing.
+ */
+export const acquireBotFrameworkToken = async (params: MintParams): Promise<string> =>
+  mintToken(params, params.scope || DEFAULT_BOT_AUDIENCE)
+
+/**
+ * Acquires (or returns cached) Microsoft Graph token. Use this ONLY for
+ * ancillary lookups (find user by email, install bot for user) — NOT for
+ * sending channel/chat messages (Graph rejects those for general bots; see
+ * connector-client.ts header comment).
+ */
+export const acquireGraphToken = async (
+  params: Omit<MintParams, 'scope'>
+): Promise<string> => mintToken(params, DEFAULT_GRAPH_AUDIENCE)
 
 /** Test-only: clear the in-memory cache. */
 export const __resetBotFrameworkTokenCache = () => {

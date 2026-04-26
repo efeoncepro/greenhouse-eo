@@ -15,6 +15,8 @@ Recursos productivos:
 - **Bicep deploy**: `gh-bot-20260426-205907` ejecutado con `parameters.prod.json` actualizado con el `botAppId` real.
 - **Manifest Teams v1.17 listo** en `infra/azure/teams-bot/manifest/greenhouse-teams.zip` (1936 bytes: manifest.json + icons/icon_color.png 192×192 + icons/icon_outline.png 32×32). Iconos placeholder generados con Python+zlib (círculo verde #00B07F con G blanca, outline blanco). Reemplazar por logo definitivo cuando design lo entregue.
 
+**Manifest publicado en Teams Admin Center 2026-04-26**: Teams catalog id (distinto del Azure AD app id) = `54fdb02a-3424-4cac-b921-50bd9e2024d1`. Estado `Allowed`, "Installed para Todos" (org-wide default), Versión `1.0.0`. Este id es el que recibe `installBotForUser` (Slice 7) y el que se usa para `POST /teams/{teamId}/installedApps`. NO confundir con el msaAppId del bot (`a1397477-4aae-4f16-a0a2-a213cb1b00b2`) — ese mintea tokens; el catalog id solo identifica el manifest publicado.
+
 Closed via CLI en esta misma sesión (segunda iteración del deploy):
 
 - **Vercel env var**: `GREENHOUSE_TEAMS_BOT_APP_ID=a1397477-4aae-4f16-a0a2-a213cb1b00b2` setado en Production + Preview (develop) + Development vía `vercel env add … --force`. Verificable con `vercel env ls | grep GREENHOUSE_TEAMS_BOT_APP_ID`.
@@ -20198,3 +20200,24 @@ Fase 4 completada:
   - `pnpm build` volvió a imprimir los warnings conocidos de `Dynamic server usage` por rutas que usan `headers`; el build terminó exit code `0`
   - `getOperationsOverview()` sigue siendo global como reader de Ops; el tenant-aware scoping quedó sólido en `GET /api/finance/data-quality`, pero extender ese scope a Ops completo requiere un follow-up fuera de este slice
   - el worktree tenía cambios ajenos vivos (`TASK-615`, `src/config/greenhouse-nomenclature.ts`); no pertenecen a `TASK-639` y deben quedar fuera del commit
+
+## Sesion 2026-04-26 — TASK-671 refactor a Bot Framework Connector + skill canonica
+
+Pivot del dispatcher: de Microsoft Graph (que rechazaba con `Teamwork.Migrate.All required`) a Bot Framework Connector API. Path verificado por smoke contra `efeoncepro.com`: token aud=`api.botframework.com`, endpoint `smba.trafficmanager.net/teams/v3/conversations`. Manifest cleaned a v1.0.5 con scopes minimos validados por `@microsoft/teamsapp-cli teamsapp validate` (62 passed, 0 failed).
+
+- `graph-client.ts` → renamed `connector-client.ts`, reescrito con region failover (`/teams → /amer → /emea → /apac`), retries con jitter, timeout 8s, GraphTransportError preservado por compat
+- `token-cache.ts` con doble audience (BF Connector + Graph) cacheado por `(tenantId, clientId, scope)` y safety margin 60s
+- Nueva tabla `greenhouse_core.teams_bot_conversation_references` (migracion `20260426220857590`) — cache de 2 niveles (in-memory Map TTL 5min + PG) per-target del serviceUrl + conversationId. Failure_count >= 3 trip circuit breaker
+- `sender.ts` rewrite con cache lookup en hot path, mark_failure on error, mark_success on 2xx
+- Tests: 9 nuevos (region failover, 429 retry, OData escape en findUserByEmail, circuit breaker en conv refs, cache TTL); total 2324 pasando
+- Skill `teams-bot-platform` canonico publicado en 3 ubicaciones:
+  - global: `~/.claude/skills/teams-bot-platform/skill.md`
+  - repo Claude: `.claude/skills/teams-bot-platform/skill.md`
+  - repo Codex: `.codex/skills/teams-bot-platform/SKILL.md`
+  Cubre los 5 concerns (app reg, Bot Service, manifest, dispatcher, inbound), 4 HARD RULES con su lesson de produccion, runbook deploy day 1, diagnosis cheatsheet, lista de archivos referenciables del Greenhouse stack
+- Spec `GREENHOUSE_TEAMS_BOT_INTERACTION_V1` bumped a v1.1 con Delta de lessons learned (Connector vs Graph, manifest webApplicationInfo, RSC consent per-team)
+
+Pendientes:
+- UPDATE de los 3 canales en Postgres (espera confirmacion literal del mapping del usuario por sandbox)
+- Smoke real via `pnpm staging:request POST /api/admin/teams/test` despues del UPDATE
+- Decommission de Logic Apps tras 1 semana de validacion
