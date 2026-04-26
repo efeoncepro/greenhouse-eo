@@ -1,5 +1,57 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-526 list motion con auto-animate (Slice 2 de TASK-642)
+
+### Que cambio
+
+- `@formkit/auto-animate` instalado (~2 KB, zero-config, respeta `prefers-reduced-motion` nativo).
+- Hook canonico `src/hooks/useListAnimation.ts` envuelve `useAutoAnimate` con timings consistentes (200ms / ease-out). Centraliza config para que cuando TASK-643 (tokens canonicos motion) cierre, el refactor sea de 1 archivo.
+- 5 listas mutables wireadas:
+  - `src/views/greenhouse/finance/workspace/QuoteLineItemsEditor.tsx` — los 2 TableBody (readonly + draft editor).
+  - `src/views/greenhouse/finance/workspace/AddonSuggestionsPanel.tsx` — Stack de suggestions.
+  - `src/views/greenhouse/finance/QuotesListView.tsx` — TableBody principal.
+  - `src/views/greenhouse/people/PeopleListTable.tsx` — tbody nativo (TanStack Table sin virtualizacion).
+  - `src/components/greenhouse/primitives/ContextChipStrip.tsx` — Stack horizontal interno.
+
+### Validaciones
+
+- `npx tsc --noEmit` -> 0 errors.
+- `pnpm lint` -> 0 errors.
+- `pnpm test --run` -> 2177 passed.
+- `pnpm build` -> Compiled successfully en 18.1s.
+
+### Decisiones de orden
+
+- Slice 2 ejecutado ANTES que Slice 1 (TASK-643 tokens canonicos). Razon: momentum visible. Timings hardcodeados marcados con TODO `// motion: TASK-643 reemplazara por motionDuration.base / motionEasing.exit`. Refactor post-643 = 5 min.
+
+### Sinergia
+
+- TASK-642 umbrella actualizada con Delta marcando Slice 2 cerrado.
+- TASK-643/644/645/646 (Slices 1, 3, 4, 5) siguen pendientes — ejecutables independientes.
+- View Transitions (TASK-525) no afectadas — coexisten sin interferir.
+
+## Sesion 2026-04-26 — TASK-648 API Platform ICO Read Surface
+
+### Que cambio
+
+- Se creó `TASK-648 — API Platform ICO Read Surface V1` en `docs/tasks/to-do/`.
+- La task formaliza el pre-requisito API-first para exponer ICO a MCP:
+  - resources ICO bajo `src/lib/api-platform/resources/**`
+  - rutas read-only bajo `src/app/api/platform/ecosystem/ico/**`
+  - scope por `sister_platform_bindings`
+  - envelopes, freshness, errores y request IDs de API Platform
+  - sin compute live amplio por defecto
+
+### Notas de coordinacion
+
+- `TASK-647` sigue siendo el primer MCP read-only base; ICO debe entrar a MCP solo después de cerrar la surface API Platform de `TASK-648`.
+- Person-level ICO queda fuera del V1 salvo diseño explícito de entitlements/capabilities.
+- Rutas legacy/product API como `/api/ico-engine/*` no se reemplazan en este corte.
+
+### Validaciones
+
+- `git diff --check -- docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md Handoff.md` -> clean.
+
 ## Sesion 2026-04-26 — Cleanup documental API Platform + TASK-647 MCP
 
 ### Que cambio

@@ -2,6 +2,14 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — List motion con auto-animate (TASK-526, Slice 2 de TASK-642)
+
+- `@formkit/auto-animate` instalado (~2 KB, zero-config, respeta `prefers-reduced-motion` nativo).
+- Hook canonico `src/hooks/useListAnimation.ts` envuelve `useAutoAnimate` con timings consistentes (200ms / ease-out). Centraliza config para refactor cuando TASK-643 (tokens canonicos motion) cierre.
+- 5 listas mutables wireadas: QuoteLineItemsEditor (2 TableBody), AddonSuggestionsPanel, QuotesListView, PeopleListTable, ContextChipStrip.
+- Slice 2 de TASK-642 (Motion Polish Program) cerrado. Slices 1/3/4/5 siguen pendientes — independientes.
+- Gates verdes: tsc 0 errors, lint 0 errors, test 2177 passed, build OK.
+
 ### 2026-04-26 — API Platform REST Hardening + First-Party App Lane (TASK-617.1 / TASK-617.2)
 
 - Recuperada e integrada de forma selectiva la implementación previa de `TASK-617.1` y `TASK-617.2` que había quedado repartida entre rama y stash.

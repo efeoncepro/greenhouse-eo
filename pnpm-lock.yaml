@@ -47,6 +47,9 @@ importers:
       '@formatjs/intl-localematcher':
         specifier: 0.6.2
         version: 0.6.2
+      '@formkit/auto-animate':
+        specifier: ^0.9.0
+        version: 0.9.0
       '@formkit/drag-and-drop':
         specifier: 0.5.3
         version: 0.5.3
@@ -1187,6 +1190,9 @@ packages:
 
   '@formatjs/intl-localematcher@0.6.2':
     resolution: {integrity: sha512-XOMO2Hupl0wdd172Y06h6kLpBz6Dv+J4okPLl4LPtzbr8f66WbIoy4ev98EBuZ6ZK4h5ydTN6XneT4QVpD7cdA==}
+
+  '@formkit/auto-animate@0.9.0':
+    resolution: {integrity: sha512-VhP4zEAacXS3dfTpJpJ88QdLqMTcabMg0jwpOSxZ/VzfQVfl3GkZSCZThhGC5uhq/TxPHPzW0dzr4H9Bb1OgKA==}
 
   '@formkit/drag-and-drop@0.5.3':
     resolution: {integrity: sha512-VGQsKYc350OOMbz7wYt69YqDbn49x7RJ32eqiJieNke54nGZYmx18XEqTw0lBiJmH3RaiH6V45gB1u+tvI/TNw==}
@@ -10051,6 +10057,8 @@ snapshots:
   '@formatjs/intl-localematcher@0.6.2':
     dependencies:
       tslib: 2.8.1
+
+  '@formkit/auto-animate@0.9.0': {}
 
   '@formkit/drag-and-drop@0.5.3': {}
 

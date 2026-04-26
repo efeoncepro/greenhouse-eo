@@ -579,7 +579,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-523` | `to-do` | bcryptjs → @node-rs/argon2 (with re-hash policy) | `docs/tasks/to-do/TASK-523-bcryptjs-to-argon2.md` |
 | `TASK-524` | `to-do` | Income → HubSpot Invoice Bridge | `docs/tasks/to-do/TASK-524-income-hubspot-invoice-bridge.md` |
 | `TASK-525` | `to-do` | View Transitions API rollout (navegación animada nativa) | `docs/tasks/to-do/TASK-525-view-transitions-api-rollout.md` |
-| `TASK-526` | `to-do` | @formkit/auto-animate para list motion zero-config | `docs/tasks/to-do/TASK-526-auto-animate-list-motion.md` |
+| `TASK-526` | `complete` | @formkit/auto-animate para list motion zero-config | `docs/tasks/complete/TASK-526-auto-animate-list-motion.md` |
 | `TASK-527` | `to-do` | Rive interactive illustrations (next-gen Lottie) | `docs/tasks/to-do/TASK-527-rive-interactive-illustrations.md` |
 | `TASK-528` | `to-do` | Chile Tax / IVA Program | `docs/tasks/to-do/TASK-528-chile-tax-iva-program.md` |
 | `TASK-529` | `to-do` | Chile Tax Code Foundation | `docs/tasks/to-do/TASK-529-chile-tax-code-foundation.md` |
@@ -723,3 +723,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-645` | `to-do` | KPI counter animations (rolling numbers) | `docs/tasks/to-do/TASK-645-kpi-counter-animations.md` |
 | `TASK-646` | `to-do` | Scroll-triggered chart entrance + list stagger | `docs/tasks/to-do/TASK-646-scroll-triggered-chart-entrance-stagger.md` |
 | `TASK-647` | `to-do` | Greenhouse MCP Read-Only Adapter V1 | `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md` |
+| `TASK-648` | `to-do` | API Platform ICO Read Surface V1 | `docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md` |
