@@ -715,7 +715,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-637` | `to-do` | GitHub Billing & Actions Cost Observability in Admin Center | `docs/tasks/to-do/TASK-637-github-billing-actions-cost-observability.md` |
 | `TASK-638` | `complete` | Reliability AI Observer (Gemini watcher hosted en ops-worker + Cloud Scheduler) | `docs/tasks/complete/TASK-638-reliability-ai-observer.md` |
 | `TASK-639` | `complete` | Finance VAT Reactive Lane & Data Quality Semantics Hardening | `docs/tasks/complete/TASK-639-finance-vat-reactive-data-quality-hardening.md` |
-| `TASK-640` | `to-do` | Nubox V2 Enterprise Enrichment Program | `docs/tasks/to-do/TASK-640-nubox-v2-enterprise-enrichment.md` |
+| `TASK-640` | `in-progress` | Nubox V2 Enterprise Enrichment Program | `docs/tasks/in-progress/TASK-640-nubox-v2-enterprise-enrichment.md` |
 | `TASK-641` | `to-do` | Adopt Apache ECharts as canonical chart stack for high-impact dashboards | `docs/tasks/to-do/TASK-641-echarts-stack-adoption.md` |
 | `TASK-642` | `to-do` | Greenhouse Motion Polish Program 2026 (umbrella) | `docs/tasks/to-do/TASK-642-motion-polish-program-2026.md` |
 | `TASK-643` | `to-do` | Microinteractions polish + tokens canónicos de motion | `docs/tasks/to-do/TASK-643-microinteractions-polish.md` |
@@ -737,3 +737,10 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-659` | `to-do` | MCP OAuth / Hosted Auth Model | `docs/tasks/to-do/TASK-659-mcp-oauth-hosted-auth-model.md` |
 | `TASK-660` | `to-do` | API Platform OpenAPI Stable Contract | `docs/tasks/to-do/TASK-660-api-platform-openapi-stable-contract.md` |
 | `TASK-661` | `to-do` | API Platform Lifecycle & Deprecation Policy | `docs/tasks/to-do/TASK-661-api-platform-lifecycle-deprecation-policy.md` |
+| `TASK-662` | `to-do` | Nubox Document Graph Foundation | `docs/tasks/to-do/TASK-662-nubox-document-graph-foundation.md` |
+| `TASK-663` | `to-do` | Nubox Durable PDF/XML Artifact Persistence | `docs/tasks/to-do/TASK-663-nubox-durable-pdf-xml-artifacts.md` |
+| `TASK-664` | `to-do` | Nubox Payment Graph & Expense Ledger Reconciliation | `docs/tasks/to-do/TASK-664-nubox-payment-graph-expense-ledger-reconciliation.md` |
+| `TASK-665` | `to-do` | Nubox Tax Graph & VAT Data Quality Enrichment | `docs/tasks/to-do/TASK-665-nubox-tax-graph-vat-data-quality.md` |
+| `TASK-666` | `to-do` | Nubox Master Data Enrichment Governance | `docs/tasks/to-do/TASK-666-nubox-master-data-enrichment-governance.md` |
+| `TASK-667` | `to-do` | Nubox Additional Hot Lanes | `docs/tasks/to-do/TASK-667-nubox-additional-hot-lanes.md` |
+| `TASK-668` | `to-do` | Nubox Ops Replay & Enterprise Promotion | `docs/tasks/to-do/TASK-668-nubox-ops-replay-enterprise-promotion.md` |

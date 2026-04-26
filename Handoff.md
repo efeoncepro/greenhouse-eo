@@ -1,5 +1,40 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-640 Nubox V2 Slice 1
+
+### Que cambio
+
+- `TASK-640` fue tomada y movida a `docs/tasks/in-progress/`.
+- Se cerró discovery de Nubox V2 contra arquitectura, runtime y schema/migrations:
+  - Nubox ya tiene full ETL `raw -> conformed -> Postgres` y hot lane solo para cotizaciones.
+  - `income_line_items` y `quote_line_items` existen, pero Nubox no las alimenta todavía.
+  - `income`-side bank movements ya usan `recordPayment()`; el gap más claro de caja está en expense-side, que todavía debe pasar por `recordExpensePayment()`/settlements.
+  - VAT base ya existe por TASK-531/532/533; Nubox V2 debe enriquecer evidencia y data quality, no re-crear el ledger.
+  - `schema-snapshot-baseline.sql` está stale para columnas/tables recientes de Finance/Nubox.
+- Se creó `docs/tasks/plans/TASK-640-plan.md`.
+- Se crearon child tasks `TASK-662` a `TASK-668`:
+  - document graph
+  - durable PDF/XML artifacts
+  - payment graph + expense ledger reconciliation
+  - tax graph + VAT data quality
+  - master data enrichment governance
+  - additional hot lanes
+  - ops replay + enterprise promotion
+
+### Notas de coordinacion
+
+- No implementar line items de Nubox dentro de `TASK-640`; coordinar con `TASK-212`.
+- No declarar Nubox V2 enterprise-grade hasta cerrar replay/promotion y hardening alineado a `TASK-399`.
+- Futuras migraciones deben usar `pnpm migrate:create <nombre>` y commitear `src/types/db.d.ts` junto con la migración.
+
+### Validaciones
+
+- `git diff --check`
+- `pnpm lint`
+- `pnpm build`
+- `rg "new Pool\(" src --glob '!src/lib/postgres/client.ts'` sin matches fuera del cliente canónico.
+- No hubo migraciones nuevas; `pnpm migrate:up` no aplica para este lote documental.
+
 ## Sesion 2026-04-26 — TASK-649 Implementation Discovery
 
 ### Que cambio

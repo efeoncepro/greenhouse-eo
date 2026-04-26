@@ -8,16 +8,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `umbrella`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Slice 1 discovery/plan`
 - Rank: `TBD`
 - Domain: `finance`, `data`, `ops`
-- Blocked by: `none`
+- Blocked by: `none for Slice 1; runtime slices depend on TASK-212 / TASK-399 / child tasks`
 - Branch: `task/TASK-640-nubox-v2-enterprise-enrichment`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -126,7 +126,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-640-nubox-v2-enterprise-enrichment.md`
+- `docs/tasks/in-progress/TASK-640-nubox-v2-enterprise-enrichment.md`
 - `src/lib/nubox/**`
 - `src/app/api/cron/nubox-*`
 - `src/lib/finance/payment-ledger.ts`
@@ -155,16 +155,21 @@ Reglas obligatorias:
 - Balance sync lane that updates `balance_nubox` for income and expenses.
 - PDF/XML download proxies for DTE documents.
 - VAT foundations for income, purchases and monthly position.
+- `income_line_items` and `quote_line_items` tables already exist, but Nubox does not feed them yet.
+- Income-side Nubox bank movements already write through `recordPayment()` into `income_payments`.
+- `expense_payments`, `settlement_groups`, `settlement_legs`, `vat_ledger_entries`, `vat_monthly_positions`, `greenhouse_core.assets` and `quote_pdf_assets` already exist as reusable foundations.
+- Canonical quotation bridge now also syncs legacy finance quotes into `greenhouse_commercial.quotations`.
 
 ### Gap
 
 - Document details and references are not modeled as a first-class graph across raw, conformed, Postgres and UI.
 - `TASK-212` covers line items, but the broader document graph also needs references, artifacts, lineage and replay controls.
-- Bank movements from Nubox are available, but the full payment graph still needs stronger reconciliation, partial-payment semantics, aging and discrepancy handling.
-- Advanced tax fields from Nubox purchases are not yet fully promoted into the VAT ledger and finance data quality surfaces.
+- Bank movements from Nubox are available. Income-side is mostly canonical through `recordPayment()`, but expense-side still marks documents paid directly instead of writing through `recordExpensePayment()` and settlement legs.
+- Advanced tax fields from Nubox purchases are partially promoted through TASK-531/TASK-532/TASK-533; the remaining gap is Nubox-specific tax graph, line/reference fidelity and data quality comparison against Nubox/SII evidence.
 - Nubox client/supplier master data enrichment needs a governed policy to avoid overwriting canonical Greenhouse identities.
 - Additional hot lanes for invoices, purchases, balances and bank movements do not yet exist.
 - PDF/XML persistence in GCS is not yet a canonical durable artifact flow for Nubox.
+- `docs/architecture/schema-snapshot-baseline.sql` is stale for Finance/Nubox recent runtime. Treat migrations and runtime code as the real source for recent tables/columns until the snapshot is regenerated.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -308,7 +313,7 @@ Cada lane nueva debe reportar:
 
 ## Acceptance Criteria
 
-- [ ] Existe un plan aprobado para Nubox V2 con slices/child tasks y sin duplicar `TASK-212` ni `TASK-399`.
+- [x] Existe un plan aprobado para Nubox V2 con slices/child tasks y sin duplicar `TASK-212` ni `TASK-399`.
 - [ ] Document graph Nubox queda definido con detalles, referencias, artifacts y lineage.
 - [ ] Payment graph Nubox queda definido con reconciliacion contra ledgers de cobro/pago y soporte de parciales.
 - [ ] Tax graph Nubox queda definido sobre snapshots tributarios canonicos y VAT monthly position.
@@ -343,11 +348,13 @@ Cada lane nueva debe reportar:
 
 ## Follow-ups
 
-- Child task para referencias documentales si el scope excede `TASK-212`.
-- Child task para durable artifacts PDF/XML si no se absorbe en document graph.
-- Child task para hot lanes de facturas/compras/saldos/movimientos.
-- Child task para master data enrichment governance si requiere UI de review.
-- Child task para mover lanes pesadas de Nubox a `ops-worker`.
+- `TASK-662` — Nubox Document Graph Foundation.
+- `TASK-663` — Nubox Durable PDF/XML Artifact Persistence.
+- `TASK-664` — Nubox Payment Graph & Expense Ledger Reconciliation.
+- `TASK-665` — Nubox Tax Graph & VAT Data Quality Enrichment.
+- `TASK-666` — Nubox Master Data Enrichment Governance.
+- `TASK-667` — Nubox Additional Hot Lanes.
+- `TASK-668` — Nubox Ops Replay & Enterprise Promotion.
 
 ## Open Questions
 
@@ -355,3 +362,13 @@ Cada lane nueva debe reportar:
 - Cual es el rate limit efectivo de Nubox para calls detail-heavy?
 - Deben los artifacts PDF/XML historicos backfillearse para todo el historico o solo desde una fecha de corte?
 - Que nivel de reconciliacion automatica es aceptable antes de requerir revision humana?
+
+## Delta 2026-04-26 — Slice 1 discovery cerrada
+
+- Se confirmó que `TASK-640` no debe intentar implementar todo Nubox V2 en un solo lote. El corte actual cierra discovery, corrige supuestos y crea plan/child tasks ejecutables.
+- Supuestos corregidos:
+  - `schema-snapshot-baseline.sql` está stale para Finance/Nubox reciente.
+  - line item tables existen, pero Nubox no las alimenta.
+  - income-side payment graph ya usa `recordPayment`; el mayor gap de caja está en expense-side y settlement/document linkage.
+  - VAT foundation ya existe por TASK-531/TASK-532/TASK-533; falta enriquecer evidencia Nubox y data quality.
+- Plan canónico: `docs/tasks/plans/TASK-640-plan.md`.

@@ -2,6 +2,13 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — Nubox V2 Enterprise Enrichment Program planificado (TASK-640)
+
+- `TASK-640` pasa a `in-progress` con Slice 1 cerrado documentalmente: discovery contra runtime real, auditoría de arquitectura/schema y plan canónico en `docs/tasks/plans/TASK-640-plan.md`.
+- Supuestos corregidos: `schema-snapshot-baseline.sql` está stale para Finance/Nubox reciente; line item tables ya existen pero Nubox no las alimenta; income-side ya usa `recordPayment()`; VAT base ya existe por TASK-531/532/533.
+- Child tasks creadas: `TASK-662` a `TASK-668` cubren document graph, PDF/XML durable, payment graph, tax graph/data quality, master data governance, hot lanes adicionales y ops replay/promotion.
+- Regla operativa: no implementar Nubox V2 como megaslice; cada child task debe preservar `Nubox API -> BigQuery raw -> BigQuery conformed -> PostgreSQL projections -> UI/events`.
+
 ### 2026-04-26 — API Platform Completion Program cerrado documentalmente (TASK-649)
 
 - `TASK-649` queda cerrada como umbrella documental: la API Platform ya tiene backlog hijo ejecutable para completar domains, writes, OAuth hosted y contrato developer-facing.
