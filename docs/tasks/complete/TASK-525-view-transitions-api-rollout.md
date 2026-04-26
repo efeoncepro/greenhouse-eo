@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio` (UX enterprise de navegación, 0 bundle cost)
 - Effort: `Medio`

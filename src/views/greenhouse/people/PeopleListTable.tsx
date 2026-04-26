@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react'
 
-import Link from 'next/link'
 
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
@@ -20,6 +19,8 @@ import {
 } from '@tanstack/react-table'
 import type { SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
+
+import ViewTransitionLink from '@/components/greenhouse/motion/ViewTransitionLink'
 
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
@@ -50,19 +51,26 @@ const PeopleListTable = ({ data }: Props) => {
         header: 'Colaborador',
         cell: ({ row }) => (
           <div className='flex items-center gap-3'>
-            <TeamAvatar
-              name={row.original.displayName}
-              avatarUrl={row.original.avatarUrl}
-              roleCategory={safeRoleCategory(row.original.roleCategory)}
-              size={38}
-            />
+            {/* TASK-525: avatar + name share view-transition-name with the
+                detail PersonProfileHeader so they morph on navigation. */}
+            <div style={{ viewTransitionName: `person-avatar-${row.original.memberId}` }}>
+              <TeamAvatar
+                name={row.original.displayName}
+                avatarUrl={row.original.avatarUrl}
+                roleCategory={safeRoleCategory(row.original.roleCategory)}
+                size={38}
+              />
+            </div>
             <div className='flex flex-col'>
               <Typography
-                component={Link}
+                component={ViewTransitionLink}
                 href={`/people/${row.original.memberId}`}
                 color='text.primary'
                 className='font-medium'
-                sx={{ '&:hover': { color: 'primary.main' } }}
+                sx={{
+                  '&:hover': { color: 'primary.main' },
+                  viewTransitionName: `person-identity-${row.original.memberId}`
+                }}
               >
                 {row.original.displayName}
               </Typography>

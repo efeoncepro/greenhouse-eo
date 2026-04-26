@@ -1,5 +1,72 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — View Transitions API rollout (TASK-525)
+
+### Que cambio
+
+Adoptamos la **CSS View Transitions API** nativa del browser para transiciones de ruta same-document en App Router. Cero bundle adicional. Es el patron 2024-2026 que usan Vercel Geist, Astro, Next docs, GitHub Issues redesign.
+
+- **Activacion**: `next.config.ts` declara `experimental: { viewTransition: true }`. Next 16 envuelve las navegaciones same-document en `document.startViewTransition()` automaticamente cuando esta el flag.
+- **Helper canonico** `src/lib/motion/view-transition.ts` con `startViewTransition(update)`. SSR-safe; feature-detection (`document.startViewTransition`); reduced-motion gating via `matchMedia('(prefers-reduced-motion: reduce)')`. Si no hay soporte o reduced-motion esta activo, ejecuta `update()` directo y resuelve.
+- **Hook + Link drop-in**:
+  - `src/hooks/useViewTransitionRouter.ts` — wrapper de `useRouter()` que envuelve `push`, `replace` y `back` con el helper. Para handlers programaticos (`onClick={() => router.push(...)}`).
+  - `src/components/greenhouse/motion/ViewTransitionLink.tsx` — drop-in para `next/link` que intercepta el click izquierdo simple y delega a `router.push` dentro del transition. Modifier-clicks (cmd/ctrl/shift/middle), `target=_blank` y hrefs no-string caen al comportamiento Link nativo. Preserva prefetching, hover y ref forwarding.
+- **CSS global** en `src/app/globals.css`:
+  - Keyframes `greenhouse-view-transition-fade-{in,out}` con curve `cubic-bezier(0.32, 0.72, 0, 1)` (Apple "spring out" — match Linear/Vercel/Stripe).
+  - Defaults `::view-transition-old(root) { 200ms fade-out }` + `::view-transition-new(root) { 260ms fade-in }`.
+  - Reduced-motion guard: `@media (prefers-reduced-motion: reduce) { ::view-transition-* { animation: none !important } }`.
+
+### 3 patterns wireados v1
+
+1. **Finance quotes list -> detail**: `QuotesListView` aplica `viewTransitionName: 'quote-identity-{quoteId}'` al numero de cotizacion y `quote-client-{quoteId}` al nombre del cliente; row `onClick` pasa por `useViewTransitionRouter().push`. `QuoteDetailView` reusa los mismos nombres en su header. El numero y el cliente "viajan" de la fila al header.
+2. **Quote detail -> edit mode**: el boton "Editar" en `QuoteDetailView` pasa por `useViewTransitionRouter().push` para que el header del detalle se transforme en el shell del builder.
+3. **People list -> detail**: `PeopleListTable` aplica `person-avatar-{memberId}` y `person-identity-{memberId}` al avatar 38px y al nombre; reemplaza `next/link` por `ViewTransitionLink`. `PersonProfileHeader` reusa los mismos nombres en el avatar 80px y el `Typography variant='h5'` del nombre. El browser hace el morph cross-size automaticamente.
+
+### Archivos tocados
+
+- `next.config.ts` — flag experimental.viewTransition.
+- `src/lib/motion/view-transition.ts` (NUEVO).
+- `src/hooks/useViewTransitionRouter.ts` (NUEVO).
+- `src/components/greenhouse/motion/ViewTransitionLink.tsx` (NUEVO).
+- `src/app/globals.css` — keyframes + reduced-motion guard.
+- `src/views/greenhouse/finance/QuotesListView.tsx` — onClick via morphRouter, viewTransitionName en numero + cliente.
+- `src/views/greenhouse/finance/QuoteDetailView.tsx` — viewTransitionName en header h5 + cliente; Editar pasa por morphRouter; `useRouter` removido (era unused tras swap).
+- `src/views/greenhouse/people/PeopleListTable.tsx` — `next/link` -> `ViewTransitionLink`; viewTransitionName en avatar + nombre.
+- `src/views/greenhouse/people/PersonProfileHeader.tsx` — viewTransitionName en avatar + nombre.
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` — Delta 2026-04-25 con seccion "Navigation transitions con View Transitions API".
+
+### Validaciones
+
+- `npx tsc --noEmit` -> clean en archivos owned.
+- `pnpm lint` -> clean.
+- `pnpm build` -> Compiled successfully en 16s.
+- Browser support: Chrome 111+, Safari 18+, Edge 111+. Firefox sin soporte aun -> fallback a navegacion instantanea sin error.
+- Reduced motion: probado en dos capas (CSS guard + helper short-circuit).
+
+### Decisiones canonicas
+
+1. **API browser nativa, no framer-motion para route transitions**. View Transitions actua a nivel documento; framer-motion sigue siendo valido para microinteracciones internas (counters, layout transitions dentro del DOM ya nuevo). No reabrimos framer-motion para esto.
+2. **Opt-in por surface, no global**. Aplicar `viewTransitionName` solo en patterns donde la continuidad visual aporta. Cualquier click no necesita transition.
+3. **Nombres unicos**. `viewTransitionName` debe ser unico al momento del snapshot. Convencion: `{kind}-{id}` con identificador estable (`quote-identity-{quoteId}`, `person-avatar-{memberId}`).
+4. **Programmatic vs declarative**. Usar `useViewTransitionRouter` para handlers `onClick`; cambiar `next/link` por `ViewTransitionLink` solo cuando el destino tiene un elemento con `viewTransitionName` que matchee el origen.
+5. **Reduced-motion en ambas capas**. CSS guard porque el browser ya lo honra parcialmente; helper short-circuit porque update functions costosas no deben pagar el snapshot cuando reduced-motion esta activo.
+
+### Verificacion visual pendiente (follow-up del usuario)
+
+- `/finance/quotes` -> click en una fila -> confirmar morph del numero + cliente al header del detalle.
+- `/finance/quotes/[id]` -> click "Editar" -> confirmar transicion suave al shell del builder.
+- `/people` -> click en un colaborador -> confirmar morph del avatar (38px -> 80px) + nombre.
+- DevTools forced media `prefers-reduced-motion: reduce` -> confirmar navegacion instantanea sin animacion.
+- Firefox -> confirmar fallback a navegacion instantanea sin error.
+
+### Out of scope (queda como follow-up)
+
+- Cross-document transitions (MPA) — el portal es SPA same-document.
+- View Transitions globales (cada click) — scope intencional v1.
+- Shared-element morph en dashboards (MRR/ARR -> contract detail) — mencionado en Follow-ups de la spec original.
+
+---
+
 ## Sesion 2026-04-25 — Quote Builder Flow Orchestration & UX Hardening (TASK-615)
 
 ### Que cambio

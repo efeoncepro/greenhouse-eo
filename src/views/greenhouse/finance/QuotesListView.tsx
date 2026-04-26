@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -20,6 +21,8 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -110,6 +113,7 @@ const marginChipColor = (effective: number | null, floor: number | null, target:
 
 const QuotesListView = () => {
   const router = useRouter()
+  const morphRouter = useViewTransitionRouter()
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Quote[]>([])
   const [statusFilter, setStatusFilter] = useState('')
@@ -244,14 +248,33 @@ const QuotesListView = () => {
                   const marginColor = marginChipColor(q.effectiveMarginPct, q.marginFloorPct, q.targetMarginPct)
 
                   return (
-                    <TableRow key={q.quoteId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/quotes/${q.quoteId}`)}>
+                    <TableRow
+                      key={q.quoteId}
+                      hover
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => morphRouter.push(`/finance/quotes/${q.quoteId}`)}
+                    >
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        {/* TASK-525: shared identity element. Same `view-transition-name` lives on the
+                            quote detail header so the row's quote number morphs into the detail header. */}
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            fontFamily: 'monospace',
+                            fontSize: '0.8rem',
+                            viewTransitionName: `quote-identity-${q.quoteId}`
+                          }}
+                        >
                           {q.quoteNumber ?? '—'}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2'>{q.clientName ?? '—'}</Typography>
+                        <Typography
+                          variant='body2'
+                          sx={{ viewTransitionName: `quote-client-${q.quoteId}` }}
+                        >
+                          {q.clientName ?? '—'}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant='body2' color='text.secondary'>{formatDate(q.quoteDate)}</Typography>

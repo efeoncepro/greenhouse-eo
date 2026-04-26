@@ -13,6 +13,62 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-25 — Navigation transitions con View Transitions API (TASK-525)
+
+Activamos la **CSS View Transitions API** nativa del browser para transiciones de ruta same-document en App Router. Cero bundle adicional — es API del browser. Es el patrón 2024-2026 que usan Vercel Geist, Astro, Next docs y GitHub Issues redesign.
+
+### Activación
+
+- `next.config.ts` declara `experimental: { viewTransition: true }`. Next 16 expone el flag a App Router para que las navegaciones same-document corran dentro de `document.startViewTransition()` automáticamente.
+- Browser support: Chrome 111+ / Edge 111+ / Safari 18+. Firefox sin soporte aún → cae a navegación instantánea sin error.
+- `prefers-reduced-motion: reduce` está honrado en dos capas:
+  1. `globals.css` aplica `animation: none !important` a todos los `::view-transition-*` cuando reduced-motion está activo.
+  2. El helper `startViewTransition` también revisa `matchMedia` antes de invocar al browser, así callers con update functions costosas no pagan ni el snapshot.
+
+### Helper canónico
+
+`src/lib/motion/view-transition.ts` exporta `startViewTransition(update)`:
+
+```ts
+import { startViewTransition } from '@/lib/motion/view-transition'
+
+await startViewTransition(() => {
+  router.push(`/finance/quotes/${quoteId}`)
+})
+```
+
+- SSR-safe: detecta `typeof document === 'undefined'`.
+- Feature-detection: si `document.startViewTransition` no existe, ejecuta `update()` directo.
+- Reduced-motion: short-circuit antes de tomar el snapshot.
+- Errores en `update` no propagan al caller (los swallow para no romper la navegación).
+
+### Hook + Link drop-in
+
+- `src/hooks/useViewTransitionRouter.ts` — wrapper de `useRouter()` que envuelve `push`, `replace` y `back` con el helper. Drop-in para handlers programáticos (`onClick={() => router.push(...)}`).
+- `src/components/greenhouse/motion/ViewTransitionLink.tsx` — drop-in para `next/link` que intercepta el click izquierdo simple y delega a `router.push` dentro del transition. Modifier-clicks (cmd/ctrl/shift/middle), `target=_blank` y hrefs no-string caen al comportamiento Link nativo.
+
+### Patterns implementados v1
+
+1. **Finance quotes list → detail**: `QuotesListView` aplica `viewTransitionName: 'quote-identity-{quoteId}'` al número de cotización y `quote-client-{quoteId}` al nombre del cliente; `QuoteDetailView` aplica los mismos nombres a su header. El número y el cliente "viajan" de la fila al header.
+2. **Quote detail → edit mode**: el botón "Editar" pasa por `useViewTransitionRouter().push` para que el header del detalle se transforme suavemente en el shell del builder.
+3. **People list → detail**: `PeopleListTable` aplica `person-avatar-{memberId}` y `person-identity-{memberId}` al avatar 38px y al nombre; `PersonProfileHeader` reusa los mismos nombres en el avatar 80px y el `Typography variant='h5'` del nombre. El browser hace el morph cross-size automáticamente.
+
+### Reglas de adopción
+
+- **No global**: aplicar `viewTransitionName` solo en patterns donde la continuidad visual aporta — list→detail con identidad compartida, header→edit, modal/drawer open. Cualquier click no necesita transition.
+- **Nombres únicos**: `viewTransitionName` debe ser único en el documento al momento del snapshot. Usar siempre `{kind}-{id}` con un identificador estable.
+- **Programmatic nav**: usar `useViewTransitionRouter` cuando la fila/CTA navega por `onClick={() => router.push(...)}`.
+- **Declarative nav**: cambiar `next/link` por `ViewTransitionLink` solo cuando el destino tiene un elemento con `viewTransitionName` que matchee el origen. Para Links sin morph queda `next/link`.
+- **No reabrir framer-motion** para esto: View Transitions actúa al nivel del documento; framer-motion sigue siendo válido para microinteracciones dentro del DOM ya nuevo (counters, layout transitions internas).
+
+### Files
+
+- `next.config.ts` — flag `experimental.viewTransition`.
+- `src/lib/motion/view-transition.ts` — helper.
+- `src/hooks/useViewTransitionRouter.ts` — hook.
+- `src/components/greenhouse/motion/ViewTransitionLink.tsx` — Link drop-in.
+- `src/app/globals.css` — keyframes `greenhouse-view-transition-fade-{in,out}` + reduced-motion guard.
+
 ## Delta 2026-04-20b — Floating UI como stack oficial de popovers (TASK-509 / TASK-510)
 
 ### Decisión de plataforma
