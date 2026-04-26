@@ -301,6 +301,27 @@ Regla: no diseñar una task o arquitectura nueva describiendo solo `views` si ta
 - Cron: `/api/cron/**`, `/api/finance/economic-indicators/sync`
 - Agent Auth: `/api/auth/agent-session` — sesión headless para agentes/Playwright (requiere `AGENT_AUTH_SECRET`)
 
+### Auth en server components / layouts / pages — patrón canónico
+
+- **NUNCA** llamar `getServerAuthSession()` directo desde un layout o page con `try/catch + redirect` ad hoc. Usar siempre los helpers canónicos de `src/lib/auth/require-server-session.ts`:
+  - `requireServerSession(redirectTo = '/login')` — para layouts/pages que **requieren** sesión activa. Si no hay session, redirige; si hay, devuelve `Session` non-null.
+  - `getOptionalServerSession()` — para pages que opcionalmente quieren saber si hay sesión (login, landing pública). Devuelve `Session | null`. La decisión de redirect queda al caller.
+- **Razón**: ambos helpers detectan el `DYNAMIC_SERVER_USAGE` que Next.js lanza durante prerender (cuando NextAuth lee cookies/headers via SSG) y lo re-lanzan correctamente para que Next marque la ruta como dynamic — en lugar de loggearlo como `[X] getServerAuthSession failed:` que ensucia los logs de build y enmascara errores reales.
+- **Combinar con `export const dynamic = 'force-dynamic'`** en cada page/layout que consuma sesión — evita que Next intente prerender la ruta en build phase.
+- Patrón canónico:
+  ```ts
+  import { requireServerSession } from '@/lib/auth/require-server-session'
+
+  export const dynamic = 'force-dynamic'
+
+  const Layout = async ({ children }) => {
+    const session = await requireServerSession()
+    // session.user es non-null acá
+    return <Providers session={session}>{children}</Providers>
+  }
+  ```
+- API routes (`route.ts`) siguen usando `getServerAuthSession()` directo — no necesitan los wrappers porque las routes son siempre dynamic por default y el manejo de error es distinto (return 401 JSON, no redirect).
+
 ### Agent Auth (acceso headless para agentes y E2E)
 
 Permite que agentes AI y tests E2E obtengan una sesión NextAuth válida sin login interactivo.

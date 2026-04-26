@@ -1,6 +1,3 @@
-// Next Imports
-import { redirect } from 'next/navigation'
-
 // MUI Imports
 import Button from '@mui/material/Button'
 
@@ -27,23 +24,16 @@ import ChunkRecoveryClear from '@/components/ChunkRecoveryClear'
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
 // Lib Imports
-import { getServerAuthSession } from '@/lib/auth'
+import { requireServerSession } from '@/lib/auth/require-server-session'
+
+// El layout depende de cookies/headers via NextAuth — siempre dynamic.
+// Evita que Next intente prerender bajo (dashboard) y emita warnings
+// "Dynamic server usage" durante build.
+export const dynamic = 'force-dynamic'
 
 const Layout = async (props: ChildrenType) => {
   const { children } = props
-
-  let session
-
-  try {
-    session = await getServerAuthSession()
-  } catch (error) {
-    console.error('[DashboardLayout] getServerAuthSession failed:', error)
-    redirect('/login')
-  }
-
-  if (!session) {
-    redirect('/login')
-  }
+  const session = await requireServerSession()
 
   // Vars
   const direction = 'ltr'

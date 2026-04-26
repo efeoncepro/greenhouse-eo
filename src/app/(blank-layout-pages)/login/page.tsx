@@ -11,7 +11,10 @@ import { getServerMode } from '@core/utils/serverHelpers'
 
 // Lib Imports
 import { hasGoogleAuthProvider, hasMicrosoftAuthProvider } from '@/lib/auth-secrets'
-import { getServerAuthSession } from '@/lib/auth'
+import { getOptionalServerSession } from '@/lib/auth/require-server-session'
+
+// Depende de cookies/headers via NextAuth — siempre dynamic.
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Login',
@@ -19,7 +22,7 @@ export const metadata: Metadata = {
 }
 
 const LoginPage = async () => {
-  const session = await getServerAuthSession()
+  const session = await getOptionalServerSession()
   const hasMicrosoftAuth = hasMicrosoftAuthProvider()
   const hasGoogleAuth = hasGoogleAuthProvider()
 
