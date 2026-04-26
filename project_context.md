@@ -1,3 +1,19 @@
+## Delta 2026-04-25 TASK-617.1 endurece REST en API Platform Ecosystem
+
+- `api/platform/ecosystem/*` ya tiene hardening REST V1.1 sin abrir writes ni mover `/api/integrations/v1/*`.
+- Contrato runtime nuevo:
+  - `src/lib/api-platform/core/pagination.ts`
+  - `src/lib/api-platform/core/freshness.ts`
+  - `runEcosystemReadRoute` propaga `ETag`, `Last-Modified`, `cache-control`, `304 Not Modified`, headers custom y rate-limit remaining/reset.
+- Reglas operativas nuevas:
+  - colecciones ecosystem-facing deben declarar `meta.pagination` y usar `Link` headers cuando aplique
+  - resources con validator seguro deben declarar `meta.freshness` y soportar conditional requests
+  - `organizations` pagina después de filtrar por scope resuelto del binding, no antes
+  - `/api/integrations/v1/*` sigue legacy/transicional y solo se toca para no-regresión
+- Fuente canónica actualizada:
+  - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+  - `docs/documentation/plataforma/api-platform-ecosystem.md`
+
 ## Delta 2026-04-25 Onboarding ya tiene arquitectura canónica propia
 
 - Greenhouse ya no debe tratar onboarding como una suma implícita de provisioning SCIM + checklist HRIS + activación manual dispersa.

@@ -154,6 +154,13 @@
 
 ## 2026-04-22
 
+### 2026-04-25 — TASK-617.1 CERRADA ✅: API Platform REST Hardening
+
+- **REST hardening del lane ecosystem**: `api/platform/ecosystem/*` suma paginación uniforme en colecciones, `Link` headers, metadata de frescura, `ETag` / `Last-Modified` selectivos y soporte `304 Not Modified`.
+- **Rate-limit headers completos**: el harness ahora expone limit, remaining, reset y `Retry-After` en `429`, manteniendo compatibilidad con los headers minuto/hora existentes.
+- **Tenant-safe pagination fix**: `organizations` filtra por scope resuelto antes de paginar, evitando totals/páginas incorrectas en scopes `organization`, `client` o `space`.
+- **No-regresión legacy**: `/api/integrations/v1/*` no fue reabierto ni movido; queda cubierto por tests de contrato legacy junto con route tests del lane nuevo.
+
 ### 2026-04-25 — API Platform V1 documentada como arquitectura canónica
 
 - **Nueva spec canónica**: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` consolida la visión de `API platform` para Greenhouse como capability shared y fija principios de robustez, resiliencia, seguridad, escalabilidad, versionado, idempotencia, pagination, observabilidad y degraded modes.

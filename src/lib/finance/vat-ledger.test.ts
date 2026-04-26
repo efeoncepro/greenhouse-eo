@@ -30,7 +30,7 @@ vi.mock('kysely', () => ({
 }))
 
 vi.mock('@/lib/db', () => ({
-  getDb: (...args: unknown[]) => mockGetDb(...args)
+  getDb: () => mockGetDb()
 }))
 
 vi.mock('@/lib/finance/reporting', () => ({

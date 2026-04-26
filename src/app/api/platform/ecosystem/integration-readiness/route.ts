@@ -7,8 +7,6 @@ export async function GET(request: Request) {
   return runEcosystemReadRoute({
     request,
     routeKey: 'platform.ecosystem.integration-readiness',
-    handler: async () => ({
-      data: await getEcosystemIntegrationReadiness(request)
-    })
+    handler: async () => getEcosystemIntegrationReadiness(request)
   })
 }

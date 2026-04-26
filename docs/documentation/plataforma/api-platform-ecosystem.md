@@ -154,10 +154,49 @@ Además, los headers operativos incluyen:
 - `x-greenhouse-request-id`
 - `x-greenhouse-api-version`
 - headers de rate limit
+  - `X-RateLimit-Limit`
+  - `X-RateLimit-Remaining`
+  - `X-RateLimit-Reset`
+  - `Retry-After` cuando una respuesta queda en `429`
+- `ETag` y, cuando existe una fecha confiable de actualización, `Last-Modified`
 
 La versión inicial por default es:
 
 - `2026-04-25`
+
+## Paginación y frescura
+
+Las colecciones del carril ecosystem exponen paginación uniforme.
+
+Hoy aplica a:
+
+- `GET /api/platform/ecosystem/organizations`
+- `GET /api/platform/ecosystem/capabilities`
+
+El consumer puede enviar:
+
+- `page`
+- `pageSize`
+
+La respuesta mantiene compatibilidad con `data.page`, `data.pageSize`, `data.count` e `data.items`, y además declara el contrato más estable en:
+
+- `meta.pagination.page`
+- `meta.pagination.pageSize`
+- `meta.pagination.total`
+- `meta.pagination.count`
+- `meta.pagination.hasNextPage`
+- `meta.pagination.nextPage`
+- `meta.pagination.hasPreviousPage`
+- `meta.pagination.previousPage`
+
+Cuando existe página siguiente o anterior, la respuesta también incluye `Link` headers.
+
+La frescura se declara en `meta.freshness`. Los resources que pueden calcular un validator seguro responden con `ETag`; cuando la fuente tiene timestamp confiable también responden con `Last-Modified`. Los consumers pueden usar:
+
+- `If-None-Match`
+- `If-Modified-Since`
+
+Si no hay cambios, Greenhouse responde `304 Not Modified`.
 
 ## Como convive con el carril legacy
 
@@ -185,15 +224,20 @@ Ya hay varias piezas sanas:
 
 - auth binding-aware
 - rate limiting por consumer
+- remaining/reset headers para rate limiting
 - request logging
 - version header
 - envelope uniforme
+- paginación uniforme en colecciones ecosystem principales
+- conditional requests selectivas con `ETag` / `Last-Modified`
 - resources montados sobre readers reales del repo
 - coexistencia explícita con `integrations/v1`
 
 Además, este primer corte ya fue verificado con:
 
-- tests nuevos de la foundation
+- tests nuevos de la foundation y del hardening REST
+- route contract tests de `api/platform/ecosystem/*`
+- tests de no-regresión de `/api/integrations/v1/*`
 - tests heredados de readers reutilizados
 - `tsc`
 - `lint`

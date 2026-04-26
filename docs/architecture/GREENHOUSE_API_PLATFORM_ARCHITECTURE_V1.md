@@ -1210,3 +1210,24 @@ Decisiones explícitas de este slice:
 - `integration-readiness` expresa health/readiness de integraciones y bindings; no pretende ser readiness transversal de toda la plataforma
 - el auth/context nuevo reutiliza el modelo seguro de `sister_platform_consumers` + `sister_platform_bindings` + `sister_platform_request_logs` sin romper `/api/integrations/v1/*`
 - `integrations/v1` y `integrations/v1/sister-platforms/*` siguen intactos y verificados como lanes legacy/transicionales
+
+## 27. Delta 2026-04-25 — TASK-617.1 endurece REST en la lane ecosystem
+
+`api/platform/ecosystem/*` ya no expone solo lecturas REST-like básicas. El hardening V1.1 agrega disciplina operacional uniforme sin abrir writes:
+
+- colecciones `organizations` y `capabilities` responden con `meta.pagination` (`page`, `pageSize`, `total`, `count`, `hasNextPage`, `nextPage`, etc.) y `Link` headers cuando hay navegación
+- `organizations` filtra el universo visible por scope antes de paginar, evitando páginas subpobladas para consumers scoping `organization`, `client` o `space`
+- rate limiting devuelve headers de límite, remaining y reset además de los headers legacy minuto/hora (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After` en `429`)
+- resources seguros exponen validators selectivos: `ETag`, `Last-Modified` cuando existe timestamp confiable y `304 Not Modified` para `If-None-Match` / `If-Modified-Since`
+- `meta.freshness` declara provenance y política de conditional requests por resource; no se promete frescura implícita
+- `/api/integrations/v1/*` conserva su contrato legacy y queda cubierto por tests de no-regresión; no fue renombrado, movido ni usado como proxy
+
+Estado V1.1:
+
+- `GET /api/platform/ecosystem/context` sigue siendo dinámico y no-cache por tratarse de contexto efectivo del consumer
+- `GET /api/platform/ecosystem/organizations` soporta paginación uniforme + conditional requests
+- `GET /api/platform/ecosystem/organizations/:id` soporta conditional requests sobre el detalle
+- `GET /api/platform/ecosystem/capabilities` soporta paginación uniforme + conditional requests
+- `GET /api/platform/ecosystem/integration-readiness` soporta `ETag`; `Last-Modified` no aplica porque readiness puede depender de health operacional externo
+
+El carril sigue read-only. `POST`, `PATCH`, `PUT`, `DELETE`, idempotencia runtime de commands y event control plane quedan para los siguientes slices del programa `TASK-617`.

@@ -1,5 +1,47 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — API Platform REST Hardening (TASK-617.1)
+
+### Que cambio
+
+Se cerró `TASK-617.1` como primer hardening V1.1 del lane `api/platform/ecosystem/*`, sin reabrir ni mover `/api/integrations/v1/*`.
+
+- **Core helpers nuevos**:
+  - `src/lib/api-platform/core/pagination.ts` — parseo page/pageSize, `meta.pagination`, `Link` headers.
+  - `src/lib/api-platform/core/freshness.ts` — ETag estable, Last-Modified max, evaluación `If-None-Match` / `If-Modified-Since`.
+- **Harness REST endurecido**:
+  - `runEcosystemReadRoute` ahora propaga `ETag`, `Last-Modified`, `cache-control`, headers custom y `304 Not Modified`.
+  - Rate limiting agrega `remaining`, `reset` y `Retry-After` en `429`, conservando los headers minute/hour existentes.
+- **Resources endurecidos**:
+  - `organizations` filtra el scope visible antes de paginar, corrigiendo páginas subpobladas/totals incorrectos para scopes `organization`, `client` y `space`.
+  - `organizations`, `capabilities` e `integration-readiness` exponen `meta.freshness`; `organizations` y `capabilities` exponen paginación uniforme.
+- **Tests nuevos**:
+  - core pagination/freshness/response headers
+  - route contract de `api/platform/ecosystem/*`
+  - no-regression contract de `/api/integrations/v1/*`
+- **Documentación**:
+  - `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+  - `docs/documentation/plataforma/api-platform-ecosystem.md`
+  - `changelog.md`
+  - task movida a `docs/tasks/complete/`
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅ — 421 files / 2170 passed / 2 skipped
+- `pnpm build` ✅
+
+### Nota adicional
+
+Durante la verificación global se corrigió un fallo de tipo preexistente en `src/lib/finance/vat-ledger.test.ts` (`getDb` mock con spread no-rest). No cambia comportamiento runtime.
+
+### Siguiente
+
+- `TASK-617.2` puede abrir la lane first-party app sobre una base REST más madura.
+- `TASK-617.3` puede montar event control plane reutilizando el harness/headers/status policy V1.1.
+- `TASK-617.4` debe documentar el contrato nuevo de paginación, freshness y rate-limit headers.
+
 ## Sesion 2026-04-25 — Quote Builder Flow Orchestration & UX Hardening (TASK-615)
 
 ### Que cambio

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { buildApiPlatformEtag, isApiPlatformConditionalMatch } from '@/lib/api-platform/core/freshness'
 import { checkMultipleReadiness } from '@/lib/integrations/readiness'
 import { getIntegrationRegistry } from '@/lib/integrations/registry'
 
@@ -25,9 +26,30 @@ export const getEcosystemIntegrationReadiness = async (request: Request) => {
   const keys = await parseRequestedKeys(request)
   const results = await checkMultipleReadiness(keys)
 
-  return {
+  const data = {
     requestedKeys: keys,
     allReady: [...results.values()].every(result => result.ready),
     results: Object.fromEntries(results)
+  }
+
+  const etag = buildApiPlatformEtag(data)
+
+  return {
+    data,
+    meta: {
+      freshness: {
+        etag,
+        lastModified: null,
+        source: 'integration_registry',
+        conditionalRequests: ['If-None-Match'],
+        policy: 'readiness is operational and may change between sync runs'
+      }
+    },
+    cacheControl: 'private, max-age=0, must-revalidate',
+    etag,
+    notModified: isApiPlatformConditionalMatch({
+      request,
+      etag
+    })
   }
 }

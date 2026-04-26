@@ -15,11 +15,27 @@ describe('api platform responses', () => {
         scope: {
           scopeType: 'internal'
         }
-      }
+      },
+      rateLimit: {
+        limitPerMinute: 60,
+        limitPerHour: 1000,
+        remainingPerMinute: 59,
+        remainingPerHour: 999,
+        resetAt: '2026-04-25T20:31:00.000Z'
+      },
+      etag: '"etag-123"',
+      lastModified: 'Sat, 25 Apr 2026 20:30:00 GMT',
+      cacheControl: 'private, max-age=0, must-revalidate'
     })
 
     expect(response.headers.get('x-greenhouse-request-id')).toBe('req-123')
     expect(response.headers.get('x-greenhouse-api-version')).toBe('2026-04-25')
+    expect(response.headers.get('x-ratelimit-limit')).toBe('60')
+    expect(response.headers.get('x-ratelimit-remaining')).toBe('59')
+    expect(response.headers.get('x-ratelimit-reset')).toBe(String(Math.ceil(new Date('2026-04-25T20:31:00.000Z').getTime() / 1000)))
+    expect(response.headers.get('etag')).toBe('"etag-123"')
+    expect(response.headers.get('last-modified')).toBe('Sat, 25 Apr 2026 20:30:00 GMT')
+    expect(response.headers.get('cache-control')).toBe('private, max-age=0, must-revalidate')
 
     const body = await response.json()
 
