@@ -29,6 +29,7 @@ import type {
 import type { ReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
 import type { GcpBillingOverview } from '@/types/billing-export'
 import type { IntegrationDataQualityRunResult, IntegrationDataQualityStatus } from '@/types/integration-data-quality'
+import AdminHandlerAcknowledgeButton from './AdminHandlerAcknowledgeButton'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
 import AdminReactiveProjectionBreakdown from './AdminReactiveProjectionBreakdown'
@@ -100,6 +101,14 @@ const sentryLevelColor = (level: string): 'success' | 'warning' | 'error' | 'sec
   return 'warning'
 }
 
+const metricChipColor = (status: NonNullable<OperationsSubsystem['metrics']>[number]['status']) => {
+  if (status === 'ok') return 'success'
+  if (status === 'error') return 'error'
+  if (status === 'info') return 'secondary'
+
+  return 'warning'
+}
+
 const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
   subsystems.filter(subsystem =>
     [
@@ -108,12 +117,17 @@ const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
       'Reactive backlog',
       'Reactive Worker',
       'Notificaciones',
+      'Teams Notifications',
       'Finance Data Quality',
       'Notion Delivery Data Quality'
     ].includes(subsystem.name)
   )
 
 const subsystemDetail = (subsystem: OperationsSubsystem) => {
+  if (subsystem.summary?.trim()) {
+    return subsystem.summary
+  }
+
   if (subsystem.name === 'Reactive backlog') {
     if (subsystem.processed === 0) {
       return 'Sin eventos reactivos publicados pendientes de entrar al ledger.'
@@ -124,6 +138,20 @@ const subsystemDetail = (subsystem: OperationsSubsystem) => {
     }
 
     return `${subsystem.processed} eventos antiguos siguen sin huella reactiva visible en el ledger.`
+  }
+
+  if (subsystem.name === 'Teams Notifications') {
+    if (subsystem.processed === 0 && subsystem.failed === 0) {
+      return 'Sin envíos a Teams en las últimas 24 horas.'
+    }
+
+    const transportBreakdown = subsystem.summary?.trim().length ? ` ${subsystem.summary}.` : ''
+
+    if (subsystem.failed > 0) {
+      return `${subsystem.failed} fallos sobre ${subsystem.processed + subsystem.failed} intentos en las últimas 24 horas.${transportBreakdown}`
+    }
+
+    return `${subsystem.processed} cards entregados a canales y chats de Teams en las últimas 24 horas.${transportBreakdown}`
   }
 
   if (subsystem.name === 'Reactive Worker') {
@@ -385,6 +413,19 @@ const AdminOpsHealthView = ({
                     <Typography variant='body2' color='text.secondary'>
                       {subsystemDetail(subsystem)}
                     </Typography>
+                    {subsystem.metrics && subsystem.metrics.length > 0 ? (
+                      <Stack direction='row' gap={1} flexWrap='wrap'>
+                        {subsystem.metrics.map(metric => (
+                          <Chip
+                            key={`${subsystem.name}-${metric.key}`}
+                            size='small'
+                            variant='tonal'
+                            color={metricChipColor(metric.status)}
+                            label={`${metric.label}: ${metric.value}`}
+                          />
+                        ))}
+                      </Stack>
+                    ) : null}
                   </Stack>
                 </CardContent>
               </Card>
@@ -430,10 +471,27 @@ const AdminOpsHealthView = ({
               />
               <ExecutiveMiniStatCard
                 eyebrow='Critical'
-                tone={notionDataQuality.totals.brokenSpaces > 0 ? 'error' : 'success'}
+                tone={
+                  // Auto-recoverable broken spaces (only `fresh_raw_after_conformed_sync` lag)
+                  // are eventual-consistency lag, not real corruption — show them as warning,
+                  // not error, so on-call doesn't get paged for normal sync timing.
+                  notionDataQuality.totals.brokenSpaces > 0
+                    ? notionDataQuality.totals.autoRecoverableSpaces >= notionDataQuality.totals.brokenSpaces
+                      ? 'warning'
+                      : 'error'
+                    : 'success'
+                }
                 title='Broken'
-                value={String(notionDataQuality.totals.brokenSpaces)}
-                detail='Spaces con errores activos que comprometen la confianza downstream.'
+                value={
+                  notionDataQuality.totals.autoRecoverableSpaces > 0
+                    ? `${notionDataQuality.totals.brokenSpaces} (${notionDataQuality.totals.autoRecoverableSpaces} auto)`
+                    : String(notionDataQuality.totals.brokenSpaces)
+                }
+                detail={
+                  notionDataQuality.totals.autoRecoverableSpaces > 0 && notionDataQuality.totals.autoRecoverableSpaces === notionDataQuality.totals.brokenSpaces
+                    ? 'Lag de conformed sync vs raw — eventual consistency, no requiere intervención.'
+                    : 'Spaces con errores activos que comprometen la confianza downstream.'
+                }
                 icon='tabler-bug'
               />
             </Box>
@@ -451,20 +509,38 @@ const AdminOpsHealthView = ({
                         alignItems='center'
                         gap={2}
                       >
-                        <Stack spacing={0.5}>
+                        <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
                           <Typography variant='body2' sx={{ fontWeight: 500 }}>
                             {space.spaceName ?? space.spaceId}
                           </Typography>
                           <Typography variant='caption' color='text.secondary'>
                             Diff {space.diffCount} · {formatDateTime(space.checkedAt)}
+                            {space.failedChecks.length > 0 && (
+                              <>
+                                {' · '}
+                                {space.failedChecks
+                                  .slice(0, 2)
+                                  .map(check => `${check.checkKey}${check.observedValue ? ` (${check.observedValue})` : ''}`)
+                                  .join(', ')}
+                              </>
+                            )}
                           </Typography>
                         </Stack>
-                        <Chip
-                          size='small'
-                          variant='tonal'
-                          color={dataQualityColor(space.qualityStatus)}
-                          label={space.qualityStatus}
-                        />
+                        <Stack direction='row' gap={1} alignItems='center'>
+                          {space.recoveryClass === 'auto_recoverable' && (
+                            <Chip size='small' variant='tonal' color='info' label='auto' />
+                          )}
+                          <Chip
+                            size='small'
+                            variant='tonal'
+                            color={
+                              space.recoveryClass === 'auto_recoverable' && space.qualityStatus === 'broken'
+                                ? 'warning'
+                                : dataQualityColor(space.qualityStatus)
+                            }
+                            label={space.qualityStatus}
+                          />
+                        </Stack>
                       </Stack>
                     ))}
                   </Stack>
@@ -1032,7 +1108,7 @@ const AdminOpsHealthView = ({
                         />
                       </Stack>
                       <Typography variant='body2' color='text.secondary'>
-                        Retries: {item.retries}
+                        Fallos consecutivos: {item.retries}
                       </Typography>
                       <Typography variant='body2' color='error.main'>
                         {item.lastError}
@@ -1040,6 +1116,7 @@ const AdminOpsHealthView = ({
                       <Typography variant='caption' color='text.secondary'>
                         {formatDateTime(item.reactedAt)}
                       </Typography>
+                      <AdminHandlerAcknowledgeButton handler={item.handler} />
                     </Stack>
                   </CardContent>
                 </Card>

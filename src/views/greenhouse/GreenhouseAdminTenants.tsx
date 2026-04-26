@@ -58,7 +58,7 @@ const authModeTone = (authMode: string) => {
 
 const columnHelper = createColumnHelper<TenantRow>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const columns: ColumnDef<TenantRow, any>[] = [
   columnHelper.accessor('clientName', {
     header: 'Space',

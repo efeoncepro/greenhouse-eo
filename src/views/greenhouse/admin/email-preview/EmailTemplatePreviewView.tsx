@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 import { useTheme } from '@mui/material/styles'
 
 import Box from '@mui/material/Box'

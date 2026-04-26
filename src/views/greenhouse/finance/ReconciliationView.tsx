@@ -131,7 +131,7 @@ const formatDate = (date: string | null): string => {
 
 const mvColumnHelper = createColumnHelper<PendingMovement>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const mvColumns: ColumnDef<PendingMovement, any>[] = [
   mvColumnHelper.accessor('type', {
     header: 'Tipo',
@@ -271,7 +271,7 @@ const ReconciliationView = () => {
   // Period columns (need accounts for lookup)
   const periodColumnHelper = createColumnHelper<ReconciliationPeriod>()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const periodColumns: ColumnDef<ReconciliationPeriod, any>[] = [
     periodColumnHelper.accessor('month', { header: 'Período', cell: ({ row }) => <Typography variant='body2' fontWeight={600}>{MONTH_NAMES[row.original.month]} {row.original.year}</Typography> }),
     periodColumnHelper.accessor('accountId', { header: 'Cuenta', cell: ({ getValue }) => <Typography variant='body2'>{accounts.find(a => a.accountId === getValue())?.accountName || getValue()}</Typography> }),

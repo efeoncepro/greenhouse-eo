@@ -16,25 +16,25 @@ import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 // ─── Configuration ──────────────────────────────────────────────────────────
 
-const getBaseUrl = () => {
-  const url = process.env.NUBOX_API_BASE_URL?.trim()
-
-  if (!url) throw new Error('NUBOX_API_BASE_URL is not configured')
-
-  return url.replace(/\/+$/, '')
-}
-
-const sanitizeNuboxToken = (value: string | null | undefined) => {
+const sanitizeNuboxConfigValue = (value: string | null | undefined) => {
   const trimmed = value?.trim()
 
   if (!trimmed) {
     return null
   }
 
-  return trimmed
-    .replace(/^['"]+|['"]+$/g, '')
-    .replace(/(?:\\n)+$/g, '')
-    .trim()
+  const withoutQuotes = trimmed.replace(/^['"]+|['"]+$/g, '').trim()
+  const withoutLiteralLineEndings = withoutQuotes.replace(/(?:\\r|\\n)+$/g, '').trim()
+
+  return withoutLiteralLineEndings ? withoutLiteralLineEndings : null
+}
+
+const getBaseUrl = () => {
+  const url = sanitizeNuboxConfigValue(process.env.NUBOX_API_BASE_URL)
+
+  if (!url) throw new Error('NUBOX_API_BASE_URL is not configured')
+
+  return url.replace(/\/+$/, '')
 }
 
 const getBearerToken = async () => {
@@ -42,19 +42,23 @@ const getBearerToken = async () => {
     envVarName: 'NUBOX_BEARER_TOKEN'
   })
 
-  const normalizedToken = sanitizeNuboxToken(token)
+  const normalizedToken = sanitizeNuboxConfigValue(token)
 
   if (!normalizedToken) throw new Error('NUBOX_BEARER_TOKEN is not configured')
 
   return normalizedToken
 }
 
-const getApiKey = () => {
-  const key = process.env.NUBOX_X_API_KEY?.trim()
+const getApiKey = async () => {
+  const { value: key } = await resolveSecret({
+    envVarName: 'NUBOX_X_API_KEY'
+  })
 
-  if (!key) throw new Error('NUBOX_X_API_KEY is not configured')
+  const normalizedKey = sanitizeNuboxConfigValue(key)
 
-  return key
+  if (!normalizedKey) throw new Error('NUBOX_X_API_KEY is not configured')
+
+  return normalizedKey
 }
 
 // ─── Retry Logic ────────────────────────────────────────────────────────────
@@ -91,7 +95,7 @@ const nuboxFetch = async <T>(options: NuboxRequestOptions): Promise<T> => {
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${await getBearerToken()}`,
-    'x-api-key': getApiKey(),
+    'x-api-key': await getApiKey(),
     Accept: 'application/json'
   }
 
@@ -212,7 +216,7 @@ export const getNuboxSalePdf = async (id: number): Promise<ArrayBuffer> => {
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${await getBearerToken()}`,
-      'x-api-key': getApiKey(),
+      'x-api-key': await getApiKey(),
       Accept: 'application/pdf'
     },
     cache: 'no-store',
@@ -233,7 +237,7 @@ export const getNuboxSaleXml = async (id: number): Promise<string> => {
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${await getBearerToken()}`,
-      'x-api-key': getApiKey(),
+      'x-api-key': await getApiKey(),
       Accept: 'application/xml,text/xml,application/json'
     },
     cache: 'no-store',
@@ -254,7 +258,7 @@ export const getNuboxPurchasePdf = async (id: number): Promise<ArrayBuffer> => {
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${await getBearerToken()}`,
-      'x-api-key': getApiKey(),
+      'x-api-key': await getApiKey(),
       Accept: 'application/pdf'
     },
     cache: 'no-store',
@@ -305,7 +309,7 @@ export const fetchAllPages = async <T>(
   const all: T[] = []
   let page = 1
 
-  // eslint-disable-next-line no-constant-condition
+   
   while (true) {
     const response = await fetcher(period, page, size)
 

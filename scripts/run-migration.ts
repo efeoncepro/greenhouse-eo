@@ -12,7 +12,7 @@ const stripLeadingSqlComments = (sql: string) => {
 
   // Remove leading whitespace + line comments.
   // Note: we keep inline/trailing comments intact; this is only for statement detection.
-  // eslint-disable-next-line no-constant-condition
+   
   while (true) {
     const next = out.replace(/^\s+/, '')
 

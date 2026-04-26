@@ -1,3 +1,93 @@
+## Delta 2026-04-26 Greenhouse Deep Link Platform documentada
+
+- Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.
+- Decision: Greenhouse debe tratar deep links como referencias semanticas access-aware, no como strings de URL repartidos por menus, notificaciones, emails, Teams, search, API Platform o futuras apps.
+- Contrato objetivo: `kind + id + action + scope` -> resolver central -> `href`, `absoluteUrl`, `label`, `viewCode`, `requiredCapabilities`, `fallback` y `preview` por audiencia.
+- Regla de acceso: todo deep link gobernable debe explicitar ambos planos cuando apliquen:
+  - `views` / `authorizedViews` / `view_code` para surface visible
+  - `entitlements` / `capabilities` para autorizacion fina
+- Hasta que exista runtime, cualquier nueva feature que emita links en notificaciones, Teams, email, search o API debe documentar URL, entidad canonica, `viewCode`, capability y fallback.
+
+## Delta 2026-04-26 Mercado Publico licitaciones helper
+
+- Greenhouse ya tiene un helper server-side para hidratar una licitacion Mercado Publico por codigo externo:
+  - detalle oficial desde `api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?codigo=...`
+  - referencias de adjuntos desde la ficha publica `DetailsAcquisition.aspx?idlicitacion=...`
+  - descarga de documentos mediante postback WebForms de `VerAntecedentes.aspx`
+- Runtime nuevo: `src/lib/integrations/mercado-publico/tenders.ts`.
+- Contrato de secreto: `MERCADO_PUBLICO_TICKET` como fallback local directo; preferir `MERCADO_PUBLICO_TICKET_SECRET_REF=greenhouse-mercado-publico-ticket` en ambientes compartidos.
+- El secreto canonico ya existe en GCP Secret Manager (`efeonce-group`) y debe consumirse como scalar crudo. No imprimir ni persistir el ticket en logs o documentos.
+- Scope actual: helper puro sin persistencia. El siguiente slice debe decidir almacenamiento de metadata, assets privados y scheduling antes de exponerlo en UI o API Greenhouse.
+
+## Delta 2026-04-26 TASK-617 cerrado y TASK-647 abre MCP read-only
+
+- `TASK-617` queda cerrado documentalmente: `TASK-617.1` a `TASK-617.4` ya cubren REST hardening, first-party app lane, event control plane y developer docs.
+- El siguiente slice ejecutable de MCP es `TASK-647`:
+  - MCP read-only
+  - downstream de `api/platform/ecosystem/*`
+  - tools iniciales para context, organizations, capabilities e integration readiness
+  - sin SQL directo, sin routes legacy y sin writes
+- Regla operativa: cualquier MCP write-safe futuro debe esperar idempotencia transversal en `src/lib/api-platform/**` y command endpoints maduros.
+
+## Delta 2026-04-26 TASK-617.4 publica Developer API Documentation Portal
+
+- `/developers/api` es ahora el entrypoint publico developer-facing de la API Platform.
+- La pagina publica centra `api/platform/*` y separa cuatro lanes:
+  - `ecosystem`
+  - `app`
+  - event control plane
+  - legacy `integrations/v1`
+- Artefactos developer-facing nuevos:
+  - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
+  - `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`
+  - `public/docs/greenhouse-api-platform-v1.md`
+  - `public/docs/greenhouse-api-platform-v1.openapi.yaml`
+- El OpenAPI de platform es preview en este corte; el OpenAPI estable de `integrations/v1` sigue en `GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`.
+- Regla operativa: la documentacion publica no debe prometer API anonima, writes ecosystem-facing amplios ni idempotencia transversal hasta que existan runtime helpers dedicados.
+
+## Delta 2026-04-26 API Platform recupera REST hardening y lane first-party app
+
+- `TASK-617.1` y `TASK-617.2` quedaron recuperadas selectivamente desde rama/stash sobre `develop` actual.
+- `api/platform/ecosystem/*` ya tiene paginación uniforme, headers rate-limit remaining/reset, freshness helpers y tests de contrato focalizados.
+- `api/platform/app/*` existe como lane first-party user-authenticated para mobile/futuros clients propios:
+  - `POST/PATCH /api/platform/app/sessions`
+  - `DELETE /api/platform/app/sessions/current`
+  - `GET /api/platform/app/context`
+  - `GET /api/platform/app/home`
+  - `GET /api/platform/app/notifications`
+  - commands de notificaciones leídas
+- Runtime nuevo:
+  - `greenhouse_core.first_party_app_sessions`
+  - `greenhouse_core.api_platform_request_logs`
+- La implementación recuperada fue portada del diseño viejo con `jsonwebtoken` a `jose`, manteniendo HS256 y el secret canónico de auth.
+- Regla operativa nueva: la futura app React Native debe usar `api/platform/app/*`; no usar `AGENT_AUTH`, `sister_platform_consumers` ni rutas web internas como contrato móvil.
+
+## Delta 2026-04-26 Nubox Quotes Hot Sync
+
+- Las cotizaciones Nubox (`COT` / DTE 52) tienen un carril incremental separado del ETL diario:
+  - `GET /api/cron/nubox-quotes-hot-sync` cada 15 minutos
+  - runtime `src/lib/nubox/sync-nubox-quotes-hot.ts`
+  - script operativo `pnpm sync:nubox:quotes-hot -- --period=YYYY-MM`
+- El carril conserva el contrato robusto source → raw BigQuery → conformed BigQuery → PostgreSQL; no inserta cotizaciones directo en `greenhouse_finance.quotes`.
+- Observabilidad: `greenhouse_sync.source_sync_runs.source_object_type='quotes_hot_sync'`.
+- Variable opcional: `NUBOX_QUOTES_HOT_WINDOW_MONTHS` controla la ventana caliente de meses (default 2, max 6).
+- Credenciales Nubox: `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` deben preferir Secret Manager via `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF`; las refs quedaron provisionadas para Development, Preview, Staging y Production.
+- El script operativo acepta env explícito para replay controlado: `pnpm sync:nubox:quotes-hot -- --env-file=/path/to/env --period=YYYY-MM`.
+
+## Delta 2026-04-26 API Platform incorpora Event Control Plane
+
+- Greenhouse ya expone `webhooks / event delivery` como control plane ecosystem-facing bajo `api/platform/ecosystem/*`.
+- Runtime reutilizado:
+  - `greenhouse_sync.webhook_subscriptions`
+  - `greenhouse_sync.webhook_deliveries`
+  - `greenhouse_sync.webhook_delivery_attempts`
+  - `greenhouse_sync.outbox_events`
+- Regla operativa nueva:
+  - `/api/webhooks/*` y `/api/cron/webhook-dispatch` siguen siendo transport boundary
+  - `/api/platform/ecosystem/webhook-*` es el control plane oficial para subscriptions, deliveries, attempts y retry
+  - las subscriptions de control plane deben tener owner/scope (`sister_platform_consumer_id`, binding y scope Greenhouse)
+  - retries se reprograman para el dispatcher existente; no se entregan inline desde la route
+
 ## Delta 2026-04-25 Onboarding ya tiene arquitectura canónica propia
 
 - Greenhouse ya no debe tratar onboarding como una suma implícita de provisioning SCIM + checklist HRIS + activación manual dispersa.
@@ -1951,7 +2041,7 @@
 ## Delta 2026-03-30 Nubox DTE download hardening
 
 - `IncomeDetailView` ahora reutiliza `nuboxPdfUrl` y `nuboxXmlUrl` directos cuando el sync ya los materializó, en vez de forzar siempre el proxy server-side de descarga.
-- `src/lib/nubox/client.ts` normaliza `NUBOX_API_BASE_URL` y `NUBOX_X_API_KEY` con `trim()` y envía `Accept` explícito para descargas `pdf/xml`.
+- `src/lib/nubox/client.ts` normaliza `NUBOX_API_BASE_URL`, resuelve `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` por `Secret Manager -> env fallback`, y envía `Accept` explícito para descargas `pdf/xml`.
 - Esto reduce fallos `401` en staging cuando el detalle intentaba descargar PDF/XML por el carril proxy aun teniendo URLs directas ya disponibles.
 
 ## Delta 2026-03-30 Finance read identity drift hardening
@@ -3456,7 +3546,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - Total: $163,820,646 CLP
   - Tipos: `service_fee` (facturas), `credit_note` (notas de crédito negativas), `quote` (cotizaciones), `debit_note`
   - 0 huérfanos: todos los ingresos tienen `client_id` válido
-- Credenciales almacenadas en `.env.local`: `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN`, `NUBOX_X_API_KEY`
+- Credenciales runtime bajo contrato actual: `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` deben vivir preferentemente en Secret Manager via `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF`; `.env.local` queda solo para desarrollo/fallback.
 - Task brief creado: `docs/tasks/to-do/CODEX_TASK_Nubox_DTE_Integration.md` (8 fases, bidireccional)
 - Script de descubrimiento: `scripts/nubox-extractor.py`
 - Regla operativa derivada:

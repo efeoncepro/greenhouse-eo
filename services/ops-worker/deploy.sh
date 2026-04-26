@@ -470,6 +470,18 @@ upsert_scheduler_job \
   '{"triggeredBy":"cloud_scheduler"}'
 echo "  -> ops-reliability-ai-watch: 0 */1 * * * (Reliability AI Observer, TASK-638 — gated by RELIABILITY_AI_OBSERVER_ENABLED)"
 
+# Notion BQ raw → conformed → PG cycle. Replaces the historically-flaky Vercel
+# `/api/cron/sync-conformed` (20 7 * * *) with a Cloud Scheduler + Cloud Run
+# path that has built-in retry semantics and longer timeout. The Vercel cron
+# stays available as a manual / smoke-test fallback. Schedule mirrors the
+# previous one (07:20 UTC = 04:20 Santiago) so handoff is timing-equivalent.
+upsert_scheduler_job \
+  "ops-notion-conformed-sync" \
+  "20 7 * * *" \
+  "/notion-conformed/sync" \
+  '{"executionSource":"scheduled_primary"}'
+echo "  -> ops-notion-conformed-sync: 20 7 * * * (Notion daily BQ + PG sync, replaces Vercel /api/cron/sync-conformed)"
+
 echo ""
 echo "=== Deployment complete ==="
 echo ""

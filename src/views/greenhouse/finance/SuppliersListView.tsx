@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -96,7 +96,7 @@ const CATEGORY_OPTIONS = [
 
 const supColumnHelper = createColumnHelper<Supplier>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const supColumns: ColumnDef<Supplier, any>[] = [
   supColumnHelper.accessor('legalName', {
     header: 'Proveedor',

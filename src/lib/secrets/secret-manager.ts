@@ -24,9 +24,9 @@ type CachedSecretResolution = SecretResolution & {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __greenhouseSecretManagerClient: SecretManagerServiceClient | undefined
-  // eslint-disable-next-line no-var
+   
   var __greenhouseSecretResolutionCache: Map<string, CachedSecretResolution> | undefined
 }
 
@@ -145,6 +145,66 @@ const readSecretFromSecretManager = async ({
 
 export const clearSecretManagerResolutionCache = () => {
   getSecretResolutionCache().clear()
+}
+
+type SecretByRefOptions = {
+  env?: NodeJS.ProcessEnv
+  cacheTtlMs?: number
+}
+
+export const resolveSecretByRef = async (
+  secretRef: string,
+  options: SecretByRefOptions = {}
+): Promise<string | null> => {
+  const { env = process.env, cacheTtlMs = DEFAULT_CACHE_TTL_MS } = options
+  const sanitized = normalizeSecretRefValue(secretRef)
+
+  if (!sanitized) {
+    return null
+  }
+
+  let normalizedSecretRef: string
+
+  try {
+    const ref = normalizeSecretRef(sanitized, env)
+
+    if (!ref) {
+      return null
+    }
+
+    normalizedSecretRef = ref
+  } catch (error) {
+    console.warn('[secrets] Secret ref normalization failed for direct lookup; not exposing the secret value.', {
+      error: error instanceof Error ? error.message : 'unknown_error'
+    })
+
+    return null
+  }
+
+  const cacheKey = `direct-ref|${normalizedSecretRef}`
+  const cache = getSecretResolutionCache()
+  const now = Date.now()
+  const cached = cache.get(cacheKey)
+
+  if (cached && cached.expiresAt > now) {
+    return cached.value
+  }
+
+  const value = await readSecretFromSecretManager({
+    normalizedSecretRef,
+    envVarName: `<direct-ref:${sanitized}>`
+  })
+
+  cache.set(cacheKey, {
+    source: value ? 'secret_manager' : 'unconfigured',
+    value,
+    envVarName: `<direct-ref:${sanitized}>`,
+    secretRefEnvVarName: '',
+    secretRef: normalizedSecretRef,
+    expiresAt: now + cacheTtlMs
+  })
+
+  return value
 }
 
 export const resolveSecret = async ({

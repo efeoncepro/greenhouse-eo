@@ -13,6 +13,10 @@ export type ApiPlatformExternalScopeType = SisterPlatformExternalScopeType
 export type ApiPlatformRateLimit = {
   limitPerMinute: number
   limitPerHour: number
+  remainingPerMinute?: number
+  remainingPerHour?: number
+  resetAt?: string
+  retryAfterSeconds?: number
 }
 
 export type ApiPlatformRequestContext = {
@@ -28,6 +32,11 @@ export type ApiPlatformSuccessResult<T> = {
   data: T
   meta?: Record<string, unknown>
   status?: number
+  headers?: Record<string, string>
+  cacheControl?: string
+  etag?: string
+  lastModified?: string
+  notModified?: boolean
 }
 
 export const buildScopeSummary = (binding: SisterPlatformBindingResolution) => ({

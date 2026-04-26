@@ -61,6 +61,7 @@ interface RegistryRow extends Record<string, unknown> {
   files_owned: unknown
   expected_signal_kinds: unknown
   slo_thresholds: unknown
+  incident_domain_tag: string | null
 }
 
 interface OverrideRow extends Record<string, unknown> {
@@ -117,7 +118,8 @@ const rowToDefinition = (row: RegistryRow): ReliabilityModuleDefinition => ({
   smokeTests: parseJsonArray<string>(row.smoke_tests, []),
   filesOwned: parseJsonArray<string>(row.files_owned, []),
   expectedSignalKinds: parseJsonArray<ReliabilitySignalKind>(row.expected_signal_kinds, []),
-  sloThresholds: parseJsonObject(row.slo_thresholds)
+  sloThresholds: parseJsonObject(row.slo_thresholds),
+  incidentDomainTag: row.incident_domain_tag ?? undefined
 })
 
 /**
@@ -138,9 +140,9 @@ export const ensureReliabilityRegistrySeed = async (): Promise<void> => {
         `INSERT INTO greenhouse_core.reliability_module_registry (
            module_key, label, description, domain,
            routes, apis, dependencies, smoke_tests, files_owned,
-           expected_signal_kinds, slo_thresholds
+           expected_signal_kinds, slo_thresholds, incident_domain_tag
          )
-         VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7::jsonb, $8::jsonb, $9::jsonb, $10::jsonb, $11::jsonb)
+         VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7::jsonb, $8::jsonb, $9::jsonb, $10::jsonb, $11::jsonb, $12)
          ON CONFLICT (module_key) DO UPDATE SET
            label = EXCLUDED.label,
            description = EXCLUDED.description,
@@ -152,6 +154,7 @@ export const ensureReliabilityRegistrySeed = async (): Promise<void> => {
            files_owned = EXCLUDED.files_owned,
            expected_signal_kinds = EXCLUDED.expected_signal_kinds,
            slo_thresholds = EXCLUDED.slo_thresholds,
+           incident_domain_tag = EXCLUDED.incident_domain_tag,
            updated_at = NOW()`,
         [
           definition.moduleKey,
@@ -164,7 +167,8 @@ export const ensureReliabilityRegistrySeed = async (): Promise<void> => {
           stableJson(definition.smokeTests),
           stableJson(definition.filesOwned),
           stableJson(definition.expectedSignalKinds),
-          stableJson(definition.sloThresholds ?? {})
+          stableJson(definition.sloThresholds ?? {}),
+          definition.incidentDomainTag ?? null
         ]
       )
     }
@@ -180,7 +184,7 @@ const fetchDefaultsFromDb = async (): Promise<ReliabilityModuleDefinition[]> => 
   const rows = await runGreenhousePostgresQuery<RegistryRow>(
     `SELECT module_key, label, description, domain,
             routes, apis, dependencies, smoke_tests, files_owned,
-            expected_signal_kinds, slo_thresholds
+            expected_signal_kinds, slo_thresholds, incident_domain_tag
        FROM greenhouse_core.reliability_module_registry
        ORDER BY module_key`
   )

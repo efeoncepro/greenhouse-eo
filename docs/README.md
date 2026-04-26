@@ -43,6 +43,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md](architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md)
 - [GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md](architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md)
 - [GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md](architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md)
+- [GREENHOUSE_DEEP_LINK_PLATFORM_V1.md](architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md)
 - [GREENHOUSE_SERVICE_MODULES_V1.md](architecture/GREENHOUSE_SERVICE_MODULES_V1.md)
 - [GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md](architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md)
 - [GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md](architecture/GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md)
@@ -92,6 +93,8 @@ Indice maestro de la documentacion no operativa del repo.
 - [RESEARCH-002-staff-augmentation-enterprise-module.md](research/RESEARCH-002-staff-augmentation-enterprise-module.md)
 - [RESEARCH-003-hiring-desk-reactive-ecosystem.md](research/RESEARCH-003-hiring-desk-reactive-ecosystem.md)
 - [RESEARCH-004-space-identity-consolidation.md](research/RESEARCH-004-space-identity-consolidation.md)
+- [RESEARCH-006-delivery-task-member-attribution.md](research/RESEARCH-006-delivery-task-member-attribution.md)
+- [RESEARCH-007-commercial-public-tenders-module.md](research/RESEARCH-007-commercial-public-tenders-module.md)
 
 ### Operations
 

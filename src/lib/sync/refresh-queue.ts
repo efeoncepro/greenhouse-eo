@@ -164,6 +164,110 @@ export const markRefreshCompleted = async (queueId: string): Promise<void> => {
   )
 }
 
+/**
+ * Entity-existence guards used by `markRefreshFailed` to detect orphan rows
+ * (refreshes that point to a Greenhouse entity that no longer exists in PG)
+ * at the moment we'd otherwise route them to `dead`. Auto-archiving these
+ * keeps the reliability dashboard honest — humans see only real incidents,
+ * not test residue, deleted records, or snapshot drift.
+ *
+ * Rules:
+ *  - Each entry is `(entity_type, error_message_pattern, table_check)`.
+ *  - `error_message_pattern` is a substring or regex used to recognize the
+ *    "entity not found" failure shape coming up from the projection.
+ *  - `table_check` returns whether the entity exists. When it returns FALSE,
+ *    the row is archived, NOT dead.
+ *
+ * Adding a new guard: copy a row, point at the right table + key column.
+ * Cheap (single-row PG lookup), runs only at the dead-routing moment.
+ */
+const ENTITY_EXISTENCE_GUARDS: Array<{
+  entityType: string
+  errorMessagePattern: RegExp
+  checkExists: (entityId: string) => Promise<boolean>
+}> = [
+  {
+    entityType: 'member',
+    errorMessagePattern: /Member .* not found/i,
+    checkExists: async (entityId: string) => {
+      const rows = await runGreenhousePostgresQuery<{ exists: boolean } & Record<string, unknown>>(
+        'SELECT EXISTS(SELECT 1 FROM greenhouse.team_members WHERE member_id = $1) AS exists',
+        [entityId]
+      )
+
+      return rows[0]?.exists === true
+    }
+  },
+  {
+    entityType: 'organization',
+    errorMessagePattern: /Organization .* not found/i,
+    checkExists: async (entityId: string) => {
+      const rows = await runGreenhousePostgresQuery<{ exists: boolean } & Record<string, unknown>>(
+        `SELECT EXISTS(
+           SELECT 1 FROM greenhouse_core.organizations WHERE organization_id = $1
+         ) AS exists`,
+        [entityId]
+      )
+
+      return rows[0]?.exists === true
+    }
+  }
+]
+
+const detectOrphan = async (
+  entityType: string,
+  entityId: string,
+  errorMessage: string
+): Promise<{ isOrphan: boolean; reason: string | null }> => {
+  const guard = ENTITY_EXISTENCE_GUARDS.find(
+    g => g.entityType === entityType && g.errorMessagePattern.test(errorMessage)
+  )
+
+  if (!guard) return { isOrphan: false, reason: null }
+
+  try {
+    const exists = await guard.checkExists(entityId)
+
+    if (exists) return { isOrphan: false, reason: null }
+
+    return {
+      isOrphan: true,
+      reason: `orphan_entity_not_found:${entityType}=${entityId}`
+    }
+  } catch {
+    // If the guard query itself fails, do NOT archive — keep behaving as
+    // before (route to dead). False negatives are safe; false positives
+    // would silently hide real incidents.
+    return { isOrphan: false, reason: null }
+  }
+}
+
+/**
+ * Mark a refresh as failed.
+ *
+ * Terminal classification (after retries are exhausted):
+ *
+ *   - `is_infrastructure_fault = true`  → status `failed`
+ *     Transient/infra problem (timeout, deadlock, rate limit, network). The
+ *     projection-recovery cron will keep claiming and retrying these.
+ *
+ *   - `is_infrastructure_fault = false` → status `dead`
+ *     Application/data fault (SQL bug, missing schema, contract violation). It
+ *     will NOT recover by itself — surfaces in the reliability control plane as
+ *     `Proyecciones` warning. Requires a code fix or manual requeue via the
+ *     admin endpoint after the underlying cause is addressed.
+ *
+ *     **Orphan auto-archive**: before routing to `dead`, we run the
+ *     `ENTITY_EXISTENCE_GUARDS` to detect refreshes that point to a Greenhouse
+ *     entity that no longer exists (smoke test residue, deleted records,
+ *     snapshot drift). When the entity is missing, the row is marked
+ *     `archived=TRUE` in the same UPDATE so the dashboard never sees it as a
+ *     real incident. The row is preserved for audit; the reliability counters
+ *     filter on `archived = FALSE`.
+ *
+ * `dead_at` is stamped when the row enters the dead state so the dashboard can
+ * age-out and escalate alerts honestly.
+ */
 export const markRefreshFailed = async (
   queueId: string,
   error: string,
@@ -174,14 +278,58 @@ export const markRefreshFailed = async (
     isInfrastructureFault?: boolean
   }
 ): Promise<void> => {
+  const isInfrastructureFault = classification?.isInfrastructureFault ?? false
+
+  // Pre-compute orphan status so we know whether to archive at the dead-routing
+  // moment. Only relevant for application faults (infra faults stay in `failed`
+  // and keep retrying — orphan detection happens via the recovery cron).
+  let orphanReason: string | null = null
+
+  if (!isInfrastructureFault) {
+    // queueId format: `{projectionName}:{entityType}:{entityId}` (per
+    // `buildRefreshQueueId`). Parse defensively so a malformed id doesn't
+    // crash the writer.
+    const idParts = queueId.split(':')
+    const entityType = idParts[1] ?? null
+    const entityId = idParts.slice(2).join(':') || null
+
+    if (entityType && entityId) {
+      const orphan = await detectOrphan(entityType, entityId, error)
+
+      if (orphan.isOrphan) {
+        orphanReason = orphan.reason
+      }
+    }
+  }
+
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_sync.projection_refresh_queue
      SET retry_count = retry_count + 1,
-         status = CASE WHEN retry_count + 1 >= $2 THEN 'failed' ELSE 'pending' END,
+         status = CASE
+           WHEN retry_count + 1 >= $2 THEN
+             CASE WHEN $6 = TRUE THEN 'failed' ELSE 'dead' END
+           ELSE 'pending'
+         END,
          error_message = $3,
          error_class = $4,
          error_family = $5,
          is_infrastructure_fault = $6,
+         dead_at = CASE
+           WHEN retry_count + 1 >= $2 AND $6 = FALSE THEN NOW()
+           ELSE dead_at
+         END,
+         archived = CASE
+           WHEN retry_count + 1 >= $2 AND $6 = FALSE AND $7::text IS NOT NULL THEN TRUE
+           ELSE archived
+         END,
+         archived_at = CASE
+           WHEN retry_count + 1 >= $2 AND $6 = FALSE AND $7::text IS NOT NULL THEN NOW()
+           ELSE archived_at
+         END,
+         archived_reason = CASE
+           WHEN retry_count + 1 >= $2 AND $6 = FALSE AND $7::text IS NOT NULL THEN $7
+           ELSE archived_reason
+         END,
          updated_at = NOW()
      WHERE refresh_id = $1`,
     [
@@ -190,9 +338,35 @@ export const markRefreshFailed = async (
       error,
       classification?.errorClass ?? null,
       classification?.errorFamily ?? null,
-      classification?.isInfrastructureFault ?? false
+      isInfrastructureFault,
+      orphanReason
     ]
   )
+}
+
+/**
+ * Requeue a `dead` or `failed` projection refresh manually. Resets retry
+ * counters and clears classification so the next reactive sweep claims it
+ * fresh. Used after fixing the underlying application fault.
+ */
+export const requeueRefreshItem = async (queueId: string): Promise<boolean> => {
+  const rows = await runGreenhousePostgresQuery<{ refresh_id: string } & Record<string, unknown>>(
+    `UPDATE greenhouse_sync.projection_refresh_queue
+     SET status = 'pending',
+         retry_count = 0,
+         error_message = NULL,
+         error_class = NULL,
+         error_family = NULL,
+         is_infrastructure_fault = FALSE,
+         dead_at = NULL,
+         updated_at = NOW()
+     WHERE refresh_id = $1
+       AND status IN ('failed', 'dead')
+     RETURNING refresh_id`,
+    [queueId]
+  )
+
+  return rows.length > 0
 }
 
 export const getQueueStats = async (): Promise<{
@@ -200,6 +374,7 @@ export const getQueueStats = async (): Promise<{
   processing: number
   completed: number
   failed: number
+  dead: number
 }> => {
   await ensureRefreshQueue()
 
@@ -207,6 +382,7 @@ export const getQueueStats = async (): Promise<{
     `SELECT status, COUNT(*)::text AS count
      FROM greenhouse_sync.projection_refresh_queue
      WHERE created_at > NOW() - INTERVAL '24 hours'
+        OR status = 'dead'
      GROUP BY status`
   )
 
@@ -216,7 +392,8 @@ export const getQueueStats = async (): Promise<{
     pending: map.get('pending') ?? 0,
     processing: map.get('processing') ?? 0,
     completed: map.get('completed') ?? 0,
-    failed: map.get('failed') ?? 0
+    failed: map.get('failed') ?? 0,
+    dead: map.get('dead') ?? 0
   }
 }
 

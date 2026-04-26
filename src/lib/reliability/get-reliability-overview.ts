@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { CloudSentryIncidentsSnapshot } from '@/lib/cloud/contracts'
+import { getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
@@ -33,6 +35,7 @@ import {
 } from './severity'
 import {
   buildCloudSignals,
+  buildDomainIncidentSignals,
   buildFinanceSmokeLaneSignals,
   buildGcpBillingSignals,
   buildNotionDataQualitySignals,
@@ -229,6 +232,15 @@ interface ReliabilityOverviewSources {
     overview: AiObservation | null
     byModule: Record<string, AiObservation>
   } | null
+
+  /**
+   * Per-module Sentry incident snapshots, keyed by `moduleKey`. Populated by
+   * the consumer (admin reliability page / cron AI watcher) by iterating the
+   * registry's `incidentDomainTag` and calling `getCloudSentryIncidents({
+   * domain })` once per tag. Kept opt-in so background watchers and tests
+   * don't accidentally hammer the Sentry API.
+   */
+  domainIncidents?: Record<string, CloudSentryIncidentsSnapshot> | null
 }
 
 export const buildReliabilityOverview = (
@@ -252,6 +264,12 @@ export const buildReliabilityOverview = (
     ...buildSyntheticRouteSignals(syntheticSnapshots),
     ...buildSyntheticModuleSignals(syntheticSnapshots),
     ...(sources.financeSmokeLane ? buildFinanceSmokeLaneSignals(sources.financeSmokeLane) : []),
+    // TASK-2026-04-26 — per-module incident signals via Sentry domain tag.
+    // Iterates the registry's `incidentDomainTag` entries and projects one
+    // `incident` signal per module from the domain-filtered Sentry feed.
+    // Closes the `expectedSignalKinds: ['incident']` gap for finance,
+    // delivery, integrations.notion (cloud already had a global signal).
+    ...(sources.domainIncidents ? buildDomainIncidentSignals(sources.domainIncidents) : []),
     ...(sources.aiObservations ? buildAiSummarySignals(sources.aiObservations.byModule) : [])
   ]
 
@@ -392,12 +410,58 @@ export const getReliabilityOverview = async (
         ? await getLatestAiObservationsByScope().catch(() => null)
         : null
 
+  // Per-module Sentry incidents via the `domain` tag. Iterates the registry's
+  // `incidentDomainTag` entries and queries Sentry once per tag in parallel.
+  // Catches per-domain to ensure a single failure doesn't poison the whole
+  // overview. Skipped when caller pre-provides `domainIncidents` (admin/AI
+  // observer paths that already have the data) or when there are no modules
+  // declaring an incident tag.
+  const domainIncidents = preloadedSources.domainIncidents !== undefined
+    ? preloadedSources.domainIncidents
+    : await hydrateDomainIncidents(modules ?? RELIABILITY_REGISTRY)
+
   return buildReliabilityOverview(operations, {
     billing,
     notionOperational,
     syntheticSnapshots,
     financeSmokeLane,
     modules,
-    aiObservations
+    aiObservations,
+    domainIncidents
   })
+}
+
+/**
+ * Fetch Sentry incident snapshots in parallel for every module whose registry
+ * entry declares an `incidentDomainTag`. Failures are isolated per domain so a
+ * Sentry hiccup on one module never poisons the others.
+ */
+const hydrateDomainIncidents = async (
+  registry: ReliabilityModuleDefinition[]
+): Promise<Record<string, CloudSentryIncidentsSnapshot> | null> => {
+  const taggedModules = registry.filter(m => Boolean(m.incidentDomainTag))
+
+  if (taggedModules.length === 0) return null
+
+  const entries = await Promise.all(
+    taggedModules.map(async module => {
+      try {
+        const snapshot = await getCloudSentryIncidents(process.env, {
+          domain: module.incidentDomainTag ?? null
+        })
+
+        return [module.moduleKey, snapshot] as const
+      } catch {
+        return null
+      }
+    })
+  )
+
+  const out: Record<string, CloudSentryIncidentsSnapshot> = {}
+
+  for (const entry of entries) {
+    if (entry) out[entry[0]] = entry[1]
+  }
+
+  return Object.keys(out).length > 0 ? out : null
 }

@@ -181,6 +181,25 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'commercial',
     actions: ['update'] as const,
     defaultScope: 'all'
+  },
+
+  // TASK-672 — Platform Health API contract.
+  // Declarative catalog entries for the agent/MCP preflight contract.
+  // V1 enforcement is route-group-driven (admin lane uses
+  // requireAdminTenantContext; ecosystem lane uses runEcosystemReadRoute
+  // scope binding). When TASK-658 lands the resource-authorization
+  // bridge, runtime checks will read from these keys to gate detail.
+  {
+    key: 'platform.health.read',
+    module: 'admin',
+    actions: ['read'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'platform.health.detail',
+    module: 'admin',
+    actions: ['read'] as const,
+    defaultScope: 'all'
   }
 ] as const
 

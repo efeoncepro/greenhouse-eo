@@ -203,7 +203,26 @@ export const getCloudObservabilityPosture = async (env: ObservabilityEnv = proce
   }
 }
 
-export const getCloudSentryIncidents = async (env: ObservabilityEnv = process.env): Promise<CloudSentryIncidentsSnapshot> => {
+/**
+ * Read open Sentry issues, optionally filtered by a domain tag.
+ *
+ * The `domain` parameter maps to a Sentry custom tag (`tags[domain]`) that
+ * we attach to every `Sentry.captureException()` call via the canonical
+ * `captureWithDomain()` wrapper in `src/lib/observability/capture.ts`.
+ * Filtering by domain lets the reliability registry surface a per-module
+ * `incident` signal (`finance`, `delivery`, `cloud`, etc.) without having
+ * to maintain per-domain Sentry projects — one project, many tags.
+ *
+ * When `domain` is not provided, returns ALL open issues (legacy behavior).
+ */
+export interface GetSentryIncidentsOptions {
+  domain?: string | null
+}
+
+export const getCloudSentryIncidents = async (
+  env: ObservabilityEnv = process.env,
+  options: GetSentryIncidentsOptions = {}
+): Promise<CloudSentryIncidentsSnapshot> => {
   const incidentsTokenResolution = await resolveSecret({
     envVarName: 'SENTRY_INCIDENTS_AUTH_TOKEN',
     env: env as NodeJS.ProcessEnv
@@ -224,7 +243,14 @@ export const getCloudSentryIncidents = async (env: ObservabilityEnv = process.en
   }
 
   const sentryEnvironment = getSentryRuntimeEnvironment(env)
-  const query = ['is:unresolved', sentryEnvironment ? `environment:${sentryEnvironment}` : null].filter(Boolean).join(' ')
+  const domainFilter = options.domain?.trim() || null
+
+  const query = [
+    'is:unresolved',
+    sentryEnvironment ? `environment:${sentryEnvironment}` : null,
+    domainFilter ? `domain:${domainFilter}` : null
+  ].filter(Boolean).join(' ')
+
   const endpoint = new URL(`https://sentry.io/api/0/projects/${encodeURIComponent(sentryOrg)}/${encodeURIComponent(sentryProject)}/issues/`)
 
   endpoint.searchParams.set('limit', '6')

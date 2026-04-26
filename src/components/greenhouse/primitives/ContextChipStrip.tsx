@@ -6,6 +6,8 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import { alpha } from '@mui/material/styles'
 
+import { useListAnimation } from '@/hooks/useListAnimation'
+
 export interface ContextChipStripProps {
   children: ReactNode
   ariaLabel: string
@@ -22,6 +24,7 @@ export interface ContextChipStripProps {
  */
 const ContextChipStrip = ({ children, ariaLabel, scrollMobile = true }: ContextChipStripProps) => {
   const scrollRef = useRef<HTMLDivElement | null>(null)
+  const [chipsRef] = useListAnimation()
   const [showLeftShadow, setShowLeftShadow] = useState(false)
   const [showRightShadow, setShowRightShadow] = useState(false)
 
@@ -104,6 +107,7 @@ const ContextChipStrip = ({ children, ariaLabel, scrollMobile = true }: ContextC
         })}
       >
         <Stack
+          ref={chipsRef}
           direction='row'
           spacing={1.5}
           sx={theme => ({

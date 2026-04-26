@@ -36,7 +36,7 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Chip from '@mui/material/Chip'
 
@@ -1259,7 +1259,7 @@ const FinanceDashboardView = () => {
 
 const movementColumnHelper = createColumnHelper<RecentMovement>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const movementColumns: any[] = [
   movementColumnHelper.accessor('type', {
     header: 'Tipo',

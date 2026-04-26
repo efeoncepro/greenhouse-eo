@@ -78,7 +78,7 @@ export async function POST(request: Request) {
   }
 
   // Generate token
-  const token = generateToken(
+  const token = await generateToken(
     { email, user_id: user.user_id, type: 'verify' },
     VERIFY_TOKEN_TTL_HOURS
   )

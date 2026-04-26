@@ -579,7 +579,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-523` | `to-do` | bcryptjs → @node-rs/argon2 (with re-hash policy) | `docs/tasks/to-do/TASK-523-bcryptjs-to-argon2.md` |
 | `TASK-524` | `to-do` | Income → HubSpot Invoice Bridge | `docs/tasks/to-do/TASK-524-income-hubspot-invoice-bridge.md` |
 | `TASK-525` | `to-do` | View Transitions API rollout (navegación animada nativa) | `docs/tasks/to-do/TASK-525-view-transitions-api-rollout.md` |
-| `TASK-526` | `to-do` | @formkit/auto-animate para list motion zero-config | `docs/tasks/to-do/TASK-526-auto-animate-list-motion.md` |
+| `TASK-526` | `complete` | @formkit/auto-animate para list motion zero-config | `docs/tasks/complete/TASK-526-auto-animate-list-motion.md` |
 | `TASK-527` | `to-do` | Rive interactive illustrations (next-gen Lottie) | `docs/tasks/to-do/TASK-527-rive-interactive-illustrations.md` |
 | `TASK-528` | `to-do` | Chile Tax / IVA Program | `docs/tasks/to-do/TASK-528-chile-tax-iva-program.md` |
 | `TASK-529` | `to-do` | Chile Tax Code Foundation | `docs/tasks/to-do/TASK-529-chile-tax-code-foundation.md` |
@@ -670,11 +670,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-614` | `to-do` | People / Payroll Economy Facet & Entitlements Hardening | `docs/tasks/to-do/TASK-614-people-payroll-economy-facet-entitlements-hardening.md` |
 | `TASK-615` | `to-do` | Quote Builder Flow Orchestration & UX Hardening | `docs/tasks/to-do/TASK-615-quote-builder-flow-orchestration-ux-hardening.md` |
 | `TASK-616` | `complete` | API Platform Foundation & Ecosystem Read Surface V1 | `docs/tasks/complete/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md` |
-| `TASK-617` | `to-do` | API Platform V1.1 Convergence Program | `docs/tasks/to-do/TASK-617-api-platform-v1-1-convergence-program.md` |
-| `TASK-617.1` | `to-do` | API Platform REST Hardening | `docs/tasks/to-do/TASK-617.1-api-platform-rest-hardening.md` |
-| `TASK-617.2` | `to-do` | API Platform First-Party App Surface Foundation | `docs/tasks/to-do/TASK-617.2-api-platform-first-party-app-surface-foundation.md` |
-| `TASK-617.3` | `to-do` | API Platform Event Control Plane | `docs/tasks/to-do/TASK-617.3-api-platform-event-control-plane.md` |
-| `TASK-617.4` | `to-do` | Developer API Documentation Portal | `docs/tasks/to-do/TASK-617.4-developer-api-documentation-portal.md` |
+| `TASK-617` | `complete` | API Platform V1.1 Convergence Program | `docs/tasks/complete/TASK-617-api-platform-v1-1-convergence-program.md` |
+| `TASK-617.1` | `complete` | API Platform REST Hardening | `docs/tasks/complete/TASK-617.1-api-platform-rest-hardening.md` |
+| `TASK-617.2` | `complete` | API Platform First-Party App Surface Foundation | `docs/tasks/complete/TASK-617.2-api-platform-first-party-app-surface-foundation.md` |
+| `TASK-617.3` | `complete` | API Platform Event Control Plane | `docs/tasks/complete/TASK-617.3-api-platform-event-control-plane.md` |
+| `TASK-617.4` | `complete` | Developer API Documentation Portal | `docs/tasks/complete/TASK-617.4-developer-api-documentation-portal.md` |
 | `TASK-619` | `to-do` | Quote eSignature (consumer del foundation neutro de firma) | `docs/tasks/to-do/TASK-619-quote-esignature-zapsign.md` |
 | `TASK-619.1` | `to-do` | Signed PDF Storage Hardening (bucket separado + retention 10 anos + multi-region) | `docs/tasks/to-do/TASK-619.1-signed-pdf-storage-hardening.md` |
 | `TASK-619.2` | `to-do` | Signature Operational Worker (reconciliation + expiry alerting + DLQ) | `docs/tasks/to-do/TASK-619.2-signature-operational-worker.md` |
@@ -714,3 +714,60 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-636` | `to-do` | Vercel Billing FOCUS Cost Observability in Admin Center | `docs/tasks/to-do/TASK-636-vercel-billing-focus-observability.md` |
 | `TASK-637` | `to-do` | GitHub Billing & Actions Cost Observability in Admin Center | `docs/tasks/to-do/TASK-637-github-billing-actions-cost-observability.md` |
 | `TASK-638` | `complete` | Reliability AI Observer (Gemini watcher hosted en ops-worker + Cloud Scheduler) | `docs/tasks/complete/TASK-638-reliability-ai-observer.md` |
+| `TASK-639` | `complete` | Finance VAT Reactive Lane & Data Quality Semantics Hardening | `docs/tasks/complete/TASK-639-finance-vat-reactive-data-quality-hardening.md` |
+| `TASK-640` | `in-progress` | Nubox V2 Enterprise Enrichment Program | `docs/tasks/in-progress/TASK-640-nubox-v2-enterprise-enrichment.md` |
+| `TASK-641` | `to-do` | Adopt Apache ECharts as canonical chart stack for high-impact dashboards | `docs/tasks/to-do/TASK-641-echarts-stack-adoption.md` |
+| `TASK-642` | `to-do` | Greenhouse Motion Polish Program 2026 (umbrella) | `docs/tasks/to-do/TASK-642-motion-polish-program-2026.md` |
+| `TASK-643` | `to-do` | Microinteractions polish + tokens canónicos de motion | `docs/tasks/to-do/TASK-643-microinteractions-polish.md` |
+| `TASK-644` | `to-do` | Page entrance + skeleton crossfade | `docs/tasks/to-do/TASK-644-page-entrance-skeleton-crossfade.md` |
+| `TASK-645` | `to-do` | KPI counter animations (rolling numbers) | `docs/tasks/to-do/TASK-645-kpi-counter-animations.md` |
+| `TASK-646` | `to-do` | Scroll-triggered chart entrance + list stagger | `docs/tasks/to-do/TASK-646-scroll-triggered-chart-entrance-stagger.md` |
+| `TASK-647` | `to-do` | Greenhouse MCP Read-Only Adapter V1 | `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md` |
+| `TASK-648` | `to-do` | API Platform ICO Read Surface V1 | `docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md` |
+| `TASK-649` | `complete` | API Platform Completion Program | `docs/tasks/complete/TASK-649-api-platform-completion-program.md` |
+| `TASK-650` | `to-do` | API Platform Domain Read Surfaces Program | `docs/tasks/to-do/TASK-650-api-platform-domain-read-surfaces-program.md` |
+| `TASK-651` | `to-do` | API Platform Finance / Commercial Read Surface | `docs/tasks/to-do/TASK-651-api-platform-finance-commercial-read-surface.md` |
+| `TASK-652` | `to-do` | API Platform People / Workforce Read Surface | `docs/tasks/to-do/TASK-652-api-platform-people-workforce-read-surface.md` |
+| `TASK-653` | `to-do` | API Platform Ops / Reliability Read Surface | `docs/tasks/to-do/TASK-653-api-platform-ops-reliability-read-surface.md` |
+| `TASK-654` | `to-do` | API Platform Organization Workspace Facets Read Surface | `docs/tasks/to-do/TASK-654-api-platform-organization-workspace-facets-read-surface.md` |
+| `TASK-655` | `to-do` | API Platform Command & Idempotency Foundation | `docs/tasks/to-do/TASK-655-api-platform-command-idempotency-foundation.md` |
+| `TASK-656` | `to-do` | API Platform Query Conventions Foundation | `docs/tasks/to-do/TASK-656-api-platform-query-conventions-foundation.md` |
+| `TASK-657` | `to-do` | API Platform Degraded Modes & Dependency Health | `docs/tasks/to-do/TASK-657-api-platform-degraded-modes-dependency-health.md` |
+| `TASK-658` | `to-do` | API Platform Resource Authorization Bridge | `docs/tasks/to-do/TASK-658-api-platform-resource-authorization-bridge.md` |
+| `TASK-659` | `to-do` | MCP OAuth / Hosted Auth Model | `docs/tasks/to-do/TASK-659-mcp-oauth-hosted-auth-model.md` |
+| `TASK-660` | `to-do` | API Platform OpenAPI Stable Contract | `docs/tasks/to-do/TASK-660-api-platform-openapi-stable-contract.md` |
+| `TASK-661` | `to-do` | API Platform Lifecycle & Deprecation Policy | `docs/tasks/to-do/TASK-661-api-platform-lifecycle-deprecation-policy.md` |
+| `TASK-662` | `to-do` | Nubox Document Graph Foundation | `docs/tasks/to-do/TASK-662-nubox-document-graph-foundation.md` |
+| `TASK-663` | `to-do` | Nubox Durable PDF/XML Artifact Persistence | `docs/tasks/to-do/TASK-663-nubox-durable-pdf-xml-artifacts.md` |
+| `TASK-664` | `to-do` | Nubox Payment Graph & Expense Ledger Reconciliation | `docs/tasks/to-do/TASK-664-nubox-payment-graph-expense-ledger-reconciliation.md` |
+| `TASK-665` | `to-do` | Nubox Tax Graph & VAT Data Quality Enrichment | `docs/tasks/to-do/TASK-665-nubox-tax-graph-vat-data-quality.md` |
+| `TASK-666` | `to-do` | Nubox Master Data Enrichment Governance | `docs/tasks/to-do/TASK-666-nubox-master-data-enrichment-governance.md` |
+| `TASK-667` | `to-do` | Nubox Additional Hot Lanes | `docs/tasks/to-do/TASK-667-nubox-additional-hot-lanes.md` |
+| `TASK-668` | `to-do` | Nubox Ops Replay & Enterprise Promotion | `docs/tasks/to-do/TASK-668-nubox-ops-replay-enterprise-promotion.md` |
+| `TASK-669` | `to-do` | Teams Workflow Notifications Channel | `docs/tasks/to-do/TASK-669-teams-workflow-notifications-channel.md` |
+| `TASK-670` | `to-do` | Brand Icon Library React Adapter | `docs/tasks/to-do/TASK-670-brand-icon-library-react-adapter.md` |
+| `TASK-671` | `in-progress` | Greenhouse Teams Bot Platform (Bot Framework + Graph) — code complete, pending Azure tenant deploy | `docs/tasks/in-progress/TASK-671-greenhouse-teams-bot-platform.md` |
+| `TASK-672` | `to-do` | Platform Health API Contract | `docs/tasks/to-do/TASK-672-platform-health-api-contract.md` |
+| `TASK-673` | `complete` | Mercado Publico Licitaciones Intelligence (POC + Validacion de Matcher) | `docs/tasks/complete/TASK-673-mercadopublico-poc.md` |
+| `TASK-674` | `to-do` | Commercial Public Procurement Architecture Contract | `docs/tasks/to-do/TASK-674-commercial-public-procurement-architecture-contract.md` |
+| `TASK-675` | `to-do` | Mercado Publico Licitaciones Ingestion Foundation | `docs/tasks/to-do/TASK-675-mercado-publico-licitaciones-ingestion-foundation.md` |
+| `TASK-676` | `to-do` | Mercado Publico Purchase Order Reconciliation Foundation | `docs/tasks/to-do/TASK-676-mercado-publico-purchase-order-reconciliation.md` |
+| `TASK-677` | `to-do` | Compra Agil Monthly COT Ingestion Foundation | `docs/tasks/to-do/TASK-677-compra-agil-cot-ingestion-foundation.md` |
+| `TASK-678` | `to-do` | Compra Agil Beta API Watch And Adapter Spike | `docs/tasks/to-do/TASK-678-compra-agil-beta-api-watch-adapter-spike.md` |
+| `TASK-679` | `to-do` | Mercado Publico Document Ingestion And Private Assets | `docs/tasks/to-do/TASK-679-mercado-publico-document-ingestion-private-assets.md` |
+| `TASK-680` | `to-do` | Mercado Publico Procedure Taxonomy Registry | `docs/tasks/to-do/TASK-680-mercado-publico-procedure-taxonomy-registry.md` |
+| `TASK-681` | `to-do` | Consulta al Mercado / RFI Discovery Spike | `docs/tasks/to-do/TASK-681-consulta-mercado-rfi-discovery-spike.md` |
+| `TASK-682` | `to-do` | Public Tenders Scoring V1 | `docs/tasks/to-do/TASK-682-public-tenders-scoring-v1.md` |
+| `TASK-683` | `to-do` | Public Tenders Workbench List And Detail | `docs/tasks/to-do/TASK-683-public-tenders-workbench-list-detail.md` |
+| `TASK-684` | `to-do` | Public Tenders Bid / No-Bid Workflow | `docs/tasks/to-do/TASK-684-public-tenders-bid-no-bid-workflow.md` |
+| `TASK-685` | `to-do` | Tender Document Intelligence And Requirement Extraction | `docs/tasks/to-do/TASK-685-tender-document-intelligence-requirements.md` |
+| `TASK-686` | `to-do` | Tender To Deal / Quote Bridge | `docs/tasks/to-do/TASK-686-tender-to-deal-quote-bridge.md` |
+| `TASK-687` | `to-do` | Public Tender Notifications And Reliability Signals | `docs/tasks/to-do/TASK-687-public-tender-notifications-reliability.md` |
+| `TASK-688` | `to-do` | Public Tender Submission Control Room Without API-Side Posting | `docs/tasks/to-do/TASK-688-public-tender-submission-control-room.md` |
+| `TASK-689` | `to-do` | Mercado Publico Companion Extension Research Spike | `docs/tasks/to-do/TASK-689-mercado-publico-companion-extension-research.md` |
+| `TASK-690` | `to-do` | Notification Hub Architecture Contract | `docs/tasks/to-do/TASK-690-notification-hub-architecture-contract.md` |
+| `TASK-691` | `to-do` | Notification Hub Shadow Mode | `docs/tasks/to-do/TASK-691-notification-hub-shadow-mode.md` |
+| `TASK-692` | `to-do` | Notification Hub Cutover | `docs/tasks/to-do/TASK-692-notification-hub-cutover.md` |
+| `TASK-693` | `to-do` | Notification Hub Bidireccional + UI Preferences + Mentions | `docs/tasks/to-do/TASK-693-notification-hub-bidirectional-ui.md` |
+| `TASK-694` | `to-do` | Deep Link Platform Foundation | `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md` |
+| `TASK-695` | `to-do` | Nexa Insights via Notification Hub (Teams + In-App + Email) | `docs/tasks/to-do/TASK-695-nexa-insights-teams-delivery.md` |

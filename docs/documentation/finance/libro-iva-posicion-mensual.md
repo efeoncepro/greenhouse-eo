@@ -61,7 +61,19 @@ El sistema soporta:
 - recalcular todos los periodos disponibles
 - rehidratar el ledger si cambian ventas o compras ya sincronizadas
 
-La materializacion pesada corre en `ops-worker`, no en UI.
+La materialización pesada corre en `ops-worker`, no en UI.
+
+## Refresh reactivo y replay
+
+La posición mensual no depende solo de un botón manual. Cuando Finance publica cambios relevantes en `income` o `expense`, la projection reactiva `vat_monthly_position` vuelve a materializar el período afectado.
+
+Reglas operativas:
+
+- el lane reactivo debe ser seguro para replay e idempotente
+- el carril canónico para recomputar períodos sigue siendo `ops-worker`
+- la route interna admin-safe queda como fallback/controlado, no como reemplazo del worker
+
+Desde TASK-639, el materializer quedó endurecido para que los placeholders textuales usados en metadata y `period_id` entren tipados explícitamente y no vuelvan a caer por ambigüedad SQL al reprocesar períodos.
 
 ## Importante para Finance
 

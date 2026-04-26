@@ -498,7 +498,7 @@ describe('createFinanceExpenseInPostgres', () => {
 
     const result = await createFinanceExpenseInPostgres(
       await buildCreateFinanceExpenseParams(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       { client: externalClient as any }
     )
 

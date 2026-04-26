@@ -17,6 +17,7 @@ import {
 import type { Json } from '@/types/db'
 import type {
   IntegrationDataQualityCheckResult,
+  IntegrationDataQualityFailedCheckSummary,
   IntegrationDataQualityOverview,
   IntegrationDataQualityRunResult,
   IntegrationDataQualitySpaceSnapshot,
@@ -26,6 +27,28 @@ import type {
   RunNotionDeliveryDataQualityInput,
   RunNotionDeliveryDataQualitySweepResult
 } from '@/types/integration-data-quality'
+
+/**
+ * Check keys whose presence as the *only* failure means the broken state will
+ * resolve itself once the conformed Notion sync catches up to raw. Used by the
+ * dashboard to downgrade visual severity and by the watcher cron to schedule
+ * re-syncs without paging a human.
+ */
+const AUTO_RECOVERABLE_CHECK_KEYS = new Set<string>([
+  'fresh_raw_after_conformed_sync'
+])
+
+const classifyRecovery = (
+  failedChecks: ReadonlyArray<{ checkKey: string; severity: string }>
+): IntegrationDataQualitySpaceSnapshot['recoveryClass'] => {
+  if (failedChecks.length === 0) return 'healthy'
+
+  const allTransient = failedChecks.every(check =>
+    check.severity === 'ok' || AUTO_RECOVERABLE_CHECK_KEYS.has(check.checkKey)
+  )
+
+  return allTransient ? 'auto_recoverable' : 'manual'
+}
 
 const INTEGRATION_KEY = 'notion'
 const MONITOR_KEY = 'notion_delivery_data_quality'
@@ -555,7 +578,8 @@ export const getNotionDeliveryDataQualityOverview = async ({
         healthySpaces: 0,
         degradedSpaces: 0,
         brokenSpaces: 0,
-        unknownSpaces: 0
+        unknownSpaces: 0,
+        autoRecoverableSpaces: 0
       },
       latestBySpace: [],
       recentRuns: []
@@ -578,31 +602,84 @@ export const getNotionDeliveryDataQualityOverview = async ({
   const mappedRuns = rows.map(mapRunRow)
   const nameBySpace = new Map(activeSpaces.map(space => [space.spaceId, space.spaceName]))
   const clientBySpace = new Map(activeSpaces.map(space => [space.spaceId, space.clientId]))
-  const latestBySpace = new Map<string, IntegrationDataQualitySpaceSnapshot>()
+  const latestRunBySpace = new Map<string, IntegrationDataQualityRunResult>()
 
   for (const run of mappedRuns) {
-    if (latestBySpace.has(run.spaceId)) continue
-
-    latestBySpace.set(run.spaceId, {
-      spaceId: run.spaceId,
-      spaceName: nameBySpace.get(run.spaceId) ?? null,
-      clientId: clientBySpace.get(run.spaceId) ?? null,
-      qualityStatus: run.qualityStatus,
-      checkedAt: run.checkedAt,
-      warningChecks: run.warningChecks,
-      errorChecks: run.errorChecks,
-      diffCount: toInteger(run.summary.diffCount)
-    })
+    if (!latestRunBySpace.has(run.spaceId)) {
+      latestRunBySpace.set(run.spaceId, run)
+    }
   }
 
-  const latestRows = Array.from(latestBySpace.values()).sort((left, right) => left.spaceName?.localeCompare(right.spaceName ?? '') ?? 0)
+  // Hydrate failed checks for each latest run so the dashboard can show *which*
+  // check broke (not just `2 con falla`). One round-trip aggregating across all
+  // run IDs — keeps the overview reader cheap.
+  const failedChecksByRun = new Map<string, IntegrationDataQualityFailedCheckSummary[]>()
+
+  const latestRunIds = Array.from(latestRunBySpace.values())
+    .filter(run => run.qualityStatus === 'broken' || run.qualityStatus === 'degraded')
+    .map(run => run.dataQualityRunId)
+
+  if (latestRunIds.length > 0) {
+    const checkRows = await db
+      .selectFrom('greenhouse_sync.integration_data_quality_checks')
+      .select([
+        'data_quality_run_id',
+        'check_key',
+        'severity',
+        'summary',
+        'observed_value',
+        'expected_value'
+      ])
+      .where('data_quality_run_id', 'in', latestRunIds)
+      .where('severity', 'in', ['warning', 'error'])
+      .orderBy('severity', 'desc')
+      .orderBy('check_key', 'asc')
+      .execute()
+
+    for (const row of checkRows) {
+      const list = failedChecksByRun.get(row.data_quality_run_id) ?? []
+      const observedNum = Number(row.observed_value ?? 0)
+
+      list.push({
+        checkKey: row.check_key,
+        severity: row.severity as IntegrationDataQualityFailedCheckSummary['severity'],
+        count: Number.isFinite(observedNum) ? observedNum : 1,
+        observedValue: row.observed_value,
+        expectedValue: row.expected_value,
+        summary: row.summary
+      })
+      failedChecksByRun.set(row.data_quality_run_id, list)
+    }
+  }
+
+  const latestRows: IntegrationDataQualitySpaceSnapshot[] = Array
+    .from(latestRunBySpace.values())
+    .map(run => {
+      const failedChecks = failedChecksByRun.get(run.dataQualityRunId) ?? []
+      const recoveryClass = classifyRecovery(failedChecks)
+
+      return {
+        spaceId: run.spaceId,
+        spaceName: nameBySpace.get(run.spaceId) ?? null,
+        clientId: clientBySpace.get(run.spaceId) ?? null,
+        qualityStatus: run.qualityStatus,
+        checkedAt: run.checkedAt,
+        warningChecks: run.warningChecks,
+        errorChecks: run.errorChecks,
+        diffCount: toInteger(run.summary.diffCount),
+        failedChecks,
+        recoveryClass
+      }
+    })
+    .sort((left, right) => left.spaceName?.localeCompare(right.spaceName ?? '') ?? 0)
 
   const totals = {
     totalSpaces: activeSpaces.length,
     healthySpaces: latestRows.filter(row => row.qualityStatus === 'healthy').length,
     degradedSpaces: latestRows.filter(row => row.qualityStatus === 'degraded').length,
     brokenSpaces: latestRows.filter(row => row.qualityStatus === 'broken').length,
-    unknownSpaces: activeSpaces.length - latestRows.length
+    unknownSpaces: activeSpaces.length - latestRows.length,
+    autoRecoverableSpaces: latestRows.filter(row => row.recoveryClass === 'auto_recoverable').length
   }
 
   return {

@@ -106,7 +106,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 
 - Todo cambio debe intentar validar al menos una de estas rutas:
   - `pnpm build`
-  - `pnpm lint`
+  - `pnpm lint` (ESLint 9 flat config; configuracion canonica en `eslint.config.mjs`)
   - `pnpm test`
   - prueba manual local o en preview de Vercel
 - Baseline vigente de unit tests:
@@ -426,6 +426,133 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
 - Documentación funcional: `docs/documentation/operations/ops-worker-reactive-crons.md`
 
+### Reliability dashboard hygiene — orphan archive, channel readiness, smoke lane bus, domain incidents (2026-04-26)
+
+Cuatro patrones canónicos que evitan re-introducir falsos positivos o `awaiting_data` perpetuos. Cualquier cambio que toque `projection_refresh_queue`, `teams_notification_channels`, smoke lane readers o Sentry capture debe respetarlos.
+
+**1. Orphan auto-archive en `projection_refresh_queue`**
+
+- `markRefreshFailed` corre `ENTITY_EXISTENCE_GUARDS` antes de rutear a `dead`. Si el `entity_id` no existe en su tabla canónica → `archived=TRUE` en el mismo UPDATE, NO se cuenta en el dashboard.
+- Dashboard query filtra `WHERE COALESCE(archived, FALSE) = FALSE`.
+- Para sumar un nuevo entity guard: añadir entry al array `ENTITY_EXISTENCE_GUARDS` (entityType, errorMessagePattern, checkExists). Un single-row PG lookup, sólo al moment dead-routing.
+- **NO** borrar rows archived — quedan para audit. Query `WHERE archived = TRUE` para ver historial.
+
+**2. Channel `provisioning_status` en `teams_notification_channels`**
+
+- Estados: `'ready' | 'pending_setup' | 'configured_but_failing'`. `pending_setup` = config en PG pero secret faltante en GCP Secret Manager — sends skipean silenciosamente, NO contribuyen al subsystem failure metric.
+- Dashboard query Teams Notifications filtra `NOT EXISTS` por `secret_ref` matching channels en `pending_setup`.
+- Workflow nuevo channel: row `pending_setup` → upload secret a Secret Manager → flip a `'ready'`. Dashboard nunca pinta warning durante setup.
+
+**3. Smoke lane runs vía `greenhouse_sync.smoke_lane_runs` (PG-backed)**
+
+- CI publica resultados Playwright via `pnpm sync:smoke-lane <lane-key>` (auto-resuelve `GITHUB_SHA`, `GITHUB_REF_NAME`, `GITHUB_RUN_ID`).
+- Reader (`getFinanceSmokeLaneStatus`, etc.) lee última row por `lane_key` desde PG. Funciona desde Vercel runtime, Cloud Run, MCP — sin filesystem dependency.
+- Lane keys canónicos: `finance.web`, `delivery.web`, `identity.api`, etc. (lowercase, dot-separated, stable).
+- Nueva lane = upsertear desde CI con un nuevo `lane_key` — cero migration.
+
+**4. Sentry incident signals via `domain` tag (per-module)**
+
+- `captureWithDomain(err, 'finance', { extra })` (en `src/lib/observability/capture.ts`) — wrapper canónico. Reemplaza `Sentry.captureException(err)` directo donde haya dominio claro.
+- `getCloudSentryIncidents(env, { domain: 'finance' })` filtra por `tags[domain]`. UN proyecto Sentry, MUCHOS tags.
+- Registry: cada `ReliabilityModuleDefinition` declara `incidentDomainTag`. `getReliabilityOverview` itera y produce un `incident` signal per module.
+- Nuevo módulo = añadir `incidentDomainTag: '<key>'` al registry + `captureWithDomain(err, '<key>', ...)` en su code path. Cero config Sentry-side.
+
+**⚠️ Reglas duras**:
+
+- **NO** borrar rows de `projection_refresh_queue` por DELETE manual. Usar el orphan guard si es residue, o `requeueRefreshItem(queueId)` si es real fallo a recuperar.
+- **NO** contar failed de `source_sync_runs WHERE source_system='teams_notification'` sin excluir `pending_setup` channels.
+- **NO** leer Playwright results desde filesystem en runtime (Vercel/Cloud Run no tienen el archivo). Usar `greenhouse_sync.smoke_lane_runs`.
+- **NO** usar `Sentry.captureException()` directo en code paths con dominio claro — el tag `domain` no se setea y el módulo correspondiente NUNCA ve el incidente. Usar `captureWithDomain()`.
+
+### Platform Health API Contract — preflight programático para agentes (TASK-672, 2026-04-26)
+
+Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI, scripts) consultar el estado real de la plataforma con un solo request antes de actuar. Compone Reliability Control Plane + Operations Overview + runtime checks + integration readiness + synthetic monitoring + webhook delivery + posture, con timeouts per-source y degradación honesta (NUNCA 5xx por una fuente caída).
+
+**Rutas**:
+
+- `GET /api/admin/platform-health` — admin lane (`requireAdminTenantContext`). Payload completo con evidencia y referencias.
+- `GET /api/platform/ecosystem/health` — ecosystem lane (`runEcosystemReadRoute`). Summary redactado, sin evidence detail hasta que TASK-658 cierre el bridge `platform.health.detail`.
+
+**Composer**: `src/lib/platform-health/composer.ts`. 7 sources via `Promise.all` con `withSourceTimeout` per-source (budgets 2-6s). Cache in-process 30s per audience.
+
+**Helpers canónicos NUEVOS**:
+
+- `src/lib/observability/redact.ts` — `redactSensitive`, `redactObjectStrings`, `redactErrorForResponse`. Strip de JWT/Bearer/GCP secret URI/DSN/email/query secret. **USAR SIEMPRE** antes de persistir o devolver `last_error` o response body que cruce un boundary externo. NUNCA loggear `error.stack` directo.
+- `src/lib/platform-health/with-source-timeout.ts` — `(produce, { source, timeoutMs }) → SourceResult<T>`. Reutilizable por TASK-657 (degraded modes) y cualquier reader que necesite timeout + fallback estructurado.
+- `src/lib/platform-health/safe-modes.ts` — booleans `readSafe/writeSafe/deploySafe/backfillSafe/notifySafe/agentAutomationSafe`. Conservador: en duda → `false`.
+- `src/lib/platform-health/recommended-checks.ts` — catálogo declarativo de runbooks accionables filtrados por trigger.
+
+**Cómo lo usa un agente**:
+
+1. Consultar `safeModes` antes de cualquier acción sensible. Respetar las banderas tal cual vienen.
+2. Si `agentAutomationSafe=false`, escalar a humano antes de actuar.
+3. Si una acción específica falla en runtime, reconsultar Platform Health para confirmar si el módulo afectado pasó a `blocked`.
+4. NO cachear el payload más allá de 30s en el cliente. La API ya tiene cache in-process.
+5. NO depender de campos no documentados. Solo `contractVersion: "platform-health.v1"` garantiza shape estable.
+
+**⚠️ Reglas duras para AGENTES**:
+
+- **NO** crear endpoints paralelos de health en otros módulos. Si un módulo nuevo necesita exponer salud, registrarlo en `RELIABILITY_REGISTRY` (con `incidentDomainTag` si aplica) y el composer lo recoge automáticamente.
+- **NO** exponer payload sin pasar por `redactSensitive` cuando contiene strings de error o de fuente externa.
+- **NO** computar safe modes ni rollup en el cliente. Consumir las banderas tal como vienen.
+- **NO** agregar fuentes al composer sin envolverlas en `withSourceTimeout` — una fuente colgada sin budget colapsa el contrato entero.
+- **NO** interpretar `degraded` como `healthy`. Si el contrato dice `degraded`, hay un warning real que requiere atención.
+
+**Tests**: `pnpm test src/lib/platform-health src/lib/observability/redact` (47 tests).
+
+**Spec**:
+
+- Arquitectura: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` (sección Platform Health)
+- Funcional (Spanish): `docs/documentation/plataforma/platform-health-api.md`
+- OpenAPI: `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` (schema `PlatformHealthV1`)
+- Markdown público: `docs/api/GREENHOUSE_API_PLATFORM_V1.md` + mirror `public/docs/greenhouse-api-platform-v1.md`
+
+### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
+
+**Decisión arquitectónica (2026-04-26)**: el daily Notion sync es un SOLO ciclo de DOS pasos en `ops-worker` Cloud Run, schedulado por Cloud Scheduler. No hay otro path scheduled.
+
+- **Trigger canónico**: Cloud Scheduler `ops-notion-conformed-sync @ 20 7 * * * America/Santiago` → `POST /notion-conformed/sync` en ops-worker. Definido en `services/ops-worker/deploy.sh` (idempotente).
+- **Step 1 — `runNotionSyncOrchestration`**: BQ raw `notion_ops.*` → BQ conformed `greenhouse_conformed.delivery_*`. Si BQ ya está fresh, skipea con "Conformed sync already current; write skipped" — comportamiento intencional, NO bug.
+- **Step 2 — `syncBqConformedToPostgres` (UNCONDICIONAL)**: BQ conformed → PG `greenhouse_delivery.*` vía `projectNotionDeliveryToPostgres`. **Corre SIEMPRE**, regardless del skip de Step 1, porque BQ puede estar fresh y PG stale (root cause del incidente abril 2026: 24 días de drift).
+
+**⚠️ Reglas duras para AGENTES (futuras sesiones, prevent regressions)**:
+
+- **NO mover el PG step adentro del path no-skip de Step 1**. Ya vivió ahí y dejaba PG stale 24+ días cuando BQ estaba current.
+- **NO crear cron Vercel scheduled** para `/api/cron/sync-conformed`. Existe como fallback manual; el trigger automático canónico vive en Cloud Scheduler. Vercel cron es frágil para syncs largos.
+- **NO depender del script manual `pnpm sync:source-runtime-projections` para escribir PG en producción**. Es solo para dev ad-hoc. El path canónico es Cloud Run.
+- **NO inyectar sentinels** (`'sin nombre'`, `'⚠️ Sin título'`, etc.) en `*_name` columns. TASK-588 los prohíbe vía CHECK constraints. NULL = unknown. Para fallback de display usar `displayTaskName/Project/Sprint` de `src/lib/delivery/task-display.ts` o `<TaskNameLabel/>`/`<ProjectNameLabel/>`/`<SprintNameLabel/>`.
+- **NO usar `Number(value)` directo** para BQ-formula columns que se persisten a PG INTEGER (`days_late`, `frame_versions`, etc.). BQ formulas devuelven fraccionales (`0.117…`) y PG INT crashea. Usar `toInteger()` (con `Math.trunc`) — vive en `src/lib/sync/sync-bq-conformed-to-postgres.ts`.
+
+**Helpers canónicos (orden de uso)**:
+
+- `runNotionSyncOrchestration({ executionSource })` — wrapper completo BQ raw → conformed.
+- `syncBqConformedToPostgres({ syncRunId?, targetSpaceIds?, replaceMissingForSpaces? })` — drena BQ conformed → PG. Default: todos los spaces activos, `replaceMissingForSpaces=true`. Reusable desde admin endpoints o scripts de recovery.
+- `projectNotionDeliveryToPostgres({ ... })` — primitiva más baja: per-row UPSERT por `notion_*_id`. Idempotente. Used by `syncBqConformedToPostgres`.
+
+**Manual triggers / recovery**:
+
+- Cloud Scheduler manual: `gcloud scheduler jobs run ops-notion-conformed-sync --location=us-east4 --project=efeonce-group`
+- Admin endpoint Vercel (auth via agent session): `POST /api/admin/integrations/notion/trigger-conformed-sync` — corre los 2 steps secuencialmente.
+- Vercel cron `/api/cron/sync-conformed` (CRON_SECRET) — fallback histórico, no usar como path principal.
+
+**Kill-switch**: `GREENHOUSE_NOTION_PG_PROJECTION_ENABLED=false` revierte el step PG dentro del path Vercel cron (`runNotionConformedCycle`) sin requerir deploy. NO afecta el endpoint Cloud Run (que es UNCONDICIONAL).
+
+**Tenant safety (Sky no rompe Efeonce ni viceversa)**:
+
+- `replaceMissingForSpaces` filtra `WHERE space_id = ANY(targetSpaceIds)` — nunca toca rows de spaces fuera del cycle.
+- UPSERT por `notion_*_id` (PK natural Notion) es idempotente, independiente del orden.
+- Cascade de title `nombre_de_tarea` / `nombre_de_la_tarea` resuelve correctamente para ambos tenants (Efeonce usa primera, Sky segunda — verificado vivo via Notion REST API + Notion MCP).
+
+**Schema constraints**:
+
+- BQ `delivery_*.{task_name,project_name,sprint_name}` están NULLABLE. Helper `ensureDeliveryTitleColumnsNullable` lo aplica idempotente al startup del sync.
+- PG tiene CHECK constraints anti-sentinel (TASK-588 / migration `20260424082917533`). Cualquier sentinel string los rechaza.
+- DB functions `greenhouse_delivery.{task,project,sprint}_display_name` (migration `20260426144105255`) producen el fallback display data-derived al READ time. Mirror exacto en TS via `src/lib/delivery/task-display.ts`.
+
+**Admin queue**: `/admin/data-quality/notion-titles` — surface las pages con `*_name IS NULL` agrupadas por space, con CTA "Editar en Notion". Backed por `getUntitledPagesOverview`. Empty state celebra "Todo en orden".
+
+**Spec arquitectónica completa**: `docs/architecture/GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md`.
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
 
 - Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).
@@ -561,6 +688,20 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   5. `pnpm build` para verificar que los tipos son consistentes
 - Conexión local: requiere Cloud SQL Auth Proxy corriendo en `127.0.0.1:15432`. El script tiene guardia fail-fast que aborta si detecta IP pública como host — no esperar timeout, leer el mensaje de error.
 - Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
+
+### Charts — política canónica (decisión 2026-04-26 — prioridad: impacto visual)
+
+**Stack visual de Greenhouse prioriza wow factor y enganche** sobre bundle/a11y. Los dashboards (MRR/ARR, Finance Intelligence, Pulse, ICO, Portfolio Health) son la cara del portal a stakeholders y clientes Globe.
+
+- **Vistas nuevas con dashboards de alto impacto**: usar **Apache ECharts** vía `echarts-for-react`. Animaciones cinemáticas, tooltips multi-series ricos, gradientes premium, soporte nativo de geo/sankey/sunburst/heatmap/calendar. Lazy-load por ruta para mitigar bundle (~250-400 KB con tree-shaking).
+- **Vistas existentes con ApexCharts** (32 archivos al 2026-04-26): siguen activas sin deadline. ApexCharts se mantiene como segundo tier oficial — no es deuda técnica, es stack válido vigente. Migración Apex → ECharts es **oportunista**, solo cuando se toque la vista por otra razón Y se busque subir el tier visual.
+- **NO usar Recharts** como default para vistas nuevas. Recharts gana en bundle/ecosystem pero pierde en wow factor sin una capa custom de polish. Reservar Recharts solo para sparklines compactos en KPI cards o cuando explícitamente NO se necesita impacto visual.
+- **Excepción única**: si necesitas control absoluto Stripe-level o un tipo que ECharts no cubre, usar Visx (requiere construcción custom).
+- **Por qué este orden** (ECharts > Apex > Recharts):
+  - ECharts: visual atractivo 10/10, enganche 10/10, cobertura asombrosa.
+  - Apex: visual 8/10, ya cubre el portal, no urge migrar.
+  - Recharts: 7/10 sin inversión adicional; gana solo si construimos `GhChart` premium (no priorizado).
+- TASK-518 (migración masiva a Recharts) **descartada** — pierde impacto visual. Ver Delta 2026-04-26 en `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md`.
 
 ## Task Lifecycle Protocol
 

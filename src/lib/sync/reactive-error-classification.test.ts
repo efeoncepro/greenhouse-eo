@@ -33,4 +33,20 @@ describe('reactive-error-classification', () => {
     expect(extractReactiveErrorCategory(message)).toBe('infra.db_privilege')
     expect(stripReactiveErrorCategory(message)).toBe('permission denied for table service_attribution_facts')
   })
+
+  it.each([
+    'Missing GREENHOUSE_INTEGRATION_API_TOKEN for HubSpot integration service write request.',
+    'Missing HUBSPOT_PRIVATE_APP_TOKEN',
+    'missing api_key for vendor x',
+    'missing API key for service x',
+    'Missing credentials for client',
+    'secret hubspot-token not found',
+    'invalid token from auth service'
+  ])('routes credential / missing-secret errors to infra.credential: %s', message => {
+    const result = classifyReactiveError(new Error(message))
+
+    expect(result.category).toBe('infra.credential')
+    expect(result.isInfrastructure).toBe(true)
+    expect(result.formattedMessage.startsWith('[infra.credential]')).toBe(true)
+  })
 })

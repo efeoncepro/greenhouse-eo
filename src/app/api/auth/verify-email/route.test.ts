@@ -43,7 +43,7 @@ describe('POST /api/auth/verify-email', () => {
     vi.clearAllMocks()
     mockRequireTenantContext.mockResolvedValue({ tenant, unauthorizedResponse: null })
     mockCheckRateLimit.mockResolvedValue(true)
-    mockGenerateToken.mockReturnValue('test-jwt-token')
+    mockGenerateToken.mockResolvedValue('test-jwt-token')
     mockStoreToken.mockResolvedValue(undefined)
     mockPublishOutboxEvent.mockResolvedValue('outbox-123')
   })

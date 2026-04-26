@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentLabel": { "value": "dev" },
+    "location": { "value": "eastus" },
+    "botDisplayName": { "value": "Greenhouse · Dev" },
+    "botAppId": { "value": "<set by post-deploy: see runbook step 1>" },
+    "azureTenantId": { "value": "a80bf6c1-7c45-4d70-b043-51389622a0e4" },
+    "messagingEndpoint": {
+      "value": "https://dev-greenhouse.efeoncepro.com/api/teams-bot/messaging"
+    },
+    "tags": {
+      "value": {
+        "workload": "greenhouse-teams-bot",
+        "owner": "platform",
+        "taskId": "TASK-671",
+        "environment": "dev"
+      }
+    }
+  }
+}

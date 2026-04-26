@@ -719,7 +719,7 @@ export const persistQuotationPricing = async (
         )
       } catch (error) {
         // Outbox insertion is best-effort; alert publishing should not block save.
-        // eslint-disable-next-line no-console
+         
         console.warn('[quotation-pricing] outbox health alert emit failed', error)
       }
     }

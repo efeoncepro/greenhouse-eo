@@ -1,5 +1,23 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-26 — First-party app sessions para API Platform `app`
+
+- Greenhouse distingue explícitamente entre:
+  - sesión web del portal (`NextAuth`, cookie/JWT, rutas internas)
+  - sesión first-party app (`api/platform/app/*`, access token corto + refresh token durable)
+  - credencial ecosystem server-to-server (`sister_platform_consumers`)
+- Runtime nuevo:
+  - `greenhouse_core.first_party_app_sessions`
+- Contrato:
+  - `POST /api/platform/app/sessions` valida credenciales de usuario y crea una sesión app.
+  - El access token es corto, user-scoped y firmado con `jose`/HS256 usando el secret canónico de auth.
+  - El refresh token se guarda solo como hash SHA-256 y se rota en cada refresh.
+  - `DELETE /api/platform/app/sessions/current` revoca la sesión actual.
+  - Cada request app rehidrata acceso efectivo desde Identity Access (`session_360`, roles, route groups, authorized views y entitlements) en vez de confiar indefinidamente en claims viejos.
+- Regla canónica:
+  - la futura app React Native no debe usar `AGENT_AUTH`, `sister_platform_consumers` ni rutas web internas como contrato de autenticación.
+  - `views` siguen gobernando surfaces visibles y `entitlements` gobiernan capacidades; la lane app debe documentar en cada resource qué plano usa.
+
 ## Delta 2026-04-17 — `password_hash` mutation guardrails (TASK-451 / ISSUE-053)
 
 ### Problema detectado

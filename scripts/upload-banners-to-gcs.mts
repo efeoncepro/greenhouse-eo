@@ -2,9 +2,10 @@
  * Upload profile banners from public/images/banners/ to GCS.
  * Run: npx tsx scripts/upload-banners-to-gcs.mts
  */
-import { GoogleAuth } from 'google-auth-library'
 import { readFile, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
+
+import { GoogleAuth } from 'google-auth-library'
 
 const BUCKET = process.env.GREENHOUSE_MEDIA_BUCKET || 'efeonce-group-greenhouse-media'
 const BANNERS_DIR = join(process.cwd(), 'public', 'images', 'banners')

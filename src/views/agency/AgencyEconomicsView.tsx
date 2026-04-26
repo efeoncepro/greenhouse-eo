@@ -75,7 +75,7 @@ const marginColor = (v: number | null | undefined): 'success' | 'warning' | 'err
 
 const clientColumnHelper = createColumnHelper<ClientEcon>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const clientColumns: ColumnDef<ClientEcon, any>[] = [
   clientColumnHelper.accessor('clientName', {
     header: 'Cliente',

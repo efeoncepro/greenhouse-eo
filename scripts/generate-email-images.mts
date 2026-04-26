@@ -2,9 +2,10 @@
  * Generate hero images for email templates via Imagen 4.
  * Run: npx tsx scripts/generate-email-images.mts
  */
-import { GoogleGenAI } from '@google/genai'
 import { writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
+
+import { GoogleGenAI } from '@google/genai'
 
 const OUTPUT_DIR = join(process.cwd(), 'public', 'images', 'emails')
 

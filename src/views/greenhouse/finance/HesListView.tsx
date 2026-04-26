@@ -91,7 +91,7 @@ const formatDate = (date: string | null) => {
 
 const hesColumnHelper = createColumnHelper<Hes>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const hesColumns: ColumnDef<Hes, any>[] = [
   hesColumnHelper.accessor('hesNumber', {
     header: 'HES #',

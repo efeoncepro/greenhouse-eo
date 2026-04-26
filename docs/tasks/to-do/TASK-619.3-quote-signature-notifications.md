@@ -1,5 +1,29 @@
 # TASK-619.3 — Quote Signature Notifications (email + in-app + Slack reactors)
 
+## Delta 2026-04-26 — alineación con Notification Hub (TASK-690)
+
+El approach original de "3 reactores independientes (email, in-app, Slack) consumiendo el outbox" está **redirigido**, no deprecado. La razón: TASK-690/691/692 introduce el Notification Hub canónico — una sola projection que consume el outbox + dispatcha a N adapters per-canal con preferencias por persona y mentions con push real.
+
+**Scope ajustado:**
+
+- En vez de 3 reactores nuevos, esta task aporta al Hub:
+  - 2 templates: `quote.signed.completed` y `quote.signed.declined` con sus 4 variantes (in_app, email, teams_card, teams_dm).
+  - Routing default en `notification-kind-defaults.ts`: ambos → `[email, in_app, teams_dm]` con mention al `salesRepMemberId` del Space owner.
+  - 1 handler opcional `quote.signature.acknowledge` para Action.Submit en Teams.
+- Slack queda fuera de V1 (Out of Scope §11 del Hub). Cuando exista un adapter Slack del Hub, se agrega como canal default de este evento sin tocar este task.
+- **Bloqueo cambiado**: ahora bloquea por TASK-693 (handlers + templates + mentions activos), no por TASK-490/TASK-619 directamente (que ya están).
+- **Type cambia** de `implementation` independiente a `implementation` parte de la fase 4 del Hub. El work se prioriza con los demás templates de TASK-693 (es uno de los 6 prioritarios candidatos junto a finance/ops/delivery/payroll/sentry/notification-assigned).
+
+Si se necesita la entrega ANTES de que TASK-693 cierre, se puede ejecutar el subset `email + in-app` con el path actual (sin pasar por el Hub) bajo un PR temporal — pero queda explícito que el código se borra cuando TASK-692 cutover llega. Mejor esperar.
+
+## Orden de implementación recomendado
+
+1. **TASK-690** Notification Hub Architecture Contract — tablas + adapters skeleton + router pure function.
+2. **TASK-691** Notification Hub Shadow Mode — dual-write 1 semana para validar parity.
+3. **TASK-692** Notification Hub Cutover — projection canónica activa, projections viejas borradas.
+4. **TASK-693** Notification Hub Bidireccional + UI Preferences + Mentions — Action.Submit handlers + templating unificado + UI `/settings/notifications`.
+5. **ESTA task (TASK-619.3)** — agregar templates `quote.signed.completed` + `quote.signed.declined` al registry del Hub. Consumer del trabajo de TASK-693, no productor de infrastructure.
+
 ## Status
 
 - Lifecycle: `to-do`

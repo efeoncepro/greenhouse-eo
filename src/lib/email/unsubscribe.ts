@@ -15,7 +15,7 @@ export const generateUnsubscribeUrl = async (
   recipientEmail: string,
   emailType: string
 ): Promise<string> => {
-  const token = generateToken(
+  const token = await generateToken(
     { email: recipientEmail, type: 'unsubscribe' },
     UNSUBSCRIBE_TOKEN_TTL_HOURS
   )

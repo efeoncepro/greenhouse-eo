@@ -56,7 +56,10 @@ const SUBSYSTEM_MODULE_MAP: Record<string, ReliabilityModuleKey> = {
   'AI LLM Enrichment': 'delivery',
 
   // Finance
-  'Finance Data Quality': 'finance'
+  'Finance Data Quality': 'finance',
+
+  // Teams notifications & bot (TASK-669 + TASK-671)
+  'Teams Notifications': 'integrations.teams'
 }
 
 const subsystemSlug = (name: string) =>
@@ -75,7 +78,7 @@ export const buildSubsystemSignals = (subsystems: OperationsSubsystem[]): Reliab
 
     const severity = fromOperationsHealth(subsystem.status)
 
-    const summaryParts = [
+    const fallbackSummaryParts = [
       `${subsystem.processed} procesado${subsystem.processed === 1 ? '' : 's'}`,
       subsystem.failed > 0 ? `${subsystem.failed} con falla` : null,
       subsystem.lastRun ? `último: ${subsystem.lastRun}` : 'sin último run'
@@ -88,7 +91,7 @@ export const buildSubsystemSignals = (subsystems: OperationsSubsystem[]): Reliab
       source: 'getOperationsOverview',
       label: `Subsystem: ${subsystem.name}`,
       severity,
-      summary: summaryParts.join(' · '),
+      summary: subsystem.summary?.trim() || fallbackSummaryParts.join(' · '),
       observedAt: subsystem.lastRun,
       evidence: [
         {
@@ -100,7 +103,12 @@ export const buildSubsystemSignals = (subsystems: OperationsSubsystem[]): Reliab
           kind: 'metric',
           label: 'Status',
           value: subsystem.status
-        }
+        },
+        ...(subsystem.metrics ?? []).map(metric => ({
+          kind: 'metric' as const,
+          label: metric.label,
+          value: `${metric.value} (${metric.status})`
+        }))
       ]
     })
   }
@@ -299,6 +307,109 @@ export const buildSentryIncidentSignals = (snapshot: CloudSentryIncidentsSnapsho
   return signals
 }
 
+/**
+ * Per-module Sentry incident signals via the `domain` tag.
+ *
+ * The legacy `buildSentryIncidentSignals` reads the GLOBAL Sentry feed and
+ * uses the `incident-mapping` heuristic to guess which module each issue
+ * belongs to. That works but produces noisy "uncorrelated" signals when the
+ * heuristic doesn't match.
+ *
+ * This builder is the structurally cleaner path: the consumer iterates the
+ * registry's `incidentDomainTag` entries and calls `getCloudSentryIncidents({
+ * domain })` per module. Each domain-filtered snapshot becomes the
+ * `incident` signal for that module — direct mapping, no heuristic.
+ *
+ * Both builders coexist: `buildSentryIncidentSignals` keeps the global feed
+ * as a safety net for incidents that don't carry the `domain` tag yet.
+ * `buildDomainIncidentSignals` produces clean per-module signals for code
+ * paths that DO use `captureWithDomain` (which is the canonical wrapper
+ * going forward).
+ */
+export const buildDomainIncidentSignals = (
+  byModule: Record<string, CloudSentryIncidentsSnapshot>
+): ReliabilitySignal[] => {
+  const signals: ReliabilitySignal[] = []
+
+  for (const [moduleKey, snapshot] of Object.entries(byModule)) {
+    const baseId = `${moduleKey}.incident.domain`
+
+    if (snapshot.status === 'unconfigured') {
+      signals.push({
+        signalId: baseId,
+        moduleKey: moduleKey as ReliabilityModuleKey,
+        kind: 'incident',
+        source: 'getCloudSentryIncidents',
+        label: 'Sentry incidents (domain-tag)',
+        severity: 'not_configured',
+        summary: snapshot.summary,
+        observedAt: snapshot.fetchedAt,
+        evidence: [
+          {
+            kind: 'helper',
+            label: 'Sentry reader',
+            value: `src/lib/cloud/observability.ts:getCloudSentryIncidents({ domain: '${moduleKey}' })`
+          }
+        ]
+      })
+      continue
+    }
+
+    if (snapshot.incidents.length === 0) {
+      signals.push({
+        signalId: baseId,
+        moduleKey: moduleKey as ReliabilityModuleKey,
+        kind: 'incident',
+        source: 'getCloudSentryIncidents',
+        label: 'Sentry incidents (domain-tag)',
+        severity: snapshot.error ? 'unknown' : 'ok',
+        summary: snapshot.error
+          ? `Reader error: ${snapshot.error}`
+          : `Sin incidentes Sentry tagged domain:${moduleKey}`,
+        observedAt: snapshot.fetchedAt,
+        evidence: [
+          {
+            kind: 'metric',
+            label: 'Domain filter',
+            value: `tags[domain]:${moduleKey}`
+          }
+        ]
+      })
+      continue
+    }
+
+    let appended = 0
+
+    for (const incident of snapshot.incidents) {
+      if (appended >= MAX_SENTRY_INCIDENTS_PER_MODULE) break
+
+      appended += 1
+
+      const incidentRef = incident.shortId ?? incident.id
+
+      const evidence: ReliabilitySignal['evidence'] = incident.permalink
+        ? [{ kind: 'incident', label: 'Sentry link', value: incident.permalink }]
+        : [{ kind: 'incident', label: 'Sentry id', value: incident.id }]
+
+      evidence.push({ kind: 'metric', label: 'Domain tag', value: moduleKey })
+
+      signals.push({
+        signalId: `${baseId}.${incidentRef}`,
+        moduleKey: moduleKey as ReliabilityModuleKey,
+        kind: 'incident',
+        source: 'getCloudSentryIncidents',
+        label: incident.shortId ? `Sentry ${incident.shortId}` : 'Sentry incident',
+        severity: fromSentryLevel(incident.level),
+        summary: `${incident.title} · ${incident.count} eventos · ${incident.userCount} usuarios · domain:${moduleKey}`,
+        observedAt: incident.lastSeen,
+        evidence
+      })
+    }
+  }
+
+  return signals
+}
+
 export const buildObservabilityPostureSignal = (
   posture: CloudObservabilityPosture
 ): ReliabilitySignal => ({
@@ -368,21 +479,39 @@ export const buildNotionDataQualitySignals = (
     ]
   }
 
-  const aggregateStatus = overview.totals.brokenSpaces > 0
+  // Spaces whose only failure is auto-recoverable lag (`fresh_raw_after_conformed_sync`)
+  // are downgraded from `broken` to `degraded`. The conformed sync watcher will
+  // re-trigger a sync, so it's not an incident — it's expected eventual consistency.
+  const manualBrokenSpaces = overview.latestBySpace.filter(
+    space => space.qualityStatus === 'broken' && space.recoveryClass === 'manual'
+  ).length
+
+  const autoRecoverableSpaces = overview.totals.autoRecoverableSpaces ?? 0
+
+  const aggregateStatus: 'healthy' | 'degraded' | 'broken' = manualBrokenSpaces > 0
     ? 'broken'
-    : overview.totals.degradedSpaces > 0 || overview.totals.unknownSpaces > 0
+    : (overview.totals.degradedSpaces > 0 || autoRecoverableSpaces > 0 || overview.totals.unknownSpaces > 0)
       ? 'degraded'
       : 'healthy'
 
-  const summary = [
+  // Surface the *actual* failing checks in the summary so on-call sees what
+  // broke, not just "2 con falla".
+  const failedCheckBreakdown = aggregateFailedCheckCounts(overview.latestBySpace)
+
+  const baseSummary = [
     `${overview.totals.totalSpaces} spaces`,
     `${overview.totals.healthySpaces} sanos`,
     overview.totals.degradedSpaces > 0 ? `${overview.totals.degradedSpaces} degradados` : null,
-    overview.totals.brokenSpaces > 0 ? `${overview.totals.brokenSpaces} rotos` : null,
+    manualBrokenSpaces > 0 ? `${manualBrokenSpaces} rotos (intervención)` : null,
+    autoRecoverableSpaces > 0 ? `${autoRecoverableSpaces} con lag auto-recuperable` : null,
     overview.totals.unknownSpaces > 0 ? `${overview.totals.unknownSpaces} sin estado` : null
   ]
     .filter(Boolean)
     .join(' · ')
+
+  const summary = failedCheckBreakdown
+    ? `${baseSummary} — checks: ${failedCheckBreakdown}`
+    : baseSummary
 
   const evidence = [
     {
@@ -421,6 +550,26 @@ export const buildNotionDataQualitySignals = (
       evidence
     }
   ]
+}
+
+const aggregateFailedCheckCounts = (
+  spaces: IntegrationDataQualityOverview['latestBySpace']
+): string => {
+  const counts = new Map<string, number>()
+
+  for (const space of spaces) {
+    for (const check of space.failedChecks) {
+      counts.set(check.checkKey, (counts.get(check.checkKey) ?? 0) + check.count)
+    }
+  }
+
+  if (counts.size === 0) return ''
+
+  return Array.from(counts.entries())
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([key, count]) => `${key} (${count})`)
+    .join(', ')
 }
 
 const formatCurrency = (cost: number, currency: string): string => {

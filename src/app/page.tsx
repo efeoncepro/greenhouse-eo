@@ -1,9 +1,12 @@
 import { redirect } from 'next/navigation'
 
-import { getServerAuthSession } from '@/lib/auth'
+import { getOptionalServerSession } from '@/lib/auth/require-server-session'
+
+// Depende de cookies/headers via NextAuth — siempre dynamic.
+export const dynamic = 'force-dynamic'
 
 export default async function Page() {
-  const session = await getServerAuthSession()
+  const session = await getOptionalServerSession()
 
   if (!session?.user) {
     redirect('/login')

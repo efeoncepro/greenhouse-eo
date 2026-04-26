@@ -63,7 +63,7 @@ const formatEmploymentContext = (person: OrganizationPerson) => {
 
 const colHelper = createColumnHelper<OrganizationPerson>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const columns: ColumnDef<OrganizationPerson, any>[] = [
   colHelper.accessor('fullName', {
     header: 'Persona',

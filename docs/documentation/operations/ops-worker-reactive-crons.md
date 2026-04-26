@@ -106,6 +106,12 @@ La posicion mensual de IVA depende de recomputar ventas y compras canónicas por
 
 Cuando llega un evento de `income` o `expense`, la projection reactiva `vat_monthly_position` puede pedir al ops-worker que materialice el periodo afectado. El mismo endpoint también sirve para replay manual o backfill histórico.
 
+Regla operativa desde TASK-639:
+
+- el carril canónico de replay del VAT ledger es `ops-worker`
+- la route interna de materialización sigue viva como fallback admin-safe
+- el materializer usa placeholders textuales tipados explícitamente para que un replay no vuelva a caer por ambigüedad SQL en `period_id` o metadata
+
 La lectura final vive en tablas materializadas, no en agregaciones inline al abrir Finance.
 
 ---

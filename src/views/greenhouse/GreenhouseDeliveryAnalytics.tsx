@@ -78,7 +78,7 @@ const num = (v: number | null) => v != null ? String(Math.round(v)) : '—'
 
 const projColHelper = createColumnHelper<ProjectMetric>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const projMetricColumns: ColumnDef<ProjectMetric, any>[] = [
   projColHelper.accessor('projectName', { header: 'Proyecto', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
   projColHelper.accessor('totalTasks', { header: 'Tasks', cell: ({ getValue }) => num(getValue()), meta: { align: 'center' } }),

@@ -4,6 +4,26 @@
 > **Created:** 2026-03-30
 > **Last updated:** 2026-04-24
 
+## Delta 2026-04-26 — Nubox Quotes Hot Sync para frescura de cotizaciones
+
+Finance mantiene el full ETL Nubox diario como reconciliación completa, pero
+las cotizaciones (`COT` / DTE 52) ahora tienen un carril incremental liviano:
+
+- Cron: `GET /api/cron/nubox-quotes-hot-sync` cada 15 minutos.
+- Runtime: `src/lib/nubox/sync-nubox-quotes-hot.ts`.
+- Alcance: lee `/sales` solo para la ventana caliente de periodos
+  (`NUBOX_QUOTES_HOT_WINDOW_MONTHS`, default 2, max 6), filtra documentos tipo
+  cotización y reutiliza el mismo upsert canónico de `sync-nubox-to-postgres`.
+- Evidencia durable: escribe primero raw snapshots en
+  `greenhouse_raw.nubox_sales_snapshots`, luego snapshots conformed en
+  `greenhouse_conformed.nubox_sales`, y recién después proyecta a
+  `greenhouse_finance.quotes`.
+- Observabilidad: cada corrida registra `source_object_type='quotes_hot_sync'`
+  en `greenhouse_sync.source_sync_runs`; fallos van a
+  `greenhouse_sync.source_sync_failures`.
+- Operación manual robusta: `pnpm sync:nubox:quotes-hot -- --period=2026-04`
+  ejecuta el mismo pipeline end-to-end, no inserciones manuales.
+
 ## Delta 2026-04-24 — `expenses/meta` Postgres-first metadata providers
 
 El endpoint `GET /api/finance/expenses/meta` deja de tratar el schema legacy de BigQuery como precondición global. La metadata del drawer ahora se compone por providers con ownership explícito:
@@ -1453,18 +1473,34 @@ Reglas declarativas ejecutadas fire-and-forget al crear un expense:
 
 ## Data Quality
 
-`GET /api/finance/data-quality` retorna 6 checks:
+`GET /api/finance/data-quality` ya no trata cualquier gasto sin `client_id` como drift. La semántica canónica separa:
 
-| Check                      | Qué verifica                                       |
-| -------------------------- | -------------------------------------------------- |
-| `payment_ledger_integrity` | amount_paid = SUM(income_payments.amount)          |
-| `exchange_rate_freshness`  | Rate USD/CLP no tiene >7 días                      |
-| `orphan_expenses`          | Gastos sin client_id (excluye tax/social_security) |
-| `income_without_client`    | Ingresos sin client_id                             |
-| `dte_pending_emission`     | Emisiones DTE en cola de retry                     |
-| `overdue_receivables`      | Facturas vencidas (due_date < today)               |
+- **drift real**: ledger divergente, cobros/pagos sin ledger, ingresos sin cliente, cartera vencida, DTE pendientes, etc.
+- **allocation policy drift**: costos directos sin cliente o sin asignación efectiva
+- **estado permitido**: `shared overhead intentionally unallocated`
 
-Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality".
+Checks relevantes:
+
+| Check                             | Qué verifica                                                                 |
+| --------------------------------- | ---------------------------------------------------------------------------- |
+| `income_payment_ledger_integrity` | `income.amount_paid = SUM(income_payments.amount)`                           |
+| `income_paid_without_ledger`      | Facturas con `amount_paid > 0` pero sin filas en `income_payments`           |
+| `expense_payment_ledger_integrity`| `expenses.amount_paid = SUM(expense_payments.amount)`                        |
+| `expense_paid_without_ledger`     | Compras con `amount_paid > 0` pero sin filas en `expense_payments`           |
+| `direct_cost_without_client`      | Gastos directos sin `allocated_client_id` / `client_id` efectivo             |
+| `shared_overhead_unallocated`     | Overhead compartido sin asignación explícita; visible pero **no** se trata como falla |
+| `income_without_client`           | Ingresos sin cliente                                                         |
+| `exchange_rate_freshness`         | Rate USD/CLP no tiene >7 días                                                |
+| `dte_pending_emission`            | Emisiones DTE en cola de retry                                               |
+| `overdue_receivables`             | Facturas vencidas (`due_date < today`)                                       |
+
+Reglas adicionales:
+
+1. Cuando el tenant trae `spaceId`, los checks que tienen `space_id` canónico deben leer en scope tenant.
+2. Los checks globales siguen existiendo para tablas que no exponen `space_id` confiable en todas sus filas.
+3. `Finance Data Quality` en Ops/Admin no debe volver a mezclar backlog de riesgo con overhead compartido permitido bajo un único contador de “fallas”.
+
+Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality", con summary semántico por buckets en vez de sobrecargar `processed/failed`.
 
 ## File Reference
 

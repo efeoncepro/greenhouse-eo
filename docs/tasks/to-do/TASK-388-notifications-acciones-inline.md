@@ -1,5 +1,26 @@
 # TASK-388 — Notificaciones In-App: Acciones Inline
 
+## Delta 2026-04-26 — converge con Notification Hub (TASK-690 / TASK-693)
+
+**No deprecada — scope reducido a UI bell.** El concepto "acciones inline desde la notificación sin abrir otra pantalla" es exactamente el mismo loop bidireccional que TASK-693 ya define para Teams Action.Submit. La sinergia: el `actionId` del action-registry (`src/lib/teams-bot/action-registry.ts`) sirve para ambas superficies. Click en bell o click en Teams card invocan el mismo handler que actualiza `notification_intents.status='acknowledged'` con `acknowledged_via='in_app'` o `'teams_action_submit'`.
+
+**Scope ajustado:**
+
+- Backend: REUSA el `action-registry` y los handlers de TASK-693. NO crea su propia tabla de actions ni su propio dispatcher.
+- Persistencia de la acción: REUSA `notification_intents` + `notification_deliveries` (esquema TASK-690). El handler ya escribe ahí.
+- Esta task se queda con el frontend: render del action button en el row del bell, optimistic update, error feedback, accesibilidad.
+- Tipos de acciones soportadas en V1 dependen de los handlers que TASK-693 entrega: `notification.mark_read`, `ops.alert.snooze`, `finance.expense.approve` (cuando exista). Esta task agrega los 1-2 patterns nuevos que el bell necesita (ej. `leave.request.approve`, `leave.request.reject`).
+- **Bloqueada por TASK-693** ahora (en vez de TASK-285 directo).
+
+**Importante:** la versión "rebuild from scratch" de la task está OBSOLETA. Si alguien la toma sin leer este Delta, va a duplicar el action-registry y crear deuda.
+
+## Orden de implementación recomendado
+
+1. **TASK-690** Notification Hub Architecture Contract — establece el contrato de `notification_intents` que esta task lee.
+2. **TASK-691** Shadow + **TASK-692** Cutover — projection canónica activa.
+3. **TASK-693** Notification Hub Bidireccional + UI + Mentions — entrega `action-registry`, handlers reales, contrato Action.Submit. Define el `actionId` + payload shape.
+4. **ESTA task (TASK-388)** — implementa el render del action button en el row del bell del portal, optimistic update, error feedback, accesibilidad. Reusa el dispatch existente.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

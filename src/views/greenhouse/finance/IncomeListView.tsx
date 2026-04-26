@@ -38,7 +38,7 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -277,7 +277,7 @@ const IncomeListView = () => {
 
   const incomeColumnHelper = createColumnHelper<Income>()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const incomeColumns: ColumnDef<Income, any>[] = [
     {
       id: 'select',

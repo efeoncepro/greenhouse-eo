@@ -328,13 +328,16 @@ Regla operativa:
   - `NEXTAUTH_SECRET` via `secret_manager`
   - `AZURE_AD_CLIENT_SECRET` via `secret_manager`
   - `NUBOX_BEARER_TOKEN` via `secret_manager`
+- Delta 2026-04-26: `NUBOX_X_API_KEY` también adopta el helper canónico `Secret Manager -> env fallback`; su referencia operativa es `NUBOX_X_API_KEY_SECRET_REF`.
+- El baseline externo de Nubox Secret Manager quedó provisionado para `Development`, `Preview`, `staging` y `Production`:
+  - `NUBOX_BEARER_TOKEN_SECRET_REF`
+  - `NUBOX_X_API_KEY_SECRET_REF`
 - `production` ya validó el mismo patrón en `greenhouse.efeoncepro.com/api/internal/health` sobre `version=7238a90`.
 - El rollout externo previo también dejó preparados en Vercel:
   - `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
   - `NEXTAUTH_SECRET_SECRET_REF`
   - `AZURE_AD_CLIENT_SECRET_SECRET_REF`
   - `GOOGLE_CLIENT_SECRET_SECRET_REF`
-  - `NUBOX_BEARER_TOKEN_SECRET_REF`
     para `staging` y `production`, sin retirar aún los env vars legacy.
 - Estado residual observado en `staging`:
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en el runtime del portal
@@ -491,6 +494,7 @@ Vercel es la capa de presentación y API del portal. GCP Cloud es la capa de pro
 | ICO member sync              | Vercel `/api/cron/ico-member-sync` | ~45s            | Monitorear, migrar si crece           |
 | Sync conformed               | Vercel `/api/cron/sync-conformed`  | ~30-60s         | Monitorear, migrar si crece           |
 | Nubox sync                   | Vercel `/api/cron/nubox-sync`      | ~15s            | OK en Vercel por ahora                |
+| Nubox quotes hot sync        | Vercel `/api/cron/nubox-quotes-hot-sync` | <10s esperado | OK en Vercel; carril liviano de frescura |
 | Exchange rates / indicators  | Vercel cron                        | ~5s             | OK en Vercel                          |
 | Outbox publish               | Vercel cron `*/5 min`              | ~5-15s          | OK en Vercel                          |
 | Outbox react + recovery      | ~~Vercel cron~~ → Cloud Run        | 5-60s           | **Migrado a `ops-worker` (TASK-254)** |
@@ -729,6 +733,7 @@ Defined in `vercel.json` at the repository root. Next.js API routes invoked by V
 | `/api/cron/ico-member-sync` | `30 10 * * *` | — | Sync BQ→PG de métricas ICO por miembro | Evaluar — upserts por fila, sin alerting |
 | `/api/cron/notion-delivery-data-quality` | `0 10 * * *` | 120s | Validar paridad de datos Notion delivery | Keep — scan sin backlog |
 | `/api/cron/nubox-sync` | `30 7 * * *` | 120s | ETL 3 fases: Nubox API → raw BQ → conformed → PG | Evaluar — multi-fase, fallos parciales tolerados |
+| `/api/cron/nubox-quotes-hot-sync` | `*/15 * * * *` | 60s | Hot lane de cotizaciones Nubox COT/DTE 52 → raw BQ → conformed → PG | Keep — liviano, idempotente, freshness comercial |
 | `/api/cron/nubox-balance-sync` | `0 */4 * * *` | 60s | Reconciliación de balances Nubox BQ→PG | Keep — ligero, rápido |
 | `/api/cron/entra-profile-sync` | `0 8 * * *` | 300s | Sync Entra: avatar, identity link, datos profesionales | Evaluar — 300s (máximo Vercel), sin retry |
 | `/api/cron/entra-webhook-renew` | `0 6 */2 * *` | 30s | Renovar suscripción webhook de Entra | Keep — trigger simple |

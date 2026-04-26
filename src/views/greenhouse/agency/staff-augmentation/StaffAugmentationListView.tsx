@@ -101,7 +101,7 @@ const formatMoney = (amount: number | null, currency: string | null) => {
 
 const columnHelper = createColumnHelper<PlacementListItem>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const columns: ColumnDef<PlacementListItem, any>[] = [
   columnHelper.accessor('publicId', {
     header: 'Placement',

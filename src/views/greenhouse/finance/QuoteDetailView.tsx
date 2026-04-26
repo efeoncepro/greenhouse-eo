@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -27,6 +27,8 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+
+import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
 
 import { QuoteShareDrawer } from './QuoteShareDrawer'
 import QuoteApprovalsPanel, { type ApprovalStep } from './governance/QuoteApprovalsPanel'
@@ -197,7 +199,7 @@ const fetchViewerContext = async (): Promise<QuoteViewerContext> => {
 
 const QuoteDetailView = () => {
   const params = useParams()
-  const router = useRouter()
+  const morphRouter = useViewTransitionRouter()
   const quoteId = params.id as string
 
   const [loading, setLoading] = useState(true)
@@ -790,10 +792,25 @@ const QuoteDetailView = () => {
               <i className='tabler-file-description' style={{ fontSize: 26, color: 'var(--mui-palette-info-main)' }} />
             </Avatar>
             <Box>
-              <Typography variant='h5' sx={{ fontWeight: 500 }}>
+              {/*
+                TASK-525: this number receives the same `view-transition-name`
+                used by QuotesListView. The browser then morphs the quote
+                number from row position to header position on navigation.
+              */}
+              <Typography
+                variant='h5'
+                sx={{
+                  fontWeight: 500,
+                  viewTransitionName: `quote-identity-${quoteId}`
+                }}
+              >
                 {quote.description || quote.quoteNumber || quote.quoteId}
               </Typography>
-              <Typography variant='body2' color='text.secondary'>
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                sx={{ viewTransitionName: `quote-client-${quoteId}` }}
+              >
                 {quote.clientName}
                 {quote.quoteNumber ? ` · ${quote.quoteNumber}` : ''}
                 {currentVersion ? ` · v${currentVersion}` : ''}
@@ -826,7 +843,13 @@ const QuoteDetailView = () => {
                 size='small'
                 color='primary'
                 startIcon={<i className='tabler-edit' />}
-                onClick={() => router.push(`/finance/quotes/${quoteId}/edit`)}
+
+                /*
+                  TASK-525: enter edit mode through a view transition. The
+                  detail header morphs into the QuoteBuilderShell header at
+                  /edit instead of cutting.
+                */
+                onClick={() => morphRouter.push(`/finance/quotes/${quoteId}/edit`)}
               >
                 Editar
               </Button>

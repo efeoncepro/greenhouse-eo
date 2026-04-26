@@ -7,11 +7,10 @@ export async function GET(request: Request) {
   return runEcosystemReadRoute({
     request,
     routeKey: 'platform.ecosystem.capabilities',
-    handler: async context => ({
-      data: await listEcosystemCapabilities({
+    handler: async context =>
+      listEcosystemCapabilities({
         context,
         request
       })
-    })
   })
 }

@@ -10,15 +10,27 @@
 
 ## Que es
 
-La API Platform Ecosystem es la nueva capa de APIs externas y machine-to-machine de Greenhouse.
+La API Platform Ecosystem es la nueva capa de APIs externas, machine-to-machine y first-party app de Greenhouse.
 
 En simple:
 
 - no reemplaza las rutas internas del portal
 - no reemplaza todavía el carril legacy `/api/integrations/v1/*`
-- crea una lane nueva, más ordenada y más estable, para consumers del ecosistema
+- crea lanes más ordenadas y estables para consumers del ecosistema y para clients first-party como la futura app móvil
 
 La idea es que Greenhouse deje de exponer contratos externos como una suma de rutas aisladas y pase a operar una capa shared con reglas uniformes.
+
+## Lanes Actuales
+
+Hoy existen dos lanes:
+
+- `ecosystem`: server-to-server, machine-to-machine, autenticada con consumer credentials y binding.
+- `app`: first-party user-authenticated, pensada para mobile y futuros clients propios no web.
+
+La regla importante:
+
+- `ecosystem` no representa a un usuario final.
+- `app` sí representa a un usuario autenticado de Greenhouse.
 
 ## Para que sirve
 
@@ -26,7 +38,8 @@ Sirve para tres cosas:
 
 1. exponer lecturas ecosystem-facing con contrato más estable
 2. resolver tenancy y contexto de forma segura
-3. dejar una base reutilizable para futuros writes, webhooks y adapters MCP
+3. servir a la futura app React Native sin acoplarla a rutas web internas
+4. dejar una base reutilizable para futuros writes, webhooks y adapters MCP
 
 No es una API pública abierta. Hoy es una lane controlada, autenticada y binding-aware.
 
@@ -37,14 +50,26 @@ Hoy la foundation nueva ya existe en el runtime:
 - `src/lib/api-platform/core/*`
 - `src/lib/api-platform/resources/*`
 - `src/app/api/platform/ecosystem/*`
+- `src/app/api/platform/app/*`
 
-La lane inicial expone estos endpoints:
+La lane inicial expone estos endpoints de lectura:
 
 - `GET /api/platform/ecosystem/context`
 - `GET /api/platform/ecosystem/organizations`
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
+
+También expone el plano de control de eventos:
+
+- `GET /api/platform/ecosystem/event-types`
+- `GET /api/platform/ecosystem/webhook-subscriptions`
+- `POST /api/platform/ecosystem/webhook-subscriptions`
+- `GET /api/platform/ecosystem/webhook-subscriptions/:id`
+- `PATCH /api/platform/ecosystem/webhook-subscriptions/:id`
+- `GET /api/platform/ecosystem/webhook-deliveries`
+- `GET /api/platform/ecosystem/webhook-deliveries/:id`
+- `POST /api/platform/ecosystem/webhook-deliveries/:id/retry`
 
 Todos funcionan con el mismo patrón:
 
@@ -54,6 +79,82 @@ Todos funcionan con el mismo patrón:
 4. aplican rate limiting
 5. dejan request logging
 6. responden con un envelope uniforme
+
+La lane `app` expone:
+
+- `POST /api/platform/app/sessions`
+- `PATCH /api/platform/app/sessions`
+- `DELETE /api/platform/app/sessions/current`
+- `GET /api/platform/app/context`
+- `GET /api/platform/app/home`
+- `GET /api/platform/app/notifications`
+- `POST /api/platform/app/notifications/:id/read`
+- `POST /api/platform/app/notifications/mark-all-read`
+
+Estos endpoints usan el mismo envelope y versionado de la API Platform.
+
+## Como autentica la app
+
+La app no usa tokens de ecosystem.
+
+El flujo base es:
+
+1. la app envía email/password a `POST /api/platform/app/sessions`
+2. Greenhouse valida al usuario contra Identity Access
+3. se crea una sesión en `greenhouse_core.first_party_app_sessions`
+4. la app recibe un access token corto y un refresh token
+5. cada refresh rota el refresh token y mantiene solo su hash en base de datos
+6. la app puede revocar la sesión actual con `DELETE /api/platform/app/sessions/current`
+
+Cada request rehidrata el acceso vigente del usuario. Esto evita depender por demasiado tiempo de permisos embebidos en un token viejo.
+
+## Recursos app iniciales
+
+### App Context
+
+`/api/platform/app/context` devuelve:
+
+- usuario técnico
+- tenant efectivo
+- `routeGroups`
+- `authorizedViews`
+- `portalHomePath`
+- módulos visibles
+- entitlements efectivos
+
+La respuesta separa dos planos:
+
+- `views`: para superficies visibles y navegación
+- `entitlements`: para capacidades y acciones disponibles
+
+### App Home
+
+`/api/platform/app/home` reutiliza el snapshot de Home, pero lo sirve dentro del envelope/versionado de API Platform.
+
+La app debe consumir este endpoint, no `/api/home/snapshot`.
+
+### Notifications
+
+`/api/platform/app/notifications` devuelve notificaciones in-app del usuario autenticado con paginación.
+
+Los writes permitidos son acotados:
+
+- marcar una notificación como leída
+- marcar todas las notificaciones como leídas
+
+## Event control plane
+
+El plano de eventos permite administrar subscriptions y observar deliveries sin usar directamente el transport raw de webhooks.
+
+La separación es intencional:
+
+- `/api/webhooks/*` recibe llamadas HTTP reales de proveedores externos.
+- `/api/cron/webhook-dispatch` ejecuta la entrega real de eventos pendientes.
+- `/api/platform/ecosystem/webhook-*` administra recursos y comandos del plano de control.
+
+Cada subscription creada desde la API Platform queda asociada al consumer autenticado y al binding resuelto. Por eso un consumer solo puede listar, modificar o reintentar deliveries de sus propias subscriptions.
+
+El command de retry no envía el webhook en la misma request. Reprograma el delivery para que el dispatcher existente lo procese con la misma política de firma, timeout, attempts y dead-letter.
 
 ## Que significa cada endpoint
 
@@ -189,6 +290,8 @@ Ya hay varias piezas sanas:
 - version header
 - envelope uniforme
 - resources montados sobre readers reales del repo
+- event control plane para subscriptions, deliveries y retry
+- lane first-party `app` para sesiones, Home y notificaciones mobile-safe
 - coexistencia explícita con `integrations/v1`
 
 Además, este primer corte ya fue verificado con:
@@ -203,12 +306,16 @@ Además, este primer corte ya fue verificado con:
 
 Todavía no hace estas cosas:
 
-- writes ecosystem-facing
+- writes ecosystem-facing amplios de dominio
 - idempotencia runtime de commands
-- webhooks outbound específicos de esta lane
+- generacion automatica de OpenAPI desde schemas runtime
 - MCP downstream
 - una API pública abierta
 - migración total de todos los recursos legacy al carril nuevo
+
+Si existe un command en V1, como crear/editar subscriptions o reprogramar un retry,
+debe leerse como command acotado de control plane. No equivale a una superficie
+general de writes para recursos de negocio.
 
 Tampoco intenta resolver todos los dominios del portal en V1. El primer slice está enfocado en recursos suficientemente maduros.
 

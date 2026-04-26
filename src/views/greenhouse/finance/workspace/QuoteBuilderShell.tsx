@@ -11,9 +11,10 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -29,6 +30,7 @@ import type {
 import { UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
 import useParties, { type PartySearchError, type PartySearchItem } from '@/hooks/useParties'
+import usePricingConfig from '@/hooks/usePricingConfig'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 import { previewChileTaxAmounts } from '@/lib/finance/pricing/quotation-tax-constants'
@@ -513,8 +515,9 @@ const QuoteBuilderShell = ({
       setOrganizationContext(adopted.organizationId)
       clearPartySearch()
       toast.success(GH_PRICING.contextChips.organization.unifiedAdopted, {
-        autoClose: 2400,
-        position: 'bottom-right'
+        // TASK-512: sonner uses `duration` (ms). Position is set globally on
+        // the Toaster in Providers.tsx; per-toast position is not supported.
+        duration: 2400
       })
     } catch (caught) {
       const nextError =
@@ -524,65 +527,52 @@ const QuoteBuilderShell = ({
 
       setError(nextError)
       toast.error(nextError, {
-        autoClose: 4200,
-        position: 'bottom-right'
+        duration: 4200
       })
     } finally {
       setPendingOrganizationLabel(null)
     }
   }, [adoptParty, clearPartySearch, setOrganizationContext])
 
+  /*
+    TASK-513: pricingConfigQuery reemplaza el useEffect+fetch+AbortController
+    manual. La cache de react-query (staleTime 5min) evita re-fetchear el
+    catalog en cada mount del builder. El derivar de `pricingConfigQuery.data`
+    se hace via useMemo abajo para mantener el contrato existente con
+    builderOptions.
+  */
+  const { data: pricingConfigCatalog } = usePricingConfig()
+
   useEffect(() => {
-    const controller = new AbortController()
+    if (!pricingConfigCatalog) return
 
-    ;(async () => {
-      try {
-        const res = await fetch('/api/finance/quotes/pricing/config', { signal: controller.signal })
+    const commercialModels = pricingConfigCatalog.commercialModelMultipliers?.map(m => ({
+      code: m.modelCode,
+      label: m.modelLabel,
+      multiplierPct: Number(m.multiplierPct)
+    }))
 
-        if (!res.ok) return
+    const countryFactors = pricingConfigCatalog.countryPricingFactors?.map(f => ({
+      code: f.factorCode,
+      label: f.factorLabel,
+      factor: Number(f.factorOpt)
+    }))
 
-        const payload = (await res.json()) as {
-          catalog?: {
-            commercialModelMultipliers?: Array<{ modelCode: CommercialModelCode; modelLabel: string; multiplierPct: number }>
-            countryPricingFactors?: Array<{ factorCode: string; factorLabel: string; factorOpt: number }>
-            businessLines?: Array<{ moduleCode: string; label: string; isActive?: boolean; sortOrder?: number }>
-            employmentTypes?: Array<{ employmentTypeCode: string; labelEs: string; active?: boolean }>
-          }
-        }
+    const businessLines = pricingConfigCatalog.businessLines
+      ?.filter(bl => bl.isActive !== false)
+      .map(bl => ({ code: bl.moduleCode, label: bl.label }))
 
-        const commercialModels = payload.catalog?.commercialModelMultipliers?.map(m => ({
-          code: m.modelCode,
-          label: m.modelLabel,
-          multiplierPct: Number(m.multiplierPct)
-        }))
+    const employmentTypes = pricingConfigCatalog.employmentTypes
+      ?.filter(et => et.active !== false)
+      .map(et => ({ value: et.employmentTypeCode, label: et.labelEs }))
 
-        const countryFactors = payload.catalog?.countryPricingFactors?.map(f => ({
-          code: f.factorCode,
-          label: f.factorLabel,
-          factor: Number(f.factorOpt)
-        }))
-
-        const businessLines = payload.catalog?.businessLines
-          ?.filter(bl => bl.isActive !== false)
-          .map(bl => ({ code: bl.moduleCode, label: bl.label }))
-
-        const employmentTypes = payload.catalog?.employmentTypes
-          ?.filter(et => et.active !== false)
-          .map(et => ({ value: et.employmentTypeCode, label: et.labelEs }))
-
-        setBuilderOptions(prev => ({
-          businessLines: businessLines && businessLines.length > 0 ? businessLines : prev.businessLines,
-          commercialModels: commercialModels && commercialModels.length > 0 ? commercialModels : prev.commercialModels,
-          countryFactors: countryFactors && countryFactors.length > 0 ? countryFactors : prev.countryFactors,
-          employmentTypes: employmentTypes && employmentTypes.length > 0 ? employmentTypes : prev.employmentTypes
-        }))
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') return
-      }
-    })()
-
-    return () => controller.abort()
-  }, [])
+    setBuilderOptions(prev => ({
+      businessLines: businessLines && businessLines.length > 0 ? businessLines : prev.businessLines,
+      commercialModels: commercialModels && commercialModels.length > 0 ? commercialModels : prev.commercialModels,
+      countryFactors: countryFactors && countryFactors.length > 0 ? countryFactors : prev.countryFactors,
+      employmentTypes: employmentTypes && employmentTypes.length > 0 ? employmentTypes : prev.employmentTypes
+    }))
+  }, [pricingConfigCatalog])
 
   // TASK-486: al cambiar de organización recargar la lista de contactos anclables.
   useEffect(() => {
@@ -1035,8 +1025,7 @@ const QuoteBuilderShell = ({
         if (!id) return
 
         toast.success(mode === 'create' ? GH_PRICING.builderCreated : GH_PRICING.builderSaved, {
-          autoClose: 2400,
-          position: 'bottom-right'
+          duration: 2400
         })
 
         router.push(closeAfter ? `/finance/quotes/${id}` : `/finance/quotes/${id}/edit`)
@@ -1058,8 +1047,7 @@ const QuoteBuilderShell = ({
 
         if (!issueRes.ok) {
           toast.error(issueBody.error ?? GH_PRICING.builderIssueErrorFallback, {
-            autoClose: 4200,
-            position: 'bottom-right'
+            duration: 4200
           })
           router.push(`/finance/quotes/${quotationId}`)
 
@@ -1071,8 +1059,7 @@ const QuoteBuilderShell = ({
             ? GH_PRICING.builderIssueRequested
             : GH_PRICING.builderIssued,
           {
-            autoClose: 2600,
-            position: 'bottom-right'
+            duration: 2600
           }
         )
         router.push(`/finance/quotes/${quotationId}`)
@@ -1341,9 +1328,43 @@ const QuoteBuilderShell = ({
 
   const title = selectedOrgName ? `${baseTitle} · ${selectedOrgName}` : baseTitle
 
-  const subtitle = mode === 'edit' ? GH_PRICING.builderSubtitleEdit : GH_PRICING.builderSubtitleCreate
   const quoteStatus = resolveQuoteStatus(quote?.status)
   const canIssueFromBuilder = mode === 'create' || isIssueableFinanceQuotationStatus(quote?.status ?? 'draft')
+
+  // TASK-615: subtitle dinámico que enseña el siguiente paso real del flujo en
+  // lugar de la línea estática "Arma la cotización combinando ítems…". El
+  // header se queda con identidad + save draft; el dock conserva la acción
+  // terminal. La narrativa del top fold cuenta el estado, el dock cierra.
+  const requiresHubSpotContextForSubtitle = useMemo(
+    () =>
+      requiresHubSpotQuoteCommercialContext({
+        hubspotDealId,
+        hubspotQuoteId: quote?.hubspotQuoteId ?? null,
+        sourceSystem: quote?.source ?? null
+      }),
+    [hubspotDealId, quote?.hubspotQuoteId, quote?.source]
+  )
+
+  const subtitle = useMemo(() => {
+    if (quoteStatus === 'pending_approval') return GH_PRICING.identityStrip.subtitlePendingApproval
+    if (mode === 'edit' && !canIssueFromBuilder) return GH_PRICING.identityStrip.subtitleEditingIssued
+    if (!organizationId) return GH_PRICING.identityStrip.subtitleNeedsOrganization
+    if (requiresHubSpotContextForSubtitle && !contactIdentityProfileId) return GH_PRICING.identityStrip.subtitleNeedsContact
+    if (requiresHubSpotContextForSubtitle && !hubspotDealId) return GH_PRICING.identityStrip.subtitleNeedsDeal
+    if (linesSnapshot.length === 0 && !selectedTemplateId) return GH_PRICING.identityStrip.subtitleNeedsLines
+
+    return GH_PRICING.identityStrip.subtitleReady
+  }, [
+    canIssueFromBuilder,
+    contactIdentityProfileId,
+    hubspotDealId,
+    linesSnapshot.length,
+    mode,
+    organizationId,
+    quoteStatus,
+    requiresHubSpotContextForSubtitle,
+    selectedTemplateId
+  ])
 
   const contextValues = useMemo(
     () => ({
@@ -1459,6 +1480,33 @@ const QuoteBuilderShell = ({
     !organizationId ||
     !canIssueFromBuilder
 
+  // TASK-615: razón humana para el CTA terminal cuando está deshabilitado.
+  // Se inyecta al dock como tooltip + aria-describedby. Orden de precedencia:
+  // 'busy' (estamos guardando) → 'simulationError' (algo falló en el motor)
+  // → 'noOrganization' (sin org no se emite) → 'noLines' (sin items tampoco)
+  // → 'notIssueable' (estado del documento no permite emisión).
+  const issueDisabledReason = useMemo<string | null>(() => {
+    if (!issueActionDisabled) return null
+    const reasons = GH_PRICING.summaryDock.disabledReasons
+
+    if (submitting || serviceExpanding) return reasons.busy
+    if (simulationError) return reasons.simulationError
+    if (!organizationId) return reasons.noOrganization
+    if (!hasSubmittableContent) return reasons.noLines
+    if (!canIssueFromBuilder) return reasons.notIssueable
+
+    // simulando sin error específico cae acá: pricing en cálculo
+    return reasons.busy
+  }, [
+    canIssueFromBuilder,
+    hasSubmittableContent,
+    issueActionDisabled,
+    organizationId,
+    serviceExpanding,
+    simulationError,
+    submitting
+  ])
+
   return (
     <Box>
       <QuoteIdentityStrip
@@ -1472,32 +1520,38 @@ const QuoteBuilderShell = ({
         quoteNumber={quote?.quotationNumber ?? null}
         status={quoteStatus}
         actions={
+
+          /*
+            TASK-615 — Action hierarchy convergence.
+            Header conserva navegación + save draft. La acción terminal vive
+            EXCLUSIVAMENTE en QuoteSummaryDock (junto al total y al save state)
+            para que la pantalla tenga un solo centro de gravedad. El save
+            draft baja a tonal/secondary (sin color primario) para no competir
+            con el contained CTA del dock.
+          */
           <>
             <Button variant='tonal' color='secondary' onClick={handleCancel} disabled={submitting}>
               {GH_PRICING.builderCancel}
             </Button>
-            <Button
-              variant='tonal'
-              color='primary'
-              startIcon={<i className='tabler-device-floppy' aria-hidden='true' />}
-              onClick={() => handleSubmit({ closeAfter: false })}
-              disabled={saveDraftDisabled}
-              sx={{ minHeight: 44 }}
+            <Tooltip
+              title={GH_PRICING.identityStrip.saveDraftMeta}
+              placement='bottom'
+              disableInteractive
             >
-              {submitting ? GH_PRICING.builderSaving : simulating ? 'Calculando pricing…' : GH_PRICING.builderSaveDraft}
-            </Button>
-            {canIssueFromBuilder ? (
-              <Button
-                variant='contained'
-                color='primary'
-                startIcon={<i className='tabler-file-check' aria-hidden='true' />}
-                onClick={() => handleSubmit({ issueAfterSave: true })}
-                disabled={issueActionDisabled}
-                sx={{ minHeight: 44 }}
-              >
-                {submitting ? GH_PRICING.builderSaving : GH_PRICING.builderSaveAndIssue}
-              </Button>
-            ) : null}
+              <span>
+                <Button
+                  variant='tonal'
+                  color='secondary'
+                  size='small'
+                  startIcon={<i className='tabler-device-floppy' aria-hidden='true' />}
+                  onClick={() => handleSubmit({ closeAfter: false })}
+                  disabled={saveDraftDisabled}
+                  sx={{ minHeight: 36 }}
+                >
+                  {submitting ? GH_PRICING.builderSaving : simulating ? 'Calculando pricing…' : GH_PRICING.builderSaveDraft}
+                </Button>
+              </span>
+            </Tooltip>
           </>
         }
       />
@@ -1630,18 +1684,36 @@ const QuoteBuilderShell = ({
             simulating={simulating}
             employmentTypeOptions={builderOptions.employmentTypes}
             onDraftChange={setLinesSnapshot}
+
+            /*
+              TASK-615 — Empty state vs toolbar orchestration.
+              Cuando todavía no hay líneas, el split button NO se muestra en
+              el header del editor: el EmptyState lleva el peso de la affordance
+              y enseña los 4 métodos de composición. Una vez que existen líneas,
+              el split button vuelve al header como acelerador de continuidad.
+            */
             headerAction={
-              <AddLineSplitButton
-                onCatalog={openCatalogPicker}
-                onService={openServicePicker}
-                onTemplate={() => setTemplatePickerOpen(true)}
-                onManual={handleManualLine}
-                disabled={submitting || serviceExpanding}
-              />
+              linesSnapshot.length > 0 ? (
+                <AddLineSplitButton
+                  onCatalog={openCatalogPicker}
+                  onService={openServicePicker}
+                  onTemplate={() => setTemplatePickerOpen(true)}
+                  onManual={handleManualLine}
+                  disabled={submitting || serviceExpanding}
+                />
+              ) : null
             }
             onAddFromCatalog={openCatalogPicker}
             onAddFromService={openServicePicker}
             onAddFromTemplate={() => setTemplatePickerOpen(true)}
+            onAddFromManual={handleManualLine}
+            pendingHint={
+              !organizationId
+                ? GH_PRICING.emptyItems.pendingNote(
+                    GH_PRICING.contextChips.progress.nextSteps.organization
+                  )
+                : null
+            }
           />
 
           <Accordion
@@ -1707,6 +1779,7 @@ const QuoteBuilderShell = ({
           primaryCtaIcon='tabler-file-check'
           primaryCtaLoading={submitting}
           primaryCtaDisabled={issueActionDisabled}
+          disabledReason={issueDisabledReason}
           onPrimaryClick={() => handleSubmit({ issueAfterSave: true })}
           marginClassification={marginClass}
           marginPct={marginPct}
@@ -1714,11 +1787,17 @@ const QuoteBuilderShell = ({
           appliedAddonsTotal={appliedAddonsTotal}
           saveState={saveState}
           simulationError={dockSimulationError}
+
+          /*
+            TASK-615: empty messages secuenciales. El dock guía al siguiente
+            paso concreto (organización primero, luego ítems) en vez de
+            empaquetar la causa en un placeholder genérico.
+          */
           emptyStateMessage={
             linesSnapshot.length === 0
               ? !organizationId
-                ? 'Selecciona una organización y agrega ítems para calcular el total.'
-                : 'Agrega al menos un ítem para calcular el total.'
+                ? GH_PRICING.summaryDock.emptyNoOrganization
+                : GH_PRICING.summaryDock.emptyNoLines
               : null
           }
         />

@@ -18,7 +18,7 @@ import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-id
 import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
 import type { ChileTaxSnapshot } from '@/lib/tax/chile'
 
-type NuboxProjectionSale = NuboxConformedSale & {
+export type NuboxProjectionSale = NuboxConformedSale & {
   source_last_ingested_at: string | null
 }
 
@@ -754,7 +754,7 @@ const reconcileIncomeFromBankMovement = async (
 
 // ─── Quote Upsert (DTE 52 → quotes table) ────────────────────────────────
 
-const upsertQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
+export const upsertNuboxQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
   if (!sale.nubox_sale_id || isNaN(Number(sale.nubox_sale_id))) return 'skipped'
 
   const existing = await runGreenhousePostgresQuery<{ quote_id: string }>(
@@ -765,6 +765,7 @@ const upsertQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created'
   if (existing.length > 0) {
     await runGreenhousePostgresQuery(
       `UPDATE greenhouse_finance.quotes SET
+        source_system = 'nubox',
         nubox_sii_track_id = $2,
         nubox_emission_status = $3,
         nubox_last_synced_at = COALESCE($4::timestamptz, greenhouse_finance.quotes.nubox_last_synced_at, NOW()),
@@ -790,6 +791,7 @@ const upsertQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created'
       exchange_rate_to_clp, total_amount_clp,
       status, nubox_document_id, nubox_sii_track_id, nubox_emission_status,
       dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
+      source_system,
       created_at, updated_at
     ) VALUES (
       $1, $2, $3, $4,
@@ -798,9 +800,11 @@ const upsertQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created'
       1, $10,
       'sent', $11, $12, $13,
       '52', $14, $15, $16::timestamptz,
+      'nubox',
       NOW(), NOW()
     )
     ON CONFLICT (quote_id) DO UPDATE SET
+      source_system = 'nubox',
       nubox_last_synced_at = COALESCE($16::timestamptz, greenhouse_finance.quotes.nubox_last_synced_at, NOW()), updated_at = NOW()`,
     [
       quoteId,
@@ -918,7 +922,7 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
     for (const sale of conformedSales) {
       if (sale.dte_type_code === '52' || sale.dte_type_code === 'COT') {
         // Cotizaciones go to quotes table, not income
-        const result = await upsertQuoteFromSale(sale)
+        const result = await upsertNuboxQuoteFromSale(sale)
 
         if (result === 'created') quotesCreated++
         else if (result === 'updated') quotesUpdated++

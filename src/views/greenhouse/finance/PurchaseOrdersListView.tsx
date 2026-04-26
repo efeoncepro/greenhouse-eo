@@ -132,7 +132,7 @@ const PurchaseOrdersListView = () => {
     setSelectedPurchaseOrder(null)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const poColumns: ColumnDef<PurchaseOrder, any>[] = [
     poColumnHelper.accessor('poNumber', {
       header: 'OC #',

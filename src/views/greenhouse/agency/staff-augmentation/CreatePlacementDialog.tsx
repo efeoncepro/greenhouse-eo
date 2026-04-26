@@ -16,7 +16,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import CustomTextField from '@core/components/mui/TextField'
 

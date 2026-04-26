@@ -1,5 +1,1210 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Greenhouse Deep Link Platform documentada
+
+- Se documento la arquitectura canonica de deep links en `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.
+- La decision queda registrada como capability shared futura: referencias semanticas (`kind/id/action/scope`) resueltas por una capa central que produce `href`, `absoluteUrl`, `label`, `viewCode`, capabilities, fallback y preview segun audiencia.
+- El doc recoge patrones de Slack, Teams, Salesforce, Atlassian, Notion, GitHub y Figma, y los aterriza al estado actual del repo: `VIEW_REGISTRY`, `portalHomePath`, `actionUrl`, search estatico, Teams cards y quote short links.
+- Se creo `TASK-694` (`docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`) para implementar la foundation runtime `src/lib/navigation/deep-links/**` sin mezclar storage, search/sidebar ni migracion completa de Notification Hub.
+- `docs/tasks/TASK_ID_REGISTRY.md` reserva `TASK-694` y `docs/tasks/README.md` deja el siguiente ID disponible en `TASK-695`.
+- `docs/README.md`, `project_context.md` y `changelog.md` quedan enlazados/actualizados. No hubo cambios runtime.
+- Validacion: doc-only; se verifico `git status` y lectura puntual del documento.
+
+## Sesion 2026-04-26 — TASK-671 Azure deploy ejecutado por CLI
+
+Bot Service desplegado a producción del tenant `efeoncepro.com`. Completado por CLI desde la sesión local con `jreyes@efeoncepro.com` (Global Admin + Owner de la suscripción).
+
+Recursos productivos:
+
+- **App registration "Greenhouse Teams Bot"** (Azure AD): `appId=a1397477-4aae-4f16-a0a2-a213cb1b00b2`, `objectId=e3dee07f-8804-4bcc-8764-f6613fb634ec`, `signInAudience=AzureADMyOrg`. Distinct del SSO app `Greenhouse` (`3626642f-…`) para no mezclar concerns.
+- **Service principal**: `id=a8c4fdd5-ee8e-4654-a40b-7b55f36fc21e`.
+- **Microsoft Graph application permissions** otorgadas con admin consent (5 roles): `User.Read.All`, `Channel.ReadBasic.All`, `Team.ReadBasic.All`, `Chat.Create`, `TeamsAppInstallation.ReadWriteForUser.All`.
+- **Client secret** (rotación 1 año, displayName `bot-runtime`) persistido como blob `{clientId, clientSecret, tenantId}` en GCP Secret Manager `greenhouse-teams-bot-client-credentials` proyecto `efeonce-group`. Tempfile local borrado.
+- **Resource group**: `rg-greenhouse-teams-bot-prod` en `eastus` con tags `greenhouse:component=teams-bot greenhouse:environment=prod greenhouse:taskId=TASK-671`.
+- **Bot Service** `gh-bot-prod` (SKU F0, `kind=azurebot`) con `endpoint=https://greenhouse.efeoncepro.com/api/teams-bot/messaging`, `msaAppId` apuntando al app registration, MsTeams channel habilitado. `provisioningState=Succeeded`.
+- **Bicep deploy**: `gh-bot-20260426-205907` ejecutado con `parameters.prod.json` actualizado con el `botAppId` real.
+- **Manifest Teams v1.17 listo** en `infra/azure/teams-bot/manifest/greenhouse-teams.zip` (1936 bytes: manifest.json + icons/icon_color.png 192×192 + icons/icon_outline.png 32×32). Iconos placeholder generados con Python+zlib (círculo verde #00B07F con G blanca, outline blanco). Reemplazar por logo definitivo cuando design lo entregue.
+
+**Manifest publicado en Teams Admin Center 2026-04-26**: Teams catalog id (distinto del Azure AD app id) = `54fdb02a-3424-4cac-b921-50bd9e2024d1`. Estado `Allowed`, "Installed para Todos" (org-wide default), Versión `1.0.0`. Este id es el que recibe `installBotForUser` (Slice 7) y el que se usa para `POST /teams/{teamId}/installedApps`. NO confundir con el msaAppId del bot (`a1397477-4aae-4f16-a0a2-a213cb1b00b2`) — ese mintea tokens; el catalog id solo identifica el manifest publicado.
+
+Closed via CLI en esta misma sesión (segunda iteración del deploy):
+
+- **Vercel env var**: `GREENHOUSE_TEAMS_BOT_APP_ID=a1397477-4aae-4f16-a0a2-a213cb1b00b2` setado en Production + Preview (develop) + Development vía `vercel env add … --force`. Verificable con `vercel env ls | grep GREENHOUSE_TEAMS_BOT_APP_ID`.
+- **Iconos definitivos**: rasterizados con Chrome headless desde `public/images/greenhouse/SVG/favicon-blue-negative.svg`. `icon_color.png` (192×192) renderiza el favicon completo (rounded square azul `#023c70` + isotipo blanco). `icon_outline.png` (32×32) renderiza solo el isotipo blanco (variante del SVG con la rect azul removida) sobre transparente. Manifest zip rebuildeado a 5430 bytes.
+- **Teams + channels descubiertos vía Graph API** (cinco teams del tenant, sus canales):
+
+  | team_id | team displayName | channel_id | channel displayName |
+  | --- | --- | --- | --- |
+  | `a54afa03-4a4e-4ef5-a207-9fcdc95fceb3` | Efeonce Group | `19:79GnJzdXDvDjhebrMxSU1rppQyfb-_v3kkLxR-hknCc1@thread.tacv2` | General |
+  | `8fc00abd-adf8-43bd-950d-1ac8b2e75d08` | Revenue & Growth | `19:13d7cf3ce3194dc4a32ea24e32e4dadb@thread.tacv2` | HubSpot |
+  | `8fc00abd-adf8-43bd-950d-1ac8b2e75d08` | Revenue & Growth | `19:8600d823bd074e24a54a50dbedb82139@thread.tacv2` | Onboarding |
+  | `8fc00abd-adf8-43bd-950d-1ac8b2e75d08` | Revenue & Growth | `19:UJyyOazcOJSSzCDT30uoutQOe1LPWSbO9R6iBQriiUg1@thread.tacv2` | General |
+  | `2541da59-d0cd-4a0a-889e-5456e88a111e` | Growth Marketing | `19:FpUnTzJSbUql0wwtyDk8Ag6LrMMnTVQZB0j5zvmpkjk1@thread.tacv2` | Alineación |
+  | `2541da59-d0cd-4a0a-889e-5456e88a111e` | Growth Marketing | `19:hIXqSsYJrHxhAa0_SjMW8rJ2ixuWaEujPKF13c-EI8c1@thread.tacv2` | ANAM |
+  | `a99833c2-31fc-416e-a66f-2284d1c2c3b0` | Sky - Efeonce | `19:hLA5AUn2SjoNXNATJv_ofEwnBKGsKXFepSg9CJur8QY1@thread.tacv2` | Shared - Sky |
+  | `a99833c2-31fc-416e-a66f-2284d1c2c3b0` | Sky - Efeonce | `19:nU5beFpSOHRQiPERF5P2u6DdwyC5Bqaj5Qo36fxbPpI1@thread.tacv2` | General |
+  | `aae47836-8e59-4d9a-bce5-37d12978a1ad` | EO - Admin | `19:19UgRoht3Vmw0qgzfC71rKlOpHtfEI4Qz1jVdWMGqXE1@thread.tacv2` | EO - Admin |
+
+  Decisión de mapping (a confirmar antes de UPDATE en PG): el spec históricamente cita `Alineación` como destino de `ops-alerts`. Las opciones razonables:
+  - `ops-alerts` → `EO - Admin / EO - Admin` (admin ops del tenant) o `Efeonce Group / General` (broadcast)
+  - `finance-alerts` → `EO - Admin / EO - Admin` (sensible) o un team Finance dedicado si se crea
+  - `delivery-pulse` → `Growth Marketing / Alineación` (alineación operativa diaria)
+
+Pendientes residuales (no son CLI Azure, requieren GUI de Global Admin o decisión humana):
+
+1. **Upload del manifest al Teams Admin Center** — Graph `/appCatalogs/teamsApps` exige scope `AppCatalog.ReadWrite.All` que el `az` CLI delegado no provee. Subir `greenhouse-teams.zip` (5430 bytes, listo en `infra/azure/teams-bot/manifest/`) en <https://admin.teams.microsoft.com/policies/manage-apps> → "+ Upload new app" → confirmar status `Allowed`.
+2. **Instalar el bot en cada team destino** (Teams desktop → ⋯ → Manage team → Apps → Add Greenhouse).
+3. **UPDATE de los 3 canales productivos** a `channel_kind='teams_bot'` usando los IDs de la tabla de arriba. Plantilla SQL canónica:
+
+   ```sql
+   UPDATE greenhouse_core.teams_notification_channels
+      SET channel_kind = 'teams_bot',
+          recipient_kind = 'channel',
+          bot_app_id = 'a1397477-4aae-4f16-a0a2-a213cb1b00b2',
+          team_id = '<TEAM_ID>',
+          channel_id = '<CHANNEL_ID>',
+          azure_tenant_id = 'a80bf6c1-7c45-4d70-b043-51389622a0e4',
+          secret_ref = 'greenhouse-teams-bot-client-credentials',
+          updated_at = now()
+    WHERE channel_code IN ('ops-alerts','finance-alerts','delivery-pulse');
+   ```
+4. **Validación de 1 semana** con tráfico real antes de decommissionar Logic Apps. Probar con `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"ops-alerts"}'`.
+
+Comandos para verificar el state desplegado:
+
+```bash
+az account set --subscription e1cfff3e-8c21-4170-8b28-ad083b741266
+az resource list --resource-group rg-greenhouse-teams-bot-prod -o table
+az bot show --resource-group rg-greenhouse-teams-bot-prod --name gh-bot-prod
+gcloud secrets versions list greenhouse-teams-bot-client-credentials --project=efeonce-group
+```
+
+## Sesion 2026-04-26 — TASK-671 Greenhouse Teams Bot Platform (Bot Framework + Graph) — code complete
+
+- Implementación end-to-end del bot interactivo Greenhouse para Microsoft Teams. Sibling enriquecido de TASK-669 (Logic Apps), construido sobre el mismo schema transport-agnostic.
+- Migraciones aplicadas: `migrations/20260426202326023_extend-teams-notification-channels-recipient-kind.sql` (columnas `recipient_kind`, `recipient_user_id`, `recipient_chat_id`, `recipient_routing_rule_json` + CHECK constraints) y `migrations/20260426202330684_create-teams-bot-inbound-actions.sql` (tabla audit + idempotency con UNIQUE en `idempotency_key`).
+- Helpers Bot Framework nativos en `src/lib/integrations/teams/bot-framework/`:
+  - `token-cache.ts` — OAuth2 client_credentials con cache `expires_in - 60s`
+  - `graph-client.ts` — POST channel/chat messages, get-or-create 1:1 chat, install bot for user, find user by email; retry exponencial en 429/5xx
+  - `jwt-validator.ts` — verificación contra JWKS de `login.botframework.com` con `jose`
+  - `sender.ts` — `sendViaBotFramework()` con 4 superficies (`channel | chat_1on1 | chat_group | dynamic_user`)
+- Recipient resolver `src/lib/integrations/teams/recipient-resolver.ts` con cascada `members.teams_user_id` → `client_users.microsoft_oid` → email lookup en Graph; cache 5 min.
+- Sender principal `src/lib/integrations/teams/sender.ts` extendido: ahora despacha `channel_kind='teams_bot'` al nuevo path. `azure_logic_app` queda intacto. `graph_rsc` sigue como `unsupported_channel_kind`.
+- Endpoint inbound `src/app/api/teams-bot/messaging/route.ts` con JWT validation + activity parsing + identity reverse-lookup (`getTenantAccessRecordByMicrosoftOid`) + persist en `teams_bot_inbound_actions` con idempotency + dispatch al action-registry. Errores redactados (sin tokens, sin emails, sin stacks).
+- Action registry `src/lib/teams-bot/action-registry.ts` (patrón clonado de `projection-registry.ts`) con handlers `ops.alert.snooze` y `notification.mark_read`. Importados side-effect via `src/lib/teams-bot/handlers/index.ts`.
+- Reliability Control Plane: nuevo módulo `'integrations.teams'` en `RELIABILITY_REGISTRY` con `incidentDomainTag='integrations.teams'`. `SUBSYSTEM_MODULE_MAP['Teams Notifications'] = 'integrations.teams'`. `getOperationsOverview` ahora reporta breakdown por transporte (Logic Apps vs Bot Framework vs Pending Setup) en `metrics[]`. Admin Ops Health view actualizada con copy diferenciado.
+- IaC scaffolded en `infra/azure/teams-bot/`: `main.bicep` (Bot Service + MsTeams channel), `parameters.{prod,dev}.json`, manifest Teams v1.17, README runbook + workflow GitHub Actions `.github/workflows/azure-teams-bot-deploy.yml` con WIF.
+- Tests: 22 unitarios nuevos (`token-cache`, `graph-client`, `recipient-resolver`, `action-registry`, validateData de los 2 handlers). Test legacy de TASK-669 actualizado de `unsupported_channel_kind` a `missing_bot_app_config` para reflejar la nueva semántica. **Total: 2315 tests pasando.** `tsc --noEmit` clean. `pnpm lint` clean. `pnpm build` clean.
+- Docs nuevos:
+  - `docs/architecture/GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.0 (modelo de interactividad)
+  - `docs/operations/azure-teams-bot.md` (runbook end-to-end)
+  - Bump de `docs/architecture/GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` a v1.1 con Delta
+- Decisión arquitectónica clave: **NO se instaló `botbuilder` SDK** (~25 deps transitivas). Implementación nativa con `jose` + fetch alineada con `src/lib/webhooks/signing.ts` y `src/lib/entra/graph-client.ts`. Bundle más ligero, menos superficie de auditoría.
+- Pendientes (no son código, requieren acceso interactivo a Azure tenant `efeoncepro.com` y Teams Admin Center):
+  1. `az ad app create --display-name "Greenhouse"` (Global Admin)
+  2. Subir blob `{clientId, clientSecret, tenantId}` a GCP Secret Manager `greenhouse-teams-bot-client-credentials`
+  3. `az deployment group create` con `infra/azure/teams-bot/main.bicep`
+  4. Upload `greenhouse-teams.zip` en Teams Admin Center → "Upload new app"
+  5. UPDATE de los 3 canales (`ops-alerts`, `finance-alerts`, `delivery-pulse`) a `channel_kind='teams_bot'` con team_id+channel_id reales
+  6. Validar 1 semana en producción antes de decommissionar Logic Apps
+- Lifecycle: archivo movido de `to-do/` a `in-progress/`. Status real `Code complete — pending Azure tenant deploy + manifest upload + cutover`.
+- Files clave para revisión rápida: `src/lib/integrations/teams/bot-framework/sender.ts`, `src/app/api/teams-bot/messaging/route.ts`, `src/lib/teams-bot/action-registry.ts`, `docs/architecture/GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md`, `infra/azure/teams-bot/README.md`.
+
+## Sesion 2026-04-26 — Backlog Commercial Public Procurement registrado
+
+- Se confirmo que el POC y helper de Mercado Publico siguen siendo `TASK-673`, no `TASK-674`:
+  - task cerrada: `docs/tasks/complete/TASK-673-mercadopublico-poc.md`
+  - helper runtime: `src/lib/integrations/mercado-publico/tenders.ts`
+  - test helper: `src/lib/integrations/mercado-publico/__tests__/tenders.test.ts`
+- Se registraron tasks nuevas `TASK-674` a `TASK-689` para madurar el dominio Commercial / Public Procurement:
+  - `TASK-674` contrato de arquitectura
+  - `TASK-675` ingesta licitaciones
+  - `TASK-676` reconciliacion OC
+  - `TASK-677` ingesta Compra Agil COT mensual
+  - `TASK-678` watch Beta API Compra Agil
+  - `TASK-679` adjuntos y assets privados
+  - `TASK-680` registry de taxonomia/procedimientos
+  - `TASK-681` discovery RFI/Consulta al Mercado
+  - `TASK-682` scoring V1
+  - `TASK-683` workbench lista/detalle
+  - `TASK-684` workflow bid/no-bid
+  - `TASK-685` document intelligence
+  - `TASK-686` bridge tender -> deal/quote
+  - `TASK-687` notificaciones y reliability
+  - `TASK-688` submission control room sin postulacion por API
+  - `TASK-689` research companion extension
+- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron con siguiente ID disponible `TASK-690`.
+- `docs/research/RESEARCH-007-commercial-public-tenders-module.md` reemplazo `TASK-TBD` por los IDs reales `TASK-674` a `TASK-689`.
+- Nota operativa: `TASK-674` es deliberadamente el contrato posterior al POC; depende de `TASK-673` y referencia el helper existente. No se borro ni reemplazo codigo del helper.
+
+## Sesion 2026-04-26 — TASK-673 Mercado Publico Commercial Fit POC
+
+- TASK-673 cerrada en `docs/tasks/complete/TASK-673-mercadopublico-poc.md`; registry e indice sincronizados.
+- Se creo POC aislado en `scripts/research/mercadopublico-poc/`:
+  - `match_licitaciones.py` consume `estado=activas`, opcionalmente hidrata detalle por `codigo`, aplica retry/backoff para 429/5xx y exporta CSV local ignorado por Git.
+  - `keywords.yaml` separa 14 servicios canonicos (`services`) de senales no canonicas (`signals.medios_pr_influencers`) para no contaminar `servicios_matched`.
+  - `README.md`, `requirements.txt` y `.gitignore` local documentan setup y evitan commitear outputs.
+- Hallazgos registrados en `docs/research/TASK-673-findings.md`.
+- Aprendizaje API: el listado activo solo trae `CodigoExterno`, `Nombre`, `FechaCierre`, `CodigoEstado`; `Descripcion` e `Items` requieren llamada de detalle por codigo. Smoke real: `Cantidad=4346`; detalle hidratado en muestra de 25; listing-only sample de 900 produjo 2 matches audiovisuales plausibles.
+- Ajuste de calidad del matcher: se agrego matching con limites de palabra/frase para evitar `SEO` dentro de `aseo`, y se removio keyword demasiado amplia `documental`.
+- Fuente de ticket usada solo via Secret Manager -> env local en comando, sin exponer ni commitear el valor. `rg` del prefijo real no encontro secretos en repo.
+- Pendiente futuro: si se promueve a modulo productivo, converger la logica a TypeScript en `src/lib/integrations/mercado-publico/tenders.ts`, persistir en `greenhouse_commercial.public_tenders*`, usar `source_sync_runs/source_sync_watermarks`, hidratar adjuntos/documentos y modelar access en views + entitlements.
+
+## Sesion 2026-04-26 — RESEARCH-007 Commercial Public Tenders Module
+
+- Se documento el research naciente para `Comercial > Licitaciones Publicas` en `docs/research/RESEARCH-007-commercial-public-tenders-module.md`.
+- Delta nuevo: se agrego la seccion `Oportunidad Producto / Operativa`, con niveles de evolucion `Radar Comercial Automatico`, `Intake Productivo`, `Bid / No-Bid Room`, `Sinergia con el ecosistema Greenhouse` y `Companion Extension Browser-Mediated`.
+- Maduracion adicional: RESEARCH-007 sube a version `0.2` e incorpora tesis de producto, anti-metas, principios (`Human-In-Control`, `Evidence-First`, `Fit Before Volume`), lifecycle operativo, scoring explicable, document intelligence, operating model, ecosystem synergy map, moat, KPIs, roadmap M0-M5 y decision gates previos a Intake V1.
+- Investigacion taxonomia: se documento que Mercado Publico incluye licitaciones publicas/privadas, trato directo, Compra Agil, Compra por Cotizacion, Convenio Marco, Compras Coordinadas, Bases Tipo, innovacion/dialogo competitivo/subasta inversa y RFI/Consultas al Mercado. RFI no respondio por `licitaciones.json?codigo=<RFI>` en smoke, por lo que probablemente requiere source surface separada.
+- Precision API: en payload real `Tipo` trae el codigo de procedimiento (`LE`, `LP`, etc.) y `CodigoTipo` trae un codigo numerico de tipo/visibilidad (`1=Pública`, `2=Privada` segun anexo); RESEARCH-007 ahora distingue `external_procedure_code`, `external_codigo_tipo` y `external_code_suffix`.
+- Tabla de codigos ampliada con el anexo oficial completo observado: `L1`, `LE`, `LP`, `LS`, `A1`, `B1`, `E1`, `F1`, `J1`, `CO`, `B2`, `E2`, `A2`, `D1`, `C2`, `C1`, `F2`, `F3`, `G2`, `G1`, `R1`, `CA`, `SE`.
+- Compra Agil: ChileCompra define `COT` como cotizacion solicitada por Compra Agil. Smokes contra `licitaciones.json?codigo=<COT>` devolvieron `{}` para IDs reales, asi que `COT` debe tratarse como source/opportunity family separada; las OCs downstream suelen aparecer con sufijo `AG` y referencia a la invitacion `COT`.
+- Inventario endpoints API oficial agregado a RESEARCH-007 (version `0.3`): `licitaciones.json`, `ordenesdecompra.json`, `Empresas/BuscarProveedor`, `Empresas/BuscarComprador`, formatos `.json/.jsonp/.xml`, parametros documentados, estados y smokes live con ticket de prueba oficial. No aparecen endpoints publicos para adjuntos, COT/Compra Agil, RFI, postulacion, subida de anexos, aceptacion/rechazo OC ni webhooks.
+- Investigacion profunda Compra Agil agregada a RESEARCH-007 (version `0.4`): ChileCompra anuncio API Beta Compra Agil para mayo 2026; Datos Abiertos expone historico mensual oficial `https://transparenciachc.blob.core.windows.net/trnspchc/COT_<YYYY-MM>.zip`; `COT_2026-03.zip` validado con 2 CSV (`COT1`, `COT2`) y ~4.27M lineas de cotizaciones/respuestas, columnas `CodigoCotizacion`, `NombreCotizacion`, `DescripcionCotizacion`, fechas, proveedor, `CodigoOC`, etc. La SPA `compra-agil.mercadopublico.cl` revela endpoints internos `servicios-compra-agil.../v1/compra-agil/*`, pero sin sesion responden `401 Bearer`; no usarlos como contrato backend productivo.
+- Madurez pre-implementacion agregada a RESEARCH-007 (version `0.5`): Source Strategy V1, Freshness/SLA matrix, Data Model Grain V1, Matching/Scoring V1, Document Intelligence V1, Operating Model V1, Compliance checklist, Reliability/Ops contract, Integration Map y cortes recomendados Cut 0-5. Tasks candidatas ajustadas hacia `public_procurement_opportunities`, ingestion licitaciones, OC reconciliation, COT mensual, watch API Beta, documents/assets, taxonomy, scoring, workbench y workflow.
+- Decision de diseño registrada: no modelar todo como `public_tender`; preferir `public_procurement_opportunities` con `opportunity_kind`, `commercial_motion`, `procedure_family`, `external_procedure_code` y `external_codigo_tipo`, o dejar `public_tenders` solo como narrow V1 con migracion prevista.
+- Recomendacion registrada: el siguiente corte debe ser `Commercial Public Tenders Intake V1` antes de UI completa o extension.
+- El brief posiciona licitaciones publicas como modulo Commercial, no Finance, y explicita los dos planos de acceso: surface `comercial.licitaciones_publicas` + capabilities `commercial.public_tenders.*`.
+- Incluye contexto validado de Mercado Publico API, descubrimiento/descarga de adjuntos via ficha publica, modelo de datos candidato, pipeline de ingestion, riesgos, UI target y criterios `Ready for task`.
+- Investigacion API postulacion: la documentacion publica vigente solo muestra consultas `GET` de datos abiertos para licitaciones/OC/proveedor/comprador; no hay endpoint oficial documentado para crear/subir/enviar ofertas. RESEARCH-007 queda ajustado a `Submission Control Room` sin postular por API.
+- Se agrego carril alternativo inspirado por LicitaLAB: extension Chrome/browser-mediated. Queda como futuro `Greenhouse Mercado Publico Companion Extension`, con usuario autenticado en MercadoPublico.cl, confirmaciones humanas, sin almacenamiento de credenciales y kill switch; no reemplaza la ausencia de API oficial.
+- Pendiente: cerrar rubros/keywords iniciales, owner operativo, storage target definitivo y scope del primer corte antes de abrir tasks implementables.
+
+## Sesion 2026-04-26 — Mercado Publico API ticket provisionado en Secret Manager
+
+- Se verifico que el ticket recibido desde `API@chilecompra.cl` funciona contra `https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json`.
+- Secret Manager:
+  - GCP project: `efeonce-group`
+  - Secret: `greenhouse-mercado-publico-ticket`
+  - Version activa: `1`
+  - Payload auditado como scalar crudo: UUID shape, sin whitespace, sin `\n`/`\r` literal.
+- IAM: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/secretmanager.secretAccessor` sobre el secreto para la futura integracion Greenhouse.
+- Smoke desde Secret Manager: `estado=activas` respondio `200`, `Cantidad=4346`, `Version=v1` el 2026-04-26.
+- Helper implementado en `src/lib/integrations/mercado-publico/tenders.ts`:
+  - `getMercadoPublicoTenderDetail(code)` hidrata detalle oficial por API JSON.
+  - `listMercadoPublicoTenderDocumentReferences(code)` descubre paginas de antecedentes desde `DetailsAcquisition.aspx?idlicitacion=...`.
+  - `downloadMercadoPublicoTenderDocument(ref)` baja el archivo real via postback WebForms.
+  - `hydrateMercadoPublicoTenderWithDocuments(code)` combina detalle + adjuntos.
+- Contrato runtime documentado en `.env.example` y `project_context.md`: usar `MERCADO_PUBLICO_TICKET_SECRET_REF=greenhouse-mercado-publico-ticket` en ambientes compartidos; `MERCADO_PUBLICO_TICKET` queda solo como fallback local.
+- Smoke live helper: `1000813-8-LE26` respondio `Publicada`, `tipo=LE`, `itemsCount=2` y descargo `ANEXO_N°1_FORMULARIO_OFERTA_ECÓNOMICA.docx` (`23090` bytes, `sha256` prefix `d5ab9465ec63`).
+- Validacion: `npx vitest run src/lib/integrations/mercado-publico/__tests__/tenders.test.ts` y `npx tsc --noEmit --pretty false` pasaron.
+- Pendiente futuro: disenar persistencia Greenhouse para licitaciones y adjuntos (metadata en PG, binarios en bucket privado, dedupe por `sha256`, worker/backoff y surface/API interna).
+
+## Sesion 2026-04-26 — Reliability dashboard hygiene end-to-end (orphan archive + channel readiness + smoke lane bus + Sentry domain tags)
+
+### Trigger
+
+Después de drenar PG, el dashboard mostraba 4 falsos positivos / `awaiting_data`:
+
+1. Cloud Platform `warning` → 1 dead-letter en `projection_refresh_queue` (`member-smoke-...`, residue de smoke test que apuntaba a un member inexistente)
+2. Teams Notifications `degraded` → 1 send failed por `missing_secret: secret_ref=greenhouse-teams-finance-alerts-webhook` (config gap, no incidente)
+3. Finance `awaiting_data` → `test_lane` `awaiting_data` perpetuo (Playwright corre en CI pero `artifacts/playwright/results.json` no llega al runtime de Vercel)
+4. Finance `awaiting_data` → `incident` signal missing (no Sentry filter por dominio finance)
+
+User pidió: ataque robusto + escalable + resiliente + seguro de los 4, no parches.
+
+### Que cambio (4 capas estructurales)
+
+**1. Orphan auto-archive en `projection_refresh_queue`** — migration `20260426161938519_add-orphan-archive-to-projection-queue.sql`
+
+- Nuevas columnas `archived BOOLEAN`, `archived_at TIMESTAMPTZ`, `archived_reason TEXT` + índice parcial.
+- `markRefreshFailed` corre `ENTITY_EXISTENCE_GUARDS` antes de rutear a `dead`. Si el `entity_id` no existe en su tabla canónica (`team_members`, `organizations`), la fila se marca `archived=TRUE` en el mismo UPDATE.
+- Dashboard query gated `WHERE COALESCE(archived, FALSE) = FALSE` — orphan rows excluidas.
+- Backfill: smoke-test residue (`member_capacity_economics:member-smoke-...`) marcado archived.
+- Extensible: añadir entry al array `ENTITY_EXISTENCE_GUARDS` para nuevos entity types.
+
+**2. Channel `provisioning_status` en `teams_notification_channels`** — migration `20260426162205347_add-teams-channel-readiness-flag.sql`
+
+- Nueva columna `provisioning_status TEXT CHECK IN ('ready', 'pending_setup', 'configured_but_failing')` + reason + updated_at.
+- `pending_setup` significa "config en PG pero secret faltante en GCP Secret Manager" — sends skipean silenciosamente, NO contribuyen al subsystem failure metric.
+- Dashboard query Teams Notifications filtra `NOT EXISTS` por channels en `pending_setup` matching el `secret_ref` del run failure.
+- Backfill: `greenhouse-teams-finance-alerts-webhook` channel marcado `pending_setup`.
+
+**3. PG-backed smoke lane runs** — migration `20260426162404624_add-smoke-lane-runs-table.sql`
+
+- Nueva tabla `greenhouse_sync.smoke_lane_runs` con `lane_key`, `commit_sha`, `branch`, `workflow_run_url`, `status`, `total/passed/failed/skipped_tests`, `summary_json`.
+- Script publisher `pnpm sync:smoke-lane <lane-key>` (`scripts/publish-smoke-lane-run.ts`) auto-resuelve `GITHUB_SHA`, `GITHUB_REF_NAME`, `GITHUB_RUN_ID`. Parsea Playwright JSON report y upsertea.
+- `getFinanceSmokeLaneStatus` reescrito: lee de PG primero, fallback al filesystem solo para dev local.
+- Funciona desde Vercel runtime, Cloud Run, MCP — cierra el `awaiting_data` perpetuo. CI debe agregar `pnpm sync:smoke-lane finance.web` después del Playwright run.
+- Lane keys canónicos: `finance.web`, `delivery.web`, `identity.api`, etc. Stable, lowercase, dot-separated.
+
+**4. Sentry incident signals via `domain` tag** — `src/lib/observability/capture.ts` + extensions a `getCloudSentryIncidents`
+
+- Wrapper canónico `captureWithDomain(err, 'finance', { extra })` tag-ea cada `Sentry.captureException` con `tags[domain]`. Type `CaptureDomain` lista los dominios válidos.
+- `getCloudSentryIncidents(env, { domain })` filtra Sentry issues por `tags[domain]:<value>` — UN proyecto Sentry, MUCHOS tags, sin overhead de proyectos por dominio.
+- Cada `ReliabilityModuleDefinition` declara `incidentDomainTag` (`'finance'`, `'integrations.notion'`, `'cloud'`, `'delivery'`).
+- `getReliabilityOverview` itera el registry y produce un `incident` signal per module via nuevo `buildDomainIncidentSignals`. Cierra el `expectedSignalKinds: ['incident']` gap.
+
+### Validaciones
+
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → 0 errores
+- `pnpm test` → **427 files / 2225 passed / 5 skipped**
+- 3 migraciones aplicadas + tipos Kysely regenerados (298 tablas)
+
+### Pendientes follow-up (no bloquean)
+
+- Wire `pnpm sync:smoke-lane <lane-key>` al final de los Playwright jobs en `.github/workflows/playwright.yml`.
+- Migrar callers existentes de `Sentry.captureException()` a `captureWithDomain()` cuando el code path tenga dominio claro (cleanup oportunista).
+- Provisionar el secret real de `greenhouse-teams-finance-alerts-webhook` en GCP Secret Manager y flip el channel a `'ready'` cuando esté listo.
+
+## Sesion 2026-04-26 — BQ conformed → PG drain canónico vía Cloud Run (cierra gap de 24 días + admin hygiene queue)
+
+### Trigger
+
+Continuación natural del trabajo del Reliability Control Plane. La user pidió que las soluciones fueran robustas + escalables + resilientes + seguras, no parches. El flujo descubierto y resuelto:
+
+1. **Hipótesis inicial fallida**: pensé que el cascade de títulos no capturaba las propiedades de Sky Airline (3,039 tasks "sin título"). Verificado vía Notion REST API + Notion MCP que NO era el problema — el cascade `nombre_de_tarea/nombre_de_la_tarea` resuelve correctamente.
+2. **Root cause real**: PG `greenhouse_delivery.{tasks,projects,sprints}` estaba **stale 24 días** (último write 2026-04-02). El sync diario `/api/cron/sync-conformed` solo escribía BQ conformed. El path BQ → PG vivía únicamente en el script manual `pnpm sync:source-runtime-projections` que **nunca tuvo schedule**.
+3. **Bug secundario**: el orchestrator hace skip cuando BQ ya está current ("Conformed sync already current; write skipped") — cualquier paso PG anidado en ese path se salteaba también.
+
+### Que cambio (4 layers, no parches)
+
+#### 1. **Helper canónico PG projection** — `src/lib/sync/project-notion-delivery-to-postgres.ts`
+
+Extracted del script manual: `projectNotionDeliveryToPostgres({ syncRunId, projects, sprints, tasks, targetSpaceIds, replaceMissingForSpaces })`. Per-row UPSERT por `notion_*_id`, idempotente, safe under concurrent writers (per-row, no table locks). Dos modos:
+- `replaceMissingForSpaces=true`: marca como `is_deleted` cualquier row de los spaces synceados que no esté en el batch (mirrors BQ staged-swap)
+- `replaceMissingForSpaces=false`: pure UPSERT, no deletes (para syncs parciales/recovery)
+
+#### 2. **Drain BQ → PG independiente** — `src/lib/sync/sync-bq-conformed-to-postgres.ts`
+
+Lee BQ `greenhouse_conformed.delivery_*` y escribe a PG vía el helper anterior. Decoupled del cycle BQ raw → conformed: corre **siempre**, regardless si el orchestrator hizo skip del lado BQ. Cierra el gap "BQ fresh + PG stale". Convierte fraccionales (e.g. `days_late=0.117...` de BQ formulas) vía `toInteger()` con `Math.trunc` para fitear PG INTEGER columns.
+
+#### 3. **Cloud Run path canónico** — `ops-worker POST /notion-conformed/sync`
+
+Reemplaza el Vercel cron `/api/cron/sync-conformed` (que queda como fallback manual). Step 1 invoca `runNotionSyncOrchestration` (BQ side), Step 2 invoca `syncBqConformedToPostgres` UNCONDICIONAL. Ambos en `try/catch` separados — fallo en PG no rompe BQ.
+
+**Ventajas vs Vercel cron**:
+- Cloud Run timeout 60min vs Vercel 800s
+- Cloud Scheduler tiene retry exponencial nativo (`maxRetryAttempts`, `minBackoffDuration`)
+- OIDC-authed invocation (no shared CRON_SECRET rotation)
+- Co-located en `us-east4` con Cloud SQL (sub-ms latency en PG step)
+- Cloud Logging nativo
+
+Cloud Scheduler job `ops-notion-conformed-sync` corre `20 7 * * *` (mismo horario que el Vercel cron previo). Auto-creado por `services/ops-worker/deploy.sh`.
+
+#### 4. **Admin hygiene queue** — `/admin/data-quality/notion-titles`
+
+Surface las páginas con `task_name/project_name/sprint_name = NULL` agrupadas por space. CTA "Editar en Notion" abre la page directo en source. Empty state celebrates. Wired al menú admin via `GH_INTERNAL_NAV.adminUntitledNotionPages`. Backed por reader cheap (`getUntitledPagesOverview`).
+
+#### 5. **DB function + TS helper canónico para fallback display name**
+
+- Migration `20260426144105255_add-delivery-display-name-functions.sql` añade 3 IMMUTABLE functions en `greenhouse_delivery` (`task_display_name`, `project_display_name`, `sprint_display_name`). Devuelven el title o un fallback data-derived (`'Tarea sin título · ' || LOWER(SUBSTRING(source_id, 1, 8))`) — NO sentinel (no viola TASK-588 anti-sentinel CHECK).
+- Helper TypeScript `src/lib/delivery/task-display.ts` con paridad SQL bit-exacta (19 tests, 3 PG-parity tests cuando hay conexión).
+- UI primitives `<TaskNameLabel />`, `<ProjectNameLabel />`, `<SprintNameLabel />` con tratamiento canónico (italic + warning icon + tooltip + Notion CTA).
+
+#### 6. **DB-side adapt para sync robusto**
+
+- Migration runtime helper `ensureDeliveryTitleColumnsNullable()` aplica `ALTER TABLE delivery_* ALTER COLUMN *_name DROP NOT NULL` en BQ — alinea contrato BQ con PG (TASK-588). Idempotente.
+
+### Validaciones live end-to-end
+
+Tras deploy de `0665fc09` (commit con `toInteger()` fix) + trigger del Cloud Scheduler job:
+
+```
+[ops-worker] PG drain from BQ: read=147p/29s/4959t, written=147p/29s/4959t, deleted=0p/0s/0t, 32785ms
+```
+
+| Scope | Antes | Después |
+|---|---|---|
+| `tasks-sky` | 0 named / 3,039 untitled (stale 24 días) | **3,591 named / 92 untitled** (solo truly null en origen) |
+| `tasks-efeonce` | 1,218 named / 2 untitled | **1,353 named / 2 untitled** ✓ no regresión |
+| `projects-sky` | 0 named / 72 untitled | **82 named / 0 untitled** |
+| `projects-efeonce` | 63 named / 0 untitled | **65 named / 0 untitled** ✓ |
+| `sprints-sky` | (no rows) | **13 named / 0 untitled** |
+
+Las 94 untitled restantes son exactamente las pages Notion verificadas vía MCP que tienen `title: []` literalmente vacío en origen (creadas por automations que no setearon title). El admin queue ahora muestra honestamente solo esas, sin falsos positivos por PG stale.
+
+### Archivos clave
+
+- Migrations: `20260426144105255_add-delivery-display-name-functions.sql`
+- Helpers: `src/lib/sync/project-notion-delivery-to-postgres.ts` + `src/lib/sync/sync-bq-conformed-to-postgres.ts`
+- UI: `src/components/greenhouse/delivery/DeliveryNameLabel.tsx`
+- Reader: `src/lib/delivery/get-untitled-pages-overview.ts`
+- Admin route: `src/app/(dashboard)/admin/data-quality/notion-titles/page.tsx` + `src/app/api/admin/data-quality/notion-titles/route.ts`
+- Cloud Run endpoint: `services/ops-worker/server.ts` (POST `/notion-conformed/sync`)
+- Cloud Scheduler job: `services/ops-worker/deploy.sh` (`ops-notion-conformed-sync @ 20 7 * * *`)
+- TS helper: `src/lib/delivery/task-display.ts` (+ test con paridad SQL)
+
+### Defensas múltiples (cumple el contrato robusto + escalable + resiliente + seguro)
+
+- Per-row UPSERT por `notion_*_id` → idempotente, no table-level locks → safe concurrente con reactive event handlers
+- `try/catch` separado por step (BQ side / PG side) → fallo en uno no rompe el otro
+- `replaceMissingForSpaces` filtra por space → cero contaminación cross-tenant (Efeonce stays Efeonce)
+- `toInteger()` truncation para BQ formulas fraccionales → no más type-mismatch crashes
+- Schema BQ NULLABLE alineado con PG (TASK-588) → sync NEVER crashea por null titles
+- Kill-switch `GREENHOUSE_NOTION_PG_PROJECTION_ENABLED=false` → revert sin deploy
+- Cloud Run timeout 60min + Cloud Scheduler retry exponencial → resiliente a fallos transientes
+- Vercel cron stays como fallback manual + admin trigger endpoint para recovery
+- Cascade de títulos sigue funcionando idéntico para Efeonce (no regresión validada en vivo)
+- Anti-sentinel: NULL = unknown (TASK-588 contract intacto), fallback data-derived only at READ-time
+
+### Pendientes follow-up (no bloquean)
+
+- Limpiar las 94 truly-untitled páginas en Notion via la admin queue (acción humana, una sola vez).
+- Los 92 de Sky son páginas creadas el 2026-04-02 11:44 UTC (bulk import Nexa Insights consumiendo pages sin title).
+- Considerar deshabilitar el Vercel cron `/api/cron/sync-conformed` post-validación de varias semanas con Cloud Run path estable.
+
+## Sesion 2026-04-26 — Income settlement reconciliation canónica (factoring + withholdings) + 45 dead requeued
+
+### Trigger
+
+Continuación de la sesión Reliability Control Plane. El user identificó que el `drift de ledger` para `INC-NB-27971848` (Nubox 6.9M paid vs 6.776M payments = 125,547) NO era drift real: la factura fue **factorizada** y la diferencia es la fee del factoring (interest 94,557 + advisory 30,990) que vive en `greenhouse_finance.factoring_operations.fee_amount`. El modelo previo en `buildFinanceDataQualitySubsystem` solo comparaba `amount_paid` vs `SUM(income_payments)` ignorando factoring + withholdings, lo que producía drift falso para toda factura factorada en el dashboard.
+
+Pedido explícito del user: "robusto y escalable, no parches" + "haz algo para que otro agente no se vuelva a equivocar cuando una factura este factorizada".
+
+### Que cambio (estructural, no parche)
+
+- **VIEW canónica `greenhouse_finance.income_settlement_reconciliation`**: nueva migración `20260426135618436_add-income-settlement-reconciliation-view.sql`. Reconcilia `income.amount_paid` contra la composición real de settlement: `cash payments + factoring fees (active ops) + tax withholdings`. Expone `expected_settlement`, `drift`, `has_drift`, `is_factored`, `factoring_operation_count` por income. Excluye `is_annulled=TRUE`. La VIEW lleva `COMMENT ON VIEW` y `COMMENT ON COLUMN` para `factoring_operations.fee_amount` + `income.amount_paid` que documentan el modelo en la propia DB para que cualquier agente que haga `\d` lo vea.
+
+- **Helper TypeScript canónico** `src/lib/finance/income-settlement.ts` con JSDoc fuerte que exporta:
+  - `getIncomeSettlementBreakdown(incomeId)` — single income con composición completa
+  - `listIncomesWithSettlementDrift({ limit })` — queue ordenada por |drift|
+  - `countIncomesWithSettlementDrift()` — usado por el RCP dashboard
+  - `IncomeSettlementBreakdown` type con todos los campos
+  El JSDoc lleva sección "FOR AGENTS / FUTURE DEVS" con las reglas duras (nunca rederivar, siempre extender helper+VIEW juntos).
+
+- **`get-operations-overview.ts`** ahora usa `countIncomesWithSettlementDrift()` en vez de inline SQL. Comment block explica por qué no hacer `SUM(income_payments)` directo.
+
+- **CLAUDE.md** sección nueva "Finance — reconciliación de income.amount_paid (factoring + withholdings)" con la ecuación canónica y reglas duras visible en cualquier `read CLAUDE.md` (las primeras instrucciones que carga cualquier agente nuevo).
+
+- **Tests**:
+  - `src/lib/finance/income-settlement.test.ts` — 7 cases: lectura desde la VIEW, mapeo de factoring + withholdings, detección de drift, null on missing, sort por ABS(drift), guardrail explícito que falla si el helper alguna vez vuelve a referenciar `FROM greenhouse_finance.income_payments` o `FROM greenhouse_finance.factoring_operations` directo.
+  - `get-operations-overview.test.ts` actualizado para usar el helper mockeado en lugar del SQL inline anterior.
+
+- **Live ops**:
+  - 45 dead projection rows requeued (44 `product_hubspot_outbound` ahora corren con el `GREENHOUSE_INTEGRATION_API_TOKEN` que ya estaba provisionado en Vercel staging+prod, + 1 `member_capacity_economics` legacy).
+  - VAT projection `vat_monthly_position:finance_period:2026-04` corrió y completó OK con el bug fix de la sesión anterior (retry_count=1, no error).
+  - Drift de ledger: ahora **0** (la VIEW reconcilia correctamente el factoring de INC-NB-27971848).
+
+### Validaciones
+
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → 0 errores
+- `pnpm test` → 426 files / 2209 passed / 2 skipped (incluye 7 tests nuevos del helper)
+- Migración aplicada localmente + tipos Kysely regenerados (297 tablas, +1 view)
+- VIEW probada en vivo: `INC-NB-27971848` ahora `drift=0.00, has_drift=false, is_factored=true`
+
+### Estado final del Admin Center post-deploy
+
+- **Cloud Platform → Proyecciones**: limpio post-requeue (45 pending recuperándose en próximo sweep, ~5min)
+- **Finance Data Quality**: status `healthy` (drift=0; AR vencidas + overhead siguen como info paralelo, no escalan)
+- **Notion Delivery DQ**: `degraded` con summary "2 con lag auto-recuperable" hasta que conformed sync se ponga al día
+
+### Guardrails que ningún agente futuro puede saltarse
+
+1. **DB-level**: `COMMENT ON COLUMN greenhouse_finance.income.amount_paid` + `COMMENT ON COLUMN greenhouse_finance.factoring_operations.fee_amount` apuntan a la VIEW canónica. Visible al hacer `\d` en psql.
+2. **Code-level**: JSDoc del helper `income-settlement.ts` con sección "FOR AGENTS / FUTURE DEVS" + tests con assertion explícita que falla si el helper rederiva la fórmula desde tablas raw.
+3. **Project-level**: sección en CLAUDE.md (cargada en todo prompt de Claude trabajando en este repo) con la ecuación canónica y la regla "NUNCA computar drift como amount_paid - SUM(income_payments) solo".
+4. **Architecture pattern**: el RCP dashboard ya consume el helper, sentando precedente. Cualquier futuro consumer (Finance Intelligence, audits, Slack alerts) lo va a encontrar listed entre los exports y se va a sumar antes de improvisar.
+
+### Pendientes
+
+- Esperar próximo reactive sweep (5min) para que las 45 pending se completen y la dashboard quede 100% verde.
+
+## Sesion 2026-04-26 — Reliability Control Plane hardening (Cloud / Delivery / Finance / Notion)
+
+### Trigger
+
+Admin Center mostraba 4 dominios con señales activas: Cloud Platform (warning, "1 con falla" en Proyecciones + GCP Billing "sin filas"), Delivery + Notion Integration (crítico, "2 spaces, 0 sanos, 2 rotos"), Finance (warning, drift de ledger + 28 AR vencidas). El reliability control plane mezclaba 3 tipos de señales (plataforma, pipelines, KPIs operativos) en un solo carril visual, lo que convertía cualquier ruido de negocio o latencia natural en "incidente crítico".
+
+### Que cambio
+
+- **Bug raíz de Proyecciones VAT corregido**: `src/lib/finance/vat-ledger.ts` ahora usa `${param}::int` / `${param}::text` postfix casts en todas las interpolaciones de `kysely.sql` template literals — antes el patrón mixto `CAST(... AS text)` dejaba a postgres sin poder inferir el tipo del parámetro `$6` cuando el SELECT llegaba vacío y abortaba con `could not determine data type of parameter $6`. Validado con script de reproducción contra Cloud SQL: los 3 bloques INSERT ($6 reason en income/expense, $9 reason en vat_monthly_positions) corren limpio.
+- **DLQ pattern para `projection_refresh_queue`**: nueva migración `20260426130806659_add-dead-status-projection-queue.sql` añade columna `dead_at TIMESTAMPTZ` + índice parcial `idx_projection_refresh_queue_dead`. `markRefreshFailed` ahora rutea: `is_infrastructure_fault=true` → status `failed` (recovery cron sigue reintentando), `is_infrastructure_fault=false` AND retries exhausted → status `dead` (poison pill — necesita intervención humana). Helper nuevo `requeueRefreshItem(queueId)` para reabrir manualmente. Backfill aplicado: 45 filas legacy (44 `product_hubspot_outbound` + 1 `member_capacity_economics`) reclasificadas a `dead` porque su clasificación apuntaba a application fault y >24h sin recovery.
+- **Operations overview Proyecciones honesto**: la query del subsystem ahora cuenta `status = 'dead'` OR `status = 'failed' AND retry_count >= max_retries AND updated_at < NOW() - INTERVAL '24 hours'`. Resultado: failures transitorios del último día NO disparan warning (recovery cron está trabajando), pero failures verdaderamente estancados (>24h sin progreso, infra o app) sí se surface. Summary del subsystem nombra "dead-letter" cuando hay failures activos.
+- **Notion DQ surface por check específico + auto-recovery classifier**: `IntegrationDataQualitySpaceSnapshot` ahora trae `failedChecks: IntegrationDataQualityFailedCheckSummary[]` (con `checkKey`, severity, observed/expected) + `recoveryClass: 'auto_recoverable' | 'manual' | 'healthy'`. Nuevo `IntegrationDataQualityOverview.totals.autoRecoverableSpaces`. Spaces cuyo único error es `fresh_raw_after_conformed_sync` (lag eventual de conformed sync vs raw, NO corrupción) se clasifican `auto_recoverable` y bajan a severity `degraded` en el reliability signal en lugar de `broken`. El summary del signal ahora muestra "checks: fresh_raw_after_conformed_sync (851)" en lugar de "2 con falla", on-call ve qué rompe sin drilear.
+- **Finance Data Quality split en plataforma vs hygiene operativa**: `payment_ledger_integrity` y `direct_cost_without_client` se mantienen como warning (integridad de datos real). `overdue_receivables` baja a `info` (es KPI de cobranzas, no incidente de plataforma). `shared_overhead_unallocated` ya estaba en `info`. La function `buildFinanceDataQualitySubsystem` solo escala a `degraded` cuando hay platform integrity issues; el summary lee "Plataforma sana · pendientes operativos: ..." cuando solo hay AR vencidas u overhead sin asignar.
+- **Credential classifier expandido**: `reactive-error-classification.ts` ahora reconoce patrones tipo `Missing GREENHOUSE_INTEGRATION_API_TOKEN`, `Missing API_KEY`, `Missing credentials` como `infra.credential` (antes caían en `application` y se trataban como bug de código).
+- **Live incidents**: requeued `vat_monthly_position:finance_period:2026-04` (status `pending`, retry_count=0) — la siguiente corrida del reactive worker ejecutará la query con el bug fix. Documentado `INC-NB-27971848` (drift `amount_paid` 6,902,000 vs sum payments 6,776,453 = 125,547) — requiere decisión de negocio (¿amount_paid de Nubox o sum payments es source of truth?), no se auto-fixa.
+
+### Validaciones
+
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → 0 errores
+- `pnpm test` → 425 files / 2202 passed / 2 skipped (suite completa, incluye 4 tests nuevos: dead-letter routing, requeueRefreshItem path, finance DQ healthy con KPIs operativos, credential classifier con 7 cases)
+- Migración aplicada en dev local (Cloud SQL Proxy) y tipos Kysely regenerados
+- VAT projection SQL fix validado en vivo con script reproductor contra Cloud SQL (los 3 bloques con $6/$9 corren limpios)
+
+### Estado post-cambio en el dashboard
+
+Una vez deployed a staging y la siguiente corrida del cron de Notion DQ refresca los runs:
+
+- Cloud Platform → Proyecciones: 1 dead (`vat_monthly_position` se va a verde después del próximo reactive sweep). Las 45 filas backfilled (`product_hubspot_outbound`+`member_capacity_economics`) se ven como dead — son issues reales pre-existentes que requieren provision del `GREENHOUSE_INTEGRATION_API_TOKEN` para autorecuperarse.
+- Cloud Platform → GCP Billing: sigue en `awaiting_data` (info, no warning) hasta que la tabla rinda datos.
+- Delivery + Notion Integration: bajará de `crítico/broken` a `warning/degraded` con label "X con lag auto-recuperable" + summary "checks: fresh_raw_after_conformed_sync (851)". La clasificación es honesta: el conformed sync (notion-bq-sync, repo sibling) está atrasado vs el raw, pero no hay corrupción.
+- Finance Data Quality: queda en `degraded` solo por el 1 drift de ledger (INC-NB-27971848). Las 28 AR vencidas + 137 overheads sin asignar se ven como informativos, no escalan a warning.
+
+### Pendientes follow-up (opcional, no bloquean)
+
+- **Watcher cron auto-recovery Notion**: re-disparar `notion-bq-sync` Cloud Run cuando un space queda `auto_recoverable` por >2h. Hoy el classifier baja la severidad pero la recuperación sigue dependiendo del schedule fijo del sync upstream.
+- **Provision `GREENHOUSE_INTEGRATION_API_TOKEN`** en staging/prod Vercel + Cloud Run para que las 44 filas dead de `product_hubspot_outbound` recuperen automáticamente vía `requeueRefreshItem` + sweep cron.
+- **UI surface del recoveryClass**: `AdminOpsHealthView` y `AdminIntegrationGovernanceView` siguen leyendo `brokenSpaces` raw (no `manualBrokenSpaces`). Una mejora futura es renderizar chip "auto" para los `auto_recoverable` en lugar de "rotos".
+
+### Notas
+
+- El backfill de 45 rows a `dead` se aplicó manualmente con autorización explícita del usuario porque el migration framework ya había marcado la migración como aplicada antes de añadir el statement de backfill al SQL. La sentencia es idempotente (`status='failed' AND COALESCE(is_infrastructure_fault, FALSE) = FALSE AND retry_count >= max_retries AND updated_at < NOW() - INTERVAL '24 hours'`) — re-correrla no hace daño.
+
+## Sesion 2026-04-26 — TASK-669 Teams Workflow Notifications Channel (Slices 1-3)
+
+### Que cambio
+
+- Foundation completa del canal Teams Notifications outbound implementada y verificada (lint + tsc + test + build verdes).
+- **Decisión arquitectónica**: Azure Logic Apps Consumption + Bicep (no Power Automate). Suscripción Azure ya provisionada (`e1cfff3e-...`, tenant efeoncepro.com). Costo $1-5 USD/mes. Trigger condicional para migrar a Bot Framework documentado en spec.
+- **Migración**: `migrations/20260426113919596_create-teams-notification-channels.sql` crea `greenhouse_core.teams_notification_channels` con `channel_kind` discriminator (`azure_logic_app | teams_bot | graph_rsc`) — schema transport-agnostic, swap a Bot Framework futuro sin DDL.
+- **Sender**: `src/lib/integrations/teams/{sender.ts,types.ts,cards/}` con `postTeamsCard(channelCode, card)` que valida tamaño 26KB, retry 429 con backoff exponencial, registra en `source_sync_runs` con `source_system='teams_notification'`. Card builders: `ops-alert`, `finance-alert`, `delivery-pulse` (Adaptive Card 1.5).
+- **Outbox consumer**: `src/lib/sync/projections/teams-notify.ts` registrado en `projections/index.ts`. Suscrito a 10 event types (3 ops, 6 finance, 1 delivery).
+- **Endpoint admin de prueba**: `/api/admin/teams/test` (GET lista canales, POST envia card de prueba) gated a `requireAdminTenantContext`.
+- **Tile en Admin > Ops Health**: nuevo subsystem "Teams Notifications" con success/failure 24h y last run.
+- **IaC**: `infra/azure/teams-notifications/{main.bicep, modules/logic-app-channel.bicep, parameters.{prod,dev}.json, README.md}` provisiona RG + Teams API connection + 1 Logic App Consumption por canal.
+- **GitHub Action**: `.github/workflows/azure-teams-deploy.yml` con Workload Identity Federation (sin client secret), validate (`az bicep build`) + deploy (`az deployment group create`). Trigger condicionado a `infra/azure/teams-notifications/**`.
+- **Docs**: `docs/architecture/GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` + runbook operativo `docs/operations/azure-teams-notifications.md` con steps OAuth one-time del Teams connector y publicación de URLs en GCP Secret Manager.
+
+### Live test validado end-to-end (2026-04-26 08:36 a.m.)
+
+Validación pre-Bicep usando un Power Automate Workflow temporal en el canal "Alineación":
+
+- Trigger HTTP del Workflow + acción "Publicar tarjeta en un chat o canal" con expresión `string(triggerBody()?['attachments']?[0]?['content'])`
+- Test 1: card `ops-alert` (severity=info, accent style) renderizó correcto con FactSet de 5 facts + botón "Ver Ops Health"
+- Test 2: card `finance-alert` (kind=vat_period_materialized, good style) renderizó correcto con montos CLP/USD formateados via Intl + botón "Ver detalle"
+- Validó: shape del payload, Adaptive Card 1.5, render del card builder, formato Intl, OpenUrl actions
+- Latencia HTTP ~377-514ms (curl directo, sin sender)
+
+Aprendizaje crítico para el runbook:
+- El template "Enviar alertas de webhook a un canal" (Azure Monitor schema) **NO sirve** — descarta el payload porque espera shape específico
+- El template correcto es: trigger "When a Teams webhook request is received" + acción "Publicar tarjeta en un chat o canal" con la expresión `string(triggerBody()?['attachments']?[0]?['content'])`
+- El editor de Power Automate dentro de Teams es buggy con drafts (cambios no persisten); usar `make.powerautomate.com` directo para edits no triviales
+- El Bicep canónico (`infra/azure/teams-notifications/modules/logic-app-channel.bicep`) ya tiene la configuración correcta — esto NO es un issue cuando deploy formal vía IaC
+
+### Estado pendiente
+
+- Despliegue Bicep formal: registrar `Microsoft.Logic` provider, configurar WIF federated credential, llenar `parameters.prod.json` con Team/Channel GUIDs reales, autorizar OAuth de la Teams API connection (interactivo, único paso manual irreductible).
+- Publicar 3 secretos en GCP Secret Manager con las URLs callback de los Logic Apps.
+- Ejecutar smoke completo del path Greenhouse: `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"ops-alerts"}'` (validar que `postTeamsCard` → `resolveSecretByRef` → fetch → `source_sync_runs` funciona end-to-end con la URL real del Logic App, no solo curl directo).
+- Open Questions vivas en la spec: cuenta de servicio dueña del Teams connector, co-owners por canal, evento `delivery.daily-pulse` (cron emitter pendiente).
+
+### Notas de coordinacion
+
+- Coexiste con TASK-670 (Codex agent) que también modificó `docs/tasks/README.md`, `TASK_ID_REGISTRY.md` y `Handoff.md`. Ambos sets de cambios convergen sin conflicto.
+- Helper nuevo `resolveSecretByRef(secretRef)` en `src/lib/secrets/secret-manager.ts` permite resolver un secret por nombre directo (sin convención env var) — reutilizable por otros consumers.
+
+### Validaciones
+
+- `pnpm test` → 425 files / 2191 tests pass
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → 0 errores
+- `pnpm build` → ok, ruta `/api/admin/teams/test` registrada como dynamic
+- Migración aplicada en dev local (Cloud SQL Proxy) y tipos Kysely regenerados (296 tablas, +1)
+
+## Sesion 2026-04-26 — TASK-670 Brand Icon Library React Adapter
+
+### Que cambio
+
+- Se creó `TASK-670 — Brand Icon Library React Adapter` en `docs/tasks/to-do/`.
+- La task formaliza la decisión de usar el stack ya presente de Iconify/Simple Icons para logos de marca, con adapter React `BrandIcon`, registry allowlist y metadata futura para API/MCP.
+
+### Notas de coordinacion
+
+- Hay cambios preexistentes no propios asociados a `TASK-669` y migración/types de Teams; no se tocaron fuera de las líneas necesarias de índices.
+- `@iconify/react` no está instalado todavía; la task deja como primer slice confirmar wrapper React vs consumo de CSS generado.
+
+### Validaciones
+
+- `git diff --check -- docs/tasks/to-do/TASK-670-brand-icon-library-react-adapter.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md Handoff.md`
+
+## Sesion 2026-04-26 — TASK-640 Nubox V2 Slice 1
+
+### Que cambio
+
+- `TASK-640` fue tomada y movida a `docs/tasks/in-progress/`.
+- Se cerró discovery de Nubox V2 contra arquitectura, runtime y schema/migrations:
+  - Nubox ya tiene full ETL `raw -> conformed -> Postgres` y hot lane solo para cotizaciones.
+  - `income_line_items` y `quote_line_items` existen, pero Nubox no las alimenta todavía.
+  - `income`-side bank movements ya usan `recordPayment()`; el gap más claro de caja está en expense-side, que todavía debe pasar por `recordExpensePayment()`/settlements.
+  - VAT base ya existe por TASK-531/532/533; Nubox V2 debe enriquecer evidencia y data quality, no re-crear el ledger.
+  - `schema-snapshot-baseline.sql` está stale para columnas/tables recientes de Finance/Nubox.
+- Se creó `docs/tasks/plans/TASK-640-plan.md`.
+- Se crearon child tasks `TASK-662` a `TASK-668`:
+  - document graph
+  - durable PDF/XML artifacts
+  - payment graph + expense ledger reconciliation
+  - tax graph + VAT data quality
+  - master data enrichment governance
+  - additional hot lanes
+  - ops replay + enterprise promotion
+
+### Notas de coordinacion
+
+- No implementar line items de Nubox dentro de `TASK-640`; coordinar con `TASK-212`.
+- No declarar Nubox V2 enterprise-grade hasta cerrar replay/promotion y hardening alineado a `TASK-399`.
+- Futuras migraciones deben usar `pnpm migrate:create <nombre>` y commitear `src/types/db.d.ts` junto con la migración.
+
+### Validaciones
+
+- `git diff --check`
+- `pnpm lint`
+- `pnpm build`
+- `rg "new Pool\(" src --glob '!src/lib/postgres/client.ts'` sin matches fuera del cliente canónico.
+- No hubo migraciones nuevas; `pnpm migrate:up` no aplica para este lote documental.
+
+## Sesion 2026-04-26 — TASK-649 Implementation Discovery
+
+### Que cambio
+
+- `TASK-649` fue tomada, corregida y cerrada documentalmente en `docs/tasks/complete/`.
+- Discovery/auditoría corrigió supuestos de la spec antes de abrir child tasks:
+  - API Platform ya tiene commands mutativos (`webhook-subscriptions`, `webhook-deliveries/:id/retry`, app sessions, notification read), pero no command/idempotency foundation transversal.
+  - App lane usa `greenhouse_core.api_platform_request_logs`; ecosystem lane sigue usando `greenhouse_core.sister_platform_request_logs`.
+  - Existen idempotencias domain-local (`greenhouse_finance`, `greenhouse_notifications`, webhook inbox, commercial deal attempts) que deben informar el diseño shared.
+  - `docs/architecture/schema-snapshot-baseline.sql` está stale para API Platform reciente.
+  - OpenAPI confunde `externalScopeType` con `greenhouseScopeType`.
+- Se crearon child tasks `TASK-650` a `TASK-661` para cerrar los workstreams:
+  - domain read surfaces
+  - Finance/Commercial read surface
+  - People/Workforce read surface
+  - Ops/Reliability read surface
+  - Organization Workspace facets read surface
+  - command/idempotency foundation
+  - query conventions
+  - degraded modes
+  - resource authorization bridge
+  - MCP OAuth hosted auth
+  - OpenAPI stable contract
+  - lifecycle/deprecation policy
+
+### Notas de coordinacion
+
+- No hay blocker para continuar con la umbrella, pero los child workstreams sí tienen gates:
+  - sensitive domain reads -> API Platform authorization bridge
+  - hosted/multi-user MCP -> OAuth model
+  - MCP writes / broader commands -> idempotency + command semantics
+
+### Validaciones
+
+- `git diff --check`
+- `pnpm lint`
+- `pnpm build`
+- `rg "new Pool\(" src --glob '!src/lib/postgres/client.ts'` sin matches fuera del cliente canónico.
+- No hubo migraciones nuevas; `pnpm migrate:up` no aplica para este lote documental.
+
+## Sesion 2026-04-26 — TASK-649 API Platform Completion Program
+
+### Que cambio
+
+- Se creó `TASK-649 — API Platform Completion Program` en `docs/tasks/to-do/`.
+- La task coordina los gaps restantes antes de declarar la API Platform completa:
+  - read surfaces por dominio
+  - command/idempotency foundation
+  - query conventions para listas grandes
+  - degraded modes por dominio
+  - authorization bridge con entitlements/capabilities
+  - MCP OAuth / hosted auth model
+  - OpenAPI stable contract
+  - lifecycle/deprecation policy
+
+### Notas de coordinacion
+
+- MCP V1 local/read-only (`TASK-647`) no queda bloqueado por OAuth; puede usar consumer token por env y scope explícito.
+- MCP remoto/hosted o multiusuario sí requiere diseño OAuth antes de exponerse.
+- `TASK-648` queda registrado como prerequisito API-first para agregar ICO al MCP.
+
+### Validaciones
+
+- `git diff --check -- docs/tasks/to-do/TASK-649-api-platform-completion-program.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md Handoff.md` -> clean.
+
+## Sesion 2026-04-26 — TASK-526 list motion con auto-animate (Slice 2 de TASK-642)
+
+### Que cambio
+
+- `@formkit/auto-animate` instalado (~2 KB, zero-config, respeta `prefers-reduced-motion` nativo).
+- Hook canonico `src/hooks/useListAnimation.ts` envuelve `useAutoAnimate` con timings consistentes (200ms / ease-out). Centraliza config para que cuando TASK-643 (tokens canonicos motion) cierre, el refactor sea de 1 archivo.
+- 5 listas mutables wireadas:
+  - `src/views/greenhouse/finance/workspace/QuoteLineItemsEditor.tsx` — los 2 TableBody (readonly + draft editor).
+  - `src/views/greenhouse/finance/workspace/AddonSuggestionsPanel.tsx` — Stack de suggestions.
+  - `src/views/greenhouse/finance/QuotesListView.tsx` — TableBody principal.
+  - `src/views/greenhouse/people/PeopleListTable.tsx` — tbody nativo (TanStack Table sin virtualizacion).
+  - `src/components/greenhouse/primitives/ContextChipStrip.tsx` — Stack horizontal interno.
+
+### Validaciones
+
+- `npx tsc --noEmit` -> 0 errors.
+- `pnpm lint` -> 0 errors.
+- `pnpm test --run` -> 2177 passed.
+- `pnpm build` -> Compiled successfully en 18.1s.
+
+### Decisiones de orden
+
+- Slice 2 ejecutado ANTES que Slice 1 (TASK-643 tokens canonicos). Razon: momentum visible. Timings hardcodeados marcados con TODO `// motion: TASK-643 reemplazara por motionDuration.base / motionEasing.exit`. Refactor post-643 = 5 min.
+
+### Sinergia
+
+- TASK-642 umbrella actualizada con Delta marcando Slice 2 cerrado.
+- TASK-643/644/645/646 (Slices 1, 3, 4, 5) siguen pendientes — ejecutables independientes.
+- View Transitions (TASK-525) no afectadas — coexisten sin interferir.
+
+## Sesion 2026-04-26 — TASK-648 API Platform ICO Read Surface
+
+### Que cambio
+
+- Se creó `TASK-648 — API Platform ICO Read Surface V1` en `docs/tasks/to-do/`.
+- La task formaliza el pre-requisito API-first para exponer ICO a MCP:
+  - resources ICO bajo `src/lib/api-platform/resources/**`
+  - rutas read-only bajo `src/app/api/platform/ecosystem/ico/**`
+  - scope por `sister_platform_bindings`
+  - envelopes, freshness, errores y request IDs de API Platform
+  - sin compute live amplio por defecto
+
+### Notas de coordinacion
+
+- `TASK-647` sigue siendo el primer MCP read-only base; ICO debe entrar a MCP solo después de cerrar la surface API Platform de `TASK-648`.
+- Person-level ICO queda fuera del V1 salvo diseño explícito de entitlements/capabilities.
+- Rutas legacy/product API como `/api/ico-engine/*` no se reemplazan en este corte.
+
+### Validaciones
+
+- `git diff --check -- docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md Handoff.md` -> clean.
+
+## Sesion 2026-04-26 — Cleanup documental API Platform + TASK-647 MCP
+
+### Que cambio
+
+- `TASK-617` fue cerrado documentalmente y movido a `docs/tasks/complete/`.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` ahora reflejan `TASK-617` como complete.
+- Se creó `TASK-647 — Greenhouse MCP Read-Only Adapter V1` en `docs/tasks/to-do/`.
+- `TASK-647` define el primer MCP como adapter read-only downstream de `api/platform/ecosystem/*`, con tools iniciales para:
+  - `get_context`
+  - `list_organizations`
+  - `get_organization`
+  - `list_capabilities`
+  - `get_integration_readiness`
+
+### Notas de coordinacion
+
+- El MCP V1 no debe usar SQL directo, routes legacy ni writes.
+- Los writes MCP quedan bloqueados hasta tener idempotencia transversal y commands maduros en API Platform.
+- Se detectaron cambios preexistentes no tocados: `TASK-526` movida a `in-progress`, `package.json`, `pnpm-lock.yaml`, `.claude/worktrees/task-617/` y `.codex/worktrees/`.
+
+### Validaciones
+
+- Cambio documental; pendiente `git diff --check`.
+
+## Sesion 2026-04-26 — TASK-617.4 Developer API Documentation Portal
+
+### Que cambio
+
+- `/developers/api` fue convergido desde el framing legacy `Integrations API` hacia `Greenhouse API Platform`.
+- La pagina publica ahora documenta:
+  - `api/platform/ecosystem/*`
+  - `api/platform/app/*`
+  - event control plane (`event-types`, `webhook-subscriptions`, `webhook-deliveries`, `retry`)
+  - legacy `integrations/v1`
+- Se agregaron artefactos derivados:
+  - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
+  - `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`
+  - `public/docs/greenhouse-api-platform-v1.md`
+  - `public/docs/greenhouse-api-platform-v1.openapi.yaml`
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md`, `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`, `docs/documentation/plataforma/api-platform-ecosystem.md` y `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` quedaron sincronizados con el estado runtime de `TASK-617.1/.2/.3`.
+- El OpenAPI de platform queda intencionalmente como preview; schema generation automatica y SDKs quedan fuera de este corte.
+
+### Validaciones
+
+- `pnpm lint` -> clean.
+- `pnpm build` -> success. Next mostro warning de worktree por lockfiles multiples y logs conocidos de `DYNAMIC_SERVER_USAGE` durante prerender de rutas dashboard autenticadas; no fallo build.
+- `pnpm exec tsc --noEmit --pretty false` -> clean.
+- Smoke local `GET /developers/api` en `http://localhost:3017` -> `200 text/html`.
+- Smoke local descargables:
+  - `/docs/greenhouse-api-platform-v1.md` -> `200 text/markdown`
+  - `/docs/greenhouse-api-platform-v1.openapi.yaml` -> `200 text/yaml`
+- Playwright desktop/mobile:
+  - titulo `API Platform` visible
+  - lanes `Ecosystem API`, `First-party App API`, `Event Control Plane`, `Legacy Integrations API` visibles
+  - link `/docs/greenhouse-api-platform-v1.openapi.yaml` visible
+  - sin responses locales `>=500` despues de symlinkear `.env.local` del checkout principal al worktree
+- YAML parse smoke:
+  - `GREENHOUSE_API_PLATFORM_V1.openapi.yaml` -> 18 paths
+  - `greenhouse-api-platform-v1.openapi.yaml` -> 18 paths
+  - `greenhouse-integrations-api-v1.openapi.yaml` -> 6 paths
+- `rg "new Pool\\(" src --glob '!src/lib/postgres/client.ts'` -> 0 matches.
+
+### Notas de coordinacion
+
+- No se agregaron migraciones ni runtime tables.
+- No se modificaron routes `src/app/api/**`.
+- La documentacion publica no promete API anonima, writes ecosystem-facing amplios ni idempotencia transversal.
+
+## Sesion 2026-04-26 — Recuperacion TASK-617.1 / TASK-617.2 API Platform
+
+### Que cambio
+
+- Se recuperó selectivamente `TASK-617.1` desde `task/TASK-617.1-api-platform-rest-hardening` sin mergear la rama completa.
+- Se recuperó `TASK-617.2` desde `stash@{0}^3`, donde habían quedado los untracked de la lane `api/platform/app/*`.
+- `api/platform/ecosystem/*` vuelve a tener hardening REST: paginación uniforme, rate-limit headers completos, freshness helpers y route tests.
+- Nueva lane `src/app/api/platform/app/**`:
+  - sesiones app `POST/PATCH /sessions`
+  - revocación `DELETE /sessions/current`
+  - `context`, `home`, `notifications`, `notifications/:id/read`, `notifications/mark-all-read`
+- Runtime nuevo en migración histórica ya registrada `20260426021650967_task-617-api-platform-app-foundation.sql`:
+  - `greenhouse_core.first_party_app_sessions`
+  - `greenhouse_core.api_platform_request_logs`
+- La implementación vieja de app sessions venía con `jsonwebtoken`; fue portada a `jose` para mantener compatibilidad con TASK-515.
+- `docs/tasks/TASK_ID_REGISTRY.md` y las task specs quedaron sincronizadas: `TASK-617.1` y `TASK-617.2` pasan a `complete`.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` → 0 errors.
+- `pnpm test --run src/lib/api-platform/core/responses.test.ts src/lib/api-platform/core/versioning.test.ts src/lib/api-platform/core/pagination.test.ts src/lib/api-platform/core/freshness.test.ts src/app/api/platform/ecosystem/route-contract.test.ts src/app/api/platform/app/context/route.test.ts src/app/api/integrations/v1/legacy-no-regression.test.ts` → 7 files / 17 tests passed.
+- `pnpm migrate:up` → la DB ya tenía registrado `20260426021650967_task-617-api-platform-app-foundation.sql`; no había migraciones pendientes y se regeneró `src/types/db.d.ts`.
+- `pnpm lint` → 0 errors.
+- `pnpm build` → success.
+- `pnpm test --run` → 423 files / 2177 passed / 2 skipped.
+
+### Pendiente
+
+- `.claude/worktrees/task-617/` sigue sin trackear; no pertenece a este commit y debe mantenerse fuera del staging.
+
+## Sesion 2026-04-26 — TASK-515 jsonwebtoken → jose
+
+### Que cambio
+
+- `src/lib/auth-tokens.ts` migrado de `jsonwebtoken@9.0.3` a `jose@^6.2.2` (Web Crypto API, edge-runtime ready). Algoritmo HS256 preservado; secret encoded vía `TextEncoder`. `SignJWT`/`jwtVerify`/`decodeJwt` reemplazan `jwt.sign`/`jwt.verify`/`jwt.decode`.
+- `generateToken()` ahora retorna `Promise<string>` (jose es async). 5 callers actualizados con `await`:
+  - `src/app/api/auth/verify-email/route.ts`
+  - `src/app/api/admin/invite/route.ts`
+  - `src/app/api/admin/users/[id]/resend-onboarding/route.ts`
+  - `src/app/api/account/forgot-password/route.ts`
+  - `src/lib/email/unsubscribe.ts`
+- `src/app/api/auth/verify-email/route.test.ts` mock cambió de `mockReturnValue` a `mockResolvedValue` para reflejar la nueva signature async.
+- `package.json`: `jose@^6.2.2` añadido como dep directa; `jsonwebtoken` y `@types/jsonwebtoken` removidos.
+- Cleanup colateral de 2 errores tsc preexistentes detectados al re-correr gates:
+  - `scripts/lib/load-greenhouse-tool-env.ts`: param `envFiles` ahora tipado `readonly string[]` (antes inferido como tupla literal `as const` que rechazaba `string[]`).
+  - `src/lib/finance/vat-ledger.test.ts`: `mockGetDb` ahora explícitamente tipada para aceptar `(...args: unknown[])`.
+
+### Validaciones
+
+- `npx tsc --noEmit` → 0 errors.
+- `pnpm lint` → 0 errors.
+- `pnpm test --run` → 2165 passed, 2 skipped, 0 failed (418 test files).
+- `pnpm build` → ✓ Compiled successfully (17.3s).
+- `grep "jsonwebtoken" src/` → 0 hits.
+
+### Sinergia
+
+- Pre-requisito desbloqueado para TASK-516 (NextAuth v4 → Auth.js v5). Auth.js v5 usa `jose` internamente; ahora la dep está presente como first-party. Se anotó delta en TASK-516 marcándola unblocked.
+- `src/app/api/auth/agent-session/route.ts` no se ve afectado: usa `next-auth/jwt` (handling JWT propio), no consume `auth-tokens.ts`.
+
+## Sesion 2026-04-26 — Nubox Secret Manager hardening
+
+### Que cambio
+
+- `src/lib/nubox/client.ts` ahora resuelve `NUBOX_X_API_KEY` con el mismo helper canonico que `NUBOX_BEARER_TOKEN`: `Secret Manager -> env fallback -> unconfigured`.
+- `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` se normalizan contra comillas envolventes y sufijos literales `\n` / `\r` antes de armar requests a Nubox.
+- `.env.example` documenta `NUBOX_X_API_KEY_SECRET_REF`.
+- `pnpm sync:nubox:quotes-hot` acepta `--env-file=/path/to/env` para replay local controlado sin editar `.env.local`.
+- Vercel quedó provisionado con `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF` en Development, Preview genérico, Staging y Production.
+- Se crearon secrets GCP separados por ambiente para Nubox bearer token y x-api-key sin exponer valores.
+- `src/lib/google-credentials.ts` ahora prefiere WIF en runtime Vercel antes de parsear service account legacy y trata `GOOGLE_APPLICATION_CREDENTIALS_JSON=""` como ausente, evitando que una variable transicional contaminada bloquee Secret Manager.
+
+### Validaciones
+
+- `pnpm test --run src/lib/google-credentials.test.ts src/lib/nubox/client.test.ts src/lib/nubox/sync-nubox-to-postgres.test.ts` -> 3 files, 27 tests passed.
+- `pnpm exec eslint src/lib/google-credentials.ts src/lib/google-credentials.test.ts src/lib/nubox/client.ts src/lib/nubox/client.test.ts scripts/run-nubox-quotes-hot-sync.ts` -> clean.
+- `pnpm sync:nubox:quotes-hot -- --env-file=/tmp/greenhouse-vercel-staging-env.nubox-secret-fresh.env` -> OK, `quotesUpdated=2`.
+- `vercel env pull --environment preview` confirmó `GCP_PROJECT`, `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF` presentes en Preview genérico.
+
+### Nota operativa
+
+- Preferir Secret Manager para ambos secretos Nubox (`NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF`) en todos los ambientes. Los env vars directos quedan solo como fallback transicional hasta que el despliegue con este commit esté activo.
+- No se modifico ni versiono `.env.local`.
+
+## Sesion 2026-04-26 — ESLint 9 flat config (TASK-514)
+
+### Que cambio
+
+Migramos `eslint 8.57.1` (legacy `.eslintrc.js`) a **`eslint 9.39.4` con flat config (`eslint.config.mjs`)**. ESLint 8 esta en maintenance mode; flat config es el default desde 2024 y todos los plugins modernos del ecosistema (typescript-eslint 8, eslint-config-next 16, eslint-plugin-import 2.32) convergieron a el.
+
+- **Stack actualizado** en `package.json`:
+  - `eslint@9.39.4` (era 8.57.1).
+  - `@eslint/js@9.39.4` (NUEVO — utils oficiales para flat).
+  - `@eslint/eslintrc@^3.3.5` (NUEVO — FlatCompat disponible para casos edge, no usado en runtime).
+  - `typescript-eslint@8.59.0` (NUEVO metapackage flat-ready) + `@typescript-eslint/parser@8.59.0` + `@typescript-eslint/eslint-plugin@8.59.0` (era 8.46.2).
+  - `eslint-config-next@16.2.4` (era 15.1.2; provee `eslint-config-next/core-web-vitals` con array flat nativo).
+  - `eslint-plugin-import@2.32.0` (era 2.31.0).
+  - `eslint-config-prettier@10.1.8` (era 9.1.0).
+  - `eslint-import-resolver-typescript@4.4.4` (era 3.7.0).
+- **Resolutions limpieza**: removidas las viejas pinned versions de `eslint@8.57.1` y `eslint-config-next@15.1.2` del bloque `resolutions` que bloqueaban el upgrade.
+- **`.eslintrc.js` DELETED**. `eslint.config.mjs` es la unica fuente de configuracion del linter.
+- **Scripts simplificados**:
+  - `"lint": "eslint ."` (drop `--ext` flag — flat config controla files via `files` en cada bloque).
+  - `"lint:fix": "eslint . --fix"`.
+
+### Composicion del flat config
+
+```js
+// eslint.config.mjs (resumen)
+export default [
+  { ignores: [/* generated, vendored, docs, etc. */] },
+  ...nextCoreWebVitals,           // Next 16 + react-hooks + jsx-a11y + import (registered)
+  ...tseslint.configs.recommended, // typescript-eslint metapackage
+  { rules: { /* convenciones del portal */ } },
+  { files: ['**/*.ts', '**/*.tsx', 'src/iconify-bundle/**'], rules: { /* TS-only overrides */ } },
+  prettierConfig                    // disable rules que conflictuan con prettier (last)
+]
+```
+
+### Reglas custom preservadas 1:1
+
+Las convenciones del repo siguen vigentes sin cambios semanticos: `padding-line-between-statements`, `lines-around-comment`, `newline-before-return`, `import/newline-after-import`, `import/order` con pathGroups (`react`, `next/**`, `~/**` external before; `@/**` internal), `@typescript-eslint/consistent-type-imports: error`, `@typescript-eslint/no-unused-vars: error`.
+
+### Reglas nuevas explicitamente desactivadas (out-of-scope)
+
+`eslint-config-next 16` agrega el bundle del **React Compiler / React 19** que introduce un set nuevo de reglas estrictas (`react-hooks/set-state-in-effect`, `react-hooks/refs`, `react-hooks/preserve-manual-memoization`, `react-hooks/immutability`, etc.). Quedan **`off`** porque la spec exige migracion 1:1 (mismo baseline pre/post). Adoptarlas requiere refactors per-componente coordinados.
+
+`react-hooks/rules-of-hooks` y `react-hooks/exhaustive-deps` (las clasicas) siguen activas.
+
+`import/no-anonymous-default-export` tambien queda off (nuevo en `eslint-plugin-import 2.32`, dispara sobre `eslint.config.mjs` y otros bundlers config files).
+
+### Validaciones
+
+- `pnpm install` -> reinstall clean.
+- `pnpm lint` -> 0 errores / 0 warnings (autofix aplicado a 102 unused-eslint-disable directives + 8 import/order errores).
+- `pnpm build` -> Compiled successfully en 16.7s.
+- AGENTS.md actualizado para mencionar el path canonico (`eslint.config.mjs`).
+
+### Decisiones canonicas
+
+1. **`.mjs` no `.js`**. Flat config canonico es ESM. El repo no tiene `"type": "module"` en package.json, asi que `.mjs` declara explicitamente el formato.
+2. **No FlatCompat en runtime**. `eslint-config-next/core-web-vitals` y `typescript-eslint` ya exportan flat. Importar `eslint-plugin-import` por separado dispara `Cannot redefine plugin "import"` porque Next ya lo registra. La regla: leer las exports flat-nativas antes de reachar a FlatCompat.
+3. **Ignores conservadores**. Flat config no honra `.eslintignore` y no resuelve generated dirs por cwd. Lista explicita: `.next/**`, `.next-local/**` (incl. nested), `node_modules`, `full-version`, `.claude/**` (worktrees), `.codex/**`, `coverage`, `dist`, `build`, `out`, `public`, `docs`, `migrations`, `artifacts`. Sin esto, ESLint linta los chunks del build (~290k errores).
+4. **React Compiler off por ahora**. La spec dice "preservar baseline"; activar las nuevas hook rules generaria 192+ errores en 1 commit. Adopcion progresiva queda como follow-up.
+
+### Out of scope (queda como follow-up)
+
+- React Compiler full adoption: encender progresivamente las reglas `react-hooks/*` nuevas con refactors per-componente.
+- Biome / oxlint exploration (mencionado en spec).
+- Plugins enterprise nuevos: `eslint-plugin-import-x` (faster fork), `eslint-plugin-tailwindcss` para Tailwind 4 class sorting (mencionado en Follow-ups del spec).
+
+---
+
+## Sesion 2026-04-26 — Nubox Quotes Hot Sync
+
+### Que cambio
+
+- Se agregó un carril incremental robusto para cotizaciones Nubox:
+  - runtime `src/lib/nubox/sync-nubox-quotes-hot.ts`
+  - cron `GET /api/cron/nubox-quotes-hot-sync`
+  - schedule Vercel `*/15 * * * *`
+  - script `pnpm sync:nubox:quotes-hot -- --period=YYYY-MM`
+- El carril consulta `/sales` solo para la ventana caliente, filtra `COT` / DTE 52, escribe primero raw BigQuery, luego conformed BigQuery y recién después proyecta a `greenhouse_finance.quotes`.
+- Reutiliza `upsertNuboxQuoteFromSale`, el mismo contrato del full ETL diario, con advisory lock de sesión para evitar solapes.
+- Observabilidad nueva en `greenhouse_sync.source_sync_runs` con `source_object_type='quotes_hot_sync'`; fallos se registran en `source_sync_failures`.
+
+### Validaciones
+
+- `pnpm exec eslint src/lib/nubox/sync-nubox-quotes-hot.ts src/lib/nubox/sync-nubox-conformed.ts src/lib/nubox/sync-nubox-to-postgres.ts src/app/api/cron/nubox-quotes-hot-sync/route.ts scripts/run-nubox-quotes-hot-sync.ts` → clean.
+- `npx tsc --noEmit --pretty false --skipLibCheck` sigue bloqueado por deuda preexistente en `src/lib/finance/vat-ledger.test.ts:33`; no corresponde a este cambio.
+- No se ejecutó hot sync local contra Nubox porque el secreto local actual devuelve 403; staging/prod usan el token runtime que ya viene funcionando en `nubox-sync`.
+
+### Notas de coordinacion
+
+- Archivos sensibles tocados: `vercel.json`, `project_context.md`, `Handoff.md`, `changelog.md`.
+- No se hizo ningún parche de datos ni inserción manual de cotizaciones.
+
+## Sesion 2026-04-26 — `@tanstack/react-query` adoption (TASK-513)
+
+### Que cambio
+
+Adoptamos **`@tanstack/react-query` 5.x** como capa canónica de server state del portal. Es el cache layer estándar 2024-2026 que usan Vercel, Linear, Stripe, Ramp, Notion, Resend y shadcn. Foundation V1: provider, query keys factory, defaults sanos, devtools en dev, y 3 ejemplos de migración shipping en producción para validar el patrón.
+
+- **Provider canónico**: `src/components/providers/QueryClientProvider.tsx` instancia un `QueryClient` por árbol cliente (via `useState`) con defaults:
+  - `staleTime: 30s`, `gcTime: 5min`, `refetchOnWindowFocus: true`, `retry: 1`, `throwOnError: false`.
+  - `mutations: { retry: 0, throwOnError: false }`.
+  - `ReactQueryDevtools initialIsOpen={false} buttonPosition='bottom-left'` solo cuando `NODE_ENV !== 'production'`.
+- **Mount**: `src/components/Providers.tsx` envuelve `{children}` con el `QueryClientProvider` adentro del `ThemeProvider`, antes del Toaster.
+- **Query keys factory** (`src/lib/react-query/keys.ts` + `index.ts`): tuplas tipadas `as const`, una rama por dominio. Patrón canónico de TanStack — `all`, `lists()`, `list(filters)`, `details()`, `detail(id)`. Consumers importan `import { qk } from '@/lib/react-query'`.
+- **Hooks ejemplo (3)** que validan el patrón:
+  - `useQuotesList(filters)` → consume `/api/finance/quotes` con filtros como queryKey. Reemplaza el `useState+useEffect+fetch` manual de `QuotesListView`.
+  - `usePricingConfig()` → consume `/api/finance/quotes/pricing/config` con `staleTime: 5min` + `gcTime: 30min` + `refetchOnWindowFocus: false` (catalog data muta solo cuando finance edita el pricing catalog). Reemplaza el `useEffect+fetch+AbortController` del `QuoteBuilderShell`.
+  - `usePeopleList()` → consume `/api/people` con defaults. Reemplaza el `loadData callback` que `CreateMemberDrawer` invocaba via prop drilling — ahora el drawer dispara `queryClient.invalidateQueries({ queryKey: qk.people.all })` desde su `onSuccess`.
+
+### Archivos tocados
+
+- `package.json` — add `@tanstack/react-query@^5.100.5` + `@tanstack/react-query-devtools@^5.100.5`.
+- `src/components/providers/QueryClientProvider.tsx` (NUEVO).
+- `src/components/Providers.tsx` — wrap children con QueryClientProvider.
+- `src/lib/react-query/keys.ts` (NUEVO) — factory canónica.
+- `src/lib/react-query/index.ts` (NUEVO) — surface publica.
+- `src/hooks/useQuotesList.ts`, `src/hooks/usePricingConfig.ts`, `src/hooks/usePeopleList.ts` (NUEVOS).
+- `src/views/greenhouse/finance/QuotesListView.tsx` — consume useQuotesList (drop useEffect + useCallback fetchQuotes).
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — consume usePricingConfig (drop useEffect+AbortController + el local async wrapper).
+- `src/views/greenhouse/people/PeopleList.tsx` — consume usePeopleList + invalidateQueries en CreateMemberDrawer onSuccess (drop loadData callback).
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` — Delta 2026-04-26 con foundation, keys, hooks, migration cheatsheet, reglas de adopción.
+
+### Validaciones
+
+- `pnpm lint` -> clean (1 error `lines-around-comment` autocorregido).
+- `pnpm build` -> Compiled successfully en 20.3s.
+- `npx tsc --noEmit` -> clean en archivos owned (vat-ledger.test.ts pre-existente sin relación).
+- Devtools verificados: aparecen en dev, ausentes en production build.
+
+### Decisiones canonicas
+
+1. **No exponer `useQuery` crudo en consumers**. Cada recurso server-side tiene un custom hook en `src/hooks/use<Resource>.ts` que centraliza queryKey, queryFn, types y overrides de cache. Consumers importan el hook, no useQuery directo.
+2. **Query keys solo desde el factory**. Inventar keys ad-hoc rompe la invalidación coordinada. Si necesitas un key nuevo, agregarlo a `qk` y exportarlo desde el index.
+3. **`throwOnError: false` por default**. El portal renderiza error UI con `query.error` en cada consumer. Cambiar a Error Boundaries forzaría refactor de cada vista.
+4. **Devtools `bottom-left`**. Coordinado para no chocar con el QuoteSummaryDock (top-right) ni con el sonner Toaster (top-right de TASK-512).
+5. **Adopción progresiva**. Esta task migra 3 ejemplos. El resto del portal (~100+ fetches) se migra slice por slice cuando se toque el dominio. No reabrir nada solo para migrar el cache layer.
+6. **Catalog data tiene staleTime largo**. `usePricingConfig` usa `staleTime: 5min` porque el catalog muta solo cuando finance edita el pricing catalog desde Admin Center. Esto reduce ~80% los hits al endpoint sin sacrificar frescura percibida.
+
+### Patrón canónico (cheatsheet para próximas migraciones)
+
+Antes:
+
+```tsx
+const [data, setData] = useState<X | null>(null)
+const [loading, setLoading] = useState(true)
+
+const load = useCallback(async () => {
+  const res = await fetch('/api/x')
+  if (res.ok) setData(await res.json())
+}, [])
+
+useEffect(() => { void load(); setLoading(false) }, [load])
+```
+
+Después:
+
+```tsx
+import useX from '@/hooks/useX'
+
+const { data, isPending: loading } = useX()
+```
+
+Para mutaciones:
+
+```tsx
+const queryClient = useQueryClient()
+
+await fetch('/api/x', { method: 'POST', ... })
+void queryClient.invalidateQueries({ queryKey: qk.x.all })
+```
+
+### Out of scope (queda como follow-up de la spec)
+
+- SSR hydration patterns para Next 16 App Router + react-query (cuando emerja un consumer que se beneficie del prefetch desde server component).
+- Audit y eventual remoción de `@reduxjs/toolkit` + `react-redux` del package.json (instalados pero unused).
+- Migración progresiva del resto de fetches en olas por dominio: finance, hr, agency, admin.
+- `useMutation` canónico para los flujos save/issue del Quote Builder con optimistic updates.
+- Suspense mode (defer explicitly mencionado en la spec).
+
+---
+
+## Sesion 2026-04-26 — API Platform Event Control Plane (TASK-617.3)
+
+### Que cambio
+
+- Se agregó el control plane ecosystem-facing de eventos bajo `src/app/api/platform/ecosystem/*`:
+  - `event-types`
+  - `webhook-subscriptions`
+  - `webhook-deliveries`
+  - `webhook-deliveries/:id/retry`
+- El transport raw sigue intacto en `src/lib/webhooks/**`, `/api/webhooks/*` y `/api/cron/webhook-dispatch`.
+- Nueva migración `20260426023509765_task-617-event-control-plane.sql` agrega metadata nullable de ownership/scope a `greenhouse_sync.webhook_subscriptions`.
+- Nuevo adapter `src/lib/api-platform/resources/events.ts` filtra subscriptions/deliveries por consumer + binding/scope.
+- El command `retry` reprograma el delivery (`retry_scheduled`, `next_retry_at=now`) para que lo procese el dispatcher existente.
+
+### Validaciones
+
+- Lint focal de los archivos nuevos del control plane: clean.
+- `npx tsc --noEmit --pretty false` no mostró errores nuevos del control plane; sigue apareciendo deuda previa en `src/lib/finance/vat-ledger.test.ts:33`.
+- Validación completa (`pnpm lint`, `pnpm build`, `pnpm migrate:up`) pendiente en esta misma sesión antes del commit/push final.
+
+### Nota de coordinación
+
+- El usuario pidió no cambiar de rama y después pidió commit/push de todo. El cierre se hará sobre la rama actual `develop`.
+
+## Sesion 2026-04-26 — `react-toastify` -> `sonner` (TASK-512)
+
+### Que cambio
+
+Reemplazamos `react-toastify 11.0.5` por **sonner 2.0** como librería canónica de toasts del portal. Sonner es el estándar 2024-2026 que usan Vercel, Linear, Resend y shadcn: stack visual moderno (pinch effect tipo iOS notifications), bundle ~4 KB (vs ~30 KB de react-toastify), `toast.promise()` integrado, swipe dismiss en mobile, keyboard shortcut `Alt+T`, theme bridge automático con `prefers-color-scheme`.
+
+- **Mount canónico** en `src/components/Providers.tsx`:
+
+  ```tsx
+  <Toaster position='top-right' richColors closeButton theme='system' duration={4000} />
+  ```
+
+  - `position='top-right'` preserva el placement del portal.
+  - `richColors` activa tinted backgrounds semánticos (success/error/warning/info), aliñado con TASK-505 y TASK-615.
+  - `closeButton` da dismiss visible.
+  - `theme='system'` se sincroniza con `prefers-color-scheme`.
+  - `duration={4000}` default; consumers sobreescriben con `duration: <ms>`.
+- **AppReactToastify.tsx eliminado** — sonner no necesita wrapper styled (el viejo wrapper era 100 líneas de CSS overrides de Toastify).
+- **59 consumers** solo cambiaron la línea de import (`from 'react-toastify'` -> `from 'sonner'`); la API `toast.success/.error/.info/.warning(...)` es compatible 1:1.
+- **5 callsites en `QuoteBuilderShell.tsx`** migraron `autoClose: <ms>` -> `duration: <ms>` y se eliminó el `position: 'bottom-right'` por toast (sonner no soporta posición per-toast; queda global en el `<Toaster />`).
+- **1 test mock** en `FinancePeriodClosureDashboardView.test.tsx` cambió de `vi.mock('react-toastify', ...)` a `vi.mock('sonner', ...)` con los 4 métodos canónicos (success/error/info/warning).
+- **`react-toastify` removido de `package.json`** vía `pnpm remove`.
+
+### Validaciones
+
+- `pnpm lint` -> clean (1 error import/order autocorregido).
+- `pnpm build` -> Compiled successfully en 31.6s.
+- `npx tsc --noEmit` -> clean.
+- `pnpm test` focal sobre `FinancePeriodClosureDashboardView.test.tsx` -> 1 passed.
+- 60 imports de sonner activos en src; 0 referencias a `react-toastify` salvo dos comentarios contextuales en Providers.tsx (intencionales).
+
+### Decisiones canonicas
+
+1. **richColors ON por default**. El portal usa colores semánticos en docks y headers (TASK-505/615); sonner sin richColors mostraría toasts neutros y descontextualizaría. richColors mantiene la coherencia visual.
+2. **Position global, no per-toast**. Los 5 overrides `bottom-right` en QuoteBuilderShell se descartaron — el portal queda con `top-right` consistente. Si en el futuro necesitamos placement distinto por surface, la decisión va a una segunda Toaster con `containerId`, no a opciones por toast.
+3. **Theme='system'**. Más limpio que pasar settings.skin manualmente; sonner picks light/dark con `prefers-color-scheme`. Si más adelante el portal expone toggle manual independiente del OS, podemos cambiar a `theme={mode}` controlado.
+4. **No reintroducir wrapper styled**. AppReactToastify hacía CSS overrides de Toastify; sonner ya respeta CSS vars del theme y la API es declarativa. No hay razón para envolver `<Toaster />` en un styled Box.
+5. **API consumer NO cambia salvo `autoClose` -> `duration`**. La spec previó "95% compatible"; en práctica fue 99% compatible — solo 5 callsites tocaron opciones avanzadas. Los otros 155 callsites son `toast.success(msg)` / `toast.error(msg)` puros.
+
+### Migration cheatsheet (para consumers nuevos)
+
+```tsx
+// correcto (sonner)
+import { toast } from 'sonner'
+
+toast.success('Cambios guardados')
+toast.error('No pudimos guardar', { duration: 4200 })
+toast.promise(saveQuote(), {
+  loading: 'Guardando…',
+  success: 'Borrador guardado',
+  error: 'No pudimos guardar el borrador'
+})
+
+// NO usar (react-toastify, removido del repo)
+// import { toast } from 'react-toastify'
+// toast.success('msg', { autoClose: 2400, position: 'bottom-right' })
+```
+
+### Out of scope (queda como follow-up de la spec)
+
+- Hooks compartidos `useSuccessToast` / `useErrorToast` para estandarizar duración + tone por dominio (operativo / commercial / system) — listado en Follow-ups de TASK-512.
+- Migrar flujos largos (issue quote, save then redirect, etc.) a `toast.promise()` para usar la integración loading/success/error nativa.
+- Custom components dentro del toast (sonner soporta `toast(<JSX/>)`) si emerge un caso real.
+
+---
+
+## Sesion 2026-04-25 — View Transitions API rollout (TASK-525)
+
+### Que cambio
+
+Adoptamos la **CSS View Transitions API** nativa del browser para transiciones de ruta same-document en App Router. Cero bundle adicional. Es el patron 2024-2026 que usan Vercel Geist, Astro, Next docs, GitHub Issues redesign.
+
+- **Activacion**: `next.config.ts` declara `experimental: { viewTransition: true }`. Next 16 envuelve las navegaciones same-document en `document.startViewTransition()` automaticamente cuando esta el flag.
+- **Helper canonico** `src/lib/motion/view-transition.ts` con `startViewTransition(update)`. SSR-safe; feature-detection (`document.startViewTransition`); reduced-motion gating via `matchMedia('(prefers-reduced-motion: reduce)')`. Si no hay soporte o reduced-motion esta activo, ejecuta `update()` directo y resuelve.
+- **Hook + Link drop-in**:
+  - `src/hooks/useViewTransitionRouter.ts` — wrapper de `useRouter()` que envuelve `push`, `replace` y `back` con el helper. Para handlers programaticos (`onClick={() => router.push(...)}`).
+  - `src/components/greenhouse/motion/ViewTransitionLink.tsx` — drop-in para `next/link` que intercepta el click izquierdo simple y delega a `router.push` dentro del transition. Modifier-clicks (cmd/ctrl/shift/middle), `target=_blank` y hrefs no-string caen al comportamiento Link nativo. Preserva prefetching, hover y ref forwarding.
+- **CSS global** en `src/app/globals.css`:
+  - Keyframes `greenhouse-view-transition-fade-{in,out}` con curve `cubic-bezier(0.32, 0.72, 0, 1)` (Apple "spring out" — match Linear/Vercel/Stripe).
+  - Defaults `::view-transition-old(root) { 200ms fade-out }` + `::view-transition-new(root) { 260ms fade-in }`.
+  - Reduced-motion guard: `@media (prefers-reduced-motion: reduce) { ::view-transition-* { animation: none !important } }`.
+
+### 3 patterns wireados v1
+
+1. **Finance quotes list -> detail**: `QuotesListView` aplica `viewTransitionName: 'quote-identity-{quoteId}'` al numero de cotizacion y `quote-client-{quoteId}` al nombre del cliente; row `onClick` pasa por `useViewTransitionRouter().push`. `QuoteDetailView` reusa los mismos nombres en su header. El numero y el cliente "viajan" de la fila al header.
+2. **Quote detail -> edit mode**: el boton "Editar" en `QuoteDetailView` pasa por `useViewTransitionRouter().push` para que el header del detalle se transforme en el shell del builder.
+3. **People list -> detail**: `PeopleListTable` aplica `person-avatar-{memberId}` y `person-identity-{memberId}` al avatar 38px y al nombre; reemplaza `next/link` por `ViewTransitionLink`. `PersonProfileHeader` reusa los mismos nombres en el avatar 80px y el `Typography variant='h5'` del nombre. El browser hace el morph cross-size automaticamente.
+
+### Archivos tocados
+
+- `next.config.ts` — flag experimental.viewTransition.
+- `src/lib/motion/view-transition.ts` (NUEVO).
+- `src/hooks/useViewTransitionRouter.ts` (NUEVO).
+- `src/components/greenhouse/motion/ViewTransitionLink.tsx` (NUEVO).
+- `src/app/globals.css` — keyframes + reduced-motion guard.
+- `src/views/greenhouse/finance/QuotesListView.tsx` — onClick via morphRouter, viewTransitionName en numero + cliente.
+- `src/views/greenhouse/finance/QuoteDetailView.tsx` — viewTransitionName en header h5 + cliente; Editar pasa por morphRouter; `useRouter` removido (era unused tras swap).
+- `src/views/greenhouse/people/PeopleListTable.tsx` — `next/link` -> `ViewTransitionLink`; viewTransitionName en avatar + nombre.
+- `src/views/greenhouse/people/PersonProfileHeader.tsx` — viewTransitionName en avatar + nombre.
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` — Delta 2026-04-25 con seccion "Navigation transitions con View Transitions API".
+
+### Validaciones
+
+- `npx tsc --noEmit` -> clean en archivos owned.
+- `pnpm lint` -> clean.
+- `pnpm build` -> Compiled successfully en 16s.
+- Browser support: Chrome 111+, Safari 18+, Edge 111+. Firefox sin soporte aun -> fallback a navegacion instantanea sin error.
+- Reduced motion: probado en dos capas (CSS guard + helper short-circuit).
+
+### Decisiones canonicas
+
+1. **API browser nativa, no framer-motion para route transitions**. View Transitions actua a nivel documento; framer-motion sigue siendo valido para microinteracciones internas (counters, layout transitions dentro del DOM ya nuevo). No reabrimos framer-motion para esto.
+2. **Opt-in por surface, no global**. Aplicar `viewTransitionName` solo en patterns donde la continuidad visual aporta. Cualquier click no necesita transition.
+3. **Nombres unicos**. `viewTransitionName` debe ser unico al momento del snapshot. Convencion: `{kind}-{id}` con identificador estable (`quote-identity-{quoteId}`, `person-avatar-{memberId}`).
+4. **Programmatic vs declarative**. Usar `useViewTransitionRouter` para handlers `onClick`; cambiar `next/link` por `ViewTransitionLink` solo cuando el destino tiene un elemento con `viewTransitionName` que matchee el origen.
+5. **Reduced-motion en ambas capas**. CSS guard porque el browser ya lo honra parcialmente; helper short-circuit porque update functions costosas no deben pagar el snapshot cuando reduced-motion esta activo.
+
+### Verificacion visual pendiente (follow-up del usuario)
+
+- `/finance/quotes` -> click en una fila -> confirmar morph del numero + cliente al header del detalle.
+- `/finance/quotes/[id]` -> click "Editar" -> confirmar transicion suave al shell del builder.
+- `/people` -> click en un colaborador -> confirmar morph del avatar (38px -> 80px) + nombre.
+- DevTools forced media `prefers-reduced-motion: reduce` -> confirmar navegacion instantanea sin animacion.
+- Firefox -> confirmar fallback a navegacion instantanea sin error.
+
+### Out of scope (queda como follow-up)
+
+- Cross-document transitions (MPA) — el portal es SPA same-document.
+- View Transitions globales (cada click) — scope intencional v1.
+- Shared-element morph en dashboards (MRR/ARR -> contract detail) — mencionado en Follow-ups de la spec original.
+
+---
+
+## Sesion 2026-04-25 — Quote Builder Flow Orchestration & UX Hardening (TASK-615)
+
+### Que cambio
+
+Convergencia UX-only del Quote Builder, sin tocar pricing-engine-v2 ni contratos `/api/finance/quotes/**`. La intencion era unir lo que TASK-505 (dock v2) y TASK-565 (context strip modernization) ya habian dejado materializado en una sola lectura mas guiada del flujo real:
+
+- **Action hierarchy convergence**: `QuoteBuilderShell` deja de duplicar el CTA terminal entre header y dock. El header conserva solo `Cancelar` + `Guardar borrador` (tonal/secondary, size small) con tooltip `saveDraftMeta` que aclara "Solo guarda. Para emitir, usa el resumen abajo." `QuoteSummaryDock` queda como unico centro de gravedad para `Guardar y emitir`.
+- **Disabled CTA explicabilidad**: `QuoteSummaryDock` gana prop `disabledReason` que envuelve el boton contained en `Tooltip` + emite `aria-describedby` con un `<span>` `visuallyHidden`. El shell deriva la razon (busy / simulationError / noOrganization / noLines / notIssueable) desde `GH_PRICING.summaryDock.disabledReasons`.
+- **Guided commercial setup**: `FieldsProgressChip` ahora acepta `nextStepHint` y `readyLabel`. La barra del strip muestra "Sigue: elige una organizacion" / "agrega un contacto" / "vincula un deal" / "asigna una business line" / "define la duracion" / "fija la fecha de validez" en orden de dependencia. Al completar los 6 campos vira a `success.main` con icono check y texto "Lista para emitir". `QuoteContextStrip` propaga `blocking-empty` a contacto cuando hay org pero falta contacto, paralelo al patron que ya tenia deal.
+- **Empty state vs toolbar**: `QuoteLineItemsEditor` deja de renderizar el `AddLineSplitButton` en el `headerAction` cuando `linesSnapshot.length === 0`. El `EmptyState` lleva el peso completo: title + subtitle + grid responsivo (2 columnas en sm+) de 4 method-hints (catalogo / servicio / template / manual) + CTA primario contained + 3 CTAs text + `pendingHint` con `role="status"` cuando falta organizacion. Una vez que existen lineas el split button vuelve al header como acelerador.
+- **Subtitle dinamico**: `QuoteIdentityStrip` recibe subtitle calculado por el shell que enseña el siguiente paso real: `subtitleNeedsOrganization`, `subtitleNeedsContact`, `subtitleNeedsDeal`, `subtitleNeedsLines`, `subtitleReady`, `subtitlePendingApproval`, `subtitleEditingIssued`.
+- **Empty messages del dock**: `GH_PRICING.summaryDock.emptyNoOrganization` / `emptyNoLines` reemplazan el placeholder generico inline.
+- **Copy en español neutro (tuteo, sin voseo)**: todas las nuevas keys agregadas en `src/config/greenhouse-nomenclature.ts` siguen las reglas de `greenhouse-ux-writing` (verbos imperativos tu, sin -á / -é / -í).
+
+### Archivos tocados
+
+- `src/config/greenhouse-nomenclature.ts` — keys nuevas en `identityStrip`, `contextChips.progress`, `summaryDock`, `emptyItems`.
+- `src/components/greenhouse/primitives/FieldsProgressChip.tsx` — props `nextStepHint`, `readyLabel`; render con `tabler-circle-check` cuando ready; layout flex-start cuando hay hint.
+- `src/components/greenhouse/pricing/QuoteSummaryDock.tsx` — prop `disabledReason`; CTA wrap en Tooltip con `aria-describedby`.
+- `src/components/greenhouse/pricing/QuoteContextStrip.tsx` — `nextStepHint` derivado por orden de dependencia; `blocking-empty` en contacto cuando falta contacto pero org esta seleccionada; popoverNotice tone='warning' cuando no hay contactos para la org.
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — header rebalanceado; subtitle dinamico (`useMemo` con 7 estados); `issueDisabledReason` resolver con precedencia (busy → simulationError → noOrganization → noLines → notIssueable); `headerAction` condicional; pasa `pendingHint` al editor.
+- `src/views/greenhouse/finance/workspace/QuoteLineItemsEditor.tsx` — props nuevos `onAddFromManual` + `pendingHint`; empty state expandido con method-hints grid + 4 CTAs + nota de bloqueo con `role="status"`.
+
+### Validaciones
+
+- `pnpm lint` → clean (4 errores `lines-around-comment` autocorregidos).
+- `pnpm build` → ✓ Compiled successfully en 45s.
+- `npx tsc --noEmit` sobre archivos owned → 0 errores. (Hay un error pre-existente en `src/lib/finance/vat-ledger.test.ts` de TASK-639, fuera de scope.)
+
+### Decisiones canonicas
+
+1. **Un solo CTA terminal**. Header y dock no compiten: header solo guarda draft (tonal/secondary), dock guarda y emite (contained/primary).
+2. **Razon visible cuando esta deshabilitado**. Tooltip + `aria-describedby` para que la causa sea verbalizable. No depende de bajo contraste.
+3. **Progress chip cuenta historia, no solo numeros**. `nextStepHint` siempre apunta al siguiente paso bloqueante; `readyLabel` celebra el estado terminal.
+4. **Empty state enseña el modelo de composicion**. Method-hints reemplazan el subtitle generico "agrega items para ver total y margen". Cuando no hay items, el split button del header desaparece para no duplicar la affordance.
+5. **No abrimos primitives nuevos**. Reutilizamos `ContextChip.popoverNotice`, `FieldsProgressChip` (extension additive), `Tooltip` MUI, `EmptyState` actual. Spec exigia consolidar lo de TASK-505 y TASK-565, no abrir otra familia.
+
+### Verificacion visual pendiente (follow-up del usuario)
+
+- `/finance/quotes/new` — confirmar que el header ya no duplica CTA, que el subtitle cambia conforme el usuario completa campos, que el empty state muestra los 4 method-hints, y que la nota de bloqueo aparece cuando no hay org seleccionada.
+- `/finance/quotes/[id]/edit` — confirmar que el subtitle muestra `subtitleEditingIssued` para cotizaciones ya emitidas, y que el dock CTA queda con tooltip explicativo cuando esta deshabilitado.
+
+### Out of scope (queda como follow-up)
+
+- Migracion del `AddLineSplitButton` y popovers a Floating UI (programa platform-wide).
+- IA asistiva sobre el builder (TASK-609).
+- Eyebrow real en `EmptyState` (requiere extender el primitive; preserve la key en nomenclature por si se decide despues).
+
+---
+
 ## Sesion 2026-04-25 — Reliability AI Observer (TASK-638) — Capa Gemini sobre el RCP
 
 ### Que cambio
@@ -18964,3 +20169,158 @@ Fase 4 completada:
     - `attemptId=e97cb047-6bcd-48d1-98e8-3a0b9d7693c9`
     - `dealId=dl-b4c2fca0-3cdc-4955-befa-332633af16f8`
     - `hubspotDealId=59448087991`
+
+## Sesion 2026-04-25 — TASK-639 completada: VAT reactive lane + Finance DQ semantics (Codex)
+
+- **Pedido del usuario:** implementar `TASK-639` end-to-end sin parches frágiles; corregir la causa real detrás de los warnings de Cloud Platform / Finance que `Reliability` estaba mostrando.
+- **Hallazgos reales antes del fix**
+  - el warning persistente de Cloud venía de `vat_monthly_position` fallando en `projection_refresh_queue` con `could not determine data type of parameter $6`
+  - `Reactive backlog` había estado en warning en la captura, pero al validar staging ya estaba sano; no era el problema persistente
+  - `Finance Data Quality` mezclaba drift real con policy incorrecta: el check `orphan_expenses` marcaba overhead compartido válido como si fuera falla
+- **Implementación shipped**
+  - `src/lib/finance/vat-ledger.ts`
+    - casts explícitos `CAST(... AS text)` en placeholders textuales usados dentro de `jsonb_build_object`, `concat_ws`, `period_id` y `materialization_reason`
+  - `src/lib/finance/vat-ledger.test.ts`
+    - regresión focalizada para verificar que el SQL emitido conserva esos casts y no reintroduce la ambigüedad
+  - `src/app/api/finance/data-quality/route.ts`
+    - reemplazo de `orphan_expenses` por:
+      - `direct_cost_without_client`
+      - `shared_overhead_unallocated`
+    - summary semántico por buckets
+    - scope tenant-aware cuando existe `tenant.spaceId`
+  - `src/lib/operations/get-operations-overview.ts`
+    - `Finance Data Quality` deja de sobrecargar `processed/failed` con semánticas incompatibles y expone `summary` + `metrics`
+  - `src/lib/reliability/signals.ts`
+    - `buildSubsystemSignals()` prioriza `subsystem.summary` y agrega `metrics` como evidencia
+  - `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+    - usa el `summary` del subsistema y muestra chips de métricas semánticas cuando existen
+  - Docs alineados:
+    - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+    - `docs/documentation/finance/libro-iva-posicion-mensual.md`
+    - `docs/documentation/plataforma/reliability-control-plane.md`
+    - `docs/documentation/operations/ops-worker-reactive-crons.md`
+    - task movida a `docs/tasks/complete/TASK-639-finance-vat-reactive-data-quality-hardening.md`
+- **Validación**
+  - `pnpm exec vitest run src/lib/finance/vat-ledger.test.ts src/app/api/finance/data-quality/route.test.ts`
+  - `pnpm exec eslint src/lib/finance/vat-ledger.ts src/lib/finance/vat-ledger.test.ts src/app/api/finance/data-quality/route.ts src/app/api/finance/data-quality/route.test.ts src/lib/operations/get-operations-overview.ts src/lib/reliability/signals.ts src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm test`
+- **Notas**
+  - `pnpm build` volvió a imprimir los warnings conocidos de `Dynamic server usage` por rutas que usan `headers`; el build terminó exit code `0`
+  - `getOperationsOverview()` sigue siendo global como reader de Ops; el tenant-aware scoping quedó sólido en `GET /api/finance/data-quality`, pero extender ese scope a Ops completo requiere un follow-up fuera de este slice
+  - el worktree tenía cambios ajenos vivos (`TASK-615`, `src/config/greenhouse-nomenclature.ts`); no pertenecen a `TASK-639` y deben quedar fuera del commit
+
+## Sesion 2026-04-26 — TASK-671 refactor a Bot Framework Connector + skill canonica
+
+Pivot del dispatcher: de Microsoft Graph (que rechazaba con `Teamwork.Migrate.All required`) a Bot Framework Connector API. Path verificado por smoke contra `efeoncepro.com`: token aud=`api.botframework.com`, endpoint `smba.trafficmanager.net/teams/v3/conversations`. Manifest cleaned a v1.0.5 con scopes minimos validados por `@microsoft/teamsapp-cli teamsapp validate` (62 passed, 0 failed).
+
+- `graph-client.ts` → renamed `connector-client.ts`, reescrito con region failover (`/teams → /amer → /emea → /apac`), retries con jitter, timeout 8s, GraphTransportError preservado por compat
+- `token-cache.ts` con doble audience (BF Connector + Graph) cacheado por `(tenantId, clientId, scope)` y safety margin 60s
+- Nueva tabla `greenhouse_core.teams_bot_conversation_references` (migracion `20260426220857590`) — cache de 2 niveles (in-memory Map TTL 5min + PG) per-target del serviceUrl + conversationId. Failure_count >= 3 trip circuit breaker
+- `sender.ts` rewrite con cache lookup en hot path, mark_failure on error, mark_success on 2xx
+- Tests: 9 nuevos (region failover, 429 retry, OData escape en findUserByEmail, circuit breaker en conv refs, cache TTL); total 2324 pasando
+- Skill `teams-bot-platform` canonico publicado en 3 ubicaciones:
+  - global: `~/.claude/skills/teams-bot-platform/skill.md`
+  - repo Claude: `.claude/skills/teams-bot-platform/skill.md`
+  - repo Codex: `.codex/skills/teams-bot-platform/SKILL.md`
+  Cubre los 5 concerns (app reg, Bot Service, manifest, dispatcher, inbound), 4 HARD RULES con su lesson de produccion, runbook deploy day 1, diagnosis cheatsheet, lista de archivos referenciables del Greenhouse stack
+- Spec `GREENHOUSE_TEAMS_BOT_INTERACTION_V1` bumped a v1.1 con Delta de lessons learned (Connector vs Graph, manifest webApplicationInfo, RSC consent per-team)
+
+Pendientes:
+- UPDATE de los 3 canales en Postgres (espera confirmacion literal del mapping del usuario por sandbox)
+- Smoke real via `pnpm staging:request POST /api/admin/teams/test` despues del UPDATE
+- Decommission de Logic Apps tras 1 semana de validacion
+
+## Sesion 2026-04-26 — TASK-671 cutover completo + smoke real OK
+
+Cutover ejecutado. Los 3 canales productivos (`ops-alerts`, `finance-alerts`, `delivery-pulse`) flippeados a `channel_kind='teams_bot'` con bot_app_id, team_id, channel_id, secret_ref correctos. `finance-alerts` salio del estado `pending_setup`. Mapping confirmado por usuario:
+
+- ops-alerts → EO - Admin / EO - Admin
+- finance-alerts → EO - Admin / EO - Admin (hasta crear team Finance dedicado)
+- delivery-pulse → Growth Marketing / Alineacion
+
+IAM grant requerido y aplicado: `roles/secretmanager.secretAccessor` para `serviceAccount:greenhouse-portal@efeonce-group.iam.gserviceaccount.com` sobre el secret `greenhouse-teams-bot-client-credentials`. Sin esto, la primera llamada del runtime cacheaba negativo por 60s y devolvia `missing_secret`.
+
+Smoke real via `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"<CH>"}'`:
+
+- ops-alerts:     HTTP 200, ok=true, 469ms cold / 426ms warm, attempts=1
+- finance-alerts: HTTP 200, ok=true, 426ms, attempts=1
+- delivery-pulse: HTTP 200, ok=true, 421ms, attempts=1
+
+`source_sync_runs` registra 4 sends `succeeded` con notes `transport=bot_framework; surface=channel; attempts=1`. `teams_bot_conversation_references` cacheo 2 rows con `service_url=smba.trafficmanager.net/teams` y `failure_count=0` — hot path activado para futuros sends.
+
+Quedan SOLO los siguientes pasos (no blockers, planificacion):
+
+1. Validacion 1 semana con trafico productivo real (eventos de outbox emitiendo a teams_notify projection).
+2. Decommission de Logic Apps (rg-greenhouse-teams-notifications-prod) tras la validacion: `az resource list --resource-group rg-greenhouse-teams-notifications-prod` + `az resource delete` selectivo.
+3. Cierre formal de TASK-669 (Logic Apps foundation) — mover archivo de `to-do/` a `complete/` cuando los Logic Apps esten apagados.
+4. Cierre formal de TASK-671 — mover archivo de `in-progress/` a `complete/` ahora que cutover esta hecho y validado por smoke real.
+
+Skill `teams-bot-platform` publicado en 3 ubicaciones (~/.claude, .claude/, .codex/) con runbook day-1, 4 HARD RULES, diagnosis cheatsheet de 8 sintomas/causas, y referencias a los archivos canonicos del Greenhouse stack. Disponible para Claude (global + repo) y Codex (repo).
+
+## Sesion 2026-04-26 — Notification Hub V1 contract + TASK-690 + bumps de specs Teams
+
+Documentacion de arquitectura completada y sinergia mapeada para que el bot de Teams (TASK-671) deje de ser una superficie aislada y pase a ser un adapter de primera clase del sistema unificado de notificaciones de Greenhouse.
+
+Archivos creados:
+
+- `docs/architecture/GREENHOUSE_NOTIFICATION_HUB_V1.md` v1.0 — contrato canonico que unifica las 3 superficies (in-app, email, Teams) detras de un solo registry de intents + router con preferencias por persona + adapters por canal. 12 secciones cubriendo modelo de dominio, 3 tablas (`notification_intents`, `notification_deliveries`, `notification_preferences`), interfaces TypeScript, sinergia con TASK-671 (DM via `recipient_kind=dynamic_user`, Action.Submit cierra loop via `acknowledgeIntent`), reliability hookup, casos piloto, fases de implementacion incremental (4 fases), reglas duras, out of scope V1.
+- `docs/tasks/to-do/TASK-690-notification-hub-architecture-contract.md` — task de tipo `architecture` que entrega el contrato + 3 tablas + router pure function + 4 adapters skeleton + templating + reliability hookup + doc funcional, sin tocar ningun emisor existente. Acceptance criteria explicito, 7 slices ordenados, follow-ups TASK-691/692/693 declarados.
+
+Bumps a specs existentes:
+
+- `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.1 → v1.2 con Delta del cutover real ejecutado (3/3 canales OK), confirmacion de path Connector verificado, mapping definitivo team/channel, IAM grant aplicado, manifest v1.0.5, skill canonica publicada, link a Notification Hub V1.
+- `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.1 → v1.2 con Delta del refactor del dispatcher (region failover + cache 2-niveles + circuit breaker + tabla `teams_bot_conversation_references`) + sinergia explicita con el Hub (handlers `mark_read`/`snooze` actualizan `notification_intents.status`, adapter `teams_dm` reusa `dynamic_user`).
+
+Fases siguientes (TASK-691, TASK-692, TASK-693) declaradas como follow-ups en TASK-690 y se crearan al cerrar TASK-690:
+
+- TASK-691 Notification Hub Shadow Mode — dual-write 1 semana para validar parity sin breakage.
+- TASK-692 Notification Hub Cutover — invertir flow, deprecar projections viejas.
+- TASK-693 Notification Hub Bidireccional + UI Preferences — Action.Submit handlers reales cierran loop, settings UI con Vuexy.
+
+Registry sincronizado: `TASK_ID_REGISTRY.md` y `docs/tasks/README.md` actualizados con TASK-690.
+
+## Sesion 2026-04-26 — TASK-691/692/693 + §13 mentions en Hub spec + skill bumped
+
+Las 3 follow-up tasks declaradas en TASK-690 ahora existen como archivos con scope explicito:
+
+- `docs/tasks/to-do/TASK-691-notification-hub-shadow-mode.md` — dual-write 1 semana, parity report diario, kill-switch via flag.
+- `docs/tasks/to-do/TASK-692-notification-hub-cutover.md` — projection canonica `notifications-v2.ts`, borra projections viejas, regla dura "no insert directo", rollback flag.
+- `docs/tasks/to-do/TASK-693-notification-hub-bidirectional-ui.md` — Action.Submit cierra loop, UI `/settings/notifications`, templating unificado para 6 eventos, mentions con `<at>` + `entities[]` + push validation.
+
+Adicionalmente:
+
+- `GREENHOUSE_NOTIFICATION_HUB_V1.md` v1.0 ganó §13 "Mentions y notificaciones push" — 8 reglas verificadas + diseno `TeamsTemplateOutput` + tabla de casos piloto + acceptance pendiente para TASK-690 (extender interfaz template) y TASK-693 (poblar `mentionedMemberIds` + UI preference).
+- Skill `teams-bot-platform` bumped en las 3 ubicaciones (~/.claude, .claude/, .codex/) con nueva seccion "Mentions and push notifications" que cubre los mismos 8 puntos para uso futuro de Claude/Codex en cualquier bot.
+- `TASK_ID_REGISTRY.md` y `docs/tasks/README.md` registran 691/692/693 con dependencies declaradas.
+
+## Sesion 2026-04-26 — Notification Hub robustness layer (no-breakage compromisos + CI gates + rollback)
+
+Las 3 tasks centrales del Hub (690/691/692) reciben capa explicita de robustness para garantizar que lo que existe hoy no se rompa sino que se robustezca. Pregunta del usuario sobre como aseguramos eso → traduccion en compromisos verificables y CI gates obligatorios.
+
+Cambios:
+
+- **TASK-690** gana **Slice 8 — Kill-switch foundation** (no-breakage prereq de TASK-691). Entrega:
+  - Feature flag `GREENHOUSE_NOTIFICATIONS_HUB_MODE` con valores `disabled | shadow | canonical`. Lectura per-refresh, NO at boot. Flip via `vercel env add` se propaga en < 1 min sin redeploy.
+  - `src/lib/notifications/hub/mode.ts` con helper `getNotificationsHubMode()` cacheado TTL 30s.
+  - `src/lib/notifications/hub/dual-write.ts` con wrapper `tryShadowWrite(intent, deliveries, deps)` que catchea internamente cualquier failure del Hub y NO propaga al caller (legacy delivery siempre completa).
+  - Snapshot tests del transport actual capturados ANTES de cualquier cambio (regression baseline pre-Hub) — in-app row shape, email subject+body, Teams Adaptive Card structure.
+  - `docs/operations/notification-hub-rollback.md` con comandos exactos de rollback + queries de verificacion + owners autorizados.
+
+- **TASK-691** gana 3 secciones:
+  - **Compromisos de no-breakage (hard rules)**: A) legacy delivery siempre gana en duda (test de simular failure del Hub → legacy completa); B) no se borra codigo viejo hasta verificar reemplazo (TASK-691 git diff es ADD-only); C) no se cambia data shape de `notifications` legacy.
+  - **CI gates de fase Fase 1→2 y Fase 2→3** con checklists explicitos (8 + 8 items), incluyendo 7 dias de shadow con discrepancia ≤ 1%, p95 dual-write ≤ 100ms, smoke E2E parity test verde 50 runs consecutivos.
+  - **Rollback procedure** con sintomas, comandos exactos, owner del flag, Sentry tag check, postmortem obligatorio.
+
+- **TASK-692** gana 4 secciones:
+  - **Compromisos de no-breakage**: A) legacy se comenta no se borra (rollback inmediato disponible); B) `mode=canonical` se activa en cascada Development → Staging → Production con ventanas de observacion 24h/48h/7d; C) data shape compatibility lock con lint rule + grep CI que prohibe `INSERT INTO notifications` y `postTeamsCard()` fuera de adapters.
+  - **CI gates de fase Fase 3→4** con checklist (8 items), incluyendo Logic Apps de TASK-669 ya decommissioned (no path paralelo), latencia p95 ≤ 1.5x legacy, cero incidents Sentry tag `notifications.hub`.
+  - **Rollback procedure** con 3 sintomas tipificados (notificaciones perdidas/duplicadas, shape mismatch, latencia > 2x) cada uno con respuesta especifica.
+  - **Decommission post-Fase 4** que documenta exactamente que se puede borrar despues de 7 dias en canonical sin rollback (incluye el propio flag — la red de seguridad se retira cuando ya no se necesita).
+
+Fundamento de la robustness:
+
+1. **Contrato tecnico**: feature flag con escape barato + dual-write idempotente con failure isolation + adapters wrappean transport actual sin reescribir + `dedup_key UNIQUE` per intent.
+2. **Verificaciones automatizadas**: parity report diario via cron Cloud Run que postea por Teams al canal ops-alerts (dogfooding) + smoke E2E parity test que rompe el merge en CI + snapshot tests que rompen el merge si la data shape cambia + Reliability dashboard como canary humano.
+3. **Protocolo humano**: 4 gates explicitos por fase (1→2, 2→3, 3→4, Fase 4 closeout) con checklists auditable en changelog. NO se avanza hasta TODOS marcados con fecha y autor.

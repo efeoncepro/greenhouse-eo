@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -38,7 +38,7 @@ import tableStyles from '@core/styles/table.module.css'
 
 const cliColumnHelper = createColumnHelper<ClientProfile>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const cliColumns: ColumnDef<ClientProfile, any>[] = [
   cliColumnHelper.accessor('legalName', {
     header: 'Razón social',

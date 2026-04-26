@@ -28,7 +28,7 @@ const DB_CONNECTIVITY_REGEX =
   /econnrefused|etimedout|connection refused|connect timeout|cloud sql reachable|could not connect|terminating connection/i
 
 const CREDENTIAL_REGEX =
-  /password authentication failed|no pg password found|secret.*not found|invalid token|missing credentials/i
+  /password authentication failed|no pg password found|secret.*not found|invalid token|missing credentials|missing\s+\S*?(token|api_key|api[\s_-]key|secret|credentials?)\b/i
 
 const normalizeMessage = (error: unknown): string => {
   if (error instanceof Error && typeof error.message === 'string') return error.message

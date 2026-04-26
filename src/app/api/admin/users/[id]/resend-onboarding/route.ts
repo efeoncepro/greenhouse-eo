@@ -55,7 +55,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     }
 
     // Generate a new 72h invite token
-    const token = generateToken(
+    const token = await generateToken(
       {
         user_id: user.user_id,
         email: user.email,

@@ -2,9 +2,10 @@
  * Generate category banners for profile headers via Imagen.
  * Run: npx tsx scripts/generate-banners.mts
  */
-import { GoogleGenAI } from '@google/genai'
 import { writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
+
+import { GoogleGenAI } from '@google/genai'
 
 const OUTPUT_DIR = join(process.cwd(), 'public', 'images', 'banners')
 

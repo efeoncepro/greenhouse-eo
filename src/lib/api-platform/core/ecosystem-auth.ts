@@ -13,7 +13,11 @@ import type {
 
 import { buildScopeSummary, type ApiPlatformRequestContext, type ApiPlatformSuccessResult } from './context'
 import { ApiPlatformError, normalizeApiPlatformError } from './errors'
-import { buildApiPlatformErrorResponse, buildApiPlatformSuccessResponse } from './responses'
+import {
+  buildApiPlatformErrorResponse,
+  buildApiPlatformNotModifiedResponse,
+  buildApiPlatformSuccessResponse
+} from './responses'
 import { DEFAULT_API_PLATFORM_VERSION, resolveApiPlatformVersion } from './versioning'
 
 type SisterPlatformConsumerRow = {
@@ -51,6 +55,8 @@ type ScopeQuery = {
 type RateWindowCounts = {
   requests_last_minute: number
   requests_last_hour: number
+  oldest_minute_request_at: string | Date | null
+  oldest_hour_request_at: string | Date | null
 }
 
 type RequestAuditState = {
@@ -268,7 +274,9 @@ const getRateWindowCounts = async (consumerId: string) => {
     `
       SELECT
         COALESCE(SUM(CASE WHEN created_at >= CURRENT_TIMESTAMP - INTERVAL '1 minute' THEN 1 ELSE 0 END), 0) AS requests_last_minute,
-        COALESCE(SUM(CASE WHEN created_at >= CURRENT_TIMESTAMP - INTERVAL '1 hour' THEN 1 ELSE 0 END), 0) AS requests_last_hour
+        COALESCE(SUM(CASE WHEN created_at >= CURRENT_TIMESTAMP - INTERVAL '1 hour' THEN 1 ELSE 0 END), 0) AS requests_last_hour,
+        MIN(created_at) FILTER (WHERE created_at >= CURRENT_TIMESTAMP - INTERVAL '1 minute') AS oldest_minute_request_at,
+        MIN(created_at) FILTER (WHERE created_at >= CURRENT_TIMESTAMP - INTERVAL '1 hour') AS oldest_hour_request_at
       FROM greenhouse_core.sister_platform_request_logs
       WHERE sister_platform_consumer_id = $1
     `,
@@ -277,26 +285,81 @@ const getRateWindowCounts = async (consumerId: string) => {
 
   return result[0] ?? {
     requests_last_minute: 0,
-    requests_last_hour: 0
+    requests_last_hour: 0,
+    oldest_minute_request_at: null,
+    oldest_hour_request_at: null
+  }
+}
+
+const addSeconds = (value: string | Date | null, seconds: number) => {
+  const baseTime = value ? new Date(value).getTime() : Date.now()
+
+  return new Date(baseTime + seconds * 1000)
+}
+
+const toRateResetAt = (counts: RateWindowCounts) => {
+  const minuteReset = addSeconds(counts.oldest_minute_request_at, 60)
+  const hourReset = addSeconds(counts.oldest_hour_request_at, 60 * 60)
+
+  return minuteReset.getTime() <= hourReset.getTime() ? minuteReset : hourReset
+}
+
+const buildRateLimitStatus = ({
+  consumer,
+  counts,
+  includeCurrentRequest
+}: {
+  consumer: SisterPlatformConsumerRecord
+  counts: RateWindowCounts
+  includeCurrentRequest: boolean
+}) => {
+  const currentRequestCost = includeCurrentRequest ? 1 : 0
+  const usedPerMinute = Number(counts.requests_last_minute || 0) + currentRequestCost
+  const usedPerHour = Number(counts.requests_last_hour || 0) + currentRequestCost
+
+  return {
+    limitPerMinute: consumer.rateLimitPerMinute,
+    limitPerHour: consumer.rateLimitPerHour,
+    remainingPerMinute: Math.max(0, consumer.rateLimitPerMinute - usedPerMinute),
+    remainingPerHour: Math.max(0, consumer.rateLimitPerHour - usedPerHour),
+    resetAt: toRateResetAt(counts).toISOString()
   }
 }
 
 const enforceRateLimit = async (consumer: SisterPlatformConsumerRecord) => {
   const counts = await getRateWindowCounts(consumer.consumerId)
 
+  const rateLimitStatus = buildRateLimitStatus({
+    consumer,
+    counts,
+    includeCurrentRequest: true
+  })
+
   if (Number(counts.requests_last_minute || 0) >= consumer.rateLimitPerMinute) {
+    const retryAfterSeconds = Math.max(1, Math.ceil((addSeconds(counts.oldest_minute_request_at, 60).getTime() - Date.now()) / 1000))
+
     throw new ApiPlatformError('Rate limit exceeded for the current minute window.', {
       statusCode: 429,
-      errorCode: 'rate_limited'
+      errorCode: 'rate_limited',
+      details: {
+        retryAfterSeconds
+      }
     })
   }
 
   if (Number(counts.requests_last_hour || 0) >= consumer.rateLimitPerHour) {
+    const retryAfterSeconds = Math.max(1, Math.ceil((addSeconds(counts.oldest_hour_request_at, 60 * 60).getTime() - Date.now()) / 1000))
+
     throw new ApiPlatformError('Rate limit exceeded for the current hour window.', {
       statusCode: 429,
-      errorCode: 'rate_limited'
+      errorCode: 'rate_limited',
+      details: {
+        retryAfterSeconds
+      }
     })
   }
+
+  return rateLimitStatus
 }
 
 const recordRequestLog = async ({
@@ -463,7 +526,7 @@ export const runEcosystemReadRoute = async <T>({
     auditState.clientId = binding.clientId
     auditState.spaceId = binding.spaceId
 
-    await enforceRateLimit(consumer)
+    const rateLimit = await enforceRateLimit(consumer)
 
     const result = await handler({
       requestId,
@@ -471,34 +534,44 @@ export const runEcosystemReadRoute = async <T>({
       version,
       consumer,
       binding,
-      rateLimit: {
-        limitPerMinute: consumer.rateLimitPerMinute,
-        limitPerHour: consumer.rateLimitPerHour
-      }
+      rateLimit
     })
 
     await recordRequestLog({
       auditState,
-      responseStatus: result.status ?? 200,
+      responseStatus: result.notModified ? 304 : result.status ?? 200,
       errorCode: null
     })
 
-    return buildApiPlatformSuccessResponse({
+    const responseArgs = {
       requestId,
       version,
-      data: result.data,
       meta: {
         ...result.meta,
         scope: buildScopeSummary(binding)
       },
       status: result.status,
-      rateLimit: {
-        limitPerMinute: consumer.rateLimitPerMinute,
-        limitPerHour: consumer.rateLimitPerHour
-      }
+      rateLimit,
+      headers: result.headers,
+      cacheControl: result.cacheControl,
+      etag: result.etag,
+      lastModified: result.lastModified
+    }
+
+    if (result.notModified) {
+      return buildApiPlatformNotModifiedResponse(responseArgs)
+    }
+
+    return buildApiPlatformSuccessResponse({
+      ...responseArgs,
+      data: result.data
     })
   } catch (error) {
     const normalizedError = normalizeApiPlatformError(error)
+
+    const retryAfterSeconds = typeof normalizedError.details?.retryAfterSeconds === 'number'
+      ? normalizedError.details.retryAfterSeconds
+      : undefined
 
     await recordRequestLog({
       auditState,
@@ -512,7 +585,8 @@ export const runEcosystemReadRoute = async <T>({
       error: normalizedError,
       rateLimit: auditState.consumer ? {
         limitPerMinute: auditState.consumer.rateLimitPerMinute,
-        limitPerHour: auditState.consumer.rateLimitPerHour
+        limitPerHour: auditState.consumer.rateLimitPerHour,
+        retryAfterSeconds
       } : undefined
     })
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -12,8 +12,11 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { useQueryClient } from '@tanstack/react-query'
+
 import { ROLE_CODES } from '@/config/role-codes'
-import type { PeopleListPayload } from '@/types/people'
+import usePeopleList from '@/hooks/usePeopleList'
+import { qk } from '@/lib/react-query'
 
 import CreateMemberDrawer from './drawers/CreateMemberDrawer'
 import PeopleListStats from './PeopleListStats'
@@ -22,28 +25,18 @@ import PeopleListTable from './PeopleListTable'
 const PeopleList = () => {
   const { data: session } = useSession()
   const router = useRouter()
-  const [data, setData] = useState<PeopleListPayload | null>(null)
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
   const [createOpen, setCreateOpen] = useState(false)
 
   const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
-  const loadData = useCallback(async () => {
-    const res = await fetch('/api/people')
-
-    if (res.ok) {
-      setData(await res.json())
-    }
-  }, [])
-
-  useEffect(() => {
-    const load = async () => {
-      await loadData()
-      setLoading(false)
-    }
-
-    load()
-  }, [loadData])
+  /*
+    TASK-513: usePeopleList reemplaza el useState+useEffect+useCallback
+    manual. El refetch tras crear un colaborador es ahora una invalidacion
+    coordinada (`invalidateQueries({ queryKey: qk.people.all })`) en vez
+    de tener que pasarle `loadData` como prop al drawer.
+  */
+  const { data, isPending: loading } = usePeopleList()
 
   if (loading) {
     return (
@@ -90,7 +83,7 @@ const PeopleList = () => {
           open={createOpen}
           onClose={() => setCreateOpen(false)}
           onSuccess={(memberId) => {
-            loadData()
+            void queryClient.invalidateQueries({ queryKey: qk.people.all })
             router.push(`/people/${memberId}`)
           }}
         />

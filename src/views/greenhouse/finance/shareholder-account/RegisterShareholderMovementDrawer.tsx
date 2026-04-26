@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import Link from 'next/link'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Autocomplete from '@mui/material/Autocomplete'
 import Alert from '@mui/material/Alert'

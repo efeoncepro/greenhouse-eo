@@ -1,0 +1,64 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.5",
+  "id": "a1397477-4aae-4f16-a0a2-a213cb1b00b2",
+  "developer": {
+    "name": "Efeonce Group SpA",
+    "websiteUrl": "https://greenhouse.efeoncepro.com",
+    "privacyUrl": "https://greenhouse.efeoncepro.com/legal/privacy",
+    "termsOfUseUrl": "https://greenhouse.efeoncepro.com/legal/terms"
+  },
+  "name": {
+    "short": "Greenhouse",
+    "full": "Greenhouse Notifications & Actions"
+  },
+  "description": {
+    "short": "Notificaciones operativas y aprobaciones de Greenhouse en Teams.",
+    "full": "Greenhouse es el portal operativo de Efeonce Group. Este bot publica alertas de operaciones, finanzas y delivery directamente en tus canales de Teams."
+  },
+  "icons": {
+    "outline": "icons/icon_outline.png",
+    "color": "icons/icon_color.png"
+  },
+  "accentColor": "#00B07F",
+  "bots": [
+    {
+      "botId": "a1397477-4aae-4f16-a0a2-a213cb1b00b2",
+      "scopes": ["team", "personal", "groupChat"],
+      "supportsFiles": false,
+      "isNotificationOnly": false
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": [
+    "greenhouse.efeoncepro.com",
+    "dev-greenhouse.efeoncepro.com"
+  ],
+  "webApplicationInfo": {
+    "id": "a1397477-4aae-4f16-a0a2-a213cb1b00b2",
+    "resource": "api://botid-a1397477-4aae-4f16-a0a2-a213cb1b00b2"
+  },
+  "authorization": {
+    "permissions": {
+      "resourceSpecific": [
+        {
+          "name": "ChannelMessage.Send.Group",
+          "type": "Application"
+        },
+        {
+          "name": "TeamsActivity.Send.Group",
+          "type": "Application"
+        },
+        {
+          "name": "TeamsAppInstallation.Read.Group",
+          "type": "Application"
+        },
+        {
+          "name": "Chat.Manage.Chat",
+          "type": "Application"
+        }
+      ]
+    }
+  }
+}

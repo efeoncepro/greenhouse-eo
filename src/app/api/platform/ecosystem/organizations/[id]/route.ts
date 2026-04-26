@@ -12,11 +12,11 @@ export async function GET(
   return runEcosystemReadRoute({
     request,
     routeKey: 'platform.ecosystem.organizations.detail',
-    handler: async context => ({
-      data: await getEcosystemOrganizationDetail({
+    handler: async context =>
+      getEcosystemOrganizationDetail({
         context,
+        request,
         identifier: id
       })
-    })
   })
 }

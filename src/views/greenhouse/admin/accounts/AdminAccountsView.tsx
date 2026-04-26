@@ -109,7 +109,7 @@ const formatDate = (iso: string) => {
 
 const columnHelper = createColumnHelper<OrganizationListItem>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const columns: ColumnDef<OrganizationListItem, any>[] = [
   columnHelper.accessor('organizationName', {
     header: 'Cuenta',

@@ -53,14 +53,27 @@ const PersonProfileHeader = ({ detail, isAdmin, onEditProfile, onDeactivate, onE
             alignItems='center'
             sx={{ flexGrow: 1, minWidth: 0 }}
           >
-            <TeamAvatar
-              name={member.displayName}
-              avatarUrl={member.avatarUrl}
-              roleCategory={roleCategory}
-              size={80}
-            />
+            {/*
+              TASK-525: avatar + name share view-transition-name with the
+              corresponding row cells in PeopleListTable so the morph reads
+              as a single visual element traveling from list to detail.
+            */}
+            <Box sx={{ viewTransitionName: `person-avatar-${member.memberId}` }}>
+              <TeamAvatar
+                name={member.displayName}
+                avatarUrl={member.avatarUrl}
+                roleCategory={roleCategory}
+                size={80}
+              />
+            </Box>
             <Box sx={{ minWidth: 0 }}>
-              <Typography variant='h5' noWrap>{member.displayName}</Typography>
+              <Typography
+                variant='h5'
+                noWrap
+                sx={{ viewTransitionName: `person-identity-${member.memberId}` }}
+              >
+                {member.displayName}
+              </Typography>
               <Typography variant='body2' color='text.secondary' noWrap>
                 {member.roleTitle}
                 {roleCategory !== 'unknown' ? ` · ${roleCategoryLabel[roleCategory]}` : ''}

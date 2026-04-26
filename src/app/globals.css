@@ -218,3 +218,52 @@ code {
   background-color: rgb(var(--mui-palette-info-mainChannel) / 0.08);
   border: 0;
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+   TASK-525 — View Transitions API canonical keyframes.
+   Applied automatically by the browser on every `document.startViewTransition`
+   call; per-element overrides arrive via inline `style={{ viewTransitionName }}`
+   set on list rows and detail headers (Finance quotes, People profiles).
+
+   The default cubic-bezier matches Apple's "spring out" curve used by
+   Linear / Vercel / Stripe so the morph reads as enterprise-grade rather
+   than playful.
+   ─────────────────────────────────────────────────────────────────────── */
+@keyframes greenhouse-view-transition-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes greenhouse-view-transition-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+::view-transition-old(root) {
+  animation: 200ms cubic-bezier(0.32, 0.72, 0, 1) both greenhouse-view-transition-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 260ms cubic-bezier(0.32, 0.72, 0, 1) both greenhouse-view-transition-fade-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

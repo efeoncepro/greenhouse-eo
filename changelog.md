@@ -1,5 +1,116 @@
 # changelog.md
 
+## 2026-04-26
+
+### 2026-04-26 — Greenhouse Deep Link Platform architecture
+
+Nueva spec canonica `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`: formaliza deep links como referencias semanticas access-aware, con resolver central objetivo para web, email, Teams, mobile, public share, API y MCP. El contrato exige declarar `viewCode` y `requiredCapabilities` cuando apliquen, evitando seguir repartiendo strings de URL en menus, notificaciones, emails, search y cards. Implementacion registrada como `TASK-694` en `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`.
+
+### 2026-04-26 — TASK-690 Notification Hub Architecture Contract + sinergia con TASK-671
+
+Spec arquitectónica `GREENHOUSE_NOTIFICATION_HUB_V1.md` v1.0 publicada. Unifica las 3 superficies de notificación (in-app bell, email, Microsoft Teams) detrás de un solo registry de intents + router con preferencias por persona + adapters por canal. Aprovecha la infraestructura ya en producción de TASK-669 (channel registry transport-agnostic) + TASK-671 (Bot Framework Connector + Action.Submit + cache de conv refs) para que Teams sea adapter de primera clase con DMs 1:1, cards interactivas, y feedback bidireccional que cierra el loop en TODAS las superficies (mark-read en Teams sincroniza la bell del portal y skipea el follow-up email).
+
+Sin breakage: las 3 projections existentes siguen vigentes; el Hub se activa incrementalmente en 4 fases.
+
+- TASK-690 (este task) entrega 3 tablas (`notification_intents`, `notification_deliveries`, `notification_preferences`) + router pure function + 4 adapters skeleton + templating unificado + Reliability Control Plane hookup (módulo `notifications.hub`) + doc funcional. Sin tocar ningún emisor.
+- TASK-691 (follow-up) shadow mode: dual-write 1 semana para validar parity.
+- TASK-692 (follow-up) cutover: invertir flow, deprecar projections viejas.
+- TASK-693 (follow-up) bidireccional + UI: Action.Submit handlers reales cierran loop, settings UI con Vuexy primitives.
+
+Bumps complementarios:
+- `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.1 → v1.2 con Delta del cutover real ejecutado (3/3 canales OK, path Connector verificado, mapping team/channel, IAM grant, manifest v1.0.5).
+- `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.1 → v1.2 con Delta del dispatcher refactor (region failover + cache 2-niveles + circuit breaker + tabla `teams_bot_conversation_references`) + sinergia explícita con el Hub.
+
+### 2026-04-26 — TASK-671 Greenhouse Teams Bot Platform (Bot Framework + Microsoft Graph) — code complete
+
+Canal interactivo bidireccional con Microsoft Teams basado en Bot Framework + Microsoft Graph, sibling enriquecido del canal Logic Apps (TASK-669). Habilita postear con identidad `Greenhouse` (sin attribution "via Workflows"), routing a canales / chats 1:1 / group chats / DMs dinámicos resueltos por payload, y `Action.Submit` server-side para aprobaciones, snooze de alertas y mark-as-read inline desde el card.
+
+Implementación end-to-end disponible en `develop`; pendiente solo el deploy interactivo a Azure tenant + manifest upload + cutover de los 3 canales productivos (runbook en `docs/operations/azure-teams-bot.md`).
+
+- 2 migraciones nuevas: extensión de `teams_notification_channels` con `recipient_kind` discriminator + tabla `teams_bot_inbound_actions` (audit + idempotency log para Action.Submit)
+- Helpers Bot Framework nativos en `src/lib/integrations/teams/bot-framework/` (token-cache, graph-client, jwt-validator, sender) — sin dependencia en `botbuilder` SDK; reusan `jose` y patrones existentes de `src/lib/webhooks/signing.ts`
+- Recipient resolver con cascada `members.teams_user_id → microsoft_oid → email lookup`
+- Endpoint inbound `/api/teams-bot/messaging` con JWT validation contra JWKS de `login.botframework.com`, idempotency por `sha256(activityId|actionId|aadObjectId)`, identity reverse-lookup vía `getTenantAccessRecordByMicrosoftOid`, dispatch al action-registry
+- Action-registry pattern (clonado de `projection-registry.ts`) con handlers `ops.alert.snooze` y `notification.mark_read`
+- Reliability Control Plane: nuevo módulo `'integrations.teams'` con `incidentDomainTag` + breakdown por transporte (Logic Apps vs Bot Framework vs Pending Setup) en `getOperationsOverview` y Admin Ops Health view
+- IaC scaffolded: `infra/azure/teams-bot/` con Bicep + manifest Teams v1.17 + workflow GitHub Actions con WIF
+- 22 tests unitarios nuevos. Total: **2315 tests pasando**. `tsc --noEmit`, `pnpm lint`, `pnpm build` limpios.
+- Docs: `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.0 + runbook `azure-teams-bot.md` + bump de `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` a v1.1
+
+### 2026-04-26 — Reliability dashboard hygiene: orphan archive + channel readiness + smoke lane bus + Sentry domain tags
+
+Cuatro patrones canónicos para que el dashboard nunca más muestre falsos positivos ni señales `awaiting_data` perpetuas. Documentados como reglas duras en `CLAUDE.md` y `AGENTS.md`.
+
+- **Orphan auto-archive en `projection_refresh_queue`** (migration `20260426161938519`): nuevas columnas `archived/archived_at/archived_reason` + `ENTITY_EXISTENCE_GUARDS` en `markRefreshFailed` que valida la existencia del entity antes de rutear a `dead`. Orphan rows (test residue, snapshot drift) quedan archived y excluidas del contador del dashboard. Dashboard query gated. Backfill de smoke-test residue (`member-smoke-*`) incluido.
+- **Channel `provisioning_status` en `teams_notification_channels`** (migration `20260426162205347`): nuevos valores `ready | pending_setup | configured_but_failing`. `pending_setup` significa "config en PG pero secret faltante en GCP Secret Manager" — sends skipean silenciosamente y NO disparan warnings. Backfill marca `greenhouse-teams-finance-alerts-webhook` como `pending_setup`. Query Teams Notifications subsystem filtra `NOT EXISTS` por `pending_setup` channels.
+- **PG-backed smoke lane runs** (migration `20260426162404624`): nueva tabla `greenhouse_sync.smoke_lane_runs` + script `pnpm sync:smoke-lane <lane-key>` para que CI publique resultados Playwright. Reader `getFinanceSmokeLaneStatus` reescrito para leer de PG primero (filesystem fallback solo para dev local). Funciona desde cualquier runtime (Vercel, Cloud Run, MCP) — cierra el `awaiting_data` perpetuo del Finance test_lane.
+- **Sentry incident signals via `domain` tag**: nuevo wrapper `captureWithDomain(err, 'finance', { extra })` en `src/lib/observability/capture.ts` que tag-ea cada captureException con `tags[domain]`. `getCloudSentryIncidents(env, { domain })` filtra por tag. Registry: cada `ReliabilityModuleDefinition` declara `incidentDomainTag` (`'finance'`, `'integrations.notion'`, `'cloud'`, `'delivery'`). `getReliabilityOverview` itera y produce un `incident` signal per module via `buildDomainIncidentSignals`. Cierra el gap `expectedSignalKinds: ['incident']` para finance/delivery/integrations.notion sin per-domain Sentry projects.
+
+Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skipped, 3 migraciones aplicadas + tipos Kysely regenerados (298 tablas).
+
+### 2026-04-26 — Notion BQ → PG drain canónico vía Cloud Run + admin hygiene queue (cierra gap PG stale 24 días)
+
+- Nuevo path canónico `ops-worker POST /notion-conformed/sync` triggered por Cloud Scheduler `ops-notion-conformed-sync @ 20 7 * * * America/Santiago`. Reemplaza dependencia del Vercel cron (que queda como fallback) y del script manual `pnpm sync:source-runtime-projections` (que NO estaba scheduled — root cause de los 24 días de drift).
+- Helpers canónicos extraídos: `projectNotionDeliveryToPostgres` (per-row UPSERT idempotente) + `syncBqConformedToPostgres` (drena BQ conformed → PG UNCONDICIONALMENTE, regardless del skip de Step 1). Vive en `src/lib/sync/{project-notion-delivery-to-postgres,sync-bq-conformed-to-postgres}.ts`.
+- Schema BQ alineado con PG (TASK-588): `delivery_*.{task_name,project_name,sprint_name}` ahora NULLABLE. Helper runtime `ensureDeliveryTitleColumnsNullable()` lo aplica idempotente al sync startup.
+- DB functions `greenhouse_delivery.{task,project,sprint}_display_name` (migration `20260426144105255`) producen fallback display data-derived al READ time. Mirror en TS via `src/lib/delivery/task-display.ts` con paridad bit-exacta regression-tested.
+- UI primitives `<TaskNameLabel/ProjectNameLabel/SprintNameLabel>` con tratamiento canónico (italic + warning icon + tooltip + click-through Notion).
+- Admin hygiene queue `/admin/data-quality/notion-titles` lista pages con `*_name IS NULL` + CTA "Editar en Notion".
+- Resultado live (post-drain): Sky tasks 0/3,039 → **3,591/92** named/untitled, Sky projects 0/72 → **82/0**, Efeonce sin regresión (1,353/2 named/untitled). Las 94 untitled restantes son `title: []` reales en Notion (verificado dual via Notion REST API + Notion MCP).
+- Reglas duras documentadas en `CLAUDE.md` y `AGENTS.md`: NO sentinels en `*_name`, NO mover PG step adentro del path no-skip, NO crear cron Vercel scheduled paralelo, NO usar `Number()` directo para BQ-formula → PG INTEGER (usar `toInteger()` con `Math.trunc`).
+- Spec arquitectónica canónica nueva: `docs/architecture/GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md`.
+
+### 2026-04-26 — Nubox V2 Enterprise Enrichment Program planificado (TASK-640)
+
+- `TASK-640` pasa a `in-progress` con Slice 1 cerrado documentalmente: discovery contra runtime real, auditoría de arquitectura/schema y plan canónico en `docs/tasks/plans/TASK-640-plan.md`.
+- Supuestos corregidos: `schema-snapshot-baseline.sql` está stale para Finance/Nubox reciente; line item tables ya existen pero Nubox no las alimenta; income-side ya usa `recordPayment()`; VAT base ya existe por TASK-531/532/533.
+- Child tasks creadas: `TASK-662` a `TASK-668` cubren document graph, PDF/XML durable, payment graph, tax graph/data quality, master data governance, hot lanes adicionales y ops replay/promotion.
+- Regla operativa: no implementar Nubox V2 como megaslice; cada child task debe preservar `Nubox API -> BigQuery raw -> BigQuery conformed -> PostgreSQL projections -> UI/events`.
+
+### 2026-04-26 — API Platform Completion Program cerrado documentalmente (TASK-649)
+
+- `TASK-649` queda cerrada como umbrella documental: la API Platform ya tiene backlog hijo ejecutable para completar domains, writes, OAuth hosted y contrato developer-facing.
+- Discovery corrigió supuestos clave: ya existen commands mutativos platform sin idempotencia transversal; app/ecosystem usan runtimes de request-log distintos; hay idempotencia domain-local reutilizable; `schema-snapshot-baseline.sql` está stale para tablas API recientes; OpenAPI confunde `externalScopeType` con `greenhouseScopeType`.
+- Child tasks creadas: `TASK-650` a `TASK-661` cubren domain read surfaces, Finance/Commercial, People/Workforce, Ops/Reliability, Organization Workspace facets, command/idempotency, query conventions, degraded modes, resource authorization bridge, MCP OAuth hosted auth, OpenAPI stable y lifecycle/deprecation policy.
+- Regla operativa: MCP local read-only sigue desbloqueado vía consumer token; MCP hosted/multiusuario queda bloqueado por `TASK-659`.
+
+### 2026-04-26 — List motion con auto-animate (TASK-526, Slice 2 de TASK-642)
+
+- `@formkit/auto-animate` instalado (~2 KB, zero-config, respeta `prefers-reduced-motion` nativo).
+- Hook canonico `src/hooks/useListAnimation.ts` envuelve `useAutoAnimate` con timings consistentes (200ms / ease-out). Centraliza config para refactor cuando TASK-643 (tokens canonicos motion) cierre.
+- 5 listas mutables wireadas: QuoteLineItemsEditor (2 TableBody), AddonSuggestionsPanel, QuotesListView, PeopleListTable, ContextChipStrip.
+- Slice 2 de TASK-642 (Motion Polish Program) cerrado. Slices 1/3/4/5 siguen pendientes — independientes.
+- Gates verdes: tsc 0 errors, lint 0 errors, test 2177 passed, build OK.
+
+### 2026-04-26 — API Platform REST Hardening + First-Party App Lane (TASK-617.1 / TASK-617.2)
+
+- Recuperada e integrada de forma selectiva la implementación previa de `TASK-617.1` y `TASK-617.2` que había quedado repartida entre rama y stash.
+- `api/platform/ecosystem/*` suma paginación uniforme, headers de rate limit más completos, freshness helpers (`ETag` / `Last-Modified`) y tests de contrato.
+- Nueva lane `api/platform/app/*` para app first-party: sesiones user-scoped, access token corto firmado con `jose`, refresh token hasheado/rotado, revocación, context/home/notifications y commands acotados de notificaciones.
+- Migración nueva recuperada: `20260426021650967_task-617-api-platform-app-foundation.sql` crea `greenhouse_core.first_party_app_sessions` y `greenhouse_core.api_platform_request_logs`.
+- Regla: la futura app React Native consume `api/platform/app/*`, no rutas web internas ni credenciales ecosystem.
+
+### 2026-04-26 — `jsonwebtoken` → `jose` (TASK-515)
+
+- `src/lib/auth-tokens.ts` migrado a `jose@^6.2.2` (Web Crypto API, edge-runtime ready). HS256 preservado. `SignJWT`/`jwtVerify`/`decodeJwt` reemplazan `jwt.sign`/`jwt.verify`/`jwt.decode`.
+- `generateToken()` ahora `async`. 5 callers actualizados (`api/auth/verify-email`, `api/admin/invite`, `api/admin/users/[id]/resend-onboarding`, `api/account/forgot-password`, `lib/email/unsubscribe`).
+- `jsonwebtoken` y `@types/jsonwebtoken` removidos de `package.json`. Grep `jsonwebtoken` en `src/` → 0 hits.
+- Pre-requisito desbloqueado para TASK-516 (Auth.js v5).
+- Cleanup colateral de 2 errores tsc preexistentes: `scripts/lib/load-greenhouse-tool-env.ts` (param type `readonly string[]`) y `src/lib/finance/vat-ledger.test.ts` (typed `mockGetDb`).
+
+### 2026-04-26 — Nubox Quotes Hot Sync
+
+- Nuevo carril incremental `nubox-quotes-hot-sync` cada 15 minutos para cotizaciones Nubox (`COT` / DTE 52), manteniendo raw BigQuery → conformed → Postgres y tracking en `source_sync_runs`.
+- Nuevo script operativo `pnpm sync:nubox:quotes-hot` para replay manual robusto por periodo sin insertar/parchear filas.
+- Credenciales Nubox endurecidas: `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` ahora comparten resolución `Secret Manager -> env fallback`, sanitización defensiva, refs provisionadas en Development/Preview/Staging/Production y soporte operativo `--env-file`.
+
+### 2026-04-26 — API Platform Event Control Plane (TASK-617.3)
+
+- Nuevo control plane ecosystem-facing bajo `/api/platform/ecosystem/*`: `event-types`, `webhook-subscriptions`, `webhook-deliveries` y command `retry`.
+- Migración `20260426023509765_task-617-event-control-plane.sql` agrega ownership/scope nullable a `greenhouse_sync.webhook_subscriptions` para aislar subscriptions por `sister_platform_consumer_id` + binding.
+- `retry` reprograma deliveries para el dispatcher existente; no duplica el transport ni envía webhooks inline.
+- Docs actualizados en arquitectura API, arquitectura webhooks y documentación funcional de API Platform.
+
 ## 2026-04-25
 
 ### 2026-04-25 — Reliability AI Observer (TASK-638) — V1.2 capa Gemini Flash sobre el RCP
@@ -113,6 +224,12 @@
 - **Nuevo endpoint admin**: `GET /api/admin/reliability` protegido por `requireAdminTenantContext()` — reusable por agentes, synthetic monitors y change-based verification.
 - **Nueva sección visible**: `Admin Center` ahora expone "Confiabilidad por módulo" entre alertas y Torre de control. `Ops Health` y `Cloud & Integrations` preservan su lectura técnica especializada.
 - **Boundaries explícitos**: `TASK-586` (billing/notion-bq-sync), `TASK-599` (finance smoke lane) y `TASK-103` (budget alerts) tienen un `ReliabilityIntegrationBoundary` declarado para enchufar sus señales sin redefinir contratos.
+
+### 2026-04-26 — TASK-617 cerrado y MCP read-only listo para ejecución
+
+- `TASK-617` queda cerrado documentalmente tras completar sus cuatro child tasks de API Platform V1.1.
+- Nueva task ejecutable: `TASK-647 — Greenhouse MCP Read-Only Adapter V1`.
+- El primer MCP queda definido como downstream de `api/platform/ecosystem/*`, read-only, sin SQL directo, sin routes legacy y sin writes.
 
 ### 2026-04-25 — API Platform ya considera mobile app como consumer first-party oficial
 
@@ -6806,6 +6923,18 @@
 - La validación funcional quedó cubierta con `dryRun` real para `Marzo 2026`, resolviendo el target page existente sin sobrescribir el contenido histórico durante la verificación.
 
 # Changelog
+
+## 2026-04-26
+
+- API Platform: `/developers/api` ahora es el portal publico developer-facing de la plataforma. La pagina deja de presentar `integrations/v1` como historia principal y documenta lanes `ecosystem`, `app`, event control plane y legacy.
+- API docs: se agregaron `GREENHOUSE_API_PLATFORM_V1.md` y `GREENHOUSE_API_PLATFORM_V1.openapi.yaml` como artefactos derivados para `api/platform/*`; el OpenAPI de platform queda marcado como preview y el YAML de `integrations/v1` sigue como contrato estable del carril legacy.
+- Documentation alignment: `docs/api/*`, `docs/documentation/plataforma/api-platform-ecosystem.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` y los descargables en `public/docs/*` quedaron alineados para no prometer API anonima, writes amplios ni idempotencia transversal que aun no existen.
+
+## 2026-04-25
+
+- Finance / VAT ledger: `vat_monthly_position` quedó endurecido contra el error SQL `could not determine data type of parameter $6`; el materializer ahora castea explícitamente los placeholders textuales usados en metadata, `period_id` y `materialization_reason`, y quedó cubierto por regresión dedicada.
+- Finance / Data Quality: el check `orphan_expenses` fue reemplazado por semántica más precisa. `direct_cost_without_client` ahora marca drift real; `shared_overhead_unallocated` sigue visible pero ya no infla warnings como si fuera falla.
+- Ops / Reliability: `Finance Data Quality` en `getOperationsOverview()` ya no mezcla `processed/failed` con conceptos incompatibles. El subsistema expone `summary` + `metrics`, `Reliability` consume ese contrato directamente y `AdminOpsHealthView` muestra el detalle semántico sin maquillaje genérico.
 
 ## 2026-04-21
 

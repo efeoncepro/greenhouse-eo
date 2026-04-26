@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
+
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -20,6 +21,10 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import { useListAnimation } from '@/hooks/useListAnimation'
+import useQuotesList from '@/hooks/useQuotesList'
+import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -110,35 +115,21 @@ const marginChipColor = (effective: number | null, floor: number | null, target:
 
 const QuotesListView = () => {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [items, setItems] = useState<Quote[]>([])
+  const morphRouter = useViewTransitionRouter()
   const [statusFilter, setStatusFilter] = useState('')
   const [sourceFilter, setSourceFilter] = useState('')
+  const [tableBodyRef] = useListAnimation()
 
-  const fetchQuotes = useCallback(async () => {
-    setLoading(true)
-
-    try {
-      const params = new URLSearchParams()
-
-      if (statusFilter) params.set('status', statusFilter)
-      if (sourceFilter) params.set('source', sourceFilter)
-
-      const res = await fetch(`/api/finance/quotes?${params.toString()}`)
-
-      if (res.ok) {
-        const data = await res.json()
-
-        setItems(data.items ?? [])
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [statusFilter, sourceFilter])
-
-  useEffect(() => {
-    fetchQuotes()
-  }, [fetchQuotes])
+  /*
+    TASK-513: useQuotesList encapsula el fetch + cache. Cada combinacion de
+    filtros vive en su propio queryKey, asi navegar entre ellas es instantaneo
+    cuando los datos siguen frescos (staleTime 30s) y refetchOnWindowFocus
+    los mantiene al dia cuando el usuario vuelve al tab.
+  */
+  const { data: items = [] as Quote[], isPending: loading } = useQuotesList({
+    status: statusFilter || undefined,
+    source: sourceFilter || undefined
+  })
 
   const handleNewQuote = useCallback(() => {
     router.push('/finance/quotes/new')
@@ -237,21 +228,40 @@ const QuotesListView = () => {
                   <TableCell>Fuente</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody ref={tableBodyRef}>
                 {items.map(q => {
                   const statusConf = STATUS_CONFIG[q.status] ?? STATUS_CONFIG.draft
                   const sourceConf = SOURCE_CHIP_CONFIG[q.source] ?? SOURCE_CHIP_CONFIG.manual
                   const marginColor = marginChipColor(q.effectiveMarginPct, q.marginFloorPct, q.targetMarginPct)
 
                   return (
-                    <TableRow key={q.quoteId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/quotes/${q.quoteId}`)}>
+                    <TableRow
+                      key={q.quoteId}
+                      hover
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => morphRouter.push(`/finance/quotes/${q.quoteId}`)}
+                    >
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        {/* TASK-525: shared identity element. Same `view-transition-name` lives on the
+                            quote detail header so the row's quote number morphs into the detail header. */}
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            fontFamily: 'monospace',
+                            fontSize: '0.8rem',
+                            viewTransitionName: `quote-identity-${q.quoteId}`
+                          }}
+                        >
                           {q.quoteNumber ?? '—'}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2'>{q.clientName ?? '—'}</Typography>
+                        <Typography
+                          variant='body2'
+                          sx={{ viewTransitionName: `quote-client-${q.quoteId}` }}
+                        >
+                          {q.clientName ?? '—'}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant='body2' color='text.secondary'>{formatDate(q.quoteDate)}</Typography>

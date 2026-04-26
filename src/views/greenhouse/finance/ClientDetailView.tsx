@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
 import { useSession } from 'next-auth/react'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'

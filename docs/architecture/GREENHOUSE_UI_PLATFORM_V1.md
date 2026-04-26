@@ -13,6 +13,309 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-26b — ESLint 9 flat config (TASK-514)
+
+Migramos `eslint 8.57.1` (legacy `.eslintrc.js`) a **`eslint 9.39.4` con flat config (`eslint.config.mjs`)**. ESLint 8 entró en maintenance mode en 2024; flat config es el default desde 2024 y todos los plugins modernos convergieron a él (`typescript-eslint 8.59`, `eslint-plugin-import 2.32`, `eslint-config-next 16`, `eslint-config-prettier 10`).
+
+### Foundation
+
+- `eslint.config.mjs` reemplaza a `.eslintrc.js` como **única fuente de configuración** del linter.
+- Stack actualizado:
+  - `eslint@9.39.4`
+  - `@eslint/js@9.39.4`
+  - `@eslint/eslintrc@^3.3.5` (FlatCompat — disponible para casos edge, no usado en producción).
+  - `typescript-eslint@8.59.0` (metapackage flat-ready) + `@typescript-eslint/parser` + `@typescript-eslint/eslint-plugin`.
+  - `eslint-config-next@16.2.4` (provee config flat nativo en `eslint-config-next/core-web-vitals`).
+  - `eslint-plugin-import@2.32.0`, `eslint-config-prettier@10.1.8`, `eslint-import-resolver-typescript@4.4.4`.
+- Scripts simplificados:
+  - `"lint": "eslint ."` (drop `--ext` flag — flat config controla files vía `files` en cada bloque).
+  - `"lint:fix": "eslint . --fix"`.
+
+### Reglas custom preservadas 1:1
+
+Las convenciones del repo siguen vigentes sin cambios semánticos:
+
+- `padding-line-between-statements` (var/const/let → blank line; consts → multiline-block-like → blank line; etc.).
+- `lines-around-comment` (comment block precedido por blank line; allowBlockStart, allowObjectStart, allowArrayStart).
+- `newline-before-return`.
+- `import/newline-after-import: { count: 1 }`.
+- `import/order` con groups, pathGroups (`react`, `next/**`, `~/**` external before; `@/**` internal).
+- `@typescript-eslint/consistent-type-imports: error`.
+- `@typescript-eslint/no-unused-vars: error`.
+- `jsx-a11y/alt-text`, `react/display-name`, `react/no-children-prop`, `@next/next/no-img-element`, `@next/next/no-page-custom-font`: off (legacy).
+
+### Reglas explícitamente desactivadas (out-of-scope para esta migración)
+
+`eslint-config-next 16` agrega el bundle del **React Compiler / React 19** que introduce reglas estrictas nuevas (pertenecientes a `react-hooks/*`):
+
+- `react-hooks/set-state-in-effect`
+- `react-hooks/incompatible-library`
+- `react-hooks/refs`
+- `react-hooks/preserve-manual-memoization`
+- `react-hooks/immutability`
+- `react-hooks/static-components`, `component-hook-factories`, `error-boundaries`, `gating`, `globals`, `purity`, `unsupported-syntax`, `use-memo`, `config`, `fbt`, `fire`, `todo`
+
+Quedan **`off`** porque la spec exige migración 1:1 (mismo baseline pre/post). Adoptarlas requiere refactors per-componente coordinados — abrir task aparte cuando el equipo apunte al React Compiler.
+
+`react-hooks/rules-of-hooks` y `react-hooks/exhaustive-deps` (las clásicas) siguen activas como antes.
+
+`import/no-anonymous-default-export` también queda off (nuevo en `eslint-plugin-import 2.32` que dispara sobre `eslint.config.mjs` y otros bundlers config files).
+
+### Composición del config flat
+
+```js
+// eslint.config.mjs (resumen)
+export default [
+  { ignores: [/* generated, vendored, docs, etc. */] },
+  ...nextCoreWebVitals,           // Next 16 + react-hooks + jsx-a11y + import (registered)
+  ...tseslint.configs.recommended, // typescript-eslint metapackage
+  { rules: { /* convenciones del portal */ } },
+  { files: ['**/*.ts', '**/*.tsx', 'src/iconify-bundle/**'], rules: { /* TS-only overrides */ } },
+  prettierConfig                    // disable rules conflicting with prettier (last)
+]
+```
+
+**Por qué NO se importa `eslint-plugin-import` directo**: `eslint-config-next/core-web-vitals` ya lo registra. Importarlo otra vez dispara `Cannot redefine plugin "import"`. Las reglas `import/*` (incluido `import/order` y `import/newline-after-import`) viven en el bloque de reglas custom y se evalúan correctamente porque el plugin ya está disponible.
+
+### Files
+
+- `package.json` — bump deps + scripts.
+- `eslint.config.mjs` (NUEVO).
+- `.eslintrc.js` — DELETED.
+
+### Adopción
+
+- Cualquier nuevo dev override va al objeto custom rules de `eslint.config.mjs` (no agregar archivos `.eslintrc.*` nuevos).
+- Para overrides per-directorio, usar bloques flat con `files: ['src/foo/**']` + `rules: { ... }`.
+- Para temporalmente silenciar una regla en un archivo concreto, mantener `// eslint-disable-next-line <rule>` (sin cambios — flat config respeta la sintaxis).
+
+## Delta 2026-04-26 — Server state con React Query (TASK-513)
+
+Adoptamos **`@tanstack/react-query` 5.x** como capa canónica de server state del portal. Es el cache layer estándar 2024-2026 (Vercel, Linear, Stripe, Ramp, Notion, Resend, shadcn). Reemplaza progresivamente el patrón `useState + useEffect + fetch` disperso por una cache global con invalidación coordinada, refetch on focus, dedup automático y devtools.
+
+### Foundation
+
+- **Mount canónico**: `src/components/providers/QueryClientProvider.tsx` instancia un `QueryClient` por árbol cliente y monta `ReactQueryDevtools` solo cuando `NODE_ENV !== 'production'`. Lo envuelve `src/components/Providers.tsx` adentro del `ThemeProvider`.
+- **Defaults sanos**:
+  - `staleTime: 30s` — evita refetch en cada mount.
+  - `gcTime: 5min` — libera memoria pero conserva cache mientras navegamos.
+  - `refetchOnWindowFocus: true` — vuelta al tab = datos frescos sin ceremonia.
+  - `retry: 1` — segunda chance en errores transitorios sin spam.
+  - `throwOnError: false` — los consumers renderizan su propio error UI con `query.error` (estilo del portal).
+- **Devtools**: solo en development; botón en `bottom-left` para no chocar con el builder dock (top-right) ni con el sonner Toaster.
+
+### Query keys factory
+
+Todos los query keys viven en `src/lib/react-query/keys.ts` siguiendo la convención oficial de TanStack: tuplas tipadas `as const`, una rama por dominio (`finance`, `people`, ...), con `all`, `lists()`, `list(filters)`, `details()`, `detail(id)`. Consumers importan vía:
+
+```ts
+import { qk } from '@/lib/react-query'
+
+useQuery({
+  queryKey: qk.finance.quotes.list({ status: 'draft' }),
+  queryFn: () => fetchQuotes({ status: 'draft' })
+})
+
+queryClient.invalidateQueries({ queryKey: qk.finance.quotes.all })
+```
+
+**Regla dura**: no inventar query keys ad-hoc en hooks de consumer. La invalidación coordinada depende de tener un solo lugar canónico donde se declaren los keys de cada recurso.
+
+### Hooks canónicos (custom)
+
+Cada recurso server-side tiene su hook custom en `src/hooks/use<Resource>.ts` que envuelve `useQuery` con su queryKey, queryFn y overrides apropiados de cache. Tres ejemplos shipping en V1:
+
+| Hook | Endpoint | Override |
+|---|---|---|
+| `useQuotesList(filters)` | `/api/finance/quotes` | defaults |
+| `usePricingConfig()` | `/api/finance/quotes/pricing/config` | `staleTime: 5min`, `gcTime: 30min`, `refetchOnWindowFocus: false` (catalog data) |
+| `usePeopleList()` | `/api/people` | defaults |
+
+### Migration cheatsheet
+
+Antes:
+
+```tsx
+const [data, setData] = useState<X | null>(null)
+const [loading, setLoading] = useState(true)
+
+const load = useCallback(async () => {
+  const res = await fetch('/api/x')
+  if (res.ok) setData(await res.json())
+}, [])
+
+useEffect(() => { void load(); setLoading(false) }, [load])
+```
+
+Después:
+
+```tsx
+import useX from '@/hooks/useX'
+
+const { data, isPending: loading } = useX()
+```
+
+Mutaciones (crear, actualizar, borrar) invalidan el query desde el callback:
+
+```tsx
+const queryClient = useQueryClient()
+
+await fetch('/api/x', { method: 'POST', ... })
+void queryClient.invalidateQueries({ queryKey: qk.x.all })
+```
+
+### Reglas de adopción
+
+- **No migrar todo de un golpe** — adopción es progresiva, slice por slice. Esta task ship 3 ejemplos y deja el patrón documentado.
+- **Custom hook por recurso** — no exponer `useQuery` crudo en consumers. El custom hook centraliza el queryKey, queryFn, types y los overrides de cache que el recurso amerita.
+- **Invalidación, no refetch manual** — al mutar un recurso, llamar `queryClient.invalidateQueries({ queryKey: qk.<resource>.all })` desde el `onSuccess` de la mutación (no via prop callback al child).
+- **`isPending` cubre el "loading inicial"** — cuando ya hay data en cache, el query es "background refresh" y `isFetching` lo refleja sin tumbar el UI.
+- **Errores en el consumer** — leer `query.error`; el provider mantiene `throwOnError: false` para no forzar Error Boundaries.
+- **Para CRUD optimistic, usar `useMutation`** con `onMutate` + `onSettled` + `setQueryData` — patrón canónico de TanStack.
+- **No reintroducir Redux Toolkit / RTK Query** — `@reduxjs/toolkit` y `react-redux` quedan installed pero unused (legacy del Vuexy starter); son candidatos a remover en un follow-up cuando se confirme que ningún flujo del portal los consume.
+
+### Files
+
+- `package.json` — add `@tanstack/react-query@^5.100.5` + `@tanstack/react-query-devtools@^5.100.5`.
+- `src/components/providers/QueryClientProvider.tsx` (NUEVO).
+- `src/components/Providers.tsx` — wrap children con QueryClientProvider.
+- `src/lib/react-query/keys.ts` (NUEVO).
+- `src/lib/react-query/index.ts` (NUEVO).
+- `src/hooks/useQuotesList.ts` (NUEVO).
+- `src/hooks/usePricingConfig.ts` (NUEVO).
+- `src/hooks/usePeopleList.ts` (NUEVO).
+- `src/views/greenhouse/finance/QuotesListView.tsx` — consume `useQuotesList`.
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — consume `usePricingConfig`.
+- `src/views/greenhouse/people/PeopleList.tsx` — consume `usePeopleList` + `invalidateQueries` desde `CreateMemberDrawer onSuccess`.
+
+### Follow-ups documentados
+
+- SSR hydration patterns (Next 16 App Router + react-query) cuando emerja un consumer que se beneficie del prefetch desde el server component.
+- Audit y eventual remoción de `@reduxjs/toolkit` + `react-redux` del `package.json`.
+- Migración progresiva del resto de fetches (~100+ lugares) en olas por dominio: finance, hr, agency, admin.
+- `useMutation` canónico para los flujos save/issue del Quote Builder con optimistic updates.
+
+## Delta 2026-04-25c — `react-toastify` → `sonner` (TASK-512)
+
+Reemplazamos `react-toastify 11.0.5` por **sonner 2.0** como librería canónica de toasts del portal. Sonner es el estándar 2024-2026 que usan Vercel, Linear, Resend y shadcn: stack visual moderno (pinch effect tipo iOS notifications), bundle ~4 KB (vs ~30 KB de react-toastify), `toast.promise()` integrado, swipe dismiss en mobile, keyboard shortcut `Alt+T`, y theme bridge con CSS vars.
+
+### Mount canónico
+
+`src/components/Providers.tsx` monta `<Toaster />` una sola vez con la configuración global del portal:
+
+```tsx
+import { Toaster } from 'sonner'
+
+<Toaster
+  position='top-right'
+  richColors
+  closeButton
+  theme='system'
+  duration={4000}
+/>
+```
+
+- `position='top-right'` preserva el placement convención del portal (mismo que tenía `react-toastify` desde antes).
+- `richColors` activa el tinted background semántico (success, error, warning, info), alineado con la paleta usada en TASK-505 (summary dock primitives) y TASK-615 (quote builder).
+- `closeButton` ofrece dismiss visible.
+- `theme='system'` deja a sonner adoptar light/dark según `prefers-color-scheme`.
+- `duration={4000}` es el default; consumers individuales sobreescriben con `duration: <ms>` cuando necesitan más o menos tiempo.
+
+### API consumer (95% compatible)
+
+Los 60 consumers existentes solo cambiaron la línea de import:
+
+```diff
+- import { toast } from 'react-toastify'
++ import { toast } from 'sonner'
+```
+
+`toast.success`, `toast.error`, `toast.info`, `toast.warning` y `toast(...)` siguen funcionando idénticos. Diferencias relevantes con la API de `react-toastify`:
+
+- **`autoClose: <ms>` → `duration: <ms>`** — sonner usa `duration`. Cinco callsites en `QuoteBuilderShell.tsx` migrados.
+- **`position` por toast NO existe** — la posición se define globalmente en `<Toaster />`. Los cinco overrides `position: 'bottom-right'` se eliminaron; toda toast usa el placement global `top-right`.
+- **`hideProgressBar` no aplica** — sonner no tiene barra de progreso.
+- **`toast.promise(fn, { loading, success, error })`** existe nativo en sonner — preferirlo a flujos manuales loading/success/error cuando el async work tiene latencia visible.
+- **`toast.dismiss(id?)`** y **`toast.loading(...)`** existen — usar para cancelaciones o estados pendientes.
+
+### Reglas
+
+- **Nunca instalar otro toast container** — el mount global de Providers.tsx es el único.
+- **Nunca importar de `react-toastify`** — el package fue removido de `package.json` (TASK-512).
+- **Para tests**, mockear `'sonner'` en lugar de `'react-toastify'`:
+  ```ts
+  vi.mock('sonner', () => ({
+    toast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }
+  }))
+  ```
+- **Theme integration**: sonner respeta CSS vars. No reintroducir wrapper styled como el viejo `AppReactToastify` — `richColors` cubre el caso semántico y el resto fluye con el `<Toaster theme='system' />`.
+- **Custom JSX dentro del toast**: `toast.message('título', { description: 'cuerpo' })` reemplaza al `toast.info(<div>...)` con JSX. Evitar JSX inline en toasts.
+
+### Files
+
+- `package.json` — drop `react-toastify@11.0.5`, add `sonner@^2.0.7`.
+- `src/components/Providers.tsx` — mount Toaster sonner.
+- `src/libs/styles/AppReactToastify.tsx` — DELETED.
+- 59 archivos de `src/views/*` — codemod del import.
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — `autoClose` → `duration`, drop `position` (5 callsites).
+- `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx` — mock `'sonner'`.
+
+## Delta 2026-04-25 — Navigation transitions con View Transitions API (TASK-525)
+
+Activamos la **CSS View Transitions API** nativa del browser para transiciones de ruta same-document en App Router. Cero bundle adicional — es API del browser. Es el patrón 2024-2026 que usan Vercel Geist, Astro, Next docs y GitHub Issues redesign.
+
+### Activación
+
+- `next.config.ts` declara `experimental: { viewTransition: true }`. Next 16 expone el flag a App Router para que las navegaciones same-document corran dentro de `document.startViewTransition()` automáticamente.
+- Browser support: Chrome 111+ / Edge 111+ / Safari 18+. Firefox sin soporte aún → cae a navegación instantánea sin error.
+- `prefers-reduced-motion: reduce` está honrado en dos capas:
+  1. `globals.css` aplica `animation: none !important` a todos los `::view-transition-*` cuando reduced-motion está activo.
+  2. El helper `startViewTransition` también revisa `matchMedia` antes de invocar al browser, así callers con update functions costosas no pagan ni el snapshot.
+
+### Helper canónico
+
+`src/lib/motion/view-transition.ts` exporta `startViewTransition(update)`:
+
+```ts
+import { startViewTransition } from '@/lib/motion/view-transition'
+
+await startViewTransition(() => {
+  router.push(`/finance/quotes/${quoteId}`)
+})
+```
+
+- SSR-safe: detecta `typeof document === 'undefined'`.
+- Feature-detection: si `document.startViewTransition` no existe, ejecuta `update()` directo.
+- Reduced-motion: short-circuit antes de tomar el snapshot.
+- Errores en `update` no propagan al caller (los swallow para no romper la navegación).
+
+### Hook + Link drop-in
+
+- `src/hooks/useViewTransitionRouter.ts` — wrapper de `useRouter()` que envuelve `push`, `replace` y `back` con el helper. Drop-in para handlers programáticos (`onClick={() => router.push(...)}`).
+- `src/components/greenhouse/motion/ViewTransitionLink.tsx` — drop-in para `next/link` que intercepta el click izquierdo simple y delega a `router.push` dentro del transition. Modifier-clicks (cmd/ctrl/shift/middle), `target=_blank` y hrefs no-string caen al comportamiento Link nativo.
+
+### Patterns implementados v1
+
+1. **Finance quotes list → detail**: `QuotesListView` aplica `viewTransitionName: 'quote-identity-{quoteId}'` al número de cotización y `quote-client-{quoteId}` al nombre del cliente; `QuoteDetailView` aplica los mismos nombres a su header. El número y el cliente "viajan" de la fila al header.
+2. **Quote detail → edit mode**: el botón "Editar" pasa por `useViewTransitionRouter().push` para que el header del detalle se transforme suavemente en el shell del builder.
+3. **People list → detail**: `PeopleListTable` aplica `person-avatar-{memberId}` y `person-identity-{memberId}` al avatar 38px y al nombre; `PersonProfileHeader` reusa los mismos nombres en el avatar 80px y el `Typography variant='h5'` del nombre. El browser hace el morph cross-size automáticamente.
+
+### Reglas de adopción
+
+- **No global**: aplicar `viewTransitionName` solo en patterns donde la continuidad visual aporta — list→detail con identidad compartida, header→edit, modal/drawer open. Cualquier click no necesita transition.
+- **Nombres únicos**: `viewTransitionName` debe ser único en el documento al momento del snapshot. Usar siempre `{kind}-{id}` con un identificador estable.
+- **Programmatic nav**: usar `useViewTransitionRouter` cuando la fila/CTA navega por `onClick={() => router.push(...)}`.
+- **Declarative nav**: cambiar `next/link` por `ViewTransitionLink` solo cuando el destino tiene un elemento con `viewTransitionName` que matchee el origen. Para Links sin morph queda `next/link`.
+- **No reabrir framer-motion** para esto: View Transitions actúa al nivel del documento; framer-motion sigue siendo válido para microinteracciones dentro del DOM ya nuevo (counters, layout transitions internas).
+
+### Files
+
+- `next.config.ts` — flag `experimental.viewTransition`.
+- `src/lib/motion/view-transition.ts` — helper.
+- `src/hooks/useViewTransitionRouter.ts` — hook.
+- `src/components/greenhouse/motion/ViewTransitionLink.tsx` — Link drop-in.
+- `src/app/globals.css` — keyframes `greenhouse-view-transition-fade-{in,out}` + reduced-motion guard.
+
 ## Delta 2026-04-20b — Floating UI como stack oficial de popovers (TASK-509 / TASK-510)
 
 ### Decisión de plataforma

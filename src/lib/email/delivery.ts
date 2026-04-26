@@ -2,7 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'crypto'
 
-import * as Sentry from '@sentry/nextjs'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 import { getEmailFromAddress, getResendClient, isResendConfigured } from '@/lib/resend'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -570,14 +570,19 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     const subject = isTemplateMissing ? '[template missing]' : '[email delivery failed]'
     const errorClass = isTemplateMissing ? 'template_error' : 'resend_api_error'
 
-    // Capture in Sentry for observability
-    Sentry.captureException(error, {
+    // Capture in Sentry for observability — tagged `domain:cloud` so it
+    // surfaces in the Cloud Platform module's `incident` signal (email
+    // delivery is part of the cloud infrastructure footprint via the
+    // `Notificaciones` subsystem).
+    captureWithDomain(error, 'cloud', {
       extra: {
         emailType: input.emailType,
         recipientEmail: input.recipient.email,
         priority: input.priority,
-        attempt: input.existingDeliveryId ? 'retry' : 'first'
-      }
+        attempt: input.existingDeliveryId ? 'retry' : 'first',
+        errorClass
+      },
+      tags: { surface: 'email_delivery' }
     })
 
     if (input.existingDeliveryId) {
@@ -780,8 +785,9 @@ const prepareBroadcastRecipient = async <TContext extends Record<string, unknown
       payload
     }
   } catch (error) {
-    Sentry.captureException(error, {
-      extra: { emailType: input.emailType, recipientEmail: recipient.email, phase: 'batch_prepare' }
+    captureWithDomain(error, 'cloud', {
+      extra: { emailType: input.emailType, recipientEmail: recipient.email, phase: 'batch_prepare' },
+      tags: { surface: 'email_delivery' }
     })
 
     return {
@@ -896,8 +902,9 @@ const deliverBroadcastBatch = async <TContext extends Record<string, unknown>>(i
     )
   } catch (batchError) {
     // Batch API failed — record all eligible as failed (retryable)
-    Sentry.captureException(batchError, {
-      extra: { emailType: input.emailType, recipientCount: eligible.length, phase: 'batch_send' }
+    captureWithDomain(batchError, 'cloud', {
+      extra: { emailType: input.emailType, recipientCount: eligible.length, phase: 'batch_send' },
+      tags: { surface: 'email_delivery' }
     })
 
     const errorMessage = batchError instanceof Error ? batchError.message : 'Batch send failed.'

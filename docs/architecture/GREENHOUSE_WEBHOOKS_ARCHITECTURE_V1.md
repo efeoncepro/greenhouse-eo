@@ -1,5 +1,31 @@
 # GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md
 
+## Delta 2026-04-26 — Event Control Plane sobre API Platform (TASK-617.3)
+
+El runtime de webhooks queda separado explícitamente en dos planos:
+
+- **Transport boundary**: `src/lib/webhooks/**`, `/api/webhooks/*`, `/api/internal/webhooks/*` y `/api/cron/webhook-dispatch`.
+- **Event control plane**: resources y commands ecosystem-facing bajo `/api/platform/ecosystem/*`.
+
+El control plane nuevo no reemplaza el dispatcher ni envía webhooks inline. Administra subscriptions, expone deliveries/attempts y reprograma retries dejando que el dispatcher existente ejecute el transporte.
+
+Endpoints canónicos V1:
+
+- `GET /api/platform/ecosystem/event-types`
+- `GET /api/platform/ecosystem/webhook-subscriptions`
+- `POST /api/platform/ecosystem/webhook-subscriptions`
+- `GET /api/platform/ecosystem/webhook-subscriptions/:id`
+- `PATCH /api/platform/ecosystem/webhook-subscriptions/:id`
+- `GET /api/platform/ecosystem/webhook-deliveries`
+- `GET /api/platform/ecosystem/webhook-deliveries/:id`
+- `POST /api/platform/ecosystem/webhook-deliveries/:id/retry`
+
+Tenancy safety:
+
+- Las subscriptions creadas desde el control plane guardan `sister_platform_consumer_id`, `sister_platform_binding_id`, `greenhouse_scope_type`, `organization_id`, `client_id` y `space_id`.
+- Las lecturas de deliveries siempre pasan por la subscription owner y el binding resuelto.
+- Las subscriptions legacy internas (`wh-sub-canary`, `wh-sub-notifications`, etc.) pueden seguir existiendo sin owner de control plane y no se exponen a consumers externos.
+
 ## Purpose
 
 Define the canonical architecture for inbound and outbound webhooks in Greenhouse.

@@ -9,6 +9,77 @@
 
 ---
 
+## Delta 2026-04-26 — TASK-672 aterriza Platform Health V1 contract
+
+Aterriza el contrato `platform-health.v1`, primer endpoint API Platform pensado para preflight programático de agentes (MCP, Teams bot, CI). Compone Reliability Control Plane + Operations Overview + runtime checks + integration readiness + synthetic monitoring + webhook delivery + posture en una sola respuesta read-only con timeouts per-source.
+
+- **Rutas**: `GET /api/admin/platform-health` (admin lane, payload completo) + `GET /api/platform/ecosystem/health` (ecosystem lane, summary redactado).
+- **Composer**: `src/lib/platform-health/composer.ts`. 7 sources via `Promise.all` con `withSourceTimeout` per-source. Cache in-process 30s per audience. Una fuente caída → `degradedSources[]` honesto, NUNCA 5xx.
+- **Helpers reusables**: `src/lib/observability/redact.ts` (sanitizer canónico — usar antes de exponer cualquier `last_error`), `src/lib/platform-health/with-source-timeout.ts` (wrapper timeout/fallback que TASK-657 hereda), `safe-modes.ts` (6 booleanos determinísticos), `recommended-checks.ts` (catálogo declarativo de runbooks).
+- **Audience-aware**: la lane admin devuelve evidencia + degraded source error details. La ecosystem trim a 160 chars por issue + `evidenceRefs[]` vacío hasta que TASK-658 cierre el bridge `platform.health.detail`.
+- **Entitlements**: `platform.health.read` y `platform.health.detail` declarados en `ENTITLEMENT_CAPABILITY_CATALOG`. V1 enforcement vía route group + scope binding (sin runtime cap check hasta TASK-658).
+- **Documentación**: ver §22 abajo, doc funcional en `docs/documentation/plataforma/platform-health-api.md`, schema OpenAPI en `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml#components.schemas.PlatformHealthV1`.
+- **Tests**: 47 nuevos cubriendo composer, safe-modes, redaction, with-source-timeout, recommended-checks. Suite completa 2277/2282 pass tras el merge.
+
+Habilitadores downstream:
+
+- TASK-647 (MCP read-only adapter) puede agregar tool `get_platform_health` envolviendo el contrato.
+- TASK-657 (degraded modes / dependency health) hereda `withSourceTimeout` y la taxonomía `confidence`/`sourceFreshness`.
+- TASK-658 (resource authorization bridge) activa enforcement de las dos capability keys ya declaradas.
+- TASK-660 (OpenAPI stable contract) promueve este schema a stable.
+- TASK-671 (Teams bot) consume `safeModes.notifySafe` antes de enviar alertas.
+
+---
+
+## Delta 2026-04-26 — TASK-617.4 publica Developer API Documentation Portal
+
+- `/developers/api` pasa a ser el entrypoint publico developer-facing de la API Platform.
+- El framing canonico cambia de `Integrations API` a `Greenhouse API Platform`, con lanes explicitas:
+  - `ecosystem`
+  - `app`
+  - event control plane
+  - legacy `integrations/v1`
+- `docs/api/GREENHOUSE_API_PLATFORM_V1.md` y `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` nacen como artefactos derivados developer-facing para el estado runtime actual.
+- El OpenAPI de platform se marca como preview: cubre rutas y auth principales, pero schema generation automatica queda como follow-up.
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml` sigue siendo el contrato machine-readable estable del carril legacy/transicional.
+
+## Delta 2026-04-26 — TASK-617.1/617.2 recupera hardening REST y lane first-party app
+
+- `api/platform/ecosystem/*` ya usa metadata de paginación uniforme (`meta.pagination`), headers de rate limit con `remaining/reset`, soporte selectivo de freshness (`ETag` / `Last-Modified`) y tests de contrato focalizados.
+- Nace la lane first-party `api/platform/app/*`:
+  - `POST /api/platform/app/sessions` crea una sesión app user-scoped con access token corto y refresh token durable hasheado.
+  - `PATCH /api/platform/app/sessions` rota el refresh token.
+  - `DELETE /api/platform/app/sessions/current` revoca la sesión actual.
+  - `GET /api/platform/app/context`, `/home` y `/notifications` exponen los primeros resources compactos para mobile.
+  - `POST /api/platform/app/notifications/:id/read` y `/notifications/mark-all-read` son commands explícitos acotados.
+- Runtime persistente nuevo:
+  - `greenhouse_core.first_party_app_sessions`
+  - `greenhouse_core.api_platform_request_logs`
+- Regla canónica:
+  - `ecosystem` sigue siendo server-to-server con `sister_platform_consumers`.
+  - `app` es first-party user-authenticated, rehidrata tenant/access por usuario y no consume rutas web internas como contrato móvil.
+  - La app móvil prevista (`React Native`) debe usar `api/platform/app/*` y no `/api/home/*` ni rutas SSR/web internas.
+
+## Delta 2026-04-26 — TASK-617.3 aterriza el Event Control Plane ecosystem-facing
+
+- `api/platform/ecosystem/*` ya expone el plano de control de eventos sin mover el transport raw:
+  - `GET /event-types`
+  - `GET/POST /webhook-subscriptions`
+  - `GET/PATCH /webhook-subscriptions/:id`
+  - `GET /webhook-deliveries`
+  - `GET /webhook-deliveries/:id`
+  - `POST /webhook-deliveries/:id/retry`
+- El transport sigue siendo `src/lib/webhooks/**`, `/api/webhooks/*` y `/api/cron/webhook-dispatch`.
+- Las subscriptions creadas por el control plane guardan ownership ecosystem-facing en `greenhouse_sync.webhook_subscriptions`:
+  - `sister_platform_consumer_id`
+  - `sister_platform_binding_id`
+  - `greenhouse_scope_type`
+  - `organization_id`, `client_id`, `space_id`
+- Regla canónica:
+  - consumers externos solo ven subscriptions/deliveries propias del consumer + binding resuelto
+  - legacy/internal subscriptions sin owner quedan fuera del control plane ecosystem-facing
+  - retry es un command de control plane que reprograma delivery; no envía HTTP inline ni reemplaza al dispatcher
+
 ## 1. Objetivo
 
 Formalizar la arquitectura canónica de la `API platform` de Greenhouse para que el portal deje de crecer como una suma de rutas aisladas y pase a operar una capa de contratos consistente, robusta, resiliente, segura y escalable para:
@@ -42,29 +113,39 @@ Hoy el repo ya tiene piezas reales de una API platform, pero aún no una capa un
   - `greenhouse_core.sister_platform_bindings`
   - `greenhouse_core.sister_platform_consumers`
   - `greenhouse_core.sister_platform_request_logs`
+- Shared layer de API Platform en:
+  - `src/lib/api-platform/core/**`
+  - `src/lib/api-platform/resources/**`
+- Lane canonica `ecosystem` en:
+  - `src/app/api/platform/ecosystem/**`
+- Lane first-party `app` en:
+  - `src/app/api/platform/app/**`
+- Event control plane en:
+  - `src/app/api/platform/ecosystem/event-types`
+  - `src/app/api/platform/ecosystem/webhook-subscriptions/**`
+  - `src/app/api/platform/ecosystem/webhook-deliveries/**`
+- Developer entrypoint publico en:
+  - `src/app/(blank-layout-pages)/developers/api/page.tsx`
 - Muchas rutas de dominio consolidadas para UI interna y producto
 
 ### 2.2 Lo que todavía no existe
 
-- una `API platform` shared y uniforme para todo Greenhouse
-- un envelope estable de respuestas transversal a las familias de API
-- una taxonomía única de errores y degraded modes
-- una policy uniforme de versionado
+- una `API platform` shared y uniforme para todos los dominios de Greenhouse
+- una taxonomía completa y granular de degraded modes por dominio
 - una capability shared de idempotencia para writes
-- una lane first-party clara para clients móviles
-- una separación explícita entre:
-  - rutas de producto/UI
-  - consumers first-party app
-  - contratos ecosystem-facing
-  - futuros adapters MCP downstream
+- generacion automatica de OpenAPI desde schemas runtime
+- una API publica anonima o self-service para developers externos
+- adapters MCP downstream sobre todos los contratos estables
 
 ### 2.3 Lectura del codebase
 
 El estado actual del código muestra tres realidades distintas:
 
-1. `integrations/sister-platforms` ya funciona como foundation de plataforma
-2. muchas rutas internas siguen resolviendo auth + payload + errores inline
-3. los backends de lectura no son homogéneos:
+1. `api/platform/ecosystem/*` ya funciona como lane canonica binding-aware.
+2. `api/platform/app/*` ya funciona como foundation first-party user-authenticated.
+3. `integrations/sister-platforms` sigue funcionando como carril legacy endurecido.
+4. muchas rutas internas siguen resolviendo auth + payload + errores inline
+5. los backends de lectura no son homogéneos:
    - `PostgreSQL / greenhouse_serving` domina en dominios nuevos o ya consolidados
    - `BigQuery` todavía aparece en carriles externos legacy como `integrations/v1`
 
@@ -375,26 +456,25 @@ La `API platform` debe soportar esta semántica objetivo:
 
 Las brechas concretas hoy son:
 
-1. **Read-only solamente**
-   - la lane nueva solo expone `GET`
-   - todavía no existen command endpoints ecosystem-facing
+1. **Writes de negocio siguen cerrados**
+   - `ecosystem` ya tiene commands acotados de event control plane
+   - todavía no existen command endpoints amplios para mutar recursos de negocio
 
-2. **Colecciones sin contrato uniforme completo**
-   - aunque ya hay shape estable, no todas las colecciones exponen cursores/links/metadata de navegación con la misma madurez
+2. **Idempotencia transversal pendiente**
+   - los futuros writes de dominio deben exigir idempotency key y auditabilidad
+   - aun no existe helper/runtime compartido en `src/lib/api-platform/**`
 
-3. **Caching y conditional requests ausentes**
-   - faltan `ETag`, `Last-Modified`, `If-None-Match` o `If-Modified-Since` donde tenga sentido
+3. **OpenAPI de platform todavia es preview**
+   - existe documentacion developer-facing y un YAML preview
+   - falta generacion automatica o validacion schema-first para todos los payloads
 
-4. **Rate limit headers incompletos**
-   - la política existe, pero todavía debe converger a un contrato más consistente y más útil para consumers
+4. **Freshness selectiva**
+   - `ETag` / `Last-Modified` existe donde la frescura es segura
+   - no debe prometerse como universal para app o event control plane
 
 5. **Semántica mutativa no definida**
-   - faltan reglas canónicas de:
-     - `201 Created`
-     - `202 Accepted`
-     - `204 No Content`
-     - `409 Conflict`
-     - `422 Unprocessable Entity`
+   - el event control plane ya usa create/update/retry commands
+   - la semantica de writes de negocio queda pendiente antes de abrir mas dominios
 
 6. **Relación legacy vs REST nueva aún transicional**
    - `/api/integrations/v1/*` sigue viva y no toda su semántica está alineada todavía con el carril nuevo
@@ -1210,3 +1290,170 @@ Decisiones explícitas de este slice:
 - `integration-readiness` expresa health/readiness de integraciones y bindings; no pretende ser readiness transversal de toda la plataforma
 - el auth/context nuevo reutiliza el modelo seguro de `sister_platform_consumers` + `sister_platform_bindings` + `sister_platform_request_logs` sin romper `/api/integrations/v1/*`
 - `integrations/v1` y `integrations/v1/sister-platforms/*` siguen intactos y verificados como lanes legacy/transicionales
+
+## 27. Platform Health V1 contract — preflight programático canónico (TASK-672)
+
+Primer endpoint API Platform pensado para ser consumido por agentes (MCP, Teams bot, CI, scripts, dashboards externos) **antes** de ejecutar acciones sensibles. Reemplaza el patrón anterior donde cada consumer tenía que inferir el estado leyendo 7 endpoints distintos y hacer su propio rollup.
+
+### Por qué existe como contrato y no como query
+
+Antes de TASK-672 había observabilidad pero no contrato:
+
+- `/api/admin/reliability` devolvía datos crudos del Reliability Control Plane, útiles para la UI admin pero no versionados ni redactados.
+- `/api/internal/health` devolvía runtime telemetry de bajo nivel (Postgres/BigQuery), pensado para Cloud Run probes — expone secrets indirectos.
+- `integration-readiness` devolvía readiness por integración pero no health global ni safe modes.
+- Degraded modes existían como principio pero no como respuesta uniforme.
+
+Un agente que quisiera "saber si la plataforma está sana antes de actuar" tenía que:
+
+1. Llamar 4-7 endpoints separados.
+2. Manejar cada formato de error distinto.
+3. Inferir su propio rollup (cuál módulo importa, cómo combinar señales).
+4. Decidir empíricamente qué secrets/PII filtrar.
+5. Reintentar cada endpoint independientemente cuando alguno fallaba.
+
+Eso no escala. La solución canónica es exponer **un solo contrato versionado** que componga todas esas fuentes con una semántica operativa (status + safe modes + recommended checks).
+
+### Shape canónica
+
+`PlatformHealthV1` (definido en `src/types/platform-health.ts`):
+
+```typescript
+type PlatformHealthV1 = {
+  contractVersion: 'platform-health.v1'
+  generatedAt: string
+  environment: 'development' | 'preview' | 'staging' | 'production' | 'unknown'
+  overallStatus: 'healthy' | 'degraded' | 'blocked' | 'unknown'
+  confidence: 'high' | 'medium' | 'low' | 'unknown'
+  safeModes: {
+    readSafe: boolean
+    writeSafe: boolean
+    deploySafe: boolean
+    backfillSafe: boolean
+    notifySafe: boolean
+    agentAutomationSafe: boolean
+  }
+  modules: PlatformHealthModule[]
+  blockingIssues: PlatformHealthIssue[]
+  warnings: PlatformHealthIssue[]
+  recommendedChecks: PlatformHealthRecommendedCheck[]
+  degradedSources: PlatformHealthDegradedSource[]
+}
+```
+
+**Garantía de versionado**: solo `contractVersion: 'platform-health.v1'` es estable. Cambios incompatibles bumpean a `v2`. Nuevos campos opcionales se agregan dentro de `v1` sin bump.
+
+### Composer y degradación honesta
+
+El composer (`src/lib/platform-health/composer.ts`) llama 7 fuentes en paralelo con `Promise.all`:
+
+|Fuente|Aporta|Timeout|
+|---|---|---|
+|`reliability_control_plane`|Modules + signals agregadas|6s|
+|`operations_overview`|KPIs operacionales|5s|
+|`internal_runtime_health`|Probes Postgres + BigQuery|5s|
+|`observability_posture`|Sentry + Slack config|2s|
+|`sentry_incidents`|Issues abiertas tagged por dominio|3s|
+|`synthetic_monitoring`|Última corrida de probes|3s|
+|`integration_readiness`|Estado por integración|4s|
+
+Cada fuente se envuelve en `withSourceTimeout` (ver §15 sobre degraded modes — esta task implementa el patrón concreto). Una fuente caída produce un `SourceResult<T>` con `status='timeout'|'error'|'not_configured'` que el composer traduce a una entrada en `degradedSources[]`. La respuesta nunca es 5xx por una sola fuente.
+
+Cuando el composer detecta `degradedSourceCount >= 3` baja `confidence` a `'low'`. Cuando `>= 1` lo baja a `'medium'`. Esa es la única política de confidence — explícita y testeable.
+
+### Audience-aware redaction
+
+El composer toma un parámetro `audience: 'admin' | 'ecosystem'`:
+
+- **admin**: 5 topIssues por módulo, summary completo (redactado de secrets), `evidenceRefs[]` con paths de evidencia, degraded source error details.
+- **ecosystem**: 3 topIssues por módulo, summary trimmed a 160 chars, `evidenceRefs: []`. Esta restricción se levantará cuando TASK-658 cierre el bridge `platform.health.detail`.
+
+La redacción se aplica vía `src/lib/observability/redact.ts`:
+
+- Patterns: JWT, Bearer, GCP secret URI, Sentry DSN, generic `user:pass@host`, query-param secrets, email user portion.
+- Helpers: `redactSensitive(string)`, `redactObjectStrings(obj, depth)`, `redactErrorForResponse(err)` (drops stack trace).
+- **Reusable más allá de Platform Health**: cualquier endpoint que persista o devuelva strings de error debe pasarlas por aquí. NUNCA loggear `error.stack` directo en payload que cruce un boundary externo.
+
+### Safe modes determinísticos
+
+`src/lib/platform-health/safe-modes.ts` deriva 6 booleanos a partir del estado por módulo + blocking issues:
+
+|Bandera|Regla|
+|---|---|
+|`readSafe`|cloud module ≤ degraded + sin blocking issues|
+|`writeSafe`|readSafe + delivery ≤ degraded + sin blocking en cloud/delivery|
+|`deploySafe`|writeSafe + overallStatus ≠ blocked|
+|`backfillSafe`|writeSafe + delivery exactamente healthy|
+|`notifySafe`|readSafe + sin blocking en webhook_delivery / integration_readiness / cloud|
+|`agentAutomationSafe`|overallStatus healthy + cloud healthy + finance/delivery/notion ≤ degraded + zero blocking|
+
+Conservador por diseño: cualquier ambigüedad (módulo missing, fuente unknown) defaultea a `false`. Falsos negativos (decir "no seguro" cuando lo es) son aceptables; falsos positivos (decir "seguro" cuando está roto) no lo son.
+
+### Recommended checks
+
+`src/lib/platform-health/recommended-checks.ts` mantiene un catálogo declarativo de runbooks operativos. Cada check tiene `appliesWhen[]` (set de triggers). El composer construye el set de triggers desde el estado observado (`overall:degraded`, `module:cloud:blocked`, `safe-mode:writeSafe:false`, etc.) y filtra el catálogo. Resultado: la respuesta dice exactamente qué comandos correr.
+
+Patrón reusable: cualquier dashboard futuro que necesite "trigger → catálogo de remediaciones" puede replicarlo.
+
+### Cache in-process
+
+`src/lib/platform-health/cache.ts`. TTL 30s per audience. Razón: agentes y MCP pueden polear agresivamente; sin cache, los 7 readers se vuelven cuello de botella. V1 es per-instance — distribuido (Redis) es overkill hasta observar thundering herd cross-instance real.
+
+### Rutas y autenticación
+
+|Ruta|Auth|Audience|Envelope|
+|---|---|---|---|
+|`GET /api/admin/platform-health`|`requireAdminTenantContext` (admin route group + EFEONCE_ADMIN role)|`admin`|NextResponse JSON directo + `x-platform-health-contract` header|
+|`GET /api/platform/ecosystem/health`|`runEcosystemReadRoute` (ecosystem bearer + scope binding)|`ecosystem`|API Platform envelope (`requestId`, `servedAt`, `version`, `data`, `meta`) con etag/freshness|
+
+Ambas rutas son `export const dynamic = 'force-dynamic'`. La ecosystem soporta `If-None-Match` (etag construido sobre `contractVersion + overallStatus + safeModes + module statuses + degraded count`).
+
+Cada hit a la ruta ecosystem persiste en `greenhouse_core.api_platform_request_logs` vía `recordApiPlatformRequestLog` (helper existente). Auditoría sin tooling adicional.
+
+### Entitlements declarados
+
+`src/config/entitlements-catalog.ts` agrega:
+
+```typescript
+{ key: 'platform.health.read', module: 'admin', actions: ['read'], defaultScope: 'all' }
+{ key: 'platform.health.detail', module: 'admin', actions: ['read'], defaultScope: 'all' }
+```
+
+V1 son **declarativas** — el enforcement runtime real lo agregará TASK-658. Por ahora el gating efectivo viene del route group (admin) y del scope binding (ecosystem). Esto evita inventar un helper paralelo de `tenantHasEntitlement()` antes de que el bridge canónico aterrice.
+
+### Tests cubiertos
+
+47 unit tests entre 5 archivos:
+
+- `redact.test.ts` (15) — patrones, idempotencia, deep walk, ciclos, error normalization
+- `with-source-timeout.test.ts` (5) — ok / timeout / error / sentinel / duration tracking
+- `safe-modes.test.ts` (8) — table-driven cubriendo healthy / blocked / degraded / empty
+- `recommended-checks.test.ts` (6) — filtrado por trigger, dedup, invariantes del catálogo
+- `composer.test.ts` (8) — payload shape, blocked rollup, degraded source, redaction, audience trimming, immutabilidad
+
+Todos passing. Suite completa post-merge: 2277/2282 (5 saltados deliberadamente por gates externos: cutover Finance + parity SQL que requiere PG, ninguno relacionado).
+
+### Reglas canónicas
+
+- **NO** crear endpoints paralelos de health en otros módulos. Si un módulo nuevo necesita exponer salud, registrarlo en `RELIABILITY_REGISTRY` y el composer lo recoge automáticamente.
+- **NO** exponer payload sin pasar por `redactSensitive`. Aplica a cualquier campo que contenga strings de error o de fuente externa.
+- **NO** computar safe modes ni rollup en el cliente. Consumir las banderas como vienen del contrato.
+- **NO** agregar fuentes al composer sin envolverlas en `withSourceTimeout`.
+- **NO** interpretar `degraded` como `healthy`. Si el contrato dice `degraded`, hay un warning real.
+- **NO** cachear en el cliente más de 30s. El composer ya cachea in-process.
+- **NO** depender de campos no documentados. Solo `contractVersion: "platform-health.v1"` garantiza shape estable.
+
+### Documentación cruzada
+
+- Doc funcional en español: `docs/documentation/plataforma/platform-health-api.md`
+- Schema OpenAPI: `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml#components.schemas.PlatformHealthV1`
+- Markdown developer-facing: `docs/api/GREENHOUSE_API_PLATFORM_V1.md` + mirror público `public/docs/greenhouse-api-platform-v1.md`
+- CLAUDE.md y AGENTS.md tienen sección "Platform Health API Contract" con reglas duras.
+
+### Tareas relacionadas
+
+- TASK-647 — MCP read-only adapter agregará tool `get_platform_health` envolviendo este contrato (follow-up).
+- TASK-657 — degraded modes / dependency health hereda `withSourceTimeout` y la taxonomía `confidence`/`sourceFreshness` (parallel).
+- TASK-658 — resource authorization bridge activará enforcement de las dos capability keys ya declaradas.
+- TASK-660 — OpenAPI stable contract promueve este schema a stable junto con el resto.
+- TASK-671 — Teams bot consume `safeModes.notifySafe` antes de cada alerta.

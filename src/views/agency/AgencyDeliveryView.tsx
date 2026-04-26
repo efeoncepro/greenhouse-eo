@@ -101,7 +101,7 @@ const trendDelta = (trend: TrendMonth[], field: 'otdPct' | 'rpaAvg' | 'ftrPct'):
 
 const spaceColumnHelper = createColumnHelper<SpaceHealth>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
   spaceColumnHelper.accessor('clientName', {
     header: 'Space',

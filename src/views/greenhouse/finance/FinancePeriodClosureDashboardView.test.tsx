@@ -9,10 +9,12 @@ import FinancePeriodClosureDashboardView from './FinancePeriodClosureDashboardVi
 
 const fetchMock = vi.fn()
 
-vi.mock('react-toastify', () => ({
+vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
-    error: vi.fn()
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn()
   }
 }))
 

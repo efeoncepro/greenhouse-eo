@@ -353,7 +353,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
   )
 
   return (
-    // eslint-disable-next-line lines-around-comment
+     
     /* Sub Menu */
     <StyledSubMenu
       ref={ref}
@@ -445,7 +445,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
                 open: isSubMenuOpen
               })
             ) : (
-              // eslint-disable-next-line lines-around-comment
+               
               /* Expanded Arrow Icon */
               <StyledVerticalNavExpandIcon open={isSubMenuOpen} transitionDuration={transitionDuration}>
                 <ChevronRight fontSize='1rem' />

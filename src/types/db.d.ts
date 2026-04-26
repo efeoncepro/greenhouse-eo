@@ -1604,6 +1604,27 @@ export interface GreenhouseContextContextDocumentVersions {
   version_number: number;
 }
 
+export interface GreenhouseCoreApiPlatformRequestLogs {
+  api_platform_request_log_id: string;
+  app_session_id: string | null;
+  client_id: string | null;
+  consumer_id: string | null;
+  created_at: Generated<Timestamp>;
+  duration_ms: number;
+  error_code: string | null;
+  ip_hash: string | null;
+  lane: string;
+  organization_id: string | null;
+  rate_limited: Generated<boolean>;
+  request_method: string;
+  request_path: string;
+  response_status: number;
+  route_key: string;
+  space_id: string | null;
+  user_agent_hash: string | null;
+  user_id: string | null;
+}
+
 export interface GreenhouseCoreAssetAccessLog {
   access_log_id: string;
   action: string;
@@ -1849,6 +1870,31 @@ export interface GreenhouseCoreEntitySourceLinks {
   source_object_type: string;
   source_system: string;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreFirstPartyAppSessions {
+  app_session_id: string;
+  app_version: string | null;
+  client_id: string | null;
+  created_at: Generated<Timestamp>;
+  device_label: string | null;
+  device_platform: string | null;
+  expires_at: Timestamp;
+  hash_algorithm: Generated<string>;
+  ip_hash: string | null;
+  last_used_at: Timestamp | null;
+  metadata_json: Generated<Json>;
+  organization_id: string | null;
+  public_id: string;
+  refresh_token_hash: string;
+  revoked_at: Timestamp | null;
+  revoked_by_user_id: string | null;
+  revoked_reason: string | null;
+  session_status: Generated<string>;
+  space_id: string | null;
+  updated_at: Generated<Timestamp>;
+  user_agent_hash: string | null;
+  user_id: string;
 }
 
 export interface GreenhouseCoreIdentityProfiles {
@@ -2281,6 +2327,10 @@ export interface GreenhouseCoreReliabilityModuleRegistry {
   domain: string;
   expected_signal_kinds: Generated<Json>;
   files_owned: Generated<Json>;
+  /**
+   * Sentry tag value used to filter incidents per module (e.g. 'finance', 'cloud'). NULL means the module does not consume domain-tagged Sentry incidents.
+   */
+  incident_domain_tag: string | null;
   label: string;
   module_key: string;
   routes: Generated<Json>;
@@ -2601,6 +2651,96 @@ export interface GreenhouseCoreSpaces {
   space_name: string;
   space_type: Generated<string>;
   status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreTeamsBotConversationReferences {
+  azure_tenant_id: string;
+  bot_app_id: string;
+  conversation_id: string | null;
+  created_at: Generated<Timestamp>;
+  failure_count: Generated<number>;
+  last_failure_at: Timestamp | null;
+  /**
+   * Redacted summary of the last failure (no tokens, no stacks). For ops dashboards only.
+   */
+  last_failure_reason: string | null;
+  last_success_at: Timestamp | null;
+  last_used_at: Generated<Timestamp>;
+  reference_id: Generated<string>;
+  /**
+   * Stable lookup key. 'channel:<teamId>:<channelId>' | 'user:<aadObjectId>' | 'chat:<chatId>'. Unique per bot_app_id.
+   */
+  reference_key: string;
+  /**
+   * Bot Framework serviceUrl that has worked at least once for this target. Region drift is rare; on persistent failure we mark failure_count high and the dispatcher re-discovers via the candidate list.
+   */
+  service_url: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreTeamsBotInboundActions {
+  action_data_json: Json | null;
+  action_id: string;
+  activity_id: string;
+  azure_tenant_id: string;
+  bot_app_id: string;
+  conversation_id: string;
+  from_aad_object_id: string;
+  /**
+   * Redacted error description (no tokens, no PII) suitable for the reliability dashboard.
+   */
+  handler_error_summary: string | null;
+  handler_finished_at: Timestamp | null;
+  handler_started_at: Timestamp | null;
+  handler_status: Generated<string>;
+  /**
+   * Stable hash sha256(activity_id|action_id|from_aad_object_id). Bot Framework may retry; the unique constraint blocks double-execution.
+   */
+  idempotency_key: string;
+  inbound_id: Generated<string>;
+  received_at: Generated<Timestamp>;
+  resolved_member_id: string | null;
+  resolved_user_id: string | null;
+}
+
+export interface GreenhouseCoreTeamsNotificationChannels {
+  azure_resource_group: string | null;
+  azure_subscription_id: string | null;
+  azure_tenant_id: string | null;
+  bot_app_id: string | null;
+  channel_code: string;
+  channel_id: string | null;
+  channel_kind: Generated<string>;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  disabled_at: Timestamp | null;
+  display_name: string;
+  logic_app_resource_id: string | null;
+  /**
+   * Lifecycle of the channel's secret provisioning. `pending_setup` means the channel row exists in PG but the GCP Secret Manager secret named by `secret_ref` is missing — sends are skipped silently and the channel does NOT count against the Teams Notifications dashboard failure metric. Updated by the readiness check at ops-worker startup and after each send.
+   */
+  provisioning_status: Generated<string>;
+  provisioning_status_reason: string | null;
+  provisioning_status_updated_at: Timestamp | null;
+  /**
+   * Microsoft Graph chat id for static recipient_kind=chat_group rows.
+   */
+  recipient_chat_id: string | null;
+  /**
+   * TASK-671: surface for the bot transport. channel = post to teams channel; chat_1on1 = static DM; chat_group = static group chat; dynamic_user = resolve member at runtime from event payload.
+   */
+  recipient_kind: Generated<string>;
+  /**
+   * Mapping rule for recipient_kind=dynamic_user. Shape: {"from":"payload.<dot.path.to.member_id>"}. The sender extracts a member_id from the event payload and resolves it via resolveTeamsUserForMember(memberId).
+   */
+  recipient_routing_rule_json: Json | null;
+  /**
+   * Microsoft Graph user id (aadObjectId) for static recipient_kind=chat_1on1 rows.
+   */
+  recipient_user_id: string | null;
+  secret_ref: string;
+  team_id: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -3389,6 +3529,9 @@ export interface GreenhouseFinanceFactoringOperations {
    */
   external_reference: string | null;
   factoring_provider_id: string;
+  /**
+   * Total factoring cost (interest + advisory). Counts toward income.amount_paid via greenhouse_finance.income_settlement_reconciliation — the receivable IS settled for this portion because we sold the AR risk to the provider, even though the fee never lands as cash. Do NOT re-derive this in ad-hoc queries.
+   */
   fee_amount: Numeric;
   fee_rate: Numeric;
   income_id: string;
@@ -3419,6 +3562,9 @@ export interface GreenhouseFinanceIdempotencyKeys {
 }
 
 export interface GreenhouseFinanceIncome {
+  /**
+   * Total settled portion of the receivable. Composed of: cash payments + factoring fees (when factored) + tax withholdings. Use the canonical view greenhouse_finance.income_settlement_reconciliation (or src/lib/finance/income-settlement.ts) to validate consistency — never sum greenhouse_finance.income_payments alone, that ignores factoring + withholdings.
+   */
   amount_paid: Generated<Numeric>;
   balance_nubox: Numeric | null;
   client_id: string | null;
@@ -3591,6 +3737,23 @@ export interface GreenhouseFinanceIncomePayments {
   recorded_by_user_id: string | null;
   reference: string | null;
   settlement_group_id: string | null;
+}
+
+export interface GreenhouseFinanceIncomeSettlementReconciliation {
+  amount_paid: Numeric | null;
+  client_id: string | null;
+  drift: Numeric | null;
+  expected_settlement: Numeric | null;
+  factoring_fee_total: Numeric | null;
+  factoring_operation_count: number | null;
+  has_drift: boolean | null;
+  income_id: string | null;
+  invoice_number: string | null;
+  is_factored: boolean | null;
+  payment_status: string | null;
+  payments_total: Numeric | null;
+  total_amount: Numeric | null;
+  withholding_amount: Numeric | null;
 }
 
 export interface GreenhouseFinanceNuboxEmissionLog {
@@ -5974,6 +6137,39 @@ export interface GreenhouseServingUser360 {
   user_id: string | null;
 }
 
+export interface GreenhouseSyncHandlerHealth {
+  consecutive_failures: Generated<number>;
+  consecutive_successes: Generated<number>;
+  created_at: Generated<Timestamp>;
+  /**
+   * State machine: healthy → degraded (>=3 consecutive failures) → failed (dead-letter or >=10 consecutive failures) → quarantined (manual or auto-quarantine). Returns to healthy on first success.
+   */
+  current_state: Generated<string>;
+  handler: string;
+  last_dead_letter_event_id: string | null;
+  last_error_class: string | null;
+  last_error_family: string | null;
+  last_event_id: string | null;
+  last_failure_at: Timestamp | null;
+  last_success_at: Timestamp | null;
+  quarantine_reason: string | null;
+  quarantined_at: Timestamp | null;
+  state_changed_at: Generated<Timestamp>;
+  total_dead_letter_count: Generated<Int8>;
+  total_recovered_count: Generated<Int8>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseSyncHandlerHealthTransitions {
+  from_state: string;
+  handler: string;
+  reason: string | null;
+  to_state: string;
+  transition_id: Generated<Int8>;
+  transitioned_at: Generated<Timestamp>;
+  trigger_event_id: string | null;
+}
+
 export interface GreenhouseSyncIdentityProfileMergeLog {
   client_users_moved: Generated<number>;
   contacts_moved: Generated<number>;
@@ -6227,6 +6423,11 @@ export interface GreenhouseSyncOutboxEvents {
 }
 
 export interface GreenhouseSyncOutboxReactiveLog {
+  /**
+   * When an operator manually acknowledged this dead-letter row as resolved. Acknowledged rows do not count toward the active dead-letter KPI.
+   */
+  acknowledged_at: Timestamp | null;
+  acknowledged_by: string | null;
   error_class: string | null;
   error_family: string | null;
   event_id: string;
@@ -6234,6 +6435,11 @@ export interface GreenhouseSyncOutboxReactiveLog {
   is_infrastructure_fault: Generated<boolean>;
   last_error: string | null;
   reacted_at: Generated<Timestamp>;
+  /**
+   * When a later attempt of the same (handler, event_id) succeeded. Auto-set by the reactive worker. Recovered rows do not count toward the active dead-letter KPI.
+   */
+  recovered_at: Timestamp | null;
+  resolution_note: string | null;
   result: string | null;
   retries: Generated<number>;
 }
@@ -6263,7 +6469,14 @@ export interface GreenhouseSyncProjectionCircuitState {
 }
 
 export interface GreenhouseSyncProjectionRefreshQueue {
+  /**
+   * Set to TRUE when a dead row points to an entity that no longer exists in PG (smoke test residue, archived records, snapshot drift). Excluded from the reliability dashboard "Proyecciones" warning count. The row stays for audit — never DELETE.
+   */
+  archived: Generated<boolean>;
+  archived_at: Timestamp | null;
+  archived_reason: string | null;
   created_at: Generated<Timestamp>;
+  dead_at: Timestamp | null;
   entity_id: string;
   entity_type: string;
   error_class: string | null;
@@ -6345,6 +6558,30 @@ export interface GreenhouseSyncServiceSyncQueue {
   status: Generated<string>;
 }
 
+export interface GreenhouseSyncSmokeLaneRuns {
+  branch: string | null;
+  commit_sha: string;
+  duration_ms: number | null;
+  failed_tests: Generated<number>;
+  finished_at: Timestamp | null;
+  /**
+   * Stable identifier for the smoke lane (e.g. `finance.web`, `delivery.web`, `identity.api`). Matches the reliability registry expectations so the reader can map by key without translation.
+   */
+  lane_key: string;
+  passed_tests: Generated<number>;
+  recorded_at: Generated<Timestamp>;
+  skipped_tests: Generated<number>;
+  smoke_lane_run_id: string;
+  started_at: Timestamp;
+  status: string;
+  /**
+   * Per-suite breakdown for the dashboard drill-down. Free-form JSON so the CI side can include whatever Playwright/Vitest emits without a schema migration. Standard keys when present: `suites[]`, `failedSpecs[]`, `slowestSpecs[]`.
+   */
+  summary_json: Generated<Json>;
+  total_tests: Generated<number>;
+  workflow_run_url: string | null;
+}
+
 export interface GreenhouseSyncSourceSyncFailures {
   created_at: Generated<Timestamp>;
   error_code: string | null;
@@ -6391,6 +6628,15 @@ export interface GreenhouseSyncSourceSyncWatermarks {
 }
 
 export interface GreenhouseSyncWebhookDeliveries {
+  /**
+   * When an operator marked this dead-letter delivery as resolved. Excludes the row from the active dead-letter KPI without losing the audit trail.
+   */
+  acknowledged_at: Timestamp | null;
+  acknowledged_by: string | null;
+  /**
+   * Auto-set by retention cron for dead_letter rows older than the retention window. Excludes the row from active dashboards.
+   */
+  archived_at: Timestamp | null;
   attempt_count: Generated<number>;
   completed_at: Timestamp | null;
   created_at: Generated<Timestamp>;
@@ -6399,6 +6645,7 @@ export interface GreenhouseSyncWebhookDeliveries {
   last_error_message: string | null;
   last_http_status: number | null;
   next_retry_at: Timestamp | null;
+  resolution_note: string | null;
   status: Generated<string>;
   webhook_delivery_id: string;
   webhook_subscription_id: string;
@@ -6415,6 +6662,23 @@ export interface GreenhouseSyncWebhookDeliveryAttempts {
   started_at: Generated<Timestamp>;
   webhook_delivery_attempt_id: string;
   webhook_delivery_id: string;
+}
+
+export interface GreenhouseSyncWebhookEndpointHealth {
+  active_dead_letter_count: Generated<number>;
+  consecutive_failures: Generated<number>;
+  consecutive_successes: Generated<number>;
+  created_at: Generated<Timestamp>;
+  current_state: Generated<string>;
+  last_dead_letter_at: Timestamp | null;
+  last_error_message: string | null;
+  last_failure_at: Timestamp | null;
+  last_http_status: number | null;
+  last_success_at: Timestamp | null;
+  state_changed_at: Generated<Timestamp>;
+  total_dead_letter_count: Generated<Int8>;
+  updated_at: Generated<Timestamp>;
+  webhook_subscription_id: string;
 }
 
 export interface GreenhouseSyncWebhookEndpoints {
@@ -6448,10 +6712,18 @@ export interface GreenhouseSyncWebhookInboxEvents {
 export interface GreenhouseSyncWebhookSubscriptions {
   active: Generated<boolean>;
   auth_mode: Generated<string>;
+  client_id: string | null;
+  control_plane_metadata_json: Generated<Json>;
   created_at: Generated<Timestamp>;
+  created_by_control_plane: Generated<boolean>;
   event_filters_json: Generated<Json>;
+  greenhouse_scope_type: string | null;
+  organization_id: string | null;
   paused_at: Timestamp | null;
   secret_ref: string | null;
+  sister_platform_binding_id: string | null;
+  sister_platform_consumer_id: string | null;
+  space_id: string | null;
   subscriber_code: string;
   target_url: string;
   updated_at: Generated<Timestamp>;
@@ -6537,6 +6809,7 @@ export interface DB {
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;
+  "greenhouse_core.api_platform_request_logs": GreenhouseCoreApiPlatformRequestLogs;
   "greenhouse_core.asset_access_log": GreenhouseCoreAssetAccessLog;
   "greenhouse_core.assets": GreenhouseCoreAssets;
   "greenhouse_core.audit_events": GreenhouseCoreAuditEvents;
@@ -6551,6 +6824,7 @@ export interface DB {
   "greenhouse_core.clients": GreenhouseCoreClients;
   "greenhouse_core.departments": GreenhouseCoreDepartments;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
+  "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
@@ -6590,6 +6864,9 @@ export interface DB {
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;
   "greenhouse_core.spaces": GreenhouseCoreSpaces;
+  "greenhouse_core.teams_bot_conversation_references": GreenhouseCoreTeamsBotConversationReferences;
+  "greenhouse_core.teams_bot_inbound_actions": GreenhouseCoreTeamsBotInboundActions;
+  "greenhouse_core.teams_notification_channels": GreenhouseCoreTeamsNotificationChannels;
   "greenhouse_core.tool_catalog": GreenhouseCoreToolCatalog;
   "greenhouse_core.user_campaign_scopes": GreenhouseCoreUserCampaignScopes;
   "greenhouse_core.user_client_scopes": GreenhouseCoreUserClientScopes;
@@ -6627,6 +6904,7 @@ export interface DB {
   "greenhouse_finance.income": GreenhouseFinanceIncome;
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
+  "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;
@@ -6728,6 +7006,8 @@ export interface DB {
   "greenhouse_serving.session_360": GreenhouseServingSession360;
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
+  "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
+  "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;
   "greenhouse_sync.identity_profile_merge_log": GreenhouseSyncIdentityProfileMergeLog;
   "greenhouse_sync.identity_reconciliation_proposals": GreenhouseSyncIdentityReconciliationProposals;
   "greenhouse_sync.integration_data_quality_checks": GreenhouseSyncIntegrationDataQualityChecks;
@@ -6749,11 +7029,13 @@ export interface DB {
   "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;
   "greenhouse_sync.service_sync_queue": GreenhouseSyncServiceSyncQueue;
+  "greenhouse_sync.smoke_lane_runs": GreenhouseSyncSmokeLaneRuns;
   "greenhouse_sync.source_sync_failures": GreenhouseSyncSourceSyncFailures;
   "greenhouse_sync.source_sync_runs": GreenhouseSyncSourceSyncRuns;
   "greenhouse_sync.source_sync_watermarks": GreenhouseSyncSourceSyncWatermarks;
   "greenhouse_sync.webhook_deliveries": GreenhouseSyncWebhookDeliveries;
   "greenhouse_sync.webhook_delivery_attempts": GreenhouseSyncWebhookDeliveryAttempts;
+  "greenhouse_sync.webhook_endpoint_health": GreenhouseSyncWebhookEndpointHealth;
   "greenhouse_sync.webhook_endpoints": GreenhouseSyncWebhookEndpoints;
   "greenhouse_sync.webhook_inbox_events": GreenhouseSyncWebhookInboxEvents;
   "greenhouse_sync.webhook_subscriptions": GreenhouseSyncWebhookSubscriptions;

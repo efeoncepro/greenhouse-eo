@@ -27,6 +27,14 @@ It is the Greenhouse-side contract that those connectors can call.
 Machine-readable handoff:
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
 
+Developer portal:
+- `/developers/api`
+
+Platform note:
+- New Greenhouse platform contracts should prefer `api/platform/*`.
+- This document remains the derived reference for the legacy/transitional `integrations/v1` lane and for consumers that still depend on it.
+- The current platform preview lives in `docs/api/GREENHOUSE_API_PLATFORM_V1.md` and `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`.
+
 ## Authentication
 
 La política general de auth, versionado, idempotencia, degraded modes y rollout

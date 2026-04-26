@@ -1,0 +1,119 @@
+name: Azure Teams Bot Deploy
+
+# TASK-671 — Provision Azure Bot Service for the Greenhouse Teams bot.
+#
+# Sibling workflow to azure-teams-deploy.yml (Logic Apps). Reuses the same
+# Workload Identity Federation setup against the efeoncepro Azure AD tenant.
+#
+# Required GitHub repo secrets (already configured for TASK-669):
+#   AZURE_CLIENT_ID         — App registration client id (federated to GH)
+#   AZURE_TENANT_ID         — efeoncepro Azure AD tenant id
+#   AZURE_SUBSCRIPTION_ID   — target subscription id
+#
+# NOT created by this workflow:
+#   - The Greenhouse bot's own Azure AD app registration (run the
+#     `az ad app create` step from `infra/azure/teams-bot/README.md`).
+#   - The Teams app manifest upload (interactive, Teams Admin Center).
+#   - The GCP Secret Manager secret holding the bot client_credentials blob.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        default: production
+        options:
+          - staging
+          - production
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/azure/teams-bot/**'
+      - '.github/workflows/azure-teams-bot-deploy.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Bicep template
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Azure CLI Bicep
+        run: az bicep install
+
+      - name: Bicep build (lint)
+        run: az bicep build --file infra/azure/teams-bot/main.bicep
+
+  deploy:
+    name: Deploy Teams Bot stack
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve environment label
+        id: env
+        run: |
+          ENV_INPUT="${{ github.event.inputs.environment }}"
+          if [ -z "$ENV_INPUT" ]; then
+            ENV_INPUT="production"
+          fi
+          if [ "$ENV_INPUT" = "production" ]; then
+            echo "env_label=prod" >> "$GITHUB_OUTPUT"
+            echo "rg_name=rg-greenhouse-teams-bot-prod" >> "$GITHUB_OUTPUT"
+            echo "params_file=infra/azure/teams-bot/parameters.prod.json" >> "$GITHUB_OUTPUT"
+          else
+            echo "env_label=dev" >> "$GITHUB_OUTPUT"
+            echo "rg_name=rg-greenhouse-teams-bot-dev" >> "$GITHUB_OUTPUT"
+            echo "params_file=infra/azure/teams-bot/parameters.dev.json" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Azure login (Workload Identity Federation)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure providers are registered
+        run: |
+          az provider register --namespace Microsoft.BotService --wait
+
+      - name: Ensure resource group exists
+        run: |
+          az group create \
+            --name "${{ steps.env.outputs.rg_name }}" \
+            --location eastus \
+            --tags greenhouse:component=teams-bot greenhouse:environment=${{ steps.env.outputs.env_label }}
+
+      - name: Deploy Bicep template
+        id: deploy
+        run: |
+          DEPLOY_NAME="gh-bot-$(date +%Y%m%d-%H%M%S)"
+          az deployment group create \
+            --resource-group "${{ steps.env.outputs.rg_name }}" \
+            --name "$DEPLOY_NAME" \
+            --template-file infra/azure/teams-bot/main.bicep \
+            --parameters "${{ steps.env.outputs.params_file }}"
+
+          echo "Deployment '$DEPLOY_NAME' completed."
+          az deployment group show \
+            --resource-group "${{ steps.env.outputs.rg_name }}" \
+            --name "$DEPLOY_NAME" \
+            --query properties.outputs
+
+      - name: Reminder — manual follow-ups
+        run: |
+          echo "::notice::Bot Service deployed. Manual follow-ups:"
+          echo "::notice::1) Upload the Teams app manifest at https://admin.teams.microsoft.com/policies/manage-apps"
+          echo "::notice::2) Install the bot in each target team (Alineación, Finance, Delivery)"
+          echo "::notice::3) UPDATE greenhouse_core.teams_notification_channels SET channel_kind='teams_bot', team_id, channel_id for ops-alerts | finance-alerts | delivery-pulse"
+          echo "::notice::4) Validate via 'pnpm staging:request POST /api/admin/teams/test {\"channelCode\":\"ops-alerts\"}'"

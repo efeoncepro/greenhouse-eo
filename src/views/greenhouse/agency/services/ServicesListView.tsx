@@ -105,7 +105,7 @@ const formatCurrency = (amount: number | null, currency: string) => {
 
 const svcColumnHelper = createColumnHelper<ServiceListItem>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const svcColumns: ColumnDef<ServiceListItem, any>[] = [
   svcColumnHelper.accessor('name', {
     header: 'Servicio',

@@ -10,6 +10,7 @@ import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/clo
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
+import { countIncomesWithSettlementDrift } from '@/lib/finance/income-settlement'
 import { readReactiveBacklogOverview, type ReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
 import { getLastReactiveRun } from '@/lib/sync/reactive-run-tracker'
 import {
@@ -30,12 +31,23 @@ export interface OperationsKpis {
 
 export type OperationsHealthStatus = 'healthy' | 'degraded' | 'down' | 'not_configured' | 'idle'
 
+export type OperationsMetricStatus = 'ok' | 'warning' | 'error' | 'info'
+
+export interface OperationsSubsystemMetric {
+  key: string
+  label: string
+  value: number
+  status: OperationsMetricStatus
+}
+
 export interface OperationsSubsystem {
   name: string
   status: OperationsHealthStatus
   processed: number
   failed: number
   lastRun: string | null
+  summary?: string | null
+  metrics?: OperationsSubsystemMetric[]
 }
 
 export interface OperationsRecentEvent {
@@ -148,6 +160,11 @@ interface CountRow extends Record<string, unknown> {
   cnt: string | number
 }
 
+interface FinanceAllocationCountsRow extends Record<string, unknown> {
+  direct_without_client: string
+  shared_unallocated: string
+}
+
 const safeCount = async (query: string, params?: unknown[]): Promise<number> => {
   try {
     const rows = await runGreenhousePostgresQuery<CountRow>(query, params)
@@ -193,46 +210,173 @@ const deriveHealth = (
   return 'healthy'
 }
 
-const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
+const pluralize = (count: number, singular: string, plural: string) => `${count} ${count === 1 ? singular : plural}`
+
+const describeFinanceMetric = (metric: OperationsSubsystemMetric) => {
+  switch (metric.key) {
+    case 'payment_ledger_integrity':
+      return pluralize(metric.value, 'drift de ledger', 'drifts de ledger')
+    case 'direct_cost_without_client':
+      return pluralize(metric.value, 'costo directo sin cliente', 'costos directos sin cliente')
+    case 'overdue_receivables':
+      return pluralize(metric.value, 'cuenta por cobrar vencida', 'cuentas por cobrar vencidas')
+    default:
+      return `${metric.value} ${metric.label}`
+  }
+}
+
+/**
+ * Build the Finance Data Quality summary, separating *platform integrity*
+ * issues (signal that the data layer itself is wrong) from *operational
+ * hygiene* metrics (counters that track human work — overdue receivables,
+ * unallocated overheads). Only platform integrity escalates the subsystem to
+ * `degraded`; operational hygiene is shown as informational context.
+ */
+const buildFinanceDataQualitySummary = (metrics: OperationsSubsystemMetric[]) => {
+  const platformIssueMetrics = metrics.filter(
+    metric => (metric.status === 'warning' || metric.status === 'error') && isPlatformIntegrityMetric(metric.key)
+  )
+
+  const operationalMetrics = metrics.filter(metric => !isPlatformIntegrityMetric(metric.key))
+
+  const operationalSummaryParts = operationalMetrics
+    .filter(metric => metric.value > 0)
+    .map(metric => `${metric.value} ${metric.label.toLowerCase()}`)
+
+  if (platformIssueMetrics.length === 0) {
+    if (operationalSummaryParts.length === 0) {
+      return 'Plataforma sana · sin pendientes operativos.'
+    }
+
+    return `Plataforma sana · pendientes operativos: ${operationalSummaryParts.join(', ')}.`
+  }
+
+  const issueParts = platformIssueMetrics.map(describeFinanceMetric)
+
+  const operationalSuffix = operationalSummaryParts.length > 0
+    ? ` Pendientes operativos paralelos: ${operationalSummaryParts.join(', ')}.`
+    : ''
+
+  return `${pluralize(platformIssueMetrics.length, 'integridad rota', 'integridades rotas')}: ${issueParts.join(', ')}.${operationalSuffix}`
+}
+
+/**
+ * Platform integrity metrics — these signal that the data layer itself is
+ * inconsistent and require a code, sync, or migration fix. Anything else
+ * (overdue invoices, unallocated overheads) is operational hygiene that the
+ * business team owns, not an incident the on-call should react to.
+ */
+const PLATFORM_INTEGRITY_METRIC_KEYS = new Set<string>([
+  'payment_ledger_integrity',
+  'direct_cost_without_client'
+])
+
+const isPlatformIntegrityMetric = (key: string): boolean =>
+  PLATFORM_INTEGRITY_METRIC_KEYS.has(key)
+
+export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
   try {
     const hasFinanceTables = await tableExists('greenhouse_finance', 'income')
 
     if (!hasFinanceTables) {
-      return { name: 'Finance Data Quality', status: 'not_configured', processed: 0, failed: 0, lastRun: null }
+      return {
+        name: 'Finance Data Quality',
+        status: 'not_configured',
+        processed: 0,
+        failed: 0,
+        lastRun: null,
+        summary: null,
+        metrics: []
+      }
     }
 
-    const [divergentPayments, orphanExpenses, overdueCount] = await Promise.all([
-      safeCount(
-        `SELECT COUNT(*) AS cnt
-         FROM greenhouse_finance.income i
-         INNER JOIN (SELECT income_id, SUM(amount)::numeric AS total FROM greenhouse_finance.income_payments GROUP BY income_id) p
-           ON p.income_id = i.income_id
-         WHERE ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01`
-      ),
-      safeCount(
-        `SELECT COUNT(*) AS cnt FROM greenhouse_finance.expenses
-         WHERE (client_id IS NULL OR client_id = '') AND expense_type = 'supplier'`
-      ),
+    const [divergentPayments, overdueCount, allocationRows] = await Promise.all([
+      // Ledger integrity goes through the canonical reconciliation helper.
+      // DO NOT inline a `SUM(income_payments)` query here — that ignores
+      // factoring fees and withholdings and produces false drift.
+      countIncomesWithSettlementDrift().catch(() => 0),
       safeCount(
         `SELECT COUNT(*) AS cnt FROM greenhouse_finance.income
          WHERE payment_status IN ('pending', 'partial', 'overdue') AND due_date < CURRENT_DATE`
-      )
+      ),
+      runGreenhousePostgresQuery<FinanceAllocationCountsRow>(
+        `SELECT
+           COUNT(*) FILTER (
+             WHERE COALESCE(e.cost_is_direct, FALSE) = TRUE
+               AND COALESCE(NULLIF(e.allocated_client_id, ''), NULLIF(e.client_id, '')) IS NULL
+           )::text AS direct_without_client,
+           COUNT(*) FILTER (
+             WHERE COALESCE(e.cost_is_direct, FALSE) = FALSE
+               AND COALESCE(NULLIF(e.allocated_client_id, ''), NULLIF(e.client_id, '')) IS NULL
+           )::text AS shared_unallocated
+         FROM greenhouse_finance.expenses e
+         WHERE COALESCE(e.is_annulled, FALSE) = FALSE
+           AND e.expense_type NOT IN ('tax', 'social_security')`
+      ).catch(() => [{ direct_without_client: '0', shared_unallocated: '0' }])
     ])
 
-    const totalIssues = divergentPayments + orphanExpenses
+    const directCostWithoutClient = Number(allocationRows[0]?.direct_without_client ?? 0)
+    const sharedOverheadUnallocated = Number(allocationRows[0]?.shared_unallocated ?? 0)
 
-    const status: OperationsHealthStatus =
-      divergentPayments > 3 ? 'degraded' : orphanExpenses > 10 ? 'degraded' : 'healthy'
+    const metrics: OperationsSubsystemMetric[] = [
+      {
+        key: 'payment_ledger_integrity',
+        label: 'Drift de ledger',
+        value: divergentPayments,
+        status: divergentPayments === 0 ? 'ok' : 'warning'
+      },
+      {
+        key: 'direct_cost_without_client',
+        label: 'Costo directo sin cliente',
+        value: directCostWithoutClient,
+        status: directCostWithoutClient === 0 ? 'ok' : 'warning'
+      },
+      {
+        key: 'overdue_receivables',
+        label: 'Cartera vencida',
+        value: overdueCount,
+
+        // Operational KPI — the existence of overdue invoices is a business
+        // workflow signal (collections), not a platform integrity issue. We
+        // surface the count for visibility but never escalate the subsystem
+        // because of it. See `isPlatformIntegrityMetric`.
+        status: 'info'
+      },
+      {
+        key: 'shared_overhead_unallocated',
+        label: 'Overhead compartido no asignado',
+        value: sharedOverheadUnallocated,
+        status: 'info'
+      }
+    ]
+
+    const platformIssueMetrics = metrics.filter(
+      metric => (metric.status === 'warning' || metric.status === 'error') && isPlatformIntegrityMetric(metric.key)
+    )
+
+    const status: OperationsHealthStatus = platformIssueMetrics.length > 0 ? 'degraded' : 'healthy'
+
+    const platformMetricsCount = metrics.filter(metric => isPlatformIntegrityMetric(metric.key)).length
 
     return {
       name: 'Finance Data Quality',
       status,
-      processed: overdueCount,
-      failed: totalIssues,
-      lastRun: new Date().toISOString()
+      processed: platformMetricsCount,
+      failed: platformIssueMetrics.length,
+      lastRun: new Date().toISOString(),
+      summary: buildFinanceDataQualitySummary(metrics),
+      metrics
     }
   } catch {
-    return { name: 'Finance Data Quality', status: 'idle', processed: 0, failed: 0, lastRun: null }
+    return {
+      name: 'Finance Data Quality',
+      status: 'idle',
+      processed: 0,
+      failed: 0,
+      lastRun: null,
+      summary: 'No se pudo construir el resumen de data quality financiera.',
+      metrics: []
+    }
   }
 }
 
@@ -250,21 +394,40 @@ const buildNotionDeliveryDataQualitySubsystem = (
   }
 
   const latestRun = overview.recentRuns[0]?.checkedAt ?? null
+
+  // Auto-recoverable spaces (only `fresh_raw_after_conformed_sync` lag) are
+  // *expected* eventual consistency, not incidents. They count toward `failed`
+  // for visibility but never escalate the subsystem to `down` — the upstream
+  // conformed sync will catch up on its own.
+  const manualBrokenSpaces = Math.max(
+    0,
+    overview.totals.brokenSpaces - (overview.totals.autoRecoverableSpaces ?? 0)
+  )
+
   const failed = overview.totals.brokenSpaces + overview.totals.degradedSpaces
 
   const status: OperationsHealthStatus =
-    overview.totals.brokenSpaces > 0
+    manualBrokenSpaces > 0
       ? 'down'
-      : overview.totals.degradedSpaces > 0 || overview.totals.unknownSpaces > 0
+      : overview.totals.brokenSpaces > 0 || overview.totals.degradedSpaces > 0 || overview.totals.unknownSpaces > 0
         ? 'degraded'
         : 'healthy'
+
+  const autoRecoverable = overview.totals.autoRecoverableSpaces ?? 0
+
+  const summary = manualBrokenSpaces > 0
+    ? `${manualBrokenSpaces} space(s) requieren intervención${autoRecoverable > 0 ? ` · ${autoRecoverable} con lag auto-recuperable` : ''}`
+    : autoRecoverable > 0
+      ? `${autoRecoverable} con lag auto-recuperable (conformed sync se pondrá al día)`
+      : null
 
   return {
     name: 'Notion Delivery Data Quality',
     status,
     processed: overview.totals.totalSpaces,
     failed,
-    lastRun: latestRun
+    lastRun: latestRun,
+    summary
   }
 }
 
@@ -316,9 +479,14 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
         `SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications WHERE created_at > NOW() - INTERVAL '24 hours'`
       ),
       safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.space_notion_sources WHERE sync_enabled = TRUE`),
+      // KPI canónica: cuenta handlers DISTINTOS en estado degraded/failed/quarantined
+      // desde el state machine (`handler_health`), no rows del audit log. Antes
+      // este KPI reportaba "7522 handlers degradados" sumando filas lifetime
+      // de retries; un único handler con 4193 retries aparecía como 4193
+      // "handlers degraded". El state machine produce un número honesto.
       hasReactiveLog
         ? safeCount(
-            `SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_reactive_log WHERE result IN ('retry', 'dead-letter')`
+            `SELECT COUNT(*) AS cnt FROM greenhouse_sync.handler_health WHERE current_state <> 'healthy'`
           )
         : 0,
       readReactiveBacklogOverview()
@@ -361,8 +529,24 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       .catch(() => null),
 
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`),
+    // DLQ-aware Proyecciones warning surface. Counts:
+    //   1) status='dead' — application/data fault, recovery cron will not help.
+    //   2) status='failed' that the recovery cron has been retrying for >24h
+    //      without success — infra/credential fault that never auto-resolved.
+    // Transient `failed` rows from the last 24h are hidden because the recovery
+    // cron is actively working on them and a yellow chip every time a single
+    // projection blips would be noise.
     safeCount(
-      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '48 hours'`
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue
+        WHERE COALESCE(archived, FALSE) = FALSE
+          AND (
+            status = 'dead'
+            OR (
+              status = 'failed'
+              AND retry_count >= max_retries
+              AND updated_at < NOW() - INTERVAL '24 hours'
+            )
+          )`
     ),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
       `SELECT MAX(updated_at)::text AS last_run FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`
@@ -422,8 +606,12 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     hasWebhookDeliveries
       ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_deliveries WHERE status = 'retry_scheduled'`)
       : 0,
+    // KPI canónica: dead-letters ACTIVOS (sin acknowledged_at, sin archived_at).
+    // Antes contaba lifetime y mostraba "1 delivery dead-letter" por una row
+    // del 29-marzo que ya nadie iba a recover. Mismo patrón que handler_health:
+    // recovery + ack son first-class en el contrato.
     hasWebhookDeliveries
-      ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_deliveries WHERE status = 'dead_letter'`)
+      ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_deliveries WHERE status = 'dead_letter' AND acknowledged_at IS NULL AND archived_at IS NULL`)
       : 0,
     hasWebhookEndpoints || hasWebhookSubscriptions
       ? safeCount(`
@@ -473,6 +661,68 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     notionDeliveryDataQuality = null
   }
 
+  const [teamsSent24h, teamsFailed24h, teamsLastRun, teamsLogicAppSent24h, teamsBotSent24h, teamsPendingSetup] = await Promise.all([
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification' AND status = 'succeeded' AND started_at > NOW() - INTERVAL '24 hours'`
+    ),
+    safeCount(
+      // Exclude failures that come from `pending_setup` channels — those are
+      // configuration gaps (secret not yet provisioned in GCP Secret Manager),
+      // not real send incidents. The reliability dashboard surfaces them via
+      // a separate "Channels esperando setup" admin widget instead. The
+      // notes column carries `secret_ref=…` so we can join back to the
+      // channel registry to filter.
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs r
+         WHERE r.source_system = 'teams_notification'
+           AND r.status = 'failed'
+           AND r.started_at > NOW() - INTERVAL '24 hours'
+           AND NOT EXISTS (
+             SELECT 1 FROM greenhouse_core.teams_notification_channels c
+              WHERE c.provisioning_status = 'pending_setup'
+                AND r.notes IS NOT NULL
+                AND r.notes LIKE '%secret_ref=' || c.secret_ref || '%'
+           )`
+    ),
+    runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
+      `SELECT MAX(COALESCE(finished_at, started_at))::text AS last_run FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification'`
+    )
+      .then(rows => rows[0]?.last_run ?? null)
+      .catch(() => null),
+    // TASK-671: breakdown by transport. The sender writes
+    // `transport=logic_app` or `transport=bot_framework` into notes for every
+    // successful send.
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs
+        WHERE source_system = 'teams_notification'
+          AND status = 'succeeded'
+          AND started_at > NOW() - INTERVAL '24 hours'
+          AND notes LIKE '%transport=logic_app%'`
+    ),
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs
+        WHERE source_system = 'teams_notification'
+          AND status = 'succeeded'
+          AND started_at > NOW() - INTERVAL '24 hours'
+          AND notes LIKE '%transport=bot_framework%'`
+    ),
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_core.teams_notification_channels
+        WHERE provisioning_status = 'pending_setup'
+          AND disabled_at IS NULL`
+    )
+  ])
+
+  const teamsHasActivity = teamsSent24h + teamsFailed24h > 0
+  const teamsBreakdownParts: string[] = []
+
+  if (teamsLogicAppSent24h > 0) teamsBreakdownParts.push(`Logic Apps ${teamsLogicAppSent24h}`)
+  if (teamsBotSent24h > 0) teamsBreakdownParts.push(`Bot ${teamsBotSent24h}`)
+  if (teamsPendingSetup > 0) teamsBreakdownParts.push(`Pending setup ${teamsPendingSetup}`)
+
+  const teamsSummary = teamsBreakdownParts.length > 0
+    ? `Envíos 24h por transporte: ${teamsBreakdownParts.join(' · ')}`
+    : null
+
   const subsystems: OperationsSubsystem[] = [
     {
       name: 'Outbox',
@@ -486,7 +736,10 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       status: deriveHealth(projCompleted, projFailed, projLastRun, hasProjections),
       processed: projCompleted,
       failed: projFailed,
-      lastRun: projLastRun
+      lastRun: projLastRun,
+      summary: projFailed > 0
+        ? `${projCompleted} completadas · ${projFailed} en dead-letter (requieren intervención manual)`
+        : null
     },
     {
       name: 'Reactive backlog',
@@ -523,6 +776,34 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       processed: notifTotal,
       failed: notifFailed,
       lastRun: null
+    },
+    {
+      name: 'Teams Notifications',
+      status: deriveHealth(teamsSent24h, teamsFailed24h, teamsLastRun, teamsHasActivity),
+      processed: teamsSent24h,
+      failed: teamsFailed24h,
+      lastRun: teamsLastRun,
+      summary: teamsSummary,
+      metrics: [
+        {
+          key: 'logic_app_sent_24h',
+          label: 'Vía Logic Apps (24h)',
+          value: teamsLogicAppSent24h,
+          status: 'ok'
+        },
+        {
+          key: 'bot_framework_sent_24h',
+          label: 'Vía Bot Framework (24h)',
+          value: teamsBotSent24h,
+          status: 'ok'
+        },
+        {
+          key: 'pending_setup_channels',
+          label: 'Canales pending_setup',
+          value: teamsPendingSetup,
+          status: teamsPendingSetup > 0 ? 'warning' : 'ok'
+        }
+      ]
     },
     {
       name: 'Notion Sync',
@@ -629,31 +910,58 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
 
   try {
     if (hasReactiveLog) {
+      // Lectura canónica: un row por handler distinto con state != healthy.
+      // Antes esta query devolvía las últimas 10 filas del audit log, lo cual
+      // mostraba el mismo handler 10 veces si fallaba seguido. El state
+      // machine produce una única vista por handler con su error más
+      // reciente (joined contra el log para preservar el `last_error`).
       const rows = await runGreenhousePostgresQuery<
         {
           handler: string
-          result: string
-          retries: number
-          reacted_at: string
+          current_state: string
+          consecutive_failures: number
+          last_failure_at: string | null
           last_error: string | null
-          error_class: string | null
+          last_error_class: string | null
           is_infrastructure_fault: boolean | null
         } & Record<string, unknown>
       >(
-        `SELECT handler, result, retries, reacted_at::text, last_error, error_class, is_infrastructure_fault
-         FROM greenhouse_sync.outbox_reactive_log
-         WHERE result IN ('retry', 'dead-letter')
-         ORDER BY reacted_at DESC
-         LIMIT 10`
+        `SELECT
+            h.handler,
+            h.current_state,
+            h.consecutive_failures,
+            h.last_failure_at::text AS last_failure_at,
+            latest.last_error,
+            h.last_error_class,
+            latest.is_infrastructure_fault
+          FROM greenhouse_sync.handler_health h
+          LEFT JOIN LATERAL (
+            SELECT last_error, is_infrastructure_fault
+              FROM greenhouse_sync.outbox_reactive_log r
+             WHERE r.handler = h.handler
+               AND r.result IN ('retry','dead-letter')
+             ORDER BY r.reacted_at DESC
+             LIMIT 1
+          ) latest ON TRUE
+          WHERE h.current_state <> 'healthy'
+          ORDER BY
+            CASE h.current_state
+              WHEN 'failed' THEN 0
+              WHEN 'quarantined' THEN 1
+              WHEN 'degraded' THEN 2
+              ELSE 3
+            END,
+            h.last_failure_at DESC NULLS LAST
+          LIMIT 10`
       )
 
       failedHandlersRows = rows.map(row => ({
         handler: row.handler,
-        result: row.result,
-        retries: Number(row.retries ?? 0),
-        reactedAt: row.reacted_at,
+        result: row.current_state === 'failed' || row.current_state === 'quarantined' ? 'dead-letter' : 'retry',
+        retries: Number(row.consecutive_failures ?? 0),
+        reactedAt: row.last_failure_at ?? new Date(0).toISOString(),
         lastError: row.last_error || 'Unknown error',
-        errorClass: row.error_class ?? null,
+        errorClass: row.last_error_class ?? null,
         isInfrastructure: Boolean(row.is_infrastructure_fault ?? false)
       }))
     }

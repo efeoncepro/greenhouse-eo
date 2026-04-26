@@ -1,0 +1,98 @@
+import * as Sentry from '@sentry/nextjs'
+
+/**
+ * Canonical Sentry capture wrapper that attaches a `domain` tag.
+ * ===============================================================
+ *
+ * The reliability dashboard exposes one `incident` signal per module
+ * (`finance`, `delivery`, `cloud`, `integrations.notion`, ...). Instead of
+ * maintaining a Sentry project per module (operationally expensive — separate
+ * DSNs, separate billing slices, separate alert rules), we tag every captured
+ * exception with the originating domain. The reliability reader then queries
+ * Sentry with `tags[domain]:<module>` to filter.
+ *
+ * Use this wrapper instead of `Sentry.captureException()` directly anywhere
+ * the failure has a clear domain. Without the tag, the exception still lands
+ * in Sentry but won't show up in any per-module incident signal.
+ *
+ * Example:
+ *   import { captureWithDomain } from '@/lib/observability/capture'
+ *
+ *   try {
+ *     await materializeVatLedgerForPeriod(...)
+ *   } catch (err) {
+ *     captureWithDomain(err, 'finance', { extra: { period: '2026-04' } })
+ *     throw err
+ *   }
+ *
+ * Domain values are short, stable, lowercase. Match them to the
+ * `ReliabilityModuleKey` values in `src/types/reliability.ts` so the reader
+ * can iterate the registry to discover the right tag per module.
+ */
+
+export type CaptureDomain =
+  | 'cloud'
+  | 'finance'
+  | 'delivery'
+  | 'people'
+  | 'identity'
+  | 'integrations.notion'
+  | 'integrations.hubspot'
+  | 'integrations.nubox'
+  | 'integrations.teams'
+  | 'commercial'
+  | 'agency'
+  | 'observability'
+
+export interface CaptureOptions {
+  /** Free-form structured context. Ends up in Sentry's `Additional Data`. */
+  extra?: Record<string, unknown>
+  /** Additional tags. `domain` is set automatically — don't override here. */
+  tags?: Record<string, string>
+  /** Sentry severity. Defaults to `error`. */
+  level?: 'fatal' | 'error' | 'warning' | 'info' | 'debug'
+  /** Optional Sentry user context. */
+  user?: { id?: string; email?: string; username?: string }
+  /** Optional fingerprint to control issue grouping. */
+  fingerprint?: string[]
+}
+
+export const captureWithDomain = (
+  err: unknown,
+  domain: CaptureDomain,
+  options: CaptureOptions = {}
+): string | undefined => {
+  return Sentry.captureException(err, {
+    tags: {
+      ...(options.tags ?? {}),
+      domain
+    },
+    extra: options.extra,
+    level: options.level ?? 'error',
+    user: options.user,
+    fingerprint: options.fingerprint
+  })
+}
+
+/**
+ * Capture a non-error message with the same domain tagging contract. Useful
+ * for surfacing notable-but-non-throwing events (skipped pipeline, degraded
+ * mode entered, etc.) so they show up filtered in the per-module incident
+ * signal.
+ */
+export const captureMessageWithDomain = (
+  message: string,
+  domain: CaptureDomain,
+  options: CaptureOptions = {}
+): string | undefined => {
+  return Sentry.captureMessage(message, {
+    tags: {
+      ...(options.tags ?? {}),
+      domain
+    },
+    extra: options.extra,
+    level: options.level ?? 'warning',
+    user: options.user,
+    fingerprint: options.fingerprint
+  })
+}

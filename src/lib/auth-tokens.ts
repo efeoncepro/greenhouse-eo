@@ -2,7 +2,7 @@ import 'server-only'
 
 import { createHash } from 'crypto'
 
-import jwt from 'jsonwebtoken'
+import { SignJWT, jwtVerify, decodeJwt } from 'jose'
 
 import { getNextAuthSecret } from '@/lib/auth-secrets'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -32,9 +32,7 @@ interface TokenRecord {
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
-const getSecret = () => {
-  return getNextAuthSecret()
-}
+const getSecretKey = () => new TextEncoder().encode(getNextAuthSecret())
 
 const hashToken = (token: string): string =>
   createHash('sha256').update(token).digest('hex')
@@ -73,15 +71,27 @@ async function ensureTable(): Promise<void> {
 
 // ── Public API ───────────────────────────────────────────────────────
 
-/** Generate a signed JWT for transactional auth flows */
-export function generateToken(payload: TokenPayload, expiresInHours: number): string {
-  return jwt.sign(payload, getSecret(), { expiresIn: `${expiresInHours}h` })
+/** Generate a signed JWT (HS256) for transactional auth flows */
+export async function generateToken(payload: TokenPayload, expiresInHours: number): Promise<string> {
+  return new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime(`${expiresInHours}h`)
+    .sign(getSecretKey())
 }
 
 /** Store the token hash in PostgreSQL */
 export async function storeToken(token: string, payload: TokenPayload): Promise<void> {
   await ensureTable()
-  const decoded = jwt.decode(token) as { exp?: number } | null
+
+  const decoded = (() => {
+    try {
+      return decodeJwt(token) as { exp?: number }
+    } catch {
+      return null
+    }
+  })()
+
   const expiresAt = decoded?.exp ? new Date(decoded.exp * 1000).toISOString() : new Date(Date.now() + 3600_000).toISOString()
 
   await runGreenhousePostgresQuery(
@@ -94,7 +104,7 @@ export async function storeToken(token: string, payload: TokenPayload): Promise<
 /** Validate a JWT: verify signature, check DB record is unused and not expired */
 export async function validateToken(token: string): Promise<TokenRecord | null> {
   try {
-    jwt.verify(token, getSecret())
+    await jwtVerify(token, getSecretKey())
   } catch {
     return null
   }
