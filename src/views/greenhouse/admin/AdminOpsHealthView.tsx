@@ -468,10 +468,27 @@ const AdminOpsHealthView = ({
               />
               <ExecutiveMiniStatCard
                 eyebrow='Critical'
-                tone={notionDataQuality.totals.brokenSpaces > 0 ? 'error' : 'success'}
+                tone={
+                  // Auto-recoverable broken spaces (only `fresh_raw_after_conformed_sync` lag)
+                  // are eventual-consistency lag, not real corruption — show them as warning,
+                  // not error, so on-call doesn't get paged for normal sync timing.
+                  notionDataQuality.totals.brokenSpaces > 0
+                    ? notionDataQuality.totals.autoRecoverableSpaces >= notionDataQuality.totals.brokenSpaces
+                      ? 'warning'
+                      : 'error'
+                    : 'success'
+                }
                 title='Broken'
-                value={String(notionDataQuality.totals.brokenSpaces)}
-                detail='Spaces con errores activos que comprometen la confianza downstream.'
+                value={
+                  notionDataQuality.totals.autoRecoverableSpaces > 0
+                    ? `${notionDataQuality.totals.brokenSpaces} (${notionDataQuality.totals.autoRecoverableSpaces} auto)`
+                    : String(notionDataQuality.totals.brokenSpaces)
+                }
+                detail={
+                  notionDataQuality.totals.autoRecoverableSpaces > 0 && notionDataQuality.totals.autoRecoverableSpaces === notionDataQuality.totals.brokenSpaces
+                    ? 'Lag de conformed sync vs raw — eventual consistency, no requiere intervención.'
+                    : 'Spaces con errores activos que comprometen la confianza downstream.'
+                }
                 icon='tabler-bug'
               />
             </Box>
@@ -489,20 +506,38 @@ const AdminOpsHealthView = ({
                         alignItems='center'
                         gap={2}
                       >
-                        <Stack spacing={0.5}>
+                        <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
                           <Typography variant='body2' sx={{ fontWeight: 500 }}>
                             {space.spaceName ?? space.spaceId}
                           </Typography>
                           <Typography variant='caption' color='text.secondary'>
                             Diff {space.diffCount} · {formatDateTime(space.checkedAt)}
+                            {space.failedChecks.length > 0 && (
+                              <>
+                                {' · '}
+                                {space.failedChecks
+                                  .slice(0, 2)
+                                  .map(check => `${check.checkKey}${check.observedValue ? ` (${check.observedValue})` : ''}`)
+                                  .join(', ')}
+                              </>
+                            )}
                           </Typography>
                         </Stack>
-                        <Chip
-                          size='small'
-                          variant='tonal'
-                          color={dataQualityColor(space.qualityStatus)}
-                          label={space.qualityStatus}
-                        />
+                        <Stack direction='row' gap={1} alignItems='center'>
+                          {space.recoveryClass === 'auto_recoverable' && (
+                            <Chip size='small' variant='tonal' color='info' label='auto' />
+                          )}
+                          <Chip
+                            size='small'
+                            variant='tonal'
+                            color={
+                              space.recoveryClass === 'auto_recoverable' && space.qualityStatus === 'broken'
+                                ? 'warning'
+                                : dataQualityColor(space.qualityStatus)
+                            }
+                            label={space.qualityStatus}
+                          />
+                        </Stack>
                       </Stack>
                     ))}
                   </Stack>
