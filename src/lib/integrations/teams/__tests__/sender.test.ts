@@ -210,8 +210,24 @@ describe('postTeamsCard', () => {
     }
   })
 
-  it('returns unsupported_channel_kind for teams_bot until V2 lands', async () => {
+  it('returns missing_bot_app_config for teams_bot rows missing bot_app_id (TASK-671)', async () => {
+    // Pre-cutover smoke: a row has been flipped to teams_bot but the runbook
+    // has not yet supplied bot_app_id / azure_tenant_id. The dispatcher must
+    // fail fast with a config-shaped reason, not silently fall through.
     pgQueryMock.mockResolvedValueOnce([{ ...baseChannel, channel_kind: 'teams_bot' }])
+    pgQueryMock.mockResolvedValue([])
+
+    const result = await postTeamsCard('ops-alerts', sampleCard)
+
+    expect(result.ok).toBe(false)
+
+    if (!result.ok) {
+      expect(result.reason).toBe('missing_bot_app_config')
+    }
+  })
+
+  it('returns unsupported_channel_kind for graph_rsc (still reserved)', async () => {
+    pgQueryMock.mockResolvedValueOnce([{ ...baseChannel, channel_kind: 'graph_rsc' }])
     pgQueryMock.mockResolvedValue([])
 
     const result = await postTeamsCard('ops-alerts', sampleCard)

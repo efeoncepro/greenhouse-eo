@@ -15,6 +15,7 @@
 export type ReliabilityModuleKey =
   | 'finance'
   | 'integrations.notion'
+  | 'integrations.teams'
   | 'cloud'
   | 'delivery'
 

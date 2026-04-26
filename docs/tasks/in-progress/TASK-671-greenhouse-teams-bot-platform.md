@@ -6,17 +6,41 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio-Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Code complete — pending Azure tenant deploy + manifest upload + cutover`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-669` (foundation transport-agnostic ya en develop)
-- Branch: `task/TASK-671-greenhouse-teams-bot-platform`
+- Branch: `develop` (entrega doc-friendly: code complete, cutover en runbook)
 - Legacy ID: `none`
+
+## Delta 2026-04-26 — código entregado
+
+Implementación end-to-end disponible en `develop`. Falta solo el deploy interactivo a Azure + Teams Admin Center + cutover de los 3 canales (runbook en `docs/operations/azure-teams-bot.md`).
+
+- Migraciones aplicadas: `20260426202326023_extend-teams-notification-channels-recipient-kind.sql` y `20260426202330684_create-teams-bot-inbound-actions.sql`
+- Bot Framework helpers: `src/lib/integrations/teams/bot-framework/{token-cache,graph-client,jwt-validator,sender}.ts`
+- Recipient resolver con cascada `members.teams_user_id → microsoft_oid → email` en `src/lib/integrations/teams/recipient-resolver.ts`
+- Sender dispatcher extendido: `postTeamsCard()` rutea `channel_kind='teams_bot'` al nuevo bot framework sender; `azure_logic_app` queda igual
+- Action.Submit endpoint: `src/app/api/teams-bot/messaging/route.ts` (JWT validation + idempotency + tenant access lookup + dispatch)
+- Action registry pattern: `src/lib/teams-bot/action-registry.ts` con handlers `ops.alert.snooze` y `notification.mark_read`
+- Reliability hookup: nuevo módulo `'integrations.teams'` en `RELIABILITY_REGISTRY` + subsystem map + breakdown por transporte en `getOperationsOverview` + UI copy actualizada
+- IaC scaffolded: `infra/azure/teams-bot/{main.bicep,parameters.{prod,dev}.json,manifest/manifest.json,README.md}` + workflow `.github/workflows/azure-teams-bot-deploy.yml`
+- Tests: 22 nuevos (token-cache, graph-client, recipient-resolver, action-registry, ops/notification handlers); test legacy de `unsupported_channel_kind` actualizado a `missing_bot_app_config`
+- Docs: `docs/architecture/GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.0 + `docs/operations/azure-teams-bot.md` runbook + bump de `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` a v1.1
+- Decisión arquitectónica: NO se instaló `botbuilder` SDK (~25 deps). Implementación nativa con `jose` + fetch alineada con `src/lib/webhooks/signing.ts` y `src/lib/entra/graph-client.ts`
+
+Pendientes operativos (no son código):
+- Crear app registration en Azure AD (`az ad app create`, runbook step 1)
+- Subir el blob `{clientId, clientSecret, tenantId}` a GCP Secret Manager `greenhouse-teams-bot-client-credentials`
+- Deploy del Bicep stack (`az deployment group create`)
+- Upload del manifest `greenhouse-teams.zip` a Teams Admin Center (Global Admin)
+- UPDATE de los 3 canales existentes a `channel_kind='teams_bot'` con `team_id` + `channel_id` reales
+- Validación de 1 semana antes de decommissionar Logic Apps
 
 ## Summary
 

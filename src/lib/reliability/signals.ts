@@ -56,7 +56,10 @@ const SUBSYSTEM_MODULE_MAP: Record<string, ReliabilityModuleKey> = {
   'AI LLM Enrichment': 'delivery',
 
   // Finance
-  'Finance Data Quality': 'finance'
+  'Finance Data Quality': 'finance',
+
+  // Teams notifications & bot (TASK-669 + TASK-671)
+  'Teams Notifications': 'integrations.teams'
 }
 
 const subsystemSlug = (name: string) =>

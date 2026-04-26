@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-671 Greenhouse Teams Bot Platform (Bot Framework + Graph) — code complete
+
+- Implementación end-to-end del bot interactivo Greenhouse para Microsoft Teams. Sibling enriquecido de TASK-669 (Logic Apps), construido sobre el mismo schema transport-agnostic.
+- Migraciones aplicadas: `migrations/20260426202326023_extend-teams-notification-channels-recipient-kind.sql` (columnas `recipient_kind`, `recipient_user_id`, `recipient_chat_id`, `recipient_routing_rule_json` + CHECK constraints) y `migrations/20260426202330684_create-teams-bot-inbound-actions.sql` (tabla audit + idempotency con UNIQUE en `idempotency_key`).
+- Helpers Bot Framework nativos en `src/lib/integrations/teams/bot-framework/`:
+  - `token-cache.ts` — OAuth2 client_credentials con cache `expires_in - 60s`
+  - `graph-client.ts` — POST channel/chat messages, get-or-create 1:1 chat, install bot for user, find user by email; retry exponencial en 429/5xx
+  - `jwt-validator.ts` — verificación contra JWKS de `login.botframework.com` con `jose`
+  - `sender.ts` — `sendViaBotFramework()` con 4 superficies (`channel | chat_1on1 | chat_group | dynamic_user`)
+- Recipient resolver `src/lib/integrations/teams/recipient-resolver.ts` con cascada `members.teams_user_id` → `client_users.microsoft_oid` → email lookup en Graph; cache 5 min.
+- Sender principal `src/lib/integrations/teams/sender.ts` extendido: ahora despacha `channel_kind='teams_bot'` al nuevo path. `azure_logic_app` queda intacto. `graph_rsc` sigue como `unsupported_channel_kind`.
+- Endpoint inbound `src/app/api/teams-bot/messaging/route.ts` con JWT validation + activity parsing + identity reverse-lookup (`getTenantAccessRecordByMicrosoftOid`) + persist en `teams_bot_inbound_actions` con idempotency + dispatch al action-registry. Errores redactados (sin tokens, sin emails, sin stacks).
+- Action registry `src/lib/teams-bot/action-registry.ts` (patrón clonado de `projection-registry.ts`) con handlers `ops.alert.snooze` y `notification.mark_read`. Importados side-effect via `src/lib/teams-bot/handlers/index.ts`.
+- Reliability Control Plane: nuevo módulo `'integrations.teams'` en `RELIABILITY_REGISTRY` con `incidentDomainTag='integrations.teams'`. `SUBSYSTEM_MODULE_MAP['Teams Notifications'] = 'integrations.teams'`. `getOperationsOverview` ahora reporta breakdown por transporte (Logic Apps vs Bot Framework vs Pending Setup) en `metrics[]`. Admin Ops Health view actualizada con copy diferenciado.
+- IaC scaffolded en `infra/azure/teams-bot/`: `main.bicep` (Bot Service + MsTeams channel), `parameters.{prod,dev}.json`, manifest Teams v1.17, README runbook + workflow GitHub Actions `.github/workflows/azure-teams-bot-deploy.yml` con WIF.
+- Tests: 22 unitarios nuevos (`token-cache`, `graph-client`, `recipient-resolver`, `action-registry`, validateData de los 2 handlers). Test legacy de TASK-669 actualizado de `unsupported_channel_kind` a `missing_bot_app_config` para reflejar la nueva semántica. **Total: 2315 tests pasando.** `tsc --noEmit` clean. `pnpm lint` clean. `pnpm build` clean.
+- Docs nuevos:
+  - `docs/architecture/GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.0 (modelo de interactividad)
+  - `docs/operations/azure-teams-bot.md` (runbook end-to-end)
+  - Bump de `docs/architecture/GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` a v1.1 con Delta
+- Decisión arquitectónica clave: **NO se instaló `botbuilder` SDK** (~25 deps transitivas). Implementación nativa con `jose` + fetch alineada con `src/lib/webhooks/signing.ts` y `src/lib/entra/graph-client.ts`. Bundle más ligero, menos superficie de auditoría.
+- Pendientes (no son código, requieren acceso interactivo a Azure tenant `efeoncepro.com` y Teams Admin Center):
+  1. `az ad app create --display-name "Greenhouse"` (Global Admin)
+  2. Subir blob `{clientId, clientSecret, tenantId}` a GCP Secret Manager `greenhouse-teams-bot-client-credentials`
+  3. `az deployment group create` con `infra/azure/teams-bot/main.bicep`
+  4. Upload `greenhouse-teams.zip` en Teams Admin Center → "Upload new app"
+  5. UPDATE de los 3 canales (`ops-alerts`, `finance-alerts`, `delivery-pulse`) a `channel_kind='teams_bot'` con team_id+channel_id reales
+  6. Validar 1 semana en producción antes de decommissionar Logic Apps
+- Lifecycle: archivo movido de `to-do/` a `in-progress/`. Status real `Code complete — pending Azure tenant deploy + manifest upload + cutover`.
+- Files clave para revisión rápida: `src/lib/integrations/teams/bot-framework/sender.ts`, `src/app/api/teams-bot/messaging/route.ts`, `src/lib/teams-bot/action-registry.ts`, `docs/architecture/GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md`, `infra/azure/teams-bot/README.md`.
+
 ## Sesion 2026-04-26 — Backlog Commercial Public Procurement registrado
 
 - Se confirmo que el POC y helper de Mercado Publico siguen siendo `TASK-673`, no `TASK-674`:

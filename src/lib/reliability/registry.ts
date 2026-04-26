@@ -175,6 +175,40 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['subsystem', 'data_quality', 'freshness', 'incident'],
     incidentDomainTag: 'delivery'
+  },
+  {
+    moduleKey: 'integrations.teams',
+    label: 'Teams Notifications & Bot',
+    description:
+      'Canal interactivo bidireccional con Microsoft Teams (Logic Apps + Bot Framework). Despacha alertas ops/finance/delivery y recibe Action.Submit de aprobaciones.',
+    domain: 'integrations',
+    routes: [
+      { path: '/admin/ops-health', label: 'Ops Health · Teams Notifications' }
+    ],
+    apis: [
+      { path: '/api/teams-bot/messaging', label: 'Bot Framework inbound (Action.Submit)' },
+      { path: '/api/admin/teams/test', label: 'Manual test sender' }
+    ],
+    dependencies: [
+      'greenhouse_core.teams_notification_channels',
+      'greenhouse_core.teams_bot_inbound_actions',
+      'greenhouse_sync.source_sync_runs (source_system=teams_notification)',
+      'Azure Bot Service + App Registration (TASK-671)',
+      'Microsoft Graph API (chats, teams, users)'
+    ],
+    smokeTests: ['tests/e2e/smoke/admin-nav.spec.ts'],
+    filesOwned: [
+      'src/lib/integrations/teams/**',
+      'src/lib/teams-bot/**',
+      'src/app/api/teams-bot/**',
+      'src/app/api/admin/teams/**',
+      'infra/azure/teams-notifications/**',
+      'infra/azure/teams-bot/**',
+      'migrations/*teams_notification_channels*.sql',
+      'migrations/*teams_bot_inbound_actions*.sql'
+    ],
+    expectedSignalKinds: ['subsystem', 'incident'],
+    incidentDomainTag: 'integrations.teams'
   }
 ]
 

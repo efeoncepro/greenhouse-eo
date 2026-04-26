@@ -2,6 +2,22 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — TASK-671 Greenhouse Teams Bot Platform (Bot Framework + Microsoft Graph) — code complete
+
+Canal interactivo bidireccional con Microsoft Teams basado en Bot Framework + Microsoft Graph, sibling enriquecido del canal Logic Apps (TASK-669). Habilita postear con identidad `Greenhouse` (sin attribution "via Workflows"), routing a canales / chats 1:1 / group chats / DMs dinámicos resueltos por payload, y `Action.Submit` server-side para aprobaciones, snooze de alertas y mark-as-read inline desde el card.
+
+Implementación end-to-end disponible en `develop`; pendiente solo el deploy interactivo a Azure tenant + manifest upload + cutover de los 3 canales productivos (runbook en `docs/operations/azure-teams-bot.md`).
+
+- 2 migraciones nuevas: extensión de `teams_notification_channels` con `recipient_kind` discriminator + tabla `teams_bot_inbound_actions` (audit + idempotency log para Action.Submit)
+- Helpers Bot Framework nativos en `src/lib/integrations/teams/bot-framework/` (token-cache, graph-client, jwt-validator, sender) — sin dependencia en `botbuilder` SDK; reusan `jose` y patrones existentes de `src/lib/webhooks/signing.ts`
+- Recipient resolver con cascada `members.teams_user_id → microsoft_oid → email lookup`
+- Endpoint inbound `/api/teams-bot/messaging` con JWT validation contra JWKS de `login.botframework.com`, idempotency por `sha256(activityId|actionId|aadObjectId)`, identity reverse-lookup vía `getTenantAccessRecordByMicrosoftOid`, dispatch al action-registry
+- Action-registry pattern (clonado de `projection-registry.ts`) con handlers `ops.alert.snooze` y `notification.mark_read`
+- Reliability Control Plane: nuevo módulo `'integrations.teams'` con `incidentDomainTag` + breakdown por transporte (Logic Apps vs Bot Framework vs Pending Setup) en `getOperationsOverview` y Admin Ops Health view
+- IaC scaffolded: `infra/azure/teams-bot/` con Bicep + manifest Teams v1.17 + workflow GitHub Actions con WIF
+- 22 tests unitarios nuevos. Total: **2315 tests pasando**. `tsc --noEmit`, `pnpm lint`, `pnpm build` limpios.
+- Docs: `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.0 + runbook `azure-teams-bot.md` + bump de `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` a v1.1
+
 ### 2026-04-26 — Reliability dashboard hygiene: orphan archive + channel readiness + smoke lane bus + Sentry domain tags
 
 Cuatro patrones canónicos para que el dashboard nunca más muestre falsos positivos ni señales `awaiting_data` perpetuas. Documentados como reglas duras en `CLAUDE.md` y `AGENTS.md`.

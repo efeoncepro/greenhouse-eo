@@ -661,7 +661,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     notionDeliveryDataQuality = null
   }
 
-  const [teamsSent24h, teamsFailed24h, teamsLastRun] = await Promise.all([
+  const [teamsSent24h, teamsFailed24h, teamsLastRun, teamsLogicAppSent24h, teamsBotSent24h, teamsPendingSetup] = await Promise.all([
     safeCount(
       `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification' AND status = 'succeeded' AND started_at > NOW() - INTERVAL '24 hours'`
     ),
@@ -687,10 +687,41 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       `SELECT MAX(COALESCE(finished_at, started_at))::text AS last_run FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification'`
     )
       .then(rows => rows[0]?.last_run ?? null)
-      .catch(() => null)
+      .catch(() => null),
+    // TASK-671: breakdown by transport. The sender writes
+    // `transport=logic_app` or `transport=bot_framework` into notes for every
+    // successful send.
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs
+        WHERE source_system = 'teams_notification'
+          AND status = 'succeeded'
+          AND started_at > NOW() - INTERVAL '24 hours'
+          AND notes LIKE '%transport=logic_app%'`
+    ),
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs
+        WHERE source_system = 'teams_notification'
+          AND status = 'succeeded'
+          AND started_at > NOW() - INTERVAL '24 hours'
+          AND notes LIKE '%transport=bot_framework%'`
+    ),
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_core.teams_notification_channels
+        WHERE provisioning_status = 'pending_setup'
+          AND disabled_at IS NULL`
+    )
   ])
 
   const teamsHasActivity = teamsSent24h + teamsFailed24h > 0
+  const teamsBreakdownParts: string[] = []
+
+  if (teamsLogicAppSent24h > 0) teamsBreakdownParts.push(`Logic Apps ${teamsLogicAppSent24h}`)
+  if (teamsBotSent24h > 0) teamsBreakdownParts.push(`Bot ${teamsBotSent24h}`)
+  if (teamsPendingSetup > 0) teamsBreakdownParts.push(`Pending setup ${teamsPendingSetup}`)
+
+  const teamsSummary = teamsBreakdownParts.length > 0
+    ? `Envíos 24h por transporte: ${teamsBreakdownParts.join(' · ')}`
+    : null
 
   const subsystems: OperationsSubsystem[] = [
     {
@@ -751,7 +782,28 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       status: deriveHealth(teamsSent24h, teamsFailed24h, teamsLastRun, teamsHasActivity),
       processed: teamsSent24h,
       failed: teamsFailed24h,
-      lastRun: teamsLastRun
+      lastRun: teamsLastRun,
+      summary: teamsSummary,
+      metrics: [
+        {
+          key: 'logic_app_sent_24h',
+          label: 'Vía Logic Apps (24h)',
+          value: teamsLogicAppSent24h,
+          status: 'ok'
+        },
+        {
+          key: 'bot_framework_sent_24h',
+          label: 'Vía Bot Framework (24h)',
+          value: teamsBotSent24h,
+          status: 'ok'
+        },
+        {
+          key: 'pending_setup_channels',
+          label: 'Canales pending_setup',
+          value: teamsPendingSetup,
+          status: teamsPendingSetup > 0 ? 'warning' : 'ok'
+        }
+      ]
     },
     {
       name: 'Notion Sync',

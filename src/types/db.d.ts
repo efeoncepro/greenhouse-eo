@@ -2654,6 +2654,31 @@ export interface GreenhouseCoreSpaces {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreTeamsBotInboundActions {
+  action_data_json: Json | null;
+  action_id: string;
+  activity_id: string;
+  azure_tenant_id: string;
+  bot_app_id: string;
+  conversation_id: string;
+  from_aad_object_id: string;
+  /**
+   * Redacted error description (no tokens, no PII) suitable for the reliability dashboard.
+   */
+  handler_error_summary: string | null;
+  handler_finished_at: Timestamp | null;
+  handler_started_at: Timestamp | null;
+  handler_status: Generated<string>;
+  /**
+   * Stable hash sha256(activity_id|action_id|from_aad_object_id). Bot Framework may retry; the unique constraint blocks double-execution.
+   */
+  idempotency_key: string;
+  inbound_id: Generated<string>;
+  received_at: Generated<Timestamp>;
+  resolved_member_id: string | null;
+  resolved_user_id: string | null;
+}
+
 export interface GreenhouseCoreTeamsNotificationChannels {
   azure_resource_group: string | null;
   azure_subscription_id: string | null;
@@ -2673,6 +2698,22 @@ export interface GreenhouseCoreTeamsNotificationChannels {
   provisioning_status: Generated<string>;
   provisioning_status_reason: string | null;
   provisioning_status_updated_at: Timestamp | null;
+  /**
+   * Microsoft Graph chat id for static recipient_kind=chat_group rows.
+   */
+  recipient_chat_id: string | null;
+  /**
+   * TASK-671: surface for the bot transport. channel = post to teams channel; chat_1on1 = static DM; chat_group = static group chat; dynamic_user = resolve member at runtime from event payload.
+   */
+  recipient_kind: Generated<string>;
+  /**
+   * Mapping rule for recipient_kind=dynamic_user. Shape: {"from":"payload.<dot.path.to.member_id>"}. The sender extracts a member_id from the event payload and resolves it via resolveTeamsUserForMember(memberId).
+   */
+  recipient_routing_rule_json: Json | null;
+  /**
+   * Microsoft Graph user id (aadObjectId) for static recipient_kind=chat_1on1 rows.
+   */
+  recipient_user_id: string | null;
   secret_ref: string;
   team_id: string | null;
   updated_at: Generated<Timestamp>;
@@ -6798,6 +6839,7 @@ export interface DB {
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;
   "greenhouse_core.spaces": GreenhouseCoreSpaces;
+  "greenhouse_core.teams_bot_inbound_actions": GreenhouseCoreTeamsBotInboundActions;
   "greenhouse_core.teams_notification_channels": GreenhouseCoreTeamsNotificationChannels;
   "greenhouse_core.tool_catalog": GreenhouseCoreToolCatalog;
   "greenhouse_core.user_campaign_scopes": GreenhouseCoreUserCampaignScopes;

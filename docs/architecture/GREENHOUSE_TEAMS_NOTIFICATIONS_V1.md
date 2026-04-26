@@ -1,9 +1,19 @@
 # GREENHOUSE_TEAMS_NOTIFICATIONS_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-04-26 por TASK-669 (Claude)
+> **Última actualización:** 2026-04-26 por TASK-671 (Claude)
 > **Estado:** vigente
+
+## Delta v1.1 (2026-04-26 — TASK-671)
+
+- El trigger condicional declarado en v1.0 ("Bot Framework si surge `Action.Submit` interactivo o multi-tenant externo") se cumplió con el alcance interno: TASK-671 entregó dispatcher `teams_bot` con soporte para canales, chats 1:1 estáticos, group chats fijos y `dynamic_user` (DM resuelto al runtime desde el payload del evento). Logic Apps queda como path V1 vigente para los 3 canales actuales hasta que IT Admin ejecute el cutover (runbook en `docs/operations/azure-teams-bot.md`).
+- Schema enriquecido en migración `20260426202326023_extend-teams-notification-channels-recipient-kind.sql`: nuevas columnas `recipient_kind` (`channel|chat_1on1|chat_group|dynamic_user`), `recipient_user_id`, `recipient_chat_id`, `recipient_routing_rule_json`. CHECK compuesto que solo aplica cuando `channel_kind != 'azure_logic_app'` (preserva compatibilidad de los seeds Logic App).
+- Tabla nueva `greenhouse_core.teams_bot_inbound_actions` (migración `20260426202330684`) — audit + idempotency log para Action.Submit; alimenta los signals del Reliability Control Plane.
+- Nuevo módulo `'integrations.teams'` en `RELIABILITY_REGISTRY` con `incidentDomainTag='integrations.teams'`. El subsystem `'Teams Notifications'` ahora reporta breakdown por transporte (Logic Apps vs Bot Framework vs Pending Setup) en `metrics[]`.
+- Cards builders sin cambios: el sender envuelve la Adaptive Card 1.5 en un `attachments[]` Graph-shape para `teams_bot`, mantiene el shape Logic App para `azure_logic_app`. Call site `postTeamsCard(channelCode, card)` queda igual.
+- Diseño completo del modelo de interactividad (Action.Submit + JWT del Bot Framework + action-registry + entitlement check): ver `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md`.
 
 ## 1. Propósito
 

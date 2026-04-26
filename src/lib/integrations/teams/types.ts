@@ -48,6 +48,17 @@ export interface TeamsAdaptiveCard {
 
 export type TeamsChannelKind = 'azure_logic_app' | 'teams_bot' | 'graph_rsc'
 
+export type TeamsRecipientKind = 'channel' | 'chat_1on1' | 'chat_group' | 'dynamic_user'
+
+export interface TeamsRecipientRoutingRule {
+  /**
+   * Dot-path into the event payload that yields a Greenhouse member_id.
+   * Example: `"payload.assigneeMemberId"` resolves
+   *   `{ payload: { assigneeMemberId: 'mem-123' } } => 'mem-123'`.
+   */
+  from: string
+}
+
 export interface TeamsChannelRecord {
   channel_code: string
   channel_kind: TeamsChannelKind
@@ -62,6 +73,10 @@ export interface TeamsChannelRecord {
   azure_subscription_id: string | null
   azure_resource_group: string | null
   disabled_at: Date | null
+  recipient_kind: TeamsRecipientKind
+  recipient_user_id: string | null
+  recipient_chat_id: string | null
+  recipient_routing_rule_json: TeamsRecipientRoutingRule | null
 }
 
 export type TeamsSendOutcome =
@@ -83,9 +98,14 @@ export type TeamsSendOutcome =
         | 'channel_disabled'
         | 'unsupported_channel_kind'
         | 'missing_secret'
+        | 'missing_bot_app_config'
         | 'card_too_large'
         | 'http_error'
         | 'transport_error'
+        | 'token_acquisition_failed'
+        | 'recipient_unresolved'
+        | 'recipient_not_in_tenant'
+        | 'invalid_routing_rule'
       detail: string
     }
 
@@ -98,6 +118,12 @@ export interface TeamsSendOptions {
    * Use 'manual' from the admin /test endpoint, 'cron' from scheduled jobs.
    */
   syncMode?: 'reactive' | 'manual' | 'cron' | 'poll'
+  /**
+   * Event payload for `recipient_kind='dynamic_user'` channels. The sender extracts
+   * the member id via the channel's routing rule and resolves it to a Microsoft Graph
+   * user before issuing the chat. Ignored for other recipient kinds.
+   */
+  eventPayload?: Record<string, unknown>
 }
 
 export class TeamsCardTooLargeError extends Error {

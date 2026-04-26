@@ -142,14 +142,16 @@ const subsystemDetail = (subsystem: OperationsSubsystem) => {
 
   if (subsystem.name === 'Teams Notifications') {
     if (subsystem.processed === 0 && subsystem.failed === 0) {
-      return 'Sin envios a Teams en las ultimas 24 horas.'
+      return 'Sin envíos a Teams en las últimas 24 horas.'
     }
+
+    const transportBreakdown = subsystem.summary?.trim().length ? ` ${subsystem.summary}.` : ''
 
     if (subsystem.failed > 0) {
-      return `${subsystem.failed} fallos sobre ${subsystem.processed + subsystem.failed} intentos en las ultimas 24 horas.`
+      return `${subsystem.failed} fallos sobre ${subsystem.processed + subsystem.failed} intentos en las últimas 24 horas.${transportBreakdown}`
     }
 
-    return `${subsystem.processed} cards entregados a canales Teams en las ultimas 24 horas.`
+    return `${subsystem.processed} cards entregados a canales y chats de Teams en las últimas 24 horas.${transportBreakdown}`
   }
 
   if (subsystem.name === 'Reactive Worker') {

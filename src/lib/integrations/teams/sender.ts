@@ -5,9 +5,12 @@ import { randomUUID } from 'crypto'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 
+import { sendViaBotFramework } from './bot-framework/sender'
 import type {
   TeamsAdaptiveCard,
   TeamsChannelRecord,
+  TeamsRecipientKind,
+  TeamsRecipientRoutingRule,
   TeamsSendOptions,
   TeamsSendOutcome} from './types';
 import {
@@ -90,30 +93,93 @@ const writeSendRunOutcome = async ({
   )
 }
 
-type TeamsChannelRow = TeamsChannelRecord & Record<string, unknown>
+type TeamsChannelRow = Omit<TeamsChannelRecord, 'recipient_kind' | 'recipient_routing_rule_json'> & {
+  recipient_kind: string | null
+  recipient_routing_rule_json: TeamsRecipientRoutingRule | string | null
+} & Record<string, unknown>
+
+const KNOWN_RECIPIENT_KINDS: ReadonlySet<TeamsRecipientKind> = new Set([
+  'channel',
+  'chat_1on1',
+  'chat_group',
+  'dynamic_user'
+])
+
+const normalizeChannelRow = (row: TeamsChannelRow): TeamsChannelRecord => {
+  const recipientKindRaw = row.recipient_kind || 'channel'
+
+  const recipientKind: TeamsRecipientKind = KNOWN_RECIPIENT_KINDS.has(recipientKindRaw as TeamsRecipientKind)
+    ? (recipientKindRaw as TeamsRecipientKind)
+    : 'channel'
+
+  let routingRule: TeamsRecipientRoutingRule | null = null
+
+  if (row.recipient_routing_rule_json) {
+    if (typeof row.recipient_routing_rule_json === 'string') {
+      try {
+        const parsed = JSON.parse(row.recipient_routing_rule_json)
+
+        if (parsed && typeof parsed === 'object' && typeof (parsed as { from?: unknown }).from === 'string') {
+          routingRule = parsed as TeamsRecipientRoutingRule
+        }
+      } catch {
+        routingRule = null
+      }
+    } else if (
+      typeof row.recipient_routing_rule_json === 'object'
+      && typeof (row.recipient_routing_rule_json as { from?: unknown }).from === 'string'
+    ) {
+      routingRule = row.recipient_routing_rule_json as TeamsRecipientRoutingRule
+    }
+  }
+
+  return {
+    channel_code: row.channel_code,
+    channel_kind: row.channel_kind,
+    display_name: row.display_name,
+    description: row.description,
+    secret_ref: row.secret_ref,
+    logic_app_resource_id: row.logic_app_resource_id,
+    bot_app_id: row.bot_app_id,
+    team_id: row.team_id,
+    channel_id: row.channel_id,
+    azure_tenant_id: row.azure_tenant_id,
+    azure_subscription_id: row.azure_subscription_id,
+    azure_resource_group: row.azure_resource_group,
+    disabled_at: row.disabled_at,
+    recipient_kind: recipientKind,
+    recipient_user_id: row.recipient_user_id,
+    recipient_chat_id: row.recipient_chat_id,
+    recipient_routing_rule_json: routingRule
+  }
+}
 
 export const loadTeamsChannel = async (channelCode: string): Promise<TeamsChannelRecord | null> => {
   const rows = await runGreenhousePostgresQuery<TeamsChannelRow>(
     `SELECT channel_code, channel_kind, display_name, description, secret_ref,
             logic_app_resource_id, bot_app_id, team_id, channel_id,
-            azure_tenant_id, azure_subscription_id, azure_resource_group, disabled_at
+            azure_tenant_id, azure_subscription_id, azure_resource_group, disabled_at,
+            recipient_kind, recipient_user_id, recipient_chat_id, recipient_routing_rule_json
        FROM greenhouse_core.teams_notification_channels
       WHERE channel_code = $1`,
     [channelCode]
   )
 
-  return rows[0] || null
+  return rows[0] ? normalizeChannelRow(rows[0]) : null
 }
 
 export const listActiveTeamsChannels = async (): Promise<TeamsChannelRecord[]> => {
-  return runGreenhousePostgresQuery<TeamsChannelRow>(
+  const rows = await runGreenhousePostgresQuery<TeamsChannelRow>(
     `SELECT channel_code, channel_kind, display_name, description, secret_ref,
             logic_app_resource_id, bot_app_id, team_id, channel_id,
-            azure_tenant_id, azure_subscription_id, azure_resource_group, disabled_at
+            azure_tenant_id, azure_subscription_id, azure_resource_group, disabled_at,
+            recipient_kind, recipient_user_id, recipient_chat_id, recipient_routing_rule_json
        FROM greenhouse_core.teams_notification_channels
       WHERE disabled_at IS NULL
       ORDER BY channel_code`
   )
+
+  return rows.map(normalizeChannelRow)
 }
 
 const sendViaLogicApp = async ({
@@ -238,6 +304,7 @@ export const postTeamsCard = async (
 
   try {
     let attempts = 0
+    let surface: 'logic_app' | 'channel' | 'chat_1on1' | 'chat_group' | 'dynamic_user' = 'logic_app'
 
     if (channel.channel_kind === 'azure_logic_app') {
       const webhookUrl = await resolveSecretByRef(channel.secret_ref)
@@ -264,8 +331,32 @@ export const postTeamsCard = async (
       const result = await sendViaLogicApp({ channel, card, webhookUrl })
 
       attempts = result.attempts
+    } else if (channel.channel_kind === 'teams_bot') {
+      const botResult = await sendViaBotFramework({ channel, card, options })
+
+      if (!botResult.ok) {
+        await writeSendRunOutcome({
+          runId,
+          status: 'failed',
+          notes: `${botResult.reason}: ${botResult.detail}; transport=bot_framework; surface=${channel.recipient_kind}`,
+          recordsWritten: 0
+        })
+
+        return {
+          ok: false,
+          channelCode,
+          channelKind: channel.channel_kind,
+          durationMs: Date.now() - startMs,
+          attempts: botResult.attempts,
+          reason: botResult.reason,
+          detail: botResult.detail
+        }
+      }
+
+      attempts = botResult.attempts
+      surface = botResult.surface
     } else {
-      // teams_bot / graph_rsc dispatchers are reserved for future migration.
+      // graph_rsc reserved for future Resource-Specific Consent flow
       await writeSendRunOutcome({
         runId,
         status: 'failed',
@@ -280,14 +371,18 @@ export const postTeamsCard = async (
         durationMs: Date.now() - startMs,
         attempts: 0,
         reason: 'unsupported_channel_kind',
-        detail: `channel_kind '${channel.channel_kind}' is reserved for future Bot Framework migration`
+        detail: `channel_kind '${channel.channel_kind}' has no dispatcher implemented`
       }
     }
+
+    const transportTag = channel.channel_kind === 'teams_bot'
+      ? `transport=bot_framework; surface=${surface}`
+      : `transport=logic_app`
 
     await writeSendRunOutcome({
       runId,
       status: 'succeeded',
-      notes: `sent via ${channel.channel_kind}; attempts=${attempts}`,
+      notes: `sent via ${channel.channel_kind}; ${transportTag}; attempts=${attempts}`,
       recordsWritten: 1
     })
 
