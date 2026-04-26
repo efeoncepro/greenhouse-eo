@@ -290,6 +290,8 @@ Ya hay varias piezas sanas:
 - version header
 - envelope uniforme
 - resources montados sobre readers reales del repo
+- event control plane para subscriptions, deliveries y retry
+- lane first-party `app` para sesiones, Home y notificaciones mobile-safe
 - coexistencia explícita con `integrations/v1`
 
 Además, este primer corte ya fue verificado con:
@@ -304,12 +306,16 @@ Además, este primer corte ya fue verificado con:
 
 Todavía no hace estas cosas:
 
-- writes ecosystem-facing
+- writes ecosystem-facing amplios de dominio
 - idempotencia runtime de commands
-- webhooks outbound específicos de esta lane
+- generacion automatica de OpenAPI desde schemas runtime
 - MCP downstream
 - una API pública abierta
 - migración total de todos los recursos legacy al carril nuevo
+
+Si existe un command en V1, como crear/editar subscriptions o reprogramar un retry,
+debe leerse como command acotado de control plane. No equivale a una superficie
+general de writes para recursos de negocio.
 
 Tampoco intenta resolver todos los dominios del portal en V1. El primer slice está enfocado en recursos suficientemente maduros.
 

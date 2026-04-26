@@ -1,3 +1,19 @@
+## Delta 2026-04-26 TASK-617.4 publica Developer API Documentation Portal
+
+- `/developers/api` es ahora el entrypoint publico developer-facing de la API Platform.
+- La pagina publica centra `api/platform/*` y separa cuatro lanes:
+  - `ecosystem`
+  - `app`
+  - event control plane
+  - legacy `integrations/v1`
+- Artefactos developer-facing nuevos:
+  - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
+  - `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`
+  - `public/docs/greenhouse-api-platform-v1.md`
+  - `public/docs/greenhouse-api-platform-v1.openapi.yaml`
+- El OpenAPI de platform es preview en este corte; el OpenAPI estable de `integrations/v1` sigue en `GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`.
+- Regla operativa: la documentacion publica no debe prometer API anonima, writes ecosystem-facing amplios ni idempotencia transversal hasta que existan runtime helpers dedicados.
+
 ## Delta 2026-04-26 API Platform recupera REST hardening y lane first-party app
 
 - `TASK-617.1` y `TASK-617.2` quedaron recuperadas selectivamente desde rama/stash sobre `develop` actual.

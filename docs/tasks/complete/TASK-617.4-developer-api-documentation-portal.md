@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementada 2026-04-26`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -35,7 +35,9 @@ Greenhouse ya tiene un primer intento real de portal público para developers:
 También tiene documentación derivada útil:
 
 - `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
+- `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+- `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
 
 Pero hoy ese primer intento sigue siendo:
@@ -82,9 +84,9 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-617.1-api-platform-rest-hardening.md`
-- `docs/tasks/to-do/TASK-617.2-api-platform-first-party-app-surface-foundation.md`
-- `docs/tasks/to-do/TASK-617.3-api-platform-event-control-plane.md`
+- `docs/tasks/complete/TASK-617.1-api-platform-rest-hardening.md`
+- `docs/tasks/complete/TASK-617.2-api-platform-first-party-app-surface-foundation.md`
+- `docs/tasks/complete/TASK-617.3-api-platform-event-control-plane.md`
 - `src/app/(blank-layout-pages)/developers/api/page.tsx`
 - `docs/api/**`
 - `src/app/api/platform/**`
@@ -120,6 +122,18 @@ Reglas obligatorias:
 - no contempla la futura lane `app`
 - no presenta event control plane como parte de la plataforma
 - no actúa todavía como portal canónico para developers
+
+### Discovery delta 2026-04-26
+
+- `TASK-617.1`, `TASK-617.2` y `TASK-617.3` ya estan cerradas y viven en `docs/tasks/complete/`.
+- La API Platform runtime actual ya incluye:
+  - `api/platform/ecosystem/*`
+  - `api/platform/app/*`
+  - event control plane bajo `api/platform/ecosystem/*`
+- El OpenAPI estable anterior cubre solo el carril legacy/transicional `/api/integrations/v1/*`; esta task agrega un OpenAPI preview para `api/platform/*`.
+- `public/docs/greenhouse-integrations-api-v1.*` estaban mas atrasados que `docs/api/*`; deben tratarse como artefactos legacy, no como contrato canonico completo.
+- La documentacion publica no debe prometer idempotencia general de writes: todavia no existe helper/runtime transversal de idempotency en `src/lib/api-platform/**`.
+- `docs/architecture/schema-snapshot-baseline.sql` esta atrasado respecto de migraciones recientes de API Platform; para este corte la referencia runtime real son las migraciones `20260426021650967_task-617-api-platform-app-foundation.sql`, `20260426023509765_task-617-event-control-plane.sql`, las migraciones sister-platform y `src/types/db.d.ts`.
 
 ## Scope
 
@@ -173,28 +187,29 @@ El orden correcto es:
 
 ## Acceptance Criteria
 
-- [ ] `/developers/api` existe como portal público developer-facing alineado con la `API platform`.
-- [ ] La documentación pública principal ya no está centrada en `integrations/v1` como historia canónica.
-- [ ] La documentación contempla `ecosystem`, `app` y event control plane según el estado real del runtime.
-- [ ] `docs/api/*`, docs funcionales y arquitectura quedaron alineados sin contradicciones.
+- [x] `/developers/api` existe como portal público developer-facing alineado con la `API platform`.
+- [x] La documentación pública principal ya no está centrada en `integrations/v1` como historia canónica.
+- [x] La documentación contempla `ecosystem`, `app` y event control plane según el estado real del runtime.
+- [x] `docs/api/*`, docs funcionales y arquitectura quedaron alineados sin contradicciones.
 
 ## Verification
 
 - `pnpm lint`
-- `pnpm tsc --noEmit`
-- prueba manual en `/developers/api`
-- revisión manual de links y artefactos descargables
+- `pnpm build`
+- `pnpm exec tsc --noEmit --pretty false`
+- revision manual de `/developers/api`
+- revision manual de links y artefactos descargables
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] se verificó manualmente que `/developers/api` no contradice la arquitectura ni los docs derivados descargables
+- [x] se verificó manualmente que `/developers/api` no contradice la arquitectura ni los docs derivados descargables
 
 ## Follow-ups
 

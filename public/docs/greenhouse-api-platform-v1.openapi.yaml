@@ -1,0 +1,503 @@
+openapi: 3.1.0
+info:
+  title: Greenhouse API Platform
+  version: 1.0.0-preview
+  description: |
+    Preview developer contract for the canonical Greenhouse API Platform lanes.
+    The legacy integrations OpenAPI remains in GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml.
+servers:
+  - url: https://greenhouse.efeoncepro.com
+  - url: https://dev-greenhouse.efeoncepro.com
+components:
+  securitySchemes:
+    ecosystemBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: Consumer Token
+    sisterPlatformKey:
+      type: apiKey
+      in: header
+      name: x-greenhouse-sister-platform-key
+    appBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: App Access Token
+  parameters:
+    ApiVersion:
+      in: header
+      name: x-greenhouse-api-version
+      schema:
+        type: string
+        default: '2026-04-25'
+    ExternalScopeType:
+      in: query
+      name: externalScopeType
+      required: true
+      schema:
+        type: string
+        enum: [organization, client, space, internal]
+    ExternalScopeId:
+      in: query
+      name: externalScopeId
+      required: true
+      schema:
+        type: string
+    Page:
+      in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      in: query
+      name: pageSize
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+  schemas:
+    PlatformEnvelope:
+      type: object
+      required: [requestId, servedAt, version, data, meta]
+      properties:
+        requestId:
+          type: string
+        servedAt:
+          type: string
+          format: date-time
+        version:
+          type: string
+        data: {}
+        meta:
+          type: object
+    PlatformErrorEnvelope:
+      type: object
+      required: [requestId, servedAt, version, data, errors, meta]
+      properties:
+        requestId:
+          type: string
+        servedAt:
+          type: string
+          format: date-time
+        version:
+          type: string
+        data:
+          type: 'null'
+        errors:
+          type: array
+          items:
+            type: object
+            required: [code, message]
+            properties:
+              code:
+                type: string
+              message:
+                type: string
+              details:
+                type: object
+        meta:
+          type: object
+    AppSessionRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        deviceLabel:
+          type: string
+        devicePlatform:
+          type: string
+        appVersion:
+          type: string
+    AppRefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+    WebhookSubscriptionRequest:
+      type: object
+      required: [targetUrl, eventFilters]
+      properties:
+        targetUrl:
+          type: string
+          format: uri
+        authMode:
+          type: string
+          enum: [hmac_sha256, bearer, none]
+          default: hmac_sha256
+        secretRef:
+          type: string
+        eventFilters:
+          type: array
+          items:
+            type: object
+            properties:
+              eventType:
+                type: string
+              aggregateType:
+                type: string
+        active:
+          type: boolean
+        paused:
+          type: boolean
+        metadata:
+          type: object
+paths:
+  /api/platform/ecosystem/context:
+    get:
+      summary: Resolve authenticated consumer and binding context
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+      responses:
+        '200':
+          description: Context resolved
+  /api/platform/ecosystem/organizations:
+    get:
+      summary: List scoped organizations
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: type
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Organization collection
+        '304':
+          description: Not modified
+  /api/platform/ecosystem/organizations/{id}:
+    get:
+      summary: Get a scoped organization detail
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Organization detail
+        '404':
+          description: Organization not found or outside resolved scope
+  /api/platform/ecosystem/capabilities:
+    get:
+      summary: List scoped capability assignments
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Capability collection
+  /api/platform/ecosystem/integration-readiness:
+    get:
+      summary: Read scoped integration readiness
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - in: query
+          name: keys
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Integration readiness
+  /api/platform/ecosystem/event-types:
+    get:
+      summary: List known event types
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - in: query
+          name: namespace
+          schema:
+            type: string
+        - in: query
+          name: aggregateType
+          schema:
+            type: string
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Event type catalog
+  /api/platform/ecosystem/webhook-subscriptions:
+    get:
+      summary: List webhook subscriptions owned by the resolved consumer and binding
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - in: query
+          name: active
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Webhook subscription collection
+    post:
+      summary: Create a webhook subscription bound to the resolved consumer and scope
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookSubscriptionRequest'
+      responses:
+        '201':
+          description: Subscription created
+  /api/platform/ecosystem/webhook-subscriptions/{id}:
+    get:
+      summary: Get one webhook subscription
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook subscription
+    patch:
+      summary: Partially update one webhook subscription
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookSubscriptionRequest'
+      responses:
+        '200':
+          description: Subscription updated
+  /api/platform/ecosystem/webhook-deliveries:
+    get:
+      summary: List webhook deliveries for owned subscriptions
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: eventType
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook delivery collection
+  /api/platform/ecosystem/webhook-deliveries/{id}:
+    get:
+      summary: Get webhook delivery detail and attempts
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook delivery
+  /api/platform/ecosystem/webhook-deliveries/{id}/retry:
+    post:
+      summary: Schedule a retry for one failed or retryable webhook delivery
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Retry scheduled
+  /api/platform/app/sessions:
+    post:
+      summary: Create a first-party app session
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppSessionRequest'
+      responses:
+        '201':
+          description: App session created
+    patch:
+      summary: Refresh and rotate a first-party app session
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppRefreshRequest'
+      responses:
+        '200':
+          description: App session refreshed
+  /api/platform/app/sessions/current:
+    delete:
+      summary: Revoke the current first-party app session
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Session revoked
+  /api/platform/app/context:
+    get:
+      summary: Get first-party app identity, access, views, and entitlements context
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: App context
+  /api/platform/app/home:
+    get:
+      summary: Get the mobile-safe Home snapshot
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: App Home snapshot
+  /api/platform/app/notifications:
+    get:
+      summary: List in-app notifications for the authenticated user
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Notification collection
+  /api/platform/app/notifications/{id}/read:
+    post:
+      summary: Mark one notification as read
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification marked as read
+  /api/platform/app/notifications/mark-all-read:
+    post:
+      summary: Mark all notifications as read for the authenticated user
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Notifications marked as read

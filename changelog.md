@@ -6838,6 +6838,12 @@
 
 # Changelog
 
+## 2026-04-26
+
+- API Platform: `/developers/api` ahora es el portal publico developer-facing de la plataforma. La pagina deja de presentar `integrations/v1` como historia principal y documenta lanes `ecosystem`, `app`, event control plane y legacy.
+- API docs: se agregaron `GREENHOUSE_API_PLATFORM_V1.md` y `GREENHOUSE_API_PLATFORM_V1.openapi.yaml` como artefactos derivados para `api/platform/*`; el OpenAPI de platform queda marcado como preview y el YAML de `integrations/v1` sigue como contrato estable del carril legacy.
+- Documentation alignment: `docs/api/*`, `docs/documentation/plataforma/api-platform-ecosystem.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` y los descargables en `public/docs/*` quedaron alineados para no prometer API anonima, writes amplios ni idempotencia transversal que aun no existen.
+
 ## 2026-04-25
 
 - Finance / VAT ledger: `vat_monthly_position` quedó endurecido contra el error SQL `could not determine data type of parameter $6`; el materializer ahora castea explícitamente los placeholders textuales usados en metadata, `period_id` y `materialization_reason`, y quedó cubierto por regresión dedicada.

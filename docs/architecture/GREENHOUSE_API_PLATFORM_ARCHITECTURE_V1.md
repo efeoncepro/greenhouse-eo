@@ -9,6 +9,18 @@
 
 ---
 
+## Delta 2026-04-26 — TASK-617.4 publica Developer API Documentation Portal
+
+- `/developers/api` pasa a ser el entrypoint publico developer-facing de la API Platform.
+- El framing canonico cambia de `Integrations API` a `Greenhouse API Platform`, con lanes explicitas:
+  - `ecosystem`
+  - `app`
+  - event control plane
+  - legacy `integrations/v1`
+- `docs/api/GREENHOUSE_API_PLATFORM_V1.md` y `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` nacen como artefactos derivados developer-facing para el estado runtime actual.
+- El OpenAPI de platform se marca como preview: cubre rutas y auth principales, pero schema generation automatica queda como follow-up.
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml` sigue siendo el contrato machine-readable estable del carril legacy/transicional.
+
 ## Delta 2026-04-26 — TASK-617.1/617.2 recupera hardening REST y lane first-party app
 
 - `api/platform/ecosystem/*` ya usa metadata de paginación uniforme (`meta.pagination`), headers de rate limit con `remaining/reset`, soporte selectivo de freshness (`ETag` / `Last-Modified`) y tests de contrato focalizados.
@@ -79,29 +91,39 @@ Hoy el repo ya tiene piezas reales de una API platform, pero aún no una capa un
   - `greenhouse_core.sister_platform_bindings`
   - `greenhouse_core.sister_platform_consumers`
   - `greenhouse_core.sister_platform_request_logs`
+- Shared layer de API Platform en:
+  - `src/lib/api-platform/core/**`
+  - `src/lib/api-platform/resources/**`
+- Lane canonica `ecosystem` en:
+  - `src/app/api/platform/ecosystem/**`
+- Lane first-party `app` en:
+  - `src/app/api/platform/app/**`
+- Event control plane en:
+  - `src/app/api/platform/ecosystem/event-types`
+  - `src/app/api/platform/ecosystem/webhook-subscriptions/**`
+  - `src/app/api/platform/ecosystem/webhook-deliveries/**`
+- Developer entrypoint publico en:
+  - `src/app/(blank-layout-pages)/developers/api/page.tsx`
 - Muchas rutas de dominio consolidadas para UI interna y producto
 
 ### 2.2 Lo que todavía no existe
 
-- una `API platform` shared y uniforme para todo Greenhouse
-- un envelope estable de respuestas transversal a las familias de API
-- una taxonomía única de errores y degraded modes
-- una policy uniforme de versionado
+- una `API platform` shared y uniforme para todos los dominios de Greenhouse
+- una taxonomía completa y granular de degraded modes por dominio
 - una capability shared de idempotencia para writes
-- una lane first-party clara para clients móviles
-- una separación explícita entre:
-  - rutas de producto/UI
-  - consumers first-party app
-  - contratos ecosystem-facing
-  - futuros adapters MCP downstream
+- generacion automatica de OpenAPI desde schemas runtime
+- una API publica anonima o self-service para developers externos
+- adapters MCP downstream sobre todos los contratos estables
 
 ### 2.3 Lectura del codebase
 
 El estado actual del código muestra tres realidades distintas:
 
-1. `integrations/sister-platforms` ya funciona como foundation de plataforma
-2. muchas rutas internas siguen resolviendo auth + payload + errores inline
-3. los backends de lectura no son homogéneos:
+1. `api/platform/ecosystem/*` ya funciona como lane canonica binding-aware.
+2. `api/platform/app/*` ya funciona como foundation first-party user-authenticated.
+3. `integrations/sister-platforms` sigue funcionando como carril legacy endurecido.
+4. muchas rutas internas siguen resolviendo auth + payload + errores inline
+5. los backends de lectura no son homogéneos:
    - `PostgreSQL / greenhouse_serving` domina en dominios nuevos o ya consolidados
    - `BigQuery` todavía aparece en carriles externos legacy como `integrations/v1`
 
@@ -412,26 +434,25 @@ La `API platform` debe soportar esta semántica objetivo:
 
 Las brechas concretas hoy son:
 
-1. **Read-only solamente**
-   - la lane nueva solo expone `GET`
-   - todavía no existen command endpoints ecosystem-facing
+1. **Writes de negocio siguen cerrados**
+   - `ecosystem` ya tiene commands acotados de event control plane
+   - todavía no existen command endpoints amplios para mutar recursos de negocio
 
-2. **Colecciones sin contrato uniforme completo**
-   - aunque ya hay shape estable, no todas las colecciones exponen cursores/links/metadata de navegación con la misma madurez
+2. **Idempotencia transversal pendiente**
+   - los futuros writes de dominio deben exigir idempotency key y auditabilidad
+   - aun no existe helper/runtime compartido en `src/lib/api-platform/**`
 
-3. **Caching y conditional requests ausentes**
-   - faltan `ETag`, `Last-Modified`, `If-None-Match` o `If-Modified-Since` donde tenga sentido
+3. **OpenAPI de platform todavia es preview**
+   - existe documentacion developer-facing y un YAML preview
+   - falta generacion automatica o validacion schema-first para todos los payloads
 
-4. **Rate limit headers incompletos**
-   - la política existe, pero todavía debe converger a un contrato más consistente y más útil para consumers
+4. **Freshness selectiva**
+   - `ETag` / `Last-Modified` existe donde la frescura es segura
+   - no debe prometerse como universal para app o event control plane
 
 5. **Semántica mutativa no definida**
-   - faltan reglas canónicas de:
-     - `201 Created`
-     - `202 Accepted`
-     - `204 No Content`
-     - `409 Conflict`
-     - `422 Unprocessable Entity`
+   - el event control plane ya usa create/update/retry commands
+   - la semantica de writes de negocio queda pendiente antes de abrir mas dominios
 
 6. **Relación legacy vs REST nueva aún transicional**
    - `/api/integrations/v1/*` sigue viva y no toda su semántica está alineada todavía con el carril nuevo

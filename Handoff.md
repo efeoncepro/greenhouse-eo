@@ -1,5 +1,49 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-617.4 Developer API Documentation Portal
+
+### Que cambio
+
+- `/developers/api` fue convergido desde el framing legacy `Integrations API` hacia `Greenhouse API Platform`.
+- La pagina publica ahora documenta:
+  - `api/platform/ecosystem/*`
+  - `api/platform/app/*`
+  - event control plane (`event-types`, `webhook-subscriptions`, `webhook-deliveries`, `retry`)
+  - legacy `integrations/v1`
+- Se agregaron artefactos derivados:
+  - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
+  - `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`
+  - `public/docs/greenhouse-api-platform-v1.md`
+  - `public/docs/greenhouse-api-platform-v1.openapi.yaml`
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md`, `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`, `docs/documentation/plataforma/api-platform-ecosystem.md` y `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` quedaron sincronizados con el estado runtime de `TASK-617.1/.2/.3`.
+- El OpenAPI de platform queda intencionalmente como preview; schema generation automatica y SDKs quedan fuera de este corte.
+
+### Validaciones
+
+- `pnpm lint` -> clean.
+- `pnpm build` -> success. Next mostro warning de worktree por lockfiles multiples y logs conocidos de `DYNAMIC_SERVER_USAGE` durante prerender de rutas dashboard autenticadas; no fallo build.
+- `pnpm exec tsc --noEmit --pretty false` -> clean.
+- Smoke local `GET /developers/api` en `http://localhost:3017` -> `200 text/html`.
+- Smoke local descargables:
+  - `/docs/greenhouse-api-platform-v1.md` -> `200 text/markdown`
+  - `/docs/greenhouse-api-platform-v1.openapi.yaml` -> `200 text/yaml`
+- Playwright desktop/mobile:
+  - titulo `API Platform` visible
+  - lanes `Ecosystem API`, `First-party App API`, `Event Control Plane`, `Legacy Integrations API` visibles
+  - link `/docs/greenhouse-api-platform-v1.openapi.yaml` visible
+  - sin responses locales `>=500` despues de symlinkear `.env.local` del checkout principal al worktree
+- YAML parse smoke:
+  - `GREENHOUSE_API_PLATFORM_V1.openapi.yaml` -> 18 paths
+  - `greenhouse-api-platform-v1.openapi.yaml` -> 18 paths
+  - `greenhouse-integrations-api-v1.openapi.yaml` -> 6 paths
+- `rg "new Pool\\(" src --glob '!src/lib/postgres/client.ts'` -> 0 matches.
+
+### Notas de coordinacion
+
+- No se agregaron migraciones ni runtime tables.
+- No se modificaron routes `src/app/api/**`.
+- La documentacion publica no promete API anonima, writes ecosystem-facing amplios ni idempotencia transversal.
+
 ## Sesion 2026-04-26 — Recuperacion TASK-617.1 / TASK-617.2 API Platform
 
 ### Que cambio

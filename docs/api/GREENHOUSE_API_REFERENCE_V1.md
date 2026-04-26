@@ -19,7 +19,54 @@ Use this file as the first read for any agent or connector that needs to integra
 La taxonomía general de lanes, versionado, auth, resiliencia, idempotencia y rollout
 ya no se define aquí. Este archivo solo resume surfaces existentes.
 
-### 1. Integrations API
+### 1. API Platform
+
+Purpose:
+- canonical platform contracts for ecosystem consumers, first-party app clients, and event control plane resources
+- stable response envelope, explicit version header, scoped auth, rate-limit headers, and selective freshness
+
+Current version:
+- `2026-04-25`
+- header: `x-greenhouse-api-version`
+
+Lanes:
+- `ecosystem`: server-to-server, binding-aware, consumer-token authenticated
+- `app`: first-party user-authenticated lane for the future React Native app
+- `event control plane`: webhook subscriptions, deliveries and retry commands under `api/platform/ecosystem/*`
+
+Routes:
+- `GET /api/platform/ecosystem/context`
+- `GET /api/platform/ecosystem/organizations`
+- `GET /api/platform/ecosystem/organizations/:id`
+- `GET /api/platform/ecosystem/capabilities`
+- `GET /api/platform/ecosystem/integration-readiness`
+- `GET /api/platform/ecosystem/event-types`
+- `GET/POST /api/platform/ecosystem/webhook-subscriptions`
+- `GET/PATCH /api/platform/ecosystem/webhook-subscriptions/:id`
+- `GET /api/platform/ecosystem/webhook-deliveries`
+- `GET /api/platform/ecosystem/webhook-deliveries/:id`
+- `POST /api/platform/ecosystem/webhook-deliveries/:id/retry`
+- `POST/PATCH /api/platform/app/sessions`
+- `DELETE /api/platform/app/sessions/current`
+- `GET /api/platform/app/context`
+- `GET /api/platform/app/home`
+- `GET /api/platform/app/notifications`
+- `POST /api/platform/app/notifications/:id/read`
+- `POST /api/platform/app/notifications/mark-all-read`
+
+Read next:
+- `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
+- `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`
+- `docs/documentation/plataforma/api-platform-ecosystem.md`
+
+Key rules:
+- `api/platform/*` is authenticated and controlled; it is not an anonymous public API
+- ecosystem consumers must resolve tenancy through consumer credentials and bindings
+- app clients must use `api/platform/app/*`, not web routes or `AGENT_AUTH`
+- event retry schedules work for the dispatcher; it does not deliver inline
+- general ecosystem writes and cross-lane idempotency remain follow-ups
+
+### 2. Integrations API
 
 Purpose:
 - generic machine-to-machine integration surface
@@ -81,12 +128,28 @@ Key rules:
 
 1. `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
 2. `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
-3. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
-4. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
-5. `project_context.md`
-6. `Handoff.md`
+3. `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
+4. `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`
+5. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+6. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
+7. `project_context.md`
+8. `Handoff.md`
 
 ## Production-Ready Endpoints
+
+### API Platform
+
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/context`
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/organizations`
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/capabilities`
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/integration-readiness`
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/event-types`
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/webhook-subscriptions`
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/webhook-deliveries`
+- `https://greenhouse.efeoncepro.com/api/platform/app/sessions`
+- `https://greenhouse.efeoncepro.com/api/platform/app/context`
+- `https://greenhouse.efeoncepro.com/api/platform/app/home`
+- `https://greenhouse.efeoncepro.com/api/platform/app/notifications`
 
 ### Integrations API
 
