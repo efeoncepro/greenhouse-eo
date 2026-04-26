@@ -765,6 +765,7 @@ export const upsertNuboxQuoteFromSale = async (sale: NuboxProjectionSale): Promi
   if (existing.length > 0) {
     await runGreenhousePostgresQuery(
       `UPDATE greenhouse_finance.quotes SET
+        source_system = 'nubox',
         nubox_sii_track_id = $2,
         nubox_emission_status = $3,
         nubox_last_synced_at = COALESCE($4::timestamptz, greenhouse_finance.quotes.nubox_last_synced_at, NOW()),
@@ -790,6 +791,7 @@ export const upsertNuboxQuoteFromSale = async (sale: NuboxProjectionSale): Promi
       exchange_rate_to_clp, total_amount_clp,
       status, nubox_document_id, nubox_sii_track_id, nubox_emission_status,
       dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
+      source_system,
       created_at, updated_at
     ) VALUES (
       $1, $2, $3, $4,
@@ -798,9 +800,11 @@ export const upsertNuboxQuoteFromSale = async (sale: NuboxProjectionSale): Promi
       1, $10,
       'sent', $11, $12, $13,
       '52', $14, $15, $16::timestamptz,
+      'nubox',
       NOW(), NOW()
     )
     ON CONFLICT (quote_id) DO UPDATE SET
+      source_system = 'nubox',
       nubox_last_synced_at = COALESCE($16::timestamptz, greenhouse_finance.quotes.nubox_last_synced_at, NOW()), updated_at = NOW()`,
     [
       quoteId,
