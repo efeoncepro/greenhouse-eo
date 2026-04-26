@@ -62,9 +62,11 @@ describe('refresh queue helpers', () => {
       expect.stringContaining("SET status = 'completed'"),
       ['queue-1']
     )
+    // markRefreshFailed now appends `orphanReason` (7th param, null when the
+    // entity-existence guard didn't classify the row as orphan).
     expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledWith(
       expect.stringContaining('retry_count = retry_count + 1'),
-      ['queue-2', 3, 'boom', null, null, false]
+      ['queue-2', 3, 'boom', null, null, false, null]
     )
   })
 

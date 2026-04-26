@@ -58,7 +58,8 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/components/greenhouse/pricing/**',
       'src/components/greenhouse/quote-builder/**'
     ],
-    expectedSignalKinds: ['subsystem', 'incident', 'test_lane']
+    expectedSignalKinds: ['subsystem', 'incident', 'test_lane'],
+    incidentDomainTag: 'finance'
   },
   {
     moduleKey: 'integrations.notion',
@@ -88,7 +89,8 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/api/cron/notion-*/**',
       'src/app/api/integrations/v1/notion/**'
     ],
-    expectedSignalKinds: ['subsystem', 'data_quality', 'freshness']
+    expectedSignalKinds: ['subsystem', 'data_quality', 'freshness', 'incident'],
+    incidentDomainTag: 'integrations.notion'
   },
   {
     moduleKey: 'cloud',
@@ -132,7 +134,8 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/(dashboard)/admin/**',
       'src/views/greenhouse/admin/**'
     ],
-    expectedSignalKinds: ['runtime', 'posture', 'incident', 'cost_guard']
+    expectedSignalKinds: ['runtime', 'posture', 'incident', 'cost_guard'],
+    incidentDomainTag: 'cloud'
   },
   {
     moduleKey: 'delivery',
@@ -170,7 +173,8 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/(dashboard)/people/**',
       'services/ops-worker/**'
     ],
-    expectedSignalKinds: ['subsystem', 'data_quality', 'freshness']
+    expectedSignalKinds: ['subsystem', 'data_quality', 'freshness', 'incident'],
+    incidentDomainTag: 'delivery'
   }
 ]
 

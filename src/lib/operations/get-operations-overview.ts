@@ -533,12 +533,15 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     // projection blips would be noise.
     safeCount(
       `SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue
-        WHERE status = 'dead'
-           OR (
-             status = 'failed'
-             AND retry_count >= max_retries
-             AND updated_at < NOW() - INTERVAL '24 hours'
-           )`
+        WHERE COALESCE(archived, FALSE) = FALSE
+          AND (
+            status = 'dead'
+            OR (
+              status = 'failed'
+              AND retry_count >= max_retries
+              AND updated_at < NOW() - INTERVAL '24 hours'
+            )
+          )`
     ),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
       `SELECT MAX(updated_at)::text AS last_run FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`
@@ -654,7 +657,22 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification' AND status = 'succeeded' AND started_at > NOW() - INTERVAL '24 hours'`
     ),
     safeCount(
-      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification' AND status = 'failed' AND started_at > NOW() - INTERVAL '24 hours'`
+      // Exclude failures that come from `pending_setup` channels — those are
+      // configuration gaps (secret not yet provisioned in GCP Secret Manager),
+      // not real send incidents. The reliability dashboard surfaces them via
+      // a separate "Channels esperando setup" admin widget instead. The
+      // notes column carries `secret_ref=…` so we can join back to the
+      // channel registry to filter.
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs r
+         WHERE r.source_system = 'teams_notification'
+           AND r.status = 'failed'
+           AND r.started_at > NOW() - INTERVAL '24 hours'
+           AND NOT EXISTS (
+             SELECT 1 FROM greenhouse_core.teams_notification_channels c
+              WHERE c.provisioning_status = 'pending_setup'
+                AND r.notes IS NOT NULL
+                AND r.notes LIKE '%secret_ref=' || c.secret_ref || '%'
+           )`
     ),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
       `SELECT MAX(COALESCE(finished_at, started_at))::text AS last_run FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification'`

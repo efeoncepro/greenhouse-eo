@@ -106,6 +106,20 @@ export interface ReliabilityModuleDefinition {
    * Ejemplos: `{ freshness_max_lag_hours: 6, error_rate_max_percent: 1.5 }`.
    */
   sloThresholds?: Record<string, unknown>
+
+  /**
+   * Sentry custom tag value used by `getCloudSentryIncidents({ domain })` to
+   * filter open issues for this module's `incident` signal. Set per module so
+   * the reliability reader can iterate the registry and produce one incident
+   * signal per module without per-domain Sentry projects.
+   *
+   * Convention: lowercase, dot-separated, matches the values in
+   * `CaptureDomain` from `src/lib/observability/capture.ts`. Example:
+   * `'finance'`, `'integrations.notion'`, `'cloud'`. When omitted, the module
+   * does not produce a per-domain incident signal (the reader falls back to
+   * the global Sentry feed for `cloud` only).
+   */
+  incidentDomainTag?: string
 }
 
 export interface ReliabilitySignal {

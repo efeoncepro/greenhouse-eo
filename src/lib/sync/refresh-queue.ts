@@ -165,6 +165,84 @@ export const markRefreshCompleted = async (queueId: string): Promise<void> => {
 }
 
 /**
+ * Entity-existence guards used by `markRefreshFailed` to detect orphan rows
+ * (refreshes that point to a Greenhouse entity that no longer exists in PG)
+ * at the moment we'd otherwise route them to `dead`. Auto-archiving these
+ * keeps the reliability dashboard honest — humans see only real incidents,
+ * not test residue, deleted records, or snapshot drift.
+ *
+ * Rules:
+ *  - Each entry is `(entity_type, error_message_pattern, table_check)`.
+ *  - `error_message_pattern` is a substring or regex used to recognize the
+ *    "entity not found" failure shape coming up from the projection.
+ *  - `table_check` returns whether the entity exists. When it returns FALSE,
+ *    the row is archived, NOT dead.
+ *
+ * Adding a new guard: copy a row, point at the right table + key column.
+ * Cheap (single-row PG lookup), runs only at the dead-routing moment.
+ */
+const ENTITY_EXISTENCE_GUARDS: Array<{
+  entityType: string
+  errorMessagePattern: RegExp
+  checkExists: (entityId: string) => Promise<boolean>
+}> = [
+  {
+    entityType: 'member',
+    errorMessagePattern: /Member .* not found/i,
+    checkExists: async (entityId: string) => {
+      const rows = await runGreenhousePostgresQuery<{ exists: boolean } & Record<string, unknown>>(
+        'SELECT EXISTS(SELECT 1 FROM greenhouse.team_members WHERE member_id = $1) AS exists',
+        [entityId]
+      )
+
+      return rows[0]?.exists === true
+    }
+  },
+  {
+    entityType: 'organization',
+    errorMessagePattern: /Organization .* not found/i,
+    checkExists: async (entityId: string) => {
+      const rows = await runGreenhousePostgresQuery<{ exists: boolean } & Record<string, unknown>>(
+        `SELECT EXISTS(
+           SELECT 1 FROM greenhouse_core.organizations WHERE organization_id = $1
+         ) AS exists`,
+        [entityId]
+      )
+
+      return rows[0]?.exists === true
+    }
+  }
+]
+
+const detectOrphan = async (
+  entityType: string,
+  entityId: string,
+  errorMessage: string
+): Promise<{ isOrphan: boolean; reason: string | null }> => {
+  const guard = ENTITY_EXISTENCE_GUARDS.find(
+    g => g.entityType === entityType && g.errorMessagePattern.test(errorMessage)
+  )
+
+  if (!guard) return { isOrphan: false, reason: null }
+
+  try {
+    const exists = await guard.checkExists(entityId)
+
+    if (exists) return { isOrphan: false, reason: null }
+
+    return {
+      isOrphan: true,
+      reason: `orphan_entity_not_found:${entityType}=${entityId}`
+    }
+  } catch {
+    // If the guard query itself fails, do NOT archive — keep behaving as
+    // before (route to dead). False negatives are safe; false positives
+    // would silently hide real incidents.
+    return { isOrphan: false, reason: null }
+  }
+}
+
+/**
  * Mark a refresh as failed.
  *
  * Terminal classification (after retries are exhausted):
@@ -179,6 +257,14 @@ export const markRefreshCompleted = async (queueId: string): Promise<void> => {
  *     `Proyecciones` warning. Requires a code fix or manual requeue via the
  *     admin endpoint after the underlying cause is addressed.
  *
+ *     **Orphan auto-archive**: before routing to `dead`, we run the
+ *     `ENTITY_EXISTENCE_GUARDS` to detect refreshes that point to a Greenhouse
+ *     entity that no longer exists (smoke test residue, deleted records,
+ *     snapshot drift). When the entity is missing, the row is marked
+ *     `archived=TRUE` in the same UPDATE so the dashboard never sees it as a
+ *     real incident. The row is preserved for audit; the reliability counters
+ *     filter on `archived = FALSE`.
+ *
  * `dead_at` is stamped when the row enters the dead state so the dashboard can
  * age-out and escalate alerts honestly.
  */
@@ -192,6 +278,30 @@ export const markRefreshFailed = async (
     isInfrastructureFault?: boolean
   }
 ): Promise<void> => {
+  const isInfrastructureFault = classification?.isInfrastructureFault ?? false
+
+  // Pre-compute orphan status so we know whether to archive at the dead-routing
+  // moment. Only relevant for application faults (infra faults stay in `failed`
+  // and keep retrying — orphan detection happens via the recovery cron).
+  let orphanReason: string | null = null
+
+  if (!isInfrastructureFault) {
+    // queueId format: `{projectionName}:{entityType}:{entityId}` (per
+    // `buildRefreshQueueId`). Parse defensively so a malformed id doesn't
+    // crash the writer.
+    const idParts = queueId.split(':')
+    const entityType = idParts[1] ?? null
+    const entityId = idParts.slice(2).join(':') || null
+
+    if (entityType && entityId) {
+      const orphan = await detectOrphan(entityType, entityId, error)
+
+      if (orphan.isOrphan) {
+        orphanReason = orphan.reason
+      }
+    }
+  }
+
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_sync.projection_refresh_queue
      SET retry_count = retry_count + 1,
@@ -208,6 +318,18 @@ export const markRefreshFailed = async (
            WHEN retry_count + 1 >= $2 AND $6 = FALSE THEN NOW()
            ELSE dead_at
          END,
+         archived = CASE
+           WHEN retry_count + 1 >= $2 AND $6 = FALSE AND $7::text IS NOT NULL THEN TRUE
+           ELSE archived
+         END,
+         archived_at = CASE
+           WHEN retry_count + 1 >= $2 AND $6 = FALSE AND $7::text IS NOT NULL THEN NOW()
+           ELSE archived_at
+         END,
+         archived_reason = CASE
+           WHEN retry_count + 1 >= $2 AND $6 = FALSE AND $7::text IS NOT NULL THEN $7
+           ELSE archived_reason
+         END,
          updated_at = NOW()
      WHERE refresh_id = $1`,
     [
@@ -216,7 +338,8 @@ export const markRefreshFailed = async (
       error,
       classification?.errorClass ?? null,
       classification?.errorFamily ?? null,
-      classification?.isInfrastructureFault ?? false
+      isInfrastructureFault,
+      orphanReason
     ]
   )
 }

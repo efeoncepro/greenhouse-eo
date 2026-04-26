@@ -2663,6 +2663,12 @@ export interface GreenhouseCoreTeamsNotificationChannels {
   disabled_at: Timestamp | null;
   display_name: string;
   logic_app_resource_id: string | null;
+  /**
+   * Lifecycle of the channel's secret provisioning. `pending_setup` means the channel row exists in PG but the GCP Secret Manager secret named by `secret_ref` is missing — sends are skipped silently and the channel does NOT count against the Teams Notifications dashboard failure metric. Updated by the readiness check at ops-worker startup and after each send.
+   */
+  provisioning_status: Generated<string>;
+  provisioning_status_reason: string | null;
+  provisioning_status_updated_at: Timestamp | null;
   secret_ref: string;
   team_id: string | null;
   updated_at: Generated<Timestamp>;
@@ -6350,6 +6356,12 @@ export interface GreenhouseSyncProjectionCircuitState {
 }
 
 export interface GreenhouseSyncProjectionRefreshQueue {
+  /**
+   * Set to TRUE when a dead row points to an entity that no longer exists in PG (smoke test residue, archived records, snapshot drift). Excluded from the reliability dashboard "Proyecciones" warning count. The row stays for audit — never DELETE.
+   */
+  archived: Generated<boolean>;
+  archived_at: Timestamp | null;
+  archived_reason: string | null;
   created_at: Generated<Timestamp>;
   dead_at: Timestamp | null;
   entity_id: string;
@@ -6431,6 +6443,30 @@ export interface GreenhouseSyncServiceSyncQueue {
   queue_id: string;
   service_id: string;
   status: Generated<string>;
+}
+
+export interface GreenhouseSyncSmokeLaneRuns {
+  branch: string | null;
+  commit_sha: string;
+  duration_ms: number | null;
+  failed_tests: Generated<number>;
+  finished_at: Timestamp | null;
+  /**
+   * Stable identifier for the smoke lane (e.g. `finance.web`, `delivery.web`, `identity.api`). Matches the reliability registry expectations so the reader can map by key without translation.
+   */
+  lane_key: string;
+  passed_tests: Generated<number>;
+  recorded_at: Generated<Timestamp>;
+  skipped_tests: Generated<number>;
+  smoke_lane_run_id: string;
+  started_at: Timestamp;
+  status: string;
+  /**
+   * Per-suite breakdown for the dashboard drill-down. Free-form JSON so the CI side can include whatever Playwright/Vitest emits without a schema migration. Standard keys when present: `suites[]`, `failedSpecs[]`, `slowestSpecs[]`.
+   */
+  summary_json: Generated<Json>;
+  total_tests: Generated<number>;
+  workflow_run_url: string | null;
 }
 
 export interface GreenhouseSyncSourceSyncFailures {
@@ -6849,6 +6885,7 @@ export interface DB {
   "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;
   "greenhouse_sync.service_sync_queue": GreenhouseSyncServiceSyncQueue;
+  "greenhouse_sync.smoke_lane_runs": GreenhouseSyncSmokeLaneRuns;
   "greenhouse_sync.source_sync_failures": GreenhouseSyncSourceSyncFailures;
   "greenhouse_sync.source_sync_runs": GreenhouseSyncSourceSyncRuns;
   "greenhouse_sync.source_sync_watermarks": GreenhouseSyncSourceSyncWatermarks;

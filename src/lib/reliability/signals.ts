@@ -304,6 +304,109 @@ export const buildSentryIncidentSignals = (snapshot: CloudSentryIncidentsSnapsho
   return signals
 }
 
+/**
+ * Per-module Sentry incident signals via the `domain` tag.
+ *
+ * The legacy `buildSentryIncidentSignals` reads the GLOBAL Sentry feed and
+ * uses the `incident-mapping` heuristic to guess which module each issue
+ * belongs to. That works but produces noisy "uncorrelated" signals when the
+ * heuristic doesn't match.
+ *
+ * This builder is the structurally cleaner path: the consumer iterates the
+ * registry's `incidentDomainTag` entries and calls `getCloudSentryIncidents({
+ * domain })` per module. Each domain-filtered snapshot becomes the
+ * `incident` signal for that module — direct mapping, no heuristic.
+ *
+ * Both builders coexist: `buildSentryIncidentSignals` keeps the global feed
+ * as a safety net for incidents that don't carry the `domain` tag yet.
+ * `buildDomainIncidentSignals` produces clean per-module signals for code
+ * paths that DO use `captureWithDomain` (which is the canonical wrapper
+ * going forward).
+ */
+export const buildDomainIncidentSignals = (
+  byModule: Record<string, CloudSentryIncidentsSnapshot>
+): ReliabilitySignal[] => {
+  const signals: ReliabilitySignal[] = []
+
+  for (const [moduleKey, snapshot] of Object.entries(byModule)) {
+    const baseId = `${moduleKey}.incident.domain`
+
+    if (snapshot.status === 'unconfigured') {
+      signals.push({
+        signalId: baseId,
+        moduleKey: moduleKey as ReliabilityModuleKey,
+        kind: 'incident',
+        source: 'getCloudSentryIncidents',
+        label: 'Sentry incidents (domain-tag)',
+        severity: 'not_configured',
+        summary: snapshot.summary,
+        observedAt: snapshot.fetchedAt,
+        evidence: [
+          {
+            kind: 'helper',
+            label: 'Sentry reader',
+            value: `src/lib/cloud/observability.ts:getCloudSentryIncidents({ domain: '${moduleKey}' })`
+          }
+        ]
+      })
+      continue
+    }
+
+    if (snapshot.incidents.length === 0) {
+      signals.push({
+        signalId: baseId,
+        moduleKey: moduleKey as ReliabilityModuleKey,
+        kind: 'incident',
+        source: 'getCloudSentryIncidents',
+        label: 'Sentry incidents (domain-tag)',
+        severity: snapshot.error ? 'unknown' : 'ok',
+        summary: snapshot.error
+          ? `Reader error: ${snapshot.error}`
+          : `Sin incidentes Sentry tagged domain:${moduleKey}`,
+        observedAt: snapshot.fetchedAt,
+        evidence: [
+          {
+            kind: 'metric',
+            label: 'Domain filter',
+            value: `tags[domain]:${moduleKey}`
+          }
+        ]
+      })
+      continue
+    }
+
+    let appended = 0
+
+    for (const incident of snapshot.incidents) {
+      if (appended >= MAX_SENTRY_INCIDENTS_PER_MODULE) break
+
+      appended += 1
+
+      const incidentRef = incident.shortId ?? incident.id
+
+      const evidence: ReliabilitySignal['evidence'] = incident.permalink
+        ? [{ kind: 'incident', label: 'Sentry link', value: incident.permalink }]
+        : [{ kind: 'incident', label: 'Sentry id', value: incident.id }]
+
+      evidence.push({ kind: 'metric', label: 'Domain tag', value: moduleKey })
+
+      signals.push({
+        signalId: `${baseId}.${incidentRef}`,
+        moduleKey: moduleKey as ReliabilityModuleKey,
+        kind: 'incident',
+        source: 'getCloudSentryIncidents',
+        label: incident.shortId ? `Sentry ${incident.shortId}` : 'Sentry incident',
+        severity: fromSentryLevel(incident.level),
+        summary: `${incident.title} · ${incident.count} eventos · ${incident.userCount} usuarios · domain:${moduleKey}`,
+        observedAt: incident.lastSeen,
+        evidence
+      })
+    }
+  }
+
+  return signals
+}
+
 export const buildObservabilityPostureSignal = (
   posture: CloudObservabilityPosture
 ): ReliabilitySignal => ({

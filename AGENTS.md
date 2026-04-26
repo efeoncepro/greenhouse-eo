@@ -426,6 +426,44 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
 - Documentación funcional: `docs/documentation/operations/ops-worker-reactive-crons.md`
 
+### Reliability dashboard hygiene — orphan archive, channel readiness, smoke lane bus, domain incidents (2026-04-26)
+
+Cuatro patrones canónicos que evitan re-introducir falsos positivos o `awaiting_data` perpetuos. Cualquier cambio que toque `projection_refresh_queue`, `teams_notification_channels`, smoke lane readers o Sentry capture debe respetarlos.
+
+**1. Orphan auto-archive en `projection_refresh_queue`**
+
+- `markRefreshFailed` corre `ENTITY_EXISTENCE_GUARDS` antes de rutear a `dead`. Si el `entity_id` no existe en su tabla canónica → `archived=TRUE` en el mismo UPDATE, NO se cuenta en el dashboard.
+- Dashboard query filtra `WHERE COALESCE(archived, FALSE) = FALSE`.
+- Para sumar un nuevo entity guard: añadir entry al array `ENTITY_EXISTENCE_GUARDS` (entityType, errorMessagePattern, checkExists). Un single-row PG lookup, sólo al moment dead-routing.
+- **NO** borrar rows archived — quedan para audit. Query `WHERE archived = TRUE` para ver historial.
+
+**2. Channel `provisioning_status` en `teams_notification_channels`**
+
+- Estados: `'ready' | 'pending_setup' | 'configured_but_failing'`. `pending_setup` = config en PG pero secret faltante en GCP Secret Manager — sends skipean silenciosamente, NO contribuyen al subsystem failure metric.
+- Dashboard query Teams Notifications filtra `NOT EXISTS` por `secret_ref` matching channels en `pending_setup`.
+- Workflow nuevo channel: row `pending_setup` → upload secret a Secret Manager → flip a `'ready'`. Dashboard nunca pinta warning durante setup.
+
+**3. Smoke lane runs vía `greenhouse_sync.smoke_lane_runs` (PG-backed)**
+
+- CI publica resultados Playwright via `pnpm sync:smoke-lane <lane-key>` (auto-resuelve `GITHUB_SHA`, `GITHUB_REF_NAME`, `GITHUB_RUN_ID`).
+- Reader (`getFinanceSmokeLaneStatus`, etc.) lee última row por `lane_key` desde PG. Funciona desde Vercel runtime, Cloud Run, MCP — sin filesystem dependency.
+- Lane keys canónicos: `finance.web`, `delivery.web`, `identity.api`, etc. (lowercase, dot-separated, stable).
+- Nueva lane = upsertear desde CI con un nuevo `lane_key` — cero migration.
+
+**4. Sentry incident signals via `domain` tag (per-module)**
+
+- `captureWithDomain(err, 'finance', { extra })` (en `src/lib/observability/capture.ts`) — wrapper canónico. Reemplaza `Sentry.captureException(err)` directo donde haya dominio claro.
+- `getCloudSentryIncidents(env, { domain: 'finance' })` filtra por `tags[domain]`. UN proyecto Sentry, MUCHOS tags.
+- Registry: cada `ReliabilityModuleDefinition` declara `incidentDomainTag`. `getReliabilityOverview` itera y produce un `incident` signal per module.
+- Nuevo módulo = añadir `incidentDomainTag: '<key>'` al registry + `captureWithDomain(err, '<key>', ...)` en su code path. Cero config Sentry-side.
+
+**⚠️ Reglas duras**:
+
+- **NO** borrar rows de `projection_refresh_queue` por DELETE manual. Usar el orphan guard si es residue, o `requeueRefreshItem(queueId)` si es real fallo a recuperar.
+- **NO** contar failed de `source_sync_runs WHERE source_system='teams_notification'` sin excluir `pending_setup` channels.
+- **NO** leer Playwright results desde filesystem en runtime (Vercel/Cloud Run no tienen el archivo). Usar `greenhouse_sync.smoke_lane_runs`.
+- **NO** usar `Sentry.captureException()` directo en code paths con dominio claro — el tag `domain` no se setea y el módulo correspondiente NUNCA ve el incidente. Usar `captureWithDomain()`.
+
 ### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
 
 **Decisión arquitectónica (2026-04-26)**: el daily Notion sync es un SOLO ciclo de DOS pasos en `ops-worker` Cloud Run, schedulado por Cloud Scheduler. No hay otro path scheduled.

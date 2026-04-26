@@ -1,5 +1,75 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Mercado Publico API ticket provisionado en Secret Manager
+
+- Se verifico que el ticket recibido desde `API@chilecompra.cl` funciona contra `https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json`.
+- Secret Manager:
+  - GCP project: `efeonce-group`
+  - Secret: `greenhouse-mercado-publico-ticket`
+  - Version activa: `1`
+  - Payload auditado como scalar crudo: UUID shape, sin whitespace, sin `\n`/`\r` literal.
+- IAM: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/secretmanager.secretAccessor` sobre el secreto para la futura integracion Greenhouse.
+- Smoke desde Secret Manager: `estado=activas` respondio `200`, `Cantidad=4346`, `Version=v1` el 2026-04-26.
+- Pendiente futuro: cuando se implemente la integracion, documentar el contrato runtime/env (`MERCADO_PUBLICO_TICKET_SECRET_REF=greenhouse-mercado-publico-ticket`) en `.env.example`, `project_context.md` y la arquitectura/docs del modulo correspondiente.
+
+## Sesion 2026-04-26 — Reliability dashboard hygiene end-to-end (orphan archive + channel readiness + smoke lane bus + Sentry domain tags)
+
+### Trigger
+
+Después de drenar PG, el dashboard mostraba 4 falsos positivos / `awaiting_data`:
+
+1. Cloud Platform `warning` → 1 dead-letter en `projection_refresh_queue` (`member-smoke-...`, residue de smoke test que apuntaba a un member inexistente)
+2. Teams Notifications `degraded` → 1 send failed por `missing_secret: secret_ref=greenhouse-teams-finance-alerts-webhook` (config gap, no incidente)
+3. Finance `awaiting_data` → `test_lane` `awaiting_data` perpetuo (Playwright corre en CI pero `artifacts/playwright/results.json` no llega al runtime de Vercel)
+4. Finance `awaiting_data` → `incident` signal missing (no Sentry filter por dominio finance)
+
+User pidió: ataque robusto + escalable + resiliente + seguro de los 4, no parches.
+
+### Que cambio (4 capas estructurales)
+
+**1. Orphan auto-archive en `projection_refresh_queue`** — migration `20260426161938519_add-orphan-archive-to-projection-queue.sql`
+
+- Nuevas columnas `archived BOOLEAN`, `archived_at TIMESTAMPTZ`, `archived_reason TEXT` + índice parcial.
+- `markRefreshFailed` corre `ENTITY_EXISTENCE_GUARDS` antes de rutear a `dead`. Si el `entity_id` no existe en su tabla canónica (`team_members`, `organizations`), la fila se marca `archived=TRUE` en el mismo UPDATE.
+- Dashboard query gated `WHERE COALESCE(archived, FALSE) = FALSE` — orphan rows excluidas.
+- Backfill: smoke-test residue (`member_capacity_economics:member-smoke-...`) marcado archived.
+- Extensible: añadir entry al array `ENTITY_EXISTENCE_GUARDS` para nuevos entity types.
+
+**2. Channel `provisioning_status` en `teams_notification_channels`** — migration `20260426162205347_add-teams-channel-readiness-flag.sql`
+
+- Nueva columna `provisioning_status TEXT CHECK IN ('ready', 'pending_setup', 'configured_but_failing')` + reason + updated_at.
+- `pending_setup` significa "config en PG pero secret faltante en GCP Secret Manager" — sends skipean silenciosamente, NO contribuyen al subsystem failure metric.
+- Dashboard query Teams Notifications filtra `NOT EXISTS` por channels en `pending_setup` matching el `secret_ref` del run failure.
+- Backfill: `greenhouse-teams-finance-alerts-webhook` channel marcado `pending_setup`.
+
+**3. PG-backed smoke lane runs** — migration `20260426162404624_add-smoke-lane-runs-table.sql`
+
+- Nueva tabla `greenhouse_sync.smoke_lane_runs` con `lane_key`, `commit_sha`, `branch`, `workflow_run_url`, `status`, `total/passed/failed/skipped_tests`, `summary_json`.
+- Script publisher `pnpm sync:smoke-lane <lane-key>` (`scripts/publish-smoke-lane-run.ts`) auto-resuelve `GITHUB_SHA`, `GITHUB_REF_NAME`, `GITHUB_RUN_ID`. Parsea Playwright JSON report y upsertea.
+- `getFinanceSmokeLaneStatus` reescrito: lee de PG primero, fallback al filesystem solo para dev local.
+- Funciona desde Vercel runtime, Cloud Run, MCP — cierra el `awaiting_data` perpetuo. CI debe agregar `pnpm sync:smoke-lane finance.web` después del Playwright run.
+- Lane keys canónicos: `finance.web`, `delivery.web`, `identity.api`, etc. Stable, lowercase, dot-separated.
+
+**4. Sentry incident signals via `domain` tag** — `src/lib/observability/capture.ts` + extensions a `getCloudSentryIncidents`
+
+- Wrapper canónico `captureWithDomain(err, 'finance', { extra })` tag-ea cada `Sentry.captureException` con `tags[domain]`. Type `CaptureDomain` lista los dominios válidos.
+- `getCloudSentryIncidents(env, { domain })` filtra Sentry issues por `tags[domain]:<value>` — UN proyecto Sentry, MUCHOS tags, sin overhead de proyectos por dominio.
+- Cada `ReliabilityModuleDefinition` declara `incidentDomainTag` (`'finance'`, `'integrations.notion'`, `'cloud'`, `'delivery'`).
+- `getReliabilityOverview` itera el registry y produce un `incident` signal per module via nuevo `buildDomainIncidentSignals`. Cierra el `expectedSignalKinds: ['incident']` gap.
+
+### Validaciones
+
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → 0 errores
+- `pnpm test` → **427 files / 2225 passed / 5 skipped**
+- 3 migraciones aplicadas + tipos Kysely regenerados (298 tablas)
+
+### Pendientes follow-up (no bloquean)
+
+- Wire `pnpm sync:smoke-lane <lane-key>` al final de los Playwright jobs en `.github/workflows/playwright.yml`.
+- Migrar callers existentes de `Sentry.captureException()` a `captureWithDomain()` cuando el code path tenga dominio claro (cleanup oportunista).
+- Provisionar el secret real de `greenhouse-teams-finance-alerts-webhook` en GCP Secret Manager y flip el channel a `'ready'` cuando esté listo.
+
 ## Sesion 2026-04-26 — BQ conformed → PG drain canónico vía Cloud Run (cierra gap de 24 días + admin hygiene queue)
 
 ### Trigger

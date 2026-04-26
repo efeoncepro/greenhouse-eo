@@ -170,7 +170,110 @@ export const parseFinanceSmokeLaneReport = (
   }
 }
 
+/**
+ * Read the latest Finance smoke lane status from the canonical
+ * `greenhouse_sync.smoke_lane_runs` table (CI uploads here after every
+ * Playwright run via `pnpm sync:smoke-lane <lane-key>`).
+ *
+ * Falls back to the legacy filesystem reader for local dev workflows where
+ * the developer wants to inspect their last `pnpm test:e2e` run without
+ * pushing a commit. The PG path is the canonical source of truth in any
+ * deployed runtime (Vercel, Cloud Run, etc.) where the artifacts directory
+ * doesn't ship.
+ */
+
+const FINANCE_LANE_KEY = 'finance.web'
+
+interface SmokeLaneRunRow extends Record<string, unknown> {
+  smoke_lane_run_id: string
+  lane_key: string
+  commit_sha: string
+  branch: string | null
+  workflow_run_url: string | null
+  status: string
+  started_at: Date | string
+  finished_at: Date | string | null
+  duration_ms: number | null
+  total_tests: number
+  passed_tests: number
+  failed_tests: number
+  skipped_tests: number
+  summary_json: unknown
+}
+
+const toIsoString = (value: Date | string | null | undefined): string | null => {
+  if (value === null || value === undefined) return null
+  if (value instanceof Date) return value.toISOString()
+  if (typeof value === 'string') return value || null
+
+  return null
+}
+
+const readLatestPgRun = async (): Promise<SmokeLaneRunRow | null> => {
+  try {
+    const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
+
+    const rows = await runGreenhousePostgresQuery<SmokeLaneRunRow>(
+      `SELECT * FROM greenhouse_sync.smoke_lane_runs
+        WHERE lane_key = $1
+        ORDER BY started_at DESC
+        LIMIT 1`,
+      [FINANCE_LANE_KEY]
+    )
+
+    return rows[0] ?? null
+  } catch {
+    return null
+  }
+}
+
+const buildFromPgRun = (row: SmokeLaneRunRow): FinanceSmokeLaneStatus => {
+  const totals: FinanceSmokeLaneTotals = {
+    total: row.total_tests,
+    passed: row.passed_tests,
+    failed: row.failed_tests,
+    skipped: row.skipped_tests
+  }
+
+  const summary = (row.summary_json && typeof row.summary_json === 'object')
+    ? (row.summary_json as Record<string, unknown>)
+    : {}
+
+  const suites: FinanceSmokeLaneSuite[] = Array.isArray(summary.suites)
+    ? (summary.suites as FinanceSmokeLaneSuite[])
+    : []
+
+  const availability: FinanceSmokeLaneAvailability =
+    row.status === 'passed' || row.status === 'flaky'
+      ? 'configured'
+      : row.status === 'cancelled'
+        ? 'awaiting_data'
+        : 'error'
+
+  return {
+    availability,
+    generatedAt: new Date().toISOString(),
+    reportPath: `pg://greenhouse_sync.smoke_lane_runs/${row.smoke_lane_run_id}`,
+    reportFinishedAt: toIsoString(row.finished_at) ?? toIsoString(row.started_at),
+    totals,
+    suites,
+    notes:
+      totals.failed === 0
+        ? [`${totals.passed} de ${totals.total} specs Finance pasaron (commit ${row.commit_sha.slice(0, 7)}${row.branch ? `, ${row.branch}` : ''}).`]
+        : [`${totals.failed} spec${totals.failed === 1 ? '' : 's'} Finance en falla en commit ${row.commit_sha.slice(0, 7)} — revisar workflow run.`],
+    error: row.status === 'errored' ? 'CI workflow errored before tests started.' : null
+  }
+}
+
 export const getFinanceSmokeLaneStatus = async (): Promise<FinanceSmokeLaneStatus> => {
+  // 1) Canonical: latest run from PG (CI publishes here).
+  const pgRun = await readLatestPgRun()
+
+  if (pgRun) {
+    return buildFromPgRun(pgRun)
+  }
+
+  // 2) Legacy fallback: local Playwright run on disk (developer dev loop).
   const reportPath = resolve(process.cwd(), REPORT_RELATIVE_PATH)
 
   let raw: string
@@ -184,8 +287,8 @@ export const getFinanceSmokeLaneStatus = async (): Promise<FinanceSmokeLaneStatu
       return buildEmpty(
         'awaiting_data',
         [
-          'No hay reporte Playwright local todavía. El smoke lane Finance corre en CI (GitHub Actions).',
-          'Cuando el job Playwright suba `artifacts/playwright/results.json`, este reader rinde la última corrida.'
+          'Sin runs de smoke lane registrados en `greenhouse_sync.smoke_lane_runs`.',
+          'CI debe llamar `pnpm sync:smoke-lane finance.web` después de cada Playwright run para poblar esta tabla.'
         ],
         { reportPath }
       )
@@ -193,7 +296,7 @@ export const getFinanceSmokeLaneStatus = async (): Promise<FinanceSmokeLaneStatu
 
     return buildEmpty(
       'error',
-      ['Error leyendo reporte Playwright.'],
+      ['Error leyendo reporte Playwright (fallback local).'],
       { reportPath, error: (error as Error).message }
     )
   }

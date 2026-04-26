@@ -2,6 +2,17 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — Reliability dashboard hygiene: orphan archive + channel readiness + smoke lane bus + Sentry domain tags
+
+Cuatro patrones canónicos para que el dashboard nunca más muestre falsos positivos ni señales `awaiting_data` perpetuas. Documentados como reglas duras en `CLAUDE.md` y `AGENTS.md`.
+
+- **Orphan auto-archive en `projection_refresh_queue`** (migration `20260426161938519`): nuevas columnas `archived/archived_at/archived_reason` + `ENTITY_EXISTENCE_GUARDS` en `markRefreshFailed` que valida la existencia del entity antes de rutear a `dead`. Orphan rows (test residue, snapshot drift) quedan archived y excluidas del contador del dashboard. Dashboard query gated. Backfill de smoke-test residue (`member-smoke-*`) incluido.
+- **Channel `provisioning_status` en `teams_notification_channels`** (migration `20260426162205347`): nuevos valores `ready | pending_setup | configured_but_failing`. `pending_setup` significa "config en PG pero secret faltante en GCP Secret Manager" — sends skipean silenciosamente y NO disparan warnings. Backfill marca `greenhouse-teams-finance-alerts-webhook` como `pending_setup`. Query Teams Notifications subsystem filtra `NOT EXISTS` por `pending_setup` channels.
+- **PG-backed smoke lane runs** (migration `20260426162404624`): nueva tabla `greenhouse_sync.smoke_lane_runs` + script `pnpm sync:smoke-lane <lane-key>` para que CI publique resultados Playwright. Reader `getFinanceSmokeLaneStatus` reescrito para leer de PG primero (filesystem fallback solo para dev local). Funciona desde cualquier runtime (Vercel, Cloud Run, MCP) — cierra el `awaiting_data` perpetuo del Finance test_lane.
+- **Sentry incident signals via `domain` tag**: nuevo wrapper `captureWithDomain(err, 'finance', { extra })` en `src/lib/observability/capture.ts` que tag-ea cada captureException con `tags[domain]`. `getCloudSentryIncidents(env, { domain })` filtra por tag. Registry: cada `ReliabilityModuleDefinition` declara `incidentDomainTag` (`'finance'`, `'integrations.notion'`, `'cloud'`, `'delivery'`). `getReliabilityOverview` itera y produce un `incident` signal per module via `buildDomainIncidentSignals`. Cierra el gap `expectedSignalKinds: ['incident']` para finance/delivery/integrations.notion sin per-domain Sentry projects.
+
+Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skipped, 3 migraciones aplicadas + tipos Kysely regenerados (298 tablas).
+
 ### 2026-04-26 — Notion BQ → PG drain canónico vía Cloud Run + admin hygiene queue (cierra gap PG stale 24 días)
 
 - Nuevo path canónico `ops-worker POST /notion-conformed/sync` triggered por Cloud Scheduler `ops-notion-conformed-sync @ 20 7 * * * America/Santiago`. Reemplaza dependencia del Vercel cron (que queda como fallback) y del script manual `pnpm sync:source-runtime-projections` (que NO estaba scheduled — root cause de los 24 días de drift).
