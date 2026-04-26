@@ -2,16 +2,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
+- Completed: `2026-04-26`
 - Priority: `P2`
 - Impact: `Medio` (edge runtime readiness + security + pre-req de Auth.js v5)
 - Effort: `Bajo-Medio`
 - Type: `dependency` + `refactor`
-- Status real: `Backlog — Ola 1 stack modernization`
+- Status real: `Implementada — jose 6.2.2 instalado, jsonwebtoken removido`
 - Rank: `Post-TASK-511 — pre-req de TASK-516`
 - Domain: `auth` + `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-515-jsonwebtoken-to-jose`
+- Branch: `develop`
 
 ## Summary
 
@@ -39,11 +40,25 @@ Parent: TASK-511 (Stack Modernization Roadmap) · Ola 1.
 
 ## Acceptance Criteria
 
-- [ ] `jose` instalado; `jsonwebtoken` + `@types/jsonwebtoken` removidos.
-- [ ] Grep `jsonwebtoken` devuelve 0 hits en `src/`.
-- [ ] Tests de auth pasan.
-- [ ] Verificar: agent-auth flow (`/api/auth/agent-session`) sigue funcional.
-- [ ] Gates tsc/lint/test/build verdes.
+- [x] `jose@^6.2.2` instalado; `jsonwebtoken` + `@types/jsonwebtoken` removidos de `package.json`.
+- [x] Grep `jsonwebtoken` devuelve 0 hits en `src/`.
+- [x] Tests pasan (`pnpm test --run` → 2165 passed, 2 skipped, 0 failed).
+- [x] Agent-auth flow (`/api/auth/agent-session`) intacto — usa `next-auth/jwt`, no se ve afectado por el cambio en `auth-tokens.ts`.
+- [x] Gates verdes: `npx tsc --noEmit` (0 errors), `pnpm lint` (0 errors), `pnpm test` (verde), `pnpm build` (✓ Compiled successfully).
+
+## Resolution Notes
+
+- `src/lib/auth-tokens.ts` migrado: `SignJWT` reemplaza `jwt.sign`, `jwtVerify` reemplaza `jwt.verify`, `decodeJwt` reemplaza `jwt.decode`. Algoritmo HS256 preservado. Secret encoded vía `TextEncoder` (Web Crypto API).
+- `generateToken()` cambió de sync `string` a `async Promise<string>` (jose es async). 5 callers actualizados con `await`:
+  - `src/app/api/auth/verify-email/route.ts`
+  - `src/app/api/admin/invite/route.ts`
+  - `src/app/api/admin/users/[id]/resend-onboarding/route.ts`
+  - `src/app/api/account/forgot-password/route.ts`
+  - `src/lib/email/unsubscribe.ts`
+- Test mock en `verify-email/route.test.ts` cambiado de `mockReturnValue` a `mockResolvedValue`.
+- Cleanup colateral (errores tsc preexistentes que aparecieron al limpiar lockfile):
+  - `scripts/lib/load-greenhouse-tool-env.ts`: relax param type a `readonly string[]`.
+  - `src/lib/finance/vat-ledger.test.ts`: typed `mockGetDb` para aceptar `unknown[]`.
 
 ## Scope
 

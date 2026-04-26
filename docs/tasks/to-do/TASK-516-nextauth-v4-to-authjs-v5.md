@@ -1,5 +1,9 @@
 # TASK-516 — NextAuth v4 → Auth.js v5 migration
 
+## Delta 2026-04-26
+
+- Pre-requisito **TASK-515 (`jose`) cerrado**. `jose@6.2.2` ya está en `package.json` como dep directa; `jsonwebtoken` removido. La fundación está lista — esta task ya no está bloqueada.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -7,10 +11,10 @@
 - Impact: `Muy alto` (auth runtime + edge + typed sessions)
 - Effort: `Alto`
 - Type: `platform` + `breaking`
-- Status real: `Backlog — Ola 2 stack modernization`
-- Rank: `Post-TASK-515` (requires jose)
+- Status real: `Backlog — Ola 2 stack modernization (unblocked 2026-04-26)`
+- Rank: `Post-TASK-515` (jose ya disponible)
 - Domain: `auth` + `platform`
-- Blocked by: `TASK-515 (jose)`
+- Blocked by: `none` (TASK-515 cerrada 2026-04-26)
 - Branch: `task/TASK-516-authjs-v5-migration`
 
 ## Summary

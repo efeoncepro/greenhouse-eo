@@ -6,7 +6,7 @@ const executedSql: string[] = []
 const queuedResults: Array<{ rows: Array<Record<string, unknown>> }> = []
 const mockTransactionExecute = vi.fn(async (callback: (trx: unknown) => Promise<unknown>) => callback({}))
 
-const mockGetDb = vi.fn(async () => ({
+const mockGetDb: (...args: unknown[]) => Promise<{ transaction: () => { execute: typeof mockTransactionExecute } }> = vi.fn(async () => ({
   transaction: () => ({
     execute: mockTransactionExecute
   })

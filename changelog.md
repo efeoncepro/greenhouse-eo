@@ -2,6 +2,14 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — `jsonwebtoken` → `jose` (TASK-515)
+
+- `src/lib/auth-tokens.ts` migrado a `jose@^6.2.2` (Web Crypto API, edge-runtime ready). HS256 preservado. `SignJWT`/`jwtVerify`/`decodeJwt` reemplazan `jwt.sign`/`jwt.verify`/`jwt.decode`.
+- `generateToken()` ahora `async`. 5 callers actualizados (`api/auth/verify-email`, `api/admin/invite`, `api/admin/users/[id]/resend-onboarding`, `api/account/forgot-password`, `lib/email/unsubscribe`).
+- `jsonwebtoken` y `@types/jsonwebtoken` removidos de `package.json`. Grep `jsonwebtoken` en `src/` → 0 hits.
+- Pre-requisito desbloqueado para TASK-516 (Auth.js v5).
+- Cleanup colateral de 2 errores tsc preexistentes: `scripts/lib/load-greenhouse-tool-env.ts` (param type `readonly string[]`) y `src/lib/finance/vat-ledger.test.ts` (typed `mockGetDb`).
+
 ### 2026-04-26 — Nubox Quotes Hot Sync
 
 - Nuevo carril incremental `nubox-quotes-hot-sync` cada 15 minutos para cotizaciones Nubox (`COT` / DTE 52), manteniendo raw BigQuery → conformed → Postgres y tracking en `source_sync_runs`.

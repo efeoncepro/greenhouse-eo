@@ -44,7 +44,7 @@ export const parseEnvFile = (content: string) => {
   return entries
 }
 
-export const loadGreenhouseToolEnv = (envFiles = DEFAULT_ENV_FILES) => {
+export const loadGreenhouseToolEnv = (envFiles: readonly string[] = DEFAULT_ENV_FILES) => {
   for (const envFile of envFiles) {
     const resolvedPath = path.resolve(process.cwd(), envFile)
 

@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-515 jsonwebtoken → jose
+
+### Que cambio
+
+- `src/lib/auth-tokens.ts` migrado de `jsonwebtoken@9.0.3` a `jose@^6.2.2` (Web Crypto API, edge-runtime ready). Algoritmo HS256 preservado; secret encoded vía `TextEncoder`. `SignJWT`/`jwtVerify`/`decodeJwt` reemplazan `jwt.sign`/`jwt.verify`/`jwt.decode`.
+- `generateToken()` ahora retorna `Promise<string>` (jose es async). 5 callers actualizados con `await`:
+  - `src/app/api/auth/verify-email/route.ts`
+  - `src/app/api/admin/invite/route.ts`
+  - `src/app/api/admin/users/[id]/resend-onboarding/route.ts`
+  - `src/app/api/account/forgot-password/route.ts`
+  - `src/lib/email/unsubscribe.ts`
+- `src/app/api/auth/verify-email/route.test.ts` mock cambió de `mockReturnValue` a `mockResolvedValue` para reflejar la nueva signature async.
+- `package.json`: `jose@^6.2.2` añadido como dep directa; `jsonwebtoken` y `@types/jsonwebtoken` removidos.
+- Cleanup colateral de 2 errores tsc preexistentes detectados al re-correr gates:
+  - `scripts/lib/load-greenhouse-tool-env.ts`: param `envFiles` ahora tipado `readonly string[]` (antes inferido como tupla literal `as const` que rechazaba `string[]`).
+  - `src/lib/finance/vat-ledger.test.ts`: `mockGetDb` ahora explícitamente tipada para aceptar `(...args: unknown[])`.
+
+### Validaciones
+
+- `npx tsc --noEmit` → 0 errors.
+- `pnpm lint` → 0 errors.
+- `pnpm test --run` → 2165 passed, 2 skipped, 0 failed (418 test files).
+- `pnpm build` → ✓ Compiled successfully (17.3s).
+- `grep "jsonwebtoken" src/` → 0 hits.
+
+### Sinergia
+
+- Pre-requisito desbloqueado para TASK-516 (NextAuth v4 → Auth.js v5). Auth.js v5 usa `jose` internamente; ahora la dep está presente como first-party. Se anotó delta en TASK-516 marcándola unblocked.
+- `src/app/api/auth/agent-session/route.ts` no se ve afectado: usa `next-auth/jwt` (handling JWT propio), no consume `auth-tokens.ts`.
+
 ## Sesion 2026-04-26 — Nubox Secret Manager hardening
 
 ### Que cambio

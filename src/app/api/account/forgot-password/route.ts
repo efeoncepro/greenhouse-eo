@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     const user = users[0]
 
     if (user) {
-      const token = generateToken({
+      const token = await generateToken({
         user_id: user.user_id,
         email: user.email,
         client_id: user.client_id ?? undefined,

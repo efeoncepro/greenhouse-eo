@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     })
 
     // Generate invite token (72h)
-    const token = generateToken({
+    const token = await generateToken({
       user_id: userId,
       email: normalizedEmail,
       client_id,
