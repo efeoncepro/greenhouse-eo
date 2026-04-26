@@ -338,7 +338,7 @@ const ProjectedPayrollView = () => {
 
   const columnHelper = createColumnHelper<ProjectedEntry>()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const columns: ColumnDef<ProjectedEntry, any>[] = useMemo(() => [
     columnHelper.display({
       id: 'expander',

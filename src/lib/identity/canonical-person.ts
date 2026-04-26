@@ -223,7 +223,7 @@ const uniqueIdentifiers = (values: string[]) =>
   Array.from(new Set(values.map(value => value.trim()).filter(Boolean)))
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __greenhousePerson360ColumnsPromise: Promise<Set<string>> | undefined
 }
 

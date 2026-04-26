@@ -277,7 +277,7 @@ const IncomeListView = () => {
 
   const incomeColumnHelper = createColumnHelper<Income>()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const incomeColumns: ColumnDef<Income, any>[] = [
     {
       id: 'select',

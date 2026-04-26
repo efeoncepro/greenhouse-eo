@@ -243,7 +243,7 @@ const AgencyTeamView = () => {
 
   const columnHelper = createColumnHelper<TeamMember>()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const columns: ColumnDef<TeamMember, any>[] = useMemo(() => [
     columnHelper.display({
       id: 'expander',

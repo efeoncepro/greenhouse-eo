@@ -38,7 +38,7 @@ import tableStyles from '@core/styles/table.module.css'
 
 const cliColumnHelper = createColumnHelper<ClientProfile>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const cliColumns: ColumnDef<ClientProfile, any>[] = [
   cliColumnHelper.accessor('legalName', {
     header: 'Razón social',

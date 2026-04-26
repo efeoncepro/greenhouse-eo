@@ -77,7 +77,7 @@ type SortField = 'revenue' | 'grossMargin' | 'netMargin'
 
 const ceColumnHelper = createColumnHelper<ClientEconomicsSnapshot>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const ceColumns: ColumnDef<ClientEconomicsSnapshot, any>[] = [
   ceColumnHelper.accessor('clientName', { header: 'Space', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
   ceColumnHelper.accessor('totalRevenueClp', { header: 'Ingreso', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),

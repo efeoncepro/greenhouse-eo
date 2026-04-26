@@ -144,7 +144,7 @@ const formatDate = (date: string | null): string => {
 
 const expColumnHelper = createColumnHelper<Expense>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const expColumns: ColumnDef<Expense, any>[] = [
   expColumnHelper.accessor('expenseType', {
     header: 'Tipo',

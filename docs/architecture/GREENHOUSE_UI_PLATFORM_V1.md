@@ -13,6 +13,82 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-26b — ESLint 9 flat config (TASK-514)
+
+Migramos `eslint 8.57.1` (legacy `.eslintrc.js`) a **`eslint 9.39.4` con flat config (`eslint.config.mjs`)**. ESLint 8 entró en maintenance mode en 2024; flat config es el default desde 2024 y todos los plugins modernos convergieron a él (`typescript-eslint 8.59`, `eslint-plugin-import 2.32`, `eslint-config-next 16`, `eslint-config-prettier 10`).
+
+### Foundation
+
+- `eslint.config.mjs` reemplaza a `.eslintrc.js` como **única fuente de configuración** del linter.
+- Stack actualizado:
+  - `eslint@9.39.4`
+  - `@eslint/js@9.39.4`
+  - `@eslint/eslintrc@^3.3.5` (FlatCompat — disponible para casos edge, no usado en producción).
+  - `typescript-eslint@8.59.0` (metapackage flat-ready) + `@typescript-eslint/parser` + `@typescript-eslint/eslint-plugin`.
+  - `eslint-config-next@16.2.4` (provee config flat nativo en `eslint-config-next/core-web-vitals`).
+  - `eslint-plugin-import@2.32.0`, `eslint-config-prettier@10.1.8`, `eslint-import-resolver-typescript@4.4.4`.
+- Scripts simplificados:
+  - `"lint": "eslint ."` (drop `--ext` flag — flat config controla files vía `files` en cada bloque).
+  - `"lint:fix": "eslint . --fix"`.
+
+### Reglas custom preservadas 1:1
+
+Las convenciones del repo siguen vigentes sin cambios semánticos:
+
+- `padding-line-between-statements` (var/const/let → blank line; consts → multiline-block-like → blank line; etc.).
+- `lines-around-comment` (comment block precedido por blank line; allowBlockStart, allowObjectStart, allowArrayStart).
+- `newline-before-return`.
+- `import/newline-after-import: { count: 1 }`.
+- `import/order` con groups, pathGroups (`react`, `next/**`, `~/**` external before; `@/**` internal).
+- `@typescript-eslint/consistent-type-imports: error`.
+- `@typescript-eslint/no-unused-vars: error`.
+- `jsx-a11y/alt-text`, `react/display-name`, `react/no-children-prop`, `@next/next/no-img-element`, `@next/next/no-page-custom-font`: off (legacy).
+
+### Reglas explícitamente desactivadas (out-of-scope para esta migración)
+
+`eslint-config-next 16` agrega el bundle del **React Compiler / React 19** que introduce reglas estrictas nuevas (pertenecientes a `react-hooks/*`):
+
+- `react-hooks/set-state-in-effect`
+- `react-hooks/incompatible-library`
+- `react-hooks/refs`
+- `react-hooks/preserve-manual-memoization`
+- `react-hooks/immutability`
+- `react-hooks/static-components`, `component-hook-factories`, `error-boundaries`, `gating`, `globals`, `purity`, `unsupported-syntax`, `use-memo`, `config`, `fbt`, `fire`, `todo`
+
+Quedan **`off`** porque la spec exige migración 1:1 (mismo baseline pre/post). Adoptarlas requiere refactors per-componente coordinados — abrir task aparte cuando el equipo apunte al React Compiler.
+
+`react-hooks/rules-of-hooks` y `react-hooks/exhaustive-deps` (las clásicas) siguen activas como antes.
+
+`import/no-anonymous-default-export` también queda off (nuevo en `eslint-plugin-import 2.32` que dispara sobre `eslint.config.mjs` y otros bundlers config files).
+
+### Composición del config flat
+
+```js
+// eslint.config.mjs (resumen)
+export default [
+  { ignores: [/* generated, vendored, docs, etc. */] },
+  ...nextCoreWebVitals,           // Next 16 + react-hooks + jsx-a11y + import (registered)
+  ...tseslint.configs.recommended, // typescript-eslint metapackage
+  { rules: { /* convenciones del portal */ } },
+  { files: ['**/*.ts', '**/*.tsx', 'src/iconify-bundle/**'], rules: { /* TS-only overrides */ } },
+  prettierConfig                    // disable rules conflicting with prettier (last)
+]
+```
+
+**Por qué NO se importa `eslint-plugin-import` directo**: `eslint-config-next/core-web-vitals` ya lo registra. Importarlo otra vez dispara `Cannot redefine plugin "import"`. Las reglas `import/*` (incluido `import/order` y `import/newline-after-import`) viven en el bloque de reglas custom y se evalúan correctamente porque el plugin ya está disponible.
+
+### Files
+
+- `package.json` — bump deps + scripts.
+- `eslint.config.mjs` (NUEVO).
+- `.eslintrc.js` — DELETED.
+
+### Adopción
+
+- Cualquier nuevo dev override va al objeto custom rules de `eslint.config.mjs` (no agregar archivos `.eslintrc.*` nuevos).
+- Para overrides per-directorio, usar bloques flat con `files: ['src/foo/**']` + `rules: { ... }`.
+- Para temporalmente silenciar una regla en un archivo concreto, mantener `// eslint-disable-next-line <rule>` (sin cambios — flat config respeta la sintaxis).
+
 ## Delta 2026-04-26 — Server state con React Query (TASK-513)
 
 Adoptamos **`@tanstack/react-query` 5.x** como capa canónica de server state del portal. Es el cache layer estándar 2024-2026 (Vercel, Linear, Stripe, Ramp, Notion, Resend, shadcn). Reemplaza progresivamente el patrón `useState + useEffect + fetch` disperso por una cache global con invalidación coordinada, refetch on focus, dedup automático y devtools.

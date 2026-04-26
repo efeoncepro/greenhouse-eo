@@ -80,7 +80,7 @@ const urgencyColor = (u: string): 'secondary' | 'warning' | 'error' => {
 
 const reviewColHelper = createColumnHelper<ReviewItem>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const reviewColumns: ColumnDef<ReviewItem, any>[] = [
   reviewColHelper.accessor('taskName', { header: 'Asset', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
   reviewColHelper.accessor('projectName', { header: 'Proyecto', cell: ({ getValue }) => <Typography variant='caption' color='text.secondary'>{getValue()}</Typography> }),
@@ -113,7 +113,7 @@ const reviewColumns: ColumnDef<ReviewItem, any>[] = [
 
 const historyColHelper = createColumnHelper<ReviewHistory>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const historyColumns: ColumnDef<ReviewHistory, any>[] = [
   historyColHelper.accessor('taskName', { header: 'Asset' }),
   historyColHelper.accessor('rpa', {

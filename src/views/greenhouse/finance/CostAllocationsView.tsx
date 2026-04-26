@@ -445,7 +445,7 @@ const CostAllocationsView = () => {
 
   const clientColumnHelper = createColumnHelper<ClientRow>()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const clientColumns: ColumnDef<ClientRow, any>[] = useMemo(() => [
     clientColumnHelper.accessor('clientName', {
       header: 'Cliente',
@@ -507,7 +507,7 @@ const CostAllocationsView = () => {
 
   const allocColumnHelper = createColumnHelper<Allocation>()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const allocColumns: ColumnDef<Allocation, any>[] = [
     allocColumnHelper.accessor('clientName', { header: 'Cliente', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
     allocColumnHelper.accessor('expenseId', { header: 'Expense ID', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{getValue().slice(0, 12)}...</Typography> }),

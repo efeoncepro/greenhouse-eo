@@ -123,7 +123,7 @@ const subsystemIcon = (name: string): string => {
 
 const eventColumnHelper = createColumnHelper<RecentEvent>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const eventColumns: ColumnDef<RecentEvent, any>[] = [
   eventColumnHelper.accessor('eventType', {
     header: 'Tipo',
@@ -148,7 +148,7 @@ const eventColumns: ColumnDef<RecentEvent, any>[] = [
 
 const projColumnHelper = createColumnHelper<FailedProjection>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const projColumns: ColumnDef<FailedProjection, any>[] = [
   projColumnHelper.accessor('projectionName', {
     header: 'Proyección',

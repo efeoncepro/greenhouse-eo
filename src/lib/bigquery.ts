@@ -24,7 +24,7 @@ export const getBigQueryClient = () => {
 
   const originalQueryFn = client.query;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   (client as any).query = async (optionsOrQuery: any, ...rest: any[]) => {
     if (typeof optionsOrQuery === 'object' && !('maximumBytesBilled' in optionsOrQuery)) {
       optionsOrQuery = {

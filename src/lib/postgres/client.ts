@@ -22,9 +22,9 @@ export type ResolvedGreenhousePostgresConfig = GreenhousePostgresConfig & {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __greenhousePostgresPoolPromise: Promise<Pool> | undefined
-  // eslint-disable-next-line no-var
+   
   var __greenhousePostgresConnector: Connector | undefined
 }
 

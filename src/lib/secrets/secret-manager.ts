@@ -24,9 +24,9 @@ type CachedSecretResolution = SecretResolution & {
 }
 
 declare global {
-  // eslint-disable-next-line no-var
+   
   var __greenhouseSecretManagerClient: SecretManagerServiceClient | undefined
-  // eslint-disable-next-line no-var
+   
   var __greenhouseSecretResolutionCache: Map<string, CachedSecretResolution> | undefined
 }
 

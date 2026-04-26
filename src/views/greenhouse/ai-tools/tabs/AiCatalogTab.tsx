@@ -344,7 +344,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
         enableSorting: false
       })
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     []
   )
 

@@ -84,7 +84,7 @@ const fetchAllCatalogEntries = async (): Promise<CommercialProductCatalogEntry[]
 
   // Paginate defensively even though 74 products fit in one page. Keeps the
   // script correct if the catalog grows between runs.
-  // eslint-disable-next-line no-constant-condition
+   
   while (true) {
     const page = await listCommercialProductCatalog({
       includeArchived: true,
@@ -249,9 +249,9 @@ const renderReport = (outcomes: BackfillOutcome[], summary: BackfillSummary, app
 const main = async () => {
   const apply = process.argv.includes('--apply')
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[backfill] Mode: ${apply ? 'APPLY' : 'dry-run'}`)
-  // eslint-disable-next-line no-console
+   
   console.log('[backfill] Loading product catalog...')
 
   let entries: CommercialProductCatalogEntry[]
@@ -259,12 +259,12 @@ const main = async () => {
   try {
     entries = await fetchAllCatalogEntries()
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.error('[backfill] Failed to load catalog:', err instanceof Error ? err.message : String(err))
     process.exit(1)
   }
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[backfill] Retrieved ${entries.length} products. Processing...`)
 
   const outcomes: BackfillOutcome[] = []
@@ -282,7 +282,7 @@ const main = async () => {
         ? ` — ${outcome.reason}`
         : ''
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[backfill] ${outcome.productCode} → ${outcome.action} (hs=${hsId})${suffix}`
     )
@@ -300,22 +300,22 @@ const main = async () => {
   mkdirSync(dirname(outputPath), { recursive: true })
   writeFileSync(outputPath, markdown, 'utf-8')
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[backfill] Report written: ${outputPath}`)
 
   if (apply) {
-    // eslint-disable-next-line no-console
+     
     console.log(
       `[backfill] Summary: total=${summary.total} created=${summary.created} updated=${summary.updated} skipped=${summary.skipped} failed=${summary.failed}`
     )
   } else {
-    // eslint-disable-next-line no-console
+     
     console.log(`[backfill] Summary (dry-run): total=${summary.total} would-sync=${summary.dryRun}`)
   }
 }
 
 main().catch(err => {
-  // eslint-disable-next-line no-console
+   
   console.error('[backfill] Fatal:', err)
   process.exit(1)
 })

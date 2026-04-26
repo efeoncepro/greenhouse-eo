@@ -10,8 +10,8 @@
     "build": "node scripts/run-next-build.mjs",
     "start": "node scripts/run-next-start.mjs",
     "prelint": "pnpm build:icons",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -245,9 +245,7 @@
     "rimraf": "5.0.7",
     "unicorn-magic": "0.1.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "eslint": "8.57.1",
-    "eslint-config-next": "15.1.2"
+    "react-dom": "19.2.3"
   },
   "overrides": {
     "rimraf": "5.0.7",

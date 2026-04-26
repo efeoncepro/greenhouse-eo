@@ -84,7 +84,7 @@ const countryFlag = (code: string | null) => code ? COUNTRY_FLAGS[code.toUpperCa
 
 const columnHelper = createColumnHelper<OrganizationListItem>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const orgColumns: ColumnDef<OrganizationListItem, any>[] = [
   columnHelper.accessor('organizationName', {
     header: 'Organización',

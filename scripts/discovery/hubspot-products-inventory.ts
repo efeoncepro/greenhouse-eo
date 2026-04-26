@@ -267,7 +267,7 @@ const renderReport = (report: InventoryReport): string => {
 // ── Main ─────────────────────────────────────────────────────
 
 const main = async () => {
-  // eslint-disable-next-line no-console
+   
   console.log('[discovery] Fetching HubSpot products via middleware...')
 
   let products: HubSpotGreenhouseProductProfile[]
@@ -277,12 +277,12 @@ const main = async () => {
 
     products = response.products
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.error('[discovery] HubSpot fetch failed:', err instanceof Error ? err.message : String(err))
     process.exit(1)
   }
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[discovery] Retrieved ${products.length} products. Building report...`)
 
   const report = buildReport(products)
@@ -298,12 +298,12 @@ const main = async () => {
   mkdirSync(dirname(outputPath), { recursive: true })
   writeFileSync(outputPath, markdown, 'utf-8')
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[discovery] Report written to: ${outputPath}`)
 }
 
 main().catch(err => {
-  // eslint-disable-next-line no-console
+   
   console.error('[discovery] Fatal:', err)
   process.exit(1)
 })

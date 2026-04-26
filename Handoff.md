@@ -1,5 +1,74 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — ESLint 9 flat config (TASK-514)
+
+### Que cambio
+
+Migramos `eslint 8.57.1` (legacy `.eslintrc.js`) a **`eslint 9.39.4` con flat config (`eslint.config.mjs`)**. ESLint 8 esta en maintenance mode; flat config es el default desde 2024 y todos los plugins modernos del ecosistema (typescript-eslint 8, eslint-config-next 16, eslint-plugin-import 2.32) convergieron a el.
+
+- **Stack actualizado** en `package.json`:
+  - `eslint@9.39.4` (era 8.57.1).
+  - `@eslint/js@9.39.4` (NUEVO — utils oficiales para flat).
+  - `@eslint/eslintrc@^3.3.5` (NUEVO — FlatCompat disponible para casos edge, no usado en runtime).
+  - `typescript-eslint@8.59.0` (NUEVO metapackage flat-ready) + `@typescript-eslint/parser@8.59.0` + `@typescript-eslint/eslint-plugin@8.59.0` (era 8.46.2).
+  - `eslint-config-next@16.2.4` (era 15.1.2; provee `eslint-config-next/core-web-vitals` con array flat nativo).
+  - `eslint-plugin-import@2.32.0` (era 2.31.0).
+  - `eslint-config-prettier@10.1.8` (era 9.1.0).
+  - `eslint-import-resolver-typescript@4.4.4` (era 3.7.0).
+- **Resolutions limpieza**: removidas las viejas pinned versions de `eslint@8.57.1` y `eslint-config-next@15.1.2` del bloque `resolutions` que bloqueaban el upgrade.
+- **`.eslintrc.js` DELETED**. `eslint.config.mjs` es la unica fuente de configuracion del linter.
+- **Scripts simplificados**:
+  - `"lint": "eslint ."` (drop `--ext` flag — flat config controla files via `files` en cada bloque).
+  - `"lint:fix": "eslint . --fix"`.
+
+### Composicion del flat config
+
+```js
+// eslint.config.mjs (resumen)
+export default [
+  { ignores: [/* generated, vendored, docs, etc. */] },
+  ...nextCoreWebVitals,           // Next 16 + react-hooks + jsx-a11y + import (registered)
+  ...tseslint.configs.recommended, // typescript-eslint metapackage
+  { rules: { /* convenciones del portal */ } },
+  { files: ['**/*.ts', '**/*.tsx', 'src/iconify-bundle/**'], rules: { /* TS-only overrides */ } },
+  prettierConfig                    // disable rules que conflictuan con prettier (last)
+]
+```
+
+### Reglas custom preservadas 1:1
+
+Las convenciones del repo siguen vigentes sin cambios semanticos: `padding-line-between-statements`, `lines-around-comment`, `newline-before-return`, `import/newline-after-import`, `import/order` con pathGroups (`react`, `next/**`, `~/**` external before; `@/**` internal), `@typescript-eslint/consistent-type-imports: error`, `@typescript-eslint/no-unused-vars: error`.
+
+### Reglas nuevas explicitamente desactivadas (out-of-scope)
+
+`eslint-config-next 16` agrega el bundle del **React Compiler / React 19** que introduce un set nuevo de reglas estrictas (`react-hooks/set-state-in-effect`, `react-hooks/refs`, `react-hooks/preserve-manual-memoization`, `react-hooks/immutability`, etc.). Quedan **`off`** porque la spec exige migracion 1:1 (mismo baseline pre/post). Adoptarlas requiere refactors per-componente coordinados.
+
+`react-hooks/rules-of-hooks` y `react-hooks/exhaustive-deps` (las clasicas) siguen activas.
+
+`import/no-anonymous-default-export` tambien queda off (nuevo en `eslint-plugin-import 2.32`, dispara sobre `eslint.config.mjs` y otros bundlers config files).
+
+### Validaciones
+
+- `pnpm install` -> reinstall clean.
+- `pnpm lint` -> 0 errores / 0 warnings (autofix aplicado a 102 unused-eslint-disable directives + 8 import/order errores).
+- `pnpm build` -> Compiled successfully en 16.7s.
+- AGENTS.md actualizado para mencionar el path canonico (`eslint.config.mjs`).
+
+### Decisiones canonicas
+
+1. **`.mjs` no `.js`**. Flat config canonico es ESM. El repo no tiene `"type": "module"` en package.json, asi que `.mjs` declara explicitamente el formato.
+2. **No FlatCompat en runtime**. `eslint-config-next/core-web-vitals` y `typescript-eslint` ya exportan flat. Importar `eslint-plugin-import` por separado dispara `Cannot redefine plugin "import"` porque Next ya lo registra. La regla: leer las exports flat-nativas antes de reachar a FlatCompat.
+3. **Ignores conservadores**. Flat config no honra `.eslintignore` y no resuelve generated dirs por cwd. Lista explicita: `.next/**`, `.next-local/**` (incl. nested), `node_modules`, `full-version`, `.claude/**` (worktrees), `.codex/**`, `coverage`, `dist`, `build`, `out`, `public`, `docs`, `migrations`, `artifacts`. Sin esto, ESLint linta los chunks del build (~290k errores).
+4. **React Compiler off por ahora**. La spec dice "preservar baseline"; activar las nuevas hook rules generaria 192+ errores en 1 commit. Adopcion progresiva queda como follow-up.
+
+### Out of scope (queda como follow-up)
+
+- React Compiler full adoption: encender progresivamente las reglas `react-hooks/*` nuevas con refactors per-componente.
+- Biome / oxlint exploration (mencionado en spec).
+- Plugins enterprise nuevos: `eslint-plugin-import-x` (faster fork), `eslint-plugin-tailwindcss` para Tailwind 4 class sorting (mencionado en Follow-ups del spec).
+
+---
+
 ## Sesion 2026-04-26 — Nubox Quotes Hot Sync
 
 ### Que cambio

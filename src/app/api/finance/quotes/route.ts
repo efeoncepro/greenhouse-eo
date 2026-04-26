@@ -343,7 +343,7 @@ export async function POST(request: Request) {
   // TASK-486: spaceId legacy se ignora. Nuevos writes lo dejan NULL; Space vuelve a ser
   // proyección operativa post-conversion.
   if (body.spaceId) {
-    // eslint-disable-next-line no-console
+     
     console.warn('[POST /api/finance/quotes] spaceId in body ignored (TASK-486: quotations anchor on organization_id, not space_id). Received:', body.spaceId)
   }
 
@@ -475,7 +475,7 @@ export async function POST(request: Request) {
       return insert.rows[0].quotation_id
     })
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error('[POST /api/finance/quotes] quotations INSERT failed', {
       businessLineCode: resolvedBusinessLineCode,
       organizationId,
@@ -544,7 +544,7 @@ export async function POST(request: Request) {
       { createVersion: true, versionNotes: 'Draft created via API.' }
     )
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error('[POST /api/finance/quotes] persistQuotationPricing failed', {
       quotationId,
       lineItemsCount: lineItems.length,

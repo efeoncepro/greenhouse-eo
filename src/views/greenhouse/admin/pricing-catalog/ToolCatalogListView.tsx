@@ -88,7 +88,7 @@ const buildColumns = (
   onToggleSelectAll: (checked: boolean) => void,
   allSelectedIds: string[]
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 ): ColumnDef<ToolItem, any>[] => [
   columnHelper.display({
     id: 'select',

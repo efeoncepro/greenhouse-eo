@@ -96,7 +96,7 @@ const CATEGORY_OPTIONS = [
 
 const supColumnHelper = createColumnHelper<Supplier>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const supColumns: ColumnDef<Supplier, any>[] = [
   supColumnHelper.accessor('legalName', {
     header: 'Proveedor',

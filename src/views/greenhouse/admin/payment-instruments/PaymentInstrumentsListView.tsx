@@ -66,7 +66,7 @@ interface ListResponse {
 
 const columnHelper = createColumnHelper<PaymentInstrumentItem>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const columns: ColumnDef<PaymentInstrumentItem, any>[] = [
   columnHelper.accessor('instrumentName', {
     header: 'Instrumento',

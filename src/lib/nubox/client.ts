@@ -305,7 +305,7 @@ export const fetchAllPages = async <T>(
   const all: T[] = []
   let page = 1
 
-  // eslint-disable-next-line no-constant-condition
+   
   while (true) {
     const response = await fetcher(period, page, size)
 

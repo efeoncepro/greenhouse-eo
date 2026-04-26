@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+ 
 
 import { execFile } from 'node:child_process'
 import { readFile } from 'node:fs/promises'

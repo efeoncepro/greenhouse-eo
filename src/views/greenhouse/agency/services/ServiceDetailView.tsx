@@ -285,7 +285,7 @@ const buildEmptySlaForm = (): ServiceSlaFormState => ({
 
 const historyColumnHelper = createColumnHelper<ServiceHistoryEntry>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const historyColumns: ColumnDef<ServiceHistoryEntry, any>[] = [
   historyColumnHelper.accessor('fieldChanged', {
     header: 'Campo',

@@ -12,5 +12,5 @@ if (dsn) {
   })
 }
 
-// eslint-disable-next-line import/namespace -- runtime export exists in @sentry/nextjs; rule lags package typing here.
+ 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

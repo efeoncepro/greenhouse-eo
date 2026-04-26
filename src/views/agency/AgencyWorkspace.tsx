@@ -66,7 +66,7 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
 
   const [activeTab, setActiveTab] = useState<AgencyTab>(defaultTab)
   const [spacesData, setSpacesData] = useState<AgencySpaceHealth[] | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const [capacityData, setCapacityData] = useState<any>(null)
   const [icoData, setIcoData] = useState<AgencyIcoData | null>(null)
   const [spacesLoading, setSpacesLoading] = useState(false)

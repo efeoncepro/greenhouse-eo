@@ -91,7 +91,7 @@ const buildColumns = (
   togglingCode: string | null,
   onEdit: (row: EmploymentTypeRow) => void
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 ): ColumnDef<EmploymentTypeRow, any>[] => [
   columnHelper.accessor('employmentTypeCode', {
     header: 'Código',

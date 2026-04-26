@@ -31,7 +31,7 @@ declare module '@tanstack/table-core' {
 }
 
 // ---- Fuzzy filter ----
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value)
 
@@ -49,7 +49,7 @@ export const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
  *   const columns = [buildSelectionColumn<MyRow>(), ...otherColumns]
  *   const table = useReactTable({ enableRowSelection: true, ... })
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const buildSelectionColumn = <T,>(): ColumnDef<T, any> => ({
   id: 'select',
   header: ({ table }: { table: Table<T> }) => {
@@ -74,7 +74,7 @@ export const buildSelectionColumn = <T,>(): ColumnDef<T, any> => ({
 /**
  * Get toggleable columns (excludes 'select' and any non-hideable columns).
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const getToggleableColumns = <T,>(table: Table<T>): Column<T, any>[] =>
   table.getAllLeafColumns().filter(col => col.getCanHide())
 
@@ -84,7 +84,7 @@ export const getToggleableColumns = <T,>(table: Table<T>): Column<T, any>[] =>
  * Compute min/max for a numeric column using faceted values.
  * Returns [min, max] or [undefined, undefined] if no faceted data.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export const getColumnFacetedRange = <T,>(column: Column<T, any>): [number | undefined, number | undefined] => {
   const minMax = column.getFacetedMinMaxValues()
 

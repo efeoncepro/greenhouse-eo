@@ -75,7 +75,7 @@ const formatDate = (d: string | null) => {
 
 const columnHelper = createColumnHelper<CampaignItem>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const columns: ColumnDef<CampaignItem, any>[] = [
   columnHelper.accessor('displayName', {
     header: 'Campaña',

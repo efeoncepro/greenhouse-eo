@@ -269,9 +269,9 @@ const renderReport = (report: ReportAggregation, apply: boolean): string => {
 const main = async () => {
   const apply = process.argv.includes('--apply')
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[seed] Mode: ${apply ? 'APPLY' : 'dry-run'}`)
-  // eslint-disable-next-line no-console
+   
   console.log('[seed] Fetching HubSpot products via middleware...')
 
   let products: HubSpotGreenhouseProductProfile[]
@@ -281,12 +281,12 @@ const main = async () => {
 
     products = response.products
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.error('[seed] HubSpot fetch failed:', err instanceof Error ? err.message : String(err))
     process.exit(1)
   }
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[seed] Retrieved ${products.length} products. Loading local catalog...`)
 
   const catalog = await fetchLocalCatalogByHubSpotId()
@@ -341,7 +341,7 @@ const main = async () => {
         else if (outcome.outcome === 'conflict') report.byCurrency[code].conflicts++
         else report.byCurrency[code].dryRun++
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.error(
           `[seed] Failed to seed ${match.productId} ${code}:`,
           err instanceof Error ? err.message : String(err)
@@ -361,16 +361,16 @@ const main = async () => {
   mkdirSync(dirname(outputPath), { recursive: true })
   writeFileSync(outputPath, markdown, 'utf-8')
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[seed] Report written: ${outputPath}`)
-  // eslint-disable-next-line no-console
+   
   console.log(
     `[seed] Matched ${report.matchedProducts}/${report.totalHubSpotProducts} products, ${report.productsWithAnyHsPrice} with HS prices, ${report.outcomes.length} outcomes.`
   )
 }
 
 main().catch(err => {
-  // eslint-disable-next-line no-console
+   
   console.error('[seed] Fatal:', err)
   process.exit(1)
 })

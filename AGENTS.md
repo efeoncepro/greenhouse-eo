@@ -106,7 +106,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 
 - Todo cambio debe intentar validar al menos una de estas rutas:
   - `pnpm build`
-  - `pnpm lint`
+  - `pnpm lint` (ESLint 9 flat config; configuracion canonica en `eslint.config.mjs`)
   - `pnpm test`
   - prueba manual local o en preview de Vercel
 - Baseline vigente de unit tests:

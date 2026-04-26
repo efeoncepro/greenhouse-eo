@@ -407,7 +407,7 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
                 open: open
               })
             ) : (
-              // eslint-disable-next-line lines-around-comment
+               
               /* Expanded Arrow Icon */
               <StyledHorizontalNavExpandIcon level={level}>
                 <ChevronRight fontSize='1rem' />

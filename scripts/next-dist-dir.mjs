@@ -13,7 +13,8 @@ const normalizeBoolean = value => ['1', 'true', 'yes', 'on'].includes((value || 
 const pathExists = async target => {
   try {
     await fs.access(target)
-    return true
+    
+return true
   } catch {
     return false
   }

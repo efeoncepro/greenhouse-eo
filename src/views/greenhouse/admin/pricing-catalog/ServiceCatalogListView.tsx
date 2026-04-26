@@ -98,7 +98,7 @@ const buildColumns = (
   togglingId: string | null,
   onEdit: (service: ServiceCatalogItem) => void
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 ): ColumnDef<ServiceCatalogItem, any>[] => [
   columnHelper.accessor('serviceSku', {
     header: COPY.columns.sku,

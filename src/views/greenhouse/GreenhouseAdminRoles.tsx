@@ -34,7 +34,7 @@ type Props = {
 
 const columnHelper = createColumnHelper<RoleRow>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const columns: ColumnDef<RoleRow, any>[] = [
   columnHelper.accessor('roleName', {
     header: GH_INTERNAL_MESSAGES.admin_roles_role_header,
