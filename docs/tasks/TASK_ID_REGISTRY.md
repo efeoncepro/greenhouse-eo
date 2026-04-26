@@ -766,3 +766,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-688` | `to-do` | Public Tender Submission Control Room Without API-Side Posting | `docs/tasks/to-do/TASK-688-public-tender-submission-control-room.md` |
 | `TASK-689` | `to-do` | Mercado Publico Companion Extension Research Spike | `docs/tasks/to-do/TASK-689-mercado-publico-companion-extension-research.md` |
 | `TASK-690` | `to-do` | Notification Hub Architecture Contract | `docs/tasks/to-do/TASK-690-notification-hub-architecture-contract.md` |
+| `TASK-691` | `to-do` | Notification Hub Shadow Mode | `docs/tasks/to-do/TASK-691-notification-hub-shadow-mode.md` |
+| `TASK-692` | `to-do` | Notification Hub Cutover | `docs/tasks/to-do/TASK-692-notification-hub-cutover.md` |
+| `TASK-693` | `to-do` | Notification Hub Bidireccional + UI Preferences + Mentions | `docs/tasks/to-do/TASK-693-notification-hub-bidirectional-ui.md` |

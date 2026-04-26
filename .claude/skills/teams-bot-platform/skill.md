@@ -183,6 +183,57 @@ curl -X POST "https://smba.trafficmanager.net/teams/v3/conversations" \
 | Admin Center "Permisos" tab shows RSC as "Sin consentir" | Expected; RSC consents at install time, not tenant-wide | Install in each team via Teams Desktop |
 | Inbound JWT validation fails | Wrong issuer / audience / clock skew / JWKS cache stale | Verify `iss ∈ {api.botframework.com, sts.windows.net/{tid}/}`, `aud === appId`, 60s clock tolerance, refresh JWKS |
 
+## Mentions and push notifications
+
+Bots can `@`-mention users to trigger real push notifications + badge. Without a mention, a card in a channel is silent for users who aren't actively watching that tab — fine for daily pulse, fatal for approvals.
+
+Verified rules (public commercial cloud, Bot Framework Connector):
+
+1. **Activity body mentions**: `text` contains `<at>Display Name</at>` and the activity declares `entities[]` with type `mention`. `mentioned.id` MUST be `"29:<aadObjectId>"` — the `29:` prefix is mandatory. Without it, Teams renders the `<at>` as plain text.
+
+   ```jsonc
+   {
+     "activity": {
+       "type": "message",
+       "text": "Hi <at>Julio Reyes</at>, expense pending review.",
+       "textFormat": "xml",
+       "entities": [
+         { "type": "mention",
+           "text": "<at>Julio Reyes</at>",
+           "mentioned": { "id": "29:<aadObjectId>", "name": "Julio Reyes" } }
+       ],
+       "attachments": [{ "contentType": "application/vnd.microsoft.card.adaptive", "content": <card> }]
+     }
+   }
+   ```
+
+2. **`text` and `<at>` tag must match exactly** — same string between `<at>...</at>`, whitespace included. Mismatch = silent mention.
+
+3. **`textFormat: "xml"`** (or `"plain"`, NOT `"markdown"`). Otherwise Teams escapes the `<at>` and shows literal.
+
+4. **Mentions inside Adaptive Cards** use a different channel: the card declares `msteams.entities` and the `TextBlock` contains the same `<at>` tag.
+
+   ```jsonc
+   {
+     "type": "AdaptiveCard", "version": "1.5",
+     "body": [{ "type": "TextBlock", "text": "Approved by <at>Julio Reyes</at>" }],
+     "msteams": {
+       "entities": [
+         { "type": "mention", "text": "<at>Julio Reyes</at>",
+           "mentioned": { "id": "29:<aadObjectId>", "name": "Julio Reyes" } }
+       ]
+     }
+   }
+   ```
+
+5. **The bot CANNOT mention users not in the team/chat** where it's posting. If `aadObjectId` is not a member, Teams renders the `<at>` as plain text. Always validate membership or accept the silent fallback.
+
+6. **DM 1:1 doesn't need `<at>`** — Teams already pings the recipient because it's a direct message.
+
+7. **Channel-wide mention** ("@channel"): `mentioned.id = "<channelId>"`, `mentioned.name = "<channelDisplayName>"`. Some tenants disable channel-wide mentions per-team in Settings → @mentions. If it doesn't work in a specific team, that's tenant config, not bot bug.
+
+8. **Activity feed notification (the bell)** is a separate channel: via RSC `TeamsActivity.Send.Group`, endpoint `POST {serviceUrl}/v3/conversations/{convId}/activities` with `activityType: 'taskCreated'` (or custom). Useful when you want to notify the user in their feed without writing to the channel.
+
 ## Tooling and references
 
 - Microsoft Bot Framework Connector REST API: <https://learn.microsoft.com/azure/bot-service/rest-api/bot-framework-rest-connector-api-reference>

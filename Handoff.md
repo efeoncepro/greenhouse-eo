@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Greenhouse Deep Link Platform documentada
+
+- Se documento la arquitectura canonica de deep links en `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.
+- La decision queda registrada como capability shared futura: referencias semanticas (`kind/id/action/scope`) resueltas por una capa central que produce `href`, `absoluteUrl`, `label`, `viewCode`, capabilities, fallback y preview segun audiencia.
+- El doc recoge patrones de Slack, Teams, Salesforce, Atlassian, Notion, GitHub y Figma, y los aterriza al estado actual del repo: `VIEW_REGISTRY`, `portalHomePath`, `actionUrl`, search estatico, Teams cards y quote short links.
+- `docs/README.md`, `project_context.md` y `changelog.md` quedan enlazados/actualizados. No hubo cambios runtime.
+- Validacion: doc-only; se verifico `git status` y lectura puntual del documento.
+
 ## Sesion 2026-04-26 — TASK-671 Azure deploy ejecutado por CLI
 
 Bot Service desplegado a producción del tenant `efeoncepro.com`. Completado por CLI desde la sesión local con `jreyes@efeoncepro.com` (Global Admin + Owner de la suscripción).
@@ -20270,3 +20278,17 @@ Fases siguientes (TASK-691, TASK-692, TASK-693) declaradas como follow-ups en TA
 - TASK-693 Notification Hub Bidireccional + UI Preferences — Action.Submit handlers reales cierran loop, settings UI con Vuexy.
 
 Registry sincronizado: `TASK_ID_REGISTRY.md` y `docs/tasks/README.md` actualizados con TASK-690.
+
+## Sesion 2026-04-26 — TASK-691/692/693 + §13 mentions en Hub spec + skill bumped
+
+Las 3 follow-up tasks declaradas en TASK-690 ahora existen como archivos con scope explicito:
+
+- `docs/tasks/to-do/TASK-691-notification-hub-shadow-mode.md` — dual-write 1 semana, parity report diario, kill-switch via flag.
+- `docs/tasks/to-do/TASK-692-notification-hub-cutover.md` — projection canonica `notifications-v2.ts`, borra projections viejas, regla dura "no insert directo", rollback flag.
+- `docs/tasks/to-do/TASK-693-notification-hub-bidirectional-ui.md` — Action.Submit cierra loop, UI `/settings/notifications`, templating unificado para 6 eventos, mentions con `<at>` + `entities[]` + push validation.
+
+Adicionalmente:
+
+- `GREENHOUSE_NOTIFICATION_HUB_V1.md` v1.0 ganó §13 "Mentions y notificaciones push" — 8 reglas verificadas + diseno `TeamsTemplateOutput` + tabla de casos piloto + acceptance pendiente para TASK-690 (extender interfaz template) y TASK-693 (poblar `mentionedMemberIds` + UI preference).
+- Skill `teams-bot-platform` bumped en las 3 ubicaciones (~/.claude, .claude/, .codex/) con nueva seccion "Mentions and push notifications" que cubre los mismos 8 puntos para uso futuro de Claude/Codex en cualquier bot.
+- `TASK_ID_REGISTRY.md` y `docs/tasks/README.md` registran 691/692/693 con dependencies declaradas.

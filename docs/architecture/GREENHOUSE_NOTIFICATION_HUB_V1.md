@@ -303,6 +303,108 @@ Cada fase es ≤ 2 semanas y no rompe lo existente. Migración inversa: el flow 
 - AI-assisted prioritization (el agente decide cuál evento mandar primero). Dejar para una iteración con Reliability AI Observer.
 - Multi-tenant externo (clientes Globe). Hoy el hub vive en el tenant interno; multi-tenant es follow-up cuando exista demanda.
 
+## 13. Mentions y notificaciones push
+
+El bot **puede** arrobar usuarios y/o el canal entero. La mención dispara el ping push real (notification + badge) — sin ella, un card en un canal queda silencioso para el destinatario que no está mirando ese tab. Es la palanca clave para que approvals lleguen "en vivo" sin que el approver tenga que abrir el portal.
+
+### Reglas verificadas (público commercial cloud, Bot Framework Connector)
+
+1. **Mentions a nivel del Activity body**: el `text` del activity contiene `<at>Display Name</at>` y el activity declara `entities[]` con tipo `mention`. El `mentioned.id` **debe** ser `"29:<aadObjectId>"` — el prefijo `29:` es obligatorio. Sin él, Teams renderiza el `<at>` como texto plano sin notification.
+
+   ```jsonc
+   {
+     "activity": {
+       "type": "message",
+       "text": "Hola <at>Julio Reyes</at>, hay un gasto pendiente.",
+       "textFormat": "xml",
+       "entities": [
+         {
+           "type": "mention",
+           "text": "<at>Julio Reyes</at>",
+           "mentioned": { "id": "29:<aadObjectId>", "name": "Julio Reyes" }
+         }
+       ],
+       "attachments": [{ "contentType": "application/vnd.microsoft.card.adaptive", "content": <card> }]
+     }
+   }
+   ```
+
+2. **`text` y `<at>` tag deben coincidir exactamente** (mismo string entre `<at>...</at>`, whitespace incluido). Mismatch silencia la mention.
+
+3. **`textFormat: "xml"`** (o `"plain"`, NO `"markdown"`). Sin esto Teams puede escapar el `<at>` y mostrar el literal.
+
+4. **Mentions dentro de Adaptive Cards** usan un canal distinto: el card declara `msteams.entities` y el `TextBlock` contiene el mismo `<at>` tag.
+
+   ```jsonc
+   {
+     "type": "AdaptiveCard", "version": "1.5",
+     "body": [{ "type": "TextBlock", "text": "Aprobado por <at>Julio Reyes</at>" }],
+     "msteams": {
+       "entities": [
+         { "type": "mention", "text": "<at>Julio Reyes</at>",
+           "mentioned": { "id": "29:<aadObjectId>", "name": "Julio Reyes" } }
+       ]
+     }
+   }
+   ```
+
+5. **El bot NO puede mencionar usuarios fuera del team/chat** donde está posteando. Si el `aadObjectId` no es miembro, Teams renderiza el `<at>` como texto plano. El Hub debe validar membership o aceptar que la mention puede caer silenciosa.
+
+6. **DM 1:1 no necesita `<at>`** — Teams ya pinguea al destinatario por el solo hecho de ser un mensaje directo.
+
+7. **Channel-wide mention** (al canal entero como "@channel"): `mentioned.id = "<channelId>"`, `mentioned.name = "<channelDisplayName>"`. Algunos tenants lo deshabilitan a nivel team (Settings → @mentions). Si no funciona en un team específico, no es bug del bot — es config del team owner.
+
+8. **Activity feed notification (la campana)** es un canal complementario: vía RSC `TeamsActivity.Send.Group` (ya consentida en TASK-671), endpoint `POST {serviceUrl}/v3/conversations/{convId}/activities` con `activityType: 'taskCreated'` (o uno custom). Útil cuando NO quieres escribir mensaje en el canal pero sí avisar al usuario en su feed.
+
+### Diseño en el Hub
+
+`NotificationTemplate.variants.teams_card` y `variants.teams_dm` ganan un retorno enriquecido:
+
+```ts
+export interface TeamsTemplateOutput {
+  card: TeamsAdaptiveCard
+  /** Mentions a renderizar en el text del activity body (precede al card). Vacío si solo es card-only. */
+  mentions?: Array<{ aadObjectId: string; displayName: string }>
+  /** Plantilla del text con `{N}` placeholders por mention. Ej: "Hola {0}, gasto pendiente." */
+  textTemplate?: string
+  /** Si true, agrega activity feed notification además del mensaje. Default: false. */
+  alsoActivityFeed?: boolean
+}
+```
+
+El adapter `teams-channel.ts` / `teams-dm.ts` construye el activity body:
+- Si `mentions` está vacío y no hay `textTemplate`, el body queda solo con `attachments` (comportamiento actual de TASK-671).
+- Si hay mentions, sustituye `{N}` por `<at>{displayName}</at>` y construye el `entities[]` con `id: "29:" + aadObjectId`.
+- Si `alsoActivityFeed=true`, después del POST a conversations, hace POST adicional al endpoint de activities con `TeamsActivity.Send.Group`.
+
+### Resolución del aadObjectId desde el intent
+
+**No llamar Graph de nuevo.** El Hub ya tiene `recipient_member_id` en el intent. Reusar `resolveTeamsUserForMember(memberId)` de TASK-671 (`src/lib/integrations/teams/recipient-resolver.ts`) — devuelve `{ aadObjectId, source, email }` con la cascada `members.teams_user_id` → `client_users.microsoft_oid` → email lookup. Hot path: el primer source es directo de PG sin Graph hit.
+
+Para mentions de **terceros** dentro del card (ej. "asignado a <at>otro miembro</at>"), el template recibe los memberIds adicionales en `intent.event_payload_json.mentionedMemberIds[]`, los resuelve uno por uno con el mismo helper, y los mete en `mentions[]`. El emisor del evento es responsable de poblar la lista.
+
+### Casos de uso piloto que lo aprovechan
+
+| Caso | Mentions | Por qué |
+| --- | --- | --- |
+| Approval gasto Finance | `<at>approver</at>` en card al canal | Sin mention el approver no se entera; con mention recibe push y abre el card en segundos |
+| Daily pulse con anomalías | `<at>scope_owner</at>` por anomalía | El pulse es read-mostly; menciones puntúan los items que requieren acción |
+| Sentry issue asignado | `<at>assignee</at>` en card al canal de delivery | Pinguea sin necesidad de DM separado |
+| Snooze ejecutado por X | `<at>X</at>` en update card | El equipo ve quién silenció y puede revertir |
+| Aprobado/rechazado | Update con `<at>actor</at>` en feedback card | Cierre del loop visible para todo el canal |
+
+### Reglas duras de mentions
+
+- **Validar membership antes de mention**: el adapter debe consultar `permissionGrants` del team o tabla `members` con `teams_user_id` antes de incluir la mention. Si el usuario no es miembro, drop la mention y postea sin ella (logueado como `mention_dropped_not_in_team` en `notification_deliveries.adapter_response_json`).
+- **Mention al canal entero** solo si `severity ∈ {critical, warning}` y la preference `disable_channel_wide_mentions` no está activa para ese channel_code. Default: deshabilitado para `delivery-pulse` (es ruidoso), habilitado para `ops-alerts` (es exigible).
+- **No abusar de mentions**: si el mismo intent tiene `severity=info` y un mention, drop el mention. Mentions son para acción requerida, no para informar.
+- **Al-mismo-actor mention en update cards**: si el `actor` que ejecutó el Action.Submit es el mismo que ya está leyendo, NO mention en el update card (sería redundante y molesto).
+
+### Acceptance pendiente
+
+- TASK-690: extender la interfaz `NotificationTemplate.variants.teams_*` para devolver `TeamsTemplateOutput` (no solo card). Adapter teams-channel/teams-dm parsea el output y construye el activity. Tests: validar `entities[].mentioned.id` empieza con `29:`, `text` matches `<at>` tag exactly, mismatch surface as warning.
+- TASK-693: implementar `mentionedMemberIds` en los 6 event types prioritarios + UI preferences gain `disable_channel_wide_mentions` per channel.
+
 ## 12. Referencias
 
 - Código (Fase 1, a crear en TASK-690):
