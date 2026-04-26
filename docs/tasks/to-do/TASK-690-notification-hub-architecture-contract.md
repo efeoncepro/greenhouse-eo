@@ -187,6 +187,26 @@ Reglas obligatorias:
   - FAQ: "¿Por qué a veces llega por Teams pero no por email?", "¿Cómo silencio una categoría?".
   - Link a la spec técnica.
 
+### Slice 8 — Kill-switch foundation (no-breakage prereq de TASK-691)
+
+Tres compromisos de no-breakage que **deben nacer en TASK-690** para que TASK-691/692 puedan ejecutarse con red de seguridad. Sin estos, las fases siguientes no tienen rollback barato.
+
+- **Feature flag `GREENHOUSE_NOTIFICATIONS_HUB_MODE`** (env var Vercel + Cloud Run): valores `disabled | shadow | canonical`. Se lee al inicio de cada projection refresh, NO al boot — flip en Vercel se propaga en < 1 min sin redeploy.
+- `src/lib/notifications/hub/mode.ts` (NUEVO): helper canónico `getNotificationsHubMode(): 'disabled' | 'shadow' | 'canonical'` con cache TTL de 30s (evita race con flips). Tests cubriendo cada modo.
+- `src/lib/notifications/hub/dual-write.ts` (NUEVO): wrapper `tryShadowWrite(intent, deliveries, deps)` que cualquier projection puede invocar:
+  - Si `mode==='disabled'` → no-op silencioso.
+  - Si `mode==='shadow' | 'canonical'` → INSERT idempotente a `notification_intents` + `notification_deliveries`. Cualquier error pasa por `captureWithDomain(err, 'notifications.hub', { phase: mode })` y NO se propaga al caller.
+- **Snapshot tests del transport actual** (regression baseline pre-Hub):
+  - `src/lib/notifications/__tests__/in-app-row-shape.snapshot.test.ts` — captura el shape exacto de la row que la projection vieja escribe en `greenhouse_core.notifications` para 3 eventos canónicos. TASK-691/692 deben pasar el mismo snapshot tras integrar el adapter.
+  - `src/lib/email/__tests__/transactional-email.snapshot.test.ts` — captura subject + body MJML de 2 emails canónicos.
+  - `src/lib/integrations/teams/__tests__/card-shape.snapshot.test.ts` — captura el Adaptive Card 1.5 de 3 eventos canónicos.
+- Documentación de **rollback procedure** en `docs/operations/notification-hub-rollback.md`:
+  - Comando exacto para flip a modo anterior (`vercel env add GREENHOUSE_NOTIFICATIONS_HUB_MODE shadow --force` con cap detalle).
+  - Query de verificación post-rollback (`SELECT count(*) FROM notification_intents WHERE created_at > now() - INTERVAL '5 minutes'` debe quedar plano).
+  - Quién es el owner del flag en Vercel + cuáles env tienen permission.
+
+**Sin Slice 8, las fases 2-3 no son seguras** — un bug del Hub en shadow puede tirar el delivery legacy si el dual-write no isola failures, o un cutover canonical sin flag de rollback obliga a deploy revert ante un incidente. El env var + el wrapper + los snapshots cierran ese gap antes de TASK-691.
+
 ## Out of Scope
 
 - **Activación de la projection canónica.** En este task NO se activa `notifications-v2`. Slice 5 deja la maquinaria lista; TASK-691 la activa en modo sombra.

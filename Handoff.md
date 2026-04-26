@@ -20294,3 +20294,33 @@ Adicionalmente:
 - `GREENHOUSE_NOTIFICATION_HUB_V1.md` v1.0 ganó §13 "Mentions y notificaciones push" — 8 reglas verificadas + diseno `TeamsTemplateOutput` + tabla de casos piloto + acceptance pendiente para TASK-690 (extender interfaz template) y TASK-693 (poblar `mentionedMemberIds` + UI preference).
 - Skill `teams-bot-platform` bumped en las 3 ubicaciones (~/.claude, .claude/, .codex/) con nueva seccion "Mentions and push notifications" que cubre los mismos 8 puntos para uso futuro de Claude/Codex en cualquier bot.
 - `TASK_ID_REGISTRY.md` y `docs/tasks/README.md` registran 691/692/693 con dependencies declaradas.
+
+## Sesion 2026-04-26 — Notification Hub robustness layer (no-breakage compromisos + CI gates + rollback)
+
+Las 3 tasks centrales del Hub (690/691/692) reciben capa explicita de robustness para garantizar que lo que existe hoy no se rompa sino que se robustezca. Pregunta del usuario sobre como aseguramos eso → traduccion en compromisos verificables y CI gates obligatorios.
+
+Cambios:
+
+- **TASK-690** gana **Slice 8 — Kill-switch foundation** (no-breakage prereq de TASK-691). Entrega:
+  - Feature flag `GREENHOUSE_NOTIFICATIONS_HUB_MODE` con valores `disabled | shadow | canonical`. Lectura per-refresh, NO at boot. Flip via `vercel env add` se propaga en < 1 min sin redeploy.
+  - `src/lib/notifications/hub/mode.ts` con helper `getNotificationsHubMode()` cacheado TTL 30s.
+  - `src/lib/notifications/hub/dual-write.ts` con wrapper `tryShadowWrite(intent, deliveries, deps)` que catchea internamente cualquier failure del Hub y NO propaga al caller (legacy delivery siempre completa).
+  - Snapshot tests del transport actual capturados ANTES de cualquier cambio (regression baseline pre-Hub) — in-app row shape, email subject+body, Teams Adaptive Card structure.
+  - `docs/operations/notification-hub-rollback.md` con comandos exactos de rollback + queries de verificacion + owners autorizados.
+
+- **TASK-691** gana 3 secciones:
+  - **Compromisos de no-breakage (hard rules)**: A) legacy delivery siempre gana en duda (test de simular failure del Hub → legacy completa); B) no se borra codigo viejo hasta verificar reemplazo (TASK-691 git diff es ADD-only); C) no se cambia data shape de `notifications` legacy.
+  - **CI gates de fase Fase 1→2 y Fase 2→3** con checklists explicitos (8 + 8 items), incluyendo 7 dias de shadow con discrepancia ≤ 1%, p95 dual-write ≤ 100ms, smoke E2E parity test verde 50 runs consecutivos.
+  - **Rollback procedure** con sintomas, comandos exactos, owner del flag, Sentry tag check, postmortem obligatorio.
+
+- **TASK-692** gana 4 secciones:
+  - **Compromisos de no-breakage**: A) legacy se comenta no se borra (rollback inmediato disponible); B) `mode=canonical` se activa en cascada Development → Staging → Production con ventanas de observacion 24h/48h/7d; C) data shape compatibility lock con lint rule + grep CI que prohibe `INSERT INTO notifications` y `postTeamsCard()` fuera de adapters.
+  - **CI gates de fase Fase 3→4** con checklist (8 items), incluyendo Logic Apps de TASK-669 ya decommissioned (no path paralelo), latencia p95 ≤ 1.5x legacy, cero incidents Sentry tag `notifications.hub`.
+  - **Rollback procedure** con 3 sintomas tipificados (notificaciones perdidas/duplicadas, shape mismatch, latencia > 2x) cada uno con respuesta especifica.
+  - **Decommission post-Fase 4** que documenta exactamente que se puede borrar despues de 7 dias en canonical sin rollback (incluye el propio flag — la red de seguridad se retira cuando ya no se necesita).
+
+Fundamento de la robustness:
+
+1. **Contrato tecnico**: feature flag con escape barato + dual-write idempotente con failure isolation + adapters wrappean transport actual sin reescribir + `dedup_key UNIQUE` per intent.
+2. **Verificaciones automatizadas**: parity report diario via cron Cloud Run que postea por Teams al canal ops-alerts (dogfooding) + smoke E2E parity test que rompe el merge en CI + snapshot tests que rompen el merge si la data shape cambia + Reliability dashboard como canary humano.
+3. **Protocolo humano**: 4 gates explicitos por fase (1→2, 2→3, 3→4, Fase 4 closeout) con checklists auditable en changelog. NO se avanza hasta TODOS marcados con fecha y autor.
