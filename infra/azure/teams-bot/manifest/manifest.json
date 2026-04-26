@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
   "manifestVersion": "1.17",
   "version": "1.0.0",
-  "id": "REPLACE_WITH_BOT_APP_ID",
+  "id": "a1397477-4aae-4f16-a0a2-a213cb1b00b2",
   "developer": {
     "name": "Efeonce Group SpA",
     "websiteUrl": "https://greenhouse.efeoncepro.com",
@@ -24,7 +24,7 @@
   "accentColor": "#00B07F",
   "bots": [
     {
-      "botId": "REPLACE_WITH_BOT_APP_ID",
+      "botId": "a1397477-4aae-4f16-a0a2-a213cb1b00b2",
       "scopes": ["team", "personal", "groupChat"],
       "supportsFiles": false,
       "isNotificationOnly": false,

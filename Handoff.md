@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-671 Azure deploy ejecutado por CLI
+
+Bot Service desplegado a producción del tenant `efeoncepro.com`. Completado por CLI desde la sesión local con `jreyes@efeoncepro.com` (Global Admin + Owner de la suscripción).
+
+Recursos productivos:
+
+- **App registration "Greenhouse Teams Bot"** (Azure AD): `appId=a1397477-4aae-4f16-a0a2-a213cb1b00b2`, `objectId=e3dee07f-8804-4bcc-8764-f6613fb634ec`, `signInAudience=AzureADMyOrg`. Distinct del SSO app `Greenhouse` (`3626642f-…`) para no mezclar concerns.
+- **Service principal**: `id=a8c4fdd5-ee8e-4654-a40b-7b55f36fc21e`.
+- **Microsoft Graph application permissions** otorgadas con admin consent (5 roles): `User.Read.All`, `Channel.ReadBasic.All`, `Team.ReadBasic.All`, `Chat.Create`, `TeamsAppInstallation.ReadWriteForUser.All`.
+- **Client secret** (rotación 1 año, displayName `bot-runtime`) persistido como blob `{clientId, clientSecret, tenantId}` en GCP Secret Manager `greenhouse-teams-bot-client-credentials` proyecto `efeonce-group`. Tempfile local borrado.
+- **Resource group**: `rg-greenhouse-teams-bot-prod` en `eastus` con tags `greenhouse:component=teams-bot greenhouse:environment=prod greenhouse:taskId=TASK-671`.
+- **Bot Service** `gh-bot-prod` (SKU F0, `kind=azurebot`) con `endpoint=https://greenhouse.efeoncepro.com/api/teams-bot/messaging`, `msaAppId` apuntando al app registration, MsTeams channel habilitado. `provisioningState=Succeeded`.
+- **Bicep deploy**: `gh-bot-20260426-205907` ejecutado con `parameters.prod.json` actualizado con el `botAppId` real.
+- **Manifest Teams v1.17 listo** en `infra/azure/teams-bot/manifest/greenhouse-teams.zip` (1936 bytes: manifest.json + icons/icon_color.png 192×192 + icons/icon_outline.png 32×32). Iconos placeholder generados con Python+zlib (círculo verde #00B07F con G blanca, outline blanco). Reemplazar por logo definitivo cuando design lo entregue.
+
+Pendientes de Slice 4 (no son CLI Azure, requieren acceso interactivo o cambios en producción):
+
+1. **Upload del manifest al Teams Admin Center** — Graph endpoint `/appCatalogs/teamsApps` requiere scope `AppCatalog.ReadWrite.All` que el `az` CLI no provee por default. Subir `greenhouse-teams.zip` manualmente vía <https://admin.teams.microsoft.com/policies/manage-apps> → "Upload new app".
+2. **Instalar el bot en cada team destino**: Alineación, Finance ops chat, Delivery ops chat (Teams desktop → ⋯ → Manage team → Apps → Add Greenhouse).
+3. **Capturar `team_id` y `channel_id` reales** (Teams desktop → click derecho en canal → "Get link to channel").
+4. **UPDATE de los 3 canales productivos** (`ops-alerts`, `finance-alerts`, `delivery-pulse`) a `channel_kind='teams_bot'` con `team_id`, `channel_id`, `bot_app_id='a1397477-4aae-4f16-a0a2-a213cb1b00b2'`, `azure_tenant_id='a80bf6c1-7c45-4d70-b043-51389622a0e4'`, `secret_ref='greenhouse-teams-bot-client-credentials'`. Ejemplo SQL en runbook.
+5. **Validación de 1 semana** con tráfico real antes de decommissionar Logic Apps.
+6. **Env var en Vercel** `GREENHOUSE_TEAMS_BOT_APP_ID=a1397477-4aae-4f16-a0a2-a213cb1b00b2` (production + preview) — necesaria para el JWT validation del endpoint inbound.
+7. **Reemplazar iconos placeholder** por el logo definitivo de design.
+
+Comandos para verificar el state desplegado:
+
+```bash
+az account set --subscription e1cfff3e-8c21-4170-8b28-ad083b741266
+az resource list --resource-group rg-greenhouse-teams-bot-prod -o table
+az bot show --resource-group rg-greenhouse-teams-bot-prod --name gh-bot-prod
+gcloud secrets versions list greenhouse-teams-bot-client-credentials --project=efeonce-group
+```
+
 ## Sesion 2026-04-26 — TASK-671 Greenhouse Teams Bot Platform (Bot Framework + Graph) — code complete
 
 - Implementación end-to-end del bot interactivo Greenhouse para Microsoft Teams. Sibling enriquecido de TASK-669 (Logic Apps), construido sobre el mismo schema transport-agnostic.
