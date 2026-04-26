@@ -28,6 +28,8 @@ Antes del RCP, el operador tenia que combinar a mano:
 
 Cada fuente tiene su propio formato, su propia escala de severidad y su propia ventana de tiempo. El RCP se hace cargo de ese trabajo: cada fuente expone un *adapter* que convierte su estado en señales canonicas, y un *composer* las agrupa por modulo. La pantalla del Admin Center solo muestra la lectura consolidada.
 
+Importante: el RCP no “corrige” semánticas malas de un dominio. Si una fuente operativa mezcla conceptos incompatibles, el RCP solo los va a reflejar. Por eso las correcciones de fondo deben hacerse en el módulo dueño del dato antes de volver a resumirlo.
+
 ---
 
 ## Como esta organizado
@@ -61,6 +63,8 @@ Una señal es la unidad atomica del RCP. Cada señal tiene severidad, fuente, ev
 | `test_lane` | Smoke tests Playwright que cubren el flujo critico de un modulo |
 | `billing` | Lectura de GCP Billing Export: costo proyectado vs presupuesto |
 | `ai_summary` | Resumen narrativo generado por Gemini Flash sobre el estado del modulo |
+
+En particular, las señales `subsystem` no siempre usan el mismo tipo de contador. Algunas vienen de runs homogéneos (`procesados` / `fallidos`), pero otras necesitan resumen semántico propio. Ejemplo: `Finance Data Quality` separa drift real, costos directos sin cliente y cartera vencida de overhead compartido permitido; el summary que ves en RCP debe venir del dominio Finance, no de una frase genérica armada aguas abajo.
 
 ### Severidades
 

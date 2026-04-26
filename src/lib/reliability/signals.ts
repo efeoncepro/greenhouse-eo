@@ -75,7 +75,7 @@ export const buildSubsystemSignals = (subsystems: OperationsSubsystem[]): Reliab
 
     const severity = fromOperationsHealth(subsystem.status)
 
-    const summaryParts = [
+    const fallbackSummaryParts = [
       `${subsystem.processed} procesado${subsystem.processed === 1 ? '' : 's'}`,
       subsystem.failed > 0 ? `${subsystem.failed} con falla` : null,
       subsystem.lastRun ? `último: ${subsystem.lastRun}` : 'sin último run'
@@ -88,7 +88,7 @@ export const buildSubsystemSignals = (subsystems: OperationsSubsystem[]): Reliab
       source: 'getOperationsOverview',
       label: `Subsystem: ${subsystem.name}`,
       severity,
-      summary: summaryParts.join(' · '),
+      summary: subsystem.summary?.trim() || fallbackSummaryParts.join(' · '),
       observedAt: subsystem.lastRun,
       evidence: [
         {
@@ -100,7 +100,12 @@ export const buildSubsystemSignals = (subsystems: OperationsSubsystem[]): Reliab
           kind: 'metric',
           label: 'Status',
           value: subsystem.status
-        }
+        },
+        ...(subsystem.metrics ?? []).map(metric => ({
+          kind: 'metric' as const,
+          label: metric.label,
+          value: `${metric.value} (${metric.status})`
+        }))
       ]
     })
   }

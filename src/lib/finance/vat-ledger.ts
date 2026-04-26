@@ -273,7 +273,7 @@ export async function materializeVatLedgerForPeriod(
         'EO-VLE-' || upper(substr(md5(concat_ws(':', 'income', income_id, 'debit_fiscal')), 1, 8)),
         ${year},
         ${month},
-        ${periodId},
+        CAST(${periodId} AS text),
         space_id,
         organization_id,
         client_id,
@@ -298,7 +298,7 @@ export async function materializeVatLedgerForPeriod(
         ),
         space_resolution_source,
         jsonb_build_object(
-          'materializationReason', ${reason},
+          'materializationReason', CAST(${reason} AS text),
           'sourceTaxKind', COALESCE(tax_snapshot_json ->> 'kind', 'vat_output')
         )
       FROM scoped_income
@@ -389,7 +389,7 @@ export async function materializeVatLedgerForPeriod(
         'EO-VLE-' || upper(substr(md5(concat_ws(':', 'expense', expense_id, vat_bucket)), 1, 8)),
         ${year},
         ${month},
-        ${periodId},
+        CAST(${periodId} AS text),
         space_id,
         organization_id,
         client_id,
@@ -408,7 +408,7 @@ export async function materializeVatLedgerForPeriod(
         ROUND(amount_clp, 2),
         'expense',
         jsonb_build_object(
-          'materializationReason', ${reason},
+          'materializationReason', CAST(${reason} AS text),
           'sourceTaxKind', COALESCE(tax_snapshot_json ->> 'kind', 'vat_input_credit')
         )
       FROM (
@@ -493,10 +493,10 @@ export async function materializeVatLedgerForPeriod(
         metadata
       )
       SELECT
-        'EO-VMP-' || upper(substr(md5(concat_ws(':', space_id, ${periodId})), 1, 8)),
+        'EO-VMP-' || upper(substr(md5(concat_ws(':', space_id, CAST(${periodId} AS text))), 1, 8)),
         ${year},
         ${month},
-        ${periodId},
+        CAST(${periodId} AS text),
         space_id,
         organization_id,
         client_id,
@@ -509,10 +509,10 @@ export async function materializeVatLedgerForPeriod(
         non_recoverable_document_count,
         ledger_entry_count,
         CURRENT_TIMESTAMP,
-        ${reason},
+        CAST(${reason} AS text),
         jsonb_build_object(
-          'periodId', ${periodId},
-          'materializationReason', ${reason}
+          'periodId', CAST(${periodId} AS text),
+          'materializationReason', CAST(${reason} AS text)
         )
       FROM aggregated
     `.execute(trx)

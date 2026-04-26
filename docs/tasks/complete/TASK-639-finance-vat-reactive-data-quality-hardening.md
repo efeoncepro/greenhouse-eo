@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-007`
-- Status real: `Diseno`
+- Status real: `Completada`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -93,12 +93,15 @@ Reglas obligatorias:
 - `GET /api/finance/data-quality` con checks de ledger, overdue, orphan expenses y otros guardrails.
 - `getOperationsOverview()` ya expone `Proyecciones`, `Reactive backlog`, `failedHandlers` y `Finance Data Quality`.
 - `ops-worker` ya tiene lane manual para materialización VAT.
+- La route interna `api/internal/vat-ledger-materialize` también ya existe para replay/materialización.
+- El drift real observado hoy en staging es `vat_monthly_position` con `could not determine data type of parameter $6`; el warning de `Reactive backlog` fue transitorio y no es la causa persistente.
 
 ### Gap
 
 - El SQL/materializer de VAT ledger no está endurecido frente al caso real de staging y deja dead-letters.
 - `orphan_expenses` no respeta la semántica arquitectónica de overhead no asignado.
 - El overview operativo sigue mezclando conteos de policy y drift real sin slices más precisos para decisión humana.
+- Las lecturas actuales de `finance/data-quality` y `agency/operations` siguen siendo globales; exigen tenant context, pero hoy no filtran por `space_id`.
 
 ## Scope
 
@@ -134,10 +137,11 @@ Reglas obligatorias:
 Puntos a cubrir en Discovery/implementación:
 
 - Auditar el uso de parámetros en `materializeVatLedgerForPeriod()` y dejar casts explícitos donde el SQL builder actual permita ambigüedad de tipo.
-- Confirmar si el replay debe ocurrir vía lane manual en `ops-worker`, vía endpoint interno, o ambos.
+- Declarar y documentar el carril canónico de replay/materialización, sabiendo que hoy ya existen tanto el lane manual en `ops-worker` como el endpoint interno.
 - Cambiar `orphan_expenses` para que no cuente rows con patrón de overhead compartido válido (`expense_type='supplier'`, `cost_is_direct=false`, sin `client_id`).
 - Si hace falta, introducir un check nuevo tipo `shared_overhead_unallocated` como `ok`/`warning` informativo separado del drift real.
 - Evitar que `getOperationsOverview()` agregue en un solo número categorías con semánticas incompatibles.
+- No asumir que `schema-snapshot-baseline.sql` ya refleja el VAT ledger mensual; para este slice la fuente canónica de DDL es la migración `20260421200121412_task-533-chile-vat-ledger-monthly-position.sql` y `src/types/db.d.ts`.
 
 ## Acceptance Criteria
 
@@ -173,5 +177,5 @@ Puntos a cubrir en Discovery/implementación:
 
 ## Open Questions
 
-- ¿El replay canónico del período VAT afectado debe vivir como comando explícito admin-safe en `ops-worker`, o basta con reusar el lane manual ya existente?
+- ¿Declaramos `ops-worker` como carril canónico de replay del período VAT afectado y dejamos la route interna como fallback admin-safe/documentado?
 - ¿`shared overhead unallocated` debe quedar como check visible de tipo `ok/info`, o salir completamente del resumen de fallas?

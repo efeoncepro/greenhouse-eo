@@ -6807,6 +6807,12 @@
 
 # Changelog
 
+## 2026-04-25
+
+- Finance / VAT ledger: `vat_monthly_position` quedó endurecido contra el error SQL `could not determine data type of parameter $6`; el materializer ahora castea explícitamente los placeholders textuales usados en metadata, `period_id` y `materialization_reason`, y quedó cubierto por regresión dedicada.
+- Finance / Data Quality: el check `orphan_expenses` fue reemplazado por semántica más precisa. `direct_cost_without_client` ahora marca drift real; `shared_overhead_unallocated` sigue visible pero ya no infla warnings como si fuera falla.
+- Ops / Reliability: `Finance Data Quality` en `getOperationsOverview()` ya no mezcla `processed/failed` con conceptos incompatibles. El subsistema expone `summary` + `metrics`, `Reliability` consume ese contrato directamente y `AdminOpsHealthView` muestra el detalle semántico sin maquillaje genérico.
+
 ## 2026-04-21
 
 - Admin Center / Commercial: nueva surface `/admin/commercial/product-sync-conflicts` para vigilar drift del catálogo comercial contra HubSpot Products, con lista operativa, detalle por conflicto, diff Greenhouse vs HubSpot y acciones auditables (`adopt`, `archive`, `replay`, `accept remote`, `ignore`).

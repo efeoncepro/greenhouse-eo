@@ -18964,3 +18964,44 @@ Fase 4 completada:
     - `attemptId=e97cb047-6bcd-48d1-98e8-3a0b9d7693c9`
     - `dealId=dl-b4c2fca0-3cdc-4955-befa-332633af16f8`
     - `hubspotDealId=59448087991`
+
+## Sesion 2026-04-25 — TASK-639 completada: VAT reactive lane + Finance DQ semantics (Codex)
+
+- **Pedido del usuario:** implementar `TASK-639` end-to-end sin parches frágiles; corregir la causa real detrás de los warnings de Cloud Platform / Finance que `Reliability` estaba mostrando.
+- **Hallazgos reales antes del fix**
+  - el warning persistente de Cloud venía de `vat_monthly_position` fallando en `projection_refresh_queue` con `could not determine data type of parameter $6`
+  - `Reactive backlog` había estado en warning en la captura, pero al validar staging ya estaba sano; no era el problema persistente
+  - `Finance Data Quality` mezclaba drift real con policy incorrecta: el check `orphan_expenses` marcaba overhead compartido válido como si fuera falla
+- **Implementación shipped**
+  - `src/lib/finance/vat-ledger.ts`
+    - casts explícitos `CAST(... AS text)` en placeholders textuales usados dentro de `jsonb_build_object`, `concat_ws`, `period_id` y `materialization_reason`
+  - `src/lib/finance/vat-ledger.test.ts`
+    - regresión focalizada para verificar que el SQL emitido conserva esos casts y no reintroduce la ambigüedad
+  - `src/app/api/finance/data-quality/route.ts`
+    - reemplazo de `orphan_expenses` por:
+      - `direct_cost_without_client`
+      - `shared_overhead_unallocated`
+    - summary semántico por buckets
+    - scope tenant-aware cuando existe `tenant.spaceId`
+  - `src/lib/operations/get-operations-overview.ts`
+    - `Finance Data Quality` deja de sobrecargar `processed/failed` con semánticas incompatibles y expone `summary` + `metrics`
+  - `src/lib/reliability/signals.ts`
+    - `buildSubsystemSignals()` prioriza `subsystem.summary` y agrega `metrics` como evidencia
+  - `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+    - usa el `summary` del subsistema y muestra chips de métricas semánticas cuando existen
+  - Docs alineados:
+    - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+    - `docs/documentation/finance/libro-iva-posicion-mensual.md`
+    - `docs/documentation/plataforma/reliability-control-plane.md`
+    - `docs/documentation/operations/ops-worker-reactive-crons.md`
+    - task movida a `docs/tasks/complete/TASK-639-finance-vat-reactive-data-quality-hardening.md`
+- **Validación**
+  - `pnpm exec vitest run src/lib/finance/vat-ledger.test.ts src/app/api/finance/data-quality/route.test.ts`
+  - `pnpm exec eslint src/lib/finance/vat-ledger.ts src/lib/finance/vat-ledger.test.ts src/app/api/finance/data-quality/route.ts src/app/api/finance/data-quality/route.test.ts src/lib/operations/get-operations-overview.ts src/lib/reliability/signals.ts src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm test`
+- **Notas**
+  - `pnpm build` volvió a imprimir los warnings conocidos de `Dynamic server usage` por rutas que usan `headers`; el build terminó exit code `0`
+  - `getOperationsOverview()` sigue siendo global como reader de Ops; el tenant-aware scoping quedó sólido en `GET /api/finance/data-quality`, pero extender ese scope a Ops completo requiere un follow-up fuera de este slice
+  - el worktree tenía cambios ajenos vivos (`TASK-615`, `src/config/greenhouse-nomenclature.ts`); no pertenecen a `TASK-639` y deben quedar fuera del commit

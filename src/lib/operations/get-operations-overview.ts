@@ -30,12 +30,23 @@ export interface OperationsKpis {
 
 export type OperationsHealthStatus = 'healthy' | 'degraded' | 'down' | 'not_configured' | 'idle'
 
+export type OperationsMetricStatus = 'ok' | 'warning' | 'error' | 'info'
+
+export interface OperationsSubsystemMetric {
+  key: string
+  label: string
+  value: number
+  status: OperationsMetricStatus
+}
+
 export interface OperationsSubsystem {
   name: string
   status: OperationsHealthStatus
   processed: number
   failed: number
   lastRun: string | null
+  summary?: string | null
+  metrics?: OperationsSubsystemMetric[]
 }
 
 export interface OperationsRecentEvent {
@@ -148,6 +159,11 @@ interface CountRow extends Record<string, unknown> {
   cnt: string | number
 }
 
+interface FinanceAllocationCountsRow extends Record<string, unknown> {
+  direct_without_client: string
+  shared_unallocated: string
+}
+
 const safeCount = async (query: string, params?: unknown[]): Promise<number> => {
   try {
     const rows = await runGreenhousePostgresQuery<CountRow>(query, params)
@@ -193,15 +209,60 @@ const deriveHealth = (
   return 'healthy'
 }
 
-const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
+const pluralize = (count: number, singular: string, plural: string) => `${count} ${count === 1 ? singular : plural}`
+
+const describeFinanceMetric = (metric: OperationsSubsystemMetric) => {
+  switch (metric.key) {
+    case 'payment_ledger_integrity':
+      return pluralize(metric.value, 'drift de ledger', 'drifts de ledger')
+    case 'direct_cost_without_client':
+      return pluralize(metric.value, 'costo directo sin cliente', 'costos directos sin cliente')
+    case 'overdue_receivables':
+      return pluralize(metric.value, 'cuenta por cobrar vencida', 'cuentas por cobrar vencidas')
+    default:
+      return `${metric.value} ${metric.label}`
+  }
+}
+
+const buildFinanceDataQualitySummary = (metrics: OperationsSubsystemMetric[]) => {
+  const issueMetrics = metrics.filter(metric => metric.status === 'warning' || metric.status === 'error')
+  const sharedOverheadMetric = metrics.find(metric => metric.key === 'shared_overhead_unallocated')
+
+  if (issueMetrics.length === 0) {
+    if (!sharedOverheadMetric || sharedOverheadMetric.value === 0) {
+      return 'Sin issues activos en ledger, asignación directa ni cartera vencida.'
+    }
+
+    return `${pluralize(sharedOverheadMetric.value, 'overhead compartido', 'overheads compartidos')} siguen sin asignación explícita; estado permitido.`
+  }
+
+  const issueParts = issueMetrics.map(describeFinanceMetric)
+
+  const allowedOverheadSummary =
+    sharedOverheadMetric && sharedOverheadMetric.value > 0
+      ? ` Además, ${pluralize(sharedOverheadMetric.value, 'overhead compartido', 'overheads compartidos')} siguen sin asignación explícita; estado permitido.`
+      : ''
+
+  return `${pluralize(issueMetrics.length, 'bucket con issue activo', 'buckets con issue activo')}: ${issueParts.join(', ')}.${allowedOverheadSummary}`
+}
+
+export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
   try {
     const hasFinanceTables = await tableExists('greenhouse_finance', 'income')
 
     if (!hasFinanceTables) {
-      return { name: 'Finance Data Quality', status: 'not_configured', processed: 0, failed: 0, lastRun: null }
+      return {
+        name: 'Finance Data Quality',
+        status: 'not_configured',
+        processed: 0,
+        failed: 0,
+        lastRun: null,
+        summary: null,
+        metrics: []
+      }
     }
 
-    const [divergentPayments, orphanExpenses, overdueCount] = await Promise.all([
+    const [divergentPayments, overdueCount, allocationRows] = await Promise.all([
       safeCount(
         `SELECT COUNT(*) AS cnt
          FROM greenhouse_finance.income i
@@ -210,29 +271,77 @@ const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> 
          WHERE ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01`
       ),
       safeCount(
-        `SELECT COUNT(*) AS cnt FROM greenhouse_finance.expenses
-         WHERE (client_id IS NULL OR client_id = '') AND expense_type = 'supplier'`
-      ),
-      safeCount(
         `SELECT COUNT(*) AS cnt FROM greenhouse_finance.income
          WHERE payment_status IN ('pending', 'partial', 'overdue') AND due_date < CURRENT_DATE`
-      )
+      ),
+      runGreenhousePostgresQuery<FinanceAllocationCountsRow>(
+        `SELECT
+           COUNT(*) FILTER (
+             WHERE COALESCE(e.cost_is_direct, FALSE) = TRUE
+               AND COALESCE(NULLIF(e.allocated_client_id, ''), NULLIF(e.client_id, '')) IS NULL
+           )::text AS direct_without_client,
+           COUNT(*) FILTER (
+             WHERE COALESCE(e.cost_is_direct, FALSE) = FALSE
+               AND COALESCE(NULLIF(e.allocated_client_id, ''), NULLIF(e.client_id, '')) IS NULL
+           )::text AS shared_unallocated
+         FROM greenhouse_finance.expenses e
+         WHERE COALESCE(e.is_annulled, FALSE) = FALSE
+           AND e.expense_type NOT IN ('tax', 'social_security')`
+      ).catch(() => [{ direct_without_client: '0', shared_unallocated: '0' }])
     ])
 
-    const totalIssues = divergentPayments + orphanExpenses
+    const directCostWithoutClient = Number(allocationRows[0]?.direct_without_client ?? 0)
+    const sharedOverheadUnallocated = Number(allocationRows[0]?.shared_unallocated ?? 0)
 
-    const status: OperationsHealthStatus =
-      divergentPayments > 3 ? 'degraded' : orphanExpenses > 10 ? 'degraded' : 'healthy'
+    const metrics: OperationsSubsystemMetric[] = [
+      {
+        key: 'payment_ledger_integrity',
+        label: 'Drift de ledger',
+        value: divergentPayments,
+        status: divergentPayments === 0 ? 'ok' : 'warning'
+      },
+      {
+        key: 'direct_cost_without_client',
+        label: 'Costo directo sin cliente',
+        value: directCostWithoutClient,
+        status: directCostWithoutClient === 0 ? 'ok' : 'warning'
+      },
+      {
+        key: 'overdue_receivables',
+        label: 'Cartera vencida',
+        value: overdueCount,
+        status: overdueCount === 0 ? 'ok' : overdueCount > 5 ? 'error' : 'warning'
+      },
+      {
+        key: 'shared_overhead_unallocated',
+        label: 'Overhead compartido no asignado',
+        value: sharedOverheadUnallocated,
+        status: 'info'
+      }
+    ]
+
+    const issueMetrics = metrics.filter(metric => metric.status === 'warning' || metric.status === 'error')
+    const status: OperationsHealthStatus = issueMetrics.length > 0 ? 'degraded' : 'healthy'
 
     return {
       name: 'Finance Data Quality',
       status,
-      processed: overdueCount,
-      failed: totalIssues,
-      lastRun: new Date().toISOString()
+      processed: metrics.length,
+      failed: issueMetrics.length,
+      lastRun: new Date().toISOString(),
+      summary: buildFinanceDataQualitySummary(metrics),
+      metrics
     }
   } catch {
-    return { name: 'Finance Data Quality', status: 'idle', processed: 0, failed: 0, lastRun: null }
+    return {
+      name: 'Finance Data Quality',
+      status: 'idle',
+      processed: 0,
+      failed: 0,
+      lastRun: null,
+      summary: 'No se pudo construir el resumen de data quality financiera.',
+      metrics: []
+    }
   }
 }
 

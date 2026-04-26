@@ -1453,18 +1453,34 @@ Reglas declarativas ejecutadas fire-and-forget al crear un expense:
 
 ## Data Quality
 
-`GET /api/finance/data-quality` retorna 6 checks:
+`GET /api/finance/data-quality` ya no trata cualquier gasto sin `client_id` como drift. La semántica canónica separa:
 
-| Check                      | Qué verifica                                       |
-| -------------------------- | -------------------------------------------------- |
-| `payment_ledger_integrity` | amount_paid = SUM(income_payments.amount)          |
-| `exchange_rate_freshness`  | Rate USD/CLP no tiene >7 días                      |
-| `orphan_expenses`          | Gastos sin client_id (excluye tax/social_security) |
-| `income_without_client`    | Ingresos sin client_id                             |
-| `dte_pending_emission`     | Emisiones DTE en cola de retry                     |
-| `overdue_receivables`      | Facturas vencidas (due_date < today)               |
+- **drift real**: ledger divergente, cobros/pagos sin ledger, ingresos sin cliente, cartera vencida, DTE pendientes, etc.
+- **allocation policy drift**: costos directos sin cliente o sin asignación efectiva
+- **estado permitido**: `shared overhead intentionally unallocated`
 
-Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality".
+Checks relevantes:
+
+| Check                             | Qué verifica                                                                 |
+| --------------------------------- | ---------------------------------------------------------------------------- |
+| `income_payment_ledger_integrity` | `income.amount_paid = SUM(income_payments.amount)`                           |
+| `income_paid_without_ledger`      | Facturas con `amount_paid > 0` pero sin filas en `income_payments`           |
+| `expense_payment_ledger_integrity`| `expenses.amount_paid = SUM(expense_payments.amount)`                        |
+| `expense_paid_without_ledger`     | Compras con `amount_paid > 0` pero sin filas en `expense_payments`           |
+| `direct_cost_without_client`      | Gastos directos sin `allocated_client_id` / `client_id` efectivo             |
+| `shared_overhead_unallocated`     | Overhead compartido sin asignación explícita; visible pero **no** se trata como falla |
+| `income_without_client`           | Ingresos sin cliente                                                         |
+| `exchange_rate_freshness`         | Rate USD/CLP no tiene >7 días                                                |
+| `dte_pending_emission`            | Emisiones DTE en cola de retry                                               |
+| `overdue_receivables`             | Facturas vencidas (`due_date < today`)                                       |
+
+Reglas adicionales:
+
+1. Cuando el tenant trae `spaceId`, los checks que tienen `space_id` canónico deben leer en scope tenant.
+2. Los checks globales siguen existiendo para tablas que no exponen `space_id` confiable en todas sus filas.
+3. `Finance Data Quality` en Ops/Admin no debe volver a mezclar backlog de riesgo con overhead compartido permitido bajo un único contador de “fallas”.
+
+Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality", con summary semántico por buckets en vez de sobrecargar `processed/failed`.
 
 ## File Reference
 

@@ -100,6 +100,14 @@ const sentryLevelColor = (level: string): 'success' | 'warning' | 'error' | 'sec
   return 'warning'
 }
 
+const metricChipColor = (status: NonNullable<OperationsSubsystem['metrics']>[number]['status']) => {
+  if (status === 'ok') return 'success'
+  if (status === 'error') return 'error'
+  if (status === 'info') return 'secondary'
+
+  return 'warning'
+}
+
 const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
   subsystems.filter(subsystem =>
     [
@@ -114,6 +122,10 @@ const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
   )
 
 const subsystemDetail = (subsystem: OperationsSubsystem) => {
+  if (subsystem.summary?.trim()) {
+    return subsystem.summary
+  }
+
   if (subsystem.name === 'Reactive backlog') {
     if (subsystem.processed === 0) {
       return 'Sin eventos reactivos publicados pendientes de entrar al ledger.'
@@ -385,6 +397,19 @@ const AdminOpsHealthView = ({
                     <Typography variant='body2' color='text.secondary'>
                       {subsystemDetail(subsystem)}
                     </Typography>
+                    {subsystem.metrics && subsystem.metrics.length > 0 ? (
+                      <Stack direction='row' gap={1} flexWrap='wrap'>
+                        {subsystem.metrics.map(metric => (
+                          <Chip
+                            key={`${subsystem.name}-${metric.key}`}
+                            size='small'
+                            variant='tonal'
+                            color={metricChipColor(metric.status)}
+                            label={`${metric.label}: ${metric.value}`}
+                          />
+                        ))}
+                      </Stack>
+                    ) : null}
                   </Stack>
                 </CardContent>
               </Card>
