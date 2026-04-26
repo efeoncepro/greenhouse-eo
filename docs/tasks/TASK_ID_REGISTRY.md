@@ -670,7 +670,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-614` | `to-do` | People / Payroll Economy Facet & Entitlements Hardening | `docs/tasks/to-do/TASK-614-people-payroll-economy-facet-entitlements-hardening.md` |
 | `TASK-615` | `to-do` | Quote Builder Flow Orchestration & UX Hardening | `docs/tasks/to-do/TASK-615-quote-builder-flow-orchestration-ux-hardening.md` |
 | `TASK-616` | `complete` | API Platform Foundation & Ecosystem Read Surface V1 | `docs/tasks/complete/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md` |
-| `TASK-617` | `to-do` | API Platform V1.1 Convergence Program | `docs/tasks/to-do/TASK-617-api-platform-v1-1-convergence-program.md` |
+| `TASK-617` | `complete` | API Platform V1.1 Convergence Program | `docs/tasks/complete/TASK-617-api-platform-v1-1-convergence-program.md` |
 | `TASK-617.1` | `to-do` | API Platform REST Hardening | `docs/tasks/to-do/TASK-617.1-api-platform-rest-hardening.md` |
 | `TASK-617.2` | `to-do` | API Platform First-Party App Surface Foundation | `docs/tasks/to-do/TASK-617.2-api-platform-first-party-app-surface-foundation.md` |
 | `TASK-617.3` | `to-do` | API Platform Event Control Plane | `docs/tasks/to-do/TASK-617.3-api-platform-event-control-plane.md` |

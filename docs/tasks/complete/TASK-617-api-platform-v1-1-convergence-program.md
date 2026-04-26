@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `umbrella`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Cerrada como umbrella programatica y documental`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -24,7 +24,7 @@
 
 ## Summary
 
-Programa de convergencia de la `API platform` después de `TASK-616`. Ordena cuatro follow-ups inmediatos y dependientes entre sí: hardening REST, lane first-party para app móvil React Native, event control plane y developer documentation pública. Su objetivo es evitar que el siguiente tramo de la plataforma crezca como tareas aisladas o que `MCP` se adelante a contratos todavía inmaduros.
+Programa de convergencia de la `API platform` después de `TASK-616`. Ordena cuatro follow-ups inmediatos y dependientes entre sí: hardening REST, lane first-party para app móvil React Native, event control plane y developer documentation pública. Su objetivo es evitar que el siguiente tramo de la plataforma crezca como tareas aisladas o que `MCP` se adelante a contratos todavía inmaduros. A la fecha, el programa ya existe como backlog explícito; esta umbrella debe mantenerlo alineado con la arquitectura y cerrar el drift documental alrededor de esa secuencia.
 
 ## Why This Task Exists
 
@@ -44,7 +44,7 @@ Si estos follow-ups se abren sin coordinación, Greenhouse corre el riesgo de:
 
 ## Goal
 
-- Coordinar el tramo `V1.1` de la `API platform` como programa explícito y secuenciado.
+- Mantener el tramo `V1.1` de la `API platform` como programa explícito, secuenciado y documentalmente consistente.
 - Mantener `MCP` downstream de contratos ya endurecidos.
 - Alinear runtime, developer docs y first-party app surface con la arquitectura canónica ya aprobada.
 
@@ -103,7 +103,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-617-api-platform-v1-1-convergence-program.md`
+- `docs/tasks/complete/TASK-617-api-platform-v1-1-convergence-program.md`
 - `docs/tasks/to-do/TASK-617.1-api-platform-rest-hardening.md`
 - `docs/tasks/to-do/TASK-617.2-api-platform-first-party-app-surface-foundation.md`
 - `docs/tasks/to-do/TASK-617.3-api-platform-event-control-plane.md`
@@ -123,9 +123,9 @@ Reglas obligatorias:
 
 ### Gap
 
-- no existe todavía un programa explícito que ordene los cuatro follow-ups inmediatos
-- la plataforma corre el riesgo de crecer de forma descoordinada entre runtime, docs y mobile
-- la secuencia correcta hacia `MCP` todavía necesita un backlog ejecutable claro
+- la ejecución real sigue abierta en `TASK-617.1` a `TASK-617.4`
+- el drift documental entre la umbrella, `docs/api/*` y el portal legacy debía cerrarse antes de continuar con los slices de implementación
+- la secuencia correcta hacia `MCP` ya quedó explícita y no debe reabrirse en esta umbrella
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -189,9 +189,10 @@ La intención es que Greenhouse llegue a un punto donde:
 
 ## Acceptance Criteria
 
-- [ ] Existen child tasks registradas y secuenciadas para REST hardening, first-party app surface, event control plane y developer docs públicas.
-- [ ] La secuencia deja explícito que `MCP` sigue downstream de este programa.
-- [ ] La relación entre `TASK-616` y estos follow-ups queda documentada sin reabrir la foundation ya implementada.
+- [x] Existen child tasks registradas y secuenciadas para REST hardening, first-party app surface, event control plane y developer docs públicas.
+- [x] La secuencia deja explícito que `MCP` sigue downstream de este programa.
+- [x] La relación entre `TASK-616` y estos follow-ups queda documentada sin reabrir la foundation ya implementada.
+- [x] La umbrella describe el estado real del programa y no contradice el backlog ya creado ni la arquitectura vigente.
 
 ## Verification
 
@@ -200,13 +201,13 @@ La intención es que Greenhouse llegue a un punto donde:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] las child tasks `TASK-617.1` a `TASK-617.4` quedaron alineadas con la arquitectura vigente
+- [x] las child tasks `TASK-617.1` a `TASK-617.4` quedaron alineadas con la arquitectura vigente
 
 ## Follow-ups
 

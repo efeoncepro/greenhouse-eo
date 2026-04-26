@@ -7,7 +7,7 @@
 > Este archivo se conserva como quick reference operativa de surfaces ya vivas,
 > pero ya no debe tratarse como source of truth arquitectónica principal.
 
-Use this file as the first read for any agent or connector that needs to integrate with Greenhouse APIs.
+Use this file as a quick operational reference after reading the canonical API platform architecture.
 
 ## Environments
 
@@ -79,8 +79,8 @@ Key rules:
 
 ## Recommended Read Order For Another Codex
 
-1. `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
-2. `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+1. `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+2. `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
 3. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
 4. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
 5. `project_context.md`

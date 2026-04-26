@@ -550,6 +550,35 @@ La secuencia operativa queda así:
 4. evolucionar `/developers/api` a portal público canónico
 5. recién después retomar `MCP`
 
+## Sesion 2026-04-25 — Se cierra TASK-617 como umbrella programatica
+
+### Que cambio
+
+`TASK-617` ya no queda abierta como si todavía faltara “crear el programa”. El repo ya tenía:
+
+- la umbrella registrada
+- las child tasks `TASK-617.1` a `TASK-617.4`
+- la architecture spec de API Platform
+- el runtime base `api/platform/ecosystem/*`
+
+En este cierre se sincronizó la historia documental con la realidad:
+
+- `TASK-617` pasa a `complete/`
+- `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` quedan alineados
+- `TASK-617.4` deja de apuntar a `[verificar] public/docs/**` y usa la ruta real `public/docs/**`
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md` deja de presentarse como “first read” por delante de la arquitectura canónica
+
+### Decisión canónica explicitada
+
+La ejecución real de V1.1 vive en:
+
+1. `TASK-617.1` — REST hardening
+2. `TASK-617.2` — lane first-party `app`
+3. `TASK-617.3` — event control plane
+4. `TASK-617.4` — developer portal
+
+`TASK-617` queda cerrada como task programática/documental. No debe reabrirse para meter implementación runtime que pertenece a esas child tasks.
+
 ## Sesion 2026-04-25 — API Platform ahora considera first-party mobile clients
 
 ### Que cambio

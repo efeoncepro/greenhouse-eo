@@ -102,7 +102,7 @@ Reglas obligatorias:
 - `docs/api/**`
 - `docs/documentation/plataforma/api-platform-ecosystem.md`
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
-- `[verificar] public/docs/**`
+- `public/docs/**`
 
 ## Current Repo State
 
