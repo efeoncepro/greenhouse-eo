@@ -29,6 +29,7 @@ import type {
 import type { ReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
 import type { GcpBillingOverview } from '@/types/billing-export'
 import type { IntegrationDataQualityRunResult, IntegrationDataQualityStatus } from '@/types/integration-data-quality'
+import AdminHandlerAcknowledgeButton from './AdminHandlerAcknowledgeButton'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
 import AdminReactiveProjectionBreakdown from './AdminReactiveProjectionBreakdown'
@@ -1105,7 +1106,7 @@ const AdminOpsHealthView = ({
                         />
                       </Stack>
                       <Typography variant='body2' color='text.secondary'>
-                        Retries: {item.retries}
+                        Fallos consecutivos: {item.retries}
                       </Typography>
                       <Typography variant='body2' color='error.main'>
                         {item.lastError}
@@ -1113,6 +1114,7 @@ const AdminOpsHealthView = ({
                       <Typography variant='caption' color='text.secondary'>
                         {formatDateTime(item.reactedAt)}
                       </Typography>
+                      <AdminHandlerAcknowledgeButton handler={item.handler} />
                     </Stack>
                   </CardContent>
                 </Card>
