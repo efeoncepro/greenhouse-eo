@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import { useSession } from 'next-auth/react'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'

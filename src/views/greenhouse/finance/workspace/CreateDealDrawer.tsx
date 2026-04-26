@@ -18,7 +18,7 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import useCreateDeal, { type CreateDealResponse } from '@/hooks/useCreateDeal'
 import useDealCreationContext, {

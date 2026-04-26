@@ -18,7 +18,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Tab from '@mui/material/Tab'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'

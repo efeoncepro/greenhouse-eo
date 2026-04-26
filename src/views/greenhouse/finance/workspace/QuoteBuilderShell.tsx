@@ -14,7 +14,7 @@ import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -514,8 +514,9 @@ const QuoteBuilderShell = ({
       setOrganizationContext(adopted.organizationId)
       clearPartySearch()
       toast.success(GH_PRICING.contextChips.organization.unifiedAdopted, {
-        autoClose: 2400,
-        position: 'bottom-right'
+        // TASK-512: sonner uses `duration` (ms). Position is set globally on
+        // the Toaster in Providers.tsx; per-toast position is not supported.
+        duration: 2400
       })
     } catch (caught) {
       const nextError =
@@ -525,8 +526,7 @@ const QuoteBuilderShell = ({
 
       setError(nextError)
       toast.error(nextError, {
-        autoClose: 4200,
-        position: 'bottom-right'
+        duration: 4200
       })
     } finally {
       setPendingOrganizationLabel(null)
@@ -1036,8 +1036,7 @@ const QuoteBuilderShell = ({
         if (!id) return
 
         toast.success(mode === 'create' ? GH_PRICING.builderCreated : GH_PRICING.builderSaved, {
-          autoClose: 2400,
-          position: 'bottom-right'
+          duration: 2400
         })
 
         router.push(closeAfter ? `/finance/quotes/${id}` : `/finance/quotes/${id}/edit`)
@@ -1059,8 +1058,7 @@ const QuoteBuilderShell = ({
 
         if (!issueRes.ok) {
           toast.error(issueBody.error ?? GH_PRICING.builderIssueErrorFallback, {
-            autoClose: 4200,
-            position: 'bottom-right'
+            duration: 4200
           })
           router.push(`/finance/quotes/${quotationId}`)
 
@@ -1072,8 +1070,7 @@ const QuoteBuilderShell = ({
             ? GH_PRICING.builderIssueRequested
             : GH_PRICING.builderIssued,
           {
-            autoClose: 2600,
-            position: 'bottom-right'
+            duration: 2600
           }
         )
         router.push(`/finance/quotes/${quotationId}`)

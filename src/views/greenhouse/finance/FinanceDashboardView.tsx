@@ -36,7 +36,7 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Chip from '@mui/material/Chip'
 

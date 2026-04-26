@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Autocomplete from '@mui/material/Autocomplete'
 import Alert from '@mui/material/Alert'

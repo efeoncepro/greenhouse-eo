@@ -13,6 +13,71 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-25c — `react-toastify` → `sonner` (TASK-512)
+
+Reemplazamos `react-toastify 11.0.5` por **sonner 2.0** como librería canónica de toasts del portal. Sonner es el estándar 2024-2026 que usan Vercel, Linear, Resend y shadcn: stack visual moderno (pinch effect tipo iOS notifications), bundle ~4 KB (vs ~30 KB de react-toastify), `toast.promise()` integrado, swipe dismiss en mobile, keyboard shortcut `Alt+T`, y theme bridge con CSS vars.
+
+### Mount canónico
+
+`src/components/Providers.tsx` monta `<Toaster />` una sola vez con la configuración global del portal:
+
+```tsx
+import { Toaster } from 'sonner'
+
+<Toaster
+  position='top-right'
+  richColors
+  closeButton
+  theme='system'
+  duration={4000}
+/>
+```
+
+- `position='top-right'` preserva el placement convención del portal (mismo que tenía `react-toastify` desde antes).
+- `richColors` activa el tinted background semántico (success, error, warning, info), alineado con la paleta usada en TASK-505 (summary dock primitives) y TASK-615 (quote builder).
+- `closeButton` ofrece dismiss visible.
+- `theme='system'` deja a sonner adoptar light/dark según `prefers-color-scheme`.
+- `duration={4000}` es el default; consumers individuales sobreescriben con `duration: <ms>` cuando necesitan más o menos tiempo.
+
+### API consumer (95% compatible)
+
+Los 60 consumers existentes solo cambiaron la línea de import:
+
+```diff
+- import { toast } from 'react-toastify'
++ import { toast } from 'sonner'
+```
+
+`toast.success`, `toast.error`, `toast.info`, `toast.warning` y `toast(...)` siguen funcionando idénticos. Diferencias relevantes con la API de `react-toastify`:
+
+- **`autoClose: <ms>` → `duration: <ms>`** — sonner usa `duration`. Cinco callsites en `QuoteBuilderShell.tsx` migrados.
+- **`position` por toast NO existe** — la posición se define globalmente en `<Toaster />`. Los cinco overrides `position: 'bottom-right'` se eliminaron; toda toast usa el placement global `top-right`.
+- **`hideProgressBar` no aplica** — sonner no tiene barra de progreso.
+- **`toast.promise(fn, { loading, success, error })`** existe nativo en sonner — preferirlo a flujos manuales loading/success/error cuando el async work tiene latencia visible.
+- **`toast.dismiss(id?)`** y **`toast.loading(...)`** existen — usar para cancelaciones o estados pendientes.
+
+### Reglas
+
+- **Nunca instalar otro toast container** — el mount global de Providers.tsx es el único.
+- **Nunca importar de `react-toastify`** — el package fue removido de `package.json` (TASK-512).
+- **Para tests**, mockear `'sonner'` en lugar de `'react-toastify'`:
+  ```ts
+  vi.mock('sonner', () => ({
+    toast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }
+  }))
+  ```
+- **Theme integration**: sonner respeta CSS vars. No reintroducir wrapper styled como el viejo `AppReactToastify` — `richColors` cubre el caso semántico y el resto fluye con el `<Toaster theme='system' />`.
+- **Custom JSX dentro del toast**: `toast.message('título', { description: 'cuerpo' })` reemplaza al `toast.info(<div>...)` con JSX. Evitar JSX inline en toasts.
+
+### Files
+
+- `package.json` — drop `react-toastify@11.0.5`, add `sonner@^2.0.7`.
+- `src/components/Providers.tsx` — mount Toaster sonner.
+- `src/libs/styles/AppReactToastify.tsx` — DELETED.
+- 59 archivos de `src/views/*` — codemod del import.
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — `autoClose` → `duration`, drop `position` (5 callsites).
+- `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx` — mock `'sonner'`.
+
 ## Delta 2026-04-25 — Navigation transitions con View Transitions API (TASK-525)
 
 Activamos la **CSS View Transitions API** nativa del browser para transiciones de ruta same-document en App Router. Cero bundle adicional — es API del browser. Es el patrón 2024-2026 que usan Vercel Geist, Astro, Next docs y GitHub Issues redesign.

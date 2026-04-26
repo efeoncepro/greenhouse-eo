@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'

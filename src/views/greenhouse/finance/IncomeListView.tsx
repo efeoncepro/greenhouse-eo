@@ -38,7 +38,7 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'

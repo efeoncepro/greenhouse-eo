@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'

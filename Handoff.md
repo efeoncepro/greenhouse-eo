@@ -1,5 +1,113 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — `react-toastify` -> `sonner` (TASK-512)
+
+### Que cambio
+
+Reemplazamos `react-toastify 11.0.5` por **sonner 2.0** como librería canónica de toasts del portal. Sonner es el estándar 2024-2026 que usan Vercel, Linear, Resend y shadcn: stack visual moderno (pinch effect tipo iOS notifications), bundle ~4 KB (vs ~30 KB de react-toastify), `toast.promise()` integrado, swipe dismiss en mobile, keyboard shortcut `Alt+T`, theme bridge automático con `prefers-color-scheme`.
+
+- **Mount canónico** en `src/components/Providers.tsx`:
+
+  ```tsx
+  <Toaster position='top-right' richColors closeButton theme='system' duration={4000} />
+  ```
+
+  - `position='top-right'` preserva el placement del portal.
+  - `richColors` activa tinted backgrounds semánticos (success/error/warning/info), aliñado con TASK-505 y TASK-615.
+  - `closeButton` da dismiss visible.
+  - `theme='system'` se sincroniza con `prefers-color-scheme`.
+  - `duration={4000}` default; consumers sobreescriben con `duration: <ms>`.
+- **AppReactToastify.tsx eliminado** — sonner no necesita wrapper styled (el viejo wrapper era 100 líneas de CSS overrides de Toastify).
+- **59 consumers** solo cambiaron la línea de import (`from 'react-toastify'` -> `from 'sonner'`); la API `toast.success/.error/.info/.warning(...)` es compatible 1:1.
+- **5 callsites en `QuoteBuilderShell.tsx`** migraron `autoClose: <ms>` -> `duration: <ms>` y se eliminó el `position: 'bottom-right'` por toast (sonner no soporta posición per-toast; queda global en el `<Toaster />`).
+- **1 test mock** en `FinancePeriodClosureDashboardView.test.tsx` cambió de `vi.mock('react-toastify', ...)` a `vi.mock('sonner', ...)` con los 4 métodos canónicos (success/error/info/warning).
+- **`react-toastify` removido de `package.json`** vía `pnpm remove`.
+
+### Validaciones
+
+- `pnpm lint` -> clean (1 error import/order autocorregido).
+- `pnpm build` -> Compiled successfully en 31.6s.
+- `npx tsc --noEmit` -> clean.
+- `pnpm test` focal sobre `FinancePeriodClosureDashboardView.test.tsx` -> 1 passed.
+- 60 imports de sonner activos en src; 0 referencias a `react-toastify` salvo dos comentarios contextuales en Providers.tsx (intencionales).
+
+### Decisiones canonicas
+
+1. **richColors ON por default**. El portal usa colores semánticos en docks y headers (TASK-505/615); sonner sin richColors mostraría toasts neutros y descontextualizaría. richColors mantiene la coherencia visual.
+2. **Position global, no per-toast**. Los 5 overrides `bottom-right` en QuoteBuilderShell se descartaron — el portal queda con `top-right` consistente. Si en el futuro necesitamos placement distinto por surface, la decisión va a una segunda Toaster con `containerId`, no a opciones por toast.
+3. **Theme='system'**. Más limpio que pasar settings.skin manualmente; sonner picks light/dark con `prefers-color-scheme`. Si más adelante el portal expone toggle manual independiente del OS, podemos cambiar a `theme={mode}` controlado.
+4. **No reintroducir wrapper styled**. AppReactToastify hacía CSS overrides de Toastify; sonner ya respeta CSS vars del theme y la API es declarativa. No hay razón para envolver `<Toaster />` en un styled Box.
+5. **API consumer NO cambia salvo `autoClose` -> `duration`**. La spec previó "95% compatible"; en práctica fue 99% compatible — solo 5 callsites tocaron opciones avanzadas. Los otros 155 callsites son `toast.success(msg)` / `toast.error(msg)` puros.
+
+### Migration cheatsheet (para consumers nuevos)
+
+```tsx
+// correcto (sonner)
+import { toast } from 'sonner'
+
+toast.success('Cambios guardados')
+toast.error('No pudimos guardar', { duration: 4200 })
+toast.promise(saveQuote(), {
+  loading: 'Guardando…',
+  success: 'Borrador guardado',
+  error: 'No pudimos guardar el borrador'
+})
+
+// NO usar (react-toastify, removido del repo)
+// import { toast } from 'react-toastify'
+// toast.success('msg', { autoClose: 2400, position: 'bottom-right' })
+```
+
+### Out of scope (queda como follow-up de la spec)
+
+- Hooks compartidos `useSuccessToast` / `useErrorToast` para estandarizar duración + tone por dominio (operativo / commercial / system) — listado en Follow-ups de TASK-512.
+- Migrar flujos largos (issue quote, save then redirect, etc.) a `toast.promise()` para usar la integración loading/success/error nativa.
+- Custom components dentro del toast (sonner soporta `toast(<JSX/>)`) si emerge un caso real.
+
+---
+
+## Sesion 2026-04-26 — API Platform REST hardening + first-party app lane (TASK-617.1/TASK-617.2)
+
+### Que cambio
+
+Se cerró el blocker operativo de `TASK-617.2` aterrizando primero el hardening base de `TASK-617.1` y luego la foundation first-party app:
+
+- `api/platform/ecosystem` collections (`organizations`, `capabilities`) ahora responden con `meta.pagination`.
+- El envelope de API Platform agrega headers opcionales `x-ratelimit-remaining-*` y `x-ratelimit-reset-*`.
+- Nueva migración `20260426021650967_task-617-api-platform-app-foundation.sql`:
+  - `greenhouse_core.first_party_app_sessions`
+  - `greenhouse_core.api_platform_request_logs`
+- Nueva lane `src/app/api/platform/app/**`:
+  - `POST /sessions` crea sesión first-party app con access token corto + refresh token hasheado.
+  - `PATCH /sessions` rota refresh token.
+  - `DELETE /sessions/current` revoca la sesión actual.
+  - `GET /context`, `/home`, `/notifications`.
+  - `POST /notifications/:id/read`, `/notifications/mark-all-read`.
+- Nuevo runner `runAppRoute` / `runAppReadRoute` en `src/lib/api-platform/core/app-auth.ts`.
+- Nuevo store/token helper `src/lib/api-platform/core/app-sessions.ts`.
+- Nuevo log genérico `src/lib/api-platform/core/request-logging.ts`; ecosystem mantiene el log legacy y además escribe al genérico.
+
+### Decisiones canonicas
+
+1. `ecosystem` sigue usando `sister_platform_consumers`; `app` no reutiliza ese modelo.
+2. La app React Native debe usar `api/platform/app/*`, no `/api/home/snapshot` ni rutas web internas.
+3. El access token app es corto; el refresh token solo se guarda como hash y se rota.
+4. Cada request app rehidrata acceso desde Identity Access en vez de confiar indefinidamente en claims viejos.
+5. `views` siguen cubriendo surfaces visibles; `entitlements` cubren capabilities. `/app/context` expone ambos planos.
+
+### Validaciones
+
+- `pnpm test --run src/lib/api-platform/core src/app/api/platform/ecosystem/capabilities/route.test.ts src/app/api/platform/app/context/route.test.ts` → 5 files / 9 tests passing.
+- `pnpm pg:doctor` → conexión local por Cloud SQL Proxy sana; superadmin health OK.
+- `pnpm migrate:up` → aplicó `20260426021650967_task-617-api-platform-app-foundation.sql` y regeneró `src/types/db.d.ts` (295 tablas).
+- `pnpm lint` → clean.
+- `pnpm build` → success.
+- `npx tsc --noEmit --pretty false` sigue mostrando un error preexistente en `src/lib/finance/vat-ledger.test.ts:33` (`spread argument must either have a tuple type...`), fuera del scope de TASK-617.
+
+### Nota de coordinación
+
+- El worktree también contiene cambios de Claude para `TASK-512` (`react-toastify` → `sonner`) y otros imports UI. No forman parte del commit TASK-617 y no deben revertirse desde esta rama.
+
 ## Sesion 2026-04-25 — View Transitions API rollout (TASK-525)
 
 ### Que cambio
