@@ -3453,6 +3453,9 @@ export interface GreenhouseFinanceFactoringOperations {
    */
   external_reference: string | null;
   factoring_provider_id: string;
+  /**
+   * Total factoring cost (interest + advisory). Counts toward income.amount_paid via greenhouse_finance.income_settlement_reconciliation — the receivable IS settled for this portion because we sold the AR risk to the provider, even though the fee never lands as cash. Do NOT re-derive this in ad-hoc queries.
+   */
   fee_amount: Numeric;
   fee_rate: Numeric;
   income_id: string;
@@ -3483,6 +3486,9 @@ export interface GreenhouseFinanceIdempotencyKeys {
 }
 
 export interface GreenhouseFinanceIncome {
+  /**
+   * Total settled portion of the receivable. Composed of: cash payments + factoring fees (when factored) + tax withholdings. Use the canonical view greenhouse_finance.income_settlement_reconciliation (or src/lib/finance/income-settlement.ts) to validate consistency — never sum greenhouse_finance.income_payments alone, that ignores factoring + withholdings.
+   */
   amount_paid: Generated<Numeric>;
   balance_nubox: Numeric | null;
   client_id: string | null;
@@ -3655,6 +3661,23 @@ export interface GreenhouseFinanceIncomePayments {
   recorded_by_user_id: string | null;
   reference: string | null;
   settlement_group_id: string | null;
+}
+
+export interface GreenhouseFinanceIncomeSettlementReconciliation {
+  amount_paid: Numeric | null;
+  client_id: string | null;
+  drift: Numeric | null;
+  expected_settlement: Numeric | null;
+  factoring_fee_total: Numeric | null;
+  factoring_operation_count: number | null;
+  has_drift: boolean | null;
+  income_id: string | null;
+  invoice_number: string | null;
+  is_factored: boolean | null;
+  payment_status: string | null;
+  payments_total: Numeric | null;
+  total_amount: Numeric | null;
+  withholding_amount: Numeric | null;
 }
 
 export interface GreenhouseFinanceNuboxEmissionLog {
@@ -6703,6 +6726,7 @@ export interface DB {
   "greenhouse_finance.income": GreenhouseFinanceIncome;
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
+  "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;

@@ -55,19 +55,23 @@ vi.mock('@/lib/sync/reactive-run-tracker', () => ({
   getLastReactiveRun: vi.fn()
 }))
 
+const mockCountIncomesWithSettlementDrift = vi.fn()
+
+vi.mock('@/lib/finance/income-settlement', () => ({
+  countIncomesWithSettlementDrift: (...args: unknown[]) => mockCountIncomesWithSettlementDrift(...args)
+}))
+
 import { buildFinanceDataQualitySubsystem } from '@/lib/operations/get-operations-overview'
 
 describe('buildFinanceDataQualitySubsystem', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    mockCountIncomesWithSettlementDrift.mockResolvedValue(1)
+
     mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
       if (sql.includes('information_schema.tables')) {
         return [{ exists: true }]
-      }
-
-      if (sql.includes('ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01')) {
-        return [{ cnt: '1' }]
       }
 
       if (sql.includes('payment_status IN (\'pending\', \'partial\', \'overdue\')')) {
@@ -131,10 +135,10 @@ describe('buildFinanceDataQualitySubsystem', () => {
   })
 
   it('keeps platform integrity green when only operational hygiene metrics have value', async () => {
+    mockCountIncomesWithSettlementDrift.mockResolvedValueOnce(0)
     mockRunGreenhousePostgresQuery.mockReset()
     mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
       if (sql.includes('information_schema.tables')) return [{ exists: true }]
-      if (sql.includes('ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01')) return [{ cnt: '0' }]
       if (sql.includes('payment_status IN (\'pending\', \'partial\', \'overdue\')')) return [{ cnt: '12' }]
       if (sql.includes('AS direct_without_client')) return [{ direct_without_client: '0', shared_unallocated: '5' }]
       throw new Error(`Unexpected SQL in test:\n${sql}`)

@@ -1,5 +1,62 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Income settlement reconciliation canónica (factoring + withholdings) + 45 dead requeued
+
+### Trigger
+
+Continuación de la sesión Reliability Control Plane. El user identificó que el `drift de ledger` para `INC-NB-27971848` (Nubox 6.9M paid vs 6.776M payments = 125,547) NO era drift real: la factura fue **factorizada** y la diferencia es la fee del factoring (interest 94,557 + advisory 30,990) que vive en `greenhouse_finance.factoring_operations.fee_amount`. El modelo previo en `buildFinanceDataQualitySubsystem` solo comparaba `amount_paid` vs `SUM(income_payments)` ignorando factoring + withholdings, lo que producía drift falso para toda factura factorada en el dashboard.
+
+Pedido explícito del user: "robusto y escalable, no parches" + "haz algo para que otro agente no se vuelva a equivocar cuando una factura este factorizada".
+
+### Que cambio (estructural, no parche)
+
+- **VIEW canónica `greenhouse_finance.income_settlement_reconciliation`**: nueva migración `20260426135618436_add-income-settlement-reconciliation-view.sql`. Reconcilia `income.amount_paid` contra la composición real de settlement: `cash payments + factoring fees (active ops) + tax withholdings`. Expone `expected_settlement`, `drift`, `has_drift`, `is_factored`, `factoring_operation_count` por income. Excluye `is_annulled=TRUE`. La VIEW lleva `COMMENT ON VIEW` y `COMMENT ON COLUMN` para `factoring_operations.fee_amount` + `income.amount_paid` que documentan el modelo en la propia DB para que cualquier agente que haga `\d` lo vea.
+
+- **Helper TypeScript canónico** `src/lib/finance/income-settlement.ts` con JSDoc fuerte que exporta:
+  - `getIncomeSettlementBreakdown(incomeId)` — single income con composición completa
+  - `listIncomesWithSettlementDrift({ limit })` — queue ordenada por |drift|
+  - `countIncomesWithSettlementDrift()` — usado por el RCP dashboard
+  - `IncomeSettlementBreakdown` type con todos los campos
+  El JSDoc lleva sección "FOR AGENTS / FUTURE DEVS" con las reglas duras (nunca rederivar, siempre extender helper+VIEW juntos).
+
+- **`get-operations-overview.ts`** ahora usa `countIncomesWithSettlementDrift()` en vez de inline SQL. Comment block explica por qué no hacer `SUM(income_payments)` directo.
+
+- **CLAUDE.md** sección nueva "Finance — reconciliación de income.amount_paid (factoring + withholdings)" con la ecuación canónica y reglas duras visible en cualquier `read CLAUDE.md` (las primeras instrucciones que carga cualquier agente nuevo).
+
+- **Tests**:
+  - `src/lib/finance/income-settlement.test.ts` — 7 cases: lectura desde la VIEW, mapeo de factoring + withholdings, detección de drift, null on missing, sort por ABS(drift), guardrail explícito que falla si el helper alguna vez vuelve a referenciar `FROM greenhouse_finance.income_payments` o `FROM greenhouse_finance.factoring_operations` directo.
+  - `get-operations-overview.test.ts` actualizado para usar el helper mockeado en lugar del SQL inline anterior.
+
+- **Live ops**:
+  - 45 dead projection rows requeued (44 `product_hubspot_outbound` ahora corren con el `GREENHOUSE_INTEGRATION_API_TOKEN` que ya estaba provisionado en Vercel staging+prod, + 1 `member_capacity_economics` legacy).
+  - VAT projection `vat_monthly_position:finance_period:2026-04` corrió y completó OK con el bug fix de la sesión anterior (retry_count=1, no error).
+  - Drift de ledger: ahora **0** (la VIEW reconcilia correctamente el factoring de INC-NB-27971848).
+
+### Validaciones
+
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → 0 errores
+- `pnpm test` → 426 files / 2209 passed / 2 skipped (incluye 7 tests nuevos del helper)
+- Migración aplicada localmente + tipos Kysely regenerados (297 tablas, +1 view)
+- VIEW probada en vivo: `INC-NB-27971848` ahora `drift=0.00, has_drift=false, is_factored=true`
+
+### Estado final del Admin Center post-deploy
+
+- **Cloud Platform → Proyecciones**: limpio post-requeue (45 pending recuperándose en próximo sweep, ~5min)
+- **Finance Data Quality**: status `healthy` (drift=0; AR vencidas + overhead siguen como info paralelo, no escalan)
+- **Notion Delivery DQ**: `degraded` con summary "2 con lag auto-recuperable" hasta que conformed sync se ponga al día
+
+### Guardrails que ningún agente futuro puede saltarse
+
+1. **DB-level**: `COMMENT ON COLUMN greenhouse_finance.income.amount_paid` + `COMMENT ON COLUMN greenhouse_finance.factoring_operations.fee_amount` apuntan a la VIEW canónica. Visible al hacer `\d` en psql.
+2. **Code-level**: JSDoc del helper `income-settlement.ts` con sección "FOR AGENTS / FUTURE DEVS" + tests con assertion explícita que falla si el helper rederiva la fórmula desde tablas raw.
+3. **Project-level**: sección en CLAUDE.md (cargada en todo prompt de Claude trabajando en este repo) con la ecuación canónica y la regla "NUNCA computar drift como amount_paid - SUM(income_payments) solo".
+4. **Architecture pattern**: el RCP dashboard ya consume el helper, sentando precedente. Cualquier futuro consumer (Finance Intelligence, audits, Slack alerts) lo va a encontrar listed entre los exports y se va a sumar antes de improvisar.
+
+### Pendientes
+
+- Esperar próximo reactive sweep (5min) para que las 45 pending se completen y la dashboard quede 100% verde.
+
 ## Sesion 2026-04-26 — Reliability Control Plane hardening (Cloud / Delivery / Finance / Notion)
 
 ### Trigger

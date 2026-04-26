@@ -454,6 +454,31 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - **Timestamps**: SIEMPRE usar `pnpm migrate:create` para generar archivos. NUNCA renombrar timestamps manualmente ni crear archivos a mano — `node-pg-migrate` rechaza migraciones con timestamp anterior a la última aplicada.
 - **Spec completa**: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
+### Finance — reconciliación de income.amount_paid (factoring + withholdings)
+
+Una factura (`greenhouse_finance.income`) puede saldarse por **3 mecanismos** distintos, y `amount_paid` es el total saldado independiente de cuál cerró cada porción:
+
+1. **Pagos en efectivo** → `income_payments.amount`
+2. **Fees de factoring** → `factoring_operations.fee_amount` cuando `status='active'`. La factura ESTÁ saldada por esa porción aunque la fee nunca llegue como cash — se vendió el riesgo AR al factoring provider. (Componente: `interest_amount` + `advisory_fee_amount`).
+3. **Retenciones tributarias** → `income.withholding_amount`. El cliente retuvo parte y la paga al SII directo. La factura ESTÁ saldada por esa porción aunque nunca llegue a Greenhouse.
+
+**Ecuación canónica**:
+
+```text
+amount_paid == SUM(income_payments.amount)
+             + SUM(factoring_operations.fee_amount WHERE status='active')
+             + COALESCE(withholding_amount, 0)
+```
+
+Cualquier diferencia es **`drift`** — un problema real de integridad de ledger que requiere humano.
+
+**Reglas duras**:
+
+- **NUNCA** computar drift como `amount_paid - SUM(income_payments)` solo. Eso ignora factoring + withholdings y produce drift falso para cada factura factorada.
+- **Usar siempre** la VIEW canónica `greenhouse_finance.income_settlement_reconciliation` o el helper `src/lib/finance/income-settlement.ts` (`countIncomesWithSettlementDrift`, `getIncomeSettlementBreakdown`, `listIncomesWithSettlementDrift`).
+- Cuando aparezca un nuevo mecanismo de settlement (notas de crédito, write-offs parciales, retenciones extranjeras, etc.), extender **ambos**: la VIEW (migración nueva con `CREATE OR REPLACE VIEW`) y el helper TypeScript. Nunca branchear la lógica en un consumer.
+- El Reliability Control Plane (`Finance Data Quality > drift de ledger`) lee desde esta VIEW. Bypass = dashboards inconsistentes.
+
 ### Tests y validación
 
 - Tests unitarios: Vitest + Testing Library + jsdom

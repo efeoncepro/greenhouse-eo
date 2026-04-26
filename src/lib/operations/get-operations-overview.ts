@@ -10,6 +10,7 @@ import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/clo
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
+import { countIncomesWithSettlementDrift } from '@/lib/finance/income-settlement'
 import { readReactiveBacklogOverview, type ReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
 import { getLastReactiveRun } from '@/lib/sync/reactive-run-tracker'
 import {
@@ -290,13 +291,10 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
     }
 
     const [divergentPayments, overdueCount, allocationRows] = await Promise.all([
-      safeCount(
-        `SELECT COUNT(*) AS cnt
-         FROM greenhouse_finance.income i
-         INNER JOIN (SELECT income_id, SUM(amount)::numeric AS total FROM greenhouse_finance.income_payments GROUP BY income_id) p
-           ON p.income_id = i.income_id
-         WHERE ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01`
-      ),
+      // Ledger integrity goes through the canonical reconciliation helper.
+      // DO NOT inline a `SUM(income_payments)` query here — that ignores
+      // factoring fees and withholdings and produces false drift.
+      countIncomesWithSettlementDrift().catch(() => 0),
       safeCount(
         `SELECT COUNT(*) AS cnt FROM greenhouse_finance.income
          WHERE payment_status IN ('pending', 'partial', 'overdue') AND due_date < CURRENT_DATE`
