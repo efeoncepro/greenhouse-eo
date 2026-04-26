@@ -15,15 +15,48 @@ Recursos productivos:
 - **Bicep deploy**: `gh-bot-20260426-205907` ejecutado con `parameters.prod.json` actualizado con el `botAppId` real.
 - **Manifest Teams v1.17 listo** en `infra/azure/teams-bot/manifest/greenhouse-teams.zip` (1936 bytes: manifest.json + icons/icon_color.png 192×192 + icons/icon_outline.png 32×32). Iconos placeholder generados con Python+zlib (círculo verde #00B07F con G blanca, outline blanco). Reemplazar por logo definitivo cuando design lo entregue.
 
-Pendientes de Slice 4 (no son CLI Azure, requieren acceso interactivo o cambios en producción):
+Closed via CLI en esta misma sesión (segunda iteración del deploy):
 
-1. **Upload del manifest al Teams Admin Center** — Graph endpoint `/appCatalogs/teamsApps` requiere scope `AppCatalog.ReadWrite.All` que el `az` CLI no provee por default. Subir `greenhouse-teams.zip` manualmente vía <https://admin.teams.microsoft.com/policies/manage-apps> → "Upload new app".
-2. **Instalar el bot en cada team destino**: Alineación, Finance ops chat, Delivery ops chat (Teams desktop → ⋯ → Manage team → Apps → Add Greenhouse).
-3. **Capturar `team_id` y `channel_id` reales** (Teams desktop → click derecho en canal → "Get link to channel").
-4. **UPDATE de los 3 canales productivos** (`ops-alerts`, `finance-alerts`, `delivery-pulse`) a `channel_kind='teams_bot'` con `team_id`, `channel_id`, `bot_app_id='a1397477-4aae-4f16-a0a2-a213cb1b00b2'`, `azure_tenant_id='a80bf6c1-7c45-4d70-b043-51389622a0e4'`, `secret_ref='greenhouse-teams-bot-client-credentials'`. Ejemplo SQL en runbook.
-5. **Validación de 1 semana** con tráfico real antes de decommissionar Logic Apps.
-6. **Env var en Vercel** `GREENHOUSE_TEAMS_BOT_APP_ID=a1397477-4aae-4f16-a0a2-a213cb1b00b2` (production + preview) — necesaria para el JWT validation del endpoint inbound.
-7. **Reemplazar iconos placeholder** por el logo definitivo de design.
+- **Vercel env var**: `GREENHOUSE_TEAMS_BOT_APP_ID=a1397477-4aae-4f16-a0a2-a213cb1b00b2` setado en Production + Preview (develop) + Development vía `vercel env add … --force`. Verificable con `vercel env ls | grep GREENHOUSE_TEAMS_BOT_APP_ID`.
+- **Iconos definitivos**: rasterizados con Chrome headless desde `public/images/greenhouse/SVG/favicon-blue-negative.svg`. `icon_color.png` (192×192) renderiza el favicon completo (rounded square azul `#023c70` + isotipo blanco). `icon_outline.png` (32×32) renderiza solo el isotipo blanco (variante del SVG con la rect azul removida) sobre transparente. Manifest zip rebuildeado a 5430 bytes.
+- **Teams + channels descubiertos vía Graph API** (cinco teams del tenant, sus canales):
+
+  | team_id | team displayName | channel_id | channel displayName |
+  | --- | --- | --- | --- |
+  | `a54afa03-4a4e-4ef5-a207-9fcdc95fceb3` | Efeonce Group | `19:79GnJzdXDvDjhebrMxSU1rppQyfb-_v3kkLxR-hknCc1@thread.tacv2` | General |
+  | `8fc00abd-adf8-43bd-950d-1ac8b2e75d08` | Revenue & Growth | `19:13d7cf3ce3194dc4a32ea24e32e4dadb@thread.tacv2` | HubSpot |
+  | `8fc00abd-adf8-43bd-950d-1ac8b2e75d08` | Revenue & Growth | `19:8600d823bd074e24a54a50dbedb82139@thread.tacv2` | Onboarding |
+  | `8fc00abd-adf8-43bd-950d-1ac8b2e75d08` | Revenue & Growth | `19:UJyyOazcOJSSzCDT30uoutQOe1LPWSbO9R6iBQriiUg1@thread.tacv2` | General |
+  | `2541da59-d0cd-4a0a-889e-5456e88a111e` | Growth Marketing | `19:FpUnTzJSbUql0wwtyDk8Ag6LrMMnTVQZB0j5zvmpkjk1@thread.tacv2` | Alineación |
+  | `2541da59-d0cd-4a0a-889e-5456e88a111e` | Growth Marketing | `19:hIXqSsYJrHxhAa0_SjMW8rJ2ixuWaEujPKF13c-EI8c1@thread.tacv2` | ANAM |
+  | `a99833c2-31fc-416e-a66f-2284d1c2c3b0` | Sky - Efeonce | `19:hLA5AUn2SjoNXNATJv_ofEwnBKGsKXFepSg9CJur8QY1@thread.tacv2` | Shared - Sky |
+  | `a99833c2-31fc-416e-a66f-2284d1c2c3b0` | Sky - Efeonce | `19:nU5beFpSOHRQiPERF5P2u6DdwyC5Bqaj5Qo36fxbPpI1@thread.tacv2` | General |
+  | `aae47836-8e59-4d9a-bce5-37d12978a1ad` | EO - Admin | `19:19UgRoht3Vmw0qgzfC71rKlOpHtfEI4Qz1jVdWMGqXE1@thread.tacv2` | EO - Admin |
+
+  Decisión de mapping (a confirmar antes de UPDATE en PG): el spec históricamente cita `Alineación` como destino de `ops-alerts`. Las opciones razonables:
+  - `ops-alerts` → `EO - Admin / EO - Admin` (admin ops del tenant) o `Efeonce Group / General` (broadcast)
+  - `finance-alerts` → `EO - Admin / EO - Admin` (sensible) o un team Finance dedicado si se crea
+  - `delivery-pulse` → `Growth Marketing / Alineación` (alineación operativa diaria)
+
+Pendientes residuales (no son CLI Azure, requieren GUI de Global Admin o decisión humana):
+
+1. **Upload del manifest al Teams Admin Center** — Graph `/appCatalogs/teamsApps` exige scope `AppCatalog.ReadWrite.All` que el `az` CLI delegado no provee. Subir `greenhouse-teams.zip` (5430 bytes, listo en `infra/azure/teams-bot/manifest/`) en <https://admin.teams.microsoft.com/policies/manage-apps> → "+ Upload new app" → confirmar status `Allowed`.
+2. **Instalar el bot en cada team destino** (Teams desktop → ⋯ → Manage team → Apps → Add Greenhouse).
+3. **UPDATE de los 3 canales productivos** a `channel_kind='teams_bot'` usando los IDs de la tabla de arriba. Plantilla SQL canónica:
+
+   ```sql
+   UPDATE greenhouse_core.teams_notification_channels
+      SET channel_kind = 'teams_bot',
+          recipient_kind = 'channel',
+          bot_app_id = 'a1397477-4aae-4f16-a0a2-a213cb1b00b2',
+          team_id = '<TEAM_ID>',
+          channel_id = '<CHANNEL_ID>',
+          azure_tenant_id = 'a80bf6c1-7c45-4d70-b043-51389622a0e4',
+          secret_ref = 'greenhouse-teams-bot-client-credentials',
+          updated_at = now()
+    WHERE channel_code IN ('ops-alerts','finance-alerts','delivery-pulse');
+   ```
+4. **Validación de 1 semana** con tráfico real antes de decommissionar Logic Apps. Probar con `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"ops-alerts"}'`.
 
 Comandos para verificar el state desplegado:
 
