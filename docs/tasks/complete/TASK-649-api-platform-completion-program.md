@@ -8,16 +8,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `umbrella`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `none`
+- Blocked by: `none` for the umbrella; child workstreams have explicit blockers in `Current Repo State`
 - Branch: `task/TASK-649-api-platform-completion-program`
 - Legacy ID: `API Platform missing pieces program`
 - GitHub Issue: `—`
@@ -36,6 +36,7 @@ La deuda actual no es "hacer REST desde cero"; es cerrar los gaps que impiden de
 
 - Definir el backlog canónico de cierre de API Platform.
 - Separar claramente foundation shared, read surfaces por dominio, command/write safety y documentación pública.
+- Corregir supuestos desactualizados detectados en Discovery antes de abrir child tasks.
 - Mantener MCP downstream de contratos API estables.
 - Evitar que nuevos dominios se expongan vía rutas legacy, SQL directo o helpers internos sin contrato.
 - Dejar criterios claros para promover endpoints de preview a stable.
@@ -113,7 +114,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-649-api-platform-completion-program.md`
+- `docs/tasks/complete/TASK-649-api-platform-completion-program.md`
 - future child tasks under `docs/tasks/to-do/TASK-###-*.md`
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` if program decisions change architecture.
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
@@ -137,13 +138,18 @@ Reglas obligatorias:
 
 - No existe programa canónico que ordene todos los gaps restantes de API Platform.
 - Falta coverage platform por dominios clave: Finance/Commercial, People/Workforce, Ops/Reliability, Organization Workspace/facets e ICO.
-- Falta foundation transversal de idempotencia y command/write safety.
+- Falta foundation transversal de idempotencia y command/write safety para API Platform.
 - Falta completar OpenAPI con schemas, filtros, errores, ejemplos y versioning estable.
 - Falta taxonomía granular de degraded modes por dominio.
 - Falta convención uniforme de filters/sort/cursor/fields/include para listas grandes.
 - Falta decidir el modelo OAuth/AuthN para MCP remoto o hosted, separado del MCP local read-only.
 - Falta puente explícito entre entitlements/capabilities y datos sensibles ecosystem-facing.
 - Falta lifecycle/deprecation policy para preview -> stable y legacy -> platform.
+- Las rutas mutativas ya existen en API Platform (`webhook-subscriptions`, `webhook-deliveries/:id/retry`, `app/sessions`, notifications read); el gap no es "crear el primer write", sino separar command semantics, idempotencia y auditoría consistente.
+- La idempotencia ya existe de forma domain-local (`greenhouse_finance.idempotency_keys`, `greenhouse_notifications.idempotency_keys`, webhook inbox idempotency, commercial deal attempts), pero no como capability transversal de API Platform.
+- `greenhouse_core.api_platform_request_logs` no cubre hoy todo el ecosistema: app lane lo usa, mientras ecosystem lane sigue registrando en `greenhouse_core.sister_platform_request_logs`.
+- `docs/architecture/schema-snapshot-baseline.sql` está desactualizado para API Platform reciente; contiene webhooks/outbox base, pero no todas las tablas de `TASK-617`. Discovery debe usar migrations como evidencia hasta regenerar/reconciliar el snapshot.
+- `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` tiene mismatch de scope: el query param `externalScopeType` representa scope externo (`tenant`, `workspace`, `portal`, etc.), no `greenhouseScopeType`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -171,8 +177,14 @@ Reglas obligatorias:
 ### Workstream 2 — Command and idempotency foundation
 
 - Diseñar e implementar una capability shared para `Idempotency-Key`.
+- Separar helper de command routes de `runEcosystemReadRoute` para que POST/PATCH/retry no queden semánticamente como reads.
 - Definir command response semantics (`accepted`, `completed`, `conflict`, `replayed`, `rejected`).
 - Persistir command audit trail y correlation IDs.
+- Reutilizar aprendizajes de idempotencia local existentes sin copiar sus tablas tal cual:
+  - `src/lib/finance/idempotency.ts`
+  - `src/lib/idempotency/idempotency-key.ts`
+  - `greenhouse_sync.webhook_inbox_events.idempotency_key`
+  - `greenhouse_commercial.deal_create_attempts`
 - Definir retry-safe writes antes de cualquier MCP write.
 
 ### Workstream 3 — Query conventions and large-list ergonomics
@@ -195,6 +207,7 @@ Reglas obligatorias:
 - Mapear qué resources requieren capabilities/entitlements adicionales.
 - Documentar la relación con `views` cuando una capability también tenga surface UI.
 - Bloquear person-level/payroll/cost-sensitive resources hasta tener autorización fina.
+- Crear una policy de resource sensitivity/capabilities para API Platform consumers; no aplicar `authorizedViews` directo a MCP salvo cuando el recurso represente una surface UI.
 
 ### Workstream 6 — MCP OAuth and hosted auth model
 
@@ -207,7 +220,10 @@ Reglas obligatorias:
 ### Workstream 7 — OpenAPI and developer contract hardening
 
 - Convertir `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` de preview parcial a contrato estable por lane/resource.
+- Corregir `ExternalScopeType` para representar el modelo externo real (`tenant`, `workspace`, `portal`, `installation`, `client`, `space`, `organization`, `other`) y documentar `greenhouseScopeType` como resultado de binding.
 - Agregar schemas, examples, errors, pagination, filters y version headers.
+- Agregar headers de rate-limit, freshness, `Idempotency-Key` y response examples por resource/command.
+- Definir si el source of truth será YAML manual validado o generación desde schemas runtime.
 - Mantener docs públicas derivadas alineadas con runtime.
 - Definir criterio de promoción `preview` -> `stable`.
 
@@ -260,12 +276,13 @@ command design
 
 ## Acceptance Criteria
 
-- [ ] Existe backlog child-task para cada workstream: domain reads, command/idempotency, query conventions, degraded modes, auth bridge, MCP OAuth/hosted auth, OpenAPI hardening y lifecycle/deprecation.
-- [ ] `TASK-648` queda registrado como child/prerequisito para ICO + MCP domain expansion.
-- [ ] MCP write-safe queda explícitamente bloqueado por command/idempotency foundation.
-- [ ] La arquitectura API Platform queda actualizada si las decisiones del programa cambian el contrato.
-- [ ] `docs/tasks/README.md` refleja el programa y su relación con `TASK-647`/`TASK-648`.
-- [ ] Los criterios `preview` vs `stable` quedan documentados en API docs o arquitectura.
+- [x] Existe backlog child-task para cada workstream: domain reads, command/idempotency, query conventions, degraded modes, auth bridge, MCP OAuth/hosted auth, OpenAPI hardening y lifecycle/deprecation.
+- [x] La spec queda corregida con los supuestos reales detectados: platform commands existentes, dual request-log runtime, idempotencias domain-local, snapshot SQL stale y mismatch de `ExternalScopeType`.
+- [x] `TASK-648` queda registrado como child/prerequisito para ICO + MCP domain expansion.
+- [x] MCP write-safe queda explícitamente bloqueado por command/idempotency foundation.
+- [x] La arquitectura API Platform queda actualizada si las decisiones del programa cambian el contrato.
+- [x] `docs/tasks/README.md` refleja el programa y su relación con `TASK-647`/`TASK-648`.
+- [x] Los criterios `preview` vs `stable` quedan documentados en API docs o arquitectura.
 
 ## Verification
 
@@ -275,23 +292,28 @@ command design
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] todos los child tasks del programa quedaron creados o explícitamente diferidos
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] todos los child tasks del programa quedaron creados o explícitamente diferidos
 
 ## Follow-ups
 
-- Child task: API Platform Command + Idempotency Foundation.
-- Child task: API Platform Finance/Commercial Read Surface.
-- Child task: API Platform People/Workforce Read Surface.
-- Child task: API Platform Ops/Reliability Read Surface.
-- Child task: MCP OAuth / Hosted Auth Model.
-- Child task: API Platform OpenAPI Stable Contract.
-- Child task: API Platform Lifecycle & Deprecation Policy.
+- `TASK-650` — API Platform Domain Read Surfaces Program.
+- `TASK-651` — API Platform Finance / Commercial Read Surface.
+- `TASK-652` — API Platform People / Workforce Read Surface.
+- `TASK-653` — API Platform Ops / Reliability Read Surface.
+- `TASK-654` — API Platform Organization Workspace Facets Read Surface.
+- `TASK-655` — API Platform Command & Idempotency Foundation.
+- `TASK-656` — API Platform Query Conventions Foundation.
+- `TASK-657` — API Platform Degraded Modes & Dependency Health.
+- `TASK-658` — API Platform Resource Authorization Bridge.
+- `TASK-659` — MCP OAuth / Hosted Auth Model.
+- `TASK-660` — API Platform OpenAPI Stable Contract.
+- `TASK-661` — API Platform Lifecycle & Deprecation Policy.
 
 ## Open Questions
 
@@ -299,3 +321,14 @@ command design
 - ¿Qué dominio después de ICO debe ser el siguiente en API Platform: Finance/Commercial u Ops/Reliability?
 - ¿El primer write-safe command debe ser webhook retry/control plane o un command interno de dominio?
 - ¿MCP hosted debe reutilizar `sister_platform_consumers` como client registry o tener una tabla OAuth client separada?
+- ¿Debe regenerarse `docs/architecture/schema-snapshot-baseline.sql` como child task separada antes de migraciones nuevas de API Platform?
+
+## Delta 2026-04-26
+
+- Discovery de implementación detectó supuestos desactualizados y la spec fue corregida antes de abrir child tasks:
+  - API Platform ya tiene commands mutativos, pero sin command/idempotency foundation transversal.
+  - Ecosystem y app lanes usan runtimes de request-log diferentes.
+  - Existen idempotencias domain-local que deben informar el diseño platform-wide.
+  - `schema-snapshot-baseline.sql` no refleja tablas recientes de API Platform.
+  - OpenAPI confunde `externalScopeType` con `greenhouseScopeType`.
+- Cierre documental: se crearon `TASK-650` a `TASK-661` como backlog hijo y `TASK-649` queda complete como umbrella de coordinación.

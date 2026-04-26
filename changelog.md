@@ -2,6 +2,13 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — API Platform Completion Program cerrado documentalmente (TASK-649)
+
+- `TASK-649` queda cerrada como umbrella documental: la API Platform ya tiene backlog hijo ejecutable para completar domains, writes, OAuth hosted y contrato developer-facing.
+- Discovery corrigió supuestos clave: ya existen commands mutativos platform sin idempotencia transversal; app/ecosystem usan runtimes de request-log distintos; hay idempotencia domain-local reutilizable; `schema-snapshot-baseline.sql` está stale para tablas API recientes; OpenAPI confunde `externalScopeType` con `greenhouseScopeType`.
+- Child tasks creadas: `TASK-650` a `TASK-661` cubren domain read surfaces, Finance/Commercial, People/Workforce, Ops/Reliability, Organization Workspace facets, command/idempotency, query conventions, degraded modes, resource authorization bridge, MCP OAuth hosted auth, OpenAPI stable y lifecycle/deprecation policy.
+- Regla operativa: MCP local read-only sigue desbloqueado vía consumer token; MCP hosted/multiusuario queda bloqueado por `TASK-659`.
+
 ### 2026-04-26 — List motion con auto-animate (TASK-526, Slice 2 de TASK-642)
 
 - `@formkit/auto-animate` instalado (~2 KB, zero-config, respeta `prefers-reduced-motion` nativo).

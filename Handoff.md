@@ -1,5 +1,45 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-649 Implementation Discovery
+
+### Que cambio
+
+- `TASK-649` fue tomada, corregida y cerrada documentalmente en `docs/tasks/complete/`.
+- Discovery/auditoría corrigió supuestos de la spec antes de abrir child tasks:
+  - API Platform ya tiene commands mutativos (`webhook-subscriptions`, `webhook-deliveries/:id/retry`, app sessions, notification read), pero no command/idempotency foundation transversal.
+  - App lane usa `greenhouse_core.api_platform_request_logs`; ecosystem lane sigue usando `greenhouse_core.sister_platform_request_logs`.
+  - Existen idempotencias domain-local (`greenhouse_finance`, `greenhouse_notifications`, webhook inbox, commercial deal attempts) que deben informar el diseño shared.
+  - `docs/architecture/schema-snapshot-baseline.sql` está stale para API Platform reciente.
+  - OpenAPI confunde `externalScopeType` con `greenhouseScopeType`.
+- Se crearon child tasks `TASK-650` a `TASK-661` para cerrar los workstreams:
+  - domain read surfaces
+  - Finance/Commercial read surface
+  - People/Workforce read surface
+  - Ops/Reliability read surface
+  - Organization Workspace facets read surface
+  - command/idempotency foundation
+  - query conventions
+  - degraded modes
+  - resource authorization bridge
+  - MCP OAuth hosted auth
+  - OpenAPI stable contract
+  - lifecycle/deprecation policy
+
+### Notas de coordinacion
+
+- No hay blocker para continuar con la umbrella, pero los child workstreams sí tienen gates:
+  - sensitive domain reads -> API Platform authorization bridge
+  - hosted/multi-user MCP -> OAuth model
+  - MCP writes / broader commands -> idempotency + command semantics
+
+### Validaciones
+
+- `git diff --check`
+- `pnpm lint`
+- `pnpm build`
+- `rg "new Pool\(" src --glob '!src/lib/postgres/client.ts'` sin matches fuera del cliente canónico.
+- No hubo migraciones nuevas; `pnpm migrate:up` no aplica para este lote documental.
+
 ## Sesion 2026-04-26 — TASK-649 API Platform Completion Program
 
 ### Que cambio

@@ -724,4 +724,16 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-646` | `to-do` | Scroll-triggered chart entrance + list stagger | `docs/tasks/to-do/TASK-646-scroll-triggered-chart-entrance-stagger.md` |
 | `TASK-647` | `to-do` | Greenhouse MCP Read-Only Adapter V1 | `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md` |
 | `TASK-648` | `to-do` | API Platform ICO Read Surface V1 | `docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md` |
-| `TASK-649` | `to-do` | API Platform Completion Program | `docs/tasks/to-do/TASK-649-api-platform-completion-program.md` |
+| `TASK-649` | `complete` | API Platform Completion Program | `docs/tasks/complete/TASK-649-api-platform-completion-program.md` |
+| `TASK-650` | `to-do` | API Platform Domain Read Surfaces Program | `docs/tasks/to-do/TASK-650-api-platform-domain-read-surfaces-program.md` |
+| `TASK-651` | `to-do` | API Platform Finance / Commercial Read Surface | `docs/tasks/to-do/TASK-651-api-platform-finance-commercial-read-surface.md` |
+| `TASK-652` | `to-do` | API Platform People / Workforce Read Surface | `docs/tasks/to-do/TASK-652-api-platform-people-workforce-read-surface.md` |
+| `TASK-653` | `to-do` | API Platform Ops / Reliability Read Surface | `docs/tasks/to-do/TASK-653-api-platform-ops-reliability-read-surface.md` |
+| `TASK-654` | `to-do` | API Platform Organization Workspace Facets Read Surface | `docs/tasks/to-do/TASK-654-api-platform-organization-workspace-facets-read-surface.md` |
+| `TASK-655` | `to-do` | API Platform Command & Idempotency Foundation | `docs/tasks/to-do/TASK-655-api-platform-command-idempotency-foundation.md` |
+| `TASK-656` | `to-do` | API Platform Query Conventions Foundation | `docs/tasks/to-do/TASK-656-api-platform-query-conventions-foundation.md` |
+| `TASK-657` | `to-do` | API Platform Degraded Modes & Dependency Health | `docs/tasks/to-do/TASK-657-api-platform-degraded-modes-dependency-health.md` |
+| `TASK-658` | `to-do` | API Platform Resource Authorization Bridge | `docs/tasks/to-do/TASK-658-api-platform-resource-authorization-bridge.md` |
+| `TASK-659` | `to-do` | MCP OAuth / Hosted Auth Model | `docs/tasks/to-do/TASK-659-mcp-oauth-hosted-auth-model.md` |
+| `TASK-660` | `to-do` | API Platform OpenAPI Stable Contract | `docs/tasks/to-do/TASK-660-api-platform-openapi-stable-contract.md` |
+| `TASK-661` | `to-do` | API Platform Lifecycle & Deprecation Policy | `docs/tasks/to-do/TASK-661-api-platform-lifecycle-deprecation-policy.md` |
