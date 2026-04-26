@@ -391,6 +391,32 @@ const QuoteContextStrip = ({
     (values.contractDurationMonths ? 1 : 0) +
     (values.validUntil ? 1 : 0)
 
+  // TASK-615: orientación contextual. El progress chip ya no muestra solo
+  // "N de 6 campos"; cuando hay un siguiente paso pendiente, lo nombra. La
+  // secuencia respeta la dependencia real del flujo (organización → contacto
+  // → deal → BL → duración → vigencia) y usa GH_PRICING para todo el copy.
+  const nextStepHint = useMemo<string | null>(() => {
+    if (progressFilled >= progressTotal) return null
+    const steps = GH_PRICING.contextChips.progress.nextSteps
+
+    if (!values.organizationId) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.organization}`
+    if (!values.contactIdentityProfileId) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.contact}`
+    if (!values.hubspotDealId) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.deal}`
+    if (!values.businessLineCode) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.businessLine}`
+    if (!values.contractDurationMonths) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.duration}`
+    if (!values.validUntil) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.validUntil}`
+
+    return null
+  }, [
+    progressFilled,
+    values.organizationId,
+    values.contactIdentityProfileId,
+    values.hubspotDealId,
+    values.businessLineCode,
+    values.contractDurationMonths,
+    values.validUntil
+  ])
+
   // TASK-565: fire a single "attention" pulse on the Deal chip the first time
   // the user picks an organization with no deal attached. Gated by reduced-motion.
   const prefersReduced = useReducedMotion()
@@ -585,6 +611,20 @@ const QuoteContextStrip = ({
               ? GH_PRICING.contextChips.contact.noOrgFirst
               : GH_PRICING.contextChips.contact.placeholder
           }
+
+          /*
+            TASK-615: una vez que la organización entra, contacto y deal
+            comparten el mismo patrón de tensión 'blocking-empty' que ya
+            tenía Deal. Así el setup superior enseña la dependencia visual
+            sin pedirle al header que duplique copy.
+          */
+          status={
+            invalidFields.contactIdentityProfileId
+              ? 'invalid'
+              : values.organizationId && !values.contactIdentityProfileId
+                ? 'blocking-empty'
+                : undefined
+          }
           disabled={disabled || !values.organizationId}
           errorMessage={invalidFields.contactIdentityProfileId}
           options={contactOptions}
@@ -597,6 +637,14 @@ const QuoteContextStrip = ({
             !values.organizationId
               ? GH_PRICING.contextChips.contact.noOrgFirst
               : GH_PRICING.contextChips.contact.empty
+          }
+          popoverNotice={
+            values.organizationId && !values.contactIdentityProfileId && contactOptions.length === 0 && !options.contactsLoading
+              ? {
+                  tone: 'warning',
+                  message: GH_PRICING.contextChips.contact.empty
+                }
+              : undefined
           }
         />
         </Box>
@@ -663,7 +711,13 @@ const QuoteContextStrip = ({
                 filled={progressFilled}
                 total={progressTotal}
                 suffix={GH_PRICING.contextChips.progress.suffix}
-                srLabel={GH_PRICING.contextChips.progress.ariaLive}
+                srLabel={
+                  progressFilled >= progressTotal
+                    ? () => GH_PRICING.contextChips.progress.readyAriaLive
+                    : GH_PRICING.contextChips.progress.ariaLive
+                }
+                readyLabel={GH_PRICING.contextChips.progress.readyLabel}
+                nextStepHint={nextStepHint ?? undefined}
                 testId='quote-context-progress'
               />
             </Box>

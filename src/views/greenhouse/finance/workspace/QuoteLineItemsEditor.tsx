@@ -136,6 +136,11 @@ export interface QuoteLineItemsEditorProps {
   onAddFromCatalog?: () => void
   onAddFromService?: () => void
   onAddFromTemplate?: () => void
+  onAddFromManual?: () => void
+
+  /** TASK-615: nota de bloqueo cuando un upstream chip todavía no está completo
+   *  (ej. organización ausente). Aparece debajo de los CTAs del empty state. */
+  pendingHint?: string | null
 }
 
 const LINE_TYPE_OPTIONS: Array<{ value: QuoteLineItem['lineType']; label: string; color: 'primary' | 'info' | 'success' | 'warning' }> = [
@@ -401,6 +406,8 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
     onAddFromCatalog,
     onAddFromService,
     onAddFromTemplate,
+    onAddFromManual,
+    pendingHint = null,
     quotationId
   },
   ref
@@ -660,6 +667,12 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
 
       {draftLines.length === 0 ? (
         <CardContent>
+          {/*
+            TASK-615 — el empty state ahora ENSEÑA el modelo de composición.
+            Eyebrow + título + 4 method-hints en grid + CTA primario único +
+            CTAs secundarios honestos. El split button del header desaparece
+            mientras estamos aquí, así no compite por la affordance dominante.
+          */}
           <EmptyState
             icon='tabler-file-invoice'
             animatedIcon='/animations/empty-chart.json'
@@ -667,49 +680,125 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
             description={GH_PRICING.emptyItems.subtitle}
             action={
               onAddFromCatalog ? (
-                <Stack direction='row' spacing={1} alignItems='center' useFlexGap>
-                  <Button
-                    variant='contained'
-                    size='small'
-                    startIcon={<i className='tabler-books' aria-hidden='true' />}
-                    onClick={onAddFromCatalog}
-                    disabled={saving}
+                <Stack spacing={3} sx={{ width: '100%', maxWidth: 720, mx: 'auto' }}>
+                  <Box
+                    component='ul'
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                      gap: 1.5,
+                      m: 0,
+                      p: 0,
+                      listStyle: 'none',
+                      textAlign: 'left'
+                    }}
                   >
-                    {GH_PRICING.emptyItems.ctaPrimary}
-                  </Button>
-                  {(onAddFromService || onAddFromTemplate) ? (
-                    <>
-                      <Typography variant='caption' color='text.secondary'>
-                        o
+                    {GH_PRICING.emptyItems.methodHints.map(hint => (
+                      <Box
+                        key={hint.title}
+                        component='li'
+                        sx={theme => ({
+                          display: 'flex',
+                          gap: 1.25,
+                          alignItems: 'flex-start',
+                          p: 1.25,
+                          borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                          backgroundColor: 'action.hover'
+                        })}
+                      >
+                        <Box
+                          component='i'
+                          className={hint.icon}
+                          aria-hidden='true'
+                          sx={{ fontSize: 18, color: 'text.secondary', mt: 0.25, flexShrink: 0 }}
+                        />
+                        <Stack spacing={0.25}>
+                          <Typography variant='body2' sx={{ fontWeight: 600, lineHeight: 1.3 }}>
+                            {hint.title}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.35 }}>
+                            {hint.description}
+                          </Typography>
+                        </Stack>
+                      </Box>
+                    ))}
+                  </Box>
+
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    spacing={1}
+                    alignItems='center'
+                    justifyContent='center'
+                    useFlexGap
+                  >
+                    <Button
+                      variant='contained'
+                      size='small'
+                      startIcon={<i className='tabler-books' aria-hidden='true' />}
+                      onClick={onAddFromCatalog}
+                      disabled={saving}
+                    >
+                      {GH_PRICING.emptyItems.ctaPrimary}
+                    </Button>
+                    {onAddFromService ? (
+                      <Button
+                        variant='text'
+                        size='small'
+                        color='primary'
+                        onClick={onAddFromService}
+                        disabled={saving}
+                      >
+                        {GH_PRICING.emptyItems.ctaSecondary}
+                      </Button>
+                    ) : null}
+                    {onAddFromTemplate ? (
+                      <Button
+                        variant='text'
+                        size='small'
+                        color='primary'
+                        onClick={onAddFromTemplate}
+                        disabled={saving}
+                      >
+                        {GH_PRICING.emptyItems.ctaTertiary}
+                      </Button>
+                    ) : null}
+                    {onAddFromManual ? (
+                      <Button
+                        variant='text'
+                        size='small'
+                        color='secondary'
+                        onClick={onAddFromManual}
+                        disabled={saving}
+                      >
+                        {GH_PRICING.emptyItems.ctaManual}
+                      </Button>
+                    ) : null}
+                  </Stack>
+
+                  {pendingHint ? (
+                    <Stack
+                      direction='row'
+                      spacing={1}
+                      alignItems='center'
+                      justifyContent='center'
+                      role='status'
+                      sx={{ color: 'warning.main' }}
+                    >
+                      <Box
+                        component='i'
+                        className='tabler-alert-circle'
+                        aria-hidden='true'
+                        sx={{ fontSize: 16 }}
+                      />
+                      <Typography variant='caption' sx={{ color: 'warning.main', fontWeight: 500 }}>
+                        {pendingHint}
                       </Typography>
-                      {onAddFromService ? (
-                        <Button
-                          variant='text'
-                          size='small'
-                          color='primary'
-                          onClick={onAddFromService}
-                          disabled={saving}
-                        >
-                          {GH_PRICING.emptyItems.ctaSecondary}
-                        </Button>
-                      ) : null}
-                      {onAddFromTemplate ? (
-                        <Button
-                          variant='text'
-                          size='small'
-                          color='primary'
-                          onClick={onAddFromTemplate}
-                          disabled={saving}
-                        >
-                          {GH_PRICING.emptyItems.ctaTertiary}
-                        </Button>
-                      ) : null}
-                    </>
+                    </Stack>
                   ) : null}
                 </Stack>
               ) : null
             }
-            minHeight={220}
+            minHeight={260}
           />
         </CardContent>
       ) : (

@@ -1,5 +1,55 @@
 # Handoff.md
 
+## Sesion 2026-04-25 — Quote Builder Flow Orchestration & UX Hardening (TASK-615)
+
+### Que cambio
+
+Convergencia UX-only del Quote Builder, sin tocar pricing-engine-v2 ni contratos `/api/finance/quotes/**`. La intencion era unir lo que TASK-505 (dock v2) y TASK-565 (context strip modernization) ya habian dejado materializado en una sola lectura mas guiada del flujo real:
+
+- **Action hierarchy convergence**: `QuoteBuilderShell` deja de duplicar el CTA terminal entre header y dock. El header conserva solo `Cancelar` + `Guardar borrador` (tonal/secondary, size small) con tooltip `saveDraftMeta` que aclara "Solo guarda. Para emitir, usa el resumen abajo." `QuoteSummaryDock` queda como unico centro de gravedad para `Guardar y emitir`.
+- **Disabled CTA explicabilidad**: `QuoteSummaryDock` gana prop `disabledReason` que envuelve el boton contained en `Tooltip` + emite `aria-describedby` con un `<span>` `visuallyHidden`. El shell deriva la razon (busy / simulationError / noOrganization / noLines / notIssueable) desde `GH_PRICING.summaryDock.disabledReasons`.
+- **Guided commercial setup**: `FieldsProgressChip` ahora acepta `nextStepHint` y `readyLabel`. La barra del strip muestra "Sigue: elige una organizacion" / "agrega un contacto" / "vincula un deal" / "asigna una business line" / "define la duracion" / "fija la fecha de validez" en orden de dependencia. Al completar los 6 campos vira a `success.main` con icono check y texto "Lista para emitir". `QuoteContextStrip` propaga `blocking-empty` a contacto cuando hay org pero falta contacto, paralelo al patron que ya tenia deal.
+- **Empty state vs toolbar**: `QuoteLineItemsEditor` deja de renderizar el `AddLineSplitButton` en el `headerAction` cuando `linesSnapshot.length === 0`. El `EmptyState` lleva el peso completo: title + subtitle + grid responsivo (2 columnas en sm+) de 4 method-hints (catalogo / servicio / template / manual) + CTA primario contained + 3 CTAs text + `pendingHint` con `role="status"` cuando falta organizacion. Una vez que existen lineas el split button vuelve al header como acelerador.
+- **Subtitle dinamico**: `QuoteIdentityStrip` recibe subtitle calculado por el shell que enseña el siguiente paso real: `subtitleNeedsOrganization`, `subtitleNeedsContact`, `subtitleNeedsDeal`, `subtitleNeedsLines`, `subtitleReady`, `subtitlePendingApproval`, `subtitleEditingIssued`.
+- **Empty messages del dock**: `GH_PRICING.summaryDock.emptyNoOrganization` / `emptyNoLines` reemplazan el placeholder generico inline.
+- **Copy en español neutro (tuteo, sin voseo)**: todas las nuevas keys agregadas en `src/config/greenhouse-nomenclature.ts` siguen las reglas de `greenhouse-ux-writing` (verbos imperativos tu, sin -á / -é / -í).
+
+### Archivos tocados
+
+- `src/config/greenhouse-nomenclature.ts` — keys nuevas en `identityStrip`, `contextChips.progress`, `summaryDock`, `emptyItems`.
+- `src/components/greenhouse/primitives/FieldsProgressChip.tsx` — props `nextStepHint`, `readyLabel`; render con `tabler-circle-check` cuando ready; layout flex-start cuando hay hint.
+- `src/components/greenhouse/pricing/QuoteSummaryDock.tsx` — prop `disabledReason`; CTA wrap en Tooltip con `aria-describedby`.
+- `src/components/greenhouse/pricing/QuoteContextStrip.tsx` — `nextStepHint` derivado por orden de dependencia; `blocking-empty` en contacto cuando falta contacto pero org esta seleccionada; popoverNotice tone='warning' cuando no hay contactos para la org.
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — header rebalanceado; subtitle dinamico (`useMemo` con 7 estados); `issueDisabledReason` resolver con precedencia (busy → simulationError → noOrganization → noLines → notIssueable); `headerAction` condicional; pasa `pendingHint` al editor.
+- `src/views/greenhouse/finance/workspace/QuoteLineItemsEditor.tsx` — props nuevos `onAddFromManual` + `pendingHint`; empty state expandido con method-hints grid + 4 CTAs + nota de bloqueo con `role="status"`.
+
+### Validaciones
+
+- `pnpm lint` → clean (4 errores `lines-around-comment` autocorregidos).
+- `pnpm build` → ✓ Compiled successfully en 45s.
+- `npx tsc --noEmit` sobre archivos owned → 0 errores. (Hay un error pre-existente en `src/lib/finance/vat-ledger.test.ts` de TASK-639, fuera de scope.)
+
+### Decisiones canonicas
+
+1. **Un solo CTA terminal**. Header y dock no compiten: header solo guarda draft (tonal/secondary), dock guarda y emite (contained/primary).
+2. **Razon visible cuando esta deshabilitado**. Tooltip + `aria-describedby` para que la causa sea verbalizable. No depende de bajo contraste.
+3. **Progress chip cuenta historia, no solo numeros**. `nextStepHint` siempre apunta al siguiente paso bloqueante; `readyLabel` celebra el estado terminal.
+4. **Empty state enseña el modelo de composicion**. Method-hints reemplazan el subtitle generico "agrega items para ver total y margen". Cuando no hay items, el split button del header desaparece para no duplicar la affordance.
+5. **No abrimos primitives nuevos**. Reutilizamos `ContextChip.popoverNotice`, `FieldsProgressChip` (extension additive), `Tooltip` MUI, `EmptyState` actual. Spec exigia consolidar lo de TASK-505 y TASK-565, no abrir otra familia.
+
+### Verificacion visual pendiente (follow-up del usuario)
+
+- `/finance/quotes/new` — confirmar que el header ya no duplica CTA, que el subtitle cambia conforme el usuario completa campos, que el empty state muestra los 4 method-hints, y que la nota de bloqueo aparece cuando no hay org seleccionada.
+- `/finance/quotes/[id]/edit` — confirmar que el subtitle muestra `subtitleEditingIssued` para cotizaciones ya emitidas, y que el dock CTA queda con tooltip explicativo cuando esta deshabilitado.
+
+### Out of scope (queda como follow-up)
+
+- Migracion del `AddLineSplitButton` y popovers a Floating UI (programa platform-wide).
+- IA asistiva sobre el builder (TASK-609).
+- Eyebrow real en `EmptyState` (requiere extender el primitive; preserve la key en nomenclature por si se decide despues).
+
+---
+
 ## Sesion 2026-04-25 — Reliability AI Observer (TASK-638) — Capa Gemini sobre el RCP
 
 ### Que cambio

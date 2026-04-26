@@ -8,8 +8,10 @@ import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
+import { visuallyHidden } from '@mui/utils'
 
 import {
   MarginHealthChip,
@@ -60,6 +62,15 @@ export interface QuoteSummaryDockProps {
    * (ej. sin ítems agregados). Si está presente, reemplaza el bloque de
    * totales por una leyenda informativa. */
   emptyStateMessage?: string | null
+
+  /**
+   * TASK-615: razón humana cuando el CTA terminal está deshabilitado.
+   *
+   * Se inyecta como tooltip arriba del botón y como `aria-describedby` para
+   * que la causa esté visible y verbalizable. Si `primaryCtaDisabled === true`
+   * pero no hay reason, el botón cae al placeholder genérico.
+   */
+  disabledReason?: string | null
 }
 
 /**
@@ -102,7 +113,8 @@ const QuoteSummaryDock = ({
   appliedAddonsTotal,
   saveState,
   simulationError,
-  emptyStateMessage
+  emptyStateMessage,
+  disabledReason
 }: QuoteSummaryDockProps) => {
   // Guarda la diferencia clave del "before/after" para re-animar counter sólo cuando el valor cambia material
   const lastTotalRef = useRef<number | null>(null)
@@ -222,22 +234,51 @@ const QuoteSummaryDock = ({
               </Button>
             ) : null}
 
-            <Button
-              variant='contained'
-              size='medium'
-              onClick={onPrimaryClick}
-              disabled={primaryCtaDisabled || primaryCtaLoading}
-              startIcon={
-                primaryCtaLoading ? (
-                  <CircularProgress size={16} color='inherit' aria-label='Cargando' />
-                ) : primaryCtaIcon ? (
-                  <i className={primaryCtaIcon} aria-hidden='true' />
-                ) : undefined
+            {(() => {
+              const isDisabled = primaryCtaDisabled || primaryCtaLoading
+              const reasonId = 'quote-summary-dock-cta-reason'
+
+              const button = (
+                <Button
+                  variant='contained'
+                  size='medium'
+                  onClick={onPrimaryClick}
+                  disabled={isDisabled}
+                  aria-describedby={isDisabled && disabledReason ? reasonId : undefined}
+                  startIcon={
+                    primaryCtaLoading ? (
+                      <CircularProgress size={16} color='inherit' aria-label='Cargando' />
+                    ) : primaryCtaIcon ? (
+                      <i className={primaryCtaIcon} aria-hidden='true' />
+                    ) : undefined
+                  }
+                  sx={{ minHeight: 44, fontWeight: 600 }}
+                >
+                  {primaryCtaLabel}
+                </Button>
+              )
+
+              if (isDisabled && disabledReason) {
+                return (
+                  <>
+                    {/*
+                      Wrap is required for Tooltip on disabled buttons; sx={{ display: 'inline-flex' }}
+                      respeta el flex layout sin agregar relayout extra.
+                    */}
+                    <Tooltip title={disabledReason} placement='top'>
+                      <Box component='span' sx={{ display: 'inline-flex' }}>
+                        {button}
+                      </Box>
+                    </Tooltip>
+                    <Box component='span' id={reasonId} sx={visuallyHidden}>
+                      {disabledReason}
+                    </Box>
+                  </>
+                )
               }
-              sx={{ minHeight: 44, fontWeight: 600 }}
-            >
-              {primaryCtaLabel}
-            </Button>
+
+              return button
+            })()}
           </Stack>
         </Grid>
       </Grid>

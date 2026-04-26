@@ -1911,7 +1911,19 @@ export const GH_PRICING = {
     numberPlaceholder: 'Q-NUEVO',
     validUntilLabel: 'Válida hasta',
     validUntilEmpty: 'Sin fecha',
-    ariaLabel: 'Identidad de la cotización'
+    ariaLabel: 'Identidad de la cotización',
+
+    // TASK-615: dynamic subtitle that mirrors the next required step.
+    // Header conserva identidad y save draft; el dock es el único centro
+    // de la acción terminal.
+    subtitleReady: 'Lista para emitir desde el resumen.',
+    subtitleNeedsLines: 'Agrega ítems desde el detalle para calcular el total.',
+    subtitleNeedsOrganization: 'Selecciona la organización para destrabar el flujo.',
+    subtitleNeedsContact: 'Falta un contacto comercial para poder emitir.',
+    subtitleNeedsDeal: 'Vincula un deal de HubSpot para esta cotización.',
+    subtitleEditingIssued: 'Estás ajustando una cotización ya emitida.',
+    subtitlePendingApproval: 'En aprobación: el cierre se libera al recibir respuesta.',
+    saveDraftMeta: 'Solo guarda. Para emitir, usa el resumen abajo.'
   },
   contextChips: {
     ariaLabel: 'Contexto de la cotización',
@@ -1988,6 +2000,18 @@ export const GH_PRICING = {
     },
     progress: {
       suffix: (total: number) => `de ${total} campos`,
+      readyLabel: 'Lista para emitir',
+      readyAriaLive: 'Cotización lista. Puedes guardar y emitir desde el resumen.',
+      nextStepPrefix: 'Sigue:',
+      nextSteps: {
+        organization: 'elige una organización',
+        contact: 'agrega un contacto',
+        deal: 'vincula un deal',
+        businessLine: 'asigna una business line',
+        duration: 'define la duración',
+        validUntil: 'fija la fecha de validez',
+        lines: 'agrega ítems al detalle'
+      } as const,
       ariaLive: (filled: number, total: number) => {
         const percent = total > 0 ? Math.round((filled / total) * 100) : 0
         const missing = Math.max(0, total - filled)
@@ -2015,7 +2039,20 @@ export const GH_PRICING = {
     loadingLabel: 'Calculando…',
     collapsedLabelPrefix: 'Total',
     collapsedExpandLabel: 'Ver detalle',
-    mobileTotalLabel: 'Total de la cotización'
+    mobileTotalLabel: 'Total de la cotización',
+
+    // Empty / partial state copy — instructive, secuencial, no genérico.
+    emptyNoOrganization: 'Elige una organización para empezar a calcular el total.',
+    emptyNoLines: 'Agrega al menos un ítem para ver subtotal, IVA y margen.',
+
+    // Disabled-CTA reasons — el dock las expone como tooltip y aria-describedby.
+    disabledReasons: {
+      busy: 'Estamos guardando los últimos cambios. Espera un instante.',
+      noLines: 'Agrega al menos un ítem antes de emitir.',
+      noOrganization: 'Selecciona la organización para poder emitir.',
+      notIssueable: 'Esta cotización ya no se puede emitir desde el builder.',
+      simulationError: 'Resuelve los avisos del motor antes de emitir.'
+    }
   },
   addMenu: {
     triggerLabel: 'Agregar ítem',
@@ -2035,11 +2072,40 @@ export const GH_PRICING = {
     dismissLabel: 'Ocultar advertencia'
   },
   emptyItems: {
-    title: 'Comencemos la cotización',
-    subtitle: 'Agrega ítems para ver el total y el margen calculados en tiempo real.',
+    eyebrow: 'Detalle de la cotización',
+    title: 'Compón el alcance con ítems del catálogo',
+    subtitle: 'Cada ítem se procesa con el motor de pricing v2: total, margen y addons se calculan en tiempo real.',
+
+    // Method hints — ensenan el modelo de composicion (catalog / service /
+    // template / manual) sin un placeholder generico "empezar".
+    methodHints: [
+      {
+        icon: 'tabler-books',
+        title: 'Desde catálogo',
+        description: 'Roles, herramientas y overhead aprobados con tarifa vigente.'
+      },
+      {
+        icon: 'tabler-package',
+        title: 'Servicio empaquetado',
+        description: 'Un EFG-XXX expande roles, horas y duración en un solo paso.'
+      },
+      {
+        icon: 'tabler-template',
+        title: 'Template guardado',
+        description: 'Reutiliza una cotización validada y ajusta los detalles.'
+      },
+      {
+        icon: 'tabler-edit',
+        title: 'Línea manual',
+        description: 'Solo cuando lo que cobras todavía no existe en el catálogo.'
+      }
+    ] as const,
+
     ctaPrimary: 'Agregar desde catálogo',
     ctaSecondary: 'Desde servicio empaquetado',
-    ctaTertiary: 'Desde template'
+    ctaTertiary: 'Desde template',
+    ctaManual: 'Crear línea manual',
+    pendingNote: (label: string) => `Aún falta ${label} antes de poder emitir.`
   },
   adjustPopover: {
     triggerLabel: 'Ajustes de pricing',
