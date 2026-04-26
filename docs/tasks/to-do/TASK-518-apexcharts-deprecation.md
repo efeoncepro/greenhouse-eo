@@ -1,5 +1,23 @@
 # TASK-518 — ApexCharts deprecation; consolidate all charts on Recharts
 
+## Delta 2026-04-26 (rev2) — DESCARTADA por priorización de impacto visual
+
+**Decisión revisada 2026-04-26 (corrige decisión previa del mismo día)**: la migración masiva a Recharts **se descarta**, no solo se difiere. Razón: Greenhouse prioriza **impacto visual** (wow factor, enganche en dashboards) sobre bundle/a11y/ecosystem. Recharts sin una capa custom `GhChart` se ve menos atractivo que el Apex actual — migrar bajaría el tier visual del portal, lo opuesto a lo deseado.
+
+**Nueva política canónica de charts** (fijada en CLAUDE.md y AGENTS.md):
+
+1. **ECharts** (Apache, vía `echarts-for-react`) es el stack canónico para vistas nuevas con dashboards de alto impacto. Wow factor 10/10, cobertura asombrosa (sankey, sunburst, heatmap, geo, calendar). Bundle mitigado con lazy-load por ruta.
+2. **ApexCharts** se mantiene como **segundo tier oficial vigente** — no es deuda técnica. Los 32 archivos actuales siguen activos sin deadline. Migración Apex → ECharts es **oportunista** cuando se toca la vista Y se busca subir el tier visual.
+3. **Recharts** no es default para vistas nuevas. Reservado solo para sparklines compactos en KPI cards o cuando explícitamente no se necesita impacto visual.
+
+**TASK-518 queda CERRADA como "won't do"** en su forma original (migración masiva a Recharts). Si en el futuro Greenhouse pivotea a un stack que requiera SVG-first/a11y por contrato (ej. cliente enterprise con WCAG), se reabrirá una task nueva con destino ECharts o Recharts+`GhChart`, no la actual.
+
+**Trigger conditions para reactivar bajo destino distinto**:
+
+1. Cliente enterprise levanta requirement de a11y por contrato (ECharts también es canvas — habría que evaluar Recharts+`GhChart`).
+2. Reporte de TTI lento en mobile causado por bundle (ECharts pesa más que Apex — habría que evaluar Recharts+`GhChart`).
+3. Decisión estratégica de adoptar ecosystem Tremor/shadcn (requiere migrar primero a Tailwind, gran refactor).
+
 ## Delta 2026-04-26 — diferida; estrategia "migración oportunista"
 
 **Audit 2026-04-26**: el portal está hoy **100% en ApexCharts** (32 archivos consumen `react-apexcharts`/`AppReactApexCharts`). Recharts está en `package.json` desde hace tiempo pero **0 callsites en views** — solo existe el re-export `src/libs/Recharts.tsx`. La premisa original ("convivir 2 chart libs es deuda técnica") era teórica; en runtime no hay coexistencia.
