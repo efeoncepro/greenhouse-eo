@@ -92,6 +92,8 @@ Indice maestro de la documentacion no operativa del repo.
 - [RESEARCH-002-staff-augmentation-enterprise-module.md](research/RESEARCH-002-staff-augmentation-enterprise-module.md)
 - [RESEARCH-003-hiring-desk-reactive-ecosystem.md](research/RESEARCH-003-hiring-desk-reactive-ecosystem.md)
 - [RESEARCH-004-space-identity-consolidation.md](research/RESEARCH-004-space-identity-consolidation.md)
+- [RESEARCH-006-delivery-task-member-attribution.md](research/RESEARCH-006-delivery-task-member-attribution.md)
+- [RESEARCH-007-commercial-public-tenders-module.md](research/RESEARCH-007-commercial-public-tenders-module.md)
 
 ### Operations
 
