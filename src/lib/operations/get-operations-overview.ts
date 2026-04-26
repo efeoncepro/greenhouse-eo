@@ -396,21 +396,40 @@ const buildNotionDeliveryDataQualitySubsystem = (
   }
 
   const latestRun = overview.recentRuns[0]?.checkedAt ?? null
+
+  // Auto-recoverable spaces (only `fresh_raw_after_conformed_sync` lag) are
+  // *expected* eventual consistency, not incidents. They count toward `failed`
+  // for visibility but never escalate the subsystem to `down` — the upstream
+  // conformed sync will catch up on its own.
+  const manualBrokenSpaces = Math.max(
+    0,
+    overview.totals.brokenSpaces - (overview.totals.autoRecoverableSpaces ?? 0)
+  )
+
   const failed = overview.totals.brokenSpaces + overview.totals.degradedSpaces
 
   const status: OperationsHealthStatus =
-    overview.totals.brokenSpaces > 0
+    manualBrokenSpaces > 0
       ? 'down'
-      : overview.totals.degradedSpaces > 0 || overview.totals.unknownSpaces > 0
+      : overview.totals.brokenSpaces > 0 || overview.totals.degradedSpaces > 0 || overview.totals.unknownSpaces > 0
         ? 'degraded'
         : 'healthy'
+
+  const autoRecoverable = overview.totals.autoRecoverableSpaces ?? 0
+
+  const summary = manualBrokenSpaces > 0
+    ? `${manualBrokenSpaces} space(s) requieren intervención${autoRecoverable > 0 ? ` · ${autoRecoverable} con lag auto-recuperable` : ''}`
+    : autoRecoverable > 0
+      ? `${autoRecoverable} con lag auto-recuperable (conformed sync se pondrá al día)`
+      : null
 
   return {
     name: 'Notion Delivery Data Quality',
     status,
     processed: overview.totals.totalSpaces,
     failed,
-    lastRun: latestRun
+    lastRun: latestRun,
+    summary
   }
 }
 
