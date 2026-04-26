@@ -2327,6 +2327,10 @@ export interface GreenhouseCoreReliabilityModuleRegistry {
   domain: string;
   expected_signal_kinds: Generated<Json>;
   files_owned: Generated<Json>;
+  /**
+   * Sentry tag value used to filter incidents per module (e.g. 'finance', 'cloud'). NULL means the module does not consume domain-tagged Sentry incidents.
+   */
+  incident_domain_tag: string | null;
   label: string;
   module_key: string;
   routes: Generated<Json>;
