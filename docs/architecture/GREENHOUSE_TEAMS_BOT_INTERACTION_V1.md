@@ -1,11 +1,29 @@
 # GREENHOUSE_TEAMS_BOT_INTERACTION_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-04-26 por TASK-671 (Claude)
-> **Última actualización:** 2026-04-26 por TASK-671 (Claude) — bump a v1.1 con path correcto Bot Framework Connector + lessons learned del deploy
+> **Última actualización:** 2026-04-26 por TASK-671 (Claude) — bump a v1.2 con cutover ejecutado + dispatcher con region failover/cache/circuit breaker + sinergia con Notification Hub
 > **Estado:** vigente
-> **Spec relacionada:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.1
+> **Specs relacionadas:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.2 (transport), `GREENHOUSE_NOTIFICATION_HUB_V1.md` (orquestador upstream — TASK-690)
+
+## Delta v1.2 (2026-04-26 — cutover real + robustness baked-in + sinergia)
+
+- **Cutover ejecutado.** Los 3 canales productivos disparan vía Bot Framework Connector. Smoke real: 3/3 HTTP 200, durations 420-470ms, transport=bot_framework registrado en `source_sync_runs`.
+- **Refactor del dispatcher** (`src/lib/integrations/teams/bot-framework/`):
+  - `connector-client.ts` (renombrado de `graph-client.ts`) con region failover, retries con jitter, timeout 8 s.
+  - `token-cache.ts` con doble audience (BF Connector + Graph) cacheado por `(tenantId, clientId, scope)`.
+  - `conversation-references.ts` — cache 2 niveles (in-memory Map TTL 5 min + tabla nueva `greenhouse_core.teams_bot_conversation_references`). `failure_count >= 3` trip circuit breaker, self-healing on next success.
+  - `sender.ts` rewrite con cache lookup en hot path → `recordReferenceSuccess` on ok / `markReferenceFailure` on error con razón redactada.
+- **Manifest v1.0.5** publicado: 4 RSC scopes (`ChannelMessage.Send.Group`, `TeamsActivity.Send.Group`, `TeamsAppInstallation.Read.Group`, `Chat.Manage.Chat`) + `webApplicationInfo` (requerido cuando hay RSC).
+- **Sinergia con Notification Hub** (TASK-690 propuesta):
+  - El Hub trata el dispatcher Teams como UN adapter más (`teams_channel`, `teams_dm`).
+  - El handler `notification.mark_read` del action-registry actualiza `notification_intents.status='acknowledged'` cuando esté implementado el Hub — hoy es no-op pendiente.
+  - El handler `ops.alert.snooze` actualiza `notification_intents.status='superseded'` para que el router de notificaciones del Hub skipee envíos siguientes del mismo `correlation_id` para ese member.
+  - `recipient_kind='dynamic_user'` (que TASK-671 ya soporta) es el mecanismo que el Hub usa para los DMs 1:1 sin crear filas estáticas en `teams_notification_channels`.
+- **Skill canónica** `teams-bot-platform` publicada en 3 ubicaciones (global + repo Claude + repo Codex) con runbook day-1 + 4 HARD RULES + diagnosis cheatsheet de 8+ síntomas/causas. Cualquier futuro bot de Teams arranca de ahí.
+
+## Delta v1.1 (2026-04-26 — verificado en producción)
 
 ## Delta v1.1 (2026-04-26 — verificado en producción)
 

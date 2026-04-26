@@ -1,12 +1,26 @@
 # GREENHOUSE_TEAMS_NOTIFICATIONS_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-04-26 por TASK-669 (Claude)
-> **Última actualización:** 2026-04-26 por TASK-671 (Claude)
+> **Última actualización:** 2026-04-26 por TASK-671 (Claude) — bump a v1.2 con cutover real ejecutado, path Connector verificado y link al Notification Hub
 > **Estado:** vigente
+> **Spec relacionada:** `GREENHOUSE_NOTIFICATION_HUB_V1.md` (orquestador upstream que decide qué eventos llegan a este transport)
 
-## Delta v1.1 (2026-04-26 — TASK-671)
+## Delta v1.2 (2026-04-26 — TASK-671 cutover ejecutado)
+
+- **Cutover completado.** Los 3 canales productivos (`ops-alerts`, `finance-alerts`, `delivery-pulse`) flippeados a `channel_kind='teams_bot'` con `bot_app_id`, `team_id`, `channel_id`, `secret_ref='greenhouse-teams-bot-client-credentials'`. `finance-alerts` salió de `pending_setup`. Mapping definitivo:
+  - `ops-alerts` → EO - Admin / EO - Admin
+  - `finance-alerts` → EO - Admin / EO - Admin (hasta crear team Finance dedicado)
+  - `delivery-pulse` → Growth Marketing / Alineación
+- **Smoke real confirmado** vía `pnpm staging:request POST /api/admin/teams/test`: 3/3 canales devolvieron HTTP 200 (`durationMs ~ 420-470ms`, `attempts=1`). `source_sync_runs` con notes `transport=bot_framework; surface=channel`.
+- **Path verificado en producción NO es Microsoft Graph.** El dispatcher `teams_bot` usa **Bot Framework Connector API** (`smba.trafficmanager.net/teams/v3/conversations`, audience `https://api.botframework.com`). Microsoft Graph `POST /v1.0/teams/{}/channels/{}/messages` con app token rechaza con `Forbidden — Teamwork.Migrate.All required` (esa scope es exclusiva de migración). Detalles completos y diagnosis cheatsheet en `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.1.
+- **Robustness baked-in en el dispatcher:** region failover (`/teams → /amer → /emea → /apac`), conversation reference cache 2-niveles (in-process Map TTL 5 min + tabla nueva `greenhouse_core.teams_bot_conversation_references`), circuit breaker per-target (`failure_count >= 3` invalida la cache row), retries con jitter en 429/5xx (respeta `Retry-After` cap 30s), token cache por `(tenantId, clientId, scope)` con margen 60 s pre-expiry.
+- **Manifest definitivo v1.0.5** en Teams Admin Center con 4 RSC scopes (Channel/TeamsActivity Send.Group, TeamsAppInstallation.Read.Group, Chat.Manage.Chat) + `webApplicationInfo` requerido. Validador oficial reporta 62 passed, 0 failed. Bot instalado y consentido en Growth Marketing y EO - Admin.
+- **IAM operacional:** `roles/secretmanager.secretAccessor` para `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` sobre `greenhouse-teams-bot-client-credentials`. Sin esto el runtime cachea negativo 60 s y devuelve `missing_secret`.
+- **Skill canónica:** `teams-bot-platform` publicada en `~/.claude/skills/`, `.claude/skills/`, `.codex/skills/` con runbook day-1 + 4 HARD RULES + diagnosis cheatsheet. Reusable para cualquier futuro bot de Teams.
+
+## Delta v1.1 (2026-04-26 — TASK-671 diseño inicial)
 
 - El trigger condicional declarado en v1.0 ("Bot Framework si surge `Action.Submit` interactivo o multi-tenant externo") se cumplió con el alcance interno: TASK-671 entregó dispatcher `teams_bot` con soporte para canales, chats 1:1 estáticos, group chats fijos y `dynamic_user` (DM resuelto al runtime desde el payload del evento). Logic Apps queda como path V1 vigente para los 3 canales actuales hasta que IT Admin ejecute el cutover (runbook en `docs/operations/azure-teams-bot.md`).
 - Schema enriquecido en migración `20260426202326023_extend-teams-notification-channels-recipient-kind.sql`: nuevas columnas `recipient_kind` (`channel|chat_1on1|chat_group|dynamic_user`), `recipient_user_id`, `recipient_chat_id`, `recipient_routing_rule_json`. CHECK compuesto que solo aplica cuando `channel_kind != 'azure_logic_app'` (preserva compatibilidad de los seeds Logic App).

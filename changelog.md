@@ -2,6 +2,21 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — TASK-690 Notification Hub Architecture Contract + sinergia con TASK-671
+
+Spec arquitectónica `GREENHOUSE_NOTIFICATION_HUB_V1.md` v1.0 publicada. Unifica las 3 superficies de notificación (in-app bell, email, Microsoft Teams) detrás de un solo registry de intents + router con preferencias por persona + adapters por canal. Aprovecha la infraestructura ya en producción de TASK-669 (channel registry transport-agnostic) + TASK-671 (Bot Framework Connector + Action.Submit + cache de conv refs) para que Teams sea adapter de primera clase con DMs 1:1, cards interactivas, y feedback bidireccional que cierra el loop en TODAS las superficies (mark-read en Teams sincroniza la bell del portal y skipea el follow-up email).
+
+Sin breakage: las 3 projections existentes siguen vigentes; el Hub se activa incrementalmente en 4 fases.
+
+- TASK-690 (este task) entrega 3 tablas (`notification_intents`, `notification_deliveries`, `notification_preferences`) + router pure function + 4 adapters skeleton + templating unificado + Reliability Control Plane hookup (módulo `notifications.hub`) + doc funcional. Sin tocar ningún emisor.
+- TASK-691 (follow-up) shadow mode: dual-write 1 semana para validar parity.
+- TASK-692 (follow-up) cutover: invertir flow, deprecar projections viejas.
+- TASK-693 (follow-up) bidireccional + UI: Action.Submit handlers reales cierran loop, settings UI con Vuexy primitives.
+
+Bumps complementarios:
+- `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.1 → v1.2 con Delta del cutover real ejecutado (3/3 canales OK, path Connector verificado, mapping team/channel, IAM grant, manifest v1.0.5).
+- `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.1 → v1.2 con Delta del dispatcher refactor (region failover + cache 2-niveles + circuit breaker + tabla `teams_bot_conversation_references`) + sinergia explícita con el Hub.
+
 ### 2026-04-26 — TASK-671 Greenhouse Teams Bot Platform (Bot Framework + Microsoft Graph) — code complete
 
 Canal interactivo bidireccional con Microsoft Teams basado en Bot Framework + Microsoft Graph, sibling enriquecido del canal Logic Apps (TASK-669). Habilita postear con identidad `Greenhouse` (sin attribution "via Workflows"), routing a canales / chats 1:1 / group chats / DMs dinámicos resueltos por payload, y `Action.Submit` server-side para aprobaciones, snooze de alertas y mark-as-read inline desde el card.

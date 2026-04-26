@@ -765,3 +765,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-687` | `to-do` | Public Tender Notifications And Reliability Signals | `docs/tasks/to-do/TASK-687-public-tender-notifications-reliability.md` |
 | `TASK-688` | `to-do` | Public Tender Submission Control Room Without API-Side Posting | `docs/tasks/to-do/TASK-688-public-tender-submission-control-room.md` |
 | `TASK-689` | `to-do` | Mercado Publico Companion Extension Research Spike | `docs/tasks/to-do/TASK-689-mercado-publico-companion-extension-research.md` |
+| `TASK-690` | `to-do` | Notification Hub Architecture Contract | `docs/tasks/to-do/TASK-690-notification-hub-architecture-contract.md` |

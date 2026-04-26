@@ -20248,3 +20248,25 @@ Quedan SOLO los siguientes pasos (no blockers, planificacion):
 4. Cierre formal de TASK-671 — mover archivo de `in-progress/` a `complete/` ahora que cutover esta hecho y validado por smoke real.
 
 Skill `teams-bot-platform` publicado en 3 ubicaciones (~/.claude, .claude/, .codex/) con runbook day-1, 4 HARD RULES, diagnosis cheatsheet de 8 sintomas/causas, y referencias a los archivos canonicos del Greenhouse stack. Disponible para Claude (global + repo) y Codex (repo).
+
+## Sesion 2026-04-26 — Notification Hub V1 contract + TASK-690 + bumps de specs Teams
+
+Documentacion de arquitectura completada y sinergia mapeada para que el bot de Teams (TASK-671) deje de ser una superficie aislada y pase a ser un adapter de primera clase del sistema unificado de notificaciones de Greenhouse.
+
+Archivos creados:
+
+- `docs/architecture/GREENHOUSE_NOTIFICATION_HUB_V1.md` v1.0 — contrato canonico que unifica las 3 superficies (in-app, email, Teams) detras de un solo registry de intents + router con preferencias por persona + adapters por canal. 12 secciones cubriendo modelo de dominio, 3 tablas (`notification_intents`, `notification_deliveries`, `notification_preferences`), interfaces TypeScript, sinergia con TASK-671 (DM via `recipient_kind=dynamic_user`, Action.Submit cierra loop via `acknowledgeIntent`), reliability hookup, casos piloto, fases de implementacion incremental (4 fases), reglas duras, out of scope V1.
+- `docs/tasks/to-do/TASK-690-notification-hub-architecture-contract.md` — task de tipo `architecture` que entrega el contrato + 3 tablas + router pure function + 4 adapters skeleton + templating + reliability hookup + doc funcional, sin tocar ningun emisor existente. Acceptance criteria explicito, 7 slices ordenados, follow-ups TASK-691/692/693 declarados.
+
+Bumps a specs existentes:
+
+- `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.1 → v1.2 con Delta del cutover real ejecutado (3/3 canales OK), confirmacion de path Connector verificado, mapping definitivo team/channel, IAM grant aplicado, manifest v1.0.5, skill canonica publicada, link a Notification Hub V1.
+- `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.1 → v1.2 con Delta del refactor del dispatcher (region failover + cache 2-niveles + circuit breaker + tabla `teams_bot_conversation_references`) + sinergia explicita con el Hub (handlers `mark_read`/`snooze` actualizan `notification_intents.status`, adapter `teams_dm` reusa `dynamic_user`).
+
+Fases siguientes (TASK-691, TASK-692, TASK-693) declaradas como follow-ups en TASK-690 y se crearan al cerrar TASK-690:
+
+- TASK-691 Notification Hub Shadow Mode — dual-write 1 semana para validar parity sin breakage.
+- TASK-692 Notification Hub Cutover — invertir flow, deprecar projections viejas.
+- TASK-693 Notification Hub Bidireccional + UI Preferences — Action.Submit handlers reales cierran loop, settings UI con Vuexy.
+
+Registry sincronizado: `TASK_ID_REGISTRY.md` y `docs/tasks/README.md` actualizados con TASK-690.
