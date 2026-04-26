@@ -85,6 +85,16 @@ const normalizeCredentialString = (value: string) =>
     .replace(/\\n/g, '\n')
     .trim()
 
+const normalizeOptionalCredentialEnv = (value: string | undefined) => {
+  if (!value?.trim()) {
+    return undefined
+  }
+
+  const normalized = stripWrappingQuotes(value).trim()
+
+  return normalized ? normalized : undefined
+}
+
 const normalizePrivateKey = (value: string) => {
   const normalized = normalizeCredentialString(value)
 
@@ -199,8 +209,8 @@ const normalizeWorkloadIdentityProvider = (value: string) => {
 const normalizeWorkloadIdentityAudience = (value: string) => `//iam.googleapis.com/${normalizeWorkloadIdentityProvider(value)}`
 
 const getServiceAccountKeyCredentials = (env: NodeJS.ProcessEnv = process.env) => {
-  const rawCredentials = env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.trim()
-  const rawCredentialsBase64 = env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64?.trim()
+  const rawCredentials = normalizeOptionalCredentialEnv(env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
+  const rawCredentialsBase64 = normalizeOptionalCredentialEnv(env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64)
 
   if (!rawCredentials && !rawCredentialsBase64) {
     return undefined
@@ -322,11 +332,6 @@ export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) 
 
 export const getGoogleCredentialSource = (env: NodeJS.ProcessEnv = process.env): GoogleCredentialSource => {
   const preference = getGoogleCredentialPreference(env)
-  const serviceAccountCredentials = getServiceAccountKeyCredentials(env)
-
-  if (preference === 'service_account_key' && serviceAccountCredentials) {
-    return 'service_account_key'
-  }
 
   if (preference === 'ambient_adc') {
     return 'ambient_adc'
@@ -334,6 +339,12 @@ export const getGoogleCredentialSource = (env: NodeJS.ProcessEnv = process.env):
 
   if (shouldUseWorkloadIdentity(env)) {
     return 'wif'
+  }
+
+  const serviceAccountCredentials = getServiceAccountKeyCredentials(env)
+
+  if (preference === 'service_account_key' && serviceAccountCredentials) {
+    return 'service_account_key'
   }
 
   if (serviceAccountCredentials) {
@@ -362,12 +373,15 @@ export const getGoogleCredentialDiagnostics = (env: NodeJS.ProcessEnv = process.
 export const getGoogleCredentials = (env: NodeJS.ProcessEnv = process.env) => getServiceAccountKeyCredentials(env)
 
 export const getGoogleProjectId = (env: NodeJS.ProcessEnv = process.env) => {
+  const explicitProjectId = env.GCP_PROJECT?.trim() || env.GOOGLE_CLOUD_PROJECT?.trim()
+
+  if (explicitProjectId) {
+    return explicitProjectId
+  }
+
   const credentials = getServiceAccountKeyCredentials(env)
 
-  const projectId =
-    env.GCP_PROJECT?.trim() ||
-    env.GOOGLE_CLOUD_PROJECT?.trim() ||
-    (typeof credentials?.project_id === 'string' ? normalizeCredentialString(credentials.project_id) : undefined)
+  const projectId = typeof credentials?.project_id === 'string' ? normalizeCredentialString(credentials.project_id) : undefined
 
   if (!projectId) {
     throw new Error('Missing GCP_PROJECT or GOOGLE_CLOUD_PROJECT environment variable')

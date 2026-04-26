@@ -7,6 +7,8 @@
 - El carril conserva el contrato robusto source → raw BigQuery → conformed BigQuery → PostgreSQL; no inserta cotizaciones directo en `greenhouse_finance.quotes`.
 - Observabilidad: `greenhouse_sync.source_sync_runs.source_object_type='quotes_hot_sync'`.
 - Variable opcional: `NUBOX_QUOTES_HOT_WINDOW_MONTHS` controla la ventana caliente de meses (default 2, max 6).
+- Credenciales Nubox: `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` deben preferir Secret Manager via `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF`; las refs quedaron provisionadas para Development, Preview, Staging y Production.
+- El script operativo acepta env explícito para replay controlado: `pnpm sync:nubox:quotes-hot -- --env-file=/path/to/env --period=YYYY-MM`.
 
 ## Delta 2026-04-26 API Platform incorpora Event Control Plane
 
@@ -1975,7 +1977,7 @@
 ## Delta 2026-03-30 Nubox DTE download hardening
 
 - `IncomeDetailView` ahora reutiliza `nuboxPdfUrl` y `nuboxXmlUrl` directos cuando el sync ya los materializó, en vez de forzar siempre el proxy server-side de descarga.
-- `src/lib/nubox/client.ts` normaliza `NUBOX_API_BASE_URL` y `NUBOX_X_API_KEY` con `trim()` y envía `Accept` explícito para descargas `pdf/xml`.
+- `src/lib/nubox/client.ts` normaliza `NUBOX_API_BASE_URL`, resuelve `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` por `Secret Manager -> env fallback`, y envía `Accept` explícito para descargas `pdf/xml`.
 - Esto reduce fallos `401` en staging cuando el detalle intentaba descargar PDF/XML por el carril proxy aun teniendo URLs directas ya disponibles.
 
 ## Delta 2026-03-30 Finance read identity drift hardening
@@ -3480,7 +3482,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - Total: $163,820,646 CLP
   - Tipos: `service_fee` (facturas), `credit_note` (notas de crédito negativas), `quote` (cotizaciones), `debit_note`
   - 0 huérfanos: todos los ingresos tienen `client_id` válido
-- Credenciales almacenadas en `.env.local`: `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN`, `NUBOX_X_API_KEY`
+- Credenciales runtime bajo contrato actual: `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` deben vivir preferentemente en Secret Manager via `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF`; `.env.local` queda solo para desarrollo/fallback.
 - Task brief creado: `docs/tasks/to-do/CODEX_TASK_Nubox_DTE_Integration.md` (8 fases, bidireccional)
 - Script de descubrimiento: `scripts/nubox-extractor.py`
 - Regla operativa derivada:

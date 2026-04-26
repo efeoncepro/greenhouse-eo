@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Nubox Secret Manager hardening
+
+### Que cambio
+
+- `src/lib/nubox/client.ts` ahora resuelve `NUBOX_X_API_KEY` con el mismo helper canonico que `NUBOX_BEARER_TOKEN`: `Secret Manager -> env fallback -> unconfigured`.
+- `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` se normalizan contra comillas envolventes y sufijos literales `\n` / `\r` antes de armar requests a Nubox.
+- `.env.example` documenta `NUBOX_X_API_KEY_SECRET_REF`.
+- `pnpm sync:nubox:quotes-hot` acepta `--env-file=/path/to/env` para replay local controlado sin editar `.env.local`.
+- Vercel quedó provisionado con `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF` en Development, Preview genérico, Staging y Production.
+- Se crearon secrets GCP separados por ambiente para Nubox bearer token y x-api-key sin exponer valores.
+- `src/lib/google-credentials.ts` ahora prefiere WIF en runtime Vercel antes de parsear service account legacy y trata `GOOGLE_APPLICATION_CREDENTIALS_JSON=""` como ausente, evitando que una variable transicional contaminada bloquee Secret Manager.
+
+### Validaciones
+
+- `pnpm test --run src/lib/google-credentials.test.ts src/lib/nubox/client.test.ts src/lib/nubox/sync-nubox-to-postgres.test.ts` -> 3 files, 27 tests passed.
+- `pnpm exec eslint src/lib/google-credentials.ts src/lib/google-credentials.test.ts src/lib/nubox/client.ts src/lib/nubox/client.test.ts scripts/run-nubox-quotes-hot-sync.ts` -> clean.
+- `pnpm sync:nubox:quotes-hot -- --env-file=/tmp/greenhouse-vercel-staging-env.nubox-secret-fresh.env` -> OK, `quotesUpdated=2`.
+- `vercel env pull --environment preview` confirmó `GCP_PROJECT`, `NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF` presentes en Preview genérico.
+
+### Nota operativa
+
+- Preferir Secret Manager para ambos secretos Nubox (`NUBOX_BEARER_TOKEN_SECRET_REF` y `NUBOX_X_API_KEY_SECRET_REF`) en todos los ambientes. Los env vars directos quedan solo como fallback transicional hasta que el despliegue con este commit esté activo.
+- No se modifico ni versiono `.env.local`.
+
 ## Sesion 2026-04-26 — ESLint 9 flat config (TASK-514)
 
 ### Que cambio

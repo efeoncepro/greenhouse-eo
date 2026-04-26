@@ -16,6 +16,16 @@ import {
   listNuboxSales
 } from '@/lib/nubox/client'
 
+const mockSecretResolution = (values: Record<string, string | null>) => {
+  resolveSecret.mockImplementation(async ({ envVarName }: { envVarName: string }) => ({
+    source: values[envVarName] ? 'secret_manager' : 'unconfigured',
+    value: values[envVarName] ?? null,
+    envVarName,
+    secretRefEnvVarName: `${envVarName}_SECRET_REF`,
+    secretRef: values[envVarName] ? `projects/test/secrets/${envVarName.toLowerCase()}/versions/latest` : null
+  }))
+}
+
 describe('decodeNuboxXmlPayload', () => {
   afterEach(() => {
     vi.unstubAllEnvs()
@@ -41,10 +51,9 @@ describe('decodeNuboxXmlPayload', () => {
 
   it('uses the resolved secret when calling Nubox', async () => {
     vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
-    vi.stubEnv('NUBOX_X_API_KEY', 'nubox-api-key')
-    resolveSecret.mockResolvedValue({
-      source: 'secret_manager',
-      value: 'sm-token'
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: 'sm-token',
+      NUBOX_X_API_KEY: 'sm-api-key'
     })
 
     const fetchMock = vi.fn().mockResolvedValue({
@@ -64,17 +73,16 @@ describe('decodeNuboxXmlPayload', () => {
     expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
       headers: expect.objectContaining({
         Authorization: 'Bearer sm-token',
-        'x-api-key': 'nubox-api-key'
+        'x-api-key': 'sm-api-key'
       })
     })
   })
 
   it('keeps legacy env fallback working when the helper resolves from env', async () => {
     vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
-    vi.stubEnv('NUBOX_X_API_KEY', 'nubox-api-key')
-    resolveSecret.mockResolvedValue({
-      source: 'env',
-      value: 'env-token'
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: 'env-token',
+      NUBOX_X_API_KEY: 'env-api-key'
     })
 
     const fetchMock = vi.fn().mockResolvedValue({
@@ -92,17 +100,17 @@ describe('decodeNuboxXmlPayload', () => {
 
     expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
       headers: expect.objectContaining({
-        Authorization: 'Bearer env-token'
+        Authorization: 'Bearer env-token',
+        'x-api-key': 'env-api-key'
       })
     })
   })
 
-  it('sanitizes quoted tokens with trailing literal newline markers', async () => {
-    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
-    vi.stubEnv('NUBOX_X_API_KEY', 'nubox-api-key')
-    resolveSecret.mockResolvedValue({
-      source: 'secret_manager',
-      value: '"env-token\\n"'
+  it('sanitizes quoted credentials and config with trailing literal newline markers', async () => {
+    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com/\\n')
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: '"env-token\\n"',
+      NUBOX_X_API_KEY: '"env-api-key\\r\\n"'
     })
 
     const fetchMock = vi.fn().mockResolvedValue({
@@ -118,30 +126,42 @@ describe('decodeNuboxXmlPayload', () => {
 
     await listNuboxSales('2026-03')
 
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      'https://nubox.example.com/sales?period=2026-03&page=1&size=100'
+    )
     expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
       headers: expect.objectContaining({
-        Authorization: 'Bearer env-token'
+        Authorization: 'Bearer env-token',
+        'x-api-key': 'env-api-key'
       })
     })
   })
 
   it('throws a clear error when the token is unconfigured', async () => {
     vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
-    vi.stubEnv('NUBOX_X_API_KEY', 'nubox-api-key')
-    resolveSecret.mockResolvedValue({
-      source: 'unconfigured',
-      value: null
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: null,
+      NUBOX_X_API_KEY: 'env-api-key'
     })
 
     await expect(listNuboxSales('2026-03')).rejects.toThrow('NUBOX_BEARER_TOKEN is not configured')
   })
 
+  it('throws a clear error when the x-api-key is unconfigured', async () => {
+    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: 'env-token',
+      NUBOX_X_API_KEY: null
+    })
+
+    await expect(listNuboxSales('2026-03')).rejects.toThrow('NUBOX_X_API_KEY is not configured')
+  })
+
   it('normalizes config and sends explicit binary Accept headers for PDF/XML downloads', async () => {
     vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com/\n')
-    vi.stubEnv('NUBOX_X_API_KEY', 'nubox-api-key\n')
-    resolveSecret.mockResolvedValue({
-      source: 'env',
-      value: 'env-token'
+    mockSecretResolution({
+      NUBOX_BEARER_TOKEN: 'env-token',
+      NUBOX_X_API_KEY: 'nubox-api-key\n'
     })
 
     const fetchMock = vi.fn()

@@ -328,13 +328,16 @@ Regla operativa:
   - `NEXTAUTH_SECRET` via `secret_manager`
   - `AZURE_AD_CLIENT_SECRET` via `secret_manager`
   - `NUBOX_BEARER_TOKEN` via `secret_manager`
+- Delta 2026-04-26: `NUBOX_X_API_KEY` también adopta el helper canónico `Secret Manager -> env fallback`; su referencia operativa es `NUBOX_X_API_KEY_SECRET_REF`.
+- El baseline externo de Nubox Secret Manager quedó provisionado para `Development`, `Preview`, `staging` y `Production`:
+  - `NUBOX_BEARER_TOKEN_SECRET_REF`
+  - `NUBOX_X_API_KEY_SECRET_REF`
 - `production` ya validó el mismo patrón en `greenhouse.efeoncepro.com/api/internal/health` sobre `version=7238a90`.
 - El rollout externo previo también dejó preparados en Vercel:
   - `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
   - `NEXTAUTH_SECRET_SECRET_REF`
   - `AZURE_AD_CLIENT_SECRET_SECRET_REF`
   - `GOOGLE_CLIENT_SECRET_SECRET_REF`
-  - `NUBOX_BEARER_TOKEN_SECRET_REF`
     para `staging` y `production`, sin retirar aún los env vars legacy.
 - Estado residual observado en `staging`:
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en el runtime del portal

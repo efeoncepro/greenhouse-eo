@@ -6,6 +6,7 @@
 
 - Nuevo carril incremental `nubox-quotes-hot-sync` cada 15 minutos para cotizaciones Nubox (`COT` / DTE 52), manteniendo raw BigQuery → conformed → Postgres y tracking en `source_sync_runs`.
 - Nuevo script operativo `pnpm sync:nubox:quotes-hot` para replay manual robusto por periodo sin insertar/parchear filas.
+- Credenciales Nubox endurecidas: `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY` ahora comparten resolución `Secret Manager -> env fallback`, sanitización defensiva, refs provisionadas en Development/Preview/Staging/Production y soporte operativo `--env-file`.
 
 ### 2026-04-26 — API Platform Event Control Plane (TASK-617.3)
 

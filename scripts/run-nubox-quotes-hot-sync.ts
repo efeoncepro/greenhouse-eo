@@ -22,8 +22,17 @@ const parsePeriods = () => {
     : undefined
 }
 
+const parseEnvFiles = () => {
+  const explicitEnvFiles = process.argv
+    .filter(argument => argument.startsWith('--env-file='))
+    .map(argument => argument.slice('--env-file='.length).trim())
+    .filter(Boolean)
+
+  return explicitEnvFiles.length > 0 ? explicitEnvFiles : undefined
+}
+
 const main = async () => {
-  loadGreenhouseToolEnv()
+  loadGreenhouseToolEnv(parseEnvFiles())
   applyGreenhousePostgresProfile('runtime')
 
   const { syncNuboxQuotesHot } = await import('@/lib/nubox/sync-nubox-quotes-hot')

@@ -102,6 +102,34 @@ describe('google credentials helpers', () => {
     expect(authOptions.credentials).toBeUndefined()
   })
 
+  it('prefers workload identity in vercel runtimes before parsing legacy service account env', () => {
+    const env = asEnv({
+      GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/pool/providers/vercel',
+      GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-runtime@efeonce-group.iam.gserviceaccount.com',
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: '""',
+      GCP_PROJECT: 'efeonce-group',
+      VERCEL: '1',
+      VERCEL_ENV: 'production',
+      VERCEL_URL: 'greenhouse.vercel.app'
+    })
+
+    expect(getGoogleCredentialSource(env)).toBe('wif')
+  })
+
+  it('prefers workload identity in vercel runtimes even when legacy service account env is malformed', () => {
+    const env = asEnv({
+      GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/pool/providers/vercel',
+      GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-runtime@efeonce-group.iam.gserviceaccount.com',
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: 'not-json',
+      GCP_PROJECT: 'efeonce-group',
+      VERCEL: '1',
+      VERCEL_ENV: 'production',
+      VERCEL_URL: 'greenhouse.vercel.app'
+    })
+
+    expect(getGoogleCredentialSource(env)).toBe('wif')
+  })
+
   it('allows an explicit service account key preference to override lazy vercel wif selection', () => {
     const env = asEnv({
       GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/pool/providers/vercel',
@@ -151,6 +179,18 @@ describe('google credentials helpers', () => {
     expect(authOptions.projectId).toBe('efeonce-group')
     expect(authOptions.credentials).toBeUndefined()
     expect(authOptions.authClient).toBeUndefined()
+  })
+
+  it('treats quoted empty service account env vars as absent', () => {
+    const env = asEnv({
+      GCP_PROJECT: 'efeonce-group',
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: '""',
+      GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64: '""'
+    })
+
+    expect(getGoogleCredentials(env)).toBeUndefined()
+    expect(getGoogleCredentialSource(env)).toBe('ambient_adc')
+    expect(getGoogleProjectId(env)).toBe('efeonce-group')
   })
 
   it('resolves project id from service account credentials when env vars are absent', () => {
