@@ -145,6 +145,12 @@
 - **Nueva sección visible**: `Admin Center` ahora expone "Confiabilidad por módulo" entre alertas y Torre de control. `Ops Health` y `Cloud & Integrations` preservan su lectura técnica especializada.
 - **Boundaries explícitos**: `TASK-586` (billing/notion-bq-sync), `TASK-599` (finance smoke lane) y `TASK-103` (budget alerts) tienen un `ReliabilityIntegrationBoundary` declarado para enchufar sus señales sin redefinir contratos.
 
+### 2026-04-26 — TASK-617 cerrado y MCP read-only listo para ejecución
+
+- `TASK-617` queda cerrado documentalmente tras completar sus cuatro child tasks de API Platform V1.1.
+- Nueva task ejecutable: `TASK-647 — Greenhouse MCP Read-Only Adapter V1`.
+- El primer MCP queda definido como downstream de `api/platform/ecosystem/*`, read-only, sin SQL directo, sin routes legacy y sin writes.
+
 ### 2026-04-25 — API Platform ya considera mobile app como consumer first-party oficial
 
 - `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` ahora deja explícito que la plataforma API también debe servir a futuras apps `iOS` y `Android`.

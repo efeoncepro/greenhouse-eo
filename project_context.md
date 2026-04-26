@@ -1,3 +1,13 @@
+## Delta 2026-04-26 TASK-617 cerrado y TASK-647 abre MCP read-only
+
+- `TASK-617` queda cerrado documentalmente: `TASK-617.1` a `TASK-617.4` ya cubren REST hardening, first-party app lane, event control plane y developer docs.
+- El siguiente slice ejecutable de MCP es `TASK-647`:
+  - MCP read-only
+  - downstream de `api/platform/ecosystem/*`
+  - tools iniciales para context, organizations, capabilities e integration readiness
+  - sin SQL directo, sin routes legacy y sin writes
+- Regla operativa: cualquier MCP write-safe futuro debe esperar idempotencia transversal en `src/lib/api-platform/**` y command endpoints maduros.
+
 ## Delta 2026-04-26 TASK-617.4 publica Developer API Documentation Portal
 
 - `/developers/api` es ahora el entrypoint publico developer-facing de la API Platform.

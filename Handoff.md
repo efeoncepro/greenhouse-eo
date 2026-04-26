@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Cleanup documental API Platform + TASK-647 MCP
+
+### Que cambio
+
+- `TASK-617` fue cerrado documentalmente y movido a `docs/tasks/complete/`.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` ahora reflejan `TASK-617` como complete.
+- Se creó `TASK-647 — Greenhouse MCP Read-Only Adapter V1` en `docs/tasks/to-do/`.
+- `TASK-647` define el primer MCP como adapter read-only downstream de `api/platform/ecosystem/*`, con tools iniciales para:
+  - `get_context`
+  - `list_organizations`
+  - `get_organization`
+  - `list_capabilities`
+  - `get_integration_readiness`
+
+### Notas de coordinacion
+
+- El MCP V1 no debe usar SQL directo, routes legacy ni writes.
+- Los writes MCP quedan bloqueados hasta tener idempotencia transversal y commands maduros en API Platform.
+- Se detectaron cambios preexistentes no tocados: `TASK-526` movida a `in-progress`, `package.json`, `pnpm-lock.yaml`, `.claude/worktrees/task-617/` y `.codex/worktrees/`.
+
+### Validaciones
+
+- Cambio documental; pendiente `git diff --check`.
+
 ## Sesion 2026-04-26 — TASK-617.4 Developer API Documentation Portal
 
 ### Que cambio
