@@ -439,6 +439,14 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - Helper de render para tests: `src/test/render.tsx`
 - Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `npx tsc --noEmit`
 
+### Charts — política canónica (TASK-518 diferida; migración oportunista)
+
+- **Vistas nuevas**: usar `recharts` (re-exportado vía `src/libs/Recharts.tsx`). NO introducir nuevos imports de `react-apexcharts`/`apexcharts`/`AppReactApexCharts`.
+- **Vistas existentes con Apex** (32 archivos al 2026-04-26): se migran de forma oportunista — cada vez que toques una vista con chart por otra razón (feature, fix, refactor), migra ese chart específico a Recharts en el mismo PR. Sin PR megalítico de "migrar todo".
+- **Excepción única**: si necesitas un tipo de chart que Recharts 3.x no cubre (heatmap, treemap), usar Visx; nunca Apex.
+- **Por qué**: Recharts es React-nativo, SVG-first (mejor a11y), bundle más chico (~150-200 KB ganados al final), y es el ecosystem 2025-2026 (shadcn/ui, Tremor, Vercel templates).
+- Spec completa y trigger conditions para ejecutar TASK-518 como PR coordinado: `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md`.
+
 ### Otras convenciones
 
 - Line endings: LF (ver `.gitattributes`)

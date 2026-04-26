@@ -1,17 +1,58 @@
 # TASK-518 — ApexCharts deprecation; consolidate all charts on Recharts
 
+## Delta 2026-04-26 — diferida; estrategia "migración oportunista"
+
+**Audit 2026-04-26**: el portal está hoy **100% en ApexCharts** (32 archivos consumen `react-apexcharts`/`AppReactApexCharts`). Recharts está en `package.json` desde hace tiempo pero **0 callsites en views** — solo existe el re-export `src/libs/Recharts.tsx`. La premisa original ("convivir 2 chart libs es deuda técnica") era teórica; en runtime no hay coexistencia.
+
+**Distribución del inventario** (32 archivos):
+
+| Dominio | Archivos | Tipos |
+| --- | --- | --- |
+| `views/greenhouse/dashboard/*` | 5 | radialBar, line, area |
+| `views/greenhouse/finance/*` | 4 | bar, line, donut (MRR/ARR, intelligence) |
+| `views/greenhouse/people/tabs/*` | 3 | bar, area |
+| `components/agency/*` | 3 | bar stacked, line (ICO, Spaces, Pulse) |
+| `views/greenhouse/payroll/*` | 2 | bar |
+| `views/greenhouse/hr-core/*` | 2 | bar, donut |
+| Otros + wrappers | 13 | mix (radialBar, sparkline, donut) |
+
+**Decisión 2026-04-26**: TASK-518 se difiere — **no se ejecuta como PR megalítico**. Razones:
+
+1. ROI inmediato bajo: ~150-200 KB de bundle JS a ganar; sin reportes de TTI lento ni a11y por contrato.
+2. Riesgo visual real: 32 archivos críticos del negocio (MrrArrDashboardView, FinanceDashboardView, PortfolioHealthCard, IcoCharts, PulseGlobalCharts) sin tests visuales (no hay Chromatic ni snapshots de charts). Migración 1:1 requiere QA manual por dominio.
+3. Look específico de Apex (`radialBar` con gradient + centered label + animation curve) no es swap mecánico a Recharts — necesita decisiones UX consensuadas.
+4. Costo de oportunidad: TASK-640 (Nubox v2) y TASK-519 (datepicker → MUI X) tienen valor de negocio directo. TASK-518 es deuda técnica pura.
+5. No bloquea nada upstream: ninguna task depende de esto.
+
+**Estrategia adoptada — "migración oportunista"**:
+
+- Toda vista **nueva** con chart usa **Recharts**. Esta regla queda fijada en `CLAUDE.md` y en el skill `greenhouse-dev` para que ningún agente introduzca un import nuevo de `react-apexcharts`.
+- Cada vez que se toque una vista existente con chart por otra razón (feature, fix, refactor), se migra ese chart específico **en el mismo PR**. Disuelve los 32 archivos en N PRs pequeños sin congelar el portal en un PR de "migrar todo".
+- Cuenta de archivos Apex baja de 32 → 31 → 30 → ... naturalmente con el tiempo. Sin deadline rígido.
+
+**Rank movido `P3` → `P4`**. Sale del backlog activo.
+
+**Trigger conditions para reactivar como task explícita** (cualquiera de las 4):
+
+1. Cliente enterprise levanta requirement de a11y por contrato (Apex no es WCAG-compliant out-of-the-box).
+2. Apex publica un CVE no parchado.
+3. Se decide rebrand visual del portal — usar la migración como trigger natural.
+4. Cliente reporta TTI lento en mobile y bundle es la causa raíz (medido con Lighthouse en `dev-greenhouse.efeoncepro.com`).
+
+Cuando se cumpla el trigger, esta spec se relee, el rank se mueve a P2, y se ejecuta como PR coordinado con QA visual por dominio.
+
 ## Status
 
-- Lifecycle: `to-do`
-- Priority: `P3`
+- Lifecycle: `to-do — diferida hasta trigger condition`
+- Priority: `P4` (era P3 — degradada 2026-04-26 tras audit)
 - Impact: `Medio` (consistencia visual + a11y + bundle)
-- Effort: `Medio-Alto` (depende del inventario de charts Apex)
+- Effort: `Medio-Alto` (32 archivos; QA visual manual)
 - Type: `refactor` + `dependency`
-- Status real: `Backlog — Ola 3 stack modernization`
-- Rank: `Post-TASK-511`
+- Status real: `Diferida — migración oportunista vigente; sin deadline`
+- Rank: `Trigger-driven` (no planificable hasta condición disparadora)
 - Domain: `ui`
 - Blocked by: `none`
-- Branch: `task/TASK-518-apexcharts-deprecation`
+- Branch: `task/TASK-518-apexcharts-deprecation` (cuando se reactive)
 
 ## Summary
 

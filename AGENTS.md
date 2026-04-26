@@ -562,6 +562,15 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Conexión local: requiere Cloud SQL Auth Proxy corriendo en `127.0.0.1:15432`. El script tiene guardia fail-fast que aborta si detecta IP pública como host — no esperar timeout, leer el mensaje de error.
 - Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
+### Charts — política canónica (TASK-518 diferida; migración oportunista)
+
+- **Vistas nuevas con chart**: usar `recharts` (re-exportado vía `src/libs/Recharts.tsx`). NO introducir nuevos imports de `react-apexcharts`/`apexcharts`/`AppReactApexCharts`. Si tu PR agrega un chart nuevo y usa Apex, será rechazado en review.
+- **Vistas existentes con Apex** (32 archivos al 2026-04-26 — `views/greenhouse/dashboard/*`, `views/greenhouse/finance/*`, `components/agency/*`, etc.): se migran de forma oportunista. Cada vez que toques una vista con chart Apex por otra razón (feature, fix, refactor), migra ese chart específico a Recharts en el mismo PR. Sin PR megalítico de "migrar todo" — eso es TASK-518 y está diferida hasta trigger condition.
+- **Excepción única**: si necesitas un tipo de chart que Recharts 3.x no cubre (heatmap, treemap), usar Visx; nunca Apex.
+- **Por qué**: Recharts es React-nativo, SVG-first (mejor a11y), bundle más chico (~150-200 KB ganados al final), y es el ecosystem 2025-2026 (shadcn/ui, Tremor, Vercel templates).
+- **Trigger conditions** para reactivar TASK-518 como PR coordinado: requirement de a11y por contrato, CVE en Apex, rebrand visual del portal, o reporte de TTI lento en mobile causado por bundle. Mientras no se cumpla ninguno, la migración oportunista es la política vigente.
+- Spec completa: `docs/tasks/to-do/TASK-518-apexcharts-deprecation.md` (sección Delta 2026-04-26).
+
 ## Task Lifecycle Protocol
 
 ### Regla general
