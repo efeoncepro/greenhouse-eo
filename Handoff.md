@@ -1,5 +1,102 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — BQ conformed → PG drain canónico vía Cloud Run (cierra gap de 24 días + admin hygiene queue)
+
+### Trigger
+
+Continuación natural del trabajo del Reliability Control Plane. La user pidió que las soluciones fueran robustas + escalables + resilientes + seguras, no parches. El flujo descubierto y resuelto:
+
+1. **Hipótesis inicial fallida**: pensé que el cascade de títulos no capturaba las propiedades de Sky Airline (3,039 tasks "sin título"). Verificado vía Notion REST API + Notion MCP que NO era el problema — el cascade `nombre_de_tarea/nombre_de_la_tarea` resuelve correctamente.
+2. **Root cause real**: PG `greenhouse_delivery.{tasks,projects,sprints}` estaba **stale 24 días** (último write 2026-04-02). El sync diario `/api/cron/sync-conformed` solo escribía BQ conformed. El path BQ → PG vivía únicamente en el script manual `pnpm sync:source-runtime-projections` que **nunca tuvo schedule**.
+3. **Bug secundario**: el orchestrator hace skip cuando BQ ya está current ("Conformed sync already current; write skipped") — cualquier paso PG anidado en ese path se salteaba también.
+
+### Que cambio (4 layers, no parches)
+
+#### 1. **Helper canónico PG projection** — `src/lib/sync/project-notion-delivery-to-postgres.ts`
+
+Extracted del script manual: `projectNotionDeliveryToPostgres({ syncRunId, projects, sprints, tasks, targetSpaceIds, replaceMissingForSpaces })`. Per-row UPSERT por `notion_*_id`, idempotente, safe under concurrent writers (per-row, no table locks). Dos modos:
+- `replaceMissingForSpaces=true`: marca como `is_deleted` cualquier row de los spaces synceados que no esté en el batch (mirrors BQ staged-swap)
+- `replaceMissingForSpaces=false`: pure UPSERT, no deletes (para syncs parciales/recovery)
+
+#### 2. **Drain BQ → PG independiente** — `src/lib/sync/sync-bq-conformed-to-postgres.ts`
+
+Lee BQ `greenhouse_conformed.delivery_*` y escribe a PG vía el helper anterior. Decoupled del cycle BQ raw → conformed: corre **siempre**, regardless si el orchestrator hizo skip del lado BQ. Cierra el gap "BQ fresh + PG stale". Convierte fraccionales (e.g. `days_late=0.117...` de BQ formulas) vía `toInteger()` con `Math.trunc` para fitear PG INTEGER columns.
+
+#### 3. **Cloud Run path canónico** — `ops-worker POST /notion-conformed/sync`
+
+Reemplaza el Vercel cron `/api/cron/sync-conformed` (que queda como fallback manual). Step 1 invoca `runNotionSyncOrchestration` (BQ side), Step 2 invoca `syncBqConformedToPostgres` UNCONDICIONAL. Ambos en `try/catch` separados — fallo en PG no rompe BQ.
+
+**Ventajas vs Vercel cron**:
+- Cloud Run timeout 60min vs Vercel 800s
+- Cloud Scheduler tiene retry exponencial nativo (`maxRetryAttempts`, `minBackoffDuration`)
+- OIDC-authed invocation (no shared CRON_SECRET rotation)
+- Co-located en `us-east4` con Cloud SQL (sub-ms latency en PG step)
+- Cloud Logging nativo
+
+Cloud Scheduler job `ops-notion-conformed-sync` corre `20 7 * * *` (mismo horario que el Vercel cron previo). Auto-creado por `services/ops-worker/deploy.sh`.
+
+#### 4. **Admin hygiene queue** — `/admin/data-quality/notion-titles`
+
+Surface las páginas con `task_name/project_name/sprint_name = NULL` agrupadas por space. CTA "Editar en Notion" abre la page directo en source. Empty state celebrates. Wired al menú admin via `GH_INTERNAL_NAV.adminUntitledNotionPages`. Backed por reader cheap (`getUntitledPagesOverview`).
+
+#### 5. **DB function + TS helper canónico para fallback display name**
+
+- Migration `20260426144105255_add-delivery-display-name-functions.sql` añade 3 IMMUTABLE functions en `greenhouse_delivery` (`task_display_name`, `project_display_name`, `sprint_display_name`). Devuelven el title o un fallback data-derived (`'Tarea sin título · ' || LOWER(SUBSTRING(source_id, 1, 8))`) — NO sentinel (no viola TASK-588 anti-sentinel CHECK).
+- Helper TypeScript `src/lib/delivery/task-display.ts` con paridad SQL bit-exacta (19 tests, 3 PG-parity tests cuando hay conexión).
+- UI primitives `<TaskNameLabel />`, `<ProjectNameLabel />`, `<SprintNameLabel />` con tratamiento canónico (italic + warning icon + tooltip + Notion CTA).
+
+#### 6. **DB-side adapt para sync robusto**
+
+- Migration runtime helper `ensureDeliveryTitleColumnsNullable()` aplica `ALTER TABLE delivery_* ALTER COLUMN *_name DROP NOT NULL` en BQ — alinea contrato BQ con PG (TASK-588). Idempotente.
+
+### Validaciones live end-to-end
+
+Tras deploy de `0665fc09` (commit con `toInteger()` fix) + trigger del Cloud Scheduler job:
+
+```
+[ops-worker] PG drain from BQ: read=147p/29s/4959t, written=147p/29s/4959t, deleted=0p/0s/0t, 32785ms
+```
+
+| Scope | Antes | Después |
+|---|---|---|
+| `tasks-sky` | 0 named / 3,039 untitled (stale 24 días) | **3,591 named / 92 untitled** (solo truly null en origen) |
+| `tasks-efeonce` | 1,218 named / 2 untitled | **1,353 named / 2 untitled** ✓ no regresión |
+| `projects-sky` | 0 named / 72 untitled | **82 named / 0 untitled** |
+| `projects-efeonce` | 63 named / 0 untitled | **65 named / 0 untitled** ✓ |
+| `sprints-sky` | (no rows) | **13 named / 0 untitled** |
+
+Las 94 untitled restantes son exactamente las pages Notion verificadas vía MCP que tienen `title: []` literalmente vacío en origen (creadas por automations que no setearon title). El admin queue ahora muestra honestamente solo esas, sin falsos positivos por PG stale.
+
+### Archivos clave
+
+- Migrations: `20260426144105255_add-delivery-display-name-functions.sql`
+- Helpers: `src/lib/sync/project-notion-delivery-to-postgres.ts` + `src/lib/sync/sync-bq-conformed-to-postgres.ts`
+- UI: `src/components/greenhouse/delivery/DeliveryNameLabel.tsx`
+- Reader: `src/lib/delivery/get-untitled-pages-overview.ts`
+- Admin route: `src/app/(dashboard)/admin/data-quality/notion-titles/page.tsx` + `src/app/api/admin/data-quality/notion-titles/route.ts`
+- Cloud Run endpoint: `services/ops-worker/server.ts` (POST `/notion-conformed/sync`)
+- Cloud Scheduler job: `services/ops-worker/deploy.sh` (`ops-notion-conformed-sync @ 20 7 * * *`)
+- TS helper: `src/lib/delivery/task-display.ts` (+ test con paridad SQL)
+
+### Defensas múltiples (cumple el contrato robusto + escalable + resiliente + seguro)
+
+- Per-row UPSERT por `notion_*_id` → idempotente, no table-level locks → safe concurrente con reactive event handlers
+- `try/catch` separado por step (BQ side / PG side) → fallo en uno no rompe el otro
+- `replaceMissingForSpaces` filtra por space → cero contaminación cross-tenant (Efeonce stays Efeonce)
+- `toInteger()` truncation para BQ formulas fraccionales → no más type-mismatch crashes
+- Schema BQ NULLABLE alineado con PG (TASK-588) → sync NEVER crashea por null titles
+- Kill-switch `GREENHOUSE_NOTION_PG_PROJECTION_ENABLED=false` → revert sin deploy
+- Cloud Run timeout 60min + Cloud Scheduler retry exponencial → resiliente a fallos transientes
+- Vercel cron stays como fallback manual + admin trigger endpoint para recovery
+- Cascade de títulos sigue funcionando idéntico para Efeonce (no regresión validada en vivo)
+- Anti-sentinel: NULL = unknown (TASK-588 contract intacto), fallback data-derived only at READ-time
+
+### Pendientes follow-up (no bloquean)
+
+- Limpiar las 94 truly-untitled páginas en Notion via la admin queue (acción humana, una sola vez).
+- Los 92 de Sky son páginas creadas el 2026-04-02 11:44 UTC (bulk import Nexa Insights consumiendo pages sin title).
+- Considerar deshabilitar el Vercel cron `/api/cron/sync-conformed` post-validación de varias semanas con Cloud Run path estable.
+
 ## Sesion 2026-04-26 — Income settlement reconciliation canónica (factoring + withholdings) + 45 dead requeued
 
 ### Trigger

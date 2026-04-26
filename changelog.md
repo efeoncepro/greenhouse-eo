@@ -2,6 +2,18 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — Notion BQ → PG drain canónico vía Cloud Run + admin hygiene queue (cierra gap PG stale 24 días)
+
+- Nuevo path canónico `ops-worker POST /notion-conformed/sync` triggered por Cloud Scheduler `ops-notion-conformed-sync @ 20 7 * * * America/Santiago`. Reemplaza dependencia del Vercel cron (que queda como fallback) y del script manual `pnpm sync:source-runtime-projections` (que NO estaba scheduled — root cause de los 24 días de drift).
+- Helpers canónicos extraídos: `projectNotionDeliveryToPostgres` (per-row UPSERT idempotente) + `syncBqConformedToPostgres` (drena BQ conformed → PG UNCONDICIONALMENTE, regardless del skip de Step 1). Vive en `src/lib/sync/{project-notion-delivery-to-postgres,sync-bq-conformed-to-postgres}.ts`.
+- Schema BQ alineado con PG (TASK-588): `delivery_*.{task_name,project_name,sprint_name}` ahora NULLABLE. Helper runtime `ensureDeliveryTitleColumnsNullable()` lo aplica idempotente al sync startup.
+- DB functions `greenhouse_delivery.{task,project,sprint}_display_name` (migration `20260426144105255`) producen fallback display data-derived al READ time. Mirror en TS via `src/lib/delivery/task-display.ts` con paridad bit-exacta regression-tested.
+- UI primitives `<TaskNameLabel/ProjectNameLabel/SprintNameLabel>` con tratamiento canónico (italic + warning icon + tooltip + click-through Notion).
+- Admin hygiene queue `/admin/data-quality/notion-titles` lista pages con `*_name IS NULL` + CTA "Editar en Notion".
+- Resultado live (post-drain): Sky tasks 0/3,039 → **3,591/92** named/untitled, Sky projects 0/72 → **82/0**, Efeonce sin regresión (1,353/2 named/untitled). Las 94 untitled restantes son `title: []` reales en Notion (verificado dual via Notion REST API + Notion MCP).
+- Reglas duras documentadas en `CLAUDE.md` y `AGENTS.md`: NO sentinels en `*_name`, NO mover PG step adentro del path no-skip, NO crear cron Vercel scheduled paralelo, NO usar `Number()` directo para BQ-formula → PG INTEGER (usar `toInteger()` con `Math.trunc`).
+- Spec arquitectónica canónica nueva: `docs/architecture/GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md`.
+
 ### 2026-04-26 — Nubox V2 Enterprise Enrichment Program planificado (TASK-640)
 
 - `TASK-640` pasa a `in-progress` con Slice 1 cerrado documentalmente: discovery contra runtime real, auditoría de arquitectura/schema y plan canónico en `docs/tasks/plans/TASK-640-plan.md`.

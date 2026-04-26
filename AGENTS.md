@@ -426,6 +426,52 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
 - Documentación funcional: `docs/documentation/operations/ops-worker-reactive-crons.md`
 
+### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
+
+**Decisión arquitectónica (2026-04-26)**: el daily Notion sync es un SOLO ciclo de DOS pasos en `ops-worker` Cloud Run, schedulado por Cloud Scheduler. No hay otro path scheduled.
+
+- **Trigger canónico**: Cloud Scheduler `ops-notion-conformed-sync @ 20 7 * * * America/Santiago` → `POST /notion-conformed/sync` en ops-worker. Definido en `services/ops-worker/deploy.sh` (idempotente).
+- **Step 1 — `runNotionSyncOrchestration`**: BQ raw `notion_ops.*` → BQ conformed `greenhouse_conformed.delivery_*`. Si BQ ya está fresh, skipea con "Conformed sync already current; write skipped" — comportamiento intencional, NO bug.
+- **Step 2 — `syncBqConformedToPostgres` (UNCONDICIONAL)**: BQ conformed → PG `greenhouse_delivery.*` vía `projectNotionDeliveryToPostgres`. **Corre SIEMPRE**, regardless del skip de Step 1, porque BQ puede estar fresh y PG stale (root cause del incidente abril 2026: 24 días de drift).
+
+**⚠️ Reglas duras para AGENTES (futuras sesiones, prevent regressions)**:
+
+- **NO mover el PG step adentro del path no-skip de Step 1**. Ya vivió ahí y dejaba PG stale 24+ días cuando BQ estaba current.
+- **NO crear cron Vercel scheduled** para `/api/cron/sync-conformed`. Existe como fallback manual; el trigger automático canónico vive en Cloud Scheduler. Vercel cron es frágil para syncs largos.
+- **NO depender del script manual `pnpm sync:source-runtime-projections` para escribir PG en producción**. Es solo para dev ad-hoc. El path canónico es Cloud Run.
+- **NO inyectar sentinels** (`'sin nombre'`, `'⚠️ Sin título'`, etc.) en `*_name` columns. TASK-588 los prohíbe vía CHECK constraints. NULL = unknown. Para fallback de display usar `displayTaskName/Project/Sprint` de `src/lib/delivery/task-display.ts` o `<TaskNameLabel/>`/`<ProjectNameLabel/>`/`<SprintNameLabel/>`.
+- **NO usar `Number(value)` directo** para BQ-formula columns que se persisten a PG INTEGER (`days_late`, `frame_versions`, etc.). BQ formulas devuelven fraccionales (`0.117…`) y PG INT crashea. Usar `toInteger()` (con `Math.trunc`) — vive en `src/lib/sync/sync-bq-conformed-to-postgres.ts`.
+
+**Helpers canónicos (orden de uso)**:
+
+- `runNotionSyncOrchestration({ executionSource })` — wrapper completo BQ raw → conformed.
+- `syncBqConformedToPostgres({ syncRunId?, targetSpaceIds?, replaceMissingForSpaces? })` — drena BQ conformed → PG. Default: todos los spaces activos, `replaceMissingForSpaces=true`. Reusable desde admin endpoints o scripts de recovery.
+- `projectNotionDeliveryToPostgres({ ... })` — primitiva más baja: per-row UPSERT por `notion_*_id`. Idempotente. Used by `syncBqConformedToPostgres`.
+
+**Manual triggers / recovery**:
+
+- Cloud Scheduler manual: `gcloud scheduler jobs run ops-notion-conformed-sync --location=us-east4 --project=efeonce-group`
+- Admin endpoint Vercel (auth via agent session): `POST /api/admin/integrations/notion/trigger-conformed-sync` — corre los 2 steps secuencialmente.
+- Vercel cron `/api/cron/sync-conformed` (CRON_SECRET) — fallback histórico, no usar como path principal.
+
+**Kill-switch**: `GREENHOUSE_NOTION_PG_PROJECTION_ENABLED=false` revierte el step PG dentro del path Vercel cron (`runNotionConformedCycle`) sin requerir deploy. NO afecta el endpoint Cloud Run (que es UNCONDICIONAL).
+
+**Tenant safety (Sky no rompe Efeonce ni viceversa)**:
+
+- `replaceMissingForSpaces` filtra `WHERE space_id = ANY(targetSpaceIds)` — nunca toca rows de spaces fuera del cycle.
+- UPSERT por `notion_*_id` (PK natural Notion) es idempotente, independiente del orden.
+- Cascade de title `nombre_de_tarea` / `nombre_de_la_tarea` resuelve correctamente para ambos tenants (Efeonce usa primera, Sky segunda — verificado vivo via Notion REST API + Notion MCP).
+
+**Schema constraints**:
+
+- BQ `delivery_*.{task_name,project_name,sprint_name}` están NULLABLE. Helper `ensureDeliveryTitleColumnsNullable` lo aplica idempotente al startup del sync.
+- PG tiene CHECK constraints anti-sentinel (TASK-588 / migration `20260424082917533`). Cualquier sentinel string los rechaza.
+- DB functions `greenhouse_delivery.{task,project,sprint}_display_name` (migration `20260426144105255`) producen el fallback display data-derived al READ time. Mirror exacto en TS via `src/lib/delivery/task-display.ts`.
+
+**Admin queue**: `/admin/data-quality/notion-titles` — surface las pages con `*_name IS NULL` agrupadas por space, con CTA "Editar en Notion". Backed por `getUntitledPagesOverview`. Empty state celebra "Todo en orden".
+
+**Spec arquitectónica completa**: `docs/architecture/GREENHOUSE_NOTION_DELIVERY_SYNC_V1.md`.
+
 ### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574 (2026-04-24)
 
 - Servicio Cloud Run Python/Flask ubicado en `us-central1` (region bloqueada — NO migrar a `us-east4` porque la URL pública contiene `-uc.` y romperia el webhook del portal HubSpot).
