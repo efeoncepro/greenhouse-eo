@@ -179,10 +179,15 @@ Postea un Adaptive Card `info` con metadata del entorno y el actor que lo dispar
 
 ## 8. Migración futura a Bot Framework
 
-Trigger condicional documentado:
+> **Status (2026-04-26):** programada como [TASK-671 — Greenhouse Teams Bot Platform](../tasks/to-do/TASK-671-greenhouse-teams-bot-platform.md). El trigger #4 (branding canónico) ya se cumplió en el live test de TASK-669, donde el post salió como `<usuario humano> a través de Flujos de trabajo` — feedback explícito del usuario que justificó priorizar la migración a P2.
+
+Triggers condicionales documentados (cualquiera basta para promover la migración):
+
 1. **>15 canales activos** — provisioning manual + connector OAuth se vuelve inmanejable
-2. **`Action.Submit` interactivo** — necesidad de botones que ejecuten acciones en Greenhouse
-3. **Multi-tenant externo** — clientes Globe recibiendo notificaciones desde Greenhouse
+2. **`Action.Submit` interactivo** — necesidad de botones que ejecuten acciones en Greenhouse (aprobaciones, snooze, mark-read)
+3. **Multi-tenant externo** — clientes Globe recibiendo notificaciones desde Greenhouse en sus tenants
+4. **Branding canónico** — eliminar la attribution "via Flujos de trabajo" y postear como bot `Greenhouse` con avatar custom (Microsoft no permite quitar esa attribution en Logic Apps / Power Automate)
+5. **Routing 1:1 por persona** — postear DM al colaborador específico (no solo a canales fijos), mapeando `team_members.member_id → client_users.microsoft_oid → Microsoft Graph user`
 
 Camino:
 1. Crear `infra/azure/teams-bot/` Bicep stack: Azure AD app registration + Bot Service + Federated Credentials
