@@ -92,7 +92,7 @@ Reglas obligatorias:
 - Microsoft Graph API access aprobado por IT Admin del tenant `efeoncepro.com`
 - Acceso a Teams Admin Center para subir manifest (rol Global Admin o Teams Admin)
 - Logo definitivo en formato Teams: `icon_color.png` 192x192 + `icon_outline.png` 32x32, ambos PNG transparente
-- Decisión de naming del bot: `Greenhouse` vs `Greenhouse Notifications` vs `Greenhouse Bot`
+- ~~Decisión de naming del bot: `Greenhouse` vs `Greenhouse Notifications` vs `Greenhouse Bot`~~ → **CERRADA 2026-04-26: `Greenhouse`** (decisión del usuario)
 - Resolución de la Open Question de TASK-669 sobre cuenta de servicio (alineada con el bot owner)
 
 ### Blocks / Impacts
@@ -183,10 +183,24 @@ Reglas obligatorias:
   - `validDomains: ["greenhouse.efeoncepro.com", "dev-greenhouse.efeoncepro.com"]`
   - `webApplicationInfo.id` y `webApplicationInfo.resource` para SSO si aplica
 - `manifest/icons/icon_color.png` 192x192 + `icon_outline.png` 32x32 (logo de marca)
-- Validar manifest con [Teams App Validator](https://dev.teams.microsoft.com/appvalidation.html) o `npx @microsoft/teamsfx-cli validate`
-- Empaquetar como zip: `manifest.json` + 2 iconos
-- IT Admin sube el zip a Teams Admin Center → Manage apps → Upload (instalación interna del tenant, no Microsoft Store)
-- Política de installation policy: permitir a usuarios autorizados instalar la app en sus chats / agregarla a teams
+- Validar manifest con [Teams App Validator](https://dev.teams.microsoft.com/appvalidation.html) (sube el zip antes de publicarlo, debe responder "App package is valid")
+- Empaquetar como zip: `manifest.json` + 2 iconos en la **raíz del zip** (sin subdirectorios). Comando referencia: `cd infra/azure/teams-bot/manifest && zip greenhouse-teams.zip manifest.json icons/icon_color.png icons/icon_outline.png`
+- **Upload del manifest** — paso interactivo manual del Global Admin / Teams Admin de `efeoncepro.com`:
+  1. URL: <https://admin.teams.microsoft.com/policies/manage-apps>
+  2. Login con cuenta con rol Global Administrator o Teams Service Administrator
+  3. Sidebar → **Teams apps** → **Manage apps**
+  4. Click **"+ Upload new app"** (arriba a la derecha) → en el modal click el botón **"Upload"** (no "Submit to app catalog")
+  5. Seleccionar el zip `greenhouse-teams.zip` → wait toast "Greenhouse uploaded successfully"
+  6. La app aparece en el listado. Click sobre ella → confirmar status **"Allowed"** (si está "Blocked" hay app permission policies que requieren explicit allow)
+  7. Verificar: la app está disponible para instalar en cada team / chat por usuarios del tenant
+- **Setup de installation policy** (también en Teams Admin Center):
+  1. Sidebar → **Teams apps** → **Setup policies**
+  2. Editar la política `Global (Org-wide default)` o crear `Greenhouse-internal`
+  3. En "Installed apps" → Add → Greenhouse → para que se auto-instale en los teams correspondientes (opcional, alternativa: instalación manual por team)
+- **Instalación en cada team destino**:
+  1. Teams desktop → click en team (ej. `Alineación`) → `…` → **Manage team** → tab **Apps** → click **More apps**
+  2. Buscar **Greenhouse** → click **Add**
+  3. Repetir para cada team que va a recibir notificaciones (ops, finance, delivery)
 
 ### Slice 3 — Sender dispatcher `sendViaBotFramework` con soporte de 3 superficies
 
@@ -397,7 +411,7 @@ team_members.member_id (canonical Greenhouse identity)
 
 ## Open Questions
 
-- Decisión final de naming del bot: `Greenhouse` (corto, riesgo de confusión con otros bots) vs `Greenhouse Notifications` (descriptivo pero largo) vs `Greenhouse Bot` (genérico). Sugerencia: `Greenhouse` con tagline en el subtitle de los cards
+- ~~Decisión final de naming del bot~~ → **CERRADA 2026-04-26: `Greenhouse`** (`name.short = "Greenhouse"`, `name.full = "Greenhouse Notifications & Actions"`)
 - Logo definitivo en formato Teams (192x192 + 32x32) — coordinar con design
 - ¿Qué cuenta de servicio firma el manifest? (probablemente la misma que se decida en TASK-669 Open Question)
 - ¿`signInAudience='AzureADMyOrg'` (single-tenant, solo efeoncepro) o `AzureADMultipleOrgs`? Default: single. Multi-tenant si crecemos con clientes Globe
