@@ -5,6 +5,8 @@
 - Se documento la arquitectura canonica de deep links en `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.
 - La decision queda registrada como capability shared futura: referencias semanticas (`kind/id/action/scope`) resueltas por una capa central que produce `href`, `absoluteUrl`, `label`, `viewCode`, capabilities, fallback y preview segun audiencia.
 - El doc recoge patrones de Slack, Teams, Salesforce, Atlassian, Notion, GitHub y Figma, y los aterriza al estado actual del repo: `VIEW_REGISTRY`, `portalHomePath`, `actionUrl`, search estatico, Teams cards y quote short links.
+- Se creo `TASK-694` (`docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`) para implementar la foundation runtime `src/lib/navigation/deep-links/**` sin mezclar storage, search/sidebar ni migracion completa de Notification Hub.
+- `docs/tasks/TASK_ID_REGISTRY.md` reserva `TASK-694` y `docs/tasks/README.md` deja el siguiente ID disponible en `TASK-695`.
 - `docs/README.md`, `project_context.md` y `changelog.md` quedan enlazados/actualizados. No hubo cambios runtime.
 - Validacion: doc-only; se verifico `git status` y lectura puntual del documento.
 

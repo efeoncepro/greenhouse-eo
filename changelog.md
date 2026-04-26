@@ -2,6 +2,10 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — Greenhouse Deep Link Platform architecture
+
+Nueva spec canonica `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`: formaliza deep links como referencias semanticas access-aware, con resolver central objetivo para web, email, Teams, mobile, public share, API y MCP. El contrato exige declarar `viewCode` y `requiredCapabilities` cuando apliquen, evitando seguir repartiendo strings de URL en menus, notificaciones, emails, search y cards. Implementacion registrada como `TASK-694` en `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`.
+
 ### 2026-04-26 — TASK-690 Notification Hub Architecture Contract + sinergia con TASK-671
 
 Spec arquitectónica `GREENHOUSE_NOTIFICATION_HUB_V1.md` v1.0 publicada. Unifica las 3 superficies de notificación (in-app bell, email, Microsoft Teams) detrás de un solo registry de intents + router con preferencias por persona + adapters por canal. Aprovecha la infraestructura ya en producción de TASK-669 (channel registry transport-agnostic) + TASK-671 (Bot Framework Connector + Action.Submit + cache de conv refs) para que Teams sea adapter de primera clase con DMs 1:1, cards interactivas, y feedback bidireccional que cierra el loop en TODAS las superficies (mark-read en Teams sincroniza la bell del portal y skipea el follow-up email).

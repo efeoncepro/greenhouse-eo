@@ -1,3 +1,13 @@
+## Delta 2026-04-26 Greenhouse Deep Link Platform documentada
+
+- Nueva arquitectura canonica: `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.
+- Decision: Greenhouse debe tratar deep links como referencias semanticas access-aware, no como strings de URL repartidos por menus, notificaciones, emails, Teams, search, API Platform o futuras apps.
+- Contrato objetivo: `kind + id + action + scope` -> resolver central -> `href`, `absoluteUrl`, `label`, `viewCode`, `requiredCapabilities`, `fallback` y `preview` por audiencia.
+- Regla de acceso: todo deep link gobernable debe explicitar ambos planos cuando apliquen:
+  - `views` / `authorizedViews` / `view_code` para surface visible
+  - `entitlements` / `capabilities` para autorizacion fina
+- Hasta que exista runtime, cualquier nueva feature que emita links en notificaciones, Teams, email, search o API debe documentar URL, entidad canonica, `viewCode`, capability y fallback.
+
 ## Delta 2026-04-26 Mercado Publico licitaciones helper
 
 - Greenhouse ya tiene un helper server-side para hidratar una licitacion Mercado Publico por codigo externo:
