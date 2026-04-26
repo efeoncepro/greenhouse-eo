@@ -1,5 +1,25 @@
 # TASK-387 — Notificaciones In-App: Agrupación y Digest
 
+## Delta 2026-04-26 — sigue vigente, pero refactor de base contra Notification Hub (TASK-690)
+
+**No deprecada.** El Hub V1 explícitamente deja aggregation/digest fuera de scope (§11 de `GREENHOUSE_NOTIFICATION_HUB_V1.md`). Esta task sigue siendo el path canónico para esa capacidad.
+
+**Scope ajustado:**
+
+- La agrupación opera sobre `greenhouse_core.notification_intents` (TASK-690), no sobre la tabla legacy `greenhouse_core.notifications`. Razón: post TASK-692 cutover, el bell del portal renderiza desde `notifications` (que el adapter `in_app` escribe) pero el "estado canónico" de qué está acknowledged vive en `notification_intents`. El digest debe leer del intent para no mostrar como "no leído" algo que ya se acknowledgeó desde Teams.
+- La columna `correlation_id` de `notification_intents` (ya en V1) es la clave de agrupación natural. Múltiples intents con el mismo `correlation_id` se colapsan en el bell. Esto evita inventar un identificador de grupo nuevo.
+- El digest cross-channel (mismo digest llega por email + bell + Teams card resumen) requiere coordinación con el router del Hub: el router decide "este es el N-ésimo intent del mismo correlation_id en X minutos → suprimir delivery individual y schedular un digest".
+- **Bloqueada por TASK-692** ahora (cutover del Hub) en vez de directamente por TASK-285.
+
+## Orden de implementación recomendado
+
+1. **TASK-690** Notification Hub Architecture Contract — establece `notification_intents.correlation_id` que es la clave de agrupación.
+2. **TASK-691** Shadow + **TASK-692** Cutover — projection canónica activa, intents poblados.
+3. **TASK-693** Notification Hub Bidireccional + UI + Mentions — el bell del portal lee desde el adapter `in_app` que escribe ambas tablas (intents + notifications); UI preferences habilitada.
+4. **ESTA task (TASK-387)** — implementa el digest reading por `correlation_id` + UI grupo expandible en el bell + opcionalmente schedule de digest cross-channel (suprime delivery individual cuando N intents en X minutos).
+
+Si TASK-385 (Email Scaling Cloud Run) cierra antes que esta task, los digests por email salen por ese path Cloud Run automáticamente.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

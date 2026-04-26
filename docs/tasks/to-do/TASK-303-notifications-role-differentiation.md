@@ -2,6 +2,27 @@
 
 - TASK-285 completada — roles diferenciados via `role_view_assignments`. Blocker resuelto.
 
+## Delta 2026-04-26 — converge con Notification Hub (TASK-690 / TASK-693)
+
+**No deprecada — ahora se materializa via las preferences del Hub.** El concepto "executive recibe KPI threshold alerts, manager recibe stuck/deadline, specialist recibe review request" es exactamente lo que el `notification_preferences` table del Hub permite expresar (`member_id × event_kind × channel → enabled + min_severity`).
+
+**Scope ajustado:**
+
+- La diferenciación per-rol se implementa como **defaults en el seed** de `notification_preferences` cuando un user con role `client_executive` se onboarda. Plantillas de defaults por rol viven en `src/lib/notifications/hub/role-defaults.ts` (NUEVO, parte de esta task).
+- Los `event_kind` glob para los 3 roles:
+  - `client_executive` → `kpi.threshold.*` enabled all channels; `task.stuck.*` disabled.
+  - `client_manager` → `task.stuck.*`, `deadline.approaching.*` enabled; `kpi.threshold.*` disabled.
+  - `client_specialist` → `review.requested.*`, `feedback.received.*` enabled.
+- El user puede override esos defaults desde la UI `/settings/notifications` (TASK-693).
+- **Bloqueada por TASK-692** (cutover del Hub donde `notification_preferences` empieza a impactar el routing).
+
+## Orden de implementación recomendado
+
+1. **TASK-690** Notification Hub Architecture Contract — establece `notification_preferences` table.
+2. **TASK-691** Shadow + **TASK-692** Cutover — projection canónica activa, preferences empiezan a impactar el routing.
+3. **TASK-693** Notification Hub Bidireccional + UI + Mentions — UI `/settings/notifications` permite override individual.
+4. **ESTA task (TASK-303)** — entrega `role-defaults.ts` con los defaults per-rol que se aplican al onboarding de un user, y el seed que pobla `notification_preferences` cuando un user nuevo se asigna un role específico.
+
 # TASK-303 — Notifications Role Differentiation
 
 ## Status

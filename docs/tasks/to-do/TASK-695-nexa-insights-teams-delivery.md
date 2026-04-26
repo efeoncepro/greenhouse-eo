@@ -132,6 +132,18 @@ El payoff es alto:
 - `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"nexa-insights-dm", "eventPayload":{"responsibleMemberId":"<test member>"}}'` → HTTP 200 con DM entregado.
 - E2E manual: emitir insight real en staging → recibir push en Teams Desktop con `<at>` correcto → click "Crear caso" → verificar Linear/Finance ticket creado + intent acknowledged + bell del portal vacía.
 
+## Orden de implementación recomendado
+
+1. **TASK-690** Notification Hub Architecture Contract — tablas + adapters skeleton.
+2. **TASK-691** Shadow + **TASK-692** Cutover — projection canónica activa.
+3. **TASK-693** Notification Hub Bidireccional + UI + Mentions — entrega `action-registry`, handlers reales, contrato Action.Submit, mentions/push.
+4. **(opcional) TASK-385** Email Scaling Cloud Run — necesario solo si los insights de Nexa generan broadcasts grandes.
+5. **ESTA task (TASK-695)** — agrega 1 template + 2-3 handlers + canal phantom + emit del lado de Nexa si aún no publica al outbox. Consumer del trabajo del Hub, no productor de infrastructure.
+
+Si Nexa ship insights antes de que TASK-693 cierre, hay 2 opciones temporales:
+- Esperar (recomendado).
+- Subir un dispatcher ad-hoc a Teams que se borra en TASK-692 cutover (deuda explícita).
+
 ## Open Questions
 
 - ¿Cuál es el cap por owner de insights/día por DM antes de aplicar throttling? Propuesta: 5 DMs/día, resto solo bell. Confirmar con UX.

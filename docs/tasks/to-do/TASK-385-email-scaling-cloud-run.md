@@ -1,5 +1,26 @@
 # TASK-385 — Email Scaling Cloud Run
 
+## Delta 2026-04-26 — sigue vigente, ortogonal al Notification Hub (TASK-690)
+
+**No deprecada.** Esta task resuelve un problema de transport (timeout de Vercel serverless en broadcasts > 50 destinatarios), NO de routing. El Notification Hub se encarga del routing per-recipient + per-channel; el adapter `email` del Hub sigue llamando al transport actual hasta que la escala lo requiera.
+
+**Scope ajustado:**
+
+- El path Cloud Run que esta task entrega lo invoca el adapter `src/lib/notifications/hub/adapters/email.ts` cuando `recipients.length > 50`. Por debajo del threshold, el adapter sigue usando el path Vercel/Resend directo.
+- La detección "es broadcast vs transactional" deja de ser implícita: el `notification_intent.recipient_kind = 'channel_static'` o un nuevo `recipient_kind = 'broadcast'` (a evaluar en TASK-693) marca la fila para el adapter scale-out. El adapter inspecciona el batch y rutea Cloud Run si supera el threshold.
+- **NO bloqueada por el Hub**: pueden coexistir. Si esta task se ejecuta antes que TASK-692 (cutover del Hub), el Cloud Run worker queda accesible vía el helper `sendBroadcastEmail()` y el Hub lo invoca cuando llega.
+- Cuando el Hub adquiera capacity de digest (TASK-387), broadcasts diarios de digest van por este mismo path Cloud Run.
+
+## Orden de implementación recomendado
+
+Esta task es **ortogonal al Hub** — puede ejecutarse en cualquier orden:
+
+- Si se ejecuta **antes** que TASK-690: el helper `sendBroadcastEmail()` queda listo y el adapter `email` del Hub lo invocará cuando llegue.
+- Si se ejecuta **después** que TASK-692 (cutover Hub): se integra directo en el adapter `src/lib/notifications/hub/adapters/email.ts` con la lógica de threshold `recipients.length > 50`.
+- Si se ejecuta **junto a TASK-387** (digest): los digests email van directo por este path desde el día 1 del digest.
+
+Recomendación: priorizar por urgencia operativa (timeout de 60s siendo o no problema actual), no por dependencia con el Hub.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
