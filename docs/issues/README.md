@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-058`
+`ISSUE-059`
 
 ## Open
 
@@ -76,6 +76,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-045` | [Registrar OC falla por referencia ambigua a `client_id` en el resolver canónico de Finance](open/ISSUE-045-purchase-order-create-ambiguous-client-id.md) | staging | 2026-04-13 | open |
 | `ISSUE-050` | [Staging salta correos de permisos porque el runtime reactivo no tiene Resend configurado](open/ISSUE-050-staging-leave-emails-skipped-resend-not-configured-in-reactive-runtime.md) | staging | 2026-04-15 | open |
 | `ISSUE-055` | [Quote builder no puede cotizar `ECG-004` por gap canónico en cost basis del rol](open/ISSUE-055-quote-builder-role-sku-missing-cost-basis.md) | staging | 2026-04-19 | open |
+| `ISSUE-058` | [Teams Finance Alerts webhook not provisioned in GCP Secret Manager](open/ISSUE-058-teams-finance-alerts-webhook-not-provisioned.md) | staging + production | 2026-04-26 | open (mitigated via `pending_setup`, awaiting Azure Logic App deploy from TASK-669) |
 
 ## Resolved
 
