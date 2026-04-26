@@ -747,3 +747,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-669` | `to-do` | Teams Workflow Notifications Channel | `docs/tasks/to-do/TASK-669-teams-workflow-notifications-channel.md` |
 | `TASK-670` | `to-do` | Brand Icon Library React Adapter | `docs/tasks/to-do/TASK-670-brand-icon-library-react-adapter.md` |
 | `TASK-671` | `to-do` | Greenhouse Teams Bot Platform (Bot Framework + Graph) | `docs/tasks/to-do/TASK-671-greenhouse-teams-bot-platform.md` |
+| `TASK-672` | `to-do` | Platform Health API Contract | `docs/tasks/to-do/TASK-672-platform-health-api-contract.md` |
