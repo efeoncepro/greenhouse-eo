@@ -1,5 +1,118 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — `@tanstack/react-query` adoption (TASK-513)
+
+### Que cambio
+
+Adoptamos **`@tanstack/react-query` 5.x** como capa canónica de server state del portal. Es el cache layer estándar 2024-2026 que usan Vercel, Linear, Stripe, Ramp, Notion, Resend y shadcn. Foundation V1: provider, query keys factory, defaults sanos, devtools en dev, y 3 ejemplos de migración shipping en producción para validar el patrón.
+
+- **Provider canónico**: `src/components/providers/QueryClientProvider.tsx` instancia un `QueryClient` por árbol cliente (via `useState`) con defaults:
+  - `staleTime: 30s`, `gcTime: 5min`, `refetchOnWindowFocus: true`, `retry: 1`, `throwOnError: false`.
+  - `mutations: { retry: 0, throwOnError: false }`.
+  - `ReactQueryDevtools initialIsOpen={false} buttonPosition='bottom-left'` solo cuando `NODE_ENV !== 'production'`.
+- **Mount**: `src/components/Providers.tsx` envuelve `{children}` con el `QueryClientProvider` adentro del `ThemeProvider`, antes del Toaster.
+- **Query keys factory** (`src/lib/react-query/keys.ts` + `index.ts`): tuplas tipadas `as const`, una rama por dominio. Patrón canónico de TanStack — `all`, `lists()`, `list(filters)`, `details()`, `detail(id)`. Consumers importan `import { qk } from '@/lib/react-query'`.
+- **Hooks ejemplo (3)** que validan el patrón:
+  - `useQuotesList(filters)` → consume `/api/finance/quotes` con filtros como queryKey. Reemplaza el `useState+useEffect+fetch` manual de `QuotesListView`.
+  - `usePricingConfig()` → consume `/api/finance/quotes/pricing/config` con `staleTime: 5min` + `gcTime: 30min` + `refetchOnWindowFocus: false` (catalog data muta solo cuando finance edita el pricing catalog). Reemplaza el `useEffect+fetch+AbortController` del `QuoteBuilderShell`.
+  - `usePeopleList()` → consume `/api/people` con defaults. Reemplaza el `loadData callback` que `CreateMemberDrawer` invocaba via prop drilling — ahora el drawer dispara `queryClient.invalidateQueries({ queryKey: qk.people.all })` desde su `onSuccess`.
+
+### Archivos tocados
+
+- `package.json` — add `@tanstack/react-query@^5.100.5` + `@tanstack/react-query-devtools@^5.100.5`.
+- `src/components/providers/QueryClientProvider.tsx` (NUEVO).
+- `src/components/Providers.tsx` — wrap children con QueryClientProvider.
+- `src/lib/react-query/keys.ts` (NUEVO) — factory canónica.
+- `src/lib/react-query/index.ts` (NUEVO) — surface publica.
+- `src/hooks/useQuotesList.ts`, `src/hooks/usePricingConfig.ts`, `src/hooks/usePeopleList.ts` (NUEVOS).
+- `src/views/greenhouse/finance/QuotesListView.tsx` — consume useQuotesList (drop useEffect + useCallback fetchQuotes).
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — consume usePricingConfig (drop useEffect+AbortController + el local async wrapper).
+- `src/views/greenhouse/people/PeopleList.tsx` — consume usePeopleList + invalidateQueries en CreateMemberDrawer onSuccess (drop loadData callback).
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` — Delta 2026-04-26 con foundation, keys, hooks, migration cheatsheet, reglas de adopción.
+
+### Validaciones
+
+- `pnpm lint` -> clean (1 error `lines-around-comment` autocorregido).
+- `pnpm build` -> Compiled successfully en 20.3s.
+- `npx tsc --noEmit` -> clean en archivos owned (vat-ledger.test.ts pre-existente sin relación).
+- Devtools verificados: aparecen en dev, ausentes en production build.
+
+### Decisiones canonicas
+
+1. **No exponer `useQuery` crudo en consumers**. Cada recurso server-side tiene un custom hook en `src/hooks/use<Resource>.ts` que centraliza queryKey, queryFn, types y overrides de cache. Consumers importan el hook, no useQuery directo.
+2. **Query keys solo desde el factory**. Inventar keys ad-hoc rompe la invalidación coordinada. Si necesitas un key nuevo, agregarlo a `qk` y exportarlo desde el index.
+3. **`throwOnError: false` por default**. El portal renderiza error UI con `query.error` en cada consumer. Cambiar a Error Boundaries forzaría refactor de cada vista.
+4. **Devtools `bottom-left`**. Coordinado para no chocar con el QuoteSummaryDock (top-right) ni con el sonner Toaster (top-right de TASK-512).
+5. **Adopción progresiva**. Esta task migra 3 ejemplos. El resto del portal (~100+ fetches) se migra slice por slice cuando se toque el dominio. No reabrir nada solo para migrar el cache layer.
+6. **Catalog data tiene staleTime largo**. `usePricingConfig` usa `staleTime: 5min` porque el catalog muta solo cuando finance edita el pricing catalog desde Admin Center. Esto reduce ~80% los hits al endpoint sin sacrificar frescura percibida.
+
+### Patrón canónico (cheatsheet para próximas migraciones)
+
+Antes:
+
+```tsx
+const [data, setData] = useState<X | null>(null)
+const [loading, setLoading] = useState(true)
+
+const load = useCallback(async () => {
+  const res = await fetch('/api/x')
+  if (res.ok) setData(await res.json())
+}, [])
+
+useEffect(() => { void load(); setLoading(false) }, [load])
+```
+
+Después:
+
+```tsx
+import useX from '@/hooks/useX'
+
+const { data, isPending: loading } = useX()
+```
+
+Para mutaciones:
+
+```tsx
+const queryClient = useQueryClient()
+
+await fetch('/api/x', { method: 'POST', ... })
+void queryClient.invalidateQueries({ queryKey: qk.x.all })
+```
+
+### Out of scope (queda como follow-up de la spec)
+
+- SSR hydration patterns para Next 16 App Router + react-query (cuando emerja un consumer que se beneficie del prefetch desde server component).
+- Audit y eventual remoción de `@reduxjs/toolkit` + `react-redux` del package.json (instalados pero unused).
+- Migración progresiva del resto de fetches en olas por dominio: finance, hr, agency, admin.
+- `useMutation` canónico para los flujos save/issue del Quote Builder con optimistic updates.
+- Suspense mode (defer explicitly mencionado en la spec).
+
+---
+
+## Sesion 2026-04-26 — API Platform Event Control Plane (TASK-617.3)
+
+### Que cambio
+
+- Se agregó el control plane ecosystem-facing de eventos bajo `src/app/api/platform/ecosystem/*`:
+  - `event-types`
+  - `webhook-subscriptions`
+  - `webhook-deliveries`
+  - `webhook-deliveries/:id/retry`
+- El transport raw sigue intacto en `src/lib/webhooks/**`, `/api/webhooks/*` y `/api/cron/webhook-dispatch`.
+- Nueva migración `20260426023509765_task-617-event-control-plane.sql` agrega metadata nullable de ownership/scope a `greenhouse_sync.webhook_subscriptions`.
+- Nuevo adapter `src/lib/api-platform/resources/events.ts` filtra subscriptions/deliveries por consumer + binding/scope.
+- El command `retry` reprograma el delivery (`retry_scheduled`, `next_retry_at=now`) para que lo procese el dispatcher existente.
+
+### Validaciones
+
+- Lint focal de los archivos nuevos del control plane: clean.
+- `npx tsc --noEmit --pretty false` no mostró errores nuevos del control plane; sigue apareciendo deuda previa en `src/lib/finance/vat-ledger.test.ts:33`.
+- Validación completa (`pnpm lint`, `pnpm build`, `pnpm migrate:up`) pendiente en esta misma sesión antes del commit/push final.
+
+### Nota de coordinación
+
+- El usuario pidió no cambiar de rama y después pidió commit/push de todo. El cierre se hará sobre la rama actual `develop`.
+
 ## Sesion 2026-04-26 — `react-toastify` -> `sonner` (TASK-512)
 
 ### Que cambio

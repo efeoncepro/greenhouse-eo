@@ -13,6 +13,112 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-26 — Server state con React Query (TASK-513)
+
+Adoptamos **`@tanstack/react-query` 5.x** como capa canónica de server state del portal. Es el cache layer estándar 2024-2026 (Vercel, Linear, Stripe, Ramp, Notion, Resend, shadcn). Reemplaza progresivamente el patrón `useState + useEffect + fetch` disperso por una cache global con invalidación coordinada, refetch on focus, dedup automático y devtools.
+
+### Foundation
+
+- **Mount canónico**: `src/components/providers/QueryClientProvider.tsx` instancia un `QueryClient` por árbol cliente y monta `ReactQueryDevtools` solo cuando `NODE_ENV !== 'production'`. Lo envuelve `src/components/Providers.tsx` adentro del `ThemeProvider`.
+- **Defaults sanos**:
+  - `staleTime: 30s` — evita refetch en cada mount.
+  - `gcTime: 5min` — libera memoria pero conserva cache mientras navegamos.
+  - `refetchOnWindowFocus: true` — vuelta al tab = datos frescos sin ceremonia.
+  - `retry: 1` — segunda chance en errores transitorios sin spam.
+  - `throwOnError: false` — los consumers renderizan su propio error UI con `query.error` (estilo del portal).
+- **Devtools**: solo en development; botón en `bottom-left` para no chocar con el builder dock (top-right) ni con el sonner Toaster.
+
+### Query keys factory
+
+Todos los query keys viven en `src/lib/react-query/keys.ts` siguiendo la convención oficial de TanStack: tuplas tipadas `as const`, una rama por dominio (`finance`, `people`, ...), con `all`, `lists()`, `list(filters)`, `details()`, `detail(id)`. Consumers importan vía:
+
+```ts
+import { qk } from '@/lib/react-query'
+
+useQuery({
+  queryKey: qk.finance.quotes.list({ status: 'draft' }),
+  queryFn: () => fetchQuotes({ status: 'draft' })
+})
+
+queryClient.invalidateQueries({ queryKey: qk.finance.quotes.all })
+```
+
+**Regla dura**: no inventar query keys ad-hoc en hooks de consumer. La invalidación coordinada depende de tener un solo lugar canónico donde se declaren los keys de cada recurso.
+
+### Hooks canónicos (custom)
+
+Cada recurso server-side tiene su hook custom en `src/hooks/use<Resource>.ts` que envuelve `useQuery` con su queryKey, queryFn y overrides apropiados de cache. Tres ejemplos shipping en V1:
+
+| Hook | Endpoint | Override |
+|---|---|---|
+| `useQuotesList(filters)` | `/api/finance/quotes` | defaults |
+| `usePricingConfig()` | `/api/finance/quotes/pricing/config` | `staleTime: 5min`, `gcTime: 30min`, `refetchOnWindowFocus: false` (catalog data) |
+| `usePeopleList()` | `/api/people` | defaults |
+
+### Migration cheatsheet
+
+Antes:
+
+```tsx
+const [data, setData] = useState<X | null>(null)
+const [loading, setLoading] = useState(true)
+
+const load = useCallback(async () => {
+  const res = await fetch('/api/x')
+  if (res.ok) setData(await res.json())
+}, [])
+
+useEffect(() => { void load(); setLoading(false) }, [load])
+```
+
+Después:
+
+```tsx
+import useX from '@/hooks/useX'
+
+const { data, isPending: loading } = useX()
+```
+
+Mutaciones (crear, actualizar, borrar) invalidan el query desde el callback:
+
+```tsx
+const queryClient = useQueryClient()
+
+await fetch('/api/x', { method: 'POST', ... })
+void queryClient.invalidateQueries({ queryKey: qk.x.all })
+```
+
+### Reglas de adopción
+
+- **No migrar todo de un golpe** — adopción es progresiva, slice por slice. Esta task ship 3 ejemplos y deja el patrón documentado.
+- **Custom hook por recurso** — no exponer `useQuery` crudo en consumers. El custom hook centraliza el queryKey, queryFn, types y los overrides de cache que el recurso amerita.
+- **Invalidación, no refetch manual** — al mutar un recurso, llamar `queryClient.invalidateQueries({ queryKey: qk.<resource>.all })` desde el `onSuccess` de la mutación (no via prop callback al child).
+- **`isPending` cubre el "loading inicial"** — cuando ya hay data en cache, el query es "background refresh" y `isFetching` lo refleja sin tumbar el UI.
+- **Errores en el consumer** — leer `query.error`; el provider mantiene `throwOnError: false` para no forzar Error Boundaries.
+- **Para CRUD optimistic, usar `useMutation`** con `onMutate` + `onSettled` + `setQueryData` — patrón canónico de TanStack.
+- **No reintroducir Redux Toolkit / RTK Query** — `@reduxjs/toolkit` y `react-redux` quedan installed pero unused (legacy del Vuexy starter); son candidatos a remover en un follow-up cuando se confirme que ningún flujo del portal los consume.
+
+### Files
+
+- `package.json` — add `@tanstack/react-query@^5.100.5` + `@tanstack/react-query-devtools@^5.100.5`.
+- `src/components/providers/QueryClientProvider.tsx` (NUEVO).
+- `src/components/Providers.tsx` — wrap children con QueryClientProvider.
+- `src/lib/react-query/keys.ts` (NUEVO).
+- `src/lib/react-query/index.ts` (NUEVO).
+- `src/hooks/useQuotesList.ts` (NUEVO).
+- `src/hooks/usePricingConfig.ts` (NUEVO).
+- `src/hooks/usePeopleList.ts` (NUEVO).
+- `src/views/greenhouse/finance/QuotesListView.tsx` — consume `useQuotesList`.
+- `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — consume `usePricingConfig`.
+- `src/views/greenhouse/people/PeopleList.tsx` — consume `usePeopleList` + `invalidateQueries` desde `CreateMemberDrawer onSuccess`.
+
+### Follow-ups documentados
+
+- SSR hydration patterns (Next 16 App Router + react-query) cuando emerja un consumer que se beneficie del prefetch desde el server component.
+- Audit y eventual remoción de `@reduxjs/toolkit` + `react-redux` del `package.json`.
+- Migración progresiva del resto de fetches (~100+ lugares) en olas por dominio: finance, hr, agency, admin.
+- `useMutation` canónico para los flujos save/issue del Quote Builder con optimistic updates.
+
 ## Delta 2026-04-25c — `react-toastify` → `sonner` (TASK-512)
 
 Reemplazamos `react-toastify 11.0.5` por **sonner 2.0** como librería canónica de toasts del portal. Sonner es el estándar 2024-2026 que usan Vercel, Linear, Resend y shadcn: stack visual moderno (pinch effect tipo iOS notifications), bundle ~4 KB (vs ~30 KB de react-toastify), `toast.promise()` integrado, swipe dismiss en mobile, keyboard shortcut `Alt+T`, y theme bridge con CSS vars.

@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto` (gap crítico — performance + consistencia + DX)
 - Effort: `Alto` (migración progresiva)

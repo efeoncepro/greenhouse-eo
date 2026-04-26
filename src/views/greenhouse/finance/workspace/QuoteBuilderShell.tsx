@@ -30,6 +30,7 @@ import type {
 import { UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
 import useParties, { type PartySearchError, type PartySearchItem } from '@/hooks/useParties'
+import usePricingConfig from '@/hooks/usePricingConfig'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
 import { GH_PRICING } from '@/config/greenhouse-nomenclature'
 import { previewChileTaxAmounts } from '@/lib/finance/pricing/quotation-tax-constants'
@@ -533,57 +534,45 @@ const QuoteBuilderShell = ({
     }
   }, [adoptParty, clearPartySearch, setOrganizationContext])
 
+  /*
+    TASK-513: pricingConfigQuery reemplaza el useEffect+fetch+AbortController
+    manual. La cache de react-query (staleTime 5min) evita re-fetchear el
+    catalog en cada mount del builder. El derivar de `pricingConfigQuery.data`
+    se hace via useMemo abajo para mantener el contrato existente con
+    builderOptions.
+  */
+  const { data: pricingConfigCatalog } = usePricingConfig()
+
   useEffect(() => {
-    const controller = new AbortController()
+    if (!pricingConfigCatalog) return
 
-    ;(async () => {
-      try {
-        const res = await fetch('/api/finance/quotes/pricing/config', { signal: controller.signal })
+    const commercialModels = pricingConfigCatalog.commercialModelMultipliers?.map(m => ({
+      code: m.modelCode,
+      label: m.modelLabel,
+      multiplierPct: Number(m.multiplierPct)
+    }))
 
-        if (!res.ok) return
+    const countryFactors = pricingConfigCatalog.countryPricingFactors?.map(f => ({
+      code: f.factorCode,
+      label: f.factorLabel,
+      factor: Number(f.factorOpt)
+    }))
 
-        const payload = (await res.json()) as {
-          catalog?: {
-            commercialModelMultipliers?: Array<{ modelCode: CommercialModelCode; modelLabel: string; multiplierPct: number }>
-            countryPricingFactors?: Array<{ factorCode: string; factorLabel: string; factorOpt: number }>
-            businessLines?: Array<{ moduleCode: string; label: string; isActive?: boolean; sortOrder?: number }>
-            employmentTypes?: Array<{ employmentTypeCode: string; labelEs: string; active?: boolean }>
-          }
-        }
+    const businessLines = pricingConfigCatalog.businessLines
+      ?.filter(bl => bl.isActive !== false)
+      .map(bl => ({ code: bl.moduleCode, label: bl.label }))
 
-        const commercialModels = payload.catalog?.commercialModelMultipliers?.map(m => ({
-          code: m.modelCode,
-          label: m.modelLabel,
-          multiplierPct: Number(m.multiplierPct)
-        }))
+    const employmentTypes = pricingConfigCatalog.employmentTypes
+      ?.filter(et => et.active !== false)
+      .map(et => ({ value: et.employmentTypeCode, label: et.labelEs }))
 
-        const countryFactors = payload.catalog?.countryPricingFactors?.map(f => ({
-          code: f.factorCode,
-          label: f.factorLabel,
-          factor: Number(f.factorOpt)
-        }))
-
-        const businessLines = payload.catalog?.businessLines
-          ?.filter(bl => bl.isActive !== false)
-          .map(bl => ({ code: bl.moduleCode, label: bl.label }))
-
-        const employmentTypes = payload.catalog?.employmentTypes
-          ?.filter(et => et.active !== false)
-          .map(et => ({ value: et.employmentTypeCode, label: et.labelEs }))
-
-        setBuilderOptions(prev => ({
-          businessLines: businessLines && businessLines.length > 0 ? businessLines : prev.businessLines,
-          commercialModels: commercialModels && commercialModels.length > 0 ? commercialModels : prev.commercialModels,
-          countryFactors: countryFactors && countryFactors.length > 0 ? countryFactors : prev.countryFactors,
-          employmentTypes: employmentTypes && employmentTypes.length > 0 ? employmentTypes : prev.employmentTypes
-        }))
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') return
-      }
-    })()
-
-    return () => controller.abort()
-  }, [])
+    setBuilderOptions(prev => ({
+      businessLines: businessLines && businessLines.length > 0 ? businessLines : prev.businessLines,
+      commercialModels: commercialModels && commercialModels.length > 0 ? commercialModels : prev.commercialModels,
+      countryFactors: countryFactors && countryFactors.length > 0 ? countryFactors : prev.countryFactors,
+      employmentTypes: employmentTypes && employmentTypes.length > 0 ? employmentTypes : prev.employmentTypes
+    }))
+  }, [pricingConfigCatalog])
 
   // TASK-486: al cambiar de organización recargar la lista de contactos anclables.
   useEffect(() => {

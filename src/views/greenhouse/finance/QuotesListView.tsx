@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -22,6 +22,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import useQuotesList from '@/hooks/useQuotesList'
 import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -114,35 +115,19 @@ const marginChipColor = (effective: number | null, floor: number | null, target:
 const QuotesListView = () => {
   const router = useRouter()
   const morphRouter = useViewTransitionRouter()
-  const [loading, setLoading] = useState(true)
-  const [items, setItems] = useState<Quote[]>([])
   const [statusFilter, setStatusFilter] = useState('')
   const [sourceFilter, setSourceFilter] = useState('')
 
-  const fetchQuotes = useCallback(async () => {
-    setLoading(true)
-
-    try {
-      const params = new URLSearchParams()
-
-      if (statusFilter) params.set('status', statusFilter)
-      if (sourceFilter) params.set('source', sourceFilter)
-
-      const res = await fetch(`/api/finance/quotes?${params.toString()}`)
-
-      if (res.ok) {
-        const data = await res.json()
-
-        setItems(data.items ?? [])
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [statusFilter, sourceFilter])
-
-  useEffect(() => {
-    fetchQuotes()
-  }, [fetchQuotes])
+  /*
+    TASK-513: useQuotesList encapsula el fetch + cache. Cada combinacion de
+    filtros vive en su propio queryKey, asi navegar entre ellas es instantaneo
+    cuando los datos siguen frescos (staleTime 30s) y refetchOnWindowFocus
+    los mantiene al dia cuando el usuario vuelve al tab.
+  */
+  const { data: items = [] as Quote[], isPending: loading } = useQuotesList({
+    status: statusFilter || undefined,
+    source: sourceFilter || undefined
+  })
 
   const handleNewQuote = useCallback(() => {
     router.push('/finance/quotes/new')

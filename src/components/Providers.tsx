@@ -11,6 +11,7 @@ import { SettingsProvider } from '@core/contexts/settingsContext'
 import { OperatingEntityProvider } from '@/context/OperatingEntityContext'
 import AuthSessionProvider from '@components/auth/AuthSessionProvider'
 import ThemeProvider from '@components/theme'
+import QueryClientProvider from '@/components/providers/QueryClientProvider'
 
 // Toast Imports — TASK-512: sonner replaces react-toastify (zero-dep, ~4KB,
 // matches the 2024-2026 enterprise toast UX shipped by Vercel/Linear/Resend).
@@ -51,7 +52,14 @@ const Providers = async (props: Props) => {
         <VerticalNavProvider>
           <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
             <ThemeProvider direction={direction} systemMode={systemMode}>
-              {children}
+              {/*
+                TASK-513: react-query QueryClientProvider envuelve la
+                aplicacion. Cualquier hook que use useQuery / useMutation
+                pasa por aqui. Devtools cargan solo en development.
+              */}
+              <QueryClientProvider>
+                {children}
+              </QueryClientProvider>
               {/*
                 TASK-512: sonner Toaster.
                 - position='top-right' preserves the placement convention
