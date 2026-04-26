@@ -6071,6 +6071,39 @@ export interface GreenhouseServingUser360 {
   user_id: string | null;
 }
 
+export interface GreenhouseSyncHandlerHealth {
+  consecutive_failures: Generated<number>;
+  consecutive_successes: Generated<number>;
+  created_at: Generated<Timestamp>;
+  /**
+   * State machine: healthy → degraded (>=3 consecutive failures) → failed (dead-letter or >=10 consecutive failures) → quarantined (manual or auto-quarantine). Returns to healthy on first success.
+   */
+  current_state: Generated<string>;
+  handler: string;
+  last_dead_letter_event_id: string | null;
+  last_error_class: string | null;
+  last_error_family: string | null;
+  last_event_id: string | null;
+  last_failure_at: Timestamp | null;
+  last_success_at: Timestamp | null;
+  quarantine_reason: string | null;
+  quarantined_at: Timestamp | null;
+  state_changed_at: Generated<Timestamp>;
+  total_dead_letter_count: Generated<Int8>;
+  total_recovered_count: Generated<Int8>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseSyncHandlerHealthTransitions {
+  from_state: string;
+  handler: string;
+  reason: string | null;
+  to_state: string;
+  transition_id: Generated<Int8>;
+  transitioned_at: Generated<Timestamp>;
+  trigger_event_id: string | null;
+}
+
 export interface GreenhouseSyncIdentityProfileMergeLog {
   client_users_moved: Generated<number>;
   contacts_moved: Generated<number>;
@@ -6324,6 +6357,11 @@ export interface GreenhouseSyncOutboxEvents {
 }
 
 export interface GreenhouseSyncOutboxReactiveLog {
+  /**
+   * When an operator manually acknowledged this dead-letter row as resolved. Acknowledged rows do not count toward the active dead-letter KPI.
+   */
+  acknowledged_at: Timestamp | null;
+  acknowledged_by: string | null;
   error_class: string | null;
   error_family: string | null;
   event_id: string;
@@ -6331,6 +6369,11 @@ export interface GreenhouseSyncOutboxReactiveLog {
   is_infrastructure_fault: Generated<boolean>;
   last_error: string | null;
   reacted_at: Generated<Timestamp>;
+  /**
+   * When a later attempt of the same (handler, event_id) succeeded. Auto-set by the reactive worker. Recovered rows do not count toward the active dead-letter KPI.
+   */
+  recovered_at: Timestamp | null;
+  resolution_note: string | null;
   result: string | null;
   retries: Generated<number>;
 }
@@ -6519,6 +6562,15 @@ export interface GreenhouseSyncSourceSyncWatermarks {
 }
 
 export interface GreenhouseSyncWebhookDeliveries {
+  /**
+   * When an operator marked this dead-letter delivery as resolved. Excludes the row from the active dead-letter KPI without losing the audit trail.
+   */
+  acknowledged_at: Timestamp | null;
+  acknowledged_by: string | null;
+  /**
+   * Auto-set by retention cron for dead_letter rows older than the retention window. Excludes the row from active dashboards.
+   */
+  archived_at: Timestamp | null;
   attempt_count: Generated<number>;
   completed_at: Timestamp | null;
   created_at: Generated<Timestamp>;
@@ -6527,6 +6579,7 @@ export interface GreenhouseSyncWebhookDeliveries {
   last_error_message: string | null;
   last_http_status: number | null;
   next_retry_at: Timestamp | null;
+  resolution_note: string | null;
   status: Generated<string>;
   webhook_delivery_id: string;
   webhook_subscription_id: string;
@@ -6543,6 +6596,23 @@ export interface GreenhouseSyncWebhookDeliveryAttempts {
   started_at: Generated<Timestamp>;
   webhook_delivery_attempt_id: string;
   webhook_delivery_id: string;
+}
+
+export interface GreenhouseSyncWebhookEndpointHealth {
+  active_dead_letter_count: Generated<number>;
+  consecutive_failures: Generated<number>;
+  consecutive_successes: Generated<number>;
+  created_at: Generated<Timestamp>;
+  current_state: Generated<string>;
+  last_dead_letter_at: Timestamp | null;
+  last_error_message: string | null;
+  last_failure_at: Timestamp | null;
+  last_http_status: number | null;
+  last_success_at: Timestamp | null;
+  state_changed_at: Generated<Timestamp>;
+  total_dead_letter_count: Generated<Int8>;
+  updated_at: Generated<Timestamp>;
+  webhook_subscription_id: string;
 }
 
 export interface GreenhouseSyncWebhookEndpoints {
@@ -6868,6 +6938,8 @@ export interface DB {
   "greenhouse_serving.session_360": GreenhouseServingSession360;
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
+  "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
+  "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;
   "greenhouse_sync.identity_profile_merge_log": GreenhouseSyncIdentityProfileMergeLog;
   "greenhouse_sync.identity_reconciliation_proposals": GreenhouseSyncIdentityReconciliationProposals;
   "greenhouse_sync.integration_data_quality_checks": GreenhouseSyncIntegrationDataQualityChecks;
@@ -6895,6 +6967,7 @@ export interface DB {
   "greenhouse_sync.source_sync_watermarks": GreenhouseSyncSourceSyncWatermarks;
   "greenhouse_sync.webhook_deliveries": GreenhouseSyncWebhookDeliveries;
   "greenhouse_sync.webhook_delivery_attempts": GreenhouseSyncWebhookDeliveryAttempts;
+  "greenhouse_sync.webhook_endpoint_health": GreenhouseSyncWebhookEndpointHealth;
   "greenhouse_sync.webhook_endpoints": GreenhouseSyncWebhookEndpoints;
   "greenhouse_sync.webhook_inbox_events": GreenhouseSyncWebhookInboxEvents;
   "greenhouse_sync.webhook_subscriptions": GreenhouseSyncWebhookSubscriptions;

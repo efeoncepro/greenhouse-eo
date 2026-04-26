@@ -4,6 +4,7 @@ import type { WebhookSubscription, WebhookDelivery, WebhookEnvelope, EventFilter
 import { signPayload, resolveSecret } from './signing'
 import { updateDeliveryStatus, insertDeliveryAttempt } from './store'
 import { getNextRetryAt, isRetryableHttpStatus, shouldDeadLetter } from './retry-policy'
+import { recordWebhookOutcome, type WebhookOutcome } from './endpoint-health'
 
 const DELIVERY_TIMEOUT_MS = 10_000
 
@@ -131,6 +132,8 @@ export const deliverWebhook = async (
         attemptCount: attemptNumber
       })
 
+      await foldOutcomeIntoEndpointHealth(subscription, 'succeeded', responseStatus, null)
+
       return
     }
 
@@ -153,12 +156,15 @@ export const deliverWebhook = async (
   })
 
   // Decide: retry or dead-letter
+  let foldedOutcome: WebhookOutcome
+
   if (shouldDeadLetter(attemptNumber, responseStatus)) {
     await updateDeliveryStatus(delivery.webhook_delivery_id, 'dead_letter', {
       httpStatus: responseStatus ?? undefined,
       errorMessage,
       attemptCount: attemptNumber
     })
+    foldedOutcome = 'dead_letter'
   } else if (isRetryableHttpStatus(responseStatus)) {
     const nextRetryAt = getNextRetryAt(attemptNumber)
 
@@ -168,11 +174,43 @@ export const deliverWebhook = async (
       nextRetryAt: nextRetryAt || undefined,
       attemptCount: attemptNumber
     })
+    foldedOutcome = 'retry_scheduled'
   } else {
     await updateDeliveryStatus(delivery.webhook_delivery_id, 'dead_letter', {
       httpStatus: responseStatus ?? undefined,
       errorMessage,
       attemptCount: attemptNumber
+    })
+    foldedOutcome = 'dead_letter'
+  }
+
+  await foldOutcomeIntoEndpointHealth(subscription, foldedOutcome, responseStatus, errorMessage)
+}
+
+/**
+ * Fold the delivery outcome into the canonical webhook_endpoint_health
+ * state machine. Failure is non-fatal: a health-table write error must
+ * not regress the delivery — the audit row already captured what
+ * happened, and the next attempt will sync the state back.
+ */
+const foldOutcomeIntoEndpointHealth = async (
+  subscription: WebhookSubscription,
+  outcome: WebhookOutcome,
+  httpStatus: number | null,
+  errorMessage: string | null
+): Promise<void> => {
+  if (!subscription.webhook_subscription_id) return
+
+  try {
+    await recordWebhookOutcome({
+      webhookSubscriptionId: subscription.webhook_subscription_id,
+      outcome,
+      httpStatus,
+      errorMessage
+    })
+  } catch (error) {
+    console.warn('[webhooks/outbound] webhook_endpoint_health upsert failed', {
+      error: error instanceof Error ? error.message : 'unknown_error'
     })
   }
 }

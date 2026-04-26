@@ -479,9 +479,14 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
         `SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications WHERE created_at > NOW() - INTERVAL '24 hours'`
       ),
       safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.space_notion_sources WHERE sync_enabled = TRUE`),
+      // KPI canónica: cuenta handlers DISTINTOS en estado degraded/failed/quarantined
+      // desde el state machine (`handler_health`), no rows del audit log. Antes
+      // este KPI reportaba "7522 handlers degradados" sumando filas lifetime
+      // de retries; un único handler con 4193 retries aparecía como 4193
+      // "handlers degraded". El state machine produce un número honesto.
       hasReactiveLog
         ? safeCount(
-            `SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_reactive_log WHERE result IN ('retry', 'dead-letter')`
+            `SELECT COUNT(*) AS cnt FROM greenhouse_sync.handler_health WHERE current_state <> 'healthy'`
           )
         : 0,
       readReactiveBacklogOverview()
@@ -601,8 +606,12 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     hasWebhookDeliveries
       ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_deliveries WHERE status = 'retry_scheduled'`)
       : 0,
+    // KPI canónica: dead-letters ACTIVOS (sin acknowledged_at, sin archived_at).
+    // Antes contaba lifetime y mostraba "1 delivery dead-letter" por una row
+    // del 29-marzo que ya nadie iba a recover. Mismo patrón que handler_health:
+    // recovery + ack son first-class en el contrato.
     hasWebhookDeliveries
-      ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_deliveries WHERE status = 'dead_letter'`)
+      ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_deliveries WHERE status = 'dead_letter' AND acknowledged_at IS NULL AND archived_at IS NULL`)
       : 0,
     hasWebhookEndpoints || hasWebhookSubscriptions
       ? safeCount(`
@@ -849,31 +858,58 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
 
   try {
     if (hasReactiveLog) {
+      // Lectura canónica: un row por handler distinto con state != healthy.
+      // Antes esta query devolvía las últimas 10 filas del audit log, lo cual
+      // mostraba el mismo handler 10 veces si fallaba seguido. El state
+      // machine produce una única vista por handler con su error más
+      // reciente (joined contra el log para preservar el `last_error`).
       const rows = await runGreenhousePostgresQuery<
         {
           handler: string
-          result: string
-          retries: number
-          reacted_at: string
+          current_state: string
+          consecutive_failures: number
+          last_failure_at: string | null
           last_error: string | null
-          error_class: string | null
+          last_error_class: string | null
           is_infrastructure_fault: boolean | null
         } & Record<string, unknown>
       >(
-        `SELECT handler, result, retries, reacted_at::text, last_error, error_class, is_infrastructure_fault
-         FROM greenhouse_sync.outbox_reactive_log
-         WHERE result IN ('retry', 'dead-letter')
-         ORDER BY reacted_at DESC
-         LIMIT 10`
+        `SELECT
+            h.handler,
+            h.current_state,
+            h.consecutive_failures,
+            h.last_failure_at::text AS last_failure_at,
+            latest.last_error,
+            h.last_error_class,
+            latest.is_infrastructure_fault
+          FROM greenhouse_sync.handler_health h
+          LEFT JOIN LATERAL (
+            SELECT last_error, is_infrastructure_fault
+              FROM greenhouse_sync.outbox_reactive_log r
+             WHERE r.handler = h.handler
+               AND r.result IN ('retry','dead-letter')
+             ORDER BY r.reacted_at DESC
+             LIMIT 1
+          ) latest ON TRUE
+          WHERE h.current_state <> 'healthy'
+          ORDER BY
+            CASE h.current_state
+              WHEN 'failed' THEN 0
+              WHEN 'quarantined' THEN 1
+              WHEN 'degraded' THEN 2
+              ELSE 3
+            END,
+            h.last_failure_at DESC NULLS LAST
+          LIMIT 10`
       )
 
       failedHandlersRows = rows.map(row => ({
         handler: row.handler,
-        result: row.result,
-        retries: Number(row.retries ?? 0),
-        reactedAt: row.reacted_at,
+        result: row.current_state === 'failed' || row.current_state === 'quarantined' ? 'dead-letter' : 'retry',
+        retries: Number(row.consecutive_failures ?? 0),
+        reactedAt: row.last_failure_at ?? new Date(0).toISOString(),
         lastError: row.last_error || 'Unknown error',
-        errorClass: row.error_class ?? null,
+        errorClass: row.last_error_class ?? null,
         isInfrastructure: Boolean(row.is_infrastructure_fault ?? false)
       }))
     }

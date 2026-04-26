@@ -27,6 +27,7 @@ import {
   markRefreshFailed
 } from './refresh-queue'
 import { classifyReactiveError } from './reactive-error-classification'
+import { recordHandlerOutcomes, type HandlerOutcome } from './handler-health'
 
 /**
  * V2 reactive consumer (TASK-379).
@@ -259,7 +260,43 @@ const bulkAcknowledgeEvents = async (
          is_infrastructure_fault = EXCLUDED.is_infrastructure_fault`,
       params
     )
+
+    // Fold each entry into the canonical handler_health state machine.
+    // Failure is non-fatal here: the reactive worker MUST not regress on a
+    // health-table write error, so the audit log stays the primary source
+    // and we just log + continue.
+    try {
+      await recordHandlerOutcomes(
+        chunk.map(entry => ({
+          handler: entry.handler,
+          outcome: classifyOutcome(entry.result),
+          eventId: entry.eventId,
+          errorClass: entry.errorClass ?? null,
+          errorFamily: entry.errorFamily ?? null
+        }))
+      )
+    } catch (error) {
+      console.warn('[reactive-consumer] handler_health upsert failed', {
+        error: error instanceof Error ? error.message : 'unknown_error'
+      })
+    }
   }
+}
+
+/**
+ * Map the audit-log `result` string to the canonical `HandlerOutcome` enum
+ * consumed by `handler_health`. Unknown values default to `no-op` (treated
+ * as success) — better to be optimistic about state than to falsely flag
+ * a handler as failed because of a string we don't recognize.
+ */
+const classifyOutcome = (result: string): HandlerOutcome => {
+  if (result === 'success' || result.startsWith('success')) return 'success'
+  if (result === 'dead-letter') return 'dead-letter'
+  if (result === 'retry') return 'retry'
+  if (result.startsWith('skipped')) return 'skipped'
+  if (result.startsWith('no-op') || result.startsWith('coalesced')) return 'no-op'
+
+  return 'no-op'
 }
 
 const ensureProjectionStats = (
