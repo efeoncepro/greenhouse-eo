@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { signAgentSessionInProcess } from '@/lib/auth/sign-agent-session-in-process'
 import { RELIABILITY_REGISTRY } from '@/lib/reliability/registry'
 import type { ReliabilityModuleKey, ReliabilityRouteRef } from '@/types/reliability'
 import type {
@@ -62,48 +63,39 @@ export const resolveBaseUrl = (env: NodeJS.ProcessEnv = process.env): BaseUrlCon
 }
 
 /**
- * Obtiene cookie de session via Agent Auth. Retorna null si no se puede
- * autenticar (kill-switch implícito: si falla auth, el sweep degrada y
- * marca cada probe como skipped).
+ * Obtiene cookie de session firmando in-process via NextAuth JWT encode.
+ *
+ * Antes hacía `fetch(${baseUrl}/api/auth/agent-session)` — un self-hit
+ * HTTP que tenía que atravesar el SSO wall de Vercel y dependía de
+ * `VERCEL_AUTOMATION_BYPASS_SECRET` estar presente y no-sombreada.
+ * Cualquier corrupción de ese secreto rompía el sweep entero con
+ * `skippedReason: 'AGENT_AUTH_SECRET no configurado o agent-session falló'`.
+ *
+ * Ahora firma el JWT directamente en el mismo proceso del cron usando
+ * `signAgentSessionInProcess` — mismo código que el endpoint HTTP usa
+ * internamente, sin roundtrip de red, sin dependencia del bypass header,
+ * sin pasar por el SSO wall. El endpoint HTTP queda intacto para clientes
+ * externos (Playwright, MCP). El sweep ya no se rompe cuando alguien rota
+ * o sombrea `VERCEL_AUTOMATION_BYPASS_SECRET`.
+ *
+ * Retorna null solo cuando:
+ *  - El usuario agente no existe en PG (bug real de provisioning).
+ *  - NextAuth secret no está disponible (bug real de config).
+ * Ambos casos producen logs específicos en `signAgentSessionInProcess`.
  */
 const acquireAgentSession = async (
-  baseUrl: string,
-  bypassSecret: string | null,
   env: NodeJS.ProcessEnv
 ): Promise<AgentAuthCookie | null> => {
-  const secret = env.AGENT_AUTH_SECRET?.trim()
-
-  if (!secret) return null
-
   const email = env.AGENT_AUTH_EMAIL?.trim() || DEFAULT_AGENT_EMAIL
 
-  const headers: Record<string, string> = { 'content-type': 'application/json' }
-
-  if (bypassSecret) headers['x-vercel-protection-bypass'] = bypassSecret
-
   try {
-    const response = await fetch(`${baseUrl}/api/auth/agent-session`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ secret, email })
-    })
+    const session = await signAgentSessionInProcess(email)
 
-    if (!response.ok) {
-      console.warn('[reliability-synthetic] agent-session failed', {
-        status: response.status,
-        text: (await response.text()).slice(0, 200)
-      })
+    if (!session) return null
 
-      return null
-    }
-
-    const json = (await response.json()) as { cookieName?: string; cookieValue?: string }
-
-    if (!json.cookieName || !json.cookieValue) return null
-
-    return { cookieName: json.cookieName, cookieValue: json.cookieValue }
+    return { cookieName: session.cookieName, cookieValue: session.cookieValue }
   } catch (error) {
-    console.warn('[reliability-synthetic] agent-session threw', {
+    console.warn('[reliability-synthetic] in-process agent-session sign threw', {
       error: (error as Error).message
     })
 
@@ -249,11 +241,11 @@ export const runReliabilitySyntheticSweep = async ({
 
   await recordSweepStarted({ sweepRunId, triggeredBy, notes: `baseUrl=${baseUrl}` })
 
-  const cookie = await acquireAgentSession(baseUrl, bypassSecret, env)
+  const cookie = await acquireAgentSession(env)
 
   if (!cookie) {
     const summary = buildSummary({
-      skippedReason: 'AGENT_AUTH_SECRET no configurado o agent-session falló — sweep cancelado.'
+      skippedReason: 'No se pudo firmar la sesión de agente in-process (usuario agente ausente o NEXTAUTH_SECRET faltante).'
     })
 
     await recordSweepFinished(summary)
