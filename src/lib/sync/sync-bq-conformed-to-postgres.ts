@@ -149,6 +149,21 @@ const toNumber = (value: string | number | null | undefined): number | null => {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+/**
+ * BQ stores some Notion-derived metrics as STRING (formulas) which can be
+ * fractional (e.g. `days_late = 0.1176...`). The PG `greenhouse_delivery.*`
+ * tables type these as INTEGER, so we truncate at the writer boundary. Using
+ * `Math.trunc` (not `Math.round`) to preserve the "days passed so far" semantic
+ * for `days_late` — `0.5` should be `0 days late`, not `1`.
+ */
+const toInteger = (value: string | number | null | undefined): number | null => {
+  const n = toNumber(value)
+
+  if (n === null) return null
+
+  return Math.trunc(n)
+}
+
 const toBool = (value: boolean | null | undefined): boolean => {
   if (value === true) return true
 
@@ -240,8 +255,8 @@ export const syncBqConformedToPostgres = async ({
     sprint_status: row.sprint_status,
     start_date: toIsoString(row.start_date),
     end_date: toIsoString(row.end_date),
-    completed_tasks_count: toNumber(row.completed_tasks_count),
-    total_tasks_count: toNumber(row.total_tasks_count),
+    completed_tasks_count: toInteger(row.completed_tasks_count),
+    total_tasks_count: toInteger(row.total_tasks_count),
     completion_pct_source: toNumber(row.completion_pct_source),
     page_url: row.page_url,
     is_deleted: toBool(row.is_deleted),
@@ -270,21 +285,21 @@ export const syncBqConformedToPostgres = async ({
     task_priority: row.task_priority,
     completion_label: row.completion_label,
     delivery_compliance: row.delivery_compliance,
-    days_late: toNumber(row.days_late),
-    rescheduled_days: toNumber(row.rescheduled_days),
+    days_late: toInteger(row.days_late),
+    rescheduled_days: toInteger(row.rescheduled_days),
     is_rescheduled: toBool(row.is_rescheduled),
     performance_indicator_label: row.performance_indicator_label,
     performance_indicator_code: row.performance_indicator_code,
     client_change_round_label: row.client_change_round_label,
-    client_change_round_final: toNumber(row.client_change_round_final),
+    client_change_round_final: toInteger(row.client_change_round_final),
     rpa_semaphore_source: row.rpa_semaphore_source,
     rpa_value: toNumber(row.rpa_value),
-    frame_versions: toNumber(row.frame_versions),
-    frame_comments: toNumber(row.frame_comments),
-    open_frame_comments: toNumber(row.open_frame_comments),
+    frame_versions: toInteger(row.frame_versions),
+    frame_comments: toInteger(row.frame_comments),
+    open_frame_comments: toInteger(row.open_frame_comments),
     client_review_open: toBool(row.client_review_open),
     workflow_review_open: toBool(row.workflow_review_open),
-    blocker_count: toNumber(row.blocker_count) ?? 0,
+    blocker_count: toInteger(row.blocker_count) ?? 0,
     last_frame_comment: row.last_frame_comment,
     tarea_principal_ids: row.tarea_principal_ids,
     subtareas_ids: row.subtareas_ids,
@@ -292,7 +307,7 @@ export const syncBqConformedToPostgres = async ({
     execution_time_label: row.execution_time_label,
     changes_time_label: row.changes_time_label,
     review_time_label: row.review_time_label,
-    workflow_change_round: toNumber(row.workflow_change_round),
+    workflow_change_round: toInteger(row.workflow_change_round),
     due_date: toIsoString(row.due_date),
     completed_at: toIsoString(row.completed_at),
     page_url: row.page_url,
