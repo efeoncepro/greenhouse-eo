@@ -15,11 +15,27 @@
 - **GitHub Action**: `.github/workflows/azure-teams-deploy.yml` con Workload Identity Federation (sin client secret), validate (`az bicep build`) + deploy (`az deployment group create`). Trigger condicionado a `infra/azure/teams-notifications/**`.
 - **Docs**: `docs/architecture/GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` + runbook operativo `docs/operations/azure-teams-notifications.md` con steps OAuth one-time del Teams connector y publicación de URLs en GCP Secret Manager.
 
+### Live test validado end-to-end (2026-04-26 08:36 a.m.)
+
+Validación pre-Bicep usando un Power Automate Workflow temporal en el canal "Alineación":
+
+- Trigger HTTP del Workflow + acción "Publicar tarjeta en un chat o canal" con expresión `string(triggerBody()?['attachments']?[0]?['content'])`
+- Test 1: card `ops-alert` (severity=info, accent style) renderizó correcto con FactSet de 5 facts + botón "Ver Ops Health"
+- Test 2: card `finance-alert` (kind=vat_period_materialized, good style) renderizó correcto con montos CLP/USD formateados via Intl + botón "Ver detalle"
+- Validó: shape del payload, Adaptive Card 1.5, render del card builder, formato Intl, OpenUrl actions
+- Latencia HTTP ~377-514ms (curl directo, sin sender)
+
+Aprendizaje crítico para el runbook:
+- El template "Enviar alertas de webhook a un canal" (Azure Monitor schema) **NO sirve** — descarta el payload porque espera shape específico
+- El template correcto es: trigger "When a Teams webhook request is received" + acción "Publicar tarjeta en un chat o canal" con la expresión `string(triggerBody()?['attachments']?[0]?['content'])`
+- El editor de Power Automate dentro de Teams es buggy con drafts (cambios no persisten); usar `make.powerautomate.com` directo para edits no triviales
+- El Bicep canónico (`infra/azure/teams-notifications/modules/logic-app-channel.bicep`) ya tiene la configuración correcta — esto NO es un issue cuando deploy formal vía IaC
+
 ### Estado pendiente
 
-- Despliegue real Azure: registrar `Microsoft.Logic` provider, configurar WIF federated credential, llenar `parameters.prod.json` con Team/Channel GUIDs reales, autorizar OAuth de la Teams API connection (interactivo, único paso manual irreductible).
+- Despliegue Bicep formal: registrar `Microsoft.Logic` provider, configurar WIF federated credential, llenar `parameters.prod.json` con Team/Channel GUIDs reales, autorizar OAuth de la Teams API connection (interactivo, único paso manual irreductible).
 - Publicar 3 secretos en GCP Secret Manager con las URLs callback de los Logic Apps.
-- Ejecutar smoke `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"ops-alerts"}'` — usuario solicitó explícitamente prueba real al final.
+- Ejecutar smoke completo del path Greenhouse: `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"ops-alerts"}'` (validar que `postTeamsCard` → `resolveSecretByRef` → fetch → `source_sync_runs` funciona end-to-end con la URL real del Logic App, no solo curl directo).
 - Open Questions vivas en la spec: cuenta de servicio dueña del Teams connector, co-owners por canal, evento `delivery.daily-pulse` (cron emitter pendiente).
 
 ### Notas de coordinacion
