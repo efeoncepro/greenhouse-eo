@@ -9,6 +9,26 @@
 
 ---
 
+## Delta 2026-04-26 — TASK-617.3 aterriza el Event Control Plane ecosystem-facing
+
+- `api/platform/ecosystem/*` ya expone el plano de control de eventos sin mover el transport raw:
+  - `GET /event-types`
+  - `GET/POST /webhook-subscriptions`
+  - `GET/PATCH /webhook-subscriptions/:id`
+  - `GET /webhook-deliveries`
+  - `GET /webhook-deliveries/:id`
+  - `POST /webhook-deliveries/:id/retry`
+- El transport sigue siendo `src/lib/webhooks/**`, `/api/webhooks/*` y `/api/cron/webhook-dispatch`.
+- Las subscriptions creadas por el control plane guardan ownership ecosystem-facing en `greenhouse_sync.webhook_subscriptions`:
+  - `sister_platform_consumer_id`
+  - `sister_platform_binding_id`
+  - `greenhouse_scope_type`
+  - `organization_id`, `client_id`, `space_id`
+- Regla canónica:
+  - consumers externos solo ven subscriptions/deliveries propias del consumer + binding resuelto
+  - legacy/internal subscriptions sin owner quedan fuera del control plane ecosystem-facing
+  - retry es un command de control plane que reprograma delivery; no envía HTTP inline ni reemplaza al dispatcher
+
 ## 1. Objetivo
 
 Formalizar la arquitectura canónica de la `API platform` de Greenhouse para que el portal deje de crecer como una suma de rutas aisladas y pase a operar una capa de contratos consistente, robusta, resiliente, segura y escalable para:

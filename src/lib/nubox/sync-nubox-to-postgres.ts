@@ -18,7 +18,7 @@ import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-id
 import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
 import type { ChileTaxSnapshot } from '@/lib/tax/chile'
 
-type NuboxProjectionSale = NuboxConformedSale & {
+export type NuboxProjectionSale = NuboxConformedSale & {
   source_last_ingested_at: string | null
 }
 
@@ -754,7 +754,7 @@ const reconcileIncomeFromBankMovement = async (
 
 // ─── Quote Upsert (DTE 52 → quotes table) ────────────────────────────────
 
-const upsertQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
+export const upsertNuboxQuoteFromSale = async (sale: NuboxProjectionSale): Promise<'created' | 'updated' | 'skipped'> => {
   if (!sale.nubox_sale_id || isNaN(Number(sale.nubox_sale_id))) return 'skipped'
 
   const existing = await runGreenhousePostgresQuery<{ quote_id: string }>(
@@ -918,7 +918,7 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
     for (const sale of conformedSales) {
       if (sale.dte_type_code === '52' || sale.dte_type_code === 'COT') {
         // Cotizaciones go to quotes table, not income
-        const result = await upsertQuoteFromSale(sale)
+        const result = await upsertNuboxQuoteFromSale(sale)
 
         if (result === 'created') quotesCreated++
         else if (result === 'updated') quotesUpdated++

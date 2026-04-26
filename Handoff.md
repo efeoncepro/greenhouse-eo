@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Nubox Quotes Hot Sync
+
+### Que cambio
+
+- Se agregó un carril incremental robusto para cotizaciones Nubox:
+  - runtime `src/lib/nubox/sync-nubox-quotes-hot.ts`
+  - cron `GET /api/cron/nubox-quotes-hot-sync`
+  - schedule Vercel `*/15 * * * *`
+  - script `pnpm sync:nubox:quotes-hot -- --period=YYYY-MM`
+- El carril consulta `/sales` solo para la ventana caliente, filtra `COT` / DTE 52, escribe primero raw BigQuery, luego conformed BigQuery y recién después proyecta a `greenhouse_finance.quotes`.
+- Reutiliza `upsertNuboxQuoteFromSale`, el mismo contrato del full ETL diario, con advisory lock de sesión para evitar solapes.
+- Observabilidad nueva en `greenhouse_sync.source_sync_runs` con `source_object_type='quotes_hot_sync'`; fallos se registran en `source_sync_failures`.
+
+### Validaciones
+
+- `pnpm exec eslint src/lib/nubox/sync-nubox-quotes-hot.ts src/lib/nubox/sync-nubox-conformed.ts src/lib/nubox/sync-nubox-to-postgres.ts src/app/api/cron/nubox-quotes-hot-sync/route.ts scripts/run-nubox-quotes-hot-sync.ts` → clean.
+- `npx tsc --noEmit --pretty false --skipLibCheck` sigue bloqueado por deuda preexistente en `src/lib/finance/vat-ledger.test.ts:33`; no corresponde a este cambio.
+- No se ejecutó hot sync local contra Nubox porque el secreto local actual devuelve 403; staging/prod usan el token runtime que ya viene funcionando en `nubox-sync`.
+
+### Notas de coordinacion
+
+- Archivos sensibles tocados: `vercel.json`, `project_context.md`, `Handoff.md`, `changelog.md`.
+- No se hizo ningún parche de datos ni inserción manual de cotizaciones.
+
 ## Sesion 2026-04-26 — `@tanstack/react-query` adoption (TASK-513)
 
 ### Que cambio

@@ -17,7 +17,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-617.1`, `TASK-617.2`, `TASK-617.3`
+- Blocked by: `none`
 - Branch: `task/TASK-617.4-developer-api-documentation-portal`
 - Legacy ID: `—`
 - GitHub Issue: `—`

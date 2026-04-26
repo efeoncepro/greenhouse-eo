@@ -34,7 +34,7 @@ export type SyncNuboxConformedResult = {
 
 // ─── Identity Resolution ────────────────────────────────────────────────────
 
-const buildOrgByRutMap = async () => {
+export const buildNuboxOrgByRutMap = async () => {
   // Use GROUP BY + MAX to pick the first non-null client_id
   // when an organization has multiple active spaces
   const rows = await runGreenhousePostgresQuery<{
@@ -62,7 +62,7 @@ const buildOrgByRutMap = async () => {
   return map
 }
 
-const buildSupplierByRutMap = async () => {
+export const buildNuboxSupplierByRutMap = async () => {
   const rows = await runGreenhousePostgresQuery<{
     supplier_id: string
     tax_id: string
@@ -81,7 +81,7 @@ const buildSupplierByRutMap = async () => {
   return map
 }
 
-const buildIncomeByNuboxIdMap = async () => {
+export const buildNuboxIncomeByNuboxIdMap = async () => {
   const rows = await runGreenhousePostgresQuery<{
     income_id: string
     nubox_document_id: string
@@ -100,7 +100,7 @@ const buildIncomeByNuboxIdMap = async () => {
   return map
 }
 
-const buildExpenseByNuboxIdMap = async () => {
+export const buildNuboxExpenseByNuboxIdMap = async () => {
   const rows = await runGreenhousePostgresQuery<{
     expense_id: string
     nubox_purchase_id: string
@@ -215,7 +215,7 @@ const readLatestRawIncomes = async (projectId: string): Promise<NuboxIncome[]> =
 
 // ─── Write Conformed ────────────────────────────────────────────────────────
 
-const writeConformedSales = async (projectId: string, rows: NuboxConformedSale[]) => {
+export const writeNuboxConformedSales = async (rows: NuboxConformedSale[]) => {
   if (rows.length === 0) return
 
   const bq = getBigQueryClient()
@@ -283,10 +283,10 @@ export const syncNuboxToConformed = async (): Promise<SyncNuboxConformedResult> 
   try {
     // 1. Build identity maps
     const [orgByRut, supplierByRut, incomeByNuboxId, expenseByNuboxId] = await Promise.all([
-      buildOrgByRutMap(),
-      buildSupplierByRutMap(),
-      buildIncomeByNuboxIdMap(),
-      buildExpenseByNuboxIdMap()
+      buildNuboxOrgByRutMap(),
+      buildNuboxSupplierByRutMap(),
+      buildNuboxIncomeByNuboxIdMap(),
+      buildNuboxExpenseByNuboxIdMap()
     ])
 
     // 2. Read latest raw snapshots
@@ -316,7 +316,7 @@ export const syncNuboxToConformed = async (): Promise<SyncNuboxConformedResult> 
     const orphanedPurchases = conformedPurchases.filter(p => p.supplier_rut && !p.supplier_id).length
 
     // 5. Append conformed snapshots; downstream readers select latest snapshot per Nubox ID
-    await writeConformedSales(projectId, conformedSales)
+    await writeNuboxConformedSales(conformedSales)
     await writeConformedPurchases(projectId, conformedPurchases)
     await writeConformedBankMovements(projectId, bankMovements)
 

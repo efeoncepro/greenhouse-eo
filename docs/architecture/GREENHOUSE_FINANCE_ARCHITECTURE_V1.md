@@ -4,6 +4,26 @@
 > **Created:** 2026-03-30
 > **Last updated:** 2026-04-24
 
+## Delta 2026-04-26 — Nubox Quotes Hot Sync para frescura de cotizaciones
+
+Finance mantiene el full ETL Nubox diario como reconciliación completa, pero
+las cotizaciones (`COT` / DTE 52) ahora tienen un carril incremental liviano:
+
+- Cron: `GET /api/cron/nubox-quotes-hot-sync` cada 15 minutos.
+- Runtime: `src/lib/nubox/sync-nubox-quotes-hot.ts`.
+- Alcance: lee `/sales` solo para la ventana caliente de periodos
+  (`NUBOX_QUOTES_HOT_WINDOW_MONTHS`, default 2, max 6), filtra documentos tipo
+  cotización y reutiliza el mismo upsert canónico de `sync-nubox-to-postgres`.
+- Evidencia durable: escribe primero raw snapshots en
+  `greenhouse_raw.nubox_sales_snapshots`, luego snapshots conformed en
+  `greenhouse_conformed.nubox_sales`, y recién después proyecta a
+  `greenhouse_finance.quotes`.
+- Observabilidad: cada corrida registra `source_object_type='quotes_hot_sync'`
+  en `greenhouse_sync.source_sync_runs`; fallos van a
+  `greenhouse_sync.source_sync_failures`.
+- Operación manual robusta: `pnpm sync:nubox:quotes-hot -- --period=2026-04`
+  ejecuta el mismo pipeline end-to-end, no inserciones manuales.
+
 ## Delta 2026-04-24 — `expenses/meta` Postgres-first metadata providers
 
 El endpoint `GET /api/finance/expenses/meta` deja de tratar el schema legacy de BigQuery como precondición global. La metadata del drawer ahora se compone por providers con ownership explícito:

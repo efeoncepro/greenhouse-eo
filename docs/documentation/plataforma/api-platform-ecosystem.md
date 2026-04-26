@@ -38,13 +38,24 @@ Hoy la foundation nueva ya existe en el runtime:
 - `src/lib/api-platform/resources/*`
 - `src/app/api/platform/ecosystem/*`
 
-La lane inicial expone estos endpoints:
+La lane inicial expone estos endpoints de lectura:
 
 - `GET /api/platform/ecosystem/context`
 - `GET /api/platform/ecosystem/organizations`
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
+
+También expone el plano de control de eventos:
+
+- `GET /api/platform/ecosystem/event-types`
+- `GET /api/platform/ecosystem/webhook-subscriptions`
+- `POST /api/platform/ecosystem/webhook-subscriptions`
+- `GET /api/platform/ecosystem/webhook-subscriptions/:id`
+- `PATCH /api/platform/ecosystem/webhook-subscriptions/:id`
+- `GET /api/platform/ecosystem/webhook-deliveries`
+- `GET /api/platform/ecosystem/webhook-deliveries/:id`
+- `POST /api/platform/ecosystem/webhook-deliveries/:id/retry`
 
 Todos funcionan con el mismo patrón:
 
@@ -54,6 +65,20 @@ Todos funcionan con el mismo patrón:
 4. aplican rate limiting
 5. dejan request logging
 6. responden con un envelope uniforme
+
+## Event control plane
+
+El plano de eventos permite administrar subscriptions y observar deliveries sin usar directamente el transport raw de webhooks.
+
+La separación es intencional:
+
+- `/api/webhooks/*` recibe llamadas HTTP reales de proveedores externos.
+- `/api/cron/webhook-dispatch` ejecuta la entrega real de eventos pendientes.
+- `/api/platform/ecosystem/webhook-*` administra recursos y comandos del plano de control.
+
+Cada subscription creada desde la API Platform queda asociada al consumer autenticado y al binding resuelto. Por eso un consumer solo puede listar, modificar o reintentar deliveries de sus propias subscriptions.
+
+El command de retry no envía el webhook en la misma request. Reprograma el delivery para que el dispatcher existente lo procese con la misma política de firma, timeout, attempts y dead-letter.
 
 ## Que significa cada endpoint
 

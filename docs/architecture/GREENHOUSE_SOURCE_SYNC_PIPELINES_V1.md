@@ -1,5 +1,39 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-26 — Nubox Quotes Hot Sync separa frescura comercial del ETL diario
+
+Las cotizaciones Nubox (`COT` / DTE 52) ya no dependen solo del ETL diario
+`/api/cron/nubox-sync` para aparecer oportunamente en Finanzas.
+
+### Topologia
+
+```text
+Vercel Cron */15
+  -> GET /api/cron/nubox-quotes-hot-sync
+    -> syncNuboxQuotesHot()
+      -> Nubox /sales?period=<current, previous>
+      -> BQ greenhouse_raw.nubox_sales_snapshots (append-only)
+      -> BQ greenhouse_conformed.nubox_sales (append-only)
+      -> PG greenhouse_finance.quotes
+      -> greenhouse_sync.source_sync_runs (source_object_type='quotes_hot_sync')
+```
+
+### Reglas
+
+1. El hot lane solo procesa ventas Nubox cuyo tipo resuelve a cotización
+   (`legalCode='52'`, `legalCode='COT'`, `abbreviation='COT'` o nombre tipo
+   cotización). Facturas, notas y movimientos siguen entrando por el full ETL.
+2. La evidencia durable sigue naciendo en raw BigQuery; el hot lane no inserta
+   filas directas en Postgres sin snapshot raw/conformed previo.
+3. El upsert producto reutiliza `upsertNuboxQuoteFromSale`, el mismo contrato
+   que el full ETL. Idempotencia por `quote_id` / `nubox_document_id`.
+4. La corrida usa advisory lock de sesión con unlock explícito para evitar
+   solapamiento entre invocaciones frecuentes.
+5. Operación manual soportada: `pnpm sync:nubox:quotes-hot -- --period=2026-04`
+   o `--periods=2026-04,2026-03`. Esto dispara el mismo pipeline, no un parche.
+6. El full ETL diario se mantiene como safety net de reconciliación histórica,
+   ventas, compras, ingresos bancarios y balances.
+
 ## Delta 2026-04-24 — TASK-588 resolución de título Notion tolerante a multi-tenant
 
 El contrato del título canónico (`project_name`, `task_name`, `sprint_name` en

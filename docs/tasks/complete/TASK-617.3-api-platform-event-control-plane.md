@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementada 2026-04-26`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `TASK-617.1`
@@ -124,6 +124,9 @@ Reglas obligatorias:
 - no existe un control plane `api/platform/*` para `webhook-subscriptions`
 - no existe una surface canónica para `webhook-deliveries` y retry/replay controlado
 - el contrato ecosystem-facing todavía no converge con envelope, versionado y seguridad de la platform API
+- `greenhouse_sync.webhook_subscriptions` existe como tabla de transport runtime global, pero todavía no modela ownership ecosystem-facing (`sister_platform_consumer_id`, binding/scope Greenhouse). El control plane V1 debe agregar esa metadata antes de exponer create/update/list a consumers externos.
+- `webhook-delivery-attempts` sí entra en V1 como detalle read-only dentro de `webhook-deliveries/:id`, porque ya existe storage y es necesario para observabilidad/dead-letter.
+- El transport envelope actual conserva compatibilidad con `version`; el control plane debe exponer representación normalizada con `eventVersion`, `publishedAt`, `scope` y `meta` cuando devuelva eventos/deliveries.
 
 ## Scope
 

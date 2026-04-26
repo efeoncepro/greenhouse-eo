@@ -33,7 +33,7 @@ En otras palabras: Finance sigue siendo la fachada y runtime visible actual; el 
 
 | Fuente | Identificador | Como llegan | Frecuencia |
 |--------|--------------|-------------|------------|
-| **Nubox** | `QUO-NB-{nubox_sale_id}` | Sync BigQuery → PostgreSQL (cron `nubox-sync`) | Diario (7:30 AM) |
+| **Nubox** | `QUO-NB-{nubox_sale_id}` | Hot sync cotizaciones → BigQuery → PostgreSQL (`nubox-quotes-hot-sync`) + full ETL (`nubox-sync`) | Cada 15 min para cotizaciones; diario para reconciliación completa |
 | **HubSpot** | `QUO-HS-{hubspot_quote_id}` | Cloud Run integration service → PostgreSQL (cron `hubspot-quotes-sync`) | Cada 6 horas |
 | **Manual** | ID generado por Greenhouse | Creacion directa (sin source externo) | On-demand |
 
@@ -108,6 +108,19 @@ Organization (greenhouse_core.organizations)
 Sin `hubspot_deal_id`, una quote manual puede existir en Greenhouse, pero no tiene a dónde empujar updates en HubSpot.
 
 ## Sincronizacion automatica
+
+Las cotizaciones Nubox tienen dos capas:
+
+1. **Hot sync cada 15 minutos**: `nubox-quotes-hot-sync` consulta ventas recientes
+   de Nubox, filtra documentos tipo cotización (`COT` / DTE 52), guarda snapshot
+   raw + conformed y actualiza `greenhouse_finance.quotes`.
+2. **Full sync diario**: `nubox-sync` mantiene la reconciliación completa de
+   ventas, compras, movimientos bancarios, históricos y balances.
+
+Si una cotización recién emitida en Nubox no aparece, la primera evidencia a
+revisar es `greenhouse_sync.source_sync_runs` con
+`source_object_type='quotes_hot_sync'`; no se debe insertar una fila manualmente
+en Postgres.
 
 El cron `hubspot-quotes-sync` se ejecuta cada 6 horas:
 

@@ -1,5 +1,19 @@
 # changelog.md
 
+## 2026-04-26
+
+### 2026-04-26 — Nubox Quotes Hot Sync
+
+- Nuevo carril incremental `nubox-quotes-hot-sync` cada 15 minutos para cotizaciones Nubox (`COT` / DTE 52), manteniendo raw BigQuery → conformed → Postgres y tracking en `source_sync_runs`.
+- Nuevo script operativo `pnpm sync:nubox:quotes-hot` para replay manual robusto por periodo sin insertar/parchear filas.
+
+### 2026-04-26 — API Platform Event Control Plane (TASK-617.3)
+
+- Nuevo control plane ecosystem-facing bajo `/api/platform/ecosystem/*`: `event-types`, `webhook-subscriptions`, `webhook-deliveries` y command `retry`.
+- Migración `20260426023509765_task-617-event-control-plane.sql` agrega ownership/scope nullable a `greenhouse_sync.webhook_subscriptions` para aislar subscriptions por `sister_platform_consumer_id` + binding.
+- `retry` reprograma deliveries para el dispatcher existente; no duplica el transport ni envía webhooks inline.
+- Docs actualizados en arquitectura API, arquitectura webhooks y documentación funcional de API Platform.
+
 ## 2026-04-25
 
 ### 2026-04-25 — Reliability AI Observer (TASK-638) — V1.2 capa Gemini Flash sobre el RCP

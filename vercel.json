@@ -37,6 +37,10 @@
       "schedule": "30 7 * * *"
     },
     {
+      "path": "/api/cron/nubox-quotes-hot-sync",
+      "schedule": "*/15 * * * *"
+    },
+    {
       "path": "/api/cron/reconciliation-auto-match",
       "schedule": "45 7 * * *"
     },

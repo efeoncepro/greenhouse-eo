@@ -1,3 +1,27 @@
+## Delta 2026-04-26 Nubox Quotes Hot Sync
+
+- Las cotizaciones Nubox (`COT` / DTE 52) tienen un carril incremental separado del ETL diario:
+  - `GET /api/cron/nubox-quotes-hot-sync` cada 15 minutos
+  - runtime `src/lib/nubox/sync-nubox-quotes-hot.ts`
+  - script operativo `pnpm sync:nubox:quotes-hot -- --period=YYYY-MM`
+- El carril conserva el contrato robusto source → raw BigQuery → conformed BigQuery → PostgreSQL; no inserta cotizaciones directo en `greenhouse_finance.quotes`.
+- Observabilidad: `greenhouse_sync.source_sync_runs.source_object_type='quotes_hot_sync'`.
+- Variable opcional: `NUBOX_QUOTES_HOT_WINDOW_MONTHS` controla la ventana caliente de meses (default 2, max 6).
+
+## Delta 2026-04-26 API Platform incorpora Event Control Plane
+
+- Greenhouse ya expone `webhooks / event delivery` como control plane ecosystem-facing bajo `api/platform/ecosystem/*`.
+- Runtime reutilizado:
+  - `greenhouse_sync.webhook_subscriptions`
+  - `greenhouse_sync.webhook_deliveries`
+  - `greenhouse_sync.webhook_delivery_attempts`
+  - `greenhouse_sync.outbox_events`
+- Regla operativa nueva:
+  - `/api/webhooks/*` y `/api/cron/webhook-dispatch` siguen siendo transport boundary
+  - `/api/platform/ecosystem/webhook-*` es el control plane oficial para subscriptions, deliveries, attempts y retry
+  - las subscriptions de control plane deben tener owner/scope (`sister_platform_consumer_id`, binding y scope Greenhouse)
+  - retries se reprograman para el dispatcher existente; no se entregan inline desde la route
+
 ## Delta 2026-04-25 Onboarding ya tiene arquitectura canónica propia
 
 - Greenhouse ya no debe tratar onboarding como una suma implícita de provisioning SCIM + checklist HRIS + activación manual dispersa.
