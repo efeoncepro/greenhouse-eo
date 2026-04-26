@@ -1,22 +1,18 @@
 import { buildApiPlatformPaginationMeta } from '@/lib/api-platform/core/pagination'
-import { runEcosystemReadRoute } from '@/lib/api-platform/core/ecosystem-auth'
-import { listWebhookDeliveries } from '@/lib/api-platform/resources/events'
+import { runAppReadRoute } from '@/lib/api-platform/core/app-auth'
+import { listAppNotifications } from '@/lib/api-platform/resources/app'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
-  return runEcosystemReadRoute({
+  return runAppReadRoute({
     request,
-    routeKey: 'platform.ecosystem.webhook-deliveries.list',
+    routeKey: 'platform.app.notifications.list',
     handler: async context => {
-      const payload = await listWebhookDeliveries({
-        context,
-        request
-      })
+      const payload = await listAppNotifications({ context, request })
 
       return {
         data: {
-          count: payload.count,
           items: payload.items
         },
         meta: {

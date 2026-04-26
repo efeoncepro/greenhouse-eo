@@ -1604,6 +1604,27 @@ export interface GreenhouseContextContextDocumentVersions {
   version_number: number;
 }
 
+export interface GreenhouseCoreApiPlatformRequestLogs {
+  api_platform_request_log_id: string;
+  app_session_id: string | null;
+  client_id: string | null;
+  consumer_id: string | null;
+  created_at: Generated<Timestamp>;
+  duration_ms: number;
+  error_code: string | null;
+  ip_hash: string | null;
+  lane: string;
+  organization_id: string | null;
+  rate_limited: Generated<boolean>;
+  request_method: string;
+  request_path: string;
+  response_status: number;
+  route_key: string;
+  space_id: string | null;
+  user_agent_hash: string | null;
+  user_id: string | null;
+}
+
 export interface GreenhouseCoreAssetAccessLog {
   access_log_id: string;
   action: string;
@@ -1849,6 +1870,31 @@ export interface GreenhouseCoreEntitySourceLinks {
   source_object_type: string;
   source_system: string;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreFirstPartyAppSessions {
+  app_session_id: string;
+  app_version: string | null;
+  client_id: string | null;
+  created_at: Generated<Timestamp>;
+  device_label: string | null;
+  device_platform: string | null;
+  expires_at: Timestamp;
+  hash_algorithm: Generated<string>;
+  ip_hash: string | null;
+  last_used_at: Timestamp | null;
+  metadata_json: Generated<Json>;
+  organization_id: string | null;
+  public_id: string;
+  refresh_token_hash: string;
+  revoked_at: Timestamp | null;
+  revoked_by_user_id: string | null;
+  revoked_reason: string | null;
+  session_status: Generated<string>;
+  space_id: string | null;
+  updated_at: Generated<Timestamp>;
+  user_agent_hash: string | null;
+  user_id: string;
 }
 
 export interface GreenhouseCoreIdentityProfiles {
@@ -6448,10 +6494,18 @@ export interface GreenhouseSyncWebhookInboxEvents {
 export interface GreenhouseSyncWebhookSubscriptions {
   active: Generated<boolean>;
   auth_mode: Generated<string>;
+  client_id: string | null;
+  control_plane_metadata_json: Generated<Json>;
   created_at: Generated<Timestamp>;
+  created_by_control_plane: Generated<boolean>;
   event_filters_json: Generated<Json>;
+  greenhouse_scope_type: string | null;
+  organization_id: string | null;
   paused_at: Timestamp | null;
   secret_ref: string | null;
+  sister_platform_binding_id: string | null;
+  sister_platform_consumer_id: string | null;
+  space_id: string | null;
   subscriber_code: string;
   target_url: string;
   updated_at: Generated<Timestamp>;
@@ -6537,6 +6591,7 @@ export interface DB {
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;
+  "greenhouse_core.api_platform_request_logs": GreenhouseCoreApiPlatformRequestLogs;
   "greenhouse_core.asset_access_log": GreenhouseCoreAssetAccessLog;
   "greenhouse_core.assets": GreenhouseCoreAssets;
   "greenhouse_core.audit_events": GreenhouseCoreAuditEvents;
@@ -6551,6 +6606,7 @@ export interface DB {
   "greenhouse_core.clients": GreenhouseCoreClients;
   "greenhouse_core.departments": GreenhouseCoreDepartments;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
+  "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;

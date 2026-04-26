@@ -1,3 +1,20 @@
+## Delta 2026-04-26 API Platform recupera REST hardening y lane first-party app
+
+- `TASK-617.1` y `TASK-617.2` quedaron recuperadas selectivamente desde rama/stash sobre `develop` actual.
+- `api/platform/ecosystem/*` ya tiene paginación uniforme, headers rate-limit remaining/reset, freshness helpers y tests de contrato focalizados.
+- `api/platform/app/*` existe como lane first-party user-authenticated para mobile/futuros clients propios:
+  - `POST/PATCH /api/platform/app/sessions`
+  - `DELETE /api/platform/app/sessions/current`
+  - `GET /api/platform/app/context`
+  - `GET /api/platform/app/home`
+  - `GET /api/platform/app/notifications`
+  - commands de notificaciones leídas
+- Runtime nuevo:
+  - `greenhouse_core.first_party_app_sessions`
+  - `greenhouse_core.api_platform_request_logs`
+- La implementación recuperada fue portada del diseño viejo con `jsonwebtoken` a `jose`, manteniendo HS256 y el secret canónico de auth.
+- Regla operativa nueva: la futura app React Native debe usar `api/platform/app/*`; no usar `AGENT_AUTH`, `sister_platform_consumers` ni rutas web internas como contrato móvil.
+
 ## Delta 2026-04-26 Nubox Quotes Hot Sync
 
 - Las cotizaciones Nubox (`COT` / DTE 52) tienen un carril incremental separado del ETL diario:

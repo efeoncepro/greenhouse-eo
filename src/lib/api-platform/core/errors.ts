@@ -8,13 +8,17 @@ export type ApiPlatformErrorCode =
   | 'internal_error'
   | 'invalid_identifier'
   | 'invalid_integration_keys'
+  | 'invalid_refresh_token'
+  | 'invalid_session'
   | 'invalid_token'
   | 'missing_external_scope_id'
   | 'missing_external_scope_type'
+  | 'missing_session'
   | 'missing_token'
   | 'not_found'
   | 'rate_limited'
   | 'scope_not_allowed'
+  | 'session_revoked'
   | 'unsupported_api_version'
 
 export class ApiPlatformError extends Error {

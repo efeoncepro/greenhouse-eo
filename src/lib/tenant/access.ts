@@ -374,6 +374,18 @@ export const getTenantAccessRecordByEmail = async (email: string) => {
   return getIdentityAccessRecordByEmail(email)
 }
 
+export const getTenantAccessRecordByUserId = async (userId: string) => {
+  try {
+    const pgRow = await getSessionFromPostgresByUserId(userId)
+
+    if (pgRow) return resolveTenantRuntimeAccess(normalizeTenantAccessRow(pgRow as TenantAccessRow))
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
+  }
+
+  return getIdentityAccessRecordByUserId(userId)
+}
+
 /**
  * Resolve a tenant record for agent/headless auth.
  * Unlike getTenantAccessRecordByEmail, this does NOT require a passwordHash

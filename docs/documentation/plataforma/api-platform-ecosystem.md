@@ -10,15 +10,27 @@
 
 ## Que es
 
-La API Platform Ecosystem es la nueva capa de APIs externas y machine-to-machine de Greenhouse.
+La API Platform Ecosystem es la nueva capa de APIs externas, machine-to-machine y first-party app de Greenhouse.
 
 En simple:
 
 - no reemplaza las rutas internas del portal
 - no reemplaza todavía el carril legacy `/api/integrations/v1/*`
-- crea una lane nueva, más ordenada y más estable, para consumers del ecosistema
+- crea lanes más ordenadas y estables para consumers del ecosistema y para clients first-party como la futura app móvil
 
 La idea es que Greenhouse deje de exponer contratos externos como una suma de rutas aisladas y pase a operar una capa shared con reglas uniformes.
+
+## Lanes Actuales
+
+Hoy existen dos lanes:
+
+- `ecosystem`: server-to-server, machine-to-machine, autenticada con consumer credentials y binding.
+- `app`: first-party user-authenticated, pensada para mobile y futuros clients propios no web.
+
+La regla importante:
+
+- `ecosystem` no representa a un usuario final.
+- `app` sí representa a un usuario autenticado de Greenhouse.
 
 ## Para que sirve
 
@@ -26,7 +38,8 @@ Sirve para tres cosas:
 
 1. exponer lecturas ecosystem-facing con contrato más estable
 2. resolver tenancy y contexto de forma segura
-3. dejar una base reutilizable para futuros writes, webhooks y adapters MCP
+3. servir a la futura app React Native sin acoplarla a rutas web internas
+4. dejar una base reutilizable para futuros writes, webhooks y adapters MCP
 
 No es una API pública abierta. Hoy es una lane controlada, autenticada y binding-aware.
 
@@ -37,6 +50,7 @@ Hoy la foundation nueva ya existe en el runtime:
 - `src/lib/api-platform/core/*`
 - `src/lib/api-platform/resources/*`
 - `src/app/api/platform/ecosystem/*`
+- `src/app/api/platform/app/*`
 
 La lane inicial expone estos endpoints de lectura:
 
@@ -65,6 +79,68 @@ Todos funcionan con el mismo patrón:
 4. aplican rate limiting
 5. dejan request logging
 6. responden con un envelope uniforme
+
+La lane `app` expone:
+
+- `POST /api/platform/app/sessions`
+- `PATCH /api/platform/app/sessions`
+- `DELETE /api/platform/app/sessions/current`
+- `GET /api/platform/app/context`
+- `GET /api/platform/app/home`
+- `GET /api/platform/app/notifications`
+- `POST /api/platform/app/notifications/:id/read`
+- `POST /api/platform/app/notifications/mark-all-read`
+
+Estos endpoints usan el mismo envelope y versionado de la API Platform.
+
+## Como autentica la app
+
+La app no usa tokens de ecosystem.
+
+El flujo base es:
+
+1. la app envía email/password a `POST /api/platform/app/sessions`
+2. Greenhouse valida al usuario contra Identity Access
+3. se crea una sesión en `greenhouse_core.first_party_app_sessions`
+4. la app recibe un access token corto y un refresh token
+5. cada refresh rota el refresh token y mantiene solo su hash en base de datos
+6. la app puede revocar la sesión actual con `DELETE /api/platform/app/sessions/current`
+
+Cada request rehidrata el acceso vigente del usuario. Esto evita depender por demasiado tiempo de permisos embebidos en un token viejo.
+
+## Recursos app iniciales
+
+### App Context
+
+`/api/platform/app/context` devuelve:
+
+- usuario técnico
+- tenant efectivo
+- `routeGroups`
+- `authorizedViews`
+- `portalHomePath`
+- módulos visibles
+- entitlements efectivos
+
+La respuesta separa dos planos:
+
+- `views`: para superficies visibles y navegación
+- `entitlements`: para capacidades y acciones disponibles
+
+### App Home
+
+`/api/platform/app/home` reutiliza el snapshot de Home, pero lo sirve dentro del envelope/versionado de API Platform.
+
+La app debe consumir este endpoint, no `/api/home/snapshot`.
+
+### Notifications
+
+`/api/platform/app/notifications` devuelve notificaciones in-app del usuario autenticado con paginación.
+
+Los writes permitidos son acotados:
+
+- marcar una notificación como leída
+- marcar todas las notificaciones como leídas
 
 ## Event control plane
 

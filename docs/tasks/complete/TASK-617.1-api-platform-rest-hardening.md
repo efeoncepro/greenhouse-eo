@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementado y verificado en develop`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -163,30 +163,31 @@ La task debe cerrar, como mínimo:
 
 ## Acceptance Criteria
 
-- [ ] Los endpoints de colección del lane `ecosystem` exponen paginación/metadatos de forma consistente.
-- [ ] El carril nuevo expone headers operativos y de rate limiting uniformes.
-- [ ] Existe al menos una implementación segura de conditional requests o una política documentada y explícita de no-aplicación por recurso.
-- [ ] Existen tests o smokes del lane `api/platform/ecosystem/*` y checks de no-regresión sobre `/api/integrations/v1/*`.
-- [ ] La documentación funcional y arquitectónica quedó alineada con la madurez REST alcanzada.
+- [x] Los endpoints de colección del lane `ecosystem` exponen paginación/metadatos de forma consistente.
+- [x] El carril nuevo expone headers operativos y de rate limiting uniformes.
+- [x] Existe al menos una implementación segura de conditional requests o una política documentada y explícita de no-aplicación por recurso.
+- [x] Existen tests o smokes del lane `api/platform/ecosystem/*` y checks de no-regresión sobre `/api/integrations/v1/*`.
+- [x] La documentación funcional y arquitectónica quedó alineada con la madurez REST alcanzada.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test`
-- smoke manual o automatizado de `/api/platform/ecosystem/*`
-- smoke manual o automatizado de `/api/integrations/v1/*`
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+- `pnpm test` ✅
+- `pnpm build` ✅
+- route contract tests de `/api/platform/ecosystem/*` ✅
+- no-regression tests de `/api/integrations/v1/*` ✅
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `docs/documentation/plataforma/api-platform-ecosystem.md` quedó actualizada con el contrato final endurecido
+- [x] `docs/documentation/plataforma/api-platform-ecosystem.md` quedó actualizada con el contrato final endurecido
 
 ## Follow-ups
 

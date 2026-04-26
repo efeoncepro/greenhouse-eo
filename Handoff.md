@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Recuperacion TASK-617.1 / TASK-617.2 API Platform
+
+### Que cambio
+
+- Se recuperó selectivamente `TASK-617.1` desde `task/TASK-617.1-api-platform-rest-hardening` sin mergear la rama completa.
+- Se recuperó `TASK-617.2` desde `stash@{0}^3`, donde habían quedado los untracked de la lane `api/platform/app/*`.
+- `api/platform/ecosystem/*` vuelve a tener hardening REST: paginación uniforme, rate-limit headers completos, freshness helpers y route tests.
+- Nueva lane `src/app/api/platform/app/**`:
+  - sesiones app `POST/PATCH /sessions`
+  - revocación `DELETE /sessions/current`
+  - `context`, `home`, `notifications`, `notifications/:id/read`, `notifications/mark-all-read`
+- Runtime nuevo en migración histórica ya registrada `20260426021650967_task-617-api-platform-app-foundation.sql`:
+  - `greenhouse_core.first_party_app_sessions`
+  - `greenhouse_core.api_platform_request_logs`
+- La implementación vieja de app sessions venía con `jsonwebtoken`; fue portada a `jose` para mantener compatibilidad con TASK-515.
+- `docs/tasks/TASK_ID_REGISTRY.md` y las task specs quedaron sincronizadas: `TASK-617.1` y `TASK-617.2` pasan a `complete`.
+
+### Validaciones
+
+- `pnpm exec tsc --noEmit --pretty false` → 0 errors.
+- `pnpm test --run src/lib/api-platform/core/responses.test.ts src/lib/api-platform/core/versioning.test.ts src/lib/api-platform/core/pagination.test.ts src/lib/api-platform/core/freshness.test.ts src/app/api/platform/ecosystem/route-contract.test.ts src/app/api/platform/app/context/route.test.ts src/app/api/integrations/v1/legacy-no-regression.test.ts` → 7 files / 17 tests passed.
+- `pnpm migrate:up` → la DB ya tenía registrado `20260426021650967_task-617-api-platform-app-foundation.sql`; no había migraciones pendientes y se regeneró `src/types/db.d.ts`.
+- `pnpm lint` → 0 errors.
+- `pnpm build` → success.
+- `pnpm test --run` → 423 files / 2177 passed / 2 skipped.
+
+### Pendiente
+
+- `.claude/worktrees/task-617/` sigue sin trackear; no pertenece a este commit y debe mantenerse fuera del staging.
+
 ## Sesion 2026-04-26 — TASK-515 jsonwebtoken → jose
 
 ### Que cambio
@@ -325,48 +355,6 @@ toast.promise(saveQuote(), {
 - Custom components dentro del toast (sonner soporta `toast(<JSX/>)`) si emerge un caso real.
 
 ---
-
-## Sesion 2026-04-26 — API Platform REST hardening + first-party app lane (TASK-617.1/TASK-617.2)
-
-### Que cambio
-
-Se cerró el blocker operativo de `TASK-617.2` aterrizando primero el hardening base de `TASK-617.1` y luego la foundation first-party app:
-
-- `api/platform/ecosystem` collections (`organizations`, `capabilities`) ahora responden con `meta.pagination`.
-- El envelope de API Platform agrega headers opcionales `x-ratelimit-remaining-*` y `x-ratelimit-reset-*`.
-- Nueva migración `20260426021650967_task-617-api-platform-app-foundation.sql`:
-  - `greenhouse_core.first_party_app_sessions`
-  - `greenhouse_core.api_platform_request_logs`
-- Nueva lane `src/app/api/platform/app/**`:
-  - `POST /sessions` crea sesión first-party app con access token corto + refresh token hasheado.
-  - `PATCH /sessions` rota refresh token.
-  - `DELETE /sessions/current` revoca la sesión actual.
-  - `GET /context`, `/home`, `/notifications`.
-  - `POST /notifications/:id/read`, `/notifications/mark-all-read`.
-- Nuevo runner `runAppRoute` / `runAppReadRoute` en `src/lib/api-platform/core/app-auth.ts`.
-- Nuevo store/token helper `src/lib/api-platform/core/app-sessions.ts`.
-- Nuevo log genérico `src/lib/api-platform/core/request-logging.ts`; ecosystem mantiene el log legacy y además escribe al genérico.
-
-### Decisiones canonicas
-
-1. `ecosystem` sigue usando `sister_platform_consumers`; `app` no reutiliza ese modelo.
-2. La app React Native debe usar `api/platform/app/*`, no `/api/home/snapshot` ni rutas web internas.
-3. El access token app es corto; el refresh token solo se guarda como hash y se rota.
-4. Cada request app rehidrata acceso desde Identity Access en vez de confiar indefinidamente en claims viejos.
-5. `views` siguen cubriendo surfaces visibles; `entitlements` cubren capabilities. `/app/context` expone ambos planos.
-
-### Validaciones
-
-- `pnpm test --run src/lib/api-platform/core src/app/api/platform/ecosystem/capabilities/route.test.ts src/app/api/platform/app/context/route.test.ts` → 5 files / 9 tests passing.
-- `pnpm pg:doctor` → conexión local por Cloud SQL Proxy sana; superadmin health OK.
-- `pnpm migrate:up` → aplicó `20260426021650967_task-617-api-platform-app-foundation.sql` y regeneró `src/types/db.d.ts` (295 tablas).
-- `pnpm lint` → clean.
-- `pnpm build` → success.
-- `npx tsc --noEmit --pretty false` sigue mostrando un error preexistente en `src/lib/finance/vat-ledger.test.ts:33` (`spread argument must either have a tuple type...`), fuera del scope de TASK-617.
-
-### Nota de coordinación
-
-- El worktree también contiene cambios de Claude para `TASK-512` (`react-toastify` → `sonner`) y otros imports UI. No forman parte del commit TASK-617 y no deben revertirse desde esta rama.
 
 ## Sesion 2026-04-25 — View Transitions API rollout (TASK-525)
 

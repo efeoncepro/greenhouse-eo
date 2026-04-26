@@ -9,6 +9,23 @@
 
 ---
 
+## Delta 2026-04-26 — TASK-617.1/617.2 recupera hardening REST y lane first-party app
+
+- `api/platform/ecosystem/*` ya usa metadata de paginación uniforme (`meta.pagination`), headers de rate limit con `remaining/reset`, soporte selectivo de freshness (`ETag` / `Last-Modified`) y tests de contrato focalizados.
+- Nace la lane first-party `api/platform/app/*`:
+  - `POST /api/platform/app/sessions` crea una sesión app user-scoped con access token corto y refresh token durable hasheado.
+  - `PATCH /api/platform/app/sessions` rota el refresh token.
+  - `DELETE /api/platform/app/sessions/current` revoca la sesión actual.
+  - `GET /api/platform/app/context`, `/home` y `/notifications` exponen los primeros resources compactos para mobile.
+  - `POST /api/platform/app/notifications/:id/read` y `/notifications/mark-all-read` son commands explícitos acotados.
+- Runtime persistente nuevo:
+  - `greenhouse_core.first_party_app_sessions`
+  - `greenhouse_core.api_platform_request_logs`
+- Regla canónica:
+  - `ecosystem` sigue siendo server-to-server con `sister_platform_consumers`.
+  - `app` es first-party user-authenticated, rehidrata tenant/access por usuario y no consume rutas web internas como contrato móvil.
+  - La app móvil prevista (`React Native`) debe usar `api/platform/app/*` y no `/api/home/*` ni rutas SSR/web internas.
+
 ## Delta 2026-04-26 — TASK-617.3 aterriza el Event Control Plane ecosystem-facing
 
 - `api/platform/ecosystem/*` ya expone el plano de control de eventos sin mover el transport raw:

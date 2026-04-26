@@ -2,6 +2,14 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — API Platform REST Hardening + First-Party App Lane (TASK-617.1 / TASK-617.2)
+
+- Recuperada e integrada de forma selectiva la implementación previa de `TASK-617.1` y `TASK-617.2` que había quedado repartida entre rama y stash.
+- `api/platform/ecosystem/*` suma paginación uniforme, headers de rate limit más completos, freshness helpers (`ETag` / `Last-Modified`) y tests de contrato.
+- Nueva lane `api/platform/app/*` para app first-party: sesiones user-scoped, access token corto firmado con `jose`, refresh token hasheado/rotado, revocación, context/home/notifications y commands acotados de notificaciones.
+- Migración nueva recuperada: `20260426021650967_task-617-api-platform-app-foundation.sql` crea `greenhouse_core.first_party_app_sessions` y `greenhouse_core.api_platform_request_logs`.
+- Regla: la futura app React Native consume `api/platform/app/*`, no rutas web internas ni credenciales ecosystem.
+
 ### 2026-04-26 — `jsonwebtoken` → `jose` (TASK-515)
 
 - `src/lib/auth-tokens.ts` migrado a `jose@^6.2.2` (Web Crypto API, edge-runtime ready). HS256 preservado. `SignJWT`/`jwtVerify`/`decodeJwt` reemplazan `jwt.sign`/`jwt.verify`/`jwt.decode`.

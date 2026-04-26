@@ -8,16 +8,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Implementada 2026-04-26`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-617.1`
+- Blocked by: `none`
 - Branch: `task/TASK-617.2-api-platform-first-party-app-surface-foundation`
 - Legacy ID: `—`
 - GitHub Issue: `—`

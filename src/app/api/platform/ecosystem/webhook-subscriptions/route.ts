@@ -23,7 +23,8 @@ export async function GET(request: Request) {
           pagination: buildApiPlatformPaginationMeta({
             page: payload.page,
             pageSize: payload.pageSize,
-            total: payload.total
+            total: payload.total,
+            count: payload.items.length
           })
         }
       }
