@@ -1,0 +1,117 @@
+name: Azure Teams Notifications Deploy
+
+# TASK-669 — Provision Azure Logic Apps Consumption per Teams channel.
+#
+# Uses Workload Identity Federation (WIF) so we don't store an Azure client
+# secret in GitHub. The federated credential is registered against the
+# Greenhouse Azure AD tenant (a80bf6c1-7c45-4d70-b043-51389622a0e4) and
+# scopes the GH Action to `repo:efeoncepro/greenhouse-eo:ref:refs/heads/main`
+# (and `refs/heads/develop` for the staging environment).
+#
+# Required GitHub repo secrets:
+#   AZURE_CLIENT_ID         — App registration client id (federated to GH)
+#   AZURE_TENANT_ID         — efeoncepro Azure AD tenant id
+#   AZURE_SUBSCRIPTION_ID   — target subscription id
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+          - production
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/azure/teams-notifications/**'
+      - '.github/workflows/azure-teams-deploy.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Bicep template
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Azure CLI Bicep
+        run: az bicep install
+
+      - name: Bicep build (lint)
+        run: az bicep build --file infra/azure/teams-notifications/main.bicep
+
+  deploy:
+    name: Deploy Teams notifications stack
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve environment label
+        id: env
+        run: |
+          ENV_INPUT="${{ github.event.inputs.environment }}"
+          if [ -z "$ENV_INPUT" ]; then
+            ENV_INPUT="production"
+          fi
+          if [ "$ENV_INPUT" = "production" ]; then
+            echo "env_label=prod" >> "$GITHUB_OUTPUT"
+            echo "rg_name=rg-greenhouse-teams-notifications-prod" >> "$GITHUB_OUTPUT"
+            echo "params_file=infra/azure/teams-notifications/parameters.prod.json" >> "$GITHUB_OUTPUT"
+          else
+            echo "env_label=dev" >> "$GITHUB_OUTPUT"
+            echo "rg_name=rg-greenhouse-teams-notifications-dev" >> "$GITHUB_OUTPUT"
+            echo "params_file=infra/azure/teams-notifications/parameters.dev.json" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Azure login (Workload Identity Federation)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure providers are registered
+        run: |
+          az provider register --namespace Microsoft.Logic --wait
+          az provider register --namespace Microsoft.Web --wait
+
+      - name: Ensure resource group exists
+        run: |
+          az group create \
+            --name "${{ steps.env.outputs.rg_name }}" \
+            --location eastus \
+            --tags greenhouse:component=teams-notification greenhouse:environment=${{ steps.env.outputs.env_label }}
+
+      - name: Deploy Bicep template
+        id: deploy
+        run: |
+          DEPLOY_NAME="gh-teams-$(date +%Y%m%d-%H%M%S)"
+          az deployment group create \
+            --resource-group "${{ steps.env.outputs.rg_name }}" \
+            --name "$DEPLOY_NAME" \
+            --template-file infra/azure/teams-notifications/main.bicep \
+            --parameters "${{ steps.env.outputs.params_file }}"
+
+          echo "Deployment '$DEPLOY_NAME' completed."
+          az deployment group show \
+            --resource-group "${{ steps.env.outputs.rg_name }}" \
+            --name "$DEPLOY_NAME" \
+            --query properties.outputs
+
+      - name: Reminder — manual steps after first deploy
+        run: |
+          echo "::notice::Logic Apps deployed. Manual follow-ups:"
+          echo "::notice::1) Authorize the Teams API connection 'gh-teams-${{ steps.env.outputs.env_label }}' in Azure Portal."
+          echo "::notice::2) Recover each Logic App's HTTP-trigger callback URL via 'az rest --method post --url <listCallbackUrl>'."
+          echo "::notice::3) Publish each URL to GCP Secret Manager: 'printf %s \"\$URL\" | gcloud secrets versions add greenhouse-teams-<code>-webhook --data-file=-'."
+          echo "::notice::4) UPDATE greenhouse_core.teams_notification_channels SET logic_app_resource_id = ... for traceability."

@@ -116,6 +116,7 @@ const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
       'Reactive backlog',
       'Reactive Worker',
       'Notificaciones',
+      'Teams Notifications',
       'Finance Data Quality',
       'Notion Delivery Data Quality'
     ].includes(subsystem.name)
@@ -136,6 +137,18 @@ const subsystemDetail = (subsystem: OperationsSubsystem) => {
     }
 
     return `${subsystem.processed} eventos antiguos siguen sin huella reactiva visible en el ledger.`
+  }
+
+  if (subsystem.name === 'Teams Notifications') {
+    if (subsystem.processed === 0 && subsystem.failed === 0) {
+      return 'Sin envios a Teams en las ultimas 24 horas.'
+    }
+
+    if (subsystem.failed > 0) {
+      return `${subsystem.failed} fallos sobre ${subsystem.processed + subsystem.failed} intentos en las ultimas 24 horas.`
+    }
+
+    return `${subsystem.processed} cards entregados a canales Teams en las ultimas 24 horas.`
   }
 
   if (subsystem.name === 'Reactive Worker') {

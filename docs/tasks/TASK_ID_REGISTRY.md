@@ -744,3 +744,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-666` | `to-do` | Nubox Master Data Enrichment Governance | `docs/tasks/to-do/TASK-666-nubox-master-data-enrichment-governance.md` |
 | `TASK-667` | `to-do` | Nubox Additional Hot Lanes | `docs/tasks/to-do/TASK-667-nubox-additional-hot-lanes.md` |
 | `TASK-668` | `to-do` | Nubox Ops Replay & Enterprise Promotion | `docs/tasks/to-do/TASK-668-nubox-ops-replay-enterprise-promotion.md` |
+| `TASK-669` | `to-do` | Teams Workflow Notifications Channel | `docs/tasks/to-do/TASK-669-teams-workflow-notifications-channel.md` |
+| `TASK-670` | `to-do` | Brand Icon Library React Adapter | `docs/tasks/to-do/TASK-670-brand-icon-library-react-adapter.md` |

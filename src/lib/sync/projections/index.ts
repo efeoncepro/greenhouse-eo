@@ -45,6 +45,7 @@ import { partyLifecycleSnapshotProjection } from './party-lifecycle-snapshot'
 import { pricingCatalogApprovalNotifierProjection } from './pricing-catalog-approval-notifier'
 import { productCatalogPricesRecomputeProjection } from './product-catalog-prices-recompute'
 import { productCatalogPricesSyncProjection } from './product-catalog-prices-sync'
+import { teamsNotifyProjection } from './teams-notify'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -100,4 +101,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(partyLifecycleSnapshotProjection)
   registerProjection(quoteToCashAutopromoterProjection)
   registerProjection(vatMonthlyPositionProjection)
+  registerProjection(teamsNotifyProjection)
 }

@@ -1,5 +1,56 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-669 Teams Workflow Notifications Channel (Slices 1-3)
+
+### Que cambio
+
+- Foundation completa del canal Teams Notifications outbound implementada y verificada (lint + tsc + test + build verdes).
+- **Decisión arquitectónica**: Azure Logic Apps Consumption + Bicep (no Power Automate). Suscripción Azure ya provisionada (`e1cfff3e-...`, tenant efeoncepro.com). Costo $1-5 USD/mes. Trigger condicional para migrar a Bot Framework documentado en spec.
+- **Migración**: `migrations/20260426113919596_create-teams-notification-channels.sql` crea `greenhouse_core.teams_notification_channels` con `channel_kind` discriminator (`azure_logic_app | teams_bot | graph_rsc`) — schema transport-agnostic, swap a Bot Framework futuro sin DDL.
+- **Sender**: `src/lib/integrations/teams/{sender.ts,types.ts,cards/}` con `postTeamsCard(channelCode, card)` que valida tamaño 26KB, retry 429 con backoff exponencial, registra en `source_sync_runs` con `source_system='teams_notification'`. Card builders: `ops-alert`, `finance-alert`, `delivery-pulse` (Adaptive Card 1.5).
+- **Outbox consumer**: `src/lib/sync/projections/teams-notify.ts` registrado en `projections/index.ts`. Suscrito a 10 event types (3 ops, 6 finance, 1 delivery).
+- **Endpoint admin de prueba**: `/api/admin/teams/test` (GET lista canales, POST envia card de prueba) gated a `requireAdminTenantContext`.
+- **Tile en Admin > Ops Health**: nuevo subsystem "Teams Notifications" con success/failure 24h y last run.
+- **IaC**: `infra/azure/teams-notifications/{main.bicep, modules/logic-app-channel.bicep, parameters.{prod,dev}.json, README.md}` provisiona RG + Teams API connection + 1 Logic App Consumption por canal.
+- **GitHub Action**: `.github/workflows/azure-teams-deploy.yml` con Workload Identity Federation (sin client secret), validate (`az bicep build`) + deploy (`az deployment group create`). Trigger condicionado a `infra/azure/teams-notifications/**`.
+- **Docs**: `docs/architecture/GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` + runbook operativo `docs/operations/azure-teams-notifications.md` con steps OAuth one-time del Teams connector y publicación de URLs en GCP Secret Manager.
+
+### Estado pendiente
+
+- Despliegue real Azure: registrar `Microsoft.Logic` provider, configurar WIF federated credential, llenar `parameters.prod.json` con Team/Channel GUIDs reales, autorizar OAuth de la Teams API connection (interactivo, único paso manual irreductible).
+- Publicar 3 secretos en GCP Secret Manager con las URLs callback de los Logic Apps.
+- Ejecutar smoke `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"ops-alerts"}'` — usuario solicitó explícitamente prueba real al final.
+- Open Questions vivas en la spec: cuenta de servicio dueña del Teams connector, co-owners por canal, evento `delivery.daily-pulse` (cron emitter pendiente).
+
+### Notas de coordinacion
+
+- Coexiste con TASK-670 (Codex agent) que también modificó `docs/tasks/README.md`, `TASK_ID_REGISTRY.md` y `Handoff.md`. Ambos sets de cambios convergen sin conflicto.
+- Helper nuevo `resolveSecretByRef(secretRef)` en `src/lib/secrets/secret-manager.ts` permite resolver un secret por nombre directo (sin convención env var) — reutilizable por otros consumers.
+
+### Validaciones
+
+- `pnpm test` → 425 files / 2191 tests pass
+- `npx tsc --noEmit` → 0 errores
+- `pnpm lint` → 0 errores
+- `pnpm build` → ok, ruta `/api/admin/teams/test` registrada como dynamic
+- Migración aplicada en dev local (Cloud SQL Proxy) y tipos Kysely regenerados (296 tablas, +1)
+
+## Sesion 2026-04-26 — TASK-670 Brand Icon Library React Adapter
+
+### Que cambio
+
+- Se creó `TASK-670 — Brand Icon Library React Adapter` en `docs/tasks/to-do/`.
+- La task formaliza la decisión de usar el stack ya presente de Iconify/Simple Icons para logos de marca, con adapter React `BrandIcon`, registry allowlist y metadata futura para API/MCP.
+
+### Notas de coordinacion
+
+- Hay cambios preexistentes no propios asociados a `TASK-669` y migración/types de Teams; no se tocaron fuera de las líneas necesarias de índices.
+- `@iconify/react` no está instalado todavía; la task deja como primer slice confirmar wrapper React vs consumo de CSS generado.
+
+### Validaciones
+
+- `git diff --check -- docs/tasks/to-do/TASK-670-brand-icon-library-react-adapter.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md Handoff.md`
+
 ## Sesion 2026-04-26 — TASK-640 Nubox V2 Slice 1
 
 ### Que cambio

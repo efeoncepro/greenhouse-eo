@@ -582,6 +582,22 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     notionDeliveryDataQuality = null
   }
 
+  const [teamsSent24h, teamsFailed24h, teamsLastRun] = await Promise.all([
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification' AND status = 'succeeded' AND started_at > NOW() - INTERVAL '24 hours'`
+    ),
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification' AND status = 'failed' AND started_at > NOW() - INTERVAL '24 hours'`
+    ),
+    runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
+      `SELECT MAX(COALESCE(finished_at, started_at))::text AS last_run FROM greenhouse_sync.source_sync_runs WHERE source_system = 'teams_notification'`
+    )
+      .then(rows => rows[0]?.last_run ?? null)
+      .catch(() => null)
+  ])
+
+  const teamsHasActivity = teamsSent24h + teamsFailed24h > 0
+
   const subsystems: OperationsSubsystem[] = [
     {
       name: 'Outbox',
@@ -632,6 +648,13 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       processed: notifTotal,
       failed: notifFailed,
       lastRun: null
+    },
+    {
+      name: 'Teams Notifications',
+      status: deriveHealth(teamsSent24h, teamsFailed24h, teamsLastRun, teamsHasActivity),
+      processed: teamsSent24h,
+      failed: teamsFailed24h,
+      lastRun: teamsLastRun
     },
     {
       name: 'Notion Sync',

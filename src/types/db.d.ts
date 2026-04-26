@@ -2650,6 +2650,24 @@ export interface GreenhouseCoreSpaces {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreTeamsNotificationChannels {
+  azure_resource_group: string | null;
+  azure_subscription_id: string | null;
+  azure_tenant_id: string | null;
+  bot_app_id: string | null;
+  channel_code: string;
+  channel_id: string | null;
+  channel_kind: Generated<string>;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  disabled_at: Timestamp | null;
+  display_name: string;
+  logic_app_resource_id: string | null;
+  secret_ref: string;
+  team_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreToolCatalog {
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
@@ -6646,6 +6664,7 @@ export interface DB {
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;
   "greenhouse_core.spaces": GreenhouseCoreSpaces;
+  "greenhouse_core.teams_notification_channels": GreenhouseCoreTeamsNotificationChannels;
   "greenhouse_core.tool_catalog": GreenhouseCoreToolCatalog;
   "greenhouse_core.user_campaign_scopes": GreenhouseCoreUserCampaignScopes;
   "greenhouse_core.user_client_scopes": GreenhouseCoreUserClientScopes;
