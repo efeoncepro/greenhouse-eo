@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `umbrella`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Cerrada documentalmente; child tasks 617.1-617.4 completas`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -72,7 +72,7 @@ Reglas obligatorias:
 - La `API platform` debe servir no solo a `ecosystem`, sino también a first-party app consumers como la futura app móvil `React Native`.
 - `webhooks / event delivery` deben converger como parte de `api/platform/*`, no seguir viviendo solo como capability operativa separada.
 - La documentación pública para developers debe montarse sobre la plataforma nueva, no quedar anclada a `integrations/v1` como source of truth.
-- `MCP` sigue downstream de este programa y no debe adelantarse.
+- `MCP` sigue downstream de este programa; el siguiente slice ejecutable debe ser read-only y montado sobre `api/platform/ecosystem/*`.
 
 ## Normative Docs
 
@@ -103,11 +103,11 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-617-api-platform-v1-1-convergence-program.md`
-- `docs/tasks/to-do/TASK-617.1-api-platform-rest-hardening.md`
-- `docs/tasks/to-do/TASK-617.2-api-platform-first-party-app-surface-foundation.md`
-- `docs/tasks/to-do/TASK-617.3-api-platform-event-control-plane.md`
-- `docs/tasks/to-do/TASK-617.4-developer-api-documentation-portal.md`
+- `docs/tasks/complete/TASK-617-api-platform-v1-1-convergence-program.md`
+- `docs/tasks/complete/TASK-617.1-api-platform-rest-hardening.md`
+- `docs/tasks/complete/TASK-617.2-api-platform-first-party-app-surface-foundation.md`
+- `docs/tasks/complete/TASK-617.3-api-platform-event-control-plane.md`
+- `docs/tasks/complete/TASK-617.4-developer-api-documentation-portal.md`
 - `docs/tasks/README.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `Handoff.md`
@@ -120,12 +120,16 @@ Reglas obligatorias:
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` ya define REST hardening, lane `app`, event control plane, developer docs públicas y relación downstream con `MCP`.
 - `src/app/(blank-layout-pages)/developers/api/page.tsx` ya existe como primer intento público para developers.
 - `src/lib/webhooks/**` y `src/app/api/webhooks/**` ya implementan inbound/outbound webhook runtime.
+- `TASK-617.1` cerró el REST hardening de `api/platform/ecosystem/*`.
+- `TASK-617.2` cerró la foundation first-party `api/platform/app/*`.
+- `TASK-617.3` cerró el event control plane bajo `api/platform/ecosystem/*`.
+- `TASK-617.4` cerró el portal público `/developers/api` y los artefactos derivados de API Platform.
 
 ### Gap
 
-- no existe todavía un programa explícito que ordene los cuatro follow-ups inmediatos
-- la plataforma corre el riesgo de crecer de forma descoordinada entre runtime, docs y mobile
-- la secuencia correcta hacia `MCP` todavía necesita un backlog ejecutable claro
+- el programa V1.1 ya está cerrado; los gaps residuales pasan a follow-ups explícitos
+- todavía falta una task ejecutable para el MCP read-only downstream
+- todavía falta una task separada para idempotencia transversal antes de abrir writes MCP o business writes amplios
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -189,9 +193,9 @@ La intención es que Greenhouse llegue a un punto donde:
 
 ## Acceptance Criteria
 
-- [ ] Existen child tasks registradas y secuenciadas para REST hardening, first-party app surface, event control plane y developer docs públicas.
-- [ ] La secuencia deja explícito que `MCP` sigue downstream de este programa.
-- [ ] La relación entre `TASK-616` y estos follow-ups queda documentada sin reabrir la foundation ya implementada.
+- [x] Existen child tasks registradas y secuenciadas para REST hardening, first-party app surface, event control plane y developer docs públicas.
+- [x] La secuencia deja explícito que `MCP` sigue downstream de este programa.
+- [x] La relación entre `TASK-616` y estos follow-ups queda documentada sin reabrir la foundation ya implementada.
 
 ## Verification
 
@@ -200,17 +204,24 @@ La intención es que Greenhouse llegue a un punto donde:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] las child tasks `TASK-617.1` a `TASK-617.4` quedaron alineadas con la arquitectura vigente
+- [x] las child tasks `TASK-617.1` a `TASK-617.4` quedaron alineadas con la arquitectura vigente
 
 ## Follow-ups
 
-- `TASK-617.1` — API Platform REST Hardening
-- `TASK-617.2` — API Platform First-Party App Surface Foundation
-- `TASK-617.3` — API Platform Event Control Plane
-- `TASK-617.4` — Developer API Documentation Portal
+- `TASK-617.1` — API Platform REST Hardening — complete
+- `TASK-617.2` — API Platform First-Party App Surface Foundation — complete
+- `TASK-617.3` — API Platform Event Control Plane — complete
+- `TASK-617.4` — Developer API Documentation Portal — complete
+- `TASK-647` — Greenhouse MCP Read-Only Adapter V1
+
+## Delta 2026-04-26
+
+- `TASK-617` se cierra documentalmente porque sus cuatro child tasks ya están completas y sincronizadas con runtime, docs públicos y arquitectura.
+- El siguiente paso queda separado como `TASK-647`: MCP read-only downstream sobre `api/platform/ecosystem/*`.
+- Los writes MCP quedan explícitamente fuera hasta que exista idempotencia transversal en `src/lib/api-platform/**` y command endpoints suficientemente maduros.

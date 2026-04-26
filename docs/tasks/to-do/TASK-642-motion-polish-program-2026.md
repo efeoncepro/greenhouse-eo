@@ -1,5 +1,11 @@
 # TASK-642 — Greenhouse Motion Polish Program 2026 (umbrella)
 
+## Delta 2026-04-26 — Slice 2 (TASK-526) cerrada
+
+`TASK-526` (auto-animate list motion) cerrada. Hook canónico `useListAnimation` en `src/hooks/useListAnimation.ts` + 5 listas wireadas (QuoteLineItemsEditor x2, AddonSuggestionsPanel, QuotesListView, PeopleListTable, ContextChipStrip). Timings hardcodeados inline con TODO marker `// motion: TASK-643 reemplazará por motionDuration.base / motionEasing.exit cuando los tokens existan` — refactor trivial cuando TASK-643 cierre.
+
+Decisión de orden: ejecutamos Slice 2 ANTES que Slice 1 (TASK-643) por momentum visible. La deuda de mover los timings hardcodeados (1 archivo, `useListAnimation.ts`) a tokens es de 5 minutos — no justifica bloquear el quick win.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

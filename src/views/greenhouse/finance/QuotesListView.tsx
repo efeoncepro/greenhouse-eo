@@ -22,6 +22,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { useListAnimation } from '@/hooks/useListAnimation'
 import useQuotesList from '@/hooks/useQuotesList'
 import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
 
@@ -117,6 +118,7 @@ const QuotesListView = () => {
   const morphRouter = useViewTransitionRouter()
   const [statusFilter, setStatusFilter] = useState('')
   const [sourceFilter, setSourceFilter] = useState('')
+  const [tableBodyRef] = useListAnimation()
 
   /*
     TASK-513: useQuotesList encapsula el fetch + cache. Cada combinacion de
@@ -226,7 +228,7 @@ const QuotesListView = () => {
                   <TableCell>Fuente</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody ref={tableBodyRef}>
                 {items.map(q => {
                   const statusConf = STATUS_CONFIG[q.status] ?? STATUS_CONFIG.draft
                   const sourceConf = SOURCE_CHIP_CONFIG[q.source] ?? SOURCE_CHIP_CONFIG.manual

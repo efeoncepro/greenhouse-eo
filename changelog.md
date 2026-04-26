@@ -2,6 +2,14 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — List motion con auto-animate (TASK-526, Slice 2 de TASK-642)
+
+- `@formkit/auto-animate` instalado (~2 KB, zero-config, respeta `prefers-reduced-motion` nativo).
+- Hook canonico `src/hooks/useListAnimation.ts` envuelve `useAutoAnimate` con timings consistentes (200ms / ease-out). Centraliza config para refactor cuando TASK-643 (tokens canonicos motion) cierre.
+- 5 listas mutables wireadas: QuoteLineItemsEditor (2 TableBody), AddonSuggestionsPanel, QuotesListView, PeopleListTable, ContextChipStrip.
+- Slice 2 de TASK-642 (Motion Polish Program) cerrado. Slices 1/3/4/5 siguen pendientes — independientes.
+- Gates verdes: tsc 0 errors, lint 0 errors, test 2177 passed, build OK.
+
 ### 2026-04-26 — API Platform REST Hardening + First-Party App Lane (TASK-617.1 / TASK-617.2)
 
 - Recuperada e integrada de forma selectiva la implementación previa de `TASK-617.1` y `TASK-617.2` que había quedado repartida entre rama y stash.
@@ -144,6 +152,12 @@
 - **Nuevo endpoint admin**: `GET /api/admin/reliability` protegido por `requireAdminTenantContext()` — reusable por agentes, synthetic monitors y change-based verification.
 - **Nueva sección visible**: `Admin Center` ahora expone "Confiabilidad por módulo" entre alertas y Torre de control. `Ops Health` y `Cloud & Integrations` preservan su lectura técnica especializada.
 - **Boundaries explícitos**: `TASK-586` (billing/notion-bq-sync), `TASK-599` (finance smoke lane) y `TASK-103` (budget alerts) tienen un `ReliabilityIntegrationBoundary` declarado para enchufar sus señales sin redefinir contratos.
+
+### 2026-04-26 — TASK-617 cerrado y MCP read-only listo para ejecución
+
+- `TASK-617` queda cerrado documentalmente tras completar sus cuatro child tasks de API Platform V1.1.
+- Nueva task ejecutable: `TASK-647 — Greenhouse MCP Read-Only Adapter V1`.
+- El primer MCP queda definido como downstream de `api/platform/ecosystem/*`, read-only, sin SQL directo, sin routes legacy y sin writes.
 
 ### 2026-04-25 — API Platform ya considera mobile app como consumer first-party oficial
 

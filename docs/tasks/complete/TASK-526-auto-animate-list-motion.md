@@ -15,10 +15,12 @@ Priority degradada a `P2` (era P3) — sube por estar dentro del programa coordi
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
+- Completed: `2026-04-26`
 - Priority: `P2`
 - Impact: `Bajo-Medio` (micro-polish visible en cada lista mutable)
-- Effort: `Bajo`
+- Effort: `Bajo` (real: ~1.5h)
+- Resolution: `@formkit/auto-animate@^0.x instalado, hook canónico useListAnimation creado, 5 listas wireadas (QuoteLineItemsEditor x2, AddonSuggestionsPanel, QuotesListView, PeopleListTable, ContextChipStrip). Slice 2 del programa TASK-642 cerrado.`
 - Type: `dependency` + `ux`
 - Status real: `Backlog — Ola 4 motion modernization`
 - Rank: `Post-TASK-511`

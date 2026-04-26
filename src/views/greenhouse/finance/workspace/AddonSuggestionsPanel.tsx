@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { useListAnimation } from '@/hooks/useListAnimation'
 
 import type { PricingAddonOutputV2, PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
@@ -47,6 +48,7 @@ const AddonSuggestionsPanel = ({
   loading = false
 }: AddonSuggestionsPanelProps) => {
   const includedSet = new Set(includedSkus)
+  const [stackRef] = useListAnimation()
 
   return (
     <Box
@@ -77,7 +79,7 @@ const AddonSuggestionsPanel = ({
           description='No hay cargos adicionales aplicables a este contexto.'
         />
       ) : (
-        <Stack spacing={1.5} divider={<Divider flexItem />}>
+        <Stack ref={stackRef} spacing={1.5} divider={<Divider flexItem />}>
           {suggestions.map(suggestion => {
             const isIncluded = includedSet.has(suggestion.sku)
 

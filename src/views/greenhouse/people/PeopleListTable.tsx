@@ -24,6 +24,7 @@ import ViewTransitionLink from '@/components/greenhouse/motion/ViewTransitionLin
 
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
+import { useListAnimation } from '@/hooks/useListAnimation'
 
 import type { PersonListItem } from '@/types/people'
 import { countryLabel, formatFte, roleCategoryLabel, safeRoleCategory } from './helpers'
@@ -44,6 +45,7 @@ const PeopleListTable = ({ data }: Props) => {
   const [search, setSearch] = useState('')
   const [filtered, setFiltered] = useState<PersonListItem[]>(data)
   const [sorting, setSorting] = useState<SortingState>([{ id: 'displayName', desc: false }])
+  const [tbodyRef] = useListAnimation()
 
   const columns = useMemo(
     () => [
@@ -183,7 +185,7 @@ const PeopleListTable = ({ data }: Props) => {
               </tr>
             ))}
           </thead>
-          <tbody>
+          <tbody ref={tbodyRef}>
             {table.getRowModel().rows.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className='text-center'>

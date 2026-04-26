@@ -579,7 +579,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-523` | `to-do` | bcryptjs → @node-rs/argon2 (with re-hash policy) | `docs/tasks/to-do/TASK-523-bcryptjs-to-argon2.md` |
 | `TASK-524` | `to-do` | Income → HubSpot Invoice Bridge | `docs/tasks/to-do/TASK-524-income-hubspot-invoice-bridge.md` |
 | `TASK-525` | `to-do` | View Transitions API rollout (navegación animada nativa) | `docs/tasks/to-do/TASK-525-view-transitions-api-rollout.md` |
-| `TASK-526` | `to-do` | @formkit/auto-animate para list motion zero-config | `docs/tasks/to-do/TASK-526-auto-animate-list-motion.md` |
+| `TASK-526` | `complete` | @formkit/auto-animate para list motion zero-config | `docs/tasks/complete/TASK-526-auto-animate-list-motion.md` |
 | `TASK-527` | `to-do` | Rive interactive illustrations (next-gen Lottie) | `docs/tasks/to-do/TASK-527-rive-interactive-illustrations.md` |
 | `TASK-528` | `to-do` | Chile Tax / IVA Program | `docs/tasks/to-do/TASK-528-chile-tax-iva-program.md` |
 | `TASK-529` | `to-do` | Chile Tax Code Foundation | `docs/tasks/to-do/TASK-529-chile-tax-code-foundation.md` |
@@ -670,7 +670,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-614` | `to-do` | People / Payroll Economy Facet & Entitlements Hardening | `docs/tasks/to-do/TASK-614-people-payroll-economy-facet-entitlements-hardening.md` |
 | `TASK-615` | `to-do` | Quote Builder Flow Orchestration & UX Hardening | `docs/tasks/to-do/TASK-615-quote-builder-flow-orchestration-ux-hardening.md` |
 | `TASK-616` | `complete` | API Platform Foundation & Ecosystem Read Surface V1 | `docs/tasks/complete/TASK-616-api-platform-foundation-ecosystem-read-surface-v1.md` |
-| `TASK-617` | `to-do` | API Platform V1.1 Convergence Program | `docs/tasks/to-do/TASK-617-api-platform-v1-1-convergence-program.md` |
+| `TASK-617` | `complete` | API Platform V1.1 Convergence Program | `docs/tasks/complete/TASK-617-api-platform-v1-1-convergence-program.md` |
 | `TASK-617.1` | `complete` | API Platform REST Hardening | `docs/tasks/complete/TASK-617.1-api-platform-rest-hardening.md` |
 | `TASK-617.2` | `complete` | API Platform First-Party App Surface Foundation | `docs/tasks/complete/TASK-617.2-api-platform-first-party-app-surface-foundation.md` |
 | `TASK-617.3` | `complete` | API Platform Event Control Plane | `docs/tasks/complete/TASK-617.3-api-platform-event-control-plane.md` |
@@ -722,3 +722,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-644` | `to-do` | Page entrance + skeleton crossfade | `docs/tasks/to-do/TASK-644-page-entrance-skeleton-crossfade.md` |
 | `TASK-645` | `to-do` | KPI counter animations (rolling numbers) | `docs/tasks/to-do/TASK-645-kpi-counter-animations.md` |
 | `TASK-646` | `to-do` | Scroll-triggered chart entrance + list stagger | `docs/tasks/to-do/TASK-646-scroll-triggered-chart-entrance-stagger.md` |
+| `TASK-647` | `to-do` | Greenhouse MCP Read-Only Adapter V1 | `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md` |
+| `TASK-648` | `to-do` | API Platform ICO Read Surface V1 | `docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md` |

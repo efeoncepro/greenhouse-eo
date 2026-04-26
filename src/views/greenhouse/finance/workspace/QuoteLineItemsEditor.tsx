@@ -37,6 +37,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import EmptyState from '@/components/greenhouse/EmptyState'
+import { useListAnimation } from '@/hooks/useListAnimation'
 import type {
   PricingLineOutputV2,
   PricingOutputCurrency,
@@ -416,6 +417,8 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   const [dirty, setDirty] = useState(false)
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
   const [hoveredRow, setHoveredRow] = useState<number | null>(null)
+  const [readonlyTableBodyRef] = useListAnimation()
+  const [draftTableBodyRef] = useListAnimation()
 
   // Popover "Ajustes" por fila — un solo popover global abierto a la vez
   const [adjustAnchor, setAdjustAnchor] = useState<HTMLElement | null>(null)
@@ -575,7 +578,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                   <TableCell align='right'>Subtotal</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody ref={readonlyTableBodyRef}>
                 {lineItems.map((line, idx) => {
                   const simulationLine = simulationLines?.[idx] ?? null
                   const resolvedUnitPrice = resolveDisplayUnitPrice(line, simulationLine)
@@ -825,7 +828,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 <TableCell sx={{ minWidth: 100 }} align='right' aria-label='Acciones' />
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody ref={draftTableBodyRef}>
               {draftLines.map((line, index) => {
                 const simulationLine = simulationLines?.[index] ?? null
                 const enginePrice = simulationLine?.suggestedBillRate?.unitPriceOutputCurrency ?? null
