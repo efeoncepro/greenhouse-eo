@@ -20221,3 +20221,30 @@ Pendientes:
 - UPDATE de los 3 canales en Postgres (espera confirmacion literal del mapping del usuario por sandbox)
 - Smoke real via `pnpm staging:request POST /api/admin/teams/test` despues del UPDATE
 - Decommission de Logic Apps tras 1 semana de validacion
+
+## Sesion 2026-04-26 — TASK-671 cutover completo + smoke real OK
+
+Cutover ejecutado. Los 3 canales productivos (`ops-alerts`, `finance-alerts`, `delivery-pulse`) flippeados a `channel_kind='teams_bot'` con bot_app_id, team_id, channel_id, secret_ref correctos. `finance-alerts` salio del estado `pending_setup`. Mapping confirmado por usuario:
+
+- ops-alerts → EO - Admin / EO - Admin
+- finance-alerts → EO - Admin / EO - Admin (hasta crear team Finance dedicado)
+- delivery-pulse → Growth Marketing / Alineacion
+
+IAM grant requerido y aplicado: `roles/secretmanager.secretAccessor` para `serviceAccount:greenhouse-portal@efeonce-group.iam.gserviceaccount.com` sobre el secret `greenhouse-teams-bot-client-credentials`. Sin esto, la primera llamada del runtime cacheaba negativo por 60s y devolvia `missing_secret`.
+
+Smoke real via `pnpm staging:request POST /api/admin/teams/test '{"channelCode":"<CH>"}'`:
+
+- ops-alerts:     HTTP 200, ok=true, 469ms cold / 426ms warm, attempts=1
+- finance-alerts: HTTP 200, ok=true, 426ms, attempts=1
+- delivery-pulse: HTTP 200, ok=true, 421ms, attempts=1
+
+`source_sync_runs` registra 4 sends `succeeded` con notes `transport=bot_framework; surface=channel; attempts=1`. `teams_bot_conversation_references` cacheo 2 rows con `service_url=smba.trafficmanager.net/teams` y `failure_count=0` — hot path activado para futuros sends.
+
+Quedan SOLO los siguientes pasos (no blockers, planificacion):
+
+1. Validacion 1 semana con trafico productivo real (eventos de outbox emitiendo a teams_notify projection).
+2. Decommission de Logic Apps (rg-greenhouse-teams-notifications-prod) tras la validacion: `az resource list --resource-group rg-greenhouse-teams-notifications-prod` + `az resource delete` selectivo.
+3. Cierre formal de TASK-669 (Logic Apps foundation) — mover archivo de `to-do/` a `complete/` cuando los Logic Apps esten apagados.
+4. Cierre formal de TASK-671 — mover archivo de `in-progress/` a `complete/` ahora que cutover esta hecho y validado por smoke real.
+
+Skill `teams-bot-platform` publicado en 3 ubicaciones (~/.claude, .claude/, .codex/) con runbook day-1, 4 HARD RULES, diagnosis cheatsheet de 8 sintomas/causas, y referencias a los archivos canonicos del Greenhouse stack. Disponible para Claude (global + repo) y Codex (repo).
