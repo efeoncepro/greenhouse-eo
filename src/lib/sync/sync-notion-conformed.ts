@@ -657,6 +657,51 @@ const ensureDeliveryTaskColumns = async (projectId: string) => {
   }
 }
 
+/**
+ * Align BigQuery `delivery_*` title columns with the canonical TASK-588
+ * decision: `NULL = título desconocido`, sentinels prohibited.
+ *
+ * Notion-side reality: a small number of pages legitimately have no title
+ * resolvable via the multi-property cascade (e.g. 28 Sky Airline tasks created
+ * by a bulk Nexa Insights import on 2026-04-02 that processed pages whose
+ * upstream automation didn't set the title property). Postgres
+ * `greenhouse_delivery.{projects,tasks,sprints}.{project_name,task_name,sprint_name}`
+ * was already made NULLABLE by migration `20260424082917533` plus a CHECK
+ * constraint that prohibits sentinel placeholders ('sin nombre', 'untitled', etc.).
+ *
+ * BigQuery `delivery_*` were left REQUIRED, so a single null-titled row crashed
+ * the entire daily sync with `Required field task_name cannot be null`. This
+ * helper closes that gap by dropping NOT NULL on the title columns at runtime
+ * (idempotent — re-running on already-nullable columns is a no-op for BQ).
+ *
+ * Why runtime, not migration: BQ schemas live outside `migrations/` (which is
+ * Postgres-only via node-pg-migrate). The pattern `ensureDeliveryTaskColumns()`
+ * sets precedent for runtime BQ schema reconciliation; this function follows it.
+ */
+const ensureDeliveryTitleColumnsNullable = async (projectId: string) => {
+  const bq = getBigQueryClient()
+
+  const targets: Array<{ table: string; column: string }> = [
+    { table: 'delivery_projects', column: 'project_name' },
+    { table: 'delivery_tasks', column: 'task_name' },
+    { table: 'delivery_sprints', column: 'sprint_name' }
+  ]
+
+  for (const { table, column } of targets) {
+    try {
+      await bq.query({
+        query: `ALTER TABLE \`${projectId}.greenhouse_conformed.${table}\` ALTER COLUMN ${column} DROP NOT NULL`
+      })
+    } catch (error) {
+      // Column may already be nullable, may not exist (cold start), or the
+      // service account may lack ALTER permissions. Safe to continue — the
+      // staged-swap write will surface the original "Required field" error
+      // if the schema is still REQUIRED on the next run.
+      console.warn(`[sync-notion-conformed] could not ensure NULLABLE on ${table}.${column}:`, error instanceof Error ? error.message : error)
+    }
+  }
+}
+
 export const writeSyncConformedRunRecord = async ({
   syncRunId,
   status,
@@ -747,7 +792,7 @@ const countMissingTitles = <T extends { project_name?: string | null; task_name?
   for (const row of rows) {
     const title = row[titleKey]
 
-    if (!isEffectivelyMissingTitle(title)) continue
+    if (title !== null && title !== undefined && typeof title === 'string' && title.trim() !== '') continue
 
     const key = row.space_id ?? null
     const bucket = perSpace.get(key) ?? { count: 0, sample: [] }
@@ -767,42 +812,6 @@ const countMissingTitles = <T extends { project_name?: string | null; task_name?
 
   return perSpace
 }
-
-/**
- * Title coercion for the BigQuery `greenhouse_conformed.{delivery_projects,
- * delivery_tasks, delivery_sprints}` writers.
- *
- * BigQuery rejects `task_name`/`project_name`/`sprint_name` as REQUIRED fields,
- * so a single null-title row from Notion would crash the *entire* daily sync
- * with `Required field task_name cannot be null at [...]` and leave every
- * conformed table stale until a human intervened.
- *
- * Resilience strategy:
- *   1. Coerce null/empty titles to a placeholder we can spot in the UI.
- *      The placeholder is intentionally Spanish + emoji so it stands out and
- *      is easy to grep for.
- *   2. Keep `emitMissingTitleWarning()` writing to `source_sync_failures` so
- *      operators can surface the affected pages in the dashboard.
- *   3. The placeholder marker (`MISSING_TITLE_PLACEHOLDER`) can be re-detected
- *      downstream (e.g., DQ checks) without re-traversing raw — anything ===
- *      this string was coerced.
- *
- * Do NOT switch the BigQuery columns to NULLABLE — REQUIRED forces explicit
- * handling here, which is the safer contract for downstream readers.
- */
-export const MISSING_TITLE_PLACEHOLDER = '⚠️ Sin título'
-
-const isEffectivelyMissingTitle = (value: unknown): boolean => {
-  if (value === null || value === undefined) return true
-  if (typeof value !== 'string') return true
-  if (value.trim() === '') return true
-  if (value === MISSING_TITLE_PLACEHOLDER) return true
-
-  return false
-}
-
-const coerceTitle = (value: string | null | undefined): string =>
-  isEffectivelyMissingTitle(value) ? MISSING_TITLE_PLACEHOLDER : (value as string)
 
 const uniqueSpaceIds = (spaceIds: Array<string | null | undefined>) =>
   Array.from(new Set(spaceIds.filter((spaceId): spaceId is string => Boolean(spaceId))))
@@ -1201,7 +1210,7 @@ export const syncNotionToConformed = async (input?: {
       client_id: clientId,
       module_code: null as string | null,
       module_id: null as string | null,
-      project_name: coerceTitle(toNullableString(row.nombre_del_proyecto)),
+      project_name: toNullableString(row.nombre_del_proyecto),
       project_status: toNullableString(row.estado),
       project_summary: toNullableString(row.resumen),
       completion_label: toNullableString(row['finalización']),
@@ -1269,7 +1278,7 @@ export const syncNotionToConformed = async (input?: {
       client_id: clientId,
       module_code: null as string | null,
       module_id: null as string | null,
-      task_name: coerceTitle(toNullableString(row.nombre_de_tarea)),
+      task_name: toNullableString(row.nombre_de_tarea),
       task_status: toNullableString(row.estado),
       task_phase: toNullableString(row['priorización']),
       task_priority: toNullableString(row.prioridad),
@@ -1384,7 +1393,7 @@ export const syncNotionToConformed = async (input?: {
       project_source_id: sprintSourceId ? (sprintProjectMap.get(sprintSourceId) || null) : null,
       project_database_source_id: null as string | null,
       space_id: spaceId,
-      sprint_name: coerceTitle(toNullableString(row.nombre_del_sprint)),
+      sprint_name: toNullableString(row.nombre_del_sprint),
       sprint_status: toNullableString(row.estado_del_sprint),
       start_date: toDateValue(row.fechas),
       end_date: toDateValue(row.fechas_end),
@@ -1468,6 +1477,7 @@ export const syncNotionToConformed = async (input?: {
   }
 
   await ensureDeliveryTaskColumns(projectId)
+  await ensureDeliveryTitleColumnsNullable(projectId)
 
   // Stage into unique tables, then atomically swap into the canonical tables.
   // This avoids partial writes if one replacement fails mid-run and reduces
