@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — Backlog Commercial Public Procurement registrado
+
+- Se confirmo que el POC y helper de Mercado Publico siguen siendo `TASK-673`, no `TASK-674`:
+  - task cerrada: `docs/tasks/complete/TASK-673-mercadopublico-poc.md`
+  - helper runtime: `src/lib/integrations/mercado-publico/tenders.ts`
+  - test helper: `src/lib/integrations/mercado-publico/__tests__/tenders.test.ts`
+- Se registraron tasks nuevas `TASK-674` a `TASK-689` para madurar el dominio Commercial / Public Procurement:
+  - `TASK-674` contrato de arquitectura
+  - `TASK-675` ingesta licitaciones
+  - `TASK-676` reconciliacion OC
+  - `TASK-677` ingesta Compra Agil COT mensual
+  - `TASK-678` watch Beta API Compra Agil
+  - `TASK-679` adjuntos y assets privados
+  - `TASK-680` registry de taxonomia/procedimientos
+  - `TASK-681` discovery RFI/Consulta al Mercado
+  - `TASK-682` scoring V1
+  - `TASK-683` workbench lista/detalle
+  - `TASK-684` workflow bid/no-bid
+  - `TASK-685` document intelligence
+  - `TASK-686` bridge tender -> deal/quote
+  - `TASK-687` notificaciones y reliability
+  - `TASK-688` submission control room sin postulacion por API
+  - `TASK-689` research companion extension
+- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron con siguiente ID disponible `TASK-690`.
+- `docs/research/RESEARCH-007-commercial-public-tenders-module.md` reemplazo `TASK-TBD` por los IDs reales `TASK-674` a `TASK-689`.
+- Nota operativa: `TASK-674` es deliberadamente el contrato posterior al POC; depende de `TASK-673` y referencia el helper existente. No se borro ni reemplazo codigo del helper.
+
 ## Sesion 2026-04-26 — TASK-673 Mercado Publico Commercial Fit POC
 
 - TASK-673 cerrada en `docs/tasks/complete/TASK-673-mercadopublico-poc.md`; registry e indice sincronizados.
@@ -16,6 +43,17 @@
 ## Sesion 2026-04-26 — RESEARCH-007 Commercial Public Tenders Module
 
 - Se documento el research naciente para `Comercial > Licitaciones Publicas` en `docs/research/RESEARCH-007-commercial-public-tenders-module.md`.
+- Delta nuevo: se agrego la seccion `Oportunidad Producto / Operativa`, con niveles de evolucion `Radar Comercial Automatico`, `Intake Productivo`, `Bid / No-Bid Room`, `Sinergia con el ecosistema Greenhouse` y `Companion Extension Browser-Mediated`.
+- Maduracion adicional: RESEARCH-007 sube a version `0.2` e incorpora tesis de producto, anti-metas, principios (`Human-In-Control`, `Evidence-First`, `Fit Before Volume`), lifecycle operativo, scoring explicable, document intelligence, operating model, ecosystem synergy map, moat, KPIs, roadmap M0-M5 y decision gates previos a Intake V1.
+- Investigacion taxonomia: se documento que Mercado Publico incluye licitaciones publicas/privadas, trato directo, Compra Agil, Compra por Cotizacion, Convenio Marco, Compras Coordinadas, Bases Tipo, innovacion/dialogo competitivo/subasta inversa y RFI/Consultas al Mercado. RFI no respondio por `licitaciones.json?codigo=<RFI>` en smoke, por lo que probablemente requiere source surface separada.
+- Precision API: en payload real `Tipo` trae el codigo de procedimiento (`LE`, `LP`, etc.) y `CodigoTipo` trae un codigo numerico de tipo/visibilidad (`1=Pública`, `2=Privada` segun anexo); RESEARCH-007 ahora distingue `external_procedure_code`, `external_codigo_tipo` y `external_code_suffix`.
+- Tabla de codigos ampliada con el anexo oficial completo observado: `L1`, `LE`, `LP`, `LS`, `A1`, `B1`, `E1`, `F1`, `J1`, `CO`, `B2`, `E2`, `A2`, `D1`, `C2`, `C1`, `F2`, `F3`, `G2`, `G1`, `R1`, `CA`, `SE`.
+- Compra Agil: ChileCompra define `COT` como cotizacion solicitada por Compra Agil. Smokes contra `licitaciones.json?codigo=<COT>` devolvieron `{}` para IDs reales, asi que `COT` debe tratarse como source/opportunity family separada; las OCs downstream suelen aparecer con sufijo `AG` y referencia a la invitacion `COT`.
+- Inventario endpoints API oficial agregado a RESEARCH-007 (version `0.3`): `licitaciones.json`, `ordenesdecompra.json`, `Empresas/BuscarProveedor`, `Empresas/BuscarComprador`, formatos `.json/.jsonp/.xml`, parametros documentados, estados y smokes live con ticket de prueba oficial. No aparecen endpoints publicos para adjuntos, COT/Compra Agil, RFI, postulacion, subida de anexos, aceptacion/rechazo OC ni webhooks.
+- Investigacion profunda Compra Agil agregada a RESEARCH-007 (version `0.4`): ChileCompra anuncio API Beta Compra Agil para mayo 2026; Datos Abiertos expone historico mensual oficial `https://transparenciachc.blob.core.windows.net/trnspchc/COT_<YYYY-MM>.zip`; `COT_2026-03.zip` validado con 2 CSV (`COT1`, `COT2`) y ~4.27M lineas de cotizaciones/respuestas, columnas `CodigoCotizacion`, `NombreCotizacion`, `DescripcionCotizacion`, fechas, proveedor, `CodigoOC`, etc. La SPA `compra-agil.mercadopublico.cl` revela endpoints internos `servicios-compra-agil.../v1/compra-agil/*`, pero sin sesion responden `401 Bearer`; no usarlos como contrato backend productivo.
+- Madurez pre-implementacion agregada a RESEARCH-007 (version `0.5`): Source Strategy V1, Freshness/SLA matrix, Data Model Grain V1, Matching/Scoring V1, Document Intelligence V1, Operating Model V1, Compliance checklist, Reliability/Ops contract, Integration Map y cortes recomendados Cut 0-5. Tasks candidatas ajustadas hacia `public_procurement_opportunities`, ingestion licitaciones, OC reconciliation, COT mensual, watch API Beta, documents/assets, taxonomy, scoring, workbench y workflow.
+- Decision de diseño registrada: no modelar todo como `public_tender`; preferir `public_procurement_opportunities` con `opportunity_kind`, `commercial_motion`, `procedure_family`, `external_procedure_code` y `external_codigo_tipo`, o dejar `public_tenders` solo como narrow V1 con migracion prevista.
+- Recomendacion registrada: el siguiente corte debe ser `Commercial Public Tenders Intake V1` antes de UI completa o extension.
 - El brief posiciona licitaciones publicas como modulo Commercial, no Finance, y explicita los dos planos de acceso: surface `comercial.licitaciones_publicas` + capabilities `commercial.public_tenders.*`.
 - Incluye contexto validado de Mercado Publico API, descubrimiento/descarga de adjuntos via ficha publica, modelo de datos candidato, pipeline de ingestion, riesgos, UI target y criterios `Ready for task`.
 - Investigacion API postulacion: la documentacion publica vigente solo muestra consultas `GET` de datos abiertos para licitaciones/OC/proveedor/comprador; no hay endpoint oficial documentado para crear/subir/enviar ofertas. RESEARCH-007 queda ajustado a `Submission Control Room` sin postular por API.

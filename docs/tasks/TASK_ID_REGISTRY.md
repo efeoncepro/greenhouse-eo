@@ -749,3 +749,19 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-671` | `to-do` | Greenhouse Teams Bot Platform (Bot Framework + Graph) | `docs/tasks/to-do/TASK-671-greenhouse-teams-bot-platform.md` |
 | `TASK-672` | `to-do` | Platform Health API Contract | `docs/tasks/to-do/TASK-672-platform-health-api-contract.md` |
 | `TASK-673` | `complete` | Mercado Publico Licitaciones Intelligence (POC + Validacion de Matcher) | `docs/tasks/complete/TASK-673-mercadopublico-poc.md` |
+| `TASK-674` | `to-do` | Commercial Public Procurement Architecture Contract | `docs/tasks/to-do/TASK-674-commercial-public-procurement-architecture-contract.md` |
+| `TASK-675` | `to-do` | Mercado Publico Licitaciones Ingestion Foundation | `docs/tasks/to-do/TASK-675-mercado-publico-licitaciones-ingestion-foundation.md` |
+| `TASK-676` | `to-do` | Mercado Publico Purchase Order Reconciliation Foundation | `docs/tasks/to-do/TASK-676-mercado-publico-purchase-order-reconciliation.md` |
+| `TASK-677` | `to-do` | Compra Agil Monthly COT Ingestion Foundation | `docs/tasks/to-do/TASK-677-compra-agil-cot-ingestion-foundation.md` |
+| `TASK-678` | `to-do` | Compra Agil Beta API Watch And Adapter Spike | `docs/tasks/to-do/TASK-678-compra-agil-beta-api-watch-adapter-spike.md` |
+| `TASK-679` | `to-do` | Mercado Publico Document Ingestion And Private Assets | `docs/tasks/to-do/TASK-679-mercado-publico-document-ingestion-private-assets.md` |
+| `TASK-680` | `to-do` | Mercado Publico Procedure Taxonomy Registry | `docs/tasks/to-do/TASK-680-mercado-publico-procedure-taxonomy-registry.md` |
+| `TASK-681` | `to-do` | Consulta al Mercado / RFI Discovery Spike | `docs/tasks/to-do/TASK-681-consulta-mercado-rfi-discovery-spike.md` |
+| `TASK-682` | `to-do` | Public Tenders Scoring V1 | `docs/tasks/to-do/TASK-682-public-tenders-scoring-v1.md` |
+| `TASK-683` | `to-do` | Public Tenders Workbench List And Detail | `docs/tasks/to-do/TASK-683-public-tenders-workbench-list-detail.md` |
+| `TASK-684` | `to-do` | Public Tenders Bid / No-Bid Workflow | `docs/tasks/to-do/TASK-684-public-tenders-bid-no-bid-workflow.md` |
+| `TASK-685` | `to-do` | Tender Document Intelligence And Requirement Extraction | `docs/tasks/to-do/TASK-685-tender-document-intelligence-requirements.md` |
+| `TASK-686` | `to-do` | Tender To Deal / Quote Bridge | `docs/tasks/to-do/TASK-686-tender-to-deal-quote-bridge.md` |
+| `TASK-687` | `to-do` | Public Tender Notifications And Reliability Signals | `docs/tasks/to-do/TASK-687-public-tender-notifications-reliability.md` |
+| `TASK-688` | `to-do` | Public Tender Submission Control Room Without API-Side Posting | `docs/tasks/to-do/TASK-688-public-tender-submission-control-room.md` |
+| `TASK-689` | `to-do` | Mercado Publico Companion Extension Research Spike | `docs/tasks/to-do/TASK-689-mercado-publico-companion-extension-research.md` |
