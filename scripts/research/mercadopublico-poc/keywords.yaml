@@ -1,0 +1,239 @@
+services:
+  agencia_creativa:
+    bu: globe
+    keywords:
+      - "agencia creativa"
+      - "campaña publicitaria"
+      - "campaña comunicacional"
+      - "campaña de difusión"
+      - "campaña de marketing"
+      - "creatividad publicitaria"
+      - "conceptualización creativa"
+      - "identidad visual"
+      - "identidad gráfica"
+      - "identidad de marca"
+      - "branding"
+      - "manual de marca"
+      - "brandbook"
+      - "naming"
+      - "isologotipo"
+      - "rediseño de marca"
+
+  produccion_audiovisual:
+    bu: globe
+    keywords:
+      - "producción audiovisual"
+      - "audiovisual"
+      - "producción de video"
+      - "spot publicitario"
+      - "spot de televisión"
+      - "registro audiovisual"
+      - "cobertura audiovisual"
+      - "cobertura fotográfica"
+      - "fotografía profesional"
+      - "cápsula audiovisual"
+      - "cápsula de video"
+      - "animación"
+      - "motion graphics"
+      - "post producción"
+      - "edición de video"
+      - "realización audiovisual"
+
+  social_media_content:
+    bu: globe
+    keywords:
+      - "redes sociales"
+      - "social media"
+      - "community manager"
+      - "gestión de redes"
+      - "administración de redes"
+      - "contenido digital"
+      - "contenido para redes"
+      - "parrilla de contenidos"
+      - "plan de contenidos"
+      - "gestión de contenidos digitales"
+
+  social_care_sac:
+    bu: efeonce_digital
+    keywords:
+      - "atención digital al ciudadano"
+      - "atención al cliente digital"
+      - "moderación de comentarios"
+      - "gestión de comentarios"
+      - "monitoreo de menciones"
+      - "social listening"
+
+  performance_paid_media:
+    bu: efeonce_digital
+    keywords:
+      - "pauta digital"
+      - "publicidad digital"
+      - "campaña digital"
+      - "google ads"
+      - "meta ads"
+      - "performance digital"
+      - "marketing digital"
+      - "gestión de campañas digitales"
+      - "compra programática"
+      - "programmatic"
+
+  seo_aeo:
+    bu: efeonce_digital
+    keywords:
+      - "SEO"
+      - "posicionamiento web"
+      - "posicionamiento orgánico"
+      - "optimización de buscadores"
+      - "search engine optimization"
+      - "auditoría SEO"
+
+  email_marketing_automation:
+    bu: efeonce_digital
+    keywords:
+      - "email marketing"
+      - "mailing masivo"
+      - "envío de correos masivos"
+      - "newsletter"
+      - "marketing automation"
+      - "automatización de marketing"
+
+  data_analytics:
+    bu: efeonce_digital
+    keywords:
+      - "analítica digital"
+      - "analítica web"
+      - "google analytics"
+      - "dashboard de marketing"
+      - "reportería digital"
+      - "business intelligence marketing"
+      - "looker studio"
+      - "data studio"
+
+  research_estrategia:
+    bu: efeonce_digital
+    keywords:
+      - "estudio de mercado"
+      - "investigación de mercado"
+      - "estudio cuantitativo"
+      - "estudio cualitativo"
+      - "focus group"
+      - "encuesta de percepción"
+      - "encuesta de satisfacción"
+      - "segmentación de audiencias"
+      - "research"
+
+  desarrollo_web:
+    bu: wave
+    keywords:
+      - "desarrollo web"
+      - "desarrollo de sitio web"
+      - "diseño y desarrollo web"
+      - "sitio web"
+      - "página web"
+      - "plataforma web"
+      - "portal web"
+      - "intranet"
+      - "landing page"
+      - "e-commerce"
+      - "comercio electrónico"
+      - "tienda online"
+      - "CMS"
+      - "wordpress"
+      - "drupal"
+      - "rediseño web"
+      - "migración web"
+
+  diseno_ux:
+    bu: wave
+    keywords:
+      - "diseño UX"
+      - "experiencia de usuario"
+      - "UX/UI"
+      - "diseño UX/UI"
+      - "prototipo de aplicación"
+      - "wireframe"
+      - "diseño de interfaz"
+      - "estudio de usabilidad"
+      - "user experience"
+
+  consultoria_crm:
+    bu: crm_solutions
+    keywords:
+      - "implementación CRM"
+      - "consultoría CRM"
+      - "sistema CRM"
+      - "gestión de relación con clientes"
+      - "fidelización digital"
+      - "customer relationship management"
+
+  licenciamiento_hubspot:
+    bu: crm_solutions
+    keywords:
+      - "hubspot"
+      - "licencias hubspot"
+      - "licenciamiento hubspot"
+
+  implementacion_onboarding:
+    bu: crm_solutions
+    keywords:
+      - "onboarding CRM"
+      - "configuración CRM"
+      - "puesta en marcha CRM"
+      - "implementación hubspot"
+      - "implementación CRM"
+
+signals:
+  medios_pr_influencers:
+    bu: reach
+    keywords:
+      - "agencia de medios"
+      - "central de medios"
+      - "planificación de medios"
+      - "compra de medios"
+      - "avisaje"
+      - "difusión publicitaria"
+      - "campaña de medios"
+      - "relaciones públicas"
+      - "RRPP"
+      - "comunicaciones estratégicas"
+      - "vocería"
+      - "vocerías"
+      - "estrategia de comunicaciones"
+      - "publicity"
+      - "gestión de prensa"
+      - "marketing de influencia"
+      - "influencers"
+
+global_exclusions:
+  - "agua potable"
+  - "alcantarillado"
+  - "red eléctrica"
+  - "redes eléctricas"
+  - "red sanitaria"
+  - "red de gas"
+  - "red de incendio"
+  - "vialidad"
+  - "asfalto"
+  - "hormigón"
+  - "pavimento"
+  - "obras civiles"
+  - "obras viales"
+  - "video laringoscopio"
+  - "videocolonoscopio"
+  - "videoendoscopio"
+  - "broncoscopio"
+  - "ecógrafo"
+  - "videovigilancia"
+  - "CCTV"
+  - "circuito cerrado"
+  - "producción de uniformes"
+  - "producción agrícola"
+  - "producción ganadera"
+  - "alimentos"
+  - "banquetería"
+  - "combustible"
+  - "ferretería"
+  - "repuestos"
+  - "neumáticos"
+  - "mantención de vehículos"
+  - "mantención de edificios"

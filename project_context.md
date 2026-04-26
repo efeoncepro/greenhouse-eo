@@ -1,3 +1,14 @@
+## Delta 2026-04-26 Mercado Publico licitaciones helper
+
+- Greenhouse ya tiene un helper server-side para hidratar una licitacion Mercado Publico por codigo externo:
+  - detalle oficial desde `api.mercadopublico.cl/servicios/v1/publico/licitaciones.json?codigo=...`
+  - referencias de adjuntos desde la ficha publica `DetailsAcquisition.aspx?idlicitacion=...`
+  - descarga de documentos mediante postback WebForms de `VerAntecedentes.aspx`
+- Runtime nuevo: `src/lib/integrations/mercado-publico/tenders.ts`.
+- Contrato de secreto: `MERCADO_PUBLICO_TICKET` como fallback local directo; preferir `MERCADO_PUBLICO_TICKET_SECRET_REF=greenhouse-mercado-publico-ticket` en ambientes compartidos.
+- El secreto canonico ya existe en GCP Secret Manager (`efeonce-group`) y debe consumirse como scalar crudo. No imprimir ni persistir el ticket en logs o documentos.
+- Scope actual: helper puro sin persistencia. El siguiente slice debe decidir almacenamiento de metadata, assets privados y scheduling antes de exponerlo en UI o API Greenhouse.
+
 ## Delta 2026-04-26 TASK-617 cerrado y TASK-647 abre MCP read-only
 
 - `TASK-617` queda cerrado documentalmente: `TASK-617.1` a `TASK-617.4` ya cubren REST hardening, first-party app lane, event control plane y developer docs.

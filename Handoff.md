@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-673 Mercado Publico Commercial Fit POC
+
+- TASK-673 cerrada en `docs/tasks/complete/TASK-673-mercadopublico-poc.md`; registry e indice sincronizados.
+- Se creo POC aislado en `scripts/research/mercadopublico-poc/`:
+  - `match_licitaciones.py` consume `estado=activas`, opcionalmente hidrata detalle por `codigo`, aplica retry/backoff para 429/5xx y exporta CSV local ignorado por Git.
+  - `keywords.yaml` separa 14 servicios canonicos (`services`) de senales no canonicas (`signals.medios_pr_influencers`) para no contaminar `servicios_matched`.
+  - `README.md`, `requirements.txt` y `.gitignore` local documentan setup y evitan commitear outputs.
+- Hallazgos registrados en `docs/research/TASK-673-findings.md`.
+- Aprendizaje API: el listado activo solo trae `CodigoExterno`, `Nombre`, `FechaCierre`, `CodigoEstado`; `Descripcion` e `Items` requieren llamada de detalle por codigo. Smoke real: `Cantidad=4346`; detalle hidratado en muestra de 25; listing-only sample de 900 produjo 2 matches audiovisuales plausibles.
+- Ajuste de calidad del matcher: se agrego matching con limites de palabra/frase para evitar `SEO` dentro de `aseo`, y se removio keyword demasiado amplia `documental`.
+- Fuente de ticket usada solo via Secret Manager -> env local en comando, sin exponer ni commitear el valor. `rg` del prefijo real no encontro secretos en repo.
+- Pendiente futuro: si se promueve a modulo productivo, converger la logica a TypeScript en `src/lib/integrations/mercado-publico/tenders.ts`, persistir en `greenhouse_commercial.public_tenders*`, usar `source_sync_runs/source_sync_watermarks`, hidratar adjuntos/documentos y modelar access en views + entitlements.
+
+## Sesion 2026-04-26 — RESEARCH-007 Commercial Public Tenders Module
+
+- Se documento el research naciente para `Comercial > Licitaciones Publicas` en `docs/research/RESEARCH-007-commercial-public-tenders-module.md`.
+- El brief posiciona licitaciones publicas como modulo Commercial, no Finance, y explicita los dos planos de acceso: surface `comercial.licitaciones_publicas` + capabilities `commercial.public_tenders.*`.
+- Incluye contexto validado de Mercado Publico API, descubrimiento/descarga de adjuntos via ficha publica, modelo de datos candidato, pipeline de ingestion, riesgos, UI target y criterios `Ready for task`.
+- Investigacion API postulacion: la documentacion publica vigente solo muestra consultas `GET` de datos abiertos para licitaciones/OC/proveedor/comprador; no hay endpoint oficial documentado para crear/subir/enviar ofertas. RESEARCH-007 queda ajustado a `Submission Control Room` sin postular por API.
+- Se agrego carril alternativo inspirado por LicitaLAB: extension Chrome/browser-mediated. Queda como futuro `Greenhouse Mercado Publico Companion Extension`, con usuario autenticado en MercadoPublico.cl, confirmaciones humanas, sin almacenamiento de credenciales y kill switch; no reemplaza la ausencia de API oficial.
+- Se actualizaron indices `docs/research/README.md` y `docs/README.md`.
+- Pendiente: cerrar rubros/keywords iniciales, owner operativo, storage target definitivo y scope del primer corte antes de abrir tasks implementables.
+
 ## Sesion 2026-04-26 — Mercado Publico API ticket provisionado en Secret Manager
 
 - Se verifico que el ticket recibido desde `API@chilecompra.cl` funciona contra `https://api.mercadopublico.cl/servicios/v1/publico/licitaciones.json`.
@@ -10,7 +33,15 @@
   - Payload auditado como scalar crudo: UUID shape, sin whitespace, sin `\n`/`\r` literal.
 - IAM: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/secretmanager.secretAccessor` sobre el secreto para la futura integracion Greenhouse.
 - Smoke desde Secret Manager: `estado=activas` respondio `200`, `Cantidad=4346`, `Version=v1` el 2026-04-26.
-- Pendiente futuro: cuando se implemente la integracion, documentar el contrato runtime/env (`MERCADO_PUBLICO_TICKET_SECRET_REF=greenhouse-mercado-publico-ticket`) en `.env.example`, `project_context.md` y la arquitectura/docs del modulo correspondiente.
+- Helper implementado en `src/lib/integrations/mercado-publico/tenders.ts`:
+  - `getMercadoPublicoTenderDetail(code)` hidrata detalle oficial por API JSON.
+  - `listMercadoPublicoTenderDocumentReferences(code)` descubre paginas de antecedentes desde `DetailsAcquisition.aspx?idlicitacion=...`.
+  - `downloadMercadoPublicoTenderDocument(ref)` baja el archivo real via postback WebForms.
+  - `hydrateMercadoPublicoTenderWithDocuments(code)` combina detalle + adjuntos.
+- Contrato runtime documentado en `.env.example` y `project_context.md`: usar `MERCADO_PUBLICO_TICKET_SECRET_REF=greenhouse-mercado-publico-ticket` en ambientes compartidos; `MERCADO_PUBLICO_TICKET` queda solo como fallback local.
+- Smoke live helper: `1000813-8-LE26` respondio `Publicada`, `tipo=LE`, `itemsCount=2` y descargo `ANEXO_N°1_FORMULARIO_OFERTA_ECÓNOMICA.docx` (`23090` bytes, `sha256` prefix `d5ab9465ec63`).
+- Validacion: `npx vitest run src/lib/integrations/mercado-publico/__tests__/tenders.test.ts` y `npx tsc --noEmit --pretty false` pasaron.
+- Pendiente futuro: disenar persistencia Greenhouse para licitaciones y adjuntos (metadata en PG, binarios en bucket privado, dedupe por `sha256`, worker/backoff y surface/API interna).
 
 ## Sesion 2026-04-26 — Reliability dashboard hygiene end-to-end (orphan archive + channel readiness + smoke lane bus + Sentry domain tags)
 
