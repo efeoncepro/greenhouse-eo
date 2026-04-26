@@ -464,6 +464,49 @@ Cuatro patrones canónicos que evitan re-introducir falsos positivos o `awaiting
 - **NO** leer Playwright results desde filesystem en runtime (Vercel/Cloud Run no tienen el archivo). Usar `greenhouse_sync.smoke_lane_runs`.
 - **NO** usar `Sentry.captureException()` directo en code paths con dominio claro — el tag `domain` no se setea y el módulo correspondiente NUNCA ve el incidente. Usar `captureWithDomain()`.
 
+### Platform Health API Contract — preflight programático para agentes (TASK-672, 2026-04-26)
+
+Contrato versionado `platform-health.v1`. Permite a agentes (MCP, Teams bot, CI, scripts) consultar el estado real de la plataforma con un solo request antes de actuar. Compone Reliability Control Plane + Operations Overview + runtime checks + integration readiness + synthetic monitoring + webhook delivery + posture, con timeouts per-source y degradación honesta (NUNCA 5xx por una fuente caída).
+
+**Rutas**:
+
+- `GET /api/admin/platform-health` — admin lane (`requireAdminTenantContext`). Payload completo con evidencia y referencias.
+- `GET /api/platform/ecosystem/health` — ecosystem lane (`runEcosystemReadRoute`). Summary redactado, sin evidence detail hasta que TASK-658 cierre el bridge `platform.health.detail`.
+
+**Composer**: `src/lib/platform-health/composer.ts`. 7 sources via `Promise.all` con `withSourceTimeout` per-source (budgets 2-6s). Cache in-process 30s per audience.
+
+**Helpers canónicos NUEVOS**:
+
+- `src/lib/observability/redact.ts` — `redactSensitive`, `redactObjectStrings`, `redactErrorForResponse`. Strip de JWT/Bearer/GCP secret URI/DSN/email/query secret. **USAR SIEMPRE** antes de persistir o devolver `last_error` o response body que cruce un boundary externo. NUNCA loggear `error.stack` directo.
+- `src/lib/platform-health/with-source-timeout.ts` — `(produce, { source, timeoutMs }) → SourceResult<T>`. Reutilizable por TASK-657 (degraded modes) y cualquier reader que necesite timeout + fallback estructurado.
+- `src/lib/platform-health/safe-modes.ts` — booleans `readSafe/writeSafe/deploySafe/backfillSafe/notifySafe/agentAutomationSafe`. Conservador: en duda → `false`.
+- `src/lib/platform-health/recommended-checks.ts` — catálogo declarativo de runbooks accionables filtrados por trigger.
+
+**Cómo lo usa un agente**:
+
+1. Consultar `safeModes` antes de cualquier acción sensible. Respetar las banderas tal cual vienen.
+2. Si `agentAutomationSafe=false`, escalar a humano antes de actuar.
+3. Si una acción específica falla en runtime, reconsultar Platform Health para confirmar si el módulo afectado pasó a `blocked`.
+4. NO cachear el payload más allá de 30s en el cliente. La API ya tiene cache in-process.
+5. NO depender de campos no documentados. Solo `contractVersion: "platform-health.v1"` garantiza shape estable.
+
+**⚠️ Reglas duras para AGENTES**:
+
+- **NO** crear endpoints paralelos de health en otros módulos. Si un módulo nuevo necesita exponer salud, registrarlo en `RELIABILITY_REGISTRY` (con `incidentDomainTag` si aplica) y el composer lo recoge automáticamente.
+- **NO** exponer payload sin pasar por `redactSensitive` cuando contiene strings de error o de fuente externa.
+- **NO** computar safe modes ni rollup en el cliente. Consumir las banderas tal como vienen.
+- **NO** agregar fuentes al composer sin envolverlas en `withSourceTimeout` — una fuente colgada sin budget colapsa el contrato entero.
+- **NO** interpretar `degraded` como `healthy`. Si el contrato dice `degraded`, hay un warning real que requiere atención.
+
+**Tests**: `pnpm test src/lib/platform-health src/lib/observability/redact` (47 tests).
+
+**Spec**:
+
+- Arquitectura: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` (sección Platform Health)
+- Funcional (Spanish): `docs/documentation/plataforma/platform-health-api.md`
+- OpenAPI: `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` (schema `PlatformHealthV1`)
+- Markdown público: `docs/api/GREENHOUSE_API_PLATFORM_V1.md` + mirror `public/docs/greenhouse-api-platform-v1.md`
+
 ### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
 
 **Decisión arquitectónica (2026-04-26)**: el daily Notion sync es un SOLO ciclo de DOS pasos en `ops-worker` Cloud Run, schedulado por Cloud Scheduler. No hay otro path scheduled.
