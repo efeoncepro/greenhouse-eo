@@ -20,7 +20,6 @@
 - Incluye contexto validado de Mercado Publico API, descubrimiento/descarga de adjuntos via ficha publica, modelo de datos candidato, pipeline de ingestion, riesgos, UI target y criterios `Ready for task`.
 - Investigacion API postulacion: la documentacion publica vigente solo muestra consultas `GET` de datos abiertos para licitaciones/OC/proveedor/comprador; no hay endpoint oficial documentado para crear/subir/enviar ofertas. RESEARCH-007 queda ajustado a `Submission Control Room` sin postular por API.
 - Se agrego carril alternativo inspirado por LicitaLAB: extension Chrome/browser-mediated. Queda como futuro `Greenhouse Mercado Publico Companion Extension`, con usuario autenticado en MercadoPublico.cl, confirmaciones humanas, sin almacenamiento de credenciales y kill switch; no reemplaza la ausencia de API oficial.
-- Se actualizaron indices `docs/research/README.md` y `docs/README.md`.
 - Pendiente: cerrar rubros/keywords iniciales, owner operativo, storage target definitivo y scope del primer corte antes de abrir tasks implementables.
 
 ## Sesion 2026-04-26 — Mercado Publico API ticket provisionado en Secret Manager
