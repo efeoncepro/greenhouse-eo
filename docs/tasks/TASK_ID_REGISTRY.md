@@ -724,3 +724,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-646` | `to-do` | Scroll-triggered chart entrance + list stagger | `docs/tasks/to-do/TASK-646-scroll-triggered-chart-entrance-stagger.md` |
 | `TASK-647` | `to-do` | Greenhouse MCP Read-Only Adapter V1 | `docs/tasks/to-do/TASK-647-greenhouse-mcp-read-only-adapter-v1.md` |
 | `TASK-648` | `to-do` | API Platform ICO Read Surface V1 | `docs/tasks/to-do/TASK-648-api-platform-ico-read-surface-v1.md` |
+| `TASK-649` | `to-do` | API Platform Completion Program | `docs/tasks/to-do/TASK-649-api-platform-completion-program.md` |

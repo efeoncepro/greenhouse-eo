@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-649 API Platform Completion Program
+
+### Que cambio
+
+- Se creó `TASK-649 — API Platform Completion Program` en `docs/tasks/to-do/`.
+- La task coordina los gaps restantes antes de declarar la API Platform completa:
+  - read surfaces por dominio
+  - command/idempotency foundation
+  - query conventions para listas grandes
+  - degraded modes por dominio
+  - authorization bridge con entitlements/capabilities
+  - MCP OAuth / hosted auth model
+  - OpenAPI stable contract
+  - lifecycle/deprecation policy
+
+### Notas de coordinacion
+
+- MCP V1 local/read-only (`TASK-647`) no queda bloqueado por OAuth; puede usar consumer token por env y scope explícito.
+- MCP remoto/hosted o multiusuario sí requiere diseño OAuth antes de exponerse.
+- `TASK-648` queda registrado como prerequisito API-first para agregar ICO al MCP.
+
+### Validaciones
+
+- `git diff --check -- docs/tasks/to-do/TASK-649-api-platform-completion-program.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/README.md Handoff.md` -> clean.
+
 ## Sesion 2026-04-26 — TASK-526 list motion con auto-animate (Slice 2 de TASK-642)
 
 ### Que cambio
