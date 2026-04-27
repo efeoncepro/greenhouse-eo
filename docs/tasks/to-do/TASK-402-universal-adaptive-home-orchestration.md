@@ -1,5 +1,18 @@
 # TASK-402 — Universal Adaptive Home Orchestration
 
+## Delta 2026-04-26
+
+- **Absorbida parcialmente por TASK-696** (Smart Home v2 Enterprise-grade redesign).
+- TASK-696 ya implementó: contrato versionado `home-snapshot.v1`, Home Block Registry declarativo, 7 bloques role-aware (`hero-ai / pulse-strip / today-inbox / closing-countdown / ai-insights-bento / recents-rail / reliability-ribbon`), composer con `withSourceTimeout`, kill switches per-block (`greenhouse_serving.home_block_flags`), pre-compute lookup (`home_pulse_snapshots`), `user_recent_items`, density toggle (`client_users.ui_density`), default-view override (`client_users.home_default_view`), opt-out a v1 (`home_v2_opt_out`), módulo `home` registrado en Reliability Control Plane, Sentry domain `home` añadido.
+- **Lo que queda** de esta TASK-402 después del cierre de TASK-696:
+  - **Density toggle UI** dentro del Customizer (PATCH `/api/home/preferences` ya existe — falta el control visual).
+  - **Default surface override UI** en Mi Perfil/Configuración.
+  - **Cron de pre-cómputo** `/api/cron/precompute-home-pulse` (la tabla y el reader existen; falta el job que la pueble).
+  - **Audience-filtered routes para ⌘K** (la palette está construida — falta filtrar por entitlements del usuario).
+  - **Tracking de `user_recent_items`** vía middleware/route.ts (la tabla y el reader existen; falta el writer en cada navegación).
+  - **OpenAPI `HomeSnapshotV1` schema** publicado en `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`.
+- Re-enfocar el scope de esta task hacia esos 6 follow-ups o cerrarla si se descomponen en tasks nuevas.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

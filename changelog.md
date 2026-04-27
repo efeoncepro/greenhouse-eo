@@ -2,6 +2,62 @@
 
 ## 2026-04-26
 
+### 2026-04-26 — TASK-696 Smart Home v2 (Enterprise-grade redesign)
+
+Rediseño completo del Home (`/home`) en 4 slices commiteados a `task/TASK-696-smart-home-v2-enterprise`. Pasa de 4 chips informativos + 1 señal Nexa enterrada a 7 bloques role-aware con observabilidad propia, kill switches per-block, contrato versionado y rollout escalado.
+
+Capas entregadas:
+- **Capa 1 — Contrato** (`src/lib/home/contract.ts`): `home-snapshot.v1` versionado consumible por web + MCP (TASK-647) + Teams bot + futuros mobile. 7 `HomeBlockId`, 5 `HomeSlotKey`, `HomeBlockEnvelope<T>` con `outcome: ok | degraded | hidden | error`, `HomeSnapshotMeta` con `confidence` 0..1.
+- **Capa 2 — Registry declarativo** (`src/lib/home/registry.ts`): `HOME_BLOCK_REGISTRY` con audiencias + `requiresCapability` + slot + cacheTtl + timeout + precomputed flag por bloque. Extender el home = +1 entry, +1 loader, +1 componente — nunca un fork JSX.
+- **Capa 3 — Data layer mixto**: pre-compute (`greenhouse_serving.home_pulse_snapshots` para Pulse Strip, lookup O(1) por audience+role+tenant) + realtime (Today Inbox, Closing, Recents, Reliability). Todos los loaders pasan por `withSourceTimeout` de Platform Health V1 — fuente caída = `degraded` envelope, NUNCA un 5xx.
+- **Capa 4 — Render consumer-agnostic**: `HomeShellV2` orquestador (CSS Grid `grid-template-areas` + `--gh-density-scale`), `HomeBlockRenderer` switch sin if/else por rol.
+
+7 bloques productivos:
+- **Hero AI elevado**: ensamble Vuexy `Congratulations` shell + `SendMsgForm` composer + `NexaModelSelector` + chips role-aware (6 audiencias × 4 prompts).
+- **Pulse Strip**: 4-6 KPI cards adaptadas de `StatsWithAreaChart` (Apex sparkline + delta chip + AnimatedCounter tabular-nums + status traffic light + drill-in).
+- **Today Inbox**: Linear-Inbox shape — 8 kinds (`approval/closing/sla_breach/sync_drift/mention/task/incident/reminder`), severity tone, triage 1-click optimista con `AnimatePresence` exit, POST a `/api/home/inbox/{action}`.
+- **Closing Countdown**: cierres finance + payroll concurrentes con traffic light + LinearProgress + hours remaining + tonal CTA.
+- **AI Insights Bento**: 2×2 desde `readTopAiLlmEnrichments` filtrado por dominio (finance/delivery/hr/commercial/agency/people/integrations) con drill-in a `/agency/insights/<id>`.
+- **Recents Rail** (aside): últimas 8 entidades + drafts pendientes desde `greenhouse_serving.user_recent_items`.
+- **Reliability Ribbon** (aside, admin-only): chips per-module desde `getReliabilityOverview()` con tooltip incidentes abiertos.
+
+4 migraciones aditivas:
+- `greenhouse_serving.home_block_flags` (kill switches global/tenant/role/user)
+- `greenhouse_serving.home_pulse_snapshots` (pre-compute table)
+- `greenhouse_serving.user_recent_items` (Continúa Con backbone)
+- `greenhouse_core.client_users` ext: `home_default_view`, `ui_density (cozy|comfortable|compact)`, `home_v2_opt_out`, `preferences_updated_at`
+
+Observabilidad propia:
+- Módulo `home` registrado en `RELIABILITY_REGISTRY` con `incidentDomainTag: 'home'` + `expectedSignalKinds: ['runtime', 'incident']`.
+- `'home'` añadido a `CaptureDomain` y `ReliabilityModuleKey`/`ReliabilityModuleDomain`.
+- Observability helpers (`recordHomeBlockOutcome`, `recordHomeRender`, `captureHomeError`) emiten métricas estructuradas (`event=home.block.outcome`, `event=home.render.completed`).
+- Per-block kill switch via `resolveHomeBlockFlags` con precedence user > role > tenant > global; tabla inalcanzable = default-enabled (jamás bloquear render).
+
+Rollout escalado:
+- `HOME_V2_ENABLED` env flag global — apagado por default; encender escalonado dogfooding 5 → internal 50 → all.
+- `home_v2_opt_out` per-user para volver a v1 durante 4 semanas.
+- Server-side resolución de v1 vs v2 en `src/app/(dashboard)/home/page.tsx`. v1 (`HomeView`) intacta como fallback.
+- API `GET/PATCH /api/home/preferences` para mutar `uiDensity / homeDefaultView / homeV2OptOut`.
+
+Reuse Vuexy + readers canónicos:
+- Vuexy `cmdk` palette portada a `src/components/greenhouse/CommandPalette/` (Spanish UI, datos de `VIEW_REGISTRY`, ⌘K shortcut, audience-filtered routes via prop).
+- Readers reusados: `NotificationService`, `readTopAiLlmEnrichments`, `getReliabilityOverview`, `period_closure_status`, `payroll_periods`.
+- Composer pattern reusado de TASK-672 (Platform Health V1): `withSourceTimeout`, redaction via `redactSensitive`, header `X-Home-Contract-Version`.
+
+Verificación: `npx tsc --noEmit` clean, `pnpm lint` clean, 42/42 tests pass en `src/lib/platform-health` + `src/lib/observability`.
+
+Tasks afectadas: `TASK-402` (universal-adaptive-home-orchestration) absorbida parcialmente; `TASK-449` (nexa-insights-interaction-layer) subsumida en el bento. Ambas marcadas con Delta 2026-04-26.
+
+Follow-ups (no bloqueantes para abrir el rollout):
+- Cron `/api/cron/precompute-home-pulse` que pueble `home_pulse_snapshots` cada 5 min.
+- Density toggle UI dentro del Customizer.
+- Default-view override UI en preferencias.
+- Tracking writer de `user_recent_items` vía middleware.
+- OpenAPI `HomeSnapshotV1` schema en `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`.
+- Audience-filtering de `routes` en CommandPalette caller.
+
+Refs: TASK-696, branch `task/TASK-696-smart-home-v2-enterprise` (4 commits).
+
 ### 2026-04-26 — Greenhouse Deep Link Platform architecture
 
 Nueva spec canonica `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`: formaliza deep links como referencias semanticas access-aware, con resolver central objetivo para web, email, Teams, mobile, public share, API y MCP. El contrato exige declarar `viewCode` y `requiredCapabilities` cuando apliquen, evitando seguir repartiendo strings de URL en menus, notificaciones, emails, search y cards. Implementacion registrada como `TASK-694` en `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md`.
