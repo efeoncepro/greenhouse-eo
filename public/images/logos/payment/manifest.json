@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-27T14:16:14.928Z",
+  "updatedAt": "2026-04-27T16:00:48.475Z",
   "variantModel": [
     "full-positive",
     "full-negative",
@@ -38,11 +38,35 @@
       "brandName": "Banco de Chile",
       "category": "bank_account",
       "country": "CL",
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
-      "logo": "/images/logos/payment/banco-chile.svg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Banco_de_Chile_Logotipo.svg",
+      "licenseSource": "Official brand source; follow source brand guidelines",
+      "logo": "/images/logos/payment/banco-chile-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": null
+      "lastVerifiedAt": "2026-04-27T16:00:48.475Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Banco_de_Chile_Logotipo.svg",
+          "licenseSource": "Official brand source; follow source brand guidelines",
+          "logo": "/images/logos/payment/banco-chile-full-positive.svg",
+          "lastVerifiedAt": "2026-04-27T16:00:47.537Z"
+        },
+        "full-negative": {
+          "sourceUrl": "derived-from:/images/logos/payment/banco-chile-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/banco-chile-full-negative.svg",
+          "lastVerifiedAt": "2026-04-27T16:00:48.475Z"
+        },
+        "mark-positive": {
+          "status": "pending",
+          "reason": "Banco de Chile uses 'Banco de Chile' wordmark in custom gothic typography as its sole brand mark; no separate isotype is published in the brand kit. The full lockup has no isolatable mark via crop-viewbox. Awaiting either (a) an official isotype SVG from Banco de Chile brand resources, or (b) a >=512px raster of any standalone mark.",
+          "lastEvaluatedAt": "2026-04-27T16:00:48.475Z"
+        },
+        "mark-negative": {
+          "status": "pending",
+          "reason": "Depends on mark-positive resolution.",
+          "lastEvaluatedAt": "2026-04-27T16:00:48.475Z"
+        }
+      }
     },
     {
       "slug": "banco-estado",
@@ -60,11 +84,37 @@
       "brandName": "BCI",
       "category": "bank_account",
       "country": "CL",
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
-      "logo": "/images/logos/payment/bci.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": null
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Bci_Logotype.svg",
+      "licenseSource": "Official brand source; follow source brand guidelines",
+      "logo": "/images/logos/payment/bci-full-positive.svg",
+      "compactLogo": "/images/logos/payment/bci-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T15:54:18.672Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Bci_Logotype.svg",
+          "licenseSource": "Official brand source; follow source brand guidelines",
+          "logo": "/images/logos/payment/bci-full-positive.svg",
+          "lastVerifiedAt": "2026-04-27T15:52:42.782Z"
+        },
+        "full-negative": {
+          "sourceUrl": "derived-from:/images/logos/payment/bci-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/bci-full-negative.svg",
+          "lastVerifiedAt": "2026-04-27T15:52:43.819Z"
+        },
+        "mark-positive": {
+          "sourceUrl": "derived-from:/images/logos/payment/bci-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/bci-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T15:54:07.598Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "derived-from:/images/logos/payment/bci-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/bci-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T15:54:18.672Z"
+        }
+      }
     },
     {
       "slug": "bice",
@@ -86,13 +136,29 @@
       "licenseSource": "Official brand source; follow source brand guidelines",
       "logo": "/images/logos/payment/deel-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": "2026-04-27T13:01:58.429Z",
+      "lastVerifiedAt": "2026-04-27T15:49:55.400Z",
       "variants": {
         "full-positive": {
           "sourceUrl": "https://website-media.deel.com/logo_revamp_164ddaed0c.svg",
           "licenseSource": "Official brand source; follow source brand guidelines",
           "logo": "/images/logos/payment/deel-full-positive.svg",
           "lastVerifiedAt": "2026-04-27T13:01:58.429Z"
+        },
+        "full-negative": {
+          "sourceUrl": "derived-from:/images/logos/payment/deel-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/deel-full-negative.svg",
+          "lastVerifiedAt": "2026-04-27T15:49:55.400Z"
+        },
+        "mark-positive": {
+          "status": "pending",
+          "reason": "Deel uses the wordmark 'deel.' as its brand mark; no separate isotype published in their brand kit. The full lockup has no isolatable mark via crop-viewbox. Awaiting either (a) a dedicated icon SVG from Deel brand resources, or (b) explicit user decision to use the 'd.' letterform crop as the compact mark.",
+          "lastEvaluatedAt": "2026-04-27T15:49:55.400Z"
+        },
+        "mark-negative": {
+          "status": "pending",
+          "reason": "Depends on mark-positive resolution.",
+          "lastEvaluatedAt": "2026-04-27T15:49:55.400Z"
         }
       }
     },
@@ -175,11 +241,34 @@
       "brandName": "Itaú",
       "category": "bank_account",
       "country": "CL",
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
-      "logo": "/images/logos/payment/itau.svg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banco_Ita%C3%BA_logo.svg",
+      "licenseSource": "Official brand source; follow source brand guidelines",
+      "logo": "/images/logos/payment/itau-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": null
+      "lastVerifiedAt": "2026-04-27T15:56:58.977Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banco_Ita%C3%BA_logo.svg",
+          "licenseSource": "Official brand source; follow source brand guidelines",
+          "logo": "/images/logos/payment/itau-full-positive.svg",
+          "lastVerifiedAt": "2026-04-27T15:56:58.138Z"
+        },
+        "full-negative": {
+          "status": "pending",
+          "reason": "Mechanical recolor-white fails for Itaú: the brand is a composite block (blue background #1a5493 + yellow wordmark #fff212 layered on top). Recoloring all fills to white collapses both layers into a solid white square, erasing the 'Itaú' wordmark. The current itau-full-negative.svg file on disk is broken output from one such derive run and must NOT be referenced from src/config/payment-instruments.ts. Awaiting either (a) an official negative variant from Itaú brand resources, or (b) a hand-crafted variant that preserves the blue block and recolors only the wordmark to white.",
+          "lastEvaluatedAt": "2026-04-27T15:56:58.977Z"
+        },
+        "mark-positive": {
+          "status": "pending",
+          "reason": "Itaú uses a unified block lockup (rounded blue square + yellow wordmark) as its complete brand mark — there is no isolatable isotype distinct from the wordmark. The full-positive file already serves both full and compact rendering contexts; payment-instruments.ts can reference itau-full-positive.svg for both `logo` and `compactLogo` fields without quality loss.",
+          "lastEvaluatedAt": "2026-04-27T15:56:58.977Z"
+        },
+        "mark-negative": {
+          "status": "pending",
+          "reason": "Depends on full-negative resolution.",
+          "lastEvaluatedAt": "2026-04-27T15:56:58.977Z"
+        }
+      }
     },
     {
       "slug": "mastercard",
@@ -302,13 +391,29 @@
       "licenseSource": "Official brand source; follow source brand guidelines",
       "logo": "/images/logos/payment/ripley-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": "2026-04-27T12:47:44.024Z",
+      "lastVerifiedAt": "2026-04-27T15:33:41.962Z",
       "variants": {
         "full-positive": {
           "sourceUrl": "https://www.bancoripley.cl/media/new-logo-banco-ripley-IWJOE57X.svg",
           "licenseSource": "Official brand source; follow source brand guidelines",
           "logo": "/images/logos/payment/ripley-full-positive.svg",
           "lastVerifiedAt": "2026-04-27T12:47:44.024Z"
+        },
+        "full-negative": {
+          "sourceUrl": "derived-from:/images/logos/payment/ripley-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/ripley-full-negative.svg",
+          "lastVerifiedAt": "2026-04-27T15:33:41.962Z"
+        },
+        "mark-positive": {
+          "status": "pending",
+          "reason": "No high-resolution source available. The official lockup at bancoripley.cl is wordmark-only (no isotype embedded). Favicon.svg is a 404 SPA fallback; favicon-{16,32,96}x{16,32,96}.png are below the vectorization quality threshold per skill rules. Awaiting either an official brand kit isotype SVG or a >=512px raster.",
+          "lastEvaluatedAt": "2026-04-27T15:33:41.962Z"
+        },
+        "mark-negative": {
+          "status": "pending",
+          "reason": "Depends on mark-positive resolution. Will be derived (recolor-white or curated) once an official isotype source is available.",
+          "lastEvaluatedAt": "2026-04-27T15:33:41.962Z"
         }
       }
     },

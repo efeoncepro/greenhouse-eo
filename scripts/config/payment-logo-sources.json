@@ -16,6 +16,18 @@
         "Banco de Chile logo svg",
         "Banco de Chile logotipo svg"
       ],
+      "officialSvgUrls": [
+        "https://upload.wikimedia.org/wikipedia/commons/e/e5/Banco_de_Chile_Logotipo.svg"
+      ],
+      "officialPages": [
+        "https://commons.wikimedia.org/wiki/File:Banco_de_Chile_Logotipo.svg"
+      ],
+      "variants": {
+        "full-negative": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "recolor-white"
+        }
+      },
       "preferredFileBase": "banco-chile"
     },
     "banco-estado": {
@@ -36,6 +48,33 @@
         "BCI banco logo svg",
         "Banco BCI logotipo svg"
       ],
+      "officialSvgUrls": [
+        "https://upload.wikimedia.org/wikipedia/commons/5/5f/Bci_Logotype.svg"
+      ],
+      "officialPages": [
+        "https://commons.wikimedia.org/wiki/File:Bci_Logotype.svg"
+      ],
+      "blockedBrandSignals": [
+        "better cotton",
+        "bettercotton",
+        "cotton initiative"
+      ],
+      "variants": {
+        "full-negative": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "recolor-white"
+        },
+        "mark-positive": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "crop-viewbox",
+          "cropViewBox": "0 0 26 30"
+        },
+        "mark-negative": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "crop-viewbox-recolor-white",
+          "cropViewBox": "0 0 26 30"
+        }
+      },
       "preferredFileBase": "bci"
     },
     "bice": {
@@ -55,6 +94,12 @@
         "https://website-media.deel.com/logo_revamp_164ddaed0c.svg",
         "https://website-media.deel.com/_next/static/media/deel_logo_purple.fdeb49b6.svg"
       ],
+      "variants": {
+        "full-negative": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "recolor-white"
+        }
+      },
       "preferredFileBase": "deel"
     },
     "falabella": {
@@ -110,6 +155,12 @@
         "Itaú logo svg",
         "Itau Unibanco logo svg",
         "Banco Itaú Chile logo svg"
+      ],
+      "officialSvgUrls": [
+        "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banco_Ita%C3%BA_logo.svg"
+      ],
+      "officialPages": [
+        "https://commons.wikimedia.org/wiki/File:Banco_Ita%C3%BA_logo.svg"
       ],
       "preferredFileBase": "itau"
     },
@@ -177,6 +228,12 @@
       "officialPages": [
         "https://www.bancoripley.cl"
       ],
+      "variants": {
+        "full-negative": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "recolor-white"
+        }
+      },
       "preferredFileBase": "ripley"
     },
     "santander": {
