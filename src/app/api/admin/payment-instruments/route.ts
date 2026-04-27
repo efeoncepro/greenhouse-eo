@@ -17,6 +17,8 @@ import { INSTRUMENT_CATEGORIES, getProvider, type InstrumentCategory } from '@/c
 import { resolveFinanceSpaceId } from '@/lib/finance/payment-instruments/admin-detail'
 import { assertPaymentInstrumentResponsibleAssignable } from '@/lib/finance/payment-instruments/responsibles'
 import { sanitizeMetadataJson, validateProviderForInstrument } from '@/lib/finance/payment-instruments/validation'
+import { translatePostgresError, extractPostgresErrorTags } from '@/lib/finance/postgres-error-translator'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 export const dynamic = 'force-dynamic'
 
@@ -116,10 +118,31 @@ export async function GET() {
     })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+      return NextResponse.json(
+        { error: error.message, code: error.code, details: error.details },
+        { status: error.statusCode }
+      )
     }
 
-    throw error
+    const translated = translatePostgresError(error)
+
+    if (translated) {
+      captureWithDomain(error, 'finance', {
+        tags: { source: 'payment_instruments_admin', op: 'list', ...extractPostgresErrorTags(error) }
+      })
+
+      return NextResponse.json(
+        { error: translated.message, code: translated.code, details: translated.details },
+        { status: translated.statusCode }
+      )
+    }
+
+    captureWithDomain(error, 'finance', { tags: { source: 'payment_instruments_admin', op: 'list' } })
+
+    return NextResponse.json(
+      { error: 'Error interno al listar instrumentos de pago.' },
+      { status: 500 }
+    )
   }
 }
 
@@ -231,9 +254,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ accountId, created: true }, { status: 201 })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+      return NextResponse.json(
+        { error: error.message, code: error.code, details: error.details },
+        { status: error.statusCode }
+      )
     }
 
-    throw error
+    const translated = translatePostgresError(error)
+
+    if (translated) {
+      captureWithDomain(error, 'finance', {
+        tags: { source: 'payment_instruments_admin', op: 'create', ...extractPostgresErrorTags(error) }
+      })
+
+      return NextResponse.json(
+        { error: translated.message, code: translated.code, details: translated.details },
+        { status: translated.statusCode }
+      )
+    }
+
+    captureWithDomain(error, 'finance', { tags: { source: 'payment_instruments_admin', op: 'create' } })
+
+    return NextResponse.json(
+      { error: 'Error interno al crear el instrumento de pago.' },
+      { status: 500 }
+    )
   }
 }

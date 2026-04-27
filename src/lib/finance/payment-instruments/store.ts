@@ -85,6 +85,47 @@ const normalizeReason = (reason: unknown) => {
   return normalized
 }
 
+/**
+ * Defense-in-depth — verify a `provider_slug` exists in the canonical PG
+ * catalog before any INSERT/UPDATE that targets `accounts.provider_slug`.
+ *
+ * Without this check, a slug that drifted between the static TS catalog
+ * (`src/config/payment-instruments.ts`) and the DB seed surfaces as a raw
+ * foreign_key_violation (PG 23503) and bubbles up as HTTP 500. With it,
+ * the API responds 422 with an actionable message — and the operator knows
+ * to re-run the canonical catalog resync migration.
+ *
+ * Null/undefined slugs are accepted (the FK column is nullable).
+ */
+const assertProviderInCanonicalCatalog = async (
+  client: QueryableClient,
+  providerSlug: string | null | undefined
+): Promise<void> => {
+  if (!providerSlug) return
+
+  const rows = await queryRows<{ exists: boolean }>(
+    `
+      SELECT EXISTS (
+        SELECT 1
+        FROM greenhouse_finance.payment_provider_catalog
+        WHERE provider_slug = $1
+      ) AS exists
+    `,
+    [providerSlug],
+    client
+  )
+
+  if (!rows[0]?.exists) {
+    throw new FinanceValidationError(
+      `Proveedor "${providerSlug}" no está registrado en el catálogo canónico (greenhouse_finance.payment_provider_catalog). ` +
+        'Aplica la última migración del catálogo (`pnpm migrate:up`) o selecciona otro proveedor.',
+      422,
+      { providerSlug },
+      'PROVIDER_NOT_IN_CANONICAL_CATALOG'
+    )
+  }
+}
+
 const impactSection = async ({
   key,
   label,
@@ -403,6 +444,10 @@ export const updatePaymentInstrumentAdmin = async ({
       throw new FinanceValidationError('No fields to update')
     }
 
+    if (updates.providerSlug !== undefined) {
+      await assertProviderInCanonicalCatalog(client, updates.providerSlug)
+    }
+
     const impact = await getPaymentInstrumentImpact({ accountId, spaceId })
     const hasHighImpactChange = changedFields.some(field => HIGH_IMPACT_FIELDS.has(field))
 
@@ -615,6 +660,8 @@ export const createPaymentInstrumentAdmin = async ({
   }
   reason?: string | null
 }) => withTransaction(async client => {
+  await assertProviderInCanonicalCatalog(client, input.providerSlug)
+
   const existing = await queryRows<{ account_id: string }>(
     `
       SELECT account_id
