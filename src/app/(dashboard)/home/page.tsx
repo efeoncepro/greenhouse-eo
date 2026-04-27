@@ -73,7 +73,10 @@ export default async function HomePage() {
     density: normalizeDensity(preferences.ui_density),
     defaultView: preferences.home_default_view,
     optedOutOfV2: preferences.home_v2_opt_out === true,
-    firstName: (user.name ?? '').split(' ')[0] || 'Usuario'
+    firstName: (user.name ?? '').split(' ')[0] || 'Usuario',
+    fullName: user.name ?? null,
+    avatarUrl: (user as { image?: string | null }).image ?? null,
+    tenantLabel: user.tenantType === 'efeonce_internal' ? 'Efeonce Group' : 'Cliente Greenhouse'
   })
 
   return <HomeShellV2 snapshot={snapshot} />

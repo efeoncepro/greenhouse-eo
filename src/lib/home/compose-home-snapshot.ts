@@ -41,6 +41,9 @@ export interface ComposeHomeSnapshotInput {
   defaultView: string | null
   optedOutOfV2: boolean
   firstName: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  tenantLabel?: string | null
 }
 
 const ALL_LOADERS = {
@@ -121,7 +124,12 @@ export const composeHomeSnapshot = async (input: ComposeHomeSnapshotInput): Prom
           if (block.blockId === 'hero-ai') {
             const heroLoader = loader as LoaderFor<'hero-ai'>
 
-            return heroLoader(ctx, { firstName: input.firstName }) as Promise<HomeHeroAiData>
+            return heroLoader(ctx, {
+              firstName: input.firstName,
+              fullName: input.fullName,
+              avatarUrl: input.avatarUrl,
+              tenantLabel: input.tenantLabel
+            }) as Promise<HomeHeroAiData>
           }
 
           const sharedLoader = loader as (ctx: HomeLoaderContext) => Promise<unknown>

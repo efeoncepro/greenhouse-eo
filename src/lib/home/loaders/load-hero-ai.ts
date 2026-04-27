@@ -59,9 +59,25 @@ const pickGreetingPool = (now: Date) => {
 
 const GENERIC_NAME_FALLBACKS = new Set(['Usuario', 'Greenhouse', 'agent', 'Agent', ''])
 
+const ROLE_LABEL_BY_AUDIENCE: Record<string, string> = {
+  admin: 'Administración',
+  internal: 'Equipo Efeonce',
+  hr: 'Personas y HR',
+  finance: 'Finanzas',
+  collaborator: 'Colaborador',
+  client: 'Cliente'
+}
+
+export interface LoadHomeHeroAiOptions {
+  firstName: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  tenantLabel?: string | null
+}
+
 export const loadHomeHeroAi = async (
   ctx: HomeLoaderContext,
-  options: { firstName: string }
+  options: LoadHomeHeroAiOptions
 ): Promise<HomeHeroAiData> => {
   const now = new Date(ctx.now)
   const pool = pickGreetingPool(now)
@@ -76,6 +92,15 @@ export const loadHomeHeroAi = async (
 
   const suggestions = SUGGESTIONS_BY_AUDIENCE[ctx.audienceKey] ?? SUGGESTIONS_BY_AUDIENCE.internal
 
+  const identity = hasRealName
+    ? {
+        displayName: options.fullName?.trim() || options.firstName,
+        role: ROLE_LABEL_BY_AUDIENCE[ctx.audienceKey] ?? 'Equipo Efeonce',
+        tenantLabel: options.tenantLabel ?? (ctx.tenantType === 'efeonce_internal' ? 'Efeonce Group' : 'Greenhouse'),
+        avatarUrl: options.avatarUrl ?? null
+      }
+    : null
+
   return {
     greeting,
     subtitle: HOME_SUBTITLE,
@@ -83,6 +108,7 @@ export const loadHomeHeroAi = async (
     modelKey: RESOLVED_MODEL_KEY,
     suggestions,
     lastQueryAtMs: null,
-    disclaimer: 'Nexa usa IA generativa. Verifica la información importante.'
+    disclaimer: 'Nexa usa IA generativa. Verifica la información importante.',
+    identity
   }
 }

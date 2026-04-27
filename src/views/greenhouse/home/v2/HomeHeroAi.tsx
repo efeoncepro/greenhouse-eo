@@ -15,6 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { motion } from '@/libs/FramerMotion'
@@ -79,6 +80,29 @@ export const HomeHeroAi = ({ data }: HomeHeroAiProps) => {
             alignItems={{ xs: 'flex-start', md: 'center' }}
           >
             <Stack spacing={3} sx={{ flex: 1, minWidth: 0 }}>
+              {data.identity ? (
+                <Stack direction='row' spacing={1.5} alignItems='center'>
+                  <CustomAvatar
+                    src={data.identity.avatarUrl ?? undefined}
+                    skin='light'
+                    color='primary'
+                    size={32}
+                  >
+                    {data.identity.displayName.charAt(0).toUpperCase()}
+                  </CustomAvatar>
+                  <Stack direction='row' spacing={1} alignItems='center' divider={<Box sx={{ width: 3, height: 3, borderRadius: '50%', bgcolor: 'text.disabled' }} />}>
+                    <Typography variant='body2' sx={{ fontWeight: 500 }} color='text.primary'>
+                      {data.identity.displayName}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {data.identity.role}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {data.identity.tenantLabel}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              ) : null}
               <Stack spacing={0.5}>
                 <Typography variant='overline' color='primary.main' sx={{ letterSpacing: 1, fontWeight: 600 }}>
                   Nexa · IA Operativa

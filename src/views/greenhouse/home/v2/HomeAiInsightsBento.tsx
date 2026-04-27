@@ -132,6 +132,8 @@ const InsightCard = ({ card, index }: { card: HomeAiInsightCard; index: number }
 }
 
 export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
+  const router = useRouter()
+
   if (!data || data.cards.length === 0) {
     return (
       <Card component='section' aria-label='Nexa Insights'>
@@ -176,6 +178,17 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
             </Grid>
           ))}
         </Grid>
+        <Stack direction='row' justifyContent='flex-end' sx={{ mt: 3 }}>
+          <Button
+            size='small'
+            variant='text'
+            color='primary'
+            endIcon={<i className='tabler-arrow-right text-base' />}
+            onClick={() => router.push('/agency/insights')}
+          >
+            Ver todos los insights del mes
+          </Button>
+        </Stack>
       </CardContent>
     </Card>
   )

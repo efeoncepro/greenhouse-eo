@@ -85,6 +85,13 @@ export interface HomeHeroAiSuggestion {
   intent: string
 }
 
+export interface HomeHeroAiIdentity {
+  displayName: string
+  role: string
+  tenantLabel: string
+  avatarUrl: string | null
+}
+
 export interface HomeHeroAiData {
   greeting: string
   subtitle: string
@@ -93,6 +100,7 @@ export interface HomeHeroAiData {
   suggestions: HomeHeroAiSuggestion[]
   lastQueryAtMs: number | null
   disclaimer: string
+  identity: HomeHeroAiIdentity | null
 }
 
 export type TodayInboxKind =

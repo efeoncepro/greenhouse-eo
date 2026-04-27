@@ -313,11 +313,12 @@ const buildRealtimeCardsForAudience = async (
 
   switch (audience) {
     case 'admin':
+      // 4 cards always — Inbox is the safety-net 4th when Notion sync is null
       return [
         cardForReliability(reliability),
         cardForFinanceMargin(finance),
         cardForFinanceClosing(finance),
-        cardForNotionSync(notionMinutes)
+        notionMinutes != null ? cardForNotionSync(notionMinutes) : cardForInboxPending(inboxCount, '/notifications')
       ]
     case 'finance':
       return [
@@ -331,7 +332,7 @@ const buildRealtimeCardsForAudience = async (
         cardForInboxPending(inboxCount, '/hr/leaves'),
         cardForFinanceClosing(finance),
         cardForReliability(reliability),
-        cardForNotionSync(notionMinutes)
+        notionMinutes != null ? cardForNotionSync(notionMinutes) : cardForInboxPending(inboxCount, '/notifications')
       ]
     case 'collaborator':
       return [cardForInboxPending(inboxCount, '/my')]
@@ -343,7 +344,7 @@ const buildRealtimeCardsForAudience = async (
         cardForReliability(reliability),
         cardForFinanceMargin(finance),
         cardForInboxPending(inboxCount),
-        cardForNotionSync(notionMinutes)
+        notionMinutes != null ? cardForNotionSync(notionMinutes) : cardForFinanceClosing(finance)
       ]
   }
 }

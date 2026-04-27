@@ -171,39 +171,69 @@ export const HomeTodayInbox = ({ data }: HomeTodayInboxProps) => {
     }
   }
 
+  // Inbox-zero pattern (Linear): when there's nothing pending, collapse the
+  // whole card to a single-line banner with the success state inline. The
+  // 200px of vertical space the empty state used to take is gone — the user's
+  // eye drops straight to the next block (Cierres, Insights, etc.) which is
+  // where their attention should be when the inbox is clean.
+  if (items.length === 0) {
+    return (
+      <Box
+        component='section'
+        aria-label='Tu día'
+        role='status'
+        aria-live='polite'
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          px: 3,
+          py: 2,
+          borderRadius: theme => theme.shape.customBorderRadius?.md ?? 6,
+          border: theme => `1px solid ${theme.palette.divider}`,
+          bgcolor: theme => `color-mix(in oklch, ${theme.palette.success.main} 8%, ${theme.palette.background.paper})`
+        }}
+      >
+        <CustomAvatar skin='light' variant='rounded' color='success' size={32}>
+          <i className='tabler-check text-[18px]' />
+        </CustomAvatar>
+        <Stack flex={1} minWidth={0}>
+          <Typography variant='body1' sx={{ fontWeight: 500 }}>Bandeja al día</Typography>
+          <Typography variant='caption' color='text.secondary'>
+            Sin pendientes hoy. Buen ritmo.
+          </Typography>
+        </Stack>
+        <Button
+          size='small'
+          variant='text'
+          color='primary'
+          onClick={() => router.push('/notifications')}
+          sx={{ textTransform: 'none', flexShrink: 0 }}
+        >
+          Ver historial
+        </Button>
+      </Box>
+    )
+  }
+
   return (
     <Card component='section' aria-label='Tu día'>
       <CardHeader
         avatar={<i className='tabler-inbox text-xl' />}
         title='Tu día'
         subheader={
-          items.length === 0
-            ? 'Bandeja al día'
-            : `${items.length} ${items.length === 1 ? 'pendiente' : 'pendientes'}${data.totalUnread > items.length ? ` · ${data.totalUnread} no leídas` : ''}`
+          `${items.length} ${items.length === 1 ? 'pendiente' : 'pendientes'}${data.totalUnread > items.length ? ` · ${data.totalUnread} no leídas` : ''}`
         }
         titleTypographyProps={{ variant: 'h5' }}
         action={<OptionMenu options={['Marcar todo como leído', 'Ver todo', 'Configurar notificaciones']} />}
         sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
       />
       <CardContent className='flex flex-col gap-[1.125rem]'>
-        {items.length === 0 ? (
-          <Box
-            role='status'
-            aria-live='polite'
-            sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1, color: 'text.secondary' }}
-          >
-            <CustomAvatar skin='light' variant='rounded' color='success' size={34}>
-              <i className='tabler-check text-[20px]' />
-            </CustomAvatar>
-            <Typography variant='body2'>Sin pendientes hoy. Todo bajo control.</Typography>
-          </Box>
-        ) : (
-          <AnimatePresence initial={false}>
-            {items.slice(0, 6).map(item => (
-              <TodayItemRow key={item.itemId} item={item} onAction={dispatchAction} />
-            ))}
-          </AnimatePresence>
-        )}
+        <AnimatePresence initial={false}>
+          {items.slice(0, 6).map(item => (
+            <TodayItemRow key={item.itemId} item={item} onAction={dispatchAction} />
+          ))}
+        </AnimatePresence>
       </CardContent>
     </Card>
   )
