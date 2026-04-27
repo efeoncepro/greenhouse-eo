@@ -12,8 +12,11 @@ import type {
 } from '@/lib/home/contract'
 
 import { HomeBlockSkeleton } from './HomeBlockSkeleton'
+import { HomeClosingCountdown } from './HomeClosingCountdown'
 import { HomeDegradedCard } from './HomeDegradedCard'
+import { HomeHeroAi } from './HomeHeroAi'
 import { HomePulseStrip } from './HomePulseStrip'
+import { HomeTodayInbox } from './HomeTodayInbox'
 
 /**
  * Block id → React component mapping. Adding a new block in the registry
@@ -41,12 +44,15 @@ export const HomeBlockRenderer = ({ envelope }: HomeBlockRendererProps) => {
     case 'pulse-strip':
       return <HomePulseStrip data={envelope.data as HomePulseStripData} />
     case 'hero-ai':
+      return <HomeHeroAi data={envelope.data as HomeHeroAiData} />
     case 'today-inbox':
+      return <HomeTodayInbox data={envelope.data as HomeTodayInboxData} />
     case 'closing-countdown':
+      return <HomeClosingCountdown data={envelope.data as HomeClosingCountdownData} />
     case 'ai-insights-bento':
     case 'recents-rail':
     case 'reliability-ribbon':
-      // Slice 2 / Slice 3 land per-block components — until then, skeletons keep the layout stable.
+      // Slice 3 lands the remaining per-block components.
       return <HomeBlockSkeleton blockId={envelope.blockId} />
     default:
       return null
