@@ -92,14 +92,15 @@ export const loadHomeHeroAi = async (
 
   const suggestions = SUGGESTIONS_BY_AUDIENCE[ctx.audienceKey] ?? SUGGESTIONS_BY_AUDIENCE.internal
 
-  const identity = hasRealName
-    ? {
-        displayName: options.fullName?.trim() || options.firstName,
-        role: ROLE_LABEL_BY_AUDIENCE[ctx.audienceKey] ?? 'Equipo Efeonce',
-        tenantLabel: options.tenantLabel ?? (ctx.tenantType === 'efeonce_internal' ? 'Efeonce Group' : 'Greenhouse'),
-        avatarUrl: options.avatarUrl ?? null
-      }
-    : null
+  // Render identity strip whenever we have a useful role/tenant context, even
+  // for agent / generic users — we just degrade the displayName to the role
+  // label instead of showing a meaningless 'Usuario'.
+  const identity = {
+    displayName: hasRealName ? (options.fullName?.trim() || options.firstName) : (ROLE_LABEL_BY_AUDIENCE[ctx.audienceKey] ?? 'Equipo Efeonce'),
+    role: ROLE_LABEL_BY_AUDIENCE[ctx.audienceKey] ?? 'Equipo Efeonce',
+    tenantLabel: options.tenantLabel ?? (ctx.tenantType === 'efeonce_internal' ? 'Efeonce Group' : 'Greenhouse'),
+    avatarUrl: options.avatarUrl ?? null
+  }
 
   return {
     greeting,

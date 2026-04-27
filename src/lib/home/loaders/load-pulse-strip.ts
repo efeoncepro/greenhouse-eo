@@ -99,10 +99,10 @@ const readInboxPendingCount = async (userId: string): Promise<number | null> => 
   try {
     const rows = await runGreenhousePostgresQuery<{ count: number | string } & Record<string, unknown>>(
       `SELECT COUNT(*)::bigint AS count
-         FROM greenhouse_core.notifications
-        WHERE recipient_user_id = $1
+         FROM greenhouse_notifications.notifications
+        WHERE user_id = $1
           AND read_at IS NULL
-          AND deleted_at IS NULL`,
+          AND archived_at IS NULL`,
       [userId]
     )
 

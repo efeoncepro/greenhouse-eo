@@ -8,6 +8,8 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import type { ApexOptions } from 'apexcharts'
 
+import Tooltip from '@mui/material/Tooltip'
+
 import StatsWithAreaChart from '@/components/card-statistics/StatsWithAreaChart'
 import type { StatsWithAreaChartProps } from '@/components/card-statistics/StatsWithAreaChart'
 import type { ThemeColor } from '@core/types'
@@ -107,40 +109,58 @@ const PulseCardSlot = ({ card, index }: PulseCardSlotProps) => {
     if (card.drillHref) router.push(card.drillHref)
   }
 
+  const computedAtLabel = (() => {
+    const ts = new Date(card.computedAt).getTime()
+
+    if (Number.isNaN(ts)) return null
+    const minutes = Math.max(0, Math.floor((Date.now() - ts) / 60000))
+
+    if (minutes < 1) return 'recién actualizado'
+    if (minutes < 60) return `actualizado hace ${minutes} min`
+
+    return `actualizado hace ${Math.floor(minutes / 60)} h`
+  })()
+
+  const tooltipTitle = card.deltaPct != null && Math.abs(card.deltaPct) >= 0.5
+    ? `${card.deltaPct > 0 ? '+' : ''}${card.deltaPct.toFixed(1)}% vs período anterior${computedAtLabel ? ` · ${computedAtLabel}` : ''}`
+    : computedAtLabel ?? card.label
+
   return (
-    <motion.div
-      initial={reduced ? false : { opacity: 0, y: 8 }}
-      animate={reduced ? undefined : { opacity: 1, y: 0 }}
-      transition={reduced ? undefined : { duration: 0.18, delay: 0.05 * index, ease: [0.2, 0, 0, 1] }}
-      whileHover={reduced ? undefined : { y: -2 }}
-      style={{ cursor: card.drillHref ? 'pointer' : 'default', height: '100%' }}
-      role='article'
-      aria-label={`${card.label}: ${formatStats(card)}${card.deltaPct != null ? `, delta ${card.deltaPct.toFixed(1)}%` : ''}`}
-      onClick={handleClick}
-    >
-      <Box
-        sx={{
-          height: '100%',
-          transition: 'box-shadow 120ms cubic-bezier(0.2, 0, 0, 1)',
-          '& > .MuiCard-root': { height: '100%' },
-          '&:hover > .MuiCard-root': { boxShadow: 4 }
-        }}
+    <Tooltip title={tooltipTitle} placement='top' arrow disableInteractive enterDelay={300}>
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 8 }}
+        animate={reduced ? undefined : { opacity: 1, y: 0 }}
+        transition={reduced ? undefined : { duration: 0.18, delay: 0.05 * index, ease: [0.2, 0, 0, 1] }}
+        whileHover={reduced ? undefined : { y: -2 }}
+        style={{ cursor: card.drillHref ? 'pointer' : 'default', height: '100%' }}
+        role='article'
+        aria-label={`${card.label}: ${formatStats(card)}${card.deltaPct != null ? `, delta ${card.deltaPct.toFixed(1)}%` : ''}`}
+        onClick={handleClick}
       >
-        <StatsWithAreaChart
-          stats={formatStats(card)}
-          title={card.label}
-          subtitle={card.description ?? undefined}
-          chartColor={tone.color}
-          chartSeries={series}
-          avatarIcon={tone.icon}
-          avatarColor={tone.color}
-          avatarSkin='light'
-          avatarSize={36}
-          trend={trendForCard(card)}
-          trendNumber={trendNumberForCard(card)}
-        />
-      </Box>
-    </motion.div>
+        <Box
+          sx={{
+            height: '100%',
+            transition: 'box-shadow 120ms cubic-bezier(0.2, 0, 0, 1)',
+            '& > .MuiCard-root': { height: '100%' },
+            '&:hover > .MuiCard-root': { boxShadow: 4 }
+          }}
+        >
+          <StatsWithAreaChart
+            stats={formatStats(card)}
+            title={card.label}
+            subtitle={card.description ?? undefined}
+            chartColor={tone.color}
+            chartSeries={series}
+            avatarIcon={tone.icon}
+            avatarColor={tone.color}
+            avatarSkin='light'
+            avatarSize={36}
+            trend={trendForCard(card)}
+            trendNumber={trendNumberForCard(card)}
+          />
+        </Box>
+      </motion.div>
+    </Tooltip>
   )
 }
 

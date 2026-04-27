@@ -4,6 +4,8 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -161,13 +163,21 @@ export const HomeTodayInbox = ({ data }: HomeTodayInboxProps) => {
     setItems(prev => prev.filter(prevItem => prevItem.itemId !== item.itemId))
 
     try {
-      await fetch(`/api/home/inbox/${actionId}`, {
+      const response = await fetch(`/api/home/inbox/${actionId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemId: item.itemId, kind: item.kind })
       })
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+
+      const verb = actionId === 'approve' ? 'aprobado' : actionId === 'snooze' ? 'pospuesto' : 'descartado'
+
+      toast.success(`Pendiente ${verb}`, { autoClose: 2500 })
     } catch {
-      // optimistic — toast handled at app level
+      // Roll back the optimistic removal and surface the error.
+      setItems(prev => [item, ...prev])
+      toast.error('No pudimos completar la acción. Reintenta en unos segundos.', { autoClose: 4000 })
     }
   }
 

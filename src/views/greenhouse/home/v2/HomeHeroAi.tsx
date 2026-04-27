@@ -81,7 +81,7 @@ export const HomeHeroAi = ({ data }: HomeHeroAiProps) => {
           >
             <Stack spacing={3} sx={{ flex: 1, minWidth: 0 }}>
               {data.identity ? (
-                <Stack direction='row' spacing={1.5} alignItems='center'>
+                <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
                   <CustomAvatar
                     src={data.identity.avatarUrl ?? undefined}
                     skin='light'
@@ -91,9 +91,11 @@ export const HomeHeroAi = ({ data }: HomeHeroAiProps) => {
                     {data.identity.displayName.charAt(0).toUpperCase()}
                   </CustomAvatar>
                   <Stack direction='row' spacing={1} alignItems='center' divider={<Box sx={{ width: 3, height: 3, borderRadius: '50%', bgcolor: 'text.disabled' }} />}>
-                    <Typography variant='body2' sx={{ fontWeight: 500 }} color='text.primary'>
-                      {data.identity.displayName}
-                    </Typography>
+                    {data.identity.displayName !== data.identity.role ? (
+                      <Typography variant='body2' sx={{ fontWeight: 500 }} color='text.primary'>
+                        {data.identity.displayName}
+                      </Typography>
+                    ) : null}
                     <Typography variant='caption' color='text.secondary'>
                       {data.identity.role}
                     </Typography>

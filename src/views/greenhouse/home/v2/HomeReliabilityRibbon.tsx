@@ -83,12 +83,33 @@ export const HomeReliabilityRibbon = ({ data }: HomeReliabilityRibbonProps) => {
             >
               <Box
                 sx={{
+                  position: 'relative',
                   width: 8,
                   height: 8,
                   borderRadius: '50%',
                   bgcolor: theme => theme.palette[tone.color].main,
                   boxShadow: theme => `0 0 0 3px color-mix(in oklch, ${theme.palette[tone.color].main} 22%, transparent)`,
-                  flexShrink: 0
+                  flexShrink: 0,
+                  '&::after':
+                    module.status === 'healthy'
+                      ? {
+                          content: '""',
+                          position: 'absolute',
+                          inset: -4,
+                          borderRadius: '50%',
+                          bgcolor: theme => theme.palette[tone.color].main,
+                          opacity: 0.35,
+                          animation: 'gh-status-heartbeat 2.4s cubic-bezier(0.2, 0, 0, 1) infinite'
+                        }
+                      : undefined,
+                  '@media (prefers-reduced-motion: reduce)': {
+                    '&::after': { animation: 'none' }
+                  },
+                  '@keyframes gh-status-heartbeat': {
+                    '0%': { transform: 'scale(1)', opacity: 0.35 },
+                    '60%': { transform: 'scale(1.55)', opacity: 0 },
+                    '100%': { transform: 'scale(1.55)', opacity: 0 }
+                  }
                 }}
               />
               <i className={classnames(icon, 'text-[16px]')} style={{ opacity: 0.65 }} />
