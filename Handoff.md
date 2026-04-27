@@ -14,7 +14,8 @@
 - Cambio aplicado:
   - `Responsable` en `/admin/payment-instruments/[id]` deja de ser input libre y pasa a selector con candidatos backend.
   - Nuevo endpoint `GET /api/admin/payment-instruments/responsibles` protegido por `finance.payment_instruments.update`.
-  - Backend valida `responsibleUserId` en create/update contra usuarios internos activos con `finance_admin`, `finance_analyst` o `efeonce_admin`; preserva responsables legacy existentes sin permitir nuevas asignaciones fuera de politica.
+  - Backend valida `responsibleUserId` en create/update contra usuarios internos activos con `finance_admin`, `finance_analyst`, `efeonce_admin` o señal operacional financiera en Person360/member profile; preserva responsables legacy existentes sin permitir nuevas asignaciones fuera de politica.
+  - Avatars del selector pasan por `resolveAvatarUrl()` para convertir `gs://` en `/api/media/users/:userId/avatar`.
   - Catalogo de proveedores agrega `compactLogo`; Santander usa `Banco_Santander_Logotipo.svg` como logo completo y `BSAC.svg` como isotipo compacto.
 - Docs actualizados:
   - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`

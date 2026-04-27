@@ -52,6 +52,7 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 ### Mejoras
 
 - En la administracion de instrumentos de pago, el responsable ahora se elige desde usuarios internos con rol financiero o Superadmin; el usuario actual se identifica como "(yo)" cuando aplica.
+- El selector de responsables muestra avatars reales y considera perfiles operativos de Finanzas, aunque su rol de acceso sea solo colaborador.
 - Santander ahora muestra el logotipo oficial y usa su isotipo en chips compactos para mejorar legibilidad en tablas y selectores.
 
 ---

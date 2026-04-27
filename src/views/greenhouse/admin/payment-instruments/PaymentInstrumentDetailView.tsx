@@ -58,6 +58,7 @@ type ResponsibleCandidate = {
   label: string
   email: string | null
   avatarUrl: string | null
+  operationalRoleLabel: string | null
   roleCodes: string[]
   isCurrentUser: boolean
   isFinanceRole: boolean
@@ -352,7 +353,7 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
     ? 'Cargando responsables financieros...'
     : responsiblesError
       ? 'No pudimos cargar el selector. Se conserva el responsable actual hasta reintentar.'
-      : 'Solo usuarios internos activos con rol de Finanzas o Superadmin pueden quedar asignados.'
+      : 'Solo usuarios internos activos con rol financiero operativo o Superadmin pueden quedar asignados.'
 
   const saveSection = async (section: SavingSection) => {
     if (!section || !detail) return
@@ -756,6 +757,9 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
                                 {option.roleCodes.slice(0, 2).map(roleCode => (
                                   <CustomChip key={roleCode} round='true' size='small' variant='tonal' color='info' label={roleLabel(roleCode)} />
                                 ))}
+                                {!option.roleCodes.some(roleCode => ['efeonce_admin', 'finance_admin', 'finance_analyst'].includes(roleCode)) && option.operationalRoleLabel ? (
+                                  <CustomChip round='true' size='small' variant='tonal' color='info' label={option.operationalRoleLabel} />
+                                ) : null}
                               </Stack>
                               <Typography variant='caption' color='text.secondary' sx={{ display: 'block', overflowWrap: 'anywhere' }}>
                                 {option.email ?? option.userId}

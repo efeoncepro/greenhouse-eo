@@ -11,7 +11,8 @@ La administracion de instrumentos de pago ya no acepta responsables como texto l
 - Endpoint nuevo: `GET /api/admin/payment-instruments/responsibles`.
 - Guard: `requireFinanceTenantContext()` + capability `finance.payment_instruments.update`.
 - Fuente canonica: `greenhouse_core.client_users` + `greenhouse_core.user_role_assignments`, enriquecido con `members` e `identity_profiles`.
-- Candidatos asignables: usuarios internos activos (`tenant_type='efeonce_internal'`) con rol activo `finance_admin`, `finance_analyst` o `efeonce_admin`.
+- Candidatos asignables: usuarios internos activos (`tenant_type='efeonce_internal'`) con rol activo `finance_admin`, `finance_analyst` o `efeonce_admin`, o con señal operacional financiera en Person360/member profile (`resolved_job_title`, `headline`, `job_title`; por ejemplo `Finance Manager`).
+- Avatars: el endpoint aplica `resolveAvatarUrl()` para convertir assets `gs://` a `/api/media/users/:userId/avatar`, manteniendo el cliente fuera de rutas privadas de storage.
 - `POST /api/admin/payment-instruments` y `PUT /api/admin/payment-instruments/[id]` validan server-side que `responsible_user_id` pertenezca al set asignable; responsables legacy existentes pueden conservarse sin abrir nuevas asignaciones arbitrarias.
 
 ## Delta 2026-04-26 — Nubox Quotes Hot Sync para frescura de cotizaciones

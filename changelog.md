@@ -5,6 +5,7 @@
 ### 2026-04-27 — Payment Instrument responsable selector y branding Santander
 
 - `/admin/payment-instruments/[id]` reemplaza el campo libre de `Responsable` por un selector backend-driven de usuarios internos activos con rol `finance_admin`, `finance_analyst` o `efeonce_admin`; el usuario actual aparece marcado como `(yo)` cuando es elegible.
+- El selector tambien reconoce responsables financieros por señal operacional de Person360/member profile (por ejemplo `Finance Manager`) y resuelve avatars `gs://` a `/api/media/users/:userId/avatar`.
 - `POST/PUT /api/admin/payment-instruments` valida server-side que `responsibleUserId` sea asignable, preservando responsables legacy existentes sin permitir nuevas asignaciones arbitrarias.
 - Nuevo endpoint `GET /api/admin/payment-instruments/responsibles` con capability `finance.payment_instruments.update` para hidratar el selector.
 - El catalogo de proveedores soporta `compactLogo`; Santander usa el logotipo oficial completo y el isotipo BSAC para chips pequeños.

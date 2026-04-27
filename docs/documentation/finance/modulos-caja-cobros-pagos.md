@@ -169,7 +169,7 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Agrupar posición de caja por instrumento
 - Registrar nuevos instrumentos desde Admin Center (`/admin/payment-instruments`)
 - Administrar cada instrumento en `/admin/payment-instruments/[id]` con un workspace de configuracion, actividad, conciliacion y auditoria.
-- Asignar un responsable operativo desde un selector de usuarios internos activos con rol de Finanzas o Superadmin. Si el usuario actual cumple la regla, aparece marcado como "(yo)".
+- Asignar un responsable operativo desde un selector de usuarios internos activos con rol de Finanzas, Superadmin o perfil operacional financiero en Person360. Si el usuario actual cumple la regla, aparece marcado como "(yo)".
 - Revisar impacto antes de mutar campos criticos o desactivar un instrumento con cobros, pagos, settlements, balances o periodos asociados.
 - Revelar identificadores completos solo de forma temporal, con permiso fino, motivo obligatorio y auditoria sin guardar el valor revelado.
 

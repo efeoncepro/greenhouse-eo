@@ -3,6 +3,7 @@ import 'server-only'
 import { ROLE_CODES } from '@/config/role-codes'
 import { query } from '@/lib/db'
 import { FinanceValidationError } from '@/lib/finance/shared'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 export type PaymentInstrumentResponsibleCandidate = {
@@ -12,6 +13,7 @@ export type PaymentInstrumentResponsibleCandidate = {
   avatarUrl: string | null
   memberId: string | null
   identityProfileId: string | null
+  operationalRoleLabel: string | null
   roleCodes: string[]
   isCurrentUser: boolean
   isFinanceRole: boolean
@@ -23,11 +25,13 @@ type ResponsibleCandidateRow = {
   microsoft_email: string | null
   full_name: string | null
   avatar_url: string | null
+  resolved_avatar_url: string | null
   member_id: string | null
   identity_profile_id: string | null
   member_display_name: string | null
   identity_full_name: string | null
   job_title: string | null
+  resolved_job_title: string | null
   active_role_codes: string[] | null
 }
 
@@ -52,20 +56,26 @@ const normalizeRoles = (value: string[] | null | undefined) =>
 const hasAnyRole = (roleCodes: readonly string[], candidates: readonly string[]) =>
   roleCodes.some(roleCode => candidates.includes(roleCode))
 
+const hasFinanceOperationalSignal = (value: string | null | undefined) =>
+  Boolean(value && /(finance|finanzas|tesorer|contab|cfo|controller|accounting|treasury)/i.test(value))
+
 const toCandidate = (row: ResponsibleCandidateRow, currentUserId: string | null): PaymentInstrumentResponsibleCandidate => {
   const roleCodes = normalizeRoles(row.active_role_codes)
   const label = row.member_display_name || row.identity_full_name || row.full_name || row.email || row.microsoft_email || row.user_id
+  const operationalRoleLabel = row.resolved_job_title || row.job_title || null
+  const hasAccessFinanceRole = hasAnyRole(roleCodes, FINANCE_ROLE_CODES)
 
   return {
     userId: row.user_id,
     label,
     email: row.email || row.microsoft_email || null,
-    avatarUrl: row.avatar_url,
+    avatarUrl: resolveAvatarUrl(row.resolved_avatar_url || row.avatar_url, row.user_id),
     memberId: row.member_id,
     identityProfileId: row.identity_profile_id,
+    operationalRoleLabel,
     roleCodes,
     isCurrentUser: Boolean(currentUserId && row.user_id === currentUserId),
-    isFinanceRole: hasAnyRole(roleCodes, FINANCE_ROLE_CODES)
+    isFinanceRole: hasAccessFinanceRole || hasFinanceOperationalSignal(operationalRoleLabel)
   }
 }
 
@@ -96,11 +106,13 @@ export const getPaymentInstrumentResponsibleCandidates = async (
         cu.microsoft_email,
         cu.full_name,
         cu.avatar_url,
+        p360.resolved_avatar_url,
         cu.member_id,
         cu.identity_profile_id,
         m.display_name AS member_display_name,
         ip.full_name AS identity_full_name,
         COALESCE(m.headline, ip.job_title) AS job_title,
+        p360.resolved_job_title,
         COALESCE(
           ARRAY_AGG(DISTINCT ura.role_code) FILTER (
             WHERE ura.role_code IS NOT NULL
@@ -118,6 +130,8 @@ export const getPaymentInstrumentResponsibleCandidates = async (
         ON m.member_id = cu.member_id
       LEFT JOIN greenhouse_core.identity_profiles ip
         ON ip.profile_id = cu.identity_profile_id
+      LEFT JOIN greenhouse_serving.person_360 p360
+        ON p360.identity_profile_id = cu.identity_profile_id
       WHERE cu.active = TRUE
         AND cu.status IN ('active', 'invited')
         AND cu.tenant_type = 'efeonce_internal'
@@ -127,12 +141,14 @@ export const getPaymentInstrumentResponsibleCandidates = async (
         cu.microsoft_email,
         cu.full_name,
         cu.avatar_url,
+        p360.resolved_avatar_url,
         cu.member_id,
         cu.identity_profile_id,
         m.display_name,
         ip.full_name,
         m.headline,
-        ip.job_title
+        ip.job_title,
+        p360.resolved_job_title
       HAVING
         COALESCE(
           ARRAY_AGG(DISTINCT ura.role_code) FILTER (
@@ -145,9 +161,15 @@ export const getPaymentInstrumentResponsibleCandidates = async (
           ARRAY[]::text[]
         ) && $1::text[]
         OR ($2::boolean = TRUE AND cu.user_id = $3)
+        OR COALESCE(p360.resolved_job_title, m.headline, ip.job_title, '') ~* $4
       ORDER BY cu.full_name ASC NULLS LAST, cu.email ASC NULLS LAST, cu.user_id ASC
     `,
-    [RESPONSIBLE_ROLE_CODES, currentUserHasResponsibleRole, tenant.userId]
+    [
+      RESPONSIBLE_ROLE_CODES,
+      currentUserHasResponsibleRole,
+      tenant.userId,
+      '(finance|finanzas|tesorer|contab|cfo|controller|accounting|treasury)'
+    ]
   )
 
   return rows
