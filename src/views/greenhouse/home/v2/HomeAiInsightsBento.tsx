@@ -11,9 +11,13 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
+import classnames from 'classnames'
+
 import CustomAvatar from '@core/components/mui/Avatar'
+import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
+import NexaMentionText from '@/components/greenhouse/NexaMentionText'
 import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
@@ -39,6 +43,12 @@ const SEVERITY_TONE: Record<NonNullable<HomeAiInsightCard['severity']>, ThemeCol
   info: 'info'
 }
 
+const SEVERITY_LABEL: Record<NonNullable<HomeAiInsightCard['severity']>, string> = {
+  critical: 'Crítico',
+  warning: 'Atención',
+  info: 'Info'
+}
+
 const InsightCard = ({ card, index }: { card: HomeAiInsightCard; index: number }) => {
   const router = useRouter()
   const reduced = useReducedMotion()
@@ -49,12 +59,15 @@ const InsightCard = ({ card, index }: { card: HomeAiInsightCard; index: number }
       initial={reduced ? false : { opacity: 0, y: 8 }}
       animate={reduced ? undefined : { opacity: 1, y: 0 }}
       transition={reduced ? undefined : { duration: 0.2, delay: 0.05 * index, ease: [0.2, 0, 0, 1] }}
+      style={{ height: '100%' }}
     >
       <Card
         variant='outlined'
         sx={{
           height: '100%',
           cursor: card.drillHref ? 'pointer' : 'default',
+          display: 'flex',
+          flexDirection: 'column',
           transition: 'box-shadow 120ms cubic-bezier(0.2, 0, 0, 1), transform 120ms cubic-bezier(0.2, 0, 0, 1)',
           '&:hover': {
             transform: card.drillHref ? 'translateY(-2px)' : undefined,
@@ -63,44 +76,54 @@ const InsightCard = ({ card, index }: { card: HomeAiInsightCard; index: number }
         }}
         onClick={() => card.drillHref && router.push(card.drillHref)}
       >
-        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, height: '100%' }}>
+        <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Stack direction='row' alignItems='center' spacing={1.5}>
             <CustomAvatar variant='rounded' skin='light' color={meta.color} size={32}>
-              <i className={meta.icon} style={{ fontSize: 18 }} />
+              <i className={classnames(meta.icon, 'text-[18px]')} />
             </CustomAvatar>
-            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5, flex: 1 }}>
               {meta.label} · {card.signalType}
             </Typography>
             {card.severity ? (
               <Chip
                 size='small'
-                variant='outlined'
+                variant='tonal'
                 color={SEVERITY_TONE[card.severity]}
-                label={card.severity === 'critical' ? 'Crítico' : card.severity === 'warning' ? 'Atención' : 'Info'}
-                sx={{ ml: 'auto', height: 20, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}
+                label={SEVERITY_LABEL[card.severity]}
+                sx={{ height: 22, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}
               />
             ) : null}
           </Stack>
-          <Typography variant='body1' sx={{ fontWeight: 500 }}>
-            {card.headline}
-          </Typography>
+          <NexaMentionText
+            text={card.headline}
+            variant='body1'
+            sx={{ fontWeight: 500, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+          />
           {card.recommendedAction ? (
-            <Typography variant='caption' color='text.secondary' sx={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-              <strong>Acción sugerida: </strong>
-              {card.recommendedAction}
-            </Typography>
+            <Stack direction='row' spacing={1} alignItems='flex-start' sx={{ mt: 'auto' }}>
+              <i className='tabler-bulb text-[18px] text-warning shrink-0' style={{ marginTop: 2 }} />
+              <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+                <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>
+                  Acción sugerida
+                </Typography>
+                <NexaMentionText
+                  text={card.recommendedAction}
+                  variant='body2'
+                  sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', color: 'text.secondary' }}
+                />
+              </Stack>
+            </Stack>
           ) : null}
           {card.drillHref ? (
-            <Stack direction='row' spacing={1} sx={{ mt: 'auto' }}>
-              <Button
-                size='small'
-                variant='text'
-                color='primary'
-                endIcon={<i className='tabler-arrow-right' style={{ fontSize: 14 }} />}
-              >
-                Ver causa raíz
-              </Button>
-            </Stack>
+            <Button
+              size='small'
+              variant='text'
+              color='primary'
+              endIcon={<i className='tabler-arrow-right text-base' />}
+              sx={{ alignSelf: 'flex-start', mt: 1 }}
+            >
+              Ver causa raíz
+            </Button>
           ) : null}
         </CardContent>
       </Card>
@@ -113,19 +136,16 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
     return (
       <Card component='section' aria-label='Nexa Insights'>
         <CardHeader
-          title={
-            <Stack direction='row' alignItems='center' spacing={1.5}>
-              <CustomAvatar variant='rounded' skin='light' color='primary' size={32}>
-                <i className='tabler-sparkles' style={{ fontSize: 18 }} />
-              </CustomAvatar>
-              <Typography variant='h6' component='h2'>Nexa Insights</Typography>
-            </Stack>
-          }
+          avatar={<i className='tabler-sparkles text-xl text-primary' />}
+          title='Nexa Insights'
+          subheader='Sin señales analizadas todavía'
+          titleTypographyProps={{ variant: 'h5' }}
+          sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
         />
         <CardContent>
-          <Stack role='status' aria-live='polite' spacing={1.5} alignItems='center' sx={{ py: 4, color: 'text.secondary' }}>
-            <Typography variant='body2'>Sin señales analizadas todavía. Nexa procesa señales nuevas cada hora.</Typography>
-          </Stack>
+          <Typography role='status' aria-live='polite' variant='body2' color='text.secondary'>
+            Nexa procesa señales nuevas cada hora. Vuelve más tarde para ver insights.
+          </Typography>
         </CardContent>
       </Card>
     )
@@ -134,20 +154,16 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
   return (
     <Card component='section' aria-label='Nexa Insights'>
       <CardHeader
-        title={
-          <Stack direction='row' alignItems='center' spacing={1.5}>
-            <CustomAvatar variant='rounded' skin='light' color='primary' size={32}>
-              <i className='tabler-sparkles' style={{ fontSize: 18 }} />
-            </CustomAvatar>
-            <Typography variant='h6' component='h2'>Nexa Insights</Typography>
-          </Stack>
-        }
+        avatar={<i className='tabler-sparkles text-xl text-primary' />}
+        title='Nexa Insights'
         subheader={
-          <Typography variant='caption' color='text.secondary'>
-            {data.totalAnalyzed} señales analizadas
-            {data.lastAnalysisAt ? ` · último análisis ${new Date(data.lastAnalysisAt).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })}` : null}
-          </Typography>
+          data.lastAnalysisAt
+            ? `${data.totalAnalyzed} señales · último análisis ${new Date(data.lastAnalysisAt).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}`
+            : `${data.totalAnalyzed} señales analizadas`
         }
+        titleTypographyProps={{ variant: 'h5' }}
+        action={<OptionMenu options={['Ver todos los insights', 'Configurar análisis']} />}
+        sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
       />
       <CardContent>
         <Grid container spacing={3}>

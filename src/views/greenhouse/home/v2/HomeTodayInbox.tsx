@@ -12,10 +12,13 @@ import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+
+import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
+import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
 import { motion, AnimatePresence } from '@/libs/FramerMotion'
@@ -38,10 +41,16 @@ const KIND_META: Record<TodayInboxKind, { label: string; icon: string; color: Th
   reminder: { label: 'Recordatorio', icon: 'tabler-bell', color: 'secondary' }
 }
 
-const SEVERITY_TONE: Record<TodayInboxSeverity, { color: ThemeColor; label: string }> = {
-  critical: { color: 'error', label: 'Crítico' },
-  warning: { color: 'warning', label: 'Atención' },
-  info: { color: 'info', label: 'Info' }
+const SEVERITY_TONE: Record<TodayInboxSeverity, ThemeColor> = {
+  critical: 'error',
+  warning: 'warning',
+  info: 'info'
+}
+
+const SEVERITY_LABEL: Record<TodayInboxSeverity, string> = {
+  critical: 'Crítico',
+  warning: 'Atención',
+  info: 'Info'
 }
 
 const formatRelativeDue = (dueAt: string | null): string | null => {
@@ -55,13 +64,13 @@ const formatRelativeDue = (dueAt: string | null): string | null => {
   if (diffMs < 0) {
     if (absHours < 1) return 'vencido recién'
 
-    return `vencido hace ${absHours} h`
+    return `vencido ${absHours} h`
   }
 
-  if (absHours < 1) return 'en menos de 1 h'
-  if (absHours < 24) return `en ${absHours} h`
+  if (absHours < 1) return '< 1 h'
+  if (absHours < 24) return `${absHours} h`
 
-  return `en ${Math.round(absHours / 24)} d`
+  return `${Math.round(absHours / 24)} d`
 }
 
 interface TodayItemRowProps {
@@ -72,7 +81,6 @@ interface TodayItemRowProps {
 const TodayItemRow = ({ item, onAction }: TodayItemRowProps) => {
   const reduced = useReducedMotion()
   const meta = KIND_META[item.kind] ?? KIND_META.reminder
-  const severity = SEVERITY_TONE[item.severity]
   const dueLabel = formatRelativeDue(item.dueAt)
 
   return (
@@ -81,62 +89,60 @@ const TodayItemRow = ({ item, onAction }: TodayItemRowProps) => {
       exit={reduced ? undefined : { opacity: 0, x: 24, height: 0 }}
       transition={reduced ? undefined : { duration: 0.18, ease: [0.2, 0, 0, 1] }}
     >
-      <Stack
-        direction='row'
-        alignItems='flex-start'
-        spacing={2}
-        sx={{
-          py: 1.5,
-          px: 2,
-          borderRadius: theme => theme.shape.customBorderRadius?.md ?? 6,
-          transition: 'background-color 120ms cubic-bezier(0.2, 0, 0, 1)',
-          '&:hover': { backgroundColor: 'action.hover' }
-        }}
-      >
-        <CustomAvatar skin='light' color={meta.color} size={36}>
-          <i className={meta.icon} style={{ fontSize: 18 }} />
+      <div className='flex items-center gap-4'>
+        <CustomAvatar skin='light' variant='rounded' color={meta.color} size={34}>
+          <i className={classnames(meta.icon, 'text-[20px]')} />
         </CustomAvatar>
-        <Stack flex={1} minWidth={0} spacing={0.5}>
-          <Stack direction='row' alignItems='center' spacing={1} flexWrap='wrap' useFlexGap>
-            <Typography variant='body2' sx={{ fontWeight: 500 }}>{item.title}</Typography>
-            <Chip
-              size='small'
-              variant='outlined'
-              color={severity.color}
-              label={severity.label}
-              sx={{ height: 20, fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5 }}
-            />
+        <div className='flex flex-wrap justify-between items-center gap-x-4 gap-y-1 is-full'>
+          <div className='flex flex-col min-is-0' style={{ flex: 1 }}>
+            <Typography className='font-medium' color='text.primary' noWrap>
+              {item.title}
+            </Typography>
+            <Typography variant='body2' noWrap>
+              {meta.label}
+              {item.description ? ` · ${item.description}` : ''}
+            </Typography>
+          </div>
+          <Stack direction='row' spacing={1} alignItems='center'>
+            {item.severity !== 'info' ? (
+              <Chip
+                size='small'
+                variant='tonal'
+                color={SEVERITY_TONE[item.severity]}
+                label={SEVERITY_LABEL[item.severity]}
+                sx={{ height: 22, textTransform: 'uppercase', fontSize: 10, letterSpacing: 0.5 }}
+              />
+            ) : null}
             {dueLabel ? (
-              <Typography variant='caption' color='text.secondary' sx={{ ml: 'auto' }}>
+              <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
                 {dueLabel}
               </Typography>
             ) : null}
-          </Stack>
-          {item.description ? (
-            <Typography variant='caption' color='text.secondary' sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-              {item.description}
-            </Typography>
-          ) : null}
-          <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap' sx={{ mt: 0.5 }}>
-            {item.actions.map(action => (
-              <Tooltip key={action.actionId} title={`${action.label}`}>
+            {item.actions.find(a => a.primary) ? (
+              <Tooltip title={item.actions.find(a => a.primary)?.label ?? 'Abrir'}>
                 <Button
                   size='small'
-                  variant={action.primary ? 'tonal' : 'outlined'}
-                  color={action.actionId === 'approve' ? 'success' : action.actionId === 'dismiss' ? 'secondary' : 'primary'}
-                  onClick={() => onAction(item, action.actionId)}
-                  sx={{ minWidth: 0, px: 1.5, py: 0.25 }}
+                  variant='tonal'
+                  color={item.kind === 'approval' ? 'success' : 'primary'}
+                  onClick={() => {
+                    const primary = item.actions.find(a => a.primary)
+
+                    if (primary) onAction(item, primary.actionId)
+                  }}
+                  sx={{ minWidth: 0, px: 1.75, py: 0.25 }}
                 >
-                  {action.label}
+                  {item.actions.find(a => a.primary)?.label}
                 </Button>
               </Tooltip>
-            ))}
+            ) : null}
+            <Tooltip title='Descartar'>
+              <IconButton size='small' aria-label={`Descartar ${item.title}`} onClick={() => onAction(item, 'dismiss')}>
+                <i className='tabler-x text-[16px]' />
+              </IconButton>
+            </Tooltip>
           </Stack>
-        </Stack>
-        <IconButton size='small' aria-label={`Descartar ${item.title}`} onClick={() => onAction(item, 'dismiss')}>
-          <i className='tabler-x' style={{ fontSize: 16 }} />
-        </IconButton>
-      </Stack>
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -161,62 +167,42 @@ export const HomeTodayInbox = ({ data }: HomeTodayInboxProps) => {
         body: JSON.stringify({ itemId: item.itemId, kind: item.kind })
       })
     } catch {
-      // optimistic — surfacing the error is handled by toast at app level when wired in Slice 3
+      // optimistic — toast handled at app level
     }
   }
 
   return (
-    <Card
-      component='section'
-      aria-label='Tu día'
-      role='region'
-      sx={{
-        '& .MuiCardHeader-action': { alignSelf: 'center' }
-      }}
-    >
+    <Card component='section' aria-label='Tu día'>
       <CardHeader
-        title={
-          <Stack direction='row' alignItems='center' spacing={1.5}>
-            <CustomAvatar variant='rounded' skin='light' color='primary' size={32}>
-              <i className='tabler-inbox' style={{ fontSize: 18 }} />
-            </CustomAvatar>
-            <Box>
-              <Typography variant='h6' component='h2'>Tu día</Typography>
-              <Typography variant='caption' color='text.secondary'>
-                {items.length} {items.length === 1 ? 'pendiente' : 'pendientes'}
-                {data.totalUnread > items.length ? ` · ${data.totalUnread} no leídas en total` : ''}
-              </Typography>
-            </Box>
-          </Stack>
+        avatar={<i className='tabler-inbox text-xl' />}
+        title='Tu día'
+        subheader={
+          items.length === 0
+            ? 'Bandeja al día'
+            : `${items.length} ${items.length === 1 ? 'pendiente' : 'pendientes'}${data.totalUnread > items.length ? ` · ${data.totalUnread} no leídas` : ''}`
         }
-        action={
-          <Button size='small' variant='text' onClick={() => router.push('/notifications')}>
-            Ver todo
-          </Button>
-        }
+        titleTypographyProps={{ variant: 'h5' }}
+        action={<OptionMenu options={['Marcar todo como leído', 'Ver todo', 'Configurar notificaciones']} />}
+        sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
       />
-      <CardContent sx={{ pt: 0, pb: 1, px: 1 }}>
+      <CardContent className='flex flex-col gap-[1.125rem]'>
         {items.length === 0 ? (
-          <Stack
+          <Box
             role='status'
             aria-live='polite'
-            spacing={1.5}
-            alignItems='center'
-            sx={{ py: 6, color: 'text.secondary' }}
+            sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1, color: 'text.secondary' }}
           >
-            <CustomAvatar variant='rounded' skin='light' color='success' size={48}>
-              <i className='tabler-check' style={{ fontSize: 24 }} />
+            <CustomAvatar skin='light' variant='rounded' color='success' size={34}>
+              <i className='tabler-check text-[20px]' />
             </CustomAvatar>
-            <Typography variant='body2'>No tienes pendientes hoy. ¡Buen trabajo!</Typography>
-          </Stack>
+            <Typography variant='body2'>Sin pendientes hoy. Todo bajo control.</Typography>
+          </Box>
         ) : (
-          <Stack divider={<Box sx={{ height: 1, bgcolor: 'divider', mx: 2 }} />}>
-            <AnimatePresence initial={false}>
-              {items.map(item => (
-                <TodayItemRow key={item.itemId} item={item} onAction={dispatchAction} />
-              ))}
-            </AnimatePresence>
-          </Stack>
+          <AnimatePresence initial={false}>
+            {items.map(item => (
+              <TodayItemRow key={item.itemId} item={item} onAction={dispatchAction} />
+            ))}
+          </AnimatePresence>
         )}
       </CardContent>
     </Card>

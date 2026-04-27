@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -10,10 +11,10 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { motion } from '@/libs/FramerMotion'
@@ -40,6 +41,16 @@ const formatRelativeTime = (timestampMs: number | null): string | null => {
   return `hace ${Math.floor(hours / 24)} d`
 }
 
+/**
+ * Smart Home v2 Hero — port of Vuexy `Congratulations` widget shape.
+ *
+ * Layout:
+ *   - Left side: title (h5) + subtitle + Nexa accent line + composer
+ *   - Right side: brand isotipo as illustration (subtle, never decorative-only)
+ *
+ * Composer is built with `CustomTextField` + `InputAdornment` start/end —
+ * NOT siblings. Chips below are role-aware suggestions.
+ */
 export const HomeHeroAi = ({ data }: HomeHeroAiProps) => {
   const router = useRouter()
   const reduced = useReducedMotion()
@@ -55,111 +66,136 @@ export const HomeHeroAi = ({ data }: HomeHeroAiProps) => {
   const lastQueryLabel = formatRelativeTime(data.lastQueryAtMs)
 
   return (
-    <Card
-      component='section'
-      aria-label='Asistente Nexa'
-      sx={{
-        background: theme =>
-          `linear-gradient(135deg, ${theme.palette.background.paper} 0%, color-mix(in oklch, ${theme.palette.primary.main} 6%, ${theme.palette.background.paper}) 100%)`,
-        overflow: 'visible'
-      }}
-    >
-      <CardContent sx={{ py: { xs: 4, md: 6 } }}>
+    <Card component='section' aria-label='Asistente Nexa'>
+      <CardContent sx={{ position: 'relative', overflow: 'hidden', py: { xs: 4, md: 5 }, px: { xs: 3, md: 5 } }}>
         <motion.div
-          initial={reduced ? false : { opacity: 0, y: 12 }}
+          initial={reduced ? false : { opacity: 0, y: 8 }}
           animate={reduced ? undefined : { opacity: 1, y: 0 }}
           transition={reduced ? undefined : { duration: 0.32, ease: [0.2, 0, 0, 1] }}
         >
-          <Stack spacing={3} alignItems='center' textAlign='center'>
-            <CustomAvatar variant='rounded' skin='light' color='primary' size={56}>
-              <i className='tabler-sparkles' style={{ fontSize: 30 }} />
-            </CustomAvatar>
-            <Stack spacing={0.5} alignItems='center'>
-              <Typography variant='h4' component='h1' sx={{ fontWeight: 500 }}>
-                {data.greeting}
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={4}
+            alignItems={{ xs: 'flex-start', md: 'center' }}
+          >
+            <Stack spacing={3} sx={{ flex: 1, minWidth: 0 }}>
+              <Stack spacing={0.5}>
+                <Typography variant='overline' color='primary.main' sx={{ letterSpacing: 1, fontWeight: 600 }}>
+                  Nexa · IA Operativa
+                </Typography>
+                <Typography variant='h5' component='h1' sx={{ fontWeight: 500 }}>
+                  {data.greeting}
+                </Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  {data.subtitle}
+                </Typography>
+              </Stack>
+              <Box
+                component='form'
+                onSubmit={event => {
+                  event.preventDefault()
+                  submitPrompt(prompt)
+                }}
+                sx={{ width: '100%', maxWidth: 720 }}
+              >
+                <CustomTextField
+                  fullWidth
+                  value={prompt}
+                  onChange={event => setPrompt(event.target.value)}
+                  placeholder='Pregunta sobre nómina, OTD, equipo, finanzas…'
+                  aria-label='Pregunta para Nexa'
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position='start'>
+                          <i className='tabler-sparkles text-xl text-primary' />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            type='submit'
+                            color='primary'
+                            aria-label='Enviar pregunta'
+                            disabled={!prompt.trim()}
+                            edge='end'
+                          >
+                            <i className='tabler-send text-xl' />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }
+                  }}
+                />
+              </Box>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                {data.suggestions.slice(0, 4).map(suggestion => (
+                  <Button
+                    key={suggestion.intent}
+                    size='small'
+                    variant='outlined'
+                    color='secondary'
+                    onClick={() => submitPrompt(suggestion.prompt)}
+                    sx={{
+                      borderRadius: 9999,
+                      fontWeight: 400,
+                      color: 'text.primary',
+                      borderColor: 'divider',
+                      bgcolor: 'background.paper',
+                      textTransform: 'none',
+                      py: 0.5,
+                      '&:hover': { borderColor: 'primary.main', bgcolor: 'primary.lightOpacity' }
+                    }}
+                  >
+                    {suggestion.shortLabel}
+                  </Button>
+                ))}
+              </Stack>
+              <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap'>
+                <Chip size='small' variant='outlined' label={data.modelLabel} icon={<i className='tabler-brand-google text-base' />} />
+                {lastQueryLabel ? (
+                  <Typography variant='caption' color='text.secondary'>
+                    Última consulta {lastQueryLabel}
+                  </Typography>
+                ) : (
+                  <Typography variant='caption' color='text.secondary'>
+                    Listo para tu primera pregunta del día
+                  </Typography>
+                )}
+              </Stack>
+              <Typography variant='caption' color='text.disabled'>
+                {data.disclaimer}
               </Typography>
-              <Typography variant='body1' color='text.secondary'>
-                {data.subtitle}
-              </Typography>
-            </Stack>
-            <Stack direction='row' spacing={1.5} alignItems='center' sx={{ color: 'text.secondary' }}>
-              <Chip size='small' variant='outlined' label={`Modelo ${data.modelLabel}`} />
-              {lastQueryLabel ? (
-                <Typography variant='caption'>Última consulta {lastQueryLabel}</Typography>
-              ) : null}
             </Stack>
             <Box
-              component='form'
-              onSubmit={event => {
-                event.preventDefault()
-                submitPrompt(prompt)
-              }}
+              aria-hidden
               sx={{
-                width: '100%',
-                maxWidth: 720,
-                display: 'flex',
+                position: 'relative',
+                width: { xs: 96, md: 168 },
+                height: { xs: 96, md: 168 },
+                flexShrink: 0,
+                display: { xs: 'none', sm: 'flex' },
                 alignItems: 'center',
-                gap: 1.5,
-                background: theme => theme.palette.background.paper,
-                border: theme => `1px solid ${theme.palette.divider}`,
-                borderRadius: theme => theme.shape.customBorderRadius?.lg ?? 8,
-                boxShadow: theme => theme.shadows[1],
-                px: 2,
-                py: 1
+                justifyContent: 'center'
               }}
             >
-              <i className='tabler-search' style={{ fontSize: 20, opacity: 0.6 }} />
-              <CustomTextField
-                fullWidth
-                value={prompt}
-                onChange={event => setPrompt(event.target.value)}
-                placeholder='Pregunta sobre nómina, OTD, equipo, finanzas...'
-                aria-label='Pregunta para Nexa'
-                slotProps={{
-                  input: {
-                    sx: {
-                      border: 0,
-                      backgroundColor: 'transparent',
-                      '& fieldset': { border: 0 },
-                      '& .MuiOutlinedInput-notchedOutline': { border: 0 }
-                    }
-                  }
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '50%',
+                  background: theme =>
+                    `radial-gradient(circle, color-mix(in oklch, ${theme.palette.primary.main} 20%, transparent) 0%, transparent 70%)`
                 }}
-                variant='outlined'
-                size='small'
               />
-              <IconButton
-                type='submit'
-                color='primary'
-                aria-label='Enviar pregunta'
-                disabled={!prompt.trim()}
-              >
-                <i className='tabler-send' />
-              </IconButton>
+              <Image
+                src='/images/greenhouse/SVG/greenhouse-blue.svg'
+                alt=''
+                width={120}
+                height={120}
+                style={{ position: 'relative', zIndex: 1 }}
+              />
             </Box>
-            <Stack direction='row' spacing={1.5} flexWrap='wrap' useFlexGap justifyContent='center'>
-              {data.suggestions.map(suggestion => (
-                <Button
-                  key={suggestion.intent}
-                  size='small'
-                  variant='outlined'
-                  onClick={() => submitPrompt(suggestion.prompt)}
-                  startIcon={<i className='tabler-sparkles' style={{ fontSize: 14 }} />}
-                  sx={{
-                    borderRadius: 9999,
-                    fontWeight: 400,
-                    color: 'text.primary',
-                    borderColor: 'divider',
-                    '&:hover': { borderColor: 'primary.main' }
-                  }}
-                >
-                  {suggestion.shortLabel}
-                </Button>
-              ))}
-            </Stack>
-            <Typography variant='caption' color='text.secondary'>
-              {data.disclaimer}
-            </Typography>
           </Stack>
         </motion.div>
       </CardContent>

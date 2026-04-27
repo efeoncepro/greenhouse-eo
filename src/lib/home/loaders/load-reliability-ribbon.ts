@@ -1,7 +1,7 @@
 import 'server-only'
 
-import { getReliabilityOverview } from '@/lib/reliability/get-reliability-overview'
-import type { ReliabilitySeverity } from '@/types/reliability'
+import { STATIC_RELIABILITY_REGISTRY } from '@/lib/reliability/registry'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { HomeReliabilityModuleSummary, HomeReliabilityRibbonData, ReliabilityModuleStatus } from '../contract'
 
@@ -12,42 +12,65 @@ const STATUS_PRIORITY: Record<ReliabilityModuleStatus, number> = {
   healthy: 1
 }
 
-const mapModuleStatus = (raw: ReliabilitySeverity | null | undefined): ReliabilityModuleStatus => {
-  if (!raw) return 'unknown'
+/**
+ * Lightweight reliability rollup for the home aside.
+ *
+ * Trades the full `getReliabilityOverview()` (which aggregates billing +
+ * Notion ops + synthetic snapshots + smoke lane and takes 3-4s) for a
+ * direct-from-registry list with cheap recent-incident counts. Total
+ * latency budget: <1s. Full detail is one click away on `/admin/operations`.
+ */
 
-  if (raw === 'ok') return 'healthy'
-  if (raw === 'error') return 'down'
-  if (raw === 'warning') return 'degraded'
-
-  return 'unknown'
+interface RecentIncidentRow {
+  domain_tag: string
+  open_count: number | string
+  last_observed_at: string | null
 }
 
-const findLastIncidentAt = (signals: ReadonlyArray<{ kind: string; severity: ReliabilitySeverity; observedAt: string | null }>): string | null => {
-  const incidents = signals
-    .filter(signal => signal.kind === 'incident' && signal.severity !== 'ok')
-    .map(signal => signal.observedAt)
-    .filter((value): value is string => typeof value === 'string')
+const fetchRecentIncidentsByDomain = async (): Promise<Record<string, RecentIncidentRow>> => {
+  try {
+    const rows = await runGreenhousePostgresQuery<RecentIncidentRow & Record<string, unknown>>(
+      `WITH per_domain AS (
+         SELECT
+           tags->>'domain' AS domain_tag,
+           COUNT(*) FILTER (WHERE resolved_at IS NULL) AS open_count,
+           MAX(observed_at) AS last_observed_at
+         FROM greenhouse_serving.reliability_incident_log
+        WHERE observed_at > NOW() - INTERVAL '7 days'
+        GROUP BY tags->>'domain'
+       )
+       SELECT domain_tag, open_count, last_observed_at FROM per_domain WHERE domain_tag IS NOT NULL`
+    )
 
-  if (incidents.length === 0) return null
+    return rows.reduce<Record<string, RecentIncidentRow>>((acc, row) => {
+      acc[row.domain_tag] = row
 
-  incidents.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-
-  return incidents[0]
+      return acc
+    }, {})
+  } catch {
+    return {}
+  }
 }
 
 export const loadHomeReliabilityRibbon = async (): Promise<HomeReliabilityRibbonData> => {
-  const overview = await getReliabilityOverview()
+  const recentIncidents = await fetchRecentIncidentsByDomain()
 
-  const modules: HomeReliabilityModuleSummary[] = overview.modules.map(snapshot => {
-    const status = mapModuleStatus(snapshot.status)
-    const incidentsOpen = snapshot.signals.filter(signal => signal.kind === 'incident' && signal.severity !== 'ok').length
+  const modules: HomeReliabilityModuleSummary[] = STATIC_RELIABILITY_REGISTRY.map(definition => {
+    const incident = definition.incidentDomainTag ? recentIncidents[definition.incidentDomainTag] : undefined
+
+    const openCount = incident ? Number(incident.open_count) : 0
+
+    let status: ReliabilityModuleStatus = 'healthy'
+
+    if (openCount > 2) status = 'down'
+    else if (openCount > 0) status = 'degraded'
 
     return {
-      moduleKey: snapshot.moduleKey,
-      label: snapshot.label,
+      moduleKey: definition.moduleKey,
+      label: definition.label,
       status,
-      incidentsOpen,
-      lastIncidentAt: findLastIncidentAt(snapshot.signals)
+      incidentsOpen: openCount,
+      lastIncidentAt: incident?.last_observed_at ?? null
     }
   })
 
@@ -58,7 +81,7 @@ export const loadHomeReliabilityRibbon = async (): Promise<HomeReliabilityRibbon
   return {
     rollup,
     modules,
-    degradedSources: overview.notes ?? [],
-    asOf: overview.generatedAt
+    degradedSources: [],
+    asOf: new Date().toISOString()
   }
 }

@@ -128,8 +128,8 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     slot: 'aside',
     audiences: ['admin', 'internal'],
     priority: 60,
-    cacheTtlMs: 30_000,
-    timeoutMs: 2_000,
+    cacheTtlMs: 60_000,
+    timeoutMs: 5_000,
     precomputed: false,
     fallback: 'hide',
     componentKey: 'reliability-ribbon'
