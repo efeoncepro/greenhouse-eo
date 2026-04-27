@@ -6,6 +6,7 @@ import {
   type InstrumentCategory
 } from '@/config/payment-instruments'
 import { getCategoryProviderRule } from '@/lib/finance/payment-instruments/category-rules'
+import { resolveDisplayIdentifier } from '@/lib/finance/payment-instruments/identifier'
 
 export type ReadinessStatus = 'ready' | 'needs_configuration' | 'at_risk' | 'inactive'
 export type SectionHealth = 'ok' | 'partial' | 'error'
@@ -372,9 +373,22 @@ export const adaptPaymentInstrumentList = (payload: unknown): PaymentInstrumentL
         createdAt: asNullableString(row.createdAt ?? row.created_at),
         readinessStatus: normalizeReadinessStatus(row.readinessStatus ?? row.readiness_status, active),
         impactScore: asNumber(row.impactScore ?? row.impact_score),
+        // Canonical category-aware identifier resolution. Single source of
+        // truth in src/lib/finance/payment-instruments/identifier.ts —
+        // delivers `•••• 2505` for credit cards, `•••• 4661` for banks,
+        // `•••• 0001` for CCAs, etc., without inline branching.
         maskedIdentifier:
-          asNullableString(row.maskedIdentifier ?? row.accountNumberMasked ?? row.providerIdentifierMasked) ??
-          maskSensitiveValue(row.accountNumber ?? row.accountNumberFull ?? row.providerIdentifier),
+          asNullableString(row.maskedIdentifier) ??
+          resolveDisplayIdentifier(
+            {
+              accountNumberMasked: asNullableString(row.accountNumberMasked ?? row.account_number_masked),
+              accountNumber: asNullableString(row.accountNumber ?? row.account_number ?? row.accountNumberFull),
+              cardLastFour: asNullableString(row.cardLastFour ?? row.card_last_four),
+              providerIdentifierMasked: asNullableString(row.providerIdentifierMasked ?? row.provider_identifier_masked),
+              providerIdentifier: asNullableString(row.providerIdentifier ?? row.provider_identifier)
+            },
+            asString(row.instrumentCategory ?? row.instrument_category)
+          ),
         updatedAt: asNullableString(row.updatedAt ?? row.updated_at)
       }
     }),

@@ -23,10 +23,20 @@ const PaymentInstrumentChip = ({
 }: Props) => {
   const provider = getProvider(providerSlug)
   const logoHeight = size === 'sm' ? 20 : 28
+
+  // Fixed-width logo box keeps the instrument name aligned in a perfect
+  // column across rows, regardless of each provider's intrinsic logo aspect
+  // ratio. Without it, wider lockups (e.g. Greenhouse, Banco_Santander)
+  // visually crowd the name and the column "jumps".
+  const logoBoxWidth = size === 'sm' ? 36 : 48
   const avatarSize = size === 'sm' ? 24 : 32
   const variant = size === 'sm' ? 'body2' : 'body1'
   const categoryColor = instrumentCategory ? INSTRUMENT_CATEGORY_COLORS[instrumentCategory] : 'primary'
-  const logoSrc = size === 'sm' ? provider?.compactLogo || provider?.logo : provider?.logo
+
+  // Prefer the compact (isotipo) logo whenever available — purpose-built
+  // for tight contexts like list rows and dropdown items. Fall back to the
+  // full lockup only when the provider has no compact variant.
+  const logoSrc = provider?.compactLogo || provider?.logo
 
   const initials = instrumentName
     .split(/\s+/)
@@ -35,33 +45,44 @@ const PaymentInstrumentChip = ({
     .join('')
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      {logoSrc ? (
-        <Box
-          component='img'
-          src={logoSrc}
-          alt={provider?.name ?? instrumentName}
-          sx={{
-            height: logoHeight,
-            maxWidth: size === 'sm' ? 34 : 112,
-            width: 'auto',
-            objectFit: 'contain',
-            flexShrink: 0
-          }}
-        />
-      ) : (
-        <Avatar
-          sx={{
-            width: avatarSize,
-            height: avatarSize,
-            fontSize: size === 'sm' ? '0.65rem' : '0.75rem',
-            bgcolor: `${categoryColor}.lightOpacity`,
-            color: `${categoryColor}.main`
-          }}
-        >
-          {initials}
-        </Avatar>
-      )}
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+      <Box
+        sx={{
+          width: logoBoxWidth,
+          height: logoHeight,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          flexShrink: 0
+        }}
+      >
+        {logoSrc ? (
+          <Box
+            component='img'
+            src={logoSrc}
+            alt={provider?.name ?? instrumentName}
+            sx={{
+              maxHeight: logoHeight,
+              maxWidth: '100%',
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain'
+            }}
+          />
+        ) : (
+          <Avatar
+            sx={{
+              width: avatarSize,
+              height: avatarSize,
+              fontSize: size === 'sm' ? '0.65rem' : '0.75rem',
+              bgcolor: `${categoryColor}.lightOpacity`,
+              color: `${categoryColor}.main`
+            }}
+          >
+            {initials}
+          </Avatar>
+        )}
+      </Box>
       {showName && (
         <Typography variant={variant} sx={{ fontWeight: 500, whiteSpace: 'nowrap' }}>
           {instrumentName}

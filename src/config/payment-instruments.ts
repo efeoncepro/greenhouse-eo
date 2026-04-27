@@ -139,7 +139,9 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
     name: 'Greenhouse',
     category: 'shareholder_account',
     logo: '/images/greenhouse/SVG/greenhouse-blue.svg',
-    compactLogo: '/images/greenhouse/SVG/negative-isotipo.svg',
+    // Self-contained favicon (rounded blue square + white isotipo) — works on
+    // both light and dark backgrounds without context-dependent variants.
+    compactLogo: '/images/greenhouse/SVG/favicon-blue-negative.svg',
     currencies: ['CLP', 'USD']
   }
 } as const
