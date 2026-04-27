@@ -777,4 +777,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-699` | `complete` | Banco "Resultado cambiario" Canonical FX P&L Pipeline | `docs/tasks/complete/TASK-699-banco-fx-result-canonical-pipeline.md` |
 | `TASK-700` | `complete` | Internal Account Number Allocator (CCA + future wallets) | `docs/tasks/complete/TASK-700-internal-account-number-allocator.md` |
 | `TASK-701` | `complete` | Payment Provider Catalog + Greenhouse as platform_operator | `docs/tasks/complete/TASK-701-payment-provider-catalog-greenhouse-as-platform.md` |
-| `TASK-702` | `in-progress` | Bank Reconciliation, Canonical Anchors & Account Balances Rematerialization | `docs/tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md` |
+| `TASK-702` | `complete` | Bank Reconciliation, Canonical Anchors & Account Balances Rematerialization | `docs/tasks/complete/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md` |

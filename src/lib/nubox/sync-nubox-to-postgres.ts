@@ -650,44 +650,102 @@ const readConformedBankMovements = async (projectId: string): Promise<NuboxConfo
   return rows as unknown as NuboxConformedBankMovement[]
 }
 
+/**
+ * Heuristic to derive `payment_account_id` from a Nubox bank movement.
+ * Nubox tells us bank_id/bank_description; we map by Chilean bank pattern to
+ * the canonical accounts seeded in `greenhouse_finance.accounts`. If the
+ * mapping is unknown, returns null (the payment can still be created;
+ * conciliation later anchors it).
+ *
+ * TASK-702 PR-B: closes the phantom-payment-without-account-id class.
+ */
+const deriveAccountIdForBankMovement = (
+  movement: NuboxConformedBankMovement
+): string | null => {
+  const bank = (movement.bank_description || '').toLowerCase()
+  const method = (movement.payment_method_description || '').toLowerCase()
+
+  // Tarjeta de crédito (TC) detection — paid via TC instead of bank account
+  if (method.includes('tarjeta') || method.includes('credit') || method.includes('mastercard') || method.includes('visa')) {
+    return 'santander-corp-clp'
+  }
+
+  if (bank.includes('santander') && (bank.includes('usd') || bank.includes('dol'))) return 'santander-usd-usd'
+  if (bank.includes('santander')) return 'santander-clp'
+
+  // Other banks not yet onboarded as accounts → null (degraded ok)
+  return null
+}
+
 const reconcileExpenseFromBankMovement = async (
   movement: NuboxConformedBankMovement
 ): Promise<boolean> => {
   if (!movement.linked_purchase_id) return false
+  if (!movement.payment_date || movement.total_amount == null) return false
 
-  const updated = await runGreenhousePostgresQuery<{ expense_id: string }>(
-    `UPDATE greenhouse_finance.expenses SET
-      payment_status = 'paid',
-      payment_date = $2,
-      payment_method = $3,
-      updated_at = NOW()
-    WHERE nubox_purchase_id = $1
-      AND payment_status != 'paid'
-    RETURNING expense_id`,
+  // Find the expense first (lookup by nubox_purchase_id)
+  const expenseRows = await runGreenhousePostgresQuery<{ expense_id: string; amount_paid: string; total_amount: string }>(
+    `SELECT expense_id, amount_paid::text, total_amount::text
+     FROM greenhouse_finance.expenses
+     WHERE nubox_purchase_id = $1 LIMIT 1`,
+    [Number(movement.linked_purchase_id)]
+  )
+
+  if (expenseRows.length === 0) return false
+
+  const expense = expenseRows[0]
+  const amount = Number(movement.total_amount)
+  const paymentRef = `nubox-mvmt-${movement.nubox_movement_id}`
+  const paymentId = `EXP-PAY-NUBOX-${movement.nubox_movement_id}`
+  const accountId = deriveAccountIdForBankMovement(movement)
+
+  // Deduplication by (expense_id, reference). Idempotent across re-runs.
+  const existing = await runGreenhousePostgresQuery<{ payment_id: string }>(
+    `SELECT payment_id FROM greenhouse_finance.expense_payments
+     WHERE expense_id = $1 AND reference = $2 LIMIT 1`,
+    [expense.expense_id, paymentRef]
+  )
+
+  if (existing.length > 0) return false
+
+  // Insert canonical expense_payment. Trigger fn_sync_expense_amount_paid
+  // updates expense.amount_paid and payment_status.
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_finance.expense_payments (
+       payment_id, expense_id, payment_date, amount, currency,
+       reference, payment_method, payment_account_id, payment_source,
+       notes, recorded_at,
+       is_reconciled, exchange_rate_at_payment, amount_clp, fx_gain_loss_clp,
+       created_at
+     ) VALUES (
+       $1, $2, $3::date, $4, 'CLP',
+       $5, $6, $7, 'nubox_sync',
+       'Auto-registrado desde movimiento bancario Nubox', NOW(),
+       FALSE, 1, $4, 0,
+       NOW()
+     )`,
     [
-      Number(movement.linked_purchase_id),
-      movement.payment_date,
-      movement.payment_method_description
+      paymentId, expense.expense_id, movement.payment_date, amount,
+      paymentRef, movement.payment_method_description || 'bank_transfer', accountId
     ]
   )
 
-  if (updated.length > 0) {
-    await publishOutboxEvent(
-      'finance.expense',
-      updated[0].expense_id,
-      'finance.expense.paid_via_nubox',
-      {
-        nubox_movement_id: movement.nubox_movement_id,
-        linked_purchase_id: movement.linked_purchase_id,
-        amount: movement.total_amount,
-        payment_date: movement.payment_date
-      }
-    )
+  await publishOutboxEvent(
+    'finance.expense_payment',
+    paymentId,
+    'finance.expense_payment.recorded_via_nubox_bank_sync',
+    {
+      paymentId,
+      expenseId: expense.expense_id,
+      nuboxMovementId: movement.nubox_movement_id,
+      linkedPurchaseId: movement.linked_purchase_id,
+      amount,
+      paymentAccountId: accountId,
+      paymentDate: movement.payment_date
+    }
+  )
 
-    return true
-  }
-
-  return false
+  return true
 }
 
 const reconcileIncomeFromBankMovement = async (
@@ -723,6 +781,22 @@ const reconcileIncomeFromBankMovement = async (
 
   const paymentId = `PAY-NUBOX-${movement.nubox_movement_id}`
 
+  // PR-B: Skip phantom creation if a factoring_operation already exists for
+  // this income — the canonical factoring_proceeds payment is the source of
+  // truth and double-creating would inflate income.amount_paid.
+  const existingFactoring = await runGreenhousePostgresQuery<{ operation_id: string }>(
+    `SELECT operation_id FROM greenhouse_finance.factoring_operations
+     WHERE income_id = $1 AND status = 'active' LIMIT 1`,
+    [income.income_id]
+  )
+
+  if (existingFactoring.length > 0) {
+    return false
+  }
+
+  // PR-B: derive payment_account_id from movement metadata (no more phantoms).
+  const paymentAccountId = deriveAccountIdForBankMovement(movement)
+
   const recordedPayment = await recordPayment({
     incomeId: income.income_id,
     paymentId,
@@ -731,6 +805,7 @@ const reconcileIncomeFromBankMovement = async (
     currency: 'CLP',
     reference: nuboxRef,
     paymentMethod: 'bank_transfer',
+    paymentAccountId,
     paymentSource: 'nubox_bank_sync',
     notes: 'Auto-registrado desde movimiento bancario Nubox'
   })
