@@ -185,83 +185,83 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
               </Typography>
             </Stack>
           ) : (
-          <>
-          <Stack direction='row' alignItems='baseline' spacing={1.5} flexWrap='wrap' useFlexGap>
-            <Tooltip title={tooltipTitle} placement='top' arrow disableInteractive enterDelay={300}>
-              <Typography
-                variant='h3'
-                component='p'
-                sx={{ fontWeight: 500, lineHeight: 1.1, fontVariantNumeric: 'tabular-nums', cursor: 'help' }}
-              >
-                {data.runwayMonths != null ? <AnimatedCounter value={data.runwayMonths} format='integer' /> : '—'}
-                <Typography component='span' variant='h5' color='text.secondary' sx={{ ml: 1 }}>
-                  {data.runwayMonths != null ? (data.runwayMonths === 1 ? 'mes' : 'meses') : ''}
-                </Typography>
-              </Typography>
-            </Tooltip>
-            {data.deltaPct != null && Math.abs(data.deltaPct) >= 0.5 ? (
-              <Chip
-                size='small'
-                variant='outlined'
-                color={data.deltaPct > 0 ? 'success' : 'error'}
-                icon={<i className={data.deltaPct > 0 ? 'tabler-arrow-up-right' : 'tabler-arrow-down-right'} />}
-                label={`${data.deltaPct > 0 ? '+' : ''}${data.deltaPct.toFixed(1)}%`}
-                sx={{ fontVariantNumeric: 'tabular-nums' }}
-              />
-            ) : null}
-            <Box
-              sx={{
-                position: 'relative',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.75,
-                px: 1.25,
-                py: 0.5,
-                borderRadius: 9999,
-                bgcolor: theme => `color-mix(in oklch, ${theme.palette[tone.color].main} 14%, transparent)`,
-                color: theme => theme.palette[tone.color].main,
-                fontSize: 12,
-                fontWeight: 500,
-                '&::after': critical
-                  ? {
-                      content: '""',
-                      position: 'absolute',
-                      inset: -3,
-                      borderRadius: 9999,
-                      bgcolor: theme => theme.palette[tone.color].main,
-                      opacity: 0.25,
-                      animation: 'gh-runway-pulse 2.4s cubic-bezier(0.2, 0, 0, 1) infinite',
-                      pointerEvents: 'none'
+            <Stack spacing={4}>
+              <Stack direction='row' alignItems='baseline' spacing={1.5} flexWrap='wrap' useFlexGap>
+                <Tooltip title={tooltipTitle} placement='top' arrow disableInteractive enterDelay={300}>
+                  <Typography
+                    variant='h3'
+                    component='p'
+                    sx={{ fontWeight: 500, lineHeight: 1.1, fontVariantNumeric: 'tabular-nums', cursor: 'help' }}
+                  >
+                    {data.runwayMonths != null ? <AnimatedCounter value={data.runwayMonths} format='integer' /> : '—'}
+                    <Typography component='span' variant='h5' color='text.secondary' sx={{ ml: 1 }}>
+                      {data.runwayMonths != null ? (data.runwayMonths === 1 ? 'mes' : 'meses') : ''}
+                    </Typography>
+                  </Typography>
+                </Tooltip>
+                {data.deltaPct != null && Math.abs(data.deltaPct) >= 0.5 ? (
+                  <Chip
+                    size='small'
+                    variant='outlined'
+                    color={data.deltaPct > 0 ? 'success' : 'error'}
+                    icon={<i className={data.deltaPct > 0 ? 'tabler-arrow-up-right' : 'tabler-arrow-down-right'} />}
+                    label={`${data.deltaPct > 0 ? '+' : ''}${data.deltaPct.toFixed(1)}%`}
+                    sx={{ fontVariantNumeric: 'tabular-nums' }}
+                  />
+                ) : null}
+                <Box
+                  sx={{
+                    position: 'relative',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    px: 1.25,
+                    py: 0.5,
+                    borderRadius: 9999,
+                    bgcolor: theme => `color-mix(in oklch, ${theme.palette[tone.color].main} 14%, transparent)`,
+                    color: theme => theme.palette[tone.color].main,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    '&::after': critical
+                      ? {
+                          content: '""',
+                          position: 'absolute',
+                          inset: -3,
+                          borderRadius: 9999,
+                          bgcolor: theme => theme.palette[tone.color].main,
+                          opacity: 0.25,
+                          animation: 'gh-runway-pulse 2.4s cubic-bezier(0.2, 0, 0, 1) infinite',
+                          pointerEvents: 'none'
+                        }
+                      : undefined,
+                    '@media (prefers-reduced-motion: reduce)': { '&::after': { animation: 'none' } },
+                    '@keyframes gh-runway-pulse': {
+                      '0%': { transform: 'scale(1)', opacity: 0.25 },
+                      '60%': { transform: 'scale(1.4)', opacity: 0 },
+                      '100%': { transform: 'scale(1.4)', opacity: 0 }
                     }
-                  : undefined,
-                '@media (prefers-reduced-motion: reduce)': { '&::after': { animation: 'none' } },
-                '@keyframes gh-runway-pulse': {
-                  '0%': { transform: 'scale(1)', opacity: 0.25 },
-                  '60%': { transform: 'scale(1.4)', opacity: 0 },
-                  '100%': { transform: 'scale(1.4)', opacity: 0 }
-                }
-              }}
-            >
-              <i className={classnames(tone.icon, 'text-[14px]')} aria-hidden />
-              {tone.label}
-            </Box>
-          </Stack>
-          <Typography variant='body2' color='text.secondary'>
-            Cash {formatCash(data.cashCurrent, data.cashCurrency)} · Burn {formatBurn(data.burnMonthly, data.cashCurrency)} / mes
-          </Typography>
-          <Box sx={{ mx: -1 }}>
-            <AppReactApexCharts type='area' height={120} width='100%' options={sparklineOptions} series={series} />
-          </Box>
-          {data.monthlyHistory.length > 0 ? (
-            <Stack direction='row' justifyContent='space-between' sx={{ px: 0.5 }}>
-              {data.monthlyHistory.map(h => (
-                <Typography key={h.periodLabel} variant='caption' color='text.disabled'>
-                  {h.periodLabel.split(' ')[0]}
-                </Typography>
-              ))}
+                  }}
+                >
+                  <i className={classnames(tone.icon, 'text-[14px]')} aria-hidden />
+                  {tone.label}
+                </Box>
+              </Stack>
+              <Typography variant='body2' color='text.secondary'>
+                Cash {formatCash(data.cashCurrent, data.cashCurrency)} · Burn {formatBurn(data.burnMonthly, data.cashCurrency)} / mes
+              </Typography>
+              <Box sx={{ mx: -1 }}>
+                <AppReactApexCharts type='area' height={120} width='100%' options={sparklineOptions} series={series} />
+              </Box>
+              {data.monthlyHistory.length > 0 ? (
+                <Stack direction='row' justifyContent='space-between' sx={{ px: 0.5 }}>
+                  {data.monthlyHistory.map(h => (
+                    <Typography key={h.periodLabel} variant='caption' color='text.disabled'>
+                      {h.periodLabel.split(' ')[0]}
+                    </Typography>
+                  ))}
+                </Stack>
+              ) : null}
             </Stack>
-          ) : null}
-          </>
           )}
           {data.drillHref ? (
             <Stack direction='row' justifyContent='flex-end' sx={{ mt: 1 }}>

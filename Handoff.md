@@ -1,5 +1,13 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — Home Runway JSX compile fix
+
+- Rama: `develop`.
+- Fix puntual en `src/views/greenhouse/home/v2/HomeRunwayStrategic.tsx`: el estado no vacio del bloque Runway quedo envuelto en un `Stack` padre en vez de fragment mal indentado, corrigiendo el error JSX que bloqueaba `npx tsc` y `pnpm build`.
+- No se cambio la logica de datos ni el copy del bloque.
+- Validacion disponible de la sesion previa inmediata: `npx tsc --noEmit --pretty false`, `pnpm lint`, `pnpm build` OK.
+- Quedan sin commitear assets Mastercard no referenciados en codigo: `public/images/logos/payment/Mastercard-Logo.wine.svg` y `public/images/logos/payment/Mastercard-logo.svg.png`.
+
 ## Sesion 2026-04-27 — Payment Instrument responsable selector y Santander branding
 
 - Rama: `develop`; se respeto la instruccion de no cambiar de rama.
