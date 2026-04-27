@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -173,11 +173,11 @@ export const HomeTodayInbox = ({ data }: HomeTodayInboxProps) => {
 
       const verb = actionId === 'approve' ? 'aprobado' : actionId === 'snooze' ? 'pospuesto' : 'descartado'
 
-      toast.success(`Pendiente ${verb}`, { autoClose: 2500 })
+      toast.success(`Pendiente ${verb}`, { duration: 2500 })
     } catch {
       // Roll back the optimistic removal and surface the error.
       setItems(prev => [item, ...prev])
-      toast.error('No pudimos completar la acción. Reintenta en unos segundos.', { autoClose: 4000 })
+      toast.error('No pudimos completar la acción. Reintenta en unos segundos.', { duration: 4000 })
     }
   }
 
