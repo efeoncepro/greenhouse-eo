@@ -6,10 +6,19 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 
-import type { HomeBlockEnvelope, HomeSlotKey, HomeSnapshotV1, HomeUiDensity } from '@/lib/home/contract'
+import type {
+  HomeBlockEnvelope,
+  HomeClosingCountdownData,
+  HomeReliabilityRibbonData,
+  HomeSlotKey,
+  HomeSnapshotV1,
+  HomeTodayInboxData,
+  HomeUiDensity
+} from '@/lib/home/contract'
 
 import { CommandPalette } from '@/components/greenhouse/CommandPalette'
 import { HomeBlockRenderer } from './HomeBlockRenderer'
+import { HomeDayActions } from './HomeDayActions'
 
 interface HomeShellV2Props {
   snapshot: HomeSnapshotV1
@@ -54,6 +63,14 @@ export const HomeShellV2 = ({ snapshot }: HomeShellV2Props) => {
   const mainBlocks = grouped.main.filter(block => block.outcome !== 'hidden')
   const asideBlocks = grouped.aside.filter(block => block.outcome !== 'hidden')
 
+  // Cross-block synthesis: extract data from main + aside blocks to feed
+  // the Day Actions banner. The banner is meta — it surfaces the
+  // strongest CTA across closing / inbox / reliability without rendering
+  // those blocks itself.
+  const closingBlock = mainBlocks.find(b => b.blockId === 'closing-countdown')
+  const inboxBlock = mainBlocks.find(b => b.blockId === 'today-inbox')
+  const reliabilityBlock = asideBlocks.find(b => b.blockId === 'reliability-ribbon')
+
   return (
     <Stack spacing={spacing} component='main'>
       {/* Top utility row: command palette */}
@@ -78,6 +95,13 @@ export const HomeShellV2 = ({ snapshot }: HomeShellV2Props) => {
           ))}
         </Stack>
       ) : null}
+
+      {/* Day Actions banner — synthesized from inbox + closing + reliability */}
+      <HomeDayActions
+        closing={(closingBlock?.data ?? null) as HomeClosingCountdownData | null}
+        inbox={(inboxBlock?.data ?? null) as HomeTodayInboxData | null}
+        reliability={(reliabilityBlock?.data ?? null) as HomeReliabilityRibbonData | null}
+      />
 
       {/* Main + Aside split */}
       {mainBlocks.length > 0 || asideBlocks.length > 0 ? (

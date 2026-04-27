@@ -106,7 +106,18 @@ const PulseCardSlot = ({ card, index }: PulseCardSlotProps) => {
   }, [card.label, card.sparkline, card.value])
 
   const handleClick = () => {
-    if (card.drillHref) router.push(card.drillHref)
+    if (!card.drillHref) return
+
+    // View Transitions API — Chrome 111+, Safari 18+. Falls back to
+    // immediate router.push when unsupported (Firefox today).
+    type DocWithVT = Document & { startViewTransition?: (cb: () => void) => unknown }
+    const docVT = document as DocWithVT
+
+    if (typeof docVT.startViewTransition === 'function') {
+      docVT.startViewTransition(() => router.push(card.drillHref!))
+    } else {
+      router.push(card.drillHref)
+    }
   }
 
   const computedAtLabel = (() => {
