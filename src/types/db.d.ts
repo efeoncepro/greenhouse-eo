@@ -1824,6 +1824,14 @@ export interface GreenhouseCoreClientUsers {
   full_name: string | null;
   google_email: string | null;
   google_sub: string | null;
+  /**
+   * TASK-696 — Smart Home v2 user override of default landing surface (e.g. pulse, finance, mi-nomina, ico-board). NULL = system-resolved by audience+startup policy.
+   */
+  home_default_view: string | null;
+  /**
+   * TASK-696 — TRUE renders legacy v1 home during v2 rollout window (4 weeks). Cleared at v1 sunset.
+   */
+  home_v2_opt_out: Generated<boolean>;
   identity_profile_id: string | null;
   last_login_at: Timestamp | null;
   last_login_provider: string | null;
@@ -1834,6 +1842,10 @@ export interface GreenhouseCoreClientUsers {
   microsoft_tenant_id: string | null;
   password_hash: string | null;
   password_hash_algorithm: string | null;
+  /**
+   * TASK-696 — last time the user mutated home preferences. Drives invalidation.
+   */
+  preferences_updated_at: Timestamp | null;
   provisioned_at: Timestamp | null;
   provisioned_by: Generated<string | null>;
   public_id: string | null;
@@ -1841,6 +1853,10 @@ export interface GreenhouseCoreClientUsers {
   status: Generated<string>;
   tenant_type: Generated<string>;
   timezone: Generated<string | null>;
+  /**
+   * TASK-696 — UI density preference: cozy (default), comfortable, compact. Drives --density-scale CSS var.
+   */
+  ui_density: string | null;
   updated_at: Generated<Timestamp>;
   user_id: string;
 }
@@ -5147,6 +5163,54 @@ export interface GreenhouseServingFinanceAiSignals {
   z_score: Numeric | null;
 }
 
+export interface GreenhouseServingHomeBlockFlags {
+  /**
+   * HomeBlockId from src/lib/home/contract.ts (e.g. hero-ai, pulse-strip, today-inbox).
+   */
+  block_id: string;
+  created_at: Generated<Timestamp>;
+  /**
+   * TRUE renders the block; FALSE hides it. Default behavior when no row matches: enabled.
+   */
+  enabled: Generated<boolean>;
+  id: Generated<Int8>;
+  reason: string | null;
+  /**
+   * tenant_id | role_code | user_id; NULL when scope_type=global
+   */
+  scope_id: string | null;
+  /**
+   * global | tenant | role | user
+   */
+  scope_type: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseServingHomePulseSnapshots {
+  /**
+   * AudienceKey from buildHomeEntitlementsContext (admin|internal|client|hr|finance|delivery|collaborator).
+   */
+  audience_key: string;
+  computed_at: Generated<Timestamp>;
+  /**
+   * role code or __default__ for audience-level snapshot.
+   */
+  role_code: Generated<string>;
+  /**
+   * JSONB matching HomePulseStripData from contract.ts. Includes 4-6 KPI cards with sparkline series + delta + status.
+   */
+  snapshot_jsonb: Json;
+  source_version: Generated<string>;
+  /**
+   * tenant_id when tenant-scoped, __all__ for cross-tenant. NEVER allow leak across tenants.
+   */
+  tenant_scope: Generated<string>;
+  /**
+   * Wall-clock expiry. Read-time skips snapshot if expired.
+   */
+  ttl_ends_at: Timestamp;
+}
+
 export interface GreenhouseServingIcoAiEnrichmentRuns {
   completed_at: Timestamp | null;
   error_message: string | null;
@@ -6137,6 +6201,33 @@ export interface GreenhouseServingUser360 {
   user_id: string | null;
 }
 
+export interface GreenhouseServingUserRecentItems {
+  created_at: Generated<Timestamp>;
+  entity_id: string;
+  /**
+   * project | quote | client | invoice | payroll_period | view | report | task | space
+   */
+  entity_kind: string;
+  href: string | null;
+  id: Generated<Int8>;
+  last_seen_at: Generated<Timestamp>;
+  /**
+   * Optional cached display snapshot (status, last activity ts, badge, etc.) so the rail renders without re-querying entity tables.
+   */
+  snapshot_jsonb: Json | null;
+  /**
+   * tenant_id snapshot at time of visit; null for global views. Used for tenant isolation.
+   */
+  tenant_id: string | null;
+  title: string | null;
+  user_id: string;
+  /**
+   * VIEW_REGISTRY view_code if applicable.
+   */
+  view_code: string | null;
+  visit_count: Generated<number>;
+}
+
 export interface GreenhouseSyncHandlerHealth {
   consecutive_failures: Generated<number>;
   consecutive_successes: Generated<number>;
@@ -6970,6 +7061,8 @@ export interface DB {
   "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
   "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
+  "greenhouse_serving.home_block_flags": GreenhouseServingHomeBlockFlags;
+  "greenhouse_serving.home_pulse_snapshots": GreenhouseServingHomePulseSnapshots;
   "greenhouse_serving.ico_ai_enrichment_runs": GreenhouseServingIcoAiEnrichmentRuns;
   "greenhouse_serving.ico_ai_signal_enrichment_history": GreenhouseServingIcoAiSignalEnrichmentHistory;
   "greenhouse_serving.ico_ai_signal_enrichments": GreenhouseServingIcoAiSignalEnrichments;
@@ -7006,6 +7099,7 @@ export interface DB {
   "greenhouse_serving.session_360": GreenhouseServingSession360;
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
+  "greenhouse_serving.user_recent_items": GreenhouseServingUserRecentItems;
   "greenhouse_sync.handler_health": GreenhouseSyncHandlerHealth;
   "greenhouse_sync.handler_health_transitions": GreenhouseSyncHandlerHealthTransitions;
   "greenhouse_sync.identity_profile_merge_log": GreenhouseSyncIdentityProfileMergeLog;
