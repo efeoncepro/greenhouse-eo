@@ -62,12 +62,12 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
     country: 'CL',
     currencies: ['CLP', 'USD']
   },
-  scotiabank: { name: 'Scotiabank', category: 'bank_account', logo: '/images/logos/payment/scotiabank.svg', country: 'CL', currencies: ['CLP', 'USD'] },
+  scotiabank: { name: 'Scotiabank', category: 'bank_account', logo: '/images/logos/payment/scotiabank-full-positive.svg', country: 'CL', currencies: ['CLP', 'USD'] },
   itau: { name: 'Itaú', category: 'bank_account', logo: '/images/logos/payment/itau.svg', country: 'CL', currencies: ['CLP'] },
   bice: { name: 'BICE', category: 'bank_account', logo: '/images/logos/payment/bice.svg', country: 'CL', currencies: ['CLP', 'USD'] },
   security: { name: 'Banco Security', category: 'bank_account', logo: '/images/logos/payment/security.svg', country: 'CL', currencies: ['CLP', 'USD'] },
-  falabella: { name: 'Banco Falabella', category: 'bank_account', logo: '/images/logos/payment/falabella.svg', country: 'CL', currencies: ['CLP'] },
-  ripley: { name: 'Banco Ripley', category: 'bank_account', logo: '/images/logos/payment/ripley.svg', country: 'CL', currencies: ['CLP'] },
+  falabella: { name: 'Banco Falabella', category: 'bank_account', logo: '/images/logos/payment/falabella-full-positive.svg', country: 'CL', currencies: ['CLP'] },
+  ripley: { name: 'Banco Ripley', category: 'bank_account', logo: '/images/logos/payment/ripley-full-positive.svg', country: 'CL', currencies: ['CLP'] },
 
   // Card networks
   visa: {
@@ -82,20 +82,49 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
     logo: '/images/logos/payment/Mastercard-logo.svg.png',
     compactLogo: '/images/logos/payment/Mastercard-Logo.wine.svg'
   },
-  amex: { name: 'American Express', category: 'credit_card', logo: '/images/logos/payment/amex.svg' },
+  amex: {
+    name: 'American Express',
+    category: 'credit_card',
+    logo: '/images/logos/payment/amex.svg',
+    compactLogo: '/images/logos/payment/amex-mark-positive.svg'
+  },
 
   // Fintechs
-  paypal: { name: 'PayPal', category: 'fintech', logo: '/images/logos/payment/paypal.svg', currencies: ['USD', 'CLP'] },
-  wise: { name: 'Wise', category: 'fintech', logo: '/images/logos/payment/wise.svg', currencies: ['USD', 'CLP'] },
-  mercadopago: { name: 'MercadoPago', category: 'fintech', logo: '/images/logos/payment/mercadopago.svg', currencies: ['CLP'] },
+  paypal: {
+    name: 'PayPal',
+    category: 'fintech',
+    logo: '/images/logos/payment/paypal.svg',
+    compactLogo: '/images/logos/payment/paypal-mark-positive.svg',
+    currencies: ['USD', 'CLP']
+  },
+  wise: {
+    name: 'Wise',
+    category: 'fintech',
+    logo: '/images/logos/payment/wise.svg',
+    compactLogo: '/images/logos/payment/wise-mark-positive.svg',
+    currencies: ['USD', 'CLP']
+  },
+  mercadopago: {
+    name: 'MercadoPago',
+    category: 'fintech',
+    logo: '/images/logos/payment/mercadopago.svg',
+    compactLogo: '/images/logos/payment/mercadopago-mark-positive.svg',
+    currencies: ['CLP']
+  },
   global66: { name: 'Global66', category: 'fintech', logo: '/images/logos/payment/global66.svg', currencies: ['USD', 'CLP'] },
 
   // Payment platforms
-  deel: { name: 'Deel', category: 'payment_platform', logo: '/images/logos/payment/deel.svg', currencies: ['USD', 'CLP'] },
-  stripe: { name: 'Stripe', category: 'payment_platform', logo: '/images/logos/payment/stripe.svg', currencies: ['USD'] },
+  deel: { name: 'Deel', category: 'payment_platform', logo: '/images/logos/payment/deel-full-positive.svg', currencies: ['USD', 'CLP'] },
+  stripe: {
+    name: 'Stripe',
+    category: 'payment_platform',
+    logo: '/images/logos/payment/stripe.svg',
+    compactLogo: '/images/logos/payment/stripe-mark-positive.svg',
+    currencies: ['USD']
+  },
 
   // Payroll processors
-  previred: { name: 'Previred', category: 'payroll_processor', logo: '/images/logos/payment/previred.svg', country: 'CL', currencies: ['CLP'] }
+  previred: { name: 'Previred', category: 'payroll_processor', logo: '/images/logos/payment/previred-full-positive.svg', country: 'CL', currencies: ['CLP'] }
 } as const
 
 export type ProviderSlug = keyof typeof PROVIDER_CATALOG

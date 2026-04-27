@@ -14,6 +14,10 @@
     },
     "banco-estado": {
       "searchTerms": ["BancoEstado logo svg", "BancoEstado logotipo svg"],
+      "officialSvgUrls": [
+        "https://www.bancoestado.cl/content/experience-fragments/bancoestado-public/cl/es/site/header/master/_jcr_content/root/container/header/Logo.coreimg.svg/1770300061629/logo-bancoestado.svg"
+      ],
+      "officialPages": ["https://www.bancoestado.cl"],
       "preferredFileBase": "banco-estado"
     },
     "bci": {
@@ -27,10 +31,30 @@
     "deel": {
       "searchTerms": ["Deel logo svg", "Deel current logo svg"],
       "simpleIconsSlug": "deel",
+      "officialSvgUrls": [
+        "https://website-media.deel.com/logo_revamp_164ddaed0c.svg",
+        "https://website-media.deel.com/_next/static/media/deel_logo_purple.fdeb49b6.svg"
+      ],
       "preferredFileBase": "deel"
     },
     "falabella": {
       "searchTerms": ["Banco Falabella logo svg", "Banco Falabella logotipo svg"],
+      "variants": {
+        "full-negative": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "recolor-white"
+        },
+        "mark-positive": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "crop-viewbox",
+          "cropViewBox": "0 0 183.57806 183.57806"
+        },
+        "mark-negative": {
+          "derivedFromVariant": "full-positive",
+          "deriveMode": "crop-viewbox-recolor-white",
+          "cropViewBox": "0 0 183.57806 183.57806"
+        }
+      },
       "preferredFileBase": "falabella"
     },
     "global66": {
@@ -59,19 +83,35 @@
     },
     "previred": {
       "searchTerms": ["Previred logo svg", "Previred logotipo svg"],
+      "officialSvgUrls": [
+        "https://www.previred.com/wp-content/themes/previred--theme/img/logo2025.svg"
+      ],
+      "officialPages": ["https://www.previred.com"],
       "preferredFileBase": "previred"
     },
     "ripley": {
       "searchTerms": ["Banco Ripley logo svg", "Banco Ripley logotipo svg"],
+      "officialSvgUrls": [
+        "https://www.bancoripley.cl/media/new-logo-banco-ripley-IWJOE57X.svg"
+      ],
+      "officialPages": ["https://www.bancoripley.cl"],
       "preferredFileBase": "ripley"
     },
     "santander": {
       "searchTerms": ["Banco Santander Chile logo svg", "Santander logo svg"],
+      "officialSvgUrls": [
+        "https://banco.santander.cl/uploads/000/003/697/9c2347b3-ca36-4f53-9f65-5cd6bdabf0d2/original/logo_santander_new.svg"
+      ],
+      "officialPages": ["https://banco.santander.cl"],
       "preferredFileBase": "santander"
     },
     "scotiabank": {
       "searchTerms": ["Scotiabank Chile logo svg", "Scotiabank logo svg"],
       "simpleIconsSlug": "scotiabank",
+      "officialSvgUrls": [
+        "https://cdn.aglty.io/scotiabank-chile/2024/header/logo-scotiabank-red.svg"
+      ],
+      "officialPages": ["https://www.scotiabankchile.cl"],
       "preferredFileBase": "scotiabank"
     },
     "security": {

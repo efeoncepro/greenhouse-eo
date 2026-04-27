@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — Payment logo scraper hardening e inventario
+
+- Rama: `develop`; no se cambio de rama.
+- Cambio aplicado:
+  - `scripts/payment-logo-scraper.ts` queda idempotente: no reescribe SVGs ni mueve timestamps del manifest cuando contenido y metadata no cambian.
+  - Validacion endurecida para evitar falsos positivos de paginas oficiales: bloquea iconos de UI/social, exige senales distintivas de marca en basename/titulo/SVG y no hereda `officialPages` globales para variantes negativas o isotipos.
+  - Capa AI usa fallback escalonado con `gemini-3-flash-preview` en Vertex `global`, luego Gemini 2.5 Pro/Flash, respetando rechazo semantico y usando fallback solo ante errores tecnicos/model availability.
+  - Scotiabank queda saneado: solo `full-positive` rojo oficial aprobado; `full-negative`, `mark-positive` y `mark-negative` permanecen pendientes porque los candidatos anteriores eran iconos incorrectos y el wordmark actual no contiene el isotipo.
+  - Banco Falabella queda con cuatro variantes SVG: `full-positive`, `full-negative`, `mark-positive`, `mark-negative`; las tres derivadas salen vectorialmente desde el SVG completo verificado y el isotipo fue renderizado con Quick Look para validar el recorte.
+  - Santander conserva los assets oficiales provistos localmente: `Banco_Santander_Logotipo.svg` y `BSAC.svg`; se elimino el duplicado `santander-full-positive.svg` generado desde Wikimedia para no desplazar la fuente curada.
+  - Catalogo de instrumentos actualiza logos oficiales/compactos para Deel, Previred, Ripley, Scotiabank y marcas con isotipos disponibles.
+- Docs:
+  - `docs/operations/payment-logo-scraper.md`
+  - `docs/operations/payment-logo-inventory.md`
+  - `changelog.md`
+- Validacion ejecutada:
+  - `pnpm logos:payment:scrape -- --provider falabella --variant full-negative,mark-positive,mark-negative --min-score 80 --apply` confirma `unchanged` para los tres SVGs y `manifest: unchanged`.
+  - `pnpm logos:payment:scrape -- --provider scotiabank --variant full-positive,full-negative,mark-positive,mark-negative --min-score 80` confirma solo `full-positive` aprobado y el resto sin candidato.
+  - `npx tsc --noEmit --pretty false` OK
+  - `git diff --check` OK
+  - `pnpm lint` OK
+- Pendiente recomendado:
+  - Buscar fuentes oficiales confiables para isotipos/negativos pendientes de bancos chilenos (`Banco de Chile`, `BancoEstado`, `BCI`, `Itaú`, `BICE`, `Security`, `Scotiabank`) sin aplicar candidatos dudosos.
+
 ## Sesion 2026-04-27 — TASK-699 Banco "Resultado cambiario" Canonical FX P&L Pipeline
 
 - Rama: `develop`.

@@ -20,7 +20,9 @@
 - Soporta variantes `full-positive`, `full-negative`, `mark-positive` y `mark-negative`, con capa Gemini opcional (`--ai-review`, `--ai-required`) y timeout de seguridad.
 - La validacion AI intenta Gemini 3 Flash en Vertex `global` y baja por fallback cuando un modelo no esta disponible; los candidatos de paginas oficiales deben tener senal marcaria en el basename del SVG para evitar iconos de UI/social.
 - Inventario enriquecido con fuentes oficiales verificadas para Banco Ripley, Previred, Santander, Deel y Scotiabank; Scotiabank queda solo con full positivo rojo oficial hasta obtener/derivar variantes correctas.
+- Banco Falabella queda con las cuatro variantes (`full-positive`, `full-negative`, `mark-positive`, `mark-negative`) derivadas de forma vectorial desde el SVG completo verificado; el isotipo fue renderizado y validado visualmente antes de dejarlo en el manifest.
 - Nuevo manifest auditable `public/images/logos/payment/manifest.json` con `slug`, `brandName`, `category`, `country`, `sourceUrl`, `licenseSource`, `logo`, `compactLogo` y `lastVerifiedAt`.
+- Nuevo inventario operativo `docs/operations/payment-logo-inventory.md` para distinguir variantes listas vs pendientes por instrumento.
 - Caso real: Visa `mark-positive` fue descargado, validado por Gemini y conectado como `compactLogo`; Mastercard `mark-positive` quedo bloqueado al detectar falta de colores esperados de marca.
 - Documentacion operativa: `docs/operations/payment-logo-scraper.md`.
 - Validacion: `pnpm logos:payment:scrape -- --provider mastercard`, `pnpm logos:payment:scrape -- --all`, `npx tsc --noEmit --pretty false`, `pnpm lint`.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-27T12:26:49.245Z",
+  "updatedAt": "2026-04-27T13:26:01.282Z",
   "variantModel": [
     "full-positive",
     "full-negative",
@@ -13,11 +13,25 @@
       "brandName": "American Express",
       "category": "credit_card",
       "country": null,
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "sourceUrl": "https://simpleicons.org/?q=americanexpress",
+      "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
       "logo": "/images/logos/payment/amex.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": null
+      "compactLogo": "/images/logos/payment/amex-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T12:36:45.592Z",
+      "variants": {
+        "mark-positive": {
+          "sourceUrl": "https://simpleicons.org/?q=americanexpress",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/amex-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:45.182Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "https://simpleicons.org/?q=americanexpress",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/amex-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:45.592Z"
+        }
+      }
     },
     {
       "slug": "banco-chile",
@@ -68,22 +82,56 @@
       "brandName": "Deel",
       "category": "payment_platform",
       "country": null,
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
-      "logo": "/images/logos/payment/deel.svg",
+      "sourceUrl": "https://website-media.deel.com/logo_revamp_164ddaed0c.svg",
+      "licenseSource": "Official brand source; follow source brand guidelines",
+      "logo": "/images/logos/payment/deel-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": null
+      "lastVerifiedAt": "2026-04-27T13:01:58.429Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "https://website-media.deel.com/logo_revamp_164ddaed0c.svg",
+          "licenseSource": "Official brand source; follow source brand guidelines",
+          "logo": "/images/logos/payment/deel-full-positive.svg",
+          "lastVerifiedAt": "2026-04-27T13:01:58.429Z"
+        }
+      }
     },
     {
       "slug": "falabella",
       "brandName": "Banco Falabella",
       "category": "bank_account",
       "country": "CL",
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
-      "logo": "/images/logos/payment/falabella.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": null
+      "sourceUrl": "derived-from:/images/logos/payment/falabella-full-positive.svg",
+      "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+      "logo": "/images/logos/payment/falabella-full-positive.svg",
+      "compactLogo": "/images/logos/payment/falabella-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T13:26:01.282Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Banco_Falabella_Logo.svg",
+          "licenseSource": "Wikimedia Commons; verify file page license and trademark notes",
+          "logo": "/images/logos/payment/falabella-full-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:42:38.277Z"
+        },
+        "full-negative": {
+          "sourceUrl": "derived-from:/images/logos/payment/falabella-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/falabella-full-negative.svg",
+          "lastVerifiedAt": "2026-04-27T13:26:00.331Z"
+        },
+        "mark-positive": {
+          "sourceUrl": "derived-from:/images/logos/payment/falabella-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/falabella-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T13:26:00.847Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "derived-from:/images/logos/payment/falabella-full-positive.svg",
+          "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/falabella-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T13:26:01.282Z"
+        }
+      }
     },
     {
       "slug": "global66",
@@ -112,17 +160,23 @@
       "brandName": "Mastercard",
       "category": "credit_card",
       "country": null,
-      "sourceUrl": null,
-      "licenseSource": "User-provided asset; pending scraper verification for full SVG",
+      "sourceUrl": "https://simpleicons.org/?q=mastercard",
+      "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
       "logo": "/images/logos/payment/Mastercard-logo.svg.png",
       "compactLogo": "/images/logos/payment/Mastercard-Logo.wine.svg",
-      "lastVerifiedAt": null,
+      "lastVerifiedAt": "2026-04-27T12:36:43.238Z",
       "variants": {
         "mark-positive": {
           "sourceUrl": "user-provided:/public/images/logos/payment/Mastercard-Logo.wine.svg",
           "licenseSource": "User-provided asset; pending official source verification",
           "logo": "/images/logos/payment/Mastercard-Logo.wine.svg",
           "lastVerifiedAt": null
+        },
+        "mark-negative": {
+          "sourceUrl": "https://simpleicons.org/?q=mastercard",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/mastercard-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:43.238Z"
         }
       }
     },
@@ -131,44 +185,88 @@
       "brandName": "MercadoPago",
       "category": "fintech",
       "country": null,
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "sourceUrl": "https://simpleicons.org/?q=mercadopago",
+      "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
       "logo": "/images/logos/payment/mercadopago.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": null
+      "compactLogo": "/images/logos/payment/mercadopago-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T12:36:51.189Z",
+      "variants": {
+        "mark-positive": {
+          "sourceUrl": "https://simpleicons.org/?q=mercadopago",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/mercadopago-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:50.568Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "https://simpleicons.org/?q=mercadopago",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/mercadopago-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:51.189Z"
+        }
+      }
     },
     {
       "slug": "paypal",
       "brandName": "PayPal",
       "category": "fintech",
       "country": null,
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "sourceUrl": "https://simpleicons.org/?q=paypal",
+      "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
       "logo": "/images/logos/payment/paypal.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": null
+      "compactLogo": "/images/logos/payment/paypal-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T12:36:47.361Z",
+      "variants": {
+        "mark-positive": {
+          "sourceUrl": "https://simpleicons.org/?q=paypal",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/paypal-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:46.923Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "https://simpleicons.org/?q=paypal",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/paypal-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:47.361Z"
+        }
+      }
     },
     {
       "slug": "previred",
       "brandName": "Previred",
       "category": "payroll_processor",
       "country": "CL",
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
-      "logo": "/images/logos/payment/previred.svg",
+      "sourceUrl": "https://www.previred.com/wp-content/themes/previred--theme/img/logo2025.svg",
+      "licenseSource": "Official brand source; follow source brand guidelines",
+      "logo": "/images/logos/payment/previred-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": null
+      "lastVerifiedAt": "2026-04-27T12:45:12.390Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "https://www.previred.com/wp-content/themes/previred--theme/img/logo2025.svg",
+          "licenseSource": "Official brand source; follow source brand guidelines",
+          "logo": "/images/logos/payment/previred-full-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:45:12.390Z"
+        }
+      }
     },
     {
       "slug": "ripley",
       "brandName": "Banco Ripley",
       "category": "bank_account",
       "country": "CL",
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
-      "logo": "/images/logos/payment/ripley.svg",
+      "sourceUrl": "https://www.bancoripley.cl/media/new-logo-banco-ripley-IWJOE57X.svg",
+      "licenseSource": "Official brand source; follow source brand guidelines",
+      "logo": "/images/logos/payment/ripley-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": null
+      "lastVerifiedAt": "2026-04-27T12:47:44.024Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "https://www.bancoripley.cl/media/new-logo-banco-ripley-IWJOE57X.svg",
+          "licenseSource": "Official brand source; follow source brand guidelines",
+          "logo": "/images/logos/payment/ripley-full-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:47:44.024Z"
+        }
+      }
     },
     {
       "slug": "santander",
@@ -176,21 +274,43 @@
       "category": "bank_account",
       "country": "CL",
       "sourceUrl": "user-provided:/public/images/logos/payment/Banco_Santander_Logotipo.svg",
-      "licenseSource": "User-provided official Santander asset",
+      "licenseSource": "User-provided official brand asset; preserve original brand guidelines",
       "logo": "/images/logos/payment/Banco_Santander_Logotipo.svg",
       "compactLogo": "/images/logos/payment/BSAC.svg",
-      "lastVerifiedAt": "2026-04-27T00:00:00.000Z"
+      "lastVerifiedAt": "2026-04-27T13:01:47.473Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "user-provided:/public/images/logos/payment/Banco_Santander_Logotipo.svg",
+          "licenseSource": "User-provided official brand asset; preserve original brand guidelines",
+          "logo": "/images/logos/payment/Banco_Santander_Logotipo.svg",
+          "lastVerifiedAt": "2026-04-27T13:01:47.473Z"
+        },
+        "mark-positive": {
+          "sourceUrl": "user-provided:/public/images/logos/payment/BSAC.svg",
+          "licenseSource": "User-provided official brand asset; preserve original brand guidelines",
+          "logo": "/images/logos/payment/BSAC.svg",
+          "lastVerifiedAt": "2026-04-27T13:01:47.473Z"
+        }
+      }
     },
     {
       "slug": "scotiabank",
       "brandName": "Scotiabank",
       "category": "bank_account",
       "country": "CL",
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
-      "logo": "/images/logos/payment/scotiabank.svg",
+      "sourceUrl": "https://www.scotiabankchile.cl",
+      "licenseSource": "Official brand source; follow source brand guidelines",
+      "logo": "/images/logos/payment/scotiabank-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": null
+      "lastVerifiedAt": "2026-04-27T13:12:26.240Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "https://www.scotiabankchile.cl",
+          "licenseSource": "Official brand source; follow source brand guidelines",
+          "logo": "/images/logos/payment/scotiabank-full-positive.svg",
+          "lastVerifiedAt": "2026-04-27T13:11:08.285Z"
+        }
+      }
     },
     {
       "slug": "security",
@@ -208,11 +328,25 @@
       "brandName": "Stripe",
       "category": "payment_platform",
       "country": null,
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "sourceUrl": "https://simpleicons.org/?q=stripe",
+      "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
       "logo": "/images/logos/payment/stripe.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": null
+      "compactLogo": "/images/logos/payment/stripe-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T12:36:56.447Z",
+      "variants": {
+        "mark-positive": {
+          "sourceUrl": "https://simpleicons.org/?q=stripe",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/stripe-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:55.936Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "https://simpleicons.org/?q=stripe",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/stripe-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:56.447Z"
+        }
+      }
     },
     {
       "slug": "visa",
@@ -223,13 +357,19 @@
       "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
       "logo": "/images/logos/payment/visa.svg",
       "compactLogo": "/images/logos/payment/visa-mark-positive.svg",
-      "lastVerifiedAt": "2026-04-27T12:26:49.245Z",
+      "lastVerifiedAt": "2026-04-27T12:36:41.394Z",
       "variants": {
         "mark-positive": {
           "sourceUrl": "https://simpleicons.org/?q=visa",
           "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
           "logo": "/images/logos/payment/visa-mark-positive.svg",
           "lastVerifiedAt": "2026-04-27T12:26:49.245Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "https://simpleicons.org/?q=visa",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/visa-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:41.394Z"
         }
       }
     },
@@ -238,11 +378,25 @@
       "brandName": "Wise",
       "category": "fintech",
       "country": null,
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "sourceUrl": "https://simpleicons.org/?q=wise",
+      "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
       "logo": "/images/logos/payment/wise.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": null
+      "compactLogo": "/images/logos/payment/wise-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T12:36:49.276Z",
+      "variants": {
+        "mark-positive": {
+          "sourceUrl": "https://simpleicons.org/?q=wise",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/wise-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:48.662Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "https://simpleicons.org/?q=wise",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/wise-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T12:36:49.276Z"
+        }
+      }
     }
   ]
 }

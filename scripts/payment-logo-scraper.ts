@@ -19,6 +19,9 @@ type VariantHint = {
   officialSvgUrls?: string[]
   officialPages?: string[]
   expectedColors?: string[]
+  derivedFromVariant?: LogoVariant
+  deriveMode?: 'recolor-white' | 'crop-viewbox' | 'crop-viewbox-recolor-white'
+  cropViewBox?: string
 }
 
 type SourceHint = {
@@ -62,7 +65,7 @@ type AuditManifest = {
   entries: AuditManifestEntry[]
 }
 
-type CandidateSource = 'official' | 'simple-icons' | 'wikimedia' | 'direct-url'
+type CandidateSource = 'official' | 'simple-icons' | 'wikimedia' | 'direct-url' | 'derived'
 
 type LogoCandidate = {
   providerSlug: ProviderSlug
@@ -116,6 +119,11 @@ type RunReport = {
   }>
 }
 
+type ManifestUpdateResult = {
+  manifest: AuditManifest
+  changed: boolean
+}
+
 const CONFIG_PATH = path.join(process.cwd(), 'scripts/config/payment-logo-sources.json')
 const AUDIT_MANIFEST_PATH = path.join(process.cwd(), 'public/images/logos/payment/manifest.json')
 const DEFAULT_REPORT_PATH = path.join(process.cwd(), 'artifacts/payment-logo-scraper/report.json')
@@ -124,10 +132,15 @@ const CURRENT_YEAR = new Date().getFullYear()
 const HTTP_TIMEOUT_MS = 12000
 const AI_REVIEW_TIMEOUT_MS = 25000
 const MAX_SVG_BYTES = 250_000
+const DOWNLOAD_CONCURRENCY = 3
+const DEFAULT_AI_REVIEW_MODELS = ['gemini-3-flash-preview', 'gemini-2.5-pro', 'gemini-2.5-flash', 'google/gemini-2.5-flash@default'] as const
+const HTTP_RETRY_STATUSES = new Set([429, 500, 502, 503, 504])
 
 const TRUSTED_WIKIMEDIA_HOSTS = new Set(['commons.wikimedia.org', 'upload.wikimedia.org'])
 const TRUSTED_SIMPLE_ICON_HOSTS = new Set(['cdn.simpleicons.org', 'simpleicons.org', 'raw.githubusercontent.com'])
-const HISTORICAL_OR_VARIANT_PATTERN = /\b(196[0-9]|197[0-9]|198[0-9]|199[0-9]|200[0-9]|201[0-6]|old|former|historical|archive|debit|yuhu|maestro|cirrus|with[\s_-]+.*stripes)\b/i
+const HISTORICAL_OR_VARIANT_PATTERN = /\b(196[0-9]|197[0-9]|198[0-9]|199[0-9]|200[0-9]|201[0-6]|old|former|historical|archive|debit|yuhu|maestro|cirrus|wikipedia[\s_-]*logo|with[\s_-]+.*stripes)\b/i
+const NON_BRAND_ASSET_PATTERN = /\b(whatsapp|facebook|instagram|linkedin|twitter|x-twitter|youtube|tiktok|arrow|chevron|close|menu|hamburger|search|spinner|loader|icono?|ico-|i-|favicon|app-store|google-play|phone|mail|email|danger|warning|check|bullet|globe|flag)\b/i
+const BRAND_TOKEN_STOPWORDS = new Set(['banco', 'bank', 'banque', 'de', 'del', 'the', 'logo', 'logotipo'])
 
 const parseArgs = () => {
   const args = process.argv.slice(2)
@@ -235,7 +248,30 @@ const readAuditManifest = async (): Promise<AuditManifest> => {
   }
 }
 
+const readTextIfExists = async (filePath: string) => {
+  try {
+    return await readFile(filePath, 'utf8')
+  } catch {
+    return null
+  }
+}
+
+const writeTextIfChanged = async (filePath: string, content: string) => {
+  const current = await readTextIfExists(filePath)
+
+  if (current === content) return false
+
+  await writeFile(filePath, content, 'utf8')
+
+  return true
+}
+
+const stableJson = (value: unknown) => JSON.stringify(value, null, 2) + '\n'
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 const inferLicenseSource = (candidate: ValidationResult) => {
+  if (candidate.source === 'derived') return 'Derived from verified SVG source; preserve original brand guidelines'
   if (candidate.source === 'simple-icons') return 'Simple Icons; verify brand usage guidelines before client-facing release'
   if (candidate.source === 'wikimedia') return 'Wikimedia Commons; verify file page license and trademark notes'
   if (candidate.source === 'official') return 'Official brand source; follow source brand guidelines'
@@ -250,43 +286,110 @@ const primaryLogoFieldForVariant = (variant: LogoVariant) => {
   return null
 }
 
-const updateAuditManifest = (manifest: AuditManifest, providerSlug: ProviderSlug, selected: ValidationResult, relativeLogoPath: string): AuditManifest => {
+const updateAuditManifest = (manifest: AuditManifest, providerSlug: ProviderSlug, selected: ValidationResult, relativeLogoPath: string, verifiedAt: string): ManifestUpdateResult => {
   const provider = PROVIDER_CATALOG[providerSlug]
   const existing = manifest.entries.find(entry => entry.slug === providerSlug)
   const entries = manifest.entries.filter(entry => entry.slug !== providerSlug)
+  const nextSourceUrl = selected.pageUrl ?? selected.url
+  const nextLicenseSource = inferLicenseSource(selected)
+  const existingVariant = existing?.variants?.[selected.variant]
+  const primaryField = primaryLogoFieldForVariant(selected.variant)
+  const nextLogo = primaryField === 'logo' ? relativeLogoPath : (existing?.logo ?? provider.logo)
+  const nextCompactLogo = primaryField === 'compactLogo' ? relativeLogoPath : (existing?.compactLogo ?? provider.compactLogo ?? null)
+  const nextEntrySourceUrl = primaryField ? nextSourceUrl : (existing?.sourceUrl ?? null)
+  const nextEntryLicenseSource = primaryField ? nextLicenseSource : (existing?.licenseSource ?? null)
+
+  const variantChanged = !existingVariant
+    || existingVariant.sourceUrl !== nextSourceUrl
+    || existingVariant.licenseSource !== nextLicenseSource
+    || existingVariant.logo !== relativeLogoPath
+
+  const entryChanged = !existing
+    || existing.sourceUrl !== nextEntrySourceUrl
+    || existing.licenseSource !== nextEntryLicenseSource
+    || existing.logo !== nextLogo
+    || existing.compactLogo !== nextCompactLogo
+
+  const lastVerifiedAt = variantChanged ? verifiedAt : (existingVariant?.lastVerifiedAt ?? existing?.lastVerifiedAt ?? verifiedAt)
+  const entryLastVerifiedAt = (variantChanged || entryChanged) ? verifiedAt : (existing?.lastVerifiedAt ?? verifiedAt)
 
   const variants = {
     ...(existing?.variants ?? {}),
     [selected.variant]: {
-      sourceUrl: selected.pageUrl ?? selected.url,
-      licenseSource: inferLicenseSource(selected),
+      sourceUrl: nextSourceUrl,
+      licenseSource: nextLicenseSource,
       logo: relativeLogoPath,
-      lastVerifiedAt: new Date().toISOString()
+      lastVerifiedAt
     }
   }
-
-  const primaryField = primaryLogoFieldForVariant(selected.variant)
-  const logo = primaryField === 'logo' ? relativeLogoPath : (existing?.logo ?? provider.logo)
-  const compactLogo = primaryField === 'compactLogo' ? relativeLogoPath : (existing?.compactLogo ?? provider.compactLogo ?? null)
 
   entries.push({
     slug: providerSlug,
     brandName: provider.name,
     category: provider.category,
     country: provider.country ?? null,
-    sourceUrl: selected.pageUrl ?? selected.url,
-    licenseSource: inferLicenseSource(selected),
-    logo,
-    compactLogo,
-    lastVerifiedAt: new Date().toISOString(),
+    sourceUrl: nextEntrySourceUrl,
+    licenseSource: nextEntryLicenseSource,
+    logo: nextLogo,
+    compactLogo: nextCompactLogo,
+    lastVerifiedAt: entryLastVerifiedAt,
     variants
   })
 
-  return {
+  const updated = {
     version: manifest.version || 1,
-    updatedAt: new Date().toISOString(),
+    updatedAt: manifest.updatedAt,
     variantModel: [...LOGO_VARIANTS],
     entries: entries.sort((a, b) => a.slug.localeCompare(b.slug))
+  }
+
+  const normalizedCurrent = {
+    ...manifest,
+    variantModel: manifest.variantModel ?? [...LOGO_VARIANTS],
+    entries: [...manifest.entries].sort((a, b) => a.slug.localeCompare(b.slug))
+  }
+
+  const changed = stableJson(normalizedCurrent) !== stableJson(updated)
+
+  return {
+    manifest: changed ? { ...updated, updatedAt: verifiedAt } : normalizedCurrent,
+    changed
+  }
+}
+
+const applySelectedCandidate = async (auditManifest: AuditManifest, providerSlug: ProviderSlug, selected: ValidationResult): Promise<{
+  manifest: AuditManifest
+  fileChanged: boolean
+  manifestChanged: boolean
+  relativeLogoPath: string | null
+}> => {
+  if (!selected.content || !selected.destination) {
+    return {
+      manifest: auditManifest,
+      fileChanged: false,
+      manifestChanged: false,
+      relativeLogoPath: null
+    }
+  }
+
+  const content = selected.content.trim() + '\n'
+  const fileChanged = await writeTextIfChanged(selected.destination, content)
+  const relativeLogoPath = `/${path.relative(path.join(process.cwd(), 'public'), selected.destination).replaceAll(path.sep, '/')}`
+  const currentFileContent = await readTextIfExists(selected.destination)
+  const currentFileHash = currentFileContent ? createHash('sha256').update(currentFileContent.trim()).digest('hex') : null
+  const candidateHash = createHash('sha256').update(selected.content.trim()).digest('hex')
+
+  const verifiedAt = fileChanged || currentFileHash !== candidateHash
+    ? new Date().toISOString()
+    : (auditManifest.entries.find(entry => entry.slug === providerSlug)?.variants?.[selected.variant]?.lastVerifiedAt ?? new Date().toISOString())
+
+  const manifestUpdate = updateAuditManifest(auditManifest, providerSlug, selected, relativeLogoPath, verifiedAt)
+
+  return {
+    manifest: manifestUpdate.manifest,
+    fileChanged,
+    manifestChanged: manifestUpdate.changed,
+    relativeLogoPath
   }
 }
 
@@ -309,6 +412,55 @@ const fetchWithTimeout = async (url: string, init: RequestInit = {}) => {
   }
 }
 
+const retryDelayMs = (response: Response | null, attempt: number) => {
+  const retryAfter = response?.headers.get('retry-after')
+  const retryAfterSeconds = retryAfter ? Number(retryAfter) : Number.NaN
+
+  if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) return Math.min(retryAfterSeconds * 1000, 10000)
+
+  return 750 * (attempt + 1)
+}
+
+const fetchWithRetry = async (url: string, init: RequestInit = {}, attempts = 3) => {
+  let lastError: unknown
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(url, init)
+
+      if (!HTTP_RETRY_STATUSES.has(response.status) || attempt === attempts - 1) return response
+
+      await sleep(retryDelayMs(response, attempt))
+    } catch (error) {
+      lastError = error
+
+      if (attempt === attempts - 1) throw error
+
+      await sleep(retryDelayMs(null, attempt))
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('HTTP retry failed.')
+}
+
+const mapWithConcurrency = async <Input, Output>(items: Input[], concurrency: number, mapper: (item: Input) => Promise<Output>) => {
+  const results: Output[] = []
+  let nextIndex = 0
+
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const currentIndex = nextIndex
+
+      nextIndex += 1
+      results[currentIndex] = await mapper(items[currentIndex])
+    }
+  })
+
+  await Promise.all(workers)
+
+  return results
+}
+
 const normalizeUrl = (url: string) => {
   try {
     const parsed = new URL(url)
@@ -325,11 +477,28 @@ const sameBrandSignal = (candidate: LogoCandidate) => {
   const haystack = `${candidate.title ?? ''} ${candidate.url} ${candidate.pageUrl ?? ''}`.toLowerCase()
   const provider = PROVIDER_CATALOG[candidate.providerSlug]
 
-  const words = [candidate.providerSlug, provider.name]
+  const words = [candidate.providerSlug, provider.name, candidate.providerSlug.replaceAll('-', '')]
     .flatMap(value => value.toLowerCase().split(/[^a-z0-9áéíóúñ]+/i))
-    .filter(word => word.length >= 3)
+    .filter(word => word.length >= 3 && !BRAND_TOKEN_STOPWORDS.has(word))
 
   return words.some(word => haystack.includes(word))
+}
+
+const brandTokensForProvider = (providerSlug: ProviderSlug) => {
+  const provider = PROVIDER_CATALOG[providerSlug]
+
+  return [providerSlug, provider.name, providerSlug.replaceAll('-', '')]
+    .flatMap(value => value.toLowerCase().split(/[^a-z0-9áéíóúñ]+/i))
+    .filter(word => word.length >= 3 && !BRAND_TOKEN_STOPWORDS.has(word))
+}
+
+const officialPageAssetBrandSignal = (providerSlug: ProviderSlug, assetUrl: string) => {
+  const parsed = new URL(assetUrl)
+  const basename = path.basename(parsed.pathname)
+  const haystack = decodeURIComponent(`${basename} ${parsed.search}`).toLowerCase()
+  const tokens = brandTokensForProvider(providerSlug)
+
+  return /(logo|logotipo|wordmark|brand|marca)/i.test(haystack) && tokens.some(token => haystack.includes(token))
 }
 
 const variantSearchSuffix = (variant: LogoVariant) => {
@@ -341,23 +510,32 @@ const variantSearchSuffix = (variant: LogoVariant) => {
 }
 
 const variantIntentSignals = (candidate: LogoCandidate) => {
-  const haystack = `${candidate.title ?? ''} ${candidate.url} ${candidate.pageUrl ?? ''} ${candidate.discoveredBy}`.toLowerCase()
+  const haystack = `${candidate.title ?? ''} ${candidate.url} ${candidate.pageUrl ?? ''}`.toLowerCase()
   const warnings: string[] = []
   let score = 0
 
   if (candidate.variant.includes('negative')) {
     if (/(negative|white|reversed|reverse|blanco|dark|light)/i.test(haystack)) score += 8
-    else warnings.push('No hay senal clara de version negativa/blanca.')
+    else {
+      score -= 35
+      warnings.push('No hay senal clara de version negativa/blanca.')
+    }
   }
 
   if (candidate.variant.includes('mark')) {
     if (/(mark|icon|symbol|isotype|isotipo|brandmark|logo mark)/i.test(haystack) || candidate.source === 'simple-icons') score += 8
-    else warnings.push('No hay senal clara de isotipo/brand mark.')
+    else {
+      score -= 25
+      warnings.push('No hay senal clara de isotipo/brand mark.')
+    }
   }
 
   if (candidate.variant.includes('full')) {
     if (/(logo|wordmark|logotipo|lockup|full)/i.test(haystack)) score += 6
-    else warnings.push('No hay senal clara de logo completo/wordmark.')
+    else {
+      score -= 10
+      warnings.push('No hay senal clara de logo completo/wordmark.')
+    }
   }
 
   return { score, warnings }
@@ -421,8 +599,12 @@ const scoreCandidate = (candidate: LogoCandidate, content: string, response: Res
 
   if (TRUSTED_WIKIMEDIA_HOSTS.has(url.hostname) || TRUSTED_SIMPLE_ICON_HOSTS.has(url.hostname)) score += 12
   if (candidate.source === 'official') score += 15
+
   if (sameBrandSignal(candidate)) score += 15
-  else warnings.push('La URL/titulo no contiene una senal fuerte del nombre de marca.')
+  else {
+    score -= 45
+    reasons.push('La URL/titulo no contiene una senal fuerte del nombre distintivo de marca.')
+  }
 
   score += variantSignals.score
   warnings.push(...variantSignals.warnings)
@@ -433,6 +615,11 @@ const scoreCandidate = (candidate: LogoCandidate, content: string, response: Res
   if (HISTORICAL_OR_VARIANT_PATTERN.test(`${candidate.title ?? ''} ${candidate.url} ${candidate.pageUrl ?? ''}`)) {
     score -= 35
     reasons.push('El candidato parece variante historica, co-brand o red derivada; no debe tratarse como logo actual de marca.')
+  }
+
+  if (NON_BRAND_ASSET_PATTERN.test(`${candidate.title ?? ''} ${candidate.url} ${candidate.pageUrl ?? ''}`)) {
+    score -= 65
+    reasons.push('El candidato parece icono de UI/social o asset no marcario; no debe usarse como logo de instrumento de pago.')
   }
 
   if (content.includes('<metadata') || content.includes('<title')) score += 4
@@ -466,11 +653,29 @@ const parseAiJson = (text: string): Record<string, unknown> | null => {
   }
 }
 
-const getAiLogoReviewRuntime = () => ({
-  project: process.env.GCP_PROJECT?.trim() || process.env.GOOGLE_CLOUD_PROJECT?.trim() || 'efeonce-group',
-  location: process.env.GOOGLE_CLOUD_LOCATION?.trim() || 'us-central1',
-  model: process.env.PAYMENT_LOGO_AI_MODEL?.trim() || process.env.GREENHOUSE_AGENT_MODEL?.trim() || 'google/gemini-2.5-flash@default'
-})
+const splitModelList = (value: string | undefined) => value
+  ?.split(',')
+  .map(model => model.trim())
+  .filter(Boolean) ?? []
+
+const locationForModel = (model: string, fallbackLocation: string) => (
+  model.startsWith('gemini-3-') ? 'global' : fallbackLocation
+)
+
+const getAiLogoReviewRuntime = () => {
+  const configuredModels = [
+    ...splitModelList(process.env.PAYMENT_LOGO_AI_MODEL),
+    ...splitModelList(process.env.GREENHOUSE_AGENT_MODEL)
+  ]
+
+  return {
+    project: process.env.GCP_PROJECT?.trim() || process.env.GOOGLE_CLOUD_PROJECT?.trim() || 'efeonce-group',
+    location: process.env.GOOGLE_CLOUD_LOCATION?.trim() || 'us-central1',
+    models: [...new Set([...configuredModels, ...DEFAULT_AI_REVIEW_MODELS])]
+  }
+}
+
+const isRetryableAiReviewError = (review: AiLogoReview) => review.status === 'error'
 
 const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number, label: string) => {
   let timeout: NodeJS.Timeout | undefined
@@ -487,28 +692,29 @@ const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number, label: st
   }
 }
 
-const runAiLogoReview = async (candidate: ValidationResult, timeoutMs: number): Promise<AiLogoReview> => {
+const runAiLogoReviewWithModel = async (candidate: ValidationResult, timeoutMs: number, model: string): Promise<AiLogoReview> => {
   if (!candidate.content) {
     return { status: 'skipped', rationale: 'No SVG content available for AI review.' }
   }
 
   const runtime = getAiLogoReviewRuntime()
+  const location = locationForModel(model, runtime.location)
 
   try {
     process.env.GOOGLE_GENAI_USE_VERTEXAI = 'true'
     process.env.GOOGLE_CLOUD_PROJECT ||= runtime.project
-    process.env.GOOGLE_CLOUD_LOCATION ||= runtime.location
+    process.env.GOOGLE_CLOUD_LOCATION = location
 
     const client = new GoogleGenAI({
       vertexai: true,
       project: runtime.project,
-      location: runtime.location,
+      location,
       apiVersion: 'v1'
     })
 
     const response = await withTimeout(
       client.models.generateContent({
-        model: runtime.model,
+        model,
         contents: [
           {
             role: 'user',
@@ -538,8 +744,7 @@ const runAiLogoReview = async (candidate: ValidationResult, timeoutMs: number): 
         config: {
           temperature: 0,
           responseMimeType: 'application/json',
-          maxOutputTokens: 900,
-          thinkingConfig: { thinkingBudget: 0 }
+          maxOutputTokens: 900
         }
       }),
       timeoutMs,
@@ -552,7 +757,7 @@ const runAiLogoReview = async (candidate: ValidationResult, timeoutMs: number): 
     if (!parsed) {
       return {
         status: 'error',
-        model: runtime.model,
+        model: `${model}@${location}`,
         rationale: 'Gemini returned an empty or non-JSON response.'
       }
     }
@@ -563,7 +768,7 @@ const runAiLogoReview = async (candidate: ValidationResult, timeoutMs: number): 
 
     return {
       status,
-      model: runtime.model,
+      model: `${model}@${location}`,
       confidence: typeof parsed.confidence === 'number' ? parsed.confidence : undefined,
       qualityScore: typeof parsed.qualityScore === 'number' ? parsed.qualityScore : undefined,
       isCorrectBrand: typeof parsed.isCorrectBrand === 'boolean' ? parsed.isCorrectBrand : undefined,
@@ -575,9 +780,28 @@ const runAiLogoReview = async (candidate: ValidationResult, timeoutMs: number): 
   } catch (error) {
     return {
       status: 'error',
-      model: runtime.model,
+      model: `${model}@${location}`,
       rationale: error instanceof Error ? error.message : 'Unknown Gemini review error.'
     }
+  }
+}
+
+const runAiLogoReview = async (candidate: ValidationResult, timeoutMs: number): Promise<AiLogoReview> => {
+  const runtime = getAiLogoReviewRuntime()
+  const errors: AiLogoReview[] = []
+
+  for (const model of runtime.models) {
+    const review = await runAiLogoReviewWithModel(candidate, timeoutMs, model)
+
+    if (!isRetryableAiReviewError(review)) return review
+
+    errors.push(review)
+  }
+
+  return {
+    status: 'error',
+    model: errors.map(error => error.model).filter(Boolean).join(', '),
+    rationale: errors.map(error => `${error.model}: ${error.rationale}`).join(' | ') || 'No AI review model was available.'
   }
 }
 
@@ -640,9 +864,12 @@ const hintForVariant = (hint: SourceHint | undefined, variant: LogoVariant): Var
   searchTerms: hint?.variants?.[variant]?.searchTerms ?? hint?.searchTerms,
   simpleIconsSlug: hint?.variants?.[variant]?.simpleIconsSlug ?? hint?.simpleIconsSlug,
   preferredFileBase: hint?.variants?.[variant]?.preferredFileBase ?? (hint?.preferredFileBase ? `${hint.preferredFileBase}-${variant}` : undefined),
-  officialSvgUrls: hint?.variants?.[variant]?.officialSvgUrls ?? hint?.officialSvgUrls,
-  officialPages: hint?.variants?.[variant]?.officialPages ?? hint?.officialPages,
-  expectedColors: hint?.variants?.[variant]?.expectedColors ?? hint?.expectedColors
+  officialSvgUrls: hint?.variants?.[variant]?.officialSvgUrls ?? (variant === 'full-positive' ? hint?.officialSvgUrls : undefined),
+  officialPages: hint?.variants?.[variant]?.officialPages ?? (variant === 'full-positive' ? hint?.officialPages : undefined),
+  expectedColors: hint?.variants?.[variant]?.expectedColors ?? (variant.includes('negative') ? undefined : hint?.expectedColors),
+  derivedFromVariant: hint?.variants?.[variant]?.derivedFromVariant,
+  deriveMode: hint?.variants?.[variant]?.deriveMode,
+  cropViewBox: hint?.variants?.[variant]?.cropViewBox
 })
 
 const validateCandidate = async (candidate: LogoCandidate, outputDir: string, hint?: VariantHint): Promise<ValidationResult> => {
@@ -650,7 +877,7 @@ const validateCandidate = async (candidate: LogoCandidate, outputDir: string, hi
   const destination = path.join(outputDir, `${destinationBase}.svg`)
 
   try {
-    const response = await fetchWithTimeout(candidate.url)
+    const response = await fetchWithRetry(candidate.url)
 
     if (!response.ok) {
       return {
@@ -715,32 +942,42 @@ const validateCandidate = async (candidate: LogoCandidate, outputDir: string, hi
 
 const discoverSimpleIcons = (providerSlug: ProviderSlug, variant: LogoVariant, hint?: VariantHint): LogoCandidate[] => {
   if (!hint?.simpleIconsSlug) return []
+  if (variant.includes('full')) return []
 
   const provider = PROVIDER_CATALOG[providerSlug]
   const slug = hint.simpleIconsSlug
 
-  return [
+  const cdnUrl = variant.includes('negative')
+    ? `https://cdn.simpleicons.org/${encodeURIComponent(slug)}/white`
+    : `https://cdn.simpleicons.org/${encodeURIComponent(slug)}`
+
+  const candidates: LogoCandidate[] = [
     {
       providerSlug,
       providerName: provider.name,
       variant,
       source: 'simple-icons',
-      url: `https://cdn.simpleicons.org/${encodeURIComponent(slug)}`,
+      url: cdnUrl,
       pageUrl: `https://simpleicons.org/?q=${encodeURIComponent(slug)}`,
-      title: `${provider.name} ${variant} logo from Simple Icons`,
-      discoveredBy: 'simple-icons-cdn'
-    },
-    {
-      providerSlug,
-      providerName: provider.name,
-      variant,
-      source: 'simple-icons',
-      url: `https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/${encodeURIComponent(slug)}.svg`,
-      pageUrl: `https://github.com/simple-icons/simple-icons/blob/develop/icons/${encodeURIComponent(slug)}.svg`,
-      title: `${provider.name} ${variant} logo from Simple Icons repository`,
-      discoveredBy: 'simple-icons-github'
+      title: `${provider.name} ${variant} mark from Simple Icons`,
+      discoveredBy: variant.includes('negative') ? 'simple-icons-cdn:white' : 'simple-icons-cdn'
     }
   ]
+
+  if (variant.includes('negative')) return candidates
+
+  candidates.push({
+    providerSlug,
+    providerName: provider.name,
+    variant,
+    source: 'simple-icons',
+    url: `https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/${encodeURIComponent(slug)}.svg`,
+    pageUrl: `https://github.com/simple-icons/simple-icons/blob/develop/icons/${encodeURIComponent(slug)}.svg`,
+    title: `${provider.name} ${variant} mark from Simple Icons repository`,
+    discoveredBy: 'simple-icons-github'
+  })
+
+  return candidates
 }
 
 const discoverOfficialUrls = (providerSlug: ProviderSlug, variant: LogoVariant, hint?: VariantHint): LogoCandidate[] => {
@@ -758,6 +995,60 @@ const discoverOfficialUrls = (providerSlug: ProviderSlug, variant: LogoVariant, 
   }))
 }
 
+const extractSvgUrlsFromHtml = (html: string, pageUrl: string) => {
+  const matches = [
+    ...html.matchAll(/https?:\/\/[^"'<>\s)]+\.svg(?:\/[^"'<>\s)]*)?/gi),
+    ...html.matchAll(/["']([^"']+\.svg(?:\/[^"']*)?)["']/gi)
+  ]
+
+  const urls = matches
+    .map(match => match[1] ?? match[0])
+    .map(value => value.replace(/^["']|["']$/g, '').replaceAll('&amp;', '&'))
+    .map(value => {
+      try {
+        return new URL(value, pageUrl).toString()
+      } catch {
+        return null
+      }
+    })
+    .filter((value): value is string => Boolean(value))
+
+  return [...new Set(urls)]
+}
+
+const discoverOfficialPages = async (providerSlug: ProviderSlug, variant: LogoVariant, hint?: VariantHint): Promise<LogoCandidate[]> => {
+  if (!hint?.officialPages?.length) return []
+
+  const provider = PROVIDER_CATALOG[providerSlug]
+
+  const pages = await Promise.all(hint.officialPages.map(async pageUrl => {
+    try {
+      const response = await fetchWithRetry(pageUrl, { headers: { accept: 'text/html,application/xhtml+xml' } }, 2)
+
+      if (!response.ok) return []
+
+      const html = await response.text()
+
+      return extractSvgUrlsFromHtml(html, pageUrl)
+        .filter(url => officialPageAssetBrandSignal(providerSlug, url))
+        .map(url => ({
+          providerSlug,
+          providerName: provider.name,
+          variant,
+          source: 'official' as const,
+          url,
+          pageUrl,
+          title: path.basename(new URL(url).pathname),
+          discoveredBy: 'official-page-html'
+        }))
+    } catch {
+      return []
+    }
+  }))
+
+  return pages.flat()
+}
+
 const queryWikimedia = async (providerSlug: ProviderSlug, variant: LogoVariant, term: string): Promise<LogoCandidate[]> => {
   const provider = PROVIDER_CATALOG[providerSlug]
   const searchUrl = new URL('https://commons.wikimedia.org/w/api.php')
@@ -767,7 +1058,7 @@ const queryWikimedia = async (providerSlug: ProviderSlug, variant: LogoVariant, 
   searchUrl.searchParams.set('generator', 'search')
   searchUrl.searchParams.set('gsrnamespace', '6')
   searchUrl.searchParams.set('gsrlimit', '8')
-  searchUrl.searchParams.set('gsrsearch', `${term} filetype:svg`)
+  searchUrl.searchParams.set('gsrsearch', term)
   searchUrl.searchParams.set('prop', 'imageinfo')
   searchUrl.searchParams.set('iiprop', 'url|mime|extmetadata')
   searchUrl.searchParams.set('origin', '*')
@@ -808,7 +1099,14 @@ const queryWikimedia = async (providerSlug: ProviderSlug, variant: LogoVariant, 
 const discoverWikimedia = async (providerSlug: ProviderSlug, variant: LogoVariant, hint?: VariantHint): Promise<LogoCandidate[]> => {
   const provider = PROVIDER_CATALOG[providerSlug]
   const baseTerms = hint?.searchTerms?.length ? hint.searchTerms : [`${provider.name} ${variantSearchSuffix(variant)}`]
-  const terms = baseTerms.map(term => `${term} ${variantSearchSuffix(variant)}`)
+
+  const terms = [
+    ...baseTerms,
+    ...baseTerms.map(term => `${term} ${variantSearchSuffix(variant)}`),
+    `${provider.name} logo`,
+    `${provider.name} logotipo`
+  ]
+
   const results = await Promise.all(terms.map(term => queryWikimedia(providerSlug, variant, term)))
 
   return results.flat()
@@ -850,6 +1148,99 @@ const stripContent = (result: ValidationResult): Omit<ValidationResult, 'content
   delete rest.content
 
   return rest as Omit<ValidationResult, 'content'>
+}
+
+const publicPathToFilePath = (logoPath: string | null | undefined) => {
+  if (!logoPath?.startsWith('/')) return null
+
+  return path.join(process.cwd(), 'public', logoPath.replace(/^\//, ''))
+}
+
+const logoPathForVariant = (auditManifest: AuditManifest, providerSlug: ProviderSlug, variant: LogoVariant) => {
+  const entry = auditManifest.entries.find(item => item.slug === providerSlug)
+
+  return entry?.variants?.[variant]?.logo ?? (variant === 'full-positive' ? entry?.logo : null) ?? PROVIDER_CATALOG[providerSlug]?.logo ?? null
+}
+
+const recolorSvgToWhite = (svg: string) => svg
+  .replace(/fill:\s*#[0-9a-f]{3,8}/gi, 'fill:#fff')
+  .replace(/fill="(?!none\b)[^"]+"/gi, 'fill="#fff"')
+  .replace(/fill='(?!none\b)[^']+'/gi, "fill='#fff'")
+
+const cropSvgViewBox = (svg: string, cropViewBox: string) => svg.replace(/<svg\b([^>]*?)>/i, match => {
+  const withoutSize = match
+    .replace(/\swidth="[^"]*"/i, '')
+    .replace(/\sheight="[^"]*"/i, '')
+    .replace(/\sviewBox="[^"]*"/i, '')
+    .replace(/\sviewbox="[^"]*"/i, '')
+
+  return withoutSize.replace(/>$/, ` viewBox="${cropViewBox}">`)
+})
+
+const deriveSvgContent = (svg: string, hint: VariantHint) => {
+  let content = svg
+
+  if (hint.cropViewBox && hint.deriveMode?.includes('crop-viewbox')) {
+    content = cropSvgViewBox(content, hint.cropViewBox)
+  }
+
+  if (hint.deriveMode?.includes('recolor-white')) {
+    content = recolorSvgToWhite(content)
+  }
+
+  return content
+}
+
+const deriveVariantCandidate = async (
+  providerSlug: ProviderSlug,
+  variant: LogoVariant,
+  outputDir: string,
+  hint: VariantHint | undefined,
+  auditManifest: AuditManifest
+): Promise<ValidationResult[]> => {
+  if (!hint?.deriveMode) return []
+
+  const sourceVariant = hint.derivedFromVariant ?? 'full-positive'
+  const sourceLogoPath = logoPathForVariant(auditManifest, providerSlug, sourceVariant)
+  const sourceFilePath = publicPathToFilePath(sourceLogoPath)
+
+  if (!sourceFilePath) return []
+
+  const sourceSvg = await readTextIfExists(sourceFilePath)
+
+  if (!sourceSvg) return []
+
+  const content = deriveSvgContent(sourceSvg, hint)
+  const provider = PROVIDER_CATALOG[providerSlug]
+  const destinationBase = hint.preferredFileBase ?? `${providerSlug}-${variant}`
+  const destination = path.join(outputDir, `${destinationBase}.svg`)
+  const svgValidation = validateSvg(content)
+  const ok = svgValidation.reasons.length === 0
+  const sha256 = createHash('sha256').update(content).digest('hex')
+
+  return [{
+    providerSlug,
+    providerName: provider.name,
+    variant,
+    source: 'derived',
+    url: `derived-from:${sourceLogoPath}`,
+    pageUrl: `derived-from:${sourceLogoPath}`,
+    title: `${provider.name} ${variant} derived from ${sourceVariant}`,
+    discoveredBy: `derived:${sourceVariant}:${hint.deriveMode}`,
+    ok,
+    score: ok ? 100 : 0,
+    reviewRequired: !ok,
+    reasons: svgValidation.reasons,
+    warnings: [
+      ...svgValidation.warnings,
+      `Variante derivada desde ${sourceVariant}; requiere respetar brand guidelines.`
+    ],
+    sha256,
+    bytes: Buffer.byteLength(content, 'utf8'),
+    destination,
+    freshnessSignals: ['derived-from-verified-source'],
+    content
+  }]
 }
 
 const main = async () => {
@@ -894,11 +1285,20 @@ const main = async () => {
 
       const candidates = dedupeCandidates([
         ...discoverOfficialUrls(providerSlug, variant, hint),
+        ...(await discoverOfficialPages(providerSlug, variant, hint)),
         ...discoverSimpleIcons(providerSlug, variant, hint),
         ...(await discoverWikimedia(providerSlug, variant, hint))
       ])
 
-      const deterministic = await Promise.all(candidates.map(candidate => validateCandidate(candidate, outputDir, hint)))
+      const discovered = await mapWithConcurrency(
+        candidates,
+        DOWNLOAD_CONCURRENCY,
+        candidate => validateCandidate(candidate, outputDir, hint)
+      )
+
+      const derived = await deriveVariantCandidate(providerSlug, variant, outputDir, hint, auditManifest)
+      const deterministic = [...derived, ...discovered]
+
       const validated = await reviewTopCandidatesWithAi(deterministic, args.aiReview, args.aiRequired, args.minScore, args.aiTimeoutMs)
 
       const selected = validated
@@ -920,14 +1320,17 @@ const main = async () => {
         if (selected.reviewRequired && !args.allowReviewRequired) {
           console.log(`  skip apply: requiere revision humana (${selected.reasons.join(' ')})`)
         } else if (selected.content && selected.destination) {
-          await writeFile(selected.destination, selected.content.trim() + '\n', 'utf8')
-          auditManifest = updateAuditManifest(
-            auditManifest,
-            providerSlug,
-            selected,
-            `/${path.relative(path.join(process.cwd(), 'public'), selected.destination).replaceAll(path.sep, '/')}`
-          )
-          console.log(`  saved: ${path.relative(process.cwd(), selected.destination)}`)
+          const applied = await applySelectedCandidate(auditManifest, providerSlug, selected)
+
+          auditManifest = applied.manifest
+
+          if (applied.fileChanged) {
+            console.log(`  saved: ${path.relative(process.cwd(), selected.destination)}`)
+          } else if (applied.manifestChanged) {
+            console.log(`  manifest updated: ${applied.relativeLogoPath}`)
+          } else {
+            console.log(`  unchanged: ${path.relative(process.cwd(), selected.destination)}`)
+          }
         }
       }
     }
@@ -936,14 +1339,20 @@ const main = async () => {
   }
 
   if (args.apply) {
-    await writeFile(AUDIT_MANIFEST_PATH, JSON.stringify(auditManifest, null, 2) + '\n', 'utf8')
+    const manifestChanged = await writeTextIfChanged(AUDIT_MANIFEST_PATH, stableJson(auditManifest))
+
+    if (!manifestChanged) console.log('manifest: unchanged')
   }
 
-  await writeFile(args.reportPath, JSON.stringify(report, null, 2) + '\n', 'utf8')
+  await writeFile(args.reportPath, stableJson(report), 'utf8')
   console.log(`report: ${path.relative(process.cwd(), args.reportPath)}`)
 }
 
-main().catch(error => {
-  console.error(error instanceof Error ? error.message : error)
-  process.exitCode = 1
-})
+main()
+  .then(() => {
+    process.exit(0)
+  })
+  .catch(error => {
+    console.error(error instanceof Error ? error.message : error)
+    process.exit(1)
+  })
