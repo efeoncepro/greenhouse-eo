@@ -43,6 +43,7 @@ export type CaptureDomain =
   | 'commercial'
   | 'agency'
   | 'observability'
+  | 'home'
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */

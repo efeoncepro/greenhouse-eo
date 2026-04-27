@@ -1,0 +1,80 @@
+import 'server-only'
+
+import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
+
+import type { HomeHeroAiData } from '../contract'
+import type { HomeLoaderContext } from '../registry'
+
+const RESOLVED_MODEL_LABEL = 'Gemini 2.5 Flash'
+const RESOLVED_MODEL_KEY = 'gemini-2.5-flash'
+
+const SUGGESTIONS_BY_AUDIENCE: Record<string, HomeHeroAiData['suggestions']> = {
+  admin: [
+    { prompt: '¿Qué módulos están degradados ahora?', shortLabel: 'Estado de la plataforma', intent: 'reliability.overview' },
+    { prompt: 'Resumen de aprobaciones pendientes', shortLabel: 'Aprobaciones pendientes', intent: 'inbox.approvals' },
+    { prompt: 'Reliability del último día', shortLabel: 'Reliability 24h', intent: 'reliability.window' },
+    { prompt: '¿Hay incidentes activos?', shortLabel: 'Incidentes activos', intent: 'reliability.incidents' }
+  ],
+  internal: [
+    { prompt: 'Estado de mis equipos esta semana', shortLabel: 'Equipo esta semana', intent: 'agency.weekly' },
+    { prompt: 'OTD del equipo esta semana', shortLabel: 'OTD del equipo', intent: 'delivery.otd' },
+    { prompt: '¿Quién tiene capacidad disponible?', shortLabel: 'Capacidad disponible', intent: 'capacity.available' },
+    { prompt: 'Mis tareas pendientes', shortLabel: 'Mis tareas', intent: 'inbox.mine' }
+  ],
+  hr: [
+    { prompt: 'Estado de nómina de este mes', shortLabel: 'Estado de nómina', intent: 'payroll.status' },
+    { prompt: 'Permisos por aprobar', shortLabel: 'Permisos pendientes', intent: 'leaves.pending' },
+    { prompt: 'Asistencias y atrasos hoy', shortLabel: 'Asistencia hoy', intent: 'attendance.today' },
+    { prompt: 'Cumpleaños esta semana', shortLabel: 'Cumpleaños', intent: 'people.birthdays' }
+  ],
+  finance: [
+    { prompt: '¿Hay facturas pendientes de cobro?', shortLabel: 'Facturas por cobrar', intent: 'finance.ar' },
+    { prompt: '¿Cuál es el margen de este mes?', shortLabel: 'Margen del mes', intent: 'finance.margin' },
+    { prompt: 'Drift de ledger detectado', shortLabel: 'Drift de ledger', intent: 'finance.drift' },
+    { prompt: 'Estado del cierre del período', shortLabel: 'Cierre del período', intent: 'finance.closing' }
+  ],
+  collaborator: [
+    { prompt: 'Mis tareas pendientes', shortLabel: 'Mis tareas', intent: 'inbox.mine' },
+    { prompt: '¿Cuántas horas tengo esta semana?', shortLabel: 'Mis horas', intent: 'capacity.mine' },
+    { prompt: 'Estado de mi nómina', shortLabel: 'Mi nómina', intent: 'payroll.mine' },
+    { prompt: 'Mis permisos disponibles', shortLabel: 'Mis permisos', intent: 'leaves.mine' }
+  ],
+  client: [
+    { prompt: 'Estado de mis proyectos', shortLabel: 'Mis proyectos', intent: 'delivery.projects' },
+    { prompt: 'Resumen de entregas esta semana', shortLabel: 'Entregas semanales', intent: 'delivery.weekly' },
+    { prompt: '¿Qué hay pendiente de mi parte?', shortLabel: 'Pendientes míos', intent: 'inbox.client' },
+    { prompt: 'Resumen de correos enviados', shortLabel: 'Correos enviados', intent: 'reports.sent' }
+  ]
+}
+
+const pickGreetingPool = (now: Date) => {
+  const hour = now.getHours()
+
+  if (hour >= 5 && hour < 12) return HOME_GREETINGS.morning
+  if (hour >= 12 && hour < 19) return HOME_GREETINGS.afternoon
+  if (hour >= 19 || hour < 5) return HOME_GREETINGS.evening
+
+  return HOME_GREETINGS.default
+}
+
+export const loadHomeHeroAi = async (
+  ctx: HomeLoaderContext,
+  options: { firstName: string }
+): Promise<HomeHeroAiData> => {
+  const now = new Date(ctx.now)
+  const pool = pickGreetingPool(now)
+  const baseGreeting = pool[Math.floor(Math.random() * pool.length)]
+  const greeting = baseGreeting.replace('{name}', options.firstName)
+
+  const suggestions = SUGGESTIONS_BY_AUDIENCE[ctx.audienceKey] ?? SUGGESTIONS_BY_AUDIENCE.internal
+
+  return {
+    greeting,
+    subtitle: HOME_SUBTITLE,
+    modelLabel: RESOLVED_MODEL_LABEL,
+    modelKey: RESOLVED_MODEL_KEY,
+    suggestions,
+    lastQueryAtMs: null,
+    disclaimer: 'Nexa usa IA generativa. Verifica la información importante.'
+  }
+}

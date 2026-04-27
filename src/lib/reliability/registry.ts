@@ -209,6 +209,33 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['subsystem', 'incident'],
     incidentDomainTag: 'integrations.teams'
+  },
+  {
+    moduleKey: 'home',
+    label: 'Smart Home Surface',
+    description:
+      'Smart Home v2 (TASK-696). Compositor server-side de 7 bloques role-aware (Hero AI, Pulse Strip, Tu Día, Closing, AI Insights, Recents, Reliability). Contrato versionado home-snapshot.v1.',
+    domain: 'home',
+    routes: [
+      { path: '/home', label: 'Smart Home v2' }
+    ],
+    apis: [
+      { path: '/api/home/snapshot/v2', label: 'Home Snapshot V1 (composer)' }
+    ],
+    dependencies: [
+      'greenhouse_serving.home_block_flags',
+      'greenhouse_serving.home_pulse_snapshots',
+      'greenhouse_serving.user_recent_items',
+      'greenhouse_core.client_users (home_default_view, ui_density, home_v2_opt_out)'
+    ],
+    smokeTests: [],
+    filesOwned: [
+      'src/lib/home/**',
+      'src/views/greenhouse/home/v2/**',
+      'src/app/api/home/snapshot/v2/**'
+    ],
+    expectedSignalKinds: ['runtime', 'incident'],
+    incidentDomainTag: 'home'
   }
 ]
 
