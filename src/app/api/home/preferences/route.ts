@@ -74,6 +74,7 @@ export async function PATCH(request: Request) {
     if (payload.uiDensity != null && !VALID_DENSITY.has(payload.uiDensity)) {
       return NextResponse.json({ error: 'Invalid density' }, { status: 400 })
     }
+
     updates.push(`ui_density = $${position++}`)
     params.push(payload.uiDensity)
   }

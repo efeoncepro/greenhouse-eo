@@ -88,7 +88,7 @@ export const composeHomeSnapshot = async (input: ComposeHomeSnapshotInput): Prom
 
   const eligibleBlocks = HOME_BLOCK_REGISTRY.filter(block => isBlockEligible(block, input.audienceKey, input.entitlements))
 
-  let cacheHits = 0
+  const cacheHits = 0
   const cacheMisses = eligibleBlocks.length
 
   const envelopes = await Promise.all(

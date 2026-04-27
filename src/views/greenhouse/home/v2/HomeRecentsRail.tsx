@@ -1,12 +1,13 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { useRouter } from 'next/navigation'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import type { ThemeColor } from '@core/types'

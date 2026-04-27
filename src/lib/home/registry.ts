@@ -2,17 +2,7 @@ import 'server-only'
 
 import type { HomeAudienceKey, TenantEntitlements } from '@/lib/entitlements/types'
 
-import type {
-  HomeAiInsightsBentoData,
-  HomeBlockId,
-  HomeClosingCountdownData,
-  HomeHeroAiData,
-  HomePulseStripData,
-  HomeRecentsRailData,
-  HomeReliabilityRibbonData,
-  HomeSlotKey,
-  HomeTodayInboxData
-} from './contract'
+import type { HomeBlockId, HomeSlotKey } from './contract'
 
 /**
  * Declarative Home Block Registry.
@@ -44,7 +34,7 @@ export interface HomeLoaderContext {
   now: string
 }
 
-export interface HomeBlockDefinition<T = unknown> {
+export interface HomeBlockDefinition {
   blockId: HomeBlockId
   slot: HomeSlotKey
   audiences: ReadonlyArray<HomeAudienceKey>
@@ -75,7 +65,7 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     precomputed: false,
     fallback: 'skeleton',
     componentKey: 'hero-ai'
-  } satisfies HomeBlockDefinition<HomeHeroAiData>,
+  } satisfies HomeBlockDefinition,
   {
     blockId: 'pulse-strip',
     slot: 'pulse',
@@ -86,7 +76,7 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     precomputed: true,
     fallback: 'skeleton',
     componentKey: 'pulse-strip'
-  } satisfies HomeBlockDefinition<HomePulseStripData>,
+  } satisfies HomeBlockDefinition,
   {
     blockId: 'closing-countdown',
     slot: 'main',
@@ -99,7 +89,7 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     precomputed: false,
     fallback: 'hide',
     componentKey: 'closing-countdown'
-  } satisfies HomeBlockDefinition<HomeClosingCountdownData>,
+  } satisfies HomeBlockDefinition,
   {
     blockId: 'today-inbox',
     slot: 'main',
@@ -110,7 +100,7 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     precomputed: false,
     fallback: 'skeleton',
     componentKey: 'today-inbox'
-  } satisfies HomeBlockDefinition<HomeTodayInboxData>,
+  } satisfies HomeBlockDefinition,
   {
     blockId: 'ai-insights-bento',
     slot: 'main',
@@ -121,7 +111,7 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     precomputed: false,
     fallback: 'skeleton',
     componentKey: 'ai-insights-bento'
-  } satisfies HomeBlockDefinition<HomeAiInsightsBentoData>,
+  } satisfies HomeBlockDefinition,
   {
     blockId: 'recents-rail',
     slot: 'aside',
@@ -132,7 +122,7 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     precomputed: false,
     fallback: 'hide',
     componentKey: 'recents-rail'
-  } satisfies HomeBlockDefinition<HomeRecentsRailData>,
+  } satisfies HomeBlockDefinition,
   {
     blockId: 'reliability-ribbon',
     slot: 'aside',
@@ -143,7 +133,7 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     precomputed: false,
     fallback: 'hide',
     componentKey: 'reliability-ribbon'
-  } satisfies HomeBlockDefinition<HomeReliabilityRibbonData>
+  } satisfies HomeBlockDefinition
 ]
 
 export const isBlockEligible = (

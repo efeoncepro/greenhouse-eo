@@ -2,13 +2,16 @@
 
 import { useMemo } from 'react'
 
+import dynamic from 'next/dynamic'
+
+import { useRouter } from 'next/navigation'
+
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import dynamic from 'next/dynamic'
 import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
@@ -18,7 +21,7 @@ import type { ThemeColor } from '@core/types'
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import { motion, AnimatePresence } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
-import { useRouter } from 'next/navigation'
+
 
 import type { HomePulseStripData, PulseKpiCard } from '@/lib/home/contract'
 

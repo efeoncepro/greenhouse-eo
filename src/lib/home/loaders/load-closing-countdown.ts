@@ -112,7 +112,7 @@ const loadPayrollClosing = async (ctx: HomeLoaderContext): Promise<HomeClosingCo
       ctaHref: '/hr/payroll',
       ctaLabel: 'Continuar cierre'
     }
-  } catch (error) {
+  } catch {
     return null
   }
 }

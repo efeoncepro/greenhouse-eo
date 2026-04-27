@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { useRouter, usePathname } from 'next/navigation'
+
 import { Command } from 'cmdk'
 import { Dialog, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogDescription } from '@radix-ui/react-dialog'
 
@@ -265,7 +266,7 @@ export const CommandPalette = ({
                 <Command.Empty>
                   <div className='gh-cmdk-empty'>
                     <i className='tabler-search-off' style={{ fontSize: 32 }} />
-                    <div>Sin resultados para "{search}"</div>
+                    <div>{`Sin resultados para "${search}"`}</div>
                   </div>
                 </Command.Empty>
               </Command.List>

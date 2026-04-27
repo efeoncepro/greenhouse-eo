@@ -1,12 +1,13 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
-import { useRouter } from 'next/navigation'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import type { ThemeColor } from '@core/types'
@@ -45,6 +46,7 @@ export const HomeReliabilityRibbon = ({ data }: HomeReliabilityRibbonProps) => {
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           {data.modules.map(module => {
             const tone = STATUS_TONE[module.status]
+
             const tooltipParts: string[] = [
               `${module.label}: ${tone.label}`
             ]

@@ -4,7 +4,6 @@ import { getReliabilityOverview } from '@/lib/reliability/get-reliability-overvi
 import type { ReliabilitySeverity } from '@/types/reliability'
 
 import type { HomeReliabilityModuleSummary, HomeReliabilityRibbonData, ReliabilityModuleStatus } from '../contract'
-import type { HomeLoaderContext } from '../registry'
 
 const STATUS_PRIORITY: Record<ReliabilityModuleStatus, number> = {
   down: 4,
@@ -36,7 +35,7 @@ const findLastIncidentAt = (signals: ReadonlyArray<{ kind: string; severity: Rel
   return incidents[0]
 }
 
-export const loadHomeReliabilityRibbon = async (_ctx: HomeLoaderContext): Promise<HomeReliabilityRibbonData> => {
+export const loadHomeReliabilityRibbon = async (): Promise<HomeReliabilityRibbonData> => {
   const overview = await getReliabilityOverview()
 
   const modules: HomeReliabilityModuleSummary[] = overview.modules.map(snapshot => {

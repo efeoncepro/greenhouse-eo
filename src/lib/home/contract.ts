@@ -230,7 +230,9 @@ export interface HomeSnapshotV1 {
 export const isHomeSnapshotV1 = (value: unknown): value is HomeSnapshotV1 => {
   if (!value || typeof value !== 'object') return false
   const candidate = value as { contractVersion?: unknown; blocks?: unknown }
-  return (
+
+  
+return (
     candidate.contractVersion === HOME_SNAPSHOT_CONTRACT_VERSION &&
     Array.isArray(candidate.blocks)
   )
