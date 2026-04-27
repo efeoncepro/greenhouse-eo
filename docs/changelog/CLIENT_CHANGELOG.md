@@ -42,6 +42,25 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.26
+
+**Canal:** Beta
+**Fecha:** 2026-04-27
+**Disponible para:** internal
+**Módulos:** Admin Center / Finanzas
+
+### Novedades
+
+- La administracion de instrumentos de pago ahora tiene un workspace por instrumento con configuracion, actividad, conciliacion y auditoria.
+
+### Mejoras
+
+- La lista muestra readiness operativo y una accion clara para administrar cada instrumento.
+- Los datos sensibles se muestran enmascarados por defecto; el reveal temporal exige permiso y motivo.
+- Antes de cambios de alto impacto, la vista muestra el uso operativo asociado para reducir errores en cobros, pagos, Banco y Conciliacion.
+
+---
+
 ## 2026.04-beta.25
 
 **Canal:** Beta

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { assertPaymentInstrumentCapability, createPaymentInstrumentAdmin } from '@/lib/finance/payment-instruments'
 import {
   assertNonEmptyString,
   assertValidCurrency,
@@ -11,11 +12,10 @@ import {
   ACCOUNT_TYPES,
   type AccountType
 } from '@/lib/finance/shared'
-import {
-  listFinanceAccountsFromPostgres,
-  createFinanceAccountInPostgres
-} from '@/lib/finance/postgres-store'
+import { listFinanceAccountsFromPostgres } from '@/lib/finance/postgres-store'
 import { INSTRUMENT_CATEGORIES, getProvider, type InstrumentCategory } from '@/config/payment-instruments'
+import { resolveFinanceSpaceId } from '@/lib/finance/payment-instruments/admin-detail'
+import { sanitizeMetadataJson, validateProviderForInstrument } from '@/lib/finance/payment-instruments/validation'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,6 +58,12 @@ const defaultAccountTypeForCategory = (category: InstrumentCategory): AccountTyp
   }
 }
 
+const maskIdentifier = (value: string | null | undefined) => {
+  const normalized = normalizeString(value)
+
+  return normalized ? `•••• ${normalized.slice(-4)}` : null
+}
+
 export async function GET() {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
@@ -66,7 +72,14 @@ export async function GET() {
   }
 
   try {
-    const accounts = await listFinanceAccountsFromPostgres({ includeInactive: true })
+    assertPaymentInstrumentCapability({
+      tenant,
+      capability: 'finance.payment_instruments.read',
+      action: 'read'
+    })
+
+    const spaceId = await resolveFinanceSpaceId(tenant)
+    const accounts = await listFinanceAccountsFromPostgres({ includeInactive: true, spaceId })
 
     const items = accounts.map(a => ({
       accountId: a.accountId,
@@ -79,7 +92,7 @@ export async function GET() {
       isActive: a.isActive,
       accountName: a.accountName,
       bankName: a.bankName,
-      accountNumber: a.accountNumber,
+      accountNumber: maskIdentifier(a.accountNumber),
       accountType: a.accountType,
       country: a.country,
       openingBalance: a.openingBalance,
@@ -88,8 +101,9 @@ export async function GET() {
       cardLastFour: a.cardLastFour,
       cardNetwork: a.cardNetwork,
       creditLimit: a.creditLimit,
-      providerIdentifier: a.providerIdentifier,
+      providerIdentifierMasked: maskIdentifier(a.providerIdentifier),
       responsibleUserId: a.responsibleUserId,
+      readinessStatus: !a.isActive ? 'inactive' : a.defaultFor?.length ? 'ready' : 'needs_configuration',
       notes: a.notes,
       metadataJson: a.metadataJson ?? {},
       createdAt: a.createdAt ?? ''
@@ -116,6 +130,12 @@ export async function POST(request: Request) {
   }
 
   try {
+    assertPaymentInstrumentCapability({
+      tenant,
+      capability: 'finance.payment_instruments.update',
+      action: 'update'
+    })
+
     const body = await request.json()
 
     // ── Required fields ──
@@ -138,6 +158,12 @@ export async function POST(request: Request) {
     // ── Optional fields ──
     const providerSlug = body.providerSlug ? normalizeString(body.providerSlug) : null
 
+    validateProviderForInstrument({
+      providerSlug,
+      instrumentCategory,
+      currency
+    })
+
     const rawAccountType = body.accountType || body.bankAccountType
 
     const accountType = (rawAccountType && ACCOUNT_TYPES.includes(rawAccountType))
@@ -158,38 +184,42 @@ export async function POST(request: Request) {
     const openingBalanceDate = body.openingBalanceDate ? normalizeString(body.openingBalanceDate) : null
     const notes = body.notes ? normalizeString(body.notes) : null
 
-    const metadataJson = (typeof body.metadataJson === 'object' && body.metadataJson && !Array.isArray(body.metadataJson))
-      ? body.metadataJson as Record<string, unknown>
-      : undefined
+    const metadataJson = sanitizeMetadataJson(body.metadataJson ?? {})
 
     // Generate accountId from name + currency (same pattern as CreateAccountDrawer)
     const accountId = body.accountId
       ? assertNonEmptyString(body.accountId, 'accountId')
       : generateAccountId(accountName, currency)
 
-    await createFinanceAccountInPostgres({
+    const spaceId = await resolveFinanceSpaceId(tenant)
+
+    await createPaymentInstrumentAdmin({
       accountId,
-      accountName,
-      bankName,
-      accountNumber,
-      accountNumberFull,
-      currency,
-      accountType,
-      country,
-      openingBalance,
-      openingBalanceDate,
-      notes,
+      spaceId,
       actorUserId: tenant.userId || null,
-      instrumentCategory,
-      providerSlug,
-      providerIdentifier,
-      cardLastFour,
-      cardNetwork,
-      creditLimit,
-      responsibleUserId,
-      defaultFor,
-      displayOrder,
-      metadataJson
+      reason: body.reason,
+      input: {
+        accountName,
+        bankName,
+        accountNumber,
+        accountNumberFull,
+        currency,
+        accountType,
+        country,
+        openingBalance,
+        openingBalanceDate,
+        notes,
+        instrumentCategory,
+        providerSlug,
+        providerIdentifier,
+        cardLastFour,
+        cardNetwork,
+        creditLimit,
+        responsibleUserId,
+        defaultFor,
+        displayOrder,
+        metadataJson
+      }
     })
 
     return NextResponse.json({ accountId, created: true }, { status: 201 })

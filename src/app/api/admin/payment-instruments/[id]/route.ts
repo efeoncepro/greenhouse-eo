@@ -1,23 +1,35 @@
 import { NextResponse } from 'next/server'
 
+import { FinanceValidationError } from '@/lib/finance/shared'
+import {
+  assertPaymentInstrumentCapability,
+  updatePaymentInstrumentAdmin
+} from '@/lib/finance/payment-instruments'
+import {
+  getPaymentInstrumentAdminDetail,
+  resolveFinanceSpaceId
+} from '@/lib/finance/payment-instruments/admin-detail'
+import { parsePaymentInstrumentUpdate, validateReason } from '@/lib/finance/payment-instruments/validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import {
-  assertValidCurrency,
-  FinanceValidationError,
-  normalizeString,
-  toNumber,
-  toNullableNumber,
-  normalizeBoolean,
-  ACCOUNT_TYPES,
-  type AccountType
-} from '@/lib/finance/shared'
-import {
-  getFinanceAccountFromPostgres,
-  updateFinanceAccountInPostgres
-} from '@/lib/finance/postgres-store'
-import { INSTRUMENT_CATEGORIES, type InstrumentCategory } from '@/config/payment-instruments'
 
 export const dynamic = 'force-dynamic'
+
+const highImpactFields = new Set(['currency', 'instrumentCategory', 'providerSlug', 'isActive'])
+
+const getChangedFields = (updates: Record<string, unknown>) =>
+  Object.keys(updates).filter(key => updates[key] !== undefined)
+
+const requireCapability = (
+  tenant: NonNullable<Awaited<ReturnType<typeof requireFinanceTenantContext>>['tenant']>,
+  capability:
+    | 'finance.payment_instruments.read'
+    | 'finance.payment_instruments.update'
+    | 'finance.payment_instruments.manage_defaults'
+    | 'finance.payment_instruments.deactivate',
+  action: 'read' | 'update' | 'manage'
+) => {
+  assertPaymentInstrumentCapability({ tenant, capability, action })
+}
 
 export async function GET(
   _request: Request,
@@ -30,17 +42,19 @@ export async function GET(
   }
 
   try {
+    requireCapability(tenant, 'finance.payment_instruments.read', 'read')
+
     const { id } = await context.params
-    const account = await getFinanceAccountFromPostgres(id)
+    const detail = await getPaymentInstrumentAdminDetail({ accountId: id, tenant })
 
-    if (!account) {
-      return NextResponse.json({ error: 'Payment instrument not found' }, { status: 404 })
-    }
-
-    return NextResponse.json(account)
+    return NextResponse.json(detail, {
+      headers: {
+        'Cache-Control': 'no-store'
+      }
+    })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+      return NextResponse.json({ error: error.message, details: error.details }, { status: error.statusCode })
     }
 
     throw error
@@ -58,118 +72,71 @@ export async function PUT(
   }
 
   try {
+    requireCapability(tenant, 'finance.payment_instruments.update', 'update')
+
     const { id } = await context.params
     const body = await request.json()
+    const detailBefore = await getPaymentInstrumentAdminDetail({ accountId: id, tenant })
 
-    // ── Build update payload with only provided fields ──
-    const updates: Parameters<typeof updateFinanceAccountInPostgres>[0] = { accountId: id }
+    const updates = parsePaymentInstrumentUpdate({
+      ...body,
+      currentInstrumentCategory: detailBefore.account.instrumentCategory
+    })
 
-    if (body.accountName !== undefined) {
-      updates.accountName = normalizeString(body.accountName)
+    const changedFields = getChangedFields(updates)
+
+    if (changedFields.length === 0) {
+      throw new FinanceValidationError('No hay campos para actualizar.', 422)
     }
 
-    if (body.bankName !== undefined) {
-      updates.bankName = normalizeString(body.bankName)
+    const mutatesDefaults = changedFields.some(field => field === 'defaultFor' || field === 'displayOrder')
+
+    if (mutatesDefaults) {
+      requireCapability(tenant, 'finance.payment_instruments.manage_defaults', 'manage')
     }
 
-    if (body.currency !== undefined) {
-      updates.currency = assertValidCurrency(body.currency)
+    if (updates.isActive === false || updates.isActive === true) {
+      requireCapability(tenant, 'finance.payment_instruments.deactivate', 'update')
     }
 
-    if (body.accountType !== undefined) {
-      if (!ACCOUNT_TYPES.includes(body.accountType)) {
-        throw new FinanceValidationError(
-          `accountType must be one of: ${ACCOUNT_TYPES.join(', ')}`
-        )
-      }
+    const requiresHighImpactConfirmation =
+      detailBefore.impact.highImpactMutationRequired &&
+      changedFields.some(field => highImpactFields.has(field))
 
-      updates.accountType = body.accountType as AccountType
+    const reason = validateReason(body.reason)
+
+    if (
+      requiresHighImpactConfirmation &&
+      body.confirmHighImpact !== true &&
+      body.impactAcknowledged !== true
+    ) {
+      return NextResponse.json(
+        {
+          error: 'Este cambio afecta instrumentos con uso historico. Confirma el impacto y agrega un motivo.',
+          impact: detailBefore.impact,
+          requiresConfirmation: true
+        },
+        { status: 409 }
+      )
     }
 
-    if (body.instrumentCategory !== undefined) {
-      const rawCategory = normalizeString(body.instrumentCategory)
+    const spaceId = await resolveFinanceSpaceId(tenant)
 
-      if (!INSTRUMENT_CATEGORIES.includes(rawCategory as InstrumentCategory)) {
-        throw new FinanceValidationError(
-          `instrumentCategory must be one of: ${INSTRUMENT_CATEGORIES.join(', ')}`
-        )
-      }
+    const result = await updatePaymentInstrumentAdmin({
+      accountId: id,
+      spaceId,
+      actorUserId: tenant.userId || null,
+      updates,
+      reason,
+      impactAcknowledged: body.confirmHighImpact === true || body.impactAcknowledged === true
+    })
 
-      updates.instrumentCategory = rawCategory
-    }
+    const detail = await getPaymentInstrumentAdminDetail({ accountId: id, tenant })
 
-    if (body.country !== undefined) {
-      updates.country = normalizeString(body.country) || 'CL'
-    }
-
-    if (body.isActive !== undefined) {
-      updates.isActive = normalizeBoolean(body.isActive)
-    }
-
-    if (body.openingBalance !== undefined) {
-      updates.openingBalance = toNumber(body.openingBalance)
-    }
-
-    if (body.openingBalanceDate !== undefined) {
-      updates.openingBalanceDate = body.openingBalanceDate ? normalizeString(body.openingBalanceDate) : null
-    }
-
-    if (body.accountNumber !== undefined) {
-      updates.accountNumber = body.accountNumber ? normalizeString(body.accountNumber) : null
-    }
-
-    if (body.accountNumberFull !== undefined) {
-      updates.accountNumberFull = body.accountNumberFull ? normalizeString(body.accountNumberFull) : null
-    }
-
-    if (body.notes !== undefined) {
-      updates.notes = body.notes ? normalizeString(body.notes) : null
-    }
-
-    if (body.providerSlug !== undefined) {
-      updates.providerSlug = body.providerSlug ? normalizeString(body.providerSlug) : null
-    }
-
-    if (body.providerIdentifier !== undefined) {
-      updates.providerIdentifier = body.providerIdentifier ? normalizeString(body.providerIdentifier) : null
-    }
-
-    if (body.cardLastFour !== undefined) {
-      updates.cardLastFour = body.cardLastFour ? normalizeString(body.cardLastFour) : null
-    }
-
-    if (body.cardNetwork !== undefined) {
-      updates.cardNetwork = body.cardNetwork ? normalizeString(body.cardNetwork) : null
-    }
-
-    if (body.creditLimit !== undefined) {
-      updates.creditLimit = toNullableNumber(body.creditLimit)
-    }
-
-    if (body.responsibleUserId !== undefined) {
-      updates.responsibleUserId = body.responsibleUserId ? normalizeString(body.responsibleUserId) : null
-    }
-
-    if (body.defaultFor !== undefined) {
-      updates.defaultFor = Array.isArray(body.defaultFor) ? body.defaultFor.map(String) : []
-    }
-
-    if (body.displayOrder !== undefined) {
-      updates.displayOrder = toNumber(body.displayOrder)
-    }
-
-    if (body.metadataJson !== undefined) {
-      updates.metadataJson = (typeof body.metadataJson === 'object' && body.metadataJson && !Array.isArray(body.metadataJson))
-        ? body.metadataJson as Record<string, unknown>
-        : {}
-    }
-
-    await updateFinanceAccountInPostgres(updates)
-
-    return NextResponse.json({ accountId: id, updated: true })
+    return NextResponse.json({ accountId: id, updated: true, changedFields: result.changedFields, detail })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+      return NextResponse.json({ error: error.message, details: error.details }, { status: error.statusCode })
     }
 
     throw error

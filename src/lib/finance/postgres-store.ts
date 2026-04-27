@@ -25,6 +25,7 @@ import { upsertProviderFromFinanceSupplierInPostgres } from '@/lib/providers/pos
 type QueryableClient = Pick<PoolClient, 'query'>
 
 type PostgresFinanceAccountRow = {
+  space_id: string | null
   account_id: string
   account_name: string
   bank_name: string
@@ -110,6 +111,7 @@ type PostgresEconomicIndicatorRow = {
 }
 
 export type FinanceAccountRecord = {
+  spaceId: string | null
   accountId: string
   accountName: string
   bankName: string
@@ -251,6 +253,7 @@ const getCurrentSantiagoPeriod = () => {
 }
 
 const mapAccount = (row: PostgresFinanceAccountRow): FinanceAccountRecord => ({
+  spaceId: row.space_id ?? null,
   accountId: normalizeString(row.account_id),
   accountName: normalizeString(row.account_name),
   bankName: normalizeString(row.bank_name),
@@ -485,12 +488,19 @@ export const shouldFallbackFromFinancePostgres = (error: unknown) => {
   )
 }
 
-export const listFinanceAccountsFromPostgres = async ({ includeInactive = false }: { includeInactive?: boolean } = {}) => {
+export const listFinanceAccountsFromPostgres = async ({
+  includeInactive = false,
+  spaceId = null
+}: {
+  includeInactive?: boolean
+  spaceId?: string | null
+} = {}) => {
   await assertFinancePostgresReady()
 
   const rows = await runGreenhousePostgresQuery<PostgresFinanceAccountRow>(
     `
       SELECT
+        space_id,
         account_id,
         account_name,
         bank_name,
@@ -517,9 +527,10 @@ export const listFinanceAccountsFromPostgres = async ({ includeInactive = false 
         updated_at
       FROM greenhouse_finance.accounts
       WHERE ($1::boolean = TRUE OR is_active = TRUE)
+        AND ($2::text IS NULL OR space_id = $2 OR space_id IS NULL)
       ORDER BY display_order ASC, account_name ASC
     `,
-    [includeInactive]
+    [includeInactive, spaceId]
   )
 
   return rows.map(mapAccount)
@@ -531,6 +542,7 @@ export const getFinanceAccountFromPostgres = async (accountId: string) => {
   const rows = await runGreenhousePostgresQuery<PostgresFinanceAccountRow>(
     `
       SELECT
+        space_id,
         account_id,
         account_name,
         bank_name,
@@ -566,6 +578,7 @@ export const getFinanceAccountFromPostgres = async (accountId: string) => {
 }
 
 export const createFinanceAccountInPostgres = async ({
+  spaceId,
   accountId,
   accountName,
   bankName,
@@ -589,6 +602,7 @@ export const createFinanceAccountInPostgres = async ({
   displayOrder,
   metadataJson
 }: {
+  spaceId?: string | null
   accountId: string
   accountName: string
   bankName: string
@@ -628,6 +642,7 @@ export const createFinanceAccountInPostgres = async ({
     const rows = await queryRows<PostgresFinanceAccountRow>(
       `
         INSERT INTO greenhouse_finance.accounts (
+          space_id,
           account_id,
           account_name,
           bank_name,
@@ -655,11 +670,12 @@ export const createFinanceAccountInPostgres = async ({
           updated_at
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, TRUE, $9, $10::date, $11,
-          $12, $13, $14, $15, $16, $17, $18, $19::text[], $20, $21::jsonb,
-          $22, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, TRUE, $10, $11::date, $12,
+          $13, $14, $15, $16, $17, $18, $19, $20::text[], $21, $22::jsonb,
+          $23, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING
+          space_id,
           account_id,
           account_name,
           bank_name,
@@ -686,6 +702,7 @@ export const createFinanceAccountInPostgres = async ({
           updated_at
       `,
       [
+        spaceId ?? null,
         accountId,
         accountName,
         bankName,
@@ -728,6 +745,7 @@ export const createFinanceAccountInPostgres = async ({
 
 export const updateFinanceAccountInPostgres = async ({
   accountId,
+  spaceId,
   accountName,
   bankName,
   currency,
@@ -751,6 +769,7 @@ export const updateFinanceAccountInPostgres = async ({
   metadataJson
 }: {
   accountId: string
+  spaceId?: string | null
   accountName?: string
   bankName?: string
   currency?: FinanceCurrency
@@ -777,8 +796,8 @@ export const updateFinanceAccountInPostgres = async ({
 
   return withGreenhousePostgresTransaction(async client => {
     const existing = await queryRows<{ account_id: string }>(
-      'SELECT account_id FROM greenhouse_finance.accounts WHERE account_id = $1 LIMIT 1',
-      [accountId],
+      'SELECT account_id FROM greenhouse_finance.accounts WHERE account_id = $1 AND ($2::text IS NULL OR space_id = $2 OR space_id IS NULL) LIMIT 1',
+      [accountId, spaceId ?? null],
       client
     )
 
@@ -787,7 +806,7 @@ export const updateFinanceAccountInPostgres = async ({
     }
 
     const updates: string[] = []
-    const values: unknown[] = [accountId]
+    const values: unknown[] = [accountId, spaceId ?? null]
 
     const pushUpdate = (column: string, value: unknown) => {
       values.push(value)
@@ -836,7 +855,9 @@ export const updateFinanceAccountInPostgres = async ({
         UPDATE greenhouse_finance.accounts
         SET ${updates.join(', ')}
         WHERE account_id = $1
+          AND ($2::text IS NULL OR space_id = $2 OR space_id IS NULL)
         RETURNING
+          space_id,
           account_id,
           account_name,
           bank_name,

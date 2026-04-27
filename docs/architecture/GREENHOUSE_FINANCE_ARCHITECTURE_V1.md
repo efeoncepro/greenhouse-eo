@@ -688,6 +688,40 @@ Implicación para el backlog:
 | `src/views/greenhouse/admin/payment-instruments/PaymentInstrumentsListView.tsx` | Admin list view |
 | `src/views/greenhouse/admin/payment-instruments/CreatePaymentInstrumentDrawer.tsx` | Drawer de creación |
 
+## Delta 2026-04-27 — Payment Instrument Admin Workspace Enterprise (TASK-697)
+
+- **Tenant-scope correction gate**
+  - `greenhouse_finance.accounts` y tablas relacionadas de ledger/tesoreria ahora exponen `space_id` como boundary operacional:
+    - `accounts`
+    - `income_payments`
+    - `expense_payments`
+    - `settlement_groups`
+    - `settlement_legs`
+    - `account_balances`
+    - `reconciliation_periods`
+  - El backfill es conservador hacia el espacio interno canonico (`space-efeonce` / `internal_space`) cuando existe.
+  - Los readers/admin helpers nuevos resuelven `space_id` desde `TenantContext.spaceId` y fallback interno para `efeonce_admin`.
+- **Workspace admin seguro**
+  - `/admin/payment-instruments/[id]` deja de ser una ficha defensiva y pasa a workspace con secciones de configuracion, actividad, conciliacion e auditoria.
+  - `GET /api/admin/payment-instruments/[id]` entrega un contrato seguro: datos sensibles enmascarados por defecto, readiness, impacto operativo, treasury summary, auditoria y capacidades efectivas.
+  - `POST /api/admin/payment-instruments/[id]/reveal-sensitive` revela valores completos solo de forma temporal, con capability, motivo obligatorio y audit redacted.
+  - `POST /api/admin/payment-instruments/[id]/reveal` queda como alias compatible del reveal seguro.
+- **Audit trail**
+  - Nueva tabla `greenhouse_finance.payment_instrument_admin_audit_log`.
+  - Registra `created`, `updated`, `deactivated`, `reactivated` y `revealed_sensitive`.
+  - Nunca persiste el valor sensible revelado; guarda campo, actor, motivo, diff redacted e impacto.
+- **Access model final**
+  - Surface visible: `administracion.instrumentos_pago`.
+  - Capabilities:
+    - `finance.payment_instruments.read`
+    - `finance.payment_instruments.update`
+    - `finance.payment_instruments.manage_defaults`
+    - `finance.payment_instruments.deactivate`
+    - `finance.payment_instruments.reveal_sensitive`
+  - Backend aplica capabilities por accion; la UI solo refleja disponibilidad.
+- **Eventos**
+  - El catalogo de eventos formaliza `finance.account.created/updated` y los eventos redacted de payment instruments (`created`, `updated`, `status_changed`, `sensitive_revealed`).
+
 ## Delta 2026-04-08 — Reconciliation settlement orchestration completed (TASK-282)
 
 - **Conciliación quedó `ledger-first` de forma operativa**

@@ -3206,6 +3206,7 @@ export interface GreenhouseFinanceAccountBalances {
   opening_balance: Generated<Numeric>;
   period_inflows: Generated<Numeric>;
   period_outflows: Generated<Numeric>;
+  space_id: string | null;
   transaction_count: Generated<number>;
   updated_at: Generated<Timestamp>;
 }
@@ -3244,6 +3245,10 @@ export interface GreenhouseFinanceAccounts {
    */
   provider_slug: string | null;
   responsible_user_id: string | null;
+  /**
+   * TASK-697: tenant boundary for payment instruments. Backfilled to the internal Efeonce space during rollout.
+   */
+  space_id: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -3388,6 +3393,7 @@ export interface GreenhouseFinanceExpensePayments {
   recorded_by_user_id: string | null;
   reference: string | null;
   settlement_group_id: string | null;
+  space_id: string | null;
 }
 
 export interface GreenhouseFinanceExpenses {
@@ -3753,6 +3759,7 @@ export interface GreenhouseFinanceIncomePayments {
   recorded_by_user_id: string | null;
   reference: string | null;
   settlement_group_id: string | null;
+  space_id: string | null;
 }
 
 export interface GreenhouseFinanceIncomeSettlementReconciliation {
@@ -3783,6 +3790,20 @@ export interface GreenhouseFinanceNuboxEmissionLog {
   request_payload: Json;
   response_body: Json | null;
   response_status: number | null;
+}
+
+export interface GreenhouseFinancePaymentInstrumentAdminAuditLog {
+  account_id: string;
+  action: string;
+  actor_user_id: string | null;
+  audit_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  diff_json: Generated<Json>;
+  field_name: string | null;
+  impact_json: Generated<Json>;
+  reason: string | null;
+  request_id: string | null;
+  space_id: string | null;
 }
 
 export interface GreenhouseFinanceProducts {
@@ -3922,6 +3943,7 @@ export interface GreenhouseFinanceReconciliationPeriods {
   provider_slug_snapshot: string | null;
   reconciled_at: Timestamp | null;
   reconciled_by_user_id: string | null;
+  space_id: string | null;
   statement_imported: Generated<boolean>;
   statement_imported_at: Timestamp | null;
   statement_row_count: number | null;
@@ -3981,6 +4003,7 @@ export interface GreenhouseFinanceSettlementGroups {
   settlement_mode: Generated<string>;
   source_payment_id: string | null;
   source_payment_type: string | null;
+  space_id: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -4005,6 +4028,7 @@ export interface GreenhouseFinanceSettlementLegs {
   reconciliation_row_id: string | null;
   settlement_group_id: string;
   settlement_leg_id: string;
+  space_id: string | null;
   transaction_date: Timestamp | null;
   updated_at: Generated<Timestamp>;
 }
@@ -6997,6 +7021,7 @@ export interface DB {
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
   "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
+  "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;
   "greenhouse_finance.quote_line_items": GreenhouseFinanceQuoteLineItems;

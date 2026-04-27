@@ -1,5 +1,45 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — TASK-697 Payment Instrument Admin Workspace implementada en develop
+
+- Rama: `develop` por instruccion explicita del usuario; no se cambio de rama.
+- Coordinacion: Claude trabajo en paralelo sobre UI/Home; se preservaron sus cambios y solo se corrigieron fallos de lint/build necesarios (`HomeRunwayStrategic`, `HomeAtRiskWatchlist`) sin revertir comportamiento.
+- Slice 0 tenant-scope:
+  - migracion `20260427102628114_task-697-payment-instrument-admin-workspace.sql`
+  - `space_id` agregado a `greenhouse_finance.accounts`, `income_payments`, `expense_payments`, `settlement_groups`, `settlement_legs`, `account_balances`, `reconciliation_periods`
+  - backfill conservador a `space-efeonce`/`internal_space` cuando existe
+  - `src/types/db.d.ts` regenerado por `pnpm migrate:up`
+- Backend:
+  - helpers nuevos en `src/lib/finance/payment-instruments/**`
+  - `GET/PUT /api/admin/payment-instruments/[id]` usa contrato seguro, capability gating, impacto y audit
+  - `POST /api/admin/payment-instruments/[id]/reveal-sensitive` y alias `/reveal` para reveal temporal con reason
+  - `POST/GET /api/admin/payment-instruments` alineado a `space_id`, payload de lista sin identificadores completos
+  - nueva audit table `greenhouse_finance.payment_instrument_admin_audit_log`
+- Access model:
+  - view surface: `administracion.instrumentos_pago`
+  - capabilities: `finance.payment_instruments.read`, `update`, `manage_defaults`, `deactivate`, `reveal_sensitive`
+  - routeGroups siguen dando entrada amplia; actions finas se validan server-side
+- UI:
+  - workspace bank-grade en `PaymentInstrumentDetailView`
+  - lista con readiness y accion accesible
+  - create drawer converge con campos/governance y validaciones
+  - adaptador defensivo `paymentInstrumentAdminAdapters.ts`
+- Docs actualizados:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/documentation/finance/modulos-caja-cobros-pagos.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `changelog.md`
+- Validacion ejecutada:
+  - `npx tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+  - `pnpm migrate:up` OK, con types regenerados
+  - `pnpm build` OK
+  - check `git diff -- src | rg "new Pool\\("` sin nuevas ocurrencias; `rg` global muestra ocurrencias legacy en tests de delivery, no creadas por esta sesion
+- Riesgos / pendientes:
+  - validar visualmente en staging/preview `/admin/payment-instruments` y `/admin/payment-instruments/santander-clp` con datos reales y roles `finance_admin`/`efeonce_admin`
+  - confirmar si se mantiene el alias `/reveal` o se depreca despues de adopcion de `/reveal-sensitive`
+  - revisar con producto si `finance_admin` debe poder revelar sensibles o si queda solo `efeonce_admin`
+
 ## Sesion 2026-04-27 — TASK-697 Payment Instrument Admin Workspace creada
 
 - Task creada: `docs/tasks/to-do/TASK-697-payment-instrument-admin-workspace-enterprise.md`.

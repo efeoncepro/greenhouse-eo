@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -10,19 +11,21 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
-import Avatar from '@mui/material/Avatar'
-import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import LinearProgress from '@mui/material/LinearProgress'
+import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
@@ -35,149 +38,122 @@ import CustomTextField from '@core/components/mui/TextField'
 import tableStyles from '@core/styles/table.module.css'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import {
-  INSTRUMENT_CATEGORY_LABELS,
   INSTRUMENT_CATEGORY_COLORS,
+  INSTRUMENT_CATEGORY_LABELS,
   type InstrumentCategory
 } from '@/config/payment-instruments'
 
 import CreatePaymentInstrumentDrawer from './CreatePaymentInstrumentDrawer'
+import {
+  adaptPaymentInstrumentList,
+  normalizeDefaultFor,
+  type PaymentInstrumentListItem,
+  type PaymentInstrumentListResponse,
+  type ReadinessStatus
+} from './paymentInstrumentAdminAdapters'
 
-// ── Types ──────────────────────────────────────────────────────────────
+const columnHelper = createColumnHelper<PaymentInstrumentListItem>()
 
-interface PaymentInstrumentItem {
-  accountId: string
-  instrumentName: string
-  instrumentCategory: InstrumentCategory
-  providerSlug: string | null
-  providerName: string | null
-  currency: string
-  active: boolean
-  defaultFor: string[]
-  createdAt: string
+const readinessTone: Record<ReadinessStatus, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
+  ready: { label: 'Listo', color: 'success', icon: 'tabler-circle-check' },
+  needs_configuration: { label: 'Configurar', color: 'warning', icon: 'tabler-alert-triangle' },
+  at_risk: { label: 'En riesgo', color: 'error', icon: 'tabler-circle-x' },
+  inactive: { label: 'Inactivo', color: 'secondary', icon: 'tabler-player-pause' }
 }
 
-interface ListResponse {
-  items: PaymentInstrumentItem[]
-  total: number
-}
-
-// ── Columns ────────────────────────────────────────────────────────────
-
-const columnHelper = createColumnHelper<PaymentInstrumentItem>()
-
- 
-const columns: ColumnDef<PaymentInstrumentItem, any>[] = [
-  columnHelper.accessor('instrumentName', {
-    header: 'Instrumento',
-    cell: ({ row }) => {
-      const item = row.original
-
-      return (
-        <PaymentInstrumentChip
-          providerSlug={item.providerSlug}
-          instrumentName={item.instrumentName}
-          instrumentCategory={item.instrumentCategory}
-          size='md'
-        />
-      )
-    }
-  }),
-  columnHelper.accessor('instrumentCategory', {
-    header: 'Categoria',
-    cell: ({ getValue }) => {
-      const cat = getValue() as InstrumentCategory
-
-      return (
-        <CustomChip
-          round='true'
-          size='small'
-          variant='tonal'
-          color={INSTRUMENT_CATEGORY_COLORS[cat] ?? 'secondary'}
-          label={INSTRUMENT_CATEGORY_LABELS[cat] ?? cat}
-        />
-      )
-    }
-  }),
-  columnHelper.accessor('providerName', {
-    header: 'Proveedor',
-    cell: ({ getValue }) => (
-      <Typography variant='body2' color='text.secondary'>
-        {getValue() ?? '\u2014'}
+const EmptyState = ({ search, onCreate }: { search: string; onCreate: () => void }) => (
+  <CardContent>
+    <Box sx={{ border: theme => `1px dashed ${theme.palette.divider}`, borderRadius: 1, py: 8, px: 4, textAlign: 'center' }} role='status'>
+      <i className='tabler-credit-card-off' style={{ fontSize: 38, color: GH_COLORS.brand.coreBlue }} />
+      <Typography variant='h6' sx={{ mt: 2 }}>
+        {search ? 'No encontramos instrumentos con ese filtro' : 'Aun no hay instrumentos registrados'}
       </Typography>
-    )
-  }),
-  columnHelper.accessor('currency', {
-    header: 'Moneda',
-    cell: ({ getValue }) => (
-      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-        {getValue()}
+      <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 560, mx: 'auto', mb: 4 }}>
+        {search
+          ? 'Prueba con proveedor, moneda, categoria o nombre visible. La busqueda no usa datos sensibles completos.'
+          : 'Registra cuentas bancarias, tarjetas o plataformas para habilitar ruteo de cobros, pagos y conciliacion.'}
       </Typography>
-    ),
-    meta: { align: 'center' }
-  }),
-  columnHelper.accessor('active', {
-    header: 'Estado',
-    cell: ({ getValue }) => (
-      <CustomChip
-        round='true'
-        size='small'
-        variant='tonal'
-        color={getValue() ? 'success' : 'secondary'}
-        label={getValue() ? 'Activo' : 'Inactivo'}
-      />
-    ),
-    meta: { align: 'center' }
-  }),
-  columnHelper.accessor('defaultFor', {
-    header: 'Default para',
-    cell: ({ getValue }) => {
-      const arr = getValue() as string[]
+      {!search ? (
+        <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={onCreate}>
+          Agregar instrumento
+        </Button>
+      ) : null}
+    </Box>
+  </CardContent>
+)
 
-      return (
-        <Typography variant='body2' color='text.secondary'>
-          {arr && arr.length > 0 ? arr.join(', ') : '\u2014'}
+const SummaryTile = ({
+  icon,
+  label,
+  value,
+  helper,
+  color = 'primary'
+}: {
+  icon: string
+  label: string
+  value: number | string
+  helper: string
+  color?: 'primary' | 'info' | 'success' | 'warning' | 'error'
+}) => (
+  <Box sx={{ border: theme => `1px solid ${theme.palette.divider}`, borderRadius: 1, p: 3, height: '100%' }}>
+    <Stack direction='row' spacing={2.5} alignItems='center'>
+      <CustomAvatar skin='light' color={color} size={42} variant='rounded'>
+        <i className={icon} />
+      </CustomAvatar>
+      <Box sx={{ minWidth: 0 }}>
+        <Typography variant='h5' sx={{ fontWeight: 700 }}>
+          {value}
         </Typography>
-      )
-    }
-  })
-]
-
-// ── Component ──────────────────────────────────────────────────────────
+        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+          {label}
+        </Typography>
+        <Typography variant='caption' color='text.secondary'>
+          {helper}
+        </Typography>
+      </Box>
+    </Stack>
+  </Box>
+)
 
 const PaymentInstrumentsListView = () => {
   const router = useRouter()
-  const [data, setData] = useState<ListResponse | null>(null)
+  const [data, setData] = useState<PaymentInstrumentListResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [searchDebounced, setSearchDebounced] = useState('')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'instrumentName', desc: false }])
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  // Debounce search input
   useEffect(() => {
-    const timer = setTimeout(() => setSearchDebounced(search), 400)
+    const timer = window.setTimeout(() => setSearchDebounced(search), 300)
 
-    return () => clearTimeout(timer)
+    return () => window.clearTimeout(timer)
   }, [search])
 
-  const loadData = useCallback(async () => {
-    setLoading(true)
+  const loadData = useCallback(async (mode: 'initial' | 'refresh' = 'initial') => {
+    if (mode === 'refresh') setRefreshing(true)
+    else setLoading(true)
 
     try {
-      const res = await fetch('/api/admin/payment-instruments')
+      const res = await fetch('/api/admin/payment-instruments', { cache: 'no-store' })
 
-      if (res.ok) {
-        setData(await res.json())
-        setError(null)
-      } else {
-        setError(`Error al cargar instrumentos de pago (HTTP ${res.status}).`)
+      if (!res.ok) {
+        setError(`No pudimos cargar instrumentos de pago (HTTP ${res.status}).`)
+
+        return
       }
+
+      setData(adaptPaymentInstrumentList(await res.json()))
+      setError(null)
     } catch {
-      setError('No se pudo conectar al servidor. Verifica tu conexion.')
+      setError('No pudimos conectar con el servidor. Revisa la conexion o reintenta.')
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }, [])
 
@@ -185,20 +161,124 @@ const PaymentInstrumentsListView = () => {
     void loadData()
   }, [loadData])
 
-  // Client-side filter
   const filteredItems = useMemo(() => {
-    if (!data?.items) return []
-    if (!searchDebounced) return data.items
-    const q = searchDebounced.toLowerCase()
+    const items = data?.items ?? []
+    const query = searchDebounced.trim().toLowerCase()
 
-    return data.items.filter(
+    if (!query) return items
+
+    return items.filter(
       item =>
-        item.instrumentName.toLowerCase().includes(q) ||
-        (item.providerName && item.providerName.toLowerCase().includes(q)) ||
-        INSTRUMENT_CATEGORY_LABELS[item.instrumentCategory]?.toLowerCase().includes(q) ||
-        item.currency.toLowerCase().includes(q)
+        item.instrumentName.toLowerCase().includes(query) ||
+        (item.providerName ?? '').toLowerCase().includes(query) ||
+        (INSTRUMENT_CATEGORY_LABELS[item.instrumentCategory] ?? '').toLowerCase().includes(query) ||
+        item.currency.toLowerCase().includes(query) ||
+        item.defaultFor.some(value => normalizeDefaultFor(value).toLowerCase().includes(query))
     )
-  }, [data, searchDebounced])
+  }, [data?.items, searchDebounced])
+
+  const columns = useMemo<ColumnDef<PaymentInstrumentListItem, any>[]>(
+    () => [
+      columnHelper.accessor('instrumentName', {
+        header: 'Instrumento',
+        cell: ({ row }) => (
+          <Stack spacing={0.5}>
+            <PaymentInstrumentChip
+              providerSlug={row.original.providerSlug}
+              instrumentName={row.original.instrumentName}
+              instrumentCategory={row.original.instrumentCategory}
+              size='md'
+            />
+            <Typography variant='caption' color='text.secondary'>
+              {row.original.maskedIdentifier ?? 'Sin identificador visible'}
+            </Typography>
+          </Stack>
+        )
+      }),
+      columnHelper.accessor('instrumentCategory', {
+        header: 'Categoria',
+        cell: ({ getValue }) => {
+          const category = getValue() as InstrumentCategory
+
+          return (
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color={INSTRUMENT_CATEGORY_COLORS[category] ?? 'secondary'}
+              label={INSTRUMENT_CATEGORY_LABELS[category] ?? category}
+            />
+          )
+        }
+      }),
+      columnHelper.accessor('providerName', {
+        header: 'Proveedor',
+        cell: ({ getValue }) => (
+          <Typography variant='body2' color='text.secondary'>
+            {getValue() ?? 'No configurado'}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('currency', {
+        header: 'Moneda',
+        cell: ({ getValue }) => (
+          <Typography variant='body2' sx={{ fontWeight: 700 }}>
+            {getValue()}
+          </Typography>
+        ),
+        meta: { align: 'center' }
+      }),
+      columnHelper.accessor('readinessStatus', {
+        header: 'Readiness',
+        cell: ({ getValue }) => {
+          const tone = readinessTone[getValue() as ReadinessStatus]
+
+          return (
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color={tone.color}
+              label={tone.label}
+              icon={<i className={tone.icon} />}
+            />
+          )
+        }
+      }),
+      columnHelper.accessor('defaultFor', {
+        header: 'Ruteo',
+        cell: ({ getValue }) => {
+          const values = getValue() as string[]
+
+          return (
+            <Typography variant='body2' color='text.secondary'>
+              {values.length ? values.map(normalizeDefaultFor).join(', ') : 'Sin default'}
+            </Typography>
+          )
+        }
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: 'Accion',
+        cell: ({ row }) => (
+          <Tooltip title={`Administrar ${row.original.instrumentName}`}>
+            <IconButton
+              size='small'
+              aria-label={`Administrar ${row.original.instrumentName}`}
+              onClick={event => {
+                event.stopPropagation()
+                router.push(`/admin/payment-instruments/${row.original.accountId}`)
+              }}
+            >
+              <i className='tabler-arrow-right' />
+            </IconButton>
+          </Tooltip>
+        ),
+        meta: { align: 'right' }
+      })
+    ],
+    [router]
+  )
 
   const table = useReactTable({
     data: filteredItems,
@@ -210,105 +290,58 @@ const PaymentInstrumentsListView = () => {
     getFilteredRowModel: getFilteredRowModel()
   })
 
-  // Aggregated KPIs
   const totalInstruments = data?.items.length ?? 0
-
-  const bankAccounts = useMemo(
-    () => data?.items.filter(i => i.instrumentCategory === 'bank_account').length ?? 0,
-    [data]
-  )
-
-  const cardsAndFintech = useMemo(
-    () =>
-      data?.items.filter(i => i.instrumentCategory === 'credit_card' || i.instrumentCategory === 'fintech').length ?? 0,
-    [data]
-  )
-
-  const platforms = useMemo(
-    () =>
-      data?.items.filter(
-        i => i.instrumentCategory === 'payment_platform' || i.instrumentCategory === 'payroll_processor'
-      ).length ?? 0,
-    [data]
-  )
+  const activeCount = data?.items.filter(item => item.active).length ?? 0
+  const needsConfiguration = data?.items.filter(item => item.readinessStatus !== 'ready').length ?? 0
+  const bankAccounts = data?.items.filter(item => item.instrumentCategory === 'bank_account').length ?? 0
+  const highImpact = data?.items.filter(item => item.impactScore > 0).length ?? 0
 
   return (
-    <Grid container spacing={6}>
-      {/* Page header */}
+    <Grid container spacing={5}>
       <Grid size={{ xs: 12 }}>
-        <Typography variant='h4' sx={{ fontWeight: 600 }}>
-          Instrumentos de pago
-        </Typography>
-        <Typography variant='body2' color='text.secondary'>
-          Administra cuentas bancarias, tarjetas, fintech y plataformas de pago.
-        </Typography>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} justifyContent='space-between' alignItems={{ xs: 'flex-start', md: 'center' }}>
+          <Box>
+            <Typography variant='h4' sx={{ fontWeight: 700 }}>
+              Instrumentos de pago
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Administra cuentas, tarjetas y plataformas usadas por Banco, Cobros, Pagos y Conciliacion.
+            </Typography>
+          </Box>
+          <Stack direction='row' spacing={2} useFlexGap flexWrap='wrap'>
+            <Button variant='tonal' color='secondary' onClick={() => void loadData('refresh')} startIcon={<i className='tabler-refresh' />}>
+              Actualizar
+            </Button>
+            <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
+              Agregar instrumento
+            </Button>
+          </Stack>
+        </Stack>
       </Grid>
 
-      {/* KPI row */}
       <Grid size={{ xs: 12 }}>
-        <Grid container spacing={6}>
-          <Grid size={{ xs: 6, md: 3 }}>
-            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-              <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 3, '&:last-child': { pb: 3 } }}>
-                <CustomAvatar skin='light' color='primary' size={42} variant='rounded'>
-                  <i className='tabler-credit-card' />
-                </CustomAvatar>
-                <Box>
-                  <Typography variant='h5' sx={{ fontWeight: 600 }}>{totalInstruments}</Typography>
-                  <Typography variant='caption' color='text.secondary'>Total instrumentos</Typography>
-                </Box>
-              </CardContent>
-            </Card>
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+            {loading && !data ? <Skeleton variant='rounded' height={104} /> : <SummaryTile icon='tabler-credit-card' label='Total' value={totalInstruments} helper={`${activeCount} activos`} />}
           </Grid>
-          <Grid size={{ xs: 6, md: 3 }}>
-            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-              <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 3, '&:last-child': { pb: 3 } }}>
-                <CustomAvatar skin='light' color='info' size={42} variant='rounded'>
-                  <i className='tabler-building-bank' />
-                </CustomAvatar>
-                <Box>
-                  <Typography variant='h5' sx={{ fontWeight: 600 }}>{bankAccounts}</Typography>
-                  <Typography variant='caption' color='text.secondary'>Cuentas bancarias</Typography>
-                </Box>
-              </CardContent>
-            </Card>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+            {loading && !data ? <Skeleton variant='rounded' height={104} /> : <SummaryTile icon='tabler-building-bank' label='Cuentas bancarias' value={bankAccounts} helper='Base treasury' color='info' />}
           </Grid>
-          <Grid size={{ xs: 6, md: 3 }}>
-            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-              <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 3, '&:last-child': { pb: 3 } }}>
-                <CustomAvatar skin='light' color='success' size={42} variant='rounded'>
-                  <i className='tabler-wallet' />
-                </CustomAvatar>
-                <Box>
-                  <Typography variant='h5' sx={{ fontWeight: 600 }}>{cardsAndFintech}</Typography>
-                  <Typography variant='caption' color='text.secondary'>Tarjetas + Fintech</Typography>
-                </Box>
-              </CardContent>
-            </Card>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+            {loading && !data ? <Skeleton variant='rounded' height={104} /> : <SummaryTile icon='tabler-alert-triangle' label='Por configurar' value={needsConfiguration} helper='Readiness incompleto' color={needsConfiguration ? 'warning' : 'success'} />}
           </Grid>
-          <Grid size={{ xs: 6, md: 3 }}>
-            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-              <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 3, '&:last-child': { pb: 3 } }}>
-                <CustomAvatar skin='light' color='warning' size={42} variant='rounded'>
-                  <i className='tabler-cloud-dollar' />
-                </CustomAvatar>
-                <Box>
-                  <Typography variant='h5' sx={{ fontWeight: 600 }}>{platforms}</Typography>
-                  <Typography variant='caption' color='text.secondary'>Plataformas</Typography>
-                </Box>
-              </CardContent>
-            </Card>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+            {loading && !data ? <Skeleton variant='rounded' height={104} /> : <SummaryTile icon='tabler-scale' label='Con impacto' value={highImpact} helper='Segun contrato backend' color={highImpact ? 'warning' : 'success'} />}
           </Grid>
         </Grid>
       </Grid>
 
-      {/* Error banner */}
-      {error && (
+      {error ? (
         <Grid size={{ xs: 12 }}>
           <Alert
             severity='error'
             action={
-              <Button color='inherit' size='small' onClick={() => void loadData()}>
+              <Button color='inherit' size='small' onClick={() => void loadData('refresh')}>
                 Reintentar
               </Button>
             }
@@ -316,90 +349,78 @@ const PaymentInstrumentsListView = () => {
             {error}
           </Alert>
         </Grid>
-      )}
+      ) : null}
 
-      {/* Table card */}
+      {data?.partial ? (
+        <Grid size={{ xs: 12 }}>
+          <Alert severity='warning'>
+            La lista esta recibiendo un contrato parcial. La vista mantiene busqueda y navegacion, pero readiness e impacto pueden completarse cuando backend entregue TASK-697.
+          </Alert>
+        </Grid>
+      ) : null}
+
       <Grid size={{ xs: 12 }}>
-        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, overflow: 'hidden' }}>
+          {refreshing ? <LinearProgress aria-label='Actualizando instrumentos de pago' /> : null}
           <CardHeader
-            title='Instrumentos registrados'
-            subheader={data ? `${filteredItems.length} de ${data.items.length}` : undefined}
-            avatar={
-              <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
-                <i className='tabler-credit-card' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
-              </Avatar>
-            }
+            title='Registro operativo'
+            subheader={data ? `${filteredItems.length} de ${data.total} instrumentos visibles` : 'Cargando instrumentos'}
             action={
-              <Stack direction='row' spacing={2} alignItems='center'>
-                <CustomTextField
-                  placeholder='Buscar instrumento...'
-                  size='small'
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  sx={{ minWidth: 220 }}
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <i className='tabler-search' style={{ fontSize: 18, marginRight: 8, opacity: 0.5 }} />
-                      )
-                    }
-                  }}
-                />
-                <Button
-                  variant='contained'
-                  size='small'
-                  startIcon={<i className='tabler-plus' />}
-                  onClick={() => setDrawerOpen(true)}
-                  sx={{ whiteSpace: 'nowrap' }}
-                >
-                  Agregar instrumento
-                </Button>
-              </Stack>
+              <CustomTextField
+                placeholder='Buscar por nombre, proveedor, moneda o ruteo'
+                size='small'
+                value={search}
+                onChange={event => setSearch(event.target.value)}
+                sx={{ minWidth: { xs: 220, sm: 360 } }}
+                aria-label='Buscar instrumentos de pago'
+                slotProps={{
+                  input: {
+                    startAdornment: <i className='tabler-search' style={{ fontSize: 18, marginRight: 8, opacity: 0.6 }} />
+                  }
+                }}
+              />
             }
           />
           <Divider />
 
           {loading && !data ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-              <CircularProgress />
-            </Box>
-          ) : !data || filteredItems.length === 0 ? (
             <CardContent>
-              <Box sx={{ textAlign: 'center', py: 6 }} role='status'>
-                <Typography variant='h6' sx={{ mb: 1 }}>
-                  Sin instrumentos registrados
-                </Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  {searchDebounced
-                    ? `No hay resultados para \u201C${searchDebounced}\u201D. Revisa la ortografia o intenta con otras palabras.`
-                    : 'Aun no hay instrumentos de pago registrados en el sistema.'}
-                </Typography>
-              </Box>
+              <Stack spacing={2} role='status' aria-label='Cargando tabla de instrumentos'>
+                {[0, 1, 2, 3, 4].map(item => (
+                  <Skeleton key={item} variant='rounded' height={58} />
+                ))}
+              </Stack>
             </CardContent>
+          ) : !filteredItems.length ? (
+            <EmptyState search={searchDebounced} onCreate={() => setDrawerOpen(true)} />
           ) : (
             <div className='overflow-x-auto'>
               <table className={tableStyles.table}>
                 <thead>
-                  {table.getHeaderGroups().map(hg => (
-                    <tr key={hg.id}>
-                      {hg.headers.map(header => (
-                        <th
-                          key={header.id}
-                          onClick={header.column.getToggleSortingHandler()}
-                          className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })}
-                          style={{
-                            textAlign:
-                              (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center'
-                                ? 'center'
-                                : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right'
-                                  ? 'right'
-                                  : 'left'
-                          }}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {{ asc: ' \u2191', desc: ' \u2193' }[header.column.getIsSorted() as string] ?? null}
-                        </th>
-                      ))}
+                  {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map(header => {
+                        const align = ((header.column.columnDef.meta as { align?: CSSProperties['textAlign'] } | undefined)?.align ?? 'left') as CSSProperties['textAlign']
+
+                        return (
+                          <th
+                            key={header.id}
+                            onClick={header.column.getToggleSortingHandler()}
+                            className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })}
+                            aria-sort={
+                              header.column.getIsSorted() === 'asc'
+                                ? 'ascending'
+                                : header.column.getIsSorted() === 'desc'
+                                  ? 'descending'
+                                  : 'none'
+                            }
+                            style={{ textAlign: align }}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                          </th>
+                        )
+                      })}
                     </tr>
                   ))}
                 </thead>
@@ -408,24 +429,24 @@ const PaymentInstrumentsListView = () => {
                     <tr
                       key={row.id}
                       onClick={() => router.push(`/admin/payment-instruments/${row.original.accountId}`)}
+                      onKeyDown={event => {
+                        if (event.key === 'Enter') router.push(`/admin/payment-instruments/${row.original.accountId}`)
+                      }}
+                      tabIndex={0}
+                      role='link'
+                      aria-label={`Administrar ${row.original.instrumentName}`}
                       style={{ cursor: 'pointer' }}
-                      className='hover:bg-actionHover'
+                      className='hover:bg-actionHover focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary'
                     >
-                      {row.getVisibleCells().map(cell => (
-                        <td
-                          key={cell.id}
-                          style={{
-                            textAlign:
-                              (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center'
-                                ? 'center'
-                                : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right'
-                                  ? 'right'
-                                  : 'left'
-                          }}
-                        >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
+                      {row.getVisibleCells().map(cell => {
+                        const align = ((cell.column.columnDef.meta as { align?: CSSProperties['textAlign'] } | undefined)?.align ?? 'left') as CSSProperties['textAlign']
+
+                        return (
+                          <td key={cell.id} style={{ textAlign: align }}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        )
+                      })}
                     </tr>
                   ))}
                 </tbody>
@@ -435,12 +456,7 @@ const PaymentInstrumentsListView = () => {
         </Card>
       </Grid>
 
-      {/* Create drawer */}
-      <CreatePaymentInstrumentDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        onSuccess={() => void loadData()}
-      />
+      <CreatePaymentInstrumentDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => void loadData('refresh')} />
     </Grid>
   )
 }

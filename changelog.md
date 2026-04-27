@@ -2,6 +2,19 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — TASK-697 Payment Instrument Admin Workspace Enterprise
+
+- `/admin/payment-instruments/[id]` evoluciona a workspace admin bank-grade con tabs de Configuracion, Actividad, Conciliacion y Auditoria.
+- Backend seguro para instrumentos de pago:
+  - payload default sin `accountNumberFull` ni `providerIdentifier` completos
+  - reveal temporal por endpoint dedicado con capability, motivo obligatorio, no-cache y audit redacted
+  - mutaciones validadas server-side con confirmacion para cambios de alto impacto
+- Tenant-scope corregido en Finance: `accounts`, pagos, settlements, balances y periodos de conciliacion reciben `space_id` e indices para filtrar por tenant/space.
+- Nueva tabla `greenhouse_finance.payment_instrument_admin_audit_log` para cambios administrativos y reveals sensibles sin guardar valores revelados.
+- Entitlements finos agregados para `finance.payment_instruments.*` y eventos payment-instrument formalizados en el catalogo.
+- UI de lista/drawer/detalle endurecida con readiness, accion accesible “Administrar”, skeletons, estados parciales y microcopy operacional.
+- Validacion: `npx tsc --noEmit --pretty false`, `pnpm lint`, `pnpm migrate:up`, `pnpm build`.
+
 ### 2026-04-27 — Admin Payment Instruments detail route
 
 - `/admin/payment-instruments/[id]` ahora existe como detalle operativo para instrumentos de pago creados desde Admin Center.

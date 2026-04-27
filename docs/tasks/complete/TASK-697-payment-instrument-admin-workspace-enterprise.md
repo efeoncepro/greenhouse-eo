@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional]`
-- Status real: `Diseno`
+- Status real: `Implementado en develop`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
-- Branch: `task/TASK-697-payment-instrument-admin-workspace-enterprise`
+- Branch: `develop` (user instruction 2026-04-27: do not switch branches)
 - Legacy ID: `TASK-281 follow-up`
 - GitHub Issue: `[optional]`
 
@@ -70,6 +70,7 @@ Reglas obligatorias:
 
 - No crear una tabla paralela de instrumentos: el agregado canonico sigue siendo `greenhouse_finance.accounts`.
 - No romper el contrato existente de selectors y drawers que consumen `/api/finance/accounts`.
+- Antes de implementar mutaciones administrativas nuevas, resolver explicitamente el tenant-scope del dominio: el schema runtime actual de `greenhouse_finance.accounts` y tablas ledger relacionadas no expone `space_id`, por lo que la regla general "cada query filtra por `space_id`" no es aplicable sin migracion o excepcion arquitectonica documentada.
 - No borrar instrumentos con ledger, settlement, balances o periodos asociados. La baja operativa debe ser `is_active = false` con impacto visible.
 - No exponer `account_number_full` ni `provider_identifier` completos en el payload default del detalle admin. Cualquier reveal debe ser explicito, capability-gated, auditado y no persistir el valor completo en logs/client state mas alla de la vista local.
 - No almacenar API keys, tokens, passwords, OAuth secrets, bank credentials ni webhooks secretos dentro de `accounts.metadata_json`.
@@ -161,6 +162,8 @@ Skill protocol obligatorio para el agente que tome esta task:
 ### Already exists
 
 - `greenhouse_finance.accounts` ya contiene `instrument_category`, `provider_slug`, `provider_identifier`, `card_last_four`, `card_network`, `credit_limit`, `responsible_user_id`, `default_for`, `display_order`, `metadata_json`.
+- El schema runtime del dominio Finance usa `account_id` slugs operativos como `santander-clp`; no usa IDs `EO-XXX-XXXX` para payment instruments existentes.
+- `docs/architecture/schema-snapshot-baseline.sql` esta desactualizado para este dominio frente a migraciones posteriores y `src/types/db.d.ts`; no debe usarse como unica fuente para implementar este modulo.
 - `src/lib/finance/postgres-store.ts` ya expone `getFinanceAccountFromPostgres`, `listFinanceAccountsFromPostgres`, `createFinanceAccountInPostgres` y `updateFinanceAccountInPostgres`.
 - `src/app/api/admin/payment-instruments/[id]/route.ts` ya soporta `GET` y `PUT`.
 - `src/app/(dashboard)/admin/payment-instruments/[id]/page.tsx` existe como route materializada tras el fix del 404.
@@ -174,6 +177,7 @@ Skill protocol obligatorio para el agente que tome esta task:
 ### Gap
 
 - La vista detalle no administra realmente: no edita, no guarda por seccion, no muestra impacto antes de mutar y no expone acciones operativas.
+- `greenhouse_finance.accounts`, `income_payments`, `expense_payments`, `settlement_groups`, `settlement_legs`, `account_balances` y `reconciliation_periods` no tienen `space_id` en el schema runtime auditado. Esto bloquea mutaciones nuevas que pretendan cumplir tenant isolation por filtro `space_id` hasta completar Slice 0.
 - El payload `GET /api/admin/payment-instruments/[id]` devuelve campos sensibles completos al cliente aunque la UI los enmascare.
 - No hay endpoint/action de reveal sensible con auditoria y capability propia.
 - No hay diff/audit domain-specific para cambios administrativos de instrumentos, mas alla del outbox genrico `finance.account.updated`.
@@ -196,6 +200,21 @@ Skill protocol obligatorio para el agente que tome esta task:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+### Slice 0 — Tenant-scope correction gate
+
+Este slice es obligatorio antes de escribir endpoints de mutacion, reveal, audit o UI editable.
+
+- Decidir y documentar el modelo tenant-scope final para payment instruments:
+  - Opcion preferida si se mantiene la regla general del repo: agregar `space_id` a `greenhouse_finance.accounts` y a las tablas dependientes donde aplique (`income_payments`, `expense_payments`, `settlement_groups`, `settlement_legs`, `account_balances`, `reconciliation_periods`), backfillear de forma segura y actualizar queries nuevas para filtrar por `space_id`.
+  - Opcion excepcional: declarar formalmente `greenhouse_finance.accounts` como objeto finance-internal tenant-global, restringido por `tenantType='efeonce_internal'`, view surface y capabilities, explicando por que no se filtra por `space_id`. Esta opcion requiere decision arquitectonica explicita en `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` antes de implementar.
+- Si se elige migracion:
+  - crearla solo con `pnpm migrate:create <nombre>`.
+  - no renombrar timestamps ni crear archivos SQL a mano.
+  - incluir backfill/idempotencia, indices y FKs/constraints compatibles con datos existentes.
+  - ejecutar `pnpm migrate:up` para regenerar `src/types/db.d.ts`.
+- Actualizar esta task y arquitectura con la decision antes de avanzar a Slice 1.
+- No construir mutaciones administrativas nuevas sobre supuestos de tenant isolation que el schema no puede cumplir.
 
 ### Slice 1 — Admin detail contract, security serializer and impact reader
 
@@ -506,6 +525,7 @@ The workspace should feel closer to Stripe/Ramp/Mercury-style admin banking soft
 
 ## Acceptance Criteria
 
+- [ ] Tenant-scope final de payment instruments queda resuelto antes de mutaciones: queries nuevas filtran por `space_id` o existe excepcion arquitectonica formal y aprobada para objeto tenant-global finance-internal.
 - [ ] `/admin/payment-instruments/[id]` is a full admin workspace with tabs/sections for configuration, activity, reconciliation and audit.
 - [ ] Default detail payload does not expose full `accountNumberFull` or full `providerIdentifier`.
 - [ ] Sensitive reveal requires capability + reason and writes audit without storing revealed value.
@@ -566,6 +586,7 @@ The workspace should feel closer to Stripe/Ramp/Mercury-style admin banking soft
 
 ## Open Questions
 
+- Confirmar si Greenhouse debe migrar payment instruments y ledger relacionado a `space_id` o declarar `greenhouse_finance.accounts` como objeto tenant-global finance-internal con excepcion explicita.
 - Confirmar si `finance.payment_instruments.reveal_sensitive` debe quedar solo para `efeonce_admin` o tambien para `finance_admin` con reason obligatorio.
 - Confirmar si `payment_instrument_admin_audit_log` debe vivir en `greenhouse_finance` o si basta con outbox/audit existente enriquecido.
 - Confirmar si el path `/finance/bank` debe aceptar query params (`accountId`, `year`, `month`) como parte de esta task o quedar como follow-up.

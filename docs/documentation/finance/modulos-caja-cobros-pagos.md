@@ -168,7 +168,9 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Ver logos de proveedores (bancos, PayPal, Wise, Deel, etc.) en las tablas de cobros y pagos
 - Agrupar posición de caja por instrumento
 - Registrar nuevos instrumentos desde Admin Center (`/admin/payment-instruments`)
-- Abrir el detalle operativo de cada instrumento en `/admin/payment-instruments/[id]` para revisar proveedor, moneda, uso por defecto, estado y trazabilidad sin exponer identificadores completos
+- Administrar cada instrumento en `/admin/payment-instruments/[id]` con un workspace de configuracion, actividad, conciliacion y auditoria.
+- Revisar impacto antes de mutar campos criticos o desactivar un instrumento con cobros, pagos, settlements, balances o periodos asociados.
+- Revelar identificadores completos solo de forma temporal, con permiso fino, motivo obligatorio y auditoria sin guardar el valor revelado.
 
 ### Categorías de instrumentos
 
@@ -187,6 +189,14 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Al registrar un pago (drawer "Registrar pago")
 - Al crear una factura de venta (drawer "Registrar ingreso")
 - Al crear un compromiso de compra (drawer "Registrar egreso")
+
+### Administracion segura
+
+- La lista de Admin Center muestra readiness operativo para distinguir instrumentos listos, inactivos o pendientes de configuracion.
+- La vista detalle usa datos sensibles enmascarados por defecto. Si un rol autorizado necesita ver el numero completo de cuenta o identificador de proveedor, debe ingresar un motivo y el valor expira en la UI.
+- Los cambios de ruteo (`default_for`, orden, responsable) se guardan por seccion y quedan auditados.
+- Los cambios de alto impacto exigen confirmacion cuando el instrumento ya tiene uso historico o periodos cerrados.
+- El tenant boundary operativo es `space_id`; los instrumentos y sus movimientos relacionados quedan ligados al espacio resuelto del usuario interno/tenant.
 
 ## Conciliacion e instrumentos
 

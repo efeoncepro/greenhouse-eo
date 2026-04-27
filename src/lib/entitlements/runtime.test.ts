@@ -67,7 +67,28 @@ describe('getTenantEntitlements', () => {
     expect(entitlements.startupPolicyKey).toBe('finance_workspace')
     expect(can(entitlements, 'finance.workspace', 'launch', 'tenant')).toBe(true)
     expect(can(entitlements, 'finance.status', 'read', 'tenant')).toBe(true)
+    expect(can(entitlements, 'finance.payment_instruments.read', 'read', 'tenant')).toBe(true)
+    expect(can(entitlements, 'finance.payment_instruments.update', 'update', 'tenant')).toBe(false)
     expect(canSeeModule(entitlements, 'finance')).toBe(true)
+  })
+
+  it('grants payment instrument admin capabilities only to finance admins and superadmins', () => {
+    const financeAdminEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.FINANCE_ADMIN],
+      primaryRoleCode: ROLE_CODES.FINANCE_ADMIN,
+      routeGroups: ['finance']
+    }))
+
+    const superadminEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
+      primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
+      routeGroups: ['admin', 'finance']
+    }))
+
+    expect(can(financeAdminEntitlements, 'finance.payment_instruments.update', 'update', 'tenant')).toBe(true)
+    expect(can(financeAdminEntitlements, 'finance.payment_instruments.manage_defaults', 'manage', 'tenant')).toBe(true)
+    expect(can(financeAdminEntitlements, 'finance.payment_instruments.reveal_sensitive', 'read', 'tenant')).toBe(false)
+    expect(can(superadminEntitlements, 'finance.payment_instruments.reveal_sensitive', 'read', 'tenant')).toBe(true)
   })
 
   it('keeps pure collaborators in my workspace', () => {
