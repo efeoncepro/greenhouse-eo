@@ -51,8 +51,21 @@ export interface ProviderDefinition {
 
 export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
   // Chilean banks
-  bci: { name: 'BCI', category: 'bank_account', logo: '/images/logos/payment/bci.svg', country: 'CL', currencies: ['CLP', 'USD'] },
-  'banco-chile': { name: 'Banco de Chile', category: 'bank_account', logo: '/images/logos/payment/banco-chile.svg', country: 'CL', currencies: ['CLP', 'USD'] },
+  bci: {
+    name: 'BCI',
+    category: 'bank_account',
+    logo: '/images/logos/payment/bci-full-positive.svg',
+    compactLogo: '/images/logos/payment/bci-mark-positive.svg',
+    country: 'CL',
+    currencies: ['CLP', 'USD']
+  },
+  'banco-chile': {
+    name: 'Banco de Chile',
+    category: 'bank_account',
+    logo: '/images/logos/payment/banco-chile-full-positive.svg',
+    country: 'CL',
+    currencies: ['CLP', 'USD']
+  },
   'banco-estado': { name: 'BancoEstado', category: 'bank_account', logo: '/images/logos/payment/banco-estado.svg', country: 'CL', currencies: ['CLP'] },
   santander: {
     name: 'Santander',
@@ -63,10 +76,17 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
     currencies: ['CLP', 'USD']
   },
   scotiabank: { name: 'Scotiabank', category: 'bank_account', logo: '/images/logos/payment/scotiabank-full-positive.svg', country: 'CL', currencies: ['CLP', 'USD'] },
-  itau: { name: 'Itaú', category: 'bank_account', logo: '/images/logos/payment/itau.svg', country: 'CL', currencies: ['CLP'] },
+  itau: { name: 'Itaú', category: 'bank_account', logo: '/images/logos/payment/itau-full-positive.svg', country: 'CL', currencies: ['CLP'] },
   bice: { name: 'BICE', category: 'bank_account', logo: '/images/logos/payment/bice.svg', country: 'CL', currencies: ['CLP', 'USD'] },
   security: { name: 'Banco Security', category: 'bank_account', logo: '/images/logos/payment/security.svg', country: 'CL', currencies: ['CLP', 'USD'] },
-  falabella: { name: 'Banco Falabella', category: 'bank_account', logo: '/images/logos/payment/falabella-full-positive.svg', country: 'CL', currencies: ['CLP'] },
+  falabella: {
+    name: 'Banco Falabella',
+    category: 'bank_account',
+    logo: '/images/logos/payment/falabella-full-positive.svg',
+    compactLogo: '/images/logos/payment/falabella-mark-positive.svg',
+    country: 'CL',
+    currencies: ['CLP']
+  },
   ripley: { name: 'Banco Ripley', category: 'bank_account', logo: '/images/logos/payment/ripley-full-positive.svg', country: 'CL', currencies: ['CLP'] },
 
   // Card networks
@@ -79,8 +99,13 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
   mastercard: {
     name: 'Mastercard',
     category: 'credit_card',
-    logo: '/images/logos/payment/Mastercard-logo.svg.png',
-    compactLogo: '/images/logos/payment/Mastercard-Logo.wine.svg'
+    // Full lockup (multicolor wordmark + circles).
+    logo: '/images/logos/payment/Mastercard-Logo.wine.svg',
+    // Compact mark = the legacy two-circles isotype (`mastercard.svg`) until
+    // a dedicated `mastercard-mark-positive.svg` is published. The negative
+    // variant (`mastercard-mark-negative.svg`) already exists on disk for
+    // dark-bg contexts via downstream theme handling.
+    compactLogo: '/images/logos/payment/mastercard.svg'
   },
   amex: {
     name: 'American Express',
@@ -130,7 +155,14 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
   },
 
   // Payroll processors
-  previred: { name: 'Previred', category: 'payroll_processor', logo: '/images/logos/payment/previred-full-positive.svg', country: 'CL', currencies: ['CLP'] },
+  previred: {
+    name: 'Previred',
+    category: 'payroll_processor',
+    logo: '/images/logos/payment/previred-full-positive.svg',
+    compactLogo: '/images/logos/payment/previred-mark-positive.svg',
+    country: 'CL',
+    currencies: ['CLP']
+  },
 
   // Platform operator — Greenhouse itself operates internal ledgers (CCA today,
   // wallets/loans/factoring tomorrow). TASK-701 promotes this to a first-class
