@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-27",
+  "outputDir": "public/images/logos/payment",
+  "providers": {
+    "amex": {
+      "searchTerms": ["American Express logo svg", "American Express current logo svg"],
+      "simpleIconsSlug": "americanexpress",
+      "preferredFileBase": "amex"
+    },
+    "banco-chile": {
+      "searchTerms": ["Banco de Chile logo svg", "Banco de Chile logotipo svg"],
+      "preferredFileBase": "banco-chile"
+    },
+    "banco-estado": {
+      "searchTerms": ["BancoEstado logo svg", "BancoEstado logotipo svg"],
+      "preferredFileBase": "banco-estado"
+    },
+    "bci": {
+      "searchTerms": ["BCI banco logo svg", "Banco BCI logotipo svg"],
+      "preferredFileBase": "bci"
+    },
+    "bice": {
+      "searchTerms": ["Banco BICE logo svg", "BICE logotipo svg"],
+      "preferredFileBase": "bice"
+    },
+    "deel": {
+      "searchTerms": ["Deel logo svg", "Deel current logo svg"],
+      "simpleIconsSlug": "deel",
+      "preferredFileBase": "deel"
+    },
+    "falabella": {
+      "searchTerms": ["Banco Falabella logo svg", "Banco Falabella logotipo svg"],
+      "preferredFileBase": "falabella"
+    },
+    "global66": {
+      "searchTerms": ["Global66 logo svg", "Global66 logotipo svg"],
+      "preferredFileBase": "global66"
+    },
+    "itau": {
+      "searchTerms": ["Itaú logo svg", "Itau Unibanco logo svg", "Banco Itaú Chile logo svg"],
+      "preferredFileBase": "itau"
+    },
+    "mastercard": {
+      "searchTerms": ["Mastercard logo svg", "Mastercard current logo svg"],
+      "simpleIconsSlug": "mastercard",
+      "preferredFileBase": "mastercard"
+    },
+    "mercadopago": {
+      "searchTerms": ["Mercado Pago logo svg", "MercadoPago logo svg"],
+      "simpleIconsSlug": "mercadopago",
+      "preferredFileBase": "mercadopago"
+    },
+    "paypal": {
+      "searchTerms": ["PayPal logo svg", "PayPal current logo svg"],
+      "simpleIconsSlug": "paypal",
+      "preferredFileBase": "paypal"
+    },
+    "previred": {
+      "searchTerms": ["Previred logo svg", "Previred logotipo svg"],
+      "preferredFileBase": "previred"
+    },
+    "ripley": {
+      "searchTerms": ["Banco Ripley logo svg", "Banco Ripley logotipo svg"],
+      "preferredFileBase": "ripley"
+    },
+    "santander": {
+      "searchTerms": ["Banco Santander Chile logo svg", "Santander logo svg"],
+      "preferredFileBase": "santander"
+    },
+    "scotiabank": {
+      "searchTerms": ["Scotiabank Chile logo svg", "Scotiabank logo svg"],
+      "simpleIconsSlug": "scotiabank",
+      "preferredFileBase": "scotiabank"
+    },
+    "security": {
+      "searchTerms": ["Banco Security logo svg", "Banco Security logotipo svg"],
+      "preferredFileBase": "security"
+    },
+    "stripe": {
+      "searchTerms": ["Stripe logo svg", "Stripe current logo svg"],
+      "simpleIconsSlug": "stripe",
+      "preferredFileBase": "stripe"
+    },
+    "visa": {
+      "searchTerms": ["Visa logo svg", "Visa current logo svg"],
+      "simpleIconsSlug": "visa",
+      "preferredFileBase": "visa"
+    },
+    "wise": {
+      "searchTerms": ["Wise logo svg", "Wise current logo svg"],
+      "simpleIconsSlug": "wise",
+      "preferredFileBase": "wise"
+    }
+  }
+}

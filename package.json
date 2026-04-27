@@ -24,6 +24,7 @@
     "test:observability:summary": "tsx scripts/test-observability-summary.ts",
     "test:observability": "pnpm test:inventory && pnpm test:results && pnpm test:coverage && pnpm test:observability:summary",
     "build:icons": "tsx src/assets/iconify-icons/bundle-icons-css.ts",
+    "logos:payment:scrape": "tsx scripts/payment-logo-scraper.ts",
     "migrate:up": "tsx scripts/migrate.ts up",
     "migrate:down": "tsx scripts/migrate.ts down",
     "migrate:create": "tsx scripts/migrate.ts create",

@@ -2,6 +2,14 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — Payment logo scraper and audit manifest
+
+- Nuevo `pnpm logos:payment:scrape` para buscar logos SVG de proveedores de instrumentos de pago en Simple Icons/Wikimedia y URLs oficiales configurables.
+- El scraper corre en modo plan por defecto, genera reporte JSON auditable, valida seguridad SVG, penaliza variantes historicas/co-brand y solo guarda assets con `--apply`.
+- Nuevo manifest auditable `public/images/logos/payment/manifest.json` con `slug`, `brandName`, `category`, `country`, `sourceUrl`, `licenseSource`, `logo`, `compactLogo` y `lastVerifiedAt`.
+- Documentacion operativa: `docs/operations/payment-logo-scraper.md`.
+- Validacion: `pnpm logos:payment:scrape -- --provider mastercard`, `pnpm logos:payment:scrape -- --all`, `npx tsc --noEmit --pretty false`, `pnpm lint`.
+
 ### 2026-04-27 — Payment Instrument card network logos
 
 - El catalogo de proveedores de instrumentos de pago usa el logo completo de Mastercard y los isotipos compactos de Mastercard/Visa para chips y selectores pequenos.

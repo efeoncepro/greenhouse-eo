@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-27T00:00:00.000Z",
+  "entries": [
+    {
+      "slug": "amex",
+      "brandName": "American Express",
+      "category": "credit_card",
+      "country": null,
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/amex.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "banco-chile",
+      "brandName": "Banco de Chile",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/banco-chile.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "banco-estado",
+      "brandName": "BancoEstado",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/banco-estado.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "bci",
+      "brandName": "BCI",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/bci.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "bice",
+      "brandName": "BICE",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/bice.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "deel",
+      "brandName": "Deel",
+      "category": "payment_platform",
+      "country": null,
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/deel.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "falabella",
+      "brandName": "Banco Falabella",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/falabella.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "global66",
+      "brandName": "Global66",
+      "category": "fintech",
+      "country": null,
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/global66.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "itau",
+      "brandName": "Itaú",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/itau.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "mastercard",
+      "brandName": "Mastercard",
+      "category": "credit_card",
+      "country": null,
+      "sourceUrl": null,
+      "licenseSource": "User-provided asset; pending scraper verification for full SVG",
+      "logo": "/images/logos/payment/Mastercard-logo.svg.png",
+      "compactLogo": "/images/logos/payment/Mastercard-Logo.wine.svg",
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "mercadopago",
+      "brandName": "MercadoPago",
+      "category": "fintech",
+      "country": null,
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/mercadopago.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "paypal",
+      "brandName": "PayPal",
+      "category": "fintech",
+      "country": null,
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/paypal.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "previred",
+      "brandName": "Previred",
+      "category": "payroll_processor",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/previred.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "ripley",
+      "brandName": "Banco Ripley",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/ripley.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "santander",
+      "brandName": "Santander",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": "user-provided:/public/images/logos/payment/Banco_Santander_Logotipo.svg",
+      "licenseSource": "User-provided official Santander asset",
+      "logo": "/images/logos/payment/Banco_Santander_Logotipo.svg",
+      "compactLogo": "/images/logos/payment/BSAC.svg",
+      "lastVerifiedAt": "2026-04-27T00:00:00.000Z"
+    },
+    {
+      "slug": "scotiabank",
+      "brandName": "Scotiabank",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/scotiabank.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "security",
+      "brandName": "Banco Security",
+      "category": "bank_account",
+      "country": "CL",
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/security.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "stripe",
+      "brandName": "Stripe",
+      "category": "payment_platform",
+      "country": null,
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/stripe.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "visa",
+      "brandName": "Visa",
+      "category": "credit_card",
+      "country": null,
+      "sourceUrl": "user-provided:/public/images/logos/payment/Visa_Inc.-Logo.wine.svg",
+      "licenseSource": "User-provided asset; pending official source verification",
+      "logo": "/images/logos/payment/visa.svg",
+      "compactLogo": "/images/logos/payment/Visa_Inc.-Logo.wine.svg",
+      "lastVerifiedAt": null
+    },
+    {
+      "slug": "wise",
+      "brandName": "Wise",
+      "category": "fintech",
+      "country": null,
+      "sourceUrl": null,
+      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "logo": "/images/logos/payment/wise.svg",
+      "compactLogo": null,
+      "lastVerifiedAt": null
+    }
+  ]
+}
