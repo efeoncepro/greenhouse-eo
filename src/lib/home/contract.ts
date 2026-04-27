@@ -30,6 +30,7 @@ export type HomeBlockId =
   | 'ai-insights-bento'
   | 'recents-rail'
   | 'reliability-ribbon'
+  | 'calendar-rail'
 
 export type HomeSlotKey = 'hero' | 'pulse' | 'main' | 'aside' | 'footer'
 
@@ -191,6 +192,30 @@ export interface HomeRecentItem {
 export interface HomeRecentsRailData {
   items: HomeRecentItem[]
   draftItems: HomeRecentItem[]
+}
+
+export type CalendarEventKind =
+  | 'closing'
+  | 'leave_window'
+  | 'sprint_end'
+  | 'cycle_review'
+  | 'invoice_due'
+  | 'meeting'
+  | 'holiday'
+
+export interface HomeCalendarEvent {
+  eventId: string
+  kind: CalendarEventKind
+  title: string
+  startsAt: string
+  endsAt?: string | null
+  href: string | null
+  badge?: string | null
+}
+
+export interface HomeCalendarRailData {
+  events: HomeCalendarEvent[]
+  asOf: string
 }
 
 export type ReliabilityModuleStatus = 'healthy' | 'degraded' | 'down' | 'unknown'

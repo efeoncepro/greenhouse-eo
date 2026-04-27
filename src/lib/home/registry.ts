@@ -124,6 +124,17 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     componentKey: 'recents-rail'
   } satisfies HomeBlockDefinition,
   {
+    blockId: 'calendar-rail',
+    slot: 'aside',
+    audiences: ['admin', 'internal', 'hr', 'finance', 'collaborator'],
+    priority: 55,
+    cacheTtlMs: 60_000,
+    timeoutMs: 2_000,
+    precomputed: false,
+    fallback: 'hide',
+    componentKey: 'calendar-rail'
+  } satisfies HomeBlockDefinition,
+  {
     blockId: 'reliability-ribbon',
     slot: 'aside',
     audiences: ['admin', 'internal'],

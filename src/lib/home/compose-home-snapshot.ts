@@ -19,6 +19,7 @@ import {
 import { resolveHomeBlockFlags } from './flags'
 import { HOME_BLOCK_REGISTRY, isBlockEligible, type HomeBlockDefinition, type HomeLoaderContext } from './registry'
 import { loadHomeAiInsightsBento } from './loaders/load-ai-insights-bento'
+import { loadHomeCalendarRail } from './loaders/load-calendar-rail'
 import { loadHomeClosingCountdown } from './loaders/load-closing-countdown'
 import { loadHomeHeroAi } from './loaders/load-hero-ai'
 import { loadHomePulseStrip } from './loaders/load-pulse-strip'
@@ -53,7 +54,8 @@ const ALL_LOADERS = {
   'closing-countdown': loadHomeClosingCountdown,
   'ai-insights-bento': loadHomeAiInsightsBento,
   'recents-rail': loadHomeRecentsRail,
-  'reliability-ribbon': loadHomeReliabilityRibbon
+  'reliability-ribbon': loadHomeReliabilityRibbon,
+  'calendar-rail': loadHomeCalendarRail
 } as const
 
 type LoaderFor<TBlockId extends keyof typeof ALL_LOADERS> = (typeof ALL_LOADERS)[TBlockId]

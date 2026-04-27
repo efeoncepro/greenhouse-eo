@@ -18,6 +18,7 @@ import VerticalFooter from '@components/layout/vertical/Footer'
 import HorizontalFooter from '@components/layout/horizontal/Footer'
 import ScrollToTop from '@core/components/scroll-to-top'
 import NexaFloatingButton from '@/components/greenhouse/NexaFloatingButton'
+import RecentsTracker from '@/components/greenhouse/RecentsTracker'
 import ChunkRecoveryClear from '@/components/ChunkRecoveryClear'
 
 // Util Imports
@@ -68,6 +69,7 @@ const Layout = async (props: ChildrenType) => {
         </Button>
       </ScrollToTop>
       <NexaFloatingButton />
+      <RecentsTracker />
       <ChunkRecoveryClear />
     </Providers>
   )

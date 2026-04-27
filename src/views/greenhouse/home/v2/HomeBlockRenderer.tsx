@@ -3,6 +3,7 @@
 import type {
   HomeAiInsightsBentoData,
   HomeBlockEnvelope,
+  HomeCalendarRailData,
   HomeClosingCountdownData,
   HomeHeroAiData,
   HomePulseStripData,
@@ -13,6 +14,7 @@ import type {
 
 import { HomeAiInsightsBento } from './HomeAiInsightsBento'
 import { HomeBlockSkeleton } from './HomeBlockSkeleton'
+import { HomeCalendarRail } from './HomeCalendarRail'
 import { HomeClosingCountdown } from './HomeClosingCountdown'
 import { HomeDegradedCard } from './HomeDegradedCard'
 import { HomeHeroAi } from './HomeHeroAi'
@@ -58,6 +60,8 @@ export const HomeBlockRenderer = ({ envelope }: HomeBlockRendererProps) => {
       return <HomeRecentsRail data={envelope.data as HomeRecentsRailData} />
     case 'reliability-ribbon':
       return <HomeReliabilityRibbon data={envelope.data as HomeReliabilityRibbonData} />
+    case 'calendar-rail':
+      return <HomeCalendarRail data={envelope.data as HomeCalendarRailData} />
     default:
       return null
   }

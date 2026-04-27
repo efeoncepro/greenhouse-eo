@@ -4,6 +4,7 @@ import { requireServerSession } from '@/lib/auth/require-server-session'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
 import { composeHomeSnapshot } from '@/lib/home/compose-home-snapshot'
 import { isHomeV2GloballyEnabled } from '@/lib/home/flags'
+import { getHomeUserIdentity } from '@/lib/home/get-home-user-identity'
 import type { HomeUiDensity } from '@/lib/home/contract'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import HomeShellV2 from '@/views/greenhouse/home/v2/HomeShellV2'
@@ -42,7 +43,11 @@ export default async function HomePage() {
   const session = await requireServerSession()
   const { user } = session
 
-  const preferences = await fetchUserPreferences(user.userId)
+  const [preferences, identity] = await Promise.all([
+    fetchUserPreferences(user.userId),
+    getHomeUserIdentity(user.userId)
+  ])
+
   const v2Enabled = isHomeV2GloballyEnabled() && preferences.home_v2_opt_out !== true
 
   if (!v2Enabled) {
@@ -73,10 +78,24 @@ export default async function HomePage() {
     density: normalizeDensity(preferences.ui_density),
     defaultView: preferences.home_default_view,
     optedOutOfV2: preferences.home_v2_opt_out === true,
-    firstName: (user.name ?? '').split(' ')[0] || 'Usuario',
-    fullName: user.name ?? null,
-    avatarUrl: (user as { image?: string | null }).image ?? null,
-    tenantLabel: user.tenantType === 'efeonce_internal' ? 'Efeonce Group' : 'Cliente Greenhouse'
+    // Identity sources, by priority:
+    //   1. greenhouse_serving.person_360.resolved_* (canonical 360 view)
+    //   2. greenhouse_core.client_users.{full_name,avatar_url}
+    //   3. NextAuth session (last resort — user.name / user.image)
+    // The Hero never invents a name; if all sources are blank we render
+    // the role label instead of a generic "Usuario".
+    firstName:
+      identity?.firstName ??
+      (user.name ?? '').split(' ')[0] ??
+      'Usuario',
+    fullName: identity?.fullName ?? user.name ?? null,
+    avatarUrl:
+      identity?.avatarUrl ??
+      (user as { image?: string | null }).image ??
+      null,
+    tenantLabel:
+      identity?.tenantLabel ??
+      (user.tenantType === 'efeonce_internal' ? 'Efeonce Group' : 'Cliente Greenhouse')
   })
 
   return <HomeShellV2 snapshot={snapshot} />
