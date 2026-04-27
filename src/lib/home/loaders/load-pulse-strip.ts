@@ -83,8 +83,8 @@ const readFinanceSnapshot = async (): Promise<FinanceSnapshotRow | null> => {
        )
        SELECT y AS period_year,
               m AS period_month,
-              COALESCE(margins[1]::float * 100, NULL) AS gross_margin_pct,
-              COALESCE(margins[2]::float * 100, NULL) AS prev_margin_pct,
+              margins[1]::float AS gross_margin_pct,
+              margins[2]::float AS prev_margin_pct,
               (SELECT readiness_pct FROM closure) AS closure_readiness
          FROM latest_array`
     )
@@ -239,21 +239,22 @@ const cardForReliability = (rollup: { healthyCount: number; total: number } | nu
     }
   }
 
-  const value = rollup.healthyCount
+  const healthy = rollup.healthyCount
+  const pct = rollup.total === 0 ? 0 : Math.round((healthy / rollup.total) * 1000) / 10
 
   return {
     kpiId: 'reliability.rollup',
-    label: `Reliability ${value}/${rollup.total}`,
-    value,
-    unit: 'count',
+    label: 'Reliability',
+    value: pct,
+    unit: 'percentage',
     currency: null,
     delta: null,
     deltaPct: null,
     trend: 'flat',
-    status: value === rollup.total ? 'optimal' : value >= rollup.total - 1 ? 'attention' : 'critical',
-    sparkline: Array.from({ length: 7 }, () => value),
+    status: healthy === rollup.total ? 'optimal' : healthy >= rollup.total - 1 ? 'attention' : 'critical',
+    sparkline: Array.from({ length: 7 }, () => pct),
     drillHref: '/admin/operations',
-    description: `${value} de ${rollup.total} módulos OK`,
+    description: `${healthy} de ${rollup.total} módulos OK`,
     computedAt: new Date().toISOString(),
     source: 'realtime'
   }
