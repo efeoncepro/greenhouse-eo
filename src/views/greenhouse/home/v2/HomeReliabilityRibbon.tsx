@@ -34,7 +34,7 @@ const MODULE_ICON: Record<string, string> = {
   cloud: 'tabler-cloud',
   home: 'tabler-home',
   'integrations.notion': 'tabler-brand-notion',
-  'integrations.teams': 'tabler-brand-microsoft-teams'
+  'integrations.teams': 'tabler-brand-teams'
 }
 
 /**
