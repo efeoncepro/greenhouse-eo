@@ -20,6 +20,7 @@ export const dynamic = 'force-dynamic'
 const serializeAccount = (account: ShareholderAccountSummary) => ({
   accountId: account.accountId,
   accountName: account.accountName,
+  accountNumber: account.accountNumber,
   shareholderName: account.shareholderName,
   shareholderEmail: account.shareholderEmail,
   profileId: account.profileId,

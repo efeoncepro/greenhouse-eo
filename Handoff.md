@@ -1,5 +1,47 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — TASK-700 Internal Account Number Allocator (CCA + future wallets)
+
+- Rama: `develop`.
+- Diagnostico: las cuentas accionistas (CCA) quedaban con `account_number = NULL` — sin identificador legible para usuario, contador, mail al accionista, ni admin. Y se necesitaba un algoritmo robusto reutilizable para el proximo modulo de wallets (employee/freelancer/client) sin re-discutir formato cada vez.
+- Solucion canonica: algoritmo TS+SQL con shape `TT-XX-D-NNNN` (`01-90-7-0001`), Luhn mod-10, multi-tenant, multi-tipo, version-tagged.
+  - Migracion `20260427134952999`: agrega `greenhouse_core.spaces.numeric_code` (NOT NULL UNIQUE 2-digit, auto-seed por created_at), tabla catalog `greenhouse_finance.internal_account_type_catalog` (`90` = shareholder hoy; ranges reservados `10-29` wallets, `70-89` loans/factoring), tabla `account_number_registry` (single allocation log multi-tabla + audit + reverse lookup), funciones SQL `luhn_check_digit()` (IMMUTABLE) + `allocate_account_number()` (atomic, advisory lock por `(space, type)`), UNIQUE partial index sobre `accounts.account_number WHERE category='shareholder_account'`. Backfill: Julio Reyes -> `01-90-7-0001`.
+  - Modulo TS canonico `src/lib/finance/internal-account-number/`: `luhn.ts` (mirror exacto del PL/pgSQL, paridad regression-tested), `format.ts` (parse + format + validate), `mask.ts` (`maskAccountNumber` -> `•••• 0001`), `allocate.ts` (delega a SQL function via Kysely, NO re-deriva).
+  - Wiring en `createShareholderAccount` (`src/lib/finance/shareholder-account/store.ts`): allocator dentro de la misma transaccion del INSERT en `accounts`, fallback a primer space si caller no provee `spaceId`. Outbox event nuevo `finance.shareholder_account.number_assigned` con `accountNumber`, `formatVersion`, `sequentialValue`, `spaceId`, `typeCode`.
+  - UI ShareholderAccountView: numero canonico bajo el nombre de la cuenta en monospace; busqueda por numero soportada (case-insensitive substring sobre el campo). Admin `/admin/payment-instruments` enmascara automaticamente `•••• 0001` via el serializer existente (`slice(-4)` produce el secuencial puro porque el shape termina en 4 digitos).
+- Validacion ejecutada:
+  - `pnpm pg:connect:migrate` OK (Cloud SQL `greenhouse-pg-dev`)
+  - `pnpm pg:connect:status` clean
+  - Smoke staging `/api/admin/payment-instruments?category=shareholder_account` -> Julio Reyes ahora `accountNumber: "•••• 0001"` (era `null`)
+  - `npx tsc --noEmit` clean (mis archivos; error pre-existente en `scripts/payment-logo-scraper.ts` no relacionado)
+  - `pnpm lint` clean (mismo pre-existente del scraper)
+  - `npx vitest run src/lib/finance` -> 55 archivos / 382 tests verde, incluye 17 nuevos (luhn, format, mask)
+- Reusabilidad confirmada: cuando llegue el modulo de wallets, se agrega fila al catalog (`('10', 'employee_wallet', ...)`) y el modulo nuevo llama `allocateAccountNumber({ typeCode: '10', targetTable: 'wallets', ... })`. Cero codigo duplicado.
+- Spec cerrada: `docs/tasks/complete/TASK-700-internal-account-number-allocator.md`.
+
+## Sesion 2026-04-27 — Payment Brand Asset Agent V1
+
+- Rama: `develop`; no se cambio de rama.
+- Cambio aplicado:
+  - `scripts/payment-logo-scraper.ts` pasa de scraper lineal a workflow agentic V1: `discover -> review -> publish`.
+  - Nuevo modo `--candidate-url` + `--candidate-source` para validar/aplicar una URL SVG explicita sin repetir busqueda amplia.
+  - Nuevo `--review-html` genera consola HTML local con previews, score, razones y comando sugerido de publish por candidato.
+  - Nuevos scripts: `pnpm logos:payment:agent`, `pnpm logos:payment:discover`, `pnpm logos:payment:publish`.
+  - Scoring soporta `requiredBrandSignals` y `blockedBrandSignals` para marcas confundibles; se expandio bloqueo de falsos positivos no marcarios.
+  - Scotiabank full positivo fue republicado desde URL oficial explicita (`cdn.aglty.io/.../logo-scotiabank-red.svg`), quedando idempotente en rerun.
+- Docs:
+  - `docs/operations/payment-logo-scraper.md`
+  - `changelog.md`
+- Validacion ejecutada:
+  - `pnpm logos:payment:agent -- --provider scotiabank --variant full-positive --candidate-url https://cdn.aglty.io/scotiabank-chile/2024/header/logo-scotiabank-red.svg --candidate-source official --min-score 80 --report artifacts/payment-logo-agent/scotiabank-direct.json --review-html artifacts/payment-logo-agent/scotiabank-direct.html` OK
+  - mismo comando con `--apply` OK; segundo rerun confirma `unchanged` y `manifest: unchanged`
+  - `pnpm logos:payment:discover -- --provider scotiabank --variant full-positive --min-score 80 --report artifacts/payment-logo-agent/scotiabank-discover-override.json --review-html artifacts/payment-logo-agent/scotiabank-discover-override.html` OK
+  - `npx eslint scripts/payment-logo-scraper.ts` OK
+  - `npx tsc --noEmit --pretty false` OK
+  - `git diff --check` OK
+- Coordinacion:
+  - Hay cambios abiertos no relacionados de TASK-700 en el workspace; no se tocaron ni se deben mezclar con el commit de logos.
+
 ## Sesion 2026-04-27 — Payment logo scraper hardening e inventario
 
 - Rama: `develop`; no se cambio de rama.

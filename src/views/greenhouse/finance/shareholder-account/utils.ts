@@ -218,6 +218,7 @@ export const normalizeShareholderAccount = (item: Record<string, unknown>): Shar
   return {
     accountId: toStringValue(readValue(item, ['accountId', 'account_id'])),
     accountName: toStringValue(readValue(item, ['accountName', 'account_name'])),
+    accountNumber: toNullableString(readValue(item, ['accountNumber', 'account_number'])),
     shareholderName: toStringValue(readValue(item, ['shareholderName', 'shareholder_name', 'profileName', 'profile_name', 'name']), 'Sin nombre'),
     profileId: toNullableString(readValue(item, ['profileId', 'profile_id'])),
     memberId: toNullableString(readValue(item, ['memberId', 'member_id'])),

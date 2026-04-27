@@ -2661,6 +2661,10 @@ export interface GreenhouseCoreSpaces {
   client_id: string | null;
   created_at: Generated<Timestamp>;
   notes: string | null;
+  /**
+   * Canonical 2-digit numeric tenant code used by greenhouse_finance.allocate_account_number. Range 01-98 for tenants; 00 and 99 reserved for system/test/technical partitions. Immutable post-assignment — emitted account numbers reference it.
+   */
+  numeric_code: string;
   organization_id: string | null;
   public_id: string | null;
   space_id: string;
@@ -3220,6 +3224,18 @@ export interface GreenhouseFinanceAccountBalances {
   space_id: string | null;
   transaction_count: Generated<number>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceAccountNumberRegistry {
+  account_number: string;
+  assigned_at: Generated<Timestamp>;
+  assigned_to_id: string;
+  assigned_to_table: string;
+  format_version: Generated<number>;
+  registry_id: Generated<Int8>;
+  sequential_value: number;
+  space_id: string;
+  type_code: string;
 }
 
 export interface GreenhouseFinanceAccounts {
@@ -3798,6 +3814,16 @@ export interface GreenhouseFinanceIncomeSettlementReconciliation {
   payments_total: Numeric | null;
   total_amount: Numeric | null;
   withholding_amount: Numeric | null;
+}
+
+export interface GreenhouseFinanceInternalAccountTypeCatalog {
+  category_slug: string;
+  created_at: Generated<Timestamp>;
+  display_name: string;
+  family: string;
+  is_active: Generated<boolean>;
+  type_code: string;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseFinanceNuboxEmissionLog {
@@ -7026,6 +7052,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
   "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
+  "greenhouse_finance.account_number_registry": GreenhouseFinanceAccountNumberRegistry;
   "greenhouse_finance.accounts": GreenhouseFinanceAccounts;
   "greenhouse_finance.bank_statement_rows": GreenhouseFinanceBankStatementRows;
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
@@ -7042,6 +7069,7 @@ export interface DB {
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
   "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
+  "greenhouse_finance.internal_account_type_catalog": GreenhouseFinanceInternalAccountTypeCatalog;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;

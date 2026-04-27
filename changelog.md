@@ -2,6 +2,17 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — TASK-700 Internal Account Number Allocator (CCA + future wallets)
+
+- Las cuentas accionistas (CCA) ya tienen numero de cuenta legible. Formato canonico `TT-XX-D-NNNN` (e.g. `01-90-7-0001`) — bank-style, todo numerico, validable con check digit Luhn mod-10. Los ultimos 4 caracteres son siempre el secuencial puro de 4 digitos, asi el masking estandar `•••• {last4}` produce identificadores distintivos sin colision visual.
+- Algoritmo reutilizable para el proximo modulo de wallets (employee/freelancer/client), prestamos intercompania, factoring — sin re-discutir formato. Componentes: `greenhouse_core.spaces.numeric_code` (2-digit canonico por tenant), `greenhouse_finance.internal_account_type_catalog` (catalogo extensible de tipos: `90` = shareholder hoy, ranges reservados `10-29` wallets, `70-89` loans/factoring), `greenhouse_finance.account_number_registry` (single allocation log multi-tabla con audit + reverse lookup), funciones SQL `luhn_check_digit()` + `allocate_account_number()` (atomico, advisory lock por `(space, type)`).
+- Modulo TS canonico `src/lib/finance/internal-account-number/` espeja la SQL function. Helpers `luhnCheckDigit`, `formatAccountNumber`, `parseAccountNumber`, `validateAccountNumber`, `maskAccountNumber`. Test de paridad TS↔SQL contra el numero del backfill (`01-90-7-0001`) bloquea drift.
+- `createShareholderAccount` invoca `allocateAccountNumber()` dentro de la misma transaccion del INSERT — el numero queda persistido junto a la fila, no en dos pasos. Outbox event nuevo `finance.shareholder_account.number_assigned` con `accountNumber`, `formatVersion`, `sequentialValue`, `spaceId`, `typeCode`.
+- Backfill de la unica CCA existente (Julio Reyes) en la migracion: `accountNumber = "01-90-7-0001"`. Verificado en staging: `/api/admin/payment-instruments?category=shareholder_account` ahora devuelve `accountNumber: "•••• 0001"` (era `null`).
+- UI ShareholderAccountView muestra el numero bajo el nombre de la cuenta en monospace. Busqueda por numero soportada. Admin `/admin/payment-instruments` enmascara automaticamente con el serializer existente (sin cambios al codigo de masking — el shape final del numero hace que `slice(-4)` produzca el secuencial puro).
+- `format_version` baked en el registry permite evolucionar a v2 sin invalidar emitidos.
+- Validacion: `pnpm pg:connect:migrate` OK, `npx tsc --noEmit` clean, `pnpm lint` clean, `npx vitest run src/lib/finance` 55 archivos / 382 tests verde (17 nuevos: luhn, format, mask). Spec: `docs/tasks/complete/TASK-700-internal-account-number-allocator.md`.
+
 ### 2026-04-27 — TASK-699 Banco "Resultado cambiario" Canonical FX P&L Pipeline
 
 - La card "Resultado cambiario" del Banco (`/finance/bank`) deja de mostrar `$0` silencioso. Ahora distingue tres estados explicitos: "Sin exposicion FX" cuando todas las cuentas activas son CLP (caso Efeonce hoy), breakdown "Realizado X · Translacion Y" + tooltip canonico cuando hay exposicion, y "Pendiente" con warning rojo cuando la materializacion falla por rate ausente.
@@ -16,7 +27,9 @@
 ### 2026-04-27 — Payment logo scraper and audit manifest
 
 - Nuevo `pnpm logos:payment:scrape` para buscar logos SVG de proveedores de instrumentos de pago en Simple Icons/Wikimedia y URLs oficiales configurables.
+- El scraper evoluciona a workflow agentic `discover -> review -> publish`: `pnpm logos:payment:discover` genera report JSON + consola HTML y `pnpm logos:payment:agent -- --candidate-url ... --apply` publica solo URLs explicitas aprobadas.
 - El scraper corre en modo plan por defecto, genera reporte JSON auditable, valida seguridad SVG, penaliza variantes historicas/co-brand y solo guarda assets con `--apply`.
+- El modo `--candidate-url` evita repetir scraping amplio durante la aprobacion y deja el source exacto en el manifest; se agregan `requiredBrandSignals`/`blockedBrandSignals` para marcas confundibles.
 - Soporta variantes `full-positive`, `full-negative`, `mark-positive` y `mark-negative`, con capa Gemini opcional (`--ai-review`, `--ai-required`) y timeout de seguridad.
 - La validacion AI intenta Gemini 3 Flash en Vertex `global` y baja por fallback cuando un modelo no esta disponible; los candidatos de paginas oficiales deben tener senal marcaria en el basename del SVG para evitar iconos de UI/social.
 - Inventario enriquecido con fuentes oficiales verificadas para Banco Ripley, Previred, Santander, Deel y Scotiabank; Scotiabank queda solo con full positivo rojo oficial hasta obtener/derivar variantes correctas.

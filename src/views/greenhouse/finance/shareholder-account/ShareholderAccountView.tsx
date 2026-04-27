@@ -154,6 +154,7 @@ const ShareholderAccountView = () => {
 
       return [
         account.accountName,
+        account.accountNumber,
         account.shareholderName,
         account.profileId,
         account.memberId,
@@ -199,6 +200,16 @@ const ShareholderAccountView = () => {
               <Typography variant='body2' fontWeight={600} noWrap>
                 {row.original.accountName}
               </Typography>
+              {row.original.accountNumber ? (
+                <Typography
+                  variant='caption'
+                  color='text.secondary'
+                  fontFamily='var(--mui-typography-monospace, monospace)'
+                  noWrap
+                >
+                  {row.original.accountNumber}
+                </Typography>
+              ) : null}
               <Typography variant='caption' color='text.secondary' noWrap>
                 {row.original.shareholderName}
               </Typography>

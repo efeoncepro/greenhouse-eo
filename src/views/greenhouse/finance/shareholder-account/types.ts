@@ -29,6 +29,8 @@ export type ShareholderMovementSourceSummary = {
 export type ShareholderAccountSummary = {
   accountId: string
   accountName: string
+  /** Canonical internal account number (e.g. '01-90-7-0001'). Null only for legacy rows pre-TASK-700 backfill. */
+  accountNumber: string | null
   shareholderName: string
   profileId: string | null
   memberId: string | null

@@ -19,6 +19,10 @@ import {
 } from '@/lib/finance/shared'
 import { rematerializeAccountBalancesFromDate } from '@/lib/finance/account-balances'
 import {
+  allocateAccountNumber,
+  InternalAccountTypeCode
+} from '@/lib/finance/internal-account-number'
+import {
   getShareholderMovementSourceSummaries,
   inferShareholderMovementSource,
   resolveShareholderMovementSource,
@@ -51,6 +55,7 @@ type DbTx = Transaction<DB>
 type ShareholderAccountSummaryRow = {
   account_id: string
   account_name: string
+  account_number: string | null
   currency: string
   status: string
   ownership_percentage: unknown
@@ -124,6 +129,8 @@ export type ShareholderPersonOption = {
 export type ShareholderAccountSummary = {
   accountId: string
   accountName: string
+  /** Canonical internal account number (e.g. '01-90-7-0001'). Null only for legacy rows pre-TASK-700 backfill. */
+  accountNumber: string | null
   currency: string
   status: string
   ownershipPercentage: number | null
@@ -258,6 +265,7 @@ const generateShareholderAccountId = (displayName: string, currency: FinanceCurr
 const mapSummaryRow = (row: ShareholderAccountSummaryRow): ShareholderAccountSummary => ({
   accountId: normalizeString(row.account_id),
   accountName: normalizeString(row.account_name),
+  accountNumber: row.account_number ? normalizeString(row.account_number) : null,
   currency: normalizeString(row.currency),
   status: normalizeString(row.status),
   ownershipPercentage: row.ownership_percentage != null ? toNumber(row.ownership_percentage) : null,
@@ -572,6 +580,7 @@ export const listShareholderAccounts = async ({
     SELECT
       sa.account_id,
       a.account_name,
+      a.account_number,
       a.currency,
       sa.status,
       sa.ownership_percentage,
@@ -631,6 +640,8 @@ export const createShareholderAccount = async (
   const actorUserId = normalizeString(input.actorUserId) || null
   const db = await getDb()
 
+  let assignedAccountNumber: string | null = null
+
   await db.transaction().execute(async trx => {
     const existing = await trx
       .selectFrom('greenhouse_finance.shareholder_accounts')
@@ -642,14 +653,50 @@ export const createShareholderAccount = async (
       throw new FinanceValidationError(`Shareholder account "${accountId}" already exists.`, 409)
     }
 
+    // Resolve the tenant scope for the allocator. Falls back to the oldest
+    // existing space if the caller did not provide one — same behavior as
+    // the migration backfill so single-tenant flows keep working.
+    let allocatorSpaceId = spaceId
+
+    if (!allocatorSpaceId) {
+      const fallbackSpace = await trx
+        .selectFrom('greenhouse_core.spaces')
+        .select('space_id')
+        .orderBy('created_at', 'asc')
+        .orderBy('space_id', 'asc')
+        .limit(1)
+        .executeTakeFirst()
+
+      if (!fallbackSpace) {
+        throw new FinanceValidationError(
+          'No space available to allocate the shareholder account number.'
+        )
+      }
+
+      allocatorSpaceId = fallbackSpace.space_id
+    }
+
+    // Allocate the canonical internal account number BEFORE inserting the
+    // accounts row so the row lands with account_number already populated
+    // (single source of truth, no two-step persistence drift).
+    const allocation = await allocateAccountNumber({
+      spaceId: allocatorSpaceId,
+      typeCode: InternalAccountTypeCode.shareholderAccount,
+      targetTable: 'accounts',
+      targetId: accountId,
+      client: trx
+    })
+
+    assignedAccountNumber = allocation.accountNumber
+
     await trx
       .insertInto('greenhouse_finance.accounts')
       .values({
         account_id: accountId,
         account_name: accountName,
         bank_name: 'Cuenta corriente accionista',
-        account_number: null,
-        account_number_full: null,
+        account_number: allocation.accountNumber,
+        account_number_full: allocation.accountNumber,
         currency,
         account_type: 'other',
         country_code: 'CL',
@@ -718,6 +765,20 @@ export const createShareholderAccount = async (
         spaceId
       }
     })
+
+    await insertOutboxEvent(trx, {
+      aggregateType: 'finance_shareholder_account',
+      aggregateId: accountId,
+      eventType: 'finance.shareholder_account.number_assigned',
+      payload: {
+        accountId,
+        accountNumber: allocation.accountNumber,
+        formatVersion: allocation.formatVersion,
+        sequentialValue: allocation.sequentialValue,
+        spaceId: allocatorSpaceId,
+        typeCode: InternalAccountTypeCode.shareholderAccount
+      }
+    })
   })
 
   const created = await listShareholderAccounts({ spaceId })
@@ -725,6 +786,7 @@ export const createShareholderAccount = async (
   return created.find(account => account.accountId === accountId) || {
     accountId,
     accountName,
+    accountNumber: assignedAccountNumber,
     currency,
     status,
     ownershipPercentage,

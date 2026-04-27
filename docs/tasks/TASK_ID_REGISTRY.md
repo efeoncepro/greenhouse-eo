@@ -775,3 +775,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-697` | `complete` | Payment Instrument Admin Workspace Enterprise | `docs/tasks/complete/TASK-697-payment-instrument-admin-workspace-enterprise.md` |
 | `TASK-698` | `to-do` | Nexa Conversation Drawer (cierre del Hero AI Smart Home v2) | `docs/tasks/to-do/TASK-698-nexa-conversation-drawer.md` |
 | `TASK-699` | `complete` | Banco "Resultado cambiario" Canonical FX P&L Pipeline | `docs/tasks/complete/TASK-699-banco-fx-result-canonical-pipeline.md` |
+| `TASK-700` | `complete` | Internal Account Number Allocator (CCA + future wallets) | `docs/tasks/complete/TASK-700-internal-account-number-allocator.md` |
