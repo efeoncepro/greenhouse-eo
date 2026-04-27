@@ -57,6 +57,8 @@ const pickGreetingPool = (now: Date) => {
   return HOME_GREETINGS.default
 }
 
+const GENERIC_NAME_FALLBACKS = new Set(['Usuario', 'Greenhouse', 'agent', 'Agent', ''])
+
 export const loadHomeHeroAi = async (
   ctx: HomeLoaderContext,
   options: { firstName: string }
@@ -64,7 +66,13 @@ export const loadHomeHeroAi = async (
   const now = new Date(ctx.now)
   const pool = pickGreetingPool(now)
   const baseGreeting = pool[Math.floor(Math.random() * pool.length)]
-  const greeting = baseGreeting.replace('{name}', options.firstName)
+  // When the user has no real first name (agent auth, fallback) drop the
+  // ", {name}" segment entirely so we don't render "Cerrando el día, Usuario".
+  const hasRealName = options.firstName && !GENERIC_NAME_FALLBACKS.has(options.firstName)
+
+  const greeting = hasRealName
+    ? baseGreeting.replace('{name}', options.firstName)
+    : baseGreeting.replace(/,\s*\{name\}/g, '').replace('{name}', '')
 
   const suggestions = SUGGESTIONS_BY_AUDIENCE[ctx.audienceKey] ?? SUGGESTIONS_BY_AUDIENCE.internal
 

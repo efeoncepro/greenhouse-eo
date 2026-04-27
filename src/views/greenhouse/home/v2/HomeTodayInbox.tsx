@@ -199,7 +199,7 @@ export const HomeTodayInbox = ({ data }: HomeTodayInboxProps) => {
           </Box>
         ) : (
           <AnimatePresence initial={false}>
-            {items.map(item => (
+            {items.slice(0, 6).map(item => (
               <TodayItemRow key={item.itemId} item={item} onAction={dispatchAction} />
             ))}
           </AnimatePresence>

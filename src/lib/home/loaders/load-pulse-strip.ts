@@ -385,7 +385,11 @@ export const loadHomePulseStrip = async (ctx: HomeLoaderContext): Promise<HomePu
     }
   }
 
-  const cards = await buildRealtimeCardsForAudience(audience, ctx)
+  const rawCards = await buildRealtimeCardsForAudience(audience, ctx)
+
+  // Drop dead KPIs (no value AND no description) — never let a sparkline-empty
+  // card take a slot. Better to render fewer cards than to show a void.
+  const cards = rawCards.filter(card => card.value != null || (card.description != null && card.description.length > 0))
 
   return {
     audienceKey: audience,

@@ -2,17 +2,16 @@
 
 import { useRouter } from 'next/navigation'
 
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
-import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import classnames from 'classnames'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
@@ -22,11 +21,11 @@ interface HomeReliabilityRibbonProps {
   data: HomeReliabilityRibbonData
 }
 
-const STATUS_TONE: Record<ReliabilityModuleStatus, { color: ThemeColor; icon: string; label: string; progress: number }> = {
-  healthy: { color: 'success', icon: 'tabler-circle-check-filled', label: 'OK', progress: 100 },
-  degraded: { color: 'warning', icon: 'tabler-alert-circle', label: 'Degradado', progress: 50 },
-  down: { color: 'error', icon: 'tabler-circle-x-filled', label: 'Caído', progress: 15 },
-  unknown: { color: 'secondary', icon: 'tabler-circle-dotted', label: '—', progress: 0 }
+const STATUS_TONE: Record<ReliabilityModuleStatus, { color: ThemeColor; icon: string; label: string }> = {
+  healthy: { color: 'success', icon: 'tabler-circle-check-filled', label: 'OK' },
+  degraded: { color: 'warning', icon: 'tabler-alert-circle', label: 'Degradado' },
+  down: { color: 'error', icon: 'tabler-circle-x-filled', label: 'Caído' },
+  unknown: { color: 'secondary', icon: 'tabler-circle-dotted', label: '—' }
 }
 
 const MODULE_ICON: Record<string, string> = {
@@ -39,9 +38,12 @@ const MODULE_ICON: Record<string, string> = {
 }
 
 /**
- * Smart Home v2 Reliability Ribbon — port of Vuexy `EarningReports` row
- * pattern: avatar + label/sublabel + status chip + linear progress.
- * Compact, dense, no improvisation.
+ * Smart Home v2 Reliability Ribbon — dense status-dot list.
+ *
+ * Inspired by Vercel/GitHub status pages: status dot + module name +
+ * incident count when > 0. No `LinearProgress` per row (too noisy when
+ * everything is healthy). Total height stays within 6 modules ≈ 220px,
+ * keeping the aside balanced against the main column.
  */
 export const HomeReliabilityRibbon = ({ data }: HomeReliabilityRibbonProps) => {
   const router = useRouter()
@@ -53,46 +55,58 @@ export const HomeReliabilityRibbon = ({ data }: HomeReliabilityRibbonProps) => {
       <CardHeader
         avatar={<i className={classnames(rollupTone.icon, 'text-xl', `text-${rollupTone.color}`)} />}
         title='Estado de plataforma'
-        subheader={`${healthy} de ${data.modules.length} módulos OK · rollup ${rollupTone.label}`}
+        subheader={`${healthy}/${data.modules.length} módulos · ${rollupTone.label}`}
         titleTypographyProps={{ variant: 'h5' }}
         action={<OptionMenu options={['Abrir Reliability', 'Ver incidentes']} />}
         sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
       />
-      <CardContent className='flex flex-col gap-4'>
+      <CardContent className='flex flex-col gap-3 pbe-5'>
         {data.modules.map(module => {
           const tone = STATUS_TONE[module.status]
           const icon = MODULE_ICON[module.moduleKey] ?? 'tabler-puzzle'
 
           return (
-            <div
+            <Stack
               key={module.moduleKey}
-              className='flex items-center gap-4 cursor-pointer'
+              direction='row'
+              alignItems='center'
+              spacing={2}
+              sx={{
+                py: 0.75,
+                px: 2,
+                borderRadius: theme => theme.shape.customBorderRadius?.md ?? 6,
+                cursor: 'pointer',
+                transition: 'background-color 120ms cubic-bezier(0.2, 0, 0, 1)',
+                '&:hover': { bgcolor: 'action.hover' }
+              }}
               onClick={() => router.push('/admin/operations')}
             >
-              <CustomAvatar skin='light' variant='rounded' color={tone.color} size={34}>
-                <i className={classnames(icon, 'text-[18px]')} />
-              </CustomAvatar>
-              <div className='flex flex-wrap justify-between items-center gap-x-4 gap-y-1 is-full'>
-                <Stack spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography className='font-medium' color='text.primary' noWrap>
-                    {module.label}
-                  </Typography>
-                  <LinearProgress
-                    variant='determinate'
-                    value={tone.progress}
-                    color={tone.color}
-                    sx={{ height: 4, borderRadius: 2, mt: 0.5 }}
-                  />
-                </Stack>
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  bgcolor: theme => theme.palette[tone.color].main,
+                  boxShadow: theme => `0 0 0 3px color-mix(in oklch, ${theme.palette[tone.color].main} 22%, transparent)`,
+                  flexShrink: 0
+                }}
+              />
+              <i className={classnames(icon, 'text-[16px]')} style={{ opacity: 0.65 }} />
+              <Typography variant='body2' sx={{ fontWeight: 500, flex: 1, minWidth: 0 }} noWrap color='text.primary'>
+                {module.label}
+              </Typography>
+              {module.incidentsOpen > 0 ? (
                 <Chip
                   size='small'
                   variant='tonal'
                   color={tone.color}
-                  label={module.incidentsOpen > 0 ? `${module.incidentsOpen}` : tone.label}
-                  sx={{ height: 22, fontVariantNumeric: 'tabular-nums' }}
+                  label={`${module.incidentsOpen}`}
+                  sx={{ height: 22, minWidth: 28, fontVariantNumeric: 'tabular-nums' }}
                 />
-              </div>
-            </div>
+              ) : (
+                <Typography variant='caption' color='text.secondary'>{tone.label}</Typography>
+              )}
+            </Stack>
           )
         })}
       </CardContent>

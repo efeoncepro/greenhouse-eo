@@ -168,7 +168,10 @@ export const HomeAiInsightsBento = ({ data }: HomeAiInsightsBentoProps) => {
       <CardContent>
         <Grid container spacing={3}>
           {data.cards.map((card, index) => (
-            <Grid key={card.insightId} size={{ xs: 12, md: 6 }}>
+            <Grid
+              key={card.insightId}
+              size={{ xs: 12, md: data.cards.length === 1 ? 12 : 6 }}
+            >
               <InsightCard card={card} index={index} />
             </Grid>
           ))}
