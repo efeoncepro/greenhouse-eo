@@ -152,6 +152,8 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
     ? `${data.deltaPct > 0 ? '+' : ''}${data.deltaPct.toFixed(1)}% vs hace 3 meses · actualizado ${new Date(data.asOf).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })}`
     : 'Calculado de income − expenses (rolling 6 meses)'
 
+  const isEmpty = data.runwayMonths == null && data.cashCurrent == null && data.monthlyHistory.length === 0
+
   return (
     <motion.div
       initial={reduced ? false : { opacity: 0, y: 8 }}
@@ -168,6 +170,22 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
           sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
         />
         <CardContent className='flex flex-col gap-4 pbe-4'>
+          {isEmpty ? (
+            <Stack spacing={2} sx={{ py: 2 }}>
+              <Stack direction='row' spacing={1.5} alignItems='center'>
+                <CustomAvatar variant='rounded' skin='light' color='secondary' size={32}>
+                  <i className='tabler-clock-hour-3 text-[18px]' />
+                </CustomAvatar>
+                <Typography variant='body2' color='text.primary' sx={{ fontWeight: 500 }}>
+                  Esperando datos del cierre operativo
+                </Typography>
+              </Stack>
+              <Typography variant='caption' color='text.secondary'>
+                El runway se calcula del P&amp;L canónico. Cuando el cierre del mes esté materializado o Nubox sincronice las facturas pagadas, este bloque se actualiza automáticamente.
+              </Typography>
+            </Stack>
+          ) : (
+          <>
           <Stack direction='row' alignItems='baseline' spacing={1.5} flexWrap='wrap' useFlexGap>
             <Tooltip title={tooltipTitle} placement='top' arrow disableInteractive enterDelay={300}>
               <Typography
@@ -177,7 +195,7 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
               >
                 {data.runwayMonths != null ? <AnimatedCounter value={data.runwayMonths} format='integer' /> : '—'}
                 <Typography component='span' variant='h5' color='text.secondary' sx={{ ml: 1 }}>
-                  {data.runwayMonths != null ? 'meses' : ''}
+                  {data.runwayMonths != null ? (data.runwayMonths === 1 ? 'mes' : 'meses') : ''}
                 </Typography>
               </Typography>
             </Tooltip>
@@ -243,6 +261,8 @@ export const HomeRunwayStrategic = ({ data }: HomeRunwayStrategicProps) => {
               ))}
             </Stack>
           ) : null}
+          </>
+          )}
           {data.drillHref ? (
             <Stack direction='row' justifyContent='flex-end' sx={{ mt: 1 }}>
               <Button

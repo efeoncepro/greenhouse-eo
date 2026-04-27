@@ -30,7 +30,54 @@ interface MonthAggregateRow {
 
 const MONTH_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
-const aggregateByMonth = async (): Promise<MonthAggregateRow[]> => {
+interface SnapshotRow {
+  period_year: number | string
+  period_month: number | string
+  revenue_clp: number | string | null
+  gross_margin_pct: number | string | null
+}
+
+/**
+ * Primary source: operational P&L snapshots — same canonical reader the
+ * Pulse Strip and AI Briefing use. Income = revenue_clp, burn derived
+ * from (1 - gross_margin_pct/100). Consistent across the home page.
+ */
+const aggregateFromSnapshots = async (): Promise<MonthAggregateRow[]> => {
+  try {
+    const rows = await runGreenhousePostgresQuery<SnapshotRow & Record<string, unknown>>(
+      `SELECT period_year, period_month,
+              MAX(revenue_clp)::numeric AS revenue_clp,
+              MAX(gross_margin_pct)::numeric AS gross_margin_pct
+         FROM greenhouse_serving.operational_pl_snapshots
+        WHERE scope_type = 'organization'
+          AND make_date(period_year::int, period_month::int, 1) >= (NOW() - INTERVAL '6 months')::date
+        GROUP BY period_year, period_month
+        ORDER BY period_year, period_month`
+    )
+
+    return rows.map(row => {
+      const revenue = Number(row.revenue_clp ?? 0)
+      const marginPct = Number(row.gross_margin_pct ?? 0)
+      const expensesProxy = Math.max(0, revenue * (1 - marginPct / 100))
+
+      return {
+        period_year: row.period_year,
+        period_month: row.period_month,
+        income_paid: revenue,
+        expenses_paid: expensesProxy
+      }
+    })
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Fallback source: raw ledger (income + expenses tables). Used only when
+ * the operational P&L snapshots have no rows for the org in the last 6
+ * months — covers tenants whose cycle hasn't materialized yet.
+ */
+const aggregateFromRawLedger = async (): Promise<MonthAggregateRow[]> => {
   try {
     const rows = await runGreenhousePostgresQuery<MonthAggregateRow & Record<string, unknown>>(
       `WITH income_by_month AS (
@@ -68,6 +115,14 @@ const aggregateByMonth = async (): Promise<MonthAggregateRow[]> => {
   } catch {
     return []
   }
+}
+
+const aggregateByMonth = async (): Promise<MonthAggregateRow[]> => {
+  const fromSnapshots = await aggregateFromSnapshots()
+
+  if (fromSnapshots.length > 0) return fromSnapshots
+
+  return aggregateFromRawLedger()
 }
 
 const statusFromRunway = (runwayMonths: number | null): PulseStatus => {
