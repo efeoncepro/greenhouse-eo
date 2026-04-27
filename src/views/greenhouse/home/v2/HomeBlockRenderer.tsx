@@ -11,11 +11,14 @@ import type {
   HomeTodayInboxData
 } from '@/lib/home/contract'
 
+import { HomeAiInsightsBento } from './HomeAiInsightsBento'
 import { HomeBlockSkeleton } from './HomeBlockSkeleton'
 import { HomeClosingCountdown } from './HomeClosingCountdown'
 import { HomeDegradedCard } from './HomeDegradedCard'
 import { HomeHeroAi } from './HomeHeroAi'
 import { HomePulseStrip } from './HomePulseStrip'
+import { HomeRecentsRail } from './HomeRecentsRail'
+import { HomeReliabilityRibbon } from './HomeReliabilityRibbon'
 import { HomeTodayInbox } from './HomeTodayInbox'
 
 /**
@@ -50,10 +53,11 @@ export const HomeBlockRenderer = ({ envelope }: HomeBlockRendererProps) => {
     case 'closing-countdown':
       return <HomeClosingCountdown data={envelope.data as HomeClosingCountdownData} />
     case 'ai-insights-bento':
+      return <HomeAiInsightsBento data={envelope.data as HomeAiInsightsBentoData} />
     case 'recents-rail':
+      return <HomeRecentsRail data={envelope.data as HomeRecentsRailData} />
     case 'reliability-ribbon':
-      // Slice 3 lands the remaining per-block components.
-      return <HomeBlockSkeleton blockId={envelope.blockId} />
+      return <HomeReliabilityRibbon data={envelope.data as HomeReliabilityRibbonData} />
     default:
       return null
   }
