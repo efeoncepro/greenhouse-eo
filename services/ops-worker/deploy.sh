@@ -452,6 +452,28 @@ upsert_scheduler_job \
   '{}'
 echo "  -> ops-product-catalog-reconcile-v2: 0 6 * * 1 (weekly Mon 06:00 Santiago, v2 drift classifier + Slack alert, TASK-605)"
 
+# ─── Finance daily probes (TASK-702 Slice 7) ────────────────────────────────
+# Cloud Run is the canonical home for finance crons:
+#   - Vercel cron timeout 800s vs Cloud Run 60min — rematerialize loops 7 days
+#     × N accounts which is fine here, tight on Vercel.
+#   - Cloud Scheduler retry exponencial nativo + co-located con Cloud SQL.
+#   - Reliability signal via captureMessageWithDomain('finance') feeds the
+#     incident lane of the dashboard, no extra Sentry project required.
+
+upsert_scheduler_job \
+  "ops-finance-rematerialize-balances" \
+  "0 5 * * *" \
+  "/finance/rematerialize-balances" \
+  '{"lookbackDays":7}'
+echo "  -> ops-finance-rematerialize-balances: 0 5 * * * America/Santiago (daily 05:00, last 7 days, TASK-702)"
+
+upsert_scheduler_job \
+  "ops-finance-ledger-health" \
+  "30 5 * * *" \
+  "/finance/ledger-health-check" \
+  '{}'
+echo "  -> ops-finance-ledger-health: 30 5 * * * America/Santiago (daily 05:30, drift probe + Sentry alert, TASK-702)"
+
 upsert_scheduler_job \
   "ops-quotation-lifecycle" \
   "0 7 * * *" \

@@ -46,6 +46,10 @@ import { runNotionSyncOrchestration } from '@/lib/integrations/notion-sync-orche
 import { syncBqConformedToPostgres } from '@/lib/sync/sync-bq-conformed-to-postgres'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { materializeAllAvailableVatPeriods, materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
+import { rematerializeAccountBalanceRange } from '@/lib/finance/account-balances-rematerialize'
+import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
+import { captureMessageWithDomain } from '@/lib/observability/capture'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { runQuotationLifecycleSweep } from '@/lib/commercial-intelligence/renewal-lifecycle'
 import { sendEmail } from '@/lib/email/delivery'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
@@ -837,6 +841,130 @@ const handleReliabilityAiWatch = async (req: IncomingMessage, res: ServerRespons
 }
 
 /**
+ * POST /finance/rematerialize-balances (TASK-702 Slice 7).
+ *
+ * Re-materializes account_balances daily snapshots for the trailing 7 days
+ * across all active accounts. Idempotente: re-runs producen los mismos
+ * snapshots dado el mismo ledger.
+ *
+ * Cloud Run is the canonical home for this — Vercel crons are too short and
+ * flaky for the per-day loop across 5 accounts.
+ *
+ * Body: { lookbackDays?: number, accountIds?: string[] }
+ */
+const handleFinanceRematerializeBalances = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const lookbackDays = typeof body.lookbackDays === 'number' && body.lookbackDays > 0 ? body.lookbackDays : 7
+  const overrideAccountIds = Array.isArray(body.accountIds) ? body.accountIds.map(String) : null
+  const startMs = Date.now()
+
+  console.log(`[ops-worker] POST /finance/rematerialize-balances lookback=${lookbackDays}d`)
+
+  try {
+    // Pull active accounts + their last known closing as opening seed
+    const accounts = await runGreenhousePostgresQuery<{ account_id: string; opening_balance: string; opening_balance_date: string | null }>(
+      `SELECT account_id, opening_balance::text, opening_balance_date::text
+       FROM greenhouse_finance.accounts
+       WHERE is_active = TRUE${overrideAccountIds ? ' AND account_id = ANY($1::text[])' : ''}`,
+      overrideAccountIds ? [overrideAccountIds] : []
+    )
+
+    const today = new Date()
+    const seedDate = new Date(today.getTime() - lookbackDays * 86_400_000).toISOString().slice(0, 10)
+    const endDate = today.toISOString().slice(0, 10)
+
+    const results: Array<{ accountId: string; days: number; closing: number }> = []
+
+    for (const acct of accounts) {
+      // Use the previous day's closing as the seed for this rematerialize
+      const seedRow = await runGreenhousePostgresQuery<{ closing_balance: string }>(
+        `SELECT closing_balance::text
+         FROM greenhouse_finance.account_balances
+         WHERE account_id = $1 AND balance_date <= $2::date
+         ORDER BY balance_date DESC LIMIT 1`,
+        [acct.account_id, seedDate]
+      )
+
+      const opening = seedRow.length > 0 ? Number(seedRow[0].closing_balance) : Number(acct.opening_balance ?? 0)
+
+      try {
+        const r = await rematerializeAccountBalanceRange({
+          accountId: acct.account_id,
+          seedDate,
+          openingBalance: opening,
+          endDate
+        })
+
+        results.push({ accountId: r.accountId, days: r.daysMaterialized, closing: r.finalClosingBalance })
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+
+        console.warn(`[ops-worker] rematerialize ${acct.account_id} failed: ${message}`)
+        results.push({ accountId: acct.account_id, days: 0, closing: -1 })
+      }
+    }
+
+    const durationMs = Date.now() - startMs
+
+    console.log(`[ops-worker] /finance/rematerialize-balances done — ${results.length} accounts, ${durationMs}ms`)
+
+    json(res, 200, { accounts: results.length, lookbackDays, seedDate, endDate, results, durationMs })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /finance/rematerialize-balances failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
+ * POST /finance/ledger-health-check (TASK-702 Slice 7).
+ *
+ * Daily health probe. Calls getFinanceLedgerHealth() which checks 4 drift
+ * dimensions (settlement_reconciliation, phantoms, balance_freshness,
+ * unanchored_expenses) and emits a Sentry message tagged `domain=finance`
+ * when drift is detected — surfaces in the Reliability dashboard via
+ * `RELIABILITY_REGISTRY[finance].incidentDomainTag` cascade.
+ */
+const handleFinanceLedgerHealthCheck = async (_req: IncomingMessage, res: ServerResponse) => {
+  const startMs = Date.now()
+
+  console.log('[ops-worker] POST /finance/ledger-health-check')
+
+  try {
+    const health = await getFinanceLedgerHealth()
+    const durationMs = Date.now() - startMs
+
+    if (!health.healthy) {
+      captureMessageWithDomain(
+        `Finance ledger drift detected on daily probe (settlement=${health.settlementDrift.driftedIncomesCount}, phantoms=${health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount}, stale_balances=${health.balanceFreshness.accountsWithStaleBalances.length}, unanchored=${health.unanchoredExpenses.count}).`,
+        'finance',
+        {
+          level: 'warning',
+          tags: { source: 'finance_ledger_drift_daily_cron' },
+          extra: {
+            settlementDriftCount: health.settlementDrift.driftedIncomesCount,
+            phantomsCount: health.phantoms.incomePhantomsCount + health.phantoms.expensePhantomsCount,
+            staleBalancesCount: health.balanceFreshness.accountsWithStaleBalances.length,
+            unanchoredExpensesCount: health.unanchoredExpenses.count
+          },
+          fingerprint: ['finance-ledger-drift-daily']
+        }
+      )
+    }
+
+    console.log(`[ops-worker] /finance/ledger-health-check done — healthy=${health.healthy} ${durationMs}ms`)
+
+    json(res, 200, { ...health, durationMs })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /finance/ledger-health-check failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
+/**
  * POST /notion-conformed/sync
  *
  * Canonical Cloud Run path for the daily Notion BQ-raw → BQ-conformed →
@@ -1016,6 +1144,18 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/reliability-ai-watch') {
       await handleReliabilityAiWatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/finance/rematerialize-balances') {
+      await handleFinanceRematerializeBalances(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/finance/ledger-health-check') {
+      await handleFinanceLedgerHealthCheck(req, res)
 
       return
     }
