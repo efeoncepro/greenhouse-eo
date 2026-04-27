@@ -20324,3 +20324,54 @@ Fundamento de la robustness:
 1. **Contrato tecnico**: feature flag con escape barato + dual-write idempotente con failure isolation + adapters wrappean transport actual sin reescribir + `dedup_key UNIQUE` per intent.
 2. **Verificaciones automatizadas**: parity report diario via cron Cloud Run que postea por Teams al canal ops-alerts (dogfooding) + smoke E2E parity test que rompe el merge en CI + snapshot tests que rompen el merge si la data shape cambia + Reliability dashboard como canary humano.
 3. **Protocolo humano**: 4 gates explicitos por fase (1→2, 2→3, 3→4, Fase 4 closeout) con checklists auditable en changelog. NO se avanza hasta TODOS marcados con fecha y autor.
+
+## Sesion 2026-04-26 — RELEASE develop → main ejecutado y verificado en producción
+
+PR #98 mergeado a `main` como squash commit `1c195532`. Vercel deployó producción en 4m. Tag git `v2026-04-27-release` creado y pusheado.
+
+### Resumen del release
+
+- **310 commits** promoted develop → main
+- **16 tasks** completadas (TASK-512/513/514/515/525/526/615/617.x/639/649/672/673)
+- **15 migraciones** nuevas aplicadas en Cloud SQL (187 totales). Todas ADD-only en UP, DOWN bien escrito para rollback
+- **2 deploys reales** a tenants productivos: Azure Bot Service para Teams + cutover de los 3 canales a `channel_kind='teams_bot'`
+- **6 tasks** backlog declarado para Notification Hub V1 + Nexa Insights (TASK-690 a TASK-695)
+- **1 task** Deep Link Platform Foundation (TASK-694)
+
+### Verificaciones pre-merge
+
+- ✅ `tsc --noEmit` exit 0
+- ✅ `pnpm lint` exit 0
+- ✅ `pnpm test` 2324 passed, 5 skipped
+- ✅ Secrets audit clean
+- ✅ Breaking changes audit: ninguna migración destructiva en UP
+- ✅ CI verde en PR #98: Lint+test+build pass, Chromium smoke pass, Vercel preview deploy completed
+- ✅ mergeable=`MERGEABLE`, mergeStateStatus=`CLEAN`
+
+### Reconciliación de divergencia (limpia)
+
+PR #98 inicialmente mostraba `mergeStateStatus=DIRTY` por 99 conflictos contra el squash commit anterior (`90e9bd7c`) cuyo snapshot estático fue evolucionado por develop en 310 commits. Resuelto con `git merge -s ours origin/main` desde develop — marca a main como ancestor sin alterar archivos. Risk = 0 porque el merge-base `d791c91c` SÍ está en develop y todos los cambios del squash provienen de commits que YA están en develop.
+
+### Verificaciones post-merge
+
+- ✅ Vercel production Ready en 4m (`https://greenhouse-laeab0d1t-efeonce.vercel.app`)
+- ✅ Custom domain `greenhouse.efeoncepro.com` HTTP 200, version=`1c19553` confirmado en `/api/internal/health`
+- ✅ `/login` renderiza
+- ✅ `/api/auth/providers` exposes `azure-ad`, `google`, `credentials`
+- ✅ `/api/platform/ecosystem/health` (TASK-672) responde con error tipado correcto sobre query params
+- ✅ `/api/teams-bot/messaging` (TASK-671) responde HTTP 401 sin bearer token (JWT validation activo)
+- ✅ `/api/platform/ecosystem/event-types` (TASK-617.3) endpoint vivo con error tipado
+- ✅ 15 migraciones aplicadas (spot-check: 6 nuevas confirmadas en `pgmigrations`)
+- ✅ Posture warning preexistente (WIF/SA key fallback) — no nuevo, no rompe el deploy
+
+### Tag git
+
+```
+v2026-04-27-release → 1c195532
+```
+
+### Owner
+
+- Release driver: Julio Reyes + Claude Opus 4.7 (1M context)
+- Ventana on-call: 4h post-merge
+- Rollback procedure documentado en PR #98 description
