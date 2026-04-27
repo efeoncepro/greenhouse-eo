@@ -19,20 +19,43 @@ El script esta pensado para humanos y agentes de IA:
 ```bash
 pnpm logos:payment:scrape -- --all
 pnpm logos:payment:scrape -- --provider mastercard,visa
+pnpm logos:payment:discover -- --provider previred
 pnpm logos:payment:scrape -- --provider mastercard --variant full-positive,mark-positive --apply
 pnpm logos:payment:scrape -- --provider mastercard --variant full-positive --ai-review
+pnpm logos:payment:discover -- --provider banco-chile --variant full-positive
+pnpm logos:payment:agent -- --provider banco-chile --variant full-positive --candidate-url https://.../logo.svg --candidate-source official --apply
 ```
 
 Opciones utiles:
 
 - `--min-score 80`: exige mas confianza antes de seleccionar.
-- `--variant full-positive,mark-positive`: limita la busqueda a logo completo positivo e isotipo positivo.
+- sin `--variant`: ejecuta la matriz completa `full-positive`, `full-negative`, `mark-positive`, `mark-negative`.
+- `--variant full-positive,mark-positive`: limita la busqueda a logo completo positivo e isotipo positivo solo cuando se necesita una prueba estrecha.
 - `--ai-review`: usa Gemini como segunda opinion sobre los mejores candidatos determinísticos.
 - `--ai-required`: bloquea seleccion/apply si Gemini no aprueba o no esta disponible.
 - `--ai-timeout-ms 25000`: limita cada revision Gemini para que el scraper no quede colgado.
+- `--candidate-url https://.../logo.svg`: valida/aplica una URL explicita, sin descubrir candidatos.
+- `--candidate-source official`: clasifica la fuente de `--candidate-url` (`official`, `wikimedia`, `simple-icons` o `direct-url`).
+- `--review-html artifacts/payment-logo-agent/review.html`: genera una consola HTML local para revision humana.
 - `--allow-review-required`: permite guardar aunque el candidato necesite revision humana.
 - `--report artifacts/payment-logo-scraper/mastercard.json`: cambia el destino del reporte.
 - `--output-dir public/images/logos/payment`: cambia la carpeta de salida.
+
+## Workflow agentic V1
+
+El flujo canonico es `discover -> review -> publish`:
+
+1. `discover`: produce candidatos y una consola HTML, sin escribir assets. Por defecto debe correr la matriz completa de variantes; usa `--variant` solo para investigar una variante puntual.
+   ```bash
+   pnpm logos:payment:discover -- --provider bci,banco-chile --min-score 80
+   ```
+2. `review`: una persona o agente abre `artifacts/payment-logo-agent/review.html`, compara visualmente y copia el comando sugerido del candidato correcto.
+3. `publish`: se aplica un candidato explicito con `--candidate-url`; no se repite la busqueda amplia.
+   ```bash
+   pnpm logos:payment:agent -- --provider banco-chile --variant full-positive --candidate-url https://.../logo.svg --candidate-source official --min-score 80 --apply
+   ```
+
+Este modelo evita que el scraper guarde por accidente un logo parecido pero incorrecto. La busqueda produce evidencia; la publicacion usa una URL exacta y auditable.
 
 ## Fuentes y scoring
 
@@ -42,6 +65,8 @@ El scraper usa `scripts/config/payment-logo-sources.json` como manifest de hints
 - `searchTerms` para Wikimedia Commons.
 - `officialSvgUrls` cuando exista un brand center oficial con URL SVG estable.
 - `preferredFileBase` para nombrar el archivo final.
+- `requiredBrandSignals` para exigir tokens concretos cuando una marca puede confundirse con otra.
+- `blockedBrandSignals` para bloquear bancos/íconos parecidos que ya causaron falsos positivos.
 
 El inventario auditable vive en `public/images/logos/payment/manifest.json`. Cada entrada mantiene:
 
@@ -59,7 +84,9 @@ El inventario auditable vive en `public/images/logos/payment/manifest.json`. Cad
 - `variants.mark-positive`
 - `variants.mark-negative`
 
-Cuando el scraper corre con `--apply`, actualiza automaticamente la entrada del proveedor seleccionado con `sourceUrl`, `licenseSource`, `logo`, `compactLogo`, `lastVerifiedAt` y la variante especifica aplicada.
+Cuando el scraper corre con `--apply`, actualiza automaticamente la entrada del proveedor seleccionado con `sourceUrl`, `licenseSource`, `logo`, `compactLogo`, `lastVerifiedAt` y la variante especifica aplicada. `full-positive` es la fuente canonica del entry; `mark-positive` solo actualiza `compactLogo`; las variantes negativas y derivadas viven en `variants.*` para evitar que una corrida cambie metadata canonica en cada ejecucion.
+
+Si una marca no publica isotipo SVG separado, una variante puede declararse como `curatedSvgPath` apuntando a un SVG local revisado y `curatedSourceUrl` apuntando a la fuente oficial usada para reconstruirlo. El scraper la valida como candidato local, la incluye en report/review y mantiene la idempotencia sin volver a buscar assets dudosos.
 
 El estado funcional por instrumento se resume en `docs/operations/payment-logo-inventory.md`. Si un candidato se rechaza por marca incorrecta o porque falta una variante confiable, dejarlo como `Pending` en ese inventario en vez de forzar un asset dudoso.
 
@@ -92,6 +119,8 @@ PAYMENT_LOGO_AI_MODEL=gemini-3-flash-preview,gemini-2.5-pro,gemini-2.5-flash
 ```
 
 Gemini 3 Flash Preview usa endpoint `global` en Vertex AI. El scraper lo enruta automaticamente a `location=global`; los modelos no-Gemini-3 usan `GOOGLE_CLOUD_LOCATION` o `us-central1`.
+
+Cuando `--ai-review` esta activo, el scraper renderiza el SVG candidato a PNG con `sharp` y manda esa imagen a Gemini como evidencia visual primaria. El excerpt SVG queda solo como contexto tecnico. Esto evita que el LLM juzgue calidad de bordes, proporcion o legibilidad leyendo XML.
 
 El scraper sigue funcionando sin AI. Usa `--ai-required` solo cuando quieras bloquear cualquier candidato sin aprobacion LLM.
 
@@ -132,6 +161,31 @@ No se debe inventar un logo de marca desde memoria del modelo. Si faltan negativ
 3. usar modelos de imagen en Vertex, como Nano Banana/Gemini image, solo como apoyo de normalizacion o revision visual, no como fuente primaria de identidad
 4. mantener salida SVG versionable; cualquier raster generado queda fuera del flujo final salvo aprobacion humana explicita
 5. registrar en el manifest `sourceUrl`, `licenseSource`, variante derivada y `lastVerifiedAt`
+
+### Vectorizacion de PNGs curados
+
+Si una marca entrega un PNG transparente de alta resolucion y no publica SVG usable, usar la herramienta local basada en VTracer:
+
+```bash
+python3 -m pip install --user vtracer Pillow
+pnpm logos:payment:vectorize -- --input public/images/logos/payment/que-es-global66-que-ofrece.png --output public/images/logos/payment/global66.svg --variant full-positive --label Global66 --brand-clean global66
+```
+
+La herramienta:
+
+- detecta el bbox por alpha y recorta `full-*` o `mark-*`
+- vectoriza con VTracer en modo color/spline
+- inyecta `viewBox` estable para render responsive
+- puede aplicar limpieza de marca antes de trazar (`--brand-clean global66`) para eliminar antialiasing sucio y bordes mordidos
+- para marcas con geometria simple y fuente raster oficial, puede usar limpieza deterministica por marca (`--brand-clean previred`) y emitir primitivas SVG limpias cuando VTracer seguiria ruido de borde
+- no embebe PNG dentro del SVG final
+
+Despues de vectorizar, correr:
+
+```bash
+pnpm logos:payment:discover -- --provider global66 --min-score 80 --ai-review
+pnpm logos:payment:publish -- --provider global66 --min-score 80
+```
 
 ## Regla de actualidad
 

@@ -19,6 +19,10 @@ type VariantHint = {
   officialSvgUrls?: string[]
   officialPages?: string[]
   expectedColors?: string[]
+  requiredBrandSignals?: string[]
+  blockedBrandSignals?: string[]
+  curatedSvgPath?: string
+  curatedSourceUrl?: string
   derivedFromVariant?: LogoVariant
   deriveMode?: 'recolor-white' | 'crop-viewbox' | 'crop-viewbox-recolor-white'
   cropViewBox?: string
@@ -31,6 +35,8 @@ type SourceHint = {
   officialSvgUrls?: string[]
   officialPages?: string[]
   expectedColors?: string[]
+  requiredBrandSignals?: string[]
+  blockedBrandSignals?: string[]
   variants?: Partial<Record<LogoVariant, VariantHint>>
 }
 
@@ -65,7 +71,7 @@ type AuditManifest = {
   entries: AuditManifestEntry[]
 }
 
-type CandidateSource = 'official' | 'simple-icons' | 'wikimedia' | 'direct-url' | 'derived'
+type CandidateSource = 'official' | 'simple-icons' | 'wikimedia' | 'direct-url' | 'derived' | 'curated'
 
 type LogoCandidate = {
   providerSlug: ProviderSlug
@@ -107,6 +113,7 @@ type AiLogoReview = {
 type RunReport = {
   generatedAt: string
   mode: 'plan' | 'apply'
+  selectionMode: 'discovery' | 'direct-candidate'
   minScore: number
   allowReviewRequired: boolean
   results: Array<{
@@ -139,14 +146,14 @@ const HTTP_RETRY_STATUSES = new Set([429, 500, 502, 503, 504])
 const TRUSTED_WIKIMEDIA_HOSTS = new Set(['commons.wikimedia.org', 'upload.wikimedia.org'])
 const TRUSTED_SIMPLE_ICON_HOSTS = new Set(['cdn.simpleicons.org', 'simpleicons.org', 'raw.githubusercontent.com'])
 const HISTORICAL_OR_VARIANT_PATTERN = /\b(196[0-9]|197[0-9]|198[0-9]|199[0-9]|200[0-9]|201[0-6]|old|former|historical|archive|debit|yuhu|maestro|cirrus|wikipedia[\s_-]*logo|with[\s_-]+.*stripes)\b/i
-const NON_BRAND_ASSET_PATTERN = /\b(whatsapp|facebook|instagram|linkedin|twitter|x-twitter|youtube|tiktok|arrow|chevron|close|menu|hamburger|search|spinner|loader|icono?|ico-|i-|favicon|app-store|google-play|phone|mail|email|danger|warning|check|bullet|globe|flag)\b/i
+const NON_BRAND_ASSET_PATTERN = /\b(whatsapp|facebook|instagram|linkedin|twitter|x-twitter|youtube|tiktok|duolingo|undertale|lipu|arrow|chevron|close|menu|hamburger|search|spinner|loader|icono?|ico-|i-|favicon|app-store|google-play|phone|mail|email|danger|warning|check|bullet|globe|flag)\b/i
 const BRAND_TOKEN_STOPWORDS = new Set(['banco', 'bank', 'banque', 'de', 'del', 'the', 'logo', 'logotipo'])
 
 const parseArgs = () => {
   const args = process.argv.slice(2)
 
   const getValue = (name: string) => {
-    const index = args.indexOf(name)
+    const index = args.lastIndexOf(name)
 
     return index >= 0 ? args[index + 1] : undefined
   }
@@ -168,6 +175,9 @@ const parseArgs = () => {
     variants,
     aiReview: args.includes('--ai-review'),
     aiRequired: args.includes('--ai-required'),
+    candidateUrl: getValue('--candidate-url'),
+    candidateSource: getValue('--candidate-source') as CandidateSource | undefined,
+    reviewHtmlPath: getValue('--review-html'),
     outputDir: getValue('--output-dir'),
     reportPath: getValue('--report') ?? DEFAULT_REPORT_PATH,
     minScore: Number(getValue('--min-score') ?? DEFAULT_MIN_SCORE),
@@ -185,6 +195,7 @@ Usage:
   pnpm logos:payment:scrape -- --all
   pnpm logos:payment:scrape -- --provider mastercard,visa
   pnpm logos:payment:scrape -- --provider mastercard --variant full-positive,mark-positive --apply
+  pnpm logos:payment:scrape -- --provider banco-chile --variant full-positive --candidate-url https://.../logo.svg --candidate-source official --apply
 
 Options:
   --all                    Scan every provider in PROVIDER_CATALOG.
@@ -193,6 +204,9 @@ Options:
   --ai-review              Ask Gemini to review top deterministic candidates.
   --ai-required            Require Gemini pass before selecting/applying a candidate.
   --ai-timeout-ms <ms>     Gemini review timeout. Default: ${AI_REVIEW_TIMEOUT_MS}.
+  --candidate-url <url>    Validate/apply one explicit SVG URL instead of discovering candidates.
+  --candidate-source <src> Source label for --candidate-url: official, wikimedia, simple-icons, direct-url. Default: direct-url.
+  --review-html <path>     Write a human review dashboard HTML for the run report.
   --apply                  Save selected SVG files into public/images/logos/payment.
   --min-score <number>     Minimum validation score required. Default: ${DEFAULT_MIN_SCORE}.
   --allow-review-required  Allow apply when the best candidate still needs human review.
@@ -271,6 +285,7 @@ const stableJson = (value: unknown) => JSON.stringify(value, null, 2) + '\n'
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 const inferLicenseSource = (candidate: ValidationResult) => {
+  if (candidate.source === 'curated') return 'Curated local SVG from verified brand source; preserve original brand guidelines'
   if (candidate.source === 'derived') return 'Derived from verified SVG source; preserve original brand guidelines'
   if (candidate.source === 'simple-icons') return 'Simple Icons; verify brand usage guidelines before client-facing release'
   if (candidate.source === 'wikimedia') return 'Wikimedia Commons; verify file page license and trademark notes'
@@ -296,8 +311,14 @@ const updateAuditManifest = (manifest: AuditManifest, providerSlug: ProviderSlug
   const primaryField = primaryLogoFieldForVariant(selected.variant)
   const nextLogo = primaryField === 'logo' ? relativeLogoPath : (existing?.logo ?? provider.logo)
   const nextCompactLogo = primaryField === 'compactLogo' ? relativeLogoPath : (existing?.compactLogo ?? provider.compactLogo ?? null)
-  const nextEntrySourceUrl = primaryField ? nextSourceUrl : (existing?.sourceUrl ?? null)
-  const nextEntryLicenseSource = primaryField ? nextLicenseSource : (existing?.licenseSource ?? null)
+
+  const nextEntrySourceUrl = selected.variant === 'full-positive'
+    ? nextSourceUrl
+    : (existing?.sourceUrl ?? nextSourceUrl)
+
+  const nextEntryLicenseSource = selected.variant === 'full-positive'
+    ? nextLicenseSource
+    : (existing?.licenseSource ?? nextLicenseSource)
 
   const variantChanged = !existingVariant
     || existingVariant.sourceUrl !== nextSourceUrl
@@ -484,6 +505,22 @@ const sameBrandSignal = (candidate: LogoCandidate) => {
   return words.some(word => haystack.includes(word))
 }
 
+const normalizeConfiguredSignal = (signal: string) => signal
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9áéíóúñ]+/gi, '')
+
+const configuredBrandSignalMatch = (haystack: string, signals: string[] | undefined) => {
+  const normalizedHaystack = haystack
+    .toLowerCase()
+    .replace(/[^a-z0-9áéíóúñ]+/gi, '')
+
+  return signals
+    ?.map(normalizeConfiguredSignal)
+    .filter(Boolean)
+    .some(signal => normalizedHaystack.includes(signal)) ?? false
+}
+
 const brandTokensForProvider = (providerSlug: ProviderSlug) => {
   const provider = PROVIDER_CATALOG[providerSlug]
 
@@ -581,12 +618,13 @@ const validateExpectedColors = (svg: string, expectedColors: string[] | undefine
   return expectedColors.filter(color => !normalizedSvg.includes(color.toLowerCase()))
 }
 
-const scoreCandidate = (candidate: LogoCandidate, content: string, response: Response, svgWarnings: string[]) => {
+const scoreCandidate = (candidate: LogoCandidate, content: string, response: Response, svgWarnings: string[], hint?: VariantHint) => {
   const url = new URL(candidate.url)
   const reasons: string[] = []
   const warnings = [...svgWarnings]
   const freshnessSignals = hasFreshnessSignal(candidate, content, response)
   const variantSignals = variantIntentSignals(candidate)
+  const candidateHaystack = `${candidate.title ?? ''} ${candidate.url} ${candidate.pageUrl ?? ''} ${content.slice(0, 2500)}`.toLowerCase()
   let score = 0
 
   if (candidate.source === 'official') score += 45
@@ -600,10 +638,20 @@ const scoreCandidate = (candidate: LogoCandidate, content: string, response: Res
   if (TRUSTED_WIKIMEDIA_HOSTS.has(url.hostname) || TRUSTED_SIMPLE_ICON_HOSTS.has(url.hostname)) score += 12
   if (candidate.source === 'official') score += 15
 
-  if (sameBrandSignal(candidate)) score += 15
+  if (sameBrandSignal(candidate) || configuredBrandSignalMatch(candidateHaystack, hint?.requiredBrandSignals)) score += 15
   else {
     score -= 45
     reasons.push('La URL/titulo no contiene una senal fuerte del nombre distintivo de marca.')
+  }
+
+  if (hint?.requiredBrandSignals?.length && !configuredBrandSignalMatch(candidateHaystack, hint.requiredBrandSignals)) {
+    score -= 75
+    reasons.push(`No contiene senales requeridas de marca configuradas: ${hint.requiredBrandSignals.join(', ')}.`)
+  }
+
+  if (configuredBrandSignalMatch(candidateHaystack, hint?.blockedBrandSignals)) {
+    score -= 90
+    reasons.push(`Contiene senales bloqueadas para esta marca: ${hint?.blockedBrandSignals?.join(', ')}.`)
   }
 
   score += variantSignals.score
@@ -699,6 +747,19 @@ const runAiLogoReviewWithModel = async (candidate: ValidationResult, timeoutMs: 
 
   const runtime = getAiLogoReviewRuntime()
   const location = locationForModel(model, runtime.location)
+  let renderedPngBase64: string | null = null
+
+  try {
+    const { default: sharp } = await import('sharp')
+
+    renderedPngBase64 = (await sharp(Buffer.from(candidate.content))
+      .resize({ width: candidate.variant.includes('full') ? 1200 : 512, withoutEnlargement: true })
+      .png()
+      .toBuffer())
+      .toString('base64')
+  } catch {
+    renderedPngBase64 = null
+  }
 
   try {
     process.env.GOOGLE_GENAI_USE_VERTEXAI = 'true'
@@ -719,9 +780,18 @@ const runAiLogoReviewWithModel = async (candidate: ValidationResult, timeoutMs: 
           {
             role: 'user',
             parts: [
+              ...(renderedPngBase64
+                ? [{
+                    inlineData: {
+                      mimeType: 'image/png',
+                      data: renderedPngBase64
+                    }
+                  }]
+                : []),
               {
                 text: [
                   'Review this SVG candidate for use in Greenhouse payment instrument logos.',
+                  renderedPngBase64 ? 'Use the rendered PNG image as the primary visual evidence; use the SVG excerpt only as technical context.' : 'No rendered PNG was available; review SVG text cautiously.',
                   'Return ONLY JSON with keys: status(pass|review|reject), confidence(0-1), qualityScore(0-100), isCorrectBrand(boolean), isCorrectVariant(boolean), isLikelyCurrent(boolean), rationale(string), risks(string[]).',
                   'Do not approve if the asset appears historical, co-branded, a derived network, not the requested brand, not the requested variant, raster-embedded, visually low quality, or unsafe for production UI.',
                   '',
@@ -867,6 +937,10 @@ const hintForVariant = (hint: SourceHint | undefined, variant: LogoVariant): Var
   officialSvgUrls: hint?.variants?.[variant]?.officialSvgUrls ?? (variant === 'full-positive' ? hint?.officialSvgUrls : undefined),
   officialPages: hint?.variants?.[variant]?.officialPages ?? (variant === 'full-positive' ? hint?.officialPages : undefined),
   expectedColors: hint?.variants?.[variant]?.expectedColors ?? (variant.includes('negative') ? undefined : hint?.expectedColors),
+  requiredBrandSignals: hint?.variants?.[variant]?.requiredBrandSignals ?? hint?.requiredBrandSignals,
+  blockedBrandSignals: hint?.variants?.[variant]?.blockedBrandSignals ?? hint?.blockedBrandSignals,
+  curatedSvgPath: hint?.variants?.[variant]?.curatedSvgPath,
+  curatedSourceUrl: hint?.variants?.[variant]?.curatedSourceUrl,
   derivedFromVariant: hint?.variants?.[variant]?.derivedFromVariant,
   deriveMode: hint?.variants?.[variant]?.deriveMode,
   cropViewBox: hint?.variants?.[variant]?.cropViewBox
@@ -901,7 +975,7 @@ const validateCandidate = async (candidate: LogoCandidate, outputDir: string, hi
       reasons.push(`Content-Type no SVG: ${contentType || 'sin content-type'}.`)
     }
 
-    const scoring = scoreCandidate(candidate, content, response, svgValidation.warnings)
+    const scoring = scoreCandidate(candidate, content, response, svgValidation.warnings, hint)
     const missingExpectedColors = validateExpectedColors(content, hint?.expectedColors)
 
     if (missingExpectedColors.length > 0) {
@@ -1142,6 +1216,160 @@ const variantListFromArgs = (variants: LogoVariant[] | undefined) => {
   return variants
 }
 
+const normalizeCandidateSource = (source: CandidateSource | undefined): CandidateSource => {
+  if (source === 'official' || source === 'wikimedia' || source === 'simple-icons' || source === 'direct-url') return source
+
+  return 'direct-url'
+}
+
+const buildDirectCandidate = (providerSlug: ProviderSlug, variant: LogoVariant, candidateUrl: string, source: CandidateSource | undefined): LogoCandidate => {
+  const provider = PROVIDER_CATALOG[providerSlug]
+  const candidateSource = normalizeCandidateSource(source)
+
+  return {
+    providerSlug,
+    providerName: provider.name,
+    variant,
+    source: candidateSource,
+    url: candidateUrl,
+    pageUrl: candidateUrl,
+    title: `${provider.name} ${variant} explicit candidate`,
+    discoveredBy: `direct-candidate:${candidateSource}`
+  }
+}
+
+const escapeHtml = (value: unknown) => String(value ?? '')
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#39;')
+
+const statusLabel = (candidate: Omit<ValidationResult, 'content'> | null) => {
+  if (!candidate) return 'No candidate'
+  if (!candidate.ok) return 'Rejected'
+  if (candidate.reviewRequired) return 'Needs review'
+
+  return 'Ready'
+}
+
+const statusClass = (candidate: Omit<ValidationResult, 'content'> | null) => {
+  if (!candidate || !candidate.ok) return 'danger'
+  if (candidate.reviewRequired) return 'warning'
+
+  return 'success'
+}
+
+const candidateApplyCommand = (providerSlug: string, variant: LogoVariant, candidate: Omit<ValidationResult, 'content'>, minScore: number) => [
+  'pnpm logos:payment:agent --',
+  `--provider ${providerSlug}`,
+  `--variant ${variant}`,
+  `--candidate-url "${candidate.url}"`,
+  `--candidate-source ${candidate.source}`,
+  `--min-score ${minScore}`,
+  '--apply'
+].join(' ')
+
+const renderReviewHtml = (report: RunReport) => {
+  const generated = escapeHtml(report.generatedAt)
+
+  const sections = report.results.map(result => {
+    const variantSections = LOGO_VARIANTS
+      .map(variant => {
+        const data = result.variants[variant]
+
+        if (!data) return ''
+
+        const candidates = data.candidates.slice(0, 6).map(candidate => {
+          const command = candidateApplyCommand(result.providerSlug, variant, candidate, report.minScore)
+          const reasons = [...candidate.reasons, ...candidate.warnings].slice(0, 6)
+
+          return `
+            <article class="candidate ${statusClass(candidate)}">
+              <div class="preview"><img src="${escapeHtml(candidate.url)}" alt="${escapeHtml(result.providerName)} ${variant}" loading="lazy" /></div>
+              <div class="candidate-body">
+                <div class="candidate-topline">
+                  <span class="badge ${statusClass(candidate)}">${escapeHtml(statusLabel(candidate))}</span>
+                  <strong>${escapeHtml(candidate.score)}/100</strong>
+                  <span>${escapeHtml(candidate.source)}</span>
+                </div>
+                <a href="${escapeHtml(candidate.url)}" target="_blank" rel="noreferrer">${escapeHtml(candidate.url)}</a>
+                ${candidate.pageUrl && candidate.pageUrl !== candidate.url ? `<a href="${escapeHtml(candidate.pageUrl)}" target="_blank" rel="noreferrer">${escapeHtml(candidate.pageUrl)}</a>` : ''}
+                <ul>${reasons.map(reason => `<li>${escapeHtml(reason)}</li>`).join('')}</ul>
+                <code>${escapeHtml(command)}</code>
+              </div>
+            </article>
+          `
+        }).join('')
+
+        return `
+          <section class="variant">
+            <h3>${escapeHtml(variant)} <span class="badge ${statusClass(data.selected)}">${escapeHtml(statusLabel(data.selected))}</span></h3>
+            ${candidates || '<p class="muted">No candidates found.</p>'}
+          </section>
+        `
+      })
+      .join('')
+
+    return `
+      <section class="provider">
+        <h2>${escapeHtml(result.providerName)} <span>${escapeHtml(result.providerSlug)}</span></h2>
+        ${variantSections}
+      </section>
+    `
+  }).join('')
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment Logo Review</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f6f8fb; color: #172033; }
+    body { margin: 0; padding: 32px; }
+    header, .provider { max-width: 1180px; margin: 0 auto 24px; }
+    header { display: flex; justify-content: space-between; gap: 24px; align-items: end; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 28px; }
+    h2 { display: flex; align-items: baseline; gap: 12px; font-size: 22px; margin-bottom: 18px; }
+    h2 span { color: #60708f; font-size: 14px; font-weight: 600; }
+    h3 { display: flex; align-items: center; gap: 10px; font-size: 16px; margin: 20px 0 12px; }
+    .provider { background: #fff; border: 1px solid #dbe3ef; border-radius: 12px; padding: 22px; box-shadow: 0 14px 40px rgba(23, 32, 51, 0.08); }
+    .variant { border-top: 1px solid #e7edf5; padding-top: 4px; }
+    .candidate { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 18px; border: 1px solid #dbe3ef; border-radius: 10px; padding: 14px; margin: 12px 0; background: #fff; }
+    .candidate.success { border-color: #9bd7b0; }
+    .candidate.warning { border-color: #ffd18a; }
+    .candidate.danger { border-color: #f2a4a4; }
+    .preview { min-height: 110px; display: grid; place-items: center; border-radius: 8px; background: linear-gradient(135deg, #fff, #eef3f9); border: 1px solid #e7edf5; }
+    .preview img { max-width: 150px; max-height: 90px; object-fit: contain; }
+    .candidate-body { min-width: 0; display: grid; gap: 8px; }
+    .candidate-topline { display: flex; gap: 10px; align-items: center; color: #60708f; }
+    .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; }
+    .badge.success { color: #086b32; background: #ddf7e7; }
+    .badge.warning { color: #875100; background: #fff0d2; }
+    .badge.danger { color: #8a1f1f; background: #ffe1e1; }
+    a { color: #0b72e7; overflow-wrap: anywhere; text-decoration: none; }
+    ul { margin: 0; padding-left: 18px; color: #60708f; }
+    code { display: block; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 8px; padding: 10px; background: #0f172a; color: #e2e8f0; font-size: 12px; }
+    .muted { color: #60708f; }
+    @media (max-width: 760px) { body { padding: 18px; } header { display: block; } .candidate { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Payment Logo Review</h1>
+      <p class="muted">Generated ${generated}. Mode: ${escapeHtml(report.mode)} / ${escapeHtml(report.selectionMode)}.</p>
+    </div>
+    <p class="muted">Approve only candidates that match the current brand and intended variant.</p>
+  </header>
+  ${sections}
+</body>
+</html>
+`
+}
+
 const stripContent = (result: ValidationResult): Omit<ValidationResult, 'content'> => {
   const rest = { ...result }
 
@@ -1154,6 +1382,48 @@ const publicPathToFilePath = (logoPath: string | null | undefined) => {
   if (!logoPath?.startsWith('/')) return null
 
   return path.join(process.cwd(), 'public', logoPath.replace(/^\//, ''))
+}
+
+const validateCuratedVariant = async (
+  providerSlug: ProviderSlug,
+  variant: LogoVariant,
+  hint: VariantHint | undefined
+): Promise<ValidationResult[]> => {
+  if (!hint?.curatedSvgPath) return []
+
+  const sourceFilePath = publicPathToFilePath(hint.curatedSvgPath)
+  const content = sourceFilePath ? await readTextIfExists(sourceFilePath) : null
+
+  if (!sourceFilePath || !content) return []
+
+  const provider = PROVIDER_CATALOG[providerSlug]
+  const svgValidation = validateSvg(content)
+  const ok = svgValidation.reasons.length === 0
+  const sha256 = createHash('sha256').update(content.trim()).digest('hex')
+
+  return [{
+    providerSlug,
+    providerName: provider.name,
+    variant,
+    source: 'curated',
+    url: hint.curatedSvgPath,
+    pageUrl: hint.curatedSourceUrl ?? hint.curatedSvgPath,
+    title: `${provider.name} ${variant} curated local SVG`,
+    discoveredBy: 'curated-local-svg',
+    ok,
+    score: ok ? 100 : 0,
+    reviewRequired: !ok,
+    reasons: svgValidation.reasons,
+    warnings: [
+      ...svgValidation.warnings,
+      'Variante curada localmente desde fuente oficial; revisar visualmente ante cambios de marca.'
+    ],
+    sha256,
+    bytes: Buffer.byteLength(content, 'utf8'),
+    destination: sourceFilePath,
+    freshnessSignals: ['source:curated', ...(hint.curatedSourceUrl ? ['source:official-raster'] : [])],
+    content
+  }]
 }
 
 const logoPathForVariant = (auditManifest: AuditManifest, providerSlug: ProviderSlug, variant: LogoVariant) => {
@@ -1257,10 +1527,16 @@ const main = async () => {
   const outputDir = path.resolve(process.cwd(), args.outputDir ?? manifest.outputDir)
   const providerSlugs = providerListFromArgs(args.provider, args.all)
   const variants = variantListFromArgs(args.variants)
+  const directCandidateMode = Boolean(args.candidateUrl)
+
+  if (directCandidateMode && (providerSlugs.length !== 1 || variants.length !== 1)) {
+    throw new Error('--candidate-url requiere exactamente un --provider y una --variant.')
+  }
 
   const report: RunReport = {
     generatedAt: new Date().toISOString(),
     mode: args.apply ? 'apply' : 'plan',
+    selectionMode: directCandidateMode ? 'direct-candidate' : 'discovery',
     minScore: args.minScore,
     allowReviewRequired: args.allowReviewRequired,
     results: []
@@ -1283,12 +1559,14 @@ const main = async () => {
     for (const variant of variants) {
       const hint = hintForVariant(manifest.providers[providerSlug], variant)
 
-      const candidates = dedupeCandidates([
-        ...discoverOfficialUrls(providerSlug, variant, hint),
-        ...(await discoverOfficialPages(providerSlug, variant, hint)),
-        ...discoverSimpleIcons(providerSlug, variant, hint),
-        ...(await discoverWikimedia(providerSlug, variant, hint))
-      ])
+      const candidates = args.candidateUrl
+        ? [buildDirectCandidate(providerSlug, variant, args.candidateUrl, args.candidateSource)]
+        : dedupeCandidates([
+          ...discoverOfficialUrls(providerSlug, variant, hint),
+          ...(await discoverOfficialPages(providerSlug, variant, hint)),
+          ...discoverSimpleIcons(providerSlug, variant, hint),
+          ...(await discoverWikimedia(providerSlug, variant, hint))
+        ])
 
       const discovered = await mapWithConcurrency(
         candidates,
@@ -1296,8 +1574,9 @@ const main = async () => {
         candidate => validateCandidate(candidate, outputDir, hint)
       )
 
+      const curated = await validateCuratedVariant(providerSlug, variant, hint)
       const derived = await deriveVariantCandidate(providerSlug, variant, outputDir, hint, auditManifest)
-      const deterministic = [...derived, ...discovered]
+      const deterministic = [...curated, ...derived, ...discovered]
 
       const validated = await reviewTopCandidatesWithAi(deterministic, args.aiReview, args.aiRequired, args.minScore, args.aiTimeoutMs)
 
@@ -1346,6 +1625,12 @@ const main = async () => {
 
   await writeFile(args.reportPath, stableJson(report), 'utf8')
   console.log(`report: ${path.relative(process.cwd(), args.reportPath)}`)
+
+  if (args.reviewHtmlPath) {
+    await mkdir(path.dirname(args.reviewHtmlPath), { recursive: true })
+    await writeFile(args.reviewHtmlPath, renderReviewHtml(report), 'utf8')
+    console.log(`review: ${path.relative(process.cwd(), args.reviewHtmlPath)}`)
+  }
 }
 
 main()

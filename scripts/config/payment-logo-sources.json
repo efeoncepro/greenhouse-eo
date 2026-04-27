@@ -4,32 +4,52 @@
   "outputDir": "public/images/logos/payment",
   "providers": {
     "amex": {
-      "searchTerms": ["American Express logo svg", "American Express current logo svg"],
+      "searchTerms": [
+        "American Express logo svg",
+        "American Express current logo svg"
+      ],
       "simpleIconsSlug": "americanexpress",
       "preferredFileBase": "amex"
     },
     "banco-chile": {
-      "searchTerms": ["Banco de Chile logo svg", "Banco de Chile logotipo svg"],
+      "searchTerms": [
+        "Banco de Chile logo svg",
+        "Banco de Chile logotipo svg"
+      ],
       "preferredFileBase": "banco-chile"
     },
     "banco-estado": {
-      "searchTerms": ["BancoEstado logo svg", "BancoEstado logotipo svg"],
+      "searchTerms": [
+        "BancoEstado logo svg",
+        "BancoEstado logotipo svg"
+      ],
       "officialSvgUrls": [
         "https://www.bancoestado.cl/content/experience-fragments/bancoestado-public/cl/es/site/header/master/_jcr_content/root/container/header/Logo.coreimg.svg/1770300061629/logo-bancoestado.svg"
       ],
-      "officialPages": ["https://www.bancoestado.cl"],
+      "officialPages": [
+        "https://www.bancoestado.cl"
+      ],
       "preferredFileBase": "banco-estado"
     },
     "bci": {
-      "searchTerms": ["BCI banco logo svg", "Banco BCI logotipo svg"],
+      "searchTerms": [
+        "BCI banco logo svg",
+        "Banco BCI logotipo svg"
+      ],
       "preferredFileBase": "bci"
     },
     "bice": {
-      "searchTerms": ["Banco BICE logo svg", "BICE logotipo svg"],
+      "searchTerms": [
+        "Banco BICE logo svg",
+        "BICE logotipo svg"
+      ],
       "preferredFileBase": "bice"
     },
     "deel": {
-      "searchTerms": ["Deel logo svg", "Deel current logo svg"],
+      "searchTerms": [
+        "Deel logo svg",
+        "Deel current logo svg"
+      ],
       "simpleIconsSlug": "deel",
       "officialSvgUrls": [
         "https://website-media.deel.com/logo_revamp_164ddaed0c.svg",
@@ -38,7 +58,10 @@
       "preferredFileBase": "deel"
     },
     "falabella": {
-      "searchTerms": ["Banco Falabella logo svg", "Banco Falabella logotipo svg"],
+      "searchTerms": [
+        "Banco Falabella logo svg",
+        "Banco Falabella logotipo svg"
+      ],
       "variants": {
         "full-negative": {
           "derivedFromVariant": "full-positive",
@@ -58,78 +81,159 @@
       "preferredFileBase": "falabella"
     },
     "global66": {
-      "searchTerms": ["Global66 logo svg", "Global66 logotipo svg"],
+      "searchTerms": [
+        "Global66 logo svg",
+        "Global66 logotipo svg"
+      ],
+      "variants": {
+        "full-positive": {
+          "curatedSvgPath": "/images/logos/payment/global66.svg",
+          "curatedSourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png"
+        },
+        "full-negative": {
+          "curatedSvgPath": "/images/logos/payment/global66-full-negative.svg",
+          "curatedSourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png"
+        },
+        "mark-positive": {
+          "curatedSvgPath": "/images/logos/payment/global66-mark-positive.svg",
+          "curatedSourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png"
+        },
+        "mark-negative": {
+          "curatedSvgPath": "/images/logos/payment/global66-mark-negative.svg",
+          "curatedSourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png"
+        }
+      },
       "preferredFileBase": "global66"
     },
     "itau": {
-      "searchTerms": ["Itaú logo svg", "Itau Unibanco logo svg", "Banco Itaú Chile logo svg"],
+      "searchTerms": [
+        "Itaú logo svg",
+        "Itau Unibanco logo svg",
+        "Banco Itaú Chile logo svg"
+      ],
       "preferredFileBase": "itau"
     },
     "mastercard": {
-      "searchTerms": ["Mastercard logo svg", "Mastercard current logo svg"],
+      "searchTerms": [
+        "Mastercard logo svg",
+        "Mastercard current logo svg"
+      ],
       "simpleIconsSlug": "mastercard",
       "preferredFileBase": "mastercard",
-      "expectedColors": ["#eb001b", "#f79e1b"]
+      "expectedColors": [
+        "#eb001b",
+        "#f79e1b"
+      ]
     },
     "mercadopago": {
-      "searchTerms": ["Mercado Pago logo svg", "MercadoPago logo svg"],
+      "searchTerms": [
+        "Mercado Pago logo svg",
+        "MercadoPago logo svg"
+      ],
       "simpleIconsSlug": "mercadopago",
       "preferredFileBase": "mercadopago"
     },
     "paypal": {
-      "searchTerms": ["PayPal logo svg", "PayPal current logo svg"],
+      "searchTerms": [
+        "PayPal logo svg",
+        "PayPal current logo svg"
+      ],
       "simpleIconsSlug": "paypal",
       "preferredFileBase": "paypal"
     },
     "previred": {
-      "searchTerms": ["Previred logo svg", "Previred logotipo svg"],
-      "officialSvgUrls": [
-        "https://www.previred.com/wp-content/themes/previred--theme/img/logo2025.svg"
+      "searchTerms": [
+        "Previred logo svg",
+        "Previred logotipo svg"
       ],
-      "officialPages": ["https://www.previred.com"],
+      "variants": {
+        "full-positive": {
+          "curatedSvgPath": "/images/logos/payment/previred-full-positive.svg",
+          "curatedSourceUrl": "composite:https://www.previred.com/wp-content/themes/previred--theme/img/logo.svg + https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png"
+        },
+        "full-negative": {
+          "curatedSvgPath": "/images/logos/payment/previred-full-negative.svg",
+          "curatedSourceUrl": "composite:https://www.previred.com/wp-content/themes/previred--theme/img/logo.svg + https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png"
+        },
+        "mark-positive": {
+          "curatedSvgPath": "/images/logos/payment/previred-mark-positive.svg",
+          "curatedSourceUrl": "https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png"
+        },
+        "mark-negative": {
+          "curatedSvgPath": "/images/logos/payment/previred-mark-negative.svg",
+          "curatedSourceUrl": "https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png"
+        }
+      },
       "preferredFileBase": "previred"
     },
     "ripley": {
-      "searchTerms": ["Banco Ripley logo svg", "Banco Ripley logotipo svg"],
+      "searchTerms": [
+        "Banco Ripley logo svg",
+        "Banco Ripley logotipo svg"
+      ],
       "officialSvgUrls": [
         "https://www.bancoripley.cl/media/new-logo-banco-ripley-IWJOE57X.svg"
       ],
-      "officialPages": ["https://www.bancoripley.cl"],
+      "officialPages": [
+        "https://www.bancoripley.cl"
+      ],
       "preferredFileBase": "ripley"
     },
     "santander": {
-      "searchTerms": ["Banco Santander Chile logo svg", "Santander logo svg"],
+      "searchTerms": [
+        "Banco Santander Chile logo svg",
+        "Santander logo svg"
+      ],
       "officialSvgUrls": [
         "https://banco.santander.cl/uploads/000/003/697/9c2347b3-ca36-4f53-9f65-5cd6bdabf0d2/original/logo_santander_new.svg"
       ],
-      "officialPages": ["https://banco.santander.cl"],
+      "officialPages": [
+        "https://banco.santander.cl"
+      ],
       "preferredFileBase": "santander"
     },
     "scotiabank": {
-      "searchTerms": ["Scotiabank Chile logo svg", "Scotiabank logo svg"],
+      "searchTerms": [
+        "Scotiabank Chile logo svg",
+        "Scotiabank logo svg"
+      ],
       "simpleIconsSlug": "scotiabank",
       "officialSvgUrls": [
         "https://cdn.aglty.io/scotiabank-chile/2024/header/logo-scotiabank-red.svg"
       ],
-      "officialPages": ["https://www.scotiabankchile.cl"],
+      "officialPages": [
+        "https://www.scotiabankchile.cl"
+      ],
       "preferredFileBase": "scotiabank"
     },
     "security": {
-      "searchTerms": ["Banco Security logo svg", "Banco Security logotipo svg"],
+      "searchTerms": [
+        "Banco Security logo svg",
+        "Banco Security logotipo svg"
+      ],
       "preferredFileBase": "security"
     },
     "stripe": {
-      "searchTerms": ["Stripe logo svg", "Stripe current logo svg"],
+      "searchTerms": [
+        "Stripe logo svg",
+        "Stripe current logo svg"
+      ],
       "simpleIconsSlug": "stripe",
       "preferredFileBase": "stripe"
     },
     "visa": {
-      "searchTerms": ["Visa logo svg", "Visa current logo svg"],
+      "searchTerms": [
+        "Visa logo svg",
+        "Visa current logo svg"
+      ],
       "simpleIconsSlug": "visa",
       "preferredFileBase": "visa"
     },
     "wise": {
-      "searchTerms": ["Wise logo svg", "Wise current logo svg"],
+      "searchTerms": [
+        "Wise logo svg",
+        "Wise current logo svg"
+      ],
       "simpleIconsSlug": "wise",
       "preferredFileBase": "wise"
     }

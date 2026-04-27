@@ -1,0 +1,14 @@
+interface:
+  display_name: "Brand Asset Designer"
+  short_description: "Vectorize and QA Greenhouse payment-instrument brand logos"
+  # Greenhouse primary blue (Brand Asset Designer card affordance).
+  # Source: src/config/greenhouse-nomenclature.ts → GH_COLORS.
+  brand_color: "#2F49C9"
+  default_prompt: "Use $greenhouse-digital-brand-asset-designer to vectorize and validate this brand logo in positive and negative SVG variants."
+
+policy:
+  # Explicit invocation only — the skill scope is narrow (payment-instrument
+  # logos / isotype matrix) and implicit triggering on broad keywords like
+  # "logo" or "marca" produces false starts in unrelated branding/marketing
+  # conversations. Users must call $greenhouse-digital-brand-asset-designer.
+  allow_implicit_invocation: false

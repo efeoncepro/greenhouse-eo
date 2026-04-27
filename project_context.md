@@ -1005,6 +1005,21 @@
 - Metadata UI/discovery agregada:
   - `.codex/skills/greenhouse-microinteractions-auditor/agents/openai.yaml`
 
+## Delta 2026-04-27 Skill local para diseño digital de assets de marca
+
+- Nueva skill de Codex disponible:
+  - `.codex/skills/greenhouse-digital-brand-asset-designer/SKILL.md`
+- Proposito:
+  - guiar vectorizacion, limpieza, variantes positivas/negativas y QA visual de logos/isotipos usados por Greenhouse
+  - evitar dibujos manuales aproximados de marcas y obligar a partir de fuentes oficiales o curadas con manifest auditable
+- Contrato operativo:
+  - usar `pnpm logos:payment:vectorize` + VTracer/Pillow para PNGs curados de alta resolucion
+  - validar matriz `full-positive`, `full-negative`, `mark-positive`, `mark-negative`
+  - renderizar SVG a PNG para inspeccion humana y para auditoria Gemini cuando aplique
+  - mantener `full-positive` como fuente canonica del entry y `mark-positive` solo como `compactLogo`
+- Metadata UI/discovery agregada:
+  - `.codex/skills/greenhouse-digital-brand-asset-designer/agents/openai.yaml`
+
 ## Delta 2026-04-11 Equipo asignado ya tiene arquitectura canónica enterprise
 
 - Greenhouse ya no debe pensar la surface cliente `/equipo` como roster simple.

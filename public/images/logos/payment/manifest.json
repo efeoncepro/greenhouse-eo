@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-27T13:26:01.282Z",
+  "updatedAt": "2026-04-27T14:16:14.928Z",
   "variantModel": [
     "full-positive",
     "full-negative",
@@ -138,11 +138,37 @@
       "brandName": "Global66",
       "category": "fintech",
       "country": null,
-      "sourceUrl": null,
-      "licenseSource": "Legacy repo asset; pending scraper verification",
+      "sourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png",
+      "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
       "logo": "/images/logos/payment/global66.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": null
+      "compactLogo": "/images/logos/payment/global66-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T14:26:30.012Z",
+      "variants": {
+        "full-positive": {
+          "sourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png",
+          "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/global66.svg",
+          "lastVerifiedAt": "2026-04-27T14:26:28.967Z"
+        },
+        "full-negative": {
+          "sourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png",
+          "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/global66-full-negative.svg",
+          "lastVerifiedAt": "2026-04-27T14:26:29.349Z"
+        },
+        "mark-positive": {
+          "sourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png",
+          "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/global66-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T14:26:29.696Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png",
+          "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/global66-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T14:26:30.012Z"
+        }
+      }
     },
     {
       "slug": "itau",
@@ -235,17 +261,35 @@
       "brandName": "Previred",
       "category": "payroll_processor",
       "country": "CL",
-      "sourceUrl": "https://www.previred.com/wp-content/themes/previred--theme/img/logo2025.svg",
-      "licenseSource": "Official brand source; follow source brand guidelines",
+      "sourceUrl": "composite:https://www.previred.com/wp-content/themes/previred--theme/img/logo.svg + https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png",
+      "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
       "logo": "/images/logos/payment/previred-full-positive.svg",
-      "compactLogo": null,
-      "lastVerifiedAt": "2026-04-27T12:45:12.390Z",
+      "compactLogo": "/images/logos/payment/previred-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T14:16:14.928Z",
       "variants": {
         "full-positive": {
-          "sourceUrl": "https://www.previred.com/wp-content/themes/previred--theme/img/logo2025.svg",
-          "licenseSource": "Official brand source; follow source brand guidelines",
+          "sourceUrl": "composite:https://www.previred.com/wp-content/themes/previred--theme/img/logo.svg + https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png",
+          "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
           "logo": "/images/logos/payment/previred-full-positive.svg",
           "lastVerifiedAt": "2026-04-27T12:45:12.390Z"
+        },
+        "full-negative": {
+          "sourceUrl": "composite:https://www.previred.com/wp-content/themes/previred--theme/img/logo.svg + https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png",
+          "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/previred-full-negative.svg",
+          "lastVerifiedAt": "2026-04-27T14:16:14.928Z"
+        },
+        "mark-positive": {
+          "sourceUrl": "https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png",
+          "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/previred-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T14:22:00.000Z"
+        },
+        "mark-negative": {
+          "sourceUrl": "https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png",
+          "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
+          "logo": "/images/logos/payment/previred-mark-negative.svg",
+          "lastVerifiedAt": "2026-04-27T14:22:00.000Z"
         }
       }
     },
@@ -298,17 +342,17 @@
       "brandName": "Scotiabank",
       "category": "bank_account",
       "country": "CL",
-      "sourceUrl": "https://www.scotiabankchile.cl",
+      "sourceUrl": "https://cdn.aglty.io/scotiabank-chile/2024/header/logo-scotiabank-red.svg",
       "licenseSource": "Official brand source; follow source brand guidelines",
       "logo": "/images/logos/payment/scotiabank-full-positive.svg",
       "compactLogo": null,
-      "lastVerifiedAt": "2026-04-27T13:12:26.240Z",
+      "lastVerifiedAt": "2026-04-27T14:02:05.099Z",
       "variants": {
         "full-positive": {
-          "sourceUrl": "https://www.scotiabankchile.cl",
+          "sourceUrl": "https://cdn.aglty.io/scotiabank-chile/2024/header/logo-scotiabank-red.svg",
           "licenseSource": "Official brand source; follow source brand guidelines",
           "logo": "/images/logos/payment/scotiabank-full-positive.svg",
-          "lastVerifiedAt": "2026-04-27T13:11:08.285Z"
+          "lastVerifiedAt": "2026-04-27T14:02:05.099Z"
         }
       }
     },
