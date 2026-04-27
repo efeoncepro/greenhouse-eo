@@ -4,12 +4,16 @@ import { useRouter } from 'next/navigation'
 
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
+import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import Tooltip from '@mui/material/Tooltip'
+
+import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
+import OptionMenu from '@core/components/option-menu'
 import type { ThemeColor } from '@core/types'
 
 import type { HomeReliabilityRibbonData, ReliabilityModuleStatus } from '@/lib/home/contract'
@@ -18,65 +22,79 @@ interface HomeReliabilityRibbonProps {
   data: HomeReliabilityRibbonData
 }
 
-const STATUS_TONE: Record<ReliabilityModuleStatus, { color: ThemeColor; icon: string; label: string }> = {
-  healthy: { color: 'success', icon: 'tabler-circle-check-filled', label: 'OK' },
-  degraded: { color: 'warning', icon: 'tabler-alert-circle', label: 'Degradado' },
-  down: { color: 'error', icon: 'tabler-circle-x-filled', label: 'Caído' },
-  unknown: { color: 'secondary', icon: 'tabler-circle-dotted', label: '—' }
+const STATUS_TONE: Record<ReliabilityModuleStatus, { color: ThemeColor; icon: string; label: string; progress: number }> = {
+  healthy: { color: 'success', icon: 'tabler-circle-check-filled', label: 'OK', progress: 100 },
+  degraded: { color: 'warning', icon: 'tabler-alert-circle', label: 'Degradado', progress: 50 },
+  down: { color: 'error', icon: 'tabler-circle-x-filled', label: 'Caído', progress: 15 },
+  unknown: { color: 'secondary', icon: 'tabler-circle-dotted', label: '—', progress: 0 }
 }
 
+const MODULE_ICON: Record<string, string> = {
+  finance: 'tabler-cash',
+  delivery: 'tabler-target',
+  cloud: 'tabler-cloud',
+  home: 'tabler-home',
+  'integrations.notion': 'tabler-brand-notion',
+  'integrations.teams': 'tabler-brand-microsoft-teams'
+}
+
+/**
+ * Smart Home v2 Reliability Ribbon — port of Vuexy `EarningReports` row
+ * pattern: avatar + label/sublabel + status chip + linear progress.
+ * Compact, dense, no improvisation.
+ */
 export const HomeReliabilityRibbon = ({ data }: HomeReliabilityRibbonProps) => {
   const router = useRouter()
   const rollupTone = STATUS_TONE[data.rollup]
+  const healthy = data.modules.filter(m => m.status === 'healthy').length
 
   return (
-    <Card component='aside' aria-label='Estado de plataforma' variant='outlined'>
-      <CardContent sx={{ py: 2 }}>
-        <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 1.5 }}>
-          <CustomAvatar variant='rounded' skin='light' color={rollupTone.color} size={28}>
-            <i className={rollupTone.icon} style={{ fontSize: 14 }} />
-          </CustomAvatar>
-          <Stack flex={1}>
-            <Typography variant='subtitle2'>Estado de plataforma</Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {data.modules.length} módulos · rollup {rollupTone.label}
-            </Typography>
-          </Stack>
-        </Stack>
-        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-          {data.modules.map(module => {
-            const tone = STATUS_TONE[module.status]
+    <Card component='aside' aria-label='Estado de plataforma'>
+      <CardHeader
+        avatar={<i className={classnames(rollupTone.icon, 'text-xl', `text-${rollupTone.color}`)} />}
+        title='Estado de plataforma'
+        subheader={`${healthy} de ${data.modules.length} módulos OK · rollup ${rollupTone.label}`}
+        titleTypographyProps={{ variant: 'h5' }}
+        action={<OptionMenu options={['Abrir Reliability', 'Ver incidentes']} />}
+        sx={{ '& .MuiCardHeader-avatar': { mr: 3 } }}
+      />
+      <CardContent className='flex flex-col gap-4'>
+        {data.modules.map(module => {
+          const tone = STATUS_TONE[module.status]
+          const icon = MODULE_ICON[module.moduleKey] ?? 'tabler-puzzle'
 
-            const tooltipParts: string[] = [
-              `${module.label}: ${tone.label}`
-            ]
-
-            if (module.incidentsOpen > 0) tooltipParts.push(`${module.incidentsOpen} incidentes abiertos`)
-
-            if (module.lastIncidentAt) {
-              tooltipParts.push(`último: ${new Date(module.lastIncidentAt).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}`)
-            }
-
-            return (
-              <Tooltip key={module.moduleKey} title={tooltipParts.join(' · ')}>
+          return (
+            <div
+              key={module.moduleKey}
+              className='flex items-center gap-4 cursor-pointer'
+              onClick={() => router.push('/admin/operations')}
+            >
+              <CustomAvatar skin='light' variant='rounded' color={tone.color} size={34}>
+                <i className={classnames(icon, 'text-[18px]')} />
+              </CustomAvatar>
+              <div className='flex flex-wrap justify-between items-center gap-x-4 gap-y-1 is-full'>
+                <Stack spacing={0.5} sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography className='font-medium' color='text.primary' noWrap>
+                    {module.label}
+                  </Typography>
+                  <LinearProgress
+                    variant='determinate'
+                    value={tone.progress}
+                    color={tone.color}
+                    sx={{ height: 4, borderRadius: 2, mt: 0.5 }}
+                  />
+                </Stack>
                 <Chip
                   size='small'
-                  variant='outlined'
+                  variant='tonal'
                   color={tone.color}
-                  icon={<i className={tone.icon} style={{ fontSize: 14 }} />}
-                  label={module.label}
-                  onClick={() => router.push('/admin/operations')}
-                  sx={{ cursor: 'pointer', height: 28 }}
+                  label={module.incidentsOpen > 0 ? `${module.incidentsOpen}` : tone.label}
+                  sx={{ height: 22, fontVariantNumeric: 'tabular-nums' }}
                 />
-              </Tooltip>
-            )
-          })}
-        </Stack>
-        {data.degradedSources.length > 0 ? (
-          <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1.5 }}>
-            Fuentes degradadas: {data.degradedSources.join(', ')}
-          </Typography>
-        ) : null}
+              </div>
+            </div>
+          )
+        })}
       </CardContent>
     </Card>
   )
