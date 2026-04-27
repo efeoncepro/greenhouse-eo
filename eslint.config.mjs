@@ -52,6 +52,8 @@ export default [
       'migrations/**',
       'src/iconify-bundle/bundle-icons-css.ts',
       'src/assets/iconify-icons/generated-icons.css',
+      'scripts/lib/server-only-shim.cjs',
+      'scripts/lib/server-only-empty.cjs',
       'tests/playwright/test-results/**',
       'artifacts/**',
       '**/* (1).js',

@@ -3421,6 +3421,12 @@ export interface GreenhouseFinanceExpensePayments {
   reference: string | null;
   settlement_group_id: string | null;
   space_id: string | null;
+  superseded_at: Timestamp | null;
+  /**
+   * Idem income_payments. Trigger fn_sync_expense_amount_paid excluye filas con esta columna no-null del SUM(amount).
+   */
+  superseded_by_payment_id: string | null;
+  superseded_reason: string | null;
 }
 
 export interface GreenhouseFinanceExpenses {
@@ -3468,6 +3474,10 @@ export interface GreenhouseFinanceExpenses {
   is_recurring: Generated<boolean>;
   is_tax_exempt: boolean | null;
   linked_income_id: string | null;
+  /**
+   * Anchor canónico a greenhouse_finance.loan_accounts. Cuotas mensuales de crédito en cartola se anclan aquí para que cost_attribution recoja el costo financiero per crédito.
+   */
+  loan_account_id: string | null;
   member_id: string | null;
   member_name: string | null;
   miscellaneous_category: string | null;
@@ -3552,6 +3562,10 @@ export interface GreenhouseFinanceExpenses {
    */
   tax_snapshot_json: Json | null;
   tax_type: string | null;
+  /**
+   * Anchor canónico al catálogo de herramientas (greenhouse_ai.tool_catalog.tool_id). Cargos TC tooling se anclan aquí para que cost_attribution + client_economics sumen correctamente per tool/cliente.
+   */
+  tool_catalog_id: string | null;
   total_amount: Numeric;
   total_amount_clp: Numeric;
   updated_at: Generated<Timestamp>;
@@ -3797,6 +3811,12 @@ export interface GreenhouseFinanceIncomePayments {
   reference: string | null;
   settlement_group_id: string | null;
   space_id: string | null;
+  superseded_at: Timestamp | null;
+  /**
+   * Anti double-counting: cuando un phantom Nubox sin payment_account_id co-existe con el payment canónico (ej. factoring_proceeds), se marca aquí en vez de eliminarlo. Audit preservado.
+   */
+  superseded_by_payment_id: string | null;
+  superseded_reason: string | null;
 }
 
 export interface GreenhouseFinanceIncomeSettlementReconciliation {
@@ -3836,6 +3856,31 @@ export interface GreenhouseFinanceInternalAccountTypeCatalog {
   family: string;
   is_active: Generated<boolean>;
   type_code: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceLoanAccounts {
+  created_at: Generated<Timestamp>;
+  currency: Generated<string>;
+  ends_at: Timestamp | null;
+  /**
+   * Referencia del crédito en el banco emisor (ej. "420051383906" Santander).
+   */
+  external_reference: string | null;
+  /**
+   * La cuenta bancaria desde la cual se debitan las cuotas (ej. santander-clp).
+   */
+  funding_account_id: string | null;
+  installment_count: number | null;
+  installments_paid: Generated<number>;
+  lender_name: string;
+  loan_id: string;
+  metadata_json: Generated<Json>;
+  monthly_installment: Numeric | null;
+  notes: string | null;
+  original_amount: Numeric | null;
+  started_at: Timestamp | null;
+  status: Generated<string>;
   updated_at: Generated<Timestamp>;
 }
 
@@ -7099,6 +7144,7 @@ export interface DB {
   "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
   "greenhouse_finance.instrument_category_provider_rules": GreenhouseFinanceInstrumentCategoryProviderRules;
   "greenhouse_finance.internal_account_type_catalog": GreenhouseFinanceInternalAccountTypeCatalog;
+  "greenhouse_finance.loan_accounts": GreenhouseFinanceLoanAccounts;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;
   "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;

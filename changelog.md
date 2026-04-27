@@ -2,6 +2,40 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — TASK-702 Bank Reconciliation, Canonical Anchors & Account Balances Rematerialization (Slices 1-3 + 5 partial)
+
+**Schema canónico (Slice 1)** — `migrations/20260427194307630_task-702-finance-canonical-anchors-and-supersede.sql` + `migrations/20260427194308180_task-702-finance-loan-accounts-scaffold.sql`:
+
+- FK constraints en columnas anchor existentes de `expenses`: `payroll_entry_id` → `greenhouse_payroll.payroll_entries(entry_id)`, `payroll_period_id` → `payroll_periods` (DEFERRABLE INITIALLY DEFERRED).
+- Nueva columna `expenses.tool_catalog_id` con FK a `greenhouse_ai.tool_catalog(tool_id)` para anclar cargos TC tooling al catálogo canónico.
+- Nueva tabla scaffold `greenhouse_finance.loan_accounts` + columna `expenses.loan_account_id` con FK. Seed para crédito Santander 420051383906 (cuota mensual ~$102k visible en cartola CLP).
+- Columnas `superseded_by_payment_id`, `superseded_at`, `superseded_reason` en `income_payments` y `expense_payments` con auto-FK al mismo table. Patrón canónico anti double-counting (mismo shape que orphan archive de `projection_refresh_queue`).
+- Trigger `fn_sync_expense_amount_paid` actualizado para EXCLUIR del SUM filas con `superseded_by_payment_id IS NOT NULL`. Resultado: `expense.amount_paid` reflejará la verdad canónica sin double-counting tras el supersede.
+- Nueva función `fn_recompute_income_amount_paid(p_income_id TEXT)` que computa la ecuación canónica: `cash payments (excl. superseded) + factoring fees activos + withholding`. Mirror de la VIEW `income_settlement_reconciliation` pero invocable desde `recordPayment` y desde supersede helpers.
+
+**Helpers TS canónicos (Slice 2 partial)** — `src/lib/finance/payment-instruments/supersede.ts`:
+
+- `supersedeIncomePhantom({ phantomPaymentId, replacementPaymentId, reason, actorUserId })` — marca phantom + recomputa `income.amount_paid` vía la nueva función PG + emite outbox event `finance.income.payment_superseded`. Idempotente.
+- `supersedeExpensePhantom(...)` — análogo para expense_payments. Trigger PG recalcula amount_paid automáticamente al UPDATE.
+- `listUnsupersededIncomePhantoms()` — read-only, lista phantoms pendientes de supersede.
+- Reglas duras: validación que phantom + replacement comparten income_id/expense_id (FinanceValidationError 422 si difieren). Reason mínimo 8 chars.
+
+**Account Balances Rematerialization (Slice 3)** — `src/lib/finance/account-balances-rematerialize.ts` + `scripts/finance/rematerialize-account-balances.ts`:
+
+- `rematerializeAccountBalanceRange(input)` — idempotente. NO toca `income_payments`/`expense_payments`. Solo reseta snapshots diarios stale y recompone día por día desde un seed conocido al 28/02.
+- Validación: si algún día del rango está `is_period_closed=TRUE`, aborta con error listando los días. Solo borra/regenera filas con `is_period_closed=FALSE`.
+- CLI `pnpm finance:rematerialize-balances [--all | --account <id>] [--seed-date YYYY-MM-DD] [--opening <n>] [--as-of YYYY-MM-DD]`.
+- Default seeds derivados de cartola al 28/02/2026: `santander-clp $5.703.909`, `santander-usd-usd USD 2.591,94`, `global66-clp $380`, `santander-corp-clp $268.442 deuda` (seed 2026-04-05 — TC arranca 06/04 con saldo inicial visible en cartola), `sha-cca-julio-reyes-clp $0`.
+- Ejecutado contra `greenhouse-pg-dev` 2026-04-27: 58 días materializados por cuenta CLP/USD/Global66, 22 días para TC. Saldos descongelados (CLP pasó de $15.776.453 frozen a $12.480.362 derivado del ledger; USD pasó de NULL a USD 2.591,94; Global66 inicializado en $380; TC en $268.442). Drift residual de ~$8.3M en CLP corresponde exactamente a payments sin anchor pendientes de conciliación canónica (Slice 4 follow-up): factoring inflows feb/mar, transferencias CLP→Global66 y CLP→TC sin settlement_groups, expense_payments faltantes para SII/Previred/Beeconta/colaboradores nacionales.
+
+**CLI tooling shim** — `scripts/lib/server-only-shim.cjs` + `scripts/lib/server-only-empty.cjs`:
+
+- Permite que scripts CLI (`tsx`) importen libs server-side que tienen `import 'server-only'` sin que el package falle al cargar fuera del bundle Next.js. Wired vía `--require ./scripts/lib/server-only-shim.cjs` en el script `pnpm finance:rematerialize-balances`. Patrón reutilizable para futuros CLI que toquen libs `@/lib/finance/**`.
+
+**Slice 4-7 (deferred)** — documentados en TASK-702 como follow-ups: ejecución conciliación marzo+abril contra cartolas reales (requiere validación interactiva del usuario sobre clasificación A/B/C/D por fila bancaria), endpoint admin `/api/admin/finance/ledger-health` para signal en Reliability dashboard, 3 PRs Nubox/Payroll cierre root causes, doc funcional `docs/documentation/finance/conciliacion-bancaria.md`.
+
+Validación: `pnpm test` 429/429 verde, `npx tsc --noEmit` limpio, `pnpm lint` limpio, migraciones aplicadas a `greenhouse-pg-dev`, `pnpm finance:rematerialize-balances --all` ejecuta correctamente, drift expectations documentadas.
+
 ### 2026-04-27 — TASK-701 Payment Provider Catalog + Greenhouse as platform_operator
 
 - El campo "Proveedor" del admin `/admin/payment-instruments/[id]` deja de ser un text input libre y pasa a un dropdown filtrado por categoria + tipo permitido. Cero modos en los que el usuario puede escribir un slug invalido.

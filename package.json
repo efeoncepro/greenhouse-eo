@@ -36,6 +36,7 @@
     "db:generate-types": "tsx scripts/generate-db-types.ts",
     "catalog:resync": "tsx scripts/catalog/resync-from-manifest.ts",
     "catalog:check": "tsx scripts/catalog/check-drift.ts",
+    "finance:rematerialize-balances": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account-balances.ts",
     "backfill:hubspot-contact-names": "tsx scripts/backfill-hubspot-contact-names.ts",
     "hubspot:properties": "tsx scripts/ensure-hubspot-custom-properties.ts",
     "hubspot:company-properties": "tsx scripts/create-hubspot-company-custom-properties.ts",
