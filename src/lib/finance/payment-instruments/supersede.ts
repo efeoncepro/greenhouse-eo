@@ -116,8 +116,7 @@ export const supersedeIncomePhantom = async (
       `UPDATE greenhouse_finance.income_payments SET
          superseded_by_payment_id = $1,
          superseded_at = NOW(),
-         superseded_reason = $2,
-         updated_at = NOW()
+         superseded_reason = $2
        WHERE payment_id = $3`,
       [input.replacementPaymentId, reason, input.phantomPaymentId]
     )

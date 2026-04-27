@@ -37,6 +37,8 @@
     "catalog:resync": "tsx scripts/catalog/resync-from-manifest.ts",
     "catalog:check": "tsx scripts/catalog/check-drift.ts",
     "finance:rematerialize-balances": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account-balances.ts",
+    "finance:conciliate-mar-apr": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/conciliate-march-april-2026.ts",
+    "finance:fix-factoring": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/fix-factoring-inflows-mar-apr.ts",
     "backfill:hubspot-contact-names": "tsx scripts/backfill-hubspot-contact-names.ts",
     "hubspot:properties": "tsx scripts/ensure-hubspot-custom-properties.ts",
     "hubspot:company-properties": "tsx scripts/create-hubspot-company-custom-properties.ts",
