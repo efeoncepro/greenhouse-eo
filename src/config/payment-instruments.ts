@@ -99,13 +99,19 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
   mastercard: {
     name: 'Mastercard',
     category: 'credit_card',
-    // Full lockup (multicolor wordmark + circles).
-    logo: '/images/logos/payment/Mastercard-Logo.wine.svg',
-    // Compact mark = the legacy two-circles isotype (`mastercard.svg`) until
-    // a dedicated `mastercard-mark-positive.svg` is published. The negative
-    // variant (`mastercard-mark-negative.svg`) already exists on disk for
-    // dark-bg contexts via downstream theme handling.
-    compactLogo: '/images/logos/payment/mastercard.svg'
+    // Source of truth: public/images/logos/payment/manifest.json (slug
+    // 'mastercard'). Both paths must match the manifest — the drift-guard
+    // test at src/config/__tests__/payment-instruments-manifest-drift.test.ts
+    // fails the build if they diverge.
+    //
+    // logo        → high-fidelity isotype (PNG 1920×1492). The .svg.png
+    //               filename is intentional per manifest provenance; the
+    //               file is a real PNG and the browser resolves it via
+    //               actual MIME, not extension.
+    // compactLogo → multicolor lockup variant declared as `mark-positive`
+    //               in the manifest. Used by the list/chip in tight rows.
+    logo: '/images/logos/payment/Mastercard-logo.svg.png',
+    compactLogo: '/images/logos/payment/Mastercard-Logo.wine.svg'
   },
   amex: {
     name: 'American Express',
