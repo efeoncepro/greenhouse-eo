@@ -32,7 +32,15 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
-import { DEFAULT_FOR_OPTIONS, INSTRUMENT_CATEGORY_COLORS, INSTRUMENT_CATEGORY_ICONS } from '@/config/payment-instruments'
+import {
+  DEFAULT_FOR_OPTIONS,
+  INSTRUMENT_CATEGORY_COLORS,
+  INSTRUMENT_CATEGORY_ICONS,
+  PROVIDER_CATALOG,
+  getProvider,
+  type InstrumentCategory
+} from '@/config/payment-instruments'
+import { getCategoryProviderRule, hasFixedProvider } from '@/lib/finance/payment-instruments/category-rules'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
 import {
@@ -300,10 +308,20 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
 
         const adapted = adaptPaymentInstrumentDetail(await response.json())
 
+        // If the category has a fixed provider (e.g. shareholder_account → 'greenhouse')
+        // pre-fill the form with the default so the user sees the right value
+        // even on legacy rows where the FK has not been backfilled yet.
+        const ruleForCategory = getCategoryProviderRule(adapted.account.instrumentCategory)
+
+        const initialProviderSlug =
+          adapted.account.providerSlug
+          ?? ruleForCategory?.defaultProviderSlug
+          ?? ''
+
         setDetail(adapted)
         setConfigForm({
           accountName: adapted.account.accountName,
-          providerSlug: adapted.account.providerSlug ?? '',
+          providerSlug: initialProviderSlug,
           providerIdentifierMasked: adapted.account.providerIdentifierMasked ?? '',
           accountNumberMasked: adapted.account.accountNumberMasked ?? '',
           notes: adapted.account.notes ?? '',
@@ -626,13 +644,88 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
                         />
                       </Grid>
                       <Grid size={{ xs: 12, md: 6 }}>
-                        <CustomTextField
-                          fullWidth
-                          label='Proveedor'
-                          value={configForm.providerSlug}
-                          onChange={event => setConfigForm(current => ({ ...current, providerSlug: event.target.value }))}
-                          helperText='Slug operativo entregado por el catalogo backend.'
-                        />
+                        {(() => {
+                          const rule = getCategoryProviderRule(account.instrumentCategory as InstrumentCategory)
+                          const fixedProvider = hasFixedProvider(rule)
+
+                          if (rule && !rule.requiresProvider) {
+                            return (
+                              <DetailField
+                                label='Proveedor'
+                                value='No aplica'
+                                helper='Esta categoria opera sin proveedor externo.'
+                              />
+                            )
+                          }
+
+                          const allowedTypes = rule?.providerTypesAllowed ?? null
+
+                          const providerOptions = Object.entries(PROVIDER_CATALOG)
+                            .filter(([slug, def]) => {
+                              // Limit to providers that match the rule's allowed types
+                              // OR (legacy) match the same instrument category as fallback.
+                              if (allowedTypes && allowedTypes.length > 0) {
+                                // PROVIDER_CATALOG entries don't carry provider_type yet, but their
+                                // `category` aligns by convention. Filter by category match instead
+                                // when allowedTypes is the legacy 'bank'/'card_network'/etc.
+                                const slugMatchesCategory = def.category === account.instrumentCategory
+                                const isPlatformProvider = slug === 'greenhouse'
+
+                                return slugMatchesCategory || (allowedTypes.includes('platform_operator') && isPlatformProvider)
+                              }
+
+                              return def.category === account.instrumentCategory
+                            })
+
+                          const label = rule?.providerLabel ?? 'Proveedor'
+
+                          const helper = fixedProvider
+                            ? 'La plataforma opera este instrumento — proveedor pre-asignado.'
+                            : `Selecciona el ${label.toLowerCase()} desde el catalogo Greenhouse.`
+
+                          return (
+                            <CustomTextField
+                              select
+                              fullWidth
+                              label={label}
+                              value={configForm.providerSlug}
+                              onChange={event => setConfigForm(current => ({ ...current, providerSlug: event.target.value }))}
+                              helperText={helper}
+                              disabled={fixedProvider}
+                              SelectProps={{
+                                renderValue: value => {
+                                  const slugValue = String(value || '')
+                                  const definition = getProvider(slugValue)
+
+                                  if (!definition) return slugValue || 'Sin proveedor'
+
+                                  return definition.name
+                                }
+                              }}
+                            >
+                              {!fixedProvider && (
+                                <MenuItem value=''>
+                                  <em>Sin proveedor</em>
+                                </MenuItem>
+                              )}
+                              {providerOptions.map(([slug, def]) => (
+                                <MenuItem key={slug} value={slug}>
+                                  <Stack direction='row' spacing={1.5} alignItems='center'>
+                                    {def.compactLogo || def.logo ? (
+                                      <Box
+                                        component='img'
+                                        src={def.compactLogo || def.logo || ''}
+                                        alt={def.name}
+                                        sx={{ width: 20, height: 20, objectFit: 'contain' }}
+                                      />
+                                    ) : null}
+                                    <Typography variant='body2'>{def.name}</Typography>
+                                  </Stack>
+                                </MenuItem>
+                              ))}
+                            </CustomTextField>
+                          )
+                        })()}
                       </Grid>
                       <Grid size={{ xs: 12, md: 6 }}>
                         <DetailField label='Cuenta enmascarada' value={configForm.accountNumberMasked || account.accountNumberMasked} helper='Reveal temporal disponible solo con razon.' />
@@ -686,6 +779,62 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
 
                 <Grid size={{ xs: 12, lg: 5 }}>
                   <Stack spacing={4}>
+                    {(() => {
+                      const rule = getCategoryProviderRule(account.instrumentCategory as InstrumentCategory)
+
+                      if (!rule?.requiresCounterparty) return null
+
+                      const meta = (account.metadataJsonSafe ?? {}) as Record<string, unknown>
+
+                      const counterpartyId =
+                        (typeof meta.shareholderProfileId === 'string' && meta.shareholderProfileId)
+                        || (typeof meta.shareholder_profile_id === 'string' && meta.shareholder_profile_id)
+                        || (typeof meta.counterpartyProfileId === 'string' && meta.counterpartyProfileId)
+                        || (typeof meta.counterparty_profile_id === 'string' && meta.counterparty_profile_id)
+                        || ''
+
+                      const counterpartyName =
+                        (typeof meta.shareholderName === 'string' && meta.shareholderName)
+                        || (typeof meta.shareholder_name === 'string' && meta.shareholder_name)
+                        || ''
+
+                      return (
+                        <Card variant='outlined' sx={{ borderRadius: 2 }}>
+                          <CardContent>
+                            <Stack spacing={2}>
+                              <Box>
+                                <Typography variant='subtitle2' color='text.secondary'>
+                                  {rule.counterpartyLabel}
+                                </Typography>
+                                <Typography variant='body2' color='text.secondary'>
+                                  Persona vinculada al saldo de este instrumento.
+                                </Typography>
+                              </Box>
+                              {counterpartyId ? (
+                                <Stack direction='row' spacing={2} alignItems='center'>
+                                  <CustomAvatar size={42} variant='rounded' color='primary'>
+                                    <i className='tabler-user' />
+                                  </CustomAvatar>
+                                  <Box sx={{ minWidth: 0 }}>
+                                    <Typography variant='body2' fontWeight={600} noWrap>
+                                      {counterpartyName || 'Persona'}
+                                    </Typography>
+                                    <Typography variant='caption' color='text.secondary' sx={{ wordBreak: 'break-all' }}>
+                                      profile_id: {counterpartyId}
+                                    </Typography>
+                                  </Box>
+                                </Stack>
+                              ) : (
+                                <Alert severity='warning' variant='outlined'>
+                                  Sin {rule.counterpartyLabel?.toLowerCase()} asignado. Asigna uno antes de operar saldos.
+                                </Alert>
+                              )}
+                            </Stack>
+                          </CardContent>
+                        </Card>
+                      )
+                    })()}
+
                     <Box>
                       <Typography variant='h6'>Ruteo y readiness</Typography>
                       <Typography variant='body2' color='text.secondary'>

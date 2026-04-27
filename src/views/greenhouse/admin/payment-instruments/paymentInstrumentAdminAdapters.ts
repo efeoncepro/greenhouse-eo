@@ -5,6 +5,7 @@ import {
   getProvider,
   type InstrumentCategory
 } from '@/config/payment-instruments'
+import { getCategoryProviderRule } from '@/lib/finance/payment-instruments/category-rules'
 
 export type ReadinessStatus = 'ready' | 'needs_configuration' | 'at_risk' | 'inactive'
 export type SectionHealth = 'ok' | 'partial' | 'error'
@@ -250,11 +251,20 @@ export const adaptPaymentInstrumentDetail = (payload: unknown): PaymentInstrumen
           actionHref: asNullableString(check.actionHref) ?? undefined
         }
       })
-    : [
+    : (() => {
+        const fallbackRule = getCategoryProviderRule(account.instrumentCategory as InstrumentCategory)
+        const fallbackProviderRequired = fallbackRule?.requiresProvider ?? account.instrumentCategory !== 'cash'
+        const fallbackProviderLabel = fallbackRule?.providerLabel ?? 'Proveedor'
+
+        return [
         {
           key: 'provider',
-          label: account.providerSlug ? 'Proveedor configurado' : 'Proveedor pendiente',
-          status: account.providerSlug ? ('pass' as const) : ('warning' as const)
+          label: account.providerSlug
+            ? `${fallbackProviderLabel} configurado`
+            : fallbackProviderRequired
+              ? `${fallbackProviderLabel} pendiente`
+              : 'Proveedor no aplica',
+          status: !fallbackProviderRequired || account.providerSlug ? ('pass' as const) : ('warning' as const)
         },
         {
           key: 'identifier',
@@ -270,6 +280,7 @@ export const adaptPaymentInstrumentDetail = (payload: unknown): PaymentInstrumen
           status: account.defaultFor.length > 0 ? ('pass' as const) : ('warning' as const)
         }
       ]
+      })()
 
   const impact: PaymentInstrumentImpact = {
     incomePaymentsCount: asNumber(impactRaw.incomePaymentsCount),

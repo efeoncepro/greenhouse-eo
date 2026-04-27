@@ -639,6 +639,29 @@ Catálogo de type codes (extender insertando filas — no requiere migrar genera
 - **NUNCA** desincronizar TS y SQL del Luhn — el test `luhn-parity` rompe build si pasa.
 - Cuando se cree el módulo de wallets, agregar fila al catalog y reusar el allocator. Cero código nuevo de generación.
 
+### Finance — Payment Provider Catalog + category provider rules (TASK-701)
+
+Toda cuenta operativa (banco, tarjeta, fintech, CCA, wallet futura) declara un proveedor que opera el ledger. El catálogo y las reglas son canónicos: el form admin y el readiness contract leen de aquí, no hay branching por categoría en consumers.
+
+**Tablas**:
+- `greenhouse_finance.payment_provider_catalog` — FK desde `accounts.provider_slug`. `provider_type` ∈ `bank`, `card_network`, `card_issuer`, `fintech`, `payment_platform`, `payroll_processor`, **`platform_operator`**. Cada fila declara `applicable_to TEXT[]` con las categorías que puede servir.
+- `greenhouse_finance.instrument_category_provider_rules` — regla por `instrument_category` (`requires_provider`, `provider_label`, `provider_types_allowed`, `default_provider_slug`, `requires_counterparty`, `counterparty_kind`, `counterparty_label`).
+
+**Greenhouse-as-platform_operator**: el provider con slug `greenhouse` es first-class. Representa que la plataforma misma opera ledger internos (CCA hoy, wallets/loans/factoring mañana). Para shareholder_account (y futuras categorías internas), `default_provider_slug='greenhouse'` → form lo pre-asigna read-only.
+
+**Helper canónico**: `getCategoryProviderRule(category)` en `src/lib/finance/payment-instruments/category-rules.ts` mirror del seed SQL.
+
+**Reglas duras**:
+- **NUNCA** escribir un `provider_slug` inventado. Solo slugs presentes en el catálogo (FK lo bloquea).
+- **NUNCA** branchear UI/readiness por `instrument_category` para decidir qué campos mostrar. Leer la rule.
+- **NUNCA** mezclar dimensiones: el `provider_slug` es "quién opera el ledger". El counterparty (cuando aplica) es "quién es el otro lado del wallet" — vive en `metadata_json` para shareholder hoy, columna dedicada cuando se materialicen futuras wallets.
+- Cuando ship una categoría nueva (`employee_wallet`, `client_wallet`, `intercompany_loan`, `escrow_account`):
+  1. INSERT row en `internal_account_type_catalog` (TASK-700)
+  2. UPDATE `payment_provider_catalog` para agregar la categoría al `applicable_to` de `greenhouse`
+  3. INSERT row en `instrument_category_provider_rules` con la regla
+  4. Agregar entrada en `getCategoryProviderRule` (mirror TS)
+  El form admin se adapta solo. Cero refactor de UI.
+
 ### Tests y validación
 
 - Tests unitarios: Vitest + Testing Library + jsdom

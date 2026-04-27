@@ -3816,6 +3816,19 @@ export interface GreenhouseFinanceIncomeSettlementReconciliation {
   withholding_amount: Numeric | null;
 }
 
+export interface GreenhouseFinanceInstrumentCategoryProviderRules {
+  counterparty_kind: string | null;
+  counterparty_label: string | null;
+  created_at: Generated<Timestamp>;
+  default_provider_slug: string | null;
+  instrument_category: string;
+  provider_label: string | null;
+  provider_types_allowed: string[] | null;
+  requires_counterparty: Generated<boolean>;
+  requires_provider: boolean;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceInternalAccountTypeCatalog {
   category_slug: string;
   created_at: Generated<Timestamp>;
@@ -3851,6 +3864,21 @@ export interface GreenhouseFinancePaymentInstrumentAdminAuditLog {
   reason: string | null;
   request_id: string | null;
   space_id: string | null;
+}
+
+export interface GreenhouseFinancePaymentProviderCatalog {
+  /**
+   * Subset of greenhouse_finance instrument categories this provider can serve. Used by admin UI to filter the provider dropdown by current category. Extend (don't branch) when a new wallet category ships.
+   */
+  applicable_to: string[];
+  country_code: string | null;
+  created_at: Generated<Timestamp>;
+  display_name: string;
+  is_active: Generated<boolean>;
+  metadata_json: Generated<Json>;
+  provider_slug: string;
+  provider_type: string;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseFinanceProducts {
@@ -7069,9 +7097,11 @@ export interface DB {
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
   "greenhouse_finance.income_settlement_reconciliation": GreenhouseFinanceIncomeSettlementReconciliation;
+  "greenhouse_finance.instrument_category_provider_rules": GreenhouseFinanceInstrumentCategoryProviderRules;
   "greenhouse_finance.internal_account_type_catalog": GreenhouseFinanceInternalAccountTypeCatalog;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
   "greenhouse_finance.payment_instrument_admin_audit_log": GreenhouseFinancePaymentInstrumentAdminAuditLog;
+  "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;
   "greenhouse_finance.quote_line_items": GreenhouseFinanceQuoteLineItems;

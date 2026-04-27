@@ -2,6 +2,18 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — TASK-701 Payment Provider Catalog + Greenhouse as platform_operator
+
+- El campo "Proveedor" del admin `/admin/payment-instruments/[id]` deja de ser un text input libre y pasa a un dropdown filtrado por categoria + tipo permitido. Cero modos en los que el usuario puede escribir un slug invalido.
+- **Greenhouse es ahora un proveedor first-class** (`provider_type = 'platform_operator'`). Para CCAs (y futuras wallets internas), Greenhouse queda pre-seteado y read-only en el form, con helper "La plataforma opera este instrumento — proveedor pre-asignado". Refleja correctamente que la plataforma misma opera el ledger interno.
+- Catalogo canonico `payment_provider_catalog` (FK desde `accounts.provider_slug`, 20 proveedores seedeados: 10 bancos chilenos, 3 card networks, 4 fintech, Deel, Previred, Greenhouse).
+- Reglas declarativas por categoria en `instrument_category_provider_rules` (label del campo, tipos permitidos, default_provider_slug, requires_counterparty, counterparty_kind, counterparty_label). El form admin y el readiness contract leen de aqui — agregar nueva categoria es 1 INSERT, no un branch.
+- Backfill: la unica CCA existente (Julio Reyes) recibe `provider_slug='greenhouse'`. Verificado en staging API.
+- Counterparty panel ("Accionista") nuevo en el right column del detail view: avatar + nombre + profile_id; Alert warning cuando falta. Lee `metadataJsonSafe.shareholderProfileId/shareholderName`.
+- Readiness check ya no muestra "Proveedor pendiente" falso para CCA (la rule sabe que el default es 'greenhouse'). Labels dinamicos: "Plataforma configurado", "Banco emisor configurado", "Red de tarjeta configurado", etc.
+- Reusable end-to-end para wallets/loans/factoring futuros: agregar al `applicable_to` de `greenhouse` la nueva categoria + INSERT rule. Cero codigo nuevo.
+- Validacion: `pnpm pg:connect:migrate` OK, `npx tsc --noEmit` clean, `pnpm lint` clean, `npx vitest run src/lib/finance` 55 archivos / 382 + 7 nuevos en `category-rules.test.ts`. Spec: `docs/tasks/complete/TASK-701-payment-provider-catalog-greenhouse-as-platform.md`.
+
 ### 2026-04-27 — TASK-700 Internal Account Number Allocator (CCA + future wallets)
 
 - Las cuentas accionistas (CCA) ya tienen numero de cuenta legible. Formato canonico `TT-XX-D-NNNN` (e.g. `01-90-7-0001`) — bank-style, todo numerico, validable con check digit Luhn mod-10. Los ultimos 4 caracteres son siempre el secuencial puro de 4 digitos, asi el masking estandar `•••• {last4}` produce identificadores distintivos sin colision visual.
@@ -34,6 +46,12 @@
 - La validacion AI intenta Gemini 3 Flash en Vertex `global` y baja por fallback cuando un modelo no esta disponible; los candidatos de paginas oficiales deben tener senal marcaria en el basename del SVG para evitar iconos de UI/social.
 - Inventario enriquecido con fuentes oficiales verificadas para Banco Ripley, Previred, Santander, Deel y Scotiabank; Scotiabank queda solo con full positivo rojo oficial hasta obtener/derivar variantes correctas.
 - Banco Falabella queda con las cuatro variantes (`full-positive`, `full-negative`, `mark-positive`, `mark-negative`) derivadas de forma vectorial desde el SVG completo verificado; el isotipo fue renderizado y validado visualmente antes de dejarlo en el manifest.
+- Previred queda probado y publicado en la matriz completa (`full-positive`, `full-negative`, `mark-positive`, `mark-negative`): el logo completo sale del SVG oficial 2025, el full negativo deriva de ese SVG y los isotipos se reconstruyen como SVG desde el favicon oficial para evitar confundir el aniversario "25" con el mark real.
+- El scraper soporta variantes curadas locales (`curatedSvgPath` + `curatedSourceUrl`) para marcas cuyo isotipo oficial existe como raster/favicon pero no como SVG publicado.
+- Nueva herramienta `pnpm logos:payment:vectorize` basada en VTracer + Pillow para convertir PNGs curados de alta resolucion a SVG sin embeber raster; Global66 queda regenerado desde el PNG provisto con limpieza de antialiasing y variantes `full/mark` positiva/negativa.
+- La revision Gemini ahora renderiza el SVG candidato a PNG con `sharp` y usa esa imagen como evidencia visual primaria; Global66 `full-positive` fue aprobado por Gemini 3 Flash con `qualityScore: 95`.
+- Nueva skill local `.codex/skills/greenhouse-digital-brand-asset-designer/` para que agentes traten logos/isotipos como identidad visual: fuente oficial o curada, vectorizacion reproducible, variantes positiva/negativa, render QA y manifest auditable.
+- El manifest deja `full-positive` como fuente canonica del entry; `mark-positive` actualiza solo `compactLogo` para evitar drift de metadata e idempotencia falsa entre corridas.
 - Nuevo manifest auditable `public/images/logos/payment/manifest.json` con `slug`, `brandName`, `category`, `country`, `sourceUrl`, `licenseSource`, `logo`, `compactLogo` y `lastVerifiedAt`.
 - Nuevo inventario operativo `docs/operations/payment-logo-inventory.md` para distinguir variantes listas vs pendientes por instrumento.
 - Caso real: Visa `mark-positive` fue descargado, validado por Gemini y conectado como `compactLogo`; Mastercard `mark-positive` quedo bloqueado al detectar falta de colores esperados de marca.

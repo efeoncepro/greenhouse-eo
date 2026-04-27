@@ -111,7 +111,13 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
     compactLogo: '/images/logos/payment/mercadopago-mark-positive.svg',
     currencies: ['CLP']
   },
-  global66: { name: 'Global66', category: 'fintech', logo: '/images/logos/payment/global66.svg', currencies: ['USD', 'CLP'] },
+  global66: {
+    name: 'Global66',
+    category: 'fintech',
+    logo: '/images/logos/payment/global66.svg',
+    compactLogo: '/images/logos/payment/global66-mark-positive.svg',
+    currencies: ['USD', 'CLP']
+  },
 
   // Payment platforms
   deel: { name: 'Deel', category: 'payment_platform', logo: '/images/logos/payment/deel-full-positive.svg', currencies: ['USD', 'CLP'] },
@@ -124,7 +130,18 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
   },
 
   // Payroll processors
-  previred: { name: 'Previred', category: 'payroll_processor', logo: '/images/logos/payment/previred-full-positive.svg', country: 'CL', currencies: ['CLP'] }
+  previred: { name: 'Previred', category: 'payroll_processor', logo: '/images/logos/payment/previred-full-positive.svg', country: 'CL', currencies: ['CLP'] },
+
+  // Platform operator — Greenhouse itself operates internal ledgers (CCA today,
+  // wallets/loans/factoring tomorrow). TASK-701 promotes this to a first-class
+  // provider so the admin UI no longer special-cases shareholder_account.
+  greenhouse: {
+    name: 'Greenhouse',
+    category: 'shareholder_account',
+    logo: '/images/greenhouse/SVG/greenhouse-blue.svg',
+    compactLogo: '/images/greenhouse/SVG/negative-isotipo.svg',
+    currencies: ['CLP', 'USD']
+  }
 } as const
 
 export type ProviderSlug = keyof typeof PROVIDER_CATALOG

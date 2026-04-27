@@ -1,5 +1,26 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — TASK-701 Payment Provider Catalog + Greenhouse as platform_operator
+
+- Rama: `develop`.
+- Diagnostico: el campo "Proveedor" del admin `/admin/payment-instruments/[id]` era un text input libre. Mezclaba dos conceptos distintos (operador externo de banco/tarjeta/fintech vs operador interno de ledger) y para CCAs aparecia vacio con warning falso "Proveedor pendiente". El modelo no podia expresar "no aplica proveedor externo" — solo "vacio".
+- Decision arquitectonica: Greenhouse-as-`platform_operator` first-class. La CCA es un wallet operado por la propia plataforma — el rol funcional de "quien custodia el ledger" es el mismo que cumple Mercado Pago para un wallet MP o Santander para una cuenta bancaria. Cada cuenta tiene proveedor; algunas tienen ademas counterparty.
+- Solucion canonica:
+  - Migracion `20260427143400960`: nueva tabla `payment_provider_catalog` con 20 proveedores seedeados (10 bancos chilenos, 3 card networks, 4 fintech, deel, previred, **greenhouse**); FK desde `accounts.provider_slug` con `ON DELETE RESTRICT`. Tabla `instrument_category_provider_rules` con seed de 7 categorias declarando `requires_provider`, `provider_label`, `provider_types_allowed`, `default_provider_slug`, `requires_counterparty`, `counterparty_kind`, `counterparty_label`. Backfill: la unica CCA existente (Julio Reyes) recibe `provider_slug='greenhouse'`.
+  - Helper canonico `src/lib/finance/payment-instruments/category-rules.ts` (`getCategoryProviderRule`, `hasFixedProvider`) mirror del seed SQL.
+  - `src/config/payment-instruments.ts` agrega entrada `greenhouse` con logo `/images/greenhouse/SVG/greenhouse-blue.svg` + compactLogo isotipo, asi `<PaymentInstrumentChip>` muestra branding correcto.
+  - `buildReadiness` en `admin-detail.ts` lee la rule y produce labels dinamicos ("Plataforma configurado" para CCA, "Banco emisor configurado" para banco) + agrega check de counterparty cuando aplica. Frontend adapter fallback alineado con la misma logica.
+  - `PaymentInstrumentDetailView`: text input libre del Proveedor reemplazado por `<Select>` filtrado por `providerTypesAllowed` + categoria. Cuando `defaultProviderSlug` esta set (caso CCA → 'greenhouse'), el dropdown queda disabled con helper "La plataforma opera este instrumento — proveedor pre-asignado". Para `cash` (sin proveedor), muestra DetailField "No aplica". Pre-fill defensivo del slug con default cuando la fila vino sin provider.
+  - Counterparty panel nuevo ("Accionista") en el right column con avatar + nombre + profile_id, lee `metadataJsonSafe.shareholderProfileId/shareholderName`. Alert warning cuando falta.
+- Validacion ejecutada:
+  - `pnpm pg:connect:migrate` OK
+  - `npx tsc --noEmit` clean
+  - `pnpm lint` clean
+  - `npx vitest run src/lib/finance` 55 archivos / 382 tests + 7 nuevos en `category-rules.test.ts`
+  - Smoke staging `/api/admin/payment-instruments?category=shareholder_account` confirma `"providerSlug":"greenhouse"` para Julio Reyes
+- Reusabilidad: cuando lleguen wallets (employee, freelancer, client) o intercompany loans, agregar al catalog `applicable_to=greenhouse += [new_category]` + INSERT rule + INSERT row en `internal_account_type_catalog` (TASK-700). Cero codigo nuevo en form/readiness.
+- Spec cerrada: `docs/tasks/complete/TASK-701-payment-provider-catalog-greenhouse-as-platform.md`.
+
 ## Sesion 2026-04-27 — TASK-700 Internal Account Number Allocator (CCA + future wallets)
 
 - Rama: `develop`.
@@ -29,6 +50,12 @@
   - Nuevos scripts: `pnpm logos:payment:agent`, `pnpm logos:payment:discover`, `pnpm logos:payment:publish`.
   - Scoring soporta `requiredBrandSignals` y `blockedBrandSignals` para marcas confundibles; se expandio bloqueo de falsos positivos no marcarios.
   - Scotiabank full positivo fue republicado desde URL oficial explicita (`cdn.aglty.io/.../logo-scotiabank-red.svg`), quedando idempotente en rerun.
+  - Previred queda resuelto en matriz completa: `full-positive` desde SVG oficial 2025; `full-negative` deriva de esa fuente; `mark-positive` y `mark-negative` usan SVGs vectoriales reconstruidos desde el favicon oficial porque el logo 2025 contiene el aniversario "25", no el isotipo real.
+  - Fix de idempotencia del manifest: solo `full-positive` gobierna `sourceUrl/licenseSource` del entry; `mark-positive` actualiza `compactLogo` sin pisar la fuente canonica.
+  - Nueva herramienta `scripts/payment-logo-vectorizer.py` expuesta como `pnpm logos:payment:vectorize`: usa VTracer + Pillow, detecta alpha bbox, genera `full/mark` y positivas/negativas, e inyecta `viewBox` estable.
+  - Global66 fue regenerado desde `public/images/logos/payment/que-es-global66-que-ofrece.png` con `--brand-clean global66`, eliminando bordes mordidos de antialiasing y reemplazando los SVGs manuales distorsionados.
+  - La revision AI ahora renderiza SVG a PNG con `sharp` y manda esa imagen a Gemini como evidencia visual; Global66 `full-positive` fue aprobado por `gemini-3-flash-preview@global` con `qualityScore: 95`.
+  - Nueva skill local `.codex/skills/greenhouse-digital-brand-asset-designer/` para que futuras vectorizaciones y variantes de marca no se hagan a ojo; obliga fuente oficial/curada, QA visual y manifest auditable.
 - Docs:
   - `docs/operations/payment-logo-scraper.md`
   - `changelog.md`
@@ -36,6 +63,11 @@
   - `pnpm logos:payment:agent -- --provider scotiabank --variant full-positive --candidate-url https://cdn.aglty.io/scotiabank-chile/2024/header/logo-scotiabank-red.svg --candidate-source official --min-score 80 --report artifacts/payment-logo-agent/scotiabank-direct.json --review-html artifacts/payment-logo-agent/scotiabank-direct.html` OK
   - mismo comando con `--apply` OK; segundo rerun confirma `unchanged` y `manifest: unchanged`
   - `pnpm logos:payment:discover -- --provider scotiabank --variant full-positive --min-score 80 --report artifacts/payment-logo-agent/scotiabank-discover-override.json --review-html artifacts/payment-logo-agent/scotiabank-discover-override.html` OK
+  - `pnpm logos:payment:discover -- --provider previred --min-score 80 --report artifacts/payment-logo-agent/previred-all-variants-derived-discover.json --review-html artifacts/payment-logo-agent/previred-all-variants-derived-discover.html` detecto la brecha: el mark derivado era el aniversario "25", no el isotipo.
+  - Correccion auditada: `previred-mark-positive.svg` y `previred-mark-negative.svg` reemplazados por el isotipo real desde favicon oficial; el scraper ahora soporta `curatedSvgPath`/`curatedSourceUrl` para que estas variantes sigan pasando la matriz completa sin redescubrimiento dudoso.
+  - `pnpm logos:payment:vectorize -- --input public/images/logos/payment/que-es-global66-que-ofrece.png --output public/images/logos/payment/global66.svg --variant full-positive --label Global66 --brand-clean global66` OK, repetido para full-negative/mark-positive/mark-negative.
+  - `pnpm logos:payment:publish -- --provider global66 --min-score 80 --report artifacts/payment-logo-agent/global66-vtracer-apply.json --review-html artifacts/payment-logo-agent/global66-vtracer-apply.html` OK: idempotente.
+  - `pnpm logos:payment:discover -- --provider global66 --variant full-positive,mark-positive --min-score 80 --ai-review --ai-timeout-ms 35000 --report artifacts/payment-logo-agent/global66-vtracer-ai-render-review.json --review-html artifacts/payment-logo-agent/global66-vtracer-ai-render-review.html` OK; Gemini aprobo full-positive, mark-positive quedo validado deterministico/visual.
   - `npx eslint scripts/payment-logo-scraper.ts` OK
   - `npx tsc --noEmit --pretty false` OK
   - `git diff --check` OK

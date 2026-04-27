@@ -12,6 +12,7 @@ import {
 } from '@/lib/finance/shared'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import { listPaymentInstrumentAuditEntries } from '@/lib/finance/payment-instruments/audit'
+import { getCategoryProviderRule } from '@/lib/finance/payment-instruments/category-rules'
 import type {
   PaymentInstrumentAdminAccount,
   PaymentInstrumentAdminDetail,
@@ -20,6 +21,32 @@ import type {
   PaymentInstrumentSensitiveField,
   PaymentInstrumentTreasury
 } from '@/lib/finance/payment-instruments/types'
+
+/**
+ * Resolve the counterparty id for an instrument when its category rule
+ * declares one. Today only `shareholder_account` carries a counterparty —
+ * the shareholder identity_profile, persisted in `accounts.metadata_json`.
+ *
+ * Future categories (employee_wallet, intercompany_loan, escrow, …) will
+ * each persist their counterparty in their own column or metadata field;
+ * extend this helper accordingly. The readiness check stays generic.
+ */
+const readCounterpartyId = (account: PaymentInstrumentAdminAccount): string | null => {
+  const meta = (account.metadataJsonSafe ?? null) as Record<string, unknown> | null
+
+  if (!meta) return null
+
+  const candidate = meta.shareholderProfileId
+    ?? meta.shareholder_profile_id
+    ?? meta.counterpartyProfileId
+    ?? meta.counterparty_profile_id
+
+  if (typeof candidate === 'string' && candidate.trim().length > 0) {
+    return candidate.trim()
+  }
+
+  return null
+}
 
 type AccountRow = {
   space_id: string | null
@@ -401,6 +428,10 @@ const getPaymentInstrumentTreasury = async (accountId: string, spaceId: string |
 }
 
 const buildReadiness = (account: PaymentInstrumentAdminAccount, impact: PaymentInstrumentImpact | null) => {
+  const rule = getCategoryProviderRule(account.instrumentCategory)
+  const providerRequired = rule?.requiresProvider ?? account.instrumentCategory !== 'cash'
+  const providerLabelHint = rule?.providerLabel ?? 'Proveedor'
+
   const checks: PaymentInstrumentReadinessCheck[] = [
     {
       key: 'active',
@@ -410,9 +441,17 @@ const buildReadiness = (account: PaymentInstrumentAdminAccount, impact: PaymentI
     },
     {
       key: 'provider',
-      label: account.providerSlug ? 'Proveedor configurado' : 'Proveedor pendiente',
-      status: account.providerSlug || account.instrumentCategory === 'cash' ? 'pass' : 'warning',
-      helper: account.providerSlug ? 'La identidad del proveedor esta completa.' : 'Agrega proveedor para mejorar conciliacion y trazabilidad.'
+      label: account.providerSlug
+        ? `${providerLabelHint} configurado`
+        : providerRequired
+          ? `${providerLabelHint} pendiente`
+          : 'Proveedor no aplica',
+      status: !providerRequired || account.providerSlug ? 'pass' : 'warning',
+      helper: account.providerSlug
+        ? 'La identidad del proveedor esta completa.'
+        : providerRequired
+          ? `Agrega ${providerLabelHint.toLowerCase()} para mejorar conciliacion y trazabilidad.`
+          : 'Esta categoria no requiere proveedor externo.'
     },
     {
       key: 'routing',
@@ -427,6 +466,22 @@ const buildReadiness = (account: PaymentInstrumentAdminAccount, impact: PaymentI
       helper: account.responsibleUserId ? 'Hay owner operativo para seguimiento.' : 'Asigna un responsable antes de usarlo en flujo recurrente.'
     }
   ]
+
+  if (rule?.requiresCounterparty) {
+    const counterpartyId = readCounterpartyId(account)
+    const counterpartyLabel = rule.counterpartyLabel ?? 'Counterparty'
+
+    checks.push({
+      key: 'counterparty',
+      label: counterpartyId
+        ? `${counterpartyLabel} asignado`
+        : `${counterpartyLabel} pendiente`,
+      status: counterpartyId ? 'pass' : 'warning',
+      helper: counterpartyId
+        ? `Persona vinculada al saldo de este instrumento.`
+        : `Asigna ${counterpartyLabel.toLowerCase()} antes de operar saldos.`
+    })
+  }
 
   if (impact?.closedPeriodsCount || impact?.closedBalancesCount) {
     checks.push({
