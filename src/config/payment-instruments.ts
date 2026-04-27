@@ -74,7 +74,7 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
     name: 'Visa',
     category: 'credit_card',
     logo: '/images/logos/payment/visa.svg',
-    compactLogo: '/images/logos/payment/Visa_Inc.-Logo.wine.svg'
+    compactLogo: '/images/logos/payment/visa-mark-positive.svg'
   },
   mastercard: {
     name: 'Mastercard',

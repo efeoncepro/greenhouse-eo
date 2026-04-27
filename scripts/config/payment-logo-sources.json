@@ -44,7 +44,8 @@
     "mastercard": {
       "searchTerms": ["Mastercard logo svg", "Mastercard current logo svg"],
       "simpleIconsSlug": "mastercard",
-      "preferredFileBase": "mastercard"
+      "preferredFileBase": "mastercard",
+      "expectedColors": ["#eb001b", "#f79e1b"]
     },
     "mercadopago": {
       "searchTerms": ["Mercado Pago logo svg", "MercadoPago logo svg"],

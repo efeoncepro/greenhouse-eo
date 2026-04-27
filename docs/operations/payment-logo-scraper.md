@@ -18,12 +18,17 @@ El script esta pensado para humanos y agentes de IA:
 ```bash
 pnpm logos:payment:scrape -- --all
 pnpm logos:payment:scrape -- --provider mastercard,visa
-pnpm logos:payment:scrape -- --provider mastercard --apply
+pnpm logos:payment:scrape -- --provider mastercard --variant full-positive,mark-positive --apply
+pnpm logos:payment:scrape -- --provider mastercard --variant full-positive --ai-review
 ```
 
 Opciones utiles:
 
 - `--min-score 80`: exige mas confianza antes de seleccionar.
+- `--variant full-positive,mark-positive`: limita la busqueda a logo completo positivo e isotipo positivo.
+- `--ai-review`: usa Gemini como segunda opinion sobre los mejores candidatos determinísticos.
+- `--ai-required`: bloquea seleccion/apply si Gemini no aprueba o no esta disponible.
+- `--ai-timeout-ms 25000`: limita cada revision Gemini para que el scraper no quede colgado.
 - `--allow-review-required`: permite guardar aunque el candidato necesite revision humana.
 - `--report artifacts/payment-logo-scraper/mastercard.json`: cambia el destino del reporte.
 - `--output-dir public/images/logos/payment`: cambia la carpeta de salida.
@@ -48,8 +53,29 @@ El inventario auditable vive en `public/images/logos/payment/manifest.json`. Cad
 - `logo`
 - `compactLogo`
 - `lastVerifiedAt`
+- `variants.full-positive`
+- `variants.full-negative`
+- `variants.mark-positive`
+- `variants.mark-negative`
 
-Cuando el scraper corre con `--apply`, actualiza automaticamente la entrada del proveedor seleccionado con `sourceUrl`, `licenseSource`, `logo` y `lastVerifiedAt`.
+Cuando el scraper corre con `--apply`, actualiza automaticamente la entrada del proveedor seleccionado con `sourceUrl`, `licenseSource`, `logo`, `compactLogo`, `lastVerifiedAt` y la variante especifica aplicada.
+
+## Capa AI opcional
+
+La validacion AI no reemplaza las reglas deterministicas. Gemini se usa como segunda opinion para revisar:
+
+- si el SVG corresponde a la marca correcta
+- si es logo completo o isotipo segun la variante pedida
+- si parece version positiva o negativa
+- si hay riesgo de logo historico, co-brand, baja calidad o mala aplicacion visual
+
+El runtime usa Vertex AI Gemini con:
+
+- `PAYMENT_LOGO_AI_MODEL` si existe
+- fallback `GREENHOUSE_AGENT_MODEL`
+- fallback final `google/gemini-2.5-flash@default`
+
+El scraper sigue funcionando sin AI. Usa `--ai-required` solo cuando quieras bloquear cualquier candidato sin aprobacion LLM.
 
 El scoring favorece:
 

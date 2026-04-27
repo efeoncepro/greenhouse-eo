@@ -1,6 +1,12 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-27T00:00:00.000Z",
+  "updatedAt": "2026-04-27T12:26:49.245Z",
+  "variantModel": [
+    "full-positive",
+    "full-negative",
+    "mark-positive",
+    "mark-negative"
+  ],
   "entries": [
     {
       "slug": "amex",
@@ -110,7 +116,15 @@
       "licenseSource": "User-provided asset; pending scraper verification for full SVG",
       "logo": "/images/logos/payment/Mastercard-logo.svg.png",
       "compactLogo": "/images/logos/payment/Mastercard-Logo.wine.svg",
-      "lastVerifiedAt": null
+      "lastVerifiedAt": null,
+      "variants": {
+        "mark-positive": {
+          "sourceUrl": "user-provided:/public/images/logos/payment/Mastercard-Logo.wine.svg",
+          "licenseSource": "User-provided asset; pending official source verification",
+          "logo": "/images/logos/payment/Mastercard-Logo.wine.svg",
+          "lastVerifiedAt": null
+        }
+      }
     },
     {
       "slug": "mercadopago",
@@ -205,11 +219,19 @@
       "brandName": "Visa",
       "category": "credit_card",
       "country": null,
-      "sourceUrl": "user-provided:/public/images/logos/payment/Visa_Inc.-Logo.wine.svg",
-      "licenseSource": "User-provided asset; pending official source verification",
+      "sourceUrl": "https://simpleicons.org/?q=visa",
+      "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
       "logo": "/images/logos/payment/visa.svg",
-      "compactLogo": "/images/logos/payment/Visa_Inc.-Logo.wine.svg",
-      "lastVerifiedAt": null
+      "compactLogo": "/images/logos/payment/visa-mark-positive.svg",
+      "lastVerifiedAt": "2026-04-27T12:26:49.245Z",
+      "variants": {
+        "mark-positive": {
+          "sourceUrl": "https://simpleicons.org/?q=visa",
+          "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
+          "logo": "/images/logos/payment/visa-mark-positive.svg",
+          "lastVerifiedAt": "2026-04-27T12:26:49.245Z"
+        }
+      }
     },
     {
       "slug": "wise",

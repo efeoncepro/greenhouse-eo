@@ -2,9 +2,24 @@ import { createHash } from 'node:crypto'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
+import { GoogleGenAI } from '@google/genai'
+
 import { PROVIDER_CATALOG } from '../src/config/payment-instruments'
 
 type ProviderSlug = keyof typeof PROVIDER_CATALOG
+
+const LOGO_VARIANTS = ['full-positive', 'full-negative', 'mark-positive', 'mark-negative'] as const
+
+type LogoVariant = (typeof LOGO_VARIANTS)[number]
+
+type VariantHint = {
+  searchTerms?: string[]
+  simpleIconsSlug?: string
+  preferredFileBase?: string
+  officialSvgUrls?: string[]
+  officialPages?: string[]
+  expectedColors?: string[]
+}
 
 type SourceHint = {
   searchTerms?: string[]
@@ -12,6 +27,8 @@ type SourceHint = {
   preferredFileBase?: string
   officialSvgUrls?: string[]
   officialPages?: string[]
+  expectedColors?: string[]
+  variants?: Partial<Record<LogoVariant, VariantHint>>
 }
 
 type SourceManifest = {
@@ -30,11 +47,18 @@ type AuditManifestEntry = {
   logo: string | null
   compactLogo: string | null
   lastVerifiedAt: string | null
+  variants?: Partial<Record<LogoVariant, {
+    sourceUrl: string | null
+    licenseSource: string | null
+    logo: string | null
+    lastVerifiedAt: string | null
+  }>>
 }
 
 type AuditManifest = {
   version: number
   updatedAt: string
+  variantModel?: LogoVariant[]
   entries: AuditManifestEntry[]
 }
 
@@ -43,6 +67,7 @@ type CandidateSource = 'official' | 'simple-icons' | 'wikimedia' | 'direct-url'
 type LogoCandidate = {
   providerSlug: ProviderSlug
   providerName: string
+  variant: LogoVariant
   source: CandidateSource
   url: string
   pageUrl?: string
@@ -60,7 +85,20 @@ type ValidationResult = LogoCandidate & {
   bytes?: number
   destination?: string
   freshnessSignals: string[]
+  aiReview?: AiLogoReview
   content?: string
+}
+
+type AiLogoReview = {
+  status: 'skipped' | 'pass' | 'review' | 'reject' | 'error'
+  model?: string
+  confidence?: number
+  qualityScore?: number
+  isCorrectBrand?: boolean
+  isCorrectVariant?: boolean
+  isLikelyCurrent?: boolean
+  rationale?: string
+  risks?: string[]
 }
 
 type RunReport = {
@@ -71,8 +109,10 @@ type RunReport = {
   results: Array<{
     providerSlug: string
     providerName: string
-    selected: Omit<ValidationResult, 'content'> | null
-    candidates: Array<Omit<ValidationResult, 'content'>>
+    variants: Partial<Record<LogoVariant, {
+      selected: Omit<ValidationResult, 'content'> | null
+      candidates: Array<Omit<ValidationResult, 'content'>>
+    }>>
   }>
 }
 
@@ -82,6 +122,7 @@ const DEFAULT_REPORT_PATH = path.join(process.cwd(), 'artifacts/payment-logo-scr
 const DEFAULT_MIN_SCORE = 70
 const CURRENT_YEAR = new Date().getFullYear()
 const HTTP_TIMEOUT_MS = 12000
+const AI_REVIEW_TIMEOUT_MS = 25000
 const MAX_SVG_BYTES = 250_000
 
 const TRUSTED_WIKIMEDIA_HOSTS = new Set(['commons.wikimedia.org', 'upload.wikimedia.org'])
@@ -102,13 +143,22 @@ const parseArgs = () => {
     .map(value => value.trim())
     .filter(Boolean) as ProviderSlug[] | undefined
 
+  const variants = getValue('--variant')
+    ?.split(',')
+    .map(value => value.trim())
+    .filter(Boolean) as LogoVariant[] | undefined
+
   return {
     apply: args.includes('--apply'),
     all: args.includes('--all'),
     provider: providers,
+    variants,
+    aiReview: args.includes('--ai-review'),
+    aiRequired: args.includes('--ai-required'),
     outputDir: getValue('--output-dir'),
     reportPath: getValue('--report') ?? DEFAULT_REPORT_PATH,
     minScore: Number(getValue('--min-score') ?? DEFAULT_MIN_SCORE),
+    aiTimeoutMs: Number(getValue('--ai-timeout-ms') ?? AI_REVIEW_TIMEOUT_MS),
     allowReviewRequired: args.includes('--allow-review-required'),
     help: args.includes('--help') || args.includes('-h')
   }
@@ -121,11 +171,15 @@ Payment logo scraper
 Usage:
   pnpm logos:payment:scrape -- --all
   pnpm logos:payment:scrape -- --provider mastercard,visa
-  pnpm logos:payment:scrape -- --provider mastercard --apply
+  pnpm logos:payment:scrape -- --provider mastercard --variant full-positive,mark-positive --apply
 
 Options:
   --all                    Scan every provider in PROVIDER_CATALOG.
   --provider <slugs>       Comma-separated provider slugs.
+  --variant <variants>     Comma-separated: ${LOGO_VARIANTS.join(', ')}. Default: all variants.
+  --ai-review              Ask Gemini to review top deterministic candidates.
+  --ai-required            Require Gemini pass before selecting/applying a candidate.
+  --ai-timeout-ms <ms>     Gemini review timeout. Default: ${AI_REVIEW_TIMEOUT_MS}.
   --apply                  Save selected SVG files into public/images/logos/payment.
   --min-score <number>     Minimum validation score required. Default: ${DEFAULT_MIN_SCORE}.
   --allow-review-required  Allow apply when the best candidate still needs human review.
@@ -143,6 +197,7 @@ const readManifest = async (): Promise<SourceManifest> => {
 const buildFallbackAuditManifest = (): AuditManifest => ({
   version: 1,
   updatedAt: new Date().toISOString(),
+  variantModel: [...LOGO_VARIANTS],
   entries: (Object.entries(PROVIDER_CATALOG) as Array<[ProviderSlug, (typeof PROVIDER_CATALOG)[ProviderSlug]]>).map(([slug, provider]) => ({
     slug,
     brandName: provider.name,
@@ -152,7 +207,21 @@ const buildFallbackAuditManifest = (): AuditManifest => ({
     licenseSource: null,
     logo: provider.logo,
     compactLogo: provider.compactLogo ?? null,
-    lastVerifiedAt: null
+    lastVerifiedAt: null,
+    variants: {
+      'full-positive': {
+        sourceUrl: null,
+        licenseSource: null,
+        logo: provider.logo,
+        lastVerifiedAt: null
+      },
+      'mark-positive': {
+        sourceUrl: null,
+        licenseSource: null,
+        logo: provider.compactLogo ?? null,
+        lastVerifiedAt: null
+      }
+    }
   }))
 })
 
@@ -174,9 +243,31 @@ const inferLicenseSource = (candidate: ValidationResult) => {
   return 'Direct URL; manual license verification required'
 }
 
+const primaryLogoFieldForVariant = (variant: LogoVariant) => {
+  if (variant === 'full-positive') return 'logo'
+  if (variant === 'mark-positive') return 'compactLogo'
+
+  return null
+}
+
 const updateAuditManifest = (manifest: AuditManifest, providerSlug: ProviderSlug, selected: ValidationResult, relativeLogoPath: string): AuditManifest => {
   const provider = PROVIDER_CATALOG[providerSlug]
+  const existing = manifest.entries.find(entry => entry.slug === providerSlug)
   const entries = manifest.entries.filter(entry => entry.slug !== providerSlug)
+
+  const variants = {
+    ...(existing?.variants ?? {}),
+    [selected.variant]: {
+      sourceUrl: selected.pageUrl ?? selected.url,
+      licenseSource: inferLicenseSource(selected),
+      logo: relativeLogoPath,
+      lastVerifiedAt: new Date().toISOString()
+    }
+  }
+
+  const primaryField = primaryLogoFieldForVariant(selected.variant)
+  const logo = primaryField === 'logo' ? relativeLogoPath : (existing?.logo ?? provider.logo)
+  const compactLogo = primaryField === 'compactLogo' ? relativeLogoPath : (existing?.compactLogo ?? provider.compactLogo ?? null)
 
   entries.push({
     slug: providerSlug,
@@ -185,14 +276,16 @@ const updateAuditManifest = (manifest: AuditManifest, providerSlug: ProviderSlug
     country: provider.country ?? null,
     sourceUrl: selected.pageUrl ?? selected.url,
     licenseSource: inferLicenseSource(selected),
-    logo: relativeLogoPath,
-    compactLogo: provider.compactLogo ?? null,
-    lastVerifiedAt: new Date().toISOString()
+    logo,
+    compactLogo,
+    lastVerifiedAt: new Date().toISOString(),
+    variants
   })
 
   return {
     version: manifest.version || 1,
     updatedAt: new Date().toISOString(),
+    variantModel: [...LOGO_VARIANTS],
     entries: entries.sort((a, b) => a.slug.localeCompare(b.slug))
   }
 }
@@ -239,6 +332,37 @@ const sameBrandSignal = (candidate: LogoCandidate) => {
   return words.some(word => haystack.includes(word))
 }
 
+const variantSearchSuffix = (variant: LogoVariant) => {
+  if (variant === 'full-positive') return 'full logo svg'
+  if (variant === 'full-negative') return 'white reversed full logo svg'
+  if (variant === 'mark-positive') return 'isotipo icon brand mark svg'
+
+  return 'white reversed isotipo icon brand mark svg'
+}
+
+const variantIntentSignals = (candidate: LogoCandidate) => {
+  const haystack = `${candidate.title ?? ''} ${candidate.url} ${candidate.pageUrl ?? ''} ${candidate.discoveredBy}`.toLowerCase()
+  const warnings: string[] = []
+  let score = 0
+
+  if (candidate.variant.includes('negative')) {
+    if (/(negative|white|reversed|reverse|blanco|dark|light)/i.test(haystack)) score += 8
+    else warnings.push('No hay senal clara de version negativa/blanca.')
+  }
+
+  if (candidate.variant.includes('mark')) {
+    if (/(mark|icon|symbol|isotype|isotipo|brandmark|logo mark)/i.test(haystack) || candidate.source === 'simple-icons') score += 8
+    else warnings.push('No hay senal clara de isotipo/brand mark.')
+  }
+
+  if (candidate.variant.includes('full')) {
+    if (/(logo|wordmark|logotipo|lockup|full)/i.test(haystack)) score += 6
+    else warnings.push('No hay senal clara de logo completo/wordmark.')
+  }
+
+  return { score, warnings }
+}
+
 const hasFreshnessSignal = (candidate: LogoCandidate, content: string, response: Response) => {
   const haystack = `${candidate.title ?? ''} ${candidate.url} ${candidate.pageUrl ?? ''} ${content.slice(0, 1500)}`.toLowerCase()
   const signals: string[] = []
@@ -271,11 +395,20 @@ const validateSvg = (svg: string) => {
   return { reasons, warnings }
 }
 
+const validateExpectedColors = (svg: string, expectedColors: string[] | undefined) => {
+  if (!expectedColors?.length) return []
+
+  const normalizedSvg = svg.toLowerCase()
+
+  return expectedColors.filter(color => !normalizedSvg.includes(color.toLowerCase()))
+}
+
 const scoreCandidate = (candidate: LogoCandidate, content: string, response: Response, svgWarnings: string[]) => {
   const url = new URL(candidate.url)
   const reasons: string[] = []
   const warnings = [...svgWarnings]
   const freshnessSignals = hasFreshnessSignal(candidate, content, response)
+  const variantSignals = variantIntentSignals(candidate)
   let score = 0
 
   if (candidate.source === 'official') score += 45
@@ -290,6 +423,9 @@ const scoreCandidate = (candidate: LogoCandidate, content: string, response: Res
   if (candidate.source === 'official') score += 15
   if (sameBrandSignal(candidate)) score += 15
   else warnings.push('La URL/titulo no contiene una senal fuerte del nombre de marca.')
+
+  score += variantSignals.score
+  warnings.push(...variantSignals.warnings)
 
   if (freshnessSignals.length > 0) score += 8
   else warnings.push('No hay senal de actualidad; requiere revision humana contra brand center o fuente oficial.')
@@ -314,8 +450,203 @@ const scoreCandidate = (candidate: LogoCandidate, content: string, response: Res
   }
 }
 
-const validateCandidate = async (candidate: LogoCandidate, outputDir: string, hint?: SourceHint): Promise<ValidationResult> => {
-  const destinationBase = hint?.preferredFileBase ?? candidate.providerSlug
+const parseAiJson = (text: string): Record<string, unknown> | null => {
+  try {
+    return JSON.parse(text) as Record<string, unknown>
+  } catch {
+    const match = text.match(/\{[\s\S]*\}/)
+
+    if (!match) return null
+
+    try {
+      return JSON.parse(match[0]) as Record<string, unknown>
+    } catch {
+      return null
+    }
+  }
+}
+
+const getAiLogoReviewRuntime = () => ({
+  project: process.env.GCP_PROJECT?.trim() || process.env.GOOGLE_CLOUD_PROJECT?.trim() || 'efeonce-group',
+  location: process.env.GOOGLE_CLOUD_LOCATION?.trim() || 'us-central1',
+  model: process.env.PAYMENT_LOGO_AI_MODEL?.trim() || process.env.GREENHOUSE_AGENT_MODEL?.trim() || 'google/gemini-2.5-flash@default'
+})
+
+const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number, label: string) => {
+  let timeout: NodeJS.Timeout | undefined
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timeout = setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs)
+      })
+    ])
+  } finally {
+    if (timeout) clearTimeout(timeout)
+  }
+}
+
+const runAiLogoReview = async (candidate: ValidationResult, timeoutMs: number): Promise<AiLogoReview> => {
+  if (!candidate.content) {
+    return { status: 'skipped', rationale: 'No SVG content available for AI review.' }
+  }
+
+  const runtime = getAiLogoReviewRuntime()
+
+  try {
+    process.env.GOOGLE_GENAI_USE_VERTEXAI = 'true'
+    process.env.GOOGLE_CLOUD_PROJECT ||= runtime.project
+    process.env.GOOGLE_CLOUD_LOCATION ||= runtime.location
+
+    const client = new GoogleGenAI({
+      vertexai: true,
+      project: runtime.project,
+      location: runtime.location,
+      apiVersion: 'v1'
+    })
+
+    const response = await withTimeout(
+      client.models.generateContent({
+        model: runtime.model,
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: [
+                  'Review this SVG candidate for use in Greenhouse payment instrument logos.',
+                  'Return ONLY JSON with keys: status(pass|review|reject), confidence(0-1), qualityScore(0-100), isCorrectBrand(boolean), isCorrectVariant(boolean), isLikelyCurrent(boolean), rationale(string), risks(string[]).',
+                  'Do not approve if the asset appears historical, co-branded, a derived network, not the requested brand, not the requested variant, raster-embedded, visually low quality, or unsafe for production UI.',
+                  '',
+                  `Brand: ${candidate.providerName}`,
+                  `Requested variant: ${candidate.variant}`,
+                  `Source: ${candidate.source}`,
+                  `URL: ${candidate.url}`,
+                  `Page: ${candidate.pageUrl ?? 'n/a'}`,
+                  `Title: ${candidate.title ?? 'n/a'}`,
+                  `Deterministic score: ${candidate.score}`,
+                  `Deterministic warnings: ${candidate.warnings.join(' | ') || 'none'}`,
+                  '',
+                  'SVG excerpt:',
+                  candidate.content.slice(0, 18000)
+                ].join('\n')
+              }
+            ]
+          }
+        ],
+        config: {
+          temperature: 0,
+          responseMimeType: 'application/json',
+          maxOutputTokens: 900,
+          thinkingConfig: { thinkingBudget: 0 }
+        }
+      }),
+      timeoutMs,
+      'Gemini logo review'
+    )
+
+    const text = response.text?.trim()
+    const parsed = text ? parseAiJson(text) : null
+
+    if (!parsed) {
+      return {
+        status: 'error',
+        model: runtime.model,
+        rationale: 'Gemini returned an empty or non-JSON response.'
+      }
+    }
+
+    const status = parsed.status === 'pass' || parsed.status === 'review' || parsed.status === 'reject'
+      ? parsed.status
+      : 'review'
+
+    return {
+      status,
+      model: runtime.model,
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : undefined,
+      qualityScore: typeof parsed.qualityScore === 'number' ? parsed.qualityScore : undefined,
+      isCorrectBrand: typeof parsed.isCorrectBrand === 'boolean' ? parsed.isCorrectBrand : undefined,
+      isCorrectVariant: typeof parsed.isCorrectVariant === 'boolean' ? parsed.isCorrectVariant : undefined,
+      isLikelyCurrent: typeof parsed.isLikelyCurrent === 'boolean' ? parsed.isLikelyCurrent : undefined,
+      rationale: typeof parsed.rationale === 'string' ? parsed.rationale : undefined,
+      risks: Array.isArray(parsed.risks) ? parsed.risks.map(String) : undefined
+    }
+  } catch (error) {
+    return {
+      status: 'error',
+      model: runtime.model,
+      rationale: error instanceof Error ? error.message : 'Unknown Gemini review error.'
+    }
+  }
+}
+
+const applyAiReview = (candidate: ValidationResult, review: AiLogoReview, aiRequired: boolean): ValidationResult => {
+  const next: ValidationResult = {
+    ...candidate,
+    aiReview: review,
+    warnings: [...candidate.warnings],
+    reasons: [...candidate.reasons]
+  }
+
+  if (review.status === 'error' || review.status === 'skipped') {
+    next.warnings.push(`AI review ${review.status}: ${review.rationale ?? 'sin detalle'}`)
+
+    if (aiRequired) {
+      next.reviewRequired = true
+      next.score = 0
+      next.reasons.push('AI review requerido pero no disponible.')
+    }
+
+    return next
+  }
+
+  if (review.status === 'reject' || review.isCorrectBrand === false || review.isCorrectVariant === false) {
+    next.reviewRequired = true
+    next.score = Math.max(0, next.score - 45)
+    next.reasons.push(`AI review rechazo o inconsistencia: ${review.rationale ?? 'sin detalle'}`)
+  } else if (review.status === 'review' || review.isLikelyCurrent === false) {
+    next.reviewRequired = true
+    next.score = Math.max(0, next.score - 15)
+    next.warnings.push(`AI review requiere revision: ${review.rationale ?? 'sin detalle'}`)
+  } else if (typeof review.qualityScore === 'number') {
+    next.score = Math.min(100, Math.round((next.score * 0.75) + (review.qualityScore * 0.25)))
+  }
+
+  return next
+}
+
+const reviewTopCandidatesWithAi = async (validated: ValidationResult[], aiReview: boolean, aiRequired: boolean, minScore: number, timeoutMs: number) => {
+  if (!aiReview && !aiRequired) return validated
+
+  const ranked = [...validated]
+    .filter(candidate => candidate.ok && candidate.score >= minScore)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 2)
+
+  const rankedKeys = new Set(ranked.map(candidate => candidate.url))
+  const reviewed = new Map<string, ValidationResult>()
+
+  for (const candidate of ranked) {
+    const review = await runAiLogoReview(candidate, timeoutMs)
+
+    reviewed.set(candidate.url, applyAiReview(candidate, review, aiRequired))
+  }
+
+  return validated.map(candidate => rankedKeys.has(candidate.url) ? reviewed.get(candidate.url) ?? candidate : candidate)
+}
+
+const hintForVariant = (hint: SourceHint | undefined, variant: LogoVariant): VariantHint | undefined => ({
+  searchTerms: hint?.variants?.[variant]?.searchTerms ?? hint?.searchTerms,
+  simpleIconsSlug: hint?.variants?.[variant]?.simpleIconsSlug ?? hint?.simpleIconsSlug,
+  preferredFileBase: hint?.variants?.[variant]?.preferredFileBase ?? (hint?.preferredFileBase ? `${hint.preferredFileBase}-${variant}` : undefined),
+  officialSvgUrls: hint?.variants?.[variant]?.officialSvgUrls ?? hint?.officialSvgUrls,
+  officialPages: hint?.variants?.[variant]?.officialPages ?? hint?.officialPages,
+  expectedColors: hint?.variants?.[variant]?.expectedColors ?? hint?.expectedColors
+})
+
+const validateCandidate = async (candidate: LogoCandidate, outputDir: string, hint?: VariantHint): Promise<ValidationResult> => {
+  const destinationBase = hint?.preferredFileBase ?? `${candidate.providerSlug}-${candidate.variant}`
   const destination = path.join(outputDir, `${destinationBase}.svg`)
 
   try {
@@ -344,6 +675,13 @@ const validateCandidate = async (candidate: LogoCandidate, outputDir: string, hi
     }
 
     const scoring = scoreCandidate(candidate, content, response, svgValidation.warnings)
+    const missingExpectedColors = validateExpectedColors(content, hint?.expectedColors)
+
+    if (missingExpectedColors.length > 0) {
+      scoring.reasons.push(`Faltan colores esperados de marca: ${missingExpectedColors.join(', ')}.`)
+      scoring.score = Math.max(0, scoring.score - 35)
+    }
+
     const sha256 = createHash('sha256').update(content).digest('hex')
     const ok = reasons.length === 0
     const reviewRequired = !ok || scoring.reasons.length > 0 || scoring.score < DEFAULT_MIN_SCORE
@@ -375,7 +713,7 @@ const validateCandidate = async (candidate: LogoCandidate, outputDir: string, hi
   }
 }
 
-const discoverSimpleIcons = (providerSlug: ProviderSlug, hint?: SourceHint): LogoCandidate[] => {
+const discoverSimpleIcons = (providerSlug: ProviderSlug, variant: LogoVariant, hint?: VariantHint): LogoCandidate[] => {
   if (!hint?.simpleIconsSlug) return []
 
   const provider = PROVIDER_CATALOG[providerSlug]
@@ -385,39 +723,42 @@ const discoverSimpleIcons = (providerSlug: ProviderSlug, hint?: SourceHint): Log
     {
       providerSlug,
       providerName: provider.name,
+      variant,
       source: 'simple-icons',
       url: `https://cdn.simpleicons.org/${encodeURIComponent(slug)}`,
       pageUrl: `https://simpleicons.org/?q=${encodeURIComponent(slug)}`,
-      title: `${provider.name} logo from Simple Icons`,
+      title: `${provider.name} ${variant} logo from Simple Icons`,
       discoveredBy: 'simple-icons-cdn'
     },
     {
       providerSlug,
       providerName: provider.name,
+      variant,
       source: 'simple-icons',
       url: `https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/${encodeURIComponent(slug)}.svg`,
       pageUrl: `https://github.com/simple-icons/simple-icons/blob/develop/icons/${encodeURIComponent(slug)}.svg`,
-      title: `${provider.name} logo from Simple Icons repository`,
+      title: `${provider.name} ${variant} logo from Simple Icons repository`,
       discoveredBy: 'simple-icons-github'
     }
   ]
 }
 
-const discoverOfficialUrls = (providerSlug: ProviderSlug, hint?: SourceHint): LogoCandidate[] => {
+const discoverOfficialUrls = (providerSlug: ProviderSlug, variant: LogoVariant, hint?: VariantHint): LogoCandidate[] => {
   const provider = PROVIDER_CATALOG[providerSlug]
 
   return (hint?.officialSvgUrls ?? []).map(url => ({
     providerSlug,
     providerName: provider.name,
+    variant,
     source: 'official' as const,
     url,
     pageUrl: url,
-    title: `${provider.name} official SVG`,
+    title: `${provider.name} official ${variant} SVG`,
     discoveredBy: 'manifest-officialSvgUrls'
   }))
 }
 
-const queryWikimedia = async (providerSlug: ProviderSlug, term: string): Promise<LogoCandidate[]> => {
+const queryWikimedia = async (providerSlug: ProviderSlug, variant: LogoVariant, term: string): Promise<LogoCandidate[]> => {
   const provider = PROVIDER_CATALOG[providerSlug]
   const searchUrl = new URL('https://commons.wikimedia.org/w/api.php')
 
@@ -455,6 +796,7 @@ const queryWikimedia = async (providerSlug: ProviderSlug, term: string): Promise
     .map(({ page, info }) => ({
       providerSlug,
       providerName: provider.name,
+      variant,
       source: 'wikimedia' as const,
       url: info.url!,
       pageUrl: info.descriptionurl,
@@ -463,10 +805,11 @@ const queryWikimedia = async (providerSlug: ProviderSlug, term: string): Promise
     }))
 }
 
-const discoverWikimedia = async (providerSlug: ProviderSlug, hint?: SourceHint): Promise<LogoCandidate[]> => {
+const discoverWikimedia = async (providerSlug: ProviderSlug, variant: LogoVariant, hint?: VariantHint): Promise<LogoCandidate[]> => {
   const provider = PROVIDER_CATALOG[providerSlug]
-  const terms = hint?.searchTerms?.length ? hint.searchTerms : [`${provider.name} logo svg`]
-  const results = await Promise.all(terms.map(term => queryWikimedia(providerSlug, term)))
+  const baseTerms = hint?.searchTerms?.length ? hint.searchTerms : [`${provider.name} ${variantSearchSuffix(variant)}`]
+  const terms = baseTerms.map(term => `${term} ${variantSearchSuffix(variant)}`)
+  const results = await Promise.all(terms.map(term => queryWikimedia(providerSlug, variant, term)))
 
   return results.flat()
 }
@@ -491,6 +834,16 @@ const providerListFromArgs = (providerArg: ProviderSlug[] | undefined, all: bool
   throw new Error('Debes indicar --all o --provider <slug[,slug]>.')
 }
 
+const variantListFromArgs = (variants: LogoVariant[] | undefined) => {
+  if (!variants?.length) return [...LOGO_VARIANTS]
+
+  const invalid = variants.filter(variant => !LOGO_VARIANTS.includes(variant))
+
+  if (invalid.length) throw new Error(`Variantes desconocidas: ${invalid.join(', ')}. Usa: ${LOGO_VARIANTS.join(', ')}`)
+
+  return variants
+}
+
 const stripContent = (result: ValidationResult): Omit<ValidationResult, 'content'> => {
   const rest = { ...result }
 
@@ -512,6 +865,7 @@ const main = async () => {
   let auditManifest = await readAuditManifest()
   const outputDir = path.resolve(process.cwd(), args.outputDir ?? manifest.outputDir)
   const providerSlugs = providerListFromArgs(args.provider, args.all)
+  const variants = variantListFromArgs(args.variants)
 
   const report: RunReport = {
     generatedAt: new Date().toISOString(),
@@ -529,47 +883,56 @@ const main = async () => {
 
     if (!provider) throw new Error(`Provider desconocido: ${providerSlug}`)
 
-    const hint = manifest.providers[providerSlug]
-
-    const candidates = dedupeCandidates([
-      ...discoverOfficialUrls(providerSlug, hint),
-      ...discoverSimpleIcons(providerSlug, hint),
-      ...(await discoverWikimedia(providerSlug, hint))
-    ])
-
-    const validated = await Promise.all(candidates.map(candidate => validateCandidate(candidate, outputDir, hint)))
-
-    const selected = validated
-      .filter(candidate => candidate.ok && candidate.score >= args.minScore)
-      .sort((a, b) => b.score - a.score || (a.bytes ?? 0) - (b.bytes ?? 0))[0] ?? null
-
-    report.results.push({
+    const providerResult: RunReport['results'][number] = {
       providerSlug,
       providerName: provider.name,
-      selected: selected ? stripContent(selected) : null,
-      candidates: validated
-        .sort((a, b) => b.score - a.score)
-        .map(stripContent)
-    })
+      variants: {}
+    }
 
-    const status = selected ? `${selected.score}/100 ${selected.reviewRequired ? 'review-required' : 'ready'}` : 'sin candidato aprobado'
+    for (const variant of variants) {
+      const hint = hintForVariant(manifest.providers[providerSlug], variant)
 
-    console.log(`[${providerSlug}] ${provider.name}: ${status}`)
+      const candidates = dedupeCandidates([
+        ...discoverOfficialUrls(providerSlug, variant, hint),
+        ...discoverSimpleIcons(providerSlug, variant, hint),
+        ...(await discoverWikimedia(providerSlug, variant, hint))
+      ])
 
-    if (args.apply && selected) {
-      if (selected.reviewRequired && !args.allowReviewRequired) {
-        console.log(`  skip apply: requiere revision humana (${selected.reasons.join(' ')})`)
-      } else if (selected.content && selected.destination) {
-        await writeFile(selected.destination, selected.content.trim() + '\n', 'utf8')
-        auditManifest = updateAuditManifest(
-          auditManifest,
-          providerSlug,
-          selected,
-          `/${path.relative(path.join(process.cwd(), 'public'), selected.destination).replaceAll(path.sep, '/')}`
-        )
-        console.log(`  saved: ${path.relative(process.cwd(), selected.destination)}`)
+      const deterministic = await Promise.all(candidates.map(candidate => validateCandidate(candidate, outputDir, hint)))
+      const validated = await reviewTopCandidatesWithAi(deterministic, args.aiReview, args.aiRequired, args.minScore, args.aiTimeoutMs)
+
+      const selected = validated
+        .filter(candidate => candidate.ok && candidate.score >= args.minScore)
+        .sort((a, b) => b.score - a.score || (a.bytes ?? 0) - (b.bytes ?? 0))[0] ?? null
+
+      providerResult.variants[variant] = {
+        selected: selected ? stripContent(selected) : null,
+        candidates: validated
+          .sort((a, b) => b.score - a.score)
+          .map(stripContent)
+      }
+
+      const status = selected ? `${selected.score}/100 ${selected.reviewRequired ? 'review-required' : 'ready'}` : 'sin candidato aprobado'
+
+      console.log(`[${providerSlug}] ${provider.name} ${variant}: ${status}`)
+
+      if (args.apply && selected) {
+        if (selected.reviewRequired && !args.allowReviewRequired) {
+          console.log(`  skip apply: requiere revision humana (${selected.reasons.join(' ')})`)
+        } else if (selected.content && selected.destination) {
+          await writeFile(selected.destination, selected.content.trim() + '\n', 'utf8')
+          auditManifest = updateAuditManifest(
+            auditManifest,
+            providerSlug,
+            selected,
+            `/${path.relative(path.join(process.cwd(), 'public'), selected.destination).replaceAll(path.sep, '/')}`
+          )
+          console.log(`  saved: ${path.relative(process.cwd(), selected.destination)}`)
+        }
       }
     }
+
+    report.results.push(providerResult)
   }
 
   if (args.apply) {
