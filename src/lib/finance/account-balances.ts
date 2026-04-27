@@ -15,6 +15,8 @@ import {
   toNumber,
   type FinanceCurrency
 } from '@/lib/finance/shared'
+import { getBankFxPnlBreakdown } from '@/lib/finance/fx-pnl'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -30,6 +32,8 @@ type AccountBalanceRow = {
   closing_balance_clp: unknown
   fx_rate_used: unknown
   fx_gain_loss_clp: unknown
+  fx_gain_loss_realized_clp: unknown
+  fx_gain_loss_translation_clp: unknown
   transaction_count: unknown
   last_transaction_at: string | Date | null
   computed_at: string | Date
@@ -81,6 +85,8 @@ type AccountOverviewRow = {
   closing_balance_clp: unknown
   fx_rate_used: unknown
   fx_gain_loss_clp: unknown
+  fx_gain_loss_realized_clp: unknown
+  fx_gain_loss_translation_clp: unknown
   transaction_count: unknown
   last_transaction_at: string | Date | null
   is_period_closed: boolean
@@ -142,7 +148,12 @@ export type AccountBalanceRecord = {
   closingBalance: number
   closingBalanceClp: number | null
   fxRateUsed: number | null
+  /** Total FX P&L = realized + translation. Backward-compat alias. */
   fxGainLossClp: number
+  /** Realized FX from settlements (rate doc vs rate pago). */
+  fxGainLossRealizedClp: number
+  /** Translation FX from mark-to-market revaluation of non-CLP closing. */
+  fxGainLossTranslationClp: number
   transactionCount: number
   lastTransactionAt: string | null
   computedAt: string | null
@@ -172,7 +183,10 @@ export type TreasuryBankAccountOverview = {
   closingBalance: number
   closingBalanceClp: number | null
   fxRateUsed: number | null
+  /** Total FX P&L = realized + translation. Backward-compat alias. */
   fxGainLossClp: number
+  fxGainLossRealizedClp: number
+  fxGainLossTranslationClp: number
   transactionCount: number
   lastTransactionAt: string | null
   isPeriodClosed: boolean
@@ -181,6 +195,21 @@ export type TreasuryBankAccountOverview = {
   reconciliationPeriodId: string | null
   creditLimit: number | null
   metadata: Record<string, unknown> | null
+}
+
+export type TreasuryFxBreakdown = {
+  /** Total FX P&L in CLP for the period. Backward-compat alias of bank `fxGainLossClp`. */
+  totalClp: number
+  /** Realized FX from settlements (rate doc vs rate pago). */
+  realizedClp: number
+  /** Translation FX from mark-to-market revaluation of non-CLP closing balances. */
+  translationClp: number
+  /** Realized FX from cross-currency internal transfers. Placeholder = 0 until follow-up task. */
+  internalTransferClp: number
+  /** True when at least one active account is non-CLP. */
+  hasExposure: boolean
+  /** True when materialization could not resolve a rate for a non-CLP account in the period. */
+  isDegraded: boolean
 }
 
 export type TreasuryBankOverview = {
@@ -196,7 +225,10 @@ export type TreasuryBankOverview = {
     totalUsd: number
     consolidatedClp: number
     activeAccounts: number
+    /** Backward-compat: equals fxGainLoss.totalClp. */
     fxGainLossClp: number
+    /** Canonical FX breakdown — sourced from VIEW greenhouse_finance.fx_pnl_breakdown via src/lib/finance/fx-pnl.ts. */
+    fxGainLoss: TreasuryFxBreakdown
     coverage: TreasuryCoverage
   }
   accounts: TreasuryBankAccountOverview[]
@@ -356,6 +388,8 @@ const mapAccountBalanceRow = (row: AccountBalanceRow): AccountBalanceRecord => (
   closingBalanceClp: row.closing_balance_clp != null ? roundCurrency(toNumber(row.closing_balance_clp)) : null,
   fxRateUsed: row.fx_rate_used != null ? toNumber(row.fx_rate_used) : null,
   fxGainLossClp: roundCurrency(toNumber(row.fx_gain_loss_clp)),
+  fxGainLossRealizedClp: roundCurrency(toNumber(row.fx_gain_loss_realized_clp)),
+  fxGainLossTranslationClp: roundCurrency(toNumber(row.fx_gain_loss_translation_clp)),
   transactionCount: Math.round(toNumber(row.transaction_count)),
   lastTransactionAt: row.last_transaction_at ? new Date(row.last_transaction_at).toISOString() : null,
   computedAt: row.computed_at ? new Date(row.computed_at).toISOString() : null,
@@ -419,6 +453,8 @@ const getExistingBalanceRow = async (
         closing_balance_clp,
         fx_rate_used,
         fx_gain_loss_clp,
+        fx_gain_loss_realized_clp,
+        fx_gain_loss_translation_clp,
         transaction_count,
         last_transaction_at,
         computed_at,
@@ -456,6 +492,8 @@ const getPreviousBalanceRow = async (
         closing_balance_clp,
         fx_rate_used,
         fx_gain_loss_clp,
+        fx_gain_loss_realized_clp,
+        fx_gain_loss_translation_clp,
         transaction_count,
         last_transaction_at,
         computed_at,
@@ -703,15 +741,63 @@ export const materializeAccountBalance = async (
   const periodOutflows = roundCurrency(toNumber(movementSummary.outflows))
   const closingBalance = roundCurrency(openingBalance + periodInflows - periodOutflows)
 
-  const fxRateUsed = currency === 'CLP'
-    ? 1
-    : await resolveExchangeRateToClp({
+  // ── FX resolution ──────────────────────────────────────────────────────
+  // CLP accounts: rate=1, no translation FX possible.
+  // Non-CLP accounts: best-effort fetch of today's rate. If the registry has
+  // no rate (network down, provider failure, day-zero for a new currency) we
+  // degrade honestly — translation = 0 + structured warning. We never block
+  // the materialization or the response, so the daily snapshot still lands.
+  let fxRateUsed: number = 1
+  let fxRateAvailable = currency === 'CLP'
+
+  if (currency !== 'CLP') {
+    try {
+      fxRateUsed = await resolveExchangeRateToClp({
         currency: currency as FinanceCurrency
       })
+      fxRateAvailable = fxRateUsed > 0
+    } catch (err) {
+      captureWithDomain(err, 'finance', {
+        level: 'warning',
+        tags: { source: 'fx_pnl_translation' },
+        extra: {
+          accountId: input.accountId,
+          balanceDate,
+          currency
+        }
+      })
+      fxRateAvailable = false
+      fxRateUsed = toNumber(previous?.fx_rate_used) || 1
+    }
+  }
 
   const closingBalanceClp = currency === 'CLP'
     ? closingBalance
     : roundCurrency(closingBalance * fxRateUsed)
+
+  // ── Translation FX ─────────────────────────────────────────────────────
+  // Mark-to-market revaluation of the held non-CLP balance from yesterday's
+  // CLP-equivalent to today's CLP-equivalent, isolated from the day's
+  // movements (those carry their own realized FX through payments).
+  //
+  //   translation = today_closing_clp − previous_closing_clp − net_movement_clp
+  //
+  // Where net_movement_clp = (period_inflows − period_outflows) × rate_today.
+  // Subtracting the movement leg keeps the metric pure: only the revaluation
+  // of the *retained* foreign balance shows up here.
+  let fxGainLossTranslationClp = 0
+
+  if (currency !== 'CLP' && fxRateAvailable && previous?.closing_balance_clp != null) {
+    const previousClosingClp = roundCurrency(toNumber(previous.closing_balance_clp))
+    const netMovementClp = roundCurrency((periodInflows - periodOutflows) * fxRateUsed)
+
+    fxGainLossTranslationClp = roundCurrency(
+      closingBalanceClp - previousClosingClp - netMovementClp
+    )
+  }
+
+  const fxGainLossRealizedClp = roundCurrency(toNumber(fxSummary.fx_gain_loss_clp))
+  const fxGainLossTotalClp = roundCurrency(fxGainLossRealizedClp + fxGainLossTranslationClp)
 
   const upsertedRows = await queryRows<AccountBalanceRow>(
     `
@@ -727,6 +813,8 @@ export const materializeAccountBalance = async (
         closing_balance_clp,
         fx_rate_used,
         fx_gain_loss_clp,
+        fx_gain_loss_realized_clp,
+        fx_gain_loss_translation_clp,
         transaction_count,
         last_transaction_at,
         computed_at,
@@ -749,6 +837,8 @@ export const materializeAccountBalance = async (
         $11,
         $12,
         $13,
+        $14,
+        $15,
         CURRENT_TIMESTAMP,
         FALSE,
         NULL,
@@ -765,6 +855,8 @@ export const materializeAccountBalance = async (
         closing_balance_clp = EXCLUDED.closing_balance_clp,
         fx_rate_used = EXCLUDED.fx_rate_used,
         fx_gain_loss_clp = EXCLUDED.fx_gain_loss_clp,
+        fx_gain_loss_realized_clp = EXCLUDED.fx_gain_loss_realized_clp,
+        fx_gain_loss_translation_clp = EXCLUDED.fx_gain_loss_translation_clp,
         transaction_count = EXCLUDED.transaction_count,
         last_transaction_at = EXCLUDED.last_transaction_at,
         computed_at = CURRENT_TIMESTAMP,
@@ -781,6 +873,8 @@ export const materializeAccountBalance = async (
         closing_balance_clp,
         fx_rate_used,
         fx_gain_loss_clp,
+        fx_gain_loss_realized_clp,
+        fx_gain_loss_translation_clp,
         transaction_count,
         last_transaction_at,
         computed_at,
@@ -799,7 +893,9 @@ export const materializeAccountBalance = async (
       closingBalance,
       closingBalanceClp,
       fxRateUsed,
-      roundCurrency(toNumber(fxSummary.fx_gain_loss_clp)),
+      fxGainLossTotalClp,
+      fxGainLossRealizedClp,
+      fxGainLossTranslationClp,
       Math.round(toNumber(movementSummary.transaction_count)),
       movementSummary.last_transaction_at
     ],
@@ -1008,6 +1104,8 @@ export const getBankOverview = async ({
           SUM(period_inflows)::text AS period_inflows,
           SUM(period_outflows)::text AS period_outflows,
           SUM(fx_gain_loss_clp)::text AS fx_gain_loss_clp,
+          SUM(fx_gain_loss_realized_clp)::text AS fx_gain_loss_realized_clp,
+          SUM(fx_gain_loss_translation_clp)::text AS fx_gain_loss_translation_clp,
           SUM(transaction_count)::text AS transaction_count,
           MAX(last_transaction_at) AS last_transaction_at
         FROM period_rows
@@ -1057,6 +1155,8 @@ export const getBankOverview = async ({
         c.closing_balance_clp,
         c.fx_rate_used,
         COALESCE(s.fx_gain_loss_clp, '0') AS fx_gain_loss_clp,
+        COALESCE(s.fx_gain_loss_realized_clp, '0') AS fx_gain_loss_realized_clp,
+        COALESCE(s.fx_gain_loss_translation_clp, '0') AS fx_gain_loss_translation_clp,
         COALESCE(s.transaction_count, '0') AS transaction_count,
         s.last_transaction_at,
         COALESCE(c.is_period_closed, FALSE) AS is_period_closed,
@@ -1090,6 +1190,8 @@ export const getBankOverview = async ({
     closingBalanceClp: row.closing_balance_clp != null ? roundCurrency(toNumber(row.closing_balance_clp)) : null,
     fxRateUsed: row.fx_rate_used != null ? toNumber(row.fx_rate_used) : null,
     fxGainLossClp: roundCurrency(toNumber(row.fx_gain_loss_clp)),
+    fxGainLossRealizedClp: roundCurrency(toNumber(row.fx_gain_loss_realized_clp)),
+    fxGainLossTranslationClp: roundCurrency(toNumber(row.fx_gain_loss_translation_clp)),
     transactionCount: Math.round(toNumber(row.transaction_count)),
     lastTransactionAt: row.last_transaction_at ? new Date(row.last_transaction_at).toISOString() : null,
     isPeriodClosed: Boolean(row.is_period_closed),
@@ -1125,9 +1227,24 @@ export const getBankOverview = async ({
     accounts.reduce((sum, account) => sum + (account.closingBalanceClp ?? 0), 0)
   )
 
-  const fxGainLossClp = roundCurrency(
-    accounts.reduce((sum, account) => sum + account.fxGainLossClp, 0)
-  )
+  // Canonical FX P&L breakdown — single source of truth (TASK-699).
+  // Reads from VIEW greenhouse_finance.fx_pnl_breakdown via the helper, so
+  // any new FX source automatically lands here without touching consumers.
+  const fxBreakdown = await getBankFxPnlBreakdown({
+    year: resolvedYear,
+    month: resolvedMonth
+  })
+
+  const fxGainLoss = {
+    totalClp: fxBreakdown.totalClp,
+    realizedClp: fxBreakdown.realizedClp,
+    translationClp: fxBreakdown.translationClp,
+    internalTransferClp: fxBreakdown.internalTransferClp,
+    hasExposure: fxBreakdown.hasExposure,
+    isDegraded: fxBreakdown.isDegraded
+  }
+
+  const fxGainLossClp = fxBreakdown.totalClp
 
   const creditCards = accounts
     .filter(account => account.instrumentCategory === 'credit_card')
@@ -1162,6 +1279,7 @@ export const getBankOverview = async ({
       consolidatedClp,
       activeAccounts: accounts.length,
       fxGainLossClp,
+      fxGainLoss,
       coverage
     },
     accounts,
@@ -1204,6 +1322,8 @@ export const getBankAccountDetail = async ({
         closing_balance_clp,
         fx_rate_used,
         fx_gain_loss_clp,
+        fx_gain_loss_realized_clp,
+        fx_gain_loss_translation_clp,
         transaction_count,
         last_transaction_at,
         computed_at,
@@ -1440,6 +1560,8 @@ export const closeAccountBalancePeriod = async ({
         closing_balance_clp,
         fx_rate_used,
         fx_gain_loss_clp,
+        fx_gain_loss_realized_clp,
+        fx_gain_loss_translation_clp,
         transaction_count,
         last_transaction_at,
         computed_at,

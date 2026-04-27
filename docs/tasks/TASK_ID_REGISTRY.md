@@ -774,3 +774,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-696` | `in-progress` | Smart Home v2 (Enterprise-grade redesign — registry + contract + observability + 7 blocks) | `docs/tasks/in-progress/TASK-696-smart-home-v2-enterprise.md` |
 | `TASK-697` | `complete` | Payment Instrument Admin Workspace Enterprise | `docs/tasks/complete/TASK-697-payment-instrument-admin-workspace-enterprise.md` |
 | `TASK-698` | `to-do` | Nexa Conversation Drawer (cierre del Hero AI Smart Home v2) | `docs/tasks/to-do/TASK-698-nexa-conversation-drawer.md` |
+| `TASK-699` | `complete` | Banco "Resultado cambiario" Canonical FX P&L Pipeline | `docs/tasks/complete/TASK-699-banco-fx-result-canonical-pipeline.md` |

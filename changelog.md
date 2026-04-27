@@ -2,11 +2,24 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — TASK-699 Banco "Resultado cambiario" Canonical FX P&L Pipeline
+
+- La card "Resultado cambiario" del Banco (`/finance/bank`) deja de mostrar `$0` silencioso. Ahora distingue tres estados explicitos: "Sin exposicion FX" cuando todas las cuentas activas son CLP (caso Efeonce hoy), breakdown "Realizado X · Translacion Y" + tooltip canonico cuando hay exposicion, y "Pendiente" con warning rojo cuando la materializacion falla por rate ausente.
+- Migracion aditiva `20260427130504368_task-699-fx-pnl-canonical-pipeline.sql`: split de `account_balances.fx_gain_loss_clp` en `fx_gain_loss_realized_clp` (settlements) + `fx_gain_loss_translation_clp` (revaluacion de saldos no-CLP). Legacy column preservada como aggregate para backward compat. Backfill desde valor previo (era 100% realized por construccion).
+- VIEW canonica `greenhouse_finance.fx_pnl_breakdown` unifica las 3 fuentes legitimas (realized + translation + internal_transfer placeholder). Comments documentan ecuacion canonica + regla "no re-derive — extender VIEW + helper". Patron replicado de `income_settlement_reconciliation` (TASK-571).
+- Helper `src/lib/finance/fx-pnl.ts` (`getBankFxPnlBreakdown`) es la unica read API. Devuelve `{ totalClp, realizedClp, translationClp, internalTransferClp, hasExposure, isDegraded, byAccount }`. Test guardrail bloquea cualquier consumer que intente leer `income_payments`/`expense_payments` directo.
+- `materializeAccountBalance` ahora calcula translation FX inline: `closing_balance_clp − previous_closing_balance_clp − net_movement_clp` para cuentas no-CLP. Cuando `resolveExchangeRateToClp` falla, `captureWithDomain(err, 'finance', { tags: { source: 'fx_pnl_translation' } })` y degrada a `translation = 0` sin bloquear el snapshot diario.
+- `getBankOverview` delega al helper canonico — ya no suma FX inline. `kpis.fxGainLoss` nuevo en el response, `kpis.fxGainLossClp` legacy preservado como alias.
+- Internal transfer FX queda como follow-up (placeholder = 0). Se activa con TASK derivada que introduzca `greenhouse_finance.internal_transfers` con rate spread tracking.
+- Validacion: `pnpm pg:connect:migrate` OK, `pnpm pg:doctor` healthy, `npx tsc --noEmit` clean, `pnpm lint` clean, `npx vitest run src/lib/finance` 52 archivos / 365 tests verdes (incluyendo 5 nuevos en `fx-pnl.test.ts`). Spec: `docs/tasks/complete/TASK-699-banco-fx-result-canonical-pipeline.md`.
+
 ### 2026-04-27 — Payment logo scraper and audit manifest
 
 - Nuevo `pnpm logos:payment:scrape` para buscar logos SVG de proveedores de instrumentos de pago en Simple Icons/Wikimedia y URLs oficiales configurables.
 - El scraper corre en modo plan por defecto, genera reporte JSON auditable, valida seguridad SVG, penaliza variantes historicas/co-brand y solo guarda assets con `--apply`.
 - Soporta variantes `full-positive`, `full-negative`, `mark-positive` y `mark-negative`, con capa Gemini opcional (`--ai-review`, `--ai-required`) y timeout de seguridad.
+- La validacion AI intenta Gemini 3 Flash en Vertex `global` y baja por fallback cuando un modelo no esta disponible; los candidatos de paginas oficiales deben tener senal marcaria en el basename del SVG para evitar iconos de UI/social.
+- Inventario enriquecido con fuentes oficiales verificadas para Banco Ripley, Previred, Santander, Deel y Scotiabank; Scotiabank queda solo con full positivo rojo oficial hasta obtener/derivar variantes correctas.
 - Nuevo manifest auditable `public/images/logos/payment/manifest.json` con `slug`, `brandName`, `category`, `country`, `sourceUrl`, `licenseSource`, `logo`, `compactLogo` y `lastVerifiedAt`.
 - Caso real: Visa `mark-positive` fue descargado, validado por Gemini y conectado como `compactLogo`; Mastercard `mark-positive` quedo bloqueado al detectar falta de colores esperados de marca.
 - Documentacion operativa: `docs/operations/payment-logo-scraper.md`.

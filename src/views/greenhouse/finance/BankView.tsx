@@ -77,6 +77,15 @@ type UnassignedPayment = {
   documentLabel: string | null
 }
 
+type FxGainLossBreakdown = {
+  totalClp: number
+  realizedClp: number
+  translationClp: number
+  internalTransferClp: number
+  hasExposure: boolean
+  isDegraded: boolean
+}
+
 type BankResponse = {
   period: {
     year: number
@@ -91,6 +100,7 @@ type BankResponse = {
     consolidatedClp: number
     activeAccounts: number
     fxGainLossClp: number
+    fxGainLoss: FxGainLossBreakdown
     coverage: Coverage
   }
   accounts: TreasuryAccount[]
@@ -374,13 +384,50 @@ const BankView = () => {
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
-          <HorizontalWithSubtitle
-            title='Resultado cambiario'
-            stats={formatAmount(data.kpis.fxGainLossClp, 'CLP')}
-            subtitle='Ganancia o pérdida FX acumulada por cuenta'
-            avatarIcon='tabler-arrows-exchange-2'
-            avatarColor='warning'
-          />
+          {(() => {
+            const fx = data.kpis.fxGainLoss
+
+            if (!fx.hasExposure) {
+              return (
+                <HorizontalWithSubtitle
+                  title='Resultado cambiario'
+                  stats='—'
+                  subtitle='Sin exposición FX en el período'
+                  avatarIcon='tabler-arrows-exchange-2'
+                  avatarColor='secondary'
+                  footer='Aparecerá un resultado cuando exista una cuenta o pago en moneda extranjera.'
+                />
+              )
+            }
+
+            if (fx.isDegraded) {
+              return (
+                <HorizontalWithSubtitle
+                  title='Resultado cambiario'
+                  stats='Pendiente'
+                  subtitle='No se pudo resolver el tipo de cambio para una cuenta en moneda extranjera.'
+                  avatarIcon='tabler-arrows-exchange-2'
+                  avatarColor='error'
+                  statusLabel='Materialización degradada'
+                  statusColor='error'
+                  statusIcon='tabler-alert-triangle'
+                  footer='Revisar Reliability Control Plane > Finance.'
+                />
+              )
+            }
+
+            return (
+              <HorizontalWithSubtitle
+                title='Resultado cambiario'
+                stats={formatAmount(fx.totalClp, 'CLP')}
+                subtitle={`Realizado ${formatAmount(fx.realizedClp, 'CLP')} · Translación ${formatAmount(fx.translationClp, 'CLP')}`}
+                avatarIcon='tabler-arrows-exchange-2'
+                avatarColor='warning'
+                titleTooltip={`Composición canónica: realized (rate documento vs rate pago) + translation (revaluación de saldos no-CLP) + transferencias internas. Internal transfers actualmente $0 — se activa con TASK derivada.`}
+                footer='Total acumulado por cuenta en el período seleccionado.'
+              />
+            )
+          })()}
         </Grid>
 
         <Grid size={{ xs: 12 }}>

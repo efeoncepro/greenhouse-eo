@@ -3196,7 +3196,18 @@ export interface GreenhouseFinanceAccountBalances {
   computed_at: Generated<Timestamp>;
   created_at: Generated<Timestamp>;
   currency: string;
+  /**
+   * Total FX gain/loss in CLP — denormalized aggregate of fx_gain_loss_realized_clp + fx_gain_loss_translation_clp. Kept for backward compatibility with existing consumers (getBankOverview, /api/finance/cash-position). New consumers MUST use VIEW greenhouse_finance.fx_pnl_breakdown or helper src/lib/finance/fx-pnl.ts.
+   */
   fx_gain_loss_clp: Generated<Numeric>;
+  /**
+   * Realized FX from settlements (rate at document issuance vs rate at payment for non-CLP invoices/expenses). Source: SUM(income_payments.fx_gain_loss_clp + expense_payments.fx_gain_loss_clp) per account-day via getDailyFxGainLoss in src/lib/finance/account-balances.ts.
+   */
+  fx_gain_loss_realized_clp: Generated<Numeric>;
+  /**
+   * Translation FX from mark-to-market revaluation of non-CLP closing balances. Computed in materializeAccountBalance as (closing_balance * rate_today) - previous_closing_balance_clp - (period_inflows - period_outflows) * rate_today. Zero by construction for CLP accounts. Zero (with structured warning via captureWithDomain) when resolveExchangeRateToClp fails for a given day — degrades honestly, never blocks materialization.
+   */
+  fx_gain_loss_translation_clp: Generated<Numeric>;
   fx_rate_used: Numeric | null;
   /**
    * Soft immutable period-close flag. Closed snapshots are preserved for audit and not overwritten by reactive recompute.
@@ -3570,6 +3581,16 @@ export interface GreenhouseFinanceFactoringOperations {
   settlement_date: Timestamp | null;
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceFxPnlBreakdown {
+  account_id: string | null;
+  balance_date: Timestamp | null;
+  currency: string | null;
+  internal_transfer_clp: Numeric | null;
+  realized_clp: Numeric | null;
+  total_clp: Numeric | null;
+  translation_clp: Numeric | null;
 }
 
 export interface GreenhouseFinanceIdempotencyKeys {
@@ -7015,6 +7036,7 @@ export interface DB {
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
   "greenhouse_finance.factoring_operations": GreenhouseFinanceFactoringOperations;
+  "greenhouse_finance.fx_pnl_breakdown": GreenhouseFinanceFxPnlBreakdown;
   "greenhouse_finance.idempotency_keys": GreenhouseFinanceIdempotencyKeys;
   "greenhouse_finance.income": GreenhouseFinanceIncome;
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;

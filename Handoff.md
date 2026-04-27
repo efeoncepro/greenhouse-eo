@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — TASK-699 Banco "Resultado cambiario" Canonical FX P&L Pipeline
+
+- Rama: `develop`.
+- Diagnostico: la card "Resultado cambiario" en `/finance/bank` mostraba siempre `$0` por arquitectura incompleta — `account_balances.fx_gain_loss_clp` solo capturaba 1 de 3 fuentes legitimas (realized en payments). Faltaban translation FX (revaluacion mark-to-market de saldos no-CLP) e internal transfer FX. Ademas, el `$0` era ambiguo entre "sin exposicion FX" (correcto, Efeonce 100% CLP) y "calculo roto".
+- Solucion canonica (no parche): pipeline completo siguiendo el patron de `income_settlement_reconciliation` (TASK-571).
+  - Migracion `20260427130504368_task-699-fx-pnl-canonical-pipeline.sql`: split de `account_balances.fx_gain_loss_clp` en `fx_gain_loss_realized_clp` + `fx_gain_loss_translation_clp` (legacy column conservada como aggregate para backward compat); backfill realized desde valor previo; VIEW canonica `greenhouse_finance.fx_pnl_breakdown` con grants y comments anti re-derive.
+  - `materializeAccountBalance` en `src/lib/finance/account-balances.ts` ahora calcula translation FX como `closing_balance_clp − previous_closing_balance_clp − net_movement_clp` para cuentas no-CLP. Cuando `resolveExchangeRateToClp` falla, `captureWithDomain(err, 'finance', { tags: { source: 'fx_pnl_translation' } })` y degrada a `translation = 0` sin bloquear materializacion.
+  - Helper canonico `src/lib/finance/fx-pnl.ts` (`getBankFxPnlBreakdown`) — single read API. Test guardrail valida que NUNCA hace `FROM income_payments` o `FROM expense_payments` directo.
+  - `getBankOverview` ya no suma FX inline; delega al helper. Response shape extendido con `kpis.fxGainLoss: { totalClp, realizedClp, translationClp, internalTransferClp, hasExposure, isDegraded }`. `kpis.fxGainLossClp` legacy preservado como alias.
+  - `BankView.tsx` muestra tres estados explicitos en la card: "Sin exposicion FX" (avatar gris, stat "—") cuando todas las cuentas son CLP; breakdown "Realizado X · Translacion Y" + tooltip canonico cuando `hasExposure`; "Pendiente" + warning rojo cuando `isDegraded`.
+- Validacion ejecutada:
+  - `pnpm pg:connect:migrate` OK (migracion aplicada en Cloud SQL `greenhouse-pg-dev`)
+  - `pnpm pg:doctor` healthy
+  - `npx tsc --noEmit` clean
+  - `pnpm lint` clean
+  - `npx vitest run src/lib/finance` — 52 archivos / 365 tests verdes, incluyendo `fx-pnl.test.ts` con 5 escenarios (no exposure, exposure mix realized+translation, isDegraded por rate ausente, guardrail anti re-derive, validacion de periodo).
+- Internal transfer FX queda como follow-up (placeholder = 0 en la VIEW). Se activa con TASK derivada que introduzca `greenhouse_finance.internal_transfers` con rate spread tracking.
+- Spec cerrada: `docs/tasks/complete/TASK-699-banco-fx-result-canonical-pipeline.md`. Patron canonico ahora reusable para Finance Intelligence P&L cuando se construya.
+
 ## Sesion 2026-04-27 — Home Runway JSX compile fix
 
 - Rama: `develop`.
