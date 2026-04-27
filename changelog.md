@@ -2,6 +2,12 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — Payment Instrument card network logos
+
+- El catalogo de proveedores de instrumentos de pago usa el logo completo de Mastercard y los isotipos compactos de Mastercard/Visa para chips y selectores pequenos.
+- Los logos quedan centralizados en `src/config/payment-instruments.ts` mediante `logo` y `compactLogo`, sin hardcodear assets en las vistas.
+- Validacion: `npx tsc --noEmit --pretty false`.
+
 ### 2026-04-27 — Payment Instrument provider selectors
 
 - El drawer de creacion de `/admin/payment-instruments` reemplaza los selects de proveedor/red/emisor por un selector controlado por `slug`, con logos, busqueda, clear state y comparacion explicita para evitar selecciones que no persisten.

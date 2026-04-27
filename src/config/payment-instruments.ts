@@ -70,8 +70,18 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
   ripley: { name: 'Banco Ripley', category: 'bank_account', logo: '/images/logos/payment/ripley.svg', country: 'CL', currencies: ['CLP'] },
 
   // Card networks
-  visa: { name: 'Visa', category: 'credit_card', logo: '/images/logos/payment/visa.svg' },
-  mastercard: { name: 'Mastercard', category: 'credit_card', logo: '/images/logos/payment/mastercard.svg' },
+  visa: {
+    name: 'Visa',
+    category: 'credit_card',
+    logo: '/images/logos/payment/visa.svg',
+    compactLogo: '/images/logos/payment/Visa_Inc.-Logo.wine.svg'
+  },
+  mastercard: {
+    name: 'Mastercard',
+    category: 'credit_card',
+    logo: '/images/logos/payment/Mastercard-logo.svg.png',
+    compactLogo: '/images/logos/payment/Mastercard-Logo.wine.svg'
+  },
   amex: { name: 'American Express', category: 'credit_card', logo: '/images/logos/payment/amex.svg' },
 
   // Fintechs
