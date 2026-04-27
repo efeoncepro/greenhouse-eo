@@ -15,6 +15,7 @@ import {
 import { listFinanceAccountsFromPostgres } from '@/lib/finance/postgres-store'
 import { INSTRUMENT_CATEGORIES, getProvider, type InstrumentCategory } from '@/config/payment-instruments'
 import { resolveFinanceSpaceId } from '@/lib/finance/payment-instruments/admin-detail'
+import { assertPaymentInstrumentResponsibleAssignable } from '@/lib/finance/payment-instruments/responsibles'
 import { sanitizeMetadataJson, validateProviderForInstrument } from '@/lib/finance/payment-instruments/validation'
 
 export const dynamic = 'force-dynamic'
@@ -192,6 +193,11 @@ export async function POST(request: Request) {
       : generateAccountId(accountName, currency)
 
     const spaceId = await resolveFinanceSpaceId(tenant)
+
+    await assertPaymentInstrumentResponsibleAssignable({
+      tenant,
+      responsibleUserId
+    })
 
     await createPaymentInstrumentAdmin({
       accountId,

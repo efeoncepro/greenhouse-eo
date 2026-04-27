@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — Payment Instrument responsable selector y Santander branding
+
+- Rama: `develop`; se respeto la instruccion de no cambiar de rama.
+- Cambio aplicado:
+  - `Responsable` en `/admin/payment-instruments/[id]` deja de ser input libre y pasa a selector con candidatos backend.
+  - Nuevo endpoint `GET /api/admin/payment-instruments/responsibles` protegido por `finance.payment_instruments.update`.
+  - Backend valida `responsibleUserId` en create/update contra usuarios internos activos con `finance_admin`, `finance_analyst` o `efeonce_admin`; preserva responsables legacy existentes sin permitir nuevas asignaciones fuera de politica.
+  - Catalogo de proveedores agrega `compactLogo`; Santander usa `Banco_Santander_Logotipo.svg` como logo completo y `BSAC.svg` como isotipo compacto.
+- Docs actualizados:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/documentation/finance/modulos-caja-cobros-pagos.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `changelog.md`
+- Validacion ejecutada:
+  - `npx tsc --noEmit --pretty false` OK
+  - `pnpm lint` OK
+- Pendiente recomendado:
+  - Smoke visual en staging para confirmar que Julio/Humberly aparecen segun roles reales y que el logo/isotipo Santander renderizan bien en lista, detalle y drawers.
+
 ## Sesion 2026-04-27 — TASK-697 Payment Instrument Admin Workspace implementada en develop
 
 - Rama: `develop` por instruccion explicita del usuario; no se cambio de rama.

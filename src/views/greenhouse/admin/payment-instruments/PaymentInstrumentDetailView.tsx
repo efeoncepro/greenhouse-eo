@@ -53,6 +53,16 @@ type ActiveTab = 'configuration' | 'activity' | 'reconciliation' | 'audit'
 type RevealField = 'accountNumberFull' | 'providerIdentifier'
 type SavingSection = 'account' | 'routing' | null
 
+type ResponsibleCandidate = {
+  userId: string
+  label: string
+  email: string | null
+  avatarUrl: string | null
+  roleCodes: string[]
+  isCurrentUser: boolean
+  isFinanceRole: boolean
+}
+
 const dateFormatter = new Intl.DateTimeFormat('es-CL', {
   dateStyle: 'medium',
   timeZone: 'America/Santiago'
@@ -134,6 +144,19 @@ const auditColor: Record<AuditTone, 'success' | 'warning' | 'error' | 'info' | '
   secondary: 'secondary'
 }
 
+const roleLabel = (roleCode: string) => {
+  switch (roleCode) {
+    case 'efeonce_admin':
+      return 'Superadmin'
+    case 'finance_admin':
+      return 'Finanzas admin'
+    case 'finance_analyst':
+      return 'Finanzas'
+    default:
+      return roleCode
+  }
+}
+
 const DetailField = ({ label, value, helper }: { label: string; value: string | number | null | undefined; helper?: string }) => (
   <Stack spacing={0.5}>
     <Typography variant='caption' color='text.secondary'>
@@ -204,6 +227,9 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
   const [revealReason, setRevealReason] = useState('')
   const [revealing, setRevealing] = useState(false)
   const [revealed, setRevealed] = useState<Partial<Record<RevealField, { value: string; expiresAt: string }>>>({})
+  const [responsibleOptions, setResponsibleOptions] = useState<ResponsibleCandidate[]>([])
+  const [responsiblesLoading, setResponsiblesLoading] = useState(false)
+  const [responsiblesError, setResponsiblesError] = useState<string | null>(null)
 
   const [configForm, setConfigForm] = useState({
     accountName: '',
@@ -218,6 +244,31 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
     responsibleUserId: '',
     defaultFor: [] as string[]
   })
+
+  const loadResponsibles = useCallback(async () => {
+    setResponsiblesLoading(true)
+    setResponsiblesError(null)
+
+    try {
+      const response = await fetch('/api/admin/payment-instruments/responsibles', {
+        cache: 'no-store'
+      })
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}))
+
+        throw new Error(body.error ?? `No pudimos cargar responsables (HTTP ${response.status}).`)
+      }
+
+      const payload = (await response.json()) as { items?: ResponsibleCandidate[] }
+
+      setResponsibleOptions(Array.isArray(payload.items) ? payload.items : [])
+    } catch (loadError) {
+      setResponsiblesError(loadError instanceof Error ? loadError.message : 'No pudimos cargar responsables financieros.')
+    } finally {
+      setResponsiblesLoading(false)
+    }
+  }, [])
 
   const loadDetail = useCallback(
     async (mode: 'initial' | 'refresh' = 'initial') => {
@@ -273,7 +324,8 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
 
   useEffect(() => {
     void loadDetail()
-  }, [loadDetail])
+    void loadResponsibles()
+  }, [loadDetail, loadResponsibles])
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -293,6 +345,14 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
   const impactedRecords = (impact?.incomePaymentsCount ?? 0) + (impact?.expensePaymentsCount ?? 0) + (impact?.settlementLegsCount ?? 0)
   const metadataEntries = useMemo(() => Object.entries(account?.metadataJsonSafe ?? {}).slice(0, 10), [account?.metadataJsonSafe])
   const hasPartialSections = detail ? Object.values(detail.sections).some(value => value !== 'ok') : false
+  const selectedResponsible = responsibleOptions.find(option => option.userId === routingForm.responsibleUserId) ?? null
+  const selectedResponsibleIsKnown = responsibleOptions.some(option => option.userId === routingForm.responsibleUserId)
+
+  const responsibleHelperText = responsiblesLoading
+    ? 'Cargando responsables financieros...'
+    : responsiblesError
+      ? 'No pudimos cargar el selector. Se conserva el responsable actual hasta reintentar.'
+      : 'Solo usuarios internos activos con rol de Finanzas o Superadmin pueden quedar asignados.'
 
   const saveSection = async (section: SavingSection) => {
     if (!section || !detail) return
@@ -633,12 +693,83 @@ const PaymentInstrumentDetailView = ({ accountId }: Props) => {
                     </Box>
 
                     <CustomTextField
+                      select
                       fullWidth
                       label='Responsable'
                       value={routingForm.responsibleUserId}
                       onChange={event => setRoutingForm(current => ({ ...current, responsibleUserId: event.target.value }))}
-                      helperText='User ID responsable hasta que backend entregue selector de personas.'
-                    />
+                      helperText={responsibleHelperText}
+                      disabled={responsiblesLoading && responsibleOptions.length === 0}
+                      SelectProps={{
+                        renderValue: value => {
+                          const selectedValue = String(value || '')
+
+                          if (!selectedValue) return 'Sin responsable'
+
+                          return selectedResponsible
+                            ? selectedResponsible.isCurrentUser
+                              ? `${selectedResponsible.label} (yo)`
+                              : selectedResponsible.label
+                            : selectedValue
+                        }
+                      }}
+                    >
+                      <MenuItem value=''>
+                        <Stack direction='row' spacing={2} alignItems='center'>
+                          <CustomAvatar skin='light' color='secondary' size={28} variant='rounded'>
+                            <i className='tabler-user-off' />
+                          </CustomAvatar>
+                          <Box>
+                            <Typography variant='body2'>Sin responsable</Typography>
+                            <Typography variant='caption' color='text.secondary'>
+                              Mantener pendiente de asignacion
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </MenuItem>
+                      {routingForm.responsibleUserId && !selectedResponsibleIsKnown ? (
+                        <MenuItem value={routingForm.responsibleUserId}>
+                          <Stack direction='row' spacing={2} alignItems='center'>
+                            <CustomAvatar skin='light' color='warning' size={28} variant='rounded'>
+                              <i className='tabler-alert-triangle' />
+                            </CustomAvatar>
+                            <Box>
+                              <Typography variant='body2'>Responsable actual</Typography>
+                              <Typography variant='caption' color='text.secondary'>
+                                {routingForm.responsibleUserId}
+                              </Typography>
+                            </Box>
+                          </Stack>
+                        </MenuItem>
+                      ) : null}
+                      {responsibleOptions.map(option => (
+                        <MenuItem key={option.userId} value={option.userId}>
+                          <Stack direction='row' spacing={2} alignItems='center' sx={{ minWidth: 0 }}>
+                            <CustomAvatar src={option.avatarUrl ?? undefined} skin='light' color={option.isCurrentUser ? 'primary' : 'info'} size={28} variant='rounded'>
+                              {option.label.slice(0, 2).toUpperCase()}
+                            </CustomAvatar>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Stack direction='row' spacing={1} alignItems='center' useFlexGap flexWrap='wrap'>
+                                <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                                  {option.isCurrentUser ? `${option.label} (yo)` : option.label}
+                                </Typography>
+                                {option.roleCodes.slice(0, 2).map(roleCode => (
+                                  <CustomChip key={roleCode} round='true' size='small' variant='tonal' color='info' label={roleLabel(roleCode)} />
+                                ))}
+                              </Stack>
+                              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', overflowWrap: 'anywhere' }}>
+                                {option.email ?? option.userId}
+                              </Typography>
+                            </Box>
+                          </Stack>
+                        </MenuItem>
+                      ))}
+                    </CustomTextField>
+                    {responsiblesError ? (
+                      <Button size='small' variant='text' onClick={() => void loadResponsibles()} startIcon={<i className='tabler-refresh' />}>
+                        Reintentar responsables
+                      </Button>
+                    ) : null}
                     <CustomTextField
                       select
                       fullWidth

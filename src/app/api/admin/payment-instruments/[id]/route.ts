@@ -9,6 +9,7 @@ import {
   getPaymentInstrumentAdminDetail,
   resolveFinanceSpaceId
 } from '@/lib/finance/payment-instruments/admin-detail'
+import { assertPaymentInstrumentResponsibleAssignable } from '@/lib/finance/payment-instruments/responsibles'
 import { parsePaymentInstrumentUpdate, validateReason } from '@/lib/finance/payment-instruments/validation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
@@ -104,6 +105,14 @@ export async function PUT(
       changedFields.some(field => highImpactFields.has(field))
 
     const reason = validateReason(body.reason)
+
+    if (updates.responsibleUserId !== undefined) {
+      await assertPaymentInstrumentResponsibleAssignable({
+        tenant,
+        responsibleUserId: updates.responsibleUserId,
+        currentResponsibleUserId: detailBefore.account.responsibleUserId
+      })
+    }
 
     if (
       requiresHighImpactConfirmation &&

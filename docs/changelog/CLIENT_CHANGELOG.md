@@ -42,6 +42,20 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.27
+
+**Canal:** Beta
+**Fecha:** 2026-04-27
+**Disponible para:** internal
+**Módulos:** Admin Center / Finanzas
+
+### Mejoras
+
+- En la administracion de instrumentos de pago, el responsable ahora se elige desde usuarios internos con rol financiero o Superadmin; el usuario actual se identifica como "(yo)" cuando aplica.
+- Santander ahora muestra el logotipo oficial y usa su isotipo en chips compactos para mejorar legibilidad en tablas y selectores.
+
+---
+
 ## 2026.04-beta.26
 
 **Canal:** Beta

@@ -2,7 +2,17 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-04-24
+> **Last updated:** 2026-04-27
+
+## Delta 2026-04-27 — Payment Instrument responsible candidates
+
+La administracion de instrumentos de pago ya no acepta responsables como texto libre desde la UI.
+
+- Endpoint nuevo: `GET /api/admin/payment-instruments/responsibles`.
+- Guard: `requireFinanceTenantContext()` + capability `finance.payment_instruments.update`.
+- Fuente canonica: `greenhouse_core.client_users` + `greenhouse_core.user_role_assignments`, enriquecido con `members` e `identity_profiles`.
+- Candidatos asignables: usuarios internos activos (`tenant_type='efeonce_internal'`) con rol activo `finance_admin`, `finance_analyst` o `efeonce_admin`.
+- `POST /api/admin/payment-instruments` y `PUT /api/admin/payment-instruments/[id]` validan server-side que `responsible_user_id` pertenezca al set asignable; responsables legacy existentes pueden conservarse sin abrir nuevas asignaciones arbitrarias.
 
 ## Delta 2026-04-26 — Nubox Quotes Hot Sync para frescura de cotizaciones
 

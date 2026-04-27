@@ -1,5 +1,5 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-04-07 por Claude
 > **Ultima actualizacion:** 2026-04-27 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
@@ -169,6 +169,7 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Agrupar posición de caja por instrumento
 - Registrar nuevos instrumentos desde Admin Center (`/admin/payment-instruments`)
 - Administrar cada instrumento en `/admin/payment-instruments/[id]` con un workspace de configuracion, actividad, conciliacion y auditoria.
+- Asignar un responsable operativo desde un selector de usuarios internos activos con rol de Finanzas o Superadmin. Si el usuario actual cumple la regla, aparece marcado como "(yo)".
 - Revisar impacto antes de mutar campos criticos o desactivar un instrumento con cobros, pagos, settlements, balances o periodos asociados.
 - Revelar identificadores completos solo de forma temporal, con permiso fino, motivo obligatorio y auditoria sin guardar el valor revelado.
 

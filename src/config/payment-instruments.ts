@@ -44,6 +44,7 @@ export interface ProviderDefinition {
   name: string
   category: InstrumentCategory
   logo: string | null
+  compactLogo?: string | null
   country?: string
   currencies?: string[]
 }
@@ -53,7 +54,14 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
   bci: { name: 'BCI', category: 'bank_account', logo: '/images/logos/payment/bci.svg', country: 'CL', currencies: ['CLP', 'USD'] },
   'banco-chile': { name: 'Banco de Chile', category: 'bank_account', logo: '/images/logos/payment/banco-chile.svg', country: 'CL', currencies: ['CLP', 'USD'] },
   'banco-estado': { name: 'BancoEstado', category: 'bank_account', logo: '/images/logos/payment/banco-estado.svg', country: 'CL', currencies: ['CLP'] },
-  santander: { name: 'Santander', category: 'bank_account', logo: '/images/logos/payment/santander.svg', country: 'CL', currencies: ['CLP', 'USD'] },
+  santander: {
+    name: 'Santander',
+    category: 'bank_account',
+    logo: '/images/logos/payment/Banco_Santander_Logotipo.svg',
+    compactLogo: '/images/logos/payment/BSAC.svg',
+    country: 'CL',
+    currencies: ['CLP', 'USD']
+  },
   scotiabank: { name: 'Scotiabank', category: 'bank_account', logo: '/images/logos/payment/scotiabank.svg', country: 'CL', currencies: ['CLP', 'USD'] },
   itau: { name: 'Itaú', category: 'bank_account', logo: '/images/logos/payment/itau.svg', country: 'CL', currencies: ['CLP'] },
   bice: { name: 'BICE', category: 'bank_account', logo: '/images/logos/payment/bice.svg', country: 'CL', currencies: ['CLP', 'USD'] },

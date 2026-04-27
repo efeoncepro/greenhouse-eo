@@ -26,6 +26,7 @@ const PaymentInstrumentChip = ({
   const avatarSize = size === 'sm' ? 24 : 32
   const variant = size === 'sm' ? 'body2' : 'body1'
   const categoryColor = instrumentCategory ? INSTRUMENT_CATEGORY_COLORS[instrumentCategory] : 'primary'
+  const logoSrc = size === 'sm' ? provider?.compactLogo || provider?.logo : provider?.logo
 
   const initials = instrumentName
     .split(/\s+/)
@@ -35,12 +36,18 @@ const PaymentInstrumentChip = ({
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      {provider?.logo ? (
+      {logoSrc ? (
         <Box
           component='img'
-          src={provider.logo}
-          alt={provider.name}
-          sx={{ height: logoHeight, width: 'auto', flexShrink: 0 }}
+          src={logoSrc}
+          alt={provider?.name ?? instrumentName}
+          sx={{
+            height: logoHeight,
+            maxWidth: size === 'sm' ? 34 : 112,
+            width: 'auto',
+            objectFit: 'contain',
+            flexShrink: 0
+          }}
         />
       ) : (
         <Avatar

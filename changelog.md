@@ -2,6 +2,14 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — Payment Instrument responsable selector y branding Santander
+
+- `/admin/payment-instruments/[id]` reemplaza el campo libre de `Responsable` por un selector backend-driven de usuarios internos activos con rol `finance_admin`, `finance_analyst` o `efeonce_admin`; el usuario actual aparece marcado como `(yo)` cuando es elegible.
+- `POST/PUT /api/admin/payment-instruments` valida server-side que `responsibleUserId` sea asignable, preservando responsables legacy existentes sin permitir nuevas asignaciones arbitrarias.
+- Nuevo endpoint `GET /api/admin/payment-instruments/responsibles` con capability `finance.payment_instruments.update` para hidratar el selector.
+- El catalogo de proveedores soporta `compactLogo`; Santander usa el logotipo oficial completo y el isotipo BSAC para chips pequeños.
+- Validacion: `npx tsc --noEmit --pretty false`, `pnpm lint`.
+
 ### 2026-04-27 — TASK-697 Payment Instrument Admin Workspace Enterprise
 
 - `/admin/payment-instruments/[id]` evoluciona a workspace admin bank-grade con tabs de Configuracion, Actividad, Conciliacion y Auditoria.
