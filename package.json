@@ -40,6 +40,8 @@
     "finance:conciliate-mar-apr": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/conciliate-march-april-2026.ts",
     "finance:fix-factoring": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/fix-factoring-inflows-mar-apr.ts",
     "payroll:materialize-payments": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/materialize-payroll-payments.ts",
+    "finance:declare-otbs": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/declare-opening-trial-balances.ts",
+    "finance:backfill-deel": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/backfill-deel-payments.ts",
     "backfill:hubspot-contact-names": "tsx scripts/backfill-hubspot-contact-names.ts",
     "hubspot:properties": "tsx scripts/ensure-hubspot-custom-properties.ts",
     "hubspot:company-properties": "tsx scripts/create-hubspot-company-custom-properties.ts",

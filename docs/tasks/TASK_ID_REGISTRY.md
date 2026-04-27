@@ -778,3 +778,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-700` | `complete` | Internal Account Number Allocator (CCA + future wallets) | `docs/tasks/complete/TASK-700-internal-account-number-allocator.md` |
 | `TASK-701` | `complete` | Payment Provider Catalog + Greenhouse as platform_operator | `docs/tasks/complete/TASK-701-payment-provider-catalog-greenhouse-as-platform.md` |
 | `TASK-702` | `complete` | Bank Reconciliation, Canonical Anchors & Account Balances Rematerialization | `docs/tasks/complete/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md` |
+| `TASK-703` | `complete` | Canonical Opening Trial Balance + Liability Accounts (TC, CCA, future loans) | `docs/tasks/complete/TASK-703-canonical-opening-trial-balance-and-liability-accounting.md` |

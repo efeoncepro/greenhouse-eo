@@ -3238,8 +3238,38 @@ export interface GreenhouseFinanceAccountNumberRegistry {
   type_code: string;
 }
 
+export interface GreenhouseFinanceAccountOpeningTrialBalance {
+  account_id: string;
+  /**
+   * 'estimated' = saldo declarado con la mejor data disponible, sujeto a reconciliación con datos completos. 'reconciled' = saldo derivado de cartola/extracto/ledger histórico verificable. 'audited' = revisado por contador y firmado.
+   */
+  audit_status: Generated<string>;
+  created_at: Generated<Timestamp>;
+  declaration_reason: string;
+  declared_at: Generated<Timestamp>;
+  declared_by_user_id: string | null;
+  /**
+   * JSONB array de fuentes de verdad usadas para derivar el opening. Ejemplo: [{"type":"cartola","institution":"santander","period":"2026-02-01..2026-02-25","ref":"file:CartolaMovimiento-...xlsx"}, {"type":"deel_history","period":"2025-11..2026-02","note":"4 receipts pre-period"}].
+   */
+  evidence_refs: Generated<Json>;
+  genesis_date: Timestamp;
+  obtb_id: string;
+  opening_balance: Numeric;
+  opening_balance_clp: Numeric;
+  superseded_at: Timestamp | null;
+  /**
+   * Anti-DELETE: cuando una OTB se revisa con nueva data, se INSERTa otra fila y la anterior queda superseded preservando audit. La activa es WHERE superseded_by IS NULL.
+   */
+  superseded_by: string | null;
+  superseded_reason: string | null;
+}
+
 export interface GreenhouseFinanceAccounts {
   account_id: string;
+  /**
+   * Generated. 'asset' = saldo positivo significa dinero a favor de la empresa (bancos, fintechs, cash, payroll processors transit). 'liability' = saldo positivo significa deuda actual de la empresa (credit_card, shareholder_account, future loans/wallets). El motor materializeAccountBalance invierte la convención de signo para liabilities.
+   */
+  account_kind: Generated<string | null>;
   account_name: string;
   account_number: string | null;
   account_number_full: string | null;
@@ -7126,6 +7156,7 @@ export interface DB {
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
   "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
   "greenhouse_finance.account_number_registry": GreenhouseFinanceAccountNumberRegistry;
+  "greenhouse_finance.account_opening_trial_balance": GreenhouseFinanceAccountOpeningTrialBalance;
   "greenhouse_finance.accounts": GreenhouseFinanceAccounts;
   "greenhouse_finance.bank_statement_rows": GreenhouseFinanceBankStatementRows;
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;

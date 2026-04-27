@@ -402,7 +402,7 @@ const getTodayInSantiago = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
 
 const getAccountRow = async (accountId: string, client?: QueryableClient) => {
-  const rows = await queryRows<AccountRow>(
+  const rows = await queryRows<AccountRow & { account_kind?: string }>(
     `
       SELECT
         account_id,
@@ -416,7 +416,8 @@ const getAccountRow = async (accountId: string, client?: QueryableClient) => {
         opening_balance,
         opening_balance_date,
         is_active,
-        metadata_json
+        metadata_json,
+        account_kind
       FROM greenhouse_finance.accounts
       WHERE account_id = $1
       LIMIT 1
@@ -739,7 +740,21 @@ export const materializeAccountBalance = async (
   const currency = normalizeString(account.currency || 'CLP') || 'CLP'
   const periodInflows = roundCurrency(toNumber(movementSummary.inflows))
   const periodOutflows = roundCurrency(toNumber(movementSummary.outflows))
-  const closingBalance = roundCurrency(openingBalance + periodInflows - periodOutflows)
+
+  // TASK-703: liability accounts (credit_card, shareholder_account, future loans/wallets)
+  // invert the sign convention. From the bank's POV:
+  //   - cargos a TC ("outflows" del POV TC instrument) AUMENTAN deuda
+  //   - pagos a TC ("inflows" desde otra cuenta) REDUCEN deuda
+  // Same for CCA:
+  //   - gastos pagados con tarjeta personal del accionista (outflows del CCA) AUMENTAN deuda
+  //   - reembolsos transferidos al accionista (inflows al CCA) REDUCEN deuda
+  // Asset accounts (banks, fintechs, cash, payroll_processor) keep the canonical
+  // bank convention: closing = opening + inflows - outflows.
+  const accountKind = (account as AccountRow & { account_kind?: string }).account_kind || 'asset'
+
+  const closingBalance = accountKind === 'liability'
+    ? roundCurrency(openingBalance - periodInflows + periodOutflows)
+    : roundCurrency(openingBalance + periodInflows - periodOutflows)
 
   // ── FX resolution ──────────────────────────────────────────────────────
   // CLP accounts: rate=1, no translation FX possible.

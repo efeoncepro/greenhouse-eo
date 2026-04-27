@@ -3,6 +3,7 @@ import type { PoolClient } from 'pg'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import { materializeAccountBalance } from './account-balances'
+import { getActiveOpeningTrialBalance } from './account-opening-trial-balance'
 
 /**
  * Account Balances Rematerialization (TASK-702).
@@ -142,7 +143,11 @@ const insertSeedRow = async (
 export const rematerializeAccountBalanceRange = async (
   input: RematerializeAccountInput
 ): Promise<RematerializeAccountResult> => {
-  const seedDate = input.seedDate
+  // Prefer OTB declaration over the input seed if available — OTB is the
+  // canonical opening source per TASK-703.
+  const otb = await getActiveOpeningTrialBalance(input.accountId)
+  const seedDate = otb?.genesisDate ?? input.seedDate
+  const openingBalance = otb?.openingBalance ?? input.openingBalance
   const endDate = input.endDate ?? ymd(new Date())
 
   if (seedDate > endDate) {
@@ -169,17 +174,18 @@ export const rematerializeAccountBalanceRange = async (
       [input.accountId, seedDate, endDate]
     )
 
-    await insertSeedRow(client, input.accountId, seedDate, input.openingBalance)
+    await insertSeedRow(client, input.accountId, seedDate, openingBalance)
 
-    // Update accounts.opening_balance + opening_balance_date so future
-    // snapshots have an authoritative anchor when no previous snapshot exists.
+    // Update accounts.opening_balance + opening_balance_date as a cache so
+    // future snapshots have an anchor when no previous snapshot exists. The
+    // OTB remains the source of truth (TASK-703).
     await client.query(
       `UPDATE greenhouse_finance.accounts SET
          opening_balance = $1,
          opening_balance_date = $2::date,
          updated_at = NOW()
        WHERE account_id = $3`,
-      [input.openingBalance, seedDate, input.accountId]
+      [openingBalance, seedDate, input.accountId]
     )
 
     let daysMaterialized = 0
@@ -197,13 +203,13 @@ export const rematerializeAccountBalanceRange = async (
       cursor = addDays(cursor, 1)
     }
 
-    const finalClosingBalance = lastResult ? Number(lastResult.closingBalance) : input.openingBalance
+    const finalClosingBalance = lastResult ? Number(lastResult.closingBalance) : openingBalance
 
     return {
       accountId: input.accountId,
       seedDate,
       endDate,
-      openingBalance: input.openingBalance,
+      openingBalance,
       finalClosingBalance,
       daysMaterialized,
       closedDaysSkipped: closedDays.length

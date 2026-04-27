@@ -457,6 +457,202 @@ export const createLoanCuotaExpensePayment = (input: CreateLoanCuotaExpensePayme
     reconciliationRowId: input.reconciliationRowId
   })
 
+// ─── TC empresa / TC personal accionista factories (TASK-703) ───────────────
+
+export interface CreateCompanyCardExpenseInput extends BaseAnchoredInput {
+  toolCatalogId?: string | null
+  memberId?: string | null
+  description: string
+  supplierName?: string | null
+  currency?: 'CLP' | 'USD' | 'EUR'
+  exchangeRateOverride?: number
+  cardLastFour?: string | null
+}
+
+export interface CreateShareholderCardExpenseInput extends BaseAnchoredInput {
+  toolCatalogId?: string | null
+  memberId?: string | null
+  description: string
+  supplierName?: string | null
+  currency?: 'CLP' | 'USD' | 'EUR'
+  exchangeRateOverride?: number
+  shareholderCardLast4?: string | null
+  shareholderName?: string
+  // payment_account_id se default a sha-cca-julio-reyes-clp si no se da
+}
+
+export interface CreateShareholderReimbursementSettlementInput {
+  paymentDate: string
+  amount: number
+  sourceAccountId?: string  // default 'santander-clp'
+  ccaInstrumentId?: string  // default 'sha-cca-julio-reyes-clp'
+  reference?: string | null
+  notes?: string | null
+  actorUserId?: string | null
+  sourceReconciliationRowId?: string | null
+  linkedExpensePaymentIds?: string[]
+}
+
+const resolveAmountClp = async (
+  client: PoolClient,
+  amount: number,
+  currency: string,
+  paymentDate: string,
+  override?: number
+): Promise<{ amountClp: number; rate: number }> => {
+  if (currency === 'CLP') {
+    return { amountClp: amount, rate: 1 }
+  }
+
+  if (override && override > 0) {
+    return { amountClp: amount * override, rate: override }
+  }
+
+  const r = await client.query<{ rate: string }>(
+    `SELECT rate::text FROM greenhouse_finance.exchange_rates
+     WHERE from_currency = $1 AND to_currency = 'CLP' AND rate_date <= $2::date
+     ORDER BY rate_date DESC LIMIT 1`,
+    [currency, paymentDate]
+  )
+
+  if (r.rows.length === 0) {
+    throw new FinanceValidationError(
+      `No exchange rate registered for ${currency}/CLP on or before ${paymentDate}`,
+      422
+    )
+  }
+
+  const rate = Number(r.rows[0].rate)
+
+  return { amountClp: Math.round(amount * rate * 100) / 100, rate }
+}
+
+/**
+ * createCompanyCardExpense — pago tooling/payroll vía TC empresa (typically
+ * santander-corp-clp). Liability account, FX-aware. The expense is anchored
+ * to tool_catalog_id (and optionally member_id for international payroll
+ * cases like Deel→Melkin).
+ */
+export const createCompanyCardExpense = async (
+  input: CreateCompanyCardExpenseInput
+): Promise<AnchoredFactoryResult> => {
+  ensurePositive(input.amount)
+
+  const currency = input.currency || 'CLP'
+
+  return withTransaction(async (client: PoolClient) => {
+    const account = await ensureAccount(client, input.paymentAccountId)
+
+    void account
+
+    const fx = await resolveAmountClp(client, input.amount, currency, input.paymentDate, input.exchangeRateOverride)
+
+    const expenseTypeChosen = input.memberId || input.toolCatalogId === 'deel' ? 'payroll' : 'miscellaneous'
+
+    return createAnchoredExpensePayment({
+      expenseType: expenseTypeChosen,
+      description: input.description,
+      anchorColumns: {
+        tool_catalog_id: input.toolCatalogId ?? null,
+        member_id: input.memberId ?? null,
+        supplier_name: input.supplierName ?? null,
+        miscellaneous_category: input.memberId ? 'international_payroll_via_card' : 'tooling',
+        payment_provider: input.cardLastFour ? `Tarjeta empresa (*${input.cardLastFour})` : null
+      },
+      paymentSource: 'bank_reconciliation',
+      paymentDate: input.paymentDate,
+      amount: fx.amountClp,  // amount stored as CLP; original amount + FX captured in metadata
+      paymentAccountId: input.paymentAccountId,
+      reference: input.reference,
+      notes: currency !== 'CLP'
+        ? `${input.notes ?? ''} | Original: ${currency} ${input.amount.toFixed(2)} @ rate ${fx.rate}`
+        : input.notes,
+      actorUserId: input.actorUserId,
+      reconciliationRowId: input.reconciliationRowId,
+      currencyOverride: 'CLP'
+    })
+  })
+}
+
+/**
+ * createShareholderCardExpense — pago tooling/payroll vía TC personal del
+ * accionista. Crea expense anclado al CCA del accionista (liability CLP).
+ * Cuando el expense está en USD/EUR, se persiste el CLP equivalent al rate
+ * del día del expense para que el CCA balance suba en CLP correctamente.
+ *
+ * Caso real: Deel REC-2026-4 04/04 $903.19 USD pagado con TC personal *1879
+ * → expense kind=payroll + member_id=melkin + tool_catalog_id=deel +
+ *   payment_account_id=sha-cca-julio-reyes-clp + payment_method=
+ *   shareholder_personal_card → la deuda con accionista sube por
+ *   $903.19 × FX al 04/04.
+ */
+export const createShareholderCardExpense = async (
+  input: CreateShareholderCardExpenseInput
+): Promise<AnchoredFactoryResult> => {
+  ensurePositive(input.amount)
+
+  const currency = input.currency || 'CLP'
+  const ccaInstrumentId = input.paymentAccountId || 'sha-cca-julio-reyes-clp'
+
+  return withTransaction(async (client: PoolClient) => {
+    const account = await ensureAccount(client, ccaInstrumentId)
+
+    void account
+
+    const fx = await resolveAmountClp(client, input.amount, currency, input.paymentDate, input.exchangeRateOverride)
+
+    const expenseTypeChosen = input.memberId || input.toolCatalogId === 'deel' ? 'payroll' : 'miscellaneous'
+
+    const providerLabel = input.shareholderCardLast4
+      ? `Tarjeta personal ${input.shareholderName ?? 'accionista'} (*${input.shareholderCardLast4})`
+      : `Tarjeta personal accionista`
+
+    return createAnchoredExpensePayment({
+      expenseType: expenseTypeChosen,
+      description: input.description,
+      anchorColumns: {
+        tool_catalog_id: input.toolCatalogId ?? null,
+        member_id: input.memberId ?? null,
+        supplier_name: input.supplierName ?? null,
+        miscellaneous_category: 'shareholder_personal_card',
+        payment_provider: providerLabel,
+        payment_rail: 'shareholder_personal_card'
+      },
+      paymentSource: 'bank_reconciliation',
+      paymentDate: input.paymentDate,
+      amount: fx.amountClp,  // CLP equivalent; the CCA is in CLP
+      paymentAccountId: ccaInstrumentId,
+      reference: input.reference,
+      notes: currency !== 'CLP'
+        ? `${input.notes ?? ''} | Original ${currency} ${input.amount.toFixed(2)} @ rate ${fx.rate} | Pagado con TC personal del accionista, deuda con accionista crece`
+        : `${input.notes ?? ''} | Pagado con TC personal del accionista, deuda con accionista crece`,
+      actorUserId: input.actorUserId,
+      reconciliationRowId: input.reconciliationRowId,
+      currencyOverride: 'CLP'
+    })
+  })
+}
+
+/**
+ * createShareholderReimbursementSettlement — settlement_group internal_transfer
+ * para "Transf a Julio Reyes" en cartola Santander CLP. Asset CLP → liability
+ * CLP. La incoming leg en CCA, gracias a account_kind='liability', REDUCE
+ * la deuda con accionista (no aumenta saldo).
+ */
+export const createShareholderReimbursementSettlement = (
+  input: CreateShareholderReimbursementSettlementInput
+) =>
+  createInternalTransferSettlement({
+    paymentDate: input.paymentDate,
+    amount: input.amount,
+    sourceAccountId: input.sourceAccountId || 'santander-clp',
+    destinationAccountId: input.ccaInstrumentId || 'sha-cca-julio-reyes-clp',
+    reference: input.reference || `shareholder-reimbursement-${input.paymentDate}`,
+    notes: input.notes || 'Reembolso al accionista — settles deuda CCA',
+    actorUserId: input.actorUserId,
+    sourceReconciliationRowId: input.sourceReconciliationRowId
+  })
+
 // ─── Settlement-group factories (multi-leg) ─────────────────────────────────
 
 export const createInternalTransferSettlement = async (input: CreateInternalTransferSettlementInput): Promise<{
