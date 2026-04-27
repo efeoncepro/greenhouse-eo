@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-27T16:00:48.475Z",
+  "updatedAt": "2026-04-27T18:58:33.379Z",
   "variantModel": [
     "full-positive",
     "full-negative",
@@ -12,6 +12,10 @@
       "slug": "amex",
       "brandName": "American Express",
       "category": "credit_card",
+      "providerType": "card_network",
+      "applicableTo": [
+        "credit_card"
+      ],
       "country": null,
       "sourceUrl": "https://simpleicons.org/?q=americanexpress",
       "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
@@ -37,6 +41,10 @@
       "slug": "banco-chile",
       "brandName": "Banco de Chile",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Banco_de_Chile_Logotipo.svg",
       "licenseSource": "Official brand source; follow source brand guidelines",
@@ -72,6 +80,10 @@
       "slug": "banco-estado",
       "brandName": "BancoEstado",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": null,
       "licenseSource": "Legacy repo asset; pending scraper verification",
@@ -83,6 +95,10 @@
       "slug": "bci",
       "brandName": "BCI",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Bci_Logotype.svg",
       "licenseSource": "Official brand source; follow source brand guidelines",
@@ -120,6 +136,10 @@
       "slug": "bice",
       "brandName": "BICE",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": null,
       "licenseSource": "Legacy repo asset; pending scraper verification",
@@ -131,6 +151,10 @@
       "slug": "deel",
       "brandName": "Deel",
       "category": "payment_platform",
+      "providerType": "payment_platform",
+      "applicableTo": [
+        "payment_platform"
+      ],
       "country": null,
       "sourceUrl": "https://website-media.deel.com/logo_revamp_164ddaed0c.svg",
       "licenseSource": "Official brand source; follow source brand guidelines",
@@ -166,6 +190,10 @@
       "slug": "falabella",
       "brandName": "Banco Falabella",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": "derived-from:/images/logos/payment/falabella-full-positive.svg",
       "licenseSource": "Derived from verified SVG source; preserve original brand guidelines",
@@ -203,6 +231,10 @@
       "slug": "global66",
       "brandName": "Global66",
       "category": "fintech",
+      "providerType": "fintech",
+      "applicableTo": [
+        "fintech"
+      ],
       "country": null,
       "sourceUrl": "/images/logos/payment/que-es-global66-que-ofrece.png",
       "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
@@ -237,9 +269,28 @@
       }
     },
     {
+      "slug": "greenhouse",
+      "brandName": "Greenhouse",
+      "category": "shareholder_account",
+      "providerType": "platform_operator",
+      "applicableTo": [
+        "shareholder_account"
+      ],
+      "country": null,
+      "sourceUrl": "in-repo:/public/images/greenhouse/SVG/greenhouse-blue.svg",
+      "licenseSource": "In-repo brand asset; Greenhouse-owned",
+      "logo": "/images/greenhouse/SVG/greenhouse-blue.svg",
+      "compactLogo": "/images/greenhouse/SVG/favicon-blue-negative.svg",
+      "lastVerifiedAt": "2026-04-27T18:58:33.362Z"
+    },
+    {
       "slug": "itau",
       "brandName": "Itaú",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banco_Ita%C3%BA_logo.svg",
       "licenseSource": "Official brand source; follow source brand guidelines",
@@ -274,6 +325,10 @@
       "slug": "mastercard",
       "brandName": "Mastercard",
       "category": "credit_card",
+      "providerType": "card_network",
+      "applicableTo": [
+        "credit_card"
+      ],
       "country": null,
       "sourceUrl": "https://simpleicons.org/?q=mastercard",
       "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
@@ -299,6 +354,10 @@
       "slug": "mercadopago",
       "brandName": "MercadoPago",
       "category": "fintech",
+      "providerType": "fintech",
+      "applicableTo": [
+        "fintech"
+      ],
       "country": null,
       "sourceUrl": "https://simpleicons.org/?q=mercadopago",
       "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
@@ -324,6 +383,10 @@
       "slug": "paypal",
       "brandName": "PayPal",
       "category": "fintech",
+      "providerType": "fintech",
+      "applicableTo": [
+        "fintech"
+      ],
       "country": null,
       "sourceUrl": "https://simpleicons.org/?q=paypal",
       "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
@@ -349,6 +412,10 @@
       "slug": "previred",
       "brandName": "Previred",
       "category": "payroll_processor",
+      "providerType": "payroll_processor",
+      "applicableTo": [
+        "payroll_processor"
+      ],
       "country": "CL",
       "sourceUrl": "composite:https://www.previred.com/wp-content/themes/previred--theme/img/logo.svg + https://www.previred.com/wp-content/uploads/2022/05/cropped-favicon-1-192x192.png",
       "licenseSource": "Curated local SVG from verified brand source; preserve original brand guidelines",
@@ -386,6 +453,10 @@
       "slug": "ripley",
       "brandName": "Banco Ripley",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": "https://www.bancoripley.cl/media/new-logo-banco-ripley-IWJOE57X.svg",
       "licenseSource": "Official brand source; follow source brand guidelines",
@@ -421,6 +492,11 @@
       "slug": "santander",
       "brandName": "Santander",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account",
+        "credit_card"
+      ],
       "country": "CL",
       "sourceUrl": "user-provided:/public/images/logos/payment/Banco_Santander_Logotipo.svg",
       "licenseSource": "User-provided official brand asset; preserve original brand guidelines",
@@ -446,6 +522,10 @@
       "slug": "scotiabank",
       "brandName": "Scotiabank",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": "https://cdn.aglty.io/scotiabank-chile/2024/header/logo-scotiabank-red.svg",
       "licenseSource": "Official brand source; follow source brand guidelines",
@@ -465,6 +545,10 @@
       "slug": "security",
       "brandName": "Banco Security",
       "category": "bank_account",
+      "providerType": "bank",
+      "applicableTo": [
+        "bank_account"
+      ],
       "country": "CL",
       "sourceUrl": null,
       "licenseSource": "Legacy repo asset; pending scraper verification",
@@ -476,6 +560,10 @@
       "slug": "stripe",
       "brandName": "Stripe",
       "category": "payment_platform",
+      "providerType": "fintech",
+      "applicableTo": [
+        "fintech"
+      ],
       "country": null,
       "sourceUrl": "https://simpleicons.org/?q=stripe",
       "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
@@ -501,6 +589,10 @@
       "slug": "visa",
       "brandName": "Visa",
       "category": "credit_card",
+      "providerType": "card_network",
+      "applicableTo": [
+        "credit_card"
+      ],
       "country": null,
       "sourceUrl": "https://simpleicons.org/?q=visa",
       "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",
@@ -526,6 +618,10 @@
       "slug": "wise",
       "brandName": "Wise",
       "category": "fintech",
+      "providerType": "fintech",
+      "applicableTo": [
+        "fintech"
+      ],
       "country": null,
       "sourceUrl": "https://simpleicons.org/?q=wise",
       "licenseSource": "Simple Icons; verify brand usage guidelines before client-facing release",

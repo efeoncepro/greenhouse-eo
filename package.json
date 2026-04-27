@@ -6,7 +6,7 @@
   "scripts": {
     "predev": "pnpm build:icons",
     "dev": "next dev --turbopack",
-    "prebuild": "pnpm build:icons",
+    "prebuild": "pnpm build:icons && pnpm catalog:check",
     "build": "node scripts/run-next-build.mjs",
     "start": "node scripts/run-next-start.mjs",
     "prelint": "pnpm build:icons",
@@ -34,6 +34,8 @@
     "migrate:create": "tsx scripts/migrate.ts create",
     "migrate:status": "tsx scripts/migrate.ts status",
     "db:generate-types": "tsx scripts/generate-db-types.ts",
+    "catalog:resync": "tsx scripts/catalog/resync-from-manifest.ts",
+    "catalog:check": "tsx scripts/catalog/check-drift.ts",
     "backfill:hubspot-contact-names": "tsx scripts/backfill-hubspot-contact-names.ts",
     "hubspot:properties": "tsx scripts/ensure-hubspot-custom-properties.ts",
     "hubspot:company-properties": "tsx scripts/create-hubspot-company-custom-properties.ts",

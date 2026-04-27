@@ -1,88 +1,128 @@
 /**
- * Canonical Payment Provider Catalog — TypeScript source of truth.
- * ================================================================
+ * Canonical Payment Provider Catalog — derived from manifest.json (single SoT).
+ * =============================================================================
  *
- * This module is the single source of truth for the slug-level identity of
- * every payment provider Greenhouse recognizes. The set is mirrored — by
- * design, with a drift-guard test — in three places:
+ * `public/images/logos/payment/manifest.json` is the canonical declarative
+ * source of truth for the entire payment provider catalog. Every artifact
+ * downstream is derived from it:
  *
- *   1. `greenhouse_finance.payment_provider_catalog` (PG)
- *      Seeded from the latest `payment-provider-catalog-canonical-resync`
- *      migration. The migration uses ON CONFLICT (provider_slug) DO UPDATE,
- *      so re-running it heals any drift that may have accumulated (e.g. when
- *      a slug was added to TS without a corresponding migration).
+ *   1. This module (`CANONICAL_PROVIDERS`, `CANONICAL_PROVIDER_SLUGS`) —
+ *      consumed by server-side validators (e.g. `validateProviderForInstrument`)
+ *      and the `assertProviderInCanonicalCatalog` defense-in-depth check.
  *
- *   2. `src/config/payment-instruments.ts` PROVIDER_CATALOG
- *      The presentation layer (logos, currencies, display labels). It MUST
- *      only contain slugs that exist here. The drift guard test enforces this.
+ *   2. `src/config/payment-instruments.ts` PROVIDER_CATALOG — the presentation
+ *      layer (logo paths, currencies, display labels). The drift-guard test at
+ *      `src/config/__tests__/payment-instruments-manifest-drift.test.ts`
+ *      enforces that every PROVIDER_CATALOG entry's logo paths match this
+ *      manifest 1:1.
  *
- *   3. The form-time validator and the server-side defense-in-depth check
- *      `assertProviderInCanonicalCatalog` (see store.ts), which queries PG
- *      before INSERT/UPDATE so a missing seed surfaces as a clean 422 instead
- *      of a foreign-key 500.
+ *   3. `greenhouse_finance.payment_provider_catalog` (PG) — seeded by the
+ *      latest `payment-provider-catalog-canonical-resync` migration. The
+ *      migration is generated automatically from this manifest by
+ *      `scripts/catalog/resync-from-manifest.ts` (`pnpm catalog:resync`),
+ *      so SQL never drifts from the manifest by hand.
+ *
+ *   4. CI `pnpm catalog:check` (run via `prebuild`) compares manifest →
+ *      latest migration row-for-row. Drift cannot reach a Vercel deploy.
+ *
+ *   5. Runtime `/api/admin/payment-instruments/health` compares manifest
+ *      → live PG rows; drift surfaces as a Reliability dashboard signal
+ *      tagged `domain=finance`.
  *
  * To add a provider:
- *   1. Append a row here.
- *   2. Add presentation metadata (logo, currencies) to PROVIDER_CATALOG in
- *      `src/config/payment-instruments.ts`.
- *   3. Append the same row to the latest canonical-resync migration's
- *      INSERT/ON CONFLICT block (or generate a new resync migration).
- *   4. Run `pnpm migrate:up` and `pnpm db:generate-types`.
- *
- * The drift-guard test will fail PR-time if any of those steps is skipped.
+ *   1. Run the brand-asset-designer skill to publish SVGs and append the
+ *      entry to `manifest.json` (with `providerType` and `applicableTo`).
+ *   2. `pnpm catalog:resync --reason "<short-reason>"` — generates a new
+ *      `payment-provider-catalog-canonical-resync` migration from manifest.
+ *   3. `pnpm migrate:up` — applies it.
+ *   4. Optionally append `currencies`/labels to `src/config/payment-instruments.ts`
+ *      for UI presentation. The drift-guard test will require manifest paths
+ *      to match.
  */
 
-export type CanonicalProviderType =
-  | 'bank'
-  | 'card_network'
-  | 'card_issuer'
-  | 'fintech'
-  | 'payment_platform'
-  | 'payroll_processor'
-  | 'platform_operator'
+import manifestJson from '../../../../public/images/logos/payment/manifest.json'
+
+export const CANONICAL_PROVIDER_TYPES = [
+  'bank',
+  'card_network',
+  'card_issuer',
+  'fintech',
+  'payment_platform',
+  'payroll_processor',
+  'platform_operator'
+] as const
+
+export type CanonicalProviderType = (typeof CANONICAL_PROVIDER_TYPES)[number]
+
+export const CANONICAL_INSTRUMENT_CATEGORIES = [
+  'bank_account',
+  'credit_card',
+  'fintech',
+  'payment_platform',
+  'cash',
+  'payroll_processor',
+  'shareholder_account'
+] as const
+
+export type CanonicalInstrumentCategory = (typeof CANONICAL_INSTRUMENT_CATEGORIES)[number]
 
 export interface CanonicalProvider {
   slug: string
   displayName: string
   providerType: CanonicalProviderType
   countryCode: string | null
-  applicableTo: readonly string[]
+  applicableTo: readonly CanonicalInstrumentCategory[]
 }
 
-export const CANONICAL_PROVIDERS: readonly CanonicalProvider[] = [
-  // Chilean banks
-  { slug: 'bci',          displayName: 'BCI',              providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
-  { slug: 'banco-chile',  displayName: 'Banco de Chile',   providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
-  { slug: 'banco-estado', displayName: 'BancoEstado',      providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
-  { slug: 'santander',    displayName: 'Santander',        providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account', 'credit_card'] },
-  { slug: 'scotiabank',   displayName: 'Scotiabank',       providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
-  { slug: 'itau',         displayName: 'Itaú',             providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
-  { slug: 'bice',         displayName: 'BICE',             providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
-  { slug: 'security',     displayName: 'Banco Security',   providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
-  { slug: 'falabella',    displayName: 'Banco Falabella',  providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
-  { slug: 'ripley',       displayName: 'Banco Ripley',     providerType: 'bank',              countryCode: 'CL', applicableTo: ['bank_account'] },
+interface ManifestEntry {
+  slug: string
+  brandName: string
+  category?: string
+  providerType?: string
+  applicableTo?: string[]
+  country?: string | null
+  logo?: string | null
+  compactLogo?: string | null
+}
 
-  // Card networks
-  { slug: 'visa',       displayName: 'Visa',             providerType: 'card_network', countryCode: null, applicableTo: ['credit_card'] },
-  { slug: 'mastercard', displayName: 'Mastercard',       providerType: 'card_network', countryCode: null, applicableTo: ['credit_card'] },
-  { slug: 'amex',       displayName: 'American Express', providerType: 'card_network', countryCode: null, applicableTo: ['credit_card'] },
+interface Manifest {
+  entries: ManifestEntry[]
+}
 
-  // Fintechs
-  { slug: 'mercadopago', displayName: 'Mercado Pago', providerType: 'fintech', countryCode: null, applicableTo: ['fintech'] },
-  { slug: 'wise',        displayName: 'Wise',         providerType: 'fintech', countryCode: null, applicableTo: ['fintech'] },
-  { slug: 'stripe',      displayName: 'Stripe',       providerType: 'fintech', countryCode: null, applicableTo: ['fintech'] },
-  { slug: 'paypal',      displayName: 'PayPal',       providerType: 'fintech', countryCode: null, applicableTo: ['fintech'] },
-  { slug: 'global66',    displayName: 'Global66',     providerType: 'fintech', countryCode: null, applicableTo: ['fintech'] },
+const isProviderType = (value: unknown): value is CanonicalProviderType =>
+  typeof value === 'string' && (CANONICAL_PROVIDER_TYPES as readonly string[]).includes(value)
 
-  // Payment platforms
-  { slug: 'deel', displayName: 'Deel', providerType: 'payment_platform', countryCode: null, applicableTo: ['payment_platform'] },
+const isInstrumentCategory = (value: unknown): value is CanonicalInstrumentCategory =>
+  typeof value === 'string' && (CANONICAL_INSTRUMENT_CATEGORIES as readonly string[]).includes(value)
 
-  // Payroll processors
-  { slug: 'previred', displayName: 'Previred', providerType: 'payroll_processor', countryCode: 'CL', applicableTo: ['payroll_processor'] },
+const deriveProvider = (entry: ManifestEntry): CanonicalProvider => {
+  if (!isProviderType(entry.providerType)) {
+    throw new Error(
+      `manifest.json entry "${entry.slug}" is missing or has an invalid providerType. ` +
+        `Expected one of: ${CANONICAL_PROVIDER_TYPES.join(', ')}`
+    )
+  }
 
-  // Platform operator (Greenhouse itself, internal ledgers — TASK-701)
-  { slug: 'greenhouse', displayName: 'Greenhouse', providerType: 'platform_operator', countryCode: null, applicableTo: ['shareholder_account'] }
-] as const
+  const applicableTo = (entry.applicableTo ?? []).filter(isInstrumentCategory)
+
+  if (applicableTo.length === 0) {
+    throw new Error(
+      `manifest.json entry "${entry.slug}" has empty or invalid applicableTo. ` +
+        `Expected non-empty subset of: ${CANONICAL_INSTRUMENT_CATEGORIES.join(', ')}`
+    )
+  }
+
+  return {
+    slug: entry.slug,
+    displayName: entry.brandName,
+    providerType: entry.providerType,
+    countryCode: entry.country ?? null,
+    applicableTo
+  }
+}
+
+export const CANONICAL_PROVIDERS: readonly CanonicalProvider[] = (manifestJson as Manifest).entries
+  .map(deriveProvider)
 
 export const CANONICAL_PROVIDER_SLUGS: ReadonlySet<string> = new Set(
   CANONICAL_PROVIDERS.map(p => p.slug)
@@ -90,3 +130,9 @@ export const CANONICAL_PROVIDER_SLUGS: ReadonlySet<string> = new Set(
 
 export const isCanonicalProviderSlug = (slug: string | null | undefined): slug is string =>
   typeof slug === 'string' && CANONICAL_PROVIDER_SLUGS.has(slug)
+
+export const getCanonicalProvider = (slug: string | null | undefined): CanonicalProvider | null => {
+  if (!slug) return null
+
+  return CANONICAL_PROVIDERS.find(p => p.slug === slug) ?? null
+}

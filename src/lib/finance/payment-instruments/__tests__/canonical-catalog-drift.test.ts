@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest'
 import { PROVIDER_CATALOG } from '@/config/payment-instruments'
 import {
   CANONICAL_PROVIDERS,
-  CANONICAL_PROVIDER_SLUGS
+  CANONICAL_PROVIDER_SLUGS,
+  CANONICAL_INSTRUMENT_CATEGORIES
 } from '@/lib/finance/payment-instruments/canonical-providers'
 
 const MIGRATIONS_DIR = path.resolve(process.cwd(), 'migrations')
@@ -27,16 +28,40 @@ const findLatestCanonicalResyncMigration = (): string => {
   return path.join(MIGRATIONS_DIR, matches[matches.length - 1])
 }
 
-const extractSeededSlugs = (sql: string): Set<string> => {
-  const slugs = new Set<string>()
-  const valuesPattern = /\(\s*'([a-z0-9-]+)'\s*,/gi
+interface MigrationRow {
+  slug: string
+  displayName: string
+  providerType: string
+  countryCode: string | null
+  applicableTo: string[]
+}
+
+/**
+ * Parses the INSERT VALUES rows from a resync migration. Mirrors the parser
+ * in scripts/catalog/check-drift.ts so we have PR-time + build-time + runtime
+ * coverage of the same drift class.
+ */
+const parseMigrationRows = (sql: string): MigrationRow[] => {
+  const rowPattern =
+    /\(\s*'([^']*(?:''[^']*)*)'\s*,\s*'([^']*(?:''[^']*)*)'\s*,\s*'([^']*(?:''[^']*)*)'\s*,\s*(NULL|'([^']*(?:''[^']*)*)')\s*,\s*ARRAY\[([^\]]+)\]\s*,\s*CURRENT_TIMESTAMP\s*\)/g
+
+  const rows: MigrationRow[] = []
   let match: RegExpExecArray | null
 
-  while ((match = valuesPattern.exec(sql)) !== null) {
-    slugs.add(match[1])
+  while ((match = rowPattern.exec(sql)) !== null) {
+    const slug = match[1].replace(/''/g, "'")
+    const displayName = match[2].replace(/''/g, "'")
+    const providerType = match[3].replace(/''/g, "'")
+    const countryCode = match[4] === 'NULL' ? null : (match[5] ?? '').replace(/''/g, "'")
+
+    const applicableTo = (match[6].match(/'([^']*(?:''[^']*)*)'/g) ?? []).map(s =>
+      s.slice(1, -1).replace(/''/g, "'")
+    )
+
+    rows.push({ slug, displayName, providerType, countryCode, applicableTo })
   }
 
-  return slugs
+  return rows
 }
 
 describe('canonical payment provider catalog — drift guard', () => {
@@ -45,8 +70,8 @@ describe('canonical payment provider catalog — drift guard', () => {
 
     expect(
       drift,
-      `Slugs present in src/config/payment-instruments.ts PROVIDER_CATALOG but missing from canonical-providers.ts: ${drift.join(', ')}. ` +
-        'Add them to CANONICAL_PROVIDERS and to the canonical-resync migration.'
+      `Slugs present in src/config/payment-instruments.ts PROVIDER_CATALOG but missing from CANONICAL_PROVIDERS (manifest-derived): ${drift.join(', ')}. ` +
+        'Add them to manifest.json and re-run pnpm catalog:resync.'
     ).toEqual([])
   })
 
@@ -64,13 +89,65 @@ describe('canonical payment provider catalog — drift guard', () => {
   it('every CANONICAL_PROVIDERS slug is seeded in the latest canonical-resync migration', () => {
     const migrationPath = findLatestCanonicalResyncMigration()
     const sql = readFileSync(migrationPath, 'utf8')
-    const seeded = extractSeededSlugs(sql)
+    const rows = parseMigrationRows(sql)
+    const seeded = new Set(rows.map(r => r.slug))
     const drift = CANONICAL_PROVIDERS.map(p => p.slug).filter(slug => !seeded.has(slug))
 
     expect(
       drift,
       `Slugs in CANONICAL_PROVIDERS but missing from ${path.basename(migrationPath)}: ${drift.join(', ')}. ` +
-        'Add them to the migration INSERT block.'
+        'Run: pnpm catalog:resync --reason "<short>" then pnpm migrate:up.'
+    ).toEqual([])
+  })
+
+  it('manifest-derived CANONICAL_PROVIDERS fields match the latest migration row-for-row', () => {
+    const migrationPath = findLatestCanonicalResyncMigration()
+    const sql = readFileSync(migrationPath, 'utf8')
+    const rows = parseMigrationRows(sql)
+    const rowsBySlug = new Map(rows.map(r => [r.slug, r]))
+
+    const drift: string[] = []
+
+    for (const provider of CANONICAL_PROVIDERS) {
+      const row = rowsBySlug.get(provider.slug)
+
+      if (!row) continue // covered by the previous test
+
+      if (row.displayName !== provider.displayName) {
+        drift.push(
+          `[${provider.slug}] displayName: manifest="${provider.displayName}" migration="${row.displayName}"`
+        )
+      }
+
+      if (row.providerType !== provider.providerType) {
+        drift.push(
+          `[${provider.slug}] providerType: manifest="${provider.providerType}" migration="${row.providerType}"`
+        )
+      }
+
+      if (row.countryCode !== (provider.countryCode ?? null)) {
+        drift.push(
+          `[${provider.slug}] countryCode: manifest=${JSON.stringify(provider.countryCode ?? null)} migration=${JSON.stringify(row.countryCode)}`
+        )
+      }
+
+      const manifestApplicable = [...provider.applicableTo].sort()
+      const migrationApplicable = [...row.applicableTo].sort()
+
+      if (
+        manifestApplicable.length !== migrationApplicable.length ||
+        manifestApplicable.some((v, i) => v !== migrationApplicable[i])
+      ) {
+        drift.push(
+          `[${provider.slug}] applicableTo: manifest=${JSON.stringify(manifestApplicable)} migration=${JSON.stringify(migrationApplicable)}`
+        )
+      }
+    }
+
+    expect(
+      drift,
+      `Deep drift between manifest (CANONICAL_PROVIDERS) and ${path.basename(migrationPath)}:\n  ${drift.join('\n  ')}\n` +
+        'Run: pnpm catalog:resync --reason "<short>" to regenerate the migration from manifest.'
     ).toEqual([])
   })
 
@@ -82,15 +159,7 @@ describe('canonical payment provider catalog — drift guard', () => {
   })
 
   it('CANONICAL_PROVIDERS.applicableTo values are all known instrument categories', () => {
-    const knownCategories = new Set([
-      'bank_account',
-      'credit_card',
-      'fintech',
-      'payment_platform',
-      'cash',
-      'payroll_processor',
-      'shareholder_account'
-    ])
+    const knownCategories = new Set<string>(CANONICAL_INSTRUMENT_CATEGORIES)
 
     for (const provider of CANONICAL_PROVIDERS) {
       for (const category of provider.applicableTo) {

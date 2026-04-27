@@ -36,13 +36,7 @@ describe('payment-instruments config — manifest drift guard', () => {
   it('every PROVIDER_CATALOG slug is registered in manifest.json', () => {
     const manifestSlugs = new Set(manifest.entries.map(entry => entry.slug))
 
-    // Greenhouse is the platform_operator — it lives outside the manifest
-    // because its assets ship with the brand, not with the payment-logos run.
-    const exempt = new Set(['greenhouse'])
-
-    const drift = Object.keys(PROVIDER_CATALOG)
-      .filter(slug => !exempt.has(slug))
-      .filter(slug => !manifestSlugs.has(slug))
+    const drift = Object.keys(PROVIDER_CATALOG).filter(slug => !manifestSlugs.has(slug))
 
     expect(
       drift,
