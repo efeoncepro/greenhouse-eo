@@ -1,5 +1,15 @@
 # changelog.md
 
+## 2026-04-27
+
+### 2026-04-27 — Admin Payment Instruments detail route
+
+- `/admin/payment-instruments/[id]` ahora existe como detalle operativo para instrumentos de pago creados desde Admin Center.
+- La lista de instrumentos ya no navega a una URL inexistente al abrir filas como `santander-clp`.
+- El detalle reutiliza el endpoint canónico `GET /api/admin/payment-instruments/[id]`, conserva el access plane vigente (`administracion.instrumentos_pago` / `admin` layout + finance tenant API guard) y muestra identificadores sensibles enmascarados.
+- Estados cubiertos: carga, error con retry, not found y navegación de regreso a `/admin/payment-instruments`.
+- Validación: `npx eslint src/app/'(dashboard)'/admin/payment-instruments/'[id]'/page.tsx src/views/greenhouse/admin/payment-instruments/PaymentInstrumentDetailView.tsx`; `npx tsc --noEmit --pretty false`.
+
 ## 2026-04-26
 
 ### 2026-04-26 — TASK-696 Smart Home v2 (Enterprise-grade redesign)

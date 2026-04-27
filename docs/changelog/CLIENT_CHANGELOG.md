@@ -42,6 +42,23 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.25
+
+**Canal:** Beta
+**Fecha:** 2026-04-27
+**Disponible para:** internal
+**Módulos:** Admin Center / Finanzas
+
+### Correcciones
+
+- El Admin Center ahora permite abrir el detalle de un instrumento de pago desde la lista sin caer en una pantalla 404.
+
+### Mejoras
+
+- El detalle muestra estado, proveedor, moneda, ruteo por defecto y trazabilidad básica del instrumento, con identificadores sensibles enmascarados.
+
+---
+
 ## 2026.04-beta.24
 
 **Canal:** Beta

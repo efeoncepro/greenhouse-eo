@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 
 /**
  * Canonical identity resolver for the Smart Home v2 Hero.
@@ -75,7 +76,12 @@ export const getHomeUserIdentity = async (userId: string): Promise<HomeUserIdent
       | 'client'
 
     const fullName = row.resolved_display_name ?? row.client_users_full_name ?? null
-    const avatarUrl = row.resolved_avatar_url ?? row.client_users_avatar_url ?? null
+    const rawAvatarUrl = row.resolved_avatar_url ?? row.client_users_avatar_url ?? null
+    // Canonical conversion: gs:// → /api/media/users/{userId}/avatar proxy.
+    // The proxy streams the GCS object after the auth check, so the public-
+    // media bucket stays fronted by Greenhouse and signed URLs aren't needed
+    // client-side. Same helper used by Person 360, Members and Assignments.
+    const avatarUrl = resolveAvatarUrl(rawAvatarUrl, row.user_id)
 
     const tenantLabel =
       tenantType === 'efeonce_internal'

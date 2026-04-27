@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — Admin Payment Instruments detail route
+
+- Trigger: la URL `https://greenhouse.efeoncepro.com/admin/payment-instruments/santander-clp` mostraba 404.
+- Causa confirmada: `PaymentInstrumentsListView` navega filas a `/admin/payment-instruments/${accountId}`, pero solo existia la pagina `/admin/payment-instruments`; el endpoint `GET /api/admin/payment-instruments/[id]` si existia.
+- Fix aplicado:
+  - Nueva route App Router `src/app/(dashboard)/admin/payment-instruments/[id]/page.tsx`.
+  - Nueva view `src/views/greenhouse/admin/payment-instruments/PaymentInstrumentDetailView.tsx`.
+  - La view reutiliza el endpoint canonico `[id]`, maneja loading/error/not-found/retry y enmascara identificadores sensibles (`accountNumber`, `accountNumberFull`, `providerIdentifier`, tarjeta).
+- Access model:
+  - Surface visible: `administracion.instrumentos_pago` bajo `AdminLayout`; fallback `routeGroups.includes('admin')`.
+  - Autorizacion backend: `requireFinanceTenantContext()` en `/api/admin/payment-instruments/[id]`.
+  - No se agregaron nuevas env vars ni capabilities persistidas.
+- Docs actualizados: `changelog.md`, `docs/changelog/CLIENT_CHANGELOG.md`, `docs/documentation/finance/modulos-caja-cobros-pagos.md`.
+- Validacion:
+  - `npx eslint src/app/'(dashboard)'/admin/payment-instruments/'[id]'/page.tsx src/views/greenhouse/admin/payment-instruments/PaymentInstrumentDetailView.tsx`
+  - `npx tsc --noEmit --pretty false`
+- Nota: el workspace ya tenia cambios abiertos de TASK-696 Home v2 antes de esta sesion; no se tocaron ni se revirtieron.
+
 ## Sesion 2026-04-26 — TASK-696 Smart Home v2 (Enterprise-grade redesign) iniciada
 
 - Task creada: `docs/tasks/in-progress/TASK-696-smart-home-v2-enterprise.md` (Lifecycle `in-progress`).

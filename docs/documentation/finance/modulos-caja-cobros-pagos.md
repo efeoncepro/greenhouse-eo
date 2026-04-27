@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-04-07 por Claude
-> **Ultima actualizacion:** 2026-04-08 por Codex
+> **Ultima actualizacion:** 2026-04-27 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 # Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja
@@ -168,6 +168,7 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Ver logos de proveedores (bancos, PayPal, Wise, Deel, etc.) en las tablas de cobros y pagos
 - Agrupar posición de caja por instrumento
 - Registrar nuevos instrumentos desde Admin Center (`/admin/payment-instruments`)
+- Abrir el detalle operativo de cada instrumento en `/admin/payment-instruments/[id]` para revisar proveedor, moneda, uso por defecto, estado y trazabilidad sin exponer identificadores completos
 
 ### Categorías de instrumentos
 
