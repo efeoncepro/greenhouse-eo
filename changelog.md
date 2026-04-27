@@ -2,6 +2,12 @@
 
 ## 2026-04-27
 
+### 2026-04-27 — Payment Instrument provider selectors
+
+- El drawer de creacion de `/admin/payment-instruments` reemplaza los selects de proveedor/red/emisor por un selector controlado por `slug`, con logos, busqueda, clear state y comparacion explicita para evitar selecciones que no persisten.
+- La creacion de tarjetas de credito ahora envia `cardNetwork` al contrato backend ademas de `providerSlug`, dejando la red seleccionada en el campo canonico del instrumento.
+- Validacion: `npx tsc --noEmit --pretty false`, `pnpm lint`, `pnpm build`.
+
 ### 2026-04-27 — Payment Instrument responsable selector y branding Santander
 
 - `/admin/payment-instruments/[id]` reemplaza el campo libre de `Responsable` por un selector backend-driven de usuarios internos activos con rol `finance_admin`, `finance_analyst` o `efeonce_admin`; el usuario actual aparece marcado como `(yo)` cuando es elegible.

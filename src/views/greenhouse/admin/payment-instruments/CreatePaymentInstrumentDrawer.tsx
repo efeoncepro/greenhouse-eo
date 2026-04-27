@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import Alert from '@mui/material/Alert'
+import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -82,6 +83,66 @@ const generateAccountId = (name: string, currency: string) =>
 
 const providerLogo = (logo: string | null | undefined) =>
   logo ? <Box component='img' src={logo} alt='' aria-hidden sx={{ height: 18, width: 'auto' }} /> : <i className='tabler-building-bank' aria-hidden />
+
+type ProviderOption = ReturnType<typeof getProvidersByCategory>[number]
+
+type ProviderAutocompleteProps = {
+  label: string
+  placeholder: string
+  providers: ProviderOption[]
+  value: string
+  onChange: (value: string) => void
+}
+
+const ProviderAutocomplete = ({ label, placeholder, providers, value, onChange }: ProviderAutocompleteProps) => {
+  const selectedProvider = providers.find(provider => provider.slug === value) ?? null
+
+  return (
+    <Autocomplete
+      fullWidth
+      size='small'
+      options={providers}
+      value={selectedProvider}
+      getOptionLabel={option => option.name}
+      isOptionEqualToValue={(option, selected) => option.slug === selected.slug}
+      noOptionsText='Sin proveedores disponibles'
+      clearText='Limpiar seleccion'
+      openText={`Abrir ${label.toLowerCase()}`}
+      closeText={`Cerrar ${label.toLowerCase()}`}
+      onChange={(_, provider) => onChange(provider?.slug ?? '')}
+      renderOption={(props, provider) => (
+        <Box component='li' {...props} key={provider.slug} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          {providerLogo(provider.logo)}
+          {provider.name}
+        </Box>
+      )}
+      renderInput={params => (
+        <CustomTextField
+          {...params}
+          label={label}
+          placeholder={placeholder}
+          InputProps={{
+            ...params.InputProps,
+            startAdornment: selectedProvider ? (
+              <>
+                {providerLogo(selectedProvider.logo)}
+                {params.InputProps.startAdornment}
+              </>
+            ) : (
+              params.InputProps.startAdornment
+            )
+          }}
+        />
+      )}
+      slotProps={{
+        paper: {
+          elevation: 8,
+          sx: { mt: 0.5 }
+        }
+      }}
+    />
+  )
+}
 
 const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [step, setStep] = useState<1 | 2>(1)
@@ -163,6 +224,7 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
             ...(form.bankAccountNumber.trim() && { bankAccountNumber: form.bankAccountNumber.trim() })
           }),
           ...(selectedCategory === 'credit_card' && {
+            ...(form.cardNetwork && { cardNetwork: form.cardNetwork }),
             ...(form.cardIssuerSlug && { cardIssuer: form.cardIssuerSlug }),
             ...(form.cardLast4.trim() && { cardLast4: form.cardLast4.trim() }),
             ...(form.cardLimitClp && { creditLimit: Number(form.cardLimitClp) }),
@@ -220,20 +282,6 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
 
     setConfirmOpen(true)
   }
-
-  const renderProviderMenu = (providers: ReturnType<typeof getProvidersByCategory>, placeholder: string) => (
-    <>
-      <MenuItem value=''>{placeholder}</MenuItem>
-      {providers.map(provider => (
-        <MenuItem key={provider.slug} value={provider.slug}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            {providerLogo(provider.logo)}
-            {provider.name}
-          </Box>
-        </MenuItem>
-      ))}
-    </>
-  )
 
   return (
     <>
@@ -361,9 +409,13 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
               {selectedCategory === 'bank_account' ? (
                 <>
                   <Grid size={{ xs: 12 }}>
-                    <CustomTextField select fullWidth size='small' label='Banco' value={form.bankProvider} onChange={event => updateForm('bankProvider', event.target.value)}>
-                      {renderProviderMenu(bankProviders, 'Seleccionar banco')}
-                    </CustomTextField>
+                    <ProviderAutocomplete
+                      label='Banco'
+                      placeholder='Seleccionar banco'
+                      providers={bankProviders}
+                      value={form.bankProvider}
+                      onChange={value => updateForm('bankProvider', value)}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <CustomTextField select fullWidth size='small' label='Tipo de cuenta' value={form.bankAccountType} onChange={event => updateForm('bankAccountType', event.target.value)}>
@@ -390,9 +442,13 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
               {selectedCategory === 'credit_card' ? (
                 <>
                   <Grid size={{ xs: 12 }}>
-                    <CustomTextField select fullWidth size='small' label='Red' value={form.cardNetwork} onChange={event => updateForm('cardNetwork', event.target.value)}>
-                      {renderProviderMenu(cardNetworkProviders, 'Seleccionar red')}
-                    </CustomTextField>
+                    <ProviderAutocomplete
+                      label='Red'
+                      placeholder='Seleccionar red'
+                      providers={cardNetworkProviders}
+                      value={form.cardNetwork}
+                      onChange={value => updateForm('cardNetwork', value)}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <Typography variant='caption' color='text.secondary' sx={{ mb: 0.5, display: 'block' }}>
@@ -413,9 +469,13 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
                     </ToggleButtonGroup>
                   </Grid>
                   <Grid size={{ xs: 12 }}>
-                    <CustomTextField select fullWidth size='small' label='Emisor' value={form.cardIssuerSlug} onChange={event => updateForm('cardIssuerSlug', event.target.value)}>
-                      {renderProviderMenu(form.cardIssuerType === 'bank' ? bankProviders : fintechProviders, 'Seleccionar emisor')}
-                    </CustomTextField>
+                    <ProviderAutocomplete
+                      label='Emisor'
+                      placeholder='Seleccionar emisor'
+                      providers={form.cardIssuerType === 'bank' ? bankProviders : fintechProviders}
+                      value={form.cardIssuerSlug}
+                      onChange={value => updateForm('cardIssuerSlug', value)}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 4 }}>
                     <CustomTextField
@@ -439,9 +499,13 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
               {selectedCategory === 'fintech' ? (
                 <>
                   <Grid size={{ xs: 12 }}>
-                    <CustomTextField select fullWidth size='small' label='Proveedor' value={form.fintechProvider} onChange={event => updateForm('fintechProvider', event.target.value)}>
-                      {renderProviderMenu(fintechProviders, 'Seleccionar fintech')}
-                    </CustomTextField>
+                    <ProviderAutocomplete
+                      label='Proveedor'
+                      placeholder='Seleccionar fintech'
+                      providers={fintechProviders}
+                      value={form.fintechProvider}
+                      onChange={value => updateForm('fintechProvider', value)}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <CustomTextField fullWidth size='small' label='Email o ID de cuenta' value={form.fintechAccountId} onChange={event => updateForm('fintechAccountId', event.target.value)} />
@@ -452,9 +516,13 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
               {selectedCategory === 'payment_platform' ? (
                 <>
                   <Grid size={{ xs: 12 }}>
-                    <CustomTextField select fullWidth size='small' label='Proveedor' value={form.platformProvider} onChange={event => updateForm('platformProvider', event.target.value)}>
-                      {renderProviderMenu(platformProviders, 'Seleccionar plataforma')}
-                    </CustomTextField>
+                    <ProviderAutocomplete
+                      label='Proveedor'
+                      placeholder='Seleccionar plataforma'
+                      providers={platformProviders}
+                      value={form.platformProvider}
+                      onChange={value => updateForm('platformProvider', value)}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <CustomTextField fullWidth size='small' label='Workspace / Merchant ID' value={form.platformMerchantId} onChange={event => updateForm('platformMerchantId', event.target.value)} />
@@ -465,9 +533,13 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
               {selectedCategory === 'payroll_processor' ? (
                 <>
                   <Grid size={{ xs: 12 }}>
-                    <CustomTextField select fullWidth size='small' label='Proveedor' value={form.payrollProvider} onChange={event => updateForm('payrollProvider', event.target.value)}>
-                      {renderProviderMenu(payrollProviders, 'Seleccionar proveedor')}
-                    </CustomTextField>
+                    <ProviderAutocomplete
+                      label='Proveedor'
+                      placeholder='Seleccionar proveedor'
+                      providers={payrollProviders}
+                      value={form.payrollProvider}
+                      onChange={value => updateForm('payrollProvider', value)}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12 }}>
                     <CustomTextField fullWidth size='small' label='RUT empresa' value={form.payrollRut} onChange={event => updateForm('payrollRut', event.target.value)} />
