@@ -42,7 +42,11 @@ const ALL_BLOCKS: HomeBlockId[] = [
   'closing-countdown',
   'ai-insights-bento',
   'recents-rail',
-  'reliability-ribbon'
+  'reliability-ribbon',
+  'calendar-rail',
+  'runway-strategic',
+  'ai-briefing',
+  'at-risk-watchlist'
 ]
 
 const SCOPE_PRECEDENCE: Record<FlagRow['scope_type'], number> = {
