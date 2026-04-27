@@ -51,7 +51,8 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
   'integrations.notion': ['notion', 'notion-bq-sync', 'delivery_tasks', 'notion_ops'],
   'integrations.teams': ['teams_notification', 'teams-bot', 'bot framework', 'graph chat', 'graph channel'],
   cloud: ['cloud sql', 'bigquery', 'sentry', 'vercel cron', 'cloud run', 'gcp'],
-  delivery: ['ico-engine', 'ico_engine', 'sprint', 'delivery_tasks', 'reactive worker', 'agency operations']
+  delivery: ['ico-engine', 'ico_engine', 'sprint', 'delivery_tasks', 'reactive worker', 'agency operations'],
+  home: ['home block', 'home snapshot', 'home pulse', 'home today', 'home insights', 'home recents']
 }
 
 /**
@@ -64,6 +65,7 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   'integrations.notion': 25,
   'integrations.teams': 22,
   delivery: 20,
+  home: 15,
   cloud: 1
 }
 

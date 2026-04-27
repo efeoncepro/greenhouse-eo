@@ -771,3 +771,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-693` | `to-do` | Notification Hub Bidireccional + UI Preferences + Mentions | `docs/tasks/to-do/TASK-693-notification-hub-bidirectional-ui.md` |
 | `TASK-694` | `to-do` | Deep Link Platform Foundation | `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md` |
 | `TASK-695` | `to-do` | Nexa Insights via Notification Hub (Teams + In-App + Email) | `docs/tasks/to-do/TASK-695-nexa-insights-teams-delivery.md` |
+| `TASK-696` | `in-progress` | Smart Home v2 (Enterprise-grade redesign — registry + contract + observability + 7 blocks) | `docs/tasks/in-progress/TASK-696-smart-home-v2-enterprise.md` |

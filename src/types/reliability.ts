@@ -18,12 +18,14 @@ export type ReliabilityModuleKey =
   | 'integrations.teams'
   | 'cloud'
   | 'delivery'
+  | 'home'
 
 export type ReliabilityModuleDomain =
   | 'platform'
   | 'integrations'
   | 'finance'
   | 'delivery'
+  | 'home'
 
 export type ReliabilitySignalKind =
   | 'runtime'

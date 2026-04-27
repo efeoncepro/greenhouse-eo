@@ -1,5 +1,15 @@
 # TASK-449 — Nexa Insights Interaction Layer (Read / Pin / Dismiss / Share)
 
+## Delta 2026-04-26
+
+- **Subsumida parcialmente por TASK-696** (Smart Home v2 Enterprise-grade redesign).
+- TASK-696 entregó la superficie ejecutable como `HomeAiInsightsBento` con drill-in, severidad chip, recommended action preview y route a `/agency/insights/<id>`. El bento se carga vía `loadHomeAiInsightsBento` desde `readTopAiLlmEnrichments` (mismo source que `NexaInsightsBlock`).
+- **Lo que queda específico de TASK-449** (no cubierto por TASK-696):
+  - Estados persistentes per-user: read / pinned / dismissed (requiere migración nueva tipo `greenhouse_serving.user_insight_states`).
+  - Share contextual con Teams (atajo a `notification_hub` con destino canal/persona).
+  - "Marcar como leído" inline desde la card del bento (extensión del comportamiento del componente, no de su contrato).
+- Re-evaluar scope: probablemente esto se vuelve TASK-449.1 sobre el bento ya construido, no un proyecto independiente.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

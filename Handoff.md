@@ -1,5 +1,21 @@
 # Handoff.md
 
+## Sesion 2026-04-26 — TASK-696 Smart Home v2 (Enterprise-grade redesign) iniciada
+
+- Task creada: `docs/tasks/in-progress/TASK-696-smart-home-v2-enterprise.md` (Lifecycle `in-progress`).
+- Registry actualizado: `TASK-696` reservado; `docs/tasks/README.md` lista la entrada bajo "In Progress".
+- Branch: `task/TASK-696-smart-home-v2-enterprise` (cortada desde `develop`).
+- Plan v3 enterprise aprobado:
+  - 4 capas: Contract `home-snapshot.v1` versionado + Home Block Registry declarativo + Data Layer mixto (pre-compute Pulse Strip / realtime Inbox+Recents) + Render consumer-agnostic.
+  - 7 bloques: Hero AI, Pulse Strip, Tu Dia Inbox, Closing Countdown, AI Insights Bento, Continua Con Rail, Reliability Ribbon.
+  - 4 migraciones aditivas: `home_block_flags`, `home_pulse_snapshots`, `user_recent_items`, `users.home_default_view + ui_density`.
+  - Reuse Vuexy full-version: `cmdk` palette, `ActivityTimeline`, `StatsWithAreaChart`, `SendMsgForm`, Customizer.
+  - Reuse readers canonicos: Platform Health V1 composer, Reliability Control Plane, Nexa Insights, NotificationService, getHomeFinanceStatus.
+  - Charts: ApexCharts en sparklines, ECharts reservada para hero charts futuros (policy 2026-04-26).
+  - Rollout escalado: feature flag `HOME_V2_ENABLED` (global/tenant/role/user) + toggle a v1 por 4 semanas.
+- Tasks afectadas: `TASK-402` (absorbida parcialmente), `TASK-449` (subsumida en Slice 3); coordinar con `TASK-110/115` (Nexa UI in-progress).
+- Implementacion en 4 slices: Slice 0 Foundation → Slice 1 Bento+Pulse+CmdK → Slice 2 Inbox+Closing+Hero → Slice 3 Insights+Recents+Reliability+Rollout. Total ~10 dias.
+
 ## Sesion 2026-04-26 — Greenhouse Deep Link Platform documentada
 
 - Se documento la arquitectura canonica de deep links en `docs/architecture/GREENHOUSE_DEEP_LINK_PLATFORM_V1.md`.

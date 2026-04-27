@@ -1,0 +1,191 @@
+/**
+ * TASK-696 — Command Palette (cmdk + Radix Dialog) styles for the Smart Home.
+ * Greenhouse adaptation of the Vuexy `NavSearch` palette: keeps the keyboard
+ * affordances (`⌘K`, `↑/↓ to navigate`, `↵ to open`, `esc to close`) but maps
+ * to Greenhouse routes and tokens.
+ */
+
+[cmdk-overlay] {
+  position: fixed;
+  inset: 0;
+  background: var(--mui-palette-background-paper);
+  background: color-mix(in oklch, var(--mui-palette-text-primary) 35%, transparent);
+  z-index: 1300;
+  animation: gh-cmdk-fade 150ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+[cmdk-dialog] {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: min(640px, 92vw);
+  max-height: min(520px, 80vh);
+  background: var(--mui-palette-background-paper);
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: var(--mui-shape-customBorderRadius-lg, 8px);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18), 0 4px 12px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  overflow: hidden;
+  z-index: 1301;
+  animation: gh-cmdk-pop 200ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+@keyframes gh-cmdk-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes gh-cmdk-pop {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.98); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [cmdk-overlay], [cmdk-dialog] {
+    animation: none;
+  }
+}
+
+[cmdk-input] {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--mui-palette-text-primary);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  width: 100%;
+  padding-block: 4px;
+}
+
+[cmdk-input]::placeholder {
+  color: var(--mui-palette-text-disabled);
+}
+
+[cmdk-list] {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 0;
+  scroll-padding-block: 8px;
+}
+
+[cmdk-group] + [cmdk-group] {
+  margin-top: 4px;
+}
+
+[cmdk-group-heading] {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--mui-palette-text-secondary);
+  padding: 6px 16px 4px;
+}
+
+[cmdk-item] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: var(--mui-palette-text-primary);
+  cursor: pointer;
+  border-radius: var(--mui-shape-customBorderRadius-md, 6px);
+  margin: 0 8px;
+  user-select: none;
+  transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+[cmdk-item][data-selected='true'],
+[cmdk-item][aria-selected='true'] {
+  background: color-mix(in oklch, var(--mui-palette-primary-main) 12%, transparent);
+}
+
+[cmdk-item][data-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+[cmdk-item] i {
+  font-size: 18px;
+  color: var(--mui-palette-text-secondary);
+}
+
+[cmdk-item][data-selected='true'] i,
+[cmdk-item][aria-selected='true'] i {
+  color: var(--mui-palette-primary-main);
+}
+
+.gh-cmdk-shortcuts {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.gh-cmdk-shortcuts kbd,
+.gh-cmdk-footer kbd {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mui-palette-text-secondary);
+  background: var(--mui-palette-action-hover);
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: 4px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+
+.gh-cmdk-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--mui-palette-divider);
+}
+
+.gh-cmdk-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--mui-palette-text-secondary);
+  font-size: 14px;
+}
+
+.gh-cmdk-footer {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--mui-palette-divider);
+  font-size: 12px;
+  color: var(--mui-palette-text-secondary);
+  background: var(--mui-palette-action-hover);
+}
+
+.gh-cmdk-footer-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gh-cmdk-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--mui-shape-customBorderRadius-md, 6px);
+  border: 1px solid var(--mui-palette-divider);
+  background: var(--mui-palette-background-default);
+  color: var(--mui-palette-text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.gh-cmdk-trigger:hover {
+  background: var(--mui-palette-action-hover);
+}
+
+.gh-cmdk-trigger i {
+  font-size: 16px;
+}
