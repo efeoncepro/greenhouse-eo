@@ -772,3 +772,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-694` | `to-do` | Deep Link Platform Foundation | `docs/tasks/to-do/TASK-694-deep-link-platform-foundation.md` |
 | `TASK-695` | `to-do` | Nexa Insights via Notification Hub (Teams + In-App + Email) | `docs/tasks/to-do/TASK-695-nexa-insights-teams-delivery.md` |
 | `TASK-696` | `in-progress` | Smart Home v2 (Enterprise-grade redesign — registry + contract + observability + 7 blocks) | `docs/tasks/in-progress/TASK-696-smart-home-v2-enterprise.md` |
+| `TASK-697` | `to-do` | Payment Instrument Admin Workspace Enterprise | `docs/tasks/to-do/TASK-697-payment-instrument-admin-workspace-enterprise.md` |

@@ -1,5 +1,14 @@
 # Handoff.md
 
+## Sesion 2026-04-27 — TASK-697 Payment Instrument Admin Workspace creada
+
+- Task creada: `docs/tasks/to-do/TASK-697-payment-instrument-admin-workspace-enterprise.md`.
+- Registry actualizado: `TASK-697` reservado; `docs/tasks/README.md` lista la entrada y deja siguiente ID disponible `TASK-698`.
+- Objetivo: convertir `/admin/payment-instruments/[id]` desde detalle defensivo/read-only hacia workspace enterprise bank-grade para administracion real de instrumentos de pago.
+- La task queda como follow-up incremental de `TASK-281/282/283`, sin reemplazar `greenhouse_finance.accounts`, sin romper `/api/finance/accounts`, Banco, Cobros, Pagos ni Conciliacion.
+- La spec exige sinergia obligatoria de skills repo/global de UI, UX y microinteracciones, y refuerza backend seguro: serializer sin sensibles por defecto, reveal auditado, capabilities finas, impacto antes de mutar y validaciones server-side.
+- No hubo cambios runtime en esta mini-sesion; solo documentacion operativa.
+
 ## Sesion 2026-04-27 — Admin Payment Instruments detail route
 
 - Trigger: la URL `https://greenhouse.efeoncepro.com/admin/payment-instruments/santander-clp` mostraba 404.
