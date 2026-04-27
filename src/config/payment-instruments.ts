@@ -104,13 +104,12 @@ export const PROVIDER_CATALOG: Record<string, ProviderDefinition> = {
     // test at src/config/__tests__/payment-instruments-manifest-drift.test.ts
     // fails the build if they diverge.
     //
-    // logo        → high-fidelity isotype (PNG 1920×1492). The .svg.png
-    //               filename is intentional per manifest provenance; the
-    //               file is a real PNG and the browser resolves it via
-    //               actual MIME, not extension.
-    // compactLogo → multicolor lockup variant declared as `mark-positive`
-    //               in the manifest. Used by the list/chip in tight rows.
-    logo: '/images/logos/payment/Mastercard-logo.svg.png',
+    // Both logo and compactLogo point to the same SVG: it's the canonical
+    // multicolor lockup (vector, scales cleanly at any size). SVG > PNG for
+    // brand marks served to the browser. The legacy PNG asset on disk
+    // (Mastercard-logo.svg.png, 1920×1492) is left for offline/audit use
+    // only and intentionally not referenced from the runtime catalog.
+    logo: '/images/logos/payment/Mastercard-Logo.wine.svg',
     compactLogo: '/images/logos/payment/Mastercard-Logo.wine.svg'
   },
   amex: {
