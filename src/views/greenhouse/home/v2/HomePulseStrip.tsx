@@ -72,6 +72,8 @@ const formatStats = (card: PulseKpiCard): string => {
 
 const trendForCard = (card: PulseKpiCard): StatsWithAreaChartProps['trend'] => {
   if (card.deltaPct == null) return undefined
+  // Don't render a trend chip for sub-noise deltas — "+0.0%" is visual debt.
+  if (Math.abs(card.deltaPct) < 0.5) return undefined
   if (card.trend === 'up') return 'positive'
   if (card.trend === 'down') return 'negative'
 
@@ -80,6 +82,7 @@ const trendForCard = (card: PulseKpiCard): StatsWithAreaChartProps['trend'] => {
 
 const trendNumberForCard = (card: PulseKpiCard): string | undefined => {
   if (card.deltaPct == null) return undefined
+  if (Math.abs(card.deltaPct) < 0.5) return undefined
 
   return `${(Math.round(Math.abs(card.deltaPct) * 10) / 10).toFixed(1)}%`
 }
