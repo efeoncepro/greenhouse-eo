@@ -1,3 +1,16 @@
+<!-- Deltas precede the canonical h1 below; they accumulate top-down. -->
+
+## Delta 2026-04-27 — Smart Home v2 role-aware composer cubre el patrón canónico (TASK-696 Wave 6)
+
+El Home v2 implementa el patrón completo de role-differentiation server-side:
+
+- `HOME_BLOCK_REGISTRY` declara `audiences[]` + `requires: { capability, action, scope }` por bloque.
+- El composer (`src/lib/home/compose-home-snapshot.ts`) pasa por **dos gates** antes de invocar el loader: (1) audience filter, (2) `can(entitlements, capability, action, scope)`. Bloque hidden si falla cualquiera — payload nunca cruza el wire.
+- Wave 6 agregó 7 nuevas capabilities (`home.runway`, `home.briefing.daily`, `home.atrisk.spaces|invoices|members|projects`) bound en `getTenantEntitlements()` por role. CEO ve todo; finance/hr/delivery ven el subset role-scoped.
+- Patrón aplicable a notifications: cuando esta task se reactive, replicar el shape — capability per notification kind + composer gate + role-aware payload. Reusar `can()` de `@/lib/entitlements/runtime`, no inventar nuevo binding.
+
+El blocker original ya está resuelto. Esta task ahora debería re-enfocarse a notifications (no a la home), aplicando el mismo pattern.
+
 ## Delta 2026-04-16
 
 - TASK-285 completada — roles diferenciados via `role_view_assignments`. Blocker resuelto.

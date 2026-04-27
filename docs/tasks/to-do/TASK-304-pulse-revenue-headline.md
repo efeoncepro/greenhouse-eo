@@ -1,5 +1,13 @@
 # TASK-304 — Pulse Revenue Enabled Headline
 
+## Delta 2026-04-27 — TASK-696 Smart Home v2 expone audience-aware Pulse Strip listo para Revenue Enabled
+
+El Smart Home v2 ya tiene un Pulse Strip role-aware (`src/lib/home/loaders/load-pulse-strip.ts`) con 4 KPI cards por audience. Cuando TASK-287 (Revenue Enabled standalone) entregue su API canónica, agregar la card de Revenue Enabled al `buildRealtimeCardsForAudience('admin')` (CEO) y `'internal'` (mid-mgr). Reusar `StatsWithAreaChart` con sparkline 6mo de Revenue Enabled trend.
+
+Capability gate: agregar `home.revenue_enabled.read` al catalog y bind a roles que ya tengan `client_portal.revenue_enabled` (TASK-287 spec). Composer ya soporta `requires: { capability, action }` en el registry.
+
+No bloquea el cierre de TASK-304 — solo apunta el patrón a usar cuando TASK-287 esté ready. Es un commit de ~30 líneas (entry en loader + entry en registry).
+
 ## Status
 
 - Lifecycle: `to-do`

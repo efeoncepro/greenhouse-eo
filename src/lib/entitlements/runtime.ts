@@ -221,6 +221,14 @@ export const getTenantEntitlements = (subject: TenantEntitlementSubject): Tenant
       scope: 'tenant',
       source
     })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_instruments.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
   }
 
   if (
@@ -235,6 +243,44 @@ export const getTenantEntitlements = (subject: TenantEntitlementSubject): Tenant
       action: 'read',
       scope: 'tenant',
       source: hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = 'role'
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_instruments.update',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_instruments.manage_defaults',
+      action: 'manage',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_instruments.deactivate',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_instruments.reveal_sensitive',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
     })
   }
 
@@ -335,6 +381,49 @@ export const getTenantEntitlements = (subject: TenantEntitlementSubject): Tenant
   if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN)) {
     addEntitlement(entries, { module: 'commercial', capability: 'commercial.party.promote_to_client', action: 'update', scope: 'tenant', source: 'role' })
     addEntitlement(entries, { module: 'commercial', capability: 'commercial.quote_to_cash.execute', action: 'approve', scope: 'tenant', source: 'role' })
+  }
+
+  // ─── TASK-696 Wave 6 — Smart Home strategic blocks (CEO/role-aware) ───
+  // Capability bindings authoritative for Home block rendering. Each gate is
+  // checked server-side in the composer before the loader runs — payload
+  // never leaves the snapshot when the user lacks the capability.
+
+  // home.briefing.daily — every authenticated user gets the AI briefing in
+  // their own scope; the narrative content varies by audience inside the
+  // loader (CEO vs finance vs hr vs delivery vs collaborator).
+  addEntitlement(entries, { module: 'home', capability: 'home.briefing.daily', action: 'read', scope: 'own', source: 'policy' })
+
+  // home.runway — finance + CEO. Organization scope (the whole tenant cash
+  // position, not per-team).
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ANALYST)) {
+    addEntitlement(entries, { module: 'finance', capability: 'home.runway', action: 'read', scope: 'organization', source: 'role' })
+  }
+
+  // home.atrisk.spaces — only CEO/admin sees the cross-tenant Top 5 risk list.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, { module: 'agency', capability: 'home.atrisk.spaces', action: 'read', scope: 'organization', source: 'role' })
+  }
+
+  // home.atrisk.invoices — finance roles + CEO.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ANALYST)) {
+    addEntitlement(entries, { module: 'finance', capability: 'home.atrisk.invoices', action: 'read', scope: 'organization', source: 'role' })
+  }
+
+  // home.atrisk.members — HR roles + CEO. Tenant scope (covers all members
+  // of the organization).
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.HR_MANAGER) || hasRole(subject, ROLE_CODES.HR_PAYROLL)) {
+    addEntitlement(entries, { module: 'hr', capability: 'home.atrisk.members', action: 'read', scope: 'tenant', source: 'role' })
+  }
+
+  // home.atrisk.projects — delivery / operations roles + CEO. Team scope —
+  // operations leads see their teams, CEO sees all (handled by the loader,
+  // not by the capability).
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
+  ) {
+    addEntitlement(entries, { module: 'agency', capability: 'home.atrisk.projects', action: 'read', scope: 'team', source: 'role' })
   }
 
   const resolvedEntries = Array.from(entries.values())

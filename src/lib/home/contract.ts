@@ -31,6 +31,9 @@ export type HomeBlockId =
   | 'recents-rail'
   | 'reliability-ribbon'
   | 'calendar-rail'
+  | 'runway-strategic'
+  | 'ai-briefing'
+  | 'at-risk-watchlist'
 
 export type HomeSlotKey = 'hero' | 'pulse' | 'main' | 'aside' | 'footer'
 
@@ -215,6 +218,65 @@ export interface HomeCalendarEvent {
 
 export interface HomeCalendarRailData {
   events: HomeCalendarEvent[]
+  asOf: string
+}
+
+// -- Runway / Cash Position (CEO + finance) ----------------------------------
+
+export interface HomeRunwayData {
+  cashCurrent: number | null
+  burnMonthly: number | null
+  runwayMonths: number | null
+  cashCurrency: 'CLP' | 'USD' | 'UF'
+  trend: PulseTrendDirection
+  deltaPct: number | null
+  monthlyHistory: Array<{ periodLabel: string; cash: number; burn: number }>
+  status: PulseStatus
+  drillHref: string | null
+  asOf: string
+  computedFrom: 'income_minus_expenses' | 'manual_balance'
+}
+
+// -- AI Briefing (proactive narrative, role-aware) ---------------------------
+
+export type AiBriefingNarrativeKind = 'business' | 'team' | 'platform' | 'finance' | 'hr' | 'delivery' | 'personal'
+
+export interface AiBriefingNarrative {
+  kind: AiBriefingNarrativeKind
+  title: string
+  body: string
+  signalCount?: number | null
+  drillHref?: string | null
+}
+
+export interface HomeAiBriefingData {
+  narratives: AiBriefingNarrative[]
+  modelLabel: string
+  generatedAt: string
+  source: 'precomputed' | 'realtime'
+  audienceScope: 'ceo' | 'finance' | 'hr' | 'delivery' | 'internal' | 'personal'
+}
+
+// -- At-Risk Watchlist (role-aware payload) ----------------------------------
+
+export type AtRiskKind = 'space' | 'invoice' | 'member' | 'project'
+
+export interface AtRiskItem {
+  itemId: string
+  kind: AtRiskKind
+  title: string
+  subtitle: string | null
+  riskScore: number
+  riskBand: 'critical' | 'attention' | 'monitor'
+  drivers: string[]
+  href: string | null
+  metric?: { label: string; value: string } | null
+}
+
+export interface HomeAtRiskWatchlistData {
+  audienceScope: 'ceo' | 'finance' | 'hr' | 'delivery'
+  domainLabel: string
+  items: AtRiskItem[]
   asOf: string
 }
 

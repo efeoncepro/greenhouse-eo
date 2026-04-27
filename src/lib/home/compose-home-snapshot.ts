@@ -18,13 +18,16 @@ import {
 } from './contract'
 import { resolveHomeBlockFlags } from './flags'
 import { HOME_BLOCK_REGISTRY, isBlockEligible, type HomeBlockDefinition, type HomeLoaderContext } from './registry'
+import { loadHomeAiBriefing } from './loaders/load-ai-briefing'
 import { loadHomeAiInsightsBento } from './loaders/load-ai-insights-bento'
+import { loadHomeAtRiskWatchlist } from './loaders/load-at-risk-watchlist'
 import { loadHomeCalendarRail } from './loaders/load-calendar-rail'
 import { loadHomeClosingCountdown } from './loaders/load-closing-countdown'
 import { loadHomeHeroAi } from './loaders/load-hero-ai'
 import { loadHomePulseStrip } from './loaders/load-pulse-strip'
 import { loadHomeRecentsRail } from './loaders/load-recents-rail'
 import { loadHomeReliabilityRibbon } from './loaders/load-reliability-ribbon'
+import { loadHomeRunwayStrategic } from './loaders/load-runway-strategic'
 import { loadHomeTodayInbox } from './loaders/load-today-inbox'
 import { captureHomeError, recordHomeBlockOutcome, recordHomeRender } from './observability'
 
@@ -55,7 +58,10 @@ const ALL_LOADERS = {
   'ai-insights-bento': loadHomeAiInsightsBento,
   'recents-rail': loadHomeRecentsRail,
   'reliability-ribbon': loadHomeReliabilityRibbon,
-  'calendar-rail': loadHomeCalendarRail
+  'calendar-rail': loadHomeCalendarRail,
+  'runway-strategic': loadHomeRunwayStrategic,
+  'ai-briefing': loadHomeAiBriefing,
+  'at-risk-watchlist': loadHomeAtRiskWatchlist
 } as const
 
 type LoaderFor<TBlockId extends keyof typeof ALL_LOADERS> = (typeof ALL_LOADERS)[TBlockId]

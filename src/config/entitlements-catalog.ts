@@ -112,6 +112,36 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    key: 'finance.payment_instruments.read',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_instruments.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_instruments.deactivate',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_instruments.manage_defaults',
+    module: 'finance',
+    actions: ['manage'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_instruments.reveal_sensitive',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'admin.workspace',
     module: 'admin',
     actions: ['read', 'manage', 'launch'] as const,
@@ -200,6 +230,46 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'admin',
     actions: ['read'] as const,
     defaultScope: 'all'
+  },
+
+  // ─── TASK-696 Wave 6 — Smart Home strategic blocks (CEO/role-aware) ───
+  // Each capability gates a Home block. The block is hidden server-side when
+  // the user lacks the capability — payload never leaves the composer.
+  {
+    key: 'home.runway',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'organization'
+  },
+  {
+    key: 'home.briefing.daily',
+    module: 'home',
+    actions: ['read'] as const,
+    defaultScope: 'own'
+  },
+  {
+    key: 'home.atrisk.spaces',
+    module: 'agency',
+    actions: ['read'] as const,
+    defaultScope: 'organization'
+  },
+  {
+    key: 'home.atrisk.invoices',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'organization'
+  },
+  {
+    key: 'home.atrisk.members',
+    module: 'hr',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'home.atrisk.projects',
+    module: 'agency',
+    actions: ['read'] as const,
+    defaultScope: 'team'
   }
 ] as const
 

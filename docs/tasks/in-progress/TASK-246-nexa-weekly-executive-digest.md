@@ -1,5 +1,18 @@
 # TASK-246 — Narrativa ejecutiva semanal de Nexa
 
+## Delta 2026-04-27 — convergencia con Smart Home v2 AI Briefing (TASK-696 Wave 6)
+
+TASK-696 entregó el bloque `ai-briefing` en el Smart Home v2 (`src/lib/home/loaders/load-ai-briefing.ts` + `src/views/greenhouse/home/v2/HomeAiBriefing.tsx`) con narrativa proactiva **diaria, role-aware, in-app**. Comparte fuentes con esta task (Pulse data + ICO LLM enrichments + NotificationService).
+
+Convergencia recomendada cuando esta task se reactive:
+
+- Pre-compute table canónica para AI Briefing: `greenhouse_serving.home_ai_briefings (audience_key, role_code, narratives_jsonb, generated_at, ttl_ends_at)` — el reader del Home ya consulta ahí. El cron de TASK-246 puede poblar esa tabla cada lunes 7 AM Santiago Y diariamente para el Home (mismo composer, dos triggers).
+- El email digest semanal reusa el mismo `narratives_jsonb` shape (`AiBriefingNarrative[]`) — cada `narrative` ya trae `title + body + signalCount + drillHref`, listo para template HTML.
+- Mention parsing: el Home renderiza `body` con `<NexaMentionText>` (chip clickeable). El email rinde `body` con HTML links explícitos (mismo regex en server-side).
+- Capability gate alineada: `home.briefing.daily.read.own` (Wave 6) ya está bound en `getTenantEntitlements()` para todos los users. El email digest se envía a quienes tengan esa capability (sin mover roles).
+
+No bloquea el cierre de TASK-246 — solo unifica el composer. Cuando se ejecute, **NO** crear un segundo composer; consumir `loadHomeAiBriefing` con el mismo audience/role argument.
+
 ## Status
 
 - Lifecycle: `in-progress`

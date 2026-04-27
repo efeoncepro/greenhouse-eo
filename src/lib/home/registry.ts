@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { EntitlementAction, EntitlementCapabilityKey, EntitlementScope } from '@/config/entitlements-catalog'
+import { can } from '@/lib/entitlements/runtime'
 import type { HomeAudienceKey, TenantEntitlements } from '@/lib/entitlements/types'
 
 import type { HomeBlockId, HomeSlotKey } from './contract'
@@ -34,12 +36,29 @@ export interface HomeLoaderContext {
   now: string
 }
 
+export interface HomeBlockCapabilityGate {
+  capability: EntitlementCapabilityKey
+  action: EntitlementAction
+  scope?: EntitlementScope
+}
+
 export interface HomeBlockDefinition {
   blockId: HomeBlockId
   slot: HomeSlotKey
   audiences: ReadonlyArray<HomeAudienceKey>
-  /** Optional capability gate evaluated against `entitlements`. */
+  /**
+   * Coarse module-level pre-check (legacy hook for blocks gated by module
+   * presence rather than canonical capability). Most new blocks should
+   * declare `requires` instead, which goes through `can()`.
+   */
   requiresCapability?: (entitlements: TenantEntitlements) => boolean
+  /**
+   * Canonical capability gate evaluated server-side via `can()`. When
+   * present and the user lacks the capability, the block is hidden and
+   * the loader is never invoked. Authoritative for sensitive blocks
+   * (Runway, At-Risk Watchlist, AI Briefing).
+   */
+  requires?: HomeBlockCapabilityGate
   /** Sort priority within a slot (lower renders first). */
   priority: number
   /** Maximum lifetime in the in-process cache. */
@@ -124,6 +143,45 @@ export const HOME_BLOCK_REGISTRY: ReadonlyArray<HomeBlockDefinition> = [
     componentKey: 'recents-rail'
   } satisfies HomeBlockDefinition,
   {
+    blockId: 'runway-strategic',
+    slot: 'main',
+    audiences: ['admin', 'finance', 'internal'],
+    requires: { capability: 'home.runway', action: 'read' },
+    priority: 22,
+    cacheTtlMs: 60_000,
+    timeoutMs: 4_000,
+    precomputed: false,
+    fallback: 'hide',
+    componentKey: 'runway-strategic'
+  } satisfies HomeBlockDefinition,
+  {
+    blockId: 'ai-briefing',
+    slot: 'main',
+    audiences: ['admin', 'internal', 'finance', 'hr', 'collaborator', 'client'],
+    requires: { capability: 'home.briefing.daily', action: 'read' },
+    priority: 35,
+    cacheTtlMs: 300_000,
+    timeoutMs: 4_000,
+    precomputed: true,
+    fallback: 'hide',
+    componentKey: 'ai-briefing'
+  } satisfies HomeBlockDefinition,
+  {
+    blockId: 'at-risk-watchlist',
+    slot: 'main',
+    audiences: ['admin', 'finance', 'hr', 'internal'],
+    // No `requires` here — the loader picks which list (spaces/invoices/
+    // members/projects) by audience, and each role has at least one of
+    // the four `home.atrisk.*` capabilities. The composer can() gate is
+    // applied per-loader internally if needed.
+    priority: 45,
+    cacheTtlMs: 90_000,
+    timeoutMs: 4_000,
+    precomputed: false,
+    fallback: 'hide',
+    componentKey: 'at-risk-watchlist'
+  } satisfies HomeBlockDefinition,
+  {
     blockId: 'calendar-rail',
     slot: 'aside',
     audiences: ['admin', 'internal', 'hr', 'finance', 'collaborator'],
@@ -154,6 +212,14 @@ export const isBlockEligible = (
 ): boolean => {
   if (!block.audiences.includes(audience)) return false
   if (block.requiresCapability && !block.requiresCapability(entitlements)) return false
+
+  // Canonical capability gate. This is the authoritative check for sensitive
+  // blocks — payload never reaches the wire if `can()` returns false.
+  if (block.requires) {
+    const ok = can(entitlements, block.requires.capability, block.requires.action, block.requires.scope)
+
+    if (!ok) return false
+  }
 
   return true
 }

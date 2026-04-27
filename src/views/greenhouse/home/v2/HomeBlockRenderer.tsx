@@ -1,7 +1,9 @@
 'use client'
 
 import type {
+  HomeAiBriefingData,
   HomeAiInsightsBentoData,
+  HomeAtRiskWatchlistData,
   HomeBlockEnvelope,
   HomeCalendarRailData,
   HomeClosingCountdownData,
@@ -9,10 +11,13 @@ import type {
   HomePulseStripData,
   HomeRecentsRailData,
   HomeReliabilityRibbonData,
+  HomeRunwayData,
   HomeTodayInboxData
 } from '@/lib/home/contract'
 
+import { HomeAiBriefing } from './HomeAiBriefing'
 import { HomeAiInsightsBento } from './HomeAiInsightsBento'
+import { HomeAtRiskWatchlist } from './HomeAtRiskWatchlist'
 import { HomeBlockSkeleton } from './HomeBlockSkeleton'
 import { HomeCalendarRail } from './HomeCalendarRail'
 import { HomeClosingCountdown } from './HomeClosingCountdown'
@@ -21,6 +26,7 @@ import { HomeHeroAi } from './HomeHeroAi'
 import { HomePulseStrip } from './HomePulseStrip'
 import { HomeRecentsRail } from './HomeRecentsRail'
 import { HomeReliabilityRibbon } from './HomeReliabilityRibbon'
+import { HomeRunwayStrategic } from './HomeRunwayStrategic'
 import { HomeTodayInbox } from './HomeTodayInbox'
 
 /**
@@ -62,6 +68,12 @@ export const HomeBlockRenderer = ({ envelope }: HomeBlockRendererProps) => {
       return <HomeReliabilityRibbon data={envelope.data as HomeReliabilityRibbonData} />
     case 'calendar-rail':
       return <HomeCalendarRail data={envelope.data as HomeCalendarRailData} />
+    case 'runway-strategic':
+      return <HomeRunwayStrategic data={envelope.data as HomeRunwayData} />
+    case 'ai-briefing':
+      return <HomeAiBriefing data={envelope.data as HomeAiBriefingData} />
+    case 'at-risk-watchlist':
+      return <HomeAtRiskWatchlist data={envelope.data as HomeAtRiskWatchlistData} />
     default:
       return null
   }
