@@ -44,6 +44,42 @@ La evidencia actual en datos confirma el problema:
 
 Eso significa que un sync documental externo está contaminando la capa de caja y, peor, que conciliación puede cerrar movimientos sobre objetos que ni siquiera saben en qué cuenta ocurrieron.
 
+## Investigation Findings To Preserve
+
+La task debe preservar explícitamente los hallazgos de la investigación sobre conciliación bancaria, porque no son ruido incidental: explican por qué el contrato actual no es confiable.
+
+1. **Candidate resolver sin scope duro por cuenta**
+   - `listReconciliationCandidatesFromPostgres(periodId)` carga el período con su `account_id`, pero luego llama al resolver por rango de fechas sin pasar esa cuenta.
+   - En la práctica, conciliación puede sugerir candidatos de otra cuenta si monto/fecha/referencia calzan.
+   - Referencias:
+     - `src/lib/finance/postgres-reconciliation.ts:911`
+     - `src/lib/finance/postgres-reconciliation.ts:919`
+     - `src/lib/finance/postgres-reconciliation.ts:996`
+     - `src/lib/finance/postgres-reconciliation.ts:1178`
+
+2. **Validación de cierre de período demasiado laxa**
+   - el route de conciliación pasa `true` hardcodeado a `validateReconciledTransitionFromPostgres(periodId, true)`;
+   - eso hace que el check de `statement_imported` dependa solo de `statement_row_count`, no del estado persistido real del período.
+   - Referencias:
+     - `src/app/api/finance/reconciliation/[id]/route.ts:96`
+     - `src/app/api/finance/reconciliation/[id]/route.ts:100`
+
+3. **Settlement legs reconciliables con `instrument_id = NULL`**
+   - el runtime actual permite construir la leg principal usando `paymentAccountId` aunque venga vacío;
+   - ya se observó en datos una fila de cartola reconciliada contra una leg sin instrumento/cuenta real.
+   - Referencias:
+     - `src/lib/finance/settlement-orchestration.ts:292`
+     - `src/lib/finance/settlement-orchestration.ts:345`
+
+4. **Contaminación de caja desde Nubox bank sync**
+   - Nubox sigue creando `income_payments` / `expense_payments` desde `nubox_bank_movements`;
+   - eso salta el contrato sano `documento -> cash Greenhouse -> conciliación bancaria`.
+   - Referencias:
+     - `src/lib/nubox/sync-nubox-to-postgres.ts:680`
+     - `src/lib/nubox/sync-nubox-to-postgres.ts:714`
+     - `src/lib/nubox/sync-nubox-to-postgres.ts:751`
+     - `src/lib/nubox/sync-nubox-to-postgres.ts:800`
+
 ## Goal
 
 - Nubox queda restringido a source of truth de `ventas` y `compras`, no de caja.
