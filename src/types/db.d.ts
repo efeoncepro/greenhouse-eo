@@ -3339,6 +3339,27 @@ export interface GreenhouseFinanceAccounts {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceAccountSignalMatchingRules {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  expires_at: Timestamp | null;
+  is_active: Generated<boolean>;
+  /**
+   * Shape: {bank_description_regex?, payment_method_in?, currency_eq?, amount_min?, amount_max?, metadata_match?}. Campos combinados con AND. Vacio = catch-all (prevenido en evaluador).
+   */
+  match_predicate_json: Json;
+  notes: string | null;
+  /**
+   * Mayor priority gana cuando se imprime el log de evaluacion, pero NO desempata. Si dos reglas matchean, ambas se reportan y la senal queda unresolved/ambiguous. La idea: una regla mal escrita es responsabilidad de revisar, no de decidir arbitrariamente.
+   */
+  priority: Generated<number>;
+  resolved_account_id: string;
+  rule_id: string;
+  rule_provenance: string;
+  source_system: string;
+  space_id: string | null;
+}
+
 export interface GreenhouseFinanceBankStatementRows {
   amount: Numeric;
   balance: Numeric | null;
@@ -3644,6 +3665,10 @@ export interface GreenhouseFinanceExpenses {
   social_security_period: string | null;
   social_security_type: string | null;
   /**
+   * TASK-708 D2: estado pagado segun la fuente upstream (Nubox purchase.estado, etc). Independiente del canonical payment_status que deriva de payments canonicos Greenhouse.
+   */
+  source_payment_status: string | null;
+  /**
    * manual | payroll_generated | bank_statement_detected | reconciliation_suggested | gateway_sync | system_adjustment
    */
   source_type: string | null;
@@ -3686,6 +3711,75 @@ export interface GreenhouseFinanceExpenses {
   vat_fixed_assets_amount: Numeric | null;
   vat_unrecoverable_amount: Numeric | null;
   withholding_amount: Numeric | null;
+}
+
+export interface GreenhouseFinanceExternalCashSignals {
+  /**
+   * Estado de resolucion de cuenta canonica Greenhouse. unresolved = sin cuenta. resolved_high_confidence = una sola regla D5 matcheo. resolved_low_confidence = match heuristico (no auto-adopt). adopted = ya creo payment canonico. superseded = reemplazada por otra senal/payment. dismissed = descartada manual.
+   */
+  account_resolution_status: Generated<string>;
+  amount: Numeric;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  document_id: string | null;
+  document_kind: string;
+  observed_at: Generated<Timestamp>;
+  /**
+   * TASK-708 D4: cuando la senal genera cash canonico Greenhouse, este campo apunta al payment_id correspondiente. Soft FK polymorphic (income_payments o expense_payments segun promoted_payment_kind). Invariante cruzada via trigger fn_enforce_promoted_payment_invariant.
+   */
+  promoted_payment_id: string | null;
+  promoted_payment_kind: string | null;
+  resolution_method: string | null;
+  resolved_account_id: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by_user_id: string | null;
+  signal_date: Timestamp;
+  signal_id: string;
+  /**
+   * ID upstream que identifica el evento de forma idempotente (nubox_movement_id, previred_planilla_id, etc.). UNIQUE (source_system, source_event_id) garantiza que un sync corra N veces sin duplicar.
+   */
+  source_event_id: string;
+  source_observed_at: Timestamp;
+  source_payload_json: Json;
+  source_system: string;
+  space_id: string;
+  superseded_at: Timestamp | null;
+  superseded_reason: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceExternalSignalAutoAdoptPolicies {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  is_active: Generated<boolean>;
+  /**
+   * review = senal queda en cola admin /finance/external-signals con capability finance.cash.adopt-external-signal. auto_adopt = senal con resolved_high_confidence promueve automaticamente al payment canonico via la API del modulo external-cash-signals.
+   */
+  mode: string;
+  notes: string | null;
+  policy_id: string;
+  source_system: string;
+  /**
+   * NULL = politica global tenant-wide para ese source_system. NOT NULL = override por space.
+   */
+  space_id: string | null;
+}
+
+export interface GreenhouseFinanceExternalSignalResolutionAttempts {
+  attempt_id: string;
+  evaluated_at: Generated<Timestamp>;
+  /**
+   * Semver del codigo evaluador en el momento de la decision. Cambiar el algoritmo bumpea version para que historico permanezca interpretable.
+   */
+  evaluator_version: string;
+  matched_rule_id: string | null;
+  resolution_account_id: string | null;
+  resolution_outcome: string;
+  /**
+   * Array of {rule_id, matched: bool, reason: string}. Preserva reglas que fallaron y su razon, no solo la ganadora. Permite debuggear por que una senal no se resolvio.
+   */
+  rules_evaluated: Json;
+  signal_id: string;
 }
 
 export interface GreenhouseFinanceFactoringOperations {
@@ -3854,6 +3948,10 @@ export interface GreenhouseFinanceIncome {
    * TASK-350: HES that authorized this income. NULL for simple-branch invoicing (quote → income directly without HES).
    */
   source_hes_id: string | null;
+  /**
+   * TASK-708 D2: estado pagado segun la fuente upstream (Nubox sale.estado, etc). Independiente del canonical payment_status que deriva de payments canonicos Greenhouse. UI puede mostrar ambos diferenciados. NULL = la fuente no provee senal.
+   */
+  source_payment_status: string | null;
   subtotal: Numeric;
   tax_amount: Generated<Numeric>;
   tax_amount_snapshot: Numeric | null;
@@ -7295,6 +7393,7 @@ export interface DB {
   "greenhouse_finance.account_number_registry": GreenhouseFinanceAccountNumberRegistry;
   "greenhouse_finance.account_opening_trial_balance": GreenhouseFinanceAccountOpeningTrialBalance;
   "greenhouse_finance.account_reconciliation_snapshots": GreenhouseFinanceAccountReconciliationSnapshots;
+  "greenhouse_finance.account_signal_matching_rules": GreenhouseFinanceAccountSignalMatchingRules;
   "greenhouse_finance.accounts": GreenhouseFinanceAccounts;
   "greenhouse_finance.bank_statement_rows": GreenhouseFinanceBankStatementRows;
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
@@ -7306,6 +7405,9 @@ export interface DB {
   "greenhouse_finance.expense_attribution_rules": GreenhouseFinanceExpenseAttributionRules;
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
+  "greenhouse_finance.external_cash_signals": GreenhouseFinanceExternalCashSignals;
+  "greenhouse_finance.external_signal_auto_adopt_policies": GreenhouseFinanceExternalSignalAutoAdoptPolicies;
+  "greenhouse_finance.external_signal_resolution_attempts": GreenhouseFinanceExternalSignalResolutionAttempts;
   "greenhouse_finance.factoring_operations": GreenhouseFinanceFactoringOperations;
   "greenhouse_finance.fx_pnl_breakdown": GreenhouseFinanceFxPnlBreakdown;
   "greenhouse_finance.idempotency_keys": GreenhouseFinanceIdempotencyKeys;
