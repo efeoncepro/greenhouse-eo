@@ -1,8 +1,8 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-04-07 por Claude
-> **Ultima actualizacion:** 2026-04-28 por Claude Opus 4.7 (TASK-714 drawer semantico por instrumento)
-> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-714](../../tasks/complete/TASK-714-banco-instrument-detail-semantic-drawer.md)
+> **Ultima actualizacion:** 2026-04-28 por Claude Opus 4.7 (TASK-706 perfil processor_transit + Previred)
+> **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [TASK-714](../../tasks/complete/TASK-714-banco-instrument-detail-semantic-drawer.md), [TASK-706](../../tasks/complete/TASK-706-previred-processor-ux-and-bank-semantics.md)
 
 # Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja
 
@@ -239,6 +239,45 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
   - tiene extracto importado
   - no quedan filas `unmatched` o `suggested`
   - la diferencia esta en cero
+
+## Processors operacionales (Previred y futuros)
+
+Algunas filas de `accounts` no son cuentas bancarias con saldo propio sino procesadores operativos. El caso canónico hoy es Previred (`account_id='previred-clp'`, `instrument_category='payroll_processor'`).
+
+Reglas duras:
+
+- El cash siempre vive en la cuenta pagadora real (`Santander CLP` para Previred). NUNCA mover saldo al processor.
+- El processor no tiene `settlement_legs` ni `expense_payments` con `payment_account_id` apuntándole. Si los tuviera, sería bug.
+- La UI narra la actividad operativa (cuántos pagos, monto procesado, estado del desglose), no inventa saldo.
+
+Drawer de processor (perfil `processor_transit`):
+
+- KPIs: "Pagos del período" (count), "Monto procesado" (CLP), "Estado del desglose".
+- Banner contextual:
+  - `none` (sin pagos) → info "Es un procesador operacional, no una cuenta bancaria con saldo propio."
+  - `pending_componentization` → warning "Hay pagos detectados desde Santander pero el desglose previsional aún no está completo."
+  - `componentized` → info "Pagos del período componentizados. El cash salió desde Santander."
+- Tabla: cada fila es un pago real desde la cuenta pagadora, con período payroll, institución y estado.
+- Chart bancario oculto (no aplica).
+
+Movements de la cuenta pagadora (`Santander CLP`):
+
+- Cuando un pago corresponde a Previred (anchor: `expense_type='social_security'` AND `social_security_institution ILIKE '%previred%'`), el row muestra un chip inline `Previred · Previsión social`. El usuario distingue de un transfer SII genérico sin abrir el detail.
+- El monto se cuenta en Santander (no se duplica en Previred). Una historia, dos vistas.
+
+Estados del desglose previsional:
+
+- `componentized`: el pago tiene `payroll_period_id` Y `is_reconciled=true`. Lifecycle cerrado.
+- `pending_componentization`: hay pago pero falta anchor estructural (payroll_period_id null o is_reconciled=false).
+- `none`: cero pagos del processor en el período. La UI dice "Sin pagos del período", no "Saldo $0".
+
+Cómo agregar un nuevo processor (Caja de Compensación, SII IVA processor, etc.):
+
+1. Insertar fila en `greenhouse_finance.accounts` con `instrument_category='payroll_processor'`.
+2. Extender `inferProcessorScope` en `src/lib/finance/processor-digest.ts` con la regla de matching (V1 keyword-based; V2 cuando TASK-712 ship moverá esto a un registry per-processor).
+3. Cero refactor del drawer ni del bridge UI — el resolver TASK-714 ya soporta el perfil.
+
+> Detalle técnico: `src/lib/finance/processor-digest.ts` (helper read-only), `src/lib/finance/instrument-presentation.ts` (perfil `processor_transit`). Bridge UI en `AccountDetailDrawer.tsx`. Cuando TASK-707 cierre el runtime canónico de Previred (`expense.componentization_status` columna explícita), `deriveComponentizationStatus` colapsa a un SELECT directo. La UI no cambia.
 
 ## Cuenta corriente accionista
 

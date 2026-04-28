@@ -170,6 +170,84 @@ describe('resolveInstrumentDetailPresentation', () => {
     expect(consumedKpi?.avatarColor).toBe('warning')
   })
 
+  it('returns processor_transit profile when category=payroll_processor and digest is null', () => {
+    const profile = resolveInstrumentDetailPresentation({
+      ...baseAccount,
+      instrumentCategory: 'payroll_processor',
+      accountName: 'Previred'
+    }, null)
+
+    expect(profile.profileKey).toBe('processor_transit')
+    expect(profile.drawerTitle).toBe('Procesador Previred')
+    expect(profile.drawerSubtitle.toLowerCase()).toContain('previsional')
+
+    const titles = profile.kpis.map(k => k.title)
+
+    expect(titles).toEqual(['Pagos del período', 'Monto procesado', 'Estado del desglose'])
+
+    // No payments yet → all KPIs in their "no data" state
+    expect(profile.kpis[0].value).toBe(0)
+    expect(profile.kpis[1].value).toBe(0)
+    expect(profile.kpis[2].value).toBeNull()
+
+    // Banner says it's a processor, not an empty account
+    expect(profile.contextBanner?.tone).toBe('info')
+    expect(profile.contextBanner?.text.toLowerCase()).toContain('procesador')
+    expect(profile.contextBanner?.text.toLowerCase()).toContain('cash')
+  })
+
+  it('processor_transit pending_componentization renders warning banner', () => {
+    const profile = resolveInstrumentDetailPresentation({
+      ...baseAccount,
+      instrumentCategory: 'payroll_processor',
+      accountName: 'Previred'
+    }, {
+      accountId: 'previred-clp',
+      accountName: 'Previred',
+      periodStart: '2026-04-01',
+      periodEnd: '2026-04-30',
+      paymentCount: 1,
+      processedAmount: 276223,
+      processedAmountClp: 276223,
+      payerAccounts: [{ accountId: 'santander-clp', accountName: 'Santander', amount: 276223 }],
+      componentizationStatus: 'pending_componentization',
+      payments: []
+    })
+
+    expect(profile.contextBanner?.tone).toBe('warning')
+    expect(profile.contextBanner?.text.toLowerCase()).toContain('santander')
+
+    const componentizationKpi = profile.kpis.find(k => k.key === 'componentizationStatus')
+
+    expect(componentizationKpi?.subtitle).toBe('Desglose pendiente')
+    expect(componentizationKpi?.avatarColor).toBe('warning')
+  })
+
+  it('processor_transit componentized renders confirmation banner', () => {
+    const profile = resolveInstrumentDetailPresentation({
+      ...baseAccount,
+      instrumentCategory: 'payroll_processor',
+      accountName: 'Previred'
+    }, {
+      accountId: 'previred-clp',
+      accountName: 'Previred',
+      periodStart: '2026-04-01',
+      periodEnd: '2026-04-30',
+      paymentCount: 1,
+      processedAmount: 276223,
+      processedAmountClp: 276223,
+      payerAccounts: [{ accountId: 'santander-clp', accountName: 'Santander', amount: 276223 }],
+      componentizationStatus: 'componentized',
+      payments: []
+    })
+
+    expect(profile.contextBanner?.tone).toBe('info')
+    const componentizationKpi = profile.kpis.find(k => k.key === 'componentizationStatus')
+
+    expect(componentizationKpi?.subtitle).toBe('Desglose completo')
+    expect(componentizationKpi?.avatarColor).toBe('success')
+  })
+
   it('returns shareholder_account profile with accionista vocabulary', () => {
     const profile = resolveInstrumentDetailPresentation({
       ...baseAccount,

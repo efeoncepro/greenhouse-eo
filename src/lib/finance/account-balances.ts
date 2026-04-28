@@ -20,6 +20,7 @@ import { buildFreshnessSignal } from '@/lib/finance/bank-freshness'
 import { getActiveOpeningTrialBalance } from '@/lib/finance/account-opening-trial-balance'
 import { getOpenDriftSummariesForAccounts } from '@/lib/finance/reconciliation/snapshots'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { getProcessorDigest, type TreasuryProcessorDigest } from '@/lib/finance/processor-digest'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -344,7 +345,28 @@ export type TreasuryBankAccountDetail = {
     providerReference: string | null
     providerStatus: string | null
     isReconciled: boolean
+    /**
+     * TASK-706 — when this movement is the cash leg of a payroll_processor
+     * payment (e.g. a PREVIRED transfer leaving Santander CLP), this object
+     * narrates which processor handled it. The UI uses it to render an
+     * inline badge so users can tell apart a generic SII transfer from a
+     * Previred social-security payment.
+     */
+    processorContext: {
+      processorAccountId: string
+      processorAccountName: string
+      label: string
+      tone: 'info' | 'warning'
+    } | null
   }>
+  /**
+   * TASK-706 — populated only when the requested account is a
+   * `payroll_processor`. Carries the operational digest (payments processed
+   * in the period, payer accounts, componentization status) so the drawer
+   * can narrate processor activity instead of pretending to be a bank
+   * ledger.
+   */
+  processor?: TreasuryProcessorDigest | null
 }
 
 export type TreasuryPaymentAssignment = {
@@ -1785,6 +1807,89 @@ export const getBankAccountDetail = async ({
   const computedAtStr = computedAtRaw instanceof Date ? computedAtRaw.toISOString() : (computedAtRaw ?? null)
   const accountFreshness = buildFreshnessSignal(computedAtStr)
 
+  // TASK-706 — processor digest is only computed for payroll_processor accounts.
+  // For everyone else this is `null`/undefined and the drawer renders the
+  // canonical bank ledger profiles unchanged.
+  const processorDigest = account.instrumentCategory === 'payroll_processor'
+    ? await getProcessorDigest({
+        accountId: account.accountId,
+        accountName: account.accountName,
+        instrumentCategory: account.instrumentCategory,
+        providerSlug: account.providerSlug,
+        periodStart: overview.period.startDate,
+        periodEnd: overview.period.endDate
+      })
+    : null
+
+  // TASK-706 — for movements that are the cash leg of a processor payment
+  // (e.g. expense_payments tied to a Previred social_security expense), look
+  // up the processor context so the UI can render an inline badge.
+  // Cheap secondary lookup: keyed by expense_payment.payment_id collected
+  // from the movement rows. Bounded by the LIMIT 50 above.
+  const expensePaymentMovementIds = movementRows
+    .filter(row => row.payment_type === 'expense_payment' && row.payment_id)
+    .map(row => row.payment_id as string)
+
+  const processorContextByPaymentId = new Map<string, {
+    processorAccountId: string
+    processorAccountName: string
+    label: string
+    tone: 'info' | 'warning'
+  }>()
+
+  if (expensePaymentMovementIds.length > 0) {
+    type ProcessorTagRow = {
+      payment_id: string
+      expense_type: string | null
+      institution: string | null
+      processor_account_id: string | null
+      processor_account_name: string | null
+    }
+
+    const tagRows = await queryRows<ProcessorTagRow>(
+      `
+        SELECT
+          ep.payment_id,
+          e.expense_type,
+          e.social_security_institution AS institution,
+          proc.account_id AS processor_account_id,
+          proc.account_name AS processor_account_name
+        FROM greenhouse_finance.expense_payments ep
+        JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
+        LEFT JOIN greenhouse_finance.accounts proc
+          ON proc.instrument_category = 'payroll_processor'
+          AND (
+            -- V1 heuristic mirror of inferProcessorScope: match Previred via
+            -- account_id keyword. Future processors plug in via additional
+            -- OR clauses or a registry lookup (TASK-712).
+            (LOWER(proc.account_id) LIKE '%previred%'
+              AND e.expense_type = 'social_security'
+              AND (
+                COALESCE(LOWER(e.social_security_institution), '') LIKE '%previred%'
+                OR COALESCE(LOWER(e.supplier_name), '') LIKE '%previred%'
+              ))
+          )
+        WHERE ep.payment_id = ANY($1::text[])
+      `,
+      [expensePaymentMovementIds],
+      client
+    )
+
+    for (const row of tagRows) {
+      if (!row.processor_account_id) continue
+      processorContextByPaymentId.set(row.payment_id, {
+        processorAccountId: normalizeString(row.processor_account_id),
+        processorAccountName: row.processor_account_name
+          ? normalizeString(row.processor_account_name)
+          : 'Procesador',
+        label: row.expense_type === 'social_security'
+          ? 'Previsión social'
+          : 'Pago procesado',
+        tone: 'info'
+      })
+    }
+  }
+
   return {
     account,
     currentBalance: mapAccountBalanceRow(currentBalance),
@@ -1798,24 +1903,30 @@ export const getBankAccountDetail = async ({
       periodOutflows: roundCurrency(toNumber(row.period_outflows)),
       fxGainLossClp: roundCurrency(toNumber(row.fx_gain_loss_clp))
     })),
-    movements: movementRows.map(row => ({
-      movementId: normalizeString(row.movement_id),
-      movementSource: normalizeString(row.movement_source),
-      movementType: normalizeString(row.movement_type),
-      direction: normalizeString(row.direction),
-      instrumentId: row.instrument_id ? normalizeString(row.instrument_id) : null,
-      counterpartyInstrumentId: row.counterparty_instrument_id ? normalizeString(row.counterparty_instrument_id) : null,
-      paymentType: row.payment_type ? normalizeString(row.payment_type) : null,
-      paymentId: row.payment_id ? normalizeString(row.payment_id) : null,
-      transactionDate: toDateString(row.transaction_date),
-      amount: roundCurrency(toNumber(row.amount)),
-      currency: normalizeString(row.currency),
-      amountClp: row.amount_clp != null ? roundCurrency(toNumber(row.amount_clp)) : null,
-      fxRate: row.fx_rate != null ? toNumber(row.fx_rate) : null,
-      providerReference: row.provider_reference ? normalizeString(row.provider_reference) : null,
-      providerStatus: row.provider_status ? normalizeString(row.provider_status) : null,
-      isReconciled: Boolean(row.is_reconciled)
-    }))
+    movements: movementRows.map(row => {
+      const paymentId = row.payment_id ? normalizeString(row.payment_id) : null
+
+      return {
+        movementId: normalizeString(row.movement_id),
+        movementSource: normalizeString(row.movement_source),
+        movementType: normalizeString(row.movement_type),
+        direction: normalizeString(row.direction),
+        instrumentId: row.instrument_id ? normalizeString(row.instrument_id) : null,
+        counterpartyInstrumentId: row.counterparty_instrument_id ? normalizeString(row.counterparty_instrument_id) : null,
+        paymentType: row.payment_type ? normalizeString(row.payment_type) : null,
+        paymentId,
+        transactionDate: toDateString(row.transaction_date),
+        amount: roundCurrency(toNumber(row.amount)),
+        currency: normalizeString(row.currency),
+        amountClp: row.amount_clp != null ? roundCurrency(toNumber(row.amount_clp)) : null,
+        fxRate: row.fx_rate != null ? toNumber(row.fx_rate) : null,
+        providerReference: row.provider_reference ? normalizeString(row.provider_reference) : null,
+        providerStatus: row.provider_status ? normalizeString(row.provider_status) : null,
+        isReconciled: Boolean(row.is_reconciled),
+        processorContext: paymentId ? processorContextByPaymentId.get(paymentId) ?? null : null
+      }
+    }),
+    processor: processorDigest
   }
 }
 
