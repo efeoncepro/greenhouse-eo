@@ -93,7 +93,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     if (updates.status === 'reconciled') {
       const { totalRows, remainingRows, statementImported } =
-        await validateReconciledTransitionFromPostgres(periodId, true)
+        await validateReconciledTransitionFromPostgres(periodId)
 
       const nextDifference = updates.difference !== undefined ? toNumber(updates.difference) : 0
 

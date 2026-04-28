@@ -343,7 +343,10 @@ describe('readCommercialCostAttributionForPeriod', () => {
 
     const laborAllocationQuery = String(mockRunGreenhousePostgresQuery.mock.calls[1]?.[0] ?? '')
 
-    expect(laborAllocationQuery).toContain('FROM greenhouse_serving.client_labor_cost_allocation cla')
+    // TASK-709: la VIEW canónica para attribution comercial es la consolidada
+    // (1 row por member × client × período) — la cruda emite N rows por payroll
+    // entry y produce double-counting cuando se JOIN-ea con expenses.
+    expect(laborAllocationQuery).toContain('FROM greenhouse_serving.client_labor_cost_allocation_consolidated cla')
     expect(laborAllocationQuery).toContain('cla.client_id')
     expect(laborAllocationQuery).toContain('ON cb.client_id = cla.client_id')
     expect(laborAllocationQuery).toContain('WHERE cla.period_year = $1')

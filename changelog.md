@@ -2,6 +2,59 @@
 
 ## 2026-04-28
 
+### 2026-04-28 — TASK-708 Slices 1-6 Cutover + observabilidad (in-progress)
+
+Cierre del cutover canónico Nubox-as-document-SoT vs Greenhouse-as-cash-SoT. Las invariantes estructurales del Slice 0 ahora están enforcadas por el código de aplicación. Solo queda TASK-708b (remediación histórica) como task hermana.
+
+**Slice 1 — Nubox documents-only cutover** (`src/lib/nubox/sync-nubox-to-postgres.ts`):
+
+- Reemplaza las 2 funciones `reconcileExpenseFromBankMovement` + `reconcileIncomeFromBankMovement` por una sola `recordSignalFromBankMovement(movement)` que escribe a `external_cash_signals` via `recordSignal()`.
+- Cero `recordPayment` / `INSERT INTO expense_payments` desde Nubox sync. El raw `INSERT` directo a `expense_payments` se eliminó por completo.
+- Idempotencia natural por `UNIQUE (source_system, source_event_id)`. spaceId resuelto desde la expense linked + fallback `NUBOX_DEFAULT_SPACE_ID` (default `spc-8641519f-12a0-456f-b03a-e94522d35e3a`).
+- Output struct + sync_run notes incluyen `signalsRecorded`. Outbox event `finance.external_cash_signal.recorded`.
+
+**Slice 2 — Reconciliation matchability central** (`src/lib/finance/reconciliation-matchability.ts`):
+
+- Discriminated union exhaustiva: `recorded` | `reconciliable` | `pending_account_resolution` | `needs_repair` (con razones tipadas).
+- `getPaymentMatchability` y `getSettlementLegMatchability` como única fuente de verdad. Helper `isReconciliable(state)` para predicate booleano.
+- Precedencia: superseded chain > NULL account; supersede tiene priority sobre needs_repair (un phantom limpio post-supersede vuelve a `recorded`).
+- 11 tests unitarios verdes que cubren todos los caminos.
+
+**Slice 3 — Candidate resolver scoped by AccountId** (`src/lib/finance/postgres-reconciliation.ts`):
+
+- `listReconciliationCandidatesByDateRangeFromPostgres` ahora exige `accountId` (validación explicit + filtra todas las queries internas).
+- Las 6 queries (3 income + 3 expense) filtran `WHERE instrument_id = $accountId` o `payment_account_id = $accountId` + excluyen superseded chains.
+- Invoice fallback skipea cuando hay accountId (rows sin anchor de cuenta).
+- `listReconciliationCandidatesFromPostgres` propaga `period.accountId`.
+- `listUnmatchedStatementRowsByDateRangeFromPostgres` ahora retorna `account_id` para que auto-match agrupe por cuenta y corra resolver una vez por cuenta — cero leakage cross-account.
+- Auto-match route (`/api/finance/reconciliation/auto-match/route.ts`) y cron (`/api/cron/reconciliation-auto-match/route.ts`) refactorizados con loop por-account.
+
+**Slice 4 — Settlement orchestration hardening** (`src/lib/finance/settlement-orchestration.ts`):
+
+- `buildSettlementLegPlan` lanza `FinanceValidationError` cuando `paymentAccountId` es null, antes de construir la leg principal. Defensa runtime explícita complementa el CHECK SQL `settlement_legs_principal_requires_instrument`.
+
+**Slice 6 — Lifecycle + observabilidad** (`src/lib/finance/postgres-reconciliation.ts` + `ledger-health.ts`):
+
+- `validateReconciledTransitionFromPostgres(periodId)` pierde el segundo parámetro `statementImported` (era hardcoded `true`). Estado se deriva de `reconciliation_periods.statement_row_count` + `COUNT(bank_statement_rows)` reales.
+- 6 métricas TASK-708 nuevas en `ledger-health.ts`: `paymentsPendingAccountResolutionRuntime` (post-cutover, healthy=0), `paymentsPendingAccountResolutionHistorical` (Cohorte A+B, baja con TASK-708b), `settlementLegsPrincipalWithoutInstrument` (debe ser 0 post-VALIDATE), `reconciledRowsAgainstUnscopedTarget` (cross-account o leg null), `externalCashSignalsUnresolvedOverThreshold` (configurable, default 14d), `externalCashSignalsPromotedInvariantViolation` (canary del trigger D4).
+- `healthy` flag exige runtime metric + canary D4 == 0. Histórico no cuenta para healthy.
+- Endpoint `/api/admin/finance/ledger-health` automáticamente sirve el nuevo objeto `task708`.
+- UI cola admin `/finance/external-signals` queda como follow-up (skill greenhouse-ux + UX writing dedicado).
+
+**Bonus: 2 fallas pre-existentes resueltas**:
+
+- `get-operations-overview.test.ts` actualizado para mockear y validar la 5ta métrica `labor_allocation_saturation_drift` que TASK-709 había añadido sin actualizar el test. Ahora `processed: 3, failed: 2`.
+- `member-period-attribution.test.ts` actualizado para verificar VIEW canónica `client_labor_cost_allocation_consolidated` (TASK-709b consolidation rename).
+
+**Verificación**:
+
+- `pnpm lint` limpio.
+- `npx tsc --noEmit` limpio.
+- `pnpm test` **2437/2437 verde** (5 skipped pre-existentes).
+- `pnpm build` OK.
+
+**Lo que queda**: solo TASK-708b (remediación histórica de Cohorte A 23 phantoms + Cohorte B 65 phantoms + 4 settlement legs + 1 bank_statement_row). Vive como task hermana con runbook propio.
+
 ### 2026-04-28 — TASK-708 Slice 0 Model Hardening (in-progress)
 
 Defensa estructural canónica para separar Nubox-as-document-SoT de Greenhouse-as-cash-SoT. Las invariantes nacen en SQL (CHECKs, FKs, triggers, UNIQUE) y en tipos TypeScript (branded `AccountId`), no en `if`s repartidos.

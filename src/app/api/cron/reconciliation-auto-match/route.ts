@@ -49,63 +49,87 @@ export async function GET(request: Request) {
       return NextResponse.json({ matched: 0, suggested: 0, total: 0, window: { fromDate, toDate } })
     }
 
-    const { items: candidates } = await listReconciliationCandidatesByDateRangeFromPostgres({
-      startDate: fromDate,
-      endDate: toDate,
-      type: 'all',
-      limit: 400
-    })
+    // TASK-708 Slice 3 — agrupar por account_id (heredado del period FK) y
+    // correr resolver + scoring una vez por cuenta. Cero leakage cross-account.
+    const rowsByAccount = new Map<string, typeof unmatched>()
 
-    const rows: AutoMatchRow[] = unmatched.map(row => ({
-      rowId: row.row_id,
-      transactionDate: row.transaction_date,
-      description: row.description,
-      reference: row.reference,
-      amount: row.amount
-    }))
+    for (const row of unmatched) {
+      const list = rowsByAccount.get(row.account_id) ?? []
 
-    const rowPeriodMap = new Map<string, string>(unmatched.map(row => [row.row_id, row.period_id]))
+      list.push(row)
+      rowsByAccount.set(row.account_id, list)
+    }
 
-    const scoring = scoreAutoMatches({ unmatchedRows: rows, candidates })
+    let totalApplied = 0
+    let totalSuggested = 0
+    let totalRows = 0
 
-    const { applied, suggested } = await persistAutoMatchDecisions({
-      decisions: scoring.decisions,
-      rowPeriodMap,
-      actorUserId: null,
-      callbacks: {
-        updateStatementRow: async input => {
-          await updateStatementRowMatchInPostgres(input.rowId, input.periodId, {
-            matchStatus: input.matchStatus,
-            matchedType: input.matchedType,
-            matchedId: input.matchedId,
-            matchedPaymentId: input.matchedPaymentId,
-            matchedSettlementLegId: input.matchedSettlementLegId,
-            matchConfidence: input.matchConfidence,
-            matchedByUserId: input.matchedByUserId
-          })
-        },
-        setReconciliationLink: async input => {
-          await setReconciliationLinkInPostgres({
-            matchedType: input.matchedType,
-            matchedId: input.matchedId,
-            matchedPaymentId: input.matchedPaymentId,
-            matchedSettlementLegId: input.matchedSettlementLegId,
-            rowId: input.rowId,
-            matchedBy: input.matchedBy
-          })
+    for (const [accountId, accountRows] of rowsByAccount) {
+      const { items: candidates } = await listReconciliationCandidatesByDateRangeFromPostgres({
+        accountId,
+        startDate: fromDate,
+        endDate: toDate,
+        type: 'all',
+        limit: 400
+      })
+
+      const rows: AutoMatchRow[] = accountRows.map(row => ({
+        rowId: row.row_id,
+        transactionDate: row.transaction_date,
+        description: row.description,
+        reference: row.reference,
+        amount: row.amount
+      }))
+
+      totalRows += rows.length
+
+      const rowPeriodMap = new Map<string, string>(accountRows.map(row => [row.row_id, row.period_id]))
+
+      const scoring = scoreAutoMatches({ unmatchedRows: rows, candidates })
+
+      const { applied, suggested } = await persistAutoMatchDecisions({
+        decisions: scoring.decisions,
+        rowPeriodMap,
+        actorUserId: null,
+        callbacks: {
+          updateStatementRow: async input => {
+            await updateStatementRowMatchInPostgres(input.rowId, input.periodId, {
+              matchStatus: input.matchStatus,
+              matchedType: input.matchedType,
+              matchedId: input.matchedId,
+              matchedPaymentId: input.matchedPaymentId,
+              matchedSettlementLegId: input.matchedSettlementLegId,
+              matchConfidence: input.matchConfidence,
+              matchedByUserId: input.matchedByUserId
+            })
+          },
+          setReconciliationLink: async input => {
+            await setReconciliationLinkInPostgres({
+              matchedType: input.matchedType,
+              matchedId: input.matchedId,
+              matchedPaymentId: input.matchedPaymentId,
+              matchedSettlementLegId: input.matchedSettlementLegId,
+              rowId: input.rowId,
+              matchedBy: input.matchedBy
+            })
+          }
         }
-      }
-    })
+      })
+
+      totalApplied += applied
+      totalSuggested += suggested
+    }
 
     console.log(
-      `[reconciliation-auto-match] ${fromDate}..${toDate}: applied=${applied} suggested=${suggested} total=${rows.length}`
+      `[reconciliation-auto-match] ${fromDate}..${toDate}: accounts=${rowsByAccount.size} applied=${totalApplied} suggested=${totalSuggested} total=${totalRows}`
     )
 
     return NextResponse.json({
-      matched: applied,
-      suggested,
-      unmatched: rows.length - applied - suggested,
-      total: rows.length,
+      matched: totalApplied,
+      suggested: totalSuggested,
+      unmatched: totalRows - totalApplied - totalSuggested,
+      total: totalRows,
+      accounts: Array.from(rowsByAccount.keys()),
       window: { fromDate, toDate }
     })
   } catch (error) {

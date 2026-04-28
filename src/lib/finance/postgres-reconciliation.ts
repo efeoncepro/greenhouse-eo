@@ -533,21 +533,37 @@ export const assertReconciliationPeriodIsMutableFromPostgres = async (periodId: 
 }
 
 // ─── Periods: validate reconciled transition ────────────────────────
+//
+// TASK-708 Slice 6 — la firma pierde el segundo parametro `statementImported`
+// que el caller pasaba hardcoded en `true`. El estado real se deriva del
+// schema persistido:
+//   - `statement_row_count` en `reconciliation_periods` es la metrica
+//     declarada al importar la cartola
+//   - `COUNT(*)` real de `bank_statement_rows` es la verdad fisica
+// Si ambos son consistentes y > 0, el statement esta importado. La diferencia
+// indica drift (rows borrados manualmente, period_id incorrecto, etc).
 
-export const validateReconciledTransitionFromPostgres = async (periodId: string, statementImported: boolean) => {
-  const counts = await queryRows<{ total: string; pending: string }>(
+export const validateReconciledTransitionFromPostgres = async (periodId: string) => {
+  const counts = await queryRows<{ total: string; pending: string; declared_count: string | null }>(
     `
       SELECT
-        COUNT(*) AS total,
-        COUNT(*) FILTER (WHERE match_status IN ('unmatched', 'suggested')) AS pending
-      FROM greenhouse_finance.bank_statement_rows
-      WHERE period_id = $1
+        COUNT(bsr.row_id) AS total,
+        COUNT(bsr.row_id) FILTER (WHERE bsr.match_status IN ('unmatched', 'suggested')) AS pending,
+        MAX(rp.statement_row_count)::text AS declared_count
+      FROM greenhouse_finance.reconciliation_periods rp
+      LEFT JOIN greenhouse_finance.bank_statement_rows bsr ON bsr.period_id = rp.period_id
+      WHERE rp.period_id = $1
+      GROUP BY rp.period_id
     `,
     [periodId]
   )
 
+  const totalRows = toNumber(counts[0]?.total)
+  const declaredCount = toNumber(counts[0]?.declared_count)
+  const statementImported = totalRows > 0 && declaredCount > 0
+
   return {
-    totalRows: toNumber(counts[0]?.total),
+    totalRows,
     remainingRows: toNumber(counts[0]?.pending),
     statementImported
   }
@@ -852,13 +868,14 @@ export const listUnmatchedStatementRowsByDateRangeFromPostgres = async ({
   return queryRows<{
     row_id: string
     period_id: string
+    account_id: string
     transaction_date: string | Date
     description: string
     reference: string | null
     amount: unknown
   }>(
     `
-      SELECT bsr.row_id, bsr.period_id, bsr.transaction_date, bsr.description, bsr.reference, bsr.amount
+      SELECT bsr.row_id, bsr.period_id, rp.account_id, bsr.transaction_date, bsr.description, bsr.reference, bsr.amount
       FROM greenhouse_finance.bank_statement_rows bsr
       JOIN greenhouse_finance.reconciliation_periods rp ON rp.period_id = bsr.period_id
       WHERE bsr.match_status = 'unmatched'
@@ -916,7 +933,11 @@ export const listReconciliationCandidatesFromPostgres = async ({
     windowDays
   })
 
+  // TASK-708 Slice 3 — propagate period.accountId to the resolver. The candidate
+  // resolver NEVER returns rows from a different account than the one the
+  // period covers. accountId is positional/required.
   const result = await listReconciliationCandidatesByDateRangeFromPostgres({
+    accountId: period.accountId,
     startDate,
     endDate,
     type,
@@ -935,22 +956,41 @@ export const listReconciliationCandidatesFromPostgres = async ({
 
 /**
  * Period-agnostic candidate loader for continuous auto-match (TASK-401).
- * Accepts an explicit { startDate, endDate } date window and runs the same 3-query
- * cascade (settlement legs → payment rows → invoice fallback) for both income and expense.
+ *
+ * TASK-708 Slice 3 — `accountId` es OBLIGATORIO. Todas las queries internas
+ * filtran por:
+ *   - settlement_legs.instrument_id = accountId
+ *   - income_payments.payment_account_id = accountId
+ *   - expense_payments.payment_account_id = accountId
+ *
+ * El invoice-level fallback (income/expense fully paid sin payments table)
+ * NO se carga cuando `accountId` esta presente — esos rows no tienen anchor
+ * de cuenta y nunca pertenecen al pool reconciliable de un periodo per-cuenta.
+ *
+ * Tambien excluye filas superseded (`superseded_by_payment_id IS NULL` y
+ * `superseded_by_otb_id IS NULL`) para alinearse con la matchability policy
+ * (Slice 2). Aquellas que esten supersededas son `recorded` historico, no
+ * `reconciliable`.
  */
 export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
+  accountId,
   startDate,
   endDate,
   type = 'all',
   search,
   limit = 100
 }: {
+  accountId: string
   startDate: string
   endDate: string
   type?: ReconciliationCandidateType | 'all'
   search?: string
   limit?: number
 }) => {
+  if (!accountId || typeof accountId !== 'string' || accountId.trim() === '') {
+    throw new FinanceValidationError('TASK-708 Slice 3: accountId is required for reconciliation candidate resolution.', 400)
+  }
+
   await assertFinanceSlice2PostgresReady()
 
   const boundedLimit = Math.min(200, Math.max(1, limit))
@@ -999,7 +1039,12 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
         JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
         LEFT JOIN greenhouse_finance.accounts a ON a.account_id = sl.instrument_id
         WHERE sl.linked_payment_type = 'income_payment'
+          AND sl.instrument_id = $5
           AND sl.is_reconciled = FALSE
+          AND sl.superseded_at IS NULL
+          AND sl.superseded_by_otb_id IS NULL
+          AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_by_otb_id IS NULL
           AND sl.transaction_date BETWEEN $1::date AND $2::date
           AND (
             $3 = ''
@@ -1014,7 +1059,7 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
         ORDER BY sl.transaction_date DESC NULLS LAST, sl.amount DESC
         LIMIT $4
       `,
-      [startDate, endDate, searchPattern, candidateRowLimit]
+      [startDate, endDate, searchPattern, candidateRowLimit, accountId]
     )
 
     for (const row of incomeSettlementRows) {
@@ -1054,6 +1099,9 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
         FROM greenhouse_finance.income_payments ip
         JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
         WHERE ip.is_reconciled = FALSE
+          AND ip.payment_account_id = $3
+          AND ip.superseded_by_payment_id IS NULL
+          AND ip.superseded_by_otb_id IS NULL
           AND ip.amount > 0
           AND NOT EXISTS (
             SELECT 1
@@ -1072,7 +1120,7 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
         ORDER BY ip.payment_date DESC NULLS LAST, ip.amount DESC
         LIMIT $2
       `,
-      [searchPattern, candidateRowLimit]
+      [searchPattern, candidateRowLimit, accountId]
     )
 
     for (const row of paymentRows) {
@@ -1097,8 +1145,12 @@ export const listReconciliationCandidatesByDateRangeFromPostgres = async ({
       })
     }
 
-    // 3. Invoice-level fallback: income fully paid with no payments table entries
-    const invoiceFallbackRows = await queryRows<IncomeInvoiceFallbackRow>(
+    // 3. Invoice-level fallback: income fully paid with no payments table entries.
+    //    TASK-708 Slice 3 — skip when accountId is scoped: estos rows no tienen
+    //    anchor de cuenta, no pertenecen al pool reconciliable per-account.
+    const invoiceFallbackRows: IncomeInvoiceFallbackRow[] = accountId
+      ? []
+      : await queryRows<IncomeInvoiceFallbackRow>(
       `
         SELECT
           i.income_id, i.total_amount, i.amount_paid, i.currency,

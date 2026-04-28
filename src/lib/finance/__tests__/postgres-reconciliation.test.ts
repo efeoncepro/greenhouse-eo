@@ -409,27 +409,37 @@ describe('validateReconciledTransitionFromPostgres', () => {
     mockAssertFinanceSlice2PostgresReady.mockResolvedValue(undefined)
   })
 
-  it('returns totalRows, remainingRows, and statementImported from the query', async () => {
+  it('returns statementImported=true when totalRows>0 AND declared_count>0 (TASK-708 Slice 6)', async () => {
     mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
-      { total: '10', pending: '2' },
+      { total: '10', pending: '2', declared_count: '10' }
     ])
 
-    const result = await validateReconciledTransitionFromPostgres('period-1', true)
+    const result = await validateReconciledTransitionFromPostgres('period-1')
 
     expect(result.totalRows).toBe(10)
     expect(result.remainingRows).toBe(2)
     expect(result.statementImported).toBe(true)
   })
 
-  it('returns zero counts when no statement rows exist', async () => {
+  it('returns statementImported=false when no statement rows exist', async () => {
     mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
-      { total: '0', pending: '0' },
+      { total: '0', pending: '0', declared_count: '0' }
     ])
 
-    const result = await validateReconciledTransitionFromPostgres('period-empty', false)
+    const result = await validateReconciledTransitionFromPostgres('period-empty')
 
     expect(result.totalRows).toBe(0)
     expect(result.remainingRows).toBe(0)
+    expect(result.statementImported).toBe(false)
+  })
+
+  it('returns statementImported=false when declared_count is 0 even if rows exist (drift detection)', async () => {
+    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+      { total: '5', pending: '0', declared_count: '0' }
+    ])
+
+    const result = await validateReconciledTransitionFromPostgres('period-drift')
+
     expect(result.statementImported).toBe(false)
   })
 })
