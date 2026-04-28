@@ -1,5 +1,57 @@
 # changelog.md
 
+## 2026-04-28
+
+### 2026-04-28 — TASK-708 Slice 0 Model Hardening (in-progress)
+
+Defensa estructural canónica para separar Nubox-as-document-SoT de Greenhouse-as-cash-SoT. Las invariantes nacen en SQL (CHECKs, FKs, triggers, UNIQUE) y en tipos TypeScript (branded `AccountId`), no en `if`s repartidos.
+
+**Migrations aplicadas** (9, todas en `20260428123802881` … `20260428123818834`):
+
+- `external_cash_signals` — lane única generalizada con discriminator `source_system`. Reemplaza implícitamente la creación de `income_payments`/`expense_payments` desde sync Nubox. Idempotencia natural vía `UNIQUE (source_system, source_event_id)`. Hereda shape para Previred / file imports / HubSpot / Stripe sin migrar tabla viva.
+- `external_signal_auto_adopt_policies` — política `review`/`auto_adopt` por `(source_system, space_id)` con `UNIQUE` parcial (una sola activa). Default global cuando no hay row: `review` (conservador).
+- `account_signal_matching_rules` + `external_signal_resolution_attempts` — reglas declarativas como datos (no código) y audit log de cada evaluación con `evaluator_version` pinned.
+- `income.source_payment_status` + `expenses.source_payment_status` — columnas separadas para conservar señal Nubox sin contaminar cash canónico.
+- Trigger `trg_sync_income_amount_paid` (NUEVO, mirror de `trg_sync_expense_amount_paid`) — `payment_status` documental ya no es escribible por sync; se recomputa desde `SUM(payments NOT superseded)`. `fn_recompute_income_amount_paid` extendida para excluir también `superseded_by_otb_id`.
+- `trg_sync_expense_amount_paid` extendido para excluir `superseded_by_otb_id` (cierra hueco TASK-703b).
+- Trigger `trg_enforce_promoted_payment_invariant` D4 — invariante cruzada signal ↔ payment: `promoted_payment_id NOT NULL` ⇒ existe payment con `payment_account_id NOT NULL` y no superseded.
+- `CHECK settlement_legs_principal_requires_instrument` con `NOT VALID` — receipts/payouts no pueden tener `instrument_id IS NULL`. Phantoms históricos (4 legs) sobreviven; `VALIDATE` final corre tras TASK-708b.
+- `CHECK income/expense_payments_account_required_after_cutover` — cualquier row creada en/después de `2026-04-28 12:38:18.834+00` debe tener `payment_account_id NOT NULL` salvo que ya esté superseded.
+
+**Módulo nuevo** `src/lib/finance/external-cash-signals/`:
+
+- `recordSignal()` (D1) — idempotente vía ON CONFLICT DO NOTHING + lookup, retorna fila existente o nueva.
+- `evaluateSignalAccount()` (D5) — rule engine puro `(signal, rules) → outcome`. Una regla matcheante = `resolved`; ≥2 = `ambiguous` (priority NO desempata, ambigüedad = revisión humana); 0 = `no_match`. Predicate vacío rechazado por construcción (anti catch-all). Persiste attempt log con `evaluator_version='1.0.0'` para reproducibilidad.
+- `resolveAutoAdoptPolicy()` (D3) — resuelve modo vigente para `(sourceSystem, spaceId)`, default `review` cuando no hay row activa.
+
+**Tipo branded** `AccountId` en `src/lib/finance/types/account-id.ts`:
+
+- `parseAccountId(raw)` valida existencia en `greenhouse_finance.accounts`.
+- `parseAccountIdOptional` para flujos legítimamente opcionales.
+- `trustAccountId` para casos donde la FK ya garantiza existencia.
+- Cualquier intento de pasar `null` o `string` crudo a una API que reciba `AccountId` falla en `tsc` — fuerza al call site a resolver cuenta antes de llamar.
+
+**Capabilities nuevas** en `src/config/entitlements-catalog.ts`:
+
+- `finance.cash.adopt-external-signal` (`['create','update']`, scope `space`) — para promover una signal a payment canónico via UI `/finance/external-signals`.
+- `finance.cash.dismiss-external-signal` (`['update']`, scope `space`) — para descartar señales sin contraparte real de cash.
+
+**Verificación**:
+
+- 15 tests unitarios verdes (`record-signal`, `rule-evaluator`, `auto-adopt-policy`).
+- 437/437 finance suite verde post-cambios (sin regresión por triggers nuevos).
+- `pnpm lint` limpio, `npx tsc --noEmit` limpio, `pnpm build` OK.
+- Invariantes verificadas live contra DB (Postgres `efeonce-group:us-east4:greenhouse-pg-dev`): D1 `amount > 0` ✓, D1 `resolved_pair_check` ✓, D1 `UNIQUE (source_system, source_event_id)` ✓, D4 trigger captura `promoted_payment_id` apuntando a payment inexistente ✓, `CHECK income_payments_account_required_after_cutover` rechaza nuevo NULL ✓.
+
+**Próximas sesiones (Slices 1-6 pendientes)**:
+
+- Slice 1: refactor `sync-nubox-to-postgres.ts` para escribir solo `external_cash_signals`.
+- Slice 2: módulo central `reconciliation-matchability.ts`.
+- Slice 3: candidate resolver con `AccountId` branded posicional obligatorio.
+- Slice 4: settlement-orchestration con firma no-nullable.
+- Slice 5: vive en TASK-708b (remediación histórica de Cohorte A + B).
+- Slice 6: 6 métricas en `ledger-health.ts` + integración Reliability Control Plane + UI cola admin.
+
 ## 2026-04-27
 
 ### 2026-04-27 — TASK-702 Bank Reconciliation, Canonical Anchors & Account Balances Rematerialization (Slices 1-3 + 5 partial)

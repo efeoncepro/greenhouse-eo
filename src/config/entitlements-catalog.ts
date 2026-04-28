@@ -142,6 +142,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    key: 'finance.cash.adopt-external-signal',
+    module: 'finance',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'space'
+  },
+  {
+    key: 'finance.cash.dismiss-external-signal',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'space'
+  },
+  {
     key: 'admin.workspace',
     module: 'admin',
     actions: ['read', 'manage', 'launch'] as const,
