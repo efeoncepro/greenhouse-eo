@@ -1,5 +1,21 @@
 # Handoff.md
 
+## Sesion 2026-04-28 — TASK-708 followups (UI cola admin + seed reglas + RCP integration)
+
+- Rama: `task/TASK-708-followups`.
+- 4 followups entregados al cierre de TASK-708 antes de pasar a 708b:
+  1. **Coordinacion TASK-707 verificada**: `materialize-payments-from-period.ts` y `anchored-payments.ts` validan `paymentAccountId` no-nulo + `ensureAccount`. La invariante `payment_account_id NOT NULL` no rompe Previred ni payroll.
+  2. **Seed D5 reglas Nubox + politica D3** (migracion `20260428140232289`): regla seed `rule-nubox-clp-bank-transfer-santander` cubre el patron dominante (CLP + bank_transfer → santander-clp); politica `policy-nubox-global-review` arranca en modo conservador `review` para que cada adopcion requiera firma humana hasta que las reglas validen 50+ casos.
+  3. **Reliability Control Plane integration**: `buildFinanceDataQualitySubsystem` consume `getFinanceLedgerHealth().task708` y emite 6 metricas nuevas. 4 son `platform_integrity` (escalan a degraded si > 0); 2 son `info` (cohorte historica + backlog operativo). Test suite extendido con 3 escenarios (clean / runtime invariant violado / mocks via `getFinanceLedgerHealth`).
+  4. **UI cola admin `/finance/external-signals`** entregada con stack canonico Greenhouse:
+     - Page server `src/app/(dashboard)/finance/external-signals/page.tsx` con guard route group + carga inicial.
+     - View client `src/views/greenhouse/finance/ExternalSignalsView.tsx` con KPIs (4 cards `HorizontalWithSubtitle` con `AnimatedCounter` + tooltips), filtros (estado, origen, busqueda debounced), tabla TanStack-style con chips de estado (icono+texto+color), dialogs Adoptar y Descartar con react-hook-form-style controlled inputs.
+     - 3 API routes admin: `GET /api/admin/finance/external-signals` (lista + counts), `POST /[id]/adopt` (capability `finance.cash.adopt-external-signal`), `POST /[id]/dismiss` (capability `finance.cash.dismiss-external-signal`), `GET /accounts` (cuentas filtradas por currency para el modal).
+     - Helpers backend nuevos en `src/lib/finance/external-cash-signals/`: `listSignals`, `adoptSignalManually` (transaccional, valida via `parseAccountId`, crea payment canonico via `recordPayment`/`recordExpensePayment`, UPDATE signal a `adopted` con `promoted_payment_id` apuntando al payment recien creado), `dismissSignal` (razon obligatoria 8+ chars).
+     - Microinteractions: `LinearProgress` durante refresh, `Skeleton` durante primer load, `EmptyState` para "Cola al dia" / "Sin coincidencias", toast `sonner` post-mutation, `role="status"` en KPI container, `aria-label` en icon buttons, `aria-labelledby` en dialogs, focus trap MUI por defecto.
+- Verificacion: `pnpm lint` limpio, `pnpm tsc --noEmit` limpio, `pnpm test` **2438/2438 verde** (5 skipped pre-existentes), `pnpm build` OK.
+- Pendiente para cerrar TASK-708 definitivamente: solo TASK-708b (remediacion historica) — ya documentada como task hermana con runbook propio. Bloqueada hasta cartola Santander marzo 2026 escaneada para caso de $6.9M.
+
 ## Sesion 2026-04-28 — TASK-708 Slices 1-6 Cutover + observabilidad (in-progress)
 
 - Rama: `task/TASK-708-slices-1-6` (mergeada a `develop`).

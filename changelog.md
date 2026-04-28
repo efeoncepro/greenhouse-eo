@@ -2,6 +2,53 @@
 
 ## 2026-04-28
 
+### 2026-04-28 — TASK-708 followups: UI cola admin + seed reglas Nubox + RCP integration
+
+Cierre del trabajo de TASK-708 antes de pasar a TASK-708b. Cuatro followups que dejan la plataforma operativa para la remediación histórica.
+
+**1. Coordinación TASK-707 verificada** — confirmado que `materialize-payments-from-period.ts:155-162` valida existence de cuenta + `anchored-payments.ts:35,152` tipa `paymentAccountId: string` (no-nullable) + `ensureAccount` valida en cada path. El CHECK `payment_account_id NOT NULL after_cutover` no rompe Previred ni payroll.
+
+**2. Seed reglas D5 + política D3 conservadora** (migración `20260428140232289`):
+
+- `account_signal_matching_rules`: regla `rule-nubox-clp-bank-transfer-santander` con predicate `{currency_eq: 'CLP', payment_method_in: ['bank_transfer']}` → `santander-clp`. Cubre el patrón dominante de Cohorte A (100% de los 23 phantoms).
+- `external_signal_auto_adopt_policies`: política `policy-nubox-global-review` (source_system='nubox', space_id=NULL, mode='review'). Cada adopción requiere firma humana; promover a `auto_adopt` solo cuando 50+ adopciones manuales hayan validado las reglas sin falsos positivos.
+
+**3. Reliability Control Plane integration** (`src/lib/operations/get-operations-overview.ts`):
+
+- `buildFinanceDataQualitySubsystem` consume `getFinanceLedgerHealth().task708` y emite 6 métricas TASK-708 al subsystem `Finance Data Quality`.
+- 4 platform integrity (escalan a degraded si > 0): `task708_payments_pending_account_runtime`, `task708_settlement_legs_principal_without_instrument`, `task708_reconciled_against_unscoped`, `task708_external_signals_promoted_invariant` (canary D4).
+- 2 informational (no escalan): `task708_payments_pending_account_historical` (Cohorte A+B, baja con TASK-708b), `task708_external_signals_unresolved_overdue` (backlog operativo).
+- Tests con mock de `getFinanceLedgerHealth`: 3 escenarios (clean / degraded por warning legacy / runtime invariant violada).
+
+**4. UI cola admin `/finance/external-signals`** — stack canónico Greenhouse:
+
+Backend:
+
+- 3 API routes admin: `GET /api/admin/finance/external-signals` (lista + counts agregados), `POST /[id]/adopt` (capability `finance.cash.adopt-external-signal`, transaccional), `POST /[id]/dismiss` (capability `finance.cash.dismiss-external-signal`, razón obligatoria 8+ chars), `GET /accounts` (cuentas activas filtradas por currency).
+- Helpers nuevos `src/lib/finance/external-cash-signals/`: `listSignals` (filtros + counts + LATERAL JOIN con último resolution attempt), `adoptSignalManually` (lock signal con FOR UPDATE → valida `parseAccountId` → crea payment canónico via `recordPayment`/`recordExpensePayment` → UPDATE signal a `adopted` con `promoted_payment_id` apuntando al payment recién creado, todo en una transacción), `dismissSignal` (razón persistida en `superseded_reason`, audit preservado).
+- Trigger D4 (`fn_enforce_promoted_payment_invariant`) valida automáticamente la consistencia signal ↔ payment.
+
+Frontend:
+
+- Page server `src/app/(dashboard)/finance/external-signals/page.tsx` con guard route group + carga inicial.
+- View client `src/views/greenhouse/finance/ExternalSignalsView.tsx`:
+  - 4 KPI cards `HorizontalWithSubtitle` con `AnimatedCounter` (Sin resolver, En revisión, Adoptadas hoy, Invariante D4 canary)
+  - Filtros: Estado / Origen / Búsqueda debounced (400ms)
+  - Tabla con chips de estado (icono + texto + color, nunca solo color)
+  - Dialogs Adoptar/Descartar con `aria-labelledby`, focus trap, validation inline
+  - Microinteractions: `LinearProgress` durante refresh, `Skeleton` first-load, `EmptyState` para cola vacía o sin coincidencias, toast `sonner` post-mutation, `role="status"` en KPIs
+
+Capabilities nuevas: `finance.cash.adopt-external-signal` y `finance.cash.dismiss-external-signal` (scope `space`).
+
+**Verificación**:
+
+- `pnpm lint` limpio
+- `npx tsc --noEmit` limpio
+- `pnpm test` **2438/2438 verde** (5 skipped pre-existentes)
+- `pnpm build` OK
+
+**Lo que queda**: solo TASK-708b (remediación histórica) que es task hermana con runbook propio, bloqueada hasta cartola Santander marzo 2026 escaneada.
+
 ### 2026-04-28 — TASK-708 Slices 1-6 Cutover + observabilidad (in-progress)
 
 Cierre del cutover canónico Nubox-as-document-SoT vs Greenhouse-as-cash-SoT. Las invariantes estructurales del Slice 0 ahora están enforcadas por el código de aplicación. Solo queda TASK-708b (remediación histórica) como task hermana.

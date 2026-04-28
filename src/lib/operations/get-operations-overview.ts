@@ -11,6 +11,7 @@ import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { countIncomesWithSettlementDrift } from '@/lib/finance/income-settlement'
+import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
 import { readReactiveBacklogOverview, type ReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
 import { getLastReactiveRun } from '@/lib/sync/reactive-run-tracker'
 import {
@@ -220,6 +221,18 @@ const describeFinanceMetric = (metric: OperationsSubsystemMetric) => {
       return pluralize(metric.value, 'costo directo sin cliente', 'costos directos sin cliente')
     case 'overdue_receivables':
       return pluralize(metric.value, 'cuenta por cobrar vencida', 'cuentas por cobrar vencidas')
+    case 'task708_payments_pending_account_runtime':
+      return pluralize(metric.value, 'pago sin cuenta (post-cutover)', 'pagos sin cuenta (post-cutover)')
+    case 'task708_settlement_legs_principal_without_instrument':
+      return pluralize(metric.value, 'leg principal sin instrumento', 'legs principales sin instrumento')
+    case 'task708_reconciled_against_unscoped':
+      return pluralize(metric.value, 'reconciliacion cross-account', 'reconciliaciones cross-account')
+    case 'task708_external_signals_promoted_invariant':
+      return pluralize(metric.value, 'senal promovida invalida', 'senales promovidas invalidas')
+    case 'task708_external_signals_unresolved_overdue':
+      return pluralize(metric.value, 'senal externa sin resolver', 'senales externas sin resolver')
+    case 'task708_payments_pending_account_historical':
+      return pluralize(metric.value, 'phantom historico', 'phantoms historicos')
     default:
       return `${metric.value} ${metric.label}`
   }
@@ -269,7 +282,17 @@ const buildFinanceDataQualitySummary = (metrics: OperationsSubsystemMetric[]) =>
 const PLATFORM_INTEGRITY_METRIC_KEYS = new Set<string>([
   'payment_ledger_integrity',
   'direct_cost_without_client',
-  'labor_allocation_saturation_drift'
+  'labor_allocation_saturation_drift',
+  // TASK-708 Slice 6 — runtime invariants. Cualquier valor > 0 escala a
+  // degraded porque el modelo SQL ya impide rows nuevos en estos estados;
+  // contar > 0 indica un bypass del CHECK/trigger o drift activo.
+  'task708_payments_pending_account_runtime',
+  'task708_settlement_legs_principal_without_instrument',
+  'task708_reconciled_against_unscoped',
+  'task708_external_signals_promoted_invariant'
+  // task708_payments_pending_account_historical y task708_external_signals_unresolved_overdue
+  // NO son platform integrity — son cohorte historica (TASK-708b cleanup) y
+  // backlog operativo respectivamente. Surface como info, no escala.
 ])
 
 const isPlatformIntegrityMetric = (key: string): boolean =>
@@ -291,7 +314,7 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
       }
     }
 
-    const [divergentPayments, overdueCount, allocationRows, saturationDriftRows] = await Promise.all([
+    const [divergentPayments, overdueCount, allocationRows, saturationDriftRows, ledgerHealthRows] = await Promise.all([
       // Ledger integrity goes through the canonical reconciliation helper.
       // DO NOT inline a `SUM(income_payments)` query here — that ignores
       // factoring fees and withholdings and produces false drift.
@@ -320,12 +343,24 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
       // partitionados por date range).
       runGreenhousePostgresQuery<{ cnt: string }>(
         `SELECT COUNT(*)::text AS cnt FROM greenhouse_serving.labor_allocation_saturation_drift`
-      ).catch(() => [{ cnt: '0' }])
+      ).catch(() => [{ cnt: '0' }]),
+      // TASK-708 Slice 6 — leemos las 6 metricas TASK-708 desde el helper
+      // canonico ledger-health (single source of truth, no re-deriving aqui).
+      // Cualquier fallo se degrada a counts=0 (no escala falso positivo).
+      getFinanceLedgerHealth().then(snap => snap.task708).catch(() => ({
+        paymentsPendingAccountResolutionRuntime: 0,
+        paymentsPendingAccountResolutionHistorical: 0,
+        settlementLegsPrincipalWithoutInstrument: 0,
+        reconciledRowsAgainstUnscopedTarget: 0,
+        externalCashSignalsUnresolvedOverThreshold: 0,
+        externalCashSignalsPromotedInvariantViolation: 0
+      }))
     ])
 
     const directCostWithoutClient = Number(allocationRows[0]?.direct_without_client ?? 0)
     const sharedOverheadUnallocated = Number(allocationRows[0]?.shared_unallocated ?? 0)
     const laborSaturationDrift = Number(saturationDriftRows[0]?.cnt ?? 0)
+    const t708 = ledgerHealthRows
 
     const metrics: OperationsSubsystemMetric[] = [
       {
@@ -366,6 +401,50 @@ export const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubs
         label: 'Drift de capacidad laboral (FTE > 100%)',
         value: laborSaturationDrift,
         status: laborSaturationDrift === 0 ? 'ok' : 'warning'
+      },
+      // ─── TASK-708 Slice 6 — 6 metricas canonicas ─────────────────────────
+      // Las 4 platform integrity metrics escalan a degraded si > 0; las 2
+      // operational (historical + unresolved overdue) surface info-only.
+      {
+        key: 'task708_payments_pending_account_runtime',
+        label: 'Pagos sin cuenta (post-cutover)',
+        value: t708.paymentsPendingAccountResolutionRuntime,
+        status: t708.paymentsPendingAccountResolutionRuntime === 0 ? 'ok' : 'error'
+      },
+      {
+        key: 'task708_settlement_legs_principal_without_instrument',
+        label: 'Settlement legs principales sin instrumento',
+        value: t708.settlementLegsPrincipalWithoutInstrument,
+        status: t708.settlementLegsPrincipalWithoutInstrument === 0 ? 'ok' : 'warning'
+      },
+      {
+        key: 'task708_reconciled_against_unscoped',
+        label: 'Reconciliaciones cross-account',
+        value: t708.reconciledRowsAgainstUnscopedTarget,
+        status: t708.reconciledRowsAgainstUnscopedTarget === 0 ? 'ok' : 'error'
+      },
+      {
+        key: 'task708_external_signals_promoted_invariant',
+        label: 'Señales promovidas inválidas (canary D4)',
+        value: t708.externalCashSignalsPromotedInvariantViolation,
+        status: t708.externalCashSignalsPromotedInvariantViolation === 0 ? 'ok' : 'error'
+      },
+      {
+        // TASK-708b queue size — surface info, no escala. Solo TASK-708b
+        // cleanup baja este número; existir > 0 hoy es esperado.
+        key: 'task708_payments_pending_account_historical',
+        label: 'Phantoms históricos pendientes (TASK-708b)',
+        value: t708.paymentsPendingAccountResolutionHistorical,
+        status: 'info'
+      },
+      {
+        // Backlog operativo — cola admin /finance/external-signals que
+        // requiere accion humana. Surface info; el escalado es por
+        // notificacion (futuro), no por dashboard.
+        key: 'task708_external_signals_unresolved_overdue',
+        label: `Señales externas sin resolver (>14d)`,
+        value: t708.externalCashSignalsUnresolvedOverThreshold,
+        status: 'info'
       }
     ]
 
