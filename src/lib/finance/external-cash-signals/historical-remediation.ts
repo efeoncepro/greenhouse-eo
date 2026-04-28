@@ -313,7 +313,7 @@ export const applyHistoricalRemediation = async (
         // (el row es pre-cutover por created_at < TASK_708_CUTOVER_TS).
         await client.query(
           `UPDATE greenhouse_finance.${phantomTable}
-           SET payment_account_id = $1${proposal.documentKind === 'expense' ? ', updated_at = NOW()' : ''}
+           SET payment_account_id = $1
            WHERE payment_id = $2`,
           [accountId, proposal.paymentId]
         )

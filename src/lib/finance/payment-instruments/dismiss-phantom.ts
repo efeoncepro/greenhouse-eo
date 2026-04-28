@@ -151,8 +151,7 @@ export const dismissExpensePhantom = async (
     await client.query(
       `UPDATE greenhouse_finance.expense_payments SET
          superseded_at = NOW(),
-         superseded_reason = $1,
-         updated_at = NOW()
+         superseded_reason = $1
        WHERE payment_id = $2`,
       [reason, input.phantomPaymentId]
     )

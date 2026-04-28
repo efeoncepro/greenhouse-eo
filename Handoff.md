@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesion 2026-04-28 — TASK-708b ejecucion apply COMPLETADA (cerrada)
+
+- Rama: `task/TASK-708b-apply-execution`.
+- Apply runbook ejecutado contra Postgres dev (`efeonce-group:us-east4:greenhouse-pg-dev`). Acceptance Criteria queries == 0 confirmadas. CHECK constraint `settlement_legs_principal_requires_instrument` VALIDATED + enforced.
+- Resultado por cohorte:
+  - **Cohorte A (income)**: 21 rows → `repaired_with_account` (D5 rule resolves to `santander-clp` con confianza alta). UPDATE in-place: `payment_account_id` poblado en phantoms + `instrument_id` poblado en settlement_legs asociadas. Signals adopted con `resolved_by_user_id=jreyes@efeoncepro.com`. 2 phantoms historicos restantes ya estaban superseded por chain previa (`pay-fact-FO-XCAPITAL-202603` factoring + otro replacement); sus settlement_legs cascade-supersedeed.
+  - **Cohorte B (expense)**: 65 rows → `dismissed_no_cash`. `superseded_at + superseded_reason` poblados. Signals dismissed con audit. Eventos outbox `finance.expense.payment_dismissed_historical` emitidos.
+  - **Cohorte C (settlement legs)**: 4 phantom legs resueltas — 3 receipt repaired in-place via Cohorte A apply, 1 funding leg auxiliar (sin invariante violada porque CHECK exime legs auxiliares). 2 cascade-supersede adicionales para legs cuyos linked payments ya estaban superseded (descubierto post-apply, resuelto via migracion 3).
+- Patron canonico extendido durante el apply:
+  - **Convencion superseded_at en CHECK**: el CHECK `settlement_legs_principal_requires_instrument` se relajo para excluir filas con `superseded_at IS NOT NULL` o `superseded_by_otb_id IS NOT NULL`. Coherente con la regla "supersede chains (payment, OTB, dismissal manual) quedan fuera de invariantes activas — son historico audit-only".
+  - **Migracion VALIDATE idempotente self-checking** (Camino E): la migracion VALIDATE puede correr en cualquier orden. Si quedan violations residuales, hace `RAISE NOTICE + RETURN` (skip silencioso); si la base esta limpia, ejecuta `ALTER TABLE VALIDATE CONSTRAINT`. Patron reusable para futuras cohortes (Previred / file imports / HubSpot / Stripe).
+  - **Cascade supersede atomico en migracion**: una sola migracion (`20260428151421785`) hace DROP + CREATE CHECK extendido + UPDATE cascade supersede + VALIDATE en transaccion. Si VALIDATE falla, todo el cleanup hace rollback. Mas robusto que correr scripts separados.
+- 3 migraciones aplicadas en orden:
+  - `20260428143356496_task-708b-extend-amount-paid-triggers-include-superseded-at` — triggers `fn_sync_expense_amount_paid` y `fn_recompute_income_amount_paid` extendidos para excluir filas con `superseded_at IS NOT NULL`.
+  - `20260428150455638_task-708b-validate-settlement-legs-principal-requires-instrument` — primer intento VALIDATE idempotente; hizo skip silencioso porque aun habia residuales.
+  - `20260428151421785_task-708b-cascade-supersede-legs-and-relax-check-for-superseded` — atomic cleanup: relax CHECK + cascade supersede + VALIDATE final exitoso.
+- 2 bugs corregidos durante apply (fixes mergeados):
+  - `dismissExpensePhantom` y `historical-remediation.ts` referenciaban columna `updated_at` inexistente en `expense_payments` (la tabla solo tiene `created_at` y `recorded_at`). Removido el clause.
+  - SQL en `cohort-backfill.ts` tenía referencias ambiguas a `payment_account_id` (columna existe en JOIN entre `income_payments` y otras tablas con misma columna). Prefijado con alias `ip.` / `ep.`.
+- 2 queries de `ledger-health.ts` actualizadas para alinear con la nueva convencion `superseded_at`:
+  - `TASK708_PAYMENTS_PENDING_ACCOUNT_RUNTIME_SQL` y `TASK708_PAYMENTS_PENDING_ACCOUNT_HISTORICAL_SQL` ahora incluyen `AND superseded_at IS NULL` (alineado con triggers y CHECK).
+  - `TASK708_RECONCILED_AGAINST_UNSCOPED_SQL` ahora excluye filas superseded.
+- Verificacion final (Postgres dev 2026-04-28 11:17):
+  - `Acceptance #1 Cohorte A residual = 0` ✓
+  - `Acceptance #2 Cohorte B residual = 0` ✓
+  - `Acceptance #3 Cohorte C residual = 0` ✓
+  - `CHECK settlement_legs_principal_requires_instrument convalidated = true` ✓
+  - `external_cash_signals: 21 adopted + 65 dismissed = 86 terminal states` ✓
+  - `paymentsPendingAccountResolutionRuntime = 0` ✓
+  - `settlementLegsPrincipalWithoutInstrument = 0` ✓
+  - `reconciledRowsAgainstUnscopedTarget = 0` ✓
+  - `externalCashSignalsPromotedInvariantViolation = 0` ✓ (canary D4)
+- Deuda residual fuera de scope TASK-708b:
+  - `paymentsPendingAccountResolutionHistorical = 1` — un income_payment legacy con `payment_source='client_direct'` (NO Nubox), creado 2026-03-15, $752,000 CLP, sin cuenta. NO es Cohorte A/B (la spec solo cubre payment_source='nubox_bank_sync' y prefix 'exp-pay-backfill-EXP-NB-%'). Este caso queda como follow-up separado (task nueva o resolución manual via UI cola admin).
+- Tests: 30/30 verde en `external-cash-signals/__tests__/`. Lint limpio. tsc --noEmit limpio.
+
 ## Sesion 2026-04-28 — TASK-708b helpers + scripts + runbook entregados (in-progress)
 
 - Rama: `task/TASK-708b-nubox-phantom-cohort-remediation`.

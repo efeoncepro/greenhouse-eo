@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto` (deuda histórica con plata real adentro; bloquea `CHECK VALIDATE` final de TASK-708)
 - Effort: `Medio-Alto`
 - Type: `remediation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Helpers + scripts + runbook entregados 2026-04-28; pendiente de ejecución apply en Postgres dev/prod`
+- Status real: `Cerrada 2026-04-28 — apply runbook ejecutado contra Postgres dev: 21 income repaired_with_account, 65 expense dismissed_no_cash, 2 cascade-supersede de legs cuyos linked payments ya estaban superseded, CHECK constraint VALIDATED enforced.`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `TASK-708` (necesita las invariantes activas para no reintroducir contaminación durante la remediación)

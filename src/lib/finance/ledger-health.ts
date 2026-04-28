@@ -127,6 +127,7 @@ const TASK708_PAYMENTS_PENDING_ACCOUNT_RUNTIME_SQL = `
       WHERE payment_account_id IS NULL
         AND superseded_by_payment_id IS NULL
         AND superseded_by_otb_id IS NULL
+        AND superseded_at IS NULL
         AND created_at >= TIMESTAMPTZ '${TASK_708_CUTOVER_TS}'
     )
     +
@@ -135,6 +136,7 @@ const TASK708_PAYMENTS_PENDING_ACCOUNT_RUNTIME_SQL = `
       WHERE payment_account_id IS NULL
         AND superseded_by_payment_id IS NULL
         AND superseded_by_otb_id IS NULL
+        AND superseded_at IS NULL
         AND created_at >= TIMESTAMPTZ '${TASK_708_CUTOVER_TS}'
     ) AS total
 `
@@ -146,6 +148,7 @@ const TASK708_PAYMENTS_PENDING_ACCOUNT_HISTORICAL_SQL = `
       WHERE payment_account_id IS NULL
         AND superseded_by_payment_id IS NULL
         AND superseded_by_otb_id IS NULL
+        AND superseded_at IS NULL
         AND created_at < TIMESTAMPTZ '${TASK_708_CUTOVER_TS}'
     )
     +
@@ -154,6 +157,7 @@ const TASK708_PAYMENTS_PENDING_ACCOUNT_HISTORICAL_SQL = `
       WHERE payment_account_id IS NULL
         AND superseded_by_payment_id IS NULL
         AND superseded_by_otb_id IS NULL
+        AND superseded_at IS NULL
         AND created_at < TIMESTAMPTZ '${TASK_708_CUTOVER_TS}'
     ) AS total
 `
@@ -175,6 +179,8 @@ const TASK708_RECONCILED_AGAINST_UNSCOPED_SQL = `
       JOIN greenhouse_finance.settlement_legs sl
         ON sl.settlement_leg_id = bsr.matched_settlement_leg_id
       WHERE sl.instrument_id IS NULL
+        AND sl.superseded_at IS NULL
+        AND sl.superseded_by_otb_id IS NULL
     )
     +
     (
