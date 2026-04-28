@@ -781,7 +781,10 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-703` | `complete` | Canonical Opening Trial Balance + Liability Accounts (TC, CCA, future loans) | `docs/tasks/complete/TASK-703-canonical-opening-trial-balance-and-liability-accounting.md` |
 | `TASK-705` | `complete` | Banco Read Model & Snapshot Cutover | `docs/tasks/complete/TASK-705-banco-read-model-snapshot-cutover.md` |
 | `TASK-706` | `to-do` | Previred Processor UX & Bank Semantics | `docs/tasks/to-do/TASK-706-previred-processor-ux-and-bank-semantics.md` |
-| `TASK-707` | `to-do` | Previred Canonical Payment Runtime & Backfill | `docs/tasks/to-do/TASK-707-previred-canonical-payment-runtime-and-backfill.md` |
+| `TASK-707` | `to-do` (umbrella) | Previred Canonical Payment Runtime & Backfill — split en 707a/b/c (2026-04-28) | `docs/tasks/to-do/TASK-707-previred-canonical-payment-runtime-and-backfill.md` |
+| `TASK-707a` | `to-do` | Previred Detection & Canonical State Runtime (no backfill) | `docs/tasks/to-do/TASK-707a-previred-detection-and-canonical-state-runtime.md` |
+| `TASK-707b` | `to-do` | Previred Historical Backfill & Downstream Rematerialize (bloqueada por 707a) | `docs/tasks/to-do/TASK-707b-previred-historical-backfill-and-rematerialize.md` |
+| `TASK-707c` | `to-do` | Previred Componentization Runtime (bloqueada por 707a + 707b) | `docs/tasks/to-do/TASK-707c-previred-componentization-runtime.md` |
 | `TASK-708` | `complete` | Nubox Documents-Only SoT + Reconciliation Purity Cutover | `docs/tasks/complete/TASK-708-nubox-documents-only-and-reconciliation-sot-cutover.md` |
 | `TASK-708b` | `complete` | Nubox Phantom Cohort Remediation (historical cleanup) | `docs/tasks/complete/TASK-708b-nubox-phantom-cohort-remediation.md` |
 | `TASK-708c` | `to-do` | Promote `payment_account_id` CHECK to `NOT NULL` puro (post 30 dias) | `docs/tasks/to-do/TASK-708c-promote-payment-account-id-not-null.md` |
