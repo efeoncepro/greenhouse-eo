@@ -2,12 +2,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Implementacion`
+- Status real: `Cerrada 2026-04-28`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`

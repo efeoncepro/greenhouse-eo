@@ -801,4 +801,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-717` | `to-do` | Reclasificación payroll declarativa via intents table (deriva TASK-714d Slice 3) | `docs/tasks/to-do/TASK-717-payroll-reclassification-intents.md` |
 | `TASK-718` | `to-do` | TC backfill: análisis automatizado debt-reduction model + apply (deriva TASK-714d Slice 4) | `docs/tasks/to-do/TASK-718-tc-debt-reduction-model-decision.md` |
 | `TASK-719` | `to-do` | OTB Global66 verificación contra cartola + detector de evidence_refs (deriva TASK-714d Slice 5) | `docs/tasks/to-do/TASK-719-otb-global66-verification-and-evidence-detector.md` |
-| `TASK-720` | `in-progress` | Instrument Category KPI Rules + policy-driven Bank aggregation | `docs/tasks/in-progress/TASK-720-instrument-category-kpi-rules.md` |
+| `TASK-720` | `complete` | Instrument Category KPI Rules + policy-driven Bank aggregation | `docs/tasks/complete/TASK-720-instrument-category-kpi-rules.md` |
