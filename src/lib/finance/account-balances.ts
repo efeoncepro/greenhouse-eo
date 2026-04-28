@@ -282,6 +282,15 @@ export type TreasuryUnassignedPayment = {
 export type TreasuryBankAccountDetail = {
   account: TreasuryBankAccountOverview
   currentBalance: AccountBalanceRecord
+  /** TASK-703b: active OTB if declared. null si nunca se declaró opening trial balance. */
+  activeOtb: {
+    obtbId: string
+    genesisDate: string
+    openingBalance: number
+    auditStatus: 'estimated' | 'reconciled' | 'audited'
+    declarationReason: string
+    supersededTransactionsCount: number
+  } | null
   history: Array<{
     month: string
     closingBalance: number
@@ -561,7 +570,6 @@ const getDailyMovementSummary = async (
         WHERE ip.payment_account_id = $1
           AND ip.payment_date = $2::date
           AND ip.superseded_by_payment_id IS NULL
-          AND ip.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
@@ -580,7 +588,6 @@ const getDailyMovementSummary = async (
         WHERE ep.payment_account_id = $1
           AND ep.payment_date = $2::date
           AND ep.superseded_by_payment_id IS NULL
-          AND ep.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
@@ -632,7 +639,6 @@ const getDailyFxGainLoss = async (
           AND ip.payment_date = $2::date
           AND ip.fx_gain_loss_clp IS NOT NULL
           AND ip.superseded_by_payment_id IS NULL
-          AND ip.superseded_by_otb_id IS NULL
         UNION ALL
         SELECT ep.fx_gain_loss_clp
         FROM greenhouse_finance.expense_payments ep
@@ -640,7 +646,6 @@ const getDailyFxGainLoss = async (
           AND ep.payment_date = $2::date
           AND ep.fx_gain_loss_clp IS NOT NULL
           AND ep.superseded_by_payment_id IS NULL
-          AND ep.superseded_by_otb_id IS NULL
       ) fx
     `,
     [accountId, balanceDate],
@@ -669,14 +674,12 @@ const getEarliestMovementDate = async (
         WHERE ip.payment_account_id = $1
           AND ip.payment_date IS NOT NULL
           AND ip.superseded_by_payment_id IS NULL
-          AND ip.superseded_by_otb_id IS NULL
         UNION ALL
         SELECT ep.payment_date AS movement_date
         FROM greenhouse_finance.expense_payments ep
         WHERE ep.payment_account_id = $1
           AND ep.payment_date IS NOT NULL
           AND ep.superseded_by_payment_id IS NULL
-          AND ep.superseded_by_otb_id IS NULL
       ) movement_dates
     `,
     [accountId],
@@ -1537,7 +1540,6 @@ export const getBankAccountDetail = async ({
         WHERE ip.payment_account_id = $1
           AND ip.payment_date BETWEEN $2::date AND $3::date
           AND ip.superseded_by_payment_id IS NULL
-          AND ip.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
@@ -1569,7 +1571,6 @@ export const getBankAccountDetail = async ({
         WHERE ep.payment_account_id = $1
           AND ep.payment_date BETWEEN $2::date AND $3::date
           AND ep.superseded_by_payment_id IS NULL
-          AND ep.superseded_by_otb_id IS NULL
           AND NOT EXISTS (
             SELECT 1
             FROM greenhouse_finance.settlement_legs sl
@@ -1594,9 +1595,36 @@ export const getBankAccountDetail = async ({
     client
   )
 
+  // TASK-703b: load active OTB so the UI can render context cuando movements
+  // está vacío porque todo quedó pre-anchor.
+  const otb = await getActiveOpeningTrialBalance(accountId)
+  let activeOtb: TreasuryBankAccountDetail['activeOtb'] = null
+
+  if (otb) {
+    const supersededCount = await queryRows<{ cnt: string }>(
+      `SELECT (
+         (SELECT COUNT(*) FROM greenhouse_finance.settlement_legs WHERE instrument_id = $1 AND superseded_by_otb_id = $2) +
+         (SELECT COUNT(*) FROM greenhouse_finance.income_payments WHERE payment_account_id = $1 AND superseded_by_otb_id = $2) +
+         (SELECT COUNT(*) FROM greenhouse_finance.expense_payments WHERE payment_account_id = $1 AND superseded_by_otb_id = $2)
+       )::text AS cnt`,
+      [accountId, otb.obtbId],
+      client
+    )
+
+    activeOtb = {
+      obtbId: otb.obtbId,
+      genesisDate: otb.genesisDate,
+      openingBalance: otb.openingBalance,
+      auditStatus: otb.auditStatus,
+      declarationReason: otb.declarationReason,
+      supersededTransactionsCount: Math.round(toNumber(supersededCount[0]?.cnt))
+    }
+  }
+
   return {
     account,
     currentBalance: mapAccountBalanceRow(currentBalance),
+    activeOtb,
     history: historyRows.map(row => ({
       month: toDateString(row.balance_month) || '',
       closingBalance: roundCurrency(toNumber(row.closing_balance)),

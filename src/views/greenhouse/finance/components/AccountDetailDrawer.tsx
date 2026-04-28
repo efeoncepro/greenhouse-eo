@@ -84,9 +84,19 @@ type Movement = {
   isReconciled: boolean
 }
 
+type ActiveOtb = {
+  obtbId: string
+  genesisDate: string
+  openingBalance: number
+  auditStatus: 'estimated' | 'reconciled' | 'audited'
+  declarationReason: string
+  supersededTransactionsCount: number
+}
+
 type DetailResponse = {
   account: AccountOverview
   currentBalance: AccountBalance
+  activeOtb: ActiveOtb | null
   history: HistoryPoint[]
   movements: Movement[]
 }
@@ -352,9 +362,20 @@ const AccountDetailDrawer = ({ open, accountId, year, month, onClose, onSuccess 
               />
               <CardContent sx={{ pt: 0 }}>
                 {detail.movements.length === 0 ? (
-                  <Alert severity='info'>
-                    Esta cuenta no tiene movimientos en el período consultado.
-                  </Alert>
+                  detail.activeOtb && detail.activeOtb.supersededTransactionsCount > 0 ? (
+                    <Alert severity='info'>
+                      <Typography variant='body2' sx={{ fontWeight: 600, mb: 0.5 }}>
+                        Cuenta anclada al {formatDate(detail.activeOtb.genesisDate)} con saldo {formatAmount(detail.activeOtb.openingBalance, detail.account.currency)} ({detail.activeOtb.auditStatus})
+                      </Typography>
+                      <Typography variant='caption' display='block'>
+                        {detail.activeOtb.supersededTransactionsCount} movimientos previos al ancla quedan en audit (encapsulados en el saldo opening). En el período consultado no hay movimientos posteriores al ancla todavía.
+                      </Typography>
+                    </Alert>
+                  ) : (
+                    <Alert severity='info'>
+                      Esta cuenta no tiene movimientos en el período consultado.
+                    </Alert>
+                  )
                 ) : (
                   <TableContainer>
                     <Table size='small'>
